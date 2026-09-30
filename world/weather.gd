@@ -193,23 +193,34 @@ func _draw() -> void:
 				canvas.draw_rect(Rect2(_snap(ctr + Vector2(cos(ang) * r, sin(ang) * r * 0.5)), Vector2(WPX, WPX)), c)
 
 func _draw_add() -> void:
-	# the shafts: long leaning bands of warm light, dithered in steps, breathing slowly
+	# the shafts: long leaning bands of warm light, dithered in steps. They are never still: the canopy they come
+	# through moves, so each ray swings a little about its top, widens and narrows, and brightens and dims as
+	# leaves cross it, faster in a gust; now and then a leaf's shadow slides down its length.
 	if shafts.is_empty():
 		return
 	var vs := get_viewport().get_visible_rect().size
 	var dk := Game.day_k()
-	var lean := 0.55
+	var wind := Game.wind
 	for s in shafts:
+		var ph: float = s["ph"]
 		var life_k: float = sin(PI * clampf(s["t"] / s["life"], 0.0, 1.0))
-		var br: float = 0.075 * dk * life_k * (0.75 + 0.25 * sin(t * 0.7 + s["ph"]))
+		# the canopy: a slow breath and a quicker shiver that grows with the wind
+		var shimmer := 0.72 + 0.18 * sin(t * 0.45 + ph) + (0.06 + 0.12 * wind) * sin(t * (1.7 + wind) + ph * 3.0) * sin(t * 0.61 + ph)
+		var br: float = 0.075 * dk * life_k * shimmer
 		if br <= 0.002:
 			continue
-		var w: float = s["w"]
+		# the swing: the ray pivots on its top, a few degrees, slowly; the gust leans it a touch more
+		var lean := 0.55 + 0.05 * sin(t * 0.12 + ph) + 0.03 * sin(t * 0.29 + ph * 2.0) + 0.04 * wind
+		var w: float = s["w"] * (1.0 + 0.14 * sin(t * 0.23 + ph * 1.7))
+		var sway := 14.0 * sin(t * 0.17 + ph) + 6.0 * sin(t * 0.41 + ph * 0.5)
+		# a leaf-shadow gap travelling down the ray
+		var gap_y := fmod(t * (30.0 + 20.0 * wind) + ph * 300.0, vs.y * 1.6)
 		var y := 0.0
 		while y < vs.y:
 			var fade := 1.0 - y / vs.y * 0.8
-			var x0: float = s["x"] + y * lean
-			var c := Color(1.0, 0.8, 0.5, br * fade)
+			var gap := 1.0 - 0.55 * clampf(1.0 - absf(y - gap_y) / 60.0, 0.0, 1.0)
+			var x0: float = s["x"] + sway + y * lean
+			var c := Color(1.0, 0.8, 0.5, br * fade * gap)
 			add_canvas.draw_rect(Rect2(Vector2(floorf(x0 / WPX) * WPX, y), Vector2(w, WPX * 2)), c)
 			add_canvas.draw_rect(Rect2(Vector2(floorf((x0 + w * 0.2) / WPX) * WPX, y), Vector2(w * 0.6, WPX * 2)), c)
 			y += WPX * 2

@@ -19,6 +19,7 @@ var wind_p: AudioStreamPlayer
 var rain_p: AudioStreamPlayer
 var hum_p: AudioStreamPlayer
 var fire_p: AudioStreamPlayer
+var rec := {}                # recorded beds (audio/amb/*.ogg, CC0 and CC-BY, see CREDITS.txt): wind, rain, deep, fire
 var fires: Array = []        # [tile, strength] of flames in this place (braziers, fires, lantern-stones, candles)
 var fires_zone := ""
 var one_p: Array = []        # one-shots (drips, bells)
@@ -43,6 +44,17 @@ func _ready() -> void:
 	rain_p.stream = _noise_loop("rain")
 	hum_p.stream = _noise_loop("hum")
 	fire_p.stream = _noise_loop("fire")
+	for k in ["wind", "rain", "deep", "fire"]:
+		var path := "res://audio/amb/%s.ogg" % k
+		if ResourceLoader.exists(path):
+			var st = load(path)
+			if st is AudioStreamOggVorbis:
+				st.loop = true
+			var rp := _player()
+			rp.stream = st
+			rp.volume_db = -80.0
+			rp.play(randf() * maxf(0.0, st.get_length() - 0.5))   # never two beds in step
+			rec[k] = rp
 	for p in [wind_p, rain_p, hum_p, fire_p]:
 		p.volume_db = -80.0
 		p.play()
@@ -125,17 +137,21 @@ func _land(dt: float) -> void:
 	var wind := Game.wind
 	# wind: a floor of breath, rising with each gust (the pitch climbs a little with it)
 	var wv := (0.1 + 0.55 * clampf(wind, 0.0, 1.2)) if outdoor else 0.03
-	wind_p.volume_db = lerpf(wind_p.volume_db, linear_to_db(maxf(0.0001, wv * sv * 0.5)), minf(1.0, dt * 2.0))
+	var has_w := rec.has("wind")
+	wind_p.volume_db = lerpf(wind_p.volume_db, linear_to_db(maxf(0.0001, wv * sv * (0.22 if has_w else 0.5))), minf(1.0, dt * 2.0))
 	wind_p.pitch_scale = 0.8 + 0.35 * clampf(wind, 0.0, 1.2)
+	_bed("wind", wv * sv * 0.75, dt, 2.0, 0.93 + 0.12 * clampf(wind, 0.0, 1.2))
 	# rain: with the shower
 	var sky = main.get("sky")
 	var rv := 0.0
 	if sky != null and sky.kind == "rain":
 		rv = 0.25 + 0.55 * float(sky.beat)
-	rain_p.volume_db = lerpf(rain_p.volume_db, linear_to_db(maxf(0.0001, rv * sv * 0.22)), minf(1.0, dt * 1.5))
+	rain_p.volume_db = lerpf(rain_p.volume_db, linear_to_db(maxf(0.0001, rv * sv * (0.06 if rec.has("rain") else 0.22))), minf(1.0, dt * 1.5))
+	_bed("rain", rv * sv * 0.8, dt, 1.5)
 	# the hum under the ground
 	var hv := 0.0 if outdoor else 0.4
-	hum_p.volume_db = lerpf(hum_p.volume_db, linear_to_db(maxf(0.0001, hv * sv * 0.5)), minf(1.0, dt * 1.0))
+	hum_p.volume_db = lerpf(hum_p.volume_db, linear_to_db(maxf(0.0001, hv * sv * (0.2 if rec.has("deep") else 0.5))), minf(1.0, dt * 1.0))
+	_bed("deep", hv * sv * 1.6, dt, 1.0)
 	# fire: the nearest flames crackle, louder as you come to them
 	if fires_zone != z.id:
 		fires_zone = z.id
@@ -150,13 +166,22 @@ func _land(dt: float) -> void:
 		var dd: float = hp.distance_to(f[0])
 		if dd < 7.0:
 			fv = maxf(fv, float(f[1]) * pow(1.0 - dd / 7.0, 1.6))
-	fire_p.volume_db = lerpf(fire_p.volume_db, linear_to_db(maxf(0.0001, fv * sv * 0.55)), minf(1.0, dt * 3.0))
+	fire_p.volume_db = lerpf(fire_p.volume_db, linear_to_db(maxf(0.0001, fv * sv * (0.3 if rec.has("fire") else 0.55))), minf(1.0, dt * 3.0))
+	_bed("fire", fv * sv * 0.75, dt, 3.0)
 	# a bell very far off, on the open moor
 	if outdoor and sky != null and sky.kind == "ash":
 		bell_t -= dt
 		if bell_t <= 0.0:
 			bell_t = randf_range(70.0, 150.0)
 			Sfx.play("bell_far", 0.8, randf_range(0.5, 0.58))   # a real bell, pitched down: very far and very large
+
+## a recorded bed eased toward a loudness (and a pitch)
+func _bed(k: String, v: float, dt: float, rate: float, pitch: float = 1.0) -> void:
+	if not rec.has(k):
+		return
+	var p: AudioStreamPlayer = rec[k]
+	p.volume_db = lerpf(p.volume_db, linear_to_db(maxf(0.0001, v)), minf(1.0, dt * rate))
+	p.pitch_scale = lerpf(p.pitch_scale, pitch, minf(1.0, dt))
 
 ## a drop from the roof reaching the floor (world/weather.gd)
 func drip() -> void:
