@@ -585,6 +585,10 @@ func _touch_lantern(e: Dictionary) -> void:
 	var o: Dictionary = e["o"]
 	if "last_lantern" in main:
 		main.last_lantern = {"zone": zone.id, "x": e["tp"].x, "y": e["tp"].y, "name": e["name"]}
+	if hero.skills:
+		hero.skills.on_lantern()
+	if main.has_method("save_game"):
+		main.save_game()
 	var key := "%s:%d" % [zone.id, int(o.get("idx", 0))]
 	Q.state()["lanterns"][key] = {"zone": zone.id, "x": e["tp"].x, "y": e["tp"].y, "name": e["name"]}
 	_say(e["name"], Q.lantern_inscription(zone.id, o), true)
@@ -627,8 +631,8 @@ func _use_shrine(e: Dictionary) -> void:
 		Bus.say.emit(SHRINE_TEXT.get(kind, "Shrine"), 2.5)
 	hero.stats_changed.emit()
 
-## the shrines' blessings last 60 s, kept in hero.st.extra (echo +50 dmg, stone +100 armor, wisp +2 wisps, +100 wisp regrowth)
-const BUFF_STATS := {"echo": {"dmg": 50.0}, "stone": {"armor": 100.0}, "wisp": {"wisps": 2.0, "wisp_regen": 100.0}}
+## the shrines' blessings last 60 s, kept in hero.st.extra (echo x1.5 skill damage, stone +100 armor, wisp +2 wisps, +100% wisp regrowth)
+const BUFF_STATS := {"echo": {"echo": 1.0}, "stone": {"armor": 100.0}, "wisp": {"shrine_wisp": 1.0}}   # echo: skill damage x1.5 (hero_stats.skill_mult); wisp: +2 choir, +100% regrowth (animancer)
 
 func _buff(kind: String, secs: float) -> void:
 	var b: Dictionary = Q.state().get("buffs", {})

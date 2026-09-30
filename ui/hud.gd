@@ -111,7 +111,15 @@ func bind(h: Hero, z: Zone) -> void:
 	bar.set_class(h.st.cls)
 	automap.bind(z)
 	var nm := str(z.d.get("name", z.id))
-	banner = {"name": nm, "line": str(zone_lines.get(z.id, "")), "t": 0.0, "max": 5.0}
+	# the zone's line only the first time this pilgrim enters (checklist 20); the name every time
+	var line := ""
+	var QS: Dictionary = load("res://world/quests.gd").state()
+	if not QS.has("seen"):
+		QS["seen"] = {}
+	if not QS["seen"].has("z:" + z.id):
+		QS["seen"]["z:" + z.id] = true
+		line = str(zone_lines.get(z.id, ""))
+	banner = {"name": nm, "line": line, "t": 0.0, "max": 5.0 if line != "" else 3.0}
 	if args.has("hudtest") and not h.st.has_meta("hudtest"):
 		_feed(h)
 	if not _opened:

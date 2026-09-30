@@ -47,7 +47,7 @@ var break_grace := 0.0
 var shaken := false        # after a break: no rolling until poise is full
 var poise_burst := 0.0
 
-const STRING := [[1.0, 0.85, 0.12], [1.1, 0.95, 0.2], [1.6, 1.35, 0.0]]   # dmg x, time x, step yd
+const STRING := [[1.0, 0.85, 0.12], [1.1, 0.95, 0.2], [1.6, 1.35, 0.42]]   # dmg x, time x, step yd (the overhead lunges 0.42 yd)
 
 func setup(z: Zone, c: String, at: Vector2) -> void:
 	zone = z
@@ -289,7 +289,7 @@ func _reach() -> float:
 	var w: Item = _weapon()
 	if w and w.is_ranged():
 		return 6.5
-	return 1.5
+	return 1.5 + (0.35 if act_mult > 1.5 else 0.0)   # the overhead finisher reaches a little further
 
 func _start_attack(m: Monster, at: Vector2) -> void:
 	if act != "":
@@ -363,15 +363,25 @@ func _land_blow() -> void:
 	d *= st.melee_mult() * act_mult
 	var m2 := act_target
 	if m2 and not m2.dead and tp.distance_to(m2.tp) <= _reach() + m2.radius + 0.4:
-		var dealt: float = Combat.hit_monster(m2, d, "phys", tp, {"melee": true, "heavy": act_mult > 1.5})
+		var o_hit := {"melee": true, "heavy": act_mult > 1.5}
+		var dealt: float = Combat.hit_monster(m2, d, "phys", tp, o_hit)
 		skills.on_weapon_hit(m2, dealt)
+		if o_hit.get("finisher", false):
+			# the finishing blow: 15% of your resource and 20 poise come back, and the frame holds
+			st.res = minf(st.res_max(), st.res + st.res_max() * 0.15)
+			st.poise = minf(st.poise_max(), st.poise + 20.0)
+			Game.hitstop(0.09)
+			Game.shake(6.0)
+		if act_mult > 1.5 and not m2.dead:
+			m2.stun = maxf(m2.stun, 0.35)   # the overhead staggers what it lands on
 		# a third splashes onto anything touching the target
 		for o in Combat.monsters_in(zone, m2.tp, 0.7):
 			if o != m2:
 				Combat.hit_monster(o, d / 3.0, "phys", tp, {"melee": true})
 		_weapon_elements(m2)
-		if act_mult > 1.5 and Settings.screen_shake:
+		if act_mult > 1.5:
 			Game.hitstop(0.07)
+			Game.shake(4.0)
 	else:
 		# a swing at the air still cuts what stands in front
 		var front := tp + Vector2(cos(0), sin(0)) * 0.0

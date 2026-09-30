@@ -12,6 +12,8 @@ var args := {}
 var last_lantern := {}        # {zone, x, y}
 var remnant := {}             # {zone, x, y, gold}
 var travelling := false
+var pending_load := {}        # a save waiting to be poured into the first hero (Continue)
+const SaveIO := preload("res://core/save.gd")
 
 func _ready() -> void:
 	randomize()
@@ -24,6 +26,11 @@ func _ready() -> void:
 		Game.cls = args["cls"]
 	if args.has("hour"):
 		Game.clock = float(args["hour"]) * Game.day_len
+	# Continue: the saved pilgrim, in a freshly rolled world, at the camp (--new starts over)
+	if not args.has("new") and not args.has("demo") and SaveIO.exists():
+		pending_load = SaveIO.read()
+		if not pending_load.is_empty():
+			Game.cls = pending_load.get("cls", Game.cls)
 	ambient = CanvasModulate.new()
 	add_child(ambient)
 	dark = DarkLayer.new()
@@ -65,6 +72,11 @@ func enter(zid: String, from: String) -> void:
 	hero.skills = old_skills
 	zone.sorted.add_child(hero)
 	hero.setup(zone, Game.cls, at)
+	if not pending_load.is_empty():
+		SaveIO.apply(self, pending_load)
+		pending_load = {}
+		if args.has("hour"):
+			Game.clock = float(args["hour"]) * Game.day_len
 	hero.died.connect(_on_hero_died)
 	for m in zone.d.get("monsters", []):
 		# the safe circle of a town holds no creatures
@@ -82,14 +94,24 @@ func enter(zid: String, from: String) -> void:
 	if ResourceLoader.exists("res://world/objects.gd"):   # (world objects): town, objects, waystones, errands
 		load("res://world/objects.gd").attach(self, zone, hero)
 	Bus.zone_entered.emit(zid)
-	Bus.say.emit(zone.d.get("name", zid), 3.0)
+	save_game()
 	await get_tree().create_timer(0.5).timeout
 	travelling = false
+
+## the save (core/save.gd): on entering a zone, touching a lantern, from the pause menu, and on quitting
+func save_game() -> void:
+	if hero != null and not hero.dead and not args.has("demo"):
+		SaveIO.write(self)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED:
+		save_game()
 
 func _process(_dt: float) -> void:
 	if hero == null or zone == null or travelling:
 		return
 	cam.position = hero.position + Vector2(0, -40)
+	cam.offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * Game.shake_amt if Game.shake_amt > 0.05 else Vector2.ZERO
 	ambient.color = Color.WHITE   # the dark layer does the night now (web model)
 	# gates and caves: walk onto one to go through
 	for c in zone.connections:
@@ -97,12 +119,7 @@ func _process(_dt: float) -> void:
 		if hero.tp.distance_to(p) < 0.8 and not hero.dead:
 			enter(c["to"], zone.id)
 			return
-	# lantern-stones: pass within 6 yd to kindle one (your return point)
-	for L in zone.lanterns:
-		var lp := Vector2(L["x"], L["y"])
-		if hero.tp.distance_to(lp) < 6.0 and (last_lantern.get("zone", "") != zone.id or Vector2(last_lantern.get("x", 0), last_lantern.get("y", 0)) != lp):
-			last_lantern = {"zone": zone.id, "x": lp.x, "y": lp.y, "name": L.get("name", "")}
-			Bus.say.emit("The lantern at %s knows you." % L.get("name", "the stone"), 2.5)
+	# lantern-stones: kindled by passing and set as the return point by touch (world/objects/manager.gd)
 	# the remnant: what the lantern kept waits where you fell
 	if not remnant.is_empty() and remnant["zone"] == zone.id and not hero.dead:
 		var rp := Vector2(remnant["x"], remnant["y"])
@@ -145,13 +162,58 @@ func _on_kill(m: Monster) -> void:
 		load("res://items/loot.gd").on_kill(zone, m, hero)
 	hero.stats_changed.emit()
 
+const DEATH_LINES := [
+	"The body keeps walking a moment longer, then remembers.",
+	"Your breath goes out and joins the Last Breath. It does not come back alone.",
+	"Somewhere a lantern leans toward the place you fell.",
+	"The ground takes you in, gently, the way it took the god.",
+	"You were a shape. Now you are a story the ash will tell badly.",
+	"The mourners in the ash come to look. They have always come to look.",
+	"Bone, flesh, breath: each lets go of you in turn.",
+	"The dark is warm here. That is the worst of it.",
+	"Your name goes on the long list. Not in ink. Not yet.",
+	"Somewhere below, something hungry marks the place, and waits."]
+const RETURN_LINES := [
+	"The lantern gives you back. It keeps a little, as it always does.",
+	"You wake to wick-light, the taste of ash, and your own name.",
+	"The flame leans toward you. It remembered.",
+	"Breath returns, borrowed. The Last Breath lends, and counts.",
+	"Again. The wick says a little longer. The wick always says a little longer.",
+	"You stand where you last knelt. The ground is still warm from you.",
+	"The ash parts to let you rise. It has seen this before.",
+	"Back, and lighter by something. You will not know what until you need it.",
+	"The lantern burned for you while you were gone. It is tired.",
+	"Up, pilgrim. The road is still down, and still yours."]
+var _last_death := -1
+var _last_ret := -1
+
+func _world_ui() -> Node:
+	return get_tree().root.find_child("GodmarrowWorldUI", true, false)
+
+func _pick(arr: Array, last: int) -> int:
+	var i := randi() % arr.size()
+	return (i + 1) % arr.size() if i == last else i
+
 func _on_hero_died() -> void:
 	var gold := hero.st.inv.gold
 	hero.st.inv.gold = 0
 	hero.st.kept = mini(3, hero.st.kept + 1)
 	remnant = {"zone": zone.id, "x": hero.tp.x, "y": hero.tp.y, "gold": gold}
-	Bus.say.emit("The lantern carries you back.", 3.0)
-	await get_tree().create_timer(2.5).timeout
+	if hero.skills:
+		hero.skills.on_death()   # wisps, the golem and every summoned thing are cleared
+	# whatever was chasing loses the scent
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if m.brain and not m.boss and m.brain.state != "sleep":
+			m.brain.set_state("sleep")
+			m.awake = false
+	_last_death = _pick(DEATH_LINES, _last_death)
+	var W := _world_ui()
+	if W:
+		W.banner("ANIMA SEVERED", Color8(142, 38, 48), 3.2)
+		W.whisper("", DEATH_LINES[_last_death], 3.0)
+	else:
+		Bus.say.emit(DEATH_LINES[_last_death], 3.0)
+	await get_tree().create_timer(3.0).timeout
 	var back_zone: String = last_lantern.get("zone", "moor")
 	var at_self := back_zone == zone.id and not last_lantern.is_empty()
 	if at_self:
@@ -159,6 +221,12 @@ func _on_hero_died() -> void:
 	else:
 		await enter(back_zone, "__lantern" if not last_lantern.is_empty() else "")
 		hero.revive(hero.tp)
+	if hero.skills:
+		hero.skills.on_lantern()
+	_last_ret = _pick(RETURN_LINES, _last_ret)
+	var W2 := _world_ui()
+	if W2:
+		W2.whisper("", RETURN_LINES[_last_ret], 5.0)
 
 # ------------------------------------------------------------------ --demo: fight the nearest creatures, for captures
 func _demo() -> void:

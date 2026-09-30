@@ -89,6 +89,8 @@ func think(m: Monster, h: Hero, dt: float) -> void:
 				if world:
 					world.grit_burst(target_p, Color(0.62, 0.6, 0.55), 26, 1.6, 10.0)
 					world.slam_scar(target_p, 2.1)
+					Game.shake(9.0)
+					Game.hitstop(0.08)
 		"cwind":
 			if t > 0.7 / k:
 				set_state("charge")

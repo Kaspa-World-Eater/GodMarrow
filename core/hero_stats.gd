@@ -90,7 +90,7 @@ func poise_regen() -> float:
 	return 4.0 + 0.35 * e_con()
 
 func skill_mult() -> float:
-	return 1.0 + 0.012 * e_ess() + minf(item("dmg"), 15.0 if false else 999.0) / 100.0
+	return (1.0 + 0.012 * e_ess() + item("dmg") / 100.0) * (1.5 if item("echo") > 0.0 else 1.0)
 
 func melee_mult() -> float:
 	return 1.0 + 0.015 * e_con()

@@ -131,3 +131,11 @@ func absorb(d: float, elem: String) -> float:
 ## override: the hero struck with a weapon (hooks for on-hit skills)
 func on_weapon_hit(m: Monster, d: float) -> void:
 	pass
+
+## override: the hero touched a lantern-stone (refill wisps and shards, wake and mend minions)
+func on_lantern() -> void:
+	pass
+
+## override: the hero died (every summoned thing is cleared; states reset)
+func on_death() -> void:
+	pass

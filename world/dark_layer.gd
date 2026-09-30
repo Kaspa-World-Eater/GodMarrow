@@ -85,9 +85,6 @@ func _process(dt: float) -> void:
 	if not hero.dead:
 		var lampk := 1.5 + hero.st.item("lrad") / 100.0 * 0.5
 		var R := minf(hero.light_radius(), 5.4 * lampk / 1.5) * ISO_R * 0.4 * (1.0 + 0.5 * dk) * mood
-		if hero.st.dim_wick:
-			R *= 0.62
-		R *= 1.0 - 0.12 * hero.st.kept
 		var foot := hp + Vector2(0.25, -0.1)
 		var rgb := Color8(120, 178, 255) if hero.cls == "animancer" else (Color8(255, 164, 84) if hero.cls == "hemomancer" else Color8(255, 170, 96))
 		var hi := holes.size()

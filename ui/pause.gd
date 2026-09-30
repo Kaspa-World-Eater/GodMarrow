@@ -17,8 +17,11 @@ func _ready() -> void:
 	focus_mode = Control.FOCUS_NONE
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
+var saved := false
+
 func open() -> void:
 	page = "main"
+	saved = false
 	visible = true
 	get_tree().paused = true
 
@@ -30,7 +33,7 @@ func close() -> void:
 func _build() -> void:
 	match page:
 		"main":
-			rows = [["Resume", "resume"], ["Options", "options"], ["Controls", "controls"], ["Quit", "quit"]]
+			rows = [["Resume", "resume"], ["Written." if saved else "Save the pilgrim", "save"], ["Options", "options"], ["Controls", "controls"], ["Save and quit", "quit"]]
 		"options":
 			rows = [
 				["Damage numbers: " + _on(Settings.damage_numbers), "t:damage_numbers"],
@@ -85,8 +88,12 @@ func _act(a: String, down: bool) -> void:
 	elif a == "back":
 		page = "main"
 		Settings.save()
+	elif a == "save":
+		_main_save()
+		saved = true
 	elif a == "quit":
 		Settings.save()
+		_main_save()
 		get_tree().quit()
 	elif a.begins_with("t:"):
 		var k := a.substr(2)
@@ -165,3 +172,9 @@ func _draw() -> void:
 	if hint != "":
 		var hw := fi2.get_string_size(hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 20).x
 		draw_string(fi2, Vector2(cx - hw / 2, b.end.y - 22), hint, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color("#8a8070"))
+
+
+func _main_save() -> void:
+	var m := get_tree().current_scene
+	if m and m.has_method("save_game"):
+		m.save_game()

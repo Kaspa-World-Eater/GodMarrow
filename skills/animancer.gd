@@ -2610,3 +2610,35 @@ static func nearest_target(z, from):
 			bd = d
 			best = a
 	return best
+
+
+# ================================================================== the lantern and death (checklist 18.4, 18.5)
+func on_lantern() -> void:
+	while wisps.size() < eff_cap():
+		spawn_wisp()
+	if golem != null:
+		if golem.state == "dormant":
+			golem.rise()
+		golem.hp = golem.max_hp
+	elif not golem_mem.is_empty():
+		golem_mem["frac"] = 1.0
+		golem_mem["dormant"] = false
+
+func on_death() -> void:
+	for w in wisps:
+		w.gone = true
+		if w.node != null and is_instance_valid(w.node):
+			w.node.queue_free()
+	wisps.clear()
+	great = null
+	if golem != null:
+		if golem.node != null and is_instance_valid(golem.node):
+			golem.node.queue_free()
+		golem.node = null
+		golem = null
+	golem_mem = {}
+	infusing = false
+	for arr in [mirrors, totems, cages, fissures, cracks, spikes, glass, gshots, rings, fires]:
+		for o in arr:
+			if o is Object and "gone" in o:
+				o.gone = true

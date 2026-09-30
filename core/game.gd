@@ -48,6 +48,12 @@ func day_k() -> float:
 
 ## hit-stop: freeze the frame for a few hundredths of a second on heavy blows (checklist section 1)
 var _stop := 0.0
+## screen shake (checklist 1): heavy blows, finishers and slams; Settings.screen_shake turns it off. main.gd reads shake_amt.
+var shake_amt := 0.0
+func shake(px: float) -> void:
+	if Settings.screen_shake:
+		shake_amt = maxf(shake_amt, px)
+
 func hitstop(secs: float) -> void:
 	_stop = maxf(_stop, secs)
 	Engine.time_scale = 0.05
@@ -58,3 +64,4 @@ func _process(dt: float) -> void:
 		if _stop <= 0.0:
 			Engine.time_scale = 1.0
 	clock += dt
+	shake_amt = move_toward(shake_amt, 0.0, dt * 60.0)
