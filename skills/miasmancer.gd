@@ -173,7 +173,7 @@ func storm_r() -> float: return 3.2 + (1.0 if K("stormwide") > 0 else 0.0)
 func storm_life() -> float: return 8.0 + 0.3 * L1("mstorm")
 func trap_k() -> float: return (1.0 + 0.08 * K("unseen")) * power()
 func needle_dmg() -> float: return (4.0 + 2.0 * (L1("ntrap") - 1.0)) * trap_k() * syn("ntrap") * 0.5   # G1 balance: four needle traps were half her damage
-func wake_dmg() -> float: return (5.0 + 2.5 * (L1("mwake") - 1.0)) * trap_k() * (1.25 if aM("zd_snare") else 1.0) * syn("mwake")
+func wake_dmg() -> float: return (3.5 + 1.75 * (L1("mwake") - 1.0)) * trap_k() * (1.25 if aM("zd_snare") else 1.0) * syn("mwake")   # G1: x0.7
 func wake_life() -> float: return 12.0 * (2.0 if K("wakelong") > 0 else 1.0) * (1.5 if aM("zd_snare") else 1.0)
 func mine_dmg() -> float: return (18.0 + 8.0 * (L1("bmine") - 1.0)) * trap_k() * syn("bmine")
 func sentry_dmg() -> float: return (20.0 + 9.0 * (L1("ntrap") - 1.0)) * trap_k()

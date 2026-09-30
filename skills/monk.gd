@@ -302,7 +302,7 @@ func info(id: String) -> String:
 	match id:
 		"kdawn", "keclipse": return "%d s · turning the sky pours three times the sand" % int(sky_len(id))
 		"kamber": return "%s/s within %.1f yd · eats 1%% life a second%s" % [r.call(D("kamber", 6.5, 3)), amber_r(), skt]
-		"khands": return "100 palms · %s in all%s" % [r.call(fist() * (0.09 + 0.01 * L1("khands")) * sky(0) * sand(0) * syn("khands") * 100.0), skt]
+		"khands": return "100 palms · %s in all%s" % [r.call(fist() * (0.07 + 0.008 * L1("khands")) * sky(0) * sand(0) * syn("khands") * 100.0), skt]
 		"klaugh": return "%s within %.1f yd every %.1f s%s" % [r.call(D("klaugh", 5.6, 2.8)), laugh_r(), laugh_every(), skt]
 		"kstar": return "%s in a %.1f yd cone · x1.5 on the raised dead%s" % [r.call(D("kstar", 12, 5.5)), 4.6 * area(), skt]
 		"kfist": return "%s to the one beneath · ring %s%s" % [r.call(D("kfist", 42, 18)), r.call(D("kfist", 42, 18) * 0.35), skt]
@@ -312,7 +312,7 @@ func info(id: String) -> String:
 		"kbell": return "%.1f s · waves %s · blows on the bell lose 70%%%s" % [5.0 + 0.15 * L1("kbell"), r.call(D("kbell", 10, 4.5)), skt]
 		"klotus": return "%s/s at full size · grows to %.1f yd%s" % [r.call(D("klotus", 14, 6)), 3.6 * area(), skt]
 		"ksun": return "%d s · beams %s at %d enemies%s" % [sun_len(), r.call(D("ksun", 20, 7)), sun_n(), skt]
-		"kpalm": return "Drags within %d yd · %s/s%s" % [palm_r(), r.call(D("kpalm", 5, 2.4) * 5.0), skt]
+		"kpalm": return "Drags within %d yd · %s/s%s" % [palm_r(), r.call(D("kpalm", 3.5, 1.7) * 5.0), skt]
 		"kclap": return "%s · stuns %.1f s within %.1f yd%s" % [r.call(D("kclap", 6, 2.6)), clap_stun(), clap_r(), skt]
 		"kbowl": return "%d%% of frontal missiles swallowed · full at 6 · holds %d" % [int(bowl_chance() * 100.0), bowl]
 		"kspade": return "%s in an arc · shadowless: rooted %.1f s, %s/s%s" % [r.call(spade_dmg()), 2.5 * dur(), r.call(D("kspade", 7, 3)), skt]
@@ -740,7 +740,7 @@ func _toggle_amber() -> bool:
 func _cast_hundred(m) -> bool:
 	if m == null:
 		return false
-	flurry = {"m": m, "t": 0.0, "n": 0, "tick": 0.0, "dmg": fist() * (0.09 + 0.01 * L1("khands")) * sky(0) * sand(0) * syn("khands")}
+	flurry = {"m": m, "t": 0.0, "n": 0, "tick": 0.0, "dmg": fist() * (0.07 + 0.008 * L1("khands")) * sky(0) * sand(0) * syn("khands")}
 	cast_len = 1.5
 	return true
 
@@ -1093,7 +1093,7 @@ func _cast_palm() -> bool:
 		# reversed: the palm casts out: everything in reach thrown to the edge, stunned 1 s, torn as it goes
 		var R := float(palm_r())
 		for m in foes(hero.tp, R):
-			hurt(m, D("kpalm", 5, 2.4) * 5.0, "kpalm")
+			hurt(m, D("kpalm", 3.5, 1.7) * 5.0, "kpalm")
 			if not m.boss:
 				var d: float = m.tp.distance_to(hero.tp)
 				shove(m, hero.tp, maxf(0.0, R - d))
@@ -1119,7 +1119,7 @@ func _update_palm(dt: float) -> void:
 			var s := minf(d - 0.8, 6.0 * dt)
 			m.tp = zone.move(m.tp, (hero.tp - m.tp) / d * s, m.radius * 0.6)
 		if tick:
-			hurt(m, D("kpalm", 5, 2.4), "kpalm")
+			hurt(m, D("kpalm", 3.5, 1.7), "kpalm")
 		wake(m)
 		# The Hungry Ghost: what reaches your feet weak enough is swallowed whole
 		if aU("ka_palm") and not m.dead and not m.boss and m.rank != "unique" and m.tp.distance_to(hero.tp) < 1.3 and m.hp < m.hp_max * 0.15:
