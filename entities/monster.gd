@@ -190,6 +190,7 @@ func add_poise_damage(pd: float, heavy: bool) -> void:
 	if poise <= 0.0:
 		var base := 0.2 if boss else (0.25 if rank == "unique" else 0.35)
 		reeling = base * Combat.STAGGER
+		Sfx.play("break", 0.8)
 		poise = poise_max
 		if brain:
 			brain.on_reel(self)

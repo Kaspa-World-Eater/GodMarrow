@@ -50,6 +50,8 @@ func _ready() -> void:
 	add_child(sky)
 	sound = Soundscape.new(self)
 	add_child(sound)
+	add_child(Sfx.new())
+	Bus.monster_killed.connect(func(_m): Sfx.play("fall"))
 	sky.snd = sound
 	fore = Foreground.new()
 	add_child(fore)

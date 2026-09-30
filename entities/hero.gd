@@ -279,6 +279,7 @@ func _physics_process(dt: float) -> void:
 		spr.step(dt)
 	_sync()
 
+var step_acc := 0.0
 func _walk(dt: float) -> bool:
 	if not walking or path_i >= path.size():
 		walking = false
@@ -295,6 +296,10 @@ func _walk(dt: float) -> bool:
 	if skills.has_method("move_k"):
 		spd *= skills.move_k()
 	var step := spd * dt
+	step_acc += minf(step, to.length())
+	if step_acc > 0.62:
+		step_acc = 0.0
+		Sfx.play("step_" + zone.surface_at(tp))
 	if to.length() <= step:
 		tp = zone.move(tp, to, radius)
 		path_i += 1
@@ -344,6 +349,7 @@ func _start_attack(m: Monster, at: Vector2) -> void:
 	act_mult = float(s[0])
 	if string_i == 2:
 		spend_poise(4.0)
+	Sfx.play("swing", 0.8 if string_i < 2 else 1.0, 1.0 if string_i < 2 else 0.82)
 	tp = zone.move(tp, (at - tp).normalized() * float(s[2]), radius)
 	string_i = (string_i + 1) % 3
 	string_idle = 0.0
@@ -402,6 +408,7 @@ func _land_blow() -> void:
 		if heavy_pm > 0.0:
 			o_hit["poise"] = d * heavy_pm
 		var dealt: float = Combat.hit_monster(m2, d, "phys", tp, o_hit)
+		Sfx.play("heavy" if (act_mult > 1.5 or heavy_pm > 0.0 or o_hit.get("finisher", false)) else "hit")
 		skills.on_weapon_hit(m2, dealt)
 		if o_hit.get("finisher", false):
 			# the finishing blow: 15% of your resource and 20 poise come back, and the frame holds
@@ -466,6 +473,7 @@ func roll() -> void:
 	hold_t = 0.0
 	string_i = 0
 	_start_act("roll", 0.34)
+	Sfx.play("roll")
 	spr.play("dodge" if spr.set.has("dodge") else "walk", true, false)
 	spr.fps_override = spr.frame_count() / 0.34
 	invuln = 0.3
@@ -491,12 +499,15 @@ func poise_hit(pd: float, from: Vector2, heavy: bool) -> void:
 		break_grace = 0.9 + 1.6
 		shaken = true
 		walking = false
+		Sfx.play("break", 1.0, 0.8)
 
 func absorb(d: float, elem: String) -> float:
 	return skills.absorb(d, elem)
 
 func drink(i: int) -> void:
 	var k: String = st.inv.drink(i)
+	if k != "":
+		Sfx.play("drink")
 	if k == "hp":
 		if st.arc and st.arc.aR("v_crown"):
 			Bus.say.emit("The draught does nothing. The choir mends you now.", 1.6)

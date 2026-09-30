@@ -58,6 +58,8 @@ static func hit_hero(h: Hero, dmg: float, elem: String = "phys", from: Vector2 =
 	if opts.has("poise"):
 		pd = float(opts["poise"])
 	h.poise_hit(pd, from, heavy)
+	if d > 0.5:
+		Sfx.play("hurt", 1.0 if heavy else 0.7)
 	Bus.hero_hit.emit(d)
 	if st.hp <= 0.0:
 		# The Last Silence: once in each place a killing blow stops the world for 3 s and leaves you at 1 life

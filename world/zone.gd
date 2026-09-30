@@ -166,6 +166,8 @@ func _ground() -> void:
 	var set := Assets.ground(land)
 	var classes := rle(d["ground"]["classes"], w * h)
 	var tex_keys: Dictionary = d["ground"]["texKeys"]
+	ground_cls = classes
+	ground_keys = tex_keys
 	var images: Array[Image] = []
 	var layer_a := PackedInt32Array()
 	var layer_b := PackedInt32Array()
@@ -400,6 +402,24 @@ func ambient_at(phase: float) -> Color:
 
 ## the wind's materials (shaders/sway.gdshader): young trees lean a little, cloth and cobwebs more, chains swing
 var sway_mats := {}
+var ground_cls = null        # the ground class per tile (for footsteps)
+var ground_keys := {}
+
+## what the ground is made of under a tile, as the feet hear it: wet | stone | leaf | ash
+func surface_at(t: Vector2) -> String:
+	var x := int(floor(t.x))
+	var y := int(floor(t.y))
+	if ground_cls == null or x < 0 or y < 0 or x >= w or y >= h:
+		return "stone"
+	var key: String = ground_keys.get(str(ground_cls[y * w + x]), "main")
+	if key in ["water", "shallow", "bog", "mud"]:
+		return "wet"
+	if key in ["flags", "road", "crypt", "barrow", "bone", "arena"] or not d.get("outdoor", false):
+		return "stone"
+	var th: String = str(d.get("theme", ""))
+	if th.contains("wood") or th.contains("root") or th.contains("fen"):
+		return "leaf"
+	return "ash"
 func _sway_mat(key: String) -> ShaderMaterial:
 	var kind := ""
 	if key.contains("_sapling") or key.contains("_young"):
