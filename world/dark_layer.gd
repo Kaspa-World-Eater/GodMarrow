@@ -77,7 +77,13 @@ func bind(z: Zone, h: Hero) -> void:
 			"raw":
 				statics.append({"t": Vector2(L["x"], L["y"]), "r": maxf(10.0, float(L.get("radiusPx", 30))), "core": 0.35, "far": 1.5, "w": 0.3, "rgb": rgb, "kind": "raw"})
 			"wallCandle":
-				statics.append({"t": Vector2(L["x"], L["y"]), "r": maxf(14.0, float(L.get("radiusPx", 34)) * 0.9), "core": 0.4, "far": 1.6, "w": 0.3, "rgb": rgb, "kind": "wallc"})
+				# the candle burns on the wall's face: its pool lies on the floor in front of it (the open side)
+				var ct := Vector2(L["x"], L["y"])
+				for dv in [Vector2(0.75, 0.0), Vector2(0.0, 0.75), Vector2(0.55, 0.55), Vector2(-0.75, 0.0), Vector2(0.0, -0.75)]:
+					if not z.is_solid(ct + dv):
+						ct += dv
+						break
+				statics.append({"t": ct, "r": maxf(14.0, float(L.get("radiusPx", 34)) * 1.15), "core": 0.4, "far": 1.7, "w": 0.3, "rgb": rgb, "kind": "wallc"})
 	for dc in z.d.get("decor", []):
 		var rr = DR.get(dc.get("key", ""))
 		if rr != null:
