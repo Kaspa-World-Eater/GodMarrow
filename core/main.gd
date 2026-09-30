@@ -237,7 +237,7 @@ func _exit_tree() -> void:
 	Lights._cache.clear()
 	Assets._cache.clear()
 	load("res://world/objects/world_ui.gd")._fonts.clear()
-	load("res://world/objects/manager.gd")._tex_cache.clear()
+	load("res://world/objects/manager_build.gd")._tex_cache.clear()
 	load("res://items/item_sfx.gd")._cache.clear()
 	load("res://items/loot.gd")._icons.clear()
 	load("res://entities/ai/brain.gd")._mys = null
