@@ -18,6 +18,9 @@ var fade_len := 3.0
 var wind_p: AudioStreamPlayer
 var rain_p: AudioStreamPlayer
 var hum_p: AudioStreamPlayer
+var fire_p: AudioStreamPlayer
+var fires: Array = []        # [tile, strength] of flames in this place (braziers, fires, lantern-stones, candles)
+var fires_zone := ""
 var one_p: Array = []        # one-shots (drips, bells)
 var bell_t := 60.0
 var boss_gone_t := 0.0
@@ -33,12 +36,14 @@ func _ready() -> void:
 	wind_p = _player()
 	rain_p = _player()
 	hum_p = _player()
+	fire_p = _player()
 	for i in 4:
 		one_p.append(_player())
 	wind_p.stream = _noise_loop("wind")
 	rain_p.stream = _noise_loop("rain")
 	hum_p.stream = _noise_loop("hum")
-	for p in [wind_p, rain_p, hum_p]:
+	fire_p.stream = _noise_loop("fire")
+	for p in [wind_p, rain_p, hum_p, fire_p]:
 		p.volume_db = -80.0
 		p.play()
 	bell_t = randf_range(40.0, 90.0)
@@ -127,10 +132,25 @@ func _land(dt: float) -> void:
 	var rv := 0.0
 	if sky != null and sky.kind == "rain":
 		rv = 0.25 + 0.55 * float(sky.beat)
-	rain_p.volume_db = lerpf(rain_p.volume_db, linear_to_db(maxf(0.0001, rv * sv * 0.28)), minf(1.0, dt * 1.5))
+	rain_p.volume_db = lerpf(rain_p.volume_db, linear_to_db(maxf(0.0001, rv * sv * 0.22)), minf(1.0, dt * 1.5))
 	# the hum under the ground
 	var hv := 0.0 if outdoor else 0.4
 	hum_p.volume_db = lerpf(hum_p.volume_db, linear_to_db(maxf(0.0001, hv * sv * 0.5)), minf(1.0, dt * 1.0))
+	# fire: the nearest flames crackle, louder as you come to them
+	if fires_zone != z.id:
+		fires_zone = z.id
+		fires.clear()
+		for l in z.d.get("lights", []):
+			if l is Dictionary and l.get("type", "") == "fire":
+				var k: float = {"brazier": 1.0, "fire": 1.0, "bonfire": 1.2, "lantern": 0.45, "candles": 0.25, "torch": 0.6}.get(str(l.get("kind", "")), 0.5)
+				fires.append([Vector2(float(l["x"]), float(l["y"])), k])
+	var fv := 0.0
+	var hp: Vector2 = main.hero.tp
+	for f in fires:
+		var dd: float = hp.distance_to(f[0])
+		if dd < 7.0:
+			fv = maxf(fv, float(f[1]) * pow(1.0 - dd / 7.0, 1.6))
+	fire_p.volume_db = lerpf(fire_p.volume_db, linear_to_db(maxf(0.0001, fv * sv * 0.55)), minf(1.0, dt * 3.0))
 	# a bell very far off, on the open moor
 	if outdoor and sky != null and sky.kind == "ash":
 		bell_t -= dt
@@ -154,6 +174,18 @@ func _one(s: AudioStream, db: float, pitch: float) -> void:
 # ------------------------------------------------------------------ sounds made from noise
 
 func _wav(samples: PackedFloat32Array, loop: bool) -> AudioStreamWAV:
+	# no offset, and never clipped: each sound is levelled to the same peak, the players set the loudness
+	var mean := 0.0
+	for v in samples:
+		mean += v
+	mean /= maxf(1.0, float(samples.size()))
+	var pk := 0.0
+	for i in samples.size():
+		samples[i] -= mean
+		pk = maxf(pk, absf(samples[i]))
+	if pk > 0.0001:
+		for i in samples.size():
+			samples[i] *= 0.8 / pk
 	var data := PackedByteArray()
 	data.resize(samples.size() * 2)
 	for i in samples.size():
@@ -205,6 +237,18 @@ func _noise_loop(kind: String) -> AudioStreamWAV:
 					br = rng.randf_range(0.2, 0.6)
 				v += br * (rng.randf() * 2.0 - 1.0)
 				br *= 0.93
+			"fire":
+				# a low roar of burning air and the snap and tick of the wood
+				lp1 += (w - lp1) * 0.03
+				v = lp1 * 1.6
+				if rng.randf() < 0.0012:
+					br = rng.randf_range(0.3, 0.9)
+				elif rng.randf() < 0.006:
+					br = maxf(br, rng.randf_range(0.05, 0.2))
+				hp = (w - prev) * br
+				prev = w
+				v += hp * 0.9
+				br *= 0.9
 			_:
 				# the hum: brown noise far down, and a faint low tone under it
 				br += (w * 0.02)

@@ -1,7 +1,7 @@
 extends SceneTree
 func _initialize() -> void:
 	var k = load("res://core/sfx.gd").new()
-	for n in ["step_ash","step_stone","step_leaf","step_wet","swing","hit","heavy","break","hurt","fall","roll","drink","m_wind","cast_mirror","cast_soul","cast_thread"]:
+	for n in ["step_ash","step_stone","step_leaf","step_wet","swing","hit","heavy","break","hurt","fall","roll","drink","m_wind","cast_mirror","cast_soul","cast_thread","chest","kindle","shrine","passage"]:
 		var t: Array = k._takes(n)
 		var mx := 0.0
 		var w: AudioStreamWAV = t[0]

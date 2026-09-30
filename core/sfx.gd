@@ -48,7 +48,7 @@ func _play(name: String, vol: float, pitch: float) -> void:
 	p.play()
 
 const GAIN := {"step_ash": -17.0, "step_stone": -18.0, "step_leaf": -18.0, "step_wet": -14.0, "swing": -13.0, "hit": -7.0,
-	"heavy": -5.0, "break": -9.0, "hurt": -8.0, "fall": -10.0, "roll": -12.0, "drink": -10.0, "m_wind": -12.0, "cast_mirror": -14.0, "cast_soul": -12.0, "cast_thread": -12.0}
+	"heavy": -5.0, "break": -9.0, "hurt": -8.0, "fall": -10.0, "roll": -12.0, "drink": -10.0, "m_wind": -12.0, "cast_mirror": -14.0, "cast_soul": -12.0, "cast_thread": -12.0, "chest": -9.0, "kindle": -9.0, "shrine": -10.0, "passage": -12.0}
 
 func _takes(name: String) -> Array:
 	if bank.has(name):
@@ -219,6 +219,39 @@ func _make(name: String, rng: RandomNumberGenerator) -> PackedFloat32Array:
 				buf[j] = (buf[j] + buf[nx]) * 0.497
 				s[i] = v * 0.4 * minf(1.0, float(i) / 40.0)
 			return s
+		"chest":       # an old lid: a creak of hinges, then the lid falls back on wood
+			var n := int(0.45 * RATE)
+			var s := PackedFloat32Array()
+			s.resize(n)
+			var ph := 0.0
+			for i in n:
+				var t := float(i) / RATE
+				if t < 0.3:
+					ph += (180.0 + 260.0 * t / 0.3 + sin(t * 60.0) * 30.0) / RATE
+					var pulse := 1.0 if fmod(ph, 1.0) < 0.12 else 0.0   # the rasp of a dry hinge
+					s[i] = pulse * 0.3 * sin(PI * t / 0.3)
+			return _mix(_mix(s, _noise(rng, 0.3, 0.05, 6.0, 0.2, 0.6, 0.15)), _thud(0.18, 140.0, 70.0, 22.0, 0.8), int(RATE * 0.3))
+		"kindle":      # a lantern given its soul: a soft breath of flame catching, and a low bell under it
+			var fl := _noise(rng, 0.8, 0.15, 4.0, 0.06, 0.25, 1.0)
+			var n := int(1.6 * RATE)
+			var s := PackedFloat32Array()
+			s.resize(n)
+			for i in n:
+				var t := float(i) / RATE
+				s[i] = (sin(TAU * 196.0 * t) + 0.5 * sin(TAU * 293.7 * t) + 0.25 * sin(TAU * 392.0 * t * 1.003)) * exp(-t * 2.2) * minf(1.0, t / 0.05) * 0.22
+			return _mix(fl, s, int(RATE * 0.08))
+		"shrine":      # a waystone or shrine answering: a low stone hum with a pale ring over it
+			var n := int(1.4 * RATE)
+			var s := PackedFloat32Array()
+			s.resize(n)
+			for i in n:
+				var t := float(i) / RATE
+				var e := minf(1.0, t / 0.25) * exp(-maxf(0.0, t - 0.25) * 2.6)
+				s[i] = (sin(TAU * 98.0 * t) * 0.5 + sin(TAU * 147.0 * t) * 0.3 + sin(TAU * 587.0 * t) * 0.12 * exp(-t * 3.0)) * e * 0.5
+			return s
+		"passage":     # going through: stone grinding, a step into another air
+			var gr := _noise(rng, 0.7, 0.2, 3.5, 0.05, 0.18, 1.3)
+			return _mix(gr, _thud(0.3, 70.0, 45.0, 8.0, 0.35), int(RATE * 0.05))
 		"drink":       # the draught: two swallows
 			var g1 := _thud(0.09, 180.0, 260.0, 30.0, 0.5)
 			return _mix(g1, _thud(0.09, 170.0, 250.0, 30.0, 0.45), int(RATE * 0.16))

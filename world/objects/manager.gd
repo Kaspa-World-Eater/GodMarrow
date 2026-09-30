@@ -382,6 +382,7 @@ func _proximity() -> void:
 	if waystone:
 		var d := hero.tp.distance_to(waystone.tp)
 		if d < 3.2 and Q.kindle_wp(zone.id):
+			Sfx.play("shrine", 0.8, 0.8)
 			Bus.say.emit("%s knows your step." % zone.d.get("name", "The waystone"), 2.5)
 			if ui:
 				ui.speak(String(waystone.o.get("name", "Waystone")), String(waystone.o.get("vInscr", "")), -1.0, true)
@@ -582,6 +583,7 @@ func _touch_lantern(e: Dictionary) -> void:
 	st.res = st.res_max()
 	st.poise = st.poise_max()
 	hero.stats_changed.emit()
+	Sfx.play("kindle")
 	var o: Dictionary = e["o"]
 	if "last_lantern" in main:
 		main.last_lantern = {"zone": zone.id, "x": e["tp"].x, "y": e["tp"].y, "name": e["name"]}
@@ -602,6 +604,7 @@ func _open_chest(e: Dictionary) -> void:
 	e["live"] = false
 	e["name"] = ""
 	_swap(e["node"], "chest_open")
+	Sfx.play("chest")
 	var L = _loot()
 	if L and L.has_method("open_chest"):
 		L.open_chest(zone, e["tp"], int(e["o"].get("ilvl", 1)), hero)
@@ -613,6 +616,7 @@ func _use_shrine(e: Dictionary) -> void:
 		return
 	mem["used"] = true
 	e["live"] = false
+	Sfx.play("shrine")
 	_swap(e["node"], "shrine_used")
 	var kind: String = o.get("kind", "")
 	var st := hero.st

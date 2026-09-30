@@ -127,6 +127,8 @@ func _ready() -> void:
 
 func enter(zid: String, from: String) -> void:
 	travelling = true
+	if from != "" and from != "__lantern":
+		Sfx.play("passage")
 	var old_stats: HeroStats = hero.st if hero else null
 	var old_skills: SkillBook = hero.skills if hero else null
 	if zone:
