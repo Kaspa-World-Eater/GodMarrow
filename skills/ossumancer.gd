@@ -2,9 +2,9 @@ extends "res://skills/ossumancer/tree_count.gd"
 ## The Ossuarch (class id "ossumancer"), part 5 of 5: casting (which skill runs what), the hooks the shared game calls,
 ## and the frame (tick). The state, numbers and helpers are in skills/ossumancer/base.gd (its header tells how the
 ## Mantle works); each tree's skills are in skills/ossumancer/tree_*.gd.
-## Ported so far: the Mantle, Bone Lance, Raise Skeleton, Bone Blade. The rest of his trees follow in steps.
+## Ported so far: the whole Carapace tree, Raise Skeleton and Grave Tithe, Bone Blade. The rest follow in steps.
 
-const DONE := ["aura", "spear", "raise", "blade"]
+const DONE := ["aura", "spear", "raise", "blade", "barmor", "siphon", "ribcage", "ossify", "spikes", "sstorm", "bonerain", "spirit"]
 
 var mantle_set := false
 
@@ -51,10 +51,15 @@ func _cast(id: String, a: Vector2, target) -> bool:
 			pull_hold = 0.35
 			cast_len = 0.3
 			return true
-		"spear":
-			return cast_lance(a)
 		"blade":
 			return strike_blade(a, target)
+		"barmor":
+			return cast_armor()
+		"spirit":
+			return cast_lord(a)
+	if _cast_bone(id, a):
+		echo(id, a)
+		return true
 	return false
 
 
@@ -81,6 +86,8 @@ func on_death() -> void:
 
 func _reset() -> void:
 	clear_dead()
+	clear_spells()
+	plates = 0.0
 	shards = 0.0
 	motes.clear()
 	spears.clear()
@@ -89,6 +96,8 @@ func _reset() -> void:
 func _on_kill(m) -> void:
 	if hero == null or hero.cls != "ossumancer" or not is_instance_valid(m):
 		return
+	ossified_death(m)
+	spiked_death(m)
 	# Grave Tithe: the slain give up bone
 	if K("tithe") > 0 and randf() < minf(0.4, 0.12 + 0.012 * K("tithe")):
 		motes.append({"tp": m.tp, "z": 0.0, "rise": 0.1, "out": 0.0, "v": Vector2.ZERO, "spd": 4.0, "t": 0.0, "dmg": mote_dmg(), "hit": {}, "val": 1.0})
@@ -114,6 +123,16 @@ func tick(dt: float) -> void:
 	tick_mantle(dt)
 	tick_dead(dt)
 	tick_spears(dt)
+	tick_cages(dt)
+	tick_rains(dt)
+	tick_lords(dt)
+	tick_ossified()
+	for f in spikes_fx:
+		f["t"] -= dt
+	spikes_fx = spikes_fx.filter(func(f): return f["t"] > 0.0)
+	for f in siph_fx:
+		f["t"] -= dt
+	siph_fx = siph_fx.filter(func(f): return f["t"] > 0.0)
 	for g in grit:
 		g["t"] -= dt
 	grit = grit.filter(func(g): return g["t"] > 0.0)
@@ -122,7 +141,7 @@ func tick(dt: float) -> void:
 	words = words.filter(func(w): return w["t"] > 0.0)
 	# hold to keep striking
 	if hero.act == "" and not hero.dead:
-		for id in ["blade", "spear"]:
+		for id in ["blade", "spear", "siphon"]:
 			if K(id) > 0 and held(id):
 				cast_anim = POSE.get(id, "cast")
 				cast_len = -1.0
@@ -141,7 +160,7 @@ func _enter_zone() -> void:
 	clear_dead()
 	zone = hero.zone
 	motes.clear()
-	spears.clear()
+	clear_spells()
 	grit.clear()
 	words.clear()
 	fx_air = null

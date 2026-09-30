@@ -474,6 +474,12 @@ by['discipline']['synergies'] = [{"from": "scourge", "from_name": "Scourge", "ta
 by['wheel']['synergies'] = [{"from": "scourge", "from_name": "Scourge", "table_pc": 6, "per_hard_point_pct": 3}]
 by['nails']['synergies'] = [{"from": "discipline", "from_name": "The Discipline", "table_pc": 6, "per_hard_point_pct": 3}]
 
+# ============================================================== the Ossuarch's Pale Lord keeps perks of its own
+by['spirit']['perks'] = [
+    {'id': 'spirittwin', 'name': 'Two Stones', 'text': 'Two Pale Lords may stand at once; each echoes your bone spells.', 'skill_level': 5, 'requires_stat': None},
+    {'id': 'spiritchain', 'name': 'The Unfallen', 'text': 'Its echoes land at full force on whatever your own spell missed.', 'skill_level': 10, 'requires_stat': {'stat': 'spi', 'value': 60}},
+]
+
 # ============================================================== every order: Masteries at level 30
 for s in S:
     if 'Mastery' in s['name'] and s['row'] != 6:

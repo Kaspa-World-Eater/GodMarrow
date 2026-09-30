@@ -40,6 +40,25 @@ func _draw() -> void:
 		for g in book.grit:
 			var k: float = clampf(g["t"] / 0.4, 0.0, 1.0)
 			px(S(g["tp"]), Color(GRIT, 0.8 * k))
+		# the Pale Lords' white waymarks
+		for l in book.lords:
+			var c := S(l["tp"])
+			draw_rect(Rect2(c + Vector2(-14, -6), Vector2(28, 12)), Color(0.16, 0.15, 0.14, 0.5))
+			draw_rect(Rect2(c + Vector2(-12, -14), Vector2(24, 12)), Color8(222, 218, 206))
+			draw_rect(Rect2(c + Vector2(-12, -4), Vector2(24, 4)), Color8(170, 164, 150))
+		# Marrow Siphon: the cone, scored in the dust
+		for f in book.siph_fx:
+			var k: float = clampf(f["t"] / 0.3, 0.0, 1.0)
+			for side in [-0.75, 0.0, 0.75]:
+				var d: Vector2 = f["dir"].rotated(side)
+				sliver(S(f["tp"]), S(f["tp"] + d * f["R"] * (1.0 - 0.3 * absf(side))), Color(BONE_D, 0.6 * k))
+		# Ossify's ring and the spurs' roots
+		for f in book.spikes_fx:
+			if f.get("ring", false):
+				var k2: float = clampf(f["t"] / 0.5, 0.0, 1.0)
+				for i in 24:
+					var ang := i / 24.0 * TAU
+					px(S(f["tp"] + Vector2(cos(ang), sin(ang)) * f["len"] * (1.0 - k2 * 0.3)), Color(BONE_M, 0.7 * k2))
 		return
 	var hero = book.hero
 	var t: float = book.time
@@ -64,6 +83,30 @@ func _draw() -> void:
 		var c := S(sp["tp"], 8.0)
 		var d: Vector2 = Iso.to_screen(sp["v"].normalized()) .normalized() * (10.0 if sp["small"] else 26.0)
 		sliver(c - d, c + d, BONE_M, 1.0 if sp["small"] else 2.0)
+	# Charnel Cages: ribs curving up round the ring, lumpy arms gripping inside
+	for c in book.cages:
+		var k: float = clampf((c["max"] - c["t"]) / 0.15, 0.0, 1.0) * clampf(c["t"] / 0.3, 0.0, 1.0)
+		for i in 10:
+			var ang: float = i / 10.0 * TAU + c["seed"]
+			var base: Vector2 = c["tp"] + Vector2(cos(ang), sin(ang)) * c["R"]
+			var top: Vector2 = c["tp"] + Vector2(cos(ang), sin(ang)) * c["R"] * 0.35
+			sliver(S(base), S(top, 22.0 * k), BONE_M if i % 2 else BONE_D, 1.0)
+		for i in 4:
+			var ang2: float = i * 1.9 + c["seed"]
+			var q: Vector2 = c["tp"] + Vector2(cos(ang2), sin(ang2)) * c["R"] * 0.5
+			sliver(S(q), S(q, 12.0 * k) + Vector2(sin(book.time * 3.0 + i) * 3.0, 0), BONE_D)
+	# spurs bursting from a wound: jagged, wild bone
+	for f in book.spikes_fx:
+		if f.get("ring", false):
+			continue
+		var k3: float = clampf(f["t"] / 0.5, 0.0, 1.0)
+		var tip: Vector2 = f["tp"] + Vector2(cos(f["a"]), sin(f["a"])) * f["len"]
+		sliver(S(f["tp"], 4.0), S(tip, 10.0 * k3), Color(BONE, k3))
+	# Bone Rain: straight falling shards
+	for r in book.rains:
+		for d in r["drops"]:
+			var c2 := S(d["tp"], d["z"] / 4.0)
+			sliver(c2 - Vector2(0, 10), c2, BONE_M)
 	# small words
 	var font = U.font("italic")
 	for w in book.words:

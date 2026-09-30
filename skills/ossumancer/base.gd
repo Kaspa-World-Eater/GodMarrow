@@ -57,10 +57,21 @@ var rise_t := 0.5             # until the next one may claw up
 # spells in flight
 var spears: Array = []        # {tp, v, t, dmg, hit: {}, splint, main, small}
 var words: Array = []         # small words over the world: {tp, s, t, col}
+var cages: Array = []         # Charnel Cages: {tp, R, t, max, dps, tick, drain}
+var spikes_fx: Array = []     # spurs bursting from a wound: {tp, a, len, t}
+var rains: Array = []         # Bone Rain: {tp, R, t, dmg, spawn, drops: [{tp, z}]}
+var siph_fx: Array = []       # Marrow Siphon's cone and the marrow drawn home: {tp, dir, R, t} / {from, t}
+var plates := 0.0             # Bone Armor still on him
+var plates_max := 0.0
+var lords: Array = []         # Pale Lords: {node, tp}
+# an echo (Pale Lord) casts the same spell from its stone, at a share of the force
+var force := 1.0
+var origin = null             # where a spell is cast from (null: from him)
+## the options an echo's blows carry (its force), so hurt() knows them; {} for his own
 
 # ================================================================== numbers (f_bone.js BS)
 func power() -> float:
-	return hero.st.skill_mult() * (1.0 + 0.1 * K("marrowm")) * (bone_floor() + (1.0 - bone_floor()) * mantle_frac())
+	return force * hero.st.skill_mult() * (1.0 + 0.1 * K("marrowm")) * (bone_floor() + (1.0 - bone_floor()) * mantle_frac())
 func bone_floor() -> float: return minf(0.95, 0.55 + 0.02 * K("marrowm") + (0.2 if K("marrowfloor") > 0 else 0.0))
 func mantle_cap() -> int: return int(round(20 + 2 * K("aura") + floorf(hero.st.e_ess() / 5.0)))
 func mantle_frac() -> float: return clampf(shards / maxf(1.0, mantle_cap()), 0.0, 1.0)
@@ -79,6 +90,21 @@ func skel_dmg() -> Vector2:
 	var L := L1("raise")
 	var k := 1.0 + 0.1 * K("legion")
 	return Vector2(1.6 + 0.8 * (L - 1.0), 3.0 + 1.3 * (L - 1.0)) * k
+func siphon_dmg() -> float: return (7.0 + 3.5 * (L1("siphon") - 1.0)) * power() * syn("siphon")
+func cage_dps() -> float: return (5.0 + 2.5 * (L1("ribcage") - 1.0)) * power() * syn("ribcage")
+func cage_life() -> float: return 2.4 + 0.12 * L1("ribcage")
+func ossify_r() -> float: return (1.8 + 0.03 * L1("ossify")) * (1.5 if K("ossifywide") > 0 else 1.0)
+func spike_dmg() -> float: return (14.0 + 6.0 * (L1("spikes") - 1.0)) * power() * syn("spikes")
+func spike_r() -> float: return (1.7 + 0.05 * L1("spikes")) * (1.5 if K("spikewide") > 0 else 1.0)
+func storm_max() -> int: return 6 + int(floorf(L1("sstorm") / 2.0))
+func storm_dmg() -> float: return (7.0 + 3.2 * (L1("sstorm") - 1.0)) * power() * syn("sstorm")
+func rain_dmg() -> float: return (6.0 + 3.0 * (L1("bonerain") - 1.0)) * power() * syn("bonerain")
+func armor_max() -> float: return (30.0 + 12.0 * (L1("barmor") - 1.0)) * syn("barmor")
+## the share of a blow meant for him that the nearest of his dead takes, while one stands within 4 yd (Bone Armor)
+func ward_share() -> float: return minf(0.4, 0.15 + 0.01 * L1("barmor")) if K("barmor") > 0 else 0.0
+func echo_k() -> float: return minf(0.85, 0.4 + 0.03 * K("spirit"))
+func from_tp() -> Vector2: return origin if origin != null else hero.tp
+func echo_opt() -> Dictionary: return {"echo": force} if origin != null else {}
 func blade_k() -> float: return 1.3 + 0.1 * maxf(1.0, K("blade"))
 func cleave_k() -> float: return 0.5 + 0.02 * K("blade")
 func cleave_n() -> int: return 3 if K("bladecleave") > 0 else 1
@@ -91,6 +117,14 @@ func weapon_avg() -> float:
 func hurt(m, dmg: float, id: String, o: Dictionary = {}) -> float:
 	if m == null or not is_instance_valid(m) or m.dead or m.buried or dmg <= 0.0:
 		return 0.0
+	if float(m.get_meta("o_oss", -1.0)) > time:   # ossified: +20%
+		dmg *= 1.2
+	if o.has("echo"):
+		# The Unfallen: an echo lands at full force on what his own spell missed
+		if K("spiritchain") > 0 and float(m.get_meta("o_struck", -9.0)) < time - 0.6:
+			dmg /= maxf(0.01, float(o["echo"]))
+	else:
+		m.set_meta("o_struck", time)
 	var opts := {}
 	if o.get("melee", false):
 		opts["melee"] = true
