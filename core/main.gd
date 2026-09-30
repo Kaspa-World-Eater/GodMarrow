@@ -12,6 +12,10 @@ var args := {}
 var last_lantern := {}        # {zone, x, y}
 var remnant := {}             # {zone, x, y, gold}
 var travelling := false
+var whisper_t := 60.0         # the world's whispers (zz_voice.js): every 60-120 s of quiet exploring
+var voice := {}
+var last_whisper := ""
+var boss_awake: Node = null
 var pending_load := {}        # a save waiting to be poured into the first hero (Continue)
 const SaveIO := preload("res://core/save.gd")
 
@@ -40,6 +44,11 @@ func _ready() -> void:
 	cam.position_smoothing_speed = 8.0
 	add_child(cam)
 	Bus.monster_killed.connect(_on_kill)
+	Bus.boss_woke.connect(func(m): boss_awake = m)
+	Bus.boss_felled.connect(func(m): if m == boss_awake: boss_awake = null)
+	var vj = JSON.parse_string(FileAccess.get_file_as_string("res://art/ui/voice.json"))
+	if vj is Dictionary:
+		voice = vj
 	if ResourceLoader.exists("res://ui/hud.gd"):
 		hud = load("res://ui/hud.gd").new()
 		add_child(hud)
@@ -100,6 +109,7 @@ func enter(zid: String, from: String) -> void:
 	if ResourceLoader.exists("res://world/objects.gd"):   # (world objects): town, objects, waystones, errands
 		load("res://world/objects.gd").attach(self, zone, hero)
 	Bus.zone_entered.emit(zid)
+	whisper_t = randf_range(40.0, 75.0)
 	save_game()
 	await get_tree().create_timer(0.5).timeout
 	travelling = false
@@ -154,6 +164,30 @@ func _process(_dt: float) -> void:
 			Bus.say.emit("The lantern takes back what it kept.", 2.5)
 			hero.stats_changed.emit()
 	_cut_walls()
+	_whisper(_dt)
+
+func _whisper(dt: float) -> void:
+	whisper_t -= dt
+	if whisper_t > 0.0:
+		return
+	var quiet: bool = not hero.dead and (hud == null or not hud.any_panel()) and not (boss_awake != null and is_instance_valid(boss_awake) and not boss_awake.dead)
+	if not quiet or voice.is_empty():
+		whisper_t = 5.0
+		return
+	whisper_t = randf_range(60.0, 120.0)
+	var zd: Dictionary = voice.get("zones", {}).get(zone.id, {})
+	var pool: Array = zd.get("w", [])
+	if pool.is_empty():
+		pool = voice.get("act", {}).get(str(load("res://world/quests.gd").act_of(zone.id)), [])
+	if pool.is_empty():
+		return
+	var line: String = pool[randi() % pool.size()]
+	if line == last_whisper and pool.size() > 1:
+		line = pool[(pool.find(line) + 1) % pool.size()]
+	last_whisper = line
+	var W := _world_ui()
+	if W:
+		W.whisper("", line)
 
 ## walls in front of the hero go thin so he is never lost behind them (the web cuts them to a stub)
 func _cut_walls() -> void:
