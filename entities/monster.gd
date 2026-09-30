@@ -260,6 +260,9 @@ func _physics_process(dt: float) -> void:
 		step_toward(_confused_to, dt)
 	elif brain:
 		brain.tick(self, dt)
+		if brain.state != _heard_state:
+			_heard_state = brain.state
+			_voice(_heard_state)
 	spr.face = face
 	spr.view = view
 	position = Iso.to_screen(tp) + Vector2(0, -z_lift)
@@ -324,3 +327,20 @@ func look(dir: Vector2) -> void:
 
 func hero() -> Hero:
 	return zone.hero_ref
+
+
+# ------------------------------------------------------------------ what you hear it do
+var _heard_state := ""
+## a wind-up creaks and scrapes (the tell you can hear), the blow itself cuts the air; quieter the farther it is
+func _voice(s: String) -> void:
+	var h = zone.hero_ref if zone else null
+	if h == null or not is_instance_valid(h):
+		return
+	var k := clampf(1.0 - tp.distance_to(h.tp) / 12.0, 0.0, 1.0)
+	if k <= 0.05:
+		return
+	var low := 0.75 if boss else (0.9 if radius > 0.45 else 1.1)
+	if s.ends_with("wind"):
+		Sfx.play("m_wind", k, low)
+	elif s in ["strike", "lunge", "charge", "lash", "dash", "swoop"]:
+		Sfx.play("swing", k * 0.9, low * 0.72)

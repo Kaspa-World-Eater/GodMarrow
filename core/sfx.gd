@@ -48,7 +48,7 @@ func _play(name: String, vol: float, pitch: float) -> void:
 	p.play()
 
 const GAIN := {"step_ash": -17.0, "step_stone": -18.0, "step_leaf": -18.0, "step_wet": -14.0, "swing": -13.0, "hit": -7.0,
-	"heavy": -5.0, "break": -9.0, "hurt": -8.0, "fall": -10.0, "roll": -12.0, "drink": -10.0}
+	"heavy": -5.0, "break": -9.0, "hurt": -8.0, "fall": -10.0, "roll": -12.0, "drink": -10.0, "m_wind": -12.0, "cast_mirror": -14.0, "cast_soul": -12.0, "cast_thread": -12.0}
 
 func _takes(name: String) -> Array:
 	if bank.has(name):
@@ -65,6 +65,12 @@ func _takes(name: String) -> Array:
 	return out
 
 func _wav(samples: PackedFloat32Array) -> AudioStreamWAV:
+	var pk := 0.0
+	for v in samples:
+		pk = maxf(pk, absf(v))
+	if pk > 0.9:
+		for i in samples.size():
+			samples[i] *= 0.9 / pk
 	var data := PackedByteArray()
 	data.resize(samples.size() * 2)
 	for i in samples.size():
@@ -167,6 +173,52 @@ func _make(name: String, rng: RandomNumberGenerator) -> PackedFloat32Array:
 			return s
 		"roll":        # cloth and ground: a longer rustle that swells
 			return _noise(rng, 0.34, 0.12, 9.0, 0.3, 0.7, 0.9)
+		"m_wind":      # a creature drawing back: a low scrape and creak rising
+			var n := int(0.4 * RATE)
+			var s := PackedFloat32Array()
+			s.resize(n)
+			var a := 0.0
+			var ph := 0.0
+			for i in n:
+				var t := float(i) / RATE
+				var w := rng.randf() * 2.0 - 1.0
+				a += (w - a) * 0.05
+				ph += (60.0 + 50.0 * t / 0.4) / RATE
+				var saw := fmod(ph, 1.0) * 2.0 - 1.0
+				var e := minf(1.0, t / 0.12) * (1.0 - t / 0.4)
+				s[i] = (a * 2.2 + saw * 0.12 * (0.5 + 0.5 * sin(t * 90.0))) * e
+			return s
+		"cast_mirror": # glass: a bright, uneven ring and a tick like a crack
+			var n := int(0.7 * RATE)
+			var s := PackedFloat32Array()
+			s.resize(n)
+			var f0 := 900.0 + rng.randf() * 180.0
+			for i in n:
+				var t := float(i) / RATE
+				var v := 0.0
+				for r in [1.0, 1.51, 2.37, 3.11]:
+					v += sin(TAU * f0 * r * t) / (r * r)
+				s[i] = v * exp(-t * 7.0) * 0.28
+			return _mix(s, _noise(rng, 0.03, 0.001, 120.0, 0.7, 0.98, 0.5))
+		"cast_soul":   # a breath let out: air, and a low hum under it
+			var s := _noise(rng, 0.45, 0.12, 7.0, 0.08, 0.3, 1.0)
+			return _mix(s, _thud(0.45, 140.0, 110.0, 6.0, 0.18))
+		"cast_thread": # a taut thread plucked: a bright pluck bending down
+			var n := int(0.4 * RATE)
+			var s := PackedFloat32Array()
+			s.resize(n)
+			var per := int(RATE / (300.0 + rng.randf() * 80.0))
+			var buf := PackedFloat32Array()
+			buf.resize(per)
+			for i in per:
+				buf[i] = rng.randf() * 2.0 - 1.0
+			for i in n:
+				var j := i % per
+				var nx := (j + 1) % per
+				var v := buf[j]
+				buf[j] = (buf[j] + buf[nx]) * 0.497
+				s[i] = v * 0.4 * minf(1.0, float(i) / 40.0)
+			return s
 		"drink":       # the draught: two swallows
 			var g1 := _thud(0.09, 180.0, 260.0, 30.0, 0.5)
 			return _mix(g1, _thud(0.09, 170.0, 250.0, 30.0, 0.45), int(RATE * 0.16))

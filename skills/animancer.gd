@@ -717,6 +717,11 @@ func held(id: String) -> bool:
 	return false
 
 ## the Mystic's own use(): costs are paid inside each cast (as the web's spendMana), held skills run in tick()
+## which of the three the skill belongs to, for its sound: glass, breath or thread
+const TREE_OF := {"pillars": "mirror", "golem": "mirror", "fissure": "mirror", "cage": "mirror", "anvil": "mirror",
+	"cull": "soul", "totem": "soul", "leash": "thread", "swarm": "thread", "wraith": "thread", "storm": "thread",
+	"mark": "thread", "orb": "thread", "word": "thread", "chain": "thread", "lance": "thread"}
+
 func use(id: String, at: Vector2, target: Monster) -> bool:
 	if id == "attack" or id == "":
 		return false
@@ -737,6 +742,7 @@ func use(id: String, at: Vector2, target: Monster) -> bool:
 	ok = _cast(id, at, target)
 	cf = -1.0
 	if ok:
+		Sfx.play("cast_" + str(TREE_OF.get(id, "soul")))
 		if id != "wraith":
 			end_wraith()
 		# The Bell-Warden: every fifth spell rings; reversed, the bell silences you a breath
