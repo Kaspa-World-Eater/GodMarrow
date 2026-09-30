@@ -17,7 +17,7 @@ const LORE := {
 	"wand": ["Carved from a finger that once pointed at the god, and was right.", "Bone remembers being a hand. It still wants to point."],
 	"dagger": ["A tithe-knife. The blade is thin from all the giving.", "The knife that cuts the cord cuts the vow, the midwives say."],
 	"staff": ["A pilgrim's staff, black with grave-dirt at the heel.", "It has walked further down than you. It knows the way."],
-	"claw": ["Vharn claws, cut from what fed on shrine-offerings."],
+	"claw": ["Lacquered claws, black as a shrine-bell's tongue."],
 	"talons": ["Hooked bone on a leather cuff, for those who take their tithe by hand."],
 	"relic": ["The skull is warm. It is listening to you choose.", "Pilgrims carried relics to be carried. It has not decided about you."],
 	"hood": ["Mourning cloth dyed in ash. It is never quite dry.", "Worn low, as the Tithed wear it, so the god cannot see who weeps."],

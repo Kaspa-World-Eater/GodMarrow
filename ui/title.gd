@@ -25,7 +25,7 @@ const PILGRIMS := [
 	["hemomancer", "pilgrim_hemo", "The Hemomancer", "Opens the vein, and the vein answers.", Vector2(928, 864), 1, false, ""],
 	["animancer", "pilgrim_mystic", "The Hollow Mystic", "Listens at mirrors. Keeps the dead on a thread.", Vector2(1152, 840), 1, true, ""],
 	["ossumancer", "pilgrim_ossu", "The Ossuarch", "Counts the dead, and the dead stand up to be counted.", Vector2(1580, 840), -1, false, ""],
-	["miasmancer", "", "The Shrine Keeper", "Folds the breath into paper, and the paper walks.", Vector2(1760, 880), -1, false, "charm"],
+	["miasmancer", "", "The Shrine Keeper", "Folds the breath into paper, and the paper walks.", Vector2(1760, 880), -1, true, "charm"],
 	["monk", "", "The Empty Hand", "Carries nothing. Strikes with that.", Vector2(1150, 1010), 1, true, "bowl"],
 ]
 ## the cards round the bowl (chapel px, the card's centre as it lies; its turn in radians). The orders' lie face up
