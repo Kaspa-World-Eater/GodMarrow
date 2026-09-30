@@ -122,6 +122,7 @@ func tick(dt: float) -> void:
 	_views()
 	tick_mantle(dt)
 	tick_dead(dt)
+	tick_charge(dt)
 	tick_spears(dt)
 	tick_cages(dt)
 	tick_rains(dt)
@@ -141,7 +142,7 @@ func tick(dt: float) -> void:
 	words = words.filter(func(w): return w["t"] > 0.0)
 	# hold to keep striking
 	if hero.act == "" and not hero.dead:
-		for id in ["blade", "spear", "siphon"]:
+		for id in ["blade", "siphon"]:
 			if K(id) > 0 and held(id):
 				cast_anim = POSE.get(id, "cast")
 				cast_len = -1.0
@@ -184,7 +185,7 @@ func _views() -> void:
 # ================================================================== the test driver (--autocast)
 func _autocast(dt: float) -> void:
 	auto_t -= dt
-	if auto_t > 0.0 or hero.dead or hero.act != "":
+	if auto_t > 0.0 or hero.dead or hero.act != "" or not charging.is_empty():
 		return
 	auto_t = 0.6
 	var ids: Array = auto_ids if not auto_ids.is_empty() else hard.keys()
@@ -203,6 +204,8 @@ func _autocast(dt: float) -> void:
 		hero.walk_to(m.tp)
 	elif use(id, m.tp, m):
 		hero._start_act(cast_anim, cast_len)
+		if id == "spear" and not charging.is_empty():
+			charging["goal"] = randi() % 4
 	elif trace:
 		print("AUTO ", id, " refused: act '", hero.act, "' res ", hero.st.res, " shards ", shards, " poise ", hero.st.poise)
 	demo_at = null

@@ -5,7 +5,7 @@ extends Node2D
 ## Bone is matter, never light: pale, flat, stepped at the pixel grain. No glow, no trails.
 
 const U := preload("res://ui/uikit.gd")
-const P := 4.0                # the pixel grain
+const P := 3.0                # the pixel grain: the heroes' own (3 scene px an art pixel)
 var book
 var floor_mode := false
 
@@ -78,11 +78,26 @@ func _draw() -> void:
 		var to: Vector2 = S(hero.tp, 6.0) - c
 		var d := to.normalized() * 6.0 if to.length() > 0.1 else Vector2(6, 0)
 		sliver(c - d, c + d, BONE_M)
-	# Bone Lances: a long straight spear of packed bone
+	# Bone Lances: a long straight spear of packed bone (splinters and the Storm's shards are slivers)
 	for sp in book.spears:
 		var c := S(sp["tp"], 8.0)
-		var d: Vector2 = Iso.to_screen(sp["v"].normalized()) .normalized() * (10.0 if sp["small"] else 26.0)
-		sliver(c - d, c + d, BONE_M, 1.0 if sp["small"] else 2.0)
+		var u: Vector2 = Iso.to_screen(sp["v"].normalized()).normalized()
+		if sp["small"]:
+			sliver(c - u * 9.0, c + u * 9.0, BONE_M)
+		else:
+			lance(c, u, int(sp.get("tier", 0)), 1.0)
+	# the lance growing at his side while he charges it
+	if not book.charging.is_empty():
+		var ch: Dictionary = book.charging
+		var tier: int = ch["tier"]
+		var nxt: float = book.LANCE_T[mini(tier, 2)]
+		var prev: float = 0.0 if tier == 0 else book.LANCE_T[tier - 1]
+		var grow := 1.0 if tier >= 3 else clampf((ch["t"] - prev) / maxf(0.01, nxt - prev), 0.0, 1.0)
+		var dir: Vector2 = ch["at"] - hero.tp
+		var u2: Vector2 = Iso.to_screen(dir.normalized() if dir.length() > 0.05 else Vector2(1, 1).normalized()).normalized()
+		var side := Vector2(-u2.y, u2.x) * (1.0 if u2.x >= 0.0 else -1.0)
+		var rise := clampf(ch["t"] / 0.2, 0.0, 1.0)
+		lance(S(hero.tp, 4.0 + 10.0 * rise) + side * 16.0, u2, tier, 0.55 + 0.45 * grow)
 	# Charnel Cages: ribs curving up round the ring, lumpy arms gripping inside
 	for c in book.cages:
 		var k: float = clampf((c["max"] - c["t"]) / 0.15, 0.0, 1.0) * clampf(c["t"] / 0.3, 0.0, 1.0)
@@ -115,3 +130,56 @@ func _draw() -> void:
 		var wd := font.get_string_size(w["s"], HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x
 		draw_string(font, pw + Vector2(-wd / 2.0 + 1, 1), w["s"], HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(0, 0, 0, 0.7 * kw))
 		draw_string(font, pw + Vector2(-wd / 2.0, 0), w["s"], HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(w["col"], kw))
+
+
+## a lance of packed bone along u, after D2's Bone Spear but solid bone in our colours: a long barbed head tapering
+## to a hard point, a thin shaft knuckled like a spine, a light edge on the upper side and shade below, a dark
+## outline. From tier 1 a faint warmth of marrow about it that deepens with each tier (the user asked for this
+## subtle glow, 2026-09-30); at tier 3 amber marrow shows through the core of the shaft.
+func lance(c: Vector2, u: Vector2, tier: int, k: float) -> void:
+	var half := int((12.0 + 4.0 * tier) * k)          # art pixels from the middle to either end
+	var head := int((6 + 2 * tier) * clampf(k, 0.6, 1.0))
+	var n := Vector2(-u.y, u.x)
+	if n.y > 0.0:
+		n = -n                                         # n points up the screen: the lit side
+	if tier >= 1:
+		for ring in 3:
+			var rr := (half + 5.0 - ring * 2.5) * P
+			var ww := (1.5 + tier * 1.2 - ring * 0.6) * P
+			var pts := PackedVector2Array()
+			for a_i in 20:
+				var a := a_i / 20.0 * TAU
+				pts.append(c + u * cos(a) * rr + n * sin(a) * ww)
+			draw_colored_polygon(pts, Color(1.0, 0.86, 0.62, 0.03 * tier))
+	var sw := 0 if tier < 2 else 1                     # half-width of the shaft (cells beside the core)
+	var OUT := Color(0.16, 0.14, 0.12)
+	var AMBER := Color(0.86, 0.62, 0.3)
+	for i in range(-half, half + 1):
+		var from_tip := half - i
+		var hw := sw
+		var barb := false
+		if from_tip < head:
+			# the head: widest at its base, straight taper to the point
+			hw = int(round((sw + 2.0) * float(from_tip) / head))
+			barb = from_tip == head - 1
+		elif (i + half) % 5 == 0 and i > -half + 1:
+			hw = sw + 1                                  # a knuckle of the spine
+		for j in range(-hw - 1, hw + 2):
+			var q := c + u * i * P + n * j * P
+			var col := BONE_M
+			if absi(j) == hw + 1:
+				col = OUT
+			elif hw > 0 and j == hw:
+				col = BONE
+			elif hw > 0 and j == -hw:
+				col = BONE_D
+			if tier >= 3 and from_tip >= head and j == 0:
+				col = BONE_M.lerp(AMBER, 0.55)
+			elif tier == 2 and from_tip >= head and j == 0 and (i + half) % 5 == 0:
+				col = BONE_M.lerp(AMBER, 0.4)
+			draw_rect(Rect2(Vector2(floorf(q.x / P) * P, floorf(q.y / P) * P), Vector2(P, P)), col)
+		if barb:   # two barbs swept back from the head's base
+			for side in [-1, 1]:
+				for b in 2:
+					var q2: Vector2 = c + u * (i - 1 - b) * P + n * side * (sw + 2 + b) * P
+					draw_rect(Rect2(Vector2(floorf(q2.x / P) * P, floorf(q2.y / P) * P), Vector2(P, P)), BONE if side > 0 else BONE_D)

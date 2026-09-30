@@ -452,7 +452,7 @@ for pk in by['molt'].get('perks', []):
 # Almoners (the brotherhood's alms-collectors, gone out to gather blood instead of coin); the terror is the Dread Procession
 for x in S:
     if x['class'] == H and x['tab'] == 2:
-        x['tree'] = 'Penances'
+        x['tree'] = 'Penance'
 by['spool']['name'] = 'The Almoners'
 by['spool']['description'] = ("[Passive] Little hooded almoners ride in your sleeves. Whenever you wound an enemy one may drop, crawl to the wound "
     "with its bowl held out, fill it, then climb back up your arm and pour what it gathered into you as life and Vitae. Levels: more "
@@ -473,6 +473,19 @@ by['tallhat']['description'] = ("Walk as the procession walked by night, in the 
 by['discipline']['synergies'] = [{"from": "scourge", "from_name": "Scourge", "table_pc": 8, "per_hard_point_pct": 4}]
 by['wheel']['synergies'] = [{"from": "scourge", "from_name": "Scourge", "table_pc": 6, "per_hard_point_pct": 3}]
 by['nails']['synergies'] = [{"from": "discipline", "from_name": "The Discipline", "table_pc": 6, "per_hard_point_pct": 3}]
+
+# ============================================================== the Ossuarch's level-30 Ossuary skill is the Pale Legion
+by['legion']['name'] = 'Pale Legion'
+NAMES_EXTRA = [('Bone Legion', 'Pale Legion')]
+for s_ in S:
+    for k_ in ('description', 'lore'):
+        if isinstance(s_.get(k_), str):
+            for a_, b_ in NAMES_EXTRA:
+                s_[k_] = s_[k_].replace(a_, b_)
+    for g_ in s_.get('synergies', []):
+        if g_.get('from') == 'legion':
+            g_['from_name'] = 'Pale Legion'
+    s_['prerequisite_names'] = [by[p_]['name'] if p_ in by else p_ for p_ in s_.get('prerequisites', [])]
 
 # ============================================================== the Ossuarch's Pale Lord keeps perks of its own
 by['spirit']['perks'] = [
@@ -555,7 +568,7 @@ json.dump(D, open(SK, 'w'), ensure_ascii=False)
 C = json.load(open('data/classes.json'))
 C['classes'][O]['tabs'] = ['Ossuary', 'Carapace', 'Count']
 C['classes'][O]['default_keys'] = {'q': 'spear', 'w': 'ribcage', 'e': 'spikes', 'r': 'colossus', 't': 'opencount', 'y': 'host', 'u': 'sstorm', 'f': 'barmor'}
-C['classes'][H]['tabs'] = ['Mortification', 'Blood', 'Penances']
+C['classes'][H]['tabs'] = ['Mortification', 'Blood', 'Penance']
 C['classes'][H]['display_name'] = 'The Red Penitent'
 C['classes'][H]['display_name_runtime'] = 'The Red Penitent'
 C['classes'][H]['default_keys'] = {'q': 'blance', 'w': 'hemor', 'e': 'vwhip', 'r': 'fgolem', 't': 'scourge', 'y': 'discipline', 'u': 'wheel', 'f': 'ironmaiden'}

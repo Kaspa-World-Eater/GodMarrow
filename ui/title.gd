@@ -29,7 +29,7 @@ const PILGRIMS := [
 const ORDER := {
 	"animancer": {"god": "Of the Soul, the Veiled Crone", "portrait": "portrait_mystic", "draws": "Essence, and a choir of wisps", "ways": "Mirror · Soul · Thread",
 		"text": "They listen at mirrors until something listens back. A Mystic keeps a few of the restless dead about her, wisps that dive at whatever comes near and grow back when spent, and ties the rest down with thread and needle. I walked a season beside one. She never once looked where she was going. The mirrors did that for her."},
-	"hemomancer": {"god": "Of the Flesh, the Bleeding Maiden", "portrait": "portrait_hemo", "draws": "Vitae; every working costs him life", "ways": "Mortification · Blood · Penances",
+	"hemomancer": {"god": "Of the Flesh, the Bleeding Maiden", "portrait": "portrait_hemo", "draws": "Vitae; every working costs him life", "ways": "Mortification · Blood · Penance",
 		"text": "The Brotherhood of the Precious Wound pays for everything in blood, and their own first. What a Hemomancer opens, he keeps: a brood that crawls out of the cut, a golem of it, pools that drink what falls in them. They are gentle with strangers. I would still not sleep near one."},
 	"ossumancer": {"god": "Of the Bone, Old Upright", "portrait": "portrait_ossu", "draws": "Marrow", "ways": "Ossuary · Carapace · Count",
 		"text": "The Pale Order counts the dead, and what they count stands up. An Ossuarch sends the bones of the fallen to walk ahead of him, wears the rest as plate, throws the splinters, and cuts a count into whatever he strikes. He does not bend. I once saw one carried home on a door, sitting upright, still counting."},

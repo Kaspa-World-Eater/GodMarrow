@@ -119,12 +119,74 @@ func absorb(d: float, _elem: String) -> float:
 	return d
 
 # ------------------------------------------------------------------ Bone Lance
-func cast_lance(a: Vector2) -> bool:
+## Hold to charge (the user, 2026-09-30: "charge tiers ... grow bigger, with more subtle glow each time", D2's Bone
+## Spear but solid bone in our colours). A tap throws the plain lance. Held, a lance grows out of the ground at his
+## side, drawing a shard from the Mantle at each tier: 0.35 s, 0.8 s, 1.3 s. Release (or a full charge held 0.3 s)
+## and it flies: bigger, harder and farther with each tier, a faint warmth of marrow in the bone that deepens.
+##   tier 0: x1        tier 1: x1.5 wider        tier 2: x2.2, splinters        tier 3: x3.2, impales and shoves
+const LANCE_T := [0.35, 0.8, 1.3]
+const LANCE_K := [1.0, 1.5, 2.2, 3.2]
+var charging := {}            # {t, tier, at, goal (autocast)}
+
+func cast_lance(a: Vector2, tier: int = -1) -> bool:
+	if tier < 0 and origin == null:
+		# his own cast: begin the charge (a tap is a tier-0 lance, thrown on release)
+		charging = {"t": 0.0, "tier": 0, "at": a}
+		cast_len = 4.0
+		return true
+	_throw_lance(a, maxi(0, tier))
+	return true
+
+func _throw_lance(a: Vector2, tier: int) -> void:
 	var o := from_tp()
 	var dir := (a - o).normalized() if a.distance_to(o) > 0.05 else Vector2(1, 1).normalized()
-	spears.append({"tp": o + dir * 0.3, "v": dir * 13.0, "t": 0.75, "dmg": spear_dmg(), "hit": {}, "splint": K("splinter") > 0, "main": true, "small": false, "pierce": 0, "opt": echo_opt()})
-	Sfx.play("cast_mirror", 0.6, 0.7)
-	return true
+	spears.append({"tp": o + dir * 0.3, "v": dir * (13.0 + tier), "t": 0.75 + 0.12 * tier, "dmg": spear_dmg() * LANCE_K[tier], "hit": {},
+		"splint": K("splinter") > 0 or tier >= 2, "main": true, "small": false, "pierce": 0, "tier": tier, "R": 0.2 + 0.08 * tier, "opt": echo_opt()})
+	Sfx.play("cast_mirror", 0.6 + 0.1 * tier, 0.75 - 0.08 * tier)
+	if tier >= 2:
+		Game.shake(1.0 + tier)
+
+## the charge grows while the button is held; released (or full), the lance flies, and the Pale Lords throw theirs
+func tick_charge(dt: float) -> void:
+	if charging.is_empty():
+		return
+	if hero.dead or hero.act == "roll" or hero.act == "stun":
+		charging = {}
+		return
+	charging["t"] += dt
+	if not charging.has("goal"):
+		charging["at"] = aim_point()   # he turns the growing lance to follow the cursor (a test's aim stays put)
+	hero.walking = false
+	hero._face(charging["at"] - hero.tp)
+	if hero.act == "cast":
+		hero.act_t = minf(hero.act_t, hero.act_len * 0.45)   # hold the raised pose while it grows
+	var tier: int = charging["tier"]
+	if tier < 3 and charging["t"] >= LANCE_T[tier]:
+		if shards >= 1.0:
+			shards -= 1.0
+			charging["tier"] = tier + 1
+			dust(hero.tp, 4)
+			Sfx.play("break", 0.25, 1.6 - 0.2 * tier)
+		else:
+			charging["t"] = LANCE_T[tier]   # no bone left to grow it with
+	var goal: int = int(charging.get("goal", -1))
+	var release: bool = not held("spear") if goal < 0 else charging["tier"] >= goal
+	if charging["tier"] >= 3 and charging["t"] > LANCE_T[2] + 0.3:
+		release = true
+	if release:
+		var at: Vector2 = charging["at"]
+		var tr: int = charging["tier"]
+		charging = {}
+		_throw_lance(at, tr)
+		for l in lords:
+			if is_instance_valid(l["node"]):
+				origin = l["tp"]
+				force = echo_k()
+				_throw_lance(at, tr)
+				origin = null
+				force = 1.0
+		if hero.act == "cast":
+			hero.act_t = maxf(hero.act_t, hero.act_len - 0.15)
 
 ## lances, splinters and the Storm's shards in flight: straight, piercing, stopped by walls
 func tick_spears(dt: float) -> void:
@@ -140,15 +202,18 @@ func tick_spears(dt: float) -> void:
 				break
 			s["tp"] = nxt
 			for m in mons():
-				if s["hit"].has(m) or m.tp.distance_to(s["tp"]) > m.radius + 0.2:
+				if s["hit"].has(m) or m.tp.distance_to(s["tp"]) > m.radius + float(s.get("R", 0.2)):
 					continue
 				s["hit"][m] = true
 				var opt: Dictionary = s["opt"].duplicate()
 				opt["from"] = s["tp"] - s["v"].normalized()
 				hurt(m, s["dmg"], s.get("id", "spear"), opt)
 				dust(m.tp, 3)
-				if s["main"] and K("impale") > 0 and m.rank != "boss":
-					m.stun = maxf(m.stun, 0.6)
+				var tier: int = int(s.get("tier", 0))
+				if s["main"] and (K("impale") > 0 or tier >= 3) and m.rank != "boss":
+					m.stun = maxf(m.stun, 0.6 + 0.2 * tier)
+				if tier >= 3 and m.rank != "boss":
+					m.tp = zone.move(m.tp, s["v"].normalized() * 0.6, m.radius)
 				if s["splint"]:
 					s["splint"] = false
 					var ang: float = s["v"].angle()
@@ -361,7 +426,7 @@ func cast_lord(a: Vector2) -> bool:
 	Sfx.play("break", 0.5, 0.5)
 	return true
 
-const ECHOED := ["spear", "siphon", "ribcage", "ossify", "spikes", "sstorm", "bonerain"]
+const ECHOED := ["siphon", "ribcage", "ossify", "spikes", "sstorm", "bonerain"]
 
 ## each Pale Lord casts the bone spell again, from its stone, at the same point, at a share of the force
 func echo(id: String, a: Vector2) -> void:
@@ -387,7 +452,7 @@ func tick_lords(dt: float) -> void:
 ## the bone spells by id (casting and echoes share it)
 func _cast_bone(id: String, a: Vector2) -> bool:
 	match id:
-		"spear": return cast_lance(a)
+		"spear": return cast_lance(a, 0 if origin != null else -1)
 		"siphon": return cast_siphon(a)
 		"ribcage": return cast_cage(a)
 		"ossify": return cast_ossify(a)
@@ -397,6 +462,7 @@ func _cast_bone(id: String, a: Vector2) -> bool:
 	return false
 
 func clear_spells() -> void:
+	charging = {}
 	spears.clear()
 	cages.clear()
 	rains.clear()
