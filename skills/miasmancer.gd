@@ -144,12 +144,6 @@ func before_hit(d: float, elem: String, from: Vector2, opts: Dictionary) -> floa
 		return 0.0
 	return d
 
-func _lose(m) -> void:
-	if m.brain and m.brain.state != "sleep":
-		m.brain._release_token(m)
-		m.brain.state = "sleep"
-		m.brain.wake_delay = -1.0
-
 func unseen(m) -> bool:
 	return unseen_t > 0.0
 

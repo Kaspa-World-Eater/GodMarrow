@@ -15,6 +15,13 @@ var data := {}             # id -> row from skills.json
 var busy := false
 var cast_anim := "cast"     # the pose the hero strikes for the skill just used (an order may pick its own)
 var cast_len := -1.0        # and how long it holds (-1: the usual 0.55 s over cast speed)
+var _virt := {}             # perk id -> [its skill id, the perk's row]: a perk counts as a skill of its own
+# tests (user args): --learn, --autocast, the trace, and what each skill dealt (core/main.gd's arena prints it)
+var trace := false
+var dmg_log := {}
+var auto_on := false
+var auto_ids: Array = []
+var demo_at = null          # where a test aims instead of the mouse
 
 static func for_class(h: Hero, c: String) -> SkillBook:
 	var path := "res://skills/%s.gd" % c
@@ -33,11 +40,43 @@ func _load() -> void:
 	var kit: Dictionary = cd.get("starting_kit", {})
 	left = kit.get("left_skill", "attack")
 	right = kit.get("right_skill", "attack")
+	for id in data:
+		for p in data[id].get("perks", []):
+			_virt[p["id"]] = [id, p]
 	if not Bus.monster_killed.is_connected(_on_kill):
 		Bus.monster_killed.connect(_on_kill)
+	_read_args()
 
 ## a creature died anywhere (Bus.monster_killed); an order answers it by overriding this
 func _on_kill(_m) -> void:
+	pass
+
+## test args shared by every order: --learn=all[:L] or --learn=id,id[:L] (hard points, default 10), --autocast[=id,id]
+func _read_args() -> void:
+	for a in OS.get_cmdline_user_args():
+		var kv: PackedStringArray = a.trim_prefix("--").split("=")
+		var k: String = kv[0]
+		var v: String = kv[1] if kv.size() > 1 else ""
+		match k:
+			"learn":
+				var L := 10
+				var spec := v
+				if ":" in v:
+					spec = v.split(":")[0]
+					L = int(v.split(":")[1])
+				var ids: Array = data.keys() if spec == "all" or spec == "" else Array(spec.split(","))
+				for id in ids:
+					if data.has(id):
+						hard[id] = clampi(L, 1, 20)
+			"autocast":
+				auto_on = true
+				if v != "":
+					auto_ids = Array(v.split(","))
+			_:
+				_arg(k, v)
+
+## an order's own test args
+func _arg(_k: String, _v: String) -> void:
 	pass
 
 func name_of(id: String) -> String:
@@ -53,6 +92,105 @@ func lvl(id: String) -> int:
 	var s: Dictionary = data.get(id, {})
 	var bonus: int = int(hero.st.item("skall")) + int(hero.st.item("skt%d" % int(s.get("tab", 0)))) + (hero.st.arc.skill_bonus() if hero.st.arc else 0)
 	return h + bonus
+
+## a skill's level for its numbers: a perk is a virtual skill at its skill's level once it is on (its skill level
+## reached, and its attribute when it asks one); 0 when off
+func K(id: String) -> int:
+	if _virt.has(id):
+		var vv: Array = _virt[id]
+		var p: Dictionary = vv[1]
+		var L := lvl(vv[0])
+		if L < int(p.get("skill_level", 99)):
+			return 0
+		var rs = p.get("requires_stat")
+		if rs is Dictionary and _stat(rs.get("stat", "")) < float(rs.get("value", 0)):
+			return 0
+		return L
+	if not data.has(id):
+		return 0
+	return lvl(id)
+
+## the SKILL_GROWTH curve on K: level 1 counts fully, every level after it 60%
+func L1(id: String) -> float:
+	return 1.0 + (maxi(1, K(id)) - 1) * 0.6
+
+## D2 synergies: each hard point in a feeding skill adds its table percent (halved, as the web build does)
+func syn(id: String) -> float:
+	var b := 0.0
+	for y in data.get(id, {}).get("synergies", []):
+		b += float(y.get("table_pc", 0)) * int(hard.get(y.get("from", ""), 0))
+	return 1.0 + b / 200.0
+
+func _stat(s: String) -> float:
+	match s:
+		"spi":
+			return hero.st.e_ess()
+		"vit":
+			return hero.st.e_vit()
+		"con":
+			return hero.st.e_con()
+	return 0.0
+
+# ------------------------------------------------------------------ helpers every order uses
+func now() -> float:
+	return Time.get_ticks_msec() / 1000.0
+
+## where the pilgrim aims: the mouse's tile, or a test's point
+func aim_point() -> Vector2:
+	if demo_at != null:
+		return demo_at
+	return hero.mouse_tile()
+
+## a point no farther than maxd from the pilgrim
+func clamp_cast(a: Vector2, maxd: float) -> Vector2:
+	var d := a - hero.tp
+	return hero.tp + d.normalized() * maxd if d.length() > maxd else a
+
+func say(t: String, secs: float = 1.0) -> void:
+	Bus.say.emit(t, secs)
+
+## the living creatures (not dead, not under the ground)
+func mons() -> Array:
+	var out: Array = []
+	if hero == null:
+		return out
+	for m in hero.get_tree().get_nodes_in_group("monsters"):
+		if not m.dead and not m.buried:
+			out.append(m)
+	return out
+
+## the nearest creature within R of p that passes filt
+func near(p: Vector2, R: float, filt: Callable = Callable()) -> Monster:
+	var best: Monster = null
+	var bd := R
+	for m in mons():
+		if filt.is_valid() and not filt.call(m):
+			continue
+		var d: float = m.tp.distance_to(p)
+		if d < bd:
+			bd = d
+			best = m
+	return best
+
+## every creature whose body is within R of c
+func foes(c: Vector2, R: float) -> Array:
+	var out: Array = []
+	for m in mons():
+		if m.tp.distance_to(c) < R + m.radius:
+			out.append(m)
+	return out
+
+func wake(m) -> void:
+	m.awake = true
+	if m.brain and m.brain.state == "sleep":
+		m.brain.wake(m)
+
+## a creature loses the pilgrim: back to sleep, its attack turn given up
+func _lose(m) -> void:
+	if m.brain and m.brain.state != "sleep":
+		m.brain._release_token(m)
+		m.brain.state = "sleep"
+		m.brain.wake_delay = -1.0
 
 func can_learn(id: String) -> bool:
 	var s: Dictionary = data.get(id, {})

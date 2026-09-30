@@ -242,12 +242,6 @@ func _cast_nothing() -> bool:
 	cast_len = 0.3
 	return true
 
-func _lose(m) -> void:
-	if m.brain and m.brain.state != "sleep":
-		m.brain._release_token(m)
-		m.brain.state = "sleep"
-		m.brain.wake_delay = -1.0
-
 func _end_nothing() -> void:
 	nothing_t = 0.0
 	var n := 0

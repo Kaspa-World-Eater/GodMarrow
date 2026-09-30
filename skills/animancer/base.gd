@@ -178,57 +178,34 @@ var cf := -1.0               # the choir as a fraction of full while a spell is 
 var pending_tap := ""
 var fx_air: Node2D
 var fx_floor: Node2D
-var _virt := {}
 var _mons: Array = []
 var _mons_t := -1.0
 var _was_dead := false
 # testing
 var hold_force := ""
-var demo_at = null
-var auto_ids: Array = []
-var auto_on := false
 var auto_stand := false        # the balance arena: stand and cast, never walk in to strike
 var auto_i := 0
 var auto_t := 1.0
-var trace := false
 var trace_t := 5.0
-var dmg_log := {}
 
 # ================================================================== setup
-func _load() -> void:
-	super._load()
-	for id in data:
-		for p in data[id].get("perks", []):
-			_virt[p["id"]] = [id, p]
-	_args()
+## the Mystic's own test args (the shared ones are read in skill_book.gd)
+func _arg(k: String, v: String) -> void:
+	match k:
+		"ess":
+			hero.st.ess = int(v)
+			hero.st.res = hero.st.res_max()
+		"mystrace":
+			trace = true
+		"myscheck":
+			check_numbers()
 
-func _args() -> void:
-	for a in OS.get_cmdline_user_args():
-		var kv: PackedStringArray = a.trim_prefix("--").split("=")
-		var k: String = kv[0]
-		var v: String = kv[1] if kv.size() > 1 else ""
-		match k:
-			"learn":
-				var L := 10
-				var spec := v
-				if ":" in v:
-					spec = v.split(":")[0]
-					L = int(v.split(":")[1])
-				var ids: Array = data.keys() if spec == "all" or spec == "" else Array(spec.split(","))
-				for id in ids:
-					if data.has(id):
-						hard[id] = clampi(L, 1, 20)
-			"ess":
-				hero.st.ess = int(v)
-				hero.st.res = hero.st.res_max()
-			"autocast":
-				auto_on = true
-				if v != "":
-					auto_ids = Array(v.split(","))
-			"mystrace":
-				trace = true
-			"myscheck":
-				check_numbers()
+## a perk is a virtual skill; the golem's three weapons count at the golem's level
+func K(id: String) -> int:
+	if id == "sword" or id == "axe" or id == "flail":
+		return lvl("golem")
+	return super.K(id)
+
 
 ## prints this port's numbers next to the web's sampled tooltip numbers (skills.json levels) at L1, L10, L20, for a
 ## fresh hero (the export's reference: Essence 25, skill multiplier x1.30). Marks rows that differ by over 6%.
@@ -283,36 +260,6 @@ func check_numbers() -> void:
 	hard = keep
 
 # ================================================================== levels, perks, synergies
-## a skill's effective level (P.skills in the web); a perk is a virtual skill at its skill's level once it is on
-func K(id: String) -> int:
-	if _virt.has(id):
-		var vv: Array = _virt[id]
-		var p: Dictionary = vv[1]
-		var L := lvl(vv[0])
-		if L < int(p.get("skill_level", 99)):
-			return 0
-		var rs = p.get("requires_stat")
-		if rs is Dictionary and _stat(rs.get("stat", "")) < float(rs.get("value", 0)):
-			return 0
-		return L
-	if id == "sword" or id == "axe" or id == "flail":
-		return lvl("golem")
-	if not data.has(id):
-		return 0
-	return lvl(id)
-
-func _stat(s: String) -> float:
-	match s:
-		"spi":
-			return hero.st.e_ess()
-		"vit":
-			return hero.st.e_vit()
-		"con":
-			return hero.st.e_con()
-	return 0.0
-
-func L1(id: String) -> float:
-	return 1.0 + (maxi(1, K(id)) - 1) * 0.6
 
 ## D2 synergies: only hard points; syn = 1 + sum(table_pc x hard[from]) / 200 (o_skills14.js)
 func syn_bonus(id: String) -> float:
@@ -535,11 +482,6 @@ func is_idle(m) -> bool:
 func threatens(m) -> bool:
 	return m.awake and m.brain != null and m.brain.state in ["chase", "wind", "strike", "recover", "gap"] and m.tp.distance_to(hero.tp) < 6.0
 
-func wake(m) -> void:
-	m.awake = true
-	if m.brain and m.brain.state == "sleep":
-		m.brain.wake(m)
-
 func taunt(m, by, secs: float) -> void:
 	m.set_meta("mys_taunt_until", Time.get_ticks_msec() / 1000.0 + secs)
 	m.set_meta("mys_taunt_by", by)
@@ -581,12 +523,6 @@ func walkable_near(p: Vector2) -> Vector2:
 					return q
 	return hero.tp
 
-func clamp_cast(a: Vector2, maxd: float) -> Vector2:
-	var d := a - hero.tp
-	if d.length() > maxd:
-		a = hero.tp + d.normalized() * maxd
-	return a
-
 ## the pale look of a thing breaking: glass that falls and lies a moment
 func glass_burst(p: Vector2, n: int, spd: float, z0: float) -> void:
 	for i in n:
@@ -614,14 +550,6 @@ func new_soul(at: Vector2, ang: float, spd: float, dmg: float, hits: int = -1) -
 		"dmg": dmg, "hits": hits if hits > 0 else ws_soul_hits(), "hit": {}}
 	souls.append(s)
 	return s
-
-func aim_point() -> Vector2:
-	if demo_at != null:
-		return demo_at
-	return hero.mouse_tile()
-
-func say(t: String, secs: float = 1.0) -> void:
-	Bus.say.emit(t, secs)
 
 ## a hit from the Mystic's side. The choir multiplies everything but his golem's blows (light79); Needle's Mark
 ## brands for its own share (the body gives x1.3 for any mark: corrected here), the lantern exposes (+15%), Cull marks.

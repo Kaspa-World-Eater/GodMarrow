@@ -42,17 +42,11 @@ const ELEM := {"khands": "phys", "kspade": "phys", "kfinger": "phys", "kmirror":
 
 var zone: Zone
 var time := 0.0
-var _virt := {}
 var fx_air: Node2D
 var fx_floor: Node2D
-var trace := false
 var trace_t := 5.0
-var dmg_log := {}
-var auto_on := false
-var auto_ids: Array = []
 var auto_t := 0.0
 var auto_i := 0
-var demo_at = null
 
 # the glass
 var kR := 0.0
@@ -126,73 +120,16 @@ var clap2 := {}              # The Unstruck Bell: the answering ring
 # per creature: faults, stone, silence, shadow
 var faults := {}
 
-func _load() -> void:
-	super._load()
-	for id in data:
-		for p in data[id].get("perks", []):
-			_virt[p["id"]] = [id, p]
-	_args()
-
-func _args() -> void:
-	for a in OS.get_cmdline_user_args():
-		var kv: PackedStringArray = a.trim_prefix("--").split("=")
-		var k: String = kv[0]
-		var v: String = kv[1] if kv.size() > 1 else ""
-		match k:
-			"learn":
-				var L := 10
-				var spec := v
-				if ":" in v:
-					spec = v.split(":")[0]
-					L = int(v.split(":")[1])
-				var ids: Array = data.keys() if spec == "all" or spec == "" else Array(spec.split(","))
-				for id in ids:
-					if data.has(id):
-						hard[id] = clampi(L, 1, 20)
-			"autocast":
-				auto_on = true
-				if v != "":
-					auto_ids = Array(v.split(","))
-			"monktrace":
-				trace = true
-			"sand":   # tests: --sand=0.6,0.3 fills the bulbs (they run back as usual)
-				var fv := v.split(",")
-				set_meta("sand_test", [float(fv[0]), float(fv[1]) if fv.size() > 1 else 0.0])
-
 # ================================================================== levels, perks, the sky, the glass
-func K(id: String) -> int:
-	if _virt.has(id):
-		var vv: Array = _virt[id]
-		var p: Dictionary = vv[1]
-		var L := lvl(vv[0])
-		if L < int(p.get("skill_level", 99)):
-			return 0
-		var rs = p.get("requires_stat")
-		if rs is Dictionary and _stat(rs.get("stat", "")) < float(rs.get("value", 0)):
-			return 0
-		return L
-	if not data.has(id):
-		return 0
-	return lvl(id)
+## the Empty Hand's own test args (the shared ones are read in skill_book.gd)
+func _arg(k: String, v: String) -> void:
+	match k:
+		"monktrace":
+			trace = true
+		"sand":   # tests: --sand=0.6,0.3 fills the bulbs (they run back as usual)
+			var fv := v.split(",")
+			set_meta("sand_test", [float(fv[0]), float(fv[1]) if fv.size() > 1 else 0.0])
 
-func _stat(s: String) -> float:
-	match s:
-		"spi":
-			return hero.st.e_ess()
-		"vit":
-			return hero.st.e_vit()
-		"con":
-			return hero.st.e_con()
-	return 0.0
-
-func L1(id: String) -> float:
-	return 1.0 + (maxi(1, K(id)) - 1) * 0.6
-
-func syn(id: String) -> float:
-	var b := 0.0
-	for y in data.get(id, {}).get("synergies", []):
-		b += float(y.get("table_pc", 0)) * int(hard.get(y.get("from", ""), 0))
-	return 1.0 + b / 200.0
 
 func tab(id: String) -> int:
 	return int(data.get(id, {}).get("tab", 2))
@@ -356,33 +293,6 @@ func buddha_stats() -> Dictionary:
 	return {"max": roundf((90.0 + 40.0 * l + hero.st.level * 6) * (1.5 if K("kweep3") > 0 else 1.0)), "dmg": (10.0 + 6.0 * l) * hero.st.skill_mult()}
 
 # ================================================================== creatures
-func mons() -> Array:
-	var out: Array = []
-	if hero == null:
-		return out
-	for m in hero.get_tree().get_nodes_in_group("monsters"):
-		if not m.dead and not m.buried:
-			out.append(m)
-	return out
-
-func foes(c: Vector2, R: float) -> Array:
-	var out: Array = []
-	for m in mons():
-		if m.tp.distance_to(c) < R + m.radius:
-			out.append(m)
-	return out
-
-func near(p: Vector2, R: float, filt: Callable = Callable()) -> Monster:
-	var best: Monster = null
-	var bd := R
-	for m in mons():
-		if filt.is_valid() and not filt.call(m):
-			continue
-		var d: float = m.tp.distance_to(p)
-		if d < bd:
-			bd = d
-			best = m
-	return best
 
 func raised(m) -> bool:
 	if m.kind in RAISED:
@@ -413,14 +323,6 @@ func shove(m, from: Vector2, d: float) -> void:
 func burn(m, dps: float, secs: float) -> void:
 	if m and not m.dead:
 		m.add_dot(dps, secs, "radiance")
-
-func wake(m) -> void:
-	m.awake = true
-	if m.brain and m.brain.state == "sleep":
-		m.brain.wake(m)
-
-func now() -> float:
-	return Time.get_ticks_msec() / 1000.0
 
 func is_stone(m) -> bool:
 	return float(m.get_meta("k_stone", -1.0)) > now()
@@ -498,22 +400,10 @@ func say_at(p: Vector2, t: String, col: Color = Color(0.86, 0.83, 0.76)) -> void
 	if words.size() > 24:
 		words.pop_front()
 
-func say(t: String, secs: float = 1.0) -> void:
-	Bus.say.emit(t, secs)
-
 func banner(t: String, col: Color) -> void:
 	var ui = hero.get_tree().root.find_child("GodmarrowWorldUI", true, false)
 	if ui and ui.has_method("banner"):
 		ui.banner(t, col, 2.0)
-
-func aim_point() -> Vector2:
-	if demo_at != null:
-		return demo_at
-	return hero.mouse_tile()
-
-func clamp_cast(a: Vector2, maxd: float) -> Vector2:
-	var d := a - hero.tp
-	return hero.tp + d.normalized() * maxd if d.length() > maxd else a
 
 func _los_point(a: Vector2) -> Vector2:
 	var d := a.distance_to(hero.tp)
