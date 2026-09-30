@@ -43,6 +43,10 @@ static func hit_hero(h: Hero, dmg: float, elem: String = "phys", from: Vector2 =
 		return 0.0
 	var st := h.st
 	var d := dmg
+	if h.skills:
+		d = h.skills.before_hit(d, elem, from, opts)
+		if d <= 0.0:
+			return 0.0
 	if st.dim_wick:
 		d *= 1.15
 	if elem == "phys":

@@ -107,8 +107,11 @@ func _ready() -> void:
 		var Br = load("res://entities/ai/brain.gd")
 		for i in n:
 			var ang := float(i) / n * TAU
-			var m = Br.spawn(zone, args.get("arena_kind", "husk"), hero.tp + Vector2(cos(ang), sin(ang)) * (3.0 + (i % 3)), 12, "normal", "arena", 1e7)
-			if m:
+			var live := args.has("arena_live")   # real, hostile creatures (a fight test)
+			var m = Br.spawn(zone, args.get("arena_kind", "husk"), hero.tp + Vector2(cos(ang), sin(ang)) * (3.0 + (i % 3)), int(args.get("arena_lvl", "12")), "normal", "arena", -1.0 if live else 1e7)
+			if m and live:
+				m.brain.wake(m)
+			elif m:
 				m.dmg = Vector2.ZERO
 				m.speed = 0.0
 		hero.st.hp = hero.st.life_max()
@@ -202,7 +205,7 @@ func enter(zid: String, from: String) -> void:
 	if hud and hud.has_method("bind"):
 		hud.bind(hero, zone)
 		# a new pilgrim opens on the skill page to spend the first point
-		if fresh_pilgrim and hero.st.skill_points > 0 and not args.has("demo") and not args.has("panel") and not args.has("shot") and not hud.is_open("skills"):
+		if fresh_pilgrim and hero.st.skill_points > 0 and not args.has("demo") and not args.has("panel") and not args.has("shot") and not args.has("arena") and not hud.is_open("skills"):
 			hud.toggle_panel("skills")
 	if ResourceLoader.exists("res://world/objects.gd") and not OS.has_environment("GM_NOOBJ"):   # (world objects): town, objects, waystones, errands
 		load("res://world/objects.gd").attach(self, zone, hero)

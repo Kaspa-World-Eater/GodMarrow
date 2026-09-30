@@ -15,6 +15,7 @@ var load_cls := ""           # the order whose pilgrim to wake next (the title's
 func new_run() -> void:
 	seed = randi()
 	zone_seeds.clear()
+	sky_force = ""
 	clock = 0.12 * day_len
 
 func seed_for(zid: String) -> int:
@@ -23,7 +24,15 @@ func seed_for(zid: String) -> int:
 		zone_seeds[zid] = int(seeds[(hash(str(seed) + zid) & 0x7fffffff) % seeds.size()])
 	return zone_seeds[zid]
 
+## the Empty Hand can turn the sky: a forced noon or night holds the hour (and so the light and the creatures)
+var sky_force := ""
+var sky_t := 0.0
+
 func phase() -> float:
+	if sky_force == "noon":
+		return 0.3
+	if sky_force == "night":
+		return 0.78
 	return fmod(clock / day_len, 1.0)
 
 ## the hour: day to 0.55, dusk to 0.66, night to 0.9, dawn to 1.0 (a 600 s day)

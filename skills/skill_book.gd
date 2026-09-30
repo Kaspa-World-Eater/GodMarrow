@@ -13,6 +13,8 @@ var right := "attack"
 var keys := {}             # "q".."f" -> skill id
 var data := {}             # id -> row from skills.json
 var busy := false
+var cast_anim := "cast"     # the pose the hero strikes for the skill just used (an order may pick its own)
+var cast_len := -1.0        # and how long it holds (-1: the usual 0.55 s over cast speed)
 
 static func for_class(h: Hero, c: String) -> SkillBook:
 	var path := "res://skills/%s.gd" % c
@@ -140,6 +142,26 @@ func on_lantern() -> void:
 func on_death() -> void:
 	pass
 
+
+## override: a blow is about to land on the hero (before armour): return what is left of it (0 = nothing lands)
+func before_hit(d: float, elem: String, from: Vector2, opts: Dictionary) -> float:
+	return d
+
+## override: a creature's missile reaches the hero: true if the order caught it (a bell, a bowl)
+func catch_missile(mi) -> bool:
+	return false
+
+## override: flat weapon damage the order adds to its blows (bare fists that grow with the pilgrim)
+func fist_add() -> Vector2:
+	return Vector2.ZERO
+
+## override: the lantern's reach (multiplier and yards added)
+func light_mod(r: float) -> float:
+	return r
+
+## override: a creature cannot see the hero (sleeping creatures stay asleep, awake ones lose him)
+func unseen(m) -> bool:
+	return false
 
 ## override: a card or state that makes the hero's weapon heavier (multiplier)
 func melee_k() -> float:

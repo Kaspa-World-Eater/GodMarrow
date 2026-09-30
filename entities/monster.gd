@@ -142,7 +142,8 @@ func _shadow() -> void:
 
 # ------------------------------------------------------------------ numbers the brain and skills use
 func roll_damage() -> float:
-	return randf_range(dmg.x, dmg.y) * hour_mult()
+	var weak := 0.6 if float(get_meta("k_weak", -1.0)) > Time.get_ticks_msec() / 1000.0 else 1.0   # the Pinch drains it
+	return randf_range(dmg.x, dmg.y) * hour_mult() * weak
 
 func hour_mult() -> float:
 	if zone == null or not zone.d.get("outdoor", false):

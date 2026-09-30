@@ -107,7 +107,7 @@ func _sleep(m: Monster, h: Hero, dt: float) -> void:
 			wake(m)
 			return
 	var d := m.tp.distance_to(h.tp)
-	if d < wake_range(m, h) and not h.dead and m.zone.sight_clear(m.tp, h.tp):
+	if d < wake_range(m, h) and not h.dead and m.zone.sight_clear(m.tp, h.tp) and not (h.skills and h.skills.unseen(m)):
 		wake(m)
 		return
 	# loiter: small hops about the spot
@@ -142,6 +142,8 @@ func _key(m: Monster) -> int:
 	return m.zone.get_instance_id()
 
 func take_token(m: Monster) -> bool:
+	if float(m.get_meta("k_silent", -1.0)) > Time.get_ticks_msec() / 1000.0:
+		return false   # the Pinch: it cannot strike for a while
 	if token:
 		return true
 	var k := _key(m)

@@ -96,6 +96,8 @@ func light_radius() -> float:
 		r *= 0.62
 	if st:
 		r *= 1.0 - 0.12 * st.kept
+	if skills:
+		r = skills.light_mod(r)
 	return r
 
 func _shadow() -> void:
@@ -193,8 +195,10 @@ func _cast_right() -> void:
 		_start_attack(m, at)
 		return
 	_face(at - tp)
+	skills.cast_anim = "cast"
+	skills.cast_len = -1.0
 	if skills.use(skills.right, at, m):
-		_start_act("cast", 0.55 / st.cast_speed())
+		_start_act(skills.cast_anim, skills.cast_len if skills.cast_len > 0.0 else 0.55 / st.cast_speed())
 		walking = false
 		cast_hold = 0.0
 
@@ -237,7 +241,7 @@ func _physics_process(dt: float) -> void:
 		_face((target.tp if target and not target.dead else mouse_tile()) - tp)
 		spr.view = view
 		spr.face = face
-		spr.play("atk", false, false)
+		spr.play("heavy" if spr.set.has("heavy") else "atk", false, false)
 		spr.set_index(mini(1, spr.frame_count() - 1))
 		_sync()
 		return
@@ -343,7 +347,7 @@ func _start_attack(m: Monster, at: Vector2) -> void:
 		act_mult = 1.0
 		return
 	var s: Array = STRING[string_i]
-	_start_act("atk2" if string_i == 1 else "atk", 0.55 * float(s[1]) / st.attack_speed())
+	_start_act(["atk", "atk2", "atk3" if spr.set.has("light3") else "atk"][string_i], 0.55 * float(s[1]) / st.attack_speed())
 	act_target = m
 	act_hit_at = 0.5
 	act_mult = float(s[0])
@@ -354,6 +358,9 @@ func _start_attack(m: Monster, at: Vector2) -> void:
 	string_i = (string_i + 1) % 3
 	string_idle = 0.0
 
+## poses a sprite set names otherwise (the Empty Hand's painted chain: three light blows, a dodge)
+const ALIAS := {"atk": "light1", "atk2": "light2", "atk3": "light3"}
+
 func _start_act(a: String, secs: float) -> void:
 	act = a
 	act_t = 0.0
@@ -362,6 +369,8 @@ func _start_act(a: String, secs: float) -> void:
 	var anim := a
 	if a == "swing":
 		anim = "atk"
+	if not spr.set.has(anim) and ALIAS.has(anim) and spr.set.has(ALIAS[anim]):
+		anim = ALIAS[anim]
 	if not spr.set.has(anim):
 		anim = "atk" if spr.set.has("atk") else "idle"
 	spr.play(anim, true, false)
@@ -373,7 +382,7 @@ func _act(dt: float) -> void:
 	spr.face = face
 	spr.step(dt)
 	match act:
-		"atk", "atk2", "swing":
+		"atk", "atk2", "atk3", "heavy", "swing":
 			if not act_done and act_t >= act_len * act_hit_at:
 				act_done = true
 				_land_blow()
@@ -390,8 +399,9 @@ func _act(dt: float) -> void:
 
 func _land_blow() -> void:
 	var w: Item = _weapon()
-	var lo: float = w.dmg.x if w else 1.0
-	var hi: float = w.dmg.y if w else 3.0
+	var fa: Vector2 = skills.fist_add()
+	var lo: float = (w.dmg.x if w else 1.0) + fa.x
+	var hi: float = (w.dmg.y if w else 3.0) + fa.y
 	var d := randf_range(lo, hi)
 	if w and w.is_ranged():
 		var m := act_target
@@ -581,7 +591,7 @@ func _release_heavy(slow: float) -> void:
 		tp = zone.move(tp, to.normalized() * lunge, radius)
 	_face(to)
 	spend_poise(lerpf(12.0, 24.0, k))
-	_start_act("atk", 0.55 * lerpf(1.1, 1.5, k) * (1.3 if slow > 1.0 else 1.0) / st.attack_speed())
+	_start_act("heavy" if spr.set.has("heavy") else "atk", 0.55 * lerpf(1.1, 1.5, k) * (1.3 if slow > 1.0 else 1.0) / st.attack_speed())
 	act_target = target if target and not target.dead else null
 	act_hit_at = 0.35
 	act_mult = lerpf(1.25, 2.0, k)

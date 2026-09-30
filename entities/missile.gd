@@ -70,6 +70,9 @@ func _collide() -> bool:
 				pierce -= 1
 	else:
 		var h: Hero = zone.hero_ref
+		if h and not h.dead and h.tp.distance_to(tp) < radius + h.radius + 0.25 and h.skills and h.skills.catch_missile(self):
+			queue_free()
+			return true
 		if h and not h.dead and h.tp.distance_to(tp) < radius + h.radius:
 			Combat.hit_hero(h, dmg, elem, tp - vel.normalized())
 			queue_free()

@@ -481,7 +481,16 @@ func skill_tip(id: String, more: bool = false) -> Array:
 	var c := sb.cost(id)
 	var pc := sb.poise_cost(id)
 	var ctext := ""
-	if c > 0.0:
+	if sb.cls == "monk":
+		# the hourglass: Radiance pours amber sand, Absence black sand (a share of the bulb); Destroyer spends poise
+		var tb := int(s.get("tab", 0))
+		if tb == 2 and c > 0.0:
+			pc = roundf(c * (1.2 if id == "kthousand" else 0.6))
+		elif c > 0.0:
+			ctext = "Pours %s sand · %d%% of the bulb" % ["amber" if tb == 0 else "black", roundi(minf(25.0, 5.0 * c * (3.0 if id in ["kdawn", "keclipse"] else 1.0) / 12.8))]
+			if s.get("kind", "") == "hold":
+				ctext += " a second"
+	elif c > 0.0:
 		ctext = "%s %.1f" % [hero.st.res_name(), c]
 		if s.get("kind", "") == "hold":
 			ctext += " a second"
@@ -491,6 +500,10 @@ func skill_tip(id: String, more: bool = false) -> Array:
 		lines.append([ctext, U.GOLD_D])
 	var lv: Dictionary = s.get("levels", {})
 	var now: Dictionary = lv.get(str(clampi(maxi(L, 1), 1, 20)), {})
+	if L > 0 and sb.has_method("info"):
+		var live: String = sb.info(id)
+		if live != "":
+			now = {"text": live}   # the order's own live numbers (the sky, the glass) over the web's samples
 	if full:
 		lines.append([str(s.get("kind_text", "")), U.DIM])
 		if now.has("text"):
