@@ -191,7 +191,12 @@ func _finish() -> void:
 func result() -> Dictionary:
 	var ps: Array = []
 	for p in picks:
-		ps.append({"step": p["step"], "id": p["id"], "rev": p["rev"]})
+		ps.append({"step": p["step"], "id": p["id"], "name": p["name"], "rev": p["rev"]})
+	var lines: Array = []
+	for k in FX_ORDER:
+		if fate.has(k):
+			lines.append(_fx_line(k, fate[k]))
+	ps.append({"step": "sum", "lines": lines, "prophecy": prophecy})
 	return {"fx": fate.duplicate(), "picks": ps, "prophecy": prophecy}
 
 # ------------------------------------------------------------------ time and input

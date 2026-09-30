@@ -32,6 +32,8 @@ func _at(lp: Vector2) -> String:
 			return "+" + ATTR[i][0]
 		if Rect2(10, y - 9, 216, 22).has_point(lp):
 			return "row:" + ATTR[i][0]
+	if Rect2(40, 6, PW - 80, 18).has_point(lp):
+		return "fate"
 	if Rect2(140, 43, 82, 12).has_point(lp):
 		return "token"
 	if Rect2(8, 26, 220, 18).has_point(lp):
@@ -83,6 +85,19 @@ func tip() -> Array:
 	match hover:
 		"close":
 			return [["Close (C)", U.TEXT]]
+		"fate":
+			if st.fate_picks.is_empty():
+				return [["No one read the cards for this pilgrim.", U.MUTED]]
+			var out: Array = [["The Reading", U.GOLD_D]]
+			for p in st.fate_picks:
+				if p.get("step", "") == "sum":
+					for ln in p.get("lines", []):
+						out.append([String(ln), U.BLUE if not String(ln).begins_with("-") else U.RED])
+					if String(p.get("prophecy", "")) != "":
+						out.append(["\u201c%s\u201d" % p["prophecy"], U.FAINT])
+				else:
+					out.append([String(p.get("name", p.get("id", ""))) + (", reversed" if p.get("rev", false) else ""), U.MUTED])
+			return out
 		"token":
 			return [["Hollow Token", U.TEXT], ["Unmake what you chose: every skill point, every attribute point and every", U.MUTED], ["Arcanum comes back to be spent again. The token is used up.", U.MUTED], ["Click twice within three breaths", U.FAINT]]
 		"xp":
