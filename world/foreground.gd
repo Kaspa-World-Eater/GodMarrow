@@ -53,7 +53,7 @@ func _kinds() -> Dictionary:
 		if s.contains("wood") or s.contains("grove") or s.contains("forest"):
 			return {"grass": 0.55, "reeds": 0.1, "branch": 0.2, "trunk": 0.15}
 		return {"grass": 0.6, "reeds": 0.15, "branch": 0.25}
-	return {"rubble": 0.65, "column": 0.35}
+	return {}   # under the ground the rooms are close enough already: nothing stands between the eye and the pilgrim
 
 func _pick(k: Dictionary, rng: RandomNumberGenerator) -> String:
 	var tot := 0.0

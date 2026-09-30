@@ -7,6 +7,7 @@ var hero: Hero
 var cam: Camera2D
 var eye: CamDirector
 var fore: Foreground
+var sky: Weather
 var ambient: CanvasModulate
 var hud: Node
 var dark: DarkLayer
@@ -44,6 +45,8 @@ func _ready() -> void:
 	add_child(dark)
 	atmos = Atmos.new()
 	add_child(atmos)
+	sky = Weather.new()
+	add_child(sky)
 	fore = Foreground.new()
 	add_child(fore)
 	cam = Camera2D.new()
@@ -161,6 +164,7 @@ func enter(zid: String, from: String) -> void:
 	cam.reset_smoothing()
 	dark.bind(zone, hero)
 	atmos.bind(zone, hero, dark)
+	sky.bind(zone, hero, dark)
 	if not OS.has_environment("GM_NOFORE"):
 		fore.bind(zone, hero, dark)
 	if hud and hud.has_method("bind"):

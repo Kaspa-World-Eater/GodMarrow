@@ -167,6 +167,8 @@ func _process(dt: float) -> void:
 	var cam := c2.get_screen_center_position() if c2 else hero.position
 	var dcam := Vector2.ZERO if last_cam == Vector2.INF else cam - last_cam
 	last_cam = cam
+	if dcam.length() > 300.0:   # a cut, not a pan
+		dcam = Vector2.ZERO
 	if _woody() and outdoor:
 		if randf() < (0.25 + gust * 1.2) * dt and leaves.size() < 40:
 			leaves.append({"p": Vector2(randf_range(-80, vs.x), randf_range(-40, vs.y * 0.6)), "v": Vector2(0, randf_range(5, 9) * WPX), "t": 0.0, "life": randf_range(4, 8), "ph": randf() * 6.0, "col": 0 if randf() < 0.6 else (1 if randf() < 0.6 else 2)})
