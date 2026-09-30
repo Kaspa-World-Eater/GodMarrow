@@ -22,6 +22,7 @@ var view := "front"
 var hurt_t := 0.0
 var swing_t := 0.0
 var spr: AnimSprite
+var temp := 0.0              # > 0: an Unearthed one, crumbling when it runs out; it holds no shards
 
 func setup_numbers() -> void:
 	max_hp = book.skel_hp() * float(book.LOADS[load_id]["hp"])
@@ -55,7 +56,7 @@ func take_hit(dmg: float, elem: String = "phys", _from: Vector2 = Vector2.INF) -
 	dmg *= (100.0 / 120.0 if elem == "phys" else 0.9) * (1.0 - float(book.LOADS[load_id].get("dr", 0.0)))
 	hp -= dmg
 	hurt_t = 0.1
-	if hp <= 0.0:
+	if hp <= 0.0 and not gone:
 		gone = true
 		remove_from_group("allies")
 		book.skel_fell(self)
@@ -68,7 +69,14 @@ func _physics_process(dt: float) -> void:
 	var L: Dictionary = book.LOADS[load_id]
 	hurt_t = maxf(0.0, hurt_t - dt)
 	swing_t = maxf(0.0, swing_t - dt)
-	cd -= dt
+	var haste: float = book.skel_haste()
+	var spd: float = 3.2 * book.skel_speed()
+	cd -= dt * haste
+	if temp > 0.0:
+		temp -= dt
+		if temp <= 0.0:
+			take_hit(1e9, "true")
+			return
 	if rise > 0.0:
 		rise -= dt
 		spr.position.y = 30.0 * maxf(0.0, rise) / 0.45   # comes up out of the ground
@@ -76,7 +84,9 @@ func _physics_process(dt: float) -> void:
 		return
 	spr.position.y = 0.0
 	if tp.distance_to(hero.tp) < 3.0:
-		hp = minf(max_hp, hp + max_hp * 0.02 * dt)
+		hp = minf(max_hp, hp + max_hp * (0.06 if book.K("mknit") > 0 else 0.02) * dt)
+	elif book.K("mknit") > 0:
+		hp = minf(max_hp, hp + max_hp * 0.01 * dt)
 	if tp.distance_to(hero.tp) > 18.0:
 		tp = hero.tp + Vector2(randf_range(-1, 1), randf_range(-1, 1))
 		if book.zone.is_solid(tp):
@@ -85,7 +95,7 @@ func _physics_process(dt: float) -> void:
 	if wind >= 0.0:
 		wind += dt
 		anim = "wind"
-		if wind > 0.3 + float(L["cd"]) * 0.15:
+		if wind > (0.3 + float(L["cd"]) * 0.15) / haste:
 			wind = -1.0
 			cd = float(L["cd"])
 			if tgt != null and is_instance_valid(tgt) and not tgt.dead:
@@ -97,7 +107,7 @@ func _physics_process(dt: float) -> void:
 			var reach: float = float(L["reach"]) + tgt.radius
 			_look(tgt.tp - tp)
 			if d > reach:
-				_move(tgt.tp, 3.2, dt)
+				_move(tgt.tp, spd, dt)
 				anim = "walk"
 			elif cd <= 0.0:
 				wind = 0.0
@@ -107,9 +117,10 @@ func _physics_process(dt: float) -> void:
 			var n: int = maxi(1, book.skels.size())
 			var ring: float = 1.7 if load_id == "halberd" else (1.1 if load_id == "shield" else 1.4)
 			var ang := float(i) / n * TAU + 0.6
-			var goal: Vector2 = hero.tp + Vector2(cos(ang), sin(ang)) * ring
+			var anchor: Vector2 = book.anchor()
+			var goal: Vector2 = anchor + Vector2(cos(ang), sin(ang)) * ring
 			if goal.distance_to(tp) > 0.5:
-				_move(goal, 3.2 * (1.3 if tp.distance_to(hero.tp) > 4.0 else 1.0), dt)
+				_move(goal, spd * (1.3 if tp.distance_to(anchor) > 4.0 else 1.0), dt)
 				_look(goal - tp)
 				anim = "walk"
 	if swing_t > 0.0:
@@ -118,6 +129,9 @@ func _physics_process(dt: float) -> void:
 
 func _target():
 	var hero = book.hero
+	var prey = book.commanded_prey()
+	if prey != null:
+		return prey
 	var best = null
 	var bd := 1e9
 	for m in book.mons():
@@ -134,7 +148,7 @@ func _target():
 
 func _strike(T, L: Dictionary) -> void:
 	var dm: Vector2 = book.skel_dmg()
-	var dmg := randf_range(dm.x, dm.y) * float(L["dmg"])
+	var dmg: float = randf_range(dm.x, dm.y) * float(L["dmg"]) * book.march_dmg() * (0.8 if temp > 0.0 else 1.0)
 	var hit := func(m):
 		book.hurt(m, dmg, "raise", {"from": tp})
 		if L.has("taunt") and m.rank != "boss":

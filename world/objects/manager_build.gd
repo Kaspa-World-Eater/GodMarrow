@@ -2,7 +2,7 @@ extends Node2D
 
 ## The world's interactive objects in one zone (zz_quests.js, zd_world22.js, d_play.js interact, zz_voice.js,
 ## zz_landmarks55.js, zz_zz_maw95.js): townsfolk, chests, shrines, god altars and their Heralds, toppled statues,
-## lantern-stones, waystones, the errands' relics, captives and shrines, landmarks' inscriptions, the town's safe
+## lantern-stones, waystones, the vows' relics, captives and shrines, landmarks' inscriptions, the town's safe
 ## circle. Made by world/objects.gd attach(); a child of the zone, so it goes when the zone goes.
 ## Click a thing to walk up to it and use it (no markers over anyone); walk into a waystone to learn it and travel.
 
@@ -286,7 +286,7 @@ func _quiet_light(tp: Vector2, energy: float, col: Color = Color(0.82, 0.76, 0.6
 	l.set_meta("dark_dy", 40.0)   # the dark layer lays its pool on the ground
 	zone.sorted.add_child(l)
 
-## the faint gold breath under an errand's object (zz_quests qGroundDraw)
+## the faint gold breath under an vow's object (zz_quests qGroundDraw)
 func _quest_glow(n: Node2D) -> void:
 	var g := Node2D.new()
 	g.set_script(load("res://world/objects/beam.gd"))
@@ -304,7 +304,7 @@ func _on_enter() -> void:
 		s["act"] = act_n
 	var fresh := Q.activate(act_n)
 	if fresh > 0:
-		_later(2.6, func(): Bus.say.emit("New errands are written in your journal (J)", 4.0))
+		_later(2.6, func(): Bus.say.emit("New grave vows are written in your journal (J)", 4.0))
 	if Q.is_town(zid):
 		if Q.kindle_wp(zid) and waystone:
 			waystone.open = 1.0
@@ -321,7 +321,7 @@ func _later(secs: float, f: Callable) -> void:
 	var tm := get_tree().create_timer(secs)
 	tm.timeout.connect(func(): if is_instance_valid(self): f.call())
 
-## what the world already settled: fulfilled errands' creatures, a felled boss, a spent Herald
+## what the world already settled: fulfilled vows' creatures, a felled boss, a spent Herald
 func _clear_settled() -> void:
 	for m in get_tree().get_nodes_in_group("monsters"):
 		if m.zone != zone:

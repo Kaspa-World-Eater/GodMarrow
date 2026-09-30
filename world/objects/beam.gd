@@ -1,6 +1,6 @@
 extends Node2D
 ## mode 0: the column over an unwoken god altar (zd_world22 drawAltars), faint, in the god's colour (never red).
-## mode 1: the faint gold breath on the ground under an errand's object (zz_quests qGroundDraw).
+## mode 1: the faint gold breath on the ground under an vow's object (zz_quests qGroundDraw).
 ## Drawn additively; not a light source.
 
 var col := Color.WHITE

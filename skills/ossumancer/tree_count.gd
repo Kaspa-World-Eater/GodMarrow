@@ -4,8 +4,13 @@ extends "res://skills/ossumancer/tree_carapace.gd"
 ## Bone Blade: for one stroke his weapon grows a long blade of bone: it hits harder, reaches 0.45 yd farther and
 ## cleaves into the enemies beside the one struck.
 
+## the Bone Host lengthens his weapon with bone: +0.35 yd and 0.1 a skeleton (eight at most); Long Bone +0.33
+func host_reach() -> float:
+	var n := int(host.get("n", 0))
+	return (0.35 + 0.1 * mini(8, n) if n > 0 else 0.0) + (0.33 if K("bladereach") > 0 else 0.0)
+
 func strike_blade(a: Vector2, target) -> bool:
-	var reach: float = hero._reach() + MELEE["blade"]
+	var reach: float = hero._reach() + MELEE["blade"] + host_reach()
 	var m = target if target != null and is_instance_valid(target) and not target.dead else melee_target(a, reach)
 	if m == null or m.tp.distance_to(hero.tp) > reach + m.radius + 0.1:
 		return false

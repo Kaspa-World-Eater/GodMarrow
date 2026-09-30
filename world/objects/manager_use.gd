@@ -1,5 +1,5 @@
 extends "res://world/objects/manager_build.gd"
-## The world's objects, part 2 of 3: using things (talking, lanterns, chests, shrines, altars), the errands in the
+## The world's objects, part 2 of 3: using things (talking, lanterns, chests, shrines, altars), the vows in the
 ## world (relics, captives, kneeling waves), kills and Heralds, landmarks' inscriptions, waystones.
 ## Chain: manager_build (state, building, zone entry) -> manager_use -> manager.gd (the frame, hover, clicks).
 
@@ -81,7 +81,7 @@ func _talk(e: Dictionary) -> void:
 			if not s["seen"].has("giver:" + nm):
 				s["seen"]["giver:" + nm] = true
 				var pend := Q.pending(act_n)
-				var line := ("One errand remains." if pend == 1 else "%d errands remain." % pend) + " The dead are patient. I am less so." if pend > 0 else "Nothing left here that needs you. Go down."
+				var line := ("One vow is still owed." if pend == 1 else "%d vows are still owed." % pend) + " The dead are patient. I am less so." if pend > 0 else "Nothing left here that needs you. Go down."
 				_say(_short(nm), line)
 			else:
 				_say(_short(nm), Q.bark(act_n, "giver"))
@@ -214,7 +214,7 @@ func _spawn(kind: String, at: Vector2, level: int, rank: String, mods: Array, pk
 		m.speed *= 1.4
 	return m
 
-# ------------------------------------------------------------------ errands in the world
+# ------------------------------------------------------------------ vows in the world
 func _take_relic(e: Dictionary) -> void:
 	var qid: String = e["o"].get("qid", "")
 	if Q.st(qid).is_empty() or Q.is_done(qid):
@@ -248,7 +248,7 @@ func _vanish(n: Node2D) -> void:
 	tw.tween_property(n, "modulate:a", 0.0, 0.8)
 	tw.tween_callback(n.queue_free)
 
-## the errand's shrine: kneel, and hold it through two waves (5, then 6 with an Extra Fast champion)
+## the vow's shrine: kneel, and hold it through two waves (5, then 6 with an Extra Fast champion)
 func _kneel(e: Dictionary) -> void:
 	var qid: String = e["o"].get("qid", "")
 	if Q.st(qid).is_empty() or Q.is_done(qid) or not wave.is_empty():

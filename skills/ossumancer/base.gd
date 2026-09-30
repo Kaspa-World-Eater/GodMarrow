@@ -54,6 +54,8 @@ var grit: Array = []          # dust where bone tears out of the ground: {tp, t}
 # the dead
 var skels: Array = []         # Skeleton nodes
 var rise_t := 0.5             # until the next one may claw up
+var colossus = null           # the Ossuary Colossus (skills/ossumancer/colossus.gd), or null
+var host := {}                # the Bone Host on him: {n, pool}
 # spells in flight
 var spears: Array = []        # {tp, v, t, dmg, hit: {}, splint, main, small}
 var words: Array = []         # small words over the world: {tp, s, t, col}
@@ -73,10 +75,14 @@ var origin = null             # where a spell is cast from (null: from him)
 func power() -> float:
 	return force * hero.st.skill_mult() * (1.0 + 0.1 * K("marrowm")) * (bone_floor() + (1.0 - bone_floor()) * mantle_frac())
 func bone_floor() -> float: return minf(0.95, 0.55 + 0.02 * K("marrowm") + (0.2 if K("marrowfloor") > 0 else 0.0))
-func mantle_cap() -> int: return int(round(20 + 2 * K("aura") + floorf(hero.st.e_ess() / 5.0)))
+func mantle_cap() -> int:
+	return int(round((20 + 2 * K("aura") + floorf(hero.st.e_ess() / 5.0)) * (1.5 if K("shardskin") > 0 and int(host.get("n", 0)) > 0 else 1.0)))
+## the dead that hold shards: standing skeletons (not the Unearthed), those fused into the Colossus and into the Host
+func standing() -> int:
+	return skels.filter(func(e): return is_instance_valid(e) and e.temp <= 0.0).size() + (colossus.n if colossus != null and is_instance_valid(colossus) else 0) + int(host.get("n", 0))
 func mantle_frac() -> float: return clampf(shards / maxf(1.0, mantle_cap()), 0.0, 1.0)
 ## the shards not held by the standing dead
-func free_cap() -> float: return maxf(0.0, mantle_cap() - SKEL_COST * skels.size())
+func free_cap() -> float: return maxf(0.0, mantle_cap() - SKEL_COST * standing())
 func pull_rate() -> float:
 	return minf(2.4, (0.22 + 0.014 * K("aura") + 0.0016 * hero.st.e_ess()) * (4.0 if pull_hold > 0.0 else 1.0) * (1.15 if K("carapregen") > 0 else 1.0))
 func pull_r() -> float: return (3.0 + 0.25 * L1("aura")) * (1.5 if K("deeppull") > 0 else 1.0)
@@ -180,9 +186,14 @@ func melee_target(a: Vector2, reach: float) -> Monster:
 			best = m
 	return best
 
+var auto_hold := ""            # --autocast: a held skill held for a while
+var auto_hold_t := 0.0
+
 func held(id: String) -> bool:
 	if hero == null or hero.dead:
 		return false
+	if auto_hold == id and auto_hold_t > 0.0:
+		return true
 	if hero.skills.right == id and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 		return true
 	return hero.skills.left == id and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT)

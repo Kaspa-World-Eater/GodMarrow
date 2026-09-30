@@ -1,5 +1,5 @@
 extends RefCounted
-## The errands, the waystones and the world's memory of what was done (zz_quests.js, zz_voice.js, zd_world22.js).
+## The vows, the waystones and the world's memory of what was done (zz_quests.js, zz_voice.js, zd_world22.js).
 ## A static store: everything lives in static vars on this script, so it outlives every zone. Load it by path
 ## (`load("res://world/quests.gd")`) and call the static functions; world/objects.gd keeps it referenced.
 ## Save with to_dict() / from_dict().
@@ -39,7 +39,7 @@ const QUESTS := [
 
 const TOWN := {
 	1: {"giver": "Warden-Crone Esk", "healer": "Sister Ysolde, Tallow-Nurse", "smith": "Brannoc of the Nail", "vendor": "Maren the Gravekeeper",
-		"greet": "Esk: 'Another pilgrim. Good. The dead have errands and no legs left to run them. Open your journal (J).'"},
+		"greet": "Esk: 'Another pilgrim. Good. The dead swore things they could not finish. Now you have. Open your journal (J).'"},
 }
 const STRANGER_LINES := {
 	1: ["The Stranger: 'You have found the Sighing Lantern? Good. Not all of them still sing.'",
@@ -74,7 +74,7 @@ const BARKS := {
 			"Cedar and tallow inside. Whatever you leave, it keeps.",
 			"The chest is older than the camp. The camp was built around it.",
 			"Scratched inside the lid: 'kept, and kept, and kept.'"],
-		"giver": ["The dead leave errands the way the living leave debts. Someone pays them.",
+		"giver": ["The dead leave vows the way the living leave debts. Someone pays them, in the end.",
 			"I was a warden once. Now I send the young ones where I used to go.",
 			"Come back with it done, or don't come back. Either way I'll light a candle.",
 			"Hundred-Fingers blew his kangling at me once. I blew back. He hasn't tried since.",
@@ -100,7 +100,7 @@ const GREET := {
 	"vendor": ["Godmarrow. Mind the ash on the goods.", "Godmarrow. Buying or burying?"],
 	"healer": ["Godmarrow. Let's see how much of yours is left.", "Godmarrow. Sit. You're dripping on my floor."],
 	"smith": ["Godmarrow. Iron's hot, and so's the god, somewhere under.", "Godmarrow. Bring it here and let me look."],
-	"giver": ["Godmarrow. The dead have been asking after you.", "Godmarrow. Errands don't keep. The dead do."],
+	"giver": ["Godmarrow. The dead have been asking after you.", "Godmarrow. A vow doesn't keep. The dead do."],
 	"stranger": ["Godmarrow... an old word. Older than the ones who say it.", "Godmarrow. They used to mean the morning by it."],
 }
 ## how the folk greet each order: plays on each order's own trade (blood, mirrors and thread, bone, breath and paper,
@@ -250,7 +250,7 @@ static func act_name(n: int) -> String:
 static func max_act() -> int:
 	return maxi(1, int(state()["act"]))
 
-# ------------------------------------------------------------------ errands
+# ------------------------------------------------------------------ vows
 static func quest(id: String) -> Dictionary:
 	for q in QUESTS:
 		if q["id"] == id:
@@ -267,7 +267,7 @@ static func resolve_zone(q: Dictionary) -> String:
 	var zs: Array = q.get("zones", [])
 	return lair_of(int(q["act"])) if zs.is_empty() else zs[zs.size() - 1]
 
-## write the act's errands into the journal (on reaching the act). Returns how many were new.
+## write the act's vows into the journal (on reaching the act). Returns how many were new.
 static func activate(n: int) -> int:
 	var fresh_n := 0
 	for q in QUESTS:
@@ -322,7 +322,7 @@ static func journal(act: int) -> Array:
 		var sv := int(e.get("s", 0))
 		var row := {"id": q["id"], "kind": q["kind"], "name": q["name"] if heard else "? ? ?", "target": q["target"],
 			"state": "unheard" if not heard else ("fulfilled" if sv == 3 else ("opened" if sv == 2 else "open")),
-			"fulfilled": sv == 3, "desc": desc(q) if heard else "You have not yet heard of this errand.",
+			"fulfilled": sv == 3, "desc": desc(q) if heard else "You have not yet sworn this vow.",
 			"where": zone_name(e["z"]) if heard and e.get("z", "") != "" else "", "reward": "Reward: " + reward_text(q["rew"]), "progress": ""}
 		row["state_text"] = row["state"]
 		if q["kind"] == "seal" and sv < 3 and heard:
@@ -341,7 +341,7 @@ static func pending(act: int) -> int:
 			n += 1
 	return n
 
-## fulfil an errand: rewards, the banner and the giver's line. `at` is where a relic reward drops.
+## fulfil an vow: rewards, the banner and the giver's line. `at` is where a relic reward drops.
 static func complete(id: String, hero: Node, zone: Node, at: Vector2) -> bool:
 	var q := quest(id)
 	if q.is_empty():
@@ -379,9 +379,9 @@ static func complete(id: String, hero: Node, zone: Node, at: Vector2) -> bool:
 	var W = _world()
 	if W:
 		if q["kind"] in ["zoneboss", "actboss"]:
-			W.banner_later("ERRAND FULFILLED", Color8(201, 164, 90), 3.2, 3.6, zone.id)   # after the FELLED banner
+			W.banner_later("THE VOW IS PAID", Color8(201, 164, 90), 3.2, 3.6, zone.id)   # after the FELLED banner
 		else:
-			W.banner("ERRAND FULFILLED", Color8(201, 164, 90), 3.2)
+			W.banner("THE VOW IS PAID", Color8(201, 164, 90), 3.2)
 		W.speak_line(String(q["done"]) + "   (" + reward_text(r) + ")", 7.0)
 	if Bus.has_signal("quest_changed"):
 		Bus.emit_signal("quest_changed", id)
@@ -406,14 +406,14 @@ static func _world() -> Object:
 	var n := ml.root.find_child("GodmarrowWorldUI", true, false)
 	return n
 
-# ------------------------------------------------------------------ kills: errands, bosses, Heralds
+# ------------------------------------------------------------------ kills: vows, bosses, Heralds
 static func on_kill(m: Node, zone: Node, hero: Node) -> void:
 	if zone == null or not is_instance_valid(zone):
 		return
 	var zid: String = zone.id
 	var n := act_of(zid)
 	var pk: String = m.pack
-	# a named errand-target (its pack is "q<errand id>")
+	# a named vow-target (its pack is "q<vow id>")
 	if pk.begins_with("q") and m.rank == "unique":
 		var qid := pk.substr(1)
 		var q := quest(qid)

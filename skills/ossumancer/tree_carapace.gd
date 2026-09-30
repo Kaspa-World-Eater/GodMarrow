@@ -92,6 +92,7 @@ func _fly_shards(dt: float) -> void:
 ## what reaches him: the plates drink first, then the nearest of his dead takes a share, then the Mantle turns part
 ## of what is left, and now and then a shard is knocked loose
 func absorb(d: float, _elem: String) -> float:
+	d = host_absorb(d)
 	if plates > 0.0:
 		var soak := minf(plates, d)
 		plates -= soak

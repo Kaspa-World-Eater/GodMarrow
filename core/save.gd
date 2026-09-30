@@ -1,7 +1,7 @@
 extends RefCounted
 ## The save (checklist 12): one slot per machine, `user://godmarrow.save`, written with store_var (types kept: int keys,
 ## Vector2s). Saved: order, level, xp, attributes, points, skill points and binds, the order's own choices (golem orders,
-## weapon), gold, pack, equipment, belt, Hollow Tokens, what the lantern keeps, the errands and waystones and lanterns,
+## weapon), gold, pack, equipment, belt, Hollow Tokens, what the lantern keeps, the vows and waystones and lanterns,
 ## the return point. Not saved: the map (every start rolls a new world), creatures, things on the ground.
 ## Continue loads it into a freshly rolled world at the Ashen Moor camp. Load by path: load("res://core/save.gd").
 
@@ -138,7 +138,7 @@ static func apply(main: Node, d: Dictionary) -> void:
 	st.fate_picks = d.get("fate_picks", []).duplicate(true)
 	var Q = load("res://world/quests.gd")
 	Q.from_dict(d.get("quests", {}))
-	# the errands' lasting gifts live in the errand store; lay them back on the pilgrim
+	# the vows' lasting gifts live in the vow store; lay them back on the pilgrim
 	var qs: Dictionary = Q.state()
 	qs["buffs"] = {}   # shrine blessings do not outlive the world they were given in
 	if int(qs.get("life", 0)) != 0:

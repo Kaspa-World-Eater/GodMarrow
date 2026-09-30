@@ -2,9 +2,10 @@ extends "res://skills/ossumancer/tree_count.gd"
 ## The Ossuarch (class id "ossumancer"), part 5 of 5: casting (which skill runs what), the hooks the shared game calls,
 ## and the frame (tick). The state, numbers and helpers are in skills/ossumancer/base.gd (its header tells how the
 ## Mantle works); each tree's skills are in skills/ossumancer/tree_*.gd.
-## Ported so far: the whole Carapace tree, Raise Skeleton and Grave Tithe, Bone Blade. The rest follow in steps.
+## Ported so far: the Ossuary and Carapace trees, Bone Blade. The Count follows.
 
-const DONE := ["aura", "spear", "raise", "blade", "barmor", "siphon", "ribcage", "ossify", "spikes", "sstorm", "bonerain", "spirit"]
+const DONE := ["aura", "spear", "raise", "blade", "barmor", "siphon", "ribcage", "ossify", "spikes", "sstorm", "bonerain", "spirit",
+	"offering", "unearth", "horn", "colossus", "host"]
 
 var mantle_set := false
 
@@ -55,6 +56,18 @@ func _cast(id: String, a: Vector2, target) -> bool:
 			return strike_blade(a, target)
 		"barmor":
 			return cast_armor()
+		"offering":
+			return cast_offering(a)
+		"unearth":
+			return cast_unearth(a)
+		"horn":
+			return cast_march()
+		"colossus":
+			cast_len = 0.3
+			return press_colossus(a)
+		"host":
+			cast_len = 0.3
+			return press_host()
 		"spirit":
 			return cast_lord(a)
 	if _cast_bone(id, a):
@@ -64,8 +77,20 @@ func _cast(id: String, a: Vector2, target) -> bool:
 
 
 # ================================================================== hooks the shared game calls
+## the Bone Host: every skeleton fused onto him makes his blows heavier and his step quicker
+func melee_k() -> float:
+	return 1.0 + host_melee() * int(host.get("n", 0))
+
+func move_k() -> float:
+	return 1.0 + 0.03 * mini(8, int(host.get("n", 0)))
+
 func hud_gauge() -> Dictionary:
-	return {"text": "SHARDS %d/%d · DEAD %d" % [int(shards), mantle_cap(), skels.size()], "pips": skels.size(), "max": skel_max(), "col": BONE}
+	var extra := ""
+	if colossus != null:
+		extra = " · COLOSSUS %d" % colossus.n
+	elif int(host.get("n", 0)) > 0:
+		extra = " · HOST %d" % int(host["n"])
+	return {"text": "SHARDS %d/%d · DEAD %d%s" % [int(shards), mantle_cap(), skels.size(), extra], "pips": skels.size(), "max": skel_max(), "col": BONE}
 
 func before_hit(d: float, _elem: String, _from: Vector2, opts: Dictionary) -> float:
 	# Bone Spurs (the Mantle at 5): a creature that strikes him in melee is cut by his shards
@@ -86,6 +111,8 @@ func on_death() -> void:
 
 func _reset() -> void:
 	clear_dead()
+	host = {}
+	march_t = 0.0
 	clear_spells()
 	plates = 0.0
 	shards = 0.0
@@ -98,9 +125,14 @@ func _on_kill(m) -> void:
 		return
 	ossified_death(m)
 	spiked_death(m)
-	# Grave Tithe: the slain give up bone
-	if K("tithe") > 0 and randf() < minf(0.4, 0.12 + 0.012 * K("tithe")):
-		motes.append({"tp": m.tp, "z": 0.0, "rise": 0.1, "out": 0.0, "v": Vector2.ZERO, "spd": 4.0, "t": 0.0, "dmg": mote_dmg(), "hit": {}, "val": 1.0})
+	# Grave Tithe: the slain give up bone (always two from champions and uniques with Full Tithe)
+	if K("tithe") > 0:
+		var big: bool = K("tithemore") > 0 and m.rank in ["champion", "unique"]
+		var n := 2 if big else (1 if randf() < minf(0.4, 0.12 + 0.012 * K("tithe")) else 0)
+		for i in n:
+			motes.append({"tp": m.tp, "z": 0.0, "rise": 0.1, "out": 0.0, "v": Vector2.ZERO, "spd": 4.0, "t": 0.0, "dmg": mote_dmg(), "hit": {}, "val": 1.0})
+			if K("tithemend") > 0:
+				hero.st.hp = minf(hero.st.life_max(), hero.st.hp + hero.st.life_max() * 0.01)
 
 func _arg(k: String, _v: String) -> void:
 	match k:
@@ -121,6 +153,7 @@ func tick(dt: float) -> void:
 		shards = mantle_cap()
 	_views()
 	tick_mantle(dt)
+	tick_fusing(dt)
 	tick_dead(dt)
 	tick_charge(dt)
 	tick_spears(dt)
@@ -185,6 +218,7 @@ func _views() -> void:
 # ================================================================== the test driver (--autocast)
 func _autocast(dt: float) -> void:
 	auto_t -= dt
+	auto_hold_t -= dt
 	if auto_t > 0.0 or hero.dead or hero.act != "" or not charging.is_empty():
 		return
 	auto_t = 0.6
@@ -198,14 +232,20 @@ func _autocast(dt: float) -> void:
 	auto_i = (auto_i + 1) % ids.size()
 	var id: String = ids[auto_i]
 	demo_at = m.tp
+	if id == "offering" and not skels.is_empty():
+		demo_at = skels[0].tp
 	cast_anim = POSE.get(id, "cast")
 	cast_len = -1.0
 	if id == "blade" and m.tp.distance_to(hero.tp) > hero._reach() + 0.6 + m.radius:
 		hero.walk_to(m.tp)
-	elif use(id, m.tp, m):
+	elif use(id, demo_at, m if id != "offering" else null):
 		hero._start_act(cast_anim, cast_len)
 		if id == "spear" and not charging.is_empty():
 			charging["goal"] = randi() % 4
+		if id in ["colossus", "host", "aura"]:
+			auto_hold = id
+			auto_hold_t = 2.0
+			auto_t = 2.2
 	elif trace:
 		print("AUTO ", id, " refused: act '", hero.act, "' res ", hero.st.res, " shards ", shards, " poise ", hero.st.poise)
 	demo_at = null

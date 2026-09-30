@@ -1,9 +1,9 @@
 extends RefCounted
-## The world's objects, the town and the errands, wired into a zone (see world/objects/manager.gd).
+## The world's objects, the town and the vows, wired into a zone (see world/objects/manager.gd).
 ## main.gd calls `load("res://world/objects.gd").attach(self, zone, hero)` at the end of every zone entry (after the
 ## hero and the creatures are placed). Calling it again for the same zone with a new hero only rebinds the hero.
 ## Persistent pieces live under main for the whole run: the world's voice on screen (GodmarrowWorldUI) and the
-## waystone passage (WaystonePassage). The errands' state is the static store world/quests.gd.
+## waystone passage (WaystonePassage). The vows' state is the static store world/quests.gd.
 
 const QUESTS := preload("res://world/quests.gd")
 
@@ -40,6 +40,6 @@ static func attach(main: Node, zone: Node, hero: Node) -> void:
 	zone.add_child(mgr)
 	mgr.setup(main, zone, hero)
 
-## the errands' store (static): journal(act), waystones(act), act_name(n), max_act(), to_dict()/from_dict()
+## the vows' store (static): journal(act), waystones(act), act_name(n), max_act(), to_dict()/from_dict()
 static func quests():
 	return QUESTS

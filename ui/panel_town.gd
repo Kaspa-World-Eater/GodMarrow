@@ -5,7 +5,7 @@ extends Control
 ##   stash   the Reliquary Chest: 48 places shared by every pilgrim on this machine; click to take, right-click
 ##           in the pack to put away (hud.stash_open)
 ##   lantern a touched lantern-stone: rest (done by the stone), and travel to any lantern kindled on this walk
-##   journal Esk's errands (J): the act's errands, their state, where, and what they pay (world/quests.gd journal)
+##   journal Esk's vows (J): the act's vows, their state, where, and what they pay (world/quests.gd journal)
 ## Opened by Bus.panel_requested(panel, who) from the townsfolk (world/objects/manager.gd), and J for the journal.
 
 const U := preload("res://ui/uikit.gd")
@@ -181,7 +181,7 @@ func _draw() -> void:
 	var col := Color("#c9a45a")
 	U.page(self, 0, 0, PW, PH, col)
 	var title: String = {"vendor": who if who != "" else "The Vendor", "smith": who if who != "" else "The Smith",
-		"stash": "The Reliquary Chest", "journal": "The Journal", "lantern": who if who != "" else "The Lantern"}.get(mode, "")
+		"stash": "The Reliquary Chest", "journal": "The Grave Vows", "lantern": who if who != "" else "The Lantern"}.get(mode, "")
 	U.title(self, title, PW / 2.0, 19, col, 150)
 	U.stud(self, PW - 15, 4, 12, 12, "", true, U.TEXT, hover == "close")
 	U.text(self, "x", PW - 9, 13, U.MUTED, 0, "pixel", 8, false)

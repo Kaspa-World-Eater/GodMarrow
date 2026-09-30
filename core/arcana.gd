@@ -5,7 +5,7 @@ extends RefCounted
 ## the hybrids at the feet, the Hollow steps and the Void at the seat. v103 added the rungs between a page's Majors and
 ## the Outer Circle joining the pages, so a held Major is a crossroads.
 ##   Minor points: one each level from 2, plus gifts (minor_bonus). Every knot laid costs one.
-##   Major points ("Arcana"): HeroStats.arcana_points, from bosses, guardians, Heralds, hidden shrines, errands. Every card
+##   Major points ("Arcana"): HeroStats.arcana_points, from bosses, guardians, Heralds, hidden shrines, vows. Every card
 ##   taken costs one. The Void opens after ten Majors are held.
 ##   Roads start at the gate and at every card held. A knot is reachable next to a laid knot or a held card; clicking a
 ##   far knot lays the cheapest road to it. A card is taken next to a laid knot or a held card.
