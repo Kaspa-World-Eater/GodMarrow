@@ -4,6 +4,7 @@ extends Control
 ##   smith   Brannoc: seven wares, bought with a click (items/shop.gd smith_wares, buy_ware)
 ##   stash   the Reliquary Chest: 48 places shared by every pilgrim on this machine; click to take, right-click
 ##           in the pack to put away (hud.stash_open)
+##   lantern a touched lantern-stone: rest (done by the stone), and travel to any lantern kindled on this walk
 ##   journal Esk's errands (J): the act's errands, their state, where, and what they pay (world/quests.gd journal)
 ## Opened by Bus.panel_requested(panel, who) from the townsfolk (world/objects/manager.gd), and J for the journal.
 
@@ -20,6 +21,7 @@ var hover := ""             # close | buy:hp | buy:mp | ware:i | chest:i | q:i
 var sel_q := 0
 var line := ""              # the last thing said (not enough gold, no room)
 var line_t := 0.0
+var opened_at := Vector2.ZERO
 
 func _ready() -> void:
 	offset_right = PW * U.S
@@ -38,6 +40,8 @@ func open(m: String, w: String = "") -> void:
 		hud.p_inv.visible = true
 	if m == "journal":
 		sel_q = 0
+	if hud.hero:
+		opened_at = hud.hero.tp
 
 func close() -> void:
 	visible = false
@@ -54,7 +58,10 @@ func _process(dt: float) -> void:
 	line_t = maxf(0.0, line_t - dt)
 	hover = _at(hud.mouse_in(self) / U.S)
 	# walked away from the townsfolk: the window closes (the journal travels with you)
-	if mode != "journal" and hud.hero and hud.zone and not load("res://world/quests.gd").is_town(hud.zone.id):
+	if mode == "lantern":
+		if hud.hero and hud.hero.tp.distance_to(opened_at) > 3.5:
+			close()
+	elif mode != "journal" and hud.hero and hud.zone and not load("res://world/quests.gd").is_town(hud.zone.id):
 		close()
 	queue_redraw()
 
@@ -94,6 +101,11 @@ func _at(lp: Vector2) -> String:
 			for i in rows.size():
 				if _q_rect(i).has_point(lp):
 					return "q:%d" % i
+		"lantern":
+			var ls: Array = _lanterns()
+			for i in ls.size():
+				if Rect2(14, 76 + i * 16, PW - 28, 14).has_point(lp):
+					return "l:%d" % i
 	return ""
 
 func _wares() -> Array:
@@ -127,6 +139,14 @@ func _gui_input(ev: InputEvent) -> void:
 			_say(SHOP.stash_take(h, j))
 	elif hover.begins_with("q:"):
 		sel_q = int(hover.substr(2))
+	elif hover.begins_with("l:"):
+		var ls: Array = _lanterns()
+		var li := int(hover.substr(2))
+		if li < ls.size() and not _here(ls[li]):
+			var main := get_tree().current_scene
+			close()
+			if main and main.has_method("travel_lantern"):
+				main.travel_lantern(ls[li])
 
 func tip() -> Array:
 	var h = hud.hero
@@ -161,7 +181,7 @@ func _draw() -> void:
 	var col := Color("#c9a45a")
 	U.page(self, 0, 0, PW, PH, col)
 	var title: String = {"vendor": who if who != "" else "The Vendor", "smith": who if who != "" else "The Smith",
-		"stash": "The Reliquary Chest", "journal": "The Journal"}.get(mode, "")
+		"stash": "The Reliquary Chest", "journal": "The Journal", "lantern": who if who != "" else "The Lantern"}.get(mode, "")
 	U.title(self, title, PW / 2.0, 19, col, 150)
 	U.stud(self, PW - 15, 4, 12, 12, "", true, U.TEXT, hover == "close")
 	U.text(self, "x", PW - 9, 13, U.MUTED, 0, "pixel", 8, false)
@@ -174,7 +194,9 @@ func _draw() -> void:
 			_draw_stash(h)
 		"journal":
 			_draw_journal(h)
-	if mode != "journal":
+		"lantern":
+			_draw_lantern(h)
+	if mode != "journal" and mode != "lantern":
 		U.text(self, "Gold: %d" % h.st.inv.gold, PW / 2.0, PH - 12, U.GOLD, 0, "pixel", 8)
 	if line_t > 0.0 and line != "":
 		U.text(self, line, PW / 2.0, PH - 24, U.RED, 0, "book", 8)
@@ -258,3 +280,29 @@ func _draw_journal(_h) -> void:
 			y += 11
 		if e2["state"] != "unheard":
 			U.text(self, str(e2["reward"]), 16, y + 8, U.GOLD_D, -1, "book", 7)
+
+
+# ------------------------------------------------------------------ the lantern
+func _lanterns() -> Array:
+	var d: Dictionary = _Q().state().get("lanterns", {})
+	var out := []
+	for k in d:
+		out.append(d[k])
+	return out
+
+func _here(e: Dictionary) -> bool:
+	return hud.zone != null and e.get("zone", "") == hud.zone.id and hud.hero and hud.hero.tp.distance_to(Vector2(e["x"], e["y"])) < 4.0
+
+func _draw_lantern(h) -> void:
+	var what: String = ("Life, %s and the choir are restored." if "wbeh" in h.skills else "Life and %s are restored.") % h.st.res_name()
+	U.text(self, "You rest. " + what, PW / 2.0, 38, U.MUTED, 0, "book", 7)
+	U.text(self, "This lantern is where you return if you fall.", PW / 2.0, 50, U.DIM, 0, "book", 7)
+	U.text(self, "Travel to:", 14, 68, U.TEXT, -1, "book", 8)
+	var ls: Array = _lanterns()
+	var Q = _Q()
+	for i in ls.size():
+		var e: Dictionary = ls[i]
+		var here := _here(e)
+		var r := Rect2(14, 76 + i * 16, PW - 28, 14)
+		U.stud(self, r.position.x, r.position.y, r.size.x, r.size.y, "", not here, U.TEXT, hover == "l:%d" % i)
+		U.text(self, "%s · %s" % [str(e.get("name", "A lantern")), Q.zone_name(str(e.get("zone", "")))], r.position.x + 6, r.position.y + 10, U.TEXT if not here else U.DIM, -1, "book", 7)

@@ -592,6 +592,7 @@ func _touch_lantern(e: Dictionary) -> void:
 	var key := "%s:%d" % [zone.id, int(o.get("idx", 0))]
 	Q.state()["lanterns"][key] = {"zone": zone.id, "x": e["tp"].x, "y": e["tp"].y, "name": e["name"]}
 	_say(e["name"], Q.lantern_inscription(zone.id, o), true)
+	_panel("lantern", e["name"])
 
 func _open_chest(e: Dictionary) -> void:
 	var mem := Q.obj(zone.id, e["i"])

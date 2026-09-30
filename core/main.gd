@@ -104,6 +104,21 @@ func enter(zid: String, from: String) -> void:
 	await get_tree().create_timer(0.5).timeout
 	travelling = false
 
+## the lantern's panel: go to any lantern kindled on this walk
+func travel_lantern(e: Dictionary) -> void:
+	if travelling or hero == null:
+		return
+	last_lantern = e.duplicate()
+	if e.get("zone", "") == zone.id:
+		hero.tp = Vector2(e["x"], e["y"] + 1.2)
+		hero.target = null
+		hero.walking = false
+		hero._sync()
+		cam.position = hero.position
+		cam.reset_smoothing()
+	else:
+		await enter(e["zone"], "__lantern")
+
 ## the save (core/save.gd): on entering a zone, touching a lantern, from the pause menu, and on quitting
 func save_game() -> void:
 	if hero != null and not hero.dead and not args.has("demo"):
