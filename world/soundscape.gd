@@ -82,7 +82,7 @@ func _music(key: String) -> AudioStream:
 func _pick() -> String:
 	var z = main.zone
 	if main.get("title_open") == true:
-		return "title"
+		return "dirge"
 	if z == null:
 		return ""
 	var b = main.boss_awake
