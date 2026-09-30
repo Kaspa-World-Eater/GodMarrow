@@ -270,7 +270,7 @@ NAMES = [  # case-sensitive, whole words: old name -> new, in every text that na
     ('Covenant of Blood', 'The Red Tithe'), ('Flesh panel', 'Penance panel'),
     ('Welt-Mail', 'Cilice'), ('The Burden', 'The Cross He Carries'), ('The Flaying', 'Sackcloth and Ashes'),
     ('Penance Mastery', 'Mortification Mastery'), ('The Suckling Clots', 'Cupping Glasses'), ('Suckling Clots', 'Cupping Glasses'),
-    ('Her Door', 'Boiling Blood'), ('Full Clots', 'Full Glasses'), ('Clot Mother', 'More Glasses'), ('Penance panel', 'Mortification panel'),
+    ('Her Door', 'Boiling Blood'), ('Cupping Glasses', 'The Almoners'), ('The Tall Red Hat', 'The Dread Procession'), ('Full Clots', 'Full Glasses'), ('Clot Mother', 'More Glasses'), ('Penance panel', 'Mortification panel'),
 ]
 def rename_all(t):
     if not isinstance(t, str):
@@ -448,6 +448,27 @@ for pk in by['molt'].get('perks', []):
     if pk['name'] == 'Crawling Skin':
         pk['name'] = 'Spilled Glasses'
         pk['text'] = "When the skin falls, two cupping glasses roll out of it and go to work on the nearest wounds."
+# names the user asked for (2026-09-30): the melee tree is PENANCES (not Iron Maiden); the drinking glasses are the
+# Almoners (the brotherhood's alms-collectors, gone out to gather blood instead of coin); the terror is the Dread Procession
+for x in S:
+    if x['class'] == H and x['tab'] == 2:
+        x['tree'] = 'Penances'
+by['spool']['name'] = 'The Almoners'
+by['spool']['description'] = ("[Passive] Little hooded almoners ride in your sleeves. Whenever you wound an enemy one may drop, crawl to the wound "
+    "with its bowl held out, fill it, then climb back up your arm and pour what it gathered into you as life and Vitae. Levels: more "
+    "almoners out at once, fuller bowls.")
+by['spool']['lore'] = "In Villa Llaga the almoners went door to door with a bowl for the wound's tithe. His still do. They no longer ask."
+for pk in by['spool'].get('perks', []):
+    pk['name'] = {'Full Glasses': 'Deep Bowls', 'More Glasses': 'More Almoners'}.get(pk['name'], pk['name'])
+    pk['text'] = pk['text'].replace('The glasses drink', 'The almoners gather').replace('Two more glasses', 'Two more almoners')
+for pk in by['molt'].get('perks', []):
+    if pk['name'] == 'Spilled Glasses':
+        pk['name'] = 'Almoners in the Skin'
+        pk['text'] = "When the skin falls, two almoners climb out of it and go to work on the nearest wounds."
+by['tallhat']['name'] = 'The Dread Procession'
+by['ironm']['name'] = 'Penance Mastery'
+by['tallhat']['description'] = ("Walk as the procession walked by night, in the tall red of the brotherhood. Enemies near you remember the "
+    "nursery song and flee in terror for a few seconds; the blows you land on the terrified strike half again as hard.")
 # synergies that pointed at the cut skills are gone (remove() did it); a few new ones, inside the trees
 by['discipline']['synergies'] = [{"from": "scourge", "from_name": "Scourge", "table_pc": 8, "per_hard_point_pct": 4}]
 by['wheel']['synergies'] = [{"from": "scourge", "from_name": "Scourge", "table_pc": 6, "per_hard_point_pct": 3}]
@@ -528,7 +549,7 @@ json.dump(D, open(SK, 'w'), ensure_ascii=False)
 C = json.load(open('data/classes.json'))
 C['classes'][O]['tabs'] = ['Ossuary', 'Carapace', 'Count']
 C['classes'][O]['default_keys'] = {'q': 'spear', 'w': 'ribcage', 'e': 'spikes', 'r': 'colossus', 't': 'opencount', 'y': 'host', 'u': 'sstorm', 'f': 'barmor'}
-C['classes'][H]['tabs'] = ['Mortification', 'Blood', 'Iron Maiden']
+C['classes'][H]['tabs'] = ['Mortification', 'Blood', 'Penances']
 C['classes'][H]['display_name'] = 'The Red Penitent'
 C['classes'][H]['display_name_runtime'] = 'The Red Penitent'
 C['classes'][H]['default_keys'] = {'q': 'blance', 'w': 'hemor', 'e': 'vwhip', 'r': 'fgolem', 't': 'scourge', 'y': 'discipline', 'u': 'wheel', 'f': 'ironmaiden'}
