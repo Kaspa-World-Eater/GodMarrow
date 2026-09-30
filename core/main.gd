@@ -87,6 +87,7 @@ func enter(zid: String, from: String) -> void:
 	hero.skills = old_skills
 	zone.sorted.add_child(hero)
 	hero.setup(zone, Game.cls, at)
+	var fresh_pilgrim := hero.st.level == 1 and hero.st.xp == 0 and pending_load.is_empty() and from == ""
 	if not pending_load.is_empty():
 		SaveIO.apply(self, pending_load)
 		pending_load = {}
@@ -106,6 +107,9 @@ func enter(zid: String, from: String) -> void:
 	dark.bind(zone, hero)
 	if hud and hud.has_method("bind"):
 		hud.bind(hero, zone)
+		# a new pilgrim opens on the skill page to spend the first point
+		if fresh_pilgrim and hero.st.skill_points > 0 and not args.has("demo") and not args.has("panel") and not hud.is_open("skills"):
+			hud.toggle_panel("skills")
 	if ResourceLoader.exists("res://world/objects.gd"):   # (world objects): town, objects, waystones, errands
 		load("res://world/objects.gd").attach(self, zone, hero)
 	Bus.zone_entered.emit(zid)

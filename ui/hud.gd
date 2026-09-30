@@ -743,6 +743,11 @@ func _mon_line(m: Monster, cx: float, y: float) -> void:
 	var nw := f.get_string_size(nm, HORIZONTAL_ALIGNMENT_LEFT, -1, 40).x
 	over.draw_string(f, Vector2(cx - nw / 2 + 2, y + 42), nm, HORIZONTAL_ALIGNMENT_LEFT, -1, 40, Color(0, 0, 0, 0.9))
 	over.draw_string(f, Vector2(cx - nw / 2, y + 40), nm, HORIZONTAL_ALIGNMENT_LEFT, -1, 40, col)
+	# champions and uniques show the bone line of their stagger along the bar's foot (checklist 6)
+	if m.rank in ["champion", "unique"]:
+		var sk := 1.0 if m.reeling > 0.0 else clampf(1.0 - m.poise / maxf(1.0, m.poise_max), 0, 1)
+		over.draw_rect(Rect2(cx - w / 2, y + h - 4, w, 4), Color("#0a090d"))
+		over.draw_rect(Rect2(cx - w / 2, y + h - 4, w * sk, 4), Color("#f4efe2") if m.reeling > 0.0 else Color("#b8ae94"))
 	if mods != "":
 		var fb := U.font("book")
 		var mw := fb.get_string_size(mods, HORIZONTAL_ALIGNMENT_LEFT, -1, 30).x
