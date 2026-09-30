@@ -40,6 +40,8 @@ var invuln := 0.0
 var roll_dir := Vector2.ZERO
 var charge := 0.0          # heavy wind-up held
 var holding_attack := false
+var hold_t := 0.0          # how long the attack button has been held (heavy wind-up after 0.18 s)
+var heavy_pm := 0.0        # a released heavy: its poise-damage multiplier (x2 -> x3.5); 0 for other blows
 var cast_hold := 0.0
 
 # poise break (v60, v79)
@@ -212,17 +214,39 @@ func _physics_process(dt: float) -> void:
 		cast_hold += dt
 		if cast_hold > 0.25:
 			_cast_right()
+	_heavy(dt)
 	if act != "":
 		_act(dt)
 		_sync()
 		return
+	if holding_attack:
+		# winding up: creep toward the target at 35% (in _walk), the blow drawn back
+		if target and not target.dead and tp.distance_to(target.tp) - target.radius > _reach():
+			repath -= dt
+			if repath <= 0.0 or not walking:
+				walk_to(target.tp)
+			_walk(dt)
+		_face((target.tp if target and not target.dead else mouse_tile()) - tp)
+		spr.view = view
+		spr.face = face
+		spr.play("atk", false, false)
+		spr.set_index(mini(1, spr.frame_count() - 1))
+		_sync()
+		return
+	# auto-attack (an option; off by default on desktop): an idle pilgrim turns on what comes near
+	if Settings.auto_attack and target == null and not walking and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		var near := Combat.nearest_monster(zone, tp, 5.0, true)
+		if near and near.awake:
+			target = near
 	# walk or chase
 	var moved := false
 	if target and not target.dead and not target.buried:
 		var reach := _reach()
 		var d := tp.distance_to(target.tp) - target.radius
 		if d <= reach:
-			_start_attack(target, target.tp)
+			# a held button is deciding between a cut and a heavy: wait for it (Settings.hold_heavy)
+			if not (Settings.hold_heavy and hold_t > 0.0 and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and skills.left == "attack"):
+				_start_attack(target, target.tp)
 		else:
 			repath -= dt
 			if repath <= 0.0 or not walking:
@@ -343,6 +367,7 @@ func _act(dt: float) -> void:
 			pass
 	if act_t >= act_len:
 		act = ""
+		heavy_pm = 0.0
 		spr.fps_override = 0.0
 		if act_target and act_target.dead:
 			target = null
@@ -363,7 +388,9 @@ func _land_blow() -> void:
 	d *= st.melee_mult() * act_mult
 	var m2 := act_target
 	if m2 and not m2.dead and tp.distance_to(m2.tp) <= _reach() + m2.radius + 0.4:
-		var o_hit := {"melee": true, "heavy": act_mult > 1.5}
+		var o_hit := {"melee": true, "heavy": act_mult > 1.5 or heavy_pm > 0.0}
+		if heavy_pm > 0.0:
+			o_hit["poise"] = d * heavy_pm
 		var dealt: float = Combat.hit_monster(m2, d, "phys", tp, o_hit)
 		skills.on_weapon_hit(m2, dealt)
 		if o_hit.get("finisher", false):
@@ -420,6 +447,8 @@ func roll() -> void:
 	_face(roll_dir)
 	act = ""
 	charge = 0.0
+	holding_attack = false
+	hold_t = 0.0
 	string_i = 0
 	_start_act("roll", 0.34)
 	spr.play("dodge" if spr.set.has("dodge") else "walk", true, false)
@@ -482,3 +511,51 @@ func revive(at: Vector2) -> void:
 	lamp.texture_scale = light_radius() * Iso.HX * 2.0 / 512.0 * 1.25
 	_sync()
 	stats_changed.emit()
+
+
+# ------------------------------------------------------------------ the heavy attack (checklist 2, zz_mech_heavy.js)
+## hold the attack past 0.18 s to wind up (full at 0.75 s); release lunges up to 0.9 yd and strikes x1.25 -> x2.0
+## damage and x2 -> x3.5 poise damage for 12 -> 24 poise. Under 10% poise the wind-up is 1.35x and the recovery 1.3x
+## slower (never locked out). A roll cancels it. Option: Settings.hold_heavy.
+func _heavy(dt: float) -> void:
+	var w: Item = _weapon()
+	var lmb := Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not _ui_captured()
+	var aimed := (target != null and not target.dead) or Input.is_key_pressed(KEY_SHIFT)
+	var slow := 1.35 if st.poise < st.poise_max() * 0.1 else 1.0
+	if not Settings.hold_heavy or (w and w.is_ranged()) or skills.left != "attack" or act == "stun" or act == "roll":
+		hold_t = 0.0
+		if holding_attack:
+			holding_attack = false
+			charge = 0.0
+		return
+	if lmb and aimed:
+		hold_t += dt
+		if hold_t > 0.18 * slow and (act == "" or holding_attack):
+			if not holding_attack:
+				holding_attack = true
+				string_i = 0
+			charge = clampf((hold_t - 0.18 * slow) / (0.57 * slow), 0.0, 1.0)
+	elif holding_attack and not lmb:
+		_release_heavy(slow)
+	else:
+		hold_t = 0.0
+
+func _release_heavy(slow: float) -> void:
+	var k := charge
+	holding_attack = false
+	hold_t = 0.0
+	charge = 0.0
+	var at: Vector2 = target.tp if target and not target.dead else mouse_tile()
+	var to := at - tp
+	var lunge := minf(0.9, maxf(0.0, to.length() - (target.radius if target else 0.0) - 0.9))
+	if to.length() > 0.01:
+		tp = zone.move(tp, to.normalized() * lunge, radius)
+	_face(to)
+	spend_poise(lerpf(12.0, 24.0, k))
+	_start_act("atk", 0.55 * lerpf(1.1, 1.5, k) * (1.3 if slow > 1.0 else 1.0) / st.attack_speed())
+	act_target = target if target and not target.dead else null
+	act_hit_at = 0.35
+	act_mult = lerpf(1.25, 2.0, k)
+	heavy_pm = lerpf(2.0, 3.5, k)
+	string_i = 0
+	string_idle = 0.0
