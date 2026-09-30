@@ -1,0 +1,10 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1920, height: 1080 } });
+ const errs=[]; p.on('pageerror', e => errs.push(e.message));
+ await p.goto('file:///tmp/mirrors.html'); const ev=(f,a)=>p.evaluate(f,a);
+ await ev(() => { localStorage.removeItem('spiritmancer.test'); const S = window.__spm; S.G.pickCls = 'animancer'; S.startGame('test'); });
+ await p.waitForTimeout(700);
+ console.log(await ev(() => { const S = window.__spm, P = S.P; for (const k in S.G.panels) S.G.panels[k] = false; Object.assign(P.skills, { pillars: 10, fissure: 10, cage: 10, anvil: 10, wisps: 6, lance: 1 }); if (S.rederive) S.rederive(); const after = P.skills.pillars; P.hp = 1e6; P.mana = 1e4; P.cast=0; P.roll=0; const n0=S.G.pillars.length; S.castPillarsNow({x:P.x+2.2,y:P.y-1.2}); return JSON.stringify({cls:P.cls, n0, n1:S.G.pillars.length, mana:P.mana, after, bs: JSON.stringify(P.baseSkills||P.pts||null).slice(0,200), roll:P.roll, cast:P.cast, keys:Object.keys(S).filter(k=>/cast|G$|^P$/.test(k)), same: S.G===undefined, px:P.x,py:P.y, solid:S.G.zone.solidAt(P.x+2.2,P.y-1.2)}); }));
+ await p.waitForTimeout(3000);
+ console.log(await ev(() => { const S = window.__spm; return JSON.stringify(S.G.pillars.map(p=>({wm:p.wm,life:p.life,rise:p.rise}))); }));
+ console.log(errs.join('\n')); await b.close(); })();

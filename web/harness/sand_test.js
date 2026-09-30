@@ -1,0 +1,22 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1920, height: 1080 } });
+ const errs = []; p.on('pageerror', e => errs.push(e.message));
+ await p.goto('file://' + process.env.HTML); await p.waitForTimeout(1500);
+ const ev = (f, a) => p.evaluate(f, a), wait = ms => p.waitForTimeout(ms);
+ await ev(() => { localStorage.removeItem('spiritmancer.test'); const S = window.__spm; S.G.pickCls = 'monk'; S.startGame('test'); }); await wait(800);
+ await ev(() => { const S = window.__spm; for (const k in S.G.panels) S.G.panels[k] = false; S.G.msgT = 0; });
+ const r = await ev(() => { const S = window.__spm, P = S.P, SK = S.SK, KS = S.KS; const ids = Object.keys(SK).filter(k => SK[k].cls === 'monk' && SK[k].mana);
+   const r0 = ids.find(k => SK[k].tab === 0), a0 = ids.find(k => SK[k].tab === 1);
+   const out = { r0, a0, start: KS.fill(), mana0: P.mana };
+   for (let i = 0; i < 40 && KS.fill().fR < 0.7; i++) S.spendMana(r0);
+   for (let i = 0; i < 40 && KS.fill().fA < 0.35; i++) S.spendMana(a0);
+   out.after = KS.fill(); out.sand = [KS.sand(0), KS.sand(1)]; out.mana = P.mana; out.maxMana = S.D ? S.D.maxMana : null; return out; });
+ console.log(JSON.stringify(r));
+ await wait(100); await p.screenshot({ path: '/tmp/sand1.png' });
+ await wait(2500); console.log('2.5s', JSON.stringify(await ev(() => window.__spm.KS.fill())));
+ await p.screenshot({ path: '/tmp/sand2.png' });
+ await wait(4000); console.log('6.5s', JSON.stringify(await ev(() => window.__spm.KS.fill())));
+ // pour absence heavy for the picture
+ await ev(() => { const S = window.__spm, SK = S.SK; const a0 = Object.keys(SK).find(k => SK[k].cls === 'monk' && SK[k].mana && SK[k].tab === 1); for (let i = 0; i < 40 && S.KS.fill().fA < 0.8; i++) S.spendMana(a0); });
+ await wait(60); await p.screenshot({ path: '/tmp/sand3.png' });
+ console.log('ERRS', errs.slice(0, 3).join(' | ') || 'none'); await b.close(); })();

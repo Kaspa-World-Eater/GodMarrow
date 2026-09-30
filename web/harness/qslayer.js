@@ -1,0 +1,13 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1920, height: 1080 } }); const errs=[]; p.on('pageerror', e => errs.push(e.message));
+await p.goto('file://' + process.env.HTML); await p.waitForTimeout(600);
+const ev = (f,a)=>p.evaluate(f,a);
+await ev(() => { const S = window.__spm; S.G.pickCls = 'hemomancer'; S.q.start('test'); });
+await p.waitForTimeout(700);
+const r = await ev(() => { const S = window.__spm; for (const k in S.G.panels) S.G.panels[k] = false; S.q.state().act = 5; S.q.enter('a5_lair'); const z = S.G.zone, b = z.boss; S.P.iframe = 1e5; S.P.x = b.x - 2; S.P.y = b.y + 3; return { b: [b.x, b.y], spr: b.b.spr, zone: z.name }; });
+await p.waitForTimeout(1500);
+const r2 = await ev(() => { const S = window.__spm, b = S.G.zone.boss; S.P.iframe = 1e5; b.hp = b.max * 0.5; return { fight: S.G.bossFight, b: [b.x, b.y], P: [S.P.x, S.P.y], st: b.state }; });
+await p.waitForTimeout(1800);
+await p.screenshot({ path: '/tmp/qshots/q_boss_act5.png' });
+const r3 = await ev(() => { const S = window.__spm, b = S.G.zone.boss; return { b: [b.x.toFixed(1), b.y.toFixed(1)], P: [S.P.x.toFixed(1), S.P.y.toFixed(1)], st: b.qstage, adds: S.G.zone.monsters.filter(m => m.qadd && !m.dead).length }; });
+console.log(JSON.stringify({ r, r2, r3 }), errs.join('\n')); await b.close(); })();

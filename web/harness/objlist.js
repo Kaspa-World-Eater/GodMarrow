@@ -1,0 +1,10 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
+ await p.goto('file://' + process.env.HTML); await p.waitForTimeout(1500);
+ await p.evaluate(() => { localStorage.removeItem('spiritmancer.test'); const S = window.__spm; S.G.pickCls = 'monk'; S.startGame('test'); }); await p.waitForTimeout(600);
+ const r = await p.evaluate(z => { const S = window.__spm; S.enterZone(z); const P = window.__zt.P(); const Z = S.G.zone;
+   const near = Z.objects.filter(o => Math.hypot(o.x - P.x, o.y - P.y) < 14).map(o => `${o.type}/${o.spr || ''}/${o.kind || ''} @${o.x.toFixed(1)},${o.y.toFixed(1)}`);
+   const types = {}; Z.objects.forEach(o => types[o.type + '/' + (o.spr || '')] = (types[o.type + '/' + (o.spr || '')] || 0) + 1);
+   const pk = {}; (Z.props || []).forEach(o => pk[o.kind] = (pk[o.kind] || 0) + 1);
+   return { P: [P.x, P.y], near, types, props: pk }; }, process.env.ZONE || 'moor');
+ console.log(JSON.stringify(r, null, 1)); console.log('ERRS', errs.slice(0, 3).join(' | ') || 'none'); await b.close(); })();

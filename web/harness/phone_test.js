@@ -1,0 +1,10 @@
+const { chromium, devices } = require('playwright');
+(async () => { const b = await chromium.launch(); const ctx = await b.newContext({ ...devices['Pixel 7 landscape'] }); const p = await ctx.newPage();
+ const errs = [], ext = []; p.on('pageerror', e => errs.push(e.message)); p.on('request', r => { if (!r.url().startsWith('file:')) ext.push(r.url().slice(0, 60)); });
+ await p.goto('file://' + process.env.HTML); await p.waitForTimeout(2000);
+ await p.screenshot({ path: '/tmp/phone_title.png' });
+ await p.evaluate(() => { localStorage.removeItem('spiritmancer.test'); const S = window.__spm; S.G.pickCls = 'monk'; S.startGame('test'); }); await p.waitForTimeout(1200);
+ await p.evaluate(() => { const S = window.__spm; for (const k in S.G.panels) S.G.panels[k] = false; S.G.msgT = 0; });
+ await p.waitForTimeout(300); await p.screenshot({ path: '/tmp/phone_game.png' });
+ console.log('touch', await p.evaluate(() => __spm.TOUCH.on), 'ext', JSON.stringify(ext.slice(0, 5)));
+ console.log('ERRS', errs.slice(0, 3).join(' | ') || 'none'); await b.close(); })();

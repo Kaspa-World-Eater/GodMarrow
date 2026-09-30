@@ -1,0 +1,11 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1920, height: 1080 } });
+ const errs=[]; p.on('pageerror', e => errs.push(e.message));
+ await p.goto('file://' + process.env.HTML); const ev=(f,a)=>p.evaluate(f,a);
+ await ev(() => { localStorage.removeItem('spiritmancer.test'); const S = window.__spm; S.G.pickCls = 'animancer'; S.startGame('test'); });
+ await p.waitForTimeout(4000);
+ console.log(await ev(() => Object.keys(window.__spm.G.panels).join(',')));
+ await ev(() => { const S = window.__spm; for (const k in S.G.panels) S.G.panels[k] = false; S.G.panels.skills = true; S.G.panels.skill = true; S.G.skillTab = 0; S.G.tab = 0; });
+ await p.waitForTimeout(600); await p.mouse.move(120, 165); await p.waitForTimeout(400);
+ await p.screenshot({ path: '/tmp/mrs/tree.png' });
+ console.log(errs.join('\n')); await b.close(); })();

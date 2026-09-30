@@ -1,0 +1,12 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1920, height: 1080 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
+ await p.goto('file://' + process.env.HTML); await p.waitForTimeout(1500);
+ await p.evaluate(c => { localStorage.removeItem('spiritmancer.test'); const S = window.__spm; S.G.pickCls = c; S.startGame('test'); }, process.env.CLS || 'ossumancer'); await p.waitForTimeout(800);
+ await p.evaluate(() => { const S = window.__spm, P = S.P, G = S.G; for (const k in G.panels) G.panels[k] = false; G.msgT = 0; G.bannerT = 0; G.zone.qSafeC = null;
+   const mk = (t, dx, dy) => { const m = S.makeMon(t, P.x + dx, P.y + dy, 5, 'normal', []); m.hp = m.max = 1e5; m.b = { ...m.b, ai: 'none' }; m.spd = 0; G.zone.monsters.push(m); return m; };
+   mk('kneeler', 2.5, 0); mk('moth', 0, 2.5); mk('knight', 3, 3); mk('hollow', -2, 2); mk('a4_animamonk', 4, 0.5); const m = mk('bloat', -1, 4); window.__m = m; });
+ await p.waitForTimeout(300);
+ await p.evaluate(() => { const S = window.__spm; S.hurtMon(window.__m, 5, '#fff'); try { for (let i = 0; i < 3; i++) S.raiseSkel(S.P.x - 1 + i, S.P.y + 1); } catch (e) { console.log('raise', e.message); } try { for (let i = 0; i < 3; i++) S.spawnWisp(); } catch (e) {} });
+ await p.mouse.move(960 + 30, 540 + 180);
+ await p.waitForTimeout(600); await p.screenshot({ path: '/tmp/wsc.png' });
+ console.log('ERRS', errs.slice(0, 3).join(' | ') || 'none'); await b.close(); })();

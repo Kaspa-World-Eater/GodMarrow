@@ -1,0 +1,11 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1920, height: 1080 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
+ await p.goto('file://' + process.env.HTML); await p.waitForTimeout(1500);
+ await p.evaluate(() => { localStorage.removeItem('spiritmancer.test'); const S = window.__spm; S.G.pickCls = 'hemomancer'; S.startGame('test'); }); await p.waitForTimeout(800);
+ await p.evaluate(() => { const S = window.__spm, P = S.P, G = S.G; for (const k in G.panels) G.panels[k] = false; G.msgT = 0; G.bannerT = 0; G.zone.qSafeC = null;
+   G.zone.monsters.forEach(m => { if (Math.hypot(m.x - P.x, m.y - P.y) < 14) { m.dead = true; m.hidden = true; } });
+   const mk = (t, dx, dy, face) => { const m = S.makeMon(t, P.x + dx, P.y + dy, 5, 'normal', []); m.hp = m.max = 1e5; m.b = { ...m.b, ai: 'none' }; m.spd = 0; m.face = face; G.zone.monsters.push(m); return m; };
+   window.__k1 = mk('kneeler', 2.5, 0, 1); window.__k2 = mk('kneeler', 0, 2.5, -1); mk('moth', 4, 3, 1); });
+ await p.waitForTimeout(700); await p.screenshot({ path: '/tmp/kn1.png' });
+ console.log(JSON.stringify(await p.evaluate(() => { const S = window.__spm; const a = S.iso(__k1.x, __k1.y), b = S.iso(__k2.x, __k2.y), c = S.iso(S.P.x, S.P.y); return [a, b, c, __k1.state, __k1.face, __k1.dead, __k1.hp, Object.keys(__k1).filter(k => /hp|max|life/i.test(k)).map(k => k + '=' + __k1[k])]; })));
+ console.log('ERRS', errs.slice(0, 3).join(' | ') || 'none'); await b.close(); })();

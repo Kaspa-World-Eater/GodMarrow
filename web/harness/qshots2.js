@@ -1,0 +1,17 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1920, height: 1080 } }); const errs=[]; p.on('pageerror', e => errs.push(e.message));
+await p.goto('file://' + process.env.HTML); await p.waitForTimeout(600);
+const ev = (f,a)=>p.evaluate(f,a), wait = ms => p.waitForTimeout(ms);
+await ev(() => { localStorage.removeItem('triune.stash.test'); const S = window.__spm; S.G.pickCls = 'ossumancer'; S.q.start('test'); });
+await wait(700);
+const info = await ev(() => { const S = window.__spm; for (const k in S.G.panels) S.G.panels[k] = false; S.q.state().act = 2; S.q.qGoTown(2); const z = S.G.zone; const npcs = z.objects.filter(o => o.q === 'npc' || o.type === 'vendor' || o.q === 'wp').map(o => [o.role || o.type || o.q, o.name, +o.x.toFixed(1), +o.y.toFixed(1)]); const g = z.objects.find(o => o.role === 'giver'); S.P.x = g.x + 1; S.P.y = g.y + 2; return { zone: z.name, npcs, spots: z.npcSpots }; });
+console.log(JSON.stringify(info));
+await wait(3000);
+await p.screenshot({ path: '/tmp/qshots/q_town_act2_npcs.png' });
+await ev(() => { const S = window.__spm, z = S.G.zone, o = z.objects.find(o => o.role === 'stash'); S.q.interact(o); for (let i = 0; i < 9; i++) { const it = S.rollItem(24, 250); if (it && !it.potion) S.q.Q.stash.push(it); } });
+await wait(500); await p.screenshot({ path: '/tmp/qshots/q_stash.png' });
+await ev(() => { const S = window.__spm, z = S.G.zone, o = z.objects.find(o => o.role === 'smith'); S.q.interact(o); });
+await wait(500); await p.screenshot({ path: '/tmp/qshots/q_wares.png' });
+await ev(() => { const S = window.__spm; for (const k in S.G.panels) S.G.panels[k] = false; S.q.credits(); });
+await wait(1600); await p.screenshot({ path: '/tmp/qshots/q_credits.png' });
+console.log('ERRS', errs.join('\n') || 'none'); await b.close(); })();

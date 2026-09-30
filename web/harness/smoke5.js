@@ -1,0 +1,41 @@
+const { chromium } = require('playwright');
+(async () => {
+  const b = await chromium.launch();
+  const p = await b.newPage({ viewport: { width: 1440, height: 810 } });
+  const errs = []; p.on('pageerror', e => errs.push('pageerror: ' + e.message)); p.on('console', m => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
+  await p.goto('file://' + process.cwd() + '/spiritmancer.html');
+  await p.click('#testBtn'); await p.waitForTimeout(400);
+  await p.keyboard.press('Escape'); // close skills panel
+  await p.evaluate(() => { const { P, learn } = window.__spm; P.attrs.vit = 400; P.attrs.ene = 300; for (let i = 0; i < 8; i++) { learn('wisps'); learn('beam'); learn('golem'); } });
+  const info = () => p.evaluate(() => { const { G, P } = window.__spm; const z = G.zone; const c = {}; z.monsters.forEach(m => c[m.type] = (c[m.type] || 0) + 1); return { zone: z.id, name: z.name, size: z.w, portals: z.objects.filter(o => o.type === 'portal').map(o => o.to), lanterns: z.lanterns.length, mons: c, boss: z.boss && z.boss.name, err: G.error, paused: G.paused, running: G.running }; });
+  const go = async to => { await p.evaluate(to => { const { G, usePortal } = window.__spm; const o = G.zone.objects.find(o => o.type === 'portal' && o.to === to); usePortal(o); }, to); await p.waitForTimeout(700); const i = await info(); console.log(JSON.stringify(i)); return i; };
+  console.log(JSON.stringify(await info()));
+  await go('fen'); await p.screenshot({ path: 'shot5_fen.png' });
+  await p.evaluate(() => { const { G, P } = window.__spm; const m = G.zone.monsters.find(m => m.type === 'drowned'); P.x = m.x - 2.5; P.y = m.y; });
+  await p.waitForTimeout(1500); await p.screenshot({ path: 'shot5_fenfight.png' });
+  await go('cata1'); await p.screenshot({ path: 'shot5_cata1.png' });
+  await go('cata2');
+  await p.evaluate(() => { const { G, P } = window.__spm; const r = G.zone.bossRoom; P.x = r.cx; P.y = r.cy + 2; P.hp = 5000; P.mana = 5000; });
+  await p.waitForTimeout(2500); await p.screenshot({ path: 'shot5_matron.png' });
+  console.log('boss fight', await p.evaluate(() => { const { G } = window.__spm; return JSON.stringify({ fight: G.bossFight, zone: G.bossZone, hp: Math.round(G.zone.boss.hp), st: G.zone.boss.state }); }));
+  await p.evaluate(() => { const { G } = window.__spm; G.zone.boss.hp = 1; });
+  await p.evaluate(() => { const { G, P } = window.__spm; });
+  await p.waitForTimeout(2000);
+  console.log('after boss', await p.evaluate(() => { const { G } = window.__spm; return JSON.stringify({ fight: G.bossFight, dead: G.zone.boss.dead, seal: G.seal.length, banner: G.banner }); }));
+  await go('cata1'); await go('fen'); await go('moor'); await go('barrow'); await p.screenshot({ path: 'shot5_barrow.png' });
+  await go('moor'); await go('crypt'); await go('moor');
+  // menu
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200);
+  console.log('menu open', JSON.stringify(await info()), await p.isVisible('#menu'));
+  await p.screenshot({ path: 'shot5_menu.png' });
+  await p.click('#mKeys'); await p.waitForTimeout(100);
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200);
+  console.log('menu closed', await p.isVisible('#menu'), JSON.stringify(await info()));
+  await p.keyboard.press('Escape'); await p.waitForTimeout(100); await p.click('#mQuit'); await p.waitForTimeout(200);
+  console.log('quit', await p.isVisible('#intro'), JSON.stringify(await info()));
+  await p.click('#newBtn'); await p.waitForTimeout(500);
+  console.log('new game', JSON.stringify(await info()));
+  await p.waitForTimeout(1000);
+  console.log('ERRORS', JSON.stringify(errs.slice(0, 10)));
+  await b.close();
+})();

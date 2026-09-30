@@ -1,0 +1,2 @@
+// zz_dbg_hooks.js: test hooks for the world painters (headless review sheets only)
+try { window.__zt = { prop: (k, v) => ztPropFrame(k, v), obj: (k, s) => ztObjFrame(k, s), tree: (k, s) => ztTreeFrame(k, s), PROPS: Object.keys(ZT_PROPP), OBJS: Object.keys(ZT_OBJP), TREE_N: ZT_TREE_SIZE.length, treeKind: (z, x, y) => ztTreeKind(z, x, y), P: () => P, wvRig: (a, b, c) => wvRig(a, b, c), DAY: () => DAY, ZG: () => ZONE_GEN, cls: (z, x, y) => ztClassOf(z, x, y), pf: (k, v) => ztPropFrame(k, v), ez: (...a) => enterZone(...a) }; } catch (e) { }

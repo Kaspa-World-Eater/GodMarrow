@@ -1,0 +1,5 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage(); await p.goto('file://' + process.env.HTML); await p.waitForTimeout(400);
+ await p.evaluate(() => { const S = window.__spm; S.G.pickCls = 'ossumancer'; S.startGame('test'); }); await p.waitForTimeout(500);
+ const r = await p.evaluate(([z, s]) => { const A = window.__act5, Z = A.gen(z, s), w = A.widthReport(Z); const T = window.__spm.T; const inv = Object.fromEntries(Object.entries(T).map(([k, v]) => [v, k])); const b = w.bottAt; let rows = []; for (let y = b.y - 6; y <= b.y + 6; y++) { let r = ''; for (let x = b.x - 10; x <= b.x + 10; x++) { const t = Z.get(x, y); r += (x === b.x && y === b.y) ? '@' : t === T.FLOOR ? '.' : t === T.WALL ? '#' : t === T.PILLAR ? 'P' : t === T.CLIFF ? ' ' : t === 15 ? 'R' : t === T.FLAGS ? ',' : t === T.ROCK ? 'o' : '?'; } rows.push(r); } return { w, rows, objs: Z.objects.filter(o => Math.hypot(o.x - b.x, o.y - b.y) < 8).map(o => o.type + ' ' + (o.name || o.to)) }; }, [process.env.Z, +process.env.S]);
+ console.log(JSON.stringify(r.w)); console.log(r.rows.join('\n')); console.log(r.objs); await b.close(); })();

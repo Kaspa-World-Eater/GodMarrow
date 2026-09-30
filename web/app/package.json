@@ -1,0 +1,7 @@
+{
+  "name": "godmarrow",
+  "productName": "Godmarrow",
+  "version": "0.53.0",
+  "description": "Godmarrow: a grimdark action RPG in the dead god's body.",
+  "main": "main.js"
+}

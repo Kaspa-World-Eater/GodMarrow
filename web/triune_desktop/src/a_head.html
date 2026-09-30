@@ -1,0 +1,307 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Godmarrow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;900&family=Cinzel+Decorative:wght@700;900&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Silkscreen&display=swap">
+<style>
+  :root {
+    color-scheme: dark;
+    --ash: #0b090d;
+    --stone: #141116;
+    --bone: #dccfb2;
+    --bone-dim: #a3967c;
+    --bone-faint: #74695a;
+    --wisp: #d8f3ff;
+    --gold: #a8844a;
+    --gold-hi: #e3c486;
+    --gold-lo: #5a4424;
+    --ember: #ff7f32;
+    --blood: #8a1a1a;
+    --line: #34303d;
+    --noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .75 -.08'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    --display: "Cinzel", "Trajan Pro", Georgia, serif;
+    --book: "IM Fell English", Georgia, "Times New Roman", serif;
+  }
+  [hidden] { display: none !important; }
+  #turn { display: none; position: fixed; inset: 0; z-index: 50; background: #060508; color: var(--bone); place-items: center; text-align: center; padding: 24px; font: italic 18px/1.6 var(--book); }
+  @media (orientation: portrait) and (pointer: coarse) { #turn { display: grid; } }
+  html, body { height: 100%; }
+  body {
+    margin: 0; overscroll-behavior: none; -webkit-tap-highlight-color: transparent;
+    background: var(--ash);
+    color: var(--bone);
+    font-family: "Silkscreen", ui-monospace, "Courier New", monospace;
+    overflow: hidden;
+  }
+  #stage { position: fixed; inset: 0; display: grid; place-items: center; background: #060508; }
+  canvas#game {
+    touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
+    max-width: 100%;
+    cursor: crosshair;
+    outline: none;
+  }
+
+  /* ---- the overlays: a dark chapel, candle-lit, engraved iron and worn gold ---- */
+  .overlay {
+    position: fixed; inset: 0; display: grid; place-items: center;
+    padding: 16px; z-index: 5;
+    background: radial-gradient(120% 90% at 50% 50%, rgba(4,3,6,.55), rgba(2,1,3,.88));
+  }
+  .panel {
+    position: relative; isolation: isolate;
+    width: min(420px, 100%); max-height: calc(100% - 8px); overflow-y: auto; overscroll-behavior: contain;
+    padding: 26px 28px 20px; display: grid; gap: 14px; align-content: start;
+    color: var(--bone);
+    background:
+      var(--noise),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='-150 -150 300 300'><g fill='none' stroke='%23c9a462' stroke-opacity='.07'><circle r='96' stroke-width='5'/><circle r='86' stroke-width='1'/><circle r='106' stroke-width='1' stroke-dasharray='2 5'/></g><g fill='%23c9a462' fill-opacity='.07'><path d='M-4 -100L0 -130 L4 -100Z' transform='rotate(0)'/><path d='M-4 -100L0 -145 L4 -100Z' transform='rotate(15)'/><path d='M-4 -100L0 -138 L4 -100Z' transform='rotate(30)'/><path d='M-4 -100L0 -131 L4 -100Z' transform='rotate(45)'/><path d='M-4 -100L0 -146 L4 -100Z' transform='rotate(60)'/><path d='M-4 -100L0 -140 L4 -100Z' transform='rotate(120)'/><path d='M-4 -100L0 -133 L4 -100Z' transform='rotate(135)'/><path d='M-4 -100L0 -148 L4 -100Z' transform='rotate(150)'/><path d='M-4 -100L0 -141 L4 -100Z' transform='rotate(165)'/><path d='M-4 -100L0 -134 L4 -100Z' transform='rotate(180)'/><path d='M-4 -100L0 -149 L4 -100Z' transform='rotate(195)'/><path d='M-4 -100L0 -142 L4 -100Z' transform='rotate(210)'/><path d='M-4 -100L0 -135 L4 -100Z' transform='rotate(225)'/><path d='M-4 -100L0 -150 L4 -100Z' transform='rotate(240)'/><path d='M-4 -100L0 -143 L4 -100Z' transform='rotate(255)'/><path d='M-4 -100L0 -136 L4 -100Z' transform='rotate(270)'/><path d='M-4 -100L0 -151 L4 -100Z' transform='rotate(285)'/><path d='M-4 -100L0 -144 L4 -100Z' transform='rotate(300)'/><path d='M-4 -100L0 -137 L4 -100Z' transform='rotate(315)'/><path d='M-4 -100L0 -130 L4 -100Z' transform='rotate(330)'/><path d='M-4 -100L0 -145 L4 -100Z' transform='rotate(345)'/></g></svg>") 50% -120px / 300px 300px no-repeat,
+      radial-gradient(110% 55% at 50% -8%, rgba(255,140,60,.13), transparent 62%),
+      radial-gradient(90% 60% at 50% 110%, rgba(120,20,20,.16), transparent 70%),
+      linear-gradient(180deg, #17131a 0%, #0e0b10 55%, #09070b 100%);
+    border: 1px solid transparent;
+    border-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='120' height='120' viewBox='0 0 120 120'><rect x='4.5' y='4.5' width='111' height='111' fill='none' stroke='%23060407' stroke-width='6'/><rect x='4.5' y='4.5' width='111' height='111' fill='none' stroke='%23a8844a' stroke-width='1.4'/><rect x='10.5' y='10.5' width='99' height='99' fill='none' stroke='%23584222' stroke-width='1'/><g id='c'><path d='M4.5 36V13Q4.5 4.5 13 4.5H36' fill='none' stroke='%23dcbb7a' stroke-width='2.2'/><path d='M0.5 0.5L17 5L5 17Z' fill='%23c9a462' stroke='%23070508' stroke-width='1'/><path d='M27 4.5l4-4.2 4 4.2M4.5 27l-4.2 4 4.2 4' fill='%23b08a4c'/><path d='M15 21.5h9M21.5 15v9' stroke='%235e4626' stroke-width='1'/><rect x='16.5' y='16.5' width='8' height='8' transform='rotate(45 20.5 20.5)' fill='%237a1414' stroke='%23d8b474' stroke-width='1'/><circle cx='20.5' cy='20.5' r='1.2' fill='%23f0d69a'/></g><use xlink:href='%23c' transform='translate(120 0) scale(-1 1)'/><use xlink:href='%23c' transform='translate(0 120) scale(1 -1)'/><use xlink:href='%23c' transform='translate(120 120) scale(-1 -1)'/></svg>") 40 / 40px / 5px stretch;
+    box-shadow:
+      inset 0 0 70px rgba(0,0,0,.85),
+      0 0 0 1px rgba(0,0,0,.9),
+      0 30px 80px rgba(0,0,0,.9);
+    scrollbar-width: thin; scrollbar-color: #5a4424 transparent;
+  }
+  .panel::after {   /* scratches and old grime across the plate */
+    content: ""; position: absolute; inset: 0; pointer-events: none; z-index: -1; opacity: .07; mix-blend-mode: screen;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='120'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='.02 .9' numOctaves='2' seed='7'/><feColorMatrix values='0 0 0 0 .9  0 0 0 0 .75  0 0 0 0 .5  0 0 0 1.4 -.95'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>");
+  }
+  .panel::-webkit-scrollbar { width: 6px; }
+  .panel::-webkit-scrollbar-thumb { background: #4a3820; }
+  .panel h1 {
+    font-family: var(--display); font-weight: 700; margin: 0; line-height: .95;
+    font-size: clamp(34px, 5.6vw, 58px); letter-spacing: .2em; text-indent: .2em; text-align: center; text-transform: uppercase;
+    color: #c9a462;
+    background: var(--noise), linear-gradient(180deg, #f6e7c0 0%, #d7b271 38%, #8a6128 52%, #c69a56 70%, #6e4c20 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 0 #000) drop-shadow(0 0 1px #000) drop-shadow(0 0 22px rgba(255,110,40,.22));
+  }
+  #introTitle { font-size: clamp(30px, 4.3vw, 46px); letter-spacing: .12em; text-indent: .12em; white-space: nowrap; }
+  .orn { display: block; width: 100%; height: 18px; margin: -4px 0 0; color: var(--gold); }
+  .lede { font-family: var(--book); font-style: italic; font-size: 17px; line-height: 1.42; color: var(--bone-dim); margin: 0; text-wrap: pretty; text-shadow: 0 1px 0 #000; }
+  #intro .lede::first-letter {
+    float: left; font-family: "Cinzel Decorative", var(--display); font-style: normal; font-weight: 900;
+    font-size: 3.05em; line-height: .82; padding: 4px 8px 0 0; color: #9a1f1c;
+    text-shadow: 0 1px 0 #000, 0 0 12px rgba(160,20,20,.45);
+  }
+  .note { font-family: var(--book); font-style: italic; font-size: 14px; color: var(--bone-faint); line-height: 1.4; margin: 0; }
+
+  /* ---- the title: the panel stands on the left; the god weeps on the right ---- */
+  #intro {
+    place-items: center start; padding-left: max(16px, 4vw);
+    background: linear-gradient(90deg, rgba(3,2,5,.86) 0%, rgba(3,2,5,.6) 36%, rgba(3,2,5,0) 58%);
+    pointer-events: none;
+  }
+  .intro-panel { width: min(380px, 100%); pointer-events: auto; }
+  #intro .row { display: grid; gap: 9px; margin-top: 2px; }
+  details.ctl { border-top: 1px solid rgba(168,132,74,.18); padding-top: 10px; }
+  details.ctl summary {
+    cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px;
+    font-family: var(--display); font-weight: 600; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--bone-faint);
+    padding: 4px 0; transition: color .2s, text-shadow .2s;
+  }
+  details.ctl summary::-webkit-details-marker { display: none; }
+  details.ctl summary::before { content: ""; width: 6px; height: 6px; border: solid var(--gold); border-width: 0 1.5px 1.5px 0; transform: rotate(-45deg); transition: transform .2s; }
+  details.ctl[open] summary::before { transform: rotate(45deg); }
+  details.ctl summary:hover, details.ctl summary:focus-visible { color: var(--gold-hi); text-shadow: 0 0 8px rgba(255,120,40,.5); outline: none; }
+  details.ctl[open] summary { margin-bottom: 8px; }
+  .keys { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0 0 10px; font-family: var(--book); font-size: 13.5px; line-height: 1.35; }
+  .keys dt { font-family: var(--display); font-weight: 600; font-size: 11px; letter-spacing: .1em; color: var(--gold-hi); padding-top: 2px; }
+  .keys dd { margin: 0; color: var(--bone-dim); }
+
+  /* ---- buttons: engraved iron plates, worn gold edges; hover wakes an ember under the plate ---- */
+  .classes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .cls { display: grid; gap: 4px; text-align: left; }
+  .cls b { font-family: var(--display); font-weight: 600; font-size: 16px; }
+  .cls span { font-family: var(--book); font-size: 13px; color: var(--bone-dim); line-height: 1.3; text-transform: none; letter-spacing: 0; }
+  .cls.on { box-shadow: inset 0 0 0 2px var(--ember); }
+  .cls:disabled { opacity: .45; cursor: not-allowed; }
+  .stack { display: grid; gap: 7px; }
+  .stack button { width: 100%; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; }
+  button {
+    position: relative; display: block; width: 100%; min-height: 42px; margin: 0;
+    padding: 10px 18px 9px 38px; text-align: left; cursor: pointer;
+    font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: .16em; text-transform: uppercase; line-height: 1.2;
+    color: #e6d3a6;
+    border: 1px solid #000; border-radius: 1px;
+    background:
+      var(--noise),
+      linear-gradient(180deg, rgba(255,220,160,.07), transparent 38%),
+      linear-gradient(180deg, #2a2019 0%, #1a130f 55%, #100b09 100%);
+    box-shadow:
+      inset 0 0 0 1px rgba(201,164,98,.62),
+      inset 0 0 0 3px #0c090a,
+      inset 0 0 0 4px rgba(201,164,98,.16),
+      inset 0 -10px 18px rgba(0,0,0,.55),
+      0 2px 0 #000, 0 4px 10px rgba(0,0,0,.6);
+    text-shadow: 0 1px 0 #000, 0 0 1px #000;
+    transition: color .18s, box-shadow .25s, background-color .25s, text-shadow .25s, transform .08s;
+    touch-action: manipulation;
+  }
+  button::before {   /* a lozenge set in the plate, like a nail head */
+    content: ""; position: absolute; left: 15px; top: 50%; width: 7px; height: 7px; margin-top: -4px; transform: rotate(45deg);
+    background: linear-gradient(135deg, #d9b56e, #5a3f1c 70%); box-shadow: 0 0 0 1px #000; transition: background .2s, box-shadow .2s;
+  }
+  button::after {   /* the ember that wakes under the plate */
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .3s;
+    background: radial-gradient(70% 120% at 12% 115%, rgba(255,110,30,.34), transparent 70%), radial-gradient(60% 90% at 50% 130%, rgba(200,50,20,.22), transparent 70%);
+  }
+  button:not(.ghost) {
+    background:
+      var(--noise),
+      linear-gradient(180deg, rgba(255,200,130,.1), transparent 40%),
+      radial-gradient(90% 140% at 50% 130%, rgba(150,40,20,.28), transparent 70%),
+      linear-gradient(180deg, #33241a 0%, #1f150e 55%, #130c08 100%);
+  }
+  button.ghost {
+    color: #bfae8a; font-weight: 600;
+    background:
+      var(--noise),
+      linear-gradient(180deg, #1b161a 0%, #121014 55%, #0b090c 100%);
+    box-shadow:
+      inset 0 0 0 1px rgba(150,118,70,.38),
+      inset 0 0 0 3px #0a080b,
+      inset 0 -10px 18px rgba(0,0,0,.5),
+      0 2px 0 #000, 0 3px 8px rgba(0,0,0,.5);
+  }
+  button.ghost::before { background: #2c2219; box-shadow: 0 0 0 1px #000, inset 0 0 0 1px rgba(160,125,70,.6); }
+  button:hover, button:focus-visible {
+    color: #fff0cc; outline: none;
+    text-shadow: 0 1px 0 #000, 0 0 10px rgba(255,120,40,.65), 0 0 2px rgba(255,180,100,.6);
+    box-shadow:
+      inset 0 0 0 1px rgba(236,196,120,.95),
+      inset 0 0 0 3px #0c090a,
+      inset 0 0 0 4px rgba(255,140,60,.28),
+      inset 0 -10px 18px rgba(0,0,0,.4),
+      0 2px 0 #000, 0 0 16px rgba(255,100,30,.22), 0 4px 10px rgba(0,0,0,.6);
+  }
+  button:hover::after, button:focus-visible::after { opacity: 1; }
+  button:hover::before, button:focus-visible::before { background: radial-gradient(circle, #fff1c0, #ff8a2a 45%, #8a2a0a); box-shadow: 0 0 0 1px #000, 0 0 8px 2px rgba(255,120,40,.75); }
+  button:focus-visible { box-shadow: inset 0 0 0 1px rgba(236,196,120,.95), inset 0 0 0 3px #0c090a, inset 0 0 0 4px rgba(255,140,60,.28), 0 0 0 2px #000, 0 0 0 3px rgba(255,150,70,.85), 0 0 18px rgba(255,100,30,.3); }
+  button:active { transform: translateY(1px); }
+
+  /* ---- the pause menu ---- */
+  #menu .panel { width: min(400px, 100%); gap: 12px; padding: 24px 26px 18px; }
+  #menu h1 { font-size: clamp(28px, 4.2vw, 40px); letter-spacing: .28em; text-indent: .28em; }
+  #menu .lede { font-size: 15px; text-align: center; color: var(--bone-dim); margin-top: -4px; }
+  #menuOpts { padding-left: 16px; border-left: 1px solid rgba(168,132,74,.25); margin-left: 8px; }
+  #menuOpts button { min-height: 36px; font-size: 12px; padding-top: 8px; padding-bottom: 7px; }
+  #menuKeys { max-height: 44vh; overflow: auto; padding-right: 6px; }
+  #menu .note { text-align: center; font-size: 13px; }
+
+  /* ---- small screens and phones held sideways ---- */
+  @media (max-width: 760px) { #intro { place-items: center start; padding-left: 12px; } .intro-panel { width: min(340px, 47vw); } }
+  @media (max-height: 600px) {
+    .panel { padding: 18px 20px 14px; gap: 10px; }
+    .panel h1 { font-size: clamp(30px, 8.5vh, 50px); }
+    button { min-height: 36px; padding-top: 7px; padding-bottom: 6px; font-size: 13px; }
+    .lede { font-size: 15.5px; line-height: 1.36; }
+    #menu .panel { gap: 8px; padding-top: 16px; }
+    #menu .stack { gap: 6px; }
+    #menu .stack button { min-height: 32px; padding-top: 6px; padding-bottom: 5px; }
+    #menuOpts { grid-template-columns: 1fr 1fr; }
+    #menuOpts button { font-size: 11px; letter-spacing: .05em; padding-left: 26px; padding-right: 6px; white-space: nowrap; }
+    #menuOpts button::before { left: 11px; }
+    #menu h1 { font-size: 30px; }
+  }
+  @media (max-height: 440px) {
+    .overlay { padding: 8px; }
+    .panel { padding: 13px 16px 10px; gap: 8px; }
+    .panel h1 { font-size: 30px; }
+    .orn { height: 12px; }
+    .lede { font-size: 14px; line-height: 1.3; }
+    #intro .lede::first-letter { font-size: 2.6em; }
+    #intro .row { grid-template-columns: 1fr 1fr; gap: 6px; }
+    #intro .row button { padding-left: 24px; padding-right: 8px; letter-spacing: .06em; font-size: 11px; }
+    #intro .row button::before { left: 9px; width: 5px; height: 5px; margin-top: -3px; }
+    button { min-height: 32px; padding-top: 6px; padding-bottom: 5px; }
+    #menu .stack { grid-template-columns: 1fr 1fr; }
+    #menu .stack #menuOpts { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; }
+    #menu .stack #mResume, #menu .stack #mQuit { grid-column: 1 / -1; }
+    #menu h1 { font-size: 26px; }
+    .note { font-size: 12.5px; }
+    .note.hint { display: none; }
+    .panel { border-image-width: 30px; padding-bottom: 16px; }
+  }
+  @media (pointer: coarse) { button { min-height: 40px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div id="turn"><div>Turn your device sideways.<br><span style="color:#a3967c">Triune is played in landscape.</span></div></div>
+<div id="stage">
+  <canvas id="game" width="960" height="540" tabindex="0" aria-label="Triune game view"></canvas>
+</div>
+
+<div class="overlay" id="intro">
+  <div class="panel intro-panel" role="dialog" aria-labelledby="introTitle">
+    <h1 id="introTitle">Godmarrow</h1>
+    <svg class="orn" viewBox="0 0 320 18" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M8 9H128M192 9H312" stroke-opacity=".7"/><path d="M40 12H122M198 12H280" stroke-opacity=".3"/><path d="M128 9l8-5 8 5-8 5z"/><path d="M176 9l8-5 8 5-8 5z"/></g><path d="M160 1l6 8-6 8-6-8z" fill="#8a1a1a" stroke="currentColor" stroke-width="1"/><circle cx="160" cy="9" r="1.6" fill="#e3c486"/><path d="M4 9l4-2v4zM316 9l-4-2v4z" fill="currentColor"/></svg>
+    <p class="lede">The god is dead, and has not finished dying. Its body is the land, and what still lives in its bones is in everything that walks. The faithful call it by a hundred names, so that no silence can unsay them all, and quarrel over the corpse. None of them sent for you. You came anyway.</p>
+    <div class="row">
+      <button id="continueBtn" type="button" hidden>Continue</button>
+      <button id="newBtn" type="button">New character</button>
+      <button id="testBtn" type="button" class="ghost" title="Kept apart from your own save">Test character (level 30)</button>
+      <button id="fsBtn" type="button" class="ghost">Full screen</button>
+    </div>
+    <details class="ctl"><summary>Controls</summary>
+    <dl class="keys" id="introKeys">
+      <dt>Controller</dt><dd>Any standard gamepad works: press a button. Left stick moves · right stick aims (left alone it finds the nearest enemy) · A attacks, picks up, opens · X or RT: right skill (hold) · B rolls · Y drinks · LB/RB cycle the right skill, D-pad ←/→ the left · D-pad ↑ skills, ↓ inventory · View: character · LT: map · Menu: pause. In menus the stick moves a cursor: A clicks, X right-clicks, B backs out.</dd>
+      <dt>Touch</dt><dd>Phones and tablets are detected automatically. Tap: left click (walk to that spot, attack, pick up) · touch and hold: right click (drag to aim) · buttons at the right: auto-attack, your skills (tap casts at the nearest enemy, hold makes it your hold skill), drink, roll</dd>
+      <dt>Left click</dt><dd>Move (hold to keep walking) · click a monster to strike it with your weapon · click items, chests, lanterns</dd>
+      <dt>Shift + left</dt><dd>Attack in place without moving</dd>
+      <dt>Right click</dt><dd>Cast your right skill at the cursor (hold to repeat)</dd>
+      <dt>Hotkeys</dt><dd>Q W E R T Y U F by default. Hover any skill and press a key to rebind it</dd>
+      <dt>Skill icons</dt><dd>Click the icons in the bottom bar to swap left and right skills</dd>
+      <dt>V · G</dt><dd>Hollow Mystic: wisp choir · golem orders. Ossuarch: army orders. Hemomancer: the Flesh (mutations, grafts, orders)</dd>
+      <dt>Space</dt><dd>Dodge roll toward the cursor</dd>
+      <dt>1 – 4</dt><dd>Drink from your belt</dd>
+      <dt>I · C · S</dt><dd>Inventory · Character · Skills</dd>
+      <dt>A</dt><dd>The Inverted Triune: your tarot web of Arcana cards</dd>
+      <dt>Tab · Alt</dt><dd>Automap · Show items on the ground</dd>
+      <dt>Esc · M</dt><dd>Close panels · Sound on/off</dd>
+    </dl>
+    <p class="note">Skills and attributes can be reset for free. Gold is picked up by walking over it. Die, and your gold stays where you fell. Each new game raises a new map; your character and items are kept in this browser.</p>
+    </details>
+    <p class="note hint">Your order is not chosen here. The Mysterious Stranger reads it in the blood: Hemomancer, Ossuarch, Hollow Mystic, Shrine Keeper or the Empty Hand.</p>
+    <p id="fsNote" class="note" hidden>Full screen was blocked by the page around the game. Open the game in its own browser tab and try again, or press F11.</p>
+  </div>
+</div>
+
+<div class="overlay" id="menu" hidden>
+  <div class="panel" role="dialog" aria-labelledby="menuTitle">
+    <h1 id="menuTitle">Paused</h1>
+    <svg class="orn" viewBox="0 0 320 18" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M8 9H128M192 9H312" stroke-opacity=".7"/><path d="M40 12H122M198 12H280" stroke-opacity=".3"/><path d="M128 9l8-5 8 5-8 5z"/><path d="M176 9l8-5 8 5-8 5z"/></g><path d="M160 1l6 8-6 8-6-8z" fill="#8a1a1a" stroke="currentColor" stroke-width="1"/><circle cx="160" cy="9" r="1.6" fill="#e3c486"/><path d="M4 9l4-2v4zM316 9l-4-2v4z" fill="currentColor"/></svg>
+    <p class="lede" id="menuWhere"></p>
+    <div class="stack" id="menuMain">
+      <button id="mResume" type="button">Resume</button>
+      <button id="mSave" type="button" class="ghost">Save game</button>
+      <button id="mKeys" type="button" class="ghost">Controls</button>
+      <button id="mFull" type="button" class="ghost">Full screen</button>
+      <button id="mOpts" type="button" class="ghost">Options</button>
+      <div class="stack" id="menuOpts" hidden>
+        <button id="oNums" type="button" class="ghost">Damage numbers: off</button>
+        <button id="oFlash" type="button" class="ghost">Hit flash: off</button>
+        <button id="oShake" type="button" class="ghost">Screen shake: on</button>
+        <button id="oAuto" type="button" class="ghost">Auto-attack: off</button>
+      </div>
+      <button id="mSound" type="button" class="ghost">Sound: on</button>
+      <button id="mMusic" type="button" class="ghost">Music: on</button>
+      <button id="mQuit" type="button" class="ghost">Save and quit to title</button>
+    </div>
+    <dl class="keys" id="menuKeys" hidden></dl>
+    <p class="note">Esc opens and closes this menu when no panel is open.</p>
+  </div>
+</div>
+
+<script>

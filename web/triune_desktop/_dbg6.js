@@ -1,0 +1,5 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage(); await p.goto('file://' + process.env.HTML); await p.waitForTimeout(400);
+ await p.evaluate(() => { const S = window.__spm; S.G.pickCls = 'ossumancer'; S.startGame('test'); }); await p.waitForTimeout(500);
+ const r = await p.evaluate(() => { const A = window.__act5, Z = A.gen('a5_cerebrum', 3); const d = A.distField(Z); const W = Z.w; const out = []; for (let y = 103; y <= 115; y++) { let s = ''; for (let x = 72; x <= 92; x++) { const v = d[y * W + x]; const tt = Z.t[y * W + x]; s += v === 0 ? (tt === 7 ? '#' : tt === 9 ? 'P' : tt === 4 ? '~' : tt === 3 ? 'o' : tt === 15 ? 'R' : '?') : v >= 3.5 ? 'C' : String(Math.min(9, Math.floor(v))); } out.push(s); } const before = A.widthReport(Z).bottleneck; const p0 = Z.a5pinches; A._dbg.fixPinches(Z, 3.5, 6, 1); const p1 = Z.a5pinches; return { out, before, p0, p1, after: A.widthReport(Z).bottleneck }; });
+ console.log(r.out.join('\n')); console.log(JSON.stringify({ before: r.before, p0: r.p0, p1: r.p1, after: r.after })); await b.close(); })();

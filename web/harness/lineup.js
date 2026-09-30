@@ -1,0 +1,12 @@
+const { chromium } = require('playwright');
+(async () => { const b = await chromium.launch(); const p = await b.newPage({ viewport: { width: 1920, height: 1080 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
+ await p.goto('file://' + process.env.HTML); await p.waitForTimeout(1500);
+ await p.evaluate(() => { localStorage.removeItem('spiritmancer.test'); const S = window.__spm; S.G.pickCls = 'monk'; S.startGame('test'); }); await p.waitForTimeout(800);
+ const types = (process.env.TYPES || 'kneeler,moth,husk').split(',');
+ const r = await p.evaluate(types => { const S = window.__spm, P = S.P, G = S.G; for (const k in G.panels) G.panels[k] = false; G.msgT = 0; G.bannerT = 0;
+   G.zone.monsters.forEach(m => { if (Math.hypot(m.x - P.x, m.y - P.y) < 14) { m.dead = true; m.hidden = true; } });
+   const out = []; types.forEach((t, i) => { try { const m = S.makeMon(t, P.x + 1.2 + i * 1.3, P.y - 1.2 - i * 1.3 + 2.4, 5, 'normal', []); m.b = { ...m.b, ai: 'none' }; m.spd = 0; m.hp = m.max = 1e5; G.zone.monsters.push(m); out.push(t + ':ok'); } catch (e) { out.push(t + ':' + e.message); } });
+   return [out, Object.keys(S.MON).join(',')]; }, types);
+ console.log(r[0].join(' ')); if (process.env.LIST) console.log(r[1]);
+ await p.waitForTimeout(600); await p.screenshot({ path: '/tmp/lineup.png' });
+ console.log('ERRS', errs.slice(0, 3).join(' | ') || 'none'); await b.close(); })();
