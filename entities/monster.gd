@@ -73,6 +73,7 @@ func setup(z: Zone, m: Dictionary) -> void:
 	home = tp
 	kd = Data.table("monsters").get("kinds", {}).get(kind, {})
 	_numbers()
+	Affixes.roll(self)
 	var sk := kind
 	if rank == "champion" or rank == "unique":
 		if ResourceLoader.exists("res://art/sprites/%s@%s.json" % [kind, rank]):
@@ -142,6 +143,8 @@ func _shadow() -> void:
 
 # ------------------------------------------------------------------ numbers the brain and skills use
 func roll_damage() -> float:
+	Combat.striker = self   # the blow about to land knows whose it is (the deeds: Thirsting, Nail-Fisted)
+	Combat.striker_frame = Engine.get_physics_frames()
 	var weak := 0.6 if float(get_meta("k_weak", -1.0)) > Time.get_ticks_msec() / 1000.0 else 1.0   # the Pinch drains it
 	return randf_range(dmg.x, dmg.y) * hour_mult() * weak
 
@@ -238,6 +241,8 @@ func die(from: Vector2 = Vector2.INF) -> void:
 	corpse_t = 30.0
 	if brain:
 		brain.on_death(self)
+	if not mods.is_empty():
+		Affixes.on_death(self)
 	Bus.monster_killed.emit(self)
 	z_index = -5
 
@@ -272,6 +277,8 @@ func _physics_process(dt: float) -> void:
 		step_toward(_confused_to, dt)
 	elif brain:
 		brain.tick(self, dt)
+		if not mods.is_empty():
+			Affixes.tick(self, dt)
 		if brain.state != _heard_state:
 			_heard_state = brain.state
 			_voice(_heard_state)

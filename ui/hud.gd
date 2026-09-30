@@ -793,7 +793,7 @@ func _mon_line(m: Monster, cx: float, y: float) -> void:
 	var nm := m.name_shown if m.name_shown != "" else m.kind.capitalize()
 	var col := Color(U.RANKCOL.get(m.rank, "#e8e2d0"))
 	var w := maxf(360.0, f.get_string_size(nm, HORIZONTAL_ALIGNMENT_LEFT, -1, 40).x + 64)
-	var mods := ", ".join(m.mods.map(func(x): return str(x)))
+	var mods := ", ".join(m.mods.map(func(x): return Affixes.shown(str(x))))
 	var h := 56.0
 	over.draw_rect(Rect2(cx - w / 2 - 4, y - 4, w + 8, h + 8 + (40.0 if mods != "" else 0.0)), Color(0.02, 0.016, 0.027, 0.88))
 	over.draw_rect(Rect2(cx - w / 2 - 4, y - 4, w + 8, h + 8 + (40.0 if mods != "" else 0.0)), Color("#3a3446"), false, 2.0)

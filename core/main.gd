@@ -50,7 +50,8 @@ func _ready() -> void:
 	Game.read_new = false
 	# Continue: the saved pilgrim, in a freshly rolled world, at the camp (--new starts over)
 	if not args.has("new") and not args.has("demo") and SaveIO.exists():
-		pending_load = SaveIO.read(Game.load_cls)
+		# a named order (--cls) wakes that order's own pilgrim, not the latest one
+		pending_load = SaveIO.read(Game.load_cls if Game.load_cls != "" else String(args.get("cls", "")))
 		Game.load_cls = ""
 		if not pending_load.is_empty():
 			Game.cls = pending_load.get("cls", Game.cls)
@@ -108,7 +109,7 @@ func _ready() -> void:
 		for i in n:
 			var ang := float(i) / n * TAU
 			var live := args.has("arena_live")   # real, hostile creatures (a fight test)
-			var m = Br.spawn(zone, args.get("arena_kind", "husk"), hero.tp + Vector2(cos(ang), sin(ang)) * (3.0 + (i % 3)), int(args.get("arena_lvl", "12")), "normal", "arena", -1.0 if live else 1e7)
+			var m = Br.spawn(zone, args.get("arena_kind", "husk"), hero.tp + Vector2(cos(ang), sin(ang)) * (3.0 + (i % 3)), int(args.get("arena_lvl", "12")), String(args.get("arena_rank", "normal")), "arena", -1.0 if live else 1e7)
 			if m and live:
 				m.brain.wake(m)
 			elif m:

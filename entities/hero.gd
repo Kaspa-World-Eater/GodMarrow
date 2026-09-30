@@ -98,7 +98,7 @@ func light_radius() -> float:
 		r *= 1.0 - 0.12 * st.kept
 	if skills:
 		r = skills.light_mod(r)
-	return r
+	return r * Affixes.lantern_k(self)
 
 func _shadow() -> void:
 	var s := Polygon2D.new()

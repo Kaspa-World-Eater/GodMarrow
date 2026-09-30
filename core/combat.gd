@@ -4,6 +4,8 @@ extends RefCounted
 ## Elements: phys, magic, miasma, blood, void, radiance, fire, cold, poison.
 
 const STAGGER := 1.2   # v79-v80: stagger is 20% stronger both ways
+static var striker: Monster = null   # the creature whose damage was rolled this frame (Monster.roll_damage)
+static var striker_frame := -1
 
 ## the hero (or an ally) strikes a creature. Returns the life actually taken.
 static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vector2 = Vector2.INF, opts: Dictionary = {}) -> float:
@@ -30,6 +32,8 @@ static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vec
 	var pd: float = opts.get("poise", d) * STAGGER
 	m.add_poise_damage(pd, bool(opts.get("heavy", false)))
 	m.on_hit(d, elem, from, opts)
+	if not m.mods.is_empty():
+		Affixes.on_struck(m, d, opts)
 	if m.hp <= 0.0:
 		m.die(from)
 	return d
@@ -43,6 +47,9 @@ static func hit_hero(h: Hero, dmg: float, elem: String = "phys", from: Vector2 =
 		return 0.0
 	var st := h.st
 	var d := dmg
+	var by: Monster = opts.get("by", striker if striker_frame == Engine.get_physics_frames() else null)
+	if by != null and not is_instance_valid(by):
+		by = null
 	if h.skills:
 		d = h.skills.before_hit(d, elem, from, opts)
 		if d <= 0.0:
@@ -61,6 +68,9 @@ static func hit_hero(h: Hero, dmg: float, elem: String = "phys", from: Vector2 =
 	var pd := maxf(4.0, d * 1.8 * (1.5 if heavy else 1.0)) * STAGGER
 	if opts.has("poise"):
 		pd = float(opts["poise"])
+	if by and not by.mods.is_empty():
+		pd *= Affixes.strike_poise(by)
+		Affixes.on_strike(by, h, d)
 	h.poise_hit(pd, from, heavy)
 	if d > 0.5:
 		Sfx.play("hurt", 1.0 if heavy else 0.7)
