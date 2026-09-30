@@ -53,17 +53,23 @@ const BARKS := {
 			"Gold's no use to the dead. They sell cheap. I don't.",
 			"Dig long enough on the Moor and you find a sword. Dig longer and you find its owner.",
 			"I bury what I can't sell and sell what I can't bury. It evens out.",
-			"Mind the ash on the goods. It isn't dust. It's the Moor."],
+			"Mind the ash on the goods. It isn't dust. It's the Moor.",
+			"Past the white road is beyond the Pale. Their counting-men buy nothing and weigh everything.",
+			"Ashwake keeps a wake every night. There is always someone owed one."],
 		"healer": ["Hold still. The ash gets into wounds here, and it doesn't want to come out.",
 			"I mended three pilgrims today. Two walked on. The third is you, again.",
 			"Breathe out, slowly. The Breath is thin even here. Don't waste it on pain.",
 			"I pray while I stitch. Not to the god. To the needle.",
-			"There. You'll scar. Scars are how the body remembers it lived."],
+			"There. You'll scar. Scars are how the body remembers it lived.",
+			"Catch your breath. It's only lent, but the god isn't asking for it back tonight.",
+			"Nothing here is done in cold blood. The ash sees to that."],
 		"smith": ["Every nail on the Moor came from my forge or my father's. Most are in coffins.",
 			"Iron's honest. It rusts where you can see it. Not like bone.",
 			"Bring me what breaks. I'll tell you if it was ever worth mending.",
 			"God-bone blunts a blade in a season. Mine hold a year. Best I've got.",
-			"Hammer, fire, water. Same three prayers for forty years."],
+			"Hammer, fire, water. Same three prayers for forty years.",
+			"The Ossa sent a skeleton crew for nails last spring. I mean that as plainly as it sounds.",
+			"Strike while the iron's hot. Everything else on the Moor is warm already."],
 		"stash": ["The lid is carved with a sleeping woman. She shifts a little as it opens.",
 			"Cedar and tallow inside. Whatever you leave, it keeps.",
 			"The chest is older than the camp. The camp was built around it.",
@@ -72,13 +78,30 @@ const BARKS := {
 			"I was a warden once. Now I send the young ones where I used to go.",
 			"Come back with it done, or don't come back. Either way I'll light a candle.",
 			"Hundred-Fingers blew his kangling at me once. I blew back. He hasn't tried since.",
-			"The Moor is patient. I'm not. Go on."],
+			"The Moor is patient. I'm not. Go on.",
+			"I've a bone to pick with the Pale Order. They keep counting mine.",
+			"Bone-tired, they say. Here that's a trade, not a complaint."],
 		"stranger": ["The ash is warm... you noticed. Good. Most never do.",
 			"Keep the lantern on your left. The dead... prefer the right.",
 			"You'll go down. Everyone who listens to me goes down.",
 			"A pilgrim asked me the way once. I told her. I am... still sorry.",
-			"Rest while the fire is yours. Fires change hands, here."],
+			"Rest while the fire is yours. Fires change hands, here.",
+			"Keep your chin up. The god's has been dripping eleven hundred years... and look, it holds.",
+			"No sign of her. Neither hair nor... well. Hide. We stand on the hide."],
 	},
+}
+## the greeting of the Hide: "godmarrow", said the way the old lands said good morrow. Heard as a blessing on the day
+## and as the thing the god is still made of. Said once a day to a pilgrim, before whatever else is said.
+const GREET := {
+	"any": ["Godmarrow.", "Godmarrow to you.", "A godmarrow on you, pilgrim.", "Godmarrow. May it keep.",
+		"Godmarrow. And a marrow worth the digging.", "Godmarrow. The bones are warm today."],
+	"dusk": ["Godmarrow. Late for it, but it still counts.", "Godmarrow. What's left of it."],
+	"night": ["Godmarrow. Or god-evening. The god won't mind which.", "Godmarrow, though it's dark. It's always marrow somewhere down."],
+	"vendor": ["Godmarrow. Mind the ash on the goods.", "Godmarrow. Buying or burying?"],
+	"healer": ["Godmarrow. Let's see how much of yours is left.", "Godmarrow. Sit. You're dripping on my floor."],
+	"smith": ["Godmarrow. Iron's hot, and so's the god, somewhere under.", "Godmarrow. Bring it here and let me look."],
+	"giver": ["Godmarrow. The dead have been asking after you.", "Godmarrow. Errands don't keep. The dead do."],
+	"stranger": ["Godmarrow... an old word. Older than the ones who say it.", "Godmarrow. They used to mean the morning by it."],
 }
 const WAYSTONE := {1: ["Chalked Waystone", "Kindled by pilgrims. Touch it, and every lit waystone on the Hide knows your step."]}
 ## inscriptions for the lanterns the builders named well (Act I), and a pool for the rest, picked by name
@@ -453,6 +476,27 @@ static func bark(n: int, role: String) -> String:
 		i = (int(_bark_i[key]) + 1 + randi() % maxi(1, L.size() - 2)) % L.size()
 	_bark_i[key] = i
 	return L[i]
+
+## a greeting, once a day per soul (the day's number from the clock); "" if already greeted today
+static func greet(who: String, role: String) -> String:
+	var day := int(Game.clock / maxf(1.0, Game.day_len))
+	var key := "greet:" + who
+	var st := state()
+	if not st.has("seen"):
+		st["seen"] = {}
+	if int(st["seen"].get(key, -1)) == day:
+		return ""
+	st["seen"][key] = day
+	var pool: Array = []
+	pool.append_array(GREET["any"])
+	pool.append_array(GREET.get(role, []))
+	pool.append_array(GREET.get(role, []))      # their own words come oftener
+	var dk := Game.day_k()
+	if dk < 0.2:
+		pool.append_array(GREET["night"])
+	elif dk < 0.8:
+		pool.append_array(GREET["dusk"])
+	return pool[randi() % pool.size()]
 
 static func stranger_line(n: int) -> String:
 	var L: Array = STRANGER_LINES.get(n, STRANGER_LINES[1])

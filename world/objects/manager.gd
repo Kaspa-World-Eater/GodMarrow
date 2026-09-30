@@ -517,6 +517,9 @@ func _interact(e: Dictionary) -> void:
 			_kneel(e)
 
 func _say(who: String, text: String, inscr: bool = false) -> void:
+	if _greeting != "" and not inscr:
+		text = _greeting + " " + text
+	_greeting = ""
 	if ui:
 		ui.speak(who, text, -1.0, inscr)
 
@@ -534,11 +537,15 @@ func _panel(p: String, who: String) -> void:
 	if Bus.has_signal("panel_requested"):
 		Bus.emit_signal("panel_requested", p, who)
 
+var _greeting := ""            # "Godmarrow." once a day, before the first words (Q.greet)
+
 func _talk(e: Dictionary) -> void:
 	var o: Dictionary = e["o"]
 	var role: String = "vendor" if e["type"] == "vendor" else String(o.get("role", ""))
 	var nm: String = e["name"]
 	var s := Q.state()
+	if role != "stash":
+		_greeting = Q.greet(nm, role)
 	match role:
 		"vendor":
 			_say(_short(nm), Q.bark(act_n, "vendor"))
