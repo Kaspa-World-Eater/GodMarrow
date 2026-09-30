@@ -89,7 +89,11 @@ static func strike_poise(by) -> float:
 ## after a creature's blow has landed
 static func on_strike(by, h, d: float) -> void:
 	if has(by, "Thirsting") and d > 0.0 and h.st:
-		h.st.res = maxf(0.0, h.st.res - h.st.res_max() * 0.07)
+		if h.cls == "monk" and h.skills and h.skills.has_method("pour"):
+			h.skills.pour(0, 4.0)   # the Empty Hand's pool is the room left in his glass: it fills it instead
+			h.skills.pour(1, 4.0)
+		else:
+			h.st.res = maxf(0.0, h.st.res - h.st.res_max() * 0.07)
 		say("thirst res %.0f" % h.st.res)
 
 ## the hero struck a creature: what comes back
