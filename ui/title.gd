@@ -55,8 +55,13 @@ func _row_rect(i: int) -> Rect2:
 	var vs := root.get_viewport_rect().size
 	return Rect2(150, vs.y * 0.5 + i * 58.0, 640, 50)
 
+var _test_done := false
 func _process(dt: float) -> void:
 	t += dt
+	if OS.has_environment("GM_TITLE_ACT") and t > 1.0 and not _test_done:
+		_test_done = true
+		for a in OS.get_environment("GM_TITLE_ACT").split(","):
+			_act(a)
 	if leaving >= 0.0:
 		leaving += dt
 		if leaving >= 1.2:
