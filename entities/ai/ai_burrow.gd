@@ -114,7 +114,7 @@ func _surface(m: Monster, h: Hero) -> void:
 		world.grit_burst(m.tp, Color(0.4, 0.08, 0.1), 10, 1.0)
 	var dmg := m.roll_damage() * 1.4
 	if hero_open(h) and h.tp.distance_to(m.tp) < 0.95:
-		Combat.hit_hero(h, dmg, "phys", m.tp)
+		Combat.hit_hero(h, dmg, "phys", m.tp, {"src": Combat.who(m) + "|rising from below"})
 	hit_allies(m.get_tree(), m.tp, 0.95, dmg, "phys", m.tp)
 	m.spr.play("atk", true, false)
 

@@ -84,7 +84,7 @@ func think(m: Monster, h: Hero, dt: float) -> void:
 				set_state("recover")
 				var dmg := m.roll_damage() * 1.3
 				if hero_open(h) and h.tp.distance_to(target_p) < 2.1:
-					Combat.hit_hero(h, dmg, "magic", target_p, {"heavy": true})
+					Combat.hit_hero(h, dmg, "magic", target_p, {"heavy": true, "src": Combat.who(m) + "|its slam"})
 				hit_allies(m.get_tree(), target_p, 2.1, dmg, "magic", target_p)
 				if world:
 					world.grit_burst(target_p, Color(0.62, 0.6, 0.55), 26, 1.6, 10.0)

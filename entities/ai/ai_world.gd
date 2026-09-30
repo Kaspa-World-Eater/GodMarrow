@@ -92,10 +92,10 @@ func light_near(p: Vector2) -> Vector2:
 	return best
 
 ## a patch of burning ground (Pyre-Saints): not on walls or in the shallows
-func fire(p: Vector2, r: float, dps: float, secs: float) -> void:
+func fire(p: Vector2, r: float, dps: float, secs: float, owner: Object = null) -> void:
 	if zone.is_solid(p) or zone.type_at(p) == 12:
 		return
-	fires.append({"p": p, "R": r, "dps": dps, "t": secs, "max": secs, "tick": 0.0, "s": randf() * 9.0})
+	fires.append({"p": p, "R": r, "dps": dps, "t": secs, "max": secs, "tick": 0.0, "s": randf() * 9.0, "who": Combat.who(owner) if owner is Monster else ""})
 	while fires.size() > 60:
 		fires.pop_front()
 
@@ -153,7 +153,7 @@ func _physics_process(dt: float) -> void:
 		if f["tick"] <= 0.0:
 			f["tick"] = 0.35
 			if alive_h and h.tp.distance_to(f["p"]) < f["R"] + h.radius:
-				Combat.hit_hero(h, f["dps"] * 0.35, "magic", f["p"])
+				Combat.hit_hero(h, f["dps"] * 0.35, "magic", f["p"], {"src": f.get("who", "") + "|its fire" if f.get("who", "") != "" else "fire on the ground"})
 			Brain.hit_allies(get_tree(), f["p"], f["R"], f["dps"] * 0.35, "magic", f["p"])
 	fires = fires.filter(func(f): return f["t"] > 0.0)
 	for r in ripples:

@@ -52,6 +52,8 @@ var poise_burst := 0.0
 
 const STRING := [[1.0, 0.85, 0.12], [1.1, 0.95, 0.2], [1.6, 1.35, 0.42]]   # dmg x, time x, step yd (the overhead lunges 0.42 yd)
 
+var last_blow := ""        # the last thing that hurt him, in plain words (Combat._blow_text), for the death screen
+
 func setup(z: Zone, c: String, at: Vector2) -> void:
 	zone = z
 	cls = c

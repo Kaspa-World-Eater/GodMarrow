@@ -77,7 +77,7 @@ static func tick(m, dt: float) -> void:
 		if last == Vector2.INF or last.distance_to(m.tp) > 0.7:
 			m.set_meta("ash_at", m.tp)
 			say("ash at %s" % str(m.tp))
-			AffixFx.ash(m.zone, m.tp, (m.dmg.x + m.dmg.y) * 0.5 * 0.22)
+			AffixFx.ash(m.zone, m.tp, (m.dmg.x + m.dmg.y) * 0.5 * 0.22, Combat.who(m))
 	if "Unquiet" in m.mods and h and m.can_act():
 		var t: float = float(m.get_meta("aff_t", 0.0)) - dt
 		var d: float = m.tp.distance_to(h.tp)

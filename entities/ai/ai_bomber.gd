@@ -35,7 +35,7 @@ func burst(m: Monster, h: Hero) -> void:
 		world.grit_burst(m.tp, Color(0.36, 0.4, 0.2), 26, 1.4, 40.0)
 		world.grit_burst(m.tp, Color(0.22, 0.05, 0.04), 12, 1.0, 30.0)
 	if hero_open(h) and m.tp.distance_to(h.tp) < 1.9:
-		Combat.hit_hero(h, dmg, "magic", m.tp)
+		Combat.hit_hero(h, dmg, "magic", m.tp, {"src": Combat.who(m) + "|its burst"})
 	hit_allies(m.get_tree(), m.tp, 1.9, dmg, "magic", m.tp)
 	m.spr.scale = Vector2.ONE
 	m.die(m.tp)

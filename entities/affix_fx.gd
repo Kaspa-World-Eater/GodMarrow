@@ -14,6 +14,7 @@ var t := 0.0
 var life := 1.0
 var dmg := 0.0
 var m                          # the creature, for slip and graves
+var src_desc := ""             # who left it (the death screen)
 var n := 0
 var spots: Array = []          # ash: [Vector2 screen offset, ember?]
 var hurt_t := 0.0
@@ -33,8 +34,9 @@ static func _make(z, k: String, at: Vector2, lf: float) -> AffixFx:
 	return f
 
 ## a patch of hot ash where an Ash-Trailing creature walked; it hurts whoever stands in it
-static func ash(z, at: Vector2, d: float) -> void:
+static func ash(z, at: Vector2, d: float, who: String = "") -> void:
 	var f := _make(z, "ash", at, 4.5)
+	f.src_desc = who
 	f.dmg = d
 	for i in 26:
 		var a := randf() * TAU
@@ -60,6 +62,7 @@ static func graves(mon, count: int) -> void:
 static func burst(mon) -> void:
 	var f := _make(mon.zone, "burst", mon.tp, 1.0)
 	f.dmg = (mon.dmg.x + mon.dmg.y) * 0.5 * 1.7
+	f.src_desc = Combat.who(mon)
 	f.z_index = -40
 
 static func _dust(z, at: Vector2, amount: int) -> void:
@@ -93,7 +96,7 @@ func _physics_process(dt: float) -> void:
 				var now := Time.get_ticks_msec()
 				if now > int(h.get_meta("ash_hurt", 0)):   # many patches underfoot still burn as one
 					h.set_meta("ash_hurt", now + 480)
-					Combat.hit_hero(h, dmg, "fire", tp, {"poise": 0.0})
+					Combat.hit_hero(h, dmg, "fire", tp, {"poise": 0.0, "src": (src_desc + "|its ash") if src_desc != "" else "hot ash on the ground"})
 		"slip":
 			if t >= life and m and is_instance_valid(m) and not m.dead:
 				var to: Vector2 = m.tp
@@ -146,7 +149,7 @@ func _physics_process(dt: float) -> void:
 				p.finished.connect(p.queue_free)
 				Sfx.play("break", 1.0, 0.8)
 				if h and not h.dead and h.tp.distance_to(tp) < 2.4:
-					Combat.hit_hero(h, d, "phys", tp, {"heavy": true})
+					Combat.hit_hero(h, d, "phys", tp, {"heavy": true, "src": (src_desc + "|its body bursting") if src_desc != "" else "a body bursting"})
 	if t >= life + (0.6 if kind == "ash" else 0.3):
 		queue_free()
 	queue_redraw()

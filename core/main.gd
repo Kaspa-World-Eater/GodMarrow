@@ -125,7 +125,9 @@ func _ready() -> void:
 			hero.skills.dmg_log.clear()
 		var T := float(args.get("arena_t", "20"))
 		var deaths := [0, 0.0, 0]   # falls, life lost, kills
-		Bus.hero_died.connect(func(): deaths[0] += 1)
+		Bus.hero_died.connect(func():
+			deaths[0] += 1
+			print("FELL slain by ", hero.last_blow))
 		Bus.hero_hit.connect(func(a): deaths[1] += float(a))
 		Bus.monster_killed.connect(func(_m): deaths[2] += 1)
 		await get_tree().create_timer(T).timeout
@@ -462,7 +464,8 @@ func _on_hero_died() -> void:
 	var W := _world_ui()
 	if W:
 		W.banner("ANIMA SEVERED", Color8(142, 38, 48), 3.2)
-		W.whisper("", DEATH_LINES[_last_death], 3.0)
+		# what did it: never an unknown killer (the user's rule: every danger is plainly seen)
+		W.whisper(("Slain by " + hero.last_blow + ".") if hero.last_blow != "" else "", DEATH_LINES[_last_death], 4.0)
 	else:
 		Bus.say.emit(DEATH_LINES[_last_death], 3.0)
 	await get_tree().create_timer(3.0).timeout

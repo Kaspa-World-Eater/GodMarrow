@@ -34,7 +34,7 @@ func think(m: Monster, h: Hero, dt: float) -> void:
 	if trail_t <= 0.0 and m.tp != last_fire and world:
 		trail_t = 0.45
 		last_fire = m.tp
-		world.fire(m.tp, 0.45, (m.dmg.x + m.dmg.y) * 0.5 * 0.7 * m.hour_mult(), 3.5)
+		world.fire(m.tp, 0.45, (m.dmg.x + m.dmg.y) * 0.5 * 0.7 * m.hour_mult(), 3.5, m)
 	if state == "wind":
 		m.look(h.tp - m.tp)
 		if t > wind:
@@ -70,12 +70,12 @@ func erupt(m: Monster, h: Hero, k: float) -> void:
 		world.grit_burst(m.tp, Color(0.95, 0.62, 0.3), 30, 1.6, 50.0)
 		world.grit_burst(m.tp, Color(0.25, 0.2, 0.18), 16, 1.2, 40.0)
 	if h and hero_open(h) and m.tp.distance_to(h.tp) < R:
-		Combat.hit_hero(h, dmg, "magic", m.tp)
+		Combat.hit_hero(h, dmg, "magic", m.tp, {"src": Combat.who(m) + "|its eruption"})
 	hit_allies(m.get_tree(), m.tp, R, dmg, "magic", m.tp)
 	if world:
 		for i in 6:
 			var a := i / 6.0 * TAU
-			world.fire(m.tp + Vector2(cos(a), sin(a)) * R * 0.55, 0.5, dmg * 0.4, 4.0)
+			world.fire(m.tp + Vector2(cos(a), sin(a)) * R * 0.55, 0.5, dmg * 0.4, 4.0, m)
 
 func on_death(m: Monster) -> void:
 	super.on_death(m)

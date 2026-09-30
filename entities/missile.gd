@@ -21,6 +21,9 @@ var opts := {}
 ## The Bell-Warden reversed (skills/animancer.gd): creatures within r of tp can't shoot while it holds
 static var hush := {}
 
+var by_desc := ""        # who loosed it, for the death screen (Combat.who)
+const NAMES := {"needle": "its needle", "orb": "its orb", "arrow": "its arrow", "bolt": "its bolt"}
+
 static func fire(z: Zone, from: Vector2, to: Vector2, speed: float, damage: float, e: String, who: String, kind: String = "arrow") -> Missile:
 	var m := Missile.new()
 	m.zone = z
@@ -30,6 +33,8 @@ static func fire(z: Zone, from: Vector2, to: Vector2, speed: float, damage: floa
 	m.elem = e
 	m.side = who
 	m.look = kind
+	if who == "monster" and Combat.striker != null and is_instance_valid(Combat.striker) and Combat.striker_frame == Engine.get_physics_frames():
+		m.by_desc = Combat.who(Combat.striker)   # the damage was rolled this frame by the one loosing it
 	m.add_to_group("missiles")
 	m.life = 12.0 / maxf(1.0, speed) + 0.6
 	if who == "monster" and not hush.is_empty() and Time.get_ticks_msec() / 1000.0 < float(hush["until"]) and from.distance_to(hush["tp"]) < float(hush["r"]):
@@ -75,7 +80,7 @@ func _collide() -> bool:
 			queue_free()
 			return true
 		if h and not h.dead and h.tp.distance_to(tp) < radius + h.radius:
-			Combat.hit_hero(h, dmg, elem, tp - vel.normalized())
+			Combat.hit_hero(h, dmg, elem, tp - vel.normalized(), {"src": (by_desc + "|" + NAMES.get(look, "its shot")) if by_desc != "" else ""})
 			queue_free()
 			return true
 		for a in get_tree().get_nodes_in_group("allies"):

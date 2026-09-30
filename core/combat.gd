@@ -64,6 +64,8 @@ static func hit_hero(h: Hero, dmg: float, elem: String = "phys", from: Vector2 =
 		d = minf(d, dmg * 2.0)
 	d = h.absorb(d, elem)
 	st.hp -= d
+	if d > 0.0:
+		h.last_blow = _blow_text(by, elem, opts)
 	var heavy := d > st.life_max() * 0.12 or bool(opts.get("heavy", false))
 	var pd := maxf(4.0, d * 1.8 * (1.5 if heavy else 1.0)) * STAGGER
 	if opts.has("poise"):
@@ -108,3 +110,26 @@ static func nearest_monster(zone: Zone, c: Vector2, r: float, need_sight: bool =
 			bd = d
 			best = m
 	return best
+
+## who a creature is, for the death screen: its name and its marks ("Champion Husk (Heavy-Handed, Bursting)")
+static func who(m) -> String:
+	if m == null or not is_instance_valid(m):
+		return ""
+	var n: String = m.name_shown if m.name_shown != "" else m.kind.capitalize()
+	var marks: Array = m.mods.map(func(x): return Affixes.shown(str(x)))
+	return n + (" (" + ", ".join(marks) + ")" if not marks.is_empty() else "")
+
+## what the last blow was, in plain words: "Champion Husk (Quick): its blow"
+static func _blow_text(by, elem: String, opts: Dictionary) -> String:
+	var src: String = opts.get("src", "")
+	if src != "":
+		if "|" in src:
+			var p := src.split("|")
+			return p[0] + ": " + p[1]
+		return src
+	if by != null:
+		if opts.get("thorns", false):
+			return who(by) + ": its thorns"
+		return who(by) + ": " + ("its blow" if elem == "phys" else "its working")
+	return {"fire": "fire on the ground", "magic": "a working from somewhere near", "miasma": "the spoiled air"}.get(elem, "something in the dark")
+
