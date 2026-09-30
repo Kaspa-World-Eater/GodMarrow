@@ -499,7 +499,7 @@ func _draw_order(a: float) -> void:
 		if not fr.is_empty():
 			var at: AtlasTexture = fr[int(t * 4.0) % fr.size()][0]
 			var sz2: Vector2 = at.get_size()
-			var k2 := minf((pr.size.y - 180.0) / sz2.y, (pr.size.x - 160.0) / sz2.x)
+			var k2 := minf(minf((pr.size.y - 180.0) / sz2.y, (pr.size.x - 160.0) / sz2.x), 5.0)
 			root.draw_texture_rect(at, Rect2(pr.get_center() + Vector2(-sz2.x * k2 / 2.0, -sz2.y * k2 / 2.0 - 10.0), sz2 * k2), false, Color(0.95 * g, 0.85 * g, 0.75 * g, a))
 		root.draw_string(fi, Vector2(pr.position.x, pr.end.y - 60), "[a portrait is still being painted]", HORIZONTAL_ALIGNMENT_CENTER, pr.size.x, 20, Color(ASH, a))
 	# the words
