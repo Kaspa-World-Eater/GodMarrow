@@ -13,6 +13,7 @@ EXTRA = [
      "The [b]Quick[/b] close the ground before you have finished counting it.\n\n"
      "The [b]Stone-Skinned[/b] turn an edge. Bring something blunt, or something that is not a blade at all.\n"
      + H("The new ones") +
+     "The [b]Ash-Trailing[/b] leave the ground hot behind them; you will see it smoulder. Fight them where they have not yet walked.\n\n"
      "The [b]Grave-Called[/b] do not fall alone. Where one goes down the ground gives up another. Do not stand over the body.\n\n"
      "The [b]Thirsting[/b] drink what you draw on: essence, breath, the sand in a glass, whatever it is you spend. Keep them off you, or keep it short.\n\n"
      "The [b]Nail-Fisted[/b] break your footing whatever you wear. A shield will not save you. Distance will.\n\n"

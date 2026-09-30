@@ -8,12 +8,14 @@ extends RefCounted
 ## Test: --affix=Name forces a deed on every champion and unique that is made.
 ## The user's rules (2026-09-30): nothing a creature leaves on the ground when it dies may hurt (it is no fun if you do
 ## not see it), and no Diablo III / IV style marks (beams, orbiting fire, trails of burning ground): D2's kind only.
-## So Ash-Trailing was taken out the day it was made, and Warded (D2's Magic Resistant) came in. Bursting stays: the
-## user counts a plainly marked burst on death as fair (as the Pyre-Saint's eruption).
+## Refined the same day: what the user means is Diablo IV's deaths to things you cannot see (lingering ground effects
+## lost in the clutter, detonations after death, blows from off screen). Anything here that hurts must read plainly.
+## Warded (D2's Magic Resistant) came in beside the rest.
 
 const SHOWN := {"Extra Strong": "Heavy-Handed", "Extra Fast": "Quick", "Stone Skin": "Stone-Skinned"}
 ## deed -> what the Stranger would say of it (the Codex and tooltips may use these)
 const DEEDS := {
+	"Ash-Trailing": "Hot ash falls from it where it walks. Do not stand where it has been.",
 	"Grave-Called": "When it falls, the ground under it gives up others.",
 	"Thirsting": "Its blows drink what you draw on.",
 	"Nail-Fisted": "Its blows break your footing, whatever you wear.",
@@ -23,7 +25,7 @@ const DEEDS := {
 	"Bursting": "It does not lie still when it dies. Step away from the body.",
 	"Unquiet": "It does not walk to you. It is simply nearer.",
 }
-const ORDER := ["Grave-Called", "Thirsting", "Nail-Fisted", "Thorned", "Candle-Eater", "Warded", "Bursting", "Unquiet"]
+const ORDER := ["Ash-Trailing", "Grave-Called", "Thirsting", "Nail-Fisted", "Thorned", "Candle-Eater", "Warded", "Bursting", "Unquiet"]
 const WARD_ELEMS := ["magic", "miasma", "blood", "void", "radiance", "fire", "cold", "poison"]
 
 static var trace := OS.get_cmdline_user_args().has("--afftrace")
@@ -70,6 +72,12 @@ static func tick(m, dt: float) -> void:
 	if m.mods.is_empty() or not m.awake:
 		return
 	var h = m.hero()
+	if "Ash-Trailing" in m.mods:
+		var last: Vector2 = m.get_meta("ash_at", Vector2.INF)
+		if last == Vector2.INF or last.distance_to(m.tp) > 0.7:
+			m.set_meta("ash_at", m.tp)
+			say("ash at %s" % str(m.tp))
+			AffixFx.ash(m.zone, m.tp, (m.dmg.x + m.dmg.y) * 0.5 * 0.22)
 	if "Unquiet" in m.mods and h and m.can_act():
 		var t: float = float(m.get_meta("aff_t", 0.0)) - dt
 		var d: float = m.tp.distance_to(h.tp)

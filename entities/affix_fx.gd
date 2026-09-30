@@ -1,7 +1,9 @@
 class_name AffixFx
 extends Node2D
-## What the deeds leave in the world (entities/affixes.gd): the dust of one that slips through the earth, the ground
-## giving up the Grave-Called, and a body that bursts (plainly marked: the user allows it). Drawn on the ground in the pixel grain;
+## What the deeds leave in the world (entities/affixes.gd): hot ash where one walked, the dust of one that slips
+## through the earth, the ground giving up the Grave-Called, and a body that bursts. The user's rule: whatever can hurt
+## must be plainly seen (no Diablo IV deaths to things you could not see), so the ash smoulders bright enough to read
+## in the dark and only burns once it has settled. Drawn on the ground in the pixel grain;
 ## nothing glows.
 
 const P := 4.0                 # the pixel grain
@@ -24,8 +26,20 @@ static func _make(z, k: String, at: Vector2, lf: float) -> AffixFx:
 	f.life = lf
 	f.position = Iso.to_screen(at)
 	f.z_index = -45
+	var mat := CanvasItemMaterial.new()
+	mat.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED   # the dark never hides a tell (as the world's fires)
+	f.material = mat
 	z.sorted.add_child(f)
 	return f
+
+## a patch of hot ash where an Ash-Trailing creature walked; it hurts whoever stands in it
+static func ash(z, at: Vector2, d: float) -> void:
+	var f := _make(z, "ash", at, 4.5)
+	f.dmg = d
+	for i in 26:
+		var a := randf() * TAU
+		var r := sqrt(randf())
+		f.spots.append([Vector2(floorf(cos(a) * r * 46.0 / P) * P, floorf(sin(a) * r * 22.0 / P) * P), randf() < 0.4])
 
 ## an Unquiet creature sinks, and comes up beside the hero
 static func slip(mon, h) -> void:
@@ -74,7 +88,7 @@ func _physics_process(dt: float) -> void:
 	match kind:
 		"ash":
 			hurt_t -= dt
-			if h and not h.dead and hurt_t <= 0.0 and h.tp.distance_to(tp) < 0.6:
+			if h and not h.dead and hurt_t <= 0.0 and t > 0.5 and t < life and h.tp.distance_to(tp) < 0.6:   # burns once settled
 				hurt_t = 0.5
 				var now := Time.get_ticks_msec()
 				if now > int(h.get_meta("ash_hurt", 0)):   # many patches underfoot still burn as one
@@ -145,9 +159,9 @@ func _draw() -> void:
 				var o: Vector2 = s[0]
 				if s[1]:
 					var e := 0.5 + 0.5 * sin(t * 7.0 + o.x)
-					draw_rect(Rect2(o, Vector2(P, P)), Color(0.42 + 0.12 * e, 0.2 + 0.06 * e, 0.1, 0.8 * a * clampf(1.0 - t / life, 0.0, 1.0) + 0.0))
+					draw_rect(Rect2(o, Vector2(P, P)), Color(0.78 + 0.14 * e, 0.42 + 0.1 * e, 0.16, 0.9 * a * clampf(1.2 - t / life, 0.0, 1.0)))
 				else:
-					draw_rect(Rect2(o, Vector2(P, P)), Color(0.13, 0.12, 0.12, 0.7 * a))
+					draw_rect(Rect2(o, Vector2(P, P)), Color(0.2, 0.18, 0.17, 0.8 * a))
 		"graves":
 			# the ground cracks open where they will come up
 			var k := clampf(t / life, 0.0, 1.0)
