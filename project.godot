@@ -6,6 +6,11 @@ config/name="Godmarrow"
 config/description="A grimdark isometric action RPG. Vertical slice."
 run/main_scene="res://scenes/game.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://icon_godmarrow.png"
+boot_splash/bg_color=Color(0.02, 0.02, 0.04, 1)
+boot_splash/image="res://icon_godmarrow.png"
+boot_splash/fullsize=false
+boot_splash/use_filter=false
 
 [display]
 window/size/viewport_width=1920
