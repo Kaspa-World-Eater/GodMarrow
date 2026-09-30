@@ -6130,12 +6130,12 @@
        3.8,
        8.8
       ],
-      "name": "Three Miles More",
+      "name": "Three Leagues More",
       "fx": {
        "frw": 1.5,
        "con": 1
       },
-      "lore": "The point below the knee that gives a tired walker three miles more."
+      "lore": "The point below the knee that gives a tired walker three leagues more."
      }
     ],
     "keys": [
@@ -19766,12 +19766,12 @@
         3.8,
         8.8
        ],
-       "name": "Three Miles More",
+       "name": "Three Leagues More",
        "fx": {
         "frw": 1.5,
         "con": 1
        },
-       "lore": "The point below the knee that gives a tired walker three miles more."
+       "lore": "The point below the knee that gives a tired walker three leagues more."
       }
      ],
      "keys": [
@@ -21073,9 +21073,9 @@
        "frw": 1.5,
        "con": 1
       },
-      "name": "Three Miles More",
+      "name": "Three Leagues More",
       "area": "The Outer Leg (yang)",
-      "lore": "The point below the knee that gives a tired walker three miles more.",
+      "lore": "The point below the knee that gives a tired walker three leagues more.",
       "links": [],
       "card": null,
       "extra": {}
