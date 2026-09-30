@@ -15,23 +15,26 @@ const BONE_D := Color("#a39a8b")
 const ASH := Color("#6f685f")
 const MARROW := Color("#c9974a")
 const K := 4.0                           # screen px per chapel px
-const FIRE := Vector2(1330, 880)         # the fire's foot on the flagstones
-const FS := 1.5                          # the fire's size
-const HS := 1.45                         # the pilgrims' size in the chapel
+const FIRE := Vector2(1360, 954)         # the fire's foot on the flagstones (chapel px 340, 238)
+const FS := 1.7                          # the fire's size
+## the pilgrims: the user's paintings cut out and brought down to the chapel's own grain (tools/title_cut.py,
+## tools/title_pix.py -> art/ui/pilgrim_*.png, shown x4). The two orders without a painting yet keep an empty place.
 const PILGRIMS := [
-	# kind, sprite set, name, line, foot, view, face, playable
-	["hemomancer", "hemomancer", "The Hemomancer", "Opens the vein, and the vein answers.", Vector2(1110, 792), "front", 1, false],
-	["ossumancer", "ossumancer", "The Ossuarch", "Counts the dead, and the dead stand up to be counted.", Vector2(1552, 792), "front", -1, false],
-	["miasmancer", "miasmancer", "The Shrine Keeper", "Folds the breath into paper, and the paper walks.", Vector2(1000, 905), "side", 1, false],
-	["monk", "monk", "The Empty Hand", "Carries nothing. Strikes with that.", Vector2(1660, 905), "side", -1, false],
-	["animancer", "animancer_unclipped", "The Hollow Mystic", "Listens at mirrors. Keeps the dead on a thread.", Vector2(1236, 1004), "back", 1, true],
+	# kind, figure png ("" = an empty place), name, line, foot (screen px), fire side, playable, what lies at an empty place
+	["hemomancer", "pilgrim_hemo", "The Hemomancer", "Opens the vein, and the vein answers.", Vector2(928, 864), 1, false, ""],
+	["animancer", "pilgrim_mystic", "The Hollow Mystic", "Listens at mirrors. Keeps the dead on a thread.", Vector2(1152, 840), 1, true, ""],
+	["ossumancer", "pilgrim_ossu", "The Ossuarch", "Counts the dead, and the dead stand up to be counted.", Vector2(1580, 840), -1, false, ""],
+	["miasmancer", "", "The Shrine Keeper", "Folds the breath into paper, and the paper walks.", Vector2(1760, 880), -1, false, "charm"],
+	["monk", "", "The Empty Hand", "Carries nothing. Strikes with that.", Vector2(1150, 1010), 1, false, "bowl"],
 ]
+const LANTERN_AT := Vector2(-80, -208)   # the Mystic's lantern glass, from her feet (screen px)
 
 var main: Node
 var root: Control
 var world: Node2D                  # the pilgrims (y-sorted, screen px)
 var add_fx: Node2D                 # additive light: the fire's glow, the candles, embers
-var fx: Node2D                     # flames, embers, the drop
+var fx: Node2D                     # the fire, embers, the empty places
+var fx_back: Node2D
 var figs: Array = []               # {spr, holder, shadow, base, step}
 var rows: Array = []
 var hover := -1
@@ -83,6 +86,9 @@ func _ready() -> void:
 			candles.append(Vector2(float(c[0]), float(c[1]) - float(c[2])) * K + Vector2(2, -2))
 		var f: Array = meta.get("face", [340, 64, 125])
 		chin = Vector2(float(f[0]) - 1.0, float(f[2])) * K
+	fx_back = Node2D.new()          # the candles and the god's drop, behind the pilgrims
+	fx_back.draw.connect(_draw_back)
+	add_child(fx_back)
 	var shadows := Node2D.new()
 	add_child(shadows)
 	world = Node2D.new()
@@ -90,21 +96,25 @@ func _ready() -> void:
 	add_child(world)
 	for i in PILGRIMS.size():
 		var p: Array = PILGRIMS[i]
-		var spr := AnimSprite.new(Data.sprite_set(p[1]))
-		spr.view = p[5]
-		spr.face = p[6]
-		spr.play("idle")
-		spr.fi = i * 2
 		var holder := Node2D.new()
 		holder.position = p[4]
-		holder.scale = Vector2(HS, HS)
-		holder.add_child(spr)
 		world.add_child(holder)
-		var sh := Sprite2D.new()
-		sh.centered = false
-		sh.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		shadows.add_child(sh)
-		figs.append({"spr": spr, "holder": holder, "shadow": sh, "base": p[4], "step": 0.0})
+		var spr: Sprite2D = null
+		var sh: Sprite2D = null
+		if p[1] != "":
+			spr = Sprite2D.new()
+			spr.texture = load("res://art/ui/%s.png" % p[1])
+			spr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			spr.centered = false
+			spr.scale = Vector2(K, K)
+			spr.position = Vector2(-roundf(spr.texture.get_width() / 2.0) * K, -spr.texture.get_height() * K)
+			holder.add_child(spr)
+			sh = Sprite2D.new()
+			sh.texture = spr.texture
+			sh.centered = false
+			sh.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			shadows.add_child(sh)
+		figs.append({"spr": spr, "holder": holder, "shadow": sh, "base": p[4], "step": 0.0, "ph": randf() * TAU})
 	fx = Node2D.new()
 	fx.draw.connect(_draw_fx)
 	add_child(fx)
@@ -163,31 +173,34 @@ func _process(dt: float) -> void:
 			main.title_done()
 			queue_free()
 			return
-	var fire_k := 0.82 + 0.18 * _flick(0.3)
+	var fire_k := 0.86 + 0.14 * _flick(0.3)
 	for i in figs.size():
 		var f: Dictionary = figs[i]
-		var spr: AnimSprite = f["spr"]
-		spr.step(dt)
 		var want := 1.0 if (mode == "choose" and fig_hover == i) else 0.0
 		f["step"] = lerpf(f["step"], want, minf(1.0, dt * 5.0))
 		var base: Vector2 = f["base"]
-		var to_fire := (FIRE - base).normalized()
 		var h: Node2D = f["holder"]
-		h.position = base + to_fire * 26.0 * f["step"]
+		var to_fire := (FIRE - base).normalized()
+		# a step toward the fire when chosen, on the chapel's grain; and a slow breath (one chapel pixel)
+		var stepv: Vector2 = to_fire * 28.0 * float(f["step"])
+		h.position = Vector2(roundf((base.x + stepv.x) / K) * K, roundf((base.y + stepv.y) / K) * K)
+		var spr: Sprite2D = f["spr"]
+		if spr == null:
+			continue
+		var breath := 1.0 if sin(t * 0.9 + float(f["ph"])) > 0.55 else 0.0
+		spr.position.y = -spr.texture.get_height() * K - breath * K
 		var d := h.position.distance_to(FIRE)
-		var lit: float = clampf(1.25 - d / 420.0, 0.35, 1.0) * fire_k + 0.25 * float(f["step"])
-		var dim := 0.55 if (mode == "choose" and fig_hover >= 0 and fig_hover != i) else 1.0
-		spr.modulate = Color(1.0 * lit * dim + 0.06, 0.8 * lit * dim + 0.06, 0.6 * lit * dim + 0.09)
+		var lit: float = clampf(1.3 - d / 700.0, 0.5, 1.1) * fire_k + 0.3 * float(f["step"])
+		var dim := 0.5 if (mode == "choose" and fig_hover >= 0 and fig_hover != i) else 1.0
+		spr.modulate = Color(lit * dim * 1.05, lit * dim * 0.92, lit * dim * 0.8)
 		var sh: Sprite2D = f["shadow"]
-		sh.texture = spr.texture
-		sh.offset = spr.offset
-		sh.flip_h = spr.flip_h
 		var away := h.position - FIRE
-		var dir := Vector2(away.x, away.y * 0.7).normalized()
-		sh.transform = Transform2D(Vector2(HS, 0), -dir * 0.55 * HS, h.position)
-		sh.modulate = Color(0, 0, 0, 0.5 * clampf(1.3 - d / 400.0, 0.2, 1.0))
+		var dir := Vector2(away.x, away.y * 0.6).normalized()
+		var ya := -dir * 0.5 * K
+		sh.transform = Transform2D(Vector2(K, 0), ya, h.position - Vector2(spr.texture.get_width() / 2.0 * K, 0) - ya * spr.texture.get_height())
+		sh.modulate = Color(0, 0, 0, 0.55 * clampf(1.4 - d / 600.0, 0.2, 1.0))
 	if randf() < dt * 9.0:
-		embers.append({"p": FIRE + Vector2(randf_range(-40, 40), -70), "v": Vector2(randf_range(-14, 14), randf_range(-70, -40)), "t": 0.0, "life": randf_range(1.2, 2.6)})
+		embers.append({"p": FIRE + Vector2(randf_range(-50, 50), -90), "v": Vector2(randf_range(-14, 14), randf_range(-70, -40)), "t": 0.0, "life": randf_range(1.2, 2.6)})
 	for e in embers:
 		e["t"] += dt
 		e["v"].x += sin(t * 2.0 + e["life"] * 7.0) * 12.0 * dt
@@ -202,6 +215,7 @@ func _process(dt: float) -> void:
 			drop_y = -1.0
 			drop_t = randf_range(3.0, 7.0)
 	fx.queue_redraw()
+	fx_back.queue_redraw()
 	add_fx.queue_redraw()
 	root.queue_redraw()
 
@@ -239,18 +253,42 @@ func _draw_fire() -> void:
 			y += K
 
 func _draw_small() -> void:
+	# the empty places: a begging bowl on a folded cloth; a stick with paper strips, stirring in the fire's draught
+	for i in PILGRIMS.size():
+		var what: String = PILGRIMS[i][7]
+		if what == "":
+			continue
+		var at: Vector2 = (figs[i]["holder"] as Node2D).position
+		var lit := 0.6 + 0.4 * _flick(i * 3.1) + (0.35 if (mode == "choose" and fig_hover == i) else 0.0)
+		if what == "bowl":
+			fx.draw_rect(Rect2(_snap(at + Vector2(-48, -8)), Vector2(96, 12)), Color("#1b1008"))
+			fx.draw_rect(Rect2(_snap(at + Vector2(-28, -24)), Vector2(56, 16)), Color("#3d2512") * lit)
+			fx.draw_rect(Rect2(_snap(at + Vector2(-28, -24)), Vector2(56, 4)), Color("#704622") * lit)
+			fx.draw_rect(Rect2(_snap(at + Vector2(-20, -20)), Vector2(40, 4)), Color("#0f0905"))
+		else:
+			fx.draw_rect(Rect2(_snap(at + Vector2(-4, -220)), Vector2(8, 220)), Color("#2a190c") * lit)
+			fx.draw_rect(Rect2(_snap(at + Vector2(-16, -224)), Vector2(32, 8)), Color("#3d2512") * lit)
+			for k in 4:
+				var sw := roundf(sin(t * 1.3 + k * 1.7) * 1.2) * K
+				var x0 := -12.0 + k * 8.0
+				for z in 6:
+					var zx := x0 + sw + (K if z % 2 == 1 else 0.0)
+					fx.draw_rect(Rect2(_snap(at + Vector2(zx, -216 + z * 12)), Vector2(K, 12)), Color("#dcc79a") * lit)
+
 	for e in embers:
 		var a: float = 1.0 - e["t"] / e["life"]
 		fx.draw_rect(Rect2(_snap(e["p"]), Vector2(K, K)), Color(1.0, 0.55 + 0.35 * a, 0.25, a))
+
+func _draw_back() -> void:
 	for i in candles.size():
 		var c: Vector2 = candles[i]
 		var g := _flick(i * 1.7)
-		fx.draw_rect(Rect2(_snap(c + Vector2(0, -8)), Vector2(K, 8 + roundf(g) * 4)), Color("#ecc47e"))
-		fx.draw_rect(Rect2(_snap(c + Vector2(0, -12 - g * 4)), Vector2(K, K)), Color("#fff2c0"))
+		fx_back.draw_rect(Rect2(_snap(c + Vector2(0, -8)), Vector2(K, 8 + roundf(g) * 4)), Color("#ecc47e"))
+		fx_back.draw_rect(Rect2(_snap(c + Vector2(0, -12 - g * 4)), Vector2(K, K)), Color("#fff2c0"))
 	if drop_y >= 0.0:
-		fx.draw_rect(Rect2(_snap(chin + Vector2(0, drop_y)), Vector2(K, K * 2)), Color("#84181c"))
+		fx_back.draw_rect(Rect2(_snap(chin + Vector2(0, drop_y)), Vector2(K, K * 2)), Color("#84181c"))
 	elif drop_t < 1.2:
-		fx.draw_rect(Rect2(_snap(chin), Vector2(K, K * (1.0 if drop_t > 0.5 else 2.0))), Color("#5e1016"))
+		fx_back.draw_rect(Rect2(_snap(chin), Vector2(K, K * (1.0 if drop_t > 0.5 else 2.0))), Color("#5e1016"))
 
 func _draw_add() -> void:
 	var g := _flick(0.3)
@@ -265,6 +303,12 @@ func _draw_add() -> void:
 	for e in embers:
 		var a: float = 1.0 - e["t"] / e["life"]
 		add_fx.draw_texture_rect(_glow, Rect2(e["p"] - Vector2(10, 10), Vector2(20, 20)), false, Color(1.0, 0.5, 0.2, 0.3 * a))
+	# the Mystic's lantern: a soul, pale and cold beside the fire
+	for i in PILGRIMS.size():
+		if PILGRIMS[i][1] == "pilgrim_mystic":
+			var lp: Vector2 = (figs[i]["holder"] as Node2D).position + LANTERN_AT
+			var lr := 60.0 + 8.0 * sin(t * 2.3)
+			add_fx.draw_texture_rect(_glow, Rect2(lp - Vector2(lr, lr), Vector2(lr * 2, lr * 2)), false, Color(0.45, 0.75, 0.8, 0.28))
 
 # ------------------------------------------------------------------ input
 
@@ -272,7 +316,7 @@ func _fig_at(p: Vector2) -> int:
 	var best := -1
 	for i in figs.size():
 		var h: Node2D = figs[i]["holder"]
-		if Rect2(h.position + Vector2(-80, -260), Vector2(160, 270)).has_point(p):
+		if Rect2(h.position + Vector2(-110, -500), Vector2(220, 510)).has_point(p):
 			if best < 0 or h.position.y > (figs[best]["holder"] as Node2D).position.y:
 				best = i
 	return best
@@ -336,10 +380,10 @@ func _act(a: String) -> void:
 				return
 			Sfx.play("page_open", 0.7)
 			mode = "choose"
-			fig_hover = PILGRIMS.size() - 1
+			fig_hover = 1
 			_build()
 		"mystic":
-			_choose(PILGRIMS.size() - 1)
+			_choose(1)
 		"back":
 			mode = "main"
 			confirm_new = false
@@ -365,7 +409,7 @@ func _act(a: String) -> void:
 
 func _choose(i: int) -> void:
 	var p: Array = PILGRIMS[i]
-	if not p[7]:
+	if not p[6]:
 		Sfx.play("break_iron", 0.25, 0.7)
 		return
 	Sfx.play("kindle", 0.9)
@@ -421,8 +465,8 @@ func _draw_ui() -> void:
 				var p: Array = PILGRIMS[fig_hover]
 				root.draw_string(sc, Vector2(150, 680), p[2], HORIZONTAL_ALIGNMENT_LEFT, -1, 40, Color(BONE, a))
 				root.draw_string(fi, Vector2(150, 726), p[3], HORIZONTAL_ALIGNMENT_LEFT, 640, 23, Color(BONE_D, a))
-				var note := "Click to walk as this pilgrim." if p[7] else "This road is not yet open."
-				root.draw_string(fi, Vector2(150, 780), note, HORIZONTAL_ALIGNMENT_LEFT, 640, 20, Color(MARROW if p[7] else ASH, a))
+				var note := "Click to walk as this pilgrim." if p[6] else "This road is not yet open."
+				root.draw_string(fi, Vector2(150, 780), note, HORIZONTAL_ALIGNMENT_LEFT, 640, 20, Color(MARROW if p[6] else ASH, a))
 				var h: Node2D = figs[fig_hover]["holder"]
 				root.draw_string(sc, h.position + Vector2(-150, 44), p[2], HORIZONTAL_ALIGNMENT_CENTER, 300, 20, Color(BONE, 0.9 * a))
 		for i in rows.size():
