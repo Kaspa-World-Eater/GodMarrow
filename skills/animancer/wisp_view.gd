@@ -24,6 +24,7 @@ func setup(wisp, kind: String = "wisp_rev") -> void:
 	lamp.energy = 0.45
 	lamp.texture_scale = 1.1
 	lamp.shadow_enabled = false
+	lamp.set_meta("dark_r", 21.0)   # (lighting): the web's wisp pool on the ground under it
 	add_child(lamp)
 	ft = randf() * 8.0
 	_place()
@@ -36,6 +37,7 @@ func _place() -> void:
 	spr.scale = Vector2.ONE * w.scale
 	lamp.position = Vector2(0, -lift - 48.0 * w.scale)
 	lamp.texture_scale = 1.1 * w.scale
+	lamp.set_meta("dark_dy", lift + 48.0 * w.scale)   # (lighting): its pool lies on the ground under it
 	spr.modulate.a = w.alpha
 
 func _process(dt: float) -> void:

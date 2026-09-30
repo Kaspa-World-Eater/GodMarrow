@@ -22,39 +22,74 @@ static func radial(size: int) -> Texture2D:
 	_cache[size] = t
 	return t
 
-## the lantern's pool: a bright core, three stepped rings, a faint ring at the edge (the web's dark layer, v64/v76)
-static func pool(size: int) -> Texture2D:
-	var key := "pool%d" % size
-	if _cache.has(key):
-		return _cache[key]
-	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
-	var c := size * 0.5
-	for y in size:
-		for x in size:
-			var r := Vector2(x + 0.5 - c, y + 0.5 - c).length() / c
+## The web's dark layer (zz_zx_dark64.js, zz_zz_cine76.js): a light is a pool on the ground, an iso ellipse twice as
+## wide as it is tall; its light falls in stepped bands (a bright core, three rings, a faint ring) whose edges are
+## dithered in 4-px cells, never smooth. One texture is baked and shared; texture_scale sets the radius.
+const POOL_W := 1440
+const POOL_H := 720
+const BANDS := [[0.42, 1.0], [0.6, 0.8], [0.75, 0.6], [0.87, 0.4], [0.96, 0.2], [1.0, 0.0]]
+const BAYER := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
+
+static func pool(_size: int = 0) -> Texture2D:
+	if _cache.has("pool"):
+		return _cache["pool"]
+	var data := PackedByteArray()
+	data.resize(POOL_W * POOL_H * 2)
+	var cx := POOL_W * 0.5
+	var cy := POOL_H * 0.5
+	var i := 0
+	for y in POOL_H:
+		var dy := (y + 0.5 - cy) / cy
+		for x in POOL_W:
+			var dx := (x + 0.5 - cx) / cx
+			var r := sqrt(dx * dx + dy * dy)
 			var v := 0.0
-			if r < 0.3:
-				v = 1.0
-			elif r < 0.5:
-				v = 0.78
-			elif r < 0.68:
-				v = 0.56
-			elif r < 0.84:
-				v = 0.34
-			elif r < 0.9:
-				v = 0.2
-			elif r < 1.0:
-				v = 0.08 * (1.0 - (r - 0.9) / 0.1)
-			# soften each step's edge a little so the rings read without hard aliasing
-			img.set_pixel(x, y, Color(1, 1, 1, v))
+			var th := float(BAYER[((y >> 2) & 3) * 4 + ((x >> 2) & 3)]) / 16.0
+			var prev := 1.0
+			for bd in BANDS:
+				var edge: float = bd[0]
+				if r < edge:
+					# dither the last 5% of each band toward the next one
+					var w := 0.05
+					var t2 := (r - (edge - w)) / w
+					v = prev if (t2 <= 0.0 or t2 < th) else float(bd[1])
+					break
+				prev = float(bd[1])
+			var b8 := int(clampf(v, 0.0, 1.0) * 255.0)
+			data[i] = 255
+			data[i + 1] = b8
+			i += 2
+	var img := Image.create_from_data(POOL_W, POOL_H, false, Image.FORMAT_LA8, data)
 	var t := ImageTexture.create_from_image(img)
-	_cache[key] = t
+	_cache["pool"] = t
+	return t
+
+## texture_scale that makes the pool's radius r yards (semi-major axis r * 72 * sqrt(2) screen px)
+static func pool_scale(r_yd: float) -> float:
+	return r_yd * Iso.HX * 1.41421 / (POOL_W * 0.5)
+
+## a soft elliptical glow for small things (wisps, candles): smooth, no bands
+static func soft(_size: int = 0) -> Texture2D:
+	if _cache.has("soft"):
+		return _cache["soft"]
+	var w := 256
+	var h := 128
+	var img := Image.create(w, h, false, Image.FORMAT_LA8)
+	for y in h:
+		for x in w:
+			var dx := (x + 0.5 - w * 0.5) / (w * 0.5)
+			var dy := (y + 0.5 - h * 0.5) / (h * 0.5)
+			var r := sqrt(dx * dx + dy * dy)
+			var v := clampf(1.0 - r, 0.0, 1.0)
+			img.set_pixel(x, y, Color(1, 1, 1, v * v))
+	var t := ImageTexture.create_from_image(img)
+	_cache["soft"] = t
 	return t
 
 ## a lantern or fire light that breathes and flickers a little
 static func flicker(parent: Node, pos: Vector2, col: Color, energy: float, scale: float, shadows: bool = false) -> PointLight2D:
 	var l := PointLight2D.new()
-	l.texture = radial(512)
+	l.texture = pool()
 	l.color = col
 	l.energy = energy
 	l.texture_scale = scale

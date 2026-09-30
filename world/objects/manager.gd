@@ -275,6 +275,7 @@ func _quiet_light(tp: Vector2, energy: float, col: Color = Color(0.82, 0.76, 0.6
 	l.energy = energy
 	l.texture_scale = 1.3
 	l.position = Iso.to_screen(tp) + Vector2(0, -40)
+	l.set_meta("dark_dy", 40.0)   # the dark layer lays its pool on the ground
 	zone.sorted.add_child(l)
 
 ## the faint gold breath under an errand's object (zz_quests qGroundDraw)
@@ -283,6 +284,7 @@ func _quest_glow(n: Node2D) -> void:
 	g.set_script(load("res://world/objects/beam.gd"))
 	g.set("mode", 1)
 	g.set("col", Color8(217, 164, 65))
+	g.show_behind_parent = true   # on the ground under the thing, never over its body
 	n.add_child(g)
 	n.move_child(g, 0)
 

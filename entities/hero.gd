@@ -63,6 +63,7 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 	_shadow()
 	lamp = PointLight2D.new()
 	lamp.texture = Lights.pool(512)
+	lamp.set_meta("dark_skip", true)   # the dark layer cuts the lantern's pool
 	lamp.color = HeroStats.lamp_color(c)
 	lamp.energy = 1.25
 	lamp.texture_scale = light_radius() * Iso.HX * 2.0 / 512.0 * 1.25

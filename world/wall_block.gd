@@ -62,7 +62,10 @@ func _draw() -> void:
 			draw_colored_polygon(pts2, Color(0.22, 0.2, 0.19))
 	var top := PackedVector2Array([N + H, E + H, S + H, W + H])
 	if top_tex:
-		draw_polygon(top, PackedColorArray([Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE]), PackedVector2Array(Array(top).map(func(p): return _uv_top(p))), top_tex)
+		# the web lays the texture over the block's own dark colour (70% base, the texture only for grain): pale stone tops
+		# must read as shadowed stone, not bright paving
+		var tc := Color(0.46, 0.44, 0.45) if top_tex.resource_path.contains("top_stone") else Color(0.85, 0.85, 0.85)
+		draw_polygon(top, PackedColorArray([tc, tc, tc, tc]), PackedVector2Array(Array(top).map(func(p): return _uv_top(p))), top_tex)
 	elif face_tex:
 		draw_polygon(top, PackedColorArray([Color(0.9, 0.9, 0.9), Color(0.9, 0.9, 0.9), Color(0.9, 0.9, 0.9), Color(0.9, 0.9, 0.9)]), PackedVector2Array(Array(top).map(func(p): return _uv_top(p))), face_tex)
 	# a dark line where the faces meet the ground and each other

@@ -349,7 +349,9 @@ func _lights() -> void:
 			p = Iso.to_screen(Vector2(L["x"], L["y"]))
 			rad = float(L.get("radiusPx", 36.0)) / 36.0
 		var a := float(L.get("a", 1.0))
-		Lights.flicker(sorted, p, col, clampf(a * 0.45, 0.2, 1.3), rad * Iso.HX * 2.0 / 512.0 * 1.2, L["type"] == "fire")
+		var fl := Lights.flicker(sorted, p, col, clampf(a * 0.45, 0.2, 1.3), rad * Iso.HX * 2.0 / 512.0 * 1.2, L["type"] == "fire")
+		fl.set_meta("dark_skip", true)   # the dark layer draws these pools itself, from the data
+		fl.enabled = false
 
 func ambient_at(phase: float) -> Color:
 	var arr: Array = d.get("ambient", {}).get("byPhase", [])

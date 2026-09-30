@@ -7,6 +7,7 @@ var hero: Hero
 var cam: Camera2D
 var ambient: CanvasModulate
 var hud: Node
+var dark: DarkLayer
 var args := {}
 var last_lantern := {}        # {zone, x, y}
 var remnant := {}             # {zone, x, y, gold}
@@ -25,6 +26,8 @@ func _ready() -> void:
 		Game.clock = float(args["hour"]) * Game.day_len
 	ambient = CanvasModulate.new()
 	add_child(ambient)
+	dark = DarkLayer.new()
+	add_child(dark)
 	cam = Camera2D.new()
 	cam.position_smoothing_enabled = true
 	cam.position_smoothing_speed = 8.0
@@ -73,6 +76,7 @@ func enter(zid: String, from: String) -> void:
 		mon.setup(zone, m)
 	cam.position = hero.position
 	cam.reset_smoothing()
+	dark.bind(zone, hero)
 	if hud and hud.has_method("bind"):
 		hud.bind(hero, zone)
 	if ResourceLoader.exists("res://world/objects.gd"):   # (world objects): town, objects, waystones, errands
@@ -86,8 +90,7 @@ func _process(_dt: float) -> void:
 	if hero == null or zone == null or travelling:
 		return
 	cam.position = hero.position + Vector2(0, -40)
-	var amb := zone.ambient_at(Game.phase())
-	ambient.color = amb.darkened(0.3)
+	ambient.color = Color.WHITE   # the dark layer does the night now (web model)
 	# gates and caves: walk onto one to go through
 	for c in zone.connections:
 		var p := Vector2(c["x"], c["y"])
