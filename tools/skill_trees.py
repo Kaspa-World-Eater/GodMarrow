@@ -329,6 +329,9 @@ for id, (nm, desc, lore) in HEMO_NEW.items():
     if lore:
         by[id]['lore'] = lore
 by['fmastery']['tree'] = 'Penance'
+for pk in by['heart'].get('perks', []):   # no waits (the user's rule): twice in each place, not "ready again"
+    if pk['id'] == 'strongbeat' or pk['name'] == 'Strong Beat':
+        pk['text'] = "[Passive] It can pound you back up twice in each place."
 clean_hemo()
 
 # ============================================================== every order: Masteries at level 30
