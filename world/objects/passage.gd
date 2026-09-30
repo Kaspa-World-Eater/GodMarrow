@@ -208,6 +208,8 @@ func arrive(zone: Node, h) -> void:
 	sink = SINK_MAX
 	_apply_sink(h)
 	if main.cam:
+		if main.eye:
+			main.eye.cut(h)
 		main.cam.position = h.position + Vector2(0, -40)
 		main.cam.reset_smoothing()
 	# the waystone learns you, even arriving
@@ -225,5 +227,7 @@ func plain(id: String) -> void:
 		main.hero._sync()
 		mg.wp_near = true
 		if main.cam:
+			if main.eye:
+				main.eye.cut(main.hero)
 			main.cam.position = main.hero.position + Vector2(0, -40)
 			main.cam.reset_smoothing()

@@ -163,7 +163,8 @@ func _process(dt: float) -> void:
 			souls.erase(s)
 	# 4. leaves (screen space), shaken loose from the trees on screen
 	var vs := get_viewport().get_visible_rect().size
-	var cam := hero.position
+	var c2 := get_viewport().get_camera_2d()
+	var cam := c2.get_screen_center_position() if c2 else hero.position
 	var dcam := Vector2.ZERO if last_cam == Vector2.INF else cam - last_cam
 	last_cam = cam
 	if _woody() and outdoor:

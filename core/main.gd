@@ -5,6 +5,8 @@ extends Node2D
 var zone: Zone
 var hero: Hero
 var cam: Camera2D
+var eye: CamDirector
+var fore: Foreground
 var ambient: CanvasModulate
 var hud: Node
 var dark: DarkLayer
@@ -42,10 +44,13 @@ func _ready() -> void:
 	add_child(dark)
 	atmos = Atmos.new()
 	add_child(atmos)
+	fore = Foreground.new()
+	add_child(fore)
 	cam = Camera2D.new()
 	cam.position_smoothing_enabled = true
 	cam.position_smoothing_speed = 8.0
 	add_child(cam)
+	eye = CamDirector.new(self, cam)
 	Bus.monster_killed.connect(_on_kill)
 	Bus.boss_woke.connect(func(m): boss_awake = m)
 	Bus.boss_felled.connect(func(m): if m == boss_awake: boss_awake = null)
@@ -151,10 +156,13 @@ func enter(zid: String, from: String) -> void:
 		var mon := Monster.new()
 		zone.sorted.add_child(mon)
 		mon.setup(zone, m)
-	cam.position = hero.position
+	eye.arrive(zone, hero, from)
+	cam.position = eye.update(0.016, hero, null, zone)
 	cam.reset_smoothing()
 	dark.bind(zone, hero)
 	atmos.bind(zone, hero, dark)
+	if not OS.has_environment("GM_NOFORE"):
+		fore.bind(zone, hero, dark)
 	if hud and hud.has_method("bind"):
 		hud.bind(hero, zone)
 		# a new pilgrim opens on the skill page to spend the first point
@@ -178,7 +186,8 @@ func travel_lantern(e: Dictionary) -> void:
 		hero.target = null
 		hero.walking = false
 		hero._sync()
-		cam.position = hero.position
+		eye.cut(hero)
+		cam.position = eye.update(0.016, hero, null, zone)
 		cam.reset_smoothing()
 	else:
 		await enter(e["zone"], "__lantern")
@@ -215,7 +224,7 @@ func _notification(what: int) -> void:
 func _process(_dt: float) -> void:
 	if hero == null or zone == null or travelling:
 		return
-	cam.position = hero.position + Vector2(0, -40)
+	cam.position = eye.update(_dt, hero, boss_awake, zone)
 	cam.offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * Game.shake_amt if Game.shake_amt > 0.05 else Vector2.ZERO
 	ambient.color = Color.WHITE   # the dark layer does the night now (web model)
 	# gates and caves: walk onto one to go through
