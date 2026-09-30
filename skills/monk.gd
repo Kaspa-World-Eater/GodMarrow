@@ -14,6 +14,8 @@ extends "res://skills/skill_book.gd"
 ## He is never refused: a full bulb still casts, at a tenth of the force. st.res is kept as the room left in the glass.
 ## No cooldowns anywhere (the user's rule): the old waits became dearer pours.
 ##
+## The Arcana (data/board.json cards kr_*, ka_*, kd_*, kh_*) are read here with aU / aR / aM where each skill acts.
+##
 ## Test args: --learn=all[:L] or --learn=id,id[:L], --autocast[=id,id] (casts learned skills at the nearest creature
 ## in turn), --monktrace (prints the glass and each skill's damage every 5 s).
 
@@ -111,6 +113,12 @@ var rings: Array = []
 var motes: Array = []
 var words: Array = []
 var sky_flash := {}
+var seals: Array = []        # The Burning Sutra: burning seals where talismans burst {tp, t, dps, tick}
+var shell_t := 0.0           # The Thousand-Armed reversed: the arms close round him
+var still_t := 0.0           # how long he has stood still (The Unmoving Door)
+var last_tp := Vector2.INF
+var sky_bonus := 0.0         # The Black-Flame Lantern: seconds kills have added to the held sky
+var clap2 := {}              # The Unstruck Bell: the answering ring
 
 # per creature: faults, stone, silence, shadow
 var faults := {}
@@ -329,10 +337,10 @@ func sky_len(id: String) -> float:
 	var outdoor: bool = zone != null and zone.d.get("outdoor", false)
 	return (20.0 + (8.0 if K("kdawn2" if id == "kdawn" else "kecl2") > 0 else 0.0)) * (1.0 if outdoor else 0.5)
 func amber_r() -> float: return (2.1 + (1.0 if K("kamberw") > 0 else 0.0)) * area()
-func laugh_r() -> float: return 3.2 * area() * (1.25 if K("klaughw") > 0 else 1.0)
+func laugh_r() -> float: return 3.2 * area() * (1.25 if K("klaughw") > 0 else 1.0) * (1.2 if aM("kr_belly") else 1.0)
 func laugh_every() -> float: return maxf(2.0, 3.8 - 0.05 * L1("klaugh"))
 func halo_max() -> int: return 3 + K("ksutra") / 4 + (2 if K("ksmore") > 0 else 0)
-func tears_n() -> int: return 5 + K("ktears") / 5 + (3 if K("ktmore") > 0 else 0)
+func tears_n() -> int: return 5 + K("ktears") / 5 + (3 if K("ktmore") > 0 else 0) + (2 if aM("kr_tears") else 0)
 func sun_len() -> int: return 10 + (4 if K("ksunlong") > 0 else 0)
 func sun_n() -> int: return 3 + int(L1("ksun") / 6.0) + (1 if K("ksunlong") > 0 else 0)
 func palm_r() -> int: return 10 if K("kpalmw") > 0 else 7
@@ -426,6 +434,8 @@ func hurt(m, dmg: float, id: String, o: Dictionary = {}) -> float:
 		elem = o["elem"]
 	if m.kind == "pyre" and tab(id) == 0:
 		d *= 0.5   # the Pyre-Saint is a burning martyr too
+	if aM("kh_unraised") and raised(m):
+		d *= 1.2
 	var was := src
 	src = id
 	if is_stone(m) and id != "kgrip":
@@ -612,7 +622,7 @@ func use(id: String, at: Vector2, target: Monster) -> bool:
 		cast_len = 0.3
 		return true
 	# melee skills walk you in, then strike
-	if MELEE.has(id):
+	if MELEE.has(id) and not (id == "kfinger" and aR("kd_finger")):
 		var m := _melee_target(at, target, float(MELEE[id]))
 		if m == null:
 			var far := near(at, 3.6)
@@ -683,6 +693,7 @@ func _turn_sky(kind: String) -> bool:
 	var t := sky_len(id)
 	Game.sky_force = kind
 	Game.sky_t = t
+	sky_bonus = 0.0
 	sky_flash = {"kind": kind, "t": 0.9}
 	if kind == "noon":
 		banner(data[id]["name"].to_upper(), Color8(255, 240, 176))
@@ -763,6 +774,8 @@ func _update_flurry(dt: float) -> void:
 			stun(m, 1.5 if big else 0.5)
 			hurt(m, F["dmg"] * 8.0, "khands", {"melee": true, "heavy": true})
 			slams.append({"tp": m.tp, "z": 4, "t": 0.5, "max": 0.5, "kind": "palm", "s": 3.0})
+		if aM("kr_ash"):
+			seals.append({"tp": m.tp, "t": 4.0, "max": 4.0, "R": 1.3, "dps": F["dmg"] * 6.0, "tick": 0.0})
 			ring(m.tp, 2.0, 0.45, Color8(255, 244, 176))
 			Sfx.play("heavy", 1.0, 0.8)
 			Game.shake(4.0)
@@ -770,13 +783,19 @@ func _update_flurry(dt: float) -> void:
 
 func _cast_star(a: Vector2) -> bool:
 	var ang := (a - hero.tp).angle()
-	cones.append({"tp": hero.tp, "a0": ang - 0.7, "a1": ang + 0.7, "t": 0.0, "dur": 0.6, "R": 4.6 * area(), "hit": {}, "dmg": D("kstar", 12, 5.5)})
+	var sdmg := D("kstar", 12, 5.5) * (0.7 if aR("kr_star") else 1.0)
+	cones.append({"tp": hero.tp, "a0": ang - 0.7, "a1": ang + 0.7, "t": 0.0, "dur": 0.6, "R": 4.6 * area(), "hit": {}, "dmg": sdmg})
+	if aU("kr_star"):
+		# the breath sweeps back the way it came
+		cones.append({"tp": hero.tp, "a0": ang + 0.7, "a1": ang - 0.7, "t": -0.6, "dur": 0.6, "R": 4.6 * area(), "hit": {}, "dmg": sdmg * 0.6})
 	say_at(hero.tp + Vector2(0, -0.2), "ha")
 	return true
 
 func _update_cones(dt: float) -> void:
 	for c in cones:
 		c["t"] += dt
+		if c["t"] < 0.0:
+			continue
 		var k: float = minf(1.0, c["t"] / c["dur"])
 		var sweep: float = lerpf(c["a0"], c["a1"], k)
 		c["sweep"] = sweep
@@ -789,23 +808,42 @@ func _update_cones(dt: float) -> void:
 				continue
 			var da := wrapf(dv.angle() - c["a0"], -PI, PI)
 			var span: float = c["a1"] - c["a0"]
-			if da < -0.15 or da > span + 0.15 or c["a0"] + da > sweep + 0.1:
-				continue
+			if span >= 0.0:
+				if da < -0.15 or da > span + 0.15 or c["a0"] + da > sweep + 0.1:
+					continue
+			else:
+				if da > 0.15 or da < span - 0.15 or c["a0"] + da < sweep - 0.1:
+					continue
 			c["hit"][m.get_instance_id()] = true
 			var und := raised(m)
 			hurt(m, c["dmg"] * (1.5 if und else 1.0), "kstar")
 			burn(m, c["dmg"] * 0.25, 3.0)
 			if und and K("kstarun") > 0:
 				burn(m, c["dmg"] * 0.4, 5.0)
+			if aR("kr_star") and not m.dead:
+				# drawn in, not out: dragged 2 yd toward you and blinded a moment
+				if not m.boss:
+					var tv: Vector2 = hero.tp - m.tp
+					m.tp = zone.move(m.tp, tv.normalized() * minf(2.0, maxf(0.0, tv.length() - 0.9)), m.radius * 0.6)
+				stun(m, 0.5)
 	cones = cones.filter(func(c): return c["t"] < c["dur"] + 0.35)
 
 func _cast_fist(a: Vector2) -> bool:
+	if aR("kr_noon"):
+		# reversed: the fist is your own, on the enemy in reach, at once and 60% harder
+		var mm := near(hero.tp, 2.2)
+		if mm == null:
+			say("No enemy in reach.", 0.8)
+			return false
+		fists.append({"tp": mm.tp, "m": mm, "t": 0.6, "dur": 0.6, "dmg": D("kfist", 42, 18) * 1.6, "done": false, "own": true})
+		return true
 	var p := clamp_cast(a, 9.0)
 	var m := near(p, 1.6)
 	fists.append({"tp": m.tp if m else p, "m": m, "t": 0.0, "dur": 0.6, "dmg": D("kfist", 42, 18), "done": false})
 	return true
 
 func _update_fists(dt: float) -> void:
+	var new_fists: Array = []
 	for f in fists:
 		f["t"] += dt
 		var m = f["m"]
@@ -826,10 +864,17 @@ func _update_fists(dt: float) -> void:
 				hurt(o, f["dmg"] * 0.35, "kfist")
 				if K("kfring") > 0:
 					burn(o, f["dmg"] * 0.15, 4.0)
+			if aU("kr_noon") and not f.get("lesser", false):
+				# two lesser fists follow on the nearest enemies round the first
+				var others := foes(f["tp"], 4.0).filter(func(q): return q != main)
+				others.sort_custom(func(p1, p2): return p1.tp.distance_to(f["tp"]) < p2.tp.distance_to(f["tp"]))
+				for q in others.slice(0, 2):
+					new_fists.append({"tp": q.tp, "m": q, "t": 0.15, "dur": 0.6, "dmg": f["dmg"] * 0.5, "done": false, "lesser": true})
 			ring(f["tp"], RR, 0.5, Color8(255, 216, 112))
 			ring(f["tp"], RR * 0.6, 0.4, Color8(255, 240, 176))
 			dust(f["tp"], Color(1.0, 0.91, 0.63), 24, 4.0)
 	fists = fists.filter(func(f): return f["t"] < f["dur"] + 0.5)
+	fists.append_array(new_fists)
 
 func _cast_sutra(a: Vector2) -> bool:
 	var n := halo
@@ -873,6 +918,8 @@ func _update_ofuda(dt: float) -> void:
 			for m in foes(o["tp"], 1.2):
 				hurt(m, o["dmg"], "ksutra")
 				burn(m, o["dmg"] * 0.2, 2.0)
+			if aU("kr_sutra"):
+				seals.append({"tp": o["tp"], "t": 3.0, "max": 3.0, "R": 0.9, "dps": o["dmg"] * 0.5, "tick": 0.0})
 			ring(o["tp"], 1.2, 0.25, Color8(255, 176, 96))
 			dust(o["tp"], Color(1.0, 0.85, 0.44), 10)
 			Sfx.play("hit", 0.4, 1.5)
@@ -1040,6 +1087,17 @@ func _laugh() -> void:
 
 # ------------------------------------------------------------------ Absence
 func _cast_palm() -> bool:
+	if aR("ka_palm"):
+		# reversed: the palm casts out: everything in reach thrown to the edge, stunned 1 s, torn as it goes
+		var R := float(palm_r())
+		for m in foes(hero.tp, R):
+			hurt(m, D("kpalm", 5, 2.4) * 5.0, "kpalm")
+			if not m.boss:
+				var d: float = m.tp.distance_to(hero.tp)
+				shove(m, hero.tp, maxf(0.0, R - d))
+			stun(m, 1.0)
+		ring(hero.tp, R, 0.6, Color8(138, 106, 200), R * 0.2)
+		return true
 	palm = {"t": 1.0, "tick": 0.0, "R": float(palm_r())}
 	cast_len = 1.0
 	ring(hero.tp, palm["R"], 0.9, Color8(138, 106, 200))
@@ -1061,11 +1119,28 @@ func _update_palm(dt: float) -> void:
 		if tick:
 			hurt(m, D("kpalm", 5, 2.4), "kpalm")
 		wake(m)
+		# The Hungry Ghost: what reaches your feet weak enough is swallowed whole
+		if aU("ka_palm") and not m.dead and not m.boss and m.rank != "unique" and m.tp.distance_to(hero.tp) < 1.3 and m.hp < m.hp_max * 0.15:
+			say_at(m.tp, "swallowed", Color8(138, 122, 168))
+			src = "dust"
+			Combat.hit_monster(m, m.hp + 1.0, "void", hero.tp, {"poise": 0.0})
+			src = ""
 	if palm["t"] <= 0.0:
 		palm = {}
 
 func _cast_clap() -> bool:
 	var R := clap_r()
+	if aR("ka_clap"):
+		# reversed: no sound. Nothing is stunned, but every enemy missile near is unmade and the ring cannot strike
+		for mi in hero.get_tree().get_nodes_in_group("missiles"):
+			if mi.side != "hero" and mi.tp.distance_to(hero.tp) < 6.0:
+				mi.queue_free()
+		for m in foes(hero.tp, R):
+			m.set_meta("k_silent", now() + 4.0)
+		claps.append({"tp": hero.tp, "t": 0.0, "dur": 0.45, "R": R})
+		return true
+	if aU("ka_clap"):
+		clap2 = {"t": 0.4, "R": R * 1.4}
 	var st := clap_stun()
 	var dmg := D("kclap", 6, 2.6)
 	var broke := 0
@@ -1085,6 +1160,19 @@ func _cast_clap() -> bool:
 
 func _cast_spade(a: Vector2) -> bool:
 	var ang := (a - hero.tp).angle()
+	if aR("ka_spade"):
+		# reversed: the cut flies as a black crescent, 7 yd through everything
+		var dv := Vector2(cos(ang), sin(ang))
+		for m in mons():
+			var o: Vector2 = m.tp - hero.tp
+			var al := o.dot(dv)
+			if al < 0.0 or al > 7.0 + m.radius or absf(o.x * dv.y - o.y * dv.x) > 0.6 + m.radius:
+				continue
+			hurt(m, spade_dmg() * 0.8, "kspade")
+			_tear_shadow(m, ang)
+		shades.append({"tp": hero.tp, "v": dv * 12.0, "t": 0.6, "w": 0.9})
+		Sfx.play("swing", 0.9, 0.7)
+		return true
 	var R := 2.1
 	var dmg := spade_dmg()
 	for m in foes(hero.tp, R):
@@ -1092,17 +1180,29 @@ func _cast_spade(a: Vector2) -> bool:
 			continue
 		hurt(m, dmg, "kspade", {"melee": true})
 		fault(m)
-		var l := lit(m)
-		if l or K("kspadew") > 0:
-			var k := 1.0 if l else 0.5
-			root(m, 2.5 * dur() * k)
-			m.set_meta("k_shadow", now() + 4.0 * dur() * k)
-			m.set_meta("k_shadow_dps", D("kspade", 7, 3))
-			shades.append({"tp": m.tp, "v": Vector2(cos(ang), sin(ang)) * 2.0 + Vector2(randf_range(-0.5, 0.5), randf_range(-0.5, 0.5)), "t": 1.1, "w": m.radius})
-			say_at(m.tp, "shadowless", Color8(138, 122, 168))
+		_tear_shadow(m, ang)
 	slams.append({"tp": hero.tp, "z": 10, "t": 0.25, "max": 0.25, "kind": "arc", "a": ang, "R": R})
 	Sfx.play("swing", 0.9, 0.9)
 	return true
+
+## tear a creature's shadow loose (lit ones only, or all with Grave-Light); The Gravedigger sends it on to pin another
+func _tear_shadow(m, ang: float, crawl: bool = true) -> void:
+	var l := lit(m)
+	if not (l or K("kspadew") > 0):
+		return
+	var k := 1.0 if l else 0.5
+	root(m, 2.5 * dur() * k)
+	m.set_meta("k_shadow", now() + 4.0 * dur() * k)
+	m.set_meta("k_shadow_dps", D("kspade", 7, 3))
+	shades.append({"tp": m.tp, "v": Vector2(cos(ang), sin(ang)) * 2.0 + Vector2(randf_range(-0.5, 0.5), randf_range(-0.5, 0.5)), "t": 1.1, "w": m.radius})
+	say_at(m.tp, "shadowless", Color8(138, 122, 168))
+	if crawl and aU("ka_spade"):
+		var o := near(m.tp, 3.0, func(q): return q != m and float(q.get_meta("k_shadow", -1.0)) < now())
+		if o:
+			root(o, 2.5 * dur() * k)
+			o.set_meta("k_shadow", now() + 4.0 * dur() * k)
+			o.set_meta("k_shadow_dps", D("kspade", 7, 3))
+			shades.append({"tp": m.tp, "v": (o.tp - m.tp) / 1.1, "t": 1.1, "w": o.radius})
 
 func _cast_pinch(a: Vector2) -> bool:
 	var m := near(a, 2.2)
@@ -1152,7 +1252,7 @@ func _cast_below(a: Vector2) -> bool:
 		if t2 != null:
 			tg.append(t2)
 	for m in tg:
-		var hold := 0.6 if m.boss else 3.0 * dur()
+		var hold := 0.6 if m.boss else 3.0 * dur() + (1.0 if aM("ka_grip") else 0.0)
 		hands.append({"m": m, "tp": m.tp, "t": 0.0, "dur": hold, "tick": 0.0, "dps": D("kbelow", 12, 5)})
 		stun(m, hold)
 		root(m, hold)
@@ -1175,7 +1275,7 @@ func _update_hands(dt: float) -> void:
 func _cast_spit(a: Vector2) -> bool:
 	var p := clamp_cast(a, 8.0)
 	var R := spit_r()
-	var t := 3.0 * dur()
+	var t := 3.0 * dur() + (1.0 if aM("ka_roots") else 0.0)
 	roots.append({"tp": p, "R": R, "t": t, "max": t, "tick": 0.0, "dps": D("kspit", 7, 3.2), "seed": randf() * 99.0})
 	for m in foes(p, R):
 		root(m, 2.5 * dur())
@@ -1210,7 +1310,7 @@ func _toggle_walk() -> bool:
 	return false
 
 func _cast_mirror() -> bool:
-	mirror_t = 3.0 + 0.1 * L1("kmirror")
+	mirror_t = 3.0 + 0.1 * L1("kmirror") + (1.0 if aM("ka_face") else 0.0)
 	dust(hero.tp, Color(0.07, 0.05, 0.09), 16)
 	cast_len = 0.25
 	return true
@@ -1258,6 +1358,8 @@ func _drink_bowl() -> void:
 	hero.st.hp = minf(hero.st.life_max(), hero.st.hp + hero.st.life_max() * 0.015 * f)
 	kR *= 0.75
 	kA *= 0.75
+	if aM("ka_bowl"):
+		run_back(0.03 * f)
 	sync_res()
 	say_at(hero.tp + Vector2(0, -0.3), "drinks nothing (%d)" % f, Color8(201, 166, 107))
 	Sfx.play("drink", 0.6)
@@ -1273,7 +1375,7 @@ func _cast_grip(m) -> bool:
 		root(q, tt)
 		dust(q.tp, Color(0.54, 0.53, 0.49), 12, 1.6)
 		say_at(q.tp, "weeping stone", Color8(176, 172, 160))
-	stone.call(m, 4.0)
+	stone.call(m, 5.0 if aM("kd_stone") else 4.0)
 	hurt(m, fist() * 0.5, "kgrip", {"melee": true})
 	if K("kgrip2") > 0:
 		var o := near(m.tp, 2.0, func(q): return q != m)
@@ -1283,13 +1385,34 @@ func _cast_grip(m) -> bool:
 	return true
 
 func _cast_finger(m) -> bool:
+	if aR("kd_finger"):
+		# reversed: the finger points and does not touch: the first enemy in a 7 yd line, through armour, at 80%
+		var dv := (aim_point() - hero.tp).normalized()
+		var best = null
+		var bd := 99.0
+		for q in mons():
+			var o: Vector2 = q.tp - hero.tp
+			var al := o.dot(dv)
+			if al > 0.0 and al < 7.0 + q.radius and absf(o.x * dv.y - o.y * dv.x) < 0.5 + q.radius and al < bd:
+				bd = al
+				best = q
+		if best == null:
+			say("Nothing in the line.", 0.8)
+			return false
+		m = best
 	if m == null:
 		return false
+	var ranged := aR("kd_finger")
 	var st := is_stone(m)
 	var dmg := fist() * (1.7 + 0.16 * L1("kfinger")) * syn("kfinger") * (2.5 if st else 1.0)
 	var poke := func(q):
-		hurt(q, dmg * (100.0 + q.armor) / 100.0, "kfinger", {"melee": true, "heavy": true})   # no armour, no guard
+		hurt(q, dmg * (100.0 + q.armor) / 100.0 * (0.8 if ranged else 1.0), "kfinger", {"melee": not ranged, "heavy": true})   # no armour, no guard
 		fault(q)
+		if aU("kd_finger") and not q.dead and not is_stone(q):
+			q.set_meta("k_stone", now() + (1.0 if q.boss else 2.0))
+			stun(q, 2.0)
+			root(q, 2.0)
+			say_at(q.tp, "the answer hardens", Color8(176, 172, 160))
 	poke.call(m)
 	if st:
 		say_at(m.tp, "truth", Color.WHITE)
@@ -1304,13 +1427,18 @@ func _cast_finger(m) -> bool:
 	return true
 
 func _cast_obsid() -> bool:
-	obsid = 10.0 + 0.5 * L1("kobsid")
+	obsid = 10.0 + 0.5 * L1("kobsid") + (4.0 if aM("kd_obsid") else 0.0)
 	dust(hero.tp, Color(0.11, 0.09, 0.15), 20, 2.2)
 	ring(hero.tp, 2.4, 0.6, Color8(154, 146, 192))
 	say_at(hero.tp + Vector2(0, -0.4), "ON KOKUYO", Color8(138, 134, 160))
 	return true
 
 func _cast_mount(a: Vector2) -> bool:
+	if aR("kd_mount"):
+		# reversed: no leap. He drops where he stands; the stone rolls twice as far and stuns
+		leap = {"from": hero.tp, "to": hero.tp, "t": 0.0, "dur": 0.3, "far": true}
+		cast_len = 0.5
+		return true
 	var p := clamp_cast(a, 5.0)
 	if zone.is_solid(p):
 		p = hero.tp.lerp(p, 0.5)
@@ -1331,16 +1459,26 @@ func _update_leap(dt: float) -> void:
 	float_z = sin(k * PI) * 30.0
 	hero.walking = false
 	if k >= 1.0:
+		var leap_was := leap
 		leap = {}
 		float_z = 0.0
 		var R := 2.3
-		var dmg := D("kmount", 20, 8) * 1.25
+		var dmg := D("kmount", 20, 8) * 1.25 * (0.6 if leap_was.get("second", false) else 1.0)
 		for m in foes(hero.tp, R):
 			hurt(m, dmg, "kmount", {"heavy": true})
 			stun(m, 0.8)
 			fault(m)
 		slams.append({"tp": hero.tp, "z": 0, "t": 0.6, "max": 0.6, "kind": "crater", "R": R})
-		quake = {"tp": hero.tp, "r": R * 0.6, "max": R + 3.0, "hit": {}, "dmg": dmg * 0.4}
+		var far: bool = leap_was.get("far", false)
+		quake = {"tp": hero.tp, "r": R * 0.6, "max": R + (6.0 if far else 3.0), "hit": {}, "dmg": dmg * 0.4, "stun": far}
+		if aU("kd_mount") and not leap_was.get("second", false) and not far:
+			# the mountain lands twice: a bounce 2 yd onward
+			var dv: Vector2 = (leap_was["to"] - leap_was["from"]).normalized()
+			if dv.length() < 0.1:
+				dv = Vector2(1, 0)
+			var p2: Vector2 = hero.tp + dv * 2.0
+			if not zone.is_solid(p2):
+				leap = {"from": hero.tp, "to": p2, "t": 0.0, "dur": 0.35, "second": true}
 		Game.shake(8.0)
 		dust(hero.tp, Color(0.54, 0.48, 0.35), 24, 4.0)
 		ring(hero.tp, R + 1.0, 0.6, Color8(216, 200, 160))
@@ -1356,7 +1494,7 @@ func _update_quake(dt: float) -> void:
 		if absf(m.tp.distance_to(quake["tp"]) - quake["r"]) < 0.5 + m.radius:
 			quake["hit"][m.get_instance_id()] = true
 			hurt(m, quake["dmg"], "kmount")
-			if K("kmount2") > 0:
+			if K("kmount2") > 0 or quake.get("stun", false):
 				stun(m, 1.0)
 	for i in 3:
 		var a := randf() * TAU
@@ -1368,7 +1506,7 @@ func _cast_step(a: Vector2) -> bool:
 	var base := (a - hero.tp).angle()
 	var angs := [base, base - 0.35, base + 0.35] if K("kstep2") > 0 else [base]
 	for ang: float in angs:
-		stepq.append({"tp": hero.tp, "d": Vector2(cos(ang), sin(ang)), "i": 0, "n": 11, "tick": 0.0, "dmg": D("kstep", 15, 6.5) * (1.0 if ang == base else 0.7), "hit": {}})
+		stepq.append({"tp": hero.tp, "d": Vector2(cos(ang), sin(ang)), "i": 0, "n": 15 if aM("kd_bedrock") else 11, "tick": 0.0, "dmg": D("kstep", 15, 6.5) * (1.0 if ang == base else 0.7), "hit": {}})
 	Game.shake(4.0)
 	return true
 
@@ -1404,7 +1542,7 @@ func _cast_pagoda(a: Vector2) -> bool:
 	if m == null:
 		say("No enemy near the cursor.", 1.0)
 		return false
-	pagodas.append({"m": m, "tp": m.tp, "t": 0.0, "dur": 2.2, "dmg": D("kpagoda", 34, 13), "r": m.radius, "done": false})
+	pagodas.append({"m": m, "tp": m.tp, "t": 0.0, "dur": 1.5 if aM("kd_snap") else 2.2, "dmg": D("kpagoda", 34, 13), "r": m.radius, "done": false})
 	stun(m, 2.3)
 	root(m, 2.3)
 	Game.shake(3.0)
@@ -1431,6 +1569,11 @@ func _update_pagodas(dt: float) -> void:
 	pagodas = pagodas.filter(func(p): return p["t"] < p["dur"] + 0.6)
 
 func _cast_thousand(a: Vector2) -> bool:
+	if aR("kd_arms"):
+		# reversed: the arms close round him as a shell for 6 s
+		shell_t = 6.0
+		ring(hero.tp, 1.6, 0.6, Color8(176, 172, 160))
+		return true
 	thousand = {"t": 0.0, "ang": (a - hero.tp).angle(), "tick": 0.0, "n": 0, "max": 18 if K("kthous2") > 0 else 12, "dmg": D("kthousand", 9, 3.5), "pulv": {}}
 	cast_len = 1.5
 	return true
@@ -1446,14 +1589,14 @@ func _update_thousand(dt: float) -> void:
 		T["tick"] = 1.1 / T["max"]
 		T["n"] += 1
 		for m in foes(hero.tp, 5.5):
-			if absf(wrapf((m.tp - hero.tp).angle() - T["ang"], -PI, PI)) > 0.85:
+			if not aU("kd_arms") and absf(wrapf((m.tp - hero.tp).angle() - T["ang"], -PI, PI)) > 0.85:
 				continue
 			hurt(m, T["dmg"], "kthousand")
 			if not T["pulv"].has(m.get_instance_id()):
 				T["pulv"][m.get_instance_id()] = true
 				m.armor = roundf(m.armor * 0.5)
 		for i in 4:
-			var aa: float = T["ang"] + randf_range(-0.8, 0.8)
+			var aa: float = T["ang"] + (randf() * TAU if aU("kd_arms") else randf_range(-0.8, 0.8))
 			slams.append({"tp": hero.tp + Vector2(cos(aa), sin(aa)) * randf_range(1.2, 5.5), "z": randf_range(4, 24), "t": 0.3, "max": 0.3, "kind": "palm", "s": randf_range(1.0, 1.8), "stone": randf() < 0.5})
 		if T["n"] % 2 == 1:
 			Sfx.play("hit", 0.5, randf_range(0.7, 0.9))
@@ -1528,6 +1671,18 @@ func before_hit(d: float, elem: String, from: Vector2, opts: Dictionary) -> floa
 		_bell_ring()
 	if melee and K("kbarthorn") > 0:
 		hurt(src_m, d * 0.2, "kbar")
+	if melee and aR("kr_sutra") and halo > 0:
+		# the halo is worn: a blow burns a talisman away, and it bursts on the one who struck for double
+		halo -= 1
+		hurt(src_m, D("ksutra", 9, 4) * 2.0, "ksutra")
+		dust(src_m.tp, Color(1.0, 0.85, 0.44), 10)
+	if shell_t > 0.0:
+		d *= 0.6
+		if melee:
+			hurt(src_m, fist() * 1.2, "kthousand")
+			slams.append({"tp": src_m.tp, "z": 14, "t": 0.3, "max": 0.3, "kind": "palm", "s": 1.4, "stone": true})
+	if aM("kd_door") and still_t > 1.0:
+		d *= 0.9
 	if elem == "phys":
 		d *= 1.0 - dr()
 	if not lotus.is_empty() or obsid > 0.0:
@@ -1596,6 +1751,7 @@ func _reset() -> void:
 	amber = false
 	walk = false
 	obsid = 0.0
+	shell_t = 0.0
 	mirror_t = 0.0
 	nothing_t = 0.0
 	sun_t = 0.0
@@ -1629,6 +1785,13 @@ func _on_kill(m) -> void:
 	if src == "kamber" and K("kash") > 0:
 		hero.st.hp = minf(hero.st.life_max(), hero.st.hp + hero.st.life_max() * 0.03)
 	faults.erase(m.get_instance_id())
+	if aM("kh_lantern") and Game.sky_force != "" and sky_bonus < 10.0:
+		Game.sky_t += 1.0
+		sky_bonus += 1.0
+	if aM("kh_unraised") and raised(m):
+		for o in foes(m.tp, 1.6):
+			stun(o, 0.5)
+		dust(m.tp, Color(0.85, 0.82, 0.74), 14)
 	if m.boss:
 		return
 	var kind := "glass"
@@ -1709,7 +1872,7 @@ func tick(dt: float) -> void:
 		var mx := halo_max()
 		if halo < mx:
 			halo_t += dt
-			if halo_t >= 1.4:
+			if halo_t >= (1.4 / 1.3 if aM("kr_brush") else 1.4):
 				halo_t = 0.0
 				halo += 1
 		else:
@@ -1717,7 +1880,7 @@ func tick(dt: float) -> void:
 		halo = mini(halo, mx)
 	# Amber-That-Eats-Itself
 	if amber:
-		st.hp = maxf(1.0, st.hp - st.life_max() * 0.01 * dt)
+		st.hp = maxf(1.0, st.hp - st.life_max() * 0.01 * dt * (2.0 / 3.0 if aM("kr_wax") else 1.0))
 		amber_t -= dt
 		if amber_t <= 0.0:
 			amber_t = 0.5
@@ -1755,6 +1918,30 @@ func tick(dt: float) -> void:
 			say_at(hero.tp + Vector2(0, -0.4), "the stone softens", Color8(138, 134, 160))
 	if mirror_t > 0.0:
 		mirror_t -= dt
+	if shell_t > 0.0:
+		shell_t -= dt
+	if last_tp != Vector2.INF and hero.tp.distance_to(last_tp) < 0.002:
+		still_t += dt
+	else:
+		still_t = 0.0
+	last_tp = hero.tp
+	if not clap2.is_empty():
+		clap2["t"] -= dt
+		if clap2["t"] <= 0.0:
+			for m in foes(hero.tp, clap2["R"]):
+				stun(m, clap_stun() * 0.6)
+				hurt(m, D("kclap", 6, 2.6) * 0.6, "kclap")
+			claps.append({"tp": hero.tp, "t": 0.0, "dur": 0.45, "R": clap2["R"]})
+			Sfx.play("heavy", 0.6, 1.6)
+			clap2 = {}
+	for sl in seals:
+		sl["t"] -= dt
+		sl["tick"] -= dt
+		if sl["tick"] <= 0.0:
+			sl["tick"] = 0.5
+			for m in foes(sl["tp"], sl["R"]):
+				hurt(m, sl["dps"] * 0.5, "ksutra")
+	seals = seals.filter(func(q): return q["t"] > 0.0)
 	if nothing_t > 0.0:
 		nothing_t -= dt
 		hero.invuln = maxf(hero.invuln, 0.1)
@@ -1872,7 +2059,7 @@ func tick(dt: float) -> void:
 
 func _enter_zone() -> void:
 	zone = hero.zone
-	for arr in [cones, fists, ofuda, tears, geysers, beams, claps, shades, hands, roots, waves, spikes, stepq, pagodas, slams, remains, marks, rings, motes, words]:
+	for arr in [cones, fists, ofuda, tears, geysers, beams, claps, shades, hands, roots, waves, spikes, stepq, pagodas, slams, remains, marks, rings, motes, words, seals]:
 		arr.clear()
 	flurry = {}
 	palm = {}

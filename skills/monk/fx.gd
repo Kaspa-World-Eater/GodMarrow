@@ -84,6 +84,15 @@ func _floor() -> void:
 				pts.append(c + Vector2(cos(a + sin(t * 3.0 + i) * 0.4) * len * t * Iso.HX * 1.41, sin(a + sin(t * 3.0 + i) * 0.4) * len * t * Iso.HX * 0.7))
 			draw_polyline(pts, Color(0.1, 0.06, 0.08, 0.9 * k2), 3.0)
 		ell(c, r["R"], Color(0.22, 0.12, 0.16, 0.35 * k2), 1.5)
+	# burning seals where the sutras burst (The Burning Sutra), and burnt ground where the hundred hands ended
+	for sl in b.seals:
+		var ks = clampf(sl["t"] / 0.5, 0.0, 1.0)
+		var sc = S(sl["tp"])
+		ell(sc, sl["R"], Color(AMBER, 0.55 * ks), 2.0)
+		ell(sc, sl["R"] * 0.55, Color(PALEGOLD, 0.35 * ks), 1.0)
+		for i in 4:
+			var aa = b.time * 0.8 + i * PI / 2.0
+			draw_rect(Rect2(sc + Vector2(cos(aa) * sl["R"] * 60.0, sin(aa) * sl["R"] * 30.0) - Vector2(2, 2), Vector2(4, 4)), Color(AMBER, 0.8 * ks))
 	# tears lying in wait
 	for t in b.tears:
 		if t["fall"] > 0.0:
@@ -301,6 +310,14 @@ func _air() -> void:
 				draw_arc(p4 + Vector2(0, -40), 7.0, 0, TAU, 16, Color(1.0, 0.7, 0.4, k9), 1.0)
 			"mirror":
 				draw_rect(Rect2(p4 + Vector2(-16, -90), Vector2(32, 80)), Color(0.05, 0.03, 0.08, 0.7 * k9))
+	# the arms closed round him as a shell (The Thousand-Armed reversed)
+	if b.shell_t > 0.0:
+		var ksh = clampf(b.shell_t / 0.5, 0.0, 1.0)
+		for i in 10:
+			var a6 = i * TAU / 10.0 + b.time * 0.3
+			var p6 = hp + Vector2(cos(a6) * 70.0, sin(a6) * 34.0 - 70.0)
+			draw_line(hp + Vector2(0, -80), p6, Color(STONE_D, 0.5 * ksh), 7.0)
+			draw_rect(Rect2(p6 - Vector2(6, 6), Vector2(12, 12)), Color(STONE, 0.7 * ksh))
 	# the thousand arms: the figure standing up behind him
 	if not b.thousand.is_empty():
 		var kt = clampf(b.thousand["t"] / 0.35, 0.0, 1.0) * clampf((1.8 - b.thousand["t"]) / 0.4, 0.0, 1.0)

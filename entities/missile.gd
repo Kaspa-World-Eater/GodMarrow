@@ -30,6 +30,7 @@ static func fire(z: Zone, from: Vector2, to: Vector2, speed: float, damage: floa
 	m.elem = e
 	m.side = who
 	m.look = kind
+	m.add_to_group("missiles")
 	m.life = 12.0 / maxf(1.0, speed) + 0.6
 	if who == "monster" and not hush.is_empty() and Time.get_ticks_msec() / 1000.0 < float(hush["until"]) and from.distance_to(hush["tp"]) < float(hush["r"]):
 		m.dmg = 0.0
