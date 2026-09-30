@@ -118,17 +118,23 @@ func _ready() -> void:
 		hero.st.hp = hero.st.life_max()
 		if "auto_stand" in hero.skills:
 			hero.skills.auto_stand = true
-			hero.skills.trace = true
+		if "trace" in hero.skills:
+			hero.skills.trace = true   # every order logs what each skill dealt
 		hero.target = null
 		if "dmg_log" in hero.skills:
 			hero.skills.dmg_log.clear()
 		var T := float(args.get("arena_t", "20"))
+		var deaths := [0, 0.0, 0]   # falls, life lost, kills
+		Bus.hero_died.connect(func(): deaths[0] += 1)
+		Bus.hero_hit.connect(func(a): deaths[1] += float(a))
+		Bus.monster_killed.connect(func(_m): deaths[2] += 1)
 		await get_tree().create_timer(T).timeout
 		var dl: Dictionary = hero.skills.dmg_log if "dmg_log" in hero.skills else {}
 		var tot := 0.0
 		for k in dl:
 			if k != "_spent":
 				tot += float(dl[k])
+		print("HERO %s lvl %d life %.0f armor %.0f res %.0f poise %.0f | now hp %.0f dead %s | creatures left %d | falls %d, life lost %.0f, kills %d" % [hero.cls, hero.st.level, hero.st.life_max(), hero.st.armor(), hero.st.res_max(), hero.st.poise_max(), hero.st.hp, str(hero.dead), get_tree().get_nodes_in_group("monsters").filter(func(x): return not x.dead).size(), deaths[0], deaths[1], deaths[2]])
 		print("BAL %s dps %.1f spent %.0f per_ess %.2f parts %s" % [args.get("autocast", "-"), tot / T, float(dl.get("_spent", 0.0)), tot / maxf(1.0, float(dl.get("_spent", 0.0))), str(dl)])
 		get_tree().quit()
 	if args.has("boardtest") and hero.st.arc:   # tests: lay a road to the right hand, take its trunk and a Major

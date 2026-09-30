@@ -9,7 +9,7 @@ extends "res://skills/skill_book.gd"
 ## regain), k_arcana.js poisonMon (a sickness keeps its strongest dose; some stack).
 ## Her resource is Miasma (st.res): it seeps back slowly, faster standing in her own miasma, and her breathing draws it
 ## in. Death skills cost poise ("stamina"). Omens (up to 3) quicken her and strengthen her strikes; they fade after 14 s.
-## Sickness is kept on each creature as meta "k_psn" {dps, t, n}; it ticks as "miasma".
+## Sickness is kept on each creature as meta "k_psn" {dps, t, n}; it ticks as "miasma" (x PSN_K, the G1 balance).
 ## The Arcana (z_*, zm_*, zd_*, zx_* in data/board.json) are read here with aU / aR / aM where each skill acts.
 ##
 ## Test args: --learn=all[:L], --autocast[=id,id], --miastrace.
@@ -21,6 +21,8 @@ const Ally = preload("res://skills/miasmancer/ally.gd")
 const POSE := {"rarc": "rake", "flurry": "rake", "gstrike": "atk", "thrust": "thrust", "execute": "thrust", "talon": "spin",
 	"reap": "spin", "dstep": "lunge", "blur": "lunge", "shuriken": "atk"}
 const MELEE := {"gstrike": 1.1, "talon": 1.2, "execute": 1.2, "flurry": 1.3}
+const PSN_K := 0.8           # G1 balance (2026-09-30): sickness ticks a fifth softer
+const TUNE := 0.8            # G1 balance: all her damage (a whole kit at level 20 dealt twice the Mystic's)
 const TRAPS := ["ntrap", "mwake", "bmine"]
 const SISTER_SKILLS := ["pnova", "contagion", "rotwall", "shuriken", "haze", "mirage", "lure", "gstrike", "talon", "flurry", "rarc", "thrust", "reap", "execute", "ntrap", "bmine", "mwake"]
 const SISTER_MELEE := ["gstrike", "talon", "flurry", "rarc", "thrust", "reap", "execute"]
@@ -147,7 +149,7 @@ func syn(id: String) -> float:
 	return 1.0 + b / 200.0
 
 func sister_k() -> float: return 0.35 + 0.015 * L1("sister")
-func power() -> float: return hero.st.skill_mult() * (1.0 + 0.1 * K("toxic")) * (sister_k() if sister_cast else 1.0)
+func power() -> float: return TUNE * hero.st.skill_mult() * (1.0 + 0.1 * K("toxic")) * (sister_k() if sister_cast else 1.0)
 func frac() -> float: return clampf(hero.st.res / maxf(1.0, hero.st.res_max()), 0.0, 1.0)
 ## the cloud about her: small at first, it grows with rank; a full breath billows (zz_miasma_breath.js)
 func aura_r() -> float:
@@ -170,7 +172,7 @@ func storm_dmg() -> float: return (5.0 + 2.4 * (L1("mstorm") - 1.0)) * power() *
 func storm_r() -> float: return 3.2 + (1.0 if K("stormwide") > 0 else 0.0)
 func storm_life() -> float: return 8.0 + 0.3 * L1("mstorm")
 func trap_k() -> float: return (1.0 + 0.08 * K("unseen")) * power()
-func needle_dmg() -> float: return (4.0 + 2.0 * (L1("ntrap") - 1.0)) * trap_k() * syn("ntrap")
+func needle_dmg() -> float: return (4.0 + 2.0 * (L1("ntrap") - 1.0)) * trap_k() * syn("ntrap") * 0.5   # G1 balance: four needle traps were half her damage
 func wake_dmg() -> float: return (5.0 + 2.5 * (L1("mwake") - 1.0)) * trap_k() * (1.25 if aM("zd_snare") else 1.0) * syn("mwake")
 func wake_life() -> float: return 12.0 * (2.0 if K("wakelong") > 0 else 1.0) * (1.5 if aM("zd_snare") else 1.0)
 func mine_dmg() -> float: return (18.0 + 8.0 * (L1("bmine") - 1.0)) * trap_k() * syn("bmine")
@@ -491,6 +493,8 @@ func use(id: String, at: Vector2, target: Monster) -> bool:
 	if not ok:
 		return false
 	hero.st.res -= c
+	if trace:
+		dmg_log["_spent"] = float(dmg_log.get("_spent", 0.0)) + c
 	if pc > 0.0:
 		hero.spend_poise(pc)
 	var tb := int(data.get(id, {}).get("tab", 0))
@@ -1135,7 +1139,7 @@ func tick(dt: float) -> void:
 		q["tick"] -= dt
 		if q["tick"] <= 0.0:
 			q["tick"] = 0.5
-			hurt(m, float(q["dps"]) * 0.5, "psn", {"elem": "miasma", "poise": 0.0})
+			hurt(m, float(q["dps"]) * 0.5 * PSN_K, "psn", {"elem": "miasma", "poise": 0.0})
 		var drip := float(m.get_meta("k_drip", 0.0)) - dt
 		if drip <= 0.0:
 			drip = 1.0 if K("toxdrip") > 0 else 2.0
@@ -1256,6 +1260,9 @@ func _inhale(dt: float) -> void:
 		for i in 2:
 			motes.append({"tp": m.tp, "z": 4.0, "v": (hero.tp - m.tp) * 2.0, "vz": 4.0, "t": 0.45, "col": VIOLET})
 	gain = gain * (1.5 if K("sickbreath") > 0 else 1.0) + 0.6 + 0.08 * L
+	# G1 balance: one breath draws at most a tenth of her pool (a field of clouds used to refill her four times
+	# faster than the Mystic's Essence comes back)
+	gain = minf(gain, hero.st.res_max() * (0.1 if not aM("zm_breath") else 0.13))
 	hero.st.res = minf(hero.st.res_max(), hero.st.res + gain)
 
 ## Warped Miasma: distortion in every cloud

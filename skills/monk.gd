@@ -8,9 +8,11 @@ extends "res://skills/skill_book.gd"
 ##
 ## The hourglass: Radiance pours amber sand down into the lower bulb, Absence pours black sand up into the upper one.
 ## A bulb is half the resource pool (st.res_max() / 2). The fuller a bulb, the weaker that tree:
-## strength = 1 - 0.9 f^2.5 (full: a tenth). A cast pours 5% of the bulb for a skill of the common cost (12.8), more
-## for dear ones, at most 25%; turning the sky pours three times over. The sand runs back 10% of a bulb a second
-## while he casts and 35% once he stops; every hit runs both back 1.5%, every kill 12%. Destroyer costs poise.
+## strength = 1 - 0.9 f^2.5 (full: a tenth). A cast pours 12% of the bulb for a skill of the common cost (12.8), more
+## for dear ones, at most 25%; turning the sky pours three times over. The sand runs back 2% of a bulb a second
+## while he casts and 25% once he has been still for 0.9 s; hits run both back 0.3% (at most four times a second),
+## every kill 7%. Destroyer costs poise. (G1 balance, 2026-09-30: the glass used to empty faster than he could pour
+## it, so it never held him back; it was 5% a cast, 10% / 35% a second, 1.5% a hit every 0.08 s, 12% a kill.)
 ## He is never refused: a full bulb still casts, at a tenth of the force. st.res is kept as the room left in the glass.
 ## No cooldowns anywhere (the user's rule): the old waits became dearer pours.
 ##
@@ -22,8 +24,8 @@ extends "res://skills/skill_book.gd"
 const FxNode = preload("res://skills/monk/fx.gd")
 const BuddhaView = preload("res://skills/monk/buddha.gd")
 
-const TUNE := 0.75        # v0.35: every skill's damage cut by a quarter
-const POUR := 0.05
+const TUNE := 0.6         # v0.35: every skill's damage cut by a quarter; G1 (2026-09-30): by two fifths
+const POUR := 0.12
 const NORM := 12.8
 const CAP := 0.25
 ## the pose each skill strikes (art/sprites/monk.json)
@@ -300,7 +302,7 @@ func info(id: String) -> String:
 	match id:
 		"kdawn", "keclipse": return "%d s · turning the sky pours three times the sand" % int(sky_len(id))
 		"kamber": return "%s/s within %.1f yd · eats 1%% life a second%s" % [r.call(D("kamber", 6.5, 3)), amber_r(), skt]
-		"khands": return "100 palms · %s in all%s" % [r.call(fist() * (0.09 + 0.01 * L1("khands")) * sky(0) * syn("khands") * 100.0), skt]
+		"khands": return "100 palms · %s in all%s" % [r.call(fist() * (0.09 + 0.01 * L1("khands")) * sky(0) * sand(0) * syn("khands") * 100.0), skt]
 		"klaugh": return "%s within %.1f yd every %.1f s%s" % [r.call(D("klaugh", 5.6, 2.8)), laugh_r(), laugh_every(), skt]
 		"kstar": return "%s in a %.1f yd cone · x1.5 on the raised dead%s" % [r.call(D("kstar", 12, 5.5)), 4.6 * area(), skt]
 		"kfist": return "%s to the one beneath · ring %s%s" % [r.call(D("kfist", 42, 18)), r.call(D("kfist", 42, 18) * 0.35), skt]
@@ -460,9 +462,9 @@ func hurt(m, dmg: float, id: String, o: Dictionary = {}) -> float:
 	if trace:
 		dmg_log[id] = float(dmg_log.get(id, 0.0)) + dealt
 	if dealt > 0.0:
-		if not m.dead and time - hit_t > 0.08:
+		if not m.dead and time - hit_t > 0.25:
 			hit_t = time
-			run_back(0.015)
+			run_back(0.003)
 	return dealt
 
 ## Mantra-Of-Obsidian: a punch leaves a fault; at five it shatters
@@ -738,7 +740,7 @@ func _toggle_amber() -> bool:
 func _cast_hundred(m) -> bool:
 	if m == null:
 		return false
-	flurry = {"m": m, "t": 0.0, "n": 0, "tick": 0.0, "dmg": fist() * (0.09 + 0.01 * L1("khands")) * sky(0) * syn("khands")}
+	flurry = {"m": m, "t": 0.0, "n": 0, "tick": 0.0, "dmg": fist() * (0.09 + 0.01 * L1("khands")) * sky(0) * sand(0) * syn("khands")}
 	cast_len = 1.5
 	return true
 
@@ -1779,7 +1781,7 @@ func _reset() -> void:
 func _on_kill(m) -> void:
 	if hero == null or hero.st == null or hero.cls != "monk" or not is_instance_valid(m):
 		return
-	run_back(0.12)
+	run_back(0.07)
 	if trace:
 		print("KILL ", m.kind, " src=", src, " hpmax=", m.hp_max)
 	if src == "kamber" and K("kash") > 0:
@@ -1834,9 +1836,9 @@ func tick(dt: float) -> void:
 		kR = maxf(0.0, kR - take * fr)
 		kA = maxf(0.0, kA - take * (1.0 - fr))
 	# the sand always runs back: slowly while he casts, fast once he stops
-	var casting: bool = hero.act == "cast" or not eye.is_empty() or not lotus.is_empty() or walk or time - cast_t < 0.4
+	var casting: bool = hero.act == "cast" or not eye.is_empty() or not lotus.is_empty() or walk or time - cast_t < 0.9
 	if not hero.dead:
-		var rate := bulb() * (0.10 if casting else 0.35)
+		var rate := bulb() * (0.02 if casting else 0.25)
 		kR = maxf(0.0, kR - rate * dt)
 		kA = maxf(0.0, kA - rate * dt)
 	kR = clampf(kR, 0.0, bulb())
@@ -2106,7 +2108,7 @@ func _autocast(dt: float) -> void:
 	auto_t -= dt
 	if auto_t > 0.0 or hero.dead:
 		return
-	auto_t = 1.2
+	auto_t = float(OS.get_environment("GM_AUTO_T")) if OS.has_environment("GM_AUTO_T") else 1.2
 	var ids: Array = auto_ids if not auto_ids.is_empty() else hard.keys()
 	ids = ids.filter(func(i): return lvl(i) > 0 and not is_passive(i))
 	if ids.is_empty():
