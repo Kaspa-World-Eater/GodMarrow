@@ -258,3 +258,325 @@ func _anim(m: Monster, dt: float) -> void:
 	if a == "walk":
 		k = m.move_speed() / maxf(0.5, float(m.kd.get("speed_yd_s", 1.5)))
 	m.spr.step(dt, k)
+
+# ==================================================================== (creature AI port): shared helpers for ai_*.gd
+# Everything below is additive: the AI kinds (entities/ai/ai_<ai>.gd) override tick() with kind_tick(), which keeps
+# the base's sleep/loiter/wake and adds the web build's per-creature timers (m.t, m.cd), the hour-hiding rule of
+# zv_time24 (hidden only while you are more than 9 yd off), stun breaking wind-ups, D2-imp skittishness
+# (zz_zz_imps67), the struck recoil pose, and helpers for lunges, allies, lights and spawning.
+const AIWorld := preload("res://entities/ai/ai_world.gd")
+var t := 0.0              # time in the current state (the web's m.t)
+var cd := 0.0             # a creature's own rest before its next move (the web's m.cd; a rhythm, not a player wait)
+var hurt_t := 0.0         # struck recoil pose
+var time_hidden := false  # lying hidden outside its hours
+var last_tp := Vector2.INF
+var moved := false
+var odir := 0             # which way it circles (+1/-1)
+var aim_dir := Vector2.RIGHT  # a locked heading (lunges, charges, dashes)
+var world: Node           # the zone's AIWorld (ground fires, ripples, telegraphs, bone walls, altars)
+# skittishness (zz_zz_imps67)
+var sk := -1.0
+var panic := 0.0
+var pv := 0.0
+var back_t := 0.0
+var bv := 0.0
+var ap := 0.0
+var hes := false
+var wv := 0.0
+var low_fled := false
+var crowd_t := 0.0
+var crowd_k := 1.0
+
+## states a stun or reel breaks (the web: windup, slamWind, chargeWind, charge)
+static var DBG := OS.has_environment("AIDBG")
+const BREAKABLE := ["wind", "lwind", "cwind", "charge", "lunge", "swind", "dash", "swoop", "swait"]
+
+func kind_tick(m: Monster, dt: float) -> void:
+	if world == null:
+		world = AIWorld.of(m.zone)
+	var h := m.hero()
+	t += dt
+	cd -= dt
+	hurt_t -= dt
+	if h == null:
+		pose(m, dt)
+		return
+	if _hours_hidden(m, h):
+		return
+	if not m.can_act():
+		if state in BREAKABLE:
+			interrupted(m)
+		m.spr.play("hit" if m.spr.set.has("hit") else "idle")
+		m.spr.step(dt)
+		last_tp = m.tp
+		return
+	if state == "sleep":
+		if m.tp.distance_to(h.tp) > 32.0 and wake_delay < 0.0:
+			return
+		_sleep(m, h, dt)
+	else:
+		think(m, h, dt)
+	_anim(m, dt)
+	if DBG and Engine.get_physics_frames() % 30 == 0 and m.tp.distance_to(h.tp) < 12.0:
+		print("AI %s %s st=%s t=%.2f cd=%.2f d=%.2f hp=%d/%d tok=%s bur=%s z=%.0f" % [m.kind, m.rank, state, t, cd, m.tp.distance_to(h.tp), m.hp, m.hp_max, token, m.buried, m.z_lift])
+
+## a stun or a reel breaks the wind-up (a boss goes to recover)
+func interrupted(m: Monster) -> void:
+	_release_token(m)
+	if m.boss:
+		state = "recover"
+		st = rec
+	else:
+		state = "chase"
+	t = 0.0
+
+func set_state(s: String) -> void:
+	state = s
+	t = 0.0
+
+## zv_time24: out of its hours a creature lies hidden where it stood, but never vanishes before your eyes
+func _hours_hidden(m: Monster, h: Hero) -> bool:
+	var out := m.walks_now()
+	if not out and not time_hidden and m.tp.distance_to(h.tp) > 9.0:
+		time_hidden = true
+		m.buried = true
+		_release_token(m)
+		state = "sleep"
+		wake_delay = -1.0
+	elif out and time_hidden:
+		time_hidden = false
+		m.buried = false
+		if world:
+			world.grit_burst(m.tp, Color(0.36, 0.4, 0.5), 10)
+	return time_hidden
+
+## the hero's front as a tile-space unit vector, from the way he faces (view + mirror)
+static func hero_front(h: Hero) -> Vector2:
+	var s := Vector2(1, 0)
+	match h.view:
+		"down":
+			s = Vector2(0, 1)
+		"up":
+			s = Vector2(0, -1)
+		"front":
+			s = Vector2(h.face, 1).normalized()
+		"back":
+			s = Vector2(h.face, -1).normalized()
+		"side":
+			s = Vector2(h.face, 0)
+	var v := Iso.to_tile(s)
+	return v.normalized() if v.length() > 0.0001 else Vector2(1, 0)
+
+func behind_hero(m: Monster, h: Hero) -> bool:
+	return (m.tp - h.tp).dot(hero_front(h)) < 0.0
+
+func dir_to(m: Monster, p: Vector2) -> Vector2:
+	var v := p - m.tp
+	return v.normalized() if v.length() > 0.0001 else Vector2(1, 0)
+
+## packmates of the same kind that are awake within R (the web's awakePackmates)
+func awake_packmates(m: Monster, r: float) -> int:
+	var n := 0
+	for o in m.get_tree().get_nodes_in_group("monsters"):
+		if o != m and o.kind == m.kind and o.brain and o.brain.state != "sleep" and o.tp.distance_to(m.tp) < r:
+			n += 1
+	return n
+
+## move by v sliding on walls (a lunge or a charge); returns how far it really went
+func shove(m: Monster, v: Vector2) -> float:
+	var o := m.tp
+	m.tp = m.zone.move(m.tp, v, m.radius * 0.6)
+	return m.tp.distance_to(o)
+
+func circle_dir() -> int:
+	if odir == 0:
+		odir = 1 if randf() < 0.5 else -1
+	return odir
+
+## the minions and summons that monster blows can also strike (group "allies": tp, radius, take_hit)
+static func hit_allies(tree: SceneTree, c: Vector2, r: float, dmg: float, elem: String, from: Vector2) -> void:
+	for a in tree.get_nodes_in_group("allies"):
+		if a.has_method("take_hit") and a.get("tp") != null and a.tp.distance_to(c) < r + float(a.get("radius") if a.get("radius") != null else 0.3):
+			a.take_hit(dmg, elem, from)
+
+func hero_open(h: Hero) -> bool:
+	return h != null and not h.dead and h.invuln <= 0.0
+
+## the plain web strike: a blow lands if the hero is within 0.8 yd of the point reach*0.8 ahead
+func strike_at(m: Monster, h: Hero, r: float, mult: float = 1.0) -> bool:
+	var hx := m.tp + dir_to(m, aim) * r * 0.8
+	if world:
+		world.grit_burst(hx, Color(0.44, 0.42, 0.47), 3)
+	hit_allies(m.get_tree(), hx, 0.8, m.roll_damage() * mult, "phys", m.tp)
+	if h.tp.distance_to(hx) < 0.8 + h.radius:
+		Combat.hit_hero(h, m.roll_damage() * mult, "phys", m.tp)
+		return true
+	return false
+
+## a new creature mid-fight (a boss's call, a birth): a row shaped like the export's monster rows
+static func spawn(zone: Zone, kind: String, at: Vector2, level: int, rank: String = "normal", pack: String = "", hp: float = -1.0) -> Monster:
+	var kd: Dictionary = Data.table("monsters").get("kinds", {}).get(kind, {})
+	if kd.is_empty():
+		return null
+	var p := at
+	if zone.is_solid(p):
+		var c := zone._nearest_open(Vector2i(int(p.x), int(p.y)))
+		p = Vector2(c.x + 0.5, c.y + 0.5)
+	var row := {"kind": kind, "name": kd.get("name", kind), "spr": kd.get("sprite", kind), "ai": kd.get("ai", "husk"),
+		"level": maxi(1, level), "rank": rank, "pack": pack if pack != "" else "spawn%d" % randi(), "x": p.x, "y": p.y,
+		"r": float(kd.get("radius", 0.3)), "mods": [], "boss": false}
+	if hp > 0.0:
+		row["hp"] = hp
+	var m := Monster.new()
+	zone.sorted.add_child(m)
+	m.setup(zone, row)
+	m.brain.state = "chase"
+	m.awake = true
+	return m
+
+# ------------------------------------------------------------------ skittishness (zz_zz_imps67, zz_mobai63)
+func skit(m: Monster) -> float:
+	if sk < 0.0:
+		var x := maxf(1.0, float(m.kd.get("xp", 20)))
+		sk = 0.0 if m.boss else clampf(14.4 / x, 0.08, 0.48) * (0.5 if m.rank == "unique" else 1.0)
+	return sk
+
+func _crowd(m: Monster) -> float:
+	if Time.get_ticks_msec() / 1000.0 > crowd_t:
+		crowd_t = Time.get_ticks_msec() / 1000.0 + 0.5
+		var n := 0
+		for o in m.get_tree().get_nodes_in_group("monsters"):
+			if o != m and o.brain and o.brain.state != "sleep" and absf(o.tp.x - m.tp.x) < 5.0 and absf(o.tp.y - m.tp.y) < 5.0:
+				n += 1
+		crowd_k = 0.3 if n >= 5 else (0.6 if n >= 3 else 1.0)
+	return crowd_k
+
+## run from the hero, veering so a pack scatters rather than retreating in a line
+func _flee_step(m: Monster, h: Hero, dt: float, k: float = 1.15) -> void:
+	var a := atan2(m.tp.y - h.tp.y, m.tp.x - h.tp.x) + pv
+	var to := m.tp + Vector2(cos(a), sin(a)) * 2.0
+	if not m.zone.is_solid(to):
+		m.step_toward(to, dt, m.move_speed() * k)
+	else:
+		pv += 0.8 * (-1.0 if randf() < 0.5 else 1.0)
+
+## returns true when skittishness took the frame (a weaving approach, a hop back, a panic)
+func skittish(m: Monster, h: Hero, dt: float) -> bool:
+	var k := skit(m)
+	if k <= 0.0 or h.dead or reach >= 2.2:
+		return false
+	k *= _crowd(m)
+	if panic > 0.0:
+		panic -= dt
+		_flee_step(m, h, dt)
+		return true
+	if not low_fled and m.hp < m.hp_max * 0.18 and randf() < k * 0.45:
+		low_fled = true
+		panic = randf_range(0.9, 1.5)
+		pv = randf_range(-0.7, 0.7)
+		_release_token(m)
+		return true
+	if back_t > 0.0:
+		back_t -= dt
+		var a := atan2(m.tp.y - h.tp.y, m.tp.x - h.tp.x) + bv
+		var to := m.tp + Vector2(cos(a), sin(a))
+		if not m.zone.is_solid(to):
+			m.step_toward(to, dt, m.move_speed() * 0.9)
+		return false   # the recover timer still runs
+	var d := m.tp.distance_to(h.tp)
+	var ringed := not token and d < 4.4
+	if state == "chase" and not ringed and d > reach + 0.6 and d < 26.0:
+		ap -= dt
+		if ap <= 0.0:
+			if hes:
+				hes = false
+				ap = randf_range(0.5, 1.2)
+				wv = randf_range(-0.9, 0.9)
+			elif randf() < 0.2 * k and d > 2.8:
+				hes = true
+				ap = randf_range(0.2, 0.5) * (0.5 + k)
+			else:
+				ap = randf_range(0.4, 1.0)
+				wv = randf_range(-0.9, 0.9) * k
+		if hes:
+			m.look(h.tp - m.tp)
+			return true
+		var a := atan2(h.tp.y - m.tp.y, h.tp.x - m.tp.x) + (wv if d > 2.0 else 0.0)
+		var to := m.tp + Vector2(cos(a), sin(a)) * minf(2.0, d)
+		if not m.zone.is_solid(to) and m.zone.line_clear(m.tp, to):
+			m.step_toward(to, dt, m.move_speed() * (1.0 + 0.25 * k))
+			return true
+	return false
+
+## the standard melee rhythm with the imps' skittishness laid over it
+func melee_k(m: Monster, h: Hero, dt: float, spd_k: float = 1.0) -> void:
+	if skittish(m, h, dt):
+		return
+	var was := state
+	melee_rhythm(m, h, dt, spd_k)
+	if was == "strike" and state == "recover" and randf() < 0.45 * skit(m):
+		back_t = randf_range(0.25, 0.45)
+		bv = randf_range(-0.8, 0.8)
+
+## a death close by scatters the skittish ones (called by AIWorld on Bus.monster_killed)
+func scatter_from(m: Monster, dead_at: Vector2) -> void:
+	var k := skit(m)
+	if k <= 0.0 or state == "sleep" or m.tp.distance_to(dead_at) > 5.0 or reach >= 2.2:
+		return
+	if randf() < 0.3 * k:
+		panic = randf_range(0.5, 1.0) * (0.6 + k)
+		pv = randf_range(-0.9, 0.9)
+		_release_token(m)
+
+# ------------------------------------------------------------------ poses
+## which anim a state shows; kinds extend it. "move" = walk when it moved this frame, else idle.
+func pose_of(s: String) -> String:
+	match s:
+		"wind", "lwind", "cwind", "swind":
+			return "wind"
+		"strike", "lunge", "charge", "dash", "lash":
+			return "atk"
+		"sleep", "chase", "home", "gap", "flee":
+			return "move"
+	return "idle"
+
+func pose(m: Monster, dt: float) -> void:
+	moved = last_tp != Vector2.INF and m.tp.distance_to(last_tp) > 0.0005
+	last_tp = m.tp
+	var a := pose_of(state)
+	if a == "move":
+		a = "walk" if moved else "idle"
+	if hurt_t > 0.0 and a in ["walk", "idle"] and m.spr.set.has("hit"):
+		a = "hit"
+	if not m.spr.set.has(a):
+		a = {"wind": "atk", "hit": "idle", "parry": "wind"}.get(a, "idle")
+		if not m.spr.set.has(a):
+			a = "idle"
+	var once := a in ["wind", "atk", "hit", "parry"]
+	if m.spr.anim != a:
+		m.spr.play(a, true, not once)
+		m.spr.fps_override = 0.0
+		if a == "wind":
+			m.spr.fps_override = m.spr.frame_count() / maxf(0.15, wind)
+	var k := 1.0
+	if a == "walk":
+		k = m.move_speed() / maxf(0.5, float(m.kd.get("speed_yd_s", 1.5)))
+	m.spr.step(dt, k)
+
+## kinds whose export has no body of their own (the fen's Mire Vein-Worm) borrow their family's, tinted
+func fix_sprite(m: Monster) -> void:
+	if m.spr and m.spr.set and not m.spr.set.has("walk"):
+		var alt: String = str(m.kd.get("sprite", ""))
+		if alt != "" and alt != m.kind and ResourceLoader.exists("res://art/sprites/%s.json" % alt):
+			m.spr.set = Data.sprite_set(alt)
+			m.spr.play("idle", true)
+			var tint = m.kd.get("flags", {}).get("tint")
+			if tint is String:
+				m.spr.modulate = Color(tint).lerp(Color.WHITE, 0.55)
+
+## the small grit tell under a great creature's melee wind-up (zz_zz_boss83); kinds give their own tells
+func tell(m: Monster) -> Dictionary:
+	if state == "wind" and (m.rank == "champion" or m.rank == "unique" or m.boss):
+		var k := clampf(1.0 - st / maxf(0.2, wind), 0.0, 1.0)
+		return {"disc": m.tp + dir_to(m, aim) * 0.8, "r": 0.8, "k": k}
+	return {}

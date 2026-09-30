@@ -114,7 +114,7 @@ func _numbers() -> void:
 				dmg *= 1.5
 			"Stone Skin":
 				armor += 80.0
-	var pk: float = float(kd.get("poiseK", 0.5))
+	var pk: float = Brain._num(kd.get("poiseK"), 0.5)
 	if boss:
 		pk *= 1.6
 	elif rank == "unique":

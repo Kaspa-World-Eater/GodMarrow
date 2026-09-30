@@ -1,0 +1,32 @@
+{
+ "statue0": {
+  "png": "res://art/objects/statue0.png",
+  "ox": 48,
+  "oy": 50,
+  "hr": 2
+ },
+ "statue1": {
+  "png": "res://art/objects/statue1.png",
+  "ox": 48,
+  "oy": 50,
+  "hr": 2
+ },
+ "statue2": {
+  "png": "res://art/objects/statue2.png",
+  "ox": 48,
+  "oy": 50,
+  "hr": 2
+ },
+ "relic_book": {
+  "png": "res://art/objects/relic_book.png",
+  "ox": 30,
+  "oy": 60,
+  "hr": 1.4
+ },
+ "captive": {
+  "png": "res://art/objects/captive.png",
+  "ox": 28,
+  "oy": 68,
+  "hr": 1.4
+ }
+}

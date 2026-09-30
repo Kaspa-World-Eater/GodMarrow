@@ -214,7 +214,10 @@ func _ground() -> void:
 
 # ------------------------------------------------------------------ scatter (small ground litter, exported as images)
 func _scatter() -> void:
-	var sc: Dictionary = d.get("scatter", {})
+	var sc0 = d.get("scatter")
+	if not (sc0 is Dictionary) or sc0.is_empty():
+		return
+	var sc: Dictionary = sc0
 	if sc.is_empty():
 		return
 	var texs := {}

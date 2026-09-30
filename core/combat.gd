@@ -12,6 +12,7 @@ static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vec
 	var d := dmg
 	if elem == "phys":
 		d *= 100.0 / (100.0 + m.armor)
+	opts["raw"] = d   # (creature AI port): the blow's weight before a creature bends it (the Duelist's parry, 14% of life)
 	d *= m.damage_taken_mult(elem, from, opts)
 	var res: float = m.resists.get(elem, 0.0)
 	d *= 1.0 - clampf(res, -100.0, 75.0) / 100.0
@@ -36,6 +37,9 @@ static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vec
 ## a creature strikes the hero. Returns the life lost.
 static func hit_hero(h: Hero, dmg: float, elem: String = "phys", from: Vector2 = Vector2.INF, opts: Dictionary = {}) -> float:
 	if h == null or h.dead or h.invuln > 0.0:
+		return 0.0
+	# (animancer): Wraith Form lets physical blows pass through untouched (no life, no poise lost)
+	if h.skills and h.skills.has_method("phases") and h.skills.phases(elem):
 		return 0.0
 	var st := h.st
 	var d := dmg

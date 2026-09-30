@@ -75,6 +75,8 @@ func enter(zid: String, from: String) -> void:
 	cam.reset_smoothing()
 	if hud and hud.has_method("bind"):
 		hud.bind(hero, zone)
+	if ResourceLoader.exists("res://world/objects.gd"):   # (world objects): town, objects, waystones, errands
+		load("res://world/objects.gd").attach(self, zone, hero)
 	Bus.zone_entered.emit(zid)
 	Bus.say.emit(zone.d.get("name", zid), 3.0)
 	await get_tree().create_timer(0.5).timeout

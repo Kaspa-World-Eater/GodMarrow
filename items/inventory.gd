@@ -4,6 +4,7 @@ extends RefCounted
 ## UI lives in ui/; rolling and drops in items/loot.gd.
 
 signal changed
+signal overflow(it)        # (items): an item that had no room (taken off with a full bag); items/ground puts it on the ground
 
 const W := 10
 const H := 4
@@ -108,7 +109,10 @@ func drink(i: int) -> String:
 # ------------------------------------------------------------------ API used by the UI (items/*.gd owns the rules)
 ## can the hero wear it? (slot fits, level, order lock)
 func can_equip(it: Item, level: int, cls: String) -> bool:
-	return it.slot != "" and it.potion == "" and level >= it.req
+	if it.slot == "" or it.potion != "" or level < it.req:
+		return false
+	var lock := it.class_lock()
+	return lock == "" or lock == cls
 
 ## the slot an item goes to (rings take the first free ring slot)
 func slot_for(it: Item) -> String:
@@ -126,6 +130,8 @@ func equip_item(it: Item) -> Item:
 		var p := free_spot(old.grid)
 		if p.x >= 0:
 			bag.append({"item": old, "pos": p})
+		else:
+			overflow.emit(old)
 	changed.emit()
 	return old
 

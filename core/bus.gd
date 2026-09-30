@@ -10,3 +10,6 @@ signal gold_changed(total)
 signal zone_entered(zone_id)
 signal boss_woke(m)
 signal boss_felled(m)
+signal herald_felled(m, god)   # (creature AI port): a god's Herald is unmade; the Arcana system grants its Major Arcanum
+signal panel_requested(panel, who)   # (world objects): a townsfolk opens a panel: "vendor" | "smith" | "stash" | "journal"
+signal quest_changed(id)             # (world objects): an errand was written or fulfilled (world/quests.gd)
