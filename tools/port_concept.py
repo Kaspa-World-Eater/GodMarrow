@@ -1,41 +1,86 @@
-from PIL import Image, ImageFilter
+"""Port one painted concept (a character on a flat dark ground) into a game sprite set.
+
+The cut follows the figure's OUTLINE: whatever lies inside the silhouette stays opaque, however dark
+(dark cloth, shadowed armour, the black under a robe). Only ground reachable from the picture's edge is removed.
+
+Usage:
+  python3 tools/port_concept.py SRC.png KIND [--height 195] [--colours 56] [--robe 0.55:0.94] [--ground-pool]
+    --robe A:B   rows A..B of the figure (fractions of its height) are filled edge to edge along each row,
+                 so the dark inside of a robe or cloak between the legs is kept. Pick the band from the hands
+                 down to the hem; leave it out for figures with open gaps (arms held away, legs apart).
+    --ground-pool  also removes a dim coloured shadow pool painted under the feet.
+Writes art/sprites/KIND.png and KIND.json (one front frame, used for idle and walk: a look test).
+"""
+import argparse, json
 import numpy as np
+from PIL import Image
 from scipy import ndimage as nd
-a=np.array(Image.open('src.png').convert('RGB')).astype(int)
-H,W,_=a.shape
-lum=a.sum(2)
-r,g,b=a[...,0],a[...,1],a[...,2]
-m=lum>11
-# the ground ellipse: dark teal pool under the feet (g,b high relative to r, dim)
-ell=(np.arange(H)[:,None]>1112)&(r<9)&(g<46)
-m&=~ell
-m=nd.binary_opening(m,iterations=1)
-lab,n=nd.label(m);sz=nd.sum(m,lab,range(1,n+1))
-keep=np.zeros(n+1,bool);keep[1:]=sz>400
-m=keep[lab]
-m=nd.binary_closing(m,iterations=7);m=nd.binary_fill_holes(m)
-ys,xs=np.where(m);y0,y1,x0,x1=ys.min(),ys.max(),xs.min(),xs.max()
-print('bbox',y0,y1,x0,x1)
-TH=int(__import__('sys').argv[1]) if len(__import__('sys').argv)>1 else 195
-k=TH/(y1-y0+1)
-rgba=np.dstack([a,m*255]).astype(np.uint8)[y0:y1+1,x0:x1+1]
-im=Image.fromarray(rgba,'RGBA')
-w2,h2=round(im.width*k),TH
-# premultiplied downscale
-pm=np.array(im).astype(float);al=pm[...,3:4]/255;pm[...,:3]*=al
-s=np.array(Image.fromarray(pm[...,:3].astype(np.uint8)).resize((w2,h2),Image.BOX)).astype(float)
-sa=np.array(Image.fromarray(rgba[...,3]).resize((w2,h2),Image.BOX)).astype(float)/255
-col=np.where(sa[...,None]>0.01,s/np.maximum(sa[...,None],1e-3),0).clip(0,255)
-A=sa>0.45
-# palette: 48 colours, no dither
-rgb=Image.fromarray(col.astype(np.uint8))
-q=rgb.quantize(56,method=Image.FASTOCTREE,dither=Image.NONE).convert('RGB')
-out=np.dstack([np.array(q),A*255]).astype(np.uint8)
-# dark outline where an opaque pixel touches empty
-edge=A&~nd.binary_erosion(A)
-out[edge,:3]=(out[edge,:3]*0.35).astype(np.uint8)
-Image.fromarray(out,'RGBA').save('oss_front.png')
-# foot anchor: the midpoint between the boots' lowest opaque row
-ys2,xs2=np.where(A);fy=ys2.max();fx=int(xs2[ys2>=fy-3].mean())
-open('anchor.txt','w').write('%d %d %d %d'%(fx,fy,w2,h2))
-print('size',w2,h2,'anchor',fx,fy)
+
+GROUND_LUM = 11      # summed RGB at or under this is the painted ground
+MIN_BLOB = 400       # source pixels; smaller specks are noise
+
+
+def silhouette(rgb: np.ndarray, robe, ground_pool: bool) -> np.ndarray:
+    lum = rgb.sum(2)
+    fig = lum > GROUND_LUM
+    if ground_pool:  # a dim teal pool under the feet: low red, some green, in the bottom tenth
+        rows = np.arange(rgb.shape[0])[:, None]
+        fig &= ~((rows > rgb.shape[0] * 0.9) & (rgb[..., 0] < 6) & (rgb[..., 1] < 36))
+    fig = nd.binary_opening(fig)
+    lab, n = nd.label(fig)
+    sizes = nd.sum(fig, lab, range(1, n + 1))
+    fig = np.isin(lab, 1 + np.flatnonzero(sizes > MIN_BLOB))
+    fig = nd.binary_closing(fig, iterations=4)
+    if robe:
+        ys = np.flatnonzero(fig.any(1))
+        top, h = ys[0], ys[-1] - ys[0]
+        for y in range(int(top + robe[0] * h), int(top + robe[1] * h)):
+            xs = np.flatnonzero(fig[y])
+            if xs.size:
+                fig[y, xs[0]:xs[-1] + 1] = True
+    # the ground is only what the picture's edge can reach; every enclosed dark pocket is the figure
+    return nd.binary_fill_holes(fig)
+
+
+def to_sprite(rgb, fig, height, colours):
+    ys, xs = np.nonzero(fig)
+    rgb, fig = rgb[ys.min():ys.max() + 1, xs.min():xs.max() + 1], fig[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+    k = height / fig.shape[0]
+    size = (round(fig.shape[1] * k), height)
+    alpha = np.array(Image.fromarray((fig * 255).astype(np.uint8)).resize(size, Image.BOX)) / 255.0
+    premul = rgb * fig[..., None]
+    col = np.array(Image.fromarray(premul.astype(np.uint8)).resize(size, Image.BOX)).astype(float)
+    col = np.where(alpha[..., None] > 0.01, col / np.maximum(alpha[..., None], 1e-3), 0).clip(0, 255)
+    solid = alpha > 0.45
+    pal = Image.fromarray(col.astype(np.uint8)).quantize(colours, method=Image.FASTOCTREE, dither=Image.NONE).convert('RGB')
+    out = np.dstack([np.array(pal), solid * 255]).astype(np.uint8)
+    edge = solid & ~nd.binary_erosion(solid)          # a dark outline on the silhouette's edge
+    out[edge, :3] = (out[edge, :3] * 0.35).astype(np.uint8)
+    fy = np.flatnonzero(solid.any(1))[-1]            # feet: the lowest opaque row,
+    fx = int(np.nonzero(solid[:height // 6])[1].mean())  # under the head (a figure standing square to us)
+    return out, (int(fx), int(fy))
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('src'); ap.add_argument('kind')
+    ap.add_argument('--height', type=int, default=195)
+    ap.add_argument('--colours', type=int, default=56)
+    ap.add_argument('--robe', default=None)
+    ap.add_argument('--ground-pool', action='store_true')
+    ap.add_argument('--out', default='art/sprites')
+    a = ap.parse_args()
+    rgb = np.array(Image.open(a.src).convert('RGB')).astype(int)
+    robe = tuple(map(float, a.robe.split(':'))) if a.robe else None
+    img, (fx, fy) = to_sprite(rgb, silhouette(rgb, robe, a.ground_pool), a.height, a.colours)
+    Image.fromarray(img, 'RGBA').save(f'{a.out}/{a.kind}.png')
+    h, w = img.shape[:2]
+    idx = {f'{anim}/front/{i}': [0, 0, 0, w, h, -fx, -fy] for anim, n in (('idle', 4), ('walk', 8)) for i in range(n)}
+    meta = {'kind': a.kind, 'category': 'hero', 'anims': {'idle': {'frames': 4, 'views': ['front']}, 'walk': {'frames': 8, 'views': ['front']}},
+            'source': f'ported from a concept by tools/port_concept.py ({a.src.split("/")[-1]}); one still front frame, a look test'}
+    json.dump({'meta': meta, 'sheets': [f'{a.kind}.png'], 'idx': idx}, open(f'{a.out}/{a.kind}.json', 'w'))
+    print(a.kind, w, 'x', h, 'feet at', fx, fy)
+
+
+if __name__ == '__main__':
+    main()
