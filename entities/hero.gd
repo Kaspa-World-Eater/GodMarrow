@@ -19,6 +19,7 @@ var path_i := 0
 var repath := 0.0
 var goal := Vector2.ZERO
 var walking := false
+var lantern: LanternUnit = null    # the floating lantern (Mystic, Hemomancer)
 var lamp: PointLight2D
 var st: HeroStats
 var skills: SkillBook
@@ -104,9 +105,16 @@ func _shadow() -> void:
 		var a := i / 16.0 * TAU
 		pts.append(Vector2(cos(a) * 30.0, sin(a) * 12.0 + 6.0))
 	s.polygon = pts
-	s.color = Color(0, 0, 0, 0.35)
+	s.color = Color(0, 0, 0, 0.25)   # the contact shadow under the feet
 	add_child(s)
 	move_child(s, 0)
+	if zone and zone.shadow_layer:
+		zone.shadow_layer.add_child(SilShadow.new(spr, self, true))
+	# the Wickbound: the lantern floats beside him, its own small follower (entities/lantern_unit.gd)
+	if LanternUnit.WHO.has(cls) and zone:
+		lantern = LanternUnit.new()
+		zone.sorted.add_child(lantern)
+		lantern.setup(self)
 
 func _sync() -> void:
 	position = Iso.to_screen(tp)

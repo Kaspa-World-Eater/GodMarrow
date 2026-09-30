@@ -8,6 +8,7 @@ var cam: Camera2D
 var ambient: CanvasModulate
 var hud: Node
 var dark: DarkLayer
+var atmos: Atmos
 var args := {}
 var last_lantern := {}        # {zone, x, y}
 var remnant := {}             # {zone, x, y, gold}
@@ -39,6 +40,8 @@ func _ready() -> void:
 	add_child(ambient)
 	dark = DarkLayer.new()
 	add_child(dark)
+	atmos = Atmos.new()
+	add_child(atmos)
 	cam = Camera2D.new()
 	cam.position_smoothing_enabled = true
 	cam.position_smoothing_speed = 8.0
@@ -66,6 +69,42 @@ func _ready() -> void:
 			if hero.st.arc.is_card(id):
 				hero.st.arc.cards[id] = args["cards"]
 		hero.st.arc._changed()
+	if args.has("arena"):   # balance: harmless, tireless targets round the hero; print what each skill dealt
+		for m in get_tree().get_nodes_in_group("monsters"):
+			m.queue_free()
+		await get_tree().process_frame
+		var n := int(args["arena"])
+		var Br = load("res://entities/ai/brain.gd")
+		for i in n:
+			var ang := float(i) / n * TAU
+			var m = Br.spawn(zone, args.get("arena_kind", "husk"), hero.tp + Vector2(cos(ang), sin(ang)) * (3.0 + (i % 3)), 12, "normal", "arena", 1e7)
+			if m:
+				m.dmg = Vector2.ZERO
+				m.speed = 0.0
+		hero.st.hp = hero.st.life_max()
+		if "auto_stand" in hero.skills:
+			hero.skills.auto_stand = true
+			hero.skills.trace = true
+		hero.target = null
+		if "dmg_log" in hero.skills:
+			hero.skills.dmg_log.clear()
+		var T := float(args.get("arena_t", "20"))
+		await get_tree().create_timer(T).timeout
+		var dl: Dictionary = hero.skills.dmg_log if "dmg_log" in hero.skills else {}
+		var tot := 0.0
+		for k in dl:
+			if k != "_spent":
+				tot += float(dl[k])
+		print("BAL %s dps %.1f spent %.0f per_ess %.2f parts %s" % [args.get("autocast", "-"), tot / T, float(dl.get("_spent", 0.0)), tot / maxf(1.0, float(dl.get("_spent", 0.0))), str(dl)])
+		get_tree().quit()
+	if args.has("boardtest") and hero.st.arc:   # tests: lay a road to the right hand, take its trunk and a Major
+		var A = hero.st.arc
+		for l in A.N["i_quake"]["links"]:
+			if A.is_knot(l):
+				A.lay(l)
+		hero.st.arcana_points = 6
+		for c in ["i_quake", "i_rust", "a_anvil"]:
+			A.take_card(c, "u")
 	if args.has("panel"):
 		if args["panel"] in ["choir", "golem", "char", "skills", "inv", "journal", "board"]:
 			hud.toggle_panel(args["panel"])
@@ -115,10 +154,11 @@ func enter(zid: String, from: String) -> void:
 	cam.position = hero.position
 	cam.reset_smoothing()
 	dark.bind(zone, hero)
+	atmos.bind(zone, hero, dark)
 	if hud and hud.has_method("bind"):
 		hud.bind(hero, zone)
 		# a new pilgrim opens on the skill page to spend the first point
-		if fresh_pilgrim and hero.st.skill_points > 0 and not args.has("demo") and not args.has("panel") and not hud.is_open("skills"):
+		if fresh_pilgrim and hero.st.skill_points > 0 and not args.has("demo") and not args.has("panel") and not args.has("shot") and not hud.is_open("skills"):
 			hud.toggle_panel("skills")
 	if ResourceLoader.exists("res://world/objects.gd"):   # (world objects): town, objects, waystones, errands
 		load("res://world/objects.gd").attach(self, zone, hero)

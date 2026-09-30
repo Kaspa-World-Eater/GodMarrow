@@ -20,7 +20,16 @@ uniform vec3 dark_rgb = vec3(0.031, 0.051, 0.106);
 uniform float tint_a = 0.25;
 uniform float cell = 4.0;
 uniform vec3 amb = vec3(1.0);        // the land's shade by the hour (the web's ambient), lifted inside the pools
-uniform float amb_lift = 0.35;      // how much of the plain colour the open dark keeps          // dither cell in window px (one web art px)
+uniform float amb_lift = 0.35;
+// the land's grade (zz_grade55.js): saturation, contrast, brightness; cool from above and warm from below (soft light);
+// a thin tinted haze by day; the dithered vignette
+uniform float g_sat = 1.0;
+uniform float g_con = 1.0;
+uniform float g_bri = 1.0;
+uniform vec4 g_hi = vec4(0.0);      // rgb, alpha
+uniform vec4 g_lo = vec4(0.0);
+uniform vec4 g_haze = vec4(0.0);
+uniform vec2 view_px = vec2(1920.0, 1080.0);      // how much of the plain colour the open dark keeps          // dither cell in window px (one web art px)
 
 const float BAY[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
 
@@ -38,6 +47,34 @@ bool crosses(vec2 L, vec2 P, vec2 A, vec2 B) {
 	return t > 0.0 && t < 1.0 && u >= 0.0 && u <= 1.0;
 }
 
+float softlight_ch(float b, float s) {
+	return s < 0.5 ? b - (1.0 - 2.0 * s) * b * (1.0 - b) : b + (2.0 * s - 1.0) * ((b < 0.25 ? ((16.0 * b - 12.0) * b + 4.0) * b : sqrt(b)) - b);
+}
+
+vec3 grade(vec3 c, vec2 uv, vec2 fc) {
+	// the filter chain: saturate, contrast, brightness (CSS order)
+	float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
+	c = mix(vec3(l), c, g_sat);
+	c = (c - 0.5) * g_con + 0.5;
+	c *= g_bri;
+	c = clamp(c, 0.0, 1.0);
+	// cool from above, warm from below
+	float y = uv.y;
+	vec4 t = y < 0.55 ? mix(g_hi, vec4(g_hi.rgb, g_hi.a * 0.35), y / 0.55) : mix(vec4(g_hi.rgb, g_hi.a * 0.35), g_lo, (y - 0.55) / 0.45);
+	vec3 sl = vec3(softlight_ch(c.r, t.r), softlight_ch(c.g, t.g), softlight_ch(c.b, t.b));
+	c = mix(c, sl, t.a);
+	c = mix(c, g_haze.rgb, g_haze.a);
+	// the vignette: dithered steps toward the corners
+	vec2 d2 = (uv - 0.5) * 2.0;
+	float dv = sqrt(d2.x * d2.x * 0.8 + d2.y * d2.y * 1.1);
+	float v = max(0.0, (dv - 0.66) / 0.5) * 3.0;
+	ivec2 cc = ivec2(floor(fc / 4.0));
+	float th = (BAY[(cc.y & 3) * 4 + (cc.x & 3)] + 0.5) / 16.0;
+	float lv = min(3.0, floor(v) + ((v - floor(v) - 0.3) * 2.5 > th ? 1.0 : 0.0));
+	c = mix(c, vec3(0.02, 0.016, 0.035), lv * 60.0 / 255.0);
+	return c;
+}
+
 float overlay_ch(float b, float t) {
 	return b < 0.5 ? 2.0 * b * t : 1.0 - 2.0 * (1.0 - b) * (1.0 - t);
 }
@@ -46,6 +83,7 @@ void fragment() {
 	// the dark is reckoned once per art pixel (a cell), like the web's dark map, so its edges are pixel-art chunky
 	vec2 p = (floor(FRAGCOORD.xy / cell) + 0.5) * cell;
 	vec3 scene = texture(screen_tex, SCREEN_UV).rgb;
+	scene = grade(scene, SCREEN_UV, FRAGCOORD.xy);
 	float dark = 1.0;
 	float warm = 0.0;
 	vec3 wc = vec3(0.0);

@@ -186,6 +186,7 @@ var hold_force := ""
 var demo_at = null
 var auto_ids: Array = []
 var auto_on := false
+var auto_stand := false        # the balance arena: stand and cast, never walk in to strike
 var auto_i := 0
 var auto_t := 1.0
 var trace := false
@@ -673,6 +674,7 @@ func spend(id: String, amt: float = -1.0) -> bool:
 		say("Not enough %s." % hero.st.res_name(), 1.0)
 		return false
 	hero.st.res -= need
+	dmg_log["_spent"] = float(dmg_log.get("_spent", 0.0)) + need
 	if amt < 0.0 and not (id in OWN):
 		var n := 2 if cost(id) >= 40.0 else 1
 		for i in n:
@@ -2736,7 +2738,7 @@ func _autocast(dt: float) -> void:
 	auto_t -= dt
 	# go to the nearest creature the hero can see (the demo's own pick may sit behind rocks)
 	var seen = Combat.nearest_monster(zone, hero.tp, 40.0, true)
-	if seen != null and hold_force == "":
+	if seen != null and hold_force == "" and not auto_stand:
 		hero.target = seen
 	var m = Combat.nearest_monster(zone, hero.tp, 9.0, true)
 	if hold_force != "":

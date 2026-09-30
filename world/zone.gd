@@ -18,6 +18,7 @@ var h := 0
 var types := PackedByteArray()
 var solid := PackedByteArray()
 var astar := AStarGrid2D.new()
+var shadow_layer: Node2D
 var sorted: Node2D           # the y-sorted layer: everything that stands up
 var floor_layer: Node2D      # ground decals, scatter, corpses' blood
 var objects: Array = []
@@ -75,6 +76,9 @@ func load_zone(zid: String, zseed: int) -> void:
 	floor_layer = Node2D.new()
 	floor_layer.z_index = -50
 	add_child(floor_layer)
+	shadow_layer = Node2D.new()      # figures' shadows: over the ground and its flat pieces, under everything standing
+	shadow_layer.z_index = -20
+	add_child(shadow_layer)
 	sorted = Node2D.new()
 	sorted.y_sort_enabled = true
 	add_child(sorted)

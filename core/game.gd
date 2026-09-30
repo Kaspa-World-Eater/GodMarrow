@@ -50,6 +50,7 @@ func day_k() -> float:
 var _stop := 0.0
 ## screen shake (checklist 1): heavy blows, finishers and slams; Settings.screen_shake turns it off. main.gd reads shake_amt.
 var shake_amt := 0.0
+var wind := 0.5              # the one shared gust (world/atmos.gd): mist, leaves, dust, grass and flames answer to it
 func shake(px: float) -> void:
 	if Settings.screen_shake:
 		shake_amt = maxf(shake_amt, px)

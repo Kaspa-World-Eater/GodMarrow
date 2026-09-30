@@ -133,9 +133,12 @@ func _shadow() -> void:
 		var a := i / 16.0 * TAU
 		pts.append(Vector2(cos(a) * rw, sin(a) * rw * 0.4 + 6.0))
 	shadow.polygon = pts
-	shadow.color = Color(0, 0, 0, 0.3)
+	shadow.color = Color(0, 0, 0, 0.22)   # the contact shadow under the feet
 	add_child(shadow)
 	move_child(shadow, 0)
+	# the silhouette the hero's lantern (or the sun) throws on the ground (entities/sil_shadow.gd)
+	if zone.shadow_layer:
+		zone.shadow_layer.add_child(SilShadow.new(spr, self, false))
 
 # ------------------------------------------------------------------ numbers the brain and skills use
 func roll_damage() -> float:

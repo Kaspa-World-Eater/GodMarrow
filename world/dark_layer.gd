@@ -10,6 +10,24 @@ const RND := {2: 0.24, 3: 0.4, 9: 0.34}
 const SQ := {5: true, 7: true, 10: true}
 const DR := {"statue_saint": 0.32, "statue_angel": 0.34, "cage": 0.22, "cage2": 0.22, "tent": 0.75}
 const MAXH := 48
+## the lands' grades (zz_grade55.js): sat, con, bri; hi/lo soft-light tints [rgb, a]; hz the day haze
+const GR := {
+	"moor": {"sat": 1.22, "con": 1.1, "bri": 1.08, "hi": [Color8(60, 86, 112), 0.18], "lo": [Color8(176, 112, 56), 0.14], "hz": [Color8(96, 112, 128), 0.05]},
+	"wood": {"sat": 1.3, "con": 1.12, "bri": 1.04, "hi": [Color8(30, 96, 92), 0.2], "lo": [Color8(168, 118, 52), 0.14], "hz": [Color8(60, 110, 100), 0.06]},
+	"fen": {"sat": 1.24, "con": 1.1, "bri": 1.03, "hi": [Color8(50, 100, 76), 0.18], "lo": [Color8(116, 74, 126), 0.14], "hz": [Color8(80, 118, 98), 0.07]},
+	"under": {"sat": 1.1, "con": 1.12, "bri": 1.0, "hi": [Color8(40, 38, 78), 0.16], "lo": [Color8(156, 90, 42), 0.1]},
+	"night": {"sat": 1.16, "con": 1.14, "hi": [Color8(26, 46, 100), 0.18], "lo": [Color8(130, 76, 42), 0.08]},
+}
+
+static func land_of(z: Zone) -> String:
+	var t: String = str(z.d.get("theme", ""))
+	if t == "moor":
+		return "moor"
+	if t == "fen" or t.contains("shog") or t.contains("bog") or t.contains("mire"):
+		return "fen"
+	if t.contains("wood") or t.contains("root") or t.contains("fern"):
+		return "wood"
+	return "moor" if z.d.get("outdoor", false) else "under"
 const MAXO := 128
 
 var rect: ColorRect
@@ -24,6 +42,9 @@ var mood := 1.0               # the lantern's mood (zz_zz_cine76): shrinks and s
 var boss_m: Node = null
 var t := 0.0
 var enabled := true
+var last_holes: Array = []     # this frame's pools (window px), for light_at()
+var last_A := 0.8
+var last_xf := Transform2D.IDENTITY
 
 func _ready() -> void:
 	layer = 5
@@ -100,10 +121,15 @@ func _process(dt: float) -> void:
 		var lampk := 1.5 + hero.st.item("lrad") / 100.0 * 0.5
 		var R := minf(hero.light_radius(), 5.4 * lampk / 1.5) * ISO_R * 0.4 * (1.0 + 0.5 * dk) * mood
 		var foot := hp + Vector2(0.25, -0.1)
+		if hero.lantern and is_instance_valid(hero.lantern):
+			foot = hero.lantern.tp   # the pool lies under the lantern, wherever it floats
 		var rgb := Color8(120, 178, 255) if hero.cls == "animancer" else (Color8(255, 164, 84) if hero.cls == "hemomancer" else Color8(255, 170, 96))
 		var hi := holes.size()
 		holes.append([xf * Iso.to_screen(foot) + Vector2(0, sc * 4.0), R * 4.0 * sc, 2.1, 0.22, 0.26, 1.0, rgb, 1.0, 0.0, 0.18])
 		_occluders(occs, foot, R * 2.1 / ISO_R, hi, xf)
+		# the glow in the lantern's own glass
+		if hero.lantern and is_instance_valid(hero.lantern):
+			holes.append([xf * hero.lantern.glass_screen(), 15.0 * 4.0 * sc * mood, 1.5, 0.3, 0.0, 0.6, rgb, 0.0, 0.0, 0.1])
 	# ---- the world's flames (the nearest four throw shadows)
 	var near: Array = []
 	for s in statics:
@@ -154,6 +180,9 @@ func _process(dt: float) -> void:
 			if vis.grow(r2 * 1.8).has_point(pos2):
 				var fl := clampf(1.0 - pl.energy * 0.9, 0.0, 0.7)   # faint lights never clear the dark
 				holes.append([pos2, r2, 1.8, 0.12, 0.0, 0.45, pl.color, 0.0, fl])
+	last_holes = holes
+	last_A = A
+	last_xf = vp.get_screen_transform()
 	# ---- feed the shader
 	var hA := PackedVector4Array()
 	var hB := PackedVector4Array()
@@ -195,6 +224,22 @@ func _process(dt: float) -> void:
 	mat.set_shader_parameter("dark_rgb", Vector3(dark_rgb.r, dark_rgb.g, dark_rgb.b))
 	mat.set_shader_parameter("tint_a", 0.2 + 0.1 * (1.0 - dk))
 	mat.set_shader_parameter("cell", 4.0 * sc)
+	# the grade, eased toward the night's as the day goes
+	var land := land_of(zone)
+	var g: Dictionary = GR[land]
+	var n := (1.0 - dk) if outdoor else 0.0
+	var N: Dictionary = GR["night"]
+	var hi: Color = (g["hi"][0] as Color).lerp(N["hi"][0], n)
+	var lo: Color = (g["lo"][0] as Color).lerp(N["lo"][0], n)
+	mat.set_shader_parameter("g_sat", lerpf(g["sat"], N["sat"], n))
+	mat.set_shader_parameter("g_con", lerpf(g["con"], N["con"], n))
+	mat.set_shader_parameter("g_bri", g.get("bri", 1.0))
+	mat.set_shader_parameter("g_hi", Vector4(hi.r, hi.g, hi.b, lerpf(g["hi"][1], N["hi"][1], n)))
+	mat.set_shader_parameter("g_lo", Vector4(lo.r, lo.g, lo.b, lerpf(g["lo"][1], N["lo"][1], n)))
+	var hz: Array = g.get("hz", [Color.BLACK, 0.0])
+	var dusk := outdoor and Game.hour_name() == "dusk"
+	var hzc: Color = Color8(90, 88, 110) if dusk else hz[0]
+	mat.set_shader_parameter("g_haze", Vector4(hzc.r, hzc.g, hzc.b, 0.1 if dusk else float(hz[1]) * dk))
 	var am := zone.ambient_at(Game.phase())
 	mat.set_shader_parameter("amb", Vector3(am.r, am.g, am.b))
 
@@ -258,3 +303,24 @@ func _occluders(out: Array, l: Vector2, rw: float, hole_i: int, xf: Transform2D)
 		var a3: Vector2 = xf * Iso.to_screen(l + Vector2(cos(th3 - al2), sin(th3 - al2)) * tl2)
 		var b3: Vector2 = xf * Iso.to_screen(l + Vector2(cos(th3 + al2), sin(th3 + al2)) * tl2)
 		out.append([Vector4(a3.x, a3.y, b3.x, b3.y), float(hole_i)])
+
+
+## how lit a point of the viewport is (0 = the open dark, 1 = a pool's heart; by day the open dark is lighter), and the
+## colour of the light there (for mist, dust, leaves: world/atmos.gd). Occluders are not tested (cheap).
+func light_at(vp_pt: Vector2) -> Array:
+	var p: Vector2 = last_xf * vp_pt
+	var dark := 1.0
+	var col := Color(0.62, 0.66, 0.78)
+	for h in last_holes:
+		var c: Vector2 = h[0]
+		var r: float = h[1]
+		var d := Vector2((p.x - c.x) / r, (p.y - c.y) / (r * 0.56)).length()
+		var far: float = h[2]
+		if d >= far:
+			continue
+		var v := 0.0 if d < float(h[3]) else (0.64 * clampf((d - float(h[3])) / (1.0 - float(h[3])), 0.0, 1.0) if d < 1.0 else 0.64 + 0.36 * pow((d - 1.0) / (far - 1.0), 0.6))
+		if v < dark:
+			dark = v
+			col = (h[6] as Color)
+	var lum := 1.0 - last_A * dark
+	return [lum, col.lerp(Color(0.62, 0.66, 0.78), dark)]
