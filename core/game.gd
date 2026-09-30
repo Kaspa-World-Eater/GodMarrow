@@ -9,6 +9,7 @@ var zone_seeds := {}       # zone id -> exported seed chosen for this run (maps 
 var visited := {}
 var skip_title := false      # a new pilgrim chosen on the title reloads the scene straight into play
 var force_new := false
+var load_cls := ""           # the order whose pilgrim to wake next (the title's order page); "" = the latest
 
 func new_run() -> void:
 	seed = randi()

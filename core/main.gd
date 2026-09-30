@@ -47,7 +47,8 @@ func _ready() -> void:
 	Game.skip_title = false
 	# Continue: the saved pilgrim, in a freshly rolled world, at the camp (--new starts over)
 	if not args.has("new") and not args.has("demo") and SaveIO.exists():
-		pending_load = SaveIO.read()
+		pending_load = SaveIO.read(Game.load_cls)
+		Game.load_cls = ""
 		if not pending_load.is_empty():
 			Game.cls = pending_load.get("cls", Game.cls)
 	ambient = CanvasModulate.new()

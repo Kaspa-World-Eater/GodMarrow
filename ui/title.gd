@@ -4,9 +4,11 @@ extends CanvasLayer
 ## fire on the flagstones and the five pilgrims of the orders standing round it, Diablo's campfire in the god's chapel.
 ## The fire lights them from its side and throws their shadows back across the floor; the candles gutter; the god's
 ## chin lets go a drop now and then. The words stand on the left, over the dark:
-##   Continue (when a pilgrim is saved) · A New Pilgrim · The Codex · Options · Those Who Lent Their Hands · Leave.
-## A New Pilgrim turns the fire into the choosing: hover a pilgrim and they step into the light; the Hollow Mystic can
-## walk, the other roads are not yet open. Continue lets the world go on; a new pilgrim reloads with Game.skip_title.
+##   Continue (the pilgrim walked most lately) · The Codex · Options · Those Who Lent Their Hands · Leave.
+## Hover a pilgrim at the fire and they step into the light; click one and their order's page opens over the dimmed
+## chapel: a large portrait (placeholders until the final paintings come), who they are in the Stranger's words, what
+## they draw on and their three ways, and that order's own pilgrim (one save per order: continue it, or begin anew).
+## The Reading (character creation) will follow "begin" once it is ported, with the god already chosen here.
 
 const U := preload("res://ui/uikit.gd")
 const SaveIO := preload("res://core/save.gd")
@@ -28,6 +30,19 @@ const PILGRIMS := [
 	["monk", "", "The Empty Hand", "Carries nothing. Strikes with that.", Vector2(1150, 1010), 1, false, "bowl"],
 ]
 const LANTERN_AT := Vector2(-80, -208)   # the Mystic's lantern glass, from her feet (screen px)
+## each order's page. Portraits are placeholders: the user's paintings, cut out (art/ui/portrait_*.png); "" = still to paint.
+const ORDER := {
+	"animancer": {"god": "Of the Soul, the Veiled Crone", "portrait": "portrait_mystic", "draws": "Essence, and a choir of wisps", "ways": "Mirror · Soul · Thread",
+		"text": "They listen at mirrors until something listens back. A Mystic keeps a few of the restless dead about her, wisps that dive at whatever comes near and grow back when spent, and ties the rest down with thread and needle. I walked a season beside one. She never once looked where she was going. The mirrors did that for her."},
+	"hemomancer": {"god": "Of the Flesh, the Bleeding Maiden", "portrait": "portrait_hemo", "draws": "Vitae; every working costs him life", "ways": "Brood · Blood · Flesh",
+		"text": "The Brotherhood of the Precious Wound pays for everything in blood, and their own first. What a Hemomancer opens, he keeps: a brood that crawls out of the cut, a golem of it, pools that drink what falls in them. They are gentle with strangers. I would still not sleep near one."},
+	"ossumancer": {"god": "Of the Bone, Old Upright", "portrait": "portrait_ossu", "draws": "Marrow", "ways": "Ossuary · Bone · Carapace",
+		"text": "The Pale Order counts the dead, and what they count stands up. An Ossuarch sends the bones of the fallen to walk ahead of him, wears the rest as plate, and throws the splinters. He does not bend. I once saw one carried home on a door, sitting upright, still counting."},
+	"miasmancer": {"god": "Of the Breath, the Myriad", "portrait": "", "draws": "Miasma, breathed in and given back", "ways": "Miasma · Distortion · Death",
+		"text": "The House of Eight Million keeps the small gods that ride the last breath out. A Keeper breathes in the spoiled air and gives it back as a violet haze, folds paper that walks, and reads Omens in what the breath leaves behind. She fights with a fan. Do not laugh at the fan."},
+	"monk": {"god": "Of the Hush", "portrait": "", "draws": "An hourglass: amber sand by day, black sand by night", "ways": "Radiance · Absence · Destroyer",
+		"text": "The Gilded Peak gave everything away, and the Empty Hand is what came down the stair after. He carries a lantern with a black flame and nothing else, and strikes with the sun or with its going. He did not ask my name. I think he would not have kept it."},
+}
 
 var main: Node
 var root: Control
@@ -39,7 +54,9 @@ var figs: Array = []               # {spr, holder, shadow, base, step}
 var rows: Array = []
 var hover := -1
 var fig_hover := -1
-var mode := "main"                 # main | choose | credits
+var mode := "main"                 # main | order | credits
+var order_i := -1                  # the order whose page is open
+var portraits := {}
 var confirm_new := false
 var t := 0.0
 var leaving := -1.0
@@ -140,20 +157,33 @@ func _build() -> void:
 	rows.clear()
 	match mode:
 		"main":
-			if SaveIO.exists():
-				rows.append(["Continue", "continue"])
-				rows.append(["Forget the old pilgrim and begin?" if confirm_new else "A New Pilgrim", "new"])
-			else:
-				rows.append(["A New Pilgrim", "new"])
+			var last := SaveIO.latest()
+			if last != "":
+				rows.append(["Continue: " + _order_name(last), "continue"])
 			rows.append(["The Codex", "codex"])
 			rows.append(["Options", "options"])
 			rows.append(["Those Who Lent Their Hands", "credits"])
 			rows.append(["Leave", "leave"])
+		"order":
+			var p: Array = PILGRIMS[order_i]
+			if p[6]:
+				if SaveIO.exists(p[0]):
+					rows.append(["Continue this pilgrim", "order_continue"])
+					rows.append(["Forget them, and begin anew?" if confirm_new else "Begin anew", "order_new"])
+				else:
+					rows.append(["Begin", "order_new"])
+			rows.append(["Back", "back"])
 		_:
 			rows.append(["Back", "back"])
 
+func _order_name(kind: String) -> String:
+	for p in PILGRIMS:
+		if p[0] == kind:
+			return p[2]
+	return kind
+
 func _row_rect(i: int) -> Rect2:
-	var y0 := 520.0 if mode == "main" else 900.0
+	var y0 := 520.0 if mode == "main" else (820.0 if mode == "order" else 900.0)
 	return Rect2(150, y0 + i * 58.0, 640, 50)
 
 # ------------------------------------------------------------------ living
@@ -176,7 +206,7 @@ func _process(dt: float) -> void:
 	var fire_k := 0.86 + 0.14 * _flick(0.3)
 	for i in figs.size():
 		var f: Dictionary = figs[i]
-		var want := 1.0 if (mode == "choose" and fig_hover == i) else 0.0
+		var want := 1.0 if ((mode == "main" or mode == "order") and (fig_hover == i or order_i == i)) else 0.0
 		f["step"] = lerpf(f["step"], want, minf(1.0, dt * 5.0))
 		var base: Vector2 = f["base"]
 		var h: Node2D = f["holder"]
@@ -191,7 +221,7 @@ func _process(dt: float) -> void:
 		spr.position.y = -spr.texture.get_height() * K - breath * K
 		var d := h.position.distance_to(FIRE)
 		var lit: float = clampf(1.3 - d / 700.0, 0.5, 1.1) * fire_k + 0.3 * float(f["step"])
-		var dim := 0.5 if (mode == "choose" and fig_hover >= 0 and fig_hover != i) else 1.0
+		var dim := 0.55 if (mode == "main" and fig_hover >= 0 and fig_hover != i) else 1.0
 		spr.modulate = Color(lit * dim * 1.05, lit * dim * 0.92, lit * dim * 0.8)
 		var sh: Sprite2D = f["shadow"]
 		var away := h.position - FIRE
@@ -259,7 +289,7 @@ func _draw_small() -> void:
 		if what == "":
 			continue
 		var at: Vector2 = (figs[i]["holder"] as Node2D).position
-		var lit := 0.6 + 0.4 * _flick(i * 3.1) + (0.35 if (mode == "choose" and fig_hover == i) else 0.0)
+		var lit := 0.6 + 0.4 * _flick(i * 3.1) + (0.35 if (mode == "main" and fig_hover == i) else 0.0)
 		if what == "bowl":
 			fx.draw_rect(Rect2(_snap(at + Vector2(-48, -8)), Vector2(96, 12)), Color("#1b1008"))
 			fx.draw_rect(Rect2(_snap(at + Vector2(-28, -24)), Vector2(56, 16)), Color("#3d2512") * lit)
@@ -332,11 +362,10 @@ func _gui(ev: InputEvent) -> void:
 		if h != hover and h >= 0:
 			Sfx.play("page_close", 0.25, 1.4)
 		hover = h
-		var fh := _fig_at(ev.position) if mode == "choose" else -1
+		var fh := _fig_at(ev.position) if mode == "main" and h < 0 else -1
 		if fh >= 0 and fh != fig_hover:
 			Sfx.play("roll", 0.35, 1.2)
-		if fh >= 0 or mode != "choose":
-			fig_hover = fh
+		fig_hover = fh
 	elif ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
 		if mode == "credits":
 			_act("back")
@@ -345,10 +374,10 @@ func _gui(ev: InputEvent) -> void:
 			if _row_rect(i).has_point(ev.position):
 				_act(rows[i][1])
 				return
-		if mode == "choose":
+		if mode == "main":
 			var f := _fig_at(ev.position)
 			if f >= 0:
-				_choose(f)
+				_open_order(f)
 
 func _unhandled_key_input(ev: InputEvent) -> void:
 	if leaving >= 0.0 or not root.visible or not (ev is InputEventKey) or not ev.pressed:
@@ -356,38 +385,42 @@ func _unhandled_key_input(ev: InputEvent) -> void:
 	if ev.keycode == KEY_ESCAPE and mode != "main":
 		_act("back")
 	elif ev.keycode == KEY_ENTER or ev.keycode == KEY_SPACE:
-		if mode == "choose" and fig_hover >= 0:
-			_choose(fig_hover)
+		if mode == "main" and fig_hover >= 0 and hover < 0:
+			_open_order(fig_hover)
 		else:
 			_act(rows[maxi(0, hover)][1])
 	elif ev.keycode == KEY_DOWN:
 		hover = (hover + 1) % rows.size()
 	elif ev.keycode == KEY_UP:
 		hover = (hover - 1 + rows.size()) % rows.size()
-	elif mode == "choose" and (ev.keycode == KEY_LEFT or ev.keycode == KEY_RIGHT):
+	elif mode == "main" and (ev.keycode == KEY_LEFT or ev.keycode == KEY_RIGHT):
 		fig_hover = (maxi(fig_hover, 0) + (1 if ev.keycode == KEY_RIGHT else -1) + figs.size()) % figs.size()
 	get_viewport().set_input_as_handled()
 
 func _act(a: String) -> void:
 	match a:
 		"continue":
-			Sfx.play("kindle", 0.8)
-			leaving = 0.0
-		"new":
-			if SaveIO.exists() and not confirm_new:
+			_wake(SaveIO.latest())
+		"order_continue":
+			_wake(PILGRIMS[order_i][0])
+		"order_new":
+			var kind: String = PILGRIMS[order_i][0]
+			if SaveIO.exists(kind) and not confirm_new:
 				confirm_new = true
 				_build()
 				return
-			Sfx.play("page_open", 0.7)
-			mode = "choose"
-			fig_hover = 1
-			_build()
-		"mystic":
-			_choose(1)
+			Sfx.play("kindle", 0.9)
+			SaveIO.forget(kind)
+			Game.skip_title = true
+			Game.force_new = true
+			Game.cls = kind
+			get_tree().reload_current_scene()
 		"back":
+			if mode == "order":
+				Sfx.play("page_close", 0.6)
 			mode = "main"
 			confirm_new = false
-			fig_hover = -1
+			order_i = -1
 			_build()
 		"codex":
 			Sfx.play("page_open")
@@ -406,21 +439,74 @@ func _act(a: String) -> void:
 		_:
 			if a.begins_with("hover"):
 				fig_hover = int(a.substr(5))
+			elif a.begins_with("order"):
+				_open_order(int(a.substr(5)))
 
-func _choose(i: int) -> void:
-	var p: Array = PILGRIMS[i]
-	if not p[6]:
-		Sfx.play("break_iron", 0.25, 0.7)
+func _open_order(i: int) -> void:
+	Sfx.play("page_open", 0.8)
+	mode = "order"
+	order_i = i
+	confirm_new = false
+	fig_hover = -1
+	_build()
+	hover = 0
+
+## wake a saved pilgrim: the one already loaded behind the title simply walks on; another order's reloads the scene
+func _wake(kind: String) -> void:
+	if kind == "":
 		return
-	Sfx.play("kindle", 0.9)
+	Sfx.play("kindle", 0.8)
+	if kind == main.hero.cls:
+		leaving = 0.0
+		return
+	Game.load_cls = kind
 	Game.skip_title = true
-	Game.force_new = true
-	Game.cls = p[0]
-	if SaveIO.exists():
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(SaveIO.FILE))
 	get_tree().reload_current_scene()
 
+func _portrait(name: String) -> Texture2D:
+	if name == "":
+		return null
+	if not portraits.has(name):
+		portraits[name] = load("res://art/ui/%s.png" % name)
+	return portraits[name]
+
 # ------------------------------------------------------------------ the words
+
+## an order's page: over the dimmed chapel, a portrait on the right and the Stranger's words on the left
+func _draw_order(a: float) -> void:
+	var vs := root.get_viewport_rect().size
+	var p: Array = PILGRIMS[order_i]
+	var info: Dictionary = ORDER.get(p[0], {})
+	var sc := U.font("sc")
+	var fi := U.font("italic")
+	var fb := U.font("book")
+	# the portrait, and the dark it stands in
+	var pr := Rect2(1060, 110, 760, 900)
+	var tex := _portrait(String(info.get("portrait", "")))
+	var g := 0.9 + 0.1 * _flick(0.3)
+	if tex:
+		var sz: Vector2 = tex.get_size()
+		var k := minf(pr.size.y / sz.y, pr.size.x / sz.x)
+		var r := Rect2(pr.position + Vector2((pr.size.x - sz.x * k) / 2.0, pr.size.y - sz.y * k), sz * k)
+		root.draw_texture_rect(tex, r, false, Color(1.0 * g, 0.9 * g, 0.8 * g, a))
+	else:
+		root.draw_rect(pr.grow(-40), Color(0.05, 0.04, 0.05, 0.8 * a))
+		root.draw_rect(pr.grow(-40), Color(MARROW, 0.35 * a), false, 1.0)
+		root.draw_string(fi, pr.get_center() + Vector2(-250, 0), "[a portrait is still being painted]", HORIZONTAL_ALIGNMENT_CENTER, 500, 22, Color(ASH, a))
+	# the words
+	var x := 150.0
+	root.draw_string(sc, Vector2(x, 450), p[2], HORIZONTAL_ALIGNMENT_LEFT, -1, 50, Color(BONE, a))
+	root.draw_string(fi, Vector2(x + 2, 490), String(info.get("god", "")), HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(MARROW, a))
+	root.draw_multiline_string(fb, Vector2(x, 540), String(info.get("text", "")), HORIZONTAL_ALIGNMENT_LEFT, 780, 22, -1, Color(BONE_D, a))
+	root.draw_string(sc, Vector2(x, 730), "DRAWS ON", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color(ASH, a))
+	root.draw_string(fb, Vector2(x + 130, 730), String(info.get("draws", "")), HORIZONTAL_ALIGNMENT_LEFT, 650, 20, Color(BONE, a))
+	root.draw_string(sc, Vector2(x, 764), "THREE WAYS", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color(ASH, a))
+	root.draw_string(fb, Vector2(x + 130, 764), String(info.get("ways", "")), HORIZONTAL_ALIGNMENT_LEFT, 650, 20, Color(BONE, a))
+	if not p[6]:
+		root.draw_string(fi, Vector2(x, 800), "This road is not yet open.", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(ASH, a))
+	elif SaveIO.exists(p[0]):
+		var d := SaveIO.read(p[0])
+		root.draw_string(fi, Vector2(x, 800), "Your pilgrim of this order: level %d, carrying %d gold." % [int(d.get("level", 1)), int(d.get("gold", 0))], HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(MARROW, a))
 
 func _draw_ui() -> void:
 	var vs := root.get_viewport_rect().size
@@ -430,6 +516,8 @@ func _draw_ui() -> void:
 	for i in 30:
 		var k := float(i) / 30.0
 		root.draw_rect(Rect2(k * vs.x * 0.6, 0, vs.x * 0.6 / 30.0 + 1.0, vs.y), Color(0, 0, 0, 0.78 * pow(1.0 - k, 1.4)))
+	if mode == "order":
+		root.draw_rect(Rect2(Vector2.ZERO, vs), Color(0, 0, 0, 0.72 * a))
 	root.draw_rect(Rect2(0, 0, vs.x, 70), Color(0, 0, 0, 0.5))
 	root.draw_rect(Rect2(0, vs.y - 50, vs.x, 50), Color(0, 0, 0, 0.5))
 	var sc := U.font("sc")
@@ -458,17 +546,15 @@ func _draw_ui() -> void:
 				cy += 30.0
 		root.draw_string(fi, Vector2(150, cy + 40), "Click to go back.", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(ASH, a))
 	else:
-		if mode == "choose":
-			root.draw_string(sc, Vector2(150, 540), "WHO WALKS?", HORIZONTAL_ALIGNMENT_LEFT, -1, 30, Color(MARROW, a))
-			root.draw_string(fi, Vector2(150, 584), "Choose one of those at the fire.", HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(BONE_D, a))
+		if mode == "main":
+			root.draw_string(fi, Vector2(152, 486), "Or choose one of those at the fire.", HORIZONTAL_ALIGNMENT_LEFT, -1, 21, Color(ASH, a))
 			if fig_hover >= 0:
 				var p: Array = PILGRIMS[fig_hover]
-				root.draw_string(sc, Vector2(150, 680), p[2], HORIZONTAL_ALIGNMENT_LEFT, -1, 40, Color(BONE, a))
-				root.draw_string(fi, Vector2(150, 726), p[3], HORIZONTAL_ALIGNMENT_LEFT, 640, 23, Color(BONE_D, a))
-				var note := "Click to walk as this pilgrim." if p[6] else "This road is not yet open."
-				root.draw_string(fi, Vector2(150, 780), note, HORIZONTAL_ALIGNMENT_LEFT, 640, 20, Color(MARROW if p[6] else ASH, a))
-				var h: Node2D = figs[fig_hover]["holder"]
-				root.draw_string(sc, h.position + Vector2(-150, 44), p[2], HORIZONTAL_ALIGNMENT_CENTER, 300, 20, Color(BONE, 0.9 * a))
+				var hh: Node2D = figs[fig_hover]["holder"]
+				root.draw_string(sc, hh.position + Vector2(-160, 40), p[2], HORIZONTAL_ALIGNMENT_CENTER, 320, 22, Color(BONE, 0.95 * a))
+				root.draw_string(fi, hh.position + Vector2(-200, 70), p[3], HORIZONTAL_ALIGNMENT_CENTER, 400, 17, Color(BONE_D, 0.9 * a))
+		elif mode == "order":
+			_draw_order(a)
 		for i in rows.size():
 			var r := _row_rect(i)
 			var on := i == hover

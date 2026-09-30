@@ -5,11 +5,54 @@ extends RefCounted
 ## the return point. Not saved: the map (every start rolls a new world), creatures, things on the ground.
 ## Continue loads it into a freshly rolled world at the Ashen Moor camp. Load by path: load("res://core/save.gd").
 
-const FILE := "user://godmarrow.save"
+const FILE := "user://godmarrow.save"          # the old single slot (moved into its order's slot on first run)
 const VERSION := 1
+const ORDERS := ["animancer", "hemomancer", "ossumancer", "miasmancer", "monk"]
 
-static func exists() -> bool:
-	return FileAccess.file_exists(FILE)
+## one pilgrim kept per order (the title's fire opens each order's own; more slots per order can come later)
+static func path(cls: String) -> String:
+	return "user://godmarrow_%s.save" % cls
+
+static func _migrate() -> void:
+	if not FileAccess.file_exists(FILE):
+		return
+	var f := FileAccess.open(FILE, FileAccess.READ)
+	var d = f.get_var() if f else null
+	f = null
+	if d is Dictionary:
+		var cls := String(d.get("cls", "animancer"))
+		if not FileAccess.file_exists(path(cls)):
+			var o := FileAccess.open(path(cls), FileAccess.WRITE)
+			if o:
+				o.store_var(d)
+	DirAccess.rename_absolute(ProjectSettings.globalize_path(FILE), ProjectSettings.globalize_path(FILE + ".old"))
+
+## any order's pilgrim ("") or that order's
+static func exists(cls: String = "") -> bool:
+	_migrate()
+	if cls != "":
+		return FileAccess.file_exists(path(cls))
+	for c in ORDERS:
+		if FileAccess.file_exists(path(c)):
+			return true
+	return false
+
+## the order walked most lately
+static func latest() -> String:
+	_migrate()
+	var best := ""
+	var bt := -1
+	for c in ORDERS:
+		if FileAccess.file_exists(path(c)):
+			var m := int(FileAccess.get_modified_time(path(c)))
+			if m > bt:
+				bt = m
+				best = c
+	return best
+
+static func forget(cls: String) -> void:
+	if FileAccess.file_exists(path(cls)):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(path(cls)))
 
 static func write(main: Node) -> bool:
 	var hero = main.hero
@@ -42,16 +85,18 @@ static func write(main: Node) -> bool:
 		"last_lantern": main.last_lantern.duplicate(), "remnant": main.remnant.duplicate(),
 		"clock": Game.clock,
 	}
-	var f := FileAccess.open(FILE, FileAccess.WRITE)
+	var f := FileAccess.open(path(st.cls), FileAccess.WRITE)
 	if f == null:
 		return false
 	f.store_var(d)
 	return true
 
-static func read() -> Dictionary:
-	if not exists():
+static func read(cls: String = "") -> Dictionary:
+	if cls == "":
+		cls = latest()
+	if cls == "" or not exists(cls):
 		return {}
-	var f := FileAccess.open(FILE, FileAccess.READ)
+	var f := FileAccess.open(path(cls), FileAccess.READ)
 	if f == null:
 		return {}
 	var d = f.get_var()
