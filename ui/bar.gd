@@ -174,6 +174,11 @@ func tip() -> Array:
 		"orbL":
 			return [["Life", Color("#e05060")], ["%d / %d" % [ceili(st.hp), roundi(st.life_max())], U.TEXT]]
 		"orbR":
+			if st.cls == "monk" and "kR" in hud.hero.skills:
+				var sb = hud.hero.skills
+				return [["The Hourglass", U.cls_col(st.cls)], ["Amber sand %d%% · black sand %d%%" % [roundi(sb.frac(0) * 100.0), roundi(sb.frac(1) * 100.0)], U.TEXT],
+					["Radiance pours amber sand down, Absence black sand up.", U.MUTED], ["The fuller a bulb, the weaker its way. It runs back when you rest.", U.MUTED],
+					["Radiance at %d%% · Absence at %d%%" % [roundi(sb.sand(0) * 100.0), roundi(sb.sand(1) * 100.0)], U.GOLD_D]]
 			return [[st.res_name(), U.cls_col(st.cls)], ["%d / %d" % [ceili(st.res), roundi(st.res_max())], U.TEXT], ["Skills spend it. It seeps back over time.", U.MUTED]]
 		"skillL", "skillR":
 			var id: String = h.skills.left if hover == "skillL" else h.skills.right
@@ -215,7 +220,20 @@ func _process(dt: float) -> void:
 		ml.set_shader_parameter("fill", clampf(h.st.hp / maxf(1.0, h.st.life_max()), 0, 1))
 		ml.set_shader_parameter("t", t)
 		var mr: ShaderMaterial = glass_r.material
-		mr.set_shader_parameter("fill", clampf(h.st.res / maxf(1.0, h.st.res_max()), 0, 1))
+		if h.cls == "monk" and "kR" in h.skills:
+			# the Empty Hand's glass is an hourglass: amber sand below, black sand above
+			if mr.shader.resource_path != "res://ui/hourglass.gdshader":
+				mr = ShaderMaterial.new()
+				mr.shader = load("res://ui/hourglass.gdshader")
+				mr.set_shader_parameter("N", ORB_RAD * 2.0 * U.S)
+				glass_r.material = mr
+			var sb = h.skills
+			mr.set_shader_parameter("fR", sb.frac(0))
+			mr.set_shader_parameter("fA", sb.frac(1))
+			mr.set_shader_parameter("pour", sb.pour_tab if sb.time - sb.pour_t < 0.45 else -1)
+			mr.set_shader_parameter("run", sb.time - sb.cast_t >= 0.6)
+		else:
+			mr.set_shader_parameter("fill", clampf(h.st.res / maxf(1.0, h.st.res_max()), 0, 1))
 		mr.set_shader_parameter("t", t)
 	if not get_global_rect().has_point(hud.mouse):
 		hover = ""
@@ -339,7 +357,10 @@ func _poise(st: HeroStats, h: Hero) -> void:
 		U.micro(self, str(g.get("text", "")), GX, 260 - Y0, U.TEXT)
 	else:
 		# the resource and poise, read plainly
-		U.micro(self, "%s %d/%d" % [st.res_name(), ceili(st.res), roundi(st.res_max())], GX, 252 - Y0, U.cls_col(st.cls))
+		if st.cls == "monk" and "kR" in hud.hero.skills:
+			U.micro(self, "Amber %d%% Black %d%%" % [roundi(hud.hero.skills.frac(0) * 100.0), roundi(hud.hero.skills.frac(1) * 100.0)], GX, 252 - Y0, U.cls_col(st.cls))
+		else:
+			U.micro(self, "%s %d/%d" % [st.res_name(), ceili(st.res), roundi(st.res_max())], GX, 252 - Y0, U.cls_col(st.cls))
 		U.micro(self, "POISE %d" % floori(st.poise), GX, 260 - Y0, U.POISE if st.poise >= 16 else Color("#b0a040"))
 
 func _belt(st: HeroStats) -> void:

@@ -146,6 +146,9 @@ func _args() -> void:
 					auto_ids = Array(v.split(","))
 			"monktrace":
 				trace = true
+			"sand":   # tests: --sand=0.6,0.3 fills the bulbs (they run back as usual)
+				var fv := v.split(",")
+				set_meta("sand_test", [float(fv[0]), float(fv[1]) if fv.size() > 1 else 0.0])
 
 # ================================================================== levels, perks, the sky, the glass
 func K(id: String) -> int:
@@ -1653,6 +1656,13 @@ func tick(dt: float) -> void:
 	if zone != hero.zone:
 		_enter_zone()
 	var st = hero.st
+	if has_meta("sand_test"):
+		var sv: Array = get_meta("sand_test")
+		kR = sv[0] * bulb()
+		kA = sv[1] * bulb()
+		cast_t = time
+		pour_tab = 0 if fmod(time, 2.0) < 1.0 else 1
+		pour_t = time
 	# potions and finishing blows fill st.res from outside: that is sand running back
 	if last_res >= 0.0 and st.res > last_res + 0.01:
 		var gain: float = st.res - last_res
