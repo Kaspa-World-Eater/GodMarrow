@@ -18,8 +18,8 @@ run() {  # name, frames (arena runs quit on their own), args...
 for cls in animancer monk miasmancer; do
   run "order $cls" 100000 --zone=fen --seed=7 --new --cls=$cls --lvl=15 --learn=all:5 --autocast --arena=6 --arena_kind=hollow --arena_t=12
 done
-run "champions + deeds" 100000 --seed=7 --zone=fen --cls=monk --arena=4 --arena_live --arena_rank=champion --arena_t=10
-run "count sigils" 100000 --zone=fen --cls=monk --arena=4 --sigils --arena_t=5
+run "champions + deeds" 100000 --seed=7 --new --zone=fen --cls=monk --arena=4 --arena_kind=hollow --arena_live --arena_rank=champion --arena_t=10
+run "count sigils" 100000 --new --zone=fen --cls=monk --arena=4 --arena_kind=hollow --sigils --arena_t=5
 for p in skills inv char board journal; do
   run "panel $p" 240 --zone=moor --cls=animancer --panel=$p
 done

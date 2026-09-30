@@ -27,6 +27,7 @@ var title_t := 0.0
 var reading_open := false    # ui/reading.gd is up: a new pilgrim is being read before the walk
 var pending_load := {}        # a save waiting to be poured into the first hero (Continue)
 const SaveIO := preload("res://core/save.gd")
+const TestHooks := preload("res://core/test_hooks.gd")
 
 func _ready() -> void:
 	randomize()
@@ -89,78 +90,8 @@ func _ready() -> void:
 		hud = load("res://ui/hud.gd").new()
 		add_child(hud)
 	await enter(args.get("zone", "moor"), "")
-	if args.has("demo"):
-		_demo()
-	if args.has("panel"):   # captures: --panel=vendor|smith|stash|journal
-		await get_tree().create_timer(1.0).timeout
-		pass
-	if args.has("lvl"):
-		hero.st.level = int(args["lvl"])
-		hero.st.arcana_points = int(args.get("arcana", "3"))
-	if args.has("cards") and hero.st.arc:   # tests: --cards=u|r holds every card of the order that way
-		for id in hero.st.arc.N:
-			if hero.st.arc.is_card(id):
-				hero.st.arc.cards[id] = args["cards"]
-		hero.st.arc._changed()
-	if args.has("arena"):   # balance: harmless, tireless targets round the hero; print what each skill dealt
-		for m in get_tree().get_nodes_in_group("monsters"):
-			m.queue_free()
-		await get_tree().process_frame
-		var n := int(args["arena"])
-		var Br = load("res://entities/ai/brain.gd")
-		for i in n:
-			var ang := float(i) / n * TAU
-			var live := args.has("arena_live")   # real, hostile creatures (a fight test)
-			var m = Br.spawn(zone, args.get("arena_kind", "husk"), hero.tp + Vector2(cos(ang), sin(ang)) * (3.0 + (i % 3)), int(args.get("arena_lvl", "12")), String(args.get("arena_rank", "normal")), "arena", -1.0 if live else 1e7)
-			if m and live:
-				m.brain.wake(m)
-			elif m:
-				m.dmg = Vector2.ZERO
-				m.speed = 0.0
-		hero.st.hp = hero.st.life_max()
-		if args.has("sigils"):   # tests: the Ossuarch's count sigils over the arena's creatures
-			var kinds := ["open", "fewer", "weigh", "stair"]
-			var j := 0
-			for m in get_tree().get_nodes_in_group("monsters"):
-				var sg := CountSigil.on(m, kinds[j % 4])
-				sg.set_meta("demo", j * 2)
-				j += 1
-		if "auto_stand" in hero.skills:
-			hero.skills.auto_stand = true
-		if "trace" in hero.skills:
-			hero.skills.trace = true   # every order logs what each skill dealt
-		hero.target = null
-		if "dmg_log" in hero.skills:
-			hero.skills.dmg_log.clear()
-		var T := float(args.get("arena_t", "20"))
-		var deaths := [0, 0.0, 0]   # falls, life lost, kills
-		Bus.hero_died.connect(func():
-			deaths[0] += 1
-			print("FELL slain by ", hero.last_blow))
-		Bus.hero_hit.connect(func(a): deaths[1] += float(a))
-		Bus.monster_killed.connect(func(_m): deaths[2] += 1)
-		await get_tree().create_timer(T).timeout
-		var dl: Dictionary = hero.skills.dmg_log if "dmg_log" in hero.skills else {}
-		var tot := 0.0
-		for k in dl:
-			if k != "_spent":
-				tot += float(dl[k])
-		print("HERO %s lvl %d life %.0f armor %.0f res %.0f poise %.0f | now hp %.0f dead %s | creatures left %d | falls %d, life lost %.0f, kills %d" % [hero.cls, hero.st.level, hero.st.life_max(), hero.st.armor(), hero.st.res_max(), hero.st.poise_max(), hero.st.hp, str(hero.dead), get_tree().get_nodes_in_group("monsters").filter(func(x): return not x.dead).size(), deaths[0], deaths[1], deaths[2]])
-		print("BAL %s dps %.1f spent %.0f per_ess %.2f parts %s" % [args.get("autocast", "-"), tot / T, float(dl.get("_spent", 0.0)), tot / maxf(1.0, float(dl.get("_spent", 0.0))), str(dl)])
-		get_tree().quit()
-	if args.has("boardtest") and hero.st.arc:   # tests: lay a road to the right hand, take its trunk and a Major
-		var A = hero.st.arc
-		for l in A.N["i_quake"]["links"]:
-			if A.is_knot(l):
-				A.lay(l)
-		hero.st.arcana_points = 6
-		for c in ["i_quake", "i_rust", "a_anvil"]:
-			A.take_card(c, "u")
-	if args.has("panel"):
-		if args["panel"] in ["choir", "golem", "char", "skills", "inv", "journal", "board"]:
-			hud.toggle_panel(args["panel"])
-		else:
-			Bus.panel_requested.emit(args["panel"], "Maren the Gravekeeper" if args["panel"] == "vendor" else "Brannoc of the Nail")
+	await TestHooks.run(self)   # test and capture hooks (core/test_hooks.gd); nothing without their args
+
 
 func enter(zid: String, from: String) -> void:
 	travelling = true
@@ -491,15 +422,3 @@ func _on_hero_died() -> void:
 	var W2 := _world_ui()
 	if W2:
 		W2.whisper("", RETURN_LINES[_last_ret], 5.0)
-
-# ------------------------------------------------------------------ --demo: fight the nearest creatures, for captures
-func _demo() -> void:
-	for i in 300:
-		await get_tree().create_timer(0.3).timeout
-		if hero == null or hero.dead:
-			continue
-		var m := Combat.nearest_monster(zone, hero.tp, 40.0)
-		if m:
-			hero.target = m
-		if args.has("trace") and i % 5 == 0:
-			print("T ", i, " hero ", hero.tp, " act ", hero.act, " walk ", hero.walking, " path ", hero.path.size(), " tgt ", (m.kind + " " + str(m.tp)) if m else "none", " hp ", hero.st.hp, " mons ", get_tree().get_nodes_in_group("monsters").size(), " thp ", (m.hp if m else -1.0), " missiles ", zone.sorted.get_children().filter(func(c): return c is Missile).size())
