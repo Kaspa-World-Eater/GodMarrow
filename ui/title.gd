@@ -21,6 +21,21 @@ var confirm_new := false
 var t := 0.0
 var leaving := -1.0          # >= 0: fading out into play
 var codex: Control
+var credits := false
+var rows_hidden := false
+const CREDITS := [
+	["Sounds", ""],
+	["Impact Sounds and RPG Audio", "Kenney (kenney.nl), CC0"],
+	["Fire Crackling", "AntumDeluge, CC0 (OpenGameArt)"],
+	["Rain (loopable)", "Ylmir, CC0 (OpenGameArt)"],
+	["Loopable Dungeon Ambience", "JaggedStone, CC0 (OpenGameArt)"],
+	["Wind", "Jonathan Shaw (InspectorJ), freesound.org, CC-BY 3.0; looped by AntumDeluge"],
+	["Letters", ""],
+	["IM Fell English", "Igino Marini, SIL Open Font License"],
+	["Silkscreen", "Jason Kottke, SIL Open Font License"],
+	["Engine", ""],
+	["Godot Engine", "Juan Linietsky, Ariel Manzur and contributors, MIT"],
+]
 
 func _init(m: Node) -> void:
 	main = m
@@ -49,6 +64,7 @@ func _build() -> void:
 		rows.append(["Begin", "new"])
 	rows.append(["The Codex", "codex"])
 	rows.append(["Options", "options"])
+	rows.append(["Those Who Lent Their Hands", "credits"])
 	rows.append(["Leave", "leave"])
 
 func _row_rect(i: int) -> Rect2:
@@ -72,6 +88,11 @@ func _process(dt: float) -> void:
 
 func _gui(ev: InputEvent) -> void:
 	if leaving >= 0.0:
+		return
+	if credits:
+		if ev is InputEventMouseButton and ev.pressed:
+			credits = false
+			Sfx.play("page_close", 0.6)
 		return
 	if ev is InputEventMouseMotion:
 		var h := -1
@@ -122,6 +143,9 @@ func _act(a: String) -> void:
 			if main.hud and main.hud.pause:
 				main.hud.pause.open()
 				main.hud.pause.page = "options"
+		"credits":
+			Sfx.play("page_open", 0.7)
+			credits = true
 		"leave":
 			get_tree().quit()
 
@@ -149,8 +173,22 @@ func _draw() -> void:
 		x += sc.get_string_size(c, HORIZONTAL_ALIGNMENT_LEFT, -1, 112).x + 14.0
 	root.draw_line(Vector2(152, y + 28), Vector2(152 + 90, y + 28), Color(MARROW, 0.8 * a), 2.0)
 	root.draw_string(fi, Vector2(152, y + 72), "Put your hand flat on the ground. It is still warm.", HORIZONTAL_ALIGNMENT_LEFT, -1, 27, Color(BONE_D, a))
+	if credits:
+		var fb := U.font("book")
+		var cy := vs.y * 0.5 - 20.0
+		for e in CREDITS:
+			if e[1] == "":
+				cy += 14.0
+				root.draw_string(sc, Vector2(150, cy + 26), String(e[0]).to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(MARROW, a))
+				cy += 34.0
+			else:
+				root.draw_string(fb, Vector2(150, cy + 22), e[0], HORIZONTAL_ALIGNMENT_LEFT, 330, 21, Color(BONE, a))
+				root.draw_string(fi, Vector2(490, cy + 22), e[1], HORIZONTAL_ALIGNMENT_LEFT, 900, 19, Color(BONE_D, a))
+				cy += 30.0
+		root.draw_string(fi, Vector2(150, cy + 40), "Click to go back.", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(ASH, a))
+		rows_hidden = true
 	# the lines
-	for i in rows.size():
+	for i in (0 if credits else rows.size()):
 		var r := _row_rect(i)
 		var on := i == hover
 		var col := BONE if on else BONE_D
