@@ -217,6 +217,46 @@ func _draw_all() -> void:
 		canvas.draw_rect(Rect2(p4, Vector2(2, 2) * WPX), Color(0.9, 0.96, 0.93, 0.95 * f4 * b))
 		canvas.draw_rect(Rect2(p4 + Vector2(-WPX, 0), Vector2(WPX, 2 * WPX)), Color(0.9, 0.96, 0.93, 0.5 * f4 * b))
 		canvas.draw_rect(Rect2(p4 + Vector2(2 * WPX, 0), Vector2(WPX, 2 * WPX)), Color(0.9, 0.96, 0.93, 0.5 * f4 * b))
+	# eye-shine (zz_zz_cine76.js): beyond the pool, what watches you shows as two points catching the lantern
+	var night := (1.0 - dk) if outdoor else 1.0
+	if night >= 0.35 and not hero.dead:
+		var F: Vector2 = hero.lantern.tp if hero.lantern and is_instance_valid(hero.lantern) else hero.tp
+		var R: float = hero.light_radius() * 0.55
+		var lc: Color = Color8(255, 214, 170)
+		var ecol := Color(minf(1.0, lc.r * 0.6 + 0.43), minf(1.0, lc.g * 0.6 + 0.39), minf(1.0, lc.b * 0.5 + 0.31))
+		for m in hero.get_tree().get_nodes_in_group("monsters"):
+			if m.dead or m.buried or m.flying or m.zone != zone:
+				continue
+			var dd: float = m.tp.distance_to(F)
+			if dd < R * 1.05 or dd > R * 3.2:
+				continue
+			var tx: float = (hero.tp.x - hero.tp.y) - (m.tp.x - m.tp.y)
+			if absf(tx) > 0.4 and signf(tx) != float(m.face):
+				continue
+			var e: Dictionary = m.get_meta("eye", {})
+			if e.is_empty():
+				e = {"blink": t + 2.0 + randf() * 4.0, "s": randf() * TAU, "on": randf() < 0.8}
+				m.set_meta("eye", e)
+			if not e["on"]:
+				continue
+			if t > e["blink"]:
+				if t > e["blink"] + 0.14:
+					e["blink"] = t + 2.5 + randf() * 5.0
+				continue
+			var hunting: bool = m.brain != null and m.brain.state in ["chase", "wind", "strike"]
+			var fade := minf(1.0, (dd - R * 1.05) / (R * 0.4)) * minf(1.0, (R * 3.2 - dd) / (R * 0.8))
+			var ea := (0.85 if hunting else 0.45) * fade * night * (0.85 + 0.15 * sin(t * 3.0 + e["s"]))
+			if ea < 0.05 or m.spr == null or m.spr.texture == null:
+				continue
+			var sz: Vector2 = m.spr.texture.get_size()
+			var top: Vector2 = xf * (m.global_position + m.spr.offset)
+			var cx := top.x + sz.x / 2.0 + float(m.face) * maxf(4.0, sz.x * 0.08)
+			var cy := top.y + sz.y * 0.2
+			var gap := 12.0 if sz.x > 136.0 else 8.0
+			var ec := ecol
+			ec.a = ea
+			canvas.draw_rect(Rect2(Vector2(cx - gap, cy).snapped(Vector2(WPX, WPX)), Vector2(WPX, WPX)), ec)
+			canvas.draw_rect(Rect2(Vector2(cx + gap - WPX, cy).snapped(Vector2(WPX, WPX)), Vector2(WPX, WPX)), ec)
 	# 4. leaves: two-pixel flakes that flip as they tumble, lit by what they pass through
 	var LEAF := [[Color("#6e3a1c"), Color("#9a5a2a")], [Color("#5a5a2a"), Color("#7c7a3a")], [Color("#3e2a1c"), Color("#5e4630")]]
 	for l in leaves:

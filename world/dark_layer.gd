@@ -38,6 +38,8 @@ var statics: Array = []        # [{t (tile), r (world px), core, far, w, rgb, ki
 var round_things: Array = []   # [[tile, radius yd]] camp things that throw shadows
 var extra_lights: Array = []   # PointLight2D nodes found in the zone
 var scan_t := 0.0
+var flash_next := 0.0          # the far flash (zz_zz_cine76.js): rare, at night, on open ground, never in town
+var flash_t0 := -9.0
 var mood := 1.0               # the lantern's mood (zz_zz_cine76): shrinks and stutters when the wound is deep, gutters in a boss fight
 var boss_m: Node = null
 var t := 0.0
@@ -108,6 +110,23 @@ func _process(dt: float) -> void:
 	var outdoor: bool = zone.d.get("outdoor", false)
 	var dk := Game.day_k() if outdoor else 0.0
 	var A := (0.82 - 0.5 * dk * dk) if outdoor else 0.84
+	# the far flash: two flickers, a quick one, a gap, a longer one fading; the land stands up out of the dark
+	var nk := clampf((1.0 - dk - 0.4) / 0.6, 0.0, 1.0) if outdoor else 0.0
+	var fv := 0.0
+	if nk > 0.0 and not load("res://world/quests.gd").is_town(zone.id):
+		if flash_next <= 0.0:
+			flash_next = t + randf_range(30.0, 70.0)
+		if t > flash_next and (boss_m == null or not is_instance_valid(boss_m)):
+			flash_t0 = t
+			flash_next = t + randf_range(55.0, 125.0)
+		var fa := t - flash_t0
+		if fa >= 0.0 and fa <= 0.9:
+			var f1 := 0.7 if fa < 0.07 else 0.0
+			var f2 := pow(1.0 - (fa - 0.16) / 0.74, 2.2) if fa > 0.16 else 0.0
+			fv = maxf(f1, f2) * nk
+	else:
+		flash_next = maxf(flash_next, t + 20.0)
+	A *= 1.0 - 0.6 * fv
 	var dark_rgb := Color8(8, 13, 27) if outdoor else Color8(8, 9, 20)
 	var vp := get_viewport()
 	var xf := vp.get_screen_transform() * vp.get_canvas_transform()
