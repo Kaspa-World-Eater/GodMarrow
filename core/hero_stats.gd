@@ -110,7 +110,14 @@ func res_name() -> String:
 	return {"animancer": "Essence", "ossumancer": "Marrow", "hemomancer": "Vitae", "miasmancer": "Miasma", "monk": "Sand"}.get(cls, "Essence")
 
 func armor() -> float:
-	return e_con() / 2.0 + (inv.armor() if inv else 0.0) + item("armor") + W("armor")
+	return e_con() / 2.0 + (inv.armor() if inv else 0.0) + item("armor") + W("armor") + empty_robe()
+
+## the Empty Hand carries nothing: while nothing covers his body, the nothing is armour (10 + 1.5 a level). Put on a
+## robe and it is only a robe. (G1 balance: he walked in close with half the Mystic's armour and no ward.)
+func empty_robe() -> float:
+	if cls != "monk" or inv == null or inv.equip.get("body") != null:
+		return 0.0
+	return 10.0 + 1.5 * level
 
 func poise_max() -> float:
 	return roundf(28.0 + 1.4 * e_con() + 0.08 * e_vit() + 0.25 * (inv.armor() if inv else 0.0) + W("poise") + float(fate.get("stam", 0.0)))
