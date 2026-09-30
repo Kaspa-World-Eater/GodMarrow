@@ -1,0 +1,29 @@
+{
+  "name": "The Ossuarch, front view",
+  "source": "/tmp/ossart/src.png",
+  "note": "Joints are pixels of the source concept (the user's Midjourney concept _2 of set 009202c4, 928x1232). Screen-left is his right side.",
+  "cut": {"robe": [0.58, 0.92], "ground_pool": true},
+  "height": 195,
+  "bones": {
+    "pelvis":   {"parent": null,       "a": [460, 640], "b": [460, 600], "z": 3},
+    "spine":    {"parent": "pelvis",   "a": [460, 600], "b": [460, 420], "z": 3},
+    "chest":    {"parent": "spine",    "a": [460, 420], "b": [465, 300], "z": 3},
+    "head":     {"parent": "chest",    "a": [465, 300], "b": [465, 200], "z": 6},
+    "plume":    {"parent": "head",     "a": [465, 200], "b": [450, 40],  "z": 6},
+    "arm_r_up": {"parent": "chest",    "a": [330, 350], "b": [275, 560], "z": 5},
+    "arm_r_lo": {"parent": "arm_r_up", "a": [275, 560], "b": [280, 720], "z": 5},
+    "arm_l_up": {"parent": "chest",    "a": [590, 350], "b": [630, 580], "z": 5},
+    "arm_l_lo": {"parent": "arm_l_up", "a": [630, 580], "b": [665, 700], "z": 5},
+    "skirt":    {"parent": "pelvis",   "a": [460, 640], "b": [470, 960], "z": 2},
+    "leg_r_up": {"parent": "pelvis",   "a": [410, 760], "b": [395, 880], "z": 1},
+    "leg_r_lo": {"parent": "leg_r_up", "a": [395, 880], "b": [355, 1130], "z": 1},
+    "foot_r":   {"parent": "leg_r_lo", "a": [355, 1130], "b": [350, 1180], "z": 1},
+    "leg_l_up": {"parent": "pelvis",   "a": [560, 760], "b": [590, 870], "z": 1},
+    "leg_l_lo": {"parent": "leg_l_up", "a": [590, 870], "b": [600, 1120], "z": 1},
+    "foot_l":   {"parent": "leg_l_lo", "a": [600, 1120], "b": [650, 1170], "z": 1},
+    "cloak_r1": {"parent": "chest",    "a": [320, 420], "b": [250, 760], "z": 0},
+    "cloak_r2": {"parent": "cloak_r1", "a": [250, 760], "b": [185, 1100], "z": 0},
+    "cloak_l1": {"parent": "chest",    "a": [615, 560], "b": [640, 800], "z": 0},
+    "cloak_l2": {"parent": "cloak_l1", "a": [640, 800], "b": [675, 1070], "z": 0}
+  }
+}
