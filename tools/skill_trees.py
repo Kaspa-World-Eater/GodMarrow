@@ -175,7 +175,7 @@ WORDS = [  # nothing of a brood, no animal words: the minions are the little hoo
     (r'leeches', 'clots'), (r'leech', 'clot'), (r'barbed suckers', 'Barbed Thorns'), (r'suckers', 'thorns'),
     (r'coiling grip', 'Tightening Crown'), (r'torn-off tentacles constrict', 'torn-off thorns hold'),
     (r'tentacles', 'thorns'), (r'tentacle', 'thorn'), (r'gills', 'wounds'),
-    (r'a whole clutch', 'a whole crowd'), (r'golem', 'Martyr'), (r'bite harder', 'strike harder'), (r'harder-biting', 'harder-striking'), (r'bites', 'blows'), (r'bite', 'strike'),
+    (r'mutations', 'penances'), (r'mutation', 'penance'), (r'a whole clutch', 'a whole crowd'), (r'golem', 'Martyr'), (r'bite harder', 'strike harder'), (r'harder-biting', 'harder-striking'), (r'bites', 'blows'), (r'bite', 'strike'),
     (r'rabid', 'fevered'), (r'spider legs', 'Long Stride'), (r'chitin', 'scar'), (r'glowing', 'swollen'),
     (r'flesh golem', 'Sewn Martyr'), (r'rabid charge', 'Procession'), (r'hivemind', 'Confraternity'),
     (r'assimilate', 'Last Rites'), (r'flesh spawn', 'Lesser Martyr'), (r'crawling skin', 'Crawling Skin'),

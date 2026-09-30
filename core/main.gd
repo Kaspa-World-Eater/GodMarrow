@@ -116,6 +116,13 @@ func _ready() -> void:
 				m.dmg = Vector2.ZERO
 				m.speed = 0.0
 		hero.st.hp = hero.st.life_max()
+		if args.has("sigils"):   # tests: the Ossuarch's count sigils over the arena's creatures
+			var kinds := ["open", "fewer", "weigh", "stair"]
+			var j := 0
+			for m in get_tree().get_nodes_in_group("monsters"):
+				var sg := CountSigil.on(m, kinds[j % 4])
+				sg.set_meta("demo", j * 2)
+				j += 1
 		if "auto_stand" in hero.skills:
 			hero.skills.auto_stand = true
 		if "trace" in hero.skills:
