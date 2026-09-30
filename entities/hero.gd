@@ -61,6 +61,9 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 	var kind := c
 	if ResourceLoader.exists("res://art/sprites/%s_unclipped.json" % c):
 		kind = c + "_unclipped"
+	for a in OS.get_cmdline_user_args():   # --skin=ossuarch: a look test of another body on this order's moves
+		if a.begins_with("--skin=") and FileAccess.file_exists("res://art/sprites/%s.json" % a.substr(7)):
+			kind = a.substr(7)
 	spr = AnimSprite.new(Data.sprite_set(kind))
 	spr.view = "down"
 	add_child(spr)
