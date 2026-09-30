@@ -113,6 +113,8 @@ func _process(dt: float) -> void:
 	Game.wind = wind
 	if zone.ground_mat:
 		zone.ground_mat.set_shader_parameter("wind", wind)
+	for sm in zone.sway_mats.values():
+		sm.set_shader_parameter("wind", wind)
 	var c := hero.tp
 	# 1. mist banks round the camera, anchored to the ground
 	var want := 18 if _fenish() else (int(round(6 + 8 * night)) if outdoor else 8)

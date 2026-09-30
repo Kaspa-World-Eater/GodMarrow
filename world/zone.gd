@@ -298,6 +298,8 @@ func _sprites() -> void:
 		var oy := 0.0
 		var hr := 2.0
 		var key: String = s["key"]
+		if key.begins_with("p_crows"):
+			key = key.replace("p_crows", "p_offering")   # no animals in the world: the crow props become offerings
 		var set_name: String = s.get("set", "w55")
 		if set_name == "landmark":
 			tex = load("res://art/landmarks/%s.webp" % key) if ResourceLoader.exists("res://art/landmarks/%s.webp" % key) else null
@@ -334,6 +336,9 @@ func _sprites() -> void:
 		holder.position = Vector2(anchor.x, dep * Iso.HY)
 		var sp := Sprite2D.new()
 		sp.texture = tex
+		var sm := _sway_mat(key)
+		if sm:
+			sp.material = sm
 		sp.centered = false
 		sp.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		var sc := Iso.WPX / hr * float(s.get("scale", 1.0))
@@ -391,3 +396,24 @@ func ambient_at(phase: float) -> Color:
 			best = a
 	var c: Array = best["rgb"]
 	return Color8(int(c[0]), int(c[1]), int(c[2]))
+
+
+## the wind's materials (shaders/sway.gdshader): young trees lean a little, cloth and cobwebs more, chains swing
+var sway_mats := {}
+func _sway_mat(key: String) -> ShaderMaterial:
+	var kind := ""
+	if key.contains("_sapling") or key.contains("_young"):
+		kind = "tree"
+	elif key.begins_with("p_cloth") or key.begins_with("p_cobweb") or key.begins_with("p_banner"):
+		kind = "cloth"
+	elif key.begins_with("p_chains") or key.begins_with("p_wallchain") or key.begins_with("p_gibbet") or key.begins_with("p_cage"):
+		kind = "chain"
+	if kind == "":
+		return null
+	if not sway_mats.has(kind):
+		var m := ShaderMaterial.new()
+		m.shader = load("res://shaders/sway.gdshader")
+		m.set_shader_parameter("amp", {"tree": 5.0, "cloth": 9.0, "chain": 4.0}[kind])
+		m.set_shader_parameter("speed", {"tree": 1.1, "cloth": 2.2, "chain": 1.6}[kind])
+		sway_mats[kind] = m
+	return sway_mats[kind]
