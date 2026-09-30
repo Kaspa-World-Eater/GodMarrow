@@ -112,10 +112,11 @@ func res_name() -> String:
 func armor() -> float:
 	return e_con() / 2.0 + (inv.armor() if inv else 0.0) + item("armor") + W("armor") + empty_robe()
 
-## the Empty Hand carries nothing: while nothing covers his body, the nothing is armour (10 + 1.5 a level). Put on a
-## robe and it is only a robe. (G1 balance: he walked in close with half the Mystic's armour and no ward.)
+## the Empty Hand's bearing: blows find less of him than they aim at (10 + 1.5 armour a level), whatever he wears, so
+## he can still take what gear gives. (G1 balance: he fights close with half the Mystic's armour. At first this held
+## only while nothing covered his body; the user: that would cost him the gear's own gifts.)
 func empty_robe() -> float:
-	if cls != "monk" or inv == null or inv.equip.get("body") != null:
+	if cls != "monk":
 		return 0.0
 	return 10.0 + 1.5 * level
 
