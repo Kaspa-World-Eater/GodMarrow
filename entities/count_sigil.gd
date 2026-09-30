@@ -9,7 +9,7 @@ extends Node2D
 ## Use: CountSigil.on(monster, kind) returns the sigil (one per monster); sigil.count = n; sigil.close().
 ## Test: --arena=5 --sigils.
 
-const R := 34.0
+const R := 22.0
 var kind := "open"
 var count := 0
 var shown := 0.0          # the count as drawn, easing toward count
@@ -76,61 +76,42 @@ func _pt(i: int, rot: float) -> Vector2:
 	var a := -PI / 2.0 + i / 9.0 * TAU + rot
 	return Vector2(cos(a), sin(a)) * R
 
+## a strand of the figure: lit strands are the count, the rest wait as the faintest ghost of themselves
+func _strand(a: Vector2, b: Vector2, i: int, lit_c: Color, ghost: Color) -> void:
+	var f := clampf(shown - i, 0.0, 1.0)
+	draw_line(a, b, ghost, 1.0)
+	if f > 0.0:
+		draw_line(a, a.lerp(b, f), lit_c, 2.0)
+
 func _draw() -> void:
-	var breath := 0.78 + 0.12 * sin(t * 1.6)
-	var bob := Vector2(0, sin(t * 1.1) * 3.0)
-	var W := Color(0.92, 0.94, 0.97, 0.78 * breath)
-	var WB := Color(1.0, 1.0, 1.0, 0.85 * breath)
-	var FAINT := Color(0.85, 0.88, 0.95, 0.28 * breath)
+	var breath := 0.8 + 0.12 * sin(t * 1.6)
+	var bob := Vector2(0, sin(t * 1.1) * 2.0)
+	var W := Color(0.95, 0.97, 1.0, 0.95 * breath)
+	var GHOST := Color(0.85, 0.88, 0.95, 0.16 * breath)
 	var rot := t * 0.12
 	draw_set_transform(bob, 0.0, Vector2.ONE)
-	# the ring and its nine points
-	draw_arc(Vector2.ZERO, R + 5.0, 0.0, TAU, 48, FAINT, 1.0)
-	draw_arc(Vector2.ZERO, R, 0.0, TAU, 9 * 4, W, 1.2)
-	var n := int(floorf(shown + 0.001))
-	for i in 9:
-		var q := _pt(i, rot)
-		var lit := i < n
-		var s := 3.0 if lit else 2.0
-		draw_colored_polygon(PackedVector2Array([q + Vector2(0, -s), q + Vector2(s, 0), q + Vector2(0, s), q + Vector2(-s, 0)]), WB if lit else W)
-	# the curse's figure, drawn as far as the count has gone
-	var k := shown / 9.0
+	draw_arc(Vector2.ZERO, R + 3.0, 0.0, TAU, 40, Color(GHOST, 0.14 * breath), 1.0)
 	match kind:
-		"open":
-			for i in 9:   # the nine-pointed star {9/4}, a stroke per notch
-				var f := clampf(shown - i, 0.0, 1.0)
-				if f <= 0.0:
-					continue
-				var a := _pt(i * 4 % 9, rot)
-				var b := _pt((i + 1) * 4 % 9, rot)
-				draw_line(a, a.lerp(b, f), W, 1.2)
-		"fewer":
-			draw_line(Vector2(0, -R * 0.7), Vector2(0, R * 0.7), W, 1.4)
+		"open":   # the nine-pointed star {9/4}: a strand per notch
 			for i in 9:
-				var y := -R * 0.6 + i * R * 0.15
-				if i >= n:
-					draw_circle(Vector2(-R * 0.35 if i % 2 == 0 else R * 0.35, y), 1.4, FAINT)
-		"weigh":
-			var tilt := k * 0.5
-			var l := Vector2(-R * 0.6, 0).rotated(tilt)
-			var r := Vector2(R * 0.6, 0).rotated(tilt)
-			draw_line(Vector2(0, -R * 0.55), Vector2(0, R * 0.2), W, 1.2)
-			draw_line(l + Vector2(0, -R * 0.3), r + Vector2(0, -R * 0.3), W, 1.2)
-			draw_arc(l + Vector2(0, -R * 0.1), R * 0.2, 0.0, PI, 8, W, 1.0)
-			draw_arc(r + Vector2(0, -R * 0.1), R * 0.2, 0.0, PI, 8, W, 1.0)
-		"stair":
+				_strand(_pt(i * 4 % 9, rot), _pt((i + 1) * 4 % 9, rot), i, W, GHOST)
+		"fewer":  # nine spokes going out from one point alone
 			for i in 9:
-				var x0 := -R * 0.62 + i * R * 0.14
-				var y0 := -R * 0.5 + i * R * 0.12
-				var c := WB if i < n else FAINT
-				draw_line(Vector2(x0, y0), Vector2(x0 + R * 0.14, y0), c, 1.2)
-				draw_line(Vector2(x0 + R * 0.14, y0), Vector2(x0 + R * 0.14, y0 + R * 0.12), c, 1.2)
-	# the numeral at its heart
-	var txt := str(clampi(int(roundf(shown)), 0, 9))
-	var fs := 38
-	var sz := font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs)
-	draw_string(font, Vector2(-sz.x / 2.0, sz.y * 0.32), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, WB)
+				var a := -PI / 2.0 + i / 9.0 * TAU + rot
+				_strand(Vector2(cos(a), sin(a)) * R * 0.18, Vector2(cos(a), sin(a)) * R, i, W, GHOST)
+		"weigh":  # the beam tips as the strands of the pans fill
+			var tilt := clampf(shown / 9.0, 0.0, 1.0) * 0.45
+			_strand(Vector2(0, -R * 0.8), Vector2(0, R * 0.8), -1, W, GHOST)
+			for i in 9:
+				var side := -1.0 if i % 2 == 0 else 1.0
+				var y := -R * 0.45 + (i / 2) * R * 0.22 + side * tilt * R * 0.5
+				_strand(Vector2(side * R * 0.2, y), Vector2(side * R * 0.85, y + side * tilt * R * 0.35), i, W, GHOST)
+		"stair":  # nine steps going down
+			for i in 9:
+				var x0 := -R * 0.8 + i * R * 0.18
+				var y0 := -R * 0.7 + i * R * 0.16
+				_strand(Vector2(x0, y0), Vector2(x0 + R * 0.18, y0 + R * 0.16), i, W, GHOST)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	for m in motes:
-		var a: float = clampf(1.0 - m["t"] / m["life"], 0.0, 1.0)
-		draw_rect(Rect2(m["p"] + bob, Vector2(2, 2)), Color(0.9, 0.93, 1.0, 0.35 * a))
+		var al: float = clampf(1.0 - m["t"] / m["life"], 0.0, 1.0)
+		draw_rect(Rect2(m["p"] * 0.6 + bob, Vector2(2, 2)), Color(0.9, 0.93, 1.0, 0.3 * al))
