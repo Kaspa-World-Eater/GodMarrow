@@ -492,9 +492,16 @@ func _draw_order(a: float) -> void:
 		var r := Rect2(pr.position + Vector2((pr.size.x - sz.x * k) / 2.0, pr.size.y - sz.y * k), sz * k)
 		root.draw_texture_rect(tex, r, false, Color(1.0 * g, 0.9 * g, 0.8 * g, a))
 	else:
+		# no painting yet: the pilgrim as he walks the Hide, drawn large, in the candles' light
 		root.draw_rect(pr.grow(-40), Color(0.05, 0.04, 0.05, 0.8 * a))
 		root.draw_rect(pr.grow(-40), Color(MARROW, 0.35 * a), false, 1.0)
-		root.draw_string(fi, pr.get_center() + Vector2(-250, 0), "[a portrait is still being painted]", HORIZONTAL_ALIGNMENT_CENTER, 500, 22, Color(ASH, a))
+		var fr: Array = Data.sprite_set(p[0]).get_frames("idle", "front")
+		if not fr.is_empty():
+			var at: AtlasTexture = fr[int(t * 4.0) % fr.size()][0]
+			var sz2: Vector2 = at.get_size()
+			var k2 := minf((pr.size.y - 180.0) / sz2.y, (pr.size.x - 160.0) / sz2.x)
+			root.draw_texture_rect(at, Rect2(pr.get_center() + Vector2(-sz2.x * k2 / 2.0, -sz2.y * k2 / 2.0 - 10.0), sz2 * k2), false, Color(0.95 * g, 0.85 * g, 0.75 * g, a))
+		root.draw_string(fi, Vector2(pr.position.x, pr.end.y - 60), "[a portrait is still being painted]", HORIZONTAL_ALIGNMENT_CENTER, pr.size.x, 20, Color(ASH, a))
 	# the words
 	var x := 150.0
 	root.draw_string(sc, Vector2(x, 450), p[2], HORIZONTAL_ALIGNMENT_LEFT, -1, 50, Color(BONE, a))
