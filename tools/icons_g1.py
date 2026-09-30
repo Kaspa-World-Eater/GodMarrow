@@ -142,6 +142,16 @@ def stigmata():
         px(im, 10, y, BONE); px(im, 13, y, BONE)
     return outline(im)
 
+def stair():
+    im = img()
+    for i in range(9):   # nine steps going down into the dark
+        x0, y0 = 2 + i * 2, 3 + i * 2
+        c = BONE if i < 6 else (IRON if i < 8 else DUST)
+        line(im, x0, y0, x0 + 3, y0, c)
+        line(im, x0 + 2, y0, x0 + 2, y0 + 2, c)
+    return outline(im)
+
+states('ninthstair', stair())
 states('tentacles', crown())
 states('gills', stigmata())
 states('tally', tally())

@@ -147,6 +147,24 @@ if 'tally' not in by:
     by['fewer']['synergies'] = [{"from": "opencount", "from_name": "Open Count", "table_pc": 6, "per_hard_point_pct": 3}]
     by['weighing']['synergies'] = [{"from": "crush", "from_name": "Marrow Crush", "table_pc": 6, "per_hard_point_pct": 3}]
 
+# ---- the combo (2026-09-30, the user: "a combo of what I said and you said"; Carapace names the Bone tree)
+if 'ninthstair' not in by:
+    rename('aura', 'Mantle')   # the tree is the Carapace now; the grit that hangs round him is his mantle
+    by['tally']['description'] = ("[Passive] Every blow you strike in close cuts a notch into the one you strike. The ninth notch closes "
+        "its count: that blow lands at double force, and the count begins again. Blows come in threes: every third blow in a string "
+        "cleaves one more enemy beside it. Your curses read the notches.")
+    add(new_skill(O, 'ninthstair', 'The Ninth Stair', 2, 'Count', 5, 2, 'cast',
+        "Curse: take one enemy down the stair. For each of your next nine blows on it, it goes down a step and takes 9% more from you than "
+        "the step before. On the ninth step, if its life is low enough, it does not come back up: it is finished. Only Ossuarchs go down the Ninth Stair.",
+        "WE WERE HERE WHEN SHE FELL. WE WILL BE HERE WHEN SHE RESTS. The older letters under it have never been copied the same way twice.",
+        lv("+{0}% a step, nine steps · the ninth finishes it below {1}% life (bosses: never)", lambda L: (9, 12 + L // 2)),
+        cost={'resource': 'Marrow', 'base': 22.4, 'per_level_pct': 5}, prereq=['weighing']))
+    by['ninthstair']['synergies'] = [{"from": "tally", "from_name": "Tally", "table_pc": 6, "per_hard_point_pct": 3}]
+    by['countm']['prerequisites'] = ['ninthstair']
+for s in S:   # the Ossuarch's second tree is named the Carapace (the user)
+    if s['class'] == O and s['tab'] == 1:
+        s['tree'] = 'Carapace'
+
 # ============================================================== the Hemomancer
 H = 'hemomancer'
 WORDS = [  # nothing of a brood, no animal words: the minions are the little hoods, penitents that crawl out of the welts
@@ -261,7 +279,7 @@ json.dump(D, open(SK, 'w'), ensure_ascii=False)
 
 # ============================================================== the orders' tabs and keys
 C = json.load(open('data/classes.json'))
-C['classes'][O]['tabs'] = ['Ossuary', 'Bone', 'Count']
+C['classes'][O]['tabs'] = ['Ossuary', 'Carapace', 'Count']
 C['classes'][O]['default_keys'] = {'q': 'spear', 'w': 'ribcage', 'e': 'spikes', 'r': 'colossus', 't': 'opencount', 'y': 'host', 'u': 'sstorm', 'f': 'barmor'}
 C['classes'][H]['tabs'] = ['Procession', 'Blood', 'Penance']
 json.dump(C, open('data/classes.json', 'w'), ensure_ascii=False)
@@ -271,7 +289,7 @@ B = open('data/board.json').read()
 for a, b in [("Bone Arms grab: the first enemy each arm catches", "Charnel Cage grips: the first enemy its arms catch"),
              ("Bone Arms knock enemies", "Charnel Cage's arms knock enemies"),
              ("Coiling Tentacles", "Tightening Thorns"), ("Tentacles hold what they catch", "The thorns hold what they catch"),
-             ("Deep Gills", "Deep Wounds"), ("Shard Aura", "Carapace"), ("Grave Spirit", "Pale Lord")]:
+             ("Deep Gills", "Deep Wounds"), ("Shard Aura", "Mantle"), ("Grave Spirit", "Pale Lord")]:
     B = B.replace(a, b)
 bd = json.loads(B)
 def walk(o, hemo=False):
