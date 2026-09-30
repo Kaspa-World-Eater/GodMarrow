@@ -92,7 +92,7 @@
   },
   "talons": {
    "id": "talons",
-   "name": "Raven Talons",
+   "name": "Grave-Hooks",
    "slot": "weapon",
    "grid": [
     1,
@@ -644,7 +644,7 @@
   },
   {
    "index": 11,
-   "name": "of the Ox",
+   "name": "of the Yoke",
    "prefix": false,
    "stat": "vit",
    "range": [
@@ -757,7 +757,7 @@
   },
   {
    "index": 18,
-   "name": "of the Leech",
+   "name": "of the Open Vein",
    "prefix": false,
    "stat": "lok",
    "range": [

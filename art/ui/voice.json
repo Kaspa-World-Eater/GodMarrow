@@ -3,7 +3,7 @@
   "moor": {
    "e": "Ash to the ankle, still warm. The god's cheek, where it struck first.",
    "w": [
-    "No birds. There have never been birds here. Only moths, and moths are not birds.",
+    "Nothing sings over the Moor. Nothing ever has. The wind only practises.",
     "The pilgrims fell mid-hymn. Some are shapes under the ash. Some are standing up.",
     "Black glass underfoot. A Husk bled here, and the ash drank it and hardened.",
     "The ash is warm because the flesh beneath is still cooling. A thousand years, cooling.",
@@ -63,7 +63,7 @@
   "sighing_ridge": {
    "e": "The Moor lifts into a ridge, and the wind across it sounds like breath.",
    "w": [
-    "The Sighing Lantern hums through its cracked bell. The moths pool beneath it, listening.",
+    "The Sighing Lantern hums through its cracked bell. The ash pools beneath it, listening.",
     "Three colonnade stumps, always warm. A foreman and two daughters, found holding hands.",
     "A line of lanterns along the crest. The Tithed keep them lit so no one walks blind.",
     "The wind lifts ash off the ridge in long grey scarves. Below, it settles on someone."
@@ -82,7 +82,7 @@
    "e": "Heather burned to wire. The Pyre-Saints walked here, and walk still.",
    "w": [
     "The ash-circle is where a Pyre-Saint knelt to burn. The centre is still warm.",
-    "Cinders lift when you pass and follow a little way, like dogs that lost their master.",
+    "Cinders lift when you pass and follow a little way, like mourners who lost the coffin.",
     "Someone chalked a milestone, then cracked it. Here, not knowing the distance is a mercy.",
     "The heath burned for a year after the god died. Nobody lit it."
    ]
@@ -110,7 +110,7 @@
    "e": "A village stood here, and still stands, a little under the water.",
    "w": [
     "Doors ajar under the water. Someone left in a hurry and meant to come back.",
-    "A loom rotting on its frame, the last shroud half-woven. The shuttle is still warm.",
+    "A loom sagging on its frame, the last shroud half-woven. The shuttle is still warm.",
     "The Reed That Points Home turns its head toward the village you were born in.",
     "Bells ring under the square at dusk. The belfry fell a thousand years ago."
    ]
@@ -134,11 +134,11 @@
    ]
   },
   "wolf_den_chapel": {
-   "e": "A chapel the wolves took. They left the pews and ate the rest.",
+   "e": "A chapel the hungry took. They left the pews and ate the rest.",
    "w": [
     "The old kill-floor, dark with a century of meals. Bone-scraps in the altar rail.",
     "Something howled here at the moment the god died. The walls still hold the note.",
-    "A pew split by a body thrown hard. The wolves were not the first to fight here.",
+    "A pew split by a body thrown hard. The hungry were not the first to fight here.",
     "The hymn-board still lists the last hymns. The numbers match nothing now."
    ]
   },
@@ -147,7 +147,7 @@
    "w": [
     "A row of cots, blankets drawn up. The shapes beneath them are patient.",
     "In her alcove the last sister wrote names on the wall until the wall was full.",
-    "Vinegar and tallow and rot. The hospice still smells of mercy attempted.",
+    "Vinegar and tallow and old wounds. The hospice still smells of mercy attempted.",
     "Something coughs, three rooms away. Then, closer, something coughs back."
    ]
   },
@@ -164,7 +164,7 @@
    "e": "Salt, rope, false floors. Contraband bone, bound for the Ossuary Lords.",
    "w": [
     "The ledger lists bones by weight and saint. Most of the saints are made up.",
-    "Salt heaped to the rafters. It kept the goods from rotting. Mostly.",
+    "Salt heaped to the rafters. It kept the goods from spoiling. Mostly.",
     "A smuggler's knife pins a note to the table. The ink has run away.",
     "They sold mothers to lords, a rib at a time. The hold remembers every price."
    ]

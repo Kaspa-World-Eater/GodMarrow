@@ -46339,7 +46339,7 @@
     },
     {
      "to": "spool",
-     "to_name": "The Leeches",
+     "to_name": "The Suckling Clots",
      "per_hard_point_pct": 2.5
     }
    ]
@@ -48436,7 +48436,7 @@
   {
    "id": "spool",
    "class": "hemomancer",
-   "name": "The Leeches",
+   "name": "The Suckling Clots",
    "tab": 1,
    "tree": "Blood",
    "row": 4,
@@ -49272,7 +49272,7 @@
    "flags": [],
    "cast_type_basis": "heuristic (kind + description text)",
    "tooltip_full_L1": [
-    "The Leeches · level 1",
+    "The Suckling Clots · level 1",
     "Passive: always working once learned",
     "",
     "[Passive] Fat leeches live in your",
@@ -50467,7 +50467,7 @@
    "synergy_targets": [
     {
      "to": "spool",
-     "to_name": "The Leeches",
+     "to_name": "The Suckling Clots",
      "per_hard_point_pct": 3
     }
    ]
@@ -68425,7 +68425,7 @@
     },
     {
      "from": "flurry",
-     "from_name": "Raven Flurry",
+     "from_name": "Black-Rag Flurry",
      "table_pc": 5,
      "per_hard_point_pct": 2.5
     }
@@ -68815,12 +68815,12 @@
     },
     {
      "to": "talon",
-     "to_name": "Crow's Heel",
+     "to_name": "Hanged Man's Heel",
      "per_hard_point_pct": 3
     },
     {
      "to": "flurry",
-     "to_name": "Raven Flurry",
+     "to_name": "Black-Rag Flurry",
      "per_hard_point_pct": 3
     }
    ]
@@ -69774,7 +69774,7 @@
   {
    "id": "talon",
    "class": "miasmancer",
-   "name": "Crow's Heel",
+   "name": "Hanged Man's Heel",
    "tab": 2,
    "tree": "Sigil",
    "row": 2,
@@ -70190,7 +70190,7 @@
    ],
    "cast_type_basis": "heuristic (kind + description text)",
    "tooltip_full_L1": [
-    "Crow's Heel · level 1",
+    "Hanged Man's Heel · level 1",
     "Cast: one use per press",
     "",
     "A spinning flurry of three kicks into",
@@ -70285,7 +70285,7 @@
    "synergy_targets": [
     {
      "to": "flurry",
-     "to_name": "Raven Flurry",
+     "to_name": "Black-Rag Flurry",
      "per_hard_point_pct": 3
     }
    ]
@@ -70720,7 +70720,7 @@
     },
     {
      "to": "talon",
-     "to_name": "Crow's Heel",
+     "to_name": "Hanged Man's Heel",
      "per_hard_point_pct": 2.5
     }
    ]
@@ -70738,7 +70738,7 @@
     "talon"
    ],
    "prerequisite_names": [
-    "Crow's Heel"
+    "Hanged Man's Heel"
    ],
    "max_hard_level": 20,
    "kind": "cast",
@@ -71233,7 +71233,7 @@
   {
    "id": "flurry",
    "class": "miasmancer",
-   "name": "Raven Flurry",
+   "name": "Black-Rag Flurry",
    "tab": 2,
    "tree": "Sigil",
    "row": 3,
@@ -71289,7 +71289,7 @@
     },
     {
      "from": "talon",
-     "from_name": "Crow's Heel",
+     "from_name": "Hanged Man's Heel",
      "table_pc": 6,
      "per_hard_point_pct": 3
     }
@@ -71609,7 +71609,7 @@
    ],
    "cast_type_basis": "heuristic (kind + description text)",
    "tooltip_full_L1": [
-    "Raven Flurry · level 1",
+    "Black-Rag Flurry · level 1",
     "Cast: hold the button to keep casting",
     "",
     "Hold: a fast chain of claw strikes at the",
@@ -72157,7 +72157,7 @@
     "flurry"
    ],
    "prerequisite_names": [
-    "Raven Flurry"
+    "Black-Rag Flurry"
    ],
    "max_hard_level": 20,
    "kind": "cast",

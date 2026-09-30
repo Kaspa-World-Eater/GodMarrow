@@ -21,7 +21,7 @@ const QUESTS := [
 		"desc": "Beneath the Moor the Hollow Crypt keeps a warden who forgot what he guards. He eats what the Tithed bury. Go down into {Z} and let him stop.",
 		"done": "Esk: 'Then the Tithed can bury their mothers again. Take this. It was his, and he will not want it.'", "rew": {"gold": 200, "item": "magic"}},
 	{"id": "a1_lantern", "act": 1, "kind": "shrine", "zones": ["sighing_ridge", "moor"], "name": "The Sighing Lantern", "target": "The Sighing Lantern",
-		"desc": "The bronze lantern at the crossing has stopped singing. Something drinks the light before it reaches the moths. Kneel at it in {Z} and hold it until the drinkers are gone.",
+		"desc": "The bronze lantern at the crossing has stopped singing. Something drinks the light before it reaches the road. Kneel at it in {Z} and hold it until the drinkers are gone.",
 		"done": "Esk: 'It sings again. Badly. It always sang badly. Here, a small truth for your trouble.'", "rew": {"skill": 1}},
 	{"id": "a1_daughter", "act": 1, "kind": "captive", "zones": ["drowned_village", "fen"], "name": "The Widow's Daughter", "target": "Nell, the foreman's daughter",
 		"desc": "The caravan-foreman died holding both his daughters' hands. One of them let go. She lives, and the drowned keep her in {Z}. Free her.",
@@ -74,7 +74,7 @@ const BARKS := {
 			"Hundred-Fingers blew his kangling at me once. I blew back. He hasn't tried since.",
 			"The Moor is patient. I'm not. Go on."],
 		"stranger": ["The ash is warm... you noticed. Good. Most never do.",
-			"Keep the lantern on your left. The moths... prefer the right.",
+			"Keep the lantern on your left. The dead... prefer the right.",
 			"You'll go down. Everyone who listens to me goes down.",
 			"A pilgrim asked me the way once. I told her. I am... still sorry.",
 			"Rest while the fire is yours. Fires change hands, here."],
@@ -97,7 +97,7 @@ const LAN_INSCR := {
 	"Sunken Chapel": "The chapel went under with its lamps lit. This is the one that came back up.",
 }
 const LAN_POOL := {1: ["I burned for a mother who does not know I am still burning.", "Forty nights. Fourteen. Four. It is all the same to a wick.",
-	"If you go into the dark, take some of me. If you do not come back, I burn alone.", "The moths remember you. Do not ask what they remember.",
+	"If you go into the dark, take some of me. If you do not come back, I burn alone.", "The ash remembers you. Do not ask what it remembers.",
 	"Chalk on the post, renewed each year by hands from Villa Llaga."]}
 ## the gods of the altars and their Heralds (zd_world22.js)
 const GODS := {

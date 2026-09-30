@@ -49310,7 +49310,7 @@
   },
   "worm": {
    "id": "worm",
-   "name": "Vein-Worm",
+   "name": "Vein-Borer",
    "sprite": "worm",
    "family": "burrow",
    "ai": "burrow",
@@ -55361,7 +55361,7 @@
   },
   "moth": {
    "id": "moth",
-   "name": "Moth-Saint",
+   "name": "Wick-Saint",
    "sprite": "moth",
    "family": "flyer",
    "ai": "flyer",
@@ -73466,7 +73466,7 @@
   },
   "leech": {
    "id": "leech",
-   "name": "Mire Vein-Worm",
+   "name": "Mire Vein-Borer",
    "sprite": "worm",
    "family": "burrow",
    "ai": "burrow",
@@ -157761,7 +157761,7 @@
   },
   "dune_kite": {
    "id": "dune_kite",
-   "name": "Grit-Moth",
+   "name": "Grit-Wick",
    "sprite": "moth",
    "family": "kiter",
    "ai": "kiter",
@@ -169834,7 +169834,7 @@
   },
   "a3_larva": {
    "id": "a3_larva",
-   "name": "Leech-Larva",
+   "name": "Clot-Spawn",
    "sprite": "worm",
    "family": "flank",
    "ai": "flank",
@@ -224100,7 +224100,7 @@
   },
   "a4_flagmoth": {
    "id": "a4_flagmoth",
-   "name": "Prayer-Flag Moth",
+   "name": "Prayer-Flag Wick",
    "sprite": "moth",
    "family": "flyer",
    "ai": "flyer",
@@ -284270,7 +284270,7 @@
   },
   "a5_parasite": {
    "id": "a5_parasite",
-   "name": "Stomach-Parasite Worm",
+   "name": "Stomach-Tether",
    "sprite": "worm",
    "family": "burrow",
    "ai": "burrow",
@@ -326339,7 +326339,7 @@
   },
   "moth_saint": {
    "id": "moth_saint",
-   "name": "Moth-Saint of the Canopy",
+   "name": "Wick-Saint of the Canopy",
    "sprite": "moth",
    "family": "flyer",
    "ai": "flyer",
@@ -332416,7 +332416,7 @@
   },
   "veinworm_elder": {
    "id": "veinworm_elder",
-   "name": "Elder Vein-Worm",
+   "name": "Elder Vein-Borer",
    "sprite": "worm",
    "family": "burrow",
    "ai": "burrow",
@@ -368528,7 +368528,7 @@
   },
   "qa_broodling": {
    "id": "qa_broodling",
-   "name": "Brood-Leech",
+   "name": "Brood-Mouth",
    "sprite": "worm",
    "family": "lair_boss_add",
    "ai": "burrow",

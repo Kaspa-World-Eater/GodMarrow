@@ -443,7 +443,7 @@
   },
   "wolf_den_chapel": {
    "id": "wolf_den_chapel",
-   "name": "Wolf-Den Chapel",
+   "name": "The Gnawed Chapel",
    "act": 1,
    "kind": "dungeon",
    "outdoor": false,

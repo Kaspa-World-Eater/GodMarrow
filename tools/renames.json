@@ -1,0 +1,36 @@
+{
+ "_why": "Rules: no animals or animal words, no 'rot'. Display text only; ids stay. Applied to the Godot data and to be applied to the web build.",
+ "exact": {
+  "Vein-Worm": "Vein-Borer",
+  "Mire Vein-Worm": "Mire Vein-Borer",
+  "Elder Vein-Worm": "Elder Vein-Borer",
+  "Moth-Saint": "Wick-Saint",
+  "Moth-Saint of the Canopy": "Wick-Saint of the Canopy",
+  "Grit-Moth": "Grit-Wick",
+  "Prayer-Flag Moth": "Prayer-Flag Wick",
+  "Leech-Larva": "Clot-Spawn",
+  "Stomach-Parasite Worm": "Stomach-Tether",
+  "Brood-Leech": "Brood-Mouth",
+  "Raven Talons": "Grave-Hooks",
+  "of the Ox": "of the Yoke",
+  "of the Leech": "of the Open Vein",
+  "The Leeches": "The Suckling Clots",
+  "Crow's Heel": "Hanged Man's Heel",
+  "Raven Flurry": "Black-Rag Flurry",
+  "Wolf-Den Chapel": "The Gnawed Chapel",
+  "The Moth-Saints' Post": "The Wick-Saints' Post"
+ },
+ "lines": {
+  "No birds. There have never been birds here. Only moths, and moths are not birds.": "Nothing sings over the Moor. Nothing ever has. The wind only practises.",
+  "The Sighing Lantern hums through its cracked bell. The moths pool beneath it, listening.": "The Sighing Lantern hums through its cracked bell. The ash pools beneath it, listening.",
+  "Cinders lift when you pass and follow a little way, like dogs that lost their master.": "Cinders lift when you pass and follow a little way, like mourners who lost the coffin.",
+  "A loom rotting on its frame, the last shroud half-woven. The shuttle is still warm.": "A loom sagging on its frame, the last shroud half-woven. The shuttle is still warm.",
+  "A chapel the wolves took. They left the pews and ate the rest.": "A chapel the hungry took. They left the pews and ate the rest.",
+  "A pew split by a body thrown hard. The wolves were not the first to fight here.": "A pew split by a body thrown hard. The hungry were not the first to fight here.",
+  "Vinegar and tallow and rot. The hospice still smells of mercy attempted.": "Vinegar and tallow and old wounds. The hospice still smells of mercy attempted.",
+  "Salt heaped to the rafters. It kept the goods from rotting. Mostly.": "Salt heaped to the rafters. It kept the goods from spoiling. Mostly.",
+  "Something drinks the light before it reaches the moths.": "Something drinks the light before it reaches the road.",
+  "Keep the lantern on your left. The moths... prefer the right.": "Keep the lantern on your left. The dead... prefer the right.",
+  "The moths remember you. Do not ask what they remember.": "The ash remembers you. Do not ask what it remembers."
+ }
+}
