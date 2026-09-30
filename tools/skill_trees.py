@@ -205,6 +205,12 @@ def clean_hemo():
         for k in ('info_template', 'tooltip_full_L1'):
             if isinstance(s.get(k), list):
                 s[k] = [clean(x) for x in s[k]]
+        for p in s.get('perks', []):
+            p['name'] = rename_all(p['name'])
+            p['text'] = rename_all(p['text'])
+        s['description'] = rename_all(s['description'])
+        for v in s.get('levels', {}).values():
+            v['text'] = rename_all(v['text'])
         s['tree'] = {'Brood': 'Procession', 'Flesh': 'Penance'}.get(s['tree'], s['tree'])
 
 if 'scourge' not in by:
@@ -254,6 +260,75 @@ if 'scourge' not in by:
     place('heart', 2, 'Penance', 5, 3, ['molt'])
     place('fmastery', 2, 'Penance', 6, 2, [])
 
+# ---- the Hemomancer's penances (2026-09-30, the user: "mutations" was too science; "penances is cool"; the skills
+#      named and told closer to the lore: the Precious Wound, Villa Llaga, the Friday of the Fall, the Open Side)
+NAMES = [  # case-sensitive, whole words: old name -> new, in every text that names them (skills, perks, board cards)
+    ('Second Graft', 'Second Vestment'), ('Belly Maw', 'The Open Side'), ('Swallow Whole', 'Taken Into the Side'),
+    ('Scar-Plates', 'Welt-Mail'), ('Devour', 'Communion'), ('Tumor Hump', 'The Burden'), ('Molt', 'The Flaying'),
+    ('Second Heart', 'Sacred Heart'), ('Flesh Mastery', 'Penance Mastery'), ('Blood Thrall', 'Bleeding Saint'),
+    ('Graft', 'Vestments'), ('Boiling Blood', 'Her Door'), ('Burst Vessel', 'Split Scab'),
+    ('Covenant of Blood', 'The Red Tithe'), ('Flesh panel', 'Penance panel'),
+]
+def rename_all(t):
+    if not isinstance(t, str):
+        return t
+    for a, b in NAMES:
+        t = re.sub(r'(?<![\w-])' + re.escape(a) + r'(?![\w-])', b, t)
+    return t
+HEMO_NEW = {
+    'thrall': ('Bleeding Saint',
+        "Call a saint down into the corpse or pool of blood nearest the cursor. It rises as a trembling figure of blood wearing a halo of clots, keeps its distance and flings shards of clotted blood. It drinks corpses and spilled blood, and each time it drinks it gives a blessing: you and your penitents near it strike faster for a while.",
+        "In the crypt rites the saints came down and rode whoever would carry them. Now they ride the blood."),
+    'graft': ('Vestments',
+        "[Passive] Dress the whole procession in the robes of the dead: Fevered Blood, Leapers, Clingers, Volatile or Long Stride, chosen in the Penance panel (V). Levels strengthen every vestment.",
+        "After the Fall the little ones dragged the dead penitents' robes over themselves and tried to walk in procession, going nowhere."),
+    'bboil': ('Her Door',
+        "Draw the Maiden's door in blood on the ground at the cursor. For 8 s everything standing on it bleeds half again as hard and as long, and each one that dies on it is taken through: it bursts, scalding those beside it.",
+        "He drew her door on the scab in his own blood and called her down. He draws it smaller now. She still comes."),
+    'cburst': ('Split Scab',
+        "The corpse or tumor nearest the cursor splits like the black scab over Villa Llaga: it bursts in meat and blood that leaves what it hits bleeding.",
+        "For a year the wound lay closed under a black crust. On the Friday of the Fall it split."),
+    'pact': ('The Red Tithe',
+        "Pay the tithe: open your veins for your procession and lose 12% of your current life. Every penitent is mended 40% and strikes 30% harder for 8 s.",
+        "The Brotherhood of the Precious Wound paid the wound a measured tithe of blood each year. Blood given is not blood taken."),
+    'maw': ('The Open Side',
+        "[Passive] Penance: the wound in your side opens and does not close, and it has teeth. Your blows strike harder, open bleeding wounds and drink life, and now and then the Side takes an enemy in whole. While something is inside you, you mend; if it still lives when you are done with it, you cast it out.",
+        "Our Lady of the Open Side. He wears her wound now."),
+    'swallow': ('Taken Into the Side',
+        "Needs The Open Side worn. It opens wide and takes the enemy nearest the cursor within reach (not bosses), and holds it until it is spent.",
+        None),
+    'chitin': ('Welt-Mail',
+        "Penance: every welt the scourge ever raised on you hardens into a ridge of scar, split and seamed like old mail. Blows glance off it, and what does strike you loses much of its weight before it ever reaches meat.",
+        "The one who opens others never opens himself. He was twenty years clean of it. He is not clean now."),
+    'devour': ('Communion',
+        "Take the little hood or tumor nearest you in communion: it restores life and Vitae and gives a stacking blessing to all your damage. The bigger the offering, the bigger the blessing.",
+        "Take, and eat. The brotherhood said it over bread. He says it over what he made."),
+    'bilehump': ('The Burden',
+        "[Passive] Penance: a swollen burden grows on your back, heavy as a cross. It buds little hoods of its own that drift off after enemies and burst in a spray of blood.",
+        "Every penitent carries something up the hill. His grows."),
+    'molt': ('The Flaying',
+        "Tear your skin off in one wet heave: mend a share of your life and shake off anything slowing you. The empty skin stands where you were, arms held out, and draws the enemy for 3 s.",
+        "The saints in the crypt paintings carry their skins over one arm like a cloak. He never understood them, until now."),
+    'heart': ('Sacred Heart',
+        "[Passive] Penance: a second heart beats outside your chest, bound in thorns. You mend steadily, and once in each place, when you fall near death, it pounds you back up.",
+        "On the Friday the brothers carry her heart through the town on a litter, pierced seven times. His carries itself."),
+    'fmastery': ('Penance Mastery',
+        "[Passive] The Bleeding Maiden asks more of you. A third penance slot opens beneath your skin, and every penance you wear grows into you more truly.",
+        None),
+    'tentacles': (None, None, "Our Lady was crowned in her own thorns. So is he."),
+    'gills': (None, None, "The palms, the feet, the side. The brotherhood painted them on its saints in red lead. His do not need paint."),
+    'scourge': (None, None, None),
+}
+for id, (nm, desc, lore) in HEMO_NEW.items():
+    if id not in by:
+        continue
+    if nm:
+        by[id]['name'] = nm
+    if desc:
+        by[id]['description'] = desc
+    if lore:
+        by[id]['lore'] = lore
+by['fmastery']['tree'] = 'Penance'
 clean_hemo()
 
 # ============================================================== every order: Masteries at level 30
@@ -297,7 +372,7 @@ def walk(o, hemo=False):
         h = hemo or o.get('cls') == H or o.get('reg') == 'hem'
         for k, v in o.items():
             if isinstance(v, str) and h and k not in ('cls', 'kind', 'card', 'reg', 'id', 'area', 'page', 'hyb'):
-                o[k] = clean(v)
+                o[k] = rename_all(clean(v))
             else:
                 walk(v, h)
     elif isinstance(o, list):
