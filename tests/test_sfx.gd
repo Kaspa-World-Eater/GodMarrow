@@ -1,4 +1,6 @@
 extends SceneTree
+## Sound test: renders each synthesised sound to /tmp/gd/aud/*.wav and prints its length and peak.
+##   godot --headless --path . -s tests/test_sfx.gd
 func _initialize() -> void:
 	var k = load("res://core/sfx.gd").new()
 	for n in ["step_ash","step_stone","step_leaf","step_wet","swing","hit","heavy","break","hurt","fall","roll","drink","m_wind","cast_mirror","cast_soul","cast_thread","chest","kindle","shrine","passage","hinge","lid","coins","glass","bell_far","page_open","roll","hit","fall","break"]:

@@ -1,4 +1,6 @@
 extends SceneTree
+## Board test: builds the Mystic's body board on a fake level-20 pilgrim and prints roads, laying and cards.
+##   godot --headless --path . -s tests/test_arcana.gd
 class FakeInv:
 	var gold := 1000
 class FakeSt:
