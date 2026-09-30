@@ -1,14 +1,15 @@
 extends CanvasLayer
-## ui/title.gd: the title, "the Pilgrims' Fire". The old title's chapel of the weeping god (zp_title.js, painted pixel by
-## pixel, captured without the Seer's bowl: art/ui/title_chapel.png, tools/cap_chapel.js) with, where the bowl stood, a
-## fire on the flagstones and the five pilgrims of the orders standing round it, Diablo's campfire in the god's chapel.
-## The fire lights them from its side and throws their shadows back across the floor; the candles gutter; the god's
-## chin lets go a drop now and then. The words stand on the left, over the dark:
-##   Continue (the pilgrim walked most lately) · The Codex · Options · Those Who Lent Their Hands · Leave.
-## Hover a pilgrim at the fire and they step into the light; click one and their order's page opens over the dimmed
-## chapel: a large portrait (placeholders until the final paintings come), who they are in the Stranger's words, what
-## they draw on and their three ways, and that order's own pilgrim (one save per order: continue it, or begin anew).
-## "Begin" opens the Reading (ui/reading.gd, character creation), with the god already chosen here.
+## ui/title.gd: the title, "the Seer's Bowl". The old web title's chapel (zp_title.js), painted pixel by pixel and
+## captured whole (tools/cap_chapel2.js -> art/ui/title_bowl.png, 480x270 shown x4): the dead god's stone face sunk in
+## the wall, weeping blood down its cheeks into a tarnished bronze bowl on the altar. Here it lives again: a drop swells
+## on the chin and falls, rings spread in the blood and bend the reflection of whoever looks down into it (a hooded
+## figure; shaders/title_blood.gdshader), the god's dying breath spills from the mouth and pools on the altar
+## (shaders/title_breath.gdshader), the candles gutter, embers rise and ash falls.
+## Round the bowl lies a spill of tarot cards, most face down. Five lie face up: the orders. Hover one and it lifts
+## and turns to you; click it and that order's page opens over the dimmed chapel (a large portrait, placeholders until
+## the final paintings come; who they are in the Stranger's words; their own pilgrim to continue or begin anew).
+## The words stand on the left: Continue (the pilgrim walked most lately) · The Codex · Options · Those Who Lent Their
+## Hands · Leave. "Begin" opens the Reading (ui/reading.gd, character creation), the god already chosen here.
 
 const U := preload("res://ui/uikit.gd")
 const SaveIO := preload("res://core/save.gd")
@@ -17,8 +18,6 @@ const BONE_D := Color("#a39a8b")
 const ASH := Color("#6f685f")
 const MARROW := Color("#c9974a")
 const K := 4.0                           # screen px per chapel px
-const FIRE := Vector2(1360, 954)         # the fire's foot on the flagstones (chapel px 340, 238)
-const FS := 1.7                          # the fire's size
 ## the pilgrims: the user's paintings cut out and brought down to the chapel's own grain (tools/title_cut.py,
 ## tools/title_pix.py -> art/ui/pilgrim_*.png, shown x4). The two orders without a painting yet keep an empty place.
 const PILGRIMS := [
@@ -29,7 +28,18 @@ const PILGRIMS := [
 	["miasmancer", "", "The Shrine Keeper", "Folds the breath into paper, and the paper walks.", Vector2(1760, 880), -1, false, "charm"],
 	["monk", "", "The Empty Hand", "Carries nothing. Strikes with that.", Vector2(1150, 1010), 1, true, "bowl"],
 ]
-const LANTERN_AT := Vector2(-80, -208)   # the Mystic's lantern glass, from her feet (screen px)
+## the cards round the bowl (chapel px, the card's centre as it lies; its turn in radians). The orders' lie face up
+## with their emblem (art/reading/cards); the rest lie face down, a spill from an old Reading.
+const CARDS := [
+	# order index (-1 = face down), emblem, at, turn
+	[-1, "", Vector2(266, 180), 0.62], [-1, "", Vector2(416, 178), -0.5], [-1, "", Vector2(222, 232), 0.25],
+	[-1, "", Vector2(460, 232), -0.35], [-1, "", Vector2(308, 256), 0.95], [-1, "", Vector2(378, 257), -0.8],
+	[-1, "", Vector2(252, 212), 1.3],
+	[0, "drop", Vector2(240, 204), -0.4], [1, "mirror", Vector2(280, 240), -0.18], [2, "skull", Vector2(340, 249), 0.04],
+	[3, "breath", Vector2(400, 240), 0.2], [4, "bowl", Vector2(440, 204), 0.42],
+]
+const CW := 21.0                         # a card as it lies, in chapel px
+const CH := 33.0
 ## each order's page. Portraits are placeholders: the user's paintings, cut out (art/ui/portrait_*.png); "" = still to paint.
 const ORDER := {
 	"animancer": {"god": "Of the Soul, the Veiled Crone", "portrait": "portrait_mystic", "draws": "Essence, and a choir of wisps", "ways": "Mirror · Soul · Thread",
@@ -46,11 +56,17 @@ const ORDER := {
 
 var main: Node
 var root: Control
-var world: Node2D                  # the pilgrims (y-sorted, screen px)
-var add_fx: Node2D                 # additive light: the fire's glow, the candles, embers
-var fx: Node2D                     # the fire, embers, the empty places
-var fx_back: Node2D
-var figs: Array = []               # {spr, holder, shadow, base, step}
+var add_fx: Node2D                 # additive light: the candles' halos, embers
+var fx: Node2D                     # the cards, embers and ash
+var fx_back: Node2D                # the candles' flames, the god's drop, sparks
+var blood: ColorRect
+var breath: ColorRect
+var cards: Array = []              # {o, emb, at, rot, lift, tex}
+var rings: Array = []              # rings spreading in the blood: {x, y, r, t}
+var drops: Array = []
+var sparks: Array = []
+var motes: Array = []
+var card_back: Texture2D
 var rows: Array = []
 var hover := -1
 var fig_hover := -1
@@ -63,8 +79,7 @@ var leaving := -1.0
 var codex: Control
 var candles: Array = []
 var embers: Array = []
-var drop_t := 2.0
-var drop_y := -1.0
+var drop_t := 1.4
 var chin := Vector2.ZERO
 var _glow: Texture2D
 var _test_done := false
@@ -91,48 +106,51 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_glow = Lights.radial(128)
 	var bg := TextureRect.new()
-	bg.texture = load("res://art/ui/title_chapel.png")
+	bg.texture = load("res://art/ui/title_bowl.png")
 	bg.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	bg.stretch_mode = TextureRect.STRETCH_SCALE
 	bg.size = Vector2(1920, 1080)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
-	var meta = JSON.parse_string(FileAccess.get_file_as_string("res://art/ui/title_chapel.json"))
+	var meta = JSON.parse_string(FileAccess.get_file_as_string("res://art/ui/title_bowl.json"))
+	var pal := PackedVector3Array()
 	if meta is Dictionary:
 		for c in meta.get("candles", []):
 			candles.append(Vector2(float(c[0]), float(c[1]) - float(c[2])) * K + Vector2(2, -2))
 		var f: Array = meta.get("face", [340, 64, 125])
-		chin = Vector2(float(f[0]) - 1.0, float(f[2])) * K
-	fx_back = Node2D.new()          # the candles and the god's drop, behind the pilgrims
+		chin = Vector2(float(f[0]) - 1.0, float(f[2]))
+		for c in meta.get("blood", []):
+			pal.append(Vector3(c[0], c[1], c[2]) / 255.0)
+	# the blood's surface and the god's breath, on the chapel's pixel grid
+	blood = ColorRect.new()
+	blood.position = Vector2(340 - 75 - 1, 202 - 32 - 1) * K
+	blood.size = Vector2(152, 66) * K
+	blood.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var bm := ShaderMaterial.new()
+	bm.shader = load("res://shaders/title_blood.gdshader")
+	bm.set_shader_parameter("refl", load("res://art/ui/title_refl.png"))
+	bm.set_shader_parameter("pal", pal)
+	blood.material = bm
+	add_child(blood)
+	fx_back = Node2D.new()          # the candles, the god's drop and its sparks
 	fx_back.draw.connect(_draw_back)
 	add_child(fx_back)
-	var shadows := Node2D.new()
-	add_child(shadows)
-	world = Node2D.new()
-	world.y_sort_enabled = true
-	add_child(world)
-	for i in PILGRIMS.size():
-		var p: Array = PILGRIMS[i]
-		var holder := Node2D.new()
-		holder.position = p[4]
-		world.add_child(holder)
-		var spr: Sprite2D = null
-		var sh: Sprite2D = null
-		if p[1] != "":
-			spr = Sprite2D.new()
-			spr.texture = load("res://art/ui/%s.png" % p[1])
-			spr.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-			spr.centered = false
-			spr.scale = Vector2(K, K)
-			spr.position = Vector2(-roundf(spr.texture.get_width() / 2.0) * K, -spr.texture.get_height() * K)
-			holder.add_child(spr)
-			sh = Sprite2D.new()
-			sh.texture = spr.texture
-			sh.centered = false
-			sh.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-			shadows.add_child(sh)
-		figs.append({"spr": spr, "holder": holder, "shadow": sh, "base": p[4], "step": 0.0, "ph": randf() * TAU})
+	breath = ColorRect.new()
+	breath.position = Vector2(210, 94) * K
+	breath.size = Vector2(260, 176) * K
+	breath.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var brm := ShaderMaterial.new()
+	brm.shader = load("res://shaders/title_breath.gdshader")
+	breath.material = brm
+	add_child(breath)
+	card_back = load("res://art/reading/cards/_back.png")
+	for c in CARDS:
+		var tex: Texture2D = card_back
+		if c[0] >= 0:
+			tex = load("res://art/reading/cards/%s.png" % c[1])
+		cards.append({"o": c[0], "at": (c[2] as Vector2) * K, "rot": c[3], "lift": 0.0, "tex": tex, "ph": randf() * TAU})
 	fx = Node2D.new()
+	fx.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	fx.draw.connect(_draw_fx)
 	add_child(fx)
 	add_fx = Node2D.new()
@@ -203,47 +221,57 @@ func _process(dt: float) -> void:
 			main.title_done()
 			queue_free()
 			return
-	var fire_k := 0.86 + 0.14 * _flick(0.3)
-	for i in figs.size():
-		var f: Dictionary = figs[i]
-		var want := 1.0 if ((mode == "main" or mode == "order") and (fig_hover == i or order_i == i)) else 0.0
-		f["step"] = lerpf(f["step"], want, minf(1.0, dt * 5.0))
-		var base: Vector2 = f["base"]
-		var h: Node2D = f["holder"]
-		var to_fire := (FIRE - base).normalized()
-		# a step toward the fire when chosen, on the chapel's grain; and a slow breath (one chapel pixel)
-		var stepv: Vector2 = to_fire * 28.0 * float(f["step"])
-		h.position = Vector2(roundf((base.x + stepv.x) / K) * K, roundf((base.y + stepv.y) / K) * K)
-		var spr: Sprite2D = f["spr"]
-		if spr == null:
-			continue
-		var breath := 1.0 if sin(t * 0.9 + float(f["ph"])) > 0.55 else 0.0
-		spr.position.y = -spr.texture.get_height() * K - breath * K
-		var d := h.position.distance_to(FIRE)
-		var lit: float = clampf(1.3 - d / 700.0, 0.5, 1.1) * fire_k + 0.3 * float(f["step"])
-		var dim := 0.55 if (mode == "main" and fig_hover >= 0 and fig_hover != i) else 1.0
-		spr.modulate = Color(lit * dim * 1.05, lit * dim * 0.92, lit * dim * 0.8)
-		var sh: Sprite2D = f["shadow"]
-		var away := h.position - FIRE
-		var dir := Vector2(away.x, away.y * 0.6).normalized()
-		var ya := -dir * 0.5 * K
-		sh.transform = Transform2D(Vector2(K, 0), ya, h.position - Vector2(spr.texture.get_width() / 2.0 * K, 0) - ya * spr.texture.get_height())
-		sh.modulate = Color(0, 0, 0, 0.55 * clampf(1.4 - d / 600.0, 0.2, 1.0))
-	if randf() < dt * 9.0:
-		embers.append({"p": FIRE + Vector2(randf_range(-50, 50), -90), "v": Vector2(randf_range(-14, 14), randf_range(-70, -40)), "t": 0.0, "life": randf_range(1.2, 2.6)})
-	for e in embers:
-		e["t"] += dt
-		e["v"].x += sin(t * 2.0 + e["life"] * 7.0) * 12.0 * dt
-		e["p"] += e["v"] * dt
-	embers = embers.filter(func(e): return e["t"] < e["life"])
+	# the cards: the chosen one lifts and turns up to you
+	for c in cards:
+		var want := 1.0 if c["o"] >= 0 and (mode == "main" or mode == "order") and (fig_hover == c["o"] or order_i == c["o"]) else 0.0
+		c["lift"] = lerpf(c["lift"], want, minf(1.0, dt * 7.0))
+	# a drop swells on the god's chin, lets go, and falls into the bowl
 	drop_t -= dt
-	if drop_t <= 0.0 and drop_y < 0.0:
-		drop_y = 0.0
-	if drop_y >= 0.0:
-		drop_y += dt * (60.0 + drop_y * 4.0)
-		if drop_y > 56.0:
-			drop_y = -1.0
-			drop_t = randf_range(3.0, 7.0)
+	if drop_t <= 0.0:
+		drop_t = randf_range(1.8, 4.2)
+		drops.append({"x": chin.x, "y": chin.y + 1.0, "ty": 202.0 - 4.0 + randf() * 10.0, "v": 10.0})
+	for d in drops:
+		d["v"] += 380.0 * dt
+		d["y"] += d["v"] * dt
+		if d["y"] >= d["ty"]:
+			d["done"] = true
+			rings.append({"x": d["x"], "y": d["ty"], "r": 0.0, "t": 0.0})
+			for k in 6:
+				sparks.append({"x": d["x"], "y": d["ty"], "vx": randf_range(-17, 17), "vy": -34.0 - randf() * 34.0, "t": 0.0})
+			if randf() < 0.7:
+				Sfx.play("glass", 0.08, randf_range(2.0, 2.4))
+	drops = drops.filter(func(d): return not d.get("done", false))
+	for r in rings:
+		r["t"] += dt
+		r["r"] += dt * 14.0 / (1.0 + r["t"] * 0.6)
+	rings = rings.filter(func(r): return r["t"] < 3.4)
+	for sp in sparks:
+		sp["t"] += dt
+		sp["vy"] += 260.0 * dt
+		sp["x"] += sp["vx"] * dt
+		sp["y"] += sp["vy"] * dt
+	sparks = sparks.filter(func(sp): return sp["t"] < 0.35)
+	var ra := []
+	for i in 8:
+		if i < rings.size():
+			ra.append(Vector4(rings[i]["x"], rings[i]["y"], rings[i]["r"], rings[i]["t"]))
+		else:
+			ra.append(Vector4(0, 0, 0, -1))
+	(blood.material as ShaderMaterial).set_shader_parameter("rings", ra)
+	(blood.material as ShaderMaterial).set_shader_parameter("time", t)
+	(breath.material as ShaderMaterial).set_shader_parameter("time", t)
+	# embers off the candles, ash drifting down through the dark (chapel px)
+	if motes.size() < 46 and randf() < dt * 9.0:
+		if randf() < 0.55 and not candles.is_empty():
+			var c: Vector2 = candles[randi() % candles.size()] / K
+			motes.append({"x": c.x, "y": c.y - 2.0, "vx": randf_range(-2, 2), "vy": -8.0 - randf() * 10.0, "t": 0.0, "life": 1.4 + randf() * 2.2, "ember": true})
+		else:
+			motes.append({"x": 290.0 + randf() * 120.0, "y": -2.0, "vx": randf_range(-1, 2), "vy": 3.0 + randf() * 4.0, "t": 0.0, "life": 20.0, "ember": false})
+	for m in motes:
+		m["t"] += dt
+		m["x"] += (m["vx"] + sin(t * 1.3 + m["y"] * 0.1) * (3.0 if m["ember"] else 1.5)) * dt
+		m["y"] += m["vy"] * dt
+	motes = motes.filter(func(m): return m["t"] < m["life"] and m["y"] < 272.0 and m["y"] > -4.0)
 	fx.queue_redraw()
 	fx_back.queue_redraw()
 	add_fx.queue_redraw()
@@ -252,62 +280,41 @@ func _process(dt: float) -> void:
 func _snap(p: Vector2) -> Vector2:
 	return Vector2(floorf(p.x / K) * K, floorf(p.y / K) * K)
 
-## the fire: split logs, a bed of embers, tongues of flame climbing and tearing off, on the chapel's pixel grid
+## the cards round the bowl: face down, or face up for the orders; the chosen one lifts, straightens and turns to you
+func _card_xform(c: Dictionary) -> Transform2D:
+	var L: float = c["lift"]
+	var rot: float = lerpf(c["rot"], 0.0, L)
+	var sy := lerpf(0.55, 1.0, L)                 # lying flat, it is foreshortened; lifted, it stands
+	var at: Vector2 = c["at"] + Vector2(0, -70.0 * L)
+	return Transform2D(rot, Vector2(CW * K / 54.0, CH * K * sy / 84.0), 0.0, at)
+
 func _draw_fx() -> void:
-	fx.draw_set_transform(FIRE * (1.0 - FS), 0.0, Vector2(FS, FS))
-	_draw_fire()
+	var order := range(cards.size())
+	order.sort_custom(func(a, b): return cards[a]["lift"] < cards[b]["lift"] if absf(cards[a]["lift"] - cards[b]["lift"]) > 0.01 else cards[a]["at"].y < cards[b]["at"].y)
+	for i in order:
+		var c: Dictionary = cards[i]
+		var xf := _card_xform(c)
+		var L: float = c["lift"]
+		# its shadow on the stone
+		fx.draw_set_transform(c["at"] + Vector2(6, 8), c["rot"], Vector2(CW * K / 54.0, CH * K * 0.55 / 84.0))
+		fx.draw_rect(Rect2(-27, -42, 54, 84), Color(0, 0, 0, 0.45 + 0.1 * L))
+		fx.draw_set_transform_matrix(xf)
+		var near_bowl: float = clampf(1.0 - (c["at"] as Vector2).distance_to(Vector2(1360, 800)) / 700.0, 0.0, 1.0)
+		var lit := (0.5 + 0.25 * near_bowl + 0.08 * _flick(c["ph"])) + 0.45 * L
+		var dim := 0.6 if (mode == "main" and fig_hover >= 0 and c["o"] != fig_hover) else 1.0
+		var col := Color(lit * dim * 1.05, lit * dim * 0.9, lit * dim * 0.75)
+		fx.draw_texture_rect(c["tex"], Rect2(-27, -42, 54, 84), false, col)
+		if c["o"] >= 0 and L > 0.05:
+			fx.draw_rect(Rect2(-28, -43, 56, 86), Color(MARROW, 0.7 * L), false, 1.0)
 	fx.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	_draw_small()
-
-func _draw_fire() -> void:
-	fx.draw_rect(Rect2(_snap(FIRE + Vector2(-44, -8)), Vector2(88, 12)), Color("#0f0905"))
-	for l in [[-40, -14, 64, 8], [-20, -20, 60, 8], [-30, -4, 70, 8]]:
-		fx.draw_rect(Rect2(_snap(FIRE + Vector2(l[0], l[1])), Vector2(l[2], l[3])), Color("#1b1008"))
-		fx.draw_rect(Rect2(_snap(FIRE + Vector2(l[0], l[1])), Vector2(l[2], 4)), Color("#3d2512"))
-	for i in 14:
-		var g := _flick(i * 1.3)
-		fx.draw_rect(Rect2(_snap(FIRE + Vector2(-36.0 + i * 6.0, -8)), Vector2(4, 4)), Color("#b83026").lerp(Color("#ecc47e"), g * 0.6))
-	var cols := 13
-	for c in cols:
-		var u := (float(c) / (cols - 1)) * 2.0 - 1.0
-		var hgt := (1.0 - u * u) * (70.0 + 30.0 * _flick(c * 2.1)) + 10.0
-		var sway := sin(t * 3.0 + c * 0.7) * 6.0 + sin(t * 7.3 + c) * 3.0
-		var y := 0.0
-		while y < hgt:
-			var k := y / hgt
-			var col := Color("#fff2c0").lerp(Color("#ecc47e"), minf(1.0, k * 2.0)).lerp(Color("#e8704e"), clampf(k * 2.0 - 0.6, 0.0, 1.0)).lerp(Color("#84181c"), clampf(k * 2.0 - 1.3, 0.0, 1.0))
-			if absf(u) > 0.6:
-				col = col.lerp(Color("#e8704e"), 0.5)
-			if k < 0.85 or fmod(t * 11.0 + c, 1.0) < 0.6:
-				fx.draw_rect(Rect2(_snap(FIRE + Vector2(u * 34.0 + sway * k, -14.0 - y)), Vector2(K, K)), col)
-			y += K
-
-func _draw_small() -> void:
-	# the empty places: a begging bowl on a folded cloth; a stick with paper strips, stirring in the fire's draught
-	for i in PILGRIMS.size():
-		var what: String = PILGRIMS[i][7]
-		if what == "":
-			continue
-		var at: Vector2 = (figs[i]["holder"] as Node2D).position
-		var lit := 0.6 + 0.4 * _flick(i * 3.1) + (0.35 if (mode == "main" and fig_hover == i) else 0.0)
-		if what == "bowl":
-			fx.draw_rect(Rect2(_snap(at + Vector2(-48, -8)), Vector2(96, 12)), Color("#1b1008"))
-			fx.draw_rect(Rect2(_snap(at + Vector2(-28, -24)), Vector2(56, 16)), Color("#3d2512") * lit)
-			fx.draw_rect(Rect2(_snap(at + Vector2(-28, -24)), Vector2(56, 4)), Color("#704622") * lit)
-			fx.draw_rect(Rect2(_snap(at + Vector2(-20, -20)), Vector2(40, 4)), Color("#0f0905"))
+	# ash and embers
+	for m in motes:
+		var a: float = clampf(1.0 - m["t"] / m["life"], 0.0, 1.0)
+		var p := Vector2(floorf(m["x"]), floorf(m["y"])) * K
+		if m["ember"]:
+			fx.draw_rect(Rect2(p, Vector2(K, K)), Color(1.0, 0.62 + 0.3 * a, 0.3, a))
 		else:
-			fx.draw_rect(Rect2(_snap(at + Vector2(-4, -220)), Vector2(8, 220)), Color("#2a190c") * lit)
-			fx.draw_rect(Rect2(_snap(at + Vector2(-16, -224)), Vector2(32, 8)), Color("#3d2512") * lit)
-			for k in 4:
-				var sw := roundf(sin(t * 1.3 + k * 1.7) * 1.2) * K
-				var x0 := -12.0 + k * 8.0
-				for z in 6:
-					var zx := x0 + sw + (K if z % 2 == 1 else 0.0)
-					fx.draw_rect(Rect2(_snap(at + Vector2(zx, -216 + z * 12)), Vector2(K, 12)), Color("#dcc79a") * lit)
-
-	for e in embers:
-		var a: float = 1.0 - e["t"] / e["life"]
-		fx.draw_rect(Rect2(_snap(e["p"]), Vector2(K, K)), Color(1.0, 0.55 + 0.35 * a, 0.25, a))
+			fx.draw_rect(Rect2(p, Vector2(K, K)), Color(0.42, 0.4, 0.44, 0.45))
 
 func _draw_back() -> void:
 	for i in candles.size():
@@ -315,40 +322,34 @@ func _draw_back() -> void:
 		var g := _flick(i * 1.7)
 		fx_back.draw_rect(Rect2(_snap(c + Vector2(0, -8)), Vector2(K, 8 + roundf(g) * 4)), Color("#ecc47e"))
 		fx_back.draw_rect(Rect2(_snap(c + Vector2(0, -12 - g * 4)), Vector2(K, K)), Color("#fff2c0"))
-	if drop_y >= 0.0:
-		fx_back.draw_rect(Rect2(_snap(chin + Vector2(0, drop_y)), Vector2(K, K * 2)), Color("#84181c"))
-	elif drop_t < 1.2:
-		fx_back.draw_rect(Rect2(_snap(chin), Vector2(K, K * (1.0 if drop_t > 0.5 else 2.0))), Color("#5e1016"))
+	# the drop swelling on the chin, and the ones falling
+	var sw := clampf(1.0 - drop_t / 2.4, 0.0, 1.0)
+	if sw > 0.3:
+		fx_back.draw_rect(Rect2(Vector2(chin.x, chin.y + 1.0) * K, Vector2(K, K * (1.0 if sw < 0.75 else 2.0))), Color("#84181c"))
+	for d in drops:
+		fx_back.draw_rect(Rect2(Vector2(chin.x, floorf(d["y"])) * K, Vector2(K, K * 2)), Color("#84181c"))
+	for sp in sparks:
+		fx_back.draw_rect(Rect2(Vector2(floorf(sp["x"]), floorf(sp["y"])) * K, Vector2(K, K)), Color("#b83026"))
 
 func _draw_add() -> void:
-	var g := _flick(0.3)
-	var fr := 520.0 + 40.0 * g
-	add_fx.draw_texture_rect(_glow, Rect2(FIRE + Vector2(-fr, -fr * 0.62 - 40), Vector2(fr * 2, fr * 1.24)), false, Color(1.0, 0.55, 0.25, 0.30 + 0.08 * g))
-	var cr := 140.0 + 16.0 * g
-	add_fx.draw_texture_rect(_glow, Rect2(FIRE + Vector2(-cr, -cr - 50), Vector2(cr * 2, cr * 2)), false, Color(1.0, 0.7, 0.35, 0.35))
 	for i in candles.size():
 		var c: Vector2 = candles[i]
 		var r := 36.0 + 10.0 * _flick(i * 1.7)
-		add_fx.draw_texture_rect(_glow, Rect2(c + Vector2(-r, -r - 8), Vector2(r * 2, r * 2)), false, Color(1.0, 0.6, 0.3, 0.22))
-	for e in embers:
-		var a: float = 1.0 - e["t"] / e["life"]
-		add_fx.draw_texture_rect(_glow, Rect2(e["p"] - Vector2(10, 10), Vector2(20, 20)), false, Color(1.0, 0.5, 0.2, 0.3 * a))
-	# the Mystic's lantern: a soul, pale and cold beside the fire
-	for i in PILGRIMS.size():
-		if PILGRIMS[i][1] == "pilgrim_mystic":
-			var lp: Vector2 = (figs[i]["holder"] as Node2D).position + LANTERN_AT
-			var lr := 60.0 + 8.0 * sin(t * 2.3)
-			add_fx.draw_texture_rect(_glow, Rect2(lp - Vector2(lr, lr), Vector2(lr * 2, lr * 2)), false, Color(0.45, 0.75, 0.8, 0.28))
+		add_fx.draw_texture_rect(_glow, Rect2(c + Vector2(-r, -r - 8), Vector2(r * 2, r * 2)), false, Color(1.0, 0.6, 0.3, 0.2))
 
 # ------------------------------------------------------------------ input
 
+## the order card under a screen point (the topmost, as they are drawn)
 func _fig_at(p: Vector2) -> int:
 	var best := -1
-	for i in figs.size():
-		var h: Node2D = figs[i]["holder"]
-		if Rect2(h.position + Vector2(-110, -500), Vector2(220, 510)).has_point(p):
-			if best < 0 or h.position.y > (figs[best]["holder"] as Node2D).position.y:
-				best = i
+	var best_y := -INF
+	for c in cards:
+		if c["o"] < 0:
+			continue
+		var lp: Vector2 = _card_xform(c).affine_inverse() * p
+		if Rect2(-30, -45, 60, 90).has_point(lp) and (c["at"].y + c["lift"] * 1000.0) > best_y:
+			best_y = c["at"].y + c["lift"] * 1000.0
+			best = c["o"]
 	return best
 
 func _gui(ev: InputEvent) -> void:
@@ -394,7 +395,7 @@ func _unhandled_key_input(ev: InputEvent) -> void:
 	elif ev.keycode == KEY_UP:
 		hover = (hover - 1 + rows.size()) % rows.size()
 	elif mode == "main" and (ev.keycode == KEY_LEFT or ev.keycode == KEY_RIGHT):
-		fig_hover = (maxi(fig_hover, 0) + (1 if ev.keycode == KEY_RIGHT else -1) + figs.size()) % figs.size()
+		fig_hover = (maxi(fig_hover, 0) + (1 if ev.keycode == KEY_RIGHT else -1) + PILGRIMS.size()) % PILGRIMS.size()
 	get_viewport().set_input_as_handled()
 
 func _act(a: String) -> void:
@@ -548,12 +549,18 @@ func _draw_ui() -> void:
 		root.draw_string(fi, Vector2(150, cy + 40), "Click to go back.", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(ASH, a))
 	else:
 		if mode == "main":
-			root.draw_string(fi, Vector2(152, 486), "Or choose one of those at the fire.", HORIZONTAL_ALIGNMENT_LEFT, -1, 21, Color(ASH, a))
+			root.draw_string(fi, Vector2(152, 486), "Or turn a card beside the bowl.", HORIZONTAL_ALIGNMENT_LEFT, -1, 21, Color(ASH, a))
 			if fig_hover >= 0:
 				var p: Array = PILGRIMS[fig_hover]
-				var hh: Node2D = figs[fig_hover]["holder"]
-				root.draw_string(sc, hh.position + Vector2(-160, 40), p[2], HORIZONTAL_ALIGNMENT_CENTER, 320, 22, Color(BONE, 0.95 * a))
-				root.draw_string(fi, hh.position + Vector2(-200, 70), p[3], HORIZONTAL_ALIGNMENT_CENTER, 400, 17, Color(BONE_D, 0.9 * a))
+				var ca: Vector2 = Vector2.ZERO
+				for c in cards:
+					if c["o"] == fig_hover:
+						ca = c["at"]
+				var ly := ca.y - 300.0
+				ca.x = clampf(ca.x, 250.0, 1920.0 - 250.0)
+				root.draw_rect(Rect2(ca.x - 230, ly - 34, 460, 76), Color(0, 0, 0, 0.55 * a))
+				root.draw_string(sc, Vector2(ca.x - 230, ly), p[2], HORIZONTAL_ALIGNMENT_CENTER, 460, 26, Color(BONE, 0.95 * a))
+				root.draw_string(fi, Vector2(ca.x - 230, ly + 30), p[3], HORIZONTAL_ALIGNMENT_CENTER, 460, 18, Color(BONE_D, 0.9 * a))
 		elif mode == "order":
 			_draw_order(a)
 		for i in rows.size():
