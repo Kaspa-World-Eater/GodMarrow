@@ -268,6 +268,9 @@ NAMES = [  # case-sensitive, whole words: old name -> new, in every text that na
     ('Second Heart', 'Sacred Heart'), ('Flesh Mastery', 'Penance Mastery'), ('Blood Thrall', 'Bleeding Saint'),
     ('Graft', 'Vestments'), ('Boiling Blood', 'Her Door'), ('Burst Vessel', 'Split Scab'),
     ('Covenant of Blood', 'The Red Tithe'), ('Flesh panel', 'Penance panel'),
+    ('Welt-Mail', 'Cilice'), ('The Burden', 'The Cross He Carries'), ('The Flaying', 'Sackcloth and Ashes'),
+    ('Penance Mastery', 'Mortification Mastery'), ('The Suckling Clots', 'Cupping Glasses'), ('Suckling Clots', 'Cupping Glasses'),
+    ('Her Door', 'Boiling Blood'), ('Full Clots', 'Full Glasses'), ('Clot Mother', 'More Glasses'), ('Penance panel', 'Mortification panel'),
 ]
 def rename_all(t):
     if not isinstance(t, str):
@@ -329,10 +332,126 @@ for id, (nm, desc, lore) in HEMO_NEW.items():
     if lore:
         by[id]['lore'] = lore
 by['fmastery']['tree'] = 'Penance'
-for pk in by['heart'].get('perks', []):   # no waits (the user's rule): twice in each place, not "ready again"
+for pk in (by['heart'].get('perks', []) if 'heart' in by else []):   # no waits (the user's rule): twice in each place, not "ready again"
     if pk['id'] == 'strongbeat' or pk['name'] == 'Strong Beat':
         pk['text'] = "[Passive] It can pound you back up twice in each place."
 clean_hemo()
+
+
+# ---- the Red Penitent (2026-09-30, the user): the Hemomancer is shown as THE RED PENITENT; three trees:
+#      Mortification (the penances he wears) · Blood (blood magic and blood made to walk) · Iron Maiden (melee and
+#      self-buffs). No "Friday" (the world has no Friday), no Sacred/Second Heart, Her Door is Boiling Blood again,
+#      no "Suckling Clots"; every skill does one thing no other skill does.
+RP_CUT = ['eggsac', 'rush', 'graft', 'assim', 'nest', 'hive', 'broodm', 'heart']
+remove([x for x in RP_CUT if x in by])
+def rp(id, tab, row, col, prereq, name=None, desc=None, lore=None):
+    s = by[id]
+    s['tab'], s['row'], s['col'], s['required_level'] = tab, row, col, ROW_LVL[row]
+    s['tree'] = ['Mortification', 'Blood', 'Iron Maiden'][tab]
+    s['prerequisites'] = list(prereq)
+    if name: s['name'] = name
+    if desc: s['description'] = desc
+    if lore is not None: s['lore'] = lore
+def rp_new(id, tab, row, col, kind, name, desc, lore, levels, cost=None, prereq=()):
+    if id not in by:
+        add(new_skill(H, id, name, tab, ['Mortification', 'Blood', 'Iron Maiden'][tab], row, col, kind, desc, lore, levels, cost=cost, prereq=prereq))
+    rp(id, tab, row, col, prereq, name, desc, lore)
+# Mortification: the penances
+rp('maw', 0, 1, 1, [], 'The Open Side',
+   "[Passive] Penance: the wound in your side opens and does not close, and it has teeth. Your blows strike harder, open bleeding wounds, and a share of what they take comes back to you as life.",
+   "Our Lady of the Open Side. He wears her wound now.")
+rp('chitin', 0, 1, 3, [], 'Cilice',
+   "Penance: a band of spiked iron cinched round the thigh, never loosened. The pain hardens you: blows glance off, and what does strike you loses much of its weight before it reaches meat.",
+   "The brothers wore it under the robe, where only the Maiden could see. He wears it over.")
+rp('swallow', 0, 2, 1, ['maw'], 'Taken Into the Side',
+   "Needs The Open Side. It opens wide and takes the enemy nearest the cursor within reach (not bosses), and holds it while it is spent: you mend for as long as it lasts, and cast out whatever still lives.")
+rp('tentacles', 0, 2, 2, ['maw'], 'Crown of Thorns',
+   "[Passive] Penance: a crown of thorns grows through your brow and down your shoulders. Its long thorns lash out at enemies in reach and hold them where they stand, then grow back. More points grow more thorns, up to eight, and regrow them faster.",
+   "Our Lady was crowned in her own thorns. So is he.")
+rp('devour', 0, 3, 1, ['swallow'], 'Communion',
+   "Take the little hood or tumor nearest you in communion: it restores life and Vitae and gives a stacking blessing to all your damage. The bigger the offering, the bigger the blessing.",
+   "Take, and eat. The brotherhood said it over bread. He says it over what he made.")
+rp('gills', 0, 3, 3, ['chitin'], 'Stigmata',
+   "[Passive] Penance: your palms and your feet open and do not close. Standing in blood heals you three times as fast and refills Vitae far more.",
+   "The brotherhood painted them on its saints in red lead. His do not need paint.")
+rp('bilehump', 0, 4, 2, ['tentacles'], 'The Cross He Carries',
+   "[Passive] Penance: a swollen burden grows across your back, heavy as a cross. It buds little hoods of its own that drift off after enemies and burst in a spray of blood.",
+   "Every penitent carries something up the hill. His grows.")
+rp('molt', 0, 4, 3, ['gills'], 'Sackcloth and Ashes',
+   "Tear your skin off in one wet heave and stand in ash: mend a share of your life and shake off anything slowing you. The empty skin stays where you were, arms held out in sackcloth, and draws the enemy for 3 s.",
+   "The saints in the crypt paintings carry their skins over one arm like a cloak. He never understood them, until now.")
+rp_new('vigil', 0, 5, 2, 'passive', 'The Vigil',
+   "[Passive] Penance: the long watch. While you are below half your life, every penance you wear works half again as hard, and you cannot be slowed.",
+   "The brothers kept the vigil on their knees until the candles guttered. He keeps it bleeding.",
+   lv("Below half life: penances x{0:.2f} · cannot be slowed", lambda L: (1.5 + 0.02 * (L - 1),)), prereq=['bilehump'])
+rp('fmastery', 0, 6, 2, [], 'Mortification Mastery',
+   "[Passive] The Bleeding Maiden asks more of you. A third penance opens beneath your skin, and every penance you wear grows into you more truly.")
+# Blood: blood magic, and blood made to walk
+rp('bboil', 1, 1, 1, [], 'Boiling Blood',
+   "Bring the blood of everything around the cursor to a boil for 8 s. Boiling enemies bleed half again as hard and as long, and each one that dies leaves its blood in a pool on the ground.")
+rp('blance', 1, 1, 2, [], 'Sin Purge')
+rp('hemor', 1, 2, 1, ['bboil'], 'Hemorrhage')
+rp('hatch', 1, 2, 2, ['blance'], 'Penitent Womb')
+rp('vwhip', 1, 2, 3, ['blance'], 'Grasping Veins')
+rp('cburst', 1, 3, 1, ['hemor'], 'Split Scab')
+rp('thrall', 1, 3, 3, ['hatch'], 'Bleeding Saint')
+rp('bwave', 1, 4, 1, ['cburst'], 'Tide of the Maiden')
+rp('fgolem', 1, 4, 2, ['thrall'], 'The Sewn Martyr')
+rp('spool', 1, 4, 3, ['vwhip'], 'Cupping Glasses',
+   "[Passive] The sangrador's glasses ride in your sleeves. Whenever you wound an enemy, one may drop, crawl to the wound on its rim and fix there, drink its fill, then crawl back up your arm and pour what it drank into you as life and Vitae. Levels: more glasses out at once, more drink.",
+   "Before the Fall he bled the brothers with glass cups and a thumb-lancet. The cups remember the work.")
+rp('hemom', 1, 6, 2, [], 'Hemomancy Mastery')
+# Iron Maiden: melee and self-buffs (every blow struck in close costs footing)
+rp('scourge', 2, 1, 1, [], 'Scourge')
+rp_new('discipline', 2, 1, 3, 'cast', 'The Discipline',
+   "A flurry of knotted cords on one enemy: five quick lashes. Every lash that lands stokes your fervour, and fervour makes the next flurry quicker, up to nine. Costs footing.",
+   "The small scourge the brothers carried at the belt was called the discipline. He carries a longer one.",
+   lv("5 lashes · x{0:.2f} weapon damage each · fervour +{1}% speed a stack (up to 9)", lambda L: (0.34 + 0.02 * (L - 1), 3)),
+   cost={'poise': 4})
+rp('bfrenzy', 2, 2, 1, ['scourge'], 'Red Fervour',
+   "Scream the blood hot. For a while you move and strike faster and your wounds knit, and every blow you land in close adds to it.")
+rp_new('nails', 2, 2, 3, 'cast', 'Nails',
+   "A heavy overhand blow that drives an iron nail through the one you strike and into the ground: it is held where it stands for a moment, and while it is held every blow on it lands harder. Costs footing.",
+   "Three nails were enough, the brothers sang. He carries a pouch of them.",
+   lv("x{0:.2f} weapon damage · held {1:.1f} s · +{2}% taken while held", lambda L: (1.5 + 0.1 * (L - 1), 1.0 + 0.03 * L, 20 + L)),
+   cost={'poise': 8}, prereq=['discipline'])
+rp_new('wheel', 2, 3, 2, 'cast', 'The Wheel',
+   "Swing the scourge round you like the breaking wheel: everything within reach is struck, dragged a step toward you, and left bleeding. Costs footing.",
+   "Mother of the Wheel, She Who Turns. The oldest paintings show her bound to one, and smiling.",
+   lv("x{0:.2f} weapon damage all around · bleeds {1}%", lambda L: (1.1 + 0.07 * (L - 1), 25 + 2 * L)),
+   cost={'poise': 9}, prereq=['bfrenzy'])
+rp('pact', 2, 3, 3, ['nails'], 'The Red Tithe',
+   "Pay the tithe: open your own veins and lose 12% of your current life. For 8 s your blows, and your procession's, strike 30% harder, and every blow you land gives back a little of what you paid.",
+   "The Brotherhood of the Precious Wound paid the wound a measured tithe of blood each year. Blood given is not blood taken.")
+rp_new('ironmaiden', 2, 4, 1, 'cast', 'Iron Maiden',
+   "Close the spiked iron round yourself. While it stands you take far less from every blow, and part of each blow is turned back through the spikes into the one who struck; you walk slowly and cannot strike. Use it again to open it.",
+   "In Villa Llaga they kept one in the chapel of the wound, for the brother who had sinned most that year. He had no brothers left to choose.",
+   lv("While closed: -{0}% damage taken · {1}% turned back · you walk at half pace", lambda L: (40 + L, 20 + 2 * L)),
+   cost={'poise': 0}, prereq=['wheel'])
+rp_new('viacrucis', 2, 4, 3, 'passive', 'Via Crucis',
+   "[Passive] Fourteen stations. Every enemy you kill walks you one station further along the road, and every station makes your blows a little heavier and your wounds knit a little faster. Leaving a place, you begin the road again.",
+   "The procession stopped fourteen times on its way round Villa Llaga, and at each stop a brother knelt in the gutter and bled.",
+   lv("Each station: +{0:.1f}% damage · +{1:.2f}% life a second (14 stations)", lambda L: (1.0 + 0.1 * (L - 1), 0.05 + 0.005 * L)),
+   prereq=['pact'])
+rp_new('tallhat', 2, 5, 2, 'cast', 'The Tall Red Hat',
+   "Rise up tall and red in the dark, the way the nursery song tells it. Enemies near you remember the song and flee in terror for a few seconds; the blows you land on the terrified strike half again as hard.",
+   "Tall red hat, tall red hat, who is under the tall red hat? Mind your mother, mind your bed, or he will take you to the Red.",
+   lv("Terror {0:.1f} s within {1:.1f} yd · x1.5 on the terrified", lambda L: (2.0 + 0.1 * L, 3.0 + 0.1 * L)),
+   cost={'resource': 'Vitae', 'base': 19.2, 'per_level_pct': 5}, prereq=['ironmaiden'])
+rp_new('ironm', 2, 6, 2, 'passive', 'Iron Mastery',
+   "[Passive] The iron knows you. Your blows in close strike harder, your footing comes back faster, and your scourge reaches further.",
+   None, lv("+{0}% melee damage · +{1}% footing regained · +{2:.1f} yd reach", lambda L: (4 * L, 3 * L, 0.02 * L)))
+by['cburst']['lore'] = "For a year the wound lay closed under a black crust. On the fast-day of the Fall it split."
+for pk in by['spool'].get('perks', []):
+    pk['text'] = pk['text'].replace('Clots drink', 'The glasses drink').replace('Two more clots', 'Two more glasses')
+for pk in by['molt'].get('perks', []):
+    if pk['name'] == 'Crawling Skin':
+        pk['name'] = 'Spilled Glasses'
+        pk['text'] = "When the skin falls, two cupping glasses roll out of it and go to work on the nearest wounds."
+# synergies that pointed at the cut skills are gone (remove() did it); a few new ones, inside the trees
+by['discipline']['synergies'] = [{"from": "scourge", "from_name": "Scourge", "table_pc": 8, "per_hard_point_pct": 4}]
+by['wheel']['synergies'] = [{"from": "scourge", "from_name": "Scourge", "table_pc": 6, "per_hard_point_pct": 3}]
+by['nails']['synergies'] = [{"from": "discipline", "from_name": "The Discipline", "table_pc": 6, "per_hard_point_pct": 3}]
 
 # ============================================================== every order: Masteries at level 30
 for s in S:
@@ -359,7 +478,10 @@ json.dump(D, open(SK, 'w'), ensure_ascii=False)
 C = json.load(open('data/classes.json'))
 C['classes'][O]['tabs'] = ['Ossuary', 'Carapace', 'Count']
 C['classes'][O]['default_keys'] = {'q': 'spear', 'w': 'ribcage', 'e': 'spikes', 'r': 'colossus', 't': 'opencount', 'y': 'host', 'u': 'sstorm', 'f': 'barmor'}
-C['classes'][H]['tabs'] = ['Procession', 'Blood', 'Penance']
+C['classes'][H]['tabs'] = ['Mortification', 'Blood', 'Iron Maiden']
+C['classes'][H]['display_name'] = 'The Red Penitent'
+C['classes'][H]['display_name_runtime'] = 'The Red Penitent'
+C['classes'][H]['default_keys'] = {'q': 'blance', 'w': 'hemor', 'e': 'vwhip', 'r': 'fgolem', 't': 'scourge', 'y': 'discipline', 'u': 'wheel', 'f': 'ironmaiden'}
 json.dump(C, open('data/classes.json', 'w'), ensure_ascii=False)
 
 # ============================================================== the body board's cards speak the new names

@@ -172,8 +172,8 @@ func _draw() -> void:
 			U.rect(self, 178, y + 6, 1, 30, tc)
 		var nm: String = names[t]
 		var fs := 16.0
-		while fs > 9 and U.text_w(nm, "sc", fs) > 40:
-			fs -= 2
+		while fs > 7 and U.text_w(nm, "sc", fs) > 39:
+			fs -= 1
 		U.text(self, nm, 204, y + 21, tc if on else Color("#8f8a7c"), 0, "sc", fs)
 		var n := 0
 		for id in _ids(t):

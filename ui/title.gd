@@ -19,7 +19,7 @@ const K := 4.0                           # screen px per chapel px
 ## tools/title_pix.py -> art/ui/pilgrim_*.png, shown x4). The two orders without a painting yet keep an empty place.
 const PILGRIMS := [
 	# kind, figure png ("" = an empty place), name, line, foot (screen px), fire side, playable, what lies at an empty place
-	["hemomancer", "pilgrim_hemo", "The Hemomancer", "Opens the vein, and the vein answers.", Vector2(928, 864), 1, false, ""],
+	["hemomancer", "pilgrim_hemo", "The Red Penitent", "Opens the vein, and the vein answers.", Vector2(928, 864), 1, false, ""],
 	["animancer", "pilgrim_mystic", "The Hollow Mystic", "Listens at mirrors. Keeps the dead on a thread.", Vector2(1152, 840), 1, true, ""],
 	["ossumancer", "pilgrim_ossu", "The Ossuarch", "Counts the dead, and the dead stand up to be counted.", Vector2(1580, 840), -1, false, ""],
 	["miasmancer", "", "The Shrine Keeper", "Folds the breath into paper, and the paper walks.", Vector2(1760, 880), -1, true, "charm"],

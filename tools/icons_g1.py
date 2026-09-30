@@ -151,6 +151,89 @@ def stair():
         line(im, x0 + 2, y0, x0 + 2, y0 + 2, c)
     return outline(im)
 
+def candle():   # The Vigil: a candle burned low
+    im = img()
+    for y in range(11, 21):
+        line(im, 10, y, 13, y, BONE)
+    line(im, 11, 8, 11, 10, O); px(im, 12, 7, WOOD2); px(im, 12, 6, HI); px(im, 11, 6, WOOD2)
+    line(im, 7, 21, 16, 21, WOOD); px(im, 14, 12, HI)
+    return outline(im)
+
+def discipline():   # knotted cords from a short handle
+    im = img()
+    line(im, 3, 20, 7, 16, WOOD); line(im, 4, 20, 8, 16, WOOD2)
+    for k, (ex, ey) in enumerate(((19, 4), (21, 9), (14, 3), (20, 14))):
+        line(im, 8, 16, ex, ey, BONE)
+        mx, my = (8 + ex) // 2, (16 + ey) // 2
+        px(im, mx, my, O); px(im, ex, ey, RED)
+    return outline(im)
+
+def nails():
+    im = img()
+    for k, x in enumerate((7, 12, 17)):
+        line(im, x - 2, 5 + k, x + 2, 5 + k, IRON)
+        line(im, x, 5 + k, x, 19, IRON if k != 1 else HI)
+        px(im, x, 20, O)
+    line(im, 3, 21, 21, 21, RED)
+    return outline(im)
+
+def wheel():
+    im = img()
+    for i in range(36):
+        a = i / 36 * math.tau
+        px(im, 12 + math.cos(a) * 9, 12 + math.sin(a) * 9, WOOD2)
+    for i in range(8):
+        a = i / 8 * math.tau
+        line(im, 12, 12, 12 + math.cos(a) * 9, 12 + math.sin(a) * 9, WOOD)
+    px(im, 12, 12, IRON); px(im, 13, 12, IRON)
+    px(im, 20, 9, RED); px(im, 5, 16, RED)
+    return outline(im)
+
+def ironmaiden():
+    im = img()
+    for y in range(4, 22):
+        w = 5 if y < 8 else 6
+        line(im, 12 - w, y, 12 + w, y, IRON)
+    for y in range(6, 21, 3):
+        px(im, 12, y, O)
+    for y in range(5, 21, 4):
+        px(im, 7, y, HI); px(im, 17, y, HI)
+    line(im, 10, 6, 14, 6, BONE); px(im, 11, 7, O); px(im, 13, 7, O)
+    return outline(im)
+
+def viacrucis():   # fourteen stations along a winding road
+    im = img()
+    pts = [(3, 20), (6, 18), (9, 19), (12, 17), (14, 15), (12, 13), (9, 12), (7, 10), (9, 8), (12, 7), (15, 8), (18, 7), (20, 5), (20, 3)]
+    for i in range(len(pts) - 1):
+        line(im, *pts[i], *pts[i + 1], DUST)
+    for i, (x, y) in enumerate(pts):
+        px(im, x, y, HI if i == len(pts) - 1 else BONE)
+    line(im, 20, 1, 20, 4, WOOD2); line(im, 19, 2, 21, 2, WOOD2)
+    return outline(im)
+
+def tallhat():   # a doorway at night, and a tall red shadow across it (no hood: the user's redo brief)
+    im = img()
+    for y in range(4, 22):
+        px(im, 5, y, WOOD); px(im, 18, y, WOOD)
+    line(im, 5, 4, 18, 4, WOOD)
+    for y in range(5, 22):
+        line(im, 6, y, 17, y, DUST)
+    for y in range(6, 22):
+        w = 1 if y < 9 else 2
+        line(im, 12 - w, y, 12 + w, y, RED)
+    px(im, 12, 5, RED)
+    return outline(im)
+
+def ironm():
+    im = img()
+    line(im, 4, 20, 19, 5, IRON); line(im, 5, 20, 20, 5, HI)
+    line(im, 4, 5, 19, 20, IRON); line(im, 5, 5, 20, 20, BONE)
+    for (x, y) in ((12, 12), (11, 12), (12, 11)):
+        px(im, x, y, RED)
+    return outline(im)
+
+for nm, f in (('vigil', candle), ('discipline', discipline), ('nails', nails), ('wheel', wheel), ('ironmaiden', ironmaiden), ('viacrucis', viacrucis), ('tallhat', tallhat), ('ironm', ironm)):
+    states(nm, f())
 states('ninthstair', stair())
 states('tentacles', crown())
 states('gills', stigmata())
