@@ -1,0 +1,1171 @@
+{
+ "format": "godmarrow-zone-index/1",
+ "generated": "2026-09-30T01:47:20.529Z",
+ "source": "/tmp/ossport/x71.html",
+ "seeds": [
+  12345,
+  777,
+  4242
+ ],
+ "zones": {
+  "moor": {
+   "id": "moor",
+   "name": "Ashen Moor",
+   "act": 1,
+   "kind": "town",
+   "outdoor": true,
+   "theme": "moor",
+   "land": "moor",
+   "wallTheme": "moor",
+   "w": 164,
+   "h": 164,
+   "mlvl": [
+    2,
+    6
+   ],
+   "links": [
+    "crypt",
+    "fen",
+    "barrow",
+    "sighing_ridge",
+    "hollow_wood"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "moor_s12345.json",
+    "moor_s777.json",
+    "moor_s4242.json"
+   ]
+  },
+  "crypt": {
+   "id": "crypt",
+   "name": "Hollow Crypt",
+   "act": 1,
+   "kind": "dungeon",
+   "outdoor": false,
+   "theme": "crypt",
+   "land": "crypt",
+   "wallTheme": "crypt",
+   "w": 109,
+   "h": 109,
+   "mlvl": [
+    9,
+    11
+   ],
+   "links": [
+    "moor",
+    "fallen_monastery",
+    "hollow_wood"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "crypt_s12345.json",
+    "crypt_s777.json",
+    "crypt_s4242.json"
+   ]
+  },
+  "fen": {
+   "id": "fen",
+   "name": "Drowned Fen",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "fen",
+   "land": "fen",
+   "wallTheme": "fen",
+   "w": 160,
+   "h": 160,
+   "mlvl": [
+    10,
+    17
+   ],
+   "links": [
+    "moor",
+    "cata1",
+    "drowned_village",
+    "root_deep",
+    "pilgrim_road"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "fen_s12345.json",
+    "fen_s777.json",
+    "fen_s4242.json"
+   ]
+  },
+  "barrow": {
+   "id": "barrow",
+   "name": "Old Barrow",
+   "act": 1,
+   "kind": "dungeon",
+   "outdoor": false,
+   "theme": "barrow",
+   "land": "barrow",
+   "wallTheme": "barrow",
+   "w": 87,
+   "h": 87,
+   "mlvl": [
+    7,
+    10
+   ],
+   "links": [
+    "moor",
+    "fallen_watchtower"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "barrow_s12345.json",
+    "barrow_s777.json",
+    "barrow_s4242.json"
+   ]
+  },
+  "cata1": {
+   "id": "cata1",
+   "name": "Bone Catacombs I",
+   "act": 1,
+   "kind": "dungeon",
+   "outdoor": false,
+   "theme": "bone",
+   "land": "bone",
+   "wallTheme": "bone",
+   "w": 117,
+   "h": 117,
+   "mlvl": [
+    12,
+    16
+   ],
+   "links": [
+    "fen",
+    "cata2",
+    "plague_hospice",
+    "root_deep"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "cata1_s12345.json",
+    "cata1_s777.json",
+    "cata1_s4242.json"
+   ]
+  },
+  "cata2": {
+   "id": "cata2",
+   "name": "Bone Catacombs II",
+   "act": 1,
+   "kind": "dungeon",
+   "outdoor": false,
+   "theme": "bone",
+   "land": "bone",
+   "wallTheme": "bone",
+   "w": 113,
+   "h": 113,
+   "mlvl": [
+    15,
+    17
+   ],
+   "links": [
+    "cata1",
+    "smugglers_hold",
+    "a2_town"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "cata2_s12345.json",
+    "cata2_s777.json",
+    "cata2_s4242.json"
+   ]
+  },
+  "sighing_ridge": {
+   "id": "sighing_ridge",
+   "name": "Sighing Ridge",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "moor",
+   "land": "ridge",
+   "wallTheme": "moor",
+   "w": 172,
+   "h": 124,
+   "mlvl": [
+    2,
+    4
+   ],
+   "links": [
+    "moor",
+    "burnt_heath",
+    "wolf_den_chapel"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "sighing_ridge_s12345.json",
+    "sighing_ridge_s777.json",
+    "sighing_ridge_s4242.json"
+   ]
+  },
+  "ash_shore": {
+   "id": "ash_shore",
+   "name": "Ash Shore",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "moor",
+   "land": "heath",
+   "wallTheme": "moor",
+   "w": 152,
+   "h": 152,
+   "mlvl": [
+    3,
+    5
+   ],
+   "links": [
+    "burnt_heath"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "ash_shore_s12345.json",
+    "ash_shore_s777.json",
+    "ash_shore_s4242.json"
+   ]
+  },
+  "burnt_heath": {
+   "id": "burnt_heath",
+   "name": "Burnt Heath",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "moor",
+   "land": "heath",
+   "wallTheme": "moor",
+   "w": 152,
+   "h": 152,
+   "mlvl": [
+    4,
+    6
+   ],
+   "links": [
+    "sighing_ridge",
+    "ash_shore",
+    "fern_gully"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "burnt_heath_s12345.json",
+    "burnt_heath_s777.json",
+    "burnt_heath_s4242.json"
+   ]
+  },
+  "fern_gully": {
+   "id": "fern_gully",
+   "name": "Fern Gully",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "hollow_wood",
+   "land": "wood",
+   "wallTheme": "crypt",
+   "w": 132,
+   "h": 172,
+   "mlvl": [
+    3,
+    6
+   ],
+   "links": [
+    "burnt_heath",
+    "hunter_cache"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "fern_gully_s12345.json",
+    "fern_gully_s777.json",
+    "fern_gully_s4242.json"
+   ]
+  },
+  "pilgrim_road": {
+   "id": "pilgrim_road",
+   "name": "Pilgrim Road",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "moor",
+   "land": "moor",
+   "wallTheme": "moor",
+   "w": 184,
+   "h": 128,
+   "mlvl": [
+    6,
+    8
+   ],
+   "links": [
+    "hollow_wood",
+    "fen",
+    "tree_hollow"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "pilgrim_road_s12345.json",
+    "pilgrim_road_s777.json",
+    "pilgrim_road_s4242.json"
+   ]
+  },
+  "drowned_village": {
+   "id": "drowned_village",
+   "name": "Drowned Village",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "fen",
+   "land": "fen",
+   "wallTheme": "fen",
+   "w": 152,
+   "h": 144,
+   "mlvl": [
+    6,
+    10
+   ],
+   "links": [
+    "fen",
+    "sunken_bog",
+    "well_shaft"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "drowned_village_s12345.json",
+    "drowned_village_s777.json",
+    "drowned_village_s4242.json"
+   ]
+  },
+  "sunken_bog": {
+   "id": "sunken_bog",
+   "name": "Sunken Bog",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "fen",
+   "land": "fen",
+   "wallTheme": "fen",
+   "w": 164,
+   "h": 152,
+   "mlvl": [
+    9,
+    11
+   ],
+   "links": [
+    "drowned_village",
+    "bogwitch_shack"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "sunken_bog_s12345.json",
+    "sunken_bog_s777.json",
+    "sunken_bog_s4242.json"
+   ]
+  },
+  "fallen_monastery": {
+   "id": "fallen_monastery",
+   "name": "Fallen Monastery",
+   "act": 1,
+   "kind": "dungeon",
+   "outdoor": false,
+   "theme": "crypt",
+   "land": "crypt",
+   "wallTheme": "crypt",
+   "w": 120,
+   "h": 120,
+   "mlvl": [
+    7,
+    9
+   ],
+   "links": [
+    "crypt",
+    "bogwitch_shack"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "fallen_monastery_s12345.json",
+    "fallen_monastery_s777.json",
+    "fallen_monastery_s4242.json"
+   ]
+  },
+  "wolf_den_chapel": {
+   "id": "wolf_den_chapel",
+   "name": "Wolf-Den Chapel",
+   "act": 1,
+   "kind": "dungeon",
+   "outdoor": false,
+   "theme": "crypt",
+   "land": "crypt",
+   "wallTheme": "crypt",
+   "w": 104,
+   "h": 104,
+   "mlvl": [
+    4,
+    8
+   ],
+   "links": [
+    "sighing_ridge"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "wolf_den_chapel_s12345.json",
+    "wolf_den_chapel_s777.json",
+    "wolf_den_chapel_s4242.json"
+   ]
+  },
+  "plague_hospice": {
+   "id": "plague_hospice",
+   "name": "Plague Hospice",
+   "act": 1,
+   "kind": "dungeon",
+   "outdoor": false,
+   "theme": "crypt",
+   "land": "crypt",
+   "wallTheme": "crypt",
+   "w": 120,
+   "h": 120,
+   "mlvl": [
+    9,
+    12
+   ],
+   "links": [
+    "cata1"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "plague_hospice_s12345.json",
+    "plague_hospice_s777.json",
+    "plague_hospice_s4242.json"
+   ]
+  },
+  "well_shaft": {
+   "id": "well_shaft",
+   "name": "The Well-Shaft",
+   "act": 1,
+   "kind": "dungeon",
+   "outdoor": false,
+   "theme": "crypt",
+   "land": "crypt",
+   "wallTheme": "crypt",
+   "w": 105,
+   "h": 105,
+   "mlvl": [
+    10,
+    13
+   ],
+   "links": [
+    "drowned_village"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "well_shaft_s12345.json",
+    "well_shaft_s777.json",
+    "well_shaft_s4242.json"
+   ]
+  },
+  "smugglers_hold": {
+   "id": "smugglers_hold",
+   "name": "Smugglers' Hold",
+   "act": 1,
+   "kind": "dungeon",
+   "outdoor": false,
+   "theme": "barrow",
+   "land": "barrow",
+   "wallTheme": "barrow",
+   "w": 107,
+   "h": 107,
+   "mlvl": [
+    5,
+    9
+   ],
+   "links": [
+    "cata2"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "smugglers_hold_s12345.json",
+    "smugglers_hold_s777.json",
+    "smugglers_hold_s4242.json"
+   ]
+  },
+  "bogwitch_shack": {
+   "id": "bogwitch_shack",
+   "name": "Bog-Witch's Shack",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "fen",
+   "land": "fen",
+   "wallTheme": "fen",
+   "w": 104,
+   "h": 104,
+   "mlvl": [
+    7,
+    12
+   ],
+   "links": [
+    "sunken_bog",
+    "fallen_monastery"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "bogwitch_shack_s12345.json",
+    "bogwitch_shack_s777.json",
+    "bogwitch_shack_s4242.json"
+   ]
+  },
+  "tree_hollow": {
+   "id": "tree_hollow",
+   "name": "The Tree-Hollow",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "hollow_wood",
+   "land": "wood",
+   "wallTheme": "crypt",
+   "w": 104,
+   "h": 104,
+   "mlvl": [
+    6,
+    7
+   ],
+   "links": [
+    "pilgrim_road"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "tree_hollow_s12345.json",
+    "tree_hollow_s777.json",
+    "tree_hollow_s4242.json"
+   ]
+  },
+  "hunter_cache": {
+   "id": "hunter_cache",
+   "name": "Hunter's Cache",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "moor",
+   "land": "wood",
+   "wallTheme": "moor",
+   "w": 104,
+   "h": 104,
+   "mlvl": [
+    4,
+    5
+   ],
+   "links": [
+    "fern_gully"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "hunter_cache_s12345.json",
+    "hunter_cache_s777.json",
+    "hunter_cache_s4242.json"
+   ]
+  },
+  "fallen_watchtower": {
+   "id": "fallen_watchtower",
+   "name": "Fallen Watchtower",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "moor",
+   "land": "moor",
+   "wallTheme": "moor",
+   "w": 124,
+   "h": 124,
+   "mlvl": [
+    6,
+    9
+   ],
+   "links": [
+    "barrow"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "fallen_watchtower_s12345.json",
+    "fallen_watchtower_s777.json",
+    "fallen_watchtower_s4242.json"
+   ]
+  },
+  "broken_bridge": {
+   "id": "broken_bridge",
+   "name": "The Broken Bridge",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "moor",
+   "land": "moor",
+   "wallTheme": "moor",
+   "w": 152,
+   "h": 132,
+   "mlvl": [
+    10,
+    13
+   ],
+   "links": [
+    "root_deep"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "broken_bridge_s12345.json",
+    "broken_bridge_s777.json",
+    "broken_bridge_s4242.json"
+   ]
+  },
+  "hollow_wood": {
+   "id": "hollow_wood",
+   "name": "Hollow Wood",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "hollow_wood",
+   "land": "wood",
+   "wallTheme": "crypt",
+   "w": 152,
+   "h": 152,
+   "mlvl": [
+    5,
+    8
+   ],
+   "links": [
+    "moor",
+    "crypt",
+    "pilgrim_road"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "hollow_wood_s12345.json",
+    "hollow_wood_s777.json",
+    "hollow_wood_s4242.json"
+   ]
+  },
+  "root_deep": {
+   "id": "root_deep",
+   "name": "Root Deep",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "root_deep",
+   "land": "wood",
+   "wallTheme": "crypt",
+   "w": 164,
+   "h": 164,
+   "mlvl": [
+    13,
+    16
+   ],
+   "links": [
+    "fen",
+    "cata1",
+    "broken_bridge"
+   ],
+   "seeds": [
+    12345,
+    777,
+    4242
+   ],
+   "files": [
+    "root_deep_s12345.json",
+    "root_deep_s777.json",
+    "root_deep_s4242.json"
+   ]
+  }
+ },
+ "missingArt": {
+  "landmark:lm_barrow_king": [
+   "barrow"
+  ],
+  "landmark:lm_bishops_tomb": [
+   "crypt",
+   "smugglers_hold"
+  ],
+  "landmark:lm_blood_font": [
+   "cata1",
+   "fallen_monastery",
+   "plague_hospice"
+  ],
+  "landmark:lm_bone_bell": [
+   "smugglers_hold",
+   "well_shaft"
+  ],
+  "landmark:lm_coin_eyed_god": [
+   "barrow",
+   "crypt",
+   "fallen_monastery",
+   "plague_hospice",
+   "wolf_den_chapel"
+  ],
+  "landmark:lm_door_above_the_wood": [
+   "fern_gully",
+   "hollow_wood",
+   "hunter_cache",
+   "root_deep",
+   "tree_hollow"
+  ],
+  "landmark:lm_drowned_belfry": [
+   "bogwitch_shack",
+   "drowned_village",
+   "fen",
+   "sunken_bog"
+  ],
+  "landmark:lm_faceless_saint": [
+   "broken_bridge",
+   "fallen_watchtower",
+   "fern_gully",
+   "hollow_wood",
+   "hunter_cache",
+   "moor",
+   "pilgrim_road",
+   "root_deep",
+   "sighing_ridge",
+   "tree_hollow"
+  ],
+  "landmark:lm_giant_sword": [
+   "ash_shore",
+   "broken_bridge",
+   "burnt_heath",
+   "fallen_watchtower",
+   "moor",
+   "pilgrim_road",
+   "sighing_ridge"
+  ],
+  "landmark:lm_hanged_god": [
+   "bogwitch_shack",
+   "broken_bridge",
+   "drowned_village",
+   "fen",
+   "fern_gully",
+   "hollow_wood",
+   "hunter_cache",
+   "moor",
+   "pilgrim_road",
+   "root_deep",
+   "sunken_bog",
+   "tree_hollow"
+  ],
+  "landmark:lm_hill_of_spent_prayers": [
+   "bogwitch_shack",
+   "drowned_village",
+   "fen",
+   "fern_gully",
+   "hollow_wood",
+   "root_deep",
+   "sunken_bog",
+   "tree_hollow"
+  ],
+  "landmark:lm_ossuary_altar": [
+   "cata1",
+   "cata2"
+  ],
+  "landmark:lm_reliquary_hand": [
+   "cata2",
+   "well_shaft",
+   "wolf_den_chapel"
+  ],
+  "landmark:lm_shoe_cairn": [
+   "ash_shore",
+   "broken_bridge",
+   "burnt_heath",
+   "fallen_watchtower",
+   "fern_gully",
+   "hollow_wood",
+   "hunter_cache",
+   "moor",
+   "pilgrim_road",
+   "root_deep",
+   "tree_hollow"
+  ],
+  "landmark:lm_six_arms": [
+   "ash_shore",
+   "broken_bridge",
+   "burnt_heath",
+   "fallen_watchtower",
+   "moor",
+   "sighing_ridge"
+  ],
+  "landmark:lm_struck_obelisk": [
+   "ash_shore",
+   "burnt_heath",
+   "sighing_ridge"
+  ],
+  "landmark:lm_swallowed_god": [
+   "fern_gully",
+   "hollow_wood",
+   "hunter_cache",
+   "root_deep",
+   "tree_hollow"
+  ],
+  "landmark:lm_toppled_king": [
+   "broken_bridge",
+   "fallen_watchtower",
+   "moor",
+   "pilgrim_road",
+   "sighing_ridge"
+  ],
+  "landmark:lm_unmirroring_ring": [
+   "broken_bridge",
+   "drowned_village",
+   "fallen_watchtower",
+   "fen",
+   "pilgrim_road",
+   "sunken_bog"
+  ],
+  "landmark:lm_veiled_mourner": [
+   "bogwitch_shack",
+   "drowned_village",
+   "fen",
+   "sunken_bog"
+  ],
+  "landmark:lm_weeping_face": [
+   "ash_shore",
+   "broken_bridge",
+   "burnt_heath",
+   "moor",
+   "pilgrim_road"
+  ]
+ },
+ "procedural": {
+  "object:altar": {
+   "draws": 24,
+   "zones": [
+    "ash_shore",
+    "bogwitch_shack",
+    "broken_bridge",
+    "burnt_heath",
+    "cata1",
+    "cata2",
+    "drowned_village",
+    "fallen_monastery",
+    "fallen_watchtower",
+    "fen",
+    "hollow_wood",
+    "hunter_cache",
+    "moor",
+    "pilgrim_road",
+    "root_deep",
+    "sighing_ridge",
+    "wolf_den_chapel"
+   ]
+  },
+  "object:qobj/captive/vendor": {
+   "draws": 3,
+   "zones": [
+    "drowned_village"
+   ]
+  },
+  "object:qobj/npc/giver/vendor": {
+   "draws": 3,
+   "zones": [
+    "moor"
+   ]
+  },
+  "object:qobj/npc/healer/vendor": {
+   "draws": 3,
+   "zones": [
+    "moor"
+   ]
+  },
+  "object:qobj/npc/smith/vendor": {
+   "draws": 3,
+   "zones": [
+    "moor"
+   ]
+  },
+  "object:qobj/npc/stranger/vendor": {
+   "draws": 3,
+   "zones": [
+    "moor"
+   ]
+  },
+  "object:qobj/relic/chest": {
+   "draws": 3,
+   "zones": [
+    "cata1"
+   ]
+  },
+  "object:qobj/shrine/shrine": {
+   "draws": 3,
+   "zones": [
+    "sighing_ridge"
+   ]
+  },
+  "object:qobj/wp (waystone pit, zz_zz_maw95) [vector: fillRect/paths]": {
+   "draws": 78,
+   "zones": [
+    "barrow",
+    "burnt_heath",
+    "cata1",
+    "cata2",
+    "crypt",
+    "drowned_village",
+    "fen",
+    "hollow_wood",
+    "moor",
+    "pilgrim_road",
+    "root_deep",
+    "sighing_ridge",
+    "sunken_bog"
+   ]
+  },
+  "object:statue": {
+   "draws": 91,
+   "zones": [
+    "ash_shore",
+    "bogwitch_shack",
+    "broken_bridge",
+    "burnt_heath",
+    "drowned_village",
+    "fallen_watchtower",
+    "fen",
+    "hunter_cache",
+    "moor",
+    "pilgrim_road",
+    "sighing_ridge",
+    "sunken_bog"
+   ]
+  },
+  "object:vendor": {
+   "draws": 3,
+   "zones": [
+    "moor"
+   ]
+  },
+  "prop:brazier (overlay: shadow/flame/cage)": {
+   "draws": 731,
+   "zones": [
+    "barrow",
+    "cata1",
+    "cata2",
+    "crypt",
+    "fallen_monastery",
+    "plague_hospice",
+    "smugglers_hold",
+    "well_shaft",
+    "wolf_den_chapel"
+   ]
+  },
+  "prop:lily": {
+   "draws": 389,
+   "zones": [
+    "bogwitch_shack",
+    "drowned_village",
+    "fen",
+    "sunken_bog"
+   ]
+  },
+  "prop:reeds": {
+   "draws": 119,
+   "zones": [
+    "bogwitch_shack",
+    "drowned_village",
+    "fen",
+    "sunken_bog"
+   ]
+  },
+  "prop:sconce (overlay: shadow/flame/cage)": {
+   "draws": 439,
+   "zones": [
+    "barrow",
+    "cata1",
+    "cata2",
+    "crypt",
+    "fallen_monastery",
+    "plague_hospice",
+    "smugglers_hold",
+    "well_shaft",
+    "wolf_den_chapel"
+   ]
+  },
+  "tile:cliff": {
+   "draws": 28738,
+   "zones": [
+    "ash_shore",
+    "bogwitch_shack",
+    "broken_bridge",
+    "burnt_heath",
+    "drowned_village",
+    "fallen_watchtower",
+    "fen",
+    "fern_gully",
+    "hollow_wood",
+    "hunter_cache",
+    "moor",
+    "pilgrim_road",
+    "root_deep",
+    "sighing_ridge",
+    "sunken_bog",
+    "tree_hollow"
+   ]
+  },
+  "tile:palisade": {
+   "draws": 300,
+   "zones": [
+    "broken_bridge",
+    "hunter_cache",
+    "moor"
+   ]
+  },
+  "tile:ruin": {
+   "draws": 2279,
+   "zones": [
+    "ash_shore",
+    "bogwitch_shack",
+    "broken_bridge",
+    "burnt_heath",
+    "drowned_village",
+    "fallen_watchtower",
+    "fen",
+    "hunter_cache",
+    "moor",
+    "pilgrim_road",
+    "sighing_ridge",
+    "sunken_bog"
+   ]
+  },
+  "tile:wall": {
+   "draws": 38971,
+   "zones": [
+    "barrow",
+    "cata1",
+    "cata2",
+    "crypt",
+    "fallen_monastery",
+    "plague_hospice",
+    "smugglers_hold",
+    "well_shaft",
+    "wolf_den_chapel"
+   ]
+  },
+  "tree (overlay: shadow/flame/cage)": {
+   "draws": 59770,
+   "zones": [
+    "ash_shore",
+    "bogwitch_shack",
+    "broken_bridge",
+    "burnt_heath",
+    "drowned_village",
+    "fallen_watchtower",
+    "fen",
+    "fern_gully",
+    "hollow_wood",
+    "hunter_cache",
+    "moor",
+    "pilgrim_road",
+    "root_deep",
+    "sighing_ridge",
+    "sunken_bog",
+    "tree_hollow"
+   ]
+  },
+  "zoneProp:lum_shroom [vector: fillRect/paths]": {
+   "draws": 1104,
+   "zones": [
+    "hollow_wood",
+    "root_deep"
+   ]
+  },
+  "zoneProp:trunk_relic [vector: fillRect/paths]": {
+   "draws": 84,
+   "zones": [
+    "hollow_wood",
+    "root_deep"
+   ]
+  }
+ },
+ "landmarkArt": "landmarks/landmarks.json"
+}

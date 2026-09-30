@@ -1,0 +1,7476 @@
+{
+ "source": "/tmp/ossport/x71.html",
+ "generated": "2026-09-30T01:54:59.219Z",
+ "tool": "export_sprites.js",
+ "px_per_world_px": 3,
+ "anchor": "entity ground point; idx entries [sheet,x,y,w,h,dx,dy], (dx,dy) = anchor -> frame top-left",
+ "kinds": [
+  {
+   "kind": "hollow",
+   "name": "Husk",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 109,
+    "h": 165,
+    "anchor_x": 24,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "hollow.png"
+   ],
+   "json": "hollow.json",
+   "base_kind": "hollow",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "hollow@champion",
+   "name": "Champion Husk",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 109,
+    "h": 165,
+    "anchor_x": 24,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "hollow@champion.png"
+   ],
+   "json": "hollow@champion.json",
+   "base_kind": "hollow",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "hollow@unique",
+   "name": "Unique Husk",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 109,
+    "h": 165,
+    "anchor_x": 24,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "hollow@unique.png"
+   ],
+   "json": "hollow@unique.json",
+   "base_kind": "hollow",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "hound",
+   "name": "Tithe-Hand",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 136,
+    "h": 158,
+    "anchor_x": 48,
+    "anchor_y": 102
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "hound.png"
+   ],
+   "json": "hound.json",
+   "base_kind": "hound",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "hound@champion",
+   "name": "Champion Tithe-Hand",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 136,
+    "h": 158,
+    "anchor_x": 48,
+    "anchor_y": 102
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "hound@champion.png"
+   ],
+   "json": "hound@champion.json",
+   "base_kind": "hound",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "hound@unique",
+   "name": "Unique Tithe-Hand",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 136,
+    "h": 158,
+    "anchor_x": 48,
+    "anchor_y": 102
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "hound@unique.png"
+   ],
+   "json": "hound@unique.json",
+   "base_kind": "hound",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "archer",
+   "name": "Weeper",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 188,
+    "h": 189,
+    "anchor_x": 82,
+    "anchor_y": 142
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "archer.png"
+   ],
+   "json": "archer.json",
+   "base_kind": "archer",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "archer@champion",
+   "name": "Champion Weeper",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 188,
+    "h": 189,
+    "anchor_x": 82,
+    "anchor_y": 142
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "archer@champion.png"
+   ],
+   "json": "archer@champion.json",
+   "base_kind": "archer",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "archer@unique",
+   "name": "Unique Weeper",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 188,
+    "h": 189,
+    "anchor_x": 82,
+    "anchor_y": 142
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "archer@unique.png"
+   ],
+   "json": "archer@unique.json",
+   "base_kind": "archer",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "caster",
+   "name": "Gasp",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 214,
+    "h": 245,
+    "anchor_x": 96,
+    "anchor_y": 188
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "caster.png"
+   ],
+   "json": "caster.json",
+   "base_kind": "caster",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "caster@champion",
+   "name": "Champion Gasp",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 214,
+    "h": 245,
+    "anchor_x": 96,
+    "anchor_y": 188
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "caster@champion.png"
+   ],
+   "json": "caster@champion.json",
+   "base_kind": "caster",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "caster@unique",
+   "name": "Unique Gasp",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 214,
+    "h": 245,
+    "anchor_x": 96,
+    "anchor_y": 188
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "caster@unique.png"
+   ],
+   "json": "caster@unique.json",
+   "base_kind": "caster",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "bloat",
+   "name": "Gravebloat",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 152,
+    "h": 131,
+    "anchor_x": 47,
+    "anchor_y": 85
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "bloat.png"
+   ],
+   "json": "bloat.json",
+   "base_kind": "bloat",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "bloat@champion",
+   "name": "Champion Gravebloat",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 152,
+    "h": 131,
+    "anchor_x": 47,
+    "anchor_y": 85
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "bloat@champion.png"
+   ],
+   "json": "bloat@champion.json",
+   "base_kind": "bloat",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "bloat@unique",
+   "name": "Unique Gravebloat",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 152,
+    "h": 131,
+    "anchor_x": 47,
+    "anchor_y": 85
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "bloat@unique.png"
+   ],
+   "json": "bloat@unique.json",
+   "base_kind": "bloat",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "knight",
+   "name": "Ossuary Warden",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 213,
+    "h": 218,
+    "anchor_x": 104,
+    "anchor_y": 174
+   },
+   "frames": 48,
+   "unique_frames": 44,
+   "sheets": [
+    "knight.png"
+   ],
+   "json": "knight.json",
+   "base_kind": "knight",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "knight@champion",
+   "name": "Champion Ossuary Warden",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 213,
+    "h": 218,
+    "anchor_x": 104,
+    "anchor_y": 174
+   },
+   "frames": 48,
+   "unique_frames": 44,
+   "sheets": [
+    "knight@champion.png"
+   ],
+   "json": "knight@champion.json",
+   "base_kind": "knight",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "knight@unique",
+   "name": "Unique Ossuary Warden",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 213,
+    "h": 218,
+    "anchor_x": 104,
+    "anchor_y": 174
+   },
+   "frames": 48,
+   "unique_frames": 44,
+   "sheets": [
+    "knight@unique.png"
+   ],
+   "json": "knight@unique.json",
+   "base_kind": "knight",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "pyre",
+   "name": "Pyre-Saint",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 272,
+    "h": 223,
+    "anchor_x": 135,
+    "anchor_y": 192
+   },
+   "frames": 48,
+   "unique_frames": 46,
+   "sheets": [
+    "pyre.png"
+   ],
+   "json": "pyre.json",
+   "base_kind": "pyre",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "pyre@champion",
+   "name": "Champion Pyre-Saint",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 272,
+    "h": 223,
+    "anchor_x": 135,
+    "anchor_y": 192
+   },
+   "frames": 48,
+   "unique_frames": 46,
+   "sheets": [
+    "pyre@champion.png"
+   ],
+   "json": "pyre@champion.json",
+   "base_kind": "pyre",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "pyre@unique",
+   "name": "Unique Pyre-Saint",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 272,
+    "h": 223,
+    "anchor_x": 135,
+    "anchor_y": 192
+   },
+   "frames": 48,
+   "unique_frames": 46,
+   "sheets": [
+    "pyre@unique.png"
+   ],
+   "json": "pyre@unique.json",
+   "base_kind": "pyre",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "pyre@doused",
+   "name": "Pyre-Saint (doused)",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 263,
+    "h": 223,
+    "anchor_x": 130,
+    "anchor_y": 186
+   },
+   "frames": 48,
+   "unique_frames": 46,
+   "sheets": [
+    "pyre@doused.png"
+   ],
+   "json": "pyre@doused.json",
+   "base_kind": "pyre",
+   "rank": "normal",
+   "variant": "doused"
+  },
+  {
+   "kind": "bell",
+   "name": "Bellwether",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 242,
+    "h": 311,
+    "anchor_x": 100,
+    "anchor_y": 216
+   },
+   "frames": 48,
+   "unique_frames": 44,
+   "sheets": [
+    "bell.png"
+   ],
+   "json": "bell.json",
+   "base_kind": "bell",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "bell@champion",
+   "name": "Champion Bellwether",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 242,
+    "h": 311,
+    "anchor_x": 100,
+    "anchor_y": 216
+   },
+   "frames": 48,
+   "unique_frames": 44,
+   "sheets": [
+    "bell@champion.png"
+   ],
+   "json": "bell@champion.json",
+   "base_kind": "bell",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "bell@unique",
+   "name": "Unique Bellwether",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 242,
+    "h": 311,
+    "anchor_x": 100,
+    "anchor_y": 216
+   },
+   "frames": 48,
+   "unique_frames": 44,
+   "sheets": [
+    "bell@unique.png"
+   ],
+   "json": "bell@unique.json",
+   "base_kind": "bell",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "worm",
+   "name": "Vein-Worm",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 116,
+    "h": 159,
+    "anchor_x": 38,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "worm.png"
+   ],
+   "json": "worm.json",
+   "base_kind": "worm",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "worm@champion",
+   "name": "Champion Vein-Worm",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 116,
+    "h": 159,
+    "anchor_x": 38,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "worm@champion.png"
+   ],
+   "json": "worm@champion.json",
+   "base_kind": "worm",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "worm@unique",
+   "name": "Unique Vein-Worm",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 116,
+    "h": 159,
+    "anchor_x": 38,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "worm@unique.png"
+   ],
+   "json": "worm@unique.json",
+   "base_kind": "worm",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "moth",
+   "name": "Moth-Saint",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 301,
+    "h": 360,
+    "anchor_x": 146,
+    "anchor_y": 262
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "moth.png"
+   ],
+   "json": "moth.json",
+   "base_kind": "moth",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "moth@champion",
+   "name": "Champion Moth-Saint",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 301,
+    "h": 360,
+    "anchor_x": 146,
+    "anchor_y": 262
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "moth@champion.png"
+   ],
+   "json": "moth@champion.json",
+   "base_kind": "moth",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "moth@unique",
+   "name": "Unique Moth-Saint",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 301,
+    "h": 360,
+    "anchor_x": 146,
+    "anchor_y": 262
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "moth@unique.png"
+   ],
+   "json": "moth@unique.json",
+   "base_kind": "moth",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "drowned",
+   "name": "Drowned Husk",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 109,
+    "h": 165,
+    "anchor_x": 24,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 52,
+   "sheets": [
+    "drowned.png"
+   ],
+   "json": "drowned.json",
+   "base_kind": "drowned",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "drowned@champion",
+   "name": "Champion Drowned Husk",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 109,
+    "h": 165,
+    "anchor_x": 24,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 52,
+   "sheets": [
+    "drowned@champion.png"
+   ],
+   "json": "drowned@champion.json",
+   "base_kind": "drowned",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "drowned@unique",
+   "name": "Unique Drowned Husk",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 109,
+    "h": 165,
+    "anchor_x": 24,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 52,
+   "sheets": [
+    "drowned@unique.png"
+   ],
+   "json": "drowned@unique.json",
+   "base_kind": "drowned",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "leech",
+   "name": "Mire Vein-Worm",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 116,
+    "h": 159,
+    "anchor_x": 38,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "leech.png"
+   ],
+   "json": "leech.json",
+   "base_kind": "leech",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "leech@champion",
+   "name": "Champion Mire Vein-Worm",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 116,
+    "h": 159,
+    "anchor_x": 38,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "leech@champion.png"
+   ],
+   "json": "leech@champion.json",
+   "base_kind": "leech",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "leech@unique",
+   "name": "Unique Mire Vein-Worm",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 116,
+    "h": 159,
+    "anchor_x": 38,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "leech@unique.png"
+   ],
+   "json": "leech@unique.json",
+   "base_kind": "leech",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "bogwitch",
+   "name": "Mire Gasp",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 214,
+    "h": 245,
+    "anchor_x": 96,
+    "anchor_y": 188
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "bogwitch.png"
+   ],
+   "json": "bogwitch.json",
+   "base_kind": "bogwitch",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "bogwitch@champion",
+   "name": "Champion Mire Gasp",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 214,
+    "h": 245,
+    "anchor_x": 96,
+    "anchor_y": 188
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "bogwitch@champion.png"
+   ],
+   "json": "bogwitch@champion.json",
+   "base_kind": "bogwitch",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "bogwitch@unique",
+   "name": "Unique Mire Gasp",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 214,
+    "h": 245,
+    "anchor_x": 96,
+    "anchor_y": 188
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "bogwitch@unique.png"
+   ],
+   "json": "bogwitch@unique.json",
+   "base_kind": "bogwitch",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "marrow",
+   "name": "Marrow Duelist",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "parry": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 192,
+    "h": 226,
+    "anchor_x": 92,
+    "anchor_y": 158
+   },
+   "frames": 50,
+   "unique_frames": 46,
+   "sheets": [
+    "marrow.png"
+   ],
+   "json": "marrow.json",
+   "base_kind": "marrow",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "marrow@champion",
+   "name": "Champion Marrow Duelist",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "parry": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 192,
+    "h": 226,
+    "anchor_x": 92,
+    "anchor_y": 158
+   },
+   "frames": 50,
+   "unique_frames": 46,
+   "sheets": [
+    "marrow@champion.png"
+   ],
+   "json": "marrow@champion.json",
+   "base_kind": "marrow",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "marrow@unique",
+   "name": "Unique Marrow Duelist",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "parry": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 192,
+    "h": 226,
+    "anchor_x": 92,
+    "anchor_y": 158
+   },
+   "frames": 50,
+   "unique_frames": 46,
+   "sheets": [
+    "marrow@unique.png"
+   ],
+   "json": "marrow@unique.json",
+   "base_kind": "marrow",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "ossarcher",
+   "name": "Ossuary Weeper",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 188,
+    "h": 189,
+    "anchor_x": 82,
+    "anchor_y": 142
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "ossarcher.png"
+   ],
+   "json": "ossarcher.json",
+   "base_kind": "ossarcher",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "ossarcher@champion",
+   "name": "Champion Ossuary Weeper",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 188,
+    "h": 189,
+    "anchor_x": 82,
+    "anchor_y": 142
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "ossarcher@champion.png"
+   ],
+   "json": "ossarcher@champion.json",
+   "base_kind": "ossarcher",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "ossarcher@unique",
+   "name": "Unique Ossuary Weeper",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 188,
+    "h": 189,
+    "anchor_x": 82,
+    "anchor_y": 142
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "ossarcher@unique.png"
+   ],
+   "json": "ossarcher@unique.json",
+   "base_kind": "ossarcher",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "kneeler",
+   "name": "Kneeler",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 177,
+    "h": 215,
+    "anchor_x": 84,
+    "anchor_y": 125
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "kneeler.png"
+   ],
+   "json": "kneeler.json",
+   "base_kind": "kneeler",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "kneeler@champion",
+   "name": "Champion Kneeler",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 177,
+    "h": 215,
+    "anchor_x": 84,
+    "anchor_y": 125
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "kneeler@champion.png"
+   ],
+   "json": "kneeler@champion.json",
+   "base_kind": "kneeler",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "kneeler@unique",
+   "name": "Unique Kneeler",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 177,
+    "h": 215,
+    "anchor_x": 84,
+    "anchor_y": 125
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "kneeler@unique.png"
+   ],
+   "json": "kneeler@unique.json",
+   "base_kind": "kneeler",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "moth_saint",
+   "name": "Moth-Saint of the Canopy",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 301,
+    "h": 360,
+    "anchor_x": 146,
+    "anchor_y": 262
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "moth_saint.png"
+   ],
+   "json": "moth_saint.json",
+   "base_kind": "moth_saint",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "moth_saint@champion",
+   "name": "Champion Moth-Saint of the Canopy",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 301,
+    "h": 360,
+    "anchor_x": 146,
+    "anchor_y": 262
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "moth_saint@champion.png"
+   ],
+   "json": "moth_saint@champion.json",
+   "base_kind": "moth_saint",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "moth_saint@unique",
+   "name": "Unique Moth-Saint of the Canopy",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 301,
+    "h": 360,
+    "anchor_x": 146,
+    "anchor_y": 262
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "moth_saint@unique.png"
+   ],
+   "json": "moth_saint@unique.json",
+   "base_kind": "moth_saint",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "veinworm_elder",
+   "name": "Elder Vein-Worm",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 116,
+    "h": 159,
+    "anchor_x": 38,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "veinworm_elder.png"
+   ],
+   "json": "veinworm_elder.json",
+   "base_kind": "veinworm_elder",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "veinworm_elder@champion",
+   "name": "Champion Elder Vein-Worm",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 116,
+    "h": 159,
+    "anchor_x": 38,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "veinworm_elder@champion.png"
+   ],
+   "json": "veinworm_elder@champion.json",
+   "base_kind": "veinworm_elder",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "veinworm_elder@unique",
+   "name": "Unique Elder Vein-Worm",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 116,
+    "h": 159,
+    "anchor_x": 38,
+    "anchor_y": 129
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "veinworm_elder@unique.png"
+   ],
+   "json": "veinworm_elder@unique.json",
+   "base_kind": "veinworm_elder",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "stalker_crone",
+   "name": "Stalker Crone",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 136,
+    "h": 158,
+    "anchor_x": 48,
+    "anchor_y": 102
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "stalker_crone.png"
+   ],
+   "json": "stalker_crone.json",
+   "base_kind": "stalker_crone",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "stalker_crone@champion",
+   "name": "Champion Stalker Crone",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 136,
+    "h": 158,
+    "anchor_x": 48,
+    "anchor_y": 102
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "stalker_crone@champion.png"
+   ],
+   "json": "stalker_crone@champion.json",
+   "base_kind": "stalker_crone",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "stalker_crone@unique",
+   "name": "Unique Stalker Crone",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 136,
+    "h": 158,
+    "anchor_x": 48,
+    "anchor_y": 102
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "stalker_crone@unique.png"
+   ],
+   "json": "stalker_crone@unique.json",
+   "base_kind": "stalker_crone",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "trunk_thing",
+   "name": "The Trunk-Thing",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 213,
+    "h": 218,
+    "anchor_x": 104,
+    "anchor_y": 174
+   },
+   "frames": 48,
+   "unique_frames": 44,
+   "sheets": [
+    "trunk_thing.png"
+   ],
+   "json": "trunk_thing.json",
+   "base_kind": "trunk_thing",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "trunk_thing@champion",
+   "name": "Champion The Trunk-Thing",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 213,
+    "h": 218,
+    "anchor_x": 104,
+    "anchor_y": 174
+   },
+   "frames": 48,
+   "unique_frames": 44,
+   "sheets": [
+    "trunk_thing@champion.png"
+   ],
+   "json": "trunk_thing@champion.json",
+   "base_kind": "trunk_thing",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "trunk_thing@unique",
+   "name": "Unique The Trunk-Thing",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 213,
+    "h": 218,
+    "anchor_x": 104,
+    "anchor_y": 174
+   },
+   "frames": 48,
+   "unique_frames": 44,
+   "sheets": [
+    "trunk_thing@unique.png"
+   ],
+   "json": "trunk_thing@unique.json",
+   "base_kind": "trunk_thing",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "chorister",
+   "name": "Chorister",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 214,
+    "h": 245,
+    "anchor_x": 96,
+    "anchor_y": 188
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "chorister.png"
+   ],
+   "json": "chorister.json",
+   "base_kind": "chorister",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "chorister@champion",
+   "name": "Champion Chorister",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 214,
+    "h": 245,
+    "anchor_x": 96,
+    "anchor_y": 188
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "chorister@champion.png"
+   ],
+   "json": "chorister@champion.json",
+   "base_kind": "chorister",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "chorister@unique",
+   "name": "Unique Chorister",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 214,
+    "h": 245,
+    "anchor_x": 96,
+    "anchor_y": 188
+   },
+   "frames": 52,
+   "unique_frames": 51,
+   "sheets": [
+    "chorister@unique.png"
+   ],
+   "json": "chorister@unique.json",
+   "base_kind": "chorister",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "bloatling",
+   "name": "Bloatling",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 152,
+    "h": 131,
+    "anchor_x": 47,
+    "anchor_y": 85
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "bloatling.png"
+   ],
+   "json": "bloatling.json",
+   "base_kind": "bloatling",
+   "rank": "normal",
+   "variant": null
+  },
+  {
+   "kind": "bloatling@champion",
+   "name": "Champion Bloatling",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 152,
+    "h": 131,
+    "anchor_x": 47,
+    "anchor_y": 85
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "bloatling@champion.png"
+   ],
+   "json": "bloatling@champion.json",
+   "base_kind": "bloatling",
+   "rank": "champion",
+   "variant": null
+  },
+  {
+   "kind": "bloatling@unique",
+   "name": "Unique Bloatling",
+   "act": 1,
+   "category": "monster",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 16,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 152,
+    "h": 131,
+    "anchor_x": 47,
+    "anchor_y": 85
+   },
+   "frames": 56,
+   "unique_frames": 54,
+   "sheets": [
+    "bloatling@unique.png"
+   ],
+   "json": "bloatling@unique.json",
+   "base_kind": "bloatling",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "boss",
+   "name": "The Carrion Warden",
+   "act": 1,
+   "category": "boss",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 631,
+    "h": 595,
+    "anchor_x": 277,
+    "anchor_y": 410
+   },
+   "frames": 48,
+   "unique_frames": 38,
+   "sheets": [
+    "boss.png"
+   ],
+   "json": "boss.json",
+   "base_kind": "boss",
+   "rank": "boss",
+   "variant": null
+  },
+  {
+   "kind": "matron",
+   "name": "The Ossuary Matron",
+   "act": 1,
+   "category": "boss",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 631,
+    "h": 595,
+    "anchor_x": 277,
+    "anchor_y": 410
+   },
+   "frames": 48,
+   "unique_frames": 38,
+   "sheets": [
+    "matron.png"
+   ],
+   "json": "matron.json",
+   "base_kind": "matron",
+   "rank": "boss",
+   "variant": null
+  },
+  {
+   "kind": "hbone",
+   "name": "The Marrow Pontiff",
+   "act": 1,
+   "category": "boss",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 590,
+    "h": 593,
+    "anchor_x": 285,
+    "anchor_y": 444
+   },
+   "frames": 48,
+   "unique_frames": 38,
+   "sheets": [
+    "hbone.png"
+   ],
+   "json": "hbone.json",
+   "base_kind": "hbone",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "hflesh",
+   "name": "The Wet Nurse",
+   "act": 1,
+   "category": "boss",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 513,
+    "h": 513,
+    "anchor_x": 249,
+    "anchor_y": 336
+   },
+   "frames": 48,
+   "unique_frames": 45,
+   "sheets": [
+    "hflesh.png"
+   ],
+   "json": "hflesh.json",
+   "base_kind": "hflesh",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "hbreath",
+   "name": "The Long Exhale",
+   "act": 1,
+   "category": "boss",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 626,
+    "h": 532,
+    "anchor_x": 314,
+    "anchor_y": 418
+   },
+   "frames": 48,
+   "unique_frames": 46,
+   "sheets": [
+    "hbreath.png"
+   ],
+   "json": "hbreath.json",
+   "base_kind": "hbreath",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "hhollow",
+   "name": "A Silent One",
+   "act": 1,
+   "category": "boss",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    },
+    "death_back": {
+     "frames": 6,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 625,
+    "h": 524,
+    "anchor_x": 308,
+    "anchor_y": 442
+   },
+   "frames": 48,
+   "unique_frames": 38,
+   "sheets": [
+    "hhollow.png"
+   ],
+   "json": "hhollow.json",
+   "base_kind": "hhollow",
+   "rank": "unique",
+   "variant": null
+  },
+  {
+   "kind": "animancer",
+   "name": "The Hollow Mystic",
+   "act": 1,
+   "category": "hero",
+   "anims": {
+    "walk": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "idle": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "atk": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "cast": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "hit": {
+     "frames": 6,
+     "views": [
+      "down",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "death": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "atk2": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "dodge": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    }
+   },
+   "views": [
+    "down",
+    "front",
+    "side",
+    "back",
+    "up"
+   ],
+   "frame_size": {
+    "w": 176,
+    "h": 151,
+    "anchor_x": 68,
+    "anchor_y": 130
+   },
+   "frames": 304,
+   "unique_frames": 255,
+   "sheets": [
+    "animancer.png"
+   ],
+   "json": "animancer.json",
+   "class": "animancer"
+  },
+  {
+   "kind": "animancer_unclipped",
+   "name": "The Hollow Mystic",
+   "act": 1,
+   "category": "hero",
+   "anims": {
+    "walk": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "idle": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "atk": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "cast": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "hit": {
+     "frames": 6,
+     "views": [
+      "down",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "death": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "atk2": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "dodge": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    }
+   },
+   "views": [
+    "down",
+    "front",
+    "side",
+    "back",
+    "up"
+   ],
+   "frame_size": {
+    "w": 185,
+    "h": 169,
+    "anchor_x": 70,
+    "anchor_y": 130
+   },
+   "frames": 304,
+   "unique_frames": 255,
+   "sheets": [
+    "animancer_unclipped.png"
+   ],
+   "json": "animancer_unclipped.json",
+   "class": "animancer",
+   "unclipped": true
+  },
+  {
+   "kind": "wisp_rev",
+   "name": "Wisp (revenant)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "drift": {
+     "frames": 8,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 74,
+    "h": 81,
+    "anchor_x": 33,
+    "anchor_y": 81
+   },
+   "frames": 8,
+   "unique_frames": 8,
+   "sheets": [
+    "wisp_rev.png"
+   ],
+   "json": "wisp_rev.json",
+   "owner": "animancer"
+  },
+  {
+   "kind": "wisp_beam",
+   "name": "Wisp (darting)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "drift": {
+     "frames": 8,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 94,
+    "h": 94,
+    "anchor_x": 43,
+    "anchor_y": 91
+   },
+   "frames": 8,
+   "unique_frames": 8,
+   "sheets": [
+    "wisp_beam.png"
+   ],
+   "json": "wisp_beam.json",
+   "owner": "animancer"
+  },
+  {
+   "kind": "wisp_prism",
+   "name": "Wisp (splitting)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "drift": {
+     "frames": 8,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 128,
+    "h": 128,
+    "anchor_x": 60,
+    "anchor_y": 108
+   },
+   "frames": 8,
+   "unique_frames": 8,
+   "sheets": [
+    "wisp_prism.png"
+   ],
+   "json": "wisp_prism.json",
+   "owner": "animancer"
+  },
+  {
+   "kind": "iron_golem_sword",
+   "name": "Iron Golem (sword, tower shield)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge_wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "dormant": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 204,
+    "h": 228,
+    "anchor_x": 60,
+    "anchor_y": 213
+   },
+   "frames": 51,
+   "unique_frames": 49,
+   "sheets": [
+    "iron_golem_sword.png"
+   ],
+   "json": "iron_golem_sword.json",
+   "owner": "animancer"
+  },
+  {
+   "kind": "iron_golem_sword_noshield",
+   "name": "Iron Golem (sword, shield thrown)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge_wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "dormant": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 204,
+    "h": 228,
+    "anchor_x": 60,
+    "anchor_y": 213
+   },
+   "frames": 51,
+   "unique_frames": 49,
+   "sheets": [
+    "iron_golem_sword_noshield.png"
+   ],
+   "json": "iron_golem_sword_noshield.json",
+   "owner": "animancer"
+  },
+  {
+   "kind": "iron_golem_axe",
+   "name": "Iron Golem (axe, tower shield)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge_wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "dormant": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 204,
+    "h": 234,
+    "anchor_x": 60,
+    "anchor_y": 216
+   },
+   "frames": 51,
+   "unique_frames": 49,
+   "sheets": [
+    "iron_golem_axe.png"
+   ],
+   "json": "iron_golem_axe.json",
+   "owner": "animancer"
+  },
+  {
+   "kind": "iron_golem_axe_noshield",
+   "name": "Iron Golem (axe, shield thrown)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge_wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "dormant": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 204,
+    "h": 234,
+    "anchor_x": 60,
+    "anchor_y": 216
+   },
+   "frames": 51,
+   "unique_frames": 49,
+   "sheets": [
+    "iron_golem_axe_noshield.png"
+   ],
+   "json": "iron_golem_axe_noshield.json",
+   "owner": "animancer"
+  },
+  {
+   "kind": "iron_golem_flail",
+   "name": "Iron Golem (flail, tower shield)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge_wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "dormant": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 204,
+    "h": 228,
+    "anchor_x": 60,
+    "anchor_y": 210
+   },
+   "frames": 51,
+   "unique_frames": 49,
+   "sheets": [
+    "iron_golem_flail.png"
+   ],
+   "json": "iron_golem_flail.json",
+   "owner": "animancer"
+  },
+  {
+   "kind": "iron_golem_flail_noshield",
+   "name": "Iron Golem (flail, shield thrown)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "charge_wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "dormant": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 204,
+    "h": 228,
+    "anchor_x": 60,
+    "anchor_y": 210
+   },
+   "frames": 51,
+   "unique_frames": 49,
+   "sheets": [
+    "iron_golem_flail_noshield.png"
+   ],
+   "json": "iron_golem_flail_noshield.json",
+   "owner": "animancer"
+  },
+  {
+   "kind": "npc_vendor",
+   "name": "Maren the Gravekeeper",
+   "act": 1,
+   "category": "npc",
+   "anims": {
+    "idle": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 129,
+    "h": 225,
+    "anchor_x": 66,
+    "anchor_y": 216
+   },
+   "frames": 1,
+   "unique_frames": 1,
+   "sheets": [
+    "npc_vendor.png"
+   ],
+   "json": "npc_vendor.json"
+  },
+  {
+   "kind": "npc_healer",
+   "name": "Sister Ysolde, Tallow-Nurse",
+   "act": 1,
+   "category": "npc",
+   "anims": {
+    "idle": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 99,
+    "h": 183,
+    "anchor_x": 54,
+    "anchor_y": 174
+   },
+   "frames": 1,
+   "unique_frames": 1,
+   "sheets": [
+    "npc_healer.png"
+   ],
+   "json": "npc_healer.json"
+  },
+  {
+   "kind": "npc_stash",
+   "name": "The Reliquary Chest",
+   "act": 1,
+   "category": "npc",
+   "anims": {
+    "idle": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 168,
+    "h": 140,
+    "anchor_x": 84,
+    "anchor_y": 108
+   },
+   "frames": 1,
+   "unique_frames": 1,
+   "sheets": [
+    "npc_stash.png"
+   ],
+   "json": "npc_stash.json"
+  },
+  {
+   "kind": "npc_smith",
+   "name": "Brannoc of the Nail",
+   "act": 1,
+   "category": "npc",
+   "anims": {
+    "idle": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 156,
+    "h": 186,
+    "anchor_x": 63,
+    "anchor_y": 177
+   },
+   "frames": 1,
+   "unique_frames": 1,
+   "sheets": [
+    "npc_smith.png"
+   ],
+   "json": "npc_smith.json"
+  },
+  {
+   "kind": "npc_giver",
+   "name": "Warden-Crone Esk",
+   "act": 1,
+   "category": "npc",
+   "anims": {
+    "idle": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 102,
+    "h": 222,
+    "anchor_x": 54,
+    "anchor_y": 213
+   },
+   "frames": 1,
+   "unique_frames": 1,
+   "sheets": [
+    "npc_giver.png"
+   ],
+   "json": "npc_giver.json"
+  },
+  {
+   "kind": "npc_stranger",
+   "name": "The Stranger",
+   "act": 1,
+   "category": "npc",
+   "anims": {
+    "idle": {
+     "frames": 1,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 108,
+    "h": 222,
+    "anchor_x": 54,
+    "anchor_y": 213
+   },
+   "frames": 1,
+   "unique_frames": 1,
+   "sheets": [
+    "npc_stranger.png"
+   ],
+   "json": "npc_stranger.json"
+  },
+  {
+   "kind": "ossumancer",
+   "name": "The Ossuarch",
+   "act": 1,
+   "category": "hero",
+   "anims": {
+    "idle": {
+     "frames": 6,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "atk": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "cast": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "hit": {
+     "frames": 6,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "death": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    }
+   },
+   "views": [
+    "down",
+    "front",
+    "side",
+    "back",
+    "up"
+   ],
+   "frame_size": {
+    "w": 179,
+    "h": 168,
+    "anchor_x": 86,
+    "anchor_y": 156
+   },
+   "frames": 220,
+   "unique_frames": 220,
+   "sheets": [
+    "ossumancer.png"
+   ],
+   "json": "ossumancer.json",
+   "class": "ossumancer"
+  },
+  {
+   "kind": "skeleton_shield",
+   "name": "Skeleton (shield)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 66,
+    "h": 150,
+    "anchor_x": 30,
+    "anchor_y": 134
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "skeleton_shield.png"
+   ],
+   "json": "skeleton_shield.json",
+   "owner": "ossumancer"
+  },
+  {
+   "kind": "skeleton_greatsword",
+   "name": "Skeleton (greatsword)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 72,
+    "h": 168,
+    "anchor_x": 30,
+    "anchor_y": 152
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "skeleton_greatsword.png"
+   ],
+   "json": "skeleton_greatsword.json",
+   "owner": "ossumancer"
+  },
+  {
+   "kind": "skeleton_halberd",
+   "name": "Skeleton (halberd)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 78,
+    "h": 174,
+    "anchor_x": 30,
+    "anchor_y": 158
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "skeleton_halberd.png"
+   ],
+   "json": "skeleton_halberd.json",
+   "owner": "ossumancer"
+  },
+  {
+   "kind": "skeleton_flail",
+   "name": "Skeleton (flail)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 68,
+    "h": 154,
+    "anchor_x": 30,
+    "anchor_y": 138
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "skeleton_flail.png"
+   ],
+   "json": "skeleton_flail.json",
+   "owner": "ossumancer"
+  },
+  {
+   "kind": "skeleton_bow",
+   "name": "Skeleton (bow)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 66,
+    "h": 136,
+    "anchor_x": 30,
+    "anchor_y": 120
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "skeleton_bow.png"
+   ],
+   "json": "skeleton_bow.json",
+   "owner": "ossumancer"
+  },
+  {
+   "kind": "skeleton_mage",
+   "name": "Skeleton (mage)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 72,
+    "h": 164,
+    "anchor_x": 30,
+    "anchor_y": 148
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "skeleton_mage.png"
+   ],
+   "json": "skeleton_mage.json",
+   "owner": "ossumancer"
+  },
+  {
+   "kind": "colossus_shield",
+   "name": "Ossuary Colossus (shield)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 120,
+    "h": 258,
+    "anchor_x": 50,
+    "anchor_y": 240
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "colossus_shield.png"
+   ],
+   "json": "colossus_shield.json",
+   "owner": "ossumancer"
+  },
+  {
+   "kind": "colossus_scythe",
+   "name": "Ossuary Colossus (scythe)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 130,
+    "h": 270,
+    "anchor_x": 50,
+    "anchor_y": 252
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "colossus_scythe.png"
+   ],
+   "json": "colossus_scythe.json",
+   "owner": "ossumancer"
+  },
+  {
+   "kind": "colossus_swords",
+   "name": "Ossuary Colossus (swords)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 120,
+    "h": 264,
+    "anchor_x": 50,
+    "anchor_y": 246
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "colossus_swords.png"
+   ],
+   "json": "colossus_swords.json",
+   "owner": "ossumancer"
+  },
+  {
+   "kind": "colossus_flail",
+   "name": "Ossuary Colossus (flail)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 120,
+    "h": 262,
+    "anchor_x": 50,
+    "anchor_y": 244
+   },
+   "frames": 32,
+   "unique_frames": 30,
+   "sheets": [
+    "colossus_flail.png"
+   ],
+   "json": "colossus_flail.json",
+   "owner": "ossumancer"
+  },
+  {
+   "kind": "hemomancer",
+   "name": "The Hemomancer",
+   "act": 1,
+   "category": "hero",
+   "anims": {
+    "walk": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "idle": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "atk": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "cast": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "hit": {
+     "frames": 6,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "death": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "atk2": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "dodge": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    }
+   },
+   "views": [
+    "down",
+    "front",
+    "side",
+    "back",
+    "up"
+   ],
+   "frame_size": {
+    "w": 180,
+    "h": 152,
+    "anchor_x": 58,
+    "anchor_y": 131
+   },
+   "frames": 310,
+   "unique_frames": 269,
+   "sheets": [
+    "hemomancer.png"
+   ],
+   "json": "hemomancer.json",
+   "class": "hemomancer"
+  },
+  {
+   "kind": "hemomancer_unclipped",
+   "name": "The Hemomancer",
+   "act": 1,
+   "category": "hero",
+   "anims": {
+    "walk": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "idle": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "atk": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "cast": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "hit": {
+     "frames": 6,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "death": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "atk2": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "dodge": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    }
+   },
+   "views": [
+    "down",
+    "front",
+    "side",
+    "back",
+    "up"
+   ],
+   "frame_size": {
+    "w": 210,
+    "h": 167,
+    "anchor_x": 88,
+    "anchor_y": 131
+   },
+   "frames": 310,
+   "unique_frames": 269,
+   "sheets": [
+    "hemomancer_unclipped.png"
+   ],
+   "json": "hemomancer_unclipped.json",
+   "class": "hemomancer",
+   "unclipped": true
+  },
+  {
+   "kind": "swarmling",
+   "name": "Swarmling (brood)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "crawl": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 90,
+    "h": 45,
+    "anchor_x": 42,
+    "anchor_y": 36
+   },
+   "frames": 8,
+   "unique_frames": 8,
+   "sheets": [
+    "swarmling.png"
+   ],
+   "json": "swarmling.json",
+   "owner": "hemomancer"
+  },
+  {
+   "kind": "leech",
+   "name": "Leech",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "crawl_fat0": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "crawl_fat1": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "crawl_fat2": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "crawl_fat3": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 80,
+    "h": 32,
+    "anchor_x": 40,
+    "anchor_y": 16
+   },
+   "frames": 16,
+   "unique_frames": 16,
+   "sheets": [
+    "leech.png"
+   ],
+   "json": "leech.json",
+   "owner": "hemomancer"
+  },
+  {
+   "kind": "flesh_golem",
+   "name": "Flesh Golem",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "puke": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "eat": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 240,
+    "h": 240,
+    "anchor_x": 75,
+    "anchor_y": 222
+   },
+   "frames": 40,
+   "unique_frames": 40,
+   "sheets": [
+    "flesh_golem.png"
+   ],
+   "json": "flesh_golem.json",
+   "owner": "hemomancer"
+  },
+  {
+   "kind": "flesh_golem_gorged",
+   "name": "Flesh Golem (gut full of brood stock)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "wind": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "puke": {
+     "frames": 3,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "eat": {
+     "frames": 2,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 246,
+    "h": 240,
+    "anchor_x": 75,
+    "anchor_y": 222
+   },
+   "frames": 40,
+   "unique_frames": 40,
+   "sheets": [
+    "flesh_golem_gorged.png"
+   ],
+   "json": "flesh_golem_gorged.json",
+   "owner": "hemomancer"
+  },
+  {
+   "kind": "miasmancer",
+   "name": "The Shrine Keeper",
+   "act": 1,
+   "category": "hero",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "atk": {
+     "frames": 4,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "cast": {
+     "frames": 4,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "rake": {
+     "frames": 4,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "thrust": {
+     "frames": 4,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "spin": {
+     "frames": 4,
+     "views": [
+      "down",
+      "front",
+      "side",
+      "back",
+      "up"
+     ]
+    },
+    "lunge": {
+     "frames": 2,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "down",
+    "front",
+    "side",
+    "back",
+    "up"
+   ],
+   "frame_size": {
+    "w": 132,
+    "h": 150,
+    "anchor_x": 60,
+    "anchor_y": 134
+   },
+   "frames": 134,
+   "unique_frames": 134,
+   "sheets": [
+    "miasmancer.png"
+   ],
+   "json": "miasmancer.json",
+   "class": "miasmancer"
+  },
+  {
+   "kind": "mirror_sister",
+   "name": "The Mirror-Sister",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "back"
+     ]
+    },
+    "atk": {
+     "frames": 1,
+     "views": [
+      "front",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "back"
+   ],
+   "frame_size": {
+    "w": 102,
+    "h": 150,
+    "anchor_x": 36,
+    "anchor_y": 132
+   },
+   "frames": 26,
+   "unique_frames": 26,
+   "sheets": [
+    "mirror_sister.png"
+   ],
+   "json": "mirror_sister.json",
+   "owner": "miasmancer"
+  },
+  {
+   "kind": "monk",
+   "name": "The Empty Hand (Kusho)",
+   "act": 1,
+   "category": "hero",
+   "anims": {
+    "idle": {
+     "frames": 4,
+     "views": [
+      "front",
+      "side",
+      "back",
+      "down",
+      "up"
+     ]
+    },
+    "walk": {
+     "frames": 8,
+     "views": [
+      "front",
+      "side",
+      "back",
+      "down",
+      "up"
+     ]
+    },
+    "cast": {
+     "frames": 4,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "light1": {
+     "frames": 7,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "light2": {
+     "frames": 7,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "light3": {
+     "frames": 7,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "heavy": {
+     "frames": 9,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "dodge": {
+     "frames": 6,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "hit": {
+     "frames": 3,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "death": {
+     "frames": 6,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "flurry_wind": {
+     "frames": 2,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "flurry": {
+     "frames": 8,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "flurry_end": {
+     "frames": 3,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "skyfist": {
+     "frames": 7,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "leap": {
+     "frames": 8,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "clap": {
+     "frames": 5,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "hungry": {
+     "frames": 6,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "pinch": {
+     "frames": 5,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    },
+    "sky": {
+     "frames": 6,
+     "views": [
+      "front",
+      "side",
+      "back"
+     ]
+    }
+   },
+   "views": [
+    "front",
+    "side",
+    "back",
+    "down",
+    "up"
+   ],
+   "frame_size": {
+    "w": 195,
+    "h": 220,
+    "anchor_x": 93,
+    "anchor_y": 201
+   },
+   "frames": 357,
+   "unique_frames": 353,
+   "sheets": [
+    "monk.png"
+   ],
+   "json": "monk.json",
+   "class": "monk"
+  },
+  {
+   "kind": "stone_buddha",
+   "name": "The Weeping One (Stone Buddha)",
+   "act": 1,
+   "category": "minion",
+   "anims": {
+    "idle": {
+     "frames": 2,
+     "views": [
+      "front"
+     ]
+    },
+    "walk": {
+     "frames": 4,
+     "views": [
+      "front"
+     ]
+    },
+    "slam": {
+     "frames": 3,
+     "views": [
+      "front"
+     ]
+    }
+   },
+   "views": [
+    "front"
+   ],
+   "frame_size": {
+    "w": 224,
+    "h": 256,
+    "anchor_x": 112,
+    "anchor_y": 232
+   },
+   "frames": 9,
+   "unique_frames": 9,
+   "sheets": [
+    "stone_buddha.png"
+   ],
+   "json": "stone_buddha.json",
+   "owner": "monk"
+  }
+ ],
+ "problems": []
+}

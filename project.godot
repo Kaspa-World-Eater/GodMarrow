@@ -1,0 +1,27 @@
+; Godmarrow — Godot 4.7 vertical slice (Act I: the pilgrims' camp and the Ashen Moor)
+config_version=5
+
+[application]
+config/name="Godmarrow"
+config/description="A grimdark isometric action RPG. Vertical slice."
+run/main_scene="res://scenes/game.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[display]
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/window_width_override=1600
+window/size/window_height_override=900
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/canvas_textures/default_texture_filter=1
+environment/defaults/default_clear_color=Color(0.02, 0.02, 0.025, 1)
+
+[autoload]
+
+Data="*res://core/data.gd"
+Game="*res://core/game.gd"

@@ -1,0 +1,986 @@
+{
+ "lm_barrow_king": {
+  "png": "landmarks/lm_barrow_king.webp",
+  "id": "barrow_king",
+  "name": "The King Who Waited",
+  "inscription": "He was buried sitting up, so he would be ready when the god called his name. The god has died. He is ready still.",
+  "lands": [
+   "barrow",
+   "crypt"
+  ],
+  "fw": 3,
+  "fh": 3,
+  "foot": [
+   135,
+   163
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    35,
+    136,
+    "255,150,70",
+    30
+   ],
+   [
+    237,
+    146,
+    "255,150,70",
+    30
+   ],
+   [
+    186,
+    156,
+    "255,150,70",
+    30
+   ],
+   [
+    78,
+    163,
+    "255,150,70",
+    30
+   ],
+   [
+    132,
+    167,
+    "255,150,70",
+    30
+   ],
+   [
+    168,
+    166,
+    "255,150,70",
+    30
+   ],
+   [
+    107,
+    167,
+    "255,150,70",
+    30
+   ]
+  ]
+ },
+ "lm_bishops_tomb": {
+  "png": "landmarks/lm_bishops_tomb.webp",
+  "id": "bishops_tomb",
+  "name": "The Unnamed Bishop",
+  "inscription": "They broke his hands so he could not bless them, and cut his name away so he could not be called. The wax is still warm.",
+  "lands": [
+   "crypt",
+   "barrow"
+  ],
+  "fw": 4,
+  "fh": 2,
+  "foot": [
+   124,
+   115
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    80,
+    41,
+    "255,150,70",
+    30
+   ],
+   [
+    21,
+    71,
+    "255,150,70",
+    30
+   ],
+   [
+    15,
+    71,
+    "255,150,70",
+    30
+   ],
+   [
+    40,
+    26,
+    "255,150,70",
+    30
+   ],
+   [
+    17,
+    77,
+    "255,150,70",
+    30
+   ],
+   [
+    85,
+    112,
+    "255,150,70",
+    30
+   ],
+   [
+    231,
+    117,
+    "255,150,70",
+    30
+   ],
+   [
+    114,
+    123,
+    "255,150,70",
+    30
+   ],
+   [
+    157,
+    90,
+    "255,150,70",
+    30
+   ],
+   [
+    177,
+    148,
+    "255,150,70",
+    30
+   ],
+   [
+    160,
+    147,
+    "255,150,70",
+    30
+   ],
+   [
+    167,
+    146,
+    "255,150,70",
+    30
+   ]
+  ]
+ },
+ "lm_blood_font": {
+  "png": "landmarks/lm_blood_font.webp",
+  "id": "blood_font",
+  "name": "The Font of the Unsaid Mother",
+  "inscription": "Her priests drained themselves into it one by one, and still it is not full. Kneel, and it will take a little of you too.",
+  "lands": [
+   "crypt",
+   "bone"
+  ],
+  "fw": 3,
+  "fh": 3,
+  "foot": [
+   111,
+   157
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    106,
+    5,
+    "255,150,70",
+    34
+   ],
+   [
+    75,
+    108,
+    "255,150,70",
+    34
+   ],
+   [
+    146,
+    6,
+    "255,150,70",
+    34
+   ],
+   [
+    67,
+    11,
+    "255,150,70",
+    34
+   ],
+   [
+    173,
+    23,
+    "255,150,70",
+    34
+   ],
+   [
+    183,
+    125,
+    "255,150,70",
+    34
+   ],
+   [
+    58,
+    120,
+    "255,150,70",
+    34
+   ],
+   [
+    36,
+    135,
+    "255,150,70",
+    34
+   ],
+   [
+    47,
+    34,
+    "255,150,70",
+    34
+   ],
+   [
+    185,
+    150,
+    "255,150,70",
+    34
+   ],
+   [
+    41,
+    150,
+    "255,150,70",
+    34
+   ],
+   [
+    171,
+    48,
+    "255,150,70",
+    34
+   ],
+   [
+    61,
+    57,
+    "255,150,70",
+    34
+   ],
+   [
+    92,
+    149,
+    "255,150,70",
+    34
+   ],
+   [
+    145,
+    66,
+    "255,150,70",
+    34
+   ],
+   [
+    127,
+    149,
+    "255,150,70",
+    34
+   ],
+   [
+    90,
+    65,
+    "255,150,70",
+    34
+   ],
+   [
+    156,
+    171,
+    "255,150,70",
+    34
+   ],
+   [
+    102,
+    154,
+    "255,150,70",
+    34
+   ],
+   [
+    68,
+    172,
+    "255,150,70",
+    34
+   ],
+   [
+    129,
+    179,
+    "255,150,70",
+    34
+   ]
+  ]
+ },
+ "lm_bone_bell": {
+  "png": "landmarks/lm_bone_bell.webp",
+  "id": "bone_bell",
+  "name": "The Bell of the Gathered",
+  "inscription": "Cast from the bones of those who would not come when it was rung. It is rung for them still.",
+  "lands": [
+   "bone",
+   "crypt",
+   "barrow"
+  ],
+  "fw": 4,
+  "fh": 3,
+  "foot": [
+   122,
+   193
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    36,
+    156,
+    "255,150,70",
+    30
+   ],
+   [
+    48,
+    178,
+    "255,150,70",
+    30
+   ],
+   [
+    201,
+    187,
+    "255,150,70",
+    30
+   ],
+   [
+    91,
+    204,
+    "255,150,70",
+    30
+   ],
+   [
+    149,
+    203,
+    "255,150,70",
+    30
+   ],
+   [
+    135,
+    208,
+    "255,150,70",
+    30
+   ],
+   [
+    120,
+    211,
+    "255,150,70",
+    30
+   ],
+   [
+    152,
+    212,
+    "255,150,70",
+    30
+   ]
+  ]
+ },
+ "lm_coin_eyed_god": {
+  "png": "landmarks/lm_coin_eyed_god.webp",
+  "id": "coin_eyed_god",
+  "name": "The Paid Witness",
+  "inscription": "Its priests put out its eyes so it could not see what was done in its name, and paid it for the loss. It is still holding out its hands.",
+  "lands": [
+   "crypt",
+   "barrow"
+  ],
+  "fw": 3,
+  "fh": 3,
+  "foot": [
+   130,
+   329
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    33,
+    307,
+    "255,150,70",
+    30
+   ],
+   [
+    229,
+    308,
+    "255,150,70",
+    30
+   ],
+   [
+    188,
+    286,
+    "255,150,70",
+    30
+   ],
+   [
+    74,
+    284,
+    "255,150,70",
+    30
+   ],
+   [
+    164,
+    297,
+    "255,150,70",
+    30
+   ],
+   [
+    98,
+    299,
+    "255,150,70",
+    30
+   ],
+   [
+    186,
+    330,
+    "255,150,70",
+    30
+   ],
+   [
+    76,
+    327,
+    "255,150,70",
+    30
+   ],
+   [
+    131,
+    303,
+    "255,150,70",
+    30
+   ],
+   [
+    119,
+    351,
+    "255,150,70",
+    30
+   ],
+   [
+    137,
+    359,
+    "255,150,70",
+    30
+   ]
+  ]
+ },
+ "lm_door_above_the_wood": {
+  "png": "landmarks/lm_door_above_the_wood.webp",
+  "id": "door_above_the_wood",
+  "name": "The Door Above the Wood",
+  "inscription": "The chapel was taken up whole, they say, and only the way in was left behind. Knock, and something on the far side knocks back.",
+  "lands": [
+   "wood"
+  ],
+  "fw": 2,
+  "fh": 3,
+  "foot": [
+   104,
+   212
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    116,
+    142,
+    "255,170,90",
+    60
+   ]
+  ]
+ },
+ "lm_drowned_belfry": {
+  "png": "landmarks/lm_drowned_belfry.webp",
+  "id": "drowned_belfry",
+  "name": "The Belfry of the Low Water",
+  "inscription": "It rang for the flood, and the flood answered. On still nights the bell is heard beneath the fen, counting something.",
+  "lands": [
+   "fen"
+  ],
+  "fw": 2,
+  "fh": 2,
+  "foot": [
+   138,
+   266
+  ],
+  "hr": 2,
+  "lights": []
+ },
+ "lm_faceless_saint": {
+  "png": "landmarks/lm_faceless_saint.webp",
+  "id": "faceless_saint",
+  "name": "The Unfaced Saint",
+  "inscription": "Its own order took the face away, lest the pilgrims learn to whom they had been praying.",
+  "lands": [
+   "moor",
+   "ridge",
+   "wood"
+  ],
+  "fw": 2,
+  "fh": 2,
+  "foot": [
+   108,
+   202
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    124,
+    215,
+    "255,168,88",
+    56
+   ]
+  ]
+ },
+ "lm_giant_sword": {
+  "png": "landmarks/lm_giant_sword.webp",
+  "id": "giant_sword",
+  "name": "The Sword None Drew",
+  "inscription": "No hand great enough to draw it has come back for it. Many lesser hands have tried.",
+  "lands": [
+   "heath",
+   "ridge",
+   "moor"
+  ],
+  "fw": 2,
+  "fh": 2,
+  "foot": [
+   142,
+   369
+  ],
+  "hr": 2,
+  "lights": []
+ },
+ "lm_hanged_god": {
+  "png": "landmarks/lm_hanged_god.webp",
+  "id": "hanged_god",
+  "name": "The Bound Oathwright",
+  "inscription": "They tied their god to the tree so it could not leave them. It did not leave. It did not answer either.",
+  "lands": [
+   "wood",
+   "moor",
+   "fen"
+  ],
+  "fw": 2,
+  "fh": 2,
+  "foot": [
+   110,
+   336
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    61,
+    332,
+    "255,170,90",
+    60
+   ],
+   [
+    60,
+    326,
+    "255,170,90",
+    60
+   ]
+  ]
+ },
+ "lm_hill_of_spent_prayers": {
+  "png": "landmarks/lm_hill_of_spent_prayers.webp",
+  "id": "hill_of_spent_prayers",
+  "name": "The Hill of Spent Prayers",
+  "inscription": "A thousand asked, and the little god drank every flame. Some still burn. Someone has not yet stopped asking.",
+  "lands": [
+   "wood",
+   "fen"
+  ],
+  "fw": 2,
+  "fh": 2,
+  "foot": [
+   102,
+   72
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    65,
+    39,
+    "255,176,96",
+    80
+   ],
+   [
+    128,
+    51,
+    "255,176,96",
+    80
+   ],
+   [
+    75,
+    40,
+    "255,176,96",
+    80
+   ]
+  ]
+ },
+ "lm_ossuary_altar": {
+  "png": "landmarks/lm_ossuary_altar.webp",
+  "id": "ossuary_altar",
+  "name": "The Saint of the Many",
+  "inscription": "She asked that no one be buried alone. They came to her by the thousand, and she has not been alone since.",
+  "lands": [
+   "bone",
+   "crypt"
+  ],
+  "fw": 4,
+  "fh": 2,
+  "foot": [
+   116,
+   168
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    46,
+    121,
+    "255,150,70",
+    30
+   ],
+   [
+    48,
+    132,
+    "255,150,70",
+    30
+   ],
+   [
+    72,
+    136,
+    "255,150,70",
+    30
+   ],
+   [
+    62,
+    140,
+    "255,150,70",
+    30
+   ],
+   [
+    89,
+    110,
+    "255,150,70",
+    30
+   ],
+   [
+    95,
+    113,
+    "255,150,70",
+    30
+   ],
+   [
+    121,
+    126,
+    "255,150,70",
+    30
+   ],
+   [
+    141,
+    165,
+    "255,150,70",
+    30
+   ],
+   [
+    138,
+    178,
+    "255,150,70",
+    30
+   ],
+   [
+    162,
+    188,
+    "255,150,70",
+    30
+   ]
+  ]
+ },
+ "lm_reliquary_hand": {
+  "png": "landmarks/lm_reliquary_hand.webp",
+  "id": "reliquary_hand",
+  "name": "The Hand That Was Kept",
+  "inscription": "It blessed the first war and was cut off for it. They caged it rather than bury it, lest the earth be blessed as well.",
+  "lands": [
+   "crypt",
+   "bone"
+  ],
+  "fw": 3,
+  "fh": 3,
+  "foot": [
+   108,
+   185
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    53,
+    148,
+    "255,150,70",
+    30
+   ],
+   [
+    165,
+    148,
+    "255,150,70",
+    30
+   ],
+   [
+    63,
+    101,
+    "255,150,70",
+    30
+   ],
+   [
+    155,
+    100,
+    "255,150,70",
+    30
+   ],
+   [
+    35,
+    157,
+    "255,150,70",
+    30
+   ],
+   [
+    183,
+    158,
+    "255,150,70",
+    30
+   ],
+   [
+    106,
+    106,
+    "255,150,70",
+    30
+   ],
+   [
+    33,
+    175,
+    "255,150,70",
+    30
+   ],
+   [
+    179,
+    181,
+    "255,150,70",
+    30
+   ],
+   [
+    109,
+    122,
+    "255,150,70",
+    30
+   ],
+   [
+    146,
+    191,
+    "255,150,70",
+    30
+   ],
+   [
+    70,
+    195,
+    "255,150,70",
+    30
+   ],
+   [
+    120,
+    194,
+    "255,150,70",
+    30
+   ],
+   [
+    101,
+    194,
+    "255,150,70",
+    30
+   ],
+   [
+    109,
+    193,
+    "255,150,70",
+    30
+   ]
+  ]
+ },
+ "lm_shoe_cairn": {
+  "png": "landmarks/lm_shoe_cairn.webp",
+  "id": "shoe_cairn",
+  "name": "The Unshod Waymark",
+  "inscription": "Past this stone the road was held too holy for shoes. The shoes are waiting still.",
+  "lands": [
+   "moor",
+   "heath",
+   "wood"
+  ],
+  "fw": 2,
+  "fh": 2,
+  "foot": [
+   131,
+   158
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    158,
+    32,
+    "255,168,88",
+    54
+   ]
+  ]
+ },
+ "lm_six_arms": {
+  "png": "landmarks/lm_six_arms.webp",
+  "id": "six_arms",
+  "name": "She of the Six Gifts",
+  "inscription": "Each hand held out one gift. The faithful broke off the two they could no longer bear to be given.",
+  "lands": [
+   "moor",
+   "heath",
+   "ridge"
+  ],
+  "fw": 2,
+  "fh": 2,
+  "foot": [
+   161,
+   224
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    192,
+    219,
+    "255,168,88",
+    60
+   ]
+  ]
+ },
+ "lm_struck_obelisk": {
+  "png": "landmarks/lm_struck_obelisk.webp",
+  "id": "struck_obelisk",
+  "name": "The Needle of Struck Names",
+  "inscription": "Every name the god was called was cut here, and every name was cut away. The chains came after, when the names began to return.",
+  "lands": [
+   "ridge",
+   "heath"
+  ],
+  "fw": 2,
+  "fh": 2,
+  "foot": [
+   127,
+   349
+  ],
+  "hr": 2,
+  "lights": []
+ },
+ "lm_swallowed_god": {
+  "png": "landmarks/lm_swallowed_god.webp",
+  "id": "swallowed_god",
+  "name": "Aumbrel Beneath the Bark",
+  "inscription": "The wood was sown to hide Aumbrel. It grew instead to hold him, and neither will let go. Still the pilgrims find his hand.",
+  "lands": [
+   "wood"
+  ],
+  "fw": 3,
+  "fh": 3,
+  "foot": [
+   135,
+   496
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    73,
+    454,
+    "255,170,90",
+    70
+   ],
+   [
+    63,
+    456,
+    "255,170,90",
+    70
+   ]
+  ]
+ },
+ "lm_toppled_king": {
+  "png": "landmarks/lm_toppled_king.webp",
+  "id": "toppled_king",
+  "name": "The Deposed Sovereign",
+  "inscription": "They crowned the god to make of it a king. A king can be pulled down.",
+  "lands": [
+   "moor",
+   "ridge"
+  ],
+  "fw": 4,
+  "fh": 4,
+  "foot": [
+   204,
+   133
+  ],
+  "hr": 2,
+  "lights": []
+ },
+ "lm_unmirroring_ring": {
+  "png": "landmarks/lm_unmirroring_ring.webp",
+  "id": "unmirroring_ring",
+  "name": "The Unmirroring Ring",
+  "inscription": "Seven stones for Ysse, who could not bear her own face. The water keeps her wish: lean over it, and it shows you only the dark.",
+  "lands": [
+   "fen",
+   "moor"
+  ],
+  "fw": 4,
+  "fh": 4,
+  "foot": [
+   161,
+   130
+  ],
+  "hr": 2,
+  "lights": []
+ },
+ "lm_veiled_mourner": {
+  "png": "landmarks/lm_veiled_mourner.webp",
+  "id": "veiled_mourner",
+  "name": "She Who Keeps the Low Light",
+  "inscription": "She kneels where the road went under. The lantern is filled each dusk; no one has seen by whom.",
+  "lands": [
+   "fen"
+  ],
+  "fw": 3,
+  "fh": 3,
+  "foot": [
+   156,
+   184
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    84,
+    57,
+    "255,190,110",
+    120
+   ]
+  ]
+ },
+ "lm_weeping_face": {
+  "png": "landmarks/lm_weeping_face.webp",
+  "id": "weeping_face",
+  "name": "The Mourner Before",
+  "inscription": "It began to weep the night before the dying. The moor-folk bring it candles, so it need not weep in the dark.",
+  "lands": [
+   "moor",
+   "heath"
+  ],
+  "fw": 4,
+  "fh": 4,
+  "foot": [
+   253,
+   305
+  ],
+  "hr": 2,
+  "lights": [
+   [
+    294,
+    330,
+    "255,168,88",
+    64
+   ],
+   [
+    232,
+    350,
+    "255,168,88",
+    64
+   ]
+  ]
+ }
+}
