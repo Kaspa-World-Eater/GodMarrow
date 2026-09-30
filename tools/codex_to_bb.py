@@ -14,6 +14,7 @@ def bb(h):
     h = re.sub(r'<h3>(.*?)</h3>', r'\n[font_size=30][color=#dcd3c2]\1[/color][/font_size]\n', h)
     h = re.sub(r'<h4>(.*?)</h4>', r'\n[font_size=26][color=#c9974a]\1[/color][/font_size]\n', h)
     h = re.sub(r'<blockquote>(.*?)</blockquote>', lambda m: '[indent][i][color=#c8bfae]' + m.group(1) + '[/color][/i][/indent]\n\n', h)
+    h = re.sub(r'<p class="sig">(.*?)</p>', lambda m: '[right][i][color=#c9974a]' + m.group(1) + '[/color][/i][/right]\n\n', h)
     h = re.sub(r'<p[^>]*>(.*?)</p>', r'\1\n\n', h)
     h = h.replace('<br>', '\n').replace('<i>', '[i]').replace('</i>', '[/i]').replace('<b>', '[b]').replace('</b>', '[/b]')
     h = re.sub(r'<[^>]+>', '', h)
