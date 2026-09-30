@@ -54,6 +54,7 @@ var t := 0.0
 var leaving := -1.0
 var codex: Control
 var _test_done := false
+var draw_t := -1.0                 # the Stranger drawing a card before the Reading (mode "draw")
 
 const CREDITS := [
 	["Sounds", ""],
@@ -141,7 +142,9 @@ func _process(dt: float) -> void:
 			main.title_done()
 			queue_free()
 			return
-	if stage_kind != Settings.title_scene:
+	if draw_t >= 0.0:
+		draw_t += dt
+	if stage_kind != Settings.title_scene and mode != "draw":
 		_set_stage(Settings.title_scene)
 	root.queue_redraw()
 
@@ -164,7 +167,7 @@ func _fig_at(p: Vector2) -> int:
 	return stage.order_at(p) if stage else -1
 
 func _gui(ev: InputEvent) -> void:
-	if leaving >= 0.0:
+	if leaving >= 0.0 or mode == "draw":
 		return
 	if ev is InputEventMouseMotion:
 		var h := -1
@@ -192,7 +195,7 @@ func _gui(ev: InputEvent) -> void:
 				_open_order(f)
 
 func _unhandled_key_input(ev: InputEvent) -> void:
-	if leaving >= 0.0 or not root.visible or not (ev is InputEventKey) or not ev.pressed:
+	if leaving >= 0.0 or mode == "draw" or not root.visible or not (ev is InputEventKey) or not ev.pressed:
 		return
 	if ev.keycode == KEY_ESCAPE and mode != "main":
 		_act("back")
@@ -227,6 +230,15 @@ func _act(a: String) -> void:
 			Game.force_new = true
 			Game.read_new = true
 			Game.cls = kind
+			if stage and stage.has_method("draw_card"):
+				# the Stranger draws that order's card from his deck first, and the dark follows it
+				mode = "draw"
+				rows.clear()
+				hover = -1
+				draw_t = 0.0
+				stage.draw_card(order_i)
+				get_tree().create_timer(stage.DRAW_LEN + 0.6).timeout.connect(func(): get_tree().reload_current_scene())
+				return
 			get_tree().reload_current_scene()
 		"back":
 			if mode == "order":
@@ -388,6 +400,8 @@ func _draw_ui() -> void:
 				root.draw_string(sc, r.position + Vector2(-34, 36), "❧", HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color(MARROW, a))
 			root.draw_string(sc, r.position + Vector2(0, 36), rows[i][0], HORIZONTAL_ALIGNMENT_LEFT, -1, 32, Color(col, a))
 	root.draw_string(fi, Vector2(152, vs.y - 18), "Act I · the Ashen Moor and what lies under it", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(ASH, a))
+	if draw_t >= 0.0:
+		root.draw_rect(Rect2(Vector2.ZERO, vs), Color(0, 0, 0, clampf((draw_t - 1.6) / 0.8, 0.0, 1.0)))
 	if fade_in < 1.0:
 		root.draw_rect(Rect2(Vector2.ZERO, vs), Color(0, 0, 0, 1.0 - fade_in))
 	if out > 0.0:
