@@ -9,6 +9,7 @@ var eye: CamDirector
 var fore: Foreground
 var sky: Weather
 var sound: Soundscape
+var far: FarPilgrims
 var ambient: CanvasModulate
 var hud: Node
 var dark: DarkLayer
@@ -51,6 +52,8 @@ func _ready() -> void:
 	sound = Soundscape.new(self)
 	add_child(sound)
 	add_child(Sfx.new())
+	far = FarPilgrims.new(self)
+	add_child(far)
 	Bus.monster_killed.connect(func(_m): Sfx.play("fall"))
 	sky.snd = sound
 	fore = Foreground.new()
@@ -173,6 +176,9 @@ func enter(zid: String, from: String) -> void:
 	dark.bind(zone, hero)
 	atmos.bind(zone, hero, dark)
 	sky.bind(zone, hero, dark)
+	far.bind(zone, hero)
+	if OS.has_environment("GM_FARNOW"):
+		far.wait = 0.5
 	if not OS.has_environment("GM_NOFORE"):
 		fore.bind(zone, hero, dark)
 	if hud and hud.has_method("bind"):
