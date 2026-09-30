@@ -24,6 +24,7 @@ var last_whisper := ""
 var boss_awake: Node = null
 var title_open := false      # ui/title.gd is up: the camera drifts, the HUD and the pilgrim wait
 var title_t := 0.0
+var reading_open := false    # ui/reading.gd is up: a new pilgrim is being read before the walk
 var pending_load := {}        # a save waiting to be poured into the first hero (Continue)
 const SaveIO := preload("res://core/save.gd")
 
@@ -43,8 +44,10 @@ func _ready() -> void:
 		Game.force_new = false
 	# the title: when the game is simply launched (no test arguments), or with --title
 	var plain := args.is_empty() or (args.size() == 1 and args.has("hour"))
-	title_open = (plain and not Game.skip_title) or args.has("title")
+	title_open = (plain or args.has("title")) and not Game.skip_title
 	Game.skip_title = false
+	reading_open = Game.read_new or args.has("reading")
+	Game.read_new = false
 	# Continue: the saved pilgrim, in a freshly rolled world, at the camp (--new starts over)
 	if not args.has("new") and not args.has("demo") and SaveIO.exists():
 		pending_load = SaveIO.read(Game.load_cls)
@@ -174,6 +177,8 @@ func enter(zid: String, from: String) -> void:
 	hero.died.connect(_on_hero_died)
 	if title_open:
 		_title_open()
+	elif reading_open and fresh_pilgrim:
+		_reading_open()
 	for m in zone.d.get("monsters", []):
 		# the safe circle of a town holds no creatures
 		var sc = zone.markers.get("safeCircle")
@@ -216,6 +221,28 @@ func _title_open() -> void:
 		hud.set_process_input(false)
 	hero.set_process_unhandled_input(false)
 	hero.set_process_input(false)
+
+## the Reading: the Stranger's fire over everything until the new pilgrim rises; what it gives is theirs for the walk
+func _reading_open() -> void:
+	var Rd = load("res://ui/reading.gd").new(self, hero.cls)
+	Rd.on_done = _reading_done
+	add_child(Rd)
+	title_open = true      # (the world waits the same way it does for the title)
+	if hud:
+		hud.visible = false
+		hud.set_process_input(false)
+	hero.set_process_unhandled_input(false)
+	hero.set_process_input(false)
+
+func _reading_done(r: Dictionary) -> void:
+	reading_open = false
+	hero.st.fate = r.get("fx", {})
+	hero.st.fate_picks = r.get("picks", [])
+	hero.st.hp = hero.st.life_max()
+	hero.st.res = hero.st.res_max()
+	hero.st.poise = hero.st.poise_max()
+	title_done()
+	save_game()
 
 func title_done() -> void:
 	title_open = false

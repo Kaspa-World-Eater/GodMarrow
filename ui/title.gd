@@ -8,7 +8,7 @@ extends CanvasLayer
 ## Hover a pilgrim at the fire and they step into the light; click one and their order's page opens over the dimmed
 ## chapel: a large portrait (placeholders until the final paintings come), who they are in the Stranger's words, what
 ## they draw on and their three ways, and that order's own pilgrim (one save per order: continue it, or begin anew).
-## The Reading (character creation) will follow "begin" once it is ported, with the god already chosen here.
+## "Begin" opens the Reading (ui/reading.gd, character creation), with the god already chosen here.
 
 const U := preload("res://ui/uikit.gd")
 const SaveIO := preload("res://core/save.gd")
@@ -413,6 +413,7 @@ func _act(a: String) -> void:
 			SaveIO.forget(kind)
 			Game.skip_title = true
 			Game.force_new = true
+			Game.read_new = true
 			Game.cls = kind
 			get_tree().reload_current_scene()
 		"back":

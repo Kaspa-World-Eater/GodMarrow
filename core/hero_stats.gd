@@ -21,6 +21,8 @@ var hollow_tokens := 1
 var arcana_points := 0
 var kept := 0            # what the lantern keeps (deaths, max 3)
 var extra := {}          # stat bonuses from shrines, auras, arcana: key -> value
+var fate := {}           # what the Reading (ui/reading.gd) made of this pilgrim: key -> value, for the whole walk
+var fate_picks: Array = []
 var arc = null           # core/arcana.gd: the body board (Minor knots laid, Major cards held)
 
 ## what the body board's knots add up to (zz_arcana_web.js sums): 0 for anything not laid
@@ -35,8 +37,11 @@ static func _lit() -> bool:
 		return bool(m.zone.d.get("outdoor", false)) and Game.hour_name() != "night"
 	return true
 
+## the Reading's words for the stats it touches, where they differ from the gear's (xp -> xpK, gold -> gf)
+const FATE_KEY := {"xpK": "xp", "gf": "gold", "xp": "", "gold": ""}
+
 func item(k: String) -> float:
-	var v := (inv.total(k) if inv else 0.0) + float(extra.get(k, 0.0))
+	var v := (inv.total(k) if inv else 0.0) + float(extra.get(k, 0.0)) + float(fate.get(FATE_KEY.get(k, k), 0.0))
 	if k == "mf" or k == "lok":
 		v += W(k)   # the body board's magic find and life-on-kill knots
 	return v
@@ -72,7 +77,7 @@ func setup(c: String) -> void:
 	poise = poise_max()
 
 func life_max() -> float:
-	return roundf((28.0 + 3.0 * e_vit() + 3.0 * level + item("life")) * (1.0 + W("life") / 100.0) * (arc.life_k() if arc else 1.0))
+	return roundf((28.0 + 3.0 * e_vit() + 3.0 * level + item("life")) * (1.0 + (W("life") + float(fate.get("hpPct", 0.0))) / 100.0) * (arc.life_k() if arc else 1.0))
 
 func res_max() -> float:
 	match cls:
@@ -84,7 +89,7 @@ func res_max() -> float:
 			return roundf((8.0 + 2.0 * e_ess() + 1.5 * level + item("mana")) * (1.0 + W("ess") / 100.0))
 
 func res_regen() -> float:
-	return _res_regen0() * (1.0 + W("regen") / 100.0)
+	return _res_regen0() * (1.0 + (W("regen") + float(fate.get("regen", 0.0))) / 100.0)
 
 func _res_regen0() -> float:
 	match cls:
@@ -108,7 +113,7 @@ func armor() -> float:
 	return e_con() / 2.0 + (inv.armor() if inv else 0.0) + item("armor") + W("armor")
 
 func poise_max() -> float:
-	return roundf(28.0 + 1.4 * e_con() + 0.08 * e_vit() + 0.25 * (inv.armor() if inv else 0.0) + W("poise"))
+	return roundf(28.0 + 1.4 * e_con() + 0.08 * e_vit() + 0.25 * (inv.armor() if inv else 0.0) + W("poise") + float(fate.get("stam", 0.0)))
 
 func poise_regen() -> float:
 	return (4.0 + 0.35 * e_con()) * (1.0 + W("prec") / 100.0)

@@ -1,0 +1,1297 @@
+{
+ "caps": {
+  "con": 2,
+  "vit": 2,
+  "spi": 2,
+  "stam": 8,
+  "lok": 1,
+  "armor": 6,
+  "mf": 6,
+  "hpPct": 5,
+  "dmg": 4,
+  "fcr": 5,
+  "gold": 8,
+  "res": 5,
+  "frw": 4,
+  "xp": 4,
+  "regen": 6
+ },
+ "faces": {
+  "ossumancer": [
+   {
+    "id": "keeper",
+    "name": "The Gravekeeper",
+    "fx": {
+     "skt0": 1,
+     "armor": 4,
+     "frw": -1
+    },
+    "say": "The Gravekeeper, lantern low, counting his dead. He will lend you the ones he cannot fit in the ground.",
+    "emb": "grave",
+    "txt": "+1 to Ossuary skills · +4 armor · -1% faster movement"
+   },
+   {
+    "id": "marrow",
+    "name": "The Marrow-Eater",
+    "fx": {
+     "skt1": 1,
+     "spi": 2,
+     "armor": -3
+    },
+    "say": "The Marrow-Eater cracks the bones to suck out what is inside. Hungry god. Hungry child.",
+    "emb": "bones",
+    "txt": "+1 to Bone skills · +2 Essence · -3 armor"
+   },
+   {
+    "id": "wall",
+    "name": "The Ossuary Wall",
+    "fx": {
+     "skt2": 1,
+     "con": 2,
+     "fcr": -1
+    },
+    "say": "The Wall. Bone on bone on bone. Behind it you will be safe. Nothing behind it is ever safe.",
+    "emb": "skull",
+    "txt": "+1 to Carapace skills · +2 Constitution · -1% faster cast rate"
+   }
+  ],
+  "hemomancer": [
+   {
+    "id": "mother",
+    "name": "The Brood-Bride",
+    "fx": {
+     "skt0": 1,
+     "hpPct": 1,
+     "dmg": -1
+    },
+    "say": "The Brood-Bride. Every tumour is a child to her. You will make a very good mother.",
+    "emb": "weep",
+    "txt": "+1 to Brood skills · +1% life · -1% skill damage"
+   },
+   {
+    "id": "vein",
+    "name": "The Open Vein",
+    "fx": {
+     "skt1": 1,
+     "dmg": 1,
+     "hpPct": -1
+    },
+    "say": "The Open Vein. She never closed. She never will. Neither will you.",
+    "emb": "drop",
+    "txt": "+1 to Blood skills · +1% skill damage · -1% life"
+   },
+   {
+    "id": "butcher",
+    "name": "The Butcher",
+    "fx": {
+     "skt2": 1,
+     "con": 2,
+     "res": -1
+    },
+    "say": "The Butcher, apron stiff with it. She taught the golem how to stand. She will teach you how to carve.",
+    "emb": "dagger",
+    "txt": "+1 to Flesh skills · +2 Constitution · -1% magic resist"
+   }
+  ],
+  "animancer": [
+   {
+    "id": "smith",
+    "name": "The Soul-Smith",
+    "fx": {
+     "skt0": 1,
+     "armor": 4,
+     "fcr": -1
+    },
+    "say": "The Soul-Smith hammers breath into iron. The iron screams, and then it obeys. Everything obeys, in the end.",
+    "emb": "hammer",
+    "txt": "+1 to Mirror skills · +4 armor · -1% faster cast rate"
+   },
+   {
+    "id": "bearer",
+    "name": "The Lantern-Bearer",
+    "fx": {
+     "skt1": 1,
+     "regen": 1,
+     "armor": -3
+    },
+    "say": "The Lantern-Bearer. The wisps come to her like sparks to a draught. They will come to you. Pray they are only sparks.",
+    "emb": "lantern",
+    "txt": "+1 to Soul skills · +1% faster refill · -3 armor"
+   },
+   {
+    "id": "speaker",
+    "name": "The Speaker",
+    "fx": {
+     "skt2": 1,
+     "fcr": 1,
+     "hpPct": -1
+    },
+    "say": "The Speaker. Her words unmade a city. Yours will unmake smaller things. Begin with yourself.",
+    "emb": "mouth",
+    "txt": "+1 to Thread skills · +1% faster cast rate · -1% life"
+   }
+  ],
+  "miasmancer": [
+   {
+    "id": "breath",
+    "name": "The Purifier",
+    "fx": {
+     "skt0": 1,
+     "res": 1,
+     "hpPct": -1
+    },
+    "say": "The Purifier. She draws the defilement out of the dead and binds it in paper. Breathe in what the world cannot bear, little assassin.",
+    "emb": "breath",
+    "txt": "+1 to Miasma skills · +1% magic resist · -1% life"
+   },
+   {
+    "id": "unseen",
+    "name": "The Keeper at the Gate",
+    "fx": {
+     "skt1": 1,
+     "frw": 1,
+     "armor": -3
+    },
+    "say": "The Keeper at the Gate, who guards the spirit road. It is never where you look. Neither will you be.",
+    "emb": "door",
+    "txt": "+1 to Distortion skills · +1% faster movement · -3 armor"
+   },
+   {
+    "id": "knell",
+    "name": "The Bell-Rope",
+    "fx": {
+     "skt2": 1,
+     "lok": 1,
+     "res": -1
+    },
+    "say": "The Bell-Rope, pulled to wake the spirits before a killing. One pull for every ending. It will be pulled once for you.",
+    "emb": "bell",
+    "txt": "+1 to Death skills · +1 life after each kill · -1% magic resist"
+   }
+  ],
+  "monk": [
+   {
+    "id": "laugh",
+    "name": "The Laughing Face",
+    "fx": {
+     "skt0": 1,
+     "dmg": 1,
+     "res": -1
+    },
+    "say": "The Laughing Face. It laughs at the sun for thinking it could clean anything. Laugh with it, and burn.",
+    "emb": "sun",
+    "txt": "+1 to Radiance skills · +1% skill damage · -1% magic resist"
+   },
+   {
+    "id": "bowl",
+    "name": "The Empty Bowl",
+    "fx": {
+     "skt1": 1,
+     "lok": 1,
+     "hpPct": -1
+    },
+    "say": "The Empty Bowl. Everything poured into it is gone. Beg with it, little monk. The world will fill it for you.",
+    "emb": "bowl",
+    "txt": "+1 to Absence skills · +1 life after each kill · -1% life"
+   },
+   {
+    "id": "unmoved",
+    "name": "The Unmoved",
+    "fx": {
+     "skt2": 1,
+     "con": 2,
+     "frw": -1
+    },
+    "say": "The Unmoved. A mountain does not hate the valley. It simply falls on it.",
+    "emb": "mountain",
+    "txt": "+1 to Destroyer skills · +2 Constitution · -1% faster movement"
+   }
+  ]
+ },
+ "stars": {
+  "ossumancer": {
+   "name": "Oss-Vharoth",
+   "sub": "the Standing Dead",
+   "fx": {
+    "con": 2,
+    "fcr": -1
+   },
+   "txt": "+2 Constitution · -1% faster cast rate",
+   "say": "Oss-Vharoth. The Standing Dead, the skeleton that would not lie down when the god fell. It held your cradle the way a grave holds a coffin. You will stand. You will not bend. You will break.",
+   "emb": "skull"
+  },
+  "hemomancer": {
+   "name": "Nol-Shogthuth",
+   "sub": "Mother of the Wheel",
+   "fx": {
+    "vit": 2,
+    "res": -1
+   },
+   "txt": "+2 Vitality · -1% magic resist",
+   "say": "Nol-Shogthuth, the flesh that keeps growing with no mind to stop it. The Wheel turns in her and she drinks what spills. She was ascendant, and she was thirsty. You will live long enough to regret it.",
+   "emb": "heart"
+  },
+  "animancer": {
+   "name": "Yh'Anuul",
+   "sub": "the Veiled Crone",
+   "fx": {
+    "spi": 2,
+    "armor": -3
+   },
+   "txt": "+2 Essence · -3 armor",
+   "say": "Yh'Anuul. The Veiled Crone, the god's soul, still at her loom though no hand works it. She drew one thread out of your cradle and held it up to the light. She has not put it down. Little thread. Little thread.",
+   "emb": "lantern"
+  },
+  "miasmancer": {
+   "name": "The Myriad",
+   "sub": "the Spirits in All Things",
+   "fx": {
+    "res": 1,
+    "mf": 1,
+    "hpPct": -1
+   },
+   "txt": "+1% magic resist · +1% magic find · -1% life",
+   "say": "The Myriad. Not one god: every stone and river and rotting thing in this corpse-world has a small spirit of its own, and they are choking on the filth. Your people bow to all of them. You will draw the rot out of the world, hold it in yourself, and give it back to what made it.",
+   "emb": "breath"
+  },
+  "monk": {
+   "name": "Ur-Nihl",
+   "sub": "the Silence",
+   "fx": {
+    "res": 1,
+    "con": 2,
+    "hpPct": -1
+   },
+   "txt": "+1% magic resist · +2 Constitution · -1% life",
+   "say": "Ur-Nihl. ... No. I will not look into the bowl for that one. See: the blood has gone still. Smooth as black glass. It is not a god that looked down on you. It is the hole the gods are lying in, and it was smiling.",
+   "emb": "blacksun"
+  }
+ },
+ "cards": [
+  {
+   "id": "digger",
+   "name": "The Gravedigger's Hands",
+   "fx": {
+    "con": 2,
+    "stam": -3
+   },
+   "say": "You have buried more than you remember. Your hands have not forgotten.",
+   "emb": "hand",
+   "txt": "+2 Constitution · -3 poise",
+   "rev": {
+    "fx": {
+     "lok": 1,
+     "con": -1
+    },
+    "say": "Reversed, the hands dig their own grave. They are very good at it.",
+    "txt": "+1 life after each kill · -1 Constitution"
+   }
+  },
+  {
+   "id": "moth",
+   "name": "The Singed Veil",
+   "fx": {
+    "mf": 1,
+    "hpPct": -1
+   },
+   "say": "Drawn to every light that burns you. You will find pretty things in the ash.",
+   "emb": "flame",
+   "txt": "+1% magic find · -1% life",
+   "rev": {
+    "fx": {
+     "fcr": 1,
+     "mf": -1
+    },
+    "say": "The veil upside down: it has already burned. It moves quicker for it.",
+    "txt": "+1% faster cast rate · -1% magic find"
+   }
+  },
+  {
+   "id": "lamb",
+   "name": "The Swaddling",
+   "fx": {
+    "hpPct": 1,
+    "dmg": -1
+   },
+   "say": "Soft. Warm. It will not last, but it will bleed a long while.",
+   "emb": "heart",
+   "txt": "+1% life · -1% skill damage",
+   "rev": {
+    "fx": {
+     "dmg": 1,
+     "hpPct": -1
+    },
+    "say": "The swaddling reversed is the knife. Softness was never going to last.",
+    "txt": "+1% skill damage · -1% life"
+   }
+  },
+  {
+   "id": "crow",
+   "name": "The Gleaner",
+   "fx": {
+    "gold": 1,
+    "res": -1
+   },
+   "say": "You will pick at what the others leave behind. So do I.",
+   "emb": "bowl",
+   "txt": "+1% gold found · -1% magic resist",
+   "rev": {
+    "fx": {
+     "mf": 1,
+     "gold": -1
+    },
+    "say": "The gleaner turned over picks at better things than coin.",
+    "txt": "+1% magic find · -1% gold found"
+   }
+  },
+  {
+   "id": "saint",
+   "name": "The Weeping Saint",
+   "fx": {
+    "vit": 2,
+    "fcr": -1
+   },
+   "say": "She wept for all of you. None of you wept for her.",
+   "emb": "saint",
+   "txt": "+2 Vitality · -1% faster cast rate",
+   "rev": {
+    "fx": {
+     "res": 1,
+     "vit": -1
+    },
+    "say": "The saint reversed stops weeping and starts to endure.",
+    "txt": "+1% magic resist · -1 Vitality"
+   }
+  },
+  {
+   "id": "scholar",
+   "name": "The Scholar's Eye",
+   "fx": {
+    "spi": 2,
+    "con": -1
+   },
+   "say": "You will read the world closely. The world does not like being read.",
+   "emb": "eye",
+   "txt": "+2 Essence · -1 Constitution",
+   "rev": {
+    "fx": {
+     "xp": 1,
+     "spi": -1
+    },
+    "say": "The eye turned inward learns faster, and sees less.",
+    "txt": "+1% experience · -1 Essence"
+   }
+  },
+  {
+   "id": "twin",
+   "name": "The Hanged Twin",
+   "fx": {
+    "frw": 1,
+    "armor": -3
+   },
+   "say": "One of you hangs. The other runs. You know which one you are.",
+   "emb": "hanged",
+   "txt": "+1% faster movement · -3 armor",
+   "rev": {
+    "fx": {
+     "armor": 4,
+     "frw": -1
+    },
+    "say": "Reversed, it is the hanged one you become. Heavier. Harder to kill.",
+    "txt": "+4 armor · -1% faster movement"
+   }
+  },
+  {
+   "id": "ratking",
+   "name": "The Knot of Mouths",
+   "fx": {
+    "lok": 1,
+    "hpPct": -1
+   },
+   "say": "Many mouths, one hunger. You will eat well at every grave.",
+   "emb": "mouth",
+   "txt": "+1 life after each kill · -1% life",
+   "rev": {
+    "fx": {
+     "gold": 1,
+     "res": -1
+    },
+    "say": "The knot reversed hoards instead of eats.",
+    "txt": "+1% gold found · -1% magic resist"
+   }
+  },
+  {
+   "id": "wick",
+   "name": "The Wick",
+   "fx": {
+    "fcr": 1,
+    "hpPct": -1
+   },
+   "say": "You burn quickly. Everyone who burns quickly thinks it is a gift.",
+   "emb": "candle",
+   "txt": "+1% faster cast rate · -1% life",
+   "rev": {
+    "fx": {
+     "hpPct": 1,
+     "fcr": -1
+    },
+    "say": "The wick upside down burns slow. You will last. You will be slow about it.",
+    "txt": "+1% life · -1% faster cast rate"
+   }
+  },
+  {
+   "id": "pilgrim",
+   "name": "The Pilgrim",
+   "fx": {
+    "stam": 4,
+    "dmg": -1
+   },
+   "say": "A long road, and nothing at the end of it. You will walk it anyway.",
+   "emb": "staff",
+   "txt": "+4 poise · -1% skill damage",
+   "rev": {
+    "fx": {
+     "frw": 1,
+     "stam": -4
+    },
+    "say": "The pilgrim reversed runs from the road instead of walking it.",
+    "txt": "+1% faster movement · -4 poise"
+   }
+  },
+  {
+   "id": "mourner",
+   "name": "The Mourner",
+   "fx": {
+    "res": 1,
+    "xp": -1
+   },
+   "say": "Grief has made you hard to wound. It has made you hard to love, too.",
+   "emb": "weep",
+   "txt": "+1% magic resist · -1% experience",
+   "rev": {
+    "fx": {
+     "spi": 2,
+     "res": -1
+    },
+    "say": "Grief reversed is rage. It will feed your spells and leave you open.",
+    "txt": "+2 Essence · -1% magic resist"
+   }
+  },
+  {
+   "id": "key",
+   "name": "The Ossuary Key",
+   "fx": {
+    "armor": 4,
+    "frw": -1
+   },
+   "say": "It opens every door in the house of bones. Only one of them lets you out.",
+   "emb": "key",
+   "txt": "+4 armor · -1% faster movement",
+   "rev": {
+    "fx": {
+     "mf": 1,
+     "armor": -3
+    },
+    "say": "The key turned opens the other doors, the ones with treasure behind them.",
+    "txt": "+1% magic find · -3 armor"
+   }
+  },
+  {
+   "id": "cup",
+   "name": "The Beggar's Cup",
+   "fx": {
+    "xp": 1,
+    "gold": -1
+   },
+   "say": "Empty, always empty. You will fill it with the lives of others.",
+   "emb": "cup",
+   "txt": "+1% experience · -1% gold found",
+   "rev": {
+    "fx": {
+     "gold": 1,
+     "xp": -1
+    },
+    "say": "The cup reversed spills gold. You will be rich and learn nothing.",
+    "txt": "+1% gold found · -1% experience"
+   }
+  },
+  {
+   "id": "bell",
+   "name": "The Drowned Bell",
+   "fx": {
+    "res": 1,
+    "frw": -1
+   },
+   "say": "It still rings under the fen. Everyone who hears it goes a little slower, a little safer.",
+   "emb": "bell",
+   "txt": "+1% magic resist · -1% faster movement",
+   "rev": {
+    "fx": {
+     "frw": 1,
+     "res": -1
+    },
+    "say": "The bell reversed rings upward, out of the water. You will hurry toward the surface all your life.",
+    "txt": "+1% faster movement · -1% magic resist"
+   }
+  },
+  {
+   "id": "tooth",
+   "name": "The First Coin",
+   "fx": {
+    "lok": 1,
+    "armor": -2
+   },
+   "say": "The first thing you ever sold. It fit in your palm. You have been finding smaller things to sell ever since.",
+   "emb": "coin",
+   "txt": "+1 life after each kill · -2 armor",
+   "rev": {
+    "fx": {
+     "armor": 4,
+     "lok": -1
+    },
+    "say": "The coin kept, never spent. It rings when you strike. Things flinch from it.",
+    "txt": "+4 armor · -1 life after each kill"
+   }
+  },
+  {
+   "id": "kiln",
+   "name": "The Kiln",
+   "fx": {
+    "dmg": 1,
+    "hpPct": -1
+   },
+   "say": "What goes in soft comes out hard, or does not come out.",
+   "emb": "kiln",
+   "txt": "+1% skill damage · -1% life",
+   "rev": {
+    "fx": {
+     "hpPct": 1,
+     "dmg": -1
+    },
+    "say": "The kiln gone cold. Whatever was inside hardened slowly. It will not crack.",
+    "txt": "+1% life · -1% skill damage"
+   }
+  },
+  {
+   "id": "loom",
+   "name": "The Unravelling Loom",
+   "fx": {
+    "xp": 1,
+    "stam": -4
+   },
+   "say": "Someone is weaving you and someone is pulling the thread out, and they are working at the same speed.",
+   "emb": "spool",
+   "txt": "+1% experience · -4 poise",
+   "rev": {
+    "fx": {
+     "stam": 4,
+     "xp": -1
+    },
+    "say": "The loom turned over weaves tighter. Slower, but it holds together under blows.",
+    "txt": "+4 poise · -1% experience"
+   }
+  }
+ ],
+ "fears": [
+  {
+   "id": "dark",
+   "name": "The dark",
+   "fx": {
+    "res": 1,
+    "mf": -1
+   },
+   "say": "The dark. Good. It is the one thing down there that will never lie to you.",
+   "emb": "blacksun",
+   "txt": "+1% magic resist · -1% magic find"
+  },
+  {
+   "id": "fire",
+   "name": "Burning",
+   "fx": {
+    "vit": 2,
+    "fcr": -1
+   },
+   "say": "Fire. Everything you love will burn, so you have that to look forward to.",
+   "emb": "flame",
+   "txt": "+2 Vitality · -1% faster cast rate"
+  },
+  {
+   "id": "water",
+   "name": "Drowning",
+   "fx": {
+    "stam": 4,
+    "frw": -1
+   },
+   "say": "Drowning. You will hold your breath a long time. Longer than the others. Not long enough.",
+   "emb": "waves",
+   "txt": "+4 poise · -1% faster movement"
+  },
+  {
+   "id": "crowd",
+   "name": "Being surrounded",
+   "fx": {
+    "armor": 4,
+    "dmg": -1
+   },
+   "say": "So many hands. You will learn to wear something thick. It will not be enough.",
+   "emb": "shadow",
+   "txt": "+4 armor · -1% skill damage"
+  },
+  {
+   "id": "forgot",
+   "name": "Being forgotten",
+   "fx": {
+    "xp": 1,
+    "gold": -1
+   },
+   "say": "Forgotten. Then go and do something worth remembering. Quickly.",
+   "emb": "grave",
+   "txt": "+1% experience · -1% gold found"
+  },
+  {
+   "id": "dogs",
+   "name": "Being hunted",
+   "fx": {
+    "frw": 1,
+    "armor": -2
+   },
+   "say": "Hunted. You can hear it already, can you not? Run.",
+   "emb": "shadow",
+   "txt": "+1% faster movement · -2 armor"
+  },
+  {
+   "id": "mirror",
+   "name": "Your own face",
+   "fx": {
+    "spi": 2,
+    "vit": -1
+   },
+   "say": "Your own face. Wise. I have seen it. I would not look either.",
+   "emb": "mirror",
+   "txt": "+2 Essence · -1 Vitality"
+  },
+  {
+   "id": "hunger",
+   "name": "Starving",
+   "fx": {
+    "lok": 1,
+    "stam": -3
+   },
+   "say": "Hunger. The dead are full of meat. You will learn not to mind.",
+   "emb": "bowl",
+   "txt": "+1 life after each kill · -3 poise"
+  },
+  {
+   "id": "bells",
+   "name": "Bells",
+   "fx": {
+    "frw": 1,
+    "res": -1
+   },
+   "say": "Bells. Yes. There is one in the ash that walks. You will know it by its ringing. Run sideways.",
+   "emb": "bell",
+   "txt": "+1% faster movement · -1% magic resist"
+  },
+  {
+   "id": "hands",
+   "name": "Hands in the dark",
+   "fx": {
+    "armor": 4,
+    "fcr": -1
+   },
+   "say": "Hands. They run on their fingers out there. Keep your back to a wall and they cannot come around you.",
+   "emb": "hand",
+   "txt": "+4 armor · -1% faster cast rate"
+  },
+  {
+   "id": "silence",
+   "name": "Silence",
+   "fx": {
+    "spi": 2,
+    "hpPct": -1
+   },
+   "say": "Silence. Then you fear the right thing. The only thing. Most never learn to.",
+   "emb": "moon",
+   "txt": "+2 Essence · -1% life"
+  }
+ ],
+ "seeks": [
+  {
+   "id": "vengeance",
+   "name": "Vengeance",
+   "fx": {
+    "dmg": 1,
+    "res": -1
+   },
+   "say": "Vengeance. That door is heavy, and it only opens one way.",
+   "emb": "dagger",
+   "txt": "+1% skill damage · -1% magic resist"
+  },
+  {
+   "id": "knowledge",
+   "name": "Knowledge",
+   "fx": {
+    "xp": 1,
+    "dmg": -1
+   },
+   "say": "Knowledge. There is a library beneath the Crypt. Its books read you back.",
+   "emb": "eye",
+   "txt": "+1% experience · -1% skill damage"
+  },
+  {
+   "id": "wealth",
+   "name": "Wealth",
+   "fx": {
+    "gold": 1,
+    "mf": 1,
+    "hpPct": -1
+   },
+   "say": "Gold. Of course. The dead do not need it, and they will not stop you. Mostly.",
+   "emb": "coin",
+   "txt": "+1% gold found · +1% magic find · -1% life"
+  },
+  {
+   "id": "absolution",
+   "name": "Absolution",
+   "fx": {
+    "hpPct": 1,
+    "dmg": -1
+   },
+   "say": "Absolution. From whom? Every god you could ask is dead or hungry.",
+   "emb": "feather",
+   "txt": "+1% life · -1% skill damage"
+  },
+  {
+   "id": "oblivion",
+   "name": "Oblivion",
+   "fx": {
+    "res": 1,
+    "xp": -1
+   },
+   "say": "Oblivion. That door is always open. You need not hurry.",
+   "emb": "door",
+   "txt": "+1% magic resist · -1% experience"
+  },
+  {
+   "id": "power",
+   "name": "Power",
+   "fx": {
+    "spi": 2,
+    "vit": -2
+   },
+   "say": "Power. They all say power. They all looked like you when they said it.",
+   "emb": "crown",
+   "txt": "+2 Essence · -2 Vitality"
+  },
+  {
+   "id": "home",
+   "name": "A way home",
+   "fx": {
+    "frw": 1,
+    "armor": -4
+   },
+   "say": "A way home. There is no home. There is a road, and it is long, and it goes down.",
+   "emb": "staff",
+   "txt": "+1% faster movement · -4 armor"
+  },
+  {
+   "id": "corpse",
+   "name": "The dead god",
+   "fx": {
+    "con": 2,
+    "vit": 2,
+    "fcr": -1
+   },
+   "say": "The dead god itself. Its heart is down there somewhere, under all of us. You would not be the first to go looking. You would not be the last to be eaten.",
+   "emb": "skull",
+   "txt": "+2 Constitution · +2 Vitality · -1% faster cast rate"
+  },
+  {
+   "id": "faith",
+   "name": "A god who answers",
+   "fx": {
+    "res": 1,
+    "gold": -1
+   },
+   "say": "A god who answers. Oh, they answer. That is the whole trouble with them.",
+   "emb": "sun",
+   "txt": "+1% magic resist · -1% gold found"
+  },
+  {
+   "id": "kin",
+   "name": "Your kin",
+   "fx": {
+    "hpPct": 1,
+    "mf": -1
+   },
+   "say": "Your kin. The Tithed scatter like seed. Some of them took root in very strange places.",
+   "emb": "heart",
+   "txt": "+1% life · -1% magic find"
+  },
+  {
+   "id": "end",
+   "name": "The end of all of it",
+   "fx": {
+    "dmg": 1,
+    "xp": -1
+   },
+   "say": "The end. You would hand the world to the Void? Then you had better be strong enough to carry it there.",
+   "emb": "blacksun",
+   "txt": "+1% skill damage · -1% experience"
+  }
+ ],
+ "roads": [
+  {
+   "id": "pilgrim",
+   "name": "The Pilgrim Road",
+   "fx": {
+    "frw": 1,
+    "armor": -2
+   },
+   "say": "The pilgrim road. Worn hollow by knees. Everyone on it was walking to a god who had already died.",
+   "emb": "staff",
+   "txt": "+1% faster movement · -2 armor"
+  },
+  {
+   "id": "river",
+   "name": "The Black River",
+   "fx": {
+    "res": 1,
+    "stam": -2
+   },
+   "say": "The river. It runs under the barrows and comes up cold. You still smell of it.",
+   "emb": "waves",
+   "txt": "+1% magic resist · -2 poise"
+  },
+  {
+   "id": "ash",
+   "name": "The Ash Road",
+   "fx": {
+    "armor": 3,
+    "hpPct": -1
+   },
+   "say": "The ash road. Something burned at both ends of it. You walked through the middle.",
+   "emb": "flame",
+   "txt": "+3 armor · -1% life"
+  },
+  {
+   "id": "bone",
+   "name": "The Ossuary Stair",
+   "fx": {
+    "con": 1,
+    "mf": -1
+   },
+   "say": "The stair of bones. Every step was someone. You counted them, at first.",
+   "emb": "bones",
+   "txt": "+1 Constitution · -1% magic find"
+  },
+  {
+   "id": "blood",
+   "name": "The Red Ditch",
+   "fx": {
+    "lok": 1,
+    "res": -1
+   },
+   "say": "The red ditch. It was a road once. Then the war came, and then the war stayed.",
+   "emb": "drop",
+   "txt": "+1 life after each kill · -1% magic resist"
+  },
+  {
+   "id": "dark",
+   "name": "The Lampless Way",
+   "fx": {
+    "mf": 1,
+    "frw": -1
+   },
+   "say": "No lamps on that way. You found it by touch. Your hands remember things your eyes never saw.",
+   "emb": "moon",
+   "txt": "+1% magic find · -1% faster movement"
+  },
+  {
+   "id": "bell",
+   "name": "The Bell Road",
+   "fx": {
+    "fcr": 1,
+    "stam": -2
+   },
+   "say": "The bell road. They ring for the dead up there, day and night. You learned to speak between the strokes.",
+   "emb": "bell",
+   "txt": "+1% faster cast rate · -2 poise"
+  },
+  {
+   "id": "nowhere",
+   "name": "No Road at All",
+   "fx": {
+    "xp": 1,
+    "gold": -1
+   },
+   "say": "No road. You simply were here, one evening, by my fire. That happens more than you would think. It is never good.",
+   "emb": "door",
+   "txt": "+1% experience · -1% gold found"
+  }
+ ],
+ "sacs": [
+  {
+   "id": "name",
+   "name": "Your name",
+   "fx": {
+    "xp": 1,
+    "gold": -1
+   },
+   "say": "Your name, then. No one will speak it over your grave. There will be no one to speak.",
+   "emb": "feather",
+   "txt": "+1% experience · -1% gold found"
+  },
+  {
+   "id": "shadow",
+   "name": "Your shadow",
+   "fx": {
+    "frw": 1,
+    "hpPct": -1
+   },
+   "say": "Your shadow. Light as smoke without it. Thin as smoke, too.",
+   "emb": "shadow",
+   "txt": "+1% faster movement · -1% life"
+  },
+  {
+   "id": "eye",
+   "name": "Your left eye",
+   "fx": {
+    "dmg": 1,
+    "armor": -4
+   },
+   "say": "The left eye. It saw too much kindness anyway. Now you will see only what you strike.",
+   "emb": "eye",
+   "txt": "+1% skill damage · -4 armor"
+  },
+  {
+   "id": "warmth",
+   "name": "Your warmth",
+   "fx": {
+    "res": 1,
+    "stam": -4
+   },
+   "say": "Cold, then. The cold keeps. The cold keeps everything.",
+   "emb": "flame",
+   "txt": "+1% magic resist · -4 poise"
+  },
+  {
+   "id": "mother",
+   "name": "Your mother's face",
+   "fx": {
+    "spi": 2,
+    "vit": -2
+   },
+   "say": "Her face. Already gone. You will wonder, some nights, whose voice that was.",
+   "emb": "weep",
+   "txt": "+2 Essence · -2 Vitality"
+  },
+  {
+   "id": "sleep",
+   "name": "Your sleep",
+   "fx": {
+    "fcr": 1,
+    "hpPct": -1
+   },
+   "say": "No more sleep. No more dreams. You will not miss the dreams. Trust me.",
+   "emb": "moon",
+   "txt": "+1% faster cast rate · -1% life"
+  },
+  {
+   "id": "voice",
+   "name": "Your voice",
+   "fx": {
+    "con": 2,
+    "fcr": -1
+   },
+   "say": "Your voice. You will scream silently now, like the rest of us.",
+   "emb": "mouth",
+   "txt": "+2 Constitution · -1% faster cast rate"
+  },
+  {
+   "id": "luck",
+   "name": "Your luck",
+   "fx": {
+    "vit": 2,
+    "spi": 2,
+    "con": 2,
+    "mf": -1
+   },
+   "say": "Luck. Ha! You never had much. I will take what there is.",
+   "emb": "coin",
+   "txt": "+2 Vitality · +2 Essence · +2 Constitution · -1% magic find"
+  },
+  {
+   "id": "hunger",
+   "name": "Your hunger",
+   "fx": {
+    "lok": 1,
+    "gold": -1
+   },
+   "say": "Hunger. Strange gift to give. The dead will feed you instead.",
+   "emb": "mouth",
+   "txt": "+1 life after each kill · -1% gold found"
+  },
+  {
+   "id": "taste",
+   "name": "Your sense of taste",
+   "fx": {
+    "lok": 1,
+    "xp": -1
+   },
+   "say": "Taste. You will eat ash and marrow and not mind it. Good. That is most of what there is.",
+   "emb": "cup",
+   "txt": "+1 life after each kill · -1% experience"
+  },
+  {
+   "id": "song",
+   "name": "The last song you knew",
+   "fx": {
+    "fcr": 1,
+    "spi": -1
+   },
+   "say": "The song. I will hum it sometimes. You will not recognise it.",
+   "emb": "bell",
+   "txt": "+1% faster cast rate · -1 Essence"
+  },
+  {
+   "id": "fear",
+   "name": "Your fear of heights",
+   "fx": {
+    "frw": 1,
+    "armor": -3
+   },
+   "say": "You will not fear falling. You will fall a great deal, and you will get up faster for it.",
+   "emb": "mountain",
+   "txt": "+1% faster movement · -3 armor"
+  }
+ ],
+ "questions": [
+  {
+   "q": [
+    "When you woke in the ash, something was in your hand.",
+    "What was it?"
+   ],
+   "a": [
+    {
+     "id": "stone",
+     "name": "A stone",
+     "fx": {
+      "armor": 4,
+      "frw": -1
+     },
+     "say": "A stone. You held on to the world before you knew what it was. It will hold on to you.",
+     "emb": "stone",
+     "txt": "+4 armor · -1% faster movement"
+    },
+    {
+     "id": "nothing",
+     "name": "Nothing",
+     "fx": {
+      "frw": 1,
+      "res": -1
+     },
+     "say": "Nothing. Empty hands run faster. They catch less, too.",
+     "emb": "bowl",
+     "txt": "+1% faster movement · -1% magic resist"
+    },
+    {
+     "id": "hand",
+     "name": "Another hand",
+     "fx": {
+      "lok": 1,
+      "gold": -1
+     },
+     "say": "Another hand. Cold? It was cold. You have been holding the dead ever since.",
+     "emb": "hand",
+     "txt": "+1 life after each kill · -1% gold found"
+    }
+   ]
+  },
+  {
+   "q": [
+    "There is a voice in the Drowned Fen that speaks to travellers.",
+    "When you passed, what did it say?"
+   ],
+   "a": [
+    {
+     "id": "myname",
+     "name": "My name",
+     "fx": {
+      "xp": 1,
+      "mf": -1
+     },
+     "say": "Your name. So it knows you. Learn quickly, before it learns the rest.",
+     "emb": "feather",
+     "txt": "+1% experience · -1% magic find"
+    },
+    {
+     "id": "babble",
+     "name": "Nothing I understood",
+     "fx": {
+      "res": 1,
+      "dmg": -1
+     },
+     "say": "Nothing you understood. A mercy. Understanding is how it gets in.",
+     "emb": "mouth",
+     "txt": "+1% magic resist · -1% skill damage"
+    },
+    {
+     "id": "yours",
+     "name": "Your name",
+     "fx": {
+      "mf": 1,
+      "hpPct": -1
+     },
+     "say": "My name? ...Then it is looking for me through you. Find it pretty things, little messenger.",
+     "emb": "eye",
+     "txt": "+1% magic find · -1% life"
+    }
+   ]
+  },
+  {
+   "q": [
+    "Everyone here was buried once. The god made sure of that.",
+    "Who buried you?"
+   ],
+   "a": [
+    {
+     "id": "mother",
+     "name": "My mother",
+     "fx": {
+      "hpPct": 1,
+      "fcr": -1
+     },
+     "say": "Your mother. She buried you gently. You will be hard to kill because of it.",
+     "emb": "heart",
+     "txt": "+1% life · -1% faster cast rate"
+    },
+    {
+     "id": "stranger",
+     "name": "A stranger",
+     "fx": {
+      "gold": 1,
+      "xp": -1
+     },
+     "say": "A stranger, who took your boots for the trouble. You will learn to take boots too.",
+     "emb": "staff",
+     "txt": "+1% gold found · -1% experience"
+    },
+    {
+     "id": "self",
+     "name": "No one. I dug myself out",
+     "fx": {
+      "con": 2,
+      "spi": -1
+     },
+     "say": "You dug yourself out. Your hands remember the dirt. Your spirit remembers less.",
+     "emb": "grave",
+     "txt": "+2 Constitution · -1 Essence"
+    }
+   ]
+  },
+  {
+   "q": [
+    "Suppose you find it. The dead god. Whatever is left of its heart.",
+    "What will you do?"
+   ],
+   "a": [
+    {
+     "id": "bury",
+     "name": "Bury it",
+     "fx": {
+      "res": 1,
+      "dmg": -1
+     },
+     "say": "Bury a world. It would take a very long time. You have that, perhaps.",
+     "emb": "grave",
+     "txt": "+1% magic resist · -1% skill damage"
+    },
+    {
+     "id": "eat",
+     "name": "Eat it",
+     "fx": {
+      "lok": 1,
+      "res": -1
+     },
+     "say": "Eat it! Ha. Many have tried. The god is patient with its eaters. It becomes them.",
+     "emb": "mouth",
+     "txt": "+1 life after each kill · -1% magic resist"
+    },
+    {
+     "id": "wake",
+     "name": "Wake it",
+     "fx": {
+      "spi": 2,
+      "vit": -1
+     },
+     "say": "Wake it. Then the Void comes for you first. Remember I warned you.",
+     "emb": "sun",
+     "txt": "+2 Essence · -1 Vitality"
+    }
+   ]
+  },
+  {
+   "q": [
+    "The lanterns call you back each time you fall.",
+    "Why do you think they want you?"
+   ],
+   "a": [
+    {
+     "id": "kind",
+     "name": "Because they are kind",
+     "fx": {
+      "hpPct": 1,
+      "mf": -1
+     },
+     "say": "Kind. Yes. Hold on to that one. Hold on hard.",
+     "emb": "lantern",
+     "txt": "+1% life · -1% magic find"
+    },
+    {
+     "id": "use",
+     "name": "Because I am useful",
+     "fx": {
+      "dmg": 1,
+      "hpPct": -1
+     },
+     "say": "Useful. A tool that knows it is a tool. That is almost a person.",
+     "emb": "hammer",
+     "txt": "+1% skill damage · -1% life"
+    },
+    {
+     "id": "hungry",
+     "name": "Because they are hungry",
+     "fx": {
+      "gold": 1,
+      "res": -1
+     },
+     "say": "Hungry. Now you are thinking like one of us.",
+     "emb": "rat",
+     "txt": "+1% gold found · -1% magic resist"
+    }
+   ]
+  }
+ ],
+ "prophecies": [
+  "You will die in the dark, and it will not be the last time.",
+  "A crown of bone is waiting for a head. It is not particular about whose.",
+  "Something below the Crypt has learned your name. Try not to answer it.",
+  "The lanterns will keep calling you back. Ask yourself why they want you so badly.",
+  "Three faces will want you. None of them will want you whole."
+ ],
+ "asides": {
+  "fear": [
+   "You flinched. Where the Tithed walk, flinching keeps you alive. Fools call it cowardice.",
+   "I will not laugh at what you fear. I fear things too. Worse things."
+  ],
+  "seek": [
+   "Some go down for gold, some for gods. The god does not care why. It eats both.",
+   "You want something. It is written all over you, in a hand I do not like."
+  ],
+  "sac": [
+   "We are nearly done. This is the part that hurts.",
+   "Do not look away from the knife. It is rude."
+  ]
+ }
+}

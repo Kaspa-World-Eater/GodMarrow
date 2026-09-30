@@ -167,6 +167,12 @@ static func _alpha(t: float, mx: float) -> float:
 	return clampf(minf((mx - t) / 0.9, t / 1.3), 0.0, 1.0)
 
 func _process(dt: float) -> void:
+	# the title and the Reading stand over the world: its words wait (their clocks held) until the pilgrim rises
+	var cs := get_tree().current_scene
+	var held: bool = cs != null and cs.get("title_open") == true
+	visible = not held
+	if held:
+		return
 	_bark_t = maxf(0.0, _bark_t - dt)
 	_wh_t = maxf(0.0, _wh_t - dt)
 	_ban_t = maxf(0.0, _ban_t - dt)

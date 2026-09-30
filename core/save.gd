@@ -82,6 +82,7 @@ static func write(main: Node) -> bool:
 		"keys": sk.keys.duplicate() if sk else {}, "own": own,
 		"quests": load("res://world/quests.gd").to_dict(),
 		"arc": st.arc.to_dict() if st.arc != null else {},
+		"fate": st.fate.duplicate(), "fate_picks": st.fate_picks.duplicate(true),
 		"last_lantern": main.last_lantern.duplicate(), "remnant": main.remnant.duplicate(),
 		"clock": Game.clock,
 	}
@@ -133,6 +134,8 @@ static func apply(main: Node, d: Dictionary) -> void:
 				sk.set(k, own[k])
 	if st.arc != null and d.has("arc"):
 		st.arc.from_dict(d["arc"])
+	st.fate = d.get("fate", {}).duplicate()
+	st.fate_picks = d.get("fate_picks", []).duplicate(true)
 	var Q = load("res://world/quests.gd")
 	Q.from_dict(d.get("quests", {}))
 	# the errands' lasting gifts live in the errand store; lay them back on the pilgrim
