@@ -11,7 +11,9 @@ uniform int n_holes = 0;
 uniform vec4 hA[48];     // x, y (window px), r (px, semi-major), far
 uniform vec4 hB[48];     // core, ring, w (tint weight), shadowed (1 if it has occluders)
 uniform vec4 hC[48];     // rgb 0..1, floor (the least dark this pool can leave: faint lights never clear the dark)
-uniform vec4 hD[48];     // lift (how much the flame's own colour pours over what it lights, the web's light map), 0, 0, 0
+uniform vec4 hD[48];     // lift (how much the flame's own colour pours over what it lights, the web's light map), halo (the
+                         // dithered glow in a lantern's glass, over the dark), rake (how far the flame lifts what it lights above
+                         // its paint, the web's doubled light map), breath (the halo's slow swell)
 uniform int n_occ = 0;
 uniform vec4 occ[128];   // a.xy, b.xy of an occluding edge (window px)
 uniform float occ_h[128];// which hole it belongs to
@@ -88,6 +90,8 @@ void fragment() {
 	float warm = 0.0;
 	vec3 wc = vec3(0.0);
 	vec3 lift = vec3(0.0);
+	float rake = 0.0;
+	vec3 halo = vec3(0.0);
 	for (int i = 0; i < n_holes; i++) {
 		vec4 a = hA[i];
 		float r = a.z;
@@ -135,6 +139,20 @@ void fragment() {
 		}
 		v = max(v, hC[i].w);
 		if (v < dark) dark = v;
+		if (hD[i].z > 0.0 && v < 0.64) rake = max(rake, hD[i].z * pow(1.0 - v / 0.64, 2.0));
+		if (hD[i].y > 0.0) {
+			// the web's glowSprite: three dithered discs (the air round the glass, the halo in it, the flame), each pixel
+			// either on or off by a Bayer threshold, so the glow reads in pixel rings
+			float dp = length((p - a.xy) / cell);
+			ivec2 hc = ivec2(floor(FRAGCOORD.xy / cell));
+			float hb = BAY[(hc.y & 3) * 4 + (hc.x & 3)] * 0.9;
+			// stepped rings (the web's ditherGlow): four alpha levels, the step between two levels dithered
+			float gv = max(0.0, 1.0 - dp / 7.0);
+			gv = gv * gv * 4.0;
+			float lv = floor(gv) + ((gv - floor(gv) - 0.25) * 2.0 > hb / 14.4 ? 1.0 : 0.0);
+			float ha = min(4.0, lv) * 0.16 + (dp < 1.6 ? 0.35 : 0.0);
+			halo = max(halo, hC[i].rgb * ha * hD[i].y * hD[i].w);
+		}
 		if (hD[i].x > 0.0) lift = max(lift, hC[i].rgb * hD[i].x * (1.0 - v / 0.64 * 0.85) * step(v, 0.99));
 		band *= b.z;
 		if (band > warm) {
@@ -154,6 +172,8 @@ void fragment() {
 		vec3 ov = vec3(overlay_ch(scene.r, wc.r), overlay_ch(scene.g, wc.g), overlay_ch(scene.b, wc.b));
 		col = mix(col, ov, ta);
 	}
+	col *= 1.0 + rake;
 	col = mix(col, dark_rgb, dark_a * vq);
+	col += halo;
 	COLOR = vec4(col, 1.0);
 }

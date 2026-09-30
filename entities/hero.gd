@@ -19,7 +19,7 @@ var path_i := 0
 var repath := 0.0
 var goal := Vector2.ZERO
 var walking := false
-var lantern: LanternUnit = null    # the floating lantern (Mystic, Hemomancer)
+var lantern: LanternUnit = null    # the floating lantern (every order)
 var lamp: PointLight2D
 var st: HeroStats
 var skills: SkillBook

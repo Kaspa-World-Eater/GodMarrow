@@ -51,7 +51,7 @@ var last_xf := Transform2D.IDENTITY
 func _ready() -> void:
 	layer = 5
 	rect = ColorRect.new()
-	rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mat = ShaderMaterial.new()
 	mat.shader = load("res://shaders/dark.gdshader")
@@ -148,13 +148,18 @@ func _process(dt: float) -> void:
 		var foot := hp + Vector2(0.25, -0.1)
 		if hero.lantern and is_instance_valid(hero.lantern):
 			foot = hero.lantern.tp   # the pool lies under the lantern, wherever it floats
-		var rgb := Color8(120, 178, 255) if hero.cls == "animancer" else (Color8(255, 164, 84) if hero.cls == "hemomancer" else Color8(255, 170, 96))
+		# each order's own flame (zz_zw_lantern63 BASE_RGB): ghost-blue glass, the penitent's amber, bone-pale candle, paper
+		# lantern, the black flame's cold light
+		var rgb: Color = {"animancer": Color8(120, 178, 255), "hemomancer": Color8(255, 164, 84), "ossumancer": Color8(240, 222, 190), "miasmancer": Color8(255, 196, 130), "monk": Color8(226, 220, 204)}.get(hero.cls, Color8(255, 170, 96))
+		# the flame breathes (zz_zw_lantern63: a slow swell, no flutter; a quick flutter strobed on phones)
+		var br := 0.86 + 0.09 * sin(t * 1.7) + 0.05 * sin(t * 2.9 + sin(t * 0.7))
+		R *= 0.96 + 0.05 * br
 		var hi := holes.size()
-		holes.append([xf * Iso.to_screen(foot) + Vector2(0, sc * 4.0), R * 4.0 * sc, 2.1, 0.22, 0.26, 1.0, rgb, 1.0, 0.0, 0.18])
+		holes.append([xf * Iso.to_screen(foot) + Vector2(0, sc * 4.0), R * 4.0 * sc, 2.1, 0.22, 0.26, 1.0, rgb, 1.0, 0.0, 0.18, 0.0, 0.32 * mood, 1.0])
 		_occluders(occs, foot, R * 2.1 / ISO_R, hi, xf)
 		# the glow in the lantern's own glass
 		if hero.lantern and is_instance_valid(hero.lantern):
-			holes.append([xf * hero.lantern.glass_screen(), 15.0 * 4.0 * sc * mood, 1.5, 0.3, 0.0, 0.6, rgb, 0.0, 0.0, 0.1])
+			holes.append([xf * hero.lantern.glass_screen(), 15.0 * 4.0 * sc * mood, 1.5, 0.3, 0.0, 0.6, rgb, 0.0, 0.0, 0.1, 1.0, 0.25, br * mood])
 	# ---- the world's flames (the nearest four throw shadows)
 	var near: Array = []
 	for s in statics:
@@ -175,7 +180,7 @@ func _process(dt: float) -> void:
 			n_sh += 1
 			shadowed = 1.0
 			_occluders(occs, s["t"], s["r"] * 1.6 / ISO_R, hi2, xf)
-		holes.append([pos, r, float(s["far"]), float(s["core"]), 0.0, float(s["w"]), s["rgb"], shadowed, 0.0, 0.0 if s["kind"] == "wallc" else 0.45])
+		holes.append([pos, r, float(s["far"]), float(s["core"]), 0.0, float(s["w"]), s["rgb"], shadowed, 0.0, 0.0 if s["kind"] == "wallc" else 0.45, 0.0, 0.0 if s["kind"] == "wallc" else 0.18, 1.0])
 	# ---- lights other systems placed (wisps, skills, objects, fires): made into pools
 	scan_t -= dt
 	if scan_t <= 0.0:
@@ -220,7 +225,7 @@ func _process(dt: float) -> void:
 		hB.append(Vector4(float(h[3]), float(h[4]), float(h[5]), sh))
 		var c: Color = h[6]
 		hC.append(Vector4(c.r, c.g, c.b, float(h[8]) if h.size() > 8 else 0.0))
-		hD.append(Vector4(float(h[9]) if h.size() > 9 else 0.0, 0, 0, 0))
+		hD.append(Vector4(float(h[9]) if h.size() > 9 else 0.0, float(h[10]) if h.size() > 10 else 0.0, float(h[11]) if h.size() > 11 else 0.0, float(h[12]) if h.size() > 12 else 1.0))
 	while hA.size() < MAXH:
 		hA.append(Vector4.ZERO)
 		hB.append(Vector4.ZERO)

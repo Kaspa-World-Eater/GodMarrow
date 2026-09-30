@@ -39,7 +39,7 @@ const QUESTS := [
 
 const TOWN := {
 	1: {"giver": "Warden-Crone Esk", "healer": "Sister Ysolde, Tallow-Nurse", "smith": "Brannoc of the Nail", "vendor": "Maren the Gravekeeper",
-		"greet": "Esk: 'Another pilgrim. Good. The dead swore things they could not finish. Now you have. Open your journal (J).'"},
+		"greet": "Esk: 'Another pilgrim. Good. The dead swore what they could not finish. Now you have. Your journal (J).'"},
 }
 const STRANGER_LINES := {
 	1: ["The Stranger: 'You have found the Sighing Lantern? Good. Not all of them still sing.'",

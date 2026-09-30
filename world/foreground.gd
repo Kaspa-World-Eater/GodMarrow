@@ -42,17 +42,18 @@ func bind(z: Zone, h: Hero, d: DarkLayer) -> void:
 		var tset: Array = _texset(kind)
 		anchors.append({"tp": tp, "kind": kind, "tex": tset[rng.randi() % tset.size()], "flip": rng.randf() < 0.5})
 
-## what grows (or lies) near the eye here, with weights
+## what grows (or lies) near the eye here, with weights. The near trunks and dead branches were taken out (2026-09-30,
+## the user: "weird tree shadows"): black trees sliding over the frame read as errors, not depth. Only low grass and reeds.
 func _kinds() -> Dictionary:
 	var s: String = str(zone.d.get("theme", "")) + " " + zone.id
 	if zone.d.get("town", false) or s.contains("town") or s.contains("camp"):
 		return {"grass": 1.0}
 	if zone.d.get("outdoor", false):
 		if s.contains("fen") or s.contains("marsh") or s.contains("mire"):
-			return {"reeds": 0.55, "grass": 0.37, "branch": 0.08}
+			return {"reeds": 0.6, "grass": 0.4}
 		if s.contains("wood") or s.contains("grove") or s.contains("forest"):
-			return {"grass": 0.55, "reeds": 0.1, "branch": 0.2, "trunk": 0.15}
-		return {"grass": 0.6, "reeds": 0.15, "branch": 0.25}
+			return {"grass": 0.85, "reeds": 0.15}
+		return {"grass": 0.8, "reeds": 0.2}
 	return {}   # under the ground the rooms are close enough already: nothing stands between the eye and the pilgrim
 
 func _pick(k: Dictionary, rng: RandomNumberGenerator) -> String:

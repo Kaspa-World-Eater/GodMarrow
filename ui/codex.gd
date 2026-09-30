@@ -28,7 +28,7 @@ var rail_scroll := 0.0
 var on_close: Callable
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var f := FileAccess.open("res://data/codex.json", FileAccess.READ)

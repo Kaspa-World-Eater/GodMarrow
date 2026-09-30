@@ -116,7 +116,7 @@ func _process(dt: float) -> void:
 	if woody and dk > 0.2:
 		if shafts.size() < 4 and (randf() < dt * 0.5 or t - bind_t < 0.3):
 			var lf := randf_range(14, 26)
-			shafts.append({"x": randf_range(-300, vs.x), "w": randf_range(60, 150), "t": lf * randf_range(0.25, 0.5) if t - bind_t < 0.3 else 0.0, "life": lf, "ph": randf() * TAU})
+			shafts.append({"x": randf_range(-300, vs.x), "w": randf_range(60, 150), "t": 0.0, "life": lf, "ph": randf() * TAU})
 	for s in shafts:
 		s["t"] += dt
 		s["x"] += (2.0 + wind * 4.0) * dt - dcam.x
@@ -203,7 +203,8 @@ func _draw_add() -> void:
 	var wind := Game.wind
 	for s in shafts:
 		var ph: float = s["ph"]
-		var life_k: float = sin(PI * clampf(s["t"] / s["life"], 0.0, 1.0))
+		# a slow rise and a slow fade (four seconds each way), so no ray ever blinks in or out
+		var life_k: float = smoothstep(0.0, 4.0, s["t"]) * smoothstep(0.0, 4.0, s["life"] - s["t"])
 		# the canopy: a slow breath and a quicker shiver that grows with the wind
 		var shimmer := 0.72 + 0.18 * sin(t * 0.45 + ph) + (0.06 + 0.12 * wind) * sin(t * (1.7 + wind) + ph * 3.0) * sin(t * 0.61 + ph)
 		var br: float = 0.075 * dk * life_k * shimmer

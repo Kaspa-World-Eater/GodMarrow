@@ -76,12 +76,13 @@ func _init(m: Node) -> void:
 func _ready() -> void:
 	layer = 25
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	Game.slot = ""   # the title shows the pilgrims; the Trial is entered from an order's page
 	for arg in OS.get_cmdline_user_args() + OS.get_cmdline_args():
 		if arg.begins_with("--title_scene="):
 			Settings.title_scene = arg.substr(14)
 	_set_stage(Settings.title_scene)
 	root = Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
 	root.draw.connect(_draw_ui)
 	root.gui_input.connect(_gui)
@@ -111,6 +112,7 @@ func _build() -> void:
 					rows.append(["Forget them, and begin anew?" if confirm_new else "Begin anew", "order_new"])
 				else:
 					rows.append(["Begin", "order_new"])
+				rows.append(["The Trial of Thirty (a test pilgrim, level 30)", "order_trial"])
 			rows.append(["Back", "back"])
 		_:
 			rows.append(["Back", "back"])
@@ -239,6 +241,19 @@ func _act(a: String) -> void:
 				stage.draw_card(order_i)
 				get_tree().create_timer(stage.DRAW_LEN + 0.6).timeout.connect(func(): get_tree().reload_current_scene())
 				return
+			get_tree().reload_current_scene()
+		"order_trial":
+			# a test pilgrim at level 30, in its own slot: the real pilgrim of the order is never touched
+			var tk: String = PILGRIMS[order_i][0]
+			Sfx.play("kindle", 0.9)
+			Game.slot = "_trial"
+			Game.skip_title = true
+			Game.cls = tk
+			if SaveIO.exists(tk):
+				Game.load_cls = tk
+			else:
+				Game.force_new = true
+				Game.trial_new = true
 			get_tree().reload_current_scene()
 		"back":
 			if mode == "order":

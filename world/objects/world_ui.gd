@@ -40,12 +40,12 @@ func _ready() -> void:
 	name = "GodmarrowWorldUI"
 	layer = 30
 	var root := Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	fade_r = ColorRect.new()
 	fade_r.color = Color(4 / 255.0, 1 / 255.0, 2 / 255.0, 0.0)
-	fade_r.set_anchors_preset(Control.PRESET_FULL_RECT)
+	fade_r.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	fade_r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(fade_r)
 	bark_plate = _plate(root)

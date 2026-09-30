@@ -17,6 +17,8 @@ const SIGIL_KINDS := ["open", "fewer", "weigh", "stair"]
 
 static func run(g) -> void:
 	var a: Dictionary = g.args
+	if a.has("menutest"):
+		await _menutest(g, a)
 	if a.has("demo"):
 		_demo(g)
 	if a.has("panel"):
@@ -108,3 +110,67 @@ static func _demo(g) -> void:
 			hero.target = m
 		if g.args.has("trace") and i % 5 == 0:
 			print("T ", i, " hero ", hero.tp, " act ", hero.act, " walk ", hero.walking, " path ", hero.path.size(), " tgt ", (m.kind + " " + str(m.tp)) if m else "none", " hp ", hero.st.hp, " mons ", g.get_tree().get_nodes_in_group("monsters").size(), " thp ", (m.hp if m else -1.0), " missiles ", g.zone.sorted.get_children().filter(func(c): return c is Missile).size())
+
+
+## --menutest=pause|title[=row]: clicks a menu row the way a mouse does (window pixels through Input), prints MENU lines
+static func _click_at(g, w: Vector2) -> void:
+	var m := InputEventMouseMotion.new()
+	m.position = w
+	m.global_position = w
+	Input.parse_input_event(m)
+	await g.get_tree().process_frame
+	for down in [true, false]:
+		var e := InputEventMouseButton.new()
+		e.position = w
+		e.global_position = w
+		e.button_index = MOUSE_BUTTON_LEFT
+		e.pressed = down
+		Input.parse_input_event(e)
+		await g.get_tree().process_frame
+
+static func _menutest(g, a: Dictionary) -> void:
+	await g.get_tree().create_timer(2.0).timeout
+	var what: String = a["menutest"]
+	print("MENU window ", DisplayServer.window_get_size(), " viewport ", g.get_viewport().get_visible_rect().size)
+	if what == "quitdirect":
+		print("MENU calling _act(quit) directly")
+		g.hud.pause.open()
+		g.hud.pause._act("quit", false)
+		await g.get_tree().create_timer(2.0).timeout
+		print("MENU STILL RUNNING after direct quit")
+		return
+	if what == "pause":
+		g.hud.pause.open()
+		await g.get_tree().create_timer(0.5).timeout
+		var P = g.hud.pause
+		P._build()
+		for i in P.rows.size():
+			if P.rows[i][1] == "quit":
+				var w: Vector2 = g.get_viewport().get_screen_transform() * P.get_global_transform_with_canvas() * P._row_rect(i).get_center()
+				print("MENU clicking Save and quit at ", w)
+				var mm := InputEventMouseMotion.new()
+				mm.position = w
+				Input.parse_input_event(mm)
+				await g.get_tree().process_frame
+				await g.get_tree().process_frame
+				var hc = g.get_viewport().gui_get_hovered_control()
+				print("MENU hovered control: ", hc, " ", hc.get_path() if hc else "", " filter ", hc.mouse_filter if hc else -1, " pause visible ", P.visible, " pause path ", P.get_path(), " rect ", P.get_global_rect(), " parent ", P.get_parent().get_global_rect(), " pfilter ", P.get_parent().mouse_filter, " layer vis ", P.get_parent().get_parent().visible, " row ", P._row_rect(0))
+				await _click_at(g, w)
+		await g.get_tree().create_timer(2.0).timeout
+		print("MENU STILL RUNNING after Save and quit")
+	elif what.begins_with("title"):
+		var T = null
+		for c in g.get_children():
+			if c.get_script() and str(c.get_script().resource_path).ends_with("ui/title.gd"):
+				T = c
+		if T == null:
+			print("MENU no title")
+			return
+		await g.get_tree().create_timer(3.0).timeout
+		print("MENU title rows ", T.rows.map(func(r): return r[1] if r.size() > 1 else r))
+		var k := int(a.get("row", "0"))
+		var w2: Vector2 = g.get_viewport().get_screen_transform() * T.root.get_global_transform_with_canvas() * T._row_rect(k).get_center()
+		print("MENU clicking row ", k, " at ", w2, " mode ", T.mode)
+		await _click_at(g, w2)
+		await g.get_tree().create_timer(1.5).timeout
+		print("MENU after click: mode ", T.mode if is_instance_valid(T) else "(title gone)", " leaving ", T.leaving if is_instance_valid(T) else -1.0)

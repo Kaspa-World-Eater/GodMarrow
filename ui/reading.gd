@@ -80,7 +80,7 @@ func _ready() -> void:
 	R = j if j is Dictionary else {}
 	sheet = load("res://art/reading/stranger_sheet.webp")
 	root = Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
 	root.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	root.draw.connect(_draw_all)

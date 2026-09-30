@@ -36,17 +36,18 @@ func _infuse_one() -> void:
 	if g.ramp > 0.0:
 		say("Your golem already burns.", 0.8)
 		return
-	if wisps.is_empty():
-		say("No wisps to give.", 0.8)
-		return
-	take_wisp()
+	# with no wisp to give he gives his own breath of Essence: half as much (never refused)
+	var gave := 1.0
+	if take_wisp() == null:
+		gave = 0.5 if hero.st.res >= 3.0 else 0.2
+		hero.st.res = maxf(0.0, hero.st.res - 3.0)
 	if g.state == "dormant":
-		g.boost = minf(1.0 + minf(0.5, 0.025 * K("overcharge")), g.boost + 0.12 + 0.004 * K("wisps"))
+		g.boost = minf(1.0 + minf(0.5, 0.025 * K("overcharge")), g.boost + (0.12 + 0.004 * K("wisps")) * gave)
 	else:
 		g.infused += 1
 		if g.hp < g.max_hp - 0.5:
-			g.hp = minf(g.max_hp, g.hp + g.max_hp * 0.07 + 4.0 * K("wisps"))
-		g.add_charge(1.0)
+			g.hp = minf(g.max_hp, g.hp + (g.max_hp * 0.07 + 4.0 * K("wisps")) * gave)
+		g.add_charge(gave)
 
 func _condense_one() -> void:
 	if wisps.is_empty():

@@ -62,7 +62,7 @@ func _ready() -> void:
 		if j is Dictionary:
 			zone_lines = j
 	root = Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
 	over = _layer(_draw_over)
@@ -101,7 +101,7 @@ func _ready() -> void:
 
 func _layer(fn: Callable) -> Control:
 	var c := Control.new()
-	c.set_anchors_preset(Control.PRESET_FULL_RECT)
+	c.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.draw.connect(fn)
 	root.add_child(c)

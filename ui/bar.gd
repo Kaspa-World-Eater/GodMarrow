@@ -50,7 +50,7 @@ func _ready() -> void:
 	glass_r = _glass(ORB_R, "essence")
 	front = Control.new()
 	front.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	front.set_anchors_preset(Control.PRESET_FULL_RECT)
+	front.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	front.draw.connect(_draw_front)
 	add_child(front)
 

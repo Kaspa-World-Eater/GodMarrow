@@ -9,6 +9,8 @@ var zone_seeds := {}       # zone id -> exported seed chosen for this run (maps 
 var visited := {}
 var skip_title := false      # a new pilgrim chosen on the title reloads the scene straight into play
 var force_new := false
+var slot := ""                # "" the pilgrims; "_trial" the Trial of Thirty (the web's test character), kept apart
+var trial_new := false         # a new Trial pilgrim: level 30 with every point to spend
 var read_new := false         # a new pilgrim from an order's page: the Reading comes first
 var load_cls := ""           # the order whose pilgrim to wake next (the title's order page); "" = the latest
 

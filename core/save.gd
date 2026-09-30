@@ -11,7 +11,7 @@ const ORDERS := ["animancer", "hemomancer", "ossumancer", "miasmancer", "monk"]
 
 ## one pilgrim kept per order (the title's fire opens each order's own; more slots per order can come later)
 static func path(cls: String) -> String:
-	return "user://godmarrow_%s.save" % cls
+	return "user://godmarrow_%s%s.save" % [cls, Game.slot]
 
 static func _migrate() -> void:
 	if not FileAccess.file_exists(FILE):
@@ -43,6 +43,8 @@ static func latest() -> String:
 	var best := ""
 	var bt := -1
 	for c in ORDERS:
+		if not ResourceLoader.exists("res://skills/%s.gd" % c):
+			continue   # an order not yet walking in this build (its pilgrim waits, untouched)
 		if FileAccess.file_exists(path(c)):
 			var m := int(FileAccess.get_modified_time(path(c)))
 			if m > bt:

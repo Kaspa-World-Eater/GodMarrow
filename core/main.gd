@@ -37,6 +37,9 @@ func _ready() -> void:
 		args[kv[0]] = kv[1] if kv.size() > 1 else "1"
 	if args.has("seed"):   # tests: the same run every time (tools/smoke.sh)
 		seed(int(args["seed"]))
+	if args.has("trial"):   # tests: the Trial of Thirty slot (--trial --new makes a fresh one)
+		Game.slot = "_trial"
+		Game.trial_new = args.has("new")
 	Game.new_run()
 	if args.has("cls"):
 		Game.cls = args["cls"]
@@ -120,6 +123,17 @@ func enter(zid: String, from: String) -> void:
 	hero.skills = old_skills
 	zone.sorted.add_child(hero)
 	hero.setup(zone, Game.cls, at)
+	if Game.trial_new:
+		# the Trial of Thirty (the web's test character): level 30, 120 skill points (S), 145 stat points (C)
+		Game.trial_new = false
+		hero.st.level = 30
+		hero.st.skill_points = 120
+		hero.st.attr_points = 145
+		hero.st.arcana_points = 30
+		hero.st.hp = hero.st.life_max()
+		hero.st.res = hero.st.res_max()
+		hero.st.poise = hero.st.poise_max()
+		get_tree().create_timer(8.0).timeout.connect(func(): Bus.say.emit("The Trial of Thirty: level 30, 120 skill points (S), 145 stat points (C)", 5.0))
 	var fresh_pilgrim := hero.st.level == 1 and hero.st.xp == 0 and pending_load.is_empty() and from == ""
 	if not pending_load.is_empty():
 		SaveIO.apply(self, pending_load)

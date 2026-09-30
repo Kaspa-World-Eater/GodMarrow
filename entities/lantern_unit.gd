@@ -6,7 +6,7 @@ extends Node2D
 ## leans with its motion. It throws no shadow; it is the light. The pool of light lies under it (world/dark_layer.gd reads
 ## tp), and its glass breathes and gutters with the flame (the lantern's mood).
 
-const WHO := {"hemomancer": "iron", "animancer": "gold"}
+const WHO := {"hemomancer": "iron", "animancer": "gold", "ossumancer": "iron", "miasmancer": "gold", "monk": "iron"}   # every order carries one (the web: lampFrame)
 var hero: Hero
 var tp := Vector2.ZERO           # tiles
 var v := Vector2.ZERO

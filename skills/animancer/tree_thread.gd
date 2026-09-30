@@ -20,18 +20,16 @@ func _cast_swarm(a: Vector2) -> bool:
 			return false
 		drains.append({"m": t, "t": 3.0, "tick": 0.0})
 		return true
-	if wisps.is_empty():
-		say("Your wisps are spent.", 1.0)
-		return false
+	# no wisps is a weaker swarm, never a refused one (the user, 2026-09-30): he sends two threads of his own
 	if not spend("swarm"):
 		return false
 	hero.spend_poise(4.0)
 	var n := mini(3, wisps.size())
 	for i in n:
 		take_wisp()
-	var count := 1 + n * (ws_souls_per_wisp() - 1) + wisps.size() / 2
+	var count := (1 + n * (ws_souls_per_wisp() - 1) + wisps.size() / 2) if n > 0 else 2
 	var base := atan2(a.y - hero.tp.y, a.x - hero.tp.x)
-	var dmg := ws_soul_dmg()
+	var dmg := ws_soul_dmg() * (1.0 if n > 0 else 0.65)
 	for i in count:
 		new_soul(hero.tp, base + (randf() - 0.5) * 1.6, 6.0, dmg)
 	return true
@@ -47,14 +45,13 @@ func _toggle_wraith() -> bool:
 	return true
 
 func _cast_storm(a: Vector2) -> bool:
-	if wisps.size() < 2:
-		say("The storm needs two wisps.", 1.0)
-		return false
+	# fewer than two wisps makes a shorter storm, never a refused one
 	if not spend("storm"):
 		return false
-	take_wisp()
-	take_wisp()
-	storms.append({"tp": a, "life": ws_storm_life(), "st": 0.0, "spin": 0.0})
+	var fed := mini(2, wisps.size())
+	for i in fed:
+		take_wisp()
+	storms.append({"tp": a, "life": ws_storm_life() * (0.5 + 0.25 * fed), "st": 0.0, "spin": 0.0})
 	return true
 
 func _cast_mark(a: Vector2) -> bool:
