@@ -4,6 +4,9 @@ extends Node
 ## broken, a body falling, the roll, the draught, being struck. Made here from noise and a few tones, once, as short
 ## sounds with small random changes of pitch so no two steps are alike. Sfx.play("hit") from anywhere.
 ## (The web's sfx() beeps are placeholders; these are the Godot build's own.)
+## Where a real recording serves better, it is used: footsteps, blows, cloth, glass, iron, coins, leather, books and a
+## bell come from Kenney's CC0 "Impact Sounds" and "RPG Audio" (Godot Asset Library 1841 and 1840; audio/sfx/,
+## LICENSE_kenney.txt). Everything plays through the "World" bus, whose reverb opens up under the ground.
 
 const RATE := 22050
 static var me: Sfx              # the one live kit (a Node, not a Resource; cleared on exit)
@@ -14,10 +17,41 @@ var last := {}                  # name -> time last played (so a storm of hits d
 func _ready() -> void:
 	me = self
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	for i in 12:
+	_bus()
+	for i in 14:
 		var p := AudioStreamPlayer.new()
+		p.bus = "World"
 		add_child(p)
 		pool.append(p)
+
+## the World bus: a reverb whose wet grows under the ground (set_room)
+func _bus() -> void:
+	if AudioServer.get_bus_index("World") >= 0:
+		return
+	AudioServer.add_bus()
+	var i := AudioServer.bus_count - 1
+	AudioServer.set_bus_name(i, "World")
+	AudioServer.set_bus_send(i, "Master")
+	var rv := AudioEffectReverb.new()
+	rv.room_size = 0.35
+	rv.damping = 0.6
+	rv.wet = 0.06
+	rv.dry = 1.0
+	rv.spread = 0.8
+	rv.predelay_msec = 30.0
+	AudioServer.add_bus_effect(i, rv)
+
+## how the place answers: open ground barely echoes; stone halls and crypts ring
+static func set_room(indoor: bool) -> void:
+	var i := AudioServer.get_bus_index("World")
+	if i < 0:
+		return
+	var rv := AudioServer.get_bus_effect(i, 0) as AudioEffectReverb
+	if rv:
+		rv.room_size = 0.72 if indoor else 0.3
+		rv.wet = 0.24 if indoor else 0.05
+		rv.damping = 0.45 if indoor else 0.7
+		rv.predelay_msec = 45.0 if indoor else 20.0
 
 func _exit_tree() -> void:
 	if me == self:
@@ -28,6 +62,14 @@ static func play(name: String, vol: float = 1.0, pitch: float = 1.0) -> void:
 		me._play(name, vol, pitch)
 
 func _play(name: String, vol: float, pitch: float) -> void:
+	if LAYERS.has(name):
+		for l in LAYERS[name]:
+			if float(l[1]) <= 0.0:
+				_play(l[0], vol, pitch)
+			else:
+				var nm: String = l[0]
+				get_tree().create_timer(float(l[1])).timeout.connect(func(): _play(nm, vol, pitch))
+		return
 	var now := Time.get_ticks_msec() / 1000.0
 	if now - float(last.get(name, -9.0)) < 0.035:
 		return
@@ -43,17 +85,58 @@ func _play(name: String, vol: float, pitch: float) -> void:
 	if p == null:
 		return
 	p.stream = takes[randi() % takes.size()]
-	p.volume_db = linear_to_db(maxf(0.0001, vol * float(Settings.sfx_vol))) + float(GAIN.get(name, 0.0))
+	p.volume_db = linear_to_db(maxf(0.0001, vol * float(Settings.sfx_vol))) + float(SGAIN.get(name, GAIN.get(name, 0.0)))
 	p.pitch_scale = pitch * randf_range(0.92, 1.08)
 	p.play()
 
-const GAIN := {"step_ash": -17.0, "step_stone": -18.0, "step_leaf": -18.0, "step_wet": -14.0, "swing": -13.0, "hit": -7.0,
+## recordings: a name's takes (files in audio/sfx/, without .ogg), and their own level
+const SAMPLES := {
+	"step_stone": ["footstep_concrete_000", "footstep_concrete_001", "footstep_concrete_002", "footstep_concrete_003", "footstep_concrete_004"],
+	"step_ash": ["footstep_snow_000", "footstep_snow_001", "footstep_snow_002", "footstep_snow_003", "footstep_snow_004"],
+	"step_leaf": ["footstep_grass_000", "footstep_grass_001", "footstep_grass_002", "footstep_grass_003", "footstep_grass_004"],
+	"hit": ["impactPunch_medium_000", "impactPunch_medium_001", "impactPunch_medium_002", "impactPunch_medium_003", "impactPunch_medium_004"],
+	"heavy": ["impactPunch_heavy_000", "impactPunch_heavy_001", "impactPunch_heavy_002", "impactPunch_heavy_003", "impactPunch_heavy_004"],
+	"hurt": ["impactSoft_heavy_000", "impactSoft_heavy_001", "impactSoft_heavy_002", "impactSoft_heavy_003", "impactSoft_heavy_004"],
+	"fall_body": ["impactSoft_medium_000", "impactSoft_medium_001", "impactSoft_medium_002", "impactSoft_medium_003", "impactSoft_medium_004"],
+	"break_iron": ["impactMetal_heavy_000", "impactMetal_heavy_001", "impactMetal_heavy_002", "impactMetal_heavy_003", "impactMetal_heavy_004"],
+	"glass": ["impactGlass_light_000", "impactGlass_light_001", "impactGlass_light_002", "impactGlass_light_003", "impactGlass_light_004"],
+	"bell_far": ["impactBell_heavy_000", "impactBell_heavy_001", "impactBell_heavy_002"],
+	"lid": ["impactWood_medium_000", "impactWood_medium_001", "impactWood_medium_002", "impactWood_medium_003", "impactWood_medium_004"],
+	"roll": ["cloth1", "cloth2", "cloth3", "cloth4"],
+	"hinge": ["creak1", "creak2", "creak3"],
+	"coins": ["handleCoins", "handleCoins2"],
+	"leather": ["handleSmallLeather", "handleSmallLeather2", "dropLeather"],
+	"page_open": ["bookOpen", "bookFlip1"],
+	"page_close": ["bookClose", "bookFlip2", "bookFlip3"],
+	"draw_blade": ["drawKnife1", "drawKnife2", "drawKnife3"],
+	"latch": ["metalLatch"],
+}
+## sounds made of others, [name, delay s]
+const LAYERS := {
+	"chest": [["hinge", 0.0], ["lid", 0.34]],
+	"break": [["break_iron", 0.0], ["break_ring", 0.0]],
+	"fall": [["fall_body", 0.0], ["fall_knocks", 0.12]],
+	"cast_mirror": [["glass", 0.0], ["cast_mirror_ring", 0.0]],
+}
+const SGAIN := {"step_stone": -22.0, "step_ash": -21.0, "step_leaf": -16.0, "hit": -11.0, "heavy": -8.0, "hurt": -10.0,
+	"fall_body": -12.0, "break_iron": -12.0, "glass": -15.0, "bell_far": -20.0, "lid": -12.0, "roll": -12.0, "hinge": -8.0,
+	"coins": -8.0, "leather": -14.0, "page_open": -4.0, "page_close": -6.0, "draw_blade": 8.0, "latch": -10.0}
+
+const GAIN := {"break_ring": -15.0, "fall_knocks": -16.0, "cast_mirror_ring": -20.0, "step_ash": -17.0, "step_stone": -18.0, "step_leaf": -18.0, "step_wet": -14.0, "swing": -13.0, "hit": -7.0,
 	"heavy": -5.0, "break": -9.0, "hurt": -8.0, "fall": -10.0, "roll": -12.0, "drink": -10.0, "m_wind": -12.0, "cast_mirror": -14.0, "cast_soul": -12.0, "cast_thread": -12.0, "chest": -9.0, "kindle": -9.0, "shrine": -10.0, "passage": -12.0}
 
 func _takes(name: String) -> Array:
 	if bank.has(name):
 		return bank[name]
 	var out: Array = []
+	if SAMPLES.has(name):
+		for f in SAMPLES[name]:
+			var path := "res://audio/sfx/%s.ogg" % f
+			if ResourceLoader.exists(path):
+				out.append(load(path))
+		if not out.is_empty():
+			bank[name] = out
+			return out
 	for k in 3:
 		var rng := RandomNumberGenerator.new()
 		rng.seed = hash(name) + k * 977
@@ -152,7 +235,7 @@ func _make(name: String, rng: RandomNumberGenerator) -> PackedFloat32Array:
 			var body := _thud(0.32, 110.0, 42.0, 11.0, 1.0)
 			var cr := _noise(rng, 0.12, 0.002, 30.0, 0.2, 0.6, 1.1)
 			return _mix(body, cr, int(RATE * 0.005))
-		"break":       # a guard broken: an iron clang, short
+		"break_ring", "break":       # a guard broken: an iron clang, short
 			var n := int(0.5 * RATE)
 			var s := PackedFloat32Array()
 			s.resize(n)
@@ -166,6 +249,11 @@ func _make(name: String, rng: RandomNumberGenerator) -> PackedFloat32Array:
 			return _mix(s, _noise(rng, 0.04, 0.001, 90.0, 0.5, 0.95, 0.5))
 		"hurt":        # the pilgrim struck: a dull blow through cloth
 			return _mix(_thud(0.2, 120.0, 55.0, 18.0, 0.9), _noise(rng, 0.09, 0.003, 40.0, 0.15, 0.45, 0.8))
+		"fall_knocks": # the small knocks of a body settling
+			var s := PackedFloat32Array()
+			for k in 3:
+				s = _mix(s, _thud(0.06, 300.0 + rng.randf() * 300.0, 180.0, 60.0, 0.18), int(RATE * (0.02 + 0.07 * k + rng.randf() * 0.04)))
+			return s
 		"fall":        # a body going down: a heavy thud, then a few small knocks settling
 			var s := _thud(0.35, 90.0, 38.0, 10.0, 0.9)
 			for k in 3:
@@ -188,7 +276,7 @@ func _make(name: String, rng: RandomNumberGenerator) -> PackedFloat32Array:
 				var e := minf(1.0, t / 0.12) * (1.0 - t / 0.4)
 				s[i] = (a * 2.2 + saw * 0.12 * (0.5 + 0.5 * sin(t * 90.0))) * e
 			return s
-		"cast_mirror": # glass: a bright, uneven ring and a tick like a crack
+		"cast_mirror_ring", "cast_mirror": # glass: a bright, uneven ring and a tick like a crack
 			var n := int(0.7 * RATE)
 			var s := PackedFloat32Array()
 			s.resize(n)

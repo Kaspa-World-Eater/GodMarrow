@@ -74,10 +74,19 @@ static func drop(parent: Node, best: int) -> void:
 		play(parent, [[0.0, 170, 0.07, "square", 0.018, -50]])
 
 static func pickup_item(parent: Node) -> void:
-	play(parent, [[0.0, 700, 0.05, "square", 0.03]])
+	if Sfx.me:
+		Sfx.play("leather")
+	else:
+		play(parent, [[0.0, 700, 0.05, "square", 0.03]])
 
 static func pickup_gold(parent: Node) -> void:
-	play(parent, [[0.0, 1200, 0.05, "square", 0.02]])
+	if Sfx.me:
+		Sfx.play("coins", 0.8)
+	else:
+		play(parent, [[0.0, 1200, 0.05, "square", 0.02]])
 
 static func buy(parent: Node) -> void:
-	play(parent, [[0.0, 1200, 0.06, "square", 0.02]])
+	if Sfx.me:
+		Sfx.play("coins")
+	else:
+		play(parent, [[0.0, 1200, 0.06, "square", 0.02]])

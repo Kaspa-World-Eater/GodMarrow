@@ -156,7 +156,7 @@ func _land(dt: float) -> void:
 		bell_t -= dt
 		if bell_t <= 0.0:
 			bell_t = randf_range(70.0, 150.0)
-			_one(_bell(), -24.0 + linear_to_db(maxf(0.0001, sv)), randf_range(0.94, 1.03))
+			Sfx.play("bell_far", 0.8, randf_range(0.5, 0.58))   # a real bell, pitched down: very far and very large
 
 ## a drop from the roof reaching the floor (world/weather.gd)
 func drip() -> void:
@@ -165,6 +165,8 @@ func drip() -> void:
 func _one(s: AudioStream, db: float, pitch: float) -> void:
 	for p in one_p:
 		if not p.playing:
+			if AudioServer.get_bus_index("World") >= 0:
+				p.bus = "World"
 			p.stream = s
 			p.volume_db = db
 			p.pitch_scale = pitch

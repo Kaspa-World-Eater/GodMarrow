@@ -226,6 +226,13 @@ func is_open(id: String) -> bool:
 	return false
 
 func toggle_panel(id: String) -> void:
+	var was := any_panel()
+	_toggle_panel(id)
+	var now := any_panel()
+	if now != was or id == "map":
+		Sfx.play("page_open" if now else "page_close", 0.8)
+
+func _toggle_panel(id: String) -> void:
 	match id:
 		"inv":
 			p_inv.visible = not p_inv.visible

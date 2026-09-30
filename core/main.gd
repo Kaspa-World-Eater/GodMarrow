@@ -177,6 +177,7 @@ func enter(zid: String, from: String) -> void:
 	atmos.bind(zone, hero, dark)
 	sky.bind(zone, hero, dark)
 	far.bind(zone, hero)
+	Sfx.set_room(not zone.d.get("outdoor", false))
 	if OS.has_environment("GM_FARNOW"):
 		far.wait = 0.5
 	if not OS.has_environment("GM_NOFORE"):
