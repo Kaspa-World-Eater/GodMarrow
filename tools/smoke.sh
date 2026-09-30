@@ -11,11 +11,11 @@ run() {  # name, frames (arena runs quit on their own), args...
   local name=$1 frames=$2; shift 2
   local log; log=$(timeout 200 "$GODOT" --headless --path . --fixed-fps 30 --quit-after "$frames" -- "$@" 2>&1 < /dev/null)
   local errs; errs=$(echo "$log" | grep -cE "SCRIPT ERROR|Parse Error|Invalid call|Invalid access")
-  local skills; skills=$(echo "$log" | grep -oE '"[a-z_0-9]+": [0-9.]+' | grep -v _spent | awk -F'"' '$3+0>0 || $3 ~ /[1-9]/ {print $2}' | sort | tr '\n' ' ')
+  local skills; skills=$(echo "$log" | grep -oE '"[a-z_0-9]+": [0-9.]+' | grep -v _spent | awk -F'"' '$3+0>0 || $3 ~ /[1-9]/ {print $2}' | sort -u | tr '\n' ' ')
   echo "$name | errors $errs | dealt: $skills" >> "$OUT"
   echo "$log" | grep -E "SCRIPT ERROR|Parse Error|Invalid call|Invalid access" -A2 | head -12 | sed 's/^/    /' >> "$OUT"
 }
-for cls in animancer monk miasmancer; do
+for cls in animancer monk miasmancer ossumancer; do
   run "order $cls" 100000 --zone=fen --seed=7 --new --cls=$cls --lvl=15 --learn=all:5 --autocast --arena=6 --arena_kind=hollow --arena_t=12
 done
 run "champions + deeds" 100000 --seed=7 --new --zone=fen --cls=monk --arena=4 --arena_kind=hollow --arena_live --arena_rank=champion --arena_t=10
