@@ -18,6 +18,7 @@ var h := 0
 var types := PackedByteArray()
 var solid := PackedByteArray()
 var astar := AStarGrid2D.new()
+var ground_mat: ShaderMaterial   # the ground shader (the wind reaches its water)
 var shadow_layer: Node2D
 var sorted: Node2D           # the y-sorted layer: everything that stands up
 var floor_layer: Node2D      # ground decals, scatter, corpses' blood
@@ -172,8 +173,11 @@ func _ground() -> void:
 	layer_b.resize(16)
 	var cache := {}
 	var fallback := {"bog": ["mud", "water", "main"], "shallow": ["water", "mud", "main"], "water": ["shallow", "mud"], "arena": ["flags", "crypt", "barrow", "bone"], "flags": ["road", "dirt"], "mud": ["dirt"], "main": ["dirt"], "crypt": ["flags"], "barrow": ["flags"], "bone": ["flags"]}
+	var wet := PackedInt32Array()
+	wet.resize(16)
 	for cid in range(1, 15):
 		var key: String = tex_keys.get(str(cid), "main")
+		wet[cid] = 1 if key in ["water", "shallow"] else 0
 		var arr: Array = set.get(key, [])
 		if arr.is_empty():
 			for alt in fallback.get(key, []):
@@ -210,6 +214,8 @@ func _ground() -> void:
 	m.set_shader_parameter("layer_a", layer_a)
 	m.set_shader_parameter("layer_b", layer_b)
 	m.set_shader_parameter("grid_size", Vector2(w, h))
+	m.set_shader_parameter("wet", wet)
+	ground_mat = m
 	var gains := {"fen": 0.78, "ridge": 0.86, "bone": 0.84, "ossa": 0.86, "a5": 0.88, "shog": 0.9}
 	m.set_shader_parameter("gain", gains.get(land, 1.0))
 	poly.material = m
