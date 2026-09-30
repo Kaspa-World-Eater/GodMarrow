@@ -115,6 +115,35 @@ def states(name, im):
                 lock.putpixel((x, y), c)
     lock.save('art/icons/%s@lock.png' % name)
 
+def crown():
+    im = img()
+    for i in range(14):
+        a = i / 14 * math.tau
+        x, y = 12 + math.cos(a) * 8, 13 + math.sin(a) * 4
+        px(im, x, y, WOOD2); px(im, x, y + 1, WOOD)
+        if i % 2 == 0:
+            px(im, x + math.cos(a) * 2, y - 2 + math.sin(a), BONE)
+            px(im, x + math.cos(a) * 1, y - 1, BONE)
+    px(im, 12, 17, RED); px(im, 12, 18, RED); px(im, 7, 16, RED)
+    return outline(im)
+
+def stigmata():
+    im = img()
+    for y in range(9, 20):
+        for x in range(8, 16):
+            px(im, x, y, BONE)
+    for f, (x0, h) in enumerate(((8, 5), (10, 7), (12, 7), (14, 5))):
+        for y in range(9 - h, 9):
+            px(im, x0 + (1 if f < 2 else 0), y, HI if f == 1 else BONE)
+    for y in range(12, 16):
+        px(im, 6, y, BONE); px(im, 7, y - 1, BONE)
+    px(im, 11, 13, RED); px(im, 12, 13, RED); px(im, 11, 14, RED); px(im, 12, 14, RED); px(im, 12, 15, RED)
+    for y in range(20, 23):
+        px(im, 10, y, BONE); px(im, 13, y, BONE)
+    return outline(im)
+
+states('tentacles', crown())
+states('gills', stigmata())
 states('tally', tally())
 states('opencount', ring(9, missing=4))
 states('fewer', fewer())
