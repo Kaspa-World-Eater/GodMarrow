@@ -1,0 +1,160 @@
+{
+ "a_anvil": {
+  "name": "The Anvil",
+  "up": "Falling Mirror and the golem's blows leave splinters of glass on the ground for 4 s. Whatever walks through them is cut.",
+  "rev": "Melee: the golem does not stand beside you; you wear it. Half of every blow you take is taken from its iron instead, and your weapon strikes 50% harder."
+ },
+ "a_maiden": {
+  "name": "The Maiden's Kiss",
+  "up": "The Hall of Mirrors also drags every creature within 3 yd into the cage.",
+  "rev": "The Hall of Mirrors closes on you instead: while it stands, whatever strikes you in melee takes 60% of the blow back, and you walk 20% slower."
+ },
+ "a_storm": {
+  "name": "Storm",
+  "up": "Every standing mirror sheds a splinter of glass at the nearest creature within 5 yd each second.",
+  "rev": "The Mirror Shield rebounds between everything it strikes: one more rebound for each creature it cuts, up to four."
+ },
+ "i_quake": {
+  "name": "Aftershock",
+  "up": "Rising mirrors stagger twice as long."
+ },
+ "i_rust": {
+  "name": "Tarnish",
+  "up": "Creatures next to your standing mirrors take 15% more damage."
+ },
+ "i_stride": {
+  "name": "Quicksilver Stride",
+  "up": "The golem walks 25% faster."
+ },
+ "i_rally": {
+  "name": "Rally",
+  "up": "When the golem rises from dormancy it mends 15% of your life."
+ },
+ "i_shield": {
+  "name": "Wide Arc",
+  "up": "The Mirror Shield flies 50% farther."
+ },
+ "i_spikes": {
+  "name": "Standing Shards",
+  "up": "Mirror Fissure leaves one more mirror standing."
+ },
+ "a_choir": {
+  "name": "The Choir",
+  "up": "Every 2 s the whole choir strikes together: every drifting revenant wisp dives at the same creature.",
+  "rev": "A revenant wisp that strikes a creature dives into it and holds it for 3 s: the held creature turns on its own kind."
+ },
+ "a_bell": {
+  "name": "The Bell-Warden",
+  "up": "Every fifth spell rings a bell: creatures within 3.5 yd stagger for half a breath.",
+  "rev": "Creatures within 5 yd can't cast or shoot, and neither can you for 1 s after each spell."
+ },
+ "a_lantern": {
+  "name": "The Lantern-Bearer",
+  "up": "Your Soul Lantern walks with you instead of standing where you set it.",
+  "rev": "Melee: you swing the Soul Lantern as a flail. Each blow splashes round the target, and every other blow frees a wisp."
+ },
+ "w_swift": {
+  "name": "Swift Wisps",
+  "up": "Wisps regrow 20% faster."
+ },
+ "w_ember": {
+  "name": "Long Flight",
+  "up": "Darting wisps' needles run 30% farther, and splitting wisps throw one more spark."
+ },
+ "w_host": {
+  "name": "Great Host",
+  "up": "The great wisp can hold 3 more wisps."
+ },
+ "w_tether": {
+  "name": "Silver Tether",
+  "up": "While you stand within 3 yd of the golem, it mends 2% of its iron a second."
+ },
+ "w_vigil": {
+  "name": "Long Vigil",
+  "up": "The Soul Lantern burns 50% longer."
+ },
+ "w_wake": {
+  "name": "Wake",
+  "up": "A revenant wisp that perishes mends 2% of your life."
+ },
+ "a_sage": {
+  "name": "The Aether-Sage",
+  "up": "Soul Swarm, Needle and Thread and Spool jump on to 2 more creatures, at 60%.",
+  "rev": "Nothing jumps. Soul Swarm becomes a thread that drains its creature's life into yours for 3 s, and Needle and Thread and Spool mend you for 20% of what they deal."
+ },
+ "a_blade": {
+  "name": "The Hollow Blade",
+  "up": "Needle and Thread leaves a smouldering seam along its line for 1.5 s. What stands in it burns.",
+  "rev": "Melee: Needle and Thread becomes a spirit sword. Hold to swing it in wide arcs."
+ },
+ "a_pyre": {
+  "name": "Pyre",
+  "up": "Soul Storm's souls and Spool's shards set creatures burning.",
+  "rev": "Wraith Form leaves a trail of pale fire behind you."
+ },
+ "a_rebuke": {
+  "name": "The Rebuke",
+  "up": "Soul Leash cracks like a whip every second: everything touching the rope is struck and thrown back.",
+  "rev": "Soul Leash flies as a harpoon: it strikes hard and pins its creature where it stands."
+ },
+ "g_ward": {
+  "name": "Deep Veil",
+  "up": "The Veil soaks 5% more of every blow."
+ },
+ "g_mark": {
+  "name": "Branding Mark",
+  "up": "Needle's Mark lasts twice as long."
+ },
+ "g_orb": {
+  "name": "Heavy Spool",
+  "up": "Spool flies slower and lasts 50% longer."
+ },
+ "g_swarm": {
+  "name": "Soul Hunger",
+  "up": "Souls strike once more before they fade."
+ },
+ "g_wraith": {
+  "name": "Wraith Step",
+  "up": "Leaving Wraith Form lets loose 6 souls."
+ },
+ "g_storm": {
+  "name": "Eye of the Storm",
+  "up": "Soul Storm drifts after you."
+ },
+ "a_revenant": {
+  "name": "The Revenant",
+  "up": "A revenant wisp that perishes comes back at once, armoured in bone: for 5 s nothing it strikes can end it."
+ },
+ "a_hunger": {
+  "name": "The Hungering Aether",
+  "up": "Soul Swarm's souls steal a little life with every strike."
+ },
+ "h_step": {
+  "name": "Hollow Step",
+  "up": "Your rolls leave a silent afterimage. Creatures within 3 yd of it stagger for half a breath."
+ },
+ "h_quiet": {
+  "name": "Unheard",
+  "up": "Creatures notice you at 70% of the usual range."
+ },
+ "v_unwritten": {
+  "name": "The Unwritten",
+  "up": "Your kills leave no corpse and drop nothing, but each one refills 5% of your Essence.",
+  "rev": "You leave no trace: a creature that can't see you for 2 s loses you."
+ },
+ "v_crown": {
+  "name": "The Choir Crown",
+  "up": "While you are above half life, every wisp you spend or lose comes back to the choir 3 s later. Each wisp in your choir drains 0.3% of your life a second.",
+  "rev": "Draughts don't heal you. Each wisp in your choir mends 0.3% of your life a second instead."
+ },
+ "v_silence": {
+  "name": "The Last Silence",
+  "up": "Once in each place, a killing blow stops the world for 3 s and leaves you at 1 life.",
+  "rev": "Your skills make no light: creatures notice you at half the range."
+ },
+ "v_unmade": {
+  "name": "The Unmade",
+  "up": "One Major you hold counts upright and reversed at once (choose it on the board). You lose 25% of your maximum life.",
+  "rev": "+1 to all your skills for each Major you hold (up to +4). You lose 25% of your maximum life."
+ }
+}

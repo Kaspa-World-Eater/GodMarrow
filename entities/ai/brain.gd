@@ -5,6 +5,7 @@ extends RefCounted
 ## melee rhythm: chase -> wind-up -> strike -> recover -> gap. Each AI kind overrides what it needs (entities/ai/*.gd).
 
 var state := "sleep"
+var lost_t := 0.0             # The Unwritten reversed: time the hero has been out of sight
 var st := 0.0            # time in the state / timer
 var loiter_t := 0.0
 var loiter_to := Vector2.ZERO
@@ -91,6 +92,12 @@ func wake_range(m: Monster, h: Hero) -> float:
 		r *= 0.85
 	if h.st.dim_wick:
 		r *= 0.7
+	var a = h.st.arc
+	if a:
+		if a.aM("h_quiet"):
+			r *= 0.7   # Unheard
+		if a.aR("v_silence"):
+			r *= 0.5   # the Last Silence reversed: your skills make no light
 	return r
 
 func _sleep(m: Monster, h: Hero, dt: float) -> void:
@@ -173,6 +180,12 @@ func melee_rhythm(m: Monster, h: Hero, dt: float, spd_k: float = 1.0) -> void:
 			if gone:
 				state = "home"
 				return
+			if f == h and h.st.arc and h.st.arc.aR("v_unwritten"):
+				lost_t = lost_t + dt if not m.zone.sight_clear(m.tp, h.tp) else 0.0
+				if lost_t > 2.0:
+					lost_t = 0.0
+					state = "home"
+					return
 			if d > 26.0:
 				state = "home"
 				return

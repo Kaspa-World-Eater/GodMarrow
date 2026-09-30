@@ -18,6 +18,8 @@ var on_hit: Callable
 var pierce := 0
 var hit_list: Array = []
 var opts := {}
+## The Bell-Warden reversed (skills/animancer.gd): creatures within r of tp can't shoot while it holds
+static var hush := {}
 
 static func fire(z: Zone, from: Vector2, to: Vector2, speed: float, damage: float, e: String, who: String, kind: String = "arrow") -> Missile:
 	var m := Missile.new()
@@ -29,6 +31,9 @@ static func fire(z: Zone, from: Vector2, to: Vector2, speed: float, damage: floa
 	m.side = who
 	m.look = kind
 	m.life = 12.0 / maxf(1.0, speed) + 0.6
+	if who == "monster" and not hush.is_empty() and Time.get_ticks_msec() / 1000.0 < float(hush["until"]) and from.distance_to(hush["tp"]) < float(hush["r"]):
+		m.dmg = 0.0
+		m.life = 0.0   # the shot dies in the hand
 	z.sorted.add_child(m)
 	m.position = Iso.to_screen(m.tp)
 	return m

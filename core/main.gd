@@ -57,7 +57,17 @@ func _ready() -> void:
 		_demo()
 	if args.has("panel"):   # captures: --panel=vendor|smith|stash|journal
 		await get_tree().create_timer(1.0).timeout
-		if args["panel"] in ["choir", "golem", "char", "skills", "inv", "journal"]:
+		pass
+	if args.has("lvl"):
+		hero.st.level = int(args["lvl"])
+		hero.st.arcana_points = int(args.get("arcana", "3"))
+	if args.has("cards") and hero.st.arc:   # tests: --cards=u|r holds every card of the order that way
+		for id in hero.st.arc.N:
+			if hero.st.arc.is_card(id):
+				hero.st.arc.cards[id] = args["cards"]
+		hero.st.arc._changed()
+	if args.has("panel"):
+		if args["panel"] in ["choir", "golem", "char", "skills", "inv", "journal", "board"]:
 			hud.toggle_panel(args["panel"])
 		else:
 			Bus.panel_requested.emit(args["panel"], "Maren the Gravekeeper" if args["panel"] == "vendor" else "Brannoc of the Nail")
@@ -231,7 +241,10 @@ func _on_kill(m: Monster) -> void:
 	var lok := hero.st.item("lok")
 	if lok > 0.0:
 		hero.st.hp = minf(hero.st.life_max(), hero.st.hp + lok)
-	if ResourceLoader.exists("res://items/loot.gd"):
+	var unwritten: bool = hero.st.arc != null and hero.st.arc.aU("v_unwritten") and not m.boss
+	if unwritten:
+		m.corpse_t = 0.0   # no corpse, nothing dropped
+	elif ResourceLoader.exists("res://items/loot.gd"):
 		load("res://items/loot.gd").on_kill(zone, m, hero)
 	hero.stats_changed.emit()
 

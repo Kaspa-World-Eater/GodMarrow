@@ -43,7 +43,7 @@ func lvl(id: String) -> int:
 	if h <= 0:
 		return 0
 	var s: Dictionary = data.get(id, {})
-	var bonus := int(hero.st.item("skall")) + int(hero.st.item("skt%d" % int(s.get("tab", 0))))
+	var bonus: int = int(hero.st.item("skall")) + int(hero.st.item("skt%d" % int(s.get("tab", 0)))) + (hero.st.arc.skill_bonus() if hero.st.arc else 0)
 	return h + bonus
 
 ## the SKILL_GROWTH curve: level 1 counts fully, every level after it 60%
@@ -139,3 +139,22 @@ func on_lantern() -> void:
 ## override: the hero died (every summoned thing is cleared; states reset)
 func on_death() -> void:
 	pass
+
+
+## override: a card or state that makes the hero's weapon heavier (multiplier)
+func melee_k() -> float:
+	return 1.0
+
+## override: a card or state that slows or quickens the hero's walk (multiplier)
+func move_k() -> float:
+	return 1.0
+
+## the order's Arcana held (core/arcana.gd); every order's book can ask
+func aU(id: String) -> bool:
+	return hero != null and hero.st.arc != null and hero.st.arc.aU(id)
+
+func aR(id: String) -> bool:
+	return hero != null and hero.st.arc != null and hero.st.arc.aR(id)
+
+func aM(id: String) -> bool:
+	return hero != null and hero.st.arc != null and hero.st.arc.aM(id)

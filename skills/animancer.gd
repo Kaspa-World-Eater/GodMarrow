@@ -78,6 +78,7 @@ class Wisp:
 	var life := 0.0
 	var pulse := 0.8
 	var beam := {}           # a lantern wisp's line
+	var armor_t := 0.0       # The Revenant: armoured in bone, it cannot perish
 	var wtt := 0.0
 
 class Mirror:
@@ -148,6 +149,19 @@ var words: Array = []
 var whips: Array = []
 var phantoms: Array = []
 var totem_beams: Array = []
+# the Arcana (v103: core/arcana.gd cards; the effects below)
+var splinters: Array = []      # The Anvil: glass on the ground [{tp, t}]
+var shell := 0.0               # The Anvil reversed: the golem worn as a shell (its iron left)
+var maiden_t := 0.0            # The Maiden's Kiss reversed: the hall closed on you
+var storm_t := 0.0             # Storm: the mirrors' splinter cadence
+var choir_t := 0.0             # The Choir: the whole choir strikes together every 2 s
+var bell_n := 0                # The Bell-Warden: spells cast (every fifth rings)
+var bell_lock := 0.0           # The Bell-Warden reversed: no spells until this time
+var lantern_blow := 0          # The Lantern-Bearer reversed: every other blow frees a wisp
+var drains: Array = []         # The Aether-Sage reversed: Soul Swarm as a draining thread [{m, t, tick}]
+var pyre_t := 0.0              # Pyre reversed: the wraith's trail
+var crown_q: Array = []        # The Choir Crown: wisps coming back (times)
+var silence_zone := ""         # The Last Silence: the place it was spent
 var proc := {"on": false, "tp": Vector2.ZERO, "t": 0.0}
 var wraith := false
 var infusing := false
@@ -394,7 +408,7 @@ func ws_challenge_r() -> float: return 3.5 + 0.1 * K("challenge")
 func ws_challenge_cd() -> float: return maxf(3.0, 6.0 - 0.15 * K("challenge"))
 func ws_harvest() -> float: return 0.04 + 0.02 * K("harvest") if K("harvest") > 0 else 0.0
 func ws_cond_rate() -> float: return maxf(0.14, 0.32 - 0.009 * K("condense"))
-func ws_cond_max() -> int: return int(round((6 + K("condense")) * (1.2 if K("greatsoul") > 0 else 1.0)))
+func ws_cond_max() -> int: return int(round((6 + K("condense") + (3 if aM("w_host") else 0)) * (1.2 if K("greatsoul") > 0 else 1.0)))
 func ws_cond_dmg() -> float: return (5.0 + 2.5 * (L1("condense") - 1.0)) * dm() * ws_anima() * syn("condense")
 func ws_cond_life() -> float: return _life(5.0 + 0.3 * K("condense"))
 func ws_rad_dmg() -> float: return (4.0 + 2.0 * (L1("radiance") - 1.0)) * dm() * ws_anima()
@@ -403,10 +417,10 @@ func ws_leash_dps() -> float: return (9.0 + 4.0 * (L1("leash") - 1.0)) * dm() * 
 ## the thread's hold (zz_zz_thread93.js leashDur); Stronger Bindings and the choir's shaping ride on it too
 func ws_leash_dur() -> float: return _life((3.0 + 0.1 * K("leash")) * (1.5 if K("bindings") > 0 else 1.0))
 func ws_totem_n() -> int: return _cnt(3 + K("totem") / 5)
-func ws_totem_life() -> float: return _life(14.0 + 0.8 * K("totem"))
+func ws_totem_life() -> float: return _life(14.0 + 0.8 * K("totem")) * (1.5 if aM("w_vigil") else 1.0)
 func ws_totem_dps() -> float: return (8.0 + 4.0 * (L1("totem") - 1.0)) * dm() * ws_anima() * syn("totem")
 func ws_soul_dmg() -> float: return (7.0 + 3.5 * (L1("swarm") - 1.0)) * dm() * ws_nether() * (1.0 + 0.05 * K("hunger")) * syn("swarm")
-func ws_soul_hits() -> int: return 2 + K("hunger") / 5 if K("hunger") > 0 else 1
+func ws_soul_hits() -> int: return (2 + K("hunger") / 5 if K("hunger") > 0 else 1) + (1 if aM("g_swarm") else 0)
 func ws_souls_per_wisp() -> int: return 3 + K("soullegion") / 3
 func ws_storm_life() -> float: return (3.0 + 0.2 * K("storm")) * (1.5 if K("eye") > 0 else 1.0)
 func ws_storm_rate() -> float: return maxf(0.08, 0.2 - 0.005 * K("storm"))
@@ -433,7 +447,7 @@ func ws_mark_life() -> float: return _life(8.0 + 0.4 * K("mark"))
 func ws_word_dmg() -> float: return (30.0 + 14.0 * (L1("word") - 1.0)) * dm() * ws_nether() * syn("word")
 func ws_chain_dmg() -> float: return (12.0 + 6.0 * (L1("chain") - 1.0)) * dm() * ws_nether() * syn("chain")
 func ws_chain_n() -> int: return _cnt(4 + int(L1("chain") / 4.0))
-func ws_ward_pct() -> float: return minf(0.95, 0.68 + 0.015 * K("ward") + (0.04 if K("wardfast") > 0 else 0.0)) if K("ward") > 0 else 0.0
+func ws_ward_pct() -> float: return minf(0.97, (0.05 if aM("g_ward") else 0.0) + minf(0.95, 0.68 + 0.015 * K("ward") + (0.04 if K("wardfast") > 0 else 0.0))) if K("ward") > 0 else 0.0
 func ws_ward_eff() -> float: return 1.0 + 0.06 * K("ward")
 # the one choir's chances on each wisp strike (zz_zz_mystic90.js CH)
 func ch_thread() -> float: return minf(0.20, 0.04 + 0.01 * K("wisps")) if K("wisps") > 0 else 0.0
@@ -442,9 +456,9 @@ func ch_needle() -> float: return minf(0.40, 0.08 + 0.025 * K("beam")) if K("bea
 func ch_split() -> float: return minf(0.40, 0.08 + 0.025 * K("prism")) if K("prism") > 0 else 0.0
 func chances() -> Dictionary: return {"thread": ch_thread(), "pass": ch_pass(), "needle": ch_needle(), "split": ch_split()}
 func needle_dmg() -> float: return ws_rev_dmg() * (0.6 + 0.04 * K("beam"))
-func needle_len() -> float: return 4.5 if K("sweep") > 0 else 2.6
+func needle_len() -> float: return (4.5 if K("sweep") > 0 else 2.6) * (1.3 if aM("w_ember") else 1.0)
 func spark_dmg() -> float: return ws_rev_dmg() * (0.5 + 0.04 * K("prism")) * (1.3 if K("prismchain") > 0 else 1.0)
-func spark_n() -> int: return 2 if K("prismex") > 0 else 1
+func spark_n() -> int: return (2 if K("prismex") > 0 else 1) + (1 if aM("w_ember") else 0)
 func proc_r() -> float: return 1.7 + (0.9 if K("procwide") > 0 else 0.0)
 func golem_orders() -> Dictionary:
 	return {"leash": 1.8 + gbeh["x"] * 1.7, "aggro": 2.5 + gbeh["y"] * 1.5 + gbeh["x"] * 0.6, "guard": gbeh["y"] <= 1}
@@ -456,7 +470,7 @@ func wisp_cap() -> int:
 
 func ws_wisp_regen() -> float:
 	var r := maxf(0.4, 2.6 - 0.1 * K("wisps"))
-	r /= 1.0 + (hero.st.item("regen") + 4.0 * K("choir") + (100.0 if hero.st.item("shrine_wisp") > 0.0 else 0.0)) / 100.0
+	r /= 1.0 + (hero.st.item("regen") + hero.st.W("wisp") + (20.0 if aM("w_swift") else 0.0) + 4.0 * K("choir") + (100.0 if hero.st.item("shrine_wisp") > 0.0 else 0.0)) / 100.0
 	return r / (1.2 if K("swiftw") > 0 else 1.0)
 
 ## wisps held by the great wisp, the golem's charge and the lantern stay out of the choir
@@ -611,6 +625,11 @@ func hurt(m, dmg: float, id: String = "", o: Dictionary = {}) -> float:
 		d *= 1.15
 	if float(m.get_meta("mys_cull", -1.0)) > time:
 		d *= 1.15
+	if aM("i_rust"):
+		for mo in mirrors:
+			if mo.kind == "pane" and mo.standing() and mo.tp.distance_to(m.tp) < 1.3 + m.radius:
+				d *= 1.15
+				break
 	var from: Vector2 = o.get("from", hero.tp)
 	var opts := {}
 	if o.has("poise"):
@@ -620,6 +639,8 @@ func hurt(m, dmg: float, id: String = "", o: Dictionary = {}) -> float:
 	var dealt: float = Combat.hit_monster(m, d, ELEM.get(id, "magic"), from, opts)
 	if trace:
 		dmg_log[id] = float(dmg_log.get(id, 0.0)) + dealt
+	if id in ["lance", "orb"] and aR("a_sage"):
+		hero.st.hp = minf(hero.st.life_max(), hero.st.hp + dealt * 0.2)
 	return dealt
 
 # ================================================================== wisps as fuel
@@ -629,6 +650,7 @@ func take_wisp() -> Wisp:
 	var w: Wisp = wisps.pop_back()
 	w.gone = true
 	glass_burst(w.tp, 2, 1.0, w.z)
+	_wisp_lost()
 	return w
 
 func spawn_wisp(at = null) -> void:
@@ -660,6 +682,9 @@ func spend(id: String, amt: float = -1.0) -> bool:
 func end_wraith() -> void:
 	if wraith:
 		wraith = false
+		if aM("g_wraith") and hero:
+			for i in 6:
+				new_soul(hero.tp, i / 6.0 * TAU, 5.0, ws_soul_dmg())
 		if hero and hero.spr:
 			hero.spr.modulate = Color.WHITE
 
@@ -689,6 +714,8 @@ func use(id: String, at: Vector2, target: Monster) -> bool:
 		return false
 	if hero.act != "" and hero.act != "swing" and hero.act != "cast":
 		return false
+	if aR("a_bell") and time < bell_lock:
+		return false
 	cf = -1.0 if id in OWN else minf(1.0, float(wisps.size()) / maxi(1, eff_cap()))
 	var ok := false
 	ok = _cast(id, at, target)
@@ -696,6 +723,16 @@ func use(id: String, at: Vector2, target: Monster) -> bool:
 	if ok:
 		if id != "wraith":
 			end_wraith()
+		# The Bell-Warden: every fifth spell rings; reversed, the bell silences you a breath
+		if aU("a_bell"):
+			bell_n += 1
+			if bell_n % 5 == 0:
+				ring(hero.tp, 3.5, 0.5, 0.4)
+				for m in mons():
+					if m.tp.distance_to(hero.tp) < 3.5 + m.radius and not m.boss:
+						m.stun = maxf(m.stun, 0.5)
+		if aR("a_bell"):
+			bell_lock = time + 1.0
 		hero.stats_changed.emit()
 	return ok
 
@@ -774,6 +811,14 @@ func _cast_pillars(a: Vector2) -> bool:
 func _cast_cage(a: Vector2) -> bool:
 	if not spend("cage"):
 		return false
+	if aR("a_maiden"):
+		a = hero.tp   # the hall closes on you
+		maiden_t = ws_cage_life()
+	elif aU("a_maiden"):
+		for m in mons():
+			var dm2: float = m.tp.distance_to(a)
+			if dm2 < 3.0 + 1.8 and dm2 > 1.2 and not m.boss:
+				shove(m, (a - m.tp) / dm2 * (dm2 - 1.0))
 	var n := ws_cage_n()
 	var life := ws_cage_life()
 	var dmg := ws_cage_dmg()
@@ -788,7 +833,7 @@ func _cast_fissure(a: Vector2) -> bool:
 		return false
 	var d := (a - hero.tp).normalized() if a.distance_to(hero.tp) > 0.01 else Vector2(1, 1).normalized()
 	var L := ws_fissure_len()
-	fissures.append({"tp": hero.tp, "d": d, "i": 0, "n": int(round(L / 0.6)), "t": 0.0, "keep": ws_fissure_keep(), "hit": {}})
+	fissures.append({"tp": hero.tp, "d": d, "i": 0, "n": int(round(L / 0.6)), "t": 0.0, "keep": ws_fissure_keep() + (1 if aM("i_spikes") else 0), "hit": {}})
 	return true
 
 func _cast_anvil(a: Vector2) -> bool:
@@ -823,6 +868,20 @@ func _drop_anvil(p: Vector2, k: float, delay: float) -> void:
 		gr.pop_front()
 
 func _cast_golem(a: Vector2) -> bool:
+	if aR("a_anvil"):
+		# The Anvil reversed: the golem is worn, not called
+		if shell > 0.0:
+			say("You already wear the iron.", 1.0)
+			return false
+		if not spend("golem"):
+			return false
+		if golem != null:
+			golem.node = null
+			golem = null
+		shell = float(ws_golem()["max"])
+		dust(hero.tp, 14, 2.0)
+		say("The iron closes round you.", 1.4)
+		return true
 	if golem != null:
 		if golem.tp.distance_to(a) < 1.3:
 			# banish: the same golem comes back when called again, its wounds and its sleep kept
@@ -940,6 +999,22 @@ func _condense_one() -> void:
 
 # ------------------------------------------------------------------ Thread tree
 func _cast_swarm(a: Vector2) -> bool:
+	if aR("a_sage"):
+		# The Aether-Sage reversed: a thread that drains its creature into you for 3 s
+		var t = null
+		var bd := 3.0
+		for m in mons():
+			var dd: float = m.tp.distance_to(a)
+			if dd < bd and m.tp.distance_to(hero.tp) < 7.0 and zone.sight_clear(hero.tp, m.tp):
+				bd = dd
+				t = m
+		if t == null:
+			say("Nothing near to drink from.", 1.0)
+			return false
+		if not spend("swarm"):
+			return false
+		drains.append({"m": t, "t": 3.0, "tick": 0.0})
+		return true
 	if wisps.is_empty():
 		say("Your wisps are spent.", 1.0)
 		return false
@@ -981,7 +1056,7 @@ func _cast_mark(a: Vector2) -> bool:
 	if not spend("mark"):
 		return false
 	var R := ws_mark_r()
-	var life := ws_mark_life()
+	var life := ws_mark_life() * (2.0 if aM("g_mark") else 1.0)
 	var n := 0
 	for m in mons():
 		if m.tp.distance_to(a) < R + m.radius:
@@ -996,10 +1071,31 @@ func _cast_orb(a: Vector2) -> bool:
 	if not spend("orb"):
 		return false
 	var d := (a - hero.tp).normalized() if a.distance_to(hero.tp) > 0.01 else Vector2(1, 1).normalized()
-	orbs.append({"tp": hero.tp, "v": d * 4.0, "life": 2.0, "ang": randf() * 6.0, "st": 0.0, "pow": 1.0, "gen": 0})
+	var heavy := aM("g_orb")
+	orbs.append({"tp": hero.tp, "v": d * (3.0 if heavy else 4.0), "life": 3.0 if heavy else 2.0, "ang": randf() * 6.0, "st": 0.0, "pow": 1.0, "gen": 0})
 	return true
 
 func _cast_leash(_a: Vector2) -> bool:
+	if aR("a_rebuke"):
+		# The Rebuke reversed: a harpoon that strikes hard and pins
+		var tgt = null
+		var bd := 9.0
+		for m in mons():
+			var dd: float = m.tp.distance_to(_a)
+			if dd < 2.5 and m.tp.distance_to(hero.tp) < 8.0 and zone.sight_clear(hero.tp, m.tp) and dd < bd:
+				bd = dd
+				tgt = m
+		if tgt == null:
+			say("Nothing near to strike.", 1.0)
+			return false
+		if not spend("leash"):
+			return false
+		hurt(tgt, ws_leash_dps() * 1.6, "leash", {"heavy": true})
+		if not tgt.dead:
+			tgt.root = maxf(tgt.root, 2.0)
+		dart_lines.append({"a": hero.tp, "za": 12.0, "b": tgt.tp, "zb": 9.0, "t": 0.4})
+		hero._face(tgt.tp - hero.tp)
+		return true
 	var near: Array = mons().filter(func(m): return m.tp.distance_to(hero.tp) < 7.0 and zone.sight_clear(hero.tp, m.tp))
 	if near.is_empty():
 		say("Nothing near enough to bind.", 1.0)
@@ -1079,6 +1175,9 @@ func _cast_chain(a: Vector2) -> bool:
 	return true
 
 func _cast_totem(a: Vector2) -> bool:
+	if aR("a_lantern"):
+		say("Your lantern is in your hand: strike with it.", 1.4)
+		return false
 	if zone.is_solid(a) or a.distance_to(hero.tp) > 9.0:
 		say("It cannot stand there.", 1.0)
 		return false
@@ -1135,6 +1234,7 @@ func tick(dt: float) -> void:
 	_update_darts(dt)
 	_update_whips(dt)
 	_update_phantoms(dt)
+	_arcana_tick(dt)
 	if golem != null:
 		golem.tick(dt)
 	_push_out()
@@ -1381,6 +1481,15 @@ func _perish(w: Wisp) -> void:
 	wisps.erase(w)
 	w.gone = true
 	glass_burst(w.tp, 2, 1.2, w.z)
+	_wisp_lost()
+	if aM("w_wake"):
+		hero.st.hp = minf(hero.st.life_max(), hero.st.hp + hero.st.life_max() * 0.02)
+	if aM("a_revenant") and wisps.size() < eff_cap():
+		spawn_wisp(w.tp)
+		if not wisps.is_empty():
+			var nw: Wisp = wisps[wisps.size() - 1]
+			nw.armor_t = 5.0
+			nw.scale = 1.15
 	if K("burst") > 0:
 		var r := ws_burst_r()
 		var dmg := ws_burst_dmg()
@@ -1461,6 +1570,11 @@ func _rebound(w: Wisp, mt: Dictionary) -> void:
 		w.cd = 0.2
 
 func _rev(w: Wisp, dt: float) -> void:
+	if w.armor_t > 0.0:
+		w.armor_t -= dt
+		if w.armor_t <= 0.0:
+			w.scale = 1.0
+			w.hits = 0
 	if proc["on"]:
 		_proc_wisp(w, dt)
 		return
@@ -1560,12 +1674,14 @@ func _rev(w: Wisp, dt: float) -> void:
 			hero.st.hp = minf(hero.st.life_max(), hero.st.hp + dmg * lp)
 			hero.st.res = minf(hero.st.res_max(), hero.st.res + dmg * lp)
 		_chances(w, m, true)
+		if aR("a_choir") and not m.boss and not m.dead:
+			m.confused = maxf(m.confused, 3.0)   # held: it turns on its own kind
 		if w.cull_t > 0.0:
 			if K("cullmark") > 0:
 				m.set_meta("mys_cull", time + 4.0)
 		else:
 			w.hits += 1
-		if w.hits >= ws_hits():
+		if w.hits >= ws_hits() and w.armor_t <= 0.0:
 			_perish(w)
 			return
 	if w.tp.distance_to(hero.tp) > (12.0 if w.cull_t > 0.0 else 7.5):
@@ -1822,7 +1938,16 @@ func _update_souls(dt: float) -> void:
 			if s["hit"].has(k) or absf(m.tp.x - n.x) > 1.0 or absf(m.tp.y - n.y) > 1.0:
 				continue
 			if m.tp.distance_to(n) < m.radius + 0.15:
-				hurt(m, s["dmg"], "swarm", {"from": n})
+				var got := hurt(m, s["dmg"], "swarm", {"from": n})
+				if aM("a_hunger"):
+					hero.st.hp = minf(hero.st.life_max(), hero.st.hp + got * 0.05)
+				if s.get("storm", false) and aU("a_pyre") and not m.dead:
+					m.add_dot(s["dmg"] * 0.4, 3.0, "fire")
+				if aU("a_sage") and not s.get("jumped", false) and s["hits"] <= 1:
+					for jj in 2:
+						var js := new_soul(m.tp, randf() * TAU, 6.0, s["dmg"] * 0.6, 1)
+						js["jumped"] = true
+						js["hit"][k] = true
 				last_hit = m
 				s["hits"] -= 1
 				s["hit"][k] = true
@@ -1852,7 +1977,7 @@ func _update_mirrors(dt: float) -> void:
 							continue
 						if o.dmg > 0.0:
 							hurt(m, o.dmg, "pillars", {"from": o.tp})
-							m.stun = maxf(m.stun, 0.5)
+							m.stun = maxf(m.stun, 1.0 if aM("i_quake") else 0.5)
 						if dd < o.r + m.radius:
 							shove(m, ((m.tp - o.tp).normalized() if dd > 0.001 else Vector2.RIGHT) * (o.r + m.radius - dd + 0.05))
 			else:
@@ -1874,6 +1999,8 @@ func _update_mirrors(dt: float) -> void:
 						m.stun = maxf(m.stun, 0.4 if m.boss else 1.2)
 						if d < o.r + m.radius:
 							shove(m, ((m.tp - o.tp).normalized() if d > 0.001 else Vector2.RIGHT) * (o.r + m.radius - d + 0.05))
+					if aU("a_anvil"):
+						_splinter_ring(o.tp, 1.4, 7)
 					var q := K("anvilquake") > 0
 					var n := 16 if q else 8
 					var k := 0.4 if q else 0.22
@@ -1988,7 +2115,7 @@ func _orb_burst(o: Dictionary) -> void:
 	for i in 14:
 		_shard(o["tp"], i / 14.0 * TAU, o["pow"] * 1.2)
 	glass_burst(o["tp"], 4, 2.0, 12.0)
-	if o["gen"] == 0 and ws_cascade_n() > 0:
+	if o["gen"] == 0 and ws_cascade_n() > 0 and not aR("a_sage"):
 		var k := ws_cascade_n()
 		var base: float = o["v"].angle()
 		for i in k:
@@ -2027,6 +2154,12 @@ func _update_orbs(dt: float) -> void:
 				continue
 			s["hit"][k] = true
 			hurt(m, s["dmg"], "orb", {"from": n2})
+			if aU("a_pyre") and not m.dead:
+				m.add_dot(s["dmg"] * 0.3, 3.0, "fire")
+			if aU("a_sage") and not s.get("jumped", false) and s["pierce"] <= 1:
+				for jj in 2:
+					var ang := randf() * TAU
+					shards.append({"tp": n2, "v": Vector2(cos(ang), sin(ang)) * 6.5, "t": 0.5, "dmg": s["dmg"] * 0.6, "pierce": 1, "hit": s["hit"].duplicate(), "jumped": true})
 			s["pierce"] -= 1
 			if s["pierce"] <= 0:
 				s["t"] = 0.0
@@ -2040,10 +2173,13 @@ func _update_storms(dt: float) -> void:
 	for s in storms:
 		s["life"] -= dt
 		s["st"] -= dt
+		if aM("g_storm"):
+			s["tp"] = s["tp"].move_toward(hero.tp, 3.5 * dt)
 		s["spin"] += dt * 6.0
 		while s["st"] <= 0.0:
 			s["st"] += ws_storm_rate()
 			var so := new_soul(s["tp"], randf() * TAU, 5.0, ws_soul_dmg() * 0.75)
+			so["storm"] = true
 			if K("tempest") > 0:
 				so["hits"] += 1
 	storms = storms.filter(func(s): return s["life"] > 0.0)
@@ -2137,6 +2273,17 @@ func _update_threads(dt: float) -> void:
 			continue
 		if K("barbs") > 0:
 			m.slow = maxf(m.slow, 0.4)
+		# The Rebuke: the rope cracks like a whip every second
+		if aU("a_rebuke"):
+			th["crack"] = float(th.get("crack", 1.0)) - dt
+			if th["crack"] <= 0.0:
+				th["crack"] = 1.0
+				for o in mons():
+					if seg_dist(o.tp, s, m.tp) < o.radius + 0.3:
+						hurt(o, ws_leash_dps() * 0.6, "leash", {"from": s, "poise": ws_leash_dps() * 0.5})
+						if not o.boss and not o.dead:
+							var away: Vector2 = o.tp - hero.tp
+							shove(o, away.normalized() * 0.9 if away.length() > 0.01 else Vector2.RIGHT * 0.9)
 		th["tick"] -= dt
 		if th["tick"] > 0.0 or th["life"] <= 0.15:
 			continue
@@ -2156,6 +2303,10 @@ func _update_threads(dt: float) -> void:
 func _update_totems(dt: float) -> void:
 	for t in totems:
 		t.life -= dt
+		if aU("a_lantern"):
+			var want: Vector2 = hero.tp + Vector2(0.9, -0.6)
+			if t.tp.distance_to(want) > 0.2:
+				t.tp = t.tp.move_toward(want, 4.5 * dt)
 		t.pulse -= dt
 		if t.pulse <= 0.0:
 			t.pulse = 0.4
@@ -2227,6 +2378,13 @@ func _launch(M: Dictionary, tgt, tk: String, bend: float) -> void:
 	M["v"] = Vector2(cos(a), sin(a))
 
 func _lance_pulse(a: Vector2) -> void:
+	if aR("a_blade"):
+		_spirit_sword(a)
+		return
+	if aU("a_blade"):
+		var end := hero.tp + (a - hero.tp).limit_length(ws_lance_range())
+		for i in 3:
+			ground_fire(hero.tp.lerp(end, (i + 1) / 3.5), 0.55, ws_lance_dps() * 0.25, 1.5)
 	var R0 := ws_lance_range()
 	var first = null
 	var bd := 2.2
@@ -2326,6 +2484,9 @@ func _dart_arrive(M: Dictionary) -> bool:
 		last_hit = m
 		dart_lines.append({"a": M["last"], "za": 10.0, "b": m.tp, "zb": 9.0, "t": 0.35})
 		M["last"] = m.tp
+		if aU("a_sage") and int(M["gen"]) == 0 and not M.get("sage", false):
+			M["sage"] = true
+			_dart_split(M, 2, 0.6)
 		M["hops"] -= 1
 		M["mult"] *= M["decay"]
 		if M["bounces"] < M["maxB"]:
@@ -2486,6 +2647,21 @@ func phases(elem: String) -> bool:
 
 ## the Veil: Essence answers the blow first (70% -> 95% of it; 1 Essence stops 1.06 -> 2.2); the wraith takes magic x1.5
 func absorb(d: float, elem: String) -> float:
+	# The Anvil reversed: the worn iron takes half of every blow
+	if shell > 0.0:
+		var half := d * 0.5
+		shell -= half
+		d -= half
+		if shell <= 0.0:
+			shell = 0.0
+			glass_burst(hero.tp, 16, 2.5, 20.0)
+			say("The iron shell splits and falls away.", 1.6)
+	# The Maiden's Kiss reversed: what strikes you in melee takes 60% of the blow back
+	if maiden_t > 0.0 and elem == "phys":
+		for m in mons():
+			if m.tp.distance_to(hero.tp) < 1.8 + m.radius:
+				hurt(m, d * 0.6, "cage", {"nochoir": true})
+				break
 	if wraith:
 		if elem == "phys":
 			return 0.0
@@ -2519,6 +2695,14 @@ func _rebuke(a: float) -> void:
 func on_weapon_hit(m: Monster, d: float) -> void:
 	last_hit = m
 	end_wraith()
+	# The Lantern-Bearer reversed: the lantern swung as a flail
+	if aR("a_lantern") and m != null:
+		for o in mons():
+			if o != m and o.tp.distance_to(m.tp) < 1.3 + o.radius:
+				hurt(o, d * 0.5, "totem", {"from": m.tp, "nochoir": true})
+		lantern_blow += 1
+		if lantern_blow % 2 == 0:
+			spawn_wisp(m.tp)
 	# the finishing blow gives the Mystic a wisp (zz_zz_study82.js)
 	if m != null and m.finisher_lock >= 1.49:
 		spawn_wisp(m.tp)
@@ -2526,6 +2710,8 @@ func on_weapon_hit(m: Monster, d: float) -> void:
 func _on_kill(m) -> void:
 	if hero == null or m == null or not is_instance_valid(m) or hero.zone == null or m.zone != hero.zone:
 		return
+	if aU("v_unwritten"):
+		hero.st.res = minf(hero.st.res_max(), hero.st.res + hero.st.res_max() * 0.05)
 	if m.marked > 0.0 and m.has_meta("mys_mark") and K("markSoul") > 0:
 		new_soul(m.tp, randf() * TAU, 5.0, ws_soul_dmg())
 	var hv := ws_harvest()
@@ -2648,3 +2834,149 @@ func on_death() -> void:
 ## the bar's gauge (ui/bar.gd): the choir's wisps as pips
 func hud_gauge() -> Dictionary:
 	return {"text": "WISPS %d/%d" % [wisps.size(), wisp_cap()], "pips": wisps.size(), "max": wisp_cap(), "col": Color8(191, 232, 255)}
+
+
+# ================================================================== the Arcana (v103): what the Mystic's cards change
+func arc():
+	return hero.st.arc if hero and hero.st else null
+
+func aU(id: String) -> bool:
+	var a = arc()
+	return a != null and a.aU(id)
+
+func aR(id: String) -> bool:
+	var a = arc()
+	return a != null and a.aR(id)
+
+func aM(id: String) -> bool:
+	var a = arc()
+	return a != null and a.aM(id)
+
+## the hero's weapon, when a card makes it heavier (The Anvil reversed, the golem worn as a shell)
+func melee_k() -> float:
+	return 1.5 if shell > 0.0 else 1.0
+
+## the hero's walk (The Maiden's Kiss reversed: the hall closed on him)
+func move_k() -> float:
+	return 0.8 if maiden_t > 0.0 else 1.0
+
+func _arcana_tick(dt: float) -> void:
+	# The Anvil: glass on the ground cuts what walks through it
+	for s in splinters:
+		s["t"] -= dt
+		s["tick"] -= dt
+		if s["tick"] <= 0.0:
+			s["tick"] = 0.5
+			for m in mons():
+				if m.tp.distance_to(s["tp"]) < 0.55 + m.radius and not m.flying:
+					hurt(m, ws_anvil_dmg() * 0.06, "anvil", {"from": s["tp"], "poise": 0.0})
+	splinters = splinters.filter(func(s): return s["t"] > 0.0)
+	maiden_t = maxf(0.0, maiden_t - dt)
+	# Storm: every standing mirror sheds a splinter at the nearest creature within 5 yd each second
+	if aU("a_storm"):
+		storm_t -= dt
+		if storm_t <= 0.0:
+			storm_t = 1.0
+			var n := 0
+			for o in mirrors:
+				if o.kind != "pane" or not o.standing() or n >= 8:
+					continue
+				var best = null
+				var bd := 5.0
+				for m in mons():
+					var d: float = m.tp.distance_to(o.tp)
+					if d < bd and not is_idle(m) and zone.sight_clear(o.tp, m.tp):
+						bd = d
+						best = m
+				if best != null:
+					n += 1
+					var dv: Vector2 = (best.tp - o.tp).normalized()
+					gshots.append({"tp": o.tp + dv * 0.3, "v": dv * 11.0, "dmg": ws_pillar_dmg() * 0.5, "t": 0.6, "hit": {}, "id": "pillars"})
+	# The Choir: the whole choir dives together every 2 s
+	if aU("a_choir"):
+		choir_t -= dt
+		if choir_t <= 0.0:
+			choir_t = 2.0
+			var t = null
+			var bd2 := 6.0
+			for m in mons():
+				var d2: float = m.tp.distance_to(hero.tp)
+				if d2 < bd2 and _wisp_allowed(m) and not is_idle(m):
+					bd2 = d2
+					t = m
+			if t != null:
+				for w in wisps:
+					if w.state == "drift":
+						w.state = "dive"
+						w.target = t
+	# The Aether-Sage reversed: the draining thread
+	for d3 in drains:
+		d3["t"] -= dt
+		d3["tick"] -= dt
+		var m3 = d3["m"]
+		if not is_instance_valid(m3) or m3.dead or m3.tp.distance_to(hero.tp) > 7.5:
+			d3["t"] = 0.0
+			continue
+		if d3["tick"] <= 0.0:
+			d3["tick"] = 0.25
+			var got := hurt(m3, ws_soul_dmg() * 0.35, "swarm", {"from": hero.tp})
+			hero.st.hp = minf(hero.st.life_max(), hero.st.hp + got)
+	drains = drains.filter(func(d4): return d4["t"] > 0.0)
+	# Pyre reversed: the wraith leaves pale fire where it walks
+	if aR("a_pyre") and wraith and hero.walking:
+		pyre_t -= dt
+		if pyre_t <= 0.0:
+			pyre_t = 0.3
+			ground_fire(hero.tp, 0.6, ws_soul_dmg() * 0.8, 2.5)
+	# Silver Tether: near the golem it mends
+	if aM("w_tether") and golem != null and golem.state != "dormant" and golem.tp.distance_to(hero.tp) < 3.0:
+		golem.hp = minf(golem.max_hp, golem.hp + golem.max_hp * 0.02 * dt)
+	# The Choir Crown: upright, wisps come back and drain; reversed, they mend
+	if aM("v_crown"):
+		var k := 0.003 * wisps.size() * hero.st.life_max() * dt
+		if aU("v_crown"):
+			hero.st.hp = maxf(1.0, hero.st.hp - k)
+		else:
+			hero.st.hp = minf(hero.st.life_max(), hero.st.hp + k)
+	if not crown_q.is_empty():
+		var keep: Array = []
+		for tq in crown_q:
+			if time >= tq:
+				spawn_wisp()
+			else:
+				keep.append(tq)
+		crown_q = keep
+	# The Bell-Warden reversed: nothing near casts or shoots (entities/missile.gd hush)
+	if aR("a_bell"):
+		Missile.hush = {"tp": hero.tp, "r": 5.0, "until": Time.get_ticks_msec() / 1000.0 + 0.2}
+
+## a wisp lost or spent: the Crown may call it back
+func _wisp_lost() -> void:
+	if aU("v_crown") and hero.st.hp > hero.st.life_max() * 0.5:
+		crown_q.append(time + 3.0)
+
+
+## The Anvil: a ring of glass splinters on the ground (cut what walks through; drawn as cracked glass)
+func _splinter_ring(c: Vector2, R: float, n: int) -> void:
+	for i in n:
+		var ang := float(i) / n * TAU + randf() * 0.4
+		var p := c + Vector2(cos(ang), sin(ang)) * R * randf_range(0.4, 1.0)
+		if zone.is_solid(p):
+			continue
+		splinters.append({"tp": p, "t": 4.0, "tick": 0.0})
+		cracks.append({"tp": p, "t": 4.0, "max": 4.0, "v": randi()})
+	while splinters.size() > 40:
+		splinters.pop_front()
+
+## The Hollow Blade reversed: Needle and Thread swung as a spirit sword in wide arcs (melee: it costs poise)
+func _spirit_sword(a: Vector2) -> void:
+	var dir := (a - hero.tp).normalized() if a.distance_to(hero.tp) > 0.01 else Vector2(1, 1).normalized()
+	hero.spend_poise(4.0)
+	hero._start_act("atk", 0.3)
+	for m in mons():
+		var dv: Vector2 = m.tp - hero.tp
+		if dv.length() > 2.1 + m.radius:
+			continue
+		if dv.length() > 0.2 and dv.normalized().dot(dir) < 0.35:
+			continue
+		hurt(m, ws_lance_dps() * 0.55, "lance", {"from": hero.tp, "poise": ws_lance_dps() * 0.4})

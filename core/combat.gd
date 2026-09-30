@@ -60,6 +60,14 @@ static func hit_hero(h: Hero, dmg: float, elem: String = "phys", from: Vector2 =
 	h.poise_hit(pd, from, heavy)
 	Bus.hero_hit.emit(d)
 	if st.hp <= 0.0:
+		# The Last Silence: once in each place a killing blow stops the world for 3 s and leaves you at 1 life
+		if st.arc and st.arc.aU("v_silence") and st.arc.silence_zone != h.zone.id:
+			st.arc.silence_zone = h.zone.id
+			st.hp = 1.0
+			for m in h.get_tree().get_nodes_in_group("monsters"):
+				m.stun = maxf(m.stun, 3.0)
+			Bus.say.emit("Silence. The world holds its breath for you.", 3.0)
+			return d
 		st.hp = 0.0
 		h.die()
 	h.stats_changed.emit()

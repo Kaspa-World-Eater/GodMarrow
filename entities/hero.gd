@@ -284,6 +284,8 @@ func _walk(dt: float) -> bool:
 		spd *= 0.8
 	if charge > 0.0:
 		spd *= 0.35
+	if skills.has_method("move_k"):
+		spd *= skills.move_k()
 	var step := spd * dt
 	if to.length() <= step:
 		tp = zone.move(tp, to, radius)
@@ -385,7 +387,7 @@ func _land_blow() -> void:
 		var mi: Missile = Missile.fire(zone, tp + (to - tp).normalized() * 0.4, to, 11.0, d * st.skill_mult(), "magic", "hero", "bolt")
 		mi.height = 70.0
 		return
-	d *= st.melee_mult() * act_mult
+	d *= st.melee_mult() * act_mult * (skills.melee_k() if skills.has_method("melee_k") else 1.0)
 	var m2 := act_target
 	if m2 and not m2.dead and tp.distance_to(m2.tp) <= _reach() + m2.radius + 0.4:
 		var o_hit := {"melee": true, "heavy": act_mult > 1.5 or heavy_pm > 0.0}
@@ -442,6 +444,11 @@ func roll() -> void:
 	if st.poise < 16.0:
 		return
 	spend_poise(34.0)
+	# Hollow Step: the roll leaves a silent afterimage; what is near it staggers
+	if st.arc and st.arc.aM("h_step"):
+		for m in Combat.monsters_in(zone, tp, 3.0):
+			if not m.boss:
+				m.stun = maxf(m.stun, 0.5)
 	var to := mouse_tile() - tp
 	roll_dir = to.normalized() if to.length() > 0.1 else Vector2(1, 1).normalized()
 	_face(roll_dir)
@@ -483,7 +490,10 @@ func absorb(d: float, elem: String) -> float:
 func drink(i: int) -> void:
 	var k: String = st.inv.drink(i)
 	if k == "hp":
-		st.heal_pool += st.life_max() * 0.4
+		if st.arc and st.arc.aR("v_crown"):
+			Bus.say.emit("The draught does nothing. The choir mends you now.", 1.6)
+		else:
+			st.heal_pool += st.life_max() * 0.4
 	elif k == "mp":
 		st.restore_pool += st.res_max() * 0.5
 	stats_changed.emit()

@@ -103,6 +103,9 @@ func rise() -> void:
 	state = "active"
 	hp = max_hp
 	Bus.say.emit("Your golem rises.", 1.2)
+	if book.aM("i_rally") and book.hero:
+		var st = book.hero.st
+		st.hp = minf(st.life_max(), st.hp + st.life_max() * 0.15)
 
 # ------------------------------------------------------------------ Overcharge
 func add_charge(n: float) -> void:
@@ -193,6 +196,8 @@ func strike(tgt: Monster) -> void:
 
 ## Quicksilver Heart's Sun-Catch: its blows set creatures alight
 func _on_strike(tgt: Monster) -> void:
+	if book.aU("a_anvil") and tgt:
+		book._splinter_ring(tgt.tp, 0.6, 2)   # The Anvil: its blows leave glass on the ground
 	if book.K("moltencore") > 0 and tgt and not tgt.dead:
 		tgt.add_dot(book.ws_golem()["dmg"][1] * 0.4, 3.0, "fire")
 
@@ -289,7 +294,7 @@ func tick(dt: float) -> void:
 	cc -= dt
 	if defy_t > 0.0:
 		defy_t -= dt
-	var spd: float = st["spd"] * (1.4 if ramp > 0.0 else 1.0 + 0.03 * charge) * (1.25 if leashed > 0.0 else 1.0)
+	var spd: float = st["spd"] * (1.4 if ramp > 0.0 else 1.0 + 0.03 * charge) * (1.25 if leashed > 0.0 else 1.0) * (1.25 if book.aM("i_stride") else 1.0)
 	if leashed > 0.0:
 		leashed -= dt
 	if state == "chargeWind":
@@ -426,7 +431,7 @@ func _challenge(dt: float) -> void:
 func _toss(tgt: Monster) -> void:
 	var d := maxf(0.01, tgt.tp.distance_to(tp))
 	shield = false
-	fly = {"tp": tp, "r": 0.42, "dir": (tgt.tp - tp) / d, "dist": 0.0, "R": minf(7.0, d + 1.0), "state": "out", "t": 0.0,
+	fly = {"tp": tp, "r": 0.42, "dir": (tgt.tp - tp) / d, "dist": 0.0, "R": minf(7.0, d + 1.0) * (1.5 if book.aM("i_shield") else 1.0), "state": "out", "t": 0.0,
 		"hit": {}, "rico": book.ws_ricochet(), "spin": 0.0, "tick": 0.0}
 
 func _shield_hits() -> void:
@@ -439,6 +444,9 @@ func _shield_hits() -> void:
 		s["hit"][k] = true
 		var tdm: float = randf_range(st["dmg"][0], st["dmg"][1]) * book.ws_toss_dmg() * (book.ws_ramp_mult() if ramp > 0.0 else 1.0)
 		book.hurt(m, tdm, "toss", {"from": s["tp"]})
+		if book.aR("a_storm") and int(s.get("storm_x", 0)) < 4:
+			s["storm_x"] = int(s.get("storm_x", 0)) + 1
+			s["rico"] += 1   # Storm reversed: one more rebound for each creature it cuts, up to four
 		m.stun = maxf(m.stun, 1.0 if book.K("tossstun") > 0 else 0.4)
 		if s["state"] == "out" and s["rico"] > 0:
 			var nt: Monster = null

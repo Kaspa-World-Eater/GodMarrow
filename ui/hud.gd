@@ -32,6 +32,7 @@ var vendor_open := false     # set by a vendor's window: right-click then sells
 var stash_open := false      # the Reliquary Chest is open: right-click in the pack puts away
 var p_town: Control          # ui/panel_town.gd: vendor, smith, chest, journal
 var p_orders: Control        # ui/panel_orders.gd: the choir (V) and the golem (G)
+var p_board: Control         # ui/panel_board.gd: the body board (A)
 var tip: Array = []
 var msgs: Array = []         # [{text, t, max}]
 var banner := {}             # {name, line, t, max}
@@ -76,6 +77,7 @@ func _ready() -> void:
 	p_inv = _panel("res://ui/panel_inv.gd")
 	p_town = _panel("res://ui/panel_town.gd")
 	p_orders = _panel("res://ui/panel_orders.gd")
+	p_board = _panel("res://ui/panel_board.gd")
 	Bus.panel_requested.connect(_on_panel_requested)
 	picker = Control.new()
 	picker.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -233,6 +235,16 @@ func toggle_panel(id: String) -> void:
 				p_skills.visible = false
 				p_town.close()
 				p_orders.visible = false
+		"board":
+			if p_board.visible:
+				p_board.visible = false
+			else:
+				p_inv.visible = false
+				p_char.visible = false
+				p_skills.visible = false
+				p_orders.visible = false
+				p_town.close()
+				p_board.open()
 		"choir", "golem":
 			if hero == null or not ("wbeh" in hero.skills):
 				return
@@ -269,7 +281,7 @@ func menu_click(id: String) -> void:
 		toggle_panel(id)
 
 func any_panel() -> bool:
-	return p_inv.visible or p_char.visible or p_skills.visible or p_town.visible or p_orders.visible or picking != ""
+	return p_inv.visible or p_char.visible or p_skills.visible or p_town.visible or p_orders.visible or p_board.visible or picking != ""
 
 func close_panels() -> void:
 	p_inv.visible = false
@@ -277,6 +289,7 @@ func close_panels() -> void:
 	p_skills.visible = false
 	p_town.close()
 	p_orders.visible = false
+	p_board.visible = false
 	picking = ""
 	vendor_open = false
 	_return_cursor()
@@ -335,6 +348,8 @@ func _input(ev: InputEvent) -> void:
 				toggle_panel("map")
 			KEY_J:
 				toggle_panel("journal")
+			KEY_A:
+				toggle_panel("board")
 			KEY_V:
 				toggle_panel("choir")
 			KEY_G:
@@ -561,6 +576,8 @@ func _process(dt: float) -> void:
 			tip = p_town.tip()
 		elif hov == p_orders:
 			tip = p_orders.tip()
+		elif hov == p_board:
+			tip = p_board.tip()
 		elif hov == bar:
 			tip = bar.tip()
 	over.queue_redraw()
