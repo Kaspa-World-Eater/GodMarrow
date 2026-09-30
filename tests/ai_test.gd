@@ -3,7 +3,7 @@ extends Node
 ##   --spawn=hollow*3,archer*2   kinds to set down 6-8 yd from the hero on open ground (awake unless --asleep)
 ##   --only                      clear the zone's own creatures first
 ##   --lvl=5                     their level     --god     the hero never dies     --at=x,y  put the hero there
-## e.g. godot --path . res://entities/ai/ai_test.tscn -- --zone=moor --demo --only --spawn=bell --god
+## e.g. godot --path . res://tests/ai_test.tscn -- --zone=moor --demo --only --spawn=bell --god
 
 var main: Node
 var args := {}

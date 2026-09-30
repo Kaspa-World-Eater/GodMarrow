@@ -64,10 +64,6 @@ static func pool(_size: int = 0) -> Texture2D:
 	_cache["pool"] = t
 	return t
 
-## texture_scale that makes the pool's radius r yards (semi-major axis r * 72 * sqrt(2) screen px)
-static func pool_scale(r_yd: float) -> float:
-	return r_yd * Iso.HX * 1.41421 / (POOL_W * 0.5)
-
 ## a soft elliptical glow for small things (wisps, candles): smooth, no bands
 static func soft(_size: int = 0) -> Texture2D:
 	if _cache.has("soft"):
@@ -97,6 +93,6 @@ static func flicker(parent: Node, pos: Vector2, col: Color, energy: float, scale
 	l.shadow_enabled = shadows
 	l.shadow_filter = Light2D.SHADOW_FILTER_PCF5
 	l.shadow_color = Color(0, 0, 0, 0.75)
-	l.set_script(load("res://scripts/flicker.gd"))
+	l.set_script(load("res://fx/flicker.gd"))
 	parent.add_child(l)
 	return l

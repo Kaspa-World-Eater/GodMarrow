@@ -227,9 +227,6 @@ static func act_of(id: String) -> int:
 		return 5
 	return 1
 
-static func town_of(n: int) -> String:
-	return "moor" if n == 1 else "a%d_town" % n
-
 static func lair_of(n: int) -> String:
 	return "cata2" if n == 1 else "a%d_lair" % n
 

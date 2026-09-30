@@ -48,11 +48,6 @@ func lvl(id: String) -> int:
 	var bonus: int = int(hero.st.item("skall")) + int(hero.st.item("skt%d" % int(s.get("tab", 0)))) + (hero.st.arc.skill_bonus() if hero.st.arc else 0)
 	return h + bonus
 
-## the SKILL_GROWTH curve: level 1 counts fully, every level after it 60%
-func growth(id: String) -> float:
-	var L := lvl(id)
-	return 0.0 if L <= 0 else 1.0 + (L - 1) * 0.6
-
 func can_learn(id: String) -> bool:
 	var s: Dictionary = data.get(id, {})
 	if s.is_empty() or hero.st.skill_points <= 0:

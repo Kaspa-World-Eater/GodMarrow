@@ -325,12 +325,6 @@ func _return_cursor() -> void:
 			_drop(cursor_item)
 		cursor_item = null
 
-## a vendor's window calls this: while open, right-clicking the pack sells
-func open_vendor(on: bool) -> void:
-	vendor_open = on
-	if on:
-		p_inv.visible = true
-
 func toggle_picker(which: String) -> void:
 	picking = "" if picking == which else which
 

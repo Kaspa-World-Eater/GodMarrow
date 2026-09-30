@@ -196,7 +196,6 @@ func omen_max() -> int: return 2 if aR("z_death") else 3 + (1 if K("omen4") > 0 
 func omen_life() -> float: return 24.0 if aM("zx_omen") else 14.0
 func warp_chance() -> float: return (0.04 + 0.004 * L1("warp")) * (2.0 if K("warpmore") > 0 else 1.0) if K("warp") > 0 else 0.0
 func sister_cd() -> float: return maxf(1.2, 3.2 - 0.05 * L1("sister")) / (2.0 if K("sisterfast") > 0 else 1.0)
-func breath_cd_len() -> float: return (40.0 if aM("zx_breath") else 60.0) - (15.0 if K("breathcd") > 0 else 0.0)
 
 ## her cast speed: Omens quicken her, and claws are her own weapon
 func cast_k() -> float:

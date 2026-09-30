@@ -138,10 +138,6 @@ func road_to(id: String) -> Array:
 		c = par.get(c, "")
 	return path
 
-func can_lay(id: String) -> bool:
-	var p := road_to(id)
-	return not p.is_empty() and p.size() <= minor_avail()
-
 func lay(id: String) -> bool:
 	var p := road_to(id)
 	if p.is_empty() or p.size() > minor_avail():

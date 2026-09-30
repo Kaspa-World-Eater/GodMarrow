@@ -54,9 +54,6 @@ func _init(b, at: Vector2) -> void:
 	max_hp = st["max"]
 	hp = max_hp
 
-func is_up() -> bool:
-	return state != "dormant"
-
 # ------------------------------------------------------------------ being struck
 ## a blow from a creature (or its missile). from: the attacker (Monster) or where the blow came from (Vector2).
 func take_hit(dmg: float, elem: String, from) -> void:

@@ -73,7 +73,7 @@ for g in groups:
             navhtml += '<a class="ni" href="#%s" data-id="%s">%s</a>' % (i, i, html.escape(t))
     navhtml += '</div>'
 
-page = open(OUT + 'shell.html', encoding='utf-8').read()
+page = open(__import__('os').path.dirname(__file__) + '/shell.html', encoding='utf-8').read()
 page = page.replace('{{NAV}}', navhtml).replace('{{TEMPLATES}}', '\n'.join(tpls)).replace('{{DOCS}}', str(len(DOCS))).replace('{{WORDS}}', '{:,}'.format(words))
 open(OUT + 'wiki.html', 'w', encoding='utf-8').write(page)
 standalone = '<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">\n' + page.replace('<title>', '<title>', 1) + '\n</html>'

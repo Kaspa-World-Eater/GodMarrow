@@ -1,21 +1,30 @@
 # Godmarrow (Godot 4.7)
 
-A vertical slice of Godmarrow rebuilt in Godot: the pilgrims' camp on the Ashen Moor, the Pilgrim Road, a ruined
-chapel, and packs of Kneelers. The art is the web build's own (extracted by `tools/extract_assets.py`).
+A grimdark isometric action RPG on the corpse of a dead god. This is the main build; the old web build is retired
+and only its exported data and art live on here. The design wiki is the "Godmarrow Wiki" page (project docs `wiki/*`).
 
-## Open it
-1. Run `Godot_v4.7.2-stable_win64.exe` (in the `Godot` folder on your Desktop).
-2. In the Project Manager choose **Import**, pick this folder's `project.godot`, then **Import & Edit**.
-   The first open takes a minute while Godot imports the art.
-3. Press **F5** (or the play arrow, top right) to play.
-
-## Play
-- **Left click / hold**: walk. **Left click a creature**: strike it. **Right click**: throw a thread (costs mana).
-- Click gold or an item on the ground to take it. If you fall, click to rise at the camp.
-
-## Where things are
-- `scripts/main.gd` lays out the level: the camp, the chapel, trees and stones, lanterns, packs, fog, music.
-- `scripts/hero.gd` the hero (eight directions from five painted views), `scripts/monster.gd` the Kneeler,
-  `scripts/loot.gd` gold and items, `scripts/hud.gd` the orbs and text.
-- `shaders/` the ground, fog and orb shaders. `audio/` the Moor's two music movements, rendered from the web score.
+## Run it
+- Play: `Play Godmarrow (Godot).bat` on the Desktop, or open `project.godot` in Godot 4.7.2 and press F5.
 - Renderer: Compatibility (OpenGL), so it runs on almost anything.
+
+## Where the code is
+| Folder | What lives there |
+|---|---|
+| `core/` | The game scene (`main.gd`), the autoloads (`data`, `game`, `bus`, `settings`), combat, hero stats, the body board (`arcana.gd`), saving, the iso grid, shared light textures and art catalogue. |
+| `entities/` | The hero, creatures, missiles, the lantern, shadows, sprites; champion deeds (`affixes.gd`, `affix_fx.gd`); the Ossuarch's count sigil. |
+| `entities/ai/` | `brain.gd` (what every creature shares) and one file per behaviour (`ai_husk`, `ai_kiter`, `ai_boss` ...); `ai_world.gd` holds a zone's shared hazards. |
+| `skills/` | `skill_book.gd` (points, levels, slots) and one file per ported order, with its own effects in a folder beside it. |
+| `items/` | Items, rolling and dropping loot, the bag, the ground, tooltips, the town's trades. |
+| `world/` | A zone and what fills it: the dark and its light, weather, atmosphere, sound, scatter, walls; `objects/` for lanterns, waystones, NPCs and errands. |
+| `ui/` | The HUD and bar, every panel, the title (its three stages in `title_stage/`), the Reading, the Codex. `uikit.gd` is the shared look. |
+| `fx/` | Small shared effects: blood, flame flicker, the orb rings. |
+| `data/` | The tables (skills, classes, monsters, items, zones) the code reads. `tools/skill_trees.py` is the source of the skill trees. |
+| `art/`, `assets/`, `audio/`, `shaders/`, `fonts/` | Art, sound and shaders. |
+| `tests/` | Test benches (`ai_test.tscn`, sound and board tests). |
+| `tools/` | Generators (skill trees, icons, the Codex, the wiki page, concept-to-sprite), `smoke.sh` (run before and after any change), and `done/` for one-off scripts kept for the record. |
+| `legacy/` | The first prototype, kept for reference; Godot ignores it. |
+
+## Test hooks (user args after `--`)
+`--cls=ID --new --zone=ID --lvl=N --learn=all:N --autocast --arena=N --arena_kind=K --arena_live --arena_rank=champion
+--affix=Name --sigils --seed=N --panel=skills|inv|char|board|journal --title --title_scene=stranger|bowl|fire --skin=KIND`.
+`tools/smoke.sh OUT.txt` runs every order, the panels, the title and a champion fight, and reports script errors.

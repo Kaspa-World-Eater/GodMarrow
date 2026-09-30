@@ -62,8 +62,8 @@ biology. The goddess is the Bleeding Maiden (never "Weeping"). No "!" markers ov
   `lvl(id)`, `growth(id)`, `cost(id)`, `num(id, part, j)` (sampled tooltip numbers), `can_learn(id)`, `learn(id)`, `use(id, at, target)`;
   a class overrides `_cast(id, at, target) -> bool`, `tick(dt)`, `absorb(d, elem)`, `on_weapon_hit(m, d)` in `skills/<cls>.gd`
   (`class_name` not needed; it is loaded by path).
-- `Lights` (`scripts/lights.gd`): `Lights.radial(size)`, `Lights.pool(size)` (the stepped lantern pool), `Lights.flicker(parent, pos, col,
-  energy, scale, shadows)`. `Fx` (`scripts/fx.gd`): `Fx.blood(parent, pos, dir, n)`, `Fx.number(parent, pos, v)`.
+- `Lights` (`core/lights.gd`): `Lights.radial(size)`, `Lights.pool(size)` (the stepped lantern pool), `Lights.flicker(parent, pos, col,
+  energy, scale, shadows)`. `Fx` (`fx/fx.gd`): `Fx.blood(parent, pos, dir, n)`, `Fx.number(parent, pos, v)`.
 - `core/main.gd` is the game scene (zone entry, gates, lantern-stones, death and the remnant, XP on kill). It calls, if the file exists,
   `load("res://items/loot.gd").on_kill(zone, m, hero)` on every kill, and `load("res://ui/hud.gd").new()` (a CanvasLayer with
   `bind(hero, zone)`, called on every zone entry). Other systems: make a `static func attach(main, zone, hero)` in your own file and say so in

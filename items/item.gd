@@ -98,9 +98,6 @@ func sell_value() -> int:
 		return 8
 	return int({"normal": 5, "magic": 25, "rare": 70, "unique": 160}.get(q, 5)) + 4 * maxi(1, req)
 
-func is_weapon() -> bool:
-	return slot == "weapon"
-
 func is_ranged() -> bool:
 	return base == "wand"
 

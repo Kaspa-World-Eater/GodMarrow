@@ -29,9 +29,6 @@ func setup(entry: Dictionary, at: Vector2, from: Vector2, icon: Texture2D) -> vo
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_glint_at = randf() * 3.0
 
-func is_gold() -> bool:
-	return gold > 0
-
 func label_text() -> String:
 	return "%d Gold" % gold if gold > 0 else item.name
 
