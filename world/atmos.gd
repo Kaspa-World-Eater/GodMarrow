@@ -28,9 +28,9 @@ var gust_t := 0.0
 var gust_v := 0.0
 var t := 0.0
 var last_cam := Vector2.INF
-static var _mist_tex: Array = []
-static var _cloud_tex: Texture2D
-static var _halo: Texture2D
+var _mist_tex: Array = []     # (instance caches: static Resources crash Godot at exit)
+var _cloud_tex: Texture2D
+var _halo: Texture2D
 
 func _ready() -> void:
 	layer = 6

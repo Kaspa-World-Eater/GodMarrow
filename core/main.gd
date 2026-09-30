@@ -52,7 +52,7 @@ func _ready() -> void:
 	var vj = JSON.parse_string(FileAccess.get_file_as_string("res://art/ui/voice.json"))
 	if vj is Dictionary:
 		voice = vj
-	if ResourceLoader.exists("res://ui/hud.gd"):
+	if ResourceLoader.exists("res://ui/hud.gd") and not OS.has_environment("GM_NOHUD"):
 		hud = load("res://ui/hud.gd").new()
 		add_child(hud)
 	await enter(args.get("zone", "moor"), "")
@@ -160,7 +160,7 @@ func enter(zid: String, from: String) -> void:
 		# a new pilgrim opens on the skill page to spend the first point
 		if fresh_pilgrim and hero.st.skill_points > 0 and not args.has("demo") and not args.has("panel") and not args.has("shot") and not hud.is_open("skills"):
 			hud.toggle_panel("skills")
-	if ResourceLoader.exists("res://world/objects.gd"):   # (world objects): town, objects, waystones, errands
+	if ResourceLoader.exists("res://world/objects.gd") and not OS.has_environment("GM_NOOBJ"):   # (world objects): town, objects, waystones, errands
 		load("res://world/objects.gd").attach(self, zone, hero)
 	Bus.zone_entered.emit(zid)
 	whisper_t = randf_range(40.0, 75.0)
@@ -187,6 +187,26 @@ func travel_lantern(e: Dictionary) -> void:
 func save_game() -> void:
 	if hero != null and not hero.dead and not args.has("demo"):
 		SaveIO.write(self)
+
+## static caches that hold Resources (textures, fonts, sounds, scripts) must be emptied before the engine shuts down, or
+## it crashes on exit freeing them after the servers are gone
+func _exit_tree() -> void:
+	# a script kept on the Engine's metadata is freed after the script language itself: that was the crash on exit
+	if Engine.has_meta("godmarrow_quests"):
+		Engine.remove_meta("godmarrow_quests")
+	var U = load("res://ui/uikit.gd")
+	U._fonts.clear()
+	U._tex.clear()
+	Lights._cache.clear()
+	Assets._cache.clear()
+	load("res://world/objects/world_ui.gd")._fonts.clear()
+	load("res://world/objects/manager.gd")._tex_cache.clear()
+	load("res://items/item_sfx.gd")._cache.clear()
+	load("res://items/loot.gd")._icons.clear()
+	load("res://entities/ai/brain.gd")._mys = null
+	load("res://items/shop.gd")._wares.clear()
+	load("res://items/shop.gd")._stash.clear()
+	load("res://items/ground.gd")._kept.clear()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED:

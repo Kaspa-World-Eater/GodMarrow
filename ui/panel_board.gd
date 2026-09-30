@@ -35,7 +35,7 @@ var drag_cen := Vector2.ZERO
 var dragged := false
 var msg := ""
 var msg_t := 0.0
-static var _paper: Texture2D
+var _paper: Texture2D          # (instance cache: static Resources crash Godot at exit)
 
 func _ready() -> void:
 	anchor_left = 0.5
@@ -277,7 +277,7 @@ func fx_text(k: String, v: float) -> String:
 	return str(T.get(k, "+%s " + k)) % s
 
 # ------------------------------------------------------------------ drawing
-static func paper_tex() -> Texture2D:
+func paper_tex() -> Texture2D:
 	if _paper:
 		return _paper
 	var img := Image.create(256, 256, false, Image.FORMAT_RGB8)
