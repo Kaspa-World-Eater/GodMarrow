@@ -174,6 +174,12 @@ func _right(inv: Inventory) -> void:
 		Bus.gold_changed.emit(inv.gold)
 		_changed(inv)
 		return
+	if hud.stash_open:
+		var why: String = load("res://items/shop.gd").stash_put(h, it)
+		if why != "":
+			Bus.say.emit(why, 1.4)
+		_changed(inv)
+		return
 	if it.potion != "":
 		inv.remove(it)
 		if it.potion == "hp":
@@ -202,6 +208,8 @@ func tip() -> Array:
 	var lines: Array = hud.item_tip(hover_item)
 	if hud.vendor_open:
 		lines.append(["Sell value: %d gold (right-click)" % hover_item.sell_value(), U.GOLD_D])
+	elif hud.stash_open and hover_slot == "":
+		lines.append(["Right-click to put it in the chest", U.FAINT])
 	elif hover_slot != "":
 		lines.append(["Right-click to take it off", U.FAINT])
 	elif hover_item.potion != "":

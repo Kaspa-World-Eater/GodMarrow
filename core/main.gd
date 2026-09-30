@@ -46,6 +46,9 @@ func _ready() -> void:
 	await enter(args.get("zone", "moor"), "")
 	if args.has("demo"):
 		_demo()
+	if args.has("panel"):   # captures: --panel=vendor|smith|stash|journal
+		await get_tree().create_timer(1.0).timeout
+		Bus.panel_requested.emit(args["panel"], "Maren the Gravekeeper" if args["panel"] == "vendor" else "Brannoc of the Nail")
 
 func enter(zid: String, from: String) -> void:
 	travelling = true

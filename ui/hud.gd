@@ -29,6 +29,8 @@ var top: Control             # tooltip and carried item
 
 var cursor_item: Item = null
 var vendor_open := false     # set by a vendor's window: right-click then sells
+var stash_open := false      # the Reliquary Chest is open: right-click in the pack puts away
+var p_town: Control          # ui/panel_town.gd: vendor, smith, chest, journal
 var tip: Array = []
 var msgs: Array = []         # [{text, t, max}]
 var banner := {}             # {name, line, t, max}
@@ -71,6 +73,8 @@ func _ready() -> void:
 	p_char = _panel("res://ui/panel_char.gd")
 	p_skills = _panel("res://ui/panel_skills.gd")
 	p_inv = _panel("res://ui/panel_inv.gd")
+	p_town = _panel("res://ui/panel_town.gd")
+	Bus.panel_requested.connect(_on_panel_requested)
 	picker = Control.new()
 	picker.mouse_filter = Control.MOUSE_FILTER_STOP
 	picker.focus_mode = Control.FOCUS_NONE
@@ -225,10 +229,19 @@ func toggle_panel(id: String) -> void:
 			p_char.visible = not p_char.visible
 			if p_char.visible:
 				p_skills.visible = false
+				p_town.close()
+		"journal":
+			if p_town.visible and p_town.mode == "journal":
+				p_town.close()
+			else:
+				p_char.visible = false
+				p_skills.visible = false
+				p_town.open("journal")
 		"skills":
 			p_skills.visible = not p_skills.visible
 			if p_skills.visible:
 				p_char.visible = false
+				p_town.close()
 		"map":
 			automap.visible = not automap.visible
 			automap.queue_redraw()
@@ -241,12 +254,13 @@ func menu_click(id: String) -> void:
 		toggle_panel(id)
 
 func any_panel() -> bool:
-	return p_inv.visible or p_char.visible or p_skills.visible or picking != ""
+	return p_inv.visible or p_char.visible or p_skills.visible or p_town.visible or picking != ""
 
 func close_panels() -> void:
 	p_inv.visible = false
 	p_char.visible = false
 	p_skills.visible = false
+	p_town.close()
 	picking = ""
 	vendor_open = false
 	_return_cursor()
@@ -303,6 +317,8 @@ func _input(ev: InputEvent) -> void:
 				toggle_panel("skills")
 			KEY_TAB:
 				toggle_panel("map")
+			KEY_J:
+				toggle_panel("journal")
 			KEY_ESCAPE:
 				if any_panel():
 					close_panels()
@@ -521,6 +537,8 @@ func _process(dt: float) -> void:
 			tip = p_skills.tip()
 		elif hov == p_char:
 			tip = p_char.tip()
+		elif hov == p_town:
+			tip = p_town.tip()
 		elif hov == bar:
 			tip = bar.tip()
 	over.queue_redraw()
@@ -738,3 +756,10 @@ func _draw_top() -> void:
 		draw_item(top, cursor_item, Rect2(mp - sz / 2.0, sz))
 	if not tip.is_empty():
 		U.tooltip(top, tip, mp, top.get_viewport_rect().size, top.get_viewport_rect().size.y - 136.0)
+
+
+## a townsfolk opens a window (world/objects/manager.gd): vendor | smith | stash | journal
+func _on_panel_requested(panel: String, who: String) -> void:
+	p_char.visible = false
+	p_skills.visible = false
+	p_town.open(panel, who)
