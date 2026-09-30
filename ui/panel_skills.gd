@@ -16,6 +16,9 @@ var hover := ""          # "close", "tab0".., "more", "skill:<id>"
 var more := false
 
 func _ready() -> void:
+	for a in OS.get_cmdline_user_args():   # tests: --skilltab=N opens that tree
+		if a.begins_with("--skilltab="):
+			tab = int(a.substr(11))
 	offset_right = PW * U.S
 	offset_bottom = PH * U.S
 	mouse_filter = Control.MOUSE_FILTER_STOP
