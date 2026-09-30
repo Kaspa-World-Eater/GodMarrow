@@ -265,7 +265,7 @@ func _physics_process(dt: float) -> void:
 		spr.play("walk")
 		spr.step(dt, st.move_speed() / 3.11)
 		if act == "":
-			st.poise = maxf(0.0, st.poise - 0.0)
+			st.poise = maxf(0.0, st.poise - 1.6 * dt)   # walking drains 1.6/s (regeneration still runs)
 	else:
 		spr.play("idle")
 		spr.step(dt)

@@ -167,12 +167,26 @@ func _cut_walls() -> void:
 		b.set_cut((t.x + t.y) > (hero.tp.x + hero.tp.y) and dt.length() < 4.0)
 
 # ------------------------------------------------------------------ kills, death, return
+## XP pacing (zz_progression.js): by the creature's level and by the hero's, piecewise-linear
+const XP_KNOTS := [[1, 0.72], [24, 0.74], [30, 0.78], [34, 0.6], [40, 0.72]]
+const LVL_KNOTS := [[1, 1.0], [16, 1.0], [21, 0.92], [27, 0.9], [32, 0.6], [36, 0.58], [40, 0.53]]
+static func _knot(k: Array, x: float) -> float:
+	if x <= k[0][0]:
+		return k[0][1]
+	for i in range(1, k.size()):
+		if x <= k[i][0]:
+			var a: Array = k[i - 1]
+			var b: Array = k[i]
+			return lerpf(a[1], b[1], (x - a[0]) / float(b[0] - a[0]))
+	return k[k.size() - 1][1]
+
 func _on_kill(m: Monster) -> void:
 	if hero == null:
 		return
-	var gain := 1.0
+	var gain := _knot(LVL_KNOTS, hero.st.level)   # (the export's m.xp already carries the creature-level factor, XP_KNOTS)
+	gain = gain * (1.0 + hero.st.item("xpK") / 100.0)
 	if hero.st.level > m.level + 5:
-		gain = maxf(0.1, 1.0 - 0.15 * (hero.st.level - m.level - 5))
+		gain *= maxf(0.1, 1.0 - 0.15 * (hero.st.level - m.level - 5))
 	if hero.st.add_xp(int(round(m.xp * gain))):
 		Bus.level_up.emit(hero.st.level)
 		Bus.say.emit("You feel the marrow settle. Level %d." % hero.st.level, 2.5)

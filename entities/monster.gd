@@ -51,6 +51,8 @@ var root := 0.0
 var slow := 0.0
 var feared := 0.0
 var confused := 0.0
+var _confused_t := 0.0
+var _confused_to := Vector2.ZERO
 var marked := 0.0
 var dots: Array = []       # [{dps, t, elem, tick}]
 var hit_flash := 0.0
@@ -234,7 +236,25 @@ func _physics_process(dt: float) -> void:
 				queue_free()
 		return
 	_tick_status(dt)
-	if brain:
+	if feared > 0.0 and not boss and can_act():
+		# feared: it flees from the hero, and does nothing else (checklist 5)
+		var h := hero()
+		if h:
+			step_toward(tp + (tp - h.tp).normalized() * 2.0, dt)
+			if spr.set.has("walk"):
+				spr.play("walk")
+	elif confused > 0.0 and not boss and can_act():
+		# confused: it wanders and strikes whatever creature it meets
+		_confused_t -= dt
+		if _confused_t <= 0.0:
+			_confused_t = 0.6
+			_confused_to = tp + Vector2(randf_range(-2, 2), randf_range(-2, 2))
+			for o in get_tree().get_nodes_in_group("monsters"):
+				if o != self and not o.dead and o.tp.distance_to(tp) < 1.4:
+					Combat.hit_monster(o, roll_damage(), "phys", tp, {"poise": 0.0})
+					break
+		step_toward(_confused_to, dt)
+	elif brain:
 		brain.tick(self, dt)
 	spr.face = face
 	spr.view = view
