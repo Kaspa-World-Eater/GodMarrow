@@ -8,6 +8,7 @@ var cam: Camera2D
 var eye: CamDirector
 var fore: Foreground
 var sky: Weather
+var sound: Soundscape
 var ambient: CanvasModulate
 var hud: Node
 var dark: DarkLayer
@@ -47,6 +48,9 @@ func _ready() -> void:
 	add_child(atmos)
 	sky = Weather.new()
 	add_child(sky)
+	sound = Soundscape.new(self)
+	add_child(sound)
+	sky.snd = sound
 	fore = Foreground.new()
 	add_child(fore)
 	cam = Camera2D.new()

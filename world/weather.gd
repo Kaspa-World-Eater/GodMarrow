@@ -27,6 +27,7 @@ var beat := 0.0              # the weather's own slow swell 0..1
 var beat_ph := 0.0
 var last_cam := Vector2.INF
 var bind_t := 0.0
+var snd: Node                # the soundscape: a drip landing makes a sound
 
 func _ready() -> void:
 	layer = 6
@@ -134,6 +135,8 @@ func _process(dt: float) -> void:
 				if d["y"] >= d["g"].y:
 					d["hit"] = true
 					d["t"] = 0.0
+					if snd:
+						snd.drip()
 		drips = drips.filter(func(d): return not d["hit"] or d["t"] < 0.9)
 	canvas.queue_redraw()
 	add_canvas.queue_redraw()
