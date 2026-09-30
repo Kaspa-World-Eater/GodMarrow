@@ -1403,7 +1403,8 @@ func metals() -> Array:
 
 func _metal(key) -> Variant:
 	for mt in metals():
-		if mt["key"] == key:
+		var k2 = mt["key"]
+		if typeof(k2) == typeof(key) and k2 == key:
 			return mt
 	return null
 

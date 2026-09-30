@@ -151,12 +151,26 @@ func _release_token(m: Monster) -> void:
 		token = false
 
 # ------------------------------------------------------------------ the standard melee rhythm
+## the creature's foe: the hero, or a standing ally (the golem) when one is nearer or has challenged it
+## (skills/animancer.gd nearest_target; checklist 15.2 "taunted: attacks the golem")
+static var _mys = null
+func foe(m: Monster, h: Hero):
+	if _mys == null:
+		_mys = load("res://skills/animancer.gd")
+	if m.get_tree().get_nodes_in_group("allies").is_empty():
+		return h
+	var f = _mys.nearest_target(m.zone, m)
+	return f if f != null else h
+
 func melee_rhythm(m: Monster, h: Hero, dt: float, spd_k: float = 1.0) -> void:
 	st -= dt
-	var d := m.tp.distance_to(h.tp)
+	var f = foe(m, h)
+	var fp: Vector2 = f.tp
+	var gone: bool = h.dead if f == h else (f.has_method("is_down") and f.is_down())
+	var d := m.tp.distance_to(fp)
 	match state:
 		"chase":
-			if h.dead:
+			if gone:
 				state = "home"
 				return
 			if d > 26.0:
@@ -166,18 +180,18 @@ func melee_rhythm(m: Monster, h: Hero, dt: float, spd_k: float = 1.0) -> void:
 				if take_token(m):
 					state = "wind"
 					st = wind
-					aim = h.tp
-					m.look(h.tp - m.tp)
+					aim = fp
+					m.look(fp - m.tp)
 				else:
 					_circle(m, h, dt)
 			else:
-				if not take_token(m) and d < 3.0:
+				if not take_token(m) and d < 3.0 and f == h:
 					_circle(m, h, dt)
 				else:
-					_approach(m, h.tp, dt, spd_k)
+					_approach(m, fp, dt, spd_k)
 		"wind":
-			m.look(h.tp - m.tp)
-			aim = h.tp
+			m.look(fp - m.tp)
+			aim = fp
 			if st <= 0.0:
 				state = "strike"
 				st = 0.18
@@ -185,7 +199,10 @@ func melee_rhythm(m: Monster, h: Hero, dt: float, spd_k: float = 1.0) -> void:
 		"strike":
 			if not struck:
 				struck = true
-				strike(m, h)
+				if f == h:
+					strike(m, h)
+				elif f.tp.distance_to(aim) <= 0.8 + float(f.get("radius") if f.get("radius") != null else 0.5):
+					f.take_hit(m.roll_damage(), "phys", m.tp)
 			if st <= 0.0:
 				state = "recover"
 				st = rec

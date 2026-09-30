@@ -20,7 +20,9 @@ var statics: Array = []        # [{t (tile), r (world px), core, far, w, rgb, ki
 var round_things: Array = []   # [[tile, radius yd]] camp things that throw shadows
 var extra_lights: Array = []   # PointLight2D nodes found in the zone
 var scan_t := 0.0
-var mood := 1.0
+var mood := 1.0               # the lantern's mood (zz_zz_cine76): shrinks and stutters when the wound is deep, gutters in a boss fight
+var boss_m: Node = null
+var t := 0.0
 var enabled := true
 
 func _ready() -> void:
@@ -32,6 +34,8 @@ func _ready() -> void:
 	mat.shader = load("res://shaders/dark.gdshader")
 	rect.material = mat
 	add_child(rect)
+	Bus.boss_woke.connect(func(m): boss_m = m)
+	Bus.boss_felled.connect(func(m): if m == boss_m: boss_m = null)
 
 func bind(z: Zone, h: Hero) -> void:
 	zone = z
@@ -70,6 +74,16 @@ func _process(dt: float) -> void:
 		rect.visible = false
 		return
 	rect.visible = enabled
+	t += dt
+	var k := 1.0
+	var f: float = hero.st.hp / maxf(1.0, hero.st.life_max())
+	if f < 0.3 and not hero.dead:
+		var s := (0.3 - f) / 0.3
+		k *= 1.0 - 0.18 * s
+		k *= 1.0 - 0.1 * s * (0.5 + 0.5 * sin(t * 2.2) * sin(t * 0.9))
+	if boss_m != null and is_instance_valid(boss_m) and not boss_m.dead and boss_m.zone == zone:
+		k *= 0.92 + 0.04 * sin(t * 2.1) - (0.06 if sin(t * 0.83) > 0.9 else 0.0)
+	mood += (k - mood) * minf(1.0, dt * 15.0)
 	var outdoor: bool = zone.d.get("outdoor", false)
 	var dk := Game.day_k() if outdoor else 0.0
 	var A := (0.82 - 0.5 * dk * dk) if outdoor else 0.84
