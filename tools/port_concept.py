@@ -4,7 +4,7 @@ The cut follows the figure's OUTLINE: whatever lies inside the silhouette stays 
 (dark cloth, shadowed armour, the black under a robe). Only ground reachable from the picture's edge is removed.
 
 Usage:
-  python3 tools/port_concept.py SRC.png KIND [--height 195] [--colours 56] [--robe 0.55:0.94] [--ground-pool]
+  python3 tools/port_concept.py SRC.png KIND [--height 195] [--colours 0 (all)] [--robe 0.55:0.94] [--ground-pool]
     --robe A:B   rows A..B of the figure (fractions of its height) are filled edge to edge along each row,
                  so the dark inside of a robe or cloak between the legs is kept. Pick the band from the hands
                  down to the hem; leave it out for figures with open gaps (arms held away, legs apart).
@@ -52,8 +52,10 @@ def to_sprite(rgb, fig, height, colours):
     col = np.array(Image.fromarray(premul.astype(np.uint8)).resize(size, Image.BOX)).astype(float)
     col = np.where(alpha[..., None] > 0.01, col / np.maximum(alpha[..., None], 1e-3), 0).clip(0, 255)
     solid = alpha > 0.45
-    pal = Image.fromarray(col.astype(np.uint8)).quantize(colours, method=Image.FASTOCTREE, dither=Image.NONE).convert('RGB')
-    out = np.dstack([np.array(pal), solid * 255]).astype(np.uint8)
+    rgb8 = Image.fromarray(col.astype(np.uint8))
+    if colours:  # a palette cap (no dither), for matching a set of sprites; 0 keeps every colour of the concept
+        rgb8 = rgb8.quantize(colours, method=Image.FASTOCTREE, dither=Image.NONE).convert('RGB')
+    out = np.dstack([np.array(rgb8), solid * 255]).astype(np.uint8)
     edge = solid & ~nd.binary_erosion(solid)          # a dark outline on the silhouette's edge
     out[edge, :3] = (out[edge, :3] * 0.35).astype(np.uint8)
     fy = np.flatnonzero(solid.any(1))[-1]            # feet: the lowest opaque row,
@@ -65,7 +67,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('src'); ap.add_argument('kind')
     ap.add_argument('--height', type=int, default=195)
-    ap.add_argument('--colours', type=int, default=56)
+    ap.add_argument('--colours', type=int, default=0)
     ap.add_argument('--robe', default=None)
     ap.add_argument('--ground-pool', action='store_true')
     ap.add_argument('--out', default='art/sprites')
