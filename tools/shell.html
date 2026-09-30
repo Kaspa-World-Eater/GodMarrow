@@ -1,0 +1,186 @@
+<title>Godmarrow Wiki</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a bone-ledger index down the left, one page of the wiki at a time on the right, read like a tome by lantern. */
+:root{
+  color-scheme:dark;
+  --ash:#0e0c10;        /* ground */
+  --slab:#17141a;       /* index and raised panels */
+  --seam:#2e2933;       /* rules and borders */
+  --bone:#e2d7bf;       /* running text */
+  --bone-dim:#a89c86;   /* secondary text */
+  --bone-faint:#6f6658; /* captions */
+  --brass:#c49a58;      /* the accent: rubrics, links */
+  --brass-lo:#6a5230;
+  --lamp:#f0dcaa;       /* search marks */
+  --display:"Cinzel","Trajan Pro",Georgia,serif;
+  --body:"Alegreya",Georgia,"Times New Roman",serif;
+  --ui:"Alegreya Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --side:17rem;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--ash);color:var(--bone);font:1.02rem/1.62 var(--body);margin:0}
+a{color:var(--brass);text-decoration-color:var(--brass-lo);text-underline-offset:.18em}
+a:hover{color:var(--lamp)}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+.wrap{display:grid;grid-template-columns:var(--side) minmax(0,1fr);min-height:100%}
+aside{background:var(--slab);border-right:1px solid var(--seam);position:sticky;top:env(safe-area-inset-top,0px);height:100vh;overflow-y:auto;padding-block:1.4rem 2rem;padding-inline:1.1rem}
+.brand{font:700 1.25rem/1.1 var(--display);letter-spacing:.14em;color:var(--bone);margin:0 0 .15rem}
+.brand small{display:block;font:500 .72rem/1.4 var(--ui);letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin-top:.35rem}
+.meta{font:.78rem/1.4 var(--ui);color:var(--bone-faint);margin:.6rem 0 1rem;font-variant-numeric:tabular-nums}
+.search{position:relative;margin-bottom:1.1rem}
+.search input{width:100%;background:var(--ash);border:1px solid var(--seam);color:var(--bone);font:.92rem var(--ui);padding:.5rem .65rem;border-radius:3px}
+.search input::placeholder{color:var(--bone-faint)}
+.ng{margin-bottom:1rem}
+.nl{font:600 .68rem/1 var(--ui);letter-spacing:.2em;text-transform:uppercase;color:var(--bone-faint);margin:0 0 .45rem .1rem}
+.ni{display:block;font:.95rem/1.3 var(--ui);color:var(--bone-dim);text-decoration:none;padding:.3rem .5rem;border-left:2px solid transparent;margin-left:-.5rem}
+.ni:hover{color:var(--bone);background:rgba(196,154,88,.06)}
+.ni[aria-current="page"]{color:var(--bone);border-left-color:var(--brass);background:rgba(196,154,88,.09)}
+
+main{min-width:0;padding-block:2.2rem 5rem;padding-inline:clamp(16px,4vw,3.5rem)}
+.col{max-width:46rem}
+.crumb{font:600 .7rem/1 var(--ui);letter-spacing:.2em;text-transform:uppercase;color:var(--brass);margin-bottom:.8rem;display:flex;gap:.8rem;flex-wrap:wrap}
+.crumb span+span{color:var(--bone-faint)}
+.otp{border:1px solid var(--seam);background:var(--slab);border-radius:3px;margin:0 0 2rem;padding:.2rem .9rem}
+.otp summary{font:600 .72rem/2.4 var(--ui);letter-spacing:.18em;text-transform:uppercase;color:var(--bone-dim);cursor:pointer}
+[hidden]{display:none!important}
+.otp ul{list-style:none;margin:.2rem 0 .8rem;padding-left:0;columns:2 16rem;column-gap:2rem;font:.9rem/1.45 var(--ui)}
+.otp li{break-inside:avoid;margin-bottom:.2rem}
+.otp a{color:var(--bone-dim);text-decoration:none}
+.otp a:hover{color:var(--lamp)}
+
+#doc h1{font:700 clamp(1.6rem,3.2vw,2.3rem)/1.15 var(--display);letter-spacing:.04em;margin:0 0 1rem;text-wrap:balance;color:var(--bone)}
+#doc h2{font:600 1.35rem/1.25 var(--display);letter-spacing:.05em;color:var(--brass);margin:2.6rem 0 .8rem;padding-top:.9rem;border-top:1px solid var(--seam);text-wrap:balance;scroll-margin-top:1rem}
+#doc h3{font:600 1.08rem/1.3 var(--display);letter-spacing:.04em;color:var(--bone);margin:1.9rem 0 .5rem;scroll-margin-top:1rem}
+#doc h4{font:700 .95rem/1.3 var(--ui);letter-spacing:.06em;color:var(--bone-dim);margin:1.4rem 0 .4rem;text-transform:uppercase}
+#doc p{margin:0 0 1rem}
+#doc ul,#doc ol{padding-left:1.3rem;margin:0 0 1rem}
+#doc li{margin-bottom:.35rem}
+#doc li::marker{color:var(--brass-lo)}
+#doc strong{color:#f1e7d0;font-weight:700}
+#doc em{color:var(--bone)}
+#doc blockquote{margin:1.2rem 0;padding:.2rem 0 .2rem 1rem;border-left:2px solid var(--brass-lo);color:var(--bone-dim);font-style:italic}
+#doc hr{border:0;border-top:1px solid var(--seam);margin:2.4rem 0}
+#doc code{font:.84em var(--mono);background:rgba(226,215,191,.07);padding:.08em .32em;border-radius:2px;color:#e8dcc2;overflow-wrap:anywhere}
+#doc pre{background:var(--slab);border:1px solid var(--seam);padding:.9rem 1rem;overflow-x:auto;border-radius:3px;font-size:.85rem;line-height:1.5}
+#doc pre code{background:none;padding:0;overflow-wrap:normal}
+.tw{overflow-x:auto;margin:0 0 1.3rem;border:1px solid var(--seam);border-radius:3px}
+#doc table{border-collapse:collapse;font:.9rem/1.45 var(--ui);width:100%;font-variant-numeric:tabular-nums}
+#doc th{text-align:left;font-weight:700;color:var(--bone);background:var(--slab);border-bottom:1px solid var(--seam);padding:.5rem .7rem;white-space:nowrap}
+#doc td{padding:.45rem .7rem;border-top:1px solid rgba(46,41,51,.7);vertical-align:top;color:var(--bone-dim)}
+#doc tr:hover td{color:var(--bone)}
+a.xref{text-decoration:none}
+a.xref code{color:var(--brass)!important;background:rgba(196,154,88,.1)!important}
+mark{background:var(--lamp);color:#1a1510;border-radius:2px;padding:0 .08em}
+
+.results{margin:0 0 2rem}
+.results h1{font:700 1.6rem/1.2 var(--display);letter-spacing:.04em;margin:0 0 .4rem}
+.results .count{font:.85rem var(--ui);color:var(--bone-faint);margin-bottom:1.4rem}
+.hit{display:block;text-decoration:none;border-top:1px solid var(--seam);padding:.8rem 0}
+.hit b{font:600 .95rem var(--display);letter-spacing:.04em;color:var(--brass)}
+.hit span{display:block;font:.9rem/1.5 var(--ui);color:var(--bone-dim);margin-top:.25rem}
+.hit:hover b{color:var(--lamp)}
+.pager{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-top:1px solid var(--seam);margin-top:3rem;padding-top:1.2rem;font:.9rem var(--ui)}
+.pager a{text-decoration:none;color:var(--bone-dim)}
+.pager a b{display:block;color:var(--brass);font:600 1rem var(--display);letter-spacing:.04em}
+.pager a:last-child{text-align:right;margin-left:auto}
+
+.menu{display:none}
+@media (max-width:820px){
+  .wrap{grid-template-columns:minmax(0,1fr)}
+  aside{position:fixed;inset:0 auto 0 0;width:min(20rem,86vw);height:100%;z-index:20;transform:translateX(-102%);transition:transform .2s ease;padding-top:calc(1.4rem + env(safe-area-inset-top,0px))}
+  body.open aside{transform:none;box-shadow:0 0 0 100vmax rgba(0,0,0,.55)}
+  .menu{display:inline-flex;align-items:center;gap:.5rem;position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--ash);border:1px solid var(--seam);color:var(--bone);font:600 .75rem var(--ui);letter-spacing:.16em;text-transform:uppercase;padding:.55rem .8rem;border-radius:3px;margin-bottom:1.2rem;cursor:pointer}
+  main{padding-top:1rem}
+}
+@media (prefers-reduced-motion:reduce){aside{transition:none}}
+</style>
+
+<div class="wrap">
+  <aside id="side" aria-label="Wiki pages">
+    <p class="brand">GODMARROW<small>The working wiki</small></p>
+    <p class="meta">{{DOCS}} pages · {{WORDS}} words · as of 30 Sep 2026</p>
+    <div class="search"><input id="q" type="search" placeholder="Search every page" aria-label="Search every page" autocomplete="off"></div>
+    <nav>{{NAV}}</nav>
+  </aside>
+  <main>
+    <button class="menu" id="menu" type="button" aria-controls="side">☰ Pages</button>
+    <div class="col">
+      <div id="crumb" class="crumb"></div>
+      <details class="otp" id="otp"><summary>On this page</summary><ul id="otpl"></ul></details>
+      <article id="doc"></article>
+      <div class="pager" id="pager"></div>
+    </div>
+  </main>
+</div>
+{{TEMPLATES}}
+<script>
+(function(){
+  var T=[].slice.call(document.querySelectorAll('template[id^="t-"]'));
+  var ids=T.map(function(t){return t.id.slice(2)});
+  var doc=document.getElementById('doc'),otp=document.getElementById('otp'),otpl=document.getElementById('otpl'),
+      crumb=document.getElementById('crumb'),pager=document.getElementById('pager'),q=document.getElementById('q');
+  var idx=null;
+  function tpl(id){return document.getElementById('t-'+id)}
+  function esc(s){return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function setNav(id){document.querySelectorAll('.ni').forEach(function(a){if(a.dataset.id===id)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')})}
+  function show(id,anchor,term){
+    var t=tpl(id); if(!t){id=ids[0];t=tpl(id)}
+    doc.innerHTML=''; doc.appendChild(t.content.cloneNode(true));
+    crumb.innerHTML='<span>'+esc(t.dataset.group)+'</span><span>Updated '+t.dataset.updated+'</span><span>'+Number(t.dataset.words).toLocaleString()+' words</span>';
+    var hs=doc.querySelectorAll('h2'); otpl.innerHTML='';
+    hs.forEach(function(h){if(!h.id)return;var li=document.createElement('li');li.innerHTML='<a href="#'+h.id+'">'+esc(h.textContent)+'</a>';otpl.appendChild(li)});
+    otp.hidden=hs.length<3; otp.open=hs.length<=14;
+    var i=ids.indexOf(id),p='';
+    if(i>0)p+='<a href="#'+ids[i-1]+'">Previous<b>'+esc(tpl(ids[i-1]).dataset.title)+'</b></a>';
+    if(i<ids.length-1)p+='<a href="#'+ids[i+1]+'">Next<b>'+esc(tpl(ids[i+1]).dataset.title)+'</b></a>';
+    pager.innerHTML=p; pager.hidden=false;
+    setNav(id); document.title=t.dataset.title+' · Godmarrow Wiki';
+    if(term)markTerm(term);
+    var target=anchor?document.getElementById(anchor):(term?doc.querySelector('mark'):null);
+    if(target)target.scrollIntoView({block:'start'}); else window.scrollTo(0,0);
+    try{localStorage.setItem('gm-wiki-page',id)}catch(e){}
+  }
+  function markTerm(term){
+    var re=new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+    var w=document.createTreeWalker(doc,NodeFilter.SHOW_TEXT,null),nodes=[],n;
+    while((n=w.nextNode()))if(re.test(n.nodeValue))nodes.push(n);
+    nodes.slice(0,400).forEach(function(n){re.lastIndex=0;var s=n.nodeValue,f=document.createDocumentFragment(),last=0,m;
+      while((m=re.exec(s))){f.appendChild(document.createTextNode(s.slice(last,m.index)));var k=document.createElement('mark');k.textContent=m[0];f.appendChild(k);last=m.index+m[0].length}
+      f.appendChild(document.createTextNode(s.slice(last)));n.parentNode.replaceChild(f,n)});
+  }
+  function route(){
+    var h=decodeURIComponent(location.hash.slice(1));
+    if(!h){var saved=null;try{saved=localStorage.getItem('gm-wiki-page')}catch(e){} show(saved&&tpl(saved)?saved:ids[0]);return}
+    if(tpl(h)){show(h);return}
+    var owner=h.split('--')[0];
+    if(tpl(owner)){show(owner,h);return}
+    show(ids[0]);
+  }
+  function search(term){
+    term=term.trim();
+    if(term.length<2){route();return}
+    if(!idx)idx=T.map(function(t){var d=document.createElement('div');d.appendChild(t.content.cloneNode(true));return {id:t.id.slice(2),title:t.dataset.title,text:d.textContent.replace(/\s+/g,' ')}});
+    var low=term.toLowerCase(),hits=[];
+    idx.forEach(function(d){var s=d.text.toLowerCase(),at=s.indexOf(low),c=0,p=at;while(p>=0&&c<999){c++;p=s.indexOf(low,p+low.length)}
+      if(at>=0)hits.push({d:d,n:c,snip:d.text.slice(Math.max(0,at-90),at+low.length+120)})});
+    hits.sort(function(a,b){return b.n-a.n});
+    var re=new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+    doc.innerHTML='<div class="results"><h1>'+esc(term)+'</h1><div class="count">'+(hits.length?hits.reduce(function(a,h){return a+h.n},0)+' matches on '+hits.length+' page'+(hits.length>1?'s':''):'No page mentions this. Try a shorter word.')+'</div>'+
+      hits.map(function(h){return '<a class="hit" href="#'+h.d.id+'" data-term="'+esc(term)+'"><b>'+esc(h.d.title)+' · '+h.n+'</b><span>…'+esc(h.snip).replace(re,function(m){return '<mark>'+m+'</mark>'})+'…</span></a>'}).join('')+'</div>';
+    otp.hidden=true;pager.hidden=true;crumb.innerHTML='<span>Search</span>';setNav('');window.scrollTo(0,0);
+  }
+  doc.addEventListener('click',function(e){var a=e.target.closest('a.hit');if(!a)return;e.preventDefault();var id=a.getAttribute('href').slice(1);history.pushState(null,'','#'+id);show(id,null,a.dataset.term)});
+  var tm;q.addEventListener('input',function(){clearTimeout(tm);tm=setTimeout(function(){search(q.value)},180)});
+  q.addEventListener('keydown',function(e){if(e.key==='Escape'){q.value='';route()}});
+  window.addEventListener('hashchange',function(){q.value='';route();document.body.classList.remove('open')});
+  document.getElementById('menu').addEventListener('click',function(){document.body.classList.toggle('open')});
+  document.getElementById('side').addEventListener('click',function(e){if(e.target===this&&document.body.classList.contains('open'))document.body.classList.remove('open')});
+  route();
+})();
+</script>
