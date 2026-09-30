@@ -1,13 +1,15 @@
 class_name Hero
 extends Node2D
 ## The hero on the tile grid. Positions are in tiles (yards), as in the web build; the node sits at iso(tp).
-## Diablo II control: hold the left button to walk (repath every 0.18 s), click a creature to go to it and strike.
+## Diablo II control (checklist section 2): hold left to walk (repath every 0.18 s); click a creature to go to it and
+## strike (the melee string, or the Bone Wand's bolt); shift+left strikes in place; hold the attack to charge a heavy
+## blow; right click casts the right skill (hold repeats); Space rolls; 1-4 drink from the belt.
 
 signal stats_changed
 signal died
 
 var zone: Zone
-var tp := Vector2.ZERO           # tile position
+var tp := Vector2.ZERO
 var cls := "animancer"
 var spr: AnimSprite
 var face := 1
@@ -19,10 +21,33 @@ var goal := Vector2.ZERO
 var walking := false
 var lamp: PointLight2D
 var st: HeroStats
-var target: Node = null
-var busy := 0.0
+var skills: SkillBook
+var target: Monster = null
 var dead := false
 var radius := 0.25
+
+# actions
+var act := ""              # "", swing, cast, roll, heavy, stun
+var act_t := 0.0
+var act_len := 0.0
+var act_hit_at := 0.0
+var act_done := false
+var act_target: Monster
+var act_mult := 1.0
+var string_i := 0          # the melee string: cut, return cut, overhead
+var string_idle := 0.0
+var invuln := 0.0
+var roll_dir := Vector2.ZERO
+var charge := 0.0          # heavy wind-up held
+var holding_attack := false
+var cast_hold := 0.0
+
+# poise break (v60, v79)
+var break_grace := 0.0
+var shaken := false        # after a break: no rolling until poise is full
+var poise_burst := 0.0
+
+const STRING := [[1.0, 0.85, 0.12], [1.1, 0.95, 0.2], [1.6, 1.35, 0.0]]   # dmg x, time x, step yd
 
 func setup(z: Zone, c: String, at: Vector2) -> void:
 	zone = z
@@ -40,7 +65,7 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 	lamp.texture = Lights.pool(512)
 	lamp.color = HeroStats.lamp_color(c)
 	lamp.energy = 1.25
-	lamp.texture_scale = 7.0 * Iso.HX * 2.0 / 512.0 * 1.25
+	lamp.texture_scale = light_radius() * Iso.HX * 2.0 / 512.0 * 1.25
 	lamp.position = Vector2(28, -90)
 	lamp.shadow_enabled = true
 	lamp.shadow_filter = Light2D.SHADOW_FILTER_PCF5
@@ -49,18 +74,34 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 	if st == null:
 		st = HeroStats.new()
 		st.setup(c)
+	if skills == null:
+		skills = SkillBook.for_class(self, c)
+	else:
+		skills.hero = self
+	z.hero_ref = self
 	_sync()
+
+func light_radius() -> float:
+	var r := 7.0
+	if zone and zone.d.get("outdoor", false) and Game.hour_name() == "night":
+		r += 1.5
+	elif zone and not zone.d.get("outdoor", false):
+		r = 7.5
+	r *= 1.0 + st.item("lrad") / 100.0 * 0.5 if st else 1.0
+	if st and st.dim_wick:
+		r *= 0.62
+	if st:
+		r *= 1.0 - 0.12 * st.kept
+	return r
 
 func _shadow() -> void:
 	var s := Polygon2D.new()
 	var pts := PackedVector2Array()
 	for i in 16:
 		var a := i / 16.0 * TAU
-		pts.append(Vector2(cos(a) * 26.0, sin(a) * 10.0 + 8.0))
+		pts.append(Vector2(cos(a) * 30.0, sin(a) * 12.0 + 6.0))
 	s.polygon = pts
 	s.color = Color(0, 0, 0, 0.35)
-	s.z_index = -1
-	s.z_as_relative = true
 	add_child(s)
 	move_child(s, 0)
 
@@ -75,46 +116,159 @@ func walk_to(t: Vector2) -> void:
 	walking = true
 	path = zone.path(tp, t)
 	path_i = 0
+	# the first cell is the one we stand in: skip it, and walk straight when the line is clear
+	if path.size() > 1:
+		path_i = 1
+	if zone.line_clear(tp, t) and not zone.is_solid(t):
+		path = PackedVector2Array([t])
+		path_i = 0
 	repath = 0.18
 
+func monster_at_mouse() -> Monster:
+	var mp := get_global_mouse_position()
+	var best: Monster = null
+	var bd := 60.0
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if m.dead or m.buried:
+			continue
+		var c: Vector2 = m.position + Vector2(0, -60)
+		var d := c.distance_to(mp)
+		if d < bd:
+			bd = d
+			best = m
+	return best
+
+# ------------------------------------------------------------------ input
+func _unhandled_input(ev: InputEvent) -> void:
+	if dead:
+		return
+	if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+		var m := monster_at_mouse()
+		if m and skills.left != "attack":
+			skills.use(skills.left, m.tp, m)
+		elif m:
+			target = m
+			walking = false
+		elif Input.is_key_pressed(KEY_SHIFT):
+			_start_attack(null, mouse_tile())
+		else:
+			target = null
+	if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_RIGHT:
+		_cast_right()
+	if ev is InputEventKey and ev.pressed and not ev.echo:
+		match ev.keycode:
+			KEY_SPACE:
+				roll()
+			KEY_1, KEY_2, KEY_3, KEY_4:
+				drink(ev.keycode - KEY_1)
+			KEY_L:
+				st.dim_wick = not st.dim_wick
+				lamp.texture_scale = light_radius() * Iso.HX * 2.0 / 512.0 * 1.25
+				Bus.say.emit("You turn the wick down." if st.dim_wick else "You turn the wick up.", 1.5)
+		var k: String = OS.get_keycode_string(ev.keycode).to_lower()
+		if skills.keys.has(k):
+			if Input.is_key_pressed(KEY_SHIFT):
+				skills.left = skills.keys[k]
+			else:
+				skills.right = skills.keys[k]
+			stats_changed.emit()
+
+func _cast_right() -> void:
+	if act != "" and act != "swing":
+		return
+	var m := monster_at_mouse()
+	var at := m.tp if m else mouse_tile()
+	if skills.right == "attack":
+		_start_attack(m, at)
+		return
+	_face(at - tp)
+	if skills.use(skills.right, at, m):
+		_start_act("cast", 0.55 / st.cast_speed())
+		walking = false
+		cast_hold = 0.0
+
+# ------------------------------------------------------------------ the frame
 func _physics_process(dt: float) -> void:
 	if dead or zone == null:
+		if dead:
+			spr.step(dt)
 		return
 	st.tick(dt)
-	if busy > 0.0:
-		busy -= dt
-		spr.step(dt)
+	skills.tick(dt)
+	invuln = maxf(0.0, invuln - dt)
+	break_grace = maxf(0.0, break_grace - dt)
+	if poise_burst > 0.0:
+		var a := minf(poise_burst, st.poise_max() * 0.5 / 0.35 * dt)
+		poise_burst -= a
+		st.poise = minf(st.poise_max(), st.poise + a)
+	if shaken and st.poise >= st.poise_max() - 0.5:
+		shaken = false
+	string_idle += dt
+	if string_idle > 0.8:
+		string_i = 0
+	# hold right to repeat the skill
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) and act == "" and skills.right != "attack":
+		cast_hold += dt
+		if cast_hold > 0.25:
+			_cast_right()
+	if act != "":
+		_act(dt)
 		_sync()
 		return
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and target == null and not _ui_captured():
-		repath -= dt
-		if repath <= 0.0 or not walking:
-			walk_to(mouse_tile())
+	# walk or chase
 	var moved := false
-	if walking and path_i < path.size():
-		var wp: Vector2 = path[path_i]
-		var to := wp - tp
-		var step := st.move_speed() * dt
-		if to.length() <= step:
-			tp = zone.move(tp, to, radius)
-			path_i += 1
+	if target and not target.dead and not target.buried:
+		var reach := _reach()
+		var d := tp.distance_to(target.tp) - target.radius
+		if d <= reach:
+			_start_attack(target, target.tp)
 		else:
-			tp = zone.move(tp, to.normalized() * step, radius)
-		_face(to)
-		moved = true
-		if path_i >= path.size():
-			walking = false
+			repath -= dt
+			if repath <= 0.0 or not walking:
+				walk_to(target.tp)
+			moved = _walk(dt)
 	else:
-		walking = false
+		target = null
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and not _ui_captured() and not Input.is_key_pressed(KEY_SHIFT):
+			repath -= dt
+			if repath <= 0.0 or not walking:
+				walk_to(mouse_tile())
+		moved = _walk(dt)
 	spr.view = view
 	spr.face = face
 	if moved:
 		spr.play("walk")
 		spr.step(dt, st.move_speed() / 3.11)
+		if act == "":
+			st.poise = maxf(0.0, st.poise - 0.0)
 	else:
 		spr.play("idle")
 		spr.step(dt)
 	_sync()
+
+func _walk(dt: float) -> bool:
+	if not walking or path_i >= path.size():
+		walking = false
+		return false
+	var wp: Vector2 = path[path_i]
+	var to := wp - tp
+	var spd := st.move_speed()
+	if zone.type_at(tp) == 12:
+		spd *= 0.72
+	elif zone.type_at(tp) == 13:
+		spd *= 0.8
+	if charge > 0.0:
+		spd *= 0.35
+	var step := spd * dt
+	if to.length() <= step:
+		tp = zone.move(tp, to, radius)
+		path_i += 1
+	else:
+		tp = zone.move(tp, to.normalized() * step, radius)
+	_face(to)
+	if path_i >= path.size():
+		walking = false
+	return true
 
 func _face(dir: Vector2) -> void:
 	var r := AnimSprite.hero_view(dir, face)
@@ -125,3 +279,195 @@ func _face(dir: Vector2) -> void:
 func _ui_captured() -> bool:
 	var vp := get_viewport()
 	return vp.gui_get_hovered_control() != null if vp else false
+
+# ------------------------------------------------------------------ attacks
+func _weapon() -> Item:
+	return st.inv.weapon() if st.inv else null
+
+func _reach() -> float:
+	var w: Item = _weapon()
+	if w and w.is_ranged():
+		return 6.5
+	return 1.5
+
+func _start_attack(m: Monster, at: Vector2) -> void:
+	if act != "":
+		return
+	_face(at - tp)
+	walking = false
+	var w: Item = _weapon()
+	if w and w.is_ranged():
+		_start_act("atk", 0.55 / st.attack_speed())
+		act_target = m
+		act_hit_at = 0.45
+		act_mult = 1.0
+		return
+	var s: Array = STRING[string_i]
+	_start_act("atk2" if string_i == 1 else "atk", 0.55 * float(s[1]) / st.attack_speed())
+	act_target = m
+	act_hit_at = 0.5
+	act_mult = float(s[0])
+	if string_i == 2:
+		spend_poise(4.0)
+	tp = zone.move(tp, (at - tp).normalized() * float(s[2]), radius)
+	string_i = (string_i + 1) % 3
+	string_idle = 0.0
+
+func _start_act(a: String, secs: float) -> void:
+	act = a
+	act_t = 0.0
+	act_len = maxf(0.08, secs)
+	act_done = false
+	var anim := a
+	if a == "swing":
+		anim = "atk"
+	if not spr.set.has(anim):
+		anim = "atk" if spr.set.has("atk") else "idle"
+	spr.play(anim, true, false)
+	spr.fps_override = spr.frame_count() / act_len
+
+func _act(dt: float) -> void:
+	act_t += dt
+	spr.view = view
+	spr.face = face
+	spr.step(dt)
+	match act:
+		"atk", "atk2", "swing":
+			if not act_done and act_t >= act_len * act_hit_at:
+				act_done = true
+				_land_blow()
+		"roll":
+			tp = zone.move(tp, roll_dir * 8.5 * dt, radius)
+		"stun":
+			pass
+	if act_t >= act_len:
+		act = ""
+		spr.fps_override = 0.0
+		if act_target and act_target.dead:
+			target = null
+
+func _land_blow() -> void:
+	var w: Item = _weapon()
+	var lo: float = w.dmg.x if w else 1.0
+	var hi: float = w.dmg.y if w else 3.0
+	var d := randf_range(lo, hi)
+	if w and w.is_ranged():
+		var m := act_target
+		if m == null or m.dead:
+			m = Combat.nearest_monster(zone, mouse_tile(), 3.0)
+		var to := m.tp if m else mouse_tile()
+		var mi: Missile = Missile.fire(zone, tp + (to - tp).normalized() * 0.4, to, 11.0, d * st.skill_mult(), "magic", "hero", "bolt")
+		mi.height = 70.0
+		return
+	d *= st.melee_mult() * act_mult
+	var m2 := act_target
+	if m2 and not m2.dead and tp.distance_to(m2.tp) <= _reach() + m2.radius + 0.4:
+		var dealt: float = Combat.hit_monster(m2, d, "phys", tp, {"melee": true, "heavy": act_mult > 1.5})
+		skills.on_weapon_hit(m2, dealt)
+		# a third splashes onto anything touching the target
+		for o in Combat.monsters_in(zone, m2.tp, 0.7):
+			if o != m2:
+				Combat.hit_monster(o, d / 3.0, "phys", tp, {"melee": true})
+		_weapon_elements(m2)
+		if act_mult > 1.5 and Settings.screen_shake:
+			Game.hitstop(0.07)
+	else:
+		# a swing at the air still cuts what stands in front
+		var front := tp + Vector2(cos(0), sin(0)) * 0.0
+		for o in Combat.monsters_in(zone, tp + (mouse_tile() - tp).normalized() * 1.0, 0.8):
+			Combat.hit_monster(o, d, "phys", tp, {"melee": true})
+
+func _weapon_elements(m: Monster) -> void:
+	var f := st.item("fire")
+	if f > 0.0:
+		Combat.hit_monster(m, f * 0.5, "fire", tp, {"poise": 0.0})
+		m.add_dot(f * 0.5, 3.0, "fire")
+	var c := st.item("cold")
+	if c > 0.0:
+		Combat.hit_monster(m, c, "cold", tp, {"poise": 0.0})
+		m.slow = maxf(m.slow, 0.35)
+	var mg := st.item("magic") + st.item("ltng")
+	if mg > 0.0:
+		Combat.hit_monster(m, mg, "magic", tp, {"poise": 0.0})
+		if randf() < 0.25:
+			m.stun = maxf(m.stun, 0.15)
+	var p := st.item("psn")
+	if p > 0.0:
+		m.add_dot(p / 2.0, 3.0, "poison")
+
+# ------------------------------------------------------------------ roll, poise, damage
+func roll() -> void:
+	if act == "stun" or shaken:
+		if shaken:
+			Bus.say.emit("Too shaken to roll.", 1.0)
+		return
+	if st.poise < 16.0:
+		return
+	spend_poise(34.0)
+	var to := mouse_tile() - tp
+	roll_dir = to.normalized() if to.length() > 0.1 else Vector2(1, 1).normalized()
+	_face(roll_dir)
+	act = ""
+	charge = 0.0
+	string_i = 0
+	_start_act("roll", 0.34)
+	spr.play("dodge" if spr.set.has("dodge") else "walk", true, false)
+	spr.fps_override = spr.frame_count() / 0.34
+	invuln = 0.3
+	walking = false
+
+func spend_poise(n: float) -> void:
+	st.poise = maxf(0.0, st.poise - n)
+	st.poise_delay = 1.0
+
+func poise_hit(pd: float, from: Vector2, heavy: bool) -> void:
+	if break_grace > 0.0:
+		return
+	st.poise -= pd
+	st.poise_delay = 1.0
+	if heavy and from != Vector2.INF:
+		tp = zone.move(tp, (tp - from).normalized() * 0.2, radius)
+	if st.poise <= 0.0:
+		st.poise = 0.0
+		act = ""
+		_start_act("stun", 0.75 * Combat.STAGGER)
+		spr.play("hit" if spr.set.has("hit") else "idle", true, false)
+		poise_burst = st.poise_max() * 0.5
+		break_grace = 0.9 + 1.6
+		shaken = true
+		walking = false
+
+func absorb(d: float, elem: String) -> float:
+	return skills.absorb(d, elem)
+
+func drink(i: int) -> void:
+	var k: String = st.inv.drink(i)
+	if k == "hp":
+		st.heal_pool += st.life_max() * 0.4
+	elif k == "mp":
+		st.restore_pool += st.res_max() * 0.5
+	stats_changed.emit()
+
+func die() -> void:
+	if dead:
+		return
+	dead = true
+	act = ""
+	spr.play("death", true, false)
+	spr.fps_override = 0.0
+	died.emit()
+	Bus.hero_died.emit()
+
+func revive(at: Vector2) -> void:
+	dead = false
+	tp = at
+	st.hp = st.life_max()
+	st.res = st.res_max()
+	st.poise = st.poise_max()
+	act = ""
+	target = null
+	walking = false
+	spr.play("idle", true)
+	lamp.texture_scale = light_radius() * Iso.HX * 2.0 / 512.0 * 1.25
+	_sync()
+	stats_changed.emit()

@@ -26,6 +26,7 @@ var connections: Array = []
 var arrive := {}
 var markers := {}
 var wall_nodes: Array = []
+var hero_ref: Hero
 
 static func rle(a: Array, n: int) -> PackedByteArray:
 	var out := PackedByteArray()

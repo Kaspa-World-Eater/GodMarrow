@@ -25,3 +25,5 @@ environment/defaults/default_clear_color=Color(0.02, 0.02, 0.025, 1)
 
 Data="*res://core/data.gd"
 Game="*res://core/game.gd"
+Bus="*res://core/bus.gd"
+Settings="*res://core/settings.gd"

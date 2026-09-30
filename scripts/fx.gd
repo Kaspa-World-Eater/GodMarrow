@@ -38,3 +38,22 @@ static func blood(parent: Node, pos: Vector2, dir: Vector2, n: int) -> void:
 		tw.tween_interval(randf_range(14, 22))
 		tw.tween_property(s, "modulate:a", 0.0, 3.0)
 		tw.tween_callback(s.queue_free)
+
+
+## damage numbers (off by default): chunky digits that rise and fade
+static func number(parent: Node, pos: Vector2, v: float) -> void:
+	var l := Label.new()
+	l.text = str(int(round(v)))
+	l.add_theme_font_size_override("font_size", 22 if v < 50 else 34)
+	l.add_theme_color_override("font_color", Color(0.86, 0.82, 0.72))
+	l.add_theme_color_override("font_outline_color", Color(0, 0, 0))
+	l.add_theme_constant_override("outline_size", 5)
+	l.position = pos + Vector2(randf_range(-14, 8), 0)
+	l.z_index = 200
+	l.z_as_relative = false
+	parent.add_child(l)
+	var tw: Tween = l.create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(l, "position:y", pos.y - 50.0, 0.8)
+	tw.tween_property(l, "modulate:a", 0.0, 0.6).set_delay(0.3)
+	tw.chain().tween_callback(l.queue_free)
