@@ -120,11 +120,21 @@ func poise_regen() -> float:
 
 func skill_mult() -> float:
 	var web := W("dmg") + (W("sun") if _lit() else 0.0)
-	return (1.0 + 0.012 * e_ess() + item("dmg") / 100.0) * (1.0 + web / 100.0) * (1.5 if item("echo") > 0.0 else 1.0)
+	return (1.0 + 0.012 * e_ess() + item("dmg") / 100.0) * (1.0 + web / 100.0) * (1.5 if item("echo") > 0.0 else 1.0) * fate_hour()
 
 func melee_mult() -> float:
 	var web := W("melee") + (W("moon") if not _lit() else 0.0)
-	return (1.0 + 0.015 * e_con()) * (1.0 + web / 100.0)
+	return (1.0 + 0.015 * e_con()) * (1.0 + web / 100.0) * (1.0 + float(fate.get("dmg", 0.0)) / 100.0) * fate_hour()
+
+## the Reading's damage by the hour: in the dark (night, or under the ground) or under an open sky
+func fate_hour() -> float:
+	var k := float(fate.get("dmg_day", 0.0)) if _lit() and _open_sky() else float(fate.get("dmg_night", 0.0)) if not _lit() else 0.0
+	return 1.0 + k / 100.0
+
+static func _open_sky() -> bool:
+	var ml := Engine.get_main_loop() as SceneTree
+	var m = ml.current_scene if ml else null
+	return m != null and "zone" in m and m.zone != null and bool(m.zone.d.get("outdoor", false))
 
 func cast_speed() -> float:
 	return 0.72 * (1.0 + (item("fcr") + W("fcr")) / 100.0)

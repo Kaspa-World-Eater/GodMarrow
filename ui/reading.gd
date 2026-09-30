@@ -20,18 +20,30 @@ const FPS := 10.0
 const CW := 162.0                 # a card on the cloth (54x84 x3)
 const CH := 252.0
 const STEPS := ["star", "face", "card", "fear", "seek", "road", "ask", "sac", "end"]
+## what he asks at each step (one of these, each time)
 const PROMPT := {
-	"face": "Your god you chose at the other fire. But a god wears more than one face, and one of them has been wearing you. Which?",
-	"card": "Four of the old cards. I will not tell you what is on them. Take one, and we will see which way up you are.",
-	"fear": "What do you fear? Say it plainly. Down there it will be asked less kindly.",
-	"seek": "And what do you go down for?",
-	"road": "Which road brought you to my fire?",
-	"sac": "A reading is not free. Something stays here with me. What will it be?",
+	"face": ["Your god you chose at the other fire. But a god wears more than one face, and one of them has been wearing you. Which?",
+		"Three faces on the one god. Look at them. One of them looked back. Which?"],
+	"card": ["Four of the old cards. I will not tell you what is on them. Take one, and we will see which way up you are.",
+		"The deck is older than the Hide. Older than me, nearly. Draw. Do not turn it; I will."],
+	"fear": ["What do you fear? Say it plainly. Down there it will be asked less kindly.",
+		"Everyone brings a fear to my fire. Put yours on the cloth where I can see it."],
+	"seek": ["And what do you go down for?", "Nobody goes down for nothing. What is it for you?"],
+	"road": ["Which road brought you to my fire?", "You came a long way to sit on this stone. Which way?"],
+	"sac": ["A reading is not free. Something stays here with me. What will it be?",
+		"And now the price. Not copper. Something of you. Choose, before I do."],
 }
 const STEP_NAME := {"star": "The God", "face": "The Face", "card": "The Card", "fear": "The Fear", "seek": "The Seeking",
 	"road": "The Road", "ask": "The Question", "sac": "The Price", "end": "The Reading"}
 ## how a fate's sum reads, in the order it is shown
-const FX_ORDER := ["skt0", "skt1", "skt2", "vit", "spi", "con", "hpPct", "armor", "stam", "res", "dmg", "fcr", "frw", "regen", "lok", "mf", "gold", "xp"]
+const FX_ORDER := ["skt0", "skt1", "skt2", "vit", "spi", "con", "life", "hpPct", "mana", "armor", "stam", "res", "res_fire", "res_cold", "res_poison",
+	"dmg", "dmg_day", "dmg_night", "raised", "fcr", "frw", "regen", "lok", "potion", "lrad", "mf", "gold", "xp"]
+const LAB := {"con": " Constitution", "vit": " Vitality", "spi": " Essence", "life": " life", "stam": " poise",
+	"lok": " life after each kill", "armor": " armor", "mf": "% magic find", "hpPct": "% life", "dmg": "% damage",
+	"dmg_night": "% damage in the dark", "dmg_day": "% damage under an open sky", "raised": "% damage to the raised dead",
+	"fcr": "% faster cast rate", "gold": "% gold found", "res": "% magic resist", "res_fire": "% fire resist",
+	"res_cold": "% cold resist", "res_poison": "% poison resist", "frw": "% faster movement", "xp": "% experience",
+	"lrad": "% lantern reach", "potion": "% from draughts"}
 
 var main: Node
 var cls := "animancer"
@@ -95,7 +107,7 @@ func _enter(i: int) -> void:
 	var s: String = STEPS[i]
 	var aside := ""
 	var asides: Dictionary = R.get("asides", {})
-	if asides.has(s) and randf() < 0.6:
+	if asides.has(s) and randf() < 0.5:
 		var a: Array = asides[s]
 		aside = String(a[randi() % a.size()]) + "  "
 	match s:
@@ -117,15 +129,32 @@ func _enter(i: int) -> void:
 			var qs: Array = R.get("questions", [])
 			question = qs[randi() % qs.size()] if not qs.is_empty() else {}
 			offer = question.get("a", []).duplicate()
-			prompt = " ".join(PackedStringArray(question.get("q", [])))
+			prompt = aside + " ".join(PackedStringArray(question.get("q", [])))
 		"end":
 			offer = []
-			var ps: Array = R.get("prophecies", [])
-			prophecy = String(ps[randi() % ps.size()]) if not ps.is_empty() else ""
+			# a prophecy that answers something he read tonight, if one does; else one of the old ones
+			var ids := {}
+			for p in picks:
+				ids[p["id"]] = true
+			var fit: Array = []
+			var any: Array = []
+			for pr in R.get("prophecies", []):
+				if pr is String:
+					any.append(pr)
+				elif pr.has("when"):
+					for w in pr["when"]:
+						if ids.has(w):
+							fit.append(pr["say"])
+							break
+				else:
+					any.append(pr["say"])
+			var pool: Array = fit if not fit.is_empty() and randf() < 0.75 else any
+			prophecy = String(pool[randi() % pool.size()]) if not pool.is_empty() else ""
 			_sum()
 			prompt = "That is as much of you as I can see. Go on, then. The dark is expecting you."
 	if PROMPT.has(s):
-		prompt = aside + String(PROMPT[s])
+		var pv: Array = PROMPT[s]
+		prompt = aside + String(pv[randi() % pv.size()])
 	root.queue_redraw()
 
 func _some(pool: Array, n: int) -> Array:
@@ -448,21 +477,10 @@ func _fx_line(k: String, v: float) -> String:
 					f = o
 			var tn := String(f.get("txt", "")).get_slice(" · ", 0).trim_prefix("+1 to ").trim_suffix(" skills")
 			return "%s%s to %s skills" % [sgn, n, tn if tn != "" else "one way's"]
-		"vit": return "%s%s Vitality" % [sgn, n]
-		"spi": return "%s%s Essence" % [sgn, n]
-		"con": return "%s%s Constitution" % [sgn, n]
-		"armor": return "%s%s armor" % [sgn, n]
-		"stam": return "%s%s poise" % [sgn, n]
-		"lok": return "%s%s life after each kill" % [sgn, n]
-		"hpPct": return "%s%s%% life" % [sgn, n]
-		"mf": return "%s%s%% magic find" % [sgn, n]
-		"dmg": return "%s%s%% skill damage" % [sgn, n]
-		"fcr": return "%s%s%% faster cast rate" % [sgn, n]
-		"gold": return "%s%s%% gold found" % [sgn, n]
-		"res": return "%s%s%% magic resist" % [sgn, n]
-		"frw": return "%s%s%% faster movement" % [sgn, n]
-		"xp": return "%s%s%% experience" % [sgn, n]
+		"mana": return "%s%s to your %s" % [sgn, n, _res_word()]
 		"regen": return "%s%s%% %s regained" % [sgn, n, _res_word()]
+	if LAB.has(k):
+		return sgn + n + String(LAB[k])
 	return "%s%s %s" % [sgn, n, k]
 
 func _res_word() -> String:
@@ -479,19 +497,22 @@ func _draw_end(ci: CanvasItem, a: float) -> void:
 		y += 50.0
 	# what the Reading made of you
 	y += 20.0
-	var keys: Array = []
+	# what it gave on the left, what it took on the right
+	var gave: Array = []
+	var took: Array = []
 	for k in FX_ORDER:
 		if fate.has(k):
-			keys.append(k)
-	var col_w := 360.0
-	var n := keys.size()
-	var per := int(ceil(n / 2.0))
-	for i in n:
-		var k: String = keys[i]
-		var v: float = fate[k]
-		var cx := 960.0 - col_w + (i / per) * col_w
-		var yy := y + (i % per) * 28.0
-		ci.draw_string(fb, Vector2(cx, yy), _fx_line(k, v), HORIZONTAL_ALIGNMENT_CENTER, col_w, 21, Color(Color("#9fb08a") if v > 0 else Color("#b58a7a"), a))
+			(gave if float(fate[k]) > 0.0 else took).append(k)
+	var col_w := 380.0
+	ci.draw_string(sc, Vector2(960.0 - col_w - 20.0, y), "IT GAVE", HORIZONTAL_ALIGNMENT_CENTER, col_w, 14, Color(ASH, a))
+	ci.draw_string(sc, Vector2(980.0, y), "IT TOOK", HORIZONTAL_ALIGNMENT_CENTER, col_w, 14, Color(ASH, a))
+	y += 28.0
+	for i in gave.size():
+		ci.draw_string(fb, Vector2(960.0 - col_w - 20.0, y + i * 26.0), _fx_line(gave[i], fate[gave[i]]), HORIZONTAL_ALIGNMENT_CENTER, col_w, 20, Color(Color("#9fb08a"), a))
+	for i in took.size():
+		ci.draw_string(fb, Vector2(980.0, y + i * 26.0), _fx_line(took[i], fate[took[i]]), HORIZONTAL_ALIGNMENT_CENTER, col_w, 20, Color(Color("#b58a7a"), a))
+	var per := maxi(gave.size(), took.size())
+	per = int(per * 26.0 / 28.0) + 1
 	# Rise
 	var rr := Rect2(860, maxf(860.0, y + per * 28.0 + 10.0), 200, 56)
 	rise_r = rr
@@ -499,4 +520,4 @@ func _draw_end(ci: CanvasItem, a: float) -> void:
 	ci.draw_rect(rr, Color(0.05, 0.04, 0.05, 0.9 * a))
 	ci.draw_rect(rr, Color(MARROW if on else MARROW_D, a), false, 1.5)
 	ci.draw_string(sc, rr.position + Vector2(0, 38), "Rise", HORIZONTAL_ALIGNMENT_CENTER, rr.size.x, 30, Color(BONE if on else BONE_D, a))
-	ci.draw_string(fi, Vector2(410, 1010), prompt, HORIZONTAL_ALIGNMENT_CENTER, 1100, 24, Color(BONE_D, a))
+	ci.draw_string(fi, Vector2(410, maxf(1010.0, rr.end.y + 40.0)), prompt, HORIZONTAL_ALIGNMENT_CENTER, 1100, 24, Color(BONE_D, a))

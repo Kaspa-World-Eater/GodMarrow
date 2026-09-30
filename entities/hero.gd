@@ -522,9 +522,9 @@ func drink(i: int) -> void:
 		if st.arc and st.arc.aR("v_crown"):
 			Bus.say.emit("The draught does nothing. The choir mends you now.", 1.6)
 		else:
-			st.heal_pool += st.life_max() * 0.4
+			st.heal_pool += st.life_max() * 0.4 * (1.0 + float(st.fate.get("potion", 0.0)) / 100.0)
 	elif k == "mp":
-		st.restore_pool += st.res_max() * 0.5
+		st.restore_pool += st.res_max() * 0.5 * (1.0 + float(st.fate.get("potion", 0.0)) / 100.0)
 	stats_changed.emit()
 
 func die() -> void:

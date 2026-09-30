@@ -174,8 +174,19 @@ func move_speed() -> float:
 func can_act() -> bool:
 	return not dead and stun <= 0.0 and reeling <= 0.0
 
+## the raised dead: bone and husk the Ossuary stood back up (the Reading's "damage to the raised dead", the Unraised)
+const RAISED := ["hollow", "drowned", "archer", "ossarcher", "marrow", "knight", "hbone", "hhollow", "calc_knight", "marrow_ghoul", "chalk_wraith", "osteo"]
+func is_raised() -> bool:
+	if kind in RAISED:
+		return true
+	var n := name_shown.to_lower()
+	return n.contains("husk") or n.contains("ossuary") or n.contains("weeper") or n.contains("bone") or n.contains("marrow")
+
 func damage_taken_mult(elem: String, from: Vector2, opts: Dictionary) -> float:
 	var k := 1.0
+	var h := hero()
+	if h and h.st and not opts.get("dot", false) and h.st.fate.has("raised") and is_raised():
+		k *= 1.0 + float(h.st.fate["raised"]) / 100.0
 	if marked > 0.0:
 		k *= 1.3
 	if brain:
