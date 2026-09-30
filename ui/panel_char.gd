@@ -10,6 +10,7 @@ const ATTR := [["vit", "Vitality", "Life and poise"], ["ess", "Essence", ""], ["
 
 var hud: Node
 var hover := ""
+var token_armed := 0.0      # the Hollow Token: a second click within 3 s unmakes the pilgrim's choices
 
 func _ready() -> void:
 	offset_right = PW * U.S
@@ -31,6 +32,8 @@ func _at(lp: Vector2) -> String:
 			return "+" + ATTR[i][0]
 		if Rect2(10, y - 9, 216, 22).has_point(lp):
 			return "row:" + ATTR[i][0]
+	if Rect2(140, 43, 82, 12).has_point(lp):
+		return "token"
 	if Rect2(8, 26, 220, 18).has_point(lp):
 		return "xp"
 	return ""
@@ -45,6 +48,13 @@ func _gui_input(ev: InputEvent) -> void:
 	var what := _at(ev.position / U.S)
 	if what == "close":
 		hud.toggle_panel("char")
+	elif what == "token" and h and h.st.hollow_tokens > 0:
+		var now := Time.get_ticks_msec() / 1000.0
+		if now < token_armed:
+			token_armed = 0.0
+			_respec(h)
+		else:
+			token_armed = now + 3.0
 	elif what.begins_with("+") and h and h.st.attr_points > 0:
 		var k := what.substr(1)
 		var n := 5 if Input.is_key_pressed(KEY_SHIFT) else 1
@@ -73,6 +83,8 @@ func tip() -> Array:
 	match hover:
 		"close":
 			return [["Close (C)", U.TEXT]]
+		"token":
+			return [["Hollow Token", U.TEXT], ["Unmake what you chose: every skill point, every attribute point and every", U.MUTED], ["Arcanum comes back to be spent again. The token is used up.", U.MUTED], ["Click twice within three breaths", U.FAINT]]
 		"xp":
 			return [["Level %d" % st.level, U.GOLD_D], ["Experience %d / %d" % [st.xp, st.xp_to_next()], U.MUTED]]
 		"+vit", "row:vit":
@@ -101,6 +113,8 @@ func _draw() -> void:
 	U.rect(self, 15, 39, roundf(206 * clampf(float(st.xp) / maxf(1, st.xp_to_next()), 0, 1)), 1, Color("#8a6a2a"))
 	y += 16
 	U.text(self, "Stat points: %d" % st.attr_points, 14, y, U.GOLD if st.attr_points > 0 else U.DIM)
+	var armed := Time.get_ticks_msec() / 1000.0 < token_armed
+	U.stud(self, 140, y - 9, 82, 12, ("Again to unmake" if armed else "Hollow Token: %d" % st.hollow_tokens), st.hollow_tokens > 0, U.RED if armed else U.TEXT, hover == "token")
 	y += 14
 	for a in ATTR:
 		var k: String = a[0]
@@ -164,3 +178,30 @@ func _sigil(k: String, x: float, y: float, cls: String) -> void:
 			U.rect(self, x + 3, y + 8, 7, 1, G[1])
 			U.rect(self, x + 1, y + 6, 2, 4, G[0])
 			U.rect(self, x + 3, y + 6, 1, 1, G[4])
+
+
+## the Hollow Token (k_arcana.js fullRespec): skills, attributes and Arcana back to be spent again
+func _respec(h: Hero) -> void:
+	var st := h.st
+	st.hollow_tokens -= 1
+	var back := (st.vit - 15) + (st.ess - 25) + (st.con - 15)
+	st.vit = 15
+	st.ess = 25
+	st.con = 15
+	st.attr_points += maxi(0, back)
+	var sk = h.skills
+	var pts := 0
+	for id in sk.hard:
+		pts += int(sk.hard[id])
+	sk.hard.clear()
+	sk.left = "attack"
+	sk.right = "attack"
+	st.skill_points += pts
+	if sk.has_method("on_death"):
+		sk.on_death()   # what the unlearned skills held up falls away (the choir regrows)
+	if st.has_method("respec_arcana"):
+		st.respec_arcana()
+	st.hp = minf(st.hp, st.life_max())
+	st.res = minf(st.res, st.res_max())
+	Bus.say.emit("The token hollows out in your palm. You are unmade, and may be made again.", 3.5)
+	h.stats_changed.emit()
