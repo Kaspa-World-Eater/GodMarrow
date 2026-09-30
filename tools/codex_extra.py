@@ -18,6 +18,7 @@ EXTRA = [
      "The [b]Nail-Fisted[/b] break your footing whatever you wear. A shield will not save you. Distance will.\n\n"
      "The [b]Thorned[/b] give back part of every close blow. Strike them from further off, or strike them once and well.\n\n"
      "Near a [b]Candle-Eater[/b] your lantern shrinks, as if something breathed on the wick. Kill it first, or you will not see the rest.\n\n"
+     "The [b]Bursting[/b] do not lie still. The body swells and flies apart in bone. When it falls, walk away from it, not toward.\n\n"
      "The [b]Warded[/b] shrug off workings: blood, breath, the light and the dark all slide from them. Steel does not.\n\n"
      "The [b]Unquiet[/b] do not walk to you. They are simply nearer. If you turn your back on one, turn it back quickly.\n"
      + ORN +

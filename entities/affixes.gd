@@ -8,7 +8,8 @@ extends RefCounted
 ## Test: --affix=Name forces a deed on every champion and unique that is made.
 ## The user's rules (2026-09-30): nothing a creature leaves on the ground when it dies may hurt (it is no fun if you do
 ## not see it), and no Diablo III / IV style marks (beams, orbiting fire, trails of burning ground): D2's kind only.
-## So Ash-Trailing and Bursting were taken out the day they were made; Warded (D2's Magic Resistant) came in.
+## So Ash-Trailing was taken out the day it was made, and Warded (D2's Magic Resistant) came in. Bursting stays: the
+## user counts a plainly marked burst on death as fair (as the Pyre-Saint's eruption).
 
 const SHOWN := {"Extra Strong": "Heavy-Handed", "Extra Fast": "Quick", "Stone Skin": "Stone-Skinned"}
 ## deed -> what the Stranger would say of it (the Codex and tooltips may use these)
@@ -19,9 +20,10 @@ const DEEDS := {
 	"Thorned": "Strike it close and some of the blow comes back.",
 	"Candle-Eater": "Near it, your lantern shrinks, as if something breathed on it.",
 	"Warded": "Workings slide off it. Steel does not.",
+	"Bursting": "It does not lie still when it dies. Step away from the body.",
 	"Unquiet": "It does not walk to you. It is simply nearer.",
 }
-const ORDER := ["Grave-Called", "Thirsting", "Nail-Fisted", "Thorned", "Candle-Eater", "Warded", "Unquiet"]
+const ORDER := ["Grave-Called", "Thirsting", "Nail-Fisted", "Thorned", "Candle-Eater", "Warded", "Bursting", "Unquiet"]
 const WARD_ELEMS := ["magic", "miasma", "blood", "void", "radiance", "fire", "cold", "poison"]
 
 static var trace := OS.get_cmdline_user_args().has("--afftrace")
@@ -81,6 +83,8 @@ static func on_death(m) -> void:
 	say("death %s %s" % [m.name_shown, str(m.mods)])
 	if "Grave-Called" in m.mods:
 		AffixFx.graves(m, 2 if m.rank == "unique" else 1)
+	if "Bursting" in m.mods:
+		AffixFx.burst(m)
 
 ## a creature's blow lands on the hero: how much harder it breaks the hero's footing
 static func strike_poise(by) -> float:
