@@ -341,8 +341,20 @@ func _size(v: float) -> float:
 	return v if cf < 0.0 else v * (0.8 + 0.3 * cf)
 
 ## costs: the data's base (already x1.6 and x1.2), +5% a level; Word of Power: Thread spells cost 10% less
+## v103 balance (tools/balance: the arena runs, wiki/15): the Mirror tree's and the dear spells' costs come down, the
+## weak ones hit harder, Soul Leash a little softer. --nobal turns it off (for comparisons).
+const BAL_COST := {"word": 0.75, "storm": 0.85, "cage": 0.82, "fissure": 0.8, "orb": 0.8, "anvil": 0.9, "pillars": 0.9}
+const BAL_DMG := {"fissure": 1.6, "orb": 1.35, "word": 1.25, "chain": 1.25, "anvil": 1.2, "cage": 1.2, "leash": 0.85}
+static var _bal_on := -1
+static func bal_on() -> bool:
+	if _bal_on < 0:
+		_bal_on = 0 if OS.get_cmdline_user_args().has("--nobal") else 1
+	return _bal_on == 1
+
 func cost(id: String) -> float:
 	var c: float = super.cost(id)
+	if bal_on():
+		c *= float(BAL_COST.get(id, 1.0))
 	if K("wordpower") > 0 and int(data.get(id, {}).get("tab", 0)) == 2:
 		c *= 0.9
 	return c
@@ -618,6 +630,8 @@ func hurt(m, dmg: float, id: String = "", o: Dictionary = {}) -> float:
 	if m == null or not is_instance_valid(m) or m.dead or m.buried or dmg <= 0.0:
 		return 0.0
 	var d := dmg
+	if bal_on():
+		d *= float(BAL_DMG.get(id, 1.0))
 	if not o.get("golem", false) and not o.get("nochoir", false):
 		d *= choir_k()
 	if m.marked > 0.0:
@@ -2750,6 +2764,8 @@ func _autocast(dt: float) -> void:
 			auto_t = 0.4
 		return
 	if auto_t > 0.0 or m == null:
+		if auto_t <= 0.0 and OS.get_cmdline_user_args().has("--autodbg"):
+			print("AUTO no target")
 		return
 	var ids: Array = auto_ids if not auto_ids.is_empty() else data.keys().filter(func(k): return not is_passive(k))
 	ids = ids.filter(func(k): return lvl(k) > 0)
@@ -2774,6 +2790,8 @@ func _autocast(dt: float) -> void:
 		if use(id, at, m):
 			hero._start_act("cast", 0.55 / hero.st.cast_speed())
 			hero.walking = false
+		elif OS.get_cmdline_user_args().has("--autodbg"):
+			print("AUTO fail ", id, " act=", hero.act, " res=", hero.st.res, " cost=", cost(id), " lvl=", lvl(id))
 
 # ================================================================== for the monster AI helper
 ## the nearest of the hero and the standing allies to a creature (or a point); Dazzling Challenge draws a

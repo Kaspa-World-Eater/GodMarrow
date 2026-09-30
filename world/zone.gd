@@ -225,18 +225,36 @@ func _scatter() -> void:
 	if sc.is_empty():
 		return
 	var texs := {}
+	var sway := {}
 	for s in sc.get("sprites", []):
 		var fr: Array = s.get("frames", [])
 		if fr.is_empty():
 			continue
-		var uri: String = fr[min(1, fr.size() - 1)]
-		var img := Image.new()
-		if img.load_png_from_buffer(Marshalls.base64_to_raw(uri.split(",")[1])) == OK:
-			texs[s["id"]] = ImageTexture.create_from_image(img)
+		var frames: Array = []
+		for uri in fr:
+			var img := Image.new()
+			if img.load_png_from_buffer(Marshalls.base64_to_raw(String(uri).split(",")[1])) == OK:
+				frames.append(ImageTexture.create_from_image(img))
+		if frames.is_empty():
+			continue
+		texs[s["id"]] = frames[mini(1, frames.size() - 1)]
+		if bool(s.get("sway", false)) and frames.size() >= 3:
+			sway[s["id"]] = frames
+	# the still litter in one batch; grass and reeds in their own layer, leaning with the wind (Game.wind)
+	var still: Array = []
+	var moving: Array = []
+	for it in sc.get("items", []):
+		(moving if sway.has(it[2]) else still).append(it)
 	var layer := ScatterLayer.new()
-	layer.items = sc.get("items", [])
+	layer.items = still
 	layer.texs = texs
 	floor_layer.add_child(layer)
+	if not moving.is_empty():
+		var sl := ScatterLayer.new()
+		sl.items = moving
+		sl.texs = texs
+		sl.sway = sway
+		floor_layer.add_child(sl)
 
 # ------------------------------------------------------------------ walls and cliffs
 func _walls() -> void:

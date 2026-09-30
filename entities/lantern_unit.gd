@@ -69,7 +69,7 @@ func _process(dt: float) -> void:
 		tp = hero.tp + (tp - hero.tp) / d * 0.75
 	z = 20.0 + sin(tt * 1.55) * 1.6 + sin(tt * 0.6) * 0.8
 	var svx := (v.x - v.y) * 72.0 / 4.0
-	tilt += (clampf(-svx * 0.004, -0.35, 0.35) - tilt) * minf(1.0, dt * 5.0)
+	tilt += (clampf(-svx * 0.004 + Game.wind * 0.08 * sin(t * 1.7), -0.35, 0.35) - tilt) * minf(1.0, dt * 5.0)   # it leans with its motion and the gust
 	position = Iso.to_screen(tp)
 	if spr and spr.texture:
 		var w := spr.texture.get_width() * spr.scale.x

@@ -89,7 +89,8 @@ func res_regen() -> float:
 func _res_regen0() -> float:
 	match cls:
 		"animancer":
-			return 0.6 + 0.03 * e_ess()
+			# v103 balance: twice the web's refill, so the Mystic casts more than once a minute (--nobal: the web's)
+			return (0.6 + 0.03 * e_ess()) * (1.0 if OS.get_cmdline_user_args().has("--nobal") else 2.0)
 		"ossumancer":
 			return 1.2 + 0.04 * e_ess()
 		"hemomancer":
