@@ -22,6 +22,8 @@ var whisper_t := 60.0         # the world's whispers (zz_voice.js): every 60-120
 var voice := {}
 var last_whisper := ""
 var boss_awake: Node = null
+var title_open := false      # ui/title.gd is up: the camera drifts, the HUD and the pilgrim wait
+var title_t := 0.0
 var pending_load := {}        # a save waiting to be poured into the first hero (Continue)
 const SaveIO := preload("res://core/save.gd")
 
@@ -36,6 +38,13 @@ func _ready() -> void:
 		Game.cls = args["cls"]
 	if args.has("hour"):
 		Game.clock = float(args["hour"]) * Game.day_len
+	if Game.force_new:
+		args["new"] = "1"
+		Game.force_new = false
+	# the title: when the game is simply launched (no test arguments), or with --title
+	var plain := args.is_empty() or (args.size() == 1 and args.has("hour"))
+	title_open = (plain and not Game.skip_title) or args.has("title")
+	Game.skip_title = false
 	# Continue: the saved pilgrim, in a freshly rolled world, at the camp (--new starts over)
 	if not args.has("new") and not args.has("demo") and SaveIO.exists():
 		pending_load = SaveIO.read()
@@ -162,6 +171,8 @@ func enter(zid: String, from: String) -> void:
 		if args.has("hour"):
 			Game.clock = float(args["hour"]) * Game.day_len
 	hero.died.connect(_on_hero_died)
+	if title_open:
+		_title_open()
 	for m in zone.d.get("monsters", []):
 		# the safe circle of a town holds no creatures
 		var sc = zone.markers.get("safeCircle")
@@ -194,6 +205,24 @@ func enter(zid: String, from: String) -> void:
 	save_game()
 	await get_tree().create_timer(0.5).timeout
 	travelling = false
+
+## the title (ui/title.gd): the world runs behind it; the pilgrim and the HUD wait
+func _title_open() -> void:
+	var T = load("res://ui/title.gd").new(self)
+	add_child(T)
+	if hud:
+		hud.visible = false
+		hud.set_process_input(false)
+	hero.set_process_unhandled_input(false)
+	hero.set_process_input(false)
+
+func title_done() -> void:
+	title_open = false
+	if hud:
+		hud.visible = true
+		hud.set_process_input(true)
+	hero.set_process_unhandled_input(true)
+	hero.set_process_input(true)
 
 ## the lantern's panel: go to any lantern kindled on this walk
 func travel_lantern(e: Dictionary) -> void:
@@ -244,6 +273,10 @@ func _process(_dt: float) -> void:
 	if hero == null or zone == null or travelling:
 		return
 	cam.position = eye.update(_dt, hero, boss_awake, zone)
+	if title_open:
+		# the title's slow drift over the camp: wide, unhurried, never quite repeating
+		title_t += _dt
+		cam.position += Vector2(-240.0 + sin(title_t * 0.045) * 200.0 + sin(title_t * 0.11) * 40.0, -60.0 + cos(title_t * 0.037) * 70.0)
 	cam.offset = Vector2(randf_range(-1, 1), randf_range(-1, 1)) * Game.shake_amt if Game.shake_amt > 0.05 else Vector2.ZERO
 	ambient.color = Color.WHITE   # the dark layer does the night now (web model)
 	# gates and caves: walk onto one to go through

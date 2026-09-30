@@ -7,6 +7,8 @@ var day_len := 600.0
 var clock := 0.12 * 600.0
 var zone_seeds := {}       # zone id -> exported seed chosen for this run (maps are random per new game)
 var visited := {}
+var skip_title := false      # a new pilgrim chosen on the title reloads the scene straight into play
+var force_new := false
 
 func new_run() -> void:
 	seed = randi()

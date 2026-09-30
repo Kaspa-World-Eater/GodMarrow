@@ -33,7 +33,7 @@ func close() -> void:
 func _build() -> void:
 	match page:
 		"main":
-			rows = [["Resume", "resume"], ["Written." if saved else "Save the pilgrim", "save"], ["Options", "options"], ["Controls", "controls"], ["Save and quit", "quit"]]
+			rows = [["Resume", "resume"], ["Written." if saved else "Save the pilgrim", "save"], ["The Codex", "codex"], ["Options", "options"], ["Controls", "controls"], ["Save and quit", "quit"]]
 		"options":
 			rows = [
 				["Damage numbers: " + _on(Settings.damage_numbers), "t:damage_numbers"],
@@ -83,6 +83,8 @@ func _gui_input(ev: InputEvent) -> void:
 func _act(a: String, down: bool) -> void:
 	if a == "resume":
 		close()
+	elif a == "codex":
+		hud.open_codex()
 	elif a == "options" or a == "controls":
 		page = a
 	elif a == "back":
@@ -117,7 +119,7 @@ func key_back() -> void:
 const CONTROLS := [
 	["Left click", "walk, strike, take"], ["Shift + left", "strike where you stand"], ["Hold the strike", "a heavy blow"],
 	["Right click", "the right skill (hold to repeat)"], ["Space", "roll"], ["1 - 4", "drink from the belt"],
-	["Q W E R T Y U F", "choose the right skill (shift: left)"], ["I  C  S  Tab", "pack, self, skills, map"], ["L", "the wick down or up"]]
+	["Q W E R T Y U F", "choose the right skill (shift: left)"], ["I  C  S  Tab  K", "pack, self, skills, map, the Codex"], ["L", "the wick down or up"]]
 
 func _draw() -> void:
 	if not visible:

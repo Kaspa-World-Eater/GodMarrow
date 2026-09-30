@@ -25,6 +25,7 @@ var p_char: Control
 var p_skills: Control
 var picker: Control
 var pause: Control
+var codex: Control
 var top: Control             # tooltip and carried item
 
 var cursor_item: Item = null
@@ -90,6 +91,9 @@ func _ready() -> void:
 	pause.hud = self
 	pause.visible = false
 	root.add_child(pause)
+	codex = load("res://ui/codex.gd").new()
+	codex.visible = false
+	root.add_child(codex)
 	top = _layer(_draw_top)
 	Bus.say.connect(_on_say)
 	Bus.boss_woke.connect(func(m): boss = m)
@@ -144,6 +148,13 @@ func bind(h: Hero, z: Zone) -> void:
 						p_char.visible = false
 					"map", "tab":
 						automap.visible = true
+					"codex", "k":
+						open_codex()
+						if args.has("page"):
+							var cp := str(args["page"]).split(".")
+							codex.ch = int(cp[0])
+							codex.pg = int(cp[1]) if cp.size() > 1 else 0
+							codex.open_book()
 					"pause", "menu", "options":
 						pause.open()
 						if p == "options":
@@ -287,6 +298,13 @@ func menu_click(id: String) -> void:
 	else:
 		toggle_panel(id)
 
+## the Codex of the Hide (ui/codex.gd), from K or the pause menu
+func open_codex() -> void:
+	codex.on_close = func(): get_tree().paused = pause.visible
+	get_tree().paused = true
+	Sfx.play("page_open")
+	codex.open_book()
+
 func any_panel() -> bool:
 	return p_inv.visible or p_char.visible or p_skills.visible or p_town.visible or p_orders.visible or p_board.visible or picking != ""
 
@@ -327,6 +345,8 @@ func _input(ev: InputEvent) -> void:
 		mouse = ev.position
 	if ev is InputEventKey and ev.pressed and not ev.echo:
 		var k := ev.keycode as Key
+		if codex.visible:
+			return          # the book reads its own keys
 		if pause.visible:
 			if k == KEY_ESCAPE:
 				pause.key_back()
@@ -361,6 +381,8 @@ func _input(ev: InputEvent) -> void:
 				toggle_panel("choir")
 			KEY_G:
 				toggle_panel("golem")
+			KEY_K:
+				open_codex()
 			KEY_ESCAPE:
 				if any_panel():
 					close_panels()
