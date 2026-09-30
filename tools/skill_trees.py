@@ -464,6 +464,56 @@ for s in S:
                 s['col'] = c
                 break
 
+
+# ---- the trees intersected the way Diablo II's are (2026-09-30, the user): skills rest on one or two others, lines
+#      cross between the columns and meet again lower down, and each Mastery rests on the tree's deep skills.
+PREREQ = {
+    # the Hollow Mystic
+    'fissure': ['pillars'], 'overcharge': ['golem'], 'toss': ['golem'], 'cage': ['fissure', 'overcharge'],
+    'challenge': ['overcharge', 'toss'], 'thorns': ['toss'], 'anvil': ['cage', 'challenge'], 'forge': ['anvil', 'thorns'],
+    'restless': ['wisps'], 'beam': ['wisps'], 'cull': ['restless'], 'condense': ['restless', 'beam'], 'prism': ['beam'],
+    'proc': ['condense'], 'totem': ['prism', 'condense'], 'choir': ['cull', 'proc'], 'animam': ['proc', 'totem'],
+    'wraith': ['ward'], 'storm': ['swarm'], 'mark': ['swarm', 'lance'], 'orb': ['lance'], 'leash': ['mark', 'wraith'],
+    'word': ['orb'], 'chain': ['word', 'leash'], 'nmastery': ['leash', 'chain'],
+    # the Shrine Keeper
+    'inhale': ['mcloud'], 'pnova': ['mcloud'], 'contagion': ['inhale', 'vblade'], 'rotwall': ['shuriken', 'pnova'],
+    'exhale': ['pnova', 'contagion'], 'mstorm': ['exhale', 'rotwall'], 'toxic': ['mstorm'],
+    'mwake': ['ntrap'], 'haze': ['blur'], 'bmine': ['mwake'], 'mirage': ['haze'], 'lure': ['haze', 'bmine'],
+    'warp': ['mirage'], 'sister': ['warp', 'lure'], 'unseen': ['sister', 'bmine'],
+    'talon': ['rarc'], 'dstep': ['thrust'], 'reap': ['talon', 'gstrike'], 'flurry': ['gstrike'], 'dhead': ['dstep'],
+    'execute': ['flurry', 'dhead'], 'deathm': ['execute', 'reap'],
+    # the Empty Hand
+    'klaugh': ['kdawn'], 'kstar': ['kamber'], 'ksutra': ['klaugh'], 'kfist': ['khands', 'kstar'], 'ktears': ['ksutra', 'kstar'],
+    'keye': ['kstar'], 'kbell': ['kfist'], 'klotus': ['keye', 'kbell'], 'ksun': ['klotus', 'ktears'],
+    'kbowl': ['keclipse'], 'kspade': ['kpalm'], 'kpinch': ['kclap'], 'kbelow': ['kspade', 'kbowl'], 'kspit': ['kpinch'],
+    'kmirror': ['kbowl'], 'kwalk': ['kspit', 'kbelow'], 'knothing': ['kmirror', 'kwalk'],
+    'kobsid': ['kbar'], 'kmount': ['kfinger'], 'kstep': ['kmount', 'kobsid'], 'kpagoda': ['kgrip', 'kmount'],
+    'kweep': ['kobsid'], 'kthousand': ['kstep', 'kweep'],
+    # the Ossuarch
+    'offering': ['raise'], 'tithe': ['raise'], 'unearth': ['offering'], 'colossus': ['offering', 'tithe'], 'horn': ['tithe'],
+    'host': ['colossus'], 'reasm': ['unearth', 'host'], 'legion': ['reasm', 'horn'],
+    'siphon': ['spear'], 'ribcage': ['barmor'], 'ossify': ['aura'], 'spikes': ['ribcage', 'ossify'],
+    'sstorm': ['siphon', 'spikes'], 'bonerain': ['spikes'], 'spirit': ['sstorm', 'bonerain'], 'marrowm': ['spirit'],
+    'gcharge': ['blade'], 'crush': ['blade', 'tally'], 'opencount': ['tally'], 'bscythe': ['crush'],
+    'fewer': ['opencount', 'crush'], 'leap': ['gcharge', 'bscythe'], 'lash': ['bscythe'], 'weighing': ['fewer'],
+    'ninthstair': ['lash', 'weighing'], 'countm': ['ninthstair', 'leap'],
+    # the Red Penitent
+    'swallow': ['maw'], 'tentacles': ['maw', 'chitin'], 'devour': ['swallow'], 'gills': ['chitin'],
+    'bilehump': ['tentacles', 'devour'], 'molt': ['gills'], 'vigil': ['bilehump', 'molt'], 'fmastery': ['vigil'],
+    'hemor': ['bboil'], 'hatch': ['blance'], 'vwhip': ['blance'], 'cburst': ['hemor'], 'thrall': ['hatch', 'vwhip'],
+    'bwave': ['cburst'], 'fgolem': ['thrall', 'cburst'], 'spool': ['vwhip', 'thrall'], 'hemom': ['fgolem', 'bwave'],
+    'bfrenzy': ['scourge'], 'nails': ['discipline'], 'wheel': ['bfrenzy', 'nails'], 'pact': ['nails'],
+    'ironmaiden': ['wheel'], 'viacrucis': ['pact', 'wheel'], 'tallhat': ['ironmaiden', 'viacrucis'], 'ironm': ['tallhat'],
+}
+for id, pre in PREREQ.items():
+    if id in by:
+        for q in pre:
+            assert q in by and by[q]['tab'] == by[id]['tab'] and by[q]['row'] < by[id]['row'] and by[q]['class'] == by[id]['class'], (id, q)
+        by[id]['prerequisites'] = list(pre)
+for s in S:   # every skill below the first row rests on something in its own tree
+    if s['class'] in ('animancer', 'miasmancer', 'monk', 'ossumancer', 'hemomancer') and s['row'] > 1 and not s['prerequisites']:
+        print('  !! no prerequisite:', s['class'], s['id'])
+
 # prerequisite names follow the (new) names
 for s in S:
     s['prerequisite_names'] = [by[p]['name'] for p in s.get('prerequisites', []) if p in by]
