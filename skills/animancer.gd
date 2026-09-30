@@ -344,7 +344,7 @@ func _size(v: float) -> float:
 ## v103 balance (tools/balance: the arena runs, wiki/15): the Mirror tree's and the dear spells' costs come down, the
 ## weak ones hit harder, Soul Leash a little softer. --nobal turns it off (for comparisons).
 const BAL_COST := {"word": 0.75, "storm": 0.85, "cage": 0.82, "fissure": 0.8, "orb": 0.8, "anvil": 0.9, "pillars": 0.9}
-const BAL_DMG := {"fissure": 1.6, "orb": 1.35, "word": 1.25, "chain": 1.25, "anvil": 1.2, "cage": 1.2, "leash": 0.85}
+const BAL_DMG := {"fissure": 2.0, "orb": 1.6, "word": 1.3, "chain": 1.2, "anvil": 1.2, "cage": 1.3, "leash": 0.7}
 static var _bal_on := -1
 static func bal_on() -> bool:
 	if _bal_on < 0:
