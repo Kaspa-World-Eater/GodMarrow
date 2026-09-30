@@ -6,20 +6,23 @@ extends RefCounted
 ## Hooks: Monster.setup -> roll(); Monster._physics_process -> tick(); Monster.die -> on_death();
 ## Combat.hit_hero -> strike_poise() / on_strike(); Combat.hit_monster -> on_struck(); Hero.light_radius -> lantern_k().
 ## Test: --affix=Name forces a deed on every champion and unique that is made.
+## The user's rules (2026-09-30): nothing a creature leaves on the ground when it dies may hurt (it is no fun if you do
+## not see it), and no Diablo III / IV style marks (beams, orbiting fire, trails of burning ground): D2's kind only.
+## So Ash-Trailing and Bursting were taken out the day they were made; Warded (D2's Magic Resistant) came in.
 
 const SHOWN := {"Extra Strong": "Heavy-Handed", "Extra Fast": "Quick", "Stone Skin": "Stone-Skinned"}
 ## deed -> what the Stranger would say of it (the Codex and tooltips may use these)
 const DEEDS := {
-	"Ash-Trailing": "Hot ash falls from it where it walks. Do not stand where it has been.",
 	"Grave-Called": "When it falls, the ground under it gives up others.",
 	"Thirsting": "Its blows drink what you draw on.",
 	"Nail-Fisted": "Its blows break your footing, whatever you wear.",
 	"Thorned": "Strike it close and some of the blow comes back.",
 	"Candle-Eater": "Near it, your lantern shrinks, as if something breathed on it.",
-	"Bursting": "It does not lie still when it dies. Step away from the body.",
+	"Warded": "Workings slide off it. Steel does not.",
 	"Unquiet": "It does not walk to you. It is simply nearer.",
 }
-const ORDER := ["Ash-Trailing", "Grave-Called", "Thirsting", "Nail-Fisted", "Thorned", "Candle-Eater", "Bursting", "Unquiet"]
+const ORDER := ["Grave-Called", "Thirsting", "Nail-Fisted", "Thorned", "Candle-Eater", "Warded", "Unquiet"]
+const WARD_ELEMS := ["magic", "miasma", "blood", "void", "radiance", "fire", "cold", "poison"]
 
 static var trace := OS.get_cmdline_user_args().has("--afftrace")
 static func say(s: String) -> void:
@@ -41,6 +44,7 @@ static func roll(m) -> void:
 			var forced := a.substr(8)
 			if not forced in m.mods:
 				m.mods = m.mods + [forced]
+			apply(m)
 			return
 	var h := absi(hash(str(m.pack) + ":" + str(m.level)))
 	var d1: String = ORDER[h % ORDER.size()]
@@ -51,18 +55,19 @@ static func roll(m) -> void:
 			add.append(d2)
 	m.mods = m.mods + add
 	m.set_meta("aff_t", randf() * 2.0)
+	apply(m)
+
+## the deeds that are only numbers, set once
+static func apply(m) -> void:
+	if "Warded" in m.mods:
+		for e in WARD_ELEMS:
+			m.resists[e] = float(m.resists.get(e, 0.0)) + 40.0
 
 ## every frame, for the few that carry a deed that acts on its own
 static func tick(m, dt: float) -> void:
 	if m.mods.is_empty() or not m.awake:
 		return
 	var h = m.hero()
-	if "Ash-Trailing" in m.mods:
-		var last: Vector2 = m.get_meta("ash_at", Vector2.INF)
-		if last == Vector2.INF or last.distance_to(m.tp) > 0.7:
-			m.set_meta("ash_at", m.tp)
-			say("ash at %s" % str(m.tp))
-			AffixFx.ash(m.zone, m.tp, (m.dmg.x + m.dmg.y) * 0.5 * 0.22)
 	if "Unquiet" in m.mods and h and m.can_act():
 		var t: float = float(m.get_meta("aff_t", 0.0)) - dt
 		var d: float = m.tp.distance_to(h.tp)
@@ -76,8 +81,6 @@ static func on_death(m) -> void:
 	say("death %s %s" % [m.name_shown, str(m.mods)])
 	if "Grave-Called" in m.mods:
 		AffixFx.graves(m, 2 if m.rank == "unique" else 1)
-	if "Bursting" in m.mods:
-		AffixFx.burst(m)
 
 ## a creature's blow lands on the hero: how much harder it breaks the hero's footing
 static func strike_poise(by) -> float:

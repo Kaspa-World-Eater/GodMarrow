@@ -13,13 +13,12 @@ EXTRA = [
      "The [b]Quick[/b] close the ground before you have finished counting it.\n\n"
      "The [b]Stone-Skinned[/b] turn an edge. Bring something blunt, or something that is not a blade at all.\n"
      + H("The new ones") +
-     "The [b]Ash-Trailing[/b] leave the ground hot behind them. Fight them where they have not yet walked.\n\n"
      "The [b]Grave-Called[/b] do not fall alone. Where one goes down the ground gives up another. Do not stand over the body.\n\n"
      "The [b]Thirsting[/b] drink what you draw on: essence, breath, the sand in a glass, whatever it is you spend. Keep them off you, or keep it short.\n\n"
      "The [b]Nail-Fisted[/b] break your footing whatever you wear. A shield will not save you. Distance will.\n\n"
      "The [b]Thorned[/b] give back part of every close blow. Strike them from further off, or strike them once and well.\n\n"
      "Near a [b]Candle-Eater[/b] your lantern shrinks, as if something breathed on the wick. Kill it first, or you will not see the rest.\n\n"
-     "The [b]Bursting[/b] do not lie still. The body swells and flies apart in bone. When it falls, walk away from it, not toward.\n\n"
+     "The [b]Warded[/b] shrug off workings: blood, breath, the light and the dark all slide from them. Steel does not.\n\n"
      "The [b]Unquiet[/b] do not walk to you. They are simply nearer. If you turn your back on one, turn it back quickly.\n"
      + ORN +
      "The ones with names carry two of these once they have grown. I have seen one that carried three. I did not see it for long.\n\n"

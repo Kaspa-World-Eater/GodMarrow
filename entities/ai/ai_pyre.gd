@@ -1,7 +1,8 @@
 extends "res://entities/ai/brain.gd"
 ## PYRE-SAINTS: burning martyrs. They walk straight at you leaving burning footprints (a fire every 0.45 s: 0.45 yd,
 ## 70% of their mean damage per second, 3.5 s), and at 1.35 yd they flare (0.9 s) and erupt: a 1.8 yd blast of x1.6
-## magic and a ring of six fires, and die. Killed, they still erupt at 55%. Wading through shallows douses one for good
+## magic, and die. Killed, they simply fall. (The user's rule, 2026-09-30: nothing a death leaves may hurt, so the web's
+## ring of six fires and the 55% eruption of a killed saint are gone.) Wading through shallows douses one for good
 ## (x0.7 speed, x0.45 damage, a plain melee walker). They burn in the dark (drawn unshaded). Tell: the flames roar
 ## white (the wind pose). zc_combat22.js AI22.pyre, pyreErupt, monDeath22.
 
@@ -34,7 +35,7 @@ func think(m: Monster, h: Hero, dt: float) -> void:
 	if trail_t <= 0.0 and m.tp != last_fire and world:
 		trail_t = 0.45
 		last_fire = m.tp
-		world.fire(m.tp, 0.45, (m.dmg.x + m.dmg.y) * 0.5 * 0.7 * m.hour_mult(), 3.5)
+		world.fire(m.tp, 0.45, (m.dmg.x + m.dmg.y) * 0.5 * 0.7 * m.hour_mult(), 3.5, m)
 	if state == "wind":
 		m.look(h.tp - m.tp)
 		if t > wind:
@@ -72,15 +73,11 @@ func erupt(m: Monster, h: Hero, k: float) -> void:
 	if h and hero_open(h) and m.tp.distance_to(h.tp) < R:
 		Combat.hit_hero(h, dmg, "magic", m.tp)
 	hit_allies(m.get_tree(), m.tp, R, dmg, "magic", m.tp)
-	if world:
-		for i in 6:
-			var a := i / 6.0 * TAU
-			world.fire(m.tp + Vector2(cos(a), sin(a)) * R * 0.55, 0.5, dmg * 0.4, 4.0)
 
 func on_death(m: Monster) -> void:
 	super.on_death(m)
-	if not doused and state != "wind":
-		erupt(m, m.hero(), 0.55)
+	if world:
+		world.douse_from(m)   # its burning footprints go out with it
 
 func _anim(m: Monster, dt: float) -> void:
 	pose(m, dt)
