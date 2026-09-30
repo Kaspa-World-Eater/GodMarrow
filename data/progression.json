@@ -23130,7 +23130,7 @@
     "cls": "miasmancer",
     "kind": "minor",
     "name": "Grave Breath",
-    "up": "Last Breath returns after 40 s instead of 60."
+    "up": "Last Breath holds you twice in each place."
    },
    "zx_crit": {
     "cls": "miasmancer",

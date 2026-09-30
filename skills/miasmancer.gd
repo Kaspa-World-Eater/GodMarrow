@@ -51,7 +51,8 @@ var omen_t := 0.0
 var venom_t := 0.0
 var venom_n := 0
 var blur_ev := 0.0
-var breath_cd := 0.0
+var breath_cd := 0.0          # (unused: Last Breath is once in each place now)
+var breath_used := {}         # place id -> times Last Breath has held her there
 var unseen_t := 0.0
 var haze_mantle := 0.0
 var aura_t := 0.0
@@ -973,11 +974,13 @@ func before_hit(d: float, elem: String, from: Vector2, opts: Dictionary) -> floa
 		_place_trap(k, hero.tp, true, 1.0)
 		if k == "bmine":
 			_trap_trigger(traps.back())
-	# Last Breath: once a minute a killing blow leaves her standing
+	# Last Breath: once in each place a killing blow leaves her standing (twice with Grave Breath). It used to be once
+	# a minute; there are no waits in the Hide (the user's rule).
 	var st = hero.st
 	var after: float = d * (100.0 / (100.0 + st.armor()) if elem == "phys" else 1.0)
-	if K("lbreath") > 0 and breath_cd <= 0.0 and st.hp - after <= 0.0:
-		breath_cd = breath_cd_len()
+	var bz: String = str(hero.zone.id) if hero.zone else ""
+	if K("lbreath") > 0 and int(breath_used.get(bz, 0)) < (2 if aM("zx_breath") else 1) and st.hp - after <= 0.0:
+		breath_used[bz] = int(breath_used.get(bz, 0)) + 1
 		st.hp = st.life_max() * 0.3 if K("breathheal") > 0 else 1.0
 		hero.invuln = 2.0
 		unseen_t = 2.0
