@@ -1,10 +1,12 @@
 extends CanvasLayer
-## ui/title.gd: the title. The game opens on the world itself: the pilgrims' camp on the Ashen Moor at dusk, the
-## camera drifting slowly over it while the ash falls, letterboxed, the title cue playing (the web's zz_zz_music96
-## "title"). Over it, the name and a few carved lines:
-##   Continue (when a pilgrim is saved) · A New Pilgrim (asks once if it would forget a saved one) · The Codex ·
-##   Options · Leave.
-## Continue simply lets the world go on; a new pilgrim reloads the scene with Game.skip_title set.
+## ui/title.gd: the title, "the Pilgrims' Fire". The old title's chapel of the weeping god (zp_title.js, painted pixel by
+## pixel, captured without the Seer's bowl: art/ui/title_chapel.png, tools/cap_chapel.js) with, where the bowl stood, a
+## fire on the flagstones and the five pilgrims of the orders standing round it, Diablo's campfire in the god's chapel.
+## The fire lights them from its side and throws their shadows back across the floor; the candles gutter; the god's
+## chin lets go a drop now and then. The words stand on the left, over the dark:
+##   Continue (when a pilgrim is saved) · A New Pilgrim · The Codex · Options · Those Who Lent Their Hands · Leave.
+## A New Pilgrim turns the fire into the choosing: hover a pilgrim and they step into the light; the Hollow Mystic can
+## walk, the other roads are not yet open. Continue lets the world go on; a new pilgrim reloads with Game.skip_title.
 
 const U := preload("res://ui/uikit.gd")
 const SaveIO := preload("res://core/save.gd")
@@ -12,17 +14,41 @@ const BONE := Color("#dcd3c2")
 const BONE_D := Color("#a39a8b")
 const ASH := Color("#6f685f")
 const MARROW := Color("#c9974a")
+const K := 4.0                           # screen px per chapel px
+const FIRE := Vector2(1330, 880)         # the fire's foot on the flagstones
+const FS := 1.5                          # the fire's size
+const HS := 1.45                         # the pilgrims' size in the chapel
+const PILGRIMS := [
+	# kind, sprite set, name, line, foot, view, face, playable
+	["hemomancer", "hemomancer", "The Hemomancer", "Opens the vein, and the vein answers.", Vector2(1110, 792), "front", 1, false],
+	["ossumancer", "ossumancer", "The Ossuarch", "Counts the dead, and the dead stand up to be counted.", Vector2(1552, 792), "front", -1, false],
+	["miasmancer", "miasmancer", "The Shrine Keeper", "Folds the breath into paper, and the paper walks.", Vector2(1000, 905), "side", 1, false],
+	["monk", "monk", "The Empty Hand", "Carries nothing. Strikes with that.", Vector2(1660, 905), "side", -1, false],
+	["animancer", "animancer_unclipped", "The Hollow Mystic", "Listens at mirrors. Keeps the dead on a thread.", Vector2(1236, 1004), "back", 1, true],
+]
 
 var main: Node
 var root: Control
+var world: Node2D                  # the pilgrims (y-sorted, screen px)
+var add_fx: Node2D                 # additive light: the fire's glow, the candles, embers
+var fx: Node2D                     # flames, embers, the drop
+var figs: Array = []               # {spr, holder, shadow, base, step}
 var rows: Array = []
 var hover := -1
+var fig_hover := -1
+var mode := "main"                 # main | choose | credits
 var confirm_new := false
 var t := 0.0
-var leaving := -1.0          # >= 0: fading out into play
+var leaving := -1.0
 var codex: Control
-var credits := false
-var rows_hidden := false
+var candles: Array = []
+var embers: Array = []
+var drop_t := 2.0
+var drop_y := -1.0
+var chin := Vector2.ZERO
+var _glow: Texture2D
+var _test_done := false
+
 const CREDITS := [
 	["Sounds", ""],
 	["Impact Sounds and RPG Audio", "Kenney (kenney.nl), CC0"],
@@ -43,10 +69,55 @@ func _init(m: Node) -> void:
 func _ready() -> void:
 	layer = 25
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	_glow = Lights.radial(128)
+	var bg := TextureRect.new()
+	bg.texture = load("res://art/ui/title_chapel.png")
+	bg.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	bg.stretch_mode = TextureRect.STRETCH_SCALE
+	bg.size = Vector2(1920, 1080)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bg)
+	var meta = JSON.parse_string(FileAccess.get_file_as_string("res://art/ui/title_chapel.json"))
+	if meta is Dictionary:
+		for c in meta.get("candles", []):
+			candles.append(Vector2(float(c[0]), float(c[1]) - float(c[2])) * K + Vector2(2, -2))
+		var f: Array = meta.get("face", [340, 64, 125])
+		chin = Vector2(float(f[0]) - 1.0, float(f[2])) * K
+	var shadows := Node2D.new()
+	add_child(shadows)
+	world = Node2D.new()
+	world.y_sort_enabled = true
+	add_child(world)
+	for i in PILGRIMS.size():
+		var p: Array = PILGRIMS[i]
+		var spr := AnimSprite.new(Data.sprite_set(p[1]))
+		spr.view = p[5]
+		spr.face = p[6]
+		spr.play("idle")
+		spr.fi = i * 2
+		var holder := Node2D.new()
+		holder.position = p[4]
+		holder.scale = Vector2(HS, HS)
+		holder.add_child(spr)
+		world.add_child(holder)
+		var sh := Sprite2D.new()
+		sh.centered = false
+		sh.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		shadows.add_child(sh)
+		figs.append({"spr": spr, "holder": holder, "shadow": sh, "base": p[4], "step": 0.0})
+	fx = Node2D.new()
+	fx.draw.connect(_draw_fx)
+	add_child(fx)
+	add_fx = Node2D.new()
+	var mat := CanvasItemMaterial.new()
+	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	add_fx.material = mat
+	add_fx.draw.connect(_draw_add)
+	add_child(add_fx)
 	root = Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
-	root.draw.connect(_draw)
+	root.draw.connect(_draw_ui)
 	root.gui_input.connect(_gui)
 	add_child(root)
 	codex = load("res://ui/codex.gd").new()
@@ -57,21 +128,29 @@ func _ready() -> void:
 
 func _build() -> void:
 	rows.clear()
-	if SaveIO.exists():
-		rows.append(["Continue", "continue"])
-		rows.append(["Forget the old pilgrim and begin?" if confirm_new else "A New Pilgrim", "new"])
-	else:
-		rows.append(["Begin", "new"])
-	rows.append(["The Codex", "codex"])
-	rows.append(["Options", "options"])
-	rows.append(["Those Who Lent Their Hands", "credits"])
-	rows.append(["Leave", "leave"])
+	match mode:
+		"main":
+			if SaveIO.exists():
+				rows.append(["Continue", "continue"])
+				rows.append(["Forget the old pilgrim and begin?" if confirm_new else "A New Pilgrim", "new"])
+			else:
+				rows.append(["A New Pilgrim", "new"])
+			rows.append(["The Codex", "codex"])
+			rows.append(["Options", "options"])
+			rows.append(["Those Who Lent Their Hands", "credits"])
+			rows.append(["Leave", "leave"])
+		_:
+			rows.append(["Back", "back"])
 
 func _row_rect(i: int) -> Rect2:
-	var vs := root.get_viewport_rect().size
-	return Rect2(150, vs.y * 0.5 + i * 58.0, 640, 50)
+	var y0 := 520.0 if mode == "main" else 900.0
+	return Rect2(150, y0 + i * 58.0, 640, 50)
 
-var _test_done := false
+# ------------------------------------------------------------------ living
+
+func _flick(s: float) -> float:
+	return 0.5 + 0.5 * sin(t * 9.0 + s) * sin(t * 5.3 + s * 2.0)
+
 func _process(dt: float) -> void:
 	t += dt
 	if OS.has_environment("GM_TITLE_ACT") and t > 1.0 and not _test_done:
@@ -84,15 +163,122 @@ func _process(dt: float) -> void:
 			main.title_done()
 			queue_free()
 			return
+	var fire_k := 0.82 + 0.18 * _flick(0.3)
+	for i in figs.size():
+		var f: Dictionary = figs[i]
+		var spr: AnimSprite = f["spr"]
+		spr.step(dt)
+		var want := 1.0 if (mode == "choose" and fig_hover == i) else 0.0
+		f["step"] = lerpf(f["step"], want, minf(1.0, dt * 5.0))
+		var base: Vector2 = f["base"]
+		var to_fire := (FIRE - base).normalized()
+		var h: Node2D = f["holder"]
+		h.position = base + to_fire * 26.0 * f["step"]
+		var d := h.position.distance_to(FIRE)
+		var lit: float = clampf(1.25 - d / 420.0, 0.35, 1.0) * fire_k + 0.25 * float(f["step"])
+		var dim := 0.55 if (mode == "choose" and fig_hover >= 0 and fig_hover != i) else 1.0
+		spr.modulate = Color(1.0 * lit * dim + 0.06, 0.8 * lit * dim + 0.06, 0.6 * lit * dim + 0.09)
+		var sh: Sprite2D = f["shadow"]
+		sh.texture = spr.texture
+		sh.offset = spr.offset
+		sh.flip_h = spr.flip_h
+		var away := h.position - FIRE
+		var dir := Vector2(away.x, away.y * 0.7).normalized()
+		sh.transform = Transform2D(Vector2(HS, 0), -dir * 0.55 * HS, h.position)
+		sh.modulate = Color(0, 0, 0, 0.5 * clampf(1.3 - d / 400.0, 0.2, 1.0))
+	if randf() < dt * 9.0:
+		embers.append({"p": FIRE + Vector2(randf_range(-40, 40), -70), "v": Vector2(randf_range(-14, 14), randf_range(-70, -40)), "t": 0.0, "life": randf_range(1.2, 2.6)})
+	for e in embers:
+		e["t"] += dt
+		e["v"].x += sin(t * 2.0 + e["life"] * 7.0) * 12.0 * dt
+		e["p"] += e["v"] * dt
+	embers = embers.filter(func(e): return e["t"] < e["life"])
+	drop_t -= dt
+	if drop_t <= 0.0 and drop_y < 0.0:
+		drop_y = 0.0
+	if drop_y >= 0.0:
+		drop_y += dt * (60.0 + drop_y * 4.0)
+		if drop_y > 56.0:
+			drop_y = -1.0
+			drop_t = randf_range(3.0, 7.0)
+	fx.queue_redraw()
+	add_fx.queue_redraw()
 	root.queue_redraw()
+
+func _snap(p: Vector2) -> Vector2:
+	return Vector2(floorf(p.x / K) * K, floorf(p.y / K) * K)
+
+## the fire: split logs, a bed of embers, tongues of flame climbing and tearing off, on the chapel's pixel grid
+func _draw_fx() -> void:
+	fx.draw_set_transform(FIRE * (1.0 - FS), 0.0, Vector2(FS, FS))
+	_draw_fire()
+	fx.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	_draw_small()
+
+func _draw_fire() -> void:
+	fx.draw_rect(Rect2(_snap(FIRE + Vector2(-44, -8)), Vector2(88, 12)), Color("#0f0905"))
+	for l in [[-40, -14, 64, 8], [-20, -20, 60, 8], [-30, -4, 70, 8]]:
+		fx.draw_rect(Rect2(_snap(FIRE + Vector2(l[0], l[1])), Vector2(l[2], l[3])), Color("#1b1008"))
+		fx.draw_rect(Rect2(_snap(FIRE + Vector2(l[0], l[1])), Vector2(l[2], 4)), Color("#3d2512"))
+	for i in 14:
+		var g := _flick(i * 1.3)
+		fx.draw_rect(Rect2(_snap(FIRE + Vector2(-36.0 + i * 6.0, -8)), Vector2(4, 4)), Color("#b83026").lerp(Color("#ecc47e"), g * 0.6))
+	var cols := 13
+	for c in cols:
+		var u := (float(c) / (cols - 1)) * 2.0 - 1.0
+		var hgt := (1.0 - u * u) * (70.0 + 30.0 * _flick(c * 2.1)) + 10.0
+		var sway := sin(t * 3.0 + c * 0.7) * 6.0 + sin(t * 7.3 + c) * 3.0
+		var y := 0.0
+		while y < hgt:
+			var k := y / hgt
+			var col := Color("#fff2c0").lerp(Color("#ecc47e"), minf(1.0, k * 2.0)).lerp(Color("#e8704e"), clampf(k * 2.0 - 0.6, 0.0, 1.0)).lerp(Color("#84181c"), clampf(k * 2.0 - 1.3, 0.0, 1.0))
+			if absf(u) > 0.6:
+				col = col.lerp(Color("#e8704e"), 0.5)
+			if k < 0.85 or fmod(t * 11.0 + c, 1.0) < 0.6:
+				fx.draw_rect(Rect2(_snap(FIRE + Vector2(u * 34.0 + sway * k, -14.0 - y)), Vector2(K, K)), col)
+			y += K
+
+func _draw_small() -> void:
+	for e in embers:
+		var a: float = 1.0 - e["t"] / e["life"]
+		fx.draw_rect(Rect2(_snap(e["p"]), Vector2(K, K)), Color(1.0, 0.55 + 0.35 * a, 0.25, a))
+	for i in candles.size():
+		var c: Vector2 = candles[i]
+		var g := _flick(i * 1.7)
+		fx.draw_rect(Rect2(_snap(c + Vector2(0, -8)), Vector2(K, 8 + roundf(g) * 4)), Color("#ecc47e"))
+		fx.draw_rect(Rect2(_snap(c + Vector2(0, -12 - g * 4)), Vector2(K, K)), Color("#fff2c0"))
+	if drop_y >= 0.0:
+		fx.draw_rect(Rect2(_snap(chin + Vector2(0, drop_y)), Vector2(K, K * 2)), Color("#84181c"))
+	elif drop_t < 1.2:
+		fx.draw_rect(Rect2(_snap(chin), Vector2(K, K * (1.0 if drop_t > 0.5 else 2.0))), Color("#5e1016"))
+
+func _draw_add() -> void:
+	var g := _flick(0.3)
+	var fr := 520.0 + 40.0 * g
+	add_fx.draw_texture_rect(_glow, Rect2(FIRE + Vector2(-fr, -fr * 0.62 - 40), Vector2(fr * 2, fr * 1.24)), false, Color(1.0, 0.55, 0.25, 0.30 + 0.08 * g))
+	var cr := 140.0 + 16.0 * g
+	add_fx.draw_texture_rect(_glow, Rect2(FIRE + Vector2(-cr, -cr - 50), Vector2(cr * 2, cr * 2)), false, Color(1.0, 0.7, 0.35, 0.35))
+	for i in candles.size():
+		var c: Vector2 = candles[i]
+		var r := 36.0 + 10.0 * _flick(i * 1.7)
+		add_fx.draw_texture_rect(_glow, Rect2(c + Vector2(-r, -r - 8), Vector2(r * 2, r * 2)), false, Color(1.0, 0.6, 0.3, 0.22))
+	for e in embers:
+		var a: float = 1.0 - e["t"] / e["life"]
+		add_fx.draw_texture_rect(_glow, Rect2(e["p"] - Vector2(10, 10), Vector2(20, 20)), false, Color(1.0, 0.5, 0.2, 0.3 * a))
+
+# ------------------------------------------------------------------ input
+
+func _fig_at(p: Vector2) -> int:
+	var best := -1
+	for i in figs.size():
+		var h: Node2D = figs[i]["holder"]
+		if Rect2(h.position + Vector2(-80, -260), Vector2(160, 270)).has_point(p):
+			if best < 0 or h.position.y > (figs[best]["holder"] as Node2D).position.y:
+				best = i
+	return best
 
 func _gui(ev: InputEvent) -> void:
 	if leaving >= 0.0:
-		return
-	if credits:
-		if ev is InputEventMouseButton and ev.pressed:
-			credits = false
-			Sfx.play("page_close", 0.6)
 		return
 	if ev is InputEventMouseMotion:
 		var h := -1
@@ -102,21 +288,40 @@ func _gui(ev: InputEvent) -> void:
 		if h != hover and h >= 0:
 			Sfx.play("page_close", 0.25, 1.4)
 		hover = h
+		var fh := _fig_at(ev.position) if mode == "choose" else -1
+		if fh >= 0 and fh != fig_hover:
+			Sfx.play("roll", 0.35, 1.2)
+		if fh >= 0 or mode != "choose":
+			fig_hover = fh
 	elif ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+		if mode == "credits":
+			_act("back")
+			return
 		for i in rows.size():
 			if _row_rect(i).has_point(ev.position):
 				_act(rows[i][1])
 				return
+		if mode == "choose":
+			var f := _fig_at(ev.position)
+			if f >= 0:
+				_choose(f)
 
 func _unhandled_key_input(ev: InputEvent) -> void:
 	if leaving >= 0.0 or not root.visible or not (ev is InputEventKey) or not ev.pressed:
 		return
-	if ev.keycode == KEY_ENTER or ev.keycode == KEY_SPACE:
-		_act(rows[maxi(0, hover)][1])
+	if ev.keycode == KEY_ESCAPE and mode != "main":
+		_act("back")
+	elif ev.keycode == KEY_ENTER or ev.keycode == KEY_SPACE:
+		if mode == "choose" and fig_hover >= 0:
+			_choose(fig_hover)
+		else:
+			_act(rows[maxi(0, hover)][1])
 	elif ev.keycode == KEY_DOWN:
 		hover = (hover + 1) % rows.size()
 	elif ev.keycode == KEY_UP:
 		hover = (hover - 1 + rows.size()) % rows.size()
+	elif mode == "choose" and (ev.keycode == KEY_LEFT or ev.keycode == KEY_RIGHT):
+		fig_hover = (maxi(fig_hover, 0) + (1 if ev.keycode == KEY_RIGHT else -1) + figs.size()) % figs.size()
 	get_viewport().set_input_as_handled()
 
 func _act(a: String) -> void:
@@ -129,12 +334,17 @@ func _act(a: String) -> void:
 				confirm_new = true
 				_build()
 				return
-			Sfx.play("kindle", 0.8)
-			Game.skip_title = true
-			Game.force_new = true
-			if SaveIO.exists():
-				DirAccess.remove_absolute(ProjectSettings.globalize_path(SaveIO.FILE))
-			get_tree().reload_current_scene()
+			Sfx.play("page_open", 0.7)
+			mode = "choose"
+			fig_hover = PILGRIMS.size() - 1
+			_build()
+		"mystic":
+			_choose(PILGRIMS.size() - 1)
+		"back":
+			mode = "main"
+			confirm_new = false
+			fig_hover = -1
+			_build()
 		"codex":
 			Sfx.play("page_open")
 			root.visible = false
@@ -145,37 +355,54 @@ func _act(a: String) -> void:
 				main.hud.pause.page = "options"
 		"credits":
 			Sfx.play("page_open", 0.7)
-			credits = true
+			mode = "credits"
+			_build()
 		"leave":
 			get_tree().quit()
+		_:
+			if a.begins_with("hover"):
+				fig_hover = int(a.substr(5))
 
-func _draw() -> void:
+func _choose(i: int) -> void:
+	var p: Array = PILGRIMS[i]
+	if not p[7]:
+		Sfx.play("break_iron", 0.25, 0.7)
+		return
+	Sfx.play("kindle", 0.9)
+	Game.skip_title = true
+	Game.force_new = true
+	Game.cls = p[0]
+	if SaveIO.exists():
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(SaveIO.FILE))
+	get_tree().reload_current_scene()
+
+# ------------------------------------------------------------------ the words
+
+func _draw_ui() -> void:
 	var vs := root.get_viewport_rect().size
 	var fade_in := clampf(t / 2.5, 0.0, 1.0)
 	var out := clampf(leaving / 1.2, 0.0, 1.0) if leaving >= 0.0 else 0.0
-	var a := (1.0 - out)
-	# the letterbox, and a darkening at the left where the words stand
-	var bar := 90.0 * (1.0 - out)
-	root.draw_rect(Rect2(0, 0, vs.x, bar), Color(0, 0, 0, 1))
-	root.draw_rect(Rect2(0, vs.y - bar, vs.x, bar), Color(0, 0, 0, 1))
-	for i in 24:
-		var k := float(i) / 24.0
-		root.draw_rect(Rect2(k * vs.x * 0.55, bar, vs.x * 0.55 / 24.0 + 1.0, vs.y - bar * 2.0), Color(0, 0, 0, 0.8 * (1.0 - k) * (1.0 - k * 0.3) * a))
-	# the name, spaced like a carving, and the line under it
+	var a := 1.0 - out
+	for i in 30:
+		var k := float(i) / 30.0
+		root.draw_rect(Rect2(k * vs.x * 0.6, 0, vs.x * 0.6 / 30.0 + 1.0, vs.y), Color(0, 0, 0, 0.78 * pow(1.0 - k, 1.4)))
+	root.draw_rect(Rect2(0, 0, vs.x, 70), Color(0, 0, 0, 0.5))
+	root.draw_rect(Rect2(0, vs.y - 50, vs.x, 50), Color(0, 0, 0, 0.5))
 	var sc := U.font("sc")
 	var fi := U.font("italic")
-	var name := "GODMARROW"
+	var fb := U.font("book")
 	var x := 150.0
-	var y := vs.y * 0.5 - 150.0
-	for c in name:
-		root.draw_string(sc, Vector2(x + 3, y + 3), c, HORIZONTAL_ALIGNMENT_LEFT, -1, 112, Color(0, 0, 0, 0.7 * a))
-		root.draw_string(sc, Vector2(x, y), c, HORIZONTAL_ALIGNMENT_LEFT, -1, 112, Color(BONE, a))
-		x += sc.get_string_size(c, HORIZONTAL_ALIGNMENT_LEFT, -1, 112).x + 14.0
-	root.draw_line(Vector2(152, y + 28), Vector2(152 + 90, y + 28), Color(MARROW, 0.8 * a), 2.0)
-	root.draw_string(fi, Vector2(152, y + 72), "Put your hand flat on the ground. It is still warm.", HORIZONTAL_ALIGNMENT_LEFT, -1, 27, Color(BONE_D, a))
-	if credits:
-		var fb := U.font("book")
-		var cy := vs.y * 0.5 - 20.0
+	var y := 300.0
+	for c in "GODMARROW":
+		var cw := sc.get_string_size(c, HORIZONTAL_ALIGNMENT_LEFT, -1, 112).x
+		root.draw_string(sc, Vector2(x + 4, y + 5), c, HORIZONTAL_ALIGNMENT_LEFT, -1, 112, Color(0, 0, 0, 0.8 * a))
+		root.draw_string(sc, Vector2(x, y), c, HORIZONTAL_ALIGNMENT_LEFT, -1, 112, Color(Color("#e0b86e"), a))
+		root.draw_string(sc, Vector2(x, y - 3), c, HORIZONTAL_ALIGNMENT_LEFT, -1, 112, Color(Color("#f3dca0"), 0.35 * a))
+		x += cw + 14.0
+	root.draw_line(Vector2(152, y + 30), Vector2(152 + 90, y + 30), Color(MARROW, 0.8 * a), 2.0)
+	root.draw_string(fi, Vector2(152, y + 74), "The god is dead, and has not finished dying.", HORIZONTAL_ALIGNMENT_LEFT, -1, 27, Color(BONE_D, a))
+	if mode == "credits":
+		var cy := 470.0
 		for e in CREDITS:
 			if e[1] == "":
 				cy += 14.0
@@ -183,21 +410,32 @@ func _draw() -> void:
 				cy += 34.0
 			else:
 				root.draw_string(fb, Vector2(150, cy + 22), e[0], HORIZONTAL_ALIGNMENT_LEFT, 330, 21, Color(BONE, a))
-				root.draw_string(fi, Vector2(490, cy + 22), e[1], HORIZONTAL_ALIGNMENT_LEFT, 900, 19, Color(BONE_D, a))
+				root.draw_string(fi, Vector2(490, cy + 22), e[1], HORIZONTAL_ALIGNMENT_LEFT, 560, 19, Color(BONE_D, a))
 				cy += 30.0
 		root.draw_string(fi, Vector2(150, cy + 40), "Click to go back.", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(ASH, a))
-		rows_hidden = true
-	# the lines
-	for i in (0 if credits else rows.size()):
-		var r := _row_rect(i)
-		var on := i == hover
-		var col := BONE if on else BONE_D
-		if rows[i][1] == "new" and confirm_new:
-			col = MARROW
-		if on:
-			root.draw_string(sc, r.position + Vector2(-34, 36), "❧", HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color(MARROW, a))
-		root.draw_string(sc, r.position + Vector2(0, 36), rows[i][0], HORIZONTAL_ALIGNMENT_LEFT, -1, 32, Color(col, a))
-	root.draw_string(fi, Vector2(152, vs.y - bar - 22), "Act I · the Ashen Moor and what lies under it", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(ASH, a))
-	# out of black at the start
+	else:
+		if mode == "choose":
+			root.draw_string(sc, Vector2(150, 540), "WHO WALKS?", HORIZONTAL_ALIGNMENT_LEFT, -1, 30, Color(MARROW, a))
+			root.draw_string(fi, Vector2(150, 584), "Choose one of those at the fire.", HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(BONE_D, a))
+			if fig_hover >= 0:
+				var p: Array = PILGRIMS[fig_hover]
+				root.draw_string(sc, Vector2(150, 680), p[2], HORIZONTAL_ALIGNMENT_LEFT, -1, 40, Color(BONE, a))
+				root.draw_string(fi, Vector2(150, 726), p[3], HORIZONTAL_ALIGNMENT_LEFT, 640, 23, Color(BONE_D, a))
+				var note := "Click to walk as this pilgrim." if p[7] else "This road is not yet open."
+				root.draw_string(fi, Vector2(150, 780), note, HORIZONTAL_ALIGNMENT_LEFT, 640, 20, Color(MARROW if p[7] else ASH, a))
+				var h: Node2D = figs[fig_hover]["holder"]
+				root.draw_string(sc, h.position + Vector2(-150, 44), p[2], HORIZONTAL_ALIGNMENT_CENTER, 300, 20, Color(BONE, 0.9 * a))
+		for i in rows.size():
+			var r := _row_rect(i)
+			var on := i == hover
+			var col := BONE if on else BONE_D
+			if rows[i][1] == "new" and confirm_new:
+				col = MARROW
+			if on:
+				root.draw_string(sc, r.position + Vector2(-34, 36), "❧", HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color(MARROW, a))
+			root.draw_string(sc, r.position + Vector2(0, 36), rows[i][0], HORIZONTAL_ALIGNMENT_LEFT, -1, 32, Color(col, a))
+	root.draw_string(fi, Vector2(152, vs.y - 18), "Act I · the Ashen Moor and what lies under it", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(ASH, a))
 	if fade_in < 1.0:
 		root.draw_rect(Rect2(Vector2.ZERO, vs), Color(0, 0, 0, 1.0 - fade_in))
+	if out > 0.0:
+		root.draw_rect(Rect2(Vector2.ZERO, vs), Color(0, 0, 0, out))
