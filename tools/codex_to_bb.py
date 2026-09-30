@@ -30,5 +30,8 @@ for c in book:
     for w in c['works']:
         pages.append({"title": w['title'], "by": plain(w['by']), "epi": "", "bb": bb(w['html'])})
     out.append({"id": c['id'], "name": c['name'], "sub": c.get('sub', ''), "pages": pages})
+sys.path.insert(0, 'tools')
+import codex_extra
+out = codex_extra.add(out)   # the Godot build's own works (tools/codex_extra.py)
 json.dump(out, open('data/codex.json', 'w'), ensure_ascii=False)
 print('chapters', len(out), 'pages', sum(len(c['pages']) for c in out))
