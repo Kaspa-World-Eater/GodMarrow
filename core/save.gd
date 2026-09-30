@@ -26,7 +26,7 @@ static func write(main: Node) -> bool:
 			equip[slot] = inv.equip[slot].to_dict()
 	var sk = hero.skills
 	var own := {}
-	for k in ["gbeh", "gweapon"]:
+	for k in ["gbeh", "gweapon", "wbeh"]:
 		if sk != null and k in sk:
 			own[k] = sk.get(k)
 	var d := {

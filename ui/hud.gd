@@ -31,6 +31,7 @@ var cursor_item: Item = null
 var vendor_open := false     # set by a vendor's window: right-click then sells
 var stash_open := false      # the Reliquary Chest is open: right-click in the pack puts away
 var p_town: Control          # ui/panel_town.gd: vendor, smith, chest, journal
+var p_orders: Control        # ui/panel_orders.gd: the choir (V) and the golem (G)
 var tip: Array = []
 var msgs: Array = []         # [{text, t, max}]
 var banner := {}             # {name, line, t, max}
@@ -74,6 +75,7 @@ func _ready() -> void:
 	p_skills = _panel("res://ui/panel_skills.gd")
 	p_inv = _panel("res://ui/panel_inv.gd")
 	p_town = _panel("res://ui/panel_town.gd")
+	p_orders = _panel("res://ui/panel_orders.gd")
 	Bus.panel_requested.connect(_on_panel_requested)
 	picker = Control.new()
 	picker.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -230,6 +232,18 @@ func toggle_panel(id: String) -> void:
 			if p_char.visible:
 				p_skills.visible = false
 				p_town.close()
+				p_orders.visible = false
+		"choir", "golem":
+			if hero == null or not ("wbeh" in hero.skills):
+				return
+			if p_orders.visible and p_orders.mode == id:
+				p_orders.visible = false
+			else:
+				p_char.visible = false
+				p_skills.visible = false
+				p_town.close()
+				p_orders.mode = id
+				p_orders.visible = true
 		"journal":
 			if p_town.visible and p_town.mode == "journal":
 				p_town.close()
@@ -242,6 +256,7 @@ func toggle_panel(id: String) -> void:
 			if p_skills.visible:
 				p_char.visible = false
 				p_town.close()
+				p_orders.visible = false
 		"map":
 			automap.visible = not automap.visible
 			automap.queue_redraw()
@@ -254,13 +269,14 @@ func menu_click(id: String) -> void:
 		toggle_panel(id)
 
 func any_panel() -> bool:
-	return p_inv.visible or p_char.visible or p_skills.visible or p_town.visible or picking != ""
+	return p_inv.visible or p_char.visible or p_skills.visible or p_town.visible or p_orders.visible or picking != ""
 
 func close_panels() -> void:
 	p_inv.visible = false
 	p_char.visible = false
 	p_skills.visible = false
 	p_town.close()
+	p_orders.visible = false
 	picking = ""
 	vendor_open = false
 	_return_cursor()
@@ -319,6 +335,10 @@ func _input(ev: InputEvent) -> void:
 				toggle_panel("map")
 			KEY_J:
 				toggle_panel("journal")
+			KEY_V:
+				toggle_panel("choir")
+			KEY_G:
+				toggle_panel("golem")
 			KEY_ESCAPE:
 				if any_panel():
 					close_panels()
@@ -539,6 +559,8 @@ func _process(dt: float) -> void:
 			tip = p_char.tip()
 		elif hov == p_town:
 			tip = p_town.tip()
+		elif hov == p_orders:
+			tip = p_orders.tip()
 		elif hov == bar:
 			tip = bar.tip()
 	over.queue_redraw()
@@ -760,6 +782,7 @@ func _draw_top() -> void:
 
 ## a townsfolk opens a window (world/objects/manager.gd): vendor | smith | stash | journal
 func _on_panel_requested(panel: String, who: String) -> void:
+	p_orders.visible = false
 	p_char.visible = false
 	p_skills.visible = false
 	p_town.open(panel, who)

@@ -2643,3 +2643,8 @@ func on_death() -> void:
 		for o in arr:
 			if o is Object and "gone" in o:
 				o.gone = true
+
+
+## the bar's gauge (ui/bar.gd): the choir's wisps as pips
+func hud_gauge() -> Dictionary:
+	return {"text": "WISPS %d/%d" % [wisps.size(), wisp_cap()], "pips": wisps.size(), "max": wisp_cap(), "col": Color8(191, 232, 255)}

@@ -48,7 +48,10 @@ func _ready() -> void:
 		_demo()
 	if args.has("panel"):   # captures: --panel=vendor|smith|stash|journal
 		await get_tree().create_timer(1.0).timeout
-		Bus.panel_requested.emit(args["panel"], "Maren the Gravekeeper" if args["panel"] == "vendor" else "Brannoc of the Nail")
+		if args["panel"] in ["choir", "golem"]:
+			hud.toggle_panel(args["panel"])
+		else:
+			Bus.panel_requested.emit(args["panel"], "Maren the Gravekeeper" if args["panel"] == "vendor" else "Brannoc of the Nail")
 
 func enter(zid: String, from: String) -> void:
 	travelling = true
