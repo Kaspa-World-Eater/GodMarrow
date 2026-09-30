@@ -303,7 +303,10 @@ static func complete(id: String, hero: Node, zone: Node, at: Vector2) -> bool:
 		hero.stats_changed.emit()
 	var W = _world()
 	if W:
-		W.banner("ERRAND FULFILLED", Color8(201, 164, 90), 3.2)
+		if q["kind"] in ["zoneboss", "actboss"]:
+			W.banner_later("ERRAND FULFILLED", Color8(201, 164, 90), 3.2, 3.6, zone.id)   # after the FELLED banner
+		else:
+			W.banner("ERRAND FULFILLED", Color8(201, 164, 90), 3.2)
 		W.speak_line(String(q["done"]) + "   (" + reward_text(r) + ")", 7.0)
 	if Bus.has_signal("quest_changed"):
 		Bus.emit_signal("quest_changed", id)
@@ -342,7 +345,20 @@ static func on_kill(m: Node, zone: Node, hero: Node) -> void:
 		if not q.is_empty() and q["kind"] == "kill" and not is_done(qid) and not st(qid).is_empty():
 			complete(qid, hero, zone, m.tp)
 	if m.boss:
+		var first: bool = not state()["felled"].has(zid)
 		state()["felled"][zid] = true
+		var W0 = _world()
+		if W0:
+			W0.banner(str(m.info.get("name", "")).to_upper() + " FELLED" if str(m.info.get("name", "")) != "" else "FELLED", Color8(201, 164, 90), 3.6)
+		# the boss's own gifts, once per pilgrim (checklist 16): the Warden +1 skill point, the Matron +2; each +1 Hollow
+		# Token and +2 Arcana
+		if first and hero and hero.st:
+			var act_boss: bool = zid == lair_of(n)
+			hero.st.skill_points += 2 if act_boss else 1
+			hero.st.hollow_tokens += 1
+			hero.st.arcana_points += 2
+			Bus.say.emit("Something of it stays with you: %s, a Hollow Token, two Arcana." % ("two lessons" if act_boss else "a lesson"), 4.0)
+			hero.stats_changed.emit()
 		for q in QUESTS:
 			var e := st(q["id"])
 			if q["kind"] == "zoneboss" and e.get("z", "") == zid and int(e.get("s", 0)) != 3:

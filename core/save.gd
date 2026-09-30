@@ -85,7 +85,16 @@ static func apply(main: Node, d: Dictionary) -> void:
 		for k in own:
 			if k in sk:
 				sk.set(k, own[k])
-	load("res://world/quests.gd").from_dict(d.get("quests", {}))
+	var Q = load("res://world/quests.gd")
+	Q.from_dict(d.get("quests", {}))
+	# the errands' lasting gifts live in the errand store; lay them back on the pilgrim
+	var qs: Dictionary = Q.state()
+	qs["buffs"] = {}   # shrine blessings do not outlive the world they were given in
+	if int(qs.get("life", 0)) != 0:
+		st.extra["life"] = float(qs["life"])
+	if int(qs.get("res", 0)) != 0:
+		for el in Q.ELEMS:
+			st.extra["res_" + el] = float(qs["res"])
 	# the return point and the remnant belonged to the old world's maps: a new world starts at the camp
 	Game.clock = float(d.get("clock", Game.clock))
 	st.hp = st.life_max()
