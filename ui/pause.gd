@@ -43,6 +43,7 @@ func _build() -> void:
 				["Hold to charge heavy attacks: " + _on(Settings.hold_heavy), "t:hold_heavy"],
 				["Music: %d%%" % roundi(Settings.music_vol * 100), "v:music_vol"],
 				["Sound: %d%%" % roundi(Settings.sfx_vol * 100), "v:sfx_vol"],
+				["The title: " + String(Settings.TITLE_NAMES[Settings.title_scene]), "title_scene"],
 				["Back", "back"]]
 		"controls":
 			rows = [["Back", "back"]]
@@ -97,6 +98,10 @@ func _act(a: String, down: bool) -> void:
 		Settings.save()
 		_main_save()
 		get_tree().quit()
+	elif a == "title_scene":
+		var ts: Array = Settings.TITLE_SCENES
+		Settings.title_scene = ts[(ts.find(Settings.title_scene) + (ts.size() - 1 if down else 1)) % ts.size()]
+		Settings.save()
 	elif a.begins_with("t:"):
 		var k := a.substr(2)
 		Settings.set(k, not bool(Settings.get(k)))
