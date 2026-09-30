@@ -33,6 +33,12 @@ func _load() -> void:
 	var kit: Dictionary = cd.get("starting_kit", {})
 	left = kit.get("left_skill", "attack")
 	right = kit.get("right_skill", "attack")
+	if not Bus.monster_killed.is_connected(_on_kill):
+		Bus.monster_killed.connect(_on_kill)
+
+## a creature died anywhere (Bus.monster_killed); an order answers it by overriding this
+func _on_kill(_m) -> void:
+	pass
 
 func name_of(id: String) -> String:
 	if id == "attack":
