@@ -341,6 +341,13 @@ func _whisper(dt: float) -> void:
 		whisper_t = 5.0
 		return
 	whisper_t = randf_range(60.0, 120.0)
+	# now and then, instead of the land's own voice, a saying of the folk who live on it
+	if randf() < 0.3:
+		var ls: Array = load("res://world/quests.gd").land_saying(zone.id, zone.d.get("outdoor", false))
+		var W0 := _world_ui()
+		if W0:
+			W0.whisper(ls[0], ls[1])
+		return
 	var zd: Dictionary = voice.get("zones", {}).get(zone.id, {})
 	var pool: Array = zd.get("w", [])
 	if pool.is_empty():

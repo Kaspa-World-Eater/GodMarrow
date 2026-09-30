@@ -103,6 +103,61 @@ const GREET := {
 	"giver": ["Godmarrow. The dead have been asking after you.", "Godmarrow. Errands don't keep. The dead do."],
 	"stranger": ["Godmarrow... an old word. Older than the ones who say it.", "Godmarrow. They used to mean the morning by it."],
 }
+## how the folk greet each order: plays on each order's own trade (blood, mirrors and thread, bone, breath and paper,
+## the empty hand). Mixed into greet() by the hero's order.
+const ORDER_GREET := {
+	"hemomancer": ["Godmarrow, and good blood to you.", "Bleed easy, brother.",
+		"No bad blood between us, I hope. You've enough of the other kind.", "In the pink, are we? You'd know better than me.",
+		"Heart on your sleeve again. Put it back, there's a draught.", "First blood's free, they say. Not from your lot.",
+		"Cut along now. Don't let me keep you."],
+	"animancer": ["God-mirror to you. Forgive me, it's an old one.", "Hanging by a thread, pilgrim? Aren't we all.",
+		"Mind your reflection. It minded you just now.", "You've a loose end. No, the other one.",
+		"Seven winters' good fortune to you, glass-bearer.", "Keep your wits about you, and your dead about you too.",
+		"Look sharp. Your mirrors do."],
+	"ossumancer": ["Godmarrow. The marrow's the best of it, eh?", "Got a bone to pick? Pick one of ours, we've plenty.",
+		"Chin up, spine straight. Though I see you've managed.", "Nothing to rattle you today, I hope.",
+		"Bare bones of a welcome, but it's yours.", "You're a sight for sore sockets.", "Stand easy. Well. Stand, anyway."],
+	"miasmancer": ["Bless you. Oh, you didn't sneeze. Bless you anyway.", "Don't hold your breath on my account.",
+		"Godmarrow to you, and to all eight million.", "A breath of fresh air, you are. Near enough.",
+		"Paper it over, that's what I always say.", "Take a breather. You've plenty of other folk's.",
+		"Air your grievances elsewhere, Keeper. Kindly."],
+	"monk": ["Godmarrow. Or god-nothing, as your lot has it.", "Nothing doing? Good. That's your trade, isn't it.",
+		"Hands empty, bowl empty. Heart?", "Say nothing. I'll know what you mean.",
+		"A fine day for it. Or night. You'd know which.", "Nothing ventured, nothing lost, eh, Hand?",
+		"Out of the sun, Hand. You shade it just by standing there."],
+}
+
+## what the folk of each land say (heard now and then in the quiet, like the land's own whispers)
+const LAND_SAYINGS := {
+	"moor": ["Ash to ash, and the rest to the Moor.", "Every cloud has a cinder lining.",
+		"Where there's smoke, there's a god still burning.", "Don't weep over spilt ash. There's always more coming down.",
+		"Many hands make light work. The Moor took the light."],
+	"fen": ["Still waters run deep. The drowned run deeper.", "Keep your head above water, and your name below it.",
+		"A reed that bends is a reed that breathes.", "Water under the bridge is still water. Count what's in it.",
+		"Don't wade where the fen won't say its name."],
+	"wood": ["Can't see the dead for the trees.", "Out of the wood isn't out of the woods.",
+		"Knock on wood. If it knocks back, walk faster.", "The root of the matter is always further down.",
+		"Every trunk is somebody's."],
+	"heath": ["No smoke without a saint.", "Playing with fire? The Pyre-Saints never stopped.",
+		"Out of the kiln, into the fire.", "Burn the candle at both ends and the heath will light the middle.",
+		"Strike while the saint is hot."],
+	"under": ["Dead men tell no tales. The dead down here never stop.", "Grave news travels slow, but it gets there.",
+		"One foot in the grave is one foot in the door.", "Let the sleeping dead lie. They seldom do.",
+		"What goes down must come up."],
+}
+const LAND_OF := {"moor": "moor", "pilgrim_road": "moor", "ash_shore": "moor", "sighing_ridge": "moor", "broken_bridge": "moor",
+	"fen": "fen", "sunken_bog": "fen", "drowned_village": "fen", "bogwitch_shack": "fen",
+	"hollow_wood": "wood", "fern_gully": "wood", "tree_hollow": "wood", "hunter_cache": "wood",
+	"burnt_heath": "heath", "fallen_watchtower": "heath"}
+const LAND_NAME := {"moor": "a saying of the Moor", "fen": "a saying of the fen folk", "wood": "a saying of the woodfolk",
+	"heath": "a saying of the heath", "under": "a saying of the diggers"}
+
+## a folk saying for a place (indoors and underground: the diggers'), with who says it
+static func land_saying(zid: String, outdoor: bool) -> Array:
+	var land: String = LAND_OF.get(zid, "moor") if outdoor else "under"
+	var pool: Array = LAND_SAYINGS[land]
+	return [LAND_NAME[land], pool[randi() % pool.size()]]
+
 const WAYSTONE := {1: ["Chalked Waystone", "Kindled by pilgrims. Touch it, and every lit waystone on the Hide knows your step."]}
 ## inscriptions for the lanterns the builders named well (Act I), and a pool for the rest, picked by name
 const LAN_INSCR := {
@@ -491,6 +546,9 @@ static func greet(who: String, role: String) -> String:
 	pool.append_array(GREET["any"])
 	pool.append_array(GREET.get(role, []))
 	pool.append_array(GREET.get(role, []))      # their own words come oftener
+	var og: Array = ORDER_GREET.get(Game.cls, [])
+	pool.append_array(og)
+	pool.append_array(og)                        # and they know an order when they see one
 	var dk := Game.day_k()
 	if dk < 0.2:
 		pool.append_array(GREET["night"])
