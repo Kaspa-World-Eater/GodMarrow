@@ -94,8 +94,8 @@ func _physics_process(dt: float) -> void:
 			if h and not h.dead and hurt_t <= 0.0 and t > 0.5 and t < life and h.tp.distance_to(tp) < 0.6:   # burns once settled
 				hurt_t = 0.5
 				var now := Time.get_ticks_msec()
-				if now > int(h.get_meta("ash_hurt", 0)):   # many patches underfoot still burn as one
-					h.set_meta("ash_hurt", now + 480)
+				if now > int(h.get_meta("ground_hurt", 0)):   # ash and fire underfoot burn as one (the clarity rule)
+					h.set_meta("ground_hurt", now + 480)
 					Combat.hit_hero(h, dmg, "fire", tp, {"poise": 0.0, "src": (src_desc + "|its ash") if src_desc != "" else "hot ash on the ground"})
 		"slip":
 			if t >= life and m and is_instance_valid(m) and not m.dead:

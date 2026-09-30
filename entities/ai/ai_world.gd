@@ -152,7 +152,9 @@ func _physics_process(dt: float) -> void:
 		f["tick"] -= dt
 		if f["tick"] <= 0.0:
 			f["tick"] = 0.35
-			if alive_h and h.tp.distance_to(f["p"]) < f["R"] + h.radius:
+			# overlapping fires burn as one: at most one ground hazard hurts him every 0.33 s (the clarity rule)
+			if alive_h and h.tp.distance_to(f["p"]) < f["R"] + h.radius and Time.get_ticks_msec() > int(h.get_meta("ground_hurt", 0)):
+				h.set_meta("ground_hurt", Time.get_ticks_msec() + 330)
 				Combat.hit_hero(h, f["dps"] * 0.35, "magic", f["p"], {"src": f.get("who", "") + "|its fire" if f.get("who", "") != "" else "fire on the ground"})
 			Brain.hit_allies(get_tree(), f["p"], f["R"], f["dps"] * 0.35, "magic", f["p"])
 	fires = fires.filter(func(f): return f["t"] > 0.0)
