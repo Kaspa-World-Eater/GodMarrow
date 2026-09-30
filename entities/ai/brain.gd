@@ -402,6 +402,16 @@ static func hero_front(h: Hero) -> Vector2:
 func behind_hero(m: Monster, h: Hero) -> bool:
 	return (m.tp - h.tp).dot(hero_front(h)) < 0.0
 
+## can the hero see it? Open ground by day, inside his lantern's pool (and a step past it), or near a world light.
+## The user's rule: every danger is plainly seen, so nothing looses a shot from the dark (it closes in first).
+static func in_sight_of(m: Monster, h: Hero) -> bool:
+	if m.zone and m.zone.d.get("outdoor", false) and Game.hour_name() != "night":
+		return true
+	if m.tp.distance_to(h.tp) <= h.light_radius() + 0.5:
+		return true
+	var w = AIWorld.of(m.zone) if m.zone else null
+	return w != null and w.has_method("light_near") and w.light_near(m.tp) != Vector2.INF
+
 func dir_to(m: Monster, p: Vector2) -> Vector2:
 	var v := p - m.tp
 	return v.normalized() if v.length() > 0.0001 else Vector2(1, 0)

@@ -71,7 +71,7 @@ func ghost_step(m: Monster, h: Hero, dt: float) -> void:
 	m.tp += Vector2(cos(Time.get_ticks_msec() / 1000.0 * 1.3 + hx), sin(Time.get_ticks_msec() / 1000.0 * 1.1 + hy)) * 0.3 * dt
 	_clamp(m)
 	m.look(h.tp - m.tp)
-	if d < 7.5 and cd <= 0.0 and state == "chase" and not m.zone.is_solid(m.tp) and m.zone.line_clear(m.tp, h.tp):
+	if d < 7.5 and cd <= 0.0 and state == "chase" and not m.zone.is_solid(m.tp) and m.zone.line_clear(m.tp, h.tp) and in_sight_of(m, h):
 		set_state("wind")
 		aim = h.tp
 

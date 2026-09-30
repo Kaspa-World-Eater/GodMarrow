@@ -18,7 +18,7 @@ func think(m: Monster, h: Hero, dt: float) -> void:
 	if h.dead or d > 26.0 or state == "home":
 		melee_rhythm(m, h, dt)
 		return
-	var see := m.zone.sight_clear(m.tp, h.tp)
+	var see := m.zone.sight_clear(m.tp, h.tp) and in_sight_of(m, h)   # out in the dark it closes in, never shoots
 	if state == "wind":
 		aim = h.tp
 		m.look(h.tp - m.tp)
