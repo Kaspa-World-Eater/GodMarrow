@@ -36,7 +36,8 @@ def find_godot(hint: str | None = None) -> str | None:
         if Path(c).exists():
             return c
     home = Path.home()
-    for pat in ("Downloads/Godot*/Godot*.exe", "Downloads/Godot*.exe", "Godot*/Godot*.exe", "Desktop/Godot*.exe", "Downloads/Godot*linux*"):
+    for pat in ("Desktop/Godot/Godot*.exe", "OneDrive/Desktop/Godot/Godot*.exe", "Desktop/Godot*.exe", "OneDrive/Desktop/Godot*.exe", "Downloads/Godot*/Godot*.exe",
+                "Downloads/Godot*.exe", "Godot*/Godot*.exe", "Downloads/Godot*linux*"):
         for p in sorted(home.glob(pat)):
             if p.is_file():
                 return str(p)

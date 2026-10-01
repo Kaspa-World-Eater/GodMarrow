@@ -12,7 +12,7 @@ set GODOT=
 if defined PIXELFORGE_GODOT if exist "%PIXELFORGE_GODOT%" set "GODOT=%PIXELFORGE_GODOT%"
 if not defined GODOT for %%F in ("tools\godot\Godot_v4*_win64.exe" "tools\godot\Godot*.exe") do if exist "%%~F" set "GODOT=%%~fF"
 if not defined GODOT for %%F in (godot.exe godot4.exe Godot.exe) do if not defined GODOT for %%G in ("%%~$PATH:F") do if exist "%%~G" set "GODOT=%%~G"
-if not defined GODOT for %%F in ("%ProgramFiles%\Godot\Godot*.exe" "%LocalAppData%\Programs\Godot\Godot*.exe" "%USERPROFILE%\Downloads\Godot*win64.exe" "%USERPROFILE%\Downloads\Godot*\Godot*win64.exe") do if not defined GODOT if exist "%%~F" set "GODOT=%%~fF"
+if not defined GODOT for %%F in ("%USERPROFILE%\Desktop\Godot\Godot*.exe" "%USERPROFILE%\OneDrive\Desktop\Godot\Godot*.exe" "%USERPROFILE%\Desktop\Godot*.exe" "%USERPROFILE%\OneDrive\Desktop\Godot*.exe" "%ProgramFiles%\Godot\Godot*.exe" "%LocalAppData%\Programs\Godot\Godot*.exe" "%USERPROFILE%\Downloads\Godot*win64.exe" "%USERPROFILE%\Downloads\Godot*\Godot*win64.exe") do if not defined GODOT if exist "%%~F" set "GODOT=%%~fF"
 if not defined GODOT (
   echo Godot 4 was not found. Downloading it ^(free, about 85 MB^) into tools\godot ...
   if not exist tools\godot mkdir tools\godot
