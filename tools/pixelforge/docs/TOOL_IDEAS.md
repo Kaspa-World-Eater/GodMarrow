@@ -1,4 +1,4 @@
-# Tools worth having (research, 2026-10-01)
+# Tools worth having
 
 What exists for free, what PixelForge already covers, and what would make building Godmarrow (and the next
 project) easier for a person. Each row says whether the Forge has it, could add it cheaply, or should just point
@@ -23,7 +23,7 @@ at an outside tool. Costs: everything here is free; nothing needs a GPU unless m
 | Still-image animation (sway, flicker, breathe) and RotSprite rotation | `pixelforge animate`, `pixelforge rotate` | |
 | AI operator interface | `pixelforge mcp` (MCP server) + `docs/GUIDE_AI.md` | Any Claude can drive it |
 
-## Added since (2026-10-01, all CPU, all offline)
+## Added since (all CPU, all offline)
 
 Done from the list below: item icons (`icons`), portraits (`portrait`), palette swapper (`recolor`), sound
 sheets (`sfx`, 18 presets), before/after (`compare`), batch mode (`project run-all --all`), a machine check

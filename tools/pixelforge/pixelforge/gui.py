@@ -6,12 +6,13 @@ boxes and previews around those functions.
 
 from __future__ import annotations
 
+import json
 import queue
 import threading
 import traceback
 import webbrowser
 from pathlib import Path
-from tkinter import BOTH, END, LEFT, RIGHT, TOP, X, Y, BooleanVar, StringVar, Tk, Toplevel, filedialog, messagebox
+from tkinter import BOTH, BOTTOM, END, LEFT, RIGHT, TOP, X, Y, BooleanVar, Menu, StringVar, Tk, Toplevel, filedialog, messagebox
 from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 
@@ -67,6 +68,28 @@ def apply_theme(root) -> None:
     root.option_add("*TCombobox*Listbox.background", FIELD)
     root.option_add("*TCombobox*Listbox.foreground", BONE)
 HELP_URL = "https://github.com/Kaspa-World-Eater/godmarrow/blob/main/tools/pixelforge/docs/GUIDE_HUMANS.md"
+RECENT_FILE = Path.home() / ".pixelforge" / "recent.json"
+STEP_BLURB = {   # one line per step, shown on the Continue button
+    "prompts": "write the Midjourney prompts", "import": "bring the pictures in", "split": "cut the figures out",
+    "palette": "lock the colours", "model": "build the 3D figure", "rig": "add the skeleton and moves",
+    "render": "film it from 8 directions", "pixelate": "turn the film into pixel art", "export": "make the game files",
+}
+
+
+def _recent() -> list[str]:
+    try:
+        return [p for p in json.loads(RECENT_FILE.read_text()) if Path(p).exists()]
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def _remember(path: str) -> None:
+    try:
+        items = [path] + [p for p in _recent() if p != path]
+        RECENT_FILE.parent.mkdir(parents=True, exist_ok=True)
+        RECENT_FILE.write_text(json.dumps(items[:8]))
+    except OSError:
+        pass
 
 
 class Studio:
@@ -86,53 +109,116 @@ class Studio:
                 root.iconbitmap(str(icon))
             except Exception:  # noqa: BLE001  (non-Windows Tk)
                 pass
-        root.minsize(900, 600)
+        root.minsize(960, 640)
+        self.status = StringVar(value="Ready")
+        self._menu()
         self._build()
         root.after(100, self._drain_log)
         if project_path:
             self._open(project_path)
 
     # ------------------------------------------------------------------ layout
+    def _menu(self) -> None:
+        m = Menu(self.root, tearoff=0)
+        f = Menu(m, tearoff=0)
+        f.add_command(label="New project…", command=self._new, accelerator="Ctrl+N")
+        f.add_command(label="Open project…", command=self._open_dialog, accelerator="Ctrl+O")
+        self.recent_menu = Menu(f, tearoff=0)
+        f.add_cascade(label="Open recent", menu=self.recent_menu)
+        f.add_separator()
+        f.add_command(label="Exit", command=self.root.destroy)
+        m.add_cascade(label="File", menu=f)
+        c = Menu(m, tearoff=0)
+        c.add_command(label="Add character…", command=self._add_character)
+        c.add_command(label="Run all automatic steps", command=self._run_all, accelerator="F5")
+        c.add_command(label="Check this character", command=self._check)
+        c.add_separator()
+        c.add_command(label="Project settings…", command=self._settings)
+        m.add_cascade(label="Character", menu=c)
+        t = Menu(m, tearoff=0)
+        t.add_command(label="Tools window (effects, props, tiles, sounds, music…)", command=self._tools, accelerator="Ctrl+T")
+        m.add_cascade(label="Tools", menu=t)
+        h = Menu(m, tearoff=0)
+        h.add_command(label="User guide", command=lambda: webbrowser.open(HELP_URL))
+        h.add_command(label="About PixelForge", command=lambda: messagebox.showinfo(APP_TITLE, "PixelForge Studio\n\nPaintings in, game-ready pixel art out: characters in 8 directions, props, effects, tiles, UI, sounds and music.\n\nEvery step is also a command line and an AI-assistant tool."))
+        m.add_cascade(label="Help", menu=h)
+        self.root.config(menu=m)
+        self.root.bind("<Control-n>", lambda e: self._new())
+        self.root.bind("<Control-o>", lambda e: self._open_dialog())
+        self.root.bind("<Control-t>", lambda e: self._tools())
+        self.root.bind("<F5>", lambda e: self._run_all())
+        self._fill_recent()
+
+    def _fill_recent(self) -> None:
+        self.recent_menu.delete(0, END)
+        for p in _recent():
+            self.recent_menu.add_command(label=p, command=lambda p=p: self._open(p))
+        if not _recent():
+            self.recent_menu.add_command(label="(none yet)", state="disabled")
+
     def _build(self) -> None:
-        bar = ttk.Frame(self.root, padding=6)
+        bar = ttk.Frame(self.root, padding=(8, 6))
         bar.pack(side=TOP, fill=X)
         ttk.Button(bar, text="New project", command=self._new).pack(side=LEFT)
         ttk.Button(bar, text="Open project", command=self._open_dialog).pack(side=LEFT, padx=4)
-        ttk.Label(bar, text="  Character:").pack(side=LEFT)
+        ttk.Separator(bar, orient="vertical").pack(side=LEFT, fill=Y, padx=8)
+        ttk.Label(bar, text="Character:").pack(side=LEFT)
         self.char_box = ttk.Combobox(bar, textvariable=self.char, state="readonly", width=24)
-        self.char_box.pack(side=LEFT)
+        self.char_box.pack(side=LEFT, padx=4)
         self.char_box.bind("<<ComboboxSelected>>", lambda e: self._refresh())
         ttk.Button(bar, text="+ Add character", command=self._add_character).pack(side=LEFT, padx=4)
+        ttk.Separator(bar, orient="vertical").pack(side=LEFT, fill=Y, padx=8)
+        ttk.Button(bar, text="Tools", command=self._tools).pack(side=LEFT)
         ttk.Button(bar, text="Settings", command=self._settings).pack(side=LEFT, padx=4)
-        ttk.Button(bar, text="Tools", command=self._tools).pack(side=LEFT, padx=4)
         ttk.Button(bar, text="Help", command=lambda: webbrowser.open(HELP_URL)).pack(side=RIGHT)
-        self.title_label = ttk.Label(bar, text="No project open", font=("Segoe UI", 10, "bold"))
-        self.title_label.pack(side=RIGHT, padx=12)
+
+        foot = ttk.Frame(self.root, padding=(8, 3))
+        foot.pack(side=BOTTOM, fill=X)
+        self.progress = ttk.Progressbar(foot, mode="indeterminate", length=160)
+        ttk.Label(foot, textvariable=self.status, style="Dim.TLabel").pack(side=LEFT)
 
         body = ttk.Panedwindow(self.root, orient="horizontal")
         body.pack(fill=BOTH, expand=True)
-        left = ttk.Frame(body, padding=6)
+        left = ttk.Frame(body, padding=8)
         body.add(left, weight=0)
-        ttk.Label(left, text="Steps", font=("Segoe UI", 10, "bold")).pack(anchor="w")
+        ttk.Label(left, text="Steps", font=FONT_B).pack(anchor="w")
         self.step_list = ttk.Treeview(left, columns=("state",), show="tree", height=len(STEPS) + 2, selectmode="browse")
-        self.step_list.column("#0", width=330)
+        self.step_list.column("#0", width=340)
+        self.step_list.tag_configure("done", foreground=DIM)
+        self.step_list.tag_configure("next", foreground=TEAL, font=FONT_B)
+        self.step_list.tag_configure("todo", foreground=BONE)
         for i, (key, title) in enumerate(STEPS):
-            self.step_list.insert("", END, iid=key, text=f"{i + 1}. {title}")
-        self.step_list.insert("", END, iid="still", text="★ Quick path: sprite + animation from one image")
+            self.step_list.insert("", END, iid=key, text=f"{i + 1}. {title}", tags=("todo",))
+        self.step_list.insert("", END, iid="still", text="★ Quick path: sprite + animation from one image", tags=("todo",))
         self.step_list.pack(fill=Y)
         self.step_list.bind("<<TreeviewSelect>>", lambda e: self._show_step())
-        ttk.Button(left, text="▶ Run all automatic steps", command=self._run_all, style="Go.TButton").pack(fill=X, pady=(10, 2))
-        ttk.Label(left, text="(stops at any step that needs you)", style="Dim.TLabel").pack(anchor="w")
+        self.go_btn = ttk.Button(left, text="▶ Continue", command=self._continue, style="Go.TButton")
+        self.go_btn.pack(fill=X, pady=(12, 2))
+        ttk.Button(left, text="Run all automatic steps", command=self._run_all).pack(fill=X, pady=2)
+        ttk.Label(left, text="Stops and tells you if a step needs you.", style="Dim.TLabel").pack(anchor="w")
+        self.check_label = ttk.Label(left, text="", style="Dim.TLabel", wraplength=330, justify=LEFT)
+        self.check_label.pack(anchor="w", pady=(10, 0))
 
         right = ttk.Panedwindow(body, orient="vertical")
         body.add(right, weight=1)
-        self.panel = ttk.Frame(right, padding=10)
+        self.panel = ttk.Frame(right, padding=12)
         right.add(self.panel, weight=3)
         logf = ttk.Labelframe(right, text="Log", padding=4)
         right.add(logf, weight=1)
         self.log = ScrolledText(logf, height=8, state="disabled", font=("Consolas", 9), bg=FIELD, fg=BONE)
         self.log.pack(fill=BOTH, expand=True)
         self._show_welcome()
+
+    def _set_busy(self, on: bool, text: str = "") -> None:
+        self.busy = on
+        self.status.set(text or ("Working…" if on else "Ready"))
+        if on:
+            self.progress.pack(side=RIGHT)
+            self.progress.start(12)
+        else:
+            self.progress.stop()
+            self.progress.pack_forget()
+        self.go_btn.configure(state="disabled" if on else "normal")
 
     def _clear_panel(self) -> None:
         for w in self.panel.winfo_children():
@@ -142,14 +228,24 @@ class Studio:
     def _show_welcome(self) -> None:
         self._clear_panel()
         ttk.Label(self.panel, text=APP_TITLE, style="Title.TLabel").pack(anchor="w")
-        ttk.Label(self.panel, text="Turns your Midjourney paintings into animated pixel-art characters for the game, in 8 directions.", style="Dim.TLabel").pack(anchor="w", pady=(2, 10))
-        ttk.Label(self.panel, text="How it goes", style="Head.TLabel").pack(anchor="w")
-        self._steps_text(["Click 'New project' (once per game) and 'Add character' (once per character).",
-                          "Step 1 writes the Midjourney prompts for you. Paint the sheet in Midjourney and save it.",
-                          "Step 2: bring the picture in. Then click '▶ Run all automatic steps' on the left.",
-                          "Wait. The log at the bottom shows what is happening. The app stops and tells you if it needs something (Blender, a picture).",
-                          "Step 8 has 'Preview animation' to judge the result; step 9 makes the game files."])
-        ttk.Label(self.panel, text="Every step can also be run by an AI assistant from the command line (see Help).", style="Dim.TLabel").pack(anchor="w", pady=6)
+        ttk.Label(self.panel, text="Paintings in, game-ready pixel art out: characters in 8 directions, props, effects, tiles, UI, sounds and music.", style="Dim.TLabel", wraplength=720).pack(anchor="w", pady=(2, 14))
+        row = ttk.Frame(self.panel)
+        row.pack(anchor="w", pady=(0, 14))
+        ttk.Button(row, text="New project", command=self._new, style="Go.TButton").pack(side=LEFT)
+        ttk.Button(row, text="Open project", command=self._open_dialog).pack(side=LEFT, padx=6)
+        ttk.Button(row, text="Tools (no project needed)", command=self._tools).pack(side=LEFT)
+        recent = _recent()
+        if recent:
+            ttk.Label(self.panel, text="Recent projects", style="Head.TLabel").pack(anchor="w")
+            for p in recent[:5]:
+                ttk.Button(self.panel, text=p, command=lambda p=p: self._open(p)).pack(anchor="w", pady=1)
+        ttk.Label(self.panel, text="A character in five moves", style="Head.TLabel").pack(anchor="w", pady=(12, 0))
+        self._steps_text(["New project, then Add character: a name and one sentence about them.",
+                          "Step 1 writes the Midjourney prompts. Paint the sheet and save the PNG.",
+                          "Step 2: bring the picture in. Then press Continue, or Run all automatic steps.",
+                          "Watch the log. The app stops and says so if it needs something (Blender, a picture).",
+                          "Step 8 previews the animation; step 9 writes the files the game loads."])
+        ttk.Label(self.panel, text="Everything here is also a command line and an AI-assistant tool (Help > User guide).", style="Dim.TLabel").pack(anchor="w", pady=6)
 
     # ----------------------------------------------------------------- project
     def _new(self) -> None:
@@ -174,13 +270,18 @@ class Studio:
         except Exception as e:  # noqa: BLE001
             messagebox.showerror(APP_TITLE, str(e))
             return
-        self.title_label.config(text=f"{self.project.name}  ·  style: {self.project.style}")
+        self.root.title(f"{APP_TITLE}  ·  {self.project.name}  ·  style: {self.project.style}")
+        self.status.set(f"Project: {self.project.name}  ·  style: {self.project.style}  ·  {self.project.root}")
         self._log(f"Opened {self.project.file}")
+        _remember(str(self.project.root))
+        self._fill_recent()
         names = sorted(self.project.characters)
         self.char_box["values"] = names
         if names:
             self.char.set(names[0])
         self._refresh()
+        if names and not self.step_list.selection():
+            self.step_list.selection_set(self._next_step(self.project.character(names[0])))
 
     def _add_character(self) -> None:
         if not self._need_project():
@@ -271,19 +372,73 @@ class Studio:
             return None
         return self.project.character(self.char.get())
 
+    def _next_step(self, c) -> str:
+        for key, _ in STEPS:
+            if not c.done.get(key):
+                return key
+        return "export"
+
     def _refresh(self, redraw: bool = True) -> None:
-        """Update the tick marks in the step list; ``redraw`` also re-renders the current step panel
-        (never from inside a step's own code, which would render itself again)."""
+        """Update the step list (done / next / to do), the Continue button and the check summary; ``redraw`` also
+        re-renders the current step panel (never from inside a step's own code, which would render itself again)."""
         if not self.project:
             return
         c = self.project.characters.get(self.char.get())
-        for key, title in STEPS:
-            mark = "✔ " if c and c.done.get(key) else "    "
-            i = [k for k, _ in STEPS].index(key)
-            self.step_list.item(key, text=f"{mark}{i + 1}. {title}")
+        nxt = self._next_step(c) if c else None
+        for i, (key, title) in enumerate(STEPS):
+            done = bool(c and c.done.get(key))
+            tag = "done" if done else ("next" if key == nxt else "todo")
+            mark = "✔ " if done else ("▶ " if key == nxt else "    ")
+            self.step_list.item(key, text=f"{mark}{i + 1}. {title}", tags=(tag,))
+        if c is None:
+            self.go_btn.configure(text="▶ Add a character")
+        elif all(c.done.get(k) for k, _ in STEPS):
+            self.go_btn.configure(text="✔ All steps done")
+        else:
+            self.go_btn.configure(text=f"▶ Continue: {STEP_BLURB.get(nxt, nxt)}")
+        issues = [v for k, v in (c.notes.items() if c else []) if k.endswith("_check") and v not in ("cutouts clean", "carve clean", "frames clean")]
+        self.check_label.configure(text=("Checks: " + " · ".join(issues)) if issues else ("Checks: clean" if c and any(k.endswith("_check") for k in c.notes) else ""),
+                                   style="Warn.TLabel" if issues else "Good.TLabel")
         sel = self.step_list.selection()
         if sel and redraw:
             self._show_step()
+
+    def _continue(self) -> None:
+        """The one button a person needs: open the next step, and run it when it is automatic."""
+        c = self._need_char()
+        if c is None:
+            self._add_character()
+            return
+        key = self._next_step(c)
+        self.step_list.selection_set(key)
+        if key in ("prompts", "import"):
+            return   # these need the person
+        self._run(lambda: api.run_step(self.project, c.name, key, log=self._log), after=lambda r: self._after_step(key, r), what=f"Working: {STEP_BLURB.get(key, key)}…")
+
+    def _after_step(self, key: str, r: dict) -> None:
+        self._refresh()
+        c = self.project.character(self.char.get())
+        nxt = self._next_step(c)
+        self.step_list.selection_set(nxt if nxt != key else key)
+        self.status.set(f"Done: {STEP_BLURB.get(key, key)}. Next: {STEP_BLURB.get(nxt, nxt)}." if nxt != key else "All steps done.")
+
+    def _check(self) -> None:
+        c = self._need_char()
+        if c is None:
+            return
+        from .checks import check_character
+
+        r = check_character(self.project, c.name)
+        text = "Nothing to fix." if r["ok"] else "\n".join("• " + i for i in r["issues"])
+        self._log("CHECK " + c.name + ": " + text.replace("\n", " | "))
+        messagebox.showinfo("Checks: " + c.name, text)
+
+    def _check_note(self, c, key: str) -> None:
+        note = c.notes.get(key)
+        if not note:
+            return
+        clean = note in ("cutouts clean", "carve clean", "frames clean")
+        ttk.Label(self.panel, text=("✔ " if clean else "⚠ ") + note, style="Good.TLabel" if clean else "Warn.TLabel", wraplength=720, justify=LEFT).pack(anchor="w", pady=(4, 0))
 
     # ------------------------------------------------------------------- steps
     def _show_step(self) -> None:
@@ -398,9 +553,10 @@ class Studio:
                 c.settings["sheet_views"] = n
             self._run(lambda: api.split(self.project, c.name, tolerance=t, expected_views=n), after=lambda r: self._show_step())
 
-        ttk.Button(f, text="Run split", command=run_split).pack(side=LEFT, padx=8)
+        ttk.Button(self.panel, text="Run split", command=run_split, style="Go.TButton").pack(anchor="w", pady=(6, 2))
         views_dir = self.project.sub(c.name, "views")
         views = [p for p in sorted(views_dir.glob("*.png")) if not p.stem.endswith("_raw")]
+        self._check_note(c, "split_check")
         self._preview_row(views, 240)
         if views:
             row = ttk.Frame(self.panel)
@@ -408,10 +564,10 @@ class Studio:
             ttk.Label(row, text="Fix by hand:").pack(side=LEFT)
             for p in views:
                 ttk.Button(row, text=f"Edit {p.stem}", command=lambda p=p: self._edit_cutout(p)).pack(side=LEFT, padx=3)
-            ttk.Button(row, text="Open folder (edit in any paint program, then Reload)", command=lambda: webbrowser.open(str(views_dir))).pack(side=LEFT, padx=(12, 3))
+            ttk.Button(row, text="Open folder", command=lambda: webbrowser.open(str(views_dir))).pack(side=LEFT, padx=(12, 3))
             ttk.Button(row, text="Reload", command=self._show_step).pack(side=LEFT)
             ttk.Label(self.panel, text="Tip: the front view decides the body; make sure nothing of the background is left inside it. "
-                      "After editing, run the next steps again (palette, model).", style="Dim.TLabel", wraplength=640).pack(anchor="w", pady=4)
+                      "You can also edit the files in the folder with any paint program, then Reload. After editing, run the next steps again.", style="Dim.TLabel", wraplength=720).pack(anchor="w", pady=4)
 
     def _edit_cutout(self, path) -> None:
         from .cutout_editor import open_editor
@@ -479,7 +635,7 @@ class Studio:
 
     def _step_palette(self, c) -> None:
         self._heading("Step 4: Lock the colours", "Picks the character's colours once so every frame of every animation uses the same ones (no shimmer).")
-        self._steps_text(["Click 'Build palette'. That is all. With the Godmarrow style every colour is kept; other styles reduce to a fixed set."])
+        self._steps_text(["Click 'Build palette'. That is all. The full-colour style keeps every colour; the other styles reduce to a fixed set."])
         ttk.Button(self.panel, text="Build palette", command=lambda: self._run(lambda: api.make_palette(self.project, c.name), after=lambda r: self._show_step())).pack(anchor="w")
         sw = self.project.char_dir(c.name) / "palette.png"
         if sw.exists():
@@ -487,10 +643,10 @@ class Studio:
             ttk.Label(self.panel, text=c.notes.get("palette", "")).pack(anchor="w")
 
     def _step_model(self, c) -> None:
-        self._heading("Step 5: Build the 3D figure", "PixelForge shapes a real human figure to match your painting and wraps the painting around it. You never model anything by hand.")
+        self._heading("Step 5: Build the 3D figure", "PixelForge carves a figure from the views of your painting and wraps the painting around it. You never model anything by hand.")
         self._steps_text(["Blender (free) must be on this computer. If the line below says 'not found', click 'Download Blender for me' and wait.",
                           "Click 'Build model'. It takes a minute or two. The log at the bottom shows progress.",
-                          "A figure in a long robe (no legs showing) gets a carved shape instead; that is normal."])
+                          "Wide hats become real cones; thin cords and charms become painted cards. A plan sheet (prompt A3) gives the top of the figure its own painting."])
         found = api.find_blender(self.project)
         ttk.Label(self.panel, text=f"Blender: {found or 'not found'}", style="Good.TLabel" if found else "Warn.TLabel").pack(anchor="w")
         if not found:
@@ -498,10 +654,10 @@ class Studio:
             ttk.Button(self.panel, text="Download Blender for me", command=lambda: self._run(lambda: api.download_blender(self.project, log=self._log), after=lambda r: self._show_step())).pack(anchor="w", pady=2)
         ttk.Button(self.panel, text="Build model", command=lambda: self._run(lambda: api.build_model(self.project, c.name, log=self._log), after=self._after_model)).pack(anchor="w", pady=4)
         ttk.Label(self.panel, text=c.notes.get("model_note", ""), style="Dim.TLabel").pack(anchor="w")
+        self._check_note(c, "model_check")
 
     def _after_model(self, r) -> None:
-        self._show_step()
-        messagebox.showinfo("Model built", "Next: step 6 rigs and animates it automatically. " + r["instructions"])
+        self._after_step("model", r)
 
     def _step_rig(self, c) -> None:
         mix = self.project.sub(c.name, "mixamo")
@@ -521,7 +677,7 @@ class Studio:
         ttk.Label(self.panel, text=f"{len(files)} FBX file(s) in the folder.").pack(anchor="w")
 
     def _step_render(self, c) -> None:
-        self._heading("Step 7: Film it from 8 directions", "Blender films every animation from every direction with the game's camera (looking down at 30°, like Diablo II).")
+        self._heading("Step 7: Film it from 8 directions", "Blender films every animation from every direction with the game camera (looking down at 30°, the classic isometric view).")
         self._steps_text(["Click 'Render'. This is the slow step: a few minutes on a laptop. Watch the log.",
                           "'Every Nth frame' 2 is the normal setting (half the frames, same look). 1 is smoother and twice as slow.",
                           "When it is done, click 'Preview animation' to watch any move from any direction."])
@@ -535,6 +691,7 @@ class Studio:
         ttk.Entry(f, textvariable=elev, width=4).pack(side=LEFT, padx=4)
         ttk.Button(self.panel, text="Render", command=lambda: self._run(lambda: api.render(self.project, c.name, step=int(step.get()), elevation=float(elev.get()), log=self._log), after=lambda r: self._show_step())).pack(anchor="w", pady=4)
         ttk.Label(self.panel, text=c.notes.get("render", "")).pack(anchor="w")
+        self._check_note(c, "render_check")
         ttk.Button(self.panel, text="Preview animation (renders)", command=lambda: self._preview_anim(c, "renders")).pack(anchor="w", pady=2)
         renders = self.project.sub(c.name, "renders")
         sample = sorted(renders.glob("*/S/frame_000.png"))[:1] + sorted(renders.glob("*/W/frame_000.png"))[:1]
@@ -542,7 +699,7 @@ class Studio:
 
     def _step_pixelate(self, c) -> None:
         self._heading("Step 8: Turn the film into pixel art", f"Every frame becomes a pixel sprite in the '{self.project.style}' style, with the locked colours, so nothing flickers between frames.")
-        self._steps_text(["Tick 'Add a dark 1-pixel outline' if you want the Godmarrow outline (recommended for the game).",
+        self._steps_text(["Tick 'Add a dark 1-pixel outline' if your game draws sprites with an outline.",
                           "Click 'Pixelate all frames'.",
                           "Click 'Preview animation' and judge it. If it looks wrong, the fix is usually in step 3 (cutout) or step 5 (model); redo from there."])
         outline = BooleanVar(value=False)
@@ -555,26 +712,27 @@ class Studio:
 
     def _step_export(self, c) -> None:
         self._heading("Step 9: Make the game files", "Packs every animation into sprite sheets and writes the files a game loads.")
-        self._steps_text(["For Godmarrow: type the kind name (for example 'mystic') and click 'Export for Godmarrow'. Copy the files it names into the game's art/sprites folder.",
-                          "For any other Godot game: click 'Export' for a SpriteFrames (.tres) and a ready scene (.tscn)."])
+        self._steps_text(["Any Godot game: click 'Export' for a sprite sheet, a SpriteFrames (.tres) and a ready scene (.tscn).",
+                          "Game atlas: type the kind name (for example 'mystic') and click 'Export game atlas'. It writes <kind>.png + <kind>.json with 8 views and foot anchors, the format the PixelForge Godot add-on loads."])
         ttk.Button(self.panel, text="Export", command=lambda: self._run(lambda: api.export(self.project, c.name), after=self._after_export)).pack(anchor="w")
         ttk.Label(self.panel, text=c.notes.get("export", "")).pack(anchor="w")
         sheet = self.project.sub(c.name, "export") / f"{c.name}.png"
         if sheet.exists():
             self._preview_row([sheet], 300)
         ttk.Separator(self.panel).pack(fill=X, pady=8)
-        ttk.Label(self.panel, text="Godmarrow: write the game's own atlas (art/sprites/<kind>.png|json, 8 views, foot anchors, normal/depth sets when rendered).", wraplength=640).pack(anchor="w")
+        ttk.Label(self.panel, text="Game atlas: <kind>.png + <kind>.json (8 views, foot anchors, normal and depth sets when those passes were rendered).", wraplength=720).pack(anchor="w")
         f = ttk.Frame(self.panel)
         f.pack(anchor="w", pady=2)
         kind = StringVar(value=c.name)
         ttk.Label(f, text="Kind (file name):").pack(side=LEFT)
         ttk.Entry(f, textvariable=kind, width=16).pack(side=LEFT, padx=4)
-        ttk.Button(f, text="Export for Godmarrow", command=lambda: self._run(lambda: api.export_game(self.project, c.name, kind.get()), after=lambda r: (self._show_step(), messagebox.showinfo("Exported", r["color"]["png"])))).pack(side=LEFT, padx=6)
+        ttk.Button(f, text="Export game atlas", command=lambda: self._run(lambda: api.export_game(self.project, c.name, kind.get()), after=lambda r: (self._show_step(), self.status.set("Exported " + r["color"]["png"])))).pack(side=LEFT, padx=6)
         ttk.Label(self.panel, text=c.notes.get("export_game", "")).pack(anchor="w")
 
     def _after_export(self, r) -> None:
         self._show_step()
-        messagebox.showinfo("Exported", r["godot"])
+        self.status.set("Exported: " + str(r.get("godot", "")))
+        self._log("Exported: " + str(r.get("godot", "")))
 
     def _step_still(self, c) -> None:
         self._heading("Quick path: one picture, one sprite", "No 3D. Takes one picture (the pixel-style image or the front view) and makes a sprite with a simple animation (sway, hover, flame...). Good for a first look, bosses, portraits and items.")
@@ -616,11 +774,11 @@ class Studio:
             ttk.Label(cell, image=photo).pack()
             ttk.Label(cell, text=p.name, style="Dim.TLabel").pack()
 
-    def _run(self, fn, after=None) -> None:
+    def _run(self, fn, after=None, what: str = "Working…") -> None:
         if self.busy:
-            messagebox.showinfo(APP_TITLE, "Still working on the previous step - watch the log.")
+            self.status.set("Still working on the previous step; watch the log.")
             return
-        self.busy = True
+        self._set_busy(True, what)
 
         def work():
             try:
@@ -635,8 +793,7 @@ class Studio:
                 self._log("ERROR: " + str(e) + "\n" + traceback.format_exc())
                 self.root.after(0, lambda: messagebox.showerror(APP_TITLE, str(e)))
             finally:
-                self.busy = False
-                self.root.after(0, self._refresh)
+                self.root.after(0, lambda: (self._set_busy(False), self._refresh()))
 
         threading.Thread(target=work, daemon=True).start()
 
@@ -652,7 +809,8 @@ class Studio:
             messagebox.showinfo(APP_TITLE, f"Ran: {', '.join(r['ran']) or 'nothing'}.\n\nStopped at step '{r['blocked_at']}':\n{r['reason']}")
             self.step_list.selection_set(r["blocked_at"])
         else:
-            messagebox.showinfo(APP_TITLE, f"All steps done: {', '.join(r['ran'])}")
+            self.status.set("All steps done: " + ", ".join(r["ran"]))
+            self.step_list.selection_set("export")
 
     def _log(self, text: str) -> None:
         self.log_queue.put(text)

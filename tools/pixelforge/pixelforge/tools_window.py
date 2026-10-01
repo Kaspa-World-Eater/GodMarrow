@@ -60,7 +60,7 @@ TOOLS = [
      "worldprompt"),
     ("Painted object", "A painted object / building / tree sheet becomes a carved, filmed, pixelated prop the hero way.",
      [("sheet", "file", "", None), ("name", "text", "gravestone", None), ("out", "dir", "art/objects", None), ("height", "float", 1.2, None),
-      ("views", "choice", "auto", ["auto", "2", "3", "4"]), ("game_objects", "file", "", None)],
+      ("views", "choice", "auto", ["auto", "2", "3", "4"]), ("top", "file", "", None), ("canopy", "check", False, None), ("game_objects", "file", "", None)],
      "object"),
     ("Skill trees", "Open the skill-tree editor over a game's data/skills.json.",
      [("skills", "file", "", None)],
@@ -119,7 +119,8 @@ def run_tool(key: str, v: dict) -> dict:
         return {"ok": True, "prompt": build_world_prompt(v["kind"], v["description"], v["sref"])}
     if key == "object":
         from .object3d import make_object
-        return make_object(v["sheet"], v["name"], v["out"], height=float(v["height"]), views=None if v["views"] == "auto" else int(v["views"]), game_objects=v["game_objects"] or None)
+        return make_object(v["sheet"], v["name"], v["out"], height=float(v["height"]), views=None if v["views"] == "auto" else int(v["views"]), game_objects=v["game_objects"] or None,
+                           top=v.get("top") or None, canopy=bool(v.get("canopy")))
     if key == "skilltree":
         from .skilltree import gui
         gui(v["skills"])
@@ -135,41 +136,77 @@ def run_tool(key: str, v: dict) -> dict:
     raise ValueError(key)
 
 
+GROUPS = [("Art", ["Effects", "Prop / tree", "Painted object", "Item icons", "Portrait", "Ground tiles", "UI frame", "Recolour", "Compare", "World prompts"]),
+          ("Audio", ["Sounds", "Music"]),
+          ("Game", ["Skill trees", "Godot add-on"])]
+
+
 class ToolsWindow:
+    """One window for every tool that is not the character pipeline: a list on the left (grouped Art / Audio / Game),
+    the chosen tool's form on the right, a log below. Forms are built from TOOLS, so a new tool is ten lines."""
+
     def __init__(self, master, log=None, base_dir: str | None = None):
         self.log = log or (lambda m: None)
         self.base = Path(base_dir) if base_dir else Path.cwd()
         self.win = Toplevel(master)
         self.win.title("PixelForge tools")
-        self.win.geometry("1320x640")   # wide enough for every tab name to read in full
-        nb = ttk.Notebook(self.win)
-        nb.pack(fill=BOTH, expand=True, padx=6, pady=6)
-        self.out = ScrolledText(self.win, height=6, state="disabled", font=("Consolas", 9))
-        self.out.pack(fill=X, padx=6, pady=(0, 6))
-        for title, blurb, fields, key in TOOLS:
-            tab = ttk.Frame(nb, padding=10)
-            nb.add(tab, text=title)
-            ttk.Label(tab, text=blurb, wraplength=700, justify=LEFT).pack(anchor="w", pady=(0, 8))
-            vars_ = {}
-            for name, kind, default, choices in fields:
-                row = ttk.Frame(tab)
-                row.pack(fill=X, pady=2)
-                ttk.Label(row, text=name.replace("_", " "), width=16).pack(side=LEFT)
-                if kind == "check":
-                    var = BooleanVar(value=bool(default))
-                    ttk.Checkbutton(row, variable=var).pack(side=LEFT)
-                elif kind == "choice":
-                    var = StringVar(value=str(default))
-                    ttk.Combobox(row, textvariable=var, values=choices, state="readonly", width=18).pack(side=LEFT)
-                else:
-                    var = StringVar(value=str(default))
-                    ttk.Entry(row, textvariable=var, width=44).pack(side=LEFT)
-                    if kind == "file":
-                        ttk.Button(row, text="Choose…", command=lambda v=var: v.set(filedialog.askopenfilename() or v.get())).pack(side=LEFT, padx=4)
-                    elif kind == "dir":
-                        ttk.Button(row, text="Folder…", command=lambda v=var: v.set(filedialog.askdirectory() or v.get())).pack(side=LEFT, padx=4)
-                vars_[name] = var
-            ttk.Button(tab, text=f"Run {title.lower()}", command=lambda k=key, vs=vars_: self._run(k, vs)).pack(anchor="w", pady=8)
+        self.win.geometry("1100x680")
+        self.win.minsize(900, 560)
+        body = ttk.Panedwindow(self.win, orient="horizontal")
+        body.pack(fill=BOTH, expand=True, padx=6, pady=6)
+        left = ttk.Frame(body, padding=4)
+        body.add(left, weight=0)
+        self.tree = ttk.Treeview(left, show="tree", selectmode="browse", height=22)
+        self.tree.column("#0", width=200)
+        by_title = {t[0]: t for t in TOOLS}
+        for group, names in GROUPS:
+            gid = self.tree.insert("", END, text=group, open=True)
+            for n in names:
+                if n in by_title:
+                    self.tree.insert(gid, END, iid=n, text=n)
+        for t in TOOLS:   # anything not in a group still shows
+            if not self.tree.exists(t[0]):
+                self.tree.insert("", END, iid=t[0], text=t[0])
+        self.tree.pack(fill=BOTH, expand=True)
+        self.tree.bind("<<TreeviewSelect>>", lambda e: self._show())
+        right = ttk.Frame(body, padding=8)
+        body.add(right, weight=1)
+        self.form = ttk.Frame(right)
+        self.form.pack(fill=BOTH, expand=True)
+        self.out = ScrolledText(right, height=7, state="disabled", font=("Consolas", 9))
+        self.out.pack(fill=X, pady=(6, 0))
+        self.by_title = by_title
+        self.tree.selection_set(TOOLS[0][0])
+
+    def _show(self) -> None:
+        sel = self.tree.selection()
+        if not sel or sel[0] not in self.by_title:
+            return
+        for w in self.form.winfo_children():
+            w.destroy()
+        title, blurb, fields, key = self.by_title[sel[0]]
+        ttk.Label(self.form, text=title, style="Head.TLabel").pack(anchor="w")
+        ttk.Label(self.form, text=blurb, wraplength=760, justify=LEFT, style="Dim.TLabel").pack(anchor="w", pady=(2, 10))
+        vars_ = {}
+        for name, kind, default, choices in fields:
+            row = ttk.Frame(self.form)
+            row.pack(fill=X, pady=2)
+            ttk.Label(row, text=name.replace("_", " "), width=16).pack(side=LEFT)
+            if kind == "check":
+                var = BooleanVar(value=bool(default))
+                ttk.Checkbutton(row, variable=var).pack(side=LEFT)
+            elif kind == "choice":
+                var = StringVar(value=str(default))
+                ttk.Combobox(row, textvariable=var, values=choices, state="readonly", width=18).pack(side=LEFT)
+            else:
+                var = StringVar(value=str(default))
+                ttk.Entry(row, textvariable=var, width=48).pack(side=LEFT)
+                if kind == "file":
+                    ttk.Button(row, text="Choose…", command=lambda v=var: v.set(filedialog.askopenfilename() or v.get())).pack(side=LEFT, padx=4)
+                elif kind == "dir":
+                    ttk.Button(row, text="Folder…", command=lambda v=var: v.set(filedialog.askdirectory() or v.get())).pack(side=LEFT, padx=4)
+            vars_[name] = var
+        ttk.Button(self.form, text=f"Run {title.lower()}", style="Go.TButton", command=lambda k=key, vs=vars_: self._run(k, vs)).pack(anchor="w", pady=10)
 
     def _say(self, text: str) -> None:
         self.out.configure(state="normal")

@@ -1,4 +1,4 @@
-# Research: free animation sources + headless retargeting (2026-10-01)
+# Research: free animation sources + headless retargeting
 
 ## Sources (verified)
 

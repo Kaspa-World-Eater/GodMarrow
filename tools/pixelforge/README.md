@@ -54,7 +54,7 @@ Image maths: `grid.py`, `palette.py`, `quantize.py`, `cleanup.py`, `pixelate.py`
 `sheet.py`, `model_spec.py`. Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`, `music.py`,
 `recolor.py`, `compare.py`, `skilltree.py`, `doctor.py`. Blender-side: `pixelforge/blender/` (no Pillow there).
 Godot-side: `godot_addon/pixelforge/` (`PFSpriteSet`, `PFFx`, `PFObjects`). Docs: `docs/GUIDE_HUMANS.md`,
-`docs/GUIDE_AI.md`, `docs/TOOL_IDEAS.md`, `NOTES.md`. Tests: `pytest` (52).
+`docs/GUIDE_AI.md`, `docs/DESIGN.md`, `docs/TOOL_IDEAS.md`. Tests: `pytest`.
 
 ## Rules it keeps
 

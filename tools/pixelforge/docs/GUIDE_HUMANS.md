@@ -45,6 +45,13 @@ The automatic cutout is usually right. When it is not (background stuck to the f
 For a first look, bosses, portraits, items. No Blender. Click **★ Quick path** in the step list, pick the picture
 and an animation (sway, hover, flame...), click **Make sprite + animate + export**.
 
+## The Continue button
+
+The step list marks what is done (grey tick), what is next (teal arrow) and what is still to do. **Continue** opens the
+next step and runs it when it is automatic; it only stops on the two steps that need you (the prompts and the
+pictures). **Run all automatic steps** does every remaining step in one go. The bar at the bottom shows what is
+happening; the log shows the details. Checks that found something are listed under the buttons in gold.
+
 ## Other things the Forge makes (the **Tools** button)
 
 Props and trees with sway, spell / aura / weather effects, inventory icons from one flat-lay picture, portraits,

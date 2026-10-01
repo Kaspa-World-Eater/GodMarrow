@@ -140,14 +140,14 @@ pixelforge object <sheet.png> <name> -o art/objects --height 1.2 [--views 3] [--
 pixelforge hero <sheet.png> <name> --describe "..." --project ./forge --to-game <game>/art/sprites           # a hero sheet -> the game, one command
 ```
 
-**The world is painted, then built (Derek, 2026-10-01): objects get the same treatment as heroes.** `prompt --world`
+**The world is painted, then built: objects get the same treatment as heroes.** `prompt --world`
 writes Midjourney prompts with one fixed style block (measured from the Hollow Mystic painting) and `--sref` to the
 hero sheet, asking for exactly the views the Forge carves from; `object` runs the hero chain on the result (cut out ->
 visual hull from the views -> painting projected on -> game camera + lantern rig -> mild grade -> pixels -> objects.json).
 `docs/ART_ORDER.md` in the game lists Act I's assets in the order to paint them. `prop3d` on CC0 kits is the fallback
 geometry until a painting exists for that asset.
 
-**The quality bar (Derek, 2026-10-01): Diablo II Resurrected / Path of Exile, not clip art.** Flat painted stand-ins
+**The quality bar: Diablo II Resurrected / Path of Exile, not clip art.** Flat painted stand-ins
 are out. Props and buildings come from real geometry: CC0 kits (Kenney graveyard / castle / nature / mini-dungeon,
 fetched by `tools/make_props3d.py`), grown trees, or a model carved from a painting; all through `prop3d`, whose
 look is: orthographic camera 30° above with the object turned to the iso diagonal, a warm key from the upper left,
@@ -173,7 +173,7 @@ behind `tools/skill_trees.py` — it keeps `tools/skill_tree_edits.json`, which 
 
 ## Godmarrow specifics (the game this forge serves)
 
-- Project style `godmarrow` (`pixelforge project set --style godmarrow`): ~195 px standing height, **every colour kept** (Derek rejected palette reduction), hard edges. Use it for every game character.
+- Project style `godmarrow` (`pixelforge project set --style godmarrow`): ~195 px standing height, **every colour kept** (no palette reduction), hard edges. Use it for every game character.
 - Sheet: prefer prompt **A2** (four views: front, three-quarter, side, back). The quarter view carves the diagonals and paints them; `split` names 4 figures `front quarter side back`.
 - Plan views: prompt **A3** (world kind `topdown` for objects) gives a second image, top view + underside side by side; import it as `topbottom`. The carve finds its orientation (`spec["orient"]`, IoU against the hull), cuts the footprint with it (hat brims, shoulders, crowns, roofs) and paints upward faces from it. Without it the top of a hat is painted from the front view, which is why wide hats looked flat-topped.
 - Checks (checks.py) run inside split, model and render and land in the step result (`check`) and the character's notes (`split_check`, `model_check`, `render_check`): paper-white pockets inside a figure, loose islands, dark paint dropped by the key, view heights that disagree, loose islands and plates in the carve, white pixels and height jumps in the frames. Cutouts also get `fill_bright_specks` (white specks inside dark cloth take the cloth's colour) and the carve counts a cell solid at 35% coverage so lacy hems keep their dark cloth. With no plan view the model gets a synthesized top (`synthesize_top`: topmost paint per column; a hat cone revolved from the brim band and lifted toward straw).
@@ -235,7 +235,7 @@ behind `tools/skill_trees.py` — it keeps `tools/skill_tree_edits.json`, which 
 
 ## What the 3D step actually does (so you can explain it)
 
-**Humanoid first (default since 2026-10-01).** When the sheet has a side view and the silhouette shows legs, the
+**Humanoid first.** When the sheet has a side view and the silhouette shows legs, the
 model step starts from the bundled CC0 mannequin (`assets/animations/quaternius_ual_standard.glb`: a human mesh
 already skinned to the armature that drives its 46 clips), fuses its jointed pieces into one skin, poses its arms down
 to the sheet's A-pose (the angle that best matches the painting), shrink-wraps it onto the hull carved from the

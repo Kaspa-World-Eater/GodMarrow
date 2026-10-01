@@ -1,4 +1,4 @@
-# Research: Godot 4 isometric ARPG architecture for Godmarrow (2026-10-01)
+# Research: Godot 4 isometric ARPG architecture for Godmarrow
 
 ## Templates / demos
 

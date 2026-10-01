@@ -1,4 +1,4 @@
-# Research: tiles, props, VFX, UI for Godmarrow (2026-10-01)
+# Research: tiles, props, VFX, UI for Godmarrow
 
 Scope: Midjourney is the only generator; everything else is numpy/Pillow
 post-processing inside PixelForge.
