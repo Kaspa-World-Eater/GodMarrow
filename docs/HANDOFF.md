@@ -177,6 +177,65 @@ PIXELFORGE_GODOT, tools\godot, PATH, Program Files, LocalAppData\Programs and Do
 
 **derek-33, 2026-10-02:** pulled to `a4c5819`; `Play Godmarrow.bat` launched like a double-click found `C:\Users\derek\OneDrive\Desktop\Godot\Godot_v4.7.2-stable_win64.exe`, downloaded nothing (no `tools\godot`), and the game window opened ("Godmarrow (DEBUG)"). Paused.
 
+**Studio overhaul (track/ui, 2026-10-01, late):** `tools/pixelforge/pixelforge/studio/` replaces the old Tkinter layout; `pixelforge.gui`
+forwards to it (`Studio`, `apply_theme`, `main`), so `pixelforge studio` and the desktop icon are unchanged. One window:
+a navigation column (Home · the character with its nine steps and the quick path · Editors: Cutout / Skin / Colour /
+Effects on a sprite / Spell designer · Tools: Describe it / Effects and spells / Objects and tiles / Icons, portraits, UI /
+Sounds and music / More · Game · Settings · Help), pages on the right, a status line with a progress bar, the log as a
+drawer (Log ▴). No `Toplevel` and no `messagebox` anywhere (grep-clean; the only box left is "could not start" in
+`studio/app.main`); the OS file pickers remain. Dark theme on every widget including combobox lists, scrollbars, Text,
+Listbox, Canvas, Spinbox, Scale, Notebook, Menu, tooltips (placed labels, not windows). Pages scroll and re-wrap their
+text to the pane width; every preview is a zoomable area (Fit / 1x / 2x / 4x / + / −) with its actions under it. Home:
+one big "Open a painting…" (names the character after the file, imports, runs every automatic step), drag-and-drop of a
+picture / project folder / spell file when `tkinterdnd2` is importable (optional: `install.bat` pip line, pyproject
+extra `studio`), recent projects with "forget", a "What to do next" card that follows the project's state. Character
+pages: one sentence, inputs, one primary button, previews, the check note; Continue always does the next right thing;
+Run all; **Redo from here** and **Start over** (inline confirmation) over the new `api.reset_character` (CLI
+`pixelforge project reset <char> [--from STEP] [--all]`, MCP `reset_character`); step 3 shows Edit / Skin / Colour under
+each cutout and opens the editor PAGE with that image and a "Back to step 3" button; steps 7 and 8 play the clip on the
+page (clip, facing, speed, Save GIF); step 9 exports and links to the Skin / Colour / Effects pages and the Game page.
+Editors (`studio/editor_core.ImageDoc`, headless, tested): Photoshop-style tool strip (erase, restore, magic erase, wand,
+lasso, rectangle, clone, smooth; skin adds pick + recolour, brush, glow, lightness, eyedropper), Shift adds / Alt takes
+away from the selection, every tool works inside the selection, Delete erases it, layers (add / hide / reorder / merge /
+opacity), named regions, in-window colour picker (the game's colours + the picture's own), before/after, undo/redo
+(Ctrl+Z / Ctrl+Y), zoom, Save (.bak once), Save ops as JSON; the cutout editor's magic erase is the `erase`+`like` op so
+the AI path (`pixelforge skin`, `edit_skin`) stays equal. Effects on a sprite: drag from the list onto the sprite (an
+in-window ghost label), markers per view, copy to all views, preview with the effects playing, Save renders the sheets,
+"In the game" goes to the Game page with `--attach`. Spell designer page: layers, knobs as sliders, live preview on a
+worker thread, Randomise, Reset layer, Undo / Redo, Keep (export), In the game. Tools page: tabs (Effects · Spells ·
+Objects · Tiles · Icons · Portraits · UI · Sounds · Music · More) built from `tools_window.TOOLS` (the window class is
+gone; `run_tool` stays), each tool a card with its form, Run, and the result shown under it (PNG or playing GIF); Sounds
+as pads; Music as a rack (cue picker with its mood line, tempo / metre / key / seed / level / wind / echo sliders, mode,
+Play 20 s, Render this / every cue, Another tune, Reset, Write the sheet, spectrogram); the skill-tree editor is embedded
+(`skilltree.build_editor`; `pixelforge skilltree` still opens its own window from the command line). Game page: sprite
+set and effect pickers (from the game's art/sprites and art/fx), zone, hour, attach, Preview in game, Take a screenshot
+(shows it on the page; `game_preview` takes `PIXELFORGE_GODOT_ARGS` / `extra_args` for `--rendering-driver opengl3`),
+Play the game (`Play Godmarrow.bat` on Windows, else the found Godot). Settings page (project, game folder, Godot
+program, drag-and-drop status, update check / Update and restart) and Help page (how it works, keys, where the files are,
+the doctor report inline). Keys: Ctrl+P, F5, Ctrl+T, Ctrl+D, Ctrl+O, Ctrl+N, Ctrl+Z / Ctrl+Y, Ctrl+S, + / −, Ctrl+L, Esc,
+F1. Docs: `tools/pixelforge/docs/GUIDE_HUMANS.md` (the window, the editors, the tools, the game page), `GUIDE_AI.md`
+(reset, the Studio's ops path), `README.md`, and `docs/track_notes/ui.md` (how a page, a step, a tool or an editor tool is
+added; the integrator wires the pixel road, the body option and the looks picker there).
+**Verified:** `pytest` 95 green (tests/test_studio.py: ImageDoc selection modes, tools inside a selection, undo/redo,
+layers, save + .bak, clone, named regions, the page registry imports without Tk, tool specs, reset_character,
+SpriteSetDoc); `tools/smoke.sh` errors 0 on every line (the game code is untouched); screenshots of every page at
+1280x800 and 1366x768 under `docs/screens/ui/1280x800/` and `docs/screens/ui/1366x768/` (Home, the nine steps, quick
+path, new character, Cutout / Skin / Colour editors on the Keeper's front view, Effects on a sprite with the Keeper set,
+Spell designer, every Tools tab, Describe it, Game with an in-game screenshot taken through the page, Settings, Help);
+the scripted walkthrough under `docs/screens/ui/walkthrough/` (fresh fake HOME → Open the Keeper painting → split and
+palette run → stops at step 5 on the page with the Blender note, no pop-up (the messagebox functions were patched to
+raise) → step 3 shows Edit / Skin / Colour under each cutout → Edit opens the cutout page on front.png → wand selection,
+erase, undo → Back to step 3 → Skin page → Home). Drivers: `scratchpad/ui_driver.py`, `scratchpad/ui_walk.py` (lost with
+the container; the method is in docs/track_notes/ui.md).
+**Honestly short of the goal:** the spell and tile "racks" are sliders and forms, not rotary knobs or dials, and the
+Tiles tab has no live iso patch preview; the music rack has no loudness meter or Stop (playback is the OS player);
+drag-and-drop of a *painting onto the window* is untested here (tkinterdnd2 is not installed in this box; the code path
+is the documented one); the editors redraw the whole picture per stroke, so a 4000-px atlas paints slowly at 1x; a
+stroke made inside a selection is recorded as the op without the selection, so "Save ops as JSON" replays it unclipped
+(name the selection first for an exact replay); no "Take it out of the game" undo for exports yet; Windows itself (the
+desktop icon, Segoe UI metrics, the OS pickers) was not run here, only Xvfb on Linux, where the nav just fits a 768-px
+screen and scrolls if the fonts are taller.
+
 ---
 
 ## 7. Handoff 2026-10-01 (cloud session, end of context): state, running agents, how to pick everything up

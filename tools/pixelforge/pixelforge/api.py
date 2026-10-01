@@ -746,6 +746,56 @@ def export_game(project: Project, name: str, kind: str | None = None, out_dir: s
     return {"ok": True, "character": c.name, "kind": kind, **r, "godot": f"copy {out}/* into the game's art/sprites/ and run with --skin={kind}"}
 
 
+# ------------------------------------------------------------------- reset
+RESET_PARTS = ("views", "palette.hex", "palette.png", "model", "renders", "frames", "frames_normal", "frames_depth", "anim", "sprites", "export", "previews")
+STEP_NOTES = {"split": ("split", "split_check"), "palette": ("palette",), "model": ("model", "model_note", "model_check"), "rig": ("rig",),
+              "render": ("render", "render_check"), "pixelate": ("pixelate",), "export": ("export", "export_game", "export_game_json")}
+
+
+def reset_character(project: Project, name: str, keep_sources: bool = True, from_step: str | None = None) -> dict:
+    """Start a character over, or redo it from one step on.
+
+    With ``from_step`` the step and every later one are marked not done (their notes cleared) so ``run-all`` /
+    Continue runs them again; files are kept until they are rebuilt. Without it every built folder (cutouts, palette,
+    model, renders, frames, quick-path output, exports, previews) is deleted and every step after import is marked
+    not done; the painting and the description stay unless ``keep_sources`` is False."""
+    from .project import STEPS
+
+    c = project.character(name)
+    steps = [k for k, _ in STEPS]
+    removed: list[str] = []
+    if from_step is not None:
+        if from_step not in steps:
+            raise StepError(f"unknown step {from_step!r}; choose from {steps}")
+        cleared = steps[steps.index(from_step):]
+    else:
+        base = project.char_dir(c.name)
+        for part in RESET_PARTS:
+            p = base / part
+            if p.is_dir():
+                shutil.rmtree(p, ignore_errors=True)
+                removed.append(part)
+            elif p.exists():
+                p.unlink()
+                removed.append(part)
+        cleared = [k for k in steps if k not in ("prompts", "import")]
+        if not keep_sources:
+            src = base / "source"
+            if src.exists():
+                shutil.rmtree(src, ignore_errors=True)
+                removed.append("source")
+            c.sources.clear()
+            cleared = steps
+        c.settings.pop("ppu", None)
+    for k in cleared:
+        c.done[k] = False
+        for note in STEP_NOTES.get(k, (k,)):
+            c.notes.pop(note, None)
+    project.save()
+    return {"ok": True, "character": c.name, "cleared": cleared, "removed": removed, "kept_sources": bool(c.sources),
+            "next": next((k for k in steps if not c.done.get(k)), None)}
+
+
 # ------------------------------------------------------------------- run-all
 STEP_FUNCS = {
     "export_game": export_game,

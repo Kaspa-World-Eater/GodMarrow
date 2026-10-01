@@ -60,8 +60,13 @@ def find_game(start: str | Path | None = None) -> Path | None:
 
 
 def preview_command(godot: str, game: Path, *, skin: str | None = None, cls: str | None = None, zone: str = "moor", fx: list[str] | None = None,
-                    attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None, seed: int = 7) -> list[str]:
+                    attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None, seed: int = 7,
+                    extra_args: list[str] | None = None) -> list[str]:
+    """The command line. ``extra_args`` (or the PIXELFORGE_GODOT_ARGS environment variable, space-separated) go before
+    the game's own arguments: e.g. ``--rendering-driver opengl3`` on a machine without Vulkan."""
     args = [godot, "--path", str(game)]
+    extra = extra_args if extra_args is not None else (os.environ.get("PIXELFORGE_GODOT_ARGS", "").split() or [])
+    args += extra
     if shot:
         args += ["--resolution", "1280x720"]
     args += ["--", f"--zone={zone}", "--new", f"--seed={seed}"]
@@ -83,7 +88,7 @@ def preview_command(godot: str, game: Path, *, skin: str | None = None, cls: str
 
 def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = None, skin: str | None = None, cls: str | None = None, zone: str = "moor",
                     fx: list[str] | None = None, attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None,
-                    wait: bool | None = None, log=None) -> dict:
+                    wait: bool | None = None, log=None, extra_args: list[str] | None = None) -> dict:
     """Launch the game. With ``shot`` it runs until the screenshot is saved and returns its path; otherwise the
     game window stays open and the call returns at once (``wait=True`` blocks until it closes)."""
     exe = find_godot(godot)
@@ -92,7 +97,7 @@ def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = N
     game = find_game(game_dir)
     if game is None:
         raise RuntimeError("No Godot project found (a folder with project.godot). Pass the game folder.")
-    cmd = preview_command(exe, game, skin=skin, cls=cls, zone=zone, fx=fx, attach=attach, shot=shot, shot_t=shot_t, hour=hour)
+    cmd = preview_command(exe, game, skin=skin, cls=cls, zone=zone, fx=fx, attach=attach, shot=shot, shot_t=shot_t, hour=hour, extra_args=extra_args)
     if log:
         log("$ " + " ".join(cmd))
     r = {"ok": True, "godot": exe, "game": str(game), "command": cmd}

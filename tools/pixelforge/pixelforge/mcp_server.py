@@ -77,6 +77,12 @@ def build_server():
         return api.run_until_blocked(_project(project), character)
 
     @mcp.tool()
+    def reset_character(project: str, character: str, from_step: str | None = None, keep_sources: bool = True) -> dict:
+        """Start a character over (cutouts, model, renders, frames, exports deleted; painting and description kept) or, with
+        from_step (split|palette|model|rig|render|pixelate|export), mark that step and the later ones not done so run_all redoes them."""
+        return api.reset_character(_project(project), character, keep_sources=keep_sources, from_step=from_step)
+
+    @mcp.tool()
     def export_game(project: str, character: str, kind: str, category: str = "hero", display_name: str | None = None) -> dict:
         """Write the Godmarrow atlas (art/sprites/<kind>.png|json, 8 views, foot anchors, normal/depth sets if rendered)."""
         return api.export_game(_project(project), character, kind, category=category, display_name=display_name)

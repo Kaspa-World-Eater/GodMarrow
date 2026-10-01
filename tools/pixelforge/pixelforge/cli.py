@@ -303,6 +303,8 @@ def cmd_project(a) -> None:
                 _emit(a, r)
             else:
                 print("OK: nothing to fix" if r["ok"] else "\n".join("- " + i for i in r["issues"]))
+        elif sub == "reset":
+            _emit(a, api.reset_character(project, a.character, keep_sources=not a.all, from_step=a.from_step))
         elif sub == "run-all":
             if a.all:
                 results = {}
@@ -664,6 +666,9 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--kind", help="sprite kind name (default: character name)"); x.add_argument("--out", help="output folder (default: characters/<name>/export_game)")
     x.add_argument("--category", default="hero"); x.add_argument("--name", help="display name")
     x = ps.add_parser("check", help="the automatic checks on a character's cutouts, carve and frames (plain English)"); x.add_argument("character")
+    x = ps.add_parser("reset", help="start a character over (the painting and the description are kept) or redo it from one step on")
+    x.add_argument("character"); x.add_argument("--from", dest="from_step", choices=["split", "palette", "model", "rig", "render", "pixelate", "export"], help="mark this step and the later ones not done; keep the files")
+    x.add_argument("--all", action="store_true", help="also delete the imported pictures and the description's prompts state")
     x = ps.add_parser("run-all", help="run every remaining automatic step"); x.add_argument("character", nargs="?", help="omit with --all"); x.add_argument("--all", action="store_true", help="every character in the project, in turn")
     x = ps.add_parser("still", help="quick path: one image -> sprite (-> animation -> export)"); x.add_argument("character")
     x.add_argument("--view", default="style", choices=["style", "front", "side", "back"]); x.add_argument("--animate", nargs="*", metavar="PRESET"); x.add_argument("--export", action="store_true")

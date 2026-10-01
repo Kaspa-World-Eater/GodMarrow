@@ -7,7 +7,9 @@ Blender + Mixamo → 8-direction renders → palette-locked pixel frames → God
   every command, the project layout, the standard procedure and the failure
   table. The person-facing version is `docs/GUIDE_HUMANS.md`.
 - **Code map:** `pixelforge/api.py` is the pipeline (one function per step);
-  `gui.py` (Tkinter app), `cli.py` and `mcp_server.py` are wrappers over it.
+  `studio/` (the one-window Tkinter app: `app.py` shell, `pages_*.py`, `editor_core.py`
+  headless editor model, `widgets.py`, `theme.py`; `gui.py` forwards to it), `cli.py` and
+  `mcp_server.py` are wrappers over it. No `Toplevel` / `messagebox` in the Studio.
   Image algorithms: `grid.py` (pixel-grid detection), `palette.py` (OKLab
   k-means), `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`
   (procedural effects), `transform.py` (RotSprite), `sheet.py` (split

@@ -105,24 +105,24 @@ def save_and_apply(skills_path: str | Path, edits: dict) -> dict:
 
 
 # ------------------------------------------------------------------ GUI
-def gui(skills_path: str | Path) -> None:
+def build_editor(parent, skills_path: str | Path, status_cb=None):
+    """The skill-tree editor built into ``parent`` (a frame of the Studio, or a bare window from ``gui``).
+    Returns a dict with ``frame``, ``save`` and ``redraw``. ``status_cb(text)`` receives what happened on save."""
     import tkinter as tk
-    from tkinter import messagebox, ttk
+    from tkinter import ttk
 
     data = load(skills_path)
     edits = load_edits(edits_path(skills_path))
     apply_edits(data, edits)
     by = {s["id"]: s for s in data["skills"]}
 
-    root = tk.Tk()
-    root.title("PixelForge — skill trees")
-    root.geometry("1180x720")
+    frame = ttk.Frame(parent)
     cls_var = tk.StringVar(value=classes(data)[0])
     tab_var = tk.IntVar(value=0)
     sel: dict = {"id": None}
     CW, CH, PADX, PADY = 150, 74, 24, 16
 
-    top = ttk.Frame(root, padding=6)
+    top = ttk.Frame(frame, padding=6)
     top.pack(fill="x")
     ttk.Label(top, text="Order").pack(side="left")
     cb = ttk.Combobox(top, values=classes(data), textvariable=cls_var, state="readonly", width=14)
@@ -136,21 +136,23 @@ def gui(skills_path: str | Path) -> None:
     status.pack(side="left", padx=12)
     ttk.Button(top, text="Save + apply", command=lambda: do_save()).pack(side="right")
 
-    body = ttk.Panedwindow(root, orient="horizontal")
+    body = ttk.Panedwindow(frame, orient="horizontal")
     body.pack(fill="both", expand=True)
-    canvas = tk.Canvas(body, bg="#14161a", highlightthickness=0, width=820)
+    canvas = tk.Canvas(body, bg="#14161a", highlightthickness=0, width=820, height=560)
     body.add(canvas, weight=5)
     side = ttk.Frame(body, padding=8, width=300)
     body.add(side, weight=0)
     fields = {}
     for key, h in (("name", 1), ("description", 8), ("lore", 6)):
         ttk.Label(side, text=key).pack(anchor="w")
-        t = tk.Text(side, height=h, wrap="word")
+        t = tk.Text(side, height=h, wrap="word", width=32)
         t.pack(fill="x", pady=(0, 8))
         fields[key] = t
     ttk.Button(side, text="Apply text to skill", command=lambda: take_text()).pack(anchor="e")
     info = ttk.Label(side, text="Click a skill. Arrow keys move it; drag with the mouse. Rows are levels 1/6/12/18/24/30.", wraplength=260)
     info.pack(anchor="w", pady=8)
+    saved = ttk.Label(side, text="", wraplength=260)
+    saved.pack(anchor="w")
 
     def mark(sid: str, **kv) -> None:
         e = edits.setdefault(sid, {})
@@ -171,7 +173,7 @@ def gui(skills_path: str | Path) -> None:
             x = 40 + (col - 1) * (CW + PADX)
             y = PADY + (row - 1) * (CH + PADY)
             fill = "#3a2a2a" if s["id"] in bad else ("#2a3a3f" if s["id"] == sel["id"] else "#1f2228")
-            outline = "#d05050" if s["id"] in bad else ("#4fd1c5" if s["id"] == sel["id"] else "#3a3f48")
+            outline = "#b0563a" if s["id"] in bad else ("#4fd1c5" if s["id"] == sel["id"] else "#3a3f48")
             canvas.create_rectangle(x, y, x + CW, y + CH, fill=fill, outline=outline, width=2, tags=("skill", s["id"]))
             canvas.create_text(x + 8, y + 10, text=s["name"], fill="#e8e4d8", anchor="nw", width=CW - 16, font=("TkDefaultFont", 10, "bold"), tags=("skill", s["id"]))
             canvas.create_text(x + 8, y + CH - 10, text=f"{s['id']} · {s['kind']}" + (" · edited" if s["id"] in edits else ""), fill="#8a8f99", anchor="sw", font=("TkDefaultFont", 8), tags=("skill", s["id"]))
@@ -209,6 +211,7 @@ def gui(skills_path: str | Path) -> None:
         return max(1, min(6, int((y - PADY) // (CH + PADY)) + 1)), max(1, int((x - 40) // (CW + PADX)) + 1)
 
     def on_click(ev) -> None:
+        canvas.focus_set()
         select(hit(ev))
 
     def on_release(ev) -> None:
@@ -227,17 +230,38 @@ def gui(skills_path: str | Path) -> None:
             mark(sel["id"], row=max(1, min(6, s["row"] + d[0])), col=max(1, s["col"] + d[1]))
             draw()
 
-    def do_save() -> None:
+    def do_save() -> dict:
         r = save_and_apply(skills_path, edits)
-        messagebox.showinfo("Saved", f"{len(r['changed'])} skills changed, {len(r['clashes'])} clashes\n{r['edits']}")
+        text = f"Saved: {len(r['changed'])} skills changed, {len(r['clashes'])} clashes; edits in {r['edits']}"
+        saved.configure(text=text)
+        if status_cb:
+            status_cb(text)
         draw()
+        return r
 
     canvas.bind("<Button-1>", on_click)
     canvas.bind("<ButtonRelease-1>", on_release)
-    root.bind("<Key>", on_key)
+    canvas.bind("<Key>", on_key)
     cb.bind("<<ComboboxSelected>>", lambda e: (order_lbl.configure(text=order_name(cls_var.get())), select(None)))
     tb.bind("<<ComboboxSelected>>", lambda e: select(None))
     draw()
+    return {"frame": frame, "save": do_save, "redraw": draw}
+
+
+def gui(skills_path: str | Path) -> None:
+    """The editor in its own window (``pixelforge skilltree data/skills.json``); the Studio embeds it as a page."""
+    import tkinter as tk
+
+    root = tk.Tk()
+    root.title("PixelForge — skill trees")
+    root.geometry("1180x720")
+    try:
+        from .studio.theme import apply_theme
+
+        apply_theme(root)
+    except Exception:  # noqa: BLE001
+        pass
+    build_editor(root, skills_path)["frame"].pack(fill="both", expand=True)
     root.mainloop()
 
 

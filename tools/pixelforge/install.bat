@@ -24,6 +24,7 @@ python -m pip install --upgrade pip >nul
 echo Installing PixelForge (a minute or two)...
 pip install -e . || (echo install failed & pause & exit /b 1)
 pip install mcp >nul 2>nul
+pip install tkinterdnd2 >nul 2>nul
 echo Creating the desktop shortcut...
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ws = New-Object -ComObject WScript.Shell; $d = [Environment]::GetFolderPath('Desktop');" ^

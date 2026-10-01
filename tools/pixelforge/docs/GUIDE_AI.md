@@ -119,6 +119,7 @@ pixelforge recolor art/sprites --kind wraith --suffix @champion --hue 60        
 pixelforge project blender-download                                                # fetch the portable Blender (380 MB) if none is installed
 pixelforge project run-all --all                                                   # every character in the project, in turn
 pixelforge project check <character>                                               # the automatic checks (cutouts, carve, frames) in plain English; also run inside split/model/render
+pixelforge project reset <character> [--from split|palette|model|rig|render|pixelate|export] [--all]   # start over (folders deleted, painting kept) or redo from a step on (flags cleared, files kept)
 pixelforge sfx all -o art/sfx [--variations 3]                                     # 18 synthesised sound presets -> WAV
 pixelforge effect spear.png bone_spear -o art/fx --kind missile --rotations 16     # painted missile art -> spinning, chip-shedding, 16-heading effect
 pixelforge vfx bone_spear bone_spear -o art/fx --rotations 16 --gif        # a spinning bone spear, 16 headings, in the manner of the classic missiles
@@ -168,10 +169,16 @@ Worked examples of using all of it at once: `tools/make_world_art.py`, `tools/ma
 objects.json, sounds, portraits, variant skins) and `tools/make_fx.py` (the 52 effect sheets). The Studio's **Tools**
 button offers every one of these as a form.
 
-Studio-only helpers an AI should know exist: the manual cutout editor (step 3, Edit <view>: erase / restore / magic
-erase, saves over `views/<view>.png`; `views/<view>_raw.png` is the untouched crop), the animation preview and
-`api.preview_gif(project, name, clip, dir)` -> `previews/<clip>_<dir>.gif`, and the one-click Blender download
-(`api.download_blender`). Character setting `model_mode` = auto | template | hull picks the 3D path.
+The Studio (`pixelforge studio`; package `pixelforge/studio/`, see the game's `docs/track_notes/ui.md`) is one window:
+Home, the character's nine steps, the editors (Cutout, Skin, Colour, Effects on a sprite, Spell designer), the tools
+(tabs), Game, Settings, Help. Everything it does is a command here; the editors drive
+`pixelforge.studio.editor_core.ImageDoc`, whose strokes are the `skin_ops` ops (the cutout editor's magic erase is
+`{"op": "erase", "like": {"at": [x, y], "range": r}}`; a wand / lasso selection named in the editor is a `region` op),
+so "Save ops as JSON" in the editor and `pixelforge skin <image> ops.json` are the same path. Other Studio helpers an
+AI should know exist: `api.preview_gif(project, name, clip, dir)` -> `previews/<clip>_<dir>.gif`; the one-click
+Blender download (`api.download_blender`); `api.reset_character` (Start over / Redo from here); `views/<view>_raw.png`
+is the untouched crop the editors restore from. Character setting `model_mode` = auto | template | hull picks the 3D
+path (the Body box on step 5).
 
 Rules the tools keep: glow only where the game allows it (`vfx` adds a halo to fire, wisps and bursts; never to smoke or
 embers); every colour comes from the ramp you give or the game's presets; `skilltree` never edits `data/skills.json`
@@ -271,7 +278,8 @@ palette and a fixed scale so all frames match.
 
 `pixelforge mcp` runs an MCP server (stdio) with tools `new_project`, `status`,
 `configure`, `add_character`, `prompts`, `import_image`, `run_step`, `run_all`,
-`quick_sprite`. Claude Desktop config:
+`reset_character`, `quick_sprite`, `export_game` and one tool per world / effect / sound / music / describe /
+preview command. Claude Desktop config:
 
 ```json
 {"mcpServers": {"pixelforge": {"command": "pixelforge", "args": ["mcp"]}}}
