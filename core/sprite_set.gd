@@ -40,6 +40,13 @@ func load_kind(k: String) -> void:
 func has(anim: String) -> bool:
 	return anims.has(anim)
 
+## true when any anim carries this view (e.g. "side_l": a real left-facing view from an 8-view export)
+func has_view(view: String) -> bool:
+	for k in frames:
+		if (k as String).ends_with("/" + view):
+			return true
+	return false
+
 ## frames of an anim in a view, falling back as the web does (down -> front, up -> back, else any)
 func get_frames(anim: String, view: String) -> Array:
 	var k := anim + "/" + view

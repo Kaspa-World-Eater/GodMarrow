@@ -67,7 +67,7 @@ func apply() -> void:
 	offset = off
 
 ## the eight octants in screen space to (view, face), following meta.view_map (heroes) or facing8 (monsters)
-static func hero_view(dir: Vector2, last_face: int) -> Array:
+static func hero_view(dir: Vector2, last_face: int, s8: SpriteSet = null) -> Array:
 	var s := Iso.to_screen(dir)
 	if s.length() < 0.001:
 		return ["", last_face]
@@ -78,6 +78,9 @@ static func hero_view(dir: Vector2, last_face: int) -> Array:
 	# 0 R, 1 DR, 2 D, 3 DL, 4 L, 5 UL, 6 U, 7 UR
 	var m := [["side", 1], ["front", 1], ["down", 0], ["front", -1], ["side", -1], ["back", -1], ["up", 0], ["back", 1]]
 	var v: Array = m[o]
+	# an 8-view set (PixelForge) has real left-facing frames: use them instead of mirroring
+	if v[1] == -1 and s8 != null and s8.has_view(v[0] + "_l"):
+		return [v[0] + "_l", 1]
 	return [v[0], last_face if v[1] == 0 else v[1]]
 
 static func mon_view(dir: Vector2, last_face: int) -> Array:

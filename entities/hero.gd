@@ -320,7 +320,7 @@ func _walk(dt: float) -> bool:
 	return true
 
 func _face(dir: Vector2) -> void:
-	var r := AnimSprite.hero_view(dir, face)
+	var r := AnimSprite.hero_view(dir, face, spr.set if spr else null)
 	if r[0] != "":
 		view = r[0]
 		face = r[1]

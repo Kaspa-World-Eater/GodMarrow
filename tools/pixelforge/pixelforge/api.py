@@ -365,7 +365,7 @@ def import_mixamo(project: Project, name: str, depth_scale: float | None = None,
     return {"ok": True, "character": c.name, "blend": str(out), "animations": actions, "next": "render"}
 
 
-def render(project: Project, name: str, actions: list[str] | None = None, step: int = 2, elevation: float = 30.0, ppu: float | None = None, log=None) -> dict:
+def render(project: Project, name: str, actions: list[str] | None = None, step: int = 2, elevation: float = 30.0, ppu: float | None = None, passes: str | None = None, log=None) -> dict:
     c = project.character(name)
     model = project.sub(c.name, "model")
     blend = model / f"{c.name}_rigged.blend"
@@ -377,6 +377,8 @@ def render(project: Project, name: str, actions: list[str] | None = None, step: 
     args = ["--out", out, "--directions", project.directions, "--size", project.render_size, "--elevation", elevation, "--step", step]
     if actions:
         args += ["--actions", ",".join(actions)]
+    passes = passes or c.settings.get("passes") or project_setting(project, "passes", "color")
+    args += ["--passes", passes]
     ppu = ppu or c.settings.get("ppu") or _shared_ppu(project)
     if ppu:
         args += ["--ppu", ppu]
@@ -387,6 +389,10 @@ def render(project: Project, name: str, actions: list[str] | None = None, step: 
     c.notes["render"] = f"{sum(a['frames'] for a in manifest['actions'].values())} frames x {len(manifest['directions'])} directions"
     project.save()
     return {"ok": True, "character": c.name, "renders": str(out), "manifest": manifest, "next": "pixelate"}
+
+
+def project_setting(project: Project, key: str, default):
+    return getattr(project, key, None) or default
 
 
 def _shared_ppu(project: Project) -> float | None:
@@ -401,10 +407,11 @@ def _shared_ppu(project: Project) -> float | None:
 def _options_for(project: Project, c: Character, **overrides) -> PixelateOptions:
     st = get_style(c.settings.get("style", project.style))
     pal_file = project.char_dir(c.name) / "palette.hex"
+    colors = overrides.get("colors", st.colors)
     return PixelateOptions(
         max_size=overrides.get("max_size", st.max_size),
-        colors=overrides.get("colors", st.colors),
-        palette=Palette.load(pal_file) if pal_file.exists() else None,
+        colors=colors,
+        palette=Palette.load(pal_file) if (pal_file.exists() and colors > 0) else None,
         dither=overrides.get("dither", st.dither),
         remove_background=overrides.get("remove_background", False),
         outline=overrides.get("outline"),
@@ -419,7 +426,12 @@ def pixelate_renders(project: Project, name: str, outline: str | None = None, lo
         raise StepError("no renders yet; run the render step")
     manifest = json.loads(manifest_file.read_text())
     st = get_style(c.settings.get("style", project.style))
-    scale = manifest["size"] / st.max_size  # source px per sprite px, same for every frame
+    # the tier's size is the CHARACTER's standing height in sprite px: derive the
+    # render-px-per-sprite-px scale from the model's height as the camera sees it
+    import math as _m
+
+    stand_px = (manifest.get("z_max", 1.8) - manifest.get("z_min", 0.0)) * manifest["ppu"] * _m.cos(_m.radians(manifest.get("elevation", 30.0)))
+    scale = max(stand_px, 1.0) / st.max_size  # source px per sprite px, same for every frame
     frames_dir = project.sub(c.name, "frames")
     opts = _options_for(project, c, outline=outline)
     opts.scale = scale
@@ -441,6 +453,22 @@ def pixelate_renders(project: Project, name: str, outline: str | None = None, lo
                 log(f"{action}/{d}: {len(results)} frames -> {results[0].image.width}x{results[0].image.height}")
     if not made:
         raise StepError("renders folder is empty")
+    for pass_name in ("normal", "depth"):
+        src_root = project.char_dir(c.name) / f"renders_{pass_name}"
+        if not src_root.exists():
+            continue
+        dst_root = project.sub(c.name, f"frames_{pass_name}")
+        popts = PixelateOptions(colors=0, palette=None, dither="none", despeckle=False, outline=None)
+        popts.scale = scale
+        for action in manifest["actions"]:
+            for d in manifest["directions"]:
+                src = sorted((src_root / action / d).glob("frame_*.png"))
+                if not src:
+                    continue
+                out = dst_root / f"{action}_{d}"
+                out.mkdir(parents=True, exist_ok=True)
+                for i, f in enumerate(src):
+                    pixelate(Image.open(f), popts).image.save(out / f"frame_{i:03d}.png")
     fps = manifest.get("fps", 12)
     (frames_dir / "animations.json").write_text(json.dumps({"fps": fps, "clips": made}, indent=2) + "\n")
     c.done["pixelate"] = True
@@ -526,8 +554,34 @@ def export(project: Project, name: str, fps: float | None = None) -> dict:
     }
 
 
+# ------------------------------------------------------------- game export
+def export_game(project: Project, name: str, kind: str | None = None, out_dir: str | Path | None = None, category: str = "hero", display_name: str | None = None) -> dict:
+    """Export in Godmarrow's own sprite-set format (``art/sprites/<kind>.png|json``),
+    plus ``<kind>_normal`` / ``<kind>_depth`` sets when those passes were rendered."""
+    from .godmarrow_export import export_godmarrow
+
+    c = project.character(name)
+    kind = kind or c.name
+    renders = project.sub(c.name, "renders")
+    manifest_file = renders / "manifest.json"
+    if not manifest_file.exists():
+        raise StepError("no renders yet; run the render step")
+    manifest = json.loads(manifest_file.read_text())
+    frames = project.sub(c.name, "frames")
+    if not (frames / "animations.json").exists():
+        raise StepError("no pixel frames yet; run the pixelate step")
+    out = Path(out_dir) if out_dir else project.sub(c.name, "export_game")
+    extra = {p: project.char_dir(c.name) / f"frames_{p}" for p in ("normal", "depth")}
+    r = export_godmarrow(frames, manifest, out, kind, category=category, display_name=display_name or c.name, extra_passes=extra)
+    c.done["export"] = True
+    c.notes["export_game"] = f"{r['color']['frames']} frames, sheet {r['color']['sheet']}"
+    project.save()
+    return {"ok": True, "character": c.name, "kind": kind, **r, "godot": f"copy {out}/* into the game's art/sprites/ and run with --skin={kind}"}
+
+
 # ------------------------------------------------------------------- run-all
 STEP_FUNCS = {
+    "export_game": export_game,
     "split": split,
     "palette": make_palette,
     "model": build_model,

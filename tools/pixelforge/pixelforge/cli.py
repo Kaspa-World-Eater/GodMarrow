@@ -275,10 +275,12 @@ def cmd_project(a) -> None:
             _emit(a, api.get_prompts(project, a.character, a.reference))
         elif sub == "import":
             _emit(a, api.import_source(project, a.character, a.kind, a.file))
+        elif sub == "export-game":
+            _emit(a, api.export_game(project, a.character, kind=a.kind, out_dir=a.out, category=a.category, display_name=a.name))
         elif sub == "run":
             kw = {}
             if a.step == "render":
-                kw = {"step": a.frame_step, "elevation": a.elevation}
+                kw = {"step": a.frame_step, "elevation": a.elevation, "passes": a.passes}
             _emit(a, api.run_step(project, a.character, a.step, log=print, **kw))
         elif sub == "run-all":
             _emit(a, api.run_until_blocked(project, a.character, log=print))
@@ -398,7 +400,10 @@ def build_parser() -> argparse.ArgumentParser:
     x = ps.add_parser("prompts", help="Midjourney prompts for the character"); x.add_argument("character"); x.add_argument("--reference", default="[SHEET IMAGE URL]")
     x = ps.add_parser("import", help="import an image"); x.add_argument("character"); x.add_argument("kind", choices=["sheet", "front", "back", "side", "quarter", "style"]); x.add_argument("file")
     x = ps.add_parser("run", help="run one step"); x.add_argument("character"); x.add_argument("step", choices=["split", "palette", "model", "rig", "render", "pixelate", "export"])
-    x.add_argument("--frame-step", type=int, default=2); x.add_argument("--elevation", type=float, default=30.0)
+    x.add_argument("--frame-step", type=int, default=2); x.add_argument("--elevation", type=float, default=30.0); x.add_argument("--passes", default=None, help="color,normal,depth")
+    x = ps.add_parser("export-game", help="export in Godmarrow's art/sprites format (+ normal/depth sets)"); x.add_argument("character")
+    x.add_argument("--kind", help="sprite kind name (default: character name)"); x.add_argument("--out", help="output folder (default: characters/<name>/export_game)")
+    x.add_argument("--category", default="hero"); x.add_argument("--name", help="display name")
     x = ps.add_parser("run-all", help="run every remaining automatic step"); x.add_argument("character")
     x = ps.add_parser("still", help="quick path: one image -> sprite (-> animation -> export)"); x.add_argument("character")
     x.add_argument("--view", default="style", choices=["style", "front", "side", "back"]); x.add_argument("--animate", nargs="*", metavar="PRESET"); x.add_argument("--export", action="store_true")
