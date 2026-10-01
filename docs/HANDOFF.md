@@ -273,3 +273,10 @@ session; the table is enough to re-brief).
 3. Effects to D2R level (track/fx, track/fxlook, painted effects). 4. Pixel road vs anatomy road comparison in the game
 (track/pixel2d, track/body3d). 5. The see-through hero (dark shader). 6. The painted world: Derek paints the art order
 in the Keeper's style; the Forge converts.
+
+**2026-10-01, later (cloud session):** the 24-frame Keeper re-render was stopped on Derek's word ("stop the keeper
+stuff, focus on upgrading pixel forge only"); the export rule change stays, so any later `render --per-clip 24` +
+`pixelate` + `export-game` gives the smooth Keeper. Nine agent tracks are building PixelForge (track/forgeapp is the
+new full-screen, game-like Forge app in Godot; track/ui the classic Studio clean-up; track/styles, pixel2d, fx,
+fxlook, body3d; plus track/scale and track/gamefeel on the game's presentation). Specs the Forge app must still take
+in a follow-up pass: docs/track_notes/music_editor.md, spell_rack.md, tile_rack.md, reset_and_start_over.md (tabs).
