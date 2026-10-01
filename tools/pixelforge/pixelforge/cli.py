@@ -65,9 +65,13 @@ def _add_pixelate_args(p: argparse.ArgumentParser) -> None:
     g.add_argument("--lightness", type=float, help="lightness lift, 0 = as painted (default: from --style)")
     g.add_argument("--edge", choices=["soft", "crisp", "hard"], help="edge treatment (default: from --style)")
     g.add_argument("--clean", type=int, help="passes of the 3x3 majority filter, 0 = none (default: from --style)")
+    g.add_argument("--value-span", type=float, help="the least lightness range the figure ends with, 0.5-0.65 reads; 0 = the painting's own (default: from --style)")
+    g.add_argument("--local-contrast", type=float, help="unsharp amount at the scale of the figure's masses, 0.3-0.8; 0 = off (default: from --style)")
+    g.add_argument("--detail", type=float, help="detail keep: 1 keeps eyes, glow, trim and metal as clean cells, 2 fainter ones too, 0 = off (default: from --style)")
+    g.add_argument("--cluster", type=int, help="clusters, not noise: the smallest run of one colour kept, in cells (2-4); 0 = off (default: from --style)")
     g.add_argument("--remove-bg", action="store_true", help="flood-remove the background from the borders")
     g.add_argument("--bg-tolerance", type=float, default=0.03, help="OKLab distance for --remove-bg")
-    g.add_argument("--outline", default="style", help="'style' (the preset's rule, default), 'none', 'auto' (darkest palette colour) or a hex colour")
+    g.add_argument("--outline", default="style", help="'style' (the preset's rule, default), 'none', 'auto' (an outer line in the darkest palette colour), 'dark' (the figure's own edge cells darkened), 'rim' (lit on the light side, dark on the other) or a hex colour")
     g.add_argument("--crop", action="store_true", help="crop to the opaque content")
     g.add_argument("--no-despeckle", action="store_true")
 
@@ -89,6 +93,10 @@ def _options(a) -> PixelateOptions:
         lightness=a.lightness,
         edge=a.edge,
         clean=a.clean,
+        value_span=a.value_span,
+        local_contrast=a.local_contrast,
+        detail=a.detail,
+        cluster=a.cluster,
         remove_background=a.remove_bg,
         bg_tolerance=a.bg_tolerance,
         despeckle=not a.no_despeckle,

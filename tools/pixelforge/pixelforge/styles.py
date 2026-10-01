@@ -18,6 +18,7 @@ from dataclasses import asdict, dataclass, fields
 
 DITHERS = ("none", "bayer", "floyd")
 EDGES = ("soft", "crisp", "hard")          # cell average (flat areas, small looks) | median of the inner half | near the cell centre (noisy, crunchy)
+OUTLINES = ("none", "auto", "dark", "rim")   # none | an outer line in the darkest colour | the figure's own edge cells darkened | lit on the light side, darkened on the other; or #rrggbb
 GLOWS = ("auto", "on", "off")              # auto = the effect kind decides (fire, wisps, magic glow; smoke does not)
 GROUPS = ("look", "tier")
 
@@ -41,10 +42,15 @@ class Style:
     contrast: float = 1.0             # lightness contrast about the figure's median; 1 = as painted
     lightness: float = 0.0            # lightness lift (OKLab L, -0.3..0.3); small bright looks need a little
     # --- edges
-    outline: str = "none"             # none | auto (the darkest palette colour) | #rrggbb
+    outline: str = "none"             # none | auto (an outer line in the darkest palette colour) | dark | rim | #rrggbb (see OUTLINES)
     outline_diagonal: bool = False
     edge: str = "crisp"               # soft | crisp | hard (see EDGES)
     clean: int = 0                    # passes of a 3x3 majority filter on the palette indices: specks join the colour area round them
+    # --- the pixel conversion (readable.py): value structure, clusters, identity details
+    value_span: float = 0.0           # the least lightness range the figure ends with (0.5-0.65 for a readable figure; 0 = the painting's own)
+    local_contrast: float = 0.0       # unsharp amount on lightness at the scale of the figure's masses (0.3-0.8; 0 = off)
+    detail: float = 0.0               # detail keep: 1 = eyes, glow, trim and metal kept as clean cells; 2 = fainter ones too; 0 = off
+    cluster: int = 0                  # clusters, not noise: the smallest run of one colour kept, in cells (2-4); 0 = off
     # --- effects
     fx_bands: int = 6                 # colour bands of a procedural effect
     fx_glow: str = "auto"             # auto | on | off: the soft halo under fire, wisps and magic
@@ -115,7 +121,8 @@ STYLES: dict[str, Style] = {
         "Large, finely drawn figures about 120 px tall on a dark gothic palette with gold and bone accents; soft "
         "painted shading, no hard outline, long smooth loops (the look of the gothic hi-res metroidvanias).",
         figure_height=120, pixel_step=1, colors=40, palette_lock=True, dither="none", shading_bands=0,
-        saturation=0.9, contrast=1.1, outline="none", edge="soft",
+        saturation=1.0, contrast=1.1, outline="rim", edge="soft",
+        value_span=0.55, local_contrast=0.5, detail=1.0, cluster=3,
         fx_bands=8, fx_glow="auto", fx_haze=True, fx_frames=12, fx_fps=12.0,
         anim_frames=12, anim_fps=10.0, clip_frames=24, tile_width=96, tile_height=48, tile_hr=2,
     ),
@@ -124,7 +131,8 @@ STYLES: dict[str, Style] = {
         "Rendered-to-sprite figures about 76 px tall on a cool, dark palette of 28 colours, soft edges, no outline, "
         "eight-frame cycles (the classic isometric action-RPG look).",
         figure_height=76, pixel_step=2, colors=28, palette_lock=True, dither="none", shading_bands=0,
-        saturation=0.85, contrast=1.05, outline="none", edge="soft",
+        saturation=1.0, contrast=1.05, outline="dark", edge="soft",
+        value_span=0.55, local_contrast=0.5, detail=1.0, cluster=3,
         fx_bands=6, fx_glow="auto", fx_haze=False, fx_frames=8, fx_fps=10.0,
         anim_frames=8, anim_fps=8.0, clip_frames=16, tile_width=80, tile_height=40, tile_hr=2,
     ),
@@ -134,6 +142,7 @@ STYLES: dict[str, Style] = {
         "areas and short 8-12 frame loops; nothing glows and nothing is soft.",
         figure_height=56, pixel_step=3, colors=16, palette_lock=True, dither="none", shading_bands=3,
         saturation=1.15, contrast=1.3, lightness=0.1, outline="auto", edge="soft", clean=1,
+        value_span=0.6, local_contrast=0.6, detail=1.0, cluster=4,
         fx_bands=4, fx_glow="off", fx_haze=False, fx_frames=8, fx_fps=10.0,
         anim_frames=10, anim_fps=10.0, clip_frames=12, tile_width=64, tile_height=32, tile_hr=1,
     ),
@@ -143,6 +152,7 @@ STYLES: dict[str, Style] = {
         "the portable 32-bit look, made to read on a tiny screen.",
         figure_height=40, pixel_step=4, colors=15, palette_lock=True, dither="none", shading_bands=3,
         saturation=1.3, contrast=1.3, lightness=0.12, outline="auto", edge="soft", clean=1,
+        value_span=0.6, local_contrast=0.6, detail=1.0, cluster=4,
         fx_bands=4, fx_glow="off", fx_haze=False, fx_frames=6, fx_fps=8.0,
         anim_frames=6, anim_fps=8.0, clip_frames=8, tile_width=48, tile_height=24, tile_hr=1,
     ),
@@ -152,6 +162,7 @@ STYLES: dict[str, Style] = {
         "twelve-frame loops: the modern indie pixel look.",
         figure_height=80, pixel_step=2, colors=32, palette_lock=True, dither="none", shading_bands=4,
         saturation=1.2, contrast=1.05, lightness=0.04, outline="none", edge="crisp",
+        value_span=0.55, local_contrast=0.5, detail=1.0, cluster=3,
         fx_bands=6, fx_glow="auto", fx_haze=False, fx_frames=12, fx_fps=12.0,
         anim_frames=12, anim_fps=12.0, clip_frames=24, tile_width=64, tile_height=32, tile_hr=2,
     ),
@@ -161,6 +172,7 @@ STYLES: dict[str, Style] = {
         "outline; pixels as a texture rather than a grid.",
         figure_height=144, pixel_step=1, colors=96, palette_lock=False, dither="none", shading_bands=0,
         saturation=1.0, contrast=1.0, outline="none", edge="soft",
+        value_span=0.45, local_contrast=0.3, detail=1.0, cluster=2,
         fx_bands=10, fx_glow="auto", fx_haze=True, fx_frames=12, fx_fps=12.0,
         anim_frames=12, anim_fps=12.0, clip_frames=24, tile_width=96, tile_height=48, tile_hr=2,
     ),
@@ -210,14 +222,22 @@ def validate(style: Style) -> list[str]:
         bad.append("contrast outside 0.5..2")
     if not (-0.3 <= style.lightness <= 0.3):
         bad.append("lightness outside -0.3..0.3")
-    if style.outline not in ("none", "auto") and not _HEX.match(style.outline):
-        bad.append(f"outline {style.outline!r} is not none, auto or #rrggbb")
+    if style.outline not in OUTLINES and not _HEX.match(style.outline):
+        bad.append(f"outline {style.outline!r} is not none, auto, dark, rim or #rrggbb")
     if style.edge not in EDGES:
         bad.append(f"edge {style.edge!r} not in {EDGES}")
     if not (0 <= style.clean <= 4):
         bad.append(f"clean {style.clean} outside 0..4")
     if style.clean > 0 and style.colors == 0:
         bad.append("clean needs a palette")
+    if not (0.0 <= style.value_span <= 0.9):
+        bad.append("value_span outside 0..0.9")
+    if not (0.0 <= style.local_contrast <= 2.0):
+        bad.append("local_contrast outside 0..2")
+    if not (0.0 <= style.detail <= 3.0):
+        bad.append("detail outside 0..3")
+    if not (0 <= style.cluster <= 8):
+        bad.append(f"cluster {style.cluster} outside 0..8")
     if not (2 <= style.fx_bands <= 16):
         bad.append("fx_bands outside 2..16")
     if style.fx_glow not in GLOWS:
@@ -274,9 +294,21 @@ def options_for_style(style: str | Style, **overrides):
         lightness=st.lightness,
         edge=st.edge,
         clean=st.clean,
+        value_span=st.value_span,
+        local_contrast=st.local_contrast,
+        detail=st.detail,
+        cluster=st.cluster,
     )
     base.update({k: v for k, v in overrides.items() if v is not None or k in ("palette", "outline")})
     return PixelateOptions(**base)
+
+
+def conversion_summary(style: str | Style) -> str:
+    """The pixel conversion's knobs in one line: ``span 0.55, local contrast 0.5, detail 1, cluster 3`` or ``off``."""
+    st = get_style(style)
+    if not (st.value_span > 0 or st.local_contrast > 0 or st.detail > 0 or st.cluster > 1):
+        return "off (resize and quantise only)"
+    return f"span {st.value_span:g}, local contrast {st.local_contrast:g}, detail {st.detail:g}, cluster {st.cluster}"
 
 
 def describe_style(style: str | Style) -> str:
@@ -292,6 +324,7 @@ def describe_style(style: str | Style) -> str:
         f"  shading {'as painted' if st.shading_bands <= 0 else f'{st.shading_bands} flat bands'}, "
         f"saturation x{st.saturation:g}, contrast x{st.contrast:g}, lightness {st.lightness:+g}, edge {st.edge}, "
         f"outline {st.outline}{f', clean x{st.clean}' if st.clean else ''}",
+        f"  conversion {conversion_summary(st)}",
         f"  effects {st.fx_bands} bands, glow {st.fx_glow}, haze {'on' if st.fx_haze else 'off'}, "
         f"{st.fx_frames} frames @ {st.fx_fps:g} fps",
         f"  loops {st.anim_frames} frames @ {st.anim_fps:g} fps, game clips up to {st.clip_frames} frames",

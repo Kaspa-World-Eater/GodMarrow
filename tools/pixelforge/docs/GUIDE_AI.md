@@ -187,18 +187,20 @@ tool `list_styles` return it as JSON. Each preset carries: `figure_height` (a st
 (screen px per sprite px, a hint recorded in the atlas), `colors` and `palette_lock`, `dither` / `dither_strength`,
 `shading_bands` (0 = the painting's shading, 3 = flat three-band), `saturation` / `contrast` / `lightness` (a grade in
 OKLab applied to the source cells before the palette is drawn, so nothing outside the palette is ever produced),
-`outline` (none / auto / hex) and `outline_diagonal`, `edge` (soft = cell average, crisp = median of the inner half,
-hard = near the cell centre), `clean` (passes of a 3x3 majority filter on the palette indices: a speck or a pair of
-specks takes the colour area round it, lines, 2x2 blocks and borders stay; the 16-bit and handheld looks run one pass
-so a detailed painting reads as clean areas at 40-60 px), `fx_bands` / `fx_glow` / `fx_haze` / `fx_frames` / `fx_fps` (procedural effects),
+`outline` (none / auto / dark / rim / hex, see the conversion below) and `outline_diagonal`, `edge` (soft = the area
+of the cell, median where an edge crosses it; crisp = median of the inner 70%; hard = near the cell centre), `clean`
+(passes of a 3x3 majority filter on the palette indices: a speck or a pair of specks takes the colour area round it,
+lines, 2x2 blocks and borders stay; the 16-bit and handheld looks run one pass so a detailed painting reads as clean
+areas at 40-60 px), the four conversion knobs `value_span` / `local_contrast` / `detail` / `cluster` (next section),
+`fx_bands` / `fx_glow` / `fx_haze` / `fx_frames` / `fx_fps` (procedural effects),
 `anim_frames` / `anim_fps` (the still path's loops), `clip_frames` (the render's `--per-clip` default and the game
 export's per-clip cap) and `tile_width` / `tile_height` / `tile_hr` (the ground diamond).
 
 | preset | look | figure | colours | outline | shading | loops | effects |
 |---|---|---|---|---|---|---|---|
 | `godmarrow` | the game's own (kept as it was) | 195 px | every colour | auto | painted | 8 f @ 8 | 6 bands, glow by kind |
-| `gothic_hd` | large gothic hi-res figures, gold and bone accents | 120 px | 40 | none | painted, soft edge | 12 f @ 10 | 8 bands, haze |
-| `rendered_arpg` | rendered-to-sprite isometric ARPG | 76 px | 28 | none | painted, soft edge | 8 f @ 8 | 6 bands |
+| `gothic_hd` | large gothic hi-res figures, gold and bone accents | 120 px | 40 | rim (lit edge) | painted, soft edge, span 0.55 | 12 f @ 10 | 8 bands, haze |
+| `rendered_arpg` | rendered-to-sprite isometric ARPG | 76 px | 28 | dark (own edge) | painted, soft edge, span 0.55 | 8 f @ 8 | 6 bands |
 | `snes` | 16-bit console | 56 px | 16 | auto (hard 1 px) | 3 bands, sat x1.15, contrast x1.3, clean x1 | 10 f @ 10, clips to 12 | 4 bands, no glow |
 | `handheld` | portable 32-bit, bright | 40 px | 15 | auto | 3 bands, sat x1.3, contrast x1.3, clean x1 | 6 f @ 8, clips to 8 | 4 bands, no glow |
 | `indie` | modern indie pixel, saturated accents | 80 px | 32 | none | 4 bands, sat x1.2 | 12 f @ 12 | 6 bands |
@@ -218,7 +220,8 @@ The older size tiers `8bit`, `16bit`, `hd` (the default for a new project), `ful
   outline (`outline="style"` is the default; `None` = none, `"auto"` or a hex colour override); `animate_still` takes
   `anim_frames` / `anim_fps`; `export-game` caps every clip at `clip_frames` and writes `style`, `pixel_step` and
   `figure_height` into the atlas meta. Lower-level tools take `--style` too: `pixelforge pixelate --style snes` (plus
-  `--bands --saturation --contrast --lightness --edge --clean --outline none|auto|#hex` overrides), `pixelforge animate --style`,
+  `--bands --saturation --contrast --lightness --edge --clean --value-span --local-contrast --detail --cluster
+  --outline none|auto|dark|rim|#hex` overrides), `pixelforge animate --style`,
   `pixelforge vfx <kind> <name> --style snes` (bands, glow rule, haze, frames, fps; `--haze on|off`), `pixelforge tiles
   ... --style handheld` (tile size and palette). MCP: `make_effect(style=)`, `make_tiles(style=)`.
 - Animated examples: `pixelforge styles --demo OUT` (MCP `style_demo`) writes `<preset>.gif` for every look (the
@@ -229,6 +232,53 @@ The older size tiers `8bit`, `16bit`, `hd` (the default for a new project), `ful
 - `pixelforge/style_demo.py`: `demo_frames(style, source, effect)` and `make_demo(out, source, only, effect)`;
   `styles.validate(style)` lists what is wrong with a hand-made `Style(...)`; `styles.options_for_style(style,
   **overrides)` is the one place a preset becomes `PixelateOptions`.
+
+## Readable pixels (the conversion between the downsample and the palette lock)
+
+A resize plus a quantise turns a dark, low-contrast, finely tattered painting into a blur at 56-120 px. Hand-made
+pixel art is not a shrunken painting: it has a value structure (three to five clearly separated lightness levels), a
+readable silhouette with a darker edge, clusters instead of noise, deliberate highlights on what identifies the figure
+(eyes, hat brim, blade, cords) and local contrast where the painting has mush. `pixelforge/readable.py` gives the
+pipeline each of those; `pixelate.py` runs them in this order on every still and every frame:
+
+1. **Cells** (`sample_cells`): area-aware downsampling in OKLab. A cell takes the alpha-weighted mean of the paint it
+   covers where it is flat and the median where an edge crosses it; a cell is opaque when at least half of it is paint
+   (`coverage_alpha`), which is stable frame to frame and keeps the gap between an arm and the body open.
+2. **Details** (`find_details`): small patches of the *source* much brighter or much more saturated than their
+   surroundings (a glowing eye from 3 px, a charm or trim from 60% of a cell, never a thin line, never more than ten
+   cells) become cells of their own colour, lifted a little in lightness, protected from every later clean-up.
+3. **Value structure** (`value_remap`, `local_contrast`, `posterise`, all in `grade_lab`): the figure's lightness
+   range (2nd..99th percentile, measured once per character by `clip_lightness_reference`) is stretched to at least
+   `value_span` about the median, the median is moved halfway to the middle of that range, the shadow never ends
+   under `SHADOW_FLOOR` (0.12: black is kept for the edges), an unsharp pass at a sixteenth of the figure's height
+   separates the masses, then the shading bands if the look has them. Hue is never touched.
+4. **Cluster** (`cluster_smooth` before the grade, `cluster_clean` after the lock): a bilateral smoothing in OKLab
+   collapses the painting's texture into clusters; after the lock, runs of one colour smaller than `cluster` cells
+   (orphans, pairs, 2 px checkers; 8-connected, so a diagonal line is one run and stays) take the neighbour they share
+   the longest border with. Then `clean` (the majority filter) as before.
+5. **Palette** (`feature_weights`, `Palette.from_image(weights=)`): the k-means is weighted toward chroma, local
+   contrast and the detail cells (six times), not the big flat dark areas.
+6. **Edges** (`edge_lab`, before the lock): concavities the downsample closed (interior cells less than 80% covered)
+   get a dark line; `outline dark` drops every edge cell of the silhouette a step (0.16) below the body beside it in
+   its own hue; `rim` lifts the edge cells facing the light (upper left) and drops the rest. Because this runs before
+   the lock, the palette holds the edge shades itself. `auto` / a hex colour still draw the older 1 px outer outline
+   after the lock.
+
+Knobs (`PixelateOptions`, the preset fields, `pixelforge pixelate` flags, MCP `pixelate_image`, `api.convert_image`):
+`value_span` (0 = the painting's own; 0.5-0.65 reads), `local_contrast` (0 = off; 0.3-0.8), `detail` (0 = off; 1 =
+the default thresholds; 2 finds fainter details), `cluster` (0 / 1 = off; 2-4), `outline` (none / auto / dark / rim /
+#hex), with the existing `contrast`, `bands`, `clean`. Every look but `godmarrow` (kept as it was, 1:1 and every
+colour) has sane defaults; a person never has to touch them.
+
+- Judge a conversion without opening the picture: `api.convert_image(src, out, style, **knobs)` (MCP `pixelate_image`)
+  returns `value_separation` (the 90th minus the 10th percentile of lightness; under 0.2 is a blur) and `orphans`
+  (lone pixels; more than 2% of the figure is noise) beside the size and the colour count. `readable.frame_change`
+  measures an animation's flicker (mean OKLab change per shared pixel between frames, and the share that changed).
+- When a figure is still a blur: raise `value_span` to 0.65 and `local_contrast` to 0.8. When it is noisy: `cluster`
+  4, `clean` 1. When the eyes or trim vanish: `detail` 2. When a bright painting looks washed out: `value_span` 0.4,
+  `detail` 0. When the edge is too heavy: `outline rim` or `none`.
+- Pictures: `docs/screens/readable/` in the game repo (the Keeper's front cutout and her idle / walk renders before
+  and after at every size, and a walk strip to check frame-to-frame stability).
 
 ## Godmarrow specifics (the game this forge serves)
 
@@ -279,8 +329,11 @@ The older size tiers `8bit`, `16bit`, `hd` (the default for a new project), `ful
   If not, `--colors` higher or import a better style image.
 - After `pixelate`: look at `frames/walk_S/frame_000.png` and one `_W`. Check
   the size is the same for every clip (it is by construction) and the
-  silhouette reads at 1x. Flicker between frames is prevented by the shared
-  palette + stabilization; if a glow pulses badly, that's the source render.
+  silhouette reads at 1x: a hat, eyes, the gear that identifies the figure.
+  `api.convert_image` on `views/front.png` gives `value_separation` and
+  `orphans` as numbers (see Readable pixels). Flicker between frames is
+  prevented by the shared palette + stabilization; if a glow pulses badly,
+  that's the source render.
 - Every rendered character in a project shares one pixels-per-unit scale
   (`settings.ppu` in project.json) so they are the right size relative to each
   other. To change the global scale, delete `ppu` from every character and
@@ -323,7 +376,7 @@ palette and a fixed scale so all frames match.
 ## MCP server
 
 `pixelforge mcp` runs an MCP server (stdio) with tools `new_project`, `status`,
-`configure`, `list_styles`, `set_style`, `style_demo`, `add_character`, `prompts`, `import_image`, `run_step`, `run_all`,
+`configure`, `list_styles`, `set_style`, `style_demo`, `pixelate_image`, `add_character`, `prompts`, `import_image`, `run_step`, `run_all`,
 `quick_sprite` (and the tool-by-tool ones named above: `make_effect`, `make_tiles`, `make_spell`, ...). Claude Desktop config:
 
 ```json

@@ -1,4 +1,20 @@
-"""The main pipeline: any image -> clean, palette-locked, game-ready sprite."""
+"""The main pipeline: any image -> clean, palette-locked, game-ready sprite.
+
+The order of work for one frame:
+
+1. the grid (detected on fake pixel art, or the preset's figure height on a painting or a render);
+2. the cells: an area-aware downsample in OKLab, a cell opaque when at least half of it is paint, and the identity
+   details of the source found at the painting's resolution (:mod:`readable`);
+3. the value structure: the lightness remap (contrast, guaranteed span, midtones expanded) and the local contrast
+   pass, the chroma grade, the shading bands, the details painted in;
+4. the palette, built with k-means weighted toward the features, then the lock (nearest colour);
+5. clusters, not noise: orphans, small clusters and 2 px checkers join their area; the majority filter;
+6. the edges: the gap lines in the concavities, the ``dark`` or ``rim`` edge on the silhouette's own cells, or the
+   older outer outline (``auto`` / a hex colour).
+
+An animation (:func:`pixelate_frames`) runs the same passes with one grid, one lightness reference, one palette and
+a temporal stabiliser shared by every frame.
+"""
 
 from __future__ import annotations
 
@@ -9,10 +25,13 @@ import numpy as np
 from PIL import Image
 
 from . import cleanup
-from .color import oklab_to_rgb
+from . import readable as rd
+from .color import hex_to_rgb, oklab_to_rgb, rgb_to_oklab
 from .grid import MIN_CONFIDENCE, Grid, detect_grid, downsample
 from .palette import Palette
 from .quantize import quantize
+
+OUTLINES = ("none", "auto", "dark", "rim")   # plus a hex colour; dark / rim recolour the figure's own edge cells
 
 
 @dataclass
@@ -28,7 +47,7 @@ class PixelateOptions:
     remove_background: bool = False
     bg_tolerance: float = 0.03
     despeckle: bool = True
-    outline: str | None = None  # None | "auto" | hex color
+    outline: str | None = None  # None | "auto" (outer, darkest colour) | "dark" | "rim" (the figure's own edge cells) | hex colour (outer)
     outline_diagonal: bool = False
     crop: bool = False
     # the look (see styles.py): a grade of the source in OKLab before the palette is extracted, so the output still
@@ -37,29 +56,18 @@ class PixelateOptions:
     saturation: float = 1.0  # chroma multiplier
     contrast: float = 1.0  # lightness contrast about the figure's median
     lightness: float = 0.0  # lightness lift
-    edge: str = "crisp"  # soft (cell average) | crisp (median of the inner half) | hard (near the cell centre)
+    edge: str = "crisp"  # soft (area mean, median where an edge crosses the cell) | crisp (median of the inner 70%) | hard (inner 35%)
     clean: int = 0  # passes of the 3x3 majority filter on the palette indices (the small flat-shaded looks use 1)
     grade_ref: tuple | None = None  # (median, low, high) lightness anchors; set once for a whole animation
+    # the pixel conversion (readable.py)
+    value_span: float = 0.0  # the least lightness range (2nd..99th percentile) the figure ends with; 0 = the painting's own
+    local_contrast: float = 0.0  # unsharp amount on lightness at the pixel scale; 0 = off
+    detail: float = 0.0  # detail keep: 1 = the default thresholds, 2 = fainter details too; 0 = off
+    cluster: int = 0  # the smallest run of one colour kept, in cells; smaller runs join their neighbour; 0 / 1 = off
 
 
-# how much of each cell is sampled and with how many samples, per edge treatment, on a painting (a detected pixel
-# grid is always sampled crisp: the inner half, where blur and compression have not reached)
-_EDGE_SAMPLING = {"soft": (0.9, 4), "crisp": (0.5, 3), "hard": (0.35, 3)}
-
-
-def _sampling(grid: Grid, edge: str, detected: bool) -> tuple[float, int]:
-    if grid.scale_x < 3:
-        return 0.9, 2
-    if detected or edge not in _EDGE_SAMPLING:
-        return _EDGE_SAMPLING["crisp"]
-    return _EDGE_SAMPLING[edge]
-
-
-def _cell_alpha(src_alpha: np.ndarray, grid: Grid, h: int, w: int) -> np.ndarray:
-    """The source alpha sampled at every cell centre (255 / 0)."""
-    ys = np.clip(((np.arange(h) + 0.5) * grid.scale_y + grid.offset_y).astype(int), 0, src_alpha.shape[0] - 1)
-    xs = np.clip(((np.arange(w) + 0.5) * grid.scale_x + grid.offset_x).astype(int), 0, src_alpha.shape[1] - 1)
-    return np.where(src_alpha[ys[:, None], xs[None, :]] > 127, 255, 0).astype(np.uint8)
+def _bleed_passes(grid: Grid) -> int:
+    return int(min(12, max(2, np.ceil(max(grid.scale_x, grid.scale_y)) + 1)))
 
 
 def paint_under_edges(rgba: np.ndarray, passes: int) -> np.ndarray:
@@ -74,12 +82,36 @@ def paint_under_edges(rgba: np.ndarray, passes: int) -> np.ndarray:
     return cleanup.bleed_edges(tmp, passes=passes)[..., :3]
 
 
-def _bleed_passes(grid: Grid) -> int:
-    return int(min(12, max(2, np.ceil(max(grid.scale_x, grid.scale_y)) + 1)))
+def conversion_on(opts: PixelateOptions) -> bool:
+    """Whether any of the pixel conversion's passes is asked for. With none of them (the ``godmarrow`` look, the
+    older size tiers) the cells are sampled exactly as before this conversion existed, so those looks do not drift."""
+    return (opts.cluster > 1 or opts.value_span > 0 or opts.detail > 0 or opts.local_contrast > 0
+            or opts.outline in ("dark", "rim"))
+
+
+# how much of each cell is sampled and with how many samples, per edge treatment, on a painting, when the conversion
+# is off (a detected pixel grid is always sampled crisp: the inner half, where blur and compression have not reached)
+_EDGE_SAMPLING = {"soft": (0.9, 4), "crisp": (0.5, 3), "hard": (0.35, 3)}
+
+
+def _legacy_sampling(grid: Grid, edge: str, detected: bool) -> tuple[float, int]:
+    if grid.scale_x < 3:
+        return 0.9, 2
+    if detected or edge not in _EDGE_SAMPLING:
+        return _EDGE_SAMPLING["crisp"]
+    return _EDGE_SAMPLING[edge]
+
+
+def _centre_alpha(src_alpha: np.ndarray, grid: Grid, h: int, w: int) -> np.ndarray:
+    """The source alpha sampled at every cell centre (255 / 0): the rule the looks without the conversion keep."""
+    ys = np.clip(((np.arange(h) + 0.5) * grid.scale_y + grid.offset_y).astype(int), 0, src_alpha.shape[0] - 1)
+    xs = np.clip(((np.arange(w) + 0.5) * grid.scale_x + grid.offset_x).astype(int), 0, src_alpha.shape[1] - 1)
+    return np.where(src_alpha[ys[:, None], xs[None, :]] > 127, 255, 0).astype(np.uint8)
 
 
 def grading(opts: PixelateOptions) -> bool:
-    return opts.bands > 0 or abs(opts.saturation - 1.0) > 1e-6 or abs(opts.contrast - 1.0) > 1e-6 or abs(opts.lightness) > 1e-6
+    return (opts.bands > 0 or abs(opts.saturation - 1.0) > 1e-6 or abs(opts.contrast - 1.0) > 1e-6
+            or abs(opts.lightness) > 1e-6 or opts.value_span > 0 or opts.local_contrast > 0)
 
 
 def lightness_reference(labs: list[np.ndarray], masks: list[np.ndarray] | None = None) -> tuple[float, float, float]:
@@ -98,26 +130,42 @@ def lightness_reference(labs: list[np.ndarray], masks: list[np.ndarray] | None =
     return med, lo, hi
 
 
-def grade_lab(lab: np.ndarray, opts: PixelateOptions, ref: tuple[float, float, float]) -> np.ndarray:
-    """Saturation, contrast and shading bands in OKLab. Lightness is stretched about the figure's median; chroma is
-    scaled; with ``bands`` the lightness between the low and high anchors is flattened to that many even levels
-    (anything brighter than the high anchor, a glowing eye, lands on the top band)."""
-    med, lo, hi = ref
+def _contrast_radius(mask: np.ndarray) -> float:
+    """The local contrast pass separates masses (hat, face, straps, skirt), not texture: its radius is about a
+    sixteenth of the figure's height, never under 1.5 cells."""
+    rows = np.nonzero((mask > 0).any(axis=1))[0]
+    height = (rows.max() - rows.min() + 1) if rows.size else mask.shape[0]
+    return float(min(8.0, max(1.5, height / 16.0)))
+
+
+def grade_lab(lab: np.ndarray, opts: PixelateOptions, ref: tuple[float, float, float], mask: np.ndarray | None = None,
+              detail: np.ndarray | None = None, detail_lab: np.ndarray | None = None) -> np.ndarray:
+    """The value structure and the colour grade in OKLab: the lightness remap (contrast about the figure's median,
+    the guaranteed ``value_span`` with the midtones expanded toward the middle of it, the ``lightness`` lift), the
+    local contrast pass, the chroma scale, the shading bands, and the identity details painted in last (remapped
+    with the same anchors, so they sit in the figure's value system, a little above their band)."""
     out = lab.astype(np.float64, copy=True)
-    L = out[..., 0]
-    if abs(opts.contrast - 1.0) > 1e-6:
-        L = med + (L - med) * opts.contrast
-        lo, hi = med + (lo - med) * opts.contrast, med + (hi - med) * opts.contrast
-    if abs(opts.lightness) > 1e-6:
-        L = L + opts.lightness
-        lo, hi = lo + opts.lightness, hi + opts.lightness
+    m = np.full(out.shape[:2], 255, np.uint8) if mask is None else mask
+    structured = opts.value_span > 0
+    L, ref2 = rd.value_remap(out[..., 0], ref, contrast=opts.contrast, span=opts.value_span,
+                             midtone=0.5 if structured else 0.0, lift=opts.lightness,
+                             floor=rd.SHADOW_FLOOR if structured else 0.03)
+    if opts.local_contrast > 0:
+        L = rd.local_contrast(L, m, opts.local_contrast, _contrast_radius(m))
     if abs(opts.saturation - 1.0) > 1e-6:
         out[..., 1:] *= opts.saturation
     if opts.bands > 1:
-        lo, hi = max(lo, 0.0), min(hi, 1.0)
-        t = np.clip((L - lo) / max(hi - lo, 1e-6), 0.0, 1.0)
-        L = lo + np.rint(t * (opts.bands - 1)) / (opts.bands - 1) * (hi - lo)
+        L = rd.posterise(L, ref2[1], ref2[2], opts.bands)
     out[..., 0] = np.clip(L, 0.0, 1.0)
+    if detail is not None and detail.any() and detail_lab is not None:
+        dl = detail_lab.astype(np.float64, copy=True)
+        dL, _ = rd.value_remap(dl[..., 0], ref, contrast=opts.contrast, span=opts.value_span,
+                               midtone=0.5 if structured else 0.0, lift=opts.lightness,
+                               floor=rd.SHADOW_FLOOR if structured else 0.03)
+        dl[..., 0] = dL
+        if abs(opts.saturation - 1.0) > 1e-6:
+            dl[..., 1:] *= opts.saturation
+        out[detail] = dl[detail]
     return out
 
 
@@ -153,42 +201,91 @@ def resolve_grid(rgb: np.ndarray, opts: PixelateOptions, notes: list[str]) -> Gr
     return Grid(s, s, 0.0, 0.0, grid.confidence)
 
 
-def pixelate(image: Image.Image | str, opts: PixelateOptions | None = None) -> PixelateResult:
-    opts = opts or PixelateOptions()
-    if isinstance(image, str):
-        image = Image.open(image)
-    rgba_src = np.asarray(image.convert("RGBA"))
-    rgb = rgba_src[..., :3]
-    notes: list[str] = []
+def _detected(grid: Grid, opts: PixelateOptions) -> bool:
+    return opts.scale == "auto" and not (opts.width or opts.height) and grid.confidence >= MIN_CONFIDENCE
 
-    grid = resolve_grid(rgb, opts, notes)
-    detected = opts.scale == "auto" and not (opts.width or opts.height) and grid.confidence >= MIN_CONFIDENCE
-    inner, samples = _sampling(grid, opts.edge, detected)
+
+# ------------------------------------------------------------------ the cells of one frame
+def frame_cells(rgba_src: np.ndarray, grid: Grid, opts: PixelateOptions, detected: bool = False) -> rd.Cells:
+    """One frame downsampled to the grid: colours, opaque mask, paint coverage, identity details (ungraded)."""
     src_alpha = rgba_src[..., 3]
     cutout = bool((src_alpha < 255).any())
-    if cutout:
-        rgb = paint_under_edges(rgba_src, _bleed_passes(grid))
-    lab = downsample(rgb, grid, inner=inner, samples=samples)
+    rgb = paint_under_edges(rgba_src, _bleed_passes(grid)) if cutout else rgba_src[..., :3]
+    edge = "crisp" if detected else opts.edge
+    if not conversion_on(opts):
+        # the sampling the looks without the conversion have always had: a sparse sample of each cell's inner part
+        # and the alpha at the cell centre
+        inner, samples = _legacy_sampling(grid, edge, detected)
+        lab = downsample(rgb, grid, inner=inner, samples=samples)
+        h, w = lab.shape[:2]
+        alpha = _centre_alpha(src_alpha, grid, h, w) if cutout else np.full((h, w), 255, np.uint8)
+        return rd.Cells(lab, alpha, np.ones((h, w)), np.zeros((h, w), bool), np.zeros((h, w, 3)), np.ones((h, w)))
+    lab_src = rgb_to_oklab(rgb)
+    lab, cover = rd.sample_cells(lab_src, src_alpha if cutout else np.full(src_alpha.shape, 255, np.uint8), grid, edge=edge)
     h, w = lab.shape[:2]
-
-    # alpha: keep source transparency, optionally flood-remove the background
-    alpha = np.full((h, w), 255, dtype=np.uint8)
     if cutout:
-        alpha = _cell_alpha(src_alpha, grid, h, w)
-    if opts.remove_background:
-        alpha[cleanup.background_mask(lab, opts.bg_tolerance)] = 0
-        if opts.despeckle:
-            alpha = cleanup.remove_alpha_specks(alpha)
-            alpha = cleanup.remove_islands(alpha)
+        alpha = rd.coverage_alpha(cover)
+    else:
+        alpha = np.full((h, w), 255, np.uint8)
+        cover = np.ones((h, w))
+    if opts.detail > 0 and cutout:
+        detail, detail_lab = rd.find_details(lab_src, src_alpha, grid, h, w, opts.detail)
+    else:
+        detail, detail_lab = np.zeros((h, w), bool), np.zeros((h, w, 3))
+    return rd.Cells(lab, alpha, cover, detail, detail_lab, np.ones((h, w)))
 
-    # the look's grade (shading bands, saturation, contrast) on the source cells, before any palette is drawn from them
-    if grading(opts):
-        ref = opts.grade_ref or lightness_reference([lab], [alpha])
-        lab = grade_lab(lab, opts, ref)
-        notes.append(f"graded: {opts.bands or 'painted'} bands, saturation x{opts.saturation:g}, contrast x{opts.contrast:g}, "
-                     f"lightness {opts.lightness:+g}")
 
-    palette = opts.palette
+def _remove_background(cells: rd.Cells, opts: PixelateOptions) -> None:
+    alpha = cells.alpha.copy()
+    alpha[cleanup.background_mask(cells.lab, opts.bg_tolerance)] = 0
+    if opts.despeckle:
+        alpha = cleanup.remove_alpha_specks(alpha)
+        alpha = cleanup.remove_islands(alpha)
+    cells.alpha = alpha
+    cells.detail &= alpha > 0
+
+
+def _clustered(cells: rd.Cells, opts: PixelateOptions) -> np.ndarray:
+    """The cells' colours with the painting's texture collapsed into clusters (``cluster`` > 1), or as sampled."""
+    if opts.cluster > 1:
+        return rd.cluster_smooth(cells.lab, cells.alpha, radius=1, passes=min(opts.cluster - 1, 3))
+    return cells.lab.copy()
+
+
+def _graded(cells: rd.Cells, opts: PixelateOptions, notes: list[str]) -> np.ndarray:
+    """The cells' colours after the value structure and the grade (the cells themselves stay ungraded)."""
+    if not grading(opts):
+        lab = _clustered(cells, opts)
+        if cells.detail.any():
+            lab[cells.detail] = cells.detail_lab[cells.detail]
+        return lab
+    ref = opts.grade_ref or lightness_reference([cells.lab], [cells.alpha])
+    lab = grade_lab(_clustered(cells, opts), opts, ref, cells.alpha, cells.detail, cells.detail_lab)
+    notes.append(f"graded: {opts.bands or 'painted'} bands, saturation x{opts.saturation:g}, contrast x{opts.contrast:g}, "
+                 f"lightness {opts.lightness:+g}, span {opts.value_span:g}, local contrast {opts.local_contrast:g}")
+    return lab
+
+
+def _edged(lab: np.ndarray, cells: rd.Cells, opts: PixelateOptions) -> np.ndarray:
+    """The edge pass on the graded colours: the gap lines whenever the conversion is on, the ``dark`` / ``rim``
+    edge on request (an ``auto`` / hex outline is drawn outside the figure after the lock instead)."""
+    if not (opts.outline or opts.cluster > 1):
+        return lab
+    mode = opts.outline if opts.outline in ("dark", "rim") else "none"
+    out, _ = rd.edge_lab(lab, cells.alpha, mode, coverage=cells.coverage, protect=cells.detail)
+    return out
+
+
+def _build_palette(labs: list[np.ndarray], cells: list[rd.Cells], opts: PixelateOptions) -> Palette:
+    rgb = np.concatenate([oklab_to_rgb(l)[c.alpha > 0] for l, c in zip(labs, cells)])
+    wgt = np.concatenate([rd.feature_weights(l, c.alpha, c.detail)[c.alpha > 0] for l, c in zip(labs, cells)])
+    return Palette.from_image(rgb[None], n_colors=opts.colors, weights=wgt)
+
+
+def _lock(lab: np.ndarray, cells: rd.Cells, opts: PixelateOptions, palette: Palette | None, notes: list[str]):
+    """The palette lock and everything that moves indices after it: ``(rgba, indices, palette)``."""
+    h, w = cells.shape
+    alpha = cells.alpha
     rgba = np.zeros((h, w, 4), dtype=np.uint8)
     if palette is None and opts.colors <= 0:
         # full colour: one true colour per cell, nothing merged
@@ -197,61 +294,91 @@ def pixelate(image: Image.Image | str, opts: PixelateOptions | None = None) -> P
         uniq = np.unique(rgba[alpha > 0][:, :3], axis=0)
         palette = Palette(uniq[:4096]) if len(uniq) else Palette(np.zeros((1, 3), np.uint8))
         notes.append(f"full colour: {len(uniq)} colours")
-    else:
-        if palette is None:
-            opaque_rgb = oklab_to_rgb(lab)[alpha > 0]
-            palette = Palette.from_image(opaque_rgb[None], n_colors=opts.colors)
-        indices = quantize(lab, palette, dither=opts.dither, strength=opts.dither_strength, mask=alpha > 0)
-        if opts.despeckle and opts.dither == "none":
+        indices = np.where(alpha > 0, 0, -1).astype(np.int32)
+        if len(uniq) <= 4096:
+            indices = palette.nearest(lab).astype(np.int32)
+            indices[alpha == 0] = -1
+        return rgba, indices, palette
+    if palette is None:
+        palette = _build_palette([lab], [cells], opts)
+    indices = quantize(lab, palette, dither=opts.dither, strength=opts.dither_strength, mask=alpha > 0).astype(np.int32)
+    protect = cells.detail & (alpha > 0)
+    kept = indices[protect]
+    if opts.dither == "none":
+        if opts.despeckle:
             indices = cleanup.remove_orphans(indices, alpha, passes=2 if opts.bands > 0 else 1)
-        if opts.clean > 0 and opts.dither == "none":
+        if opts.cluster > 1:
+            indices = rd.cluster_clean(indices, alpha, opts.cluster, protect=protect)
+        if opts.clean > 0:
             indices = cleanup.majority_filter(indices, alpha, passes=opts.clean)
-        rgba[..., :3] = palette.colors[indices]
-        rgba[..., 3] = alpha
+        indices[protect] = kept
+    indices[alpha == 0] = -1
+    rgba[..., :3] = palette.colors[np.clip(indices, 0, len(palette) - 1)]
+    rgba[..., 3] = alpha
+    return rgba, indices, palette
 
-    if opts.outline:
-        from .color import hex_to_rgb
 
+def _finish(rgba: np.ndarray, indices: np.ndarray, palette: Palette, opts: PixelateOptions, grid: Grid, notes: list[str]) -> PixelateResult:
+    """The outer outline (``auto`` / hex), the crop, the result."""
+    if opts.outline and opts.outline not in ("dark", "rim"):
         color = cleanup.darkest(palette.colors) if opts.outline == "auto" else hex_to_rgb(opts.outline)
+        before = rgba[..., 3] > 0
         rgba = cleanup.add_outline(cleanup.pad(rgba), color, diagonal=opts.outline_diagonal)
-        if opts.outline != "auto" and not (palette.colors == np.array(color)).all(1).any():
+        hit = np.nonzero((palette.colors == np.array(color)).all(1))[0]
+        if len(hit) == 0:
             palette = Palette(np.vstack([palette.colors, color]))
+            hit = [len(palette) - 1]
+        indices = np.pad(indices, 1, constant_values=-1)
+        new = (rgba[..., 3] > 0) & ~np.pad(before, 1)
+        indices[new] = int(hit[0])
     if opts.crop:
-        rgba = cleanup.crop_to_content(rgba)
-
-    final_idx = _indices_for(rgba, palette) if len(palette) <= 4096 and opts.colors > 0 else np.where(rgba[..., 3] > 0, 0, -1)
-    return PixelateResult(Image.fromarray(rgba, "RGBA"), final_idx, palette, grid, notes)
-
-
-def _indices_for(rgba: np.ndarray, palette: Palette) -> np.ndarray:
-    key = lambda c: (c[..., 0].astype(np.int64) << 16) | (c[..., 1].astype(np.int64) << 8) | c[..., 2]
-    lookup = {int(k): i for i, k in enumerate(key(palette.colors))}
-    k = key(rgba[..., :3])
-    out = np.vectorize(lambda v: lookup.get(int(v), -1), otypes=[np.int32])(k)
-    out[rgba[..., 3] == 0] = -1
-    return out
+        ys, xs = np.nonzero(rgba[..., 3])
+        if len(ys):
+            y0, y1 = max(ys.min() - 1, 0), min(ys.max() + 2, rgba.shape[0])
+            x0, x1 = max(xs.min() - 1, 0), min(xs.max() + 2, rgba.shape[1])
+            rgba, indices = rgba[y0:y1, x0:x1], indices[y0:y1, x0:x1]
+    return PixelateResult(Image.fromarray(np.ascontiguousarray(rgba), "RGBA"), np.ascontiguousarray(indices), palette, grid, notes)
 
 
-def _clip_cells(frames: list[Image.Image], opts: PixelateOptions):
-    """The front half of :func:`pixelate_frames`: the grid detected on the first frame, the options fixed to it, and
-    every frame's cells in OKLab (ungraded) with their opaque masks."""
+def pixelate(image: Image.Image | str, opts: PixelateOptions | None = None) -> PixelateResult:
+    opts = opts or PixelateOptions()
+    if isinstance(image, str):
+        image = Image.open(image)
+    rgba_src = np.asarray(image.convert("RGBA"))
+    notes: list[str] = []
+    grid = resolve_grid(rgba_src[..., :3], opts, notes)
+    cells = frame_cells(rgba_src, grid, opts, _detected(grid, opts))
+    if opts.remove_background:
+        _remove_background(cells, opts)
+    lab = _edged(_graded(cells, opts, notes), cells, opts)
+    rgba, indices, palette = _lock(lab, cells, opts, opts.palette, notes)
+    return _finish(rgba, indices, palette, opts, grid, notes)
+
+
+# ------------------------------------------------------------------ animations
+def _clip(frames: list[Image.Image], opts: PixelateOptions):
+    """The front half of :func:`pixelate_frames`: the grid detected on the first frame, the options fixed to it,
+    and every frame's cells (ungraded)."""
     notes: list[str] = []
     first = np.asarray(frames[0].convert("RGB"))
     grid = resolve_grid(first, opts, notes)
-    detected = opts.scale == "auto" and not (opts.width or opts.height) and grid.confidence >= MIN_CONFIDENCE
+    detected = _detected(grid, opts)
     # Per-frame cropping would misalign frames, so it is never applied here; a detected pixel grid is sampled crisp.
     fixed = PixelateOptions(
         **{**opts.__dict__, "scale": grid.scale_x, "width": None, "height": None, "crop": False,
            "edge": "crisp" if detected else opts.edge}
     )
-    inner, samples = _sampling(grid, fixed.edge, detected)
-    passes = _bleed_passes(grid)
-    srcs = [np.asarray(f.convert("RGBA")) for f in frames]
-    labs = [downsample(paint_under_edges(a, passes) if (a[..., 3] < 255).any() else a[..., :3], grid, inner=inner, samples=samples)
-            for a in srcs]
-    masks = [_cell_alpha(a[..., 3], grid, *l.shape[:2]) if (a[..., 3] < 255).any() else np.full(l.shape[:2], 255, np.uint8)
-             for a, l in zip(srcs, labs)]
-    return notes, fixed, labs, masks
+    cells = [frame_cells(np.asarray(f.convert("RGBA")), grid, fixed, detected) for f in frames]
+    if fixed.remove_background:
+        for c in cells:
+            _remove_background(c, fixed)
+    return notes, fixed, grid, cells
+
+
+def _clip_cells(frames: list[Image.Image], opts: PixelateOptions):
+    """``(notes, fixed options, labs, masks)``: every frame's cells in OKLab (ungraded) with their opaque masks."""
+    notes, fixed, _, cells = _clip(frames, opts)
+    return notes, fixed, [c.lab for c in cells], [c.alpha for c in cells]
 
 
 def clip_lightness_reference(clips: list[list[Image.Image]], opts: PixelateOptions) -> tuple[float, float, float]:
@@ -277,8 +404,10 @@ def pixelate_frames(
 ) -> list[PixelateResult]:
     """Pixelate an animation (e.g. frames from a video model) consistently.
 
-    * one palette shared by every frame (extracted jointly),
+    * one palette shared by every frame (extracted jointly, weighted toward the features),
     * one grid shared by every frame (detected on the first frame),
+    * one lightness reference for the grade and the bands (the clip's, or the character's when the caller measured
+      one with :func:`clip_lightness_reference`),
     * temporal stabilization: a pixel whose color changed by less than
       ``stabilize`` (OKLab distance) keeps its previous-frame color, which kills
       most of the "boiling" that makes AI animations look wrong as pixel art.
@@ -286,19 +415,20 @@ def pixelate_frames(
     opts = opts or PixelateOptions()
     if not frames:
         return []
-    notes, fixed, labs, masks = _clip_cells(frames, opts)
+    notes, fixed, grid, cells = _clip(frames, opts)
     if grading(fixed):
-        # one set of lightness anchors for the whole clip (or the whole character, when the caller measured one with
-        # clip_lightness_reference), so bands and contrast never flicker between frames or jump between clips
-        fixed.grade_ref = opts.grade_ref or lightness_reference(labs, masks)
-        labs = [grade_lab(l, fixed, fixed.grade_ref) for l in labs]
+        fixed.grade_ref = opts.grade_ref or lightness_reference([c.lab for c in cells], [c.alpha for c in cells])
+    labs = [_edged(_graded(c, fixed, notes if i == 0 else []), c, fixed) for i, c in enumerate(cells)]
     if fixed.palette is None and opts.colors > 0:
-        stacked = np.concatenate([oklab_to_rgb(l).reshape(-1, 3) for l in labs])
-        fixed.palette = Palette.from_image(stacked[None], n_colors=opts.colors)
+        fixed.palette = _build_palette(labs, cells, fixed)
 
-    results = [pixelate(f, fixed) for f in frames]
+    results = []
+    for lab, c in zip(labs, cells):
+        frame_notes = list(notes)
+        rgba, indices, palette = _lock(lab, c, fixed, fixed.palette, frame_notes)
+        results.append(_finish(rgba, indices, palette, fixed, grid, frame_notes))
     if stabilize > 0 and len(results) > 1 and fixed.palette is not None:
-        pad = 1 if fixed.outline else 0
+        pad = 1 if (fixed.outline and fixed.outline not in ("dark", "rim")) else 0
         colors = fixed.palette.colors
         prev_idx = results[0].indices
         for t in range(1, len(results)):
@@ -319,8 +449,6 @@ def pixelate_frames(
                 r.image = Image.fromarray(arr, "RGBA")
                 r.indices = idx
             prev_idx = idx
-    for r in results:
-        r.notes = notes + r.notes
     if any("no reliable" in n for n in notes):
         warnings.warn(notes[0])
     return results

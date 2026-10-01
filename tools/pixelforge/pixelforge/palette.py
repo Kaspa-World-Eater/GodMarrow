@@ -60,6 +60,7 @@ class Palette:
         accent_boost: float = 0.5,
         iterations: int = 30,
         seed: int = 0,
+        weights: np.ndarray | None = None,
     ) -> "Palette":
         """Extract a palette with weighted k-means in OKLab.
 
@@ -67,11 +68,19 @@ class Palette:
         With ``accent_boost < 1`` rare-but-important accents (a lantern's glow, gold
         trim, a green flame) keep a cluster of their own instead of being swamped by
         the huge dark background.
+
+        ``weights`` (one per pixel of ``image``, before any alpha filtering) makes some pixels count more than
+        others: the pixel conversion hands in the identity details and the high-contrast, saturated cells with a
+        higher weight than the big flat dark areas, so the palette spends its entries on what identifies the figure.
         """
         rgb, alpha = _split_rgba(image)
         pixels = rgb.reshape(-1, 3)
+        pw = None if weights is None else np.asarray(weights, dtype=np.float64).reshape(-1)
         if alpha is not None:
-            pixels = pixels[alpha.reshape(-1) > 127]
+            keep = alpha.reshape(-1) > 127
+            pixels = pixels[keep]
+            if pw is not None:
+                pw = pw[keep]
         if len(pixels) == 0:
             raise ValueError("image has no opaque pixels")
 
@@ -83,7 +92,12 @@ class Palette:
         np.add.at(sums, inverse, pixels.astype(np.float64))
         bin_rgb = np.rint(sums / counts[:, None]).astype(np.uint8)
         points = rgb_to_oklab(bin_rgb)
-        weights = counts.astype(np.float64) ** accent_boost
+        mass = counts.astype(np.float64)
+        if pw is not None:
+            mass = np.zeros(len(uniq))
+            np.add.at(mass, inverse, np.clip(pw, 0.0, None))
+            mass = np.maximum(mass, 1e-9)
+        weights = mass ** accent_boost
 
         k = min(n_colors, len(points))
         centers = _weighted_kmeans(points, weights, k, iterations, seed)

@@ -162,8 +162,10 @@ and the size of a ground tile. Seven looks ship, each with an animated example o
 (`assets/styles/<look>.gif`; all of them side by side with their numbers in `assets/styles/styles_sheet.png`):
 
 - **Godmarrow**: the game's own look, 195 px tall, every colour kept, the dark edge.
-- **Gothic hi-res**: large finely drawn figures (120 px), dark gothic palette, soft shading, no outline.
-- **Rendered ARPG**: 76 px figures that look rendered, cool dark palette of 28 colours, no outline.
+- **Gothic hi-res**: large finely drawn figures (120 px), dark gothic palette, soft shading, a rim of light on the
+  lit edge instead of a black outline.
+- **Rendered ARPG**: 76 px figures that look rendered, cool dark palette of 28 colours, the figure's own edge a shade
+  darker.
 - **SNES 16-bit**: chunky 56 px figures, 16 colours, hard outline, three flat shading bands in clean colour areas
   (specks are tidied into the area round them), short loops, no glow.
 - **Handheld 32-bit**: small bright 40 px figures, 15 colours, hard outline, the same clean areas.
@@ -174,11 +176,26 @@ Pick one in **Settings → Style** (or `pixelforge project set --style snes` fro
 pixelate and export steps again; the whole project takes the new look. One character can have its own
 (`--character`). Every number behind a look can be changed: `pixelforge styles` prints them all.
 
+### Readable pixels
+
+Shrinking a dark painting used to give a blur. Every look now converts the way a pixel artist draws: the darkest and
+lightest shades are pushed apart so the figure has a few clear lightness levels, folds and gear separate from the
+cloth, the eyes, glow, trim and metal are kept as clean pixels, the painting's fine texture settles into clusters
+instead of specks, and the edge of the figure is a shade darker (or lit on one side, in the hi-res look). Four knobs
+drive it, each with a sane default per look, so you never have to touch them: **value span** (how far apart the
+darkest and lightest shades sit), **local contrast** (how much folds and gear separate), **detail keep** (eyes, glow,
+trim and metal kept as pixels; 2 keeps fainter ones too) and **cluster size** (the smallest speck kept). If a figure
+still looks like a blur, raise value span and local contrast; if it looks noisy, raise cluster size; if a bright
+painting looks washed out, lower value span. Before and after pictures of the Shrine Keeper at every size are in
+`docs/screens/readable/` in the game repo.
+
 ## Knobs you might touch
 
 - **Settings → Style**: the look (above). `godmarrow` is the game's; the others are for comparing and for other games.
 - **Step 7 → Camera elevation**: 30° is Diablo II. 45° is more top-down.
-- **Step 8 → outline**: the dark 1-pixel edge the game uses.
+- **Step 8 → outline**: the dark 1-pixel edge the game uses (`auto`); `dark` darkens the figure's own edge instead
+  of growing it, `rim` lights the edge on the lit side.
+- **Conversion** (value span, local contrast, detail keep, cluster size): see *Readable pixels* above.
 
 ## When something goes wrong
 

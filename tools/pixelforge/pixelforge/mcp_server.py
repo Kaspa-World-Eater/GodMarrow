@@ -55,6 +55,24 @@ def build_server():
         return make_demo(out_dir, source=source or None, effect=effect, only=only.split(",") if only else None)
 
     @mcp.tool()
+    def pixelate_image(image: str, out: str, style: str = "rendered_arpg", outline: str = "style", preview: int = 0,
+                       colors: int | None = None, max_size: int | None = None, bands: int | None = None,
+                       contrast: float | None = None, saturation: float | None = None, lightness: float | None = None,
+                       value_span: float | None = None, local_contrast: float | None = None, detail: float | None = None,
+                       cluster: int | None = None, clean: int | None = None, edge: str | None = None, crop: bool = True) -> dict:
+        """One image (a cutout, a render, a painting) -> a palette-locked sprite in a look preset, any knob overridden:
+        contrast, bands, value_span (least lightness range, 0.5-0.65 reads), local_contrast (0.3-0.8), detail (1 keeps
+        eyes, glow, trim, metal), cluster (smallest colour run kept, 2-4), clean (majority passes), edge soft|crisp|hard,
+        outline style|none|auto|dark|rim|#rrggbb. Reports size, colours, value_separation and orphans."""
+        try:
+            return api.convert_image(image, out, style, outline=None if outline in ("", "none") else outline, preview=preview,
+                                     colors=colors, max_size=max_size, bands=bands, contrast=contrast, saturation=saturation,
+                                     lightness=lightness, value_span=value_span, local_contrast=local_contrast, detail=detail,
+                                     cluster=cluster, clean=clean, edge=edge, crop=crop)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
     def status(project: str) -> dict:
         """Show characters, what is done and what the next step is."""
         return api.status(_project(project))

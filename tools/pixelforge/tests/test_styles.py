@@ -15,7 +15,8 @@ from pixelforge.styles import FIELDS, LOOKS, STYLES, Style, describe_style, get_
 REQUIRED = {
     "name", "title", "description", "group", "figure_height", "pixel_step", "colors", "palette_lock", "dither",
     "dither_strength", "shading_bands", "saturation", "contrast", "lightness", "outline", "outline_diagonal", "edge",
-    "clean", "fx_bands", "fx_glow", "fx_haze", "fx_frames", "fx_fps", "anim_frames", "anim_fps", "clip_frames",
+    "clean", "value_span", "local_contrast", "detail", "cluster",
+    "fx_bands", "fx_glow", "fx_haze", "fx_frames", "fx_fps", "anim_frames", "anim_fps", "clip_frames",
     "tile_width", "tile_height", "tile_hr",
 }
 
@@ -61,7 +62,7 @@ def test_every_preset_has_every_key_and_sane_numbers():
 def test_the_looks_are_what_they_say():
     g = STYLES["godmarrow"]
     assert g.figure_height == 195 and g.colors == 0 and g.outline == "auto" and g.clip_frames == 24 and g.tile == (72, 36)
-    assert 100 <= STYLES["gothic_hd"].figure_height <= 140 and 32 <= STYLES["gothic_hd"].colors <= 48 and STYLES["gothic_hd"].outline == "none"
+    assert 100 <= STYLES["gothic_hd"].figure_height <= 140 and 32 <= STYLES["gothic_hd"].colors <= 48 and STYLES["gothic_hd"].outline == "rim"
     assert 70 <= STYLES["rendered_arpg"].figure_height <= 80 and 24 <= STYLES["rendered_arpg"].colors <= 32
     s = STYLES["snes"]
     assert 48 <= s.figure_height <= 64 and s.colors == 16 and s.outline == "auto" and s.shading_bands == 3 and 8 <= s.anim_frames <= 12 and s.fx_glow == "off"
@@ -89,7 +90,8 @@ def test_options_for_style_carries_every_number_and_overrides_win():
     assert isinstance(o, PixelateOptions)
     assert o.max_size == 56 and o.colors == 16 and o.outline == "auto" and o.bands == 3 and o.edge == "soft" and o.clean == 1
     assert o.saturation == pytest.approx(1.15) and o.contrast == pytest.approx(1.3)
-    assert options_for_style("gothic_hd").outline is None and options_for_style("gothic_hd").clean == 0
+    assert options_for_style("gothic_hd").outline == "rim" and options_for_style("gothic_hd").clean == 0
+    assert options_for_style("painterly").outline is None and options_for_style("rendered_arpg").outline == "dark"
     o = options_for_style("snes", outline=None, colors=8, crop=True)
     assert o.outline is None and o.colors == 8 and o.crop
     assert options_for_style("gothic_hd", outline="auto").outline == "auto"

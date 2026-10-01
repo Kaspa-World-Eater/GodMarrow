@@ -350,3 +350,59 @@ byte. Smoke: errors 0 on every line (the game did not change).
 edited styles are not saved in `project.json`, the game does not read `pixel_step` or the tile size, and the two
 tallest looks' GIFs stand over 160 px because the figures are shown 1:1. The clean pass and the stronger contrast
 are tuned on one dark figure; a bright painting may want `clean 0` or a smaller lift in the Advanced numbers.
+
+### 7.8 2026-10-01, track/readable: readable pixels, the conversion between the downsample and the palette lock
+
+**What.** The pixelate step was a resize plus a quantise with a grade, and a dark, low-contrast, finely tattered
+painting became a blur at 56-120 px ("most of those examples look like purple blurs"). A real pixel conversion now
+runs between the downsample and the palette lock (`tools/pixelforge/pixelforge/readable.py`, driven from
+`pixelate.py`): area-aware cells (the alpha-weighted mean of the paint under each sprite pixel, the median where an
+edge crosses it, a pixel solid when at least half of it is paint, so arm-body gaps stay open and edges stop boiling);
+a value structure (the figure's lightness range stretched to a guaranteed span about the median, the midtones opened,
+the shadow kept above black so black is the edges', an unsharp pass at the size of the figure's masses, then the
+look's bands; hue untouched); identity details (eyes, glow, trim, metal found on the source as small bright or
+saturated compact patches and placed as at least one clean, slightly brightened pixel each, protected from every
+clean-up); clusters, not noise (a bilateral smoothing in OKLab before the grade, and after the lock every run of one
+colour smaller than the cluster size, orphans, pairs, 2 px checkers, joins the neighbour it borders most; lines and
+blocks stay); a palette weighted toward chroma, local contrast and the details rather than the big dark areas; and
+edges before the lock (dark lines in the concavities the downsample closed, `outline dark` = the silhouette's own
+edge cells a step darker than the body beside them in their own hue, `outline rim` = lit on the upper-left side and
+dark on the other; `auto` / hex still draw the older outer line). Four knobs with defaults per look: `value_span`,
+`local_contrast`, `detail`, `cluster` (plus the existing contrast, bands, clean, and the two new outline rules), in
+`PixelateOptions`, the presets (`gothic_hd` rim, `rendered_arpg` dark, both at saturation 1 and span 0.55; `snes`
+and `handheld` span 0.6, cluster 4; `indie` 0.55; `painterly` 0.45, cluster 2; `godmarrow` untouched), CLI
+`pixelforge pixelate --value-span --local-contrast --detail --cluster --outline dark|rim`, `api.convert_image`
+(reports size, colours, `value_separation` and `orphans` so an AI can judge without opening the picture) and MCP
+`pixelate_image`. `Palette.from_image` takes per-pixel `weights`. The contact sheet prints the conversion line.
+
+**Verified.** 125 tests green (`tests/test_readable.py`, 17 new: the value remap guarantees the span and keeps the
+order, the grade separates values and keeps hue, posterise lands on the bands, the cluster clean removes an orphan,
+a pair and a checker but keeps a line, a block and a protected eye, the smoothing collapses texture and keeps a
+border, a tiny saturated eye is found and survives a 60 px downsample while a thin bright line is not a detail, the
+dark edge ends a step below the body and the arm-body gap stays open, the rim lights the lit side only, four
+animation frames stay palette-locked with a bounded change, every preset validates and carries the knobs, the CLI
+and `api.convert_image` and the MCP tool, and two slow Keeper tests gated on her files (`PIXELFORGE_KEEPER=<project>/characters/keeper`
+in the environment; skipped otherwise): she reads at every size with
+at least two purple eye cells at 120 and 76 px, one at 56, value separation over 0.25, shadow above black, orphans
+under 2%; her walk does not flicker). Pictures, all under 60 KB: `docs/screens/readable/2026-10-01_keeper_front_
+before_after.png` (the front cutout at gothic 120, ARPG 76 and SNES 56, before and after, 3x),
+`2026-10-01_keeper_renders_{gothic_hd,rendered_arpg,snes}_before_after.png` (idle S, walk E and walk S frames of
+the 256 px renders), `2026-10-01_keeper_walk_E_arpg_{before,after}.png` (eight consecutive walk frames);
+`docs/screens/styles/styles_sheet.png` and the seven GIFs regenerated (`tools/pixelforge/assets/styles/` too).
+Frame-to-frame change of the walk E renders at ARPG, measured as the share of shared opaque pixels that change colour
+between consecutive frames: 38.6% before, 35.4% after (idle S 14.4% to 13.0%; SNES walk E 17.1% to 11.8%). The mean
+OKLab change per shared pixel rose (0.027 to 0.038 at ARPG) because the value span is wider, so each pixel that does
+change moves further; the figure's motion, not noise, is what changes. Looking at the pictures: at 76 and 56 px she
+reads as a figure with a hat, two purple eyes, the cords across the chest, the pale charms and a ragged skirt with a
+dark edge, which the before did not; at 120 px she reads but the body is a field of grey-purple patches rather than
+drawn folds. The renders read as a hatted figure with eyes at every size, limited by the 256 px render's blurred
+projected texture. The game was not changed.
+
+**Honestly short.** The hi-res look (120 px) is better but not hand-drawn: the cloth is painted grit in patches, not
+strokes along the folds; a stroke-aware pass (contrast along the cloth's direction) is the next step. The figure
+stays a dark purple-grey because the painting is; the references' warm fire light against cold ground is a lighting
+and palette choice this track did not take (no colour grade toward warm highlights). Details are found per frame,
+so a detail at the threshold can appear and vanish between frames (the stabiliser holds it when the source barely
+moves). The rim light assumes light from the upper left. The conversion is tuned on one dark figure; a bright
+painting may want `value_span` lower and `detail` 0. The Studio / Forge page for the knobs is a spec
+(`docs/track_notes/readable.md`), not built here.

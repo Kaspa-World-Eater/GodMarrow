@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont
 from .animate import PRESETS, animate
 from .pixelate import pixelate
 from .spritesheet import save_gif
-from .styles import LOOKS, STYLES, get_style, options_for_style
+from .styles import LOOKS, STYLES, conversion_summary, get_style, options_for_style
 from .vfx import DEFAULT_SIZE, render_frames
 
 SOURCE = Path(__file__).resolve().parent.parent / "assets" / "styles" / "keeper_front.png"
@@ -95,6 +95,7 @@ def contact_sheet(examples: list[dict], path: str | Path) -> Path:
              + (f", shown x{ex['zoom']}" if ex["zoom"] > 1 else ""), small, BONE),
             (f"outline {st.outline}, {'painted shading' if st.shading_bands <= 0 else f'{st.shading_bands} bands'}", small, BONE),
             (f"sat x{st.saturation:g}, contrast x{st.contrast:g}, edge {st.edge}" + (f", clean x{st.clean}" if st.clean else ""), small, BONE),
+            (conversion_summary(st), small, BONE),
             (f"{st.anim_frames} f @ {st.anim_fps:g} fps, clips to {st.clip_frames}", small, BONE),
             (f"fx {st.fx_bands} bands, glow {st.fx_glow}, haze {'on' if st.fx_haze else 'off'}", small, BONE),
             (f"tile {st.tile_width}x{st.tile_height} @ {st.tile_hr}, step {st.pixel_step}", small, DIM),

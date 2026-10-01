@@ -686,6 +686,39 @@ def pixelate_renders(project: Project, name: str, outline: str | None = "style",
     return {"ok": True, "character": c.name, "frames": str(frames_dir), "clips": made, "fps": fps, "next": "export"}
 
 
+CONVERSION_KNOBS = ("bands", "saturation", "contrast", "lightness", "edge", "clean", "value_span", "local_contrast", "detail", "cluster")
+
+
+def convert_image(src: str | Path, out: str | Path, style: str = DEFAULT_STYLE, outline: str | None = "style",
+                  preview: int = 0, **overrides) -> dict:
+    """One image (a cutout, a render, a painting) -> one palette-locked sprite in a look preset, with any of the
+    preset's numbers overridden (``bands``, ``saturation``, ``contrast``, ``lightness``, ``edge``, ``clean``,
+    ``value_span``, ``local_contrast``, ``detail``, ``cluster``, ``colors``, ``max_size``, ``crop``...). ``outline``:
+    ``"style"`` (the preset's rule), ``None`` (none), ``"auto"``, ``"dark"``, ``"rim"`` or a hex colour. Writes
+    ``out`` (and ``<out>_x<preview>.png`` when ``preview`` > 0) and reports the size, the colours used, the measured
+    value separation and the orphan count, so an AI can judge a conversion without opening the picture."""
+    from .color import rgb_to_oklab
+    from .readable import orphan_count, value_separation
+
+    src, out = Path(src), Path(out)
+    if not src.exists():
+        raise StepError(f"no image at {src}")
+    opts = options_for_style(style, outline=outline, **{k: v for k, v in overrides.items() if v is not None})
+    r = pixelate(Image.open(src), opts)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    r.image.save(out)
+    result = {"ok": True, "source": str(src), "sprite": str(out), "size": list(r.image.size), "colors": len(r.palette),
+              "style": get_style(style).name, "notes": r.notes}
+    if preview > 0:
+        pv = out.with_name(f"{out.stem}_x{preview}.png")
+        r.preview(preview).save(pv)
+        result["preview"] = str(pv)
+    arr = np.asarray(r.image)
+    result["value_separation"] = round(value_separation(rgb_to_oklab(arr[..., :3])[..., 0], arr[..., 3]), 3)
+    result["orphans"] = orphan_count(r.indices, arr[..., 3])
+    return result
+
+
 def pixelate_still(project: Project, name: str, view: str = "front", outline: str | None = "style", **overrides) -> dict:
     """Direct path: one imported image (style or a view) -> one sprite, in the character's look (``outline``:
     ``"style"`` = the preset's rule, ``None`` = none, ``"auto"`` or a hex colour)."""
