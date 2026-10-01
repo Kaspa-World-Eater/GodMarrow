@@ -111,3 +111,18 @@ def test_recolor_map_and_hue(tmp_path):
     (d / "wisp.json").write_text(json.dumps({"sheets": ["wisp.png"], "meta": {"kind": "wisp"}, "idx": {"idle/down/0": [0, 0, 0, 4, 4, 0, 0]}}))
     r = recolor_set(d, "wisp", "@champion", hue=90.0)
     assert (d / "wisp@champion.png").exists() and json.loads((d / "wisp@champion.json").read_text())["sheets"] == ["wisp@champion.png"]
+
+
+def test_icons_from_flat_lay(tmp_path):
+    from pixelforge.icons import make_icons
+
+    im = np.full((120, 180, 3), 245, np.uint8)   # pale background, three objects
+    im[20:60, 20:50] = (90, 60, 30)
+    im[20:100, 80:95] = (120, 120, 130)          # a tall one -> 1x3
+    im[70:105, 120:160] = (40, 80, 70)
+    r = make_icons(Image.fromarray(im), tmp_path, ["pouch", "staff:1x3", "hood"])
+    assert r["found"] == 3 and set(r["icons"]) == {"pouch", "staff", "hood"}
+    assert Image.open(tmp_path / "staff@1x.png").size == (12, 36) and Image.open(tmp_path / "staff.png").size == (48, 144)
+    assert Image.open(tmp_path / "hood@1x.png").size == (12, 12)
+    data = json.loads((tmp_path / "icons.json").read_text())
+    assert data["icons"]["staff"]["grid"] == [1, 3] and data["cell_px"] == 48

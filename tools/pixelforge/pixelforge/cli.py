@@ -329,6 +329,13 @@ def cmd_ui9(a) -> None:
     _emit(a, r)
 
 
+def cmd_icons(a) -> None:
+    from .icons import make_icons
+
+    names = [n.strip() for n in a.names.split(",")] if a.names else None
+    _emit(a, make_icons(a.image, a.out, names, cell_art=a.cell, scale=a.scale, tolerance=a.tolerance, outline=not a.no_outline, colors=a.colors))
+
+
 def cmd_recolor(a) -> None:
     from .recolor import _read_hex, recolor_file, recolor_set
 
@@ -496,6 +503,14 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--colors", type=int, default=0); s.add_argument("--mid", type=int, default=8, help="px of each edge/centre to keep")
     s.add_argument("--res-dir", default="res://art/ui"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_ui9)
+
+    s = sub.add_parser("icons", help="one painted flat lay of items -> inventory icons (<id>.png + <id>@1x.png + icons.json)")
+    s.add_argument("image"); s.add_argument("-o", "--out", default="art/items")
+    s.add_argument("--names", help='ids in reading order, with grid sizes: "sword:1x3,ring,hood:2x2"')
+    s.add_argument("--cell", type=int, default=12, help="art px per inventory cell"); s.add_argument("--scale", type=int, default=4)
+    s.add_argument("--tolerance", type=float, default=0.08); s.add_argument("--no-outline", action="store_true"); s.add_argument("--colors", type=int, default=0)
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_icons)
 
     s = sub.add_parser("recolor", help="recolour a finished sprite/atlas (champion, unique, seasonal) without re-rendering")
     s.add_argument("image", help="a PNG, or with --kind the art/sprites folder")
