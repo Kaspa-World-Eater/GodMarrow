@@ -285,7 +285,19 @@ def cmd_project(a) -> None:
                 kw = {"step": a.frame_step, "elevation": a.elevation, "passes": a.passes}
             _emit(a, api.run_step(project, a.character, a.step, log=print, **kw))
         elif sub == "run-all":
-            _emit(a, api.run_until_blocked(project, a.character, log=print))
+            if a.all:
+                results = {}
+                for cname in list(project.characters):
+                    print(f"=== {cname}")
+                    try:
+                        results[cname] = api.run_until_blocked(project, cname, log=print)
+                    except Exception as e:  # noqa: BLE001
+                        results[cname] = {"ok": False, "error": str(e)}
+                _emit(a, {"ok": all(r.get("ok", False) for r in results.values()), "characters": results})
+            elif not a.character:
+                _emit(a, {"ok": False, "error": "give a character name or --all"})
+            else:
+                _emit(a, api.run_until_blocked(project, a.character, log=print))
         elif sub == "still":
             r = api.pixelate_still(project, a.character, a.view)
             if a.animate:
@@ -327,6 +339,47 @@ def cmd_ui9(a) -> None:
 
     r = make_ui9(a.image, a.name, a.out, border=tuple(a.border) if a.border else None, width=a.width, colors=a.colors, mid=a.mid, res_dir=a.res_dir)
     _emit(a, r)
+
+
+def cmd_sfx(a) -> None:
+    from .sfx import make_sfx
+
+    _emit(a, make_sfx(a.preset, a.out, seed=a.seed, variations=a.variations))
+
+
+def cmd_portrait(a) -> None:
+    from .portrait import make_portrait
+
+    _emit(a, make_portrait(a.image, a.name, a.out, sizes=tuple(a.sizes), colors=a.colors, outline=not a.no_outline, head_fraction=a.head))
+
+
+def cmd_compare(a) -> None:
+    from .compare import compare
+
+    _emit(a, compare(a.a, a.b, a.out, zoom=a.zoom))
+
+
+def cmd_doctor(a) -> None:
+    from .doctor import format_report, run
+
+    r = run(a.project)
+    if getattr(a, "json", False):
+        _emit(a, r)
+    else:
+        print(format_report(r))
+    raise SystemExit(0 if r["ok"] else 1)
+
+
+def cmd_godot_addon(a) -> None:
+    import shutil
+
+    src = Path(__file__).resolve().parent.parent / "godot_addon" / "pixelforge"
+    dst = Path(a.godot_project) / "addons" / "pixelforge"
+    dst.mkdir(parents=True, exist_ok=True)
+    for f in src.iterdir():
+        shutil.copy(f, dst / f.name)
+    _emit(a, {"ok": True, "installed": str(dst), "files": sorted(f.name for f in dst.iterdir()),
+              "next": "Project > Project Settings > Plugins > enable PixelForge (optional); use PFSpriteSet, PFFx, PFObjects from any script."})
 
 
 def cmd_icons(a) -> None:
@@ -463,7 +516,7 @@ def build_parser() -> argparse.ArgumentParser:
     x = ps.add_parser("export-game", help="export in Godmarrow's art/sprites format (+ normal/depth sets)"); x.add_argument("character")
     x.add_argument("--kind", help="sprite kind name (default: character name)"); x.add_argument("--out", help="output folder (default: characters/<name>/export_game)")
     x.add_argument("--category", default="hero"); x.add_argument("--name", help="display name")
-    x = ps.add_parser("run-all", help="run every remaining automatic step"); x.add_argument("character")
+    x = ps.add_parser("run-all", help="run every remaining automatic step"); x.add_argument("character", nargs="?", help="omit with --all"); x.add_argument("--all", action="store_true", help="every character in the project, in turn")
     x = ps.add_parser("still", help="quick path: one image -> sprite (-> animation -> export)"); x.add_argument("character")
     x.add_argument("--view", default="style", choices=["style", "front", "side", "back"]); x.add_argument("--animate", nargs="*", metavar="PRESET"); x.add_argument("--export", action="store_true")
     s.set_defaults(func=cmd_project)
@@ -503,6 +556,31 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--colors", type=int, default=0); s.add_argument("--mid", type=int, default=8, help="px of each edge/centre to keep")
     s.add_argument("--res-dir", default="res://art/ui"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_ui9)
+
+    s = sub.add_parser("sfx", help="synthesised sound effects (hit, bone_click, pour, glass, cast, ui_tick, ...) -> WAV")
+    s.add_argument("preset", help="a preset name or 'all'"); s.add_argument("-o", "--out", default="art/sfx")
+    s.add_argument("--seed", type=int, default=0); s.add_argument("--variations", type=int, default=1, help="N seeded variations per preset")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_sfx)
+
+    s = sub.add_parser("portrait", help="head-and-shoulders portraits from a front view cutout")
+    s.add_argument("image"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/portraits")
+    s.add_argument("--sizes", type=int, nargs="+", default=[48, 96]); s.add_argument("--head", type=float, default=0.34, help="fraction of the figure's height to keep")
+    s.add_argument("--colors", type=int, default=0); s.add_argument("--no-outline", action="store_true"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_portrait)
+
+    s = sub.add_parser("compare", help="before/after strip (+ GIF for frame folders) and a difference number")
+    s.add_argument("a"); s.add_argument("b"); s.add_argument("-o", "--out", default="compare.png"); s.add_argument("--zoom", type=int, default=2)
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_compare)
+
+    s = sub.add_parser("doctor", help="check this machine: Python, Pillow, numpy, Tk, Blender, the animation library")
+    s.add_argument("--project"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_doctor)
+
+    s = sub.add_parser("godot-addon", help="copy the PixelForge loaders (PFSpriteSet, PFFx, PFObjects) into a Godot project's addons/")
+    s.add_argument("godot_project"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_godot_addon)
 
     s = sub.add_parser("icons", help="one painted flat lay of items -> inventory icons (<id>.png + <id>@1x.png + icons.json)")
     s.add_argument("image"); s.add_argument("-o", "--out", default="art/items")

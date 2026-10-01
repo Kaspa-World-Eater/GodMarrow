@@ -126,3 +126,45 @@ def test_icons_from_flat_lay(tmp_path):
     assert Image.open(tmp_path / "hood@1x.png").size == (12, 12)
     data = json.loads((tmp_path / "icons.json").read_text())
     assert data["icons"]["staff"]["grid"] == [1, 3] and data["cell_px"] == 48
+
+
+def test_sfx_presets_write_wav(tmp_path):
+    import wave
+
+    from pixelforge.sfx import PRESETS, make_sfx
+
+    r = make_sfx("all", tmp_path, variations=1)
+    assert len(r["files"]) == len(PRESETS)
+    with wave.open(str(tmp_path / "hit.wav")) as w:
+        assert w.getframerate() == 44100 and w.getnchannels() == 1 and w.getnframes() > 1000
+    r2 = make_sfx("bone_click", tmp_path / "v", variations=3)
+    assert len(r2["files"]) == 3
+
+
+def test_portrait_bust(tmp_path):
+    from pixelforge.portrait import bust_box, make_portrait
+
+    fig = np.zeros((200, 80, 4), np.uint8)
+    fig[10:190, 30:50] = (90, 70, 60, 255)      # body
+    fig[10:40, 25:55] = (200, 170, 140, 255)    # head, wider
+    x0, y0, x1, y1 = bust_box(fig)
+    assert y0 == 10 and 60 < y1 < 90
+    r = make_portrait(Image.fromarray(fig, "RGBA"), "hero", tmp_path, sizes=(48,))
+    assert Image.open(r["files"][48]).size == (48, 48)
+
+
+def test_compare_strip_and_diff(tmp_path):
+    from pixelforge.compare import compare
+
+    a = Image.new("RGBA", (10, 10), (10, 20, 30, 255)); b = Image.new("RGBA", (10, 10), (10, 20, 40, 255))
+    a.save(tmp_path / "a.png"); b.save(tmp_path / "b.png")
+    r = compare(tmp_path / "a.png", tmp_path / "b.png", tmp_path / "cmp.png")
+    assert r["mean_abs_diff"] == 2.5 and (tmp_path / "cmp.png").exists()
+
+
+def test_doctor_runs():
+    from pixelforge.doctor import format_report, run
+
+    r = run(None)
+    assert any(x["check"] == "numpy" and x["ok"] for x in r["rows"])
+    assert "numpy" in format_report(r)
