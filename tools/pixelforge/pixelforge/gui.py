@@ -12,7 +12,7 @@ import threading
 import traceback
 import webbrowser
 from pathlib import Path
-from tkinter import BOTH, BOTTOM, END, LEFT, RIGHT, TOP, X, Y, BooleanVar, Menu, StringVar, Tk, Toplevel, filedialog, messagebox
+from tkinter import BOTH, BOTTOM, END, LEFT, RIGHT, TOP, X, Y, BooleanVar, Canvas, Menu, StringVar, Tk, Toplevel, filedialog, messagebox
 from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 
@@ -128,6 +128,7 @@ class Studio:
     def _menu(self) -> None:
         m = Menu(self.root, tearoff=0)
         f = Menu(m, tearoff=0)
+        f.add_command(label="Open a painting and start…", command=self._start_from_picture, accelerator="Ctrl+P")
         f.add_command(label="New project…", command=self._new, accelerator="Ctrl+N")
         f.add_command(label="Open project…", command=self._open_dialog, accelerator="Ctrl+O")
         self.recent_menu = Menu(f, tearoff=0)
@@ -159,6 +160,7 @@ class Studio:
         m.add_cascade(label="Help", menu=h)
         self.root.config(menu=m)
         self.root.bind("<Control-n>", lambda e: self._new())
+        self.root.bind("<Control-p>", lambda e: self._start_from_picture())
         self.root.bind("<Control-o>", lambda e: self._open_dialog())
         self.root.bind("<Control-t>", lambda e: self._tools())
         self.root.bind("<F5>", lambda e: self._run_all())
@@ -253,7 +255,7 @@ class Studio:
     def _build(self) -> None:
         bar = ttk.Frame(self.root, padding=(8, 6))
         bar.pack(side=TOP, fill=X)
-        ttk.Button(bar, text="New project", command=self._new).pack(side=LEFT)
+        ttk.Button(bar, text="Open painting…", command=self._start_from_picture, style="Go.TButton").pack(side=LEFT)
         ttk.Button(bar, text="Open project", command=self._open_dialog).pack(side=LEFT, padx=4)
         ttk.Separator(bar, orient="vertical").pack(side=LEFT, fill=Y, padx=8)
         ttk.Label(bar, text="Character:").pack(side=LEFT)
@@ -296,8 +298,21 @@ class Studio:
 
         right = ttk.Panedwindow(body, orient="vertical")
         body.add(right, weight=1)
-        self.panel = ttk.Frame(right, padding=12)
-        right.add(self.panel, weight=3)
+        # the step panel scrolls: a long step (previews plus buttons) is never cut off at the bottom
+        pframe = ttk.Frame(right)
+        right.add(pframe, weight=3)
+        self.panel_canvas = Canvas(pframe, bg=PANEL, highlightthickness=0, bd=0)
+        vs = ttk.Scrollbar(pframe, orient="vertical", command=self.panel_canvas.yview)
+        self.panel_canvas.configure(yscrollcommand=vs.set)
+        vs.pack(side=RIGHT, fill=Y)
+        self.panel_canvas.pack(side=LEFT, fill=BOTH, expand=True)
+        self.panel = ttk.Frame(self.panel_canvas, padding=12)
+        self._panel_win = self.panel_canvas.create_window((0, 0), window=self.panel, anchor="nw")
+        self.panel.bind("<Configure>", lambda e: self.panel_canvas.configure(scrollregion=self.panel_canvas.bbox("all")))
+        self.panel_canvas.bind("<Configure>", lambda e: (self.panel_canvas.itemconfigure(self._panel_win, width=e.width), self._wrap_labels(e.width)))
+        self.panel_canvas.bind_all("<MouseWheel>", lambda e: self.panel_canvas.yview_scroll(-int(e.delta / 120), "units"))
+        self.panel_canvas.bind_all("<Button-4>", lambda e: self.panel_canvas.yview_scroll(-1, "units"))
+        self.panel_canvas.bind_all("<Button-5>", lambda e: self.panel_canvas.yview_scroll(1, "units"))
         logf = ttk.Labelframe(right, text="Log", padding=4)
         right.add(logf, weight=1)
         self.log = ScrolledText(logf, height=8, state="disabled", font=("Consolas", 9), bg=FIELD, fg=BONE)
@@ -319,14 +334,24 @@ class Studio:
         for w in self.panel.winfo_children():
             w.destroy()
         self._previews.clear()
+        self.panel_canvas.yview_moveto(0)
+
+    def _wrap_labels(self, width: int, widget=None) -> None:
+        """Text in the panel wraps to the panel's width, whatever size the window is."""
+        for w in (widget or self.panel).winfo_children():
+            if isinstance(w, ttk.Label) and w.cget("wraplength"):
+                w.configure(wraplength=max(240, width - 40))
+            elif isinstance(w, ttk.Frame):
+                self._wrap_labels(width, w)
 
     def _show_welcome(self) -> None:
         self._clear_panel()
         ttk.Label(self.panel, text=APP_TITLE, style="Title.TLabel").pack(anchor="w")
-        ttk.Label(self.panel, text="Paintings in, game-ready pixel art out: characters in 8 directions, props, effects, tiles, UI, sounds and music.", style="Dim.TLabel", wraplength=720).pack(anchor="w", pady=(2, 14))
+        ttk.Label(self.panel, text="Paintings in, game-ready pixel art out: characters in 8 directions, props, effects, tiles, UI, sounds and music.", style="Dim.TLabel", wraplength=self._wrap()).pack(anchor="w", pady=(2, 14))
         row = ttk.Frame(self.panel)
         row.pack(anchor="w", pady=(0, 14))
-        ttk.Button(row, text="+ Add a character (start here)", command=self._add_character, style="Go.TButton").pack(side=LEFT)
+        ttk.Button(row, text="Open a painting and start", command=self._start_from_picture, style="Go.TButton").pack(side=LEFT)
+        ttk.Button(row, text="+ Add a character (name it yourself)", command=self._add_character).pack(side=LEFT, padx=6)
         ttk.Button(row, text="Open project", command=self._open_dialog).pack(side=LEFT, padx=6)
         ttk.Button(row, text="New project in a folder of your choice", command=self._new).pack(side=LEFT)
         ttk.Button(row, text="Tools", command=self._tools).pack(side=LEFT, padx=6)
@@ -336,10 +361,9 @@ class Studio:
             for p in recent[:5]:
                 ttk.Button(self.panel, text=p, command=lambda p=p: self._open(p)).pack(anchor="w", pady=1)
         ttk.Label(self.panel, text="A character in five moves", style="Head.TLabel").pack(anchor="w", pady=(12, 0))
-        self._steps_text(["Add a character: a name, one sentence about them, and the painting if you already have it. (A project folder is made for you in Documents.)",
-                          "Step 1 writes the Midjourney prompts. Paint the sheet and save the PNG.",
-                          "Step 2: bring the picture in. Then press Continue, or Run all automatic steps.",
-                          "Watch the log. The app stops and says so if it needs something (Blender, a picture).",
+        self._steps_text(["Open a painting: the character is made from it and every automatic step runs. (A project folder is made for you in Documents.)",
+                          "Or add a character by name first: step 1 writes the Midjourney prompts, step 2 brings the painting in.",
+                          "Watch the log and the note under the steps. The app stops and says so if it needs something (Blender, a picture).",
                           "Step 8 previews the animation; step 9 writes the files the game loads."])
         ttk.Label(self.panel, text="Everything here is also a command line and an AI-assistant tool (Help > User guide).", style="Dim.TLabel").pack(anchor="w", pady=6)
 
@@ -398,38 +422,77 @@ class Studio:
             return False
         return self.project is not None
 
-    def _add_character(self) -> None:
+    def _start_from_picture(self, path: str | None = None) -> None:
+        """One move: pick a painting; the character is named after the file, the picture brought in and every automatic
+        step run. A wide picture is taken for a sheet of views, a tall one for a single front view."""
+        if self.busy:
+            self.status.set("Still working on the previous step; watch the log.")
+            return
+        if not path:
+            path = filedialog.askopenfilename(title="Your painting", filetypes=[("Images", "*.png *.jpg *.jpeg *.webp"), ("All files", "*.*")])
+        if not path:
+            return
         if not self._ensure_project():
             return
-        dlg = Toplevel(self.root)
-        dlg.configure(bg=PANEL)
-        dlg.title("New character")
-        dlg.geometry("+%d+%d" % (self.root.winfo_rootx() + 300, self.root.winfo_rooty() + 160))
-        ttk.Label(dlg, text="New character", style="Head.TLabel").pack(anchor="w", padx=10, pady=(10, 0))
-        ttk.Label(dlg, text="A short name for the files (letters, numbers, underscores) and one sentence about them. "
-                  "Step 1 then writes the Midjourney prompts from the sentence.", style="Dim.TLabel", wraplength=440).pack(anchor="w", padx=10, pady=(0, 6))
-        ttk.Label(dlg, text="Name (e.g. lantern_wraith):").pack(anchor="w", padx=10, pady=(4, 0))
-        name = ttk.Entry(dlg, width=40)
-        name.pack(padx=10, anchor="w")
+        try:
+            with Image.open(path) as im:
+                w, h = im.size
+        except Exception as e:  # noqa: BLE001
+            self._tell(f"That file is not a picture I can open: {e}", warn=True)
+            return
+        import re
+
+        stem = Path(path).stem
+        base = re.sub(r"[^a-z0-9]+", "_", stem.lower()).strip("_") or "character"
+        name, n = base, 2
+        while name in self.project.characters:
+            name = f"{base}_{n}"
+            n += 1
+        kind = "sheet" if w >= h * 1.5 else "front"
+        try:
+            r = api.add_character(self.project, name, re.sub(r"[_\-]+", " ", stem).strip())
+            api.import_source(self.project, r["character"], kind, path)
+        except Exception as e:  # noqa: BLE001
+            self._tell(f"Could not bring the picture in: {e}", warn=True)
+            return
+        self._open(str(self.project.root))
+        self.char.set(r["character"])
+        self._refresh()
+        self.step_list.selection_set("split")
+        self._log(f"'{r['character']}' made from {Path(path).name} ({'a sheet of views' if kind == 'sheet' else 'one front view'}). Running every automatic step.")
+        self._run_all()
+
+    def _add_character(self) -> None:
+        """The New character form, in the main window (no extra window)."""
+        if not self._ensure_project():
+            return
+        self._clear_panel()
+        self._heading("New character", "A short name for the files (letters, numbers, underscores) and one sentence about them. "
+                      "Step 1 then writes the Midjourney prompts from the sentence. Have the painting already? Choose it here and skip to the cutting.")
+        ttk.Label(self.panel, text="Name (e.g. lantern_wraith):").pack(anchor="w", pady=(4, 0))
+        name = ttk.Entry(self.panel, width=40)
+        name.pack(anchor="w")
         name.focus_set()
-        ttk.Label(dlg, text="One-sentence description:").pack(anchor="w", padx=10, pady=(10, 0))
-        ttk.Label(dlg, text=DESCRIPTION_TIPS, wraplength=420, style="Dim.TLabel").pack(anchor="w", padx=10)
-        ttk.Label(dlg, text="For example: " + EXAMPLE_DESCRIPTION, style="Dim.TLabel", wraplength=440).pack(anchor="w", padx=10)
-        desc = ScrolledText(dlg, width=60, height=5)
-        desc.pack(padx=10, pady=4)
-        ttk.Label(dlg, text="Your painting (optional now): the Midjourney sheet with the front, side and back views, or any single picture of the character.").pack(anchor="w", padx=10, pady=(10, 0))
+        ttk.Label(self.panel, text="One-sentence description:").pack(anchor="w", pady=(10, 0))
+        ttk.Label(self.panel, text=DESCRIPTION_TIPS, wraplength=self._wrap(), style="Dim.TLabel", justify=LEFT).pack(anchor="w")
+        ttk.Label(self.panel, text="For example: " + EXAMPLE_DESCRIPTION, style="Dim.TLabel", wraplength=self._wrap(), justify=LEFT).pack(anchor="w")
+        desc = ScrolledText(self.panel, width=72, height=4, font=FONT, bg=FIELD, fg=BONE, insertbackground=BONE, relief="flat")
+        desc.pack(anchor="w", pady=4)
+        ttk.Label(self.panel, text="Your painting (optional now): the Midjourney sheet with the front, side and back views, or any single picture of the character.", wraplength=self._wrap(), justify=LEFT).pack(anchor="w", pady=(10, 0))
         pic = StringVar(value="")
-        prow = ttk.Frame(dlg)
-        prow.pack(fill=X, padx=10)
-        ttk.Entry(prow, textvariable=pic, width=48).pack(side=LEFT)
+        prow = ttk.Frame(self.panel)
+        prow.pack(anchor="w")
+        ttk.Entry(prow, textvariable=pic, width=56).pack(side=LEFT)
         ttk.Button(prow, text="Choose picture…", command=lambda: pic.set(filedialog.askopenfilename(title="The character's painting", filetypes=[("Images", "*.png *.jpg *.jpeg *.webp")]) or pic.get())).pack(side=LEFT, padx=4)
         kind_var = StringVar(value="sheet")
-        krow = ttk.Frame(dlg)
-        krow.pack(fill=X, padx=10, pady=(2, 0))
+        krow = ttk.Frame(self.panel)
+        krow.pack(anchor="w", pady=(2, 0))
         ttk.Label(krow, text="That picture is:").pack(side=LEFT)
         ttk.Radiobutton(krow, text="a sheet (several views side by side)", value="sheet", variable=kind_var).pack(side=LEFT, padx=4)
         ttk.Radiobutton(krow, text="one front view", value="front", variable=kind_var).pack(side=LEFT, padx=4)
         ttk.Radiobutton(krow, text="a pixel-style image", value="style", variable=kind_var).pack(side=LEFT, padx=4)
+        note = ttk.Label(self.panel, text="", style="Warn.TLabel", wraplength=self._wrap(), justify=LEFT)
+        note.pack(anchor="w", pady=(6, 0))
 
         def ok():
             if not desc.get("1.0", END).strip():
@@ -437,7 +500,7 @@ class Studio:
             try:
                 r = api.add_character(self.project, name.get(), desc.get("1.0", END).strip())
             except Exception as e:  # noqa: BLE001
-                messagebox.showerror(APP_TITLE, str(e))
+                note.configure(text=str(e))
                 return
             api.set_description(self.project, r["character"], desc.get("1.0", END).strip())
             picture = pic.get().strip()
@@ -446,23 +509,28 @@ class Studio:
                 try:
                     imported = api.import_source(self.project, r["character"], kind_var.get(), picture)
                 except Exception as e:  # noqa: BLE001
-                    messagebox.showwarning(APP_TITLE, f"The character was made, but the picture could not be brought in:\n{e}\n\nUse step 2 to add it.")
-            dlg.destroy()
+                    self._log(f"The character was made, but the picture could not be brought in: {e}. Use step 2 to add it.")
             self._open(str(self.project.root))
             self.char.set(r["character"])
             self._refresh()
             if imported:
                 self.step_list.selection_set("split")
-                self.status.set(f"Character '{r['character']}' added with its picture. Press Continue to cut the figures out, or Run all automatic steps.")
+                self._tell(f"'{r['character']}' added with its picture. Press Continue to cut the figures out, or Run all automatic steps.")
             else:
                 self.step_list.selection_set("prompts")
-                self.status.set(f"Character '{r['character']}' added. Step 1 gives the Midjourney prompt; step 2 brings the picture in.")
+                self._tell(f"'{r['character']}' added. Step 1 gives the Midjourney prompt; step 2 brings the picture in.")
 
-        row = ttk.Frame(dlg)
-        row.pack(fill=X, padx=10, pady=8)
+        row = ttk.Frame(self.panel)
+        row.pack(anchor="w", pady=10)
         ttk.Button(row, text="Create", command=ok, style="Go.TButton").pack(side=LEFT)
-        ttk.Button(row, text="Cancel", command=dlg.destroy).pack(side=LEFT, padx=6)
+        ttk.Button(row, text="Cancel", command=self._show_welcome).pack(side=LEFT, padx=6)
         name.bind("<Return>", lambda e: ok())
+
+    def _tell(self, text: str, warn: bool = False) -> None:
+        """Say something in the window itself (the status line and the note under the steps), never in a pop-up."""
+        self.status.set(text)
+        self.check_label.configure(text=text, style="Warn.TLabel" if warn else "Dim.TLabel")
+        self._log(("NOTE: " if warn else "") + text)
 
     def _tools(self) -> None:
         from .tools_window import ToolsWindow
@@ -591,7 +659,7 @@ class Studio:
         if not note:
             return
         clean = note in ("cutouts clean", "carve clean", "frames clean")
-        ttk.Label(self.panel, text=("✔ " if clean else "⚠ ") + note, style="Good.TLabel" if clean else "Warn.TLabel", wraplength=720, justify=LEFT).pack(anchor="w", pady=(4, 0))
+        ttk.Label(self.panel, text=("✔ " if clean else "⚠ ") + note, style="Good.TLabel" if clean else "Warn.TLabel", wraplength=self._wrap(), justify=LEFT).pack(anchor="w", pady=(4, 0))
 
     # ------------------------------------------------------------------- steps
     def _show_step(self) -> None:
@@ -609,11 +677,17 @@ class Studio:
     def _heading(self, text: str, sub: str = "") -> None:
         ttk.Label(self.panel, text=text, style="Head.TLabel").pack(anchor="w")
         if sub:
-            ttk.Label(self.panel, text=sub, style="Dim.TLabel", wraplength=640, justify=LEFT).pack(anchor="w", pady=(2, 8))
+            ttk.Label(self.panel, text=sub, style="Dim.TLabel", wraplength=self._wrap(), justify=LEFT).pack(anchor="w", pady=(2, 8))
+
+    def _wrap(self) -> int:
+        try:
+            return max(240, self.panel_canvas.winfo_width() - 40)
+        except Exception:  # noqa: BLE001
+            return 640
 
     def _steps_text(self, lines: list[str]) -> None:
         """Numbered, plain instructions under a heading."""
-        ttk.Label(self.panel, text="\n".join(f"{i + 1}. {t}" for i, t in enumerate(lines)), justify=LEFT, wraplength=640).pack(anchor="w", pady=(0, 8))
+        ttk.Label(self.panel, text="\n".join(f"{i + 1}. {t}" for i, t in enumerate(lines)), justify=LEFT, wraplength=self._wrap()).pack(anchor="w", pady=(0, 8))
 
     def _step_prompts(self, c) -> None:
         self._heading("Step 1: Get the prompts for Midjourney", "You paint the character in Midjourney. PixelForge writes the prompts so the pictures come out the way the next steps need them.")
@@ -625,7 +699,7 @@ class Studio:
         desc = ScrolledText(self.panel, height=3, width=100)
         desc.insert("1.0", c.description or EXAMPLE_DESCRIPTION)
         desc.pack(fill=X)
-        ttk.Label(self.panel, text=DESCRIPTION_TIPS, style="Dim.TLabel", wraplength=640).pack(anchor="w")
+        ttk.Label(self.panel, text=DESCRIPTION_TIPS, style="Dim.TLabel", wraplength=self._wrap()).pack(anchor="w")
         ref = StringVar(value="[SHEET IMAGE URL]")
         f = ttk.Frame(self.panel)
         f.pack(fill=X, pady=4)
@@ -710,22 +784,16 @@ class Studio:
         views_dir = self.project.sub(c.name, "views")
         views = [p for p in sorted(views_dir.glob("*.png")) if not p.stem.endswith("_raw")]
         self._check_note(c, "split_check")
-        self._preview_row(views, 240)
         if views:
             row = ttk.Frame(self.panel)
-            row.pack(anchor="w")
-            ttk.Label(row, text="Fix by hand:").pack(side=LEFT)
-            for p in views:
-                ttk.Button(row, text=f"Edit {p.stem}", command=lambda p=p: self._edit_cutout(p)).pack(side=LEFT, padx=3)
-            row2 = ttk.Frame(self.panel)
-            row2.pack(anchor="w", pady=(2, 0))
-            ttk.Label(row2, text="Paint on it (recolour, brush, glow, regions):").pack(side=LEFT)
-            for p in views:
-                ttk.Button(row2, text=f"Skin {p.stem}", command=lambda p=p: self._skin_editor(p)).pack(side=LEFT, padx=3)
+            row.pack(anchor="w", pady=(6, 0))
+            ttk.Label(row, text="Under each cutout: Edit erases leftover background or puts parts back; Skin paints on it (recolour, brush, glow).", wraplength=self._wrap(), justify=LEFT).pack(side=LEFT)
             ttk.Button(row, text="Open folder", command=lambda: webbrowser.open(str(views_dir))).pack(side=LEFT, padx=(12, 3))
             ttk.Button(row, text="Reload", command=self._show_step).pack(side=LEFT)
+        self._preview_row(views, 240, actions=[("Edit", self._edit_cutout), ("Skin", self._skin_editor)])
+        if views:
             ttk.Label(self.panel, text="Tip: the front view decides the body; make sure nothing of the background is left inside it. "
-                      "You can also edit the files in the folder with any paint program, then Reload. After editing, run the next steps again.", style="Dim.TLabel", wraplength=720).pack(anchor="w", pady=4)
+                      "You can also edit the files in the folder with any paint program, then Reload. After editing, run the next steps again.", style="Dim.TLabel", wraplength=self._wrap(), justify=LEFT).pack(anchor="w", pady=4)
 
     def _describe(self) -> None:
         """One box: say it, get a draft in the right editor."""
@@ -899,7 +967,7 @@ class Studio:
         found = api.find_blender(self.project)
         ttk.Label(self.panel, text=f"Blender: {found or 'not found'}", style="Good.TLabel" if found else "Warn.TLabel").pack(anchor="w")
         if not found:
-            ttk.Label(self.panel, text="Blender is free and the Forge can fetch it for you (about 380 MB, no installer, kept next to PixelForge).", wraplength=640).pack(anchor="w")
+            ttk.Label(self.panel, text="Blender is free and the Forge can fetch it for you (about 380 MB, no installer, kept next to PixelForge).", wraplength=self._wrap()).pack(anchor="w")
             ttk.Button(self.panel, text="Download Blender for me", command=lambda: self._run(lambda: api.download_blender(self.project, log=self._log), after=lambda r: self._show_step())).pack(anchor="w", pady=2)
         ttk.Button(self.panel, text="Build model", command=lambda: self._run(lambda: api.build_model(self.project, c.name, log=self._log), after=self._after_model)).pack(anchor="w", pady=4)
         ttk.Label(self.panel, text=c.notes.get("model_note", ""), style="Dim.TLabel").pack(anchor="w")
@@ -969,7 +1037,7 @@ class Studio:
         if sheet.exists():
             self._preview_row([sheet], 300)
         ttk.Separator(self.panel).pack(fill=X, pady=8)
-        ttk.Label(self.panel, text="Game atlas: <kind>.png + <kind>.json (8 views, foot anchors, normal and depth sets when those passes were rendered).", wraplength=720).pack(anchor="w")
+        ttk.Label(self.panel, text="Game atlas: <kind>.png + <kind>.json (8 views, foot anchors, normal and depth sets when those passes were rendered).", wraplength=self._wrap()).pack(anchor="w")
         f = ttk.Frame(self.panel)
         f.pack(anchor="w", pady=2)
         kind = StringVar(value=c.name)
@@ -1009,7 +1077,8 @@ class Studio:
         self._preview_row(sprites, 300)
 
     # ---------------------------------------------------------------- helpers
-    def _preview_row(self, paths, height: int, zoom: bool = False) -> None:
+    def _preview_row(self, paths, height: int, zoom: bool = False, actions=()) -> None:
+        """Pictures side by side, each with its name and, with `actions` [(label, fn(path))], its own buttons under it."""
         row = ttk.Frame(self.panel)
         row.pack(anchor="w", pady=8)
         for p in paths:
@@ -1031,6 +1100,11 @@ class Studio:
             cell.pack(side=LEFT, padx=4)
             ttk.Label(cell, image=photo).pack()
             ttk.Label(cell, text=p.name, style="Dim.TLabel").pack()
+            if actions:
+                brow = ttk.Frame(cell)
+                brow.pack()
+                for label, fn in actions:
+                    ttk.Button(brow, text=label, command=lambda fn=fn, p=p: fn(p), width=6).pack(side=LEFT, padx=1)
 
     def _run(self, fn, after=None, what: str = "Working…") -> None:
         if self.busy:
@@ -1038,20 +1112,24 @@ class Studio:
             return
         self._set_busy(True, what)
 
+        def done(then=None):
+            self._set_busy(False)
+            self._refresh()
+            if then:
+                then()
+
         def work():
             try:
                 r = fn()
-                self._log("OK: " + ", ".join(f"{k}={v}" for k, v in r.items() if k in ("character", "next", "colors", "count", "clips", "animations")))
-                if after:
-                    self.root.after(0, lambda: after(r))
+                brief = ", ".join(f"{k}={v}" for k, v in r.items() if k in ("character", "next", "colors", "count", "clips", "animations"))
+                if brief:
+                    self._log("OK: " + brief)
+                self.root.after(0, lambda: done((lambda: after(r)) if after else None))
             except api.StepError as e:
-                self._log("STOPPED: " + str(e))
-                self.root.after(0, lambda: messagebox.showwarning(APP_TITLE, str(e)))
+                self.root.after(0, lambda: done(lambda: self._tell("Stopped: " + str(e), warn=True)))
             except Exception as e:  # noqa: BLE001
                 self._log("ERROR: " + str(e) + "\n" + traceback.format_exc())
-                self.root.after(0, lambda: messagebox.showerror(APP_TITLE, str(e)))
-            finally:
-                self.root.after(0, lambda: (self._set_busy(False), self._refresh()))
+                self.root.after(0, lambda: done(lambda: self._tell("Something went wrong: " + str(e) + " (details in the log)", warn=True)))
 
         threading.Thread(target=work, daemon=True).start()
 
@@ -1064,11 +1142,11 @@ class Studio:
     def _after_run_all(self, r) -> None:
         self._refresh()
         if r["blocked_at"]:
-            messagebox.showinfo(APP_TITLE, f"Ran: {', '.join(r['ran']) or 'nothing'}.\n\nStopped at step '{r['blocked_at']}':\n{r['reason']}")
             self.step_list.selection_set(r["blocked_at"])
+            self._tell(f"Ran {', '.join(r['ran']) or 'nothing'}; stopped at step '{r['blocked_at']}': {r['reason']}", warn=True)
         else:
-            self.status.set("All steps done: " + ", ".join(r["ran"]))
             self.step_list.selection_set("export")
+            self._tell("All steps done: " + ", ".join(r["ran"]) + ". Step 9 shows the files the game loads.")
 
     def _log(self, text: str) -> None:
         self.log_queue.put(text)
