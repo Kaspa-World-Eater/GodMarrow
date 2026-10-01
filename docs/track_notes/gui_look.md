@@ -22,3 +22,22 @@ old school mystery dungeon bit style music"). What it is:
   triangle bass, noise percussion) and ship 2-3 loops (home, working, done) plus UI blips in the same voice.
 - Still a tool: the picture window is where previews, frame strips, racks of knobs (drawn as pixel dials) and the
   drop target live; the text box is where the step's words and choices live. Full screen, integer scaled.
+
+## Music reference (the owner's upload)
+
+`docs/refs/forge_music_reference.mp3` (a Pixabay dungeon-synth track, reference only, not to ship). The owner:
+"maybe not so distorted and some sparkly high notes but stuff like this". Measured: 107 s, loud for ambient
+(RMS 0.13), very dark spectrum (median spectral centroid about 275 Hz: nearly all energy under 1 kHz), tonal centre
+around C#, slow drifting pads with no real beat. So the Forge's music family is DUNGEON SYNTH, not chiptune:
+- slow (60-80 bpm or free time), long detuned pad chords in C# minor / phrygian, a low drone, soft noise wash,
+  plenty of hall reverb and a slow echo;
+- cleaner than the reference: no distortion or clipping, the low end tidy (high-pass the pads at ~60 Hz), master
+  RMS about 0.09 like the game's cues;
+- the "sparkly high notes": a bell / music-box / glass-pluck voice (sine with a short bright attack, long decay,
+  shimmer reverb) playing sparse pentatonic or minor-scale arpeggios and occasional high trills in the 1-4 kHz
+  range, quiet, as the one bright thing over the dark pads, with the spectral centroid landing around 600-900 Hz
+  overall;
+- three loops (home, working, done) sharing one motif, 90-120 s, seamless, plus matching UI blips (a soft bell
+  for confirm, a low thud for back).
+Built in `music.py` as a "forge" cue family with its own instruments, rendered by the same path as the game's cues
+(`pixelforge music forge_home` etc.), knobs on the music rack.
