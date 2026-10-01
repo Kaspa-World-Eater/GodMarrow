@@ -82,7 +82,12 @@ Known rough edges / next work, in priority order:
 4. Godot 4 demo scene with Y-sorted isometric map and one character playing
    all clips; a `godot/` folder exists but is empty.
 5. Hem/feet: hull bottom is flat; a small taper would help.
-6. Later: props/items pipeline (prompt D + rotate --spin), tilesets, UI.
+6. DONE 2026-10-01: props (`prop`, with the game's objects.json bridge), effects (`vfx`),
+   iso tiles (`tiles`, TileSet .tres), UI 9-slice (`ui9`), skill-tree editor
+   (`skilltree`, edits file applied by the game's `tools/skill_trees.py`). The GUI
+   editor and the Studio app are still unlaunched (no display here): Windows
+   smoke test needed. Game-side loaders for `art/fx` and `art/tiles` do not exist
+   yet (objects.json entries work today; VFX `--atlas` sets load through SpriteSet).
 
 ## Godmarrow integration (2026-10-01)
 

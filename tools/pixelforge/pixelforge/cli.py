@@ -300,8 +300,37 @@ def cmd_prop(a) -> None:
     from .props import make_prop
 
     r = make_prop(a.image, a.name, a.out, height=a.height, scale=a.scale, colors=a.colors, outline=not a.no_outline,
-                  sway=a.sway, frames=a.frames, fps=a.fps, variations=a.variations)
+                  sway=a.sway, frames=a.frames, fps=a.fps, variations=a.variations, game_objects=a.game_objects, hr=a.hr)
     _emit(a, r)
+
+
+def cmd_vfx(a) -> None:
+    from .vfx import make_vfx
+
+    palette = a.palette.split(",") if "," in a.palette else a.palette
+    r = make_vfx(a.kind, a.name, a.out, size=tuple(a.size) if a.size else None, frames=a.frames, fps=a.fps, palette=palette,
+                 bands=a.bands, seed=a.seed, glow=(None if a.glow == "auto" else a.glow == "on"), gif=a.gif, atlas_dir=a.atlas)
+    _emit(a, r)
+
+
+def cmd_tiles(a) -> None:
+    from .tiles import make_tiles
+
+    r = make_tiles(a.texture, a.name, a.out, second=a.second, tile=tuple(a.tile), variants=a.variants, colors=a.colors, seed=a.seed, res_dir=a.res_dir)
+    _emit(a, r)
+
+
+def cmd_ui9(a) -> None:
+    from .ui9 import make_ui9
+
+    r = make_ui9(a.image, a.name, a.out, border=tuple(a.border) if a.border else None, width=a.width, colors=a.colors, mid=a.mid, res_dir=a.res_dir)
+    _emit(a, r)
+
+
+def cmd_skilltree(a) -> None:
+    from .skilltree import cli_main
+
+    _emit(a, cli_main(a))
 
 
 def cmd_studio(a) -> None:
@@ -423,8 +452,43 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--colors", type=int, default=0, help="0 = keep every colour"); s.add_argument("--no-outline", action="store_true")
     s.add_argument("--sway", choices=["canopy", "banner", "flame"]); s.add_argument("--frames", type=int, default=8); s.add_argument("--fps", type=float, default=6)
     s.add_argument("--variations", type=int, default=1, help="figures on the sheet (e.g. 4 for a 2x2 'four variations' prompt)")
+    s.add_argument("--game-objects", metavar="OBJECTS_JSON", help="merge into Godmarrow's art/objects/objects.json (png, ox, oy, hr)")
+    s.add_argument("--hr", type=float, default=2.0, help="texels per world px for --game-objects (the game's objects use 2)")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_prop)
+
+    s = sub.add_parser("vfx", help="procedural looping effect sheet: fire, smoke, wisp, burst, embers")
+    s.add_argument("kind", choices=["fire", "smoke", "wisp", "burst", "embers"]); s.add_argument("name"); s.add_argument("-o", "--out", default="art/fx")
+    s.add_argument("--size", type=int, nargs=2, metavar=("W", "H")); s.add_argument("--frames", type=int, default=8); s.add_argument("--fps", type=float, default=10)
+    s.add_argument("--palette", default="lantern", help="preset (wisp lantern miasma bone smoke blood) or dark->bright hex list a,b,c")
+    s.add_argument("--bands", type=int, default=6, help="colour bands"); s.add_argument("--seed", type=int, default=1)
+    s.add_argument("--glow", choices=["auto", "on", "off"], default="auto", help="soft halo (auto: fire/wisp/burst only)")
+    s.add_argument("--gif", action="store_true"); s.add_argument("--atlas", metavar="DIR", help="also write a Godmarrow sprite set (art/sprites) for SpriteSet")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_vfx)
+
+    s = sub.add_parser("tiles", help="painted ground texture -> 2:1 iso diamond tiles (+16 transition tiles) and a Godot TileSet")
+    s.add_argument("texture"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/tiles")
+    s.add_argument("--second", help="second material for the transition tiles"); s.add_argument("--tile", type=int, nargs=2, default=[72, 36], metavar=("W", "H"))
+    s.add_argument("--variants", type=int, default=6); s.add_argument("--colors", type=int, default=0); s.add_argument("--seed", type=int, default=1)
+    s.add_argument("--res-dir", default="res://art/tiles"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_tiles)
+
+    s = sub.add_parser("ui9", help="painted panel/frame -> 9-slice texture + Godot StyleBoxTexture")
+    s.add_argument("image"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/ui")
+    s.add_argument("--border", type=int, nargs=4, metavar=("L", "T", "R", "B"), help="margins (default: detected)")
+    s.add_argument("--width", type=int, help="pixelate to this width first (default: keep the image's pixels)")
+    s.add_argument("--colors", type=int, default=0); s.add_argument("--mid", type=int, default=8, help="px of each edge/centre to keep")
+    s.add_argument("--res-dir", default="res://art/ui"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_ui9)
+
+    s = sub.add_parser("skilltree", help="edit Godmarrow's skill trees (GUI, or --list/--move/--rename headless); edits live in tools/skill_tree_edits.json")
+    s.add_argument("skills", help="path to data/skills.json")
+    s.add_argument("--list", metavar="CLASS", help="print a class's trees and exit")
+    s.add_argument("--move", action="append", metavar="ID=ROW,COL[,TAB]"); s.add_argument("--rename", action="append", metavar="ID=NAME")
+    s.add_argument("--apply", action="store_true", help="re-apply the edit file to skills.json and exit")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_skilltree)
 
     s = sub.add_parser("studio", help="open the desktop app")
     s.add_argument("project", nargs="?")

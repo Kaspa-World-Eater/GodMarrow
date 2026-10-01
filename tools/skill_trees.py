@@ -607,3 +607,19 @@ for cls in (O, H, 'animancer', 'miasmancer', 'monk'):
         grid[k] = s['id']
         if cls in (O, H) or 'Mastery' in s['name']:
             print('  %d r%d c%d L%-2d %-10s %s' % (s['tab'], s['row'], s['col'], s['required_level'], s['id'], s['name']))
+
+# ============================================================== editor edits (tools/skill_tree_edits.json)
+# PixelForge's skill-tree editor (`pixelforge skilltree data/skills.json`) keeps its moves and renames in that file so
+# they survive a re-export; applied last so this script stays the source of truth.
+import os, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pixelforge'))
+try:
+    from pixelforge.skilltree import apply_edits, load_edits
+    _ep = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'skill_tree_edits.json')
+    _edits = load_edits(__import__('pathlib').Path(_ep))
+    if _edits:
+        _changed = apply_edits(D, _edits)
+        json.dump(D, open(SK, 'w'), ensure_ascii=False)
+        print('editor edits applied:', _changed)
+except ImportError:
+    pass

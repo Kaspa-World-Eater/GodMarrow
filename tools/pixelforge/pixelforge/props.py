@@ -55,11 +55,18 @@ def make_prop(
     fps: float = 6.0,
     tolerance: float = 0.08,
     variations: int = 1,
+    game_objects: str | Path | None = None,
+    hr: float = 2.0,
 ) -> dict:
     """Cut a prop (or a sheet of ``variations`` props) out of a painting and
     write game-ready sprites.  ``height`` = target sprite height in px, or
     ``scale`` = source px per sprite px (use the project's character scale so
-    props and characters agree)."""
+    props and characters agree).
+
+    ``game_objects`` = Godmarrow's ``art/objects/objects.json``: each variation is
+    merged in as ``{"png": "res://art/objects/<file>", "ox", "oy", "hr"}`` (anchor
+    = the foot point; ``hr`` = texels per world px, 2 for the game's objects), so
+    ``world/objects/manager_build.gd`` can place it by key ``<name>`` or ``<name>_vN``."""
     if isinstance(image, str):
         image = Image.open(image)
     out = Path(out_dir) / name
@@ -103,4 +110,29 @@ def make_prop(
         written[v.name] = entry
     meta = {"name": name, "variations": written, "outline": outline, "sway": sway, "source": "pixelforge"}
     (out / f"{name}.json").write_text(json.dumps(meta, indent=2) + "\n")
-    return {"ok": True, "name": name, "dir": str(out), "variations": written}
+    result = {"ok": True, "name": name, "dir": str(out), "variations": written}
+    if game_objects:
+        result["game_objects"] = merge_game_objects(game_objects, name, out, written, hr)
+    return result
+
+
+def merge_game_objects(objects_json: str | Path, name: str, out: Path, written: dict, hr: float) -> dict:
+    """Add/replace this prop's entries in the game's objects.json (keys ``<name>`` for v1 and ``<name>_vN``)."""
+    oj = Path(objects_json)
+    data = json.loads(oj.read_text()) if oj.exists() else {}
+    try:
+        rel = out.resolve().relative_to(oj.resolve().parent)
+        prefix = f"res://art/objects/{rel.as_posix()}/"
+    except ValueError:
+        prefix = f"res://art/objects/{out.name}/"
+    added = {}
+    for i, (vname, e) in enumerate(written.items()):
+        key = name if i == 0 else f"{name}_{vname}"
+        entry = {"png": f"{prefix}{name}_{vname}.png", "ox": int(e["anchor"][0]), "oy": int(e["anchor"][1]), "hr": hr}
+        if e.get("frames", 1) > 1:
+            entry.update({"frames": e["frames"], "frame_width": e["frame_width"], "fps": e["fps"]})
+        data[key] = entry
+        added[key] = entry
+    oj.parent.mkdir(parents=True, exist_ok=True)
+    oj.write_text(json.dumps(data, indent=1) + "\n")
+    return {"file": str(oj), "added": added}

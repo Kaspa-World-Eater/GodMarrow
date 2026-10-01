@@ -376,6 +376,15 @@ class Studio:
         sheet = self.project.sub(c.name, "export") / f"{c.name}.png"
         if sheet.exists():
             self._preview_row([sheet], 300)
+        ttk.Separator(self.panel).pack(fill=X, pady=8)
+        ttk.Label(self.panel, text="Godmarrow: write the game's own atlas (art/sprites/<kind>.png|json, 8 views, foot anchors, normal/depth sets when rendered).", wraplength=700).pack(anchor="w")
+        f = ttk.Frame(self.panel)
+        f.pack(anchor="w", pady=2)
+        kind = StringVar(value=c.name)
+        ttk.Label(f, text="Kind (file name):").pack(side=LEFT)
+        ttk.Entry(f, textvariable=kind, width=16).pack(side=LEFT, padx=4)
+        ttk.Button(f, text="Export for Godmarrow", command=lambda: self._run(lambda: api.export_game(self.project, c.name, kind.get()), after=lambda r: (self._show_step(), messagebox.showinfo("Exported", r["color"]["png"])))).pack(side=LEFT, padx=6)
+        ttk.Label(self.panel, text=c.notes.get("export_game", "")).pack(anchor="w")
 
     def _after_export(self, r) -> None:
         self._show_step()

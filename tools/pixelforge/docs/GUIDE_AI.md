@@ -103,6 +103,22 @@ pixelforge godot --anim "walk=dir/*.png@12" --name hero --out <godot>/sprites/he
 pixelforge prompt --describe "<sentence>" [--kind sheet|front|back|sprite|item]
 ```
 
+World, effects and UI tools (no project; each writes a PNG + JSON and, where Godot wants one, a .tres):
+
+```
+pixelforge prop <image> <name> -o art/objects [--height 96 | --scale S] [--sway canopy|banner|flame] [--variations 4]
+                 [--game-objects art/objects/objects.json --hr 2]   # merges into Godmarrow's objects.json (png, ox, oy, hr)
+pixelforge vfx fire|smoke|wisp|burst|embers <name> -o art/fx [--palette wisp|lantern|miasma|bone|smoke|blood | a,b,c hex]
+                 [--size W H --frames 8 --fps 10 --bands 6 --glow auto|on|off --gif] [--atlas art/sprites]   # looping sheet; --atlas = a SpriteSet (anim loop/once, view down)
+pixelforge tiles <texture.png> <name> -o art/tiles [--second <texture2.png>] [--tile 72 36 --variants 6]   # 2:1 diamonds + 16 transition tiles + TileSet .tres
+pixelforge ui9 <panel.png> <name> -o art/ui [--border L T R B] [--mid 8]        # 9-slice texture + StyleBoxTexture .tres (margins detected)
+pixelforge skilltree data/skills.json [--list <class>] [--move id=row,col[,tab]] [--rename id="Name"] [--apply]   # no flags = the GUI editor
+```
+
+Rules the tools keep: glow only where the game allows it (`vfx` adds a halo to fire, wisps and bursts; never to smoke or
+embers); every colour comes from the ramp you give or the game's presets; `skilltree` never edits `data/skills.json`
+behind `tools/skill_trees.py` — it keeps `tools/skill_tree_edits.json`, which that script applies last.
+
 ## Godmarrow specifics (the game this forge serves)
 
 - Project style `godmarrow` (`pixelforge project set --style godmarrow`): ~195 px standing height, **every colour kept** (Derek rejected palette reduction), hard edges. Use it for every game character.
