@@ -28,6 +28,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$s.Description = 'PixelForge Studio - pixel art sprite pipeline'; $s.Save()" ^
   && echo   Desktop shortcut created. || echo   (could not create the shortcut; use "PixelForge Studio.bat")
 echo.
+echo.
+echo Checking this computer...
+python -m pixelforge.cli doctor
+echo.
 echo Done. Double-click the "PixelForge Studio" icon on your desktop to start.
-echo Blender (free, blender.org) is only needed for the 3D animation path.
+echo Blender (free) does the 3D part: step 5 in the app can download it for you.
 pause

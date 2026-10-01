@@ -1,73 +1,59 @@
 # PixelForge
 
-Turn AI images into real, animated, Godot-ready pixel art — on a normal laptop,
-no graphics card. Built for a Diablo 2 style game: characters rendered from 8
-directions, every animation, one consistent look.
+An all-in-one forge for making a Godot game's art on a normal laptop: no graphics card, no paid tools, no
+browser steps. Paint in Midjourney (or anything), and PixelForge turns it into animated 8-direction characters,
+props, effects, icons, tiles, UI and sounds, with the files Godot loads. Built for *Godmarrow* (a Diablo II style
+game); every piece is generic except one exporter.
 
-| Midjourney render → pixel sprite | Animated from one still | Rotated / spun without blur |
+## What it does
+
+| Need | Command | Studio |
 |---|---|---|
-| ![](examples/output/wraith_before_after.png) | ![](examples/output/wraith_anim/idle.gif) | ![](examples/output/lantern_spin/lantern_spin.gif) |
+| Character: painting → 3D figure → 46 clips → 8 directions → pixel frames → game files | `pixelforge project …` | Steps 1-9 |
+| Fix a cutout by hand | — | Step 3 → Edit |
+| Judge the motion | `project` + `preview_gif` | Step 7/8 → Preview |
+| Props and trees with sway, foot points | `pixelforge prop` | Tools |
+| Spell / aura / fire / smoke / impact sheets (17 kinds, 13 palettes) | `pixelforge vfx` | Tools |
+| Inventory icons from one flat-lay painting | `pixelforge icons` | Tools |
+| Portraits | `pixelforge portrait` | Tools |
+| Iso ground tiles + transitions + TileSet | `pixelforge tiles` | Tools |
+| UI frames (9-slice + StyleBox) | `pixelforge ui9` | Tools |
+| Sound effects (synthesised, WAV) | `pixelforge sfx` | Tools |
+| Recolours (champion / unique tints) | `pixelforge recolor` | Tools |
+| Before / after check | `pixelforge compare` | Tools |
+| Skill-tree editor | `pixelforge skilltree` | Tools |
+| Loaders for any Godot project | `pixelforge godot-addon <project>` | Tools |
+| Is this machine ready? | `pixelforge doctor` | install.bat |
+| An AI running all of it | `pixelforge mcp`, `docs/GUIDE_AI.md` | — |
 
-## What's in the box
+## Install (Windows)
 
-- **PixelForge Studio** — a desktop app (Windows; pure Python) that walks you
-  through: prompts → import → cut out → palette → 3D model → Mixamo → render 8
-  directions → pixelate → Godot export. The Midjourney prompts are built in.
-- **`pixelforge` command line** — every app step as a command with `--json`,
-  plus lower-level tools (`pixelate`, `frames`, `animate`, `rotate`, `pack`,
-  `godot`). An AI can run the whole pipeline: see `docs/GUIDE_AI.md`.
-- **MCP server** (`pixelforge mcp`) for Claude Desktop / Claude Code.
-- **Blender scripts** that build an "inflated cutout" model from a front view,
-  paint it with the art, import Mixamo animations, and batch-render sprites.
+1. Python 3.11+ from python.org, tick *Add Python to PATH*.
+2. Double-click `install.bat`. It makes a private environment, checks the machine, and puts a desktop icon.
+3. Double-click **PixelForge Studio**. Step 5 downloads Blender (free, 380 MB) for you if none is installed.
 
-## Quick start (Windows)
+Any OS: `pip install -e .` then `pixelforge doctor`.
 
-1. Install Python 3.11+ (tick *Add to PATH*).
-2. Download this repo, double-click `install.bat`, then `PixelForge Studio.bat`.
-3. Read `docs/GUIDE_HUMANS.md` (5 minutes).
+## The character pipeline, in one paragraph
 
-Command line, any OS:
+A turnaround sheet (front, side, back, optionally three-quarter) is split and cut out with soft edges. A visual
+hull is carved from the silhouettes; the bundled, skinned CC0 mannequin is posed to the sheet's A-pose, shrink-
+wrapped onto that hull and painted with the views in that pose, so it keeps clean knees, elbows and hands and the
+46 library clips play on it directly (robes with no visible legs keep the carved hull and a retargeted rig). Blender
+films it orthographically from 30° above at 8 yaws, sampling only the frames the game keeps, with optional normal
+and depth passes; the frames are pressed to pixels with a locked OKLab palette and a fixed scale; the exporter
+packs them into Godot SpriteFrames or the game's atlas with foot anchors.
 
-```sh
-pip install -e .
-pixelforge pixelate render.png -o sprite.png --remove-bg --crop --outline auto   # one image -> sprite
-pixelforge animate sprite.png -o frames --preset idle --gif                       # still -> looping clip
-pixelforge project new MyGame && cd MyGame
-pixelforge project add wraith --describe "a gaunt hooded wanderer with a gold lantern"
-pixelforge project prompts wraith            # copy prompt A (sheet) + C (sprite) into Midjourney
-pixelforge project import wraith sheet sheet.png
-pixelforge project run-all wraith            # split -> palette -> model -> (you: Mixamo) -> render -> pixelate -> export
-```
+## Layout
 
-## Quality tiers
+`pixelforge/api.py` is the pipeline (one function per step). `gui.py` (Studio), `cli.py`, `mcp_server.py` wrap it.
+Image maths: `grid.py`, `palette.py`, `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`, `transform.py`,
+`sheet.py`, `model_spec.py`. Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`,
+`recolor.py`, `compare.py`, `skilltree.py`, `doctor.py`. Blender-side: `pixelforge/blender/` (no Pillow there).
+Godot-side: `godot_addon/pixelforge/` (`PFSpriteSet`, `PFFx`, `PFObjects`). Docs: `docs/GUIDE_HUMANS.md`,
+`docs/GUIDE_AI.md`, `docs/TOOL_IDEAS.md`, `NOTES.md`. Tests: `pytest` (52).
 
-`--style 8bit` (64 px, 12 colors) · `16bit` (128 px, 32) · `snes` (160 px, 48) ·
-`hd` (224 px, 96, default — the Blasphemous / Dead Cells look).
+## Rules it keeps
 
-## How it works, in one paragraph
-
-All color work is in OKLab, so the dark blues and greens of this art style stay
-distinct. Palettes come from weighted k-means that protects rare accents (a
-lantern's glow). Upscaled "fake" pixel art has its grid detected and sampled one
-color per cell; painterly AI renders are resampled to the chosen tier. Cleanup
-removes the background by flood fill, drops islands, repairs orphan pixels and
-adds outlines. Procedural animation moves or recolors pixels only within the
-palette, so frames stay true pixel art. Rotation uses the RotSprite method
-(Scale2x ×3, nearest rotate, majority downscale). For the 3D path the front
-silhouette is inflated into a mesh, painted by camera projection, rigged and
-animated on Mixamo, and rendered orthographically from 30° above at 8 yaw
-angles; the frames are then pixelated with a locked palette and a fixed scale.
-
-## Docs
-
-- `docs/GUIDE_HUMANS.md` — the short guide for people.
-- `docs/GUIDE_AI.md` — the complete operating guide for AI agents.
-- `docs/BLENDER_MIXAMO.md` — what the 3D step does and how to do it by hand.
-- `examples/README.md` — example outputs and the commands that made them.
-
-## Development
-
-```sh
-pip install -e .[dev]
-pytest                      # pip install bpy  additionally runs the Blender-script tests
-```
+All colour distance in OKLab. A transform never invents a colour outside the sprite's palette. Every step returns a
+JSON-serialisable dict and prints `PF_OK` from Blender. Glow only where the game allows it.

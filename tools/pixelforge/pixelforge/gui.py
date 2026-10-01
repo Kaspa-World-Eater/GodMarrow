@@ -66,7 +66,7 @@ def apply_theme(root) -> None:
     root.option_add("*Text.font", "Consolas 10")
     root.option_add("*TCombobox*Listbox.background", FIELD)
     root.option_add("*TCombobox*Listbox.foreground", BONE)
-HELP_URL = "https://github.com/Kaspa-World-Eater/Curriculum-Vitae-/blob/claude/pixel-art-generation-y6yk25/docs/GUIDE_HUMANS.md"
+HELP_URL = "https://github.com/Kaspa-World-Eater/godmarrow/blob/main/tools/pixelforge/docs/GUIDE_HUMANS.md"
 
 
 class Studio:
@@ -104,6 +104,7 @@ class Studio:
         self.char_box.bind("<<ComboboxSelected>>", lambda e: self._refresh())
         ttk.Button(bar, text="+ Add character", command=self._add_character).pack(side=LEFT, padx=4)
         ttk.Button(bar, text="Settings", command=self._settings).pack(side=LEFT, padx=4)
+        ttk.Button(bar, text="Tools", command=self._tools).pack(side=LEFT, padx=4)
         ttk.Button(bar, text="Help", command=lambda: webbrowser.open(HELP_URL)).pack(side=RIGHT)
         self.title_label = ttk.Label(bar, text="No project open", font=("Segoe UI", 10, "bold"))
         self.title_label.pack(side=RIGHT, padx=12)
@@ -209,6 +210,11 @@ class Studio:
             self.step_list.selection_set("prompts")
 
         ttk.Button(dlg, text="Create", command=ok).pack(pady=8)
+
+    def _tools(self) -> None:
+        from .tools_window import ToolsWindow
+
+        ToolsWindow(self.root, log=self._log, base_dir=str(self.project.root) if self.project else None)
 
     def _settings(self) -> None:
         if not self._need_project():
