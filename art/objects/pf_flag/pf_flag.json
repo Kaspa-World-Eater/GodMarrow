@@ -1,0 +1,27 @@
+{
+  "name": "pf_flag",
+  "variations": {
+    "v1": {
+      "size": [
+        128,
+        308
+      ],
+      "anchor": [
+        60,
+        274
+      ],
+      "ellipse": [
+        60,
+        274,
+        142,
+        71
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": [
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/flag.glb"
+  ],
+  "source": "pixelforge prop3d"
+}

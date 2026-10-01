@@ -1,0 +1,25 @@
+{
+  "name": "pf_stone_wall_damaged",
+  "variations": {
+    "v1": {
+      "size": [
+        143,
+        171
+      ],
+      "anchor": [
+        73,
+        136
+      ],
+      "ellipse": [
+        73,
+        136,
+        138,
+        69
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/stone-wall-damaged.glb",
+  "source": "pixelforge prop3d"
+}

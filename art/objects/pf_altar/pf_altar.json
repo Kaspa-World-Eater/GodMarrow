@@ -3,24 +3,23 @@
   "variations": {
     "v1": {
       "size": [
-        95,
-        77
+        259,
+        219
       ],
       "anchor": [
-        47,
-        74
+        131,
+        155
       ],
       "ellipse": [
-        47,
-        74,
-        91,
-        45
+        131,
+        155,
+        265,
+        132
       ],
       "frames": 1,
       "fps": 0
     }
   },
-  "outline": true,
-  "sway": null,
-  "source": "pixelforge"
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/altar-stone.glb",
+  "source": "pixelforge prop3d"
 }

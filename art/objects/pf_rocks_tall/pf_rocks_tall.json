@@ -1,0 +1,25 @@
+{
+  "name": "pf_rocks_tall",
+  "variations": {
+    "v1": {
+      "size": [
+        311,
+        243
+      ],
+      "anchor": [
+        142,
+        164
+      ],
+      "ellipse": [
+        142,
+        164,
+        426,
+        213
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/rocks-tall.glb",
+  "source": "pixelforge prop3d"
+}

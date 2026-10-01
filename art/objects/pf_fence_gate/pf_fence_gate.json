@@ -1,0 +1,25 @@
+{
+  "name": "pf_fence_gate",
+  "variations": {
+    "v1": {
+      "size": [
+        193,
+        204
+      ],
+      "anchor": [
+        98,
+        160
+      ],
+      "ellipse": [
+        98,
+        160,
+        192,
+        96
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/fence-gate.glb",
+  "source": "pixelforge prop3d"
+}

@@ -43,7 +43,7 @@ def diamond_mask(tw: int, th: int) -> np.ndarray:
     ys, xs = np.mgrid[0:th, 0:tw].astype(np.float32)
     u = np.abs((xs + 0.5) / tw * 2 - 1)
     v = np.abs((ys + 0.5) / th * 2 - 1)
-    return (u + v) <= 1.0
+    return (u + v) <= 1.0 + 1.0 / tw   # include the edge pixels, so neighbours meet with no hairline
 
 
 def _cut(tex: np.ndarray, x0: int, y0: int, tw: int, th: int) -> np.ndarray:

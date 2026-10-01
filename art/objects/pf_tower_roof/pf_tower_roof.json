@@ -1,0 +1,25 @@
+{
+  "name": "pf_tower_roof",
+  "variations": {
+    "v1": {
+      "size": [
+        626,
+        674
+      ],
+      "anchor": [
+        314,
+        528
+      ],
+      "ellipse": [
+        314,
+        528,
+        622,
+        311
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/castle-kit/Models/GLB format/tower-square-top-roof-high.glb",
+  "source": "pixelforge prop3d"
+}

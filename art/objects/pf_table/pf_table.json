@@ -1,0 +1,25 @@
+{
+  "name": "pf_table",
+  "variations": {
+    "v1": {
+      "size": [
+        270,
+        210
+      ],
+      "anchor": [
+        136,
+        144
+      ],
+      "ellipse": [
+        136,
+        144,
+        296,
+        148
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/mini-dungeon/Models/GLB format/table.glb",
+  "source": "pixelforge prop3d"
+}

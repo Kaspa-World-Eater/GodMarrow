@@ -1,0 +1,25 @@
+{
+  "name": "pf_stairs_stone",
+  "variations": {
+    "v1": {
+      "size": [
+        147,
+        90
+      ],
+      "anchor": [
+        74,
+        100
+      ],
+      "ellipse": [
+        74,
+        100,
+        142,
+        71
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/castle-kit/Models/GLB format/stairs-stone.glb",
+  "source": "pixelforge prop3d"
+}

@@ -10,3 +10,7 @@ _backup/
 tools/done/music_orig/
 __pycache__/
 *.pyc
+tools/pixelforge/assets/kits/
+art/tiles/_patches/
+art/objects/*/*_render.png
+art/objects/*/*_render.json

@@ -1,0 +1,25 @@
+{
+  "name": "pf_catapult",
+  "variations": {
+    "v1": {
+      "size": [
+        341,
+        336
+      ],
+      "anchor": [
+        169,
+        265
+      ],
+      "ellipse": [
+        169,
+        265,
+        342,
+        171
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/castle-kit/Models/GLB format/siege-catapult.glb",
+  "source": "pixelforge prop3d"
+}

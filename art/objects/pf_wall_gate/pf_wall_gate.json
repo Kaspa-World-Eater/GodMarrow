@@ -1,0 +1,25 @@
+{
+  "name": "pf_wall_gate",
+  "variations": {
+    "v1": {
+      "size": [
+        277,
+        475
+      ],
+      "anchor": [
+        140,
+        406
+      ],
+      "ellipse": [
+        140,
+        406,
+        273,
+        136
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/castle-kit/Models/GLB format/gate.glb",
+  "source": "pixelforge prop3d"
+}

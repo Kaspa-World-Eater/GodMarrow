@@ -1,0 +1,25 @@
+{
+  "name": "pf_pot",
+  "variations": {
+    "v1": {
+      "size": [
+        67,
+        83
+      ],
+      "anchor": [
+        35,
+        71
+      ],
+      "ellipse": [
+        35,
+        71,
+        107,
+        53
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/mini-dungeon/Models/GLB format/pot.glb",
+  "source": "pixelforge prop3d"
+}

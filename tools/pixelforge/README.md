@@ -12,7 +12,9 @@ game); every piece is generic except one exporter.
 | Character: painting → 3D figure → 46 clips → 8 directions → pixel frames → game files | `pixelforge project …` | Steps 1-9 |
 | Fix a cutout by hand | — | Step 3 → Edit |
 | Judge the motion | `project` + `preview_gif` | Step 7/8 → Preview |
-| Props and trees with sway, foot points | `pixelforge prop` | Tools |
+| Props and buildings from 3D models (kits, grown trees), lit and graded like the game | `pixelforge prop3d` | — |
+| Ground tiles rendered in 3D with the same light, lit transitions | `pixelforge tiles3d` | — |
+| Props from paintings with sway, foot points | `pixelforge prop` | Tools |
 | Spell / aura / fire / smoke / impact sheets (17 kinds, 13 palettes) | `pixelforge vfx` | Tools |
 | Inventory icons from one flat-lay painting | `pixelforge icons` | Tools |
 | Portraits | `pixelforge portrait` | Tools |

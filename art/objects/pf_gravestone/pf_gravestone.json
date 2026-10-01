@@ -3,24 +3,23 @@
   "variations": {
     "v1": {
       "size": [
-        57,
-        102
+        113,
+        151
       ],
       "anchor": [
-        28,
-        99
+        58,
+        127
       ],
       "ellipse": [
-        28,
-        99,
-        53,
-        26
+        58,
+        127,
+        117,
+        58
       ],
       "frames": 1,
       "fps": 0
     }
   },
-  "outline": true,
-  "sway": null,
-  "source": "pixelforge"
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/gravestone-decorative.glb",
+  "source": "pixelforge prop3d"
 }

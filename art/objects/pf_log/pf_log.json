@@ -1,0 +1,25 @@
+{
+  "name": "pf_log",
+  "variations": {
+    "v1": {
+      "size": [
+        148,
+        119
+      ],
+      "anchor": [
+        79,
+        83
+      ],
+      "ellipse": [
+        79,
+        83,
+        170,
+        85
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/nature-kit/Models/GLTF format/log_large.glb",
+  "source": "pixelforge prop3d"
+}

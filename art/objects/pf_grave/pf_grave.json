@@ -1,0 +1,25 @@
+{
+  "name": "pf_grave",
+  "variations": {
+    "v1": {
+      "size": [
+        357,
+        186
+      ],
+      "anchor": [
+        166,
+        106
+      ],
+      "ellipse": [
+        166,
+        106,
+        460,
+        230
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/grave.glb",
+  "source": "pixelforge prop3d"
+}

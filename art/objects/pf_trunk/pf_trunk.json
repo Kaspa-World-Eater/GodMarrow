@@ -1,0 +1,25 @@
+{
+  "name": "pf_trunk",
+  "variations": {
+    "v1": {
+      "size": [
+        83,
+        89
+      ],
+      "anchor": [
+        43,
+        69
+      ],
+      "ellipse": [
+        43,
+        69,
+        111,
+        55
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/trunk.glb",
+  "source": "pixelforge prop3d"
+}

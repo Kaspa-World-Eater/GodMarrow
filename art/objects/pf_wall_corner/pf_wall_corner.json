@@ -1,0 +1,25 @@
+{
+  "name": "pf_wall_corner",
+  "variations": {
+    "v1": {
+      "size": [
+        492,
+        475
+      ],
+      "anchor": [
+        274,
+        384
+      ],
+      "ellipse": [
+        274,
+        384,
+        540,
+        270
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/castle-kit/Models/GLB format/wall-corner-half-tower.glb",
+  "source": "pixelforge prop3d"
+}

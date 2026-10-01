@@ -1,0 +1,25 @@
+{
+  "name": "pf_dungeon_column",
+  "variations": {
+    "v1": {
+      "size": [
+        176,
+        371
+      ],
+      "anchor": [
+        89,
+        327
+      ],
+      "ellipse": [
+        89,
+        327,
+        208,
+        104
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/mini-dungeon/Models/GLB format/column.glb",
+  "source": "pixelforge prop3d"
+}

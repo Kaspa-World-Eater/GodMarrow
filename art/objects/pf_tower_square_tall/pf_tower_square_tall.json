@@ -1,0 +1,30 @@
+{
+  "name": "pf_tower_square_tall",
+  "variations": {
+    "v1": {
+      "size": [
+        338,
+        936
+      ],
+      "anchor": [
+        170,
+        853
+      ],
+      "ellipse": [
+        170,
+        853,
+        334,
+        167
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": [
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/tower-square-base.glb",
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/tower-square-mid-windows.glb",
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/tower-square-mid.glb",
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/tower-square-top-roof-high-windows.glb"
+  ],
+  "source": "pixelforge prop3d"
+}

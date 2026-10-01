@@ -1,0 +1,25 @@
+{
+  "name": "pf_iron_fence",
+  "variations": {
+    "v1": {
+      "size": [
+        139,
+        184
+      ],
+      "anchor": [
+        71,
+        158
+      ],
+      "ellipse": [
+        71,
+        158,
+        135,
+        67
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/iron-fence.glb",
+  "source": "pixelforge prop3d"
+}

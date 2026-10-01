@@ -3,25 +3,23 @@
   "variations": {
     "v1": {
       "size": [
-        66,
-        106
+        387,
+        489
       ],
       "anchor": [
-        32,
-        101
+        178,
+        518
       ],
       "ellipse": [
-        30,
-        99,
-        18,
-        9
+        178,
+        518,
+        433,
+        216
       ],
-      "frames": 8,
-      "fps": 6,
-      "frame_width": 66
+      "frames": 1,
+      "fps": 0
     }
   },
-  "outline": true,
-  "sway": "canopy",
-  "source": "pixelforge"
+  "model": "/home/user/godmarrow/art/objects/_models/dead_tree.glb",
+  "source": "pixelforge prop3d"
 }

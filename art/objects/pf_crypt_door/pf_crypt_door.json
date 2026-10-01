@@ -3,24 +3,23 @@
   "variations": {
     "v1": {
       "size": [
-        197,
-        225
+        126,
+        258
       ],
       "anchor": [
-        98,
-        222
+        64,
+        238
       ],
       "ellipse": [
-        98,
-        222,
-        193,
-        96
+        64,
+        238,
+        122,
+        47
       ],
       "frames": 1,
       "fps": 0
     }
   },
-  "outline": true,
-  "sway": null,
-  "source": "pixelforge"
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/crypt-door.glb",
+  "source": "pixelforge prop3d"
 }

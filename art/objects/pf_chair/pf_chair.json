@@ -1,0 +1,25 @@
+{
+  "name": "pf_chair",
+  "variations": {
+    "v1": {
+      "size": [
+        96,
+        132
+      ],
+      "anchor": [
+        50,
+        109
+      ],
+      "ellipse": [
+        50,
+        109,
+        103,
+        51
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/mini-dungeon/Models/GLB format/chair.glb",
+  "source": "pixelforge prop3d"
+}

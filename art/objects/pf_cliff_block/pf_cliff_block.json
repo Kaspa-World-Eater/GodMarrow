@@ -1,0 +1,25 @@
+{
+  "name": "pf_cliff_block",
+  "variations": {
+    "v1": {
+      "size": [
+        309,
+        344
+      ],
+      "anchor": [
+        156,
+        267
+      ],
+      "ellipse": [
+        156,
+        267,
+        305,
+        152
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/nature-kit/Models/GLTF format/cliff_block_rock.glb",
+  "source": "pixelforge prop3d"
+}

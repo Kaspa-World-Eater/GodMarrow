@@ -1,0 +1,25 @@
+{
+  "name": "pf_siege_tower_ruin",
+  "variations": {
+    "v1": {
+      "size": [
+        404,
+        553
+      ],
+      "anchor": [
+        239,
+        432
+      ],
+      "ellipse": [
+        239,
+        432,
+        585,
+        292
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/castle-kit/Models/GLB format/siege-tower-demolished.glb",
+  "source": "pixelforge prop3d"
+}

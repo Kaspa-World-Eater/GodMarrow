@@ -1,0 +1,25 @@
+{
+  "name": "pf_fire_basket",
+  "variations": {
+    "v1": {
+      "size": [
+        273,
+        193
+      ],
+      "anchor": [
+        138,
+        159
+      ],
+      "ellipse": [
+        138,
+        159,
+        417,
+        208
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/fire-basket.glb",
+  "source": "pixelforge prop3d"
+}

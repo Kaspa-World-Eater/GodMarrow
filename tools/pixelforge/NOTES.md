@@ -33,6 +33,9 @@ server. Full operating manual for an AI: `docs/GUIDE_AI.md`. Human guide:
 - **HD tier is the default** (`--style hd`: ~224 px tall, 96 colors). Derek
   explicitly wants the modern HD-pixel look (Blasphemous / Dead Cells), *not*
   16-bit. Other tiers exist for props/UI.
+- **Props and ground are rendered 3D, never painted flat (2026-10-01, Derek: "Diablo II Resurrected, not clip art").**
+  `prop3d` / `tiles3d` / `gen_tree.py` + `grade.py`; CC0 kits fetched by the game's `tools/make_props3d.py`.
+  The painted stand-ins (`pf_paint.py`, `make_buildings.py`) are kept only as a last resort.
 - **Humanoid first, then fit to the art (2026-10-01, Derek's suggestion).** The
   library mannequin (already skinned to the 46-clip armature) is fused, posed to
   the sheet's A-pose, shrink-wrapped onto the carved hull and painted in that

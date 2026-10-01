@@ -1,0 +1,31 @@
+{
+  "name": "pf_tower_hexagon",
+  "variations": {
+    "v1": {
+      "size": [
+        243,
+        767
+      ],
+      "anchor": [
+        123,
+        712
+      ],
+      "ellipse": [
+        123,
+        712,
+        327,
+        163
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": [
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/tower-hexagon-base.glb",
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/tower-hexagon-mid.glb",
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/tower-hexagon-mid.glb",
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/tower-hexagon-top.glb",
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/tower-hexagon-roof.glb"
+  ],
+  "source": "pixelforge prop3d"
+}

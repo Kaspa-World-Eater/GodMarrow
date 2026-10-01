@@ -4,8 +4,11 @@
     72,
     36
   ],
-  "variants": 6,
+  "variants": 36,
   "transitions": 16,
-  "bitmask": "tile index = variants + bits; bits: N=1 (top-right edge) E=2 (bottom-right) S=4 (bottom-left) W=8 (top-left); 0 = all first material, 15 = all second",
-  "source": "pixelforge"
+  "material": "stone",
+  "second": "mud",
+  "bitmask": "index = variants + bits; N=1 (top-right edge) E=2 (bottom-right) S=4 (bottom-left) W=8 (top-left)",
+  "source": "pixelforge tiles3d",
+  "lit": "same rig as prop3d"
 }

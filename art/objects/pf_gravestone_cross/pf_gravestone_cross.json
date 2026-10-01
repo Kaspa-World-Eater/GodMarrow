@@ -1,0 +1,25 @@
+{
+  "name": "pf_gravestone_cross",
+  "variations": {
+    "v1": {
+      "size": [
+        92,
+        182
+      ],
+      "anchor": [
+        47,
+        159
+      ],
+      "ellipse": [
+        47,
+        159,
+        101,
+        50
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/gravestone-cross-large.glb",
+  "source": "pixelforge prop3d"
+}

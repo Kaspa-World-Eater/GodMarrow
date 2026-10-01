@@ -1,0 +1,27 @@
+{
+  "name": "pf_banner_long",
+  "variations": {
+    "v1": {
+      "size": [
+        79,
+        323
+      ],
+      "anchor": [
+        41,
+        321
+      ],
+      "ellipse": [
+        41,
+        321,
+        75,
+        37
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": [
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/flag-banner-long.glb"
+  ],
+  "source": "pixelforge prop3d"
+}

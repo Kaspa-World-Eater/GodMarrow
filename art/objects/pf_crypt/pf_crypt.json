@@ -1,0 +1,25 @@
+{
+  "name": "pf_crypt",
+  "variations": {
+    "v1": {
+      "size": [
+        612,
+        564
+      ],
+      "anchor": [
+        307,
+        411
+      ],
+      "ellipse": [
+        307,
+        411,
+        651,
+        325
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/crypt.glb",
+  "source": "pixelforge prop3d"
+}

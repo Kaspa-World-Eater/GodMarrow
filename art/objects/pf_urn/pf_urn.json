@@ -1,0 +1,25 @@
+{
+  "name": "pf_urn",
+  "variations": {
+    "v1": {
+      "size": [
+        56,
+        81
+      ],
+      "anchor": [
+        29,
+        71
+      ],
+      "ellipse": [
+        29,
+        71,
+        73,
+        36
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/urn-round.glb",
+  "source": "pixelforge prop3d"
+}

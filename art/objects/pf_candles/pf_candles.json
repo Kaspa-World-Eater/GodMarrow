@@ -3,25 +3,23 @@
   "variations": {
     "v1": {
       "size": [
-        83,
-        81
+        45,
+        47
       ],
       "anchor": [
-        41,
-        76
+        19,
+        36
       ],
       "ellipse": [
-        39,
-        74,
-        75,
-        37
+        19,
+        36,
+        59,
+        29
       ],
-      "frames": 8,
-      "fps": 6,
-      "frame_width": 83
+      "frames": 1,
+      "fps": 0
     }
   },
-  "outline": true,
-  "sway": "flame",
-  "source": "pixelforge"
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/candle-multiple.glb",
+  "source": "pixelforge prop3d"
 }

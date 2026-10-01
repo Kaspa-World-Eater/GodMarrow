@@ -1,0 +1,25 @@
+{
+  "name": "pf_lantern_post_double",
+  "variations": {
+    "v1": {
+      "size": [
+        139,
+        285
+      ],
+      "anchor": [
+        70,
+        271
+      ],
+      "ellipse": [
+        70,
+        271,
+        146,
+        73
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/lightpost-double.glb",
+  "source": "pixelforge prop3d"
+}

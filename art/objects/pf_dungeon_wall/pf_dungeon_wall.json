@@ -1,0 +1,25 @@
+{
+  "name": "pf_dungeon_wall",
+  "variations": {
+    "v1": {
+      "size": [
+        421,
+        493
+      ],
+      "anchor": [
+        212,
+        388
+      ],
+      "ellipse": [
+        212,
+        388,
+        416,
+        208
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/mini-dungeon/Models/GLB format/wall.glb",
+  "source": "pixelforge prop3d"
+}

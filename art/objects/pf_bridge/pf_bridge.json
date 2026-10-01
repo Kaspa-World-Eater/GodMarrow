@@ -1,0 +1,25 @@
+{
+  "name": "pf_bridge",
+  "variations": {
+    "v1": {
+      "size": [
+        125,
+        156
+      ],
+      "anchor": [
+        64,
+        127
+      ],
+      "ellipse": [
+        64,
+        127,
+        120,
+        60
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/castle-kit/Models/GLB format/bridge-straight.glb",
+  "source": "pixelforge prop3d"
+}

@@ -29,256 +29,502 @@
   "oy": 68,
   "hr": 1.4
  },
- "pf_gravestone": {
-  "png": "res://art/objects/pf_gravestone/pf_gravestone_v1.png",
-  "ox": 28,
-  "oy": 99,
-  "hr": 2
- },
- "pf_bone_pile": {
-  "png": "res://art/objects/pf_bone_pile/pf_bone_pile_v1.png",
-  "ox": 52,
-  "oy": 99,
-  "hr": 2
- },
  "pf_dead_tree": {
   "png": "res://art/objects/pf_dead_tree/pf_dead_tree_v1.png",
-  "ox": 32,
-  "oy": 101,
-  "hr": 2,
-  "frames": 8,
-  "frame_width": 66,
-  "fps": 6
+  "ox": 178,
+  "oy": 518,
+  "hr": 4
  },
- "pf_banner": {
-  "png": "res://art/objects/pf_banner/pf_banner_v1.png",
-  "ox": 30,
-  "oy": 100,
-  "hr": 2,
-  "frames": 8,
-  "frame_width": 60,
-  "fps": 6
+ "pf_dead_tree_2": {
+  "png": "res://art/objects/pf_dead_tree_2/pf_dead_tree_2_v1.png",
+  "ox": 142,
+  "oy": 479,
+  "hr": 4
  },
- "pf_brazier": {
-  "png": "res://art/objects/pf_brazier/pf_brazier_v1.png",
-  "ox": 24,
-  "oy": 100,
-  "hr": 2,
-  "frames": 8,
-  "frame_width": 50,
-  "fps": 6
+ "pf_dead_tree_3": {
+  "png": "res://art/objects/pf_dead_tree_3/pf_dead_tree_3_v1.png",
+  "ox": 182,
+  "oy": 541,
+  "hr": 4
  },
- "pf_lantern_post": {
-  "png": "res://art/objects/pf_lantern_post/pf_lantern_post_v1.png",
-  "ox": 13,
-  "oy": 98,
-  "hr": 2
+ "pf_pine": {
+  "png": "res://art/objects/pf_pine/pf_pine_v1.png",
+  "ox": 206,
+  "oy": 549,
+  "hr": 4
  },
- "pf_cairn": {
-  "png": "res://art/objects/pf_cairn/pf_cairn_v1.png",
-  "ox": 30,
-  "oy": 99,
-  "hr": 2
+ "pf_pine_2": {
+  "png": "res://art/objects/pf_pine_2/pf_pine_2_v1.png",
+  "ox": 198,
+  "oy": 466,
+  "hr": 4
  },
- "pf_hut": {
-  "png": "res://art/objects/pf_hut/pf_hut_v1.png",
-  "ox": 113,
-  "oy": 222,
-  "hr": 2
+ "pf_willow": {
+  "png": "res://art/objects/pf_willow/pf_willow_v1.png",
+  "ox": 124,
+  "oy": 473,
+  "hr": 4
  },
- "pf_longhouse": {
-  "png": "res://art/objects/pf_longhouse/pf_longhouse_v1.png",
-  "ox": 131,
-  "oy": 222,
-  "hr": 2
+ "pf_gravestone": {
+  "png": "res://art/objects/pf_gravestone/pf_gravestone_v1.png",
+  "ox": 58,
+  "oy": 127,
+  "hr": 4
  },
- "pf_chapel_ruin": {
-  "png": "res://art/objects/pf_chapel_ruin/pf_chapel_ruin_v1.png",
-  "ox": 100,
-  "oy": 222,
-  "hr": 2
+ "pf_gravestone_round": {
+  "png": "res://art/objects/pf_gravestone_round/pf_gravestone_round_v1.png",
+  "ox": 44,
+  "oy": 104,
+  "hr": 4
  },
- "pf_watchtower": {
-  "png": "res://art/objects/pf_watchtower/pf_watchtower_v1.png",
-  "ox": 56,
-  "oy": 223,
-  "hr": 2
+ "pf_gravestone_broken": {
+  "png": "res://art/objects/pf_gravestone_broken/pf_gravestone_broken_v1.png",
+  "ox": 75,
+  "oy": 94,
+  "hr": 4
  },
- "pf_well": {
-  "png": "res://art/objects/pf_well/pf_well_v1.png",
-  "ox": 84,
-  "oy": 223,
-  "hr": 2
+ "pf_gravestone_cross": {
+  "png": "res://art/objects/pf_gravestone_cross/pf_gravestone_cross_v1.png",
+  "ox": 47,
+  "oy": 159,
+  "hr": 4
  },
- "pf_gallows": {
-  "png": "res://art/objects/pf_gallows/pf_gallows_v1.png",
-  "ox": 83,
-  "oy": 223,
-  "hr": 2
+ "pf_gravestone_wide": {
+  "png": "res://art/objects/pf_gravestone_wide/pf_gravestone_wide_v1.png",
+  "ox": 80,
+  "oy": 120,
+  "hr": 4
  },
- "pf_shrine": {
-  "png": "res://art/objects/pf_shrine/pf_shrine_v1.png",
-  "ox": 95,
-  "oy": 223,
-  "hr": 2
+ "pf_grave": {
+  "png": "res://art/objects/pf_grave/pf_grave_v1.png",
+  "ox": 166,
+  "oy": 106,
+  "hr": 4
  },
- "pf_gate_arch": {
-  "png": "res://art/objects/pf_gate_arch/pf_gate_arch_v1.png",
-  "ox": 112,
-  "oy": 222,
-  "hr": 2
+ "pf_grave_border": {
+  "png": "res://art/objects/pf_grave_border/pf_grave_border_v1.png",
+  "ox": 160,
+  "oy": 96,
+  "hr": 4
  },
- "pf_wall_segment": {
-  "png": "res://art/objects/pf_wall_segment/pf_wall_segment_v1.png",
-  "ox": 203,
-  "oy": 223,
-  "hr": 2
+ "pf_cross_wood": {
+  "png": "res://art/objects/pf_cross_wood/pf_cross_wood_v1.png",
+  "ox": 43,
+  "oy": 138,
+  "hr": 4
  },
- "pf_crypt_door": {
-  "png": "res://art/objects/pf_crypt_door/pf_crypt_door_v1.png",
-  "ox": 98,
-  "oy": 222,
-  "hr": 2
+ "pf_obelisk": {
+  "png": "res://art/objects/pf_obelisk/pf_obelisk_v1.png",
+  "ox": 62,
+  "oy": 249,
+  "hr": 4
  },
- "pf_smithy": {
-  "png": "res://art/objects/pf_smithy/pf_smithy_v1.png",
-  "ox": 132,
-  "oy": 223,
-  "hr": 2
+ "pf_pillar": {
+  "png": "res://art/objects/pf_pillar/pf_pillar_v1.png",
+  "ox": 31,
+  "oy": 211,
+  "hr": 4
  },
- "pf_market_stall": {
-  "png": "res://art/objects/pf_market_stall/pf_market_stall_v1.png",
-  "ox": 123,
-  "oy": 223,
-  "hr": 2
+ "pf_column": {
+  "png": "res://art/objects/pf_column/pf_column_v1.png",
+  "ox": 67,
+  "oy": 284,
+  "hr": 4
  },
- "pf_chest": {
-  "png": "res://art/objects/pf_chest/pf_chest_v1.png",
-  "ox": 51,
-  "oy": 75,
-  "hr": 2
- },
- "pf_barrel": {
-  "png": "res://art/objects/pf_barrel/pf_barrel_v1.png",
-  "ox": 30,
-  "oy": 74,
-  "hr": 2
- },
- "pf_crate": {
-  "png": "res://art/objects/pf_crate/pf_crate_v1.png",
-  "ox": 42,
-  "oy": 75,
-  "hr": 2
- },
- "pf_cart": {
-  "png": "res://art/objects/pf_cart/pf_cart_v1.png",
-  "ox": 60,
-  "oy": 74,
-  "hr": 2
- },
- "pf_cage": {
-  "png": "res://art/objects/pf_cage/pf_cage_v1.png",
-  "ox": 23,
-  "oy": 75,
-  "hr": 2
- },
- "pf_coffin": {
-  "png": "res://art/objects/pf_coffin/pf_coffin_v1.png",
-  "ox": 30,
-  "oy": 75,
-  "hr": 2
+ "pf_urn": {
+  "png": "res://art/objects/pf_urn/pf_urn_v1.png",
+  "ox": 29,
+  "oy": 71,
+  "hr": 4
  },
  "pf_altar": {
   "png": "res://art/objects/pf_altar/pf_altar_v1.png",
-  "ox": 47,
-  "oy": 74,
-  "hr": 2
+  "ox": 131,
+  "oy": 155,
+  "hr": 4
  },
- "pf_bell_frame": {
-  "png": "res://art/objects/pf_bell_frame/pf_bell_frame_v1.png",
-  "ox": 28,
-  "oy": 74,
-  "hr": 2
+ "pf_altar_wood": {
+  "png": "res://art/objects/pf_altar_wood/pf_altar_wood_v1.png",
+  "ox": 119,
+  "oy": 153,
+  "hr": 4
  },
- "pf_candles": {
-  "png": "res://art/objects/pf_candles/pf_candles_v1.png",
-  "ox": 41,
+ "pf_bench": {
+  "png": "res://art/objects/pf_bench/pf_bench_v1.png",
+  "ox": 60,
   "oy": 76,
-  "hr": 2,
-  "frames": 8,
-  "frame_width": 83,
-  "fps": 6
+  "hr": 4
  },
- "pf_skull_pile": {
-  "png": "res://art/objects/pf_skull_pile/pf_skull_pile_v1.png",
-  "ox": 59,
-  "oy": 75,
-  "hr": 2
+ "pf_coffin": {
+  "png": "res://art/objects/pf_coffin/pf_coffin_v1.png",
+  "ox": 126,
+  "oy": 120,
+  "hr": 4
  },
- "pf_dead_bush": {
-  "png": "res://art/objects/pf_dead_bush/pf_dead_bush_v1.png",
-  "ox": 59,
-  "oy": 76,
-  "hr": 2,
-  "frames": 8,
-  "frame_width": 119,
-  "fps": 6
+ "pf_crypt": {
+  "png": "res://art/objects/pf_crypt/pf_crypt_v1.png",
+  "ox": 307,
+  "oy": 411,
+  "hr": 4
  },
- "pf_reeds": {
-  "png": "res://art/objects/pf_reeds/pf_reeds_v1.png",
-  "ox": 35,
-  "oy": 77,
-  "hr": 2,
-  "frames": 8,
-  "frame_width": 72,
-  "fps": 6
+ "pf_crypt_small": {
+  "png": "res://art/objects/pf_crypt_small/pf_crypt_small_v1.png",
+  "ox": 189,
+  "oy": 335,
+  "hr": 4
  },
- "pf_mushrooms": {
-  "png": "res://art/objects/pf_mushrooms/pf_mushrooms_v1.png",
-  "ox": 62,
-  "oy": 74,
-  "hr": 2
+ "pf_crypt_large": {
+  "png": "res://art/objects/pf_crypt_large/pf_crypt_large_v1.png",
+  "ox": 414,
+  "oy": 542,
+  "hr": 4
  },
- "pf_rocks": {
-  "png": "res://art/objects/pf_rocks/pf_rocks_v1.png",
-  "ox": 100,
-  "oy": 75,
-  "hr": 2
- },
- "pf_signpost": {
-  "png": "res://art/objects/pf_signpost/pf_signpost_v1.png",
-  "ox": 27,
-  "oy": 75,
-  "hr": 2
+ "pf_crypt_door": {
+  "png": "res://art/objects/pf_crypt_door/pf_crypt_door_v1.png",
+  "ox": 64,
+  "oy": 238,
+  "hr": 4
  },
  "pf_fence": {
   "png": "res://art/objects/pf_fence/pf_fence_v1.png",
-  "ox": 67,
-  "oy": 74,
-  "hr": 2
+  "ox": 76,
+  "oy": 124,
+  "hr": 4
  },
- "pf_chained_post": {
-  "png": "res://art/objects/pf_chained_post/pf_chained_post_v1.png",
-  "ox": 25,
-  "oy": 74,
-  "hr": 2
+ "pf_fence_damaged": {
+  "png": "res://art/objects/pf_fence_damaged/pf_fence_damaged_v1.png",
+  "ox": 81,
+  "oy": 126,
+  "hr": 4
  },
- "pf_bone_statue": {
-  "png": "res://art/objects/pf_bone_statue/pf_bone_statue_v1.png",
-  "ox": 20,
-  "oy": 74,
-  "hr": 2
+ "pf_fence_gate": {
+  "png": "res://art/objects/pf_fence_gate/pf_fence_gate_v1.png",
+  "ox": 98,
+  "oy": 160,
+  "hr": 4
  },
- "pf_lantern": {
-  "png": "res://art/objects/pf_lantern/pf_lantern_v1.png",
+ "pf_iron_fence": {
+  "png": "res://art/objects/pf_iron_fence/pf_iron_fence_v1.png",
+  "ox": 71,
+  "oy": 158,
+  "hr": 4
+ },
+ "pf_iron_fence_gate": {
+  "png": "res://art/objects/pf_iron_fence_gate/pf_iron_fence_gate_v1.png",
+  "ox": 120,
+  "oy": 249,
+  "hr": 4
+ },
+ "pf_stone_wall": {
+  "png": "res://art/objects/pf_stone_wall/pf_stone_wall_v1.png",
+  "ox": 79,
+  "oy": 147,
+  "hr": 4
+ },
+ "pf_stone_wall_damaged": {
+  "png": "res://art/objects/pf_stone_wall_damaged/pf_stone_wall_damaged_v1.png",
+  "ox": 73,
+  "oy": 136,
+  "hr": 4
+ },
+ "pf_stone_wall_column": {
+  "png": "res://art/objects/pf_stone_wall_column/pf_stone_wall_column_v1.png",
+  "ox": 89,
+  "oy": 174,
+  "hr": 4
+ },
+ "pf_lantern_post": {
+  "png": "res://art/objects/pf_lantern_post/pf_lantern_post_v1.png",
+  "ox": 51,
+  "oy": 262,
+  "hr": 4
+ },
+ "pf_lantern_post_double": {
+  "png": "res://art/objects/pf_lantern_post_double/pf_lantern_post_double_v1.png",
+  "ox": 70,
+  "oy": 271,
+  "hr": 4
+ },
+ "pf_lantern_candle": {
+  "png": "res://art/objects/pf_lantern_candle/pf_lantern_candle_v1.png",
+  "ox": 22,
+  "oy": 51,
+  "hr": 4
+ },
+ "pf_fire_basket": {
+  "png": "res://art/objects/pf_fire_basket/pf_fire_basket_v1.png",
+  "ox": 138,
+  "oy": 159,
+  "hr": 4
+ },
+ "pf_candles": {
+  "png": "res://art/objects/pf_candles/pf_candles_v1.png",
+  "ox": 19,
+  "oy": 36,
+  "hr": 4
+ },
+ "pf_debris": {
+  "png": "res://art/objects/pf_debris/pf_debris_v1.png",
+  "ox": 94,
+  "oy": 62,
+  "hr": 4
+ },
+ "pf_debris_wood": {
+  "png": "res://art/objects/pf_debris_wood/pf_debris_wood_v1.png",
+  "ox": 101,
+  "oy": 87,
+  "hr": 4
+ },
+ "pf_shovel": {
+  "png": "res://art/objects/pf_shovel/pf_shovel_v1.png",
+  "ox": 60,
+  "oy": 90,
+  "hr": 4
+ },
+ "pf_rocks": {
+  "png": "res://art/objects/pf_rocks/pf_rocks_v1.png",
+  "ox": 138,
+  "oy": 103,
+  "hr": 4
+ },
+ "pf_rocks_tall": {
+  "png": "res://art/objects/pf_rocks_tall/pf_rocks_tall_v1.png",
+  "ox": 142,
+  "oy": 164,
+  "hr": 4
+ },
+ "pf_trunk": {
+  "png": "res://art/objects/pf_trunk/pf_trunk_v1.png",
+  "ox": 43,
+  "oy": 69,
+  "hr": 4
+ },
+ "pf_trunk_long": {
+  "png": "res://art/objects/pf_trunk_long/pf_trunk_long_v1.png",
   "ox": 21,
-  "oy": 75,
-  "hr": 2
+  "oy": 66,
+  "hr": 4
  },
- "pf_tombstone_cross": {
-  "png": "res://art/objects/pf_tombstone_cross/pf_tombstone_cross_v1.png",
-  "ox": 31,
-  "oy": 75,
-  "hr": 2
+ "pf_hay_bale": {
+  "png": "res://art/objects/pf_hay_bale/pf_hay_bale_v1.png",
+  "ox": 101,
+  "oy": 128,
+  "hr": 4
+ },
+ "pf_tower_square": {
+  "png": "res://art/objects/pf_tower_square/pf_tower_square_v1.png",
+  "ox": 353,
+  "oy": 739,
+  "hr": 4
+ },
+ "pf_tower_hexagon": {
+  "png": "res://art/objects/pf_tower_hexagon/pf_tower_hexagon_v1.png",
+  "ox": 123,
+  "oy": 712,
+  "hr": 4
+ },
+ "pf_tower_roof": {
+  "png": "res://art/objects/pf_tower_roof/pf_tower_roof_v1.png",
+  "ox": 314,
+  "oy": 528,
+  "hr": 4
+ },
+ "pf_wall": {
+  "png": "res://art/objects/pf_wall/pf_wall_v1.png",
+  "ox": 178,
+  "oy": 371,
+  "hr": 4
+ },
+ "pf_wall_gate": {
+  "png": "res://art/objects/pf_wall_gate/pf_wall_gate_v1.png",
+  "ox": 140,
+  "oy": 406,
+  "hr": 4
+ },
+ "pf_wall_corner": {
+  "png": "res://art/objects/pf_wall_corner/pf_wall_corner_v1.png",
+  "ox": 274,
+  "oy": 384,
+  "hr": 4
+ },
+ "pf_bridge": {
+  "png": "res://art/objects/pf_bridge/pf_bridge_v1.png",
+  "ox": 64,
+  "oy": 127,
+  "hr": 4
+ },
+ "pf_stairs_stone": {
+  "png": "res://art/objects/pf_stairs_stone/pf_stairs_stone_v1.png",
+  "ox": 74,
+  "oy": 100,
+  "hr": 4
+ },
+ "pf_flag": {
+  "png": "res://art/objects/pf_flag/pf_flag_v1.png",
+  "ox": 60,
+  "oy": 274,
+  "hr": 4
+ },
+ "pf_banner_long": {
+  "png": "res://art/objects/pf_banner_long/pf_banner_long_v1.png",
+  "ox": 41,
+  "oy": 321,
+  "hr": 4
+ },
+ "pf_siege_tower_ruin": {
+  "png": "res://art/objects/pf_siege_tower_ruin/pf_siege_tower_ruin_v1.png",
+  "ox": 239,
+  "oy": 432,
+  "hr": 4
+ },
+ "pf_catapult": {
+  "png": "res://art/objects/pf_catapult/pf_catapult_v1.png",
+  "ox": 169,
+  "oy": 265,
+  "hr": 4
+ },
+ "pf_rocks_large": {
+  "png": "res://art/objects/pf_rocks_large/pf_rocks_large_v1.png",
+  "ox": 172,
+  "oy": 148,
+  "hr": 4
+ },
+ "pf_cliff_block": {
+  "png": "res://art/objects/pf_cliff_block/pf_cliff_block_v1.png",
+  "ox": 156,
+  "oy": 267,
+  "hr": 4
+ },
+ "pf_cliff_slope": {
+  "png": "res://art/objects/pf_cliff_slope/pf_cliff_slope_v1.png",
+  "ox": 155,
+  "oy": 189,
+  "hr": 4
+ },
+ "pf_cliff_cave": {
+  "png": "res://art/objects/pf_cliff_cave/pf_cliff_cave_v1.png",
+  "ox": 156,
+  "oy": 267,
+  "hr": 4
+ },
+ "pf_log": {
+  "png": "res://art/objects/pf_log/pf_log_v1.png",
+  "ox": 79,
+  "oy": 83,
+  "hr": 4
+ },
+ "pf_stump": {
+  "png": "res://art/objects/pf_stump/pf_stump_v1.png",
+  "ox": 59,
+  "oy": 80,
+  "hr": 4
+ },
+ "pf_campfire": {
+  "png": "res://art/objects/pf_campfire/pf_campfire_v1.png",
+  "ox": 141,
+  "oy": 104,
+  "hr": 4
+ },
+ "pf_mushrooms": {
+  "png": "res://art/objects/pf_mushrooms/pf_mushrooms_v1.png",
+  "ox": 26,
+  "oy": 56,
+  "hr": 4
+ },
+ "pf_grass_tuft": {
+  "png": "res://art/objects/pf_grass_tuft/pf_grass_tuft_v1.png",
+  "ox": 52,
+  "oy": 61,
+  "hr": 4
+ },
+ "pf_bush": {
+  "png": "res://art/objects/pf_bush/pf_bush_v1.png",
+  "ox": 69,
+  "oy": 122,
+  "hr": 4
+ },
+ "pf_pine_tall": {
+  "png": "res://art/objects/pf_pine_tall/pf_pine_tall_v1.png",
+  "ox": 128,
+  "oy": 668,
+  "hr": 4
+ },
+ "pf_pine_small": {
+  "png": "res://art/objects/pf_pine_small/pf_pine_small_v1.png",
+  "ox": 113,
+  "oy": 339,
+  "hr": 4
+ },
+ "pf_tree_dark": {
+  "png": "res://art/objects/pf_tree_dark/pf_tree_dark_v1.png",
+  "ox": 88,
+  "oy": 577,
+  "hr": 4
+ },
+ "pf_chest": {
+  "png": "res://art/objects/pf_chest/pf_chest_v1.png",
+  "ox": 44,
+  "oy": 72,
+  "hr": 4
+ },
+ "pf_barrel": {
+  "png": "res://art/objects/pf_barrel/pf_barrel_v1.png",
+  "ox": 56,
+  "oy": 107,
+  "hr": 4
+ },
+ "pf_table": {
+  "png": "res://art/objects/pf_table/pf_table_v1.png",
+  "ox": 136,
+  "oy": 144,
+  "hr": 4
+ },
+ "pf_chair": {
+  "png": "res://art/objects/pf_chair/pf_chair_v1.png",
+  "ox": 50,
+  "oy": 109,
+  "hr": 4
+ },
+ "pf_pot": {
+  "png": "res://art/objects/pf_pot/pf_pot_v1.png",
+  "ox": 35,
+  "oy": 71,
+  "hr": 4
+ },
+ "pf_dungeon_column": {
+  "png": "res://art/objects/pf_dungeon_column/pf_dungeon_column_v1.png",
+  "ox": 89,
+  "oy": 327,
+  "hr": 4
+ },
+ "pf_dungeon_wall": {
+  "png": "res://art/objects/pf_dungeon_wall/pf_dungeon_wall_v1.png",
+  "ox": 212,
+  "oy": 388,
+  "hr": 4
+ },
+ "pf_dungeon_gate": {
+  "png": "res://art/objects/pf_dungeon_gate/pf_dungeon_gate_v1.png",
+  "ox": 156,
+  "oy": 352,
+  "hr": 4
+ },
+ "pf_wood_support": {
+  "png": "res://art/objects/pf_wood_support/pf_wood_support_v1.png",
+  "ox": 126,
+  "oy": 303,
+  "hr": 4
+ },
+ "pf_stones": {
+  "png": "res://art/objects/pf_stones/pf_stones_v1.png",
+  "ox": 52,
+  "oy": 49,
+  "hr": 4
+ },
+ "pf_tower_square_tall": {
+  "png": "res://art/objects/pf_tower_square_tall/pf_tower_square_tall_v1.png",
+  "ox": 170,
+  "oy": 853,
+  "hr": 4
  }
 }

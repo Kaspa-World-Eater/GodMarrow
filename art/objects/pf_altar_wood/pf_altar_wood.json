@@ -1,0 +1,25 @@
+{
+  "name": "pf_altar_wood",
+  "variations": {
+    "v1": {
+      "size": [
+        236,
+        212
+      ],
+      "anchor": [
+        119,
+        153
+      ],
+      "ellipse": [
+        119,
+        153,
+        242,
+        121
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/altar-wood.glb",
+  "source": "pixelforge prop3d"
+}

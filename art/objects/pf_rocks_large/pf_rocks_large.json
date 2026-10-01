@@ -1,0 +1,25 @@
+{
+  "name": "pf_rocks_large",
+  "variations": {
+    "v1": {
+      "size": [
+        380,
+        244
+      ],
+      "anchor": [
+        172,
+        148
+      ],
+      "ellipse": [
+        172,
+        148,
+        545,
+        272
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/castle-kit/Models/GLB format/rocks-large.glb",
+  "source": "pixelforge prop3d"
+}

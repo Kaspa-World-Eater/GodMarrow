@@ -3,24 +3,23 @@
   "variations": {
     "v1": {
       "size": [
-        61,
-        78
+        247,
+        182
       ],
       "anchor": [
-        30,
-        75
+        126,
+        120
       ],
       "ellipse": [
-        30,
-        75,
-        57,
-        28
+        126,
+        120,
+        323,
+        161
       ],
       "frames": 1,
       "fps": 0
     }
   },
-  "outline": true,
-  "sway": null,
-  "source": "pixelforge"
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/coffin-old.glb",
+  "source": "pixelforge prop3d"
 }

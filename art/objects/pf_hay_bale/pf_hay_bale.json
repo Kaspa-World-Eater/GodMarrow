@@ -1,0 +1,25 @@
+{
+  "name": "pf_hay_bale",
+  "variations": {
+    "v1": {
+      "size": [
+        200,
+        170
+      ],
+      "anchor": [
+        101,
+        128
+      ],
+      "ellipse": [
+        101,
+        128,
+        195,
+        97
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/hay-bale.glb",
+  "source": "pixelforge prop3d"
+}

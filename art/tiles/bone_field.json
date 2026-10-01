@@ -1,0 +1,14 @@
+{
+  "name": "bone_field",
+  "tile": [
+    72,
+    36
+  ],
+  "variants": 36,
+  "transitions": 16,
+  "material": "bone",
+  "second": "ash",
+  "bitmask": "index = variants + bits; N=1 (top-right edge) E=2 (bottom-right) S=4 (bottom-left) W=8 (top-left)",
+  "source": "pixelforge tiles3d",
+  "lit": "same rig as prop3d"
+}

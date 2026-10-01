@@ -1,0 +1,25 @@
+{
+  "name": "pf_cross_wood",
+  "variations": {
+    "v1": {
+      "size": [
+        84,
+        158
+      ],
+      "anchor": [
+        43,
+        138
+      ],
+      "ellipse": [
+        43,
+        138,
+        88,
+        44
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/cross-wood.glb",
+  "source": "pixelforge prop3d"
+}

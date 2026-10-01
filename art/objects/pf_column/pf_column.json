@@ -1,0 +1,25 @@
+{
+  "name": "pf_column",
+  "variations": {
+    "v1": {
+      "size": [
+        132,
+        317
+      ],
+      "anchor": [
+        67,
+        284
+      ],
+      "ellipse": [
+        67,
+        284,
+        147,
+        73
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/column-large.glb",
+  "source": "pixelforge prop3d"
+}

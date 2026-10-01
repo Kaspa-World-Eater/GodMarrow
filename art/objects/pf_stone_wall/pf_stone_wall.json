@@ -1,0 +1,25 @@
+{
+  "name": "pf_stone_wall",
+  "variations": {
+    "v1": {
+      "size": [
+        156,
+        186
+      ],
+      "anchor": [
+        79,
+        147
+      ],
+      "ellipse": [
+        79,
+        147,
+        151,
+        75
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/stone-wall.glb",
+  "source": "pixelforge prop3d"
+}

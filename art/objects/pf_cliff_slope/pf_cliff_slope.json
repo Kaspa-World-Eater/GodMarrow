@@ -1,0 +1,25 @@
+{
+  "name": "pf_cliff_slope",
+  "variations": {
+    "v1": {
+      "size": [
+        308,
+        266
+      ],
+      "anchor": [
+        155,
+        189
+      ],
+      "ellipse": [
+        155,
+        189,
+        335,
+        167
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/nature-kit/Models/GLTF format/cliff_blockSlope_rock.glb",
+  "source": "pixelforge prop3d"
+}

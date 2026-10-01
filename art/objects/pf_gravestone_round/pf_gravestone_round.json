@@ -1,0 +1,25 @@
+{
+  "name": "pf_gravestone_round",
+  "variations": {
+    "v1": {
+      "size": [
+        85,
+        124
+      ],
+      "anchor": [
+        44,
+        104
+      ],
+      "ellipse": [
+        44,
+        104,
+        92,
+        46
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/gravestone-round.glb",
+  "source": "pixelforge prop3d"
+}

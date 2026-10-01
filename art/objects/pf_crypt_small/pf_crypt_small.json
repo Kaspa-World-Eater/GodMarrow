@@ -1,0 +1,28 @@
+{
+  "name": "pf_crypt_small",
+  "variations": {
+    "v1": {
+      "size": [
+        375,
+        422
+      ],
+      "anchor": [
+        189,
+        335
+      ],
+      "ellipse": [
+        189,
+        335,
+        387,
+        193
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": [
+    "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/crypt-small.glb",
+    "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/crypt-small-roof.glb"
+  ],
+  "source": "pixelforge prop3d"
+}

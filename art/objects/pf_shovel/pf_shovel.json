@@ -1,0 +1,25 @@
+{
+  "name": "pf_shovel",
+  "variations": {
+    "v1": {
+      "size": [
+        119,
+        117
+      ],
+      "anchor": [
+        60,
+        90
+      ],
+      "ellipse": [
+        60,
+        90,
+        145,
+        72
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/shovel-dirt.glb",
+  "source": "pixelforge prop3d"
+}

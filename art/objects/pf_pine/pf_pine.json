@@ -1,0 +1,27 @@
+{
+  "name": "pf_pine",
+  "variations": {
+    "v1": {
+      "size": [
+        336,
+        559
+      ],
+      "anchor": [
+        206,
+        549
+      ],
+      "ellipse": [
+        206,
+        549,
+        448,
+        224
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": [
+    "/home/user/godmarrow/art/objects/_models/pine.glb"
+  ],
+  "source": "pixelforge prop3d"
+}

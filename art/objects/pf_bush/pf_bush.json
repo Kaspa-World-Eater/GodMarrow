@@ -1,0 +1,25 @@
+{
+  "name": "pf_bush",
+  "variations": {
+    "v1": {
+      "size": [
+        136,
+        143
+      ],
+      "anchor": [
+        69,
+        122
+      ],
+      "ellipse": [
+        69,
+        122,
+        255,
+        127
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/nature-kit/Models/GLTF format/plant_bushDetailed.glb",
+  "source": "pixelforge prop3d"
+}

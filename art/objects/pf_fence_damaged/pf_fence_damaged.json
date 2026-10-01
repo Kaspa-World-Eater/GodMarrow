@@ -1,0 +1,25 @@
+{
+  "name": "pf_fence_damaged",
+  "variations": {
+    "v1": {
+      "size": [
+        149,
+        157
+      ],
+      "anchor": [
+        81,
+        126
+      ],
+      "ellipse": [
+        81,
+        126,
+        161,
+        80
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/fence-damaged.glb",
+  "source": "pixelforge prop3d"
+}

@@ -3,24 +3,23 @@
   "variations": {
     "v1": {
       "size": [
-        135,
-        77
+        150,
+        158
       ],
       "anchor": [
-        67,
-        74
+        76,
+        124
       ],
       "ellipse": [
-        67,
-        74,
-        131,
-        65
+        76,
+        124,
+        145,
+        72
       ],
       "frames": 1,
       "fps": 0
     }
   },
-  "outline": true,
-  "sway": null,
-  "source": "pixelforge"
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/fence.glb",
+  "source": "pixelforge prop3d"
 }

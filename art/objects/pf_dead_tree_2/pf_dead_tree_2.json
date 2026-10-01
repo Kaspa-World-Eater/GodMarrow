@@ -1,0 +1,25 @@
+{
+  "name": "pf_dead_tree_2",
+  "variations": {
+    "v1": {
+      "size": [
+        236,
+        407
+      ],
+      "anchor": [
+        142,
+        479
+      ],
+      "ellipse": [
+        142,
+        479,
+        450,
+        225
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/home/user/godmarrow/art/objects/_models/dead_tree_2.glb",
+  "source": "pixelforge prop3d"
+}

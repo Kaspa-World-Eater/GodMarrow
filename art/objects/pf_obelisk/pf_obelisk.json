@@ -1,0 +1,25 @@
+{
+  "name": "pf_obelisk",
+  "variations": {
+    "v1": {
+      "size": [
+        121,
+        279
+      ],
+      "anchor": [
+        62,
+        249
+      ],
+      "ellipse": [
+        62,
+        249,
+        137,
+        68
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/pillar-obelisk.glb",
+  "source": "pixelforge prop3d"
+}

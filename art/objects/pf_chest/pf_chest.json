@@ -3,24 +3,23 @@
   "variations": {
     "v1": {
       "size": [
-        103,
-        78
+        93,
+        97
       ],
       "anchor": [
-        51,
-        75
+        44,
+        72
       ],
       "ellipse": [
-        51,
-        75,
-        99,
-        49
+        44,
+        72,
+        96,
+        48
       ],
       "frames": 1,
       "fps": 0
     }
   },
-  "outline": true,
-  "sway": null,
-  "source": "pixelforge"
+  "model": "/tmp/claude-0/kenney/mini-dungeon/Models/GLB format/chest.glb",
+  "source": "pixelforge prop3d"
 }

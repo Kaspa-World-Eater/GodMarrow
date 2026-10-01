@@ -1,0 +1,25 @@
+{
+  "name": "pf_grave_border",
+  "variations": {
+    "v1": {
+      "size": [
+        318,
+        197
+      ],
+      "anchor": [
+        160,
+        96
+      ],
+      "ellipse": [
+        160,
+        96,
+        440,
+        220
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/grave-border.glb",
+  "source": "pixelforge prop3d"
+}

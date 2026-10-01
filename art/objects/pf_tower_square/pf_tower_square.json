@@ -1,0 +1,25 @@
+{
+  "name": "pf_tower_square",
+  "variations": {
+    "v1": {
+      "size": [
+        704,
+        915
+      ],
+      "anchor": [
+        353,
+        739
+      ],
+      "ellipse": [
+        353,
+        739,
+        699,
+        349
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/castle-kit/Models/GLB format/tower-square.glb",
+  "source": "pixelforge prop3d"
+}

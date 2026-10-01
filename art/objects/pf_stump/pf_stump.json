@@ -1,0 +1,25 @@
+{
+  "name": "pf_stump",
+  "variations": {
+    "v1": {
+      "size": [
+        116,
+        109
+      ],
+      "anchor": [
+        59,
+        80
+      ],
+      "ellipse": [
+        59,
+        80,
+        153,
+        76
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/nature-kit/Models/GLTF format/stump_round.glb",
+  "source": "pixelforge prop3d"
+}

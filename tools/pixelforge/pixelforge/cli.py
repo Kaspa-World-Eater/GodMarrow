@@ -318,6 +318,20 @@ def cmd_prop(a) -> None:
     _emit(a, r)
 
 
+def cmd_tiles3d(a) -> None:
+    from .tiles3d import make_tiles3d
+
+    _emit(a, make_tiles3d(a.material, a.second, a.name, a.out, tiles=a.tiles, seed=a.seed, ppu=a.ppu, res_dir=a.res_dir))
+
+
+def cmd_prop3d(a) -> None:
+    from .prop3d import make_prop3d
+
+    r = make_prop3d(a.model, a.name, a.out, height=a.height, yaw=a.yaw, ppu=a.ppu, reference=a.reference, strength=a.strength, scale=a.scale,
+                    outline=not a.no_outline, game_objects=a.game_objects, hr=a.hr, grime=a.grime, bump=a.bump, dust=a.dust, log=print)
+    _emit(a, r)
+
+
 def cmd_vfx(a) -> None:
     from .vfx import make_vfx
 
@@ -532,6 +546,22 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--key-all", action="store_true", help="also clear background-coloured pixels the border flood cannot reach (archways, gaps)")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_prop)
+
+    s = sub.add_parser("tiles3d", help="iso ground tiles rendered in 3D (grass mud ash stone bone water snow) with lit transitions to a second material")
+    s.add_argument("material"); s.add_argument("second", nargs="?"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/tiles")
+    s.add_argument("--tiles", type=int, default=4); s.add_argument("--seed", type=int, default=1); s.add_argument("--ppu", type=float, default=108.0)
+    s.add_argument("--res-dir", default="res://art/tiles"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_tiles3d)
+
+    s = sub.add_parser("prop3d", help="a 3D model (GLB/FBX/OBJ) -> graded, pixelated prop with a foot point (game camera + lantern light rig)")
+    s.add_argument("model"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/objects")
+    s.add_argument("--height", type=float, default=0.0, help="metres (0 = the model's own)"); s.add_argument("--yaw", type=float, default=45.0)
+    s.add_argument("--ppu", type=float, default=108.0, help="final pixels per metre (heroes: ~108)"); s.add_argument("--scale", type=float, default=2.0, help="render at N x and press down")
+    s.add_argument("--reference", help="image whose tones to grade toward (default: the Godmarrow painting target)"); s.add_argument("--strength", type=float, default=1.0)
+    s.add_argument("--grime", type=float, default=0.45); s.add_argument("--bump", type=float, default=0.35); s.add_argument("--dust", type=float, default=0.25)
+    s.add_argument("--no-outline", action="store_true"); s.add_argument("--game-objects"); s.add_argument("--hr", type=float, default=2.0)
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_prop3d)
 
     s = sub.add_parser("vfx", help="procedural looping effect sheet: fire, smoke, wisp, burst, embers")
     from .vfx import KINDS as _KINDS

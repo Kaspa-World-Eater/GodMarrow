@@ -1,0 +1,25 @@
+{
+  "name": "pf_wood_support",
+  "variations": {
+    "v1": {
+      "size": [
+        249,
+        361
+      ],
+      "anchor": [
+        126,
+        303
+      ],
+      "ellipse": [
+        126,
+        303,
+        263,
+        131
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/mini-dungeon/Models/GLB format/wood-support.glb",
+  "source": "pixelforge prop3d"
+}

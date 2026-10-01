@@ -1,0 +1,25 @@
+{
+  "name": "pf_bench",
+  "variations": {
+    "v1": {
+      "size": [
+        122,
+        104
+      ],
+      "anchor": [
+        60,
+        76
+      ],
+      "ellipse": [
+        60,
+        76,
+        120,
+        60
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/bench-damaged.glb",
+  "source": "pixelforge prop3d"
+}

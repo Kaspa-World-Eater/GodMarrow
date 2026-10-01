@@ -1,0 +1,25 @@
+{
+  "name": "pf_tree_dark",
+  "variations": {
+    "v1": {
+      "size": [
+        174,
+        590
+      ],
+      "anchor": [
+        88,
+        577
+      ],
+      "ellipse": [
+        88,
+        577,
+        233,
+        116
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/nature-kit/Models/GLTF format/tree_tall_dark.glb",
+  "source": "pixelforge prop3d"
+}

@@ -3,24 +3,23 @@
   "variations": {
     "v1": {
       "size": [
-        125,
-        77
+        61,
+        70
       ],
       "anchor": [
-        62,
-        74
+        26,
+        56
       ],
       "ellipse": [
-        62,
-        74,
-        121,
-        60
+        26,
+        56,
+        79,
+        39
       ],
       "frames": 1,
       "fps": 0
     }
   },
-  "outline": true,
-  "sway": null,
-  "source": "pixelforge"
+  "model": "/tmp/claude-0/kenney/nature-kit/Models/GLTF format/mushroom_redGroup.glb",
+  "source": "pixelforge prop3d"
 }

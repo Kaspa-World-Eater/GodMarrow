@@ -123,7 +123,21 @@ pixelforge portrait views/front.png mystic -o art/portraits [--sizes 48 96]     
 pixelforge compare before.png after.png -o cmp.png                                 # strip (+GIF for frame folders) + mean difference
 pixelforge doctor [--project <folder>]                                             # what works on this machine, with fixes
 pixelforge godot-addon <godot project>                                             # PFSpriteSet / PFFx / PFObjects loaders into addons/pixelforge
+pixelforge prop3d <model.glb|.fbx|.obj> <name> -o art/objects --height 3.4 [--game-objects objects.json]   # REAL props: game camera, lantern light rig, grime + bump, graded to the painting, pixelated
+pixelforge tiles3d grass stone moor_grass -o art/tiles [--tiles 6]                 # ground rendered in 3D with the same light; 36 variants + 16 lit transitions + TileSet
+blender -b --python pixelforge/blender/gen_tree.py -- --out dead.glb --kind dead|pine|willow --seed 3 --height 5   # grown trees (no add-on)
 ```
+
+**The quality bar (Derek, 2026-10-01): Diablo II Resurrected / Path of Exile, not clip art.** Flat painted stand-ins
+are out. Props and buildings come from real geometry: CC0 kits (Kenney graveyard / castle / nature / mini-dungeon,
+fetched by `tools/make_props3d.py`), grown trees, or a model carved from a painting; all through `prop3d`, whose
+look is: orthographic camera 30° above with the object turned to the iso diagonal, a warm key from the upper left,
+cold teal fill and rim, dark world, ambient occlusion, procedural grime + bump + top dust on every material, then
+`grade.py` (lightness curve to the Hollow Mystic painting's median 0.35, chroma to ~0.035, shadows toward teal,
+pure blues turned teal, fine grain), 2x render pressed down with a box filter, dark 1 px outline. Scale: `--ppu 108`
+is one texel per screen px with heroes ~195 px (objects.json `hr` 4; the 2D tiles/props of the first pass used hr 2).
+Modular kit pieces stack with `--stack` (each part sits on its own base). Ground: `tiles3d` renders a patch with the
+same rig and cuts grid-aligned diamonds (72x36 texels, hr 2); two materials on one relief give the edge tiles.
 
 Worked examples of using all of it at once: `tools/make_world_art.py`, `tools/make_buildings.py` (+ `tools/pf_paint.py`, a painting kit for stand-ins) in the game (tiles, UI frames, props into
 objects.json, sounds, portraits, variant skins) and `tools/make_fx.py` (the 52 effect sheets). The Studio's **Tools**

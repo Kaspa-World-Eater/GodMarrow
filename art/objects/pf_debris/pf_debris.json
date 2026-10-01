@@ -1,0 +1,25 @@
+{
+  "name": "pf_debris",
+  "variations": {
+    "v1": {
+      "size": [
+        164,
+        92
+      ],
+      "anchor": [
+        94,
+        62
+      ],
+      "ellipse": [
+        94,
+        62,
+        206,
+        103
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/debris.glb",
+  "source": "pixelforge prop3d"
+}

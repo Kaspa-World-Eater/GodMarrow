@@ -1,0 +1,28 @@
+{
+  "name": "pf_crypt_large",
+  "variations": {
+    "v1": {
+      "size": [
+        825,
+        740
+      ],
+      "anchor": [
+        414,
+        542
+      ],
+      "ellipse": [
+        414,
+        542,
+        843,
+        421
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": [
+    "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/crypt-large.glb",
+    "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/crypt-large-roof.glb"
+  ],
+  "source": "pixelforge prop3d"
+}

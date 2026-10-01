@@ -1,0 +1,25 @@
+{
+  "name": "pf_stone_wall_column",
+  "variations": {
+    "v1": {
+      "size": [
+        176,
+        218
+      ],
+      "anchor": [
+        89,
+        174
+      ],
+      "ellipse": [
+        89,
+        174,
+        194,
+        97
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/stone-wall-column.glb",
+  "source": "pixelforge prop3d"
+}

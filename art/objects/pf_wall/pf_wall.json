@@ -1,0 +1,25 @@
+{
+  "name": "pf_wall",
+  "variations": {
+    "v1": {
+      "size": [
+        354,
+        459
+      ],
+      "anchor": [
+        178,
+        371
+      ],
+      "ellipse": [
+        178,
+        371,
+        349,
+        174
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/castle-kit/Models/GLB format/wall.glb",
+  "source": "pixelforge prop3d"
+}

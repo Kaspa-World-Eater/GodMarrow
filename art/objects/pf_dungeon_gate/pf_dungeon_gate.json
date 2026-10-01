@@ -1,0 +1,25 @@
+{
+  "name": "pf_dungeon_gate",
+  "variations": {
+    "v1": {
+      "size": [
+        309,
+        429
+      ],
+      "anchor": [
+        156,
+        352
+      ],
+      "ellipse": [
+        156,
+        352,
+        305,
+        152
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/mini-dungeon/Models/GLB format/gate.glb",
+  "source": "pixelforge prop3d"
+}

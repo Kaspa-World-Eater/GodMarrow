@@ -1,0 +1,25 @@
+{
+  "name": "pf_iron_fence_gate",
+  "variations": {
+    "v1": {
+      "size": [
+        237,
+        308
+      ],
+      "anchor": [
+        120,
+        249
+      ],
+      "ellipse": [
+        120,
+        249,
+        245,
+        122
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/iron-fence-border-gate.glb",
+  "source": "pixelforge prop3d"
+}

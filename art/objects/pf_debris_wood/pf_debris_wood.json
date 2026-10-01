@@ -1,0 +1,25 @@
+{
+  "name": "pf_debris_wood",
+  "variations": {
+    "v1": {
+      "size": [
+        232,
+        150
+      ],
+      "anchor": [
+        101,
+        87
+      ],
+      "ellipse": [
+        101,
+        87,
+        294,
+        147
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/debris-wood.glb",
+  "source": "pixelforge prop3d"
+}

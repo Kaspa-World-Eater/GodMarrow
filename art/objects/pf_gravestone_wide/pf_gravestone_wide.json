@@ -1,0 +1,25 @@
+{
+  "name": "pf_gravestone_wide",
+  "variations": {
+    "v1": {
+      "size": [
+        157,
+        160
+      ],
+      "anchor": [
+        80,
+        120
+      ],
+      "ellipse": [
+        80,
+        120,
+        169,
+        84
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/gravestone-wide.glb",
+  "source": "pixelforge prop3d"
+}

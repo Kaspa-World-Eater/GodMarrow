@@ -1,0 +1,25 @@
+{
+  "name": "pf_pine_small",
+  "variations": {
+    "v1": {
+      "size": [
+        224,
+        365
+      ],
+      "anchor": [
+        113,
+        339
+      ],
+      "ellipse": [
+        113,
+        339,
+        276,
+        138
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/nature-kit/Models/GLTF format/tree_pineSmallA.glb",
+  "source": "pixelforge prop3d"
+}

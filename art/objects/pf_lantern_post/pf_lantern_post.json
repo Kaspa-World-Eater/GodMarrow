@@ -3,24 +3,23 @@
   "variations": {
     "v1": {
       "size": [
-        38,
-        101
+        99,
+        266
       ],
       "anchor": [
-        13,
-        98
+        51,
+        262
       ],
       "ellipse": [
-        13,
-        98,
-        23,
-        11
+        51,
+        262,
+        105,
+        52
       ],
       "frames": 1,
       "fps": 0
     }
   },
-  "outline": true,
-  "sway": null,
-  "source": "pixelforge"
+  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/lightpost-single.glb",
+  "source": "pixelforge prop3d"
 }

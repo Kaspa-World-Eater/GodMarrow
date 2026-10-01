@@ -1,0 +1,25 @@
+{
+  "name": "pf_campfire",
+  "variations": {
+    "v1": {
+      "size": [
+        280,
+        174
+      ],
+      "anchor": [
+        141,
+        104
+      ],
+      "ellipse": [
+        141,
+        104,
+        356,
+        178
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "model": "/tmp/claude-0/kenney/nature-kit/Models/GLTF format/campfire_logs.glb",
+  "source": "pixelforge prop3d"
+}
