@@ -431,8 +431,8 @@ func _land_blow() -> void:
 			st.poise = minf(st.poise_max(), st.poise + 20.0)
 			Game.hitstop(0.09)
 			Game.shake(6.0)
-		if act_mult > 1.5 and not m2.dead:
-			m2.stun = maxf(m2.stun, 0.35)   # the overhead staggers what it lands on
+		if act_mult > 1.5 and not m2.dead and not m2.boss:
+			m2.stun = maxf(m2.stun, 0.35)   # the overhead staggers what it lands on (never a boss: zz_melee_chain.js:56)
 		# a third splashes onto anything touching the target
 		for o in Combat.monsters_in(zone, m2.tp, 0.7):
 			if o != m2:
@@ -440,7 +440,7 @@ func _land_blow() -> void:
 		_weapon_elements(m2)
 		if act_mult > 1.5:
 			Game.hitstop(0.07)
-			Game.shake(4.0)
+			Game.shake(2.2)   # the browser's finisher shake (zz_melee_chain.js:55)
 	else:
 		# a swing at the air still cuts what stands in front
 		var front := tp + Vector2(cos(0), sin(0)) * 0.0
