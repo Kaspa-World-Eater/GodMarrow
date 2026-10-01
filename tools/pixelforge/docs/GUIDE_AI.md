@@ -113,7 +113,16 @@ pixelforge vfx fire|smoke|wisp|burst|embers <name> -o art/fx [--palette wisp|lan
 pixelforge tiles <texture.png> <name> -o art/tiles [--second <texture2.png>] [--tile 72 36 --variants 6]   # 2:1 diamonds + 16 transition tiles + TileSet .tres
 pixelforge ui9 <panel.png> <name> -o art/ui [--border L T R B] [--mid 8]        # 9-slice texture + StyleBoxTexture .tres (margins detected)
 pixelforge skilltree data/skills.json [--list <class>] [--move id=row,col[,tab]] [--rename id="Name"] [--apply]   # no flags = the GUI editor
+pixelforge icons <flatlay.png> -o art/items --names "sword:1x3,ring,hood:2x2"      # inventory icons: <id>.png (4x) + <id>@1x.png + icons.json
+pixelforge recolor <atlas.png> -o out.png --hue 40 | --map "#1d4a4c=#7a3d10"       # recolour without re-rendering
+pixelforge recolor art/sprites --kind wraith --suffix @champion --hue 60            # a Godmarrow variant set from the base one
+pixelforge project blender-download                                                # fetch the portable Blender (380 MB) if none is installed
 ```
+
+Studio-only helpers an AI should know exist: the manual cutout editor (step 3, Edit <view>: erase / restore / magic
+erase, saves over `views/<view>.png`; `views/<view>_raw.png` is the untouched crop), the animation preview and
+`api.preview_gif(project, name, clip, dir)` -> `previews/<clip>_<dir>.gif`, and the one-click Blender download
+(`api.download_blender`). Character setting `model_mode` = auto | template | hull picks the 3D path.
 
 Rules the tools keep: glow only where the game allows it (`vfx` adds a halo to fire, wisps and bursts; never to smoke or
 embers); every colour comes from the ramp you give or the game's presets; `skilltree` never edits `data/skills.json`

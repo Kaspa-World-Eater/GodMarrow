@@ -1,76 +1,70 @@
 # PixelForge Studio — the short guide
 
-Turn Midjourney pictures into real pixel-art sprites, animated, ready for Godot.
-Runs on any Windows laptop. No graphics card needed.
+Turn Midjourney pictures into real pixel-art characters, animated, seen from 8 directions, ready for the game.
+Runs on any Windows laptop. No graphics card needed. No paid tools. No Mixamo.
 
 ## Install (once)
 
 1. Install **Python 3.11 or newer** from python.org. Tick **"Add Python to PATH"**.
-2. Download this repository (green *Code* button → *Download ZIP*) and unzip it.
-3. Double-click **`install.bat`**. It sets everything up.
-4. Double-click **`PixelForge Studio.bat`** to open the app.
+2. Get the `tools/pixelforge` folder (it lives in the GodMarrow repository).
+3. Double-click **`install.bat`**. It sets everything up and puts a **PixelForge Studio** icon on the desktop.
+4. Double-click the icon. If it does not open, run **`PixelForge Studio.bat`** instead; a crash is written to
+   `studio_error.log` next to it.
 
-Optional, only for the 3D/animation path:
-- **Blender** (free, blender.org). Install it normally; the app finds it.
-  Nothing else: rigging and animations are built in. (Mixamo is an optional
-  upgrade for motion-capture animations.)
+**Blender** (free) does the 3D part. You do not have to install it: step 5 has a **Download Blender for me**
+button (380 MB, no installer). If you already have Blender, the app finds it.
 
-## The two paths
+## How a character is made
 
-**Quick path — one picture → one sprite.** Good for bosses, portraits, items,
-and for deciding whether you like the look. No Blender.
+1. **New project** → pick an empty folder (one project per game).
+2. **+ Add character** → name it, write one sentence about it.
+3. **Step 1** → click **Copy A: sheet** → paste into Midjourney. You get front, side and back in one picture.
+   Upscale it and save the PNG. (Copy **A2** for a four-view sheet: better 3D. Copy **C** for a single pixel-style
+   picture: better colours.)
+4. **Step 2** → choose that PNG as the character sheet (and the C picture if you made one).
+5. Click **▶ Run all automatic steps** and wait. The log at the bottom shows what is happening. Filming from 8
+   directions is the slow part (a few minutes on a laptop).
+6. **Step 8 → Preview animation**: watch any move from any direction. **Save GIF** if you want to show someone.
+7. **Step 9 → Export for Godmarrow**: type the kind name (for example `mystic`), click, and copy the files it names
+   into the game's `art/sprites` folder. Other Godot games: **Export** gives a SpriteFrames and a scene.
 
-**Full path — one character → every animation from 8 directions.** This is the
-Diablo 2 way: a rough 3D model is used *behind the scenes* to render frames,
-and the app turns those frames into pixel art. You never see the 3D model in
-the game.
+## Fixing a bad cutout (step 3)
 
-## Quick path, step by step
+The automatic cutout is usually right. When it is not (background stuck to the figure, a sleeve cut off):
 
-1. **New project** → pick an empty folder.
-2. **+ Add character** → name it, write one sentence describing it.
-3. Step **1. Prompts** → click **Copy C: sprite** → paste into Midjourney.
-4. Save the upscaled PNG. Step **2. Import** → *C. Pixel-style image* → choose it.
-5. Click **★ Quick path** in the step list → **Make sprite + animate + export**.
-6. Your files are in `characters/<name>/export/`. Copy that folder into your
-   Godot project and drop the `.tscn` into a scene.
+- Click **Edit front** (or side / back). Left-drag **erases**, right-drag **puts pixels back**, **Magic erase**
+  removes one patch of colour with a click. **Undo** undoes. **Save**.
+- Or **Open folder** and edit the PNG in any paint program, then **Reload**.
+- If it found the wrong number of figures, set **Figures on the sheet** to 3 or 4 and run split again. Loosen the
+  tolerance if background remains; tighten it if the figure loses parts.
+- Then run steps 4 and 5 again (click them on the left).
 
-## Full path, step by step
+## Quick path, one picture → one sprite
 
-1. Same as above, but at step 3 use **Copy A: sheet**. Midjourney gives you a
-   sheet with front, side and back views. Upscale it, save the PNG.
-   (Optional: **B1/B2** give bigger front/back images. Put the sheet's image
-   URL in the box first.)
-2. Step **2. Import** → *A. Character sheet*. Also import the *C* image if you
-   made one — it gives the best colors.
-3. Click **▶ Run all automatic steps**. The app splits the sheet, locks the
-   palette, builds the 3D model, rigs it, gives it idle / walk / run / attack /
-   hit / death, renders everything from 8 directions, pixelates the frames and
-   exports the Godot files. Rendering takes a while (hundreds of frames);
-   watch the Log panel. Nothing to click in between.
+For a first look, bosses, portraits, items. No Blender. Click **★ Quick path** in the step list, pick the picture
+and an animation (sway, hover, flame...), click **Make sprite + animate + export**.
 
-   Optional upgrade: for motion-capture animations, upload
-   `characters/<name>/model/<name>.fbx` to mixamo.com, download animations
-   (first *With Skin*, rest *Without Skin*) into `characters/<name>/mixamo/`
-   and run the rig step again — the app uses them instead of the built-in set.
+## Other things the Forge makes (command line, see GUIDE_AI.md)
+
+Props and trees with sway, 52 kinds of spell / aura / weather effects, inventory icons from one flat-lay picture,
+iso ground tiles, UI frames, recolours (champion / unique tints from one render), and a skill-tree editor.
+An AI assistant can run every step for you from the command line.
 
 ## Knobs you might touch
 
-- **Settings → Quality style**: `8bit`, `16bit`, `snes`, `hd` (default).
-- **Step 7 → Camera elevation**: 30° is Diablo 2. 45° is a more top-down look.
-- **Step 8 → outline**: adds the classic dark 1-pixel edge.
+- **Settings → Quality style**: `godmarrow` (every colour kept, ~195 px tall) is the game's; `hd`, `16bit`, `8bit`
+  exist for other projects.
+- **Step 7 → Camera elevation**: 30° is Diablo II. 45° is more top-down.
+- **Step 8 → outline**: the dark 1-pixel edge the game uses.
 
 ## When something goes wrong
 
-- *"Blender was not found"* → install it, or Settings → Blender path → browse
-  to `blender.exe`.
-- *"could not identify a front view"* → the sheet's background wasn't plain
-  enough, or the views touch each other. Re-roll the sheet, or import a
-  separate front image (B1).
-- *The model looks lumpy in Blender* → that's expected. At sprite size it
-  disappears. Judge the pixel frames, not the model.
-- Anything else: the Log panel shows exactly what ran. Paste it to Claude
-  along with `docs/GUIDE_AI.md` and it can take over from the command line.
+- *"Blender was not found"* → step 5, **Download Blender for me**; or Settings → Blender path.
+- *"could not identify a front view"* → the sheet's background was not plain enough, or the views touch. Set
+  **Figures on the sheet**, loosen the tolerance, or import a separate front image.
+- *The sprite looks wrong* → the fix is nearly always in step 3 (cutout) or the sheet itself (A-pose, arms away
+  from the body, plain background). Fix the cutout, run step 5 again.
+- Anything else: the Log panel shows exactly what ran. Paste it to Claude with `docs/GUIDE_AI.md`.
 
 ## Let an AI drive it
 
