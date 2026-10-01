@@ -164,3 +164,13 @@ wide straw hat seen from 30° above; its colour is pink where the sheet's hat is
 building a browser-vs-Godot capture to tune it against the reference.
 
 **Keeper build 4 in game (derek-33):** `docs/screens/2026-10-02_keeper_build2_vs_build4.png`. At game size it is hard to tell from build 2: the hat still reads as a pale pink-brown disc facing the camera with a dark rim. Part of the pink is the warm light map (my side), so judge the hat from a flat-lit Forge preview too.
+
+**derek-33, 2026-10-02 (as asked via the PixelForge session):** pulled; ended on `72f0e64`. Paused otherwise.
+`tools\pixelforge\install.bat` re-run on Derek's PC: clean (scipy 1.18.1 added, doctor "All good", Blender 4.5 found);
+it created `Godmarrow.lnk` on the Desktop -> `C:\Users\derek\GodMarrow\Play Godmarrow.bat` (replacing the old shortcut
+to the Desktop playable copy). **Godot: `Play Godmarrow.bat` would NOT find Derek's Godot.** It lives at
+`C:\Users\derek\OneDrive\Desktop\Godot\Godot_v4.7.2-stable_win64.exe` (OneDrive Desktop); the launcher searches
+PIXELFORGE_GODOT, tools\godot, PATH, Program Files, LocalAppData\Programs and Downloads `*.exe` (Downloads has only the
+`.zip`), so it would download a second 85 MB copy. I did not double-click it. Suggest adding
+`%USERPROFILE%\OneDrive\Desktop\Godot\Godot*win64.exe` and `%USERPROFILE%\Desktop\Godot\Godot*win64.exe` (and the
+`[Environment]::GetFolderPath('Desktop')` path) to the search before the download step.
