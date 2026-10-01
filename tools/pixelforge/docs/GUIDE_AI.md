@@ -132,6 +132,7 @@ blender -b --python pixelforge/blender/gen_tree.py -- --out dead.glb --kind dead
 pixelforge prompt --world object|building|tree|ground|effect|ui|icons|portrait --describe "..." --sref <hero sheet url>   # style-locked world prompts
 pixelforge artlist -o docs/ART_ORDER.md --sref <hero sheet url>                   # the Act I art order with every prompt
 pixelforge object <sheet.png> <name> -o art/objects --height 1.2 [--views 3] [--game-objects objects.json]   # painted sheet -> carved, painted, filmed, pixelated prop (the hero way)
+pixelforge hero <sheet.png> <name> --describe "..." --project ./forge --to-game <game>/art/sprites           # a hero sheet -> the game, one command
 ```
 
 **The world is painted, then built (Derek, 2026-10-01): objects get the same treatment as heroes.** `prompt --world`

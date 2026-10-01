@@ -334,6 +334,13 @@ def cmd_tiles3d(a) -> None:
     _emit(a, make_tiles3d(a.material, a.second, a.name, a.out, tiles=a.tiles, seed=a.seed, ppu=a.ppu, res_dir=a.res_dir))
 
 
+def cmd_hero(a) -> None:
+    from .hero import make_hero
+
+    _emit(a, make_hero(a.sheet, a.name, a.project, describe=a.describe or "", to_game=a.to_game, kind=a.kind, display_name=a.display_name,
+                       style=a.style, per_clip=a.per_clip, tolerance=a.tolerance, model_mode=a.model_mode, clips=a.clips, passes=a.passes))
+
+
 def cmd_object(a) -> None:
     from .object3d import make_object
 
@@ -581,6 +588,15 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--tiles", type=int, default=4); s.add_argument("--seed", type=int, default=1); s.add_argument("--ppu", type=float, default=108.0)
     s.add_argument("--res-dir", default="res://art/tiles"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_tiles3d)
+
+    s = sub.add_parser("hero", help="a turnaround sheet -> a hero in the game, in one go (split, palette, model, rig, render, pixelate, export)")
+    s.add_argument("sheet"); s.add_argument("name"); s.add_argument("--project", default="forge", help="Forge project folder (made if missing)")
+    s.add_argument("--describe", help="one sentence about the character"); s.add_argument("--to-game", help="the game's art/sprites folder (Godmarrow atlas); omit for plain Godot files")
+    s.add_argument("--kind", help="atlas name in the game (default: the name)"); s.add_argument("--display-name")
+    s.add_argument("--style", default="godmarrow"); s.add_argument("--per-clip", type=int, default=12); s.add_argument("--tolerance", type=float, default=0.1)
+    s.add_argument("--model-mode", choices=["auto", "template", "hull"], default="auto"); s.add_argument("--clips"); s.add_argument("--passes", help="color,normal,depth")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_hero)
 
     s = sub.add_parser("object", help="a painted object/building/tree sheet -> carved, painted, filmed, pixelated prop (the hero way)")
     s.add_argument("sheet"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/objects")
