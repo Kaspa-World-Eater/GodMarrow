@@ -56,6 +56,12 @@ TOOLS = [
     ("Preview in game", "See it in the game: launches Godot on the moor with a character skin, effects playing at the hero, or the attachments from the effects editor.",
      [("game", "dir", "", None), ("skin", "text", "", None), ("fx", "text", "", None), ("attach", "check", False, None), ("screenshot", "check", False, None)],
      "game_preview"),
+    ("Painted effect", "Midjourney spell or missile art (one shape on black) becomes an animated game effect: missiles spin and shed chips (with 16 headings), "
+                       "loops breathe or flicker, bursts grow and dissolve, a painted strip of key frames loops. Then compose it in the spell designer (layer kind 'image').",
+     [("image", "file", "", None), ("name", "text", "my_effect", None), ("out", "dir", "art/fx", None),
+      ("kind", "choice", "loop", ["missile", "loop", "burst", "frames"]), ("preset", "choice", "glow", ["glow", "flame", "hover", "idle", "cloak", "grass"]),
+      ("frames", "int", 8, None), ("width", "int", 0, None), ("rotations", "int", 0, None)],
+     "effect_art"),
     ("Spell designer", "Build a spell from layers of effects (fire + burst + embers, ring + rune + wisp...) with a live preview; export the strip the game plays.",
      [("start_from", "choice", "fireball", ["fireball", "ward", "soul_drain", "bone_shatter", "lightning_strike", "bone_spear_hit", "frost_nova", "fire_wall", "corpse_burst"]), ("out", "dir", "art/fx", None)],
      "spell_designer"),
@@ -158,7 +164,7 @@ def run_tool(key: str, v: dict) -> dict:
     raise ValueError(key)
 
 
-GROUPS = [("Start", ["Describe it", "Preview in game"]), ("Art", ["Effects", "Spell designer", "Effects editor", "Skin editor", "Colour editor", "Prop / tree", "Painted object", "Item icons", "Portrait", "Ground tiles", "UI frame", "Recolour", "Compare", "World prompts"]),
+GROUPS = [("Start", ["Describe it", "Preview in game"]), ("Art", ["Effects", "Painted effect", "Spell designer", "Effects editor", "Skin editor", "Colour editor", "Prop / tree", "Painted object", "Item icons", "Portrait", "Ground tiles", "UI frame", "Recolour", "Compare", "World prompts"]),
           ("Audio", ["Sounds", "Music"]),
           ("Game", ["Skill trees", "Godot add-on"])]
 
@@ -284,6 +290,14 @@ class ToolsWindow:
             self._say("launched " + " ".join(r["command"][-6:]) if not shot else ("screenshot " + str(r.get("png") or r.get("error"))))
             if shot and r.get("png"):
                 webbrowser.open(r["png"])
+            return
+        if key == "effect_art":
+            from .effect_art import make_effect
+            r = make_effect(values["image"], values["name"], values["out"], kind=values["kind"], preset=values["preset"], frames=int(values["frames"]),
+                            width=int(values["width"]) or None, rotations=int(values["rotations"]))
+            self._say("OK " + r["png"] + (" gif " + r["gif"] if r.get("gif") else ""))
+            if r.get("gif"):
+                webbrowser.open(r["gif"])
             return
         if key == "spell_designer":
             from .spell_designer import open_spell_designer

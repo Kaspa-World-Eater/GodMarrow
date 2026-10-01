@@ -402,3 +402,52 @@ def test_new_effect_kinds_and_spell_presets_render(tmp_path):
         frames = spell.render_spell(sp)
         assert len(frames) == sp["frames"] and sum(int((f[..., 3] > 0).sum()) for f in frames) > 500, k
     assert spell.PRESETS["fire_wall"]["loop"] and not spell.PRESETS["frost_nova"]["loop"]
+
+
+def test_painted_effects_orbits_image_layers_and_skin_layers(tmp_path):
+    import json
+
+    import numpy as np
+    from PIL import Image, ImageDraw
+
+    from pixelforge import spell, vfx
+    from pixelforge.effect_art import make_effect
+    from pixelforge.skin_editor import SkinEditor
+
+    im = Image.new("RGB", (160, 80), (0, 0, 0))
+    d = ImageDraw.Draw(im)
+    d.polygon([(10, 40), (120, 32), (150, 40), (120, 48)], fill=(214, 206, 186))
+    im.save(tmp_path / "spear.png")
+    r = make_effect(tmp_path / "spear.png", "spear", tmp_path, kind="missile", frames=6, rotations=4, width=64)
+    meta = json.loads((tmp_path / "spear.json").read_text())
+    assert meta["rotations"] == 4 and meta["frames"] == 6 and Image.open(r["png"]).height == meta["frame_height"] * 4
+    r = make_effect(tmp_path / "spear.png", "burst", tmp_path, kind="burst", frames=6, width=48)
+    assert json.loads((tmp_path / "burst.json").read_text())["loop"] is False
+    r = make_effect(tmp_path / "spear.png", "loop", tmp_path, kind="loop", preset="glow", frames=4, width=48)
+    assert r["frames"] == 4
+    strip = Image.new("RGB", (300, 60), (0, 0, 0))
+    dd = ImageDraw.Draw(strip)
+    for k in range(3):
+        dd.ellipse((k * 100 + 20, 10, k * 100 + 80, 50), outline=(200, 200, 255), width=4)
+    strip.save(tmp_path / "frames.png")
+    r = make_effect(tmp_path / "frames.png", "frames", tmp_path, kind="frames")
+    assert r["frames"] == 3
+    # the painted effect composes as an image layer in a spell
+    sp = {"name": "mix", "size": [96, 64], "frames": 6, "fps": 10, "loop": True, "anchor": [48, 32],
+          "layers": [{**spell.LAYER_DEFAULTS, "kind": "image", "image": str(tmp_path / "spear.json"), "name": "painted"},
+                     {**spell.LAYER_DEFAULTS, "kind": "embers", "palette": "bone", "name": "embers"}]}
+    frames = spell.render_spell(sp)
+    assert len(frames) == 6 and (frames[0][..., 3] > 0).sum() > 100
+    # orbits: the front and back halves of one ring, both looping
+    for k in ("bone_armor_front", "bone_armor_back", "bone_shard_aura_front"):
+        seq = vfx.GENERATORS[k](112, 64, 8, np.random.default_rng(1), True)
+        assert len(seq) == 8 and any(a.sum() > 30 for _i, a, _h in seq), k
+    assert spell.PRESETS["bone_armor"]["attach"] == {"back": "behind", "front": "front"}
+    # skin editor layers compose like a paint program (pure part, no window)
+    base = {"name": "base", "rgba": np.full((4, 4, 4), (10, 20, 30, 255), np.uint8), "visible": True, "opacity": 1.0}
+    top = {"name": "l", "rgba": np.zeros((4, 4, 4), np.uint8), "visible": True, "opacity": 1.0}
+    top["rgba"][1, 1] = (255, 0, 0, 255)
+    out = SkinEditor.composite([base, top])
+    assert tuple(out[1, 1, :3]) == (255, 0, 0) and tuple(out[0, 0, :3]) == (10, 20, 30)
+    top["visible"] = False
+    assert tuple(SkinEditor.composite([base, top])[1, 1, :3]) == (10, 20, 30)

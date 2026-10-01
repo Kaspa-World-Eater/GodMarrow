@@ -29,6 +29,8 @@ class SkinEditor(ColorEditor):
         self.brush_color = "#2a2630"
         self.glow_color = "#9ff4ea"
         self.ops: list[dict] = []
+        self.layers: list[dict] = [{"name": "base", "rgba": self.rgba.copy(), "visible": True, "opacity": 1.0}]
+        self.active = 0
         self.regions = skin_ops.load_regions(self.path)
         self.poly: list = []
         rawp = self.path.with_name(self.path.stem + "_raw.png")
@@ -48,6 +50,21 @@ class SkinEditor(ColorEditor):
         ttk.Button(tools, text="Glow colour…", command=self.pick_glow_color).pack(anchor="w", pady=(8, 2))
         self.glow_swatch = ttk.Label(tools, text="      ", background=self.glow_color)
         self.glow_swatch.pack(anchor="w")
+        ttk.Label(tools, text="Layers").pack(anchor="w", pady=(12, 0))
+        from tkinter import Listbox
+        self.layer_list = Listbox(tools, height=5, width=18, exportselection=False, bg="#23272f", fg="#e8e2d2", selectbackground="#1f4a46",
+                                  selectforeground="#eafff8", highlightthickness=0, relief="flat")
+        self.layer_list.pack(anchor="w")
+        self.layer_list.bind("<<ListboxSelect>>", lambda e: self.select_layer())
+        lrow = ttk.Frame(tools)
+        lrow.pack(anchor="w")
+        ttk.Button(lrow, text="+", width=3, command=self.add_layer).pack(side=LEFT)
+        ttk.Button(lrow, text="−", width=3, command=self.remove_layer).pack(side=LEFT)
+        ttk.Button(lrow, text="👁", width=3, command=self.toggle_layer).pack(side=LEFT)
+        ttk.Button(lrow, text="↑", width=3, command=lambda: self.move_layer(-1)).pack(side=LEFT)
+        ttk.Button(lrow, text="↓", width=3, command=lambda: self.move_layer(1)).pack(side=LEFT)
+        ttk.Button(tools, text="Merge down", command=self.merge_down).pack(anchor="w", pady=2)
+        self.fill_layers()
         ttk.Label(tools, text="Regions").pack(anchor="w", pady=(12, 0))
         self.region_list = ttk.Combobox(tools, values=sorted(self.regions), state="readonly", width=14)
         self.region_list.pack(anchor="w")
@@ -75,13 +92,97 @@ class SkinEditor(ColorEditor):
             self.glow_color = hexv
             self.glow_swatch.configure(background=hexv)
 
-    def _do(self, op: dict) -> None:
-        self.undo.append(self.rgba.copy())
-        self.rgba = skin_ops.apply_op(self.rgba, op, self.regions, self.raw)
+    # ------------------------------------------------------------ layers
+    def fill_layers(self) -> None:
+        self.layer_list.delete(0, "end")
+        for i, L in enumerate(reversed(self.layers)):
+            self.layer_list.insert("end", ("● " if L["visible"] else "○ ") + L["name"])
+        self.layer_list.selection_set(len(self.layers) - 1 - self.active)
+
+    def select_layer(self) -> None:
+        sel = self.layer_list.curselection()
+        if sel:
+            self.active = len(self.layers) - 1 - sel[0]
+
+    def add_layer(self) -> None:
+        self.layers.append({"name": f"layer {len(self.layers)}", "rgba": np.zeros_like(self.rgba), "visible": True, "opacity": 1.0})
+        self.active = len(self.layers) - 1
+        self.fill_layers()
+
+    def remove_layer(self) -> None:
+        if self.active > 0:
+            self.layers.pop(self.active)
+            self.active = min(self.active, len(self.layers) - 1)
+            self.fill_layers(); self.recomposite()
+
+    def toggle_layer(self) -> None:
+        self.layers[self.active]["visible"] = not self.layers[self.active]["visible"]
+        self.fill_layers(); self.recomposite()
+
+    def move_layer(self, d: int) -> None:
+        j = self.active + d
+        if 1 <= j < len(self.layers) and self.active >= 1:
+            self.layers[self.active], self.layers[j] = self.layers[j], self.layers[self.active]
+            self.active = j
+            self.fill_layers(); self.recomposite()
+
+    def merge_down(self) -> None:
+        if self.active >= 1:
+            below = self.layers[self.active - 1]
+            below["rgba"] = self.composite([below, self.layers[self.active]])
+            self.layers.pop(self.active)
+            self.active -= 1
+            self.fill_layers(); self.recomposite()
+
+    @staticmethod
+    def composite(layers: list[dict]) -> np.ndarray:
+        from PIL import Image
+
+        out = Image.new("RGBA", (layers[0]["rgba"].shape[1], layers[0]["rgba"].shape[0]), (0, 0, 0, 0))
+        for L in layers:
+            if not L["visible"]:
+                continue
+            im = Image.fromarray(L["rgba"], "RGBA")
+            if L.get("opacity", 1.0) < 1.0:
+                a = im.split()[3].point(lambda v, o=L["opacity"]: int(v * o))
+                im.putalpha(a)
+            out = Image.alpha_composite(out, im)
+        return np.array(out)
+
+    def recomposite(self) -> None:
+        self.rgba = self.composite(self.layers)
         self.lab = rgb_to_oklab(self.rgba[..., :3]).astype(np.float32)
         self.preview = self.rgba
-        self.ops.append(op)
         self.draw()
+
+    def _do(self, op: dict) -> None:
+        """An op on the active layer: applied to the composite, and the changed pixels are kept on that layer."""
+        self.undo.append([{**L, "rgba": L["rgba"].copy()} for L in self.layers])
+        before = self.composite(self.layers)
+        after = skin_ops.apply_op(before, op, self.regions, self.raw)
+        changed = (after != before).any(axis=2)
+        L = self.layers[self.active]
+        if self.active == 0:
+            L["rgba"] = after if len(self.layers) == 1 else np.where(changed[..., None], after, L["rgba"])
+        else:
+            L["rgba"][changed] = after[changed]
+            if op["op"] == "erase":   # erasing on a layer above the base: the layer hides what is below
+                L["rgba"][changed] = 0
+        op = {**op, "layer": L["name"]}
+        self.ops.append(op)
+        self.recomposite()
+
+    def do_undo(self) -> None:
+        if self.undo:
+            state = self.undo.pop()
+            if isinstance(state, list):
+                self.layers = state
+                self.active = min(self.active, len(self.layers) - 1)
+                self.fill_layers()
+                self.recomposite()
+            else:
+                self.rgba = state
+                self.recomposite()
 
     def press(self, e) -> None:
         t = self.tool.get()
@@ -120,10 +221,10 @@ class SkinEditor(ColorEditor):
         else:
             return
         if not first and self.ops and self.ops[-1]["op"] == op["op"]:   # one undo step per stroke
-            self.rgba = skin_ops.apply_op(self.rgba, op, self.regions, self.raw)
-            self.preview = self.rgba
-            self.ops.append(op)
-            self.draw()
+            saved = self.undo.pop() if self.undo else None
+            self._do(op)
+            if saved is not None:
+                self.undo.pop(); self.undo.append(saved)
         else:
             self._do(op)
 
@@ -166,11 +267,27 @@ class SkinEditor(ColorEditor):
         if self.dst is not None:
             rgb = self.swatch2.cget("bg")
             op["to"] = rgb
-        self.ops.append(op)
-        super().apply()
+        self.src = None
+        self.mask[:] = False
+        self.dst = None
+        self.lightness.set(0.0); self.chroma.set(1.0); self.hue.set(0.0)
+        self.swatch2.configure(bg="#303030")
+        self._do(op)
+        self.pick_label.set("Applied. Click another colour, or Save.")
 
     def save(self) -> None:
-        super().save()
+        """Flatten the visible layers into the file (the layers stay in the window; the ops list records each)."""
+        if self.src is not None and self.mask.any():
+            self.apply()
+        self.rgba = self.composite(self.layers)
+        bak = self.path.with_suffix(self.path.suffix + ".bak")
+        if not bak.exists():
+            import shutil
+            shutil.copy(self.path, bak)
+        Image.fromarray(self.rgba, "RGBA").save(self.path)
+        self.pick_label.set(f"Saved {self.path.name}, {len(self.layers)} layer(s) flattened (the original is kept as {bak.name}).")
+        if self.on_save:
+            self.on_save()
         if self.regions:
             skin_ops.regions_path(self.path).write_text(json.dumps(self.regions, indent=1))
 

@@ -91,7 +91,7 @@ class SpellDesigner:
         self.vars = {}
         form = ttk.Frame(left)
         form.pack(fill=X)
-        spec = [("name", "text"), ("kind", "kind"), ("palette", "palette"), ("scale", 0.1, 4.0), ("x", -96, 96), ("y", -96, 96), ("rotation", -180, 180),
+        spec = [("name", "text"), ("kind", "kind"), ("image", "text"), ("palette", "palette"), ("scale", 0.1, 4.0), ("x", -96, 96), ("y", -96, 96), ("rotation", -180, 180),
                 ("start", 0, 32), ("speed", 0.1, 4.0), ("opacity", 0.0, 1.0), ("blend", "blend"), ("seed", 1, 99)]
         for i, item in enumerate(spec):
             key = item[0]
@@ -100,7 +100,7 @@ class SpellDesigner:
                 v = StringVar(); ttk.Entry(form, textvariable=v, width=14).grid(row=i, column=1, sticky="w")
                 v.trace_add("write", lambda *_, k=key: self.set_prop(k))
             elif item[1] == "kind":
-                v = StringVar(); ttk.Combobox(form, textvariable=v, values=list(vfx.KINDS), state="readonly", width=12).grid(row=i, column=1, sticky="w")
+                v = StringVar(); ttk.Combobox(form, textvariable=v, values=["image", *vfx.KINDS], state="readonly", width=12).grid(row=i, column=1, sticky="w")
                 v.trace_add("write", lambda *_, k=key: self.set_prop(k))
             elif item[1] == "palette":
                 v = StringVar(); ttk.Combobox(form, textvariable=v, values=sorted(vfx.PRESETS), state="readonly", width=12).grid(row=i, column=1, sticky="w")
@@ -144,7 +144,7 @@ class SpellDesigner:
         self.loading = True
         for k, v in self.vars.items():
             try:
-                v.set(lyr[k])
+                v.set(lyr.get(k, ""))
             except Exception:  # noqa: BLE001
                 pass
         self.flip.set(bool(lyr.get("flip"))); self.hidden.set(bool(lyr.get("hidden")))
@@ -165,6 +165,8 @@ class SpellDesigner:
             elif key not in ("name", "kind", "palette", "blend"):
                 val = round(float(val), 2)
             lyr[key] = val
+        if key == "image" and val and not Path(str(val)).exists():
+            return   # typed half a path: wait
         if key in ("name", "kind", "palette"):
             i = self.sel
             self.fill_list()

@@ -5,7 +5,7 @@ once per view, or place it on one and copy to all (left-facing views mirror). Pr
 effects composited; Save writes ``attachments`` into the sprite set's JSON and renders each effect's sheet into the
 effects folder, where the Godot add-on (PFFx.spawn_attachments) picks them up.
 
-Attachment: {"name", "kind", "palette", "scale", "glow", "fx": "<sheet name>", "views": {view: [ox, oy]}}
+Attachment: {"name", "kind", "palette", "scale", "glow", "z": "front" | "behind", "fx": "<sheet name>", "views": {view: [ox, oy]}}
 with (ox, oy) in sprite pixels from the entity's ground point (the same origin as the frames' dx, dy).
 """
 from __future__ import annotations
@@ -155,6 +155,8 @@ class FxEditor:
         ttk.Scale(left, from_=0.15, to=2.0, variable=self.scale, orient="horizontal", length=120, command=lambda _v: self.apply_props()).pack(anchor="w")
         self.glow = BooleanVar(value=True)
         ttk.Checkbutton(left, text="Glow", variable=self.glow, command=self.apply_props).pack(anchor="w", pady=4)
+        self.behind = BooleanVar(value=False)
+        ttk.Checkbutton(left, text="Behind the body", variable=self.behind, command=self.apply_props).pack(anchor="w")
         self.palette.trace_add("write", lambda *_: self.apply_props())
         self.info = ttk.Label(left, text="", foreground="#888", wraplength=150)
         self.info.pack(anchor="w", pady=8)
@@ -252,6 +254,7 @@ class FxEditor:
                     self.palette.set(att.get("palette", "lantern"))
                     self.scale.set(att.get("scale", 1.0))
                     self.glow.set(bool(att.get("glow", True)))
+                    self.behind.set(att.get("z") == "behind")
                     self.draw()
                     return
         self.sel = None
@@ -274,6 +277,7 @@ class FxEditor:
         att["palette"] = self.palette.get()
         att["scale"] = round(float(self.scale.get()), 2)
         att["glow"] = bool(self.glow.get())
+        att["z"] = "behind" if self.behind.get() else "front"
         att["fx"] = f"{self.s['data']['meta'].get('kind', 'sprite')}_{att['name']}_{att['palette']}{'_glow' if att['glow'] else ''}"
         self.draw()
 

@@ -464,6 +464,13 @@ def cmd_game_preview(a) -> None:
                              shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, log=print))
 
 
+def cmd_effect(a) -> None:
+    from .effect_art import make_effect
+
+    _emit(a, make_effect(a.image, a.name, a.out, kind=a.kind, preset=a.preset, frames=a.frames, fps=a.fps, width=a.width, rotations=a.rotations,
+                         seed=a.seed, gif=not a.no_gif, tolerance=a.tolerance, atlas_dir=a.atlas))
+
+
 def cmd_spell(a) -> None:
     from . import spell
 
@@ -769,6 +776,14 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--shot", default=None, help="save a screenshot here after --shot-t seconds and quit"); s.add_argument("--shot-t", dest="shot_t", type=float, default=4.0)
     s.add_argument("--hour", type=float, default=None); s.add_argument("--wait", action="store_true"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_game_preview)
+
+    s = sub.add_parser("effect", help="painted spell / missile art (Midjourney, on black) -> an animated game effect in the vfx layout")
+    s.add_argument("image"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/fx")
+    s.add_argument("--kind", choices=["missile", "loop", "burst", "frames"], default="loop", help="missile: spins + sheds chips; loop: breathes/flickers; burst: one-shot grow + dissolve; frames: a painted strip of key frames")
+    s.add_argument("--preset", default="glow", help="loop motion: glow | flame | hover | idle | cloak | grass"); s.add_argument("--frames", type=int, default=8); s.add_argument("--fps", type=float, default=10.0)
+    s.add_argument("--width", type=int, default=None, help="game pixels across (default: the painting's own size)"); s.add_argument("--rotations", type=int, default=0, help="missiles: N headings")
+    s.add_argument("--seed", type=int, default=1); s.add_argument("--tolerance", type=float, default=0.1); s.add_argument("--no-gif", action="store_true"); s.add_argument("--atlas", default=None); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_effect)
 
     s = sub.add_parser("spell", help="spell designer: layered effects (fire + burst + embers...) -> strip + json (+ gif, atlas)")
     s.add_argument("action", choices=["new", "render", "presets"]); s.add_argument("name", nargs="?", default="fireball", help="new: the spell's name; render: a .spell.json")

@@ -25,6 +25,8 @@ game); every piece is generic except one exporter.
 | Describe it, get it: plain words -> a spell, a skin edit, a prompt or a music cue | `pixelforge describe` | Describe it… |
 | Preview in game: the set, its attached effects or any effect on the hero in Godot | `pixelforge game-preview` | step 9 / Tools |
 | Skin editor: paint-program toolbar (recolour, brush, glow, erase, restore, regions); every stroke replayable by an AI | Studio steps 3 and 9, `pixelforge skin` | Tools |
+| Painted effects: Midjourney spell / missile art -> animated game effects | `pixelforge effect` | Tools |
+| Bone armour / shard auras orbiting a character, in front and behind | spell presets | Tools |
 | Missiles (bone spear, teeth, ice bolt, fire bolt) with rotation sheets | `pixelforge vfx <kind> --rotations 16` | Tools |
 | Spell designer: layered effects with live preview | `pixelforge spell` | Tools |
 | Colour editor: pick a colour, give it a new one, shading kept | Studio steps 3 and 9 | Tools |
@@ -58,7 +60,7 @@ packs them into Godot SpriteFrames or the game's atlas with foot anchors.
 
 `pixelforge/api.py` is the pipeline (one function per step). `gui.py` (Studio), `cli.py`, `mcp_server.py` wrap it.
 Image maths: `grid.py`, `palette.py`, `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`, `transform.py`,
-`sheet.py`, `model_spec.py`. Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`, `music.py`, `color_editor.py`, `skin_ops.py`, `skin_editor.py`, `fx_editor.py`, `spell.py`, `spell_designer.py`, `describe.py`, `game_preview.py`, `checks.py`,
+`sheet.py`, `model_spec.py`. Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`, `music.py`, `color_editor.py`, `skin_ops.py`, `skin_editor.py`, `fx_editor.py`, `spell.py`, `spell_designer.py`, `effect_art.py`, `describe.py`, `game_preview.py`, `checks.py`,
 `recolor.py`, `compare.py`, `skilltree.py`, `doctor.py`. Blender-side: `pixelforge/blender/` (no Pillow there).
 Godot-side: `godot_addon/pixelforge/` (`PFSpriteSet`, `PFFx`, `PFObjects`). Docs: `docs/GUIDE_HUMANS.md`,
 `docs/GUIDE_AI.md`, `docs/DESIGN.md`, `docs/TOOL_IDEAS.md`. Tests: `pytest`.

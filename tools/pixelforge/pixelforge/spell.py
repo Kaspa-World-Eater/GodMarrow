@@ -20,7 +20,7 @@ from PIL import Image
 
 from . import vfx
 
-LAYER_DEFAULTS = {"kind": "fire", "palette": "lantern", "scale": 1.0, "x": 0, "y": 0, "rotation": 0.0, "start": 0, "speed": 1.0,
+LAYER_DEFAULTS = {"kind": "fire", "image": "", "palette": "lantern", "scale": 1.0, "x": 0, "y": 0, "rotation": 0.0, "start": 0, "speed": 1.0,
                   "opacity": 1.0, "blend": "normal", "glow": None, "seed": 1, "flip": False, "loop": True, "name": ""}
 
 PRESETS = {
@@ -55,6 +55,15 @@ PRESETS = {
                                 {"name": "bone", "kind": "bone_burst", "palette": "bone", "scale": 1.1},
                                 {"name": "blood", "kind": "shards", "palette": "blood", "scale": 1.2, "opacity": 0.9},
                                 {"name": "miasma", "kind": "cloud", "palette": "miasma", "scale": 1.0, "start": 2, "opacity": 0.6}]},
+    "bone_armor": {"size": [112, 64], "frames": 16, "fps": 12, "loop": True, "anchor": [56, 32],
+                   "layers": [{"name": "back", "kind": "bone_armor_back", "palette": "bone", "opacity": 0.85},
+                              {"name": "front", "kind": "bone_armor_front", "palette": "bone"}],
+                   "attach": {"back": "behind", "front": "front"}},
+    "bone_shard_aura": {"size": [112, 64], "frames": 16, "fps": 12, "loop": True, "anchor": [56, 32],
+                        "layers": [{"name": "back", "kind": "bone_shard_aura_back", "palette": "iron", "opacity": 0.85},
+                                   {"name": "front", "kind": "bone_shard_aura_front", "palette": "iron"},
+                                   {"name": "glints", "kind": "wisp", "palette": "wisp", "scale": 0.5, "y": -14, "opacity": 0.6, "blend": "add"}],
+                        "attach": {"back": "behind", "front": "front"}},
     "lightning_strike": {"size": [64, 128], "frames": 8, "fps": 16, "loop": False, "anchor": [32, 124],
                          "layers": [{"name": "bolt", "kind": "lightning", "palette": "silver", "scale": 1.0},
                                     {"name": "impact", "kind": "burst", "palette": "silver", "scale": 0.8, "y": 44, "start": 2, "blend": "add"},
@@ -88,6 +97,19 @@ def render_kind(kind: str, w: int, h: int, frames: int, palette, seed: int = 1, 
     return [vfx.paint(i, a, lut, hl) for i, a, hl in gen]
 
 
+def load_image_frames(path: str | Path) -> list[np.ndarray]:
+    """A layer from a painted or exported effect: a <name>.json next to its strip (the vfx layout), or a plain PNG."""
+    p = Path(path)
+    if not p.exists():
+        raise FileNotFoundError(f"image layer not found: {p}")
+    if p.suffix == ".json":
+        meta = json.loads(p.read_text())
+        strip = np.array(Image.open(p.with_suffix(".png")).convert("RGBA"))
+        fw, fh = int(meta["frame_width"]), int(meta.get("frame_height", meta["size"][1]))
+        return [strip[0:fh, i * fw:(i + 1) * fw] for i in range(int(meta["frames"]))]
+    return [np.array(Image.open(p).convert("RGBA"))]
+
+
 def _blend(base: Image.Image, layer: Image.Image, mode: str, opacity: float) -> Image.Image:
     if opacity < 1.0:
         a = layer.split()[3].point(lambda v: int(v * opacity))
@@ -115,10 +137,13 @@ def render_spell(spell: dict) -> list[np.ndarray]:
             lyr = {**LAYER_DEFAULTS, **lyr}
             if lyr.get("hidden"):
                 continue
-            key = (lyr["kind"], str(lyr["palette"]), lyr["seed"], lyr["glow"], n)
+            key = (lyr["kind"], str(lyr["palette"]), lyr["seed"], lyr["glow"], n, lyr.get("image", ""))
             if key not in cache:
-                w, h = vfx.DEFAULT_SIZE.get(lyr["kind"], (48, 48))
-                cache[key] = render_kind(lyr["kind"], w, h, n, lyr["palette"], int(lyr["seed"]), lyr["glow"])
+                if lyr["kind"] == "image":
+                    cache[key] = load_image_frames(lyr.get("image", ""))
+                else:
+                    w, h = vfx.DEFAULT_SIZE.get(lyr["kind"], (48, 48))
+                    cache[key] = render_kind(lyr["kind"], w, h, n, lyr["palette"], int(lyr["seed"]), lyr["glow"])
             seq = cache[key]
             local = (t - int(lyr["start"])) * float(lyr["speed"])
             if local < 0:

@@ -231,7 +231,8 @@ def make_vfx(
     if kind not in KINDS:
         raise ValueError(f"kind must be one of {KINDS}")
     if palette is None:
-        palette = MISSILES[kind]["palette"] if kind in MISSILES else "lantern"
+        base = kind.rsplit("_", 1)[0] if kind.endswith(("_front", "_back")) else kind
+        palette = MISSILES[kind]["palette"] if kind in MISSILES else (ORBITS[base]["palette"] if base in ORBITS else "lantern")
     colors = PRESETS[palette] if isinstance(palette, str) else list(palette)
     w, h = size or DEFAULT_SIZE[kind]
     rng = np.random.default_rng(seed)
@@ -809,14 +810,15 @@ def _spindle(xs, ys, x0, x1, cy, rmax, bright_front=0.35, head=0.72, jag=None, s
     return body * (1 - bright_front + bright_front * u), u
 
 
-def _shard(inten, xs, ys, px, py, length, angle, depth_shade):
-    """A small sliver of bone / ice at px, py, turned by angle."""
+def _shard(inten, xs, ys, px, py, length, angle, depth_shade, width: float = 1.3):
+    """A sliver (or, with ``width``, a chunk) of bone / ice at px, py, turned by angle, lit along its top edge."""
     ca, sa = math.cos(angle), math.sin(angle)
     dx, dy = xs - px, ys - py
     along = dx * ca + dy * sa
     across = -dx * sa + dy * ca
-    sliver = np.clip(1 - np.abs(along) / length, 0, 1) * np.clip(1 - np.abs(across) / 1.3, 0, 1)
-    np.maximum(inten, sliver * depth_shade, out=inten)
+    body = np.clip(1 - np.abs(along) / length, 0, 1) ** 0.5 * np.clip((width - np.abs(across)) / 1.0 + 0.5, 0, 1)
+    lit = 0.75 + 0.25 * np.clip(1 - (across + width * 0.5) ** 2 / max(width * width, 1e-6), 0, 1)
+    np.maximum(inten, body * lit * depth_shade, out=inten)
 
 
 def gen_missile(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = True, spec: dict | None = None) -> list:
@@ -973,3 +975,59 @@ DEFAULT_SIZE.update({"nova": (128, 72), "firewall": (128, 64), "bone_burst": (64
 LOOPING |= {"firewall"}
 GLOW_KINDS |= {"nova", "firewall", "bone_burst"}
 KINDS = KINDS + ("nova", "firewall", "bone_burst")
+
+
+# ---------------------------------------------------------------- orbits: bone armour, shard auras
+# Fragments circling a figure at chest height. Rendered as two kinds from one motion: ``orbit_front`` is the half of
+# the ring nearer the camera (attach in front of the character) and ``orbit_back`` the far half (attach behind), so
+# the pieces pass in front of and behind the body. Both loop with the same period.
+ORBITS = {
+    "bone_armor": {"palette": "bone", "n": 9, "rx": 0.42, "ry": 0.16, "len": 7.0, "width": 3.2, "spin": 1.0, "tumble": 2.0, "glow": True, "wisps": 0},
+    "bone_shard_aura": {"palette": "bone", "n": 14, "rx": 0.46, "ry": 0.2, "len": 5.5, "width": 2.4, "spin": -0.6, "tumble": 3.0, "glow": True, "wisps": 5},
+}
+
+
+def gen_orbit(w: int, h: int, frames: int, rng: np.random.Generator, glow: bool = True, spec: dict | None = None, half: str = "front") -> list:
+    spec = {**ORBITS["bone_armor"], **(spec or {})}
+    xs, ys = _grid(w, h)
+    cx, cy = w / 2, h / 2
+    n = int(spec["n"])
+    ph = rng.random((n, 3)).astype(np.float32)
+    out = []
+    for i in range(frames):
+        t = i / frames
+        inten = np.zeros((h, w), dtype=np.float32)
+        for j in range(n):
+            a = 2 * math.pi * (j / n + spec["spin"] * t)
+            depth = math.sin(a)             # +1 nearest the camera (bottom of the ellipse on screen)
+            if (half == "front") != (depth >= 0):
+                continue
+            px = cx + math.cos(a) * w * spec["rx"]
+            py = cy + math.sin(a) * h * spec["ry"] * 2
+            tilt = 2 * math.pi * (ph[j, 0] + spec["tumble"] * t * (0.6 + 0.8 * ph[j, 1]))
+            shade = 0.7 + 0.3 * (0.5 + 0.5 * depth)
+            _shard(inten, xs, ys, px, py, spec["len"] * (0.8 + 0.5 * ph[j, 2]), tilt, shade, width=spec.get("width", 1.3) * (0.8 + 0.4 * ph[j, 1]))
+        for k in range(int(spec["wisps"])):
+            a = 2 * math.pi * (k / max(spec["wisps"], 1) - 0.4 * spec["spin"] * t + 0.13)
+            depth = math.sin(a)
+            if (half == "front") != (depth >= 0):
+                continue
+            px = cx + math.cos(a) * w * spec["rx"] * 0.8
+            py = cy + math.sin(a) * h * spec["ry"] * 1.6 - h * 0.08
+            d = np.hypot(xs - px, (ys - py) * 1.3)
+            inten = np.maximum(inten, np.clip(1 - d / 3.0, 0, 1) * 0.8)
+        alpha = (inten > 0.3).astype(np.float32)
+        halo = _blur(np.clip(inten, 0, 1), 2) * 0.7 if glow else None
+        out.append((np.clip(inten * 1.2, 0, 1), alpha, halo))
+    return out
+
+
+for _name, _spec in ORBITS.items():
+    for _half in ("front", "back"):
+        GENERATORS[f"{_name}_{_half}"] = (lambda w, h, frames, rng, glow, _s=_spec, _h=_half: gen_orbit(w, h, frames, rng, glow=glow, spec=_s, half=_h))
+        DEFAULT_SIZE[f"{_name}_{_half}"] = (112, 64)
+        LOOPING.add(f"{_name}_{_half}")
+        if _spec["glow"]:
+            GLOW_KINDS.add(f"{_name}_{_half}")
+        KINDS = KINDS + (f"{_name}_{_half}",)
+PRESETS.setdefault("iron", ["#0f1012", "#2b2d33", "#4c5059", "#7d8290", "#b7bcc6"])

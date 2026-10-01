@@ -158,6 +158,13 @@ def build_server():
         return _p(game_dir or None, skin=skin or None, fx=fx.split(",") if fx else None, attach=attach, shot=shot or None, zone=zone)
 
     @mcp.tool()
+    def make_effect_from_art(image: str, name: str, out_dir: str, kind: str = "loop", preset: str = "glow", frames: int = 8, width: int = 0, rotations: int = 0) -> dict:
+        """A painted effect (on black) -> animated game effect. kind: missile (spins, sheds chips; use rotations=16) | loop (preset glow|flame|hover) |
+        burst (one-shot grow + dissolve) | frames (a painted strip of key frames). Writes the vfx layout the add-on and the spell designer load."""
+        from .effect_art import make_effect
+        return make_effect(image, name, out_dir, kind=kind, preset=preset, frames=frames, width=width or None, rotations=rotations)
+
+    @mcp.tool()
     def make_spell(name: str, out_dir: str, preset: str = "fireball", layers_json: str = "", gif: bool = True) -> dict:
         """A layered spell effect -> strip + json (+ gif). preset: fireball | ward | soul_drain | bone_shatter | lightning_strike.
         layers_json: optional JSON list of layers [{kind, palette, scale, x, y, rotation, start, speed, opacity, blend, seed}] replacing the preset's."""

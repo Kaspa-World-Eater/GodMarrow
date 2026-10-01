@@ -55,6 +55,16 @@ WORLD_KINDS: list[WorldKind] = [
               "reference sheet of {description}, two views side by side: top-down plan view seen directly from above, and bottom-up view "
               "seen directly from below, same object in both views, orthographic, " + LIGHT_FLAT + ", " + STYLE + " --ar 2:1 --style raw {sref} " + NEG,
               "pixelforge object sheet.png <name> --height <metres> --top plan.png [--canopy]"),
+    WorldKind("missile", "Missile / projectile art (one painted missile, flying right, on black)",
+              "Paint it pointing right. The Forge spins it, sheds chips behind it and turns it to 16 headings.",
+              "{description}, a single magical projectile seen exactly from the side, flying to the right, horizontal, centered, pure black background, "
+              "soft glow at the edges, " + STYLE.replace(", no glow", "") + " --ar 2:1 --style raw {sref} --no text, watermark, frame, border, scenery, people, characters, hands",
+              "pixelforge effect missile.png <name> --kind missile --rotations 16"),
+    WorldKind("spell_frames", "Spell key frames (a strip of 4-6 frames of one effect, on black)",
+              "One effect at four to six moments, side by side, same size, so the Forge can loop them.",
+              "animation sprite sheet of {description}, 5 frames side by side in one row, the same effect at successive moments of its motion, "
+              "same size and position in every frame, pure black background, " + STYLE.replace(", no glow", "") + " --ar 5:1 --style raw {sref} --no text, watermark, frame, border, scenery, people, characters",
+              "pixelforge effect frames.png <name> --kind frames"),
     WorldKind("ground", "Ground texture (grass, mud, ash, stone flags, bone field, shallow water)",
               "Seamless, top-down. The Forge cuts the iso diamonds and the edges between two materials.",
               "seamless tileable top-down texture of {description}, flat even lighting, no shadows, no objects, fills the whole frame edge to edge, "

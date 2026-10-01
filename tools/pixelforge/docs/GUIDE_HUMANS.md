@@ -98,6 +98,19 @@ with the edit_skin tool, and the same operations run from the command line (`pix
 
 **A-pose or T-pose?** Either works. The prompts ask for an A-pose (arms a little away from the body) because Midjourney paints shoulders and sleeves more naturally that way and the carve separates the arms fine. Copy **A4** gives a T-pose sheet when a character's arms keep merging with the body; the skeleton fits both.
 
+**Painted effects (Midjourney spell and missile art).** Paint the effect in Midjourney with the `missile`, `effect` or
+`spell_frames` world prompt (one shape on black), then Tools > Painted effect: a missile spins, sheds chips of its own
+colours and gets 16 headings; a single frame becomes a breathing or flickering loop or a one-shot that grows and
+dissolves; a strip of key frames loops as painted. The result is a game effect like any other: attach it to a
+character, play it in the game, or put it in the spell designer as an `image` layer under generated embers and glow.
+
+**Bone armour and auras.** Orbiting fragments round a character, in two halves: the half nearer the camera attaches in
+front of the body and the far half behind it (the effects editor has a "Behind the body" tick), so the pieces pass
+round the figure. Presets `bone_armor` and `bone_shard_aura` in the spell designer; new ones are a row of numbers.
+
+**Layers in the skin editor.** The Layers panel adds, hides, reorders and merges layers; every stroke lands on the
+selected layer and Save flattens the visible ones into the file. The ops list records which layer each stroke went on.
+
 **Missiles.** The Effects tool has structured projectiles: bone spear, teeth, ice bolt, fire bolt. They are built like the classic action-RPG missiles (a spinning spear body, chips of bone flying round it, a trail, a glow) and every pixel is generated. Set "rotations" to 16 or 32 to get a sheet with the spear facing every direction, which the game picks from by heading; new missiles are a few numbers in a table.
 
 **Spell designer** (Tools > Spell designer): a spell is layers of effects. Start from a preset (fireball, ward, soul drain, bone shatter, lightning strike, bone spear hit, frost nova, fire wall,
