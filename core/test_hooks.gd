@@ -15,6 +15,8 @@ extends RefCounted
 ##   --attach                 spawn the effects the Forge's effects editor attached to the pilgrim's sprite set
 ##   --shot=PATH [--shot_t=S] [--shot_n=N]   save the screen to PATH after S seconds (default 4), N frames 0.25 s apart
 ##                            (PATH_1.png ...), then quit. Needs a window (not --headless). --hour=0..1 sets the hour.
+##   --hide=dark,atmos,sky,fore   switch those overlays off (the dark and light map, the air, the weather, the near dark),
+##                            to judge a sprite or an effect in its plain paint
 
 const PANELS := ["choir", "golem", "char", "skills", "inv", "journal", "board"]
 const SIGIL_KINDS := ["open", "fewer", "weigh", "stair"]
@@ -27,6 +29,18 @@ static func run(g) -> void:
 		_demo(g)
 	if a.has("panel"):
 		await g.get_tree().create_timer(1.0).timeout
+	if a.has("hide"):
+		for n in String(a["hide"]).split(","):
+			var layer = g.get(n.strip_edges())
+			if layer is CanvasLayer:
+				layer.visible = false
+	if a.has("nolm") and g.dark != null:   # the dark without its light map (the web's older look), for lighting checks
+		g.dark.mat.set_shader_parameter("lm_on", false)
+	if a.has("darkflat") and g.dark != null:   # the dark as a plain veil, no shader: tells a shader fault from a draw-order one
+		g.dark.rect.material = null
+		g.dark.rect.color = Color(0, 0, 0, 0.35)
+	if a.has("nolamp") and g.hero != null and g.hero.lamp != null:
+		g.hero.lamp.enabled = false
 	if a.has("fx") or a.has("attach"):
 		_forge_preview(g, a)
 	if a.has("lvl"):
