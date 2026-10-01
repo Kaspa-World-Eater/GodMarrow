@@ -6,10 +6,18 @@
         {"op": "paint", "at": [100, 300], "color": "#2a2630", "radius": 4},                 # a brush dab
         {"op": "erase", "region": "stray_bit"}, {"op": "restore", "at": [50, 50], "radius": 6},
         {"op": "region", "name": "eye_left", "polygon": [[210, 45], [232, 45], [232, 60], [210, 60]]},
+        {"op": "region", "name": "eye_left", "mode": "add", "like": {"at": [214, 50], "range": 0.1}},   # Shift+click: add the patch of that colour
+        {"op": "region", "name": "eye_left", "mode": "subtract", "polygon": [[220, 50], [224, 50], [224, 54], [220, 54]]},
+        {"op": "clone", "from": [120, 200], "to": [160, 200], "radius": 8, "path": [[160, 200], [164, 203], [168, 206]]},  # the clone brush
     ])
 
-Regions are named polygons kept in <image>.regions.json so later ops (and people) can target "the left eye" by name.
-Every op keeps shading where that makes sense (recolor is an OKLab offset; glow lifts lightness with a soft falloff).
+Regions are named selections kept in <image>.regions.json so later ops (and people) can target "the left eye" by name.
+A region is built the way a person builds a selection: polygons (lasso) and "like" patches (magic wand: the pixels of
+one colour round a point), added with mode "add" (Shift+click in the editor) or taken away with mode "subtract"
+(Alt+click); a plain polygon with no mode starts the region over. "clone" is the clone brush: it paints pixels copied
+from an offset elsewhere in the picture (Alt+click sets the source, then paint), so repairs use the painting's own
+colours. Every op keeps shading where that makes sense (recolor is an OKLab offset; glow lifts lightness with a soft
+falloff).
 """
 from __future__ import annotations
 
@@ -23,7 +31,7 @@ from PIL import Image, ImageDraw
 from .color import oklab_to_rgb, rgb_to_oklab
 from .color_editor import select_like, shift_colors
 
-OPS = ("recolor", "glow", "paint", "erase", "restore", "region", "lightness", "smooth")
+OPS = ("recolor", "glow", "paint", "erase", "restore", "region", "lightness", "smooth", "clone")
 
 
 def _hex(c) -> np.ndarray:
@@ -60,16 +68,49 @@ def region_mask(shape, polygon) -> np.ndarray:
     return np.asarray(im) > 0
 
 
+def _like_mask(rgba: np.ndarray, like: dict) -> np.ndarray:
+    """The magic wand: the pixels whose colour is like the one at `at` (OKLab distance `range`), the connected patch
+    when `radius` is 0, else everything within `radius` of the point."""
+    lab = rgb_to_oklab(rgba[..., :3]).astype(np.float32)
+    x, y = int(like["at"][0]), int(like["at"][1])
+    return select_like(lab, rgba[..., 3], lab[y, x], float(like.get("range", 0.1)), (x, y), int(like.get("radius", 0)))
+
+
+def _piece_mask(rgba: np.ndarray, piece) -> np.ndarray:
+    """One piece of a selection: a polygon (a list of points, or {"polygon": [...]}) or a magic-wand patch ({"like": {...}})."""
+    h, w = rgba.shape[:2]
+    if isinstance(piece, dict):
+        if "like" in piece:
+            return _like_mask(rgba, piece["like"])
+        return region_mask((h, w), piece["polygon"])
+    return region_mask((h, w), piece)
+
+
+def resolve_region(rgba: np.ndarray, spec) -> np.ndarray:
+    """A region's pixels. `spec` is a polygon (the old form) or {"add": [pieces], "subtract": [pieces]}: every added
+    piece, less every subtracted one, in the order the dict keeps (add first, then subtract)."""
+    if isinstance(spec, dict):
+        m = np.zeros(rgba.shape[:2], bool)
+        for piece in spec.get("add", []):
+            m |= _piece_mask(rgba, piece)
+        for piece in spec.get("subtract", []):
+            m &= ~_piece_mask(rgba, piece)
+        return m
+    return region_mask(rgba.shape[:2], spec)
+
+
 def _target(rgba: np.ndarray, op: dict, regions: dict) -> np.ndarray:
-    """The pixels an op works on: a region by name, a polygon, or a disc round a point; always only opaque pixels."""
+    """The pixels an op works on: a region by name, a polygon, a magic-wand patch, or a disc round a point; always only opaque pixels."""
     h, w = rgba.shape[:2]
     if "region" in op:
-        poly = regions.get(op["region"])
-        if poly is None:
+        spec = regions.get(op["region"])
+        if spec is None:
             raise ValueError(f"no region named {op['region']!r}; known: {sorted(regions)}")
-        m = region_mask((h, w), poly)
+        m = resolve_region(rgba, spec)
     elif "polygon" in op:
         m = region_mask((h, w), op["polygon"])
+    elif "like" in op:
+        m = _like_mask(rgba, op["like"])
     elif "at" in op:
         m = _disc((h, w), op["at"], float(op.get("radius", 6)))
     else:
@@ -82,7 +123,41 @@ def apply_op(rgba: np.ndarray, op: dict, regions: dict, raw: np.ndarray | None =
     out = rgba.copy()
     h, w = rgba.shape[:2]
     if kind == "region":
-        regions[op["name"]] = [list(map(int, p)) for p in op["polygon"]]
+        piece = {"like": dict(op["like"])} if "like" in op else {"polygon": [list(map(int, p)) for p in op["polygon"]]}
+        mode = op.get("mode", "replace")
+        if mode == "replace" or op["name"] not in regions:
+            regions[op["name"]] = {"add": [piece], "subtract": []}
+            return out
+        spec = regions[op["name"]]
+        if not isinstance(spec, dict):   # an old plain polygon becomes the first added piece
+            spec = {"add": [{"polygon": spec}], "subtract": []}
+        spec.setdefault("add", []).append(piece) if mode == "add" else spec.setdefault("subtract", []).append(piece)
+        regions[op["name"]] = spec
+        return out
+    if kind == "clone":
+        # the clone brush: pixels copied from `from` to `to` (the offset holds along the stroke, as a clone stamp does),
+        # sampled from the picture as it was before the stroke, only where the source is painted
+        fx, fy = float(op["from"][0]), float(op["from"][1])
+        tx, ty = float(op["to"][0]), float(op["to"][1])
+        dx, dy = int(round(fx - tx)), int(round(fy - ty))
+        r = float(op.get("radius", 6))
+        a = float(op.get("opacity", 1.0))
+        soft = bool(op.get("soft", True))
+        src = rgba
+        for px, py in op.get("path") or [[tx, ty]]:
+            m = _disc((h, w), (px, py), r)
+            ys, xs = np.nonzero(m)
+            sy, sx = ys + dy, xs + dx
+            ok = (sy >= 0) & (sy < h) & (sx >= 0) & (sx < w)
+            ys, xs, sy, sx = ys[ok], xs[ok], sy[ok], sx[ok]
+            ok = src[sy, sx, 3] > 0
+            ys, xs, sy, sx = ys[ok], xs[ok], sy[ok], sx[ok]
+            if ys.size == 0:
+                continue
+            wgt = (_falloff((h, w), (px, py), r)[ys, xs] if soft else np.ones(ys.size, np.float32)) * a
+            wgt = np.where(out[ys, xs, 3] == 0, 1.0, wgt)   # over bare canvas the copy lands whole
+            out[ys, xs, :3] = (out[ys, xs, :3] * (1 - wgt[:, None]) + src[sy, sx, :3] * wgt[:, None] + 0.5).astype(np.uint8)
+            out[ys, xs, 3] = np.maximum(out[ys, xs, 3], (src[sy, sx, 3] * np.clip(wgt * 2, 0, 1)).astype(np.uint8))
         return out
     if kind == "recolor":
         lab = rgb_to_oklab(rgba[..., :3]).astype(np.float32)
@@ -130,7 +205,7 @@ def apply_op(rgba: np.ndarray, op: dict, regions: dict, raw: np.ndarray | None =
     if kind == "restore":
         if raw is None:
             raise ValueError("restore needs the raw crop (<image>_raw.png) next to the image")
-        m = _disc((h, w), op["at"], float(op.get("radius", 6))) if "at" in op else region_mask((h, w), regions[op["region"]] if "region" in op else op["polygon"])
+        m = _disc((h, w), op["at"], float(op.get("radius", 6))) if "at" in op else (resolve_region(rgba, regions[op["region"]]) if "region" in op else region_mask((h, w), op["polygon"]))
         out[..., :3][m] = raw[..., :3][m]
         out[..., 3][m] = 255
         return out

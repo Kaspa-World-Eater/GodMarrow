@@ -115,6 +115,12 @@ character, play it in the game, or put it in the spell designer as an `image` la
 front of the body and the far half behind it (the effects editor has a "Behind the body" tick), so the pieces pass
 round the figure. Presets `bone_armor` and `bone_shard_aura` in the spell designer; new ones are a row of numbers.
 
+**Selections and the clone brush.** A selection is built the way you would expect: the magic wand picks the patch of one
+colour you click, **Shift+click** adds another patch or lasso to it, **Alt+click** takes one away, and a plain click starts
+over. Name it and every later edit (recolour, glow, erase, lightness) can target it by name. The **clone brush** repairs a
+spot with the painting's own pixels: Alt+click the place to copy from, then paint where it should go; the offset holds
+along the stroke, as a clone stamp does, and nothing is ever copied from bare background.
+
 **Layers in the skin editor.** The Layers panel adds, hides, reorders and merges layers; every stroke lands on the
 selected layer and Save flattens the visible ones into the file. The ops list records which layer each stroke went on.
 

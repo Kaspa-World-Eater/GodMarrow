@@ -451,3 +451,43 @@ def test_painted_effects_orbits_image_layers_and_skin_layers(tmp_path):
     assert tuple(out[1, 1, :3]) == (255, 0, 0) and tuple(out[0, 0, :3]) == (10, 20, 30)
     top["visible"] = False
     assert tuple(SkinEditor.composite([base, top])[1, 1, :3]) == (10, 20, 30)
+
+
+def test_skin_ops_selection_modes_and_clone_brush(tmp_path):
+    """Selections build like a person's: add a wand patch with Shift, take a polygon away with Alt; the clone brush
+    copies the picture's own pixels along a stroke."""
+    import numpy as np
+    from PIL import Image
+
+    from pixelforge import skin_ops
+
+    rgba = np.zeros((40, 40, 4), np.uint8)
+    rgba[5:35, 5:35] = (60, 50, 70, 255)        # the body
+    rgba[10:16, 10:16, :3] = (200, 40, 40)      # a red patch (the wand's target)
+    rgba[20:30, 20:30, :3] = (40, 180, 160)     # a teal patch to clone from
+    p = tmp_path / "front.png"
+    Image.fromarray(rgba).save(p)
+    ops = [
+        {"op": "region", "name": "sel", "polygon": [[5, 5], [8, 5], [8, 8], [5, 8]]},
+        {"op": "region", "name": "sel", "mode": "add", "like": {"at": [12, 12], "range": 0.1}},
+        {"op": "region", "name": "sel", "mode": "subtract", "polygon": [[10, 10], [12, 10], [12, 12], [10, 12]]},
+        {"op": "paint", "region": "sel", "color": "#ffffff"},
+    ]
+    skin_ops.apply_ops(p, ops)
+    out = np.array(Image.open(p).convert("RGBA"))
+    assert tuple(out[6, 6, :3]) == (255, 255, 255)        # the first polygon
+    assert tuple(out[14, 14, :3]) == (255, 255, 255)      # the wand patch was added
+    assert tuple(out[11, 11, :3]) == (200, 40, 40)        # ...less the subtracted corner
+    assert tuple(out[25, 25, :3]) == (40, 180, 160)       # nothing else touched
+    regions = skin_ops.load_regions(p)
+    assert len(regions["sel"]["add"]) == 2 and len(regions["sel"]["subtract"]) == 1
+    # the clone brush: a stroke at the top-left copies the teal patch there (offset kept along the stroke)
+    skin_ops.apply_ops(p, [{"op": "clone", "from": [25, 25], "to": [6, 25], "radius": 2, "soft": False, "path": [[6, 25], [7, 25], [8, 25]]}])
+    out2 = np.array(Image.open(p).convert("RGBA"))
+    assert tuple(out2[25, 7, :3]) == (40, 180, 160) and out2[25, 7, 3] == 255
+    assert tuple(out2[25, 15, :3]) == (60, 50, 70)        # outside the stroke unchanged
+    # the clone never paints from bare canvas: cloning from outside the body leaves the target as it was
+    before = out2.copy()
+    skin_ops.apply_ops(p, [{"op": "clone", "from": [1, 1], "to": [30, 30], "radius": 2}])
+    out3 = np.array(Image.open(p).convert("RGBA"))
+    assert np.array_equal(out3, before)
