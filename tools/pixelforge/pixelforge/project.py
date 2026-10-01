@@ -31,15 +31,15 @@ PROJECT_FILE = "project.json"
 SOURCE_KINDS = ("sheet", "front", "back", "side", "quarter", "style")
 DIRECTIONS_8 = ["S", "SW", "W", "NW", "N", "NE", "E", "SE"]
 STEPS = [
-    ("prompts", "Write the Midjourney prompts"),
-    ("import", "Import the images"),
-    ("split", "Split the sheet into views and cut out the background"),
-    ("palette", "Lock the color palette"),
-    ("model", "Build the 3D model (Blender)"),
-    ("rig", "Rig + animate (automatic; Mixamo optional)"),
-    ("render", "Render every animation from 8 directions (Blender)"),
-    ("pixelate", "Turn the renders into pixel art"),
-    ("export", "Export sprite sheets + Godot files"),
+    ("prompts", "Get the Midjourney prompts"),
+    ("import", "Bring the pictures in"),
+    ("split", "Cut the figures out"),
+    ("palette", "Lock the colours"),
+    ("model", "Build the 3D figure (Blender)"),
+    ("rig", "Skeleton and moves (automatic)"),
+    ("render", "Film it from 8 directions"),
+    ("pixelate", "Turn the film into pixel art"),
+    ("export", "Make the game files"),
 ]
 
 

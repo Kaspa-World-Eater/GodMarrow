@@ -141,21 +141,27 @@ def split(project: Project, name: str, tolerance: float = 0.08, expected_views: 
     made: dict[str, str] = {}
     sheet = _source(project, c, "sheet")
     if sheet is not None:
-        views = normalize_heights(split_sheet(Image.open(sheet), tolerance=tolerance, expected=4 if expected_views == 4 else 3))
+        sheet_im = Image.open(sheet).convert("RGB")
+        views = normalize_heights(split_sheet(sheet_im, tolerance=tolerance, expected=4 if expected_views == 4 else 3))
         if not views:
-            raise StepError("no figures found on the sheet; is the background plain?")
+            raise StepError("no figures found on the sheet; is the background plain (one flat colour)? Try a higher tolerance, or import the views one by one.")
         for v in views:
             out = views_dir / f"{v.name}.png"
             v.image.save(out)
             made[v.name] = str(out)
+            # the raw crop, for the manual cutout editor's Restore brush
+            sheet_im.crop(v.box).resize(v.image.size, Image.LANCZOS).save(views_dir / f"{v.name}_raw.png")
     # single views override the sheet's crops when supplied (they are higher-res)
     for kind in ("front", "back", "side", "quarter"):
         single = _source(project, c, kind)
         if single is not None:
-            rgba = cutout(Image.open(single), tolerance)
+            src = Image.open(single).convert("RGB")
+            rgba = cutout(src, tolerance)
             ys, xs = np.nonzero(rgba[..., 3])
             if len(ys):
-                rgba = rgba[ys.min() : ys.max() + 1, xs.min() : xs.max() + 1]
+                box = (int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1)
+                rgba = rgba[box[1] : box[3], box[0] : box[2]]
+                src.crop(box).save(views_dir / f"{kind}_raw.png")
             out = views_dir / f"{kind}.png"
             Image.fromarray(np.ascontiguousarray(rgba), "RGBA").save(out)
             made[kind] = str(out)
@@ -163,10 +169,37 @@ def split(project: Project, name: str, tolerance: float = 0.08, expected_views: 
         raise StepError("import a sheet or a front image first")
     if "front" not in made:
         raise StepError(f"could not identify a front view (found {sorted(made)}); import a front image")
+    c.settings["tolerance"] = float(tolerance)
     c.done["split"] = True
     c.notes["split"] = f"views: {', '.join(sorted(made))}"
     project.save()
     return {"ok": True, "character": c.name, "views": made, "next": "palette"}
+
+
+def preview_gif(project: Project, name: str, clip: str = "walk", direction: str = "S", source: str = "auto", zoom: int = 3) -> dict:
+    """A looping GIF of one clip from one direction, from the pixel frames when they exist, else the renders.
+    Written to ``previews/<clip>_<dir>.gif`` so a person can judge the motion without opening folders."""
+    from .spritesheet import save_gif
+
+    c = project.character(name)
+    roots = []
+    if source in ("auto", "frames"):
+        roots.append(project.sub(c.name, "frames"))
+    if source in ("auto", "renders"):
+        roots.append(project.sub(c.name, "renders"))
+    for root in roots:
+        d = root / f"{clip}_{direction}" if root.name == "frames" else root / clip / direction
+        files = sorted(d.glob("frame_*.png"))
+        if files:
+            out = project.sub(c.name, "previews") / f"{clip}_{direction}.gif"
+            out.parent.mkdir(parents=True, exist_ok=True)
+            fps = 10.0
+            aj = project.sub(c.name, "frames") / "animations.json"
+            if aj.exists():
+                fps = float(json.loads(aj.read_text()).get("fps", fps))
+            save_gif([Image.open(f).convert("RGBA") for f in files], out, fps=fps, zoom=zoom if root.name == "frames" else 1)
+            return {"ok": True, "gif": str(out), "frames": len(files), "source": root.name}
+    raise StepError(f"no frames for {clip} facing {direction} yet; render first")
 
 
 # ------------------------------------------------------------------- palette
@@ -179,6 +212,8 @@ def make_palette(project: Project, name: str, colors: int | None = None) -> dict
     if style_img is not None:
         sources.append(np.asarray(Image.open(style_img).convert("RGBA")))
     for v in sorted(project.sub(c.name, "views").glob("*.png")):
+        if v.stem.endswith("_raw"):
+            continue
         sources.append(np.asarray(Image.open(v).convert("RGBA")))
     if not sources:
         raise StepError("nothing to build a palette from; import a style image or run split")
@@ -203,9 +238,72 @@ WINDOWS_BLENDER_GLOBS = [
 ]
 
 
+BLENDER_VERSION = "4.2.23"   # the LTS the Forge is tested with (4.2+ and 5.x both work)
+BLENDER_DIR = Path(__file__).resolve().parent.parent / "blender_portable"
+
+
+def _blender_download_url() -> tuple[str, str]:
+    import platform
+
+    base = f"https://download.blender.org/release/Blender{BLENDER_VERSION.rsplit('.', 1)[0]}/"
+    if sys.platform.startswith("win"):
+        return base + f"blender-{BLENDER_VERSION}-windows-x64.zip", "zip"
+    if sys.platform == "darwin":
+        arch = "arm64" if platform.machine() == "arm64" else "x64"
+        return base + f"blender-{BLENDER_VERSION}-macos-{arch}.dmg", "dmg"
+    return base + f"blender-{BLENDER_VERSION}-linux-x64.tar.xz", "tar.xz"
+
+
+def download_blender(project: Project | None = None, log=None, dest: str | Path | None = None) -> dict:
+    """Fetch the portable Blender (about 380 MB, no installer) into ``blender_portable/`` next to the
+    package and point the project at it. Windows and Linux; on macOS it points at the .dmg to open."""
+    import tarfile
+    import urllib.request
+    import zipfile
+
+    url, kind = _blender_download_url()
+    dest = Path(dest) if dest else BLENDER_DIR
+    dest.mkdir(parents=True, exist_ok=True)
+    archive = dest / url.rsplit("/", 1)[-1]
+    say = log or (lambda m: None)
+    if not archive.exists():
+        say(f"Downloading Blender {BLENDER_VERSION} ({url}) ...")
+        with urllib.request.urlopen(url) as r, open(archive, "wb") as f:
+            total = int(r.headers.get("Content-Length") or 0)
+            done = 0
+            while True:
+                chunk = r.read(1 << 20)
+                if not chunk:
+                    break
+                f.write(chunk)
+                done += len(chunk)
+                if total and done % (20 << 20) < (1 << 20):
+                    say(f"  {done // (1 << 20)} / {total // (1 << 20)} MB")
+    if kind == "dmg":
+        return {"ok": False, "archive": str(archive), "message": "Open the .dmg, drag Blender to Applications, then Settings finds it."}
+    say("Unpacking ...")
+    if kind == "zip":
+        with zipfile.ZipFile(archive) as z:
+            z.extractall(dest)
+    else:
+        with tarfile.open(archive) as t:
+            t.extractall(dest)
+    exe = next(iter(sorted(dest.glob("blender-*/blender.exe")) + sorted(dest.glob("blender-*/blender"))), None)
+    if exe is None:
+        raise StepError(f"downloaded Blender but found no executable under {dest}")
+    if project is not None:
+        project.blender = str(exe)
+        project.save()
+    say(f"Blender ready: {exe}")
+    return {"ok": True, "blender": str(exe)}
+
+
 def find_blender(project: Project | None = None) -> str | None:
     if project and project.blender and Path(project.blender).exists():
         return project.blender
+    portable = sorted(BLENDER_DIR.glob("blender-*/blender.exe")) + sorted(BLENDER_DIR.glob("blender-*/blender"))
+    if portable:
+        return str(portable[-1])
     for cand in ("blender", "blender.exe"):
         found = shutil.which(cand)
         if found:
@@ -224,8 +322,9 @@ def run_blender(project: Project, script: str, args: list[str], blend: str | Non
     exe = find_blender(project)
     if exe is None:
         raise StepError(
-            "Blender was not found. Install it from blender.org, or set the path in Settings "
-            "(`pixelforge project set --blender \"C:\\...\\blender.exe\"`)."
+            "Blender was not found. In the Studio, step 5 has a 'Download Blender for me' button (380 MB, no installer); "
+            "or install it from blender.org, or set the path in Settings "
+            "(`pixelforge project set --blender \"C:\\...\\blender.exe\"`, or `pixelforge project blender-download`)."
         )
     cmd = [exe, "-b"]
     if blend:
@@ -308,6 +407,8 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
         c.notes["model_mode"] = "hull"
     c.done["model"] = True
     c.notes["model"] = result
+    c.notes["model_note"] = ("Built: a real human figure fitted to the painting." if c.notes["model_mode"] == "template"
+                             else "Built: a carved shape (the silhouette shows no legs, so the human fit was skipped).")
     project.save()
     return {
         "ok": True,

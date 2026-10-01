@@ -260,7 +260,9 @@ def cmd_project(a) -> None:
         _emit(a, {"ok": False, "error": f"{e}. Use --project <folder> or run inside the project folder."})
         raise SystemExit(2)
     try:
-        if sub == "status":
+        if sub == "blender-download":
+            _emit(a, api.download_blender(project, log=print))
+        elif sub == "status":
             _emit(a, api.status(project))
         elif sub == "set":
             _emit(a, api.configure(project, style=a.style, blender=a.blender, directions=a.directions, render_size=a.render_size, godot_res_dir=a.godot_res_dir))
@@ -430,6 +432,7 @@ def build_parser() -> argparse.ArgumentParser:
     ps = s.add_subparsers(dest="project_cmd", required=True, parser_class=lambda **kw: argparse.ArgumentParser(parents=[common], **kw))
     x = ps.add_parser("new", help="create a project folder"); x.add_argument("folder"); x.add_argument("--name"); x.add_argument("--style", choices=sorted(STYLES), default=DEFAULT_STYLE)
     ps.add_parser("status", help="what is done, what is next")
+    ps.add_parser("blender-download", help="fetch the portable Blender (380 MB, no installer) and point the project at it")
     x = ps.add_parser("set", help="change settings")
     x.add_argument("--style", choices=sorted(STYLES)); x.add_argument("--blender"); x.add_argument("--directions", type=int); x.add_argument("--render-size", type=int); x.add_argument("--godot-res-dir")
     x = ps.add_parser("add", help="add a character"); x.add_argument("character"); x.add_argument("--describe")
