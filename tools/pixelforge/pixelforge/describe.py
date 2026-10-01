@@ -69,7 +69,12 @@ def classify(text: str) -> str:
         return "music"
     if re.search(r"\b(prompt|midjourney|paint me|sheet|turnaround|concept)\b", t):
         return "prompt"
-    if re.search(r"\b(character|hero|monster|creature|boss|npc|villager|building|tree|gravestone|statue|altar)\b", t) and not re.search(r"\bspell\b", t):
+    figure = (r"\b(character|hero|heroine|monster|creature|boss|npc|villager|warrior|knight|skeleton|undead|zombie|ghoul|wraith|mage|wizard|"
+              r"witch|necromancer|priest|monk|archer|rogue|assassin|paladin|barbarian|soldier|guard|king|queen|lord|lady|hunter|golem|"
+              r"demon|beast|wolf|spider|dragon|giant|ogre|troll|goblin|orc|lich|vampire|cultist|pilgrim|keeper|mystic|building|tree|"
+              r"gravestone|statue|altar|shrine|house|tower|gate|bridge|cart|wagon|barrel|chest|lantern post)\b")
+    person = r"\b(he|she|they|his|her|their|wearing|wears|wields|wielding|welding|armou?r|armored|sword|axe|spear|bow|staff|shield|helm|helmet|robe|cloak)\b"
+    if (re.search(figure, t) or re.search(person, t)) and not re.search(r"\bspell\b", t) and not re.search(r"\b(make|turn|paint|recolou?r|erase)\b", t):
         return "prompt"
     if _find(t, EFFECTS) or _find(t, SPELL_WORDS) or re.search(r"\bspell\b", t):
         return "spell"
@@ -291,11 +296,14 @@ def draft_prompt(text: str) -> dict:
     for k in ("building", "tree", "ground", "effect", "ui", "icons", "portrait", "topdown"):
         if re.search(r"\b" + k + r"\b", t):
             kind = k
-    if re.search(r"\b(character|hero|monster|creature|boss|figure)\b", t):
+    objects = r"\b(building|tree|gravestone|statue|altar|shrine|house|tower|gate|bridge|cart|wagon|barrel|chest|lantern post|ground|effect|ui|icons|portrait|topdown)\b"
+    if not re.search(objects, t) or re.search(r"\b(character|hero|monster|creature|boss|figure|warrior|knight|skeleton|undead|he|she|wields|wielding|welding|wearing)\b", t):
         from .prompts import build_prompt
 
-        desc = re.sub(r"^(a |an |paint me |prompt for |make )", "", text.strip(), flags=re.I)
-        return {"what": "prompt", "prompt": build_prompt("sheet", desc), "read": [f"character sheet prompt for: {desc}"]}
+        desc = re.sub(r"^(a |an |paint me |prompt for |make |hero: |character: )", "", text.strip(), flags=re.I)
+        desc = re.sub(r"\bwelding\b", "wielding", desc, flags=re.I)   # the common slip
+        return {"what": "prompt", "prompt": build_prompt("sheet", desc), "read": [f"character sheet prompt (A, three views) for: {desc}",
+                "paste it into Midjourney; use Copy A2 in the Studio for the four-view version"]}
     desc = re.sub(r"^(a |an |paint me |prompt for |make )", "", text.strip(), flags=re.I)
     return {"what": "prompt", "prompt": build_world_prompt(kind, desc, ""), "read": [f"world prompt, kind {kind}: {desc}"], "kinds": [k.key for k in WORLD_KINDS]}
 
