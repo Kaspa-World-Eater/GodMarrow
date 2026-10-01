@@ -9,7 +9,7 @@ from pixelforge import skilltree as st
 from pixelforge.props import make_prop
 from pixelforge.tiles import make_tiles
 from pixelforge.ui9 import detect_border, make_ui9
-from pixelforge.vfx import KINDS, make_vfx, periodic_noise, ramp_lut
+from pixelforge.vfx import KINDS, LOOPING, make_vfx, periodic_noise, ramp_lut
 
 
 def _tex(seed, c0, c1, n=96):
@@ -24,7 +24,7 @@ def test_vfx_every_kind_loops_and_exports(tmp_path, kind):
     assert im.size == (r["size"][0] * 6, r["size"][1])
     assert np.asarray(im)[..., 3].max() == 255
     atlas = json.loads((tmp_path / "atlas" / "fx.json").read_text())
-    anim = "once" if kind == "burst" else "loop"
+    anim = "loop" if kind in LOOPING else "once"
     assert len(atlas["idx"]) == 6 and f"{anim}/down/0" in atlas["idx"]
     assert atlas["meta"]["anims"][anim]["views"] == ["down"]
 
