@@ -92,3 +92,22 @@ def test_skilltree_edits_apply_and_report_clashes(tmp_path):
     r = st.save_and_apply(sp, {"a": {"row": 2}})
     assert r["clashes"] and r["clashes"][0][1:] == ("a", "b")
     assert "Alpha" in st.list_tree(d, "x")
+
+
+def test_recolor_map_and_hue(tmp_path):
+    from pixelforge.recolor import recolor_image, recolor_set
+
+    im = np.zeros((4, 4, 4), np.uint8)
+    im[..., :3] = (29, 74, 76)   # the wisp teal
+    im[..., 3] = 255
+    im[0, 0, 3] = 0
+    out = recolor_image(im, mapping={"#1d4a4c": "#7a3d10"})
+    assert tuple(out[1, 1, :3]) == (0x7A, 0x3D, 0x10) and out[0, 0, 3] == 0
+    shifted = recolor_image(im, hue=180.0)
+    assert int(shifted[1, 1, 0]) > int(im[1, 1, 0])   # teal turned warm
+    # a Godmarrow set
+    d = tmp_path / "sprites"; d.mkdir()
+    Image.fromarray(im, "RGBA").save(d / "wisp.png")
+    (d / "wisp.json").write_text(json.dumps({"sheets": ["wisp.png"], "meta": {"kind": "wisp"}, "idx": {"idle/down/0": [0, 0, 0, 4, 4, 0, 0]}}))
+    r = recolor_set(d, "wisp", "@champion", hue=90.0)
+    assert (d / "wisp@champion.png").exists() and json.loads((d / "wisp@champion.json").read_text())["sheets"] == ["wisp@champion.png"]

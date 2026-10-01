@@ -329,6 +329,18 @@ def cmd_ui9(a) -> None:
     _emit(a, r)
 
 
+def cmd_recolor(a) -> None:
+    from .recolor import _read_hex, recolor_file, recolor_set
+
+    mapping = dict(pair.split("=", 1) for pair in a.map.split(",")) if a.map else None
+    kw = dict(mapping=mapping, hue=a.hue, lightness=a.lightness, chroma=a.chroma,
+              palette_from=_read_hex(a.palette_from) if a.palette_from else None, palette_to=_read_hex(a.palette_to) if a.palette_to else None)
+    if a.kind:
+        _emit(a, recolor_set(a.image, a.kind, a.suffix, **kw))
+    else:
+        _emit(a, recolor_file(a.image, a.out, **kw))
+
+
 def cmd_skilltree(a) -> None:
     from .skilltree import cli_main
 
@@ -484,6 +496,16 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--colors", type=int, default=0); s.add_argument("--mid", type=int, default=8, help="px of each edge/centre to keep")
     s.add_argument("--res-dir", default="res://art/ui"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_ui9)
+
+    s = sub.add_parser("recolor", help="recolour a finished sprite/atlas (champion, unique, seasonal) without re-rendering")
+    s.add_argument("image", help="a PNG, or with --kind the art/sprites folder")
+    s.add_argument("-o", "--out", help="output PNG (file mode)")
+    s.add_argument("--kind", help="Godmarrow set mode: recolour art/sprites/<kind>.* into <kind><suffix>.*"); s.add_argument("--suffix", default="@champion")
+    s.add_argument("--map", help='colour pairs "#src=#dst,#src2=#dst2": pixels shift by their nearest pair')
+    s.add_argument("--hue", type=float, default=0.0, help="hue rotation in degrees"); s.add_argument("--lightness", type=float, default=1.0); s.add_argument("--chroma", type=float, default=1.0)
+    s.add_argument("--palette-from"); s.add_argument("--palette-to", help=".hex files of equal length, matched by line")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_recolor)
 
     s = sub.add_parser("skilltree", help="edit Godmarrow's skill trees (GUI, or --list/--move/--rename headless); edits live in tools/skill_tree_edits.json")
     s.add_argument("skills", help="path to data/skills.json")
