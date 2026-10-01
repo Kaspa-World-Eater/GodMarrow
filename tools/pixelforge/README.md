@@ -21,6 +21,7 @@ game); every piece is generic except one exporter.
 | Iso ground tiles + transitions + TileSet | `pixelforge tiles` | Tools |
 | UI frames (9-slice + StyleBox) | `pixelforge ui9` | Tools |
 | Sound effects (synthesised, WAV) | `pixelforge sfx` | Tools |
+| Music: 21 seeded looping cues, a knob sheet to edit, WAV/OGG, spectrograms | `pixelforge music` | Tools |
 | Recolours (champion / unique tints) | `pixelforge recolor` | Tools |
 | Before / after check | `pixelforge compare` | Tools |
 | Skill-tree editor | `pixelforge skilltree` | Tools |
@@ -50,7 +51,7 @@ packs them into Godot SpriteFrames or the game's atlas with foot anchors.
 
 `pixelforge/api.py` is the pipeline (one function per step). `gui.py` (Studio), `cli.py`, `mcp_server.py` wrap it.
 Image maths: `grid.py`, `palette.py`, `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`, `transform.py`,
-`sheet.py`, `model_spec.py`. Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`,
+`sheet.py`, `model_spec.py`. Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`, `music.py`,
 `recolor.py`, `compare.py`, `skilltree.py`, `doctor.py`. Blender-side: `pixelforge/blender/` (no Pillow there).
 Godot-side: `godot_addon/pixelforge/` (`PFSpriteSet`, `PFFx`, `PFObjects`). Docs: `docs/GUIDE_HUMANS.md`,
 `docs/GUIDE_AI.md`, `docs/TOOL_IDEAS.md`, `NOTES.md`. Tests: `pytest` (52).

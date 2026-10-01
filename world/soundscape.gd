@@ -1,7 +1,8 @@
 class_name Soundscape
 extends Node
 ## What the pilgrim hears (checklist 12, music; zz_zz_music96.js).
-## - The score: the web's live-synthesised Act I cues rendered to seamless loops (audio/music/*.ogg, tools/render_mus.js):
+## - The score: the Forge's port of the web's live-synthesised score rendered to seamless loops (audio/music/*.ogg,
+##   tools/make_music.py -> pixelforge music; one cue per act and place, five bosses, the title):
 ##   the camp's twelve-string, the wilds' long silences and drones, the deep's sub-drones and far bells, the boss's drums.
 ##   Places cross-fade slowly; a waking great one cuts in fast; when it falls the land's own cue comes back.
 ## - The land: wind that rises with the gust you see (Game.wind), rain in the fen that swells with the shower, a low hum
@@ -73,30 +74,42 @@ func _music(key: String) -> AudioStream:
 		return streams[key]
 	var path := "res://audio/music/%s.ogg" % key
 	if not ResourceLoader.exists(path):
+		path = "res://audio/music/%s.wav" % key
+	if not ResourceLoader.exists(path):
 		return null
 	var s = load(path)
 	if s is AudioStreamOggVorbis:
 		s.loop = true
+	elif s is AudioStreamWAV:
+		s.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		s.loop_end = s.data.size() / 4   # 16-bit stereo
 	streams[key] = s
 	return s
 
 func _pick() -> String:
+	# the browser's pick (zz_zz_music96.js): each act has its own camp, wilds, depths and boss cue; the title has its own
 	var z = main.zone
 	if main.get("title_open") == true:
-		return "dirge"
+		return _have("title", "dirge")
 	if z == null:
 		return ""
+	var act: int = load("res://world/quests.gd").act_of(z.id)
+	var boss := "boss%d" % act
 	var b = main.boss_awake
 	if b != null and is_instance_valid(b) and not b.dead:
 		boss_gone_t = 4.0
-		return "boss1"
-	if boss_gone_t > 0.0 and mus_key == "boss1":
-		return "boss1"      # the drums ring out a little after it falls
+		return _have(boss, "boss1")
+	if boss_gone_t > 0.0 and mus_key.begins_with("boss"):
+		return mus_key      # the drums ring out a little after it falls
 	if z.id == "moor" or z.d.get("town", false):
-		return "a1_town"
+		return _have("a%d_town" % act, "a1_town")
 	if not z.d.get("outdoor", false):
-		return "a1_deep"
-	return "a1_wild"
+		return _have("a%d_deep" % act, "a1_deep")
+	return _have("a%d_wild" % act, "a1_wild")
+
+func _have(key: String, fallback: String) -> String:
+	# a cue not rendered yet (tools/make_music.py) falls back to Act I's
+	return key if ResourceLoader.exists("res://audio/music/%s.ogg" % key) or ResourceLoader.exists("res://audio/music/%s.wav" % key) else fallback
 
 func _swap(key: String) -> void:
 	# the old cue moves to b and fades out; the new one comes in on a

@@ -40,6 +40,14 @@ TOOLS = [
      [("preset", "choice", "all", ["all", "hit", "heavy_hit", "bone_click", "bone_break", "thud", "whoosh", "pour", "glass", "cast", "wisp", "pickup", "ui_tick", "ui_open", "death_rattle", "lantern_light", "step_stone", "step_soft", "coin"]),
       ("out", "dir", "art/sfx", None), ("variations", "int", 1, None), ("seed", "int", 0, None)],
      "sfx"),
+    ("Music", "The score: looping cues for every act's camp, wilds and depths, the bosses and the title. Pick a cue, set a length, Run; "
+               "the picture is its waveform and spectrogram. 'seed' gives the same place another tune; 'knobs' overrides e.g. bpm=90 sc=phr root=45. "
+               "'sheet' writes a JSON of every knob to edit and render with.",
+     [("cue", "choice", "a1_town", ["all", "act", "sheet", "a1_town", "a1_wild", "a1_deep", "a2_town", "a2_wild", "a2_deep", "a3_town", "a3_wild", "a3_deep",
+                                    "a4_town", "a4_wild", "a4_deep", "a5_town", "a5_wild", "a5_deep", "boss1", "boss2", "boss3", "boss4", "boss5", "title"]),
+      ("out", "dir", "art/music", None), ("seconds", "float", 120.0, None), ("seed", "text", "", None), ("act", "int", 1, None),
+      ("knobs", "text", "", None), ("sheet", "file", "", None), ("format", "choice", "wav", ["wav", "ogg", "both"]), ("play", "check", True, None)],
+     "music"),
     ("Recolour", "Tint a finished sprite or atlas (champion / unique variants) without re-rendering.",
      [("image", "file", "", None), ("out", "text", "recoloured.png", None), ("hue", "float", 0.0, None), ("lightness", "float", 1.0, None), ("chroma", "float", 1.0, None), ("map", "text", "", None)],
      "recolor"),
@@ -88,6 +96,17 @@ def run_tool(key: str, v: dict) -> dict:
     if key == "sfx":
         from .sfx import make_sfx
         return make_sfx(v["preset"], v["out"], seed=int(v["seed"]), variations=int(v["variations"]))
+    if key == "music":
+        from . import music
+        if v["cue"] == "sheet":
+            return music.write_sheet(str(Path(v["out"]) / "music_sheet.json"))
+        r = music.make_music(v["cue"], v["out"], seconds=float(v["seconds"]), seed=int(v["seed"]) if str(v["seed"]).strip() else None,
+                             overrides=music.parse_overrides(str(v["knobs"]).split()), act=int(v["act"]), sheet=v["sheet"] or None, fmt=v["format"])
+        if v.get("play") and v["cue"] not in ("all", "act"):
+            wav = next((f for f in r["files"] if f.endswith(".wav")), None)
+            if wav:
+                r["played"] = music.play(wav)
+        return r
     if key == "recolor":
         from .recolor import recolor_file
         mapping = dict(p.split("=", 1) for p in v["map"].split(",")) if v["map"].strip() else None
@@ -175,7 +194,7 @@ class ToolsWindow:
         def work():
             try:
                 r = run_tool(key, values)
-                self.win.after(0, lambda: self._say("OK " + ", ".join(f"{k}={v}" for k, v in r.items() if k in ("png", "dir", "files", "json", "tres", "found", "installed", "gif", "mean_abs_diff", "prompt"))))
+                self.win.after(0, lambda: self._say("OK " + ", ".join(f"{k}={v}" for k, v in r.items() if k in ("png", "dir", "files", "json", "tres", "found", "installed", "gif", "mean_abs_diff", "prompt", "sheet", "notes", "played"))))
                 if r.get("prompt"):
                     self.win.after(0, lambda: (self.win.clipboard_clear(), self.win.clipboard_append(r["prompt"]), self._say("(copied to the clipboard)")))
                 if r.get("gif"):

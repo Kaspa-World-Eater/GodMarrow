@@ -141,6 +141,40 @@ def test_sfx_presets_write_wav(tmp_path):
     assert len(r2["files"]) == 3
 
 
+def test_music_cues_render_loop_and_sheet(tmp_path):
+    import json
+    import wave
+
+    import numpy as np
+
+    from pixelforge import music
+
+    assert set(music.CUES) == set(music.CUE_INFO) and len(music.CUES) == 21
+    for key in ("a1_town", "a3_wild", "boss5"):
+        x = music.render_cue(key, 6)
+        assert x.shape == (6 * music.RATE, 2) and np.isfinite(x).all()
+        assert 0.06 < float(np.sqrt((x ** 2).mean())) < 0.13 and float(np.abs(x).max()) <= 1.0
+    # the same seed is the same tune; another seed is another one
+    a = music.render_cue("a1_wild", 4, seed=3)
+    assert np.array_equal(a, music.render_cue("a1_wild", 4, seed=3))
+    assert not np.array_equal(a, music.render_cue("a1_wild", 4, seed=4))
+    r = music.make_music("a1_deep", tmp_path, seconds=5, overrides=music.parse_overrides(["bpm=70", "sc=phr", "drone=[26,0.05,180]"]))
+    with wave.open(str(tmp_path / "a1_deep.wav")) as w:
+        assert w.getnchannels() == 2 and w.getframerate() == 44100 and w.getnframes() == 5 * 44100
+    assert (tmp_path / "a1_deep.png").exists()
+    m = json.loads((tmp_path / "music.json").read_text())
+    assert m["cues"]["a1_deep"]["loop"] and m["cues"]["a1_deep"]["knobs"]["sc"] == "phr"
+    sheet = music.write_sheet(tmp_path / "sheet.json")
+    assert len(sheet["cues"]) == 21
+    edited = json.loads((tmp_path / "sheet.json").read_text())
+    edited["title"]["bpm"] = 60
+    (tmp_path / "sheet.json").write_text(json.dumps(edited))
+    r2 = music.make_music("title", tmp_path / "s", seconds=4, sheet=tmp_path / "sheet.json")
+    assert json.loads((tmp_path / "s" / "music.json").read_text())["cues"]["title"]["knobs"]["bpm"] == 60
+    with pytest.raises(ValueError):
+        music.parse_overrides(["tempo=1"])
+
+
 def test_portrait_bust(tmp_path):
     from pixelforge.portrait import bust_box, make_portrait
 

@@ -396,6 +396,31 @@ def cmd_sfx(a) -> None:
     _emit(a, make_sfx(a.preset, a.out, seed=a.seed, variations=a.variations))
 
 
+def cmd_music(a) -> None:
+    from . import music
+
+    if a.cue == "list":
+        rows = music.cue_table()
+        if a.json:
+            _emit(a, {"ok": True, "cues": rows, "knobs": music.FIELDS})
+            return
+        print(f"{'cue':9s} {'act':>3s} {'place':6s} {'bpm':>4s} {'steps':>5s} {'root':>4s} {'mode':5s} {'seed':>4s}  what it is")
+        for r in rows:
+            print(f"{r['key']:9s} {r['act']:>3d} {r['place']:6s} {r['bpm']:>4.0f} {r['steps']:>5d} {r['root']:>4d} {r['sc']:5s} {r['seed']:>4d}  {r['description']}")
+        print("\nknobs for --set and the sheet: " + ", ".join(f"{k} ({v.split(' (')[0].split(',')[0]})" for k, v in music.FIELDS.items()))
+        return
+    if a.cue == "sheet":
+        _emit(a, music.write_sheet(a.sheet_out or str(Path(a.out) / "music_sheet.json")))
+        return
+    r = music.make_music(a.cue, a.out, seconds=a.seconds, seed=a.seed, overrides=music.parse_overrides(a.set), act=a.act,
+                         sheet=a.sheet, fmt=a.format, preview=not a.no_preview, log=lambda m: print(m, flush=True) if not a.json else None)
+    if a.play and r["files"]:
+        wav = next((f for f in r["files"] if f.endswith(".wav")), None)
+        if wav:
+            r["played"] = music.play(wav)
+    _emit(a, r)
+
+
 def cmd_portrait(a) -> None:
     from .portrait import make_portrait
 
@@ -652,6 +677,17 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--seed", type=int, default=0); s.add_argument("--variations", type=int, default=1, help="N seeded variations per preset")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_sfx)
+
+    s = sub.add_parser("music", help="the score: 21 seeded, looping cues (town / wild / deep per act, bosses, title) -> WAV/OGG + preview PNG")
+    s.add_argument("cue", help="a cue key, 'all', 'act' (with --act), 'list' (the table), or 'sheet' (write the editable JSON)")
+    s.add_argument("-o", "--out", default="art/music"); s.add_argument("--seconds", type=float, default=120.0, help="loop length")
+    s.add_argument("--seed", type=int, default=None, help="another tune for the same place"); s.add_argument("--act", type=int, default=None)
+    s.add_argument("--set", action="append", default=[], metavar="KNOB=VALUE", help="override a knob: bpm=90 sc=phr root=45 drone=[38,0.03,300] (repeatable)")
+    s.add_argument("--sheet", default=None, help="a sheet JSON from 'music sheet' with your edits"); s.add_argument("--sheet-out", default=None)
+    s.add_argument("--format", choices=["wav", "ogg", "both"], default="wav", help="ogg needs ffmpeg")
+    s.add_argument("--no-preview", action="store_true", help="skip the waveform + spectrogram PNG")
+    s.add_argument("--play", action="store_true", help="play the (last) cue when done"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_music)
 
     s = sub.add_parser("portrait", help="head-and-shoulders portraits from a front view cutout")
     s.add_argument("image"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/portraits")

@@ -119,6 +119,10 @@ pixelforge recolor art/sprites --kind wraith --suffix @champion --hue 60        
 pixelforge project blender-download                                                # fetch the portable Blender (380 MB) if none is installed
 pixelforge project run-all --all                                                   # every character in the project, in turn
 pixelforge sfx all -o art/sfx [--variations 3]                                     # 18 synthesised sound presets -> WAV
+pixelforge music list                                                              # the score's 21 cues (act, place, tempo, key, mode, seed) and the knobs
+pixelforge music all -o art/music [--seconds 120] [--format ogg]                   # every cue as a seamless loop + spectrogram PNG + music.json
+pixelforge music a1_wild --seed 5 --set bpm=64 --set sc=phr --play                 # another tune for a place, with knobs, and hear it
+pixelforge music sheet -o art/music; pixelforge music all --sheet art/music/music_sheet.json   # the editor: a JSON of every knob, edited, rendered
 pixelforge portrait views/front.png mystic -o art/portraits [--sizes 48 96]        # head-and-shoulders portraits
 pixelforge compare before.png after.png -o cmp.png                                 # strip (+GIF for frame folders) + mean difference
 pixelforge doctor [--project <folder>]                                             # what works on this machine, with fixes

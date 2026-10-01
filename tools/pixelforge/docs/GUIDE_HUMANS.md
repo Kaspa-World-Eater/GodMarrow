@@ -47,9 +47,20 @@ and an animation (sway, hover, flame...), click **Make sprite + animate + export
 ## Other things the Forge makes (the **Tools** button)
 
 Props and trees with sway, spell / aura / weather effects, inventory icons from one flat-lay picture, portraits,
-iso ground tiles, UI frames, sound effects, recolours (champion / unique tints from one render), before/after
+iso ground tiles, UI frames, sound effects, music, recolours (champion / unique tints from one render), before/after
 compares, a skill-tree editor, and a one-click install of the loaders into any Godot project. Each is a small form:
 pick the picture, name it, press Run. An AI assistant can run every one from the command line too.
+
+**Music** writes the game's score: a looping cue for every act's camp, wilds and depths, five boss cues and the
+title, all played by synthesised instruments (a twelve-string, lutes, log drums, flutes, strings, horns, choir,
+bells, drums, drones and wind) through a long reverb. Nothing is sampled or copied; every note is generated. Pick a
+cue, press Run, and it plays; the picture is its waveform and spectrogram. Every cue has a **seed**: a different
+number is a different tune for the same place, so you can audition tunes until one feels right. **Knobs** change
+tempo (`bpm=90`), key (`root=45`), mode (`sc=phr` for darker, `sc=hij` for eastern), levels and the drone. To edit
+everything at once choose the cue **sheet**: it writes `music_sheet.json` with every cue's knobs; change the numbers
+in any text editor, then run **all** with that sheet. Loops are seamless (the reverb tail is folded into the start)
+and every cue sits at the same loudness. Format `ogg` makes small files for the game when ffmpeg is installed;
+otherwise WAV, which Godot also plays.
 
 ## Knobs you might touch
 

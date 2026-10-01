@@ -123,6 +123,27 @@ def build_server():
         return make_ui9(image, name, out_dir, mid=mid)
 
     @mcp.tool()
+    def make_music(cue: str, out_dir: str, seconds: float = 120.0, seed: int | None = None, knobs: str = "", act: int | None = None,
+                   sheet: str = "", fmt: str = "wav") -> dict:
+        """The score: cue key | 'all' | 'act' (with act) -> looping WAV/OGG + spectrogram PNG + music.json.
+        knobs like "bpm=90 sc=phr"; sheet = a JSON from music_sheet with edits. Cues and knobs: music_cues."""
+        from . import music
+        return music.make_music(cue, out_dir, seconds=seconds, seed=seed, overrides=music.parse_overrides(knobs.split()), act=act,
+                                sheet=sheet or None, fmt=fmt)
+
+    @mcp.tool()
+    def music_cues() -> dict:
+        """Every cue (act, place, tempo, key, mode, seed, what it sounds like) and the knobs that can be set."""
+        from . import music
+        return {"cues": music.cue_table(), "knobs": music.FIELDS, "modes": list(music.SC)}
+
+    @mcp.tool()
+    def music_sheet(path: str) -> dict:
+        """Write the editable sheet (every cue's knobs) to a JSON file; edit it and pass it to make_music."""
+        from . import music
+        return music.write_sheet(path)
+
+    @mcp.tool()
     def make_sfx(preset: str, out_dir: str, variations: int = 1, seed: int = 0) -> dict:
         """Synthesised sound effects (preset or 'all') -> WAV."""
         from .sfx import make_sfx as _ms
