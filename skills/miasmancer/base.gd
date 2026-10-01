@@ -169,14 +169,14 @@ func info(id: String) -> String:
 		"unseen": return "+%d%% control time · +%d%% evasion · %d traps, +%d%% trap damage" % [4 * K("unseen"), K("unseen"), trap_max(), 8 * K("unseen")]
 		"rarc": return "%s to each in a half-circle · +10%% per extra enemy" % r.call(weapon() * (0.95 + 0.09 * L1("rarc")) * syn("rarc"))
 		"thrust": return "%s to each in a %d yd line" % [r.call(weapon() * (1.25 + 0.11 * L1("thrust")) * syn("thrust")), 4 if K("thrustlong") > 0 else 3]
-		"gstrike": return "%s damage · +1 Sigil · each Sigil +6%% damage, +5%% speed" % r.call(weapon() * (1.4 + 0.12 * L1("gstrike")) * syn("gstrike"))
-		"talon": return "%d kicks · %s each · +1 Sigil" % [_kicks(), r.call(weapon() * (0.55 + 0.06 * L1("talon")) * syn("talon"))]
+		"gstrike": return "%s damage · +1 Omen · each Omen +6%% damage, +5%% speed" % r.call(weapon() * (1.4 + 0.12 * L1("gstrike")) * syn("gstrike"))
+		"talon": return "%d kicks · %s each · +1 Omen" % [_kicks(), r.call(weapon() * (0.55 + 0.06 * L1("talon")) * syn("talon"))]
 		"dstep": return "%s to each · %d yd" % [r.call(weapon() * (0.9 + 0.08 * L1("dstep")) * syn("dstep")), 8 if K("steplong") > 0 else 5]
 		"flurry": return "%d strikes · %s each · hops between enemies in reach" % [6 if K("flurrymore") > 0 else 4, r.call(weapon() * (0.5 + 0.05 * L1("flurry")) * syn("flurry"))]
-		"reap": return "%s · +70%% and +0.3 yd per Sigil" % r.call(weapon() * (1.2 + 0.1 * L1("reap")) * syn("reap"))
-		"execute": return "%s · +90%% per Sigil · kills below %s +8%% per Sigil" % [r.call(weapon() * (1.6 + 0.12 * L1("execute")) * syn("execute")), pc.call(0.15 if K("execthr") > 0 else 0.1)]
+		"reap": return "%s · +70%% and +0.3 yd per Omen" % r.call(weapon() * (1.2 + 0.1 * L1("reap")) * syn("reap"))
+		"execute": return "%s · +90%% per Omen · kills below %s +8%% per Omen" % [r.call(weapon() * (1.6 + 0.12 * L1("execute")) * syn("execute")), pc.call(0.15 if K("execthr") > 0 else 0.1)]
 		"dhead": return "%s critical chance" % pc.call(crit_ch())
-		"deathm": return "+%d%% melee · %d Sigils%s" % [6 * K("deathm"), omen_max(), " · claws: +25% strikes, +15% speed" if claw_on() else " · wield claws for more"]
+		"deathm": return "+%d%% melee · %d Omens%s" % [6 * K("deathm"), omen_max(), " · claws: +25% strikes, +15% speed" if claw_on() else " · wield claws for more"]
 	return ""
 
 func _kicks() -> int: return 3 + (1 if K("talonkick") > 0 else 0) + (1 if aM("zx_kiss") else 0)
@@ -281,7 +281,7 @@ func add_omen() -> void:
 		return
 	if omens < omen_max():
 		omens += 1
-		say_at(hero.tp + Vector2(0, -0.3), "sigil %d" % omens, PALE)
+		say_at(hero.tp + Vector2(0, -0.3), "omen %d" % omens, PALE)
 		Sfx.play("glass", 0.3, 0.8 + omens * 0.15)
 	omen_t = omen_life()
 
