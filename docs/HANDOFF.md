@@ -350,3 +350,5 @@ byte. Smoke: errors 0 on every line (the game did not change).
 edited styles are not saved in `project.json`, the game does not read `pixel_step` or the tile size, and the two
 tallest looks' GIFs stand over 160 px because the figures are shown 1:1. The clean pass and the stronger contrast
 are tuned on one dark figure; a bright painting may want `clean 0` or a smaller lift in the Advanced numbers.
+
+**2026-10-01 23:45 (Derek): "Stop working on Godmarrow."** No game work of any kind until he says otherwise: no sprites, effects, scale, presentation or launcher changes. PixelForge only. The game may be used read-only as a viewer to judge the Forge's output.
