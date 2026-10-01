@@ -149,3 +149,9 @@ Mystic's robe and cords read better than the wraith, the face/hood is less disti
 right scale. Screens `docs/screens/2026-10-02_skin_keeper_*`. For the Forge: the wide flat straw hat (the sheet's strongest
 silhouette) comes out as a small pinkish dome; the brim seems lost in the carve or the cutout, and the purple robe reads
 muddy. The same see-through look and thin orange outline as the Mystic is on my side (lighting), now confirmed on two skins.
+
+**Keeper second build in game (derek-33):** `docs/screens/2026-10-02_keeper_build1_vs_build2.png` (left build 1, right
+build 2). The brim now exists but reads as a flat pink disc tilted toward the camera, more like a plate or a face than a
+wide straw hat seen from 30° above; its colour is pink where the sheet's hat is dark brown-purple. The body is better
+(less blob). The washed, warm look on every skin is the light map from the lighting merge (tested: off = solid); I am
+building a browser-vs-Godot capture to tune it against the reference.
