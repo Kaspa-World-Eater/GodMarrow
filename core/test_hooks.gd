@@ -12,9 +12,10 @@ extends RefCounted
 ##   --panel=ID               open a panel (skills, inv, char, board, journal, choir, golem) or a town window
 ##   --demo [--trace]         the pilgrim fights the nearest creatures, for captures
 ##   --fx=NAME[,NAME]         PixelForge effects (art/fx/<NAME>.json) playing at the pilgrim, for a look (the Forge's "Preview in game")
+##     --fx_scale=S           draw them S times their size (default 1), to judge a small effect's frames and loop
 ##   --attach                 spawn the effects the Forge's effects editor attached to the pilgrim's sprite set
-##   --shot=PATH [--shot_t=S] [--shot_n=N]   save the screen to PATH after S seconds (default 4), N frames 0.25 s apart
-##                            (PATH_1.png ...), then quit. Needs a window (not --headless). --hour=0..1 sets the hour.
+##   --shot=PATH [--shot_t=S] [--shot_n=N] [--shot_dt=D]   save the screen to PATH after S seconds (default 4), N frames D seconds
+##                            apart (default 0.25; PATH_1.png ...), then quit. Needs a window (not --headless). --hour=0..1 sets the hour.
 ##   --hide=dark,atmos,sky,fore   switch those overlays off (the dark and light map, the air, the weather, the near dark),
 ##                            to judge a sprite or an effect in its plain paint
 
@@ -211,16 +212,17 @@ static func _shot(g, a: Dictionary) -> void:
 		var p := path if n == 1 else path.get_basename() + "_%d.png" % i
 		g.get_viewport().get_texture().get_image().save_png(p)
 		if i < n - 1:
-			await tree.create_timer(0.25).timeout
+			await tree.create_timer(float(a.get("shot_dt", "0.25"))).timeout
 	tree.quit()
 
 static func _forge_preview(g, a: Dictionary) -> void:
 	## PixelForge's "Preview in game": effects at the pilgrim (--fx=a,b) and the sprite set's attached effects (--attach).
 	var fx_dir := "res://art/fx"
 	if a.has("fx"):
+		var fx_scale := float(a.get("fx_scale", "1.0"))
 		for name in String(a["fx"]).split(","):
 			if name != "":
-				var sp = PFFx.spawn(g.hero, fx_dir, name, Vector2(0, -60), 1.0, 2)
+				var sp = PFFx.spawn(g.hero, fx_dir, name, Vector2(0, -60), fx_scale, 2)
 				if sp == null:
 					print("FORGE fx missing: ", name)
 	if a.has("attach"):

@@ -230,7 +230,10 @@ def make_vfx(
     """Render a looping VFX strip. ``palette`` is a preset name or a dark->bright hex list.
     ``glow`` defaults by kind (fire/wisp/burst on, smoke/embers off) and is the only soft alpha in the sheet.
     ``looks`` (``"phosphorus:strength=0.8,echo:count=3"``, see :mod:`fxlook`) finishes the frames before any rotation
-    sheet is built, so every heading carries the look; the json lists the palette actually used."""
+    sheet is built, so every heading carries the look; the json lists the palette actually used. A look that paints
+    outside the effect (haze, bloom, smoke, afterimages...) grows the frame by its reach with a transparent margin: the
+    json's ``size`` / ``frame_width`` / ``frame_height`` are the grown frame, ``pad`` the margin, and ``anchor`` is moved
+    with the effect."""
     if kind not in KINDS:
         raise ValueError(f"kind must be one of {KINDS}")
     if palette is None:
@@ -254,15 +257,18 @@ def make_vfx(
         seq = [paint(i, a, lut, hl) for i, a, hl in gen]
     loop = kind in LOOPING
     look_info = None
+    pl, pt = 0, 0   # the looks' margin: the frame grows, the anchor moves with the effect
+    w0, h0 = w, h
     if looks:
         from .fxlook import apply_looks
 
         seq, look_info = apply_looks(seq, looks, colors, loop=loop, seed=seed, fps=fps)
         colors, loop, frames = look_info["palette"], look_info["loop"], len(seq)
         fps = fps * look_info["fps_scale"]
+        (w, h), (pl, pt) = look_info["size"], look_info["pad"][:2]
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    anchor = [w // 2, h - 1] if kind in ("fire", "smoke", "embers", "pillar", "ward") else [w // 2, h // 2]
+    anchor = [pl + w0 // 2, pt + h0 - 1] if kind in ("fire", "smoke", "embers", "pillar", "ward") else [pl + w0 // 2, pt + h0 // 2]
     rows = [seq]
     if rotations and rotations > 1:
         # a missile drawn flying right, turned by RotSprite into N headings (row k = k * 360 / N degrees anticlockwise),
@@ -290,11 +296,11 @@ def make_vfx(
             "heading": "row k faces k * 360 / rotations degrees anticlockwise from flying right" if rotations and rotations > 1 else "flying right",
             "source": "pixelforge"}
     if look_info:
-        meta["look"], meta["looks"] = look_info["spec"], look_info["looks"]
+        meta["look"], meta["looks"], meta["pad"] = look_info["spec"], look_info["looks"], look_info["pad"]
     (out / f"{name}.json").write_text(json.dumps(meta, indent=2) + "\n")
-    result = {"ok": True, "png": str(out / f"{name}.png"), "json": str(out / f"{name}.json"), **{k: meta[k] for k in ("size", "frames", "fps", "loop")}}
+    result = {"ok": True, "png": str(out / f"{name}.png"), "json": str(out / f"{name}.json"), **{k: meta[k] for k in ("size", "frames", "fps", "loop", "anchor")}}
     if look_info:
-        result["look"], result["palette"] = look_info["spec"], look_info["palette"]
+        result["look"], result["palette"], result["pad"] = look_info["spec"], look_info["palette"], look_info["pad"]
     if gif:
         from .spritesheet import save_gif
         save_gif([Image.fromarray(f, "RGBA") for f in seq], out / f"{name}.gif", fps=fps, zoom=4)

@@ -1,0 +1,53 @@
+{
+  "name": "wisp_haze_glow",
+  "kind": "wisp",
+  "size": [
+    98,
+    110
+  ],
+  "frames": 12,
+  "frame_width": 98,
+  "frame_height": 110,
+  "fps": 10.0,
+  "loop": true,
+  "anchor": [
+    49,
+    55
+  ],
+  "glow": true,
+  "palette": [
+    "#2a1206",
+    "#7a3d10",
+    "#d08a2a",
+    "#f3c75c",
+    "#fff1b0"
+  ],
+  "bands": 6,
+  "seed": 3,
+  "rotations": 1,
+  "heading": "flying right",
+  "source": "pixelforge",
+  "look": "haze:strength=0.8+glow:intensity=1",
+  "looks": [
+    {
+      "name": "haze",
+      "radius": 5.0,
+      "strength": 0.8,
+      "drift": 1.0,
+      "bands": 2
+    },
+    {
+      "name": "glow",
+      "intensity": 1.0,
+      "radius": 6.0,
+      "core": 0.5,
+      "threshold": 0.55
+    }
+  ],
+  "pad": [
+    37,
+    37,
+    37,
+    37
+  ]
+}

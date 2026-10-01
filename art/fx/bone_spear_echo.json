@@ -2,17 +2,17 @@
   "name": "bone_spear_echo",
   "kind": "bone_spear",
   "size": [
-    97,
-    97
+    117,
+    117
   ],
   "frames": 10,
-  "frame_width": 97,
-  "frame_height": 97,
+  "frame_width": 117,
+  "frame_height": 117,
   "fps": 10.0,
   "loop": true,
   "anchor": [
-    48,
-    48
+    58,
+    58
   ],
   "glow": true,
   "palette": [
@@ -39,5 +39,11 @@
       "scale": 1.0,
       "dim": 1
     }
+  ],
+  "pad": [
+    21,
+    0,
+    0,
+    0
   ]
 }

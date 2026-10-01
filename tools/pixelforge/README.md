@@ -29,7 +29,7 @@ game); every piece is generic except one exporter.
 | Bone armour / shard auras orbiting a character, in front and behind | spell presets | Tools |
 | Missiles (bone spear, teeth, ice bolt, fire bolt) with rotation sheets | `pixelforge vfx <kind> --rotations 16` | Tools |
 | Spell designer: layered effects with live preview | `pixelforge spell` | Tools |
-| Looks: 18 finishing layers (phosphorus, haze, ethereal, glow, cyberpunk, psychedelic, echo, smooth, embers, smoke, shimmer, outline, pulse, grain, flicker, dissolve, ice, rot) on any effect, stackable, palette-locked | `pixelforge looks`, `--look` on vfx / spell / effect / animate, `pixelforge relook` | Tools |
+| Looks: 18 finishing layers (phosphorus, haze, ethereal, glow, cyberpunk, psychedelic, echo, smooth, embers, smoke, shimmer, outline, pulse, grain, flicker, dissolve, ice, rot) on any effect, stackable, palette-locked; a look that paints outside the effect grows the frame by its reach and moves the anchor | `pixelforge looks`, `--look` on vfx / spell / effect / animate, `pixelforge relook` | Tools |
 | Colour editor: pick a colour, give it a new one, shading kept | Studio steps 3 and 9 | Tools |
 | Effects editor: drag smoke, glow, embers onto a sprite, per view | Studio step 9 | Tools |
 | Recolours (champion / unique tints) | `pixelforge recolor` | Tools |

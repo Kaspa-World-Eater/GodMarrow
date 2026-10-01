@@ -3,7 +3,10 @@
 
 Run from the project root: `python3 tools/make_fx.py` (re-runnable; same seeds = same frames). Writes
 `art/fx/<name>.png` (frames in a row), `art/fx/<name>.json` and the manifest `art/fx/fx.json` that `fx/sheet_fx.gd`
-reads. Texels at hr 2 (two texels per web world px, like art/objects).
+reads. The manifest lists every effect sheet in the folder, the catalog below and the sheets other Forge tools
+wrote there (`pixelforge vfx --look`, `pixelforge relook`, spells, painted effects); `python3 tools/make_fx.py
+--manifest` rebuilds only the manifest, without re-rendering. Texels at hr 2 (two texels per web world px, like
+art/objects).
 
 The game's law: glow only on magic, lanterns and wisps (the Forge adds a halo only to those kinds; melee slashes,
 smoke, dust, shards, blood never glow); no red light (blood is dark, not lit); every colour from the order's ramp.
@@ -97,19 +100,48 @@ CATALOG = {
 }
 
 
-def main() -> None:
-    os.makedirs(OUT, exist_ok=True)
+def manifest_entry(name: str, meta: dict) -> dict:
+    """One fx.json entry from an effect's <name>.json (what `fx/sheet_fx.gd` and the add-on's PFFx read)."""
+    e = {"png": f"res://art/fx/{name}.png", "kind": meta.get("kind", "fx"), "frames": meta["frames"], "frame_width": meta["frame_width"],
+         "frame_height": int(meta.get("frame_height", meta["size"][1])), "size": meta["size"], "fps": meta["fps"], "loop": meta["loop"],
+         "anchor": meta["anchor"], "glow": meta.get("glow", True), "hr": 2}
+    if int(meta.get("rotations", 1) or 1) > 1:
+        e["rotations"] = int(meta["rotations"])
+    if meta.get("look"):
+        e["look"] = meta["look"]
+    return e
+
+
+def write_manifest() -> dict:
+    """`art/fx/fx.json` from every effect json in the folder: the catalog above plus sheets made with `pixelforge vfx --look`,
+    `pixelforge relook`, the spell designer or painted effects (`<name>.spell.json` files are the editable spells, not sheets).
+    `python3 tools/make_fx.py --manifest` rebuilds only this, without re-rendering."""
     manifest = {}
-    for name, (kind, palette, size, frames, fps, extra) in CATALOG.items():
-        r = make_vfx(kind, name, OUT, size=size, frames=frames, fps=fps, palette=palette, seed=sum(ord(c) for c in name), **extra)
-        meta = json.load(open(os.path.join(OUT, name + ".json")))
-        manifest[name] = {"png": f"res://art/fx/{name}.png", "kind": kind, "frames": meta["frames"], "frame_width": meta["frame_width"],
-                          "size": meta["size"], "fps": meta["fps"], "loop": meta["loop"], "anchor": meta["anchor"], "glow": meta["glow"], "hr": 2}
-        print(f"{name:28s} {kind:7s} {palette:8s} {meta['size']}  x{meta['frames']}")
+    for fn in sorted(os.listdir(OUT)):
+        if not fn.endswith(".json") or fn == "fx.json" or fn.endswith(".spell.json"):
+            continue
+        name = fn[:-5]
+        if not os.path.exists(os.path.join(OUT, name + ".png")):
+            continue
+        meta = json.load(open(os.path.join(OUT, fn)))
+        if not all(k in meta for k in ("frames", "frame_width", "size", "fps", "loop", "anchor")):
+            continue   # a sprite set or other json, not an effect strip
+        manifest[name] = manifest_entry(name, meta)
     with open(os.path.join(OUT, "fx.json"), "w") as f:
         json.dump(manifest, f, indent=1)
-    print(len(manifest), "effects ->", os.path.abspath(OUT))
+    return manifest
+
+
+def main(render: bool = True) -> None:
+    os.makedirs(OUT, exist_ok=True)
+    if render:
+        for name, (kind, palette, size, frames, fps, extra) in CATALOG.items():
+            make_vfx(kind, name, OUT, size=size, frames=frames, fps=fps, palette=palette, seed=sum(ord(c) for c in name), **extra)
+            meta = json.load(open(os.path.join(OUT, name + ".json")))
+            print(f"{name:28s} {kind:7s} {palette:8s} {meta['size']}  x{meta['frames']}")
+    manifest = write_manifest()
+    print(len(manifest), "effects in the manifest ->", os.path.abspath(os.path.join(OUT, "fx.json")))
 
 
 if __name__ == "__main__":
-    main()
+    main(render="--manifest" not in sys.argv[1:])

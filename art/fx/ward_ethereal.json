@@ -2,34 +2,34 @@
   "name": "ward_ethereal",
   "kind": "ward",
   "size": [
-    64,
-    72
+    68,
+    80
   ],
   "frames": 12,
-  "frame_width": 64,
-  "frame_height": 72,
+  "frame_width": 68,
+  "frame_height": 80,
   "fps": 8.0,
   "loop": true,
   "anchor": [
-    32,
-    71
+    34,
+    75
   ],
   "glow": true,
   "palette": [
-    "#0b1c20",
-    "#1d4a4c",
-    "#3b5451",
-    "#547571",
+    "#2a1206",
+    "#485149",
+    "#7a3d10",
     "#4f7d78",
-    "#3f9c92",
-    "#7fada5",
+    "#7a7969",
+    "#d08a2a",
+    "#b1b093",
     "#8fb8b0",
-    "#8fe3d2",
-    "#afded3",
+    "#f3c75c",
+    "#cdd5b4",
     "#c9e2dc",
-    "#d9f6ef",
-    "#eef7f4",
-    "#eafff8"
+    "#dcefd7",
+    "#fff1b0",
+    "#eef7f4"
   ],
   "bands": 6,
   "seed": 4,
@@ -45,5 +45,11 @@
       "softness": 0.5,
       "inner": 0.4
     }
+  ],
+  "pad": [
+    2,
+    4,
+    2,
+    4
   ]
 }

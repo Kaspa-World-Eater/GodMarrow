@@ -2,16 +2,16 @@
   "name": "fire_cyberpunk",
   "kind": "fire",
   "size": [
-    32,
+    34,
     48
   ],
   "frames": 12,
-  "frame_width": 32,
+  "frame_width": 34,
   "frame_height": 48,
   "fps": 12.0,
   "loop": true,
   "anchor": [
-    16,
+    17,
     47
   ],
   "glow": true,
@@ -42,5 +42,11 @@
       "offset": 1,
       "core": 0.6
     }
+  ],
+  "pad": [
+    1,
+    0,
+    1,
+    0
   ]
 }

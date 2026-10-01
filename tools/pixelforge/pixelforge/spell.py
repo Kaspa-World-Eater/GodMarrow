@@ -14,6 +14,7 @@ a top-level ``"look"`` applied to the composite (its palette is the colours the 
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 import numpy as np
@@ -147,17 +148,23 @@ def render_spell(spell: dict, *, with_look: bool = True) -> list[np.ndarray]:
             look = lyr.get("look") or ""
             key = (lyr["kind"], str(lyr["palette"]), lyr["seed"], lyr["glow"], n, lyr.get("image", ""), str(look))
             if key not in cache:
+                pad = (0, 0, 0, 0)   # a look's margin round the layer's frames (left, top, right, bottom)
                 if lyr["kind"] == "image":
                     frames_img = load_image_frames(lyr.get("image", ""))
                     if look:
                         from .fxlook import apply_looks
 
                         frames_img, _info = apply_looks(frames_img, look, None, loop=bool(lyr["loop"]), seed=int(lyr["seed"]))
-                    cache[key] = frames_img
+                        pad = tuple(_info["pad"])
+                    cache[key] = (frames_img, pad)
                 else:
                     w, h = vfx.DEFAULT_SIZE.get(lyr["kind"], (48, 48))
-                    cache[key] = render_kind(lyr["kind"], w, h, n, lyr["palette"], int(lyr["seed"]), lyr["glow"], looks=look or None)
-            seq = cache[key]
+                    if look:
+                        from .fxlook import chain_reach
+
+                        pad = chain_reach(look, w, h)
+                    cache[key] = (render_kind(lyr["kind"], w, h, n, lyr["palette"], int(lyr["seed"]), lyr["glow"], looks=look or None), pad)
+            seq, pad = cache[key]
             local = (t - int(lyr["start"])) * float(lyr["speed"])
             if local < 0:
                 continue
@@ -165,15 +172,22 @@ def render_spell(spell: dict, *, with_look: bool = True) -> list[np.ndarray]:
             if i >= len(seq) and not lyr["loop"]:
                 continue
             f = Image.fromarray(seq[i % len(seq)], "RGBA")
+            # the look's margin can be uneven (smoke rises, afterimages trail): (cx, cy) is where the effect's own centre
+            # sits from the frame centre, so the layer stays where the designer put it
+            cx, cy = (pad[0] - pad[2]) / 2, (pad[1] - pad[3]) / 2
             sc = float(lyr["scale"])
             if sc != 1.0:
                 f = f.resize((max(1, int(f.width * sc)), max(1, int(f.height * sc))), Image.NEAREST)
+                cx, cy = cx * sc, cy * sc
             if lyr["flip"]:
                 f = f.transpose(Image.FLIP_LEFT_RIGHT)
+                cx = -cx
             if lyr["rotation"]:
                 f = f.rotate(float(lyr["rotation"]), resample=Image.NEAREST, expand=True)
+                ang = math.radians(float(lyr["rotation"]))
+                cx, cy = cx * math.cos(ang) + cy * math.sin(ang), -cx * math.sin(ang) + cy * math.cos(ang)
             layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-            layer.paste(f, (int(W / 2 + lyr["x"] - f.width / 2), int(H / 2 + lyr["y"] - f.height / 2)), f)
+            layer.paste(f, (int(W / 2 + lyr["x"] - f.width / 2 - cx), int(H / 2 + lyr["y"] - f.height / 2 - cy)), f)
             canvas = _blend(canvas, layer, lyr["blend"], float(lyr["opacity"]))
         frames_out.append(np.asarray(canvas).copy())
     if with_look and spell.get("look"):
@@ -217,26 +231,29 @@ def export_spell(spell: dict, out_dir: str | Path, gif: bool = False, atlas_dir:
     """The strip and json a game loads (same layout as `pixelforge vfx`), plus the editable spell file."""
     seq = render_spell(spell, with_look=False)
     fps, loop = float(spell.get("fps", 12)), bool(spell.get("loop", True))
+    W, H = spell["size"]
+    anchor = [int(v) for v in spell.get("anchor", [W // 2, H // 2])]
     look_info = None
     if spell.get("look"):
         seq, look_info = spell_look(spell, seq)
         fps, loop = fps * look_info["fps_scale"], look_info["loop"]
+        (W, H), (pl, pt) = look_info["size"], look_info["pad"][:2]   # the spell's look grows the frame; the anchor moves with the spell
+        anchor = [anchor[0] + pl, anchor[1] + pt]
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     name = spell["name"]
-    W, H = spell["size"]
     strip = np.concatenate(seq, axis=1)
     Image.fromarray(strip, "RGBA").save(out / f"{name}.png")
     meta = {"name": name, "kind": "spell", "size": [W, H], "frames": len(seq), "frame_width": W, "frame_height": H, "fps": fps, "loop": loop,
-            "anchor": spell.get("anchor", [W // 2, H // 2]), "glow": True, "layers": [l.get("kind") for l in spell["layers"]],
+            "anchor": anchor, "glow": True, "layers": [l.get("kind") for l in spell["layers"]],
             "layer_looks": [l.get("look", "") for l in spell["layers"]], "palette": look_info["palette"] if look_info else spell_palette(spell),
             "source": "pixelforge spell"}
     if look_info:
-        meta["look"], meta["looks"] = look_info["spec"], look_info["looks"]
+        meta["look"], meta["looks"], meta["pad"] = look_info["spec"], look_info["looks"], look_info["pad"]
     (out / f"{name}.json").write_text(json.dumps(meta, indent=2) + "\n")
     save_spell(spell, out / f"{name}.spell.json")
     r = {"ok": True, "png": str(out / f"{name}.png"), "json": str(out / f"{name}.json"), "spell": str(out / f"{name}.spell.json"), "frames": len(seq),
-         "fps": fps, "loop": loop, "palette": meta["palette"]}
+         "fps": fps, "loop": loop, "palette": meta["palette"], "size": [W, H], "anchor": anchor}
     if look_info:
         r["look"] = look_info["spec"]
     if gif:

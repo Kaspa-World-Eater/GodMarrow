@@ -52,7 +52,9 @@ server (`mcp_server.py`) are thin layers over it.
   and gives frames, so one implementation serves procedural effects, missiles and orbits, spell layers and spells,
   painted effects and sprite clips. Looks stack in order; everything time-based is periodic over the frame count so
   loops close; the output is locked in OKLab to the effect's palette plus the look's own colours, and the json lists
-  the palette actually used. The game's theme keeps the neon and hue-cycling looks for magic.
+  the palette actually used. A look that paints outside the effect declares its reach; the frames are padded by the
+  chain's reach before the looks run (never a halo cut square at the frame edge) and the anchor moves with the effect.
+  The game's theme keeps the neon and hue-cycling looks for magic.
 - **Music is generated, not sampled.** Twenty-one seeded cues from synthesised instruments, an editable knob sheet,
   seamless loops at one loudness.
 

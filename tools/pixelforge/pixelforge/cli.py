@@ -492,7 +492,7 @@ def cmd_game_preview(a) -> None:
     from .game_preview import preview_in_game
 
     _emit(a, preview_in_game(a.game, godot=a.godot, skin=a.skin, cls=a.cls, zone=a.zone, fx=a.fx.split(",") if a.fx else None, attach=a.attach,
-                             shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, log=print))
+                             shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, log=print, fx_scale=a.fx_scale, shot_n=a.shot_n, shot_dt=a.shot_dt))
 
 
 def cmd_effect(a) -> None:
@@ -832,6 +832,9 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--skin", default=None, help="a sprite set kind, e.g. keeper"); s.add_argument("--cls", default=None); s.add_argument("--zone", default="moor")
     s.add_argument("--fx", default=None, help="effects to play at the hero: a,b"); s.add_argument("--attach", action="store_true", help="the effects editor's attachments on the skin")
     s.add_argument("--shot", default=None, help="save a screenshot here after --shot-t seconds and quit"); s.add_argument("--shot-t", dest="shot_t", type=float, default=4.0)
+    s.add_argument("--shot-n", dest="shot_n", type=int, default=1, help="save this many frames (<shot>_0.png, _1.png ...)")
+    s.add_argument("--shot-dt", dest="shot_dt", type=float, default=0.25, help="seconds between the frames (0.1 shows a 10 fps loop frame by frame)")
+    s.add_argument("--fx-scale", dest="fx_scale", type=float, default=1.0, help="draw the effects this many times their size, to judge a small effect")
     s.add_argument("--hour", type=float, default=None); s.add_argument("--wait", action="store_true"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_game_preview)
 

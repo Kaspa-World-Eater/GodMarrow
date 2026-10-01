@@ -154,18 +154,22 @@ def make_effect(image: str | Path, name: str, out_dir: str | Path, *, kind: str 
             seq = animate(rgba, effects, frames)
             loop = True
     look_info = None
+    h0, w0 = seq[0].shape[:2]
+    pl, pt = 0, 0   # a look's margin: the frame grows, the anchor moves with the painting
     if looks:
         from .fxlook import apply_looks, frames_palette
 
         seq, look_info = apply_looks(seq, looks, frames_palette(seq), loop=loop, seed=seed, fps=fps)
         loop, fps = look_info["loop"], fps * look_info["fps_scale"]
+        pl, pt = look_info["pad"][:2]
     h, w = seq[0].shape[:2]
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     if anchor == "auto":
-        anc = [w // 2, h - 1] if (kind == "loop" and preset in ("flame", "grass")) else [w // 2, h // 2]
+        anc = [pl + w0 // 2, pt + h0 - 1] if (kind == "loop" and preset in ("flame", "grass")) else [pl + w0 // 2, pt + h0 // 2]
     else:
         anc = [int(v) for v in str(anchor).split(",")]
+        anc = [anc[0] + pl, anc[1] + pt]
     rows = [seq]
     if rotations and rotations > 1:
         turned = [[rotate(f, k * 360.0 / rotations, expand=True) for f in seq] for k in range(rotations)]
@@ -186,7 +190,7 @@ def make_effect(image: str | Path, name: str, out_dir: str | Path, *, kind: str 
     meta = {"name": name, "kind": f"painted_{kind}", "size": [w, h], "frames": len(seq), "frame_width": w, "frame_height": h, "fps": fps, "loop": loop,
             "anchor": anc, "glow": True, "rotations": int(rotations or 1), "source": "pixelforge effect (painted)", "painting": str(image)}
     if look_info:
-        meta.update(look=look_info["spec"], looks=look_info["looks"], palette=look_info["palette"])
+        meta.update(look=look_info["spec"], looks=look_info["looks"], palette=look_info["palette"], pad=look_info["pad"])
     (out / f"{name}.json").write_text(json.dumps(meta, indent=2) + "\n")
     r = {"ok": True, "png": str(out / f"{name}.png"), "json": str(out / f"{name}.json"), "frames": len(seq), "size": [w, h], "kind": kind}
     if look_info:

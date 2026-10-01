@@ -7,6 +7,10 @@ shimmer, rim light, pulse, grain, flicker, dissolve, frost and rot. Looks stack 
 palette, extended by the look's own colours when the look adds light (neon, phosphor, frost, rot, a chosen outline
 colour), and the json written next to a sheet lists the palette actually used. All colour distance is OKLab.
 Loops stay loops: everything that moves in time is periodic over the frame count, so frame N is frame 0.
+Looks that paint outside the effect (haze, bloom, smoke, afterimages, drips, embers) declare a ``reach``; apply_looks
+pads every frame by the chain's reach with a transparent margin first, so nothing stops dead at the frame edge, and
+``info["pad"]`` (left, top, right, bottom) and ``info["size"]`` tell the caller how the frame grew (the anchor moves by
+the left and top pad). ``pad=False`` keeps the frame size; soft fields are then faded out on the outermost pixels.
 
     frames, info = apply_looks(frames, "glow:radius=8,echo:count=2", palette)   # palette: hex list, Palette or RGB array
     LOOKS["phosphorus"].params                                                   # the knobs: default, range, meaning
@@ -52,6 +56,7 @@ class Look:
     doc: str
     params: dict[str, Param]
     extra: Callable | None = None   # (params, base palette RGB) -> hex colours the look adds to the palette
+    reach: Callable | None = None   # (params, w, h) -> margin px the look paints outside the effect: one int, or (left, top, right, bottom)
 
     def defaults(self) -> dict:
         return {k: v.default for k, v in self.params.items()}
@@ -60,11 +65,33 @@ class Look:
 LOOKS: dict[str, Look] = {}
 
 
-def _register(name: str, doc: str, params: dict, extra=None):
+def _register(name: str, doc: str, params: dict, extra=None, reach=None):
     def deco(fn):
-        LOOKS[name] = Look(name, fn, doc, {k: (v if isinstance(v, Param) else Param(*v)) for k, v in params.items()}, extra)
+        LOOKS[name] = Look(name, fn, doc, {k: (v if isinstance(v, Param) else Param(*v)) for k, v in params.items()}, extra, reach)
         return fn
     return deco
+
+
+def look_reach(look, params: dict, w: int, h: int) -> tuple[int, int, int, int]:
+    """The transparent margin (left, top, right, bottom) one look needs round w x h frames; zeros for a look that stays inside."""
+    lk = LOOKS[look] if isinstance(look, str) else look
+    if lk.reach is None:
+        return (0, 0, 0, 0)
+    r = lk.reach(params, int(w), int(h))
+    if not isinstance(r, (tuple, list)):
+        r = (r, r, r, r)
+    return tuple(max(0, int(math.ceil(float(v)))) for v in r)
+
+
+def chain_reach(looks, w: int, h: int) -> tuple[int, int, int, int]:
+    """The margin a whole chain needs (its looks' reaches added up in order, since a later look spreads what an earlier
+    one painted): what apply_looks pads by, and what a caller that places the frames must shift its anchor by."""
+    l = t = r = b = 0
+    for d in parse_looks(looks):
+        p = {k: v for k, v in d.items() if k != "name"}
+        dl, dt, dr, db = look_reach(d["name"], p, w + l + r, h + t + b)
+        l, t, r, b = l + dl, t + dt, r + dr, b + db
+    return (l, t, r, b)
 
 
 def looks_table() -> list[dict]:
@@ -78,7 +105,8 @@ def looks_table() -> list[dict]:
                 ps[k]["min"], ps[k]["max"] = prm.lo, prm.hi
             if prm.choices:
                 ps[k]["choices"] = list(prm.choices)
-        rows.append({"name": name, "doc": lk.doc, "params": ps, "adds_colours": lk.extra is not None})
+        rows.append({"name": name, "doc": lk.doc, "params": ps, "adds_colours": lk.extra is not None, "pads": lk.reach is not None,
+                     "reach": list(look_reach(lk, lk.defaults(), 32, 48))})
     return rows
 
 
@@ -175,6 +203,15 @@ def _layer(rgb: np.ndarray, alpha01: np.ndarray) -> np.ndarray:
     out[..., 3] = (a * 255 + 0.5).astype(np.uint8)
     out[a <= 0] = 0
     return out
+
+
+def _edge_window(h: int, w: int, inner: int = 2, fade: int = 2) -> np.ndarray:
+    """1 inside the frame, 0 on the outermost ``inner`` rows and columns, a ramp of ``fade`` px between. Soft fields
+    (haze, bloom, smoke) are multiplied by it, so they fall off in pixels instead of stopping dead at the frame edge."""
+    def ramp(n):
+        d = np.minimum(np.arange(n), np.arange(n)[::-1]).astype(np.float32)
+        return np.clip((d - inner + 1) / max(fade, 1), 0, 1)
+    return ramp(h)[:, None] * ramp(w)[None, :]
 
 
 def _bayer(h: int, w: int) -> np.ndarray:
@@ -284,12 +321,14 @@ def look_phosphorus(frames, p, ctx):
 
 @_register("haze", "Soft bands of haze round the effect, dithered in the palette's darker steps, drifting slowly.",
            {"radius": (5.0, 1.0, 12.0, "how far the haze reaches, px"), "strength": (0.55, 0.0, 1.0, "how thick it is"),
-            "drift": (1.0, 0.0, 4.0, "how far it wanders over the loop, px"), "bands": (2, 1, 3, "how many of the palette's dark steps it uses")})
+            "drift": (1.0, 0.0, 4.0, "how far it wanders over the loop, px"), "bands": (2, 1, 3, "how many of the palette's dark steps it uses")},
+           reach=lambda p, w, h: math.ceil(p["radius"] * 2.2 * 1.5 + p["drift"]) + 2)
 def look_haze(frames, p, ctx):
     n = len(frames)
     pal = ctx["pal"]
     bands = max(1, min(int(p["bands"]), len(pal)))
     th = _bayer(*frames[0].shape[:2])
+    win = _edge_window(*frames[0].shape[:2])
     out = []
     for i, f in enumerate(frames):
         t = i / n
@@ -303,7 +342,7 @@ def look_haze(frames, p, ctx):
         ang = 2 * math.pi * t
         soft = _roll(soft, math.sin(ang) * p["drift"], math.cos(ang) * p["drift"] * 0.6)
         soft2 = _roll(soft2, -math.cos(ang) * p["drift"] * 0.5, math.sin(ang) * p["drift"] * 0.4)
-        field = np.clip(0.75 * soft + 0.55 * soft2, 0, 1) ** 1.6 * p["strength"]   # a steep tail: the haze ends before the frame does
+        field = np.clip(0.75 * soft + 0.55 * soft2, 0, 1) ** 1.6 * p["strength"] * win   # a steep tail, and nothing on the frame edge
         level = np.floor(field * 3 + th * 0.85).astype(int)
         a = np.array([0.0, 0.4, 0.6, 0.8])[np.clip(level, 0, 3)]
         a[cov > 0.5] = 0
@@ -324,7 +363,8 @@ def _etherealize(rgb: np.ndarray, pale: float) -> np.ndarray:
 @_register("ethereal", "Pale and see-through: colours fade toward bone and teal, edges soften, a faint inner light, a slow vertical drift.",
            {"pale": (0.6, 0.0, 1.0, "how far the colours fade toward bone and teal"), "drift": (1.5, 0.0, 4.0, "vertical wander over the loop, px"),
             "softness": (0.5, 0.0, 1.0, "how soft and see-through the edge gets"), "inner": (0.4, 0.0, 1.0, "faint light from inside")},
-           extra=lambda p, pal: hexes(_etherealize(pal, p["pale"])) + BONE_TEAL)
+           extra=lambda p, pal: hexes(_etherealize(pal, p["pale"])) + BONE_TEAL,
+           reach=lambda p, w, h: (2, math.ceil(p["drift"]) + 2, 2, math.ceil(p["drift"]) + 2))
 def look_ethereal(frames, p, ctx):
     n = len(frames)
     pale_rgb = np.array(hex_to_rgb(BONE_TEAL[-2]), np.uint8)
@@ -356,13 +396,15 @@ def look_ethereal(frames, p, ctx):
 
 @_register("glow", "Bloom in palette bands: an additive core and a wide soft halo.",
            {"intensity": (0.8, 0.0, 1.5, "halo strength"), "radius": (6.0, 1.0, 16.0, "halo reach, px"),
-            "core": (0.5, 0.0, 1.0, "how much the bright pixels lift"), "threshold": (0.55, 0.0, 1.0, "lightness where the glow starts")})
+            "core": (0.5, 0.0, 1.0, "how much the bright pixels lift"), "threshold": (0.55, 0.0, 1.0, "lightness where the glow starts")},
+           reach=lambda p, w, h: math.ceil(p["radius"] * 2.5) + 2)
 def look_glow(frames, p, ctx):
     pal = ctx["pal"]
     inner_c = pal[-2] if len(pal) > 1 else pal[-1]
     mid_c = pal[-3] if len(pal) > 2 else pal[0]
     outer_c = pal[-4] if len(pal) > 3 else mid_c
     th = _bayer(*frames[0].shape[:2])
+    win = _edge_window(*frames[0].shape[:2])
     out = []
     for f in frames:
         L = _L(f)
@@ -373,7 +415,7 @@ def look_glow(frames, p, ctx):
             continue
         halo = _blur(bright, p["radius"])
         halo /= max(halo.max(), 1e-6)
-        halo = halo ** 1.3 * p["intensity"]
+        halo = halo ** 1.3 * p["intensity"] * win   # the bloom fades out before the frame edge, never a square cut
         # three bands, each dithered at its edge so the halo falls off in pixels rather than a flat blob
         level = np.floor(np.clip(halo, 0, 1) * 3 + th * 0.9).astype(int)
         rgb = np.where((level >= 3)[..., None], inner_c, np.where((level == 2)[..., None], mid_c, outer_c)).astype(np.uint8)
@@ -392,7 +434,7 @@ def look_glow(frames, p, ctx):
 @_register("cyberpunk", "Neon edge light in magenta and cyan, scanline shimmer, a small chromatic offset, a hard dark core.",
            {"edge": (1.0, 0.0, 1.0, "rim brightness"), "scanline": (0.35, 0.0, 0.8, "how dark the alternate rows go"),
             "offset": (1, 0, 3, "chromatic split, px"), "core": (0.6, 0.0, 1.0, "how dark the inside goes")},
-           extra=lambda p, pal: NEON)
+           extra=lambda p, pal: NEON, reach=lambda p, w, h: (int(p["offset"]), 0, int(p["offset"]), 0))
 def look_cyberpunk(frames, p, ctx):
     n = len(frames)
     mag, mag2, cy, cy2, dark, _dark2 = [np.array(hex_to_rgb(c), np.float32) for c in NEON]
@@ -491,10 +533,18 @@ def look_psychedelic(frames, p, ctx):
     return out
 
 
+def _echo_reach(p, w, h):
+    n = int(p["count"])
+    dx, dy = n * p["dx"], n * p["dy"]
+    grow = math.ceil((max(float(p["scale"]), 1.0) ** n - 1) * max(w, h) / 2)
+    return (max(-dx, 0) + grow, max(-dy, 0) + grow, max(dx, 0) + grow, max(dy, 0) + grow)
+
+
 @_register("echo", "Afterimages: ghost copies trailing the motion, each fainter and darker, optionally offset or smaller.",
            {"count": (3, 1, 6, "ghosts"), "decay": (0.6, 0.2, 0.9, "opacity kept per ghost"), "spacing": (1, 1, 3, "frames between ghosts"),
             "dx": (-3, -16, 16, "offset per ghost, px (negative trails a missile flying right)"), "dy": (0, -16, 16, "vertical offset per ghost, px"),
-            "scale": (1.0, 0.5, 1.2, "size factor per ghost"), "dim": (1, 0, 3, "palette steps darker per ghost")})
+            "scale": (1.0, 0.5, 1.2, "size factor per ghost"), "dim": (1, 0, 3, "palette steps darker per ghost")},
+           reach=_echo_reach)
 def look_echo(frames, p, ctx):
     pal = ctx["pal"]
     palette = Palette(pal)
@@ -562,10 +612,12 @@ def look_smooth(frames, p, ctx):
 
 @_register("embers", "Sparks that rise from the bright parts and die, in the palette's brightest steps.",
            {"count": (12, 1, 40, "sparks"), "rise": (1.0, 0.0, 3.0, "how far they climb, as a share of the height"),
-            "speed": (1, 1, 3, "lives per loop"), "size": (1, 1, 2, "spark size, px")})
+            "speed": (1, 1, 3, "lives per loop"), "size": (1, 1, 2, "spark size, px")},
+           reach=lambda p, w, h: (int(p["size"]) + 2, math.ceil(p["rise"] * 0.35 * h) + int(p["size"]) + 1, int(p["size"]) + 2, 0))
 def look_embers(frames, p, ctx):
     n = len(frames)
     h, w = frames[0].shape[:2]
+    h0 = ctx["size0"][1]   # the climb is measured on the effect's own height, not the padded frame
     pal = ctx["pal"]
     rng = np.random.default_rng(ctx["seed"] + 11)
     cands = []
@@ -588,7 +640,7 @@ def look_embers(frames, p, ctx):
         for j in range(count):
             x0, y0 = cands[pick[j]]
             life = (t * speed + ph[j, 0]) % 1.0
-            y = y0 - life * p["rise"] * h * 0.35
+            y = y0 - life * p["rise"] * h0 * 0.35
             x = x0 + math.sin(2 * math.pi * (life * 2 + ph[j, 1])) * 1.5
             a = (1 - life) ** 0.6 * amp
             if a < 0.2:
@@ -604,7 +656,9 @@ def look_embers(frames, p, ctx):
 
 @_register("smoke", "A dark smoke layer trailing up and away behind the effect, in the palette's darkest steps.",
            {"strength": (0.6, 0.0, 1.0, "thickness"), "rise": (1.0, 0.0, 3.0, "how fast it climbs"),
-            "drift": (0.5, -2.0, 2.0, "sideways wander"), "radius": (3.0, 1.0, 8.0, "how wide it spreads, px")})
+            "drift": (0.5, -2.0, 2.0, "sideways wander"), "radius": (3.0, 1.0, 8.0, "how wide it spreads, px")},
+           reach=lambda p, w, h: (math.ceil(abs(p["drift"]) * 6 + p["radius"] * 2) + 2, math.ceil(p["rise"] * 10 + p["radius"] * 2) + 2,
+                                  math.ceil(abs(p["drift"]) * 6 + p["radius"] * 2) + 2, math.ceil(p["radius"] * 2) + 2))
 def look_smoke(frames, p, ctx):
     n = len(frames)
     h, w = frames[0].shape[:2]
@@ -612,6 +666,7 @@ def look_smoke(frames, p, ctx):
     rng = np.random.default_rng(ctx["seed"] + 23)
     noise = periodic_noise(w, h, 2, rng, octaves=3)
     th = _bayer(h, w)
+    win = _edge_window(h, w)
     ry, rx = max(1, int(round(p["rise"]))), int(round(p["drift"]))
     out = []
     for i, f in enumerate(frames):
@@ -629,7 +684,7 @@ def look_smoke(frames, p, ctx):
         plume /= max(plume.max(), 1e-6)
         nz = _roll(noise, -t * h * ry, t * w * rx)
         nz = (nz - nz.min()) / max(nz.max() - nz.min(), 1e-6)
-        dens = np.clip((nz - 0.3) * 1.8, 0, 1) * plume * p["strength"]
+        dens = np.clip((nz - 0.3) * 1.8, 0, 1) * plume * p["strength"] * win
         level = np.floor(dens * 3 + th).astype(int)
         a = np.array([0.0, 0.5, 0.7, 0.85])[np.clip(level, 0, 3)]
         a[_cov(f)] = 0
@@ -641,7 +696,8 @@ def look_smoke(frames, p, ctx):
 
 
 @_register("shimmer", "Heat shimmer: rows sway by a small periodic displacement.",
-           {"amplitude": (1.0, 0.0, 3.0, "px"), "wavelength": (6.0, 2.0, 24.0, "rows per wave"), "speed": (1, 1, 4, "waves travelling per loop")})
+           {"amplitude": (1.0, 0.0, 3.0, "px"), "wavelength": (6.0, 2.0, 24.0, "rows per wave"), "speed": (1, 1, 4, "waves travelling per loop")},
+           reach=lambda p, w, h: (math.ceil(p["amplitude"]), 0, math.ceil(p["amplitude"]), 0))
 def look_shimmer(frames, p, ctx):
     n = len(frames)
     h = frames[0].shape[0]
@@ -665,7 +721,7 @@ def look_shimmer(frames, p, ctx):
 @_register("outline", "Rim light: a one-pixel (or wider) edge in a chosen colour, all round or from one side.",
            {"colour": Param("#eafff8", doc="hex colour of the rim"), "width": (1, 1, 3, "px"), "strength": (1.0, 0.0, 1.0, "opacity"),
             "side": Param("all", doc="all | top | bottom | left | right", choices=("all", "top", "bottom", "left", "right"))},
-           extra=lambda p, pal: [p["colour"]])
+           extra=lambda p, pal: [p["colour"]], reach=lambda p, w, h: int(p["width"]))
 def look_outline(frames, p, ctx):
     col = np.array(hex_to_rgb(p["colour"]), np.uint8)
     width = int(p["width"])
@@ -755,7 +811,7 @@ def look_dissolve(frames, p, ctx):
 @_register("ice", "Frost: colours chill toward pale blue, crystals twinkle on the bright edges.",
            {"frost": (0.6, 0.0, 1.0, "how blue"), "crystals": (10, 0, 40, "how many"), "pale": (0.5, 0.0, 1.0, "how much the bright parts whiten"),
             "twinkle": (1, 0, 1, "crystals twinkle over the loop")},
-           extra=lambda p, pal: FROST)
+           extra=lambda p, pal: FROST, reach=lambda p, w, h: 1 if int(p["crystals"]) else 0)
 def look_ice(frames, p, ctx):
     n = len(frames)
     h, w = frames[0].shape[:2]
@@ -803,10 +859,11 @@ def look_ice(frames, p, ctx):
 @_register("rot", "Miasma rot in the game's teal-green: the lower part sickens, drips fall from the underside.",
            {"drips": (6, 0, 16, "how many drops"), "strength": (0.6, 0.0, 1.0, "how thick the miasma"),
             "speed": (1, 1, 3, "falls per loop"), "tint": (0.5, 0.0, 1.0, "how green the lower part goes")},
-           extra=lambda p, pal: ROT)
+           extra=lambda p, pal: ROT, reach=lambda p, w, h: (7, 5, 7, (math.ceil(0.4 * h) + 3) if int(p["drips"]) else 5))
 def look_rot(frames, p, ctx):
     n = len(frames)
     h, w = frames[0].shape[:2]
+    h0 = ctx["size0"][1]
     rng = np.random.default_rng(ctx["seed"] + 53)
     th = _bayer(h, w)
     rot = np.array([hex_to_rgb(c) for c in ROT], np.uint8)
@@ -844,7 +901,7 @@ def look_rot(frames, p, ctx):
         covb = _cov(f)
         for j in range(nd):
             u = (t * rates[j] + ph[j, 0]) % 1.0
-            y, x = int(bottoms[j] + 1 + u * u * h * 0.5), int(dxs[j])
+            y, x = int(bottoms[j] + 1 + u * u * h0 * 0.4), int(dxs[j])
             a_d = int(255 * (1 - 0.6 * u))
             for dy, c in ((0, rot[3] if u < 0.5 else rot[2]), (-1, rot[2]), (-2, rot[1])):
                 yy = y + dy
@@ -940,20 +997,36 @@ def spec_string(looks: list[dict]) -> str:
     return "+".join(parts)
 
 
-def apply_looks(frames: list[np.ndarray], looks, palette=None, *, loop: bool = True, seed: int = 1, fps: float = 10.0) -> tuple[list[np.ndarray], dict]:
+def apply_looks(frames: list[np.ndarray], looks, palette=None, *, loop: bool = True, seed: int = 1, fps: float = 10.0,
+                pad: bool | int = True) -> tuple[list[np.ndarray], dict]:
     """Run the looks in order and finish palette-locked. Returns ``(frames, info)`` with ``info["palette"]`` the hex list
     actually used (the effect's palette plus the looks' own colours), ``looks`` normalized, ``fps_scale`` and ``loop``
-    (``smooth`` may double the frame count and ``dissolve`` makes a one-shot)."""
+    (``smooth`` may double the frame count and ``dissolve`` makes a one-shot), ``pad`` (left, top, right, bottom: the
+    transparent margin added round every frame for the chain's reach, see :func:`chain_reach`) and ``size`` (w, h of the
+    frames returned). ``pad=False`` keeps the frame size (soft fields then fade out on the outermost pixels); an int pads
+    by that much on every side instead of the chain's reach. A caller that places the frames moves its anchor by the
+    left and top pad."""
     chain = parse_looks(looks)
     frames = [np.ascontiguousarray(np.asarray(f, np.uint8)) for f in frames]
     frames = [np.dstack([f, np.full(f.shape[:2], 255, np.uint8)]) if f.shape[-1] == 3 else f for f in frames]
+    h0, w0 = frames[0].shape[:2] if frames else (0, 0)
     base = as_palette(palette) if palette is not None and len(palette) else frames_palette(frames)
-    info = {"looks": chain, "spec": spec_string(chain), "fps_scale": 1.0, "loop": bool(loop)}
+    info = {"looks": chain, "spec": spec_string(chain), "fps_scale": 1.0, "loop": bool(loop), "pad": [0, 0, 0, 0], "size": [w0, h0]}
     if not chain or not frames:
         info.update(palette=hexes(base), frames=len(frames))
         return frames, info
+    if pad is True:
+        margin = chain_reach(chain, w0, h0)
+    elif pad:
+        margin = (int(pad),) * 4
+    else:
+        margin = (0, 0, 0, 0)
+    if any(margin):
+        l, t, r, b = margin
+        frames = [np.pad(f, ((t, b), (l, r), (0, 0))) for f in frames]
+    info["pad"] = list(margin)
     rng = np.random.default_rng(seed)
-    ctx = {"pal": base, "loop": bool(loop), "seed": int(seed), "fps": float(fps), "phases": rng.random(4)}
+    ctx = {"pal": base, "loop": bool(loop), "seed": int(seed), "fps": float(fps), "phases": rng.random(4), "size0": (w0, h0), "pad": margin}
     extras: list[str] = []
     for d in chain:
         lk = LOOKS[d["name"]]
@@ -971,7 +1044,7 @@ def apply_looks(frames: list[np.ndarray], looks, palette=None, *, loop: bool = T
             frames = res
     full = as_palette(np.concatenate([base, np.array([hex_to_rgb(c) for c in extras], np.uint8).reshape(-1, 3)]))
     frames = lock_palette(frames, full)
-    info.update(palette=hexes(full), frames=len(frames))
+    info.update(palette=hexes(full), frames=len(frames), size=[int(frames[0].shape[1]), int(frames[0].shape[0])])
     return frames, info
 
 
@@ -988,6 +1061,7 @@ def relook(json_path: str | Path, looks, name: str | None = None, out_dir: str |
     rows = max(1, int(meta.get("rotations", 1) or 1))
     pal = meta.get("palette") or frames_palette([strip])
     loop, fps = bool(meta.get("loop", True)), float(meta.get("fps", 10) or 10)
+    anchor = list(meta.get("anchor") or [fw // 2, fh // 2])
     out_rows, info, first = [], None, None
     for r in range(rows):
         frames = [strip[r * fh:(r + 1) * fh, i * fw:(i + 1) * fw] for i in range(n)]
@@ -999,11 +1073,15 @@ def relook(json_path: str | Path, looks, name: str | None = None, out_dir: str |
     out = Path(out_dir) if out_dir else p.parent
     out.mkdir(parents=True, exist_ok=True)
     Image.fromarray(sheet, "RGBA").save(out / f"{name}.png")
+    pl, pt = info["pad"][:2]
     meta2 = {**meta, "name": name, "frames": info["frames"], "fps": fps * info["fps_scale"], "loop": info["loop"], "palette": info["palette"],
-             "look": info["spec"], "looks": info["looks"], "source": str(meta.get("source", "pixelforge")) + " + look"}
+             "look": info["spec"], "looks": info["looks"], "source": str(meta.get("source", "pixelforge")) + " + look",
+             "size": list(info["size"]), "frame_width": info["size"][0], "frame_height": info["size"][1],
+             "anchor": [int(anchor[0]) + pl, int(anchor[1]) + pt], "pad": info["pad"]}
     (out / f"{name}.json").write_text(json.dumps(meta2, indent=2) + "\n")
     r = {"ok": True, "png": str(out / f"{name}.png"), "json": str(out / f"{name}.json"), "frames": info["frames"], "fps": meta2["fps"],
-         "loop": info["loop"], "palette": info["palette"], "look": info["spec"], "rotations": rows}
+         "loop": info["loop"], "palette": info["palette"], "look": info["spec"], "rotations": rows, "size": meta2["size"], "anchor": meta2["anchor"],
+         "pad": info["pad"]}
     if gif:
         from .spritesheet import save_gif
 
@@ -1013,11 +1091,42 @@ def relook(json_path: str | Path, looks, name: str | None = None, out_dir: str |
 
 
 # ------------------------------------------------------------------ the demo: every look on a wisp and a bone spear
-DEMO = (("wisp", (32, 48)), ("bone_spear", (96, 40)))
+DEMO = (("wisp", (32, 48), 0.0), ("bone_spear", (96, 40), 14.0))   # kind, size, glide: px the spear travels right and back over the loop
 
 
-def demo(out_dir: str | Path, looks=None, *, frames: int = 12, fps: float = 10.0, zoom: int = 2, bg: str = "#0f1317", seed: int = 3) -> dict:
-    """One GIF per look (a wisp and the bone spear side by side, on the game's dark) and a contact sheet PNG of them all."""
+def _paste(canvas: np.ndarray, f: np.ndarray, x: int, y: int) -> None:
+    """``f`` drawn over ``canvas`` with its top-left at (x, y), clipped to the canvas."""
+    H, W = canvas.shape[:2]
+    h, w = f.shape[:2]
+    x0, y0, x1, y1 = max(x, 0), max(y, 0), min(x + w, W), min(y + h, H)
+    if x1 <= x0 or y1 <= y0:
+        return
+    canvas[y0:y1, x0:x1] = _over(f[y0 - y:y1 - y, x0 - x:x1 - x], canvas[y0:y1, x0:x1])
+
+
+def _glide(frames: list[np.ndarray], amp: float) -> list[np.ndarray]:
+    """The frames on a canvas 2 * amp wider, the effect travelling right and back over the loop (a sine, so the loop
+    closes): a missile in flight, which is what afterimages, trails and persistence need to show."""
+    a = int(round(amp))
+    if a <= 0:
+        return frames
+    n = len(frames)
+    out = []
+    for i, f in enumerate(frames):
+        h, w = f.shape[:2]
+        c = np.zeros((h, w + 2 * a, 4), np.uint8)
+        x = a + int(round(a * math.sin(2 * math.pi * i / n)))
+        c[:, x:x + w] = f
+        out.append(c)
+    return out
+
+
+def demo(out_dir: str | Path, looks=None, *, frames: int = 12, fps: float = 10.0, zoom: int = 2, bg: str = "#0f1317", seed: int = 3,
+         margin: int = 24, budget: int = 380_000) -> dict:
+    """One GIF per look (a wisp and the bone spear side by side on the game's dark; the spear glides so the motion looks
+    show) and a contact sheet PNG of them all, three moments per look. A look's GIF cell is the plain effect plus that
+    look's own margin (its reach), so nothing it paints is cut; the contact sheet uses one cell for every look (the
+    largest margin, capped at ``margin`` px) and drops to zoom 1 when the file would pass ``budget`` bytes."""
     from PIL import ImageDraw
 
     from . import spell, vfx
@@ -1025,51 +1134,73 @@ def demo(out_dir: str | Path, looks=None, *, frames: int = 12, fps: float = 10.0
 
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    names = ["plain", *LOOKS] if looks is None else [n for n in (looks if isinstance(looks, (list, tuple)) else str(looks).split(" "))]
+    names = list(LOOKS) if looks is None else [n for n in (looks if isinstance(looks, (list, tuple)) else str(looks).split(" ")) if n]
+    names = ["plain"] + [n for n in names if n != "plain"]   # the plain effect is always the first row, the reference
     bgc = hex_to_rgb(bg) + (255,)
     plain = {}
-    for kind, (w, h) in DEMO:
+    for kind, (w, h), glide in DEMO:
         pal = vfx.PRESETS[vfx.MISSILES[kind]["palette"]] if kind in vfx.MISSILES else vfx.PRESETS["wisp"]
-        plain[kind] = (spell.render_kind(kind, w, h, frames, pal, seed), pal)
+        plain[kind] = (_glide(spell.render_kind(kind, w, h, frames, pal, seed), glide), pal)
+    sizes = [(plain[kind][0][0].shape[1], plain[kind][0][0].shape[0]) for kind, _s, _g in DEMO]   # plain (w, h), glide included
     gap = 6
-    cw = sum(w for _k, (w, _h) in DEMO) + gap * (len(DEMO) - 1)
-    ch = max(h for _k, (_w, h) in DEMO)
-    gifs, rows = {}, []
+    rendered = {}   # name -> ([(frames, pad)] per demo effect, fps)
     for name in names:
         seqs, cfps = [], fps
-        for kind, (w, h) in DEMO:
+        for kind, _size, _g in DEMO:
             seq, pal = plain[kind]
+            padv = (0, 0, 0, 0)
             if name != "plain":
                 seq, info = apply_looks(seq, name, pal, loop=True, seed=seed, fps=fps)
-                cfps = fps * info["fps_scale"]
-            seqs.append(seq)
-        count = max(len(s) for s in seqs)
+                cfps, padv = fps * info["fps_scale"], tuple(info["pad"])
+            seqs.append((seq, padv))
+        rendered[name] = (seqs, cfps)
+
+    def compose(seqs, cell_pad):
+        """Frames of one row: each effect centred in its cell (plain size + cell_pad all round), its look's margin laid round it."""
+        cw = sum(w + 2 * cell_pad for w, _h in sizes) + gap * (len(sizes) - 1)
+        ch = max(h + 2 * cell_pad for _w, h in sizes)
+        count = max(len(s) for s, _p in seqs)
         canvases = []
         for i in range(count):
             canvas = np.zeros((ch, cw, 4), np.uint8)
             canvas[...] = bgc
             x = 0
-            for seq, (kind, (w, h)) in zip(seqs, DEMO):
-                f = seq[i % len(seq)]
-                y0 = (ch - h) // 2
-                canvas[y0:y0 + h, x:x + w] = _over(f, canvas[y0:y0 + h, x:x + w])
-                x += w + gap
+            for (seq, padv), (w, h) in zip(seqs, sizes):
+                _paste(canvas, seq[i % len(seq)], x + cell_pad - padv[0], (ch - h) // 2 - padv[1])
+                x += w + 2 * cell_pad + gap
             canvases.append(canvas)
+        return canvases
+
+    gifs = {}
+    for name in names:
+        seqs, cfps = rendered[name]
+        canvases = compose(seqs, max([max(p) for _s, p in seqs] + [0]))
         path = out / f"look_{name}.gif"
         save_gif(canvases, path, fps=cfps, zoom=zoom, background=bgc)
         gifs[name] = str(path)
+    # the contact sheet: a row per look, three moments each, one cell size for all so the looks compare
+    cell_pad = min(int(margin), max(max(p) for name in names for _s, p in rendered[name][0]))
+    rows = []
+    for name in names:
+        canvases = compose(rendered[name][0], cell_pad)
+        count = len(canvases)
         rows.append((name, [canvases[int(k * count / 3)] for k in range(3)]))
-    # the contact sheet: a row per look, three moments each
     label_w = 120
-    zw, zh = cw * zoom, ch * zoom
-    sheet = Image.new("RGB", (label_w + 3 * (zw + 4), len(rows) * (zh + 4) + 4), bgc[:3])
-    draw = ImageDraw.Draw(sheet)
-    for r, (name, moments) in enumerate(rows):
-        y = 4 + r * (zh + 4)
-        draw.text((8, y + zh // 2 - 6), name, fill=(214, 206, 186))
-        for c, canvas in enumerate(moments):
-            im = Image.fromarray(canvas, "RGBA").convert("RGB").resize((zw, zh), Image.NEAREST)
-            sheet.paste(im, (label_w + c * (zw + 4), y))
+    ch, cw = rows[0][1][0].shape[:2]
     contact = out / "looks_contact.png"
-    sheet.save(contact, optimize=True)
-    return {"ok": True, "gifs": gifs, "contact": str(contact), "looks": [n for n in names if n != "plain"], "frames": frames, "fps": fps}
+    z = zoom
+    for z in sorted({zoom, 1}, reverse=True):
+        zw, zh = cw * z, ch * z
+        sheet = Image.new("RGB", (label_w + 3 * (zw + 4), len(rows) * (zh + 4) + 4), bgc[:3])
+        draw = ImageDraw.Draw(sheet)
+        for r, (name, moments) in enumerate(rows):
+            y = 4 + r * (zh + 4)
+            draw.text((8, y + zh // 2 - 6), name, fill=(214, 206, 186))
+            for c, canvas in enumerate(moments):
+                im = Image.fromarray(canvas, "RGBA").convert("RGB").resize((zw, zh), Image.NEAREST)
+                sheet.paste(im, (label_w + c * (zw + 4), y))
+        sheet.save(contact, optimize=True)
+        if contact.stat().st_size <= budget:
+            break
+    return {"ok": True, "gifs": gifs, "contact": str(contact), "contact_zoom": z, "looks": [n for n in names if n != "plain"], "frames": frames,
+            "fps": fps, "cell_pad": cell_pad}

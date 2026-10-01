@@ -137,7 +137,10 @@ and "Describe it" understands the words (phosphorus, hazy, ghostly, neon, trippy
 rotting...). Every frame stays in the effect's own colours plus the few the look adds, so it still reads as pixel
 art. The game's own theme keeps the neon and psychedelic looks for magic. To see them side by side, run
 `pixelforge looks --demo <folder>`: one GIF per look and a contact sheet; the game repo has them in
-`docs/screens/fxlook/`.
+`docs/screens/fxlook/`. A look that spreads outside the effect (haze, glow, smoke, afterimages, drips, embers) is given
+room: the frame grows by what the look needs, so nothing is cut square at the edge, and the effect's anchor moves with
+it; the game reads the new size from the json. To judge a small effect in the game, the game preview can draw it
+bigger (effect scale 3) and save a run of frames a tenth of a second apart, which shows the loop frame by frame.
 
 **Spell designer** (Tools > Spell designer): a spell is layers of effects. Start from a preset (fireball, ward, soul drain, bone shatter, lightning strike, bone spear hit, frost nova, fire wall,
 corpse burst), add or remove layers, and set each layer's kind, colours, size, position,

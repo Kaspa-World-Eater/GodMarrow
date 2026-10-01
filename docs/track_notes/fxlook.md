@@ -41,8 +41,20 @@ palette, loop, seed, fps) -> (frames, info)` and `relook(json, spec, name, out_d
   designer should open with those pads on.
 - **Theme note for the page**: a small line under the pads, "The game keeps cyberpunk and psychedelic for magic"
   (the rule in docs/wiki/01: glow only on magic, lanterns and wisps; no bright red in the world's own things).
+- **Frame growth**: a look that paints outside the effect (haze, glow, smoke, echo, embers, rot, ethereal, outline,
+  shimmer, cyberpunk, ice) grows the frame by its reach (`info["pad"]` = left, top, right, bottom; `info["size"]`;
+  `chain_reach(spec, w, h)` gives it without rendering). Show a readout next to the preview, "frame 24x36 -> 64x76,
+  anchor 32,38", and draw the preview centred on the **anchor**, not the frame, so switching a look on does not jump
+  the effect. The exported json carries `pad`, the grown `size` / `frame_width` / `frame_height` and the moved
+  `anchor`; `apply_looks(..., pad=False)` is for a preview that must keep its canvas (the soft looks then fade on the
+  edge). `looks_table()` rows have `reach` and `pads` for the pad's tooltip.
+- **Game preview page**: an "effect scale" spinner (1-4, `fx_scale`, the game's `--fx_scale`) and "frames / interval"
+  (`shot_n`, `shot_dt`; `--shot_n`, `--shot_dt`) beside Screenshot, so a 24 px wisp can be judged at 3x and a loop
+  seen frame by frame; `preview_in_game(..., fx_scale=3, shot_n=12, shot_dt=0.1)` returns `<shot>_0.png` ...
 
 ## In the game
 
-`art/fx/wisp_phosphorus`, `bone_spear_echo` (8 headings), `vortex_psychedelic`, `ward_ethereal`, `fire_cyberpunk`
-are exported examples; `--fx=<name>` shows any of them at the pilgrim; crops in `docs/screens/fxlook/game_*.png`.
+`art/fx/wisp_phosphorus`, `wisp_haze_glow`, `bone_spear_echo` (8 headings), `vortex_psychedelic`, `ward_ethereal`,
+`fire_cyberpunk` are exported examples, listed in `art/fx/fx.json` (`python3 tools/make_fx.py --manifest` rebuilds the
+manifest from every sheet in the folder); `--fx=<name> --fx_scale=3` shows any of them at the pilgrim three times
+their size; crops in `docs/screens/fxlook/game_*.png` (12 frames 0.1 s apart) and the loops in `game_*.gif`.
