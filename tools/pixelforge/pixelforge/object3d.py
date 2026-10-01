@@ -38,8 +38,9 @@ def make_object(sheet: str | Path, name: str, out_dir: str | Path, *, height: fl
         raise api.StepError(f"could not find a front view (found {sorted(got)})")
     tex = {}
     for k, v in got.items():
-        v.image.save(work / f"{k}.png")
-        rgba = cleanup.bleed_edges(np.asarray(v.image.convert("RGBA")))
+        clean = cleanup.remove_background_pockets(cleanup.drop_floor_shadow(np.asarray(v.image.convert("RGBA"))))
+        Image.fromarray(clean, "RGBA").save(work / f"{k}.png")
+        rgba = cleanup.bleed_edges(clean)
         p = work / f"tex_{k}.png"
         Image.fromarray(rgba, "RGBA").save(p)
         tex[k] = p

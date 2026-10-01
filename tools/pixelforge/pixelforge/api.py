@@ -147,7 +147,9 @@ def split(project: Project, name: str, tolerance: float = 0.08, expected_views: 
             raise StepError("no figures found on the sheet; is the background plain (one flat colour)? Try a higher tolerance, or import the views one by one.")
         for v in views:
             out = views_dir / f"{v.name}.png"
-            v.image.save(out)
+            rgba_v = cleanup.remove_background_pockets(cleanup.drop_floor_shadow(np.asarray(v.image.convert("RGBA"))))
+            rgba_v[..., 3] = cleanup.remove_islands(rgba_v[..., 3], min_fraction=0.0015)   # fringe specks would float as voxels
+            Image.fromarray(rgba_v, "RGBA").save(out)
             made[v.name] = str(out)
             # the raw crop, for the manual cutout editor's Restore brush
             sheet_im.crop(v.box).resize(v.image.size, Image.LANCZOS).save(views_dir / f"{v.name}_raw.png")

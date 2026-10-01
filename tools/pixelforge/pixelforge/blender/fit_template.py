@@ -160,10 +160,13 @@ def arm_vertices(arm, mesh) -> np.ndarray:
 def legs_visible(vox: np.ndarray) -> bool:
     """Two silhouette runs at knee height in the front view = the legs show (no robe)."""
     rows = vox.shape[0]
-    band = vox[int(rows * 0.72):int(rows * 0.9)].any(axis=1)   # z, x
     def nruns(occ):
         return int(np.count_nonzero(np.diff(np.concatenate([[0], occ.astype(int), [0]])) == 1))
-    return int(np.median([nruns(r) for r in band])) >= 2
+    for lo, hi in ((0.72, 0.9), (0.86, 0.97)):   # knees, or at least the shins and feet under a skirt
+        band = vox[int(rows * lo):int(rows * hi)].any(axis=1)   # z, x
+        if int(np.median([nruns(r) for r in band])) >= 2:
+            return True
+    return False
 
 
 def fcurves(action):

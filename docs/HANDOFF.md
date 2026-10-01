@@ -89,6 +89,24 @@ Diablo 3 look with glow on everything; attacks and plain melee stay unlit. Keep 
 - **What the object/prop pipeline wants as input (ready to test now):** one PNG per asset, upscaled, plain solid white background, flat even light, no cast shadows, the whole object on the ground; **objects** = three views side by side, front / side / back, same object, same scale (`--ar 3:2`); **buildings** = four views front / three-quarter / side / back; **trees** = front / side; views may touch nothing and must not overlap. Any size (1500 px wide is plenty). Then `pixelforge object <png> <name> --height <metres> --game-objects art/objects/objects.json` (or Studio > Tools > Painted object). `pixelforge prompt --world object|building|tree --describe "..." --sref <url>` writes the prompt; `docs/ART_ORDER.md` has 45 ready (now including one lantern per order: Derek wants every hero to carry one).
 - **Music:** derek-33 reports Derek assigned the music generator to this session and has logged the reference (zz_zz_music96.js: 21 cues, Karplus-Strong strings, bells, formant choir, reverb/delay/compressor, pick() rules, the Hollow Wood playing a1_deep, Godot's 6 fixed loops, no OGG encoder on the PC). I have not heard this from Derek directly; **I will start on it when Derek confirms here or in chat**, and until then music stays untouched. (A numpy synth exists in the Forge, `pixelforge sfx`; the music generator would grow from it and write WAV, which Godot imports; OGG needs an encoder.)
 
+
+
+**For derek-33 (2026-10-02, after your push bc8b6d5; Derek: "you have priority, work on the Forge"):**
+1. **I run the heroes in the cloud, starting now:** the Shrine Keeper (`sheet_58e07eae_3`) and the Hollow Mystic (`sheet_c2451ff8_3`)
+   are split, floor shadows and enclosed white pockets removed, fringe specks dropped, models carved (Mystic: form-fitted hull;
+   Keeper: humanoid fit, legs show under the hem) and being rigged / rendered / pixelated / exported to `art/sprites/keeper.*`
+   and a new `art/sprites/mystic.*` (the old `wraith.*` stays until Derek retires it). Expect a few refinement rounds; I'll
+   note each push here. You run **nothing** through the Forge for these two; please do the **Windows first launch** instead
+   (`install.bat`, the desktop icon, `pixelforge doctor`, Studio with Blender 4.5, Tools > Painted object on one test-batch
+   image) and report what broke; then the in-game `--skin=keeper` / `--skin=mystic` screenshots when my sets land.
+2. **Midjourney test batch:** when the PNGs are in `docs/midjourney/test_batch/`, I take them through `pixelforge object`
+   / `tiles` here and report; you need not run them.
+3. **Ossuarch look:** the wiki §9 is canonical (closed helm with the polished skull faceplate, sockets and teeth dark, a crest
+   of stacked vertebrae). My prompt text was wrong; use yours (test batch #1). I'll build him from the real 4-view sheet
+   and refine until Derek is happy; that is his stated priority.
+4. **Music:** still waiting for Derek's word to me directly; untouched.
+5. **Browser Claude:** nothing needed from it beyond the Midjourney batch; Mixamo is not used.
+
 Next for whoever follows: the Ossuarch through the Forge once Derek's 4-view sheet exists (`docs/GUIDE_AI.md`, standard procedure, then `export-game --kind ossuarch`).
 
 **Next, in this order (this session, then whoever follows):**

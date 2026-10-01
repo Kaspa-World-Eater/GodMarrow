@@ -216,3 +216,51 @@ def crop_to_content(rgba: np.ndarray, margin: int = 1) -> np.ndarray:
 
 def darkest(colors: np.ndarray) -> np.ndarray:
     return colors[rgb_to_oklab(colors)[:, 0].argmin()]
+
+
+def drop_floor_shadow(rgba: np.ndarray, band: float = 0.1, min_l: float = 0.68, max_chroma: float = 0.035) -> np.ndarray:
+    """Remove the pale cast shadow a turnaround sheet leaves under the feet: in the bottom ``band`` of the figure,
+    light, grey pixels (OKLab L > min_l, chroma < max_chroma) that touch the bottom edge become transparent.
+    Boots and hems are darker or coloured, so they stay."""
+    from .color import rgb_to_oklab
+
+    out = rgba.copy()
+    ys, xs = np.nonzero(out[..., 3])
+    if len(ys) == 0:
+        return out
+    top, bottom = ys.min(), ys.max()
+    y0 = int(bottom - (bottom - top) * band)
+    sub = out[y0:bottom + 1]
+    lab = rgb_to_oklab(sub[..., :3])
+    pale = (lab[..., 0] > min_l) & (np.hypot(lab[..., 1], lab[..., 2]) < max_chroma) & (sub[..., 3] > 0)
+    # keep only pale pixels connected to the bottom row (the shadow lies on the floor)
+    from collections import deque
+
+    h, w = pale.shape
+    seen = np.zeros_like(pale)
+    q = deque((h - 1, x) for x in range(w) if pale[h - 1, x])
+    for y, x in q:
+        seen[y, x] = True
+    while q:
+        y, x = q.popleft()
+        for ny, nx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
+            if 0 <= ny < h and 0 <= nx < w and pale[ny, nx] and not seen[ny, nx]:
+                seen[ny, nx] = True
+                q.append((ny, nx))
+    sub[seen, 3] = 0
+    return out
+
+
+def remove_background_pockets(rgba: np.ndarray, tolerance: float = 0.04) -> np.ndarray:
+    """Enclosed pockets of background (between legs, under an arm) that the border flood could not reach:
+    opaque pixels within a strict ``tolerance`` of the image's corner colour become transparent. Strict on purpose,
+    so bone-white cloth (farther from pure white than that) stays."""
+    from .color import rgb_to_oklab
+
+    out = rgba.copy()
+    lab = rgb_to_oklab(out[..., :3])
+    corners = np.stack([lab[0, 0], lab[0, -1], lab[-1, 0], lab[-1, -1]])
+    bg = corners.mean(axis=0)
+    close = (np.linalg.norm(lab - bg, axis=-1) < tolerance) & (out[..., 3] > 0)
+    out[close, 3] = 0
+    return out
