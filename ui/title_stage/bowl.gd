@@ -16,6 +16,7 @@ const CARDS := [
 	[0, "drop", Vector2(240, 204), -0.4], [1, "mirror", Vector2(280, 240), -0.18], [2, "skull", Vector2(340, 249), 0.04],
 	[3, "breath", Vector2(400, 240), 0.2], [4, "bowl", Vector2(440, 204), 0.42],
 ]
+const SHIFT := -100.0
 const CW := 21.0
 const CH := 33.0
 
@@ -47,6 +48,13 @@ func _ready() -> void:
 	bg.size = Vector2(1920, 1080)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
+	# the web moves the chapel so the face stands in the middle (zz_title54.js:11, SHIFT -100) and fills the strip it
+	# never painted on the right with its own left side, mirrored about the face, laid in with a stepped cross-fade
+	position.x = SHIFT * K
+	var mir := Node2D.new()
+	mir.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	mir.draw.connect(_draw_mirror.bind(mir, bg.texture))
+	add_child(mir)
 	var meta = JSON.parse_string(FileAccess.get_file_as_string("res://art/ui/title_bowl.json"))
 	var pal := PackedVector3Array()
 	if meta is Dictionary:
@@ -191,7 +199,21 @@ func _draw_add() -> void:
 		var r: float = 36.0 + 10.0 * T._flick(i * 1.7)
 		add_fx.draw_texture_rect(_glow, Rect2(c + Vector2(-r, -r - 8), Vector2(r * 2, r * 2)), false, Color(1.0, 0.6, 0.3, 0.2))
 
+## the strip right of the chapel: its own left side, mirrored about the face (x 340)
+func _draw_mirror(n: Node2D, tex: Texture2D) -> void:
+	for i in 7:
+		# a stepped cross-fade (six 2 px slices from 368), then the strip itself from 380 to the edge
+		var x0 := 368.0 + i * 2.0 if i < 6 else 380.0
+		var w := 2.0 if i < 6 else 100.0
+		var a := (i + 1) / 7.0 if i < 6 else 1.0
+		# screen x0..x0+w (the web's grid) shows the chapel at 580 - x, flipped (this stage stands at SHIFT)
+		var sx := 580.0 - x0 - w
+		n.draw_set_transform(Vector2((x0 - SHIFT + w) * K, 0), 0.0, Vector2(-1, 1))
+		n.draw_texture_rect_region(tex, Rect2(0, 0, w * K, 270 * K), Rect2(sx, 0, w, 270), Color(1, 1, 1, a))
+	n.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
 func order_at(p: Vector2) -> int:
+	p -= position
 	var best := -1
 	var best_y := -INF
 	for c in cards:
@@ -206,5 +228,5 @@ func order_at(p: Vector2) -> int:
 func label_at(i: int) -> Vector2:
 	for c in cards:
 		if c["o"] == i:
-			return c["at"] + Vector2(0, -300)
-	return Vector2(1360, 500)
+			return c["at"] + Vector2(0, -300) + position
+	return Vector2(1360, 500) + position

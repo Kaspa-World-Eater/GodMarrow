@@ -10,6 +10,7 @@ const RND := {2: 0.24, 3: 0.4, 9: 0.34}
 const SQ := {5: true, 7: true, 10: true}
 const DR := {"statue_saint": 0.32, "statue_angel": 0.34, "cage": 0.22, "cage2": 0.22, "tent": 0.75}
 const MAXH := 48
+const MAXL := 48               # lights in the light map
 ## the lands' grades (zz_grade55.js): sat, con, bri; hi/lo soft-light tints [rgb, a]; hz the day haze
 const GR := {
 	"moor": {"sat": 1.22, "con": 1.1, "bri": 1.08, "hi": [Color8(60, 86, 112), 0.18], "lo": [Color8(176, 112, 56), 0.14], "hz": [Color8(96, 112, 128), 0.05]},
@@ -30,7 +31,11 @@ static func land_of(z: Zone) -> String:
 	return "moor" if z.d.get("outdoor", false) else "under"
 const MAXO := 128
 
+const FlameK = preload("res://fx/flame.gd")
 var rect: ColorRect
+var lm_vp: SubViewport
+var lm_rect: ColorRect
+var lm_mat: ShaderMaterial
 var mat: ShaderMaterial
 var zone: Zone
 var hero: Hero
@@ -41,6 +46,8 @@ var scan_t := 0.0
 var flash_next := 0.0          # the far flash (zz_zz_cine76.js): rare, at night, on open ground, never in town
 var flash_t0 := -9.0
 var mood := 1.0               # the lantern's mood (zz_zz_cine76): shrinks and stutters when the wound is deep, gutters in a boss fight
+var _haze_h := -1
+var keep := 1.0               # the dim wick and what the lantern keeps (zz_zz_study82), applied after the 5.4 cap
 var boss_m: Node = null
 var t := 0.0
 var enabled := true
@@ -57,6 +64,19 @@ func _ready() -> void:
 	mat.shader = load("res://shaders/dark.gdshader")
 	rect.material = mat
 	add_child(rect)
+	# the light map, one texel per art pixel (shaders/lightmap.gdshader)
+	lm_vp = SubViewport.new()
+	lm_vp.disable_3d = true
+	lm_vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	lm_vp.size = Vector2i(480, 270)
+	lm_rect = ColorRect.new()
+	lm_mat = ShaderMaterial.new()
+	lm_mat.shader = load("res://shaders/lightmap.gdshader")
+	lm_rect.material = lm_mat
+	lm_rect.size = Vector2(480, 270)
+	lm_vp.add_child(lm_rect)
+	add_child(lm_vp)
+	mat.set_shader_parameter("lmap", lm_vp.get_texture())
 	Bus.boss_woke.connect(func(m): boss_m = m)
 	Bus.boss_felled.connect(func(m): if m == boss_m: boss_m = null)
 
@@ -73,7 +93,8 @@ func bind(z: Zone, h: Hero) -> void:
 			"fire":
 				var k: String = L.get("kind", "fire")
 				var kk := 0.26 if k == "lantern" else (0.36 if k == "brazier" else 0.32)
-				statics.append({"t": Vector2(L["x"], L["y"]), "r": maxf(14.0, float(L.get("radius", 3)) * ISO_R * kk), "core": 0.4, "far": 1.6, "w": 0.3, "rgb": rgb, "kind": k})
+				statics.append({"t": Vector2(L["x"], L["y"]), "r": maxf(14.0, float(L.get("radius", 3)) * ISO_R * kk), "core": 0.4, "far": 1.6, "w": 0.3, "rgb": rgb, "kind": k,
+					"R": float(L.get("radius", 3)), "a": float(L.get("a", 1.0)), "fh": float(L.get("heightPx", 0)), "dx": float(L.get("dxPx", 0))})
 			"raw":
 				statics.append({"t": Vector2(L["x"], L["y"]), "r": maxf(10.0, float(L.get("radiusPx", 30))), "core": 0.35, "far": 1.5, "w": 0.3, "rgb": rgb, "kind": "raw"})
 			"wallCandle":
@@ -105,14 +126,13 @@ func _process(dt: float) -> void:
 	rect.visible = enabled
 	t += dt
 	var k := 1.0
-	var f: float = hero.st.hp / maxf(1.0, hero.st.life_max())
-	if f < 0.3 and not hero.dead:
-		var s := (0.3 - f) / 0.3
-		k *= 1.0 - 0.18 * s
-		k *= 1.0 - 0.1 * s * (0.5 + 0.5 * sin(t * 2.2) * sin(t * 0.9))
+	# the wound and the flame's own gutters: the lantern says how brightly it burns (entities/lantern_unit.gd glow)
+	if hero.lantern and is_instance_valid(hero.lantern):
+		k *= hero.lantern.glow
 	if boss_m != null and is_instance_valid(boss_m) and not boss_m.dead and boss_m.zone == zone:
 		k *= 0.92 + 0.04 * sin(t * 2.1) - (0.06 if sin(t * 0.83) > 0.9 else 0.0)
 	mood += (k - mood) * minf(1.0, dt * 15.0)
+	keep += (hero.lamp_keep() - keep) * minf(1.0, dt * 4.8)   # 0.08 a frame at 60 (zz_zz_study82.js:19)
 	var outdoor: bool = zone.d.get("outdoor", false)
 	var dk := Game.day_k() if outdoor else 0.0
 	var A := (0.82 - 0.5 * dk * dk) if outdoor else 0.84
@@ -140,26 +160,51 @@ func _process(dt: float) -> void:
 	var vis := Rect2(Vector2.ZERO, Vector2(vp.get_visible_rect().size) * vp.get_screen_transform().get_scale())
 	var holes: Array = []
 	var occs: Array = []
+	var lights: Array = []    # the light map (y_light21.js L37): [pos, r (window px), A, rgb, mode, squash, hole whose edges stop it]
+	var lnk := (1.0 - dk) if outdoor else 1.0   # how far into the night (the light map's nk)
 	# ---- the hero's lantern
 	var hp := hero.tp
 	if not hero.dead:
 		var lampk := 1.5 + hero.st.item("lrad") / 100.0 * 0.5
-		var R := minf(hero.light_radius(), 5.4 * lampk / 1.5) * ISO_R * 0.4 * (1.0 + 0.5 * dk) * mood
-		var foot := hp + Vector2(0.25, -0.1)
+		var R := minf(hero.light_radius(), 5.4 * lampk / 1.5) * ISO_R * 0.4 * (1.0 + 0.5 * dk) * mood * keep
+		var foot := hp + Vector2(0.25, -0.25) * float(hero.face)   # the web: P + face x (0.25, -0.25) (y_light21.js:112)
 		if hero.lantern and is_instance_valid(hero.lantern):
 			foot = hero.lantern.tp   # the pool lies under the lantern, wherever it floats
 		# each order's own flame (zz_zw_lantern63 BASE_RGB): ghost-blue glass, the penitent's amber, bone-pale candle, paper
 		# lantern, the black flame's cold light
-		var rgb: Color = {"animancer": Color8(120, 178, 255), "hemomancer": Color8(255, 164, 84), "ossumancer": Color8(240, 222, 190), "miasmancer": Color8(255, 196, 130), "monk": Color8(226, 220, 204)}.get(hero.cls, Color8(255, 170, 96))
+		var rgb: Color = {"animancer": Color8(120, 178, 255), "hemomancer": Color8(255, 164, 84)}.get(hero.cls, Color8(255, 170, 96))
 		# the flame breathes (zz_zw_lantern63: a slow swell, no flutter; a quick flutter strobed on phones)
 		var br := 0.86 + 0.09 * sin(t * 1.7) + 0.05 * sin(t * 2.9 + sin(t * 0.7))
 		R *= 0.96 + 0.05 * br
 		var hi := holes.size()
 		holes.append([xf * Iso.to_screen(foot) + Vector2(0, sc * 4.0), R * 4.0 * sc, 2.1, 0.22, 0.26, 1.0, rgb, 1.0, 0.0, 0.18, 0.0, 0.32 * mood, 1.0])
 		_occluders(occs, foot, R * 2.1 / ISO_R, hi, xf)
+		# the light map: the hero's pool cut by what the lantern can see (y_light21.js:110-116, zz_grade55.js:111-123), and the
+		# lantern's own light from its glass down to the ground (zz_zw_lantern63.js:51-70)
+		var fl: float = FlameK.smooth(3.3)
+		var Ry := minf(hero.light_radius(), R / ISO_R * 1.35)
+		var lp: Vector2 = xf * Iso.to_screen(foot)
+		# the lantern's own colour (zz_zw_lantern63 BASE_RGB), or its wick's (__lampRGB): the wick tints the light (the pool keeps the order's tint, as the web's does)
+		var lrgb: Color = {"animancer": Color8(150, 196, 255), "hemomancer": Color8(242, 214, 168), "ossumancer": Color8(240, 228, 204), "miasmancer": Color8(255, 210, 150)}.get(hero.cls, Color8(255, 214, 160))
+		var wk: String = load("res://items/ground.gd").wick(hero)
+		if wk != "":
+			lrgb = load("res://items/ground.gd").WICK_RGB[wk]
+		lights.append([lp, Ry * 0.85 * ISO_R * 4.0 * sc * fl, minf(1.0, (0.06 + 0.36 * lnk) * (1.0 if outdoor else 0.9) * lampk * 0.5), lrgb, 2, 0.5, hi])
+		lights.append([lp, Ry * (0.84 + 0.04 * fl) * ISO_R * 4.0 * sc, minf(1.0, (0.34 + 0.86 * (1.0 - dk) if outdoor else 1.05) * 0.62 * fl * 0.5), lrgb, 2, 0.5, hi])
+		if hero.lantern and is_instance_valid(hero.lantern) and hero.lantern.visible:
+			var k2 := maxf(0.5, 1.0 + (fl - 1.0) * 0.8 - Game.wind * 0.06) * lampk * mood * keep
+			var gl: Vector2 = xf * hero.lantern.glass_screen()
+			var gq: Vector2 = lp + Vector2(0, 4.0 * sc)
+			lights.append([gq, 64.0 * lampk / 1.5 * 4.0 * sc, minf(1.0, (0.17 + 0.15 * lnk) * k2 * 0.5), lrgb, 0, 1.0, -1])
+			lights.append([gl, 22.0 * 4.0 * sc, minf(1.0, (0.2 + 0.12 * lnk) * k2 * 0.5), lrgb, 0, 1.0, -1])
+			lights.append([(gq + gl) / 2.0, 26.0 * 4.0 * sc, minf(1.0, (0.1 + 0.08 * lnk) * k2 * 0.5), lrgb, 0, 1.0, -1])
+			lights.append([gl, 16.0 * 4.0 * sc, minf(1.0, 0.5 * k2 * 0.5), lrgb, 0, 1.0, -1])
 		# the glow in the lantern's own glass
-		if hero.lantern and is_instance_valid(hero.lantern):
+		if hero.lantern and is_instance_valid(hero.lantern) and hero.lantern.visible:
 			holes.append([xf * hero.lantern.glass_screen(), 15.0 * 4.0 * sc * mood, 1.5, 0.3, 0.0, 0.6, rgb, 0.0, 0.0, 0.1, 1.0, 0.25, br * mood])
+		elif hero.class_lamp and is_instance_valid(hero.class_lamp) and hero.class_lamp.visible:
+			# the lamp in hand: its light lives inside it (zz_tune_v59.js:83-94, a spot r50 on the lamp)
+			holes.append([xf * hero.class_lamp.glass_screen(), 15.0 * 4.0 * sc * mood, 1.5, 0.3, 0.0, 0.6, rgb, 0.0, 0.0, 0.1, 1.0, 0.25, br * mood])
 	# ---- the world's flames (the nearest four throw shadows)
 	var near: Array = []
 	for s in statics:
@@ -169,7 +214,8 @@ func _process(dt: float) -> void:
 	for e in near:
 		var s: Dictionary = e[1]
 		var pos: Vector2 = xf * Iso.to_screen(s["t"])
-		var r: float = s["r"] * 4.0 * sc
+		var st0: Vector2 = s["t"]
+		var r: float = s["r"] * 4.0 * sc * FlameK.smooth(st0.x * 3.1 + st0.y * 7.7)   # each flame breathes (zz_zx_dark64.js:131, s.f)
 		if not vis.grow(r * float(s["far"])).has_point(pos):
 			continue
 		if holes.size() >= MAXH:
@@ -180,7 +226,20 @@ func _process(dt: float) -> void:
 			n_sh += 1
 			shadowed = 1.0
 			_occluders(occs, s["t"], s["r"] * 1.6 / ISO_R, hi2, xf)
-		holes.append([pos, r, float(s["far"]), float(s["core"]), 0.0, float(s["w"]), s["rgb"], shadowed, 0.0, 0.0 if s["kind"] == "wallc" else 0.45, 0.0, 0.0 if s["kind"] == "wallc" else 0.18, 1.0])
+		holes.append([pos, r, float(s["far"]), float(s["core"]), 0.0, float(s["w"]), s["rgb"], shadowed, 0.0, 0.0, 0.0, 0.0, 1.0])
+		# the light map: a pool on the ground cut by what the flame can see, a round light at the flame's own height
+		# (fireLight37, y_light21.js:100-107); a wall candle's glow (y_light21.js:131-136)
+		var ff: float = FlameK.smooth(st0.x * 3.1 + st0.y * 7.7)
+		if s["kind"] == "wallc":
+			lights.append([pos + Vector2(0, -16.0 * sc), 36.0 * 4.0 * sc, minf(1.0, 0.85 * 0.5) * (1.0 if ff > 0.95 else 0.86), s["rgb"], 1, 1.0, -1])
+		elif s.has("R"):
+			var fa: float = s["a"]
+			if s["kind"] == "lantern":
+				fa = 2.3 - 0.9 * dk
+			elif outdoor:
+				fa *= 1.0 - 0.5 * dk
+			lights.append([pos, s["R"] * (0.96 + 0.04 * ff) * ISO_R * 4.0 * sc, minf(1.0, fa * ff * 0.5), s["rgb"], 2, 0.5, hi2 if shadowed > 0.0 else -1])
+			lights.append([pos + Vector2(s["dx"], -s["fh"]) * 4.0 * sc, s["R"] * ISO_R * 0.42 * 4.0 * sc, minf(1.0, fa * 0.7 * ff * 0.5), s["rgb"], 1, 1.0, -1])
 	# ---- lights other systems placed (wisps, skills, objects, fires): made into pools
 	scan_t -= dt
 	if scan_t <= 0.0:
@@ -202,6 +261,7 @@ func _process(dt: float) -> void:
 			if pl.has_meta("dark_r"):   # a light that asks for an exact pool, in web world px (wisps: r 21, core .25, far 1.5)
 				var rw: float = float(pl.get_meta("dark_r")) * 4.0 * sc
 				if vis.grow(rw * 1.6).has_point(pos2):
+					lights.append([xf * pl.global_position, rw * 1.4, minf(1.0, 0.42 * 1.25 * 0.5), pl.color, 0, 1.0, -1])   # a soft light where it hangs (y_light21.js:148)
 					holes.append([pos2, rw, float(pl.get_meta("dark_far", 1.5)), float(pl.get_meta("dark_core", 0.25)), 0.0, float(pl.get_meta("dark_w", 0.5)), pl.color, 0.0, 0.0, 0.0])
 				continue
 			var tw := float(pl.texture.get_width()) if pl.texture else 256.0
@@ -242,6 +302,38 @@ func _process(dt: float) -> void:
 	while oA.size() < MAXO:
 		oA.append(Vector4.ZERO)
 		oH.append(-1.0)
+	var lA := PackedVector4Array()
+	var lB := PackedVector4Array()
+	var lC := PackedVector4Array()
+	for l in lights:
+		if lA.size() >= MAXL:
+			break
+		var lc: Color = l[3]
+		lA.append(Vector4(l[0].x, l[0].y, l[1], l[2]))
+		lB.append(Vector4(lc.r, lc.g, lc.b, float(l[4])))
+		lC.append(Vector4(l[5], float(l[6]), 0.0, 0.0))
+	var n_l := lA.size()
+	while lA.size() < MAXL:
+		lA.append(Vector4.ZERO)
+		lB.append(Vector4.ZERO)
+		lC.append(Vector4.ZERO)
+	var cellw := 4.0 * sc
+	var vsz := Vector2i(int(ceil(vis.size.x / cellw)), int(ceil(vis.size.y / cellw)))
+	if lm_vp.size != vsz:
+		lm_vp.size = vsz
+		lm_rect.size = Vector2(vsz)
+	for i in n_l:
+		lA[i] = Vector4(lA[i].x / cellw, lA[i].y / cellw, lA[i].z / cellw, lA[i].w)
+	var oT := PackedVector4Array()
+	for o in oA:
+		oT.append(o / cellw)
+	lm_mat.set_shader_parameter("n_lights", n_l)
+	lm_mat.set_shader_parameter("lA", lA)
+	lm_mat.set_shader_parameter("lB", lB)
+	lm_mat.set_shader_parameter("lC", lC)
+	lm_mat.set_shader_parameter("n_occ", n_occ)
+	lm_mat.set_shader_parameter("occ", oT)
+	lm_mat.set_shader_parameter("occ_h", oH)
 	mat.set_shader_parameter("n_holes", holes.size())
 	mat.set_shader_parameter("hA", hA)
 	mat.set_shader_parameter("hB", hB)
@@ -269,9 +361,30 @@ func _process(dt: float) -> void:
 	var hz: Array = g.get("hz", [Color.BLACK, 0.0])
 	var dusk := outdoor and Game.hour_name() == "dusk"
 	var hzc: Color = Color8(90, 88, 110) if dusk else hz[0]
-	mat.set_shader_parameter("g_haze", Vector4(hzc.r, hzc.g, hzc.b, 0.1 if dusk else float(hz[1]) * dk))
+	# the haze: three dithered strips drifting with the camera (drawHaze37); v59 halves every land's haze
+	var ha: float = 0.1 if dusk else float(hz[1]) * 0.5
+	var hh := 60 if dusk else 64
+	mat.set_shader_parameter("g_haze", Vector4(hzc.r, hzc.g, hzc.b, ha if outdoor else 0.0))
+	if ha > 0.005:
+		if _haze_h != hh:
+			_haze_h = hh
+			mat.set_shader_parameter("haze_tex", _haze_strip(hh))
+		var camw := (vp.get_canvas_transform().affine_inverse() * Vector2.ZERO) / 4.0
+		var VH := vis.size.y / (4.0 * sc)
+		var hy := Vector4(0, 0, 0, hh)
+		var hx := Vector4.ZERO
+		var hav := Vector4.ZERO
+		for i in 3:
+			var par := 0.35 + i * 0.25
+			hy[i] = roundf(VH * (0.28 + i * 0.26) - fmod(camw.y * par, 40.0) + sin(t * 0.1 + i) * 6.0)
+			hx[i] = -roundf(fposmod(camw.x * par + t * (3.0 + i * 2.0), 256.0))
+			hav[i] = 0.7 + 0.3 * sin(t * 0.13 + i * 2.0)
+		mat.set_shader_parameter("haze_y", hy)
+		mat.set_shader_parameter("haze_x", hx)
+		mat.set_shader_parameter("haze_a", hav)
 	var am := zone.ambient_at(Game.phase())
 	mat.set_shader_parameter("amb", Vector3(am.r, am.g, am.b))
+	lm_mat.set_shader_parameter("amb", Vector3(am.r, am.g, am.b))
 
 ## the edges that stop a light at tile l within rw yards, as screen-space segments (the near side of each blocker:
 ## round bases for trunks, stones and pillars; the two corners that bound a wall tile's silhouette)
@@ -354,3 +467,31 @@ func light_at(vp_pt: Vector2) -> Array:
 			col = (h[6] as Color)
 	var lum := 1.0 - last_A * dark
 	return [lum, col.lerp(Color(0.62, 0.66, 0.78), dark)]
+
+## hazeStrip37 (y_light21.js:412-421): a long strip of dithered density, 256 art px, alpha in four levels of 70
+static func _haze_strip(h: int) -> Texture2D:
+	var F = load("res://fx/flame.gd")
+	var w := 256
+	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
+	var vn := func(u: float, v: float) -> float:
+		var i := int(floor(u))
+		var j := int(floor(v))
+		var fu := u - i
+		var fv := v - j
+		var su := fu * fu * (3.0 - 2.0 * fu)
+		var sv := fv * fv * (3.0 - 2.0 * fv)
+		var h00: float = F.hash2(posmod(i, 16), j)
+		var h10: float = F.hash2(posmod(i + 1, 16), j)
+		var h01: float = F.hash2(posmod(i, 16), j + 1)
+		var h11: float = F.hash2(posmod(i + 1, 16), j + 1)
+		return (h00 + (h10 - h00) * su) * (1.0 - sv) + (h01 + (h11 - h01) * su) * sv
+	for j in h:
+		for i in w:
+			var env := sin(j / float(h) * PI)
+			var n: float = vn.call(i / 16.0, j / 10.0) * 0.65 + vn.call(i / 6.0, j / 4.0 + 7.0) * 0.35
+			var v := maxf(0.0, env * (n * 2.4 - 1.05)) * 3.2
+			var b := (float(F.BAY4[((j & 3) << 2) + (i & 3)]) + 0.5) / 16.0
+			var lv := mini(3, int(v) + (1 if (v - int(v) - 0.3) * 2.5 > b else 0))
+			if lv > 0:
+				img.set_pixel(i, j, Color(1, 1, 1, lv * 70.0 / 255.0))
+	return ImageTexture.create_from_image(img)

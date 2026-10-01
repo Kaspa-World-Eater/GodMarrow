@@ -392,12 +392,20 @@ func ambient_at(phase: float) -> Color:
 	var arr: Array = d.get("ambient", {}).get("byPhase", [])
 	if arr.is_empty():
 		return Color(0.4, 0.42, 0.46)
-	var best: Dictionary = arr[0]
-	for a in arr:
-		if float(a["phase"]) <= phase:
-			best = a
-	var c: Array = best["rgb"]
-	return Color8(int(c[0]), int(c[1]), int(c[2]))
+	# the web blends the sky smoothly through the hour (ambient37: smoothstep of dayK); the export samples it every
+	# 1/24 of the day, so blend between the two rows either side
+	var i0 := 0
+	for i in arr.size():
+		if float(arr[i]["phase"]) <= phase:
+			i0 = i
+	var a0: Dictionary = arr[i0]
+	var a1: Dictionary = arr[(i0 + 1) % arr.size()]
+	var p0 := float(a0["phase"])
+	var p1 := float(a1["phase"]) if i0 + 1 < arr.size() else 1.0 + float(arr[0]["phase"])
+	var k := clampf((phase - p0) / maxf(0.0001, p1 - p0), 0.0, 1.0)
+	var c0: Array = a0["rgb"]
+	var c1: Array = a1["rgb"]
+	return Color8(int(c0[0]), int(c0[1]), int(c0[2])).lerp(Color8(int(c1[0]), int(c1[1]), int(c1[2])), k)
 
 
 ## the wind's materials (shaders/sway.gdshader): young trees lean a little, cloth and cobwebs more, chains swing

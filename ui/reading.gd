@@ -17,6 +17,8 @@ const SK := 4.0                   # screen px per Stranger px
 const FW := 320
 const FH := 270
 const FPS := 10.0
+var pace = load("res://ui/stranger_pace.gd").new()
+var sframe := 0
 const CW := 162.0                 # a card on the cloth (54x84 x3)
 const CH := 252.0
 const STEPS := ["star", "face", "card", "fear", "seek", "road", "ask", "sac", "end"]
@@ -232,6 +234,7 @@ func result() -> Dictionary:
 
 func _process(dt: float) -> void:
 	t += dt
+	sframe = pace.step(dt)   # the Stranger mostly sits still; he gestures at random (ui/stranger_pace.gd)
 	fade = minf(1.0, fade + dt / 1.2)
 	if picked >= 0 and flip < 1.0:
 		flip = minf(1.0, flip + dt / 0.45)
@@ -345,7 +348,7 @@ func _draw_all() -> void:
 	ci.draw_rect(Rect2(0, 0, 1920, 1080), Color(0.01, 0.01, 0.015))
 	# the Stranger at his fire
 	if sheet:
-		var f := int(t * FPS) % 121
+		var f := sframe
 		var src := Rect2((f % 11) * FW, (f / 11) * FH, FW, FH)
 		ci.draw_texture_rect_region(sheet, Rect2(320, 0, FW * SK, FH * SK), src, Color(a, a, a))
 		# the painting's edges go down into the dark

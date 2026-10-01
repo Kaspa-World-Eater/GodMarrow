@@ -30,7 +30,16 @@ uniform float g_con = 1.0;
 uniform float g_bri = 1.0;
 uniform vec4 g_hi = vec4(0.0);      // rgb, alpha
 uniform vec4 g_lo = vec4(0.0);
-uniform vec4 g_haze = vec4(0.0);
+uniform vec4 g_haze = vec4(0.0);    // rgb, alpha: laid on in three dithered strips (y_light21.js drawHaze37), screen
+uniform sampler2D haze_tex : filter_nearest, repeat_enable;   // 256 x h, alpha in four dithered levels
+uniform vec4 haze_y = vec4(0.0);    // each strip's middle (art px) and h in w
+uniform vec4 haze_x = vec4(0.0);    // each strip's x offset (art px)
+uniform vec4 haze_a = vec4(0.0);    // each strip's alpha
+// the light map (y_light21.js L37): the land's ambient at half strength, flames and the lantern laid over it (lighten keeps
+// the hottest where pools meet; small lights add), cut into bands of 12 (a Bayer step between), capped at 160; the scene is
+// multiplied by it and doubled, so a flame can light a surface brighter than its paint, and the excess goes on again at 0.2
+uniform sampler2D lmap : filter_nearest;   // shaders/lightmap.gdshader, one texel per art pixel
+uniform bool lm_on = true;
 uniform vec2 view_px = vec2(1920.0, 1080.0);      // how much of the plain colour the open dark keeps          // dither cell in window px (one web art px)
 
 const float BAY[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
@@ -65,7 +74,15 @@ vec3 grade(vec3 c, vec2 uv, vec2 fc) {
 	vec4 t = y < 0.55 ? mix(g_hi, vec4(g_hi.rgb, g_hi.a * 0.35), y / 0.55) : mix(vec4(g_hi.rgb, g_hi.a * 0.35), g_lo, (y - 0.55) / 0.45);
 	vec3 sl = vec3(softlight_ch(c.r, t.r), softlight_ch(c.g, t.g), softlight_ch(c.b, t.b));
 	c = mix(c, sl, t.a);
-	c = mix(c, g_haze.rgb, g_haze.a);
+	if (g_haze.a > 0.005) {
+		vec2 ap = floor(fc / cell);
+		for (int i = 0; i < 3; i++) {
+			float wy = ap.y - (haze_y[i] - haze_y.w * 0.5);
+			if (wy < 0.0 || wy >= haze_y.w) continue;
+			float ha = texture(haze_tex, vec2((ap.x - haze_x[i]) / 256.0, (wy + 0.5) / haze_y.w)).a * haze_a[i];
+			c = vec3(1.0) - (vec3(1.0) - c) * (vec3(1.0) - g_haze.rgb * ha);
+		}
+	}
 	// the vignette: dithered steps toward the corners
 	vec2 d2 = (uv - 0.5) * 2.0;
 	float dv = sqrt(d2.x * d2.x * 0.8 + d2.y * d2.y * 1.1);
@@ -85,6 +102,10 @@ void fragment() {
 	// the dark is reckoned once per art pixel (a cell), like the web's dark map, so its edges are pixel-art chunky
 	vec2 p = (floor(FRAGCOORD.xy / cell) + 0.5) * cell;
 	vec3 scene = texture(screen_tex, SCREEN_UV).rgb;
+	if (lm_on) {
+		vec3 L = texture(lmap, SCREEN_UV).rgb;
+		scene = scene * L * 2.0 + max(vec3(0.0), L - amb * 0.5) * 0.2;
+	}
 	scene = grade(scene, SCREEN_UV, FRAGCOORD.xy);
 	float dark = 1.0;
 	float warm = 0.0;
@@ -139,7 +160,7 @@ void fragment() {
 		}
 		v = max(v, hC[i].w);
 		if (v < dark) dark = v;
-		if (hD[i].z > 0.0 && v < 0.64) rake = max(rake, hD[i].z * pow(1.0 - v / 0.64, 2.0));
+		if (!lm_on && hD[i].z > 0.0 && v < 0.64) rake = max(rake, hD[i].z * pow(1.0 - v / 0.64, 2.0));
 		if (hD[i].y > 0.0) {
 			// the web's glowSprite: three dithered discs (the air round the glass, the halo in it, the flame), each pixel
 			// either on or off by a Bayer threshold, so the glow reads in pixel rings
@@ -153,7 +174,7 @@ void fragment() {
 			float ha = min(4.0, lv) * 0.16 + (dp < 1.6 ? 0.35 : 0.0);
 			halo = max(halo, hC[i].rgb * ha * hD[i].y * hD[i].w);
 		}
-		if (hD[i].x > 0.0) lift = max(lift, hC[i].rgb * hD[i].x * (1.0 - v / 0.64 * 0.85) * step(v, 0.99));
+		if (!lm_on && hD[i].x > 0.0) lift = max(lift, hC[i].rgb * hD[i].x * (1.0 - v / 0.64 * 0.85) * step(v, 0.99));
 		band *= b.z;
 		if (band > warm) {
 			warm = band;
@@ -164,7 +185,7 @@ void fragment() {
 	float th = (BAY[(c.y & 3) * 4 + (c.x & 3)] + 0.5) / 16.0;
 	float vq = min(1.0, floor(dark * 12.0 + th) / 12.0);
 	// the lamp's breath of colour (overlay blend), then the dark over it
-	vec3 shade = mix(amb, vec3(1.0), amb_lift);
+	vec3 shade = lm_on ? vec3(1.0) : mix(amb, vec3(1.0), amb_lift);
 	// the flame's colour shifts what it lights toward itself (warmer, not brighter: pale stone must not burn white)
 	vec3 col = scene * mix(shade, vec3(1.0), 1.0 - dark) * (vec3(1.0) + lift * 1.2 - vec3(max(max(lift.r, lift.g), lift.b)) * 0.6);
 	if (warm > 0.0) {

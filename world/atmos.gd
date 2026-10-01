@@ -23,7 +23,8 @@ var embers: Array = []       # dusk: embers lifting off the ash (orange motes, n
 var motes: Array = []        # dawn: gold dust in the long light
 var dapple: Array = []       # the woods by day: patches of light through the canopy, drifting
 var add_canvas: Node2D       # the additive layer (dapple, motes)
-var sparks: Array = []       # sparks off braziers and fires: world-anchored, lifting and fading (matter, never light)
+var air: Node2D
+var flames: Node2D           # world/flames.gd: halos at every flame (in the world), embers and smoke (drawn here)
 var gust := 0.0
 var gust_t := 0.0
 var gust_v := 0.0
@@ -38,6 +39,8 @@ func _ready() -> void:
 	canvas = Node2D.new()
 	canvas.draw.connect(_draw_all)
 	add_child(canvas)
+	air = load("res://world/air37.gd").new()   # the older air of each place (world/air37.gd)
+	add_child(air)
 	add_canvas = Node2D.new()
 	var mat := CanvasItemMaterial.new()
 	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
@@ -61,6 +64,12 @@ func bind(z: Zone, h: Hero, d: DarkLayer) -> void:
 	embers.clear()
 	motes.clear()
 	dapple.clear()
+	if flames and is_instance_valid(flames):
+		flames.queue_free()
+	flames = load("res://world/flames.gd").new()
+	z.add_child(flames)
+	flames.bind(z)
+	air.bind(z, d, h)
 
 ## a dithered white blob, the web's mist sprite (world px)
 static func _blob(w: int, h: int, soft: float) -> Texture2D:
@@ -185,22 +194,6 @@ func _process(dt: float) -> void:
 		k["t"] += dt
 		k["p"] += Vector2((4.0 + wind * 8.0) * WPX, 1.2 * WPX) * dt - dcam
 	clouds = clouds.filter(func(k): return k["t"] < k["life"] and k["p"].x < vs.x + 800 and k["p"].y < vs.y + 480)
-	# sparks off the braziers and fires near the hero
-	if dark:
-		for s2 in dark.statics:
-			if not (s2["kind"] in ["brazier", "fire", "pyre"]):
-				continue
-			var st2: Vector2 = s2["t"]
-			if st2.distance_to(c) > 12.0:
-				continue
-			if randf() < 2.2 * dt and sparks.size() < 60:
-				sparks.append({"tp": st2 + Vector2(randf_range(-0.12, 0.12), randf_range(-0.12, 0.12)), "z": 30.0 if s2["kind"] == "brazier" else 8.0, "vz": randf_range(8, 16), "vx": randf_range(-2, 2), "t": 0.0, "life": randf_range(0.8, 1.8)})
-	for sp in sparks:
-		sp["t"] += dt
-		sp["z"] += sp["vz"] * dt
-		sp["vx"] += wind * 6.0 * dt
-		sp["tp"] += Vector2(sp["vx"], -sp["vx"]) * dt / 18.0
-	sparks = sparks.filter(func(sp): return sp["t"] < sp["life"])
 	# dusk embers, dawn motes, the canopy's dapple (screen space, carried with the camera)
 	var hr := Game.hour_name() if outdoor else ""
 	if hr == "dusk" and randf() < 6.0 * dt and embers.size() < 30:
@@ -318,10 +311,8 @@ func _draw_all() -> void:
 			ec.a = ea
 			canvas.draw_rect(Rect2(Vector2(cx - gap, cy).snapped(Vector2(WPX, WPX)), Vector2(WPX, WPX)), ec)
 			canvas.draw_rect(Rect2(Vector2(cx + gap - WPX, cy).snapped(Vector2(WPX, WPX)), Vector2(WPX, WPX)), ec)
-	for sp in sparks:
-		var f7: float = 1.0 - sp["t"] / sp["life"]
-		var p7: Vector2 = xf * (Iso.to_screen(sp["tp"]) + Vector2(0, -float(sp["z"]) * WPX))
-		canvas.draw_rect(Rect2(p7.snapped(Vector2(WPX, WPX)), Vector2(WPX, WPX)), Color(1.0, 0.62 + 0.2 * f7, 0.25, 0.9 * f7))
+	if flames and is_instance_valid(flames):   # embers and smoke off every flame (world/flames.gd)
+		flames.draw_air(canvas, xf, _light)
 	# dusk embers: small orange motes lifting off the ash (matter, not light)
 	for e in embers:
 		var f6 := minf(1.0, minf(e["t"] / 0.5, (e["life"] - e["t"]) / 1.5))

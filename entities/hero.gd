@@ -19,7 +19,8 @@ var path_i := 0
 var repath := 0.0
 var goal := Vector2.ZERO
 var walking := false
-var lantern: LanternUnit = null    # the floating lantern (every order)
+var lantern: LanternUnit = null    # the floating lantern (the Mystic, the Penitent)
+var class_lamp: Node2D = null      # the lamp carried in hand (the Ossuarch, the Shrine Keeper, the Empty Hand)
 var lamp: PointLight2D
 var st: HeroStats
 var skills: SkillBook
@@ -67,6 +68,7 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 	spr = AnimSprite.new(Data.sprite_set(kind))
 	spr.view = "down"
 	add_child(spr)
+	add_child(load("res://entities/hero_rim.gd").new(self, spr))   # the edge the nearest flame lights (heroRim37)
 	spr.play("idle")
 	_shadow()
 	lamp = PointLight2D.new()
@@ -91,19 +93,20 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 	_sync()
 
 func light_radius() -> float:
-	var r := 7.0
-	if zone and zone.d.get("outdoor", false) and Game.hour_name() == "night":
-		r += 1.5
-	elif zone and not zone.d.get("outdoor", false):
-		r = 7.5
-	r *= 1.0 + st.item("lrad") / 100.0 * 0.5 if st else 1.0
-	if st and st.dim_wick:
-		r *= 0.62
-	if st:
-		r *= 1.0 - 0.12 * st.kept
+	# heroLightR (zd_world22.js:421, zz_zw_lantern63.js:44): wider as the day goes; the dim wick and what the lantern
+	# keeps are the lantern's mood, not its reach (zz_zz_study82.js:16-20, world/dark_layer.gd)
+	var out: bool = zone != null and zone.d.get("outdoor", false)
+	var r := 7.0 + 1.5 * (1.0 - Game.day_k()) if out else 7.5
 	if skills:
 		r = skills.light_mod(r)
+	r *= 0.62 * (1.0 + (st.item("lrad") if st else 0.0) / 100.0)
 	return r * Affixes.lantern_k(self)
+
+## the dim wick and what the lantern keeps (zz_zz_study82.js: target, eased 0.08 a frame by the dark layer)
+func lamp_keep() -> float:
+	if st == null:
+		return 1.0
+	return (0.62 if st.dim_wick else 1.0) * (1.0 - 0.12 * clampf(st.kept, 0, 3))
 
 func _shadow() -> void:
 	var s := Polygon2D.new()

@@ -54,6 +54,10 @@ var t := 0.0
 var leaving := -1.0
 var codex: Control
 var _test_done := false
+var bronze: Node                   # ui/bronze.gd: the title and the choices cast in bronze
+var kindle := {}                   # each choice: 0 tarnished .. 1 rubbed bright
+var drops: Array = []              # the god's drop falling into the chosen word
+var drop_for := ""
 var draw_t := -1.0                 # the Stranger drawing a card before the Reading (mode "draw")
 
 const CREDITS := [
@@ -87,6 +91,8 @@ func _ready() -> void:
 	root.draw.connect(_draw_ui)
 	root.gui_input.connect(_gui)
 	add_child(root)
+	bronze = load("res://ui/bronze.gd").new()
+	add_child(bronze)
 	codex = load("res://ui/codex.gd").new()
 	codex.visible = false
 	codex.on_close = func(): root.visible = true
@@ -124,8 +130,21 @@ func _order_name(kind: String) -> String:
 	return kind
 
 func _row_rect(i: int) -> Rect2:
-	var y0 := 520.0 if mode == "main" else (820.0 if mode == "order" else 900.0)
+	if mode == "main":
+		# centred, as the web casts them (zz_title54.js:33-41: CX 240, Y0 184, DY 12 on the 480 grid)
+		var y := (184.0 - maxf(0.0, rows.size() - 4) * 6.0 + i * 12.0) * K
+		var w := _label_w(rows[i][0])
+		return Rect2(_menu_cx() - w / 2.0, y - 8.0 * K, w, 11.0 * K)
+	var y0 := 820.0 if mode == "order" else 900.0
 	return Rect2(150, y0 + i * 58.0, 640, 50)
+
+## the menu's middle: on the blood in the bowl (the web's chapel); on the other stages, in the dark to the left of the scene
+func _menu_cx() -> float:
+	return 960.0 if stage_kind == "bowl" else 520.0
+
+## a choice's width on screen (the web: the word in 8 px IM Fell SC x1.12, plus 18)
+func _label_w(s: String) -> float:
+	return ceilf(U.font("sc").get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 32).x * 1.12) + 18.0 * K
 
 # ------------------------------------------------------------------ living
 
@@ -146,6 +165,7 @@ func _process(dt: float) -> void:
 			return
 	if draw_t >= 0.0:
 		draw_t += dt
+	_tick_main(dt)
 	if stage_kind != Settings.title_scene and mode != "draw":
 		_set_stage(Settings.title_scene)
 	root.queue_redraw()
@@ -360,6 +380,10 @@ func _draw_ui() -> void:
 	var fade_in := clampf(t / 2.5, 0.0, 1.0)
 	var out := clampf(leaving / 1.2, 0.0, 1.0) if leaving >= 0.0 else 0.0
 	var a := 1.0 - out
+	if mode == "main":
+		_draw_main(a)
+		_draw_veils(vs, fade_in, out)
+		return
 	for i in 30:
 		var k := float(i) / 30.0
 		root.draw_rect(Rect2(k * vs.x * 0.6, 0, vs.x * 0.6 / 30.0 + 1.0, vs.y), Color(0, 0, 0, 0.78 * pow(1.0 - k, 1.4)))
@@ -415,9 +439,101 @@ func _draw_ui() -> void:
 				root.draw_string(sc, r.position + Vector2(-34, 36), "❧", HORIZONTAL_ALIGNMENT_LEFT, -1, 24, Color(MARROW, a))
 			root.draw_string(sc, r.position + Vector2(0, 36), rows[i][0], HORIZONTAL_ALIGNMENT_LEFT, -1, 32, Color(col, a))
 	root.draw_string(fi, Vector2(152, vs.y - 18), "Act I · the Ashen Moor and what lies under it", HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color(ASH, a))
+	_draw_veils(vs, fade_in, out)
+
+func _draw_veils(vs: Vector2, fade_in: float, out: float) -> void:
 	if draw_t >= 0.0:
 		root.draw_rect(Rect2(Vector2.ZERO, vs), Color(0, 0, 0, clampf((draw_t - 1.6) / 0.8, 0.0, 1.0)))
 	if fade_in < 1.0:
 		root.draw_rect(Rect2(Vector2.ZERO, vs), Color(0, 0, 0, 1.0 - fade_in))
 	if out > 0.0:
 		root.draw_rect(Rect2(Vector2.ZERO, vs), Color(0, 0, 0, out))
+
+# ------------------------------------------------------------------ the web's title (zz_title54.js)
+
+func _tick_main(dt: float) -> void:
+	if mode != "main":
+		return
+	var sel := maxi(hover, 0)
+	for i in rows.size():
+		var id: String = rows[i][1]
+		kindle[id] = clampf(float(kindle.get(id, 0.0)) + (0.08 if i == sel else -0.05) * dt * 60.0, 0.0, 1.0)
+	# the god's drop answers the choice: it falls into the chosen word
+	if sel < rows.size() and rows[sel][1] != drop_for:
+		drop_for = rows[sel][1]
+		var r := _row_rect(sel)
+		drops.append({"x": r.get_center().x, "y": 128.0 * K, "ty": r.position.y + 5.0 * K, "v": 30.0 * K})
+	for d in drops:
+		d["v"] += 380.0 * K * dt
+		d["y"] += d["v"] * dt
+	drops = drops.filter(func(d): return d["y"] < d["ty"])
+
+## GODMARROW cut across the top in stepped bronze, the rule with its eye, the lede, and the choices cast in bronze in
+## the middle, floating on the blood; side veils stepped, not smooth
+func _draw_main(a: float) -> void:
+	var vs := root.get_viewport_rect().size
+	for i in 12:
+		var al := (0.07 + i * 0.045) * a
+		root.draw_rect(Rect2(vs.x - (12 - i) * 10.0 * K, 0, 10.0 * K, vs.y), Color(3 / 255.0, 2 / 255.0, 4 / 255.0, al))
+		root.draw_rect(Rect2((12 - i - 1) * 10.0 * K, 0, 10.0 * K, vs.y), Color(3 / 255.0, 2 / 255.0, 4 / 255.0, al))
+	# a dark band behind the title
+	for y in 50:
+		root.draw_rect(Rect2(0, y * K, vs.x, K), Color(4 / 255.0, 3 / 255.0, 6 / 255.0, 0.55 * (1.0 - y / 50.0) * a))
+	var sc := U.font("sc")
+	var tt: Texture2D = bronze.cast("title", "GODMARROW", sc, int(22 * K), int(2 * K), "title", int(300 * K), int(34 * K), int(25 * K))
+	if tt:
+		root.draw_texture(tt, Vector2(960.0 - 150.0 * K, 1.0 * K), Color(1, 1, 1, a))
+	# the rule under it, with an eye in the middle that opens and shuts
+	var R := func(x: float, y: float, w: float, h: float, c: String) -> void:
+		root.draw_rect(Rect2(x * K, y * K, w * K, h * K), Color(Color(c), a))
+	R.call(150, 36, 76, 1, "#3d2512"); R.call(254, 36, 76, 1, "#3d2512")
+	R.call(170, 36, 50, 1, "#704622"); R.call(260, 36, 50, 1, "#704622")
+	R.call(150, 35, 1, 3, "#945e2e"); R.call(329, 35, 1, 3, "#945e2e")
+	R.call(233, 36, 14, 1, "#945e2e")
+	if fmod(t, 6.5) <= 6.25:
+		R.call(235, 34, 10, 5, "#1b1008")
+		R.call(234, 35, 1, 3, "#c08644"); R.call(245, 35, 1, 3, "#c08644"); R.call(236, 33, 8, 1, "#c08644"); R.call(236, 39, 8, 1, "#c08644")
+		R.call(237, 35, 6, 3, "#e8d8b0"); R.call(239, 35, 2, 3, "#84181c")
+		R.call(239 + roundf(sin(t * 0.7)), 36, 1, 1, "#050303")
+	else:
+		R.call(235, 36, 10, 1, "#c08644")
+	var fi := U.font("italic")
+	var lede := "The god is dead, and has not finished dying."
+	root.draw_string(fi, Vector2(2, 49.5 * K), lede, HORIZONTAL_ALIGNMENT_CENTER, vs.x, int(7 * K), Color(5 / 255.0, 3 / 255.0, 4 / 255.0, a))
+	root.draw_string(fi, Vector2(0, 49 * K), lede, HORIZONTAL_ALIGNMENT_CENTER, vs.x, int(7 * K), Color(Color("#8f7a5c"), a))
+	# the choices, cast in old pitted bronze; the chosen one rubbed bright, a sigil turning on either side
+	var sel := maxi(hover, 0)
+	for i in rows.size():
+		var r := _row_rect(i)
+		var label: String = rows[i][0]
+		var bright: bool = float(kindle.get(rows[i][1], 0.0)) > 0.5
+		var lw := int(ceilf(sc.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, int(10 * K)).x + label.length() * K) + 6 * K)
+		var lt: Texture2D = bronze.cast(label + ("|1" if bright else "|0"), label, sc, int(10 * K), int(K), "label_bright" if bright else "label", lw, int(14 * K), int(10 * K))
+		var cx := r.get_center().x
+		var y := r.position.y + 8.0 * K
+		if lt:
+			root.draw_texture(lt, Vector2(roundf((cx - lw / 2.0) / K) * K, y - 10.0 * K), Color(1, 1, 1, a))
+		if i == sel:
+			for side in [-1, 1]:
+				var sx := roundf(cx / K + side * (r.size.x / K / 2.0 + 2.0))
+				var sy := y / K - 3.0
+				var an: float = t * 1.6 * side
+				for q in 6:
+					var aa := an + q * 1.047
+					R.call(roundf(sx + cos(aa) * 3.0), roundf(sy + sin(aa) * 3.0), 1, 1, "#553418" if q % 2 else "#945e2e")
+				R.call(sx, sy, 1, 1, "#2a4735")
+	for d in drops:
+		var dx := roundf(float(d["x"]) / K)
+		var dy := roundf(float(d["y"]) / K)
+		R.call(dx, dy - 2, 1, 3, "#84181c")
+		R.call(dx, dy, 1, 1, "#e8704e")
+	# what the stage offers, under the choices
+	if stage:
+		root.draw_string(fi, Vector2(0, vs.y - 16), stage.hint(), HORIZONTAL_ALIGNMENT_CENTER, vs.x, 21, Color(ASH, a))
+	if fig_hover >= 0:
+		var p: Array = PILGRIMS[fig_hover]
+		var ca: Vector2 = stage.label_at(fig_hover) if stage else Vector2(1360, 500)
+		ca.x = clampf(ca.x, 250.0, 1920.0 - 250.0)
+		root.draw_rect(Rect2(ca.x - 230, ca.y - 34, 460, 76), Color(0, 0, 0, 0.55 * a))
+		root.draw_string(sc, Vector2(ca.x - 230, ca.y), p[2], HORIZONTAL_ALIGNMENT_CENTER, 460, 26, Color(BONE, 0.95 * a))
+		root.draw_string(fi, Vector2(ca.x - 230, ca.y + 30), p[3], HORIZONTAL_ALIGNMENT_CENTER, 460, 18, Color(BONE_D, 0.9 * a))

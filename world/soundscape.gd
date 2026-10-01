@@ -25,6 +25,7 @@ var fires_zone := ""
 var one_p: Array = []        # one-shots (drips, bells)
 var bell_t := 60.0
 var boss_gone_t := 0.0
+var master := 1.0            # paused, the score falls silent (zz_zz_music96.js:452: want 0, eased at tau 0.5)
 var streams := {}            # instance cache (static Resources crash Godot at exit)
 
 func _init(m: Node) -> void:
@@ -121,7 +122,8 @@ func _process(dt: float) -> void:
 	fade = minf(1.0, fade + dt / fade_len)
 	var mv := float(Settings.music_vol)
 	var paused := main.get_tree().paused
-	var mk := mv * (0.55 if paused else 1.0)
+	master += ((0.0 if paused else 1.0) - master) * (1.0 - exp(-dt / 0.5))
+	var mk := mv * master
 	mus_a.volume_db = linear_to_db(maxf(0.0001, mk * fade))
 	mus_b.volume_db = linear_to_db(maxf(0.0001, mk * (1.0 - fade)))
 	if fade >= 1.0 and mus_b.playing:

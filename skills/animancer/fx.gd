@@ -9,9 +9,9 @@ var book
 var floor_mode := false
 
 const PALE := Color(0.84, 0.86, 0.82)
-const THREAD := Color(0.68, 0.74, 0.78)
-const SNAG := Color(0.79, 0.84, 0.87)
-const BIND := Color(0.84, 0.81, 0.75)
+const THREAD := Color("#aebdc6")   # the web's Soul Leash (zz_zz_thread93.js:137)
+const SNAG := Color("#c9d6de")
+const BIND := Color("#d6cfbf")
 const SOUL := Color(0.9, 0.95, 0.98)
 const GLASS := Color(0.81, 0.91, 0.98)
 
@@ -24,14 +24,35 @@ func _process(_dt: float) -> void:
 static func S(tp: Vector2, z: float = 0.0) -> Vector2:
 	return Iso.to_screen(tp) + Vector2(0, -z * 4.0)
 
-## a thread that sags between two screen points (quadratic), n segments
-func sag(a: Vector2, b: Vector2, s: float, col: Color, w: float = 2.0) -> void:
-	var pts := PackedVector2Array()
+## one cell of the art grid (1 web px = 4 px here), at a screen point
+func cell(p: Vector2, col: Color, cw: float = 1.0, ch: float = 1.0) -> void:
+	var g := global_position
+	var q := Vector2(floor((p.x + g.x) / 4.0) * 4.0, floor((p.y + g.y) / 4.0) * 4.0) - g
+	draw_rect(Rect2(q, Vector2(cw, ch) * 4.0), col)
+
+## a line one web px wide, stepped on the art grid (the web's 1 px canvas strokes)
+func pix_line(a: Vector2, b: Vector2, col: Color) -> void:
+	var n := maxi(1, int(maxf(absf(b.x - a.x), absf(b.y - a.y)) / 4.0))
+	for i in n + 1:
+		cell(a.lerp(b, i / float(n)), col)
+
+## a thread that sags between two screen points (zz_zz_mystic90 sag: a quadratic one web px wide), laid on the art
+## grid, with the user's ghostly shimmer: a faint brightening that runs along it (HANDOFF §5.5)
+func sag(a: Vector2, b: Vector2, s: float, col: Color, _w: float = 2.0) -> void:
 	var mid := (a + b) * 0.5 + Vector2(0, s)
-	for i in 11:
-		var t := i / 10.0
-		pts.append(a.lerp(mid, t).lerp(mid.lerp(b, t), t))
-	draw_polyline(pts, col, w, true)
+	var n := maxi(2, int((a.distance_to(mid) + mid.distance_to(b)) / 4.0))
+	var g := global_position
+	var seen := {}
+	var t0: float = book.time if book else 0.0
+	for i in n + 1:
+		var t := i / float(n)
+		var p := a.lerp(mid, t).lerp(mid.lerp(b, t), t)
+		var key := Vector2i(int(floor((p.x + g.x) / 4.0)), int(floor((p.y + g.y) / 4.0)))
+		if seen.has(key):
+			continue
+		seen[key] = true
+		var sh := 0.85 + 0.15 * sin(t * 9.0 - t0 * 4.0)
+		cell(p, Color(col.r, col.g, col.b, col.a * sh))
 
 func ellipse(c: Vector2, R: float, col: Color, w: float = 2.0, dashed: bool = false) -> void:
 	var rx := R * Iso.HX * 1.414
@@ -112,7 +133,7 @@ func _floor() -> void:
 		ellipse(S(r["tp"]), R, Color(0.88, 0.9, 0.9, 0.3 * k4), 1.5)
 	var pr: Dictionary = b.proc
 	if pr["on"]:             # the procession's worn ring
-		ellipse(S(pr["tp"]), b.proc_r(), Color(0.78, 0.84, 0.87, 0.22), 1.5, true)
+		pix_ring(S(pr["tp"]), b.proc_r(), Color(200 / 255.0, 214 / 255.0, 222 / 255.0, 0.18))   # dashed [2,4] (zz_zz_thread93.js:142-146)
 
 # ------------------------------------------------------------------ above the world
 func _air() -> void:
@@ -129,7 +150,9 @@ func _air() -> void:
 			var m = e
 			if not is_instance_valid(m) or m.dead:
 				continue
-			sag(pa, S(m.tp, 11), (2.0 + k * 12.0) * 4.0, Color(BIND.r, BIND.g, BIND.b, al), 2.0)
+			sag(pa, S(m.tp, 11), (2.0 + k * 12.0) * 4.0, Color(BIND.r, BIND.g, BIND.b, al))
+		if not bd["done"]:   # the knot on the held one
+			cell(S(A.tp, 12) + Vector2(-4, 0), Color(BIND.r, BIND.g, BIND.b, 0.7), 2.0, 2.0)
 	# Soul Leash: pale threads from the wisps to what they hold
 	for th in b.threads:
 		var m = th["m"]
@@ -139,23 +162,26 @@ func _air() -> void:
 		var f: float = minf(1.0, th["life"] / 0.3) * minf(1.0, (th["max"] - th["life"]) / 0.12 + 0.2)
 		var a := S(Vector2(s.x, s.y), s.z)
 		var e := S(m.tp, 10)
-		sag(a, e, (8.0 + 4.0 * sin(b.time * 3.0 + a.x * 0.025)) * 4.0, Color(THREAD.r, THREAD.g, THREAD.b, 0.45 * f), 2.0)
+		sag(a, e, (8.0 + 4.0 * sin(b.time * 3.0 + a.x * 0.025)) * 4.0, Color(THREAD.r, THREAD.g, THREAD.b, 0.38 * f))
 	# snags: a wisp's strike catches a thread on the foe
 	for sn in b.snags:
 		var m2 = sn["m"]
 		if not is_instance_valid(m2) or m2.dead:
 			continue
 		var k2: float = 1.0 - sn["t"] / sn["dur"]
-		sag(S(sn["tp"], 9), S(m2.tp, 10), (6.0 * k2 + 1.0) * 4.0, Color(SNAG.r, SNAG.g, SNAG.b, 0.5 * k2), 2.0)
+		sag(S(sn["tp"], 9), S(m2.tp, 10), (6.0 * k2 + 1.0) * 4.0, Color(SNAG.r, SNAG.g, SNAG.b, 0.5 * k2))
 	# needles: a short pale dash that runs out and is gone
 	for n in b.needles:
 		var k3: float = n["t"] / n["dur"]
 		var s1: float = n["end"] * k3
 		var s0: float = maxf(0.0, s1 - 0.7)
-		draw_line(S(n["tp"] + n["d"] * s0, 10), S(n["tp"] + n["d"] * s1, 10), Color(0.72, 0.82, 0.87, 0.55 * (1.0 - k3 * 0.5)), 2.0)
+		pix_line(S(n["tp"] + n["d"] * s0, 10), S(n["tp"] + n["d"] * s1, 10), Color(0.722, 0.816, 0.871, 0.5 * (1.0 - k3 * 0.5)))   # #b8d0de
 	# sparks: motes like the wisps themselves
 	for sp in b.sparks:
-		mote(S(sp["tp"], sp["z"]), 4.0, Color(0.9, 0.96, 0.98, 0.9))
+		var tr: Array = sp.get("trail", [])
+		for i in tr.size():   # a 3-point trail, then a 2x2 spark (zz_zz_mystic90.js:158-160)
+			cell(S(tr[i], sp["z"]), Color(200 / 255.0, 228 / 255.0, 240 / 255.0, 0.15 + i * 0.12))
+		cell(S(sp["tp"], sp["z"]) + Vector2(-4, -4), Color("#e4f4fa"), 2.0, 2.0)
 	# seeking souls (Soul Swarm, Soul Storm, the golem's overflow, a branded death)
 	for so in b.souls:
 		mote(S(so["tp"], 9.0 + sin(so["wob"]) * 1.5), 5.0, Color(SOUL.r, SOUL.g, SOUL.b, 0.85))
@@ -238,3 +264,18 @@ func _oval(c: Vector2, rx: float, ry: float) -> PackedVector2Array:
 		var a := i / 16.0 * TAU
 		pts.append(c + Vector2(cos(a) * rx, sin(a) * ry))
 	return pts
+
+## a ring on the ground one web px wide, dashed two on and four off along its length, on the art grid
+func pix_ring(c: Vector2, R: float, col: Color) -> void:
+	var rx := R * Iso.HX * 1.414
+	var ry := rx * 0.5
+	var n := maxi(24, int(TAU * rx / 4.0))
+	var run := 0.0
+	var last := c + Vector2(rx, 0)
+	for i in n:
+		var a := i / float(n) * TAU
+		var p := c + Vector2(cos(a) * rx, sin(a) * ry)
+		run += p.distance_to(last) / 4.0
+		last = p
+		if fmod(run, 6.0) < 2.0:
+			cell(p, col)

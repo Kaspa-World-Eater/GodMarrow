@@ -34,6 +34,7 @@ var stash_open := false      # the Reliquary Chest is open: right-click in the p
 var p_town: Control          # ui/panel_town.gd: vendor, smith, chest, journal
 var p_orders: Control        # ui/panel_orders.gd: the choir (V) and the golem (G)
 var p_board: Control         # ui/panel_board.gd: the body board (A)
+var dial: Control            # ui/sky_dial.gd: the clock, top right (zz_polish.js)
 var tip: Array = []
 var msgs: Array = []         # [{text, t, max}]
 var banner := {}             # {name, line, t, max}
@@ -70,6 +71,9 @@ func _ready() -> void:
 	automap.hud = self
 	automap.visible = false
 	root.add_child(automap)
+	dial = load("res://ui/sky_dial.gd").new()
+	dial.hud = self
+	root.add_child(dial)
 	bar = load("res://ui/bar.gd").new()
 	bar.hud = self
 	root.add_child(bar)
@@ -612,6 +616,8 @@ func _process(dt: float) -> void:
 			tip = p_town.tip()
 		elif hov == p_orders:
 			tip = p_orders.tip()
+		elif hov == dial:
+			tip = dial.tip()
 		elif hov == p_board:
 			tip = p_board.tip()
 		elif hov == bar:

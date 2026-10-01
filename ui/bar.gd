@@ -281,6 +281,20 @@ func _draw_front() -> void:
 	# the numbers on the carved plaques, in the book face
 	_plaque(str(maxi(0, ceili(h.st.hp))), 63.0, h.st.hp / maxf(1, h.st.life_max()) < 0.25 and not h.dead)
 	_plaque(str(maxi(0, ceili(h.st.res))), 417.0, false)
+	# an orb under a quarter pulses: a ring round the glass and a breath of its colour (zz_polish.js:47-56)
+	if not h.dead:
+		_crit(ORB_L, h.st.hp / maxf(1.0, h.st.life_max()), "life")
+		_crit(ORB_R, h.st.res / maxf(1.0, h.st.res_max()), res_kind(h.cls))
+
+func _crit(c: Vector2, f: float, kind: String) -> void:
+	if f >= 0.25:
+		return
+	var k := 0.55 + 0.45 * sin(t * 7.0)
+	var dim := Color((LIQ.get(kind, LIQ["life"]) as Array)[0][3])
+	var rr := ORB_RAD + 2.0 + roundf(k * 2.0)
+	var p := _L(c.x, c.y)
+	front.draw_arc(p, rr * U.S, 0.0, TAU, 48, Color(dim, 0.35 + 0.5 * k), 2.0 * U.S)
+	front.draw_circle(p, ORB_RAD * U.S, Color(dim, 0.18 * k))
 
 func _plaque(s: String, cx: float, low: bool) -> void:
 	var f := U.font("sc")

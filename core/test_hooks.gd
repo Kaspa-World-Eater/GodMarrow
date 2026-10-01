@@ -11,6 +11,8 @@ extends RefCounted
 ##   --boardtest              lay a road to the right hand of the body board and take three cards
 ##   --panel=ID               open a panel (skills, inv, char, board, journal, choir, golem) or a town window
 ##   --demo [--trace]         the pilgrim fights the nearest creatures, for captures
+##   --shot=PATH [--shot_t=S] [--shot_n=N]   save the screen to PATH after S seconds (default 4), N frames 0.25 s apart
+##                            (PATH_1.png ...), then quit. Needs a window (not --headless). --hour=0..1 sets the hour.
 
 const PANELS := ["choir", "golem", "char", "skills", "inv", "journal", "board"]
 const SIGIL_KINDS := ["open", "fewer", "weigh", "stair"]
@@ -32,6 +34,11 @@ static func run(g) -> void:
 			if arc.is_card(id):
 				arc.cards[id] = a["cards"]
 		arc._changed()
+	if a.has("wisps") and g.hero.skills.has_method("spawn_wisp"):
+		for i in int(a["wisps"]):
+			g.hero.skills.spawn_wisp()
+	if a.has("shot"):
+		_shot(g, a)
 	if a.has("arena"):
 		await _arena(g, a)
 	if a.has("boardtest") and g.hero.st.arc:
@@ -174,3 +181,17 @@ static func _menutest(g, a: Dictionary) -> void:
 		await _click_at(g, w2)
 		await g.get_tree().create_timer(1.5).timeout
 		print("MENU after click: mode ", T.mode if is_instance_valid(T) else "(title gone)", " leaving ", T.leaving if is_instance_valid(T) else -1.0)
+
+## the screen, saved (--shot): for side-by-side checks against the browser build
+static func _shot(g, a: Dictionary) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(float(a.get("shot_t", "4"))).timeout
+	var n := int(a.get("shot_n", "1"))
+	var path := String(a["shot"])
+	for i in n:
+		await RenderingServer.frame_post_draw
+		var p := path if n == 1 else path.get_basename() + "_%d.png" % i
+		g.get_viewport().get_texture().get_image().save_png(p)
+		if i < n - 1:
+			await tree.create_timer(0.25).timeout
+	tree.quit()
