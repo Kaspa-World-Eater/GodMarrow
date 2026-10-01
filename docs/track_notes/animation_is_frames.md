@@ -21,3 +21,8 @@ delete a frame, mirror a direction, re-time (hold a frame, ease), "redo this fra
 The target look for every road: Morbid: The Seven Acolytes / There Is No Light / the Dark Souls bonfire pixel
 painting: painted grit, dark palette with warm fire and cold ground, chunky but detailed, weight and momentum in
 motion (anticipation, follow-through, hit-stop) with cloth and gear that lag the body.
+
+Another reference from the owner: Eitr (isometric pixel-art action RPG, Norse): detailed sprites of about 64-96 px
+with smooth, weighty frame animation, dark painted ground with cold light, readable silhouettes. It is the closest
+match to Godmarrow's own view (isometric, 8 directions) and the bar for the pixel road's motion: anticipation,
+follow-through, cloth lag, and hit reactions that move the whole body.
