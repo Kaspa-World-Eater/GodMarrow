@@ -20,6 +20,8 @@
       "fps": 0
     }
   },
-  "model": "/tmp/claude-0/kenney/nature-kit/Models/GLTF format/cliff_blockCave_rock.glb",
+  "model": [
+    "/tmp/claude-0/kenney/nature-kit/Models/GLTF format/cliff_blockCave_rock.glb"
+  ],
   "source": "pixelforge prop3d"
 }

@@ -20,6 +20,8 @@
       "fps": 0
     }
   },
-  "model": "/home/user/godmarrow/art/objects/_models/willow.glb",
+  "model": [
+    "/home/user/godmarrow/art/objects/_models/willow.glb"
+  ],
   "source": "pixelforge prop3d"
 }

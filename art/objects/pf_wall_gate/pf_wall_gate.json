@@ -20,6 +20,8 @@
       "fps": 0
     }
   },
-  "model": "/tmp/claude-0/kenney/castle-kit/Models/GLB format/gate.glb",
+  "model": [
+    "/tmp/claude-0/kenney/castle-kit/Models/GLB format/gate.glb"
+  ],
   "source": "pixelforge prop3d"
 }

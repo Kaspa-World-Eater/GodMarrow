@@ -128,6 +128,19 @@ pixelforge tiles3d grass stone moor_grass -o art/tiles [--tiles 6]              
 blender -b --python pixelforge/blender/gen_tree.py -- --out dead.glb --kind dead|pine|willow --seed 3 --height 5   # grown trees (no add-on)
 ```
 
+```
+pixelforge prompt --world object|building|tree|ground|effect|ui|icons|portrait --describe "..." --sref <hero sheet url>   # style-locked world prompts
+pixelforge artlist -o docs/ART_ORDER.md --sref <hero sheet url>                   # the Act I art order with every prompt
+pixelforge object <sheet.png> <name> -o art/objects --height 1.2 [--views 3] [--game-objects objects.json]   # painted sheet -> carved, painted, filmed, pixelated prop (the hero way)
+```
+
+**The world is painted, then built (Derek, 2026-10-01): objects get the same treatment as heroes.** `prompt --world`
+writes Midjourney prompts with one fixed style block (measured from the Hollow Mystic painting) and `--sref` to the
+hero sheet, asking for exactly the views the Forge carves from; `object` runs the hero chain on the result (cut out ->
+visual hull from the views -> painting projected on -> game camera + lantern rig -> mild grade -> pixels -> objects.json).
+`docs/ART_ORDER.md` in the game lists Act I's assets in the order to paint them. `prop3d` on CC0 kits is the fallback
+geometry until a painting exists for that asset.
+
 **The quality bar (Derek, 2026-10-01): Diablo II Resurrected / Path of Exile, not clip art.** Flat painted stand-ins
 are out. Props and buildings come from real geometry: CC0 kits (Kenney graveyard / castle / nature / mini-dungeon,
 fetched by `tools/make_props3d.py`), grown trees, or a model carved from a painting; all through `prop3d`, whose

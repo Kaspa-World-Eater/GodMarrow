@@ -168,3 +168,14 @@ def test_doctor_runs():
     r = run(None)
     assert any(x["check"] == "numpy" and x["ok"] for x in r["rows"])
     assert "numpy" in format_report(r)
+
+
+def test_world_prompts_carry_the_style_and_the_order_is_complete():
+    from pixelforge.world_prompts import ART_ORDER, STYLE, WORLD_KINDS, art_order_markdown, build_world_prompt
+
+    for k in WORLD_KINDS:
+        p = build_world_prompt(k.key, "a thing", "https://x/y.png")
+        assert "deep teal-blue, bone white" in p and "--sref https://x/y.png" in p and "pixel art" not in p
+    assert "no glow" not in build_world_prompt("effect", "a flame")
+    md = art_order_markdown("")
+    assert md.count("## ") == len(ART_ORDER) + 1 and "[HERO SHEET IMAGE URL]" in md

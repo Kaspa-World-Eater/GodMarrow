@@ -46,6 +46,14 @@ TOOLS = [
     ("Compare", "Before / after strip and GIF for two images or two frame folders.",
      [("a", "file", "", None), ("b", "file", "", None), ("out", "text", "compare.png", None), ("zoom", "int", 2, None)],
      "compare"),
+    ("World prompts", "Midjourney prompts for objects, buildings, trees, ground, effects, UI, icons and portraits, locked to the heroes' style.",
+     [("kind", "choice", "object", ["object", "building", "tree", "ground", "effect", "ui", "icons", "portrait"]), ("description", "text", "a weathered stone gravestone with a worn bone sigil", None),
+      ("sref", "text", "", None)],
+     "worldprompt"),
+    ("Painted object", "A painted object / building / tree sheet becomes a carved, filmed, pixelated prop the hero way.",
+     [("sheet", "file", "", None), ("name", "text", "gravestone", None), ("out", "dir", "art/objects", None), ("height", "float", 1.2, None),
+      ("views", "choice", "auto", ["auto", "2", "3", "4"]), ("game_objects", "file", "", None)],
+     "object"),
     ("Skill trees", "Open the skill-tree editor over a game's data/skills.json.",
      [("skills", "file", "", None)],
      "skilltree"),
@@ -87,6 +95,12 @@ def run_tool(key: str, v: dict) -> dict:
     if key == "compare":
         from .compare import compare
         return compare(v["a"], v["b"], v["out"], zoom=int(v["zoom"]))
+    if key == "worldprompt":
+        from .world_prompts import build_world_prompt
+        return {"ok": True, "prompt": build_world_prompt(v["kind"], v["description"], v["sref"])}
+    if key == "object":
+        from .object3d import make_object
+        return make_object(v["sheet"], v["name"], v["out"], height=float(v["height"]), views=None if v["views"] == "auto" else int(v["views"]), game_objects=v["game_objects"] or None)
     if key == "skilltree":
         from .skilltree import gui
         gui(v["skills"])
@@ -161,7 +175,9 @@ class ToolsWindow:
         def work():
             try:
                 r = run_tool(key, values)
-                self.win.after(0, lambda: self._say("OK " + ", ".join(f"{k}={v}" for k, v in r.items() if k in ("png", "dir", "files", "json", "tres", "found", "installed", "gif", "mean_abs_diff"))))
+                self.win.after(0, lambda: self._say("OK " + ", ".join(f"{k}={v}" for k, v in r.items() if k in ("png", "dir", "files", "json", "tres", "found", "installed", "gif", "mean_abs_diff", "prompt"))))
+                if r.get("prompt"):
+                    self.win.after(0, lambda: (self.win.clipboard_clear(), self.win.clipboard_append(r["prompt"]), self._say("(copied to the clipboard)")))
                 if r.get("gif"):
                     self.win.after(0, lambda: webbrowser.open(r["gif"]))
             except Exception as e:  # noqa: BLE001

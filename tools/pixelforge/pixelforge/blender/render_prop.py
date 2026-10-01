@@ -91,10 +91,12 @@ def painterly(mat, grime: float, bump: float, dust: float) -> None:
     pw = nt.nodes.new("ShaderNodeMath")
     pw.operation = "POWER"
     pw.inputs[1].default_value = 3.0
+    pw.use_clamp = True   # downward faces (negative z) must not drive the mix negative (it overshoots to orange)
     nt.links.new(sep.outputs["Z"], pw.inputs[0])
     sc = nt.nodes.new("ShaderNodeMath")
     sc.operation = "MULTIPLY"
     sc.inputs[1].default_value = dust
+    sc.use_clamp = True
     nt.links.new(pw.outputs[0], sc.inputs[0])
     dmix = nt.nodes.new("ShaderNodeMixRGB")
     dmix.blend_type = "MIX"
@@ -158,11 +160,20 @@ def main() -> None:
     p.add_argument("--ground-shadow", action="store_true", help="catch a soft shadow on an invisible ground plane")
     a = script_args(p)
 
-    bpy.ops.wm.read_factory_settings(use_empty=True)
+    if len(a.model) == 1 and a.model[0].lower().endswith(".blend"):
+        bpy.ops.wm.open_mainfile(filepath=os.path.abspath(a.model[0]))
+        for o in list(bpy.data.objects):
+            if o.type in ("LIGHT", "CAMERA"):
+                bpy.data.objects.remove(o, do_unlink=True)
+    else:
+        bpy.ops.wm.read_factory_settings(use_empty=True)
     scene = bpy.context.scene
     meshes, tops = [], []
     z_off = 0.0
-    for path in a.model:
+    if len(a.model) == 1 and a.model[0].lower().endswith(".blend"):
+        meshes = [o for o in bpy.data.objects if o.type == "MESH"]
+        tops = [o for o in bpy.data.objects if o.parent is None]
+    for path in ([] if meshes else a.model):
         m, t = import_model(os.path.abspath(path))
         if a.stack:
             lo_p, hi_p = bbox(m)

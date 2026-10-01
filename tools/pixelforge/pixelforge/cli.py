@@ -237,6 +237,16 @@ def _emit(a, result: dict) -> None:
 
 
 def cmd_prompt(a) -> None:
+    if getattr(a, "world", None):
+        from .world_prompts import WORLD_KINDS, WORLD_RULES, build_world_prompt
+
+        if a.world == "all":
+            for k in WORLD_KINDS:
+                print(f"### {k.title}\n{k.purpose}\n{build_world_prompt(k.key, a.describe, a.sref or '')}\nForge: {k.forge}\n")
+            print("RULES\n" + "\n".join(f"- {r}" for r in WORLD_RULES))
+        else:
+            print(build_world_prompt(a.world, a.describe, a.sref or ""))
+        return
     if a.kind == "all":
         for kind, text in build_all(a.describe, a.reference).items():
             title = next(k.title for k in PROMPT_KINDS if k.key == kind)
@@ -322,6 +332,24 @@ def cmd_tiles3d(a) -> None:
     from .tiles3d import make_tiles3d
 
     _emit(a, make_tiles3d(a.material, a.second, a.name, a.out, tiles=a.tiles, seed=a.seed, ppu=a.ppu, res_dir=a.res_dir))
+
+
+def cmd_object(a) -> None:
+    from .object3d import make_object
+
+    _emit(a, make_object(a.sheet, a.name, a.out, height=a.height, views=a.views, tolerance=a.tolerance, yaw=a.yaw, ppu=a.ppu, strength=a.strength,
+                         game_objects=a.game_objects, hr=a.hr, log=print))
+
+
+def cmd_artlist(a) -> None:
+    from .world_prompts import art_order_markdown
+
+    text = art_order_markdown(a.sref or "")
+    if a.out:
+        Path(a.out).write_text(text)
+        _emit(a, {"ok": True, "file": a.out})
+    else:
+        print(text)
 
 
 def cmd_prop3d(a) -> None:
@@ -508,6 +536,7 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("prompt", help="print the Midjourney prompt(s) for a character description")
     s.add_argument("--describe", required=True, help="one-sentence character description")
     s.add_argument("--kind", choices=["all", *[k.key for k in PROMPT_KINDS]], default="all")
+    s.add_argument("--world", help="a world prompt instead: object building tree ground effect ui icons portrait"); s.add_argument("--sref", help="hero sheet image URL (style reference)")
     s.add_argument("--reference", default="[SHEET IMAGE URL]", help="sheet image URL for the --cref prompts")
     s.set_defaults(func=cmd_prompt)
 
@@ -552,6 +581,19 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--tiles", type=int, default=4); s.add_argument("--seed", type=int, default=1); s.add_argument("--ppu", type=float, default=108.0)
     s.add_argument("--res-dir", default="res://art/tiles"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_tiles3d)
+
+    s = sub.add_parser("object", help="a painted object/building/tree sheet -> carved, painted, filmed, pixelated prop (the hero way)")
+    s.add_argument("sheet"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/objects")
+    s.add_argument("--height", type=float, default=1.0, help="metres"); s.add_argument("--views", type=int, choices=[2, 3, 4], help="figures on the sheet (default: detect)")
+    s.add_argument("--tolerance", type=float, default=0.08); s.add_argument("--yaw", type=float, default=45.0); s.add_argument("--ppu", type=float, default=108.0)
+    s.add_argument("--strength", type=float, default=0.35, help="grading strength (the painting already has the look)")
+    s.add_argument("--game-objects"); s.add_argument("--hr", type=float, default=4.0); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_object)
+
+    s = sub.add_parser("artlist", help="the Act I art order: every world asset with its style-locked Midjourney prompt, in order")
+    s.add_argument("-o", "--out", help="write markdown here (default: print)"); s.add_argument("--sref", help="hero sheet image URL for --sref")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_artlist)
 
     s = sub.add_parser("prop3d", help="a 3D model (GLB/FBX/OBJ) -> graded, pixelated prop with a foot point (game camera + lantern light rig)")
     s.add_argument("model"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/objects")

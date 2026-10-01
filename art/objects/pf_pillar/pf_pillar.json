@@ -20,6 +20,8 @@
       "fps": 0
     }
   },
-  "model": "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/pillar-large.glb",
+  "model": [
+    "/tmp/claude-0/kenney/graveyard-kit/Models/GLB format/pillar-large.glb"
+  ],
   "source": "pixelforge prop3d"
 }
