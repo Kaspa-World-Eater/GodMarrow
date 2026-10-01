@@ -158,3 +158,5 @@ build 2). The brim now exists but reads as a flat pink disc tilted toward the ca
 wide straw hat seen from 30° above; its colour is pink where the sheet's hat is dark brown-purple. The body is better
 (less blob). The washed, warm look on every skin is the light map from the lighting merge (tested: off = solid); I am
 building a browser-vs-Godot capture to tune it against the reference.
+
+**Keeper build 4 in game (derek-33):** `docs/screens/2026-10-02_keeper_build2_vs_build4.png`. At game size it is hard to tell from build 2: the hat still reads as a pale pink-brown disc facing the camera with a dark rim. Part of the pink is the warm light map (my side), so judge the hat from a flat-lit Forge preview too.
