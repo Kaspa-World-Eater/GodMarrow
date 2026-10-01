@@ -1,0 +1,27 @@
+{
+  "name": "hand_stone_shards",
+  "kind": "shards",
+  "size": [
+    56,
+    56
+  ],
+  "frames": 8,
+  "frame_width": 56,
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+    28,
+    28
+  ],
+  "glow": false,
+  "palette": [
+    "#121214",
+    "#2e2f33",
+    "#55575c",
+    "#80838a",
+    "#aeb2b9"
+  ],
+  "bands": 6,
+  "seed": 1799,
+  "source": "pixelforge"
+}

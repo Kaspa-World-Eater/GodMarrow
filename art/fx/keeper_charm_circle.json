@@ -1,0 +1,27 @@
+{
+  "name": "keeper_charm_circle",
+  "kind": "circle",
+  "size": [
+    96,
+    48
+  ],
+  "frames": 8,
+  "frame_width": 96,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    48,
+    24
+  ],
+  "glow": true,
+  "palette": [
+    "#2a2318",
+    "#6b5a3a",
+    "#b09a6a",
+    "#e2d3a8",
+    "#fff6dc"
+  ],
+  "bands": 6,
+  "seed": 1975,
+  "source": "pixelforge"
+}

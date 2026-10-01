@@ -1,0 +1,27 @@
+{
+  "name": "keeper_poison_cloud",
+  "kind": "cloud",
+  "size": [
+    56,
+    40
+  ],
+  "frames": 8,
+  "frame_width": 56,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    28,
+    20
+  ],
+  "glow": false,
+  "palette": [
+    "#0d1a0c",
+    "#234d1e",
+    "#4f8f3a",
+    "#95c860",
+    "#e3ffb8"
+  ],
+  "bands": 6,
+  "seed": 2025,
+  "source": "pixelforge"
+}

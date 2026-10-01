@@ -1,0 +1,27 @@
+{
+  "name": "mystic_soul_ring",
+  "kind": "ring",
+  "size": [
+    80,
+    40
+  ],
+  "frames": 8,
+  "frame_width": 80,
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+    40,
+    20
+  ],
+  "glow": true,
+  "palette": [
+    "#0b1c20",
+    "#1d4a4c",
+    "#3f9c92",
+    "#8fe3d2",
+    "#eafff8"
+  ],
+  "bands": 6,
+  "seed": 1738,
+  "source": "pixelforge"
+}

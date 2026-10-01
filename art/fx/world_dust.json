@@ -1,0 +1,27 @@
+{
+  "name": "world_dust",
+  "kind": "cloud",
+  "size": [
+    48,
+    32
+  ],
+  "frames": 8,
+  "frame_width": 48,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    24,
+    16
+  ],
+  "glow": false,
+  "palette": [
+    "#121214",
+    "#2e2f33",
+    "#55575c",
+    "#80838a",
+    "#aeb2b9"
+  ],
+  "bands": 6,
+  "seed": 1095,
+  "source": "pixelforge"
+}

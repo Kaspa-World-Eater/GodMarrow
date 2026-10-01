@@ -1,0 +1,27 @@
+{
+  "name": "penitent_blood_drip",
+  "kind": "drip",
+  "size": [
+    24,
+    40
+  ],
+  "frames": 8,
+  "frame_width": 24,
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+    12,
+    20
+  ],
+  "glow": false,
+  "palette": [
+    "#140202",
+    "#300606",
+    "#480a0a",
+    "#5c1010",
+    "#701616"
+  ],
+  "bands": 6,
+  "seed": 2020,
+  "source": "pixelforge"
+}

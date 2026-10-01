@@ -1,0 +1,27 @@
+{
+  "name": "hand_noon_pillar",
+  "kind": "pillar",
+  "size": [
+    40,
+    96
+  ],
+  "frames": 8,
+  "frame_width": 40,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    20,
+    95
+  ],
+  "glow": true,
+  "palette": [
+    "#2a1a05",
+    "#7a4a0c",
+    "#c98a1e",
+    "#f0c24a",
+    "#fff0b8"
+  ],
+  "bands": 6,
+  "seed": 1687,
+  "source": "pixelforge"
+}

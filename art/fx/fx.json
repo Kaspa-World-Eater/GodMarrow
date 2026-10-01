@@ -1,0 +1,938 @@
+{
+ "mystic_wisp": {
+  "png": "res://art/fx/mystic_wisp.png",
+  "kind": "wisp",
+  "frames": 8,
+  "frame_width": 24,
+  "size": [
+   24,
+   36
+  ],
+  "fps": 10,
+  "loop": true,
+  "anchor": [
+   12,
+   18
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "mystic_soul_ring": {
+  "png": "res://art/fx/mystic_soul_ring.png",
+  "kind": "ring",
+  "frames": 8,
+  "frame_width": 80,
+  "size": [
+   80,
+   40
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   40,
+   20
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "mystic_mirror_bolt": {
+  "png": "res://art/fx/mystic_mirror_bolt.png",
+  "kind": "bolt",
+  "frames": 6,
+  "frame_width": 48,
+  "size": [
+   48,
+   20
+  ],
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+   24,
+   10
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "mystic_mirror_shards": {
+  "png": "res://art/fx/mystic_mirror_shards.png",
+  "kind": "shards",
+  "frames": 8,
+  "frame_width": 56,
+  "size": [
+   56,
+   56
+  ],
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+   28,
+   28
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "mystic_mirror_ward": {
+  "png": "res://art/fx/mystic_mirror_ward.png",
+  "kind": "ward",
+  "frames": 8,
+  "frame_width": 64,
+  "size": [
+   64,
+   72
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   32,
+   71
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "mystic_thread_vortex": {
+  "png": "res://art/fx/mystic_thread_vortex.png",
+  "kind": "vortex",
+  "frames": 8,
+  "frame_width": 80,
+  "size": [
+   80,
+   40
+  ],
+  "fps": 10,
+  "loop": true,
+  "anchor": [
+   40,
+   20
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "mystic_cast_circle": {
+  "png": "res://art/fx/mystic_cast_circle.png",
+  "kind": "circle",
+  "frames": 8,
+  "frame_width": 96,
+  "size": [
+   96,
+   48
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   48,
+   24
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "ossuarch_bone_shards": {
+  "png": "res://art/fx/ossuarch_bone_shards.png",
+  "kind": "shards",
+  "frames": 8,
+  "frame_width": 56,
+  "size": [
+   56,
+   56
+  ],
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+   28,
+   28
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "ossuarch_bone_bolt": {
+  "png": "res://art/fx/ossuarch_bone_bolt.png",
+  "kind": "bolt",
+  "frames": 6,
+  "frame_width": 48,
+  "size": [
+   48,
+   20
+  ],
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+   24,
+   10
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "ossuarch_bone_slash": {
+  "png": "res://art/fx/ossuarch_bone_slash.png",
+  "kind": "slash",
+  "frames": 6,
+  "frame_width": 56,
+  "size": [
+   56,
+   64
+  ],
+  "fps": 18,
+  "loop": false,
+  "anchor": [
+   28,
+   32
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "ossuarch_raise_circle": {
+  "png": "res://art/fx/ossuarch_raise_circle.png",
+  "kind": "circle",
+  "frames": 8,
+  "frame_width": 96,
+  "size": [
+   96,
+   48
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   48,
+   24
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "ossuarch_carapace_ward": {
+  "png": "res://art/fx/ossuarch_carapace_ward.png",
+  "kind": "ward",
+  "frames": 8,
+  "frame_width": 64,
+  "size": [
+   64,
+   72
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   32,
+   71
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "ossuarch_count_ring": {
+  "png": "res://art/fx/ossuarch_count_ring.png",
+  "kind": "ring",
+  "frames": 8,
+  "frame_width": 80,
+  "size": [
+   80,
+   40
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   40,
+   20
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "ossuarch_grave_dust": {
+  "png": "res://art/fx/ossuarch_grave_dust.png",
+  "kind": "cloud",
+  "frames": 8,
+  "frame_width": 56,
+  "size": [
+   56,
+   40
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   28,
+   20
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "ossuarch_bone_decal": {
+  "png": "res://art/fx/ossuarch_bone_decal.png",
+  "kind": "decal",
+  "frames": 1,
+  "frame_width": 48,
+  "size": [
+   48,
+   24
+  ],
+  "fps": 0,
+  "loop": false,
+  "anchor": [
+   24,
+   12
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "keeper_miasma_cloud": {
+  "png": "res://art/fx/keeper_miasma_cloud.png",
+  "kind": "cloud",
+  "frames": 8,
+  "frame_width": 64,
+  "size": [
+   64,
+   44
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   32,
+   22
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "keeper_poison_cloud": {
+  "png": "res://art/fx/keeper_poison_cloud.png",
+  "kind": "cloud",
+  "frames": 8,
+  "frame_width": 56,
+  "size": [
+   56,
+   40
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   28,
+   20
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "keeper_paper_bolt": {
+  "png": "res://art/fx/keeper_paper_bolt.png",
+  "kind": "bolt",
+  "frames": 6,
+  "frame_width": 48,
+  "size": [
+   48,
+   20
+  ],
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+   24,
+   10
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "keeper_charm_circle": {
+  "png": "res://art/fx/keeper_charm_circle.png",
+  "kind": "circle",
+  "frames": 8,
+  "frame_width": 96,
+  "size": [
+   96,
+   48
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   48,
+   24
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "keeper_omen_ring": {
+  "png": "res://art/fx/keeper_omen_ring.png",
+  "kind": "ring",
+  "frames": 8,
+  "frame_width": 80,
+  "size": [
+   80,
+   40
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   40,
+   20
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "keeper_miasma_vortex": {
+  "png": "res://art/fx/keeper_miasma_vortex.png",
+  "kind": "vortex",
+  "frames": 8,
+  "frame_width": 80,
+  "size": [
+   80,
+   40
+  ],
+  "fps": 10,
+  "loop": true,
+  "anchor": [
+   40,
+   20
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "keeper_haze": {
+  "png": "res://art/fx/keeper_haze.png",
+  "kind": "smoke",
+  "frames": 8,
+  "frame_width": 48,
+  "size": [
+   48,
+   64
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   24,
+   63
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "hand_amber_slash": {
+  "png": "res://art/fx/hand_amber_slash.png",
+  "kind": "slash",
+  "frames": 6,
+  "frame_width": 56,
+  "size": [
+   56,
+   64
+  ],
+  "fps": 18,
+  "loop": false,
+  "anchor": [
+   28,
+   32
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "hand_black_slash": {
+  "png": "res://art/fx/hand_black_slash.png",
+  "kind": "slash",
+  "frames": 6,
+  "frame_width": 56,
+  "size": [
+   56,
+   64
+  ],
+  "fps": 18,
+  "loop": false,
+  "anchor": [
+   28,
+   32
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "hand_amber_sand": {
+  "png": "res://art/fx/hand_amber_sand.png",
+  "kind": "cloud",
+  "frames": 8,
+  "frame_width": 56,
+  "size": [
+   56,
+   40
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   28,
+   20
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "hand_black_sand": {
+  "png": "res://art/fx/hand_black_sand.png",
+  "kind": "cloud",
+  "frames": 8,
+  "frame_width": 56,
+  "size": [
+   56,
+   40
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   28,
+   20
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "hand_noon_pillar": {
+  "png": "res://art/fx/hand_noon_pillar.png",
+  "kind": "pillar",
+  "frames": 8,
+  "frame_width": 40,
+  "size": [
+   40,
+   96
+  ],
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+   20,
+   95
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "hand_night_ring": {
+  "png": "res://art/fx/hand_night_ring.png",
+  "kind": "ring",
+  "frames": 8,
+  "frame_width": 80,
+  "size": [
+   80,
+   40
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   40,
+   20
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "hand_amber_flash": {
+  "png": "res://art/fx/hand_amber_flash.png",
+  "kind": "flash",
+  "frames": 4,
+  "frame_width": 32,
+  "size": [
+   32,
+   32
+  ],
+  "fps": 20,
+  "loop": false,
+  "anchor": [
+   16,
+   16
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "hand_stone_shards": {
+  "png": "res://art/fx/hand_stone_shards.png",
+  "kind": "shards",
+  "frames": 8,
+  "frame_width": 56,
+  "size": [
+   56,
+   56
+  ],
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+   28,
+   28
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "penitent_blood_drip": {
+  "png": "res://art/fx/penitent_blood_drip.png",
+  "kind": "drip",
+  "frames": 8,
+  "frame_width": 24,
+  "size": [
+   24,
+   40
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   12,
+   20
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "penitent_blood_burst": {
+  "png": "res://art/fx/penitent_blood_burst.png",
+  "kind": "burst",
+  "frames": 6,
+  "frame_width": 64,
+  "size": [
+   64,
+   40
+  ],
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+   32,
+   20
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "penitent_blood_decal": {
+  "png": "res://art/fx/penitent_blood_decal.png",
+  "kind": "decal",
+  "frames": 1,
+  "frame_width": 48,
+  "size": [
+   48,
+   24
+  ],
+  "fps": 0,
+  "loop": false,
+  "anchor": [
+   24,
+   12
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "penitent_blood_ring": {
+  "png": "res://art/fx/penitent_blood_ring.png",
+  "kind": "ring",
+  "frames": 8,
+  "frame_width": 80,
+  "size": [
+   80,
+   40
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   40,
+   20
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "penitent_blood_slash": {
+  "png": "res://art/fx/penitent_blood_slash.png",
+  "kind": "slash",
+  "frames": 6,
+  "frame_width": 56,
+  "size": [
+   56,
+   64
+  ],
+  "fps": 18,
+  "loop": false,
+  "anchor": [
+   28,
+   32
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "penitent_scourge_shards": {
+  "png": "res://art/fx/penitent_scourge_shards.png",
+  "kind": "shards",
+  "frames": 8,
+  "frame_width": 56,
+  "size": [
+   56,
+   56
+  ],
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+   28,
+   28
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_lantern_flame": {
+  "png": "res://art/fx/world_lantern_flame.png",
+  "kind": "fire",
+  "frames": 8,
+  "frame_width": 20,
+  "size": [
+   20,
+   32
+  ],
+  "fps": 10,
+  "loop": true,
+  "anchor": [
+   10,
+   31
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "world_campfire": {
+  "png": "res://art/fx/world_campfire.png",
+  "kind": "fire",
+  "frames": 8,
+  "frame_width": 40,
+  "size": [
+   40,
+   56
+  ],
+  "fps": 10,
+  "loop": true,
+  "anchor": [
+   20,
+   55
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "world_torch_smoke": {
+  "png": "res://art/fx/world_torch_smoke.png",
+  "kind": "smoke",
+  "frames": 8,
+  "frame_width": 40,
+  "size": [
+   40,
+   56
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   20,
+   55
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_embers": {
+  "png": "res://art/fx/world_embers.png",
+  "kind": "embers",
+  "frames": 8,
+  "frame_width": 48,
+  "size": [
+   48,
+   64
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   24,
+   63
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_hit_flash": {
+  "png": "res://art/fx/world_hit_flash.png",
+  "kind": "flash",
+  "frames": 4,
+  "frame_width": 32,
+  "size": [
+   32,
+   32
+  ],
+  "fps": 20,
+  "loop": false,
+  "anchor": [
+   16,
+   16
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_level_pillar": {
+  "png": "res://art/fx/world_level_pillar.png",
+  "kind": "pillar",
+  "frames": 10,
+  "frame_width": 48,
+  "size": [
+   48,
+   112
+  ],
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+   24,
+   111
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "world_dust": {
+  "png": "res://art/fx/world_dust.png",
+  "kind": "cloud",
+  "frames": 8,
+  "frame_width": 48,
+  "size": [
+   48,
+   32
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   24,
+   16
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_frost_cloud": {
+  "png": "res://art/fx/world_frost_cloud.png",
+  "kind": "cloud",
+  "frames": 8,
+  "frame_width": 56,
+  "size": [
+   56,
+   40
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   28,
+   20
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_chill_ring": {
+  "png": "res://art/fx/world_chill_ring.png",
+  "kind": "ring",
+  "frames": 8,
+  "frame_width": 80,
+  "size": [
+   80,
+   40
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   40,
+   20
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "world_burn": {
+  "png": "res://art/fx/world_burn.png",
+  "kind": "fire",
+  "frames": 8,
+  "frame_width": 16,
+  "size": [
+   16,
+   24
+  ],
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+   8,
+   23
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "world_scorch_decal": {
+  "png": "res://art/fx/world_scorch_decal.png",
+  "kind": "decal",
+  "frames": 1,
+  "frame_width": 48,
+  "size": [
+   48,
+   24
+  ],
+  "fps": 0,
+  "loop": false,
+  "anchor": [
+   24,
+   12
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_heal_ring": {
+  "png": "res://art/fx/world_heal_ring.png",
+  "kind": "ring",
+  "frames": 8,
+  "frame_width": 80,
+  "size": [
+   80,
+   40
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   40,
+   20
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "world_summon_circle": {
+  "png": "res://art/fx/world_summon_circle.png",
+  "kind": "circle",
+  "frames": 8,
+  "frame_width": 96,
+  "size": [
+   96,
+   48
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   48,
+   24
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "world_death_burst": {
+  "png": "res://art/fx/world_death_burst.png",
+  "kind": "burst",
+  "frames": 6,
+  "frame_width": 64,
+  "size": [
+   64,
+   40
+  ],
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+   32,
+   20
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_waypoint_pillar": {
+  "png": "res://art/fx/world_waypoint_pillar.png",
+  "kind": "pillar",
+  "frames": 8,
+  "frame_width": 32,
+  "size": [
+   32,
+   96
+  ],
+  "fps": 8,
+  "loop": false,
+  "anchor": [
+   16,
+   95
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "world_shrine_ward": {
+  "png": "res://art/fx/world_shrine_ward.png",
+  "kind": "ward",
+  "frames": 8,
+  "frame_width": 64,
+  "size": [
+   64,
+   72
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   32,
+   71
+  ],
+  "glow": true,
+  "hr": 2
+ }
+}

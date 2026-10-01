@@ -1,0 +1,27 @@
+{
+  "name": "mystic_mirror_shards",
+  "kind": "shards",
+  "size": [
+    56,
+    56
+  ],
+  "frames": 8,
+  "frame_width": 56,
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+    28,
+    28
+  ],
+  "glow": false,
+  "palette": [
+    "#141a22",
+    "#3a4a5a",
+    "#7f93a6",
+    "#c2d2dd",
+    "#f2f7fa"
+  ],
+  "bands": 6,
+  "seed": 2167,
+  "source": "pixelforge"
+}

@@ -30,7 +30,7 @@ PRESETS = {
     "miasma": ["#140b1e", "#3a1f52", "#6d3f9a", "#a97fd1", "#e3d2f5"],
     "bone": ["#1a1712", "#4a4336", "#8f8470", "#c9bfa6", "#f0ead8"],
     "smoke": ["#1a1b1f", "#2e3036", "#45484f", "#5c6068", "#767a83"],
-    "blood": ["#160303", "#3a0707", "#5a0c0c", "#731313", "#8a1a1a"],
+    "blood": ["#140202", "#300606", "#480a0a", "#5c1010", "#701616"],   # dark, never lit
 }
 KINDS = ("fire", "smoke", "wisp", "burst", "embers")
 
@@ -133,7 +133,7 @@ def gen_smoke(w: int, h: int, frames: int, rng: np.random.Generator) -> list:
         n = _roll(noise, -t * h, math.sin(t * 2 * math.pi) * w * 0.08)
         inten = np.clip((n - 0.42) * 3.0, 0, 1) * np.clip(shape * 1.6, 0, 1)
         alpha = (inten > 0.18).astype(np.float32)
-        out.append((np.clip((inten - 0.18) / 0.82, 0, 1), alpha, None))
+        out.append((0.2 + np.clip((inten - 0.18) / 0.82, 0, 1) * 0.4, alpha, None))
     return out
 
 
@@ -230,25 +230,19 @@ def make_vfx(
     if kind not in KINDS:
         raise ValueError(f"kind must be one of {KINDS}")
     colors = PRESETS[palette] if isinstance(palette, str) else list(palette)
-    w, h = size or {"fire": (32, 48), "smoke": (40, 56), "wisp": (24, 36), "burst": (64, 40), "embers": (48, 64)}[kind]
+    w, h = size or DEFAULT_SIZE[kind]
     rng = np.random.default_rng(seed)
     if glow is None:
-        glow = kind in ("fire", "wisp", "burst")
-    gen = {
-        "fire": lambda: gen_fire(w, h, frames, rng, glow=glow),
-        "smoke": lambda: gen_smoke(w, h, frames, rng),
-        "wisp": lambda: gen_wisp(w, h, frames, rng, glow=glow),
-        "burst": lambda: gen_burst(w, h, frames, rng, glow=glow),
-        "embers": lambda: gen_embers(w, h, frames, rng),
-    }[kind]()
+        glow = kind in GLOW_KINDS
+    gen = GENERATORS[kind](w, h, frames, rng, glow)
     lut = ramp_lut(colors, bands)
     seq = [paint(i, a, lut, hl) for i, a, hl in gen]
-    loop = kind != "burst"
+    loop = kind in LOOPING
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     strip = np.concatenate(seq, axis=1)
     Image.fromarray(strip, "RGBA").save(out / f"{name}.png")
-    anchor = [w // 2, h - 1] if kind in ("fire", "smoke", "embers") else [w // 2, h // 2]
+    anchor = [w // 2, h - 1] if kind in ("fire", "smoke", "embers", "pillar", "ward") else [w // 2, h // 2]
     meta = {"name": name, "kind": kind, "size": [w, h], "frames": frames, "frame_width": w, "fps": fps, "loop": loop,
             "anchor": anchor, "glow": glow, "palette": colors, "bands": bands, "seed": seed, "source": "pixelforge"}
     (out / f"{name}.json").write_text(json.dumps(meta, indent=2) + "\n")
@@ -284,3 +278,270 @@ def export_vfx_set(seq: list[np.ndarray], kind: str, out_dir: str | Path, *, fps
                                             "source": "pixelforge"}, "idx": idx}
     (out / f"{kind}.json").write_text(json.dumps(data, separators=(",", ":")) + "\n")
     return {"png": str(png), "json": str(out / f"{kind}.json"), "frames": len(seq)}
+
+
+# ------------------------------------------------------------------ more kinds (auras, spells, impacts)
+def _grid(w: int, h: int):
+    ys, xs = np.mgrid[0:h, 0:w].astype(np.float32)
+    return xs + 0.5, ys + 0.5
+
+
+def gen_ring(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = True) -> list:
+    """A pulsing 2:1 ground aura: a ring that breathes, with drifting motes on it."""
+    xs, ys = _grid(w, h)
+    cx, cy = w / 2, h / 2
+    d = np.hypot(xs - cx, (ys - cy) * 2)
+    R = min(w / 2, h) * 0.86
+    motes = rng.random((10, 2)).astype(np.float32)
+    out = []
+    for i in range(frames):
+        t = i / frames
+        rad = R * (0.94 + 0.06 * math.sin(t * 2 * math.pi))
+        ring = np.clip(1 - np.abs(d - rad) / 2.2, 0, 1)
+        inten = ring * 0.85
+        for a, s in motes:
+            ang = (a + t * (0.5 + s)) * 2 * math.pi
+            mx, my = cx + math.cos(ang) * rad, cy + math.sin(ang) * rad * 0.5
+            inten = np.maximum(inten, np.clip(1 - np.hypot(xs - mx, ys - my) / 1.5, 0, 1))
+        alpha = (inten > 0.2).astype(np.float32)
+        halo = _blur(ring, 3) * 1.2 if glow else None
+        out.append((np.clip(inten * 1.2, 0, 1), alpha, halo))
+    return out
+
+
+def gen_bolt(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = True) -> list:
+    """A projectile flying right: bright head, flickering tail. Loops (the game moves it)."""
+    xs, ys = _grid(w, h)
+    noise = periodic_noise(w, h, 3, rng, octaves=3)
+    hx, hy, r = w * 0.78, h / 2, h * 0.22
+    out = []
+    for i in range(frames):
+        t = i / frames
+        n = _roll(noise, 0, -t * w)
+        head = np.clip(1 - np.hypot(xs - hx, ys - hy) / r, 0, 1)
+        tail_mask = np.clip((hx - xs) / (w * 0.7), 0, 1)                      # 0 at the head, 1 at the back
+        tail = np.clip(1 - np.abs(ys - hy) / (r * (1.1 - tail_mask * 0.9)), 0, 1) * (1 - tail_mask) ** 0.6 * (xs < hx)
+        tail = tail * np.clip((n - 0.25) * 2.2, 0, 1)
+        inten = np.maximum(head * 1.3, tail)
+        alpha = (inten > 0.18).astype(np.float32)
+        halo = np.clip(1 - np.hypot(xs - hx, ys - hy) / (r * 2.6), 0, 1) ** 1.5 if glow else None
+        out.append((np.clip(inten, 0, 1), alpha, halo))
+    return out
+
+
+def gen_slash(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = False) -> list:
+    """A melee arc: a crescent sweeping top to bottom on the right, one-shot. Bright leading edge, fading trail."""
+    xs, ys = _grid(w, h)
+    cx, cy = w * 0.1, h / 2
+    R = min(w * 0.85, h * 0.5)
+    d = np.hypot(xs - cx, ys - cy)
+    ang = np.arctan2(ys - cy, xs - cx)   # 0 = right, negative = up
+    out = []
+    for i in range(frames):
+        t = (i + 0.5) / frames
+        lead = -1.0 + 2.0 * t
+        thick = R * (0.16 + 0.1 * (1 - t))
+        band = np.clip(1 - np.abs(d - R * 0.85) / thick, 0, 1)
+        swept = np.clip((lead - ang) / 1.4, 0, 1)                       # 0 at the edge, 1 far behind
+        arc = band * (ang <= lead) * (ang > lead - 1.4) * (1 - swept) ** 1.2
+        edge = band * np.clip(1 - np.abs(ang - lead) / 0.16, 0, 1)
+        inten = np.clip(np.maximum(arc * 0.9, edge * 1.5) * (1 - 0.6 * t), 0, 1)
+        alpha = (inten > 0.15).astype(np.float32)
+        out.append((inten, alpha, _blur(arc, 2) * 0.5 if glow else None))
+    return out
+
+
+def gen_circle(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = True) -> list:
+    """A summoning circle on the ground (2:1): two rings, spokes, turning slowly. Loops."""
+    xs, ys = _grid(w, h)
+    cx, cy = w / 2, h / 2
+    dx, dy = xs - cx, (ys - cy) * 2
+    d = np.hypot(dx, dy)
+    ang = np.arctan2(dy, dx)
+    R = min(w / 2, h) * 0.9
+    out = []
+    for i in range(frames):
+        t = i / frames * 2 * math.pi
+        inten = np.clip(1 - np.abs(d - R) / 1.8, 0, 1) * 0.9
+        inten = np.maximum(inten, np.clip(1 - np.abs(d - R * 0.62) / 1.4, 0, 1) * 0.7)
+        spokes = np.clip(1 - np.abs(np.sin((ang + t) * 3)) * 9, 0, 1) * (d < R) * (d > R * 0.62)
+        inten = np.maximum(inten, spokes * 0.8)
+        glyphs = np.clip(1 - np.abs(np.sin((ang - t * 0.5) * 8)) * 5, 0, 1) * np.clip(1 - np.abs(d - R * 0.8) / 2.5, 0, 1)
+        inten = np.maximum(inten, glyphs)
+        alpha = (inten > 0.25).astype(np.float32)
+        halo = _blur(inten, 3) * 1.1 if glow else None
+        out.append((np.clip(inten, 0, 1), alpha, halo))
+    return out
+
+
+def gen_cloud(w: int, h: int, frames: int, rng: np.random.Generator) -> list:
+    """A lingering status cloud (poison, chill, dust): a soft blob that rolls in place. Loops, no glow."""
+    xs, ys = _grid(w, h)
+    noise = periodic_noise(w, h, 2, rng, octaves=3)
+    cx, cy = w / 2, h * 0.55
+    body = np.clip(1 - np.hypot((xs - cx) / (w * 0.45), (ys - cy) / (h * 0.38)), 0, 1)
+    out = []
+    for i in range(frames):
+        t = i / frames
+        n = _roll(noise, math.sin(t * 2 * math.pi) * h * 0.1, -t * w)
+        n = (n - n.min()) / max(n.max() - n.min(), 1e-6)   # full range whatever the seed and size
+        inten = np.clip((n - 0.42) * 2.6, 0, 1) * np.clip(body * 1.6, 0, 1)
+        alpha = (inten > 0.2).astype(np.float32)
+        out.append((0.3 + np.clip((inten - 0.2) / 0.8, 0, 1) * 0.55, alpha, None))
+    return out
+
+
+def gen_shards(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = False, n: int = 12) -> list:
+    """Debris bursting out and falling (bone, glass, stone). One-shot, no glow."""
+    xs, ys = _grid(w, h)
+    p = rng.random((n, 4)).astype(np.float32)   # angle, speed, size, spin
+    cx, cy = w / 2, h * 0.6
+    out = []
+    for i in range(frames):
+        t = (i + 0.5) / frames
+        inten = np.zeros((h, w), dtype=np.float32)
+        for a, s, sz, sp in p:
+            ang = a * 2 * math.pi
+            vx, vy = math.cos(ang) * (0.5 + s) * w * 0.45, -abs(math.sin(ang)) * (0.6 + s) * h * 0.5
+            px, py = cx + vx * t, cy + vy * t + h * 0.9 * t * t
+            L = 2.2 + sz * 3.5
+            dd = np.hypot((xs - px) * (0.5 + 0.5 * abs(math.cos(sp * 6 + t * 12))), (ys - py) * 1.4)
+            inten = np.maximum(inten, np.clip(1 - dd / L, 0, 1) * (0.7 + 0.3 * sz))
+        alpha = (inten > 0.25).astype(np.float32) * (t < 0.95)
+        out.append((np.clip(inten * 1.4, 0, 1), alpha, None))
+    return out
+
+
+def gen_pillar(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = True) -> list:
+    """A beam of light from the ground, rising then fading (level-up, a vow fulfilled). One-shot."""
+    xs, ys = _grid(w, h)
+    noise = periodic_noise(w, h, 2, rng, octaves=3)
+    cx = w / 2
+    out = []
+    for i in range(frames):
+        t = (i + 0.5) / frames
+        rise = np.clip((1 - ys / h) < t * 1.6, 0, 1)
+        core = np.clip(1 - np.abs(xs - cx) / (w * 0.14 * (1 + 0.6 * (1 - t))), 0, 1)
+        streaks = np.clip((_roll(noise, -t * h * 2) - 0.35) * 2.5, 0, 1) * np.clip(1 - np.abs(xs - cx) / (w * 0.42), 0, 1)
+        inten = np.maximum(core, streaks * 0.8) * rise * (1 - t) ** 0.7
+        alpha = (inten > 0.2).astype(np.float32)
+        halo = np.clip(1 - np.abs(xs - cx) / (w * 0.5), 0, 1) ** 2 * rise * (1 - t) * 0.7 if glow else None
+        out.append((np.clip(inten, 0, 1), alpha, halo))
+    return out
+
+
+def gen_decal(w: int, h: int, frames: int, rng: np.random.Generator) -> list:
+    """A ground splat (blood, scorch, sand), one still frame, 2:1 and ragged. No glow."""
+    xs, ys = _grid(w, h)
+    noise = periodic_noise(w, h, 3, rng, octaves=3)
+    cx, cy = w / 2, h / 2
+    d = np.hypot((xs - cx) / (w * 0.48), (ys - cy) / (h * 0.46))
+    inten = np.clip((1 - d) * 1.6 + (noise - 0.5) * 1.3, 0, 1)
+    drops = rng.random((7, 3)).astype(np.float32)
+    for a, r, s in drops:
+        px, py = cx + math.cos(a * 6.28) * w * 0.46 * (0.5 + r / 2), cy + math.sin(a * 6.28) * h * 0.46 * (0.5 + r / 2)
+        inten = np.maximum(inten, np.clip(1 - np.hypot(xs - px, (ys - py) * 2) / (1 + s * 2), 0, 1) * 0.6)
+    alpha = (inten > 0.25).astype(np.float32)
+    return [(np.clip(inten * 0.8, 0, 1), alpha, None)] * frames
+
+
+def gen_drip(w: int, h: int, frames: int, rng: np.random.Generator, n: int = 6) -> list:
+    """Drops falling from the top edge (blood, water, wax). Loops, no glow."""
+    xs, ys = _grid(w, h)
+    p = rng.random((n, 3)).astype(np.float32)
+    out = []
+    for i in range(frames):
+        t = i / frames
+        inten = np.zeros((h, w), dtype=np.float32)
+        for px, ph, sp in p:
+            u = (t * (0.6 + sp) + ph) % 1.0
+            py = u * u * h
+            dd = np.hypot((xs - px * w) * 1.4, (ys - py) * (0.55 if u > 0.2 else 1.0))
+            inten = np.maximum(inten, np.clip(1 - dd / 2.6, 0, 1) * (0.6 + 0.4 * u))
+        alpha = (inten > 0.3).astype(np.float32)
+        out.append((inten, alpha, None))
+    return out
+
+
+def gen_flash(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = False) -> list:
+    """A hit flash: a bright star that collapses in three frames. One-shot."""
+    xs, ys = _grid(w, h)
+    cx, cy = w / 2, h / 2
+    ang = np.arctan2(ys - cy, xs - cx)
+    d = np.hypot(xs - cx, ys - cy)
+    out = []
+    for i in range(frames):
+        t = (i + 0.5) / frames
+        R = min(w, h) * 0.5 * (1 - t) ** 0.5
+        star = np.clip(1 - d / (R * (0.45 + 0.55 * np.abs(np.cos(ang * 2)))), 0, 1)
+        inten = np.clip(star * 1.6, 0, 1)
+        alpha = (inten > 0.25).astype(np.float32)
+        out.append((inten, alpha, None))
+    return out
+
+
+def gen_ward(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = True) -> list:
+    """A dome over the character: a shimmering shell, open at the bottom. Loops."""
+    xs, ys = _grid(w, h)
+    cx, cy = w / 2, h * 0.62
+    d = np.hypot((xs - cx) / (w * 0.48), (ys - cy) / (h * 0.6))
+    noise = periodic_noise(w, h, 3, rng, octaves=2)
+    out = []
+    for i in range(frames):
+        t = i / frames
+        n = _roll(noise, -t * h, t * w)
+        shell = np.clip(1 - np.abs(d - 1) / 0.06, 0, 1) * (ys < cy + h * 0.2)
+        shimmer = shell * np.clip((n - 0.3) * 2.0, 0, 1)
+        inten = np.maximum(shell * 0.45, shimmer)
+        alpha = (inten > 0.2).astype(np.float32)
+        halo = _blur(shell, 3) * 1.0 if glow else None
+        out.append((np.clip(inten, 0, 1), alpha, halo))
+    return out
+
+
+def gen_vortex(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = True) -> list:
+    """A spiral pulling inward on the ground (2:1). Loops."""
+    xs, ys = _grid(w, h)
+    cx, cy = w / 2, h / 2
+    dx, dy = xs - cx, (ys - cy) * 2
+    d = np.hypot(dx, dy)
+    ang = np.arctan2(dy, dx)
+    R = min(w / 2, h) * 0.9
+    out = []
+    for i in range(frames):
+        t = i / frames * 2 * math.pi
+        arms = np.clip(1 - np.abs(np.sin(ang * 2 + d / R * 7 + t)) * 3.0, 0, 1) * (d < R) * (d > 2)
+        inten = arms * np.clip(1 - d / R, 0, 1) ** 0.4
+        alpha = (inten > 0.3).astype(np.float32)
+        halo = _blur(arms, 3) * 1.0 if glow else None
+        out.append((np.clip(inten * 1.2, 0, 1), alpha, halo))
+    return out
+
+
+KINDS = KINDS + ("ring", "bolt", "slash", "circle", "cloud", "shards", "pillar", "decal", "drip", "flash", "ward", "vortex")
+LOOPING = {"fire", "smoke", "wisp", "embers", "ring", "bolt", "circle", "cloud", "drip", "ward", "vortex"}
+GLOW_KINDS = {"fire", "wisp", "burst", "ring", "bolt", "circle", "pillar", "ward", "vortex"}
+DEFAULT_SIZE = {"fire": (32, 48), "smoke": (40, 56), "wisp": (24, 36), "burst": (64, 40), "embers": (48, 64),
+                "ring": (80, 40), "bolt": (48, 20), "slash": (56, 64), "circle": (96, 48), "cloud": (56, 40),
+                "shards": (56, 56), "pillar": (40, 96), "decal": (48, 24), "drip": (24, 40), "flash": (32, 32),
+                "ward": (64, 72), "vortex": (80, 40)}
+GENERATORS = {
+    "fire": lambda w, h, f, r, g: gen_fire(w, h, f, r, glow=g), "smoke": lambda w, h, f, r, g: gen_smoke(w, h, f, r),
+    "wisp": lambda w, h, f, r, g: gen_wisp(w, h, f, r, glow=g), "burst": lambda w, h, f, r, g: gen_burst(w, h, f, r, glow=g),
+    "embers": lambda w, h, f, r, g: gen_embers(w, h, f, r), "ring": lambda w, h, f, r, g: gen_ring(w, h, f, r, glow=g),
+    "bolt": lambda w, h, f, r, g: gen_bolt(w, h, f, r, glow=g), "slash": lambda w, h, f, r, g: gen_slash(w, h, f, r, glow=g),
+    "circle": lambda w, h, f, r, g: gen_circle(w, h, f, r, glow=g), "cloud": lambda w, h, f, r, g: gen_cloud(w, h, f, r),
+    "shards": lambda w, h, f, r, g: gen_shards(w, h, f, r), "pillar": lambda w, h, f, r, g: gen_pillar(w, h, f, r, glow=g),
+    "decal": lambda w, h, f, r, g: gen_decal(w, h, f, r), "drip": lambda w, h, f, r, g: gen_drip(w, h, f, r),
+    "flash": lambda w, h, f, r, g: gen_flash(w, h, f, r), "ward": lambda w, h, f, r, g: gen_ward(w, h, f, r, glow=g),
+    "vortex": lambda w, h, f, r, g: gen_vortex(w, h, f, r, glow=g),
+}
+PRESETS.update({
+    "silver": ["#141a22", "#3a4a5a", "#7f93a6", "#c2d2dd", "#f2f7fa"],     # the Hollow Mystic's mirrors
+    "amber": ["#2a1a05", "#7a4a0c", "#c98a1e", "#f0c24a", "#fff0b8"],      # the Empty Hand's amber sand
+    "black": ["#050507", "#15141a", "#2a2831", "#423f4a", "#5b5866"],      # the Empty Hand's black sand
+    "paper": ["#2a2318", "#6b5a3a", "#b09a6a", "#e2d3a8", "#fff6dc"],      # the Shrine Keeper's charms
+    "iron": ["#121214", "#2e2f33", "#55575c", "#80838a", "#aeb2b9"],
+    "frost": ["#0b1a26", "#1f4a63", "#4d93b3", "#9ad4e8", "#eafaff"],
+    "poison": ["#0d1a0c", "#234d1e", "#4f8f3a", "#95c860", "#e3ffb8"],
+})

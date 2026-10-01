@@ -1,0 +1,27 @@
+{
+  "name": "keeper_miasma_cloud",
+  "kind": "cloud",
+  "size": [
+    64,
+    44
+  ],
+  "frames": 8,
+  "frame_width": 64,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    32,
+    22
+  ],
+  "glow": false,
+  "palette": [
+    "#140b1e",
+    "#3a1f52",
+    "#6d3f9a",
+    "#a97fd1",
+    "#e3d2f5"
+  ],
+  "bands": 6,
+  "seed": 1993,
+  "source": "pixelforge"
+}

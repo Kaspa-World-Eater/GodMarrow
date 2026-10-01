@@ -1,0 +1,27 @@
+{
+  "name": "world_scorch_decal",
+  "kind": "decal",
+  "size": [
+    48,
+    24
+  ],
+  "frames": 1,
+  "frame_width": 48,
+  "fps": 0,
+  "loop": false,
+  "anchor": [
+    24,
+    12
+  ],
+  "glow": false,
+  "palette": [
+    "#050507",
+    "#15141a",
+    "#2a2831",
+    "#423f4a",
+    "#5b5866"
+  ],
+  "bands": 6,
+  "seed": 1889,
+  "source": "pixelforge"
+}

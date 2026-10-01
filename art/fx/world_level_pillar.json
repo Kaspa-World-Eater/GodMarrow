@@ -1,0 +1,27 @@
+{
+  "name": "world_level_pillar",
+  "kind": "pillar",
+  "size": [
+    48,
+    112
+  ],
+  "frames": 10,
+  "frame_width": 48,
+  "fps": 12,
+  "loop": false,
+  "anchor": [
+    24,
+    111
+  ],
+  "glow": true,
+  "palette": [
+    "#2a1206",
+    "#7a3d10",
+    "#d08a2a",
+    "#f3c75c",
+    "#fff1b0"
+  ],
+  "bands": 6,
+  "seed": 1922,
+  "source": "pixelforge"
+}

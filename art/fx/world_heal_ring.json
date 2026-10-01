@@ -1,0 +1,27 @@
+{
+  "name": "world_heal_ring",
+  "kind": "ring",
+  "size": [
+    80,
+    40
+  ],
+  "frames": 8,
+  "frame_width": 80,
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+    40,
+    20
+  ],
+  "glow": true,
+  "palette": [
+    "#2a1206",
+    "#7a3d10",
+    "#d08a2a",
+    "#f3c75c",
+    "#fff1b0"
+  ],
+  "bands": 6,
+  "seed": 1584,
+  "source": "pixelforge"
+}

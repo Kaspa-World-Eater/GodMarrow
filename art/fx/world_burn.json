@@ -1,0 +1,27 @@
+{
+  "name": "world_burn",
+  "kind": "fire",
+  "size": [
+    16,
+    24
+  ],
+  "frames": 8,
+  "frame_width": 16,
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+    8,
+    23
+  ],
+  "glow": true,
+  "palette": [
+    "#2a1206",
+    "#7a3d10",
+    "#d08a2a",
+    "#f3c75c",
+    "#fff1b0"
+  ],
+  "bands": 6,
+  "seed": 1086,
+  "source": "pixelforge"
+}

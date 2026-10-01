@@ -1,0 +1,27 @@
+{
+  "name": "ossuarch_bone_shards",
+  "kind": "shards",
+  "size": [
+    56,
+    56
+  ],
+  "frames": 8,
+  "frame_width": 56,
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+    28,
+    28
+  ],
+  "glow": false,
+  "palette": [
+    "#1a1712",
+    "#4a4336",
+    "#8f8470",
+    "#c9bfa6",
+    "#f0ead8"
+  ],
+  "bands": 6,
+  "seed": 2127,
+  "source": "pixelforge"
+}

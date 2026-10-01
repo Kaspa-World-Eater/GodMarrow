@@ -1,0 +1,27 @@
+{
+  "name": "ossuarch_bone_bolt",
+  "kind": "bolt",
+  "size": [
+    48,
+    20
+  ],
+  "frames": 6,
+  "frame_width": 48,
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+    24,
+    10
+  ],
+  "glow": true,
+  "palette": [
+    "#1a1712",
+    "#4a4336",
+    "#8f8470",
+    "#c9bfa6",
+    "#f0ead8"
+  ],
+  "bands": 6,
+  "seed": 1915,
+  "source": "pixelforge"
+}

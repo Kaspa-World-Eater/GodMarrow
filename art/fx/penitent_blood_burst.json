@@ -1,0 +1,27 @@
+{
+  "name": "penitent_blood_burst",
+  "kind": "burst",
+  "size": [
+    64,
+    40
+  ],
+  "frames": 6,
+  "frame_width": 64,
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+    32,
+    20
+  ],
+  "glow": false,
+  "palette": [
+    "#140202",
+    "#300606",
+    "#480a0a",
+    "#5c1010",
+    "#701616"
+  ],
+  "bands": 6,
+  "seed": 2149,
+  "source": "pixelforge"
+}

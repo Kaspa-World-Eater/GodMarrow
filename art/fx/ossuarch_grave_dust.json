@@ -1,0 +1,27 @@
+{
+  "name": "ossuarch_grave_dust",
+  "kind": "cloud",
+  "size": [
+    56,
+    40
+  ],
+  "frames": 8,
+  "frame_width": 56,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    28,
+    20
+  ],
+  "glow": false,
+  "palette": [
+    "#121214",
+    "#2e2f33",
+    "#55575c",
+    "#80838a",
+    "#aeb2b9"
+  ],
+  "bands": 6,
+  "seed": 2043,
+  "source": "pixelforge"
+}

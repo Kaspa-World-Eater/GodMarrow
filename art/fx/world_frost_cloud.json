@@ -1,0 +1,27 @@
+{
+  "name": "world_frost_cloud",
+  "kind": "cloud",
+  "size": [
+    56,
+    40
+  ],
+  "frames": 8,
+  "frame_width": 56,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    28,
+    20
+  ],
+  "glow": false,
+  "palette": [
+    "#0b1a26",
+    "#1f4a63",
+    "#4d93b3",
+    "#9ad4e8",
+    "#eafaff"
+  ],
+  "bands": 6,
+  "seed": 1835,
+  "source": "pixelforge"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "hand_black_sand",
+  "kind": "cloud",
+  "size": [
+    56,
+    40
+  ],
+  "frames": 8,
+  "frame_width": 56,
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+    28,
+    20
+  ],
+  "glow": false,
+  "palette": [
+    "#050507",
+    "#15141a",
+    "#2a2831",
+    "#423f4a",
+    "#5b5866"
+  ],
+  "bands": 6,
+  "seed": 1532,
+  "source": "pixelforge"
+}

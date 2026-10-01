@@ -1,0 +1,27 @@
+{
+  "name": "world_torch_smoke",
+  "kind": "smoke",
+  "size": [
+    40,
+    56
+  ],
+  "frames": 8,
+  "frame_width": 40,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    20,
+    55
+  ],
+  "glow": false,
+  "palette": [
+    "#1a1b1f",
+    "#2e3036",
+    "#45484f",
+    "#5c6068",
+    "#767a83"
+  ],
+  "bands": 6,
+  "seed": 1829,
+  "source": "pixelforge"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "world_campfire",
+  "kind": "fire",
+  "size": [
+    40,
+    56
+  ],
+  "frames": 8,
+  "frame_width": 40,
+  "fps": 10,
+  "loop": true,
+  "anchor": [
+    20,
+    55
+  ],
+  "glow": true,
+  "palette": [
+    "#2a1206",
+    "#7a3d10",
+    "#d08a2a",
+    "#f3c75c",
+    "#fff1b0"
+  ],
+  "bands": 6,
+  "seed": 1486,
+  "source": "pixelforge"
+}

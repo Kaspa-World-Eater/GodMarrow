@@ -1,0 +1,27 @@
+{
+  "name": "world_waypoint_pillar",
+  "kind": "pillar",
+  "size": [
+    32,
+    96
+  ],
+  "frames": 8,
+  "frame_width": 32,
+  "fps": 8,
+  "loop": false,
+  "anchor": [
+    16,
+    95
+  ],
+  "glow": true,
+  "palette": [
+    "#0b1c20",
+    "#1d4a4c",
+    "#3f9c92",
+    "#8fe3d2",
+    "#eafff8"
+  ],
+  "bands": 6,
+  "seed": 2277,
+  "source": "pixelforge"
+}

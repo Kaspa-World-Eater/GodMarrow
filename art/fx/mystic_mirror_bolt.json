@@ -1,0 +1,27 @@
+{
+  "name": "mystic_mirror_bolt",
+  "kind": "bolt",
+  "size": [
+    48,
+    20
+  ],
+  "frames": 6,
+  "frame_width": 48,
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+    24,
+    10
+  ],
+  "glow": true,
+  "palette": [
+    "#141a22",
+    "#3a4a5a",
+    "#7f93a6",
+    "#c2d2dd",
+    "#f2f7fa"
+  ],
+  "bands": 6,
+  "seed": 1955,
+  "source": "pixelforge"
+}

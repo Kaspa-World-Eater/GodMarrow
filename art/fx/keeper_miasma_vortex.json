@@ -1,0 +1,27 @@
+{
+  "name": "keeper_miasma_vortex",
+  "kind": "vortex",
+  "size": [
+    80,
+    40
+  ],
+  "frames": 8,
+  "frame_width": 80,
+  "fps": 10,
+  "loop": true,
+  "anchor": [
+    40,
+    20
+  ],
+  "glow": true,
+  "palette": [
+    "#140b1e",
+    "#3a1f52",
+    "#6d3f9a",
+    "#a97fd1",
+    "#e3d2f5"
+  ],
+  "bands": 6,
+  "seed": 2138,
+  "source": "pixelforge"
+}

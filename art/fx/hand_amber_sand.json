@@ -1,0 +1,27 @@
+{
+  "name": "hand_amber_sand",
+  "kind": "cloud",
+  "size": [
+    56,
+    40
+  ],
+  "frames": 8,
+  "frame_width": 56,
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+    28,
+    20
+  ],
+  "glow": false,
+  "palette": [
+    "#2a1a05",
+    "#7a4a0c",
+    "#c98a1e",
+    "#f0c24a",
+    "#fff0b8"
+  ],
+  "bands": 6,
+  "seed": 1542,
+  "source": "pixelforge"
+}

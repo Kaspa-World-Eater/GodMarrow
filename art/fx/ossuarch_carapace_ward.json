@@ -1,0 +1,27 @@
+{
+  "name": "ossuarch_carapace_ward",
+  "kind": "ward",
+  "size": [
+    64,
+    72
+  ],
+  "frames": 8,
+  "frame_width": 64,
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+    32,
+    71
+  ],
+  "glow": true,
+  "palette": [
+    "#1a1712",
+    "#4a4336",
+    "#8f8470",
+    "#c9bfa6",
+    "#f0ead8"
+  ],
+  "bands": 6,
+  "seed": 2308,
+  "source": "pixelforge"
+}

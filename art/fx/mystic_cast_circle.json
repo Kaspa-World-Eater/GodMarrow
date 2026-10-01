@@ -1,0 +1,27 @@
+{
+  "name": "mystic_cast_circle",
+  "kind": "circle",
+  "size": [
+    96,
+    48
+  ],
+  "frames": 8,
+  "frame_width": 96,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    48,
+    24
+  ],
+  "glow": true,
+  "palette": [
+    "#141a22",
+    "#3a4a5a",
+    "#7f93a6",
+    "#c2d2dd",
+    "#f2f7fa"
+  ],
+  "bands": 6,
+  "seed": 1908,
+  "source": "pixelforge"
+}

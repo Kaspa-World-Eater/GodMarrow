@@ -1,0 +1,27 @@
+{
+  "name": "ossuarch_bone_decal",
+  "kind": "decal",
+  "size": [
+    48,
+    24
+  ],
+  "frames": 1,
+  "frame_width": 48,
+  "fps": 0,
+  "loop": false,
+  "anchor": [
+    24,
+    12
+  ],
+  "glow": false,
+  "palette": [
+    "#1a1712",
+    "#4a4336",
+    "#8f8470",
+    "#c9bfa6",
+    "#f0ead8"
+  ],
+  "bands": 6,
+  "seed": 1987,
+  "source": "pixelforge"
+}

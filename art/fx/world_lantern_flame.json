@@ -1,0 +1,27 @@
+{
+  "name": "world_lantern_flame",
+  "kind": "fire",
+  "size": [
+    20,
+    32
+  ],
+  "frames": 8,
+  "frame_width": 20,
+  "fps": 10,
+  "loop": true,
+  "anchor": [
+    10,
+    31
+  ],
+  "glow": true,
+  "palette": [
+    "#2a1206",
+    "#7a3d10",
+    "#d08a2a",
+    "#f3c75c",
+    "#fff1b0"
+  ],
+  "bands": 6,
+  "seed": 2015,
+  "source": "pixelforge"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "mystic_wisp",
+  "kind": "wisp",
+  "size": [
+    24,
+    36
+  ],
+  "frames": 8,
+  "frame_width": 24,
+  "fps": 10,
+  "loop": true,
+  "anchor": [
+    12,
+    18
+  ],
+  "glow": true,
+  "palette": [
+    "#0b1c20",
+    "#1d4a4c",
+    "#3f9c92",
+    "#8fe3d2",
+    "#eafff8"
+  ],
+  "bands": 6,
+  "seed": 1211,
+  "source": "pixelforge"
+}

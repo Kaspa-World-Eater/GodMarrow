@@ -1,0 +1,27 @@
+{
+  "name": "ossuarch_bone_slash",
+  "kind": "slash",
+  "size": [
+    56,
+    64
+  ],
+  "frames": 6,
+  "frame_width": 56,
+  "fps": 18,
+  "loop": false,
+  "anchor": [
+    28,
+    32
+  ],
+  "glow": false,
+  "palette": [
+    "#1a1712",
+    "#4a4336",
+    "#8f8470",
+    "#c9bfa6",
+    "#f0ead8"
+  ],
+  "bands": 6,
+  "seed": 2021,
+  "source": "pixelforge"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "ossuarch_count_ring",
+  "kind": "ring",
+  "size": [
+    80,
+    40
+  ],
+  "frames": 8,
+  "frame_width": 80,
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+    40,
+    20
+  ],
+  "glow": true,
+  "palette": [
+    "#1a1712",
+    "#4a4336",
+    "#8f8470",
+    "#c9bfa6",
+    "#f0ead8"
+  ],
+  "bands": 6,
+  "seed": 2047,
+  "source": "pixelforge"
+}

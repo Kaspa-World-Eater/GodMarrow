@@ -1,0 +1,27 @@
+{
+  "name": "penitent_blood_ring",
+  "kind": "ring",
+  "size": [
+    80,
+    40
+  ],
+  "frames": 8,
+  "frame_width": 80,
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+    40,
+    20
+  ],
+  "glow": false,
+  "palette": [
+    "#140202",
+    "#300606",
+    "#480a0a",
+    "#5c1010",
+    "#701616"
+  ],
+  "bands": 6,
+  "seed": 2021,
+  "source": "pixelforge"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "hand_amber_slash",
+  "kind": "slash",
+  "size": [
+    56,
+    64
+  ],
+  "frames": 6,
+  "frame_width": 56,
+  "fps": 18,
+  "loop": false,
+  "anchor": [
+    28,
+    32
+  ],
+  "glow": false,
+  "palette": [
+    "#2a1a05",
+    "#7a4a0c",
+    "#c98a1e",
+    "#f0c24a",
+    "#fff0b8"
+  ],
+  "bands": 6,
+  "seed": 1659,
+  "source": "pixelforge"
+}
