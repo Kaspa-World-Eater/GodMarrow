@@ -424,6 +424,7 @@ class Studio:
             return
         win = Toplevel(self.root)
         win.title(f"Preview ({source})")
+        win.configure(bg=PANEL)
         bar = ttk.Frame(win, padding=4)
         bar.pack(fill=X)
         clip = StringVar(value="walk" if "walk" in clips else clips[0])
@@ -443,7 +444,7 @@ class Studio:
                 im = Image.open(p).convert("RGBA")
                 bg = Image.new("RGBA", im.size, (40, 40, 40, 255))
                 im = Image.alpha_composite(bg, im)
-                z = 3 if source == "frames" else 1
+                z = max(1, min(3, 560 // max(im.height, 1))) if source == "frames" else 1   # fit a laptop screen
                 ims.append(ImageTk.PhotoImage(im.resize((im.width * z, im.height * z), Image.NEAREST)))
             state["frames"], state["i"] = ims, 0
             if not ims:
