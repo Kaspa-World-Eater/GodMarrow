@@ -216,6 +216,86 @@ def _open(vox: np.ndarray, n: int) -> np.ndarray:
     return opened & vox   # never grow past the original hull
 
 
+def _brim_rows(F: np.ndarray) -> list[int]:
+    """Rows of a hat brim: a band in the top third whose width is > 1.5x the width a few rows below it, and whose
+    lowest row is at least 1.5x wider than the row under it (the head). Empty when there is no such band."""
+    rows = F.shape[0]
+    width = F.sum(axis=1)
+    top = [z for z in range(rows) if width[z] > 0]
+    if not top:
+        return []
+    z0 = top[0]
+    best = []
+    for z in range(z0, min(rows, z0 + rows // 3)):
+        below = width[min(z + 3, rows - 1)]
+        if width[z] >= 1.5 * max(below, 1) and width[z] >= 0.25 * width.max():
+            best.append(z)
+        elif best:
+            break
+    if len(best) < 2 or len(best) > rows // 6:
+        return []
+    return list(range(z0, max(best) + 1))   # everything from the figure's top down to the brim's underside is the hat
+
+
+def _cull_slivers(vox: np.ndarray, keep_fraction: float = 0.03) -> np.ndarray:
+    """Keep the body and any island at least keep_fraction of it (a held thing); drop the rest. Loose slivers (a plate
+    where a cord seen edge-on met the body's width, a tassel's voxels) read as lines sticking out of the figure; the
+    card pass that follows brings back what the front view shows, attached to the body at its mid-depth."""
+    from scipy import ndimage
+
+    lab, n = ndimage.label(vox)
+    if n <= 1:
+        return vox
+    sizes = ndimage.sum(vox, lab, index=np.arange(n + 1))
+    biggest = sizes[1:].max()
+    keep = sizes >= keep_fraction * biggest
+    keep[0] = False
+    return keep[lab]
+
+
+def hull_preview(spec: dict, path: str | Path, scale: int = 3) -> str:
+    """Front, side and top views of the carved voxels (and a 3/4 view) as one PNG, so a carve can be judged without
+    Blender: the shape problems (slabs, plates, thick brims) show here first."""
+    vox = np.array([[[c == "1" for c in row] for row in layer] for layer in spec["voxels"]], bool)   # z, y, x
+    rows, depth, cols = vox.shape
+    for part in spec.get("parts", []):
+        if part["kind"] == "cone":
+            yy, xx = np.mgrid[0:depth, 0:cols]
+            for z in range(part["z_apex"], part["z_base"]):
+                r = part["radius"] * (z - part["z_apex"] + 0.5) / max(part["z_base"] - part["z_apex"], 1)
+                vox[z] |= ((xx - part["cx"]) ** 2 + (yy - part["cy"]) ** 2) <= r * r
+    def depth_shade(mask_depth):   # nearest-surface shading: brighter = nearer
+        out = np.zeros(mask_depth.shape[:2] + (3,), np.uint8)
+        a = mask_depth
+        any_ = a.any(axis=2)
+        first = np.argmax(a, axis=2)
+        n = a.shape[2]
+        v = (0.35 + 0.65 * (1 - first / max(n - 1, 1)))
+        g = (v * 200).astype(np.uint8)
+        out[..., 0] = np.where(any_, (g * 0.9).astype(np.uint8), 18)
+        out[..., 1] = np.where(any_, g, 18)
+        out[..., 2] = np.where(any_, (g * 0.95).astype(np.uint8), 20)
+        return out
+    front = depth_shade(np.transpose(vox, (0, 2, 1)))                      # z, x, y(depth)
+    side = depth_shade(np.transpose(vox, (0, 1, 2))[:, :, ::-1])            # z, y, x: seen from the character's left
+    top = depth_shade(np.transpose(vox, (1, 2, 0)))                         # y, x, z
+    # a 3/4 view: shear x by depth
+    q = np.zeros((rows, cols + depth, depth), bool)
+    for y in range(depth):
+        q[:, y:y + cols, y] = vox[:, y, :]
+    quarter = depth_shade(q)
+    tiles = [front, side, quarter, top]
+    H = max(t.shape[0] for t in tiles); W = sum(t.shape[1] for t in tiles) + 6 * len(tiles)
+    img = Image.new("RGB", (W, H), (18, 18, 20)); x = 0
+    for t in tiles:
+        im = Image.fromarray(t)
+        img.paste(im, (x, H - t.shape[0])); x += t.shape[1] + 6
+    img = img.resize((img.width * scale, img.height * scale), Image.NEAREST)
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    img.save(path)
+    return str(path)
+
+
 def build_hull_spec(
     front: Image.Image,
     side: Image.Image,
@@ -228,6 +308,8 @@ def build_hull_spec(
     depth_scale: float = 0.8,
     fit: float = 2.6,
     opening: int = 1,
+    thin_run: int = 3,
+    brim: bool = True,
 ) -> dict:
     """Carve a voxel model from the front and side silhouettes (a visual hull).
 
@@ -262,11 +344,19 @@ def build_hull_spec(
         if not f_runs or not s_runs:
             continue
         widest = max(x1 - x0 for x0, x1 in f_runs)
+        deepest = max(y1 - y0 for y0, y1 in s_runs)
         for x0, x1 in f_runs:
             cx, hw = (x0 + x1 - 1) / 2, max((x1 - x0) / 2, 0.5)
+            thin_f = x1 - x0 < widest * 0.6
             for y0, y1 in s_runs:
                 cy, hd = (y0 + y1 - 1) / 2, max((y1 - y0) / 2, 0.5)
-                if x1 - x0 < widest * 0.6:  # a thin run (arm, chain) is not torso-deep
+                thin_s = y1 - y0 < deepest * 0.6 and y1 - y0 <= thin_run
+                if thin_s and not thin_f:
+                    # a sliver in the side view (a tassel, a cord end, a blade seen edge-on) meeting the whole body width
+                    # would carve as a plate the width of the figure: the "lines sticking out". It belongs to something
+                    # thin in the front view or to nothing; the cards below bring back what the front view shows.
+                    continue
+                if thin_f:  # a thin run (arm, chain) is not torso-deep
                     hd = min(hd, hw * arm_depth_ratio)
                 # form-fit: a side silhouette is the cloak's widest sweep, not the body; pull the depth in toward its
                 # centre line, and use a superellipse (fit > 2 = fuller shoulders, no boxy corners, less bulk front/back)
@@ -278,10 +368,30 @@ def build_hull_spec(
                 vox[z, ys[:, None], xs[None, :]] |= (xn**fit + yn**fit) <= 1.0
     if opening > 0:   # strip one-voxel protrusions (the "lines off the back"): erode then dilate
         vox = _open(vox, opening)
+    parts: list[dict] = []
+    brim_rows = _brim_rows(F) if brim else []
+    if brim_rows:
+        # a hat: the front view's brim is a wide band that narrows sharply below it (the head). A one-voxel cone would be
+        # eaten by the mesh smoothing (it came out as a small dome), so the brim leaves the voxels and becomes a real
+        # cone part: base at the brim's lowest row, apex at the top of the figure, built as geometry in Blender.
+        z_lo = max(brim_rows)
+        xs = np.nonzero(F[brim_rows].any(axis=0))[0]
+        cx = (xs.min() + xs.max()) / 2
+        r = max((xs.max() - xs.min()) / 2, 1.0)
+        body = [np.nonzero(vox[z].any(axis=1))[0] for z in range(z_lo + 1, min(rows, z_lo + 8)) if vox[z].any()]
+        cy = float(np.mean([b.mean() for b in body])) if body else depth_cols / 2
+        z_top = int(np.nonzero(F.any(axis=1))[0].min())
+        for z in brim_rows:
+            vox[z] = False
+        parts.append({"kind": "cone", "cx": float(cx), "cy": float(cy), "radius": float(r), "z_base": int(z_lo + 1), "z_apex": int(z_top),
+                      "rows": brim_rows})
+    vox = _cull_slivers(vox)
     # cards: what the front view shows but the carve lost (ropes, chains, hanging charms, hem fringe) comes back as a
     # two-voxel-thick card at the body's mid-depth, painted by the same projection (the Diablo II way)
     front_proj = vox.any(axis=1)   # z, x
     lost = F & ~front_proj
+    for part in parts:   # the brim is a cone part, not a card
+        lost[part["rows"]] = False
     for z in range(rows):
         if not lost[z].any():
             continue
@@ -313,5 +423,6 @@ def build_hull_spec(
         "depth_columns": int(depth_cols),
         "aspect": float(w / h),
         "thickness": float(depth_cols / rows),
+        "parts": parts,
         "voxels": packed,
     }

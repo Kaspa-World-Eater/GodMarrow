@@ -169,3 +169,44 @@ def test_model_spec_shape():
     inside = sum(row.count("1") for row in spec["grid"])
     assert inside > 0.5 * 32 * 80 * 0.78  # ellipse fills ~78% of its box
     assert max(max(r) for r in spec["depth"]) == 1.0
+
+
+def test_hull_culls_slivers_and_builds_a_hat_cone():
+    import numpy as np
+    from PIL import Image
+
+    from pixelforge.model_spec import build_hull_spec
+
+    def view(w, h, paint):
+        a = np.zeros((h, w), np.uint8)
+        paint(a)
+        rgba = np.zeros((h, w, 4), np.uint8)
+        rgba[..., :3] = 120
+        rgba[..., 3] = a * 255
+        return Image.fromarray(rgba)
+
+    def body(a):   # a figure: a wide thin brim at the top, a head, a torso, legs
+        a[2:6, 4:60] = 1       # brim, 56 wide
+        a[6:14, 26:38] = 1     # head
+        a[14:60, 18:46] = 1    # torso
+        a[60:90, 22:30] = 1    # legs
+        a[60:90, 34:42] = 1
+
+    def side(a):
+        a[2:6, 10:30] = 1      # brim from the side: same width (a cone)
+        a[6:14, 14:24] = 1
+        a[14:60, 12:28] = 1
+        a[60:90, 14:26] = 1
+        a[30:34, 2:6] = 1      # a cord seen edge-on, in front of the body: used to carve as a plate the width of the torso
+
+    spec = build_hull_spec(view(64, 92, body), view(32, 92, side))
+    vox = np.array([[[c == "1" for c in row] for row in layer] for layer in spec["voxels"]], bool)
+    from scipy import ndimage
+
+    _, n = ndimage.label(vox)
+    assert n == 1, "loose slivers must be culled; what the front shows comes back as attached cards"
+    assert spec["parts"] and spec["parts"][0]["kind"] == "cone"
+    cone = spec["parts"][0]
+    assert cone["radius"] > 20 and cone["z_base"] > cone["z_apex"]
+    assert not vox[cone["rows"]].any(), "the brim rows leave the voxels and live in the cone part"
+    assert vox[20:60].any(), "the torso stays"

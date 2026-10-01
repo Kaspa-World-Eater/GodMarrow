@@ -88,6 +88,24 @@ def build_mesh_from_spec(spec: dict, height: float, name: str):
     bpy.ops.object.mode_set(mode="OBJECT")
     for poly in mesh.polygons:
         poly.use_smooth = True
+    # real parts the carve recorded (a hat's cone): built as geometry after the smoothing, so they keep their shape
+    for part in spec.get("parts", []):
+        if part["kind"] != "cone":
+            continue
+        base_z = height - part["z_base"] * cz
+        apex_z = height - part["z_apex"] * cz
+        h = max(apex_z - base_z, cz)
+        bpy.ops.mesh.primitive_cone_add(vertices=48, radius1=part["radius"] * cx, radius2=0.0, depth=h,
+                                        location=(-width / 2 + (part["cx"] + 0.5) * cx, -depth / 2 + (part["cy"] + 0.5) * cy, base_z + h / 2))
+        cone = bpy.context.active_object
+        cone.name = f"{name}_cone"
+        for poly in cone.data.polygons:
+            poly.use_smooth = True
+        bpy.ops.object.select_all(action="DESELECT")
+        cone.select_set(True)
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.join()
     return obj, width
 
 
@@ -147,6 +165,24 @@ def build_hull_from_spec(spec: dict, height: float, name: str):
     bpy.ops.object.modifier_apply(modifier=sm.name)
     for poly in mesh.polygons:
         poly.use_smooth = True
+    # real parts the carve recorded (a hat's cone): built as geometry after the smoothing, so they keep their shape
+    for part in spec.get("parts", []):
+        if part["kind"] != "cone":
+            continue
+        base_z = height - part["z_base"] * cz
+        apex_z = height - part["z_apex"] * cz
+        h = max(apex_z - base_z, cz)
+        bpy.ops.mesh.primitive_cone_add(vertices=48, radius1=part["radius"] * cx, radius2=0.0, depth=h,
+                                        location=(-width / 2 + (part["cx"] + 0.5) * cx, -depth / 2 + (part["cy"] + 0.5) * cy, base_z + h / 2))
+        cone = bpy.context.active_object
+        cone.name = f"{name}_cone"
+        for poly in cone.data.polygons:
+            poly.use_smooth = True
+        bpy.ops.object.select_all(action="DESELECT")
+        cone.select_set(True)
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.join()
     return obj, width
 
 
