@@ -162,11 +162,9 @@ def legs_visible(vox: np.ndarray) -> bool:
     rows = vox.shape[0]
     def nruns(occ):
         return int(np.count_nonzero(np.diff(np.concatenate([[0], occ.astype(int), [0]])) == 1))
-    for lo, hi in ((0.72, 0.9), (0.86, 0.97)):   # knees, or at least the shins and feet under a skirt
-        band = vox[int(rows * lo):int(rows * hi)].any(axis=1)   # z, x
-        if int(np.median([nruns(r) for r in band])) >= 2:
-            return True
-    return False
+    # knees must be separate: a skirt with feet poking out is a hull job (the mannequin wraps itself into the skirt)
+    band = vox[int(rows * 0.72):int(rows * 0.9)].any(axis=1)   # z, x
+    return int(np.median([nruns(r) for r in band])) >= 2
 
 
 def fcurves(action):

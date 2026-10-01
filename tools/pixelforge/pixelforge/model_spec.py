@@ -137,7 +137,10 @@ def _runs(row: np.ndarray) -> list[tuple[int, int]]:
 
 
 def _mask(image: Image.Image) -> np.ndarray:
+    from .cleanup import remove_islands
+
     a = np.asarray(image.convert("RGBA"))[..., 3] > 127
+    a = remove_islands(a.astype(np.uint8) * 255, min_fraction=0.004) > 0   # loose chain bits and fringe would carve as floating slivers
     ys, xs = np.nonzero(a)
     if len(ys) == 0:
         raise ValueError("view has no opaque pixels")
