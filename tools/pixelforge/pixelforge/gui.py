@@ -336,7 +336,7 @@ class Studio:
             for p in recent[:5]:
                 ttk.Button(self.panel, text=p, command=lambda p=p: self._open(p)).pack(anchor="w", pady=1)
         ttk.Label(self.panel, text="A character in five moves", style="Head.TLabel").pack(anchor="w", pady=(12, 0))
-        self._steps_text(["Add a character: a name and one sentence about them. (A project folder is made for you in Documents.)",
+        self._steps_text(["Add a character: a name, one sentence about them, and the painting if you already have it. (A project folder is made for you in Documents.)",
                           "Step 1 writes the Midjourney prompts. Paint the sheet and save the PNG.",
                           "Step 2: bring the picture in. Then press Continue, or Run all automatic steps.",
                           "Watch the log. The app stops and says so if it needs something (Blender, a picture).",
@@ -417,6 +417,19 @@ class Studio:
         ttk.Label(dlg, text="For example: " + EXAMPLE_DESCRIPTION, style="Dim.TLabel", wraplength=440).pack(anchor="w", padx=10)
         desc = ScrolledText(dlg, width=60, height=5)
         desc.pack(padx=10, pady=4)
+        ttk.Label(dlg, text="Your painting (optional now): the Midjourney sheet with the front, side and back views, or any single picture of the character.").pack(anchor="w", padx=10, pady=(10, 0))
+        pic = StringVar(value="")
+        prow = ttk.Frame(dlg)
+        prow.pack(fill=X, padx=10)
+        ttk.Entry(prow, textvariable=pic, width=48).pack(side=LEFT)
+        ttk.Button(prow, text="Choose picture…", command=lambda: pic.set(filedialog.askopenfilename(title="The character's painting", filetypes=[("Images", "*.png *.jpg *.jpeg *.webp")]) or pic.get())).pack(side=LEFT, padx=4)
+        kind_var = StringVar(value="sheet")
+        krow = ttk.Frame(dlg)
+        krow.pack(fill=X, padx=10, pady=(2, 0))
+        ttk.Label(krow, text="That picture is:").pack(side=LEFT)
+        ttk.Radiobutton(krow, text="a sheet (several views side by side)", value="sheet", variable=kind_var).pack(side=LEFT, padx=4)
+        ttk.Radiobutton(krow, text="one front view", value="front", variable=kind_var).pack(side=LEFT, padx=4)
+        ttk.Radiobutton(krow, text="a pixel-style image", value="style", variable=kind_var).pack(side=LEFT, padx=4)
 
         def ok():
             if not desc.get("1.0", END).strip():
@@ -427,12 +440,23 @@ class Studio:
                 messagebox.showerror(APP_TITLE, str(e))
                 return
             api.set_description(self.project, r["character"], desc.get("1.0", END).strip())
+            picture = pic.get().strip()
+            imported = None
+            if picture:
+                try:
+                    imported = api.import_source(self.project, r["character"], kind_var.get(), picture)
+                except Exception as e:  # noqa: BLE001
+                    messagebox.showwarning(APP_TITLE, f"The character was made, but the picture could not be brought in:\n{e}\n\nUse step 2 to add it.")
             dlg.destroy()
             self._open(str(self.project.root))
             self.char.set(r["character"])
             self._refresh()
-            self.step_list.selection_set("prompts")
-            self.status.set(f"Character '{r['character']}' added. Step 1: copy a prompt, paint the sheet in Midjourney, then step 2.")
+            if imported:
+                self.step_list.selection_set("split")
+                self.status.set(f"Character '{r['character']}' added with its picture. Press Continue to cut the figures out, or Run all automatic steps.")
+            else:
+                self.step_list.selection_set("prompts")
+                self.status.set(f"Character '{r['character']}' added. Step 1 gives the Midjourney prompt; step 2 brings the picture in.")
 
         row = ttk.Frame(dlg)
         row.pack(fill=X, padx=10, pady=8)
