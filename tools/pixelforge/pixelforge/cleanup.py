@@ -264,3 +264,23 @@ def remove_background_pockets(rgba: np.ndarray, tolerance: float = 0.04) -> np.n
     close = (np.linalg.norm(lab - bg, axis=-1) < tolerance) & (out[..., 3] > 0)
     out[close, 3] = 0
     return out
+
+
+def unmix_background(rgba: np.ndarray, background=None) -> np.ndarray:
+    """Edge pixels of a cutout are the paint mixed with the background (white); take the background back out:
+    C_fg = (C - (1 - a) * bg) / a. Partial-alpha pixels keep their alpha but get the paint's own colour, so a
+    pixelate pass that composites them never shows a pale rim."""
+    out = rgba.copy()
+    a = out[..., 3].astype(np.float32) / 255.0
+    edge = (a > 0.02) & (a < 0.98)
+    if not edge.any():
+        return out
+    if background is None:
+        h, w = out.shape[:2]
+        corners = out[[0, 0, h - 1, h - 1], [0, w - 1, 0, w - 1], :3].astype(np.float32)
+        background = corners.mean(axis=0)
+    bg = np.asarray(background, dtype=np.float32)
+    c = out[..., :3].astype(np.float32)
+    fg = (c[edge] - (1 - a[edge])[:, None] * bg) / a[edge][:, None]
+    out[..., :3][edge] = np.clip(fg, 0, 255).astype(np.uint8)
+    return out

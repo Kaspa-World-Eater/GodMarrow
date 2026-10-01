@@ -158,6 +158,7 @@ def main() -> None:
     p.add_argument("--side", help="side view image, painted onto the sides (hull models)")
     p.add_argument("--quarter", help="three-quarter view image, painted onto the diagonals")
     p.add_argument("--shade", type=float, default=0.0, help="0..0.5 top-front darkening to help the volume read")
+    p.add_argument("--relief", type=float, default=0.35, help="0..1 relief from the painting's brightness (ropes, beads, folds catch the light)")
     p.add_argument("--height", type=float, default=1.8, help="character height in metres")
     p.add_argument("--name", default="Character")
     p.add_argument("--smooth", type=int, default=1, help="subdivision levels (0 = blocky)")
@@ -199,7 +200,7 @@ def main() -> None:
         cam_q = make_ortho_camera("pf_cam_quarter", (10 * qsign * c, -10 * c, a.height / 2), (deg(90), 0, deg(45) * qsign), ortho_scale_for_height(quarter, a.height))
         project_image_onto(obj, quarter, UV_QUARTER, cam_q)
 
-    mat = build_projection_material(f"{a.name}_paint", front, back, side, quarter, qsign, shade=a.shade)
+    mat = build_projection_material(f"{a.name}_paint", front, back, side, quarter, qsign, shade=a.shade, relief=a.relief)
     assign_material(obj, mat)
 
     if a.smooth > 0 and spec.get("mode") != "hull":  # the hull is smoothed already

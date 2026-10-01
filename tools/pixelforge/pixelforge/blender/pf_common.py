@@ -123,12 +123,14 @@ def _facing(nt, sep, direction, lo=0.45, hi=0.9):
     return ramp.outputs["Result"]
 
 
-def build_projection_material(name: str, front_img, back_img=None, side_img=None, quarter_img=None, quarter_sign: int = 1, blend: float = 0.15, shade: float = 0.0):
+def build_projection_material(name: str, front_img, back_img=None, side_img=None, quarter_img=None, quarter_sign: int = 1, blend: float = 0.15, shade: float = 0.0, relief: float = 0.35):
     """Unlit material: the front image where the surface faces the front, the
     back image behind, the side image on the flanks and the three-quarter image
     on the diagonals (both diagonals: the projection goes through the body).
     ``shade`` > 0 darkens surfaces that face away from a top-front light, a
-    little, to help the volume read (0 = the painting's own light only)."""
+    little, to help the volume read (0 = the painting's own light only).
+    ``relief`` > 0 reads the painting's own brightness as height and lights it from the top-front, so ropes,
+    beads, buckles and folds that the carve flattened still catch the key light and read as raised."""
     mat = bpy.data.materials.new(name)
     mat.use_nodes = True
     nt = mat.node_tree
@@ -170,6 +172,31 @@ def build_projection_material(name: str, front_img, back_img=None, side_img=None
         nt.links.new(w1, mx.inputs[0])
         nt.links.new(w2, mx.inputs[1])
         color = _mix_rgb(nt, mx.outputs["Value"], color, tex_q.outputs["Color"])
+    if relief > 0:
+        # height from the front painting's brightness -> bumped normal -> facing a top-front key light
+        bw = nt.nodes.new("ShaderNodeRGBToBW")
+        nt.links.new(tex_front.outputs["Color"], bw.inputs["Color"])
+        bump = nt.nodes.new("ShaderNodeBump")
+        bump.inputs["Strength"].default_value = min(1.0, relief)
+        bump.inputs["Distance"].default_value = 0.03
+        nt.links.new(bw.outputs["Val"], bump.inputs["Height"])
+        dot = nt.nodes.new("ShaderNodeVectorMath")
+        dot.operation = "DOT_PRODUCT"
+        nt.links.new(bump.outputs["Normal"], dot.inputs[0])
+        dot.inputs[1].default_value = (-0.35, -0.5, 0.79)
+        dot0 = nt.nodes.new("ShaderNodeVectorMath")   # the unbumped facing, so flat surfaces are unchanged
+        dot0.operation = "DOT_PRODUCT"
+        nt.links.new(geo.outputs["Normal"], dot0.inputs[0])
+        dot0.inputs[1].default_value = (-0.35, -0.5, 0.79)
+        diff = nt.nodes.new("ShaderNodeMath"); diff.operation = "SUBTRACT"
+        nt.links.new(dot.outputs["Value"], diff.inputs[0]); nt.links.new(dot0.outputs["Value"], diff.inputs[1])
+        fac = nt.nodes.new("ShaderNodeMath"); fac.operation = "MULTIPLY_ADD"
+        nt.links.new(diff.outputs["Value"], fac.inputs[0]); fac.inputs[1].default_value = 0.9 * relief; fac.inputs[2].default_value = 1.0
+        clamp = nt.nodes.new("ShaderNodeClamp"); clamp.inputs["Min"].default_value = 0.6; clamp.inputs["Max"].default_value = 1.35
+        nt.links.new(fac.outputs["Value"], clamp.inputs["Value"])
+        rl = nt.nodes.new("ShaderNodeVectorMath"); rl.operation = "SCALE"
+        nt.links.new(color, rl.inputs[0]); nt.links.new(clamp.outputs["Result"], rl.inputs["Scale"])
+        color = rl.outputs["Vector"]
     if shade > 0:
         # light from above and the front: factor = 1 - shade * (1 - facing(light)) / 2
         light = _facing(nt, sep, (0.0, -0.5, 0.866), -1.0, 1.0)

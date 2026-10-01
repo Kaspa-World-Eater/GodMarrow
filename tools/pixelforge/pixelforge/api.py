@@ -149,6 +149,7 @@ def split(project: Project, name: str, tolerance: float = 0.08, expected_views: 
             out = views_dir / f"{v.name}.png"
             rgba_v = cleanup.remove_background_pockets(cleanup.drop_floor_shadow(np.asarray(v.image.convert("RGBA"))))
             rgba_v[..., 3] = cleanup.remove_islands(rgba_v[..., 3], min_fraction=0.0015)   # fringe specks would float as voxels
+            rgba_v = cleanup.unmix_background(rgba_v, (255, 255, 255))   # no pale rim: the edge keeps the paint, not the white
             Image.fromarray(rgba_v, "RGBA").save(out)
             made[v.name] = str(out)
             # the raw crop, for the manual cutout editor's Restore brush
@@ -395,6 +396,7 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
     shade = c.settings.get("shade", 0.0)
     if shade:
         args += ["--shade", shade]
+    args += ["--relief", c.settings.get("relief", 0.35)]
     # humanoid first: fit the library mannequin to the painting (clean limbs, the clips play directly);
     # the carved hull is the fallback for robes/skirts (no legs in the silhouette) or model_mode = "hull"
     mode = c.settings.get("model_mode", "auto")   # auto | template | hull

@@ -229,6 +229,7 @@ def main() -> None:
     p.add_argument("--side")
     p.add_argument("--quarter")
     p.add_argument("--shade", type=float, default=0.0)
+    p.add_argument("--relief", type=float, default=0.35)
     p.add_argument("--arm-angle", type=float, default=0.0, help="A-pose arm swing from the T-pose, degrees (0 = pick the best of 35/50/65/80)")
     p.add_argument("--voxel", type=float, default=0.0, help="remesh voxel size in metres (0 = height/90)")
     p.add_argument("--force", action="store_true", help="fit even when the silhouette shows no legs (a robe): normally that falls back to the hull")
@@ -321,7 +322,7 @@ def main() -> None:
     clear_pose(arm)
     rename_bones(arm)
     mesh.data.materials.clear()
-    assign_material(mesh, build_projection_material(f"{a.name}_paint", front, back, side, quarter, qsign, shade=a.shade))
+    assign_material(mesh, build_projection_material(f"{a.name}_paint", front, back, side, quarter, qsign, shade=a.shade, relief=a.relief))
     for poly in mesh.data.polygons:
         poly.use_smooth = True
     for img in (front, back, side, quarter):

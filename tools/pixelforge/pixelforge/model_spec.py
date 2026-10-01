@@ -278,6 +278,22 @@ def build_hull_spec(
                 vox[z, ys[:, None], xs[None, :]] |= (xn**fit + yn**fit) <= 1.0
     if opening > 0:   # strip one-voxel protrusions (the "lines off the back"): erode then dilate
         vox = _open(vox, opening)
+    # cards: what the front view shows but the carve lost (ropes, chains, hanging charms, hem fringe) comes back as a
+    # two-voxel-thick card at the body's mid-depth, painted by the same projection (the Diablo II way)
+    front_proj = vox.any(axis=1)   # z, x
+    lost = F & ~front_proj
+    for z in range(rows):
+        if not lost[z].any():
+            continue
+        body = np.nonzero(vox[z].any(axis=1))[0]   # depths used by the body at this row
+        if len(body):
+            yc = int(round(body.mean()))
+        else:
+            near = [zz for zz in range(max(0, z - 6), min(rows, z + 7)) if vox[zz].any()]
+            yc = int(round(np.mean([np.nonzero(vox[zz].any(axis=1))[0].mean() for zz in near]))) if near else depth_cols // 2
+        for y in (yc - 1, yc):
+            if 0 <= y < depth_cols:
+                vox[z, y, lost[z]] = True
     if not vox.any():
         raise ValueError("hull is empty; check that the side view faces the right way")
     quarter_sign, quarter_iou = 0, 0.0

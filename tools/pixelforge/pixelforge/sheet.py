@@ -13,7 +13,7 @@ from dataclasses import dataclass
 import numpy as np
 from PIL import Image
 
-from .cleanup import soft_matte, background_mask, border_color, defringe, drop_floor_shadow
+from .cleanup import soft_matte, background_mask, border_color, defringe, drop_floor_shadow, unmix_background
 from .color import rgb_to_oklab
 
 DEFAULT_NAMES = {1: ["front"], 2: ["front", "back"], 3: ["front", "side", "back"], 4: ["front", "quarter", "side", "back"]}
@@ -40,7 +40,7 @@ def cutout(image: Image.Image, tolerance: float = 0.08, soft: bool = True) -> np
     alpha = defringe(np.where(bg, 0, 255).astype(np.uint8), lab, bg_color, tolerance)
     if soft:
         alpha = soft_matte(alpha, lab, bg_color, tolerance)
-    return drop_floor_shadow(np.dstack([rgb, alpha]))
+    return unmix_background(drop_floor_shadow(np.dstack([rgb, alpha])))
 
 
 def _column_runs(alpha: np.ndarray, min_gap: int, min_width: int) -> list[tuple[int, int]]:
