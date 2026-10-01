@@ -53,6 +53,10 @@ Diablo 3 look with glow on everything; attacks and plain melee stay unlit. Keep 
 
 **Decision 2026-10-01 (Derek): the hybrid.** Diablo II sprites (from the Forge) as upright cards in the real-3D lit scene of `tests/scene3d`; not full 3D models. The port rebuilds the look on that base, with the browser as the target.
 
+**Division of labour (2026-10-01, agreed with derek-33, the session on Derek's PC):** derek-33 owns the browser → Godot parity work (lantern, wisps, threads, menus, music, and the 3D scene lighting) — it has Godot, a headless browser and audio on Derek's PC, and its local branch `desktop-snapshot-2026-10-01` holds last night's lighting work (not pushed yet; nobody starts the lantern from scratch). The PixelForge session (cloud) owns the Forge and the Forge → game contract, and delivers the port AUDIT (below) as input for derek-33. Neither edits the other's area without a line here first.
+
+**Forge → game status (updated by the PixelForge session):** exporter to `art/sprites/<kind>.png|json` — in progress (today); 8 views — render side done, exporter in progress, `AnimSprite` 8-view read to follow; full-colour tier — done (`--style full` / `godmarrow`, 195 px); normal + depth maps — render passes done (`--passes color,normal,depth`), export to matching sheets in progress.
+
 **Port audit** started 2026-10-01: `docs/port_audit_part{1,2,3}.md` (every browser source file vs Godot: EXACT / DIFFERENT / MISSING / LATER / SUPERSEDED). Work the "Top gaps" lists first.
 
 **Next, in this order (this session, then whoever follows):**

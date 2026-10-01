@@ -65,6 +65,43 @@ def anchor_xy(arm, meshes) -> tuple[float, float]:
     return (lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2
 
 
+def pass_material(kind: str, ortho: float):
+    """Unlit material that paints camera-space normals or depth, for lighting
+    the sprite cards in the game. Normal: xyz -> rgb (0.5 = flat). Depth: 0 =
+    nearest to the camera, 1 = one ortho-frame deep (so the map is in sprite
+    pixels: depth * frame height)."""
+    mat = bpy.data.materials.new(f"pf_pass_{kind}")
+    mat.use_nodes = True
+    nt = mat.node_tree
+    nt.nodes.clear()
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    emit = nt.nodes.new("ShaderNodeEmission")
+    nt.links.new(emit.outputs["Emission"], out.inputs["Surface"])
+    geo = nt.nodes.new("ShaderNodeNewGeometry")
+    if kind == "normal":
+        # world normal -> camera space
+        tr = nt.nodes.new("ShaderNodeVectorTransform")
+        tr.vector_type = "NORMAL"
+        tr.convert_from = "WORLD"
+        tr.convert_to = "CAMERA"
+        nt.links.new(geo.outputs["Normal"], tr.inputs["Vector"])
+        scale = nt.nodes.new("ShaderNodeVectorMath")
+        scale.operation = "MULTIPLY_ADD"
+        scale.inputs[1].default_value = (0.5, 0.5, 0.5)
+        scale.inputs[2].default_value = (0.5, 0.5, 0.5)
+        nt.links.new(tr.outputs["Vector"], scale.inputs[0])
+        nt.links.new(scale.outputs["Vector"], emit.inputs["Color"])
+    else:
+        cam = nt.nodes.new("ShaderNodeCameraData")  # View Z Depth
+        rng = nt.nodes.new("ShaderNodeMapRange")
+        rng.inputs["From Min"].default_value = 50.0 - ortho  # camera sits 50 units out
+        rng.inputs["From Max"].default_value = 50.0 + ortho
+        rng.clamp = True
+        nt.links.new(cam.outputs["View Z Depth"], rng.inputs["Value"])
+        nt.links.new(rng.outputs["Result"], emit.inputs["Color"])
+    return mat
+
+
 def direction_names(n: int) -> list[str]:
     if n == 8:
         return DIRECTIONS
@@ -86,6 +123,7 @@ def main() -> None:
     p.add_argument("--ppu", type=float, help="pixels per unit; fixes the scale across characters")
     p.add_argument("--margin", type=float, default=1.08)
     p.add_argument("--samples", type=int, default=8)
+    p.add_argument("--passes", default="color", help="comma list of color,normal,depth (extra passes go to <out>_normal, <out>_depth)")
     a = script_args(p)
 
     scene = bpy.context.scene
@@ -171,9 +209,16 @@ def main() -> None:
         "elevation": a.elevation,
         "ortho_scale": ortho,
         "ppu": ppu,
+        "z_mid": z_mid,
+        "z_min": lo_all[2],
+        "z_max": hi_all[2],
+        "passes": [p.strip() for p in a.passes.split(",") if p.strip()],
         "fps": scene.render.fps / max(1, a.step),
         "actions": {},
     }
+    passes = [p.strip() for p in a.passes.split(",") if p.strip()]
+    pass_mats = {name: (None if name == "color" else pass_material(name, ortho)) for name in passes}
+    view_layer = bpy.context.view_layer
     total = 0
     for act, frames in frame_plan:
         if act is not None:
@@ -187,11 +232,15 @@ def main() -> None:
                 yaw = 2 * math.pi * di / a.directions
                 cam.location = (ax + dist * math.cos(elev) * math.sin(yaw), ay - dist * math.cos(elev) * math.cos(yaw), z_mid + dist * math.sin(elev))
                 cam.rotation_euler = (deg(90) - elev, 0, yaw)
-                path = os.path.join(out_root, act_name, dname, f"frame_{fi:03d}.png")
-                os.makedirs(os.path.dirname(path), exist_ok=True)
-                render_to(path, a.size)
-                total += 1
+                for pname in passes:
+                    view_layer.material_override = pass_mats[pname]
+                    root = out_root if pname == "color" else f"{out_root}_{pname}"
+                    path = os.path.join(root, act_name, dname, f"frame_{fi:03d}.png")
+                    os.makedirs(os.path.dirname(path), exist_ok=True)
+                    render_to(path, a.size)
+                    total += 1
         print(f"PF_PROGRESS action={act_name} frames={len(frames)}")
+    view_layer.material_override = None
     with open(os.path.join(out_root, "manifest.json"), "w") as fh:
         json.dump(manifest, fh, indent=2)
     print(f"PF_OK renders={total} ppu={ppu:.2f} out={out_root}")

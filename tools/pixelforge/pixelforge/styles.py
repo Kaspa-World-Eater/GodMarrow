@@ -23,6 +23,8 @@ STYLES: dict[str, Style] = {
     "16bit": Style("16bit", 128, 32, "none", "SNES/Genesis-era: medium sprites, 32 colors"),
     "snes": Style("snes", 160, 48, "none", "late-16-bit / early-32-bit: bigger, richer shading"),
     "hd": Style("hd", 224, 96, "none", "modern HD pixel (Blasphemous, Dead Cells): all detail kept"),
+    "full": Style("full", 224, 0, "none", "every colour of the painting kept (no palette), hard pixel edges"),
+    "godmarrow": Style("godmarrow", 195, 0, "none", "Godmarrow heroes: ~195 px tall, full colour, as the game draws them"),
 }
 
 DEFAULT_STYLE = "hd"

@@ -92,17 +92,23 @@ def pixelate(image: Image.Image | str, opts: PixelateOptions | None = None) -> P
             alpha = cleanup.remove_islands(alpha)
 
     palette = opts.palette
-    if palette is None:
-        opaque_rgb = oklab_to_rgb(lab)[alpha > 0]
-        palette = Palette.from_image(opaque_rgb[None], n_colors=opts.colors)
-
-    indices = quantize(lab, palette, dither=opts.dither, strength=opts.dither_strength, mask=alpha > 0)
-    if opts.despeckle and opts.dither == "none":
-        indices = cleanup.remove_orphans(indices, alpha)
-
     rgba = np.zeros((h, w, 4), dtype=np.uint8)
-    rgba[..., :3] = palette.colors[indices]
-    rgba[..., 3] = alpha
+    if palette is None and opts.colors <= 0:
+        # full colour: one true colour per cell, nothing merged
+        rgba[..., :3] = oklab_to_rgb(lab)
+        rgba[..., 3] = alpha
+        uniq = np.unique(rgba[alpha > 0][:, :3], axis=0)
+        palette = Palette(uniq[:4096]) if len(uniq) else Palette(np.zeros((1, 3), np.uint8))
+        notes.append(f"full colour: {len(uniq)} colours")
+    else:
+        if palette is None:
+            opaque_rgb = oklab_to_rgb(lab)[alpha > 0]
+            palette = Palette.from_image(opaque_rgb[None], n_colors=opts.colors)
+        indices = quantize(lab, palette, dither=opts.dither, strength=opts.dither_strength, mask=alpha > 0)
+        if opts.despeckle and opts.dither == "none":
+            indices = cleanup.remove_orphans(indices, alpha)
+        rgba[..., :3] = palette.colors[indices]
+        rgba[..., 3] = alpha
 
     if opts.outline:
         from .color import hex_to_rgb
@@ -114,7 +120,7 @@ def pixelate(image: Image.Image | str, opts: PixelateOptions | None = None) -> P
     if opts.crop:
         rgba = cleanup.crop_to_content(rgba)
 
-    final_idx = _indices_for(rgba, palette)
+    final_idx = _indices_for(rgba, palette) if len(palette) <= 4096 and opts.colors > 0 else np.where(rgba[..., 3] > 0, 0, -1)
     return PixelateResult(Image.fromarray(rgba, "RGBA"), final_idx, palette, grid, notes)
 
 
@@ -152,12 +158,12 @@ def pixelate_frames(
         **{**opts.__dict__, "scale": grid.scale_x, "width": None, "height": None, "crop": False}
     )
     labs = [downsample(np.asarray(f.convert("RGB")), grid) for f in frames]
-    if fixed.palette is None:
+    if fixed.palette is None and opts.colors > 0:
         stacked = np.concatenate([oklab_to_rgb(l).reshape(-1, 3) for l in labs])
         fixed.palette = Palette.from_image(stacked[None], n_colors=opts.colors)
 
     results = [pixelate(f, fixed) for f in frames]
-    if stabilize > 0 and len(results) > 1:
+    if stabilize > 0 and len(results) > 1 and fixed.palette is not None:
         pad = 1 if fixed.outline else 0
         colors = fixed.palette.colors
         prev_idx = results[0].indices
