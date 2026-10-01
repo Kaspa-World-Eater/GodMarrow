@@ -224,7 +224,8 @@ def make_palette(project: Project, name: str, colors: int | None = None) -> dict
     pal.save(out)
     pal.swatch(16).save(out.with_suffix(".png"))
     c.done["palette"] = True
-    c.notes["palette"] = f"{len(pal)} colors from {'style image + ' if style_img else ''}views"
+    c.notes["palette"] = (f"{len(pal)} colours locked from {'the style image + ' if style_img else ''}the views" if n
+                          else f"every colour kept (style '{st.name}'); reference built from {'the style image + ' if style_img else ''}the views")
     project.save()
     return {"ok": True, "character": c.name, "palette": str(out), "colors": len(pal), "next": "model"}
 
@@ -239,7 +240,7 @@ WINDOWS_BLENDER_GLOBS = [
 
 
 BLENDER_VERSION = "4.2.23"   # the LTS the Forge is tested with (4.2+ and 5.x both work)
-BLENDER_DIR = Path(__file__).resolve().parent.parent / "blender_portable"
+PORTABLE_BLENDER_DIR = Path(__file__).resolve().parent.parent / "blender_portable"
 
 
 def _blender_download_url() -> tuple[str, str]:
@@ -262,7 +263,7 @@ def download_blender(project: Project | None = None, log=None, dest: str | Path 
     import zipfile
 
     url, kind = _blender_download_url()
-    dest = Path(dest) if dest else BLENDER_DIR
+    dest = Path(dest) if dest else PORTABLE_BLENDER_DIR
     dest.mkdir(parents=True, exist_ok=True)
     archive = dest / url.rsplit("/", 1)[-1]
     say = log or (lambda m: None)
@@ -301,7 +302,7 @@ def download_blender(project: Project | None = None, log=None, dest: str | Path 
 def find_blender(project: Project | None = None) -> str | None:
     if project and project.blender and Path(project.blender).exists():
         return project.blender
-    portable = sorted(BLENDER_DIR.glob("blender-*/blender.exe")) + sorted(BLENDER_DIR.glob("blender-*/blender"))
+    portable = sorted(PORTABLE_BLENDER_DIR.glob("blender-*/blender.exe")) + sorted(PORTABLE_BLENDER_DIR.glob("blender-*/blender"))
     if portable:
         return str(portable[-1])
     for cand in ("blender", "blender.exe"):
