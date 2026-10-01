@@ -23,6 +23,14 @@ at an outside tool. Costs: everything here is free; nothing needs a GPU unless m
 | Still-image animation (sway, flicker, breathe) and RotSprite rotation | `pixelforge animate`, `pixelforge rotate` | |
 | AI operator interface | `pixelforge mcp` (MCP server) + `docs/GUIDE_AI.md` | Any Claude can drive it |
 
+## Added since (2026-10-01, all CPU, all offline)
+
+Done from the list below: item icons (`icons`), portraits (`portrait`), palette swapper (`recolor`), sound
+sheets (`sfx`, 18 presets), before/after (`compare`), batch mode (`project run-all --all`), a machine check
+(`doctor`), the Godot add-on (`godot-addon`: PFSpriteSet / PFFx / PFObjects), the Studio's Tools window, and
+`tools/make_world_art.py` in the game as the worked example. Still open: the shadow / rim-light baker, font to
+bitmap, the zone preview renderer.
+
 ## Cheap to add next (a day each, all CPU, all offline)
 
 1. **Item icon maker.** One Midjourney "flat lay" image of 9-16 items -> cut, square, outline, 32/48 px icons,

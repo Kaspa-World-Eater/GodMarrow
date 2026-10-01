@@ -117,7 +117,17 @@ pixelforge icons <flatlay.png> -o art/items --names "sword:1x3,ring,hood:2x2"   
 pixelforge recolor <atlas.png> -o out.png --hue 40 | --map "#1d4a4c=#7a3d10"       # recolour without re-rendering
 pixelforge recolor art/sprites --kind wraith --suffix @champion --hue 60            # a Godmarrow variant set from the base one
 pixelforge project blender-download                                                # fetch the portable Blender (380 MB) if none is installed
+pixelforge project run-all --all                                                   # every character in the project, in turn
+pixelforge sfx all -o art/sfx [--variations 3]                                     # 18 synthesised sound presets -> WAV
+pixelforge portrait views/front.png mystic -o art/portraits [--sizes 48 96]        # head-and-shoulders portraits
+pixelforge compare before.png after.png -o cmp.png                                 # strip (+GIF for frame folders) + mean difference
+pixelforge doctor [--project <folder>]                                             # what works on this machine, with fixes
+pixelforge godot-addon <godot project>                                             # PFSpriteSet / PFFx / PFObjects loaders into addons/pixelforge
 ```
+
+Worked example of using all of it at once: `tools/make_world_art.py` in the game (tiles, UI frames, props into
+objects.json, sounds, portraits, variant skins) and `tools/make_fx.py` (the 52 effect sheets). The Studio's **Tools**
+button offers every one of these as a form.
 
 Studio-only helpers an AI should know exist: the manual cutout editor (step 3, Edit <view>: erase / restore / magic
 erase, saves over `views/<view>.png`; `views/<view>_raw.png` is the untouched crop), the animation preview and

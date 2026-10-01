@@ -77,8 +77,9 @@ server. Full operating manual for an AI: `docs/GUIDE_AI.md`. Human guide:
 | Mixamo path (import FBX, smooth weights) | works (tested with Derek's Walking.fbx); optional upgrade only | — |
 | render (Eevee, Xvfb in cloud) | works; ~1 s/frame CPU | — |
 | pixelate renders + export Godot | works | tests/test_project.py |
-| desktop app (Tkinter) | written, **never launched** (no display in cloud) | needs a Windows smoke test |
-| Godot demo project | **not built yet** | — |
+| desktop app (Tkinter) | launched and walked under Xvfb: every panel, a full new-project run, the cutout editor, the Tools window | `scratchpad` screenshots in the session; Windows double-click still Derek's |
+| Godot side | add-on `godot_addon/pixelforge` (PFSpriteSet, PFFx, PFObjects) load-tested in the game (`tests/addon_check.gd`) | — |
+| tools: props, vfx (17 kinds), icons, portraits, tiles, ui9, sfx, recolor, compare, skilltree, doctor | all tested (52 pytest) and used for real: `art/fx` (52 sheets), `art/tiles`, `art/ui`, `art/objects/pf_*`, `art/sfx/pf`, portraits, @champion/@unique | `tools/make_fx.py`, `tools/make_world_art.py` |
 
 Known rough edges / next work, in priority order:
 1. Carving v3: four-view sheet (prompt A2 adds a three-quarter view) ->

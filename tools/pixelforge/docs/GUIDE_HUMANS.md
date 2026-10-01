@@ -44,11 +44,12 @@ The automatic cutout is usually right. When it is not (background stuck to the f
 For a first look, bosses, portraits, items. No Blender. Click **★ Quick path** in the step list, pick the picture
 and an animation (sway, hover, flame...), click **Make sprite + animate + export**.
 
-## Other things the Forge makes (command line, see GUIDE_AI.md)
+## Other things the Forge makes (the **Tools** button)
 
-Props and trees with sway, 52 kinds of spell / aura / weather effects, inventory icons from one flat-lay picture,
-iso ground tiles, UI frames, recolours (champion / unique tints from one render), and a skill-tree editor.
-An AI assistant can run every step for you from the command line.
+Props and trees with sway, spell / aura / weather effects, inventory icons from one flat-lay picture, portraits,
+iso ground tiles, UI frames, sound effects, recolours (champion / unique tints from one render), before/after
+compares, a skill-tree editor, and a one-click install of the loaders into any Godot project. Each is a small form:
+pick the picture, name it, press Run. An AI assistant can run every one from the command line too.
 
 ## Knobs you might touch
 

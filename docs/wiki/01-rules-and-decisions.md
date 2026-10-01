@@ -93,6 +93,7 @@
 
 - **Never used in the game:** cooldown, dps, proc, aggro, loot, buff, nerf, stun, lightning (as a word), mana (except as code), chain lightning.
 
+- **2026-10-01 (Derek): PixelForge is the game's forge, for this game and the next.** All art tooling goes through it (`tools/pixelforge`), stays in theme (near-black, bone, iron, dull teal; amber only for lanterns and the Empty Hand's sand; blood dark; glow only on magic, lanterns, wisps), and ships with its Godot add-on so another project can use it unchanged.
 - **2026-10-01 (Derek): the Shrine Keeper's stacks are Omens**, not Sigils ("let's use omens over sigils"). The Word skill's drawn *sigil* stays a sigil; the Ossuarch's *count sigils* stay.
 - **2026-10-01 (Derek): crows are allowed.** The "no animals" rule does not cover the crows in the moor (and the audit's "crows" rows are closed).
 - **2026-10-01 (Derek): the wraith test skin is the Hollow Mystic.** `art/sprites/wraith.*` (made by the Forge) is his look; `--skin=wraith` on the Hollow Mystic is the look test.
