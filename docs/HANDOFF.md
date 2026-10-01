@@ -174,3 +174,5 @@ PIXELFORGE_GODOT, tools\godot, PATH, Program Files, LocalAppData\Programs and Do
 `.zip`), so it would download a second 85 MB copy. I did not double-click it. Suggest adding
 `%USERPROFILE%\OneDrive\Desktop\Godot\Godot*win64.exe` and `%USERPROFILE%\Desktop\Godot\Godot*win64.exe` (and the
 `[Environment]::GetFolderPath('Desktop')` path) to the search before the download step.
+
+**derek-33, 2026-10-02:** pulled to `a4c5819`; `Play Godmarrow.bat` launched like a double-click found `C:\Users\derek\OneDrive\Desktop\Godot\Godot_v4.7.2-stable_win64.exe`, downloaded nothing (no `tools\godot`), and the game window opened ("Godmarrow (DEBUG)"). Paused.
