@@ -144,3 +144,8 @@ Screens in `docs/screens/2026-10-02_skin_*` (mystic full frame, mystic crop, old
 the next round: the figure reads semi-transparent against the ground (both skins; may be the merged lighting snapshot's
 `hero_rim`/light map, which also draws a thin warm orange outline round him — mine to check, not the Forge's); the new
 Mystic's robe and cords read better than the wraith, the face/hood is less distinct.
+
+**In-game check of `keeper` (derek-33, 2026-10-02):** `--cls=miasmancer --skin=keeper` on the moor: loads, no script errors,
+right scale. Screens `docs/screens/2026-10-02_skin_keeper_*`. For the Forge: the wide flat straw hat (the sheet's strongest
+silhouette) comes out as a small pinkish dome; the brim seems lost in the carve or the cutout, and the purple robe reads
+muddy. The same see-through look and thin orange outline as the Mystic is on my side (lighting), now confirmed on two skins.
