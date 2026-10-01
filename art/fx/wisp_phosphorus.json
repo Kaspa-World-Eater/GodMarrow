@@ -1,0 +1,45 @@
+{
+  "name": "wisp_phosphorus",
+  "kind": "wisp",
+  "size": [
+    24,
+    36
+  ],
+  "frames": 12,
+  "frame_width": 24,
+  "frame_height": 36,
+  "fps": 10.0,
+  "loop": true,
+  "anchor": [
+    12,
+    18
+  ],
+  "glow": true,
+  "palette": [
+    "#0b1c20",
+    "#0b2318",
+    "#1d4a4c",
+    "#17553a",
+    "#3f9c92",
+    "#3ccf86",
+    "#8fe3d2",
+    "#a8ffd0",
+    "#eafff6",
+    "#eafff8"
+  ],
+  "bands": 6,
+  "seed": 3,
+  "rotations": 1,
+  "heading": "flying right",
+  "source": "pixelforge",
+  "look": "phosphorus:strength=1,decay=0.78,core=0.8",
+  "looks": [
+    {
+      "name": "phosphorus",
+      "strength": 1.0,
+      "decay": 0.78,
+      "flicker": 0.15,
+      "core": 0.8
+    }
+  ]
+}

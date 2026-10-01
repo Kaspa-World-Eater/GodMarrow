@@ -1,0 +1,43 @@
+{
+  "name": "bone_spear_echo",
+  "kind": "bone_spear",
+  "size": [
+    97,
+    97
+  ],
+  "frames": 10,
+  "frame_width": 97,
+  "frame_height": 97,
+  "fps": 10.0,
+  "loop": true,
+  "anchor": [
+    48,
+    48
+  ],
+  "glow": true,
+  "palette": [
+    "#1a1712",
+    "#4a4336",
+    "#8f8470",
+    "#c9bfa6",
+    "#f0ead8"
+  ],
+  "bands": 6,
+  "seed": 1,
+  "rotations": 8,
+  "heading": "row k faces k * 360 / rotations degrees anticlockwise from flying right",
+  "source": "pixelforge",
+  "look": "echo:dx=-7",
+  "looks": [
+    {
+      "name": "echo",
+      "count": 3,
+      "decay": 0.6,
+      "spacing": 1,
+      "dx": -7,
+      "dy": 0,
+      "scale": 1.0,
+      "dim": 1
+    }
+  ]
+}

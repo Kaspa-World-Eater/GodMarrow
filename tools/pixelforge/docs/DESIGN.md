@@ -47,6 +47,12 @@ server (`mcp_server.py`) are thin layers over it.
 - **Mixamo is optional.** The pipeline must run unattended; the built-in rig and motion library are the default.
 - **Rendered props, painted objects.** Props and buildings are real geometry (painted sheets carved like heroes, or
   CC0 kits) filmed with the same camera and lantern rig as the heroes; flat clip art is not used.
+- **Looks are a layer, not new generators.** A finishing look (phosphorus, haze, ethereal, glow, cyberpunk, psychedelic,
+  echo, smooth, embers, smoke, shimmer, outline, pulse, grain, flicker, dissolve, ice, rot; `fxlook.py`) takes frames
+  and gives frames, so one implementation serves procedural effects, missiles and orbits, spell layers and spells,
+  painted effects and sprite clips. Looks stack in order; everything time-based is periodic over the frame count so
+  loops close; the output is locked in OKLab to the effect's palette plus the look's own colours, and the json lists
+  the palette actually used. The game's theme keeps the neon and hue-cycling looks for magic.
 - **Music is generated, not sampled.** Twenty-one seeded cues from synthesised instruments, an editable knob sheet,
   seamless loops at one loudness.
 

@@ -126,9 +126,22 @@ selected layer and Save flattens the visible ones into the file. The ops list re
 
 **Missiles.** The Effects tool has structured projectiles: bone spear, teeth, ice bolt, fire bolt. They are built like the classic action-RPG missiles (a spinning spear body, chips of bone flying round it, a trail, a glow) and every pixel is generated. Set "rotations" to 16 or 32 to get a sheet with the spear facing every direction, which the game picks from by heading; new missiles are a few numbers in a table.
 
+**Looks.** Any effect can be finished with a look, and looks stack: phosphorus (a green-white afterglow that
+lingers), haze, ethereal (pale, see-through, drifting), glow (a proper bloom), cyberpunk (neon rims and scanlines),
+psychedelic (colours cycling round the loop, with a kaleidoscope option), echo (afterimages trailing the motion),
+smooth (a seamless loop, twice the frames, ping-pong), embers, smoke, shimmer (heat haze), outline (rim light in a
+colour you choose), pulse, grain, flicker, dissolve (it eats away), ice (frost and crystals) and rot (the game's
+teal-green miasma, dripping). Each has two to four knobs with sensible defaults. The Effects and Spell tools take a
+look (type it, e.g. `phosphorus` or `echo:count=3`; the Looks list shows every knob), spell layers each take their own,
+and "Describe it" understands the words (phosphorus, hazy, ghostly, neon, trippy, afterimages, smooth loop, icy,
+rotting...). Every frame stays in the effect's own colours plus the few the look adds, so it still reads as pixel
+art. The game's own theme keeps the neon and psychedelic looks for magic. To see them side by side, run
+`pixelforge looks --demo <folder>`: one GIF per look and a contact sheet; the game repo has them in
+`docs/screens/fxlook/`.
+
 **Spell designer** (Tools > Spell designer): a spell is layers of effects. Start from a preset (fireball, ward, soul drain, bone shatter, lightning strike, bone spear hit, frost nova, fire wall,
 corpse burst), add or remove layers, and set each layer's kind, colours, size, position,
-rotation, start frame, speed, opacity and blend (normal or add) while the preview loops. Export writes the strip and
+rotation, start frame, speed, opacity, blend (normal or add) and look while the preview loops; the spell takes a look of its own on top. Export writes the strip and
 the JSON the game plays, plus a GIF and the editable spell file, so a spell is placed in the game exactly like any
 effect and attached to a character with the effects editor.
 

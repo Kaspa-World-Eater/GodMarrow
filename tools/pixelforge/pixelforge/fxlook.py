@@ -303,8 +303,8 @@ def look_haze(frames, p, ctx):
         ang = 2 * math.pi * t
         soft = _roll(soft, math.sin(ang) * p["drift"], math.cos(ang) * p["drift"] * 0.6)
         soft2 = _roll(soft2, -math.cos(ang) * p["drift"] * 0.5, math.sin(ang) * p["drift"] * 0.4)
-        field = np.clip(0.75 * soft + 0.55 * soft2, 0, 1) * p["strength"]
-        level = np.floor(field * 3 + th).astype(int)
+        field = np.clip(0.75 * soft + 0.55 * soft2, 0, 1) ** 1.6 * p["strength"]   # a steep tail: the haze ends before the frame does
+        level = np.floor(field * 3 + th * 0.85).astype(int)
         a = np.array([0.0, 0.4, 0.6, 0.8])[np.clip(level, 0, 3)]
         a[cov > 0.5] = 0
         lo = 1 if len(pal) > bands else 0   # skip the near-black step: haze must show on the game's dark ground

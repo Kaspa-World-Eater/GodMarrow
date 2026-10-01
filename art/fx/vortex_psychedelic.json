@@ -1,0 +1,64 @@
+{
+  "name": "vortex_psychedelic",
+  "kind": "vortex",
+  "size": [
+    80,
+    40
+  ],
+  "frames": 12,
+  "frame_width": 80,
+  "frame_height": 40,
+  "fps": 10.0,
+  "loop": true,
+  "anchor": [
+    40,
+    20
+  ],
+  "glow": true,
+  "palette": [
+    "#140b1e",
+    "#410766",
+    "#3a1f52",
+    "#1c3800",
+    "#5b0f00",
+    "#620023",
+    "#002c72",
+    "#00423a",
+    "#7912bf",
+    "#6d3f9a",
+    "#a91c00",
+    "#3e6a00",
+    "#0057d0",
+    "#b50049",
+    "#007c6a",
+    "#b56bf3",
+    "#f45080",
+    "#a97fd1",
+    "#009aff",
+    "#74a900",
+    "#e37300",
+    "#00b9a9",
+    "#ffc4d1",
+    "#afe0ff",
+    "#e8cdff",
+    "#9aece3",
+    "#cbe5ab",
+    "#e3d2f5",
+    "#ffd1a1"
+  ],
+  "bands": 6,
+  "seed": 2,
+  "rotations": 1,
+  "heading": "flying right",
+  "source": "pixelforge",
+  "look": "psychedelic:saturation=1.6,trail=0.6",
+  "looks": [
+    {
+      "name": "psychedelic",
+      "cycles": 1,
+      "saturation": 1.6,
+      "kaleidoscope": 0,
+      "trail": 0.6
+    }
+  ]
+}

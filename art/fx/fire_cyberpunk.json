@@ -1,0 +1,46 @@
+{
+  "name": "fire_cyberpunk",
+  "kind": "fire",
+  "size": [
+    32,
+    48
+  ],
+  "frames": 12,
+  "frame_width": 32,
+  "frame_height": 48,
+  "fps": 12.0,
+  "loop": true,
+  "anchor": [
+    16,
+    47
+  ],
+  "glow": true,
+  "palette": [
+    "#07060c",
+    "#1c0a2c",
+    "#2a1206",
+    "#7a3d10",
+    "#d08a2a",
+    "#ff2bd6",
+    "#ff8ae9",
+    "#15e2ff",
+    "#f3c75c",
+    "#8df6ff",
+    "#fff1b0"
+  ],
+  "bands": 6,
+  "seed": 5,
+  "rotations": 1,
+  "heading": "flying right",
+  "source": "pixelforge",
+  "look": "cyberpunk:scanline=0.25",
+  "looks": [
+    {
+      "name": "cyberpunk",
+      "edge": 1.0,
+      "scanline": 0.25,
+      "offset": 1,
+      "core": 0.6
+    }
+  ]
+}
