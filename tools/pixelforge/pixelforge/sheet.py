@@ -13,7 +13,7 @@ from dataclasses import dataclass
 import numpy as np
 from PIL import Image
 
-from .cleanup import background_mask, border_color, defringe
+from .cleanup import soft_matte, background_mask, border_color, defringe
 from .color import rgb_to_oklab
 
 DEFAULT_NAMES = {1: ["front"], 2: ["front", "back"], 3: ["front", "side", "back"], 4: ["front", "quarter", "side", "back"]}
@@ -26,13 +26,20 @@ class View:
     box: tuple[int, int, int, int]  # x0, y0, x1, y1 in the sheet
 
 
-def cutout(image: Image.Image, tolerance: float = 0.08) -> np.ndarray:
-    """RGBA array with the flood-filled background made transparent."""
+def cutout(image: Image.Image, tolerance: float = 0.08, soft: bool = True) -> np.ndarray:
+    """RGBA array with the flood-filled background made transparent.
+
+    ``soft`` recovers the painting's own anti-aliased edge (``cleanup.soft_matte``)
+    so the carve and the pixelate step see a true silhouette instead of a
+    one-pixel stair; the hull carve thresholds alpha at 50%, the pixelate step
+    resamples it, so neither is hurt by the partial values."""
     rgb = np.asarray(image.convert("RGB"))
     lab = rgb_to_oklab(rgb)
     bg_color = border_color(lab)
     bg = background_mask(lab, tolerance, bg_color)
     alpha = defringe(np.where(bg, 0, 255).astype(np.uint8), lab, bg_color, tolerance)
+    if soft:
+        alpha = soft_matte(alpha, lab, bg_color, tolerance)
     return np.dstack([rgb, alpha])
 
 
