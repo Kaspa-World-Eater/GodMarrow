@@ -296,6 +296,14 @@ def cmd_project(a) -> None:
         raise SystemExit(2)
 
 
+def cmd_prop(a) -> None:
+    from .props import make_prop
+
+    r = make_prop(a.image, a.name, a.out, height=a.height, scale=a.scale, colors=a.colors, outline=not a.no_outline,
+                  sway=a.sway, frames=a.frames, fps=a.fps, variations=a.variations)
+    _emit(a, r)
+
+
 def cmd_studio(a) -> None:
     from .gui import main as gui_main
 
@@ -408,6 +416,15 @@ def build_parser() -> argparse.ArgumentParser:
     x = ps.add_parser("still", help="quick path: one image -> sprite (-> animation -> export)"); x.add_argument("character")
     x.add_argument("--view", default="style", choices=["style", "front", "side", "back"]); x.add_argument("--animate", nargs="*", metavar="PRESET"); x.add_argument("--export", action="store_true")
     s.set_defaults(func=cmd_project)
+
+    s = sub.add_parser("prop", help="a painted object/tree/banner -> game sprite with footprint (+ sway animation)")
+    s.add_argument("image"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/objects")
+    s.add_argument("--height", type=int, help="sprite height in px (default 96)"); s.add_argument("--scale", type=float, help="source px per sprite px (use the character scale)")
+    s.add_argument("--colors", type=int, default=0, help="0 = keep every colour"); s.add_argument("--no-outline", action="store_true")
+    s.add_argument("--sway", choices=["canopy", "banner", "flame"]); s.add_argument("--frames", type=int, default=8); s.add_argument("--fps", type=float, default=6)
+    s.add_argument("--variations", type=int, default=1, help="figures on the sheet (e.g. 4 for a 2x2 'four variations' prompt)")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_prop)
 
     s = sub.add_parser("studio", help="open the desktop app")
     s.add_argument("project", nargs="?")
