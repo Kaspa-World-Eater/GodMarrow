@@ -9,7 +9,7 @@ applies as its last step, so the edits survive a re-export.
 
 Headless use::
 
-    pixelforge skilltree data/skills.json --list ossumancer
+    pixelforge skilltree data/skills.json --list ossumancer      # the Ossuarch (ids are the data's; names are the lore's)
     pixelforge skilltree data/skills.json --move raise=1,3,0 --rename raise="Raise the Fallen" --apply
 
 GUI (Tkinter): ``pixelforge skilltree data/skills.json`` with no flags.  Left: class
@@ -24,6 +24,13 @@ import json
 from pathlib import Path
 
 ROW_LVL = {1: 1, 2: 6, 3: 12, 4: 18, 5: 24, 6: 30}
+# the orders as the lore names them (ui/title.gd is the game's own list); the data keeps the old ids
+ORDER_NAMES = {"animancer": "The Hollow Mystic", "ossumancer": "The Ossuarch", "miasmancer": "The Shrine Keeper",
+               "monk": "The Empty Hand", "hemomancer": "The Red Penitent"}
+
+
+def order_name(cls: str) -> str:
+    return ORDER_NAMES.get(cls, cls)
 EDIT_FIELDS = ("row", "col", "tab", "name", "description", "lore")
 
 
@@ -79,7 +86,7 @@ def classes(data: dict) -> list[str]:
 def list_tree(data: dict, cls: str) -> str:
     lines = []
     for tab in sorted({s["tab"] for s in data["skills"] if s["class"] == cls}):
-        lines.append(f"== {cls} tab {tab}")
+        lines.append(f"== {order_name(cls)} ({cls}) tab {tab}")
         g = grid(data, cls, tab)
         for row in range(1, 7):
             cells = [g[(row, c)] for c in sorted(c for r, c in g if r == row)]
@@ -119,6 +126,8 @@ def gui(skills_path: str | Path) -> None:
     top.pack(fill="x")
     ttk.Label(top, text="Order").pack(side="left")
     cb = ttk.Combobox(top, values=classes(data), textvariable=cls_var, state="readonly", width=14)
+    order_lbl = ttk.Label(top, text=order_name(cls_var.get()))
+    order_lbl.pack(side="left", padx=4)
     cb.pack(side="left", padx=6)
     ttk.Label(top, text="Tree").pack(side="left")
     tb = ttk.Combobox(top, values=[0, 1, 2], textvariable=tab_var, state="readonly", width=4)
@@ -226,7 +235,7 @@ def gui(skills_path: str | Path) -> None:
     canvas.bind("<Button-1>", on_click)
     canvas.bind("<ButtonRelease-1>", on_release)
     root.bind("<Key>", on_key)
-    cb.bind("<<ComboboxSelected>>", lambda e: select(None))
+    cb.bind("<<ComboboxSelected>>", lambda e: (order_lbl.configure(text=order_name(cls_var.get())), select(None)))
     tb.bind("<<ComboboxSelected>>", lambda e: select(None))
     draw()
     root.mainloop()

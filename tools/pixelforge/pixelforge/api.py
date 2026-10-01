@@ -241,7 +241,7 @@ def run_blender(project: Project, script: str, args: list[str], blend: str | Non
         if log and (line.startswith("PF_") or "Error" in line or "Traceback" in line):
             log(line)
     proc.wait()
-    ok = [l for l in lines if l.startswith("PF_OK")]
+    ok = [l for l in lines if l.startswith("PF_OK") or l.startswith("PF_FALLBACK")]
     if proc.returncode != 0 or not ok:
         tail = "\n".join(lines[-25:])
         raise StepError(f"Blender failed (exit {proc.returncode}):\n{tail}")
@@ -292,7 +292,20 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
     shade = c.settings.get("shade", 0.0)
     if shade:
         args += ["--shade", shade]
-    result = run_blender(project, "build_mesh.py", args, log=log)
+    # humanoid first: fit the library mannequin to the painting (clean limbs, the clips play directly);
+    # the carved hull is the fallback for robes/skirts (no legs in the silhouette) or model_mode = "hull"
+    mode = c.settings.get("model_mode", "auto")   # auto | template | hull
+    result = ""
+    if spec.get("mode") == "hull" and mode != "hull" and ANIMATION_LIBRARY.exists():
+        t_args = ["--library", ANIMATION_LIBRARY, *args] + (["--force"] if mode == "template" else [])
+        result = run_blender(project, "fit_template.py", t_args, log=log)
+    if result.startswith("PF_OK"):
+        c.notes["model_mode"] = "template"
+    else:
+        if result:
+            (log or (lambda m: None))(result)
+        result = run_blender(project, "build_mesh.py", args, log=log)
+        c.notes["model_mode"] = "hull"
     c.done["model"] = True
     c.notes["model"] = result
     project.save()
@@ -332,14 +345,16 @@ def rig(project: Project, name: str, clips: str = DEFAULT_CLIPS, library: str | 
     out = model / f"{c.name}_rigged.blend"
     lib = Path(library) if library else (ANIMATION_LIBRARY if ANIMATION_LIBRARY.exists() else None)
     args = ["--skeleton", skel, "--out", out, "--clips", clips]
-    if lib is not None:
+    if c.notes.get("model_mode") == "template":
+        args += ["--template"]   # the fitted mannequin keeps its own rig and takes the clips directly
+    elif lib is not None:
         args += ["--library", lib]
     for spec in c.settings.get("clip_overrides", []):  # e.g. "walk=Walk_Formal_Loop:loop"
         args += ["--clip", spec]
     result = run_blender(project, "rig_character.py", args, blend=blend, log=log)
     actions = result.split("actions=")[-1].split(" ")[0].split(",") if "actions=" in result else []
     actions = [a for a in actions if a]
-    source = "motion library" if lib is not None else "procedural"
+    source = "fitted mannequin, library clips direct" if c.notes.get("model_mode") == "template" else ("motion library" if lib is not None else "procedural")
     c.done["rig"] = True
     c.notes["rig"] = f"built-in rig ({source}), {len(actions)} animations: {', '.join(actions)}"
     project.save()

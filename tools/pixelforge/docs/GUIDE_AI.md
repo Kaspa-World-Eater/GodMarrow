@@ -180,6 +180,17 @@ behind `tools/skill_trees.py` — it keeps `tools/skill_tree_edits.json`, which 
 
 ## What the 3D step actually does (so you can explain it)
 
+**Humanoid first (default since 2026-10-01).** When the sheet has a side view and the silhouette shows legs, the
+model step starts from the bundled CC0 mannequin (`assets/animations/quaternius_ual_standard.glb`: a human mesh
+already skinned to the armature that drives its 46 clips), fuses its jointed pieces into one skin, poses its arms down
+to the sheet's A-pose (the angle that best matches the painting), shrink-wraps it onto the hull carved from the
+painting, carries the fit back to the rest pose through the skin weights, and paints the art onto it in that pose.
+The rig step then keeps that armature and takes the clips directly (no retargeting). Clean knees, elbows and hands,
+and the body still matches the painting's silhouette. `fit_template.py` prints `PF_FALLBACK` for a robe or a skirt
+(no legs in the silhouette) and the carved hull is used instead, as before. Settings: `model_mode` on the character =
+`auto` (default) | `template` (force the fit, e.g. a short robe) | `hull`. The old description follows.
+
+
 `model` builds an "inflated cutout": the front-view silhouette is put on a
 grid, each cell's distance from the edge decides how much it bulges forward and
 backward, and the front/back images are camera-projected onto the surface as

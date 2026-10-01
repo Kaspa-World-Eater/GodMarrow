@@ -415,6 +415,41 @@ def retarget_clip(src, dst, src_action, name: str, loop: bool, fps: int, src_fps
     return action, n_out
 
 
+def template_clips(a) -> None:
+    """The fitted mannequin already carries the library armature (Mixamo-named) and all its actions:
+    keep the requested clips under our names, drop the rest."""
+    arms = [o for o in bpy.context.scene.objects if o.type == "ARMATURE"]
+    if not arms:
+        raise SystemExit("no armature in the template model")
+    arm = arms[0]
+    bpy.context.scene.render.fps = a.fps
+    mapping = dict(LIBRARY_CLIPS)
+    for spec in a.clip:
+        ours, _, rest_ = spec.partition("=")
+        lib, _, loop = rest_.partition(":")
+        mapping[ours] = (lib, loop.lower() in ("", "loop", "true", "1"))
+    names = [c.strip() for c in a.clips.split(",") if c.strip()]
+    made = []
+    for name in names:
+        if name in mapping and mapping[name][0] in bpy.data.actions:
+            act = bpy.data.actions[mapping[name][0]].copy()
+            act.name = name
+            act.use_fake_user = True
+            act["pf_loop"] = mapping[name][1]
+            made.append(name)
+            print(f"PF_INFO {name} <- {mapping[name][0]} (template, direct)")
+        else:
+            print(f"PF_WARN unknown clip {name}; choose from {sorted(mapping)}")
+    for act in list(bpy.data.actions):
+        if act.name not in made:
+            bpy.data.actions.remove(act)
+    arm.animation_data_create()
+    out = os.path.abspath(a.out)
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    bpy.ops.wm.save_as_mainfile(filepath=out)
+    print(f"PF_OK blend={out} actions={','.join(made)} bones={len(arm.data.bones)}")
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--skeleton", required=True)
@@ -424,11 +459,14 @@ def main() -> None:
     p.add_argument("--clip", action="append", default=[], help="override mapping: ours=LibraryAction[:loop]")
     p.add_argument("--fps", type=int, default=30)
     p.add_argument("--smooth-weights", type=int, default=3)
+    p.add_argument("--template", action="store_true", help="the model is the fitted library mannequin: keep its rig and weights, take the clips directly")
     a = script_args(p)
 
     meshes = mesh_objects()
     if not meshes:
         raise SystemExit("no mesh in the .blend; run the model step first")
+    if a.template:
+        return template_clips(a)
     spec = json.load(open(a.skeleton))
     lo = [min(min((m.matrix_world @ v.co)[i] for v in m.data.vertices) for m in meshes) for i in range(3)]
     hi = [max(max((m.matrix_world @ v.co)[i] for v in m.data.vertices) for m in meshes) for i in range(3)]

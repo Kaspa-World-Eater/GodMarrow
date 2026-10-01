@@ -33,7 +33,20 @@ server. Full operating manual for an AI: `docs/GUIDE_AI.md`. Human guide:
 - **HD tier is the default** (`--style hd`: ~224 px tall, 96 colors). Derek
   explicitly wants the modern HD-pixel look (Blasphemous / Dead Cells), *not*
   16-bit. Other tiers exist for props/UI.
-- **Carved visual hull beats free AI image-to-3D.** Tested TripoSR (open
+- **Humanoid first, then fit to the art (2026-10-01, Derek's suggestion).** The
+  library mannequin (already skinned to the 46-clip armature) is fused, posed to
+  the sheet's A-pose, shrink-wrapped onto the carved hull and painted in that
+  pose; the clips play directly. Clean limbs where the hull gave lumps. Robes
+  (no legs in the silhouette) fall back to the hull. `fit_template.py`.
+- **Front, side AND back views are all used** (plus the three-quarter view when
+  the A2 sheet has one): the hull is carved from front+side, trimmed by the back,
+  and painted from all of them with a 5-way blend by normal.
+- **Free GPU image-to-3D (Hunyuan3D, TRELLIS, Pixal3D via image-to-3dlab) needs
+  a 16-24 GB GPU or an Apple M-series with 32 GB.** Derek's laptop has neither
+  and the cloud session has no GPU, so it stays out; its "Pixel Match" idea
+  (keep the painting's pixels on the surface) is what our camera projection
+  already does.
+- **Carved visual hull beats free AI image-to-3D on CPU.** Tested TripoSR (open
   source, CPU) on 2026-10-01: washed-out blob, far worse than our carve +
   painted art. Paid services (Meshy/Tripo) would be better but are off the
   table. Keep carving as the default; a user-supplied GLB/FBX model is a
