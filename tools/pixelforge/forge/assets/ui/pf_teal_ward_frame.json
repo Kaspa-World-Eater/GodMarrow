@@ -1,0 +1,14 @@
+{
+  "name": "pf_teal_ward_frame",
+  "size": [
+    26,
+    26
+  ],
+  "margins": {
+    "left": 8,
+    "top": 8,
+    "right": 8,
+    "bottom": 8
+  },
+  "source": "pixelforge"
+}

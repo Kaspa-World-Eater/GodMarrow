@@ -384,9 +384,16 @@ def model_textures(project: Project, c: Character, orient: dict | None = None) -
     return out
 
 
-def build_model(project: Project, name: str, height: float = 1.8, columns: int = 64, thickness: float | None = None, log=None) -> dict:
-    """Front (+side) cutout -> inflated-cutout mesh painted with the art -> .blend + .fbx."""
+def build_model(project: Project, name: str, height: float = 1.8, columns: int = 64, thickness: float | None = None, mode: str | None = None, log=None) -> dict:
+    """Front (+side) cutout -> inflated-cutout mesh painted with the art -> .blend + .fbx.
+    ``mode`` (auto | template | hull) sets the character's ``model_mode`` first. A picture of the carve
+    (``model/<name>_hull.png``) is written before Blender runs, so the shape can be judged even without it."""
     c = project.character(name)
+    if mode:
+        if mode not in ("auto", "template", "hull"):
+            raise StepError("mode must be auto, template or hull")
+        c.settings["model_mode"] = mode
+        project.save()
     views = project.sub(c.name, "views")
     front = views / "front.png"
     if not front.exists():
@@ -406,6 +413,14 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
         spec["thickness"] = float(min(spec["thickness"], 0.3))
     model_dir = project.sub(c.name, "model")
     spec_path = write_spec(spec, model_dir / f"{c.name}_spec.json")
+    if spec.get("mode") == "hull":
+        try:
+            from .model_spec import hull_preview
+
+            hull_preview(spec, model_dir / f"{c.name}_hull.png")
+        except Exception as e:  # noqa: BLE001 - a preview, never a stop
+            if log:
+                log(f"(no hull preview: {e})")
     blend = model_dir / f"{c.name}.blend"
     fbx = model_dir / f"{c.name}.fbx"
     tex = model_textures(project, c, spec.get("orient"))

@@ -7,7 +7,10 @@ Blender + Mixamo → 8-direction renders → palette-locked pixel frames → God
   every command, the project layout, the standard procedure and the failure
   table. The person-facing version is `docs/GUIDE_HUMANS.md`.
 - **Code map:** `pixelforge/api.py` is the pipeline (one function per step);
-  `gui.py` (Tkinter app), `cli.py` and `mcp_server.py` are wrappers over it.
+  `gui.py` (the classic Tkinter Studio), `cli.py`, `mcp_server.py` and the
+  Forge app (`forge/`, a Godot 4.7 project started by `forge_launch.py` /
+  `pixelforge forge`; it only runs CLI commands, never the pipeline itself)
+  are wrappers over it.
   Image algorithms: `grid.py` (pixel-grid detection), `palette.py` (OKLab
   k-means), `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`
   (procedural effects), `transform.py` (RotSprite), `sheet.py` (split

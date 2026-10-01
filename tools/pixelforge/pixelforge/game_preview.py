@@ -23,11 +23,19 @@ GODOT_CANDIDATES = [
 SKIN_CLASS = {"mystic": "animancer", "wraith": "animancer", "keeper": "miasmancer", "ossuarch": "ossuarch"}
 
 
+REPO_GODOT_DIR = Path(__file__).resolve().parents[3] / "tools" / "godot"   # where "Play Godmarrow.bat" downloads it
+
+
 def find_godot(hint: str | None = None) -> str | None:
     cands = [hint, os.environ.get("PIXELFORGE_GODOT"), os.environ.get("GODOT")]
     for c in cands:
         if c and Path(c).exists():
             return str(c)
+    if REPO_GODOT_DIR.is_dir():
+        for pat in ("Godot_v4*_win64.exe", "Godot*.exe", "Godot_v4*linux*", "Godot*"):
+            for p in sorted(REPO_GODOT_DIR.glob(pat)):
+                if p.is_file() and not p.suffix in (".zip", ".txt"):
+                    return str(p)
     for name in ("godot", "godot4", "Godot", "Godot_v4.7.2-stable_win64.exe", "Godot_v4.7.2-stable_linux.x86_64"):
         w = shutil.which(name)
         if w:
@@ -60,8 +68,12 @@ def find_game(start: str | Path | None = None) -> Path | None:
 
 
 def preview_command(godot: str, game: Path, *, skin: str | None = None, cls: str | None = None, zone: str = "moor", fx: list[str] | None = None,
-                    attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None, seed: int = 7) -> list[str]:
+                    attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None, seed: int = 7,
+                    play: bool = False) -> list[str]:
+    """``play``: the plain game (title and all), no test arguments: what "Play the game" in the Forge app does."""
     args = [godot, "--path", str(game)]
+    if play:
+        return args
     if shot:
         args += ["--resolution", "1280x720"]
     args += ["--", f"--zone={zone}", "--new", f"--seed={seed}"]
@@ -81,9 +93,27 @@ def preview_command(godot: str, game: Path, *, skin: str | None = None, cls: str
     return args
 
 
+def import_game(game_dir: str | Path | None = None, *, godot: str | None = None, log=None, timeout: float = 600.0) -> dict:
+    """Make the game notice files the Forge put in it: a headless import pass (``godot --headless --import``).
+    Needed once after new PNGs land in art/; takes a few seconds, a minute the first time."""
+    exe = find_godot(godot)
+    if exe is None:
+        raise RuntimeError("Godot was not found. Install Godot 4 or set PIXELFORGE_GODOT to the executable.")
+    game = find_game(game_dir)
+    if game is None:
+        raise RuntimeError("No Godot project found (a folder with project.godot). Pass the game folder.")
+    cmd = [exe, "--headless", "--path", str(game), "--import"]
+    if log:
+        log("$ " + " ".join(cmd))
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, cwd=str(game))
+    tail = (proc.stdout + proc.stderr)[-800:]
+    ok = proc.returncode == 0
+    return {"ok": ok, "godot": exe, "game": str(game), "returncode": proc.returncode, "tail": tail.strip()[-300:]}
+
+
 def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = None, skin: str | None = None, cls: str | None = None, zone: str = "moor",
                     fx: list[str] | None = None, attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None,
-                    wait: bool | None = None, log=None) -> dict:
+                    wait: bool | None = None, play: bool = False, log=None) -> dict:
     """Launch the game. With ``shot`` it runs until the screenshot is saved and returns its path; otherwise the
     game window stays open and the call returns at once (``wait=True`` blocks until it closes)."""
     exe = find_godot(godot)
@@ -92,7 +122,7 @@ def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = N
     game = find_game(game_dir)
     if game is None:
         raise RuntimeError("No Godot project found (a folder with project.godot). Pass the game folder.")
-    cmd = preview_command(exe, game, skin=skin, cls=cls, zone=zone, fx=fx, attach=attach, shot=shot, shot_t=shot_t, hour=hour)
+    cmd = preview_command(exe, game, skin=skin, cls=cls, zone=zone, fx=fx, attach=attach, shot=shot, shot_t=shot_t, hour=hour, play=play)
     if log:
         log("$ " + " ".join(cmd))
     r = {"ok": True, "godot": exe, "game": str(game), "command": cmd}

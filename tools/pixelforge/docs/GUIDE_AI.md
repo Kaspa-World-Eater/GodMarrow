@@ -76,12 +76,13 @@ pixelforge project describe <character> "<one sentence>"
 pixelforge project prompts <character> [--reference <sheet image url>] --json
 pixelforge project import <character> sheet|front|back|side|quarter|topbottom|top|bottom|style <file>   # topbottom = plan view + underside in one image
 
-pixelforge project run <character> split
-pixelforge project run <character> palette
-pixelforge project run <character> model          # needs Blender; writes model/<name>.fbx for Mixamo
-pixelforge project run <character> rig            # built-in rig + clips; uses mixamo/*.fbx instead if present
-pixelforge project run <character> render [--frame-step 2] [--elevation 30]
-pixelforge project run <character> pixelate
+pixelforge project run <character> split [--tolerance 0.08] [--views 3|4]
+pixelforge project run <character> palette [--colors 0]
+pixelforge project run <character> model [--model-mode auto|template|hull] [--height 1.8]   # needs Blender; writes model/<name>.fbx (and model/<name>_hull.png, the carve, before Blender runs)
+pixelforge project run <character> rig [--clips idle,walk,...]   # built-in rig + clips; uses mixamo/*.fbx instead if present
+pixelforge project run <character> render [--frame-step 2] [--elevation 30] [--per-clip 24] [--actions walk,idle]
+pixelforge project run <character> pixelate [--outline auto|none|#hex]
+pixelforge project preview-gif <character> [--clip walk] [--dir S]     # previews/<clip>_<dir>.gif
 pixelforge project run <character> export        # generic Godot SpriteFrames (.tres/.tscn)
 pixelforge project export-game <character> --kind <kind> [--name "Display Name"]   # GODMARROW format: art/sprites/<kind>.png|json (+ _normal/_depth sets)
 pixelforge project run-all <character>            # runs the remaining automatic steps, stops where blocked
@@ -124,6 +125,8 @@ pixelforge effect spear.png bone_spear -o art/fx --kind missile --rotations 16  
 pixelforge vfx bone_spear bone_spear -o art/fx --rotations 16 --gif        # a spinning bone spear, 16 headings, in the manner of the classic missiles
 pixelforge describe "a wisp lantern spell, pale blue, slow, with embers" -o art/fx   # plain words -> a spell (or skin ops / prompt / music cue)
 pixelforge game-preview --skin keeper --attach [--shot shot.png]                   # launch the game with the set (and its attached effects) on the hero
+pixelforge game-preview --play                                                     # the plain game; --import = a headless import pass so new art files are seen
+pixelforge forge [--screen spell] [--windowed]                                     # the Forge app (the person's face of all this; see below)
 pixelforge spell new fireball -o art/fx --preset fireball --gif                   # a layered spell: strip + json + gif + editable .spell.json
 pixelforge skin views/front.png '[{"op":"recolor","at":[220,51],"to":"#5ae6d2","range":0.12,"radius":30}]'   # headless skin edit (ops: recolor glow paint erase restore region smooth clone)
 pixelforge music list                                                              # the score's 21 cues (act, place, tempo, key, mode, seed) and the knobs
@@ -266,6 +269,54 @@ because it is a humanoid silhouette. `render` circles an orthographic camera
 30° above the ground around the animated model, framing every frame of every
 action identically. `pixelate` then converts each render with the locked
 palette and a fixed scale so all frames match.
+
+## The Forge app (tools/pixelforge/forge): what it is to an assistant
+
+The person's face of PixelForge is a Godot 4.7 project at `tools/pixelforge/forge/` (full screen, the game's fonts
+and frames, nine tiles, guided paths). **It never reimplements the pipeline**: every action is one CLI command run as
+`python -u -c "<boot>" <pixelforge root> <command> ... --json` in a thread (`forge/scripts/backend.gd`), its output
+read line by line (the `PF_PROGRESS` lines drive the progress strip; everything lands in the log drawer) and the last
+JSON object printed is the result. A `{"ok": false, "error": ...}` is shown as a card with the fix the message
+names ("Blender was not found" gets a *Download Blender for me* button that runs `project blender-download`). So the
+project.json the app works on is the same one you work on; `status --json` tells both of you where a character is.
+
+Start it: `pixelforge forge [--project P] [--screen S] [--windowed]` (`pixelforge/forge_launch.py` finds Godot with
+`game_preview.find_godot`, fetches it into `tools/godot` when there is none, and passes `--python=<this interpreter>`
+and `--game=<the folder with project.godot>` to the app), or `PixelForge.bat`. What the app runs, per tile:
+
+| tile | commands |
+|---|---|
+| Make a character | `project new` (first use; style godmarrow) · `project add` · `project import <name> sheet|front` · `project run <name> split|palette|model|rig|render|pixelate` with the Advanced flags (`--tolerance --views --colors --model-mode --height --clips --per-clip --elevation --passes --actions --outline`) · `project export-game` · `project preview-gif` · `project export-game --out <game>/art/sprites` · `game-preview --import` · `game-preview --skin <kind> [--shot]` · the no-3D road: `project still <name> --view front --animate idle --export` |
+| Make an object | `prop <painting> <name> -o <project>/objects [--sway canopy|banner|flame ...]`, then the same with `-o <game>/art/objects --game-objects <game>/art/objects/objects.json --hr 2`; Advanced "carve in 3D" uses `object` |
+| Make a spell or effect | `vfx <kind> <name> -o <project>/fx --palette <look> --gif [--frames --fps --size --bands --seed --glow --rotations]` or `spell new <name> --preset <p>`; into the game with `-o <game>/art/fx` (missiles get `--rotations 16`); `game-preview --fx <name>` |
+| Make tiles and ground | `tiles <texture> <name> -o <project>/tiles [--second --variants --tile --colors --seed]`, then `-o <game>/art/tiles` |
+| Make icons, portraits and UI | `icons`, `portrait`, `ui9` into `<project>/items|portraits|ui`, then the game's folders |
+| Make sounds and music | `music list` · `music <cue> -o <project>/music --seconds 20 [--seed --set ...]` · `music <cue> -o <game>/audio/music --seconds 120 --format ogg` · `sfx all` |
+| Fix up a picture | `skin <image> '<ops>' -o <project>/fix/<file>` after every click (recolor, glow, erase, restore, smooth at a point); Keep = `skin <image> '<ops>'` in place (a .bak is kept); the ops can be saved as JSON for you to replay |
+| Describe it | `describe "<words>" --json` → `what` picks the path; spells export with `describe ... -o <folder>` |
+| Play the game | `game-preview --play` (the plain game); Advanced: `game-preview --cls <order>` |
+| Settings | `doctor --json`, `project blender-download`, `project set --blender` |
+
+After new files land in the game the app runs `game-preview --import` (a headless `godot --import` pass) so the game's
+loaders see them.
+
+**Screenshots of the app (test hooks, after `--`):** `--screen=NAME` opens a screen directly (home, settings, play,
+character, object, spell, tiles, ui, sound, fix), `--project=PATH` and `--game=PATH` choose the folders, `--python=`
+the interpreter, `--shot=PATH --shot_t=S` saves the window after S seconds and quits, `--windowed` and `--nosound`.
+Per path: `--character=NAME` (continue one), `--drop=FILE` (as if dropped), `--shape=nova --look=frost --play`
+(spell), `--kind=portrait|icons|frame` (ui), `--cue=a1_wild [--silent]` (sound), `--advanced` (the fold open),
+`--autoput` (press *Put it in the game* and *Take a screenshot* by itself). Under xvfb:
+
+```
+timeout 300 xvfb-run -a -s "-screen 0 1280x720x24" godot --path tools/pixelforge/forge --rendering-driver opengl3 \
+  --windowed --resolution 1280x720 -- --windowed --nosound --project=/tmp/forge_project \
+  --screen=spell --shape=nova --look=frost --play --shot=/tmp/spell.png --shot_t=12
+godot --headless --path tools/pixelforge/forge --script res://tools/check_scripts.gd    # every script parses
+```
+
+The app's own files: `forge/scripts/theme.gd` (the look), `widgets.gd`, `backend.gd` (the CLI runner), `app.gd`
+(screens, transitions, log drawer), `screen.gd` and `quest.gd` (the base of every path), `screens/`, `quests/`. No
+`.import` files and no `class_name`: everything loads from plain files, so the folder runs without an editor pass.
 
 ## MCP server
 

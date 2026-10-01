@@ -7,7 +7,13 @@ game); every piece is generic except one exporter.
 
 ## What it does
 
-| Need | Command | Studio |
+**For people: the Forge app** (`PixelForge.bat`, `pixelforge forge`; `forge/`, a Godot 4.7 project in the game's own
+look). Full screen, nine tiles (character, object, spell, tiles, icons/portraits/UI, sounds and music, fix up a
+picture, play the game, settings), each a guided path: drop a painting, one big button a screen, a picture of what you
+get, "put it in the game", "see it in the game". Every screen's *Advanced* fold has the step's real settings. It only
+ever runs the commands below, so an assistant on the command line and a person in the app never disagree.
+
+| Need | Command | App / Studio |
 |---|---|---|
 | Character: painting → 3D figure → 46 clips → 8 directions → pixel frames → game files | `pixelforge project …` | Steps 1-9 |
 | Fix a cutout by hand | — | Step 3 → Edit |
@@ -35,14 +41,15 @@ game); every piece is generic except one exporter.
 | Before / after check | `pixelforge compare` | Tools |
 | Skill-tree editor | `pixelforge skilltree` | Tools |
 | Loaders for any Godot project | `pixelforge godot-addon <project>` | Tools |
-| Is this machine ready? | `pixelforge doctor` | install.bat |
+| Is this machine ready? | `pixelforge doctor` | Settings / install.bat |
+| The app itself | `pixelforge forge`, `forge_launch.py` | `PixelForge.bat` |
 | An AI running all of it | `pixelforge mcp`, `docs/GUIDE_AI.md` | — |
 
 ## Install (Windows)
 
 1. Python 3.11+ from python.org, tick *Add Python to PATH*.
 2. Double-click `install.bat`. It makes a private environment, checks the machine, and puts a desktop icon.
-3. Double-click **PixelForge Studio**. Step 5 downloads Blender (free, 380 MB) for you if none is installed.
+3. Double-click **PixelForge** (the app) or **PixelForge Studio (classic)**. The Build step downloads Blender (free, 380 MB) for you if none is installed; the app fetches Godot (free) the first time if the game's is not there.
 
 Any OS: `pip install -e .` then `pixelforge doctor`.
 
@@ -58,7 +65,7 @@ packs them into Godot SpriteFrames or the game's atlas with foot anchors.
 
 ## Layout
 
-`pixelforge/api.py` is the pipeline (one function per step). `gui.py` (Studio), `cli.py`, `mcp_server.py` wrap it.
+`pixelforge/api.py` is the pipeline (one function per step). `gui.py` (Studio), `cli.py`, `mcp_server.py` and the Forge app (`forge/`, launched by `forge_launch.py`) wrap it.
 Image maths: `grid.py`, `palette.py`, `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`, `transform.py`,
 `sheet.py`, `model_spec.py`. Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`, `music.py`, `color_editor.py`, `skin_ops.py`, `skin_editor.py`, `fx_editor.py`, `spell.py`, `spell_designer.py`, `effect_art.py`, `describe.py`, `game_preview.py`, `checks.py`,
 `recolor.py`, `compare.py`, `skilltree.py`, `doctor.py`. Blender-side: `pixelforge/blender/` (no Pillow there).

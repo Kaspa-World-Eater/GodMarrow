@@ -1,13 +1,64 @@
-# PixelForge Studio — the short guide
+# PixelForge — the short guide
 
-Turn Midjourney pictures into real pixel-art characters, animated, seen from 8 directions, ready for the game.
-Runs on any Windows laptop. No graphics card needed. No paid tools. No Mixamo.
+Turn Midjourney pictures into real pixel-art characters, animated, seen from 8 directions, ready for the game; and
+objects, spells, tiles, icons, portraits, frames, sounds and music. Runs on any Windows laptop. No graphics card
+needed. No paid tools. No Mixamo.
+
+## The Forge app (start here)
+
+Double-click **PixelForge** on the desktop (or `PixelForge.bat` in the `tools\pixelforge` folder). It opens full
+screen, in the game's own look, and shows nine tiles:
+
+**Make a character · Make an object · Make a spell or effect · Make tiles and ground · Make icons, portraits and UI ·
+Make sounds and music · Fix up a picture · Play the game · Settings**
+
+Pick a tile and follow the path. Every screen has one big teal button (the next thing to do), a picture of what you
+get, a line saying what happens next, and a strip along the top showing where you are. **Esc** (or the gamepad's B
+button) always goes one screen back. The arrow keys, Enter and a gamepad work everywhere; so does the mouse.
+
+**Make a character.** Drop your painting onto the window (or press *Choose a painting*). That is all you set up: the
+Forge cuts the figure out, locks its colours, builds the 3D figure, gives it its moves, films it from 8 directions,
+turns the film into pixels and packs the game files, one after another, lighting up the strip as it goes. Filming is
+the slow part (ten minutes or more on a laptop). Then you see it walk: turn the dial to any direction, pick a move.
+Press **Put it in the game**, then **See it in the game**: the game opens with your character on the moor.
+The first time, the Build step stops with a card: Blender does the 3D part. Press **Download Blender for me** (free,
+380 MB, no installer) and the path carries on by itself. There is also a "no 3D for now" road that makes a still
+sprite that breathes.
+
+**Make an object.** Drop a painting of a barrel, a gravestone, a dead tree, a banner. It is cut out, given its
+footprint, and pressed to the game's pixels. Choose whether it stays still, sways like a tree, flutters like a banner
+or flickers like a flame, then put it in the game's object list.
+
+**Make a spell or effect.** Pick a shape (missile, nova, wall, burst, armour, and more) or one of the game's whole
+spells, then a look (the game's colour ramps). Watch it play. Put it in the game and **See it**: it plays at the hero
+on the moor.
+
+**Make tiles and ground.** Drop a painted ground texture; it becomes iso diamonds with variants and edge tiles.
+**Make icons, portraits and UI.** Icons from one flat-lay painting; a portrait from a front view; a stretching
+frame from a painted panel. **Make sounds and music.** Pick a place in the game, hear its cue, ask for another tune,
+keep it; or make the eighteen small sounds. **Fix up a picture.** Click where the fix goes: recolour (the shading
+stays), glow, erase, restore the original, smooth. Undo takes a click back; Keep saves it with the original beside it.
+
+**Describe it.** The bar at the top of the first screen takes plain words: "a wisp lantern spell, pale blue, slow,
+with embers" opens the spell path with that spell playing; "make the left eye teal with a pale glow" opens the fix-up
+path; "a grave knight with a rusted helm" gives you the painting prompt; "a slow sombre act 2 wilds tune" renders it.
+
+**Advanced, not hidden.** Every screen has an *Advanced* fold with the step's real settings and their usual values
+(the same ones the command line takes), closed until you open it. **Log** at the top right shows exactly what ran.
+**Settings** has the window / full screen switch (also F11), the sounds, the folders, what this computer has, and
+the button to open **PixelForge Studio (classic)**, the older window with every form.
+
+Everything the app makes lands in a project folder it creates for you (Documents\PixelForge\Forge) and, when you
+say so, in the game's art. An AI assistant can do every one of these things through the command line; the app and the
+assistant never disagree, because the app only ever runs the same commands.
 
 ## Install (once)
 
 1. Install **Python 3.11 or newer** from python.org. Tick **"Add Python to PATH"**.
 2. Get the `tools/pixelforge` folder (it lives in the GodMarrow repository).
-3. Double-click **`install.bat`**. It sets everything up and puts a **PixelForge Studio** icon on the desktop.
+3. Double-click **`install.bat`**. It sets everything up and puts two icons on the desktop: **PixelForge** (the
+   full-screen app above) and **PixelForge Studio (classic)** (the older window described below). The app needs
+   Godot 4 (free); it finds the one the game uses, or fetches it the first time.
 
 **Playing the game.** The **Godmarrow** icon on the desktop (made by `install.bat`; or `Play Godmarrow.bat` in the
 Godmarrow folder) gets the latest version first, finds Godot 4 or downloads it (free, once), and starts the game.
@@ -15,13 +66,19 @@ Godmarrow folder) gets the latest version first, finds Godot 4 or downloads it (
 **Updating.** The Studio checks for a newer version when it opens and shows one button, **Update and restart**. The same
 is in Help > Update PixelForge, and **`Update PixelForge.bat`** in the folder does it from outside the app. The game and
 the Forge live in one folder, so one update brings both.
-4. Double-click the icon. If it does not open, run **`PixelForge Studio.bat`** instead; a crash is written to
-   `studio_error.log` next to it.
+4. Double-click an icon. If the app does not open, run **`PixelForge.bat`**; if the classic window does not, run
+   **`PixelForge Studio.bat`**; a crash is written to `studio_error.log` next to it.
 
 **Blender** (free) does the 3D part. You do not have to install it: step 5 has a **Download Blender for me**
 button (380 MB, no installer). If you already have Blender, the app finds it.
 
-## How a character is made
+## The classic Studio (the older window)
+
+Everything below is the older window, **PixelForge Studio (classic)**: a step list on the left, forms, every editor and
+tool. The app above covers the everyday jobs; the Studio keeps the full editors (cutout, skin with layers and the
+clone brush, colour, effects with per-view attachments, the spell designer, the skill-tree editor) and every tool form.
+
+### How a character is made
 
 1. **New project** → pick an empty folder (one project per game).
 2. **+ Add character** → name it, write one sentence about it.
@@ -36,7 +93,7 @@ button (380 MB, no installer). If you already have Blender, the app finds it.
 7. **Step 9 → Export for Godmarrow**: type the kind name (for example `mystic`), click, and copy the files it names
    into the game's `art/sprites` folder. Other Godot games: **Export** gives a SpriteFrames and a scene.
 
-## Fixing a bad cutout (step 3)
+### Fixing a bad cutout (step 3)
 
 The automatic cutout is usually right. When it is not (background stuck to the figure, a sleeve cut off):
 
@@ -47,19 +104,19 @@ The automatic cutout is usually right. When it is not (background stuck to the f
   tolerance if background remains; tighten it if the figure loses parts.
 - Then run steps 4 and 5 again (click them on the left).
 
-## Quick path, one picture → one sprite
+### Quick path, one picture → one sprite
 
 For a first look, bosses, portraits, items. No Blender. Click **★ Quick path** in the step list, pick the picture
 and an animation (sway, hover, flame...), click **Make sprite + animate + export**.
 
-## The Continue button
+### The Continue button
 
 The step list marks what is done (grey tick), what is next (teal arrow) and what is still to do. **Continue** opens the
 next step and runs it when it is automatic; it only stops on the two steps that need you (the prompts and the
 pictures). **Run all automatic steps** does every remaining step in one go. The bar at the bottom shows what is
 happening; the log shows the details. Checks that found something are listed under the buttons in gold.
 
-## Other things the Forge makes (the **Tools** button)
+### Other things the Forge makes (the **Tools** button)
 
 Props and trees with sway, spell / aura / weather effects, inventory icons from one flat-lay picture, portraits,
 iso ground tiles, UI frames, sound effects, music, recolours (champion / unique tints from one render), before/after
@@ -77,7 +134,7 @@ in any text editor, then run **all** with that sheet. Loops are seamless (the re
 and every cue sits at the same loudness. Format `ogg` makes small files for the game when ffmpeg is installed;
 otherwise WAV, which Godot also plays.
 
-## Describe it, get it
+### Describe it, get it
 
 The **Describe it…** button (also Ctrl+D, and Tools > Describe it): say what you want in plain words and the Forge
 drafts it and opens it in the right editor. "A wisp lantern spell, pale blue, slow, with embers" becomes a spell in
@@ -87,14 +144,14 @@ the Midjourney prompt. "A slow sombre act 2 wilds tune with more wind" renders a
 a vocabulary of colours, effects, places and moods, not a mind-reader; an AI assistant connected to the Forge can
 write anything the vocabulary does not cover.
 
-## Preview in game
+### Preview in game
 
 **▶ Preview in game** (step 9, Tools > Preview in game, or the Tools menu) launches the game on the moor with the
 character's exported set on the hero, the effects you attached playing on them, or any effect by name, so judging
 happens in the real light and scale. Godot is found automatically; if not, set `PIXELFORGE_GODOT` to its path. With
 "screenshot" ticked it saves a picture after four seconds and quits instead.
 
-## Skins and spells
+### Skins and spells
 
 **Skin editor** (step 3 under each cutout as "Skin", step 9 on the finished set, Tools > Skin editor for any PNG):
 a paint-program toolbar. Pick + recolour is the colour editor's eyedropper. Brush paints a colour; Glow adds a soft
@@ -132,7 +189,7 @@ rotation, start frame, speed, opacity and blend (normal or add) while the previe
 the JSON the game plays, plus a GIF and the editable spell file, so a spell is placed in the game exactly like any
 effect and attached to a character with the effects editor.
 
-## Colours and effects, by hand
+### Colours and effects, by hand
 
 **Colour editor** (step 3 under each cutout, step 9 on the finished set, Tools > Colour editor for any PNG): click a
 colour on the picture, widen the range until the highlight covers what you mean (both eyes, the whole trim), click
@@ -146,14 +203,14 @@ per view, or place it once and copy to all views (left-facing views mirror). Pre
 effects on. Save writes the placements into the sprite set and the effect sheets into the effects folder; the Godot
 add-on spawns them at the right spot for whichever way the character faces.
 
-## What the Forge checks for you
+### What the Forge checks for you
 
 After cutting out, carving and filming, the Forge runs automatic checks and writes the result in the step notes and the log: white
 specks left inside a figure, loose bits that would float, dark cloth the cut-out dropped, views of different heights, lines
 sticking out of the carve, white pixels or size jumps in the frames. Small white specks inside dark cloth are painted the
 cloth's colour automatically. `pixelforge project check <character>` prints the same list any time.
 
-## Knobs you might touch
+### Knobs you might touch
 
 - **Settings → Quality style**: `godmarrow` (every colour kept, ~195 px tall) is the game's; `hd`, `16bit`, `8bit`
   exist for other projects.

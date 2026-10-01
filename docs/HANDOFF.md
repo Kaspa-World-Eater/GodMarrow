@@ -273,3 +273,23 @@ session; the table is enough to re-brief).
 3. Effects to D2R level (track/fx, track/fxlook, painted effects). 4. Pixel road vs anatomy road comparison in the game
 (track/pixel2d, track/body3d). 5. The see-through hero (dark shader). 6. The painted world: Derek paints the art order
 in the Keeper's style; the Forge converts.
+
+### 7.6 track/forgeapp (2026-10-01): the Forge app, PixelForge for people
+Derek: "the pixel forge ui doesnt make sense to me, i cant even figure out how to make an object. so gamify it all,
+make it a full screen video game like experience, dark mode ... for the non tech savy. but just as capable."
+Built on `track/forgeapp`: `tools/pixelforge/forge/`, a Godot 4.7 project in the game's own look (its fonts and
+frames copied into `forge/assets`), full screen with integer scaling and letterbox, nine tiles on Home (character,
+object, spell or effect, tiles and ground, icons/portraits/UI, sounds and music, fix up a picture, play the game,
+settings), a Describe-it bar, and a guided path per tile: drop a painting, one big teal button a screen, a picture of
+what you get, "what happens next", a progress strip, an Advanced fold with the step's real flags, a log drawer, "put it
+in the game", "see it in the game", a screenshot button. Esc / gamepad B always goes back; F11 and Settings toggle the
+window. It only ever runs `python -m pixelforge.cli ... --json` (`forge/scripts/backend.gd`), so the AI road and the
+person's road are one road. Launchers: `pixelforge forge` (`pixelforge/forge_launch.py`, finds or fetches Godot),
+`tools/pixelforge/PixelForge.bat`; install.bat now makes two icons, **PixelForge** and **PixelForge Studio
+(classic)**. CLI additions: per-step flags on `project run`, `project preview-gif`, `game-preview --play|--import`,
+`pixelforge forge`; `build_model(mode=)` + a hull preview PNG. Docs: GUIDE_HUMANS (the app is chapter one), GUIDE_AI
+(how the app calls the CLI, the test hooks, how to screenshot it), README, `docs/track_notes/forgeapp.md` (what
+remains, how the Tk Studio relates). Screenshots of every screen at 1280x720 and 1366x768 under
+`docs/screens/forgeapp/`. Tests: 96 green (`tests/test_forge.py` is new); `forge/tools/check_scripts.gd` parses
+every script headless. Not done here: a full Blender run from inside the app (the cloud has no Blender; the chain was
+run to the "Download Blender for me" card and the finished Keeper was used for the preview and put-in-game steps).

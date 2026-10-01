@@ -1,0 +1,14 @@
+{
+  "name": "pf_vellum_panel",
+  "size": [
+    30,
+    30
+  ],
+  "margins": {
+    "left": 10,
+    "top": 10,
+    "right": 10,
+    "bottom": 10
+  },
+  "source": "pixelforge"
+}

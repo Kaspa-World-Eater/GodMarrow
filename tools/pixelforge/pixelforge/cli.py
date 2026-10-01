@@ -292,10 +292,10 @@ def cmd_project(a) -> None:
         elif sub == "export-game":
             _emit(a, api.export_game(project, a.character, kind=a.kind, out_dir=a.out, category=a.category, display_name=a.name))
         elif sub == "run":
-            kw = {}
-            if a.step == "render":
-                kw = {"step": a.frame_step, "elevation": a.elevation, "passes": a.passes}
+            kw = _run_kwargs(a)
             _emit(a, api.run_step(project, a.character, a.step, log=print, **kw))
+        elif sub == "preview-gif":
+            _emit(a, api.preview_gif(project, a.character, clip=a.clip, direction=a.dir))
         elif sub == "check":
             from .checks import check_character
             r = check_character(project, a.character)
@@ -327,6 +327,37 @@ def cmd_project(a) -> None:
     except api.StepError as e:
         _emit(a, {"ok": False, "error": str(e)})
         raise SystemExit(2)
+
+
+def _run_kwargs(a) -> dict:
+    """The per-step flags of ``project run`` (each step's real parameters, as the Forge app's Advanced fold shows them)."""
+    kw = {}
+    if a.step == "split":
+        if a.tolerance is not None:
+            kw["tolerance"] = a.tolerance
+        if a.views:
+            kw["expected_views"] = a.views
+    elif a.step == "palette":
+        if a.colors is not None:
+            kw["colors"] = a.colors
+    elif a.step == "model":
+        if a.model_mode:
+            kw["mode"] = a.model_mode
+        if a.height is not None:
+            kw["height"] = a.height
+    elif a.step == "rig":
+        if a.clips:
+            kw["clips"] = a.clips
+    elif a.step == "render":
+        kw = {"step": a.frame_step, "elevation": a.elevation, "passes": a.passes}
+        if a.per_clip is not None:
+            kw["per_clip"] = a.per_clip
+        if a.actions:
+            kw["actions"] = [x for x in a.actions.split(",") if x]
+    elif a.step == "pixelate":
+        if a.outline:
+            kw["outline"] = None if a.outline == "none" else a.outline
+    return kw
 
 
 def cmd_prop(a) -> None:
@@ -460,8 +491,22 @@ def cmd_describe(a) -> None:
 def cmd_game_preview(a) -> None:
     from .game_preview import preview_in_game
 
+    if getattr(a, "do_import", False):
+        from .game_preview import import_game
+
+        _emit(a, import_game(a.game, godot=a.godot, log=print))
+        return
     _emit(a, preview_in_game(a.game, godot=a.godot, skin=a.skin, cls=a.cls, zone=a.zone, fx=a.fx.split(",") if a.fx else None, attach=a.attach,
-                             shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, log=print))
+                             shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, play=a.play, log=print))
+
+
+def cmd_forge(a) -> None:
+    from .forge_launch import launch
+
+    r = launch(godot=a.godot, project=a.project, screen=a.screen, windowed=a.windowed, extra=a.extra, wait=a.wait, log=None if a.json else print)
+    _emit(a, r)
+    if not r.get("ok"):
+        raise SystemExit(2)
 
 
 def cmd_effect(a) -> None:
@@ -660,6 +705,14 @@ def build_parser() -> argparse.ArgumentParser:
     x = ps.add_parser("import", help="import an image"); x.add_argument("character"); x.add_argument("kind", choices=list(SOURCE_KINDS)); x.add_argument("file")
     x = ps.add_parser("run", help="run one step"); x.add_argument("character"); x.add_argument("step", choices=["split", "palette", "model", "rig", "render", "pixelate", "export"])
     x.add_argument("--frame-step", type=int, default=2); x.add_argument("--elevation", type=float, default=30.0); x.add_argument("--passes", default=None, help="color,normal,depth")
+    x.add_argument("--tolerance", type=float, default=None, help="split: background tolerance (default 0.08)"); x.add_argument("--views", type=int, choices=[3, 4], default=None, help="split: figures on the sheet")
+    x.add_argument("--colors", type=int, default=None, help="palette: colours to keep (0 = every colour)")
+    x.add_argument("--model-mode", choices=["auto", "template", "hull"], default=None, help="model: fit the human figure, or carve only"); x.add_argument("--height", type=float, default=None, help="model: metres")
+    x.add_argument("--clips", default=None, help="rig: the moves, comma separated")
+    x.add_argument("--per-clip", type=int, default=None, help="render: frames a move (24 smooth, 12 quick)"); x.add_argument("--actions", default=None, help="render: only these moves")
+    x.add_argument("--outline", default=None, help="pixelate: auto | none | a hex colour")
+    x = ps.add_parser("preview-gif", help="a looping GIF of one move from one direction (previews/<clip>_<dir>.gif)"); x.add_argument("character")
+    x.add_argument("--clip", default="walk"); x.add_argument("--dir", default="S", help="S SW W NW N NE E SE")
     x = ps.add_parser("export-game", help="export in Godmarrow's art/sprites format (+ normal/depth sets)"); x.add_argument("character")
     x.add_argument("--kind", help="sprite kind name (default: character name)"); x.add_argument("--out", help="output folder (default: characters/<name>/export_game)")
     x.add_argument("--category", default="hero"); x.add_argument("--name", help="display name")
@@ -775,7 +828,16 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--fx", default=None, help="effects to play at the hero: a,b"); s.add_argument("--attach", action="store_true", help="the effects editor's attachments on the skin")
     s.add_argument("--shot", default=None, help="save a screenshot here after --shot-t seconds and quit"); s.add_argument("--shot-t", dest="shot_t", type=float, default=4.0)
     s.add_argument("--hour", type=float, default=None); s.add_argument("--wait", action="store_true"); s.add_argument("--json", action="store_true")
+    s.add_argument("--play", action="store_true", help="just start the game, no test arguments (the Forge app's Play)")
+    s.add_argument("--import", dest="do_import", action="store_true", help="make the game notice new files (a headless import pass), then exit")
     s.set_defaults(func=cmd_game_preview)
+
+    s = sub.add_parser("forge", help="open the Forge app (PixelForge for people: full screen, guided, in the game's look)")
+    s.add_argument("--project", default=None, help="the Forge project folder (default: Documents/PixelForge/Forge)"); s.add_argument("--godot", default=None)
+    s.add_argument("--screen", default=None, help="open a screen directly: home character object spell tiles ui sound fix settings")
+    s.add_argument("--windowed", action="store_true"); s.add_argument("--wait", action="store_true", help="block until the app closes")
+    s.add_argument("--json", action="store_true"); s.add_argument("extra", nargs="*", help="more arguments for the app (after --)")
+    s.set_defaults(func=cmd_forge)
 
     s = sub.add_parser("effect", help="painted spell / missile art (Midjourney, on black) -> an animated game effect in the vfx layout")
     s.add_argument("image"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/fx")
