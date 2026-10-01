@@ -8,6 +8,10 @@ Runs on any Windows laptop. No graphics card needed. No paid tools. No Mixamo.
 1. Install **Python 3.11 or newer** from python.org. Tick **"Add Python to PATH"**.
 2. Get the `tools/pixelforge` folder (it lives in the GodMarrow repository).
 3. Double-click **`install.bat`**. It sets everything up and puts a **PixelForge Studio** icon on the desktop.
+
+**Updating.** The Studio checks for a newer version when it opens and shows one button, **Update and restart**. The same
+is in Help > Update PixelForge, and **`Update PixelForge.bat`** in the folder does it from outside the app. The game and
+the Forge live in one folder, so one update brings both.
 4. Double-click the icon. If it does not open, run **`PixelForge Studio.bat`** instead; a crash is written to
    `studio_error.log` next to it.
 

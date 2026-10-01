@@ -120,6 +120,7 @@ class Studio:
         self._menu()
         self._build()
         root.after(100, self._drain_log)
+        root.after(1500, self._check_updates)
         if project_path:
             self._open(project_path)
 
@@ -164,6 +165,43 @@ class Studio:
         self.root.bind("<Control-d>", lambda e: self._describe())
         self._fill_recent()
 
+    def _repo_root(self):
+        here = Path(__file__).resolve().parents[1]
+        for cand in (here, *here.parents):
+            if (cand / ".git").exists():
+                return cand
+        return None
+
+    def _check_updates(self) -> None:
+        """Quietly ask the repository whether a newer Forge exists; if so, show one button: Update and restart."""
+        import shutil
+        import subprocess
+
+        repo = self._repo_root()
+        if repo is None or not shutil.which("git"):
+            return
+
+        def work():
+            try:
+                subprocess.run(["git", "fetch", "--quiet"], cwd=str(repo), capture_output=True, text=True, timeout=60)
+                r = subprocess.run(["git", "rev-list", "--count", "HEAD..@{u}"], cwd=str(repo), capture_output=True, text=True, timeout=30)
+                behind = int(r.stdout.strip() or 0)
+            except Exception:  # noqa: BLE001
+                return
+            if behind > 0:
+                self.root.after(0, lambda: self._offer_update(behind))
+
+        threading.Thread(target=work, daemon=True).start()
+
+    def _offer_update(self, behind: int) -> None:
+        if getattr(self, "update_bar", None) is not None:
+            return
+        self.update_bar = ttk.Frame(self.root, padding=(8, 4))
+        self.update_bar.pack(side=TOP, fill=X, before=self.root.winfo_children()[0])
+        ttk.Label(self.update_bar, text=f"A newer PixelForge is ready ({behind} change{'s' if behind != 1 else ''}).", style="Warn.TLabel").pack(side=LEFT)
+        ttk.Button(self.update_bar, text="Update and restart", command=self._update_forge, style="Go.TButton").pack(side=LEFT, padx=8)
+        ttk.Button(self.update_bar, text="Later", command=self.update_bar.destroy).pack(side=LEFT)
+
     def _update_forge(self) -> None:
         """Pull the latest Forge from the repository it was installed from, then ask for a restart."""
         import subprocess
@@ -183,7 +221,27 @@ class Studio:
             messagebox.showerror(APP_TITLE, f"Could not run git:\n{e}")
             return
         self._log("UPDATE " + out.replace("\n", " | "))
-        messagebox.showinfo(APP_TITLE, ("Already up to date." if "Already up to date" in out else "Updated. Close and reopen PixelForge Studio to use the new version.") + "\n\n" + out)
+        if "Already up to date" in out:
+            messagebox.showinfo(APP_TITLE, "Already up to date.")
+            return
+        if r.returncode != 0:
+            messagebox.showerror(APP_TITLE, "The update did not apply:\n\n" + out)
+            return
+        # new code may bring new packages: install quietly, then relaunch this same program
+        import sys
+
+        try:
+            subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-e", str(Path(__file__).resolve().parents[1])], capture_output=True, text=True, timeout=600)
+        except Exception:  # noqa: BLE001
+            pass
+        self.status.set("Updated. Restarting…")
+        self.root.update()
+        try:
+            subprocess.Popen([sys.executable, "-m", "pixelforge.cli", "studio"], cwd=str(Path(__file__).resolve().parents[1]))
+        except Exception as e:  # noqa: BLE001
+            messagebox.showinfo(APP_TITLE, f"Updated. Please close and reopen PixelForge Studio.\n({e})")
+            return
+        self.root.after(300, self.root.destroy)
 
     def _fill_recent(self) -> None:
         self.recent_menu.delete(0, END)

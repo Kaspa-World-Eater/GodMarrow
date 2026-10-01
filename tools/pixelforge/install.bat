@@ -3,6 +3,12 @@ setlocal
 cd /d "%~dp0"
 echo PixelForge Studio - install
 echo.
+if exist ..\..\.git (
+  where git >nul 2>nul && (
+    echo Getting the latest PixelForge...
+    git -C ..\.. pull --ff-only
+  )
+)
 where py >nul 2>nul && (set PY=py -3) || (set PY=python)
 %PY% --version >nul 2>nul || (
   echo Python was not found. Install Python 3.11+ from https://www.python.org/downloads/
