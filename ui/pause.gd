@@ -33,7 +33,7 @@ func close() -> void:
 func _build() -> void:
 	match page:
 		"main":
-			rows = [["Resume", "resume"], ["Written." if saved else "Save the pilgrim", "save"], ["The Codex", "codex"], ["Options", "options"], ["Controls", "controls"], ["Save and quit", "quit"]]
+			rows = [["Resume", "resume"], ["Written." if saved else "Save the pilgrim", "save"], ["The Codex", "codex"], ["Controls", "controls"], ["Full screen: " + _on(_full()), "fullscreen"], ["Options", "options"], ["Save and quit", "quit"]]
 		"options":
 			rows = [
 				["Damage numbers: " + _on(Settings.damage_numbers), "t:damage_numbers"],
@@ -44,9 +44,13 @@ func _build() -> void:
 				["Music: %d%%" % roundi(Settings.music_vol * 100), "v:music_vol"],
 				["Sound: %d%%" % roundi(Settings.sfx_vol * 100), "v:sfx_vol"],
 				["The title: " + String(Settings.TITLE_NAMES[Settings.title_scene]), "title_scene"],
+				["Fewer effects (a slower machine): " + _on(Settings.fewer_fx), "t:fewer_fx"],
 				["Back", "back"]]
 		"controls":
 			rows = [["Back", "back"]]
+
+func _full() -> bool:
+	return DisplayServer.window_get_mode() in [DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
 
 func _on(b: bool) -> String:
 	return "on" if b else "off"
@@ -98,6 +102,8 @@ func _act(a: String, down: bool) -> void:
 		Settings.save()
 		_main_save()
 		get_tree().quit()
+	elif a == "fullscreen":   # the web's pause menu has it (a_head.html:281-304)
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if _full() else DisplayServer.WINDOW_MODE_FULLSCREEN)
 	elif a == "title_scene":
 		var ts: Array = Settings.TITLE_SCENES
 		Settings.title_scene = ts[(ts.find(Settings.title_scene) + (ts.size() - 1 if down else 1)) % ts.size()]

@@ -507,6 +507,10 @@ func _update_fx(dt: float) -> void:
 			continue
 		var dv: Vector2 = g.tp - s["tp"]
 		var d := maxf(dv.length(), 0.001)
+		var tr: Array = s.get_or_add("trail", [])   # the last three places it was (zz_zz_mystic90.js:127)
+		tr.append(s["tp"])
+		if tr.size() > 3:
+			tr.pop_front()
 		s["tp"] += dv / d * minf(d, 11.0 * dt)
 		if d < 0.3:
 			hurt(g, s["dmg"], "prism", {"from": s["tp"]})

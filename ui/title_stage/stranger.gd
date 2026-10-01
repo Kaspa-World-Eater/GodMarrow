@@ -12,6 +12,8 @@ const SK := 4.0
 const FW := 320
 const FH := 270
 const FPS := 10.0
+var pace = load("res://ui/stranger_pace.gd").new()
+var sframe := 0
 const X0 := 640.0                  # where the painting starts on screen
 const MARROW := Color("#c9974a")
 const DARK := Color(0.01, 0.01, 0.015)
@@ -95,6 +97,7 @@ func draw_card(o: int) -> void:
 
 func _process(dt: float) -> void:
 	var t: float = T.t
+	sframe = pace.step(dt)   # the Stranger mostly sits still; he gestures at random (ui/stranger_pace.gd)
 	for c in cards:
 		var want := 1.0 if (T.mode == "main" or T.mode == "order") and (T.fig_hover == c["o"] or T.order_i == c["o"]) else 0.0
 		c["lift"] = lerpf(c["lift"], want, minf(1.0, dt * 7.0))
@@ -145,7 +148,7 @@ func _draw_paint() -> void:
 	paint.draw_rect(Rect2(0, 0, 1920, 1080), DARK)
 	if sheet == null:
 		return
-	var f := int(float(T.t) * FPS) % 121
+	var f := sframe
 	var src := Rect2((f % 11) * FW, (f / 11) * FH, FW, FH)
 	paint.draw_texture_rect_region(sheet, Rect2(X0, 0, FW * SK, FH * SK), src)
 	# its left edge goes down into the dark

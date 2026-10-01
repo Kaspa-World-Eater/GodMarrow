@@ -116,7 +116,9 @@ static func wick(hero) -> String:
 	return best
 
 static func in_light(hero, p: Vector2) -> bool:
-	return hero != null and p.distance_to(hero.tp) < hero.light_radius() * 0.7
+	# measured from where the light stands: under the lantern (zz_zw_lantern63.js:106)
+	var at: Vector2 = hero.lantern.tp if hero != null and hero.lantern != null and is_instance_valid(hero.lantern) else (hero.tp if hero else Vector2.ZERO)
+	return hero != null and p.distance_to(at) < hero.light_radius() * 0.7
 
 ## the violet wick: a creature dying in the lantern's light gives back a little of the hero's resource
 static func wick_kill(_z: Zone, m, hero) -> void:

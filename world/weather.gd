@@ -113,10 +113,7 @@ func _process(dt: float) -> void:
 		splashes = splashes.filter(func(s): return s["t"] < 0.28)
 	# --- light shafts in the woods by day
 	var dk := Game.day_k() if outdoor else 0.0
-	if woody and dk > 0.2:
-		if shafts.size() < 4 and (randf() < dt * 0.5 or t - bind_t < 0.3):
-			var lf := randf_range(14, 26)
-			shafts.append({"x": randf_range(-300, vs.x), "w": randf_range(60, 150), "t": 0.0, "life": lf, "ph": randf() * TAU})
+	# (the woods' shafts are the web's canopy shafts now, drawn by world/air37.gd)
 	for s in shafts:
 		s["t"] += dt
 		s["x"] += (2.0 + wind * 4.0) * dt - dcam.x
