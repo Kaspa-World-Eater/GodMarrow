@@ -134,6 +134,11 @@ ART_ORDER = [
     ("ui", "panel_vellum", "a vellum and dark wood tome page frame"),
     ("icons", "weapons_1", "a grave knight's weapons: a bone sword, an iron mace, a hooked scythe, a short dagger, a bone wand, a staff, a round shield, a lantern, a ring"),
     ("icons", "armor_1", "a pilgrim's gear: a hooded robe, a mail shirt, iron gloves, curled-toe boots, a leather belt, a mask, an amulet, a potion flask, a scroll"),
+    ("object", "lantern_mystic", "an ornate gold hand lantern with a small cyan flame behind glass, a short chain handle, the Hollow Mystic's lantern"),
+    ("object", "lantern_ossuarch", "a hand lamp of bone and grey iron burning marrow-tallow with a warm amber flame, a bone handle, dust in its joints"),
+    ("object", "lantern_keeper", "a folded paper hand lantern with a charm strip hanging from it, a faint violet haze inside, a thin wooden handle"),
+    ("object", "lantern_hand", "a plain clay bowl lamp with a wick, amber flame, no ornament, carried by a wandering ascetic"),
+    ("object", "lantern_penitent", "a dark iron censer lantern on a short chain, pierced with slits, a dim red-brown ember inside, unlit look"),
     ("portrait", "hollow_mystic", "a gaunt hooded wanderer with a faceless black void under a teal-blue tattered hood"),
     ("portrait", "ossuarch", "a tall grim man in bone plate with a pale shaven head and iron-grey eyes"),
 ]
