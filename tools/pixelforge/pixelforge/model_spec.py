@@ -297,7 +297,7 @@ def _canopy_cards(vox: np.ndarray, F: np.ndarray, S: np.ndarray, T: np.ndarray |
     return parts
 
 
-def synthesize_top(front: Image.Image, spec: dict, scale: int = 8, top_light: float = 0.10) -> Image.Image:
+def synthesize_top(front: Image.Image, spec: dict, scale: int = 8, top_light: float = 0.06) -> Image.Image:
     """What the camera sees from above when no plan view was painted: only the parts whose top is known. A hat cone
     is revolved from the front painting's brim band (lifted a little toward lit straw); everything else stays
     transparent so the body keeps its front and side paint. Canonical orientation (image-up = the figure's back)."""
