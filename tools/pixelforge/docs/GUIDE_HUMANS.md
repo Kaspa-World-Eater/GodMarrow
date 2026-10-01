@@ -70,6 +70,21 @@ in any text editor, then run **all** with that sheet. Loops are seamless (the re
 and every cue sits at the same loudness. Format `ogg` makes small files for the game when ffmpeg is installed;
 otherwise WAV, which Godot also plays.
 
+## Skins and spells
+
+**Skin editor** (step 3 under each cutout as "Skin", step 9 on the finished set, Tools > Skin editor for any PNG):
+a paint-program toolbar. Pick + recolour is the colour editor's eyedropper. Brush paints a colour; Glow adds a soft
+light that spills a little past the edge; Erase and Restore take pixels away and bring the original back; Smooth
+softens a patch; Region lets you click round a part (an eye, the lantern, the hood), name it, and recolour it by name
+later. Every stroke is an operation; "Save ops as JSON" writes them out so an AI assistant can replay or adapt them
+with the edit_skin tool, and the same operations run from the command line (`pixelforge skin`).
+
+**Spell designer** (Tools > Spell designer): a spell is layers of effects. Start from a preset (fireball, ward, soul
+drain, bone shatter, lightning strike), add or remove layers, and set each layer's kind, colours, size, position,
+rotation, start frame, speed, opacity and blend (normal or add) while the preview loops. Export writes the strip and
+the JSON the game plays, plus a GIF and the editable spell file, so a spell is placed in the game exactly like any
+effect and attached to a character with the effects editor.
+
 ## Colours and effects, by hand
 
 **Colour editor** (step 3 under each cutout, step 9 on the finished set, Tools > Colour editor for any PNG): click a

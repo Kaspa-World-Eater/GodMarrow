@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import glob
 import sys
 from pathlib import Path
@@ -429,6 +430,28 @@ def cmd_music(a) -> None:
     _emit(a, r)
 
 
+def cmd_spell(a) -> None:
+    from . import spell
+
+    if a.action == "new":
+        sp = spell.new_spell(a.name, a.preset)
+        path = spell.save_spell(sp, Path(a.out) / f"{a.name}.spell.json")
+        r = spell.export_spell(sp, a.out, gif=a.gif)
+        _emit(a, {**r, "spell": path, "presets": sorted(spell.PRESETS)})
+    elif a.action == "render":
+        sp = spell.load_spell(a.name)
+        _emit(a, spell.export_spell(sp, a.out, gif=a.gif, atlas_dir=a.atlas))
+    else:
+        _emit(a, {"ok": True, "presets": {k: [l["kind"] for l in v["layers"]] for k, v in spell.PRESETS.items()}, "kinds": list(__import__("pixelforge.vfx", fromlist=["KINDS"]).KINDS)})
+
+
+def cmd_skin(a) -> None:
+    from . import skin_ops
+
+    ops = json.loads(Path(a.ops).read_text()) if Path(a.ops).exists() else json.loads(a.ops)
+    _emit(a, skin_ops.apply_ops(a.image, ops, out_path=a.out))
+
+
 def cmd_portrait(a) -> None:
     from .portrait import make_portrait
 
@@ -697,6 +720,17 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--no-preview", action="store_true", help="skip the waveform + spectrogram PNG")
     s.add_argument("--play", action="store_true", help="play the (last) cue when done"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_music)
+
+    s = sub.add_parser("spell", help="spell designer: layered effects (fire + burst + embers...) -> strip + json (+ gif, atlas)")
+    s.add_argument("action", choices=["new", "render", "presets"]); s.add_argument("name", nargs="?", default="fireball", help="new: the spell's name; render: a .spell.json")
+    s.add_argument("-o", "--out", default="art/fx"); s.add_argument("--preset", default="fireball", help="fireball | ward | soul_drain | bone_shatter | lightning_strike")
+    s.add_argument("--gif", action="store_true"); s.add_argument("--atlas", help="also write a sprite set into this folder"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_spell)
+
+    s = sub.add_parser("skin", help="edit a cutout / sprite / atlas with ops (recolor, glow, paint, erase, restore, region, smooth): what the skin editor does, headless")
+    s.add_argument("image"); s.add_argument("ops", help="a JSON list of ops, or a path to one (the editor's 'Save ops as JSON')")
+    s.add_argument("-o", "--out", default=None, help="write here instead of in place"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_skin)
 
     s = sub.add_parser("portrait", help="head-and-shoulders portraits from a front view cutout")
     s.add_argument("image"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/portraits")

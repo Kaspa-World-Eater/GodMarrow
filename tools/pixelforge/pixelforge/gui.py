@@ -138,6 +138,8 @@ class Studio:
         m.add_cascade(label="Character", menu=c)
         t = Menu(m, tearoff=0)
         t.add_command(label="Tools window (effects, props, tiles, sounds, music…)", command=self._tools, accelerator="Ctrl+T")
+        t.add_command(label="Spell designer…", command=lambda: __import__("pixelforge.spell_designer", fromlist=["open_spell_designer"]).open_spell_designer(self.root, "fireball", str(self.project.root / "fx") if self.project else "art/fx"))
+        t.add_command(label="Skin editor (any image)…", command=lambda: (lambda p: self._skin_editor(p) if p else None)(filedialog.askopenfilename(title="Image to edit", filetypes=[("PNG", "*.png")])))
         t.add_command(label="Colour editor (any image)…", command=lambda: (lambda p: self._color_editor(p) if p else None)(filedialog.askopenfilename(title="Image to recolour", filetypes=[("PNG", "*.png")])))
         m.add_cascade(label="Tools", menu=t)
         h = Menu(m, tearoff=0)
@@ -568,13 +570,18 @@ class Studio:
                 ttk.Button(row, text=f"Edit {p.stem}", command=lambda p=p: self._edit_cutout(p)).pack(side=LEFT, padx=3)
             row2 = ttk.Frame(self.panel)
             row2.pack(anchor="w", pady=(2, 0))
-            ttk.Label(row2, text="Change colours (eyes, trim, glow):").pack(side=LEFT)
+            ttk.Label(row2, text="Paint on it (recolour, brush, glow, regions):").pack(side=LEFT)
             for p in views:
-                ttk.Button(row2, text=f"Colours {p.stem}", command=lambda p=p: self._color_editor(p)).pack(side=LEFT, padx=3)
+                ttk.Button(row2, text=f"Skin {p.stem}", command=lambda p=p: self._skin_editor(p)).pack(side=LEFT, padx=3)
             ttk.Button(row, text="Open folder", command=lambda: webbrowser.open(str(views_dir))).pack(side=LEFT, padx=(12, 3))
             ttk.Button(row, text="Reload", command=self._show_step).pack(side=LEFT)
             ttk.Label(self.panel, text="Tip: the front view decides the body; make sure nothing of the background is left inside it. "
                       "You can also edit the files in the folder with any paint program, then Reload. After editing, run the next steps again.", style="Dim.TLabel", wraplength=720).pack(anchor="w", pady=4)
+
+    def _skin_editor(self, path) -> None:
+        from .skin_editor import open_skin_editor
+
+        open_skin_editor(self.root, path, on_save=lambda: (self._log(f"Saved skin edits in {Path(path).name}"), self._show_step()))
 
     def _color_editor(self, path) -> None:
         from .color_editor import open_color_editor
@@ -756,7 +763,7 @@ class Studio:
             ttk.Label(self.panel, text="Touch up the finished set", style="Head.TLabel").pack(anchor="w")
             row = ttk.Frame(self.panel)
             row.pack(anchor="w", pady=4)
-            ttk.Button(row, text="Colour editor (every frame at once)", command=lambda: self._color_editor(Path(js).with_suffix(".png"))).pack(side=LEFT)
+            ttk.Button(row, text="Skin editor (every frame at once)", command=lambda: self._skin_editor(Path(js).with_suffix(".png"))).pack(side=LEFT)
             ttk.Button(row, text="Effects editor (attach smoke, glow, embers…)", command=lambda: self._fx_editor(c)).pack(side=LEFT, padx=6)
 
     def _after_export(self, r) -> None:

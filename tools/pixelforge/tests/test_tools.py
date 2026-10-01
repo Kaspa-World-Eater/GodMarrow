@@ -267,3 +267,56 @@ def test_color_editor_keeps_shading_and_fx_editor_saves_attachments(tmp_path):
     canvas[pad:pad + 40, pad:pad + 40] = frame
     out = composite(canvas, (pad - dx, pad - dy), [att], "down", fx_dir, 0)
     assert out[..., 3].sum() > canvas[..., 3].sum(), "the effect is drawn onto the frame"
+
+
+def test_spell_presets_render_and_export(tmp_path):
+    import json
+
+    from pixelforge import spell
+
+    for k in spell.PRESETS:
+        sp = spell.new_spell(k, k)
+        frames = spell.render_spell(sp)
+        assert len(frames) == sp["frames"] and frames[0].shape == (sp["size"][1], sp["size"][0], 4)
+        assert any((f[..., 3] > 0).any() for f in frames), k
+    sp = spell.new_spell("fireball", "fireball")
+    sp["layers"][0]["hidden"] = True
+    r = spell.export_spell(sp, tmp_path, gif=True, atlas_dir=tmp_path / "atlas")
+    meta = json.loads((tmp_path / "fireball.json").read_text())
+    assert meta["frame_width"] == 96 and meta["frames"] == 12 and (tmp_path / "fireball.gif").exists()
+    assert (tmp_path / "fireball.spell.json").exists() and (tmp_path / "atlas" / "fireball.json").exists()
+    assert spell.load_spell(tmp_path / "fireball.spell.json")["layers"][0]["hidden"] is True
+
+
+def test_skin_ops_recolor_glow_region_and_replay(tmp_path):
+    import json
+
+    import numpy as np
+    from PIL import Image
+
+    from pixelforge import skin_ops
+
+    rgba = np.zeros((60, 60, 4), np.uint8)
+    rgba[10:50, 10:50] = (60, 50, 70, 255)
+    rgba[20:23, 20:23] = (200, 80, 220, 255)   # an eye
+    p = tmp_path / "front.png"
+    Image.fromarray(rgba, "RGBA").save(p)
+    Image.fromarray(np.full((60, 60, 4), (120, 120, 120, 255), np.uint8), "RGBA").save(tmp_path / "front_raw.png")
+    ops = [{"op": "region", "name": "eye", "polygon": [[19, 19], [24, 19], [24, 24], [19, 24]]},
+           {"op": "recolor", "region": "eye", "to": "#5ae6d2"},
+           {"op": "glow", "at": [21, 21], "color": "#9ff4ea", "radius": 8, "strength": 0.6},
+           {"op": "paint", "at": [40, 40], "color": "#ff0000", "radius": 2},
+           {"op": "erase", "at": [12, 12], "radius": 1},
+           {"op": "restore", "at": [45, 12], "radius": 1}]
+    r = skin_ops.apply_ops(p, ops)
+    out = np.array(Image.open(p).convert("RGBA"))
+    assert r["regions"] == ["eye"] and (tmp_path / "front.regions.json").exists() and (tmp_path / "front.png.bak").exists()
+    assert out[21, 21, 1] > out[21, 21, 0], "the eye turned teal"
+    assert out[21, 28, :3].astype(int).sum() > rgba[21, 28, :3].astype(int).sum(), "the glow lit the cloth next to the eye"
+    assert tuple(out[40, 40, :3]) == (255, 0, 0) and out[12, 12, 3] == 0 and tuple(out[12, 45, :3]) == (120, 120, 120)
+    assert tuple(out[45, 45, :3]) == (60, 50, 70), "untouched cloth stays"
+    # the regions survive to the next call and ops can be replayed from the file the editor writes
+    (tmp_path / "front.ops.json").write_text(json.dumps([{"op": "recolor", "region": "eye", "to": "#ff8800"}]))
+    r2 = skin_ops.apply_ops(p, json.loads((tmp_path / "front.ops.json").read_text()))
+    out2 = np.array(Image.open(p).convert("RGBA"))
+    assert out2[21, 21, 0] > out2[21, 21, 2], "replayed: the eye is orange now"

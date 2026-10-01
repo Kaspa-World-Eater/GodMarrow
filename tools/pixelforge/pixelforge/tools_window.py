@@ -48,6 +48,12 @@ TOOLS = [
       ("out", "dir", "art/music", None), ("seconds", "float", 120.0, None), ("seed", "text", "", None), ("act", "int", 1, None),
       ("knobs", "text", "", None), ("sheet", "file", "", None), ("format", "choice", "wav", ["wav", "ogg", "both"]), ("play", "check", True, None)],
      "music"),
+    ("Spell designer", "Build a spell from layers of effects (fire + burst + embers, ring + rune + wisp...) with a live preview; export the strip the game plays.",
+     [("start_from", "choice", "fireball", ["fireball", "ward", "soul_drain", "bone_shatter", "lightning_strike"]), ("out", "dir", "art/fx", None)],
+     "spell_designer"),
+    ("Skin editor", "A paint-program toolbar over a sprite, atlas or cutout: pick + recolour, brush, glow, erase, restore, smooth, named regions. Every stroke is an op an AI can replay.",
+     [("image", "file", "", None)],
+     "skin_editor"),
     ("Colour editor", "Click a colour on a sprite, atlas or cutout, widen the range, give it a new colour: shading stays, only the colour changes. Every frame of an atlas at once.",
      [("image", "file", "", None)],
      "color_editor"),
@@ -142,7 +148,7 @@ def run_tool(key: str, v: dict) -> dict:
     raise ValueError(key)
 
 
-GROUPS = [("Art", ["Effects", "Effects editor", "Colour editor", "Prop / tree", "Painted object", "Item icons", "Portrait", "Ground tiles", "UI frame", "Recolour", "Compare", "World prompts"]),
+GROUPS = [("Art", ["Effects", "Spell designer", "Effects editor", "Skin editor", "Colour editor", "Prop / tree", "Painted object", "Item icons", "Portrait", "Ground tiles", "UI frame", "Recolour", "Compare", "World prompts"]),
           ("Audio", ["Sounds", "Music"]),
           ("Game", ["Skill trees", "Godot add-on"])]
 
@@ -227,6 +233,14 @@ class ToolsWindow:
             if isinstance(val, str) and val and k in ("out",) and not Path(val).is_absolute():
                 values[k] = str(self.base / val)
         self._say(f"> {key} {values}")
+        if key == "spell_designer":
+            from .spell_designer import open_spell_designer
+            open_spell_designer(self.win, values["start_from"], values["out"], on_save=lambda r: self._say("exported " + r["png"]))
+            return
+        if key == "skin_editor":
+            from .skin_editor import open_skin_editor
+            open_skin_editor(self.win, values["image"], on_save=lambda: self._say("saved " + values["image"]))
+            return
         if key == "color_editor":   # windows open on the main thread
             from .color_editor import open_color_editor
             open_color_editor(self.win, values["image"], on_save=lambda: self._say("saved " + values["image"]))

@@ -144,6 +144,25 @@ def build_server():
         return music.write_sheet(path)
 
     @mcp.tool()
+    def make_spell(name: str, out_dir: str, preset: str = "fireball", layers_json: str = "", gif: bool = True) -> dict:
+        """A layered spell effect -> strip + json (+ gif). preset: fireball | ward | soul_drain | bone_shatter | lightning_strike.
+        layers_json: optional JSON list of layers [{kind, palette, scale, x, y, rotation, start, speed, opacity, blend, seed}] replacing the preset's."""
+        from . import spell
+        sp = spell.new_spell(name, preset)
+        if layers_json:
+            sp["layers"] = [{**spell.LAYER_DEFAULTS, **lyr} for lyr in json.loads(layers_json)]
+        return spell.export_spell(sp, out_dir, gif=gif)
+
+    @mcp.tool()
+    def edit_skin(image: str, ops_json: str, out: str = "") -> dict:
+        """Edit a cutout / sprite / atlas with ops: [{"op":"recolor","at":[x,y],"to":"#hex","range":0.1,"radius":30},
+        {"op":"glow","at":[x,y],"color":"#hex","radius":10,"strength":0.6}, {"op":"paint","at":[x,y],"color":"#hex","radius":4},
+        {"op":"erase","at":[x,y],"radius":6}, {"op":"restore","at":[x,y],"radius":6}, {"op":"region","name":"eye","polygon":[[x,y],...]},
+        {"op":"recolor","region":"eye","to":"#hex"}, {"op":"smooth","region":"hood","sigma":1}]. Shading is kept."""
+        from . import skin_ops
+        return skin_ops.apply_ops(image, json.loads(ops_json), out_path=out or None)
+
+    @mcp.tool()
     def make_sfx(preset: str, out_dir: str, variations: int = 1, seed: int = 0) -> dict:
         """Synthesised sound effects (preset or 'all') -> WAV."""
         from .sfx import make_sfx as _ms
