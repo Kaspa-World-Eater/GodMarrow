@@ -247,8 +247,7 @@ func use(id: String, at: Vector2, target: Monster) -> bool:
 		Bus.say.emit("Not enough %s." % hero.st.res_name(), 1.0)
 		return false
 	var pc := poise_cost(id)
-	if pc > 0.0 and hero.st.poise < pc * 0.5:
-		return false
+	# poise is stamina, never a lockout (zz_bone_melee_shard_costs:30-40): a swing on empty poise still happens
 	if not _cast(id, at, target):
 		return false
 	hero.st.res -= c
