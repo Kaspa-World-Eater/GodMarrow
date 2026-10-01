@@ -16,7 +16,7 @@ Godmarrow is the user's grimdark isometric pixel-art ARPG: Diablo II's structure
 - **The user's PC** (a Windows machine, reached through the Cowork desktop bridge; the connected folder is the Desktop, on OneDrive):
   - `Desktop\Godmarrow\Godot Project\` the playable copy. `Launch Godmarrow.bat` / the desktop icon (the icon's shortcut was hand-made and may not work: `Desktop\Play Godmarrow.bat` remakes it with Windows' own shortcut maker). `3D Test Scene.bat`. `_backup\` sync parts and logs (`launch.log`, `game.log`).
   - `Desktop\Godmarrow\_archive\` a full backup: `godmarrow_godot.bundle` (all history; `git clone` it), `web_source.tgz`, `android_build.tgz` (**contains the Android signing key: never put it on GitHub**), the session transcript.
-  - `Desktop\Godot\` the Godot 4.7.2 Windows executables. `Desktop\Ossuarch\` the user's 14 Midjourney Ossuarch concepts.
+  - `Desktop\Godot\` the Godot 4.7.2 Windows executables. `Desktop\Workspace\Art\Ossuarch\` the user's 14 Midjourney Ossuarch concepts (copied into the repo at `docs/concepts/ossuarch/`).
 - **Claude project "God marrow":** the wiki (`wiki/00`–`15`), class docs, `claude/godmarrow-errants.md` (the Errant Ways, three archetypes per order), `claude/godmarrow-3d-tool-brief.md`, `claude/session-2026-09-30-transcript.md`. The wiki artifact: https://claude.ai/artifact/1MJBrszsZ1mWGhi2idFXxi. Errants artifact: https://claude.ai/artifact/RFUbPmbnSKshapF4EwbWvt.
 
 ## 3. How to work (the user's standing preferences)
