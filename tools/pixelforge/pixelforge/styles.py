@@ -2,7 +2,7 @@
 
 A :class:`Style` carries the figure height in sprite pixels, the pixel step the game draws at, the palette size and
 whether it is locked across frames, the outline rule, dither, the number of shading bands, a saturation / contrast
-grade, the edge treatment, the effect look (colour bands, glow, haze, frame count, speed), the animation frame counts
+grade, the edge treatment and clean-up, the effect look (colour bands, glow, haze, frame count, speed), the animation frame counts
 and speeds, the frame cap of the game export and the world tile scale. Every step of the pipeline reads its numbers
 from the project's style (or a character's own), so switching the look is one setting, not twenty.
 
@@ -44,6 +44,7 @@ class Style:
     outline: str = "none"             # none | auto (the darkest palette colour) | #rrggbb
     outline_diagonal: bool = False
     edge: str = "crisp"               # soft | crisp | hard (see EDGES)
+    clean: int = 0                    # passes of a 3x3 majority filter on the palette indices: specks join the colour area round them
     # --- effects
     fx_bands: int = 6                 # colour bands of a procedural effect
     fx_glow: str = "auto"             # auto | on | off: the soft halo under fire, wisps and magic
@@ -129,10 +130,10 @@ STYLES: dict[str, Style] = {
     ),
     "snes": _look(
         "snes", "SNES 16-bit",
-        "Chunky 16-colour figures 56 px tall with a hard 1 px dark outline, flat three-band shading and short 8-12 "
-        "frame loops; nothing glows and nothing is soft.",
+        "Chunky 16-colour figures 56 px tall with a hard 1 px dark outline, flat three-band shading in clean colour "
+        "areas and short 8-12 frame loops; nothing glows and nothing is soft.",
         figure_height=56, pixel_step=3, colors=16, palette_lock=True, dither="none", shading_bands=3,
-        saturation=1.15, contrast=1.1, lightness=0.08, outline="auto", edge="soft",
+        saturation=1.15, contrast=1.3, lightness=0.1, outline="auto", edge="soft", clean=1,
         fx_bands=4, fx_glow="off", fx_haze=False, fx_frames=8, fx_fps=10.0,
         anim_frames=10, anim_fps=10.0, clip_frames=12, tile_width=64, tile_height=32, tile_hr=1,
     ),
@@ -141,7 +142,7 @@ STYLES: dict[str, Style] = {
         "Small bright figures about 40 px tall in a 15-colour palette with a hard outline and punchy saturation: "
         "the portable 32-bit look, made to read on a tiny screen.",
         figure_height=40, pixel_step=4, colors=15, palette_lock=True, dither="none", shading_bands=3,
-        saturation=1.3, contrast=1.15, lightness=0.12, outline="auto", edge="soft",
+        saturation=1.3, contrast=1.3, lightness=0.12, outline="auto", edge="soft", clean=1,
         fx_bands=4, fx_glow="off", fx_haze=False, fx_frames=6, fx_fps=8.0,
         anim_frames=6, anim_fps=8.0, clip_frames=8, tile_width=48, tile_height=24, tile_hr=1,
     ),
@@ -213,6 +214,10 @@ def validate(style: Style) -> list[str]:
         bad.append(f"outline {style.outline!r} is not none, auto or #rrggbb")
     if style.edge not in EDGES:
         bad.append(f"edge {style.edge!r} not in {EDGES}")
+    if not (0 <= style.clean <= 4):
+        bad.append(f"clean {style.clean} outside 0..4")
+    if style.clean > 0 and style.colors == 0:
+        bad.append("clean needs a palette")
     if not (2 <= style.fx_bands <= 16):
         bad.append("fx_bands outside 2..16")
     if style.fx_glow not in GLOWS:
@@ -268,6 +273,7 @@ def options_for_style(style: str | Style, **overrides):
         contrast=st.contrast,
         lightness=st.lightness,
         edge=st.edge,
+        clean=st.clean,
     )
     base.update({k: v for k, v in overrides.items() if v is not None or k in ("palette", "outline")})
     return PixelateOptions(**base)
@@ -285,7 +291,7 @@ def describe_style(style: str | Style) -> str:
         f"{'' if st.dither == 'none' else f' ({st.dither_strength:g})'}",
         f"  shading {'as painted' if st.shading_bands <= 0 else f'{st.shading_bands} flat bands'}, "
         f"saturation x{st.saturation:g}, contrast x{st.contrast:g}, lightness {st.lightness:+g}, edge {st.edge}, "
-        f"outline {st.outline}",
+        f"outline {st.outline}{f', clean x{st.clean}' if st.clean else ''}",
         f"  effects {st.fx_bands} bands, glow {st.fx_glow}, haze {'on' if st.fx_haze else 'off'}, "
         f"{st.fx_frames} frames @ {st.fx_fps:g} fps",
         f"  loops {st.anim_frames} frames @ {st.anim_fps:g} fps, game clips up to {st.clip_frames} frames",

@@ -38,6 +38,7 @@ class PixelateOptions:
     contrast: float = 1.0  # lightness contrast about the figure's median
     lightness: float = 0.0  # lightness lift
     edge: str = "crisp"  # soft (cell average) | crisp (median of the inner half) | hard (near the cell centre)
+    clean: int = 0  # passes of the 3x3 majority filter on the palette indices (the small flat-shaded looks use 1)
     grade_ref: tuple | None = None  # (median, low, high) lightness anchors; set once for a whole animation
 
 
@@ -203,6 +204,8 @@ def pixelate(image: Image.Image | str, opts: PixelateOptions | None = None) -> P
         indices = quantize(lab, palette, dither=opts.dither, strength=opts.dither_strength, mask=alpha > 0)
         if opts.despeckle and opts.dither == "none":
             indices = cleanup.remove_orphans(indices, alpha, passes=2 if opts.bands > 0 else 1)
+        if opts.clean > 0 and opts.dither == "none":
+            indices = cleanup.majority_filter(indices, alpha, passes=opts.clean)
         rgba[..., :3] = palette.colors[indices]
         rgba[..., 3] = alpha
 
@@ -229,6 +232,43 @@ def _indices_for(rgba: np.ndarray, palette: Palette) -> np.ndarray:
     return out
 
 
+def _clip_cells(frames: list[Image.Image], opts: PixelateOptions):
+    """The front half of :func:`pixelate_frames`: the grid detected on the first frame, the options fixed to it, and
+    every frame's cells in OKLab (ungraded) with their opaque masks."""
+    notes: list[str] = []
+    first = np.asarray(frames[0].convert("RGB"))
+    grid = resolve_grid(first, opts, notes)
+    detected = opts.scale == "auto" and not (opts.width or opts.height) and grid.confidence >= MIN_CONFIDENCE
+    # Per-frame cropping would misalign frames, so it is never applied here; a detected pixel grid is sampled crisp.
+    fixed = PixelateOptions(
+        **{**opts.__dict__, "scale": grid.scale_x, "width": None, "height": None, "crop": False,
+           "edge": "crisp" if detected else opts.edge}
+    )
+    inner, samples = _sampling(grid, fixed.edge, detected)
+    passes = _bleed_passes(grid)
+    srcs = [np.asarray(f.convert("RGBA")) for f in frames]
+    labs = [downsample(paint_under_edges(a, passes) if (a[..., 3] < 255).any() else a[..., :3], grid, inner=inner, samples=samples)
+            for a in srcs]
+    masks = [_cell_alpha(a[..., 3], grid, *l.shape[:2]) if (a[..., 3] < 255).any() else np.full(l.shape[:2], 255, np.uint8)
+             for a, l in zip(srcs, labs)]
+    return notes, fixed, labs, masks
+
+
+def clip_lightness_reference(clips: list[list[Image.Image]], opts: PixelateOptions) -> tuple[float, float, float]:
+    """One (median, low, high) lightness reference over sample frames of every clip of a character, to pass as
+    ``opts.grade_ref`` to each :func:`pixelate_frames` call: a three-band figure then keeps the same three levels in
+    idle, walk and cast instead of each clip finding its own, which would make the body jump in lightness when the
+    game switches animation."""
+    labs, masks = [], []
+    for frames in clips:
+        if not frames:
+            continue
+        _, _, l, m = _clip_cells(frames, opts)
+        labs += l
+        masks += m
+    return lightness_reference(labs, masks)
+
+
 def pixelate_frames(
     frames: list[Image.Image],
     opts: PixelateOptions | None = None,
@@ -246,24 +286,10 @@ def pixelate_frames(
     opts = opts or PixelateOptions()
     if not frames:
         return []
-    notes: list[str] = []
-    first = np.asarray(frames[0].convert("RGB"))
-    grid = resolve_grid(first, opts, notes)
-    detected = opts.scale == "auto" and not (opts.width or opts.height) and grid.confidence >= MIN_CONFIDENCE
-    # Per-frame cropping would misalign frames, so it is never applied here; a detected pixel grid is sampled crisp.
-    fixed = PixelateOptions(
-        **{**opts.__dict__, "scale": grid.scale_x, "width": None, "height": None, "crop": False,
-           "edge": "crisp" if detected else opts.edge}
-    )
-    inner, samples = _sampling(grid, fixed.edge, detected)
-    passes = _bleed_passes(grid)
-    srcs = [np.asarray(f.convert("RGBA")) for f in frames]
-    labs = [downsample(paint_under_edges(a, passes) if (a[..., 3] < 255).any() else a[..., :3], grid, inner=inner, samples=samples)
-            for a in srcs]
+    notes, fixed, labs, masks = _clip_cells(frames, opts)
     if grading(fixed):
-        # one set of lightness anchors for the whole clip, so bands and contrast never flicker between frames
-        masks = [_cell_alpha(a[..., 3], grid, *l.shape[:2]) if (a[..., 3] < 255).any() else np.full(l.shape[:2], 255, np.uint8)
-                 for a, l in zip(srcs, labs)]
+        # one set of lightness anchors for the whole clip (or the whole character, when the caller measured one with
+        # clip_lightness_reference), so bands and contrast never flicker between frames or jump between clips
         fixed.grade_ref = opts.grade_ref or lightness_reference(labs, masks)
         labs = [grade_lab(l, fixed, fixed.grade_ref) for l in labs]
     if fixed.palette is None and opts.colors > 0:

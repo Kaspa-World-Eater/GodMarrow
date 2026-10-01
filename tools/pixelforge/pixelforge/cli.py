@@ -64,6 +64,7 @@ def _add_pixelate_args(p: argparse.ArgumentParser) -> None:
     g.add_argument("--contrast", type=float, help="lightness contrast, 1 = as painted (default: from --style)")
     g.add_argument("--lightness", type=float, help="lightness lift, 0 = as painted (default: from --style)")
     g.add_argument("--edge", choices=["soft", "crisp", "hard"], help="edge treatment (default: from --style)")
+    g.add_argument("--clean", type=int, help="passes of the 3x3 majority filter, 0 = none (default: from --style)")
     g.add_argument("--remove-bg", action="store_true", help="flood-remove the background from the borders")
     g.add_argument("--bg-tolerance", type=float, default=0.03, help="OKLab distance for --remove-bg")
     g.add_argument("--outline", default="style", help="'style' (the preset's rule, default), 'none', 'auto' (darkest palette colour) or a hex colour")
@@ -87,6 +88,7 @@ def _options(a) -> PixelateOptions:
         contrast=a.contrast,
         lightness=a.lightness,
         edge=a.edge,
+        clean=a.clean,
         remove_background=a.remove_bg,
         bg_tolerance=a.bg_tolerance,
         despeckle=not a.no_despeckle,

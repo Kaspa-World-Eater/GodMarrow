@@ -21,12 +21,14 @@ fixes everything that decides how a painting becomes game art. Pick one; every s
   - a **Use this style** button -> `api.set_style(project, name)`; the card of the project's current style is marked
     (teal border, "current"). With a character selected in the nav, a second small button **Only for <character>** ->
     `api.set_style(project, name, character)`; a character with its own style shows "follows the project" / "own
-    style: X" and a link **Follow the project again** -> `api.set_style(project, "project", character)`.
+    style: X" (`status()["characters"][name]["style"]` and `["own_style"]`) and a link **Follow the project again** ->
+    `api.set_style(project, "project", character)`.
   - after setting, the status line says what to run again: *"Run palette, pixelate and export again for the new look"*
     (the `next` field of the result). Nothing is re-run automatically.
 - **Advanced fold** under the cards (closed by default): every number of the current style, editable, grouped as the
   dataclass is: Figure (figure height, pixel step), Colour (colours, palette lock, dither, dither strength, shading
-  bands, saturation, contrast, lightness), Edges (outline none / auto / hex, diagonal, edge soft / crisp / hard),
+  bands, saturation, contrast, lightness), Edges (outline none / auto / hex, diagonal, edge soft / crisp / hard, clean
+  0-4 passes),
   Effects (bands, glow auto / on / off, haze, frames, fps), Animation (loop frames, loop fps, clip frames), World
   (tile width, tile height, tile hr). Editing a number makes a custom style named `<preset>_custom` stored in
   `project.json` as a dict (`project.custom_styles[name] = fields`) and selected like a preset; `styles.validate()`
@@ -37,7 +39,9 @@ fixes everything that decides how a painting becomes game art. Pick one; every s
   bundled GIFs are missing or a custom style exists (then the custom one gets a card too, using the project's own
   front cutout as the source: `make_demo(out, source=views/front.png, only=[name])`).
 - The old **Settings -> Quality style** combo box becomes a link to this page; `set --style` on the CLI keeps working.
-- The contact sheet `styles_sheet.png` is the picture for the Help page and the README.
+- The contact sheet `styles_sheet.png` is the picture for the Help page and the README. It says "shown x2" under a
+  small look that is zoomed; a card should zoom the same way (`styles.json` carries `zoom` per preset) and never
+  scale a GIF by a fraction.
 
 ## Where the numbers go (so the UI can explain them)
 
@@ -46,7 +50,8 @@ fixes everything that decides how a painting becomes game art. Pick one; every s
 | figure_height | pixelate (stills and renders: the standing height), the game export meta |
 | pixel_step | the game export meta (`pixel_step`), preview zoom |
 | colors, palette_lock, dither, dither_strength | palette step, pixelate |
-| shading_bands, saturation, contrast, lightness, edge, outline | pixelate (the grade runs in OKLab before the palette is drawn) |
+| shading_bands, saturation, contrast, lightness, edge, outline | pixelate (the grade runs in OKLab before the palette is drawn; the render step measures the grade's lightness anchors once per character, so every clip sits on the same bands) |
+| clean | pixelate (passes of the 3x3 majority filter on the palette indices: specks join their area, lines and borders stay) |
 | fx_bands, fx_glow, fx_haze, fx_frames, fx_fps | `vfx --style`, `make_effect(style=)`, the effects editor's defaults |
 | anim_frames, anim_fps | the still path (`animate_still`, `animate --style`) |
 | clip_frames | render `--per-clip` default and the game export's per-clip cap |

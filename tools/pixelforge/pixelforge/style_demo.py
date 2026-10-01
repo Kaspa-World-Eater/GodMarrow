@@ -91,9 +91,10 @@ def contact_sheet(examples: list[dict], path: str | Path) -> Path:
         im = im.resize((im.width * ex["zoom"], im.height * ex["zoom"]), Image.NEAREST)
         lines = [
             (st.title, font, TEAL),
-            (f"{st.figure_height} px tall, {'every colour' if st.colors <= 0 else f'{st.colors} colours'}", small, BONE),
+            (f"{st.figure_height} px tall, {'every colour' if st.colors <= 0 else f'{st.colors} colours'}"
+             + (f", shown x{ex['zoom']}" if ex["zoom"] > 1 else ""), small, BONE),
             (f"outline {st.outline}, {'painted shading' if st.shading_bands <= 0 else f'{st.shading_bands} bands'}", small, BONE),
-            (f"sat x{st.saturation:g}, contrast x{st.contrast:g}, edge {st.edge}", small, BONE),
+            (f"sat x{st.saturation:g}, contrast x{st.contrast:g}, edge {st.edge}" + (f", clean x{st.clean}" if st.clean else ""), small, BONE),
             (f"{st.anim_frames} f @ {st.anim_fps:g} fps, clips to {st.clip_frames}", small, BONE),
             (f"fx {st.fx_bands} bands, glow {st.fx_glow}, haze {'on' if st.fx_haze else 'off'}", small, BONE),
             (f"tile {st.tile_width}x{st.tile_height} @ {st.tile_hr}, step {st.pixel_step}", small, DIM),

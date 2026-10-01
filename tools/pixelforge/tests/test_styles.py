@@ -7,14 +7,15 @@ from PIL import Image
 
 from pixelforge import api, styles
 from pixelforge.color import rgb_to_oklab
-from pixelforge.pixelate import PixelateOptions, pixelate, pixelate_frames
+from pixelforge.cleanup import majority_filter
+from pixelforge.pixelate import PixelateOptions, _clip_cells, clip_lightness_reference, lightness_reference, pixelate, pixelate_frames
 from pixelforge.project import Project
 from pixelforge.styles import FIELDS, LOOKS, STYLES, Style, describe_style, get_style, options_for_style, style_table, validate
 
 REQUIRED = {
     "name", "title", "description", "group", "figure_height", "pixel_step", "colors", "palette_lock", "dither",
     "dither_strength", "shading_bands", "saturation", "contrast", "lightness", "outline", "outline_diagonal", "edge",
-    "fx_bands", "fx_glow", "fx_haze", "fx_frames", "fx_fps", "anim_frames", "anim_fps", "clip_frames",
+    "clean", "fx_bands", "fx_glow", "fx_haze", "fx_frames", "fx_fps", "anim_frames", "anim_fps", "clip_frames",
     "tile_width", "tile_height", "tile_hr",
 }
 
@@ -73,9 +74,10 @@ def test_the_looks_are_what_they_say():
 
 
 def test_validate_catches_bad_numbers_and_get_style_rejects_unknown():
-    bad = Style("x", "x", "x", figure_height=4, colors=999, dither="plaid", outline="red", edge="fuzzy", tile_width=50, tile_height=30)
+    bad = Style("x", "x", "x", figure_height=4, colors=999, dither="plaid", outline="red", edge="fuzzy", tile_width=50, tile_height=30, clean=9)
     problems = validate(bad)
-    assert len(problems) >= 6
+    assert len(problems) >= 7 and any("clean" in b for b in problems)
+    assert any("clean needs a palette" in b for b in validate(Style("y", "y", "y", colors=0, clean=1)))
     with pytest.raises(ValueError):
         get_style("no_such_look")
     assert get_style(STYLES["snes"]) is STYLES["snes"]
@@ -85,9 +87,9 @@ def test_validate_catches_bad_numbers_and_get_style_rejects_unknown():
 def test_options_for_style_carries_every_number_and_overrides_win():
     o = options_for_style("snes")
     assert isinstance(o, PixelateOptions)
-    assert o.max_size == 56 and o.colors == 16 and o.outline == "auto" and o.bands == 3 and o.edge == "soft"
-    assert o.saturation == pytest.approx(1.15) and o.contrast == pytest.approx(1.1)
-    assert options_for_style("gothic_hd").outline is None
+    assert o.max_size == 56 and o.colors == 16 and o.outline == "auto" and o.bands == 3 and o.edge == "soft" and o.clean == 1
+    assert o.saturation == pytest.approx(1.15) and o.contrast == pytest.approx(1.3)
+    assert options_for_style("gothic_hd").outline is None and options_for_style("gothic_hd").clean == 0
     o = options_for_style("snes", outline=None, colors=8, crop=True)
     assert o.outline is None and o.colors == 8 and o.crop
     assert options_for_style("gothic_hd", outline="auto").outline == "auto"
@@ -133,6 +135,68 @@ def test_grade_is_stable_across_frames_and_adds_no_colour_outside_the_palette():
     # one lightness reference for the clip (the anchors do not drift frame to frame)
     heights = [np.asarray(r.image).shape[0] for r in res]
     assert len(set(heights)) == 1
+
+
+def test_majority_filter_joins_specks_to_their_area_and_keeps_lines_and_borders():
+    idx = np.zeros((12, 12), dtype=np.int32)
+    idx[:, 6:] = 1            # two flat areas with a border down the middle
+    idx[3, 3] = 2             # a speck in the left area
+    idx[8, 9] = 0             # a speck of the left colour in the right area
+    idx[5, :] = 3             # a 1 px line across both
+    idx[10, 1:3] = 4          # a pair of specks
+    idx[1:3, 8:10] = 5        # a 2x2 block
+    alpha = np.full((12, 12), 255, np.uint8)
+    out = majority_filter(idx, alpha, passes=1)
+    assert out[3, 3] == 0 and out[8, 9] == 1 and (out[10, 1:3] == 0).all()   # specks and a pair take the area's colour
+    assert (out[5, :] == 3).all() and (out[1:3, 8:10] == 5).all()            # the line and the block survive
+    assert set(np.unique(out[:, :6])) == {0, 3} and set(np.unique(out[:, 6:])) == {1, 3, 5}   # the border is where it was
+    assert set(np.unique(out)) <= set(np.unique(idx))              # no new index
+    # through pixelate: the clean pass moves nothing outside the palette and leaves the size alone
+    a = pixelate(_painting(), options_for_style("snes", crop=True, clean=0))
+    b = pixelate(_painting(), options_for_style("snes", crop=True, clean=1))
+    assert a.image.size == b.image.size
+    pb = np.asarray(b.image)
+    assert {tuple(p) for p in pb[pb[..., 3] > 0][:, :3]} <= {tuple(c) for c in b.palette.colors}
+
+
+def test_one_lightness_reference_for_every_clip_of_a_character(project, monkeypatch):
+    bright = [_painting(seed=k) for k in range(2)]
+    dark = []
+    for f in bright:
+        d = Image.eval(f.convert("RGB"), lambda v: v // 2).convert("RGBA")
+        d.putalpha(f.getchannel("A"))
+        dark.append(d)
+    opts = options_for_style("snes")
+    both = clip_lightness_reference([bright, dark], opts)
+    _, _, lb, mb = _clip_cells(bright, opts)
+    _, _, ld, md = _clip_cells(dark, opts)
+    only_bright, only_dark = lightness_reference(lb, mb), lightness_reference(ld, md)
+    assert only_dark[0] < both[0] < only_bright[0]          # one anchor between the two clips, not each its own
+    # pixelate_renders measures it once and hands the same anchors to every clip
+    api.set_style(project, "snes", "hero")
+    renders = project.sub("hero", "renders")
+    manifest = {"directions": ["S"], "size": 128, "fps": 12, "actions": {"idle": {"frames": 3}, "walk": {"frames": 3}}, "ppu": 60.0, "elevation": 30.0, "z_min": 0.0, "z_max": 1.8}
+    (renders / "manifest.json").write_text(json.dumps(manifest))
+    for action, fig in (("idle", bright[0]), ("walk", dark[0])):
+        out = renders / action / "S"
+        out.mkdir(parents=True, exist_ok=True)
+        for i in range(3):
+            frame = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
+            frame.paste(fig.resize((40, 76), Image.LANCZOS), (44 + i, 26))
+            frame.save(out / f"frame_{i:03d}.png")
+    seen = []
+    real = api.pixelate_frames
+
+    def spy(frames, opts, **kw):
+        seen.append(opts.grade_ref)
+        return real(frames, opts, **kw)
+
+    monkeypatch.setattr(api, "pixelate_frames", spy)
+    r = api.pixelate_renders(project, "hero")
+    assert r["clips"] == {"idle_S": 3, "walk_S": 3}
+    assert len(seen) == 2 and seen[0] is not None and seen[0] == seen[1]
+    s = api.status(project)["characters"]
+    assert s["hero"]["style"] == "snes" and s["hero"]["own_style"] and s["imp"]["style"] == "rendered_arpg" and not s["imp"]["own_style"]
 
 
 def test_saturation_and_contrast_move_the_colours_the_right_way():
@@ -247,6 +311,10 @@ def test_cli_styles_lists_and_sets(tmp_path, capsys):
     main(["styles"])
     out = capsys.readouterr().out
     assert "SNES 16-bit" in out and "Gothic hi-res" in out and "ground tile" in out
+    _painting().save(tmp_path / "src.png")
+    main(["pixelate", str(tmp_path / "src.png"), "-o", str(tmp_path / "clean0.png"), "--style", "snes", "--clean", "0", "--crop"])
+    capsys.readouterr()
+    assert (tmp_path / "clean0.png").exists()
     main(["styles", "--json"])
     data = json.loads(capsys.readouterr().out)
     assert data["looks"] == LOOKS and data["styles"][0]["name"] == "godmarrow"

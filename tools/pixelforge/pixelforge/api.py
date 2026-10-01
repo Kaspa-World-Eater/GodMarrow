@@ -25,7 +25,7 @@ from .animate import PRESETS, animate
 from .checks import check_frames, check_spec, check_views
 from .model_spec import synthesize_top, transpose_image, build_hull_spec, build_spec, write_spec
 from .palette import Palette
-from .pixelate import PixelateOptions, pixelate, pixelate_frames
+from .pixelate import PixelateOptions, clip_lightness_reference, grading, pixelate, pixelate_frames
 from .project import DIRECTIONS_8, SOURCE_KINDS, Character, Project, slugify
 from .rig import estimate_skeleton, write_skeleton
 from .prompts import PROMPT_KINDS, RULES, build_all
@@ -638,22 +638,27 @@ def pixelate_renders(project: Project, name: str, outline: str | None = "style",
     frames_dir = project.sub(c.name, "frames")
     opts = _options_for(project, c, outline=outline)
     opts.scale = scale
+    clips = [(action, d, sorted((renders / action / d).glob("frame_*.png"))) for action in manifest["actions"] for d in manifest["directions"]]
+    clips = [(a, d, src) for a, d, src in clips if src]
+    if grading(opts) and opts.grade_ref is None and clips:
+        # a graded or banded look measures its lightness anchors once for the whole character (the first and middle
+        # frame of every clip), so the bands sit on the same levels in idle, walk and cast
+        sample = [[Image.open(src[0])] + ([Image.open(src[len(src) // 2])] if len(src) > 2 else []) for _, _, src in clips]
+        opts.grade_ref = clip_lightness_reference(sample, opts)
+        if log:
+            log(f"lightness anchors for the whole character: median {opts.grade_ref[0]:.2f}, {opts.grade_ref[1]:.2f}..{opts.grade_ref[2]:.2f}")
     made = {}
-    for action in manifest["actions"]:
-        for d in manifest["directions"]:
-            src = sorted((renders / action / d).glob("frame_*.png"))
-            if not src:
-                continue
-            results = pixelate_frames([Image.open(p) for p in src], opts)
-            out = frames_dir / f"{action}_{d}"
-            out.mkdir(parents=True, exist_ok=True)
-            for old in out.glob("frame_*.png"):
-                old.unlink()
-            for i, r in enumerate(results):
-                r.image.save(out / f"frame_{i:03d}.png")
-            made[f"{action}_{d}"] = len(results)
-            if log:
-                log(f"{action}/{d}: {len(results)} frames -> {results[0].image.width}x{results[0].image.height}")
+    for action, d, src in clips:
+        results = pixelate_frames([Image.open(p) for p in src], opts)
+        out = frames_dir / f"{action}_{d}"
+        out.mkdir(parents=True, exist_ok=True)
+        for old in out.glob("frame_*.png"):
+            old.unlink()
+        for i, r in enumerate(results):
+            r.image.save(out / f"frame_{i:03d}.png")
+        made[f"{action}_{d}"] = len(results)
+        if log:
+            log(f"{action}/{d}: {len(results)} frames -> {results[0].image.width}x{results[0].image.height}")
     if not made:
         raise StepError("renders folder is empty")
     for pass_name in ("normal", "depth"):

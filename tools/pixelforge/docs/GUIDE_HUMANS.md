@@ -164,8 +164,9 @@ and the size of a ground tile. Seven looks ship, each with an animated example o
 - **Godmarrow**: the game's own look, 195 px tall, every colour kept, the dark edge.
 - **Gothic hi-res**: large finely drawn figures (120 px), dark gothic palette, soft shading, no outline.
 - **Rendered ARPG**: 76 px figures that look rendered, cool dark palette of 28 colours, no outline.
-- **SNES 16-bit**: chunky 56 px figures, 16 colours, hard outline, three flat shading bands, short loops, no glow.
-- **Handheld 32-bit**: small bright 40 px figures, 15 colours, hard outline.
+- **SNES 16-bit**: chunky 56 px figures, 16 colours, hard outline, three flat shading bands in clean colour areas
+  (specks are tidied into the area round them), short loops, no glow.
+- **Handheld 32-bit**: small bright 40 px figures, 15 colours, hard outline, the same clean areas.
 - **Modern indie pixel**: 80 px, saturated accents, four shading bands, smooth twelve-frame loops.
 - **Painterly hi-bit**: 144 px, 96 colours, almost the painting.
 
