@@ -276,14 +276,49 @@ flat lay of a pilgrim's gear: a hooded robe, a mail shirt, iron gloves, curled-t
 ```
 Save as `armor_1.png`. Then: `pixelforge icons armor_1.png --names "sword:1x3,ring,..."`
 
-## 40. hollow_mystic  (Portrait)
+## 40. lantern_mystic  (Object sheet)
+
+```
+object turnaround reference sheet of an ornate gold hand lantern with a small cyan flame behind glass, a short chain handle, the Hollow Mystic's lantern, three views side by side: front view, side view, back view, same object in every view, resting on the ground, full object top to bottom, orthographic, flat even lighting, no cast shadows, plain solid white background, detailed dark fantasy digital painting in one consistent style, muted desaturated palette of deep teal-blue, bone white, cold iron grey and near-black, painterly gritty texture with visible brushwork, weathered and worn surfaces, grim and quiet, no bright colors, no neon, no glow --ar 3:2 --style raw --sref [HERO SHEET IMAGE URL] --sw 60 --no text, labels, watermark, frame, border, perspective, scenery, people, characters, animals, sky
+```
+Save as `lantern_mystic.png`. Then: `pixelforge object lantern_mystic.png lantern_mystic --height <metres>`
+
+## 41. lantern_ossuarch  (Object sheet)
+
+```
+object turnaround reference sheet of a hand lamp of bone and grey iron burning marrow-tallow with a warm amber flame, a bone handle, dust in its joints, three views side by side: front view, side view, back view, same object in every view, resting on the ground, full object top to bottom, orthographic, flat even lighting, no cast shadows, plain solid white background, detailed dark fantasy digital painting in one consistent style, muted desaturated palette of deep teal-blue, bone white, cold iron grey and near-black, painterly gritty texture with visible brushwork, weathered and worn surfaces, grim and quiet, no bright colors, no neon, no glow --ar 3:2 --style raw --sref [HERO SHEET IMAGE URL] --sw 60 --no text, labels, watermark, frame, border, perspective, scenery, people, characters, animals, sky
+```
+Save as `lantern_ossuarch.png`. Then: `pixelforge object lantern_ossuarch.png lantern_ossuarch --height <metres>`
+
+## 42. lantern_keeper  (Object sheet)
+
+```
+object turnaround reference sheet of a folded paper hand lantern with a charm strip hanging from it, a faint violet haze inside, a thin wooden handle, three views side by side: front view, side view, back view, same object in every view, resting on the ground, full object top to bottom, orthographic, flat even lighting, no cast shadows, plain solid white background, detailed dark fantasy digital painting in one consistent style, muted desaturated palette of deep teal-blue, bone white, cold iron grey and near-black, painterly gritty texture with visible brushwork, weathered and worn surfaces, grim and quiet, no bright colors, no neon, no glow --ar 3:2 --style raw --sref [HERO SHEET IMAGE URL] --sw 60 --no text, labels, watermark, frame, border, perspective, scenery, people, characters, animals, sky
+```
+Save as `lantern_keeper.png`. Then: `pixelforge object lantern_keeper.png lantern_keeper --height <metres>`
+
+## 43. lantern_hand  (Object sheet)
+
+```
+object turnaround reference sheet of a plain clay bowl lamp with a wick, amber flame, no ornament, carried by a wandering ascetic, three views side by side: front view, side view, back view, same object in every view, resting on the ground, full object top to bottom, orthographic, flat even lighting, no cast shadows, plain solid white background, detailed dark fantasy digital painting in one consistent style, muted desaturated palette of deep teal-blue, bone white, cold iron grey and near-black, painterly gritty texture with visible brushwork, weathered and worn surfaces, grim and quiet, no bright colors, no neon, no glow --ar 3:2 --style raw --sref [HERO SHEET IMAGE URL] --sw 60 --no text, labels, watermark, frame, border, perspective, scenery, people, characters, animals, sky
+```
+Save as `lantern_hand.png`. Then: `pixelforge object lantern_hand.png lantern_hand --height <metres>`
+
+## 44. lantern_penitent  (Object sheet)
+
+```
+object turnaround reference sheet of a dark iron censer lantern on a short chain, pierced with slits, a dim red-brown ember inside, unlit look, three views side by side: front view, side view, back view, same object in every view, resting on the ground, full object top to bottom, orthographic, flat even lighting, no cast shadows, plain solid white background, detailed dark fantasy digital painting in one consistent style, muted desaturated palette of deep teal-blue, bone white, cold iron grey and near-black, painterly gritty texture with visible brushwork, weathered and worn surfaces, grim and quiet, no bright colors, no neon, no glow --ar 3:2 --style raw --sref [HERO SHEET IMAGE URL] --sw 60 --no text, labels, watermark, frame, border, perspective, scenery, people, characters, animals, sky
+```
+Save as `lantern_penitent.png`. Then: `pixelforge object lantern_penitent.png lantern_penitent --height <metres>`
+
+## 45. hollow_mystic  (Portrait)
 
 ```
 head and shoulders portrait of a gaunt hooded wanderer with a faceless black void under a teal-blue tattered hood, facing the viewer, orthographic, flat even lighting, no cast shadows, plain solid white background, detailed dark fantasy digital painting in one consistent style, muted desaturated palette of deep teal-blue, bone white, cold iron grey and near-black, painterly gritty texture with visible brushwork, weathered and worn surfaces, grim and quiet, no bright colors, no neon, no glow --ar 1:1 --style raw --sref [HERO SHEET IMAGE URL] --sw 60 --no text, labels, watermark, frame, border, perspective, scenery, animals, sky
 ```
 Save as `hollow_mystic.png`. Then: `pixelforge portrait hollow_mystic.png hollow_mystic`
 
-## 41. ossuarch  (Portrait)
+## 46. ossuarch  (Portrait)
 
 ```
 head and shoulders portrait of a tall grim man in bone plate with a pale shaven head and iron-grey eyes, facing the viewer, orthographic, flat even lighting, no cast shadows, plain solid white background, detailed dark fantasy digital painting in one consistent style, muted desaturated palette of deep teal-blue, bone white, cold iron grey and near-black, painterly gritty texture with visible brushwork, weathered and worn surfaces, grim and quiet, no bright colors, no neon, no glow --ar 1:1 --style raw --sref [HERO SHEET IMAGE URL] --sw 60 --no text, labels, watermark, frame, border, perspective, scenery, animals, sky

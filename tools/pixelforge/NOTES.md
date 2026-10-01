@@ -36,6 +36,8 @@ server. Full operating manual for an AI: `docs/GUIDE_AI.md`. Human guide:
 - **Props and ground are rendered 3D, never painted flat (2026-10-01, Derek: "Diablo II Resurrected, not clip art").**
   `prop3d` / `tiles3d` / `gen_tree.py` + `grade.py`; CC0 kits fetched by the game's `tools/make_props3d.py`.
   The painted stand-ins (`pf_paint.py`, `make_buildings.py`) are kept only as a last resort.
+- **The carve is form-fitted (Derek-approved on the Hollow Mystic, 2026-10-01):** `depth_scale` 0.8, superellipse
+  `fit` 2.6, one-voxel opening, 10 smoothing passes. A side view is the cloak's widest sweep, not the body.
 - **Humanoid first, then fit to the art (2026-10-01, Derek's suggestion).** The
   library mannequin (already skinned to the 46-clip armature) is fused, posed to
   the sheet's A-pose, shrink-wrapped onto the carved hull and painted in that
