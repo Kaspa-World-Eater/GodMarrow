@@ -48,7 +48,13 @@ WORLD_KINDS: list[WorldKind] = [
               "Front and side. Bare branches must be bare; keep the trunk upright.",
               "turnaround reference sheet of {description}, two views side by side: front view, side view, same tree in every view, "
               "whole tree from crown to roots, trunk upright, " + LIGHT_FLAT + ", " + STYLE + " --ar 3:2 --style raw {sref} " + NEG,
-              "pixelforge object sheet.png <name> --height <metres> --views 2"),
+              "pixelforge object sheet.png <name> --height <metres> --views 2 --canopy [--top plan.png]"),
+    WorldKind("topdown", "Plan sheet: top view + underside, for any object, building or tree (optional second image)",
+              "The camera looks down on everything at 30 degrees, so roofs, crowns, brims and table tops matter. Use with the main sheet: "
+              "pixelforge object sheet.png <name> --top plan.png",
+              "reference sheet of {description}, two views side by side: top-down plan view seen directly from above, and bottom-up view "
+              "seen directly from below, same object in both views, orthographic, " + LIGHT_FLAT + ", " + STYLE + " --ar 2:1 --style raw {sref} " + NEG,
+              "pixelforge object sheet.png <name> --height <metres> --top plan.png [--canopy]"),
     WorldKind("ground", "Ground texture (grass, mud, ash, stone flags, bone field, shallow water)",
               "Seamless, top-down. The Forge cuts the iso diamonds and the edges between two materials.",
               "seamless tileable top-down texture of {description}, flat even lighting, no shadows, no objects, fills the whole frame edge to edge, "

@@ -143,7 +143,7 @@ def test_prompts_use_description_everywhere():
     for k, text in build_all(d, "http://x/sheet.png").items():
         assert d in text
     assert "--cref http://x/sheet.png" in build_prompt("front", d, "http://x/sheet.png")
-    assert {k.key for k in PROMPT_KINDS} == {"sheet", "sheet4", "front", "back", "sprite", "item"}
+    assert {k.key for k in PROMPT_KINDS} == {"sheet", "sheet4", "sheet_top", "front", "back", "sprite", "item"}
 
 
 def test_split_sheet_finds_three_views():
@@ -210,3 +210,47 @@ def test_hull_culls_slivers_and_builds_a_hat_cone():
     assert cone["radius"] > 20 and cone["z_base"] > cone["z_apex"]
     assert not vox[cone["rows"]].any(), "the brim rows leave the voxels and live in the cone part"
     assert vox[20:60].any(), "the torso stays"
+
+
+def test_hull_top_view_carves_the_footprint_and_canopy_makes_cards():
+    import numpy as np
+    from PIL import Image
+
+    from pixelforge.model_spec import build_hull_spec
+
+    def view(w, h, paint):
+        a = np.zeros((h, w), np.uint8)
+        paint(a)
+        rgba = np.zeros((h, w, 4), np.uint8)
+        rgba[..., :3] = 90
+        rgba[..., 3] = a * 255
+        return Image.fromarray(rgba)
+
+    # a tree: a round crown over a thin trunk; the plan view is a crescent (the crown is lopsided), drawn turned
+    def front(a):
+        yy, xx = np.mgrid[0:96, 0:64]
+        a[((yy - 30) ** 2 + (xx - 32) ** 2) < 26 ** 2] = 1
+        a[56:96, 29:35] = 1
+
+    def side(a):
+        yy, xx = np.mgrid[0:96, 0:64]
+        a[((yy - 30) ** 2 + (xx - 32) ** 2) < 26 ** 2] = 1
+        a[56:96, 29:35] = 1
+
+    def top(a):   # a disc with a bite out of one side (which side is for the carve to find)
+        yy, xx = np.mgrid[0:64, 0:64]
+        a[((yy - 32) ** 2 + (xx - 32) ** 2) < 26 ** 2] = 1
+        a[((yy - 32) ** 2 + (xx - 58) ** 2) < 18 ** 2] = 0
+
+    plain = build_hull_spec(view(64, 96, front), view(64, 96, side))
+    planned = build_hull_spec(view(64, 96, front), view(64, 96, side), top=view(64, 64, top))
+    count = lambda sp: sum(r.count("1") for l in sp["voxels"] for r in l)
+    assert count(planned) < 0.96 * count(plain), "the plan view must carve the bite out of the crown"
+    assert "top" in planned["orient"] and planned["orient"]["top"]["iou"] > 0.6
+
+    tree = build_hull_spec(view(64, 96, front), view(64, 96, side), top=view(64, 64, top), canopy=True)
+    kinds = [(p["kind"], p.get("axis")) for p in tree["parts"]]
+    assert ("card", "y") in kinds and ("card", "x") in kinds and ("card", "z") in kinds
+    vox = np.array([[[c == "1" for c in row] for row in layer] for layer in tree["voxels"]], bool)
+    assert vox[80:].any(), "the trunk stays solid"
+    assert not vox[10:40].any(), "the crown is cards, not voxels"

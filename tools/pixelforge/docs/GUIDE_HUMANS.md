@@ -19,7 +19,8 @@ button (380 MB, no installer). If you already have Blender, the app finds it.
 1. **New project** → pick an empty folder (one project per game).
 2. **+ Add character** → name it, write one sentence about it.
 3. **Step 1** → click **Copy A: sheet** → paste into Midjourney. You get front, side and back in one picture.
-   Upscale it and save the PNG. (Copy **A2** for a four-view sheet: better 3D. Copy **C** for a single pixel-style
+   Upscale it and save the PNG. (Copy **A2** for a four-view sheet: better 3D. Copy **A3** for a plan sheet, top view and underside,
+   when the character has a wide hat or shoulders: the camera looks down on everyone, and this is the only view that paints the top. Copy **C** for a single pixel-style
    picture: better colours.)
 4. **Step 2** → choose that PNG as the character sheet (and the C picture if you made one).
 5. Click **▶ Run all automatic steps** and wait. The log at the bottom shows what is happening. Filming from 8

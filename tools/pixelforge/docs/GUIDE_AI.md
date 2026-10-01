@@ -74,7 +74,7 @@ pixelforge project set [--style S] [--blender PATH] [--directions 8] [--render-s
 pixelforge project add <character> --describe "<one sentence>"
 pixelforge project describe <character> "<one sentence>"
 pixelforge project prompts <character> [--reference <sheet image url>] --json
-pixelforge project import <character> sheet|front|back|side|style <file>
+pixelforge project import <character> sheet|front|back|side|quarter|topbottom|top|bottom|style <file>   # topbottom = plan view + underside in one image
 
 pixelforge project run <character> split
 pixelforge project run <character> palette
@@ -135,7 +135,7 @@ blender -b --python pixelforge/blender/gen_tree.py -- --out dead.glb --kind dead
 ```
 pixelforge prompt --world object|building|tree|ground|effect|ui|icons|portrait --describe "..." --sref <hero sheet url>   # style-locked world prompts
 pixelforge artlist -o docs/ART_ORDER.md --sref <hero sheet url>                   # the Act I art order with every prompt
-pixelforge object <sheet.png> <name> -o art/objects --height 1.2 [--views 3] [--game-objects objects.json]   # painted sheet -> carved, painted, filmed, pixelated prop (the hero way)
+pixelforge object <sheet.png> <name> -o art/objects --height 1.2 [--views 3] [--top plan.png] [--canopy] [--game-objects objects.json]   # painted sheet -> carved, painted, filmed, pixelated prop (the hero way); --top carves the footprint and paints the top; --canopy for trees
 pixelforge hero <sheet.png> <name> --describe "..." --project ./forge --to-game <game>/art/sprites           # a hero sheet -> the game, one command
 ```
 
@@ -174,6 +174,8 @@ behind `tools/skill_trees.py` — it keeps `tools/skill_tree_edits.json`, which 
 
 - Project style `godmarrow` (`pixelforge project set --style godmarrow`): ~195 px standing height, **every colour kept** (Derek rejected palette reduction), hard edges. Use it for every game character.
 - Sheet: prefer prompt **A2** (four views: front, three-quarter, side, back). The quarter view carves the diagonals and paints them; `split` names 4 figures `front quarter side back`.
+- Plan views: prompt **A3** (world kind `topdown` for objects) gives a second image, top view + underside side by side; import it as `topbottom`. The carve finds its orientation (`spec["orient"]`, IoU against the hull), cuts the footprint with it (hat brims, shoulders, crowns, roofs) and paints upward faces from it. Without it the top of a hat is painted from the front view, which is why wide hats looked flat-topped.
+- Carve rules (model_spec.build_hull_spec): a thin side-view run only pairs with a thin front run (no plates across the body); islands under 3% of the body are culled; the front view's lost thin parts return as cards at mid-depth; a wide thin band at the top is a hat brim -> a real cone part built after smoothing; `canopy=True` (object --canopy) turns a tree's crown into crossed painted cards (front, side, and top when a plan view is given) over a solid trunk. `hull_preview(spec, png)` draws front/side/quarter/top of the voxels for a quick check without Blender.
 - Render with `--passes color,normal,depth` when the character is final (the lantern lights the sprite cards with those maps); `export-game` then writes `<kind>_normal.*` and `<kind>_depth.*` next to the colour set.
 - `export-game` writes the game's own atlas (`idx` keyed `anim/view/i`, foot anchors, 8 views `down front side back up front_l side_l back_l`, anim set idle/walk/atk/atk2/cast 8, hit 6, death 8, dodge 8). Copy the files into the game's `art/sprites/` and look-test with `--skin=<kind>`.
 - Game rules that touch art: no red light; glows only on magic, lanterns and wisps (never on plain attacks); no animals or animal motifs; the Ossuarch is bone and iron, never gold; realistic proportions, worn and tattered, one bold saturated mass per figure. Full list: the game's `docs/wiki/01-rules-and-decisions.md`.

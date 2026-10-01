@@ -346,7 +346,7 @@ class Studio:
         btns = ttk.Frame(self.panel)
         btns.pack(fill=X)
         ttk.Button(btns, text="Update prompts", command=regen).pack(side=LEFT)
-        for kind, label in (("sheet", "Copy A: sheet"), ("sheet4", "Copy A2: 4-view sheet"), ("front", "Copy B1: front"), ("back", "Copy B2: back"), ("sprite", "Copy C: sprite"), ("item", "Copy D: item")):
+        for kind, label in (("sheet", "Copy A: sheet"), ("sheet4", "Copy A2: 4-view sheet"), ("sheet_top", "Copy A3: plan sheet"), ("front", "Copy B1: front"), ("back", "Copy B2: back"), ("sprite", "Copy C: sprite"), ("item", "Copy D: item")):
             ttk.Button(btns, text=label, command=lambda k=kind: copy(k)).pack(side=LEFT, padx=2)
         regen()
 
@@ -356,7 +356,7 @@ class Studio:
                           "If you also made a single pixel-style picture (prompt C), add it under 'Pixel-style image'. It helps the colours.",
                           "The single front / back / side pictures are optional extras.",
                           "Then click the next step on the left, or '▶ Run all automatic steps'."])
-        rows = [("sheet", "A / A2. Character sheet (front / [three-quarter] / side / back)"), ("front", "B1. Front view (optional)"), ("back", "B2. Back view (optional)"), ("side", "Side view (optional)"), ("quarter", "Three-quarter view (optional)"), ("style", "C. Pixel-style image (palette / quick path)")]
+        rows = [("sheet", "A / A2. Character sheet (front / [three-quarter] / side / back)"), ("front", "B1. Front view (optional)"), ("back", "B2. Back view (optional)"), ("side", "Side view (optional)"), ("quarter", "Three-quarter view (optional)"), ("topbottom", "A3. Plan sheet: top view + underside (optional; hats, shoulders, crowns)"), ("style", "C. Pixel-style image (palette / quick path)")]
         for kind, label in rows:
             f = ttk.Frame(self.panel)
             f.pack(fill=X, pady=3)

@@ -14,6 +14,7 @@ from .animate import PRESETS, animate, parse_effect
 from .palette import Palette
 from .pixelate import PixelateOptions, pixelate, pixelate_frames
 from .quantize import DITHER_MODES
+from .project import SOURCE_KINDS
 from .prompts import PROMPT_KINDS, RULES, build_all, build_prompt
 from .spritesheet import pack, save_gif, slice_sheet
 from .styles import DEFAULT_STYLE, STYLES, get_style
@@ -345,7 +346,7 @@ def cmd_object(a) -> None:
     from .object3d import make_object
 
     _emit(a, make_object(a.sheet, a.name, a.out, height=a.height, views=a.views, tolerance=a.tolerance, yaw=a.yaw, ppu=a.ppu, strength=a.strength,
-                         game_objects=a.game_objects, hr=a.hr, log=print))
+                         game_objects=a.game_objects, hr=a.hr, top=a.top, canopy=a.canopy, log=print))
 
 
 def cmd_artlist(a) -> None:
@@ -585,7 +586,7 @@ def build_parser() -> argparse.ArgumentParser:
     x = ps.add_parser("add", help="add a character"); x.add_argument("character"); x.add_argument("--describe")
     x = ps.add_parser("describe", help="set the description"); x.add_argument("character"); x.add_argument("describe")
     x = ps.add_parser("prompts", help="Midjourney prompts for the character"); x.add_argument("character"); x.add_argument("--reference", default="[SHEET IMAGE URL]")
-    x = ps.add_parser("import", help="import an image"); x.add_argument("character"); x.add_argument("kind", choices=["sheet", "front", "back", "side", "quarter", "style"]); x.add_argument("file")
+    x = ps.add_parser("import", help="import an image"); x.add_argument("character"); x.add_argument("kind", choices=list(SOURCE_KINDS)); x.add_argument("file")
     x = ps.add_parser("run", help="run one step"); x.add_argument("character"); x.add_argument("step", choices=["split", "palette", "model", "rig", "render", "pixelate", "export"])
     x.add_argument("--frame-step", type=int, default=2); x.add_argument("--elevation", type=float, default=30.0); x.add_argument("--passes", default=None, help="color,normal,depth")
     x = ps.add_parser("export-game", help="export in Godmarrow's art/sprites format (+ normal/depth sets)"); x.add_argument("character")
@@ -624,7 +625,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=cmd_hero)
 
     s = sub.add_parser("object", help="a painted object/building/tree sheet -> carved, painted, filmed, pixelated prop (the hero way)")
-    s.add_argument("sheet"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/objects")
+    s.add_argument("sheet"); s.add_argument("--top", help="second sheet: plan view + underside side by side (carves the footprint, paints the top)"); s.add_argument("--canopy", action="store_true", help="a tree: the crown becomes crossed painted cards, not a carved blob"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/objects")
     s.add_argument("--height", type=float, default=1.0, help="metres"); s.add_argument("--views", type=int, choices=[2, 3, 4], help="figures on the sheet (default: detect)")
     s.add_argument("--tolerance", type=float, default=0.08); s.add_argument("--yaw", type=float, default=45.0); s.add_argument("--ppu", type=float, default=108.0)
     s.add_argument("--strength", type=float, default=0.35, help="grading strength (the painting already has the look)")

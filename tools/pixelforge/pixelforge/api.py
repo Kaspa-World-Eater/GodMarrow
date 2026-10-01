@@ -22,7 +22,7 @@ from PIL import Image
 from . import cleanup
 from . import godot as godot_export
 from .animate import PRESETS, animate
-from .model_spec import build_hull_spec, build_spec, write_spec
+from .model_spec import transpose_image, build_hull_spec, build_spec, write_spec
 from .palette import Palette
 from .pixelate import PixelateOptions, pixelate, pixelate_frames
 from .project import DIRECTIONS_8, SOURCE_KINDS, Character, Project, slugify
@@ -154,8 +154,19 @@ def split(project: Project, name: str, tolerance: float = 0.08, expected_views: 
             made[v.name] = str(out)
             # the raw crop, for the manual cutout editor's Restore brush
             sheet_im.crop(v.box).resize(v.image.size, Image.LANCZOS).save(views_dir / f"{v.name}_raw.png")
+    plan = _source(project, c, "topbottom")   # the optional second sheet: plan view and underside, side by side
+    if plan is not None:
+        plan_im = Image.open(plan).convert("RGB")
+        pv = split_sheet(plan_im, names=["top", "bottom"], tolerance=tolerance, expected=2)
+        for v in pv[:2]:
+            rgba_v = cleanup.remove_background_pockets(np.asarray(v.image.convert("RGBA")))
+            rgba_v[..., 3] = cleanup.remove_islands(rgba_v[..., 3], min_fraction=0.0015)
+            rgba_v = cleanup.unmix_background(rgba_v, (255, 255, 255))
+            out = views_dir / f"{v.name}.png"
+            Image.fromarray(rgba_v, "RGBA").save(out)
+            made[v.name] = str(out)
     # single views override the sheet's crops when supplied (they are higher-res)
-    for kind in ("front", "back", "side", "quarter"):
+    for kind in ("front", "back", "side", "quarter", "top", "bottom"):
         single = _source(project, c, kind)
         if single is not None:
             src = Image.open(single).convert("RGB")
@@ -351,16 +362,19 @@ def run_blender(project: Project, script: str, args: list[str], blend: str | Non
     return ok[-1]
 
 
-def model_textures(project: Project, c: Character) -> dict[str, Path]:
+def model_textures(project: Project, c: Character, orient: dict | None = None) -> dict[str, Path]:
     """Edge-padded copies of the view cutouts, for use as 3D textures."""
     views = project.sub(c.name, "views")
     out = {}
-    for kind in ("front", "back", "side", "quarter"):
+    orient = orient or {}
+    for kind in ("front", "back", "side", "quarter", "top", "bottom"):
         src = views / f"{kind}.png"
         if src.exists():
             tex = project.sub(c.name, "model") / f"tex_{kind}.png"
-            if not tex.exists() or tex.stat().st_mtime < src.stat().st_mtime:
-                rgba = cleanup.bleed_edges(np.asarray(Image.open(src).convert("RGBA")))
+            k = int(orient.get(kind, {}).get("transpose", 0))
+            if not tex.exists() or tex.stat().st_mtime < src.stat().st_mtime or k:
+                im = transpose_image(Image.open(src).convert("RGBA"), k)   # the plan views turned the way the carve matched them
+                rgba = cleanup.bleed_edges(np.asarray(im))
                 Image.fromarray(rgba, "RGBA").save(tex)
             out[kind] = tex
     return out
@@ -378,9 +392,11 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
     quarter = views / "quarter.png"
     if side.exists():
         # carve a proper 3D shape from the front + side (+ back, + three-quarter) silhouettes
+        top, bottom = views / "top.png", views / "bottom.png"
         spec = build_hull_spec(Image.open(front), Image.open(side), Image.open(back) if back.exists() else None,
                                Image.open(quarter) if quarter.exists() else None, columns=columns,
-                               depth_scale=float(c.settings.get("depth_scale", 0.8)), fit=float(c.settings.get("fit", 2.6)))
+                               depth_scale=float(c.settings.get("depth_scale", 0.8)), fit=float(c.settings.get("fit", 2.6)),
+                               top=Image.open(top) if top.exists() else None, bottom=Image.open(bottom) if bottom.exists() else None)
     else:
         spec = build_spec(Image.open(front), None, columns=columns, thickness=thickness)
         spec["thickness"] = float(min(spec["thickness"], 0.3))
@@ -388,9 +404,9 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
     spec_path = write_spec(spec, model_dir / f"{c.name}_spec.json")
     blend = model_dir / f"{c.name}.blend"
     fbx = model_dir / f"{c.name}.fbx"
-    tex = model_textures(project, c)
+    tex = model_textures(project, c, spec.get("orient"))
     args = ["--spec", spec_path, "--front", tex["front"], "--height", height, "--name", c.name, "--out", blend, "--fbx", fbx]
-    for kind in ("back", "side", "quarter"):
+    for kind in ("back", "side", "quarter", "top", "bottom"):
         if kind in tex:
             args += [f"--{kind}", tex[kind]]
     shade = c.settings.get("shade", 0.0)

@@ -58,6 +58,18 @@ PROMPT_KINDS: list[PromptKind] = [
         "scenery, extra characters, cropping",
     ),
     PromptKind(
+        "sheet_top",
+        "A3. Plan sheet: top view + underside (optional; hats, wide shoulders, anything the camera looks down on)",
+        "A second image: the same character seen straight from above and straight from below, side by side. "
+        "The Forge carves the footprint from it and paints the top of the hat and the shoulders, which the "
+        "camera sees in every direction. Import it as 'topbottom'.",
+        "reference sheet of {description}, two views side by side: top-down view seen directly from above, "
+        "and bottom-up view seen directly from below, same character in both views, standing in A-pose, "
+        "orthographic plan views, flat even lighting, no cast shadows, plain solid white background, "
+        "detailed dark fantasy digital painting, muted desaturated colors, gritty painterly texture "
+        "--ar 2:1 --style raw --no text, labels, perspective, scenery, extra characters, cropping",
+    ),
+    PromptKind(
         "front",
         "B1. Front view, high-res (optional, nicer texture)",
         "Uses the sheet as a character reference. On Midjourney V7 replace --cref/--cw "

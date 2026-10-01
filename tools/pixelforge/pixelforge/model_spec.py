@@ -253,12 +253,62 @@ def _cull_slivers(vox: np.ndarray, keep_fraction: float = 0.03) -> np.ndarray:
     return keep[lab]
 
 
+# PIL's Image.transpose methods, in the order _dihedral() numbers them
+DIHEDRAL = [None, Image.FLIP_LEFT_RIGHT, Image.FLIP_TOP_BOTTOM, Image.ROTATE_180, Image.ROTATE_90, Image.ROTATE_270, Image.TRANSPOSE, Image.TRANSVERSE]
+
+
+def _dihedral(a: np.ndarray, k: int) -> np.ndarray:
+    """The 8 flips/rotations of a 2D array, matching DIHEDRAL (PIL's transpose) index for index."""
+    return [lambda a: a, np.fliplr, np.flipud, lambda a: np.rot90(a, 2), lambda a: np.rot90(a, 1), lambda a: np.rot90(a, 3),
+            lambda a: a.T, lambda a: np.rot90(a.T, 2)][k](a)
+
+
+def transpose_image(img: Image.Image, k: int) -> Image.Image:
+    return img if not k else img.transpose(DIHEDRAL[k])
+
+
+def _canopy_cards(vox: np.ndarray, F: np.ndarray, S: np.ndarray, T: np.ndarray | None) -> list[dict]:
+    """A tree: the trunk stays a carved solid; the crown becomes crossed painted cards (front plane, side plane and,
+    with a top view, a horizontal plane), the way game trees are built, so leaves keep their painted lace instead of
+    carving into a solid blob. The crown rows are the ones wider than 1.8x the trunk (the narrow rows at the base)."""
+    rows, depth_cols, columns = vox.shape
+    width = F.sum(axis=1)
+    filled = np.nonzero(width)[0]
+    if len(filled) == 0:
+        return []
+    base = filled[-1]
+    trunk_w = max(float(np.median(width[max(filled[0], base - rows // 6):base + 1])), 1.0)
+    crown = [z for z in filled if width[z] > 1.8 * trunk_w]
+    if len(crown) < rows // 10:
+        return []
+    z0, z1 = min(crown), max(crown) + 1
+    body = [np.nonzero(vox[z].any(axis=1))[0] for z in range(z0, z1) if vox[z].any()]
+    cy = int(round(float(np.mean([b.mean() for b in body])))) if body else depth_cols // 2
+    xs = np.nonzero(F[z0:z1].any(axis=0))[0]
+    cx = int(round((xs.min() + xs.max()) / 2)) if len(xs) else columns // 2
+    parts = [{"kind": "card", "axis": "y", "at": cy, "z0": int(z0), "z1": int(z1), "mask": ["".join("1" if v else "0" for v in F[z]) for z in range(z0, z1)]},
+             {"kind": "card", "axis": "x", "at": cx, "z0": int(z0), "z1": int(z1), "mask": ["".join("1" if v else "0" for v in S[z]) for z in range(z0, z1)]}]
+    if T is not None:
+        zm = (z0 + z1) // 2
+        parts.append({"kind": "card", "axis": "z", "at": int(zm), "mask": ["".join("1" if v else "0" for v in T[y]) for y in range(depth_cols)]})
+    vox[z0:z1] = False
+    return parts
+
+
 def hull_preview(spec: dict, path: str | Path, scale: int = 3) -> str:
     """Front, side and top views of the carved voxels (and a 3/4 view) as one PNG, so a carve can be judged without
     Blender: the shape problems (slabs, plates, thick brims) show here first."""
     vox = np.array([[[c == "1" for c in row] for row in layer] for layer in spec["voxels"]], bool)   # z, y, x
     rows, depth, cols = vox.shape
     for part in spec.get("parts", []):
+        if part["kind"] == "card":
+            m = np.array([[c == "1" for c in row] for row in part["mask"]], bool)
+            if part["axis"] == "y":
+                vox[part["z0"]:part["z1"], part["at"], :] |= m
+            elif part["axis"] == "x":
+                vox[part["z0"]:part["z1"], :, part["at"]] |= m
+            else:
+                vox[part["at"], :, :] |= m
         if part["kind"] == "cone":
             yy, xx = np.mgrid[0:depth, 0:cols]
             for z in range(part["z_apex"], part["z_base"]):
@@ -310,6 +360,9 @@ def build_hull_spec(
     opening: int = 1,
     thin_run: int = 3,
     brim: bool = True,
+    top: Image.Image | None = None,
+    bottom: Image.Image | None = None,
+    canopy: bool = False,
 ) -> dict:
     """Carve a voxel model from the front and side silhouettes (a visual hull).
 
@@ -386,12 +439,39 @@ def build_hull_spec(
         parts.append({"kind": "cone", "cx": float(cx), "cy": float(cy), "radius": float(r), "z_base": int(z_lo + 1), "z_apex": int(z_top),
                       "rows": brim_rows})
     vox = _cull_slivers(vox)
+    # a top view (and an underside view) carve the footprint: what the camera looks down on (hat brims, shoulders,
+    # a tree's crown, a roof) gets its real plan shape instead of the front x side box. The view's orientation is
+    # found by matching the carve (sheets are not consistent about which way is up in a plan view).
+    orient = {}
+    for label, img in (("top", top), ("bottom", bottom)):
+        if img is None:
+            continue
+        m = _mask(img)
+        foot = vox.any(axis=0)   # y, x
+        best, best_k, best_iou = None, 0, -1.0
+        for k in range(8):
+            cand = shrink(_dihedral(m, k), (columns, depth_cols))
+            cand = cand[::-1] if label == "top" else cand   # the top camera's image-up is the back (+y)
+            iou = (cand & foot).sum() / max((cand | foot).sum(), 1)
+            if iou > best_iou:
+                best, best_k, best_iou = cand, k, iou
+        vox &= best[None]
+        if brim_rows and parts:   # the cone's radius follows the plan view too
+            ys_, xs_ = np.nonzero(best)
+            if len(xs_):
+                parts[0]["radius"] = float(min(parts[0]["radius"], (xs_.max() - xs_.min() + 1) / 2))
+        orient[label] = {"transpose": best_k, "iou": round(float(best_iou), 3)}
+    if canopy:
+        parts += _canopy_cards(vox, F, S, shrink(_dihedral(_mask(top), orient["top"]["transpose"]), (columns, depth_cols))[::-1] if top is not None else None)
     # cards: what the front view shows but the carve lost (ropes, chains, hanging charms, hem fringe) comes back as a
     # two-voxel-thick card at the body's mid-depth, painted by the same projection (the Diablo II way)
     front_proj = vox.any(axis=1)   # z, x
     lost = F & ~front_proj
-    for part in parts:   # the brim is a cone part, not a card
-        lost[part["rows"]] = False
+    for part in parts:   # the brim is a cone part and the crown is cards: neither comes back as a mid-depth card
+        if part["kind"] == "cone":
+            lost[part["rows"]] = False
+        elif part["kind"] == "card" and part["axis"] != "z":
+            lost[part["z0"]:part["z1"]] = False
     for z in range(rows):
         if not lost[z].any():
             continue
@@ -424,5 +504,6 @@ def build_hull_spec(
         "aspect": float(w / h),
         "thickness": float(depth_cols / rows),
         "parts": parts,
+        "orient": orient,   # which transpose made each plan view match the carve (the texture gets the same)
         "voxels": packed,
     }

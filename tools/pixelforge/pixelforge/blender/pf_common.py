@@ -15,6 +15,8 @@ UV_FRONT = "proj_front"
 UV_BACK = "proj_back"
 UV_SIDE = "proj_side"
 UV_QUARTER = "proj_quarter"
+UV_TOP = "proj_top"
+UV_BOTTOM = "proj_bottom"
 
 
 def script_args(parser: argparse.ArgumentParser) -> argparse.Namespace:
@@ -123,7 +125,8 @@ def _facing(nt, sep, direction, lo=0.45, hi=0.9):
     return ramp.outputs["Result"]
 
 
-def build_projection_material(name: str, front_img, back_img=None, side_img=None, quarter_img=None, quarter_sign: int = 1, blend: float = 0.15, shade: float = 0.0, relief: float = 0.35):
+def build_projection_material(name: str, front_img, back_img=None, side_img=None, quarter_img=None, quarter_sign: int = 1, blend: float = 0.15, shade: float = 0.0, relief: float = 0.35,
+                              top_img=None, bottom_img=None):
     """Unlit material: the front image where the surface faces the front, the
     back image behind, the side image on the flanks and the three-quarter image
     on the diagonals (both diagonals: the projection goes through the body).
@@ -172,6 +175,12 @@ def build_projection_material(name: str, front_img, back_img=None, side_img=None
         nt.links.new(w1, mx.inputs[0])
         nt.links.new(w2, mx.inputs[1])
         color = _mix_rgb(nt, mx.outputs["Value"], color, tex_q.outputs["Color"])
+    if top_img is not None:   # upward faces (a hat's top, shoulders, a crown of leaves) take the plan view
+        tex_t = _image_node(nt, top_img, UV_TOP)
+        color = _mix_rgb(nt, _facing(nt, sep, (0.0, 0.0, 1.0), 0.45, 0.85), color, tex_t.outputs["Color"])
+    if bottom_img is not None:
+        tex_u = _image_node(nt, bottom_img, UV_BOTTOM)
+        color = _mix_rgb(nt, _facing(nt, sep, (0.0, 0.0, -1.0), 0.45, 0.85), color, tex_u.outputs["Color"])
     if relief > 0:
         # height from the front painting's brightness -> bumped normal -> facing a top-front key light
         bw = nt.nodes.new("ShaderNodeRGBToBW")

@@ -25,6 +25,8 @@ from pf_common import (  # noqa: E402
     UV_FRONT,
     UV_QUARTER,
     UV_SIDE,
+    UV_TOP,
+    UV_BOTTOM,
     assign_material,
     build_projection_material,
     deg,
@@ -90,6 +92,9 @@ def build_mesh_from_spec(spec: dict, height: float, name: str):
         poly.use_smooth = True
     # real parts the carve recorded (a hat's cone): built as geometry after the smoothing, so they keep their shape
     for part in spec.get("parts", []):
+        if part["kind"] == "card":
+            _add_card(obj, part, name, width, depth, height, cx, cy, cz)
+            continue
         if part["kind"] != "cone":
             continue
         base_z = height - part["z_base"] * cz
@@ -107,6 +112,51 @@ def build_mesh_from_spec(spec: dict, height: float, name: str):
         bpy.context.view_layer.objects.active = obj
         bpy.ops.object.join()
     return obj, width
+
+
+def _add_card(obj, part: dict, name: str, width, depth, height, cx, cy, cz):
+    """A painted plane (a tree's crown): one quad per set cell, so its edge is the painting's silhouette."""
+    m = [[c == "1" for c in row] for row in part["mask"]]
+    verts, faces, index = [], [], {}
+
+    def vid(x, y, z):
+        key = (x, y, z)
+        if key not in index:
+            index[key] = len(verts)
+            verts.append((-width / 2 + x * cx, -depth / 2 + y * cy, height - z * cz))
+        return index[key]
+
+    ax, at = part["axis"], part["at"]
+    if ax == "y":
+        y = at + 0.5
+        for i, row in enumerate(m):
+            z = part["z0"] + i
+            for x, v in enumerate(row):
+                if v:
+                    faces.append([vid(x, y, z), vid(x + 1, y, z), vid(x + 1, y, z + 1), vid(x, y, z + 1)])
+    elif ax == "x":
+        x = at + 0.5
+        for i, row in enumerate(m):
+            z = part["z0"] + i
+            for y, v in enumerate(row):
+                if v:
+                    faces.append([vid(x, y, z), vid(x, y + 1, z), vid(x, y + 1, z + 1), vid(x, y, z + 1)])
+    else:
+        z = at + 0.5
+        for y, row in enumerate(m):
+            for x, v in enumerate(row):
+                if v:
+                    faces.append([vid(x, y, z), vid(x + 1, y, z), vid(x + 1, y + 1, z), vid(x, y + 1, z)])
+    mesh = bpy.data.meshes.new(f"{name}_card_{ax}")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    card = bpy.data.objects.new(mesh.name, mesh)
+    bpy.context.scene.collection.objects.link(card)
+    bpy.ops.object.select_all(action="DESELECT")
+    card.select_set(True)
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.join()
 
 
 def build_hull_from_spec(spec: dict, height: float, name: str):
@@ -167,6 +217,9 @@ def build_hull_from_spec(spec: dict, height: float, name: str):
         poly.use_smooth = True
     # real parts the carve recorded (a hat's cone): built as geometry after the smoothing, so they keep their shape
     for part in spec.get("parts", []):
+        if part["kind"] == "card":
+            _add_card(obj, part, name, width, depth, height, cx, cy, cz)
+            continue
         if part["kind"] != "cone":
             continue
         base_z = height - part["z_base"] * cz
@@ -193,6 +246,8 @@ def main() -> None:
     p.add_argument("--back")
     p.add_argument("--side", help="side view image, painted onto the sides (hull models)")
     p.add_argument("--quarter", help="three-quarter view image, painted onto the diagonals")
+    p.add_argument("--top", help="plan view from above (already oriented: image-up = the character's back), painted onto upward faces")
+    p.add_argument("--bottom", help="underside view (image-up = the character's front), painted onto downward faces")
     p.add_argument("--shade", type=float, default=0.0, help="0..0.5 top-front darkening to help the volume read")
     p.add_argument("--relief", type=float, default=0.35, help="0..1 relief from the painting's brightness (ropes, beads, folds catch the light)")
     p.add_argument("--height", type=float, default=1.8, help="character height in metres")
@@ -213,6 +268,8 @@ def main() -> None:
     back = load_image(os.path.abspath(a.back)) if a.back else None
     side = load_image(os.path.abspath(a.side)) if a.side else None
     quarter = load_image(os.path.abspath(a.quarter)) if a.quarter else None
+    top = load_image(os.path.abspath(a.top)) if a.top else None
+    bottom = load_image(os.path.abspath(a.bottom)) if a.bottom else None
     qsign = int(spec.get("quarter_sign", 1) or 1)
 
     # cameras framing the silhouette exactly: the cutouts are tight-cropped, and
@@ -236,14 +293,24 @@ def main() -> None:
         cam_q = make_ortho_camera("pf_cam_quarter", (10 * qsign * c, -10 * c, a.height / 2), (deg(90), 0, deg(45) * qsign), ortho_scale_for_height(quarter, a.height))
         project_image_onto(obj, quarter, UV_QUARTER, cam_q)
 
-    mat = build_projection_material(f"{a.name}_paint", front, back, side, quarter, qsign, shade=a.shade, relief=a.relief)
+    model_width = a.height * spec["aspect"]
+    if top is not None:
+        iw, ih = top.size
+        cam_t = make_ortho_camera("pf_cam_top", (0, 0, a.height + 10), (0, 0, 0), model_width if iw >= ih else model_width * ih / iw)
+        project_image_onto(obj, top, UV_TOP, cam_t)
+    if bottom is not None:
+        iw, ih = bottom.size
+        cam_u = make_ortho_camera("pf_cam_bottom", (0, 0, -10), (deg(180), 0, 0), model_width if iw >= ih else model_width * ih / iw)
+        project_image_onto(obj, bottom, UV_BOTTOM, cam_u)
+
+    mat = build_projection_material(f"{a.name}_paint", front, back, side, quarter, qsign, shade=a.shade, relief=a.relief, top_img=top, bottom_img=bottom)
     assign_material(obj, mat)
 
     if a.smooth > 0 and spec.get("mode") != "hull":  # the hull is smoothed already
         sub = obj.modifiers.new("pf_smooth", "SUBSURF")
         sub.levels = sub.render_levels = a.smooth
 
-    for img in (front, back, side, quarter):
+    for img in (front, back, side, quarter, top, bottom):
         if img is not None:
             img.pack()
 

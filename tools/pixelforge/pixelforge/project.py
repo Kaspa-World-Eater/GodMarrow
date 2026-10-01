@@ -28,7 +28,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 PROJECT_FILE = "project.json"
-SOURCE_KINDS = ("sheet", "front", "back", "side", "quarter", "style")
+SOURCE_KINDS = ("sheet", "front", "back", "side", "quarter", "topbottom", "top", "bottom", "style")
 DIRECTIONS_8 = ["S", "SW", "W", "NW", "N", "NE", "E", "SE"]
 STEPS = [
     ("prompts", "Get the Midjourney prompts"),
