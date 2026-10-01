@@ -252,7 +252,7 @@ def model_textures(project: Project, c: Character) -> dict[str, Path]:
     """Edge-padded copies of the view cutouts, for use as 3D textures."""
     views = project.sub(c.name, "views")
     out = {}
-    for kind in ("front", "back", "side"):
+    for kind in ("front", "back", "side", "quarter"):
         src = views / f"{kind}.png"
         if src.exists():
             tex = project.sub(c.name, "model") / f"tex_{kind}.png"
@@ -272,9 +272,11 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
         raise StepError("run split first (no views/front.png)")
     side = views / "side.png"
     back = views / "back.png"
+    quarter = views / "quarter.png"
     if side.exists():
-        # carve a proper 3D shape from the front + side silhouettes
-        spec = build_hull_spec(Image.open(front), Image.open(side), Image.open(back) if back.exists() else None, columns=columns)
+        # carve a proper 3D shape from the front + side (+ back, + three-quarter) silhouettes
+        spec = build_hull_spec(Image.open(front), Image.open(side), Image.open(back) if back.exists() else None,
+                               Image.open(quarter) if quarter.exists() else None, columns=columns)
     else:
         spec = build_spec(Image.open(front), None, columns=columns, thickness=thickness)
         spec["thickness"] = float(min(spec["thickness"], 0.3))
@@ -284,9 +286,12 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
     fbx = model_dir / f"{c.name}.fbx"
     tex = model_textures(project, c)
     args = ["--spec", spec_path, "--front", tex["front"], "--height", height, "--name", c.name, "--out", blend, "--fbx", fbx]
-    for kind in ("back", "side"):
+    for kind in ("back", "side", "quarter"):
         if kind in tex:
             args += [f"--{kind}", tex[kind]]
+    shade = c.settings.get("shade", 0.0)
+    if shade:
+        args += ["--shade", shade]
     result = run_blender(project, "build_mesh.py", args, log=log)
     c.done["model"] = True
     c.notes["model"] = result
@@ -430,8 +435,11 @@ def pixelate_renders(project: Project, name: str, outline: str | None = None, lo
     # render-px-per-sprite-px scale from the model's height as the camera sees it
     import math as _m
 
-    stand_px = (manifest.get("z_max", 1.8) - manifest.get("z_min", 0.0)) * manifest["ppu"] * _m.cos(_m.radians(manifest.get("elevation", 30.0)))
-    scale = max(stand_px, 1.0) / st.max_size  # source px per sprite px, same for every frame
+    if "ppu" in manifest:
+        stand_px = (manifest.get("z_max", 1.8) - manifest.get("z_min", 0.0)) * manifest["ppu"] * _m.cos(_m.radians(manifest.get("elevation", 30.0)))
+        scale = max(stand_px, 1.0) / st.max_size  # source px per sprite px, same for every frame
+    else:  # older manifests: size the frame instead
+        scale = manifest["size"] / st.max_size
     frames_dir = project.sub(c.name, "frames")
     opts = _options_for(project, c, outline=outline)
     opts.scale = scale

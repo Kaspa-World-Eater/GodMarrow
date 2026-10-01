@@ -18,6 +18,7 @@ at sprite scale, and it needs no modelling skill at all.
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 import numpy as np
@@ -143,10 +144,55 @@ def _mask(image: Image.Image) -> np.ndarray:
     return a[ys.min() : ys.max() + 1, xs.min() : xs.max() + 1]
 
 
+def _project_quarter(vox: np.ndarray, sign: int) -> np.ndarray:
+    """Silhouette of the voxel hull seen from the +-45 degree camera (yaw sign),
+    on a column grid along u = x*c + sign*y*c (c = cos 45)."""
+    rows, dcols, cols = vox.shape
+    c = math.sqrt(0.5)
+    ix = np.arange(cols) + 0.5 - cols / 2
+    iy = np.arange(dcols) + 0.5 - dcols / 2
+    u = (ix[None, :] * c + sign * iy[:, None] * c)  # (dcols, cols)
+    u_min, u_max = u.min(), u.max()
+    n_u = int(math.ceil(u_max - u_min)) + 1
+    sil = np.zeros((rows, n_u), dtype=bool)
+    ui = np.clip(np.rint(u - u_min).astype(int), 0, n_u - 1)
+    for z in range(rows):
+        layer = vox[z]
+        if layer.any():
+            sil[z, np.unique(ui[layer])] = True
+    return sil, (u_min, u_max, ui)
+
+
+def carve_quarter(vox: np.ndarray, quarter_mask: np.ndarray) -> tuple[np.ndarray, int, float]:
+    """Carve the hull with the three-quarter silhouette.  The view may face
+    either way; the orientation whose projected hull best matches the mask
+    (IoU) wins.  Returns (voxels, sign, iou)."""
+    rows = vox.shape[0]
+    best = None
+    for sign in (+1, -1):
+        sil, (u_min, u_max, ui) = _project_quarter(vox, sign)
+        # fit the mask to the hull's projected box (height is shared, width by extent)
+        ys, xs = np.nonzero(sil)
+        if len(xs) == 0:
+            continue
+        x0, x1 = xs.min(), xs.max() + 1
+        q = np.asarray(Image.fromarray(quarter_mask.astype(np.uint8) * 255).resize((x1 - x0, rows), Image.BOX)) > 127
+        full = np.zeros_like(sil)
+        full[:, x0:x1] = q
+        inter, union = (full & sil).sum(), (full | sil).sum()
+        iou = inter / max(union, 1)
+        if best is None or iou > best[0]:
+            best = (iou, sign, full, ui)
+    iou, sign, full, ui = best
+    keep = full[:, ui]  # (rows, dcols, cols): is the voxel's u column inside the quarter silhouette
+    return vox & keep, sign, float(iou)
+
+
 def build_hull_spec(
     front: Image.Image,
     side: Image.Image,
     back: Image.Image | None = None,
+    quarter: Image.Image | None = None,
     *,
     columns: int = 64,
     side_faces: str = "left",
@@ -198,10 +244,18 @@ def build_hull_spec(
                 vox[z, ys[:, None], xs[None, :]] |= (xn**2 + yn**2) <= 1.0
     if not vox.any():
         raise ValueError("hull is empty; check that the side view faces the right way")
+    quarter_sign, quarter_iou = 0, 0.0
+    if quarter is not None:
+        # smooth the hull a little before carving so the quarter view trims shape, not staircase noise
+        vox, quarter_sign, quarter_iou = carve_quarter(vox, _mask(quarter))
+        if not vox.any():
+            raise ValueError("the three-quarter view carved everything away; check it is the same character")
     packed = [["".join("1" if v else "0" for v in vox[z, y]) for y in range(depth_cols)] for z in range(rows)]
     return {
         "version": 2,
         "mode": "hull",
+        "quarter_sign": int(quarter_sign),  # +1: the quarter view shows the character's left/front; 0: none
+        "quarter_iou": round(quarter_iou, 3),
         "columns": int(columns),
         "rows": int(rows),
         "depth_columns": int(depth_cols),

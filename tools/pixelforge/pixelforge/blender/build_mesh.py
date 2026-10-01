@@ -23,6 +23,7 @@ import bpy  # type: ignore
 from pf_common import (  # noqa: E402
     UV_BACK,
     UV_FRONT,
+    UV_QUARTER,
     UV_SIDE,
     assign_material,
     build_projection_material,
@@ -155,6 +156,8 @@ def main() -> None:
     p.add_argument("--front", required=True)
     p.add_argument("--back")
     p.add_argument("--side", help="side view image, painted onto the sides (hull models)")
+    p.add_argument("--quarter", help="three-quarter view image, painted onto the diagonals")
+    p.add_argument("--shade", type=float, default=0.0, help="0..0.5 top-front darkening to help the volume read")
     p.add_argument("--height", type=float, default=1.8, help="character height in metres")
     p.add_argument("--name", default="Character")
     p.add_argument("--smooth", type=int, default=1, help="subdivision levels (0 = blocky)")
@@ -172,6 +175,8 @@ def main() -> None:
     front = load_image(os.path.abspath(a.front))
     back = load_image(os.path.abspath(a.back)) if a.back else None
     side = load_image(os.path.abspath(a.side)) if a.side else None
+    quarter = load_image(os.path.abspath(a.quarter)) if a.quarter else None
+    qsign = int(spec.get("quarter_sign", 1) or 1)
 
     # cameras framing the silhouette exactly: the cutouts are tight-cropped, and
     # the mesh spans the same box, so the image maps onto the body 1:1 (fitted
@@ -188,14 +193,20 @@ def main() -> None:
         cam_s = make_ortho_camera("pf_cam_side", (10, 0, a.height / 2), (deg(90), 0, deg(90)), ortho_scale_for_height(side, a.height))
         project_image_onto(obj, side, UV_SIDE, cam_s)
 
-    mat = build_projection_material(f"{a.name}_paint", front, back, side)
+    if quarter is not None:
+        # camera on the diagonal the quarter view was painted from, looking at the character
+        c = 0.7071
+        cam_q = make_ortho_camera("pf_cam_quarter", (10 * qsign * c, -10 * c, a.height / 2), (deg(90), 0, deg(45) * qsign), ortho_scale_for_height(quarter, a.height))
+        project_image_onto(obj, quarter, UV_QUARTER, cam_q)
+
+    mat = build_projection_material(f"{a.name}_paint", front, back, side, quarter, qsign, shade=a.shade)
     assign_material(obj, mat)
 
     if a.smooth > 0 and spec.get("mode") != "hull":  # the hull is smoothed already
         sub = obj.modifiers.new("pf_smooth", "SUBSURF")
         sub.levels = sub.render_levels = a.smooth
 
-    for img in (front, back, side):
+    for img in (front, back, side, quarter):
         if img is not None:
             img.pack()
 

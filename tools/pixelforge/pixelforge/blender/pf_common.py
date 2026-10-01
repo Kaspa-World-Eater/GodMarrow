@@ -14,6 +14,7 @@ import bpy  # type: ignore
 UV_FRONT = "proj_front"
 UV_BACK = "proj_back"
 UV_SIDE = "proj_side"
+UV_QUARTER = "proj_quarter"
 
 
 def script_args(parser: argparse.ArgumentParser) -> argparse.Namespace:
@@ -93,7 +94,7 @@ def _mix_rgb(nt, fac, color_a, color_b):
 def _image_node(nt, image, uv_name):
     tex = nt.nodes.new("ShaderNodeTexImage")
     tex.image = image
-    tex.interpolation = "Closest" if max(image.size) < 600 else "Linear"
+    tex.interpolation = "Closest"  # the painting's own pixels, never smoothed
     tex.extension = "EXTEND"
     uv = nt.nodes.new("ShaderNodeUVMap")
     uv.uv_map = uv_name
@@ -101,9 +102,33 @@ def _image_node(nt, image, uv_name):
     return tex
 
 
-def build_projection_material(name: str, front_img, back_img=None, side_img=None, blend: float = 0.15):
-    """Unlit material: front image on front-facing parts, back on the rest,
-    and (if given) the side image where the surface faces sideways."""
+def _facing(nt, sep, direction, lo=0.45, hi=0.9):
+    """0..1 weight for how much the surface faces ``direction`` (unit vector)."""
+    comb = nt.nodes.new("ShaderNodeCombineXYZ")
+    comb.inputs[0].default_value, comb.inputs[1].default_value, comb.inputs[2].default_value = direction
+    dot = nt.nodes.new("ShaderNodeVectorMath")
+    dot.operation = "DOT_PRODUCT"
+    nt.links.new(sep.outputs["X"], nt.nodes.new("NodeReroute").inputs[0]) if False else None
+    geo_vec = nt.nodes.new("ShaderNodeCombineXYZ")
+    nt.links.new(sep.outputs["X"], geo_vec.inputs[0])
+    nt.links.new(sep.outputs["Y"], geo_vec.inputs[1])
+    nt.links.new(sep.outputs["Z"], geo_vec.inputs[2])
+    nt.links.new(geo_vec.outputs["Vector"], dot.inputs[0])
+    nt.links.new(comb.outputs["Vector"], dot.inputs[1])
+    ramp = nt.nodes.new("ShaderNodeMapRange")
+    ramp.inputs["From Min"].default_value = lo
+    ramp.inputs["From Max"].default_value = hi
+    ramp.clamp = True
+    nt.links.new(dot.outputs["Value"], ramp.inputs["Value"])
+    return ramp.outputs["Result"]
+
+
+def build_projection_material(name: str, front_img, back_img=None, side_img=None, quarter_img=None, quarter_sign: int = 1, blend: float = 0.15, shade: float = 0.0):
+    """Unlit material: the front image where the surface faces the front, the
+    back image behind, the side image on the flanks and the three-quarter image
+    on the diagonals (both diagonals: the projection goes through the body).
+    ``shade`` > 0 darkens surfaces that face away from a top-front light, a
+    little, to help the volume read (0 = the painting's own light only)."""
     mat = bpy.data.materials.new(name)
     mat.use_nodes = True
     nt = mat.node_tree
@@ -123,14 +148,7 @@ def build_projection_material(name: str, front_img, back_img=None, side_img=None
 
     if back_img is not None:
         tex_back = _image_node(nt, back_img, UV_BACK)
-        # facing: normal.y < 0 looks at the front camera
-        ramp = nt.nodes.new("ShaderNodeMapRange")
-        ramp.inputs["From Min"].default_value = blend
-        ramp.inputs["From Max"].default_value = -blend
-        ramp.clamp = True
-        nt.links.new(sep.outputs["Y"], ramp.inputs["Value"])
-        color = _mix_rgb(nt, ramp.outputs["Result"], tex_back.outputs["Color"], color)
-
+        color = _mix_rgb(nt, _facing(nt, sep, (0.0, 1.0, 0.0), -blend, blend), color, tex_back.outputs["Color"])
     if side_img is not None:
         tex_side = _image_node(nt, side_img, UV_SIDE)
         absx = nt.nodes.new("ShaderNodeMath")
@@ -142,6 +160,24 @@ def build_projection_material(name: str, front_img, back_img=None, side_img=None
         ramp_s.clamp = True
         nt.links.new(absx.outputs["Value"], ramp_s.inputs["Value"])
         color = _mix_rgb(nt, ramp_s.outputs["Result"], color, tex_side.outputs["Color"])
+    if quarter_img is not None:
+        tex_q = _image_node(nt, quarter_img, UV_QUARTER)
+        c = 0.7071
+        w1 = _facing(nt, sep, (quarter_sign * c, -c, 0.0), 0.75, 0.98)
+        w2 = _facing(nt, sep, (-quarter_sign * c, -c, 0.0), 0.75, 0.98)
+        mx = nt.nodes.new("ShaderNodeMath")
+        mx.operation = "MAXIMUM"
+        nt.links.new(w1, mx.inputs[0])
+        nt.links.new(w2, mx.inputs[1])
+        color = _mix_rgb(nt, mx.outputs["Value"], color, tex_q.outputs["Color"])
+    if shade > 0:
+        # light from above and the front: factor = 1 - shade * (1 - facing(light)) / 2
+        light = _facing(nt, sep, (0.0, -0.5, 0.866), -1.0, 1.0)
+        m1 = nt.nodes.new("ShaderNodeMath"); m1.operation = "MULTIPLY_ADD"
+        nt.links.new(light, m1.inputs[0]); m1.inputs[1].default_value = shade; m1.inputs[2].default_value = 1.0 - shade
+        mul = nt.nodes.new("ShaderNodeVectorMath"); mul.operation = "SCALE"
+        nt.links.new(color, mul.inputs[0]); nt.links.new(m1.outputs["Value"], mul.inputs["Scale"])
+        color = mul.outputs["Vector"]
 
     nt.links.new(color, emit.inputs["Color"])
     return mat
