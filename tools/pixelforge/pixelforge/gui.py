@@ -138,6 +138,9 @@ class Studio:
         m.add_cascade(label="Character", menu=c)
         t = Menu(m, tearoff=0)
         t.add_command(label="Tools window (effects, props, tiles, sounds, music…)", command=self._tools, accelerator="Ctrl+T")
+        t.add_command(label="Describe it, get it…", command=self._describe, accelerator="Ctrl+D")
+        t.add_command(label="Preview in game…", command=self._preview_game)
+        t.add_separator()
         t.add_command(label="Spell designer…", command=lambda: __import__("pixelforge.spell_designer", fromlist=["open_spell_designer"]).open_spell_designer(self.root, "fireball", str(self.project.root / "fx") if self.project else "art/fx"))
         t.add_command(label="Skin editor (any image)…", command=lambda: (lambda p: self._skin_editor(p) if p else None)(filedialog.askopenfilename(title="Image to edit", filetypes=[("PNG", "*.png")])))
         t.add_command(label="Colour editor (any image)…", command=lambda: (lambda p: self._color_editor(p) if p else None)(filedialog.askopenfilename(title="Image to recolour", filetypes=[("PNG", "*.png")])))
@@ -151,6 +154,7 @@ class Studio:
         self.root.bind("<Control-o>", lambda e: self._open_dialog())
         self.root.bind("<Control-t>", lambda e: self._tools())
         self.root.bind("<F5>", lambda e: self._run_all())
+        self.root.bind("<Control-d>", lambda e: self._describe())
         self._fill_recent()
 
     def _fill_recent(self) -> None:
@@ -172,7 +176,8 @@ class Studio:
         self.char_box.bind("<<ComboboxSelected>>", lambda e: self._refresh())
         ttk.Button(bar, text="+ Add character", command=self._add_character).pack(side=LEFT, padx=4)
         ttk.Separator(bar, orient="vertical").pack(side=LEFT, fill=Y, padx=8)
-        ttk.Button(bar, text="Tools", command=self._tools).pack(side=LEFT)
+        ttk.Button(bar, text="Describe it…", command=self._describe).pack(side=LEFT)
+        ttk.Button(bar, text="Tools", command=self._tools).pack(side=LEFT, padx=4)
         ttk.Button(bar, text="Settings", command=self._settings).pack(side=LEFT, padx=4)
         ttk.Button(bar, text="Help", command=lambda: webbrowser.open(HELP_URL)).pack(side=RIGHT)
 
@@ -291,6 +296,7 @@ class Studio:
         if not self._need_project():
             return
         dlg = Toplevel(self.root)
+        dlg.configure(bg=PANEL)
         dlg.title("New character")
         ttk.Label(dlg, text="Name (e.g. lantern_wraith):").pack(anchor="w", padx=10, pady=(10, 0))
         name = ttk.Entry(dlg, width=40)
@@ -326,6 +332,7 @@ class Studio:
             return
         p = self.project
         dlg = Toplevel(self.root)
+        dlg.configure(bg=PANEL)
         dlg.title("Settings")
         rows = [
             ("Quality style", "style", p.style),
@@ -578,6 +585,77 @@ class Studio:
             ttk.Label(self.panel, text="Tip: the front view decides the body; make sure nothing of the background is left inside it. "
                       "You can also edit the files in the folder with any paint program, then Reload. After editing, run the next steps again.", style="Dim.TLabel", wraplength=720).pack(anchor="w", pady=4)
 
+    def _describe(self) -> None:
+        """One box: say it, get a draft in the right editor."""
+        from . import describe as D
+
+        dlg = Toplevel(self.root)
+        dlg.configure(bg=PANEL)
+        dlg.title("Describe it, get it")
+        ttk.Label(dlg, text="Say what you want. A spell, a change to a character's skin, a Midjourney prompt or a music cue.", wraplength=520).pack(anchor="w", padx=10, pady=(10, 2))
+        ttk.Label(dlg, text="Examples: 'a wisp lantern spell, pale blue, slow, with embers'  ·  'make the left eye teal with a pale glow'  ·  'a slow sombre act 2 wilds tune'", style="Dim.TLabel", wraplength=520).pack(anchor="w", padx=10)
+        text = ttk.Entry(dlg, width=70)
+        text.pack(padx=10, pady=6)
+        text.focus_set()
+        c = self.project.characters.get(self.char.get()) if self.project else None
+        views = sorted((self.project.sub(c.name, "views")).glob("front.png")) if c else []
+        img = StringVar(value=str(views[0]) if views else "")
+        row = ttk.Frame(dlg)
+        row.pack(fill=X, padx=10)
+        ttk.Label(row, text="Picture for skin edits:").pack(side=LEFT)
+        ttk.Entry(row, textvariable=img, width=40).pack(side=LEFT, padx=4)
+        ttk.Button(row, text="Choose…", command=lambda: img.set(filedialog.askopenfilename(filetypes=[("PNG", "*.png")]) or img.get())).pack(side=LEFT)
+        out = ttk.Label(dlg, text="", style="Dim.TLabel", wraplength=520, justify=LEFT)
+        out.pack(anchor="w", padx=10, pady=4)
+
+        def go(*_):
+            t = text.get().strip()
+            if not t:
+                return
+            d = D.draft(t, image=img.get() or None)
+            out.configure(text="I read: " + "; ".join(d["read"]))
+            self._log("DESCRIBE " + t + " -> " + d["what"] + ": " + "; ".join(d["read"]))
+            fx_dir = Path(self.project.root / "fx") if self.project else Path("art/fx")
+            if d["what"] == "spell":
+                from . import spell as S
+                from .spell_designer import open_spell_designer
+                path = S.save_spell(d["spell"], fx_dir / f"{d['spell']['name']}.spell.json")
+                open_spell_designer(self.root, path, fx_dir, on_save=lambda r: self._log("exported " + r["png"]))
+            elif d["what"] == "skin":
+                if not img.get():
+                    out.configure(text=out.cget("text") + "\nChoose the picture to locate the parts; the ops: " + json.dumps(d["ops"]))
+                    return
+                from .skin_editor import open_skin_editor
+                ed = open_skin_editor(self.root, img.get(), on_save=lambda: (self._log("saved skin edits"), self._show_step()))
+                for op in d["ops"]:
+                    ed._do(op)
+                ed.pick_label.set(f"Applied {len(d['ops'])} drafted op(s): adjust, Undo, or Save.")
+            elif d["what"] == "prompt":
+                self.root.clipboard_clear(); self.root.clipboard_append(d["prompt"])
+                out.configure(text=out.cget("text") + "\nPrompt copied to the clipboard:\n" + d["prompt"][:300] + "…")
+            else:
+                from . import music
+                r = music.make_music(d["cue"], fx_dir.parent / "music", seconds=60, overrides=d["knobs"])
+                out.configure(text=out.cget("text") + "\nRendered " + ", ".join(Path(f).name for f in r["files"]) + " (playing)")
+                music.play(next((f for f in r["files"] if f.endswith(".wav")), r["files"][0]))
+
+        text.bind("<Return>", go)
+        ttk.Button(dlg, text="Get it", command=go, style="Go.TButton").pack(pady=8)
+
+    def _preview_game(self, skin: str | None = None, attach: bool = False) -> None:
+        from .game_preview import preview_in_game
+
+        c = self.project.characters.get(self.char.get()) if self.project else None
+        js = c.notes.get("export_game_json") if c else None
+        kind = skin or (Path(js).stem if js else None)
+        game = Path(js).parent.parent if js else None
+        try:
+            r = preview_in_game(game, skin=kind, attach=attach, log=self._log)
+        except Exception as e:  # noqa: BLE001
+            messagebox.showerror(APP_TITLE, str(e) + "\n\nSet the Godot path in Settings (PIXELFORGE_GODOT) or install Godot 4.")
+            return
+        self.status.set("Game launched: " + " ".join(r["command"][-5:]))
+
     def _skin_editor(self, path) -> None:
         from .skin_editor import open_skin_editor
 
@@ -765,6 +843,7 @@ class Studio:
             row.pack(anchor="w", pady=4)
             ttk.Button(row, text="Skin editor (every frame at once)", command=lambda: self._skin_editor(Path(js).with_suffix(".png"))).pack(side=LEFT)
             ttk.Button(row, text="Effects editor (attach smoke, glow, embers…)", command=lambda: self._fx_editor(c)).pack(side=LEFT, padx=6)
+            ttk.Button(row, text="▶ Preview in game", command=lambda: self._preview_game(Path(js).stem, attach=True), style="Go.TButton").pack(side=LEFT, padx=6)
 
     def _after_export(self, r) -> None:
         self._show_step()

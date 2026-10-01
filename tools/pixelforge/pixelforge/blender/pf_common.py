@@ -176,11 +176,21 @@ def build_projection_material(name: str, front_img, back_img=None, side_img=None
         nt.links.new(w2, mx.inputs[1])
         color = _mix_rgb(nt, mx.outputs["Value"], color, tex_q.outputs["Color"])
     if top_img is not None:   # upward faces (a hat's top, shoulders, a crown of leaves) take the plan view
+        # only where the plan view has paint (its alpha): a synthesized top covers the hat disc alone, and a painted
+        # plan view covers the figure's footprint, so folds on the body never pick up a stray top colour
         tex_t = _image_node(nt, top_img, UV_TOP)
-        color = _mix_rgb(nt, _facing(nt, sep, (0.0, 0.0, 1.0), 0.45, 0.85), color, tex_t.outputs["Color"])
+        wt = nt.nodes.new("ShaderNodeMath")
+        wt.operation = "MULTIPLY"
+        nt.links.new(_facing(nt, sep, (0.0, 0.0, 1.0), 0.6, 0.92), wt.inputs[0])
+        nt.links.new(tex_t.outputs["Alpha"], wt.inputs[1])
+        color = _mix_rgb(nt, wt.outputs["Value"], color, tex_t.outputs["Color"])
     if bottom_img is not None:
         tex_u = _image_node(nt, bottom_img, UV_BOTTOM)
-        color = _mix_rgb(nt, _facing(nt, sep, (0.0, 0.0, -1.0), 0.45, 0.85), color, tex_u.outputs["Color"])
+        wu = nt.nodes.new("ShaderNodeMath")
+        wu.operation = "MULTIPLY"
+        nt.links.new(_facing(nt, sep, (0.0, 0.0, -1.0), 0.6, 0.92), wu.inputs[0])
+        nt.links.new(tex_u.outputs["Alpha"], wu.inputs[1])
+        color = _mix_rgb(nt, wu.outputs["Value"], color, tex_u.outputs["Color"])
     if relief > 0:
         # height from the front painting's brightness -> bumped normal -> facing a top-front key light
         bw = nt.nodes.new("ShaderNodeRGBToBW")

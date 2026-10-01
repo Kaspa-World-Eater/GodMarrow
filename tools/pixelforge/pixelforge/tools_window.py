@@ -4,6 +4,7 @@ Forms are built from a small spec so a new tool is ten lines."""
 
 from __future__ import annotations
 
+import json
 import threading
 import webbrowser
 from pathlib import Path
@@ -48,6 +49,13 @@ TOOLS = [
       ("out", "dir", "art/music", None), ("seconds", "float", 120.0, None), ("seed", "text", "", None), ("act", "int", 1, None),
       ("knobs", "text", "", None), ("sheet", "file", "", None), ("format", "choice", "wav", ["wav", "ogg", "both"]), ("play", "check", True, None)],
      "music"),
+    ("Describe it", "Say what you want in plain words and get a draft to adjust: a spell ('a wisp lantern spell, pale blue, slow, with embers'), a skin edit "
+                    "('make the left eye teal with a pale glow', with the picture chosen), a Midjourney prompt, or a music cue. The draft opens in the right editor.",
+     [("text", "text", "a wisp lantern spell, pale blue, slow, with embers", None), ("image", "file", "", None), ("out", "dir", "art/fx", None)],
+     "describe"),
+    ("Preview in game", "See it in the game: launches Godot on the moor with a character skin, effects playing at the hero, or the attachments from the effects editor.",
+     [("game", "dir", "", None), ("skin", "text", "", None), ("fx", "text", "", None), ("attach", "check", False, None), ("screenshot", "check", False, None)],
+     "game_preview"),
     ("Spell designer", "Build a spell from layers of effects (fire + burst + embers, ring + rune + wisp...) with a live preview; export the strip the game plays.",
      [("start_from", "choice", "fireball", ["fireball", "ward", "soul_drain", "bone_shatter", "lightning_strike"]), ("out", "dir", "art/fx", None)],
      "spell_designer"),
@@ -148,7 +156,7 @@ def run_tool(key: str, v: dict) -> dict:
     raise ValueError(key)
 
 
-GROUPS = [("Art", ["Effects", "Spell designer", "Effects editor", "Skin editor", "Colour editor", "Prop / tree", "Painted object", "Item icons", "Portrait", "Ground tiles", "UI frame", "Recolour", "Compare", "World prompts"]),
+GROUPS = [("Start", ["Describe it", "Preview in game"]), ("Art", ["Effects", "Spell designer", "Effects editor", "Skin editor", "Colour editor", "Prop / tree", "Painted object", "Item icons", "Portrait", "Ground tiles", "UI frame", "Recolour", "Compare", "World prompts"]),
           ("Audio", ["Sounds", "Music"]),
           ("Game", ["Skill trees", "Godot add-on"])]
 
@@ -233,6 +241,48 @@ class ToolsWindow:
             if isinstance(val, str) and val and k in ("out",) and not Path(val).is_absolute():
                 values[k] = str(self.base / val)
         self._say(f"> {key} {values}")
+        if key == "describe":
+            from . import describe as D
+            d = D.draft(values["text"], image=values["image"] or None)
+            self._say("I read: " + "; ".join(d["read"]))
+            if d["what"] == "spell":
+                from . import spell as S
+                from .spell_designer import open_spell_designer
+                path = S.save_spell(d["spell"], Path(values["out"]) / f"{d['spell']['name']}.spell.json")
+                open_spell_designer(self.win, path, values["out"], on_save=lambda r: self._say("exported " + r["png"]))
+            elif d["what"] == "skin":
+                if not values["image"]:
+                    self._say("ops: " + json.dumps(d["ops"]) + "  (choose the picture to locate the parts and open the skin editor)")
+                else:
+                    from .skin_editor import open_skin_editor
+                    ed = open_skin_editor(self.win, values["image"], on_save=lambda: self._say("saved " + values["image"]))
+                    for op in d["ops"]:
+                        ed._do(op)
+                    ed.pick_label.set(f"Applied {len(d['ops'])} drafted op(s): adjust, Undo, or Save.")
+            elif d["what"] == "prompt":
+                self.win.clipboard_clear(); self.win.clipboard_append(d["prompt"])
+                self._say(d["prompt"] + "\n(copied to the clipboard)")
+            else:
+                self._say(f"music: cue {d['cue']}, knobs {d['knobs']}; rendering…")
+                from . import music
+                r = music.make_music(d["cue"], values["out"], seconds=60, overrides=d["knobs"])
+                self._say("rendered " + ", ".join(r["files"]))
+                if r["files"]:
+                    music.play(next((f for f in r["files"] if f.endswith(".wav")), r["files"][0]))
+            return
+        if key == "game_preview":
+            from .game_preview import preview_in_game
+            shot = str(self.base / "preview_shot.png") if values.get("screenshot") else None
+            try:
+                r = preview_in_game(values["game"] or None, skin=values["skin"] or None, fx=values["fx"].split(",") if values["fx"] else None,
+                                    attach=bool(values["attach"]), shot=shot, log=self._say)
+            except Exception as e:  # noqa: BLE001
+                messagebox.showerror("Preview in game", str(e))
+                return
+            self._say("launched " + " ".join(r["command"][-6:]) if not shot else ("screenshot " + str(r.get("png") or r.get("error"))))
+            if shot and r.get("png"):
+                webbrowser.open(r["png"])
+            return
         if key == "spell_designer":
             from .spell_designer import open_spell_designer
             open_spell_designer(self.win, values["start_from"], values["out"], on_save=lambda r: self._say("exported " + r["png"]))

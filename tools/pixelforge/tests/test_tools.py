@@ -320,3 +320,42 @@ def test_skin_ops_recolor_glow_region_and_replay(tmp_path):
     r2 = skin_ops.apply_ops(p, json.loads((tmp_path / "front.ops.json").read_text()))
     out2 = np.array(Image.open(p).convert("RGBA"))
     assert out2[21, 21, 0] > out2[21, 21, 2], "replayed: the eye is orange now"
+
+
+def test_describe_drafts_spells_skins_prompts_and_music(tmp_path):
+    import numpy as np
+    from PIL import Image
+
+    from pixelforge.describe import draft, find_feature
+    from pixelforge.game_preview import find_game, preview_command
+
+    d = draft("a wisp lantern spell, pale blue, slow, with embers")
+    assert d["what"] == "spell" and [l["kind"] for l in d["spell"]["layers"]] == ["embers", "wisp"]
+    assert d["spell"]["layers"][0]["palette"] == "wisp" and d["spell"]["layers"][0]["speed"] == 0.5
+    d = draft("fireball, big and fast")
+    assert d["what"] == "spell" and len(d["spell"]["layers"]) == 3 and d["spell"]["layers"][1]["scale"] == 1.5
+    d = draft("a bone shatter impact")
+    assert d["spell"]["loop"] is False
+    # a figure with two glowing eyes; the words find the left one
+    rgba = np.zeros((120, 80, 4), np.uint8)
+    rgba[10:110, 20:60] = (60, 50, 70, 255)
+    rgba[22:25, 30:33] = (220, 80, 240, 255)
+    rgba[22:25, 46:49] = (220, 80, 240, 255)
+    p = tmp_path / "front.png"
+    Image.fromarray(rgba, "RGBA").save(p)
+    assert find_feature(rgba, "eye_left")["at"][0] < find_feature(rgba, "eye_right")["at"][0]
+    assert find_feature(rgba, "feet")["at"][1] > 100
+    d = draft("make the left eye teal with a pale glow", image=p)
+    assert d["what"] == "skin" and d["ops"][0]["op"] == "recolor" and d["ops"][0]["at"][0] < 40 and d["ops"][1]["op"] == "glow"
+    d = draft("erase the right hand", image=p)
+    assert d["ops"] == [{"op": "erase", "at": d["ops"][0]["at"], "radius": d["ops"][0]["radius"]}]
+    d = draft("a hero: a grave knight with a rusted helm")
+    assert d["what"] == "prompt" and "turnaround" in d["prompt"]
+    d = draft("a slow sombre act 2 wilds tune with more wind")
+    assert d["what"] == "music" and d["cue"] == "a2_wild" and d["knobs"]["bpm"] < 84 and d["knobs"]["wind"] > 0.027
+    # the game launcher composes the game's own test arguments
+    (tmp_path / "game" / "art" / "sprites").mkdir(parents=True)
+    (tmp_path / "game" / "project.godot").write_text("")
+    assert find_game(tmp_path / "game" / "art" / "sprites") == tmp_path / "game"
+    cmd = preview_command("godot", tmp_path / "game", skin="keeper", fx=["a", "b"], attach=True, shot=tmp_path / "s.png")
+    assert "--skin=keeper" in cmd and "--cls=miasmancer" in cmd and "--fx=a,b" in cmd and "--attach" in cmd and any(a.startswith("--shot=") for a in cmd)

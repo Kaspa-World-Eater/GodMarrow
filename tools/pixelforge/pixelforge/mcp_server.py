@@ -144,6 +144,20 @@ def build_server():
         return music.write_sheet(path)
 
     @mcp.tool()
+    def describe(text: str, image: str = "", what: str = "") -> dict:
+        """Plain words -> a draft: a spell (layers), skin ops (located on the image: eyes, hands, lantern, hood...), a Midjourney
+        prompt, or a music cue with knobs. what: spell | skin | prompt | music (else the words decide). Adjust, then make_spell / edit_skin / make_music."""
+        from . import describe as D
+        return D.draft(text, image=image or None, what=what or None)
+
+    @mcp.tool()
+    def preview_in_game(game_dir: str = "", skin: str = "", fx: str = "", attach: bool = False, shot: str = "", zone: str = "moor") -> dict:
+        """Launch the Godot game with a skin / effects (a,b) / the skin's attachments on the moor; with shot=path it saves a screenshot
+        after 4 s and quits (needs a display). Godot is found automatically or via PIXELFORGE_GODOT."""
+        from .game_preview import preview_in_game as _p
+        return _p(game_dir or None, skin=skin or None, fx=fx.split(",") if fx else None, attach=attach, shot=shot or None, zone=zone)
+
+    @mcp.tool()
     def make_spell(name: str, out_dir: str, preset: str = "fireball", layers_json: str = "", gif: bool = True) -> dict:
         """A layered spell effect -> strip + json (+ gif). preset: fireball | ward | soul_drain | bone_shatter | lightning_strike.
         layers_json: optional JSON list of layers [{kind, palette, scale, x, y, rotation, start, speed, opacity, blend, seed}] replacing the preset's."""

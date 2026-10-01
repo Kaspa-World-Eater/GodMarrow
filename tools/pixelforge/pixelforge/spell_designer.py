@@ -36,6 +36,7 @@ class SpellDesigner:
         self.dirty = True
 
         self.win = Toplevel(master)
+        self.win.configure(bg="#1b1e24")
         self.win.title(f"Spell designer: {self.spell['name']}")
         top = ttk.Frame(self.win, padding=6)
         top.pack(fill=X)

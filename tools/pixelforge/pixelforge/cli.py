@@ -430,6 +430,40 @@ def cmd_music(a) -> None:
     _emit(a, r)
 
 
+def cmd_describe(a) -> None:
+    from . import describe
+
+    d = describe.draft(a.text, image=a.image, what=a.as_)
+    if d["what"] == "spell" and a.out:
+        from . import spell as S
+        d["export"] = S.export_spell(d["spell"], a.out, gif=True)
+    if d["what"] == "skin" and a.image and a.apply:
+        from . import skin_ops
+        d["applied"] = skin_ops.apply_ops(a.image, d["ops"])
+    if d["what"] == "music" and a.out:
+        from . import music
+        d["export"] = music.make_music(d["cue"], a.out, seconds=a.seconds, overrides=d["knobs"])
+    if a.json:
+        _emit(a, d)
+    else:
+        print("I read: " + "; ".join(d["read"]))
+        if d["what"] == "spell":
+            print("spell layers: " + ", ".join(f"{l['kind']} ({l['palette']}, x{l['scale']})" for l in d["spell"]["layers"]) + (f"\nexported {d['export']['png']}" if "export" in d else "\n(add -o <folder> to export, or open it in the spell designer)"))
+        elif d["what"] == "skin":
+            print("ops: " + json.dumps(d["ops"]) + ("\napplied" if "applied" in d else "\n(add --apply with --image to apply, or run them in the skin editor)"))
+        elif d["what"] == "prompt":
+            print(d["prompt"])
+        else:
+            print(f"music: cue {d['cue']} knobs {d['knobs']}" + (f"\nrendered {d['export']['files']}" if "export" in d else " (add -o <folder> to render)"))
+
+
+def cmd_game_preview(a) -> None:
+    from .game_preview import preview_in_game
+
+    _emit(a, preview_in_game(a.game, godot=a.godot, skin=a.skin, cls=a.cls, zone=a.zone, fx=a.fx.split(",") if a.fx else None, attach=a.attach,
+                             shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, log=print))
+
+
 def cmd_spell(a) -> None:
     from . import spell
 
@@ -720,6 +754,21 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--no-preview", action="store_true", help="skip the waveform + spectrogram PNG")
     s.add_argument("--play", action="store_true", help="play the (last) cue when done"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_music)
+
+    s = sub.add_parser("describe", help="describe it, get it: plain words -> a spell, skin edits, a prompt or a music cue (a draft to adjust)")
+    s.add_argument("text", help='e.g. "a wisp lantern spell, pale blue, slow, with embers" or "make the left eye teal with a pale glow"')
+    s.add_argument("--image", help="the cutout / sprite the words are about (locates eyes, hands, lantern...)"); s.add_argument("--as", dest="as_", choices=["spell", "skin", "prompt", "music"], default=None)
+    s.add_argument("-o", "--out", default=None, help="spell / music: export here"); s.add_argument("--apply", action="store_true", help="skin: apply the ops to --image")
+    s.add_argument("--seconds", type=float, default=60.0); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_describe)
+
+    s = sub.add_parser("game-preview", help="see it in the game: launch Godot with a skin, effects or attachments on the moor (or take a screenshot)")
+    s.add_argument("--game", default=None, help="the Godot project folder (found upward from here when omitted)"); s.add_argument("--godot", default=None)
+    s.add_argument("--skin", default=None, help="a sprite set kind, e.g. keeper"); s.add_argument("--cls", default=None); s.add_argument("--zone", default="moor")
+    s.add_argument("--fx", default=None, help="effects to play at the hero: a,b"); s.add_argument("--attach", action="store_true", help="the effects editor's attachments on the skin")
+    s.add_argument("--shot", default=None, help="save a screenshot here after --shot-t seconds and quit"); s.add_argument("--shot-t", dest="shot_t", type=float, default=4.0)
+    s.add_argument("--hour", type=float, default=None); s.add_argument("--wait", action="store_true"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_game_preview)
 
     s = sub.add_parser("spell", help="spell designer: layered effects (fire + burst + embers...) -> strip + json (+ gif, atlas)")
     s.add_argument("action", choices=["new", "render", "presets"]); s.add_argument("name", nargs="?", default="fireball", help="new: the spell's name; render: a .spell.json")

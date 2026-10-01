@@ -119,6 +119,7 @@ class FxEditor:
         self.n_frames = int(meta["anims"][self.anim]["frames"])
 
         self.win = Toplevel(master)
+        self.win.configure(bg="#1b1e24")
         self.win.title(f"Effects editor: {meta.get('name', meta.get('kind'))}")
         top = ttk.Frame(self.win, padding=6)
         top.pack(fill=X)

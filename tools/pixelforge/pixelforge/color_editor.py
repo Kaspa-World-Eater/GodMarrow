@@ -69,6 +69,7 @@ class ColorEditor:
         self.zoom = max(1, min(6, int(640 / max(h, 1)), int(1000 / max(w, 1))))
 
         self.win = Toplevel(master)
+        self.win.configure(bg="#1b1e24")
         self.win.title(f"Colour editor: {self.path.name}")
         self.tol = DoubleVar(value=0.08)
         self.radius = IntVar(value=0)

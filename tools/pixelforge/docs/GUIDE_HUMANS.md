@@ -70,6 +70,23 @@ in any text editor, then run **all** with that sheet. Loops are seamless (the re
 and every cue sits at the same loudness. Format `ogg` makes small files for the game when ffmpeg is installed;
 otherwise WAV, which Godot also plays.
 
+## Describe it, get it
+
+The **Describe it…** button (also Ctrl+D, and Tools > Describe it): say what you want in plain words and the Forge
+drafts it and opens it in the right editor. "A wisp lantern spell, pale blue, slow, with embers" becomes a spell in
+the spell designer with those layers. "Make the left eye teal with a pale glow" finds the eye on the chosen picture
+and opens the skin editor with the change made (Undo if it read you wrong). "A grave knight with a rusted helm" gives
+the Midjourney prompt. "A slow sombre act 2 wilds tune with more wind" renders and plays that cue. It is a draft from
+a vocabulary of colours, effects, places and moods, not a mind-reader; an AI assistant connected to the Forge can
+write anything the vocabulary does not cover.
+
+## Preview in game
+
+**▶ Preview in game** (step 9, Tools > Preview in game, or the Tools menu) launches the game on the moor with the
+character's exported set on the hero, the effects you attached playing on them, or any effect by name, so judging
+happens in the real light and scale. Godot is found automatically; if not, set `PIXELFORGE_GODOT` to its path. With
+"screenshot" ticked it saves a picture after four seconds and quits instead.
+
 ## Skins and spells
 
 **Skin editor** (step 3 under each cutout as "Skin", step 9 on the finished set, Tools > Skin editor for any PNG):

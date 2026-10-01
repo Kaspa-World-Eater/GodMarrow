@@ -298,10 +298,9 @@ def _canopy_cards(vox: np.ndarray, F: np.ndarray, S: np.ndarray, T: np.ndarray |
 
 
 def synthesize_top(front: Image.Image, spec: dict, scale: int = 8, top_light: float = 0.10) -> Image.Image:
-    """What the camera sees from above when no plan view was painted. Each column of the front view gives the colour
-    of its topmost paint (the surface the camera looks down on); a hat cone is revolved from the front painting's
-    brim band, so the hat's top is the brim's colour out to its edge and the crown's colour at the centre, not the
-    pale disc the front projection smeared over it. Canonical orientation (image-up = the figure's back)."""
+    """What the camera sees from above when no plan view was painted: only the parts whose top is known. A hat cone
+    is revolved from the front painting's brim band (lifted a little toward lit straw); everything else stays
+    transparent so the body keeps its front and side paint. Canonical orientation (image-up = the figure's back)."""
     f = np.asarray(front.convert("RGBA"))
     a = f[..., 3] > 127
     ys, xs = np.nonzero(a)
@@ -310,26 +309,16 @@ def synthesize_top(front: Image.Image, spec: dict, scale: int = 8, top_light: fl
     h, w = a.shape
     cols, dcols, rows = spec["columns"], spec["depth_columns"], spec["rows"]
     W, H = cols * scale, dcols * scale
-    out = np.zeros((H, W, 4), np.uint8)
-    # topmost paint per column, averaged over a few pixels down so it is the surface and not the edge fringe
-    xs_src = (np.arange(W) * w / W).astype(int)
-    for X in range(W):
-        col = np.nonzero(a[:, xs_src[X]])[0]
-        if len(col) == 0:
-            continue
-        y0 = col[0]
-        band = f[y0:min(h, y0 + max(2, h // 60)), xs_src[X]]
-        band = band[band[..., 3] > 127]
-        out[:, X, :3] = band[..., :3].mean(axis=0).astype(np.uint8)
-        out[:, X, 3] = 255
+    out = np.zeros((H, W, 4), np.uint8)   # transparent: the material paints upward faces only where this has paint
     for part in spec.get("parts", []):
         if part["kind"] != "cone":
             continue
         # revolve: a point at radius r (in columns) takes the front painting's colour at x = cx +- r in the brim band
         rows_b = part["rows"]
         yb0, yb1 = int(min(rows_b) * h / rows), int((max(rows_b) + 1) * h / rows)
-        # the upper half of the brim band is the hat's top surface in the painting; the lower half its underside
-        band = f[yb0:max(yb0 + max(1, (yb1 - yb0) // 2), yb0 + 1)]
+        # the brim band's lower half is the hat itself (straw, dark); its upper rows are often the crown or what shows
+        # behind it, so the revolve reads the lower half and the lift below makes a lit straw top of it
+        band = f[yb0 + (yb1 - yb0) // 2:max(yb1, yb0 + 1)]
         R = part["radius"]
         cxp = (part["cx"] + 0.5) * w / cols
         prof = np.zeros((int(R * scale) + 2, 3), np.float32)

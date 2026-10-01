@@ -11,6 +11,8 @@ extends RefCounted
 ##   --boardtest              lay a road to the right hand of the body board and take three cards
 ##   --panel=ID               open a panel (skills, inv, char, board, journal, choir, golem) or a town window
 ##   --demo [--trace]         the pilgrim fights the nearest creatures, for captures
+##   --fx=NAME[,NAME]         PixelForge effects (art/fx/<NAME>.json) playing at the pilgrim, for a look (the Forge's "Preview in game")
+##   --attach                 spawn the effects the Forge's effects editor attached to the pilgrim's sprite set
 ##   --shot=PATH [--shot_t=S] [--shot_n=N]   save the screen to PATH after S seconds (default 4), N frames 0.25 s apart
 ##                            (PATH_1.png ...), then quit. Needs a window (not --headless). --hour=0..1 sets the hour.
 
@@ -25,6 +27,8 @@ static func run(g) -> void:
 		_demo(g)
 	if a.has("panel"):
 		await g.get_tree().create_timer(1.0).timeout
+	if a.has("fx") or a.has("attach"):
+		_forge_preview(g, a)
 	if a.has("lvl"):
 		g.hero.st.level = int(a["lvl"])
 		g.hero.st.arcana_points = int(a.get("arcana", "3"))
@@ -195,3 +199,20 @@ static func _shot(g, a: Dictionary) -> void:
 		if i < n - 1:
 			await tree.create_timer(0.25).timeout
 	tree.quit()
+
+static func _forge_preview(g, a: Dictionary) -> void:
+	## PixelForge's "Preview in game": effects at the pilgrim (--fx=a,b) and the sprite set's attached effects (--attach).
+	var fx_dir := "res://art/fx"
+	if a.has("fx"):
+		for name in String(a["fx"]).split(","):
+			if name != "":
+				var sp = PFFx.spawn(g.hero, fx_dir, name, Vector2(0, -60), 1.0, 2)
+				if sp == null:
+					print("FORGE fx missing: ", name)
+	if a.has("attach"):
+		var kind := String(a.get("skin", g.hero.cls))
+		var set := PFSpriteSet.new()
+		if set.load_file("res://art/sprites/%s.json" % kind):
+			var nodes := PFFx.spawn_attachments(g.hero, set.fx_dir(fx_dir), set, "down", 1.0, 2)
+			g.hero.set_meta("forge_attachments", nodes)
+			print("FORGE attachments: ", nodes.size())
