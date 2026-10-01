@@ -176,3 +176,100 @@ PIXELFORGE_GODOT, tools\godot, PATH, Program Files, LocalAppData\Programs and Do
 `[Environment]::GetFolderPath('Desktop')` path) to the search before the download step.
 
 **derek-33, 2026-10-02:** pulled to `a4c5819`; `Play Godmarrow.bat` launched like a double-click found `C:\Users\derek\OneDrive\Desktop\Godot\Godot_v4.7.2-stable_win64.exe`, downloaded nothing (no `tools\godot`), and the game window opened ("Godmarrow (DEBUG)"). Paused.
+
+---
+
+## 7. Handoff 2026-10-01 (cloud session, end of context): state, running agents, how to pick everything up
+
+**If you are a new session reading this: the cloud session that wrote it is out of tokens. Everything below is on
+`origin/main` except the agent branches, which may or may not have been pushed. Read the whole section first.**
+
+### 7.1 What is on main (all pushed)
+- **Models in the game.** `art/sprites/skins.json` maps a class to a sprite set (`miasmancer` -> `keeper`,
+  `animancer` -> `mystic`); `core/data.gd skin_for()` reads it. Spell sheets in `art/fx/` (bone_spear r16, teeth,
+  ice_bolt, fire_bolt, bone_armor/bone_shard_aura front+back, frost_nova, fire_wall, bone_spear_hit, corpse_burst and
+  their `.spell.json`). All `.import` files committed. Smoke: every scene errors 0.
+- **Studio** (`tools/pixelforge/pixelforge/gui.py`): "Open painting…" (toolbar, File menu, Ctrl+P, welcome page) names
+  the character after the file, imports it (wide = sheet, tall = front) and runs every automatic step; New character is
+  an inline form (no Toplevel); results and stops show in the status line and under the steps (`_tell`), not pop-ups;
+  the step panel scrolls and wraps (`panel_canvas`, `_wrap_labels`); Edit/Skin buttons sit under each cutout.
+- **Skin ops** (`skin_ops.py`): regions take `mode: add|subtract` with polygon or magic-wand `like` pieces (Shift+click
+  adds, Alt+click subtracts in the editors, to be wired); `clone` op = clone brush. Spec for the editors in
+  `docs/track_notes/editor_tools.md`.
+- **Smooth motion** (`godmarrow_export.py`): the export keeps every rendered frame up to 24 a clip at the clip's real
+  speed (it used to thin to 8 and play a walk at 4.8 fps, the "choppy" look); frames past a 4096 px sheet go on
+  further sheets; render default `per_clip` 24. **The Keeper in `art/sprites/keeper.*` is still the old 12-frame
+  render thinned to 8.** To make her smooth: re-render with `--per-clip 24`, pixelate, `export-game`, copy to
+  `art/sprites/keeper.*`, `godot --headless --path . --import`, smoke, commit. (A scratch attempt at
+  `scratchpad/smooth/rerender.py` failed at start: the Blender shim's python3 could not import numpy; the shim is
+  `scratchpad/heroes/blender`, a `python3 -c "import bpy"` wrapper under xvfb. derek-33 on Derek's PC has real Blender
+  4.5 and can run the same three Forge commands.)
+- **Game test hooks** (`core/test_hooks.gd`): `--hide=dark,atmos,sky,fore`, `--nolm`, `--darkflat`, `--nolamp`,
+  `--shot=PATH --shot_t --shot_n`. In-game screenshots work in the cloud: `xvfb-run -a -s "-screen 0 1280x720x24"
+  godot --path . --rendering-driver opengl3 --resolution 1280x720 -- --zone=moor --seed=3 --new --cls=miasmancer
+  --hour=0.5 --shot=/abs.png --shot_t=5`.
+- **See-through hero: diagnosed, not fixed.** The sprites are fully opaque (alpha only 0/255). With the dark layer
+  (`world/dark_layer.gd` + `shaders/dark.gdshader`) hidden the Keeper is solid; with it on, the ground pattern shows
+  through her skirt. Ruled out: the light map (`--nolm` still see-through), the air layers (`--hide=atmos,sky,fore`
+  still see-through), the hero's lamp (`--nolamp`), and draw order (`--darkflat`, the dark as a plain veil with no
+  shader, is solid). So it is the dark shader's own output over the hero's lower body; cause still unknown. Compare
+  `scratchpad/shots/keeper_skirt3.png` panels if the scratchpad survives; otherwise re-take with the hooks above.
+
+### 7.2 Derek's direction (verbatim intent, in order)
+- "push the new models into the game so i can actually see how they look" (done); "it worked, it just opened another
+  window, i dont like that" (fixed); "it says click edit to edit the cut out but there is no button, massively improve
+  the ui. major overhaul"; "i want pixel forge to be a smooth in window experience for humans at least, ai can run it
+  however is best for them"; "needs a shift+click to add selected areas, and a clone tool brush" (ops done, UI pending).
+- "your spell effects are good pixel art style but not diablo 2R level. your bone spear isnt even close. the character
+  models dont work well. either full blown 3d models or a true pixel art game with maybe the 3d elements" -> "get some
+  agents building pixel forge for both option, improve the ui". The cloud session's recommendation to Derek: pixel art
+  as the main road for characters (the game draws at 4-px cells, figures ~70 px tall), 3D kept for props, missiles and
+  effects; build both so he can compare in the game.
+- "refine the graphics effects, more options like phosphorus, and haze and ethereal, and glow and cyberpunk,
+  psychedelic, smoother loops, echo, etc".
+- "shrine keeper doesnt look half bad, the issue is the animations are choppy and shes in a cartoon world with cartoony
+  spell effects". Choppy: see 7.1 (fixed in the export, re-render pending). Cartoon world: the props/tiles are the
+  procedural stand-ins (`tools/pf_paint.py`, `art/objects/pf_*`) made before any Midjourney world art existed; the road
+  to a painted world is `docs/ART_ORDER.md` / `pixelforge prompt --world ... --sref <Keeper sheet url>` painted by
+  Derek in Midjourney, then `pixelforge tiles|prop|object`. Cartoony effects: the fx and fxlook tracks below, plus the
+  painted-effect road (`world_prompts` kinds `missile`, `effect`, `spell_frames` -> `pixelforge effect`).
+- Standing: never work on the Mystic (the Keeper is the test subject); no pop-ups; no model identifiers in commits;
+  commits end with the two attribution lines; never tokens; derek-33 paused unless Derek says otherwise.
+
+### 7.3 Agent tracks that were running when this session ended
+Five builder/reviewer teams were launched from the cloud session (two Workflow runs), each in its own git worktree and
+branch, each told to commit with the attribution lines, to push its branch to origin as a backup when something works,
+to never touch main, and to leave `docs/track_notes/<track>.md` for the integrator. Worktrees live only in the dead
+container; **what survives is whatever reached `origin/track/*`**. Check with `git fetch origin && git branch -r`.
+
+| branch | worktree (gone with the container) | goal |
+|---|---|---|
+| `track/ui` | /home/user/wt/ui | Studio overhaul: one window, left nav + pages (Home, Character steps, editors with toolbars, Tools, Game, Settings), no Toplevel/messagebox, dark theme on every widget, scrolling/wrapping, drag-and-drop (optional tkinterdnd2), screenshots at 1280x800 and 1366x768 under docs/screens/ui/ |
+| `track/pixel2d` | /home/user/wt/pixel2d | the no-Blender "pixel path": joint tracks exported once from `assets/animations/quaternius_ual_standard.glb` (export_joints.py, committed file), `puppet.py` (parts with pivots per view), 8-direction 2D puppet animation, `api.run_pixel_path`, CLI `pixelforge puppet` / `run --road pixel`, MCP, a `keeper_pixel` set in the game with side-by-side shots under docs/screens/pixel2d/ |
+| `track/fx` | /home/user/wt/fx | the bone spear benchmark: a 3D-rendered spear (Blender script, 16 rotations, wake layer) vs an improved procedural one; `--fx_fly=NAME` / `--fx_fly8` test hooks so missiles fly in the preview; a 3D missile library (spear, teeth, bolts, bone chunk); verdict against D2R under docs/screens/fx/ |
+| `track/body3d` | /home/user/wt/body3d | the anatomical body (skin-modifier skeleton fitted per part + garment shells + the painting projection) as `api.build_model(..., body="anatomy")`, an anatomy check in checks.py, a `keeper_anatomy` set in the game, verdict under docs/screens/body3d/ |
+| `track/fxlook` | /home/user/wt/fxlook | `fxlook.py`: composable looks (phosphorus, haze, ethereal, glow, cyberpunk, psychedelic, echo, smooth loops, embers, smoke, shimmer, outline, pulse, grain, flicker, dissolve, ice, rot) on any effect; `--look` on vfx/spell/effect/animate, `pixelforge looks [--demo]`, MCP, describe-it words; GIF contact sheet and in-game shots under docs/screens/fxlook/ |
+
+At the time of writing none of the five had committed yet (they were in their first hour). If a branch is missing from
+origin, that track's work is lost and must be restarted from its goal above (the full prompts are only in the dead
+session; the table is enough to re-brief).
+
+### 7.4 How to integrate what survived (the plan the integrator agent was given)
+1. `git -C <repo> pull --ff-only`; for each surviving branch, `git merge --no-ff origin/track/<t>` in this order:
+   fx, fxlook, pixel2d, body3d, ui (the UI branch owns gui.py / the Studio package; the others own their modules,
+   api/cli/mcp additions, docs and game files; for the guides and HANDOFF keep every section from every side).
+2. Wire the new features into the overhauled Studio following each `docs/track_notes/*.md`: road choice (3D / Pixel)
+   on the character pages, body option (hull / anatomy) on the model step, effect looks picker, 3D-vs-procedural and
+   "fly" preview on the Effects page, Shift/Alt selection and the clone brush in the editors
+   (`docs/track_notes/editor_tools.md`).
+3. Verify: `cd tools/pixelforge && python -m pytest -q`; `GODOT=<godot> bash tools/smoke.sh out.txt` (every line
+   errors 0; run `godot --headless --path . --import` first if textures are missing); `tests/addon_check.gd`; a Studio
+   walkthrough under xvfb (open the Keeper painting on a fresh fake HOME, steps 3-4 run, step 5 stops inline; the pixel
+   road runs to export without Blender); screenshots under docs/screens/integrated/.
+4. HANDOFF entry, push main. Derek sees it through the Godmarrow icon (pulls) and the Studio's "Update and restart" bar.
+
+### 7.5 Open items, in Derek's priority
+1. Re-render the Keeper at 24 frames a clip and ship her (7.1). 2. UI overhaul (track/ui) with the editor tools.
+3. Effects to D2R level (track/fx, track/fxlook, painted effects). 4. Pixel road vs anatomy road comparison in the game
+(track/pixel2d, track/body3d). 5. The see-through hero (dark shader). 6. The painted world: Derek paints the art order
+in the Keeper's style; the Forge converts.
