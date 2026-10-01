@@ -1,0 +1,26 @@
+{
+  "name": "pf_cairn",
+  "variations": {
+    "v1": {
+      "size": [
+        62,
+        102
+      ],
+      "anchor": [
+        30,
+        99
+      ],
+      "ellipse": [
+        30,
+        99,
+        54,
+        27
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

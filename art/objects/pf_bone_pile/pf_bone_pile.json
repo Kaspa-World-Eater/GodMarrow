@@ -1,0 +1,26 @@
+{
+  "name": "pf_bone_pile",
+  "variations": {
+    "v1": {
+      "size": [
+        119,
+        102
+      ],
+      "anchor": [
+        52,
+        99
+      ],
+      "ellipse": [
+        52,
+        99,
+        101,
+        50
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

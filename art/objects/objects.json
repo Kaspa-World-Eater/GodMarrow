@@ -28,5 +28,56 @@
   "ox": 28,
   "oy": 68,
   "hr": 1.4
+ },
+ "pf_gravestone": {
+  "png": "res://art/objects/pf_gravestone/pf_gravestone_v1.png",
+  "ox": 28,
+  "oy": 99,
+  "hr": 2
+ },
+ "pf_bone_pile": {
+  "png": "res://art/objects/pf_bone_pile/pf_bone_pile_v1.png",
+  "ox": 52,
+  "oy": 99,
+  "hr": 2
+ },
+ "pf_dead_tree": {
+  "png": "res://art/objects/pf_dead_tree/pf_dead_tree_v1.png",
+  "ox": 32,
+  "oy": 101,
+  "hr": 2,
+  "frames": 8,
+  "frame_width": 66,
+  "fps": 6
+ },
+ "pf_banner": {
+  "png": "res://art/objects/pf_banner/pf_banner_v1.png",
+  "ox": 30,
+  "oy": 100,
+  "hr": 2,
+  "frames": 8,
+  "frame_width": 60,
+  "fps": 6
+ },
+ "pf_brazier": {
+  "png": "res://art/objects/pf_brazier/pf_brazier_v1.png",
+  "ox": 24,
+  "oy": 100,
+  "hr": 2,
+  "frames": 8,
+  "frame_width": 50,
+  "fps": 6
+ },
+ "pf_lantern_post": {
+  "png": "res://art/objects/pf_lantern_post/pf_lantern_post_v1.png",
+  "ox": 13,
+  "oy": 98,
+  "hr": 2
+ },
+ "pf_cairn": {
+  "png": "res://art/objects/pf_cairn/pf_cairn_v1.png",
+  "ox": 30,
+  "oy": 99,
+  "hr": 2
  }
 }

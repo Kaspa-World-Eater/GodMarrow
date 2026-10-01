@@ -1,0 +1,26 @@
+{
+  "name": "pf_gravestone",
+  "variations": {
+    "v1": {
+      "size": [
+        57,
+        102
+      ],
+      "anchor": [
+        28,
+        99
+      ],
+      "ellipse": [
+        28,
+        99,
+        53,
+        26
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

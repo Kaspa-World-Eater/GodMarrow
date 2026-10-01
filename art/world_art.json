@@ -1,0 +1,167 @@
+{
+ "moor_grass": {
+  "png": "/home/user/godmarrow/tools/../art/tiles/moor_grass.png",
+  "json": "/home/user/godmarrow/tools/../art/tiles/moor_grass.json",
+  "tres": "/home/user/godmarrow/tools/../art/tiles/moor_grass.tres",
+  "tiles": 22
+ },
+ "fen_mud": {
+  "png": "/home/user/godmarrow/tools/../art/tiles/fen_mud.png",
+  "json": "/home/user/godmarrow/tools/../art/tiles/fen_mud.json",
+  "tres": "/home/user/godmarrow/tools/../art/tiles/fen_mud.tres",
+  "tiles": 22
+ },
+ "ash_shore": {
+  "png": "/home/user/godmarrow/tools/../art/tiles/ash_shore.png",
+  "json": "/home/user/godmarrow/tools/../art/tiles/ash_shore.json",
+  "tres": "/home/user/godmarrow/tools/../art/tiles/ash_shore.tres",
+  "tiles": 22
+ },
+ "stone_flags": {
+  "png": "/home/user/godmarrow/tools/../art/tiles/stone_flags.png",
+  "json": "/home/user/godmarrow/tools/../art/tiles/stone_flags.json",
+  "tres": "/home/user/godmarrow/tools/../art/tiles/stone_flags.tres",
+  "tiles": 22
+ },
+ "pf_bone_frame": {
+  "png": "/home/user/godmarrow/tools/../art/ui/pf_bone_frame.png",
+  "tres": "/home/user/godmarrow/tools/../art/ui/pf_bone_frame.tres",
+  "json": "/home/user/godmarrow/tools/../art/ui/pf_bone_frame.json",
+  "margins": {
+   "left": 14,
+   "top": 14,
+   "right": 14,
+   "bottom": 14
+  }
+ },
+ "pf_iron_frame": {
+  "png": "/home/user/godmarrow/tools/../art/ui/pf_iron_frame.png",
+  "tres": "/home/user/godmarrow/tools/../art/ui/pf_iron_frame.tres",
+  "json": "/home/user/godmarrow/tools/../art/ui/pf_iron_frame.json",
+  "margins": {
+   "left": 12,
+   "top": 12,
+   "right": 12,
+   "bottom": 12
+  }
+ },
+ "pf_vellum_panel": {
+  "png": "/home/user/godmarrow/tools/../art/ui/pf_vellum_panel.png",
+  "tres": "/home/user/godmarrow/tools/../art/ui/pf_vellum_panel.tres",
+  "json": "/home/user/godmarrow/tools/../art/ui/pf_vellum_panel.json",
+  "margins": {
+   "left": 10,
+   "top": 10,
+   "right": 10,
+   "bottom": 10
+  }
+ },
+ "pf_teal_ward_frame": {
+  "png": "/home/user/godmarrow/tools/../art/ui/pf_teal_ward_frame.png",
+  "tres": "/home/user/godmarrow/tools/../art/ui/pf_teal_ward_frame.tres",
+  "json": "/home/user/godmarrow/tools/../art/ui/pf_teal_ward_frame.json",
+  "margins": {
+   "left": 8,
+   "top": 8,
+   "right": 8,
+   "bottom": 8
+  }
+ },
+ "gravestone": {
+  "dir": "/home/user/godmarrow/tools/../art/objects/pf_gravestone"
+ },
+ "bone_pile": {
+  "dir": "/home/user/godmarrow/tools/../art/objects/pf_bone_pile"
+ },
+ "dead_tree": {
+  "dir": "/home/user/godmarrow/tools/../art/objects/pf_dead_tree"
+ },
+ "banner": {
+  "dir": "/home/user/godmarrow/tools/../art/objects/pf_banner"
+ },
+ "brazier": {
+  "dir": "/home/user/godmarrow/tools/../art/objects/pf_brazier"
+ },
+ "lantern_post": {
+  "dir": "/home/user/godmarrow/tools/../art/objects/pf_lantern_post"
+ },
+ "cairn": {
+  "dir": "/home/user/godmarrow/tools/../art/objects/pf_cairn"
+ },
+ "sfx": {
+  "files": [
+   "/home/user/godmarrow/tools/../art/sfx/pf/hit_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/hit_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/hit_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/heavy_hit_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/heavy_hit_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/heavy_hit_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/bone_click_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/bone_click_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/bone_click_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/bone_break_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/bone_break_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/bone_break_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/thud_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/thud_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/thud_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/whoosh_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/whoosh_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/whoosh_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/pour_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/pour_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/pour_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/glass_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/glass_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/glass_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/cast_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/cast_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/cast_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/wisp_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/wisp_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/wisp_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/pickup_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/pickup_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/pickup_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/ui_tick_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/ui_tick_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/ui_tick_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/ui_open_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/ui_open_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/ui_open_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/death_rattle_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/death_rattle_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/death_rattle_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/lantern_light_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/lantern_light_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/lantern_light_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/step_stone_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/step_stone_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/step_stone_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/step_soft_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/step_soft_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/step_soft_3.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/coin_1.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/coin_2.wav",
+   "/home/user/godmarrow/tools/../art/sfx/pf/coin_3.wav"
+  ]
+ },
+ "portrait": {
+  "files": {
+   "48": "/home/user/godmarrow/tools/../art/portraits/mystic_portrait_48.png",
+   "96": "/home/user/godmarrow/tools/../art/portraits/mystic_portrait_96.png"
+  }
+ },
+ "champion": {
+  "json": "/home/user/godmarrow/tools/../art/sprites/wraith@champion.json",
+  "sheets": [
+   "wraith@champion.png"
+  ]
+ },
+ "unique": {
+  "json": "/home/user/godmarrow/tools/../art/sprites/wraith@unique.json",
+  "sheets": [
+   "wraith@unique.png"
+  ]
+ }
+}

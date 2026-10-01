@@ -1,0 +1,26 @@
+{
+  "name": "pf_lantern_post",
+  "variations": {
+    "v1": {
+      "size": [
+        38,
+        101
+      ],
+      "anchor": [
+        13,
+        98
+      ],
+      "ellipse": [
+        13,
+        98,
+        23,
+        11
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "pf_bone_frame",
+  "size": [
+    38,
+    38
+  ],
+  "margins": {
+    "left": 14,
+    "top": 14,
+    "right": 14,
+    "bottom": 14
+  },
+  "source": "pixelforge"
+}

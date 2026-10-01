@@ -1,0 +1,14 @@
+{
+  "name": "pf_iron_frame",
+  "size": [
+    34,
+    34
+  ],
+  "margins": {
+    "left": 12,
+    "top": 12,
+    "right": 12,
+    "bottom": 12
+  },
+  "source": "pixelforge"
+}
