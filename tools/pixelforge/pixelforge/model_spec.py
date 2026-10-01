@@ -237,7 +237,7 @@ def _brim_rows(F: np.ndarray) -> list[int]:
     return list(range(z0, max(best) + 1))   # everything from the figure's top down to the brim's underside is the hat
 
 
-def _cull_slivers(vox: np.ndarray, keep_fraction: float = 0.03) -> np.ndarray:
+def _cull_slivers(vox: np.ndarray, keep_fraction: float = 0.03, attached_only: bool = False) -> np.ndarray:
     """Keep the body and any island at least keep_fraction of it (a held thing); drop the rest. Loose slivers (a plate
     where a cord seen edge-on met the body's width, a tassel's voxels) read as lines sticking out of the figure; the
     card pass that follows brings back what the front view shows, attached to the body at its mid-depth."""
@@ -249,6 +249,8 @@ def _cull_slivers(vox: np.ndarray, keep_fraction: float = 0.03) -> np.ndarray:
     sizes = ndimage.sum(vox, lab, index=np.arange(n + 1))
     biggest = sizes[1:].max()
     keep = sizes >= keep_fraction * biggest
+    if attached_only:   # only the body and a held thing (a quarter of its size or more); every other loose piece goes
+        keep &= (sizes >= 0.25 * biggest)
     keep[0] = False
     return keep[lab]
 
@@ -295,7 +297,7 @@ def _canopy_cards(vox: np.ndarray, F: np.ndarray, S: np.ndarray, T: np.ndarray |
     return parts
 
 
-def synthesize_top(front: Image.Image, spec: dict, scale: int = 8) -> Image.Image:
+def synthesize_top(front: Image.Image, spec: dict, scale: int = 8, top_light: float = 0.10) -> Image.Image:
     """What the camera sees from above when no plan view was painted. Each column of the front view gives the colour
     of its topmost paint (the surface the camera looks down on); a hat cone is revolved from the front painting's
     brim band, so the hat's top is the brim's colour out to its edge and the crown's colour at the centre, not the
@@ -326,7 +328,8 @@ def synthesize_top(front: Image.Image, spec: dict, scale: int = 8) -> Image.Imag
         # revolve: a point at radius r (in columns) takes the front painting's colour at x = cx +- r in the brim band
         rows_b = part["rows"]
         yb0, yb1 = int(min(rows_b) * h / rows), int((max(rows_b) + 1) * h / rows)
-        band = f[yb0:max(yb1, yb0 + 1)]
+        # the upper half of the brim band is the hat's top surface in the painting; the lower half its underside
+        band = f[yb0:max(yb0 + max(1, (yb1 - yb0) // 2), yb0 + 1)]
         R = part["radius"]
         cxp = (part["cx"] + 0.5) * w / cols
         prof = np.zeros((int(R * scale) + 2, 3), np.float32)
@@ -342,7 +345,18 @@ def synthesize_top(front: Image.Image, spec: dict, scale: int = 8) -> Image.Imag
         d = np.sqrt((xx - (part["cx"] + 0.5) * scale) ** 2 + (yy - (cy + 0.5 * scale)) ** 2)
         inside = d <= R * scale
         idx = np.clip(d[inside].astype(int), 0, len(prof) - 1)
-        out[inside, :3] = prof[idx].astype(np.uint8)
+        cols_rgb = prof[idx]
+        if top_light:
+            # a hat's top faces the sky: lift it toward straw (OKLab lightness up, a little warmth) so it reads as a
+            # lit surface and not the brim's shadowed underside
+            from .color import oklab_to_rgb, rgb_to_oklab
+
+            lab = rgb_to_oklab(cols_rgb[None].astype(np.uint8))[0]
+            lab[:, 0] = np.clip(lab[:, 0] + top_light, 0, 1)
+            lab[:, 1] += 0.01
+            lab[:, 2] += 0.02
+            cols_rgb = np.clip(oklab_to_rgb(lab[None])[0], 0, 255)
+        out[inside, :3] = cols_rgb.astype(np.uint8)
         out[inside, 3] = 255
     return Image.fromarray(out, "RGBA")
 
@@ -432,8 +446,10 @@ def build_hull_spec(
     cell = 1.0 / rows  # cubic voxels in units of height
     depth_cols = max(4, round((s.shape[1] / s.shape[0]) / cell))
 
-    def shrink(mask, size):
-        return np.asarray(Image.fromarray(mask.astype(np.uint8) * 255).resize(size, Image.BOX)) > 127
+    def shrink(mask, size, coverage: float = 0.35):
+        # a cell is solid when more than ``coverage`` of it is paint: a lacy hem or a tattered edge (half paint, half
+        # holes) must still carve, or the dark cloth there vanishes from the model
+        return np.asarray(Image.fromarray(mask.astype(np.uint8) * 255).resize(size, Image.BOX)) > int(255 * coverage)
 
     F = shrink(f, (columns, rows))
     S = shrink(s, (depth_cols, rows))
@@ -536,6 +552,8 @@ def build_hull_spec(
         for y in (yc - 1, yc):
             if 0 <= y < depth_cols:
                 vox[z, y, lost[z]] = True
+    # a card that touched nothing (a charm whose string is thinner than a voxel) would float: keep what is attached
+    vox = _cull_slivers(vox, keep_fraction=0.03, attached_only=True)
     if not vox.any():
         raise ValueError("hull is empty; check that the side view faces the right way")
     quarter_sign, quarter_iou = 0, 0.0

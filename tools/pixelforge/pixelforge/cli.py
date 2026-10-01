@@ -295,6 +295,13 @@ def cmd_project(a) -> None:
             if a.step == "render":
                 kw = {"step": a.frame_step, "elevation": a.elevation, "passes": a.passes}
             _emit(a, api.run_step(project, a.character, a.step, log=print, **kw))
+        elif sub == "check":
+            from .checks import check_character
+            r = check_character(project, a.character)
+            if a.json:
+                _emit(a, r)
+            else:
+                print("OK: nothing to fix" if r["ok"] else "\n".join("- " + i for i in r["issues"]))
         elif sub == "run-all":
             if a.all:
                 results = {}
@@ -592,6 +599,7 @@ def build_parser() -> argparse.ArgumentParser:
     x = ps.add_parser("export-game", help="export in Godmarrow's art/sprites format (+ normal/depth sets)"); x.add_argument("character")
     x.add_argument("--kind", help="sprite kind name (default: character name)"); x.add_argument("--out", help="output folder (default: characters/<name>/export_game)")
     x.add_argument("--category", default="hero"); x.add_argument("--name", help="display name")
+    x = ps.add_parser("check", help="the automatic checks on a character's cutouts, carve and frames (plain English)"); x.add_argument("character")
     x = ps.add_parser("run-all", help="run every remaining automatic step"); x.add_argument("character", nargs="?", help="omit with --all"); x.add_argument("--all", action="store_true", help="every character in the project, in turn")
     x = ps.add_parser("still", help="quick path: one image -> sprite (-> animation -> export)"); x.add_argument("character")
     x.add_argument("--view", default="style", choices=["style", "front", "side", "back"]); x.add_argument("--animate", nargs="*", metavar="PRESET"); x.add_argument("--export", action="store_true")

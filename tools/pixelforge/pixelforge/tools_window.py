@@ -141,7 +141,7 @@ class ToolsWindow:
         self.base = Path(base_dir) if base_dir else Path.cwd()
         self.win = Toplevel(master)
         self.win.title("PixelForge tools")
-        self.win.geometry("760x560")
+        self.win.geometry("1320x640")   # wide enough for every tab name to read in full
         nb = ttk.Notebook(self.win)
         nb.pack(fill=BOTH, expand=True, padx=6, pady=6)
         self.out = ScrolledText(self.win, height=6, state="disabled", font=("Consolas", 9))

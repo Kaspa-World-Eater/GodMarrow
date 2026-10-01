@@ -47,6 +47,7 @@ def make_object(sheet: str | Path, name: str, out_dir: str | Path, *, height: fl
     for k, v in got.items():
         rgba = np.asarray(v.image.convert("RGBA"))
         clean = cleanup.remove_background_pockets(rgba if k in ("top", "bottom") else cleanup.drop_floor_shadow(rgba))
+        clean = cleanup.fill_bright_specks(clean)
         Image.fromarray(clean, "RGBA").save(work / f"{k}.png")
         rgba = cleanup.bleed_edges(clean)
         p = work / f"tex_{k}.png"

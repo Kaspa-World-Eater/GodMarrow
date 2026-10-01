@@ -22,6 +22,7 @@ from PIL import Image
 from . import cleanup
 from . import godot as godot_export
 from .animate import PRESETS, animate
+from .checks import check_frames, check_spec, check_views
 from .model_spec import synthesize_top, transpose_image, build_hull_spec, build_spec, write_spec
 from .palette import Palette
 from .pixelate import PixelateOptions, pixelate, pixelate_frames
@@ -150,6 +151,7 @@ def split(project: Project, name: str, tolerance: float = 0.08, expected_views: 
             rgba_v = cleanup.remove_background_pockets(cleanup.drop_floor_shadow(np.asarray(v.image.convert("RGBA"))))
             rgba_v[..., 3] = cleanup.remove_islands(rgba_v[..., 3], min_fraction=0.0015)   # fringe specks would float as voxels
             rgba_v = cleanup.unmix_background(rgba_v, (255, 255, 255))   # no pale rim: the edge keeps the paint, not the white
+            rgba_v = cleanup.fill_bright_specks(rgba_v)   # white pokes through a dark hem: paint it the hem's colour
             Image.fromarray(rgba_v, "RGBA").save(out)
             made[v.name] = str(out)
             # the raw crop, for the manual cutout editor's Restore brush
@@ -186,8 +188,10 @@ def split(project: Project, name: str, tolerance: float = 0.08, expected_views: 
     c.settings["tolerance"] = float(tolerance)
     c.done["split"] = True
     c.notes["split"] = f"views: {', '.join(sorted(made))}"
+    chk = check_views(views_dir)
+    c.notes["split_check"] = "cutouts clean" if chk["ok"] else "; ".join(chk["issues"])
     project.save()
-    return {"ok": True, "character": c.name, "views": made, "next": "palette"}
+    return {"ok": True, "character": c.name, "views": made, "check": chk, "next": "palette"}
 
 
 def preview_gif(project: Project, name: str, clip: str = "walk", direction: str = "S", source: str = "auto", zoom: int = 3) -> dict:
@@ -434,6 +438,8 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
         c.notes["model_mode"] = "hull"
     c.done["model"] = True
     c.notes["model"] = result
+    chk = check_spec(spec)
+    c.notes["model_check"] = "carve clean" if chk["ok"] else "; ".join(chk["issues"])
     c.notes["model_note"] = ("Built: a real human figure fitted to the painting." if c.notes["model_mode"] == "template"
                              else "Built: a carved shape (the silhouette shows no legs, so the human fit was skipped).")
     project.save()
@@ -540,8 +546,10 @@ def render(project: Project, name: str, actions: list[str] | None = None, step: 
     c.settings["ppu"] = manifest["ppu"]
     c.done["render"] = True
     c.notes["render"] = f"{sum(a['frames'] for a in manifest['actions'].values())} frames x {len(manifest['directions'])} directions"
+    chk = check_frames(out)
+    c.notes["render_check"] = "frames clean" if chk["ok"] else "; ".join(chk["issues"])
     project.save()
-    return {"ok": True, "character": c.name, "renders": str(out), "manifest": manifest, "next": "pixelate"}
+    return {"ok": True, "character": c.name, "renders": str(out), "manifest": manifest, "check": chk, "next": "pixelate"}
 
 
 def project_setting(project: Project, key: str, default):

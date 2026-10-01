@@ -272,10 +272,33 @@ def test_synthesized_top_revolves_the_hat_from_the_front_view():
     front = Image.fromarray(rgba)
     spec = build_hull_spec(front, Image.fromarray(np.concatenate([rgba[:, 16:48]], axis=1)))
     assert spec["parts"] and spec["parts"][0]["kind"] == "cone"
-    top = np.asarray(synthesize_top(front, spec))
+    top = np.asarray(synthesize_top(front, spec, top_light=0.0))
     H, W = top.shape[:2]
     cone = spec["parts"][0]
     cx, cy = int((cone["cx"] + 0.5) * 8), int((spec["depth_columns"] - 1 - cone["cy"] + 0.5) * 8)
     edge = top[cy, min(W - 1, cx + int(cone["radius"] * 8) - 3)]
     assert tuple(edge[:3]) == (60, 40, 70), "the hat's top is the brim's colour out to its edge"
     assert top[cy, cx, 3] == 255
+    lit = np.asarray(synthesize_top(front, spec))   # the default lifts the top toward straw
+    assert lit[cy, cx + 20, :3].astype(int).sum() > edge[:3].astype(int).sum() + 30
+
+
+def test_bright_specks_take_the_cloth_colour_and_checks_report_them():
+    import numpy as np
+
+    from pixelforge.checks import check_spec, check_view
+    from pixelforge.cleanup import fill_bright_specks
+
+    rgba = np.zeros((80, 60, 4), np.uint8)
+    rgba[10:70, 10:50] = (40, 25, 45, 255)            # dark cloth
+    rgba[40:43, 30:33] = (250, 250, 250, 255)         # a white speck inside it
+    rgba[12:30, 15:45] = (210, 200, 180, 255)         # a big bone patch: cloth, must stay
+    before = check_view(rgba)
+    assert not before["ok"] and "pockets" in before["issues"][0]
+    out = fill_bright_specks(rgba)
+    assert out[41, 31, :3].max() < 90, "the speck is painted the cloth's colour"
+    assert tuple(out[20, 30, :3]) == (210, 200, 180), "the bone patch stays"
+    assert check_view(out)["ok"]
+    spec = {"voxels": [["0110", "0110"], ["0110", "0110"], ["0000", "0000"], ["1000", "0000"]], "parts": []}
+    r = check_spec(spec)
+    assert r["islands"] == 1 and not r["ok"]

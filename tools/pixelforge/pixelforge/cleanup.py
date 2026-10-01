@@ -284,3 +284,47 @@ def unmix_background(rgba: np.ndarray, background=None) -> np.ndarray:
     fg = (c[edge] - (1 - a[edge])[:, None] * bg) / a[edge][:, None]
     out[..., :3][edge] = np.clip(fg, 0, 255).astype(np.uint8)
     return out
+
+
+def fill_bright_specks(rgba: np.ndarray, max_fraction: float = 0.002, l_min: float = 0.85, chroma_max: float = 0.05) -> np.ndarray:
+    """Small paper-white specks inside the figure (spray dots in a tattered hem, pockets the key missed) take the
+    colour of the paint around them instead of rendering as white. Only specks: a bright patch bigger than
+    ``max_fraction`` of the figure is cloth (bone, paper charms) and stays."""
+    from scipy import ndimage
+
+    from .color import rgb_to_oklab
+
+    out = rgba.copy()
+    a = out[..., 3] > 127
+    n_px = int(a.sum())
+    if n_px == 0:
+        return out
+    lab = rgb_to_oklab(out[..., :3])
+    bright = a & (lab[..., 0] > l_min) & (np.hypot(lab[..., 1], lab[..., 2]) < chroma_max)
+    envelope = ndimage.binary_fill_holes(ndimage.binary_closing(a, iterations=4))
+    inner = ndimage.binary_erosion(envelope, iterations=2)
+    cand = bright & inner
+    lab_i, n = ndimage.label(cand)
+    if n == 0:
+        return out
+    sizes = ndimage.sum(cand, lab_i, range(1, n + 1))
+    limit = max(64, max_fraction * n_px)
+    small = np.isin(lab_i, [i + 1 for i, sz in enumerate(sizes) if sz <= limit])
+    if not small.any():
+        return out
+    # the paint around each speck: a mean of the non-bright opaque pixels in a 5-px ring, spread inward
+    src = a & ~bright
+    rgb = out[..., :3].astype(np.float32)
+    filled = np.zeros_like(rgb)
+    weight = np.zeros(a.shape, np.float32)
+    filled[src] = rgb[src]
+    weight[src] = 1.0
+    for _ in range(6):
+        filled = ndimage.uniform_filter(filled, size=(5, 5, 1))
+        weight = ndimage.uniform_filter(weight, size=5)
+        filled = np.where(src[..., None], rgb, filled)
+        weight = np.where(src, 1.0, weight)
+    fill = filled / np.maximum(weight, 1e-6)[..., None]
+    out[..., :3][small] = np.clip(fill[small], 0, 255).astype(np.uint8)
+    out[..., 3][small] = 255
+    return out

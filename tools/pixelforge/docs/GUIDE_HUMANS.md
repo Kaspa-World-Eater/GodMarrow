@@ -63,6 +63,13 @@ in any text editor, then run **all** with that sheet. Loops are seamless (the re
 and every cue sits at the same loudness. Format `ogg` makes small files for the game when ffmpeg is installed;
 otherwise WAV, which Godot also plays.
 
+## What the Forge checks for you
+
+After cutting out, carving and filming, the Forge runs automatic checks and writes the result in the step notes and the log: white
+specks left inside a figure, loose bits that would float, dark cloth the cut-out dropped, views of different heights, lines
+sticking out of the carve, white pixels or size jumps in the frames. Small white specks inside dark cloth are painted the
+cloth's colour automatically. `pixelforge project check <character>` prints the same list any time.
+
 ## Knobs you might touch
 
 - **Settings → Quality style**: `godmarrow` (every colour kept, ~195 px tall) is the game's; `hd`, `16bit`, `8bit`
