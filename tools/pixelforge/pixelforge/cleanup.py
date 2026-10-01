@@ -260,7 +260,7 @@ def remove_background_pockets(rgba: np.ndarray, tolerance: float = 0.04) -> np.n
     out = rgba.copy()
     lab = rgb_to_oklab(out[..., :3])
     corners = np.stack([lab[0, 0], lab[0, -1], lab[-1, 0], lab[-1, -1]])
-    bg = corners.mean(axis=0)
+    bg = corners[int(np.argmax(corners[:, 0]))]   # the lightest corner is the paper; the bottom ones may sit in the floor shadow
     close = (np.linalg.norm(lab - bg, axis=-1) < tolerance) & (out[..., 3] > 0)
     out[close, 3] = 0
     return out
