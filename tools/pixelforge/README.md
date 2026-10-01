@@ -35,6 +35,7 @@ game); every piece is generic except one exporter.
 | Before / after check | `pixelforge compare` | Tools |
 | Skill-tree editor | `pixelforge skilltree` | Tools |
 | Loaders for any Godot project | `pixelforge godot-addon <project>` | Tools |
+| Looks: seven presets (Godmarrow, gothic hi-res, rendered ARPG, SNES 16-bit, handheld, modern indie, painterly) fixing figure height, palette, outline, shading, grade, effects, loops and tiles; animated examples | `pixelforge styles [--demo OUT]`, `project set --style` | Style page |
 | Is this machine ready? | `pixelforge doctor` | install.bat |
 | An AI running all of it | `pixelforge mcp`, `docs/GUIDE_AI.md` | — |
 
@@ -61,7 +62,7 @@ packs them into Godot SpriteFrames or the game's atlas with foot anchors.
 `pixelforge/api.py` is the pipeline (one function per step). `gui.py` (Studio), `cli.py`, `mcp_server.py` wrap it.
 Image maths: `grid.py`, `palette.py`, `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`, `transform.py`,
 `sheet.py`, `model_spec.py`. Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`, `music.py`, `color_editor.py`, `skin_ops.py`, `skin_editor.py`, `fx_editor.py`, `spell.py`, `spell_designer.py`, `effect_art.py`, `describe.py`, `game_preview.py`, `checks.py`,
-`recolor.py`, `compare.py`, `skilltree.py`, `doctor.py`. Blender-side: `pixelforge/blender/` (no Pillow there).
+`recolor.py`, `compare.py`, `skilltree.py`, `doctor.py`. Looks: `styles.py` (the preset table), `style_demo.py` (the animated examples in `assets/styles/`). Blender-side: `pixelforge/blender/` (no Pillow there).
 Godot-side: `godot_addon/pixelforge/` (`PFSpriteSet`, `PFFx`, `PFObjects`). Docs: `docs/GUIDE_HUMANS.md`,
 `docs/GUIDE_AI.md`, `docs/DESIGN.md`, `docs/TOOL_IDEAS.md`. Tests: `pytest`.
 

@@ -67,9 +67,11 @@ and `--json` for machine-readable output. Non-zero exit + `{"ok": false,
 "error": ...}` means the step needs something; the error text says what.
 
 ```
-pixelforge project new <folder> [--name N] [--style hd|snes|16bit|8bit]
+pixelforge project new <folder> [--name N] [--style godmarrow|gothic_hd|rendered_arpg|snes|handheld|indie|painterly]
 pixelforge project status --json
-pixelforge project set [--style S] [--blender PATH] [--directions 8] [--render-size 256] [--godot-res-dir res://sprites]
+pixelforge project set [--style S [--character C]] [--blender PATH] [--directions 8] [--render-size 256] [--godot-res-dir res://sprites]
+pixelforge styles [--json]                       # the look presets and every number each fixes
+pixelforge styles --demo OUT [--source front.png] [--only snes,indie] [--effect wisp]   # a GIF per look + contact sheet + styles.json
 
 pixelforge project add <character> --describe "<one sentence>"
 pixelforge project describe <character> "<one sentence>"
@@ -177,9 +179,54 @@ Rules the tools keep: glow only where the game allows it (`vfx` adds a halo to f
 embers); every colour comes from the ramp you give or the game's presets; `skilltree` never edits `data/skills.json`
 behind `tools/skill_trees.py` — it keeps `tools/skill_tree_edits.json`, which that script applies last.
 
+## Look presets (the style)
+
+A style is one name that fixes everything deciding how a painting becomes game art, so switching the look of a project
+is one setting. `pixelforge/styles.py` holds the table; `pixelforge styles` prints it; `api.list_styles()` and the MCP
+tool `list_styles` return it as JSON. Each preset carries: `figure_height` (a standing hero in sprite px), `pixel_step`
+(screen px per sprite px, a hint recorded in the atlas), `colors` and `palette_lock`, `dither` / `dither_strength`,
+`shading_bands` (0 = the painting's shading, 3 = flat three-band), `saturation` / `contrast` / `lightness` (a grade in
+OKLab applied to the source cells before the palette is drawn, so nothing outside the palette is ever produced),
+`outline` (none / auto / hex) and `outline_diagonal`, `edge` (soft = cell average, crisp = median of the inner half,
+hard = near the cell centre), `fx_bands` / `fx_glow` / `fx_haze` / `fx_frames` / `fx_fps` (procedural effects),
+`anim_frames` / `anim_fps` (the still path's loops), `clip_frames` (the render's `--per-clip` default and the game
+export's per-clip cap) and `tile_width` / `tile_height` / `tile_hr` (the ground diamond).
+
+| preset | look | figure | colours | outline | shading | loops | effects |
+|---|---|---|---|---|---|---|---|
+| `godmarrow` | the game's own (kept as it was) | 195 px | every colour | auto | painted | 8 f @ 8 | 6 bands, glow by kind |
+| `gothic_hd` | large gothic hi-res figures, gold and bone accents | 120 px | 40 | none | painted, soft edge | 12 f @ 10 | 8 bands, haze |
+| `rendered_arpg` | rendered-to-sprite isometric ARPG | 76 px | 28 | none | painted, soft edge | 8 f @ 8 | 6 bands |
+| `snes` | 16-bit console | 56 px | 16 | auto (hard 1 px) | 3 bands, sat x1.15 | 10 f @ 10, clips to 12 | 4 bands, no glow |
+| `handheld` | portable 32-bit, bright | 40 px | 15 | auto | 3 bands, sat x1.3 | 6 f @ 8, clips to 8 | 4 bands, no glow |
+| `indie` | modern indie pixel, saturated accents | 80 px | 32 | none | 4 bands, sat x1.2 | 12 f @ 12 | 6 bands |
+| `painterly` | hi-bit, almost the painting | 144 px | 96 (not locked) | none | painted, soft edge | 12 f @ 12 | 10 bands, haze |
+
+The older size tiers `8bit`, `16bit`, `hd` (the default for a new project), `full` are still in the table.
+
+- Set it: `pixelforge project set --style snes` (the project), `pixelforge project set --style handheld --character imp`
+  (one character; `--style project` takes it back), `api.set_style(project, name, character=None)`, MCP `set_style`.
+  The result's `next` says what to run again: palette, pixelate and export (and render, for the clip count).
+- Every step reads the character's style (`api.style_of`): `palette` takes `colors`; `render` takes `clip_frames` as
+  `--per-clip`; `pixelate` (stills and renders) takes the figure height, palette lock, dither, bands, grade, edge and
+  outline (`outline="style"` is the default; `None` = none, `"auto"` or a hex colour override); `animate_still` takes
+  `anim_frames` / `anim_fps`; `export-game` caps every clip at `clip_frames` and writes `style`, `pixel_step` and
+  `figure_height` into the atlas meta. Lower-level tools take `--style` too: `pixelforge pixelate --style snes` (plus
+  `--bands --saturation --contrast --lightness --edge --outline none|auto|#hex` overrides), `pixelforge animate --style`,
+  `pixelforge vfx <kind> <name> --style snes` (bands, glow rule, haze, frames, fps; `--haze on|off`), `pixelforge tiles
+  ... --style handheld` (tile size and palette). MCP: `make_effect(style=)`, `make_tiles(style=)`.
+- Animated examples: `pixelforge styles --demo OUT` (MCP `style_demo`) writes `<preset>.gif` for every look (the
+  bundled Keeper front cutout `assets/styles/keeper_front.png`, or `--source`, pixelated in that look and animated with
+  the still path, idle breathing plus cloak sway, with a wisp loop in that look's effect style beside her),
+  `styles_sheet.png` (one frame per preset side by side with the numbers under it) and `styles.json`. The shipped set
+  is in `assets/styles/` and `docs/screens/styles/` in the game repo. Show the person the sheet before choosing.
+- `pixelforge/style_demo.py`: `demo_frames(style, source, effect)` and `make_demo(out, source, only, effect)`;
+  `styles.validate(style)` lists what is wrong with a hand-made `Style(...)`; `styles.options_for_style(style,
+  **overrides)` is the one place a preset becomes `PixelateOptions`.
+
 ## Godmarrow specifics (the game this forge serves)
 
-- Project style `godmarrow` (`pixelforge project set --style godmarrow`): ~195 px standing height, **every colour kept** (no palette reduction), hard edges. Use it for every game character.
+- Project style `godmarrow` (`pixelforge project set --style godmarrow`): ~195 px standing height, **every colour kept** (no palette reduction), the dark 1 px edge, crisp sampling. Use it for every game character; the other looks exist to compare and for other games.
 - Sheet: prefer prompt **A2** (four views: front, three-quarter, side, back). The quarter view carves the diagonals and paints them; `split` names 4 figures `front quarter side back`.
 - Plan views: prompt **A3** (world kind `topdown` for objects) gives a second image, top view + underside side by side; import it as `topbottom`. The carve finds its orientation (`spec["orient"]`, IoU against the hull), cuts the footprint with it (hat brims, shoulders, crowns, roofs) and paints upward faces from it. Without it the top of a hat is painted from the front view, which is why wide hats looked flat-topped.
 - Painted effects (`effect_art.make_effect(image, name, out, kind=missile|loop|burst|frames, preset, frames, width, rotations)`; CLI `pixelforge effect`; MCP `make_effect_from_art`; world prompts `missile`, `effect`, `spell_frames`): cut out on black/white, animated per kind, written in the vfx layout. Spell layers of kind `image` take a vfx json (painted or generated) or a PNG. Orbits (`vfx.ORBITS`: bone_armor, bone_shard_aura; kinds `<name>_front` / `<name>_back` for the near and far halves) and attachment `z: behind|front` (effects editor tick, add-on spawns behind the body). Skin editor layers: `SkinEditor.layers`, ops carry `layer`, Save flattens.
@@ -270,8 +317,8 @@ palette and a fixed scale so all frames match.
 ## MCP server
 
 `pixelforge mcp` runs an MCP server (stdio) with tools `new_project`, `status`,
-`configure`, `add_character`, `prompts`, `import_image`, `run_step`, `run_all`,
-`quick_sprite`. Claude Desktop config:
+`configure`, `list_styles`, `set_style`, `style_demo`, `add_character`, `prompts`, `import_image`, `run_step`, `run_all`,
+`quick_sprite` (and the tool-by-tool ones named above: `make_effect`, `make_tiles`, `make_spell`, ...). Claude Desktop config:
 
 ```json
 {"mcpServers": {"pixelforge": {"command": "pixelforge", "args": ["mcp"]}}}

@@ -273,3 +273,42 @@ session; the table is enough to re-brief).
 3. Effects to D2R level (track/fx, track/fxlook, painted effects). 4. Pixel road vs anatomy road comparison in the game
 (track/pixel2d, track/body3d). 5. The see-through hero (dark shader). 6. The painted world: Derek paints the art order
 in the Keeper's style; the Forge converts.
+
+### 7.6 2026-10-01, track/styles: look presets with animated examples
+
+**What.** PixelForge's style tiers became a real look-preset system (`tools/pixelforge/pixelforge/styles.py`). A
+preset fixes everything that decides how a painting becomes game art: figure height, pixel step, palette size and
+lock, dither, shading bands, a saturation / contrast / lightness grade (OKLab, applied to the source cells before the
+palette is drawn, so a transform still never adds a colour outside the palette), edge treatment (soft / crisp /
+hard), outline rule, effect look (bands, glow rule, haze, frames, fps), loop frames and speed, the game export's
+per-clip cap and the ground-tile size. Seven looks: `godmarrow` (kept as it was), `gothic_hd`, `rendered_arpg`,
+`snes`, `handheld`, `indie`, `painterly`; the old tiers `8bit 16bit hd full` remain. Wired through
+`api.list_styles / set_style / style_of` (per-character styles via `character.settings["style"]`), every step reading
+its numbers from the preset (palette, render `--per-clip`, pixelate stills and renders, `animate_still`, `export_game`
+cap + `style` / `pixel_step` / `figure_height` in the atlas meta), `vfx.make_vfx(style=, haze=)` with a file-free
+`render_frames`, `tiles.make_tiles(style=)`, CLI `pixelforge styles [--json] [--demo OUT]`, `project set --style S
+[--character C]`, `--style` on `pixelate` / `animate` / `vfx` / `tiles` (plus `--bands --saturation --contrast
+--lightness --edge --outline` overrides on `pixelate`), MCP `list_styles / set_style / style_demo` and `style=` on
+`make_effect` / `make_tiles`. `pixelate` also now spreads a cutout's paint under its soft edge before sampling, which
+removed the pale rim and the bright specks small looks showed along a hem.
+
+**Animated examples.** `pixelforge styles --demo OUT` makes, per look, a GIF of the Keeper's front cutout (bundled,
+cleaned, 400 px: `tools/pixelforge/assets/styles/keeper_front.png`) pixelated in that look and animated with the still
+path (idle breathing + cloak sway) with a wisp loop in that look's effect style beside her, a contact sheet with one
+frame per look and the numbers printed under it, and `styles.json`. Shipped: `tools/pixelforge/assets/styles/*.gif`,
+`styles_sheet.png` and the same under `docs/screens/styles/` (sheet: `docs/screens/styles/styles_sheet.png`; the edge
+treatments compared: `docs/screens/styles/2026-10-01_snes_handheld_edge_soft_crisp_hard.png`).
+
+**Verified.** `tests/test_styles.py` (19 tests: every key present and sane on every preset, one pixelate run per look on
+a synthetic painting checking height / colour count / bands / outline, frame-stable grading, api set_style project and
+per character, the still path and the game export reading the preset, vfx + tiles taking the look, the CLI, the demo);
+the whole suite is 106 green. The game was not changed; smoke still errors 0.
+
+**Honestly short.** The Studio's Style page (cards playing the GIFs, "Use this style", the Advanced fold) is specified
+in `docs/track_notes/styles.md` for the UI track, not built here (gui.py belongs to track/ui). Custom edited styles
+are not saved in `project.json` yet (`Style(**fields)` + `styles.validate()` are ready for it). The game does not read
+`pixel_step` or the tile size; the export only records them. The GIFs of the two tallest looks (Godmarrow 207 px,
+Modern indie 180 px with its wisp) stand over the 160 px asked for because the figures are shown 1:1; the small looks
+are zoomed to at least 96 px. The small looks are tuned on one dark figure (the Keeper); a bright painting may want
+its `lightness` lift set back to 0 in the Advanced numbers. Effect "looks" beyond glow / haze (phosphorus, echo, ...)
+belong to track/fxlook and are not here.

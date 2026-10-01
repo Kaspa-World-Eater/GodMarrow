@@ -32,8 +32,27 @@ def build_server():
 
     @mcp.tool()
     def new_project(folder: str, name: str, style: str = "hd") -> dict:
-        """Create a project folder. style: 8bit | 16bit | snes | hd."""
+        """Create a project folder. style: a look preset (list_styles): godmarrow gothic_hd rendered_arpg snes handheld indie painterly, or a size tier 8bit 16bit hd full."""
         return api.new_project(folder, name, style)
+
+    @mcp.tool()
+    def list_styles() -> dict:
+        """The look presets and every number each one fixes (figure height, pixel step, palette size and lock, outline, dither,
+        shading bands, saturation/contrast/lightness grade, edge, effect bands/glow/haze/frames/fps, loop frames/fps, clip cap, tile)."""
+        return api.list_styles()
+
+    @mcp.tool()
+    def set_style(project: str, style: str, character: str = "") -> dict:
+        """Set the project's look preset, or one character's own (character given; 'project' takes it back to the project's).
+        Later steps read their numbers from it; run palette, pixelate and export again for the new look."""
+        return api.set_style(_project(project), style, character or None)
+
+    @mcp.tool()
+    def style_demo(out_dir: str, source: str = "", effect: str = "wisp", only: str = "") -> dict:
+        """Animated examples of the look presets: a GIF per preset (the Keeper's front cutout, or `source`, animated in that look
+        with an effect loop beside it), a contact sheet PNG with the numbers printed under each, and styles.json."""
+        from .style_demo import make_demo
+        return make_demo(out_dir, source=source or None, effect=effect, only=only.split(",") if only else None)
 
     @mcp.tool()
     def status(project: str) -> dict:
@@ -87,10 +106,11 @@ def build_server():
         return api.preview_gif(_project(project), character, clip, direction)
 
     @mcp.tool()
-    def make_effect(kind: str, name: str, out_dir: str, palette: str = "lantern", frames: int = 8, fps: float = 10.0, atlas_dir: str | None = None) -> dict:
-        """Procedural effect sheet: fire smoke wisp burst embers ring bolt slash circle cloud shards pillar decal drip flash ward vortex."""
+    def make_effect(kind: str, name: str, out_dir: str, palette: str = "lantern", frames: int = 0, fps: float = 0.0, atlas_dir: str | None = None, style: str = "") -> dict:
+        """Procedural effect sheet: fire smoke wisp burst embers ring bolt slash circle cloud shards pillar decal drip flash ward vortex.
+        With style (a look preset) the bands, glow rule, haze, frames and fps default to the preset's; frames/fps 0 = default."""
         from .vfx import make_vfx
-        return make_vfx(kind, name, out_dir, frames=frames, fps=fps, palette=palette, atlas_dir=atlas_dir)
+        return make_vfx(kind, name, out_dir, frames=frames or None, fps=fps or None, palette=palette, atlas_dir=atlas_dir, style=style or None)
 
     @mcp.tool()
     def make_prop(image: str, name: str, out_dir: str, height: int = 96, sway: str | None = None, variations: int = 1, game_objects: str | None = None) -> dict:
@@ -111,10 +131,10 @@ def build_server():
         return _mp(image, name, out_dir, sizes=tuple(int(x) for x in sizes.split()))
 
     @mcp.tool()
-    def make_tiles(texture: str, name: str, out_dir: str, second: str | None = None, variants: int = 6) -> dict:
-        """Iso diamond ground tiles (+16 edge tiles to a second material) and a Godot TileSet."""
+    def make_tiles(texture: str, name: str, out_dir: str, second: str | None = None, variants: int = 6, style: str = "") -> dict:
+        """Iso diamond ground tiles (+16 edge tiles to a second material) and a Godot TileSet; style (a look preset) sets the tile size and palette."""
         from .tiles import make_tiles as _mt
-        return _mt(texture, name, out_dir, second=second, variants=variants)
+        return _mt(texture, name, out_dir, second=second, variants=variants, style=style or None)
 
     @mcp.tool()
     def make_ui_frame(image: str, name: str, out_dir: str, mid: int = 8) -> dict:

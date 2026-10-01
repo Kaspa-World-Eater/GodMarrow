@@ -114,6 +114,8 @@ def export_godmarrow(
     anim_map: dict | None = None,
     fps: float | None = None,
     extra_passes: dict[str, Path] | None = None,
+    max_frames: int | None = None,
+    extra_meta: dict | None = None,
 ) -> dict:
     """Pack ``frames_dir/<clip>_<DIR>/frame_NNN.png`` into ``out_dir/<kind>.png|json``.
 
@@ -125,6 +127,8 @@ def export_godmarrow(
     frames_dir, out_dir = Path(frames_dir), Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     anim_map = {**HERO_ANIMS, **(anim_map or {})}
+    if max_frames:   # the look's clip cap (an 8-frame handheld loop, a 12-frame 16-bit one) on top of the game's own
+        anim_map = {k: (a, min(int(cap), int(max_frames))) for k, (a, cap) in anim_map.items()}
     anims_json = json.loads((frames_dir / "animations.json").read_text()) if (frames_dir / "animations.json").exists() else {}
     clip_fps = fps or anims_json.get("fps", 10)
     per_clip_fps = anims_json.get("clip_fps", {})   # each clip keeps its real duration when it was sampled sparsely
@@ -201,6 +205,8 @@ def export_godmarrow(
                      f"camera {manifest.get('elevation', 30)} deg, {manifest['ppu'] * scale:.1f} px per metre.",
             "source": "pixelforge",
         }
+        if extra_meta:
+            meta.update(extra_meta)
         if passes_meta:
             meta.update(passes_meta)
         data = {"sheets": [q.name for q in pngs], "meta": meta, "idx": full_idx}

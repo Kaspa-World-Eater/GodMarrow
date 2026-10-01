@@ -18,7 +18,7 @@ from .quantize import DITHER_MODES
 from .project import SOURCE_KINDS
 from .prompts import PROMPT_KINDS, RULES, build_all, build_prompt
 from .spritesheet import pack, save_gif, slice_sheet
-from .styles import DEFAULT_STYLE, STYLES, get_style
+from .styles import DEFAULT_STYLE, LOOKS, STYLES, describe_style, get_style, options_for_style, style_table
 from .transform import flip, rotate, spin_frames, turn
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif"}
@@ -49,40 +49,68 @@ def _parse_anim(spec: str) -> tuple[str, list[Path], float]:
 
 def _add_pixelate_args(p: argparse.ArgumentParser) -> None:
     g = p.add_argument_group("pixelation")
-    styles = ", ".join(f"{k} ({v.max_size}px/{v.colors} colors)" for k, v in STYLES.items())
-    g.add_argument("--style", choices=sorted(STYLES), default=DEFAULT_STYLE, help=f"quality tier: {styles}")
+    styles = ", ".join(f"{k} ({v.figure_height}px/{v.colors or 'all'} colours)" for k, v in STYLES.items())
+    g.add_argument("--style", choices=sorted(STYLES), default=DEFAULT_STYLE, help=f"look preset (see 'pixelforge styles'): {styles}")
     g.add_argument("--scale", default="auto", help="logical pixel size in source pixels, or 'auto' (default)")
-    g.add_argument("--max-size", type=int, help="fallback longest side when no grid is detected (default: from --style)")
+    g.add_argument("--max-size", type=int, help="fallback longest side when no grid is detected (default: the preset's figure height)")
     g.add_argument("--width", type=int, help="force sprite width in pixels")
     g.add_argument("--height", type=int, help="force sprite height in pixels")
     g.add_argument("--colors", type=int, help="palette size when extracting (default: from --style)")
     g.add_argument("--palette", help="use a fixed palette (.hex, .gpl or .png)")
     g.add_argument("--dither", choices=DITHER_MODES, help="default: from --style")
-    g.add_argument("--dither-strength", type=float, default=0.6)
+    g.add_argument("--dither-strength", type=float, help="default: from --style")
+    g.add_argument("--bands", type=int, help="flat shading bands, 0 = as painted (default: from --style)")
+    g.add_argument("--saturation", type=float, help="chroma grade, 1 = as painted (default: from --style)")
+    g.add_argument("--contrast", type=float, help="lightness contrast, 1 = as painted (default: from --style)")
+    g.add_argument("--lightness", type=float, help="lightness lift, 0 = as painted (default: from --style)")
+    g.add_argument("--edge", choices=["soft", "crisp", "hard"], help="edge treatment (default: from --style)")
     g.add_argument("--remove-bg", action="store_true", help="flood-remove the background from the borders")
     g.add_argument("--bg-tolerance", type=float, default=0.03, help="OKLab distance for --remove-bg")
-    g.add_argument("--outline", help="'auto' (darkest palette color) or a hex color")
+    g.add_argument("--outline", default="style", help="'style' (the preset's rule, default), 'none', 'auto' (darkest palette colour) or a hex colour")
     g.add_argument("--crop", action="store_true", help="crop to the opaque content")
     g.add_argument("--no-despeckle", action="store_true")
 
 
 def _options(a) -> PixelateOptions:
-    style = get_style(a.style)
-    return PixelateOptions(
+    return options_for_style(
+        a.style,
         scale=a.scale if a.scale == "auto" else float(a.scale),
-        max_size=a.max_size or style.max_size,
+        max_size=a.max_size,
         width=a.width,
         height=a.height,
-        colors=a.colors or style.colors,
+        colors=a.colors,
         palette=Palette.load(a.palette) if a.palette else None,
-        dither=a.dither or style.dither,
+        dither=a.dither,
         dither_strength=a.dither_strength,
+        bands=a.bands,
+        saturation=a.saturation,
+        contrast=a.contrast,
+        lightness=a.lightness,
+        edge=a.edge,
         remove_background=a.remove_bg,
         bg_tolerance=a.bg_tolerance,
         despeckle=not a.no_despeckle,
         outline=a.outline,
         crop=a.crop,
     )
+
+
+def cmd_styles(a) -> None:
+    """``pixelforge styles``: the look presets and their numbers; ``--demo OUT`` makes the animated examples."""
+    if a.demo:
+        from .style_demo import make_demo
+
+        r = make_demo(a.demo, source=a.source, only=a.only.split(",") if a.only else None, effect=a.effect, log=print)
+        _emit(a, r)
+        return
+    if a.json:
+        _emit(a, {"ok": True, "default": DEFAULT_STYLE, "looks": LOOKS, "styles": style_table()})
+        return
+    print("Look presets (pixelforge project set --style NAME [--character C]; pixelforge styles --demo OUT for animated examples):\n")
+    for name in LOOKS:
+        print(describe_style(name) + "\n")
+    tiers = [k for k, v in STYLES.items() if v.group == "tier"]
+    print("Older size tiers: " + ", ".join(f"{k} ({STYLES[k].figure_height} px, {STYLES[k].colors or 'every'} colours)" for k in tiers))
 
 
 def cmd_pixelate(a) -> None:
@@ -135,6 +163,12 @@ def cmd_frames(a) -> None:
 def cmd_animate(a) -> None:
     import numpy as np
 
+    if a.style:
+        st = get_style(a.style)
+        a.frames = a.frames or st.anim_frames
+        a.fps = a.fps or st.anim_fps
+    a.frames = a.frames or 8
+    a.fps = a.fps or 8.0
     sprite = np.asarray(Image.open(a.sprite).convert("RGBA"))
     effects = [e for name in a.preset for e in _fresh_preset(name)]
     effects += [parse_effect(s) for s in a.effect]
@@ -277,7 +311,13 @@ def cmd_project(a) -> None:
         elif sub == "status":
             _emit(a, api.status(project))
         elif sub == "set":
-            _emit(a, api.configure(project, style=a.style, blender=a.blender, directions=a.directions, render_size=a.render_size, godot_res_dir=a.godot_res_dir))
+            if a.character:
+                if not a.style:
+                    _emit(a, {"ok": False, "error": "--character needs --style (a preset name, or 'project' to follow the project)"})
+                    raise SystemExit(2)
+                _emit(a, api.set_style(project, a.style, a.character))
+            else:
+                _emit(a, api.configure(project, style=a.style, blender=a.blender, directions=a.directions, render_size=a.render_size, godot_res_dir=a.godot_res_dir))
         elif sub == "add":
             r = api.add_character(project, a.character, a.describe or "")
             if a.describe:
@@ -381,14 +421,15 @@ def cmd_vfx(a) -> None:
 
     palette = None if a.palette == "auto" else (a.palette.split(",") if "," in a.palette else a.palette)
     r = make_vfx(a.kind, a.name, a.out, size=tuple(a.size) if a.size else None, frames=a.frames, fps=a.fps, palette=palette,
-                 bands=a.bands, seed=a.seed, glow=(None if a.glow == "auto" else a.glow == "on"), gif=a.gif, atlas_dir=a.atlas, rotations=a.rotations)
+                 bands=a.bands, seed=a.seed, glow=(None if a.glow == "auto" else a.glow == "on"), haze=(None if a.haze == "auto" else a.haze == "on"),
+                 gif=a.gif, atlas_dir=a.atlas, rotations=a.rotations, style=a.style)
     _emit(a, r)
 
 
 def cmd_tiles(a) -> None:
     from .tiles import make_tiles
 
-    r = make_tiles(a.texture, a.name, a.out, second=a.second, tile=tuple(a.tile), variants=a.variants, colors=a.colors, seed=a.seed, res_dir=a.res_dir)
+    r = make_tiles(a.texture, a.name, a.out, second=a.second, tile=tuple(a.tile) if a.tile else None, variants=a.variants, colors=a.colors, seed=a.seed, res_dir=a.res_dir, style=a.style)
     _emit(a, r)
 
 
@@ -600,8 +641,9 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("-o", "--output", required=True, help="output directory")
     s.add_argument("--preset", action="append", default=[], help=f"one of {sorted(PRESETS)} (repeatable)")
     s.add_argument("--effect", action="append", default=[], help="e.g. 'sway:amplitude=2,anchor=bottom,box=0;0.6;1;1'")
-    s.add_argument("--frames", type=int, default=8)
-    s.add_argument("--fps", type=float, default=8)
+    s.add_argument("--frames", type=int, default=None, help="default 8, or the look preset's with --style")
+    s.add_argument("--fps", type=float, default=None, help="default 8, or the look preset's with --style")
+    s.add_argument("--style", choices=sorted(STYLES), help="take frame count and speed from a look preset")
     s.add_argument("--name", default="anim", help="frame file prefix")
     s.add_argument("--palette", help="palette for flicker (default: the sprite's own colors)")
     s.add_argument("--flip", action="store_true", help="mirror first, e.g. to make the left-facing set")
@@ -652,8 +694,8 @@ def build_parser() -> argparse.ArgumentParser:
     x = ps.add_parser("new", help="create a project folder"); x.add_argument("folder"); x.add_argument("--name"); x.add_argument("--style", choices=sorted(STYLES), default=DEFAULT_STYLE)
     ps.add_parser("status", help="what is done, what is next")
     ps.add_parser("blender-download", help="fetch the portable Blender (380 MB, no installer) and point the project at it")
-    x = ps.add_parser("set", help="change settings")
-    x.add_argument("--style", choices=sorted(STYLES)); x.add_argument("--blender"); x.add_argument("--directions", type=int); x.add_argument("--render-size", type=int); x.add_argument("--godot-res-dir")
+    x = ps.add_parser("set", help="change settings (--style NAME sets the look; with --character only that character's)")
+    x.add_argument("--style", choices=sorted(STYLES) + ["project"], help="a look preset ('pixelforge styles' lists them)"); x.add_argument("--character", help="give this character its own look ('project' follows the project again)"); x.add_argument("--blender"); x.add_argument("--directions", type=int); x.add_argument("--render-size", type=int); x.add_argument("--godot-res-dir")
     x = ps.add_parser("add", help="add a character"); x.add_argument("character"); x.add_argument("--describe")
     x = ps.add_parser("describe", help="set the description"); x.add_argument("character"); x.add_argument("describe")
     x = ps.add_parser("prompts", help="Midjourney prompts for the character"); x.add_argument("character"); x.add_argument("--reference", default="[SHEET IMAGE URL]")
@@ -722,18 +764,21 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("vfx", help="procedural looping effect sheet: fire, smoke, wisp, burst, embers")
     from .vfx import KINDS as _KINDS
     s.add_argument("kind", choices=list(_KINDS)); s.add_argument("name"); s.add_argument("-o", "--out", default="art/fx")
-    s.add_argument("--size", type=int, nargs=2, metavar=("W", "H")); s.add_argument("--frames", type=int, default=8); s.add_argument("--fps", type=float, default=10)
+    s.add_argument("--size", type=int, nargs=2, metavar=("W", "H")); s.add_argument("--frames", type=int, default=None, help="default 8, or the look's"); s.add_argument("--fps", type=float, default=None, help="default 10, or the look's")
     s.add_argument("--palette", default="auto", help="preset (wisp lantern miasma bone smoke blood) or dark->bright hex list a,b,c")
-    s.add_argument("--bands", type=int, default=6, help="colour bands"); s.add_argument("--seed", type=int, default=1)
-    s.add_argument("--glow", choices=["auto", "on", "off"], default="auto", help="soft halo (auto: fire/wisp/burst only)")
+    s.add_argument("--bands", type=int, default=None, help="colour bands (default 6, or the look's)"); s.add_argument("--seed", type=int, default=1)
+    s.add_argument("--glow", choices=["auto", "on", "off"], default="auto", help="soft halo (auto: fire/wisp/burst only, or the look's rule)")
+    s.add_argument("--haze", choices=["auto", "on", "off"], default="auto", help="a wide faint haze round the effect (auto: the look's; off without one)")
+    s.add_argument("--style", choices=sorted(STYLES), help="take bands, glow, haze, frames and fps from a look preset")
     s.add_argument("--gif", action="store_true"); s.add_argument("--rotations", type=int, default=0, help="missiles: a sheet with N headings (rows), turned with RotSprite"); s.add_argument("--atlas", metavar="DIR", help="also write a Godmarrow sprite set (art/sprites) for SpriteSet")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_vfx)
 
     s = sub.add_parser("tiles", help="painted ground texture -> 2:1 iso diamond tiles (+16 transition tiles) and a Godot TileSet")
     s.add_argument("texture"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/tiles")
-    s.add_argument("--second", help="second material for the transition tiles"); s.add_argument("--tile", type=int, nargs=2, default=[72, 36], metavar=("W", "H"))
-    s.add_argument("--variants", type=int, default=6); s.add_argument("--colors", type=int, default=0); s.add_argument("--seed", type=int, default=1)
+    s.add_argument("--second", help="second material for the transition tiles"); s.add_argument("--tile", type=int, nargs=2, default=None, metavar=("W", "H"), help="diamond size in texels (default 72 36, or the look's)")
+    s.add_argument("--variants", type=int, default=6); s.add_argument("--colors", type=int, default=None, help="palette size (default every colour, or the look's)"); s.add_argument("--seed", type=int, default=1)
+    s.add_argument("--style", choices=sorted(STYLES), help="take the tile size and palette size from a look preset")
     s.add_argument("--res-dir", default="res://art/tiles"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_tiles)
 
@@ -840,6 +885,14 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--apply", action="store_true", help="re-apply the edit file to skills.json and exit")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_skilltree)
+
+    s = sub.add_parser("styles", help="the look presets (figure height, palette, outline, shading, effects, loops, tiles) and animated examples")
+    s.add_argument("--demo", metavar="OUT", help="write a GIF per preset (the Keeper animated in that look + an effect loop), a contact sheet and styles.json into OUT")
+    s.add_argument("--source", help="a front cutout PNG to use instead of the bundled Keeper")
+    s.add_argument("--only", help="comma-separated preset names for --demo (default: every look)")
+    s.add_argument("--effect", default="wisp", help="the effect loop shown beside the figure in --demo (default wisp)")
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_styles)
 
     s = sub.add_parser("studio", help="open the desktop app")
     s.add_argument("project", nargs="?")
