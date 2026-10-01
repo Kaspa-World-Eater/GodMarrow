@@ -376,7 +376,8 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
     if side.exists():
         # carve a proper 3D shape from the front + side (+ back, + three-quarter) silhouettes
         spec = build_hull_spec(Image.open(front), Image.open(side), Image.open(back) if back.exists() else None,
-                               Image.open(quarter) if quarter.exists() else None, columns=columns)
+                               Image.open(quarter) if quarter.exists() else None, columns=columns,
+                               depth_scale=float(c.settings.get("depth_scale", 0.8)), fit=float(c.settings.get("fit", 2.6)))
     else:
         spec = build_spec(Image.open(front), None, columns=columns, thickness=thickness)
         spec["thickness"] = float(min(spec["thickness"], 0.3))

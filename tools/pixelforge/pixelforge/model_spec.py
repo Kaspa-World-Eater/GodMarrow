@@ -188,6 +188,31 @@ def carve_quarter(vox: np.ndarray, quarter_mask: np.ndarray) -> tuple[np.ndarray
     return vox & keep, sign, float(iou)
 
 
+def _open(vox: np.ndarray, n: int) -> np.ndarray:
+    """Morphological opening with a 3x3x3 cross, n times: removes protrusions thinner than 2 voxels."""
+    def shift_and(v):
+        out = v.copy()
+        for axis in range(3):
+            for d in (-1, 1):
+                out &= np.roll(v, d, axis=axis)
+        return out
+
+    def shift_or(v):
+        out = v.copy()
+        for axis in range(3):
+            for d in (-1, 1):
+                out |= np.roll(v, d, axis=axis)
+        return out
+
+    eroded = vox
+    for _ in range(n):
+        eroded = shift_and(eroded)
+    opened = eroded
+    for _ in range(n):
+        opened = shift_or(opened)
+    return opened & vox   # never grow past the original hull
+
+
 def build_hull_spec(
     front: Image.Image,
     side: Image.Image,
@@ -197,6 +222,9 @@ def build_hull_spec(
     columns: int = 64,
     side_faces: str = "left",
     arm_depth_ratio: float = 1.4,
+    depth_scale: float = 0.8,
+    fit: float = 2.6,
+    opening: int = 1,
 ) -> dict:
     """Carve a voxel model from the front and side silhouettes (a visual hull).
 
@@ -237,11 +265,16 @@ def build_hull_spec(
                 cy, hd = (y0 + y1 - 1) / 2, max((y1 - y0) / 2, 0.5)
                 if x1 - x0 < widest * 0.6:  # a thin run (arm, chain) is not torso-deep
                     hd = min(hd, hw * arm_depth_ratio)
+                # form-fit: a side silhouette is the cloak's widest sweep, not the body; pull the depth in toward its
+                # centre line, and use a superellipse (fit > 2 = fuller shoulders, no boxy corners, less bulk front/back)
+                hd = max(hd * depth_scale, 0.5)
                 xs = np.arange(x0, x1)
                 ys = np.arange(max(y0, 0), min(y1, depth_cols))
-                xn = ((xs - cx) / hw)[None, :]
-                yn = ((ys - cy) / hd)[:, None]
-                vox[z, ys[:, None], xs[None, :]] |= (xn**2 + yn**2) <= 1.0
+                xn = np.abs((xs - cx) / hw)[None, :]
+                yn = np.abs((ys - cy) / hd)[:, None]
+                vox[z, ys[:, None], xs[None, :]] |= (xn**fit + yn**fit) <= 1.0
+    if opening > 0:   # strip one-voxel protrusions (the "lines off the back"): erode then dilate
+        vox = _open(vox, opening)
     if not vox.any():
         raise ValueError("hull is empty; check that the side view faces the right way")
     quarter_sign, quarter_iou = 0, 0.0

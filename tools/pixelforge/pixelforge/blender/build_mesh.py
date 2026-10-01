@@ -143,7 +143,7 @@ def build_hull_from_spec(spec: dict, height: float, name: str):
     # round off the voxel steps, then bake so Mixamo gets the smooth shape
     sm = obj.modifiers.new("pf_round", "SMOOTH")
     sm.factor = 1.0
-    sm.iterations = 6
+    sm.iterations = 10
     bpy.ops.object.modifier_apply(modifier=sm.name)
     for poly in mesh.polygons:
         poly.use_smooth = True
