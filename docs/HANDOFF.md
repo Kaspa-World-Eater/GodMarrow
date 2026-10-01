@@ -128,3 +128,11 @@ Next for whoever follows: the Ossuarch through the Forge once Derek's 4-view she
 Hard limits of this session: a cloud Linux container (Blender via `pip install bpy` + Xvfb works; no Windows, no
 browser, no access to Derek's PC). It cannot run the Godot editor; headless Godot checks are possible if a Linux
 Godot binary is downloaded.
+
+**Windows first launch (derek-33, 2026-10-02, Derek's PC, Windows 11, Python 3.14.7):** `install.bat` ran clean: venv made,
+numpy 2.5.3 + Pillow 12.3.0 installed, desktop shortcut `PixelForge Studio.lnk` created on the OneDrive Desktop, `doctor`
+"All good" (tkinter ok, Blender 4.5 found automatically at `C:\Program Files\Blender Foundation\Blender 4.5\blender.exe`,
+animation library found). The shortcut launches Studio (pythonw, no console); window screenshot checked: theme, 9 steps,
+Run all, Tools, Help all render. `.venv` is ignored by git. Nothing broke. **Not yet tested:** Tools > Painted object and a
+real Blender run (no Midjourney test image exists yet; the browser Claude is generating the batch). Only side effect:
+untracked `art/fx/*.import` files appear after a Windows Godot import (Godot's own metadata; harmless).
