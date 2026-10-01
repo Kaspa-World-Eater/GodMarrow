@@ -153,10 +153,30 @@ specks left inside a figure, loose bits that would float, dark cloth the cut-out
 sticking out of the carve, white pixels or size jumps in the frames. Small white specks inside dark cloth are painted the
 cloth's colour automatically. `pixelforge project check <character>` prints the same list any time.
 
+## The look (styles)
+
+A **style** is one choice that fixes everything about how a painting becomes game art: how tall a figure stands in
+pixels, how many colours it keeps, whether it has a dark outline, flat shading bands or the painting's own shading, how
+punchy the colours are, how soft the edges are, how effects glow, how many frames a loop has and how fast it plays,
+and the size of a ground tile. Seven looks ship, each with an animated example of the Shrine Keeper in that look
+(`assets/styles/<look>.gif`; all of them side by side with their numbers in `assets/styles/styles_sheet.png`):
+
+- **Godmarrow**: the game's own look, 195 px tall, every colour kept, the dark edge.
+- **Gothic hi-res**: large finely drawn figures (120 px), dark gothic palette, soft shading, no outline.
+- **Rendered ARPG**: 76 px figures that look rendered, cool dark palette of 28 colours, no outline.
+- **SNES 16-bit**: chunky 56 px figures, 16 colours, hard outline, three flat shading bands in clean colour areas
+  (specks are tidied into the area round them), short loops, no glow.
+- **Handheld 32-bit**: small bright 40 px figures, 15 colours, hard outline, the same clean areas.
+- **Modern indie pixel**: 80 px, saturated accents, four shading bands, smooth twelve-frame loops.
+- **Painterly hi-bit**: 144 px, 96 colours, almost the painting.
+
+Pick one in **Settings → Style** (or `pixelforge project set --style snes` from a prompt) and run the palette,
+pixelate and export steps again; the whole project takes the new look. One character can have its own
+(`--character`). Every number behind a look can be changed: `pixelforge styles` prints them all.
+
 ## Knobs you might touch
 
-- **Settings → Quality style**: `godmarrow` (every colour kept, ~195 px tall) is the game's; `hd`, `16bit`, `8bit`
-  exist for other projects.
+- **Settings → Style**: the look (above). `godmarrow` is the game's; the others are for comparing and for other games.
 - **Step 7 → Camera elevation**: 30° is Diablo II. 45° is more top-down.
 - **Step 8 → outline**: the dark 1-pixel edge the game uses.
 

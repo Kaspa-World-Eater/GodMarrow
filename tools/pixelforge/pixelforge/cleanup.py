@@ -173,6 +173,34 @@ def remove_orphans(indices: np.ndarray, alpha: np.ndarray, passes: int = 1) -> n
     return idx
 
 
+def majority_filter(indices: np.ndarray, alpha: np.ndarray, passes: int = 1, need: int = 5, keep: int = 1) -> np.ndarray:
+    """Give a speck the palette index most of its 3x3 window agrees on: a pixel moves when at least ``need`` of the
+    nine (itself included) share another index AND at most ``keep`` of its eight neighbours share its own, so a lone
+    speck or a pair of specks inside a flat area takes the area's colour while a 1 px line (two like neighbours), a
+    2x2 block, a diagonal and the border between two areas all stay. The small flat-shaded looks (16-bit, handheld)
+    run one pass so a detailed painting reads as clean colour areas at 40-60 px. Only palette indices move; no colour
+    is introduced."""
+    idx = indices.copy()
+    for _ in range(passes):
+        around = np.stack([_shift(idx, dy, dx, -1) for dy, dx in _N8], axis=0)
+        neigh = np.concatenate([idx[None], around], axis=0)
+        best = idx.copy()
+        best_n = np.zeros(idx.shape, dtype=np.int32)
+        for c in np.unique(idx[alpha > 0]):
+            if c < 0:
+                continue
+            n = (neigh == c).sum(axis=0)
+            better = n > best_n
+            best[better] = c
+            best_n[better] = n[better]
+        own = (around == idx[None]).sum(axis=0)
+        move = (best_n >= need) & (best != idx) & (own <= keep) & (alpha > 0) & (idx >= 0)
+        if not move.any():
+            break
+        idx[move] = best[move]
+    return idx
+
+
 def remove_alpha_specks(alpha: np.ndarray, min_neighbors: int = 2) -> np.ndarray:
     """Drop opaque pixels with fewer than ``min_neighbors`` opaque 8-neighbours."""
     opaque = alpha > 0

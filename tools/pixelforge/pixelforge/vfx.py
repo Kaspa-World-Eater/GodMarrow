@@ -210,24 +210,34 @@ def _blur(a: np.ndarray, r: int) -> np.ndarray:
 
 
 # ------------------------------------------------------------------ driver
-def make_vfx(
+def add_haze(seq: list[np.ndarray], lut: np.ndarray, strength: float = 0.3, radius: int = 6) -> list[np.ndarray]:
+    """A wide, faint haze round an effect in the ramp's second-darkest colour (the painterly looks): fills only the
+    pixels the effect and its halo left clear, so the hard bands and the glow stay exactly as drawn."""
+    out = []
+    for f in seq:
+        body = (f[..., 3] > 0).astype(np.float32)
+        field = np.clip(_blur(body, radius) * 1.6, 0, 1) * strength
+        g = f.copy()
+        clear = f[..., 3] == 0
+        g[clear, :3] = lut[1] if len(lut) > 1 else lut[0]
+        g[clear, 3] = (field[clear] * 255).astype(np.uint8)
+        out.append(g)
+    return out
+
+
+def render_frames(
     kind: str,
-    name: str,
-    out_dir: str | Path,
     *,
     size: tuple[int, int] | None = None,
     frames: int = 8,
-    fps: float = 10.0,
     palette: str | list[str] | None = None,
     bands: int = 6,
     seed: int = 1,
     glow: bool | None = None,
-    gif: bool = False,
-    atlas_dir: str | Path | None = None,
-    rotations: int = 0,
-) -> dict:
-    """Render a looping VFX strip. ``palette`` is a preset name or a dark->bright hex list.
-    ``glow`` defaults by kind (fire/wisp/burst on, smoke/embers off) and is the only soft alpha in the sheet."""
+    haze: bool = False,
+) -> tuple[list[np.ndarray], dict]:
+    """The frames of one effect loop as RGBA arrays (no files), plus what was decided: size, colours, glow, loop,
+    anchor. ``make_vfx`` writes these out; the style demo composes them next to a figure."""
     if kind not in KINDS:
         raise ValueError(f"kind must be one of {KINDS}")
     if palette is None:
@@ -249,10 +259,51 @@ def make_vfx(
             seq.append(rgba)
     else:
         seq = [paint(i, a, lut, hl) for i, a, hl in gen]
+    if haze and glow and kind != "cookie":   # haze is a kind of glow: only where the game allows one
+        seq = add_haze(seq, lut)
     loop = kind in LOOPING
+    anchor = [w // 2, h - 1] if kind in ("fire", "smoke", "embers", "pillar", "ward") else [w // 2, h // 2]
+    return seq, {"size": (w, h), "colors": colors, "bands": bands, "glow": bool(glow), "haze": bool(haze and glow), "loop": loop, "anchor": anchor}
+
+
+def make_vfx(
+    kind: str,
+    name: str,
+    out_dir: str | Path,
+    *,
+    size: tuple[int, int] | None = None,
+    frames: int | None = None,
+    fps: float | None = None,
+    palette: str | list[str] | None = None,
+    bands: int | None = None,
+    seed: int = 1,
+    glow: bool | None = None,
+    haze: bool | None = None,
+    gif: bool = False,
+    atlas_dir: str | Path | None = None,
+    rotations: int = 0,
+    style: str | None = None,
+) -> dict:
+    """Render a looping VFX strip. ``palette`` is a preset name or a dark->bright hex list.
+    ``glow`` defaults by kind (fire/wisp/burst on, smoke/embers off) and is the only soft alpha in the sheet.
+    With ``style`` (a look preset name) the bands, glow rule, haze, frame count and speed default to the preset's;
+    an explicit argument always wins."""
+    st = None
+    if style:
+        from .styles import get_style
+        st = get_style(style)
+    frames = frames or (st.fx_frames if st else 8)
+    fps = fps or (st.fx_fps if st else 10.0)
+    bands = bands or (st.fx_bands if st else 6)
+    if glow is None and st is not None:
+        glow = st.glow_arg
+    if haze is None:
+        haze = bool(st.fx_haze) if st else False
+    seq, info = render_frames(kind, size=size, frames=frames, palette=palette, bands=bands, seed=seed, glow=glow, haze=haze)
+    w, h = info["size"]
+    colors, glow, loop, anchor = info["colors"], info["glow"], info["loop"], info["anchor"]
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    anchor = [w // 2, h - 1] if kind in ("fire", "smoke", "embers", "pillar", "ward") else [w // 2, h // 2]
     rows = [seq]
     if rotations and rotations > 1:
         # a missile drawn flying right, turned by RotSprite into N headings (row k = k * 360 / N degrees anticlockwise),
@@ -276,7 +327,8 @@ def make_vfx(
     sheet = np.concatenate([np.concatenate(r, axis=1) for r in rows], axis=0)
     Image.fromarray(sheet, "RGBA").save(out / f"{name}.png")
     meta = {"name": name, "kind": kind, "size": [w, h], "frames": frames, "frame_width": w, "frame_height": h, "fps": fps, "loop": loop,
-            "anchor": anchor, "glow": glow, "palette": colors, "bands": bands, "seed": seed, "rotations": int(rotations or 1),
+            "anchor": anchor, "glow": glow, "haze": info["haze"], "palette": colors, "bands": bands, "seed": seed, "rotations": int(rotations or 1),
+            **({"style": st.name} if st else {}),
             "heading": "row k faces k * 360 / rotations degrees anticlockwise from flying right" if rotations and rotations > 1 else "flying right",
             "source": "pixelforge"}
     (out / f"{name}.json").write_text(json.dumps(meta, indent=2) + "\n")

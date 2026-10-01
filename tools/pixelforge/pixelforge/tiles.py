@@ -76,12 +76,21 @@ def make_tiles(
     out_dir: str | Path,
     *,
     second: Image.Image | str | None = None,
-    tile: tuple[int, int] = (72, 36),
+    tile: tuple[int, int] | None = None,
     variants: int = 6,
-    colors: int = 0,
+    colors: int | None = None,
     seed: int = 1,
     res_dir: str = "res://art/tiles",
+    style: str | None = None,
 ) -> dict:
+    """``tile`` (the diamond in texels) and ``colors`` default to the look preset ``style`` when one is given
+    (72x36, every colour otherwise)."""
+    st = None
+    if style:
+        from .styles import get_style
+        st = get_style(style)
+    tile = tuple(tile) if tile else (st.tile if st else (72, 36))
+    colors = (st.colors if st else 0) if colors is None else colors
     rng = np.random.default_rng(seed)
     tw, th = tile
 
@@ -121,7 +130,8 @@ def make_tiles(
     strip = np.concatenate(tiles, axis=1)
     png = out / f"{name}.png"
     Image.fromarray(strip, "RGBA").save(png)
-    meta = {"name": name, "tile": [tw, th], "variants": variants, "transitions": n_trans,
+    meta = {"name": name, "tile": [tw, th], "hr": st.tile_hr if st else 2, "variants": variants, "transitions": n_trans,
+            **({"style": st.name} if st else {}),
             "bitmask": "tile index = variants + bits; bits: N=1 (top-right edge) E=2 (bottom-right) S=4 (bottom-left) W=8 (top-left); 0 = all first material, 15 = all second",
             "source": "pixelforge"}
     (out / f"{name}.json").write_text(json.dumps(meta, indent=2) + "\n")

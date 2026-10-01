@@ -280,3 +280,73 @@ stuff, focus on upgrading pixel forge only"); the export rule change stays, so a
 new full-screen, game-like Forge app in Godot; track/ui the classic Studio clean-up; track/styles, pixel2d, fx,
 fxlook, body3d; plus track/scale and track/gamefeel on the game's presentation). Specs the Forge app must still take
 in a follow-up pass: docs/track_notes/music_editor.md, spell_rack.md, tile_rack.md, reset_and_start_over.md (tabs).
+### 7.6 2026-10-01, track/styles: look presets with animated examples
+
+**What.** PixelForge's style tiers became a real look-preset system (`tools/pixelforge/pixelforge/styles.py`). A
+preset fixes everything that decides how a painting becomes game art: figure height, pixel step, palette size and
+lock, dither, shading bands, a saturation / contrast / lightness grade (OKLab, applied to the source cells before the
+palette is drawn, so a transform still never adds a colour outside the palette), edge treatment (soft / crisp /
+hard), outline rule, effect look (bands, glow rule, haze, frames, fps), loop frames and speed, the game export's
+per-clip cap and the ground-tile size. Seven looks: `godmarrow` (kept as it was), `gothic_hd`, `rendered_arpg`,
+`snes`, `handheld`, `indie`, `painterly`; the old tiers `8bit 16bit hd full` remain. Wired through
+`api.list_styles / set_style / style_of` (per-character styles via `character.settings["style"]`), every step reading
+its numbers from the preset (palette, render `--per-clip`, pixelate stills and renders, `animate_still`, `export_game`
+cap + `style` / `pixel_step` / `figure_height` in the atlas meta), `vfx.make_vfx(style=, haze=)` with a file-free
+`render_frames`, `tiles.make_tiles(style=)`, CLI `pixelforge styles [--json] [--demo OUT]`, `project set --style S
+[--character C]`, `--style` on `pixelate` / `animate` / `vfx` / `tiles` (plus `--bands --saturation --contrast
+--lightness --edge --outline` overrides on `pixelate`), MCP `list_styles / set_style / style_demo` and `style=` on
+`make_effect` / `make_tiles`. `pixelate` also now spreads a cutout's paint under its soft edge before sampling, which
+removed the pale rim and the bright specks small looks showed along a hem.
+
+**Animated examples.** `pixelforge styles --demo OUT` makes, per look, a GIF of the Keeper's front cutout (bundled,
+cleaned, 400 px: `tools/pixelforge/assets/styles/keeper_front.png`) pixelated in that look and animated with the still
+path (idle breathing + cloak sway) with a wisp loop in that look's effect style beside her, a contact sheet with one
+frame per look and the numbers printed under it, and `styles.json`. Shipped: `tools/pixelforge/assets/styles/*.gif`,
+`styles_sheet.png` and the same under `docs/screens/styles/` (sheet: `docs/screens/styles/styles_sheet.png`; the edge
+treatments compared: `docs/screens/styles/2026-10-01_snes_handheld_edge_soft_crisp_hard.png`).
+
+**Verified.** `tests/test_styles.py` (19 tests: every key present and sane on every preset, one pixelate run per look on
+a synthetic painting checking height / colour count / bands / outline, frame-stable grading, api set_style project and
+per character, the still path and the game export reading the preset, vfx + tiles taking the look, the CLI, the demo);
+the whole suite is 106 green. The game was not changed; smoke still errors 0.
+
+**Honestly short.** The Studio's Style page (cards playing the GIFs, "Use this style", the Advanced fold) is specified
+in `docs/track_notes/styles.md` for the UI track, not built here (gui.py belongs to track/ui). Custom edited styles
+are not saved in `project.json` yet (`Style(**fields)` + `styles.validate()` are ready for it). The game does not read
+`pixel_step` or the tile size; the export only records them. The GIFs of the two tallest looks (Godmarrow 207 px,
+Modern indie 180 px with its wisp) stand over the 160 px asked for because the figures are shown 1:1; the small looks
+are zoomed to at least 96 px. The small looks are tuned on one dark figure (the Keeper); a bright painting may want
+its `lightness` lift set back to 0 in the Advanced numbers. Effect "looks" beyond glow / haze (phosphorus, echo, ...)
+belong to track/fxlook and are not here.
+
+### 7.7 2026-10-01, track/styles, second pass: verified, the small looks cleaned, one lightness anchor per character
+
+**What.** Commit 763091d (7.6) was checked against the goal: the 106 tests passed, `pixelforge styles --demo`
+reproduced the shipped GIFs byte for byte in under two seconds, every GIF moves (5-30% of its pixels change per
+frame), the MCP server lists `list_styles / set_style / style_demo`, the game was untouched and the smoke test said
+errors 0 on all twelve lines. Two things were short and are now done:
+- **The small looks read as noise.** At 40-60 px the Keeper's tattered detail became scattered specks. A new preset
+  field `clean` runs a 3x3 majority filter on the palette indices (`cleanup.majority_filter`: a pixel moves when at
+  least five of its nine agree on another index and at most one of its eight neighbours shares its own, so a speck or
+  a pair of specks joins the area round it while a 1 px line, a 2x2 block and the border between two areas stay).
+  `snes` and `handheld` run one pass and their contrast went from x1.1 / x1.15 to x1.3 so the three bands separate.
+  `pixelforge pixelate --clean N` overrides it. Only indices move; no colour outside the palette.
+- **A banded look anchored per clip.** `pixelate_frames` measured the grade's lightness anchors per clip, so a
+  three-band idle and walk could sit on different levels and the body would jump when the game switched animation.
+  `pixelate_renders` now measures them once per character (`pixelate.clip_lightness_reference` over the first and
+  middle frame of every clip) and hands the same anchors to every clip.
+- Also: `status()` reports each character's `style` and `own_style` (for the Style page's "follows the project /
+  own style"); the contact sheet prints "shown x2" under a zoomed look and "clean x1" where the filter runs.
+
+**Verified.** `tests/test_styles.py` is 21 tests (108 in all, green): the filter's rules on a synthetic index map
+(specks and a pair move, a line, a block and a border do not), the clean pass adds no colour outside the palette, one
+`grade_ref` shared by two clips of different brightness (a spy on `pixelate_frames`), the status fields, the CLI
+override. Pictures: `docs/screens/styles/2026-10-01_small_looks_clean_before_after.png` (both small looks before and
+after), `2026-10-01_snes_majority_filter_rules.png` (the vote thresholds and the line-keeping rule side by side),
+`styles_sheet.png` regenerated; `snes.gif` and `handheld.gif` regenerated, the other five GIFs unchanged byte for
+byte. Smoke: errors 0 on every line (the game did not change).
+
+**Honestly short.** The same list as 7.6: the Studio's Style page is a spec in `docs/track_notes/styles.md`, custom
+edited styles are not saved in `project.json`, the game does not read `pixel_step` or the tile size, and the two
+tallest looks' GIFs stand over 160 px because the figures are shown 1:1. The clean pass and the stronger contrast
+are tuned on one dark figure; a bright painting may want `clean 0` or a smaller lift in the Advanced numbers.

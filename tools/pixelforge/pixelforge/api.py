@@ -25,13 +25,13 @@ from .animate import PRESETS, animate
 from .checks import check_frames, check_spec, check_views
 from .model_spec import synthesize_top, transpose_image, build_hull_spec, build_spec, write_spec
 from .palette import Palette
-from .pixelate import PixelateOptions, pixelate, pixelate_frames
+from .pixelate import PixelateOptions, clip_lightness_reference, grading, pixelate, pixelate_frames
 from .project import DIRECTIONS_8, SOURCE_KINDS, Character, Project, slugify
 from .rig import estimate_skeleton, write_skeleton
 from .prompts import PROMPT_KINDS, RULES, build_all
 from .sheet import cutout, normalize_heights, split_sheet
 from .spritesheet import pack, save_gif
-from .styles import get_style
+from .styles import STYLES, DEFAULT_STYLE, Style, get_style, options_for_style, style_table
 
 BLENDER_DIR = Path(__file__).parent / "blender"
 
@@ -66,6 +66,42 @@ def configure(project: Project, **fields) -> dict:
         setattr(project, k, type(getattr(project, k))(v))
     project.save()
     return status(project)
+
+
+# ------------------------------------------------------------------- looks
+def list_styles() -> dict:
+    """Every look preset with its numbers (looks first, then the older size tiers)."""
+    return {"ok": True, "default": DEFAULT_STYLE, "looks": [k for k, v in STYLES.items() if v.group == "look"], "styles": style_table()}
+
+
+def set_style(project: Project, style: str, character: str | None = None) -> dict:
+    """Make ``style`` the project's look, or one character's own (``character``); ``"project"`` as a character's
+    style takes the character back to the project's. Every later step (palette, render, pixelate, export, effects,
+    tiles) reads its numbers from it; steps already run keep their files until they are run again."""
+    if character:
+        c = project.character(character)
+        if style in ("", "project", None):
+            c.settings.pop("style", None)
+            st = get_style(project.style)
+        else:
+            st = get_style(style)
+            c.settings["style"] = st.name
+        project.save()
+        return {"ok": True, "scope": "character", "character": c.name, "style": st.as_dict(),
+                "next": "run palette, pixelate and export again for this character to take the new look"}
+    st = get_style(style)
+    project.style = st.name
+    project.save()
+    return {"ok": True, "scope": "project", "style": st.as_dict(),
+            "next": "run palette, pixelate and export again for every character to take the new look"}
+
+
+def style_of(project: Project, character: str | Character | None = None) -> Style:
+    """The preset a character works in (its own, else the project's)."""
+    if character is None:
+        return get_style(project.style)
+    c = character if isinstance(character, Character) else project.character(character)
+    return get_style(c.settings.get("style", project.style))
 
 
 # ---------------------------------------------------------------- characters
@@ -223,8 +259,8 @@ def preview_gif(project: Project, name: str, clip: str = "walk", direction: str 
 # ------------------------------------------------------------------- palette
 def make_palette(project: Project, name: str, colors: int | None = None) -> dict:
     c = project.character(name)
-    st = get_style(c.settings.get("style", project.style))
-    n = colors or st.colors
+    st = style_of(project, c)
+    n = st.colors if colors is None else colors
     style_img = _source(project, c, "style")
     sources = []
     if style_img is not None:
@@ -533,7 +569,7 @@ def render(project: Project, name: str, actions: list[str] | None = None, step: 
             raise StepError("no model yet; run the model step (and the rig step for animations)")
     out = project.sub(c.name, "renders")
     if per_clip is None:
-        per_clip = int(c.settings.get("per_clip", 0) or project_setting(project, "per_clip", 0) or (24 if c.settings.get("style", project.style) == "godmarrow" else 0))
+        per_clip = int(c.settings.get("per_clip", 0) or project_setting(project, "per_clip", 0) or style_of(project, c).clip_frames)
     args = ["--out", out, "--directions", project.directions, "--size", project.render_size, "--elevation", elevation, "--step", step, "--per-clip", per_clip]
     if actions:
         args += ["--actions", ",".join(actions)]
@@ -567,28 +603,30 @@ def _shared_ppu(project: Project) -> float | None:
 
 # ------------------------------------------------------------------ pixelate
 def _options_for(project: Project, c: Character, **overrides) -> PixelateOptions:
-    st = get_style(c.settings.get("style", project.style))
+    """The character's preset as pixelate options: figure height, palette (the locked ``palette.hex`` when the preset
+    locks one), dither, outline, shading bands, grade and edge; ``overrides`` win (``outline="style"`` = the preset's,
+    ``None`` = none)."""
+    st = style_of(project, c)
     pal_file = project.char_dir(c.name) / "palette.hex"
-    colors = overrides.get("colors", st.colors)
-    return PixelateOptions(
-        max_size=overrides.get("max_size", st.max_size),
-        colors=colors,
-        palette=Palette.load(pal_file) if (pal_file.exists() and colors > 0) else None,
-        dither=overrides.get("dither", st.dither),
-        remove_background=overrides.get("remove_background", False),
-        outline=overrides.get("outline"),
-    )
+    colors = overrides.get("colors")
+    colors = st.colors if colors is None else colors
+    if "palette" not in overrides:
+        overrides["palette"] = Palette.load(pal_file) if (pal_file.exists() and colors > 0 and st.palette_lock) else None
+    overrides["colors"] = colors
+    return options_for_style(st, **overrides)
 
 
-def pixelate_renders(project: Project, name: str, outline: str | None = None, log=None) -> dict:
+def pixelate_renders(project: Project, name: str, outline: str | None = "style", log=None) -> dict:
+    """Every rendered frame -> pixel frames in the character's look. ``outline``: ``"style"`` (the preset's rule),
+    ``None`` (none), ``"auto"`` (the darkest palette colour) or a hex colour."""
     c = project.character(name)
     renders = project.sub(c.name, "renders")
     manifest_file = renders / "manifest.json"
     if not manifest_file.exists():
         raise StepError("no renders yet; run the render step")
     manifest = json.loads(manifest_file.read_text())
-    st = get_style(c.settings.get("style", project.style))
-    # the tier's size is the CHARACTER's standing height in sprite px: derive the
+    st = style_of(project, c)
+    # the preset's figure height is the CHARACTER's standing height in sprite px: derive the
     # render-px-per-sprite-px scale from the model's height as the camera sees it
     import math as _m
 
@@ -600,22 +638,27 @@ def pixelate_renders(project: Project, name: str, outline: str | None = None, lo
     frames_dir = project.sub(c.name, "frames")
     opts = _options_for(project, c, outline=outline)
     opts.scale = scale
+    clips = [(action, d, sorted((renders / action / d).glob("frame_*.png"))) for action in manifest["actions"] for d in manifest["directions"]]
+    clips = [(a, d, src) for a, d, src in clips if src]
+    if grading(opts) and opts.grade_ref is None and clips:
+        # a graded or banded look measures its lightness anchors once for the whole character (the first and middle
+        # frame of every clip), so the bands sit on the same levels in idle, walk and cast
+        sample = [[Image.open(src[0])] + ([Image.open(src[len(src) // 2])] if len(src) > 2 else []) for _, _, src in clips]
+        opts.grade_ref = clip_lightness_reference(sample, opts)
+        if log:
+            log(f"lightness anchors for the whole character: median {opts.grade_ref[0]:.2f}, {opts.grade_ref[1]:.2f}..{opts.grade_ref[2]:.2f}")
     made = {}
-    for action in manifest["actions"]:
-        for d in manifest["directions"]:
-            src = sorted((renders / action / d).glob("frame_*.png"))
-            if not src:
-                continue
-            results = pixelate_frames([Image.open(p) for p in src], opts)
-            out = frames_dir / f"{action}_{d}"
-            out.mkdir(parents=True, exist_ok=True)
-            for old in out.glob("frame_*.png"):
-                old.unlink()
-            for i, r in enumerate(results):
-                r.image.save(out / f"frame_{i:03d}.png")
-            made[f"{action}_{d}"] = len(results)
-            if log:
-                log(f"{action}/{d}: {len(results)} frames -> {results[0].image.width}x{results[0].image.height}")
+    for action, d, src in clips:
+        results = pixelate_frames([Image.open(p) for p in src], opts)
+        out = frames_dir / f"{action}_{d}"
+        out.mkdir(parents=True, exist_ok=True)
+        for old in out.glob("frame_*.png"):
+            old.unlink()
+        for i, r in enumerate(results):
+            r.image.save(out / f"frame_{i:03d}.png")
+        made[f"{action}_{d}"] = len(results)
+        if log:
+            log(f"{action}/{d}: {len(results)} frames -> {results[0].image.width}x{results[0].image.height}")
     if not made:
         raise StepError("renders folder is empty")
     for pass_name in ("normal", "depth"):
@@ -643,8 +686,9 @@ def pixelate_renders(project: Project, name: str, outline: str | None = None, lo
     return {"ok": True, "character": c.name, "frames": str(frames_dir), "clips": made, "fps": fps, "next": "export"}
 
 
-def pixelate_still(project: Project, name: str, view: str = "front", outline: str | None = "auto", **overrides) -> dict:
-    """Direct path: one imported image (style or a view) -> one sprite."""
+def pixelate_still(project: Project, name: str, view: str = "front", outline: str | None = "style", **overrides) -> dict:
+    """Direct path: one imported image (style or a view) -> one sprite, in the character's look (``outline``:
+    ``"style"`` = the preset's rule, ``None`` = none, ``"auto"`` or a hex colour)."""
     c = project.character(name)
     src = project.sub(c.name, "views") / f"{view}.png"
     if view == "style":
@@ -657,13 +701,18 @@ def pixelate_still(project: Project, name: str, view: str = "front", outline: st
     out = project.sub(c.name, "sprites") / f"{view}.png"
     r.image.save(out)
     r.preview(4).save(out.with_name(f"{view}_x4.png"))
-    return {"ok": True, "character": c.name, "sprite": str(out), "size": list(r.image.size), "colors": len(r.palette), "notes": r.notes}
+    return {"ok": True, "character": c.name, "sprite": str(out), "size": list(r.image.size), "colors": len(r.palette),
+            "style": style_of(project, c).name, "notes": r.notes}
 
 
-def animate_still(project: Project, name: str, view: str = "front", presets: list[str] | None = None, frames: int = 8, fps: float = 8) -> dict:
+def animate_still(project: Project, name: str, view: str = "front", presets: list[str] | None = None, frames: int | None = None, fps: float | None = None) -> dict:
+    """A procedural loop of the still sprite; frame count and speed come from the character's look unless given."""
     import copy
 
     c = project.character(name)
+    st = style_of(project, c)
+    frames = frames or st.anim_frames
+    fps = fps or st.anim_fps
     sprite = project.sub(c.name, "sprites") / f"{view}.png"
     if not sprite.exists():
         pixelate_still(project, name, view)
@@ -674,8 +723,8 @@ def animate_still(project: Project, name: str, view: str = "front", presets: lis
     out.mkdir(parents=True, exist_ok=True)
     for i, f in enumerate(out_frames):
         Image.fromarray(f, "RGBA").save(out / f"frame_{i:03d}.png")
-    save_gif(out_frames, out / "preview.gif", fps=fps, zoom=3)
-    return {"ok": True, "character": c.name, "frames": str(out), "gif": str(out / "preview.gif"), "count": len(out_frames)}
+    save_gif(out_frames, out / "preview.gif", fps=fps, zoom=max(3, st.pixel_step))
+    return {"ok": True, "character": c.name, "frames": str(out), "gif": str(out / "preview.gif"), "count": len(out_frames), "fps": fps, "style": st.name}
 
 
 # -------------------------------------------------------------------- export
@@ -738,7 +787,9 @@ def export_game(project: Project, name: str, kind: str | None = None, out_dir: s
         raise StepError("no pixel frames yet; run the pixelate step")
     out = Path(out_dir) if out_dir else project.sub(c.name, "export_game")
     extra = {p: project.char_dir(c.name) / f"frames_{p}" for p in ("normal", "depth")}
-    r = export_godmarrow(frames, manifest, out, kind, category=category, display_name=display_name or c.name, extra_passes=extra)
+    st = style_of(project, c)
+    r = export_godmarrow(frames, manifest, out, kind, category=category, display_name=display_name or c.name, extra_passes=extra,
+                         max_frames=st.clip_frames, extra_meta={"style": st.name, "pixel_step": st.pixel_step, "figure_height": st.figure_height})
     c.done["export"] = True
     c.notes["export_game"] = f"{r['color']['frames']} frames, sheet {r['color']['sheet']}"
     c.notes["export_game_json"] = str(r["color"]["json"])
