@@ -740,6 +740,7 @@ def export_game(project: Project, name: str, kind: str | None = None, out_dir: s
     r = export_godmarrow(frames, manifest, out, kind, category=category, display_name=display_name or c.name, extra_passes=extra)
     c.done["export"] = True
     c.notes["export_game"] = f"{r['color']['frames']} frames, sheet {r['color']['sheet']}"
+    c.notes["export_game_json"] = str(r["color"]["json"])
     project.save()
     return {"ok": True, "character": c.name, "kind": kind, **r, "godot": f"copy {out}/* into the game's art/sprites/ and run with --skin={kind}"}
 

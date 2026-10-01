@@ -132,11 +132,13 @@ class Studio:
         c.add_command(label="Add character…", command=self._add_character)
         c.add_command(label="Run all automatic steps", command=self._run_all, accelerator="F5")
         c.add_command(label="Check this character", command=self._check)
+        c.add_command(label="Effects editor (on the exported set)…", command=lambda: self._fx_editor(self._need_char()) if self._need_char() else None)
         c.add_separator()
         c.add_command(label="Project settings…", command=self._settings)
         m.add_cascade(label="Character", menu=c)
         t = Menu(m, tearoff=0)
         t.add_command(label="Tools window (effects, props, tiles, sounds, music…)", command=self._tools, accelerator="Ctrl+T")
+        t.add_command(label="Colour editor (any image)…", command=lambda: (lambda p: self._color_editor(p) if p else None)(filedialog.askopenfilename(title="Image to recolour", filetypes=[("PNG", "*.png")])))
         m.add_cascade(label="Tools", menu=t)
         h = Menu(m, tearoff=0)
         h.add_command(label="User guide", command=lambda: webbrowser.open(HELP_URL))
@@ -564,10 +566,30 @@ class Studio:
             ttk.Label(row, text="Fix by hand:").pack(side=LEFT)
             for p in views:
                 ttk.Button(row, text=f"Edit {p.stem}", command=lambda p=p: self._edit_cutout(p)).pack(side=LEFT, padx=3)
+            row2 = ttk.Frame(self.panel)
+            row2.pack(anchor="w", pady=(2, 0))
+            ttk.Label(row2, text="Change colours (eyes, trim, glow):").pack(side=LEFT)
+            for p in views:
+                ttk.Button(row2, text=f"Colours {p.stem}", command=lambda p=p: self._color_editor(p)).pack(side=LEFT, padx=3)
             ttk.Button(row, text="Open folder", command=lambda: webbrowser.open(str(views_dir))).pack(side=LEFT, padx=(12, 3))
             ttk.Button(row, text="Reload", command=self._show_step).pack(side=LEFT)
             ttk.Label(self.panel, text="Tip: the front view decides the body; make sure nothing of the background is left inside it. "
                       "You can also edit the files in the folder with any paint program, then Reload. After editing, run the next steps again.", style="Dim.TLabel", wraplength=720).pack(anchor="w", pady=4)
+
+    def _color_editor(self, path) -> None:
+        from .color_editor import open_color_editor
+
+        open_color_editor(self.root, path, on_save=lambda: (self._log(f"Saved colours in {Path(path).name}"), self._show_step()))
+
+    def _fx_editor(self, c) -> None:
+        from .fx_editor import open_fx_editor
+
+        js = c.notes.get("export_game_json")
+        if not js or not Path(js).exists():
+            messagebox.showinfo(APP_TITLE, "Export the game atlas first (step 9); the effects editor works on that sprite set.")
+            return
+        fx_dir = Path(js).parent.parent / "fx"
+        open_fx_editor(self.root, js, fx_dir, on_save=lambda r: self._log(f"Saved {r['attachments']} effect attachment(s) into {Path(js).name}; sheets in {fx_dir}"))
 
     def _edit_cutout(self, path) -> None:
         from .cutout_editor import open_editor
@@ -728,6 +750,14 @@ class Studio:
         ttk.Entry(f, textvariable=kind, width=16).pack(side=LEFT, padx=4)
         ttk.Button(f, text="Export game atlas", command=lambda: self._run(lambda: api.export_game(self.project, c.name, kind.get()), after=lambda r: (self._show_step(), self.status.set("Exported " + r["color"]["png"])))).pack(side=LEFT, padx=6)
         ttk.Label(self.panel, text=c.notes.get("export_game", "")).pack(anchor="w")
+        js = c.notes.get("export_game_json")
+        if js and Path(js).exists():
+            ttk.Separator(self.panel).pack(fill=X, pady=8)
+            ttk.Label(self.panel, text="Touch up the finished set", style="Head.TLabel").pack(anchor="w")
+            row = ttk.Frame(self.panel)
+            row.pack(anchor="w", pady=4)
+            ttk.Button(row, text="Colour editor (every frame at once)", command=lambda: self._color_editor(Path(js).with_suffix(".png"))).pack(side=LEFT)
+            ttk.Button(row, text="Effects editor (attach smoke, glow, embers…)", command=lambda: self._fx_editor(c)).pack(side=LEFT, padx=6)
 
     def _after_export(self, r) -> None:
         self._show_step()

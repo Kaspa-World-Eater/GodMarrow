@@ -48,6 +48,12 @@ TOOLS = [
       ("out", "dir", "art/music", None), ("seconds", "float", 120.0, None), ("seed", "text", "", None), ("act", "int", 1, None),
       ("knobs", "text", "", None), ("sheet", "file", "", None), ("format", "choice", "wav", ["wav", "ogg", "both"]), ("play", "check", True, None)],
      "music"),
+    ("Colour editor", "Click a colour on a sprite, atlas or cutout, widen the range, give it a new colour: shading stays, only the colour changes. Every frame of an atlas at once.",
+     [("image", "file", "", None)],
+     "color_editor"),
+    ("Effects editor", "Drag an effect (smoke, wisp, embers, glow…) onto a point of an exported sprite set, per view; saved into the set and spawned by the Godot add-on.",
+     [("sprite_json", "file", "", None), ("fx_dir", "dir", "art/fx", None)],
+     "fx_editor"),
     ("Recolour", "Tint a finished sprite or atlas (champion / unique variants) without re-rendering.",
      [("image", "file", "", None), ("out", "text", "recoloured.png", None), ("hue", "float", 0.0, None), ("lightness", "float", 1.0, None), ("chroma", "float", 1.0, None), ("map", "text", "", None)],
      "recolor"),
@@ -136,7 +142,7 @@ def run_tool(key: str, v: dict) -> dict:
     raise ValueError(key)
 
 
-GROUPS = [("Art", ["Effects", "Prop / tree", "Painted object", "Item icons", "Portrait", "Ground tiles", "UI frame", "Recolour", "Compare", "World prompts"]),
+GROUPS = [("Art", ["Effects", "Effects editor", "Colour editor", "Prop / tree", "Painted object", "Item icons", "Portrait", "Ground tiles", "UI frame", "Recolour", "Compare", "World prompts"]),
           ("Audio", ["Sounds", "Music"]),
           ("Game", ["Skill trees", "Godot add-on"])]
 
@@ -221,6 +227,14 @@ class ToolsWindow:
             if isinstance(val, str) and val and k in ("out",) and not Path(val).is_absolute():
                 values[k] = str(self.base / val)
         self._say(f"> {key} {values}")
+        if key == "color_editor":   # windows open on the main thread
+            from .color_editor import open_color_editor
+            open_color_editor(self.win, values["image"], on_save=lambda: self._say("saved " + values["image"]))
+            return
+        if key == "fx_editor":
+            from .fx_editor import open_fx_editor
+            open_fx_editor(self.win, values["sprite_json"], values["fx_dir"], on_save=lambda r: self._say(f"saved {r['attachments']} attachment(s)"))
+            return
         if key == "skilltree":   # Tk must stay on the main thread
             try:
                 run_tool(key, values)

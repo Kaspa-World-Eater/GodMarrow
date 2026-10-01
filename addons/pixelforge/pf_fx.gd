@@ -63,3 +63,37 @@ static func spawn(parent: Node, dir: String, name: String, pos: Vector2, scale: 
 	if not bool(e.get("loop", true)):
 		sp.animation_finished.connect(sp.queue_free)
 	return sp
+
+static func attachment_offset(att: Dictionary, view: String) -> Vector2:
+	## The attachment's offset for a view, in sprite pixels from the ground point (Vector2.INF when not placed there).
+	var views: Dictionary = att.get("views", {})
+	if views.has(view):
+		var o: Array = views[view]
+		return Vector2(float(o[0]), float(o[1]))
+	return Vector2.INF
+
+static func spawn_attachments(parent: Node, fx_dir: String, set: PFSpriteSet, view: String, scale: float = 1.0, z: int = 1) -> Array:
+	## One AnimatedSprite2D per attachment placed on `view`, as children of `parent` (the entity at its ground
+	## point). Keep the returned nodes and call update_attachments() when the entity's view changes.
+	var out: Array = []
+	for att in set.attachments():
+		var off := attachment_offset(att, view)
+		if off == Vector2.INF:
+			continue
+		var sp := spawn(parent, fx_dir, str(att["fx"]), off * scale, float(att.get("scale", 1.0)) * scale, z)
+		if sp == null:
+			continue
+		sp.set_meta("pf_attachment", att)
+		sp.set_meta("pf_scale", scale)
+		out.append(sp)
+	return out
+
+static func update_attachments(nodes: Array, view: String) -> void:
+	## Move (or hide) each attached effect for the entity's current view.
+	for sp in nodes:
+		if not is_instance_valid(sp) or not sp.has_meta("pf_attachment"):
+			continue
+		var off := attachment_offset(sp.get_meta("pf_attachment"), view)
+		sp.visible = off != Vector2.INF
+		if sp.visible:
+			sp.position = off * float(sp.get_meta("pf_scale", 1.0))

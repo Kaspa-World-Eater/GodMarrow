@@ -70,6 +70,20 @@ in any text editor, then run **all** with that sheet. Loops are seamless (the re
 and every cue sits at the same loudness. Format `ogg` makes small files for the game when ffmpeg is installed;
 otherwise WAV, which Godot also plays.
 
+## Colours and effects, by hand
+
+**Colour editor** (step 3 under each cutout, step 9 on the finished set, Tools > Colour editor for any PNG): click a
+colour on the picture, widen the range until the highlight covers what you mean (both eyes, the whole trim), click
+New colour and pick one. The shading stays; only the colour changes. The sliders tune lightness, chroma and hue; "Only
+near the click" limits it to one spot. Apply, then Save (the original is kept as a .bak). On a cutout the change goes
+into the model and every frame; on a finished atlas every frame changes at once.
+
+**Effects editor** (step 9, Character menu, or Tools > Effects editor): drag an effect from the list (smoke, wisp,
+embers, fire, glow rings...) and drop it where it belongs, for example on an eye, with a colour set and a size. Place it
+per view, or place it once and copy to all views (left-facing views mirror). Preview plays the idle clip with the
+effects on. Save writes the placements into the sprite set and the effect sheets into the effects folder; the Godot
+add-on spawns them at the right spot for whichever way the character faces.
+
 ## What the Forge checks for you
 
 After cutting out, carving and filming, the Forge runs automatic checks and writes the result in the step notes and the log: white

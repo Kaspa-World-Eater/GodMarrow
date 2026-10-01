@@ -102,3 +102,14 @@ func apply(sp: Sprite2D, anim: String, view: String, i: int) -> void:
 	if f["flip"]:
 		off.x = -off.x - (f["tex"] as AtlasTexture).region.size.x
 	sp.offset = off
+
+func attachments() -> Array:
+	## Effects the Forge's effects editor attached to this set: [{name, kind, fx, scale, views: {view: [ox, oy]}}],
+	## offsets in sprite pixels from the entity's ground point. Spawn them with PFFx.spawn_attachments().
+	return meta.get("attachments", [])
+
+func fx_dir(default: String = "res://art/fx") -> String:
+	## Where the attached effects' sheets live (a folder next to the sprites folder, as the editor wrote them).
+	if meta.has("fx_dir"):
+		return default.get_base_dir() + "/" + str(meta["fx_dir"])
+	return default

@@ -213,3 +213,57 @@ def test_world_prompts_carry_the_style_and_the_order_is_complete():
     assert "no glow" not in build_world_prompt("effect", "a flame")
     md = art_order_markdown("")
     assert md.count("## ") == len(ART_ORDER) + 1 and "[HERO SHEET IMAGE URL]" in md
+
+
+def test_color_editor_keeps_shading_and_fx_editor_saves_attachments(tmp_path):
+    import json
+
+    import numpy as np
+    from PIL import Image
+
+    from pixelforge.color import rgb_to_oklab
+    from pixelforge.color_editor import select_like, shift_colors
+    from pixelforge.fx_editor import composite, load_set, mirror_to_all, save_attachments
+
+    # a sprite with two shades of a violet eye glow and a grey body
+    rgba = np.zeros((40, 40, 4), np.uint8)
+    rgba[5:35, 5:35] = (90, 90, 90, 255)
+    rgba[12:14, 12:14] = (200, 80, 220, 255)
+    rgba[12:14, 26:28] = (160, 60, 180, 255)   # the same eye colour, darker
+    lab = rgb_to_oklab(rgba[..., :3]).astype(np.float32)
+    src = lab[12, 12]
+    m = select_like(lab, rgba[..., 3], src, 0.12)
+    assert m[12, 12] and m[12, 26] and not m[20, 20], "both eye shades, not the body"
+    assert select_like(lab, rgba[..., 3], src, 0.12, (12, 12), 6)[12, 26] == False  # noqa: E712  (local: one eye only)
+    dst = rgb_to_oklab(np.array([[[80, 220, 200]]], np.uint8))[0, 0]
+    out = shift_colors(rgba, m, src, dst)
+    assert tuple(out[20, 20, :3]) == (90, 90, 90)
+    assert out[12, 12, 1] > out[12, 12, 0] and out[12, 26, 1] > out[12, 26, 0], "both eyes turned teal"
+    assert int(out[12, 12, :3].astype(int).sum()) > int(out[12, 26, :3].astype(int).sum()), "the darker eye stays darker"
+
+    # a tiny sprite set with one idle frame per view, the ground point under the feet
+    views = ["down", "front", "side", "back", "up", "front_l", "side_l", "back_l"]
+    sheet = np.zeros((40, 40 * len(views), 4), np.uint8)
+    idx = {}
+    for i, v in enumerate(views):
+        sheet[:, i * 40:(i + 1) * 40] = rgba
+        idx[f"idle/{v}/0"] = [0, i * 40, 0, 40, 40, -20, -38]
+    Image.fromarray(sheet, "RGBA").save(tmp_path / "hero.png")
+    data = {"sheets": ["hero.png"], "meta": {"kind": "hero", "anims": {"idle": {"frames": 1, "views": views}}, "fps": {"idle": 4}}, "idx": idx}
+    (tmp_path / "hero.json").write_text(json.dumps(data))
+    att = {"name": "smoke_1", "kind": "smoke", "palette": "wisp", "scale": 0.5, "glow": True, "fx": "hero_smoke_1",
+           "views": mirror_to_all([-7.0, -26.0], "down", views)}
+    assert att["views"]["front_l"] == [7.0, -26.0] and att["views"]["back"] == [-7.0, -26.0]
+    fx_dir = tmp_path / "fx"
+    r = save_attachments(tmp_path / "hero.json", [att], fx_dir)
+    assert r["attachments"] == 1 and (fx_dir / "hero_smoke_1.png").exists() and (fx_dir / "hero_smoke_1.json").exists()
+    saved = json.loads((tmp_path / "hero.json").read_text())
+    assert saved["meta"]["attachments"][0]["views"]["side_l"] == [7.0, -26.0]
+    s = load_set(tmp_path / "hero.json")
+    fr, (dx, dy) = s["data"]["idx"]["idle/down/0"][1:5], s["data"]["idx"]["idle/down/0"][5:7]
+    frame = sheet[:, 0:40]
+    pad = 32
+    canvas = np.zeros((40 + 2 * pad, 40 + 2 * pad, 4), np.uint8)
+    canvas[pad:pad + 40, pad:pad + 40] = frame
+    out = composite(canvas, (pad - dx, pad - dy), [att], "down", fx_dir, 0)
+    assert out[..., 3].sum() > canvas[..., 3].sum(), "the effect is drawn onto the frame"
