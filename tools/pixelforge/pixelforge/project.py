@@ -36,7 +36,7 @@ STEPS = [
     ("split", "Split the sheet into views and cut out the background"),
     ("palette", "Lock the color palette"),
     ("model", "Build the 3D model (Blender)"),
-    ("rig", "Rig + animate on Mixamo, import the FBX files"),
+    ("rig", "Rig + animate (automatic; Mixamo optional)"),
     ("render", "Render every animation from 8 directions (Blender)"),
     ("pixelate", "Turn the renders into pixel art"),
     ("export", "Export sprite sheets + Godot files"),

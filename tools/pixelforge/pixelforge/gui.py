@@ -101,7 +101,7 @@ class Studio:
             "Turn AI images into real, animated, Godot-ready pixel art.\n\n"
             "1. New project  →  2. Add a character and describe it  →  3. Copy the prompts into Midjourney\n"
             "4. Import the images  →  5. Click ▶ Run all automatic steps.\n\n"
-            "The app stops and tells you when it needs you (uploading to Mixamo, or Blender missing).\n"
+            "The app stops and tells you when it needs you (Blender missing, an image missing).\n"
             "Every step is also a command line an AI can run - see Help."
         )
         ttk.Label(self.panel, text=text, justify=LEFT).pack(anchor="w", pady=10)
@@ -221,7 +221,9 @@ class Studio:
             return None
         return self.project.character(self.char.get())
 
-    def _refresh(self) -> None:
+    def _refresh(self, redraw: bool = True) -> None:
+        """Update the tick marks in the step list; ``redraw`` also re-renders the current step panel
+        (never from inside a step's own code, which would render itself again)."""
         if not self.project:
             return
         c = self.project.characters.get(self.char.get())
@@ -230,7 +232,7 @@ class Studio:
             i = [k for k, _ in STEPS].index(key)
             self.step_list.item(key, text=f"{mark}{i + 1}. {title}")
         sel = self.step_list.selection()
-        if sel:
+        if sel and redraw:
             self._show_step()
 
     # ------------------------------------------------------------------- steps
@@ -273,7 +275,7 @@ class Studio:
             for pr in r["prompts"]:
                 box.insert(END, f"{pr['title']}\n{pr['purpose']}\n\n{pr['prompt']}\n\n{'-' * 100}\n\n")
             box.insert(END, "RULES\n" + "\n".join(f"• {x}" for x in r["rules"]))
-            self._refresh()
+            self._refresh(redraw=False)
 
         def copy(kind):
             api.set_description(self.project, c.name, desc.get("1.0", END).strip())
@@ -322,7 +324,7 @@ class Studio:
             ttk.Label(self.panel, text=c.notes.get("palette", "")).pack(anchor="w")
 
     def _step_model(self, c) -> None:
-        self._heading("5. Build the 3D model", "Makes an 'inflated cutout' model from the front view, paints it with the front/back art, and writes an FBX for Mixamo. Needs Blender installed (free) - nothing to model by hand.")
+        self._heading("5. Build the 3D model", "Fits a real humanoid model to your painting (front + side + back, three-quarter if you have it) and paints the art onto it; a robe with no legs showing gets a carved hull instead. Needs Blender installed (free) - nothing to model by hand.")
         found = api.find_blender(self.project)
         ttk.Label(self.panel, text=f"Blender: {found or 'not found - install from blender.org or set the path in Settings'}", foreground="#060" if found else "#a00").pack(anchor="w")
         ttk.Button(self.panel, text="Build model", command=lambda: self._run(lambda: api.build_model(self.project, c.name, log=self._log), after=self._after_model)).pack(anchor="w", pady=4)
@@ -330,19 +332,23 @@ class Studio:
 
     def _after_model(self, r) -> None:
         self._show_step()
-        messagebox.showinfo("Next: Mixamo", r["instructions"])
+        messagebox.showinfo("Model built", "Next: step 6 rigs and animates it automatically. " + r["instructions"])
 
     def _step_rig(self, c) -> None:
         mix = self.project.sub(c.name, "mixamo")
-        self._heading("6. Rig + animate on Mixamo", "This is the one step that needs you, and it is free:\n"
-                      f"1. Go to mixamo.com and sign in (free Adobe account).\n2. Upload  {self.project.sub(c.name, 'model') / (c.name + '.fbx')}\n"
-                      "3. Place the markers on chin, wrists, elbows, knees, groin. Next.\n4. Pick animations: idle, walk, run, attack, hit, death (search the names).\n"
-                      "5. Download the FIRST one as FBX 'With Skin', every other one 'Without Skin' (30 fps).\n"
-                      f"6. Put all the .fbx files in:\n    {mix}\n7. Click Import below.")
+        self._heading("6. Rig + animate", "Automatic: a skeleton and the built-in motion library (idle, walk, run, attack, punch, cast, hit, death, roll). "
+                      "Nothing to do but click. Mixamo is an optional upgrade, not required.")
+        ttk.Button(self.panel, text="Rig + animate automatically", command=lambda: self._run(lambda: api.rig(self.project, c.name, log=self._log), after=lambda r: self._show_step())).pack(anchor="w", pady=4)
+        ttk.Label(self.panel, text=c.notes.get("rig", ""), foreground="#444").pack(anchor="w")
+        ttk.Separator(self.panel).pack(fill=X, pady=8)
+        ttk.Label(self.panel, text="Optional, Mixamo motion capture (free Adobe account, a browser):\n"
+                  f"1. Upload  {self.project.sub(c.name, 'model') / (c.name + '.fbx')}  at mixamo.com, place the markers, pick animations.\n"
+                  "2. Download the FIRST as FBX 'With Skin', the others 'Without Skin' (30 fps).\n"
+                  f"3. Put the .fbx files in  {mix}  and click Import.", foreground="#555", justify="left").pack(anchor="w")
         ttk.Button(self.panel, text="Open the mixamo folder", command=lambda: webbrowser.open(str(mix))).pack(anchor="w")
         ttk.Button(self.panel, text="Import Mixamo files", command=lambda: self._run(lambda: api.import_mixamo(self.project, c.name, log=self._log), after=lambda r: self._show_step())).pack(anchor="w", pady=4)
         files = sorted(mix.glob("*.fbx")) + sorted(mix.glob("*.FBX"))
-        ttk.Label(self.panel, text=f"{len(files)} FBX file(s) in the folder. {c.notes.get('rig', '')}").pack(anchor="w")
+        ttk.Label(self.panel, text=f"{len(files)} FBX file(s) in the folder.").pack(anchor="w")
 
     def _step_render(self, c) -> None:
         self._heading("7. Render from 8 directions", "Blender renders every animation from every direction with a Diablo-style camera. Takes a few minutes; watch the log.")

@@ -138,10 +138,10 @@ def gui(skills_path: str | Path) -> None:
 
     body = ttk.Panedwindow(root, orient="horizontal")
     body.pack(fill="both", expand=True)
-    canvas = tk.Canvas(body, bg="#14161a", highlightthickness=0)
-    body.add(canvas, weight=3)
-    side = ttk.Frame(body, padding=8)
-    body.add(side, weight=1)
+    canvas = tk.Canvas(body, bg="#14161a", highlightthickness=0, width=820)
+    body.add(canvas, weight=5)
+    side = ttk.Frame(body, padding=8, width=300)
+    body.add(side, weight=0)
     fields = {}
     for key, h in (("name", 1), ("description", 8), ("lore", 6)):
         ttk.Label(side, text=key).pack(anchor="w")
