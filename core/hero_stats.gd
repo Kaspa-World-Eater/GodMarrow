@@ -145,7 +145,8 @@ static func _open_sky() -> bool:
 	return m != null and "zone" in m and m.zone != null and bool(m.zone.d.get("outdoor", false))
 
 func cast_speed() -> float:
-	return 0.72 * (1.0 + (item("fcr") + W("fcr")) / 100.0)
+	# Essence quickens casting a little: 40 Essence = +6% (zz_polish.js:74)
+	return 0.72 * (1.0 + (item("fcr") + W("fcr")) / 100.0) * (1.0 + e_ess() * 0.0015)
 
 func move_speed() -> float:
 	var f := item("frw") + W("frw")
@@ -195,6 +196,8 @@ func tick(dt: float) -> void:
 	var lamber := item("lamber")
 	if lamber > 0.0:
 		hp = minf(life_max(), hp + lamber * dt)
+	# Vitality mends: 40 Vitality = +0.4 life a second (zz_polish.js:76)
+	hp = minf(life_max(), hp + e_vit() * 0.01 * dt)
 	if poise_delay > 0.0:
 		poise_delay -= dt
 	else:
