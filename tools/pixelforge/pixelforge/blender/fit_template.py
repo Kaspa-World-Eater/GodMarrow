@@ -273,7 +273,7 @@ def main() -> None:
     hull, _ = build_hull_from_spec(spec, a.height, "pf_hull")
     best = None
     arm_idx = arm_vertices(arm, mesh)
-    for angle in ((a.arm_angle,) if a.arm_angle else tuple(range(25, 86, 5))):
+    for angle in ((a.arm_angle,) if a.arm_angle else (0, 10, 18) + tuple(range(25, 86, 5))):   # 0 = a T-pose sheet
         pose_arms(arm, angle)
         score = inside_score(evaluated_vertices(mesh)[arm_idx], vox, width, depth, a.height)
         if best is None or score > best[0]:

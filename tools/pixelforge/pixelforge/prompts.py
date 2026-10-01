@@ -58,6 +58,17 @@ PROMPT_KINDS: list[PromptKind] = [
         "scenery, extra characters, cropping",
     ),
     PromptKind(
+        "sheet_t",
+        "A4. T-pose sheet (optional: arms straight out, for the cleanest arm carve and rig)",
+        "Like A2 but standing in a T-pose. The arms carve clean of the torso and the skeleton fits them without "
+        "guessing an angle; shoulders and sleeves paint a little less naturally, which is the trade.",
+        "character turnaround reference sheet of {description}, four views side by side: front view, three-quarter view, "
+        "side view, back view, standing in T-pose with both arms held straight out to the sides at shoulder height, palms "
+        "down, feet shoulder-width apart, full body head to toe, same character in every view, orthographic, flat even "
+        "lighting, no cast shadows, plain solid white background, detailed dark fantasy digital painting, muted desaturated "
+        "colors, gritty painterly texture --ar 2:1 --style raw --no text, labels, perspective, scenery, extra characters, cropping",
+    ),
+    PromptKind(
         "sheet_top",
         "A3. Plan sheet: top view + underside (optional; hats, wide shoulders, anything the camera looks down on)",
         "A second image: the same character seen straight from above and straight from below, side by side. "

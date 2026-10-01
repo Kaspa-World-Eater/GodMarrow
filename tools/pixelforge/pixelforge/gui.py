@@ -512,7 +512,7 @@ class Studio:
         btns = ttk.Frame(self.panel)
         btns.pack(fill=X)
         ttk.Button(btns, text="Update prompts", command=regen).pack(side=LEFT)
-        for kind, label in (("sheet", "Copy A: sheet"), ("sheet4", "Copy A2: 4-view sheet"), ("sheet_top", "Copy A3: plan sheet"), ("front", "Copy B1: front"), ("back", "Copy B2: back"), ("sprite", "Copy C: sprite"), ("item", "Copy D: item")):
+        for kind, label in (("sheet", "Copy A: sheet"), ("sheet4", "Copy A2: 4-view sheet"), ("sheet_t", "Copy A4: T-pose sheet"), ("sheet_top", "Copy A3: plan sheet"), ("front", "Copy B1: front"), ("back", "Copy B2: back"), ("sprite", "Copy C: sprite"), ("item", "Copy D: item")):
             ttk.Button(btns, text=label, command=lambda k=kind: copy(k)).pack(side=LEFT, padx=2)
         regen()
 

@@ -15,7 +15,7 @@ from tkinter.scrolledtext import ScrolledText
 # field kinds: file, dir, text, int, float, choice, check
 TOOLS = [
     ("Effects", "Looping spell, aura, fire, smoke and impact sheets. Glow is added only to the magic kinds.",
-     [("kind", "choice", "fire", ["fire", "smoke", "wisp", "burst", "embers", "ring", "bolt", "slash", "circle", "cloud", "shards", "pillar", "decal", "drip", "flash", "ward", "vortex", "rain", "ashfall", "fog", "lightning", "swarm", "chain", "rune", "pool", "cookie", "bone_spear", "teeth", "ice_bolt", "fire_bolt"]),
+     [("kind", "choice", "fire", ["fire", "smoke", "wisp", "burst", "embers", "ring", "bolt", "slash", "circle", "cloud", "shards", "pillar", "decal", "drip", "flash", "ward", "vortex", "rain", "ashfall", "fog", "lightning", "swarm", "chain", "rune", "pool", "cookie", "bone_spear", "teeth", "ice_bolt", "fire_bolt", "nova", "firewall", "bone_burst"]),
       ("name", "text", "my_effect", None), ("out", "dir", "art/fx", None),
       ("palette", "choice", "auto", ["auto", "lantern", "wisp", "silver", "miasma", "paper", "poison", "bone", "iron", "amber", "black", "frost", "blood", "smoke"]),
       ("frames", "int", 8, None), ("fps", "float", 10.0, None), ("rotations", "int", 0, None), ("gif", "check", True, None)],
@@ -57,7 +57,7 @@ TOOLS = [
      [("game", "dir", "", None), ("skin", "text", "", None), ("fx", "text", "", None), ("attach", "check", False, None), ("screenshot", "check", False, None)],
      "game_preview"),
     ("Spell designer", "Build a spell from layers of effects (fire + burst + embers, ring + rune + wisp...) with a live preview; export the strip the game plays.",
-     [("start_from", "choice", "fireball", ["fireball", "ward", "soul_drain", "bone_shatter", "lightning_strike"]), ("out", "dir", "art/fx", None)],
+     [("start_from", "choice", "fireball", ["fireball", "ward", "soul_drain", "bone_shatter", "lightning_strike", "bone_spear_hit", "frost_nova", "fire_wall", "corpse_burst"]), ("out", "dir", "art/fx", None)],
      "spell_designer"),
     ("Skin editor", "A paint-program toolbar over a sprite, atlas or cutout: pick + recolour, brush, glow, erase, restore, smooth, named regions. Every stroke is an op an AI can replay.",
      [("image", "file", "", None)],

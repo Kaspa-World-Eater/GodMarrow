@@ -42,6 +42,7 @@ EFFECTS = {
     "sigil": "rune", "glyph": "rune", "pool": "pool", "puddle": "pool", "glow": "cookie", "light": "cookie", "aura": "ring",
     "bone spear": "bone_spear", "spear": "bone_spear", "teeth": "teeth", "tooth": "teeth", "ice bolt": "ice_bolt", "frost bolt": "ice_bolt",
     "fire bolt": "fire_bolt", "fireball": "fire_bolt", "missile": "bone_spear", "projectile": "bone_spear", "dart": "teeth",
+    "nova": "nova", "wave": "nova", "wall": "firewall", "fire wall": "firewall", "impact": "bone_burst", "hit": "bone_burst",
 }
 PLACES = {"eye": "eye", "eyes": "eyes", "left eye": "eye_left", "right eye": "eye_right", "hand": "hand", "hands": "hands", "left hand": "hand_left",
           "right hand": "hand_right", "head": "head", "hood": "head", "hat": "head", "helm": "head", "feet": "feet", "foot": "feet", "ground": "feet",
@@ -49,8 +50,9 @@ PLACES = {"eye": "eye", "eyes": "eyes", "left eye": "eye_left", "right eye": "ey
 SIZE = {"tiny": 0.3, "small": 0.5, "little": 0.5, "medium": 1.0, "big": 1.5, "large": 1.5, "huge": 2.2, "massive": 2.6}
 SPEED = {"slow": 0.5, "slowly": 0.5, "lazy": 0.5, "drifting": 0.5, "fast": 1.8, "quick": 1.8, "rapid": 2.0, "flickering": 1.6}
 STRENGTH = {"faint": 0.35, "subtle": 0.4, "soft": 0.5, "pale": 0.55, "bright": 0.9, "strong": 1.0, "intense": 1.0, "blazing": 1.0}
-SPELL_WORDS = {"fireball": "fireball", "ward": "ward", "drain": "soul_drain", "soul": "soul_drain", "shatter": "bone_shatter", "strike": "lightning_strike",
-               "lightning strike": "lightning_strike", "bolt from": "lightning_strike"}
+SPELL_WORDS = {"fireball": "fireball", "ward": "ward", "drain": "soul_drain", "soul drain": "soul_drain", "shatter": "bone_shatter", "strike": "lightning_strike",
+               "lightning strike": "lightning_strike", "bolt from": "lightning_strike", "frost nova": "frost_nova", "ice nova": "frost_nova",
+               "fire wall": "fire_wall", "firewall": "fire_wall", "corpse": "corpse_burst", "corpse explosion": "corpse_burst", "spear hit": "bone_spear_hit"}
 
 
 def _find(text: str, table: dict) -> list[str]:

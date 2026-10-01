@@ -385,3 +385,20 @@ def test_missiles_render_with_their_palette_and_rotation_sheets(tmp_path):
     fh, fw = meta["frame_height"], meta["frame_width"]
     right, up = a[0:fh, 0:fw, 3] > 0, a[4 * fh:5 * fh, 0:fw, 3] > 0
     assert abs(int(right.sum()) - int(up.sum())) < 0.25 * right.sum() and (right != up).any()
+
+
+def test_new_effect_kinds_and_spell_presets_render(tmp_path):
+    import numpy as np
+
+    from pixelforge import spell, vfx
+
+    for k in ("nova", "firewall", "bone_burst"):
+        w, h = vfx.DEFAULT_SIZE[k]
+        seq = vfx.GENERATORS[k](w, h, 8, np.random.default_rng(1), True)
+        assert len(seq) == 8 and any(a.sum() > 50 for _i, a, _h in seq), k
+        assert vfx.paint(seq[3][0], seq[3][1], vfx.ramp_lut(vfx.PRESETS["bone"], 6), seq[3][2]).shape == (h, w, 4)
+    for k in ("bone_spear_hit", "frost_nova", "fire_wall", "corpse_burst"):
+        sp = spell.new_spell(k, k)
+        frames = spell.render_spell(sp)
+        assert len(frames) == sp["frames"] and sum(int((f[..., 3] > 0).sum()) for f in frames) > 500, k
+    assert spell.PRESETS["fire_wall"]["loop"] and not spell.PRESETS["frost_nova"]["loop"]

@@ -96,10 +96,12 @@ softens a patch; Region lets you click round a part (an eye, the lantern, the ho
 later. Every stroke is an operation; "Save ops as JSON" writes them out so an AI assistant can replay or adapt them
 with the edit_skin tool, and the same operations run from the command line (`pixelforge skin`).
 
+**A-pose or T-pose?** Either works. The prompts ask for an A-pose (arms a little away from the body) because Midjourney paints shoulders and sleeves more naturally that way and the carve separates the arms fine. Copy **A4** gives a T-pose sheet when a character's arms keep merging with the body; the skeleton fits both.
+
 **Missiles.** The Effects tool has structured projectiles: bone spear, teeth, ice bolt, fire bolt. They are built like the classic action-RPG missiles (a spinning spear body, chips of bone flying round it, a trail, a glow) and every pixel is generated. Set "rotations" to 16 or 32 to get a sheet with the spear facing every direction, which the game picks from by heading; new missiles are a few numbers in a table.
 
-**Spell designer** (Tools > Spell designer): a spell is layers of effects. Start from a preset (fireball, ward, soul
-drain, bone shatter, lightning strike), add or remove layers, and set each layer's kind, colours, size, position,
+**Spell designer** (Tools > Spell designer): a spell is layers of effects. Start from a preset (fireball, ward, soul drain, bone shatter, lightning strike, bone spear hit, frost nova, fire wall,
+corpse burst), add or remove layers, and set each layer's kind, colours, size, position,
 rotation, start frame, speed, opacity and blend (normal or add) while the preview loops. Export writes the strip and
 the JSON the game plays, plus a GIF and the editable spell file, so a spell is placed in the game exactly like any
 effect and attached to a character with the effects editor.

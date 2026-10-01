@@ -886,3 +886,90 @@ for _name, _spec in MISSILES.items():
     LOOPING.add(_name)
 KINDS = KINDS + tuple(MISSILES)
 PRESETS.setdefault("frost", ["#0a1620", "#1e3a52", "#3f7aa0", "#8fd0ec", "#eafaff"])
+
+
+# ---------------------------------------------------------------- impacts, novas, walls
+def gen_nova(w: int, h: int, frames: int, rng: np.random.Generator, glow: bool = True, n: int = 28, flat: float = 0.5) -> list:
+    """A ring of fragments bursting outward on the ground plane (a frost nova, a bone nova): an expanding ellipse of
+    shards with a bright leading edge and a fading inner haze. One-shot."""
+    xs, ys = _grid(w, h)
+    cx, cy = w / 2, h / 2
+    p = rng.random((n, 3)).astype(np.float32)   # angle, size, speed
+    noise = periodic_noise(w, h, 3, rng, octaves=3)
+    out = []
+    for i in range(frames):
+        t = (i + 0.5) / frames
+        R = (0.12 + 0.88 * (1 - (1 - t) ** 2)) * w * 0.48
+        inten = np.zeros((h, w), dtype=np.float32)
+        for a, sz, sp in p:
+            ang = a * 2 * math.pi
+            r = R * (0.85 + 0.3 * sp)
+            px, py = cx + math.cos(ang) * r, cy + math.sin(ang) * r * flat
+            _shard(inten, xs, ys, px, py, 2.5 + 4 * sz, ang + math.pi / 2 + 0.4 * (sz - 0.5), 0.9 + 0.2 * sz)
+        # the leading edge: a thin bright ellipse
+        d = np.hypot((xs - cx), (ys - cy) / flat)
+        edge = np.exp(-((d - R) ** 2) / (2 * (1.5 + 2 * t) ** 2)) * (1 - 0.6 * t)
+        haze = np.clip(1 - d / max(R, 1), 0, 1) * noise * 0.5 * (1 - t)
+        full = np.maximum(inten, np.maximum(edge, haze))
+        alpha = (full > 0.3).astype(np.float32) * (t < 0.97)
+        halo = _blur(np.clip(full, 0, 1), 3) * (1 - t) if glow else None
+        out.append((np.clip(full * 1.2, 0, 1), alpha, halo))
+    return out
+
+
+def gen_firewall(w: int, h: int, frames: int, rng: np.random.Generator, glow: bool = True) -> list:
+    """A line of flames along the ground, seen from the game's angle: several tongues of fire side by side with
+    licking tips, embers above. Loops."""
+    xs, ys = _grid(w, h)
+    noise = periodic_noise(w, h, 4, rng, octaves=4)
+    noise2 = periodic_noise(w, h, 2, rng, octaves=3)
+    out = []
+    base = h * 0.9
+    for i in range(frames):
+        t = i / frames
+        n1 = _roll(noise, -h * 1.2 * t, 0)
+        n2 = _roll(noise2, -h * 0.5 * t, w * 0.25 * t)
+        # two families of tongues, offset, so the wall is a continuous flickering mass with licking tips
+        ta = 0.55 + 0.45 * np.cos(2 * math.pi * (xs / w * 3.5 + 0.7 * n2 + 0.3 * t))
+        tb = 0.55 + 0.45 * np.cos(2 * math.pi * (xs / w * 5.5 - 0.5 * n2 - 0.45 * t + 0.3))
+        height = h * (0.3 + 0.55 * n1) * np.maximum(ta, 0.75 * tb)
+        rise = base - ys
+        inten = np.clip((height - rise) / (h * 0.22), 0, 1) * np.clip(rise / (h * 0.06), 0, 1)
+        inten = inten * (0.7 + 0.3 * n1) * np.clip(1 - np.abs(xs - w / 2) / (w * 0.5), 0, 1) ** 0.25
+        inten = np.where(ys <= base, inten, 0)
+        alpha = (inten > 0.28).astype(np.float32)
+        halo = _blur(np.clip(inten, 0, 1), 4) * 0.8 if glow else None
+        out.append((np.clip(inten * 1.3, 0, 1), alpha, halo))
+    return out
+
+
+def gen_bone_burst(w: int, h: int, frames: int, rng: np.random.Generator, glow: bool = True) -> list:
+    """What a bone spear leaves on impact: a flash, chips flying out and down, a puff of bone dust. One-shot."""
+    xs, ys = _grid(w, h)
+    cx, cy = w / 2, h * 0.55
+    n = 16
+    p = rng.random((n, 4)).astype(np.float32)
+    noise = periodic_noise(w, h, 3, rng, octaves=3)
+    out = []
+    for i in range(frames):
+        t = (i + 0.5) / frames
+        inten = np.zeros((h, w), dtype=np.float32)
+        flash = np.exp(-(((xs - cx) ** 2 + (ys - cy) ** 2) / (2 * (w * 0.12 * (1 - t) + 1) ** 2))) * max(0.0, 1 - t * 3)
+        for a, s, sz, sp in p:
+            ang = a * 2 * math.pi
+            px = cx + math.cos(ang) * (0.4 + s) * w * 0.4 * t
+            py = cy + math.sin(ang) * (0.4 + s) * h * 0.3 * t + h * 0.5 * t * t
+            _shard(inten, xs, ys, px, py, 3 + 4 * sz, ang + sp * 6 * t, min(1.0, 1.1 - t * 0.4))
+        puff = np.clip(1 - np.hypot(xs - cx, (ys - cy) * 1.4) / (w * 0.3 * (0.3 + t)), 0, 1) * _roll(noise, -h * 0.3 * t, 0) * 0.55 * (1 - t)
+        full = np.maximum(np.clip(inten * 1.3, 0, 1), np.maximum(flash, puff))
+        alpha = (full > 0.3).astype(np.float32) * (t < 0.97)
+        halo = _blur(np.clip(full, 0, 1), 3) * (1 - t) if glow else None
+        out.append((np.clip(full * 1.2, 0, 1), alpha, halo))
+    return out
+
+
+GENERATORS.update({"nova": gen_nova, "firewall": gen_firewall, "bone_burst": gen_bone_burst})
+DEFAULT_SIZE.update({"nova": (128, 72), "firewall": (128, 64), "bone_burst": (64, 56)})
+LOOPING |= {"firewall"}
+GLOW_KINDS |= {"nova", "firewall", "bone_burst"}
+KINDS = KINDS + ("nova", "firewall", "bone_burst")
