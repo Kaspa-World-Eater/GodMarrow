@@ -1,0 +1,30 @@
+{
+  "name": "bone_armor_front",
+  "kind": "bone_armor_front",
+  "size": [
+    112,
+    64
+  ],
+  "frames": 16,
+  "frame_width": 112,
+  "frame_height": 64,
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+    56,
+    32
+  ],
+  "glow": true,
+  "palette": [
+    "#1a1712",
+    "#4a4336",
+    "#8f8470",
+    "#c9bfa6",
+    "#f0ead8"
+  ],
+  "bands": 6,
+  "seed": 1,
+  "rotations": 1,
+  "heading": "flying right",
+  "source": "pixelforge"
+}

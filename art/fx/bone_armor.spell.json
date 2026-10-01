@@ -1,0 +1,56 @@
+{
+ "size": [
+  112,
+  64
+ ],
+ "frames": 16,
+ "fps": 12,
+ "loop": true,
+ "anchor": [
+  56,
+  32
+ ],
+ "layers": [
+  {
+   "kind": "bone_armor_back",
+   "image": "",
+   "palette": "bone",
+   "scale": 1.0,
+   "x": 0,
+   "y": 0,
+   "rotation": 0.0,
+   "start": 0,
+   "speed": 1.0,
+   "opacity": 0.85,
+   "blend": "normal",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "back"
+  },
+  {
+   "kind": "bone_armor_front",
+   "image": "",
+   "palette": "bone",
+   "scale": 1.0,
+   "x": 0,
+   "y": 0,
+   "rotation": 0.0,
+   "start": 0,
+   "speed": 1.0,
+   "opacity": 1.0,
+   "blend": "normal",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "front"
+  }
+ ],
+ "attach": {
+  "back": "behind",
+  "front": "front"
+ },
+ "name": "bone_armor"
+}

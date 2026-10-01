@@ -1,0 +1,88 @@
+{
+ "size": [
+  96,
+  72
+ ],
+ "frames": 10,
+ "fps": 14,
+ "loop": false,
+ "anchor": [
+  48,
+  48
+ ],
+ "layers": [
+  {
+   "kind": "flash",
+   "image": "",
+   "palette": "blood",
+   "scale": 0.9,
+   "x": 0,
+   "y": 0,
+   "rotation": 0.0,
+   "start": 0,
+   "speed": 1.0,
+   "opacity": 1.0,
+   "blend": "add",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "flash"
+  },
+  {
+   "kind": "bone_burst",
+   "image": "",
+   "palette": "bone",
+   "scale": 1.1,
+   "x": 0,
+   "y": 0,
+   "rotation": 0.0,
+   "start": 0,
+   "speed": 1.0,
+   "opacity": 1.0,
+   "blend": "normal",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "bone"
+  },
+  {
+   "kind": "shards",
+   "image": "",
+   "palette": "blood",
+   "scale": 1.2,
+   "x": 0,
+   "y": 0,
+   "rotation": 0.0,
+   "start": 0,
+   "speed": 1.0,
+   "opacity": 0.9,
+   "blend": "normal",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "blood"
+  },
+  {
+   "kind": "cloud",
+   "image": "",
+   "palette": "miasma",
+   "scale": 1.0,
+   "x": 0,
+   "y": 0,
+   "rotation": 0.0,
+   "start": 2,
+   "speed": 1.0,
+   "opacity": 0.6,
+   "blend": "normal",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "miasma"
+  }
+ ],
+ "name": "corpse_burst"
+}

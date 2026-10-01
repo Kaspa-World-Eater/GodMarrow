@@ -1,0 +1,52 @@
+{
+ "size": [
+  80,
+  64
+ ],
+ "frames": 10,
+ "fps": 14,
+ "loop": false,
+ "anchor": [
+  40,
+  36
+ ],
+ "layers": [
+  {
+   "kind": "bone_burst",
+   "image": "",
+   "palette": "bone",
+   "scale": 1.5,
+   "x": 0,
+   "y": 0,
+   "rotation": 0.0,
+   "start": 0,
+   "speed": 1.0,
+   "opacity": 1.0,
+   "blend": "normal",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "burst"
+  },
+  {
+   "kind": "cloud",
+   "image": "",
+   "palette": "bone",
+   "scale": 0.8,
+   "x": 0,
+   "y": 8,
+   "rotation": 0.0,
+   "start": 2,
+   "speed": 1.0,
+   "opacity": 0.5,
+   "blend": "normal",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "dust"
+  }
+ ],
+ "name": "bone_spear_hit"
+}

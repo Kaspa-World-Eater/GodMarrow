@@ -1,0 +1,23 @@
+{
+  "name": "frost_nova",
+  "kind": "spell",
+  "size": [
+    160,
+    96
+  ],
+  "frames": 12,
+  "frame_width": 160,
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+    80,
+    48
+  ],
+  "glow": true,
+  "layers": [
+    "nova",
+    "flash",
+    "fog"
+  ],
+  "source": "pixelforge spell"
+}

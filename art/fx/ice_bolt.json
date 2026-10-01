@@ -1,0 +1,30 @@
+{
+  "name": "ice_bolt",
+  "kind": "ice_bolt",
+  "size": [
+    87,
+    87
+  ],
+  "frames": 10,
+  "frame_width": 87,
+  "frame_height": 87,
+  "fps": 10.0,
+  "loop": true,
+  "anchor": [
+    43,
+    43
+  ],
+  "glow": true,
+  "palette": [
+    "#0b1a26",
+    "#1f4a63",
+    "#4d93b3",
+    "#9ad4e8",
+    "#eafaff"
+  ],
+  "bands": 6,
+  "seed": 1,
+  "rotations": 16,
+  "heading": "row k faces k * 360 / rotations degrees anticlockwise from flying right",
+  "source": "pixelforge"
+}

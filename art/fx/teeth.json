@@ -1,0 +1,30 @@
+{
+  "name": "teeth",
+  "kind": "teeth",
+  "size": [
+    111,
+    111
+  ],
+  "frames": 10,
+  "frame_width": 111,
+  "frame_height": 111,
+  "fps": 10.0,
+  "loop": true,
+  "anchor": [
+    55,
+    55
+  ],
+  "glow": false,
+  "palette": [
+    "#1a1712",
+    "#4a4336",
+    "#8f8470",
+    "#c9bfa6",
+    "#f0ead8"
+  ],
+  "bands": 6,
+  "seed": 1,
+  "rotations": 16,
+  "heading": "row k faces k * 360 / rotations degrees anticlockwise from flying right",
+  "source": "pixelforge"
+}

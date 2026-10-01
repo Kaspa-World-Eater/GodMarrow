@@ -26,7 +26,29 @@ func zone_seeds(id: String) -> Array:
 	return z.get("seeds", [12345, 777, 4242])
 
 ## a sprite atlas: {anim/view -> [[AtlasTexture, Vector2 offset], ...]}, plus meta
+var _skins := {}
+var _skins_loaded := false
+
+func skin_for(kind: String) -> String:
+	## art/sprites/skins.json maps a kind to the set that should stand in for it ({"animancer": "mystic"}): the
+	## PixelForge builds of the heroes replace the old painter sets without renaming files. "<kind>_unclipped" follows
+	## its base kind. --skin=NAME on the command line still wins (entities/hero.gd).
+	if not _skins_loaded:
+		_skins_loaded = true
+		var f := FileAccess.open("res://art/sprites/skins.json", FileAccess.READ)
+		if f:
+			var d = JSON.parse_string(f.get_as_text())
+			if d is Dictionary:
+				_skins = d
+	if _skins.has(kind):
+		return str(_skins[kind])
+	var base := kind.trim_suffix("_unclipped")
+	if base != kind and _skins.has(base):
+		return str(_skins[base])
+	return kind
+
 func sprite_set(kind: String) -> SpriteSet:
+	kind = skin_for(kind)
 	if _sets.has(kind):
 		return _sets[kind]
 	var s := SpriteSet.new()

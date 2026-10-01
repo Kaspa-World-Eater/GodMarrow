@@ -1,0 +1,70 @@
+{
+ "size": [
+  160,
+  96
+ ],
+ "frames": 12,
+ "fps": 14,
+ "loop": false,
+ "anchor": [
+  80,
+  48
+ ],
+ "layers": [
+  {
+   "kind": "nova",
+   "image": "",
+   "palette": "frost",
+   "scale": 1.2,
+   "x": 0,
+   "y": 0,
+   "rotation": 0.0,
+   "start": 0,
+   "speed": 1.0,
+   "opacity": 1.0,
+   "blend": "normal",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "ring"
+  },
+  {
+   "kind": "flash",
+   "image": "",
+   "palette": "frost",
+   "scale": 0.8,
+   "x": 0,
+   "y": 0,
+   "rotation": 0.0,
+   "start": 0,
+   "speed": 1.0,
+   "opacity": 0.7,
+   "blend": "add",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "flash"
+  },
+  {
+   "kind": "fog",
+   "image": "",
+   "palette": "frost",
+   "scale": 0.9,
+   "x": 0,
+   "y": 0,
+   "rotation": 0.0,
+   "start": 3,
+   "speed": 1.0,
+   "opacity": 0.5,
+   "blend": "normal",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "mist"
+  }
+ ],
+ "name": "frost_nova"
+}

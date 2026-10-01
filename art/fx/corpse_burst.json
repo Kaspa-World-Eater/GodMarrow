@@ -1,0 +1,24 @@
+{
+  "name": "corpse_burst",
+  "kind": "spell",
+  "size": [
+    96,
+    72
+  ],
+  "frames": 10,
+  "frame_width": 96,
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+    48,
+    48
+  ],
+  "glow": true,
+  "layers": [
+    "flash",
+    "bone_burst",
+    "shards",
+    "cloud"
+  ],
+  "source": "pixelforge spell"
+}

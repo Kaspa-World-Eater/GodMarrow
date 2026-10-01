@@ -98,7 +98,7 @@ static func spawn_attachments(parent: Node, fx_dir: String, set: PFSpriteSet, vi
 		var off := attachment_offset(att, view)
 		if off == Vector2.INF:
 			continue
-		var zz := z if str(att.get("z", "front")) != "behind" else -abs(z) - 1   # behind the body: under its sprite
+		var zz: int = z if str(att.get("z", "front")) != "behind" else -abs(z) - 1   # behind the body: under its sprite
 		var sp := spawn(parent, fx_dir, str(att["fx"]), off * scale, float(att.get("scale", 1.0)) * scale, zz)
 		if sp == null:
 			continue

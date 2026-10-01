@@ -1,0 +1,22 @@
+{
+  "name": "fire_wall",
+  "kind": "spell",
+  "size": [
+    160,
+    80
+  ],
+  "frames": 12,
+  "frame_width": 160,
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+    80,
+    72
+  ],
+  "glow": true,
+  "layers": [
+    "firewall",
+    "embers"
+  ],
+  "source": "pixelforge spell"
+}

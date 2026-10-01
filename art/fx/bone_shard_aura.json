@@ -1,0 +1,23 @@
+{
+  "name": "bone_shard_aura",
+  "kind": "spell",
+  "size": [
+    112,
+    64
+  ],
+  "frames": 16,
+  "frame_width": 112,
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+    56,
+    32
+  ],
+  "glow": true,
+  "layers": [
+    "bone_shard_aura_back",
+    "bone_shard_aura_front",
+    "wisp"
+  ],
+  "source": "pixelforge spell"
+}

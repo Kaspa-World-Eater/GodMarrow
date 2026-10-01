@@ -1,0 +1,52 @@
+{
+ "size": [
+  160,
+  80
+ ],
+ "frames": 12,
+ "fps": 12,
+ "loop": true,
+ "anchor": [
+  80,
+  72
+ ],
+ "layers": [
+  {
+   "kind": "firewall",
+   "image": "",
+   "palette": "lantern",
+   "scale": 1.25,
+   "x": 0,
+   "y": 8,
+   "rotation": 0.0,
+   "start": 0,
+   "speed": 1.0,
+   "opacity": 1.0,
+   "blend": "normal",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "flames"
+  },
+  {
+   "kind": "embers",
+   "image": "",
+   "palette": "lantern",
+   "scale": 1.3,
+   "x": 0,
+   "y": -10,
+   "rotation": 0.0,
+   "start": 0,
+   "speed": 1.0,
+   "opacity": 0.8,
+   "blend": "normal",
+   "glow": null,
+   "seed": 1,
+   "flip": false,
+   "loop": true,
+   "name": "embers"
+  }
+ ],
+ "name": "fire_wall"
+}

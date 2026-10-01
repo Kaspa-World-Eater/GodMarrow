@@ -1,0 +1,30 @@
+{
+  "name": "fire_bolt",
+  "kind": "fire_bolt",
+  "size": [
+    87,
+    87
+  ],
+  "frames": 10,
+  "frame_width": 87,
+  "frame_height": 87,
+  "fps": 10.0,
+  "loop": true,
+  "anchor": [
+    43,
+    43
+  ],
+  "glow": true,
+  "palette": [
+    "#2a1206",
+    "#7a3d10",
+    "#d08a2a",
+    "#f3c75c",
+    "#fff1b0"
+  ],
+  "bands": 6,
+  "seed": 1,
+  "rotations": 16,
+  "heading": "row k faces k * 360 / rotations degrees anticlockwise from flying right",
+  "source": "pixelforge"
+}

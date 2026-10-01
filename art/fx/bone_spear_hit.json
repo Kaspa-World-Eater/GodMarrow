@@ -1,0 +1,22 @@
+{
+  "name": "bone_spear_hit",
+  "kind": "spell",
+  "size": [
+    80,
+    64
+  ],
+  "frames": 10,
+  "frame_width": 80,
+  "fps": 14,
+  "loop": false,
+  "anchor": [
+    40,
+    36
+  ],
+  "glow": true,
+  "layers": [
+    "bone_burst",
+    "cloud"
+  ],
+  "source": "pixelforge spell"
+}

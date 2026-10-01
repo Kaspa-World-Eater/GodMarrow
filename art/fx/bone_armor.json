@@ -1,0 +1,22 @@
+{
+  "name": "bone_armor",
+  "kind": "spell",
+  "size": [
+    112,
+    64
+  ],
+  "frames": 16,
+  "frame_width": 112,
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+    56,
+    32
+  ],
+  "glow": true,
+  "layers": [
+    "bone_armor_back",
+    "bone_armor_front"
+  ],
+  "source": "pixelforge spell"
+}
