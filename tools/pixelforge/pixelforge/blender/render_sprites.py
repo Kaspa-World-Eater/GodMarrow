@@ -119,6 +119,7 @@ def main() -> None:
     p.add_argument("--size", type=int, default=256)
     p.add_argument("--elevation", type=float, default=30.0)
     p.add_argument("--step", type=int, default=2, help="render every Nth frame")
+    p.add_argument("--per-clip", type=int, default=0, help="render exactly N evenly spaced frames per clip (0 = use --step); the game only keeps 6-8")
     p.add_argument("--actions", help="comma-separated action names (default: all)")
     p.add_argument("--ppu", type=float, help="pixels per unit; fixes the scale across characters")
     p.add_argument("--margin", type=float, default=1.08)
@@ -146,7 +147,11 @@ def main() -> None:
             arm.animation_data_create()
             arm.animation_data.action = act
             start, end = (int(round(v)) for v in act.frame_range)
-            frames = list(range(start, end + 1, max(1, a.step)))
+            if a.per_clip > 0:
+                n = max(2, min(a.per_clip, end - start + 1))
+                frames = sorted({start + int(round(i * (end - start) / n)) for i in range(n)})
+            else:
+                frames = list(range(start, end + 1, max(1, a.step)))
         else:
             frames = [scene.frame_current]
         frame_plan.append((act, frames))
@@ -224,7 +229,9 @@ def main() -> None:
         if act is not None:
             arm.animation_data.action = act
         act_name = act.name if act is not None else "still"
-        manifest["actions"][act_name] = {"frames": len(frames), "source_frames": frames}
+        span = max(1, (frames[-1] - frames[0]) + (frames[1] - frames[0] if len(frames) > 1 else 1))
+        manifest["actions"][act_name] = {"frames": len(frames), "source_frames": frames,
+                                         "fps": scene.render.fps * len(frames) / span}   # playback speed that keeps the clip's real duration
         for fi, f in enumerate(frames):
             scene.frame_set(f)
             ax, ay = anchor_xy(arm, meshes)

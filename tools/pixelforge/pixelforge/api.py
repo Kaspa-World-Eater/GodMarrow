@@ -486,7 +486,10 @@ def import_mixamo(project: Project, name: str, depth_scale: float | None = None,
     return {"ok": True, "character": c.name, "blend": str(out), "animations": actions, "next": "render"}
 
 
-def render(project: Project, name: str, actions: list[str] | None = None, step: int = 2, elevation: float = 30.0, ppu: float | None = None, passes: str | None = None, log=None) -> dict:
+def render(project: Project, name: str, actions: list[str] | None = None, step: int = 2, elevation: float = 30.0, ppu: float | None = None, passes: str | None = None, per_clip: int | None = None, log=None) -> dict:
+    """``per_clip`` = N evenly spaced frames per clip (the game keeps 6-8, so 12 is plenty and renders four times
+    faster than every 2nd frame of a long clip). Default: the character/project setting, else 12 for the
+    godmarrow style, else 0 (= --step)."""
     c = project.character(name)
     model = project.sub(c.name, "model")
     blend = model / f"{c.name}_rigged.blend"
@@ -495,7 +498,9 @@ def render(project: Project, name: str, actions: list[str] | None = None, step: 
         if not blend.exists():
             raise StepError("no model yet; run the model step (and the rig step for animations)")
     out = project.sub(c.name, "renders")
-    args = ["--out", out, "--directions", project.directions, "--size", project.render_size, "--elevation", elevation, "--step", step]
+    if per_clip is None:
+        per_clip = int(c.settings.get("per_clip", 0) or project_setting(project, "per_clip", 0) or (12 if c.settings.get("style", project.style) == "godmarrow" else 0))
+    args = ["--out", out, "--directions", project.directions, "--size", project.render_size, "--elevation", elevation, "--step", step, "--per-clip", per_clip]
     if actions:
         args += ["--actions", ",".join(actions)]
     passes = passes or c.settings.get("passes") or project_setting(project, "passes", "color")
@@ -594,7 +599,8 @@ def pixelate_renders(project: Project, name: str, outline: str | None = None, lo
                 for i, f in enumerate(src):
                     pixelate(Image.open(f), popts).image.save(out / f"frame_{i:03d}.png")
     fps = manifest.get("fps", 12)
-    (frames_dir / "animations.json").write_text(json.dumps({"fps": fps, "clips": made}, indent=2) + "\n")
+    clip_fps = {name: a.get("fps", fps) for name, a in manifest.get("actions", {}).items()}
+    (frames_dir / "animations.json").write_text(json.dumps({"fps": fps, "clip_fps": clip_fps, "clips": made}, indent=2) + "\n")
     c.done["pixelate"] = True
     c.notes["pixelate"] = f"{len(made)} clips"
     project.save()

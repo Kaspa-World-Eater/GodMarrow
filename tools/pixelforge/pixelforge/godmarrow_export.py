@@ -112,6 +112,7 @@ def export_godmarrow(
     anim_map = {**HERO_ANIMS, **(anim_map or {})}
     anims_json = json.loads((frames_dir / "animations.json").read_text()) if (frames_dir / "animations.json").exists() else {}
     clip_fps = fps or anims_json.get("fps", 10)
+    per_clip_fps = anims_json.get("clip_fps", {})   # each clip keeps its real duration when it was sampled sparsely
     # render px -> sprite px
     sample = next(frames_dir.glob("*/frame_000.png"), None)
     if sample is None:
@@ -124,11 +125,15 @@ def export_godmarrow(
 
     def collect(src_root: Path) -> tuple[list, dict, dict]:
         packed_frames, idx, meta_anims = [], {}, {}
+        anim_fps = {}
         for clip_dir in sorted(p for p in src_root.iterdir() if p.is_dir()):
             clip, _, d = clip_dir.name.rpartition("_")
             if d not in DIR_TO_VIEW or clip not in anim_map:
                 continue
             anim, n_dst = anim_map[clip]
+            n_src_files = len(list(clip_dir.glob("frame_*.png")))
+            src_fps = float(per_clip_fps.get(clip, clip_fps))
+            anim_fps[anim] = src_fps * n_dst / max(n_src_files, 1) if n_src_files else clip_fps
             view = DIR_TO_VIEW[d]
             files = sorted(clip_dir.glob("frame_*.png"))
             loop = anim in ("idle", "walk", "run")
@@ -143,10 +148,12 @@ def export_godmarrow(
                 ma["views"].append(view)
         for ma in meta_anims.values():
             ma["views"].sort(key=VIEW_ORDER.index)
+        meta_anims["__fps__"] = anim_fps
         return packed_frames, idx, meta_anims
 
     def write_set(src_root: Path, name: str, passes_meta: dict | None = None) -> dict:
         packed_frames, idx, meta_anims = collect(src_root)
+        anim_fps = meta_anims.pop("__fps__", {})
         if not packed_frames:
             raise FileNotFoundError(f"no exportable clips under {src_root}")
         sheet, placed = shelf_pack(packed_frames)
@@ -164,7 +171,7 @@ def export_godmarrow(
             "category": category,
             "name": display_name or kind,
             "anims": meta_anims,
-            "fps": {a: clip_fps for a in meta_anims},
+            "fps": {a: round(float(anim_fps.get(a, clip_fps)), 2) for a in meta_anims},
             "bounds": bounds,
             "frame_count": len(full_idx),
             "views_note": "down front side back up face screen-right (mirror for the left octants, as the web); "

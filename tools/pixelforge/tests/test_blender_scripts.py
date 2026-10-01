@@ -71,7 +71,7 @@ def test_render_script_framing_and_manifest(model, tmp_path, monkeypatch):
     _run("render_sprites.py", ["--out", out, "--directions", "8", "--size", "64", "--elevation", "30"])
     manifest = json.loads((out / "manifest.json").read_text())
     assert manifest["directions"] == ["S", "SW", "W", "NW", "N", "NE", "E", "SE"]
-    assert manifest["actions"] == {"still": {"frames": 1, "source_frames": [1]}}
+    assert manifest["actions"]["still"]["frames"] == 1 and manifest["actions"]["still"]["source_frames"] == [1]
     written = sorted(out.glob("still/*/frame_000.png"))
     assert len(written) == 8 and Image.open(out / "still" / "SW" / "frame_000.png").size == (64, 64)
     # the whole 1.8-unit figure fits in the frame with a small margin
