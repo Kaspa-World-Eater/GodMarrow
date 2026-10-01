@@ -311,7 +311,7 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
     }
 
 
-DEFAULT_CLIPS = "idle,walk,run,attack,hit,death,cast"
+DEFAULT_CLIPS = "idle,walk,run,attack,punch,cast,hit,death,roll"  # the game set: atk, atk2(punch), dodge(roll)
 ANIMATION_LIBRARY = Path(__file__).resolve().parent.parent / "assets" / "animations" / "quaternius_ual_standard.glb"
 
 

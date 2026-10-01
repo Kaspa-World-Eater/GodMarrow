@@ -75,6 +75,30 @@ def defringe(alpha: np.ndarray, lab: np.ndarray, background: np.ndarray, toleran
     return out
 
 
+def soft_matte(alpha: np.ndarray, lab: np.ndarray, background: np.ndarray, tolerance: float, width: int = 2) -> np.ndarray:
+    """Anti-aliased edge alpha from colour distance to the background.
+
+    Hard cutouts leave a one-pixel stair on every edge.  Within ``width`` px of
+    the hard edge, alpha becomes how far the pixel's colour is from the
+    background colour (0 at the background colour, 255 at ``2*tolerance`` away),
+    which recovers the painting's own soft edges.  Interior pixels stay opaque.
+    """
+    opaque = alpha > 0
+    edge = opaque.copy()
+    ring = np.zeros_like(opaque)
+    for _ in range(width):
+        grown = edge | np.any([_shift(edge, dy, dx, False) for dy, dx in _N8], axis=0)
+        ring |= grown & ~opaque
+        shrunk = edge & np.all([_shift(edge, dy, dx, False) for dy, dx in _N8], axis=0)
+        ring |= edge & ~shrunk
+        edge = shrunk
+    dist = np.sqrt(((lab - background) ** 2).sum(-1))
+    soft = np.clip(dist / max(2 * tolerance, 1e-6), 0.0, 1.0)
+    out = alpha.astype(np.float64)
+    out[ring] = np.minimum(np.where(opaque[ring], 1.0, soft[ring] * 0.0 + soft[ring] * (dist[ring] > tolerance)), soft[ring]) * 255.0
+    return np.clip(np.rint(out), 0, 255).astype(np.uint8)
+
+
 def bleed_edges(rgba: np.ndarray, passes: int = 16) -> np.ndarray:
     """Spread opaque colors outward into transparent pixels (texture padding).
 

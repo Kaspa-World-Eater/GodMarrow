@@ -82,8 +82,10 @@ pixelforge project run <character> model          # needs Blender; writes model/
 pixelforge project run <character> rig            # built-in rig + clips; uses mixamo/*.fbx instead if present
 pixelforge project run <character> render [--frame-step 2] [--elevation 30]
 pixelforge project run <character> pixelate
-pixelforge project run <character> export
+pixelforge project run <character> export        # generic Godot SpriteFrames (.tres/.tscn)
+pixelforge project export-game <character> --kind <kind> [--name "Display Name"]   # GODMARROW format: art/sprites/<kind>.png|json (+ _normal/_depth sets)
 pixelforge project run-all <character>            # runs the remaining automatic steps, stops where blocked
+pixelforge project run <character> render --passes color,normal,depth   # also render lighting maps (slower: 3 renders per frame)
 
 pixelforge project still <character> [--view style|front|side|back] [--animate idle glow ...] [--export]
 ```
@@ -100,6 +102,14 @@ pixelforge pack --anim "walk=dir/*.png@12" -o sheet.png
 pixelforge godot --anim "walk=dir/*.png@12" --name hero --out <godot>/sprites/hero --res-dir res://sprites/hero
 pixelforge prompt --describe "<sentence>" [--kind sheet|front|back|sprite|item]
 ```
+
+## Godmarrow specifics (the game this forge serves)
+
+- Project style `godmarrow` (`pixelforge project set --style godmarrow`): ~195 px standing height, **every colour kept** (Derek rejected palette reduction), hard edges. Use it for every game character.
+- Sheet: prefer prompt **A2** (four views: front, three-quarter, side, back). The quarter view carves the diagonals and paints them; `split` names 4 figures `front quarter side back`.
+- Render with `--passes color,normal,depth` when the character is final (the lantern lights the sprite cards with those maps); `export-game` then writes `<kind>_normal.*` and `<kind>_depth.*` next to the colour set.
+- `export-game` writes the game's own atlas (`idx` keyed `anim/view/i`, foot anchors, 8 views `down front side back up front_l side_l back_l`, anim set idle/walk/atk/atk2/cast 8, hit 6, death 8, dodge 8). Copy the files into the game's `art/sprites/` and look-test with `--skin=<kind>`.
+- Game rules that touch art: no red light; glows only on magic, lanterns and wisps (never on plain attacks); no animals or animal motifs; the Ossuarch is bone and iron, never gold; realistic proportions, worn and tattered, one bold saturated mass per figure. Full list: the game's `docs/wiki/01-rules-and-decisions.md`.
 
 ## The standard procedure
 

@@ -84,6 +84,16 @@ Known rough edges / next work, in priority order:
 5. Hem/feet: hull bottom is flat; a small taper would help.
 6. Later: props/items pipeline (prompt D + rotate --spin), tilesets, UI.
 
+## Godmarrow integration (2026-10-01)
+
+PixelForge lives at `tools/pixelforge/` inside the GodMarrow repo. The contract
+with the game: `pixelforge project export-game` → `art/sprites/<kind>.png|json`
+(the game's own format, 8 views, foot anchors, fixed anim set), style
+`godmarrow` (195 px, full colour), `--passes color,normal,depth` for the
+lantern's lighting maps, prompt A2 (four-view sheet) for the best carve.
+`entities/anim_sprite.gd` reads the real left-facing views when a set has them.
+Verified with the game's `tools/smoke.sh` (errors 0) on a headless Godot 4.7.2.
+
 ## Conventions
 
 - Directions: `S SW W NW N NE E SE` = where the character *faces on screen*;
