@@ -534,7 +534,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=cmd_prop)
 
     s = sub.add_parser("vfx", help="procedural looping effect sheet: fire, smoke, wisp, burst, embers")
-    s.add_argument("kind", choices=["fire", "smoke", "wisp", "burst", "embers"]); s.add_argument("name"); s.add_argument("-o", "--out", default="art/fx")
+    from .vfx import KINDS as _KINDS
+    s.add_argument("kind", choices=list(_KINDS)); s.add_argument("name"); s.add_argument("-o", "--out", default="art/fx")
     s.add_argument("--size", type=int, nargs=2, metavar=("W", "H")); s.add_argument("--frames", type=int, default=8); s.add_argument("--fps", type=float, default=10)
     s.add_argument("--palette", default="lantern", help="preset (wisp lantern miasma bone smoke blood) or dark->bright hex list a,b,c")
     s.add_argument("--bands", type=int, default=6, help="colour bands"); s.add_argument("--seed", type=int, default=1)
