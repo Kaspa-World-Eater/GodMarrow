@@ -16,3 +16,11 @@ never destructive by accident:
   the previous files (export_game keeps a `.prev` copy before overwriting art/sprites, art/fx, audio).
 - Same from the command line and MCP: `pixelforge reset <character> [--step split] [--all]`, `project forget`,
   `export-game --undo`.
+
+# Tools have tabs
+
+The tool screens (effects, props, tiles, icons, portraits, UI frames, sounds, music, editors) are one workbench with
+tabs along the top, like a console game's menu tabs (left/right shoulder buttons move between them on a gamepad):
+Effects · Spells · Objects · Tiles · Icons · Portraits · UI · Sounds · Music · Editors. Each tab keeps its state
+while you switch; each has the same shape: a picker on the left, the live preview in the middle, the knobs on the
+right, Keep / Reset / Start over along the bottom. The classic Studio's Tools window follows the same tabs.
