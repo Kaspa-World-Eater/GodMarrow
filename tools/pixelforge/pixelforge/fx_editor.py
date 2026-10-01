@@ -317,6 +317,7 @@ class FxEditor:
         if not frames:
             return
         win = Toplevel(self.win)
+        win.configure(bg="#1b1e24")
         win.title("Preview")
         lbl = ttk.Label(win)
         lbl.pack(padx=8, pady=8)

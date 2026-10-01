@@ -46,6 +46,7 @@ class CutoutEditor:
         self.tolerance = IntVar(value=8)   # /100 OKLab
 
         self.win = Toplevel(master)
+        self.win.configure(bg="#1b1e24")
         self.win.title(f"Cutout: {self.path.name}")
         bar = ttk.Frame(self.win, padding=4)
         bar.pack(fill=X)
@@ -56,8 +57,9 @@ class CutoutEditor:
         ttk.Label(bar, text="Tolerance").pack(side=LEFT, padx=(12, 2))
         ttk.Scale(bar, from_=1, to=30, variable=self.tolerance, orient="horizontal", length=100).pack(side=LEFT)
         ttk.Button(bar, text="Undo", command=self.do_undo).pack(side=LEFT, padx=(12, 2))
-        ttk.Button(bar, text="Zoom +", command=lambda: self.set_zoom(self.zoom + 1)).pack(side=LEFT)
-        ttk.Button(bar, text="Zoom -", command=lambda: self.set_zoom(self.zoom - 1)).pack(side=LEFT)
+        ttk.Label(bar, text="Zoom").pack(side=LEFT, padx=(10, 2))
+        ttk.Button(bar, text="+", width=3, command=lambda: self.set_zoom(self.zoom + 1)).pack(side=LEFT)
+        ttk.Button(bar, text="−", width=3, command=lambda: self.set_zoom(self.zoom - 1)).pack(side=LEFT)
         ttk.Button(bar, text="Revert to automatic", command=self.revert).pack(side=LEFT, padx=(12, 2))
         ttk.Button(bar, text="Save", command=self.save).pack(side=RIGHT, padx=4)
         self.status = ttk.Label(self.win, text="Left drag erases, right drag restores. Magic erase removes one patch of similar colour.", foreground="#555")

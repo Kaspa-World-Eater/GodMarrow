@@ -61,6 +61,12 @@ def apply_theme(root) -> None:
     st.configure("TScale", background=PANEL, troughcolor=FIELD)
     st.configure("TScrollbar", background="#2a2f38", troughcolor=INK, arrowcolor=BONE)
     st.configure("TSeparator", background="#2c313a")
+    root.option_add("*Toplevel.background", PANEL)
+    root.option_add("*Listbox.background", FIELD)
+    root.option_add("*Listbox.foreground", BONE)
+    root.option_add("*Listbox.selectBackground", "#1f4a46")
+    root.option_add("*Listbox.selectForeground", "#eafff8")
+    root.option_add("*Canvas.background", "#303030")
     root.option_add("*Text.background", FIELD)
     root.option_add("*Text.foreground", BONE)
     root.option_add("*Text.insertBackground", BONE)
@@ -147,6 +153,7 @@ class Studio:
         m.add_cascade(label="Tools", menu=t)
         h = Menu(m, tearoff=0)
         h.add_command(label="User guide", command=lambda: webbrowser.open(HELP_URL))
+        h.add_command(label="Update PixelForge (git pull)", command=self._update_forge)
         h.add_command(label="About PixelForge", command=lambda: messagebox.showinfo(APP_TITLE, "PixelForge Studio\n\nPaintings in, game-ready pixel art out: characters in 8 directions, props, effects, tiles, UI, sounds and music.\n\nEvery step is also a command line and an AI-assistant tool."))
         m.add_cascade(label="Help", menu=h)
         self.root.config(menu=m)
@@ -156,6 +163,27 @@ class Studio:
         self.root.bind("<F5>", lambda e: self._run_all())
         self.root.bind("<Control-d>", lambda e: self._describe())
         self._fill_recent()
+
+    def _update_forge(self) -> None:
+        """Pull the latest Forge from the repository it was installed from, then ask for a restart."""
+        import subprocess
+
+        repo = Path(__file__).resolve().parents[1]
+        for cand in (repo, *repo.parents):
+            if (cand / ".git").exists():
+                repo = cand
+                break
+        else:
+            messagebox.showinfo(APP_TITLE, "This copy was not installed from git; download the latest release instead.")
+            return
+        try:
+            r = subprocess.run(["git", "pull", "--ff-only"], cwd=str(repo), capture_output=True, text=True, timeout=120)
+            out = (r.stdout + r.stderr).strip()[-800:]
+        except Exception as e:  # noqa: BLE001
+            messagebox.showerror(APP_TITLE, f"Could not run git:\n{e}")
+            return
+        self._log("UPDATE " + out.replace("\n", " | "))
+        messagebox.showinfo(APP_TITLE, ("Already up to date." if "Already up to date" in out else "Updated. Close and reopen PixelForge Studio to use the new version.") + "\n\n" + out)
 
     def _fill_recent(self) -> None:
         self.recent_menu.delete(0, END)
@@ -240,16 +268,17 @@ class Studio:
         ttk.Label(self.panel, text="Paintings in, game-ready pixel art out: characters in 8 directions, props, effects, tiles, UI, sounds and music.", style="Dim.TLabel", wraplength=720).pack(anchor="w", pady=(2, 14))
         row = ttk.Frame(self.panel)
         row.pack(anchor="w", pady=(0, 14))
-        ttk.Button(row, text="New project", command=self._new, style="Go.TButton").pack(side=LEFT)
+        ttk.Button(row, text="+ Add a character (start here)", command=self._add_character, style="Go.TButton").pack(side=LEFT)
         ttk.Button(row, text="Open project", command=self._open_dialog).pack(side=LEFT, padx=6)
-        ttk.Button(row, text="Tools (no project needed)", command=self._tools).pack(side=LEFT)
+        ttk.Button(row, text="New project in a folder of your choice", command=self._new).pack(side=LEFT)
+        ttk.Button(row, text="Tools", command=self._tools).pack(side=LEFT, padx=6)
         recent = _recent()
         if recent:
             ttk.Label(self.panel, text="Recent projects", style="Head.TLabel").pack(anchor="w")
             for p in recent[:5]:
                 ttk.Button(self.panel, text=p, command=lambda p=p: self._open(p)).pack(anchor="w", pady=1)
         ttk.Label(self.panel, text="A character in five moves", style="Head.TLabel").pack(anchor="w", pady=(12, 0))
-        self._steps_text(["New project, then Add character: a name and one sentence about them.",
+        self._steps_text(["Add a character: a name and one sentence about them. (A project folder is made for you in Documents.)",
                           "Step 1 writes the Midjourney prompts. Paint the sheet and save the PNG.",
                           "Step 2: bring the picture in. Then press Continue, or Run all automatic steps.",
                           "Watch the log. The app stops and says so if it needs something (Blender, a picture).",
@@ -292,22 +321,48 @@ class Studio:
         if names and not self.step_list.selection():
             self.step_list.selection_set(self._next_step(self.project.character(names[0])))
 
+    def _ensure_project(self) -> bool:
+        """No project open: make one in Documents/PixelForge Projects/My Game (or open it) so a person can start with
+        Add character and never meet the empty-folder step."""
+        if self.project is not None:
+            return True
+        home = Path.home()
+        base = home / "Documents" if (home / "Documents").exists() else home
+        folder = base / "PixelForge Projects" / "My Game"
+        try:
+            if not (folder / "project.json").exists():
+                folder.mkdir(parents=True, exist_ok=True)
+                api.new_project(folder, "My Game", style="godmarrow")
+            self._open(str(folder))
+            self._log(f"Made a project for you in {folder} (File > Open project to use another).")
+        except Exception as e:  # noqa: BLE001
+            messagebox.showerror(APP_TITLE, f"Could not make a project folder:\n{e}\n\nUse New project and pick a folder.")
+            return False
+        return self.project is not None
+
     def _add_character(self) -> None:
-        if not self._need_project():
+        if not self._ensure_project():
             return
         dlg = Toplevel(self.root)
         dlg.configure(bg=PANEL)
         dlg.title("New character")
-        ttk.Label(dlg, text="Name (e.g. lantern_wraith):").pack(anchor="w", padx=10, pady=(10, 0))
+        dlg.geometry("+%d+%d" % (self.root.winfo_rootx() + 300, self.root.winfo_rooty() + 160))
+        ttk.Label(dlg, text="New character", style="Head.TLabel").pack(anchor="w", padx=10, pady=(10, 0))
+        ttk.Label(dlg, text="A short name for the files (letters, numbers, underscores) and one sentence about them. "
+                  "Step 1 then writes the Midjourney prompts from the sentence.", style="Dim.TLabel", wraplength=440).pack(anchor="w", padx=10, pady=(0, 6))
+        ttk.Label(dlg, text="Name (e.g. lantern_wraith):").pack(anchor="w", padx=10, pady=(4, 0))
         name = ttk.Entry(dlg, width=40)
-        name.pack(padx=10)
+        name.pack(padx=10, anchor="w")
+        name.focus_set()
         ttk.Label(dlg, text="One-sentence description:").pack(anchor="w", padx=10, pady=(10, 0))
         ttk.Label(dlg, text=DESCRIPTION_TIPS, wraplength=420, style="Dim.TLabel").pack(anchor="w", padx=10)
+        ttk.Label(dlg, text="For example: " + EXAMPLE_DESCRIPTION, style="Dim.TLabel", wraplength=440).pack(anchor="w", padx=10)
         desc = ScrolledText(dlg, width=60, height=5)
-        desc.insert("1.0", EXAMPLE_DESCRIPTION)
         desc.pack(padx=10, pady=4)
 
         def ok():
+            if not desc.get("1.0", END).strip():
+                desc.insert("1.0", EXAMPLE_DESCRIPTION)
             try:
                 r = api.add_character(self.project, name.get(), desc.get("1.0", END).strip())
             except Exception as e:  # noqa: BLE001
@@ -319,8 +374,13 @@ class Studio:
             self.char.set(r["character"])
             self._refresh()
             self.step_list.selection_set("prompts")
+            self.status.set(f"Character '{r['character']}' added. Step 1: copy a prompt, paint the sheet in Midjourney, then step 2.")
 
-        ttk.Button(dlg, text="Create", command=ok).pack(pady=8)
+        row = ttk.Frame(dlg)
+        row.pack(fill=X, padx=10, pady=8)
+        ttk.Button(row, text="Create", command=ok, style="Go.TButton").pack(side=LEFT)
+        ttk.Button(row, text="Cancel", command=dlg.destroy).pack(side=LEFT, padx=6)
+        name.bind("<Return>", lambda e: ok())
 
     def _tools(self) -> None:
         from .tools_window import ToolsWindow
@@ -416,10 +476,10 @@ class Studio:
 
     def _continue(self) -> None:
         """The one button a person needs: open the next step, and run it when it is automatic."""
-        c = self._need_char()
-        if c is None:
+        if self.project is None or not self.char.get():
             self._add_character()
             return
+        c = self.project.character(self.char.get())
         key = self._next_step(c)
         self.step_list.selection_set(key)
         if key in ("prompts", "import"):

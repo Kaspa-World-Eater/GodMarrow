@@ -177,6 +177,7 @@ class ToolsWindow:
         self.log = log or (lambda m: None)
         self.base = Path(base_dir) if base_dir else Path.cwd()
         self.win = Toplevel(master)
+        self.win.configure(bg="#1b1e24")
         self.win.title("PixelForge tools")
         self.win.geometry("1100x680")
         self.win.minsize(900, 560)
