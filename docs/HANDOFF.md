@@ -137,3 +137,10 @@ animation library found). The shortcut launches Studio (pythonw, no console); wi
 Run all, Tools, Help all render. `.venv` is ignored by git. Nothing broke. **Not yet tested:** Tools > Painted object and a
 real Blender run (no Midjourney test image exists yet; the browser Claude is generating the batch). Only side effect:
 untracked `art/fx/*.import` files appear after a Windows Godot import (Godot's own metadata; harmless).
+
+**In-game check of `mystic` (derek-33, 2026-10-02, Windows Godot 4.7.2, real renderer):** `--zone=moor --cls=animancer
+--new --seed=7 --skin=mystic --shot=...`: loads, no script errors, right scale next to the camp NPCs, wisps orbit, HUD fine.
+Screens in `docs/screens/2026-10-02_skin_*` (mystic full frame, mystic crop, old wraith crop for comparison). Notes for
+the next round: the figure reads semi-transparent against the ground (both skins; may be the merged lighting snapshot's
+`hero_rim`/light map, which also draws a thin warm orange outline round him — mine to check, not the Forge's); the new
+Mystic's robe and cords read better than the wraith, the face/hood is less distinct.
