@@ -36,3 +36,37 @@ No cooldowns or waits. No red light. No glows or trails on attacks or casts (lan
 4. **Re-apply the Godot-only upgrades** after parity: the Ossuarch's three trees (Ossuary, Carapace, Count), Bone Lance charge tiers, the Colossus, count sigils, the Penance tree, Pale Legion, grave vows, the menu fixes and the Trial of Thirty.
 5. **The user's queued edits:** Hollow Mystic lanterns and wisps ghostly pale blue-white; threads as pixel art with a ghostly shimmer; lantern light that dims naturally at its edge instead of reading as an overlay; remove screen overlays such as glowing orange dots; the desktop icon; the music slightly slower and more sombre (done on desktop, originals kept in `tools/done/music_orig`).
 6. Later: the Red Penitent in Godot; the Count tree's melee; army orders (V); Colossus weapons; the Errant Ways in game; Marrowpress (`tools/marrowpress`, the 2D bone-rig press) may be retired in favour of PixelForge.
+
+
+## 6. From the PixelForge session (2026-10-01) — what I am doing in this repo
+
+*Written by the Fable session that built PixelForge, after Derek merged it here. Read `tools/pixelforge/NOTES.md` for the tool's own state.*
+
+**Done today:** PixelForge now lives at `tools/pixelforge/` (history preserved, `.gdignore`). It turns a Midjourney
+turnaround sheet into a carved 3D hull painted with the art, rigs it automatically, retargets a bundled CC0 motion
+library (46 clips, no Mixamo needed), renders 8 directions at 30°, presses to pixels and exports. The wraith test
+character ran end to end unattended. The design wiki and the Errant Ways are being copied into `docs/wiki/` so no
+session has to read them from a Claude project.
+
+**Rule clarification from Derek (2026-10-01):** glows are fine on magic, lanterns and wisps. What he does not want is a
+Diablo 3 look with glow on everything; attacks and plain melee stay unlit. Keep the dark blue-teal, no red light.
+
+**Next, in this order (this session, then whoever follows):**
+1. Forge → game contract: export to this game's atlas format (`art/sprites/<kind>.png|json`, `idx` keyed
+   `anim/view/i` with foot anchors), 8 views (`down front side back up` + the four diagonals; `AnimSprite` to be
+   extended from 5-mirrored to 8), ~195 px heroes, a `full` colour tier (no palette reduction), the fixed anim set
+   (idle/walk/atk/atk2/cast 8, hit 6, death 8, dodge 8), normal + depth map sheets per frame for real lantern light.
+2. Cutout and carve precision (soft matting; four-view carve with the three-quarter view; depth shade; crisp sampling).
+3. More clips (roll/dodge, crouch, jump, spell idle, hit variants) and per-order attack choices (the Ossuarch's
+   melee, the Mystic's casts).
+4. The Ossuarch as the first Forge-made character in the game (needs Derek's concept `_2` of set 009202c4 as a
+   4-view sheet; `--skin=ossuarch` for the look test).
+5. Tool additions in `tools/pixelforge`: props and trees with sway, wisps/fire/magic VFX sheets (palette-indexed),
+   tiles (2:1 diamonds, blob terrains, TileSet), 9-slice UI, a skill-tree editor over `data/skills.json` that keeps
+   `tools/skill_trees.py` as the source of truth, a Godot importer for all of it.
+6. Browser → Godot parity audit and port (§5.3 above): lantern light, wisps, threads, menus, music. Same method as
+   before: capture both side by side, copy, never "improve".
+
+Hard limits of this session: a cloud Linux container (Blender via `pip install bpy` + Xvfb works; no Windows, no
+browser, no access to Derek's PC). It cannot run the Godot editor; headless Godot checks are possible if a Linux
+Godot binary is downloaded.
