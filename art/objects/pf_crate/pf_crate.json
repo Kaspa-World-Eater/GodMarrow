@@ -1,0 +1,26 @@
+{
+  "name": "pf_crate",
+  "variations": {
+    "v1": {
+      "size": [
+        85,
+        78
+      ],
+      "anchor": [
+        42,
+        75
+      ],
+      "ellipse": [
+        42,
+        75,
+        81,
+        40
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

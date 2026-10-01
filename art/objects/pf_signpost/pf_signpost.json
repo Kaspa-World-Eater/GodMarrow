@@ -1,0 +1,26 @@
+{
+  "name": "pf_signpost",
+  "variations": {
+    "v1": {
+      "size": [
+        70,
+        78
+      ],
+      "anchor": [
+        27,
+        75
+      ],
+      "ellipse": [
+        27,
+        75,
+        27,
+        13
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

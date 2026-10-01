@@ -1,0 +1,26 @@
+{
+  "name": "pf_wall_segment",
+  "variations": {
+    "v1": {
+      "size": [
+        407,
+        226
+      ],
+      "anchor": [
+        203,
+        223
+      ],
+      "ellipse": [
+        203,
+        223,
+        403,
+        201
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

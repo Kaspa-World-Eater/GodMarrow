@@ -1,0 +1,26 @@
+{
+  "name": "pf_altar",
+  "variations": {
+    "v1": {
+      "size": [
+        95,
+        77
+      ],
+      "anchor": [
+        47,
+        74
+      ],
+      "ellipse": [
+        47,
+        74,
+        91,
+        45
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

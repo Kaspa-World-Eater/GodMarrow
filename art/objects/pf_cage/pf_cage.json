@@ -1,0 +1,26 @@
+{
+  "name": "pf_cage",
+  "variations": {
+    "v1": {
+      "size": [
+        48,
+        78
+      ],
+      "anchor": [
+        23,
+        75
+      ],
+      "ellipse": [
+        23,
+        75,
+        44,
+        22
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

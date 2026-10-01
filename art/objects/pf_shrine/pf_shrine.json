@@ -1,0 +1,26 @@
+{
+  "name": "pf_shrine",
+  "variations": {
+    "v1": {
+      "size": [
+        191,
+        226
+      ],
+      "anchor": [
+        95,
+        223
+      ],
+      "ellipse": [
+        95,
+        223,
+        187,
+        93
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

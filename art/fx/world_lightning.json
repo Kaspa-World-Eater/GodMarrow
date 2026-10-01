@@ -1,0 +1,27 @@
+{
+  "name": "world_lightning",
+  "kind": "lightning",
+  "size": [
+    48,
+    112
+  ],
+  "frames": 8,
+  "frame_width": 48,
+  "fps": 16,
+  "loop": false,
+  "anchor": [
+    24,
+    56
+  ],
+  "glow": true,
+  "palette": [
+    "#141a22",
+    "#3a4a5a",
+    "#7f93a6",
+    "#c2d2dd",
+    "#f2f7fa"
+  ],
+  "bands": 6,
+  "seed": 1611,
+  "source": "pixelforge"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "penitent_rune",
+  "kind": "rune",
+  "size": [
+    72,
+    36
+  ],
+  "frames": 8,
+  "frame_width": 72,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    36,
+    18
+  ],
+  "glow": false,
+  "palette": [
+    "#140202",
+    "#300606",
+    "#480a0a",
+    "#5c1010",
+    "#701616"
+  ],
+  "bands": 6,
+  "seed": 1408,
+  "source": "pixelforge"
+}

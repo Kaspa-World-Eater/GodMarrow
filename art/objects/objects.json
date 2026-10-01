@@ -79,5 +79,206 @@
   "ox": 30,
   "oy": 99,
   "hr": 2
+ },
+ "pf_hut": {
+  "png": "res://art/objects/pf_hut/pf_hut_v1.png",
+  "ox": 113,
+  "oy": 222,
+  "hr": 2
+ },
+ "pf_longhouse": {
+  "png": "res://art/objects/pf_longhouse/pf_longhouse_v1.png",
+  "ox": 131,
+  "oy": 222,
+  "hr": 2
+ },
+ "pf_chapel_ruin": {
+  "png": "res://art/objects/pf_chapel_ruin/pf_chapel_ruin_v1.png",
+  "ox": 100,
+  "oy": 222,
+  "hr": 2
+ },
+ "pf_watchtower": {
+  "png": "res://art/objects/pf_watchtower/pf_watchtower_v1.png",
+  "ox": 56,
+  "oy": 223,
+  "hr": 2
+ },
+ "pf_well": {
+  "png": "res://art/objects/pf_well/pf_well_v1.png",
+  "ox": 84,
+  "oy": 223,
+  "hr": 2
+ },
+ "pf_gallows": {
+  "png": "res://art/objects/pf_gallows/pf_gallows_v1.png",
+  "ox": 83,
+  "oy": 223,
+  "hr": 2
+ },
+ "pf_shrine": {
+  "png": "res://art/objects/pf_shrine/pf_shrine_v1.png",
+  "ox": 95,
+  "oy": 223,
+  "hr": 2
+ },
+ "pf_gate_arch": {
+  "png": "res://art/objects/pf_gate_arch/pf_gate_arch_v1.png",
+  "ox": 112,
+  "oy": 222,
+  "hr": 2
+ },
+ "pf_wall_segment": {
+  "png": "res://art/objects/pf_wall_segment/pf_wall_segment_v1.png",
+  "ox": 203,
+  "oy": 223,
+  "hr": 2
+ },
+ "pf_crypt_door": {
+  "png": "res://art/objects/pf_crypt_door/pf_crypt_door_v1.png",
+  "ox": 98,
+  "oy": 222,
+  "hr": 2
+ },
+ "pf_smithy": {
+  "png": "res://art/objects/pf_smithy/pf_smithy_v1.png",
+  "ox": 132,
+  "oy": 223,
+  "hr": 2
+ },
+ "pf_market_stall": {
+  "png": "res://art/objects/pf_market_stall/pf_market_stall_v1.png",
+  "ox": 123,
+  "oy": 223,
+  "hr": 2
+ },
+ "pf_chest": {
+  "png": "res://art/objects/pf_chest/pf_chest_v1.png",
+  "ox": 51,
+  "oy": 75,
+  "hr": 2
+ },
+ "pf_barrel": {
+  "png": "res://art/objects/pf_barrel/pf_barrel_v1.png",
+  "ox": 30,
+  "oy": 74,
+  "hr": 2
+ },
+ "pf_crate": {
+  "png": "res://art/objects/pf_crate/pf_crate_v1.png",
+  "ox": 42,
+  "oy": 75,
+  "hr": 2
+ },
+ "pf_cart": {
+  "png": "res://art/objects/pf_cart/pf_cart_v1.png",
+  "ox": 60,
+  "oy": 74,
+  "hr": 2
+ },
+ "pf_cage": {
+  "png": "res://art/objects/pf_cage/pf_cage_v1.png",
+  "ox": 23,
+  "oy": 75,
+  "hr": 2
+ },
+ "pf_coffin": {
+  "png": "res://art/objects/pf_coffin/pf_coffin_v1.png",
+  "ox": 30,
+  "oy": 75,
+  "hr": 2
+ },
+ "pf_altar": {
+  "png": "res://art/objects/pf_altar/pf_altar_v1.png",
+  "ox": 47,
+  "oy": 74,
+  "hr": 2
+ },
+ "pf_bell_frame": {
+  "png": "res://art/objects/pf_bell_frame/pf_bell_frame_v1.png",
+  "ox": 28,
+  "oy": 74,
+  "hr": 2
+ },
+ "pf_candles": {
+  "png": "res://art/objects/pf_candles/pf_candles_v1.png",
+  "ox": 41,
+  "oy": 76,
+  "hr": 2,
+  "frames": 8,
+  "frame_width": 83,
+  "fps": 6
+ },
+ "pf_skull_pile": {
+  "png": "res://art/objects/pf_skull_pile/pf_skull_pile_v1.png",
+  "ox": 59,
+  "oy": 75,
+  "hr": 2
+ },
+ "pf_dead_bush": {
+  "png": "res://art/objects/pf_dead_bush/pf_dead_bush_v1.png",
+  "ox": 59,
+  "oy": 76,
+  "hr": 2,
+  "frames": 8,
+  "frame_width": 119,
+  "fps": 6
+ },
+ "pf_reeds": {
+  "png": "res://art/objects/pf_reeds/pf_reeds_v1.png",
+  "ox": 35,
+  "oy": 77,
+  "hr": 2,
+  "frames": 8,
+  "frame_width": 72,
+  "fps": 6
+ },
+ "pf_mushrooms": {
+  "png": "res://art/objects/pf_mushrooms/pf_mushrooms_v1.png",
+  "ox": 62,
+  "oy": 74,
+  "hr": 2
+ },
+ "pf_rocks": {
+  "png": "res://art/objects/pf_rocks/pf_rocks_v1.png",
+  "ox": 100,
+  "oy": 75,
+  "hr": 2
+ },
+ "pf_signpost": {
+  "png": "res://art/objects/pf_signpost/pf_signpost_v1.png",
+  "ox": 27,
+  "oy": 75,
+  "hr": 2
+ },
+ "pf_fence": {
+  "png": "res://art/objects/pf_fence/pf_fence_v1.png",
+  "ox": 67,
+  "oy": 74,
+  "hr": 2
+ },
+ "pf_chained_post": {
+  "png": "res://art/objects/pf_chained_post/pf_chained_post_v1.png",
+  "ox": 25,
+  "oy": 74,
+  "hr": 2
+ },
+ "pf_bone_statue": {
+  "png": "res://art/objects/pf_bone_statue/pf_bone_statue_v1.png",
+  "ox": 20,
+  "oy": 74,
+  "hr": 2
+ },
+ "pf_lantern": {
+  "png": "res://art/objects/pf_lantern/pf_lantern_v1.png",
+  "ox": 21,
+  "oy": 75,
+  "hr": 2
+ },
+ "pf_tombstone_cross": {
+  "png": "res://art/objects/pf_tombstone_cross/pf_tombstone_cross_v1.png",
+  "ox": 31,
+  "oy": 75,
+  "hr": 2
  }
 }

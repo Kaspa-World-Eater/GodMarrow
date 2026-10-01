@@ -934,5 +934,329 @@
   ],
   "glow": true,
   "hr": 2
+ },
+ "world_rain": {
+  "png": "res://art/fx/world_rain.png",
+  "kind": "rain",
+  "frames": 8,
+  "frame_width": 64,
+  "size": [
+   64,
+   64
+  ],
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+   32,
+   32
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_ashfall": {
+  "png": "res://art/fx/world_ashfall.png",
+  "kind": "ashfall",
+  "frames": 8,
+  "frame_width": 64,
+  "size": [
+   64,
+   64
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   32,
+   32
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_snowfall": {
+  "png": "res://art/fx/world_snowfall.png",
+  "kind": "ashfall",
+  "frames": 8,
+  "frame_width": 64,
+  "size": [
+   64,
+   64
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   32,
+   32
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_fog_bank": {
+  "png": "res://art/fx/world_fog_bank.png",
+  "kind": "fog",
+  "frames": 8,
+  "frame_width": 128,
+  "size": [
+   128,
+   48
+  ],
+  "fps": 5,
+  "loop": true,
+  "anchor": [
+   64,
+   24
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_lightning": {
+  "png": "res://art/fx/world_lightning.png",
+  "kind": "lightning",
+  "frames": 8,
+  "frame_width": 48,
+  "size": [
+   48,
+   112
+  ],
+  "fps": 16,
+  "loop": false,
+  "anchor": [
+   24,
+   56
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "world_chain": {
+  "png": "res://art/fx/world_chain.png",
+  "kind": "chain",
+  "frames": 8,
+  "frame_width": 12,
+  "size": [
+   12,
+   64
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   6,
+   32
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_blood_pool": {
+  "png": "res://art/fx/world_blood_pool.png",
+  "kind": "pool",
+  "frames": 8,
+  "frame_width": 56,
+  "size": [
+   56,
+   28
+  ],
+  "fps": 10,
+  "loop": false,
+  "anchor": [
+   28,
+   14
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "world_tar_pool": {
+  "png": "res://art/fx/world_tar_pool.png",
+  "kind": "pool",
+  "frames": 8,
+  "frame_width": 56,
+  "size": [
+   56,
+   28
+  ],
+  "fps": 10,
+  "loop": false,
+  "anchor": [
+   28,
+   14
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "mystic_wisp_swarm": {
+  "png": "res://art/fx/mystic_wisp_swarm.png",
+  "kind": "swarm",
+  "frames": 8,
+  "frame_width": 80,
+  "size": [
+   80,
+   56
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   40,
+   28
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "mystic_rune": {
+  "png": "res://art/fx/mystic_rune.png",
+  "kind": "rune",
+  "frames": 8,
+  "frame_width": 72,
+  "size": [
+   72,
+   36
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   36,
+   18
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "ossuarch_rune": {
+  "png": "res://art/fx/ossuarch_rune.png",
+  "kind": "rune",
+  "frames": 8,
+  "frame_width": 72,
+  "size": [
+   72,
+   36
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   36,
+   18
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "keeper_rune": {
+  "png": "res://art/fx/keeper_rune.png",
+  "kind": "rune",
+  "frames": 8,
+  "frame_width": 72,
+  "size": [
+   72,
+   36
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   36,
+   18
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "hand_rune": {
+  "png": "res://art/fx/hand_rune.png",
+  "kind": "rune",
+  "frames": 8,
+  "frame_width": 72,
+  "size": [
+   72,
+   36
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   36,
+   18
+  ],
+  "glow": true,
+  "hr": 2
+ },
+ "penitent_rune": {
+  "png": "res://art/fx/penitent_rune.png",
+  "kind": "rune",
+  "frames": 8,
+  "frame_width": 72,
+  "size": [
+   72,
+   36
+  ],
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+   36,
+   18
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "light_lantern": {
+  "png": "res://art/fx/light_lantern.png",
+  "kind": "cookie",
+  "frames": 8,
+  "frame_width": 128,
+  "size": [
+   128,
+   128
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   64,
+   64
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "light_moon": {
+  "png": "res://art/fx/light_moon.png",
+  "kind": "cookie",
+  "frames": 4,
+  "frame_width": 192,
+  "size": [
+   192,
+   192
+  ],
+  "fps": 2,
+  "loop": true,
+  "anchor": [
+   96,
+   96
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "light_window": {
+  "png": "res://art/fx/light_window.png",
+  "kind": "cookie",
+  "frames": 4,
+  "frame_width": 96,
+  "size": [
+   96,
+   96
+  ],
+  "fps": 4,
+  "loop": true,
+  "anchor": [
+   48,
+   48
+  ],
+  "glow": false,
+  "hr": 2
+ },
+ "light_wisp": {
+  "png": "res://art/fx/light_wisp.png",
+  "kind": "cookie",
+  "frames": 8,
+  "frame_width": 64,
+  "size": [
+   64,
+   64
+  ],
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+   32,
+   32
+  ],
+  "glow": false,
+  "hr": 2
  }
 }

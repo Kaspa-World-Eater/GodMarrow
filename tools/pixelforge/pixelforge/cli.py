@@ -314,7 +314,7 @@ def cmd_prop(a) -> None:
     from .props import make_prop
 
     r = make_prop(a.image, a.name, a.out, height=a.height, scale=a.scale, colors=a.colors, outline=not a.no_outline,
-                  sway=a.sway, frames=a.frames, fps=a.fps, variations=a.variations, game_objects=a.game_objects, hr=a.hr)
+                  sway=a.sway, frames=a.frames, fps=a.fps, variations=a.variations, game_objects=a.game_objects, hr=a.hr, key_all=a.key_all)
     _emit(a, r)
 
 
@@ -529,6 +529,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--variations", type=int, default=1, help="figures on the sheet (e.g. 4 for a 2x2 'four variations' prompt)")
     s.add_argument("--game-objects", metavar="OBJECTS_JSON", help="merge into Godmarrow's art/objects/objects.json (png, ox, oy, hr)")
     s.add_argument("--hr", type=float, default=2.0, help="texels per world px for --game-objects (the game's objects use 2)")
+    s.add_argument("--key-all", action="store_true", help="also clear background-coloured pixels the border flood cannot reach (archways, gaps)")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_prop)
 

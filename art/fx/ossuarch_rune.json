@@ -1,0 +1,27 @@
+{
+  "name": "ossuarch_rune",
+  "kind": "rune",
+  "size": [
+    72,
+    36
+  ],
+  "frames": 8,
+  "frame_width": 72,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    36,
+    18
+  ],
+  "glow": true,
+  "palette": [
+    "#1a1712",
+    "#4a4336",
+    "#8f8470",
+    "#c9bfa6",
+    "#f0ead8"
+  ],
+  "bands": 6,
+  "seed": 1409,
+  "source": "pixelforge"
+}

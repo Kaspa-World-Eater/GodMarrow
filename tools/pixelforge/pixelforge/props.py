@@ -57,11 +57,15 @@ def make_prop(
     variations: int = 1,
     game_objects: str | Path | None = None,
     hr: float = 2.0,
+    key_all: bool = False,
 ) -> dict:
     """Cut a prop (or a sheet of ``variations`` props) out of a painting and
     write game-ready sprites.  ``height`` = target sprite height in px, or
     ``scale`` = source px per sprite px (use the project's character scale so
     props and characters agree).
+
+    ``key_all``: also make transparent every pixel of the background colour that the border flood cannot reach
+    (an archway, a gap in a fence); safe for paintings on a plain background whose subject has no pure patches of it.
 
     ``game_objects`` = Godmarrow's ``art/objects/objects.json``: each variation is
     merged in as ``{"png": "res://art/objects/<file>", "ox", "oy", "hr"}`` (anchor
@@ -78,7 +82,11 @@ def make_prop(
         views = [View("v1", Image.fromarray(np.ascontiguousarray(rgba), "RGBA"), (0, 0, image.width, image.height))]
     written = {}
     for v in views:
-        src = np.asarray(v.image.convert("RGBA"))
+        src = np.asarray(v.image.convert("RGBA")).copy()
+        if key_all:
+            lab = rgb_to_oklab(src[..., :3])
+            bg = rgb_to_oklab(np.asarray(image.convert("RGB")))[0, 0]
+            src[np.linalg.norm(lab - bg, axis=-1) < tolerance * 1.5, 3] = 0
         ys, xs = np.nonzero(src[..., 3])
         src = src[ys.min() : ys.max() + 1, xs.min() : xs.max() + 1]
         src_im = Image.fromarray(np.ascontiguousarray(src), "RGBA")

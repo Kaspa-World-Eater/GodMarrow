@@ -1,0 +1,26 @@
+{
+  "name": "pf_chest",
+  "variations": {
+    "v1": {
+      "size": [
+        103,
+        78
+      ],
+      "anchor": [
+        51,
+        75
+      ],
+      "ellipse": [
+        51,
+        75,
+        99,
+        49
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

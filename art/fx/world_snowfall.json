@@ -1,0 +1,27 @@
+{
+  "name": "world_snowfall",
+  "kind": "ashfall",
+  "size": [
+    64,
+    64
+  ],
+  "frames": 8,
+  "frame_width": 64,
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+    32,
+    32
+  ],
+  "glow": false,
+  "palette": [
+    "#000000",
+    "#404040",
+    "#808080",
+    "#c0c0c0",
+    "#ffffff"
+  ],
+  "bands": 6,
+  "seed": 1517,
+  "source": "pixelforge"
+}

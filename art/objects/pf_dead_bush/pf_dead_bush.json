@@ -1,0 +1,27 @@
+{
+  "name": "pf_dead_bush",
+  "variations": {
+    "v1": {
+      "size": [
+        119,
+        81
+      ],
+      "anchor": [
+        59,
+        76
+      ],
+      "ellipse": [
+        57,
+        74,
+        58,
+        29
+      ],
+      "frames": 8,
+      "fps": 6,
+      "frame_width": 119
+    }
+  },
+  "outline": true,
+  "sway": "canopy",
+  "source": "pixelforge"
+}

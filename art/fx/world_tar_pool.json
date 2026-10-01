@@ -1,0 +1,27 @@
+{
+  "name": "world_tar_pool",
+  "kind": "pool",
+  "size": [
+    56,
+    28
+  ],
+  "frames": 8,
+  "frame_width": 56,
+  "fps": 10,
+  "loop": false,
+  "anchor": [
+    28,
+    14
+  ],
+  "glow": false,
+  "palette": [
+    "#050507",
+    "#15141a",
+    "#2a2831",
+    "#423f4a",
+    "#5b5866"
+  ],
+  "bands": 6,
+  "seed": 1511,
+  "source": "pixelforge"
+}

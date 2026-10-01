@@ -1,0 +1,26 @@
+{
+  "name": "pf_chained_post",
+  "variations": {
+    "v1": {
+      "size": [
+        51,
+        77
+      ],
+      "anchor": [
+        25,
+        74
+      ],
+      "ellipse": [
+        25,
+        74,
+        47,
+        23
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

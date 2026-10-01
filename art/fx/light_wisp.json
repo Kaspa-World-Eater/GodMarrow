@@ -1,0 +1,27 @@
+{
+  "name": "light_wisp",
+  "kind": "cookie",
+  "size": [
+    64,
+    64
+  ],
+  "frames": 8,
+  "frame_width": 64,
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+    32,
+    32
+  ],
+  "glow": false,
+  "palette": [
+    "#0b1c20",
+    "#1d4a4c",
+    "#3f9c92",
+    "#8fe3d2",
+    "#eafff8"
+  ],
+  "bands": 6,
+  "seed": 1082,
+  "source": "pixelforge"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "world_fog_bank",
+  "kind": "fog",
+  "size": [
+    128,
+    48
+  ],
+  "frames": 8,
+  "frame_width": 128,
+  "fps": 5,
+  "loop": true,
+  "anchor": [
+    64,
+    24
+  ],
+  "glow": false,
+  "palette": [
+    "#1a1b1f",
+    "#2e3036",
+    "#45484f",
+    "#5c6068",
+    "#767a83"
+  ],
+  "bands": 6,
+  "seed": 1470,
+  "source": "pixelforge"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "hand_rune",
+  "kind": "rune",
+  "size": [
+    72,
+    36
+  ],
+  "frames": 8,
+  "frame_width": 72,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    36,
+    18
+  ],
+  "glow": true,
+  "palette": [
+    "#2a1a05",
+    "#7a4a0c",
+    "#c98a1e",
+    "#f0c24a",
+    "#fff0b8"
+  ],
+  "bands": 6,
+  "seed": 948,
+  "source": "pixelforge"
+}

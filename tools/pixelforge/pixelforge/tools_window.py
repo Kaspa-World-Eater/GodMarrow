@@ -14,7 +14,7 @@ from tkinter.scrolledtext import ScrolledText
 # field kinds: file, dir, text, int, float, choice, check
 TOOLS = [
     ("Effects", "Looping spell, aura, fire, smoke and impact sheets. Glow is added only to the magic kinds.",
-     [("kind", "choice", "fire", ["fire", "smoke", "wisp", "burst", "embers", "ring", "bolt", "slash", "circle", "cloud", "shards", "pillar", "decal", "drip", "flash", "ward", "vortex"]),
+     [("kind", "choice", "fire", ["fire", "smoke", "wisp", "burst", "embers", "ring", "bolt", "slash", "circle", "cloud", "shards", "pillar", "decal", "drip", "flash", "ward", "vortex", "rain", "ashfall", "fog", "lightning", "swarm", "chain", "rune", "pool", "cookie"]),
       ("name", "text", "my_effect", None), ("out", "dir", "art/fx", None),
       ("palette", "choice", "lantern", ["lantern", "wisp", "silver", "miasma", "paper", "poison", "bone", "iron", "amber", "black", "frost", "blood", "smoke"]),
       ("frames", "int", 8, None), ("fps", "float", 10.0, None), ("gif", "check", True, None)],

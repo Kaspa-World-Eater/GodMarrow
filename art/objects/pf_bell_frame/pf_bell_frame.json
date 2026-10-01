@@ -1,0 +1,26 @@
+{
+  "name": "pf_bell_frame",
+  "variations": {
+    "v1": {
+      "size": [
+        58,
+        77
+      ],
+      "anchor": [
+        28,
+        74
+      ],
+      "ellipse": [
+        28,
+        74,
+        54,
+        27
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

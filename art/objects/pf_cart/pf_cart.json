@@ -1,0 +1,26 @@
+{
+  "name": "pf_cart",
+  "variations": {
+    "v1": {
+      "size": [
+        154,
+        77
+      ],
+      "anchor": [
+        60,
+        74
+      ],
+      "ellipse": [
+        60,
+        74,
+        117,
+        58
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

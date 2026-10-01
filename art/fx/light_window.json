@@ -1,0 +1,27 @@
+{
+  "name": "light_window",
+  "kind": "cookie",
+  "size": [
+    96,
+    96
+  ],
+  "frames": 4,
+  "frame_width": 96,
+  "fps": 4,
+  "loop": true,
+  "anchor": [
+    48,
+    48
+  ],
+  "glow": false,
+  "palette": [
+    "#2a1a05",
+    "#7a4a0c",
+    "#c98a1e",
+    "#f0c24a",
+    "#fff0b8"
+  ],
+  "bands": 6,
+  "seed": 1295,
+  "source": "pixelforge"
+}

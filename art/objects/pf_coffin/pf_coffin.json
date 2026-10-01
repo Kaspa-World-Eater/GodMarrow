@@ -1,0 +1,26 @@
+{
+  "name": "pf_coffin",
+  "variations": {
+    "v1": {
+      "size": [
+        61,
+        78
+      ],
+      "anchor": [
+        30,
+        75
+      ],
+      "ellipse": [
+        30,
+        75,
+        57,
+        28
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

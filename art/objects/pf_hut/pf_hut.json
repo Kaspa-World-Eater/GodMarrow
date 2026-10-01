@@ -1,0 +1,26 @@
+{
+  "name": "pf_hut",
+  "variations": {
+    "v1": {
+      "size": [
+        228,
+        225
+      ],
+      "anchor": [
+        113,
+        222
+      ],
+      "ellipse": [
+        113,
+        222,
+        224,
+        112
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

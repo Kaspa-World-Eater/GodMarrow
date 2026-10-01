@@ -1,0 +1,27 @@
+{
+  "name": "pf_reeds",
+  "variations": {
+    "v1": {
+      "size": [
+        72,
+        82
+      ],
+      "anchor": [
+        35,
+        77
+      ],
+      "ellipse": [
+        33,
+        75,
+        64,
+        32
+      ],
+      "frames": 8,
+      "fps": 6,
+      "frame_width": 72
+    }
+  },
+  "outline": true,
+  "sway": "canopy",
+  "source": "pixelforge"
+}

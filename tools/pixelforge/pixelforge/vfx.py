@@ -236,7 +236,15 @@ def make_vfx(
         glow = kind in GLOW_KINDS
     gen = GENERATORS[kind](w, h, frames, rng, glow)
     lut = ramp_lut(colors, bands)
-    seq = [paint(i, a, lut, hl) for i, a, hl in gen]
+    if kind == "cookie":   # a light texture is soft by nature: single colour, alpha = falloff
+        seq = []
+        for inten, _a, _h in gen:
+            rgba = np.zeros((h, w, 4), dtype=np.uint8)
+            rgba[..., :3] = lut[-1]
+            rgba[..., 3] = (np.clip(inten, 0, 1) * 255).astype(np.uint8)
+            seq.append(rgba)
+    else:
+        seq = [paint(i, a, lut, hl) for i, a, hl in gen]
     loop = kind in LOOPING
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -545,3 +553,197 @@ PRESETS.update({
     "frost": ["#0b1a26", "#1f4a63", "#4d93b3", "#9ad4e8", "#eafaff"],
     "poison": ["#0d1a0c", "#234d1e", "#4f8f3a", "#95c860", "#e3ffb8"],
 })
+
+
+# ------------------------------------------------------------------ weather, world and light
+def gen_rain(w: int, h: int, frames: int, rng: np.random.Generator, n: int = 40) -> list:
+    """Falling streaks, slightly slanted, tileable. Loops, no glow."""
+    xs, ys = _grid(w, h)
+    p = rng.random((n, 3)).astype(np.float32)
+    out = []
+    for i in range(frames):
+        t = i / frames
+        inten = np.zeros((h, w), dtype=np.float32)
+        for px, ph, L in p:
+            y0 = ((ph + t * 1.0) % 1.0) * h
+            x0 = (px * w + y0 * 0.18) % w
+            length = 4 + L * 6
+            for k in range(int(length)):
+                yy, xx = int(y0 - k) % h, int(x0 - k * 0.18) % w
+                inten[yy, xx] = max(inten[yy, xx], 0.5 + 0.5 * (1 - k / length))
+        alpha = (inten > 0.3).astype(np.float32)
+        out.append((inten, alpha, None))
+    return out
+
+
+def gen_ashfall(w: int, h: int, frames: int, rng: np.random.Generator, n: int = 26) -> list:
+    """Flakes drifting down and sideways (ash, snow, petals). Loops, no glow."""
+    xs, ys = _grid(w, h)
+    p = rng.random((n, 4)).astype(np.float32)
+    out = []
+    for i in range(frames):
+        t = i / frames
+        inten = np.zeros((h, w), dtype=np.float32)
+        for px, ph, sp, sz in p:
+            y0 = ((ph + t * (0.4 + sp * 0.4)) % 1.0) * h
+            x0 = (px * w + math.sin((t + ph) * 2 * math.pi) * 3) % w
+            dd = np.hypot(xs - x0, ys - y0)
+            inten = np.maximum(inten, np.clip(1 - dd / (1.0 + sz * 1.2), 0, 1) * (0.5 + 0.5 * sz))
+        alpha = (inten > 0.3).astype(np.float32)
+        out.append((inten, alpha, None))
+    return out
+
+
+def gen_fog(w: int, h: int, frames: int, rng: np.random.Generator) -> list:
+    """A low bank of fog rolling sideways, soft-edged (hard bands, low tones). Loops, no glow."""
+    xs, ys = _grid(w, h)
+    noise = periodic_noise(w, h, 2, rng, octaves=3)
+    band = np.clip(1 - np.abs(ys / h - 0.6) / 0.45, 0, 1) ** 1.5
+    out = []
+    for i in range(frames):
+        t = i / frames
+        n = _roll(noise, math.sin(t * 2 * math.pi) * 2, -t * w)
+        n = (n - n.min()) / max(n.max() - n.min(), 1e-6)
+        inten = np.clip((n - 0.35) * 2.0, 0, 1) * band
+        alpha = (inten > 0.15).astype(np.float32)
+        out.append((0.25 + np.clip(inten, 0, 1) * 0.4, alpha, None))
+    return out
+
+
+def gen_lightning(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = True) -> list:
+    """A jagged bolt from the top, two flickers then gone. One-shot."""
+    xs, ys = _grid(w, h)
+    pts = [(w / 2 + rng.uniform(-w * 0.1, w * 0.1), 0.0)]
+    y = 0.0
+    while y < h - 2:
+        y += rng.uniform(h * 0.06, h * 0.14)
+        pts.append((float(np.clip(pts[-1][0] + rng.uniform(-w * 0.18, w * 0.18), 2, w - 3)), min(y, h - 1)))
+    bolt = np.zeros((h, w), dtype=np.float32)
+    for (x0, y0), (x1, y1) in zip(pts[:-1], pts[1:]):
+        n = int(max(abs(x1 - x0), abs(y1 - y0))) + 1
+        for k in range(n):
+            u = k / max(n - 1, 1)
+            bolt[int(y0 + (y1 - y0) * u), int(x0 + (x1 - x0) * u)] = 1
+    thick = _blur(bolt, 1)
+    out = []
+    for i in range(frames):
+        t = (i + 0.5) / frames
+        k = 1.0 if t < 0.3 else (0.0 if t < 0.45 else (0.7 if t < 0.65 else max(0.0, 1 - (t - 0.65) / 0.35) * 0.4))
+        inten = np.clip(np.maximum(bolt * 1.5, thick * 2.0) * k, 0, 1)
+        alpha = (inten > 0.25).astype(np.float32)
+        out.append((inten, alpha, _blur(bolt, 4) * 2.5 * k if glow else None))
+    return out
+
+
+def gen_swarm(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = True, n: int = 9) -> list:
+    """Many small wisps drifting on their own loops (fireflies without the word). Loops."""
+    xs, ys = _grid(w, h)
+    p = rng.random((n, 5)).astype(np.float32)
+    out = []
+    for i in range(frames):
+        t = i / frames * 2 * math.pi
+        inten = np.zeros((h, w), dtype=np.float32)
+        halo = np.zeros((h, w), dtype=np.float32)
+        for px, py, a, b, ph in p:
+            x0 = px * w + math.sin(t * (1 + a) + ph * 6) * w * 0.12
+            y0 = py * h + math.cos(t * (1 + b) + ph * 4) * h * 0.1
+            dd = np.hypot(xs - x0, ys - y0)
+            bright = 0.6 + 0.4 * math.sin(t * 2 + ph * 9)
+            inten = np.maximum(inten, np.clip(1 - dd / 1.4, 0, 1) * bright)
+            halo = np.maximum(halo, np.clip(1 - dd / 5.0, 0, 1) ** 2 * bright)
+        alpha = (inten > 0.3).astype(np.float32)
+        out.append((inten, alpha, halo * 0.9 if glow else None))
+    return out
+
+
+def gen_chain(w: int, h: int, frames: int, rng: np.random.Generator) -> list:
+    """A hanging chain swinging gently from the top. Loops, no glow."""
+    xs, ys = _grid(w, h)
+    out = []
+    for i in range(frames):
+        t = i / frames * 2 * math.pi
+        inten = np.zeros((h, w), dtype=np.float32)
+        for k in range(int(h / 3)):
+            yy = 1 + k * 3
+            u = yy / h
+            xx = w / 2 + math.sin(t) * u * u * w * 0.22
+            rx, ry = (2.2, 1.4) if k % 2 == 0 else (1.4, 2.2)
+            dd = np.hypot((xs - xx) / rx, (ys - yy) / ry)
+            inten = np.maximum(inten, np.clip(1 - np.abs(dd - 0.75) / 0.35, 0, 1) * (0.55 + 0.45 * (k % 2)))
+        alpha = (inten > 0.3).astype(np.float32)
+        out.append((inten, alpha, None))
+    return out
+
+
+def gen_rune(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = True) -> list:
+    """A glowing mark on the ground: a ring with strokes that breathe. Loops."""
+    xs, ys = _grid(w, h)
+    cx, cy = w / 2, h / 2
+    dx, dy = xs - cx, (ys - cy) * 2
+    d = np.hypot(dx, dy)
+    R = min(w / 2, h) * 0.8
+    strokes = np.zeros((h, w), dtype=np.float32)
+    for _ in range(5):
+        a0, a1 = rng.uniform(0, 2 * math.pi, 2)
+        r0, r1 = rng.uniform(0.15, 0.9, 2) * R
+        x0, y0, x1, y1 = cx + math.cos(a0) * r0, cy + math.sin(a0) * r0 * 0.5, cx + math.cos(a1) * r1, cy + math.sin(a1) * r1 * 0.5
+        n = int(max(abs(x1 - x0), abs(y1 - y0))) + 1
+        for k in range(n):
+            u = k / max(n - 1, 1)
+            strokes[int(np.clip(y0 + (y1 - y0) * u, 0, h - 1)), int(np.clip(x0 + (x1 - x0) * u, 0, w - 1))] = 1
+    strokes = np.clip(_blur(strokes, 1) * 2.5, 0, 1)
+    out = []
+    for i in range(frames):
+        t = i / frames * 2 * math.pi
+        breathe = 0.75 + 0.25 * math.sin(t)
+        ring = np.clip(1 - np.abs(d - R) / 1.6, 0, 1)
+        inten = np.clip(np.maximum(ring, strokes) * breathe * 1.2, 0, 1)
+        alpha = (inten > 0.25).astype(np.float32)
+        out.append((inten, alpha, _blur(inten, 3) * 1.0 if glow else None))
+    return out
+
+
+def gen_pool(w: int, h: int, frames: int, rng: np.random.Generator) -> list:
+    """A pool spreading on the ground (blood, water, tar) then holding. One-shot, no glow."""
+    xs, ys = _grid(w, h)
+    noise = periodic_noise(w, h, 3, rng, octaves=3)
+    cx, cy = w / 2, h / 2
+    d = np.hypot((xs - cx) / (w * 0.48), (ys - cy) / (h * 0.46)) + (noise - 0.5) * 0.5
+    out = []
+    for i in range(frames):
+        t = (i + 0.5) / frames
+        r = min(1.0, t * 1.4) ** 0.6
+        inten = np.clip((r - d) * 4, 0, 1) * 0.75
+        alpha = (inten > 0.25).astype(np.float32)
+        out.append((inten, alpha, None))
+    return out
+
+
+def gen_cookie(w: int, h: int, frames: int, rng: np.random.Generator) -> list:
+    """A light cookie: soft radial falloff with faint flicker, for PointLight2D textures. Loops, single colour."""
+    xs, ys = _grid(w, h)
+    cx, cy = w / 2, h / 2
+    d = np.hypot(xs - cx, ys - cy) / (min(w, h) / 2)
+    out = []
+    for i in range(frames):
+        t = i / frames * 2 * math.pi
+        k = 0.96 + 0.04 * math.sin(t * 3)
+        inten = np.clip(1 - d / k, 0, 1) ** 1.8
+        alpha = (inten > 0.02).astype(np.float32)
+        out.append((inten, alpha, None))
+    return out
+
+
+KINDS = KINDS + ("rain", "ashfall", "fog", "lightning", "swarm", "chain", "rune", "pool", "cookie")
+LOOPING |= {"rain", "ashfall", "fog", "swarm", "chain", "rune", "cookie"}
+GLOW_KINDS |= {"lightning", "swarm", "rune"}
+DEFAULT_SIZE.update({"rain": (64, 64), "ashfall": (64, 64), "fog": (128, 48), "lightning": (48, 112), "swarm": (80, 56),
+                     "chain": (12, 64), "rune": (72, 36), "pool": (56, 28), "cookie": (128, 128)})
+GENERATORS.update({
+    "rain": lambda w, h, f, r, g: gen_rain(w, h, f, r), "ashfall": lambda w, h, f, r, g: gen_ashfall(w, h, f, r),
+    "fog": lambda w, h, f, r, g: gen_fog(w, h, f, r), "lightning": lambda w, h, f, r, g: gen_lightning(w, h, f, r, glow=g),
+    "swarm": lambda w, h, f, r, g: gen_swarm(w, h, f, r, glow=g), "chain": lambda w, h, f, r, g: gen_chain(w, h, f, r),
+    "rune": lambda w, h, f, r, g: gen_rune(w, h, f, r, glow=g), "pool": lambda w, h, f, r, g: gen_pool(w, h, f, r),
+    "cookie": lambda w, h, f, r, g: gen_cookie(w, h, f, r),
+})
+PRESETS.update({"rain": ["#0c1218", "#22313c", "#3f5563", "#6b8593", "#a7bcc6"], "white": ["#000000", "#404040", "#808080", "#c0c0c0", "#ffffff"]})

@@ -1,0 +1,26 @@
+{
+  "name": "pf_well",
+  "variations": {
+    "v1": {
+      "size": [
+        169,
+        226
+      ],
+      "anchor": [
+        84,
+        223
+      ],
+      "ellipse": [
+        84,
+        223,
+        165,
+        82
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

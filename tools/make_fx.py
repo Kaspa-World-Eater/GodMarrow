@@ -74,6 +74,26 @@ CATALOG = {
     "world_death_burst":  ("burst",  "bone",   None, 6, 14, {"glow": False}),
     "world_waypoint_pillar": ("pillar", "wisp", (32, 96), 8, 8, {}),
     "world_shrine_ward":  ("ward",   "lantern", None, 8, 8, {}),
+    # --- weather and world (second batch)
+    "world_rain":         ("rain",   "rain",   None, 8, 12, {}),
+    "world_ashfall":      ("ashfall", "iron",  None, 8, 8,  {}),
+    "world_snowfall":     ("ashfall", "white", None, 8, 8,  {}),
+    "world_fog_bank":     ("fog",    "smoke",  None, 8, 5,  {}),
+    "world_lightning":    ("lightning", "silver", None, 8, 16, {}),
+    "world_chain":        ("chain",  "iron",   None, 8, 6,  {}),
+    "world_blood_pool":   ("pool",   "blood",  None, 8, 10, {}),
+    "world_tar_pool":     ("pool",   "black",  None, 8, 10, {}),
+    "mystic_wisp_swarm":  ("swarm",  "wisp",   None, 8, 8,  {}),
+    "mystic_rune":        ("rune",   "silver", None, 8, 6,  {}),
+    "ossuarch_rune":      ("rune",   "bone",   None, 8, 6,  {}),
+    "keeper_rune":        ("rune",   "miasma", None, 8, 6,  {}),
+    "hand_rune":          ("rune",   "amber",  None, 8, 6,  {}),
+    "penitent_rune":      ("rune",   "blood",  None, 8, 6,  {"glow": False}),
+    # --- light cookies (PointLight2D textures): warm lantern, cold moon, window
+    "light_lantern":      ("cookie", "lantern", (128, 128), 8, 8, {}),
+    "light_moon":         ("cookie", "frost",  (192, 192), 4, 2,  {}),
+    "light_window":       ("cookie", "amber",  (96, 96),   4, 4,  {}),
+    "light_wisp":         ("cookie", "wisp",   (64, 64),   8, 8,  {}),
 }
 
 

@@ -1,0 +1,26 @@
+{
+  "name": "pf_watchtower",
+  "variations": {
+    "v1": {
+      "size": [
+        114,
+        226
+      ],
+      "anchor": [
+        56,
+        223
+      ],
+      "ellipse": [
+        56,
+        223,
+        110,
+        55
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

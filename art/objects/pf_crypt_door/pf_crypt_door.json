@@ -1,0 +1,26 @@
+{
+  "name": "pf_crypt_door",
+  "variations": {
+    "v1": {
+      "size": [
+        197,
+        225
+      ],
+      "anchor": [
+        98,
+        222
+      ],
+      "ellipse": [
+        98,
+        222,
+        193,
+        96
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

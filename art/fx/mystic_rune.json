@@ -1,0 +1,27 @@
+{
+  "name": "mystic_rune",
+  "kind": "rune",
+  "size": [
+    72,
+    36
+  ],
+  "frames": 8,
+  "frame_width": 72,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    36,
+    18
+  ],
+  "glow": true,
+  "palette": [
+    "#141a22",
+    "#3a4a5a",
+    "#7f93a6",
+    "#c2d2dd",
+    "#f2f7fa"
+  ],
+  "bands": 6,
+  "seed": 1202,
+  "source": "pixelforge"
+}

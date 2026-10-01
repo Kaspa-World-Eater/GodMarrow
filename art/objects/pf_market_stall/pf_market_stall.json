@@ -1,0 +1,26 @@
+{
+  "name": "pf_market_stall",
+  "variations": {
+    "v1": {
+      "size": [
+        247,
+        226
+      ],
+      "anchor": [
+        123,
+        223
+      ],
+      "ellipse": [
+        123,
+        223,
+        243,
+        121
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

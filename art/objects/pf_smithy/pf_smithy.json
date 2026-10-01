@@ -1,0 +1,26 @@
+{
+  "name": "pf_smithy",
+  "variations": {
+    "v1": {
+      "size": [
+        266,
+        226
+      ],
+      "anchor": [
+        132,
+        223
+      ],
+      "ellipse": [
+        132,
+        223,
+        262,
+        131
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

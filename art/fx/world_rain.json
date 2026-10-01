@@ -1,0 +1,27 @@
+{
+  "name": "world_rain",
+  "kind": "rain",
+  "size": [
+    64,
+    64
+  ],
+  "frames": 8,
+  "frame_width": 64,
+  "fps": 12,
+  "loop": true,
+  "anchor": [
+    32,
+    32
+  ],
+  "glow": false,
+  "palette": [
+    "#0c1218",
+    "#22313c",
+    "#3f5563",
+    "#6b8593",
+    "#a7bcc6"
+  ],
+  "bands": 6,
+  "seed": 1073,
+  "source": "pixelforge"
+}

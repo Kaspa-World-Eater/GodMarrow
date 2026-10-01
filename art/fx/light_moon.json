@@ -1,0 +1,27 @@
+{
+  "name": "light_moon",
+  "kind": "cookie",
+  "size": [
+    192,
+    192
+  ],
+  "frames": 4,
+  "frame_width": 192,
+  "fps": 2,
+  "loop": true,
+  "anchor": [
+    96,
+    96
+  ],
+  "glow": false,
+  "palette": [
+    "#0b1a26",
+    "#1f4a63",
+    "#4d93b3",
+    "#9ad4e8",
+    "#eafaff"
+  ],
+  "bands": 6,
+  "seed": 1072,
+  "source": "pixelforge"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "keeper_rune",
+  "kind": "rune",
+  "size": [
+    72,
+    36
+  ],
+  "frames": 8,
+  "frame_width": 72,
+  "fps": 6,
+  "loop": true,
+  "anchor": [
+    36,
+    18
+  ],
+  "glow": true,
+  "palette": [
+    "#140b1e",
+    "#3a1f52",
+    "#6d3f9a",
+    "#a97fd1",
+    "#e3d2f5"
+  ],
+  "bands": 6,
+  "seed": 1173,
+  "source": "pixelforge"
+}

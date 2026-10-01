@@ -1,0 +1,27 @@
+{
+  "name": "world_ashfall",
+  "kind": "ashfall",
+  "size": [
+    64,
+    64
+  ],
+  "frames": 8,
+  "frame_width": 64,
+  "fps": 8,
+  "loop": true,
+  "anchor": [
+    32,
+    32
+  ],
+  "glow": false,
+  "palette": [
+    "#121214",
+    "#2e2f33",
+    "#55575c",
+    "#80838a",
+    "#aeb2b9"
+  ],
+  "bands": 6,
+  "seed": 1378,
+  "source": "pixelforge"
+}

@@ -1,0 +1,26 @@
+{
+  "name": "pf_rocks",
+  "variations": {
+    "v1": {
+      "size": [
+        198,
+        78
+      ],
+      "anchor": [
+        100,
+        75
+      ],
+      "ellipse": [
+        100,
+        75,
+        179,
+        89
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

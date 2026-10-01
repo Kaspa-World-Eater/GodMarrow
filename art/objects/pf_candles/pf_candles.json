@@ -1,0 +1,27 @@
+{
+  "name": "pf_candles",
+  "variations": {
+    "v1": {
+      "size": [
+        83,
+        81
+      ],
+      "anchor": [
+        41,
+        76
+      ],
+      "ellipse": [
+        39,
+        74,
+        75,
+        37
+      ],
+      "frames": 8,
+      "fps": 6,
+      "frame_width": 83
+    }
+  },
+  "outline": true,
+  "sway": "flame",
+  "source": "pixelforge"
+}

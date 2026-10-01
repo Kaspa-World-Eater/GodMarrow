@@ -1,0 +1,26 @@
+{
+  "name": "pf_barrel",
+  "variations": {
+    "v1": {
+      "size": [
+        61,
+        77
+      ],
+      "anchor": [
+        30,
+        74
+      ],
+      "ellipse": [
+        30,
+        74,
+        57,
+        28
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}

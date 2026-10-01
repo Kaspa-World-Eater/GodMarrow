@@ -1,0 +1,26 @@
+{
+  "name": "pf_bone_statue",
+  "variations": {
+    "v1": {
+      "size": [
+        42,
+        77
+      ],
+      "anchor": [
+        20,
+        74
+      ],
+      "ellipse": [
+        20,
+        74,
+        38,
+        19
+      ],
+      "frames": 1,
+      "fps": 0
+    }
+  },
+  "outline": true,
+  "sway": null,
+  "source": "pixelforge"
+}
