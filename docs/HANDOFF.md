@@ -51,6 +51,10 @@ session has to read them from a Claude project.
 **Rule clarification from Derek (2026-10-01):** glows are fine on magic, lanterns and wisps. What he does not want is a
 Diablo 3 look with glow on everything; attacks and plain melee stay unlit. Keep the dark blue-teal, no red light.
 
+**Decision 2026-10-01 (Derek): the hybrid.** Diablo II sprites (from the Forge) as upright cards in the real-3D lit scene of `tests/scene3d`; not full 3D models. The port rebuilds the look on that base, with the browser as the target.
+
+**Port audit** started 2026-10-01: `docs/port_audit_part{1,2,3}.md` (every browser source file vs Godot: EXACT / DIFFERENT / MISSING / LATER / SUPERSEDED). Work the "Top gaps" lists first.
+
 **Next, in this order (this session, then whoever follows):**
 1. Forge → game contract: export to this game's atlas format (`art/sprites/<kind>.png|json`, `idx` keyed
    `anim/view/i` with foot anchors), 8 views (`down front side back up` + the four diagonals; `AnimSprite` to be

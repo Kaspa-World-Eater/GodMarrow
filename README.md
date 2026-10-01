@@ -1,7 +1,7 @@
 # Godmarrow (Godot 4.7)
 
 A grimdark isometric action RPG on the corpse of a dead god. This is the main build; the old web build is retired
-and only its exported data and art live on here. The design wiki is the "Godmarrow Wiki" page (project docs `wiki/*`).
+and only its exported data and art live on here. The design wiki is in `docs/wiki/`. The hand-off for any new session is `docs/HANDOFF.md`; `CLAUDE.md` points the way.
 
 ## Run it
 - Play: `Play Godmarrow (Godot).bat` on the Desktop, or open `project.godot` in Godot 4.7.2 and press F5.
@@ -23,6 +23,9 @@ and only its exported data and art live on here. The design wiki is the "Godmarr
 | `tests/` | Test benches (`ai_test.tscn`, sound and board tests). |
 | `tools/` | Generators (skill trees, icons, the Codex, the wiki page, concept-to-sprite), `smoke.sh` (run before and after any change), and `done/` for one-off scripts kept for the record. |
 | `legacy/` | The first prototype, kept for reference; Godot ignores it. |
+| `tools/pixelforge/` | **PixelForge**, the asset forge: Midjourney sheet → carved 3D → auto-rig + motion library → 8-direction pixel sprites in this game's atlas format. Python; Godot ignores it (`.gdignore`). See its `NOTES.md` and `docs/GUIDE_AI.md`. |
+| `docs/wiki/` | The design wiki (rules, world, orders, art, mechanics checklist) and the Errant Ways. Read `00-start-here.md` and `01-rules-and-decisions.md` first. |
+| `web/` | The browser build (the reference), its Electron wrapper and harnesses. |
 
 ## Test hooks (user args after `--`)
 `--cls=ID --new --zone=ID --lvl=N --learn=all:N --autocast --arena=N --arena_kind=K --arena_live --arena_rank=champion

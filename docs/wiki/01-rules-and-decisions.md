@@ -101,6 +101,7 @@
 
 ## Decision log (newest first)
 
+- **2026-10-01, the look going forward (Derek, confirmed):** Diablo II sprites lit by a real 3D lantern. The game stays 2D pixel sprites made by the Forge (pre-rendered from carved models), standing as upright cards in the real-3D scene of `tests/scene3d` (orthographic 30° camera, real lantern light with stepped falloff, real shadows; normal + depth maps per frame from the Forge make the cards light like bodies). Not full 3D models in-game. The browser build's look and behaviour remain the reference for the port; its lighting is rebuilt on the 3D scene with the browser as the target.
 - **2026-10-01, glows:** glows are fine on magic, lanterns and wisps. The rule is against a Diablo III look with glow on everything; attacks and plain melee stay unlit, the dark stays blue-teal, no red light. (Derek, to the PixelForge session.)
 - **2026-10-01, PixelForge merged:** the asset forge lives at `tools/pixelforge/` in this repo. It replaces Marrowpress for anything that needs side or back views. The wiki is copied into `docs/wiki/`.
 

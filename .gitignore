@@ -8,3 +8,5 @@ _backup/
 *token*
 !**/*token*.gd
 tools/done/music_orig/
+__pycache__/
+*.pyc
