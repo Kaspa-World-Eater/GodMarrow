@@ -9,6 +9,9 @@ Runs on any Windows laptop. No graphics card needed. No paid tools. No Mixamo.
 2. Get the `tools/pixelforge` folder (it lives in the GodMarrow repository).
 3. Double-click **`install.bat`**. It sets everything up and puts a **PixelForge Studio** icon on the desktop.
 
+**Playing the game.** The **Godmarrow** icon on the desktop (made by `install.bat`; or `Play Godmarrow.bat` in the
+Godmarrow folder) gets the latest version first, finds Godot 4 or downloads it (free, once), and starts the game.
+
 **Updating.** The Studio checks for a newer version when it opens and shows one button, **Update and restart**. The same
 is in Help > Update PixelForge, and **`Update PixelForge.bat`** in the folder does it from outside the app. The game and
 the Forge live in one folder, so one update brings both.

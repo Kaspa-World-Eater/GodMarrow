@@ -33,6 +33,16 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$s.IconLocation = (Join-Path '%CD%' 'assets\pixelforge.ico') + ',0';" ^
   "$s.Description = 'PixelForge Studio - pixel art sprite pipeline'; $s.Save()" ^
   && echo   Desktop shortcut created. || echo   (could not create the shortcut; use "PixelForge Studio.bat")
+if exist "..\..\Play Godmarrow.bat" (
+  echo Creating the game shortcut...
+  powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+    "$ws = New-Object -ComObject WScript.Shell; $d = [Environment]::GetFolderPath('Desktop');" ^
+    "$s = $ws.CreateShortcut((Join-Path $d 'Godmarrow.lnk'));" ^
+    "$s.TargetPath = (Resolve-Path '..\..\Play Godmarrow.bat').Path; $s.WorkingDirectory = (Resolve-Path '..\..').Path;" ^
+    "$s.IconLocation = (Join-Path '%CD%' 'assets\pixelforge.ico') + ',0';" ^
+    "$s.Description = 'Godmarrow - updates itself, then plays'; $s.Save()" ^
+    && echo   Game shortcut created. || echo   (could not create the game shortcut; double-click "Play Godmarrow.bat" in the Godmarrow folder)
+)
 echo.
 echo.
 echo Checking this computer...
