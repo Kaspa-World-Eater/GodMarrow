@@ -136,7 +136,19 @@ func wake(m: Monster) -> void:
 
 # ------------------------------------------------------------------ attack tokens
 func max_tokens(m: Monster) -> int:
-	return mini(7, int(round((3 + floori(m.level / 5.0)) * 1.2)))
+	# the HERO's level, as zz_mobai63 tokensFor(): 4 at level 1, 7 from level 15. (It was the creature's level, which
+	# handed 7 tokens at hero level 1 in a level-15 zone: the "zerged at level 1" complaint.)
+	var h := m.hero()
+	var lv: int = h.st.level if h else m.level
+	var n := mini(7, int(round((3 + floori(lv / 5.0)) * 1.2)))
+	if h and m.zone:
+		# v0.88 (user): a big pack presses the attack; half of those close get a turn
+		var close := 0
+		for o in m.get_tree().get_nodes_in_group("monsters"):
+			if o.zone == m.zone and not o.dead and o.brain and o.brain.state != "sleep" and o.tp.distance_to(h.tp) < 5.0:
+				close += 1
+		n = maxi(n, ceili(close * 0.5))
+	return n
 
 func _key(m: Monster) -> int:
 	return m.zone.get_instance_id()
