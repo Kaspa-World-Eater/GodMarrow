@@ -254,3 +254,28 @@ def test_hull_top_view_carves_the_footprint_and_canopy_makes_cards():
     vox = np.array([[[c == "1" for c in row] for row in layer] for layer in tree["voxels"]], bool)
     assert vox[80:].any(), "the trunk stays solid"
     assert not vox[10:40].any(), "the crown is cards, not voxels"
+
+
+def test_synthesized_top_revolves_the_hat_from_the_front_view():
+    import numpy as np
+    from PIL import Image
+
+    from pixelforge.model_spec import build_hull_spec, synthesize_top
+
+    h, w = 92, 64
+    rgba = np.zeros((h, w, 4), np.uint8)
+    rgba[2:6, 4:60] = (60, 40, 70, 255)      # a dark brim
+    rgba[6:14, 26:38] = (200, 170, 190, 255)  # a pale head under it
+    rgba[14:60, 18:46] = (90, 60, 90, 255)
+    rgba[60:90, 22:30] = (30, 30, 30, 255)
+    rgba[60:90, 34:42] = (30, 30, 30, 255)
+    front = Image.fromarray(rgba)
+    spec = build_hull_spec(front, Image.fromarray(np.concatenate([rgba[:, 16:48]], axis=1)))
+    assert spec["parts"] and spec["parts"][0]["kind"] == "cone"
+    top = np.asarray(synthesize_top(front, spec))
+    H, W = top.shape[:2]
+    cone = spec["parts"][0]
+    cx, cy = int((cone["cx"] + 0.5) * 8), int((spec["depth_columns"] - 1 - cone["cy"] + 0.5) * 8)
+    edge = top[cy, min(W - 1, cx + int(cone["radius"] * 8) - 3)]
+    assert tuple(edge[:3]) == (60, 40, 70), "the hat's top is the brim's colour out to its edge"
+    assert top[cy, cx, 3] == 255

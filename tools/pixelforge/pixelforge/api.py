@@ -22,7 +22,7 @@ from PIL import Image
 from . import cleanup
 from . import godot as godot_export
 from .animate import PRESETS, animate
-from .model_spec import transpose_image, build_hull_spec, build_spec, write_spec
+from .model_spec import synthesize_top, transpose_image, build_hull_spec, build_spec, write_spec
 from .palette import Palette
 from .pixelate import PixelateOptions, pixelate, pixelate_frames
 from .project import DIRECTIONS_8, SOURCE_KINDS, Character, Project, slugify
@@ -405,6 +405,11 @@ def build_model(project: Project, name: str, height: float = 1.8, columns: int =
     blend = model_dir / f"{c.name}.blend"
     fbx = model_dir / f"{c.name}.fbx"
     tex = model_textures(project, c, spec.get("orient"))
+    if "top" not in tex and spec.get("mode") == "hull":
+        # no plan view painted: make the top from the front view (topmost paint per column, hat cones revolved)
+        synth = project.sub(c.name, "model") / "tex_top.png"
+        synthesize_top(Image.open(front), spec).save(synth)
+        tex["top"] = synth
     args = ["--spec", spec_path, "--front", tex["front"], "--height", height, "--name", c.name, "--out", blend, "--fbx", fbx]
     for kind in ("back", "side", "quarter", "top", "bottom"):
         if kind in tex:

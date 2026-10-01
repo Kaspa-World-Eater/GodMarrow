@@ -14,7 +14,7 @@ import numpy as np
 from PIL import Image
 
 from . import api, cleanup
-from .model_spec import build_hull_spec, build_spec, transpose_image, write_spec
+from .model_spec import build_hull_spec, build_spec, synthesize_top, transpose_image, write_spec
 from .prop3d import make_prop3d
 from .sheet import cutout, normalize_heights, split_sheet
 
@@ -56,6 +56,9 @@ def make_object(sheet: str | Path, name: str, out_dir: str | Path, *, height: fl
     if "side" in got:
         spec = build_hull_spec(front, got["side"].image, got["back"].image if "back" in got else None, got["quarter"].image if "quarter" in got else None, columns=columns,
                                top=got["top"].image if "top" in got else None, bottom=got["bottom"].image if "bottom" in got else None, canopy=canopy)
+        if "top" not in tex:
+            tex["top"] = work / "tex_top.png"
+            synthesize_top(front, spec).save(tex["top"])
         for k in ("top", "bottom"):   # the plan views, turned the way the carve matched them
             kk = spec.get("orient", {}).get(k, {}).get("transpose", 0)
             if k in tex and kk:

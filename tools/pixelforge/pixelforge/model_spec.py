@@ -295,6 +295,58 @@ def _canopy_cards(vox: np.ndarray, F: np.ndarray, S: np.ndarray, T: np.ndarray |
     return parts
 
 
+def synthesize_top(front: Image.Image, spec: dict, scale: int = 8) -> Image.Image:
+    """What the camera sees from above when no plan view was painted. Each column of the front view gives the colour
+    of its topmost paint (the surface the camera looks down on); a hat cone is revolved from the front painting's
+    brim band, so the hat's top is the brim's colour out to its edge and the crown's colour at the centre, not the
+    pale disc the front projection smeared over it. Canonical orientation (image-up = the figure's back)."""
+    f = np.asarray(front.convert("RGBA"))
+    a = f[..., 3] > 127
+    ys, xs = np.nonzero(a)
+    f = f[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+    a = f[..., 3] > 127
+    h, w = a.shape
+    cols, dcols, rows = spec["columns"], spec["depth_columns"], spec["rows"]
+    W, H = cols * scale, dcols * scale
+    out = np.zeros((H, W, 4), np.uint8)
+    # topmost paint per column, averaged over a few pixels down so it is the surface and not the edge fringe
+    xs_src = (np.arange(W) * w / W).astype(int)
+    for X in range(W):
+        col = np.nonzero(a[:, xs_src[X]])[0]
+        if len(col) == 0:
+            continue
+        y0 = col[0]
+        band = f[y0:min(h, y0 + max(2, h // 60)), xs_src[X]]
+        band = band[band[..., 3] > 127]
+        out[:, X, :3] = band[..., :3].mean(axis=0).astype(np.uint8)
+        out[:, X, 3] = 255
+    for part in spec.get("parts", []):
+        if part["kind"] != "cone":
+            continue
+        # revolve: a point at radius r (in columns) takes the front painting's colour at x = cx +- r in the brim band
+        rows_b = part["rows"]
+        yb0, yb1 = int(min(rows_b) * h / rows), int((max(rows_b) + 1) * h / rows)
+        band = f[yb0:max(yb1, yb0 + 1)]
+        R = part["radius"]
+        cxp = (part["cx"] + 0.5) * w / cols
+        prof = np.zeros((int(R * scale) + 2, 3), np.float32)
+        for i in range(len(prof)):
+            r_px = (i / scale) * w / cols
+            lo, hi = int(max(0, cxp - r_px - 1)), int(min(w, cxp - r_px + 2))
+            lo2, hi2 = int(max(0, cxp + r_px - 1)), int(min(w, cxp + r_px + 2))
+            px = np.concatenate([band[:, lo:hi].reshape(-1, 4), band[:, lo2:hi2].reshape(-1, 4)])
+            px = px[px[:, 3] > 127]
+            prof[i] = px[:, :3].mean(axis=0) if len(px) else (prof[i - 1] if i else 0)
+        yy, xx = np.mgrid[0:H, 0:W]
+        cy = (dcols - 1 - part["cy"]) * scale   # canonical top: row 0 is the back (+y)
+        d = np.sqrt((xx - (part["cx"] + 0.5) * scale) ** 2 + (yy - (cy + 0.5 * scale)) ** 2)
+        inside = d <= R * scale
+        idx = np.clip(d[inside].astype(int), 0, len(prof) - 1)
+        out[inside, :3] = prof[idx].astype(np.uint8)
+        out[inside, 3] = 255
+    return Image.fromarray(out, "RGBA")
+
+
 def hull_preview(spec: dict, path: str | Path, scale: int = 3) -> str:
     """Front, side and top views of the carved voxels (and a 3/4 view) as one PNG, so a carve can be judged without
     Blender: the shape problems (slabs, plates, thick brims) show here first."""
