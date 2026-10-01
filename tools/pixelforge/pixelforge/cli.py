@@ -379,9 +379,9 @@ def cmd_prop3d(a) -> None:
 def cmd_vfx(a) -> None:
     from .vfx import make_vfx
 
-    palette = a.palette.split(",") if "," in a.palette else a.palette
+    palette = None if a.palette == "auto" else (a.palette.split(",") if "," in a.palette else a.palette)
     r = make_vfx(a.kind, a.name, a.out, size=tuple(a.size) if a.size else None, frames=a.frames, fps=a.fps, palette=palette,
-                 bands=a.bands, seed=a.seed, glow=(None if a.glow == "auto" else a.glow == "on"), gif=a.gif, atlas_dir=a.atlas)
+                 bands=a.bands, seed=a.seed, glow=(None if a.glow == "auto" else a.glow == "on"), gif=a.gif, atlas_dir=a.atlas, rotations=a.rotations)
     _emit(a, r)
 
 
@@ -716,10 +716,10 @@ def build_parser() -> argparse.ArgumentParser:
     from .vfx import KINDS as _KINDS
     s.add_argument("kind", choices=list(_KINDS)); s.add_argument("name"); s.add_argument("-o", "--out", default="art/fx")
     s.add_argument("--size", type=int, nargs=2, metavar=("W", "H")); s.add_argument("--frames", type=int, default=8); s.add_argument("--fps", type=float, default=10)
-    s.add_argument("--palette", default="lantern", help="preset (wisp lantern miasma bone smoke blood) or dark->bright hex list a,b,c")
+    s.add_argument("--palette", default="auto", help="preset (wisp lantern miasma bone smoke blood) or dark->bright hex list a,b,c")
     s.add_argument("--bands", type=int, default=6, help="colour bands"); s.add_argument("--seed", type=int, default=1)
     s.add_argument("--glow", choices=["auto", "on", "off"], default="auto", help="soft halo (auto: fire/wisp/burst only)")
-    s.add_argument("--gif", action="store_true"); s.add_argument("--atlas", metavar="DIR", help="also write a Godmarrow sprite set (art/sprites) for SpriteSet")
+    s.add_argument("--gif", action="store_true"); s.add_argument("--rotations", type=int, default=0, help="missiles: a sheet with N headings (rows), turned with RotSprite"); s.add_argument("--atlas", metavar="DIR", help="also write a Godmarrow sprite set (art/sprites) for SpriteSet")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_vfx)
 

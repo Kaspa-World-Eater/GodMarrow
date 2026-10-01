@@ -25,6 +25,7 @@ game); every piece is generic except one exporter.
 | Describe it, get it: plain words -> a spell, a skin edit, a prompt or a music cue | `pixelforge describe` | Describe it… |
 | Preview in game: the set, its attached effects or any effect on the hero in Godot | `pixelforge game-preview` | step 9 / Tools |
 | Skin editor: paint-program toolbar (recolour, brush, glow, erase, restore, regions); every stroke replayable by an AI | Studio steps 3 and 9, `pixelforge skin` | Tools |
+| Missiles (bone spear, teeth, ice bolt, fire bolt) with rotation sheets | `pixelforge vfx <kind> --rotations 16` | Tools |
 | Spell designer: layered effects with live preview | `pixelforge spell` | Tools |
 | Colour editor: pick a colour, give it a new one, shading kept | Studio steps 3 and 9 | Tools |
 | Effects editor: drag smoke, glow, embers onto a sprite, per view | Studio step 9 | Tools |

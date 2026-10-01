@@ -359,3 +359,29 @@ def test_describe_drafts_spells_skins_prompts_and_music(tmp_path):
     assert find_game(tmp_path / "game" / "art" / "sprites") == tmp_path / "game"
     cmd = preview_command("godot", tmp_path / "game", skin="keeper", fx=["a", "b"], attach=True, shot=tmp_path / "s.png")
     assert "--skin=keeper" in cmd and "--cls=miasmancer" in cmd and "--fx=a,b" in cmd and "--attach" in cmd and any(a.startswith("--shot=") for a in cmd)
+
+
+def test_missiles_render_with_their_palette_and_rotation_sheets(tmp_path):
+    import json
+
+    import numpy as np
+    from PIL import Image
+
+    from pixelforge import vfx
+
+    for k in vfx.MISSILES:
+        r = vfx.make_vfx(k, k, tmp_path, frames=6)
+        meta = json.loads((tmp_path / f"{k}.json").read_text())
+        assert meta["palette"] == vfx.PRESETS[vfx.MISSILES[k]["palette"]], k
+        strip = np.array(Image.open(r["png"]).convert("RGBA"))
+        assert (strip[..., 3] > 0).sum() > 200
+    r = vfx.make_vfx("bone_spear", "spear16", tmp_path, frames=4, rotations=16)
+    meta = json.loads((tmp_path / "spear16.json").read_text())
+    sheet = Image.open(r["png"])
+    assert meta["rotations"] == 16 and sheet.height == meta["frame_height"] * 16 and sheet.width == meta["frame_width"] * 4
+    assert meta["anchor"] == [meta["frame_width"] // 2, meta["frame_height"] // 2]
+    # the row that faces up is the row that faces right turned a quarter: same pixel count, different shape
+    a = np.array(sheet.convert("RGBA"))
+    fh, fw = meta["frame_height"], meta["frame_width"]
+    right, up = a[0:fh, 0:fw, 3] > 0, a[4 * fh:5 * fh, 0:fw, 3] > 0
+    assert abs(int(right.sum()) - int(up.sum())) < 0.25 * right.sum() and (right != up).any()

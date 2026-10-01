@@ -26,23 +26,41 @@ static func _meta(dir: String, name: String) -> Dictionary:
 	_cache[key] = e
 	return e
 
-static func frames_for(dir: String, name: String) -> SpriteFrames:
+static func frames_for(dir: String, name: String, heading: float = 0.0) -> SpriteFrames:
+	## `heading` in degrees (anticlockwise from flying right) picks the nearest row of a rotation sheet
+	## (`rotations` > 1 in the json: missiles made with `pixelforge vfx ... --rotations N`).
 	var e := _meta(dir, name)
 	var sf := SpriteFrames.new()
 	if e.is_empty():
 		return sf
 	var tex: Texture2D = load(e["png"])
 	var w := int(e["frame_width"])
-	var h := int(e["size"][1])
+	var h := int(e.get("frame_height", e["size"][1]))
+	var rots := int(e.get("rotations", 1))
+	var row := 0
+	if rots > 1:
+		row = int(round(fposmod(heading, 360.0) / (360.0 / rots))) % rots
 	sf.add_animation("play")
 	sf.set_animation_speed("play", maxf(float(e.get("fps", 8)), 0.01))
 	sf.set_animation_loop("play", bool(e.get("loop", true)))
 	for i in int(e["frames"]):
 		var at := AtlasTexture.new()
 		at.atlas = tex
-		at.region = Rect2(i * w, 0, w, h)
+		at.region = Rect2(i * w, row * h, w, h)
 		sf.add_frame("play", at)
 	return sf
+
+static func spawn_missile(parent: Node, dir: String, name: String, pos: Vector2, heading: float, scale: float = 1.0, z: int = 0) -> AnimatedSprite2D:
+	## A projectile facing `heading` degrees: the nearest pre-turned row of a rotation sheet, or the sprite rotated.
+	var sp := spawn(parent, dir, name, pos, scale, z)
+	if sp == null:
+		return null
+	var e := _meta(dir, name)
+	if int(e.get("rotations", 1)) > 1:
+		sp.sprite_frames = frames_for(dir, name, heading)
+	else:
+		sp.rotation = -deg_to_rad(heading)
+	return sp
 
 static func spawn(parent: Node, dir: String, name: String, pos: Vector2, scale: float = 1.0, z: int = 0) -> AnimatedSprite2D:
 	var e := _meta(dir, name)

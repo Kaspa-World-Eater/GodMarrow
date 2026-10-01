@@ -218,17 +218,20 @@ def make_vfx(
     size: tuple[int, int] | None = None,
     frames: int = 8,
     fps: float = 10.0,
-    palette: str | list[str] = "lantern",
+    palette: str | list[str] | None = None,
     bands: int = 6,
     seed: int = 1,
     glow: bool | None = None,
     gif: bool = False,
     atlas_dir: str | Path | None = None,
+    rotations: int = 0,
 ) -> dict:
     """Render a looping VFX strip. ``palette`` is a preset name or a dark->bright hex list.
     ``glow`` defaults by kind (fire/wisp/burst on, smoke/embers off) and is the only soft alpha in the sheet."""
     if kind not in KINDS:
         raise ValueError(f"kind must be one of {KINDS}")
+    if palette is None:
+        palette = MISSILES[kind]["palette"] if kind in MISSILES else "lantern"
     colors = PRESETS[palette] if isinstance(palette, str) else list(palette)
     w, h = size or DEFAULT_SIZE[kind]
     rng = np.random.default_rng(seed)
@@ -248,11 +251,33 @@ def make_vfx(
     loop = kind in LOOPING
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
-    strip = np.concatenate(seq, axis=1)
-    Image.fromarray(strip, "RGBA").save(out / f"{name}.png")
     anchor = [w // 2, h - 1] if kind in ("fire", "smoke", "embers", "pillar", "ward") else [w // 2, h // 2]
-    meta = {"name": name, "kind": kind, "size": [w, h], "frames": frames, "frame_width": w, "fps": fps, "loop": loop,
-            "anchor": anchor, "glow": glow, "palette": colors, "bands": bands, "seed": seed, "source": "pixelforge"}
+    rows = [seq]
+    if rotations and rotations > 1:
+        # a missile drawn flying right, turned by RotSprite into N headings (row k = k * 360 / N degrees anticlockwise),
+        # every row padded to one cell so the sheet is a grid; the game picks the row nearest its heading
+        from .transform import rotate
+
+        turned = [[rotate(f, k * 360.0 / rotations, expand=True) for f in seq] for k in range(rotations)]
+        cw = max(f.shape[1] for row in turned for f in row)
+        ch = max(f.shape[0] for row in turned for f in row)
+        rows = []
+        for row in turned:
+            cells = []
+            for f in row:
+                cell = np.zeros((ch, cw, 4), np.uint8)
+                oy, ox = (ch - f.shape[0]) // 2, (cw - f.shape[1]) // 2
+                cell[oy:oy + f.shape[0], ox:ox + f.shape[1]] = f
+                cells.append(cell)
+            rows.append(cells)
+        w, h = cw, ch
+        anchor = [cw // 2, ch // 2]
+    sheet = np.concatenate([np.concatenate(r, axis=1) for r in rows], axis=0)
+    Image.fromarray(sheet, "RGBA").save(out / f"{name}.png")
+    meta = {"name": name, "kind": kind, "size": [w, h], "frames": frames, "frame_width": w, "frame_height": h, "fps": fps, "loop": loop,
+            "anchor": anchor, "glow": glow, "palette": colors, "bands": bands, "seed": seed, "rotations": int(rotations or 1),
+            "heading": "row k faces k * 360 / rotations degrees anticlockwise from flying right" if rotations and rotations > 1 else "flying right",
+            "source": "pixelforge"}
     (out / f"{name}.json").write_text(json.dumps(meta, indent=2) + "\n")
     result = {"ok": True, "png": str(out / f"{name}.png"), "json": str(out / f"{name}.json"), **{k: meta[k] for k in ("size", "frames", "fps", "loop")}}
     if gif:
@@ -747,3 +772,117 @@ GENERATORS.update({
     "cookie": lambda w, h, f, r, g: gen_cookie(w, h, f, r),
 })
 PRESETS.update({"rain": ["#0c1218", "#22313c", "#3f5563", "#6b8593", "#a7bcc6"], "white": ["#000000", "#404040", "#808080", "#c0c0c0", "#ffffff"]})
+
+
+# ---------------------------------------------------------------- missiles: spears, bolts, teeth
+# Structured projectiles in the manner of the classic action-RPG missiles (a spinning spear of bone fragments, a
+# fan of teeth, an ice bolt, a fire bolt): a spindle body with a twisting stripe, fragments on a helix round the axis
+# that pass in front and behind it, a trail that falls away, and a glow. Every pixel is generated here. Missiles fly
+# to the right; the game (or ``rotations``) turns them.
+MISSILES = {
+    "bone_spear": {"palette": "bone", "size": (96, 40), "length": 0.86, "radius": 0.17, "twist": 3.0, "twist_depth": 0.5, "spin": 1.0, "shards": 18,
+                   "shard_len": 7.0, "helix": 0.8, "trail": 0.6, "glow": True, "core": 1.0, "loop": True, "head": 0.55, "shaft": 0.4},
+    "teeth": {"palette": "bone", "size": (96, 56), "length": 0.42, "radius": 0.07, "twist": 0.0, "spin": 0.6, "shards": 12, "shard_len": 4.0,
+              "helix": 0.9, "trail": 0.3, "glow": False, "core": 0.9, "loop": True, "fan": 3, "head": 0.6, "shaft": 0.5},
+    "ice_bolt": {"palette": "frost", "size": (80, 32), "length": 0.7, "radius": 0.16, "twist": 1.5, "twist_depth": 0.2, "spin": 0.6, "shards": 8,
+                 "shard_len": 4.5, "helix": 0.7, "trail": 0.7, "glow": True, "core": 1.0, "loop": True, "head": 0.55, "shaft": 0.45},
+    "fire_bolt": {"palette": "lantern", "size": (80, 32), "length": 0.62, "radius": 0.2, "twist": 0.0, "spin": 1.2, "shards": 8, "shard_len": 3.0,
+                  "helix": 0.5, "trail": 1.0, "glow": True, "core": 1.0, "loop": True, "head": 0.5, "shaft": 0.6, "jagged": True},
+}
+
+
+def _spindle(xs, ys, x0, x1, cy, rmax, bright_front=0.35, head=0.72, jag=None, shaft=0.38):
+    """A spear body between x0 (tail) and x1 (point): a slim shaft, a blade that widens from ``head`` and tapers to
+    the point over the last quarter; ``jag`` (a noise field) chips the edge. Brighter toward the head, with a
+    lit top edge so it reads as a solid rod, not a flat bar."""
+    u = np.clip((xs - x0) / max(x1 - x0, 1e-6), 0, 1)
+    blade = np.clip((u - head) / max(1 - head, 1e-6), 0, 1)           # 0 on the shaft, 1 at the point
+    widen = np.clip(np.sin(np.pi * np.clip(blade, 0, 1) ** 0.5), 0, 1)   # widens early, then tapers to the point
+    taper_tail = np.clip(u / 0.06, 0, 1) ** 0.5
+    r = rmax * (shaft + (1 - shaft) * widen) * taper_tail * np.clip((1 - u) / 0.14, 0, 1) ** 0.6 + 1e-6
+    d = ys - cy
+    edge = r if jag is None else r * (0.85 + 0.35 * jag)
+    inside = np.clip((edge - np.abs(d)) / 1.0 + 0.5, 0, 1)
+    shade = 0.55 + 0.45 * np.clip(1 - (d + 0.35 * r) ** 2 / (1.6 * r * r), 0, 1)   # a highlight above the axis
+    body = inside * shade
+    body = np.where((xs >= x0) & (xs <= x1), body, 0)
+    return body * (1 - bright_front + bright_front * u), u
+
+
+def _shard(inten, xs, ys, px, py, length, angle, depth_shade):
+    """A small sliver of bone / ice at px, py, turned by angle."""
+    ca, sa = math.cos(angle), math.sin(angle)
+    dx, dy = xs - px, ys - py
+    along = dx * ca + dy * sa
+    across = -dx * sa + dy * ca
+    sliver = np.clip(1 - np.abs(along) / length, 0, 1) * np.clip(1 - np.abs(across) / 1.3, 0, 1)
+    np.maximum(inten, sliver * depth_shade, out=inten)
+
+
+def gen_missile(w: int, h: int, frames: int, rng: np.random.Generator, *, glow: bool = True, spec: dict | None = None) -> list:
+    spec = {**MISSILES["bone_spear"], **(spec or {})}
+    xs, ys = _grid(w, h)
+    cy = h / 2
+    L = w * spec["length"]
+    x1 = w * 0.92
+    x0 = x1 - L
+    rmax = h * spec["radius"]
+    n = int(spec["shards"])
+    fan = int(spec.get("fan", 1))
+    # each shard: position along the body (0 tail .. 1 head), phase on the helix, size, a lane for fans
+    sp = rng.random((n, 4)).astype(np.float32)
+    noise = periodic_noise(w, h, 3, rng, octaves=3)
+    out = []
+    for i in range(frames):
+        t = i / frames
+        inten = np.zeros((h, w), dtype=np.float32)
+        back = np.zeros((h, w), dtype=np.float32)
+        lanes = [cy] if fan == 1 else [cy + (k - (fan - 1) / 2) * h * 0.3 for k in range(fan)]
+        for lane_i, ly in enumerate(lanes):
+            jag = _roll(noise, 0, -w * 0.4 * t) if spec.get("jagged", True) else None
+            body, u = _spindle(xs, ys, x0 + (lane_i % 2) * w * 0.06, x1 - (lane_i % 2) * w * 0.06, ly, rmax, head=spec.get("head", 0.72), jag=jag, shaft=spec.get("shaft", 0.38))
+            if spec["twist"]:
+                dep = spec.get("twist_depth", 0.3)
+                stripe = (1 - dep * 0.5) + dep * 0.5 * np.cos(2 * math.pi * (spec["twist"] * u - spec["spin"] * t) + 2.0 * (ys - cy) / max(rmax, 1))
+                body = body * stripe
+            inten = np.maximum(inten, body * spec["core"])
+        # the helix of fragments: in front (drawn over the body) and behind (drawn under, darker)
+        for j in range(n):
+            s, phase, size, lane_r = sp[j]
+            lane_y = lanes[int(lane_r * len(lanes)) % len(lanes)]
+            s_t = (s + 0.0) if spec["loop"] else s
+            px = x0 + s_t * L
+            ang = 2 * math.pi * (phase + spec["spin"] * t * (1.0 + 0.3 * size))
+            py = lane_y + math.sin(ang) * (rmax * 2.2 * spec["helix"] * (0.4 + 0.6 * s_t))
+            depth = math.cos(ang)
+            tilt = 0.45 * math.sin(ang) + 0.15 * (size - 0.5)
+            shade = 0.6 + 0.4 * (0.5 + 0.5 * depth)
+            target = inten if depth >= 0 else back
+            _shard(target, xs, ys, px, py, spec["shard_len"] * (0.7 + 0.8 * size), tilt, min(1.0, shade * (0.9 + 0.3 * size)))
+        # the trail: fragments falling away behind the tail, fading, plus a wisp of dust
+        tr = spec["trail"]
+        if tr > 0:
+            for j in range(n // 2):
+                s, phase, size, _ = sp[j]
+                life = (s + t * 1.0) % 1.0
+                px = x0 - life * w * 0.28 * tr
+                py = cy + math.sin(2 * math.pi * (phase + t)) * rmax * 1.4 * life + (life * life) * h * 0.12
+                _shard(back, xs, ys, px, py, spec["shard_len"] * 0.7, 0.6 * math.sin(2 * math.pi * (phase + 2 * t)), (1 - life) * 0.7)
+            dust = _roll(noise, 0, -w * 0.35 * t)
+            band = np.exp(-((ys - cy) ** 2) / (2 * (rmax * 1.6) ** 2)) * np.clip((x0 + w * 0.15 - xs) / (w * 0.35), 0, 1) * np.clip((xs - 2) / (w * 0.15), 0, 1)
+            back = np.maximum(back, dust * band * 0.5 * tr)
+        full = np.maximum(inten, back * 0.75)
+        alpha = (full > 0.28).astype(np.float32)
+        halo = _blur(np.clip(full, 0, 1), 3) * 0.9 if glow else None
+        out.append((np.clip(full * 1.25, 0, 1), alpha, halo))
+    return out
+
+
+for _name, _spec in MISSILES.items():
+    GENERATORS[_name] = (lambda w, h, frames, rng, glow, _s=_spec: gen_missile(w, h, frames, rng, glow=glow, spec=_s))
+    DEFAULT_SIZE[_name] = _spec["size"]
+    if _spec["glow"]:
+        GLOW_KINDS.add(_name)
+    LOOPING.add(_name)
+KINDS = KINDS + tuple(MISSILES)
+PRESETS.setdefault("frost", ["#0a1620", "#1e3a52", "#3f7aa0", "#8fd0ec", "#eafaff"])

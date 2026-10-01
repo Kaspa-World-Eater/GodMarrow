@@ -15,10 +15,10 @@ from tkinter.scrolledtext import ScrolledText
 # field kinds: file, dir, text, int, float, choice, check
 TOOLS = [
     ("Effects", "Looping spell, aura, fire, smoke and impact sheets. Glow is added only to the magic kinds.",
-     [("kind", "choice", "fire", ["fire", "smoke", "wisp", "burst", "embers", "ring", "bolt", "slash", "circle", "cloud", "shards", "pillar", "decal", "drip", "flash", "ward", "vortex", "rain", "ashfall", "fog", "lightning", "swarm", "chain", "rune", "pool", "cookie"]),
+     [("kind", "choice", "fire", ["fire", "smoke", "wisp", "burst", "embers", "ring", "bolt", "slash", "circle", "cloud", "shards", "pillar", "decal", "drip", "flash", "ward", "vortex", "rain", "ashfall", "fog", "lightning", "swarm", "chain", "rune", "pool", "cookie", "bone_spear", "teeth", "ice_bolt", "fire_bolt"]),
       ("name", "text", "my_effect", None), ("out", "dir", "art/fx", None),
-      ("palette", "choice", "lantern", ["lantern", "wisp", "silver", "miasma", "paper", "poison", "bone", "iron", "amber", "black", "frost", "blood", "smoke"]),
-      ("frames", "int", 8, None), ("fps", "float", 10.0, None), ("gif", "check", True, None)],
+      ("palette", "choice", "auto", ["auto", "lantern", "wisp", "silver", "miasma", "paper", "poison", "bone", "iron", "amber", "black", "frost", "blood", "smoke"]),
+      ("frames", "int", 8, None), ("fps", "float", 10.0, None), ("rotations", "int", 0, None), ("gif", "check", True, None)],
      "vfx"),
     ("Prop / tree", "A painted object (or a sheet of 4) becomes a game sprite with a foot point; trees and banners can sway.",
      [("image", "file", "", None), ("name", "text", "dead_tree", None), ("out", "dir", "art/objects", None),
@@ -95,7 +95,9 @@ def run_tool(key: str, v: dict) -> dict:
     """Call the library directly (no subprocess) so errors come back as text."""
     if key == "vfx":
         from .vfx import make_vfx
-        return make_vfx(v["kind"], v["name"], v["out"], frames=int(v["frames"]), fps=float(v["fps"]), palette=v["palette"], gif=bool(v["gif"]))
+        if v.get("palette") == "auto":
+            v = {**v, "palette": None}
+        return make_vfx(v["kind"], v["name"], v["out"], frames=int(v["frames"]), fps=float(v["fps"]), palette=v["palette"], gif=bool(v["gif"]), rotations=int(v.get("rotations", 0) or 0))
     if key == "prop":
         from .props import make_prop
         return make_prop(v["image"], v["name"], v["out"], height=int(v["height"]), sway=None if v["sway"] == "none" else v["sway"],

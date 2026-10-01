@@ -40,6 +40,8 @@ EFFECTS = {
     "ward": "ward", "shield": "ward", "barrier": "ward", "vortex": "vortex", "whirl": "vortex", "swirl": "vortex", "rain": "rain", "ashfall": "ashfall",
     "falling ash": "ashfall", "fog": "fog", "mist": "fog", "swarm": "swarm", "flies": "swarm", "chain": "chain", "chains": "chain", "rune": "rune",
     "sigil": "rune", "glyph": "rune", "pool": "pool", "puddle": "pool", "glow": "cookie", "light": "cookie", "aura": "ring",
+    "bone spear": "bone_spear", "spear": "bone_spear", "teeth": "teeth", "tooth": "teeth", "ice bolt": "ice_bolt", "frost bolt": "ice_bolt",
+    "fire bolt": "fire_bolt", "fireball": "fire_bolt", "missile": "bone_spear", "projectile": "bone_spear", "dart": "teeth",
 }
 PLACES = {"eye": "eye", "eyes": "eyes", "left eye": "eye_left", "right eye": "eye_right", "hand": "hand", "hands": "hands", "left hand": "hand_left",
           "right hand": "hand_right", "head": "head", "hood": "head", "hat": "head", "helm": "head", "feet": "feet", "foot": "feet", "ground": "feet",
@@ -125,6 +127,8 @@ def draft_spell(text: str) -> dict:
                 lyr["glow"] = True
             sp["layers"].append(lyr)
         read.append("layers: " + ", ".join(kinds))
+        if any(k in vfx.MISSILES for k in kinds):
+            read.append("a missile: export with rotations (pixelforge vfx <kind> --rotations 16) for a projectile the game turns")
     if scale != 1.0:
         read.append(f"size x{scale}")
     if speed != 1.0:

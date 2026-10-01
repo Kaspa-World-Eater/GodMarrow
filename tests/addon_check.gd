@@ -24,6 +24,10 @@ func _init() -> void:
 	if fx == null or fx.sprite_frames.get_frame_count("play") != 4:
 		errs += 1
 	print("ADDON fx frames: ", fx.sprite_frames.get_frame_count("play") if fx else -1)
+	var ms := PFFx.spawn_missile(root, "res://art/fx", "world_hit_flash", Vector2.ZERO, 90.0)
+	if ms == null or absf(ms.rotation + PI / 2) > 0.01:
+		errs += 1
+	print("ADDON missile rotation: ", ms.rotation if ms else null)
 	var ob := PFObjects.place(root, "res://art/objects/objects.json", "statue0", Vector2.ZERO, 4.0)
 	if ob == null:
 		errs += 1
