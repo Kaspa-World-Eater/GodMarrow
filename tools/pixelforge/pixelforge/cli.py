@@ -691,7 +691,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("sheet"); s.add_argument("name"); s.add_argument("--project", default="forge", help="Forge project folder (made if missing)")
     s.add_argument("--describe", help="one sentence about the character"); s.add_argument("--to-game", help="the game's art/sprites folder (Godmarrow atlas); omit for plain Godot files")
     s.add_argument("--kind", help="atlas name in the game (default: the name)"); s.add_argument("--display-name")
-    s.add_argument("--style", default="godmarrow"); s.add_argument("--per-clip", type=int, default=12); s.add_argument("--tolerance", type=float, default=0.1)
+    s.add_argument("--style", default="godmarrow"); s.add_argument("--per-clip", type=int, default=24); s.add_argument("--tolerance", type=float, default=0.1)
     s.add_argument("--model-mode", choices=["auto", "template", "hull"], default="auto"); s.add_argument("--clips"); s.add_argument("--passes", help="color,normal,depth")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_hero)

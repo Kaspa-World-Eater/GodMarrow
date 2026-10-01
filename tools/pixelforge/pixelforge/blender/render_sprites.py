@@ -119,7 +119,7 @@ def main() -> None:
     p.add_argument("--size", type=int, default=256)
     p.add_argument("--elevation", type=float, default=30.0)
     p.add_argument("--step", type=int, default=2, help="render every Nth frame")
-    p.add_argument("--per-clip", type=int, default=0, help="render exactly N evenly spaced frames per clip (0 = use --step); the game only keeps 6-8")
+    p.add_argument("--per-clip", type=int, default=0, help="render exactly N evenly spaced frames per clip (0 = use --step); 24 for smooth motion, 12 while iterating")
     p.add_argument("--actions", help="comma-separated action names (default: all)")
     p.add_argument("--ppu", type=float, help="pixels per unit; fixes the scale across characters")
     p.add_argument("--margin", type=float, default=1.08)

@@ -491,3 +491,38 @@ def test_skin_ops_selection_modes_and_clone_brush(tmp_path):
     skin_ops.apply_ops(p, [{"op": "clone", "from": [1, 1], "to": [30, 30], "radius": 2}])
     out3 = np.array(Image.open(p).convert("RGBA"))
     assert np.array_equal(out3, before)
+
+
+def test_game_export_keeps_rendered_frames_and_splits_tall_sheets(tmp_path):
+    """Every rendered frame is kept (up to the cap) at the clip's real speed; frames past one sheet's height go on
+    further sheets the game's loader indexes by sheet number."""
+    import json
+
+    import numpy as np
+    from PIL import Image
+
+    from pixelforge.godmarrow_export import export_godmarrow, shelf_pack, shelf_pack_sheets
+
+    frames = tmp_path / "frames"
+    for d in ("S", "E"):
+        cd = frames / f"walk_{d}"
+        cd.mkdir(parents=True)
+        for i in range(12):
+            im = np.zeros((32, 32, 4), np.uint8)
+            im[4:28, 8:24] = (100, 90, 120, 255)
+            im[4 + i, 8:24] = (200, 200, 200, 255)
+            Image.fromarray(im).save(cd / f"frame_{i:03d}.png")
+    (frames / "animations.json").write_text(json.dumps({"fps": 15.0, "clip_fps": {"walk": 7.2}, "clips": {}}))
+    manifest = {"size": 256, "ppu": 72.0, "elevation": 30.0, "z_mid": 0.8}
+    r = export_godmarrow(frames, manifest, tmp_path / "out", "hero_test")
+    data = json.loads((tmp_path / "out" / "hero_test.json").read_text())
+    assert data["meta"]["anims"]["walk"]["frames"] == 12          # all 12 rendered frames, not 8
+    assert abs(data["meta"]["fps"]["walk"] - 7.2) < 0.01           # at the clip's real speed
+    assert r["color"]["frames"] == 24 and data["sheets"] == ["hero_test.png"]
+    # packing: the one-sheet packer keeps its old contract; the sheet packer splits when a shelf would pass max_height
+    tiles = [(f"k{i}", np.ones((30, 30, 4), np.uint8)) for i in range(20)]
+    sheet, placed = shelf_pack(tiles, max_width=100)
+    assert sheet.shape[0] > 100 and len(placed["k0"]) == 4
+    sheets, placed2 = shelf_pack_sheets(tiles, max_width=100, max_height=70)
+    assert len(sheets) >= 3 and all(sh.shape[0] <= 70 for sh in sheets) and placed2["k0"][0] == 0
+    assert {v[0] for v in placed2.values()} == set(range(len(sheets)))

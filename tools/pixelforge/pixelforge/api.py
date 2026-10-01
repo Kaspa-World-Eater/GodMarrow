@@ -520,9 +520,10 @@ def import_mixamo(project: Project, name: str, depth_scale: float | None = None,
 
 
 def render(project: Project, name: str, actions: list[str] | None = None, step: int = 2, elevation: float = 30.0, ppu: float | None = None, passes: str | None = None, per_clip: int | None = None, log=None) -> dict:
-    """``per_clip`` = N evenly spaced frames per clip (the game keeps 6-8, so 12 is plenty and renders four times
-    faster than every 2nd frame of a long clip). Default: the character/project setting, else 12 for the
-    godmarrow style, else 0 (= --step)."""
+    """``per_clip`` = N evenly spaced frames per clip. The game keeps every rendered frame (up to 24 a clip) and plays
+    the clip at its real length, so 24 gives smooth motion (a walk at about 14 frames a second) and 12 a quick,
+    choppier look while iterating. Default: the character/project setting, else 24 for the godmarrow style, else 0
+    (= --step)."""
     c = project.character(name)
     model = project.sub(c.name, "model")
     blend = model / f"{c.name}_rigged.blend"
@@ -532,7 +533,7 @@ def render(project: Project, name: str, actions: list[str] | None = None, step: 
             raise StepError("no model yet; run the model step (and the rig step for animations)")
     out = project.sub(c.name, "renders")
     if per_clip is None:
-        per_clip = int(c.settings.get("per_clip", 0) or project_setting(project, "per_clip", 0) or (12 if c.settings.get("style", project.style) == "godmarrow" else 0))
+        per_clip = int(c.settings.get("per_clip", 0) or project_setting(project, "per_clip", 0) or (24 if c.settings.get("style", project.style) == "godmarrow" else 0))
     args = ["--out", out, "--directions", project.directions, "--size", project.render_size, "--elevation", elevation, "--step", step, "--per-clip", per_clip]
     if actions:
         args += ["--actions", ",".join(actions)]

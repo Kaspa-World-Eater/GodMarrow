@@ -32,20 +32,23 @@ from PIL import Image
 
 DIR_TO_VIEW = {"S": "down", "SE": "front", "E": "side", "NE": "back", "N": "up", "SW": "front_l", "W": "side_l", "NW": "back_l"}
 VIEW_ORDER = ["down", "front", "side", "back", "up", "front_l", "side_l", "back_l"]
-# the game's fixed animation set for heroes: Forge clip -> (game anim, frame count)
+# the game's fixed animation set for heroes: Forge clip -> (game anim, the most frames kept). Every rendered frame is
+# kept up to that cap, and the clip keeps its real length, so a walk rendered with 24 frames plays at about 14 frames
+# a second instead of the old 8 frames at 5 (which looked choppy); render with --per-clip 24 for smooth motion.
 HERO_ANIMS = {
-    "idle": ("idle", 8),
-    "walk": ("walk", 8),
-    "attack": ("atk", 8),
-    "punch": ("atk2", 8),
-    "attack2": ("atk2", 8),
-    "cast": ("cast", 8),
-    "hit": ("hit", 6),
-    "death": ("death", 8),
-    "roll": ("dodge", 8),
-    "dodge": ("dodge", 8),
-    "run": ("run", 8),
+    "idle": ("idle", 24),
+    "walk": ("walk", 24),
+    "attack": ("atk", 24),
+    "punch": ("atk2", 24),
+    "attack2": ("atk2", 24),
+    "cast": ("cast", 24),
+    "hit": ("hit", 12),
+    "death": ("death", 24),
+    "roll": ("dodge", 24),
+    "dodge": ("dodge", 24),
+    "run": ("run", 24),
 }
+MAX_SHEET = 4096   # a sheet never grows past this on either side; more frames go on further sheets
 
 
 def resample_indices(n_src: int, n_dst: int, loop: bool) -> list[int]:
@@ -66,26 +69,38 @@ def trim(rgba: np.ndarray) -> tuple[np.ndarray, int, int]:
     return rgba[y0:y1, x0:x1], int(x0), int(y0)
 
 
-def shelf_pack(frames: list[tuple[str, np.ndarray]], max_width: int = 4096, pad: int = 1):
-    """Simple shelf packing, tallest first. Returns (sheet_rgba, {key: (x, y, w, h)})."""
+def shelf_pack(frames: list[tuple[str, np.ndarray]], max_width: int = MAX_SHEET, pad: int = 1):
+    """Simple shelf packing, tallest first, on one sheet. Returns (sheet_rgba, {key: (x, y, w, h)})."""
+    sheets, placed = shelf_pack_sheets(frames, max_width, pad, max_height=1 << 30)
+    return sheets[0], {k: v[1:] for k, v in placed.items()}
+
+
+def shelf_pack_sheets(frames: list[tuple[str, np.ndarray]], max_width: int = MAX_SHEET, pad: int = 1, max_height: int = MAX_SHEET):
+    """Shelf packing, tallest first, over as many sheets as needed (a new sheet when the next shelf would pass
+    ``max_height``). Returns ([sheet_rgba, ...], {key: (sheet, x, y, w, h)})."""
     order = sorted(range(len(frames)), key=lambda i: -frames[i][1].shape[0])
-    placed: dict[str, tuple[int, int, int, int]] = {}
-    x = y = shelf_h = 0
+    placed: dict[str, tuple[int, int, int, int, int]] = {}
+    si = x = y = shelf_h = 0
     for i in order:
         key, fr = frames[i]
         h, w = fr.shape[:2]
         if x + w + pad > max_width:
             x, y, shelf_h = 0, y + shelf_h + pad, 0
-        placed[key] = (x, y, w, h)
+        if y + h > max_height and y > 0:
+            si, x, y, shelf_h = si + 1, 0, 0, 0
+        placed[key] = (si, x, y, w, h)
         x += w + pad
         shelf_h = max(shelf_h, h)
-    width = max((px + w for px, _, w, _ in placed.values()), default=1)
-    height = y + shelf_h
-    sheet = np.zeros((max(height, 1), max(width, 1), 4), dtype=np.uint8)
+    sheets = []
+    for k in range(si + 1):
+        mine = [v for v in placed.values() if v[0] == k]
+        width = max((px + w for _, px, _, w, _ in mine), default=1)
+        height = max((py + h for _, _, py, _, h in mine), default=1)
+        sheets.append(np.zeros((max(height, 1), max(width, 1), 4), dtype=np.uint8))
     for key, fr in frames:
-        px, py, w, h = placed[key]
-        sheet[py : py + h, px : px + w] = fr
-    return sheet, placed
+        k, px, py, w, h = placed[key]
+        sheets[k][py : py + h, px : px + w] = fr
+    return sheets, placed
 
 
 def export_godmarrow(
@@ -130,8 +145,9 @@ def export_godmarrow(
             clip, _, d = clip_dir.name.rpartition("_")
             if d not in DIR_TO_VIEW or clip not in anim_map:
                 continue
-            anim, n_dst = anim_map[clip]
+            anim, cap = anim_map[clip]
             n_src_files = len(list(clip_dir.glob("frame_*.png")))
+            n_dst = min(int(cap), n_src_files) if n_src_files else int(cap)
             src_fps = float(per_clip_fps.get(clip, clip_fps))
             anim_fps[anim] = src_fps * n_dst / max(n_src_files, 1) if n_src_files else clip_fps
             view = DIR_TO_VIEW[d]
@@ -156,14 +172,18 @@ def export_godmarrow(
         anim_fps = meta_anims.pop("__fps__", {})
         if not packed_frames:
             raise FileNotFoundError(f"no exportable clips under {src_root}")
-        sheet, placed = shelf_pack(packed_frames)
-        png = out_dir / f"{name}.png"
-        Image.fromarray(sheet, "RGBA").save(png)
+        sheets, placed = shelf_pack_sheets(packed_frames)
+        pngs = []
+        for k, sheet in enumerate(sheets):
+            png = out_dir / (f"{name}.png" if k == 0 else f"{name}_{k + 1}.png")
+            Image.fromarray(sheet, "RGBA").save(png)
+            pngs.append(png)
+        png = pngs[0]
         full_idx = {}
         xs, ys, ws, hs = [], [], [], []
         for key, (dx, dy) in idx.items():
-            px, py, w, h = placed[key]
-            full_idx[key] = [0, px, py, w, h, int(round(dx)), int(round(dy))]
+            k, px, py, w, h = placed[key]
+            full_idx[key] = [k, px, py, w, h, int(round(dx)), int(round(dy))]
             xs.append(dx); ys.append(dy); ws.append(dx + w); hs.append(dy + h)
         bounds = {"x": int(min(xs)), "y": int(min(ys)), "w": int(max(ws) - min(xs)), "h": int(max(hs) - min(ys))}
         meta = {
@@ -183,9 +203,9 @@ def export_godmarrow(
         }
         if passes_meta:
             meta.update(passes_meta)
-        data = {"sheets": [png.name], "meta": meta, "idx": full_idx}
+        data = {"sheets": [q.name for q in pngs], "meta": meta, "idx": full_idx}
         (out_dir / f"{name}.json").write_text(json.dumps(data, separators=(",", ":")) + "\n")
-        return {"png": str(png), "json": str(out_dir / f"{name}.json"), "frames": len(full_idx), "sheet": list(sheet.shape[1::-1]), "anims": meta_anims}
+        return {"png": str(png), "pngs": [str(q) for q in pngs], "json": str(out_dir / f"{name}.json"), "frames": len(full_idx), "sheet": list(sheets[0].shape[1::-1]), "sheets": len(pngs), "anims": meta_anims}
 
     result = {"color": write_set(frames_dir, kind)}
     for pass_name, pass_dir in (extra_passes or {}).items():
