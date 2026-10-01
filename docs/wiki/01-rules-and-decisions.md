@@ -93,6 +93,9 @@
 
 - **Never used in the game:** cooldown, dps, proc, aggro, loot, buff, nerf, stun, lightning (as a word), mana (except as code), chain lightning.
 
+- **2026-10-01 (Derek): the Shrine Keeper's stacks are Omens**, not Sigils ("let's use omens over sigils"). The Word skill's drawn *sigil* stays a sigil; the Ossuarch's *count sigils* stay.
+- **2026-10-01 (Derek): crows are allowed.** The "no animals" rule does not cover the crows in the moor (and the audit's "crows" rows are closed).
+- **2026-10-01 (Derek): the wraith test skin is the Hollow Mystic.** `art/sprites/wraith.*` (made by the Forge) is his look; `--skin=wraith` on the Hollow Mystic is the look test.
 - **"Rot" is never used** for miasma, the Shrine Keeper or anything else.
 
 - The Hemomancer's goddess is the **Bleeding** Maiden, never "Weeping".
