@@ -16,10 +16,21 @@ character sheet (front / side / back [/ three-quarter] [+ plan sheet: top / unde
    -> export    (sprite sheet + Godot SpriteFrames / scene, or the game atlas with foot anchors)
 ```
 
+The pixel road replaces the three Blender steps with two that need no 3D model: `puppet` (each view cut into
+parts with pivots along a skeleton fitted to its silhouette) and `animate` (the motion library's joint tracks,
+exported once into `assets/animations/joints.json.gz`, retargeted to the painting's proportions, projected with the
+same camera from the 8 directions and drawn far-to-near with secondary motion on the garments and the hat). It
+writes the same `renders/` layout, so pixelate and the exports are shared. `pixelforge/puppet.py`.
+
 `pixelforge/api.py` holds one function per step. The Studio (`gui.py`), the command line (`cli.py`) and the MCP
 server (`mcp_server.py`) are thin layers over it.
 
 ## Decisions and the reasons
+
+- **Two roads to the same frames.** The 3D road keeps the painting's volume (a hat's crown from above, a true
+  three-quarter view); the pixel road keeps the painting's own strokes and runs in minutes without Blender. Both
+  draw real frames per clip and direction and end in one `renders/` layout; the game's loader sees no difference.
+  Procedural sway on a still is never called animation.
 
 - **Pixelate last.** The model carries the smooth painting; pixels are made on the final rendered frame so they sit
   on the screen grid and never shimmer between frames.

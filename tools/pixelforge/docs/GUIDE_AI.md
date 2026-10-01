@@ -13,12 +13,17 @@ Midjourney image(s)  ──►  cutouts  ──►  palette  ──►  [3D mode
    (person)               split       palette        model     rig(person)   render         pixelate           export
 ```
 
-Two paths share the first steps:
+Three paths share the first steps:
 
 - **Quick path** (no Blender): one image → `still` → sprite, procedural
-  animation, Godot export. Use it to show results fast and to judge the look.
-- **Full path**: sheet → model → Mixamo (person) → render → pixelate → export.
-  Gives every animation from 8 directions with one consistent look.
+  motion, Godot export. Use it to show results fast and to judge the look. Its
+  sway / hover loops are not a character's animation (no frames are drawn).
+- **Pixel road** (no Blender, real frames): sheet → `puppet` (the cutouts cut
+  into parts with pivots) → `animate` (the motion library's joint tracks pose
+  the parts from 8 directions) → pixelate → export. Every clip, every
+  direction, drawn frame by frame, on any laptop. See *The pixel road* below.
+- **3D road**: sheet → model → rig → render (Blender) → pixelate → export.
+  A carved, painted figure filmed from 8 directions.
 
 Steps needing a person (you cannot do them): making Midjourney images and
 installing Blender. Everything else is yours; the pipeline runs unattended.
@@ -50,6 +55,7 @@ operations as tools (see the end of this file).
     model/   <name>_spec.json <name>.blend <name>.fbx          3D stage (fbx goes to Mixamo)
     mixamo/  *.fbx                                             person drops Mixamo downloads here
     model/   <name>_rigged.blend                               after `rig`
+    puppet/  <view>.json <view>/<part>.png <view>_parts.png    pixel road: parts with pivots per view, a sheet to check
     renders/ manifest.json <action>/<dir>/frame_NNN.png        Blender output, RGBA, render_size px
     frames/  animations.json <action>_<dir>/frame_NNN.png      pixel art frames (sprite size)
     sprites/ <view>.png <view>_x4.png                          quick-path stills
@@ -85,6 +91,11 @@ pixelforge project run <character> rig            # built-in rig + clips; uses m
 pixelforge project run <character> render [--frame-step 2] [--elevation 30]
 pixelforge project run <character> pixelate
 pixelforge project run <character> export        # generic Godot SpriteFrames (.tres/.tscn)
+pixelforge project set --character <c> --road pixel|3d   # which road the character is on (pixel = 2D puppet, no Blender)
+pixelforge project run <character> puppet         # pixel road: cut the cutouts into parts with pivots (+ puppet/<view>_parts.png)
+pixelforge project run <character> animate [--clips idle,walk] [--directions S,W] [--per-clip 12]   # pixel road: pose and draw every frame into renders/
+pixelforge puppet build|animate|run|preview <character> [--project P]   # the same, as its own command group; run = the whole road
+pixelforge run <character> --road pixel           # every remaining step of that road (= project run-all --road pixel)
 pixelforge project export-game <character> --kind <kind> [--name "Display Name"]   # GODMARROW format: art/sprites/<kind>.png|json (+ _normal/_depth sets)
 pixelforge project run-all <character>            # runs the remaining automatic steps, stops where blocked
 pixelforge project run <character> render --passes color,normal,depth   # also render lighting maps (slower: 3 renders per frame)
@@ -178,6 +189,39 @@ erase, saves over `views/<view>.png`; `views/<view>_raw.png` is the untouched cr
 Rules the tools keep: glow only where the game allows it (`vfx` adds a halo to fire, wisps and bursts; never to smoke or
 embers); every colour comes from the ramp you give or the game's presets; `skilltree` never edits `data/skills.json`
 behind `tools/skill_trees.py` — it keeps `tools/skill_tree_edits.json`, which that script applies last.
+
+## The pixel road (2D puppets, no Blender)
+
+The game draws pixel art; what reads at sprite size is silhouette, colour and motion, not 3D fidelity. The pixel
+road makes an 8-direction character from the painted sheet with real drawn frames and no 3D model, so it runs on a
+weak laptop in minutes. `pixelforge/puppet.py`; spec for the Studio page in `docs/track_notes/pixel2d.md`.
+
+- **Joint tracks, once.** `assets/animations/joints.json.gz` (98 KB, committed) holds the 3D positions of 24
+  joints per frame of the motion-library clips the forge maps (idle, walk, run, attack, punch, cast, hit, death,
+  roll and the others; `blender/export_joints.py` wrote it from the CC0 library, once). Nothing at run time
+  needs Blender.
+- **`puppet`** (`api.build_puppet`): a skeleton is fitted to every view's silhouette (`rig.fit_view`: the arms
+  found beside the body, the feet at the bottom, a skirt or robe noticed and its hem found, a side view's facing
+  from its feet; `facing_side` setting or `--facing-side` overrides), and the painting is cut into parts with
+  pivots: head with the hat, torso, upper and lower arms, thighs, shins, feet, and the skirt as a garment. Parts
+  overlap at the seams; what a limb hides on the body is filled from the body's own paint; a side view's far
+  limbs are clones of the near ones in shadow. Check `puppet/<view>_parts.png`: the hat with the head, the hands
+  their own parts, the hem line where the feet begin.
+- **`animate`** (`api.animate_puppet`): per clip and direction, the joint tracks are retargeted to the painting's
+  proportions (the clip gives each bone its direction, the painting its length), the lowest foot is put on the
+  floor, the skeleton is turned to the direction and projected with the game camera (30 degrees above), and the
+  nearest painted view is posed (front for S / SW / SE, back for N / NW / NE, the side for W and mirrored for E; a
+  three-quarter view takes SW / SE) and drawn far-to-near by depth. Secondary motion: the hem chases the hips
+  through a damped spring and follows the legs (a mesh warp), the hat lags the head. Frames and `manifest.json`
+  land in `renders/` exactly as the Blender road writes them, so `pixelate` (in the look preset, palette locked)
+  and both exports run unchanged. `--directions S,W --per-clip 8` while iterating; the full set (9 clips x 8
+  directions x 24 frames) draws in about 2 minutes and pixelates in about 3.
+- `run-all --road pixel` / `pixelforge run <c> --road pixel` / `api.run_pixel_path` do the whole road; `status`
+  shows `model_mode: puppet` and the road's notes; `export-game --kind <kind>` is the same as on the 3D road.
+- Limits (honest): the texture of a diagonal view is the front or back painting posed at 45 degrees (no
+  three-quarter paint unless the sheet has one); a limb pointing at the camera is foreshortened, not drawn from
+  its end; the hat keeps the painting's elevation; cords and hanging gear stay with the torso; the death and roll
+  clips turn the parts the way the clip turns the bones, which reads as a doll falling.
 
 ## Look presets (the style)
 
@@ -324,7 +368,7 @@ palette and a fixed scale so all frames match.
 
 `pixelforge mcp` runs an MCP server (stdio) with tools `new_project`, `status`,
 `configure`, `list_styles`, `set_style`, `style_demo`, `add_character`, `prompts`, `import_image`, `run_step`, `run_all`,
-`quick_sprite` (and the tool-by-tool ones named above: `make_effect`, `make_tiles`, `make_spell`, ...). Claude Desktop config:
+`set_road`, `build_puppet`, `animate_puppet`, `run_pixel_path` (the pixel road), `quick_sprite` (and the tool-by-tool ones named above: `make_effect`, `make_tiles`, `make_spell`, ...). Claude Desktop config:
 
 ```json
 {"mcpServers": {"pixelforge": {"command": "pixelforge", "args": ["mcp"]}}}
@@ -337,7 +381,8 @@ palette and a fixed scale so all frames match.
   description sentence in every prompt.
 - Don't re-run `render` for a tweak that `pixelate` can do (style, outline).
 - Don't promise animation from Midjourney alone: frame-to-frame consistency
-  needs the 3D path.
+  needs the 3D road or the pixel road (both draw real frames from the clips).
+- Don't present the still path's sway / hover loops as a character's animation.
 
 ## Doing the Mixamo step yourself (local session with a browser)
 

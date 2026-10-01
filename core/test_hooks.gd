@@ -17,6 +17,8 @@ extends RefCounted
 ##                            (PATH_1.png ...), then quit. Needs a window (not --headless). --hour=0..1 sets the hour.
 ##   --hide=dark,atmos,sky,fore   switch those overlays off (the dark and light map, the air, the weather, the near dark),
 ##                            to judge a sprite or an effect in its plain paint
+##   --walk=S [--walk_dir=X,Y]   the pilgrim walks for about S seconds (tile direction X,Y; default 1,0) so a --shot
+##                            catches the walk cycle of a sprite set (PixelForge's look tests)
 
 const PANELS := ["choir", "golem", "char", "skills", "inv", "journal", "board"]
 const SIGIL_KINDS := ["open", "fewer", "weigh", "stair"]
@@ -43,6 +45,8 @@ static func run(g) -> void:
 		g.hero.lamp.enabled = false
 	if a.has("fx") or a.has("attach"):
 		_forge_preview(g, a)
+	if a.has("walk"):
+		_walk(g, a)
 	if a.has("lvl"):
 		g.hero.st.level = int(a["lvl"])
 		g.hero.st.arcana_points = int(a.get("arcana", "3"))
@@ -199,6 +203,23 @@ static func _menutest(g, a: Dictionary) -> void:
 		await _click_at(g, w2)
 		await g.get_tree().create_timer(1.5).timeout
 		print("MENU after click: mode ", T.mode if is_instance_valid(T) else "(title gone)", " leaving ", T.leaving if is_instance_valid(T) else -1.0)
+
+## --walk=S: the pilgrim sets off across the zone for about S seconds, for a screenshot of a walk cycle
+static func _walk(g, a: Dictionary) -> void:
+	await g.get_tree().create_timer(0.6).timeout
+	var hero = g.hero
+	if hero == null or hero.dead:
+		return
+	var dir := Vector2(1, 0)
+	if a.has("walk_dir"):
+		var parts := String(a["walk_dir"]).split(",")
+		if parts.size() == 2:
+			dir = Vector2(float(parts[0]), float(parts[1]))
+	if dir.length() < 0.001:
+		dir = Vector2(1, 0)
+	var secs := maxf(float(a["walk"]), 0.5)
+	hero.walk_to(hero.tp + dir.normalized() * secs * hero.st.move_speed())
+
 
 ## the screen, saved (--shot): for side-by-side checks against the browser build
 static func _shot(g, a: Dictionary) -> void:

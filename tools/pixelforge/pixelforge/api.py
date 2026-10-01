@@ -32,6 +32,7 @@ from .prompts import PROMPT_KINDS, RULES, build_all
 from .sheet import cutout, normalize_heights, split_sheet
 from .spritesheet import pack, save_gif
 from .styles import STYLES, DEFAULT_STYLE, Style, get_style, options_for_style, style_table
+from . import puppet as puppet_mod
 
 BLENDER_DIR = Path(__file__).parent / "blender"
 
@@ -797,6 +798,138 @@ def export_game(project: Project, name: str, kind: str | None = None, out_dir: s
     return {"ok": True, "character": c.name, "kind": kind, **r, "godot": f"copy {out}/* into the game's art/sprites/ and run with --skin={kind}"}
 
 
+# ---------------------------------------------------------------- the pixel road (2D puppets, no Blender)
+ROADS = ("3d", "pixel")
+
+
+def road_of(project: Project, character: str | Character) -> str:
+    """Which road a character is on: ``3d`` (the Blender model) or ``pixel`` (the 2D puppet)."""
+    c = character if isinstance(character, Character) else project.character(character)
+    return c.settings.get("road", "3d")
+
+
+def set_road(project: Project, name: str, road: str) -> dict:
+    """Put a character on the ``pixel`` road (puppet -> animate, no Blender) or back on the ``3d`` one."""
+    if road not in ROADS:
+        raise StepError(f"road must be one of {ROADS}")
+    c = project.character(name)
+    c.settings["road"] = road
+    for step in ("model", "rig", "render", "pixelate", "export"):   # the roads' steps do not mix: start again from split/palette
+        c.done.pop(step, None)
+    project.save()
+    return {"ok": True, "character": c.name, "road": road, "next": "puppet" if road == "pixel" else "model"}
+
+
+def build_puppet(project: Project, name: str, facing: dict | None = None, log=None) -> dict:
+    """Cut every view cutout into parts with pivots along a skeleton fitted to its silhouette (the pixel road's
+    model step). Writes ``puppet/<view>.json`` + ``puppet/<view>/<part>.png`` and a contact sheet
+    ``puppet/<view>_parts.png`` for checking. The front view decides whether there is a skirt and where its hem is."""
+    c = project.character(name)
+    views_dir = project.sub(c.name, "views")
+    views = {}
+    for v in ("front", "back", "side", "quarter"):
+        f = views_dir / f"{v}.png"
+        if f.exists():
+            views[v] = Image.open(f)
+    if "front" not in views:
+        raise StepError("run split first (no views/front.png)")
+    facing = facing or {k[7:]: v for k, v in c.settings.items() if k.startswith("facing_")}   # settings facing_side = left|right
+    pups = puppet_mod.build_puppets(views, facing=facing)
+    out = project.sub(c.name, "puppet")
+    result = {}
+    for v, vp in pups.items():
+        puppet_mod.save_view_puppet(vp, out / v)
+        puppet_mod.parts_sheet(vp).save(out / f"{v}_parts.png")
+        result[v] = {"facing": vp.facing, "skirt": bool(vp.skeleton.get("skirt")), "parts": [p.name for p in vp.parts if not p.clone_of],
+                     "sheet": str(out / f"{v}_parts.png"), "json": str(out / f"{v}.json")}
+        if log:
+            log(f"{v}: {len(vp.parts)} parts" + (", skirt" if vp.skeleton.get("skirt") else "") + (f", faces {vp.facing}" if vp.facing != "none" else ""))
+    c.settings["road"] = "pixel"
+    c.done["puppet"] = True
+    c.done["model"] = True     # the puppet stands in for the 3D model on this road
+    c.done["rig"] = True
+    c.notes["model_mode"] = "puppet"
+    c.notes["model"] = f"pixel road: {len(pups)} views cut into parts (" + ", ".join(f"{v} {len(vp.parts)}" for v, vp in pups.items()) + ")"
+    c.notes["model_note"] = "Built: a 2D puppet (parts with pivots cut from the painting); no 3D model on this road."
+    c.notes["rig"] = "pixel road: the motion library's joint tracks pose the puppet; nothing to rig"
+    c.notes["puppet"] = c.notes["model"]
+    project.save()
+    return {"ok": True, "character": c.name, "road": "pixel", "views": result, "next": "animate"}
+
+
+def animate_puppet(project: Project, name: str, clips: str | list[str] | None = None, directions: str | list[str] | None = None,
+                   per_clip: int | None = None, elevation: float = 30.0, figure_px: int | None = None, log=None) -> dict:
+    """Pose the puppet with the motion library's joint tracks and draw every frame of every clip from every
+    direction into ``renders/`` with the Blender road's manifest, so ``pixelate`` and the exports run unchanged.
+    ``clips``: the forge clip names (default the game set); ``directions``: a subset of S SW W NW N NE E SE while
+    iterating; ``per_clip``: frames per clip (default the look's ``clip_frames``); ``figure_px``: the standing
+    figure's height in render px (default 2x the look's figure height, at most the painting's)."""
+    c = project.character(name)
+    pdir = project.sub(c.name, "puppet")
+    pups = {}
+    for v in ("front", "back", "side", "quarter"):
+        j = pdir / f"{v}.json"
+        if j.exists():
+            pups[v] = puppet_mod.load_view_puppet(j)
+    if not pups:
+        raise StepError("no puppet yet; run the puppet step")
+    lib = puppet_mod.load_joints()
+    if isinstance(clips, str):
+        clips = [x.strip() for x in clips.split(",") if x.strip()]
+    clips = clips or DEFAULT_CLIPS.split(",")
+    if isinstance(directions, str):
+        directions = [x.strip() for x in directions.split(",") if x.strip()]
+    directions = directions or (puppet_mod.DIRECTIONS if project.directions == 8 else puppet_mod.DIRECTIONS[:: 8 // max(project.directions, 1)])
+    st = style_of(project, c)
+    if per_clip is None:
+        per_clip = int(c.settings.get("per_clip", 0) or project_setting(project, "per_clip", 0) or st.clip_frames)
+    if figure_px is None:
+        # 2 render px per sprite px exactly (seen from the camera's elevation), so pixelate's cells land on whole
+        # pixels and the frames can be cut to the figure; never more than the painting has
+        import math as _m
+
+        painting_h = max(vp.skeleton["height"] for vp in pups.values())
+        figure_px = int(min(painting_h, max(round(2 * st.figure_height / _m.cos(_m.radians(elevation))), 96)))
+    out = project.sub(c.name, "renders")
+    for old in out.iterdir():   # a clip rendered before (by either road) must not linger
+        if old.is_dir():
+            shutil.rmtree(old)
+    manifest = puppet_mod.animate(pups, lib, clips, out, directions=directions, per_clip=per_clip, figure_px=figure_px, elevation=elevation, log=log)
+    c.settings["ppu"] = manifest["ppu"]
+    c.done["render"] = True
+    c.done["animate"] = True
+    c.notes["render"] = f"pixel road: {manifest['renders']} frames drawn, {len(clips)} clips x {len(directions)} directions"
+    chk = check_frames(out)
+    c.notes["render_check"] = "frames clean" if chk["ok"] else "; ".join(chk["issues"])
+    project.save()
+    return {"ok": True, "character": c.name, "road": "pixel", "renders": str(out), "manifest": {k: v for k, v in manifest.items() if k != "actions"},
+            "clips": {k: v["frames"] for k, v in manifest["actions"].items()}, "check": chk, "next": "pixelate"}
+
+
+def run_pixel_path(project: Project, name: str, clips: str | list[str] | None = None, directions: str | list[str] | None = None,
+                   per_clip: int | None = None, log=None) -> dict:
+    """The whole pixel road: split -> palette -> puppet -> animate -> pixelate -> export, no Blender. Steps already
+    done (split, palette) are kept; the rest run again."""
+    c = project.character(name)
+    ran = []
+    if not c.done.get("split"):
+        split(project, name)
+        ran.append("split")
+    if not c.done.get("palette"):
+        make_palette(project, name)
+        ran.append("palette")
+    build_puppet(project, name, log=log)
+    ran.append("puppet")
+    animate_puppet(project, name, clips=clips, directions=directions, per_clip=per_clip, log=log)
+    ran.append("animate")
+    pixelate_renders(project, name, log=log)
+    ran.append("pixelate")
+    r = export(project, name)
+    ran.append("export")
+    return {"ok": True, "character": c.name, "road": "pixel", "ran": ran, "export": r["files"], "clips": r["clips"],
+            "next": "export-game (pixelforge project export-game <character> --kind <kind>) to put it in the game"}
+
+
 # ------------------------------------------------------------------- run-all
 STEP_FUNCS = {
     "export_game": export_game,
@@ -807,7 +940,11 @@ STEP_FUNCS = {
     "render": render,
     "pixelate": pixelate_renders,
     "export": export,
+    "puppet": build_puppet,
+    "animate": animate_puppet,
 }
+PIXEL_ROAD_STEPS = ("split", "palette", "puppet", "animate", "pixelate", "export")
+MODEL_ROAD_STEPS = ("split", "palette", "model", "rig", "render", "pixelate", "export")
 
 
 def run_step(project: Project, name: str, step: str, log=None, **kw) -> dict:
@@ -819,11 +956,15 @@ def run_step(project: Project, name: str, step: str, log=None, **kw) -> dict:
     return fn(project, name, **kw)
 
 
-def run_until_blocked(project: Project, name: str, log=None) -> dict:
-    """Run every remaining automatic step; stop at the first that needs a person."""
+def run_until_blocked(project: Project, name: str, log=None, road: str | None = None) -> dict:
+    """Run every remaining automatic step; stop at the first that needs a person. ``road`` (``3d`` | ``pixel``)
+    switches the character's road first; the pixel road has no step that needs Blender."""
     c = project.character(name)
+    if road is not None and road != road_of(project, c):
+        set_road(project, name, road)
+    steps = PIXEL_ROAD_STEPS if road_of(project, c) == "pixel" else MODEL_ROAD_STEPS
     done = []
-    for step in ("split", "palette", "model", "rig", "render", "pixelate", "export"):
+    for step in steps:
         if c.done.get(step):
             continue
         try:

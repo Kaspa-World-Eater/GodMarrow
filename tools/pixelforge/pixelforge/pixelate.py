@@ -69,9 +69,18 @@ def paint_under_edges(rgba: np.ndarray, passes: int) -> np.ndarray:
     solid = rgba[..., 3] > 127
     if solid.all():
         return rgba[..., :3]
-    tmp = rgba.copy()
-    tmp[..., 3] = np.where(solid, 255, 0).astype(np.uint8)
-    return cleanup.bleed_edges(tmp, passes=passes)[..., :3]
+    ys, xs = np.nonzero(rgba[..., 3])
+    if len(ys) == 0:
+        return rgba[..., :3]
+    # only the painted box (plus the bleed's reach) is worked on: a figure in a large frame costs its own size
+    h, w = solid.shape
+    y0, y1 = max(int(ys.min()) - passes - 1, 0), min(int(ys.max()) + passes + 2, h)
+    x0, x1 = max(int(xs.min()) - passes - 1, 0), min(int(xs.max()) + passes + 2, w)
+    tmp = rgba[y0:y1, x0:x1].copy()
+    tmp[..., 3] = np.where(solid[y0:y1, x0:x1], 255, 0).astype(np.uint8)
+    out = rgba[..., :3].copy()
+    out[y0:y1, x0:x1] = cleanup.bleed_edges(tmp, passes=passes)[..., :3]
+    return out
 
 
 def _bleed_passes(grid: Grid) -> int:
@@ -227,9 +236,57 @@ def _indices_for(rgba: np.ndarray, palette: Palette) -> np.ndarray:
     key = lambda c: (c[..., 0].astype(np.int64) << 16) | (c[..., 1].astype(np.int64) << 8) | c[..., 2]
     lookup = {int(k): i for i, k in enumerate(key(palette.colors))}
     k = key(rgba[..., :3])
-    out = np.vectorize(lambda v: lookup.get(int(v), -1), otypes=[np.int32])(k)
+    uniq, inv = np.unique(k, return_inverse=True)   # one lookup per distinct colour, not per pixel
+    table = np.array([lookup.get(int(v), -1) for v in uniq], dtype=np.int32)
+    out = table[inv].reshape(k.shape)
     out[rgba[..., 3] == 0] = -1
     return out
+
+
+def _clip_box(frames: list[Image.Image], opts: PixelateOptions) -> tuple[int, int, int, int, int] | None:
+    """The painted box of a clip (with an edge of cells round it) on a fixed integer-scale grid, when cutting the
+    frames to it would save real work; ``None`` otherwise (auto grids, forced sizes, small or nearly full frames)."""
+    if opts.scale == "auto" or opts.width or opts.height or opts.crop:
+        return None
+    s = float(opts.scale)
+    if s < 1.0 or abs(s - round(s)) > 1e-6:
+        return None
+    s = int(round(s))
+    w, h = frames[0].size
+    if w * h < 300_000 or any(f.size != (w, h) for f in frames):
+        return None
+    x0, y0, x1, y1 = w, h, 0, 0
+    for f in frames:
+        a = np.asarray(f.getchannel("A")) if f.mode in ("RGBA", "LA") else None
+        if a is None:
+            return None
+        ys, xs = np.nonzero(a)
+        if len(ys) == 0:
+            continue
+        x0, y0, x1, y1 = min(x0, int(xs.min())), min(y0, int(ys.min())), max(x1, int(xs.max()) + 1), max(y1, int(ys.max()) + 1)
+    if x1 <= x0 or y1 <= y0:
+        return None
+    pad = 2 * s
+    x0, y0 = max((x0 - pad) // s * s, 0), max((y0 - pad) // s * s, 0)
+    x1, y1 = min(-(-(x1 + pad) // s) * s, w), min(-(-(y1 + pad) // s) * s, h)
+    if (x1 - x0) * (y1 - y0) > 0.6 * w * h:
+        return None
+    return x0, y0, x1, y1, s
+
+
+def _pad_result(r: "PixelateResult", full_w: int, full_h: int, x0: int, y0: int, s: int, outlined: bool) -> "PixelateResult":
+    """A sprite made from a cut-out box put back into the full canvas's sprite (transparent round it)."""
+    ring = 1 if outlined else 0
+    H, W = full_h // s + 2 * ring, full_w // s + 2 * ring
+    ox, oy = x0 // s, y0 // s
+    img = np.zeros((H, W, 4), dtype=np.uint8)
+    idx = np.full((H, W), -1, dtype=np.int32)
+    src = np.asarray(r.image)
+    h, w = src.shape[:2]
+    h, w = min(h, H - oy), min(w, W - ox)
+    img[oy:oy + h, ox:ox + w] = src[:h, :w]
+    idx[oy:oy + h, ox:ox + w] = r.indices[:h, :w]
+    return PixelateResult(Image.fromarray(img, "RGBA"), idx, r.palette, r.grid, r.notes)
 
 
 def _clip_cells(frames: list[Image.Image], opts: PixelateOptions):
@@ -286,6 +343,14 @@ def pixelate_frames(
     opts = opts or PixelateOptions()
     if not frames:
         return []
+    box = _clip_box(frames, opts)
+    if box is not None:
+        # a figure in a large frame (the rendered roads) costs its own size: cut the clip to the painted box, on
+        # cell boundaries, and pad the sprites back into the full canvas afterwards
+        x0, y0, x1, y1, s = box
+        inner = pixelate_frames([f.crop((x0, y0, x1, y1)) for f in frames], opts, stabilize=stabilize)
+        full_w, full_h = frames[0].size
+        return [_pad_result(r, full_w, full_h, x0, y0, s, bool(opts.outline)) for r in inner]
     notes, fixed, labs, masks = _clip_cells(frames, opts)
     if grading(fixed):
         # one set of lightness anchors for the whole clip (or the whole character, when the caller measured one with

@@ -84,16 +84,49 @@ def build_server():
 
     @mcp.tool()
     def run_step(project: str, character: str, step: str) -> dict:
-        """Run one step: split | palette | model | rig | render | pixelate | export."""
+        """Run one step: split | palette | model | rig | render | pixelate | export, or the pixel road's puppet | animate."""
         try:
             return api.run_step(_project(project), character, step)
         except api.StepError as e:
             return {"ok": False, "error": str(e)}
 
     @mcp.tool()
-    def run_all(project: str, character: str) -> dict:
-        """Run every remaining automatic step; stops where a person is needed."""
-        return api.run_until_blocked(_project(project), character)
+    def run_all(project: str, character: str, road: str = "") -> dict:
+        """Run every remaining automatic step; stops where a person is needed. road: '' (the character's), '3d' (Blender model) or
+        'pixel' (2D puppet, no Blender)."""
+        return api.run_until_blocked(_project(project), character, road=road or None)
+
+    @mcp.tool()
+    def set_road(project: str, character: str, road: str) -> dict:
+        """Put a character on the 'pixel' road (puppet -> animate, no Blender) or the '3d' road (model -> rig -> render)."""
+        return api.set_road(_project(project), character, road)
+
+    @mcp.tool()
+    def build_puppet(project: str, character: str, facing_side: str = "") -> dict:
+        """Pixel road, model step: cut the view cutouts into parts with pivots along a fitted skeleton (puppet/<view>.json and a
+        parts sheet PNG to check). facing_side: left | right when the side view's facing is not obvious from the feet."""
+        try:
+            return api.build_puppet(_project(project), character, facing={"side": facing_side} if facing_side else None)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
+    def animate_puppet(project: str, character: str, clips: str = "", directions: str = "", per_clip: int = 0) -> dict:
+        """Pixel road, render step: pose the puppet with the motion library's joint tracks and draw every frame of every clip
+        from every direction into renders/ (then run pixelate and export as usual). clips / directions: comma lists
+        (default the game set and all 8); per_clip: frames per clip (0 = the look's)."""
+        try:
+            return api.animate_puppet(_project(project), character, clips=clips or None, directions=directions or None, per_clip=per_clip or None)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
+    def run_pixel_path(project: str, character: str, clips: str = "", directions: str = "", per_clip: int = 0) -> dict:
+        """The whole pixel road without Blender: split -> palette -> puppet -> animate -> pixelate -> export. Then export_game."""
+        try:
+            return api.run_pixel_path(_project(project), character, clips=clips or None, directions=directions or None, per_clip=per_clip or None)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
 
     @mcp.tool()
     def export_game(project: str, character: str, kind: str, category: str = "hero", display_name: str | None = None) -> dict:

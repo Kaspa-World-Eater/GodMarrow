@@ -47,10 +47,27 @@ The automatic cutout is usually right. When it is not (background stuck to the f
   tolerance if background remains; tighten it if the figure loses parts.
 - Then run steps 4 and 5 again (click them on the left).
 
+## The pixel road: no Blender, real frames
+
+The 3D road carves a figure and films it in Blender. The **pixel road** does without: it cuts each view of the sheet
+into parts (the head with its hat, the body, the arms, the legs and feet, a skirt as cloth of its own), each with a
+pivot, and moves them frame by frame with the same library of moves (walk, run, attack, cast, hit, death, roll), seen
+from all eight directions with the game's camera. Cloth follows the legs and swings a beat behind the hips; the hat
+lags the head. Every frame is drawn, then turned into pixel art in the chosen look like any other.
+
+From a prompt: `pixelforge puppet run <character>` (or `pixelforge run <character> --road pixel`), then
+`pixelforge project export-game <character> --kind <kind>` as usual. The parts it cut are laid out in
+`characters/<character>/puppet/<view>_parts.png`: look at it once; the hat should sit with the head, the hands be their
+own parts, and the line across the figure (the hem) sit where the feet begin. If the side view faces the wrong way,
+`pixelforge puppet build <character> --facing-side left` (or `right`) and run again. A whole character takes a few
+minutes on a laptop. Where it falls short of the 3D road: a figure seen from a corner wears the front or back painting
+turned, not a true three-quarter painting, and a wide hat is always seen as the painter drew it.
+
 ## Quick path, one picture → one sprite
 
 For a first look, bosses, portraits, items. No Blender. Click **★ Quick path** in the step list, pick the picture
-and an animation (sway, hover, flame...), click **Make sprite + animate + export**.
+and a motion preset (sway, hover, flame...), click **Make sprite + animate + export**. This is a still with some
+motion on it, good for a prop or a first impression; a character's animation comes from the 3D road or the pixel road.
 
 ## The Continue button
 

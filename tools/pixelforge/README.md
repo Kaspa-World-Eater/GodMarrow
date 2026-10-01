@@ -10,6 +10,7 @@ game); every piece is generic except one exporter.
 | Need | Command | Studio |
 |---|---|---|
 | Character: painting → 3D figure → 46 clips → 8 directions → pixel frames → game files | `pixelforge project …` | Steps 1-9 |
+| Character without Blender (the pixel road): painting → parts with pivots → posed by the same clips from 8 directions → pixel frames → game files | `pixelforge puppet run`, `pixelforge run <c> --road pixel` | Steps 1-9 (road: pixel) |
 | Fix a cutout by hand | — | Step 3 → Edit |
 | Judge the motion | `project` + `preview_gif` | Step 7/8 → Preview |
 | Props and buildings from 3D models (kits, grown trees), lit and graded like the game | `pixelforge prop3d` | — |
@@ -57,11 +58,17 @@ films it orthographically from 30° above at 8 yaws, sampling only the frames th
 and depth passes; the frames are pressed to pixels with a locked OKLab palette and a fixed scale; the exporter
 packs them into Godot SpriteFrames or the game's atlas with foot anchors.
 
+**The pixel road** needs no Blender: each view is cut into parts with pivots along a skeleton fitted to its
+silhouette (head with the hat, torso, arms, legs, feet, a skirt as a garment); the motion library's joint tracks
+(exported once into `assets/animations/joints.json.gz`) pose the parts per frame from every direction with the
+same camera; the hem follows the legs and lags the hips, the hat lags the head; the frames go through the same
+pixelate and export steps. Minutes on a laptop, real frames for every clip.
+
 ## Layout
 
 `pixelforge/api.py` is the pipeline (one function per step). `gui.py` (Studio), `cli.py`, `mcp_server.py` wrap it.
 Image maths: `grid.py`, `palette.py`, `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`, `transform.py`,
-`sheet.py`, `model_spec.py`. Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`, `music.py`, `color_editor.py`, `skin_ops.py`, `skin_editor.py`, `fx_editor.py`, `spell.py`, `spell_designer.py`, `effect_art.py`, `describe.py`, `game_preview.py`, `checks.py`,
+`sheet.py`, `model_spec.py`, `rig.py` (skeleton fits), `puppet.py` (the pixel road). Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`, `music.py`, `color_editor.py`, `skin_ops.py`, `skin_editor.py`, `fx_editor.py`, `spell.py`, `spell_designer.py`, `effect_art.py`, `describe.py`, `game_preview.py`, `checks.py`,
 `recolor.py`, `compare.py`, `skilltree.py`, `doctor.py`. Looks: `styles.py` (the preset table), `style_demo.py` (the animated examples in `assets/styles/`). Blender-side: `pixelforge/blender/` (no Pillow there).
 Godot-side: `godot_addon/pixelforge/` (`PFSpriteSet`, `PFFx`, `PFObjects`). Docs: `docs/GUIDE_HUMANS.md`,
 `docs/GUIDE_AI.md`, `docs/DESIGN.md`, `docs/TOOL_IDEAS.md`. Tests: `pytest`.

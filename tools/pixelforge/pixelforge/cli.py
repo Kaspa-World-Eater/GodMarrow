@@ -314,10 +314,19 @@ def cmd_project(a) -> None:
             _emit(a, api.status(project))
         elif sub == "set":
             if a.character:
+                if a.road:
+                    r = api.set_road(project, a.character, a.road)
+                    if a.style:
+                        r["style"] = api.set_style(project, a.style, a.character)["style"]
+                    _emit(a, r)
+                    return
                 if not a.style:
-                    _emit(a, {"ok": False, "error": "--character needs --style (a preset name, or 'project' to follow the project)"})
+                    _emit(a, {"ok": False, "error": "--character needs --style (a preset name, or 'project' to follow the project) or --road pixel|3d"})
                     raise SystemExit(2)
                 _emit(a, api.set_style(project, a.style, a.character))
+            elif a.road:
+                _emit(a, {"ok": False, "error": "--road is set per character: add --character NAME"})
+                raise SystemExit(2)
             else:
                 _emit(a, api.configure(project, style=a.style, blender=a.blender, directions=a.directions, render_size=a.render_size, godot_res_dir=a.godot_res_dir))
         elif sub == "add":
@@ -337,6 +346,8 @@ def cmd_project(a) -> None:
             kw = {}
             if a.step == "render":
                 kw = {"step": a.frame_step, "elevation": a.elevation, "passes": a.passes}
+            elif a.step == "animate":
+                kw = {"clips": a.clips, "directions": a.directions, "per_clip": a.per_clip, "elevation": a.elevation}
             _emit(a, api.run_step(project, a.character, a.step, log=print, **kw))
         elif sub == "check":
             from .checks import check_character
@@ -351,14 +362,14 @@ def cmd_project(a) -> None:
                 for cname in list(project.characters):
                     print(f"=== {cname}")
                     try:
-                        results[cname] = api.run_until_blocked(project, cname, log=print)
+                        results[cname] = api.run_until_blocked(project, cname, log=print, road=a.road)
                     except Exception as e:  # noqa: BLE001
                         results[cname] = {"ok": False, "error": str(e)}
                 _emit(a, {"ok": all(r.get("ok", False) for r in results.values()), "characters": results})
             elif not a.character:
                 _emit(a, {"ok": False, "error": "give a character name or --all"})
             else:
-                _emit(a, api.run_until_blocked(project, a.character, log=print))
+                _emit(a, api.run_until_blocked(project, a.character, log=print, road=a.road))
         elif sub == "still":
             r = api.pixelate_still(project, a.character, a.view)
             if a.animate:
@@ -366,6 +377,48 @@ def cmd_project(a) -> None:
             if a.export:
                 r["export"] = api.export(project, a.character)
             _emit(a, r)
+    except api.StepError as e:
+        _emit(a, {"ok": False, "error": str(e)})
+        raise SystemExit(2)
+
+
+def cmd_puppet(a) -> None:
+    """``pixelforge puppet build|animate|run|preview <character>``: the pixel road (2D puppets, no Blender)."""
+    from . import api
+    from .project import Project
+
+    try:
+        project = Project.load(a.project) if a.project else Project.find(".")
+    except FileNotFoundError as e:
+        _emit(a, {"ok": False, "error": f"{e}. Use --project <folder> or run inside the project folder."})
+        raise SystemExit(2)
+    try:
+        if a.puppet_cmd == "build":
+            facing = {"side": a.facing_side} if a.facing_side else None
+            _emit(a, api.build_puppet(project, a.character, facing=facing, log=print))
+        elif a.puppet_cmd == "animate":
+            _emit(a, api.animate_puppet(project, a.character, clips=a.clips, directions=a.directions, per_clip=a.per_clip, elevation=a.elevation, log=print))
+        elif a.puppet_cmd == "run":
+            _emit(a, api.run_pixel_path(project, a.character, clips=a.clips, directions=a.directions, per_clip=a.per_clip, log=print))
+        elif a.puppet_cmd == "preview":
+            _emit(a, api.preview_gif(project, a.character, a.clip, a.direction, source=a.source))
+    except api.StepError as e:
+        _emit(a, {"ok": False, "error": str(e)})
+        raise SystemExit(2)
+
+
+def cmd_run(a) -> None:
+    """``pixelforge run <character> [--road pixel|3d]``: every remaining step of the character's road."""
+    from . import api
+    from .project import Project
+
+    try:
+        project = Project.load(a.project) if a.project else Project.find(".")
+    except FileNotFoundError as e:
+        _emit(a, {"ok": False, "error": f"{e}. Use --project <folder> or run inside the project folder."})
+        raise SystemExit(2)
+    try:
+        _emit(a, api.run_until_blocked(project, a.character, log=print, road=a.road))
     except api.StepError as e:
         _emit(a, {"ok": False, "error": str(e)})
         raise SystemExit(2)
@@ -697,21 +750,44 @@ def build_parser() -> argparse.ArgumentParser:
     ps.add_parser("status", help="what is done, what is next")
     ps.add_parser("blender-download", help="fetch the portable Blender (380 MB, no installer) and point the project at it")
     x = ps.add_parser("set", help="change settings (--style NAME sets the look; with --character only that character's)")
-    x.add_argument("--style", choices=sorted(STYLES) + ["project"], help="a look preset ('pixelforge styles' lists them)"); x.add_argument("--character", help="give this character its own look ('project' follows the project again)"); x.add_argument("--blender"); x.add_argument("--directions", type=int); x.add_argument("--render-size", type=int); x.add_argument("--godot-res-dir")
+    x.add_argument("--style", choices=sorted(STYLES) + ["project"], help="a look preset ('pixelforge styles' lists them)"); x.add_argument("--character", help="give this character its own look ('project' follows the project again) or road"); x.add_argument("--blender"); x.add_argument("--directions", type=int); x.add_argument("--render-size", type=int); x.add_argument("--godot-res-dir")
+    x.add_argument("--road", choices=["3d", "pixel"], help="with --character: the 3d road (Blender model) or the pixel road (2D puppet, no Blender)")
     x = ps.add_parser("add", help="add a character"); x.add_argument("character"); x.add_argument("--describe")
     x = ps.add_parser("describe", help="set the description"); x.add_argument("character"); x.add_argument("describe")
     x = ps.add_parser("prompts", help="Midjourney prompts for the character"); x.add_argument("character"); x.add_argument("--reference", default="[SHEET IMAGE URL]")
     x = ps.add_parser("import", help="import an image"); x.add_argument("character"); x.add_argument("kind", choices=list(SOURCE_KINDS)); x.add_argument("file")
-    x = ps.add_parser("run", help="run one step"); x.add_argument("character"); x.add_argument("step", choices=["split", "palette", "model", "rig", "render", "pixelate", "export"])
+    x = ps.add_parser("run", help="run one step (puppet and animate are the pixel road's model and render)"); x.add_argument("character"); x.add_argument("step", choices=["split", "palette", "model", "rig", "render", "pixelate", "export", "puppet", "animate"])
     x.add_argument("--frame-step", type=int, default=2); x.add_argument("--elevation", type=float, default=30.0); x.add_argument("--passes", default=None, help="color,normal,depth")
+    x.add_argument("--clips", help="animate: comma list of clips (default idle,walk,run,attack,punch,cast,hit,death,roll)"); x.add_argument("--directions", help="animate: comma list of S SW W NW N NE E SE (default all)"); x.add_argument("--per-clip", type=int, help="animate: frames per clip (default the look's)")
     x = ps.add_parser("export-game", help="export in Godmarrow's art/sprites format (+ normal/depth sets)"); x.add_argument("character")
     x.add_argument("--kind", help="sprite kind name (default: character name)"); x.add_argument("--out", help="output folder (default: characters/<name>/export_game)")
     x.add_argument("--category", default="hero"); x.add_argument("--name", help="display name")
     x = ps.add_parser("check", help="the automatic checks on a character's cutouts, carve and frames (plain English)"); x.add_argument("character")
     x = ps.add_parser("run-all", help="run every remaining automatic step"); x.add_argument("character", nargs="?", help="omit with --all"); x.add_argument("--all", action="store_true", help="every character in the project, in turn")
+    x.add_argument("--road", choices=["3d", "pixel"], help="switch the character to this road first (pixel = 2D puppet, no Blender)")
     x = ps.add_parser("still", help="quick path: one image -> sprite (-> animation -> export)"); x.add_argument("character")
     x.add_argument("--view", default="style", choices=["style", "front", "side", "back"]); x.add_argument("--animate", nargs="*", metavar="PRESET"); x.add_argument("--export", action="store_true")
     s.set_defaults(func=cmd_project)
+
+    s = sub.add_parser("puppet", help="the pixel road: a 2D puppet from the cutouts, posed by the motion library in 8 directions, no Blender")
+    pcommon = argparse.ArgumentParser(add_help=False)
+    pcommon.add_argument("--project", "-p", help="project folder (default: current folder or a parent)")
+    pcommon.add_argument("--json", action="store_true", help="machine-readable output")
+    pp = s.add_subparsers(dest="puppet_cmd", required=True, parser_class=lambda **kw: argparse.ArgumentParser(parents=[pcommon], **kw))
+    x = pp.add_parser("build", help="cut the view cutouts into parts with pivots (puppet/<view>.json, a parts sheet to check)"); x.add_argument("character")
+    x.add_argument("--facing-side", choices=["left", "right"], help="which way the side view faces, when the feet do not tell")
+    x = pp.add_parser("animate", help="pose the puppet with the motion clips and draw every frame from every direction into renders/"); x.add_argument("character")
+    x.add_argument("--clips", help="comma list (default idle,walk,run,attack,punch,cast,hit,death,roll)"); x.add_argument("--directions", help="comma list of S SW W NW N NE E SE (default all)")
+    x.add_argument("--per-clip", type=int, help="frames per clip (default the look's clip_frames)"); x.add_argument("--elevation", type=float, default=30.0)
+    x = pp.add_parser("run", help="the whole road: split, palette, puppet, animate, pixelate, export"); x.add_argument("character")
+    x.add_argument("--clips"); x.add_argument("--directions"); x.add_argument("--per-clip", type=int)
+    x = pp.add_parser("preview", help="a GIF of one clip from one direction (previews/<clip>_<dir>.gif)"); x.add_argument("character")
+    x.add_argument("--clip", default="walk"); x.add_argument("--direction", default="S"); x.add_argument("--source", default="auto", choices=["auto", "frames", "renders"])
+    s.set_defaults(func=cmd_puppet)
+
+    s = sub.add_parser("run", help="every remaining step of a character's road (--road pixel: the 2D puppet road, no Blender)")
+    s.add_argument("character"); s.add_argument("--road", choices=["3d", "pixel"]); s.add_argument("--project", "-p"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_run)
 
     s = sub.add_parser("prop", help="a painted object/tree/banner -> game sprite with footprint (+ sway animation)")
     s.add_argument("image"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/objects")
