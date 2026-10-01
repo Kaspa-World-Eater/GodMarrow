@@ -138,12 +138,12 @@ def cmd_animate(a) -> None:
     sprite = np.asarray(Image.open(a.sprite).convert("RGBA"))
     effects = [e for name in a.preset for e in _fresh_preset(name)]
     effects += [parse_effect(s) for s in a.effect]
-    if not effects:
-        raise SystemExit("choose at least one --preset or --effect")
+    if not effects and not a.look:
+        raise SystemExit("choose at least one --preset, --effect or --look")
     palette = Palette.load(a.palette) if a.palette else None
     if a.flip:
         sprite = flip(sprite)
-    frames = animate(sprite, effects, a.frames, palette=palette)
+    frames = animate(sprite, effects, a.frames, palette=palette, looks=_look_spec(a))
     out = Path(a.output)
     out.mkdir(parents=True, exist_ok=True)
     for i, f in enumerate(frames):
@@ -151,6 +151,36 @@ def cmd_animate(a) -> None:
     if a.gif:
         save_gif(frames, out / f"{a.name}.gif", fps=a.fps, zoom=a.zoom)
     print(f"{len(frames)} frames ({frames[0].shape[1]}x{frames[0].shape[0]}) -> {out}")
+
+
+def _look_spec(a):
+    """``--look`` repeated or combined: one spec string for fxlook (None when none given)."""
+    specs = [x for x in (getattr(a, "look", None) or []) if x]
+    return "+".join(specs) if specs else None
+
+
+def cmd_looks(a) -> None:
+    from . import fxlook
+
+    if a.demo:
+        _emit(a, fxlook.demo(a.demo, frames=a.frames, fps=a.fps))
+        return
+    rows = fxlook.looks_table()
+    if a.json:
+        _emit(a, {"ok": True, "looks": rows, "syntax": "name[:param=value,...] ; several looks joined with + (or , ; space): phosphorus:strength=0.8+echo:count=3"})
+        return
+    print("looks: finishing layers for any effect (vfx, spell layers and spells, painted effects, animate). Stack them in order:")
+    print('  --look "phosphorus:strength=0.8+echo:count=3"   (a parameter left out keeps its default)\n')
+    for r in rows:
+        ps = ", ".join(f"{k}={v['default']}" + (f" [{v['min']}..{v['max']}]" if "min" in v else (f" ({'|'.join(v['choices'])})" if "choices" in v else "")) for k, v in r["params"].items())
+        print(f"{r['name']:12s} {r['doc']}\n{'':12s} {ps}" + ("\n" + " " * 13 + "adds its own colours to the palette" if r["adds_colours"] else ""))
+    print("\npixelforge looks --demo OUT_DIR   writes one GIF per look (a wisp and the bone spear) and a contact sheet")
+
+
+def cmd_relook(a) -> None:
+    from . import fxlook
+
+    _emit(a, fxlook.relook(a.sheet, _look_spec(a) or "", name=a.name, out_dir=a.out, gif=a.gif))
 
 
 def _fresh_preset(name: str) -> list:
@@ -381,7 +411,8 @@ def cmd_vfx(a) -> None:
 
     palette = None if a.palette == "auto" else (a.palette.split(",") if "," in a.palette else a.palette)
     r = make_vfx(a.kind, a.name, a.out, size=tuple(a.size) if a.size else None, frames=a.frames, fps=a.fps, palette=palette,
-                 bands=a.bands, seed=a.seed, glow=(None if a.glow == "auto" else a.glow == "on"), gif=a.gif, atlas_dir=a.atlas, rotations=a.rotations)
+                 bands=a.bands, seed=a.seed, glow=(None if a.glow == "auto" else a.glow == "on"), gif=a.gif, atlas_dir=a.atlas, rotations=a.rotations,
+                 looks=_look_spec(a))
     _emit(a, r)
 
 
@@ -468,7 +499,7 @@ def cmd_effect(a) -> None:
     from .effect_art import make_effect
 
     _emit(a, make_effect(a.image, a.name, a.out, kind=a.kind, preset=a.preset, frames=a.frames, fps=a.fps, width=a.width, rotations=a.rotations,
-                         seed=a.seed, gif=not a.no_gif, tolerance=a.tolerance, atlas_dir=a.atlas))
+                         seed=a.seed, gif=not a.no_gif, tolerance=a.tolerance, atlas_dir=a.atlas, looks=_look_spec(a)))
 
 
 def cmd_spell(a) -> None:
@@ -476,14 +507,27 @@ def cmd_spell(a) -> None:
 
     if a.action == "new":
         sp = spell.new_spell(a.name, a.preset)
+        if a.frames:
+            sp["frames"] = a.frames
+        if a.fps:
+            sp["fps"] = a.fps
+        if _look_spec(a):
+            sp["look"] = _look_spec(a)
         path = spell.save_spell(sp, Path(a.out) / f"{a.name}.spell.json")
         r = spell.export_spell(sp, a.out, gif=a.gif)
         _emit(a, {**r, "spell": path, "presets": sorted(spell.PRESETS)})
     elif a.action == "render":
         sp = spell.load_spell(a.name)
+        if a.frames:
+            sp["frames"] = a.frames
+        if a.fps:
+            sp["fps"] = a.fps
+        if _look_spec(a):
+            sp["look"] = _look_spec(a)
         _emit(a, spell.export_spell(sp, a.out, gif=a.gif, atlas_dir=a.atlas))
     else:
-        _emit(a, {"ok": True, "presets": {k: [l["kind"] for l in v["layers"]] for k, v in spell.PRESETS.items()}, "kinds": list(__import__("pixelforge.vfx", fromlist=["KINDS"]).KINDS)})
+        _emit(a, {"ok": True, "presets": {k: [l["kind"] for l in v["layers"]] for k, v in spell.PRESETS.items()}, "kinds": list(__import__("pixelforge.vfx", fromlist=["KINDS"]).KINDS),
+                  "looks": list(__import__("pixelforge.fxlook", fromlist=["LOOKS"]).LOOKS)})
 
 
 def cmd_skin(a) -> None:
@@ -605,6 +649,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--name", default="anim", help="frame file prefix")
     s.add_argument("--palette", help="palette for flicker (default: the sprite's own colors)")
     s.add_argument("--flip", action="store_true", help="mirror first, e.g. to make the left-facing set")
+    s.add_argument("--look", action="append", default=[], help="a finishing look on the clip, e.g. 'pulse' or 'echo:count=2,dy=1' (pixelforge looks lists them; repeatable)")
     s.add_argument("--gif", action="store_true")
     s.add_argument("--zoom", type=int, default=4)
     s.set_defaults(func=cmd_animate)
@@ -727,8 +772,21 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--bands", type=int, default=6, help="colour bands"); s.add_argument("--seed", type=int, default=1)
     s.add_argument("--glow", choices=["auto", "on", "off"], default="auto", help="soft halo (auto: fire/wisp/burst only)")
     s.add_argument("--gif", action="store_true"); s.add_argument("--rotations", type=int, default=0, help="missiles: a sheet with N headings (rows), turned with RotSprite"); s.add_argument("--atlas", metavar="DIR", help="also write a Godmarrow sprite set (art/sprites) for SpriteSet")
+    s.add_argument("--look", action="append", default=[], help="finishing looks in order, e.g. 'phosphorus:strength=0.8+echo:count=3' (pixelforge looks lists them; repeatable)")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_vfx)
+
+    s = sub.add_parser("looks", help="the looks (phosphorus, haze, ethereal, glow, cyberpunk, psychedelic, echo, smooth, embers, smoke, shimmer, outline, pulse, grain, flicker, dissolve, ice, rot) and their knobs; --demo renders them")
+    s.add_argument("--demo", metavar="OUT_DIR", help="write one GIF per look (a wisp and the bone spear side by side) and a contact sheet PNG here")
+    s.add_argument("--frames", type=int, default=12); s.add_argument("--fps", type=float, default=10.0)
+    s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_looks)
+
+    s = sub.add_parser("relook", help="apply looks to an exported effect sheet (<name>.json + png, rotation sheets too) and write a new one")
+    s.add_argument("sheet", help="the effect's json (art/fx/wisp.json)"); s.add_argument("--look", action="append", default=[], required=True, help="looks in order")
+    s.add_argument("--name", default=None, help="the new sheet's name (default: the same name, overwritten)"); s.add_argument("-o", "--out", default=None, help="folder (default: next to the source)")
+    s.add_argument("--gif", action="store_true"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_relook)
 
     s = sub.add_parser("tiles", help="painted ground texture -> 2:1 iso diamond tiles (+16 transition tiles) and a Godot TileSet")
     s.add_argument("texture"); s.add_argument("name"); s.add_argument("-o", "--out", default="art/tiles")
@@ -783,12 +841,15 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--preset", default="glow", help="loop motion: glow | flame | hover | idle | cloak | grass"); s.add_argument("--frames", type=int, default=8); s.add_argument("--fps", type=float, default=10.0)
     s.add_argument("--width", type=int, default=None, help="game pixels across (default: the painting's own size)"); s.add_argument("--rotations", type=int, default=0, help="missiles: N headings")
     s.add_argument("--seed", type=int, default=1); s.add_argument("--tolerance", type=float, default=0.1); s.add_argument("--no-gif", action="store_true"); s.add_argument("--atlas", default=None); s.add_argument("--json", action="store_true")
+    s.add_argument("--look", action="append", default=[], help="finishing looks in order (pixelforge looks lists them; repeatable)")
     s.set_defaults(func=cmd_effect)
 
     s = sub.add_parser("spell", help="spell designer: layered effects (fire + burst + embers...) -> strip + json (+ gif, atlas)")
     s.add_argument("action", choices=["new", "render", "presets"]); s.add_argument("name", nargs="?", default="fireball", help="new: the spell's name; render: a .spell.json")
     s.add_argument("-o", "--out", default="art/fx"); s.add_argument("--preset", default="fireball", help="fireball | ward | soul_drain | bone_shatter | lightning_strike")
     s.add_argument("--gif", action="store_true"); s.add_argument("--atlas", help="also write a sprite set into this folder"); s.add_argument("--json", action="store_true")
+    s.add_argument("--look", action="append", default=[], help="the spell's top-level look(s), e.g. 'ethereal' or 'glow+echo:count=2' (layers carry their own 'look' field)")
+    s.add_argument("--frames", type=int, default=None, help="loop length in frames (longer = a slower, longer loop)"); s.add_argument("--fps", type=float, default=None)
     s.set_defaults(func=cmd_spell)
 
     s = sub.add_parser("skin", help="edit a cutout / sprite / atlas with ops (recolor, glow, paint, erase, restore, region, smooth): what the skin editor does, headless")

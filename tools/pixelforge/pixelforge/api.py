@@ -660,7 +660,8 @@ def pixelate_still(project: Project, name: str, view: str = "front", outline: st
     return {"ok": True, "character": c.name, "sprite": str(out), "size": list(r.image.size), "colors": len(r.palette), "notes": r.notes}
 
 
-def animate_still(project: Project, name: str, view: str = "front", presets: list[str] | None = None, frames: int = 8, fps: float = 8) -> dict:
+def animate_still(project: Project, name: str, view: str = "front", presets: list[str] | None = None, frames: int = 8, fps: float = 8, looks=None) -> dict:
+    """``looks`` (a look spec, see fxlook, e.g. "ethereal" or "echo:count=2") finishes the clip."""
     import copy
 
     c = project.character(name)
@@ -669,7 +670,7 @@ def animate_still(project: Project, name: str, view: str = "front", presets: lis
         pixelate_still(project, name, view)
     presets = presets or ["idle"]
     effects = [e for p in presets for e in copy.deepcopy(PRESETS[p])]
-    out_frames = animate(np.asarray(Image.open(sprite).convert("RGBA")), effects, frames)
+    out_frames = animate(np.asarray(Image.open(sprite).convert("RGBA")), effects, frames, looks=looks)
     out = project.sub(c.name, "anim") / "_".join(presets)
     out.mkdir(parents=True, exist_ok=True)
     for i, f in enumerate(out_frames):

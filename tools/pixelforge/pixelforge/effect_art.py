@@ -117,8 +117,9 @@ def _burst_frames(rgba: np.ndarray, frames: int) -> list[np.ndarray]:
 
 def make_effect(image: str | Path, name: str, out_dir: str | Path, *, kind: str = "loop", preset: str = "glow", frames: int = 8, fps: float = 10.0,
                 width: int | None = None, rotations: int = 0, seed: int = 1, gif: bool = True, tolerance: float = 0.1, anchor: str = "auto",
-                atlas_dir: str | Path | None = None) -> dict:
-    """A painted effect -> strip + json (+ gif) in the vfx layout."""
+                atlas_dir: str | Path | None = None, looks=None) -> dict:
+    """A painted effect -> strip + json (+ gif) in the vfx layout. ``looks`` (see fxlook) finishes the frames before any
+    rotation sheet; the lock palette is the painting's own colours (k-means to 96 when it has more) plus the look's."""
     if kind not in KINDS:
         raise ValueError(f"kind must be one of {KINDS}")
     src = Image.open(image)
@@ -152,6 +153,12 @@ def make_effect(image: str | Path, name: str, out_dir: str | Path, *, kind: str 
             effects = ANIM_PRESETS.get(preset, ANIM_PRESETS["glow"])
             seq = animate(rgba, effects, frames)
             loop = True
+    look_info = None
+    if looks:
+        from .fxlook import apply_looks, frames_palette
+
+        seq, look_info = apply_looks(seq, looks, frames_palette(seq), loop=loop, seed=seed, fps=fps)
+        loop, fps = look_info["loop"], fps * look_info["fps_scale"]
     h, w = seq[0].shape[:2]
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -178,8 +185,12 @@ def make_effect(image: str | Path, name: str, out_dir: str | Path, *, kind: str 
     Image.fromarray(sheet, "RGBA").save(out / f"{name}.png")
     meta = {"name": name, "kind": f"painted_{kind}", "size": [w, h], "frames": len(seq), "frame_width": w, "frame_height": h, "fps": fps, "loop": loop,
             "anchor": anc, "glow": True, "rotations": int(rotations or 1), "source": "pixelforge effect (painted)", "painting": str(image)}
+    if look_info:
+        meta.update(look=look_info["spec"], looks=look_info["looks"], palette=look_info["palette"])
     (out / f"{name}.json").write_text(json.dumps(meta, indent=2) + "\n")
     r = {"ok": True, "png": str(out / f"{name}.png"), "json": str(out / f"{name}.json"), "frames": len(seq), "size": [w, h], "kind": kind}
+    if look_info:
+        r["look"], r["palette"] = look_info["spec"], look_info["palette"]
     if gif:
         from .spritesheet import save_gif
         save_gif([Image.fromarray(f, "RGBA") for f in seq], out / f"{name}.gif", fps=fps, zoom=3)

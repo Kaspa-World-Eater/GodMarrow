@@ -1,9 +1,10 @@
 """Spell designer: build a complex effect from layers of the Forge's effect generators.
 
 A spell is a JSON file: a canvas size, a length in frames, fps, and layers. Each layer is one effect kind with its
-own colours, size, position, rotation, start frame, speed, opacity and blend (normal or add), so a fireball is a
-burst layer over a fire layer with an ember layer trailing behind, a ward is a ring under a rune under a wisp, and
-so on. The composer renders the layers to one strip and the same files `pixelforge vfx` writes (<name>.png,
+own colours, size, position, rotation, start frame, speed, opacity, blend (normal or add) and look (a finishing layer
+from :mod:`fxlook`, e.g. ``"phosphorus"`` or ``"echo:count=3"``), so a fireball is a burst layer over a fire layer
+with an ember layer trailing behind, a ward is a ring under a rune under a wisp, and so on. The spell itself may carry
+a top-level ``"look"`` applied to the composite (its palette is the colours the layers used, plus the look's own). The composer renders the layers to one strip and the same files `pixelforge vfx` writes (<name>.png,
 <name>.json; optional atlas set), so the Godot add-on plays a spell like any effect.
 
     pixelforge spell new fireball -o art/fx --preset fireball       # a starting point to edit
@@ -21,7 +22,7 @@ from PIL import Image
 from . import vfx
 
 LAYER_DEFAULTS = {"kind": "fire", "image": "", "palette": "lantern", "scale": 1.0, "x": 0, "y": 0, "rotation": 0.0, "start": 0, "speed": 1.0,
-                  "opacity": 1.0, "blend": "normal", "glow": None, "seed": 1, "flip": False, "loop": True, "name": ""}
+                  "opacity": 1.0, "blend": "normal", "glow": None, "seed": 1, "flip": False, "loop": True, "name": "", "look": ""}
 
 PRESETS = {
     "fireball": {"size": [96, 64], "frames": 12, "fps": 12, "loop": True, "anchor": [48, 32],
@@ -78,8 +79,8 @@ def new_spell(name: str, preset: str = "fireball") -> dict:
     return base
 
 
-def render_kind(kind: str, w: int, h: int, frames: int, palette, seed: int = 1, glow: bool | None = None, bands: int = 6) -> list[np.ndarray]:
-    """One effect kind as RGBA frames (what make_vfx renders, without files)."""
+def render_kind(kind: str, w: int, h: int, frames: int, palette, seed: int = 1, glow: bool | None = None, bands: int = 6, looks=None) -> list[np.ndarray]:
+    """One effect kind as RGBA frames (what make_vfx renders, without files); ``looks`` finishes them (see fxlook)."""
     colors = vfx.PRESETS[palette] if isinstance(palette, str) else list(palette)
     rng = np.random.default_rng(seed)
     if glow is None:
@@ -93,8 +94,13 @@ def render_kind(kind: str, w: int, h: int, frames: int, palette, seed: int = 1, 
             rgba[..., :3] = lut[-1]
             rgba[..., 3] = (np.clip(inten, 0, 1) * 255).astype(np.uint8)
             out.append(rgba)
-        return out
-    return [vfx.paint(i, a, lut, hl) for i, a, hl in gen]
+    else:
+        out = [vfx.paint(i, a, lut, hl) for i, a, hl in gen]
+    if looks:
+        from .fxlook import apply_looks
+
+        out, _info = apply_looks(out, looks, colors, loop=kind in vfx.LOOPING, seed=seed)
+    return out
 
 
 def load_image_frames(path: str | Path) -> list[np.ndarray]:
@@ -125,8 +131,9 @@ def _blend(base: Image.Image, layer: Image.Image, mode: str, opacity: float) -> 
     return Image.alpha_composite(base, layer)
 
 
-def render_spell(spell: dict) -> list[np.ndarray]:
-    """Every layer rendered and composited on the spell's canvas; frames of the strip."""
+def render_spell(spell: dict, *, with_look: bool = True) -> list[np.ndarray]:
+    """Every layer rendered (each with its own look) and composited on the spell's canvas, then the spell's top-level
+    look; frames of the strip. ``with_look=False`` leaves the composite plain (the designer's before/after)."""
     W, H = spell["size"]
     n = int(spell["frames"])
     frames_out = []
@@ -137,13 +144,19 @@ def render_spell(spell: dict) -> list[np.ndarray]:
             lyr = {**LAYER_DEFAULTS, **lyr}
             if lyr.get("hidden"):
                 continue
-            key = (lyr["kind"], str(lyr["palette"]), lyr["seed"], lyr["glow"], n, lyr.get("image", ""))
+            look = lyr.get("look") or ""
+            key = (lyr["kind"], str(lyr["palette"]), lyr["seed"], lyr["glow"], n, lyr.get("image", ""), str(look))
             if key not in cache:
                 if lyr["kind"] == "image":
-                    cache[key] = load_image_frames(lyr.get("image", ""))
+                    frames_img = load_image_frames(lyr.get("image", ""))
+                    if look:
+                        from .fxlook import apply_looks
+
+                        frames_img, _info = apply_looks(frames_img, look, None, loop=bool(lyr["loop"]), seed=int(lyr["seed"]))
+                    cache[key] = frames_img
                 else:
                     w, h = vfx.DEFAULT_SIZE.get(lyr["kind"], (48, 48))
-                    cache[key] = render_kind(lyr["kind"], w, h, n, lyr["palette"], int(lyr["seed"]), lyr["glow"])
+                    cache[key] = render_kind(lyr["kind"], w, h, n, lyr["palette"], int(lyr["seed"]), lyr["glow"], looks=look or None)
             seq = cache[key]
             local = (t - int(lyr["start"])) * float(lyr["speed"])
             if local < 0:
@@ -163,7 +176,31 @@ def render_spell(spell: dict) -> list[np.ndarray]:
             layer.paste(f, (int(W / 2 + lyr["x"] - f.width / 2), int(H / 2 + lyr["y"] - f.height / 2)), f)
             canvas = _blend(canvas, layer, lyr["blend"], float(lyr["opacity"]))
         frames_out.append(np.asarray(canvas).copy())
+    if with_look and spell.get("look"):
+        frames_out, _info = spell_look(spell, frames_out)
     return frames_out
+
+
+def spell_palette(spell: dict) -> list[str]:
+    """The colours a spell's layers draw with: every layer palette (presets or hex lists), dark -> bright."""
+    from .fxlook import as_palette, hexes
+
+    cols = []
+    for lyr in spell.get("layers", []):
+        pal = lyr.get("palette", "lantern")
+        if lyr.get("kind") == "image":
+            continue
+        cols += vfx.PRESETS[pal] if isinstance(pal, str) else list(pal)
+    return hexes(as_palette(cols)) if cols else []
+
+
+def spell_look(spell: dict, frames: list[np.ndarray]) -> tuple[list[np.ndarray], dict]:
+    """The spell's top-level look on composited frames. The lock palette is the colours the frames actually use
+    (layer palettes, image layers, additive blends) plus the look's own colours."""
+    from .fxlook import apply_looks, frames_palette
+
+    return apply_looks(frames, spell["look"], frames_palette(frames), loop=bool(spell.get("loop", True)), seed=int(spell.get("seed", 1)),
+                       fps=float(spell.get("fps", 12)))
 
 
 def save_spell(spell: dict, path: str | Path) -> str:
@@ -178,22 +215,34 @@ def load_spell(path: str | Path) -> dict:
 
 def export_spell(spell: dict, out_dir: str | Path, gif: bool = False, atlas_dir: str | Path | None = None) -> dict:
     """The strip and json a game loads (same layout as `pixelforge vfx`), plus the editable spell file."""
-    seq = render_spell(spell)
+    seq = render_spell(spell, with_look=False)
+    fps, loop = float(spell.get("fps", 12)), bool(spell.get("loop", True))
+    look_info = None
+    if spell.get("look"):
+        seq, look_info = spell_look(spell, seq)
+        fps, loop = fps * look_info["fps_scale"], look_info["loop"]
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     name = spell["name"]
     W, H = spell["size"]
     strip = np.concatenate(seq, axis=1)
     Image.fromarray(strip, "RGBA").save(out / f"{name}.png")
-    meta = {"name": name, "kind": "spell", "size": [W, H], "frames": len(seq), "frame_width": W, "fps": spell.get("fps", 12), "loop": bool(spell.get("loop", True)),
-            "anchor": spell.get("anchor", [W // 2, H // 2]), "glow": True, "layers": [l.get("kind") for l in spell["layers"]], "source": "pixelforge spell"}
+    meta = {"name": name, "kind": "spell", "size": [W, H], "frames": len(seq), "frame_width": W, "frame_height": H, "fps": fps, "loop": loop,
+            "anchor": spell.get("anchor", [W // 2, H // 2]), "glow": True, "layers": [l.get("kind") for l in spell["layers"]],
+            "layer_looks": [l.get("look", "") for l in spell["layers"]], "palette": look_info["palette"] if look_info else spell_palette(spell),
+            "source": "pixelforge spell"}
+    if look_info:
+        meta["look"], meta["looks"] = look_info["spec"], look_info["looks"]
     (out / f"{name}.json").write_text(json.dumps(meta, indent=2) + "\n")
     save_spell(spell, out / f"{name}.spell.json")
-    r = {"ok": True, "png": str(out / f"{name}.png"), "json": str(out / f"{name}.json"), "spell": str(out / f"{name}.spell.json"), "frames": len(seq)}
+    r = {"ok": True, "png": str(out / f"{name}.png"), "json": str(out / f"{name}.json"), "spell": str(out / f"{name}.spell.json"), "frames": len(seq),
+         "fps": fps, "loop": loop, "palette": meta["palette"]}
+    if look_info:
+        r["look"] = look_info["spec"]
     if gif:
         from .spritesheet import save_gif
-        save_gif([Image.fromarray(f, "RGBA") for f in seq], out / f"{name}.gif", fps=float(spell.get("fps", 12)), zoom=4)
+        save_gif([Image.fromarray(f, "RGBA") for f in seq], out / f"{name}.gif", fps=fps, zoom=4)
         r["gif"] = str(out / f"{name}.gif")
     if atlas_dir:
-        r["atlas"] = vfx.export_vfx_set(seq, name, atlas_dir, fps=float(spell.get("fps", 12)), loop=bool(spell.get("loop", True)), anchor=meta["anchor"])
+        r["atlas"] = vfx.export_vfx_set(seq, name, atlas_dir, fps=fps, loop=loop, anchor=meta["anchor"])
     return r

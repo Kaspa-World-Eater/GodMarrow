@@ -5,12 +5,15 @@ once per view, or place it on one and copy to all (left-facing views mirror). Pr
 effects composited; Save writes ``attachments`` into the sprite set's JSON and renders each effect's sheet into the
 effects folder, where the Godot add-on (PFFx.spawn_attachments) picks them up.
 
-Attachment: {"name", "kind", "palette", "scale", "glow", "z": "front" | "behind", "fx": "<sheet name>", "views": {view: [ox, oy]}}
-with (ox, oy) in sprite pixels from the entity's ground point (the same origin as the frames' dx, dy).
+Attachment: {"name", "kind", "palette", "scale", "glow", "look", "z": "front" | "behind", "fx": "<sheet name>", "views": {view: [ox, oy]}}
+with (ox, oy) in sprite pixels from the entity's ground point (the same origin as the frames' dx, dy). ``look`` is an
+fxlook spec ("phosphorus", "echo:count=2"...) rendered into the sheet; ``fx`` names the sheet and must change with
+the look (``attachment_fx_name``), since a sheet that exists is reused.
 """
 from __future__ import annotations
 
 import json
+import re
 import tempfile
 from pathlib import Path
 
@@ -34,6 +37,13 @@ def mirror_to_all(offset: list[float], view: str, views: list[str]) -> dict:
     return out
 
 
+def attachment_fx_name(att: dict, set_kind: str = "sprite") -> str:
+    """The sheet name an attachment renders to: kind, name, palette, glow and the look (slugged), so a changed look
+    means a new sheet rather than a stale one."""
+    slug = re.sub(r"[^a-z0-9]+", "_", str(att.get("look") or "").lower()).strip("_")
+    return f"{set_kind}_{att['name']}_{att.get('palette', 'lantern')}{'_glow' if att.get('glow', True) else ''}" + (f"_{slug}" if slug else "")
+
+
 def load_set(json_path: str | Path) -> dict:
     p = Path(json_path)
     d = json.loads(p.read_text())
@@ -55,7 +65,7 @@ def effect_frames(att: dict, fx_dir: str | Path) -> tuple[list[np.ndarray], list
     name = att["fx"]
     meta_p = out / f"{name}.json"
     if not meta_p.exists():
-        vfx.make_vfx(att["kind"], name, out, palette=att.get("palette", "lantern"), glow=att.get("glow"), seed=att.get("seed", 1))
+        vfx.make_vfx(att["kind"], name, out, palette=att.get("palette", "lantern"), glow=att.get("glow"), seed=att.get("seed", 1), looks=att.get("look") or None)
     meta = json.loads(meta_p.read_text())
     strip = np.array(Image.open(out / f"{name}.png").convert("RGBA"))
     fw = meta["frame_width"]
@@ -278,7 +288,7 @@ class FxEditor:
         att["scale"] = round(float(self.scale.get()), 2)
         att["glow"] = bool(self.glow.get())
         att["z"] = "behind" if self.behind.get() else "front"
-        att["fx"] = f"{self.s['data']['meta'].get('kind', 'sprite')}_{att['name']}_{att['palette']}{'_glow' if att['glow'] else ''}"
+        att["fx"] = attachment_fx_name(att, self.s["data"]["meta"].get("kind", "sprite"))
         self.draw()
 
     def copy_all(self) -> None:

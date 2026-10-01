@@ -87,10 +87,35 @@ def build_server():
         return api.preview_gif(_project(project), character, clip, direction)
 
     @mcp.tool()
-    def make_effect(kind: str, name: str, out_dir: str, palette: str = "lantern", frames: int = 8, fps: float = 10.0, atlas_dir: str | None = None) -> dict:
-        """Procedural effect sheet: fire smoke wisp burst embers ring bolt slash circle cloud shards pillar decal drip flash ward vortex."""
+    def make_effect(kind: str, name: str, out_dir: str, palette: str = "lantern", frames: int = 8, fps: float = 10.0, atlas_dir: str | None = None,
+                    looks: str = "", rotations: int = 0, seed: int = 1, gif: bool = False) -> dict:
+        """Procedural effect sheet: fire smoke wisp burst embers ring bolt slash circle cloud shards pillar decal drip flash ward vortex rain
+        ashfall fog lightning swarm chain rune pool cookie nova firewall bone_burst, missiles bone_spear teeth ice_bolt fire_bolt (rotations=16
+        for a heading sheet), orbits bone_armor_front/_back. looks: finishing looks in order, e.g. "phosphorus:strength=0.8+echo:count=3"
+        (list_looks)."""
         from .vfx import make_vfx
-        return make_vfx(kind, name, out_dir, frames=frames, fps=fps, palette=palette, atlas_dir=atlas_dir)
+        return make_vfx(kind, name, out_dir, frames=frames, fps=fps, palette=palette, atlas_dir=atlas_dir, looks=looks or None, rotations=rotations, seed=seed, gif=gif)
+
+    @mcp.tool()
+    def list_looks() -> dict:
+        """The looks (finishing layers for any effect) with a one-line description and every parameter's default, range and meaning:
+        phosphorus haze ethereal glow cyberpunk psychedelic echo smooth embers smoke shimmer outline pulse grain flicker dissolve ice rot.
+        Spec syntax: name[:param=value,...], several joined with +. The game's own theme keeps cyberpunk and psychedelic for magic."""
+        from . import fxlook
+        return {"ok": True, "looks": fxlook.looks_table(), "syntax": "phosphorus:strength=0.8+echo:count=3"}
+
+    @mcp.tool()
+    def relook(sheet_json: str, looks: str, name: str = "", out_dir: str = "", gif: bool = False) -> dict:
+        """Apply looks to an exported effect (its <name>.json next to the strip; rotation sheets get the look on every row) and write a
+        new sheet (name, out_dir) in the same layout; the json lists the palette used."""
+        from . import fxlook
+        return fxlook.relook(sheet_json, looks, name=name or None, out_dir=out_dir or None, gif=gif)
+
+    @mcp.tool()
+    def looks_demo(out_dir: str, frames: int = 12, fps: float = 10.0) -> dict:
+        """One GIF per look on a wisp and the bone spear, plus a contact sheet PNG, so a person can compare them side by side."""
+        from . import fxlook
+        return fxlook.demo(out_dir, frames=frames, fps=fps)
 
     @mcp.tool()
     def make_prop(image: str, name: str, out_dir: str, height: int = 96, sway: str | None = None, variations: int = 1, game_objects: str | None = None) -> dict:
@@ -158,20 +183,29 @@ def build_server():
         return _p(game_dir or None, skin=skin or None, fx=fx.split(",") if fx else None, attach=attach, shot=shot or None, zone=zone)
 
     @mcp.tool()
-    def make_effect_from_art(image: str, name: str, out_dir: str, kind: str = "loop", preset: str = "glow", frames: int = 8, width: int = 0, rotations: int = 0) -> dict:
+    def make_effect_from_art(image: str, name: str, out_dir: str, kind: str = "loop", preset: str = "glow", frames: int = 8, width: int = 0, rotations: int = 0,
+                             looks: str = "") -> dict:
         """A painted effect (on black) -> animated game effect. kind: missile (spins, sheds chips; use rotations=16) | loop (preset glow|flame|hover) |
-        burst (one-shot grow + dissolve) | frames (a painted strip of key frames). Writes the vfx layout the add-on and the spell designer load."""
+        burst (one-shot grow + dissolve) | frames (a painted strip of key frames). looks: finishing looks (list_looks). Writes the vfx layout the
+        add-on and the spell designer load."""
         from .effect_art import make_effect
-        return make_effect(image, name, out_dir, kind=kind, preset=preset, frames=frames, width=width or None, rotations=rotations)
+        return make_effect(image, name, out_dir, kind=kind, preset=preset, frames=frames, width=width or None, rotations=rotations, looks=looks or None)
 
     @mcp.tool()
-    def make_spell(name: str, out_dir: str, preset: str = "fireball", layers_json: str = "", gif: bool = True) -> dict:
-        """A layered spell effect -> strip + json (+ gif). preset: fireball | ward | soul_drain | bone_shatter | lightning_strike.
-        layers_json: optional JSON list of layers [{kind, palette, scale, x, y, rotation, start, speed, opacity, blend, seed}] replacing the preset's."""
+    def make_spell(name: str, out_dir: str, preset: str = "fireball", layers_json: str = "", gif: bool = True, look: str = "", frames: int = 0, fps: float = 0.0) -> dict:
+        """A layered spell effect -> strip + json (+ gif). preset: fireball | ward | soul_drain | bone_shatter | bone_spear_hit | frost_nova | fire_wall |
+        corpse_burst | bone_armor | bone_shard_aura | lightning_strike. layers_json: optional JSON list of layers [{kind, palette, scale, x, y, rotation,
+        start, speed, opacity, blend, seed, look}] replacing the preset's; look: the spell's top-level look(s) (list_looks); frames/fps: the loop's length."""
         from . import spell
         sp = spell.new_spell(name, preset)
         if layers_json:
             sp["layers"] = [{**spell.LAYER_DEFAULTS, **lyr} for lyr in json.loads(layers_json)]
+        if look:
+            sp["look"] = look
+        if frames:
+            sp["frames"] = int(frames)
+        if fps:
+            sp["fps"] = float(fps)
         return spell.export_spell(sp, out_dir, gif=gif)
 
     @mcp.tool()
@@ -209,11 +243,12 @@ def build_server():
         return run(project)
 
     @mcp.tool()
-    def quick_sprite(project: str, character: str, view: str = "style", preset: str = "idle") -> dict:
-        """No-3D path: one image -> sprite -> animated clip -> Godot export."""
+    def quick_sprite(project: str, character: str, view: str = "style", preset: str = "idle", looks: str = "") -> dict:
+        """No-3D path: one image -> sprite -> animated clip (preset idle|cloak|hover|flame|glow|grass|pulse|haunt|heat; looks: a finishing look,
+        list_looks) -> Godot export."""
         p = _project(project)
         api.pixelate_still(p, character, view)
-        api.animate_still(p, character, view, [preset])
+        api.animate_still(p, character, view, [preset], looks=looks or None)
         return api.export(p, character)
 
     return mcp

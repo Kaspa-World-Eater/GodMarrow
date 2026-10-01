@@ -50,6 +50,23 @@ PLACES = {"eye": "eye", "eyes": "eyes", "left eye": "eye_left", "right eye": "ey
 SIZE = {"tiny": 0.3, "small": 0.5, "little": 0.5, "medium": 1.0, "big": 1.5, "large": 1.5, "huge": 2.2, "massive": 2.6}
 SPEED = {"slow": 0.5, "slowly": 0.5, "lazy": 0.5, "drifting": 0.5, "fast": 1.8, "quick": 1.8, "rapid": 2.0, "flickering": 1.6}
 STRENGTH = {"faint": 0.35, "subtle": 0.4, "soft": 0.5, "pale": 0.55, "bright": 0.9, "strong": 1.0, "intense": 1.0, "blazing": 1.0}
+# look words -> fxlook looks (finishing layers on an effect)
+LOOK_WORDS = {
+    "phosphorus": "phosphorus", "phosphorescent": "phosphorus", "phosphor": "phosphorus", "afterglow": "phosphorus", "persistence": "phosphorus",
+    "hazy": "haze", "haze": "haze", "murky": "haze", "ethereal": "ethereal", "ghostly": "ethereal", "spectral": "ethereal", "translucent": "ethereal",
+    "see-through": "ethereal", "bloom": "glow", "glowing": "glow", "radiant": "glow", "luminous": "glow", "neon": "cyberpunk", "cyberpunk": "cyberpunk",
+    "synthwave": "cyberpunk", "glitch": "cyberpunk", "glitchy": "cyberpunk", "trippy": "psychedelic", "psychedelic": "psychedelic", "rainbow": "psychedelic",
+    "kaleidoscope": "psychedelic", "kaleidoscopic": "psychedelic", "afterimage": "echo", "afterimages": "echo", "echo": "echo", "echoes": "echo",
+    "echoing": "echo", "ghost trail": "echo", "smooth loop": "smooth", "smoother loop": "smooth", "smooth": "smooth", "smoother": "smooth",
+    "seamless": "smooth", "ping-pong": "smooth", "sparking": "embers", "sparky": "embers", "smouldering": "smoke", "smoldering": "smoke",
+    "sooty": "smoke", "shimmer": "shimmer", "shimmering": "shimmer", "heat haze": "shimmer", "wavering": "shimmer", "outlined": "outline",
+    "outline": "outline", "rim light": "outline", "rim-lit": "outline", "pulsing": "pulse", "pulse": "pulse", "throbbing": "pulse", "breathing": "pulse",
+    "grainy": "grain", "grain": "grain", "noisy": "grain", "dithered": "grain", "flicker": "flicker", "flickering": "flicker", "flickers": "flicker",
+    "guttering": "flicker", "dissolve": "dissolve",
+    "dissolving": "dissolve", "crumbling": "dissolve", "crumble": "dissolve", "burning away": "dissolve", "fading away": "dissolve", "icy": "ice",
+    "frosted": "ice", "frozen": "ice", "frosty": "ice", "crystalline": "ice", "rotten": "rot", "rotting": "rot", "rot": "rot", "miasmic": "rot",
+    "putrid": "rot", "festering": "rot", "sickly green": "rot",
+}
 SPELL_WORDS = {"fireball": "fireball", "ward": "ward", "drain": "soul_drain", "soul drain": "soul_drain", "shatter": "bone_shatter", "strike": "lightning_strike",
                "lightning strike": "lightning_strike", "bolt from": "lightning_strike", "frost nova": "frost_nova", "ice nova": "frost_nova",
                "fire wall": "fire_wall", "firewall": "fire_wall", "corpse": "corpse_burst", "corpse explosion": "corpse_burst", "spear hit": "bone_spear_hit"}
@@ -141,7 +158,22 @@ def draft_spell(text: str) -> dict:
     if re.search(r"\b(once|single|one[- ]shot|impact|hit)\b", t):
         sp["loop"] = False
         read.append("plays once")
+    looks = looks_from_words(t)
+    if looks:
+        sp["look"] = "+".join(looks)
+        read.append("look: " + ", ".join(looks))
     return {"what": "spell", "spell": sp, "read": read}
+
+
+def looks_from_words(text: str) -> list[str]:
+    """The looks (fxlook) a sentence asks for, in the order the words come, each once."""
+    t = text.lower()
+    hits = []
+    for w in sorted(LOOK_WORDS, key=len, reverse=True):
+        m = re.search(r"\b" + re.escape(w) + r"\b", t)
+        if m and not any(w in f for f, _ in hits):
+            hits.append((w, m.start()))
+    return list(dict.fromkeys(LOOK_WORDS[w] for w, _ in sorted(hits, key=lambda x: x[1])))
 
 
 # ---------------------------------------------------------------- skin edits

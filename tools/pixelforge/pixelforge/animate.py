@@ -14,6 +14,11 @@ many 16-bit games:
 Every effect only moves existing pixels or swaps them for other palette colors,
 so frames never introduce new colors or blur - they stay real pixel art.
 Effects are composable and each can be restricted to a box of the sprite.
+
+* **LookEffect** - a finishing look from :mod:`fxlook` (``"pulse"``, ``"echo:count=2"``,
+                 ``"ethereal"``...) run over the whole clip once the motion is done.
+                 Looks that add light extend the sprite's palette by their own colours
+                 (the clip stays palette-locked to that extended palette).
 """
 
 from __future__ import annotations
@@ -179,7 +184,20 @@ class Flicker:
         return out
 
 
-EFFECTS = {"sway": Sway, "breathe": Breathe, "bob": Bob, "flicker": Flicker}
+@dataclass
+class LookEffect:
+    """A look (fxlook) over the finished clip: ``LookEffect("echo:count=2,dx=0,dy=1")``. Per-frame it is the identity;
+    ``animate`` collects every LookEffect and runs them together at the end, in order."""
+
+    spec: str = "pulse"
+
+    reach = 0.0
+
+    def __call__(self, frame, t, ctx):
+        return frame
+
+
+EFFECTS = {"sway": Sway, "breathe": Breathe, "bob": Bob, "flicker": Flicker, "look": LookEffect}
 
 PRESETS: dict[str, list] = {
     "idle": [Breathe(1, pivot=0.45), Sway(1, anchor="top", box=(0, 0.45, 1, 1), wavelength=0.8)],
@@ -188,12 +206,18 @@ PRESETS: dict[str, list] = {
     "flame": [Sway(2, anchor="bottom", wavelength=0.5, cycles=2), Flicker(0.1, threshold=0.45)],
     "glow": [Flicker(0.1, threshold=0.55)],
     "grass": [Sway(2, anchor="bottom", box=(0, 0.75, 1, 1), wavelength=2.0, power=1.0)],
+    # presets with a look (these three keep the sprite's own colours; ethereal / ice / rot looks add theirs)
+    "pulse": [Breathe(1, pivot=0.45), LookEffect("pulse:depth=0.2")],
+    "haunt": [Bob(1.5), LookEffect("echo:count=2,decay=0.5,dx=0,dy=1,dim=1")],
+    "heat": [Sway(1, anchor="bottom", wavelength=0.6), LookEffect("shimmer:amplitude=1,wavelength=5")],
 }
 
 
 def parse_effect(spec: str):
-    """Parse ``"sway:amplitude=2,anchor=bottom,box=0;0.7;1;1"`` into an effect."""
+    """Parse ``"sway:amplitude=2,anchor=bottom,box=0;0.7;1;1"`` into an effect (``"look:echo:count=2"`` is a LookEffect)."""
     name, _, args = spec.partition(":")
+    if name == "look":
+        return LookEffect(args)
     if name not in EFFECTS:
         raise ValueError(f"unknown effect {name!r}; choose from {sorted(EFFECTS)}")
     kwargs = {}
@@ -218,11 +242,13 @@ def animate(
     frames: int = 8,
     *,
     palette: Palette | None = None,
+    looks=None,
 ) -> list[np.ndarray]:
     """Render ``frames`` looping RGBA frames of ``sprite`` with ``effects`` applied.
 
     Cutout sprites (with transparency) get a transparent margin so motion is
-    never clipped; every frame has the same size.
+    never clipped; every frame has the same size. ``looks`` (a look spec, see
+    fxlook) and any LookEffect among ``effects`` finish the clip at the end.
     """
     sprite = np.asarray(sprite)
     if sprite.shape[-1] == 3:
@@ -241,4 +267,9 @@ def animate(
         for effect in effects:
             frame = effect(frame, t, ctx)
         out.append(frame)
+    chain = [e.spec for e in effects if isinstance(e, LookEffect)] + ([looks] if isinstance(looks, str) else list(looks or []))
+    if chain:
+        from .fxlook import apply_looks
+
+        out, _info = apply_looks(out, chain, palette.colors, loop=True)
     return out
