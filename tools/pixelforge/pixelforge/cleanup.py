@@ -286,9 +286,10 @@ def unmix_background(rgba: np.ndarray, background=None) -> np.ndarray:
     return out
 
 
-def fill_bright_specks(rgba: np.ndarray, max_fraction: float = 0.002, l_min: float = 0.85, chroma_max: float = 0.05) -> np.ndarray:
-    """Small paper-white specks inside the figure (spray dots in a tattered hem, pockets the key missed) take the
-    colour of the paint around them instead of rendering as white. Only specks: a bright patch bigger than
+def fill_bright_specks(rgba: np.ndarray, max_fraction: float = 0.002, l_min: float = 0.85, chroma_max: float = 0.05, pop: float = 0.22) -> np.ndarray:
+    """Small pale specks inside the figure (spray dots in a tattered hem, pockets the key missed, grey dots a render
+    averaged from them) take the colour of the paint around them. A speck is low-chroma and either near paper-white
+    (L > l_min) or much lighter than its surroundings (L above the local median by ``pop``); a pale patch bigger than
     ``max_fraction`` of the figure is cloth (bone, paper charms) and stays."""
     from scipy import ndimage
 
@@ -300,7 +301,28 @@ def fill_bright_specks(rgba: np.ndarray, max_fraction: float = 0.002, l_min: flo
     if n_px == 0:
         return out
     lab = rgb_to_oklab(out[..., :3])
-    bright = a & (lab[..., 0] > l_min) & (np.hypot(lab[..., 1], lab[..., 2]) < chroma_max)
+    L = lab[..., 0]
+    Lm = np.where(a, L, np.nan)
+    med = ndimage.median_filter(np.nan_to_num(Lm, nan=0.0), size=9)
+    C = np.hypot(lab[..., 1], lab[..., 2])
+    low_chroma = C < chroma_max
+    bright = a & low_chroma & ((L > l_min) | ((L - med) > pop))
+    # grey dust on coloured cloth (a render's average of white specks and dark paint): neutral, lighter than its
+    # surroundings, where the surroundings themselves are coloured
+    medC = ndimage.median_filter(np.where(a, C, 0.0), size=9)
+    bright |= a & (C < 0.02) & (L > 0.35) & (medC > 0.045) & ((L - med) > 0.12)
+    # hem dust: at the bottom of each figure (the lowest 18% of its height) neutral grey on dark cloth is spray from
+    # the painting's floor edge, never cloth; frames in an atlas are separate figures, so each gets its own band
+    lab_f, nf = ndimage.label(a)
+    if nf:
+        hem = np.zeros_like(a)
+        for sl_i, sl in enumerate(ndimage.find_objects(lab_f)):
+            if sl is None:
+                continue
+            y0, y1 = sl[0].start, sl[0].stop
+            band_top = y0 + int((y1 - y0) * 0.82)
+            hem[band_top:y1, sl[1]] |= lab_f[band_top:y1, sl[1]] == sl_i + 1
+        bright |= hem & (C < 0.025) & (L > 0.3)
     envelope = ndimage.binary_fill_holes(ndimage.binary_closing(a, iterations=4))
     inner = ndimage.binary_erosion(envelope, iterations=2)
     cand = bright & inner
