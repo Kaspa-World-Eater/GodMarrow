@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import importlib.util
 import platform
 import shutil
 import sys
@@ -38,7 +39,6 @@ def run(project_dir: str | None = None) -> dict:
     row("animation library", lib.exists(), str(lib) if lib.exists() else "missing", "re-download tools/pixelforge/assets/animations")
     godot = shutil.which("godot") or shutil.which("godot4") or shutil.which("Godot")
     row("godot (optional)", True, godot or "not on PATH (only needed to run the game)")
-    import importlib.util
     row("bpy module (optional)", True, "present: Blender scripts can be tested in-process" if importlib.util.find_spec("bpy") else "absent (fine; Blender itself is used)")
     ok = all(r["ok"] for r in rows)
     return {"ok": ok, "rows": rows}
