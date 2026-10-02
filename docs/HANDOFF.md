@@ -589,3 +589,12 @@ on this fresh worktree with Godot 4.7.2 imported the project, ran under `xvfb-ru
 the chest and each held step re-draws them; the margin under 0.12 is what the thresholds give without freezing the
 breath. The holds are a half pixel laggier than before (a body may be drawn up to 1.5 px from its true place). The
 import step runs on every preview (seconds when the project is already imported).
+
+### 7.12 2026-10-02 (cloud session, near end of context)
+Main has the shape-sprite engine (67f3cec, 149 tests). The Forge app is being built to the approved mockup on
+`track/forgeapp` (worktree /home/user/wt/forgeapp; brief = docs/mockups/forge_app_v8.html + docs/track_notes/gui_look.md
+and the other track notes). If this session dies, whatever reached origin/track/forgeapp is the state: merge main into it,
+read its HANDOFF entry and docs/track_notes/forgeapp.md, run tests and the app's --screen/--shot hooks, then a
+builder/reviewer round against the mockup, then merge to main. After the app: the Keeper's second authoring pass
+(sharper limbs, readable skirt, more accents), then objects/effects/tiles through the engine (docs/PLAN.md phases).
+Godmarrow stays on hold.
