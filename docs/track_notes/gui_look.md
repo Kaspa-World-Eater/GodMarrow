@@ -133,3 +133,11 @@ in Settings; silent when reduced motion or mute is set.
   a clean fanned or ruled row in the text box area, large enough to read, one card per selector step, the selected
   card lifts one pixel with the blip, art on the cards drawn through the Forge's icon road in the game's palette.
   Mock it up first (docs/PLAN.md: mock first).
+
+## From the mockup round 3 (2026-10-02)
+Transitions are quick: the pixel dissolve is 4 steps each way at 24 fps (about a third of a second in all).
+Selecting plays a quick falling "shrink" blip and the selector flashes white-to-gold for three frames. The Forge's
+music plays in the app from the first interaction (a toggle in the title bar, volume in Settings): the dungeon-synth
+family (docs/track_notes/gui_look.md, music reference), rendered by music.py; the mockup carries a procedural
+in-browser stand-in (detuned pads in C# minor over a drone, breathing lowpass, sparse pentatonic bell sparkles
+through a long reverb) that states the intent.
