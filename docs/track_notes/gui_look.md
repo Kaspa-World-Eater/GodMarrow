@@ -78,3 +78,10 @@ The picture window shows the thing being made in a chosen pseudo-environment, sw
 crypt, moor, fen, snow, plain (neutral grey for colour checks), each with its own palette, light colour, floor
 pattern, fog and torch count, all animated. Later: the game's own zones rendered as backdrops, and a "day/night"
 hour knob, so a sprite is judged where it will live.
+
+## Controls (2026-10-02)
+Knobs are large and of the dungeon: iron levers in slotted brackets (value = handle height, a bone-and-gold grip),
+valve wheels (value = spoke angle) for angles and directions, chain pulls or toggles for on/off; drawn in 2-px pixel
+steps with a lit top edge and a dark cast; each with its name and its value under it in the text typeface; dragging a
+lever makes an iron scrape, a wheel a ratchet tick; double-click resets. Smaller fine values live in the Advanced fold
+as plain pixel sliders.
