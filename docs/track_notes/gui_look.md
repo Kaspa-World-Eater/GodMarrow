@@ -111,3 +111,7 @@ a path), crackle (lightning branches that re-draw each frame), smoke-lit (a haze
 how much it tints the model and the ground. The glow's shape also drives the light it casts: a flame lights above
 itself more than below, an orb evenly. These are the same generators the effects workbench uses (vfx kinds),
 attached to a solid, so a character's staff fire and a spell's fire are one thing.
+
+Controls are drawn as true pixel art (a tiny canvas per control, scaled up crisp): iron bracket with a lit top-left
+edge, a dark slot with ticks, rivets, a bar handle with a bone-gold grip; wheels with a dithered iron face, rim
+rivets and a gold spoke. No CSS gradients or anti-aliasing anywhere in the app.
