@@ -845,7 +845,7 @@ def frame_extent(puppets: dict[str, ViewPuppet]) -> float:
 
 
 def animate(puppets: dict[str, ViewPuppet], lib: JointLibrary, clips: list[str], out_dir: str | Path, *,
-            directions: list[str] | None = None, per_clip: int = 24, figure_px: int = 512, height: float = 1.8,
+            directions: list[str] | None = None, per_clip: int = 24, figure_px: float = 512, height: float = 1.8,
             elevation: float = 30.0, margin: float = 1.06, log=None) -> dict:
     """Every clip in every direction as PNG frames under ``out_dir/<clip>/<DIR>/frame_NNN.png`` plus the render
     manifest the Blender road writes (size, ppu, elevation, z_mid, fps per action), so pixelate and the exports

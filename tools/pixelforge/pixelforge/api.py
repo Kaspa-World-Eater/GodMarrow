@@ -858,7 +858,7 @@ def build_puppet(project: Project, name: str, facing: dict | None = None, log=No
 
 
 def animate_puppet(project: Project, name: str, clips: str | list[str] | None = None, directions: str | list[str] | None = None,
-                   per_clip: int | None = None, elevation: float = 30.0, figure_px: int | None = None, log=None) -> dict:
+                   per_clip: int | None = None, elevation: float = 30.0, figure_px: float | None = None, log=None) -> dict:
     """Pose the puppet with the motion library's joint tracks and draw every frame of every clip from every
     direction into ``renders/`` with the Blender road's manifest, so ``pixelate`` and the exports run unchanged.
     ``clips``: the forge clip names (default the game set); ``directions``: a subset of S SW W NW N NE E SE while
@@ -889,7 +889,10 @@ def animate_puppet(project: Project, name: str, clips: str | list[str] | None = 
         import math as _m
 
         painting_h = max(vp.skeleton["height"] for vp in pups.values())
-        figure_px = int(min(painting_h, max(round(2 * st.figure_height / _m.cos(_m.radians(elevation))), 96)))
+        k = 2
+        while k > 1 and k * st.figure_height / _m.cos(_m.radians(elevation)) > painting_h:
+            k -= 1
+        figure_px = max(k * st.figure_height / _m.cos(_m.radians(elevation)), 96.0)   # exact: pixelate's scale is then the whole number k
     out = project.sub(c.name, "renders")
     for old in out.iterdir():   # a clip rendered before (by either road) must not linger
         if old.is_dir():
