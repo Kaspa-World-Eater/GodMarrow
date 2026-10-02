@@ -95,11 +95,23 @@ def test_validate_reports_problems():
     good = {"size": [32, 32], "ground": 30, "shapes": [{"kind": "capsule", "a": [16, 4, 0], "b": [16, 28, 0], "r": 3, "material": "iron7"}]}
     assert S.validate(good) == []
     assert S.mode_of(good) == "solid"
+    # the sub-shapes of a union are checked too
+    union = {"size": [32, 32], "ground": 30, "shapes": [{"kind": "union", "name": "hood", "material": "cloth", "of": [
+        {"kind": "ellipsoid", "centre": [16, 10, 0], "radii": [5, 6, 5]}, {"kind": "capsule", "a": [16, 4, 0], "r": 3}, {"kind": "box", "centre": [1, 1, 1], "half": [1, 1, 1], "material": "nothing"}]}]}
+    problems = S.validate(union)
+    assert len(problems) == 2 and all("hood" in p and "of[" in p for p in problems)
+    assert S.validate({"size": [32, 32], "ground": 30, "shapes": [{"kind": "union", "of": []}]})
+    # hang is a fraction
+    assert S.validate({**good, "parts": {"skirt": {"bone": "hips", "hang": 3}}})
+    assert S.validate({**good, "shapes": [{**good["shapes"][0], "hang": -1}]})
+    assert S.validate({**good, "parts": {"skirt": {"bone": "hips", "hang": 0.25}}}) == []
 
 
 def test_shipped_files_validate(necro, necro3d, keeper):
     for doc in (necro, necro3d, keeper):
         assert S.validate(doc) == []
+    for name in ("chest", "skull", "dead_tree"):
+        assert S.validate(S.load_shapes(ASSETS / "objects" / f"{name}.shapes.json")) == []
     r = T.validate_file(ASSETS / "characters" / "keeper.shapes.json")
     assert r["ok"] and r["mode"] == "solid" and r["shapes"] >= 40 and "head" in r["bones"] and r["unbound_shapes"] == []
 
@@ -206,16 +218,80 @@ def test_binding_a_known_pose_gives_the_expected_pivot_and_rotation(tracks):
     assert np.allclose(moved, head + Rz @ (tail - head), atol=1e-9)         # the tail swings about it
 
 
-def test_idle_frames_are_stable_and_walk_feet_stay_on_the_ground(keeper, tracks):
-    model = S.Model(keeper, 76 / 120)
-    idle = R.render_clip(keeper, "idle", "S", tracks=tracks, model=model, scale=76 / 120, max_frames=12)
-    arr = np.stack(idle["frames"]).astype(int)
-    change = np.mean([np.any(arr[i] != arr[i + 1], axis=-1).mean() for i in range(len(arr) - 1)])
-    assert change < 0.08                                                   # a breathing idle, not a shimmer
-    walk = R.render_clip(keeper, "walk", "E", tracks=tracks, model=model, scale=76 / 120, max_frames=16)
-    lowest = {int(np.nonzero(f[..., 3] > 0)[0].max()) for f in walk["frames"]}
-    assert len(lowest) <= 2                                                # the planted foot holds the ground line
-    assert walk["fps"] == pytest.approx(24 * 16 / tracks.frames("walk"))
+def _no_shadow(doc):
+    d = dict(doc); d["shadow"] = None
+    return d
+
+
+def test_idle_frames_do_not_shimmer(keeper, tracks):
+    """At the clip's own frame rate, few of the figure's own pixels change from one idle frame to the next, and almost
+    none change and change straight back (the sparkle of a re-rolled voxel pick or a sliding dither)."""
+    doc = _no_shadow(keeper)
+    model = S.Model(doc, 1.0)
+    for d in ("S", "E"):
+        idle = R.render_clip(doc, "idle", d, tracks=tracks, model=model)
+        arr = np.stack(idle["frames"]).astype(int)
+        assert len(arr) == tracks.frames("idle")
+        opaque = (arr[:-1, ..., 3] > 0) | (arr[1:, ..., 3] > 0)
+        change = np.any(arr[:-1] != arr[1:], axis=-1) & opaque
+        sparkle = np.any(arr[:-2] != arr[1:-1], axis=-1) & np.all(arr[:-2] == arr[2:], axis=-1) & opaque[:-1]
+        assert change.sum() / opaque.sum() < 0.12, d
+        assert sparkle.sum() / opaque[:-1].sum() < 0.03, d
+
+
+def test_walk_feet_stay_on_the_ground_and_the_shadow_never_moves(keeper, tracks):
+    doc = _no_shadow(keeper)
+    model = S.Model(doc, 76 / 120)
+    for d in ("E", "W"):
+        walk = R.render_clip(doc, "walk", d, tracks=tracks, model=model, scale=76 / 120, max_frames=16)
+        lowest = [int(np.nonzero(f[..., 3] > 0)[0].max()) for f in walk["frames"]]
+        assert max(lowest) - min(lowest) <= 1, (d, lowest)                 # the planted foot holds the ground line
+        assert walk["fps"] == pytest.approx(24 * 16 / tracks.frames("walk"))
+    with_shadow = R.render_clip(keeper, "walk", "E", tracks=tracks, model=S.Model(keeper, 76 / 120), scale=76 / 120, max_frames=8)
+    shadow_rows = {int(np.nonzero(f[..., 3] > 0)[0].max()) for f in with_shadow["frames"]}
+    assert len(shadow_rows) == 1                                           # the contact shadow is the lowest thing and it stays put
+    assert next(iter(shadow_rows)) >= max(lowest)
+
+
+def test_every_frame_is_one_piece(keeper, tracks):
+    """Idle, walk, run, attack and death in all eight directions: the figure never breaks into separate pieces (a foot
+    stepping out from under a skirt, a hat lifting off a fast head)."""
+    from scipy import ndimage
+
+    doc = _no_shadow(keeper)
+    clips = ("idle", "walk", "run", "attack", "death")
+    model = S.Model(doc, 1.0, width=R.canvas_width(doc, clips, tracks))
+    for clip in clips:
+        for d in R.DIRECTIONS:
+            res = R.render_clip(doc, clip, d, tracks=tracks, model=model, max_frames=8)
+            for i, fr in enumerate(res["frames"]):
+                labels, n = ndimage.label(fr[..., 3] > 0)
+                sizes = ndimage.sum(np.ones_like(labels), labels, range(1, n + 1))
+                assert int((np.asarray(sizes) >= 12).sum()) == 1, (clip, d, i)
+                assert not fr[:, 0, 3].any() and not fr[:, -1, 3].any(), (clip, d, i)    # and stays inside the canvas
+
+
+def test_hang_and_lag_keep_parts_on_the_body(keeper, tracks):
+    """damp_tilt keeps a bone's turn and drops its tilt; a lagged hem is never dragged further than a tenth of its height."""
+    tilt = R.rot_x(40.0)
+    assert np.allclose(R.damp_tilt(tilt, 0.0), np.eye(3), atol=1e-9)
+    assert np.allclose(R.damp_tilt(tilt, 1.0), tilt)
+    turned = R.rodrigues(np.array([0.0, 1.0, 0.0]), math.radians(90)) @ tilt
+    assert np.allclose(R.damp_tilt(turned, 0.0) @ np.array([0.0, 1.0, 0.0]), [0.0, 1.0, 0.0], atol=1e-9)
+    assert np.allclose(R.damp_tilt(turned, 0.0)[:, 0], [0.0, 0.0, -1.0], atol=1e-9) or np.allclose(R.damp_tilt(turned, 0.0)[:, 0], [0.0, 0.0, 1.0], atol=1e-9)
+    model = S.Model(keeper, 1.0)
+    skel = R.skeleton_for(keeper, tracks)
+    poser = R.Poser(model, skel, "attack")
+    lagged = 0
+    for t in range(0, tracks.frames("attack"), 2):
+        for pi, mo in poser.transforms(float(t)).items():
+            if mo.drag is not None:
+                lagged += 1
+                assert np.linalg.norm(mo.drag) <= 0.1 * (mo.y1 - mo.y0) + 1e-6
+    assert lagged > 10
+    hat = next(p for p in model.prims if p.name == "hat")
+    drag = poser.transforms(8.0)[hat.index].drag
+    assert np.linalg.norm(drag) <= 0.1 * (hat.bbox[1][1] - hat.bbox[0][1]) + 1e-6 and np.linalg.norm(drag) < 4.0   # the hat stays on a fast head
 
 
 def test_eight_directions_are_different_views(keeper, tracks):
@@ -234,6 +310,42 @@ def test_flat_rig_moves_parts(necro, tracks):
     assert np.any(a != b)
     back = R.render_clip(necro, "idle", "N", tracks=tracks, max_frames=1)["frames"][0]
     assert back.shape == a.shape
+    # a loose part follows its parent's bone late
+    skel = R.skeleton_for(necro, tracks)
+    doc = dict(necro); doc["parts"] = {"robe": {"bone": "spine.001"}, "hem": {"parent": "robe", "lag": 3}, "now": {"parent": "robe", "lag": 0}}
+    tf = R.flat_transforms(doc, skel, "walk", 6.0, "S")
+    assert tf["now"][1:3] == tf["robe"][1:3] and tf["hem"][1:3] != tf["robe"][1:3]
+
+
+def test_death_gets_a_wider_canvas(keeper, tracks):
+    assert R.canvas_width(keeper, ["idle", "walk"], tracks) == keeper["size"][0]
+    wide = R.canvas_width(keeper, ["death"], tracks)
+    assert wide > keeper["size"][0] + 40
+    model = S.Model(keeper, 0.5, width=wide)
+    assert model.W == round(wide * 0.5) and model.H == round(keeper["size"][1] * 0.5)
+    fr = R.render_clip(_no_shadow(keeper), "death", "E", tracks=tracks, model=model, scale=0.5, max_frames=4, square=True)["frames"][-1]
+    assert fr.shape[0] == fr.shape[1] == model.W and (fr[..., 3] > 0).sum() > 500
+
+
+def test_objects_export_with_foot_anchors(tmp_path):
+    chest = S.load_shapes(ASSETS / "objects" / "chest.shapes.json")
+    oj = tmp_path / "art" / "objects" / "objects.json"
+    oj.parent.mkdir(parents=True)
+    oj.write_text(json.dumps({"statue0": {"png": "res://art/objects/statue0.png", "ox": 48, "oy": 50, "hr": 2}}))
+    r = T.export_object(chest, tmp_path / "art" / "objects" / "chest", directions=("S", "SE", "E"), game_objects=oj)
+    assert r["ok"] and set(r["views"]) == {"S", "SE", "E"}
+    data = json.loads(oj.read_text())
+    assert set(data) == {"statue0", "chest", "chest_SE", "chest_E"}
+    e = data["chest"]
+    assert e["png"] == "res://art/objects/chest/chest_S.png" and e["hr"] == 2
+    im = Image.open(tmp_path / "art" / "objects" / "chest" / "chest_S.png")
+    w, h = im.size
+    assert 0 < e["ox"] < w and h - 12 <= e["oy"] <= h + 2                   # the foot point is on the bottom edge, under the middle
+    assert (tmp_path / "art" / "objects" / "chest" / "chest.png").exists() and (tmp_path / "art" / "objects" / "chest" / "chest.json").exists()
+    arr = np.asarray(im)
+    assert arr[..., 3].any(axis=1).all() and arr[..., 3].any(axis=0).all()   # trimmed
+    r2 = T.still(S.load_shapes(ASSETS / "objects" / "skull.shapes.json"), tmp_path / "skull.png", direction="SE", game_objects=oj, name="skull_se")
+    assert r2["ok"] and json.loads(oj.read_text())["skull_se"]["oy"] == int(round(r2["anchor"][1]))
 
 
 # ------------------------------------------------------------------------------------------------ files, pipeline, export
@@ -248,7 +360,8 @@ def test_render_set_writes_the_frames_layout_and_export_game_reads_it(keeper, tm
     manifest = json.loads((out / "manifest.json").read_text())
     g = export_godmarrow(out, manifest, tmp_path / "game", "keeper_shapes", max_frames=16)
     data = json.loads(Path(g["color"]["json"]).read_text())
-    assert set(data["meta"]["anims"]) == {"idle", "walk"} and data["meta"]["anims"]["walk"]["views"] == ["side", "down"] or data["meta"]["anims"]["walk"]["views"] == ["down", "side"]
+    assert set(data["meta"]["anims"]) == {"idle", "walk"} and (data["meta"]["anims"]["walk"]["views"] == ["side", "down"] or data["meta"]["anims"]["walk"]["views"] == ["down", "side"])
+    assert manifest["elevation"] == 0.0 and manifest["view_elevation"] == 12 and "camera 12 deg" in data["meta"]["scale"]
     k, x, y, w, h, dx, dy = data["idx"]["idle/down/0"]
     assert abs(dy + h) <= 8 and -r["size"] // 2 < dx < 0                  # the frame's bottom sits on the ground anchor, the figure astride it
     assert data["meta"]["fps"]["walk"] == pytest.approx(r["fps"]["walk"], abs=0.1)
@@ -302,6 +415,8 @@ def test_cli_shapes_commands(tmp_path, capsys):
     assert "ok" in capsys.readouterr().out
     main(["shapes", "still", str(ASSETS / "necromancer.shapes.json"), "-o", str(tmp_path / "n.png"), "--frame", "40"])
     assert (tmp_path / "n.png").exists()
+    main(["shapes", "object", str(ASSETS / "objects" / "skull.shapes.json"), "-o", str(tmp_path / "objs"), "--directions", "S,E", "--game-objects", str(tmp_path / "objs" / "objects.json")])
+    assert (tmp_path / "objs" / "skull_E.png").exists() and "skull_E" in json.loads((tmp_path / "objs" / "objects.json").read_text())
     main(["shapes", "preview", str(ASSETS / "characters" / "keeper.shapes.json"), "--clip", "idle", "--direction", "E", "--frames", "3", "--style", "rendered_arpg", "-o", str(tmp_path / "k.gif")])
     assert (tmp_path / "k.gif").exists()
     capsys.readouterr()

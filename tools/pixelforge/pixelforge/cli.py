@@ -507,7 +507,7 @@ def cmd_describe(a) -> None:
 
 
 def cmd_shapes(a) -> None:
-    """pixelforge shapes render|preview|sheet|still|turntable|validate|template|draft|joints"""
+    """pixelforge shapes render|preview|sheet|still|object|turntable|validate|template|draft|joints"""
     from . import shape_rig, shape_tools, shapes as S
 
     sub = a.shapes_cmd
@@ -583,8 +583,18 @@ def cmd_shapes(a) -> None:
         _emit(a, r) if a.json else print(f"{r['sheet']}: {r['rows']} rows x {r['columns']} frames")
     elif sub == "still":
         r = shape_tools.still(doc, a.out, frame=a.frame, direction=a.direction.upper(), style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style",
-                              elevation=a.elevation, zoom=a.zoom, passes=a.passes)
-        _emit(a, r) if a.json else print(f"{r['png']} ({r['size'][0]}x{r['size'][1]})")
+                              elevation=a.elevation, zoom=a.zoom, passes=a.passes, game_objects=a.game_objects, name=a.name, hr=a.hr)
+        _emit(a, r) if a.json else print(f"{r['png']} ({r['size'][0]}x{r['size'][1]}, foot anchor {r['anchor']})" + (f"; objects.json entry {r['game_objects']['key']}" if a.game_objects else ""))
+    elif sub == "object":
+        dirs = [d.strip().upper() for d in a.directions.split(",")] if a.directions else ["S"]
+        r = shape_tools.export_object(doc, a.out, a.name, directions=dirs, style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style",
+                                      elevation=a.elevation, frame=a.frame, game_objects=a.game_objects, hr=a.hr)
+        if a.json:
+            _emit(a, r)
+        else:
+            views = ", ".join("%s %dx%d anchor (%d, %d)" % (d, v["size"][0], v["size"][1], v["ox"], v["oy"]) for d, v in r["views"].items())
+            added = ("; objects.json: " + ", ".join(r["game_objects"]["added"])) if a.game_objects else ""
+            print(f"{r['name']}: {views} -> {r['dir']}{added}")
     elif sub == "turntable":
         r = shape_tools.turntable(doc, a.out, frames=a.frames or 48, style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style", elevation=a.elevation, zoom=a.zoom)
         _emit(a, r) if a.json else print(f"{r['gif']} ({r['frames']} views) and {r['views']}")
@@ -931,8 +941,14 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--clip", default="idle"); x.add_argument("--direction", default="S"); x.add_argument("-o", "--out", default=None)
     x = ss.add_parser("sheet", help="a contact sheet: a row per clip and direction"); _render_args(x)
     x.add_argument("-o", "--out", required=True); x.add_argument("--clips", default=None); x.add_argument("--directions", default=None); x.add_argument("--columns", type=int, default=8)
-    x = ss.add_parser("still", help="one frame of the file (its own animation rules, no clip)"); _render_args(x)
+    x = ss.add_parser("still", help="one frame of the file (its own animation rules, no clip); with --game-objects also an objects.json entry"); _render_args(x)
     x.add_argument("-o", "--out", required=True); x.add_argument("--frame", type=int, default=0); x.add_argument("--direction", default="S"); x.add_argument("--passes", action="store_true")
+    x.add_argument("--game-objects", dest="game_objects", default=None, metavar="OBJECTS_JSON", help="add the PNG to the game's art/objects/objects.json (png, ox, oy, hr)")
+    x.add_argument("--name", default=None, help="the objects.json key (default: the file's name)"); x.add_argument("--hr", type=float, default=2.0, help="texels per world px (2 for the game's objects)")
+    x = ss.add_parser("object", help="a file as a game object: trimmed PNGs with foot anchors per direction, <name>.json, optional objects.json entries"); _render_args(x)
+    x.add_argument("-o", "--out", required=True, help="the folder to write into (e.g. the game's art/objects)"); x.add_argument("--name", default=None)
+    x.add_argument("--directions", default=None, help="comma list (default S); the first is also written as <name>.png"); x.add_argument("--frame", type=int, default=0)
+    x.add_argument("--game-objects", dest="game_objects", default=None, metavar="OBJECTS_JSON"); x.add_argument("--hr", type=float, default=2.0)
     x = ss.add_parser("turntable", help="a solid file spinning through 48 views (GIF) plus its 8 game views"); _render_args(x); x.add_argument("-o", "--out", required=True)
     x = ss.add_parser("validate", help="check a .shapes.json and summarise it"); x.add_argument("file"); x.add_argument("--json", action="store_true")
     x = ss.add_parser("template", help="the author pose (bone heads and tails) for a figure height, to draw shapes around")

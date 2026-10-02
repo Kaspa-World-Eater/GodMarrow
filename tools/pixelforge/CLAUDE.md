@@ -16,7 +16,8 @@ Blender + Mixamo → 8-direction renders → palette-locked pixel frames → God
   flat masks and solid signed-distance shapes, one set of shading rules),
   `shape_rig.py` (bones from the motion clips, lag, ground lock, 8 directions),
   `shape_tools.py` (frame sets, GIFs, sheets), `joints.py` (numpy glTF reader,
-  `assets/animations/joints.json.gz`); files under `assets/shapes/`. Scripts that run
+  `assets/animations/joints.json.gz`); files under `assets/shapes/` (characters, objects, the
+  material library); the procedure for a session is the game repository's `docs/GUIDE_SESSION.md`. Scripts that run
   inside Blender live in `pixelforge/blender/` and must stay free of Pillow.
 - **Tests:** `pytest`. Blender scripts are only import-safe under Blender;
   `tests/test_blender_scripts.py` runs them when the `bpy` module is available.

@@ -6,8 +6,11 @@ height, arms lowered to hang at the sides, placed on the file's ground line and 
 it takes the joints' world transforms from the exported tracks (:mod:`pixelforge.joints`), converts them to file
 units (y down, the character facing the viewer) and gives each shape the rigid motion that carries its bone from
 the author pose to the clip pose. Loose parts (cloth, cords, a hat, a ribbon) take their bone's transform a few
-frames late and shear with the bone's velocity and the clip's travel, so hems trail the body. The lowest planted
-foot is held on the ground line. The renderer then z-buffers the moved shell, so draw order, contours, outline,
+frames late and shear with the bone's velocity and the clip's travel, so hems trail the body; the trailing is
+capped at a fraction of the part's height and fades out when the bone is nearly still, so a fast bone never carries
+a hem away from the body and a resting part never drifts under a pixel. A hanging part (``hang`` below 1) takes its
+bone's position and turn but only that fraction of its tilt, so a skirt hangs from the hips instead of swinging with
+the pelvis. The lowest planted foot is held on the ground line. The renderer then z-buffers the moved shell, so draw order, contours, outline,
 lights and the shadow come out right in every one of the eight directions.
 
 A flat file (the 2D path) binds its ``parts`` (groups of shapes with a pivot) to bones the same way, in the
@@ -32,7 +35,8 @@ GROUND_LOCK = {"idle", "walk", "run", "sprint", "attack", "cast", "hit", "punch"
                "crouch", "crouch_walk", "torch_idle", "walk_hunched", "interact", "dance"}
 DRIFT = {"walk": 0.5, "walk_hunched": 0.5, "run": 1.0, "sprint": 1.4, "crouch_walk": 0.3, "roll": 1.0}   # travel per frame at 120 px (the clips are in place)
 ARM_CHAIN = ("upper_arm", "forearm", "hand")
-DEFAULT_LAG = {"frames": 2, "sway": 0.6}
+DEFAULT_LAG = {"frames": 2, "sway": 0.6, "max": 0.1}
+LAG_STILL, LAG_MOVING = 0.1, 0.4           # bone speed (units per frame) below which a lag fades out, above which it is whole
 
 
 def rot_z(deg: float) -> np.ndarray:
@@ -43,6 +47,31 @@ def rot_z(deg: float) -> np.ndarray:
 def rot_x(deg: float) -> np.ndarray:
     c, s = math.cos(math.radians(deg)), math.sin(math.radians(deg))
     return np.array([[1, 0, 0], [0, c, -s], [0, s, c]], float)
+
+
+def rodrigues(axis: np.ndarray, ang: float) -> np.ndarray:
+    """The rotation of ``ang`` radians about the unit vector ``axis``."""
+    K = np.array([[0, -axis[2], axis[1]], [axis[2], 0, -axis[0]], [-axis[1], axis[0], 0]], float)
+    return np.eye(3) + math.sin(ang) * K + (1 - math.cos(ang)) * (K @ K)
+
+
+def damp_tilt(R: np.ndarray, hang: float) -> np.ndarray:
+    """``R`` with its tilt (how far it turns the vertical axis) scaled by ``hang``: 1 keeps the bone's whole rotation,
+    0 keeps only its turn about the vertical, so a garment hangs from its joint instead of swinging with the pelvis
+    or the chest."""
+    hang = float(hang)
+    if hang >= 1.0:
+        return R
+    up = np.array([0.0, 1.0, 0.0])
+    v = R @ up
+    ang = math.acos(float(np.clip(v[1], -1.0, 1.0)))
+    axis = np.cross(up, v)
+    n = float(np.linalg.norm(axis))
+    if ang < 1e-6 or n < 1e-9:
+        return R
+    axis = axis / n
+    yaw = rodrigues(axis, ang).T @ R           # R = tilt @ yaw, and yaw keeps the vertical fixed
+    return rodrigues(axis, ang * max(hang, 0.0)) @ yaw
 
 
 def aim(R: np.ndarray, new_dir: np.ndarray) -> np.ndarray:
@@ -145,20 +174,26 @@ def skeleton_for(doc: dict, tracks: JointTracks | None = None) -> Skeleton:
 
 
 # ---------------------------------------------------------------------------------------------- binding
-def _bone_and_lag(spec: dict, parts: dict) -> tuple[str | None, dict | None]:
+def _bone_and_lag(spec: dict, parts: dict) -> tuple[str | None, dict | None, float]:
+    """A shape's bone, its lag (``{"frames", "sway", "max"}`` or None) and its hang (1 = rigid), from the shape or its part."""
     part = parts.get(spec.get("part"), {}) if spec.get("part") else {}
     bone = spec.get("bone", part.get("bone"))
     lag = spec.get("lag", part.get("lag"))
     if lag is True:
         lag = dict(DEFAULT_LAG)
-    return bone, lag
+    hang = float(spec.get("hang", part.get("hang", 1.0)))
+    return bone, lag, hang
 
 
 class Poser:
     """Per-frame transforms of a solid model's shapes for one clip, with lag, sway, drift and the ground lock."""
 
-    def __init__(self, model: S.Model, skel: Skeleton, clip: str, lock: bool | None = None):
+    def __init__(self, model: S.Model, skel: Skeleton, clip: str, lock: bool | None = None, view: tuple[float, float] | None = None):
+        """``view`` is (phi, elevation) of the render; with it the ground lock works on the screen: the lowest foot pixel
+        lands on one row in every frame, as a drawn sprite's would, whichever foot is planted and however far forward
+        it is (at an elevation a forward foot projects lower). Without it the lock holds the feet in file units."""
         self.model, self.skel, self.clip = model, skel, clip
+        self.view = view
         if not skel.t.has(clip):
             raise ValueError(f"unknown clip {clip!r}; the library has {skel.t.clips}")
         self.n_src = skel.t.frames(clip)
@@ -170,6 +205,31 @@ class Poser:
         toes = [skel.index[n] for n in ("toe.L", "toe.R") if n in skel.index]
         self.toes = toes
         self.author_sole = float(max(skel.pos[j][1] for j in toes)) if toes else skel.ground
+        # the ground lock holds the lowest point of the foot shapes themselves (the toe joint sits inside a foot that
+        # overhangs it and pitches), or the toe joints when the file has no feet
+        self.feet: list[tuple[str, float, np.ndarray, np.ndarray]] = []
+        for p in model.prims:
+            bone, _, hang = _bone_and_lag(p.spec, self.parts)
+            if bone and bone.split(".")[0] in ("foot", "toe") and bone in skel.index:
+                vox = model.shell.pos[model.shell.prim == p.index]
+                if len(vox):
+                    self.feet.append((bone, hang, self._pivot(p), vox))
+        self.author_low = float(max(self._screen_low(v) for _, _, _, v in self.feet)) if self.feet else self.author_sole
+        self._shifts: dict[float, float] = {}
+
+    def _screen_low(self, vox: np.ndarray) -> float:
+        """The lowest point of voxels as the view sees it, in file units of screen height (plain y without a view)."""
+        if not self.view:
+            return float(vox[:, 1].max())
+        phi, elev = self.view
+        cx, cz = self.skel.cx, self.skel.cz
+        zr = -(vox[:, 0] - cx) * math.sin(phi) + (vox[:, 2] - cz) * math.cos(phi)
+        return float(((vox[:, 1] - self.skel.ground) * math.cos(math.radians(elev)) + zr * math.sin(math.radians(elev))).max())
+
+    @staticmethod
+    def _pivot(p) -> np.ndarray:
+        """Where a hanging shape attaches: the top centre of its box in the author pose."""
+        return np.array([(p.bbox[0][0] + p.bbox[1][0]) / 2, p.bbox[0][1], (p.bbox[0][2] + p.bbox[1][2]) / 2])
 
     def pose(self, t: float):
         key = round(t, 4)
@@ -178,36 +238,78 @@ class Poser:
         return self._poses[key]
 
     def ground_shift(self, t: float) -> float:
-        if not self.lock or not self.toes:
+        """How far down (+) the whole figure moves this frame so its lowest foot pixel sits on the ground line."""
+        if not self.lock or not (self.toes or self.feet):
             return 0.0
-        pos, _ = self.pose(t)
-        return self.author_sole - float(max(pos[j][1] for j in self.toes))
+        key = round(t, 4)
+        if key not in self._shifts:
+            if self.feet:
+                low = -1e9
+                for bone, hang, piv, vox in self.feet:
+                    R, tr = self.bone_delta(bone, t, 0.0, hang, piv)
+                    low = max(low, self._screen_low(vox @ R.T + tr))
+                ce = math.cos(math.radians(self.view[1])) if self.view else 1.0
+                self._shifts[key] = (self.author_low - low) / max(ce, 0.2)
+            else:
+                pos, _ = self.pose(t)
+                self._shifts[key] = self.author_sole - float(max(pos[j][1] for j in self.toes))
+        return self._shifts[key]
 
-    def bone_delta(self, bone: str, t: float, shift: float = 0.0) -> tuple[np.ndarray, np.ndarray]:
+    def bone_delta(self, bone: str, t: float, shift: float = 0.0, hang: float = 1.0, pivot: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
+        """(R, t) carrying ``bone`` from the author pose to the clip pose at ``t``, the ground shift added. With ``hang``
+        below 1 the bone's tilt is damped and the shape hangs from ``pivot`` (its attachment point, in the author
+        pose; the bone's head when not given), which follows the bone rigidly. The damping fades as the bone lies
+        down: cloth hangs from an upright body and lies along a fallen one."""
         pos, rot = self.pose(t)
-        R, tr = self.skel.delta(self.skel.index[bone], pos, rot)
+        j = self.skel.index[bone]
+        R = rot[j] @ self.skel.rot[j].T
+        tr = pos[j] - R @ self.skel.pos[j]
+        if hang < 1.0:
+            upright = float(np.clip((R @ np.array([0.0, 1.0, 0.0]))[1], 0.0, 1.0))
+            Rh = damp_tilt(R, hang + (1.0 - hang) * (1.0 - upright))
+            piv = self.skel.pos[j] if pivot is None else np.asarray(pivot, float)
+            tr = (R @ piv + tr) - Rh @ piv
+            R = Rh
         return R, tr + np.array([0.0, shift, 0.0])
 
+    def speed(self, bone: str, t: float) -> float:
+        """How far the bone's head moves in this frame, in file units."""
+        j = self.skel.index[bone]
+        return float(np.linalg.norm(self.pose(t)[0][j] - self.pose(t - 1)[0][j]))
+
     def transforms(self, t: float) -> dict:
+        """Every bound shape's :class:`Motion` at frame ``t``. A loose part gets a drag vector its hem follows: where
+        its bone's late pose puts the hem, plus the bone's velocity times ``sway`` and the clip's travel, faded out
+        while the bone is nearly still (under :data:`LAG_STILL` units a frame) and capped at ``max`` (0.1) of the
+        part's height, so a hat stays on a fast head and a skirt never leaves the hips."""
         shift = self.ground_shift(t)
         out = {}
         for p in self.model.prims:
-            bone, lag = _bone_and_lag(p.spec, self.parts)
+            bone, lag, hang = _bone_and_lag(p.spec, self.parts)
             if not bone or bone not in self.skel.index:
                 continue
-            R, tr = self.bone_delta(bone, t, shift)
-            if lag:
-                tl = t - float(lag.get("frames", 2))
-                if not self.loop:
-                    tl = max(tl, 0.0)
-                R1, t1 = self.bone_delta(bone, tl, shift)
-                sway = float(lag.get("sway", 0.6))
-                j = self.skel.index[bone]
-                v = self.pose(t)[0][j] - self.pose(t - 1)[0][j]
-                d = -v * sway * np.array([1.0, 0.5, 1.0]) + np.array([0.0, 0.0, -self.drift * sway])
-                out[p.index] = S.Motion(R, tr, R1, t1, d, float(p.bbox[0][1]), float(p.bbox[1][1]))
-            else:
+            piv = self._pivot(p) if hang < 1.0 else None
+            R, tr = self.bone_delta(bone, t, shift, hang, piv)
+            if not lag:
                 out[p.index] = S.Motion(R, tr)
+                continue
+            y0, y1 = float(p.bbox[0][1]), float(p.bbox[1][1])
+            tl = t - float(lag.get("frames", 2))
+            if not self.loop:
+                tl = max(tl, 0.0)
+            R1, t1 = self.bone_delta(bone, tl, shift, hang, piv)
+            hem = np.array([(p.bbox[0][0] + p.bbox[1][0]) / 2, y1, (p.bbox[0][2] + p.bbox[1][2]) / 2])
+            j = self.skel.index[bone]
+            v = self.pose(t)[0][j] - self.pose(t - 1)[0][j]
+            k = float(np.clip((np.linalg.norm(v) - LAG_STILL) / (LAG_MOVING - LAG_STILL), 0.0, 1.0))
+            sway = float(lag.get("sway", 0.6))
+            d = ((R1 @ hem + t1) - (R @ hem + tr)) * k - v * sway * np.array([1.0, 0.5, 1.0]) * k
+            d = d + np.array([0.0, 0.0, -self.drift * sway])
+            lim = float(lag.get("max", DEFAULT_LAG["max"])) * max(y1 - y0, 1.0)
+            n = float(np.linalg.norm(d))
+            if n > lim:
+                d = d * (lim / n)
+            out[p.index] = S.Motion(R, tr, R, tr, d, y0, y1)
         return out
 
     def point(self, spec: dict, t: float, transforms: dict) -> np.ndarray | None:
@@ -245,6 +347,37 @@ class Poser:
         return anchors, effects, lights
 
 
+def canvas_width(doc: dict, clips, tracks: JointTracks | None = None) -> float:
+    """The canvas width (file units) that keeps the figure inside the frame through ``clips`` in every direction: the
+    farthest any joint gets from the body axis, plus the room the file's own canvas leaves round the author pose
+    (the hat, a held staff). The file's width when the clips stay within it."""
+    tracks = tracks or load_joints()
+    skel = skeleton_for(doc, tracks)
+    cx, cz = skel.cx, skel.cz
+    parts = doc.get("parts") or {}
+    # how far each bone's own shapes reach from its head in the author pose (the hat round the head, a skirt round the hips)
+    margin: dict[int, float] = {}
+    for i, spec in enumerate(doc["shapes"]):
+        bone, _, _ = _bone_and_lag(spec, parts)
+        if not bone or bone not in skel.index or spec.get("carve"):
+            continue
+        j = skel.index[bone]
+        lo, hi = S.Prim(spec, i, (cx, cz)).bbox
+        corners = np.array([[x, y, z] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])])
+        margin[j] = max(margin.get(j, 0.0), float(np.max(np.linalg.norm(corners - skel.pos[j], axis=1))))
+    if not margin:
+        return float(doc["size"][0])
+    js = np.array(sorted(margin)); ms = np.array([margin[j] for j in js])
+    reach = 0.0
+    for clip in clips:
+        if not tracks.has(clip):
+            continue
+        for t in range(tracks.frames(clip)):
+            pos, _ = skel.clip_pose(clip, float(t))
+            reach = max(reach, float(np.max(np.hypot(pos[js, 0] - cx, pos[js, 2] - cz) + ms)))
+    return float(max(doc["size"][0], 2 * math.ceil(reach + 2)))
+
+
 def frame_times(n_src: int, n_out: int | None, loop: bool) -> list[float]:
     """Evenly spaced source times for ``n_out`` frames (the whole clip, at most ``n_out`` frames)."""
     if not n_out or n_out >= n_src:
@@ -256,9 +389,10 @@ def frame_times(n_src: int, n_out: int | None, loop: bool) -> list[float]:
 
 def render_clip(doc: dict, clip: str, direction: str = "S", *, tracks: JointTracks | None = None, model: S.Model | None = None,
                 scale: float = 1.0, steps: int | None = None, outline="auto", elevation: float | None = None, max_frames: int | None = None,
-                square: bool = False, passes: bool = False, lock: bool | None = None) -> dict:
+                square: bool | int = False, passes: bool = False, lock: bool | None = None) -> dict:
     """Every frame of one clip facing one direction. Returns ``{"frames": [rgba, ...], "fps": f, "times": [...], "normal": [...],
-    "depth": [...]}``; the fps keeps the clip's real duration when it was thinned to ``max_frames``."""
+    "depth": [...]}``; the fps keeps the clip's real duration when it was thinned to ``max_frames``. ``square`` pads
+    each frame to a square canvas (True: the larger side; a number: that side) with the ground kept at the bottom."""
     tracks = tracks or load_joints()
     if direction not in DIRECTIONS:
         raise ValueError(f"direction {direction!r} not in {list(DIRECTIONS)}")
@@ -267,8 +401,8 @@ def render_clip(doc: dict, clip: str, direction: str = "S", *, tracks: JointTrac
         return render_clip_flat(doc, clip, direction, tracks=tracks, scale=scale, steps=steps, outline=outline, max_frames=max_frames)
     model = model or S.Model(doc, scale, steps)
     skel = skeleton_for(doc, tracks)
-    poser = Poser(model, skel, clip, lock)
     elev = float(doc.get("view", {}).get("elevation", 0.0)) if elevation is None else float(elevation)
+    poser = Poser(model, skel, clip, lock, view=(phi, elev))
     oc = S.outline_colour(doc, outline)
     times = frame_times(poser.n_src, max_frames, poser.loop)
     frames, normals, depths = [], [], []
@@ -277,20 +411,23 @@ def render_clip(doc: dict, clip: str, direction: str = "S", *, tracks: JointTrac
         anchors, effects, lights = poser.anchors(t, tf)
         fr = model.render(k, phi, elev, tf, outline=oc, lights=lights, effects=effects, shadow=doc.get("shadow"), anchors=anchors, passes=passes)
         rgba = fr.rgba
-        if square:
-            rgba = squared(rgba, model.W, model.H)
+        side = (max(model.W, model.H) if square is True else int(square)) if square else 0
+        if side:
+            rgba = squared(rgba, model.W, model.H, side)
         frames.append(rgba)
         if passes:
-            normals.append(squared(fr.normal, model.W, model.H) if square else fr.normal)
-            depths.append(squared(fr.depth, model.W, model.H) if square else fr.depth)
+            normals.append(squared(fr.normal, model.W, model.H, side) if side else fr.normal)
+            depths.append(squared(fr.depth, model.W, model.H, side) if side else fr.depth)
     fps = tracks.fps * len(times) / poser.n_src
     return {"frames": frames, "fps": round(fps, 3), "times": times, "loop": poser.loop, "clip": clip, "direction": direction,
-            "normal": normals, "depth": depths, "ground_y": (model.ground * model.scale), "axis_x": model.W / 2 if not square else max(model.W, model.H) / 2}
+            "normal": normals, "depth": depths, "ground_y": (model.ground * model.scale) + ((side - model.H) if side else 0),
+            "axis_x": side / 2 if side else model.W / 2}
 
 
-def squared(rgba: np.ndarray, W: int, H: int) -> np.ndarray:
-    """Pad a frame to a square canvas with the body axis (the canvas centre column) kept at the centre."""
-    side = max(W, H)
+def squared(rgba: np.ndarray, W: int, H: int, side: int | None = None) -> np.ndarray:
+    """Pad a frame to a square canvas of ``side`` (the larger side when not given) with the body axis (the canvas
+    centre column) kept at the centre and the ground at the same distance from the bottom."""
+    side = max(W, H, int(side or 0))
     out = np.zeros((side, side, 4), np.uint8)
     ox = (side - W) // 2; oy = side - H
     out[oy:oy + H, ox:ox + W] = rgba
@@ -311,29 +448,38 @@ def flat_transforms(doc: dict, skel: Skeleton, clip: str, t: float, direction: s
         xr = (p[0] - skel.cx) * cs + (p[2] - skel.cz) * sn
         return np.array([skel.cx + xr, p[1]])
 
+    def bone_move(bone: str, at: float) -> tuple[float, np.ndarray, np.ndarray]:
+        """The projected bone at time ``at``: its change of angle, the movement of its head, and the author head."""
+        j = skel.index[bone]
+        pf, rf = (pos_f, rot_f) if at == t else skel.clip_pose(clip, at)
+        h_a, t_a = proj(skel.pos[j]), proj(skel.tail(j))
+        h_f, t_f = proj(pf[j]), proj(skel.tail(j, pf, rf))
+        ang = math.atan2(*(t_f - h_f)[::-1]) - math.atan2(*(t_a - h_a)[::-1])
+        return ang, h_f - h_a, h_a
+
+    def lag_of(part: dict, default: float) -> float:
+        lag = part.get("lag", default)
+        if isinstance(lag, dict):
+            lag = lag.get("frames", default)
+        return float(lag or 0.0)
+
     out = {}
     for name, part in parts.items():
         bone = part.get("bone")
         if not bone or bone not in skel.index:
             continue
-        j = skel.index[bone]
-        lag = part.get("lag", 0)
-        tl = t - float(lag) if lag else t
-        pf, rf = (pos_f, rot_f) if tl == t else skel.clip_pose(clip, tl)
-        h_a, t_a = proj(skel.pos[j]), proj(skel.tail(j))
-        h_f, t_f = proj(pf[j]), proj(skel.tail(j, pf, rf))
-        ang = math.atan2(*(t_f - h_f)[::-1]) - math.atan2(*(t_a - h_a)[::-1])
+        ang, d, h_a = bone_move(bone, t - lag_of(part, 0.0))
         pivot = part.get("pivot", [float(h_a[0]), float(h_a[1])])
-        d = h_f - h_a
         out[name] = (ang, float(d[0]), float(d[1]), (float(pivot[0]), float(pivot[1])))
-    for name, part in parts.items():          # loose parts without a bone follow their parent, late
+    for name, part in parts.items():          # a loose part without a bone follows its parent's bone, a frame or more late
         if name in out or not part.get("parent"):
             continue
-        par = part["parent"]
-        if par in out:
-            ang, dx, dy, _ = out[par]
-            lag = float(part.get("lag", 1))
-            out[name] = (ang * 0.5, dx, dy, tuple(part.get("pivot", out[par][3])))
+        par = parts.get(part["parent"], {})
+        bone = par.get("bone")
+        if part["parent"] not in out or not bone or bone not in skel.index:
+            continue
+        ang, d, _ = bone_move(bone, t - lag_of(part, 1.0))
+        out[name] = (ang * float(part.get("follow", 0.5)), float(d[0]), float(d[1]), tuple(part.get("pivot", out[part["parent"]][3])))
     return out
 
 

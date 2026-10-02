@@ -709,9 +709,10 @@ def rule_mask(rule: dict, P: np.ndarray, prim: Prim) -> np.ndarray:
             hm = prim.hem_y(a)
             d0, d1 = val
             m &= (y > hm - d1) & (y < hm - d0)
-        elif key == "hash":                              # a scattered fraction of the voxels
-            p, seed = (list(val) + [0])[:2] if isinstance(val, (list, tuple)) else (val, 0)
-            m &= hash2(np.floor(x * 3) + seed, np.floor(y * 3 + z)) < p
+        elif key == "hash":                              # a scattered fraction of the voxels: [p, seed, cell]; cell = the speck size in units
+            p, seed, cell = (list(val) + [0, 1 / 3])[:3] if isinstance(val, (list, tuple)) else (val, 0, 1 / 3)
+            cell = max(float(cell), 1e-3)
+            m &= hash2(np.floor(x / cell) + seed, np.floor(y / cell) + np.floor(z / cell) * 7.0) < p
         elif key == "crack":                             # a wiggly vertical line: {"x": x0, "amp": a, "k": k, "w": w}
             x0 = val["x"]; amp = val.get("amp", 0.7); kk = val.get("k", 1.5); w = val.get("w", 0.7)
             m &= np.abs(x - (x0 + np.sin(y * kk) * amp)) < w
@@ -793,7 +794,10 @@ class Shell:
 class Model:
     """A solid shape sprite voxelised once at a scale, ready to render from any direction and pose."""
 
-    def __init__(self, doc: dict, scale: float = 1.0, steps: int | None = None, materials: dict[str, Material] | None = None):
+    def __init__(self, doc: dict, scale: float = 1.0, steps: int | None = None, materials: dict[str, Material] | None = None,
+                 width: float | None = None):
+        """``width`` (file units) widens the canvas beyond the file's ``size`` for clips that reach past it (a death
+        that lies down); the body axis stays at the canvas centre and the ground line where the file put it."""
         self.doc = doc
         self.scale = float(scale)
         self.M = materials or build_materials(doc, steps)
@@ -801,7 +805,8 @@ class Model:
         self.axis = tuple(doc.get("axis", [doc["size"][0] / 2, 0.0]))
         self.ground = float(doc.get("ground", doc["size"][1] - 1))
         self.prims = [Prim(s, i, self.axis) for i, s in enumerate(doc["shapes"])]
-        self.W = int(round(doc["size"][0] * self.scale)); self.H = int(round(doc["size"][1] * self.scale))
+        self.set_width(width)
+        self.H = int(round(doc["size"][1] * self.scale))
         self.shell = self._voxelise()
         n = max(m.steps for m in self.M.values())
         self.table = np.zeros((len(self.M), n, 3)); self.lengths = np.zeros(len(self.M), int)
@@ -810,35 +815,60 @@ class Model:
             self.table[i, :m.steps] = m.ramp; self.lengths[i] = m.steps; self.spec[i] = m.spec; self.emissive[i] = m.emissive
         self.stats = {"shapes": len(self.prims), "voxels": int(len(self.shell.pos)), "size": [self.W, self.H], "scale": self.scale}
 
+    def set_width(self, width: float | None) -> None:
+        """Change the canvas width (file units, never below the file's own); the voxels are untouched."""
+        self.width = float(max(self.doc["size"][0], width or 0))
+        self.W = int(round(self.width * self.scale))
+
     # ---- voxelise once
+    @staticmethod
+    def group_key(p: Prim) -> tuple:
+        """The rigid body a shape belongs to: its part (which may lag), else its bone, else the static model. Shapes
+        of one body are voxelised together (a hand and its fingers share one surface); different bodies keep their
+        own surface even where they overlap in the author pose, so a leg inside a skirt still has its voxels when
+        the clip swings it out."""
+        if p.part:
+            return ("part", p.part)
+        if p.bone:
+            return ("bone", p.bone)
+        return ("static",)
+
     def _voxelise(self) -> Shell:
         s = self.scale
-        lo = np.min([p.bbox[0] for p in self.prims], axis=0) - 1
-        hi = np.max([p.bbox[1] for p in self.prims], axis=0) + 1
-        g0 = np.floor(lo * s).astype(int); g1 = np.ceil(hi * s).astype(int)
-        N = g1 - g0
-        own = np.full(tuple(N), -1, np.int16)
+        groups: dict[tuple, list[Prim]] = {}
+        carves = [p for p in self.prims if p.carve]
         for p in self.prims:
-            b0 = np.maximum(np.floor(p.bbox[0] * s).astype(int), g0); b1 = np.minimum(np.ceil(p.bbox[1] * s).astype(int), g1)
-            if np.any(b1 <= b0):
-                continue
-            gx, gy, gz = np.mgrid[b0[0]:b1[0], b0[1]:b1[1], b0[2]:b1[2]]
-            P = (np.stack([gx.ravel(), gy.ravel(), gz.ravel()], 1) + 0.5) / s
-            inside = p.sd(P) <= 0
-            sl = (slice(b0[0] - g0[0], b1[0] - g0[0]), slice(b0[1] - g0[1], b1[1] - g0[1]), slice(b0[2] - g0[2], b1[2] - g0[2]))
-            view = own[sl]
-            view[inside.reshape(view.shape)] = -1 if p.carve else p.index
-        filled = own >= 0
-        pad = np.pad(filled, 2, constant_values=False)
-        surf = np.zeros_like(filled)
-        for ax in range(3):
-            for d in (1, 2, -1, -2):
-                sh = np.roll(pad, -d, axis=ax)[2:-2, 2:-2, 2:-2]
-                surf |= ~sh
-        surf &= filled
-        ix, iy, iz = np.nonzero(surf)
-        P = (np.stack([ix + g0[0], iy + g0[1], iz + g0[2]], 1) + 0.5) / s
-        prim_of = own[ix, iy, iz].astype(np.int32)
+            if not p.carve:
+                groups.setdefault(self.group_key(p), []).append(p)
+        P_parts, prim_parts = [], []
+        for prims in groups.values():
+            lo = np.min([p.bbox[0] for p in prims], axis=0) - 1
+            hi = np.max([p.bbox[1] for p in prims], axis=0) + 1
+            g0 = np.floor(lo * s).astype(int); g1 = np.ceil(hi * s).astype(int)
+            own = np.full(tuple(g1 - g0), -1, np.int16)
+            for p in sorted(prims + carves, key=lambda q: q.index):        # file order: a carve empties what came before it
+                b0 = np.maximum(np.floor(p.bbox[0] * s).astype(int), g0); b1 = np.minimum(np.ceil(p.bbox[1] * s).astype(int), g1)
+                if np.any(b1 <= b0):
+                    continue
+                gx, gy, gz = np.mgrid[b0[0]:b1[0], b0[1]:b1[1], b0[2]:b1[2]]
+                P = (np.stack([gx.ravel(), gy.ravel(), gz.ravel()], 1) + 0.5) / s
+                inside = p.sd(P) <= 0
+                sl = (slice(b0[0] - g0[0], b1[0] - g0[0]), slice(b0[1] - g0[1], b1[1] - g0[1]), slice(b0[2] - g0[2], b1[2] - g0[2]))
+                view = own[sl]
+                view[inside.reshape(view.shape)] = -1 if p.carve else p.index
+            filled = own >= 0
+            pad = np.pad(filled, 2, constant_values=False)
+            surf = np.zeros_like(filled)
+            for ax in range(3):
+                for d in (1, 2, -1, -2):
+                    sh = np.roll(pad, -d, axis=ax)[2:-2, 2:-2, 2:-2]
+                    surf |= ~sh
+            surf &= filled
+            ix, iy, iz = np.nonzero(surf)
+            P_parts.append((np.stack([ix + g0[0], iy + g0[1], iz + g0[2]], 1) + 0.5) / s)
+            prim_parts.append(own[ix, iy, iz].astype(np.int32))
+        P = np.concatenate(P_parts) if P_parts else np.zeros((0, 3))
+        prim_of = np.concatenate(prim_parts) if prim_parts else np.zeros(0, np.int32)
         n = len(P)
         nrm = np.zeros((n, 3)); mat = np.zeros(n, np.int32); tone = np.zeros(n, np.int8); emit = np.zeros(n, np.int8)
         rivet = np.zeros(n, bool); flat = np.full(n, -1, np.int32); lift = np.zeros(n); spec_t = np.full(n, 0.88)
@@ -937,6 +967,8 @@ class Model:
                 win, yy, xx = win[free], yy[free], xx[free]
                 inner[yy, xx] = True
             vid[yy, xx] = win; zb[yy, xx] = depth[win]
+            if pas == 0:
+                self._close_cracks(vid, zb, s)
         m = vid >= 0
         ys, xs = np.nonzero(m)
         v = vid[ys, xs]
@@ -1023,7 +1055,9 @@ class Model:
             if at is None:
                 continue
             x, y, z = at
-            strength = float(li.get("strength", 1.0)) + float(li.get("pulse", 0.0)) * pulse(frame, 0.3)
+            x, y = math.floor(x) + 0.5, math.floor(y) + 0.5           # a light sits on a pixel centre, so its tint field never slides under a pixel
+            # the pulse moves in four steps, not every frame: a glow that breathes like a hand-animated one instead of crawling
+            strength = float(li.get("strength", 1.0)) + float(li.get("pulse", 0.0)) * round(pulse(frame, 0.3) * 3) / 3
             tint = hexrgb(li.get("colour", "#7dff78"))
             cv.light_point(x, y, z, float(li.get("radius", 20)) * s, strength, tint, rim=bool(li.get("rim", False)))
         for ef in effects or []:
@@ -1043,6 +1077,28 @@ class Model:
             fr.normal = cv.normal_pass()
             fr.depth = cv.depth_pass(zb[m].max() if m.any() else 1, zb[m].min() if m.any() else 0)
         return fr
+
+    def _close_cracks(self, vid: np.ndarray, zb: np.ndarray, s: float) -> None:
+        """Close the one-pixel cracks a voxel shell leaves when it is seen at a slant: a pixel that is empty, or far
+        behind both its left and right (or upper and lower) neighbours when those belong to one shape at one depth,
+        takes the nearer neighbour's voxel. Without this the head shows through a hat and the crack pattern re-rolls
+        with every sub-pixel move, which reads as shimmer. Wider holes (a torn hem, an open front) are untouched."""
+        prim = self.shell.prim
+        for axis in (1, 0):
+            if axis == 1:
+                a, b, c = vid[:, :-2], vid[:, 2:], vid[:, 1:-1]
+                za, zb_, zc = zb[:, :-2], zb[:, 2:], zb[:, 1:-1]
+            else:
+                a, b, c = vid[:-2, :], vid[2:, :], vid[1:-1, :]
+                za, zb_, zc = zb[:-2, :], zb[2:, :], zb[1:-1, :]
+            both = (a >= 0) & (b >= 0)
+            same = both & (prim[np.where(both, a, 0)] == prim[np.where(both, b, 0)]) & (np.abs(za - zb_) < 2.0 * s)
+            near = np.maximum(za, zb_)
+            hole = same & ((c < 0) | (zc < near - 1.5 * s))
+            if hole.any():
+                pick = np.where(za >= zb_, a, b)
+                c[hole] = pick[hole]
+                zc[hole] = ((za + zb_) / 2)[hole]
 
     def project(self, pt, phi: float, elevation: float) -> tuple[float, float, float]:
         """A file-space point -> (screen x, screen y, depth) at this direction and elevation (canvas pixels)."""
@@ -1320,12 +1376,11 @@ def validate(doc: dict, library: dict | None = None) -> list[str]:
         return bad + [f"materials: {e}"]
     mode = mode_of(doc)
     kinds = FLAT_KINDS if mode == "flat" else SOLID_KINDS
-    for i, s in enumerate(doc["shapes"]):
-        tag = f"shape {i} ({s.get('name', s.get('kind', '?'))})"
+    def check(s, tag):
         kind = s.get("kind", "poly")
         if kind not in kinds:
             bad.append(f"{tag}: kind {kind!r} is not a {mode} kind {kinds}")
-            continue
+            return
         mat = s.get("material", "cloth" if mode == "solid" else None)
         if "flat" not in s and kind not in ("dot", "dots") and mat not in M:
             bad.append(f"{tag}: unknown material {mat!r}")
@@ -1343,18 +1398,33 @@ def validate(doc: dict, library: dict | None = None) -> list[str]:
             bad.append(f"{tag}: a ring needs y [top, bottom] and rx (a number or [r0, growth per unit])")
         if kind == "prism" and not (len(s.get("centre", [])) == 2 and len(s.get("radii", [])) == 2 and len(s.get("z", [])) == 2):
             bad.append(f"{tag}: a prism needs centre [x, y], radii [rx, ry] and z [z0, z1]")
-        if kind == "union" and not s.get("of"):
-            bad.append(f"{tag}: a union needs 'of': a list of shapes")
+        if kind == "union":
+            if not isinstance(s.get("of"), list) or not s["of"]:
+                bad.append(f"{tag}: a union needs 'of': a list of shapes")
+            else:
+                for k, sub in enumerate(s["of"]):
+                    if not isinstance(sub, dict):
+                        bad.append(f"{tag}: of[{k}] must be a shape object")
+                    else:
+                        check(sub, f"{tag} of[{k}] ({sub.get('name', sub.get('kind', '?'))})")
         for r in s.get("rules", []):
             if "material" in r and r["material"] not in M:
                 bad.append(f"{tag}: rule uses unknown material {r['material']!r}")
             if "emit" in r and r["emit"] not in EMIT_CODES:
                 bad.append(f"{tag}: rule emit {r['emit']!r} not in {list(EMIT_CODES)}")
-        if "bone" in s and doc.get("skeleton") is None and doc.get("parts") is None and mode == "solid":
-            pass
+        if "hang" in s and not (isinstance(s["hang"], (int, float)) and 0 <= s["hang"] <= 1):
+            bad.append(f"{tag}: hang must be a number from 0 (hangs straight) to 1 (rigid with the bone)")
+
+    for i, s in enumerate(doc["shapes"]):
+        if not isinstance(s, dict):
+            bad.append(f"shape {i} must be an object")
+            continue
+        check(s, f"shape {i} ({s.get('name', s.get('kind', '?'))})")
     for name, part in (doc.get("parts") or {}).items():
         if not isinstance(part, dict):
             bad.append(f"part {name!r} must be an object")
+        elif "hang" in part and not (isinstance(part["hang"], (int, float)) and 0 <= part["hang"] <= 1):
+            bad.append(f"part {name!r}: hang must be a number from 0 (hangs straight) to 1 (rigid with the bone)")
     for i, ef in enumerate(doc.get("effects", [])):
         if ef.get("material", "soul") not in M:
             bad.append(f"effect {i}: unknown material {ef.get('material')!r}")

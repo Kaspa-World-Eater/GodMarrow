@@ -262,6 +262,18 @@ def build_server():
         return shape_tools.contact_sheet(rows, out, columns=columns)
 
     @mcp.tool()
+    def shape_object(file: str, out_dir: str, name: str = "", directions: str = "S", style: str = "gothic_hd", game_objects: str = "", hr: float = 2.0) -> dict:
+        """A .shapes.json (a chest, a skull, a tree) as a game object: a trimmed PNG per direction with its foot anchor into out_dir,
+        <name>.json beside them, and entries in the game's art/objects/objects.json when game_objects names it (hr = texels per world px)."""
+        from . import shape_tools, shapes as S
+        doc = S.load_shapes(file)
+        problems = S.validate(doc)
+        if problems:
+            return {"ok": False, "problems": problems}
+        return shape_tools.export_object(doc, out_dir, name or None, directions=[d.strip().upper() for d in directions.split(",") if d.strip()] or ["S"],
+                                         style=style or None, game_objects=game_objects or None, hr=hr)
+
+    @mcp.tool()
     def validate_shapes(file: str) -> dict:
         """Check a .shapes.json: problems in plain words, or a summary (mode, shapes, materials, bones, unbound shapes)."""
         return api.validate_shapes(file)

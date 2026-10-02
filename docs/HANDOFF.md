@@ -432,7 +432,64 @@ Not built: the Forge app's pages (specified in `docs/track_notes/shapes.md`), ob
 format already takes them), the painting-to-shapes extraction (the painting is a reference; describe-it starts from
 words).
 
-**To pick up.** `cd tools/pixelforge && python -m pytest -q`; `pixelforge shapes preview assets/shapes/characters/
-keeper.shapes.json --clip walk --direction E --style gothic_hd`; edit the file (every shape is named; `pixelforge
-shapes validate` first) and preview again; `pixelforge shapes render ... -o frames --style gothic_hd` then
-`godmarrow_export` or the project commands to put it in the game.
+**To pick up.** `pip install -e tools/pixelforge` (or `python -m pixelforge ...`), then `cd tools/pixelforge && python
+-m pytest -q`; `pixelforge shapes preview assets/shapes/characters/keeper.shapes.json --clip walk --direction E
+--style gothic_hd`; edit the file (every shape is named; `pixelforge shapes validate` first) and preview again;
+`pixelforge shapes render FILE -o frames --style gothic_hd`, or in a project `pixelforge project import-shapes
+<character> FILE -p <folder>`, `render-shapes <character> -p <folder>`, `export-game <character> --kind <kind> -p
+<folder>` to put it in the game. The step-by-step guide for a fresh session is `docs/GUIDE_SESSION.md`.
+
+
+### 7.9 2026-10-02, track/shapes: the review round (parts stay on the body, the session guide, objects, the tests that measure the right thing)
+
+**What.** The reviewer's blockers were that the Keeper broke into pieces in the side views (feet stepping out from
+under an opaque skirt, the hat lifting off a fast head, the long veil swinging over the face) and that the session
+guide, the end-to-end test and the object road did not exist. Fixed in the engine, not only in the file:
+`shape_rig.py` gives parts a `hang` (a garment takes its bone's position and turn but only a fraction of its tilt,
+pivoting where it attaches; the damping fades as the body lies down, so a fallen skirt lies along the legs), caps a
+lagged hem's trailing at a tenth of the part's height and fades it out while the bone is still, holds the lowest
+*foot pixel* on the screen's ground line (the toe joint sat inside a foot that overhangs and pitches, and at an
+elevation the near and far feet project to different rows), widens the canvas per clip (the death lies down past the
+file's width; every frame of a set is padded to one square) and uses the flat rig's `lag`. `shapes.py` voxelises one
+surface per rigid body (a leg inside a skirt kept no voxels of its own and vanished when it swung out: the real cause
+of the floating feet), closes the one-pixel cracks a slanted voxel shell leaves (the head showed through the hat),
+snaps lights to pixel centres and steps their pulse in four levels (the tint no longer crawls), gives `hash` a speck
+size, checks the sub-shapes of a `union` and the range of `hang`, and takes a `width`. `keeper.shapes.json`: the
+skirt ends above the ankles with a wide front split over a violet underskirt, the veil is shorter and hangs, the hat
+is dark weathered straw with a plain brim (a sawtooth of 48 tiny tongues flickered), the eyes are sockets with a
+two-radius glow, a waist capsule fills the gap between the chest and the belt that opened when the body bent or
+fell, specks are 2 units. Objects: `assets/shapes/objects/chest, skull, dead_tree .shapes.json` (solid files without
+bones, 30 degree camera), `shape_tools.export_object` / `add_game_object`, CLI `pixelforge shapes object` and
+`shapes still --game-objects`, MCP `shape_object`: a trimmed PNG per direction with the foot anchor under the body
+axis and an `objects.json` entry (`png, ox, oy, hr`). The manifest carries `view_elevation` (the export's camera note
+reads it); describe-it drafts garments with `hang`. Guides: `docs/GUIDE_SESSION.md` (new: the whole job for a fresh
+session with a browser: set-up, where every reference is, getting a Midjourney reference, the literal command
+sequence with `-p <folder>`, editing by complaint, what passes, what to commit), GUIDE_AI's shape section (the
+install line, `-p`, the 24 clips, `hang`, `max`, `hash` cells, objects, the checks with the right metrics),
+GUIDE_HUMANS, README, CLAUDE.md, `docs/track_notes/shapes.md`.
+
+**Verified.** 138 tests green in 37 s (`tests/test_shapes.py` 28, `tests/test_e2e_shapes.py` 3: a sentence to the
+game's atlas headlessly through the API, the project road and the CLI; run three times). The new tests measure what
+the reviewer asked: one opaque island per frame in idle, walk, run, attack and death in all 8 directions with the
+shadow off (0 broken frames over all 7 clips x 8 directions at 24 frames, down from 143); the idle's change over the
+figure's own pixels at the clip's frame rate (S 0.081, E 0.096, threshold 0.12; the change-and-revert sparkle 0.005
+and 0.011, threshold 0.03); the lowest foot pixel on one row in every E and W walk frame with the shadow off, and the
+shadow's row never moving; a hem never dragged past a tenth of its height; `damp_tilt`; the death's wider canvas;
+the union and hang checks; the object export's anchors and `objects.json` entries. Pictures under
+`docs/screens/shapes/` (all replaced, all under 400 KB): the Keeper at 120 and 76 px in idle and walk from 8
+directions (sheets and GIFs), attack / cast / run / hit / death, a before-and-after strip of the attack and the walk
+(the old frames from the previous build's GIFs beside the new), the head at 5x, the painting beside the converted
+painting and the sprite at one height (120 and 76), every clip in every direction on one sheet, the objects from
+five directions, the describe-it drafts, the necromancer parity and turntable, the in-game shot (`keeper_shapes` on
+the moor, then `art/` reverted; the game repository is untouched). The full set (7 clips x 8 directions, 1120
+frames at 120 px) renders in 41 s.
+
+**Honestly.** The Keeper now holds together through every clip and direction, the hat stays on through the attack,
+the legs show through the split skirt and the feet stay on the ground; the eyes read under the brim at 120 px. She
+is still a figure written by rules: broader and softer than the necromancer page, with fewer accents, and at 76 px
+the cords and gourds are a few pixels. The per-frame change of the 24-frame export (17%) is higher than at the
+clip's own rate (8%) because each thinned frame moves 2.5 times further, not because of noise; a per-clip frame cap
+(8-12 for the idle) is the pixel-art answer and is one `--frames` away. The hanging rule is tilt damping, not cloth.
+The objects are first passes (the chest, the skull and the dead tree read at 3x; no in-game placement was tried,
+the game's zones reference objects by key). The MCP tools were exercised by building the server, not by a client.
+

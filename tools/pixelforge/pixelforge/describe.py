@@ -420,20 +420,23 @@ def draft_shapes(text: str, out: str | Path | None = None, height: int = 120) ->
     if glow or re.search(r"\b(glowing eyes|burning eyes|eyes glow)\b", t):
         glow = glow or "soul"
         ey = (head_y + top_y) / 2 + 1
-        shapes[-1].setdefault("rules", []).append({"z": [4.5, None], "near": [[[cx - 2.5, ey, None], [cx + 2.5, ey, None]], 0.9], "material": glow, "emit": "pulse"})
+        shapes[-1].setdefault("rules", []).append({"z": [4.5, None], "near": [[[cx - 2.5, ey, None], [cx + 2.5, ey, None]], 2.0], "t": -3})
+        shapes[-1]["rules"].append({"z": [4.5, None], "near": [[[cx - 2.5, ey, None], [cx + 2.5, ey, None]], 1.4], "material": glow, "emit": "pulse"})
+        shapes[-1]["rules"].append({"z": [4.5, None], "near": [[[cx - 2.5, ey, None], [cx + 2.5, ey, None]], 0.6], "material": glow, "emit": "pulse", "t": 1})
         read.append(f"glowing eyes ({glow})")
     add(name="neck", kind="capsule", a=[cx, B["neck"]["head"][1], 0], b=[cx, head_y, 0], r=[2.8, 2.6], material=head_mat if hood else skin_mat, bone="neck")
     if re.search(r"\b(hat|straw hat|wide hat|brim)\b", t):
         hat_mat = _material_near(words, "hat|brim", "straw")
-        add(name="hat", kind="ring", y=[top_y - 13, top_y + 7], rx=[1.0, 1.2], rz=[1.0, 1.15], thickness=1.8, hem={"tongues": 48, "depth": 0.7, "seed": 2},
-            material=hat_mat, part="hat", rotate={"x": 16, "about": [cx, top_y + 2, 0]}, rules=[{"every_angle": [44, 0], "t": -1}])
-        parts["hat"] = {"bone": "head", "lag": {"frames": 1, "sway": 0.35}}
+        add(name="hat", kind="ring", y=[top_y - 13, top_y + 7], rx=[1.0, 1.2], rz=[1.0, 1.15], thickness=1.8,
+            material=hat_mat, part="hat", rotate={"x": 16, "about": [cx, top_y + 2, 0]}, bump={"ridges": [0.18, 5]},
+            rules=[{"every_angle": [36, 0], "y": [top_y - 5, None], "t": -1}])
+        parts["hat"] = {"bone": "head", "lag": {"frames": 1, "sway": 0.12}}
         read.append(f"a wide hat ({hat_mat})")
     # torso
     sp2 = B["spine.002"]["head"][1]; sp3 = B["spine.003"]["head"][1]
     chest_c = (sp3 + hips_y) / 2 - 2
     add(name="chest", kind="ellipsoid", centre=[cx, chest_c, 0], radii=[10, (hips_y - sp3) / 2 + 2, 7.2], material=armour_mat if has_armour else body_mat, bone="spine.002",
-        rules=([{"every_y": [5, 0], "t": -1}, {"x": [cx - 0.7, cx + 0.7], "z": [4, None], "t": 1}] if has_armour else [{"every_y": [4, 0], "hash": [0.3, 2], "t": -1}]))
+        rules=([{"every_y": [5, 0], "t": -1}, {"x": [cx - 0.7, cx + 0.7], "z": [4, None], "t": 1}] if has_armour else [{"every_y": [4, 0], "hash": [0.3, 2, 2], "t": -1}]))
     read.append(("armoured " if has_armour else "") + f"torso ({armour_mat if has_armour else body_mat})")
     if re.search(r"\b(cords?|ropes?|straps?)\b", t):
         add(name="cord_x1", kind="capsule", a=[cx - 10, sp3 - 5, 6.2], b=[cx + 9, sp2 + 5, 6.4], r=[1.6, 1.4], material="rope", bone="spine.002", rules=[{"every_y": [2, 0], "t": -1}])
@@ -462,28 +465,28 @@ def draft_shapes(text: str, out: str | Path | None = None, height: int = 120) ->
     add(name="belt", kind="ring", y=[hips_y - 3.5, hips_y + 2.5], rx=12.6, rz=9.6, material=belt_mat, bone="hips", rules=[{"every_angle": [14, 0], "t": 1}])
     read.append(f"a belt ({belt_mat})")
     if re.search(r"\b(gourds?|flasks?|vials?|bottles?|pouch|pouches)\b", t):
-        add(name="gourd_big", kind="ellipsoid", centre=[cx + 7, hips_y + 11, 9.6], radii=[4.6, 5.6, 4.4], material="gourd", part="gourds", rules=[{"dy": [None, -3.8], "material": "rope", "t": -1}, {"hash": [0.14, 3], "t": -3}])
+        add(name="gourd_big", kind="ellipsoid", centre=[cx + 7, hips_y + 11, 9.6], radii=[4.6, 5.6, 4.4], material="gourd", part="gourds", rules=[{"dy": [None, -3.8], "material": "rope", "t": -1}, {"hash": [0.14, 3, 2], "t": -3}])
         add(name="gourd_small", kind="ellipsoid", centre=[cx - 5, hips_y + 9, 9.0], radii=[3.6, 4.6, 3.6], material="gourd", part="gourds", rules=[{"dy": [None, -3.1], "material": "rope", "t": -1}])
-        parts["gourds"] = {"bone": "hips", "lag": {"frames": 1, "sway": 0.7}}
+        parts["gourds"] = {"bone": "hips", "lag": {"frames": 1, "sway": 0.7}, "hang": 0.5}
         read.append("charm gourds at the belt")
     # long garments
     if re.search(r"\b(skirts?|robes?|gown|dress|kilt|tabard)\b", t):
         sk_mat = _material_near(words, "skirts?|robes?|gown|dress|kilt|tabard", body_mat)
-        add(name="skirt", kind="ring", y=[hips_y + 2, ground - 10], rx=[12.4, 0.2], rz=[9.6, 0.15], thickness=2.2, hem={"tongues": 14, "depth": 9 if "tattered" in t else 3, "seed": 8},
-            open={"angle": 0.32, "below": hips_y + 28}, material=sk_mat, part="skirt", bump={"folds": [0.5, 8, 3.1]}, rules=[{"hem_band": [0, 2.5], "t": -1}],
+        add(name="skirt", kind="ring", y=[hips_y + 2, ground - 22], rx=[12.4, 0.2], rz=[9.6, 0.15], thickness=2.2, hem={"tongues": 14, "depth": 9 if "tattered" in t else 3, "seed": 8},
+            open={"angle": 0.55, "below": hips_y + 12}, material=sk_mat, part="skirt", bump={"folds": [0.5, 8, 3.1]}, rules=[{"hem_band": [0, 2.5], "t": -1}],
             **({"holes": {"p": 0.08, "band": 24, "seed": 5}} if re.search(r"\b(tattered|torn|ragged)\b", t) else {}))
-        parts["skirt"] = {"bone": "hips", "lag": {"frames": 2, "sway": 0.8}}
+        parts["skirt"] = {"bone": "hips", "lag": {"frames": 2, "sway": 0.8}, "hang": 0.25}
         read.append(f"a long {sk_mat} skirt" + (" (tattered)" if "tattered" in t else ""))
     if re.search(r"\b(cape|cloak|mantle)\b", t):
         cp_mat = _material_near(words, "cape|cloak|mantle", "cape6")
         add(name="cape", kind="ring", y=[sp3 - 2, ground - 12], rx=[12, 0.17], rz=[9.8, 0.12], thickness=1.6, hem={"tongues": 18, "depth": 6, "seed": 5}, keep={"back": 1.75},
             material=cp_mat, part="cape", bump={"folds": [0.4, 7, 0.3]}, **({"holes": {"p": 0.07, "band": 16}} if re.search(r"\b(tattered|torn|ragged)\b", t) else {}))
-        parts["cape"] = {"bone": "spine.003", "lag": {"frames": 3, "sway": 1.0}}
+        parts["cape"] = {"bone": "spine.003", "lag": {"frames": 2, "sway": 0.7}, "hang": 0.35}
         read.append(f"a cape ({cp_mat})")
     if re.search(r"\b(veil|wrappings|shawl)\b", t):
-        add(name="veil", kind="ring", y=[head_y + 3, hips_y + 14], rx=[8.0, 0.14], rz=[7.6, 0.08], thickness=1.6, hem={"tongues": 9, "depth": 14, "seed": 6}, keep={"back": 1.95},
+        add(name="veil", kind="ring", y=[head_y + 3, hips_y - 2], rx=[8.0, 0.14], rz=[7.6, 0.08], thickness=1.6, hem={"tongues": 9, "depth": 14, "seed": 6}, keep={"back": 1.95},
             holes={"p": 0.1, "band": 26, "seed": 3}, material="wrap", t=-1, part="veil", bump={"folds": [0.5, 6, 1.0]})
-        parts["veil"] = {"bone": "spine.003", "lag": {"frames": 3, "sway": 1.0}}
+        parts["veil"] = {"bone": "spine.003", "lag": {"frames": 2, "sway": 0.45}, "hang": 0.35}
         read.append("a long veil down the back")
     # the hands' things
     hl = B["hand.L"]["head"]; hr = B["hand.R"]["head"]

@@ -55,10 +55,24 @@ offer "adjust in Shape it" rather than more sentences. An AI connected to the MC
 `validate_shapes`, `preview_shape_sprite`, `render_shape_sprite`) writes the file directly for anything the
 vocabulary does not cover; the guide's worked example (the necromancer, flat and solid) is what it reads first.
 
+## Knobs added in the review round (2026-10-02)
+
+- Per part (and per shape): `hang` 0..1 (1 rigid; 0.25 a skirt, 0.35 a veil or cape, 0.5 gourds): the slider the
+  motion page should show next to the lag frames and sway. `lag.max` (0.1 of the part's height) caps the trailing.
+- `hash` rules take a speck size (`[p, seed, cell]`); the materials page can show it as "speck size".
+- Objects: `shape_tools.export_object(doc, out_dir, name, directions, game_objects, hr)` writes the trimmed PNGs with
+  foot anchors and the `objects.json` entries; an object quest is: draft or write the file, `still` from S, SE and E,
+  export. The game's camera for objects is 30 degrees (`view.elevation`).
+- The ground lock works on the screen (the lowest foot pixel on one row); the canvas widens per clip for a death that
+  lies down, so the frame editor should expect frames of one square side per set, not the file's size.
+- The step-by-step procedure for a session (and for the app's help page) is `docs/GUIDE_SESSION.md`.
+
 ## Numbers the app can rely on
 
-At 120 px (gothic_hd): the Keeper voxelises in 0.15 s (30k shell voxels) and renders a frame in about 25 ms; a clip
-of 24 frames in a direction in 0.6 s; the seven game clips in eight directions in about 16 s. At 76 px
-(rendered_arpg): 9k voxels, about 5 s for the set. The flat necromancer renders in 15 ms a frame. Idle frames differ
-by 3-5% of their pixels (the breath, the pulsing eyes, the motes); a walk by 7-11%; the lowest opaque row is the
-same in every frame of the standing clips.
+At 120 px (gothic_hd): the Keeper voxelises in 0.11 s (33k shell voxels, one surface per rigid body) and renders a
+frame in about 25 ms; a clip of 24 frames in a direction in 0.7 s; the seven game clips in eight directions in about
+41 s (the death clip renders on a canvas twice as wide). At 76 px (rendered_arpg): about 12 s for the set. The flat
+necromancer renders in 15 ms a frame. At the clip's own frame rate consecutive idle frames differ in 8-10% of the
+figure's pixels (S 8.1%, E 9.6%) and 0.5-1% change and change straight back; a 24-frame export of the idle differs
+by about 17% a frame because each frame moves further. Every frame of idle, walk, run, attack, cast, hit and death is
+one piece in all eight directions; the lowest foot pixel is on one row in every frame of the standing clips.

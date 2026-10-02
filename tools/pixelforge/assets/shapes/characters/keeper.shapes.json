@@ -1,6 +1,6 @@
 {
  "name": "keeper",
- "about": "The Shrine Keeper as a solid shape sprite: a wide straw hat, violet wrappings with burning eyes, a shawl and a long tattered veil, dark lacquered pauldrons, bracers and tassets, rope cords and charm gourds at the belt, layered tattered black skirts, wrapped shins and feet. Drawn around the 120 px author pose (pixelforge shapes template --height 120).",
+ "about": "The Shrine Keeper as a solid shape sprite: a wide weathered straw hat, violet wrappings with burning eyes, a shawl and a veil down the back, dark lacquered pauldrons, bracers and tassets, rope cords and charm gourds at the belt, a tattered black skirt split at the front over a violet underskirt, wrapped shins and feet. Drawn around the 120 px author pose (pixelforge shapes template --height 120); the skirts, veil, cords and gourds hang from their bones (hang) and trail them (lag).",
  "mode": "solid",
  "size": [
   138,
@@ -21,63 +21,83 @@
   "ground": 134,
   "cx": 69.0
  },
- "materials": {},
+ "materials": {
+  "straw": {
+   "ramp": [
+    "#15100c",
+    "#241b13",
+    "#35291c",
+    "#473826",
+    "#594832",
+    "#6b5a40"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.5
+  }
+ },
  "parts": {
   "hat": {
    "bone": "head",
    "lag": {
     "frames": 1,
-    "sway": 0.35
+    "sway": 0.12
    }
   },
   "veil": {
    "bone": "spine.003",
    "lag": {
     "frames": 2,
-    "sway": 0.6
-   }
+    "sway": 0.5
+   },
+   "hang": 0.5
   },
   "veil_long": {
    "bone": "spine.003",
    "lag": {
-    "frames": 3,
-    "sway": 1.0
-   }
+    "frames": 2,
+    "sway": 0.45
+   },
+   "hang": 0.35
   },
   "cords": {
    "bone": "hips",
    "lag": {
     "frames": 2,
-    "sway": 1.1
-   }
+    "sway": 0.5
+   },
+   "hang": 0.3
   },
   "gourds": {
    "bone": "hips",
    "lag": {
     "frames": 1,
     "sway": 0.7
-   }
+   },
+   "hang": 0.5
   },
   "tassets": {
    "bone": "hips",
    "lag": {
     "frames": 1,
     "sway": 0.4
-   }
+   },
+   "hang": 0.6
   },
   "skirt": {
    "bone": "hips",
    "lag": {
     "frames": 2,
     "sway": 0.8
-   }
+   },
+   "hang": 0.25
   },
   "underskirt": {
    "bone": "hips",
    "lag": {
     "frames": 1,
     "sway": 0.5
-   }
+   },
+   "hang": 0.25
   }
  },
  "shapes": [
@@ -97,11 +117,6 @@
     1.18
    ],
    "thickness": 1.8,
-   "hem": {
-    "tongues": 48,
-    "depth": 0.7,
-    "seed": 2
-   },
    "material": "straw",
    "part": "hat",
    "rotate": {
@@ -114,15 +129,19 @@
    },
    "bump": {
     "ridges": [
-     0.25,
-     2.5
+     0.18,
+     5
     ]
    },
    "rules": [
     {
      "every_angle": [
-      44,
+      36,
       0
+     ],
+     "y": [
+      9,
+      null
      ],
      "t": -1
     },
@@ -139,13 +158,6 @@
       5
      ],
      "t": -1
-    },
-    {
-     "hash": [
-      0.05,
-      1
-     ],
-     "t": 1
     }
    ]
   },
@@ -204,7 +216,8 @@
      ],
      "hash": [
       0.2,
-      4
+      4,
+      2
      ],
      "t": 1
     },
@@ -226,7 +239,7 @@
         null
        ]
       ],
-      1.7
+      2.0
      ],
      "t": -3
     },
@@ -248,10 +261,34 @@
         null
        ]
       ],
-      0.9
+      1.4
      ],
      "material": "miasma",
      "emit": "pulse"
+    },
+    {
+     "z": [
+      4.5,
+      null
+     ],
+     "near": [
+      [
+       [
+        66.5,
+        23.5,
+        null
+       ],
+       [
+        71.5,
+        23.5,
+        null
+       ]
+      ],
+      0.6
+     ],
+     "material": "miasma",
+     "emit": "pulse",
+     "t": 1
     }
    ]
   },
@@ -345,7 +382,7 @@
    "kind": "ring",
    "y": [
     30,
-    92
+    70
    ],
    "rx": [
     8.0,
@@ -387,7 +424,8 @@
      ],
      "hash": [
       0.4,
-      7
+      7,
+      2
      ],
      "t": -2
     },
@@ -426,7 +464,45 @@
     {
      "hash": [
       0.06,
-      9
+      9,
+      2
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "waist",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    58.0,
+    -0.3
+   ],
+   "b": [
+    69.0,
+    72.0,
+    -1.5
+   ],
+   "r": [
+    8.6,
+    9.8
+   ],
+   "material": "violet",
+   "bone": "spine.001",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      2
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.06,
+      12,
+      2
      ],
      "t": -1
     }
@@ -462,6 +538,7 @@
     {
      "hash": [
       0.12,
+      2,
       2
      ],
      "t": 1
@@ -498,7 +575,8 @@
     {
      "hash": [
       0.12,
-      3
+      3,
+      2
      ],
      "t": 1
     }
@@ -615,7 +693,8 @@
     {
      "hash": [
       0.05,
-      5
+      5,
+      2
      ],
      "t": -1
     }
@@ -899,7 +978,8 @@
     {
      "hash": [
       0.05,
-      5
+      5,
+      2
      ],
      "t": -1
     }
@@ -1230,7 +1310,8 @@
     {
      "hash": [
       0.14,
-      3
+      3,
+      2
      ],
      "t": -3
     },
@@ -1274,7 +1355,8 @@
     {
      "hash": [
       0.14,
-      6
+      6,
+      2
      ],
      "t": -3
     }
@@ -1388,7 +1470,8 @@
     {
      "hash": [
       0.05,
-      8
+      8,
+      2
      ],
      "t": -1
     }
@@ -1428,7 +1511,8 @@
     {
      "hash": [
       0.05,
-      8
+      8,
+      2
      ],
      "t": -1
     }
@@ -1439,7 +1523,7 @@
    "kind": "ring",
    "y": [
     74,
-    124
+    112
    ],
    "rx": [
     12.4,
@@ -1456,8 +1540,8 @@
     "seed": 8
    },
    "open": {
-    "angle": 0.32,
-    "below": 100
+    "angle": 0.55,
+    "below": 84
    },
    "holes": {
     "p": 0.08,
@@ -1477,7 +1561,8 @@
     {
      "hash": [
       0.08,
-      5
+      5,
+      2
      ],
      "t": -1
     },
@@ -1495,7 +1580,8 @@
      ],
      "hash": [
       0.5,
-      11
+      11,
+      2
      ],
      "t": 1
     }
@@ -1506,7 +1592,7 @@
    "kind": "ring",
    "y": [
     76,
-    117
+    108
    ],
    "rx": [
     10.4,
@@ -1521,8 +1607,8 @@
     "depth": 6,
     "seed": 9
    },
-   "material": "rag",
-   "t": -1,
+   "material": "violet",
+   "t": 0,
    "part": "underskirt",
    "bump": {
     "folds": [

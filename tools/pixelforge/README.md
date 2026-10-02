@@ -9,7 +9,7 @@ game); every piece is generic except one exporter.
 
 | Need | Command | Studio |
 |---|---|---|
-| Character drawn by code: a `.shapes.json` of shapes with materials on bones → the 46 clips → real frames in 8 directions → game files (no painting, no Blender) | `pixelforge shapes …`, `project import-shapes / render-shapes` | — |
+| Character or object drawn by code: a `.shapes.json` of shapes with materials on bones → the motion clips (24) → real frames in 8 directions → game files (no painting, no Blender); objects as stills with foot points | `pixelforge shapes …`, `project import-shapes / render-shapes` | — |
 | Character: painting → 3D figure → 46 clips → 8 directions → pixel frames → game files | `pixelforge project …` | Steps 1-9 |
 | Fix a cutout by hand | — | Step 3 → Edit |
 | Judge the motion | `project` + `preview_gif` | Step 7/8 → Preview |

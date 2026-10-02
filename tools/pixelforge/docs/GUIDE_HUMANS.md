@@ -83,16 +83,19 @@ Since October 2026 a character does not have to start from a painting. A **shape
 (`.shapes.json`) that lists the pieces of a figure (a hat as a cone, a head as an egg, arms and legs as capsules, a
 coat as a ring with a ragged hem) with a colour ramp each, and which bone of the body each piece rides. The Forge
 draws it as pixel art with the same shading rules for everything (one light from the top left, dark lines between
-pieces, a thin outline, glowing eyes and flames drawn last, a dithered shadow on the ground) and plays the 46 motion
-clips on it, so idle, walk, run, attack, cast, hit and death come out as real frames from all eight directions, with
-hems, veils and hats trailing the body. No Blender, no Mixamo, a few seconds per clip.
+pieces, a thin outline, glowing eyes and flames drawn last, a dithered shadow on the ground) and plays the library's
+motion clips on it (24 of them, idle, walk, run, attack, cast, hit, death and more), so every clip comes out as real
+frames from all eight directions, with skirts, veils and cords hanging from the body and trailing it, the feet on the
+ground and the hat on the head. No Blender, no Mixamo, a few seconds per clip. Objects (a chest, a skull, a dead tree)
+are the same kind of file without bones, rendered as a still with a foot point for the game.
 
 The painting is the reference for the costume, not the source. Writing the file is a job for the AI assistant (the
 necromancer and the Keeper under `assets/shapes/` are the examples); you judge the result and ask for changes in
 plain words ("the hat is too bright", "make the skirt longer"). To look: `pixelforge shapes preview FILE --clip walk
 --direction E` makes a GIF; `pixelforge shapes sheet FILE -o sheet.png` a contact sheet; `pixelforge shapes
-turntable FILE -o turn.gif` a spin. To put one in the game: `pixelforge project import-shapes <character> FILE`,
-then **render-shapes** and **export-game** as usual. "Describe it" can draft a starting file from a sentence
+turntable FILE -o turn.gif` a spin. To put one in the game: `pixelforge project import-shapes <character> FILE -p
+<project folder>`, then **render-shapes** and **export-game** as usual (the step-by-step list for an assistant is
+`docs/GUIDE_SESSION.md` in the game repository). "Describe it" can draft a starting file from a sentence
 (`pixelforge shapes draft "a knight in steel plate with a sword and a crimson cape" -o knight.shapes.json`): a
 mannequin with the right pieces, to be shaped by hand or by the assistant.
 

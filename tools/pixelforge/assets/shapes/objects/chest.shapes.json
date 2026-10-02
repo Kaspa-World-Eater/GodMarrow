@@ -1,0 +1,338 @@
+{
+ "name": "chest",
+ "about": "An iron-banded wooden chest with a domed lid, a brass lock plate and four stub feet. An object: no bones; rendered as a still (pixelforge shapes object) at the game's 30 degree camera. Its height is its size in texels at hr 2.",
+ "mode": "solid",
+ "size": [
+  64,
+  48
+ ],
+ "height": 30,
+ "ground": 44.0,
+ "axis": [
+  32.0,
+  0
+ ],
+ "view": {
+  "elevation": 30
+ },
+ "outline": "#0a080c",
+ "materials": {
+  "oak": {
+   "ramp": "wood5",
+   "lift": 0.02
+  }
+ },
+ "shapes": [
+  {
+   "name": "body",
+   "kind": "box",
+   "centre": [
+    32.0,
+    33.0,
+    0
+   ],
+   "half": [
+    19,
+    10,
+    12
+   ],
+   "round": 0.8,
+   "material": "oak",
+   "rules": [
+    {
+     "every_y": [
+      5,
+      2
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.08,
+      3,
+      2
+     ],
+     "t": -1
+    },
+    {
+     "x": [
+      17.5,
+      20.5
+     ],
+     "material": "iron7"
+    },
+    {
+     "x": [
+      43.5,
+      46.5
+     ],
+     "material": "iron7"
+    },
+    {
+     "x": [
+      17.5,
+      20.5
+     ],
+     "every_y": [
+      4,
+      0
+     ],
+     "z": [
+      11.5,
+      null
+     ],
+     "rivet": true
+    },
+    {
+     "x": [
+      43.5,
+      46.5
+     ],
+     "every_y": [
+      4,
+      0
+     ],
+     "z": [
+      11.5,
+      null
+     ],
+     "rivet": true
+    },
+    {
+     "y": [
+      41.5,
+      null
+     ],
+     "material": "iron7",
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "lid",
+   "kind": "box",
+   "centre": [
+    32.0,
+    20.5,
+    0
+   ],
+   "half": [
+    19.5,
+    4.2,
+    12.5
+   ],
+   "round": 3.4,
+   "material": "oak",
+   "rules": [
+    {
+     "every_z": [
+      5,
+      1
+     ],
+     "y": [
+      null,
+      20.0
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.08,
+      5,
+      2
+     ],
+     "t": -1
+    },
+    {
+     "x": [
+      17.5,
+      20.5
+     ],
+     "material": "iron7"
+    },
+    {
+     "x": [
+      43.5,
+      46.5
+     ],
+     "material": "iron7"
+    },
+    {
+     "x": [
+      17.5,
+      20.5
+     ],
+     "y": [
+      null,
+      19.0
+     ],
+     "every_z": [
+      4,
+      0
+     ],
+     "rivet": true
+    },
+    {
+     "x": [
+      43.5,
+      46.5
+     ],
+     "y": [
+      null,
+      19.0
+     ],
+     "every_z": [
+      4,
+      0
+     ],
+     "rivet": true
+    },
+    {
+     "y": [
+      23.5,
+      25.0
+     ],
+     "material": "iron7",
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "lock",
+   "kind": "box",
+   "centre": [
+    32.0,
+    25.5,
+    12.6
+   ],
+   "half": [
+    2.6,
+    3.2,
+    0.9
+   ],
+   "round": 0.6,
+   "material": "gold6",
+   "rules": [
+    {
+     "near": [
+      [
+       [
+        32.0,
+        25.2,
+        null
+       ]
+      ],
+      0.9
+     ],
+     "t": -4
+    },
+    {
+     "y": [
+      null,
+      23.5
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "hinge.L",
+   "kind": "box",
+   "centre": [
+    24.0,
+    24.0,
+    -12.2
+   ],
+   "half": [
+    2.2,
+    1.2,
+    1.0
+   ],
+   "material": "iron7",
+   "t": -1
+  },
+  {
+   "name": "hinge.R",
+   "kind": "box",
+   "centre": [
+    40.0,
+    24.0,
+    -12.2
+   ],
+   "half": [
+    2.2,
+    1.2,
+    1.0
+   ],
+   "material": "iron7",
+   "t": -1
+  },
+  {
+   "name": "foot.FL",
+   "kind": "box",
+   "centre": [
+    17.0,
+    43.2,
+    9.5
+   ],
+   "half": [
+    2.4,
+    1.2,
+    2.2
+   ],
+   "material": "iron7",
+   "t": -1
+  },
+  {
+   "name": "foot.FR",
+   "kind": "box",
+   "centre": [
+    47.0,
+    43.2,
+    9.5
+   ],
+   "half": [
+    2.4,
+    1.2,
+    2.2
+   ],
+   "material": "iron7",
+   "t": -1
+  },
+  {
+   "name": "foot.BL",
+   "kind": "box",
+   "centre": [
+    17.0,
+    43.2,
+    -9.5
+   ],
+   "half": [
+    2.4,
+    1.2,
+    2.2
+   ],
+   "material": "iron7",
+   "t": -1
+  },
+  {
+   "name": "foot.BR",
+   "kind": "box",
+   "centre": [
+    47.0,
+    43.2,
+    -9.5
+   ],
+   "half": [
+    2.4,
+    1.2,
+    2.2
+   ],
+   "material": "iron7",
+   "t": -1
+  }
+ ],
+ "effects": [],
+ "lights": [],
+ "shadow": null
+}
