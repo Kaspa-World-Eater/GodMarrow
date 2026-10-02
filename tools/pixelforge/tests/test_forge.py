@@ -179,13 +179,30 @@ def test_game_preview_place_and_a_plain_timeout(monkeypatch, tmp_path):
     assert "--place=barrel,dead_tree" in cmd and "--cls=miasmancer" in cmd
     import subprocess
 
+    class R:
+        returncode = 0
+        stdout = "imported"
+        stderr = ""
+
+    seen = []
+
     def run(cmd, **kw):
+        seen.append(cmd)
+        if "--import" in cmd:      # the import step (main's) answers; the game itself overruns
+            return R()
         raise subprocess.TimeoutExpired(cmd, kw.get("timeout", 0), output="booting")
 
     monkeypatch.setattr(game_preview.subprocess, "run", run)
     monkeypatch.setattr(game_preview, "find_godot", lambda hint=None: "/g")
-    r = game_preview.preview_in_game(tmp_path, godot="/g", shot=tmp_path / "x.png", timeout=120)
-    assert r["ok"] is False and "2 minutes" in r["error"] and "Traceback" not in r["error"] and r["timeout"] == 120
+    from pixelforge import api
+    with pytest.raises(api.StepError) as e:
+        game_preview.preview_in_game(tmp_path, godot="/g", shot=tmp_path / "x.png", timeout=120)
+    msg = str(e.value)
+    assert msg.startswith("the game did not finish within 120 s") and "Traceback" not in msg
+    assert "--import" in seen[0] and len(seen) == 2          # the import ran first and answered; the game's limit was the given one
+    assert game_preview.game_timeout(None) == game_preview.RUN_TIMEOUT
+    monkeypatch.setenv("PIXELFORGE_GAME_TIMEOUT", "300")
+    assert game_preview.game_timeout(None) == 300.0 and game_preview.game_timeout(45) == 45.0
     from pixelforge.cli import build_parser
     a = build_parser().parse_args(["game-preview", "--place", "barrel", "--timeout", "300", "--json"])
     assert a.place == "barrel" and a.timeout == 300.0

@@ -28,6 +28,7 @@ GODOT_CANDIDATES = [
     "/Applications/Godot.app/Contents/MacOS/Godot", "/usr/local/bin/godot", "/usr/bin/godot", "/opt/godot/Godot_v4.7.2-stable_linux.x86_64",
 ]
 SKIN_CLASS = {"mystic": "animancer", "wraith": "animancer", "keeper": "miasmancer", "ossuarch": "ossuarch"}
+REPO_GODOT_DIR = Path(__file__).resolve().parents[3] / "tools" / "godot"   # where "Play Godmarrow.bat" downloads it
 
 
 def find_godot(hint: str | None = None) -> str | None:
@@ -39,6 +40,11 @@ def find_godot(hint: str | None = None) -> str | None:
         w = shutil.which(name)
         if w:
             return w
+    if REPO_GODOT_DIR.is_dir():
+        for pat in ("Godot_v4*_win64.exe", "Godot*.exe", "Godot_v4*linux*", "Godot*"):
+            for p in sorted(REPO_GODOT_DIR.glob(pat)):
+                if p.is_file() and p.suffix not in (".zip", ".txt"):
+                    return str(p)
     for c in GODOT_CANDIDATES:
         if Path(c).exists():
             return c
@@ -78,10 +84,14 @@ XVFB = ["xvfb-run", "-a", "-s", "-screen 0 1280x720x24"]
 
 def preview_command(godot: str, game: Path, *, skin: str | None = None, cls: str | None = None, zone: str = "moor", fx: list[str] | None = None,
                     attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None, seed: int = 7,
-                    virtual: bool = False) -> list[str]:
+                    virtual: bool = False, play: bool = False, place: list[str] | None = None) -> list[str]:
     """The game's command line. ``virtual`` wraps it in ``xvfb-run`` with the OpenGL driver for a session without a
-    display (what :func:`needs_virtual_display` detects)."""
+    display (what :func:`needs_virtual_display` detects). ``play``: the plain game (title and all), no test arguments:
+    what "Play the game" in the Forge app does. ``place``: objects from art/objects/objects.json stood next to the hero
+    for a look (the game's ``--place`` hook)."""
     args = ([*XVFB] if virtual else []) + [godot, "--path", str(game)]
+    if play:
+        return args
     if virtual:
         args += ["--rendering-driver", "opengl3"]
     if shot:
@@ -96,6 +106,8 @@ def preview_command(godot: str, game: Path, *, skin: str | None = None, cls: str
         args.append("--fx=" + ",".join(fx))
     if attach:
         args.append("--attach")
+    if place:
+        args.append("--place=" + ",".join(place))
     if hour is not None:
         args.append(f"--hour={hour}")
     if shot:
@@ -131,11 +143,43 @@ def import_project(godot: str, game: Path, *, timeout: float = IMPORT_TIMEOUT, l
     return {"command": cmd, "returncode": proc.returncode}
 
 
+def import_game(game_dir: str | Path | None = None, *, godot: str | None = None, log=None, timeout: float = IMPORT_TIMEOUT) -> dict:
+    """Make the game notice files the Forge put in it: a headless import pass (``godot --headless --import``) on its
+    own, as ``pixelforge game-preview --import`` and the app's "Put it in the game" run it. Seconds on an imported
+    project, minutes the first time; past ``timeout`` it is a :class:`StepError` with the plain reason."""
+    exe = find_godot(godot)
+    if exe is None:
+        raise RuntimeError("Godot was not found. Install Godot 4 or set PIXELFORGE_GODOT to the executable.")
+    game = find_game(game_dir)
+    if game is None:
+        raise RuntimeError("No Godot project found (a folder with project.godot). Pass the game folder.")
+    cmd = import_command(exe, game)
+    if log:
+        log("$ " + " ".join(cmd))
+    proc = _run(cmd, game, timeout, "importing the game's assets")
+    tail = (proc.stdout + proc.stderr)[-800:]
+    return {"ok": proc.returncode == 0, "godot": exe, "game": str(game), "command": cmd, "returncode": proc.returncode, "tail": tail.strip()[-300:]}
+
+
+def game_timeout(timeout: float | None = None) -> float:
+    """Seconds to wait for the game itself: the given value, else PIXELFORGE_GAME_TIMEOUT, else :data:`RUN_TIMEOUT`."""
+    if timeout is not None:
+        return float(timeout)
+    try:
+        return float(os.environ.get("PIXELFORGE_GAME_TIMEOUT", "") or RUN_TIMEOUT)
+    except ValueError:
+        return RUN_TIMEOUT
+
+
 def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = None, skin: str | None = None, cls: str | None = None, zone: str = "moor",
                     fx: list[str] | None = None, attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None,
-                    wait: bool | None = None, log=None) -> dict:
+                    wait: bool | None = None, play: bool = False, place: list[str] | None = None, timeout: float | None = None, log=None) -> dict:
     """Launch the game. With ``shot`` it runs until the screenshot is saved and returns its path; otherwise the
-    game window stays open and the call returns at once (``wait=True`` blocks until it closes)."""
+    game window stays open and the call returns at once (``wait=True`` blocks until it closes). The project's assets
+    are imported first (:func:`import_project`; a fresh checkout takes minutes). A game run that takes longer than
+    ``timeout`` seconds (default 180, or PIXELFORGE_GAME_TIMEOUT) is stopped and is a :class:`StepError` with the
+    plain reason (the CLI prints ``{"ok": false, "error": ...}``), never a traceback."""
+    timeout = game_timeout(timeout)
     exe = find_godot(godot)
     if exe is None:
         raise RuntimeError("Godot was not found. Install Godot 4 or set PIXELFORGE_GODOT to the executable.")
@@ -143,21 +187,22 @@ def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = N
     if game is None:
         raise RuntimeError("No Godot project found (a folder with project.godot). Pass the game folder.")
     virtual = bool(shot) and needs_virtual_display()
-    cmd = preview_command(exe, game, skin=skin, cls=cls, zone=zone, fx=fx, attach=attach, shot=shot, shot_t=shot_t, hour=hour, virtual=virtual)
+    kw = dict(skin=skin, cls=cls, zone=zone, fx=fx, attach=attach, shot=shot, shot_t=shot_t, hour=hour, play=play, place=place)
+    cmd = preview_command(exe, game, virtual=virtual, **kw)
     r = {"ok": True, "godot": exe, "game": str(game), "command": cmd, "virtual_display": virtual}
     r["import"] = import_project(exe, game, log=log)
     if log:
         log("$ " + " ".join(cmd))
     if shot or wait:
-        proc = _run(cmd, game, RUN_TIMEOUT, "the game")
+        proc = _run(cmd, game, timeout, "the game")
         if shot and not Path(shot).exists() and not virtual and shutil.which("xvfb-run") and not sys.platform.startswith(("win", "darwin")):
             # a display that is set but unusable: once more under a virtual one
             virtual = True
-            cmd = preview_command(exe, game, skin=skin, cls=cls, zone=zone, fx=fx, attach=attach, shot=shot, shot_t=shot_t, hour=hour, virtual=True)
+            cmd = preview_command(exe, game, virtual=True, **kw)
             r["command"] = cmd; r["virtual_display"] = True
             if log:
                 log("no usable display; again under xvfb-run\n$ " + " ".join(cmd))
-            proc = _run(cmd, game, RUN_TIMEOUT, "the game")
+            proc = _run(cmd, game, timeout, "the game")
         r["returncode"] = proc.returncode
         tail = (proc.stdout + proc.stderr)[-1500:]
         if log and tail.strip():
