@@ -230,6 +230,25 @@ class Fold:
 		head.text = ("▾ " if o else "▸ ") + title
 		body.visible = o
 		plate.visible = o
+		if o and is_inside_tree():
+			_reveal()
+	## an opened fold inside a ScrollContainer scrolls into view: the whole plate when it fits, else its header to
+	## the top so as much as possible shows (the scroll bar on the right shows there is more)
+	func _reveal() -> void:
+		var n: Node = get_parent()
+		while n != null and not (n is ScrollContainer):
+			n = n.get_parent()
+		if n == null:
+			return
+		var sc := n as ScrollContainer
+		await get_tree().process_frame
+		await get_tree().process_frame
+		if not (is_inside_tree() and open and is_instance_valid(plate)):
+			return
+		if head.size.y + plate.size.y + 4.0 <= sc.size.y:
+			sc.ensure_control_visible(plate)
+		else:
+			sc.scroll_vertical = int(sc.scroll_vertical + head.global_position.y - sc.global_position.y)
 
 static func fold(title: String) -> Fold:
 	var f := Fold.new()

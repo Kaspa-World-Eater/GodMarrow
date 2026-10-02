@@ -9,6 +9,7 @@ OUT=${1:?OUTDIR}; RES=${2:-1280x720}
 GODOT=${GODOT:-godot}; PROJECT=${PROJECT:?PROJECT}
 HERE=$(cd "$(dirname "$0")/.." && pwd)
 mkdir -p "$OUT"
+OUT=$(cd "$OUT" && pwd)   # absolute: Godot resolves a relative --shot against the project folder
 shoot() {  # name "args" seconds
   local name=$1 args=$2 t=$3
   local log; log=$(timeout 400 xvfb-run -a -s "-screen 0 ${RES}x24" "$GODOT" --path "$HERE" --rendering-driver opengl3 --windowed --resolution "$RES" \

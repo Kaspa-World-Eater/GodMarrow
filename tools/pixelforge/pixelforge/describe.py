@@ -76,7 +76,8 @@ def classify(text: str) -> str:
     figure = (r"\b(character|hero|heroine|monster|creature|boss|npc|villager|warrior|knight|skeleton|undead|zombie|ghoul|wraith|mage|wizard|"
               r"witch|necromancer|priest|monk|archer|rogue|assassin|paladin|barbarian|soldier|guard|king|queen|lord|lady|hunter|golem|"
               r"demon|beast|wolf|spider|dragon|giant|ogre|troll|goblin|orc|lich|vampire|cultist|pilgrim|keeper|mystic|building|tree|"
-              r"gravestone|statue|altar|shrine|house|tower|gate|bridge|cart|wagon|barrel|chest|lantern post)\b")
+              r"gravestone|statue|altar|shrine|house|tower|gate|bridge|cart|wagon|barrel|chest|lantern post|"
+              r"ground|texture|tiles?|portrait|icons?|frame|panel|banner|urn|brazier|crypt|well|fence|signpost)\b")
     person = r"\b(he|she|they|his|her|their|wearing|wears|wields|wielding|welding|armou?r|armored|sword|axe|spear|bow|staff|shield|helm|helmet|robe|cloak)\b"
     if (re.search(figure, t) or re.search(person, t)) and not re.search(r"\bspell\b", t) and not re.search(r"\b(make|turn|paint|recolou?r|erase)\b", t):
         return "prompt"
@@ -299,10 +300,13 @@ def draft_prompt(text: str) -> dict:
 
     t = text.lower()
     kind = "object"
-    for k in ("building", "tree", "ground", "effect", "ui", "icons", "portrait", "topdown"):
-        if re.search(r"\b" + k + r"\b", t):
+    # the world kinds, and the plain words for them (a frame or a panel is UI art; tiles and textures are ground)
+    for k, word in (("building", "building"), ("building", "crypt"), ("tree", "tree"), ("ground", "ground"), ("ground", "texture"), ("ground", "tiles?"),
+                    ("effect", "effect"), ("ui", "ui"), ("ui", "frame"), ("ui", "panel"), ("icons", "icons?"), ("portrait", "portrait"), ("topdown", "topdown")):
+        if re.search(r"\b" + word + r"\b", t):
             kind = k
-    objects = r"\b(building|tree|gravestone|statue|altar|shrine|house|tower|gate|bridge|cart|wagon|barrel|chest|lantern post|ground|effect|ui|icons|portrait|topdown)\b"
+    objects = (r"\b(building|tree|gravestone|statue|altar|shrine|house|tower|gate|bridge|cart|wagon|barrel|chest|lantern post|ground|effect|ui|icons?|portrait|topdown|"
+               r"texture|tiles?|frame|panel|banner|urn|brazier|crypt|well|fence|signpost)\b")
     if not re.search(objects, t) or re.search(r"\b(character|hero|monster|creature|boss|figure|warrior|knight|skeleton|undead|he|she|wields|wielding|welding|wearing)\b", t):
         from .prompts import build_prompt
 

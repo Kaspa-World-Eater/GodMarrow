@@ -76,7 +76,37 @@ func _described(r: Dictionary, text: String) -> void:
 	var what := String(r.get("what", "spell"))
 	var a := {"describe": text, "draft": r}
 	var screen: String = {"spell": "spell", "skin": "fix", "music": "sound", "prompt": "character"}.get(what, "spell")
+	if what == "prompt":
+		screen = _prompt_screen(r, a)
 	app.go(screen, a)
+
+## a painting prompt opens the path that will take the painting: a character sheet goes to the character path; a
+## world prompt ("world prompt, kind object: ...") to the path for that kind: objects, trees and buildings to Make an
+## object, ground to the tiles, frames, icons and portraits to the UI path, painted effects to the spell path
+static func _prompt_screen(r: Dictionary, a: Dictionary) -> String:
+	var kind := ""
+	var reads: Array = r.get("read", [])
+	if not reads.is_empty():
+		var first := String(reads[0])
+		if first.begins_with("world prompt, kind "):
+			kind = first.trim_prefix("world prompt, kind ").split(":")[0].strip_edges()
+	if kind == "" and r.has("kinds"):
+		kind = "object"
+	a["prompt_kind"] = kind
+	match kind:
+		"object", "building", "tree", "topdown":
+			return "object"
+		"ground":
+			return "tiles"
+		"ui":
+			a["kind"] = "frame"
+			return "ui"
+		"icons", "portrait":
+			a["kind"] = kind
+			return "ui"
+		"missile", "spell_frames", "effect":
+			return "spell"
+	return "character"
 
 func on_drop(paths: PackedStringArray) -> void:
 	# a painting dropped on Home: a wide picture is a turnaround sheet (a character); a tall one an object

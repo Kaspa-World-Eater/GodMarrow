@@ -62,12 +62,25 @@ func _find_python(hint: String) -> String:
 			return name
 	return "python"
 
-## the game: --game=, PIXELFORGE_GAME, or the folder three above (the Forge lives at <game>/tools/pixelforge/forge)
+## the game: --game=, PIXELFORGE_GAME, or the folder three above (the Forge lives at <game>/tools/pixelforge/forge).
+## Never the Forge's own folder: it has a project.godot too, and the game's art must not land in it.
 func _find_game(hint: String) -> String:
 	for c in [hint, OS.get_environment("PIXELFORGE_GAME"), pf_root.path_join("../..").simplify_path()]:
-		if c != "" and FileAccess.file_exists(c.path_join("project.godot")):
+		if is_game_folder(c):
 			return c
 	return ""
+
+## a folder with a project.godot that is not the Forge app's own
+static func is_game_folder(path: String) -> bool:
+	if path == "" or not FileAccess.file_exists(path.path_join("project.godot")):
+		return false
+	var own := ProjectSettings.globalize_path("res://").simplify_path().rstrip("/")
+	if path.simplify_path().rstrip("/") == own:
+		return false
+	var f := FileAccess.open(path.path_join("project.godot"), FileAccess.READ)
+	if f and f.get_as_text().contains("config/name=\"PixelForge\""):
+		return false
+	return true
 
 ## the Forge project folder: Documents/PixelForge/Forge (made on first use), else next to the user data
 func _default_project_dir() -> String:
@@ -86,7 +99,7 @@ func python_ok() -> bool:
 	return python != ""
 
 func game_ok() -> bool:
-	return game_dir != "" and FileAccess.file_exists(game_dir.path_join("project.godot"))
+	return is_game_folder(game_dir)
 
 ## a sub-folder of the project for a quest's output
 func out_dir(kind: String) -> String:

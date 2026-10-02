@@ -32,6 +32,10 @@ func build() -> void:
 	hint("Esc goes back  ·  Enter does the big thing  ·  the strip above is where you are")
 	if args.has("advanced"):
 		adv["_open"] = true
+	# Describe-it's draft for a painting: the prompt to paint, shown on the first screen (prompt_card)
+	if args.has("draft") and args["draft"] is Dictionary and String(args["draft"].get("what", "")) == "prompt":
+		state["prompt"] = String(args["draft"].get("prompt", ""))
+		state["prompt_kind"] = String(args.get("prompt_kind", ""))
 	begin()
 	show_step()
 
@@ -127,6 +131,15 @@ func buttons(list: Array) -> HBoxContainer:
 	right.add_child(r)
 	return r
 
+## the Describe-it draft: the Midjourney prompt for what was described, with a button to copy it
+func prompt_card() -> void:
+	if String(state.get("prompt", "")) == "":
+		return
+	words("Here is the Midjourney prompt for what you described. Copy it, paint it, and drop the painting here.", "Small")
+	var pb := W.button("Copy the prompt", "", func(): DisplayServer.clipboard_set(String(state["prompt"])); app.say("Prompt copied."))
+	right.add_child(pb)
+	first_focus = pb
+
 ## the Advanced fold: the step's real settings with the defaults filled in
 func advanced(spec: Array, note: String = "") -> void:
 	var f := W.fold("Advanced")
@@ -158,9 +171,13 @@ func run(cli: Array, label: String, on_ok: Callable, on_line: Callable = Callabl
 		return
 	working = true
 	sub_progress = ""
-	if action_btn:
-		action_btn.disabled = true
-		action_btn.text = "Working…"
+	# the big button waits while the command runs and gets its own words and its own job back after (never a
+	# second job bound to it: a stop is retried from the card)
+	var btn := action_btn
+	var btn_text := btn.text if btn else ""
+	if btn:
+		btn.disabled = true
+		btn.text = "Working…"
 	working_label = W.label("", "Teal")
 	working_label.add_theme_font_override("font", FT.font("pixel"))
 	working_label.add_theme_font_size_override("font_size", 8)
@@ -178,6 +195,9 @@ func run(cli: Array, label: String, on_ok: Callable, on_line: Callable = Callabl
 				stop.queue_free()
 			if is_instance_valid(working_label):
 				working_label.queue_free()
+			if btn and is_instance_valid(btn):
+				btn.disabled = false
+				btn.text = btn_text
 			if r.get("ok", false):
 				FSfx.play("done")
 				on_ok.call(r)
@@ -230,10 +250,6 @@ func fail(r: Dictionary) -> void:
 		plain = "Stopped. Nothing was broken; try again when you like."
 	var c := W.card("This step stopped", plain, btns)
 	right.add_child(c)
-	if action_btn:
-		action_btn.disabled = false
-		action_btn.text = "Try again"
-		action_btn.pressed.connect(func(): retry(), CONNECT_ONE_SHOT)
 	first_focus = btns[0]
 	focus_first()
 
@@ -242,6 +258,8 @@ func _plain(msg: String) -> String:
 	var first := msg.split("\n")[0]
 	if "(`" in first:
 		first = first.split("(`")[0]
+	if first.begins_with("Blender failed"):
+		return "Blender stopped partway; the log has what it said. Try again, and if it keeps stopping, Settings has Download Blender for me, which gets the version the Forge knows."
 	if "could not identify a front view" in first:
 		return "The painting's figures could not be told apart. Use a plain background, keep the figures apart, or try Advanced: more figures on the sheet."
 	if "no figures found" in first:
@@ -296,7 +314,7 @@ func screenshot_in_game(extra: Array, name: String, cb: Callable) -> void:
 		FT.forget(shot)
 		cb.call(shot if r.get("ok", false) else ""))
 
-## the standard last step: it is in the game; see it, screenshot it
+## the standard last step: it is in the game; see it (the game's --skin, --fx or --place hook), screenshot it
 func in_game_step(what: String, see_args: Array, shot_name: String) -> void:
 	headline("It is in the game.")
 	words(what)

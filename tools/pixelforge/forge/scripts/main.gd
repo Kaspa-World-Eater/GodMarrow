@@ -7,7 +7,8 @@ const FSfx := preload("res://scripts/sfx.gd")
 ##   --windowed      start in a window (Settings has the toggle; the choice is remembered)
 ##   --nosound
 ##   --screen=NAME [--character=NAME --kind=x --advanced --play ...]   open a screen directly (test hook)
-##   --shot=PATH [--shot_t=S]   save the screen to PATH after S seconds (default 2), then quit (test hook)
+##   --shot=PATH [--shot_t=S]   save the window to PATH after S seconds (default 2), then quit (test hook)
+##   --toggle=window            flip the window (full screen / window) after a second, as the header button does (test hook)
 
 var app: Control
 
@@ -31,6 +32,8 @@ func _ready() -> void:
 	app.args = args
 	app.cfg = cfg
 	add_child(app)
+	if args.has("toggle") and String(args["toggle"]) == "window":
+		get_tree().create_timer(1.0).timeout.connect(func(): app.toggle_fullscreen())
 	if args.has("shot"):
 		_shot(args)
 
@@ -51,13 +54,32 @@ static func save_cfg(d: Dictionary) -> void:
 	if f:
 		f.store_string(JSON.stringify(d, "  "))
 
-## the screen, saved (test hook): the whole window, letterbox and all
+## the window, saved (test hook): read back from the screen and cropped to the window, so the letterbox shows as it
+## does to the person; the viewport's own texture (the content without the bars) is the fallback where the screen
+## cannot be read
 func _shot(a: Dictionary) -> void:
 	await get_tree().create_timer(float(a.get("shot_t", "2"))).timeout
 	await RenderingServer.frame_post_draw
-	var img := get_viewport().get_texture().get_image()
 	var path := String(a["shot"])
 	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+	var img := _window_image()
+	var how := "screen"
+	if img == null:
+		img = get_viewport().get_texture().get_image()
+		how = "viewport"
 	img.save_png(path)
-	print("SHOT ", path, " ", img.get_size())
+	print("SHOT ", path, " ", img.get_size(), " ", how)
 	get_tree().quit()
+
+static func _window_image() -> Image:
+	if not DisplayServer.has_feature(DisplayServer.FEATURE_SCREEN_CAPTURE):
+		return null
+	var screen := DisplayServer.window_get_current_screen()
+	var img := DisplayServer.screen_get_image(screen)
+	if img == null or img.is_empty():
+		return null
+	var at := DisplayServer.window_get_position() - DisplayServer.screen_get_position(screen)
+	var rect := Rect2i(at, DisplayServer.window_get_size()).intersection(Rect2i(Vector2i.ZERO, img.get_size()))
+	if rect.size.x < 8 or rect.size.y < 8:
+		return null
+	return img.get_region(rect)

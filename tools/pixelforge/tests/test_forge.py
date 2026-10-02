@@ -147,3 +147,65 @@ def test_the_pictures_and_assets_the_app_needs_are_committed():
     for n in ["pf_bone_frame", "pf_iron_frame", "pf_teal_ward_frame", "pf_vellum_panel"]:
         assert (FORGE / "assets/ui" / f"{n}.png").exists() and json.loads((FORGE / "assets/ui" / f"{n}.json").read_text())["margins"]
     assert (FORGE / "assets/sfx/LICENSE_kenney.txt").exists()
+
+
+def test_forge_launch_never_hands_the_app_its_own_folder_as_the_game(monkeypatch, tmp_path):
+    """The Forge has a project.godot of its own; the game is the repository root above tools/pixelforge."""
+    monkeypatch.delenv("PIXELFORGE_GAME", raising=False)
+    monkeypatch.setattr(forge_launch, "find_godot", lambda hint=None: "/fake/godot")
+    seen = {}
+
+    class P:
+        pid = 1
+
+    monkeypatch.setattr(forge_launch.subprocess, "Popen", lambda cmd, **kw: seen.update(cmd=cmd) or P())
+    r = forge_launch.launch(project=tmp_path)
+    assert r["ok"]
+    game = [x for x in seen["cmd"] if x.startswith("--game=")]
+    repo_root = FORGE.resolve().parents[2]
+    assert game == [f"--game={repo_root}"], seen["cmd"]
+    assert f"--game={FORGE}" not in seen["cmd"] and f"--game={FORGE.resolve()}" not in seen["cmd"]
+    # a PIXELFORGE_GAME that points at the Forge itself is refused too
+    monkeypatch.setenv("PIXELFORGE_GAME", str(FORGE))
+    assert forge_launch.game_dir() != FORGE.resolve()
+    # the app's own check, on the same facts: a project.godot named PixelForge is not the game
+    backend = (FORGE / "scripts/backend.gd").read_text()
+    assert 'config/name=\\"PixelForge\\"' in backend and "is_game_folder" in backend
+
+
+def test_game_preview_place_and_a_plain_timeout(monkeypatch, tmp_path):
+    (tmp_path / "project.godot").write_text("")
+    cmd = game_preview.preview_command("/g", tmp_path, place=["barrel", "dead_tree"], cls="miasmancer")
+    assert "--place=barrel,dead_tree" in cmd and "--cls=miasmancer" in cmd
+    import subprocess
+
+    def run(cmd, **kw):
+        raise subprocess.TimeoutExpired(cmd, kw.get("timeout", 0), output="booting")
+
+    monkeypatch.setattr(game_preview.subprocess, "run", run)
+    monkeypatch.setattr(game_preview, "find_godot", lambda hint=None: "/g")
+    r = game_preview.preview_in_game(tmp_path, godot="/g", shot=tmp_path / "x.png", timeout=120)
+    assert r["ok"] is False and "2 minutes" in r["error"] and "Traceback" not in r["error"] and r["timeout"] == 120
+    from pixelforge.cli import build_parser
+    a = build_parser().parse_args(["game-preview", "--place", "barrel", "--timeout", "300", "--json"])
+    assert a.place == "barrel" and a.timeout == 300.0
+    assert build_parser().parse_args(["game-preview"]).timeout is None
+
+
+def test_describe_sends_world_things_to_their_own_path():
+    """Describe-it: what a person types for an object, ground, a portrait or a frame is a world prompt of that kind
+    (home.gd routes it to the object, tiles or UI path); a figure is still a character sheet."""
+    from pixelforge import describe
+
+    for text, kind in [("a wooden barrel", "object"), ("a dead tree", "tree"), ("a stone crypt", "building"), ("mossy stone ground", "ground"),
+                       ("a portrait of the gravekeeper", "portrait"), ("inventory icons: a sword, a ring", "icons"), ("a bone ui frame", "ui"),
+                       ("a torn banner", "object")]:
+        d = describe.draft(text)
+        assert d["what"] == "prompt" and "kinds" in d, text
+        assert d["read"][0].startswith(f"world prompt, kind {kind}:"), (text, d["read"][0])
+    d = describe.draft("a grave knight with a rusted helm")
+    assert d["what"] == "prompt" and "kinds" not in d and d["read"][0].startswith("character sheet prompt")
+    # the app's routing table covers every world kind the classifier can name
+    home = (FORGE / "scripts/screens/home.gd").read_text()
+    for k in ["object", "building", "tree", "topdown", "ground", "ui", "icons", "portrait", "missile", "spell_frames", "effect"]:
+        assert f'"{k}"' in home, k

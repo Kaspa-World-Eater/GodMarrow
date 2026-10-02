@@ -31,8 +31,6 @@ func begin() -> void:
 			if args.has("step"):
 				step = int(args["step"])
 			show_step())
-	if args.has("draft") and args["draft"].get("what", "") == "prompt":
-		state["prompt"] = String(args["draft"].get("prompt", ""))
 
 func char_dir() -> String:
 	return app.backend.project_dir.path_join("characters").path_join(cname)
@@ -80,10 +78,7 @@ func _painting() -> void:
 	picture(W.drop_zone("Drop your painting here", "Choose a painting", func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; Pictures"]), _dropped)))
 	headline("Start with a painting")
 	words("A turnaround sheet works best: the same figure from the front, the side and the back on one plain background. A single front view works too.")
-	if state.has("prompt"):
-		words("Here is the Midjourney prompt for what you described. Copy it, paint it, and drop the result here.", "Small")
-		var pb := W.button("Copy the prompt", "", func(): DisplayServer.clipboard_set(state["prompt"]); app.say("Prompt copied."))
-		right.add_child(pb)
+	prompt_card()
 	next_line("the Forge cuts the figure out, locks its colours, builds it, films it from 8 directions and makes it pixels. Nothing to set up.")
 	var chars: Dictionary = status.get("characters", {})
 	if chars.is_empty() and app.backend.project_exists() and status.is_empty():
@@ -159,7 +154,7 @@ func _auto_step(i: int) -> void:
 		right.add_child(again)
 		cont.grab_focus()
 	else:
-		big(titles[i].split(" ")[0] + " now" if not chain else "Working…", func(): _run_step(i))
+		big(titles[i].split(" ")[0] + " now", func(): _run_step(i))   # "Working…" while it runs (quest.run), its own words after
 		if chain:
 			var pause := W.ghost("Pause after this step", func(): chain = false; app.say("The Forge will pause after this step."))
 			right.add_child(pause)

@@ -293,3 +293,20 @@ remains, how the Tk Studio relates). Screenshots of every screen at 1280x720 and
 `docs/screens/forgeapp/`. Tests: 96 green (`tests/test_forge.py` is new); `forge/tools/check_scripts.gd` parses
 every script headless. Not done here: a full Blender run from inside the app (the cloud has no Blender; the chain was
 run to the "Download Blender for me" card and the finished Keeper was used for the preview and put-in-game steps).
+
+### 7.7 track/forgeapp review fixes (2026-10-01)
+A review of 7.6 found one blocker: every real launcher (`pixelforge forge`, PixelForge.bat, the desktop icon) handed
+the app its own folder as "the game", because the Forge has a project.godot of its own and `find_game` took the
+first one it met; Play would have relaunched the app and "Put it in the game" would have written into
+`tools/pixelforge/forge`. Fixed in `forge_launch.game_dir()` (climbs from `tools/pixelforge`, refuses the Forge) and
+`backend.gd` (refuses a project named PixelForge), with a test on the launch command. Also fixed: Describe-it sent
+"a wooden barrel" to Make a character (world prompts now open the path for their kind, with a *Copy the prompt*
+button); the Settings full-screen switch did not follow the header button; a stopped "Take a screenshot" showed a
+traceback-shaped card and rebound the big button (now a plain timed-out message, one *Try again* on the card);
+the open Advanced fold ran off the bottom with no visible scroll bar; the 1366x768 shots were viewport captures
+(now the window is read from the screen, letterbox and all); `screens.sh` took a relative OUT; `tools/godot/` was
+not ignored. New: the game's `--place=NAME` test hook (`core/test_hooks.gd`) so the object road's "See it in the
+game" shows the object beside the hero; `game-preview --place`, `--timeout` (`PIXELFORGE_GAME_TIMEOUT`). The game's
+smoke needs a `.godot` class cache in a fresh worktree (`godot --headless --import` once) before it reads clean.
+The owner's later direction for the app's look is `docs/track_notes/gui_look.md` (1-bit dungeon text-adventure
+framing, dungeon-synth music); it is the next pass, noted in `docs/track_notes/forgeapp.md`, not done here.

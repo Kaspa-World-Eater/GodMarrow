@@ -14,3 +14,4 @@ tools/pixelforge/assets/kits/
 art/tiles/_patches/
 art/objects/*/*_render.png
 art/objects/*/*_render.json
+tools/godot/

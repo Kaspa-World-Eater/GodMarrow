@@ -25,6 +25,7 @@ func _painting() -> void:
 	picture(W.drop_zone("Drop a ground texture here", "Choose a texture", func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; Pictures"]), _dropped)))
 	headline("Start with a painted texture")
 	words("A square of ground seen from above: grass, mud, ash, stone. It is made seamless and cut into iso diamonds, with six variants so the ground does not repeat.")
+	prompt_card()
 	next_line("you see the tiles, then put them in the game.")
 	var second := String(state.get("second", ""))
 	var sb := W.button("Second texture for the edges: " + ("chosen" if second != "" else "none"), "", func():

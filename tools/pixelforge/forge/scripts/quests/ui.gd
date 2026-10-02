@@ -60,6 +60,7 @@ func _painting() -> void:
 	picture(W.drop_zone("Drop your painting here", "Choose a painting", func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; Pictures"]), _dropped)))
 	headline(k[1])
 	words(W.sentence(k[2]) + ".")
+	prompt_card()
 	match kind:
 		"icons":
 			next_line("each item is found, cut out and pressed to an icon at two sizes.")

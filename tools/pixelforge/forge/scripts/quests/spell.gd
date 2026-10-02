@@ -97,6 +97,7 @@ func _shape() -> void:
 	first_focus = first
 	headline("Pick a shape")
 	words("A missile flies, a nova spreads on the ground, a wall stands and burns, a burst flashes once, armour circles a figure. The whole spells are the game's own, layered.")
+	prompt_card()
 	next_line("you pick its colours, and it plays.")
 
 func _look() -> void:

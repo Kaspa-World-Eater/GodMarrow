@@ -31,6 +31,28 @@ def find_python() -> str:
     return sys.executable
 
 
+def game_dir() -> Path | None:
+    """The game the app puts things in: PIXELFORGE_GAME, else the nearest project.godot above tools/pixelforge
+    (the repository root). Never the Forge app's own folder: it has a project.godot of its own, and "Play the game"
+    or "Put it in the game" must not land there."""
+    forge = forge_dir()
+    cands: list[Path] = []
+    env = os.environ.get("PIXELFORGE_GAME")
+    if env:
+        cands.append(Path(env))
+    found = find_game(forge.parent)
+    if found is not None:
+        cands.append(found)
+    for c in cands:
+        try:
+            c = c.resolve()
+        except OSError:
+            continue
+        if (c / "project.godot").exists() and c != forge:
+            return c
+    return None
+
+
 def godot_download_url() -> tuple[str, str]:
     if sys.platform.startswith("win"):
         return GODOT_RELEASE + f"Godot_v{GODOT_VERSION}-stable_win64.exe.zip", "zip"
@@ -106,7 +128,7 @@ def launch(godot: str | None = None, *, project: str | Path | None = None, scree
             return {"ok": False, "error": f"Godot was not found and the download failed ({e}). Get Godot 4 from godotengine.org and set PIXELFORGE_GODOT."}
     if exe is None:
         return {"ok": False, "error": "Godot was not found. Get Godot 4 from godotengine.org and set PIXELFORGE_GODOT to the executable."}
-    game = find_game(forge)
+    game = game_dir()
     cmd = command(exe, game=game, project=project, screen=screen, windowed=windowed, extra=extra)
     if log:
         log("$ " + " ".join(cmd))

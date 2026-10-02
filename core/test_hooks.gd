@@ -13,6 +13,7 @@ extends RefCounted
 ##   --demo [--trace]         the pilgrim fights the nearest creatures, for captures
 ##   --fx=NAME[,NAME]         PixelForge effects (art/fx/<NAME>.json) playing at the pilgrim, for a look (the Forge's "Preview in game")
 ##   --attach                 spawn the effects the Forge's effects editor attached to the pilgrim's sprite set
+##   --place=NAME[,NAME]      the Forge's objects (art/objects/objects.json) stood beside the pilgrim for a look, nothing saved
 ##   --shot=PATH [--shot_t=S] [--shot_n=N]   save the screen to PATH after S seconds (default 4), N frames 0.25 s apart
 ##                            (PATH_1.png ...), then quit. Needs a window (not --headless). --hour=0..1 sets the hour.
 ##   --hide=dark,atmos,sky,fore   switch those overlays off (the dark and light map, the air, the weather, the near dark),
@@ -43,6 +44,8 @@ static func run(g) -> void:
 		g.hero.lamp.enabled = false
 	if a.has("fx") or a.has("attach"):
 		_forge_preview(g, a)
+	if a.has("place"):
+		_forge_place(g, a)
 	if a.has("lvl"):
 		g.hero.st.level = int(a["lvl"])
 		g.hero.st.arcana_points = int(a.get("arcana", "3"))
@@ -214,15 +217,55 @@ static func _shot(g, a: Dictionary) -> void:
 			await tree.create_timer(0.25).timeout
 	tree.quit()
 
+## PixelForge's "See it in the game" for an object (--place=a,b): each stands a few tiles from the pilgrim, drawn
+## the way the world draws its painted objects (world/objects/manager_build.gd), a swaying one through the addon
+static func _forge_place(g, a: Dictionary) -> void:
+	var manifest := "res://art/objects/objects.json"
+	var meta: Dictionary = PFObjects.manifest(manifest)
+	var mgr = g.zone.get_node_or_null("WorldObjects")
+	var i := 0
+	for name in String(a["place"]).split(","):
+		name = name.strip_edges()
+		if name == "":
+			continue
+		var e: Dictionary = meta.get(name, {})
+		if e.is_empty():
+			print("FORGE object missing: ", name)
+			continue
+		var tp: Vector2 = g.hero.tp + Vector2(2.0 + 1.5 * float(i % 3), -1.0 + 1.5 * floorf(float(i) / 3.0))
+		if int(e.get("frames", 1)) <= 1 and mgr != null and mgr.has_method("_art_node"):
+			mgr._art_node(name, tp)
+		else:
+			PFObjects.place(g.zone.sorted, manifest, name, Iso.to_screen(tp), Iso.WPX)
+		print("FORGE placed: ", name, " at ", tp)
+		i += 1
+
+## a look at an effect (--fx): a looping one plays on; a one-shot (a nova, a burst) plays again every 1.5 s for
+## twenty seconds, so it is on screen for a --shot and for a person's glance, not gone in a blink
+static func _forge_fx_look(g, fx_dir: String, names: PackedStringArray) -> void:
+	var again: Array = []
+	for name in names:
+		if name == "":
+			continue
+		var sp = PFFx.spawn(g.hero, fx_dir, name, Vector2(0, -60), 1.0, 2)
+		if sp == null:
+			print("FORGE fx missing: ", name)
+		elif not sp.sprite_frames.get_animation_loop("play"):
+			again.append(name)
+	for i in 13:
+		if again.is_empty():
+			return
+		await g.get_tree().create_timer(1.5).timeout
+		if g.hero == null or not is_instance_valid(g.hero):
+			return
+		for name in again:
+			PFFx.spawn(g.hero, fx_dir, name, Vector2(0, -60), 1.0, 2)
+
 static func _forge_preview(g, a: Dictionary) -> void:
 	## PixelForge's "Preview in game": effects at the pilgrim (--fx=a,b) and the sprite set's attached effects (--attach).
 	var fx_dir := "res://art/fx"
 	if a.has("fx"):
-		for name in String(a["fx"]).split(","):
-			if name != "":
-				var sp = PFFx.spawn(g.hero, fx_dir, name, Vector2(0, -60), 1.0, 2)
-				if sp == null:
-					print("FORGE fx missing: ", name)
+		_forge_fx_look(g, fx_dir, String(a["fx"]).split(","))
 	if a.has("attach"):
 		var kind := String(a.get("skin", g.hero.cls))
 		var set := PFSpriteSet.new()

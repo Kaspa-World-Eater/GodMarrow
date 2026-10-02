@@ -27,7 +27,8 @@ sprite that breathes.
 
 **Make an object.** Drop a painting of a barrel, a gravestone, a dead tree, a banner. It is cut out, given its
 footprint, and pressed to the game's pixels. Choose whether it stays still, sways like a tree, flutters like a banner
-or flickers like a flame, then put it in the game's object list.
+or flickers like a flame, then put it in the game's object list. **See it in the game** stands one beside the hero on
+the moor for a look; the world builder places it for good.
 
 **Make a spell or effect.** Pick a shape (missile, nova, wall, burst, armour, and more) or one of the game's whole
 spells, then a look (the game's colour ramps). Watch it play. Put it in the game and **See it**: it plays at the hero
@@ -41,10 +42,14 @@ stays), glow, erase, restore the original, smooth. Undo takes a click back; Keep
 
 **Describe it.** The bar at the top of the first screen takes plain words: "a wisp lantern spell, pale blue, slow,
 with embers" opens the spell path with that spell playing; "make the left eye teal with a pale glow" opens the fix-up
-path; "a grave knight with a rusted helm" gives you the painting prompt; "a slow sombre act 2 wilds tune" renders it.
+path; "a slow sombre act 2 wilds tune" renders it. Something to paint first opens the path that will take the
+painting, with the Midjourney prompt ready to copy: "a grave knight with a rusted helm" opens Make a character, "a
+wooden barrel" Make an object, "mossy stone ground" the tiles, "a portrait of the gravekeeper" the portraits.
 
 **Advanced, not hidden.** Every screen has an *Advanced* fold with the step's real settings and their usual values
-(the same ones the command line takes), closed until you open it. **Log** at the top right shows exactly what ran.
+(the same ones the command line takes), closed until you open it; when it is longer than the screen, the bar on the
+right scrolls it. **Log** at the top right shows exactly what ran. When a step stops, a card says why in plain words
+and offers the fix; *Try again* on the card runs that step again.
 **Settings** has the window / full screen switch (also F11), the sounds, the folders, what this computer has, and
 the button to open **PixelForge Studio (classic)**, the older window with every form.
 

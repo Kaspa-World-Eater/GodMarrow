@@ -35,6 +35,7 @@ func _painting() -> void:
 	picture(W.drop_zone("Drop your painting here", "Choose a painting", func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; Pictures"]), _dropped)))
 	headline("Start with a painting")
 	words("One object on a plain background: a barrel, a gravestone, a dead tree, a banner. A sheet of four variations works too (say so in Advanced).")
+	prompt_card()
 	next_line("the Forge cuts it out, finds where it stands on the ground, and presses it to the game's pixels.")
 	advanced([
 		{"key": "name", "label": "Name", "type": "text", "default": "", "hint": "blank = the file's name"},
@@ -120,6 +121,9 @@ func _cut() -> void:
 	words("%s cut out, %d by %d pixels, standing on its own footprint (the game knows where its feet are)." % ["One object" if n <= 1 else "%d variations" % n, int(sz[0]), int(sz[1])])
 	next_line("choose whether it moves in the wind.")
 	big("Continue", func(): advance())
+	if args.has("autoput") and not state.get("auto_cont", false):   # test hook: the whole road by itself
+		state["auto_cont"] = true
+		call_deferred("advance")
 	buttons([W.ghost("Do it again with the Advanced settings", func(): _make(out_dir(), false, func(): show_step()))])
 	_painting_advanced()
 
@@ -151,6 +155,9 @@ func _sway() -> void:
 	right.add_child(g)
 	next_line("it goes into the game's object list, ready to be placed.")
 	big("Put it in the game", func(): mark_done(2); go_step(3))
+	if args.has("autoput") and not state.get("auto_went", false):   # test hook: the whole road by itself
+		state["auto_went"] = true
+		call_deferred("go_step", 3)
 	_painting_advanced()
 
 func _in_game() -> void:
@@ -160,9 +167,13 @@ func _in_game() -> void:
 		_result_picture()
 		headline("Put " + W.pretty(oname) + " in the game")
 		words("The sprite goes into the game's objects folder and its list, with the footprint. The world builder can place it as \"" + oname + "\".")
-		next_line("the game is told to look, and you can open it.")
+		next_line("the game is told to look, and you see it standing on the moor.")
 		var game_out: String = app.backend.game_dir.path_join("art").path_join("objects")
 		big("Put it in the game", func(): _make(game_out, true, func(): import_game(func(): state["in_game"] = true; show_step())))
+		if args.has("autoput") and not state.get("auto_put", false):
+			state["auto_put"] = true
+			call_deferred("_auto_press")
 		return
 	_result_picture()
-	in_game_step(W.pretty(oname) + " is in the game's object list as \"" + oname + "\". The world builder places it; the moor does not change on its own.", ["--cls", "miasmancer"], oname)
+	in_game_step(W.pretty(oname) + " is in the game's object list as \"" + oname + "\". \"See it in the game\" stands one beside the hero on the moor for a look; the world builder places it for good.",
+		["--place", oname, "--cls", "miasmancer"], oname)

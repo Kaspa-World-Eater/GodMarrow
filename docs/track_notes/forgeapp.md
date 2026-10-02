@@ -26,6 +26,26 @@ and character roads were run that way against a scratch copy of the game. 96 pyt
 `tests/test_forge.py`); `godot --headless --path tools/pixelforge/forge --script res://tools/check_scripts.gd` parses
 all 20 scripts.
 
+**Review fixes (2026-10-01, same branch).** The launchers (`pixelforge forge`, PixelForge.bat, the desktop icon) handed
+the app its own folder as "the game" (the Forge has a project.godot too), so Play would have relaunched the app and
+"Put it in the game" would have written into `tools/pixelforge/forge`: `forge_launch.game_dir()` now climbs from
+`tools/pixelforge` and refuses the Forge, `backend.gd` refuses any project named PixelForge, and a test asserts the
+command carries `--game=<repository root>`. Describe-it sent every painting prompt to Make a character: world prompts
+now open the path for their kind (object, tiles, UI, spell), each with a *Copy the prompt* button (`quest.prompt_card`).
+The Settings switch follows the header button and F11 (`app.window_changed`). A stopped step restores the big
+button's own words and job; the card's *Try again* is the one retry. `game-preview --shot` past its time limit is
+a plain error (`--timeout`, `PIXELFORGE_GAME_TIMEOUT`), not a traceback. The Advanced fold scrolls into view when
+opened and the scroll bar can be seen. `--shot` reads the window back from the screen (letterbox and all).
+`screens.sh` absolutises OUT; `tools/godot/` is ignored. The game got a `--place=NAME` hook (core/test_hooks.gd) so the
+object road's "See it in the game" shows the object beside the hero, and `--autoput` runs that road end to end.
+
+**Next direction (not done here): the look.** `docs/track_notes/gui_look.md` on main (the owner's reference,
+`docs/refs/forge_gui_reference.png`) asks for an old-school dungeon text-adventure framing: one ink-and-bone palette,
+dithered 1-bit pixel art, an ornate hand-drawn border, the step's words in a text box in a narrative tone, a pixel
+cursor glyph for the chosen button, and dungeon-synth music with sparkling bells (`forge_home`, `forge_working`,
+`forge_done` cues in `music.py`). The app's structure (tiles, paths, strip, Advanced, log, backend) stays; the theme
+(`theme.gd`), the frames in `forge/assets/ui`, the transitions and the sounds are what that pass replaces.
+
 **How the Tk Studio relates.** It is the classic fallback: `pixelforge studio`, the "PixelForge Studio (classic)"
 desktop icon install.bat still makes, and a button in the app's Settings and in the fix-up path. track/ui owns it
 (`gui.py`, `tools_window.py`, untouched here). The app covers the common jobs end to end; the Studio keeps the full
@@ -40,8 +60,8 @@ editors should move into Godot screens; until then the app sends the person to t
   full filmed run from inside the app. On the laptop the chain runs on its own; watch the first full run.
 - *Looks.* The spell path's "look" is the vfx palettes; when track/fxlook lands, add its presets as a second row
   (`pixelforge looks --json`).
-- *Objects in the world.* "Put it in the game" adds the object to `objects.json`; nothing places it on the moor. A
-  "drop it on the moor" test hook in the game (like `--fx`) would let "See it in the game" show it.
+- *Objects in the world.* "Put it in the game" adds the object to `objects.json` and "See it in the game" stands it
+  beside the hero (`--place`, a look only); placing it for good is the world builder's job (`world/objects`).
 - *The native file dialog.* Godot's `use_native_dialog` gives the Windows dialog; under Linux without a portal it
   falls back to the themed Godot dialog. Fine on the laptop; untested there.
 - *Drag-and-drop from a browser* (dragging a Midjourney image straight from Discord) is a file drop only when the

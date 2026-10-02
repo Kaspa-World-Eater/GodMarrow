@@ -22,6 +22,8 @@ const SCREENS := {
 	"fix": "res://scripts/quests/fix.gd",
 }
 
+signal window_changed            # after the window went full screen or back (Settings follows it)
+
 var args := {}
 var cfg := {}
 var backend: Backend
@@ -198,6 +200,7 @@ func toggle_fullscreen() -> void:
 		var b := current.header.get_node_or_null("WindowToggle")
 		if b:
 			b.text = "Window" if is_fullscreen() else "Full screen"
+	window_changed.emit()
 
 func set_sound(on: bool) -> void:
 	FSfx.enabled = on

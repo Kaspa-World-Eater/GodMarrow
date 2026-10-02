@@ -282,18 +282,21 @@ project.json the app works on is the same one you work on; `status --json` tells
 
 Start it: `pixelforge forge [--project P] [--screen S] [--windowed]` (`pixelforge/forge_launch.py` finds Godot with
 `game_preview.find_godot`, fetches it into `tools/godot` when there is none, and passes `--python=<this interpreter>`
-and `--game=<the folder with project.godot>` to the app), or `PixelForge.bat`. What the app runs, per tile:
+and `--game=<the game>` to the app), or `PixelForge.bat`. The game is `forge_launch.game_dir()`: `PIXELFORGE_GAME`,
+else the nearest `project.godot` above `tools/pixelforge` (the repository root); never the Forge's own folder, which
+has a `project.godot` too (the app's `backend.gd` refuses it as well: a project named PixelForge is not the game).
+What the app runs, per tile:
 
 | tile | commands |
 |---|---|
 | Make a character | `project new` (first use; style godmarrow) · `project add` · `project import <name> sheet|front` · `project run <name> split|palette|model|rig|render|pixelate` with the Advanced flags (`--tolerance --views --colors --model-mode --height --clips --per-clip --elevation --passes --actions --outline`) · `project export-game` · `project preview-gif` · `project export-game --out <game>/art/sprites` · `game-preview --import` · `game-preview --skin <kind> [--shot]` · the no-3D road: `project still <name> --view front --animate idle --export` |
-| Make an object | `prop <painting> <name> -o <project>/objects [--sway canopy|banner|flame ...]`, then the same with `-o <game>/art/objects --game-objects <game>/art/objects/objects.json --hr 2`; Advanced "carve in 3D" uses `object` |
+| Make an object | `prop <painting> <name> -o <project>/objects [--sway canopy|banner|flame ...]`, then the same with `-o <game>/art/objects --game-objects <game>/art/objects/objects.json --hr 2`; Advanced "carve in 3D" uses `object`; `game-preview --place <name>` stands it beside the hero on the moor (the game's `--place` hook; nothing is saved) |
 | Make a spell or effect | `vfx <kind> <name> -o <project>/fx --palette <look> --gif [--frames --fps --size --bands --seed --glow --rotations]` or `spell new <name> --preset <p>`; into the game with `-o <game>/art/fx` (missiles get `--rotations 16`); `game-preview --fx <name>` |
 | Make tiles and ground | `tiles <texture> <name> -o <project>/tiles [--second --variants --tile --colors --seed]`, then `-o <game>/art/tiles` |
 | Make icons, portraits and UI | `icons`, `portrait`, `ui9` into `<project>/items|portraits|ui`, then the game's folders |
 | Make sounds and music | `music list` · `music <cue> -o <project>/music --seconds 20 [--seed --set ...]` · `music <cue> -o <game>/audio/music --seconds 120 --format ogg` · `sfx all` |
 | Fix up a picture | `skin <image> '<ops>' -o <project>/fix/<file>` after every click (recolor, glow, erase, restore, smooth at a point); Keep = `skin <image> '<ops>'` in place (a .bak is kept); the ops can be saved as JSON for you to replay |
-| Describe it | `describe "<words>" --json` → `what` picks the path; spells export with `describe ... -o <folder>` |
+| Describe it | `describe "<words>" --json` → `what` picks the path: `spell` → the spell path with it playing, `skin` → fix up, `music` → sounds and music, `prompt` → the path that will take the painting (a character-sheet prompt → Make a character; a world prompt → its kind: object/building/tree/topdown → Make an object, ground → tiles, ui/icons/portrait → the UI path, missile/spell_frames/effect → the spell path), with a *Copy the prompt* button on its first screen; spells export with `describe ... -o <folder>` |
 | Play the game | `game-preview --play` (the plain game); Advanced: `game-preview --cls <order>` |
 | Settings | `doctor --json`, `project blender-download`, `project set --blender` |
 
@@ -302,10 +305,15 @@ loaders see them.
 
 **Screenshots of the app (test hooks, after `--`):** `--screen=NAME` opens a screen directly (home, settings, play,
 character, object, spell, tiles, ui, sound, fix), `--project=PATH` and `--game=PATH` choose the folders, `--python=`
-the interpreter, `--shot=PATH --shot_t=S` saves the window after S seconds and quits, `--windowed` and `--nosound`.
-Per path: `--character=NAME` (continue one), `--drop=FILE` (as if dropped), `--shape=nova --look=frost --play`
-(spell), `--kind=portrait|icons|frame` (ui), `--cue=a1_wild [--silent]` (sound), `--advanced` (the fold open),
-`--autoput` (press *Put it in the game* and *Take a screenshot* by itself). Under xvfb:
+the interpreter, `--shot=PATH --shot_t=S` saves the window after S seconds and quits (read back from the screen and
+cropped to the window, so the letterbox shows as the person sees it; where the screen cannot be read it falls back to
+the viewport texture, and the `SHOT` line it prints says which), `--windowed` and `--nosound`, `--toggle=window`
+(flip full screen / window after a second, as the header button does), `--describe=WORDS --go` (type into the
+Describe-it bar and press *Make it*; quote the argument). Per path: `--character=NAME` (continue one), `--drop=FILE`
+(as if dropped), `--shape=nova --look=frost --play` (spell), `--kind=portrait|icons|frame` (ui), `--cue=a1_wild
+[--silent]` (sound), `--advanced` (the fold open), `--autoput` (the character and object roads press *Put it in the
+game* and *Take a screenshot* by themselves). A relative `--shot` path is resolved against the app's folder, so pass
+absolute ones (`forge/tools/screens.sh OUT [WxH]` shoots the whole set and absolutises OUT). Under xvfb:
 
 ```
 timeout 300 xvfb-run -a -s "-screen 0 1280x720x24" godot --path tools/pixelforge/forge --rendering-driver opengl3 \
@@ -313,6 +321,11 @@ timeout 300 xvfb-run -a -s "-screen 0 1280x720x24" godot --path tools/pixelforge
   --screen=spell --shape=nova --look=frost --play --shot=/tmp/spell.png --shot_t=12
 godot --headless --path tools/pixelforge/forge --script res://tools/check_scripts.gd    # every script parses
 ```
+
+`game-preview --shot` and `--wait` give the game 180 s (`--timeout S`, or `PIXELFORGE_GAME_TIMEOUT`); past that the
+result is a plain `{"ok": false, "error": "The game took more than 3 minutes..."}`, not a traceback, and the app shows
+it as a card. The game's own hooks it uses: `--skin`, `--fx`, `--attach`, `--place=a,b` (the Forge's objects stood
+beside the hero), `--shot`.
 
 The app's own files: `forge/scripts/theme.gd` (the look), `widgets.gd`, `backend.gd` (the CLI runner), `app.gd`
 (screens, transitions, log drawer), `screen.gd` and `quest.gd` (the base of every path), `screens/`, `quests/`. No

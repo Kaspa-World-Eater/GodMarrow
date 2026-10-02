@@ -497,7 +497,8 @@ def cmd_game_preview(a) -> None:
         _emit(a, import_game(a.game, godot=a.godot, log=print))
         return
     _emit(a, preview_in_game(a.game, godot=a.godot, skin=a.skin, cls=a.cls, zone=a.zone, fx=a.fx.split(",") if a.fx else None, attach=a.attach,
-                             shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, play=a.play, log=print))
+                             shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, play=a.play, place=a.place.split(",") if a.place else None,
+                             timeout=a.timeout, log=print))
 
 
 def cmd_forge(a) -> None:
@@ -826,6 +827,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--game", default=None, help="the Godot project folder (found upward from here when omitted)"); s.add_argument("--godot", default=None)
     s.add_argument("--skin", default=None, help="a sprite set kind, e.g. keeper"); s.add_argument("--cls", default=None); s.add_argument("--zone", default="moor")
     s.add_argument("--fx", default=None, help="effects to play at the hero: a,b"); s.add_argument("--attach", action="store_true", help="the effects editor's attachments on the skin")
+    s.add_argument("--place", default=None, help="objects from the game's objects.json stood next to the hero for a look: a,b (the Forge's objects)")
+    s.add_argument("--timeout", type=float, default=None, help="seconds to wait for a --shot or --wait run before reporting it stopped (default 180, or PIXELFORGE_GAME_TIMEOUT)")
     s.add_argument("--shot", default=None, help="save a screenshot here after --shot-t seconds and quit"); s.add_argument("--shot-t", dest="shot_t", type=float, default=4.0)
     s.add_argument("--hour", type=float, default=None); s.add_argument("--wait", action="store_true"); s.add_argument("--json", action="store_true")
     s.add_argument("--play", action="store_true", help="just start the game, no test arguments (the Forge app's Play)")

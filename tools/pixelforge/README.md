@@ -10,8 +10,9 @@ game); every piece is generic except one exporter.
 **For people: the Forge app** (`PixelForge.bat`, `pixelforge forge`; `forge/`, a Godot 4.7 project in the game's own
 look). Full screen, nine tiles (character, object, spell, tiles, icons/portraits/UI, sounds and music, fix up a
 picture, play the game, settings), each a guided path: drop a painting, one big button a screen, a picture of what you
-get, "put it in the game", "see it in the game". Every screen's *Advanced* fold has the step's real settings. It only
-ever runs the commands below, so an assistant on the command line and a person in the app never disagree.
+get, "put it in the game", "see it in the game" (a character walks the moor, an effect plays at the hero, an object
+stands beside it). Every screen's *Advanced* fold has the step's real settings. It only ever runs the commands below,
+so an assistant on the command line and a person in the app never disagree.
 
 | Need | Command | App / Studio |
 |---|---|---|

@@ -296,14 +296,25 @@ static func theme() -> Theme:
 	t.set_icon("grabber_highlight", "HSlider", _grabber(true))
 	t.set_icon("grabber_disabled", "HSlider", _grabber(false))
 	# ---- scroll bars
-	t.set_stylebox("scroll", "VScrollBar", flat(Color("#0d0c12"), Color(0, 0, 0, 0), 0, 0))
-	t.set_stylebox("grabber", "VScrollBar", flat(IRON, Color(0, 0, 0, 0), 0, 0))
-	t.set_stylebox("grabber_highlight", "VScrollBar", flat(IRON_L, Color(0, 0, 0, 0), 0, 0))
-	t.set_stylebox("grabber_pressed", "VScrollBar", flat(TEAL_D, Color(0, 0, 0, 0), 0, 0))
-	t.set_stylebox("scroll", "HScrollBar", flat(Color("#0d0c12"), Color(0, 0, 0, 0), 0, 0))
-	t.set_stylebox("grabber", "HScrollBar", flat(IRON, Color(0, 0, 0, 0), 0, 0))
-	t.set_stylebox("grabber_highlight", "HScrollBar", flat(IRON_L, Color(0, 0, 0, 0), 0, 0))
-	t.set_stylebox("grabber_pressed", "HScrollBar", flat(TEAL_D, Color(0, 0, 0, 0), 0, 0))
+	# a bar that can be seen on the near-black page: an iron track 3 px wide (6 on screen) with a lit grabber, so a
+	# column with more below it says so
+	t.set_stylebox("scroll", "VScrollBar", flat(IRON_D, Color(0, 0, 0, 0), 0, 0))
+	t.set_stylebox("grabber", "VScrollBar", flat(IRON_L, Color(0, 0, 0, 0), 0, 0))
+	t.set_stylebox("grabber_highlight", "VScrollBar", flat(DIM, Color(0, 0, 0, 0), 0, 0))
+	t.set_stylebox("grabber_pressed", "VScrollBar", flat(TEAL, Color(0, 0, 0, 0), 0, 0))
+	t.set_stylebox("scroll", "HScrollBar", flat(IRON_D, Color(0, 0, 0, 0), 0, 0))
+	t.set_stylebox("grabber", "HScrollBar", flat(IRON_L, Color(0, 0, 0, 0), 0, 0))
+	t.set_stylebox("grabber_highlight", "HScrollBar", flat(DIM, Color(0, 0, 0, 0), 0, 0))
+	t.set_stylebox("grabber_pressed", "HScrollBar", flat(TEAL, Color(0, 0, 0, 0), 0, 0))
+	for bar in ["VScrollBar", "HScrollBar"]:
+		for k in ["scroll", "grabber", "grabber_highlight", "grabber_pressed"]:
+			var sb: StyleBoxFlat = t.get_stylebox(k, bar)
+			if bar == "VScrollBar":
+				sb.content_margin_left = 1.5
+				sb.content_margin_right = 1.5
+			else:
+				sb.content_margin_top = 1.5
+				sb.content_margin_bottom = 1.5
 	# ---- progress bar
 	t.set_stylebox("background", "ProgressBar", flat(Color("#1a1518"), Color("#332c34"), 1, 0))
 	t.set_stylebox("fill", "ProgressBar", flat(TEAL_D, Color(0, 0, 0, 0), 0, 0))

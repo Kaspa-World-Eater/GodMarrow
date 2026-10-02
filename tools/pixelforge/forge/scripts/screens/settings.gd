@@ -16,7 +16,12 @@ func build() -> void:
 	var fs := CheckButton.new()
 	fs.text = "Full screen"
 	fs.button_pressed = app.is_fullscreen()
-	fs.toggled.connect(func(_on): app.toggle_fullscreen(); FSfx.play("tick"))
+	fs.toggled.connect(func(on):
+		FSfx.play("tick")
+		if on != app.is_fullscreen():
+			app.toggle_fullscreen())
+	# the header's button and F11 change the window too: the switch follows them
+	app.window_changed.connect(func(): if is_instance_valid(fs): fs.set_pressed_no_signal(app.is_fullscreen()))
 	lv.add_child(fs)
 	first_focus = fs
 	var sd := CheckButton.new()
@@ -41,7 +46,7 @@ func build() -> void:
 	gr.add_child(W.spacer())
 	gr.add_child(W.ghost("Choose…", func(): app.choose_dir(func(p):
 		app.backend.game_dir = p
-		app.say("Game folder set." if app.backend.game_ok() else "That folder has no project.godot.")
+		app.say("Game folder set." if app.backend.game_ok() else "That is not the game's folder (it needs the game's project.godot).")
 		_refresh(), "Choose the game folder (with project.godot)")))
 	lv.add_child(gr)
 	lv.add_child(W.rule())
