@@ -63,3 +63,12 @@ through it; an AI drives the same functions by CLI and MCP and never needs the w
 16-bit-era palette: the game's own near-black, bone, iron and dull teal with a dull gold for warnings, dithered
 gradients where they help, shaded frames with a lit edge, coloured icons on the tiles, live previews in full
 colour. Think a polished SNES RPG menu or a late-'90s PC tool with a pixel skin, not a Game Boy.
+
+## From the mockup round (2026-10-02)
+Approved direction: the reference's framing (ornate pixel frame with thorned edges and skull corners, blackletter
+banner, picture window above, text box with choices and dials below). Accent is NOT teal in the Forge app: use a
+dull ember gold / bone for pointers and values (the game keeps teal for its own next-action; the Forge is warmer).
+The app has its own ambient effects: torches that flicker (light pools breathing on the stone, flames that move),
+motes drifting up, a faint glow under the thing on the bench, pixel-dissolve transitions; all respecting reduced
+motion. Drag and drop stays: a picture dropped anywhere starts a build, and the frame answers while a file hovers
+("A painting hovers over the bench. Let it fall...").
