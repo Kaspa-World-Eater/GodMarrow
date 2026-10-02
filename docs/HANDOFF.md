@@ -598,3 +598,5 @@ read its HANDOFF entry and docs/track_notes/forgeapp.md, run tests and the app's
 builder/reviewer round against the mockup, then merge to main. After the app: the Keeper's second authoring pass
 (sharper limbs, readable skirt, more accents), then objects/effects/tiles through the engine (docs/PLAN.md phases).
 Godmarrow stays on hold.
+
+**2026-10-02 (cloud):** the Forge app build (track/forgeapp) was stopped by the account's weekly usage limit (resets 2026-10-04 18:00 UTC) about 70 minutes in; its work is committed as WIP on origin/track/forgeapp. Resume per 7.12 after the reset.
