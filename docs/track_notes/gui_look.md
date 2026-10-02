@@ -41,3 +41,17 @@ around C#, slow drifting pads with no real beat. So the Forge's music family is 
   for confirm, a low thud for back).
 Built in `music.py` as a "forge" cue family with its own instruments, rendered by the same path as the game's cues
 (`pixelforge music forge_home` etc.), knobs on the music rack.
+
+## Correction from the owner (2026-10-02): aesthetic, not quests
+
+"We are keeping the gamified aesthetic. We don't necessarily need the quest thing; it's more the aesthetic of
+PixelForge itself having that old-school Super Nintendo feel while being a highly technical program that is easy
+for humans and for AIs in their own way."
+
+So: drop the quest framing (no "quests", no progress strips dressed as level selects, no narrative hand-holding).
+Keep the look and feel: full screen, integer-scaled pixel rendering, the 1-bit dungeon frame and pixel fonts, the
+dungeon-synth music and bell/thud sounds, pixel cursor, gamepad and keyboard, transitions. Inside that skin the
+Forge is a straightforward professional tool: Home with the nine things it makes as tiles; each one opens a
+workbench with tabs; every workbench is picker / live preview / knobs / bottom bar (Keep, Reset, Start over,
+Undo); Advanced is a fold, not a mode; text is adult and precise (docs/track_notes/tone.md). A person clicks
+through it; an AI drives the same functions by CLI and MCP and never needs the window.
