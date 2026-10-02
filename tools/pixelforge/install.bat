@@ -28,8 +28,8 @@ echo Creating the desktop shortcut...
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ws = New-Object -ComObject WScript.Shell; $d = [Environment]::GetFolderPath('Desktop');" ^
   "$s = $ws.CreateShortcut((Join-Path $d 'PixelForge Studio.lnk'));" ^
-  "$s.TargetPath = (Join-Path '%CD%' '.venv\Scripts\pythonw.exe');" ^
-  "$s.Arguments = '-m pixelforge.cli studio'; $s.WorkingDirectory = '%CD%';" ^
+  "$s.TargetPath = (Join-Path '%CD%' 'PixelForge Studio.bat');" ^
+  "$s.Arguments = ''; $s.WorkingDirectory = '%CD%'; $s.WindowStyle = 7;" ^
   "$s.IconLocation = (Join-Path '%CD%' 'assets\pixelforge.ico') + ',0';" ^
   "$s.Description = 'PixelForge Studio - pixel art sprite pipeline'; $s.Save()" ^
   && echo   Desktop shortcut created. || echo   (could not create the shortcut; use "PixelForge Studio.bat")
