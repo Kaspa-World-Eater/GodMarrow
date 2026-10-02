@@ -72,3 +72,9 @@ The app has its own ambient effects: torches that flicker (light pools breathing
 motes drifting up, a faint glow under the thing on the bench, pixel-dissolve transitions; all respecting reduced
 motion. Drag and drop stays: a picture dropped anywhere starts a build, and the frame answers while a file hovers
 ("A painting hovers over the bench. Let it fall...").
+
+## Swappable backgrounds (2026-10-02)
+The picture window shows the thing being made in a chosen pseudo-environment, switchable from the foot: dungeon,
+crypt, moor, fen, snow, plain (neutral grey for colour checks), each with its own palette, light colour, floor
+pattern, fog and torch count, all animated. Later: the game's own zones rendered as backdrops, and a "day/night"
+hour knob, so a sprite is judged where it will live.
