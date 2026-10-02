@@ -560,7 +560,8 @@ def cmd_shapes(a) -> None:
             for clip in clips:
                 for d in dirs:
                     files = sorted((Path(a.out) / f"{clip}_{d}").glob("frame_*.png"))
-                    save_gif([Image.open(f).convert("RGBA") for f in files], Path(a.out) / f"{clip}_{d}.gif", fps=r["fps"][clip], zoom=a.zoom, background=(94, 93, 98, 255))
+                    frames = shape_tools.trim_frames([np.asarray(Image.open(f).convert("RGBA")) for f in files])
+                    save_gif(frames, Path(a.out) / f"{clip}_{d}.gif", fps=r["fps"][clip], zoom=a.zoom, background=(94, 93, 98, 255))
         _emit(a, r) if a.json else print(f"{len(clips)} clips x {len(dirs)} directions -> {a.out} ({r['seconds']} s, frames {r['size']} px)")
     elif sub == "preview":
         out = a.out or f"{Path(a.file).stem.split('.')[0]}_{a.clip}_{a.direction}.gif"

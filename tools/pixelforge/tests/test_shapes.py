@@ -282,16 +282,27 @@ def test_hang_and_lag_keep_parts_on_the_body(keeper, tracks):
     model = S.Model(keeper, 1.0)
     skel = R.skeleton_for(keeper, tracks)
     poser = R.Poser(model, skel, "attack")
-    lagged = 0
+    poser.prepare([float(t) for t in range(tracks.frames("attack"))])
+    parts = keeper["parts"]
+    swung = 0
     for t in range(0, tracks.frames("attack"), 2):
-        for pi, mo in poser.transforms(float(t)).items():
-            if mo.drag is not None:
-                lagged += 1
-                assert np.linalg.norm(mo.drag) <= 0.1 * (mo.y1 - mo.y0) + 1e-6
-    assert lagged > 10
-    hat = next(p for p in model.prims if p.name == "hat")
-    drag = poser.transforms(8.0)[hat.index].drag
-    assert np.linalg.norm(drag) <= 0.1 * (hat.bbox[1][1] - hat.bbox[0][1]) + 1e-6 and np.linalg.norm(drag) < 4.0   # the hat stays on a fast head
+        tf = poser.transforms(float(t))
+        for p in model.prims:
+            bone, lag, hang = R._bone_and_lag(p.spec, parts)
+            if not lag:
+                continue
+            # a loose part is a rigid swing about its top: its hem lands within a tenth of its height of where the bone alone would put it
+            lo, hi = poser.box_of(p)
+            top = poser._pivot(p); hem = np.array([(lo[0] + hi[0]) / 2, hi[1], (lo[2] + hi[2]) / 2])
+            Rb, tb = poser.bone_delta(bone, float(t), poser.ground_shift(float(t)), hang, top if hang < 1 else None)
+            mo = tf[p.index]
+            assert np.linalg.norm((mo.R @ hem + mo.t) - (Rb @ hem + tb + poser.bone_move(bone, float(t), poser.ground_shift(float(t))))) <= 0.1 * (hi[1] - lo[1]) + 1.5
+            if R.rotation_angle(mo.R, Rb) > 1e-3:
+                swung += 1
+    assert swung > 10
+    hat = next(p for p in model.prims if p.name == "hat"); cap = next(p for p in model.prims if p.name == "hat_cap")
+    tf = poser.transforms(8.0)
+    assert np.allclose(tf[hat.index].R, tf[cap.index].R) and np.allclose(tf[hat.index].t, tf[cap.index].t)   # one part, one body
 
 
 def test_eight_directions_are_different_views(keeper, tracks):
@@ -428,3 +439,184 @@ def test_cli_shapes_commands(tmp_path, capsys):
     assert (tmp_path / "d.shapes.json").exists()
     with pytest.raises(SystemExit):
         main(["shapes", "validate", str(tmp_path / "d.shapes.json").replace("d.shapes", "missing")])
+
+
+# ------------------------------------------------------------------------------------------------ still pixels: the holds
+def test_a_sub_pixel_move_changes_nothing_and_a_whole_pixel_move_is_a_shift(keeper):
+    """The renderer snaps every body to whole pixels: translating the whole static model by 0.3 units changes no
+    pixel, and by one pixel's worth moves the picture as a block."""
+    doc = _no_shadow(keeper)
+    model = S.Model(doc, 1.0)
+    base = model.render(0, 0.0, 12.0, None).rgba
+    for axis in (0, 1):
+        t = np.zeros(3); t[axis] = 0.3
+        moved = model.render(0, 0.0, 12.0, {i: (np.eye(3), t) for i in range(len(model.prims))}).rgba
+        assert np.array_equal(base, moved), axis
+    t = np.array([1.0, 0.0, 0.0])
+    moved = model.render(0, 0.0, 12.0, {i: (np.eye(3), t) for i in range(len(model.prims))}).rgba
+    assert np.array_equal(base[:, :-1], moved[:, 1:])
+    # and the renderer can be told not to (the raw voxel picture, which does change)
+    raw = model.render(0, 0.0, 12.0, {i: (np.eye(3), np.array([0.0, 0.3, 0.0])) for i in range(len(model.prims))}, snap=False).rgba
+    assert np.any(raw != base)
+
+
+def test_turn_and_place_holds(keeper, tracks):
+    """A bone turning a degree a frame holds its drawn pose and then steps by the full turn; a pivot creeping under
+    a pixel a frame holds its drawn place and then moves a whole pixel; the drawn pose never chatters."""
+    model = S.Model(keeper, 1.0)
+    skel = R.skeleton_for(keeper, tracks)
+    poser = R.Poser(model, skel, "idle", view=(0.0, 12.0))
+    piv = np.array([10.0, 20.0, 0.0])
+    held = []
+    for f in range(12):
+        Rf = R.rot_z(float(f))                                   # one degree a frame
+        Rq, _ = poser.hold_turn("k", float(f), Rf, np.zeros(3), piv)
+        held.append(R.rotation_angle(Rq, np.eye(3)))
+    assert held[:4] == pytest.approx([0, 0, 0, 0], abs=1e-9) and held[4] == pytest.approx(4.0, abs=1e-6) and held[5:8] == pytest.approx([4, 4, 4], abs=1e-6)
+    assert held[8] == pytest.approx(8.0, abs=1e-6)
+    # the same frame asked twice gives the same answer; a swing back under a step is held too
+    assert poser.hold_turn("k", 8.0, R.rot_z(8.0), np.zeros(3), piv)[0] is poser.hold_turn("k", 8.0, R.rot_z(8.0), np.zeros(3), piv)[0]
+    Rq, _ = poser.hold_turn("k", 12.0, R.rot_z(9.5), np.zeros(3), piv)
+    assert R.rotation_angle(Rq, np.eye(3)) == pytest.approx(8.0, abs=1e-6)
+    # the place hold: the pivot lands a whole number of screen pixels from its author place, held under a pixel of creep
+    px = []
+    for f in range(8):
+        tr = np.array([0.0, 0.3 * f, 0.0])                       # 0.3 units a frame, 0.29 px at 12 degrees
+        move = poser.hold_place("p", float(f), np.eye(3), tr, piv)
+        px.append(round(model.screen_offset(piv, piv + tr + move, 0.0, 12.0)[1], 6))
+    assert px[:4] == [0, 0, 0, 0] and px[4] == 1.0 and px[7] == 2.0, px
+    assert R.rotation_between(np.array([0, 1.0, 0]), np.array([0, 1.0, 0])).tolist() == np.eye(3).tolist()
+    v = R.rotation_between(np.array([0, 1.0, 0]), np.array([1.0, 1.0, 0])) @ np.array([0, 1.0, 0])
+    assert np.allclose(v, [math.sqrt(0.5), math.sqrt(0.5), 0])
+
+
+def _clip_frames(doc, clip, d, tracks, model, n=24, **kw):
+    arr = np.stack(R.render_clip(doc, clip, d, tracks=tracks, model=model, max_frames=n, **kw)["frames"]).astype(int)
+    opaque = (arr[:-1, ..., 3] > 0) | (arr[1:, ..., 3] > 0)
+    change = np.any(arr[:-1] != arr[1:], axis=-1) & opaque
+    sparkle = np.any(arr[:-2] != arr[1:-1], axis=-1) & np.all(arr[:-2] == arr[2:], axis=-1) & opaque[:-1]
+    return arr, change.sum() / opaque.sum(), sparkle.sum() / opaque[:-1].sum()
+
+
+def _aligned_change(a, b, y1, reach=2):
+    """The change in rows [0, y1) after the best whole-pixel alignment: what is left when a block move is forgiven."""
+    best = 1.0
+    A = a[:y1]
+    for dy in range(-reach, reach + 1):
+        for dx in range(-reach, reach + 1):
+            B = np.roll(np.roll(b, dy, axis=0), dx, axis=1)[:y1]
+            op = (A[..., 3] > 0) | (B[..., 3] > 0)
+            best = min(best, (np.any(A != B, axis=-1) & op).sum() / max(op.sum(), 1))
+    return best
+
+
+def test_exported_idle_and_walk_frames_do_not_boil(keeper, tracks):
+    """At the frames the game plays (the gothic preset's 24 per clip, the idle at 9.6 fps): few of the figure's own
+    pixels change from one idle frame to the next and almost none change and change straight back; in the walk the
+    hat rows are a shifted copy of the frame before (a whole-pixel bob, never a re-rolled voxel pick)."""
+    from pixelforge.styles import get_style
+
+    n = get_style("gothic_hd").clip_frames
+    assert n == 24
+    doc = _no_shadow(keeper)
+    model = S.Model(doc, 1.0)
+    brim = 22                                                             # rows above the brim: hat only
+    for d in ("S", "E"):
+        arr, change, sparkle = _clip_frames(doc, "idle", d, tracks, model, n)
+        assert len(arr) == n
+        assert change < 0.12 and sparkle < 0.03, (d, change, sparkle)
+        hat = np.mean([_aligned_change(arr[i], arr[i + 1], brim) for i in range(n - 1)])
+        assert hat < 0.02, (d, hat)
+        arr, change, sparkle = _clip_frames(doc, "walk", d, tracks, model, n)
+        assert sparkle < 0.06, (d, sparkle)
+        hat = np.mean([_aligned_change(arr[i], arr[i + 1], brim) for i in range(n - 1)])
+        assert hat < 0.10, (d, hat)
+
+
+def test_feet_hold_the_ground_in_every_direction_and_a_run_flies(keeper, tracks):
+    """Walk (and idle) at 120 px: the lowest foot pixel sits on one row in all eight directions. In the run the planted
+    frames sit on that row and the airborne frames lift (never sink below it)."""
+    doc = _no_shadow(keeper)
+    model = S.Model(doc, 1.0)
+    skel = R.skeleton_for(doc, tracks)
+    for clip in ("walk", "idle"):
+        for d in R.DIRECTIONS:
+            res = R.render_clip(doc, clip, d, tracks=tracks, model=model, max_frames=24)
+            lowest = {int(np.nonzero(f[..., 3] > 0)[0].max()) for f in res["frames"]}
+            assert len(lowest) == 1, (clip, d, lowest)
+    model = S.Model(doc, 1.0, width=R.canvas_width(doc, ["run"], tracks))       # a running stride reaches past the file's canvas
+    feet = [p.index for p in model.prims if str(p.spec.get("bone", "")).split(".")[0] in ("foot", "toe")]
+    for d in ("S", "E"):
+        phi = math.radians(R.DIRECTIONS[d])
+        poser = R.Poser(model, skel, "run", view=(phi, 12.0))
+        times = R.frame_times(poser.n_src, 24, poser.loop)
+        poser.prepare(times)
+        rows = []
+        for k, t in enumerate(times):
+            fr = model.render(k, phi, 12.0, poser.transforms(t))
+            rows.append(int(np.nonzero(np.isin(fr.pid, feet))[0].max()))          # the lowest pixel a foot painted (in a crouch the hem hangs lower)
+        planted = [poser.contact(t) for t in times]
+        ground = max(r for r, c in zip(rows, planted) if c)
+        assert all(r == ground for r, c in zip(rows, planted) if c), (d, rows, planted)
+        assert all(r <= ground for r in rows) and any(not c for c in planted), (d, rows, planted)
+
+
+def test_px_ranges_pick_the_size_variant():
+    doc = {"size": [40, 60], "height": 50, "ground": 58, "shapes": [
+        {"name": "body", "kind": "capsule", "a": [20, 10, 0], "b": [20, 50, 0], "r": 6, "material": "cloth",
+         "rules": [{"hash": [0.5, 1, 2], "t": 2, "px": [45, None]}, {"every_y": [2, 0], "t": -2, "px": [None, 45]}]},
+        {"name": "cord", "kind": "capsule", "a": [20, 20, 7], "b": [20, 40, 7], "r": 0.9, "material": "rope", "px": [45, None]},
+        {"name": "cord_s", "kind": "capsule", "a": [20, 20, 7], "b": [20, 40, 7], "r": 1.4, "material": "rope", "px": [None, 45]}]}
+    assert S.validate(doc) == []
+    big = S.Model(doc, 1.0); small = S.Model(doc, 0.6)
+    assert big.px == 50 and small.px == pytest.approx(30)
+    names = {p.index: p.name for p in big.prims}
+    assert {names[i] for i in np.unique(big.shell.prim)} == {"body", "cord"} and {names[i] for i in np.unique(small.shell.prim)} == {"body", "cord_s"}
+    assert (big.shell.tone == 2).any() and not (big.shell.tone == -2).any()
+    assert (small.shell.tone == -2).any() and not (small.shell.tone == 2).any()
+    assert S.validate({**doc, "shapes": [{**doc["shapes"][0], "px": 5}]})
+    # the Keeper carries both sizes: fingers and specks at 120 px, thicker cords and bigger hands at 76 px
+    keeper = S.load_shapes(ASSETS / "characters" / "keeper.shapes.json")
+    at120 = {p.name for p in S.Model(keeper, 1.0).prims if S.px_ok(p.spec, 120)}
+    at76 = {p.name for p in S.Model(keeper, 76 / 120).prims if S.px_ok(p.spec, 76)}
+    assert "finger0.L" in at120 and "finger0.L" not in at76 and "cord_long1_s" in at76 and "cord_long1_s" not in at120
+
+
+def test_describe_hood_and_hat_words():
+    r = describe.draft_shapes("a hooded necromancer with green glowing eyes")
+    names = {s["name"] for s in r["doc"]["shapes"]}
+    assert {"hood", "hood_crown", "head"} <= names and S.validate(r["doc"]) == []
+    head = next(s for s in r["doc"]["shapes"] if s["name"] == "head")
+    assert any(rule.get("emit") for rule in head.get("rules", [])) and head["material"] == "skin"
+    fr = S.render_still(r["doc"], 0, phi=0.0)
+    rgba = fr.rgba
+    glow = (rgba[..., 3] > 0) & (rgba[..., 1] > 170) & (rgba[..., 0] < 150)                      # the soul ramp's bright steps
+    assert glow.sum() >= 2
+    r2 = describe.draft_shapes("a veiled keeper in wrappings")
+    assert next(s for s in r2["doc"]["shapes"] if s["name"] == "head")["material"] == "wrap"
+
+
+def test_game_preview_uses_a_virtual_display_when_there_is_none(monkeypatch, tmp_path):
+    from pixelforge import game_preview as G
+
+    cmd = G.preview_command("godot", tmp_path, skin="keeper_shapes", shot=tmp_path / "s.png", virtual=True)
+    assert cmd[:4] == G.XVFB and "--rendering-driver" in cmd and cmd[cmd.index("--rendering-driver") + 1] == "opengl3"
+    assert G.preview_command("godot", tmp_path, skin="keeper_shapes")[0] == "godot"
+    monkeypatch.setattr(G.sys, "platform", "linux")
+    monkeypatch.delenv("DISPLAY", raising=False); monkeypatch.delenv("WAYLAND_DISPLAY", raising=False)
+    monkeypatch.setattr(G.shutil, "which", lambda name: "/usr/bin/xvfb-run" if name == "xvfb-run" else None)
+    assert G.needs_virtual_display()
+    monkeypatch.setenv("DISPLAY", ":0")
+    assert not G.needs_virtual_display()
+
+
+def test_gif_durations_and_trimmed_frames():
+    from pixelforge.spritesheet import gif_durations
+
+    d = gif_durations(24, 9.6)
+    assert sum(d) == 2500 and set(d) <= {100, 110}
+    assert gif_durations(5, 10.0) == [100] * 5
+    frames = [np.zeros((270, 270, 4), np.uint8) for _ in range(3)]
+    frames[0][100:150, 120:140, 3] = 255; frames[2][90:160, 125:150, 3] = 255
+    out = T.trim_frames(frames, margin=2)
+    assert out[0].shape == (74, 34, 4) and all(f.shape == out[0].shape for f in out)

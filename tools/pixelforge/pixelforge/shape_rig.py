@@ -37,6 +37,9 @@ DRIFT = {"walk": 0.5, "walk_hunched": 0.5, "run": 1.0, "sprint": 1.4, "crouch_wa
 ARM_CHAIN = ("upper_arm", "forearm", "hand")
 DEFAULT_LAG = {"frames": 2, "sway": 0.6, "max": 0.1}
 LAG_STILL, LAG_MOVING = 0.1, 0.4           # bone speed (units per frame) below which a lag fades out, above which it is whole
+TURN_STEP = 4.0                            # degrees: a bone's drawn turn holds until the clip's is this far from it
+MOVE_STEP = 1.0                            # pixels: a body's drawn place holds until the clip's is this far from it
+GROUND_REACH = 6.0                         # units at 120 px: a foot this close to the clip's floor is planted (mocap feet hover and pitch); higher is flight
 
 
 def rot_z(deg: float) -> np.ndarray:
@@ -53,6 +56,26 @@ def rodrigues(axis: np.ndarray, ang: float) -> np.ndarray:
     """The rotation of ``ang`` radians about the unit vector ``axis``."""
     K = np.array([[0, -axis[2], axis[1]], [axis[2], 0, -axis[0]], [-axis[1], axis[0], 0]], float)
     return np.eye(3) + math.sin(ang) * K + (1 - math.cos(ang)) * (K @ K)
+
+
+def rotation_angle(Ra: np.ndarray, Rb: np.ndarray) -> float:
+    """The angle in degrees between two rotations."""
+    tr = float(np.clip((np.trace(Rb @ Ra.T) - 1.0) / 2.0, -1.0, 1.0))
+    return math.degrees(math.acos(tr))
+
+
+def rotation_between(u: np.ndarray, v: np.ndarray) -> np.ndarray:
+    """The smallest rotation carrying the direction of ``u`` to the direction of ``v`` (identity when either is zero)."""
+    nu, nv = float(np.linalg.norm(u)), float(np.linalg.norm(v))
+    if nu < 1e-9 or nv < 1e-9:
+        return np.eye(3)
+    a, b = u / nu, v / nv
+    axis = np.cross(a, b)
+    n = float(np.linalg.norm(axis))
+    c = float(np.clip(np.dot(a, b), -1.0, 1.0))
+    if n < 1e-9:
+        return np.eye(3) if c > 0 else np.diag([1.0, -1.0, -1.0])
+    return rodrigues(axis / n, math.atan2(n, c))
 
 
 def damp_tilt(R: np.ndarray, hang: float) -> np.ndarray:
@@ -188,12 +211,21 @@ def _bone_and_lag(spec: dict, parts: dict) -> tuple[str | None, dict | None, flo
 class Poser:
     """Per-frame transforms of a solid model's shapes for one clip, with lag, sway, drift and the ground lock."""
 
-    def __init__(self, model: S.Model, skel: Skeleton, clip: str, lock: bool | None = None, view: tuple[float, float] | None = None):
+    def __init__(self, model: S.Model, skel: Skeleton, clip: str, lock: bool | None = None, view: tuple[float, float] | None = None,
+                 turn_step: float | None = None):
         """``view`` is (phi, elevation) of the render; with it the ground lock works on the screen: the lowest foot pixel
         lands on one row in every frame, as a drawn sprite's would, whichever foot is planted and however far forward
-        it is (at an elevation a forward foot projects lower). Without it the lock holds the feet in file units."""
+        it is (at an elevation a forward foot projects lower). Without it the lock holds the feet in file units.
+        ``turn_step`` (degrees, :data:`TURN_STEP`; the file's ``view.turn_step`` when given; 0 = continuous) is the
+        step every bone's rotation is held to, so a slow turn is a held pose and then a step, never a creep."""
         self.model, self.skel, self.clip = model, skel, clip
         self.view = view
+        view_spec = model.doc.get("view") or {}
+        self.turn_step = float(view_spec.get("turn_step", TURN_STEP)) if turn_step is None else float(turn_step)
+        self.move_step = float(view_spec.get("move_step", MOVE_STEP))
+        # the holds: per key the last (t, held value) and a memo of the value at each prepared time
+        self._rot_last: dict = {}; self._rot_at: dict = {}
+        self._off_last: dict = {}; self._off_at: dict = {}
         if not skel.t.has(clip):
             raise ValueError(f"unknown clip {clip!r}; the library has {skel.t.clips}")
         self.n_src = skel.t.frames(clip)
@@ -213,9 +245,25 @@ class Poser:
             if bone and bone.split(".")[0] in ("foot", "toe") and bone in skel.index:
                 vox = model.shell.pos[model.shell.prim == p.index]
                 if len(vox):
-                    self.feet.append((bone, hang, self._pivot(p), vox))
+                    self.feet.append((bone, hang, self._pivot(p) if hang < 1.0 else None, vox))     # the pivot transforms() uses
         self.author_low = float(max(self._screen_low(v) for _, _, _, v in self.feet)) if self.feet else self.author_sole
         self._shifts: dict[float, float] = {}
+        self.reach = GROUND_REACH * skel.height / 120.0
+        self._floor: float | None = None
+        # the box of each part: the shapes of one part are one body (a hat and its crown knob swing and hold together)
+        self.part_box: dict[str, np.ndarray] = {}
+        for p in model.prims:
+            if p.part and not p.carve:
+                lo, hi = p.bbox
+                if p.part in self.part_box:
+                    b = self.part_box[p.part]
+                    self.part_box[p.part] = np.array([np.minimum(b[0], lo), np.maximum(b[1], hi)])
+                else:
+                    self.part_box[p.part] = np.array([lo, hi])
+
+    def box_of(self, p) -> np.ndarray:
+        """The box a shape moves by: its part's (all the part's shapes together) or its own."""
+        return self.part_box.get(p.part, p.bbox) if p.part else p.bbox
 
     def _screen_low(self, vox: np.ndarray) -> float:
         """The lowest point of voxels as the view sees it, in file units of screen height (plain y without a view)."""
@@ -226,10 +274,10 @@ class Poser:
         zr = -(vox[:, 0] - cx) * math.sin(phi) + (vox[:, 2] - cz) * math.cos(phi)
         return float(((vox[:, 1] - self.skel.ground) * math.cos(math.radians(elev)) + zr * math.sin(math.radians(elev))).max())
 
-    @staticmethod
-    def _pivot(p) -> np.ndarray:
-        """Where a hanging shape attaches: the top centre of its box in the author pose."""
-        return np.array([(p.bbox[0][0] + p.bbox[1][0]) / 2, p.bbox[0][1], (p.bbox[0][2] + p.bbox[1][2]) / 2])
+    def _pivot(self, p) -> np.ndarray:
+        """Where a hanging shape attaches: the top centre of its body's box in the author pose."""
+        lo, hi = self.box_of(p)
+        return np.array([(lo[0] + hi[0]) / 2, lo[1], (lo[2] + hi[2]) / 2])
 
     def pose(self, t: float):
         key = round(t, 4)
@@ -237,40 +285,131 @@ class Poser:
             self._poses[key] = self.skel.clip_pose(self.clip, t)
         return self._poses[key]
 
+    def foot_low(self, t: float, hold: bool = True) -> float:
+        """The lowest point of the feet at ``t`` as the view sees it (screen file units), before any ground shift."""
+        if self.feet:
+            low = -1e9
+            for bone, hang, piv, vox in self.feet:
+                R, tr = self.bone_delta(bone, t, 0.0, hang, piv, hold=hold)
+                low = max(low, self._screen_low(vox @ R.T + tr))
+            return float(low)
+        pos, _ = self.pose(t)
+        return float(max(pos[j][1] for j in self.toes))
+
+    def floor(self) -> float:
+        """The lowest the feet get in the whole clip: where the clip's own ground is."""
+        if self._floor is None:
+            self._floor = max(self.foot_low(float(t), hold=False) for t in range(self.n_src))
+        return self._floor
+
+    def contact(self, t: float) -> bool:
+        """Whether a foot is on the ground this frame (within :data:`GROUND_REACH` of the clip's floor); otherwise the
+        figure is in flight and the lock lets it rise."""
+        return self.floor() - self.foot_low(t) <= self.reach
+
     def ground_shift(self, t: float) -> float:
-        """How far down (+) the whole figure moves this frame so its lowest foot pixel sits on the ground line."""
+        """How far down (+) the whole figure moves this frame so its lowest foot pixel sits on the ground line: the
+        lowest foot voxel is aimed at the centre of the row the author pose's lowest foot pixel is on, so the
+        renderer's whole-pixel snap (up to half a pixel either way) can never move it off that row. A foot up to
+        ``reach`` units above the clip's floor is planted and pulled onto the line (mocap feet hover and pitch);
+        higher is a jump, and the body is pulled down by ``reach`` and otherwise flies."""
         if not self.lock or not (self.toes or self.feet):
             return 0.0
         key = round(t, 4)
         if key not in self._shifts:
-            if self.feet:
-                low = -1e9
-                for bone, hang, piv, vox in self.feet:
-                    R, tr = self.bone_delta(bone, t, 0.0, hang, piv)
-                    low = max(low, self._screen_low(vox @ R.T + tr))
-                ce = math.cos(math.radians(self.view[1])) if self.view else 1.0
-                self._shifts[key] = (self.author_low - low) / max(ce, 0.2)
-            else:
-                pos, _ = self.pose(t)
-                self._shifts[key] = self.author_sole - float(max(pos[j][1] for j in self.toes))
+            s = self.model.scale
+            gy = self.skel.ground if self.view else 0.0
+            target = (math.floor((gy + self.author_low) * s) + 0.5) / s - gy      # the row's centre, in screen file units
+            low = self.foot_low(t)
+            pull = min(self.floor() - low, self.reach)
+            ce = math.cos(math.radians(self.view[1])) if (self.view and self.feet) else 1.0
+            self._shifts[key] = (target - self.floor() + pull) / max(ce, 0.2)
         return self._shifts[key]
 
-    def bone_delta(self, bone: str, t: float, shift: float = 0.0, hang: float = 1.0, pivot: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
+    def bone_delta(self, bone: str, t: float, shift: float = 0.0, hang: float = 1.0, pivot: np.ndarray | None = None,
+                   hold: bool = True) -> tuple[np.ndarray, np.ndarray]:
         """(R, t) carrying ``bone`` from the author pose to the clip pose at ``t``, the ground shift added. With ``hang``
         below 1 the bone's tilt is damped and the shape hangs from ``pivot`` (its attachment point, in the author
         pose; the bone's head when not given), which follows the bone rigidly. The damping fades as the bone lies
-        down: cloth hangs from an upright body and lies along a fallen one."""
+        down: cloth hangs from an upright body and lies along a fallen one. ``hold`` applies the turn hold
+        (:meth:`hold_turn`); the late pose a lag looks back at is taken raw."""
         pos, rot = self.pose(t)
         j = self.skel.index[bone]
         R = rot[j] @ self.skel.rot[j].T
         tr = pos[j] - R @ self.skel.pos[j]
+        piv = self.skel.pos[j] if pivot is None else np.asarray(pivot, float)
         if hang < 1.0:
             upright = float(np.clip((R @ np.array([0.0, 1.0, 0.0]))[1], 0.0, 1.0))
             Rh = damp_tilt(R, hang + (1.0 - hang) * (1.0 - upright))
-            piv = self.skel.pos[j] if pivot is None else np.asarray(pivot, float)
             tr = (R @ piv + tr) - Rh @ piv
             R = Rh
+        if hold:                                      # the drawn turn holds; the pivot (the joint) stays exactly where the clip puts it
+            R, tr = self.hold_turn((bone, round(hang, 3)), t, R, tr, piv)
         return R, tr + np.array([0.0, shift, 0.0])
+
+    def pivot_of(self, bone: str, hang: float, p) -> np.ndarray:
+        """The point of a shape the renderer snaps to whole pixels: where a hanging shape attaches, else its bone's head."""
+        return self._pivot(p) if hang < 1.0 else self.skel.pos[self.skel.index[bone]].copy()
+
+    # ---- the holds: a drawn sprite's parts stay put until they have somewhere to go
+    def hold_turn(self, key, t: float, R: np.ndarray, tr: np.ndarray, piv: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        """``R`` replaced by the rotation drawn last for ``key`` while the clip's is under ``turn_step`` degrees from it,
+        the clip's own rotation once it is that far (so a fast bone is exact and a slow one holds and then steps);
+        ``tr`` re-anchored so ``piv`` lands where the clip puts it."""
+        if self.turn_step <= 0.0:
+            return R, tr
+        k = (key, round(t, 4))
+        if k in self._rot_at:
+            Rq = self._rot_at[k]
+        else:
+            last = self._rot_last.get(key)
+            Rq = R if last is None or rotation_angle(last[1], R) >= self.turn_step else last[1]
+            self._rot_at[k] = Rq; self._rot_last[key] = (t, Rq)
+        if Rq is R:
+            return R, tr
+        return Rq, (R @ piv + tr) - Rq @ piv
+
+    def hold_place(self, key, t: float, R: np.ndarray, tr: np.ndarray, piv: np.ndarray, round_y: bool = False) -> np.ndarray:
+        """The move (file units) that puts ``piv``, carried by (``R``, ``tr``), a whole number of screen pixels from
+        its author-pose place: the offset drawn last for ``key`` while the clip's is under ``move_step`` pixels from
+        it, the rounded clip offset once it is that far. With ``round_y`` the vertical is always the rounded offset
+        (the feet: the ground lock aims them at the centre of their row, and rounding cannot take them off it). The
+        move is along the screen axes, so the depth is unchanged; every shape of a bone gets the bone's move."""
+        if self.move_step <= 0.0:
+            return np.zeros(3)
+        phi, elev = self.view if self.view else (0.0, 0.0)
+        s = self.model.scale
+        dx, dy = self.model.screen_offset(piv, R @ piv + tr, phi, elev)
+        k = (key, round(t, 4))
+        if k in self._off_at:
+            hx, hy = self._off_at[k]
+        else:
+            last = self._off_last.get(key)
+            hx = last[1] if last is not None and abs(dx - last[1]) < self.move_step else math.floor(dx + 0.5)
+            hy = (last[2] if last is not None and abs(dy - last[2]) < self.move_step else math.floor(dy + 0.5)) if not round_y else math.ceil(dy - 0.5)
+            self._off_at[k] = (hx, hy); self._off_last[key] = (t, hx, hy)
+        cs, sn = math.cos(phi), math.sin(phi)
+        ce, se = math.cos(math.radians(elev)), math.sin(math.radians(elev))
+        ex = np.array([cs, 0.0, sn]); ey = np.array([-se * sn, ce, se * cs])          # file-space directions of the screen axes
+        return (ex * (hx - dx) + ey * (hy - dy)) / s
+
+    def bone_move(self, bone: str, t: float, shift: float) -> np.ndarray:
+        """The whole-pixel move of a bone this frame (:meth:`hold_place` on its head, from its held rigid transform)."""
+        R, tr = self.bone_delta(bone, t, shift, 1.0)
+        head = self.skel.pos[self.skel.index[bone]]
+        return self.hold_place(bone, t, R, tr, head, round_y=bone.split(".")[0] in ("foot", "toe"))
+
+    def prepare(self, times) -> None:
+        """Run the holds over the frames that will be rendered, in order (twice round a looping clip, so the last frame
+        hands the first the same held poses); the memo then answers every frame the same whichever order they are asked."""
+        passes = 2 if self.loop else 1
+        for _ in range(passes):
+            self._rot_at.clear(); self._off_at.clear(); self._shifts.clear()
+            for t in times:
+                self.transforms(float(t))
+                for spec in list(self.model.doc.get("lights", [])) + list(self.model.doc.get("effects", [])):
+                    if "bone" in spec:
+                        self.point(spec, float(t), {})
 
     def speed(self, bone: str, t: float) -> float:
         """How far the bone's head moves in this frame, in file units."""
@@ -289,27 +428,39 @@ class Poser:
             if not bone or bone not in self.skel.index:
                 continue
             piv = self._pivot(p) if hang < 1.0 else None
+            snap_at = self.pivot_of(bone, hang, p)
+            move = self.bone_move(bone, t, shift)
             R, tr = self.bone_delta(bone, t, shift, hang, piv)
-            if not lag:
-                out[p.index] = S.Motion(R, tr)
-                continue
-            y0, y1 = float(p.bbox[0][1]), float(p.bbox[1][1])
-            tl = t - float(lag.get("frames", 2))
-            if not self.loop:
-                tl = max(tl, 0.0)
-            R1, t1 = self.bone_delta(bone, tl, shift, hang, piv)
-            hem = np.array([(p.bbox[0][0] + p.bbox[1][0]) / 2, y1, (p.bbox[0][2] + p.bbox[1][2]) / 2])
-            j = self.skel.index[bone]
-            v = self.pose(t)[0][j] - self.pose(t - 1)[0][j]
-            k = float(np.clip((np.linalg.norm(v) - LAG_STILL) / (LAG_MOVING - LAG_STILL), 0.0, 1.0))
-            sway = float(lag.get("sway", 0.6))
-            d = ((R1 @ hem + t1) - (R @ hem + tr)) * k - v * sway * np.array([1.0, 0.5, 1.0]) * k
-            d = d + np.array([0.0, 0.0, -self.drift * sway])
-            lim = float(lag.get("max", DEFAULT_LAG["max"])) * max(y1 - y0, 1.0)
-            n = float(np.linalg.norm(d))
-            if n > lim:
-                d = d * (lim / n)
-            out[p.index] = S.Motion(R, tr, R, tr, d, y0, y1)
+            if lag:
+                # a loose part: where its bone's late pose and velocity would drag the hem, as a vector...
+                Rr, trr = self.bone_delta(bone, t, shift, hang, piv, hold=False)
+                lo, hi = self.box_of(p)
+                y0, y1 = float(lo[1]), float(hi[1])
+                tl = t - float(lag.get("frames", 2))
+                if not self.loop:
+                    tl = max(tl, 0.0)
+                R1, t1 = self.bone_delta(bone, tl, shift, hang, piv, hold=False)
+                hem = np.array([(lo[0] + hi[0]) / 2, y1, (lo[2] + hi[2]) / 2])
+                j = self.skel.index[bone]
+                v = self.pose(t)[0][j] - self.pose(t - 1)[0][j]
+                k = float(np.clip((np.linalg.norm(v) - LAG_STILL) / (LAG_MOVING - LAG_STILL), 0.0, 1.0))
+                sway = float(lag.get("sway", 0.6))
+                d = ((R1 @ hem + t1) - (Rr @ hem + trr)) * k - v * sway * np.array([1.0, 0.5, 1.0]) * k
+                d = d + np.array([0.0, 0.0, -self.drift * sway])
+                lim = float(lag.get("max", DEFAULT_LAG["max"])) * max(y1 - y0, 1.0)
+                n = float(np.linalg.norm(d))
+                if n > lim:
+                    d = d * (lim / n)
+                # ...then as a swing about the top of the part that puts the hem there (a shear would move every voxel
+                # by its own fraction of a pixel, which boils). The swing is held like a turn, on top of the bone's own
+                # held pose, so a part at rest on its bone is pixel for pixel the bone's and only a real swing shows.
+                top = self._pivot(p)
+                u = Rr @ (hem - top)
+                swing, _ = self.hold_turn(("swing", p.part or p.index), t, rotation_between(u, u + d), np.zeros(3), np.zeros(3))
+                Rs = swing @ R
+                tr = (R @ top + tr) - Rs @ top
+                R = Rs
+            out[p.index] = S.Motion(R, tr + move, pivot=snap_at)
         return out
 
     def point(self, spec: dict, t: float, transforms: dict) -> np.ndarray | None:
@@ -322,8 +473,10 @@ class Poser:
                 return transforms[pi].point(at)
             return at
         if "bone" in spec and spec["bone"] in self.skel.index:
-            R, tr = self.bone_delta(spec["bone"], t, self.ground_shift(t))
-            return R @ at + tr
+            bone = spec["bone"]
+            shift = self.ground_shift(t)
+            R, tr = self.bone_delta(bone, t, shift)
+            return R @ at + tr + self.bone_move(bone, t, shift)
         return at
 
     def anchors(self, t: float, transforms: dict) -> tuple[dict, list, list]:
@@ -389,10 +542,13 @@ def frame_times(n_src: int, n_out: int | None, loop: bool) -> list[float]:
 
 def render_clip(doc: dict, clip: str, direction: str = "S", *, tracks: JointTracks | None = None, model: S.Model | None = None,
                 scale: float = 1.0, steps: int | None = None, outline="auto", elevation: float | None = None, max_frames: int | None = None,
-                square: bool | int = False, passes: bool = False, lock: bool | None = None) -> dict:
+                square: bool | int = False, passes: bool = False, lock: bool | None = None, turn_step: float | None = None,
+                snap: bool = True) -> dict:
     """Every frame of one clip facing one direction. Returns ``{"frames": [rgba, ...], "fps": f, "times": [...], "normal": [...],
     "depth": [...]}``; the fps keeps the clip's real duration when it was thinned to ``max_frames``. ``square`` pads
-    each frame to a square canvas (True: the larger side; a number: that side) with the ground kept at the bottom."""
+    each frame to a square canvas (True: the larger side; a number: that side) with the ground kept at the bottom.
+    ``turn_step`` (degrees) and ``snap`` are the two rules that keep the pixels still between poses: bones turn in
+    steps and bodies move by whole pixels (see :class:`Poser` and :meth:`pixelforge.shapes.Model.render`)."""
     tracks = tracks or load_joints()
     if direction not in DIRECTIONS:
         raise ValueError(f"direction {direction!r} not in {list(DIRECTIONS)}")
@@ -402,14 +558,16 @@ def render_clip(doc: dict, clip: str, direction: str = "S", *, tracks: JointTrac
     model = model or S.Model(doc, scale, steps)
     skel = skeleton_for(doc, tracks)
     elev = float(doc.get("view", {}).get("elevation", 0.0)) if elevation is None else float(elevation)
-    poser = Poser(model, skel, clip, lock, view=(phi, elev))
+    poser = Poser(model, skel, clip, lock, view=(phi, elev), turn_step=turn_step)
     oc = S.outline_colour(doc, outline)
     times = frame_times(poser.n_src, max_frames, poser.loop)
+    poser.prepare(times)
     frames, normals, depths = [], [], []
     for k, t in enumerate(times):
         tf = poser.transforms(t)
         anchors, effects, lights = poser.anchors(t, tf)
-        fr = model.render(k, phi, elev, tf, outline=oc, lights=lights, effects=effects, shadow=doc.get("shadow"), anchors=anchors, passes=passes)
+        fr = model.render(k, phi, elev, tf, outline=oc, lights=lights, effects=effects, shadow=doc.get("shadow"), anchors=anchors, passes=passes,
+                          snap=snap)
         rgba = fr.rgba
         side = (max(model.W, model.H) if square is True else int(square)) if square else 0
         if side:

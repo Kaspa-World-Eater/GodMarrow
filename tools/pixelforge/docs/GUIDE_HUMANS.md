@@ -85,8 +85,10 @@ coat as a ring with a ragged hem) with a colour ramp each, and which bone of the
 draws it as pixel art with the same shading rules for everything (one light from the top left, dark lines between
 pieces, a thin outline, glowing eyes and flames drawn last, a dithered shadow on the ground) and plays the library's
 motion clips on it (24 of them, idle, walk, run, attack, cast, hit, death and more), so every clip comes out as real
-frames from all eight directions, with skirts, veils and cords hanging from the body and trailing it, the feet on the
-ground and the hat on the head. No Blender, no Mixamo, a few seconds per clip. Objects (a chest, a skull, a dead tree)
+frames from all eight directions, with skirts, veils and cords hanging from the body and swinging after it, the feet
+on the ground and the hat on the head. The pieces move the way a hand would draw them: by whole pixels, holding a
+pose until it has somewhere to go, so nothing crawls or boils between frames. No Blender, no Mixamo, a few seconds
+per clip. One file serves both sizes: the small-size variant keeps the silhouette and drops the detail. Objects (a chest, a skull, a dead tree)
 are the same kind of file without bones, rendered as a still with a foot point for the game.
 
 The painting is the reference for the costume, not the source. Writing the file is a job for the AI assistant (the

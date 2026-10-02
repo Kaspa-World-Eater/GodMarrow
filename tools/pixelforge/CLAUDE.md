@@ -14,7 +14,7 @@ Blender + Mixamo → 8-direction renders → palette-locked pixel frames → God
   turnaround sheets), `model_spec.py` (inflated-cutout spec). Shape sprites
   (characters drawn by code, the character road): `shapes.py` (the renderer:
   flat masks and solid signed-distance shapes, one set of shading rules),
-  `shape_rig.py` (bones from the motion clips, lag, ground lock, 8 directions),
+  `shape_rig.py` (bones from the motion clips, swing, the turn and place holds, ground lock, 8 directions),
   `shape_tools.py` (frame sets, GIFs, sheets), `joints.py` (numpy glTF reader,
   `assets/animations/joints.json.gz`); files under `assets/shapes/` (characters, objects, the
   material library); the procedure for a session is the game repository's `docs/GUIDE_SESSION.md`. Scripts that run

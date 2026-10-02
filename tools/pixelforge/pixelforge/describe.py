@@ -410,21 +410,31 @@ def draft_shapes(text: str, out: str | Path | None = None, height: int = 120) ->
     boots_mat = _material_near(words, "boots|shoes|feet|sandals", "leather5" if not re.search(r"\bwrapped feet\b", t) else "wrap")
     skin_mat = "shadowskin" if re.search(r"\b(dark skin|shadow|undead|wraith|ghoul)\b", t) else "skin"
     # head
-    hood = bool(re.search(r"\b(hood|hooded|cowl|veil|wrappings|wrapped head|bandaged)\b", t))
-    head_mat = _material_near(words, "hood|cowl|veil|wrappings|bandages|head|face|helm|helmet", "wrap" if hood else skin_mat)
+    hooded = bool(re.search(r"\b(hood|hooded|cowl|cowled)\b", t))
+    wrapped = bool(re.search(r"\b(veil|veiled|wrappings|wrapped head|bandaged|bandages)\b", t))
+    hood = hooded or wrapped
+    head_mat = _material_near(words, "hood|cowl|veil|wrappings|bandages|head|face|helm|helmet", "wrap" if wrapped else "cloth" if hooded else skin_mat)
     helm = bool(re.search(r"\b(helm|helmet)\b", t))
-    add(name="head", kind="ellipsoid", centre=[cx, (head_y + top_y) / 2 + 1, 0.3], radii=[6.0, (head_y - top_y) / 2 + 1, 6.6], material=head_mat if (hood or helm) else skin_mat,
-        bone="head", rules=([{"every_y": [3, 0], "t": -1}] if hood else []))
-    read.append(("a hooded " if hood else "a helmed " if helm else "a bare ") + "head")
+    face_mat = head_mat if (wrapped or helm) else skin_mat
+    add(name="head", kind="ellipsoid", centre=[cx, (head_y + top_y) / 2 + 1, 0.3], radii=[6.0, (head_y - top_y) / 2 + 1, 6.6], material=face_mat,
+        bone="head", rules=([{"every_y": [3, 0], "t": -1}] if wrapped else []))
+    head_shape = shapes[-1]
+    if hooded:
+        # a hood: a crown over the top of the head and a ring round its back and sides, open at the face
+        add(name="hood_crown", kind="ellipsoid", centre=[cx, top_y + 4.5, -0.8], radii=[8.4, 7.0, 8.8], clip_y=[None, top_y + 5.5], material=head_mat, bone="head",
+            bump={"folds": [0.35, 7, 1.0]}, rules=[{"y": [top_y + 3, None], "front": 0.9, "t": -2}, {"back": 0.1, "t": -1}])
+        add(name="hood", kind="ring", y=[top_y + 3, head_y + 9], rx=[8.2, 0.1], rz=[7.8, 0.08], thickness=2.0, keep={"back": 0.95}, material=head_mat, bone="head",
+            bump={"folds": [0.4, 7, 1.0]}, rules=[{"every_y": [4, 0], "t": -1}, {"hem_band": [0, 1.5], "t": -1}])
+    read.append(("a hooded " if hooded else "a wrapped " if wrapped else "a helmed " if helm else "a bare ") + "head")
     glow = next((SHAPE_GLOWS[w] for w in words if w in SHAPE_GLOWS and re.search(r"\b(eyes?|glow|glowing|burning)\b", t)), None)
     if glow or re.search(r"\b(glowing eyes|burning eyes|eyes glow)\b", t):
         glow = glow or "soul"
         ey = (head_y + top_y) / 2 + 1
-        shapes[-1].setdefault("rules", []).append({"z": [4.5, None], "near": [[[cx - 2.5, ey, None], [cx + 2.5, ey, None]], 2.0], "t": -3})
-        shapes[-1]["rules"].append({"z": [4.5, None], "near": [[[cx - 2.5, ey, None], [cx + 2.5, ey, None]], 1.4], "material": glow, "emit": "pulse"})
-        shapes[-1]["rules"].append({"z": [4.5, None], "near": [[[cx - 2.5, ey, None], [cx + 2.5, ey, None]], 0.6], "material": glow, "emit": "pulse", "t": 1})
+        head_shape.setdefault("rules", []).append({"z": [4.5, None], "near": [[[cx - 2.5, ey, None], [cx + 2.5, ey, None]], 2.0], "t": -3})
+        head_shape["rules"].append({"z": [4.5, None], "near": [[[cx - 2.5, ey, None], [cx + 2.5, ey, None]], 1.4], "material": glow, "emit": "pulse"})
+        head_shape["rules"].append({"z": [4.5, None], "near": [[[cx - 2.5, ey, None], [cx + 2.5, ey, None]], 0.6], "material": glow, "emit": "pulse", "t": 1})
         read.append(f"glowing eyes ({glow})")
-    add(name="neck", kind="capsule", a=[cx, B["neck"]["head"][1], 0], b=[cx, head_y, 0], r=[2.8, 2.6], material=head_mat if hood else skin_mat, bone="neck")
+    add(name="neck", kind="capsule", a=[cx, B["neck"]["head"][1], 0], b=[cx, head_y, 0], r=[2.8, 2.6], material=head_mat if wrapped else skin_mat, bone="neck")
     if re.search(r"\b(hat|straw hat|wide hat|brim)\b", t):
         hat_mat = _material_near(words, "hat|brim", "straw")
         add(name="hat", kind="ring", y=[top_y - 13, top_y + 7], rx=[1.0, 1.2], rz=[1.0, 1.15], thickness=1.8,

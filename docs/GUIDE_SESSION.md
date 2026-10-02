@@ -27,7 +27,7 @@ task says so; the in-game look-test below copies files into `art/sprites/` and r
 |---|---|
 | The look to reach (a necromancer drawn entirely by code, with its render) | `docs/refs/necromancer_shape_sprite.html`, `docs/refs/necromancer_shape_sprite.png` |
 | The same figure as a 3D solid, seen from 8 directions | `docs/refs/necromancer_3d_breakdown.html`, `docs/refs/necromancer_3d_turn.png` |
-| Finished shape files to copy from | `tools/pixelforge/assets/shapes/necromancer.shapes.json` (flat), `necromancer_3d.shapes.json` (solid), `characters/keeper.shapes.json` (the Keeper, 45 shapes), `objects/chest.shapes.json`, `skull.shapes.json`, `dead_tree.shapes.json` |
+| Finished shape files to copy from | `tools/pixelforge/assets/shapes/necromancer.shapes.json` (flat), `necromancer_3d.shapes.json` (solid), `characters/keeper.shapes.json` (the Keeper, 58 shapes with size variants), `objects/chest.shapes.json`, `skull.shapes.json`, `dead_tree.shapes.json` |
 | The material library (named colour ramps) | `tools/pixelforge/assets/shapes/materials.json` |
 | The Keeper as she is in the game today (converted from a painting) | `art/sprites/keeper.png` + `keeper.json` (frames by `anim/view/i`) |
 | Midjourney prompts in the game's style, ready to paste | `docs/midjourney/test_batch_2026-10-01.md`; `pixelforge prompt --describe "..."` writes more |
@@ -88,7 +88,9 @@ pixelforge game-preview --skin <name>_shapes --shot shot.png
 git checkout -- art/ && rm -f art/sprites/<name>_shapes.*
 ```
 
-Headless, the same game shot is: `godot --headless --path . --import`, then
+`game-preview` finds Godot (or takes `--godot <exe>`) and, on a box with no display, runs the game under `xvfb-run`
+with the OpenGL driver by itself (`xvfb-run` must be installed; the result says `virtual_display: true`). The same
+shot by hand is: `godot --headless --path . --import`, then
 `xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --resolution 1280x720 -- --zone=moor --seed=3 --new --cls=miasmancer --hour=0.5 --skin=<name>_shapes --hide=dark --shot=/abs/shot.png --shot_t=5 --shot_n=8`.
 
 An object (a chest, a skull, a tree) has no bones and one still per direction:
@@ -120,6 +122,13 @@ The file is the sprite. Every shape is named; change numbers, re-render, look. T
   Keeper needed a waist capsule between the chest and the belt). Render the death clip to find such gaps.
 - **Speckles crawl.** `hash` rules take a third number, the speck size in units (`[0.08, 5, 2]`); a sawtooth hem of
   many tiny tongues flickers, so give a brim a plain edge and a hem 9-16 tongues.
+- **It boils between frames** (pixels re-rolling where nothing moved). The rig holds every body's drawn turn until
+  the clip has turned it 4 degrees and its drawn place until the clip has moved it a pixel (`view.turn_step`,
+  `view.move_step`), so this should not happen with the shipped engine; if a part still crawls, it is an effect
+  (`motes`) or a light whose `pulse` is large, or two shapes of one thing in different parts (give them one `part`).
+- **At the small size it is a silhouette.** Give the file size variants: `"px": [90, null]` on the fingers, specks
+  (`hash`) and rivets, and a twin shape with `"px": [null, 90]` where the small size needs more (a cord 1.3 wide
+  instead of 0.7, a bigger hand). The Keeper has both; `shapes still --style rendered_arpg` shows the small set.
 
 Materials by name come from the library; a file's own `materials` win. Bones:
 `hips spine.001 spine.002 spine.003 neck head shoulder.L upper_arm.L forearm.L hand.L thigh.L shin.L foot.L toe.L`
@@ -132,11 +141,15 @@ Judge the pictures, not the numbers alone; the numbers are what the tests check.
 - Every direction is a full figure; nothing collapses or flips; the back view really is the back.
 - One piece per frame: no foot, hat or hem floating free in idle, walk, run, attack or death (the test counts
   opaque islands of 12 px or more; one).
-- The idle does not shimmer: at the clip's own frame rate fewer than 12% of the figure's own pixels change from one
-  frame to the next, and fewer than 3% change and change straight back (the Keeper: 8%, 0.5%).
-- The feet hold the ground: the lowest foot pixel sits on one row in every walk frame (the test allows 1 px); the
-  contact shadow never moves.
-- Hems, veils and cords trail the body by a frame or two; the hat stays on the head in the attack.
+- The frames the game plays do not boil: at the preset's frame count (24 for the gothic look) fewer than 12% of the
+  figure's own pixels change from one idle frame to the next and fewer than 3% change and change straight back (the
+  Keeper: 4% and 0.4% facing S, 9% and 0.2% facing E), and the hat rows of a walk frame are a whole-pixel shifted
+  copy of the frame before (under 10% left over after the shift; the Keeper 1-3%). `pixelforge shapes preview` at the
+  preset's frames is what to look at: a held pose must be pixel for pixel the frame before.
+- The feet hold the ground: the lowest foot pixel sits on one row in every walk and idle frame in all eight
+  directions; in the run the planted frames sit on that row and the airborne frames lift; the contact shadow never
+  moves.
+- Hems, veils and cords swing after the body by a frame or two; the hat stays on the head in the attack.
 - The eyes show under the brim in the front and three-quarter views at the gothic size (120 px).
 - At the small size (76 px, `rendered_arpg`) the figure still reads as a silhouette: hat, shoulders, hem.
 - The exported atlas's frames sit on their anchors (`dy + h` within a few px of 0) and the game shows the figure on

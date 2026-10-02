@@ -56,8 +56,9 @@ glow), every shape riding a bone. `shapes.py` voxelises the file once and render
 surface shell, z-buffering it and shading each pixel from one fixed light with the ramps, then contours, a 1 px
 outline, emissives, point lights with real depth and normals, a dithered shadow; the same rules draw flat 2D shape
 sprites for icons and effects (the reference necromancer page, re-rendered pixel for pixel). `joints.py` reads the
-animation library with numpy, `shape_rig.py` binds the shapes to the clips' joints (loose parts lag at the hem, the
-planted foot holds the ground) and renders every clip in eight directions in a few seconds. Examples under
+animation library with numpy, `shape_rig.py` binds the shapes to the clips' joints (loose parts swing after the body,
+the planted foot holds the ground, every body moves by whole pixels and holds its drawn turn until the clip has
+turned it a step, so the frames never boil) and renders every clip in eight directions in a few seconds. Examples under
 `assets/shapes/`; the guide's "Shape sprites" section is the format reference.
 
 ## The character pipeline, in one paragraph

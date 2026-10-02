@@ -493,3 +493,65 @@ clip's own rate (8%) because each thinned frame moves 2.5 times further, not bec
 The objects are first passes (the chest, the skull and the dead tree read at 3x; no in-game placement was tried,
 the game's zones reference objects by key). The MCP tools were exercised by building the server, not by a client.
 
+### 7.10 2026-10-02, track/shapes: the second review round (still pixels between poses, the Keeper's accents, the run flies)
+
+**What.** The reviewer's blocker was that the solid renderer boiled: a sub-pixel move of a body re-picked which voxel
+owned each pixel and its tone, so the frames the game plays (24 per clip) changed 17-20% of the figure's pixels in
+the idle and 45% in the walk, the hat's specks and the eyes re-rolling every frame. Fixed in the engine, three
+ways. `shapes.py` `Model.render` snaps every rigid body to whole pixels on the screen (the projected offset of its
+pivot from the author pose is rounded and the rounding error added to all its voxels; `Motion.pivot`; `snap=False`
+gives the raw picture; `Model.screen_offset`): a static model moved by 0.3 units renders identically, moved by a
+pixel's worth it moves as a block. `shape_rig.py` holds every body's drawn pose the way a hand would draw it: the
+turn holds until the clip's is `turn_step` (4 degrees) away and then takes the clip's exactly, the place holds until
+the clip has moved it `move_step` (1 px) and then rounds (hysteresis, which cannot chatter where a lattice would;
+`Poser.hold_turn`, `hold_place`, `bone_move`, `prepare(times)` runs the holds over the frames in order, twice round a
+loop so the seam is clean; every shape of a bone takes the bone's move, so a hat, its head and the eye light are one
+block; `view.turn_step` and `view.move_step` in the file). The lag was a per-voxel shear (the hem weighted by
+height) that moved every voxel by its own fraction of a pixel, which no snap can hold: a loose part is now a rigid
+**swing** about its top that puts the hem where the drag would (`rotation_between`), held like a turn on top of the
+bone's held pose, so a part at rest is pixel for pixel its bone and only a real swing shows; the shapes of one part
+are one body (the hat's crown knob detached when it was held on its own). The ground lock aims the lowest foot voxel
+at the centre of its row (so the rounding can never take it off) with the same pivot the transforms use, and is
+contact-aware: a foot within `GROUND_REACH` (6 units at 120 px) of the clip's own floor is planted and pulled onto
+the line, higher is a jump and the figure lifts (the run used to be dragged down 9-12 units so the skirt hit the
+ground). `Frame.pid` is the shape per pixel. The Keeper (`keeper.shapes.json`, 58 shapes): a flatter, wider hat with
+a 1.3-thick brim and the brow in its shadow, lamed pauldrons with a rivet row, tapering bracers and shins with wrap
+lines, rounded-box feet with a dark sole and a toe, a yoke ring that tilts with the hips (hang 0.6) over a skirt that
+hangs (0.25), and the size variants through the new `px` ranges on shapes and rules (`px_ok`): fingers, specks and
+rivets at 90 px and above, thicker cords and bigger hands below. Minors: `game-preview` runs the game under
+`xvfb-run` with the OpenGL driver when there is no display (and once more under it when a set display fails;
+`needs_virtual_display`, `preview_command(virtual=True)`); describe-it's hood words add a hood crown and ring
+(`hood`, `hood_crown`) and keep the face, the wrap words wrap it; GIF durations add up to the clip's real rate
+(`gif_durations`: 9.6 fps is 100, 110, 100 ...); `shapes render --gif` crops its GIFs to the clip (`trim_frames`);
+every sheet is a palette PNG under 400 KB. Docs: GUIDE_AI (the holds, the swing, `px`, the checks with the numbers
+at the game's frame count, the honest judgement), GUIDE_SESSION (58 shapes, the display fallback, two new
+complaints, the numbers), GUIDE_HUMANS, README, CLAUDE.md, the track note (the knobs the app should show, the
+numbers).
+
+**Verified.** 146 tests green in about 90 s (`tests/test_shapes.py` 35: a 0.3-unit move of the static model changes
+no pixel and a 1 px move is a shift; the holds step at 4 degrees and 1 px and never chatter; the idle at the gothic
+preset's 24 frames changes under 0.12 of the figure's own pixels with under 0.03 change-and-revert, the hat rows a
+shifted copy (S 0.038 and 0.004, E 0.095 and 0.002; hat rows 0.000 after the shift) and the walk's hat rows under
+0.10 after the shift (0.01-0.03); the lowest foot pixel on one row in every walk and idle frame in all eight
+directions at 120 px, the run's planted frames on that row and its airborne frames above it; `px` variants; the
+describe-it hood; the virtual display; the GIF durations and the trim; `tests/test_e2e_shapes.py` 3). Pictures under
+`docs/screens/shapes/` (every Keeper picture replaced, each under 400 KB): the Keeper at 120 and 76 px in idle and
+walk from eight directions (sheets and GIFs), attack / cast / run / hit / death, before-and-after strips of the idle,
+the walk and the attack (the previous build's frames beside these), the head at 5x over eight exported idle frames
+and eight walk frames, the painting beside the converted painting and the sprite at one height (120 and 76), every
+clip from every direction on one sheet, the describe-it drafts (with the hooded necromancer), the in-game shot
+(`keeper_shapes` on the moor through the xvfb command and through `game-preview` itself; `art/` reverted after).
+The full set (7 clips, 8 directions) renders in about 60 s at 120 px and 30 s at 76 px.
+
+**Honestly.** The boiling is gone at the frames the game plays, and gone for the right reason (the holds and the
+swing are engine rules, not a filter): a held pose is pixel for pixel the frame before, and what changes in the idle
+is the eyes' pulse and a 1 px breath. The cost is that a slow turn steps by 4 degrees and a slow drift by 1 px,
+which is what a drawn sprite does, but a hand would choose each frame and this picks them by rule; the walk still
+changes a third of the figure's pixels a frame because the legs, arms and a 1 px bob really move. The Keeper reads
+better (the lames, the rivets, the sandals, the yoke over the skirt, the hat with the eyes in its shadow) and holds
+her silhouette at 76 px with the size variants, but she is still a figure written by rules beside the necromancer
+page. In the run's crouch the rigidly hanging skirt dips a row below the feet in a few frames (cloth would fold);
+the hanging rule is still tilt damping. The reviewer's raw "hat rows under 10%" is not met in the walk (22-29%), because
+the head bobs a pixel every few frames and a whole-pixel bob changes every hat pixel by that measure; the test
+forgives a whole-pixel shift and then asks for under 10%, which is 1-3%. The MCP tools were exercised by importing
+the server, not by a client round-trip.

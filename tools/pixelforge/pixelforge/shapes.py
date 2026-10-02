@@ -643,12 +643,22 @@ def apply_bump(bump: dict, P, n, a):
 
 
 # ---- material rules: a rule is a dict of conditions plus what to set when they all hold
+def px_ok(spec: dict, px: float) -> bool:
+    """Whether a shape or rule with a ``px`` range ([lo, hi), figure height in pixels; None = open) applies at this
+    render size: the way a file carries a small-size variant (thicker cords, fewer specks) next to the large one."""
+    rng = spec.get("px")
+    if not rng:
+        return True
+    lo, hi = rng
+    return (lo is None or px >= float(lo)) and (hi is None or px < float(hi))
+
+
 def rule_mask(rule: dict, P: np.ndarray, prim: Prim) -> np.ndarray:
     m = np.ones(len(P), bool)
     x, y, z = P[:, 0], P[:, 1], P[:, 2]
     a = None
     for key, val in rule.items():
-        if key in ("material", "t", "emit", "rivet", "flat", "lift", "spec_t"):
+        if key in ("material", "t", "emit", "rivet", "flat", "lift", "spec_t", "px", "note"):
             continue
         if key in ("x", "y", "z"):
             v = {"x": x, "y": y, "z": z}[key]
@@ -744,7 +754,9 @@ def rule_mask(rule: dict, P: np.ndarray, prim: Prim) -> np.ndarray:
 @dataclass
 class Motion:
     """How one shape moves in a frame: a rigid transform (p' = R p + t), and for a loose part a second, late
-    transform plus a drag vector that the hem follows more than the top (``y0``..``y1`` is the shape's span)."""
+    transform plus a drag vector that the hem follows more than the top (``y0``..``y1`` is the shape's span).
+    ``pivot`` (a file-space point of the author pose, the bone's head) is the point the renderer snaps to whole
+    pixels; without it the body's centre is used. Shapes that share one Motion object move as one body."""
     R: np.ndarray
     t: np.ndarray
     R_lag: np.ndarray | None = None
@@ -752,6 +764,7 @@ class Motion:
     drag: np.ndarray | None = None
     y0: float = 0.0
     y1: float = 1.0
+    pivot: np.ndarray | None = None
 
     def apply(self, P: np.ndarray, N: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         Q = P @ self.R.T + self.t
@@ -805,6 +818,7 @@ class Model:
         self.axis = tuple(doc.get("axis", [doc["size"][0] / 2, 0.0]))
         self.ground = float(doc.get("ground", doc["size"][1] - 1))
         self.prims = [Prim(s, i, self.axis) for i, s in enumerate(doc["shapes"])]
+        self.px = float(doc.get("height", doc["size"][1])) * self.scale      # the figure's height in pixels: what ``px`` ranges test
         self.set_width(width)
         self.H = int(round(doc["size"][1] * self.scale))
         self.shell = self._voxelise()
@@ -836,8 +850,9 @@ class Model:
     def _voxelise(self) -> Shell:
         s = self.scale
         groups: dict[tuple, list[Prim]] = {}
-        carves = [p for p in self.prims if p.carve]
-        for p in self.prims:
+        active = [p for p in self.prims if px_ok(p.spec, self.px)]
+        carves = [p for p in active if p.carve]
+        for p in active:
             if not p.carve:
                 groups.setdefault(self.group_key(p), []).append(p)
         P_parts, prim_parts = [], []
@@ -888,6 +903,8 @@ class Model:
             if p.spec.get("flat"):
                 flats.append(hexrgb(p.spec["flat"])); flat[sel] = len(flats) - 1
             for rule in p.spec.get("rules", []):
+                if not px_ok(rule, self.px):
+                    continue
                 hit = rule_mask(rule, Pp, p)
                 if not hit.any():
                     continue
@@ -916,24 +933,37 @@ class Model:
     # ---- one frame
     def render(self, frame: int = 0, phi: float = 0.0, elevation: float = 0.0, transforms: dict | None = None, *,
                outline: np.ndarray | None = None, lights: list | None = None, effects: list | None = None, shadow: dict | None = None,
-               anchors: dict | None = None, contour: float = 2.2, passes: bool = False, shade: bool = True) -> "Frame":
+               anchors: dict | None = None, contour: float = 2.2, passes: bool = False, shade: bool = True,
+               snap: bool = True) -> "Frame":
         """Render the model facing ``phi`` radians (0 = toward the viewer, +pi/2 = toward the viewer's right) seen from
         ``elevation`` degrees above. ``transforms`` maps a shape index to a (3x3 rotation, 3 translation) pair in
         file units (what the rig makes from a clip's joints). ``anchors`` are named 3D points in file units (after
-        posing) that lights and effects refer to."""
+        posing) that lights and effects refer to.
+
+        ``snap`` moves every rigid body by whole pixels on the screen: the projected offset of the body's pivot from
+        its author-pose place is rounded, and the rounding error is added to all of the body's voxels, so a part that
+        moves under a pixel does not change at all and one that moves a pixel moves as a block, every voxel keeping
+        the pixel it owned. Without it a sub-pixel move re-picks the nearest voxel in every pixel (and its tone), which
+        boils like noise from frame to frame."""
         sh = self.shell
         s = self.scale
         W, H = self.W, self.H
         cv = Canvas(W, H, s)
         P = sh.pos.copy(); N = sh.nrm.copy()
+        bodies: list[tuple[np.ndarray, np.ndarray, np.ndarray]] = []     # (voxel selection, author pivot, moved pivot)
         if transforms:
+            by_motion: dict[int, tuple[Motion, list[int]]] = {}
             for pi, mo in transforms.items():
-                sel = sh.prim == pi
-                if not sel.any():
-                    continue
                 if not isinstance(mo, Motion):
                     mo = Motion(np.asarray(mo[0], float), np.asarray(mo[1], float))
+                by_motion.setdefault(id(mo), (mo, []))[1].append(int(pi))
+            for mo, pis in by_motion.values():
+                sel = np.isin(sh.prim, pis)
+                if not sel.any():
+                    continue
                 P[sel], N[sel] = mo.apply(P[sel], N[sel])
+                piv = np.asarray(mo.pivot, float) if mo.pivot is not None else sh.pos[sel].mean(axis=0)
+                bodies.append((sel, piv, mo.R @ piv + mo.t))
         cx, cz = self.axis
         cs, sn = math.cos(phi), math.sin(phi)
         xr = (P[:, 0] - cx) * cs + (P[:, 2] - cz) * sn
@@ -945,6 +975,11 @@ class Model:
         sx = W / 2 + xr * s
         sy = (gy + (P[:, 1] - gy) * ce + zr * se) * s
         depth = (zr * ce - (P[:, 1] - gy) * se) * s
+        if snap:
+            for sel, piv0, piv1 in bodies:
+                dx, dy = self.screen_offset(piv0, piv1, phi, elevation)
+                sx[sel] += math.floor(dx + 0.5) - dx
+                sy[sel] += math.ceil(dy - 0.5) - dy
         nvx, nvy, nvz = nx, ny * ce + nz * se, nz * ce - ny * se
         px = np.floor(sx).astype(int); py = np.floor(sy).astype(int)
         ok = (px >= 1) & (px < W - 1) & (py >= 1) & (py < H - 1)
@@ -1073,6 +1108,7 @@ class Model:
             shadow_colour = hexrgb(shadow.get("colour", "#4b4a4f"))
         rgba = cv.compose(shadow_mask, shadow_colour)
         fr = Frame(rgba, proj, {"filled": int(m.sum())})
+        fr.pid = cv.pid
         if passes:
             fr.normal = cv.normal_pass()
             fr.depth = cv.depth_pass(zb[m].max() if m.any() else 1, zb[m].min() if m.any() else 0)
@@ -1111,6 +1147,12 @@ class Model:
         gy = self.ground
         return (self.W / 2 + xr * s, (gy + (y - gy) * math.cos(e) + zr * math.sin(e)) * s, (zr * math.cos(e) - (y - gy) * math.sin(e)) * s)
 
+    def screen_offset(self, p0, p1, phi: float, elevation: float) -> tuple[float, float]:
+        """How far (pixels, x and y) the file-space point ``p1`` lands from ``p0`` on the screen at this view."""
+        x0, y0, _ = self.project(p0, phi, elevation)
+        x1, y1, _ = self.project(p1, phi, elevation)
+        return x1 - x0, y1 - y0
+
     def _screen_at(self, spec: dict, proj: dict, phi: float, elevation: float):
         """Where a light, effect or shadow sits on the canvas: a rig anchor by name (already projected, with an
         ``offset`` in file units on screen) or a fixed ``at`` point in file units (with a 3D ``offset``)."""
@@ -1133,6 +1175,7 @@ class Frame:
     stats: dict
     normal: np.ndarray | None = None
     depth: np.ndarray | None = None
+    pid: np.ndarray | None = None         # the shape index that painted each pixel (-1 none): for tests and diagnostics
 
 
 # ---------------------------------------------------------------------------------------------- effects
@@ -1359,6 +1402,10 @@ def mode_of(doc: dict) -> str:
     return "solid" if kinds & set(SOLID_KINDS) else "flat"
 
 
+def _px_range_ok(v) -> bool:
+    return isinstance(v, (list, tuple)) and len(v) == 2 and all(x is None or isinstance(x, (int, float)) for x in v)
+
+
 def validate(doc: dict, library: dict | None = None) -> list[str]:
     """The reasons a file is not a valid shape sprite (empty when it is)."""
     bad = []
@@ -1412,8 +1459,12 @@ def validate(doc: dict, library: dict | None = None) -> list[str]:
                 bad.append(f"{tag}: rule uses unknown material {r['material']!r}")
             if "emit" in r and r["emit"] not in EMIT_CODES:
                 bad.append(f"{tag}: rule emit {r['emit']!r} not in {list(EMIT_CODES)}")
+            if "px" in r and not _px_range_ok(r["px"]):
+                bad.append(f"{tag}: rule px must be [lo, hi] in pixels of figure height (None = open)")
         if "hang" in s and not (isinstance(s["hang"], (int, float)) and 0 <= s["hang"] <= 1):
             bad.append(f"{tag}: hang must be a number from 0 (hangs straight) to 1 (rigid with the bone)")
+        if "px" in s and not _px_range_ok(s["px"]):
+            bad.append(f"{tag}: px must be [lo, hi] in pixels of figure height (None = open)")
 
     for i, s in enumerate(doc["shapes"]):
         if not isinstance(s, dict):

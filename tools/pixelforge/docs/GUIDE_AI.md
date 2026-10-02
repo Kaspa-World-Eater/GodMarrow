@@ -280,7 +280,7 @@ pixelforge shapes object FILE -o art/objects/chest [--directions S,SE,E] [--game
 pixelforge shapes preview FILE --clip walk --direction E [--style gothic_hd] [-o walk_E.gif]   # a looping GIF of one clip and direction
 pixelforge shapes sheet FILE -o sheet.png [--clips idle,walk] [--directions S,E] [--columns 8]   # a contact sheet, a row per clip and direction
 pixelforge shapes turntable FILE -o turn.gif                               # a solid file spinning through 48 views, plus its 8 game views
-pixelforge shapes render FILE -o frames [--style gothic_hd] [--clips idle,walk,run,attack,cast,hit,death] [--directions S,SE,...] [--passes] [--gif]
+pixelforge shapes render FILE -o frames [--style gothic_hd] [--clips idle,walk,run,attack,cast,hit,death] [--directions S,SE,...] [--passes] [--gif]   # --gif: a GIF per clip and direction, cropped to the clip
 pixelforge shapes joints [--fps 24]                                        # re-export assets/animations/joints.json.gz from the library (numpy, no Blender)
 
 pixelforge project new <folder> --style gothic_hd
@@ -320,20 +320,25 @@ square with the ground at the bottom. The frames folder's `manifest.json` carrie
    materials, then details.
 4. `pixelforge shapes render FILE -o frames --style gothic_hd` or, in a project, `project import-shapes` +
    `project render-shapes` + `project export-game --kind <kind>` (each with `-p <folder>`); copy the atlas into the
-   game's `art/sprites/` and look with `pixelforge game-preview --skin <kind> --shot shot.png`.
+   game's `art/sprites/` and look with `pixelforge game-preview --skin <kind> --shot shot.png` (on a box without a
+   display it runs the game under `xvfb-run` with the OpenGL driver by itself).
 5. An object: `shapes still` for one view, `shapes object` for the game's `objects.json` (a trimmed PNG per direction
    with the foot anchor under the body axis; `hr` 2 is the game's texels per world px).
 
 What to check before saying it is done: every direction is a full figure (nothing collapses or flips); every frame
 is one piece (count opaque islands of 12 px or more with the shadow off: one, in idle, walk, run, attack and death);
-the idle does not shimmer (at the clip's own frame rate, the fraction of the figure's own pixels that change between
-consecutive frames is under 0.12 and the fraction that change and change straight back under 0.03; the Keeper's are
-0.08 and 0.005; a clip thinned to 24 frames changes more per frame because each frame moves further); the lowest foot
-pixel is on one row in every walk frame (the ground lock holds the feet on the screen's ground line, whichever foot is
-planted) and the shadow never moves; loose parts trail the body (hems and veils move a frame or two after the hips)
-and never leave it (a hem trails at most a tenth of its height); the eyes show under the brim at 120 px; at the small
-size the figure still reads as a silhouette (hat, shoulders, hem) rather than as detail. `tests/test_shapes.py` and
-`tests/test_e2e_shapes.py` check all of this on the Keeper and on a drafted file.
+the frames the game plays do not boil (at the preset's frame count, 24 for `gothic_hd`, the fraction of the figure's
+own pixels that change between consecutive idle frames is under 0.12 and the fraction that change and change
+straight back under 0.03: the Keeper's are 0.04 and 0.004 facing S, 0.09 and 0.002 facing E; and the hat rows of one
+frame are a whole-pixel shifted copy of the frame before, in the idle exactly, in the walk with under 0.10 of their
+pixels left over after the shift: the Keeper's 0.01-0.03); the lowest foot pixel is on one row in every walk and idle
+frame in all eight directions (the ground lock holds the planted foot on the screen's ground line; in a run the
+airborne frames lift and never sink) and the shadow never moves; loose parts swing after the body (hems and veils
+move a frame or two after the hips) and never leave it (a hem swings at most a tenth of its height); the eyes show
+under the brim at 120 px; at the small size the figure still reads as a silhouette (hat, shoulders, hem) and its
+`px` variants carry the detail it can afford (thicker cords, bigger hands, no specks). `tests/test_shapes.py` and
+`tests/test_e2e_shapes.py` check all of this on the Keeper and on a drafted file; `pixelforge shapes preview` at the
+preset's frame count is what to look at.
 
 ### The file
 
@@ -344,7 +349,8 @@ size the figure still reads as a silhouette (hat, shoulders, hem) rather than as
   "view": {"elevation": 12}, "outline": "#0a080c",
   "skeleton": {"height": 120, "ground": 134, "cx": 69},
   "materials": {"straw": {"ramp": ["#15100c", "#241b13", "#35291c", "#473826", "#594832", "#6b5a40"], "texture": "grain", "texture_strength": 0.5}},
-  "parts": {"hat": {"bone": "head", "lag": {"frames": 1, "sway": 0.12}}, "skirt": {"bone": "hips", "lag": {"frames": 2, "sway": 0.8}, "hang": 0.25}},
+  "parts": {"hat": {"bone": "head", "lag": {"frames": 1, "sway": 0.12}}, "yoke": {"bone": "hips", "lag": {"frames": 1, "sway": 0.4}, "hang": 0.6},
+            "skirt": {"bone": "hips", "lag": {"frames": 2, "sway": 0.8}, "hang": 0.25}},
   "shapes": [ ... ],
   "effects": [ ... ], "lights": [ ... ], "shadow": {"radii": [22, 4.2], "colour": "#4b4a4f"}
 }
@@ -353,7 +359,8 @@ size the figure still reads as a silhouette (hat, shoulders, hem) rather than as
 - `size` is the canvas in file units; `height` the figure's height (the preset's figure height divides it to get the
   render scale; for an object it is its size in texels); `ground` the y of the ground line; `axis` the body axis (x, z)
   the rings and the turn use; `view.elevation` the camera's degrees above level (0 = the page's straight-on view; the
-  game's Keeper uses 12, the objects 30, the game's camera).
+  game's Keeper uses 12, the objects 30, the game's camera); `view.turn_step` (degrees, 4) and `view.move_step`
+  (pixels, 1) are the holds of the rig (below), rarely changed.
 - `materials`: a ramp per name, shadow first, any length (2..8 steps; the page used 5, the 3D page 5-7, the preset's
   `shading_bands` resamples them). Options: `emissive` (its steps are picked by rule, never by light), `spec` (metal:
   the brightest step only for near-direct light; `spec_t` the threshold, 0.88), `texture` (`weave fur scratch grain`)
@@ -364,12 +371,13 @@ size the figure still reads as a silhouette (hat, shoulders, hem) rather than as
   emissives `soul ember miasma frost`.
 - `outline`: the file's near-black; the preset's rule decides whether it is drawn (`auto`), skipped (`none`) or
   replaced (a hex).
-- `parts`: named groups of shapes (a shape names its `part`) with the `bone` they ride, an optional `lag`
-  (`{"frames": n, "sway": s, "max": 0.1}`: the hem follows n frames late, dragged by the bone's velocity times s and
-  the clip's travel, never further than `max` of the part's height, fading out while the bone is still) and an
-  optional `hang` (1 = rigid with the bone; 0.25 = takes the bone's position and turn but a quarter of its tilt,
-  pivoting where the part attaches, so a skirt hangs from the hips instead of swinging with the pelvis; the damping
-  fades as the body lies down). A shape may carry `bone`, `lag` and `hang` itself instead.
+- `parts`: named groups of shapes (a shape names its `part`; the shapes of a part are one body and move as one)
+  with the `bone` they ride, an optional `lag` (`{"frames": n, "sway": s, "max": 0.1}`: the part swings about its top
+  so that its hem lands where the bone's pose n frames ago, the bone's velocity times s and the clip's travel would
+  drag it, never further than `max` of the part's height, fading out while the bone is still) and an optional
+  `hang` (1 = rigid with the bone; 0.25 = takes the bone's position and turn but a quarter of its tilt, pivoting
+  where the part attaches, so a skirt hangs from the hips instead of swinging with the pelvis; the damping fades as
+  the body lies down). A shape may carry `bone`, `lag` and `hang` itself instead.
 - `lights`: `{"at": [x, y, z], "radius": 30, "strength": 1.0, "pulse": 0.2, "colour": "#7dff78"}`; with `"bone"` or
   `"prim"` the point rides that bone or shape; `{"from": "flicker", "radius": 3.2, "strength": 0.7, "every": 3}` puts a
   small light on every third glowing-crack pixel. Flat files use `[x, y]` and may add `"breathe": true` and `"rim": true`.
@@ -391,8 +399,11 @@ open front, `keep` `{"back": a}` or `{"front": a}` to keep one side, `holes` `{"
 `{"x", "y", "z", "about"}` in degrees, `carve: true` (empties what it covers in every body; the hood's face opening,
 a skull's sockets), `material`, `t` (a tone offset), `lift`, `spec_t`, `emit` (`flicker` for cracks, `pulse` for
 eyes, `steady` for an orb, `soft`), `flat` (a fixed colour), `bump` (`{"folds": [amp, k, seed]}`, `{"fur": true}`,
-`{"ridges": [amp, period]}`), `bone` or `part`, `lag`, `hang`, and `rules`: a list of `{conditions..., sets...}`
-evaluated per voxel in order (later rules win). Conditions: `x y z` ranges `[lo, hi]` (null = open), `dx dy dz` from
+`{"ridges": [amp, period]}`), `bone` or `part`, `lag`, `hang`, `px` `[lo, hi]` (the figure heights in pixels, lo
+included and hi not, at which the shape exists; null = open: the size variants, a cord 0.7 wide at `[90, null]` and
+its 1.3-wide twin at `[null, 90]`, fingers at the large size only), and `rules`: a list of `{conditions..., sets...}`
+evaluated per voxel in order (later rules win; a rule with `px` applies at those sizes only, so specks and rivets
+can be kept for the large size). Conditions: `x y z` ranges `[lo, hi]` (null = open), `dx dy dz` from
 the shape's centre, `angle [a0, a1]` / `abs_angle` around the axis (0 = front, +pi/2 = the character's left, pi =
 back), `front a` / `back a` (within a radians of straight ahead / behind), `every_y [period, which]` (`floor(y) %
 period == which`, lames and bandage lines; `every_x`, `every_z`, `every_angle [n, which]` for alternating tongues),
@@ -413,10 +424,17 @@ hold `{"hem": [xa, xb, y, seed, deep]}`, which expands to a ragged hem whose alt
 
 **Animation rules.** Animation means frames. In a solid file the frames come from the motion clips: every shape with
 a `bone` (or a `part` naming one) takes the rigid motion that carries that bone from the author pose to the clip's
-pose, its tilt damped by `hang` for things that hang; shapes with `lag` have their top follow now and their hem
-follow late, dragged by the bone's velocity and, in a walk or run, by the clip's travel (the clips are in place), so
-hems, veils, cords and hats trail the body, by at most a tenth of their height and not at all while the bone rests.
-The lowest foot pixel is held on the screen's ground line in the standing clips. Bones:
+pose, its tilt damped by `hang` for things that hang; a part with `lag` swings rigidly about its top so that its hem
+follows late, dragged by the bone's velocity and, in a walk or run, by the clip's travel (the clips are in place), so
+hems, veils, cords and hats swing after the body, by at most a tenth of their height and not at all while the bone
+rests. The frames are pixel art, so the rig draws them the way a hand would: a body's drawn turn holds until the
+clip's is `turn_step` degrees (4) away from it and then takes the clip's turn exactly (a slow bone holds its pose and
+steps; a fast one is exact), and a body's drawn place is a whole number of screen pixels from its author-pose place,
+held until the clip has moved it `move_step` (1 px) and then rounded (every shape of a bone takes the bone's move, so
+a hat, its head and the eye light move as one block). The renderer snaps every body the same way, so a part that
+has not moved is pixel for pixel the frame before, and nothing boils between frames. The lowest foot pixel is held
+on the screen's ground line in the standing clips: a foot within 6 units (at 120 px) of the clip's own floor is
+planted and pulled onto the line, higher is a jump and the figure lifts. Bones:
 `hips spine.001 spine.002 spine.003 neck head shoulder.L upper_arm.L forearm.L hand.L thigh.L shin.L foot.L toe.L`
 and the `.R` side. Clips the game uses: `idle walk run attack cast hit death` (also `sprint punch jab hit_head
 attack_idle cast_idle cast_enter roll crouch crouch_walk jump torch_idle talk interact pickup dance walk_hunched`;
@@ -479,15 +497,19 @@ shapes without bones: a chest of rounded boxes with `every_x` iron bands, `rivet
 
 The proof images are in `docs/screens/shapes/` (dated 2026-10-02): the flat parity strip, the solid necromancer beside
 the page's turn, the Keeper at 120 and 76 px in idle and walk from all eight directions and attack / cast / run / hit
-/ death from two, a before-and-after strip of the attack and the walk, the head at 5x, the painting beside the
-converted painting and the sprite at one height, the objects, the in-game shot. Judged honestly: the Keeper reads as
-the Keeper at 120 px (the dark straw hat, the burning eyes, cords, belt and gourds, the split tattered skirt over
-violet, wrapped feet) and holds together through every clip in every direction; the motion is the clips' (a weighty
-walk, the hat on the head through the attack, the hems a frame late). Against the necromancer page she is still a
-rule-written figure rather than a hand-written one: broader, softer in the details, with fewer accents. At 76 px she
-is a silhouette with a hat; the cords and gourds are a few pixels, which is where a hand-drawn sprite would simplify
-and this one does not yet (a per-size rule set is the next step). The clips are in place, so a walk's travel is faked
-as a backward drag on loose parts; secondary motion is kinematic (lag and drag), not simulated. The hanging rule is a
+/ death from two, before-and-after strips of the idle, the walk and the attack (the previous build's frames beside
+these), the head at 5x over eight exported frames, the painting beside the converted painting and the sprite at one
+height, the objects, the in-game shot. Judged honestly: the Keeper reads as the Keeper at 120 px (the wide weathered
+straw hat with the eyes burning in its shadow, lamed pauldrons, cords, belt and gourds, the yoke and tassets over the
+split tattered skirt, wrapped shins and sandalled feet) and holds together through every clip in every direction;
+the frames are still between poses (the idle changes 4-9% of its pixels a frame at the game's 24 frames, almost all
+of it the eyes' pulse and a 1 px breath; the hat rows of a walk frame are a shifted copy of the frame before) and
+the motion is the clips' (a weighty walk, the hat on the head through the attack, the hems swinging a frame late).
+Against the necromancer page she is still a figure written by rules rather than by hand: broader, with fewer
+accents, and her held poses step by 4 degrees and 1 px where a hand would choose each frame. At 76 px she reads as
+hat, shoulders, cords, gourds and hem; the `px` variants give her thicker cords and bigger hands there, and the
+fingers, specks and rivets are left to the large size. The clips are in place, so a walk's travel is faked as a
+backward swing of loose parts; secondary motion is kinematic (a held swing), not simulated. The hanging rule is a
 tilt damping, not cloth: a fallen body's skirt lies along the legs (the damping fades with the tilt) but never
 crumples.
 

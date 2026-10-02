@@ -113,6 +113,21 @@ def gif_of(doc: dict, clip: str, direction: str, out: str | Path, *, style=None,
     return {"ok": True, "gif": str(out), "frames": len(res["frames"]), "fps": res["fps"], "size": list(res["frames"][0].shape[1::-1])}
 
 
+def trim_frames(frames: list, margin: int = 2) -> list:
+    """Every frame cropped to the one box that holds the content of all of them (plus ``margin``), so a GIF of the
+    idle is not padded to the death clip's wide square; the frames stay aligned with each other."""
+    if not frames:
+        return frames
+    alpha = np.any(np.stack([f[..., 3] > 0 for f in frames]), axis=0)
+    ys, xs = np.nonzero(alpha)
+    if len(ys) == 0:
+        return list(frames)
+    H, W = alpha.shape
+    y0, y1 = max(int(ys.min()) - margin, 0), min(int(ys.max()) + margin + 1, H)
+    x0, x1 = max(int(xs.min()) - margin, 0), min(int(xs.max()) + margin + 1, W)
+    return [f[y0:y1, x0:x1] for f in frames]
+
+
 def on_grey(rgba: np.ndarray, bg=GREY) -> np.ndarray:
     a = rgba[..., 3:4] / 255.0
     return (rgba[..., :3] * a + np.array(bg[:3]) * (1 - a)).astype(np.uint8)
