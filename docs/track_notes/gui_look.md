@@ -101,3 +101,13 @@ file marks emissive solids, and the preview reads their screen positions and col
   casts), the key light (direction, colour, strength), rim (colour, strength), ambient. Presets per game style;
   "Randomise within the preset" for variants; champion / unique recolours are saved alternate ramp sets on the same
   model. Every one is a field in the .shapes.json so the AI sets it the same way.
+
+## Shaped glows (2026-10-02)
+An emissive is not a dot with a halo; it has a shape and a behaviour chosen on the Materials tab. Glow kinds: flame
+(a tongue that licks upward, flickers and sheds embers, its light pool warm and jittering), orb (a steady sphere with
+a soft bloom and a slow pulse), eyes (two points with a thin trail when the head turns), runes (lit in sequence along
+a path), crackle (lightning branches that re-draw each frame), smoke-lit (a haze that carries the colour), ember
+(sparks drifting), beam. Each has knobs: height, width, speed, flicker, ember count, colour ramp, light radius and
+how much it tints the model and the ground. The glow's shape also drives the light it casts: a flame lights above
+itself more than below, an orb evenly. These are the same generators the effects workbench uses (vfx kinds),
+attached to a solid, so a character's staff fire and a spell's fire are one thing.
