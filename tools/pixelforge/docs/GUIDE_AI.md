@@ -24,6 +24,10 @@ Steps needing a person (you cannot do them): making Midjourney images and
 installing Blender. Everything else is yours; the pipeline runs unattended.
 Mixamo is optional (mocap upgrade), never required.
 
+- **Shape sprites** (the character road since 2026-10-02, no painting, no Blender): you write a `.shapes.json`
+  (shapes with materials, bound to bones), the renderer draws it as pixel art and the motion clips give every frame
+  in 8 directions. See "Shape sprites" below; `pixelforge shapes --help`.
+
 ## Install / environment
 
 ```
@@ -230,6 +234,220 @@ The older size tiers `8bit`, `16bit`, `hd` (the default for a new project), `ful
   `styles.validate(style)` lists what is wrong with a hand-made `Style(...)`; `styles.options_for_style(style,
   **overrides)` is the one place a preset becomes `PixelateOptions`.
 
+## Shape sprites: characters and objects drawn by code
+
+A shape sprite is a `.shapes.json` file you write: a list of shapes with a material each, the lights, the ground
+shadow and (for a character) the bone each shape rides. The renderer (`pixelforge/shapes.py`) turns it into pixel
+art that reads like hand-made work, and the rig (`pixelforge/shape_rig.py`) plays the 46 CC0 motion clips on it, so
+the result is real frames per clip per direction with no painting, no Blender and no Mixamo. This is the character
+road of the Forge from now on; the painting road stays for reference and for props. The worked example is the
+necromancer of the reference page (`docs/refs/necromancer_shape_sprite.html` in the game repository): its flat file
+`assets/shapes/necromancer.shapes.json` re-renders the page's PNG with 99.8% of the figure's pixels identical, and
+its solid file `assets/shapes/necromancer_3d.shapes.json` is the page's 3D model (61 shapes) seen from any angle.
+
+Two kinds of file share one set of shading rules:
+
+- **flat** (`"mode": "flat"`): polygons, ellipses and dots in the picture plane, painted back to front with
+  automatic form shading. For icons, effects and props without depth, and for anything that only needs a front view.
+  The page's recipe exactly: a step up along the top-left edges, a step down along the bottom-right ones, a directional
+  gradient across the shape's box with a half-step Bayer dither, contour pixels (touching an earlier shape) forced to the
+  darkest step, optional fold stripes, a 1 px outline, emissive pixels last, point lights tinting lit pixels through a
+  Bayer threshold, a dithered contact shadow.
+- **solid** (`"mode": "solid"`): ellipsoids, capsules, boxes, rings and prisms as signed-distance shapes around a
+  body axis. They are voxelised once; a two-voxel surface shell keeps each voxel's normal, material and tone; a frame
+  rotates the shell to the wanted direction, z-buffers it and shades every pixel from one fixed light with the
+  material's ramp (metal keeps its brightest step for near-direct light), draws contours where a neighbouring pixel
+  belongs to another shape behind this one, the outline, the emissives, point lights using each pixel's real depth
+  and normal, the shadow. All eight game directions are real views of one model; the pose comes from the clips.
+
+### Commands
+
+```
+pixelforge shapes template [--height 120] [-o tpl.json] [--png tpl.png]   # the author pose: every bone's head and tail, to draw around
+pixelforge shapes draft "a hooded necromancer with a bone staff and green glowing eyes" -o necro.shapes.json   # a starter humanoid from a sentence
+pixelforge shapes validate FILE                                            # problems in plain words, or a summary (mode, shapes, materials, bones, unbound shapes)
+pixelforge shapes still FILE -o out.png [--frame 40] [--direction SE] [--passes]      # one frame of the file's own animation rules (no clip)
+pixelforge shapes preview FILE --clip walk --direction E [--style gothic_hd] [-o walk_E.gif]   # a looping GIF of one clip and direction
+pixelforge shapes sheet FILE -o sheet.png [--clips idle,walk] [--directions S,E] [--columns 8]   # a contact sheet, a row per clip and direction
+pixelforge shapes turntable FILE -o turn.gif                               # a solid file spinning through 48 views, plus its 8 game views
+pixelforge shapes render FILE -o frames [--style gothic_hd] [--clips idle,walk,run,attack,cast,hit,death] [--directions S,SE,...] [--passes] [--gif]
+pixelforge shapes joints [--fps 24]                                        # re-export assets/animations/joints.json.gz from the library (numpy, no Blender)
+
+pixelforge project import-shapes <character> FILE        # the character now renders from the file; the painting steps are skipped
+pixelforge project render-shapes <character> [--style S] [--clips ...] [--directions ...]   # frames/<clip>_<DIR>/frame_NNN.png + animations.json + renders/manifest.json
+pixelforge project run <character> shapes                # the same as a step; run-all runs it when the character has a shape file
+pixelforge project export-game <character> --kind <kind> # unchanged: the game's atlas with foot anchors, from those frames
+pixelforge project preview-shapes <character> --clip idle --direction S
+```
+
+Every `--style` is a look preset: it gives the render scale (its `figure_height` over the file's `height`), the ramp
+length (`shading_bands`; 0 keeps each ramp's own) and the outline rule (`none` / `auto` / hex); `--scale`, `--steps`,
+`--outline`, `--elevation` override one at a time. `--frames` caps the frames per clip (default the preset's
+`clip_frames`); the clip keeps its real duration, so the fps written for it is `24 * frames / clip frames`. API:
+`api.import_shapes`, `api.render_shapes(project, name, preset, clips, directions, elevation, passes)`,
+`api.preview_shapes`, `api.validate_shapes`, `api.draft_shapes`; file-level tools in `pixelforge.shape_tools`
+(`render_set`, `gif_of`, `contact_sheet`, `turntable`, `still`, `validate_file`, `template_file`). MCP:
+`render_shape_sprite`, `preview_shape_sprite`, `shape_sheet`, `validate_shapes`, `shape_template`, `draft_shapes`,
+`import_shapes`, `render_shapes`.
+
+### The procedure for an AI
+
+1. `pixelforge shapes template --height 120 --png tpl.png` (120 for the gothic hi-res look; a file is authored at one
+   height and rendered at any). Read the bone table: every bone's head and tail in file units, y down, x across, z
+   toward the viewer, the figure facing you, its left hand on +x. The ground line and the body axis are in the table.
+2. Write the file around those bones (or start from `shapes draft "<sentence>"` and edit): a shape per body part
+   bound to its bone, garments as rings, details as rules. Use the material library by name or add your own ramps.
+3. `pixelforge shapes validate FILE`, then `shapes still FILE -o f.png --direction S` and `--direction E` to judge the
+   figure, `shapes preview FILE --clip walk --direction E` to judge the motion. Fix what reads wrong: silhouette first
+   (the hat, the shoulders, the hem), then materials, then details.
+4. `pixelforge shapes render FILE -o frames --style gothic_hd` or, in a project, `project import-shapes` +
+   `project render-shapes` + `project export-game --kind <kind>`; copy the atlas into the game's `art/sprites/` and
+   look with `pixelforge game-preview --skin <kind> --shot shot.png`.
+
+What to check before saying it is done: every direction is a full figure (nothing collapses or flips), the idle does
+not shimmer (the mean fraction of pixels that change between consecutive idle frames is under 0.08; the Keeper's is
+0.03-0.05), the lowest opaque row is the same in every walk frame (the planted foot holds the ground), loose parts
+trail the body (hems and veils move a frame or two after the hips), and at the small size the figure still reads as
+a silhouette (hat, shoulders, hem) rather than as detail.
+
+### The file
+
+```json
+{
+  "name": "keeper", "mode": "solid",
+  "size": [138, 138], "height": 120, "ground": 134, "axis": [69, 0],
+  "view": {"elevation": 12}, "outline": "#0a080c",
+  "skeleton": {"height": 120, "ground": 134, "cx": 69},
+  "materials": {"mine": {"ramp": ["#1a1018", "#2b1b28", "#402a3b", "#573a51", "#6e4d68", "#86627f"], "texture": "weave", "texture_strength": 0.6}},
+  "parts": {"hat": {"bone": "head", "lag": {"frames": 1, "sway": 0.35}}, "skirt": {"bone": "hips", "lag": {"frames": 2, "sway": 0.8}}},
+  "shapes": [ ... ],
+  "effects": [ ... ], "lights": [ ... ], "shadow": {"radii": [22, 4.2], "colour": "#4b4a4f"}
+}
+```
+
+- `size` is the canvas in file units; `height` the figure's height (the preset's figure height divides it to get the
+  render scale); `ground` the y of the ground line; `axis` the body axis (x, z) the rings and the turn use;
+  `view.elevation` the camera's degrees above level (0 = the page's straight-on view; the game's Keeper uses 12).
+- `materials`: a ramp per name, shadow first, any length (2..8 steps; the page used 5, the 3D page 5-7, the preset's
+  `shading_bands` resamples them). Options: `emissive` (its steps are picked by rule, never by light), `spec` (metal:
+  the brightest step only for near-direct light; `spec_t` the threshold, 0.88), `texture` (`weave fur scratch grain`)
+  with `texture_strength`, `lift`. A ramp may alias a library material: `{"ramp": "iron", "spec_t": 0.5}`. The library
+  (`assets/shapes/materials.json`, `pixelforge shapes validate` lists what a file uses): `robe sash cape tunic mantle
+  bone skin gold wood leather iron soul` (the page's five-step ramps), `cloth cape6 tabard iron7 fur bone6 gold6
+  leather5 wood5 crimson` (the 3D page's), `straw violet wrap lacquer rope gourd rag shadowskin steel` (the Keeper's),
+  emissives `soul ember miasma frost`.
+- `outline`: the file's near-black; the preset's rule decides whether it is drawn (`auto`), skipped (`none`) or
+  replaced (a hex).
+- `lights`: `{"at": [x, y, z], "radius": 30, "strength": 1.0, "pulse": 0.2, "colour": "#7dff78"}`; with `"bone"` or
+  `"prim"` the point rides that bone or shape; `{"from": "flicker", "radius": 3.2, "strength": 0.7, "every": 3}` puts a
+  small light on every third glowing-crack pixel. Flat files use `[x, y]` and may add `"breathe": true` and `"rim": true`.
+- `shadow`: `{"radii": [rx, ry], "colour": "#4b4a4f"}`, a checkerboard ellipse on the ground under the axis (or `"at"`).
+- `effects` (emissive sprites stamped last, never shaded): `flame` (`height`, `width`, `fall`, `flicker`,
+  `sway_from`), `orb` (`radius`, `grow`, `period`), `pixels` (`points`, `step` or `steps` + `pulse`), `runes`
+  (stitches flowing down a robe opening: `x`, `y`, `count`, `dy`, `spread`, `period`, `lit`, `speed`), `motes`
+  (`rate`, `spread`, `vy`, `life`, `seed`: replayed from frame 0 with a fixed seed, so a frame always looks the same).
+  Position: `"at": [x, y]` (flat) or `[x, y, z]` (solid), `"bone"`/`"prim"` + `"at"` to ride a part, or `"anchor"`
+  naming an entry of the file's `"anchors"`.
+
+**Solid shapes** (`kind`): `ellipsoid` (`centre`, `radii`), `capsule` (`a`, `b`, `r` as a number or `[ra, rb]`),
+`box` (`centre`, `half`, `round`), `prism` (an ellipse in x/y extruded along z: `centre`, `radii`, `z`), `ring` (an
+elliptical tube around the axis: `y` [top, bottom], `rx` and `rz` as a number or `[r0, growth per unit down]`,
+`thickness` for a shell, `hem` `{"tongues", "depth", "seed"}` for a ragged hem, `open` `{"angle", "below"}` for an
+open front, `keep` `{"back": a}` or `{"front": a}` to keep one side, `holes` `{"p", "band", "seed"}`, `cz`), `union`
+(`of`: a list of shapes). Any shape takes `clip_y` [top, bottom] (+ `hem`), `rotate` `{"x", "y", "z", "about"}` in
+degrees, `carve: true` (empties what it covers; the hood's face opening), `material`, `t` (a tone offset), `lift`,
+`spec_t`, `emit` (`flicker` for cracks, `pulse` for eyes, `steady` for an orb, `soft`), `flat` (a fixed colour),
+`bump` (`{"folds": [amp, k, seed]}`, `{"fur": true}`, `{"ridges": [amp, period]}`), `bone` or `part`, `lag`, and
+`rules`: a list of `{conditions..., sets...}` evaluated per voxel in order (later rules win). Conditions: `x y z`
+ranges `[lo, hi]` (null = open), `dx dy dz` from the shape's centre, `angle [a0, a1]` / `abs_angle` around the axis
+(0 = front, +pi/2 = the character's left, pi = back), `front a` / `back a` (within a radians of straight ahead /
+behind), `every_y [period, which]` (`floor(y) % period == which`, lames and bandage lines; `every_x`, `every_z`,
+`every_angle [n, which]` for alternating tongues), `near [[[x, y, z], ...], r]` (within a box of half-size r of any
+point; null skips an axis; rivets, eyes, sockets), `hem_band [d0, d1]` (units above a ring's hem: stitching),
+`hash [p, seed]` (a scattered fraction: scratches, wear), `crack {"x", "amp", "k", "w"}` (a wiggly vertical line),
+`bitmap {"rows": ["0111110", ...], "y", "by": "angle"|"x", "x", "spread", "scale"}` (a sigil), `ellipse_xy
+{"centre", "radii"}`, `where_cut d` (the trim of an open front). Sets: `material`, `t`, `emit`, `rivet: true` (a
+highlight pixel with a shadow pixel below), `flat`, `lift`, `spec_t`.
+
+**Flat shapes**: `poly` (`points`), `ellipse` (`centre`, `radii`), `dot` (`at`, `step`) and `dots` (`at`: `[x, y]` or
+`[x, y, step]`), with `material`, `base` (the ramp step a flat area gets, 2 of 5), `gx` / `gy` (the gradient, default
+-0.9 / -0.6), `fold [p, w]` (a stripe every w px, slanted by p), `contour: false` to skip the contour rule, `flat` for
+a fixed colour (the face cavity). A point is `[x, y]` or `[x, y, i]` (its y waves with index i) and a points list may
+hold `{"hem": [xa, xb, y, seed, deep]}`, which expands to a ragged hem whose alternate points wave. Shapes may
+`breathe` (sink by the file's `animation.breathe` amount for half its period), take `dx` / `dy` as a number or
+`{"wave": [i, amp]}`, name a `part` (for the flat rig) and list `views` to appear in.
+
+**Animation rules.** Animation means frames. In a solid file the frames come from the motion clips: every shape with
+a `bone` (or a `part` naming one) takes the rigid motion that carries that bone from the author pose to the clip's
+pose; shapes with `lag` `{"frames": n, "sway": s}` have their top follow now and their hem follow n frames late, dragged
+by the bone's velocity times s and, in a walk or run, by the clip's travel (the clips are in place), so hems, veils,
+cords and hats trail the body; the planted foot holds the ground line in the standing clips. Bones:
+`hips spine.001 spine.002 spine.003 neck head shoulder.L upper_arm.L forearm.L hand.L thigh.L shin.L foot.L toe.L`
+and the `.R` side. Clips the game uses: `idle walk run attack cast hit death` (also `sprint punch jab hit_head
+attack_idle cast_idle cast_enter roll crouch crouch_walk jump torch_idle talk interact pickup dance walk_hunched`;
+`pixelforge shapes joints` lists them). A flat file animates by its own rules (waves, breath, pulses, flows, motes)
+and, with `parts` (a pivot and a bone each), by the projected bones in the picture plane; the back views mirror the
+front unless shapes list `views`. The flat path's motion is the fast path for things without depth; characters are solid.
+
+### The worked example: the necromancer
+
+The flat file is the page's shape list, one entry per `paint()` call, in the page's order (the cape first, the hand
+holding the staff last), so the contours fall where the page's did:
+
+```json
+{"name": "cape", "kind": "poly", "material": "cape", "fold": [0.12, 5], "part": "cape",
+ "points": [[34, 38], [59, 38], [64, 60], [70, 92], {"hem": [70, 24, 93, 5, 3]}, [28, 60]]},
+{"name": "tunic", "kind": "poly", "material": "tunic", "gy": -0.3, "fold": [0.05, 4], "part": "robe",
+ "points": [[44, 44], [50, 44], [54, 87], [52, 91, 1], [49, 88], [46, 92, 4], [43, 88], [40, 90, 7], [41, 70]]},
+{"name": "face_void", "kind": "ellipse", "flat": "#050307", "breathe": true, "part": "head", "centre": [49.8, 24.8], "radii": [4.1, 5.6]},
+{"name": "skull", "kind": "poly", "material": "bone", "gx": -1.2, "contour": false, "breathe": true, "part": "head", "points": [...]},
+...
+"effects": [{"kind": "pixels", "material": "soul", "points": [[48, 23], [51, 23]], "pulse": 0.3, "steps": [4, 3], "breathe": true},
+            {"kind": "runes", "material": "soul", "x": [44, 50], "y": 48, "count": 13, "dy": 3, "spread": 0.08, "period": 5, "lit": 2, "speed": 2},
+            {"kind": "orb", "material": "soul", "at": [30, 73], "radius": 1, "grow": 1, "period": 3, "breathe": true},
+            {"kind": "flame", "material": "soul", "at": [69, 8], "height": 7, "width": 3, "fall": 2, "flicker": 1.4}],
+"lights": [{"at": [69, 6], "radius": 22, "strength": 0.75, "pulse": 0.15, "colour": "#6fe86a"}, ...],
+"shadow": {"at": [46, 95], "radii": [30, 4.2], "colour": "#3c3b40"}
+```
+
+The solid file is the page's v13 model, shape for shape. The open coat is a ring shell with a wedge cut from the
+front, gold trim where the opening ends, a crimson sash in an angle band and gold stitching above the ragged hem:
+
+```json
+{"name": "coat", "kind": "ring", "y": [46, 111], "rx": [10.5, 0.16], "rz": [8, 0.1], "thickness": 2.2,
+ "hem": {"tongues": 16, "depth": 6, "seed": 2}, "open": {"angle": 0.36, "below": 48}, "material": "cloth",
+ "bump": {"folds": [0.4, 8, 0.4]}, "bone": "spine.001", "lag": {"frames": 2, "sway": 0.6},
+ "rules": [{"where_cut": 0.09, "y": [48, null], "material": "gold6"},
+           {"where_cut": 0.09, "y": [48, null], "every_y": [4, 0], "material": "gold6", "t": 1},
+           {"angle": [-0.8, -0.52], "y": [75, 110], "material": "crimson"},
+           {"hem_band": [1.8, 3], "every_angle": [34, 0], "material": "gold6", "t": -2}]}
+```
+
+The breastplate is an ellipsoid with lames, a ridge, rivets and glowing cracks (`"material": "soul", "emit":
+"flicker"` along `crack` lines, lit by the `{"from": "flicker"}` light); the hood is a `union` of an ellipsoid and a
+capsule with a `prism` `carve` for the face and a `flat` void behind it; the cape keeps only its back (`keep.back`),
+has holes near the hem and a gold skull `bitmap` by angle; the staff fire is a `flame` effect at `[85.5, 12, 4]`, the
+soul orb an emissive ellipsoid with `"emit": "steady"`. The Keeper (`assets/shapes/characters/keeper.shapes.json`) is
+the same language around the 120 px author pose: a straw-cone hat as a shell ring tilted back (`rotate`), a wrapped
+head with `pulse` eyes, a shawl ring open at the front and a long veil ring kept to the back, lacquered pauldrons,
+bracers and tassets, rope capsules across the chest, a rope belt with gourd ellipsoids, a tattered outer skirt split
+at the front over a darker underskirt, wrapped shins and feet; `parts` give the hat, veil, cords, gourds, tassets and
+skirts their lag.
+
+### What is still short
+
+The proof images are in `docs/screens/shapes/` (dated 2026-10-02): the flat parity strip, the solid necromancer beside
+the page's turn, the Keeper at 120 and 76 px in idle and walk from all eight directions and attack / cast from two,
+the painting beside the sprite, the in-game shot. Judged honestly: the Keeper reads as the Keeper at 120 px (hat,
+burning eyes, cords, gourds, tattered hem) and the motion is the clips' (weighty walk, the hat bobbing a frame late,
+the veil swinging); at 76 px she is a silhouette with a bright hat and the cords and gourds become specks, which is
+where a hand-drawn sprite would simplify and this one does not yet (a per-size rule set, or fewer shapes at small
+scales, is the next step). Feet step out from under the long skirt in the side views as separate blobs because the
+skirt is opaque down to the ankles; a shorter split or a translucent-hem rule would fix it. The solid necromancer is a
+little softer than the page's render (its rules are approximations of the page's hand-written functions). The clips
+are in place, so a walk's travel is faked as a backward drag on loose parts. Secondary motion is kinematic (lag and
+drag), not simulated.
+
 ## Godmarrow specifics (the game this forge serves)
 
 - Project style `godmarrow` (`pixelforge project set --style godmarrow`): ~195 px standing height, **every colour kept** (no palette reduction), the dark 1 px edge, crisp sampling. Use it for every game character; the other looks exist to compare and for other games.
@@ -324,7 +542,9 @@ palette and a fixed scale so all frames match.
 
 `pixelforge mcp` runs an MCP server (stdio) with tools `new_project`, `status`,
 `configure`, `list_styles`, `set_style`, `style_demo`, `add_character`, `prompts`, `import_image`, `run_step`, `run_all`,
-`quick_sprite` (and the tool-by-tool ones named above: `make_effect`, `make_tiles`, `make_spell`, ...). Claude Desktop config:
+`quick_sprite`, the shape-sprite tools `render_shape_sprite`, `preview_shape_sprite`, `shape_sheet`, `validate_shapes`,
+`shape_template`, `draft_shapes`, `import_shapes`, `render_shapes` (and the tool-by-tool ones named above: `make_effect`,
+`make_tiles`, `make_spell`, ...). Claude Desktop config:
 
 ```json
 {"mcpServers": {"pixelforge": {"command": "pixelforge", "args": ["mcp"]}}}

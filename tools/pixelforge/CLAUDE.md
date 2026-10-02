@@ -11,7 +11,12 @@ Blender + Mixamo → 8-direction renders → palette-locked pixel frames → God
   Image algorithms: `grid.py` (pixel-grid detection), `palette.py` (OKLab
   k-means), `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`
   (procedural effects), `transform.py` (RotSprite), `sheet.py` (split
-  turnaround sheets), `model_spec.py` (inflated-cutout spec). Scripts that run
+  turnaround sheets), `model_spec.py` (inflated-cutout spec). Shape sprites
+  (characters drawn by code, the character road): `shapes.py` (the renderer:
+  flat masks and solid signed-distance shapes, one set of shading rules),
+  `shape_rig.py` (bones from the motion clips, lag, ground lock, 8 directions),
+  `shape_tools.py` (frame sets, GIFs, sheets), `joints.py` (numpy glTF reader,
+  `assets/animations/joints.json.gz`); files under `assets/shapes/`. Scripts that run
   inside Blender live in `pixelforge/blender/` and must stay free of Pillow.
 - **Tests:** `pytest`. Blender scripts are only import-safe under Blender;
   `tests/test_blender_scripts.py` runs them when the `bpy` module is available.

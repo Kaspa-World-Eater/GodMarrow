@@ -376,3 +376,63 @@ Godmarrow is ON HOLD until PixelForge is mastered (Derek). To resume: for each b
 its docs/track_notes and HANDOFF entry, run tests, then a builder/reviewer round from where it stopped; the Forge
 app branch is the priority, followed by readable, pixel2d, fxlook, ui. Integration order into main: fxlook,
 readable, pixel2d, ui, forgeapp.
+
+### 7.8 2026-10-02, track/shapes: shape sprites, the character and object engine (built to docs/track_notes/shapes_3d.md)
+
+**What.** Characters are now drawn by code and rendered as pixel art, with real frames from the motion clips in eight
+directions, no painting, no Blender, no Mixamo. `tools/pixelforge/pixelforge/shapes.py` renders a `.shapes.json` two
+ways with one set of shading rules: the **flat** path is the reference page's recipe (masks, ramps, edge and gradient
+shading with a Bayer half-step, contours, fold stripes, outline, emissives, Bayer-thresholded point lights, a dithered
+contact shadow) and re-renders the page's necromancer with 99.8% of the figure's pixels identical to its PNG (the rest
+are the page's random motes); the **solid** path is the page's v13 model: signed-distance ellipsoids, capsules, boxes,
+prisms and rings (ragged hems, open fronts, keep-the-back, holes, carves, rotations, material rules by height, angle,
+stripe, point, hash, crack and bitmap, fold and fur bumps), voxelised once into a two-voxel shell with normals, then
+rotated, z-buffered and shaded from one fixed light, so every direction is a real view (`necromancer_3d.shapes.json`,
+61 shapes, 30k voxels, 11 ms a frame at 120 px). `joints.py` reads the animation library's glTF with numpy and ships the
+joint tracks (`assets/animations/joints.json.gz`, 24 clips at 24 fps, 269 KB); `shape_rig.py` builds the author pose
+(the rest skeleton scaled to the file's height, arms lowered), binds every shape to its bone, lets loose parts follow
+late at the hem with the bone's velocity and the clip's travel as drag, holds the planted foot on the ground, and
+renders any clip in any of the 8 directions; the flat path has a parts-and-pivots rig in the picture plane.
+`shape_tools.py` writes frame sets in the layout `export` / `export_game` already read (foot anchors from a manifest),
+GIFs, contact sheets, turntables. Wired: `api.import_shapes / render_shapes / preview_shapes / validate_shapes /
+draft_shapes`, CLI `pixelforge shapes render|preview|sheet|still|turntable|validate|template|draft|joints` and
+`project import-shapes / render-shapes / preview-shapes / run <c> shapes`, MCP `render_shape_sprite`,
+`preview_shape_sprite`, `shape_sheet`, `validate_shapes`, `shape_template`, `draft_shapes`, `import_shapes`,
+`render_shapes`; describe-it drafts a starter humanoid from a sentence. Files: `assets/shapes/materials.json` (the
+library), `necromancer.shapes.json`, `necromancer_3d.shapes.json`, `characters/keeper.shapes.json` (44 shapes).
+`scratch_demo/` removed. Guide: `tools/pixelforge/docs/GUIDE_AI.md` "Shape sprites" (the format, the materials, the
+animation rules, the necromancer as the worked example), GUIDE_HUMANS, README, CLAUDE.md; the app's needs in
+`docs/track_notes/shapes.md`.
+
+**Verified.** `tests/test_shapes.py`, 22 tests (parity with the page PNG, determinism and scaling, colours from the
+ramps only, ramp resampling, validation, the shipped files, aliases, the solid model in 8 directions, normal / depth
+passes and the outline, rules and emissives, rotation and the lag blend, the joint tracks, the author pose, binding a
+known pose, idle stability and walk ground contact, 8 directions differ, the flat rig, the frames layout and the game
+export round-trip, the project pipeline, the tools, describe-it, the CLI): 130 green in 22 s. In the game: the Keeper
+exported at the gothic hi-res preset (120 px, 1120 frames) as `keeper_shapes`, imported, screenshot on the moor
+(`docs/screens/shapes/2026-10-02_keeper_shapes_in_game_moor_*.png`), then `art/` reverted; the game is untouched.
+Pictures under `docs/screens/shapes/` (all under 400 KB): the flat parity strip, the solid necromancer beside the
+page's turn and its 48-view turntable and a walk, the Keeper at 120 and 76 px (idle and walk GIFs in 8 directions,
+attack and cast in S and E, contact sheets), the painting beside the sprite at one height, the describe-it drafts
+(keeper, knight, necromancer), the author-pose template. Numbers: the Keeper's seven clips in eight directions render
+in 16 s at 120 px and 5 s at 76 px; idle frames differ by 3-5% of their pixels, walk by 7-11%; the lowest row is the
+same in every frame of the standing clips.
+
+**Honestly.** At 120 px the Keeper reads (hat, burning eyes, cords, belt and gourds, tattered hem, wrapped feet) and
+the motion is the clips': a weighty walk, the hat a frame late, the veil swinging, the attack lunging. Against the
+necromancer page she is chunkier and less crisp: the page's details are hand-written functions, hers are rule
+approximations, and her hat and pauldrons are large. At 76 px she is a silhouette with a bright hat; cords and gourds
+become specks, so a per-size simplification (fewer rules at small scales) is the next step. Feet step out from under
+the long skirt as separate blobs in the side views (the skirt is opaque to the ankles). The clips are in place, so a
+walk's travel is faked as a backward drag on loose parts; secondary motion is kinematic, not simulated. The game's
+view has a 30 degree camera; the Keeper's file renders at 12 degrees with the hat tilted back so the eyes show (0 is
+the page's straight-on view). The in-game check used the gothic hi-res height (120 px) while the current painted
+Keeper is 190 px, so she is smaller on the moor than the old one (the scale track decides the game's figure size).
+Not built: the Forge app's pages (specified in `docs/track_notes/shapes.md`), objects and effects as solids (the
+format already takes them), the painting-to-shapes extraction (the painting is a reference; describe-it starts from
+words).
+
+**To pick up.** `cd tools/pixelforge && python -m pytest -q`; `pixelforge shapes preview assets/shapes/characters/
+keeper.shapes.json --clip walk --direction E --style gothic_hd`; edit the file (every shape is named; `pixelforge
+shapes validate` first) and preview again; `pixelforge shapes render ... -o frames --style gothic_hd` then
+`godmarrow_export` or the project commands to put it in the game.
