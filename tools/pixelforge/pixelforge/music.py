@@ -368,6 +368,41 @@ def breath(mx, t, dur, vol, pan):
     mx.out(sig * env(n, dur * 0.45, vol, dur, dur * 0.5), t, pan)
 
 
+# ------------------------------------------------------------------ the Forge family's voices (dungeon synth)
+def pad(mx, t, midi, dur, vol, pan, detune=6.0, lp0=820.0, lp_depth=340.0, lp_rate=0.25, phase=0.0):
+    """Two detuned saws (+- ``detune`` cents) through a lowpass that breathes: cutoff lp0 +- lp_depth on a slow sine of
+    ``lp_rate`` rad/s whose phase follows the cue's own clock, so every pad in a loop breathes together."""
+    n = int((dur + 0.1) * RATE)
+    tt = np.arange(n) / RATE
+    f = NOTE(midi)
+    sig = np.zeros(n, np.float32)
+    for cents in (-detune, detune):
+        ph = f * 2 ** (cents / 1200) * tt
+        sig += (2 * (ph % 1.0) - 1).astype(np.float32)
+    cut = lp0 + lp_depth * np.sin(lp_rate * (tt + t) + phase)
+    sig = sweep_filter(sig, "lowpass", np.maximum(cut, 80), 2, block=2048)
+    sig = filt(sig, "highpass", 60, 0.7)
+    e = env(n, min(1.6, dur * 0.3), vol, dur, min(2.5, dur * 0.4))
+    mx.out(sig * e, t, pan)
+
+
+def glass(mx, t, midi, vol, pan, decay=2.6):
+    """The sparkle: a sine with a quiet second partial a hair sharp, a near-instant bright attack and a long decay."""
+    f = NOTE(midi)
+    tone(mx, t, f, decay, vol, "sine", 0.004, pan)
+    tone(mx, t, f * 2.01, decay * 0.7, vol * 0.25, "sine", 0.002, pan)
+    tone(mx, t, f * 3.0, 0.08, vol * 0.18, "sine", 0.001, pan)   # the "click" of the strike
+
+
+def thump(mx, t, midi, vol, pan):
+    """A soft, round low pulse for the working loop: a sine with a short pitch drop and a muffled attack."""
+    n = int(0.5 * RATE)
+    tt = np.arange(n) / RATE
+    f = NOTE(midi) * (1 + 0.35 * np.exp(-tt / 0.04))
+    w = np.sin(2 * math.pi * np.cumsum(f) / RATE)
+    mx.out((w * exp_decay(n, vol, 0.42)).astype(np.float32), t, pan)
+
+
 # ------------------------------------------------------------------ beds
 class Drone:
     """Four voices (saw, saw +7 c, sine -12, tri +7 -4 c) through a slow-LFO lowpass; the root glides on setDrone."""
@@ -497,6 +532,8 @@ class Cue:
     windF: float = 420.0
     ds: float = 0.0
     prog: list | None = None
+    reverb: float = 5.5       # the hall's length in seconds (the Forge family sits in a longer one)
+    hpf: float = 0.0          # a high-pass on the whole cue in Hz (0 = none): the Forge keeps its low end tidy
 
 
 def _cues() -> dict[str, Cue]:
@@ -775,6 +812,85 @@ def _cues() -> dict[str, Cue]:
         C[f"boss{a}"] = boss(a)
     t_ = C["a1_town"]
     C["title"] = Cue("title", 110, t_.steps, t_.root, t_.sc, t_.drone, 11, t_.step, gain=t_.gain, wind=0.012, ds=t_.ds, prog=t_.prog)
+    C.update(_forge_cues())
+    return C
+
+
+# ------------------------------------------------------------------ the Forge app's family: dungeon synth
+# Three seamless loops that share one motif, for the app's three states (docs/track_notes/gui_look.md, "Music
+# reference"): long detuned pads in C# minor over a drone through a breathing lowpass, a soft noise wash, and sparse
+# pentatonic glass sparkles high above the dark pads, in a long hall; cleaner than the reference (no distortion, the
+# low end high-passed, the master at the game's loudness). Home is still; Working adds a slow pulse and more
+# motion; Done opens to the relative major and lets the sparkles fall.
+FORGE_PENTA = [0, 3, 5, 7, 10]         # minor pentatonic degrees for the sparkles
+
+
+def _forge_pad_chord(mx, t, root, sc, degree, dur, vol, phase, voices=(0, 2, 4, 6)):
+    for i, v in enumerate(voices):
+        m = root + deg(sc, degree + v)
+        pad(mx, t + i * 0.02, m, dur, vol * (1.0 if i < 2 else 0.8), (i - 1.5) * 0.3, detune=5.0 + i * 1.5, phase=phase)
+
+
+def _forge_cues() -> dict[str, Cue]:
+    C: dict[str, Cue] = {}
+
+    def home(mx, t, s, bar, c, st):
+        ch = c.prog[bar % len(c.prog)]
+        if s == 0:
+            _forge_pad_chord(mx, t, c.root, c.sc, ch, 60.0 / c.bpm * c.steps + 1.5, 0.028, bar * 0.4)
+            if bar % 2 == 0:
+                st["drone"].set(t, c.root - 24 + deg(c.sc, ch))
+        # sparkles: sparse, pentatonic, high; a second one a beat later now and then
+        if mx.rng.random() < 0.42:
+            d = FORGE_PENTA[int(mx.rng.random() * len(FORGE_PENTA))] + 12 * (2 + int(mx.rng.random() * 2))
+            glass(mx, t + mx.rng.random() * 0.3, c.root + d, 0.065, mx.rng.random() - 0.5)
+            if mx.rng.random() < 0.35:
+                glass(mx, t + 0.35, c.root + d + 7, 0.04, mx.rng.random() - 0.5)
+        if s == 4 and (bar // 2) % 4 == 3:
+            st["mel"].at(0, lambda d, l: glass(mx, t, c.root + 24 + deg(c.sc, d), 0.045, 0.2, decay=3.2))
+        if s == 2 and bar % 6 == 1:
+            swell(mx, t, 4.0, 0.012, 120, 900, 0.3)
+
+    C["forge_home"] = Cue("forge_home", 60, 8, 49, SC["aeol"], (25, 0.022, 170), 21, home, gain=1.0, wind=0.006, windF=300.0, ds=0.2,
+                          prog=[0, 5, 3, 6], reverb=8.0, hpf=55.0)
+
+    def working(mx, t, s, bar, c, st):
+        ch = c.prog[bar % len(c.prog)]
+        if s == 0:
+            _forge_pad_chord(mx, t, c.root, c.sc, ch, 60.0 / c.bpm * c.steps + 1.2, 0.026, bar * 0.4)
+            if bar % 2 == 0:
+                st["drone"].set(t, c.root - 24 + deg(c.sc, ch))
+        if s % 2 == 0:
+            thump(mx, t, c.root - 24, 0.09 if s == 0 else 0.06, 0.0)
+        if s % 2 == 1 and mx.rng.random() < 0.7:
+            mallet(mx, t, c.root + 12 + deg(c.sc, ch + [0, 4, 2, 4][s // 2]), 0.035, 0.25 if s % 4 == 1 else -0.25)
+        if mx.rng.random() < 0.4:
+            d = FORGE_PENTA[int(mx.rng.random() * len(FORGE_PENTA))] + 12 * (2 + int(mx.rng.random() * 2))
+            glass(mx, t + mx.rng.random() * 0.25, c.root + d, 0.06, mx.rng.random() - 0.5, decay=2.0)
+        if (bar // 2) % 4 == 2:
+            st["mel"].at(s, lambda d, l: glass(mx, t, c.root + 24 + deg(c.sc, d), 0.05, -0.2, decay=2.4))
+
+    C["forge_working"] = Cue("forge_working", 66, 8, 49, SC["aeol"], (25, 0.022, 200), 21, working, gain=1.0, wind=0.008, windF=320.0, ds=0.25,
+                             prog=[0, 5, 3, 6], reverb=7.0, hpf=55.0)
+
+    def done(mx, t, s, bar, c, st):
+        ch = c.prog[bar % len(c.prog)]
+        if s == 0:
+            _forge_pad_chord(mx, t, c.root, c.sc, ch, 60.0 / c.bpm * c.steps + 2.0, 0.03, bar * 0.4, voices=(0, 2, 4, 7))
+            if bar % 2 == 0:
+                st["drone"].set(t, c.root - 24 + deg(c.sc, ch))
+        if mx.rng.random() < 0.5:
+            d = FORGE_PENTA[int(mx.rng.random() * len(FORGE_PENTA))] + 12 * (2 + int(mx.rng.random() * 2))
+            glass(mx, t + mx.rng.random() * 0.3, c.root + d, 0.07, mx.rng.random() - 0.5, decay=3.4)
+            if mx.rng.random() < 0.5:
+                glass(mx, t + 0.4, c.root + d - 5, 0.045, -(mx.rng.random() - 0.5), decay=3.0)
+        if s == 0 and (bar // 2) % 3 == 1:
+            st["mel"].at(0, lambda d, l: glass(mx, t, c.root + 36 + deg(c.sc, d), 0.04, 0.0, decay=4.0))
+        if s == 4 and bar % 4 == 2:
+            harmonic(mx, t, c.root + 12 + deg(c.sc, ch + 4), 0.03, 0.3)
+
+    C["forge_done"] = Cue("forge_done", 56, 8, 49, SC["aeol"], (25, 0.02, 190), 21, done, gain=1.0, wind=0.005, windF=280.0, ds=0.3,
+                          prog=[5, 2, 6, 0], reverb=9.0, hpf=55.0)
     return C
 
 
@@ -866,10 +982,13 @@ def render_cue(key: str, seconds: float = 120.0, seed: int | None = None, overri
         wind(mx, seconds, c.wind, c.windF)
     # effects: delay -> master and reverb; reverb -> master; compressor
     dly = _delay(mx.dly_in) * 0.3
-    rev = _convolve_stereo(mx.rev_in + dly, _impulse(5.5, 2.6, rng)) * 0.62
+    rev = _convolve_stereo(mx.rev_in + dly, _impulse(c.reverb, 2.6 if c.reverb <= 5.5 else 2.0, rng)) * 0.62
     n = len(mx.dry)
     master = mx.dry + dly
     master[: min(n, len(rev))] += rev[:n]
+    if c.hpf:
+        for ch_ in range(2):
+            master[:, ch_] = filt(master[:, ch_], "highpass", c.hpf, 0.7)
     master = _compress(master)
     master = master[: int((seconds + 6) * RATE)]
     body = master[: int(seconds * RATE)].copy()
@@ -913,6 +1032,8 @@ def make_music(key: str, out_dir: str | Path, *, seconds: float = 120.0, seed: i
         sheet = load_sheet(sheet)
     if key == "all":
         keys = list(CUES)
+    elif key == "forge":
+        keys = [k for k in CUES if k.startswith("forge_")]
     elif key == "act":
         a = act or 1
         keys = [k for k in CUES if k.startswith(f"a{a}_") or k == f"boss{a}"]
@@ -985,6 +1106,9 @@ CUE_INFO = {
     "boss4": ("Boss, Act IV", 4, "boss", "the same, with the horn and the choir"),
     "boss5": ("Boss, Act V", 5, "boss", "the same, distorted"),
     "title": ("Title", 0, "title", "the Moor tune, slower, with more air"),
+    "forge_home": ("Forge, at rest", 0, "forge", "dungeon synth: detuned pads in C# minor over a drone, a breathing lowpass, sparse glass sparkles in a long hall"),
+    "forge_working": ("Forge, working", 0, "forge", "the same motif with a slow pulse and a mallet keeping time"),
+    "forge_done": ("Forge, done", 0, "forge", "the motif opened to the relative major, the sparkles falling"),
 }
 
 # field -> (what it does, in plain words)
@@ -1104,6 +1228,82 @@ def preview_png(x: np.ndarray, path: str | Path, seconds_shown: float | None = N
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     img.save(path)
     return str(path)
+
+
+# ------------------------------------------------------------------ the Forge app's UI sounds
+def _blip_wave(freqs: list[tuple[float, float]], kind: str = "square", vol: float = 0.5, decay: float = 0.06, gap: float = 0.0) -> np.ndarray:
+    """Short notes in a row: ``freqs`` is [(hz, seconds), ...]; each note a plain wave with a quick decay, no sweep."""
+    out = []
+    for f, d in freqs:
+        n = int(d * RATE)
+        tt = np.arange(n) / RATE
+        ph = 2 * math.pi * f * tt
+        w = np.sign(np.sin(ph)) if kind == "square" else np.sin(ph) if kind == "sine" else (2 * np.abs(2 * ((f * tt) % 1.0) - 1) - 1)
+        e = np.minimum(tt / 0.002, 1.0) * np.exp(-np.maximum(tt - (d - decay), 0) / (decay / 4))
+        out.append((w * e * vol).astype(np.float32))
+        if gap:
+            out.append(np.zeros(int(gap * RATE), np.float32))
+    return np.concatenate(out)
+
+
+def _noise_burst(dur: float, lo: float, hi: float, vol: float, rng, q: float = 2.0, attack: float = 0.004) -> np.ndarray:
+    n = int(dur * RATE)
+    tt = np.arange(n) / RATE
+    fr = lo * (hi / lo) ** np.clip(tt / dur, 0, 1)
+    sig = sweep_filter(rng.uniform(-1, 1, n).astype(np.float32), "bandpass", fr, q, block=256)
+    e = np.minimum(tt / attack, 1.0) * np.exp(-tt / (dur * 0.45))
+    return (sig * e * vol).astype(np.float32)
+
+
+def forge_blips() -> dict[str, np.ndarray]:
+    """The app's interface sounds, in the family's voice (docs/track_notes/gui_look.md, "Motion and sound discipline"):
+    a square-wave cursor blip (higher for right and down, lower for left and up), a two-note confirm (a short low note,
+    then a fifth up; never a sweep), an iron scrape for a lever, a ratchet tick for a wheel, a chain's clunk, a low
+    thud for back, a soft bell for a finished job, a dull knock for a stopped one, and a drop. Mono float32."""
+    rng = np.random.default_rng(3)
+    blips = {
+        "cursor_hi": _blip_wave([(880.0, 0.045), (1320.0, 0.04)], vol=0.35, decay=0.03),
+        "cursor_lo": _blip_wave([(660.0, 0.045), (990.0, 0.04)], vol=0.35, decay=0.03),
+        "confirm": _blip_wave([(440.0, 0.06), (660.0, 0.11)], vol=0.4, decay=0.05, gap=0.012),
+        "back": _blip_wave([(72.0, 0.16)], "sine", vol=0.7, decay=0.1) + np.pad(_noise_burst(0.05, 180, 90, 0.15, rng, q=1.5), (0, int(0.16 * RATE) - int(0.05 * RATE))),
+        "scrape": _noise_burst(0.09, 900, 2600, 0.32, rng, q=6.0),
+        "ratchet": np.concatenate([_noise_burst(0.018, 2400, 1800, 0.5, rng, q=4.0, attack=0.0005), np.zeros(int(0.01 * RATE), np.float32)]),
+        "clunk": _blip_wave([(95.0, 0.12)], "sine", vol=0.6, decay=0.08) + np.pad(_noise_burst(0.05, 700, 300, 0.25, rng, q=3.0), (0, int(0.12 * RATE) - int(0.05 * RATE))),
+        "done": _blip_wave([(1318.5, 0.5)], "sine", vol=0.3, decay=0.4) + np.pad(_blip_wave([(1975.5, 0.35)], "sine", vol=0.12, decay=0.3), (0, int(0.5 * RATE) - int(0.35 * RATE))),
+        "fail": _blip_wave([(110.0, 0.14), (98.0, 0.18)], "triangle", vol=0.5, decay=0.1, gap=0.02),
+        "drop": _blip_wave([(60.0, 0.2)], "sine", vol=0.6, decay=0.15),
+        "tab": _blip_wave([(1046.5, 0.03), (1318.5, 0.035)], vol=0.3, decay=0.025),
+    }
+    out = {}
+    for k, v in blips.items():
+        v = v / max(float(np.abs(v).max()), 1e-6) * 0.6
+        out[k] = v.astype(np.float32)
+    return out
+
+
+def write_blips(out_dir: str | Path, fmt: str = "wav") -> dict:
+    """Write every UI sound as ``ui_<name>.wav`` (and ``.ogg`` with ``fmt`` ogg|both, where ffmpeg is installed)."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    files, notes = [], []
+    for name, x in forge_blips().items():
+        wav = out_dir / f"ui_{name}.wav"
+        pcm = (np.clip(x, -1, 1) * 32767).astype("<i2")
+        with wave.open(str(wav), "wb") as w:
+            w.setnchannels(1); w.setsampwidth(2); w.setframerate(RATE); w.writeframes(pcm.tobytes())
+        if fmt in ("ogg", "both"):
+            ogg = to_ogg(wav, quality=4)
+            if ogg:
+                files.append(ogg)
+                if fmt == "ogg":
+                    wav.unlink()
+                continue
+            notes.append("ffmpeg not found: wrote WAV")
+        files.append(str(wav))
+    r = {"ok": True, "files": files, "dir": str(out_dir)}
+    if notes:
+        r["notes"] = sorted(set(notes))
+    return r
 
 
 def to_ogg(wav: str | Path, ogg: str | Path | None = None, quality: int = 3) -> str | None:

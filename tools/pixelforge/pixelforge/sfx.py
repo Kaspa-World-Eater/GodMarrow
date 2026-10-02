@@ -93,6 +93,35 @@ PRESETS = {
 }
 
 
+KNOBS = {
+    "freq": "pitch in Hz (0 for noise)", "slide": "pitch slide in octaves a second (negative falls)", "vibrato": "vibrato depth (0..0.3)",
+    "vib_speed": "vibrato rate in Hz", "attack": "seconds", "sustain": "seconds", "decay": "seconds", "lowpass": "tone: 1 bright, 0.1 muffled",
+    "crush": "grit: bits dropped (0 none, 6 harsh)", "duty": "square wave duty (0.5 full, 0.25 thin)", "noise_mix": "noise mixed in (0..1)",
+    "tail": "a short reverb tail in seconds", "gain": "level (0..1)",
+    "freq_mul": "pitch as a multiple of the preset's (2 = an octave up)", "decay_mul": "length as a multiple of the preset's decay",
+}
+WAVES = ("square", "saw", "triangle", "sine", "noise")
+
+
+def parse_overrides(items) -> dict:
+    """"freq=300 decay=0.4 wave_kind=saw" -> typed dict (for --set and the Forge's sound pads)."""
+    out = {}
+    for it in items or []:
+        if not it or "=" not in it:
+            continue
+        k, v = it.split("=", 1)
+        k, v = k.strip(), v.strip()
+        if k == "wave_kind" or k == "wave":
+            if v not in WAVES:
+                raise ValueError(f"unknown wave {v!r}; waves: {', '.join(WAVES)}")
+            out["wave_kind"] = v
+        elif k in KNOBS:
+            out[k] = int(float(v)) if k == "crush" else float(v)
+        else:
+            raise ValueError(f"unknown knob {k!r}; knobs: {', '.join(KNOBS)}, wave")
+    return out
+
+
 def write_wav(samples: np.ndarray, path: str | Path) -> None:
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     pcm = (np.clip(samples, -1, 1) * 32767).astype("<i2")
@@ -110,7 +139,11 @@ def make_sfx(name: str, out_dir: str | Path, *, seed: int = 0, variations: int =
         if nm not in PRESETS:
             raise ValueError(f"unknown preset {nm}; choose from {sorted(PRESETS)}")
         for v in range(variations):
-            params = {**PRESETS[nm], **overrides}
+            params = {**PRESETS[nm], **{k: val for k, val in overrides.items() if not k.endswith("_mul")}}
+            if "freq_mul" in overrides:
+                params["freq"] = params.get("freq", 0) * float(overrides["freq_mul"])
+            if "decay_mul" in overrides:
+                params["decay"] = params["decay"] * float(overrides["decay_mul"])
             rng = np.random.default_rng(seed * 1000 + v)
             if v > 0:   # small seeded variation so repeated hits do not sound stamped out
                 params["freq"] = params.get("freq", 0) * float(rng.uniform(0.93, 1.07))

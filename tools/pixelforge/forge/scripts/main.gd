@@ -1,14 +1,14 @@
 extends Node
-const FSfx := preload("res://scripts/sfx.gd")
 ## scripts/main.gd: the entry point. Reads the arguments after `--`, sets the window, and raises the App.
 ##   --python=PATH   the interpreter with PixelForge (forge_launch.py passes its own)
 ##   --game=PATH     the Godot project to put things in (default: three folders up)
 ##   --project=PATH  the Forge project folder (default: Documents/PixelForge/Forge)
-##   --windowed      start in a window (Settings has the toggle; the choice is remembered)
-##   --nosound
-##   --screen=NAME [--character=NAME --kind=x --advanced --play ...]   open a screen directly (test hook)
-##   --shot=PATH [--shot_t=S]   save the window to PATH after S seconds (default 2), then quit (test hook)
-##   --toggle=window            flip the window (full screen / window) after a second, as the header button does (test hook)
+##   --windowed      start in a window (Settings has the switch; the choice is remembered)
+##   --nosound --nomusic --reduced
+##   --screen=NAME [--tab=NAME --model=FILE --advanced --env=NAME --light=0|1|2 ...]   open a screen directly (test hook)
+##   --shot=PATH [--shot_t=S] [--shot_n=N]   save the window to PATH after S seconds (default 2), N frames 0.1 s apart, then quit
+##   --script=FILE   drive a sequence of inputs (scripts/driver.gd lists the lines), then quit
+##   --log[=S]       open the log drawer after S seconds
 
 var app: Control
 
@@ -21,13 +21,11 @@ func _ready() -> void:
 	var cfg := _load_cfg()
 	if args.has("windowed") or (cfg.get("windowed", false) and not args.has("fullscreen")):
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-		if not args.has("shot"):
-			DisplayServer.window_set_size(Vector2i(1280, 720))
+		if not args.has("shot") and not args.has("script"):
+			var k := int(cfg.get("scale", 2))
+			DisplayServer.window_set_size(Vector2i(640 * k, 360 * k))
 			var sc := DisplayServer.screen_get_size()
-			DisplayServer.window_set_position((sc - Vector2i(1280, 720)) / 2)
-	if args.has("nosound") or cfg.get("sound", true) == false:
-		FSfx.enabled = false
-	get_tree().root.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+			DisplayServer.window_set_position((sc - Vector2i(640 * k, 360 * k)) / 2)
 	app = load("res://scripts/app.gd").new()
 	app.args = args
 	app.cfg = cfg
@@ -56,22 +54,27 @@ static func save_cfg(d: Dictionary) -> void:
 
 ## the window, saved (test hook): read back from the screen and cropped to the window, so the letterbox shows as it
 ## does to the person; the viewport's own texture (the content without the bars) is the fallback where the screen
-## cannot be read
+## cannot be read. --shot_n=N saves N frames 0.1 s apart (path_0.png ...), for GIFs of the motion.
 func _shot(a: Dictionary) -> void:
 	await get_tree().create_timer(float(a.get("shot_t", "2"))).timeout
-	await RenderingServer.frame_post_draw
+	var n := int(a.get("shot_n", "1"))
 	var path := String(a["shot"])
 	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
-	var img := _window_image()
-	var how := "screen"
-	if img == null:
-		img = get_viewport().get_texture().get_image()
-		how = "viewport"
-	img.save_png(path)
-	print("SHOT ", path, " ", img.get_size(), " ", how)
+	for i in n:
+		await RenderingServer.frame_post_draw
+		var p := path if n == 1 else path.get_basename() + "_%02d.png" % i
+		var img := window_image()
+		var how := "screen"
+		if img == null:
+			img = get_viewport().get_texture().get_image()
+			how = "viewport"
+		img.save_png(p)
+		print("SHOT ", p, " ", img.get_size(), " ", how)
+		if i < n - 1:
+			await get_tree().create_timer(0.1).timeout
 	get_tree().quit()
 
-static func _window_image() -> Image:
+static func window_image() -> Image:
 	if not DisplayServer.has_feature(DisplayServer.FEATURE_SCREEN_CAPTURE):
 		return null
 	var screen := DisplayServer.window_get_current_screen()

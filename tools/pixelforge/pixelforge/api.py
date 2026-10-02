@@ -812,6 +812,36 @@ def export_game(project: Project, name: str, kind: str | None = None, out_dir: s
     return {"ok": True, "character": c.name, "kind": kind, **r, "godot": f"copy {out}/* into the game's art/sprites/ and run with --skin={kind}"}
 
 
+def reset_character(project: Project, name: str, keep_sources: bool = True, steps: list[str] | None = None) -> dict:
+    """Start a character over: delete what the steps made (views, palette, model, rig, frames, renders, previews,
+    exports) and clear its done marks and notes; the imported paintings and the shape file stay (``keep_sources``).
+    ``steps``: only these parts (e.g. ["frames", "renders", "export_game"]) for a "redo from here"."""
+    c = project.character(name)
+    parts = steps or ["views", "palette", "model", "rig", "frames", "frames_normal", "frames_depth", "renders", "previews", "pixels", "export", "export_game"]
+    removed = []
+    for part in parts:
+        d = project.char_dir(c.name) / part
+        if d.exists():
+            shutil.rmtree(d)
+            removed.append(part)
+    if not keep_sources:
+        for part in ("sources", "shapes"):
+            d = project.char_dir(c.name) / part
+            if d.exists():
+                shutil.rmtree(d)
+                removed.append(part)
+        c.sources = {}
+    if steps is None:
+        c.done = {}
+        c.notes = {}
+    else:
+        for k in list(c.done):
+            if k in parts or (k in ("render", "pixelate", "export") and any(p in parts for p in ("frames", "renders", "export_game"))):
+                c.done.pop(k, None)
+    project.save()
+    return {"ok": True, "character": c.name, "removed": removed, "kept": [] if not keep_sources else ["sources", "shapes"]}
+
+
 # ------------------------------------------------------------- shape sprites
 def shapes_file(project: Project, name: str) -> Path:
     """Where a character's shape sprite lives: ``<character>/shapes/<name>.shapes.json``."""
@@ -837,7 +867,7 @@ def import_shapes(project: Project, name: str, path: str | Path) -> dict:
 
 
 def render_shapes(project: Project, name: str, preset: str | None = None, clips: list[str] | str | None = None, directions: list[str] | str | None = None,
-                  elevation: float | None = None, passes: bool = False, log=None) -> dict:
+                  elevation: float | None = None, passes: bool = False, log=None, progress=None) -> dict:
     """Render a character's shape sprite with the motion clips into the frames layout the export steps read
     (``frames/<clip>_<DIR>/frame_NNN.png`` + ``animations.json``, and ``renders/manifest.json`` for the foot anchors).
     ``preset`` (a look) gives the figure height, the ramp length and the outline rule; the project's style when omitted."""
@@ -859,7 +889,7 @@ def render_shapes(project: Project, name: str, preset: str | None = None, clips:
     for old in frames.iterdir():
         if old.is_dir():
             shutil.rmtree(old)
-    r = shape_tools.render_set(doc, frames, clips=clips, directions=directions, style=st, elevation=elevation, passes=passes, log=log)
+    r = shape_tools.render_set(doc, frames, clips=clips, directions=directions, style=st, elevation=elevation, passes=passes, log=log, progress=progress)
     renders = project.sub(c.name, "renders")
     shutil.copy(frames / "manifest.json", renders / "manifest.json")
     if passes:

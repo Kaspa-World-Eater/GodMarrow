@@ -1,0 +1,44 @@
+{
+ "godmarrow": {
+  "frames": 8,
+  "frame_width": 191,
+  "frame_height": 207,
+  "fps": 8.33
+ },
+ "gothic_hd": {
+  "frames": 12,
+  "frame_width": 122,
+  "frame_height": 129,
+  "fps": 10.0
+ },
+ "rendered_arpg": {
+  "frames": 8,
+  "frame_width": 166,
+  "frame_height": 170,
+  "fps": 8.33
+ },
+ "snes": {
+  "frames": 10,
+  "frame_width": 134,
+  "frame_height": 134,
+  "fps": 10.0
+ },
+ "handheld": {
+  "frames": 6,
+  "frame_width": 159,
+  "frame_height": 156,
+  "fps": 8.33
+ },
+ "indie": {
+  "frames": 12,
+  "frame_width": 172,
+  "frame_height": 180,
+  "fps": 12.5
+ },
+ "painterly": {
+  "frames": 12,
+  "frame_width": 143,
+  "frame_height": 154,
+  "fps": 12.5
+ }
+}

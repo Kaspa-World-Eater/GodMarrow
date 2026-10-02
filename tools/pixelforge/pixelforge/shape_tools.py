@@ -42,7 +42,7 @@ def options_for(doc: dict, style: str | Style | None, scale: float | None = None
 
 
 def render_set(doc: dict, out_dir: str | Path, *, clips=R.GAME_CLIPS, directions=tuple(R.DIRECTIONS), style=None, scale=None, steps=None,
-               outline="style", elevation=None, max_frames=None, passes: bool = False, square: bool = True, lock=None, log=None) -> dict:
+               outline="style", elevation=None, max_frames=None, passes: bool = False, square: bool = True, lock=None, log=None, progress=None) -> dict:
     """Render every clip in every direction into ``out_dir/<clip>_<DIR>/frame_NNN.png`` and write
     ``animations.json`` (fps per clip) and ``manifest.json`` (what the game export needs). Returns the summary."""
     out_dir = Path(out_dir)
@@ -83,6 +83,8 @@ def render_set(doc: dict, out_dir: str | Path, *, clips=R.GAME_CLIPS, directions
             sizes[f"{clip}_{d}"] = list(res["frames"][0].shape[1::-1])
             if log:
                 log(f"{clip} {d}: {len(res['frames'])} frames at {res['fps']:g} fps")
+            if progress:
+                progress(clips.index(clip) * len(directions) + list(directions).index(d) + 1, len(clips) * len(directions), clip, d)
     side = max(v[0] for v in sizes.values())
     ground_y = float(doc.get("ground", doc["size"][1] - 1)) * opt["scale"]
     if square:
@@ -205,7 +207,8 @@ def still(doc: dict, out: str | Path, *, frame: int = 0, direction: str = "S", s
         im = im.resize((im.width * zoom, im.height * zoom), Image.NEAREST)
     im.save(out)
     ax, ay = ground_point(doc, direction, opt["scale"], opt["elevation"], model)
-    result = {"ok": True, "png": str(out), "size": list(fr.rgba.shape[1::-1]), "anchor": [round(ax * zoom, 1), round(ay * zoom, 1)], **fr.stats}
+    result = {"ok": True, "png": str(out), "size": list(fr.rgba.shape[1::-1]), "anchor": [round(ax * zoom, 1), round(ay * zoom, 1)], **fr.stats,
+              "lights": light_places(doc, fr, model, direction, opt["elevation"], zoom)}
     if passes and fr.normal is not None:
         Image.fromarray(fr.normal, "RGBA").save(out.with_name(out.stem + "_normal.png"))
         Image.fromarray(fr.depth, "RGBA").save(out.with_name(out.stem + "_depth.png"))
@@ -214,6 +217,28 @@ def still(doc: dict, out: str | Path, *, frame: int = 0, direction: str = "S", s
         key = name or S.file_summary(doc)["name"]
         result["game_objects"] = add_game_object(game_objects, key, out, (int(round(ax * zoom)), int(round(ay * zoom))), hr)
     return result
+
+
+def light_places(doc: dict, fr: S.Frame, model: S.Model | None, direction: str, elevation: float | None, zoom: int = 1) -> list[dict]:
+    """Where the file's lights land on the rendered picture (``x``, ``y`` in picture pixels, with the light's colour,
+    radius, strength and pulse): what a preview reads to cast the sprite's own light onto its surroundings."""
+    out = []
+    phi = math.radians(R.DIRECTIONS[direction])
+    elev = float(doc.get("view", {}).get("elevation", 0.0)) if elevation is None else float(elevation)
+    for li in doc.get("lights", []):
+        if li.get("from") == "flicker":
+            continue
+        at = None
+        if model is not None:
+            at = model._screen_at(li, fr.anchors or {}, phi, elev)
+        elif len(li.get("at", [])) >= 2:
+            at = (float(li["at"][0]), float(li["at"][1]), 0.0)
+        if at is None:
+            continue
+        out.append({"name": li.get("name", "light"), "x": round(at[0] * zoom, 1), "y": round(at[1] * zoom, 1), "colour": li.get("colour", "#7dff78"),
+                    "radius": float(li.get("radius", 20)) * (model.scale if model is not None else 1.0) * zoom,
+                    "strength": float(li.get("strength", 1.0)), "pulse": float(li.get("pulse", 0.0)), "bone": li.get("bone", "")})
+    return out
 
 
 def add_game_object(objects_json: str | Path, key: str, png: Path, anchor: tuple[int, int], hr: float = 2.0, extra: dict | None = None) -> dict:

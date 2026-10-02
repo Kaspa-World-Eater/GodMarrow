@@ -1,21 +1,30 @@
-; PixelForge — the Forge app: PixelForge for people, in the look of Godmarrow.
-; A Godot 4.7 project. It runs the pipeline through `python -m pixelforge.cli ... --json` and never
-; reimplements it. Start it with `pixelforge forge` (tools/pixelforge/pixelforge/forge_launch.py) or PixelForge.bat.
+; PixelForge: the Forge app. PixelForge's face: a full-screen, integer-scaled, pixel-art front end in the dungeon
+; framing of docs/mockups/forge_app_v8.html. A Godot 4.7 project that renders at 640x360 and scales by whole numbers.
+; It runs the pipeline through `python -m pixelforge.cli ... --json` and never reimplements it. Start it with
+; `pixelforge forge` (tools/pixelforge/pixelforge/forge_launch.py) or PixelForge.bat.
 config_version=5
 
 [application]
 config/name="PixelForge"
-config/description="Paintings in, game art out. The Forge for people."
+config/description="The Forge: characters, creatures, objects, effects, tiles, interface, sound and music for a pixel game."
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-boot_splash/bg_color=Color(0.023, 0.023, 0.035, 1)
+boot_splash/bg_color=Color(0.039, 0.039, 0.051, 1)
 boot_splash/show_image=false
-config/icon="res://assets/pics/icon.png"
+config/icon="res://assets/icon.png"
 
 [debug]
-gdscript/warnings/inferred_declaration=1
+gdscript/warnings/inferred_declaration=0
 gdscript/warnings/untyped_declaration=0
 gdscript/warnings/unsafe_call_argument=0
+gdscript/warnings/shadowed_variable=0
+gdscript/warnings/integer_division=0
+gdscript/warnings/inference_on_variant=0
+gdscript/warnings/unsafe_method_access=0
+gdscript/warnings/unsafe_property_access=0
+gdscript/warnings/return_value_discarded=0
+gdscript/warnings/narrowing_conversion=0
+gdscript/warnings/confusable_local_declaration=0
 
 [display]
 window/size/viewport_width=640
@@ -23,15 +32,18 @@ window/size/viewport_height=360
 window/size/window_width_override=1280
 window/size/window_height_override=720
 window/size/mode=3
-window/stretch/mode="canvas_items"
+window/stretch/mode="viewport"
 window/stretch/aspect="keep"
 window/stretch/scale_mode="integer"
 
 [gui]
 theme/default_theme_scale=1.0
 
+[input_devices]
+pointing/emulate_touch_from_mouse=false
+
 [rendering]
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/canvas_textures/default_texture_filter=0
-environment/defaults/default_clear_color=Color(0.023, 0.023, 0.035, 1)
+environment/defaults/default_clear_color=Color(0.039, 0.039, 0.051, 1)

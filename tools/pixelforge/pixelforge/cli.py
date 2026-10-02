@@ -258,6 +258,11 @@ def cmd_slice(a) -> None:
 
 
 # ----------------------------------------------------------------- projects
+def _progress(done: int, total: int, clip: str = "", direction: str = "") -> None:
+    """A progress line the Forge app reads while a command runs with --json (the JSON result still comes last)."""
+    print(f"PF_PROGRESS step=render clip={clip} dir={direction} done={done} total={total}", flush=True)
+
+
 def _emit(a, result: dict) -> None:
     import json
 
@@ -273,6 +278,15 @@ def _emit(a, result: dict) -> None:
 
 
 def cmd_prompt(a) -> None:
+    if getattr(a, "json", False):
+        if getattr(a, "world", None) and a.world != "all":
+            from .world_prompts import build_world_prompt
+            _emit(a, {"ok": True, "kind": a.world, "prompt": build_world_prompt(a.world, a.describe, a.sref or "")})
+        elif a.kind == "all":
+            _emit(a, {"ok": True, "prompts": build_all(a.describe, a.reference), "rules": list(RULES)})
+        else:
+            _emit(a, {"ok": True, "kind": a.kind, "prompt": build_prompt(a.kind, a.describe, a.reference)})
+        return
     if getattr(a, "world", None):
         from .world_prompts import WORLD_KINDS, WORLD_RULES, build_world_prompt
 
@@ -334,7 +348,10 @@ def cmd_project(a) -> None:
         elif sub == "import-shapes":
             _emit(a, api.import_shapes(project, a.character, a.file))
         elif sub == "render-shapes":
-            _emit(a, api.render_shapes(project, a.character, preset=a.style, clips=a.clips, directions=a.directions, elevation=a.elevation, passes=a.passes, log=None if a.json else print))
+            _emit(a, api.render_shapes(project, a.character, preset=a.style, clips=a.clips, directions=a.directions, elevation=a.elevation, passes=a.passes,
+                                       log=None if a.json else print, progress=_progress if a.json else None))
+        elif sub == "reset":
+            _emit(a, api.reset_character(project, a.character, keep_sources=not a.all, steps=a.steps.split(",") if a.steps else None))
         elif sub == "preview-shapes":
             _emit(a, api.preview_shapes(project, a.character, clip=a.clip, direction=a.direction.upper(), preset=a.style))
         elif sub == "run":
@@ -479,9 +496,9 @@ def cmd_ui9(a) -> None:
 
 
 def cmd_sfx(a) -> None:
-    from .sfx import make_sfx
+    from .sfx import make_sfx, parse_overrides
 
-    _emit(a, make_sfx(a.preset, a.out, seed=a.seed, variations=a.variations))
+    _emit(a, make_sfx(a.preset, a.out, seed=a.seed, variations=a.variations, **parse_overrides(a.set)))
 
 
 def cmd_music(a) -> None:
@@ -499,6 +516,9 @@ def cmd_music(a) -> None:
         return
     if a.cue == "sheet":
         _emit(a, music.write_sheet(a.sheet_out or str(Path(a.out) / "music_sheet.json")))
+        return
+    if a.cue == "blips":
+        _emit(a, music.write_blips(a.out, fmt=a.format))
         return
     r = music.make_music(a.cue, a.out, seconds=a.seconds, seed=a.seed, overrides=music.parse_overrides(a.set), act=a.act,
                          sheet=a.sheet, fmt=a.format, preview=not a.no_preview, log=lambda m: print(m, flush=True) if not a.json else None)
@@ -585,7 +605,7 @@ def cmd_shapes(a) -> None:
         clips = [c.strip() for c in a.clips.split(",")] if a.clips else list(shape_rig.GAME_CLIPS)
         dirs = [d.strip().upper() for d in a.directions.split(",")] if a.directions else list(shape_rig.DIRECTIONS)
         r = shape_tools.render_set(doc, a.out, clips=clips, directions=dirs, style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style",
-                                   elevation=a.elevation, max_frames=a.frames, passes=a.passes, log=None if a.json else print)
+                                   elevation=a.elevation, max_frames=a.frames, passes=a.passes, log=None if a.json else print, progress=_progress if a.json else None)
         if a.gif:
             for clip in clips:
                 for d in dirs:
@@ -836,6 +856,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--kind", choices=["all", *[k.key for k in PROMPT_KINDS]], default="all")
     s.add_argument("--world", help="a world prompt instead: object building tree ground effect ui icons portrait"); s.add_argument("--sref", help="hero sheet image URL (style reference)")
     s.add_argument("--reference", default="[SHEET IMAGE URL]", help="sheet image URL for the --cref prompts")
+    s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_prompt)
 
     s = sub.add_parser("project", help="the full pipeline on a project folder (what the app does)")
@@ -845,6 +866,8 @@ def build_parser() -> argparse.ArgumentParser:
     ps = s.add_subparsers(dest="project_cmd", required=True, parser_class=lambda **kw: argparse.ArgumentParser(parents=[common], **kw))
     x = ps.add_parser("new", help="create a project folder"); x.add_argument("folder"); x.add_argument("--name"); x.add_argument("--style", choices=sorted(STYLES), default=DEFAULT_STYLE)
     ps.add_parser("status", help="what is done, what is next")
+    x = ps.add_parser("reset", help="start a character over: delete what the steps made, keep the paintings and the shape file"); x.add_argument("character")
+    x.add_argument("--all", action="store_true", help="also the imported paintings and the shape file"); x.add_argument("--steps", default=None, help="only these parts, e.g. frames,renders,export_game (redo from here)")
     ps.add_parser("blender-download", help="fetch the portable Blender (380 MB, no installer) and point the project at it")
     x = ps.add_parser("set", help="change settings (--style NAME sets the look; with --character only that character's)")
     x.add_argument("--style", choices=sorted(STYLES) + ["project"], help="a look preset ('pixelforge styles' lists them)"); x.add_argument("--character", help="give this character its own look ('project' follows the project again)"); x.add_argument("--blender"); x.add_argument("--directions", type=int); x.add_argument("--render-size", type=int); x.add_argument("--godot-res-dir")
@@ -958,11 +981,12 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("sfx", help="synthesised sound effects (hit, bone_click, pour, glass, cast, ui_tick, ...) -> WAV")
     s.add_argument("preset", help="a preset name or 'all'"); s.add_argument("-o", "--out", default="art/sfx")
     s.add_argument("--seed", type=int, default=0); s.add_argument("--variations", type=int, default=1, help="N seeded variations per preset")
+    s.add_argument("--set", action="append", default=[], metavar="KNOB=VALUE", help="override a knob of the preset: freq=300 decay=0.4 lowpass=0.3 crush=5 duty=0.3 tail=0.2 (repeatable)")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_sfx)
 
     s = sub.add_parser("music", help="the score: 21 seeded, looping cues (town / wild / deep per act, bosses, title) -> WAV/OGG + preview PNG")
-    s.add_argument("cue", help="a cue key, 'all', 'act' (with --act), 'list' (the table), or 'sheet' (write the editable JSON)")
+    s.add_argument("cue", help="a cue key, 'all', 'act' (with --act), 'forge' (the Forge app's three loops), 'blips' (its interface sounds), 'list' (the table), or 'sheet' (write the editable JSON)")
     s.add_argument("-o", "--out", default="art/music"); s.add_argument("--seconds", type=float, default=120.0, help="loop length")
     s.add_argument("--seed", type=int, default=None, help="another tune for the same place"); s.add_argument("--act", type=int, default=None)
     s.add_argument("--set", action="append", default=[], metavar="KNOB=VALUE", help="override a knob: bpm=90 sc=phr root=45 drone=[38,0.03,300] (repeatable)")

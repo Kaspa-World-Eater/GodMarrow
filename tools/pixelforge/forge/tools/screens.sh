@@ -1,36 +1,49 @@
 #!/bin/bash
-# Screenshot every screen of the Forge app under xvfb (no GPU needed), for docs/screens/forgeapp/.
+# Screenshot every screen and tab of the Forge app under xvfb (no GPU needed), for docs/screens/forgeapp/.
 #   GODOT=/path/to/godot PROJECT=/path/to/a/forge/project tools/pixelforge/forge/tools/screens.sh OUTDIR [WxH]
-# PROJECT should hold a finished character (the Keeper copy) so the preview and put-in-game screens have something
-# to show; a sheet painting at $SHEET, an object painting at $OBJECT, a ground texture at $GROUND are optional.
-# Each shot: "name | errors N" (N must be 0). The app's test hooks are documented in forge/scripts/main.gd.
+# PROJECT is a Forge project folder (made if missing). KEEPER is the shape model to stand on the bench (default: the
+# bundled Keeper); PAINTING a reference painting, GROUND and MUD ground textures, PANEL a painted panel, FLATLAY a
+# flat lay, FRONT a front cutout: optional, each opens its bench with it. GAME is the game folder (default: found
+# above the Forge). Each shot prints "name | errors N" (N must be 0). The app's test hooks are listed in
+# forge/scripts/main.gd.
 set -u
 OUT=${1:?OUTDIR}; RES=${2:-1280x720}
-GODOT=${GODOT:-godot}; PROJECT=${PROJECT:?PROJECT}
+GODOT=${GODOT:-godot}; PROJECT=${PROJECT:?PROJECT}; PY=${PY:-python}
 HERE=$(cd "$(dirname "$0")/.." && pwd)
+KEEPER=${KEEPER:-$HERE/../assets/shapes/characters/keeper.shapes.json}
+CHEST=${CHEST:-$HERE/../assets/shapes/objects/chest.shapes.json}
 mkdir -p "$OUT"
 OUT=$(cd "$OUT" && pwd)   # absolute: Godot resolves a relative --shot against the project folder
 shoot() {  # name "args" seconds
   local name=$1 args=$2 t=$3
-  local log; log=$(timeout 400 xvfb-run -a -s "-screen 0 ${RES}x24" "$GODOT" --path "$HERE" --rendering-driver opengl3 --windowed --resolution "$RES" \
-    -- --windowed --nosound --project="$PROJECT" ${GAME:+--game=$GAME} --godot="$GODOT" --shot="$OUT/$name.png" --shot_t=$t $args 2>&1)
-  echo "$name | errors $(echo "$log" | grep -cE 'SCRIPT ERROR|caller thread|handle_crash')"
+  local log; log=$(timeout 400 xvfb-run -a -s "-screen 0 ${RES}x24" "$GODOT" --path "$HERE" --rendering-driver opengl3 --resolution "$RES" \
+    -- --nosound --project="$PROJECT" --python="$PY" ${GAME:+--game=$GAME} --shot="$OUT/$name.png" --shot_t=$t $args 2>&1)
+  echo "$name | errors $(echo "$log" | grep -cE 'SCRIPT ERROR|SHADER ERROR|handle_crash')"
 }
-shoot boot "--screen=boot" 1.6
-shoot home "--screen=home" 2.5
-shoot settings "--screen=settings" 6
-shoot play "--screen=play" 3
-shoot character "--screen=character" 5
-[ -n "${CHARACTER:-}" ] && shoot character_preview "--screen=character --character=$CHARACTER" 7
-[ -n "${SHEET:-}" ] && shoot character_drop "--screen=character --drop=$SHEET" 40
-shoot object "--screen=object" 3
-[ -n "${OBJECT:-}" ] && shoot object_cut "--screen=object --drop=$OBJECT" 12
-shoot spell "--screen=spell" 3
-shoot spell_play "--screen=spell --shape=nova --look=frost --play" 12
-shoot spell_advanced "--screen=spell --shape=wisp --look=wisp --play --advanced" 12
-shoot tiles "--screen=tiles" 3
-[ -n "${GROUND:-}" ] && shoot tiles_cut "--screen=tiles --drop=$GROUND" 16
-shoot ui "--screen=ui" 3
-shoot sound "--screen=sound" 3
-shoot sound_listen "--screen=sound --cue=a1_wild --silent" 16
-shoot fix "--screen=fix" 5
+shoot home "--screen=home" 3
+shoot home_moor "--screen=home --env=moor" 3
+shoot home_snow "--screen=home --env=snow --light=1" 3
+shoot characters_empty "--screen=characters" 3
+for t in Reference Model Materials Motion Frames Export; do
+  shoot characters_${t,,} "--screen=characters --model=$KEEPER --tab=$t ${PAINTING:+--painting=$PAINTING}" 12
+done
+shoot characters_advanced "--screen=characters --model=$KEEPER --tab=Motion --advanced" 12
+shoot creatures "--screen=creatures" 3
+for t in Model Materials Behaviour Export; do
+  shoot objects_${t,,} "--screen=objects --model=$CHEST --tab=$t --env=crypt" 8
+done
+for t in Shape Layers Looks Missile Export; do
+  shoot effects_${t,,} "--screen=effects --tab=$t" 8
+done
+shoot tiles_empty "--screen=tiles" 3
+[ -n "${GROUND:-}" ] && for t in Source Edges Variants Export; do shoot tiles_${t,,} "--screen=tiles --painting=$GROUND --tab=$t" 10; done
+shoot interface_frames "--screen=interface ${PANEL:+--painting=$PANEL}" 8
+[ -n "${FLATLAY:-}" ] && shoot interface_icons "--screen=interface --painting=$FLATLAY --tab=Icons" 10
+[ -n "${FRONT:-}" ] && shoot interface_portraits "--screen=interface --painting=$FRONT --tab=Portraits" 10
+shoot interface_fonts "--screen=interface --tab=Fonts" 3
+shoot sound "--screen=sound" 6
+shoot music "--screen=music" 6
+shoot music_cues "--screen=music --tab=Cues" 6
+for t in Window Folders Style; do shoot settings_${t,,} "--screen=settings --tab=$t" 4; done
+shoot settings_computer "--screen=settings --tab=3" 12
+shoot log "--screen=home --log=1" 3
