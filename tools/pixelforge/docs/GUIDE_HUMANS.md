@@ -27,8 +27,9 @@ One window, nothing pops up. On the left: **Home**, the **character** with its n
 **editors** (Cutout, Skin, Colour, Effects on a sprite, Spell designer), the **tools** (Describe it, Effects and
 spells, Objects and tiles, Icons / portraits / UI, Sounds and music, More tools) and **Game**, **Settings**, **Help**.
 The page on the right changes; long pages scroll; pictures have Fit / 1x / 2x / 4x / + / − under them. The status
-line at the bottom says what is happening and what stopped it; **Log ▴** opens the detail. A step that needs you
-says so on its page, in gold.
+line at the bottom says what is happening and what stopped it (a long message is shortened to the line with …; the
+whole of it is on the page and in the log); **Log ▴** opens the detail. A step that needs you says so on its page, in
+gold. Rows of buttons wrap to the window, so nothing is ever cut off on the right.
 
 Keys: **Ctrl+P** open a painting · **F5** run every automatic step · **Ctrl+T** tools · **Ctrl+D** describe it ·
 **Ctrl+Z / Ctrl+Y** undo and redo in the editors · **Ctrl+S** save · **+ / −** zoom · **Ctrl+L** the log · **Esc** back.
@@ -57,10 +58,11 @@ model, renders, frames and exports after one question on the page; the painting 
 ## Fixing a bad cutout (step 3)
 
 The automatic cutout is usually right. When it is not (background stuck to the figure, a sleeve cut off), click
-**Edit** under that view. The cutout editor is a page with a toolbar on the left:
+**Edit** under that view. The cutout editor is a page with a toolbar on the left; the chosen tool's options (size,
+tolerance, **Connected**) sit on their own row under the top bar, named after the tool:
 
 - **E Erase** (left drag; right drag restores) · **R Restore** from the raw crop · **✦ Magic erase**: click a patch
-  of one colour and it goes (tolerance on the top bar).
+  of one colour and it goes (tolerance on the options row; untick **Connected** to take that colour everywhere).
 - **W Wand**, **L Lasso** (click round a part, double-click to close), **▭ Rectangle**: a selection. **Shift+click
   adds** to it, **Alt+click takes away**, a plain click starts over. Then **Erase** / **Restore** / **Invert** the
   selection on the right; **Delete** erases it; **Esc** deselects.
@@ -83,7 +85,7 @@ animation (sway, hover, flame…), click **Make sprite + animate + export**.
 **Skin** (under each cutout on step 3; on the finished set on step 9; the Skin page for any PNG): a paint program
 over the picture. **P Pick + recolour**: click a colour, widen **Range** until the highlight covers what you mean (both
 eyes, the whole trim), click a swatch or type a hex on the right, tune **Light / Chroma / Hue**, **Apply**. The shading
-stays; only the colour moves. **B Brush** (the colour on the right; opacity on the top bar), **G Glow** (a soft light
+stays; only the colour moves. **B Brush** (the colour on the right; size and opacity on the options row), **G Glow** (a soft light
 that spills a little past the edge: eyes, the lantern, runes), **I Lightness**, **S Smooth**, **E Erase**, **R
 Restore**, **C Clone**, the **W / L / ▭** selections with Shift and Alt, **✎ Eyedropper**. **Layers** on the right
 (add, hide, reorder, merge, opacity); Save flattens the visible ones. A selection can be **named** (eye_left, lantern,
@@ -95,15 +97,17 @@ Save. On a cutout the change goes into the model and every frame; on a finished 
 
 **Effects on a sprite** (step 9, or the page for any exported set): drag an effect from the list (smoke, wisp,
 embers, fire, glow rings…) and drop it where it belongs, for example on an eye; set its colours, size, glow and
-whether it sits behind the body. Place it per view or **Copy to all views** (left-facing views mirror). **Preview**
-plays the idle clip with the effects on; **Save** writes them into the set and renders the sheets; **In the game**
-shows them on the hero.
+whether it sits behind the body. The second row of the top bar is for the markers: **▶ Preview** plays the idle clip
+with the effects on, **Copy to all views** places the selected marker on every view (left-facing views mirror),
+**Delete marker** removes it, and **In the game** shows the set on the hero. **Save** (top right) writes the effects
+into the set and renders the sheets.
 
-**Spell designer**: a spell is layers of effects. Start from a preset (fireball, ward, soul drain, bone shatter,
-lightning strike, bone spear hit, frost nova, fire wall, corpse burst), add or remove layers, and turn each layer's
-knobs (kind, colours, scale, position, rotation, start, speed, opacity, blend, seed) while the preview loops.
-**Randomise** gives new seeds, **Reset** a layer, **Undo / Redo**, **Keep** exports the strip and the JSON the game
-plays plus a GIF, **In the game** plays it on the hero. A painted Midjourney effect joins as a layer of kind `image`.
+**Spell designer**: a spell is layers of effects. Pick a **Preset** (fireball, ward, soul drain, bone shatter,
+lightning strike, bone spear hit, frost nova, fire wall, corpse burst) and **Load** it, add or remove layers, and turn
+each layer's knobs (kind, colours, scale, position, rotation, start, speed, opacity, blend, seed) while the preview
+loops (**Pause** and the zoom buttons are under it). **Randomise** gives new seeds, **Reset** a layer, **Undo / Redo**,
+**Keep (export)** writes the strip and the JSON the game plays plus a GIF, **In the game** plays it on the hero. A
+painted Midjourney effect joins as a layer of kind `image`.
 
 ## The tools
 

@@ -17,6 +17,9 @@ from .editor_core import ImageDoc, outline_of
 from .widgets import ColourPicker, LabeledScale, Note, ScrollFrame, Toolbar, Tooltip, ZoomCanvas, tk
 
 SEL = np.array([79, 209, 197, 255], np.uint8)
+TOOL_NAMES = {"erase": "Erase", "restore": "Restore", "magic": "Magic erase", "wand": "Magic wand", "lasso": "Lasso", "rect": "Rectangle",
+              "clone": "Clone brush", "smooth": "Smooth", "pick": "Pick + recolour", "brush": "Brush", "glow": "Glow", "light": "Lightness",
+              "dropper": "Eyedropper"}
 SHIFT = 0x0001
 ALT = 0x0008 | 0x0080 | 0x20000
 
@@ -60,12 +63,16 @@ class EditorPage(Page):
     def build(self) -> None:
         t = tk()
         f = self.frame
-        self.options = t.ttk.Frame(f, style="Tool.TFrame", padding=(8, 4))
+        # row 1: Open… on the left; undo / redo, before, zoom and Save on the right.
+        # row 2: the chosen tool's options (its own row, so a wide right group never pushes them off the edge).
+        self.options = t.ttk.Frame(f, style="Tool.TFrame", padding=(8, 4, 8, 2))
         self.options.pack(side="top", fill="x")
         right = t.ttk.Frame(self.options, style="Tool.TFrame")
         right.pack(side="right")
-        self.opt_left = t.ttk.Frame(self.options, style="Tool.TFrame")
-        self.opt_left.pack(side="left", fill="x", expand=True)
+        self.opt_left = t.ttk.Frame(f, style="Tool.TFrame", padding=(8, 2, 8, 4))
+        self.opt_left.pack(side="top", fill="x")
+        self.opt_title = t.ttk.Label(self.opt_left, text="", style="Tool.TLabel", font=T.FONT_B, width=14)
+        self.opt_title.pack(side="left", padx=(0, 8))
         self.undo_btn = t.ttk.Button(right, text="↶ Undo", width=7, command=self.undo, style="Tool.TButton")
         self.undo_btn.pack(side="left")
         Tooltip(self.undo_btn, "Ctrl+Z")
@@ -81,7 +88,7 @@ class EditorPage(Page):
         t.ttk.Button(right, text="−", width=2, command=lambda: self.zoom(-1), style="Tool.TButton").pack(side="left", padx=(1, 8))
         self.zoom_label = t.ttk.Label(right, text="", style="Tool.TLabel", width=5)
         self.zoom_label.pack(side="left")
-        self.save_btn = t.ttk.Button(right, text="Save", command=self.save, style="Go.TButton")
+        self.save_btn = t.ttk.Button(right, text="Save", width=6, command=self.save, style="Go.TButton")
         self.save_btn.pack(side="left", padx=(8, 0))
         Tooltip(self.save_btn, "Ctrl+S. Writes the picture; the first save keeps a .bak next to it.")
         body = t.ttk.Frame(f)
@@ -291,6 +298,7 @@ class EditorPage(Page):
         self.toolbar.set_active(key)
         self.poly = []
         self.rect0 = None
+        self.opt_title.configure(text=TOOL_NAMES.get(key, key.title()))
         for k, frame in getattr(self, "opt_frames", {}).items():
             if k == key or k in getattr(self, "opt_shared", {}).get(key, ()):
                 frame.pack(side="left", padx=(0, 10))
@@ -506,12 +514,13 @@ class EditorPage(Page):
 
     def selection_buttons(self, parent) -> None:
         t = tk()
-        row = t.ttk.Frame(parent)
-        row.pack(fill="x", pady=(2, 0))
-        t.ttk.Button(row, text="Erase", width=6, command=lambda: (self.doc.erase_selection(), self.redraw()) if self.doc else None, style="Tool.TButton").pack(side="left")
-        t.ttk.Button(row, text="Restore", width=7, command=lambda: (self.doc.restore_selection(), self.redraw()) if self.doc else None, style="Tool.TButton").pack(side="left")
-        t.ttk.Button(row, text="Invert", width=6, command=lambda: (self.doc.invert_selection(), self.redraw()) if self.doc else None, style="Tool.TButton").pack(side="left")
-        t.ttk.Button(row, text="None", width=5, command=lambda: (self.doc.select(None), self.redraw()) if self.doc else None, style="Tool.TButton").pack(side="left")
+        grid = t.ttk.Frame(parent)
+        grid.pack(fill="x", pady=(2, 0))
+        grid.columnconfigure(0, weight=1)
+        grid.columnconfigure(1, weight=1)
+        for i, (text, fn) in enumerate((("Erase", lambda: self.doc.erase_selection()), ("Restore", lambda: self.doc.restore_selection()),
+                                        ("Invert", lambda: self.doc.invert_selection()), ("None", lambda: self.doc.select(None)))):
+            t.ttk.Button(grid, text=text, width=7, command=lambda fn=fn: (fn(), self.redraw()) if self.doc else None, style="Tool.TButton").grid(row=i // 2, column=i % 2, sticky="ew", padx=1, pady=1)
 
 
 # ------------------------------------------------------------------------------ Cutout
@@ -541,11 +550,11 @@ class CutoutPage(EditorPage):
         self.opt_shared = {"restore": ("erase",), "clone": ("erase",), "smooth": ("erase",)}
         f = self._opt("magic")
         self._slider(f, "Tolerance", self.tolerance, 1, 40, fmt="{:.0f}")
-        t.ttk.Checkbutton(f, text="connected", variable=self.contiguous, style="Card.TCheckbutton").pack(side="left")
+        t.ttk.Checkbutton(f, text="Connected", variable=self.contiguous, style="Card.TCheckbutton").pack(side="left")
         self.opt_frames["wand"] = f
         self.opt_shared["wand"] = ("magic",)
         self.opt_shared["lasso"] = ()
-        t.ttk.Button(self.opt_left, text="Open…", command=self.open_dialog, style="Tool.TButton").pack(side="right", padx=4)
+        t.ttk.Button(self.options, text="Open…", width=6, command=self.open_dialog, style="Tool.TButton").pack(side="left")
 
     def build_side(self) -> None:
         t = tk()
@@ -616,10 +625,10 @@ class SkinPage(EditorPage):
         self._slider(f, "Amount", self.amount, -0.3, 0.3, fmt="{:+.2f}")
         f = self._opt("wand")
         self._slider(f, "Tolerance", self.tolerance, 1, 40)
-        t.ttk.Checkbutton(f, text="connected", variable=self.contiguous, style="Card.TCheckbutton").pack(side="left")
+        t.ttk.Checkbutton(f, text="Connected", variable=self.contiguous, style="Card.TCheckbutton").pack(side="left")
         f = self._opt("pick")
         t.ttk.Button(f, text="Apply", command=self.apply_pick, style="Go.TButton").pack(side="left", padx=(0, 8))
-        t.ttk.Button(self.opt_left, text="Open…", command=self.open_dialog, style="Tool.TButton").pack(side="right", padx=4)
+        t.ttk.Button(self.options, text="Open…", width=6, command=self.open_dialog, style="Tool.TButton").pack(side="left")
         self.pick_src = None
         self.pick_center = None
         self.pick_mask = None
@@ -669,7 +678,7 @@ class SkinPage(EditorPage):
         row.pack(fill="x", pady=(4, 0))
         self.region_name = t.StringVar(value="")
         t.ttk.Entry(row, textvariable=self.region_name, width=12).pack(side="left")
-        b = t.ttk.Button(row, text="Name it", command=self.name_selection, style="Tool.TButton")
+        b = t.ttk.Button(row, text="Name it", width=8, command=self.name_selection, style="Tool.TButton")
         b.pack(side="left", padx=2)
         Tooltip(b, "Keep the selection as a named region (eye_left, lantern…) that ops and the AI path can target")
         t.ttk.Label(s, text="Regions", style="Sub.TLabel").pack(anchor="w", pady=(6, 0))
@@ -677,7 +686,7 @@ class SkinPage(EditorPage):
         row.pack(fill="x")
         self.region_box = t.ttk.Combobox(row, values=[], state="readonly", width=12)
         self.region_box.pack(side="left")
-        t.ttk.Button(row, text="Select", command=self.select_region, style="Tool.TButton").pack(side="left", padx=2)
+        t.ttk.Button(row, text="Select", width=7, command=self.select_region, style="Tool.TButton").pack(side="left", padx=2)
         t.ttk.Separator(s).pack(fill="x", pady=6)
         t.ttk.Button(s, text="Save ops as JSON", command=self.save_ops).pack(fill="x", pady=1)
         t.ttk.Button(s, text="Revert to saved", command=lambda: self.revert("saved")).pack(fill="x", pady=1)

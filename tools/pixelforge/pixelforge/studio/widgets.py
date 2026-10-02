@@ -9,6 +9,7 @@
 - :class:`Note`          an inline message (plain, good, warning) instead of a pop-up
 - :class:`Confirm`       an inline Yes / Cancel bar for the few things that need asking
 - :class:`Collapsible`   a header that opens and closes a section
+- :class:`Flow`          buttons in rows that wrap to the width (nothing is cut off on the right)
 - :class:`Toolbar`       a strip of tool buttons, one of which is "on"
 - :class:`ColourPicker`  swatches + a hex box, in the window
 - :class:`Tooltip`       a hover hint placed inside the window
@@ -105,8 +106,86 @@ def steps_text(parent, lines: list[str], pady=(0, 8)):
     return para(parent, "\n".join(f"{i + 1}. {s}" for i, s in enumerate(lines)), pady=pady)
 
 
+def _px(v) -> int:
+    try:
+        return int(float(str(v).rstrip("pm")))
+    except Exception:  # noqa: BLE001
+        return 0
+
+
+def pad_sides(raw) -> tuple[int, int]:
+    """(left, right) of a ttk padding value: an int, a tuple, or the string Tk gives back ("12", "8 4", "0 0 16 4").
+    Missing sides default the way ttk does: right to left."""
+    if raw is None:
+        return 0, 0
+    if isinstance(raw, (tuple, list)):
+        parts = [str(x) for x in raw]
+    else:
+        parts = [x for x in str(raw).replace("{", "").replace("}", "").split() if x]
+    if not parts:
+        return 0, 0
+    left = _px(parts[0])
+    right = _px(parts[2]) if len(parts) >= 3 else left
+    return left, right
+
+
+def hpad(widget) -> int:
+    """The horizontal room a frame's own padding takes (left + right), in pixels."""
+    try:
+        raw = widget.cget("padding")
+    except Exception:  # noqa: BLE001
+        return 0
+    left, right = pad_sides(raw)
+    return left + right
+
+
+def flow_rows(widths: list[int], room: int, gap: int = 4) -> list[list[int]]:
+    """Which items (by index) go on which row when items of the given widths flow into ``room`` pixels: a new row
+    starts when the next item would cross the right edge; a row is never empty."""
+    rows, row, x = [], [], 0
+    for i, w in enumerate(widths):
+        need = w + gap
+        if row and x + need > room:
+            rows.append(row)
+            row, x = [], 0
+        row.append(i)
+        x += need
+    rows.append(row)
+    return rows
+
+
+def elide(text: str, measure, width: int) -> str:
+    """``text`` cut to ``width`` pixels with "…" when it does not fit; ``measure(s)`` gives a string's width."""
+    text = " ".join(text.split())
+    if not text or measure(text) <= width:
+        return text
+    lo, hi = 0, len(text)
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        if measure(text[:mid] + "…") <= width:
+            lo = mid
+        else:
+            hi = mid - 1
+    return text[:lo].rstrip() + "…"
+
+
+def pack_padx(widget) -> int:
+    """The left + right padx a packed widget was given (0 when it is not packed)."""
+    try:
+        if widget.winfo_manager() != "pack":
+            return 0
+        p = widget.pack_info().get("padx", 0)
+    except Exception:  # noqa: BLE001
+        return 0
+    if isinstance(p, (tuple, list)):
+        return sum(_px(x) for x in p)
+    parts = str(p).split()
+    return sum(_px(x) for x in parts) * (2 if len(parts) == 1 else 1)
+
+
 def rewrap(widget, width: int) -> None:
-    """Set the wraplength of every wrapping label under ``widget`` to the available width."""
+    """Set the wraplength of every wrapping label under ``widget`` to the room it really has: the given width less
+    each frame's own padding on the way down and the label's own padx."""
     t = tk()
     try:
         kids = widget.winfo_children()
@@ -115,12 +194,51 @@ def rewrap(widget, width: int) -> None:
     for w in kids:
         if getattr(w, "_wrap", False):
             try:
-                w.configure(wraplength=max(200, width))
+                w.configure(wraplength=max(200, width - pack_padx(w)))
             except Exception:  # noqa: BLE001
                 pass
         if isinstance(w, (t.ttk.Frame, t.Frame, t.ttk.Labelframe)):
-            pad = 24 if isinstance(w, t.ttk.Labelframe) else 0
+            pad = (24 if isinstance(w, t.ttk.Labelframe) else 0) + hpad(w) + pack_padx(w)
             rewrap(w, width - pad)
+
+
+class Flow:
+    """Buttons (or any widgets) in rows that wrap to the width, so nothing is ever cut off on the right. Build the
+    children with ``flow.frame`` as their parent and ``add(widget)`` them; the layout follows the frame's width."""
+
+    def __init__(self, parent, gap: int = 4, style: str = "TFrame"):
+        t = tk()
+        self.frame = t.ttk.Frame(parent, style=style)
+        self.gap = gap
+        self.items: list = []
+        self._cols: list = []
+        self.frame.bind("<Configure>", self._reflow)
+
+    def pack(self, **kw):
+        self.frame.pack(**kw)
+        return self
+
+    def add(self, widget) -> None:
+        self.items.append(widget)
+        self._cols = []
+        self._reflow()
+
+    def _reflow(self, _e=None) -> None:
+        if not self.items:
+            return
+        width = max(self.frame.winfo_width(), 1)
+        if width < 40:   # not laid out yet: one row, measured again on the first Configure
+            width = 10_000
+        rows = flow_rows([w.winfo_reqwidth() for w in self.items], width, self.gap)
+        layout = [len(r) for r in rows]
+        if layout == self._cols:
+            return
+        self._cols = layout
+        for w in self.items:
+            w.grid_forget()
+        for r, items in enumerate(rows):
+            for c, i in enumerate(items):
+                self.items[i].grid(row=r, column=c, padx=(0, self.gap), pady=(0, self.gap), sticky="w")
 
 
 def hsep(parent, pady=8):
@@ -341,13 +459,17 @@ class PreviewArea:
         self.view.pack(fill="both", expand=True)
         bar = t.ttk.Frame(self.frame)
         bar.pack(fill="x", pady=(4, 0))
-        self.caption = t.ttk.Label(bar, text=caption, style="Dim.TLabel")
-        self.caption.pack(side="left")
-        self.zoom_label = t.ttk.Label(bar, text="", style="Small.TLabel", width=6, anchor="e")
+        # the zoom controls first (they always show); the caption takes what is left and wraps to it
+        zoom = t.ttk.Frame(bar)
+        zoom.pack(side="right")
+        self.zoom_label = t.ttk.Label(zoom, text="", style="Small.TLabel", width=6, anchor="e")
         self.zoom_label.pack(side="right", padx=(6, 0))
         for label, mode in (("−", "out"), ("+", "in"), ("4x", 4), ("2x", 2), ("1x", 1), ("Fit", "fit")):
             cmd = (self.view.zoom_in if mode == "in" else self.view.zoom_out if mode == "out" else (lambda m=mode: self.view.set_mode(m)))
-            t.ttk.Button(bar, text=label, width=3 if len(label) < 3 else 4, command=cmd, style="Tool.TButton").pack(side="right", padx=1)
+            t.ttk.Button(zoom, text=label, width=3 if len(label) < 3 else 4, command=cmd, style="Tool.TButton").pack(side="right", padx=1)
+        self.caption = t.ttk.Label(bar, text=caption, style="Dim.TLabel", justify="left", wraplength=400)
+        self.caption.pack(side="left", fill="x", expand=True)
+        bar.bind("<Configure>", lambda e: self.caption.configure(wraplength=max(120, e.width - zoom.winfo_reqwidth() - 12)))
         self.actions = t.ttk.Frame(self.frame)
         self.actions.pack(fill="x", pady=(4, 0))
         self.view.on_zoom = lambda z: self.zoom_label.configure(text=f"{z:.2g}x" if z < 1 else f"{z:g}x")

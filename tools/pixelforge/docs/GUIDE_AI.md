@@ -178,7 +178,11 @@ so "Save ops as JSON" in the editor and `pixelforge skin <image> ops.json` are t
 AI should know exist: `api.preview_gif(project, name, clip, dir)` -> `previews/<clip>_<dir>.gif`; the one-click
 Blender download (`api.download_blender`); `api.reset_character` (Start over / Redo from here); `views/<view>_raw.png`
 is the untouched crop the editors restore from. Character setting `model_mode` = auto | template | hull picks the 3D
-path (the Body box on step 5).
+path (the Body box on step 5). A script that drives the window (`Studio(root, project)`, `show(page, **kw)`) reads the
+whole last message from `app.status.get()`; the status line itself shows `app.status_shown` (cut to the line with …).
+Every page is checked to fit the window by `tests/test_studio.py::test_every_page_fits_the_window`, which runs when a
+display is there (`xvfb-run -a -s "-screen 0 1366x768x24" python -m pytest tests/test_studio.py -k fits_the_window`)
+and is skipped otherwise.
 
 Rules the tools keep: glow only where the game allows it (`vfx` adds a halo to fire, wisps and bursts; never to smoke or
 embers); every colour comes from the ramp you give or the game's presets; `skilltree` never edits `data/skills.json`

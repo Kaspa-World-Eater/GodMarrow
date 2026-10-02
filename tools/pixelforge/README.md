@@ -67,7 +67,9 @@ Image maths: `grid.py`, `palette.py`, `quantize.py`, `cleanup.py`, `pixelate.py`
 `sheet.py`, `model_spec.py`. Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`, `music.py`, `color_editor.py`, `skin_ops.py`, `skin_editor.py`, `fx_editor.py`, `spell.py`, `spell_designer.py`, `effect_art.py`, `describe.py`, `game_preview.py`, `checks.py`,
 `recolor.py`, `compare.py`, `skilltree.py`, `doctor.py`. Blender-side: `pixelforge/blender/` (no Pillow there).
 Godot-side: `godot_addon/pixelforge/` (`PFSpriteSet`, `PFFx`, `PFObjects`). Docs: `docs/GUIDE_HUMANS.md`,
-`docs/GUIDE_AI.md`, `docs/DESIGN.md`, `docs/TOOL_IDEAS.md`. Tests: `pytest`.
+`docs/GUIDE_AI.md`, `docs/DESIGN.md`, `docs/TOOL_IDEAS.md`. Tests: `pytest` (the Studio's page-fit test runs when a
+display is there, e.g. `xvfb-run -a -s "-screen 0 1366x768x24" python -m pytest tests/test_studio.py -k fits_the_window`,
+and is skipped otherwise).
 
 ## Rules it keeps
 

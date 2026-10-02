@@ -36,36 +36,50 @@ class FxPage(Page):
         from .. import vfx
 
         f = self.frame
-        top = t.ttk.Frame(f, style="Tool.TFrame", padding=(8, 4))
+        # row 1: which set and view on the left; undo / redo, zoom and Save on the right
+        top = t.ttk.Frame(f, style="Tool.TFrame", padding=(8, 4, 8, 2))
         top.pack(side="top", fill="x")
         right = t.ttk.Frame(top, style="Tool.TFrame")
         right.pack(side="right")
         t.ttk.Label(top, text="Sprite set", style="Tool.TLabel").pack(side="left")
-        self.set_box = t.ttk.Combobox(top, values=[], width=18, state="readonly")
+        self.set_box = t.ttk.Combobox(top, values=[], width=14, state="readonly")
         self.set_box.pack(side="left", padx=4)
         self.set_box.bind("<<ComboboxSelected>>", lambda e: self.load(self.sets.get(self.set_box.get())))
-        t.ttk.Button(top, text="Open…", command=self.open_dialog, style="Tool.TButton").pack(side="left")
+        t.ttk.Button(top, text="Open…", width=6, command=self.open_dialog, style="Tool.TButton").pack(side="left")
         t.ttk.Label(top, text="View", style="Tool.TLabel").pack(side="left", padx=(12, 2))
         self.view_var = t.StringVar(value="down")
         self.view_box = t.ttk.Combobox(top, textvariable=self.view_var, values=["down"], width=8, state="readonly")
         self.view_box.pack(side="left")
         self.view_box.bind("<<ComboboxSelected>>", lambda e: self.draw())
-        t.ttk.Button(top, text="Copy to all views", command=self.copy_all, style="Tool.TButton").pack(side="left", padx=(12, 2))
-        self.play_btn = t.ttk.Button(top, text="▶ Preview", command=self.preview, style="Tool.TButton")
-        self.play_btn.pack(side="left", padx=2)
-        t.ttk.Button(top, text="Delete marker", command=self.delete, style="Tool.TButton").pack(side="left", padx=2)
         t.ttk.Button(right, text="↶ Undo", width=7, command=self.undo, style="Tool.TButton").pack(side="left")
         t.ttk.Button(right, text="↷ Redo", width=7, command=self.redo, style="Tool.TButton").pack(side="left", padx=(2, 8))
         for label, mode in (("Fit", "fit"), ("2x", 2), ("3x", 3), ("4x", 4)):
             t.ttk.Button(right, text=label, width=3, command=lambda m=mode: self.view.set_mode(m), style="Tool.TButton").pack(side="left", padx=1)
-        t.ttk.Button(right, text="In the game", command=self.in_game, style="Tool.TButton").pack(side="left", padx=(8, 2))
-        t.ttk.Button(right, text="Save", command=self.save, style="Go.TButton").pack(side="left", padx=(6, 0))
+        t.ttk.Button(right, text="Save", width=6, command=self.save, style="Go.TButton").pack(side="left", padx=(8, 0))
+        # row 2: what to do with the markers (its own row, so it is never pushed off the right edge); In the game
+        act = t.ttk.Frame(f, style="Tool.TFrame", padding=(8, 2, 8, 4))
+        act.pack(side="top", fill="x")
+        self.play_btn = t.ttk.Button(act, text="▶ Preview", width=10, command=self.preview, style="Tool.TButton")
+        self.play_btn.pack(side="left")
+        Tooltip(self.play_btn, "Plays the idle clip of this view with the effects on it. Click again to stop.")
+        b = t.ttk.Button(act, text="Copy to all views", width=17, command=self.copy_all, style="Tool.TButton")
+        b.pack(side="left", padx=(8, 2))
+        Tooltip(b, "Places the selected marker on every view (left-facing views mirrored).")
+        b = t.ttk.Button(act, text="Delete marker", width=13, command=self.delete, style="Tool.TButton")
+        b.pack(side="left", padx=2)
+        Tooltip(b, "Removes the selected marker from every view.")
+        self.act_info = t.ttk.Label(act, text="", style="Tool.TLabel")
+        self.act_info.pack(side="left", padx=(12, 0))
+        b = t.ttk.Button(act, text="In the game", width=11, command=self.in_game, style="Tool.TButton")
+        b.pack(side="right")
+        Tooltip(b, "Save first; then the Game page shows the sprite with its effects attached.")
         body = t.ttk.Frame(f)
         body.pack(fill="both", expand=True)
-        left = t.ttk.Frame(body, padding=(8, 6), width=220)
+        left = t.ttk.Frame(body, padding=(8, 6), width=236)
         left.pack(side="left", fill="y")
         left.pack_propagate(False)
-        t.ttk.Label(left, text="Effects: drag onto the sprite", style="Sub.TLabel").pack(anchor="w")
+        t.ttk.Label(left, text="Effects", style="Sub.TLabel").pack(anchor="w")
+        t.ttk.Label(left, text="Drag one onto the sprite.", style="Dim.TLabel", wraplength=216, justify="left").pack(anchor="w")
         self.list = t.Listbox(left, height=14, exportselection=False, bg=T.FIELD, fg=T.BONE, selectbackground=T.TEAL_DK, selectforeground="#eafff8",
                               highlightthickness=0, relief="flat", font=T.FONT_S)
         for k in vfx.KINDS:
@@ -85,10 +99,12 @@ class FxPage(Page):
         self.scale = t.DoubleVar(value=0.5)
         LabeledScale(left, "Size (x sprite)", self.scale, 0.15, 2.0, command=lambda v: self.apply_props(), length=190).pack(fill="x", pady=(4, 0))
         self.glow = t.BooleanVar(value=True)
-        t.ttk.Checkbutton(left, text="Glow (magic, lanterns, wisps only)", variable=self.glow, command=self.apply_props).pack(anchor="w", pady=(4, 0))
+        cb = t.ttk.Checkbutton(left, text="Glow", variable=self.glow, command=self.apply_props)
+        cb.pack(anchor="w", pady=(4, 0))
+        Tooltip(cb, "Only for magic, lanterns and wisps.")
         self.behind = t.BooleanVar(value=False)
         t.ttk.Checkbutton(left, text="Behind the body", variable=self.behind, command=self.apply_props).pack(anchor="w")
-        self.info = t.ttk.Label(left, text="", style="Dim.TLabel", wraplength=200, justify="left")
+        self.info = t.ttk.Label(left, text="", style="Dim.TLabel", wraplength=216, justify="left")
         self.info.pack(anchor="w", pady=8)
         self.view = ZoomCanvas(body, height=400)
         self.view.pack(side="left", fill="both", expand=True)
@@ -174,11 +190,13 @@ class FxPage(Page):
     def draw(self) -> None:
         if self.doc is None:
             self.view.set_image(None)
+            self.act_info.configure(text="")
             return
         fr, _g = self.doc.frame(self.view_var.get(), 0)
         self.view.set_image(fr, keep_zoom=True)   # after_draw draws the markers
         n = sum(1 for a in self.doc.atts if self.view_var.get() in a.get("views", {}))
-        self.info.configure(text=f"{len(self.doc.atts)} effect(s); {n} placed on this view. " + ("Selected: " + self.doc.atts[self.sel]["name"] if self.sel is not None and self.sel < len(self.doc.atts) else "Click a marker to select it."))
+        self.act_info.configure(text=f"{len(self.doc.atts)} effect(s); {n} on this view")
+        self.info.configure(text=("Selected: " + self.doc.atts[self.sel]["name"] + ". Drag it to move it." if self.sel is not None and self.sel < len(self.doc.atts) else "Click a marker to select it."))
 
     def draw_markers(self) -> None:
         if self.doc is None or self.playing:
@@ -237,7 +255,7 @@ class FxPage(Page):
         ox, oy = self.to_sprite(x, y)
         self.sel = self.doc.add(kind, self.view_var.get(), (ox, oy), palette=self.palette.get(), scale=float(self.scale.get()), glow=bool(self.glow.get()), behind=bool(self.behind.get()))
         self.draw()
-        self.note.say(f"{kind} placed at ({ox}, {oy}) from the ground point on view {self.view_var.get()}. Drag the marker to move it; 'Copy placement to all views' when it is right.")
+        self.note.say(f"{kind} placed at ({ox}, {oy}) from the ground point on view {self.view_var.get()}. Drag the marker to move it; 'Copy to all views' when it is right.")
 
     # ---------------------------------------------------- markers on canvas
     def marker_press(self, e) -> None:
@@ -318,7 +336,10 @@ class FxPage(Page):
 
         def work():
             frames = self.doc.preview_frames(v)
-            self.app.root.after(0, lambda: self.start_preview(frames))
+            try:
+                self.app.root.after(0, lambda: self.start_preview(frames))
+            except RuntimeError:   # the window closed while rendering
+                pass
 
         threading.Thread(target=work, daemon=True).start()
 

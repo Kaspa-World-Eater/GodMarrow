@@ -177,3 +177,133 @@ def test_sprite_set_doc_attachments(tmp_path):
     assert doc.atts[i]["views"]["front_l"] == [-3.0, -10.0]
     doc.delete(i)
     assert doc.atts == [] and doc.undo() and len(doc.atts) == 1
+
+
+def test_layout_helpers_padding_flow_and_elide():
+    """The rules the pages lay themselves out by, without a window: a frame's padding (as Tk gives it back), how
+    buttons flow into rows, and how the status line is cut to its width."""
+    from pixelforge.studio.widgets import elide, flow_rows, pad_sides
+
+    assert pad_sides((14,)) == (14, 14) and pad_sides((16, 8, 16, 4)) == (16, 16) and pad_sides((0, 0, 16, 4)) == (0, 16)
+    assert pad_sides("12") == (12, 12) and pad_sides("8 4") == (8, 8) and pad_sides("") == (0, 0) and pad_sides(None) == (0, 0)
+    assert flow_rows([100, 100, 100], 250) == [[0, 1], [2]]          # the third button would cross the edge
+    assert flow_rows([300], 100) == [[0]] and flow_rows([], 100) == [[]]  # one item always fits on a row
+    assert flow_rows([120, 120, 120, 120], 10_000) == [[0, 1, 2, 3]]
+    measure = lambda s: len(s) * 10  # noqa: E731
+    assert elide("short", measure, 100) == "short"
+    cut = elide("a long status line that is cut", measure, 120)
+    assert cut.endswith("…") and measure(cut) <= 120 and cut == "a long stat…"
+    assert elide("two  spaced\nlines", measure, 1000) == "two spaced lines"
+
+
+def _tk_display():
+    """A Tk root when a display is there (Xvfb in the container, the desktop on Windows), else None."""
+    try:
+        import tkinter
+
+        root = tkinter.Tk()
+        root.withdraw()
+        return root
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _clipped(root, allow=()):
+    """Widgets that pack or grid want shown but that are unmapped, narrower than they ask for, or past the screen's
+    right edge; what a person would see cut off."""
+    root.update_idletasks()
+    root.update()
+    sw = root.winfo_screenwidth()
+    bad = []
+
+    def walk(w):
+        yield w
+        for ch in w.winfo_children():
+            yield from walk(ch)
+
+    for w in walk(root):
+        try:
+            cls = w.winfo_class()
+            if cls not in ("TButton", "TCombobox", "TCheckbutton", "TLabel", "TEntry", "TRadiobutton", "TSpinbox") or not w.winfo_manager():
+                continue
+            parent = w.nametowidget(w.winfo_parent())
+            if not parent.winfo_ismapped() or not parent.winfo_viewable():
+                continue
+            text = str(w.cget("text"))[:40] if "text" in w.keys() else ""
+            if text in allow:
+                continue
+            if not w.winfo_ismapped():
+                bad.append(("unmapped", cls, text))
+            elif w.winfo_rootx() + w.winfo_width() > sw + 1:
+                bad.append(("off-screen", cls, text))
+            elif w.winfo_width() < w.winfo_reqwidth() - 2:
+                bad.append(("narrow", cls, text, w.winfo_width(), w.winfo_reqwidth()))
+        except Exception:  # noqa: BLE001
+            pass
+    return bad
+
+
+def test_every_page_fits_the_window(tmp_path, monkeypatch):
+    """With a display: every page, every editor tool and the new-character form at the app's own window size show
+    every button, box and label in full (nothing cut off on the right, nothing pushed off the row)."""
+    root = _tk_display()
+    if root is None:
+        pytest.skip("no display / no tkinter")
+    root.destroy()
+    from pixelforge.studio import app as A
+
+    home = tmp_path / "home" / ".pixelforge"      # the recent-projects list and the prefs stay in the test
+    monkeypatch.setattr(A, "PREFS_DIR", home)
+    monkeypatch.setattr(A, "RECENT_FILE", home / A.RECENT_FILE.name)
+    monkeypatch.setattr(A, "PREFS_FILE", home / A.PREFS_FILE.name)
+    from pixelforge import api
+    from pixelforge.project import Project
+
+    api.new_project(tmp_path / "g", "G", "16bit")
+    p = Project.load(tmp_path / "g")
+    api.add_character(p, "hero", "a hooded hero with a lantern")
+    c = p.character("hero")
+    rgba = np.zeros((64, 40, 4), np.uint8)
+    rgba[4:60, 6:34] = (120, 40, 160, 255)
+    for name in ("front", "front_raw", "side", "back"):
+        Image.fromarray(rgba, "RGBA").save(p.sub("hero", "views") / f"{name}.png")
+    Image.fromarray(rgba, "RGBA").save(p.sub("hero", "source") / "sheet.png")
+    c.sources["sheet"] = "characters/hero/source/sheet.png"
+    for k in ("prompts", "import", "split"):
+        c.done[k] = True
+    c.notes["split_check"] = "front: 3 loose island(s) (largest 2 px) will float as separate voxels"
+    p.save()
+    root = A.make_root()
+    st = A.Studio(root, str(p.root))
+    try:
+        front = str(p.sub("hero", "views") / "front.png")
+        problems = {}
+        for key, kw in [("home", {}), ("character", {"step": "prompts"}), ("character", {"step": "import"}), ("character", {"step": "split"}),
+                        ("character", {"step": "model"}), ("character", {"step": "render"}), ("character", {"step": "export"}), ("character", {"new": True}),
+                        ("cutout", {"path": front}), ("skin", {"path": front}), ("colour", {"path": front}), ("fx", {}), ("spell", {}),
+                        ("tools", {"tab": "effects"}), ("tools", {"tab": "music"}), ("tools", {"tab": "more"}), ("describe", {}), ("game", {}), ("settings", {}), ("help", {})]:
+            pg = st.show(key, **kw)
+            root.update()
+            bad = _clipped(root)
+            if bad:
+                problems[f"{key} {kw}"] = bad
+            if key in ("cutout", "skin", "colour"):
+                for tool in [k for k, _g, _t in pg.TOOLS if k != "-"]:
+                    pg.pick_tool(tool)
+                    bad = _clipped(root)
+                    if bad:
+                        problems[f"{key}/{tool}"] = bad
+        assert not problems, problems
+        # the new-character form carries no step bar and no other character's check note
+        cp = st.show("character", new=True)
+        root.update()
+        assert not cp.bar.winfo_ismapped() and cp.note.label.cget("text") == ""
+        cp = st.show("character", step="split")
+        root.update()
+        assert cp.bar.winfo_ismapped() and "loose island" in cp.note.label.cget("text")
+        # the status line shows what fits and keeps the whole text for the log and the page
+        st._tell("x" * 600)
+        root.update()
+        assert len(st.status.get()) == 600 and st.status_shown.get().endswith("…") and st.status_label.winfo_reqwidth() <= st.status_label.winfo_width() + 2
+    finally:
+        root.destroy()

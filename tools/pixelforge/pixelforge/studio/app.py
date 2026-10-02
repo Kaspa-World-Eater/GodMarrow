@@ -167,6 +167,8 @@ class Studio:
         self.pages: dict[str, Page] = {}
         self.current: Page | None = None
         self.status = t.StringVar(value="Ready")
+        self.status_shown = t.StringVar(value="Ready")
+        self.status.trace_add("write", lambda *_: self._fit_status())
         self._status_warn = False
         self.update_bar = None
         self.progress_total = 0
@@ -208,8 +210,10 @@ class Studio:
         # bottom: status line, then the log drawer above it
         foot = t.ttk.Frame(r, style="Ink.TFrame", padding=(10, 4))
         foot.pack(side="bottom", fill="x")
-        self.status_label = t.ttk.Label(foot, textvariable=self.status, style="Status.TLabel", anchor="w")
+        self.status_label = t.ttk.Label(foot, textvariable=self.status_shown, style="Status.TLabel", anchor="w")
         self.status_label.pack(side="left", fill="x", expand=True)
+        self.status_label.bind("<Configure>", lambda e: self._fit_status())
+        Tooltip(self.status_label, "The whole message is in the log (Log ▴) and on the page.")
         self.log_btn = t.ttk.Button(foot, text="Log ▴", width=7, command=self.toggle_log, style="Tool.TButton")
         self.log_btn.pack(side="right")
         self.progress = t.ttk.Progressbar(foot, mode="indeterminate", length=180)
@@ -261,7 +265,7 @@ class Studio:
         t.ttk.Label(n, text="CHARACTER", style="NavHead.TLabel").pack(anchor="w", fill="x")
         row = t.ttk.Frame(n, style="Ink.TFrame", padding=(12, 0, 8, 2))
         row.pack(fill="x")
-        self.char_box = t.ttk.Combobox(row, textvariable=self.char, state="readonly", width=16)
+        self.char_box = t.ttk.Combobox(row, textvariable=self.char, state="readonly", width=12)
         self.char_box.pack(side="left", fill="x", expand=True)
         self.char_box.bind("<<ComboboxSelected>>", lambda e: self._char_changed())
         b = t.ttk.Button(row, text="+", width=2, command=self._add_character, style="Tool.TButton")
@@ -507,6 +511,25 @@ class Studio:
                 pass
         self._log(("NOTE: " if warn else "") + text)
 
+    def _fit_status(self) -> None:
+        """Show as much of the status text as fits on the one line, with … when it is cut (the page note and the
+        log have all of it)."""
+        text = " ".join(self.status.get().split())
+        try:
+            from tkinter import font as tkfont
+
+            from .widgets import elide
+
+            label = self.status_label
+            width = label.winfo_width() - 8
+            if width < 40 or not text:
+                self.status_shown.set(text)
+                return
+            f = tkfont.Font(font=label.cget("font") or T.FONT_S)
+            self.status_shown.set(elide(text, f.measure, width))
+        except Exception:  # noqa: BLE001
+            self.status_shown.set(text)
+
     def _log(self, text: str) -> None:
         self.log_queue.put(str(text))
 
@@ -742,9 +765,12 @@ class Studio:
         if r["blocked_at"]:
             self.show("character", step=r["blocked_at"])
             self._tell(f"Ran {', '.join(r['ran']) or 'nothing'}; stopped at step '{r['blocked_at']}': {r['reason']}", warn=True)
-        else:
+        elif r["ran"]:
             self.show("character", step="export")
             self._tell("All steps done: " + ", ".join(r["ran"]) + ". Step 9 shows the files the game loads.")
+        else:
+            self.show("character", step="export")
+            self._tell("Nothing left to run: all 9 steps are done. Step 9 shows the files the game loads.")
 
     def run_step(self, key: str, **kw) -> None:
         """Run one pipeline step for the current character and come back to its page."""

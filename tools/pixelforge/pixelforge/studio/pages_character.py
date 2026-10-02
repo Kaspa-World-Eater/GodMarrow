@@ -11,7 +11,7 @@ from pathlib import Path
 
 from . import theme as T
 from .app import Page, STEP_BLURB
-from .widgets import (AnimPlayer, Collapsible, Confirm, Note, PreviewArea, ScrollFrame, ThumbStrip, Tooltip, heading, hsep, para, steps_text, tk)
+from .widgets import (AnimPlayer, Collapsible, Confirm, Flow, Note, PreviewArea, ScrollFrame, ThumbStrip, Tooltip, heading, hsep, para, steps_text, tk)
 
 STEP_TITLES = {
     "prompts": ("Step 1: Get the prompts for Midjourney", "You paint the character in Midjourney; PixelForge writes the prompts so the pictures come out the way the next steps need them."),
@@ -41,7 +41,7 @@ class CharacterPage(Page):
     # ---------------------------------------------------------------- frame
     def build(self) -> None:
         t = tk()
-        bar = t.ttk.Frame(self.frame, padding=(16, 8, 16, 4))
+        bar = self.bar = t.ttk.Frame(self.frame, padding=(16, 8, 16, 4))
         bar.pack(fill="x")
         self.go_btn = t.ttk.Button(bar, text="▶ Continue", command=self.app.continue_, style="Go.TButton")
         self.go_btn.pack(side="left")
@@ -102,7 +102,14 @@ class CharacterPage(Page):
         self.scroll.clear()
         self.p = self.scroll.inner
         c = self.app.current_char()
-        self._update_go(c)
+        if self.mode == "new":
+            # the form for a character that does not exist yet: no step bar, no check note of another character
+            self.bar.pack_forget()
+            self.note.clear()
+        else:
+            if not self.bar.winfo_manager():
+                self.bar.pack(fill="x", before=self.note.label)
+            self._update_go(c)
         if self.mode == "new":
             self._new_character()
         elif c is None:
@@ -127,6 +134,12 @@ class CharacterPage(Page):
         else:
             nxt = self.app.next_step(c)
             self.go_btn.configure(text=f"▶ Continue: {STEP_BLURB.get(nxt, nxt)}")
+        # Start over and Redo from here only make sense for a character that exists
+        for b, kw in ((self.redo_btn, {}), (self.reset_btn, {"padx": 6})):
+            if c is None:
+                b.pack_forget()
+            elif not b.winfo_manager():
+                b.pack(side="right", **kw)
         issues = [v for k, v in (c.notes.items() if c else []) if k.endswith("_check") and v not in CLEAN]
         if issues:
             self.note.say("Checks: " + " · ".join(issues), "warn")
@@ -289,8 +302,8 @@ class CharacterPage(Page):
         f.pack(fill="x", pady=4)
         t.ttk.Label(f, text="Sheet image URL for the B prompts (after you made the sheet):").pack(side="left")
         t.ttk.Entry(f, textvariable=ref, width=40).pack(side="left", padx=4)
-        btns = t.ttk.Frame(p)
-        btns.pack(fill="x", pady=(2, 4))
+        btns = Flow(p)
+        btns.pack(fill="x", pady=(2, 0))
         from tkinter.scrolledtext import ScrolledText
 
         box = ScrolledText(p, height=16, font=T.FONT_MONO, wrap="word", bg=T.FIELD, fg=T.BONE, relief="flat", highlightthickness=1, highlightbackground=T.BORDER, insertbackground=T.BONE)
@@ -313,10 +326,10 @@ class CharacterPage(Page):
             self.app.root.clipboard_append(text)
             self.app._tell(f"Copied prompt {kind.upper()} to the clipboard. Paste it into Midjourney.")
 
-        t.ttk.Button(btns, text="Update prompts", command=regen, style="Go.TButton").pack(side="left")
+        btns.add(t.ttk.Button(btns.frame, text="Update prompts", command=regen, style="Go.TButton"))
         for kind, label in (("sheet4", "Copy A2: 4-view sheet"), ("sheet", "Copy A: 3-view sheet"), ("sheet_t", "Copy A4: T-pose"), ("sheet_top", "Copy A3: plan"),
                             ("front", "Copy B1: front"), ("back", "Copy B2: back"), ("sprite", "Copy C: sprite"), ("item", "Copy D: item")):
-            t.ttk.Button(btns, text=label, command=lambda k=kind: copy(k), style="Tool.TButton").pack(side="left", padx=2)
+            btns.add(t.ttk.Button(btns.frame, text=label, command=lambda k=kind: copy(k), style="Tool.TButton"))
         regen()
 
     def _step_import(self, c) -> None:

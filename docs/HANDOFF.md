@@ -236,6 +236,50 @@ stroke made inside a selection is recorded as the op without the selection, so "
 desktop icon, Segoe UI metrics, the OS pickers) was not run here, only Xvfb on Linux, where the nav just fits a 768-px
 screen and scrolls if the fonts are taller.
 
+**Studio review fixes (track/ui, 2026-10-02):** the reviewer's findings on the overhaul, all fixed in
+`tools/pixelforge/pixelforge/studio/`. *Blocker:* Effects on a sprite had Preview, Delete marker and Copy to all views
+pushed off the right edge at 1366x768 (and the View box at 1280x800); the top bar is now two rows (row 1: Sprite set,
+Open…, View | Undo, Redo, zoom, Save; row 2: ▶ Preview, Copy to all views, Delete marker, the counts | In the game), and
+the side panel's texts wrap to it (`Effects` / `Drag one onto the sprite.`, `Glow` with its tooltip). *Major:* step 1's
+eight Copy buttons flow into rows that wrap to the page (`widgets.Flow`, so "Copy C: sprite" and "Copy D: item" are
+reachable at every width); the spell designer's toolbar is two rows that fit at 1280 (Name, Preset + Load, Open… |
+Undo, Redo, Save spell, Keep (export); Frames / fps / Width / Height / Loops / Apply / Randomise | In the game) with Pause
+and the zoom buttons under the preview like every other preview; the new-character form no longer carries the previous
+character's step bar ("All steps done", Start over, Redo from here) or its check note (the bar is `pack_forget` in that
+mode and comes back on a step page; Start over / Redo are hidden when there is no character). *Minor:* wrapping text
+inside cards was clipped on the right because `rewrap` ignored frame padding (`cget("padding")` comes back as a tuple
+of ints; `widgets.pad_sides` parses it and `rewrap` subtracts every frame's padding and the label's padx on the way
+down), which fixes the tool cards, the Music / Spells / More blurbs and Home's "What to do next"; the editors' tool
+options have their own row under the top bar, named after the tool (`Magic wand · Tolerance · Connected`), the
+selection buttons are a 2x2 grid that fits the side panel, "Name it" / "Select" / "Open…" / "Get it" have explicit
+widths (the clam theme's default minimum of 11 characters was the hidden cause of several clips); the status line is
+elided to its width with … (`app.status` keeps the whole text for scripts, `app.status_shown` is what the label
+shows; the page note and the log have all of it); F5 / Run all on a finished character says "Nothing left to run: all 9
+steps are done…" instead of "All steps done: ."; a preview's caption wraps beside its zoom buttons (the Game page's
+screenshot path used to push "Fit" off the row) and its blank Hour box says "blank: the game's own time"; the nav's
+character box leaves room for its + button; the render
+threads of the spell and FX pages no longer raise when the window closes mid-render.
+**Verified:** `pytest` 96 green + 1 skipped headless (new: `test_layout_helpers_padding_flow_and_elide` for
+`pad_sides` / `flow_rows` / `elide`; `test_every_page_fits_the_window` builds the Studio on a small project under a
+display, visits every page, every editor tool and the new-character form at the app's own window size and fails on
+any button, box or label that is unmapped, narrower than it asks for, or past the screen's right edge; it passed under
+Xvfb at 1280x800 and 1366x768 with `/usr/bin/python3.12 -m pytest tests/test_studio.py -k fits_the_window`, and is
+skipped where there is no display or no tkinter, as in `/usr/local/bin/python`); a wider probe over all 31 pages
+(every Tools tab, the quick path, Describe, Settings, Help) at both sizes: 0 problems (before the fixes: 4 unmapped
+buttons / boxes on the FX and spell pages, 2 clipped Copy buttons, 10 narrow labels and buttons); `tools/smoke.sh`
+errors 0 on every line (`scratchpad/ui_smoke.txt`; the game code is untouched); fresh screenshots of every page replace
+the old ones under `docs/screens/ui/1280x800/` and `docs/screens/ui/1366x768/` (32 each, including the in-game
+screenshot taken through the Game page) and the walkthrough under `docs/screens/ui/walkthrough/` (fresh fake HOME →
+Open the Keeper painting → split and palette → stops on step 5 with the Blender note on the page and the elided status
+line, no pop-up → step 3 → Edit → the cutout page on front.png with the wand's options row → selection, erase, undo →
+Back → Skin → Home). Scripts (lost with the container; the method is in `docs/track_notes/ui.md`): `ui_fix_probe.py`
+(the fit measurement over every page), `ui_fix_shoot.py` (the named screenshots), `ui_walk.py` (the walkthrough).
+**Honestly short of the goal:** the same points as the overhaul entry (no rotary knobs, drag-and-drop of a painting
+untested without tkinterdnd2, slow painting on a 4000-px atlas, unnamed-selection replay, no export undo, not run on
+Windows); the fit test checks the app's window at the two laptop sizes with the Linux fallback font, which is wider
+than Segoe UI, so Windows should be no tighter, but that is reasoned, not seen; below the app's minimum window width
+(980 px) rows still clip, by design.
+
 ---
 
 ## 7. Handoff 2026-10-01 (cloud session, end of context): state, running agents, how to pick everything up

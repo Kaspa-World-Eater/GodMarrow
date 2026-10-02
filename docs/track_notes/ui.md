@@ -88,10 +88,37 @@ makes; `_opt(key)` builds that tool's options row. Selections are `doc.select(ma
 `_mods(event)` (Shift adds, Alt subtracts). New op kinds go into `skin_ops.apply_op` first so the CLI / MCP path
 (`pixelforge skin`, `edit_skin`) stays equal to the clicking path.
 
+## Layout rules (so nothing is cut off at 1280x800 or 1366x768)
+
+The app's own window is `min(1280, screen - 24)` wide; the page area is that less the 232-px nav. Everything a page
+packs in one row must fit in about 1020 px with the Linux fallback font (wider than Segoe UI), or it is clipped on the
+right and the test below fails.
+
+- A row of buttons that may not all fit goes in a `widgets.Flow` (`flow = Flow(parent); flow.add(ttk.Button(flow.frame,
+  ...))`): it wraps the buttons into rows as the width changes (step 1's Copy buttons).
+- A toolbar with a right-hand group (Undo / Redo / zoom / Save) keeps only that group and a short left part on the
+  first row; the rest goes on a second `Tool.TFrame` row (the editors' tool options, the FX page's marker actions, the
+  spell designer's numbers). Give every toolbar button an explicit `width`: the clam theme's default minimum is 11
+  characters, which makes "Open…" 115 px.
+- Wrapping text: `para(...)` and labels with `_wrap = True` are re-wrapped by `ScrollFrame` to the room they really
+  have; `widgets.rewrap` subtracts each frame's own `padding` and the label's `padx` on the way down (cards included).
+  A label inside a fixed-width panel (`pack_propagate(False)`) is not under a ScrollFrame: give it `wraplength` =
+  the panel's inner width (FX side panel 216, editor side panel 210).
+- A preview's caption (`PreviewArea`) wraps beside its zoom buttons; the zoom buttons are packed first so they always show.
+- The status line: `app._tell(text)` keeps the whole text in `app.status` (scripts read it) and shows `app.status_shown`,
+  cut to the line with …; the page's note and the log carry the whole message.
+- The new-character form hides the step bar and the check note (they belong to the current character); a page that
+  shows a form for something that does not exist yet should do the same.
+
 ## Verifying
 
-- `cd tools/pixelforge && python -m pytest -q` (tests/test_studio.py covers the headless parts).
+- `cd tools/pixelforge && python -m pytest -q` (tests/test_studio.py covers the headless parts; the layout helpers
+  `pad_sides`, `flow_rows`, `elide` have their own test).
+- With a display: `xvfb-run -a -s "-screen 0 1366x768x24" python -m pytest tests/test_studio.py -k fits_the_window`
+  builds the Studio on a small project, visits every page and every editor tool, and fails on any button, box or label
+  that is unmapped, narrower than it asks for, or past the screen's right edge (run it at 1280x800 too; it skips when
+  there is no display or no tkinter).
 - Under a virtual display: a driver that builds `Studio(root, project)`, calls `show(...)` per page and saves the
   window with ImageMagick (`import -window root out.png`); the walkthrough script opens a painting on a fresh fake HOME,
   waits for `st.busy` to clear, checks it stopped at step 5, opens the cutout editor from step 3 and comes back.
-  Both scripts are described in `docs/HANDOFF.md` section 6 (2026-10-01, Studio overhaul).
+  Both scripts are described in `docs/HANDOFF.md` section 6 (2026-10-01, Studio overhaul; 2026-10-02, review fixes).
