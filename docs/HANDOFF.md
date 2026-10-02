@@ -352,3 +352,27 @@ tallest looks' GIFs stand over 160 px because the figures are shown 1:1. The cle
 are tuned on one dark figure; a bright painting may want `clean 0` or a smaller lift in the Advanced numbers.
 
 **2026-10-01 23:45 (Derek): "Stop working on Godmarrow."** No game work of any kind until he says otherwise: no sprites, effects, scale, presentation or launcher changes. PixelForge only. The game may be used read-only as a viewer to judge the Forge's output.
+
+### 7.6 Stop point, 2026-10-02 00:00 (Derek: "stop working for now")
+All five PixelForge teams were stopped mid-work and their state committed and pushed as branches on origin (the
+last commit on each is a WIP commit, unreviewed):
+- `origin/track/forgeapp`: the Forge app (Godot, tools/pixelforge/forge): home with nine tiles, describe bar, the
+  character quest with its progress strip, theme, fonts, drag-and-drop; first review done, first fix round was in
+  progress. Screens: docs/screens/forgeapp/ on the branch. Not yet taking: the racks (music, spells, tiles),
+  tabs, reset/start over, the frame animation editor, the compare screen, the 1-bit dungeon look
+  (docs/track_notes/gui_look.md + docs/refs/forge_gui_reference.png), the dungeon-synth music
+  (docs/refs/forge_music_reference.mp3), the adult tone (docs/track_notes/tone.md), the Aseprite ideas and format.
+- `origin/track/ui`: the classic Tk Studio rebuilt as a studio package (one window, pages, no pop-ups); first
+  version committed, its review was running.
+- `origin/track/fxlook`: effect looks (fxlook.py, --look on vfx/spell/effect, pixelforge looks --demo); two
+  commits plus WIP, first fix round was running.
+- `origin/track/pixel2d`: the pixel road (joint tracks exported, puppet parts done, 8-direction animation in
+  progress). Rule: animation means frames (docs/track_notes/animation_is_frames.md).
+- `origin/track/readable`: the readable-pixels conversion (value structure, clusters, edges, detail keep) to fix
+  the "purple blur"; builder was mid-way, nothing reviewed.
+Merged on main already: the seven look presets (track/styles), the pixel-styled sheet prompt (sheet_px), skin ops
+selections/clone, smooth-motion export, the Studio one-click start, and all the track notes under docs/track_notes/.
+Godmarrow is ON HOLD until PixelForge is mastered (Derek). To resume: for each branch, merge main into it, read
+its docs/track_notes and HANDOFF entry, run tests, then a builder/reviewer round from where it stopped; the Forge
+app branch is the priority, followed by readable, pixel2d, fxlook, ui. Integration order into main: fxlook,
+readable, pixel2d, ui, forgeapp.
