@@ -115,3 +115,10 @@ attached to a solid, so a character's staff fire and a spell's fire are one thin
 Controls are drawn as true pixel art (a tiny canvas per control, scaled up crisp): iron bracket with a lit top-left
 edge, a dark slot with ticks, rivets, a bar handle with a bone-gold grip; wheels with a dithered iron face, rim
 rivets and a gold spoke. No CSS gradients or anti-aliasing anywhere in the app.
+
+## Motion and sound discipline (2026-10-02)
+The only animated interface element is the selector: a pixel-drawn arrow that nudges one pixel on a two-frame cycle.
+Nothing else in the chrome moves (no hover glows, no sliding panels, no pulsing buttons); the ambient scene and the
+sprite preview are the only other motion. Moving the selector plays a short square-wave cursor blip (higher for
+right/down, lower for left/up, a two-note confirm on select), as SNES menus did; levers scrape, wheels tick. Volume
+in Settings; silent when reduced motion or mute is set.
