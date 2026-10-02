@@ -46,3 +46,15 @@ A stranger opens the Forge, drops a painting, and has a character walking in 8 d
 hour, looking like the Morbid / Eitr references at game size; an AI does the same from one sentence; both can
 make an object, an effect and a tune the same way; and a second game's preset produces a different look from the
 same files.
+
+## Working method: mock first (added 2026-10-02)
+Before a team builds a screen, a tool page, or a new game's look, a mockup is made and approved: a self-contained
+HTML page (docs/mockups/) with real assets standing in, the real framing, controls and motion rules, reviewed in a
+few rounds of "change this". The approved mockup is the brief; the build is judged against it with screenshots.
+Mockups are cheap (an hour), builds are not. The Forge app's approved mockup is docs/mockups/forge_app_v8.html.
+
+## A second game in this style
+The Forge's menu framing (ornate pixel frame, banner, picture window, text box, pixel levers and wheels, selector
+blip, flame-anchored light) is a reusable skin: it becomes a Godot theme and scene set shipped with the Forge's
+add-on, so a new game can open with the same presentation and its own palette and ornaments. When the owner starts
+the next game, the first step is a mockup of its home screen in this framing, then its style preset.
