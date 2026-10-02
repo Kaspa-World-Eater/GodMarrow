@@ -1,0 +1,400 @@
+{
+ "_about": "The material library of shape sprites: a ramp (shadow to highlight) per name, optional emissive, spec (metal keeps its brightest tone for near-direct light), texture (weave fur scratch grain) with a strength, and lift. A .shapes.json refers to these by name and may add or override its own.",
+ "robe": {
+  "ramp": [
+   "#0a080c",
+   "#141017",
+   "#1f1922",
+   "#2c2430",
+   "#3d3242"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.55
+ },
+ "sash": {
+  "ramp": [
+   "#1e0a0c",
+   "#3a1014",
+   "#5e1a1e",
+   "#842a2a",
+   "#a8413a"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.45
+ },
+ "cape": {
+  "ramp": [
+   "#070609",
+   "#0e0b10",
+   "#161219",
+   "#1f1924",
+   "#2a222f"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.5
+ },
+ "tunic": {
+  "ramp": [
+   "#1b1b21",
+   "#2a2a32",
+   "#3c3c46",
+   "#52525c",
+   "#6b6b76"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.45
+ },
+ "mantle": {
+  "ramp": [
+   "#1c1b17",
+   "#302e26",
+   "#48443a",
+   "#635e4e",
+   "#827b64"
+  ],
+  "texture": "fur",
+  "texture_strength": 0.7
+ },
+ "bone": {
+  "ramp": [
+   "#3a3428",
+   "#675e4c",
+   "#968c74",
+   "#c2b897",
+   "#e6ddc0"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.45
+ },
+ "skin": {
+  "ramp": [
+   "#26251f",
+   "#45433a",
+   "#6a6656",
+   "#908a74",
+   "#b5ae93"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.2
+ },
+ "gold": {
+  "ramp": [
+   "#2a1e0e",
+   "#4c3818",
+   "#765925",
+   "#a37f38",
+   "#cfac5d"
+  ],
+  "spec": true,
+  "spec_t": 0.85,
+  "texture": "scratch",
+  "texture_strength": 0.5
+ },
+ "wood": {
+  "ramp": [
+   "#17100b",
+   "#2a1d13",
+   "#43301f",
+   "#5e442c",
+   "#7c5d3c"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.55
+ },
+ "leather": {
+  "ramp": [
+   "#150f0c",
+   "#261b15",
+   "#3b2a20",
+   "#53392a",
+   "#6d4c37"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.4
+ },
+ "iron": {
+  "ramp": [
+   "#121216",
+   "#212127",
+   "#34343c",
+   "#4d4d56",
+   "#6d6d78"
+  ],
+  "spec": true,
+  "spec_t": 0.88,
+  "texture": "scratch",
+  "texture_strength": 0.6
+ },
+ "soul": {
+  "ramp": [
+   "#0f3a1c",
+   "#1f6e2e",
+   "#3fb04a",
+   "#8cf07a",
+   "#e6ffdc"
+  ],
+  "emissive": true
+ },
+ "cloth": {
+  "ramp": [
+   "#08060a",
+   "#110d14",
+   "#1a141e",
+   "#251c2a",
+   "#322637",
+   "#45354b"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.5
+ },
+ "cape6": {
+  "ramp": [
+   "#060508",
+   "#0c0a0f",
+   "#141118",
+   "#1d1822",
+   "#28202e"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.5
+ },
+ "tabard": {
+  "ramp": [
+   "#1a1a20",
+   "#26262e",
+   "#34343e",
+   "#45454f",
+   "#5a5a66",
+   "#717180"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.4
+ },
+ "iron7": {
+  "ramp": [
+   "#0c0c0f",
+   "#16161b",
+   "#212128",
+   "#2e2e37",
+   "#41414c",
+   "#5c5c68",
+   "#9898a5"
+  ],
+  "spec": true,
+  "spec_t": 0.88,
+  "texture": "scratch",
+  "texture_strength": 0.5
+ },
+ "fur": {
+  "ramp": [
+   "#191813",
+   "#29271f",
+   "#3a372d",
+   "#4f4b3d",
+   "#676150",
+   "#857e67"
+  ],
+  "texture": "fur",
+  "texture_strength": 0.7
+ },
+ "bone6": {
+  "ramp": [
+   "#2e2a21",
+   "#4f483a",
+   "#776e58",
+   "#a29778",
+   "#c9bf9e",
+   "#ebe4c9"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.4
+ },
+ "gold6": {
+  "ramp": [
+   "#24180a",
+   "#45321a",
+   "#6b4f25",
+   "#967434",
+   "#c39f4f",
+   "#f0d78f"
+  ],
+  "spec": true,
+  "spec_t": 0.85,
+  "texture": "scratch",
+  "texture_strength": 0.5
+ },
+ "leather5": {
+  "ramp": [
+   "#120d0a",
+   "#21180f",
+   "#33251a",
+   "#473425",
+   "#5e4632"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.4
+ },
+ "wood5": {
+  "ramp": [
+   "#140e09",
+   "#24190f",
+   "#372718",
+   "#4c3722",
+   "#654a2f"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.5
+ },
+ "crimson": {
+  "ramp": [
+   "#16070a",
+   "#2c0c10",
+   "#481317",
+   "#681d1f",
+   "#8a2a27",
+   "#a8403a"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.4
+ },
+ "straw": {
+  "ramp": [
+   "#1a140d",
+   "#2f2518",
+   "#473923",
+   "#604e30",
+   "#7a653f",
+   "#937b4e"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.6
+ },
+ "violet": {
+  "ramp": [
+   "#0f0a12",
+   "#19111c",
+   "#231826",
+   "#2e2032",
+   "#3b2a40",
+   "#4a374f"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.5
+ },
+ "wrap": {
+  "ramp": [
+   "#1a1018",
+   "#2b1b28",
+   "#402a3b",
+   "#573a51",
+   "#6e4d68",
+   "#86627f"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.6
+ },
+ "lacquer": {
+  "ramp": [
+   "#0d0a10",
+   "#181220",
+   "#251b2d",
+   "#33263d",
+   "#45354f",
+   "#6a5878"
+  ],
+  "spec": true,
+  "spec_t": 0.9,
+  "texture": "scratch",
+  "texture_strength": 0.4
+ },
+ "rope": {
+  "ramp": [
+   "#1f1711",
+   "#33271b",
+   "#4a3a28",
+   "#634e36",
+   "#7c6446",
+   "#937957"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.6
+ },
+ "gourd": {
+  "ramp": [
+   "#2a2420",
+   "#443b33",
+   "#5f554a",
+   "#7c7162",
+   "#978b7a",
+   "#aea291"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.3
+ },
+ "rag": {
+  "ramp": [
+   "#0a070b",
+   "#130e16",
+   "#1c1520",
+   "#261d2b",
+   "#322737"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.6
+ },
+ "shadowskin": {
+  "ramp": [
+   "#1a1416",
+   "#2c2225",
+   "#3f3236",
+   "#544449",
+   "#6a585e"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.2
+ },
+ "steel": {
+  "ramp": [
+   "#15161a",
+   "#24262c",
+   "#373a42",
+   "#4f535c",
+   "#6a6f79",
+   "#9299a6"
+  ],
+  "spec": true,
+  "spec_t": 0.86,
+  "texture": "scratch",
+  "texture_strength": 0.5
+ },
+ "ember": {
+  "ramp": [
+   "#3a1206",
+   "#7a2a08",
+   "#c45a14",
+   "#f0a040",
+   "#fff1b0"
+  ],
+  "emissive": true
+ },
+ "miasma": {
+  "ramp": [
+   "#2a1340",
+   "#4b2470",
+   "#7a3fb0",
+   "#b57ae0",
+   "#ead6ff"
+  ],
+  "emissive": true
+ },
+ "frost": {
+  "ramp": [
+   "#10304a",
+   "#1f5c80",
+   "#3f94c0",
+   "#8fd0ec",
+   "#e2f6ff"
+  ],
+  "emissive": true
+ }
+}

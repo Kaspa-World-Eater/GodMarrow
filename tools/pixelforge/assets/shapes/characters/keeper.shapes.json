@@ -1,0 +1,1592 @@
+{
+ "name": "keeper",
+ "about": "The Shrine Keeper as a solid shape sprite: a wide straw hat, violet wrappings with burning eyes, a shawl and a long tattered veil, dark lacquered pauldrons, bracers and tassets, rope cords and charm gourds at the belt, layered tattered black skirts, wrapped shins and feet. Drawn around the 120 px author pose (pixelforge shapes template --height 120).",
+ "mode": "solid",
+ "size": [
+  138,
+  138
+ ],
+ "height": 120,
+ "ground": 134,
+ "axis": [
+  69.0,
+  0
+ ],
+ "view": {
+  "elevation": 12
+ },
+ "outline": "#0a080c",
+ "skeleton": {
+  "height": 120,
+  "ground": 134,
+  "cx": 69.0
+ },
+ "materials": {},
+ "parts": {
+  "hat": {
+   "bone": "head",
+   "lag": {
+    "frames": 1,
+    "sway": 0.35
+   }
+  },
+  "veil": {
+   "bone": "spine.003",
+   "lag": {
+    "frames": 2,
+    "sway": 0.6
+   }
+  },
+  "veil_long": {
+   "bone": "spine.003",
+   "lag": {
+    "frames": 3,
+    "sway": 1.0
+   }
+  },
+  "cords": {
+   "bone": "hips",
+   "lag": {
+    "frames": 2,
+    "sway": 1.1
+   }
+  },
+  "gourds": {
+   "bone": "hips",
+   "lag": {
+    "frames": 1,
+    "sway": 0.7
+   }
+  },
+  "tassets": {
+   "bone": "hips",
+   "lag": {
+    "frames": 1,
+    "sway": 0.4
+   }
+  },
+  "skirt": {
+   "bone": "hips",
+   "lag": {
+    "frames": 2,
+    "sway": 0.8
+   }
+  },
+  "underskirt": {
+   "bone": "hips",
+   "lag": {
+    "frames": 1,
+    "sway": 0.5
+   }
+  }
+ },
+ "shapes": [
+  {
+   "name": "hat",
+   "kind": "ring",
+   "y": [
+    1,
+    21
+   ],
+   "rx": [
+    1.0,
+    1.22
+   ],
+   "rz": [
+    1.0,
+    1.18
+   ],
+   "thickness": 1.8,
+   "hem": {
+    "tongues": 48,
+    "depth": 0.7,
+    "seed": 2
+   },
+   "material": "straw",
+   "part": "hat",
+   "rotate": {
+    "x": 16,
+    "about": [
+     69.0,
+     16,
+     0
+    ]
+   },
+   "bump": {
+    "ridges": [
+     0.25,
+     2.5
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      44,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      17,
+      18
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      1,
+      5
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.05,
+      1
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "hat_cap",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    2.2,
+    0
+   ],
+   "radii": [
+    1.6,
+    1.6,
+    1.6
+   ],
+   "material": "straw",
+   "t": -1,
+   "part": "hat",
+   "rotate": {
+    "x": 16,
+    "about": [
+     69.0,
+     16,
+     0
+    ]
+   }
+  },
+  {
+   "name": "head",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    23.5,
+    0.3
+   ],
+   "radii": [
+    6.0,
+    8.0,
+    6.6
+   ],
+   "material": "wrap",
+   "bone": "head",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "every_y": [
+      3,
+      1
+     ],
+     "hash": [
+      0.2,
+      4
+     ],
+     "t": 1
+    },
+    {
+     "z": [
+      4.5,
+      null
+     ],
+     "near": [
+      [
+       [
+        66.5,
+        23.5,
+        null
+       ],
+       [
+        71.5,
+        23.5,
+        null
+       ]
+      ],
+      1.7
+     ],
+     "t": -3
+    },
+    {
+     "z": [
+      4.5,
+      null
+     ],
+     "near": [
+      [
+       [
+        66.5,
+        23.5,
+        null
+       ],
+       [
+        71.5,
+        23.5,
+        null
+       ]
+      ],
+      0.9
+     ],
+     "material": "miasma",
+     "emit": "pulse"
+    }
+   ]
+  },
+  {
+   "name": "neck",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    33,
+    0
+   ],
+   "b": [
+    69.0,
+    27.5,
+    0
+   ],
+   "r": [
+    2.8,
+    2.6
+   ],
+   "material": "wrap",
+   "bone": "neck",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "shawl",
+   "kind": "ring",
+   "y": [
+    27,
+    46
+   ],
+   "rx": [
+    6.6,
+    0.34
+   ],
+   "rz": [
+    6.2,
+    0.26
+   ],
+   "thickness": 1.8,
+   "hem": {
+    "tongues": 12,
+    "depth": 7,
+    "seed": 4
+   },
+   "open": {
+    "angle": 0.75,
+    "below": 30
+   },
+   "holes": {
+    "p": 0.05,
+    "band": 10,
+    "seed": 2
+   },
+   "material": "wrap",
+   "part": "veil",
+   "bump": {
+    "folds": [
+     0.4,
+     9,
+     2.0
+    ]
+   },
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      1.5
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "veil",
+   "kind": "ring",
+   "y": [
+    30,
+    92
+   ],
+   "rx": [
+    8.0,
+    0.14
+   ],
+   "rz": [
+    7.6,
+    0.08
+   ],
+   "thickness": 1.6,
+   "hem": {
+    "tongues": 9,
+    "depth": 14,
+    "seed": 6
+   },
+   "keep": {
+    "back": 1.95
+   },
+   "holes": {
+    "p": 0.1,
+    "band": 26,
+    "seed": 3
+   },
+   "material": "wrap",
+   "t": -1,
+   "part": "veil_long",
+   "bump": {
+    "folds": [
+     0.5,
+     6,
+     1.0
+    ]
+   },
+   "rules": [
+    {
+     "every_y": [
+      5,
+      2
+     ],
+     "hash": [
+      0.4,
+      7
+     ],
+     "t": -2
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "chest",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    50,
+    0
+   ],
+   "radii": [
+    10,
+    12.5,
+    7.2
+   ],
+   "material": "violet",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.06,
+      9
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "rope_x1",
+   "kind": "capsule",
+   "a": [
+    59.0,
+    40,
+    6.2
+   ],
+   "b": [
+    78.0,
+    59,
+    6.4
+   ],
+   "r": [
+    1.7,
+    1.5
+   ],
+   "material": "rope",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.12,
+      2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "rope_x2",
+   "kind": "capsule",
+   "a": [
+    79.0,
+    40,
+    6.2
+   ],
+   "b": [
+    60.0,
+    59,
+    6.4
+   ],
+   "r": [
+    1.7,
+    1.5
+   ],
+   "material": "rope",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      1
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.12,
+      3
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "rope_band",
+   "kind": "capsule",
+   "a": [
+    59.0,
+    61,
+    6.0
+   ],
+   "b": [
+    79.0,
+    61,
+    6.0
+   ],
+   "r": 1.5,
+   "material": "rope",
+   "bone": "spine.001",
+   "rules": [
+    {
+     "every_x": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "rope_knot",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    49.5,
+    7.6
+   ],
+   "radii": [
+    3.2,
+    2.6,
+    2.4
+   ],
+   "material": "rope",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dz": [
+      1.8,
+      null
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "rope_tail",
+   "kind": "capsule",
+   "a": [
+    70.0,
+    52,
+    7.6
+   ],
+   "b": [
+    72.0,
+    66,
+    8.5
+   ],
+   "r": [
+    1.0,
+    0.7
+   ],
+   "material": "rope",
+   "part": "cords"
+  },
+  {
+   "name": "pauldron.L",
+   "kind": "ellipsoid",
+   "centre": [
+    82.0,
+    38.5,
+    -2.0
+   ],
+   "radii": [
+    7.2,
+    4.6,
+    7.0
+   ],
+   "material": "lacquer",
+   "bone": "shoulder.L",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      null,
+      35.5
+     ],
+     "t": 1
+    },
+    {
+     "hash": [
+      0.05,
+      5
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "upper_arm.L",
+   "kind": "capsule",
+   "a": [
+    82.02,
+    36.24,
+    -4.44
+   ],
+   "b": [
+    85.89,
+    54.45,
+    -4.76
+   ],
+   "r": [
+    3.8,
+    3.3
+   ],
+   "material": "violet",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "bracer.L",
+   "kind": "capsule",
+   "a": [
+    85.89,
+    54.45,
+    -4.76
+   ],
+   "b": [
+    89.74,
+    72.08,
+    -0.68
+   ],
+   "r": [
+    3.6,
+    3.0
+   ],
+   "material": "lacquer",
+   "bone": "forearm.L",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      55,
+      58
+     ],
+     "material": "rope",
+     "t": 0
+    }
+   ]
+  },
+  {
+   "name": "hand.L",
+   "kind": "ellipsoid",
+   "centre": [
+    90.2,
+    75.0,
+    0.2
+   ],
+   "radii": [
+    2.7,
+    3.4,
+    2.3
+   ],
+   "material": "shadowskin",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "finger0.L",
+   "kind": "capsule",
+   "a": [
+    88.60000000000001,
+    77.5,
+    0.6
+   ],
+   "b": [
+    88.28,
+    82.5,
+    1.4
+   ],
+   "r": [
+    0.75,
+    0.5
+   ],
+   "material": "shadowskin",
+   "bone": "hand.L",
+   "t": -1
+  },
+  {
+   "name": "finger1.L",
+   "kind": "capsule",
+   "a": [
+    90.2,
+    77.5,
+    1.2
+   ],
+   "b": [
+    90.2,
+    82.5,
+    2.0
+   ],
+   "r": [
+    0.75,
+    0.5
+   ],
+   "material": "shadowskin",
+   "bone": "hand.L",
+   "t": 0
+  },
+  {
+   "name": "finger2.L",
+   "kind": "capsule",
+   "a": [
+    91.8,
+    77.5,
+    0.4
+   ],
+   "b": [
+    92.12,
+    82.5,
+    1.2000000000000002
+   ],
+   "r": [
+    0.75,
+    0.5
+   ],
+   "material": "shadowskin",
+   "bone": "hand.L",
+   "t": -1
+  },
+  {
+   "name": "thigh.L",
+   "kind": "capsule",
+   "a": [
+    75.04,
+    70.76,
+    0.09
+   ],
+   "b": [
+    75.04,
+    97.92,
+    -0.1
+   ],
+   "r": [
+    4.4,
+    3.5
+   ],
+   "material": "rag",
+   "bone": "thigh.L"
+  },
+  {
+   "name": "shin.L",
+   "kind": "capsule",
+   "a": [
+    75.04,
+    97.92,
+    -0.09
+   ],
+   "b": [
+    75.04,
+    126.97,
+    -2.43
+   ],
+   "r": [
+    3.5,
+    2.9
+   ],
+   "material": "violet",
+   "bone": "shin.L",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "material": "wrap",
+     "t": -2
+    },
+    {
+     "y": [
+      96,
+      101
+     ],
+     "material": "rope"
+    }
+   ]
+  },
+  {
+   "name": "foot.L",
+   "kind": "ellipsoid",
+   "centre": [
+    75.04,
+    130.6,
+    3.0
+   ],
+   "radii": [
+    3.9,
+    3.3,
+    7.2
+   ],
+   "material": "violet",
+   "bone": "foot.L",
+   "rules": [
+    {
+     "every_z": [
+      3,
+      0
+     ],
+     "material": "wrap",
+     "t": -2
+    },
+    {
+     "y": [
+      132.4,
+      null
+     ],
+     "material": "leather5",
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "pauldron.R",
+   "kind": "ellipsoid",
+   "centre": [
+    56.0,
+    38.5,
+    -2.0
+   ],
+   "radii": [
+    7.2,
+    4.6,
+    7.0
+   ],
+   "material": "lacquer",
+   "bone": "shoulder.R",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      null,
+      35.5
+     ],
+     "t": 1
+    },
+    {
+     "hash": [
+      0.05,
+      5
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "upper_arm.R",
+   "kind": "capsule",
+   "a": [
+    55.980000000000004,
+    36.24,
+    -4.44
+   ],
+   "b": [
+    52.11,
+    54.45,
+    -4.76
+   ],
+   "r": [
+    3.8,
+    3.3
+   ],
+   "material": "violet",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "bracer.R",
+   "kind": "capsule",
+   "a": [
+    52.11,
+    54.45,
+    -4.76
+   ],
+   "b": [
+    48.260000000000005,
+    72.08,
+    -0.68
+   ],
+   "r": [
+    3.6,
+    3.0
+   ],
+   "material": "lacquer",
+   "bone": "forearm.R",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      55,
+      58
+     ],
+     "material": "rope",
+     "t": 0
+    }
+   ]
+  },
+  {
+   "name": "hand.R",
+   "kind": "ellipsoid",
+   "centre": [
+    47.8,
+    75.0,
+    0.2
+   ],
+   "radii": [
+    2.7,
+    3.4,
+    2.3
+   ],
+   "material": "shadowskin",
+   "bone": "hand.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "finger0.R",
+   "kind": "capsule",
+   "a": [
+    46.199999999999996,
+    77.5,
+    0.6
+   ],
+   "b": [
+    45.879999999999995,
+    82.5,
+    1.4
+   ],
+   "r": [
+    0.75,
+    0.5
+   ],
+   "material": "shadowskin",
+   "bone": "hand.R",
+   "t": -1
+  },
+  {
+   "name": "finger1.R",
+   "kind": "capsule",
+   "a": [
+    47.8,
+    77.5,
+    1.2
+   ],
+   "b": [
+    47.8,
+    82.5,
+    2.0
+   ],
+   "r": [
+    0.75,
+    0.5
+   ],
+   "material": "shadowskin",
+   "bone": "hand.R",
+   "t": 0
+  },
+  {
+   "name": "finger2.R",
+   "kind": "capsule",
+   "a": [
+    49.4,
+    77.5,
+    0.4
+   ],
+   "b": [
+    49.72,
+    82.5,
+    1.2000000000000002
+   ],
+   "r": [
+    0.75,
+    0.5
+   ],
+   "material": "shadowskin",
+   "bone": "hand.R",
+   "t": -1
+  },
+  {
+   "name": "thigh.R",
+   "kind": "capsule",
+   "a": [
+    62.96,
+    70.76,
+    0.09
+   ],
+   "b": [
+    62.96,
+    97.92,
+    -0.1
+   ],
+   "r": [
+    4.4,
+    3.5
+   ],
+   "material": "rag",
+   "bone": "thigh.R"
+  },
+  {
+   "name": "shin.R",
+   "kind": "capsule",
+   "a": [
+    62.96,
+    97.92,
+    -0.09
+   ],
+   "b": [
+    62.96,
+    126.97,
+    -2.43
+   ],
+   "r": [
+    3.5,
+    2.9
+   ],
+   "material": "violet",
+   "bone": "shin.R",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "material": "wrap",
+     "t": -2
+    },
+    {
+     "y": [
+      96,
+      101
+     ],
+     "material": "rope"
+    }
+   ]
+  },
+  {
+   "name": "foot.R",
+   "kind": "ellipsoid",
+   "centre": [
+    62.96,
+    130.6,
+    3.0
+   ],
+   "radii": [
+    3.9,
+    3.3,
+    7.2
+   ],
+   "material": "violet",
+   "bone": "foot.R",
+   "rules": [
+    {
+     "every_z": [
+      3,
+      0
+     ],
+     "material": "wrap",
+     "t": -2
+    },
+    {
+     "y": [
+      132.4,
+      null
+     ],
+     "material": "leather5",
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "belt",
+   "kind": "ring",
+   "y": [
+    68,
+    74
+   ],
+   "rx": 12.6,
+   "rz": 9.6,
+   "material": "rope",
+   "bone": "hips",
+   "rules": [
+    {
+     "every_angle": [
+      14,
+      0
+     ],
+     "t": 1
+    },
+    {
+     "y": [
+      70.5,
+      71.5
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "belt_knot",
+   "kind": "ellipsoid",
+   "centre": [
+    71.0,
+    71.5,
+    9.8
+   ],
+   "radii": [
+    3.2,
+    2.6,
+    2.2
+   ],
+   "material": "rope",
+   "bone": "hips",
+   "rules": [
+    {
+     "dz": [
+      1.5,
+      null
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "gourd_big",
+   "kind": "ellipsoid",
+   "centre": [
+    76.0,
+    83,
+    9.6
+   ],
+   "radii": [
+    4.6,
+    5.6,
+    4.4
+   ],
+   "material": "gourd",
+   "part": "gourds",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -3.8
+     ],
+     "material": "rope",
+     "t": -1
+    },
+    {
+     "hash": [
+      0.14,
+      3
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      -1,
+      1
+     ],
+     "z": [
+      12.5,
+      null
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "gourd_small",
+   "kind": "ellipsoid",
+   "centre": [
+    64.0,
+    81,
+    9.0
+   ],
+   "radii": [
+    3.6,
+    4.6,
+    3.6
+   ],
+   "material": "gourd",
+   "part": "gourds",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -3.1
+     ],
+     "material": "rope",
+     "t": -1
+    },
+    {
+     "hash": [
+      0.14,
+      6
+     ],
+     "t": -3
+    }
+   ]
+  },
+  {
+   "name": "gourd_cord1",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    73,
+    9.4
+   ],
+   "b": [
+    76.0,
+    78,
+    9.6
+   ],
+   "r": 0.6,
+   "material": "rope",
+   "part": "gourds"
+  },
+  {
+   "name": "gourd_cord2",
+   "kind": "capsule",
+   "a": [
+    65.0,
+    73,
+    9.0
+   ],
+   "b": [
+    64.0,
+    77,
+    9.0
+   ],
+   "r": 0.6,
+   "material": "rope",
+   "part": "gourds"
+  },
+  {
+   "name": "cord_long1",
+   "kind": "capsule",
+   "a": [
+    60.0,
+    73,
+    8.5
+   ],
+   "b": [
+    58.0,
+    92,
+    9.5
+   ],
+   "r": [
+    0.7,
+    0.5
+   ],
+   "material": "rope",
+   "part": "cords"
+  },
+  {
+   "name": "cord_long2",
+   "kind": "capsule",
+   "a": [
+    80.0,
+    73,
+    7.5
+   ],
+   "b": [
+    82.0,
+    95,
+    8.5
+   ],
+   "r": [
+    0.7,
+    0.5
+   ],
+   "material": "rope",
+   "part": "cords"
+  },
+  {
+   "name": "tasset.L",
+   "kind": "box",
+   "centre": [
+    78.5,
+    81,
+    7.8
+   ],
+   "half": [
+    4.2,
+    7.0,
+    1.0
+   ],
+   "round": 0.8,
+   "material": "lacquer",
+   "part": "tassets",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      null,
+      -5.8
+     ],
+     "t": 1
+    },
+    {
+     "hash": [
+      0.05,
+      8
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "tasset.R",
+   "kind": "box",
+   "centre": [
+    59.5,
+    81,
+    7.8
+   ],
+   "half": [
+    4.2,
+    7.0,
+    1.0
+   ],
+   "round": 0.8,
+   "material": "lacquer",
+   "part": "tassets",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      null,
+      -5.8
+     ],
+     "t": 1
+    },
+    {
+     "hash": [
+      0.05,
+      8
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "skirt",
+   "kind": "ring",
+   "y": [
+    74,
+    124
+   ],
+   "rx": [
+    12.4,
+    0.2
+   ],
+   "rz": [
+    9.6,
+    0.15
+   ],
+   "thickness": 2.2,
+   "hem": {
+    "tongues": 14,
+    "depth": 9,
+    "seed": 8
+   },
+   "open": {
+    "angle": 0.32,
+    "below": 100
+   },
+   "holes": {
+    "p": 0.08,
+    "band": 24,
+    "seed": 5
+   },
+   "material": "rag",
+   "part": "skirt",
+   "bump": {
+    "folds": [
+     0.5,
+     8,
+     3.1
+    ]
+   },
+   "rules": [
+    {
+     "hash": [
+      0.08,
+      5
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2.5
+     ],
+     "t": -1
+    },
+    {
+     "every_y": [
+      9,
+      4
+     ],
+     "hash": [
+      0.5,
+      11
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "underskirt",
+   "kind": "ring",
+   "y": [
+    76,
+    117
+   ],
+   "rx": [
+    10.4,
+    0.14
+   ],
+   "rz": [
+    8.0,
+    0.1
+   ],
+   "hem": {
+    "tongues": 10,
+    "depth": 6,
+    "seed": 9
+   },
+   "material": "rag",
+   "t": -1,
+   "part": "underskirt",
+   "bump": {
+    "folds": [
+     0.3,
+     10,
+     0.5
+    ]
+   },
+   "rules": [
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    }
+   ]
+  }
+ ],
+ "effects": [
+  {
+   "name": "gourd_motes",
+   "kind": "motes",
+   "material": "miasma",
+   "bone": "hips",
+   "at": [
+    76.0,
+    77,
+    10
+   ],
+   "spread": 2.5,
+   "rate": 0.25,
+   "vy": [
+    -0.4,
+    -0.9
+   ],
+   "life": [
+    8,
+    14
+   ],
+   "seed": 11,
+   "every": 2
+  }
+ ],
+ "lights": [
+  {
+   "name": "eyes",
+   "bone": "head",
+   "at": [
+    69.0,
+    23.5,
+    7.5
+   ],
+   "radius": 11,
+   "strength": 0.85,
+   "pulse": 0.25,
+   "colour": "#b57ae0"
+  }
+ ],
+ "shadow": {
+  "radii": [
+   22,
+   4.2
+  ],
+  "colour": "#4b4a4f"
+ }
+}

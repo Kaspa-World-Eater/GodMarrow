@@ -217,6 +217,86 @@ def build_server():
         return recolor_file(image, out, mapping=m, hue=hue, lightness=lightness, chroma=chroma)
 
     @mcp.tool()
+    def render_shape_sprite(file: str, out_dir: str, style: str = "gothic_hd", clips: str = "", directions: str = "", elevation: float = -1.0,
+                            passes: bool = False, gif: bool = False) -> dict:
+        """Render a .shapes.json (a character or object drawn by code) with the motion clips: every clip in every direction as real
+        frames into out_dir/<clip>_<DIR>/frame_NNN.png (+ animations.json, manifest.json: what export / export_game read).
+        style: a look preset (figure height, ramp length, outline). clips/directions: comma lists (defaults: the game's seven clips, all 8).
+        elevation: camera degrees above level (-1 = the file's). gif: also a GIF per clip and direction."""
+        from . import shape_rig, shape_tools, shapes as S
+        from .spritesheet import save_gif
+        doc = S.load_shapes(file)
+        problems = S.validate(doc)
+        if problems:
+            return {"ok": False, "problems": problems}
+        cl = [c.strip() for c in clips.split(",") if c.strip()] or list(shape_rig.GAME_CLIPS)
+        di = [d.strip().upper() for d in directions.split(",") if d.strip()] or list(shape_rig.DIRECTIONS)
+        r = shape_tools.render_set(doc, out_dir, clips=cl, directions=di, style=style or None, elevation=None if elevation < 0 else elevation, passes=passes)
+        if gif:
+            from PIL import Image
+            for c in cl:
+                for d in di:
+                    files = sorted((Path(out_dir) / f"{c}_{d}").glob("frame_*.png"))
+                    save_gif([Image.open(f).convert("RGBA") for f in files], Path(out_dir) / f"{c}_{d}.gif", fps=r["fps"][c], zoom=3, background=(94, 93, 98, 255))
+        return r
+
+    @mcp.tool()
+    def preview_shape_sprite(file: str, out: str, clip: str = "idle", direction: str = "S", style: str = "gothic_hd", elevation: float = -1.0) -> dict:
+        """A looping GIF of one clip in one direction from a .shapes.json, to judge the look and the motion."""
+        from . import shape_tools, shapes as S
+        return shape_tools.gif_of(S.load_shapes(file), clip, direction.upper(), out, style=style or None, elevation=None if elevation < 0 else elevation)
+
+    @mcp.tool()
+    def shape_sheet(file: str, out: str, clips: str = "idle,walk", directions: str = "", style: str = "gothic_hd", columns: int = 8) -> dict:
+        """A contact sheet PNG of a .shapes.json: a row per clip and direction, `columns` frames each."""
+        from . import shape_rig, shape_tools, shapes as S
+        doc = S.load_shapes(file)
+        opt = shape_tools.options_for(doc, style or None)
+        model = S.Model(doc, opt["scale"], opt["steps"]) if S.mode_of(doc) == "solid" else None
+        tracks = shape_rig.load_joints()
+        rows = []
+        for c in [x.strip() for x in clips.split(",") if x.strip()]:
+            for d in [x.strip().upper() for x in directions.split(",") if x.strip()] or list(shape_rig.DIRECTIONS):
+                res = shape_rig.render_clip(doc, c, d, tracks=tracks, model=model, scale=opt["scale"], steps=opt["steps"], outline=opt["outline"], elevation=opt["elevation"], max_frames=opt["max_frames"])
+                rows.append((f"{c} {d}", res["frames"][::max(1, len(res["frames"]) // columns)][:columns]))
+        return shape_tools.contact_sheet(rows, out, columns=columns)
+
+    @mcp.tool()
+    def validate_shapes(file: str) -> dict:
+        """Check a .shapes.json: problems in plain words, or a summary (mode, shapes, materials, bones, unbound shapes)."""
+        return api.validate_shapes(file)
+
+    @mcp.tool()
+    def shape_template(height: int = 120, out: str = "", png: str = "") -> dict:
+        """The author pose for a figure height: every bone's head and tail in file units (what to draw shapes around), optionally
+        written as JSON and as a stick-figure PNG."""
+        from . import shape_tools
+        return shape_tools.template_file(height, out or None, png or None)
+
+    @mcp.tool()
+    def draft_shapes(text: str, out: str = "", height: int = 120) -> dict:
+        """Describe it: a sentence -> a starter .shapes.json (a humanoid on the author pose; costume words become parts and materials).
+        Edit the file, then render_shape_sprite."""
+        return api.draft_shapes(text, out=out or None, height=height)
+
+    @mcp.tool()
+    def import_shapes(project: str, character: str, file: str) -> dict:
+        """Give a project character a shape sprite (.shapes.json); render_shapes then replaces the painting steps."""
+        try:
+            return api.import_shapes(_project(project), character, file)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
+    def render_shapes(project: str, character: str, style: str = "", clips: str = "", directions: str = "", elevation: float = -1.0) -> dict:
+        """Render a character's shape sprite into its frames folder (then export_game writes the game's atlas with foot anchors)."""
+        try:
+            return api.render_shapes(_project(project), character, preset=style or None, clips=clips or None, directions=directions or None,
+                                     elevation=None if elevation < 0 else elevation)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
     def compare(a: str, b: str, out: str = "compare.png") -> dict:
         """Before/after strip (+GIF for frame folders) and a mean difference number."""
         from .compare import compare as _c

@@ -11,6 +11,7 @@ the MCP tools can write the same structures directly for anything the vocabulary
 """
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
@@ -73,6 +74,8 @@ def classify(text: str) -> str:
         return "music"
     if re.search(r"\b(prompt|midjourney|paint me|sheet|turnaround|concept)\b", t):
         return "prompt"
+    if re.search(r"\b(shape sprite|shapes|draw (him|her|it|a|an|the)|as shapes|solid sprite)\b", t):
+        return "shapes"
     figure = (r"\b(character|hero|heroine|monster|creature|boss|npc|villager|warrior|knight|skeleton|undead|zombie|ghoul|wraith|mage|wizard|"
               r"witch|necromancer|priest|monk|archer|rogue|assassin|paladin|barbarian|soldier|guard|king|queen|lord|lady|hunter|golem|"
               r"demon|beast|wolf|spider|dragon|giant|ogre|troll|goblin|orc|lich|vampire|cultist|pilgrim|keeper|mystic|building|tree|"
@@ -352,9 +355,172 @@ def draft_music(text: str) -> dict:
     return {"what": "music", "cue": key, "knobs": knobs, "read": read}
 
 
+# ---------------------------------------------------------------------------------------------- shape sprites
+# costume words -> what they add to the humanoid; materials by word; colours as ramps of the library
+SHAPE_MATERIALS = {
+    "iron": "iron7", "steel": "steel", "plate": "steel", "armour": "steel", "armor": "steel", "mail": "iron7", "lacquer": "lacquer", "lacquered": "lacquer",
+    "gold": "gold6", "golden": "gold6", "brass": "gold6", "bone": "bone6", "skull": "bone6", "leather": "leather5", "hide": "leather5", "wood": "wood5",
+    "wooden": "wood5", "straw": "straw", "rope": "rope", "cord": "rope", "cords": "rope", "fur": "fur", "cloth": "cloth", "linen": "tabard", "grey": "tabard",
+    "gray": "tabard", "black": "rag", "dark": "cloth", "crimson": "crimson", "red": "crimson", "blood": "crimson", "violet": "violet", "purple": "violet",
+    "mauve": "wrap", "wrapped": "wrap", "wrappings": "wrap", "bandages": "wrap", "bandaged": "wrap", "rags": "rag", "tattered": "rag", "ragged": "rag",
+    "silver": "steel", "skin": "skin", "pale": "bone6",
+}
+SHAPE_GLOWS = {"green": "soul", "soul": "soul", "fire": "ember", "flame": "ember", "ember": "ember", "amber": "ember", "violet": "miasma", "purple": "miasma",
+               "miasma": "miasma", "blue": "frost", "frost": "frost", "ice": "frost", "white": "frost", "cold": "frost"}
+
+
+def _material_near(words: list[str], noun_pattern: str, default: str) -> str:
+    """The material word closest before a noun ("dark lacquered armour" -> lacquer)."""
+    t = " ".join(words)
+    m = re.search(r"((?:\w+\s+){0,3})\b(" + noun_pattern + r")\b", t)
+    if not m:
+        return default
+    before = m.group(1).split()
+    for w in reversed(before):
+        if w in SHAPE_MATERIALS:
+            return SHAPE_MATERIALS[w]
+    return default
+
+
+def draft_shapes(text: str, out: str | Path | None = None, height: int = 120) -> dict:
+    """A sentence -> a starter solid .shapes.json: a humanoid drawn around the author pose, with the costume words of
+    the sentence as parts (hat, hood, cape, cloak, robe, skirt, armour, pauldrons, belt, boots, staff, sword, shield,
+    gourds, cords) in the materials the words name. It is a draft to edit: move the shapes, change the ramps."""
+    from . import shape_rig
+
+    t = text.lower()
+    words = re.findall(r"[a-z']+", t)
+    read = []
+    tpl = shape_rig.template(height)
+    B = tpl["bones"]
+    cx = tpl["axis"][0]
+    W = tpl["size"][0]
+    head_y = B["head"]["head"][1]; top_y = B["head"]["tail"][1]
+    hips_y = B["hips"]["head"][1]; ground = tpl["ground"]
+    shapes: list[dict] = []
+    parts: dict = {}
+
+    def add(**kw):
+        shapes.append(kw)
+
+    body_mat = _material_near(words, "robe|robes|coat|tunic|dress|gown|shirt|jerkin|cloth|body", "cloth")
+    armour_mat = _material_near(words, "armou?r|plate|mail|cuirass|breastplate", "steel")
+    has_armour = bool(re.search(r"\b(armou?r|plate|mail|cuirass|breastplate)\b", t))
+    legs_mat = _material_near(words, "legs|trousers|breeches|leggings|greaves", body_mat)
+    boots_mat = _material_near(words, "boots|shoes|feet|sandals", "leather5" if not re.search(r"\bwrapped feet\b", t) else "wrap")
+    skin_mat = "shadowskin" if re.search(r"\b(dark skin|shadow|undead|wraith|ghoul)\b", t) else "skin"
+    # head
+    hood = bool(re.search(r"\b(hood|hooded|cowl|veil|wrappings|wrapped head|bandaged)\b", t))
+    head_mat = _material_near(words, "hood|cowl|veil|wrappings|bandages|head|face|helm|helmet", "wrap" if hood else skin_mat)
+    helm = bool(re.search(r"\b(helm|helmet)\b", t))
+    add(name="head", kind="ellipsoid", centre=[cx, (head_y + top_y) / 2 + 1, 0.3], radii=[6.0, (head_y - top_y) / 2 + 1, 6.6], material=head_mat if (hood or helm) else skin_mat,
+        bone="head", rules=([{"every_y": [3, 0], "t": -1}] if hood else []))
+    read.append(("a hooded " if hood else "a helmed " if helm else "a bare ") + "head")
+    glow = next((SHAPE_GLOWS[w] for w in words if w in SHAPE_GLOWS and re.search(r"\b(eyes?|glow|glowing|burning)\b", t)), None)
+    if glow or re.search(r"\b(glowing eyes|burning eyes|eyes glow)\b", t):
+        glow = glow or "soul"
+        ey = (head_y + top_y) / 2 + 1
+        shapes[-1].setdefault("rules", []).append({"z": [4.5, None], "near": [[[cx - 2.5, ey, None], [cx + 2.5, ey, None]], 0.9], "material": glow, "emit": "pulse"})
+        read.append(f"glowing eyes ({glow})")
+    add(name="neck", kind="capsule", a=[cx, B["neck"]["head"][1], 0], b=[cx, head_y, 0], r=[2.8, 2.6], material=head_mat if hood else skin_mat, bone="neck")
+    if re.search(r"\b(hat|straw hat|wide hat|brim)\b", t):
+        hat_mat = _material_near(words, "hat|brim", "straw")
+        add(name="hat", kind="ring", y=[top_y - 13, top_y + 7], rx=[1.0, 1.2], rz=[1.0, 1.15], thickness=1.8, hem={"tongues": 48, "depth": 0.7, "seed": 2},
+            material=hat_mat, part="hat", rotate={"x": 16, "about": [cx, top_y + 2, 0]}, rules=[{"every_angle": [44, 0], "t": -1}])
+        parts["hat"] = {"bone": "head", "lag": {"frames": 1, "sway": 0.35}}
+        read.append(f"a wide hat ({hat_mat})")
+    # torso
+    sp2 = B["spine.002"]["head"][1]; sp3 = B["spine.003"]["head"][1]
+    chest_c = (sp3 + hips_y) / 2 - 2
+    add(name="chest", kind="ellipsoid", centre=[cx, chest_c, 0], radii=[10, (hips_y - sp3) / 2 + 2, 7.2], material=armour_mat if has_armour else body_mat, bone="spine.002",
+        rules=([{"every_y": [5, 0], "t": -1}, {"x": [cx - 0.7, cx + 0.7], "z": [4, None], "t": 1}] if has_armour else [{"every_y": [4, 0], "hash": [0.3, 2], "t": -1}]))
+    read.append(("armoured " if has_armour else "") + f"torso ({armour_mat if has_armour else body_mat})")
+    if re.search(r"\b(cords?|ropes?|straps?)\b", t):
+        add(name="cord_x1", kind="capsule", a=[cx - 10, sp3 - 5, 6.2], b=[cx + 9, sp2 + 5, 6.4], r=[1.6, 1.4], material="rope", bone="spine.002", rules=[{"every_y": [2, 0], "t": -1}])
+        add(name="cord_x2", kind="capsule", a=[cx + 10, sp3 - 5, 6.2], b=[cx - 9, sp2 + 5, 6.4], r=[1.6, 1.4], material="rope", bone="spine.002", rules=[{"every_y": [2, 1], "t": -1}])
+        read.append("rope cords across the chest")
+    pauldrons = bool(re.search(r"\b(pauldrons?|shoulder plates?|shoulders?)\b", t)) or has_armour
+    for side, sx in (("L", 1), ("R", -1)):
+        ua = B[f"upper_arm.{side}"]; fa = B[f"forearm.{side}"]; ha = B[f"hand.{side}"]
+        if pauldrons:
+            add(name=f"pauldron.{side}", kind="ellipsoid", centre=[ua["head"][0] + sx * 1, ua["head"][1] + 2, -2], radii=[7.0, 4.5, 7.0], material=armour_mat,
+                bone=f"shoulder.{side}", rules=[{"every_y": [3, 0], "t": -1}])
+        add(name=f"upper_arm.{side}", kind="capsule", a=ua["head"], b=ua["tail"], r=[3.8, 3.3], material=body_mat, bone=f"upper_arm.{side}", rules=[{"every_y": [3, 0], "t": -1}])
+        add(name=f"forearm.{side}", kind="capsule", a=fa["head"], b=fa["tail"], r=[3.5, 2.9], material=armour_mat if has_armour else body_mat, bone=f"forearm.{side}",
+            rules=[{"every_y": [4, 0], "t": -1}])
+        add(name=f"hand.{side}", kind="ellipsoid", centre=[ha["head"][0] + sx * 0.5, ha["head"][1] + 3, ha["head"][2] + 1], radii=[2.7, 3.4, 2.3], material=skin_mat, bone=f"hand.{side}")
+        th = B[f"thigh.{side}"]; sh = B[f"shin.{side}"]; ft = B[f"foot.{side}"]
+        add(name=f"thigh.{side}", kind="capsule", a=th["head"], b=th["tail"], r=[4.4, 3.5], material=legs_mat, bone=f"thigh.{side}")
+        add(name=f"shin.{side}", kind="capsule", a=sh["head"], b=sh["tail"], r=[3.5, 2.9], material=legs_mat, bone=f"shin.{side}", rules=[{"every_y": [3, 0], "t": -1}])
+        add(name=f"foot.{side}", kind="ellipsoid", centre=[ft["head"][0], ground - 3.4, 3.0], radii=[3.9, 3.3, 7.2], material=boots_mat, bone=f"foot.{side}",
+            rules=[{"y": [ground - 1.6, None], "material": "leather5", "t": -2}])
+    if pauldrons:
+        read.append(f"pauldrons ({armour_mat})")
+    read.append(f"arms and legs ({body_mat}, {legs_mat}), {boots_mat} feet")
+    # belt and hangings
+    belt_mat = _material_near(words, "belt|sash|girdle", "leather5")
+    add(name="belt", kind="ring", y=[hips_y - 3.5, hips_y + 2.5], rx=12.6, rz=9.6, material=belt_mat, bone="hips", rules=[{"every_angle": [14, 0], "t": 1}])
+    read.append(f"a belt ({belt_mat})")
+    if re.search(r"\b(gourds?|flasks?|vials?|bottles?|pouch|pouches)\b", t):
+        add(name="gourd_big", kind="ellipsoid", centre=[cx + 7, hips_y + 11, 9.6], radii=[4.6, 5.6, 4.4], material="gourd", part="gourds", rules=[{"dy": [None, -3.8], "material": "rope", "t": -1}, {"hash": [0.14, 3], "t": -3}])
+        add(name="gourd_small", kind="ellipsoid", centre=[cx - 5, hips_y + 9, 9.0], radii=[3.6, 4.6, 3.6], material="gourd", part="gourds", rules=[{"dy": [None, -3.1], "material": "rope", "t": -1}])
+        parts["gourds"] = {"bone": "hips", "lag": {"frames": 1, "sway": 0.7}}
+        read.append("charm gourds at the belt")
+    # long garments
+    if re.search(r"\b(skirts?|robes?|gown|dress|kilt|tabard)\b", t):
+        sk_mat = _material_near(words, "skirts?|robes?|gown|dress|kilt|tabard", body_mat)
+        add(name="skirt", kind="ring", y=[hips_y + 2, ground - 10], rx=[12.4, 0.2], rz=[9.6, 0.15], thickness=2.2, hem={"tongues": 14, "depth": 9 if "tattered" in t else 3, "seed": 8},
+            open={"angle": 0.32, "below": hips_y + 28}, material=sk_mat, part="skirt", bump={"folds": [0.5, 8, 3.1]}, rules=[{"hem_band": [0, 2.5], "t": -1}],
+            **({"holes": {"p": 0.08, "band": 24, "seed": 5}} if re.search(r"\b(tattered|torn|ragged)\b", t) else {}))
+        parts["skirt"] = {"bone": "hips", "lag": {"frames": 2, "sway": 0.8}}
+        read.append(f"a long {sk_mat} skirt" + (" (tattered)" if "tattered" in t else ""))
+    if re.search(r"\b(cape|cloak|mantle)\b", t):
+        cp_mat = _material_near(words, "cape|cloak|mantle", "cape6")
+        add(name="cape", kind="ring", y=[sp3 - 2, ground - 12], rx=[12, 0.17], rz=[9.8, 0.12], thickness=1.6, hem={"tongues": 18, "depth": 6, "seed": 5}, keep={"back": 1.75},
+            material=cp_mat, part="cape", bump={"folds": [0.4, 7, 0.3]}, **({"holes": {"p": 0.07, "band": 16}} if re.search(r"\b(tattered|torn|ragged)\b", t) else {}))
+        parts["cape"] = {"bone": "spine.003", "lag": {"frames": 3, "sway": 1.0}}
+        read.append(f"a cape ({cp_mat})")
+    if re.search(r"\b(veil|wrappings|shawl)\b", t):
+        add(name="veil", kind="ring", y=[head_y + 3, hips_y + 14], rx=[8.0, 0.14], rz=[7.6, 0.08], thickness=1.6, hem={"tongues": 9, "depth": 14, "seed": 6}, keep={"back": 1.95},
+            holes={"p": 0.1, "band": 26, "seed": 3}, material="wrap", t=-1, part="veil", bump={"folds": [0.5, 6, 1.0]})
+        parts["veil"] = {"bone": "spine.003", "lag": {"frames": 3, "sway": 1.0}}
+        read.append("a long veil down the back")
+    # the hands' things
+    hl = B["hand.L"]["head"]; hr = B["hand.R"]["head"]
+    if re.search(r"\b(staff|stave|rod)\b", t):
+        add(name="staff", kind="capsule", a=[hl[0] + 1.5, ground - 2, hl[2] + 4], b=[hl[0] + 1.5, top_y - 8, hl[2] + 4], r=1.6, material="wood5", bone="hand.L", rules=[{"every_y": [7, 0], "t": -1}])
+        add(name="staff_fist", kind="ellipsoid", centre=[hl[0] + 1, hl[1] + 3, hl[2] + 4], radii=[3.4, 3.8, 3.4], material=skin_mat, bone="hand.L")
+        read.append("a staff in the left hand")
+    if re.search(r"\b(sword|blade|sabre|saber)\b", t):
+        add(name="sword", kind="box", centre=[hr[0] - 1, hr[1] + 16, hr[2] + 3], half=[1.1, 20, 0.5], material="steel", bone="hand.R", rules=[{"dy": [-20, -17], "material": "gold6"}])
+        read.append("a sword in the right hand")
+    if re.search(r"\b(shield|buckler)\b", t):
+        add(name="shield", kind="ellipsoid", centre=[hl[0] + 2, hl[1] - 6, hl[2] + 3], radii=[7, 9, 1.4], material="steel", bone="forearm.L", rules=[{"every_y": [6, 0], "t": -1}])
+        read.append("a shield on the left arm")
+    lights = []
+    if glow:
+        ey = (head_y + top_y) / 2 + 1
+        lights.append({"name": "eyes", "bone": "head", "at": [cx, ey, 7.5], "radius": 11, "strength": 0.85, "pulse": 0.25,
+                       "colour": {"soul": "#7dff78", "ember": "#f0a040", "miasma": "#b57ae0", "frost": "#8fd0ec"}[glow]})
+    name = re.sub(r"[^a-z0-9]+", "_", re.sub(r"^(a |an |the )", "", t.split(",")[0].strip())).strip("_")[:32] or "figure"
+    doc = {
+        "name": name, "about": f"Drafted from: {text.strip()}", "mode": "solid", "size": tpl["size"], "height": height, "ground": ground, "axis": [cx, 0],
+        "view": {"elevation": 12}, "outline": "#0a080c", "skeleton": {"height": height, "ground": ground, "cx": cx}, "materials": {}, "parts": parts,
+        "shapes": shapes, "effects": [], "lights": lights, "shadow": {"radii": [22, 4.2], "colour": "#4b4a4f"},
+    }
+    result = {"what": "shapes", "doc": doc, "read": read, "shapes": len(shapes)}
+    if out:
+        Path(out).parent.mkdir(parents=True, exist_ok=True)
+        Path(out).write_text(json.dumps(doc, indent=1))
+        result["file"] = str(out)
+    return result
+
+
 def draft(text: str, image: str | Path | None = None, what: str | None = None) -> dict:
-    """The dispatcher: ``what`` forces spell | skin | prompt | music; otherwise the words decide."""
+    """The dispatcher: ``what`` forces spell | skin | prompt | music | shapes; otherwise the words decide."""
     what = what or classify(text)
+    if what == "shapes":
+        return draft_shapes(text)
     if what == "skin":
         return draft_skin(text, image)
     if what == "prompt":

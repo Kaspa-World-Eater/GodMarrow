@@ -1,0 +1,2487 @@
+{
+ "name": "necromancer_3d",
+ "about": "The Gravebound Necromancer as a solid shape sprite: the reference page's v13 model, 61 signed-distance shapes on a 120x136 canvas, body axis x = 57.5. Every direction is a real view of this model.",
+ "mode": "solid",
+ "size": [
+  120,
+  136
+ ],
+ "height": 122,
+ "ground": 126,
+ "axis": [
+  57.5,
+  0
+ ],
+ "view": {
+  "elevation": 0
+ },
+ "outline": "#0a080c",
+ "skeleton": {
+  "height": 122,
+  "ground": 126,
+  "cx": 57.5
+ },
+ "materials": {},
+ "shapes": [
+  {
+   "name": "shin.L",
+   "kind": "capsule",
+   "a": [
+    64.5,
+    90,
+    0
+   ],
+   "b": [
+    64.5,
+    106,
+    0
+   ],
+   "r": [
+    3.6,
+    3.4
+   ],
+   "material": "cloth",
+   "bone": "shin.L"
+  },
+  {
+   "name": "greave.L",
+   "kind": "capsule",
+   "a": [
+    64.5,
+    104,
+    0
+   ],
+   "b": [
+    64.5,
+    121,
+    0.5
+   ],
+   "r": [
+    4.1,
+    3.4
+   ],
+   "material": "iron7",
+   "bone": "shin.L",
+   "rules": [
+    {
+     "every_y": [
+      6,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "near": [
+      [
+       [
+        62.5,
+        110,
+        null
+       ],
+       [
+        66.5,
+        110,
+        null
+       ]
+      ],
+      0.6
+     ],
+     "rivet": true
+    }
+   ]
+  },
+  {
+   "name": "boot.L",
+   "kind": "ellipsoid",
+   "centre": [
+    64.5,
+    123,
+    2.5
+   ],
+   "radii": [
+    4.6,
+    3.4,
+    7
+   ],
+   "material": "iron7",
+   "bone": "foot.L",
+   "rules": [
+    {
+     "z": [
+      4,
+      null
+     ],
+     "every_z": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      125.2,
+      null
+     ],
+     "material": "leather5",
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "knee.L",
+   "kind": "ellipsoid",
+   "centre": [
+    64.5,
+    106,
+    2.6
+   ],
+   "radii": [
+    3.4,
+    2.6,
+    2.6
+   ],
+   "material": "iron7",
+   "spec_t": 0.8,
+   "bone": "shin.L"
+  },
+  {
+   "name": "shin.R",
+   "kind": "capsule",
+   "a": [
+    50.5,
+    90,
+    0
+   ],
+   "b": [
+    50.5,
+    106,
+    0
+   ],
+   "r": [
+    3.6,
+    3.4
+   ],
+   "material": "cloth",
+   "bone": "shin.R"
+  },
+  {
+   "name": "greave.R",
+   "kind": "capsule",
+   "a": [
+    50.5,
+    104,
+    0
+   ],
+   "b": [
+    50.5,
+    121,
+    0.5
+   ],
+   "r": [
+    4.1,
+    3.4
+   ],
+   "material": "iron7",
+   "bone": "shin.R",
+   "rules": [
+    {
+     "every_y": [
+      6,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "near": [
+      [
+       [
+        48.5,
+        110,
+        null
+       ],
+       [
+        52.5,
+        110,
+        null
+       ]
+      ],
+      0.6
+     ],
+     "rivet": true
+    }
+   ]
+  },
+  {
+   "name": "boot.R",
+   "kind": "ellipsoid",
+   "centre": [
+    50.5,
+    123,
+    2.5
+   ],
+   "radii": [
+    4.6,
+    3.4,
+    7
+   ],
+   "material": "iron7",
+   "bone": "foot.R",
+   "rules": [
+    {
+     "z": [
+      4,
+      null
+     ],
+     "every_z": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      125.2,
+      null
+     ],
+     "material": "leather5",
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "knee.R",
+   "kind": "ellipsoid",
+   "centre": [
+    50.5,
+    106,
+    2.6
+   ],
+   "radii": [
+    3.4,
+    2.6,
+    2.6
+   ],
+   "material": "iron7",
+   "spec_t": 0.8,
+   "bone": "shin.R"
+  },
+  {
+   "name": "tabard",
+   "kind": "ring",
+   "y": [
+    70,
+    100
+   ],
+   "rx": [
+    8,
+    0.12
+   ],
+   "rz": [
+    6.5,
+    0.08
+   ],
+   "hem": {
+    "tongues": 12,
+    "depth": 4,
+    "seed": 1
+   },
+   "material": "tabard",
+   "bump": {
+    "folds": [
+     0.45,
+     9,
+     1.7
+    ]
+   },
+   "bone": "hips",
+   "lag": {
+    "frames": 1,
+    "sway": 0.4
+   },
+   "rules": [
+    {
+     "hem_band": [
+      1.8,
+      3
+     ],
+     "every_angle": [
+      30,
+      0
+     ],
+     "material": "gold6",
+     "t": -2
+    },
+    {
+     "z": [
+      0,
+      null
+     ],
+     "bitmap": {
+      "rows": [
+       "111111",
+       "100001",
+       "101101",
+       "100001",
+       "100001",
+       "111111"
+      ],
+      "by": "x",
+      "x": 57.5,
+      "y": 81
+     },
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "coat",
+   "kind": "ring",
+   "y": [
+    46,
+    111
+   ],
+   "rx": [
+    10.5,
+    0.16
+   ],
+   "rz": [
+    8,
+    0.1
+   ],
+   "thickness": 2.2,
+   "hem": {
+    "tongues": 16,
+    "depth": 6,
+    "seed": 2
+   },
+   "open": {
+    "angle": 0.36,
+    "below": 48
+   },
+   "material": "cloth",
+   "bump": {
+    "folds": [
+     0.4,
+     8,
+     0.4
+    ]
+   },
+   "bone": "spine.001",
+   "lag": {
+    "frames": 2,
+    "sway": 0.6
+   },
+   "rules": [
+    {
+     "where_cut": 0.09,
+     "y": [
+      48,
+      null
+     ],
+     "material": "gold6"
+    },
+    {
+     "where_cut": 0.09,
+     "y": [
+      48,
+      null
+     ],
+     "every_y": [
+      4,
+      0
+     ],
+     "material": "gold6",
+     "t": 1
+    },
+    {
+     "angle": [
+      -0.8,
+      -0.52
+     ],
+     "y": [
+      75,
+      110
+     ],
+     "material": "crimson"
+    },
+    {
+     "hem_band": [
+      1.8,
+      3
+     ],
+     "every_angle": [
+      34,
+      0
+     ],
+     "material": "gold6",
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "breastplate",
+   "kind": "ellipsoid",
+   "centre": [
+    57.5,
+    58,
+    0.5
+   ],
+   "radii": [
+    9.5,
+    13,
+    7.5
+   ],
+   "material": "iron7",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "x": [
+      56.8,
+      58.2
+     ],
+     "z": [
+      3,
+      null
+     ],
+     "t": 1
+    },
+    {
+     "y": [
+      61,
+      62
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      67,
+      68
+     ],
+     "t": -1
+    },
+    {
+     "z": [
+      3,
+      null
+     ],
+     "y": [
+      51,
+      57
+     ],
+     "crack": {
+      "x": 53.8,
+      "amp": 0.8,
+      "k": 1.3,
+      "w": 0.7
+     },
+     "material": "soul",
+     "emit": "flicker"
+    },
+    {
+     "z": [
+      3,
+      null
+     ],
+     "y": [
+      50,
+      55
+     ],
+     "crack": {
+      "x": 61,
+      "amp": 0.7,
+      "k": 1.7,
+      "w": 0.7
+     },
+     "material": "soul",
+     "emit": "flicker"
+    },
+    {
+     "z": [
+      3,
+      null
+     ],
+     "y": [
+      62,
+      66
+     ],
+     "crack": {
+      "x": 58,
+      "amp": 0.6,
+      "k": 2.1,
+      "w": 0.6
+     },
+     "material": "soul",
+     "emit": "flicker"
+    },
+    {
+     "near": [
+      [
+       [
+        50.5,
+        51,
+        null
+       ],
+       [
+        64.5,
+        51,
+        null
+       ],
+       [
+        49.5,
+        60,
+        null
+       ],
+       [
+        65.5,
+        60,
+        null
+       ]
+      ],
+      0.7
+     ],
+     "rivet": true
+    }
+   ]
+  },
+  {
+   "name": "belt",
+   "kind": "ring",
+   "y": [
+    69.9,
+    75.1
+   ],
+   "rx": 15.44,
+   "rz": 11.35,
+   "material": "leather5",
+   "bone": "hips",
+   "rules": [
+    {
+     "y": [
+      72,
+      73
+     ],
+     "every_angle": [
+      9,
+      0
+     ],
+     "material": "gold6",
+     "t": 1
+    },
+    {
+     "front": 0.2,
+     "z": [
+      0,
+      null
+     ],
+     "material": "gold6"
+    },
+    {
+     "front": 0.2,
+     "z": [
+      0,
+      null
+     ],
+     "near": [
+      [
+       [
+        56.3,
+        72,
+        null
+       ],
+       [
+        58.7,
+        72,
+        null
+       ]
+      ],
+      0.6
+     ],
+     "material": "gold6",
+     "t": -3
+    }
+   ]
+  },
+  {
+   "name": "grimoire",
+   "kind": "box",
+   "centre": [
+    77.5,
+    89.5,
+    0
+   ],
+   "half": [
+    1.6,
+    5.5,
+    4
+   ],
+   "material": "leather5",
+   "bone": "hips",
+   "lag": {
+    "frames": 1,
+    "sway": 0.3
+   },
+   "rules": [
+    {
+     "dy": [
+      4.5,
+      null
+     ],
+     "dz": [
+      3,
+      null
+     ],
+     "material": "gold6",
+     "t": 1
+    },
+    {
+     "dy": [
+      4.5,
+      null
+     ],
+     "dz": [
+      null,
+      -3
+     ],
+     "material": "gold6",
+     "t": 1
+    },
+    {
+     "dy": [
+      null,
+      -4.5
+     ],
+     "dz": [
+      3,
+      null
+     ],
+     "material": "gold6",
+     "t": 1
+    },
+    {
+     "dy": [
+      null,
+      -4.5
+     ],
+     "dz": [
+      null,
+      -3
+     ],
+     "material": "gold6",
+     "t": 1
+    },
+    {
+     "z": [
+      3.6,
+      null
+     ],
+     "material": "bone6"
+    },
+    {
+     "z": [
+      3.6,
+      null
+     ],
+     "every_y": [
+      2,
+      0
+     ],
+     "material": "bone6",
+     "t": -1
+    },
+    {
+     "x": [
+      78.8,
+      null
+     ],
+     "near": [
+      [
+       [
+        null,
+        88.5,
+        0
+       ]
+      ],
+      1.8
+     ],
+     "material": "bone6"
+    },
+    {
+     "x": [
+      78.8,
+      null
+     ],
+     "near": [
+      [
+       [
+        null,
+        88.5,
+        0.9
+       ],
+       [
+        null,
+        88.5,
+        -0.9
+       ]
+      ],
+      0.6
+     ],
+     "material": "bone6",
+     "t": -3
+    }
+   ]
+  },
+  {
+   "name": "chain",
+   "kind": "capsule",
+   "a": [
+    76.5,
+    75,
+    0
+   ],
+   "b": [
+    77.5,
+    84,
+    0
+   ],
+   "r": 0.6,
+   "material": "iron7",
+   "bone": "hips",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      1
+     ],
+     "t": 1
+    },
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "charm",
+   "kind": "ellipsoid",
+   "centre": [
+    43.5,
+    82,
+    8.6
+   ],
+   "radii": [
+    2.3,
+    2.2,
+    2
+   ],
+   "material": "bone6",
+   "bone": "hips",
+   "lag": {
+    "frames": 1,
+    "sway": 0.5
+   },
+   "rules": [
+    {
+     "z": [
+      10,
+      null
+     ],
+     "near": [
+      [
+       [
+        42.6,
+        81.6,
+        null
+       ],
+       [
+        44.4,
+        81.6,
+        null
+       ]
+      ],
+      0.6
+     ],
+     "t": -3
+    }
+   ]
+  },
+  {
+   "name": "charm_cord",
+   "kind": "capsule",
+   "a": [
+    44,
+    75,
+    9.2
+   ],
+   "b": [
+    43.5,
+    80,
+    8.8
+   ],
+   "r": 0.5,
+   "material": "leather5",
+   "t": -1,
+   "bone": "hips"
+  },
+  {
+   "name": "upper_arm.R",
+   "kind": "capsule",
+   "a": [
+    42,
+    49,
+    0
+   ],
+   "b": [
+    39.5,
+    66,
+    1
+   ],
+   "r": [
+    3.6,
+    3.2
+   ],
+   "material": "cloth",
+   "bump": {
+    "folds": [
+     0.4,
+     7,
+     2
+    ]
+   },
+   "bone": "upper_arm.R"
+  },
+  {
+   "name": "arm_strap.R",
+   "kind": "capsule",
+   "a": [
+    41.5,
+    58,
+    -2.5
+   ],
+   "b": [
+    41,
+    74,
+    -3.5
+   ],
+   "r": [
+    3,
+    1.6
+   ],
+   "material": "cloth",
+   "bone": "forearm.R"
+  },
+  {
+   "name": "gauntlet.R",
+   "kind": "capsule",
+   "a": [
+    39.5,
+    65,
+    1
+   ],
+   "b": [
+    39,
+    80,
+    2
+   ],
+   "r": [
+    3.3,
+    2.8
+   ],
+   "material": "iron7",
+   "lift": 0.12,
+   "bone": "forearm.R",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "z": [
+      2.5,
+      null
+     ],
+     "y": [
+      70.4,
+      71.6
+     ],
+     "x": [
+      37.9,
+      41.1
+     ],
+     "material": "soul",
+     "emit": "flicker"
+    }
+   ]
+  },
+  {
+   "name": "fist.R",
+   "kind": "ellipsoid",
+   "centre": [
+    38.8,
+    82,
+    2.4
+   ],
+   "radii": [
+    3,
+    3,
+    3
+   ],
+   "material": "iron7",
+   "lift": 0.12,
+   "bone": "hand.R"
+  },
+  {
+   "name": "claw0",
+   "kind": "capsule",
+   "a": [
+    36.8,
+    84,
+    3
+   ],
+   "b": [
+    36.5,
+    87.5,
+    3.6
+   ],
+   "r": [
+    0.8,
+    0.4
+   ],
+   "material": "iron7",
+   "t": 1,
+   "bone": "hand.R"
+  },
+  {
+   "name": "claw1",
+   "kind": "capsule",
+   "a": [
+    38.6,
+    84,
+    4.2
+   ],
+   "b": [
+    38.300000000000004,
+    87.5,
+    4.8
+   ],
+   "r": [
+    0.8,
+    0.4
+   ],
+   "material": "iron7",
+   "t": 1,
+   "bone": "hand.R"
+  },
+  {
+   "name": "claw2",
+   "kind": "capsule",
+   "a": [
+    40.4,
+    84,
+    3.6
+   ],
+   "b": [
+    40.1,
+    87.5,
+    4.2
+   ],
+   "r": [
+    0.8,
+    0.4
+   ],
+   "material": "iron7",
+   "t": 1,
+   "bone": "hand.R"
+  },
+  {
+   "name": "claw3",
+   "kind": "capsule",
+   "a": [
+    41.2,
+    84,
+    1.4
+   ],
+   "b": [
+    40.900000000000006,
+    87.5,
+    2.0
+   ],
+   "r": [
+    0.8,
+    0.4
+   ],
+   "material": "iron7",
+   "t": 1,
+   "bone": "hand.R"
+  },
+  {
+   "name": "pauldron.R",
+   "kind": "ellipsoid",
+   "centre": [
+    43,
+    47,
+    0
+   ],
+   "radii": [
+    5.6,
+    4.2,
+    6.6
+   ],
+   "material": "iron7",
+   "bone": "shoulder.R",
+   "rules": [
+    {
+     "y": [
+      null,
+      44.4
+     ],
+     "material": "gold6",
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "upper_arm.L",
+   "kind": "capsule",
+   "a": [
+    73,
+    50,
+    0
+   ],
+   "b": [
+    77,
+    61,
+    2
+   ],
+   "r": [
+    3.6,
+    3.2
+   ],
+   "material": "cloth",
+   "bump": {
+    "folds": [
+     0.4,
+     7,
+     3
+    ]
+   },
+   "bone": "upper_arm.L"
+  },
+  {
+   "name": "gauntlet.L",
+   "kind": "capsule",
+   "a": [
+    77,
+    61,
+    2
+   ],
+   "b": [
+    83.5,
+    62,
+    4
+   ],
+   "r": [
+    3.2,
+    2.8
+   ],
+   "material": "iron7",
+   "bone": "forearm.L",
+   "rules": [
+    {
+     "every_x": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      null,
+      60.5
+     ],
+     "x": [
+      78.1,
+      80.9
+     ],
+     "material": "soul",
+     "emit": "flicker"
+    }
+   ]
+  },
+  {
+   "name": "staff",
+   "kind": "capsule",
+   "a": [
+    85.5,
+    127,
+    4.0
+   ],
+   "b": [
+    85.5,
+    14,
+    4.0
+   ],
+   "r": 1.6,
+   "material": "wood5",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "every_y": [
+      7,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      52,
+      57
+     ],
+     "material": "leather5"
+    },
+    {
+     "y": [
+      66,
+      80
+     ],
+     "material": "leather5"
+    },
+    {
+     "y": [
+      52,
+      57
+     ],
+     "every_y": [
+      3,
+      0
+     ],
+     "material": "leather5",
+     "t": -2
+    },
+    {
+     "y": [
+      66,
+      80
+     ],
+     "every_y": [
+      3,
+      0
+     ],
+     "material": "leather5",
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "staff_ring40",
+   "kind": "capsule",
+   "a": [
+    85.5,
+    40,
+    4.0
+   ],
+   "b": [
+    85.5,
+    42.4,
+    4.0
+   ],
+   "r": 2.4,
+   "material": "gold6",
+   "spec_t": 0.85,
+   "bone": "hand.L"
+  },
+  {
+   "name": "staff_ring92",
+   "kind": "capsule",
+   "a": [
+    85.5,
+    92,
+    4.0
+   ],
+   "b": [
+    85.5,
+    94.4,
+    4.0
+   ],
+   "r": 2.4,
+   "material": "gold6",
+   "spec_t": 0.85,
+   "bone": "hand.L"
+  },
+  {
+   "name": "staff_ring110",
+   "kind": "capsule",
+   "a": [
+    85.5,
+    110,
+    4.0
+   ],
+   "b": [
+    85.5,
+    112.4,
+    4.0
+   ],
+   "r": 2.4,
+   "material": "gold6",
+   "spec_t": 0.85,
+   "bone": "hand.L"
+  },
+  {
+   "name": "ribbon",
+   "kind": "box",
+   "centre": [
+    82.5,
+    27,
+    4.3
+   ],
+   "half": [
+    0.9,
+    6.5,
+    0.5
+   ],
+   "material": "crimson",
+   "bone": "hand.L",
+   "lag": {
+    "frames": 2,
+    "sway": 0.8
+   },
+   "rules": [
+    {
+     "every_y": [
+      5,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "staff_skull",
+   "kind": "ellipsoid",
+   "centre": [
+    85.5,
+    15,
+    4.0
+   ],
+   "radii": [
+    4.2,
+    3.6,
+    4
+   ],
+   "material": "bone6",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "z": [
+      6.4,
+      null
+     ],
+     "near": [
+      [
+       [
+        84.0,
+        15,
+        null
+       ],
+       [
+        87.0,
+        15,
+        null
+       ]
+      ],
+      1.1
+     ],
+     "material": "soul",
+     "emit": "pulse"
+    }
+   ]
+  },
+  {
+   "name": "staff_jaw",
+   "kind": "box",
+   "centre": [
+    85.5,
+    18.8,
+    4.6
+   ],
+   "half": [
+    2.3,
+    1.7,
+    2.6
+   ],
+   "material": "bone6",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "z": [
+      6.6,
+      null
+     ],
+     "y": [
+      18.6,
+      null
+     ],
+     "every_x": [
+      2,
+      0
+     ],
+     "t": -3
+    }
+   ]
+  },
+  {
+   "name": "cage0",
+   "kind": "union",
+   "material": "gold6",
+   "t": 1,
+   "bone": "hand.L",
+   "of": [
+    {
+     "kind": "capsule",
+     "a": [
+      81.9,
+      12,
+      4.0
+     ],
+     "b": [
+      81.2,
+      8,
+      4.0
+     ],
+     "r": 0.6
+    },
+    {
+     "kind": "capsule",
+     "a": [
+      81.2,
+      8,
+      4.0
+     ],
+     "b": [
+      82.1,
+      4.5,
+      4.0
+     ],
+     "r": 0.6
+    }
+   ]
+  },
+  {
+   "name": "cage1",
+   "kind": "union",
+   "material": "gold6",
+   "t": 1,
+   "bone": "hand.L",
+   "of": [
+    {
+     "kind": "capsule",
+     "a": [
+      89.1,
+      12,
+      4.0
+     ],
+     "b": [
+      89.8,
+      8,
+      4.0
+     ],
+     "r": 0.6
+    },
+    {
+     "kind": "capsule",
+     "a": [
+      89.8,
+      8,
+      4.0
+     ],
+     "b": [
+      88.9,
+      4.5,
+      4.0
+     ],
+     "r": 0.6
+    }
+   ]
+  },
+  {
+   "name": "cage2",
+   "kind": "union",
+   "material": "gold6",
+   "t": 1,
+   "bone": "hand.L",
+   "of": [
+    {
+     "kind": "capsule",
+     "a": [
+      85.5,
+      12,
+      7.6
+     ],
+     "b": [
+      85.5,
+      8,
+      8.3
+     ],
+     "r": 0.6
+    },
+    {
+     "kind": "capsule",
+     "a": [
+      85.5,
+      8,
+      8.3
+     ],
+     "b": [
+      85.5,
+      4.5,
+      7.4
+     ],
+     "r": 0.6
+    }
+   ]
+  },
+  {
+   "name": "cage3",
+   "kind": "union",
+   "material": "gold6",
+   "t": 1,
+   "bone": "hand.L",
+   "of": [
+    {
+     "kind": "capsule",
+     "a": [
+      85.5,
+      12,
+      0.3999999999999999
+     ],
+     "b": [
+      85.5,
+      8,
+      -0.2999999999999998
+     ],
+     "r": 0.6
+    },
+    {
+     "kind": "capsule",
+     "a": [
+      85.5,
+      8,
+      -0.2999999999999998
+     ],
+     "b": [
+      85.5,
+      4.5,
+      0.6000000000000001
+     ],
+     "r": 0.6
+    }
+   ]
+  },
+  {
+   "name": "fist.L",
+   "kind": "ellipsoid",
+   "centre": [
+    85.5,
+    62,
+    4.0
+   ],
+   "radii": [
+    3.6,
+    4,
+    3.6
+   ],
+   "material": "iron7",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "y": [
+      59,
+      65
+     ],
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "mantle",
+   "kind": "ellipsoid",
+   "centre": [
+    57.5,
+    46,
+    0
+   ],
+   "radii": [
+    20,
+    9.5,
+    13.5
+   ],
+   "clip_y": [
+    38,
+    53
+   ],
+   "hem": {
+    "tongues": 22,
+    "depth": 4,
+    "seed": 3
+   },
+   "material": "fur",
+   "bump": {
+    "fur": true
+   },
+   "bone": "spine.003",
+   "rules": [
+    {
+     "hem_band": [
+      0,
+      1.4
+     ],
+     "t": 1
+    },
+    {
+     "angle": [
+      -1.08,
+      -0.78
+     ],
+     "material": "crimson"
+    },
+    {
+     "angle": [
+      -2.55,
+      -2.22
+     ],
+     "material": "crimson"
+    },
+    {
+     "angle": [
+      -1.08,
+      -0.78
+     ],
+     "every_y": [
+      6,
+      0
+     ],
+     "material": "crimson",
+     "t": -1
+    },
+    {
+     "angle": [
+      -2.55,
+      -2.22
+     ],
+     "every_y": [
+      6,
+      0
+     ],
+     "material": "crimson",
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "cowl",
+   "kind": "ellipsoid",
+   "centre": [
+    57.5,
+    40.5,
+    0.5
+   ],
+   "radii": [
+    10.2,
+    3.8,
+    9.4
+   ],
+   "material": "crimson",
+   "bump": {
+    "folds": [
+     0.4,
+     8,
+     1.1
+    ]
+   },
+   "bone": "spine.003"
+  },
+  {
+   "name": "scarf_front",
+   "kind": "capsule",
+   "a": [
+    45.5,
+    52,
+    9
+   ],
+   "b": [
+    45,
+    63,
+    8.8
+   ],
+   "r": [
+    2.2,
+    1.6
+   ],
+   "material": "crimson",
+   "bone": "spine.003",
+   "lag": {
+    "frames": 2,
+    "sway": 0.8
+   }
+  },
+  {
+   "name": "scarf_back",
+   "kind": "capsule",
+   "a": [
+    47.5,
+    52,
+    -10.6
+   ],
+   "b": [
+    48.5,
+    64,
+    -12.6
+   ],
+   "r": [
+    2.2,
+    1.6
+   ],
+   "material": "crimson",
+   "bone": "spine.003",
+   "lag": {
+    "frames": 2,
+    "sway": 0.8
+   }
+  },
+  {
+   "name": "cape",
+   "kind": "ring",
+   "y": [
+    44,
+    117
+   ],
+   "rx": [
+    12,
+    0.17
+   ],
+   "rz": [
+    9.8,
+    0.12
+   ],
+   "thickness": 1.6,
+   "hem": {
+    "tongues": 18,
+    "depth": 6,
+    "seed": 5
+   },
+   "keep": {
+    "back": 1.75
+   },
+   "holes": {
+    "p": 0.07,
+    "band": 16
+   },
+   "material": "cloth",
+   "t": -1,
+   "bump": {
+    "folds": [
+     0.4,
+     7,
+     0.3
+    ]
+   },
+   "bone": "spine.003",
+   "lag": {
+    "frames": 3,
+    "sway": 1.0
+   },
+   "rules": [
+    {
+     "angle": [
+      -1.08,
+      -0.78
+     ],
+     "y": [
+      null,
+      66
+     ],
+     "material": "crimson"
+    },
+    {
+     "angle": [
+      -2.55,
+      -2.22
+     ],
+     "y": [
+      null,
+      66
+     ],
+     "material": "crimson"
+    },
+    {
+     "back": 0.22,
+     "y": [
+      64,
+      73
+     ],
+     "bitmap": {
+      "rows": [
+       "0111110",
+       "1000001",
+       "1010101",
+       "1000001",
+       "0111110",
+       "0101010",
+       "0011100"
+      ],
+      "by": "angle",
+      "spread": 14,
+      "y": 64
+     },
+     "material": "gold6",
+     "t": -1
+    },
+    {
+     "hem_band": [
+      1.8,
+      3
+     ],
+     "every_angle": [
+      30,
+      0
+     ],
+     "material": "gold6",
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "lame0",
+   "kind": "ellipsoid",
+   "centre": [
+    74.5,
+    56,
+    0
+   ],
+   "radii": [
+    6,
+    3,
+    7
+   ],
+   "material": "iron7",
+   "bone": "shoulder.L",
+   "rules": [
+    {
+     "hash": [
+      0.07,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      1.6500000000000001,
+      null
+     ],
+     "x": [
+      74.5,
+      null
+     ],
+     "near": [
+      [
+       [
+        78.0,
+        58.1,
+        2.5
+       ],
+       [
+        79.5,
+        58.1,
+        -3
+       ]
+      ],
+      0.6
+     ],
+     "rivet": true
+    },
+    {
+     "dy": [
+      1.2000000000000002,
+      null
+     ],
+     "x": [
+      75.5,
+      null
+     ],
+     "crack": {
+      "x": 79.0,
+      "amp": 0.6,
+      "k": 1.9,
+      "w": 0.5
+     },
+     "material": "soul",
+     "emit": "flicker"
+    }
+   ]
+  },
+  {
+   "name": "lame1",
+   "kind": "ellipsoid",
+   "centre": [
+    73.5,
+    52,
+    0
+   ],
+   "radii": [
+    6.6,
+    3.6,
+    7.6
+   ],
+   "material": "iron7",
+   "bone": "shoulder.L",
+   "rules": [
+    {
+     "hash": [
+      0.07,
+      1
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      1.9800000000000002,
+      null
+     ],
+     "x": [
+      73.5,
+      null
+     ],
+     "near": [
+      [
+       [
+        77.0,
+        54.52,
+        2.5
+       ],
+       [
+        78.5,
+        54.52,
+        -3
+       ]
+      ],
+      0.6
+     ],
+     "rivet": true
+    },
+    {
+     "dy": [
+      1.4400000000000002,
+      null
+     ],
+     "x": [
+      74.5,
+      null
+     ],
+     "crack": {
+      "x": 78.0,
+      "amp": 0.6,
+      "k": 1.9,
+      "w": 0.5
+     },
+     "material": "soul",
+     "emit": "flicker"
+    }
+   ]
+  },
+  {
+   "name": "lame2",
+   "kind": "ellipsoid",
+   "centre": [
+    72,
+    47,
+    0
+   ],
+   "radii": [
+    6.6,
+    4.6,
+    7.8
+   ],
+   "material": "iron7",
+   "bone": "shoulder.L",
+   "rules": [
+    {
+     "hash": [
+      0.07,
+      2
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      null,
+      43.8
+     ],
+     "material": "gold6",
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "pauldron_skull",
+   "kind": "ellipsoid",
+   "centre": [
+    77.8,
+    45,
+    1.2
+   ],
+   "radii": [
+    3,
+    3,
+    3.2
+   ],
+   "material": "bone6",
+   "bone": "shoulder.L",
+   "rules": [
+    {
+     "x": [
+      79.6,
+      null
+     ],
+     "near": [
+      [
+       [
+        null,
+        44.6,
+        2.5
+       ],
+       [
+        null,
+        44.6,
+        -0.1
+       ]
+      ],
+      0.8
+     ],
+     "t": -4
+    },
+    {
+     "x": [
+      79.4,
+      null
+     ],
+     "y": [
+      46.7,
+      47.7
+     ],
+     "every_z": [
+      2,
+      0
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "hood",
+   "kind": "union",
+   "material": "cloth",
+   "lift": 0.08,
+   "bone": "head",
+   "of": [
+    {
+     "kind": "ellipsoid",
+     "centre": [
+      57.5,
+      31.5,
+      -0.8
+     ],
+     "radii": [
+      8.8,
+      11.5,
+      9.8
+     ]
+    },
+    {
+     "kind": "capsule",
+     "a": [
+      57.5,
+      24,
+      -2
+     ],
+     "b": [
+      57.5,
+      15.5,
+      -5.5
+     ],
+     "r": [
+      6.2,
+      1
+     ]
+    }
+   ],
+   "rules": [
+    {
+     "z": [
+      4,
+      null
+     ],
+     "ellipse_xy": {
+      "centre": [
+       57.5,
+       32.5
+      ],
+      "radii": [
+       5.7,
+       7.6
+      ]
+     },
+     "t": 1
+    },
+    {
+     "back": 0.08,
+     "t": -1
+    },
+    {
+     "z": [
+      -3,
+      null
+     ],
+     "ellipse_xy": {
+      "centre": [
+       57.5,
+       32.5
+      ],
+      "radii": [
+       4.7,
+       6.6
+      ]
+     },
+     "flat": "#040306"
+    }
+   ]
+  },
+  {
+   "name": "face_carve",
+   "kind": "prism",
+   "centre": [
+    57.5,
+    32.5
+   ],
+   "radii": [
+    4.7,
+    6.6
+   ],
+   "z": [
+    1.2,
+    11
+   ],
+   "carve": true
+  },
+  {
+   "name": "skull_mask",
+   "kind": "ellipsoid",
+   "centre": [
+    57.5,
+    32.6,
+    3
+   ],
+   "radii": [
+    3.7,
+    5.3,
+    2.7
+   ],
+   "material": "bone6",
+   "bone": "head",
+   "rules": [
+    {
+     "z": [
+      4.2,
+      null
+     ],
+     "near": [
+      [
+       [
+        55.8,
+        30.8,
+        null
+       ],
+       [
+        59.2,
+        30.8,
+        null
+       ]
+      ],
+      1.1
+     ],
+     "t": -5
+    },
+    {
+     "z": [
+      4.6,
+      null
+     ],
+     "x": [
+      56.9,
+      58.1
+     ],
+     "y": [
+      32.6,
+      34.6
+     ],
+     "t": -3
+    },
+    {
+     "z": [
+      3.8,
+      null
+     ],
+     "y": [
+      36.1,
+      37.1
+     ],
+     "every_x": [
+      2,
+      0
+     ],
+     "t": -3
+    },
+    {
+     "y": [
+      32,
+      36
+     ],
+     "crack": {
+      "x": 59.6,
+      "amp": 0.5,
+      "k": 2,
+      "w": 0.45
+     },
+     "t": -2
+    },
+    {
+     "z": [
+      4.2,
+      null
+     ],
+     "near": [
+      [
+       [
+        55.8,
+        30.8,
+        null
+       ],
+       [
+        59.2,
+        30.8,
+        null
+       ]
+      ],
+      0.6
+     ],
+     "material": "soul",
+     "emit": "pulse"
+    }
+   ]
+  },
+  {
+   "name": "crown_band",
+   "kind": "ring",
+   "y": [
+    22.1,
+    25.1
+   ],
+   "rx": 9.4,
+   "rz": 10.2,
+   "cz": -0.5,
+   "thickness": 1.6,
+   "material": "gold6",
+   "spec_t": 0.8,
+   "bone": "head"
+  },
+  {
+   "name": "spike0",
+   "kind": "capsule",
+   "a": [
+    57.5,
+    22.4,
+    8.9
+   ],
+   "b": [
+    57.5,
+    16.4,
+    8.5
+   ],
+   "r": [
+    1.3,
+    0.3
+   ],
+   "material": "gold6",
+   "spec_t": 0.82,
+   "bone": "head"
+  },
+  {
+   "name": "spike1",
+   "kind": "capsule",
+   "a": [
+    64.224,
+    22.4,
+    5.361
+   ],
+   "b": [
+    64.224,
+    16.965,
+    4.961
+   ],
+   "r": [
+    1.3,
+    0.3
+   ],
+   "material": "gold6",
+   "spec_t": 0.82,
+   "bone": "head"
+  },
+  {
+   "name": "spike2",
+   "kind": "capsule",
+   "a": [
+    65.884,
+    22.4,
+    -2.592
+   ],
+   "b": [
+    65.884,
+    18.234,
+    -2.992
+   ],
+   "r": [
+    1.3,
+    0.3
+   ],
+   "material": "gold6",
+   "spec_t": 0.82,
+   "bone": "head"
+  },
+  {
+   "name": "spike3",
+   "kind": "capsule",
+   "a": [
+    61.231,
+    22.4,
+    -8.969
+   ],
+   "b": [
+    61.231,
+    19.251,
+    -9.369
+   ],
+   "r": [
+    1.3,
+    0.3
+   ],
+   "material": "gold6",
+   "spec_t": 0.82,
+   "bone": "head"
+  },
+  {
+   "name": "spike4",
+   "kind": "capsule",
+   "a": [
+    53.769,
+    22.4,
+    -8.969
+   ],
+   "b": [
+    53.769,
+    19.251,
+    -9.369
+   ],
+   "r": [
+    1.3,
+    0.3
+   ],
+   "material": "gold6",
+   "spec_t": 0.82,
+   "bone": "head"
+  },
+  {
+   "name": "spike5",
+   "kind": "capsule",
+   "a": [
+    49.116,
+    22.4,
+    -2.592
+   ],
+   "b": [
+    49.116,
+    18.234,
+    -2.992
+   ],
+   "r": [
+    1.3,
+    0.3
+   ],
+   "material": "gold6",
+   "spec_t": 0.82,
+   "bone": "head"
+  },
+  {
+   "name": "spike6",
+   "kind": "capsule",
+   "a": [
+    50.776,
+    22.4,
+    5.361
+   ],
+   "b": [
+    50.776,
+    16.965,
+    4.961
+   ],
+   "r": [
+    1.3,
+    0.3
+   ],
+   "material": "gold6",
+   "spec_t": 0.82,
+   "bone": "head"
+  },
+  {
+   "name": "crown_gem",
+   "kind": "ellipsoid",
+   "centre": [
+    57.5,
+    23.6,
+    9.4
+   ],
+   "radii": [
+    0.9,
+    1.1,
+    0.8
+   ],
+   "material": "soul",
+   "emit": "soft",
+   "bone": "head"
+  },
+  {
+   "name": "orb",
+   "kind": "ellipsoid",
+   "centre": [
+    38.8,
+    91.5,
+    3
+   ],
+   "radii": [
+    2.6,
+    2.6,
+    2.6
+   ],
+   "material": "soul",
+   "emit": "steady",
+   "bone": "hand.R"
+  }
+ ],
+ "effects": [
+  {
+   "name": "soul_fire",
+   "kind": "flame",
+   "material": "soul",
+   "at": [
+    85.5,
+    12,
+    4.0
+   ],
+   "height": 10,
+   "width": 4,
+   "fall": 2.3,
+   "flicker": 1.6,
+   "sway_from": 5
+  },
+  {
+   "name": "fire_motes",
+   "kind": "motes",
+   "material": "soul",
+   "at": [
+    85.5,
+    3,
+    4.0
+   ],
+   "spread": 3,
+   "rate": 0.7,
+   "vy": [
+    -0.7,
+    -1.4
+   ],
+   "life": [
+    4,
+    8
+   ],
+   "seed": 3
+  },
+  {
+   "name": "orb_motes",
+   "kind": "motes",
+   "material": "soul",
+   "at": [
+    38.8,
+    88.5,
+    3
+   ],
+   "spread": 1,
+   "rate": 0.4,
+   "vy": [
+    -0.6,
+    -1.1
+   ],
+   "life": [
+    8,
+    14
+   ],
+   "seed": 5
+  }
+ ],
+ "lights": [
+  {
+   "name": "soul_fire",
+   "at": [
+    85.5,
+    6,
+    4.0
+   ],
+   "radius": 30,
+   "strength": 1.0,
+   "pulse": 0.2,
+   "colour": "#7dff78"
+  },
+  {
+   "name": "orb",
+   "at": [
+    38.8,
+    91.5,
+    3
+   ],
+   "radius": 18,
+   "strength": 1.1,
+   "pulse": 0.25,
+   "colour": "#7dff78"
+  },
+  {
+   "name": "cracks",
+   "from": "flicker",
+   "radius": 3.2,
+   "strength": 0.7,
+   "every": 3,
+   "colour": "#7dff78"
+  }
+ ],
+ "shadow": {
+  "radii": [
+   32,
+   5
+  ],
+  "colour": "#4b4a4f"
+ }
+}
