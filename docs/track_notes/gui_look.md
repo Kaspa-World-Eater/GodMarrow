@@ -55,3 +55,11 @@ Forge is a straightforward professional tool: Home with the nine things it makes
 workbench with tabs; every workbench is picker / live preview / knobs / bottom bar (Keep, Reset, Start over,
 Undo); Advanced is a fold, not a mode; text is adult and precise (docs/track_notes/tone.md). A person clicks
 through it; an AI drives the same functions by CLI and MCP and never needs the window.
+
+## Correction (2026-10-02): not 1-bit
+
+"It doesn't have to be one bit. It can be more sophisticated than that." The reference image set the framing
+(ornate pixel border, picture window above, text below, pixel fonts), not the colour budget. Use a full
+16-bit-era palette: the game's own near-black, bone, iron and dull teal with a dull gold for warnings, dithered
+gradients where they help, shaded frames with a lit edge, coloured icons on the tiles, live previews in full
+colour. Think a polished SNES RPG menu or a late-'90s PC tool with a pixel skin, not a Game Boy.
