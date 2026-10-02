@@ -85,3 +85,9 @@ valve wheels (value = spoke angle) for angles and directions, chain pulls or tog
 steps with a lit top edge and a dark cast; each with its name and its value under it in the text typeface; dragging a
 lever makes an iron scrape, a wheel a ratchet tick; double-click resets. Smaller fine values live in the Advanced fold
 as plain pixel sliders.
+
+## Light comes from the flames (2026-10-02)
+Every light in the picture window is anchored to a real flame: the torches' pools sit at the torch flames and breathe
+with them, and the sprite's own emissives (a staff fire, an orb, glowing eyes, embers) cast their own coloured,
+flickering light onto the backdrop and the floor. In the app this comes for free from the renderer: the shape
+file marks emissive solids, and the preview reads their screen positions and colours as point lights.
