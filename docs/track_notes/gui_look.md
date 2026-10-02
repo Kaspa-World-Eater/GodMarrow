@@ -122,3 +122,14 @@ Nothing else in the chrome moves (no hover glows, no sliding panels, no pulsing 
 sprite preview are the only other motion. Moving the selector plays a short square-wave cursor blip (higher for
 right/down, lower for left/up, a two-note confirm on select), as SNES menus did; levers scrape, wheels tick. Volume
 in Settings; silent when reduced motion or mute is set.
+
+## Notes for later: Godmarrow's title screen (owner, 2026-10-02)
+- "I really liked the old title screen we had of the face and the blood pool; mixing it with this style would be
+  cool." The current Godmarrow title (ui/title.gd, shaders/title_blood.gdshader, title_breath.gdshader: the face
+  and the blood pool) should be kept and placed inside this menu framing when the game's presentation is done:
+  the face and pool as the picture window, the choices in the text box with the pixel selector and blip.
+- "I like the tarot card idea; they didn't look great in the title screen, laid weird and were hard to select, but
+  the idea was ace." Keep the cards (the Arcana: upright / reversed) as a mechanic and a motif; redo their layout:
+  a clean fanned or ruled row in the text box area, large enough to read, one card per selector step, the selected
+  card lifts one pixel with the blip, art on the cards drawn through the Forge's icon road in the game's palette.
+  Mock it up first (docs/PLAN.md: mock first).
