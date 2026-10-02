@@ -91,3 +91,13 @@ Every light in the picture window is anchored to a real flame: the torches' pool
 with them, and the sprite's own emissives (a staff fire, an orb, glowing eyes, embers) cast their own coloured,
 flickering light onto the backdrop and the floor. In the app this comes for free from the renderer: the shape
 file marks emissive solids, and the preview reads their screen positions and colours as point lights.
+
+## Scene light off; the character's own lights and colours are knobs (2026-10-02)
+- A "scene light" lever on the picture window: off renders the sprite with only its own preset light (no torch
+  tint, no fog, the plain ground), so colours are judged clean; on shows it as it would sit in the chosen place.
+  Also "sprite lights only" (its own emissives light the backdrop, nothing else).
+- On the character itself, everything that is a light or a colour is a control on the Materials tab: each material
+  ramp (base hue, lightness, contrast, steps), each emissive (colour, strength, pulse rate, radius of the light it
+  casts), the key light (direction, colour, strength), rim (colour, strength), ambient. Presets per game style;
+  "Randomise within the preset" for variants; champion / unique recolours are saved alternate ramp sets on the same
+  model. Every one is a field in the .shapes.json so the AI sets it the same way.
