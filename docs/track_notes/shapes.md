@@ -69,7 +69,7 @@ vocabulary does not cover; the guide's worked example (the necromancer, flat and
 
 ## Knobs added in the second review round (2026-10-02)
 
-- The holds, `view.turn_step` (degrees, 4) and `view.move_step` (pixels, 1): a body's drawn turn and place hold until
+- The holds, `view.turn_step` (degrees, 5) and `view.move_step` (pixels, 1.5): a body's drawn turn and place hold until
   the clip has moved them that far, then step. Two sliders on the motion page, with a "continuous" position (0) for
   comparison; the frame strip should make the difference obvious (a held pose is pixel for pixel the frame before).
 - A lagged part is a swing about its top, held like a turn; the shapes of a part are one body. The motion page can
@@ -88,7 +88,7 @@ At 120 px (gothic_hd): the Keeper (58 shapes, 52 live at 120 px) voxelises in ab
 body) and renders a frame in about 30 ms; a clip of 24 frames in a direction in about 0.8 s; the seven game clips in
 eight directions in about a minute (the death clip renders on a canvas twice as wide). At 76 px (rendered_arpg):
 about 30 s for the set. The flat necromancer renders in 15 ms a frame. At the game's own 24 frames consecutive idle
-frames differ in 4% (S) to 9% (E) of the figure's pixels, 0.2-0.4% change and change straight back, and the hat rows
+frames differ in 3% (S) to 10% (W) of the figure's pixels, 0.2-0.4% change and change straight back, and the hat rows
 are pixel for pixel the frame before; a walk frame differs in 32-37% (the legs, the arms, a 1 px bob) with 1-3% of
 the hat rows left over after a whole-pixel shift; a static model moved by a fraction of a pixel renders identically.
 Every frame of idle, walk, run, attack, cast, hit and death is one piece in all eight directions; the lowest foot

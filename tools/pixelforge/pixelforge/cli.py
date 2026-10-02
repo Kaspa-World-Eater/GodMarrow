@@ -8,6 +8,7 @@ import glob
 import sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image
 
 from . import godot
@@ -136,7 +137,6 @@ def cmd_pixelate(a) -> None:
 
 def cmd_palette(a) -> None:
     images = [Image.open(p).convert("RGBA") for p in _expand(a.inputs)]
-    import numpy as np
 
     px = np.concatenate([np.asarray(im).reshape(-1, 4) for im in images])
     px = px[px[:, 3] > 127][:, :3]
@@ -163,7 +163,6 @@ def cmd_frames(a) -> None:
 
 
 def cmd_animate(a) -> None:
-    import numpy as np
 
     if a.style:
         st = get_style(a.style)
@@ -220,7 +219,6 @@ def cmd_godot(a) -> None:
 
 
 def cmd_rotate(a) -> None:
-    import numpy as np
 
     sprite = np.asarray(Image.open(a.sprite).convert("RGBA"))
     out = Path(a.output)
@@ -602,10 +600,15 @@ def cmd_shapes(a) -> None:
 
 
 def cmd_game_preview(a) -> None:
+    from . import api
     from .game_preview import preview_in_game
 
-    _emit(a, preview_in_game(a.game, godot=a.godot, skin=a.skin, cls=a.cls, zone=a.zone, fx=a.fx.split(",") if a.fx else None, attach=a.attach,
-                             shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, log=print))
+    try:
+        _emit(a, preview_in_game(a.game, godot=a.godot, skin=a.skin, cls=a.cls, zone=a.zone, fx=a.fx.split(",") if a.fx else None, attach=a.attach,
+                                 shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, log=print))
+    except api.StepError as e:
+        _emit(a, {"ok": False, "error": str(e)})
+        raise SystemExit(2)
 
 
 def cmd_effect(a) -> None:

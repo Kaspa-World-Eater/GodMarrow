@@ -76,3 +76,20 @@ def test_cli_sequence(tmp_path, capsys):
     main(["shapes", "render", str(tmp_path / "w.shapes.json"), "-o", str(tmp_path / "fr"), "--clips", "idle", "--directions", "S,E", "--frames", "3", "--style", "rendered_arpg", "--json"])
     out = json.loads(capsys.readouterr().out)
     assert out["ok"] and out["frames"]["idle_E"] == 3 and (tmp_path / "fr" / "idle_E" / "frame_002.png").exists()
+
+
+def test_guide_render_command_as_written(tmp_path):
+    """The guide's render command, run the way the guide says to run it without an install: from tools/pixelforge
+    through ``python -m pixelforge``, with ``--gif``."""
+    import subprocess
+    import sys
+
+    from PIL import Image
+
+    here = Path(__file__).resolve().parents[1]
+    cmd = [sys.executable, "-m", "pixelforge", "shapes", "render", str(S.ASSETS / "characters" / "keeper.shapes.json"), "-o", str(tmp_path / "frames"),
+           "--style", "gothic_hd", "--clips", "idle", "--directions", "S", "--frames", "2", "--gif"]
+    proc = subprocess.run(cmd, cwd=str(here), capture_output=True, text=True, timeout=600)
+    assert proc.returncode == 0, proc.stderr[-2000:]
+    assert "NameError" not in proc.stderr and "1 clips x 1 directions" in proc.stdout
+    assert Image.open(tmp_path / "frames" / "idle_S.gif").n_frames == 2

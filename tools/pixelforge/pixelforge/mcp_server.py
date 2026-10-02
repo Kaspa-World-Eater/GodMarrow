@@ -174,8 +174,12 @@ def build_server():
     def preview_in_game(game_dir: str = "", skin: str = "", fx: str = "", attach: bool = False, shot: str = "", zone: str = "moor") -> dict:
         """Launch the Godot game with a skin / effects (a,b) / the skin's attachments on the moor; with shot=path it saves a screenshot
         after 4 s and quits (needs a display). Godot is found automatically or via PIXELFORGE_GODOT."""
+        from .api import StepError
         from .game_preview import preview_in_game as _p
-        return _p(game_dir or None, skin=skin or None, fx=fx.split(",") if fx else None, attach=attach, shot=shot or None, zone=zone)
+        try:
+            return _p(game_dir or None, skin=skin or None, fx=fx.split(",") if fx else None, attach=attach, shot=shot or None, zone=zone)
+        except StepError as e:
+            return {"ok": False, "error": str(e)}
 
     @mcp.tool()
     def make_effect_from_art(image: str, name: str, out_dir: str, kind: str = "loop", preset: str = "glow", frames: int = 8, width: int = 0, rotations: int = 0) -> dict:

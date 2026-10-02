@@ -1,6 +1,7 @@
 """Shape sprites: the renderer's parity with the necromancer page, the file format, the rig and the export."""
 import json
 import math
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -228,7 +229,7 @@ def test_idle_frames_do_not_shimmer(keeper, tracks):
     none change and change straight back (the sparkle of a re-rolled voxel pick or a sliding dither)."""
     doc = _no_shadow(keeper)
     model = S.Model(doc, 1.0)
-    for d in ("S", "E"):
+    for d in R.DIRECTIONS:
         idle = R.render_clip(doc, "idle", d, tracks=tracks, model=model)
         arr = np.stack(idle["frames"]).astype(int)
         assert len(arr) == tracks.frames("idle")
@@ -433,6 +434,12 @@ def test_cli_shapes_commands(tmp_path, capsys):
     capsys.readouterr()
     main(["shapes", "render", str(ASSETS / "characters" / "keeper.shapes.json"), "-o", str(tmp_path / "fr"), "--clips", "idle", "--directions", "S", "--frames", "2", "--style", "rendered_arpg", "--json"])
     assert json.loads(capsys.readouterr().out)["ok"]
+    # the guide's command: a GIF per clip and direction, cropped to the clip
+    main(["shapes", "render", str(ASSETS / "characters" / "keeper.shapes.json"), "-o", str(tmp_path / "frg"), "--style", "gothic_hd", "--clips", "idle,walk", "--directions", "S,E", "--frames", "2", "--gif"])
+    for name in ("idle_S", "idle_E", "walk_S", "walk_E"):
+        gif = Image.open(tmp_path / "frg" / f"{name}.gif")
+        assert gif.n_frames == 2 and (tmp_path / "frg" / name / "frame_001.png").exists(), name
+    assert "2 clips x 2 directions" in capsys.readouterr().out
     main(["shapes", "template", "--height", "100", "--json"])
     assert json.loads(capsys.readouterr().out)["height"] == 100
     main(["shapes", "draft", "a knight with a sword", "-o", str(tmp_path / "d.shapes.json")])
@@ -472,19 +479,21 @@ def test_turn_and_place_holds(keeper, tracks):
         Rf = R.rot_z(float(f))                                   # one degree a frame
         Rq, _ = poser.hold_turn("k", float(f), Rf, np.zeros(3), piv)
         held.append(R.rotation_angle(Rq, np.eye(3)))
-    assert held[:4] == pytest.approx([0, 0, 0, 0], abs=1e-9) and held[4] == pytest.approx(4.0, abs=1e-6) and held[5:8] == pytest.approx([4, 4, 4], abs=1e-6)
-    assert held[8] == pytest.approx(8.0, abs=1e-6)
+    assert R.TURN_STEP == 5.0 and R.MOVE_STEP == 1.5
+    assert held[:5] == pytest.approx([0, 0, 0, 0, 0], abs=1e-9) and held[5] == pytest.approx(5.0, abs=1e-6) and held[6:10] == pytest.approx([5, 5, 5, 5], abs=1e-6)
+    assert held[10] == pytest.approx(10.0, abs=1e-6)
     # the same frame asked twice gives the same answer; a swing back under a step is held too
-    assert poser.hold_turn("k", 8.0, R.rot_z(8.0), np.zeros(3), piv)[0] is poser.hold_turn("k", 8.0, R.rot_z(8.0), np.zeros(3), piv)[0]
+    assert poser.hold_turn("k", 10.0, R.rot_z(10.0), np.zeros(3), piv)[0] is poser.hold_turn("k", 10.0, R.rot_z(10.0), np.zeros(3), piv)[0]
     Rq, _ = poser.hold_turn("k", 12.0, R.rot_z(9.5), np.zeros(3), piv)
-    assert R.rotation_angle(Rq, np.eye(3)) == pytest.approx(8.0, abs=1e-6)
-    # the place hold: the pivot lands a whole number of screen pixels from its author place, held under a pixel of creep
+    assert R.rotation_angle(Rq, np.eye(3)) == pytest.approx(10.0, abs=1e-6)
+    # the place hold: the pivot lands a whole number of screen pixels from its author place, held under 1.5 px of creep
+    # (0.29 px a frame: 1.47 px at frame 5 holds, 1.76 px at frame 6 rounds to 2, and 2 holds to frame 7)
     px = []
     for f in range(8):
         tr = np.array([0.0, 0.3 * f, 0.0])                       # 0.3 units a frame, 0.29 px at 12 degrees
         move = poser.hold_place("p", float(f), np.eye(3), tr, piv)
         px.append(round(model.screen_offset(piv, piv + tr + move, 0.0, 12.0)[1], 6))
-    assert px[:4] == [0, 0, 0, 0] and px[4] == 1.0 and px[7] == 2.0, px
+    assert px[:6] == [0, 0, 0, 0, 0, 0] and px[6] == 2.0 and px[7] == 2.0, px
     assert R.rotation_between(np.array([0, 1.0, 0]), np.array([0, 1.0, 0])).tolist() == np.eye(3).tolist()
     v = R.rotation_between(np.array([0, 1.0, 0]), np.array([1.0, 1.0, 0])) @ np.array([0, 1.0, 0])
     assert np.allclose(v, [math.sqrt(0.5), math.sqrt(0.5), 0])
@@ -521,12 +530,13 @@ def test_exported_idle_and_walk_frames_do_not_boil(keeper, tracks):
     doc = _no_shadow(keeper)
     model = S.Model(doc, 1.0)
     brim = 22                                                             # rows above the brim: hat only
-    for d in ("S", "E"):
+    for d in R.DIRECTIONS:                                                # the idle in all eight directions (W moves most: the near arm and the shawl)
         arr, change, sparkle = _clip_frames(doc, "idle", d, tracks, model, n)
         assert len(arr) == n
         assert change < 0.12 and sparkle < 0.03, (d, change, sparkle)
         hat = np.mean([_aligned_change(arr[i], arr[i + 1], brim) for i in range(n - 1)])
         assert hat < 0.02, (d, hat)
+    for d in ("S", "E"):
         arr, change, sparkle = _clip_frames(doc, "walk", d, tracks, model, n)
         assert sparkle < 0.06, (d, sparkle)
         hat = np.mean([_aligned_change(arr[i], arr[i + 1], brim) for i in range(n - 1)])
@@ -620,3 +630,56 @@ def test_gif_durations_and_trimmed_frames():
     frames[0][100:150, 120:140, 3] = 255; frames[2][90:160, 125:150, 3] = 255
     out = T.trim_frames(frames, margin=2)
     assert out[0].shape == (74, 34, 4) and all(f.shape == out[0].shape for f in out)
+
+
+def _fake_run(calls, *, hang_on=None, shot=None):
+    """A stand-in for subprocess.run: records the commands, writes the screenshot for the game run, and times out on
+    the command whose argument list holds ``hang_on``."""
+    import subprocess
+
+    def run(cmd, **kw):
+        calls.append((list(cmd), kw.get("timeout")))
+        if hang_on and hang_on in cmd:
+            raise subprocess.TimeoutExpired(cmd, kw.get("timeout"), output="Godot Engine v4\n", stderr="")
+        if shot is not None and "--import" not in cmd:
+            Path(shot).write_bytes(b"png")
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+    return run
+
+
+def test_game_preview_imports_the_project_first_with_its_own_time_limit(monkeypatch, tmp_path):
+    from pixelforge import game_preview as G
+
+    game = tmp_path / "game"; game.mkdir(); (game / "project.godot").write_text("")
+    shot = tmp_path / "shot.png"
+    calls = []
+    monkeypatch.setattr(G.subprocess, "run", _fake_run(calls, shot=shot))
+    monkeypatch.setattr(G, "needs_virtual_display", lambda: False)
+    r = G.preview_in_game(game, godot=sys.executable, skin="keeper_shapes", shot=shot, log=lambda m: None)
+    assert r["ok"] and r["png"] == str(shot.resolve())
+    assert len(calls) == 2
+    assert calls[0][0] == [sys.executable, "--headless", "--path", str(game), "--import"] and calls[0][1] == G.IMPORT_TIMEOUT
+    assert "--import" not in calls[1][0] and calls[1][1] == G.RUN_TIMEOUT and G.IMPORT_TIMEOUT > G.RUN_TIMEOUT
+    assert r["import"]["returncode"] == 0
+
+
+def test_game_preview_turns_a_timeout_into_a_plain_error(monkeypatch, tmp_path, capsys):
+    from pixelforge import game_preview as G
+    from pixelforge.cli import main
+
+    game = tmp_path / "game"; game.mkdir(); (game / "project.godot").write_text("")
+    for hang, words in (("--import", "importing the game's assets"), ("--shot_t=4.0", "the game")):
+        calls = []
+        monkeypatch.setattr(G.subprocess, "run", _fake_run(calls, hang_on=hang))
+        monkeypatch.setattr(G, "needs_virtual_display", lambda: False)
+        with pytest.raises(api.StepError) as e:
+            G.preview_in_game(game, godot=sys.executable, skin="keeper_shapes", shot=tmp_path / "s.png")
+        msg = str(e.value)
+        assert msg.startswith(words + " did not finish within") and "was stopped" in msg and "Godot Engine" in msg and "Traceback" not in msg
+        # the CLI reports the same reason and exits with 2, no traceback
+        with pytest.raises(SystemExit) as x:
+            main(["game-preview", "--game", str(game), "--godot", sys.executable, "--skin", "keeper_shapes", "--shot", str(tmp_path / "s.png"), "--json"])
+        assert x.value.code == 2
+        text = capsys.readouterr().out
+        out = json.loads(text[text.rfind("{"):])                                   # the log lines, then the result
+        assert out["ok"] is False and out["error"] == msg

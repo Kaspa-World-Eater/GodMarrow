@@ -32,7 +32,7 @@ Mixamo is optional (mocap upgrade), never required.
 ## Install / environment
 
 ```
-pip install -e .            # from the repo root; needs Python >= 3.10
+pip install -e .            # from tools/pixelforge (or pip install -e tools/pixelforge from the repository root); needs Python >= 3.10
 pixelforge --help
 ```
 
@@ -270,7 +270,8 @@ Two kinds of file share one set of shading rules:
 ### Commands
 
 ```
-pip install -e tools/pixelforge   # once, from the repository root; or run every command as: python -m pixelforge ...
+pip install -e tools/pixelforge   # once, from the repository root. Without installing: cd tools/pixelforge && python -m pixelforge ...
+                                  # (file paths then start from tools/pixelforge; from the repository root, python -m pixelforge does not find this checkout's package)
 
 pixelforge shapes template [--height 120] [-o tpl.json] [--png tpl.png]   # the author pose: every bone's head and tail, to draw around
 pixelforge shapes draft "a hooded necromancer with a bone staff and green glowing eyes" -o necro.shapes.json   # a starter humanoid from a sentence
@@ -320,8 +321,9 @@ square with the ground at the bottom. The frames folder's `manifest.json` carrie
    materials, then details.
 4. `pixelforge shapes render FILE -o frames --style gothic_hd` or, in a project, `project import-shapes` +
    `project render-shapes` + `project export-game --kind <kind>` (each with `-p <folder>`); copy the atlas into the
-   game's `art/sprites/` and look with `pixelforge game-preview --skin <kind> --shot shot.png` (on a box without a
-   display it runs the game under `xvfb-run` with the OpenGL driver by itself).
+   game's `art/sprites/` and look with `pixelforge game-preview --skin <kind> --shot shot.png` (it imports the project's assets first,
+   which takes minutes on a fresh checkout and seconds after; on a box without a display it runs the game under
+   `xvfb-run` with the OpenGL driver by itself; a Godot run that overruns its time limit ends in a plain error).
 5. An object: `shapes still` for one view, `shapes object` for the game's `objects.json` (a trimmed PNG per direction
    with the foot anchor under the body axis; `hr` 2 is the game's texels per world px).
 
@@ -359,8 +361,8 @@ preset's frame count is what to look at.
 - `size` is the canvas in file units; `height` the figure's height (the preset's figure height divides it to get the
   render scale; for an object it is its size in texels); `ground` the y of the ground line; `axis` the body axis (x, z)
   the rings and the turn use; `view.elevation` the camera's degrees above level (0 = the page's straight-on view; the
-  game's Keeper uses 12, the objects 30, the game's camera); `view.turn_step` (degrees, 4) and `view.move_step`
-  (pixels, 1) are the holds of the rig (below), rarely changed.
+  game's Keeper uses 12, the objects 30, the game's camera); `view.turn_step` (degrees, 5) and `view.move_step`
+  (pixels, 1.5) are the holds of the rig (below), rarely changed.
 - `materials`: a ramp per name, shadow first, any length (2..8 steps; the page used 5, the 3D page 5-7, the preset's
   `shading_bands` resamples them). Options: `emissive` (its steps are picked by rule, never by light), `spec` (metal:
   the brightest step only for near-direct light; `spec_t` the threshold, 0.88), `texture` (`weave fur scratch grain`)
@@ -428,9 +430,9 @@ pose, its tilt damped by `hang` for things that hang; a part with `lag` swings r
 follows late, dragged by the bone's velocity and, in a walk or run, by the clip's travel (the clips are in place), so
 hems, veils, cords and hats swing after the body, by at most a tenth of their height and not at all while the bone
 rests. The frames are pixel art, so the rig draws them the way a hand would: a body's drawn turn holds until the
-clip's is `turn_step` degrees (4) away from it and then takes the clip's turn exactly (a slow bone holds its pose and
+clip's is `turn_step` degrees (5) away from it and then takes the clip's turn exactly (a slow bone holds its pose and
 steps; a fast one is exact), and a body's drawn place is a whole number of screen pixels from its author-pose place,
-held until the clip has moved it `move_step` (1 px) and then rounded (every shape of a bone takes the bone's move, so
+held until the clip has moved it `move_step` (1.5 px) and then rounded (every shape of a bone takes the bone's move, so
 a hat, its head and the eye light move as one block). The renderer snaps every body the same way, so a part that
 has not moved is pixel for pixel the frame before, and nothing boils between frames. The lowest foot pixel is held
 on the screen's ground line in the standing clips: a foot within 6 units (at 120 px) of the clip's own floor is
@@ -483,7 +485,7 @@ The breastplate is an ellipsoid with lames, a ridge, rivets and glowing cracks (
 capsule with a `prism` `carve` for the face and a `flat` void behind it; the cape keeps only its back (`keep.back`),
 has holes near the hem and a gold skull `bitmap` by angle; the staff fire is a `flame` effect at `[85.5, 12, 4]`, the
 soul orb an emissive ellipsoid with `"emit": "steady"`. The Keeper (`assets/shapes/characters/keeper.shapes.json`,
-45 shapes) is the same language around the 120 px author pose: a weathered straw cone as a shell ring tilted back
+58 shapes) is the same language around the 120 px author pose: a weathered straw cone as a shell ring tilted back
 (`rotate`) with a plain brim and faint ridges, a wrapped head with dark sockets and `pulse` eyes in two radii, a
 shawl ring open at the front and a veil ring kept to the back, lacquered pauldrons, bracers and tassets, rope
 capsules across the chest, a waist capsule, a rope belt with gourd ellipsoids, a tattered outer skirt ending above
@@ -502,11 +504,11 @@ these), the head at 5x over eight exported frames, the painting beside the conve
 height, the objects, the in-game shot. Judged honestly: the Keeper reads as the Keeper at 120 px (the wide weathered
 straw hat with the eyes burning in its shadow, lamed pauldrons, cords, belt and gourds, the yoke and tassets over the
 split tattered skirt, wrapped shins and sandalled feet) and holds together through every clip in every direction;
-the frames are still between poses (the idle changes 4-9% of its pixels a frame at the game's 24 frames, almost all
+the frames are still between poses (the idle changes 3-10% of its pixels a frame at the game's 24 frames in every direction, almost all
 of it the eyes' pulse and a 1 px breath; the hat rows of a walk frame are a shifted copy of the frame before) and
 the motion is the clips' (a weighty walk, the hat on the head through the attack, the hems swinging a frame late).
 Against the necromancer page she is still a figure written by rules rather than by hand: broader, with fewer
-accents, and her held poses step by 4 degrees and 1 px where a hand would choose each frame. At 76 px she reads as
+accents, and her held poses step by 5 degrees and 1.5 px where a hand would choose each frame. At 76 px she reads as
 hat, shoulders, cords, gourds and hem; the `px` variants give her thicker cords and bigger hands there, and the
 fingers, specks and rivets are left to the large size. The clips are in place, so a walk's travel is faked as a
 backward swing of loose parts; secondary motion is kinematic (a held swing), not simulated. The hanging rule is a

@@ -432,7 +432,7 @@ Not built: the Forge app's pages (specified in `docs/track_notes/shapes.md`), ob
 format already takes them), the painting-to-shapes extraction (the painting is a reference; describe-it starts from
 words).
 
-**To pick up.** `pip install -e tools/pixelforge` (or `python -m pixelforge ...`), then `cd tools/pixelforge && python
+**To pick up.** `pip install -e tools/pixelforge` (or, from `tools/pixelforge`, `python -m pixelforge ...`), then `cd tools/pixelforge && python
 -m pytest -q`; `pixelforge shapes preview assets/shapes/characters/keeper.shapes.json --clip walk --direction E
 --style gothic_hd`; edit the file (every shape is named; `pixelforge shapes validate` first) and preview again;
 `pixelforge shapes render FILE -o frames --style gothic_hd`, or in a project `pixelforge project import-shapes
@@ -555,3 +555,37 @@ the hanging rule is still tilt damping. The reviewer's raw "hat rows under 10%" 
 the head bobs a pixel every few frames and a whole-pixel bob changes every hat pixel by that measure; the test
 forgives a whole-pixel shift and then asks for under 10%, which is 1-3%. The MCP tools were exercised by importing
 the server, not by a client round-trip.
+
+### 7.11 2026-10-02, track/shapes: the third review round (the render command, game-preview on a fresh checkout, the guides as written)
+
+**What.** The reviewer's blocker was that the guide's `pixelforge shapes render ... --gif` crashed with a NameError
+(`np` was imported inside three other CLI functions, not at the module's top): fixed in `cli.py`, with the exact
+command in `tests/test_shapes.py` (through `main`) and in `tests/test_e2e_shapes.py` run as the guide says to run it
+without an install, `cd tools/pixelforge && python -m pixelforge shapes render ... --style gothic_hd --gif`. The major
+was `game-preview` on a fresh checkout: Godot's first import of the project takes minutes, the game sat on a blank
+window, and after 180 s an uncaught `TimeoutExpired` traceback. `game_preview.py` now imports the project first
+(`import_project`: `--headless --import`, `IMPORT_TIMEOUT` 900 s, a message that says why it takes long), then runs
+the game under `RUN_TIMEOUT` (180 s); either overrun becomes a `StepError` with the plain reason and Godot's last
+lines, which the CLI prints as `{"ok": false, "error": ...}` with exit 2 and the MCP tool returns as a dict. Minors:
+the guides' no-install alternative is `cd tools/pixelforge && python -m pixelforge ...` (from the repository root
+`python -m pixelforge` found no package, or another checkout's; GUIDE_AI, GUIDE_SESSION, this file); GUIDE_AI's
+Keeper count is 58 (was 45); the idle W sat at 0.115 against the 0.12 boil threshold, so the holds are now
+`TURN_STEP` 5 degrees and `MOVE_STEP` 1.5 px (`shape_rig.py`; a turn or move exactly at its step counts as the step,
+`EPS`): the idle at the game's 24 frames changes 0.026 (S), 0.086 (E), 0.101 (W) and 0.03-0.07 in the other five,
+down from 0.038 / 0.095 / 0.115, with the 1 px breath kept (1.75 px and above freeze it); GUIDE_SESSION's object
+example writes into the project's folder and says when copying into `art/objects/` is intended. Tried and dropped:
+holding child bones relative to their parent, or stepping them with it, made the idle worse (0.13-0.15 in E and W),
+because the arm and the shawl swing against the chest and the hysteresis around their own last place is what keeps
+them still.
+
+**Verified.** 149 tests green, twice (about 110 s): the idle tests run in all eight directions at the clip's rate and
+at 24 frames; the hold test steps at 5 degrees and 1.5 px; `--gif` through `main` and through `python -m pixelforge`
+from `tools/pixelforge`; the preview's import runs first with its own limit and a timeout of either step is a plain
+error through the API and the CLI (`subprocess.run` monkeypatched). For real: `game-preview --skin keeper --shot`
+on this fresh worktree with Godot 4.7.2 imported the project, ran under `xvfb-run` and wrote the shot (`ok: true`);
+`art/` untouched. The guide's object example ran as written with `<folder>` substituted.
+
+**Honestly.** The W idle's 0.101 is motion, not boil (its sparkle is 0.005): the near arm and the shawl move against
+the chest and each held step re-draws them; the margin under 0.12 is what the thresholds give without freezing the
+breath. The holds are a half pixel laggier than before (a body may be drawn up to 1.5 px from its true place). The
+import step runs on every preview (seconds when the project is already imported).

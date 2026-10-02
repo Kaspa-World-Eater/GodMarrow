@@ -37,8 +37,9 @@ DRIFT = {"walk": 0.5, "walk_hunched": 0.5, "run": 1.0, "sprint": 1.4, "crouch_wa
 ARM_CHAIN = ("upper_arm", "forearm", "hand")
 DEFAULT_LAG = {"frames": 2, "sway": 0.6, "max": 0.1}
 LAG_STILL, LAG_MOVING = 0.1, 0.4           # bone speed (units per frame) below which a lag fades out, above which it is whole
-TURN_STEP = 4.0                            # degrees: a bone's drawn turn holds until the clip's is this far from it
-MOVE_STEP = 1.0                            # pixels: a body's drawn place holds until the clip's is this far from it
+TURN_STEP = 5.0                            # degrees: a bone's drawn turn holds until the clip's is this far from it
+MOVE_STEP = 1.5                            # pixels: a body's drawn place holds until the clip's is this far from it
+EPS = 1e-9                                 # a turn or move exactly at its step counts as the step (floating point lands a hair under)
 GROUND_REACH = 6.0                         # units at 120 px: a foot this close to the clip's floor is planted (mocap feet hover and pitch); higher is flight
 
 
@@ -363,7 +364,7 @@ class Poser:
             Rq = self._rot_at[k]
         else:
             last = self._rot_last.get(key)
-            Rq = R if last is None or rotation_angle(last[1], R) >= self.turn_step else last[1]
+            Rq = R if last is None or rotation_angle(last[1], R) >= self.turn_step - EPS else last[1]
             self._rot_at[k] = Rq; self._rot_last[key] = (t, Rq)
         if Rq is R:
             return R, tr
@@ -385,8 +386,8 @@ class Poser:
             hx, hy = self._off_at[k]
         else:
             last = self._off_last.get(key)
-            hx = last[1] if last is not None and abs(dx - last[1]) < self.move_step else math.floor(dx + 0.5)
-            hy = (last[2] if last is not None and abs(dy - last[2]) < self.move_step else math.floor(dy + 0.5)) if not round_y else math.ceil(dy - 0.5)
+            hx = last[1] if last is not None and abs(dx - last[1]) < self.move_step - EPS else math.floor(dx + 0.5)
+            hy = (last[2] if last is not None and abs(dy - last[2]) < self.move_step - EPS else math.floor(dy + 0.5)) if not round_y else math.ceil(dy - 0.5)
             self._off_at[k] = (hx, hy); self._off_last[key] = (t, hx, hy)
         cs, sn = math.cos(phi), math.sin(phi)
         ce, se = math.cos(math.radians(elev)), math.sin(math.radians(elev))

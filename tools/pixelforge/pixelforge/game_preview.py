@@ -6,7 +6,9 @@ Finds Godot (settings, PIXELFORGE_GODOT, PATH, the usual install folders), the g
 project.godot: given, or found upward from a sprite set / the project), and runs it with the game's own test
 arguments: ``--zone`` ``--cls`` ``--skin`` for a look at a character, ``--fx`` for effects at the hero,
 ``--attach`` for the effects editor's attachments, ``--shot`` for a screenshot after a few seconds (then quit).
-Nothing in the game changes; these are the capture hooks it already has.
+The project's assets are imported first (``--headless --import``, its own generous time limit: minutes on a fresh
+checkout), and a Godot run that overruns its limit ends in a :class:`StepError` with the plain reason instead of a
+traceback. Nothing in the game changes; these are the capture hooks it already has.
 """
 from __future__ import annotations
 
@@ -15,6 +17,11 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+from .api import StepError
+
+IMPORT_TIMEOUT = 900.0      # seconds for Godot's import of the project's assets: a fresh checkout takes minutes, an imported one seconds
+RUN_TIMEOUT = 180.0         # seconds for the game itself to start, take the screenshot and quit
 
 GODOT_CANDIDATES = [
     r"C:\Program Files\Godot\Godot_v4.7.2-stable_win64.exe", r"C:\Program Files\Godot\Godot.exe", r"C:\Godot\Godot.exe",
@@ -96,6 +103,34 @@ def preview_command(godot: str, game: Path, *, skin: str | None = None, cls: str
     return args
 
 
+def import_command(godot: str, game: Path) -> list[str]:
+    """Godot's headless import of the project's assets (what the editor does on opening a fresh checkout)."""
+    return [godot, "--headless", "--path", str(game), "--import"]
+
+
+def _run(cmd: list[str], game: Path, timeout: float, what: str) -> subprocess.CompletedProcess:
+    """``subprocess.run`` with a time limit, a timeout turned into a :class:`StepError` that says what took too long."""
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, cwd=str(game))
+    except subprocess.TimeoutExpired as e:
+        tail = "".join(str(x or "") for x in (e.stdout, e.stderr))[-800:].strip()
+        raise StepError(f"{what} did not finish within {timeout:g} s and was stopped." + (f"\nGodot's last output:\n{tail}" if tail else "")) from None
+
+
+def import_project(godot: str, game: Path, *, timeout: float = IMPORT_TIMEOUT, log=None) -> dict:
+    """Import the project's assets before the game runs. On a fresh checkout Godot has to import every texture and
+    scene first (minutes); a game launched before that sits on a blank window and never reaches the screenshot.
+    An already imported project takes a few seconds."""
+    cmd = import_command(godot, game)
+    if log:
+        log("importing the game's assets first (a fresh checkout takes a few minutes; an imported one seconds)\n$ " + " ".join(cmd))
+    proc = _run(cmd, game, timeout, "importing the game's assets")
+    tail = (proc.stdout + proc.stderr)[-1500:]
+    if log and tail.strip():
+        log(tail)
+    return {"command": cmd, "returncode": proc.returncode}
+
+
 def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = None, skin: str | None = None, cls: str | None = None, zone: str = "moor",
                     fx: list[str] | None = None, attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None,
                     wait: bool | None = None, log=None) -> dict:
@@ -109,11 +144,12 @@ def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = N
         raise RuntimeError("No Godot project found (a folder with project.godot). Pass the game folder.")
     virtual = bool(shot) and needs_virtual_display()
     cmd = preview_command(exe, game, skin=skin, cls=cls, zone=zone, fx=fx, attach=attach, shot=shot, shot_t=shot_t, hour=hour, virtual=virtual)
+    r = {"ok": True, "godot": exe, "game": str(game), "command": cmd, "virtual_display": virtual}
+    r["import"] = import_project(exe, game, log=log)
     if log:
         log("$ " + " ".join(cmd))
-    r = {"ok": True, "godot": exe, "game": str(game), "command": cmd, "virtual_display": virtual}
     if shot or wait:
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=180, cwd=str(game))
+        proc = _run(cmd, game, RUN_TIMEOUT, "the game")
         if shot and not Path(shot).exists() and not virtual and shutil.which("xvfb-run") and not sys.platform.startswith(("win", "darwin")):
             # a display that is set but unusable: once more under a virtual one
             virtual = True
@@ -121,7 +157,7 @@ def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = N
             r["command"] = cmd; r["virtual_display"] = True
             if log:
                 log("no usable display; again under xvfb-run\n$ " + " ".join(cmd))
-            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=180, cwd=str(game))
+            proc = _run(cmd, game, RUN_TIMEOUT, "the game")
         r["returncode"] = proc.returncode
         tail = (proc.stdout + proc.stderr)[-1500:]
         if log and tail.strip():

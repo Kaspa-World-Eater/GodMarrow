@@ -14,7 +14,7 @@ directions in seconds, and the game's exporter packs them with foot anchors. The
 
 ```
 cd <repository root>
-pip install -e tools/pixelforge            # Python >= 3.10; or prefix every command below with: python -m pixelforge
+pip install -e tools/pixelforge            # Python >= 3.10. Without installing: cd tools/pixelforge && python -m pixelforge ... (paths then start from there)
 cd tools/pixelforge && python -m pytest -q tests/test_shapes.py tests/test_e2e_shapes.py && cd ../..
 ```
 
@@ -88,7 +88,8 @@ pixelforge game-preview --skin <name>_shapes --shot shot.png
 git checkout -- art/ && rm -f art/sprites/<name>_shapes.*
 ```
 
-`game-preview` finds Godot (or takes `--godot <exe>`) and, on a box with no display, runs the game under `xvfb-run`
+`game-preview` finds Godot (or takes `--godot <exe>`), imports the project's assets first (minutes on a fresh checkout,
+seconds after; a run that overruns its time limit ends in a plain error, not a traceback) and, on a box with no display, runs the game under `xvfb-run`
 with the OpenGL driver by itself (`xvfb-run` must be installed; the result says `virtual_display: true`). The same
 shot by hand is: `godot --headless --path . --import`, then
 `xvfb-run -a -s "-screen 0 1280x720x24" godot --path . --rendering-driver opengl3 --resolution 1280x720 -- --zone=moor --seed=3 --new --cls=miasmancer --hour=0.5 --skin=<name>_shapes --hide=dark --shot=/abs/shot.png --shot_t=5 --shot_n=8`.
@@ -96,8 +97,12 @@ shot by hand is: `godot --headless --path . --import`, then
 An object (a chest, a skull, a tree) has no bones and one still per direction:
 
 ```
-pixelforge shapes object tools/pixelforge/assets/shapes/objects/chest.shapes.json -o art/objects/chest --directions S,SE,E --game-objects art/objects/objects.json
+pixelforge shapes object tools/pixelforge/assets/shapes/objects/chest.shapes.json -o <folder>/objects/chest --directions S,SE,E --game-objects <folder>/objects/objects.json
 ```
+
+That writes into the project's own folder. Copy the PNGs into `art/objects/` and merge the entry into
+`art/objects/objects.json` only when the task is to put the object in the game, after a look-test, and revert
+`art/` otherwise, as with the sprites above.
 
 The whole sequence runs headlessly in `tools/pixelforge/tests/test_e2e_shapes.py`; run it when something seems off.
 
@@ -123,7 +128,7 @@ The file is the sprite. Every shape is named; change numbers, re-render, look. T
 - **Speckles crawl.** `hash` rules take a third number, the speck size in units (`[0.08, 5, 2]`); a sawtooth hem of
   many tiny tongues flickers, so give a brim a plain edge and a hem 9-16 tongues.
 - **It boils between frames** (pixels re-rolling where nothing moved). The rig holds every body's drawn turn until
-  the clip has turned it 4 degrees and its drawn place until the clip has moved it a pixel (`view.turn_step`,
+  the clip has turned it 5 degrees and its drawn place until the clip has moved it 1.5 px (`view.turn_step`,
   `view.move_step`), so this should not happen with the shipped engine; if a part still crawls, it is an effect
   (`motes`) or a light whose `pulse` is large, or two shapes of one thing in different parts (give them one `part`).
 - **At the small size it is a silhouette.** Give the file size variants: `"px": [90, null]` on the fingers, specks
