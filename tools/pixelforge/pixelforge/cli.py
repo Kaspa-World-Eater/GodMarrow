@@ -8,6 +8,7 @@ import glob
 import sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image
 
 from . import godot
@@ -136,7 +137,6 @@ def cmd_pixelate(a) -> None:
 
 def cmd_palette(a) -> None:
     images = [Image.open(p).convert("RGBA") for p in _expand(a.inputs)]
-    import numpy as np
 
     px = np.concatenate([np.asarray(im).reshape(-1, 4) for im in images])
     px = px[px[:, 3] > 127][:, :3]
@@ -163,7 +163,6 @@ def cmd_frames(a) -> None:
 
 
 def cmd_animate(a) -> None:
-    import numpy as np
 
     if a.style:
         st = get_style(a.style)
@@ -220,7 +219,6 @@ def cmd_godot(a) -> None:
 
 
 def cmd_rotate(a) -> None:
-    import numpy as np
 
     sprite = np.asarray(Image.open(a.sprite).convert("RGBA"))
     out = Path(a.output)
@@ -333,6 +331,12 @@ def cmd_project(a) -> None:
             _emit(a, api.import_source(project, a.character, a.kind, a.file))
         elif sub == "export-game":
             _emit(a, api.export_game(project, a.character, kind=a.kind, out_dir=a.out, category=a.category, display_name=a.name))
+        elif sub == "import-shapes":
+            _emit(a, api.import_shapes(project, a.character, a.file))
+        elif sub == "render-shapes":
+            _emit(a, api.render_shapes(project, a.character, preset=a.style, clips=a.clips, directions=a.directions, elevation=a.elevation, passes=a.passes, log=None if a.json else print))
+        elif sub == "preview-shapes":
+            _emit(a, api.preview_shapes(project, a.character, clip=a.clip, direction=a.direction.upper(), preset=a.style))
         elif sub == "run":
             kw = {}
             if a.step == "render":
@@ -500,11 +504,111 @@ def cmd_describe(a) -> None:
             print(f"music: cue {d['cue']} knobs {d['knobs']}" + (f"\nrendered {d['export']['files']}" if "export" in d else " (add -o <folder> to render)"))
 
 
+def cmd_shapes(a) -> None:
+    """pixelforge shapes render|preview|sheet|still|object|turntable|validate|template|draft|joints"""
+    from . import shape_rig, shape_tools, shapes as S
+
+    sub = a.shapes_cmd
+    if sub == "validate":
+        r = shape_tools.validate_file(a.file)
+        if a.json:
+            _emit(a, r)
+        else:
+            print(("ok: " if r["ok"] else "problems:\n  ") + ("\n  ".join(r["problems"]) if r["problems"] else f"{r['mode']} file, {r['shapes']} shapes, materials {', '.join(r['materials'])}, bones {len(r.get('bones', []))}"))
+        if not r["ok"]:
+            sys.exit(1)
+        return
+    if sub == "template":
+        r = shape_tools.template_file(a.height, a.out, a.png)
+        if a.json:
+            _emit(a, r)
+        else:
+            print(f"author pose for a {a.height} px figure on a {r['size'][0]}x{r['size'][1]} canvas, ground {r['ground']}, axis x {r['axis'][0]}")
+            for n, b in r["bones"].items():
+                print(f"  {n:14s} head {b['head']}  tail {b['tail']}")
+            if a.out:
+                print("written", a.out)
+        return
+    if sub == "draft":
+        from . import describe
+        r = describe.draft_shapes(a.text, out=a.out, height=a.height)
+        if a.json:
+            _emit(a, r)
+        else:
+            print("I read: " + "; ".join(r["read"]))
+            print(f"{len(r['doc']['shapes'])} shapes" + (f", written {r['file']}" if r.get("file") else " (add -o file.shapes.json to write it)"))
+        return
+    if sub == "joints":
+        from . import joints
+        r = joints.export_joints(a.glb or joints.LIBRARY, a.out or joints.JOINTS_FILE, fps=a.fps)
+        _emit(a, r) if a.json else print(f"wrote {r['file']}: {r['joints']} joints, {len(r['clips'])} clips at {r['fps']} fps, {r['bytes']} bytes")
+        return
+    doc = S.load_shapes(a.file)
+    problems = S.validate(doc)
+    if problems:
+        print("the file has problems:\n  " + "\n  ".join(problems), file=sys.stderr)
+        sys.exit(1)
+    style = a.style or None
+    if sub == "render":
+        clips = [c.strip() for c in a.clips.split(",")] if a.clips else list(shape_rig.GAME_CLIPS)
+        dirs = [d.strip().upper() for d in a.directions.split(",")] if a.directions else list(shape_rig.DIRECTIONS)
+        r = shape_tools.render_set(doc, a.out, clips=clips, directions=dirs, style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style",
+                                   elevation=a.elevation, max_frames=a.frames, passes=a.passes, log=None if a.json else print)
+        if a.gif:
+            for clip in clips:
+                for d in dirs:
+                    files = sorted((Path(a.out) / f"{clip}_{d}").glob("frame_*.png"))
+                    frames = shape_tools.trim_frames([np.asarray(Image.open(f).convert("RGBA")) for f in files])
+                    save_gif(frames, Path(a.out) / f"{clip}_{d}.gif", fps=r["fps"][clip], zoom=a.zoom, background=(94, 93, 98, 255))
+        _emit(a, r) if a.json else print(f"{len(clips)} clips x {len(dirs)} directions -> {a.out} ({r['seconds']} s, frames {r['size']} px)")
+    elif sub == "preview":
+        out = a.out or f"{Path(a.file).stem.split('.')[0]}_{a.clip}_{a.direction}.gif"
+        r = shape_tools.gif_of(doc, a.clip, a.direction.upper(), out, style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style", elevation=a.elevation,
+                               max_frames=a.frames, zoom=a.zoom)
+        _emit(a, r) if a.json else print(f"{r['gif']}: {r['frames']} frames at {r['fps']:g} fps")
+    elif sub == "sheet":
+        clips = [c.strip() for c in a.clips.split(",")] if a.clips else ["idle", "walk"]
+        dirs = [d.strip().upper() for d in a.directions.split(",")] if a.directions else list(shape_rig.DIRECTIONS)
+        opt = shape_tools.options_for(doc, style, a.scale, a.steps, a.outline or "style", a.elevation)
+        model = S.Model(doc, opt["scale"], opt["steps"]) if S.mode_of(doc) == "solid" else None
+        tracks = shape_rig.load_joints()
+        rows = []
+        for clip in clips:
+            for d in dirs:
+                res = shape_rig.render_clip(doc, clip, d, tracks=tracks, model=model, scale=opt["scale"], steps=opt["steps"], outline=opt["outline"],
+                                            elevation=opt["elevation"], max_frames=a.frames or opt["max_frames"])
+                rows.append((f"{clip} {d} ({len(res['frames'])} f @ {res['fps']:g} fps)", res["frames"][::max(1, len(res["frames"]) // a.columns)][:a.columns]))
+        r = shape_tools.contact_sheet(rows, a.out, zoom=a.zoom, columns=a.columns)
+        _emit(a, r) if a.json else print(f"{r['sheet']}: {r['rows']} rows x {r['columns']} frames")
+    elif sub == "still":
+        r = shape_tools.still(doc, a.out, frame=a.frame, direction=a.direction.upper(), style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style",
+                              elevation=a.elevation, zoom=a.zoom, passes=a.passes, game_objects=a.game_objects, name=a.name, hr=a.hr)
+        _emit(a, r) if a.json else print(f"{r['png']} ({r['size'][0]}x{r['size'][1]}, foot anchor {r['anchor']})" + (f"; objects.json entry {r['game_objects']['key']}" if a.game_objects else ""))
+    elif sub == "object":
+        dirs = [d.strip().upper() for d in a.directions.split(",")] if a.directions else ["S"]
+        r = shape_tools.export_object(doc, a.out, a.name, directions=dirs, style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style",
+                                      elevation=a.elevation, frame=a.frame, game_objects=a.game_objects, hr=a.hr)
+        if a.json:
+            _emit(a, r)
+        else:
+            views = ", ".join("%s %dx%d anchor (%d, %d)" % (d, v["size"][0], v["size"][1], v["ox"], v["oy"]) for d, v in r["views"].items())
+            added = ("; objects.json: " + ", ".join(r["game_objects"]["added"])) if a.game_objects else ""
+            print(f"{r['name']}: {views} -> {r['dir']}{added}")
+    elif sub == "turntable":
+        r = shape_tools.turntable(doc, a.out, frames=a.frames or 48, style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style", elevation=a.elevation, zoom=a.zoom)
+        _emit(a, r) if a.json else print(f"{r['gif']} ({r['frames']} views) and {r['views']}")
+
+
 def cmd_game_preview(a) -> None:
+    from . import api
     from .game_preview import preview_in_game
 
-    _emit(a, preview_in_game(a.game, godot=a.godot, skin=a.skin, cls=a.cls, zone=a.zone, fx=a.fx.split(",") if a.fx else None, attach=a.attach,
-                             shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, log=print))
+    try:
+        _emit(a, preview_in_game(a.game, godot=a.godot, skin=a.skin, cls=a.cls, zone=a.zone, fx=a.fx.split(",") if a.fx else None, attach=a.attach,
+                                 shot=a.shot, shot_t=a.shot_t, hour=a.hour, wait=a.wait, log=print))
+    except api.StepError as e:
+        _emit(a, {"ok": False, "error": str(e)})
+        raise SystemExit(2)
 
 
 def cmd_effect(a) -> None:
@@ -702,7 +806,12 @@ def build_parser() -> argparse.ArgumentParser:
     x = ps.add_parser("describe", help="set the description"); x.add_argument("character"); x.add_argument("describe")
     x = ps.add_parser("prompts", help="Midjourney prompts for the character"); x.add_argument("character"); x.add_argument("--reference", default="[SHEET IMAGE URL]")
     x = ps.add_parser("import", help="import an image"); x.add_argument("character"); x.add_argument("kind", choices=list(SOURCE_KINDS)); x.add_argument("file")
-    x = ps.add_parser("run", help="run one step"); x.add_argument("character"); x.add_argument("step", choices=["split", "palette", "model", "rig", "render", "pixelate", "export"])
+    x = ps.add_parser("run", help="run one step"); x.add_argument("character"); x.add_argument("step", choices=["split", "palette", "model", "rig", "render", "pixelate", "export", "shapes"])
+    x = ps.add_parser("import-shapes", help="give a character a shape sprite (.shapes.json); it then renders with 'run <character> shapes' or render-shapes"); x.add_argument("character"); x.add_argument("file")
+    x = ps.add_parser("render-shapes", help="render the character's shape sprite with the motion clips into frames (then export / export-game as usual)")
+    x.add_argument("character"); x.add_argument("--style", default=None, help="a look preset (default: the character's / project's)"); x.add_argument("--clips", default=None); x.add_argument("--directions", default=None)
+    x.add_argument("--elevation", type=float, default=None); x.add_argument("--passes", action="store_true")
+    x = ps.add_parser("preview-shapes", help="a GIF of one clip and direction straight from the character's shape sprite"); x.add_argument("character"); x.add_argument("--clip", default="idle"); x.add_argument("--direction", default="S"); x.add_argument("--style", default=None)
     x.add_argument("--frame-step", type=int, default=2); x.add_argument("--elevation", type=float, default=30.0); x.add_argument("--passes", default=None, help="color,normal,depth")
     x = ps.add_parser("export-game", help="export in Godmarrow's art/sprites format (+ normal/depth sets)"); x.add_argument("character")
     x.add_argument("--kind", help="sprite kind name (default: character name)"); x.add_argument("--out", help="output folder (default: characters/<name>/export_game)")
@@ -815,6 +924,44 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("-o", "--out", default=None, help="spell / music: export here"); s.add_argument("--apply", action="store_true", help="skin: apply the ops to --image")
     s.add_argument("--seconds", type=float, default=60.0); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_describe)
+
+    s = sub.add_parser("shapes", help="shape sprites: characters and objects drawn by code (.shapes.json) rendered as pixel art with real frame animation in 8 directions")
+    ss = s.add_subparsers(dest="shapes_cmd", required=True)
+    def _render_args(x, out_default=None):
+        x.add_argument("file", help="a .shapes.json")
+        x.add_argument("--style", default=None, help="a look preset: figure height, ramp length (bands) and outline rule (e.g. gothic_hd, rendered_arpg)")
+        x.add_argument("--scale", type=float, default=None, help="render scale instead of the preset's (1 = the file's own size)")
+        x.add_argument("--steps", type=int, default=None, help="ramp length instead of the preset's (0/omitted = each ramp's own)")
+        x.add_argument("--outline", default=None, help="none | auto | #rrggbb (default: the preset's rule)")
+        x.add_argument("--elevation", type=float, default=None, help="camera degrees above level (default: the file's view)")
+        x.add_argument("--frames", type=int, default=None, help="at most this many frames per clip (default: the preset's clip cap)")
+        x.add_argument("--zoom", type=int, default=3)
+        x.add_argument("--json", action="store_true")
+    x = ss.add_parser("render", help="every clip in every direction -> frames folder (+ animations.json, manifest.json) that export / export-game read")
+    _render_args(x); x.add_argument("-o", "--out", required=True); x.add_argument("--clips", default=None, help="comma list (default idle,walk,run,attack,cast,hit,death)")
+    x.add_argument("--directions", default=None, help="comma list of S,SE,E,NE,N,NW,W,SW (default all)"); x.add_argument("--passes", action="store_true", help="also normal and depth frames")
+    x.add_argument("--gif", action="store_true", help="also a GIF per clip and direction")
+    x = ss.add_parser("preview", help="a looping GIF of one clip in one direction"); _render_args(x)
+    x.add_argument("--clip", default="idle"); x.add_argument("--direction", default="S"); x.add_argument("-o", "--out", default=None)
+    x = ss.add_parser("sheet", help="a contact sheet: a row per clip and direction"); _render_args(x)
+    x.add_argument("-o", "--out", required=True); x.add_argument("--clips", default=None); x.add_argument("--directions", default=None); x.add_argument("--columns", type=int, default=8)
+    x = ss.add_parser("still", help="one frame of the file (its own animation rules, no clip); with --game-objects also an objects.json entry"); _render_args(x)
+    x.add_argument("-o", "--out", required=True); x.add_argument("--frame", type=int, default=0); x.add_argument("--direction", default="S"); x.add_argument("--passes", action="store_true")
+    x.add_argument("--game-objects", dest="game_objects", default=None, metavar="OBJECTS_JSON", help="add the PNG to the game's art/objects/objects.json (png, ox, oy, hr)")
+    x.add_argument("--name", default=None, help="the objects.json key (default: the file's name)"); x.add_argument("--hr", type=float, default=2.0, help="texels per world px (2 for the game's objects)")
+    x = ss.add_parser("object", help="a file as a game object: trimmed PNGs with foot anchors per direction, <name>.json, optional objects.json entries"); _render_args(x)
+    x.add_argument("-o", "--out", required=True, help="the folder to write into (e.g. the game's art/objects)"); x.add_argument("--name", default=None)
+    x.add_argument("--directions", default=None, help="comma list (default S); the first is also written as <name>.png"); x.add_argument("--frame", type=int, default=0)
+    x.add_argument("--game-objects", dest="game_objects", default=None, metavar="OBJECTS_JSON"); x.add_argument("--hr", type=float, default=2.0)
+    x = ss.add_parser("turntable", help="a solid file spinning through 48 views (GIF) plus its 8 game views"); _render_args(x); x.add_argument("-o", "--out", required=True)
+    x = ss.add_parser("validate", help="check a .shapes.json and summarise it"); x.add_argument("file"); x.add_argument("--json", action="store_true")
+    x = ss.add_parser("template", help="the author pose (bone heads and tails) for a figure height, to draw shapes around")
+    x.add_argument("--height", type=int, default=120); x.add_argument("-o", "--out", default=None, help="write the table as JSON"); x.add_argument("--png", default=None, help="write a stick figure"); x.add_argument("--json", action="store_true")
+    x = ss.add_parser("draft", help="describe it: a sentence -> a starter .shapes.json (a humanoid with the costume words as parts and materials)")
+    x.add_argument("text"); x.add_argument("-o", "--out", default=None); x.add_argument("--height", type=int, default=120); x.add_argument("--json", action="store_true")
+    x = ss.add_parser("joints", help="re-export the joint tracks of the motion clips from the animation library (numpy, no Blender)")
+    x.add_argument("--glb", default=None); x.add_argument("-o", "--out", default=None); x.add_argument("--fps", type=int, default=24); x.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_shapes)
 
     s = sub.add_parser("game-preview", help="see it in the game: launch Godot with a skin, effects or attachments on the moor (or take a screenshot)")
     s.add_argument("--game", default=None, help="the Godot project folder (found upward from here when omitted)"); s.add_argument("--godot", default=None)

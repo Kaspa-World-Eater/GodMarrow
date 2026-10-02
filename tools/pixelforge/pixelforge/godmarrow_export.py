@@ -202,7 +202,7 @@ def export_godmarrow(
                           "front_l side_l back_l are REAL left-facing views for an 8-view AnimSprite (no mirroring).",
             "anchor": "(0,0) = the entity's ground point; (dx,dy) = offset to the frame's top-left. No shadow in the frames.",
             "scale": f"{sprite_size} px frames at 1 atlas px = 1 screen px; made by PixelForge from the carved model, "
-                     f"camera {manifest.get('elevation', 30)} deg, {manifest['ppu'] * scale:.1f} px per metre.",
+                     f"camera {float(manifest.get('view_elevation', manifest.get('elevation', 30))):g} deg, {manifest['ppu'] * scale:.1f} px per metre.",
             "source": "pixelforge",
         }
         if extra_meta:

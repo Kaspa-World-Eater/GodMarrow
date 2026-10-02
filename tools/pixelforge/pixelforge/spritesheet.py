@@ -137,10 +137,11 @@ def save_gif(frames: list, path: str | Path, fps: float = 8.0, zoom: int = 4, ba
     """Upscaled looping GIF preview (nearest-neighbour, transparency preserved)."""
     ims = [_to_image(f) for f in frames]
     ims = [im.resize((im.width * zoom, im.height * zoom), Image.NEAREST) for im in ims]
+    durations = gif_durations(len(ims), fps)
     if background is not None:
         ims = [Image.alpha_composite(Image.new("RGBA", im.size, background), im) for im in ims]
         conv = [im.convert("RGB").convert("P", palette=Image.ADAPTIVE, colors=255) for im in ims]
-        conv[0].save(path, save_all=True, append_images=conv[1:], duration=int(1000 / fps), loop=0, disposal=2)
+        conv[0].save(path, save_all=True, append_images=conv[1:], duration=durations, loop=0, disposal=2)
         return
     # reserve palette index 255 for transparency
     conv = []
@@ -153,6 +154,14 @@ def save_gif(frames: list, path: str | Path, fps: float = 8.0, zoom: int = 4, ba
         q.putpalette(p.getpalette()[: 255 * 3] + [0, 0, 0])
         conv.append(q)
     conv[0].save(
-        path, save_all=True, append_images=conv[1:], duration=int(1000 / fps),
+        path, save_all=True, append_images=conv[1:], duration=durations,
         loop=0, transparency=255, disposal=2,
     )
+
+
+def gif_durations(n: int, fps: float) -> list[int]:
+    """Per-frame durations in ms (whole centiseconds, as GIF stores them) whose sum is the clip's real length at
+    ``fps``: 9.6 fps becomes 100, 110, 100, 100, 110 ... instead of a flat 100."""
+    fps = max(float(fps), 0.01)
+    edges = [int(round(i * 100.0 / fps)) for i in range(n + 1)]
+    return [max(edges[i + 1] - edges[i], 1) * 10 for i in range(n)]

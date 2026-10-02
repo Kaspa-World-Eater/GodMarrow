@@ -77,10 +77,35 @@ in any text editor, then run **all** with that sheet. Loops are seamless (the re
 and every cue sits at the same loudness. Format `ogg` makes small files for the game when ffmpeg is installed;
 otherwise WAV, which Godot also plays.
 
+## Characters drawn by code (shape sprites)
+
+Since October 2026 a character does not have to start from a painting. A **shape sprite** is a small text file
+(`.shapes.json`) that lists the pieces of a figure (a hat as a cone, a head as an egg, arms and legs as capsules, a
+coat as a ring with a ragged hem) with a colour ramp each, and which bone of the body each piece rides. The Forge
+draws it as pixel art with the same shading rules for everything (one light from the top left, dark lines between
+pieces, a thin outline, glowing eyes and flames drawn last, a dithered shadow on the ground) and plays the library's
+motion clips on it (24 of them, idle, walk, run, attack, cast, hit, death and more), so every clip comes out as real
+frames from all eight directions, with skirts, veils and cords hanging from the body and swinging after it, the feet
+on the ground and the hat on the head. The pieces move the way a hand would draw them: by whole pixels, holding a
+pose until it has somewhere to go, so nothing crawls or boils between frames. No Blender, no Mixamo, a few seconds
+per clip. One file serves both sizes: the small-size variant keeps the silhouette and drops the detail. Objects (a chest, a skull, a dead tree)
+are the same kind of file without bones, rendered as a still with a foot point for the game.
+
+The painting is the reference for the costume, not the source. Writing the file is a job for the AI assistant (the
+necromancer and the Keeper under `assets/shapes/` are the examples); you judge the result and ask for changes in
+plain words ("the hat is too bright", "make the skirt longer"). To look: `pixelforge shapes preview FILE --clip walk
+--direction E` makes a GIF; `pixelforge shapes sheet FILE -o sheet.png` a contact sheet; `pixelforge shapes
+turntable FILE -o turn.gif` a spin. To put one in the game: `pixelforge project import-shapes <character> FILE -p
+<project folder>`, then **render-shapes** and **export-game** as usual (the step-by-step list for an assistant is
+`docs/GUIDE_SESSION.md` in the game repository). "Describe it" can draft a starting file from a sentence
+(`pixelforge shapes draft "a knight in steel plate with a sword and a crimson cape" -o knight.shapes.json`): a
+mannequin with the right pieces, to be shaped by hand or by the assistant.
+
 ## Describe it, get it
 
 The **Describe it…** button (also Ctrl+D, and Tools > Describe it): say what you want in plain words and the Forge
-drafts it and opens it in the right editor. "A wisp lantern spell, pale blue, slow, with embers" becomes a spell in
+drafts it and opens it in the right editor. "Draw a hooded necromancer with a bone staff as shapes" drafts a shape
+sprite (see above). "A wisp lantern spell, pale blue, slow, with embers" becomes a spell in
 the spell designer with those layers. "Make the left eye teal with a pale glow" finds the eye on the chosen picture
 and opens the skin editor with the change made (Undo if it read you wrong). "A grave knight with a rusted helm" gives
 the Midjourney prompt. "A slow sombre act 2 wilds tune with more wind" renders and plays that cue. It is a draft from

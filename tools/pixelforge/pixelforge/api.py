@@ -797,6 +797,93 @@ def export_game(project: Project, name: str, kind: str | None = None, out_dir: s
     return {"ok": True, "character": c.name, "kind": kind, **r, "godot": f"copy {out}/* into the game's art/sprites/ and run with --skin={kind}"}
 
 
+# ------------------------------------------------------------- shape sprites
+def shapes_file(project: Project, name: str) -> Path:
+    """Where a character's shape sprite lives: ``<character>/shapes/<name>.shapes.json``."""
+    c = project.character(name)
+    return project.sub(c.name, "shapes") / f"{c.name}.shapes.json"
+
+
+def import_shapes(project: Project, name: str, path: str | Path) -> dict:
+    """Copy a .shapes.json into the character (validated first). A character made this way skips the painting steps."""
+    from . import shape_tools
+
+    c = project.character(name)
+    check = shape_tools.validate_file(path)
+    if not check["ok"]:
+        raise StepError("the shape file has problems: " + "; ".join(check["problems"]))
+    dst = shapes_file(project, c.name)
+    shutil.copy(path, dst)
+    c.sources["shapes"] = str(dst.relative_to(project.root))
+    c.done["split"] = c.done["palette"] = c.done["model"] = c.done["rig"] = True
+    c.notes["shapes"] = f"{check['shapes']} shapes, {check['mode']}"
+    project.save()
+    return {"ok": True, "character": c.name, "file": str(dst), **{k: v for k, v in check.items() if k != "file"}}
+
+
+def render_shapes(project: Project, name: str, preset: str | None = None, clips: list[str] | str | None = None, directions: list[str] | str | None = None,
+                  elevation: float | None = None, passes: bool = False, log=None) -> dict:
+    """Render a character's shape sprite with the motion clips into the frames layout the export steps read
+    (``frames/<clip>_<DIR>/frame_NNN.png`` + ``animations.json``, and ``renders/manifest.json`` for the foot anchors).
+    ``preset`` (a look) gives the figure height, the ramp length and the outline rule; the project's style when omitted."""
+    from . import shape_rig, shape_tools, shapes as S
+
+    c = project.character(name)
+    src = shapes_file(project, c.name)
+    if not src.exists():
+        raise StepError(f"no shape sprite for {c.name}; import one with import_shapes (pixelforge project import-shapes) or draft one with describe")
+    doc = S.load_shapes(src)
+    st = get_style(preset) if preset else style_of(project, c)
+    if isinstance(clips, str):
+        clips = [x.strip() for x in clips.split(",") if x.strip()]
+    if isinstance(directions, str):
+        directions = [x.strip().upper() for x in directions.split(",") if x.strip()]
+    clips = list(clips or shape_rig.GAME_CLIPS)
+    directions = list(directions or shape_rig.DIRECTIONS)
+    frames = project.sub(c.name, "frames")
+    for old in frames.iterdir():
+        if old.is_dir():
+            shutil.rmtree(old)
+    r = shape_tools.render_set(doc, frames, clips=clips, directions=directions, style=st, elevation=elevation, passes=passes, log=log)
+    renders = project.sub(c.name, "renders")
+    shutil.copy(frames / "manifest.json", renders / "manifest.json")
+    if passes:
+        for p in ("normal", "depth"):
+            src_dir = project.char_dir(c.name) / f"frames_{p}"
+            if src_dir.exists():
+                (src_dir / "animations.json").write_text((frames / "animations.json").read_text())
+    c.done["render"] = c.done["pixelate"] = True
+    c.notes["render"] = f"shape sprite: {len(clips)} clips x {len(directions)} directions at {st.figure_height} px ({st.name}) in {r['seconds']} s"
+    c.settings["style"] = st.name
+    project.save()
+    return {"ok": True, "character": c.name, "style": st.name, **r}
+
+
+def preview_shapes(project: Project, name: str, clip: str = "idle", direction: str = "S", preset: str | None = None, zoom: int = 3) -> dict:
+    """A looping GIF of one clip in one direction straight from the shape file (no frames folder needed)."""
+    from . import shape_tools, shapes as S
+
+    c = project.character(name)
+    src = shapes_file(project, c.name)
+    if not src.exists():
+        raise StepError(f"no shape sprite for {c.name}")
+    st = get_style(preset) if preset else style_of(project, c)
+    out = project.sub(c.name, "previews") / f"{clip}_{direction}.gif"
+    return {"character": c.name, **shape_tools.gif_of(S.load_shapes(src), clip, direction, out, style=st, zoom=zoom)}
+
+
+def validate_shapes(path: str | Path) -> dict:
+    from . import shape_tools
+    return shape_tools.validate_file(path)
+
+
+def draft_shapes(text: str, out: str | Path | None = None, height: int = 120) -> dict:
+    """Describe-it for shape sprites: a sentence -> a starter .shapes.json (a humanoid on the author pose with the
+    costume words mapped to parts and materials), written to ``out`` when given."""
+    from . import describe
+    return describe.draft_shapes(text, out=out, height=height)
+
+
 # ------------------------------------------------------------------- run-all
 STEP_FUNCS = {
     "export_game": export_game,
@@ -807,6 +894,7 @@ STEP_FUNCS = {
     "render": render,
     "pixelate": pixelate_renders,
     "export": export,
+    "shapes": render_shapes,
 }
 
 
@@ -823,6 +911,9 @@ def run_until_blocked(project: Project, name: str, log=None) -> dict:
     """Run every remaining automatic step; stop at the first that needs a person."""
     c = project.character(name)
     done = []
+    if c.sources.get("shapes") and not c.done.get("render"):
+        run_step(project, name, "shapes", log=log)
+        done.append("shapes")
     for step in ("split", "palette", "model", "rig", "render", "pixelate", "export"):
         if c.done.get(step):
             continue

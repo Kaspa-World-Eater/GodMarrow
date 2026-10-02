@@ -6,7 +6,9 @@ Finds Godot (settings, PIXELFORGE_GODOT, PATH, the usual install folders), the g
 project.godot: given, or found upward from a sprite set / the project), and runs it with the game's own test
 arguments: ``--zone`` ``--cls`` ``--skin`` for a look at a character, ``--fx`` for effects at the hero,
 ``--attach`` for the effects editor's attachments, ``--shot`` for a screenshot after a few seconds (then quit).
-Nothing in the game changes; these are the capture hooks it already has.
+The project's assets are imported first (``--headless --import``, its own generous time limit: minutes on a fresh
+checkout), and a Godot run that overruns its limit ends in a :class:`StepError` with the plain reason instead of a
+traceback. Nothing in the game changes; these are the capture hooks it already has.
 """
 from __future__ import annotations
 
@@ -15,6 +17,11 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+from .api import StepError
+
+IMPORT_TIMEOUT = 900.0      # seconds for Godot's import of the project's assets: a fresh checkout takes minutes, an imported one seconds
+RUN_TIMEOUT = 180.0         # seconds for the game itself to start, take the screenshot and quit
 
 GODOT_CANDIDATES = [
     r"C:\Program Files\Godot\Godot_v4.7.2-stable_win64.exe", r"C:\Program Files\Godot\Godot.exe", r"C:\Godot\Godot.exe",
@@ -59,9 +66,24 @@ def find_game(start: str | Path | None = None) -> Path | None:
     return None
 
 
+def needs_virtual_display() -> bool:
+    """True on a Linux box with no display: the game then runs under ``xvfb-run`` with the OpenGL driver."""
+    if sys.platform.startswith("win") or sys.platform == "darwin":
+        return False
+    return not (os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")) and shutil.which("xvfb-run") is not None
+
+
+XVFB = ["xvfb-run", "-a", "-s", "-screen 0 1280x720x24"]
+
+
 def preview_command(godot: str, game: Path, *, skin: str | None = None, cls: str | None = None, zone: str = "moor", fx: list[str] | None = None,
-                    attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None, seed: int = 7) -> list[str]:
-    args = [godot, "--path", str(game)]
+                    attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None, seed: int = 7,
+                    virtual: bool = False) -> list[str]:
+    """The game's command line. ``virtual`` wraps it in ``xvfb-run`` with the OpenGL driver for a session without a
+    display (what :func:`needs_virtual_display` detects)."""
+    args = ([*XVFB] if virtual else []) + [godot, "--path", str(game)]
+    if virtual:
+        args += ["--rendering-driver", "opengl3"]
     if shot:
         args += ["--resolution", "1280x720"]
     args += ["--", f"--zone={zone}", "--new", f"--seed={seed}"]
@@ -81,6 +103,34 @@ def preview_command(godot: str, game: Path, *, skin: str | None = None, cls: str
     return args
 
 
+def import_command(godot: str, game: Path) -> list[str]:
+    """Godot's headless import of the project's assets (what the editor does on opening a fresh checkout)."""
+    return [godot, "--headless", "--path", str(game), "--import"]
+
+
+def _run(cmd: list[str], game: Path, timeout: float, what: str) -> subprocess.CompletedProcess:
+    """``subprocess.run`` with a time limit, a timeout turned into a :class:`StepError` that says what took too long."""
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, cwd=str(game))
+    except subprocess.TimeoutExpired as e:
+        tail = "".join(str(x or "") for x in (e.stdout, e.stderr))[-800:].strip()
+        raise StepError(f"{what} did not finish within {timeout:g} s and was stopped." + (f"\nGodot's last output:\n{tail}" if tail else "")) from None
+
+
+def import_project(godot: str, game: Path, *, timeout: float = IMPORT_TIMEOUT, log=None) -> dict:
+    """Import the project's assets before the game runs. On a fresh checkout Godot has to import every texture and
+    scene first (minutes); a game launched before that sits on a blank window and never reaches the screenshot.
+    An already imported project takes a few seconds."""
+    cmd = import_command(godot, game)
+    if log:
+        log("importing the game's assets first (a fresh checkout takes a few minutes; an imported one seconds)\n$ " + " ".join(cmd))
+    proc = _run(cmd, game, timeout, "importing the game's assets")
+    tail = (proc.stdout + proc.stderr)[-1500:]
+    if log and tail.strip():
+        log(tail)
+    return {"command": cmd, "returncode": proc.returncode}
+
+
 def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = None, skin: str | None = None, cls: str | None = None, zone: str = "moor",
                     fx: list[str] | None = None, attach: bool = False, shot: str | Path | None = None, shot_t: float = 4.0, hour: float | None = None,
                     wait: bool | None = None, log=None) -> dict:
@@ -92,12 +142,22 @@ def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = N
     game = find_game(game_dir)
     if game is None:
         raise RuntimeError("No Godot project found (a folder with project.godot). Pass the game folder.")
-    cmd = preview_command(exe, game, skin=skin, cls=cls, zone=zone, fx=fx, attach=attach, shot=shot, shot_t=shot_t, hour=hour)
+    virtual = bool(shot) and needs_virtual_display()
+    cmd = preview_command(exe, game, skin=skin, cls=cls, zone=zone, fx=fx, attach=attach, shot=shot, shot_t=shot_t, hour=hour, virtual=virtual)
+    r = {"ok": True, "godot": exe, "game": str(game), "command": cmd, "virtual_display": virtual}
+    r["import"] = import_project(exe, game, log=log)
     if log:
         log("$ " + " ".join(cmd))
-    r = {"ok": True, "godot": exe, "game": str(game), "command": cmd}
     if shot or wait:
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=180, cwd=str(game))
+        proc = _run(cmd, game, RUN_TIMEOUT, "the game")
+        if shot and not Path(shot).exists() and not virtual and shutil.which("xvfb-run") and not sys.platform.startswith(("win", "darwin")):
+            # a display that is set but unusable: once more under a virtual one
+            virtual = True
+            cmd = preview_command(exe, game, skin=skin, cls=cls, zone=zone, fx=fx, attach=attach, shot=shot, shot_t=shot_t, hour=hour, virtual=True)
+            r["command"] = cmd; r["virtual_display"] = True
+            if log:
+                log("no usable display; again under xvfb-run\n$ " + " ".join(cmd))
+            proc = _run(cmd, game, RUN_TIMEOUT, "the game")
         r["returncode"] = proc.returncode
         tail = (proc.stdout + proc.stderr)[-1500:]
         if log and tail.strip():
@@ -106,7 +166,9 @@ def preview_in_game(game_dir: str | Path | None = None, *, godot: str | None = N
             r["png"] = str(Path(shot).resolve()) if Path(shot).exists() else None
             r["ok"] = r["png"] is not None
             if not r["ok"]:
-                r["error"] = "the game did not write the screenshot; it needs a window (not headless)\n" + tail
+                r["error"] = ("the game did not write the screenshot; it needs a window (no display was found and xvfb-run is not installed)\n"
+                              if not virtual and not (os.environ.get("DISPLAY") or os.environ.get("WAYLAND_DISPLAY")) and not sys.platform.startswith(("win", "darwin"))
+                              else "the game did not write the screenshot\n") + tail
         return r
     flags = {"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if sys.platform.startswith("win") else {}
     proc = subprocess.Popen(cmd, cwd=str(game), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, **flags)
