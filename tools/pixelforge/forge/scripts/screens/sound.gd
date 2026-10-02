@@ -17,6 +17,8 @@ func build() -> void:
 	tab_from_args()
 	rebuild()
 	app.scene.show_text(PackedStringArray(["the sound bench", "pick a pad, turn its knobs, Play; the wave is drawn here"]), "sound")
+	if app.backend.python_ok():
+		play()
 
 func sfx_dir() -> String:
 	return app.backend.out_dir("sfx")

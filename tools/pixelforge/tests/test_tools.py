@@ -149,7 +149,7 @@ def test_music_cues_render_loop_and_sheet(tmp_path):
 
     from pixelforge import music
 
-    assert set(music.CUES) == set(music.CUE_INFO) and len(music.CUES) == 21
+    assert set(music.CUES) == set(music.CUE_INFO) and len(music.CUES) == 24   # the game's 21 and the Forge's 3 loops
     for key in ("a1_town", "a3_wild", "boss5"):
         x = music.render_cue(key, 6)
         assert x.shape == (6 * music.RATE, 2) and np.isfinite(x).all()
@@ -165,7 +165,7 @@ def test_music_cues_render_loop_and_sheet(tmp_path):
     m = json.loads((tmp_path / "music.json").read_text())
     assert m["cues"]["a1_deep"]["loop"] and m["cues"]["a1_deep"]["knobs"]["sc"] == "phr"
     sheet = music.write_sheet(tmp_path / "sheet.json")
-    assert len(sheet["cues"]) == 21
+    assert len(sheet["cues"]) == 24
     edited = json.loads((tmp_path / "sheet.json").read_text())
     edited["title"]["bpm"] = 60
     (tmp_path / "sheet.json").write_text(json.dumps(edited))

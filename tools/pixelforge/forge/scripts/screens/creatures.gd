@@ -6,11 +6,11 @@ func build() -> void:
 	super.build()
 	if has_model():
 		return
-	hint_text = "the beast rig is not in the engine yet: creatures stand on the humanoid skeleton"
+	hint_text = "beast rig not in the engine yet"
 	app.set_hint(hint_text)
 
 func _build_empty() -> void:
-	state_line("The creatures' bench shares the characters' engine. Drop a shape model (.shapes.json) here; until the beast rig lands, a creature stands on the humanoid skeleton (wings, tails and extra limbs as parts that hang and lag).")
+	state_line("The creatures' bench shares the characters' engine. Drop a shape model (.shapes.json) here; until the beast rig lands, a creature stands on the humanoid skeleton (wings, tails and extra limbs as parts that hang and lag).", "", 3)
 	add_spacer()
 	add_choices([
 		{"label": "Choose a model file", "cb": func(): app.choose_file(PackedStringArray(["*.json ; shape models"]), import_model, "Choose a shape model")},

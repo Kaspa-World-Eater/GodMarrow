@@ -102,7 +102,10 @@ func _model_loaded() -> void:
 	full_render = FileAccess.file_exists(char_dir().path_join("frames").path_join("animations.json"))
 	retime = app.backend.read_json(char_dir().path_join("frames").path_join("retime.json"))
 	rebuild()
-	refresh_preview()
+	if tab in [3, 4]:
+		show_clip()
+	else:
+		refresh_preview()
 
 func has_model() -> bool:
 	return not doc.is_empty()
@@ -195,7 +198,7 @@ func _apply_retime(frames: Array) -> Array:
 
 func _show_compare(sprite: Texture2D) -> void:
 	var painting := tex(String(state["painting"]))
-	app.scene.show_compare(painting, sprite, "the reference · the sprite at game size and 3x")
+	app.scene.show_compare(painting, sprite, "the reference · the sprite at game size" if painting else "no reference painting · the sprite at game size")
 
 # ------------------------------------------------------------------ the tabs
 func build_tab(i: int) -> void:
@@ -221,7 +224,7 @@ func _build_empty() -> void:
 	var line := "The bench is empty. Drop a shape model (.shapes.json) or a reference painting here, or describe one on Home."
 	if String(state.get("painting", "")) != "":
 		line = "The reference is on the bench. Drop a shape model (.shapes.json) to stand beside it, draft one from a sentence on Home, or start from the Keeper."
-	state_line(line)
+	state_line(line, "", 2)
 	add_spacer()
 	add_choices([
 		{"label": "Choose a model file", "cb": func(): app.choose_file(PackedStringArray(["*.json ; shape models"]), import_model, "Choose a shape model")},
@@ -366,6 +369,18 @@ func _build_model() -> void:
 	add_rack(controls, 8)
 	var items := [{"label": "Hide" if not s.get("hidden", false) else "Show", "cb": _toggle_hidden}]
 	add_choices(standard_choices(items))
+
+## the Advanced fold: the chosen solid's offsets in half units and its scale in hundredths (the levers step whole ones)
+func advanced_extra() -> Array:
+	if tab != 1 or not has_model():
+		return []
+	var e := _edit()
+	return [
+		fine_slider("x fine", float(e.get("dx", 0)), -20.0, 20.0, 0.0, 1, func(v): _set_edit("dx", snappedf(v, 0.5))),
+		fine_slider("y fine", float(e.get("dy", 0)), -20.0, 20.0, 0.0, 1, func(v): _set_edit("dy", snappedf(v, 0.5))),
+		fine_slider("z fine", float(e.get("dz", 0)), -20.0, 20.0, 0.0, 1, func(v): _set_edit("dz", snappedf(v, 0.5))),
+		fine_slider("scale", float(e.get("k", 1.0)), 0.5, 1.5, 1.0, 2, func(v): _set_edit("k", snappedf(v, 0.01))),
+	]
 
 func _pick_part(p) -> void:
 	state["part"] = String(p)
@@ -554,11 +569,18 @@ func _build_materials() -> void:
 		cy.append({"label": "light", "value": lname, "left": func(): state["emissive"] = posmod(li0 - 1, lights0.size()); rebuild(), "right": func(): state["emissive"] = posmod(li0 + 1, lights0.size()); rebuild()})
 		cy.append({"label": "glow", "value": _glow_kind(), "left": func(): _set_glow_kind(_cycle(GLOW_KINDS, _glow_kind(), -1)), "right": func(): _set_glow_kind(_cycle(GLOW_KINDS, _glow_kind(), 1))})
 	add_cyclers(cy)
-	var swatch := W.RampRow.new()
-	swatch.init("", _ramp_of(m), Callable())
-	swatch.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	swatch.custom_minimum_size = Vector2(0, 10)
-	rows.add_child(swatch)
+	# the sprite's whole palette: one swatch row per material, the chosen one framed
+	var swatches := []
+	for name in used:
+		var row := W.RampRow.new()
+		row.init("", _ramp_of(name), func(_n): state["material"] = name; rebuild())
+		row.on = name == m
+		swatches.append(row)
+	var rr := W.RampRack.new()
+	rr.setup(swatches, app, 8)
+	rr.custom_minimum_size = Vector2(0, 13)
+	rows.add_child(rr)
+	groups.append(rr)
 	var k := _ramp_knobs(m)
 	var controls := []
 	var lh := W.Wheel.new()
@@ -604,17 +626,29 @@ func _used_materials() -> Array:
 			out.append(m)
 	return out
 
+## a material's ramp may name another material's ("ramp": "wood5"): follow the names through the file and the library
+func _resolve_ramp(v, depth: int = 0) -> Array:
+	if v is Array:
+		return v
+	if v is String and depth < 6:
+		var mats: Dictionary = orig.get("materials", {})
+		if mats.has(v) and mats[v] is Dictionary and mats[v].has("ramp"):
+			return _resolve_ramp(mats[v]["ramp"], depth + 1)
+		if library.has(v) and library[v] is Dictionary and library[v].has("ramp"):
+			return _resolve_ramp(library[v]["ramp"], depth + 1)
+	return ["#202020", "#404040", "#606060", "#808080", "#a0a0a0"]
+
 func _orig_ramp(name: String) -> Array:
 	var mats: Dictionary = orig.get("materials", {})
 	if mats.has(name) and mats[name] is Dictionary and mats[name].has("ramp"):
-		return mats[name]["ramp"]
+		return _resolve_ramp(mats[name]["ramp"])
 	if library.has(name) and library[name] is Dictionary and library[name].has("ramp"):
-		return library[name]["ramp"]
+		return _resolve_ramp(library[name]["ramp"])
 	return ["#202020", "#404040", "#606060", "#808080", "#a0a0a0"]
 
 func _ramp_of(name: String) -> Array:
 	var mats: Dictionary = doc.get("materials", {})
-	if mats.has(name) and mats[name] is Dictionary and mats[name].has("ramp"):
+	if mats.has(name) and mats[name] is Dictionary and mats[name].has("ramp") and mats[name]["ramp"] is Array:
 		return mats[name]["ramp"]
 	return _orig_ramp(name)
 
@@ -1035,7 +1069,7 @@ func _build_export() -> void:
 	var exported := String(state.get("exported", ""))
 	var line := "%s · export · %s" % [String(state["title"]), ("sheets written%s" % (", in the game" if state.get("in_game", false) else "")) if exported != "" else ("the full set is rendered; the sheets can be written" if full_render else "Render all first, then the sheets")]
 	state_line(line)
-	dim_line("The in-game shot is in the picture window." if (state.get("shot", "") != "" and FileAccess.file_exists(String(state["shot"]))) else "Put it in the game copies the sheets into the game's art; See it in the game opens the game with it on the moor.")
+	dim_line("The in-game shot is in the picture window." if (state.get("shot", "") != "" and FileAccess.file_exists(String(state["shot"]))) else "Put it in the game copies the sheets into the game's art; See it in the game opens the game with it on the moor.", 2)
 	add_rack([direction_wheel(), scene_light_lever()], 8)
 	var items := [
 		{"label": "Export sheets", "cb": _export_sheets},

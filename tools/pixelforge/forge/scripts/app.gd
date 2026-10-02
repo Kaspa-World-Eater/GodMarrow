@@ -25,8 +25,9 @@ const SCREENS := {
 	"settings": "res://scripts/screens/settings.gd",
 }
 const CANVAS := Vector2(640, 360)
-const PIC := Rect2(22, 27, 596, 152)
-const TEXTBOX := Rect2(22, 189, 596, 130)
+const PIC := Rect2(22, 27, 596, 140)
+const TEXTBOX := Rect2(22, 183, 596, 136)
+const TABS_H := 14
 const FOOT_Y := 322
 const DISSOLVE_STEPS := 4
 const DISSOLVE_FPS := 24.0
@@ -100,12 +101,6 @@ func _ready() -> void:
 	layer.mouse_filter = Control.MOUSE_FILTER_PASS
 	layer.clip_contents = true
 	add_child(layer)
-	# the tabs on the text box's top edge
-	tabs_ctrl = W.Tabs.new()
-	tabs_ctrl.position = Vector2(TEXTBOX.position.x, TEXTBOX.position.y - 8)
-	tabs_ctrl.size = Vector2(TEXTBOX.size.x, 16)
-	tabs_ctrl.visible = false
-	add_child(tabs_ctrl)
 	_build_foot()
 	# the chrome over everything: border, banner, rims, the title-line toggles
 	chrome = Control.new()
@@ -113,6 +108,12 @@ func _ready() -> void:
 	chrome.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chrome.draw.connect(_draw_chrome)
 	add_child(chrome)
+	# the tabs, set into the text box's top rim (drawn over the chrome: each name's field cuts the rim under it)
+	tabs_ctrl = W.Tabs.new()
+	tabs_ctrl.position = Vector2(TEXTBOX.position.x, TEXTBOX.position.y - TABS_H + 1)
+	tabs_ctrl.size = Vector2(TEXTBOX.size.x, TABS_H + 2)
+	tabs_ctrl.visible = false
+	add_child(tabs_ctrl)
 	selector = Control.new()
 	selector.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	selector.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -498,7 +499,7 @@ func _draw_selector() -> void:
 	if g is W.Rack or g is W.SliderRack or g is W.RampRack:
 		at = r.position + Vector2(-16, 0)
 	if g == tabs_ctrl:
-		at = r.position + Vector2(-18, 1)
+		at = r.position + Vector2(-18, 0)
 	if g != tabs_ctrl and g != envs_ctrl:
 		at += layer.position
 	elif g == envs_ctrl:

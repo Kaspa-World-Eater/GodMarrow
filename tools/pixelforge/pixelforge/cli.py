@@ -259,8 +259,9 @@ def cmd_slice(a) -> None:
 
 # ----------------------------------------------------------------- projects
 def _progress(done: int, total: int, clip: str = "", direction: str = "") -> None:
-    """A progress line the Forge app reads while a command runs with --json (the JSON result still comes last)."""
-    print(f"PF_PROGRESS step=render clip={clip} dir={direction} done={done} total={total}", flush=True)
+    """A progress line the Forge app reads while a command runs (on stderr, so ``--json`` keeps stdout to the result;
+    the app merges the two streams and reads the last JSON object)."""
+    print(f"PF_PROGRESS step=render clip={clip} dir={direction} done={done} total={total}", file=sys.stderr, flush=True)
 
 
 def _emit(a, result: dict) -> None:

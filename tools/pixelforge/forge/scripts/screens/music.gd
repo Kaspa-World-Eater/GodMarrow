@@ -86,7 +86,8 @@ func build_tab(i: int) -> void:
 		{"label": "mode", "value": String(MODE_NAMES.get(mode, mode)), "left": func(): _set_str("sc", _cycle(MODES, mode, -1)), "right": func(): _set_str("sc", _cycle(MODES, mode, 1))},
 		{"label": "metre", "value": "lilting" if steps == 6 else "straight", "left": func(): _setv("steps", 6 if steps == 8 else 8), "right": func(): _setv("steps", 8 if steps == 6 else 6)},
 		{"label": "tune", "value": str(seed), "left": func(): _setv("seed", maxi(seed - 1, 1)), "right": func(): _setv("seed", seed + 1)},
-		{"label": "drone", "value": "%s%d %s" % [NOTES[posmod(int(dr[0]), 12)], int(int(dr[0]) / 12) - 1, "dist" if dist else "clean"], "left": func(): _set_drone(0, int(dr[0]) - 1), "right": func(): _set_drone(0, int(dr[0]) + 1)},
+		{"label": "drone", "value": "%s%d" % [NOTES[posmod(int(dr[0]), 12)], int(int(dr[0]) / 12) - 1], "left": func(): _set_drone(0, int(dr[0]) - 1), "right": func(): _set_drone(0, int(dr[0]) + 1)},
+		{"label": "kind", "value": "dist" if dist else "clean", "left": _toggle_drone_kind, "right": _toggle_drone_kind},
 	])
 	var controls := []
 	var lt := W.Lever.new()
@@ -107,7 +108,24 @@ func build_tab(i: int) -> void:
 	ln.init("length", (float(state["seconds"]) - 10.0) / 110.0, 10.0 / 110.0, func(v): return "%d s" % int(round(10 + v * 110)), Callable(), func(v): state["seconds"] = int(round(10 + v * 110)); rebuild())
 	controls.append_array([lt, ll, lw, lwp, le, ldl, ldd, ln])
 	add_rack(controls, 8)
-	add_choices(standard_choices([{"label": "Play", "cb": play}, {"label": "Stop", "cb": func(): player.stop()}, {"label": "Dice", "cb": _dice}, {"label": "Drone kind", "cb": _toggle_drone_kind}]))
+	add_choices(standard_choices([{"label": "Stop" if player.playing else "Play", "cb": _play_or_stop}, {"label": "Dice", "cb": _dice}], false))
+
+func _play_or_stop() -> void:
+	if player.playing:
+		player.stop()
+		rebuild()
+	else:
+		play()
+
+## the Advanced fold: the exact tempo and the loop's length
+func advanced_extra() -> Array:
+	if tab != 0:
+		return []
+	var info := cue_info(String(state["cue"]))
+	return [
+		fine_slider("tempo exact", knob("bpm", 90), 40.0, 160.0, float(info.get("bpm", 90)), 0, func(v): _setv("bpm", round(v)), func(v): return "%d bpm" % int(v)),
+		fine_slider("seconds", float(state["seconds"]), 10.0, 120.0, 20.0, 0, func(v): state["seconds"] = int(round(v)); rebuild(), func(v): return "%d s" % int(v)),
+	]
 
 ## the cue cards: every place in the game and the Forge's own three loops
 func _build_cues() -> void:
@@ -202,6 +220,7 @@ func play() -> void:
 				player.stream = s
 				player.volume_db = linear_to_db(maxf(app.audio.music_volume, 0.01))
 				player.play()
+				rebuild()
 		var png := String(r.get("png", ""))
 		var t := tex(png)
 		if t:

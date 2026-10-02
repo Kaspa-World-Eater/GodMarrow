@@ -124,6 +124,15 @@ func _setv(key: String, value: float) -> void:
 	preview()
 	rebuild()
 
+## the Advanced fold: the seed to 999 and the exact size
+func advanced_extra() -> Array:
+	if tab in [1, 4]:
+		return []
+	return [
+		fine_slider("seed exact", float(state["seed"]), 1.0, 999.0, 1.0, 0, func(v): _setv("seed", round(v))),
+		fine_slider("size exact", float(state["size"]), 16.0, 128.0, 48.0, 0, func(v): _setv("size", round(v)), func(v): return "%d px" % int(v)),
+	]
+
 func _set_str(key: String, value: String) -> void:
 	push_undo()
 	state[key] = value

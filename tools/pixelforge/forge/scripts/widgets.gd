@@ -255,8 +255,8 @@ class Tabs:
 		return maxi(names.size(), 1)
 	func item_rect(i: int) -> Rect2:
 		if i < 0 or i >= xs.size():
-			return Rect2(position, Vector2(10, 16))
-		return Rect2(position + Vector2(xs[i], 0), Vector2(T.text_width(names[i]), 16))
+			return Rect2(position, Vector2(10, size.y))
+		return Rect2(position + Vector2(xs[i], 0), Vector2(T.text_width(names[i]), size.y))
 	func set_sel(i: int) -> void:
 		if i != current and on_pick.is_valid():
 			on_pick.call(i)
@@ -273,18 +273,22 @@ class Tabs:
 		if xs.size() != names.size():
 			_layout()
 		var f := T.font("text")
-		draw_rect(Rect2(0, 0, size.x, size.y), Color(0, 0, 0, 0))
+		var h := size.y
 		for i in names.size():
 			var on := i == current
 			var w := T.text_width(names[i])
-			draw_rect(Rect2(xs[i] - 4, 0, w + 8, 16), T.WELL if on else T.INK)
+			# the field under the name cuts the rim; the chosen one is a well open to the text box below
+			draw_rect(Rect2(xs[i] - 5, 0, w + 10, h), T.WELL if on else T.INK)
 			if on:
-				draw_rect(Rect2(xs[i] - 4, 0, w + 8, 1), T.FRAME2)
-				draw_rect(Rect2(xs[i] - 4, 0, 1, 16), T.FRAME2)
-				draw_rect(Rect2(xs[i] + w + 3, 0, 1, 16), T.FRAME2)
-			draw_string(f, Vector2(xs[i], 13), names[i], HORIZONTAL_ALIGNMENT_LEFT, -1, T.TEXT_SIZE, T.ACCENT if on else T.DIM)
+				draw_rect(Rect2(xs[i] - 6, 0, w + 12, 1), T.BLACK)
+				draw_rect(Rect2(xs[i] - 6, 0, 1, h), T.BLACK)
+				draw_rect(Rect2(xs[i] + w + 5, 0, 1, h), T.BLACK)
+				draw_rect(Rect2(xs[i] - 5, 1, w + 10, 2), T.FRAME2)
+				draw_rect(Rect2(xs[i] - 5, 1, 2, h - 1), T.FRAME2)
+				draw_rect(Rect2(xs[i] + w + 3, 1, 2, h - 1), T.FRAME2)
+			draw_string(f, Vector2(xs[i], h - 3), names[i], HORIZONTAL_ALIGNMENT_LEFT, -1, T.TEXT_SIZE, T.ACCENT if on else T.DIM)
 			if i < names.size() - 1:
-				draw_rect(Rect2(xs[i] + w + 10, 7, 2, 2), T.FRAME2)
+				draw_rect(Rect2(xs[i] + w + 10, floorf(h / 2.0) - 1, 2, 2), T.FRAME2)
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
 			for i in names.size():
@@ -614,10 +618,13 @@ class PxSlider:
 	var default := 0.0
 	var places := 2
 	var hot := false
-	var on_change: Callable
+	var on_change: Callable          # live, while dragging
+	var on_commit: Callable          # at the end of a drag or a step
+	var fmt: Callable                # value -> words (else the number)
 	var app: Node = null
 	var rack: Control = null
 	var dragging := false
+	var changed := false
 	var track_w := 60
 	var last_click := 0
 	func init(name: String, v: float, l: float, h: float, def: float, p: int, change: Callable) -> void:
@@ -650,14 +657,21 @@ class PxSlider:
 	func step(delta: int, dir: String) -> bool:
 		if dir in ["left", "right"]:
 			var d := delta if dir == "right" else -delta
-			set_value(value + (hi - lo) * 0.05 * d if places > 0 else value + d)
+			set_value(value + (hi - lo) * 0.02 * d if places > 0 else value + d)
+			commit()
 			if app:
 				app.audio.blip("ratchet")
 			return true
 		return false
+	func commit() -> void:
+		if on_commit.is_valid():
+			on_commit.call(value)
 	func reset() -> void:
 		set_value(default)
+		commit()
 	func value_text() -> String:
+		if fmt.is_valid():
+			return String(fmt.call(value))
 		return T.fmt(value, places)
 	func _draw() -> void:
 		var f := T.font("text")
@@ -674,10 +688,13 @@ class PxSlider:
 					return
 				last_click = now
 				dragging = true
+				changed = false
 				if app and rack:
 					app.focus_on(rack, rack.controls.find(self), false)
 				_at(ev.position.x)
 			else:
+				if dragging and changed:
+					commit()
 				dragging = false
 		elif ev is InputEventMouseMotion and dragging:
 			_at(ev.position.x)
@@ -685,8 +702,10 @@ class PxSlider:
 		var k := clampf((x - 64) / float(track_w - 3), 0.0, 1.0)
 		var before := value
 		set_value(lo + (hi - lo) * k)
-		if app and absf(before - value) > 0:
-			app.audio.blip("ratchet")
+		if absf(before - value) > 0:
+			changed = true
+			if app:
+				app.audio.blip("ratchet")
 
 ## the Advanced fold's rack: sliders in two columns
 class SliderRack:
@@ -695,7 +714,8 @@ class SliderRack:
 		var cw := floorf(size.x / columns_n)
 		for i in controls.size():
 			var c: Control = controls[i]
-			c.position = Vector2((i % columns_n) * cw, (i / columns_n) * 16)
+			c.position = Vector2((i % columns_n) * cw + 18, (i / columns_n) * 16)
+			c.size.x = cw - 18
 		custom_minimum_size = Vector2(0, 16 * ceili(controls.size() / float(columns_n)))
 	func item_rect(i: int) -> Rect2:
 		if i < 0 or i >= controls.size():
@@ -742,12 +762,14 @@ class RampRow:
 	var app: Node = null
 	var rack: Control = null
 	var on_pick: Callable
+	var compact := false            # the swatch alone (the name is elsewhere)
 	func init(name: String, cs: Array, pick: Callable) -> void:
 		ramp_name = name
 		colors = cs
 		on_pick = pick
 		mouse_filter = Control.MOUSE_FILTER_STOP
-		size = Vector2(180, 13)
+		compact = name == ""
+		size = Vector2(maxi(cs.size(), 1) * 8 + 4, 13) if compact else Vector2(180, 13)
 	func set_hot(h: bool) -> void:
 		hot = h
 		queue_redraw()
@@ -758,8 +780,13 @@ class RampRow:
 		return false
 	func _draw() -> void:
 		var f := T.font("text")
-		draw_string(f, Vector2(0, 11), ramp_name, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT if (on or hot) else T.DIM)
 		var tex := PX.ramp(colors)
+		if compact:
+			draw_texture_rect(tex, Rect2(2, 1, tex.get_width(), tex.get_height() * 2 - 2), false)
+			if on or hot:
+				draw_rect(Rect2(0, 0, tex.get_width() + 4, 13), T.ACCENT if on else T.GD, false, 1.0)
+			return
+		draw_string(f, Vector2(0, 11), ramp_name, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT if (on or hot) else T.DIM)
 		draw_texture_rect(tex, Rect2(70, 1, tex.get_width(), tex.get_height() * 2 - 2), false)
 		draw_rect(Rect2(0, 12, size.x, 1), T.RULE)
 	func _gui_input(ev: InputEvent) -> void:
@@ -771,6 +798,20 @@ class RampRow:
 class RampRack:
 	extends Rack
 	func _layout() -> void:
+		if not controls.is_empty() and controls[0].get("compact"):
+			# swatches in a row, each with room for the arrow in front; wrapping past the width
+			var x := 18.0
+			var y := 0.0
+			var rows_n := 1
+			for c in controls:
+				if x + c.size.x > size.x and x > 18.0:
+					x = 18.0
+					y += 13.0
+					rows_n += 1
+				c.position = Vector2(x, y)
+				x += c.size.x + 22.0
+			custom_minimum_size = Vector2(0, 13 * rows_n)
+			return
 		var cw := floorf(size.x / columns_n)
 		for i in controls.size():
 			var c: Control = controls[i]

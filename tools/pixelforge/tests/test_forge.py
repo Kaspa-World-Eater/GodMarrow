@@ -139,14 +139,26 @@ def test_build_model_writes_a_hull_preview_before_blender(project, monkeypatch):
     assert project.character("test_hero").settings["model_mode"] == "hull"
 
 
-def test_the_pictures_and_assets_the_app_needs_are_committed():
-    for n in ["character", "object", "spell", "tiles", "ui", "sound", "fix", "play", "settings", "icon"]:
-        assert (FORGE / "assets/pics" / f"{n}.png").exists(), n
-    for n in ["Silkscreen-Regular.ttf", "IMFeENrm28P.ttf", "IMFeENsc28P.ttf", "IMFeENit28P.ttf", "OFL.txt"]:
+def test_the_assets_the_app_needs_are_committed():
+    """The framing's faces, the style strips, and every sound the audio graph loads (rendered by `pixelforge music
+    forge` / `blips`, each under 1.5 MB so the repository stays light)."""
+    for n in ["Jacquard12-Regular.ttf", "VT323-Regular.ttf", "Silkscreen-Regular.ttf", "OFL.txt", "OFL_Jacquard12.txt", "OFL_VT323.txt"]:
         assert (FORGE / "assets/fonts" / n).exists(), n
-    for n in ["pf_bone_frame", "pf_iron_frame", "pf_teal_ward_frame", "pf_vellum_panel"]:
-        assert (FORGE / "assets/ui" / f"{n}.png").exists() and json.loads((FORGE / "assets/ui" / f"{n}.json").read_text())["margins"]
-    assert (FORGE / "assets/sfx/LICENSE_kenney.txt").exists()
+    strips = json.loads((FORGE / "assets/styles/strips.json").read_text())
+    for st in ["godmarrow", "gothic_hd", "rendered_arpg", "snes", "handheld", "indie", "painterly"]:
+        assert (FORGE / "assets/styles" / f"{st}.png").exists() and st in strips, st
+    audio = (FORGE / "scripts/audio.gd").read_text()
+    for loop in ["forge_home", "forge_working", "forge_done"]:
+        f = FORGE / "assets/audio" / f"{loop}.ogg"
+        assert f.exists() and f.stat().st_size < 1_500_000, loop
+        assert f'"{loop}"' in audio
+    for blip in ["cursor_hi", "cursor_lo", "confirm", "back", "scrape", "ratchet", "clunk", "done", "fail", "drop", "tab"]:
+        assert (FORGE / "assets/audio" / f"ui_{blip}.ogg").exists(), blip
+        assert f'"{blip}"' in audio
+    assert (FORGE / "assets/icon.png").exists()
+    # no quest-era leftovers: the old pictures, 9-slice frames and third-party sounds are gone
+    for gone in ["assets/pics", "assets/ui", "assets/sfx"]:
+        assert not (FORGE / gone).exists(), gone
 
 
 def test_forge_launch_never_hands_the_app_its_own_folder_as_the_game(monkeypatch, tmp_path):

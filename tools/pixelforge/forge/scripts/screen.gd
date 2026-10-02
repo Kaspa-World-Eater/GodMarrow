@@ -40,12 +40,12 @@ func setup(a: App, name_: String, arguments: Dictionary) -> void:
 	args = arguments
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	rows = VBoxContainer.new()
-	rows.add_theme_constant_override("separation", 2)
+	rows.add_theme_constant_override("separation", 1)
 	rows.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	rows.offset_left = 8
 	rows.offset_right = -8
-	rows.offset_top = 4
-	rows.offset_bottom = -2
+	rows.offset_top = 3
+	rows.offset_bottom = -1
 	rows.mouse_filter = Control.MOUSE_FILTER_PASS
 	add_child(rows)
 	if args.has("advanced"):
@@ -144,14 +144,54 @@ func set_state_text(text: String) -> void:
 	if state_label and is_instance_valid(state_label):
 		state_label.set_text(text)
 
-## the rack: a list of W.Knob controls (Lever / Wheel / Pull / Lever3) laid in `cols` columns
+## the rack: a list of W.Knob controls (Lever / Wheel / Pull / Lever3) laid in `cols` columns. With the Advanced
+## fold open the same controls show as plain pixel sliders with their exact values (finer steps), plus whatever
+## fine values the screen adds in advanced_extra().
 func add_rack(controls: Array, cols: int = 8) -> Control:
+	if advanced_open:
+		return add_advanced(sliders_of(controls) + advanced_extra(), 3)
 	var r := W.Rack.new()
 	r.setup(controls, app, cols)
 	rows.add_child(r)
 	rack = r
 	groups.append(r)
 	return r
+
+## override: extra plain sliders for the Advanced fold (the fine values the levers round)
+func advanced_extra() -> Array:
+	return []
+
+## a plain slider for every pixel control: the same value, the same words under it, finer steps; the control itself
+## rides along hidden so its callbacks (what the screen gave it) stay alive
+static func sliders_of(controls: Array) -> Array:
+	var out := []
+	for k in controls:
+		var sl := W.PxSlider.new()
+		if k is W.Wheel:
+			sl.init(k.label, k.angle, -180.0, 180.0, k.default_angle, 0, func(v): k.set_angle(v, false))
+			sl.on_commit = func(_v): if k.on_commit.is_valid(): k.on_commit.call(k.angle)
+		elif k is W.Pull:
+			sl.init(k.label, 1.0 if k.on else 0.0, 0.0, 1.0, 1.0 if k.default > 0.5 else 0.0, 0, func(v): k.set_on(v > 0.5))
+		elif k is W.Lever3:
+			sl.init(k.label, float(k.stop), 0.0, 2.0, round(k.default * 2.0), 0, func(v): k.set_stop(int(round(v))))
+		elif k is W.Knob:
+			sl.init(k.label, k.value, 0.0, 1.0, k.default, 3, func(v): k.set_value(v, false))
+			sl.on_commit = func(_v): if k.on_commit.is_valid(): k.on_commit.call(k.value)
+		else:
+			continue
+		sl.fmt = func(_v): return k.value_text()
+		k.visible = false
+		sl.add_child(k)
+		out.append(sl)
+	return out
+
+## a plain slider with a range of its own (for advanced_extra)
+static func fine_slider(name: String, v: float, lo: float, hi: float, def: float, places: int, commit: Callable, fmt: Callable = Callable()) -> Control:
+	var sl := W.PxSlider.new()
+	sl.init(name, v, lo, hi, def, places, Callable())
+	sl.on_commit = commit
+	sl.fmt = fmt
+	return sl
 
 ## the Advanced fold: plain sliders in two columns (shown instead of the rack when open)
 func add_advanced(sliders: Array, cols: int = 2) -> Control:
@@ -183,6 +223,7 @@ func add_choices(items: Array, cols: int = 0) -> Control:
 	else:
 		c.flow = true
 		c.flow_gap = 8
+		c.row_h = 15
 		c.wrap_width = App.TEXTBOX.size.x - 16
 		c.setup(items, 1, app)
 	rows.add_child(c)
