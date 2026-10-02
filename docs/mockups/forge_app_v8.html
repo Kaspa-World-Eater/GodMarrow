@@ -115,7 +115,7 @@ function scene(id,t){const E=ENVS[ENV];const SL=spriteLights(document.getElement
   else if(E.floor==='water')edge=floor?((Math.floor(y*0.7+Math.sin(x*0.3+t*2)*2)%5)===0?.25:0):(hash(Math.floor(x/4),Math.floor(y/3))<.1?-.25:0);
   else if(E.floor==='snow')edge=floor?(hash(x,y)<.05?.25:0):(y<cy?(hash(Math.floor(x/5),Math.floor(y/5))<.06?.3:0):0);
   else edge=(floor?((Math.floor((y-cy)*1.6+x*0.02)%6)===0):(x%9===0||y%5===0))?-.25:0;
-  if(E.sky&&y<cy){l=0;stone=0;edge=(hash(Math.floor(x/2),Math.floor(y/2))<.012)?.5:0;v=1-E.sky*(1-y/cy)*.6}
+  if(E.sky&&y<cy){stone=0;edge=(hash(Math.floor(x/2),Math.floor(y/2))<.012)?.5:0;v=1-E.sky*(1-y/cy)*.6}
   let l2=(1-v)*0.9+stone+edge;if(E.sky&&y<cy)l2=(1-v)*0.5+edge;let l=l2;
   const tl=Math.hypot(x-w*.27,y-h*.44)/(w*.22),tr=Math.hypot(x-w*.73,y-h*.44)/(w*.22);const torch=E.lights===0?0:E.lights===1?Math.max(0,1-tl*1.2)**2*fl1:Math.max(0,1-tl)**2*fl1+Math.max(0,1-tr)**2*fl2;l+=torch*.9;
   let idx=Math.floor(l*pal.length+ (bay(x,y)-.5)*.6);idx=Math.max(0,Math.min(pal.length-1,idx));let col=pal[idx].slice();
@@ -131,7 +131,7 @@ function scene(id,t){const E=ENVS[ENV];const SL=spriteLights(document.getElement
  g.putImageData(img,0,0)}
 let t0=performance.now();function draw(){border();scene('scene1',(performance.now()-t0)/1000);scene('scene2',(performance.now()-t0)/1000)}
 draw();addEventListener('resize',draw);
-const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let last=0;function tick(now){if(!reduce&&now-last>100){last=now;const t=(now-t0)/1000;scene(s1.hidden?'scene2':'scene1',t)}requestAnimationFrame(tick)}requestAnimationFrame(tick);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;let last=0;function tick(now){if(!reduce&&now-last>100){last=now;const t=(now-t0)/1000;try{scene(s1.hidden?'scene2':'scene1',t)}catch(e){console.error(e)}}requestAnimationFrame(tick)}requestAnimationFrame(tick);
 document.querySelectorAll('.envs button').forEach(b=>b.addEventListener('click',()=>{ENV=b.dataset.env;document.querySelectorAll('.envs button').forEach(x=>x.classList.toggle('on',x.dataset.env===ENV));draw()}));
 /* drag and drop: any picture dropped anywhere starts a build; the frame answers while a file is over it */
 const frame=document.querySelector('.frame'),texts=document.querySelectorAll('.text p:first-child');let saved=[];
