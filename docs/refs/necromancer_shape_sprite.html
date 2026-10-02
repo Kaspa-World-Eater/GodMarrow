@@ -1,0 +1,286 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Gravebound Necromancer</title>
+<style>
+/* Layout: one centred sprite on a flat neutral ground, like a sprite sheet preview. Single look by design. */
+:root { color-scheme: dark; --bg: #5e5d62; }
+html, body { height: 100%; }
+body { background: var(--bg); margin: 0; padding-inline: 16px; box-sizing: border-box; display: grid; place-items: center; }
+canvas { width: min(100%, 480px); aspect-ratio: 96 / 108; image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+</style>
+
+<canvas id="c" width="96" height="108" role="img" aria-label="Pixel art idle animation of a hooded necromancer in tattered robes, holding a skull-topped staff that burns with green soul fire."></canvas>
+
+<script>
+(() => {
+const W = 96, H = 108, OY = 6, FPS = 10;
+const ctx = document.getElementById('c').getContext('2d');
+const img = ctx.createImageData(W, H);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const BAYER = [0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v => (v + 0.5) / 16);
+const bay = (x, y) => BAYER[((y & 3) << 2) | (x & 3)];
+const hex = s => parseInt(s.slice(1), 16);
+const ramp = a => a.map(hex);
+
+const P = {
+  robe:   ramp(['#0a080c', '#141017', '#1f1922', '#2c2430', '#3d3242']),
+  sash:   ramp(['#1e0a0c', '#3a1014', '#5e1a1e', '#842a2a', '#a8413a']),
+  cape:   ramp(['#070609', '#0e0b10', '#161219', '#1f1924', '#2a222f']),
+  tunic:  ramp(['#1b1b21', '#2a2a32', '#3c3c46', '#52525c', '#6b6b76']),
+  mantle: ramp(['#1c1b17', '#302e26', '#48443a', '#635e4e', '#827b64']),
+  bone:   ramp(['#3a3428', '#675e4c', '#968c74', '#c2b897', '#e6ddc0']),
+  skin:   ramp(['#26251f', '#45433a', '#6a6656', '#908a74', '#b5ae93']),
+  gold:   ramp(['#2a1e0e', '#4c3818', '#765925', '#a37f38', '#cfac5d']),
+  wood:   ramp(['#17100b', '#2a1d13', '#43301f', '#5e442c', '#7c5d3c']),
+  leather:ramp(['#150f0c', '#261b15', '#3b2a20', '#53392a', '#6d4c37']),
+  iron:   ramp(['#121216', '#212127', '#34343c', '#4d4d56', '#6d6d78']),
+};
+const VOID = hex('#050307');
+const OUT = hex('#08060a');
+const SHADOW = hex('#3c3b40');
+const SOUL = ramp(['#0f3a1c', '#1f6e2e', '#3fb04a', '#8cf07a', '#e6ffdc']);
+const TINT = hex('#6fe86a');
+
+let col = new Int32Array(W * H), fill = new Uint8Array(W * H);
+
+/* ---------- masks ---------- */
+function poly(pts, dx = 0, dy = 0) {
+  const m = new Uint8Array(W * H);
+  const q = pts.map(([x, y]) => [x + dx, y + dy + OY]);
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+  for (const [x, y] of q) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  for (let y = Math.max(1, Math.floor(y0)); y <= Math.min(H - 2, Math.ceil(y1)); y++)
+    for (let x = Math.max(1, Math.floor(x0)); x <= Math.min(W - 2, Math.ceil(x1)); x++) {
+      const px = x + 0.5, py = y + 0.5; let inside = false;
+      for (let i = 0, j = q.length - 1; i < q.length; j = i++) {
+        const [xi, yi] = q[i], [xj, yj] = q[j];
+        if ((yi > py) !== (yj > py) && px < (xj - xi) * (py - yi) / (yj - yi) + xi) inside = !inside;
+      }
+      if (inside) m[y * W + x] = 1;
+    }
+  m.bb = [x0, y0, x1, y1];
+  return m;
+}
+function ell(cx, cy, rx, ry, dy = 0) {
+  const m = new Uint8Array(W * H); cy += OY + dy;
+  for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++)
+    for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) {
+      const u = (x + 0.5 - cx) / rx, v = (y + 0.5 - cy) / ry;
+      if (u * u + v * v <= 1) m[y * W + x] = 1;
+    }
+  m.bb = [cx - rx, cy - ry, cx + rx, cy + ry];
+  return m;
+}
+
+/* ---------- painting with automatic form shading ---------- */
+function paint(m, r, o = {}) {
+  const base = o.base ?? 2, [bx0, by0, bx1, by1] = m.bb;
+  const mx = (bx0 + bx1) / 2, my = (by0 + by1) / 2, hw = Math.max(1, (bx1 - bx0) / 2), hh = Math.max(1, (by1 - by0) / 2);
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x; if (!m[i]) continue;
+    let t = base;
+    const nb = [i - 1, i + 1, i - W, i + W];
+    let contour = false;
+    for (const n of nb) if (!m[n] && fill[n] === 1) contour = true;
+    if (!m[i - 1] || !m[i - W]) t += 1;
+    else if (!m[i - 2] || !m[i - 2 * W]) t += 1;
+    if (!m[i + 1]) t -= 1;
+    if (!m[i + W]) t -= 1;
+    const g = (o.gx ?? -0.9) * (x - mx) / hw + (o.gy ?? -0.6) * (y - my) / hh;
+    t += Math.floor(g + 0.5 + (bay(x, y) - 0.5) * 0.5);
+    if (contour && o.contour !== false) t = Math.min(t, 0);
+    if (o.fold) t += o.fold(x, y);
+    col[i] = r[Math.max(0, Math.min(r.length - 1, t))];
+    fill[i] = 1;
+  }
+}
+function dot(x, y, c) { const i = (y + OY) * W + x; col[i] = c; fill[i] = 1; }
+
+/* ---------- emissive layer, drawn after outlines ---------- */
+let glow = [];
+const emit = (x, y, c) => glow.push([x, y + OY, c]);
+
+function wave(f, i, amp = 1) { return Math.round(Math.sin(f * 0.55 + i * 1.9) * amp); }
+
+function hemPts(xa, xb, y, f, seed, deep = 4) {
+  const pts = [], n = Math.round(Math.abs(xb - xa) / 3);
+  for (let k = 0; k <= n; k++) {
+    const x = xa + (xb - xa) * k / n;
+    const d = k % 2 ? deep + ((k * 7 + seed) % 3) : 0;
+    pts.push([x + (k % 2 ? wave(f, k + seed) : 0), y + d + (k % 2 ? wave(f + 3, k * 3 + seed) : 0)]);
+  }
+  return pts;
+}
+
+/* ---------- the figure ---------- */
+function drawFigure(f) {
+  col.fill(0); fill.fill(0); glow = [];
+  const b = (Math.floor(f / 10) % 2);            // breath: upper body sinks 1px for half the cycle
+  const fold = (p, w) => (x, y) => ((x + Math.floor(y * p)) % w === 0 ? -1 : 0);
+
+  // back cape
+  paint(poly([[34, 38], [59, 38], [64, 60], [70, 92], ...hemPts(70, 24, 93, f, 5, 3), [28, 60]]), P.cape, { base: 2, fold: fold(0.12, 5) });
+  // boots
+  paint(poly([[36, 85], [42, 85], [43, 94], [33, 94], [34, 90]]), P.iron, { base: 2 });
+  paint(poly([[48, 85], [54, 85], [55, 90], [57, 94], [47, 94]]), P.iron, { base: 2 });
+  // main robe
+  paint(poly([[35, 35], [58, 35], [60, 46], [60, 60], [62, 74], [64, 86], ...hemPts(64, 29, 86, f, 2, 4), [29, 74], [31, 60], [33, 46]]), P.robe, { base: 2, fold: fold(0.18, 6) });
+  // inner tunic
+  paint(poly([[44, 44], [50, 44], [54, 87], [52, 91 + wave(f, 1)], [49, 88], [46, 92 + wave(f, 4)], [43, 88], [40, 90 + wave(f, 7)], [41, 70]]), P.tunic, { base: 2, gy: -0.3, fold: fold(0.05, 4) });
+  // belt, buckle, pouch, skull charm
+  paint(poly([[32, 54], [60, 53], [60, 57], [32, 58]]), P.leather, { base: 2 });
+  paint(poly([[45, 53], [49, 53], [49, 58], [45, 58]]), P.gold, { base: 3 });
+  dot(46, 55, P.gold[0]); dot(47, 55, P.gold[0]); dot(46, 56, P.gold[0]); dot(47, 56, P.gold[0]);
+  paint(poly([[54, 57], [58, 57], [58, 63], [54, 63]]), P.leather, { base: 2 });
+  paint(poly([[39, 57], [44, 57], [45, 70], [43, 83], [44, 89 + wave(f, 11)], [42, 85], [40, 88 + wave(f, 12)], [39, 79], [38, 67]]), P.sash, { base: 2, fold: fold(0.1, 3) });
+  const sw = wave(f, 9);
+  for (let y = 58; y < 62; y++) dot(35 + (y > 60 ? sw : 0), y, P.leather[1]);
+  paint(ell(35.5 + sw, 63.5, 2.1, 1.9), P.bone, { base: 3 });
+  dot(35 + sw, 63, P.bone[0]); dot(36 + sw, 63, P.bone[0]);
+
+  // far sleeve (viewer's left), hand and orb
+  paint(poly([[36, 36], [32, 40], [29, 49], [28, 56], [32, 58], [34, 50], [37, 43]], 0, b), P.robe, { base: 2, gx: -0.4 });
+  paint(poly([[26, 55], [33, 56], [34, 62], [32, 60 + wave(f, 2)], [29, 64 + wave(f, 5)], [27, 61], [25, 63 + wave(f, 8)]], 0, b), P.robe, { base: 1 });
+  paint(poly([[28, 61], [32, 61], [33, 66], [29, 67]], 0, b), P.skin, { base: 3 });
+  dot(28, 67 + b, P.skin[2]); dot(28, 68 + b, P.skin[1]); dot(30, 68 + b, P.skin[3]); dot(30, 69 + b, P.skin[2]); dot(32, 67 + b, P.skin[2]); dot(32, 68 + b, P.skin[1]);
+
+  // mantle
+  paint(poly([[39, 30], [53, 30], [59, 33], [62, 38], [62, 45], [60, 43 + wave(f, 1)], [58, 49 + wave(f, 2)], [55, 44], [52, 48 + wave(f, 3)], [49, 44], [46, 50 + wave(f, 4)], [43, 44], [40, 48 + wave(f, 5)], [37, 43], [33, 46 + wave(f, 6)], [31, 40], [34, 34]], 0, b), P.mantle, { base: 2, fold: fold(0.3, 4) });
+
+  // hood, bone crown, face
+  paint(poly([[42, 13], [47, 13], [51, 16], [54, 21], [55, 27], [53, 32], [40, 33], [37, 28], [37, 20], [39, 15]], 0, b), P.robe, { base: 2 });
+  [[40, 16, 3], [42.5, 14.5, 5], [45.5, 13.5, 6], [48.5, 14, 5], [51, 16, 3]].forEach(([x, y, h]) =>
+    paint(poly([[x - 1.3, y + 1], [x - 0.6 - h * 0.12, y - h], [x + 1.3, y + 1]], 0, b), P.bone, { base: 3, contour: false }));
+  paint(poly([[38, 15.5], [52, 15.5], [53, 18], [38, 18]], 0, b), P.gold, { base: 3, gy: 0 });
+  dot(45, 16 + b, P.sash[4]); dot(45, 17 + b, P.sash[2]);
+  const cav = ell(49.8, 24.8, 4.1, 5.6, b);
+  for (let i = 0; i < W * H; i++) if (cav[i]) col[i] = VOID;
+  paint(poly([[47, 20.5], [52, 20.5], [53, 24], [52, 28], [50, 30], [48, 30], [46, 27], [46, 23]], 0, b), P.bone, { base: 2, gx: -1.2, contour: false });
+  dot(48, 23 + b, P.bone[0]); dot(51, 23 + b, P.bone[0]); dot(47, 23 + b, P.bone[1]); dot(50, 25 + b, P.bone[0]);
+  dot(48, 28 + b, P.bone[0]); dot(50, 28 + b, P.bone[0]); dot(49, 27 + b, P.bone[1]);
+
+  // near sleeve (viewer's right) holding the staff
+  paint(poly([[55, 35], [61, 37], [64, 44], [69, 43], [70, 48], [65, 51], [60, 48], [56, 42]]), P.robe, { base: 3, gx: -0.5 });
+  paint(poly([[61, 49], [67, 50], [66, 59 + wave(f, 3)], [64, 55], [62, 58 + wave(f, 6)]]), P.robe, { base: 2 });
+
+  paint(ell(58.5, 36.5, 4.2, 3.4), P.bone, { base: 2 });
+  dot(57, 36, P.bone[0]); dot(59, 36, P.bone[0]); dot(58, 38, P.bone[1]); dot(60, 38, P.bone[1]);
+  paint(poly([[54, 39], [62.5, 39], [62, 41], [55, 41]]), P.iron, { base: 2 });
+
+  // staff
+  paint(poly([[67.5, 13], [69.8, 13], [68.6, 95], [66.4, 95]]), P.wood, { base: 2, gx: -2, gy: 0 });
+  for (const y of [30, 62, 80]) paint(poly([[66, y], [70.5, y], [70.2, y + 2], [66, y + 2]]), P.gold, { base: 2 });
+  // skull finial with a gold cage
+  paint(ell(69, 10.6, 3.1, 2.6), P.bone, { base: 3 });
+  paint(poly([[67.6, 12], [70.6, 12], [70.4, 14.4], [67.8, 14.4]]), P.bone, { base: 2 });
+  dot(68, 13, P.bone[0]); dot(70, 13, P.bone[0]);
+  [[65, 11], [65, 10], [65, 9], [66, 8], [66, 7], [73, 11], [73, 10], [73, 9], [72, 8], [72, 7]].forEach(([x, y]) => dot(x, y, P.gold[3]));
+  dot(65, 12, P.gold[1]); dot(73, 12, P.gold[1]);
+  // hand gripping the staff
+  paint(poly([[66, 43], [70.5, 43], [71, 47], [66.5, 48]]), P.skin, { base: 2 });
+  dot(67, 45, P.skin[0]); dot(69, 45, P.skin[0]);
+
+  /* outline pass */
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x; if (fill[i]) continue;
+    if (fill[i - 1] === 1 || fill[i + 1] === 1 || fill[i - W] === 1 || fill[i + W] === 1) { col[i] = OUT; fill[i] = 2; }
+  }
+
+  /* emissives */
+  const pulse = (Math.sin(f * 0.35) + 1) / 2;
+  const eye = pulse > 0.3 ? SOUL[4] : SOUL[3];
+  emit(48, 23 + b, eye); emit(51, 23 + b, eye);
+  emit(68, 11, SOUL[3]); emit(70, 11, SOUL[3]);
+  // runes stitched down the robe opening, flowing downward
+  for (let k = 0; k < 13; k++) {
+    const y = 48 + k * 3, xl = Math.round(44 - (y - 44) * 0.08), xr = Math.round(50 + (y - 44) * 0.08);
+    const lit = (k + Math.floor(f / 2)) % 5;
+    if (lit < 2) { emit(xl - 1, y, SOUL[lit ? 2 : 3]); emit(xr + 1, y + 1, SOUL[lit ? 2 : 3]); }
+  }
+  // orb in the free hand
+  const orbR = 1 + (Math.floor(f / 3) % 2);
+  for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+    const d = Math.hypot(dx, dy); if (d > orbR + 0.3) continue;
+    emit(30 + dx, 73 + dy + b, d < 0.5 ? SOUL[4] : d < 1.3 ? SOUL[3] : SOUL[2]);
+  }
+  // soul fire above the skull
+  for (let dx = -3; dx <= 3; dx++) {
+    const h = Math.max(0, 7 - Math.abs(dx) * 2 + Math.round(Math.sin(f * 1.3 + dx * 2.1) * 1.4 + Math.sin(f * 0.7 - dx) ));
+    for (let k = 0; k < h; k++) {
+      const rel = k / Math.max(1, h), core = Math.abs(dx) <= 1 && rel < 0.5;
+      emit(69 + dx + (k > 4 ? Math.round(Math.sin(f * 0.9 + k)) : 0), 8 - k, core ? SOUL[4] : rel < 0.6 ? SOUL[3] : rel < 0.85 ? SOUL[2] : SOUL[1]);
+    }
+  }
+  return { b, pulse };
+}
+
+/* ---------- soul motes ---------- */
+const motes = [];
+function stepMotes(f, b) {
+  if (!reduce || f % 3 === 0) {
+    if (Math.random() < 0.7) motes.push({ x: 69 + (Math.random() * 4 - 2), y: 4 + OY, vy: -0.8 - Math.random() * 0.8, ph: Math.random() * 6, age: 0, life: 6 + Math.random() * 6 });
+    if (Math.random() < 0.35) motes.push({ x: 30 + (Math.random() * 2 - 1), y: 71 + OY + b, vy: -0.6 - Math.random() * 0.5, ph: Math.random() * 6, age: 0, life: 6 + Math.random() * 5 });
+  }
+  for (let i = motes.length - 1; i >= 0; i--) {
+    const m = motes[i]; m.age++; m.y += m.vy; m.x += Math.sin(m.age * 0.6 + m.ph) * 0.5;
+    if (m.age >= m.life || m.y < 0) motes.splice(i, 1);
+  }
+}
+
+/* ---------- compose ---------- */
+function lerp(a, b, k) {
+  const r = ((a >> 16) & 255) + ((((b >> 16) & 255) - ((a >> 16) & 255)) * k);
+  const g = ((a >> 8) & 255) + ((((b >> 8) & 255) - ((a >> 8) & 255)) * k);
+  const bl = (a & 255) + (((b & 255) - (a & 255)) * k);
+  return (r << 16) | (g << 8) | bl;
+}
+function light(cx, cy, R, s) {
+  for (let y = Math.max(0, cy - R); y < Math.min(H, cy + R); y++) for (let x = Math.max(0, cx - R); x < Math.min(W, cx + R); x++) {
+    const i = y * W + x; if (fill[i] !== 1) continue;
+    const d = Math.hypot(x - cx, y - cy); if (d >= R) continue;
+    const v = (1 - d / R) ** 2 * s;
+    if (v > bay(x, y)) col[i] = lerp(col[i], TINT, 0.3);
+    if (v > 0.6 + bay(x, y) * 0.4) col[i] = lerp(col[i], TINT, 0.25);
+  }
+}
+
+function render(f) {
+  const { b, pulse } = drawFigure(f);
+  light(69, 6 + OY, 22, 0.75 + pulse * 0.15);
+  light(30, 73 + OY + b, 12, 0.6 + pulse * 0.2);
+  light(49, 23 + OY + b, 5, 0.6);
+
+  const d = img.data;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x, o = i * 4;
+    let c = -1;
+    if (fill[i]) c = col[i];
+    else {
+      const u = (x + 0.5 - 46) / 30, v = (y + 0.5 - (95 + OY)) / 4.2;
+      if (u * u + v * v <= 1 && (x + y) % 2 === 0) c = SHADOW;
+    }
+    if (c < 0) { d[o + 3] = 0; continue; }
+    d[o] = (c >> 16) & 255; d[o + 1] = (c >> 8) & 255; d[o + 2] = c & 255; d[o + 3] = 255;
+  }
+  const put = (x, y, c) => { x |= 0; y |= 0; if (x < 0 || y < 0 || x >= W || y >= H) return; const o = (y * W + x) * 4; d[o] = (c >> 16) & 255; d[o + 1] = (c >> 8) & 255; d[o + 2] = c & 255; d[o + 3] = 255; };
+  for (const [x, y, c] of glow) put(x, y, c);
+  for (const m of motes) put(m.x, m.y, SOUL[Math.min(4, Math.max(1, 4 - Math.floor(m.age / m.life * 4)))]);
+  ctx.putImageData(img, 0, 0);
+}
+
+let f = 0, last = performance.now(), acc = 0;
+const step = 1000 / FPS;
+function loop(now) {
+  acc += Math.min(500, now - last); last = now;
+  let dirty = false;
+  while (acc >= step) { f++; stepMotes(f, Math.floor(f / 10) % 2); acc -= step; dirty = true; }
+  if (dirty) render(f);
+  requestAnimationFrame(loop);
+}
+for (let i = 0; i < 40; i++) { f++; stepMotes(f, 0); }
+render(f);
+requestAnimationFrame(loop);
+})();
+</script>
+
+</body></html>

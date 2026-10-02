@@ -32,8 +32,27 @@ def build_server():
 
     @mcp.tool()
     def new_project(folder: str, name: str, style: str = "hd") -> dict:
-        """Create a project folder. style: 8bit | 16bit | snes | hd."""
+        """Create a project folder. style: a look preset (list_styles): godmarrow gothic_hd rendered_arpg snes handheld indie painterly, or a size tier 8bit 16bit hd full."""
         return api.new_project(folder, name, style)
+
+    @mcp.tool()
+    def list_styles() -> dict:
+        """The look presets and every number each one fixes (figure height, pixel step, palette size and lock, outline, dither,
+        shading bands, saturation/contrast/lightness grade, edge, effect bands/glow/haze/frames/fps, loop frames/fps, clip cap, tile)."""
+        return api.list_styles()
+
+    @mcp.tool()
+    def set_style(project: str, style: str, character: str = "") -> dict:
+        """Set the project's look preset, or one character's own (character given; 'project' takes it back to the project's).
+        Later steps read their numbers from it; run palette, pixelate and export again for the new look."""
+        return api.set_style(_project(project), style, character or None)
+
+    @mcp.tool()
+    def style_demo(out_dir: str, source: str = "", effect: str = "wisp", only: str = "") -> dict:
+        """Animated examples of the look presets: a GIF per preset (the Keeper's front cutout, or `source`, animated in that look
+        with an effect loop beside it), a contact sheet PNG with the numbers printed under each, and styles.json."""
+        from .style_demo import make_demo
+        return make_demo(out_dir, source=source or None, effect=effect, only=only.split(",") if only else None)
 
     @mcp.tool()
     def status(project: str) -> dict:
@@ -87,10 +106,11 @@ def build_server():
         return api.preview_gif(_project(project), character, clip, direction)
 
     @mcp.tool()
-    def make_effect(kind: str, name: str, out_dir: str, palette: str = "lantern", frames: int = 8, fps: float = 10.0, atlas_dir: str | None = None) -> dict:
-        """Procedural effect sheet: fire smoke wisp burst embers ring bolt slash circle cloud shards pillar decal drip flash ward vortex."""
+    def make_effect(kind: str, name: str, out_dir: str, palette: str = "lantern", frames: int = 0, fps: float = 0.0, atlas_dir: str | None = None, style: str = "") -> dict:
+        """Procedural effect sheet: fire smoke wisp burst embers ring bolt slash circle cloud shards pillar decal drip flash ward vortex.
+        With style (a look preset) the bands, glow rule, haze, frames and fps default to the preset's; frames/fps 0 = default."""
         from .vfx import make_vfx
-        return make_vfx(kind, name, out_dir, frames=frames, fps=fps, palette=palette, atlas_dir=atlas_dir)
+        return make_vfx(kind, name, out_dir, frames=frames or None, fps=fps or None, palette=palette, atlas_dir=atlas_dir, style=style or None)
 
     @mcp.tool()
     def make_prop(image: str, name: str, out_dir: str, height: int = 96, sway: str | None = None, variations: int = 1, game_objects: str | None = None) -> dict:
@@ -111,10 +131,10 @@ def build_server():
         return _mp(image, name, out_dir, sizes=tuple(int(x) for x in sizes.split()))
 
     @mcp.tool()
-    def make_tiles(texture: str, name: str, out_dir: str, second: str | None = None, variants: int = 6) -> dict:
-        """Iso diamond ground tiles (+16 edge tiles to a second material) and a Godot TileSet."""
+    def make_tiles(texture: str, name: str, out_dir: str, second: str | None = None, variants: int = 6, style: str = "") -> dict:
+        """Iso diamond ground tiles (+16 edge tiles to a second material) and a Godot TileSet; style (a look preset) sets the tile size and palette."""
         from .tiles import make_tiles as _mt
-        return _mt(texture, name, out_dir, second=second, variants=variants)
+        return _mt(texture, name, out_dir, second=second, variants=variants, style=style or None)
 
     @mcp.tool()
     def make_ui_frame(image: str, name: str, out_dir: str, mid: int = 8) -> dict:
@@ -154,8 +174,12 @@ def build_server():
     def preview_in_game(game_dir: str = "", skin: str = "", fx: str = "", attach: bool = False, shot: str = "", zone: str = "moor") -> dict:
         """Launch the Godot game with a skin / effects (a,b) / the skin's attachments on the moor; with shot=path it saves a screenshot
         after 4 s and quits (needs a display). Godot is found automatically or via PIXELFORGE_GODOT."""
+        from .api import StepError
         from .game_preview import preview_in_game as _p
-        return _p(game_dir or None, skin=skin or None, fx=fx.split(",") if fx else None, attach=attach, shot=shot or None, zone=zone)
+        try:
+            return _p(game_dir or None, skin=skin or None, fx=fx.split(",") if fx else None, attach=attach, shot=shot or None, zone=zone)
+        except StepError as e:
+            return {"ok": False, "error": str(e)}
 
     @mcp.tool()
     def make_effect_from_art(image: str, name: str, out_dir: str, kind: str = "loop", preset: str = "glow", frames: int = 8, width: int = 0, rotations: int = 0) -> dict:
@@ -195,6 +219,98 @@ def build_server():
         from .recolor import recolor_file
         m = dict(p.split("=", 1) for p in mapping.split(",")) if mapping else None
         return recolor_file(image, out, mapping=m, hue=hue, lightness=lightness, chroma=chroma)
+
+    @mcp.tool()
+    def render_shape_sprite(file: str, out_dir: str, style: str = "gothic_hd", clips: str = "", directions: str = "", elevation: float = -1.0,
+                            passes: bool = False, gif: bool = False) -> dict:
+        """Render a .shapes.json (a character or object drawn by code) with the motion clips: every clip in every direction as real
+        frames into out_dir/<clip>_<DIR>/frame_NNN.png (+ animations.json, manifest.json: what export / export_game read).
+        style: a look preset (figure height, ramp length, outline). clips/directions: comma lists (defaults: the game's seven clips, all 8).
+        elevation: camera degrees above level (-1 = the file's). gif: also a GIF per clip and direction."""
+        from . import shape_rig, shape_tools, shapes as S
+        from .spritesheet import save_gif
+        doc = S.load_shapes(file)
+        problems = S.validate(doc)
+        if problems:
+            return {"ok": False, "problems": problems}
+        cl = [c.strip() for c in clips.split(",") if c.strip()] or list(shape_rig.GAME_CLIPS)
+        di = [d.strip().upper() for d in directions.split(",") if d.strip()] or list(shape_rig.DIRECTIONS)
+        r = shape_tools.render_set(doc, out_dir, clips=cl, directions=di, style=style or None, elevation=None if elevation < 0 else elevation, passes=passes)
+        if gif:
+            from PIL import Image
+            for c in cl:
+                for d in di:
+                    files = sorted((Path(out_dir) / f"{c}_{d}").glob("frame_*.png"))
+                    save_gif([Image.open(f).convert("RGBA") for f in files], Path(out_dir) / f"{c}_{d}.gif", fps=r["fps"][c], zoom=3, background=(94, 93, 98, 255))
+        return r
+
+    @mcp.tool()
+    def preview_shape_sprite(file: str, out: str, clip: str = "idle", direction: str = "S", style: str = "gothic_hd", elevation: float = -1.0) -> dict:
+        """A looping GIF of one clip in one direction from a .shapes.json, to judge the look and the motion."""
+        from . import shape_tools, shapes as S
+        return shape_tools.gif_of(S.load_shapes(file), clip, direction.upper(), out, style=style or None, elevation=None if elevation < 0 else elevation)
+
+    @mcp.tool()
+    def shape_sheet(file: str, out: str, clips: str = "idle,walk", directions: str = "", style: str = "gothic_hd", columns: int = 8) -> dict:
+        """A contact sheet PNG of a .shapes.json: a row per clip and direction, `columns` frames each."""
+        from . import shape_rig, shape_tools, shapes as S
+        doc = S.load_shapes(file)
+        opt = shape_tools.options_for(doc, style or None)
+        model = S.Model(doc, opt["scale"], opt["steps"]) if S.mode_of(doc) == "solid" else None
+        tracks = shape_rig.load_joints()
+        rows = []
+        for c in [x.strip() for x in clips.split(",") if x.strip()]:
+            for d in [x.strip().upper() for x in directions.split(",") if x.strip()] or list(shape_rig.DIRECTIONS):
+                res = shape_rig.render_clip(doc, c, d, tracks=tracks, model=model, scale=opt["scale"], steps=opt["steps"], outline=opt["outline"], elevation=opt["elevation"], max_frames=opt["max_frames"])
+                rows.append((f"{c} {d}", res["frames"][::max(1, len(res["frames"]) // columns)][:columns]))
+        return shape_tools.contact_sheet(rows, out, columns=columns)
+
+    @mcp.tool()
+    def shape_object(file: str, out_dir: str, name: str = "", directions: str = "S", style: str = "gothic_hd", game_objects: str = "", hr: float = 2.0) -> dict:
+        """A .shapes.json (a chest, a skull, a tree) as a game object: a trimmed PNG per direction with its foot anchor into out_dir,
+        <name>.json beside them, and entries in the game's art/objects/objects.json when game_objects names it (hr = texels per world px)."""
+        from . import shape_tools, shapes as S
+        doc = S.load_shapes(file)
+        problems = S.validate(doc)
+        if problems:
+            return {"ok": False, "problems": problems}
+        return shape_tools.export_object(doc, out_dir, name or None, directions=[d.strip().upper() for d in directions.split(",") if d.strip()] or ["S"],
+                                         style=style or None, game_objects=game_objects or None, hr=hr)
+
+    @mcp.tool()
+    def validate_shapes(file: str) -> dict:
+        """Check a .shapes.json: problems in plain words, or a summary (mode, shapes, materials, bones, unbound shapes)."""
+        return api.validate_shapes(file)
+
+    @mcp.tool()
+    def shape_template(height: int = 120, out: str = "", png: str = "") -> dict:
+        """The author pose for a figure height: every bone's head and tail in file units (what to draw shapes around), optionally
+        written as JSON and as a stick-figure PNG."""
+        from . import shape_tools
+        return shape_tools.template_file(height, out or None, png or None)
+
+    @mcp.tool()
+    def draft_shapes(text: str, out: str = "", height: int = 120) -> dict:
+        """Describe it: a sentence -> a starter .shapes.json (a humanoid on the author pose; costume words become parts and materials).
+        Edit the file, then render_shape_sprite."""
+        return api.draft_shapes(text, out=out or None, height=height)
+
+    @mcp.tool()
+    def import_shapes(project: str, character: str, file: str) -> dict:
+        """Give a project character a shape sprite (.shapes.json); render_shapes then replaces the painting steps."""
+        try:
+            return api.import_shapes(_project(project), character, file)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
+    def render_shapes(project: str, character: str, style: str = "", clips: str = "", directions: str = "", elevation: float = -1.0) -> dict:
+        """Render a character's shape sprite into its frames folder (then export_game writes the game's atlas with foot anchors)."""
+        try:
+            return api.render_shapes(_project(project), character, preset=style or None, clips=clips or None, directions=directions or None,
+                                     elevation=None if elevation < 0 else elevation)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
 
     @mcp.tool()
     def compare(a: str, b: str, out: str = "compare.png") -> dict:

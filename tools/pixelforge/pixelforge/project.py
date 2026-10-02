@@ -160,6 +160,8 @@ class Project:
                     "done": [s for s, _ in STEPS if c.done.get(s)],
                     "next": next((s for s, _ in STEPS if not c.done.get(s)), None),
                     "notes": c.notes,
+                    "style": c.settings.get("style", self.style),   # the look the character works in
+                    "own_style": bool(c.settings.get("style")),      # its own, or following the project's
                 }
                 for k, c in self.characters.items()
             },

@@ -16,6 +16,7 @@ so an assistant on the command line and a person in the app never disagree.
 
 | Need | Command | App / Studio |
 |---|---|---|
+| Character or object drawn by code: a `.shapes.json` of shapes with materials on bones → the motion clips (24) → real frames in 8 directions → game files (no painting, no Blender); objects as stills with foot points | `pixelforge shapes …`, `project import-shapes / render-shapes` | — |
 | Character: painting → 3D figure → 46 clips → 8 directions → pixel frames → game files | `pixelforge project …` | Steps 1-9 |
 | Fix a cutout by hand | — | Step 3 → Edit |
 | Judge the motion | `project` + `preview_gif` | Step 7/8 → Preview |
@@ -44,6 +45,8 @@ so an assistant on the command line and a person in the app never disagree.
 | Loaders for any Godot project | `pixelforge godot-addon <project>` | Tools |
 | Is this machine ready? | `pixelforge doctor` | Settings / install.bat |
 | The app itself | `pixelforge forge`, `forge_launch.py` | `PixelForge.bat` |
+| Looks: seven presets (Godmarrow, gothic hi-res, rendered ARPG, SNES 16-bit, handheld, modern indie, painterly) fixing figure height, palette, outline, shading, grade, effects, loops and tiles; animated examples | `pixelforge styles [--demo OUT]`, `project set --style` | Style page |
+| Is this machine ready? | `pixelforge doctor` | install.bat |
 | An AI running all of it | `pixelforge mcp`, `docs/GUIDE_AI.md` | — |
 
 ## Install (Windows)
@@ -53,6 +56,19 @@ so an assistant on the command line and a person in the app never disagree.
 3. Double-click **PixelForge** (the app) or **PixelForge Studio (classic)**. The Build step downloads Blender (free, 380 MB) for you if none is installed; the app fetches Godot (free) the first time if the game's is not there.
 
 Any OS: `pip install -e .` then `pixelforge doctor`.
+
+## Shape sprites, in one paragraph
+
+A character is a text file of shapes: ellipsoids, capsules, boxes and rings (coats, capes, skirts, hat brims, with
+ragged hems, open fronts and holes) with a colour ramp each and material rules (lames, rivets, stitching, cracks that
+glow), every shape riding a bone. `shapes.py` voxelises the file once and renders any direction by rotating the
+surface shell, z-buffering it and shading each pixel from one fixed light with the ramps, then contours, a 1 px
+outline, emissives, point lights with real depth and normals, a dithered shadow; the same rules draw flat 2D shape
+sprites for icons and effects (the reference necromancer page, re-rendered pixel for pixel). `joints.py` reads the
+animation library with numpy, `shape_rig.py` binds the shapes to the clips' joints (loose parts swing after the body,
+the planted foot holds the ground, every body moves by whole pixels and holds its drawn turn until the clip has
+turned it a step, so the frames never boil) and renders every clip in eight directions in a few seconds. Examples under
+`assets/shapes/`; the guide's "Shape sprites" section is the format reference.
 
 ## The character pipeline, in one paragraph
 
@@ -68,8 +84,9 @@ packs them into Godot SpriteFrames or the game's atlas with foot anchors.
 
 `pixelforge/api.py` is the pipeline (one function per step). `gui.py` (Studio), `cli.py`, `mcp_server.py` and the Forge app (`forge/`, launched by `forge_launch.py`) wrap it.
 Image maths: `grid.py`, `palette.py`, `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`, `transform.py`,
-`sheet.py`, `model_spec.py`. Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`, `music.py`, `color_editor.py`, `skin_ops.py`, `skin_editor.py`, `fx_editor.py`, `spell.py`, `spell_designer.py`, `effect_art.py`, `describe.py`, `game_preview.py`, `checks.py`,
-`recolor.py`, `compare.py`, `skilltree.py`, `doctor.py`. Blender-side: `pixelforge/blender/` (no Pillow there).
+`sheet.py`, `model_spec.py`. Shape sprites: `shapes.py` (the renderer, flat and solid), `shape_rig.py` (bones, lag, ground, 8 directions),
+`shape_tools.py` (sets, GIFs, sheets, turntables), `joints.py` (the clips' joint tracks from the library). Tools: `props.py`, `vfx.py`, `icons.py`, `portrait.py`, `tiles.py`, `ui9.py`, `sfx.py`, `music.py`, `color_editor.py`, `skin_ops.py`, `skin_editor.py`, `fx_editor.py`, `spell.py`, `spell_designer.py`, `effect_art.py`, `describe.py`, `game_preview.py`, `checks.py`,
+`recolor.py`, `compare.py`, `skilltree.py`, `doctor.py`. Looks: `styles.py` (the preset table), `style_demo.py` (the animated examples in `assets/styles/`). Blender-side: `pixelforge/blender/` (no Pillow there).
 Godot-side: `godot_addon/pixelforge/` (`PFSpriteSet`, `PFFx`, `PFObjects`). Docs: `docs/GUIDE_HUMANS.md`,
 `docs/GUIDE_AI.md`, `docs/DESIGN.md`, `docs/TOOL_IDEAS.md`. Tests: `pytest`.
 

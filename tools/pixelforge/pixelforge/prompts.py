@@ -45,6 +45,20 @@ PROMPT_KINDS: list[PromptKind] = [
         "scenery, extra characters, cropping",
     ),
     PromptKind(
+        "sheet_px",
+        "A5. Pixel-styled sheet (cleanest conversion: the painting is already pixel art)",
+        "Like A, but painted as large-sprite pixel art with strong value contrast and clear accents, so the "
+        "figure keeps its eyes, trim and silhouette at game size. Use this when a painted sheet turned to mush.",
+        "character turnaround reference sheet of {description}, three views side by side: front view, side view, "
+        "back view, standing in A-pose with arms slightly away from the body, feet shoulder-width apart, full body "
+        "head to toe, same character in every view, orthographic, flat even lighting, no cast shadows, plain solid "
+        "white background, high quality pixel art in the style of a modern gritty 2D action game, large detailed "
+        "sprite, clean pixel clusters, strong value contrast with clearly separated dark, mid and light tones, a "
+        "darker one-pixel edge round the silhouette, deliberate bright accents on the eyes, trim and metal, limited "
+        "palette of about 32 colours, no dithering noise, no blur, dark fantasy, muted desaturated colours "
+        "--ar 3:2 --style raw --no text, labels, perspective, scenery, extra characters, cropping, blur, gradients",
+    ),
+    PromptKind(
         "sheet4",
         "A2. Four-view sheet (best 3D model: adds the three-quarter view)",
         "Like A, plus a three-quarter view. The extra outline makes the diagonal "

@@ -1,0 +1,479 @@
+{
+ "name": "dead_tree",
+ "about": "A tall dead moorland tree: a twisted bare trunk with grooved black bark, a root flare, two reaching limbs, a snapped top and bare twigs. An object: no bones; rendered as a still at the game's 30 degree camera. Height 100 texels at hr 2.",
+ "mode": "solid",
+ "size": [
+  120,
+  110
+ ],
+ "height": 100,
+ "ground": 104.0,
+ "axis": [
+  60.0,
+  0
+ ],
+ "view": {
+  "elevation": 30
+ },
+ "outline": "#0a080c",
+ "materials": {
+  "bark": {
+   "ramp": [
+    "#0d0a08",
+    "#1a1410",
+    "#2a2119",
+    "#3a2e23",
+    "#4c3d2e",
+    "#5e4c3a"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.5
+  },
+  "deadwood": {
+   "ramp": [
+    "#2a2420",
+    "#3f3730",
+    "#574d43",
+    "#6f6355",
+    "#857869"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.4
+  }
+ },
+ "shapes": [
+  {
+   "name": "trunk",
+   "kind": "capsule",
+   "a": [
+    60.0,
+    105.0,
+    0
+   ],
+   "b": [
+    57.0,
+    46.0,
+    1
+   ],
+   "r": [
+    6.8,
+    3.4
+   ],
+   "material": "bark",
+   "rules": [
+    {
+     "every_angle": [
+      14,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.12,
+      4,
+      2
+     ],
+     "t": -1
+    },
+    {
+     "crack": {
+      "x": 61.5,
+      "amp": 1.2,
+      "k": 0.25,
+      "w": 0.7
+     },
+     "y": [
+      54.0,
+      98.0
+     ],
+     "t": -3
+    },
+    {
+     "y": [
+      100.0,
+      null
+     ],
+     "t": -1
+    }
+   ],
+   "bump": {
+    "folds": [
+     0.5,
+     7,
+     1.0
+    ]
+   }
+  },
+  {
+   "name": "root.F",
+   "kind": "capsule",
+   "a": [
+    59.0,
+    99.0,
+    2
+   ],
+   "b": [
+    64.0,
+    104.5,
+    13
+   ],
+   "r": [
+    3.6,
+    1.3
+   ],
+   "material": "bark"
+  },
+  {
+   "name": "root.L",
+   "kind": "capsule",
+   "a": [
+    59.0,
+    99.0,
+    0
+   ],
+   "b": [
+    74.0,
+    104.5,
+    3
+   ],
+   "r": [
+    3.4,
+    1.2
+   ],
+   "material": "bark"
+  },
+  {
+   "name": "root.R",
+   "kind": "capsule",
+   "a": [
+    59.0,
+    99.0,
+    0
+   ],
+   "b": [
+    45.0,
+    104.5,
+    -4
+   ],
+   "r": [
+    3.6,
+    1.3
+   ],
+   "material": "bark"
+  },
+  {
+   "name": "root.B",
+   "kind": "capsule",
+   "a": [
+    59.0,
+    99.0,
+    -2
+   ],
+   "b": [
+    55.0,
+    104.5,
+    -12
+   ],
+   "r": [
+    3.2,
+    1.2
+   ],
+   "material": "bark"
+  },
+  {
+   "name": "limb.R",
+   "kind": "capsule",
+   "a": [
+    58.0,
+    58.0,
+    0
+   ],
+   "b": [
+    85.0,
+    34.0,
+    5
+   ],
+   "r": [
+    3.2,
+    1.2
+   ],
+   "material": "bark",
+   "rules": [
+    {
+     "every_angle": [
+      10,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "limb.R2",
+   "kind": "capsule",
+   "a": [
+    74.0,
+    44.0,
+    3
+   ],
+   "b": [
+    91.0,
+    42.0,
+    9
+   ],
+   "r": [
+    1.5,
+    0.6
+   ],
+   "material": "bark"
+  },
+  {
+   "name": "limb.R3",
+   "kind": "capsule",
+   "a": [
+    85.0,
+    34.0,
+    5
+   ],
+   "b": [
+    94.0,
+    18.0,
+    2
+   ],
+   "r": [
+    1.3,
+    0.5
+   ],
+   "material": "bark"
+  },
+  {
+   "name": "limb.R4",
+   "kind": "capsule",
+   "a": [
+    80.0,
+    38.0,
+    4
+   ],
+   "b": [
+    76.0,
+    24.0,
+    8
+   ],
+   "r": [
+    1.1,
+    0.4
+   ],
+   "material": "bark"
+  },
+  {
+   "name": "limb.L",
+   "kind": "capsule",
+   "a": [
+    57.0,
+    64.0,
+    1
+   ],
+   "b": [
+    36.0,
+    44.0,
+    -6
+   ],
+   "r": [
+    3.0,
+    1.1
+   ],
+   "material": "bark",
+   "rules": [
+    {
+     "every_angle": [
+      10,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "limb.L2",
+   "kind": "capsule",
+   "a": [
+    36.0,
+    44.0,
+    -6
+   ],
+   "b": [
+    24.0,
+    32.0,
+    -4
+   ],
+   "r": [
+    1.2,
+    0.5
+   ],
+   "material": "bark"
+  },
+  {
+   "name": "limb.L3",
+   "kind": "capsule",
+   "a": [
+    45.0,
+    52.0,
+    -3
+   ],
+   "b": [
+    40.0,
+    34.0,
+    2
+   ],
+   "r": [
+    1.3,
+    0.5
+   ],
+   "material": "bark"
+  },
+  {
+   "name": "limb.L4",
+   "kind": "capsule",
+   "a": [
+    30.0,
+    38.0,
+    -5
+   ],
+   "b": [
+    20.0,
+    40.0,
+    -11
+   ],
+   "r": [
+    0.9,
+    0.4
+   ],
+   "material": "bark"
+  },
+  {
+   "name": "top",
+   "kind": "capsule",
+   "a": [
+    57.0,
+    46.0,
+    1
+   ],
+   "b": [
+    62.0,
+    20.0,
+    -2
+   ],
+   "r": [
+    3.0,
+    1.3
+   ],
+   "material": "deadwood",
+   "rules": [
+    {
+     "every_angle": [
+      9,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      null,
+      24.0
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "top.twig",
+   "kind": "capsule",
+   "a": [
+    61.0,
+    26.0,
+    -1
+   ],
+   "b": [
+    70.0,
+    12.0,
+    3
+   ],
+   "r": [
+    1.0,
+    0.4
+   ],
+   "material": "deadwood"
+  },
+  {
+   "name": "top.twig2",
+   "kind": "capsule",
+   "a": [
+    62.0,
+    20.0,
+    -2
+   ],
+   "b": [
+    54.0,
+    8.0,
+    0
+   ],
+   "r": [
+    1.1,
+    0.4
+   ],
+   "material": "deadwood"
+  },
+  {
+   "name": "stub",
+   "kind": "capsule",
+   "a": [
+    62.0,
+    76.0,
+    2
+   ],
+   "b": [
+    71.0,
+    70.0,
+    9
+   ],
+   "r": [
+    2.2,
+    1.0
+   ],
+   "material": "bark",
+   "rules": [
+    {
+     "z": [
+      7,
+      null
+     ],
+     "material": "deadwood",
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "stub.B",
+   "kind": "capsule",
+   "a": [
+    57.0,
+    82.0,
+    -4
+   ],
+   "b": [
+    51.0,
+    74.0,
+    -11
+   ],
+   "r": [
+    1.9,
+    0.8
+   ],
+   "material": "bark"
+  }
+ ],
+ "effects": [],
+ "lights": [],
+ "shadow": null
+}
