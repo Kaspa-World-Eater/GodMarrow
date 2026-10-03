@@ -101,7 +101,9 @@ func _model_loaded() -> void:
 	state["title"] = String(doc.get("name", state["name"])).capitalize()
 	full_render = FileAccess.file_exists(char_dir().path_join("frames").path_join("animations.json"))
 	retime = app.backend.read_json(char_dir().path_join("frames").path_join("retime.json"))
+	print("DBG model_loaded tab=", tab)
 	rebuild()
+	print("DBG rebuilt")
 	if tab in [3, 4]:
 		show_clip()
 	else:
@@ -143,6 +145,7 @@ var _frames_dirty := true
 
 ## the frames of the chosen clip and direction: from the full render when there is one, else a quick preview render
 func show_clip(force_render: bool = false) -> void:
+	print("DBG show_clip has_model=", has_model(), " job=", job, " dirty=", _frames_dirty, " tab=", tab)
 	if not has_model():
 		return
 	var clip := String(state["clip"])

@@ -16,6 +16,8 @@ extends Node
 ##   music on|off
 ##   log                     toggle the log drawer
 ##   say TEXT                print a line to the terminal
+##   geometry                print the picture window's, the text box's and the rows' rects (a check hook)
+##   dumplog                 print the backend's log so far
 ##   quit
 
 var app: Node
@@ -100,6 +102,11 @@ func _run() -> void:
 				app.toggle_log()
 			"say":
 				print(arg)
+			"geometry":
+				_geometry()
+			"dumplog":
+				for l in app.backend.log_lines:
+					print("LOG ", l)
 			"quit":
 				get_tree().quit()
 				return
@@ -107,6 +114,13 @@ func _run() -> void:
 				print("SCRIPT unknown: ", line)
 	print("SCRIPT done")
 	get_tree().quit()
+
+func _geometry() -> void:
+	print("GEOM scene ", app.scene.position, " ", app.scene.size, " layer ", app.layer.position, " ", app.layer.size, " tabs ", app.tabs_ctrl.position, " ", app.tabs_ctrl.size, " visible ", app.tabs_ctrl.visible)
+	if app.current:
+		print("GEOM screen ", app.current.screen_name, " tab ", app.current.tab, " rows ", app.current.rows.position, " ", app.current.rows.size)
+		for c in app.current.rows.get_children():
+			print("GEOM   row ", c.get_class(), " ", c.position, " ", c.size, " min ", c.custom_minimum_size, " vis ", c.visible)
 
 func _settle(s: float = 0.5) -> void:
 	await get_tree().create_timer(s).timeout

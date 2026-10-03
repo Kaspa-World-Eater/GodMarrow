@@ -341,6 +341,7 @@ func on_state_restored() -> void:
 # ------------------------------------------------------------------ running the pipeline
 ## run one command; the strip shows progress; `on_done` gets the result; a stopped step shows its plain line
 func run(args: Array, words: String, on_done: Callable, with_progress: bool = true) -> void:
+	print("DBG run ", args[0], " job=", job)
 	if job != null:
 		app.say("Still working on the last thing.")
 		return
