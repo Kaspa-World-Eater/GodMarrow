@@ -228,6 +228,8 @@ def main() -> None:
     p.add_argument("--back")
     p.add_argument("--side")
     p.add_argument("--quarter")
+    p.add_argument("--top", help="accepted for parity with build_mesh.py (api passes it); the fitted mannequin does not paint plan views")
+    p.add_argument("--bottom", help="accepted for parity with build_mesh.py; unused here")
     p.add_argument("--shade", type=float, default=0.0)
     p.add_argument("--relief", type=float, default=0.35)
     p.add_argument("--arm-angle", type=float, default=0.0, help="A-pose arm swing from the T-pose, degrees (0 = pick the best of 35/50/65/80)")

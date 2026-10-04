@@ -678,3 +678,12 @@ tools/pixelforge/forge --script res://tools/check_scripts.gd`; the sweep and the
 section says. Next, in the owner's order: watch the first full run on the laptop (the Godot download, the first
 *Put it in the game*); the Keeper's second authoring pass; the beast rig for Creatures; then objects / effects / tiles
 through the engine (PLAN.md phases 3-4).
+
+**derek-33, 2026-10-04: Hemomancer test 1 and two Forge fixes.** Derek's three-view Hemomancer sheet went through the Forge
+on his PC: `docs/concepts/hemomancer/test1/` (source, cleaned views, prep script, walk/attack GIFs, README with the verdict);
+sprite set `art/sprites/hemomancer_test1.*` (not in `skins.json`). Forge fixes found on the way: `checks.check_spec` crashed
+(`KeyError: 'voxels'`) on the front-only inflated-cutout spec, now returns ok when there are no voxels; `api.build_model`
+passes `--top`/`--bottom` to every Blender script but `blender/fit_template.py` did not accept them ("unrecognized
+arguments: --top"), so the humanoid fit never ran; it now accepts and ignores them. Also on Derek's PC since 2026-10-04:
+a fresh clone at `C:\Users\derek\GodMarrow`, the self-updating Desktop icons Godmarrow / PixelForge / PixelForge Studio
+(classic) from `install.bat`, Derek's art gathered in `Desktop\Godmarrow Art`.

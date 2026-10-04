@@ -80,6 +80,8 @@ def check_views(views_dir: str | Path) -> dict:
 def check_spec(spec: dict) -> dict:
     from scipy import ndimage
 
+    if "voxels" not in spec:   # the front-only inflated cutout (spec v1: a depth grid, no voxels) has nothing to carve-check
+        return {"ok": True, "issues": [], "voxels": 0, "parts": [p["kind"] for p in spec.get("parts", [])]}
     vox = np.array([[[c == "1" for c in row] for row in layer] for layer in spec["voxels"]], bool)
     out = {"ok": True, "issues": [], "voxels": int(vox.sum()), "parts": [p["kind"] for p in spec.get("parts", [])]}
     lab, n = ndimage.label(vox)
