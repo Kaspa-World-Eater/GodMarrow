@@ -125,6 +125,65 @@ Everything the app makes lands in a project folder it creates for you (Documents
 say so, in the game's art. An AI assistant can do every one of these things through the command line; the app and the
 assistant never disagree, because the app only ever runs the same commands.
 
+## Claude on the bench
+
+Every bench has a line at the foot of the text box marked **Claude:** (press `/` to jump to it). Type what you want
+in plain words and press Enter: *"slower, 76 bpm, darker"* on Music, *"a hooded necromancer with a skull-topped
+staff, a longer cape"* on Characters, *"a slow pale wisp with embers"* on Effects, *"more variants, fewer colours"*
+on Tiles. Claude Code (Anthropic's command-line assistant) takes the line and does the work through PixelForge's own
+tools on the same project folder: it cannot do anything the levers cannot, and everything it does is one command
+you could have run. While it works the title line reads **Claude: working** in a pulsing ember and the progress
+strip says what it is doing right now (*drafting the model*, *setting tempo 76*). When it is done the bench reloads:
+a new model stands in the window, the levers it moved light up for a moment, new notes are ringed on the grid, and
+its one or two sentences of notes sit on the state line. **Undo** takes the whole run back, files included (the
+bench keeps a snapshot of its files before every run). On Characters the result also brings the Midjourney prompts
+for the figure: the *prompt* cycler on the Reference tab picks one, **Copy prompt** puts it on the clipboard.
+
+**What you need, once.** Claude Code installed and signed in: install it from claude.com/claude-code, open a
+terminal, run `claude`, sign in with your Anthropic account, close it. `install.bat` then tells Claude Code about
+PixelForge's tools (`claude mcp add pixelforge`); the Forge does the same on its first launch if it finds it has not
+been done. The title line tells you where you stand: **Claude: ready**, **Claude: not found (install Claude Code)**
+or **Claude: not signed in**. A line typed before it is ready answers with the same sentence and the fix.
+
+**When it fails.** The bench says so in one plain line, never a pop-up: *Claude Code was not found...*, *not signed
+in...*, *Claude did not finish within 600 s; it was stopped...*, *Claude stopped at the spending limit for one job*.
+Every run is written to `<project>\claude\logs\` (`pixelforge claude log` prints the last one; Ctrl+L shows the
+Forge's own log). One job may spend up to 3 dollars of your plan's usage by default (`PIXELFORGE_CLAUDE_BUDGET`
+changes it). A long sentence is fine; a vague one gets a vague result. Say what, not how: Claude knows the tools.
+
+## Midjourney through your browser
+
+Claude Code can drive your own Chrome through the **Claude in Chrome** extension, so the Characters bench can send its
+prompt to Midjourney and bring the painting back without you copying anything: **Paint it in Midjourney** on the
+Reference tab (Objects has **Fetch a turnaround** and **Fetch a prop sheet of nine**). The painting lands on the
+Reference tab beside the model when it is done.
+
+**First run, step by step.**
+1. Install the Claude in Chrome extension from the Chrome Web Store (version 1.0.36 or later) and sign in to it with
+   the same Anthropic account as Claude Code. Chrome or Edge; not inside WSL.
+2. Sign in to midjourney.com in that same Chrome and leave Chrome open. The extension uses your logged-in tabs.
+3. In a terminal, run `claude --chrome` once, press Enter on the one-time dialog, and ask it to *open midjourney.com*:
+   the first time, the extension asks you to allow Claude on that site; allow it (the site permissions live in the
+   extension's settings). Type `/chrome` in that session: it should read *Status: Enabled, Extension: Installed*. Close it.
+4. In the Forge, with a model on the Characters bench, choose **Paint it in Midjourney**. The state line says *Watch
+   the browser*: a new Chrome tab opens on midjourney.com, the prompt is typed in with the bench's clay view attached
+   as the image prompt, the grid is waited for, the best variation (or all four when the choice says so) is
+   upscaled, and the files are downloaded into `<project>\characters\<name>\reference\`. One job at a time, at a
+   human pace; it can take a few minutes. Do not touch that tab while it works.
+
+**What to do when it fails.** The bench says which it was:
+- *Chrome is not connected to Claude Code* — Chrome is not open, the extension is not installed or not signed in, or the
+  pairing was never done (step 3). Restart Chrome and run `claude --chrome` once more; `/chrome` in it has *Reconnect
+  extension*.
+- *Midjourney asked for a sign-in or a check* — do it in the tab yourself (Claude never passes sign-ins or checks),
+  then choose the button again.
+- *Midjourney gave nothing back* — the grid never finished or the download was refused; look at the tab, and at the log.
+- Chrome integration needs a sign-in with your Anthropic account (a plan: Pro, Max, Team or Enterprise); it is off when
+  Claude Code runs on an API key or a long-lived token.
+
+The fallback is always there: **Copy prompt**, paste it in Midjourney yourself, upscale, save the PNG, and drop the
+file on the bench. The bench says so whenever the browser road is closed.
+
 ## Install (once)
 
 1. Install **Python 3.11 or newer** from python.org. Tick **"Add Python to PATH"**.

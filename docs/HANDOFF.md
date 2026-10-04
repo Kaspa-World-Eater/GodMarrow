@@ -796,3 +796,36 @@ tools/pixelforge/forge --script res://tools/check_scripts.gd`; `pixelforge forge
 owner's listening pass on the theme and three samples; map the describe line's mood words to `music compose`; a
 chord lane; swing.
 
+
+### 7.19 2026-10-04, track/claude: Claude on the bench, and Midjourney through the owner's Chrome
+
+**What.** Claude Code wired into the Forge: every workbench has a *Claude:* line (`/`); the sentence goes to
+`pixelforge describe --bench <bench> -p <project> "<words>"`, which runs the Claude Code CLI in print mode with
+PixelForge's own MCP server as its only tools (`pixelforge/claude_bridge.py`: `claude -p --output-format stream-json
+--mcp-config ... --tools Read --allowedTools mcp__pixelforge,Read --permission-prompts none --strict-mcp-config
+--max-budget-usd 3 --append-system-prompt <the bench, the project, what is on the bench, the style rules, the banned
+words, the JSON ending>`). The title line reads *Claude: ready / working (ember pulse) / not found / not signed in*;
+the strip says what it is doing (*drafting the model*, *setting tempo 76*); when done the bench reloads, the levers
+it moved light, new notes are ringed, its notes sit on the state line, and **Undo** puts the files back from the
+snapshot the run took (`<project>/claude/undo/`, `pixelforge claude undo`). Characters gets the Midjourney prompts
+(a *prompt* cycler, **Copy prompt**) and **Paint it in Midjourney**; Objects **Fetch a turnaround** / **Fetch a prop
+sheet of nine**: `pixelforge midjourney fetch` runs the bridge with `--chrome` and a procedure prompt for the Claude
+in Chrome extension (one job, human pace; the painting lands on the Reference tab). `pixelforge claude status |
+register | log | undo`; `install.bat` and the Forge's first launch register the server (`claude mcp add -s user
+pixelforge -- <python> -m pixelforge.cli mcp`). A mock (`PIXELFORGE_CLAUDE=mock:<jsonl>`) stands in for the CLI in
+tests and the sweep. Docs: GUIDE_HUMANS *Claude on the bench* and *Midjourney through your browser* (the first-run
+procedure, what fails and what to do), GUIDE_AI *Claude on the bench* (the command, the system prompt contract, the
+summary JSON, how a session should behave when it is the Claude on the bench), `docs/track_notes/claude_bench.md`.
+
+**Verified.** 225 pytest green (`tests/test_claude_bridge.py` 25); `check_scripts.gd` 33/0; the sweep's
+`describe_characters` and `describe_music` walkthroughs at 0 errors (`docs/screens/forgeapp/describe_*.png`); one
+real `claude -p` stream read to confirm the event shapes. **Not exercised:** the Chrome step itself (no Chrome, no
+Midjourney here): built to the documented `--chrome` behaviour; the owner's PC needs Chrome open with the Claude in
+Chrome extension (1.0.36+) signed in, Claude Code signed in through `/login` (not an API key), midjourney.com signed
+in, and one `claude --chrome` session by hand first. Watch the first run (print mode pairing with the extension, the
+per-site permission, the time a grid takes).
+
+**How to resume.** `cd tools/pixelforge && PIXELFORGE_NO_UPDATE=1 python -m pytest -q`; `godot --headless --path
+tools/pixelforge/forge --script res://tools/check_scripts.gd`; `ONLY=describe GODOT=... PROJECT=... PY=python
+forge/tools/screens.sh OUT`. On the laptop: `pixelforge claude status`, then a line on the Music bench first (cheap,
+visible), then Characters, then **Paint it in Midjourney** with the browser in view.
