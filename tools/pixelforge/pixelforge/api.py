@@ -243,7 +243,7 @@ def preview_gif(project: Project, name: str, clip: str = "walk", direction: str 
         roots.append(project.sub(c.name, "renders"))
     for root in roots:
         d = root / f"{clip}_{direction}" if root.name == "frames" else root / clip / direction
-        files = sorted(d.glob("frame_*.png"))
+        files = sorted(d.glob("frame_[0-9][0-9][0-9].png"))
         if files:
             out = project.sub(c.name, "previews") / f"{clip}_{direction}.gif"
             out.parent.mkdir(parents=True, exist_ok=True)
@@ -653,7 +653,7 @@ def pixelate_renders(project: Project, name: str, outline: str | None = "style",
     frames_dir = project.sub(c.name, "frames")
     opts = _options_for(project, c, outline=outline)
     opts.scale = scale
-    clips = [(action, d, sorted((renders / action / d).glob("frame_*.png"))) for action in manifest["actions"] for d in manifest["directions"]]
+    clips = [(action, d, sorted((renders / action / d).glob("frame_[0-9][0-9][0-9].png"))) for action in manifest["actions"] for d in manifest["directions"]]
     clips = [(a, d, src) for a, d, src in clips if src]
     if grading(opts) and opts.grade_ref is None and clips:
         # a graded or banded look measures its lightness anchors once for the whole character (the first and middle
@@ -685,7 +685,7 @@ def pixelate_renders(project: Project, name: str, outline: str | None = "style",
         popts.scale = scale
         for action in manifest["actions"]:
             for d in manifest["directions"]:
-                src = sorted((src_root / action / d).glob("frame_*.png"))
+                src = sorted((src_root / action / d).glob("frame_[0-9][0-9][0-9].png"))
                 if not src:
                     continue
                 out = dst_root / f"{action}_{d}"
@@ -750,12 +750,12 @@ def export(project: Project, name: str, fps: float | None = None) -> dict:
     meta = frames_dir / "animations.json"
     clip_fps = fps or (json.loads(meta.read_text())["fps"] if meta.exists() else 8)
     for clip in sorted(p for p in frames_dir.iterdir() if p.is_dir()):
-        files = sorted(clip.glob("frame_*.png"))
+        files = sorted(clip.glob("frame_[0-9][0-9][0-9].png"))
         if files:
             clips[clip.name] = [Image.open(f) for f in files]
     if not clips:  # quick path only: the procedural clips made from a still
         for anim in sorted(project.sub(c.name, "anim").glob("*/")):
-            files = sorted(anim.glob("frame_*.png"))
+            files = sorted(anim.glob("frame_[0-9][0-9][0-9].png"))
             if files:
                 clips[f"still_{anim.name}"] = [Image.open(f) for f in files]
     if not clips:
@@ -883,10 +883,11 @@ def import_shapes(project: Project, name: str, path: str | Path) -> dict:
 
 
 def render_shapes(project: Project, name: str, preset: str | None = None, clips: list[str] | str | None = None, directions: list[str] | str | None = None,
-                  elevation: float | None = None, passes: bool = False, log=None, progress=None) -> dict:
+                  elevation: float | None = None, passes: bool = False, log=None, progress=None, parts: bool = True) -> dict:
     """Render a character's shape sprite with the motion clips into the frames layout the export steps read
     (``frames/<clip>_<DIR>/frame_NNN.png`` + ``animations.json``, and ``renders/manifest.json`` for the foot anchors).
-    ``preset`` (a look) gives the figure height, the ramp length and the outline rule; the project's style when omitted."""
+    ``preset`` (a look) gives the figure height, the ramp length and the outline rule; the project's style when omitted.
+    ``parts`` (the default) also writes ``frame_NNN.parts.png`` per frame and the part table into the manifest."""
     from . import shape_rig, shape_tools, shapes as S
 
     c = project.character(name)
@@ -905,7 +906,8 @@ def render_shapes(project: Project, name: str, preset: str | None = None, clips:
     for old in frames.iterdir():
         if old.is_dir():
             shutil.rmtree(old)
-    r = shape_tools.render_set(doc, frames, clips=clips, directions=directions, style=st, elevation=elevation, passes=passes, log=log, progress=progress)
+    r = shape_tools.render_set(doc, frames, clips=clips, directions=directions, style=st, elevation=elevation, passes=passes, log=log, progress=progress,
+                               parts=parts)
     renders = project.sub(c.name, "renders")
     shutil.copy(frames / "manifest.json", renders / "manifest.json")
     if passes:

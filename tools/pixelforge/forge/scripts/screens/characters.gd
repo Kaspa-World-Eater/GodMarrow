@@ -1157,7 +1157,7 @@ func _materialise_retime() -> void:
 		return
 	var imgs := []
 	for f in da.get_files():
-		if f.begins_with("frame_") and f.ends_with(".png"):
+		if f.begins_with("frame_") and f.ends_with(".png") and not f.contains(".parts."):
 			imgs.append(f)
 	imgs.sort()
 	var out := []

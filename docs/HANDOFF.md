@@ -796,3 +796,25 @@ tools/pixelforge/forge --script res://tools/check_scripts.gd`; `pixelforge forge
 owner's listening pass on the theme and three samples; map the describe line's mood words to `music compose`; a
 chord lane; swing.
 
+### 7.20 2026-10-04, track/partids: part-id masks from the shape road, so the editor's carry matches by part
+
+**Done.** Every frame the shape road renders gets `frame_NNN.parts.png` beside it: a paletted PNG whose pixel value is
+the part index (0 = empty; palette entry i is grey level i with index 0 transparent, so the editor's `Doc.part_at`
+reads `r8` as the part and alpha 0 as empty; 16-bit greyscale only from 256 parts up). The part table goes into
+`manifest.json` under `"parts"` (`index`, `name`, `group` = the bone, `material`, `shapes`): one entry per named part,
+one per shape without a part. `shapes.part_table`, `Canvas.parts_pass`, `Frame.parts`, `render_clip["parts"]`,
+`shape_tools.save_parts` / `load_parts`; `render_set`, `still` (`<stem>.parts.png`, zoomed with the picture) and
+`turntable` (`<stem>_parts/`) write them, `api.render_shapes(parts=True)`, `--no-parts` on `shapes render|still|turntable`
+and `project render-shapes`, `render_shape_sprite(parts=)` on MCP. Outline pixels take the part beside them. The frames
+readers (`godmarrow_export`, `api` previews/export, `checks`, `gui`, the GIF options, the Forge's folder listings) match
+`frame_NNN.png` only, so the masks are never counted as frames.
+
+**Verified.** 209 pytest green (`tests/test_part_ids.py` 9: the table, a mask per frame whose values map to the table,
+the hat's pixels are the hat part, empty pixels 0, outline coverage, the manifest round trip and the game export's
+frame count, `--no-parts`, still and turntable, the flat path, the CLI flag); `test_editor.gd` 106/0,
+`check_scripts.gd` 33/0. The editor's carry run headless on a Keeper idle S/E/N set rendered with parts (`--screen=editor
+--frames=... --edits=...`): a 3 px stroke on the hat carried to 4 frames, 12 px, `"by": "part"`; `pixel` reports
+`part: 1`. No editor change was needed. Render time: the Keeper's idle S 4.37 s before, 4.34 s after (medians of four).
+
+**How to resume.** `cd tools/pixelforge && PIXELFORGE_NO_UPDATE=1 python -m pytest -q`. Next: the editor could read
+the manifest's `"parts"` to name the part under the cursor; anchors could ride a part id.

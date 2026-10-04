@@ -74,6 +74,7 @@ operations as tools (see the end of this file).
     model/   <name>_rigged.blend                               after `rig`
     renders/ manifest.json <action>/<dir>/frame_NNN.png        Blender output, RGBA, render_size px
     frames/  animations.json <action>_<dir>/frame_NNN.png      pixel art frames (sprite size)
+             <clip>_<DIR>/frame_NNN.parts.png                  shape road: the part index per pixel (0 = empty), paletted PNG
     sprites/ <view>.png <view>_x4.png                          quick-path stills
     anim/    <preset>/frame_NNN.png preview.gif                quick-path procedural clips
     export/  <name>.png .json .tres .tscn                      Godot 4 files
@@ -316,7 +317,7 @@ pixelforge shapes joints [--fps 24]                                        # re-
 pixelforge project new <folder> --style gothic_hd
 pixelforge project add <character> -p <folder>
 pixelforge project import-shapes <character> FILE -p <folder>      # the character now renders from the file; the painting steps are skipped
-pixelforge project render-shapes <character> -p <folder> [--style S] [--clips ...] [--directions ...]   # frames/<clip>_<DIR>/frame_NNN.png + animations.json + renders/manifest.json
+pixelforge project render-shapes <character> -p <folder> [--style S] [--clips ...] [--directions ...] [--no-parts]   # frames/<clip>_<DIR>/frame_NNN.png (+ frame_NNN.parts.png) + animations.json + renders/manifest.json (with "parts")
 pixelforge project run <character> shapes -p <folder>              # the same as a step; run-all runs it when the character has a shape file
 pixelforge project export-game <character> --kind <kind> -p <folder> [--out <game>/art/sprites] [--skin-for <class>]   # the game's atlas with foot anchors, from those frames; into art/sprites it also writes the skins.json entry (the hero loader prefers a PixelForge set over <kind>_unclipped) and warns when the figure is not 195 px
 pixelforge project preview-shapes <character> --clip idle --direction S -p <folder>
@@ -328,8 +329,18 @@ length (`shading_bands`; 0 keeps each ramp's own) and the outline rule (`none` /
 `clip_frames`); the clip keeps its real duration, so the fps written for it is `24 * frames / clip frames`. A clip
 that reaches past the file's canvas (the death lies down) gets a wider one; every frame of a set is padded to one
 square with the ground at the bottom. The frames folder's `manifest.json` carries `elevation: 0` for the anchor maths
-(the frames are already projected) and `view_elevation` for the camera the frames were seen from. API:
-`api.import_shapes`, `api.render_shapes(project, name, preset, clips, directions, elevation, passes)`,
+(the frames are already projected) and `view_elevation` for the camera the frames were seen from.
+
+**Part ids.** Every rendered frame comes with `frame_NNN.parts.png` beside it (`shapes render`, `render-shapes`,
+`render_shape_sprite`; `shapes still` writes `<stem>.parts.png`, `shapes turntable` a `<stem>_parts/` folder; all take
+`--no-parts`): a paletted PNG whose pixel value is the part index, 0 = empty, palette entry i = grey level i with index 0
+transparent (so a reader that expands the palette sees `r8 == index`, alpha 0 for empty); 16-bit greyscale only when a
+file has 256 parts or more. The manifest carries the table under `"parts"`: `[{"index": 1, "name": "hat", "group":
+"head", "material": "straw", "shapes": [0, 1]}, ...]`, one entry per named part (all its shapes) and one per shape
+without a part (under the shape's name); `group` is the bone it rides, `"static"` when none. Outline pixels take the
+part beside them; shadow and glow pixels are 0. `shapes.part_table(doc)` builds the table, `shape_tools.load_parts(png)`
+reads a mask back, `Frame.parts` holds it in memory. The editor's carry matches by these masks (`"by": "part"`). API:
+`api.import_shapes`, `api.render_shapes(project, name, preset, clips, directions, elevation, passes, parts=True)`,
 `api.preview_shapes`, `api.validate_shapes`, `api.draft_shapes`; file-level tools in `pixelforge.shape_tools`
 (`render_set`, `gif_of`, `contact_sheet`, `turntable`, `still`, `export_object`, `add_game_object`, `validate_file`,
 `template_file`). MCP: `render_shape_sprite`, `preview_shape_sprite`, `shape_sheet`, `shape_object`,
@@ -772,8 +783,9 @@ are 1-based.
 | `save` | flatten the visible layers into the frame files (and `.layers/` for the paint layer), save the anchors |
 
 Frame data the editor writes: `<root>/<clip>_<DIR>/frame_NNN.png` (on save), `<root>/.layers/<clip>_<DIR>/frame_NNN.paint.png`,
-`<root>/anchors.json`. It reads `<root>/<clip>_<DIR>/frame_NNN.parts.png` as part-id masks when the render writes them
-(it does not yet: carry and anchors fall back to position, the result says `"by": "position"`).
+`<root>/anchors.json`. It reads `<root>/<clip>_<DIR>/frame_NNN.parts.png` as part-id masks (the shape road writes them
+by default; see "Part ids" under shape sprites), so carry reports `"by": "part"`; without them carry and anchors fall
+back to position and the result says `"by": "position"`.
 
 ## MCP server
 

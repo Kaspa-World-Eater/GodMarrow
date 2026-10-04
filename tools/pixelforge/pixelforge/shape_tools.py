@@ -23,6 +23,31 @@ from .styles import CHARACTER_STYLE, Style, get_style
 GREY = (94, 93, 98, 255)
 
 
+def save_parts(parts: np.ndarray, path: str | Path, zoom: int = 1) -> str:
+    """Write a part-index mask (uint16, 0 = empty) as ``path``: a paletted PNG whose entry i is the grey level i with
+    index 0 transparent when the file has under 256 parts (what the editor reads: ``r8`` is the part, alpha 0 is
+    empty), else a 16-bit greyscale PNG. ``zoom`` repeats each pixel (a zoomed still's mask stays aligned)."""
+    a = np.asarray(parts)
+    if zoom > 1:
+        a = a.repeat(zoom, 0).repeat(zoom, 1)
+    path = Path(path)
+    if a.max(initial=0) < 256:
+        im = Image.fromarray(a.astype(np.uint8), "P")
+        im.putpalette([v for i in range(256) for v in (i, i, i)])
+        im.save(path, transparency=0)
+    else:
+        Image.fromarray(a.astype(np.uint16), "I;16").save(path)
+    return str(path)
+
+
+def load_parts(path: str | Path) -> np.ndarray:
+    """Read a mask :func:`save_parts` wrote back to its uint16 indices."""
+    im = Image.open(path)
+    if im.mode in ("P", "L", "I", "I;16"):          # palette indices, or the grey levels, are the part indices
+        return np.asarray(im, np.uint16)
+    return np.asarray(im.convert("L"), np.uint16)
+
+
 def is_character(doc: dict) -> bool:
     """A solid file whose shapes ride bones (directly or through parts): a figure the clips move, not an object."""
     if S.mode_of(doc) != "solid":
@@ -59,9 +84,12 @@ def options_for(doc: dict, style: str | Style | None, scale: float | None = None
 
 
 def render_set(doc: dict, out_dir: str | Path, *, clips=R.GAME_CLIPS, directions=tuple(R.DIRECTIONS), style=None, scale=None, steps=None,
-               outline="style", elevation=None, max_frames=None, passes: bool = False, square: bool = True, lock=None, log=None, progress=None) -> dict:
+               outline="style", elevation=None, max_frames=None, passes: bool = False, square: bool = True, lock=None, log=None, progress=None,
+               parts: bool = True) -> dict:
     """Render every clip in every direction into ``out_dir/<clip>_<DIR>/frame_NNN.png`` and write
-    ``animations.json`` (fps per clip) and ``manifest.json`` (what the game export needs). Returns the summary."""
+    ``animations.json`` (fps per clip) and ``manifest.json`` (what the game export needs). With ``parts`` (the default)
+    every frame also gets ``frame_NNN.parts.png`` (the part index per pixel, 0 = empty: what the editor's carry matches
+    by) and the manifest the part table under ``"parts"`` (:func:`pixelforge.shapes.part_table`). Returns the summary."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     opt = options_for(doc, style, scale, steps, outline, elevation)
@@ -90,6 +118,8 @@ def render_set(doc: dict, out_dir: str | Path, *, clips=R.GAME_CLIPS, directions
                 old.unlink()
             for i, fr in enumerate(res["frames"]):
                 Image.fromarray(fr, "RGBA").save(folder / f"frame_{i:03d}.png")
+                if parts:
+                    save_parts(res["parts"][i], folder / f"frame_{i:03d}.parts.png")
             if passes:
                 for name, frames in (("normal", res["normal"]), ("depth", res["depth"])):
                     pf = out_dir.parent / f"{out_dir.name}_{name}" / f"{clip}_{d}"
@@ -115,10 +145,13 @@ def render_set(doc: dict, out_dir: str | Path, *, clips=R.GAME_CLIPS, directions
     # view_elevation (what the export's scale note reports).
     manifest = {"size": side, "ppu": 1.0, "elevation": 0.0, "view_elevation": view_elevation, "z_mid": ground_y - side / 2, "source": "shapes",
                 "style": opt["style"], "figure_height": doc.get("height"), "render_scale": opt["scale"]}
+    table = S.part_table(doc)[0]
+    if parts:
+        manifest["parts"] = table
     (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=1))
     return {"ok": True, "frames_dir": str(out_dir), "clips": list(clips), "directions": list(directions), "frames": counts, "fps": clip_fps,
             "size": side, "scale": opt["scale"], "steps": opt["steps"], "outline": opt["outline"], "elevation": view_elevation,
-            "seconds": round(time.time() - t0, 2), "voxels": model.stats["voxels"] if model else None}
+            "seconds": round(time.time() - t0, 2), "voxels": model.stats["voxels"] if model else None, "parts": len(table) if parts else 0}
 
 
 def gif_of(doc: dict, clip: str, direction: str, out: str | Path, *, style=None, scale=None, steps=None, outline="style", elevation=None,
@@ -171,8 +204,10 @@ def contact_sheet(rows: list[tuple[str, list[np.ndarray]]], out: str | Path, *, 
 
 
 def turntable(doc: dict, out: str | Path, *, frames: int = 48, style=None, scale=None, steps=None, outline="style", elevation=None, zoom: int = 3,
-              gif: bool = True) -> dict:
-    """A solid file turning through ``frames`` views (the page's spin) as a GIF, plus its 8 game views as a strip."""
+              gif: bool = True, parts: bool = True) -> dict:
+    """A solid file turning through ``frames`` views (the page's spin) as a GIF, plus its 8 game views as a strip. With
+    ``parts`` the masks go beside them: ``<stem>_parts/frame_NNN.parts.png`` per spin frame, ``view_<DIR>.parts.png``
+    per game view, and ``manifest.json`` with the part table."""
     if S.mode_of(doc) != "solid":
         raise ValueError("a turntable needs a solid file")
     opt = options_for(doc, style, scale, steps, outline, elevation)
@@ -180,19 +215,28 @@ def turntable(doc: dict, out: str | Path, *, frames: int = 48, style=None, scale
     elev = float(doc.get("view", {}).get("elevation", 0.0)) if opt["elevation"] is None else opt["elevation"]
     oc = S.outline_colour(doc, opt["outline"])
     out = Path(out); out.parent.mkdir(parents=True, exist_ok=True)
-    ims = []
+    ims, masks = [], []
     for k in range(frames):
         fr = model.render(k, 2 * math.pi * k / frames, elev, None, outline=oc, lights=doc.get("lights"), effects=doc.get("effects"), shadow=doc.get("shadow"))
-        ims.append(fr.rgba)
+        ims.append(fr.rgba); masks.append(fr.parts)
     result = {"ok": True, "frames": frames, "size": [model.W, model.H], "voxels": model.stats["voxels"]}
     if gif:
         save_gif(ims, out, fps=12, zoom=zoom, background=GREY)
         result["gif"] = str(out)
-    views = [model.render(0, math.radians(R.DIRECTIONS[d]), elev, None, outline=oc, lights=doc.get("lights"), effects=doc.get("effects"), shadow=doc.get("shadow")).rgba
-             for d in R.DIRECTIONS]
+    frs = [model.render(0, math.radians(R.DIRECTIONS[d]), elev, None, outline=oc, lights=doc.get("lights"), effects=doc.get("effects"), shadow=doc.get("shadow"))
+           for d in R.DIRECTIONS]
     strip = out.with_name(out.stem + "_views.png")
-    contact_sheet([("S SE E NE N NW W SW", views)], strip, zoom=zoom)
+    contact_sheet([("S SE E NE N NW W SW", [f.rgba for f in frs])], strip, zoom=zoom)
     result["views"] = str(strip)
+    if parts:
+        pdir = out.with_name(out.stem + "_parts")
+        pdir.mkdir(parents=True, exist_ok=True)
+        for k, m in enumerate(masks):
+            save_parts(m, pdir / f"frame_{k:03d}.parts.png")
+        for d, f in zip(R.DIRECTIONS, frs):
+            save_parts(f.parts, pdir / f"view_{d}.parts.png")
+        (pdir / "manifest.json").write_text(json.dumps({"source": "shapes", "parts": model.part_table}, indent=1))
+        result["parts"] = str(pdir)
     return result
 
 
@@ -210,10 +254,13 @@ def ground_point(doc: dict, direction: str, scale: float, elevation: float | Non
 
 
 def still(doc: dict, out: str | Path, *, frame: int = 0, direction: str = "S", style=None, scale=None, steps=None, outline="style", elevation=None,
-          zoom: int = 1, passes: bool = False, game_objects: str | Path | None = None, name: str | None = None, hr: float = 2.0) -> dict:
+          zoom: int = 1, passes: bool = False, game_objects: str | Path | None = None, name: str | None = None, hr: float = 2.0,
+          parts: bool = True) -> dict:
     """One frame of a file (no clip): its own animation rules at ``frame``, facing ``direction``. With ``game_objects``
     (the game's ``art/objects/objects.json``) the PNG is also entered there as an object: ``{"png", "ox", "oy", "hr"}``
-    with the foot point under the body axis as the anchor (``hr`` = texels per world px, 2 for the game's objects)."""
+    with the foot point under the body axis as the anchor (``hr`` = texels per world px, 2 for the game's objects).
+    With ``parts`` (the default) the part-index mask is written beside it as ``<stem>.parts.png`` (at the same zoom)
+    and the part table returned under ``"part_table"``."""
     opt = options_for(doc, style, scale, steps, outline, elevation)
     model = S.Model(doc, opt["scale"], opt["steps"]) if S.mode_of(doc) == "solid" else None
     fr = S.render_still(doc, frame, scale=opt["scale"], steps=opt["steps"], outline=opt["outline"], phi=math.radians(R.DIRECTIONS[direction]),
@@ -230,6 +277,9 @@ def still(doc: dict, out: str | Path, *, frame: int = 0, direction: str = "S", s
         Image.fromarray(fr.normal, "RGBA").save(out.with_name(out.stem + "_normal.png"))
         Image.fromarray(fr.depth, "RGBA").save(out.with_name(out.stem + "_depth.png"))
         result["normal"] = str(out.with_name(out.stem + "_normal.png")); result["depth"] = str(out.with_name(out.stem + "_depth.png"))
+    if parts and fr.parts is not None:
+        result["parts"] = save_parts(fr.parts, out.with_name(out.stem + ".parts.png"), zoom=zoom)
+        result["part_table"] = S.part_table(doc)[0]
     if game_objects:
         key = name or S.file_summary(doc)["name"]
         result["game_objects"] = add_game_object(game_objects, key, out, (int(round(ax * zoom)), int(round(ay * zoom))), hr)

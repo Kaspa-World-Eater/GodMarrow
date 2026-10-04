@@ -919,7 +919,7 @@ class Studio:
         def load(*_):
             d = root_dir / f"{clip.get()}_{direction.get()}" if source == "frames" else root_dir / clip.get() / direction.get()
             ims = []
-            for p in sorted(d.glob("frame_*.png")):
+            for p in sorted(d.glob("frame_[0-9][0-9][0-9].png")):
                 im = Image.open(p).convert("RGBA")
                 bg = Image.new("RGBA", im.size, (40, 40, 40, 255))
                 im = Image.alpha_composite(bg, im)

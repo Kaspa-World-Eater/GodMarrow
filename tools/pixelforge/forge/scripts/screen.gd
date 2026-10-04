@@ -403,7 +403,7 @@ static func frame_textures(dir: String) -> Array:
 		return out
 	var names := []
 	for f in d.get_files():
-		if f.begins_with("frame_") and f.ends_with(".png"):
+		if f.begins_with("frame_") and f.ends_with(".png") and not f.contains(".parts."):
 			names.append(f)
 	names.sort()
 	for f in names:

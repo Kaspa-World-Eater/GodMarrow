@@ -349,7 +349,7 @@ def cmd_project(a) -> None:
         elif sub == "import-shapes":
             _emit(a, api.import_shapes(project, a.character, a.file))
         elif sub == "render-shapes":
-            _emit(a, api.render_shapes(project, a.character, preset=a.style, clips=a.clips, directions=a.directions, elevation=a.elevation, passes=a.passes,
+            _emit(a, api.render_shapes(project, a.character, preset=a.style, clips=a.clips, directions=a.directions, elevation=a.elevation, passes=a.passes, parts=a.parts,
                                        log=None if a.json else print, progress=_progress if a.json else None))
         elif sub == "reset":
             _emit(a, api.reset_character(project, a.character, keep_sources=not a.all, steps=a.steps.split(",") if a.steps else None))
@@ -653,11 +653,12 @@ def cmd_shapes(a) -> None:
         clips = [c.strip() for c in a.clips.split(",")] if a.clips else list(shape_rig.GAME_CLIPS)
         dirs = [d.strip().upper() for d in a.directions.split(",")] if a.directions else list(shape_rig.DIRECTIONS)
         r = shape_tools.render_set(doc, a.out, clips=clips, directions=dirs, style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style",
-                                   elevation=a.elevation, max_frames=a.frames, passes=a.passes, log=None if a.json else print, progress=_progress if a.json else None)
+                                   elevation=a.elevation, max_frames=a.frames, passes=a.passes, parts=a.parts, log=None if a.json else print,
+                                   progress=_progress if a.json else None)
         if a.gif:
             for clip in clips:
                 for d in dirs:
-                    files = sorted((Path(a.out) / f"{clip}_{d}").glob("frame_*.png"))
+                    files = sorted((Path(a.out) / f"{clip}_{d}").glob("frame_[0-9][0-9][0-9].png"))
                     frames = shape_tools.trim_frames([np.asarray(Image.open(f).convert("RGBA")) for f in files])
                     save_gif(frames, Path(a.out) / f"{clip}_{d}.gif", fps=r["fps"][clip], zoom=a.zoom, background=(94, 93, 98, 255))
         _emit(a, r) if a.json else print(f"{len(clips)} clips x {len(dirs)} directions -> {a.out} ({r['seconds']} s, frames {r['size']} px)")
@@ -682,7 +683,7 @@ def cmd_shapes(a) -> None:
         _emit(a, r) if a.json else print(f"{r['sheet']}: {r['rows']} rows x {r['columns']} frames")
     elif sub == "still":
         r = shape_tools.still(doc, a.out, frame=a.frame, direction=a.direction.upper(), style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style",
-                              elevation=a.elevation, zoom=a.zoom, passes=a.passes, game_objects=a.game_objects, name=a.name, hr=a.hr)
+                              elevation=a.elevation, zoom=a.zoom, passes=a.passes, game_objects=a.game_objects, name=a.name, hr=a.hr, parts=a.parts)
         _emit(a, r) if a.json else print(f"{r['png']} ({r['size'][0]}x{r['size'][1]}, foot anchor {r['anchor']})" + (f"; objects.json entry {r['game_objects']['key']}" if a.game_objects else ""))
     elif sub == "object":
         dirs = [d.strip().upper() for d in a.directions.split(",")] if a.directions else ["S"]
@@ -695,7 +696,8 @@ def cmd_shapes(a) -> None:
             added = ("; objects.json: " + ", ".join(r["game_objects"]["added"])) if a.game_objects else ""
             print(f"{r['name']}: {views} -> {r['dir']}{added}")
     elif sub == "turntable":
-        r = shape_tools.turntable(doc, a.out, frames=a.frames or 48, style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style", elevation=a.elevation, zoom=a.zoom)
+        r = shape_tools.turntable(doc, a.out, frames=a.frames or 48, style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style", elevation=a.elevation, zoom=a.zoom,
+                                  parts=a.parts)
         _emit(a, r) if a.json else print(f"{r['gif']} ({r['frames']} views) and {r['views']}")
     elif sub == "compare":
         from . import shape_measure
@@ -962,6 +964,7 @@ def build_parser() -> argparse.ArgumentParser:
     x = ps.add_parser("render-shapes", help="render the character's shape sprite with the motion clips into frames (then export / export-game as usual)")
     x.add_argument("character"); x.add_argument("--style", default=None, help="a look preset (default: the character's / project's)"); x.add_argument("--clips", default=None); x.add_argument("--directions", default=None)
     x.add_argument("--elevation", type=float, default=None); x.add_argument("--passes", action="store_true")
+    x.add_argument("--no-parts", dest="parts", action="store_false", help="skip the frame_NNN.parts.png part-id masks and the manifest's part table")
     x = ps.add_parser("preview-shapes", help="a GIF of one clip and direction straight from the character's shape sprite"); x.add_argument("character"); x.add_argument("--clip", default="idle"); x.add_argument("--direction", default="S"); x.add_argument("--style", default=None)
     x = ps.add_parser("export-game", help="export in Godmarrow's art/sprites format (+ normal/depth sets)"); x.add_argument("character")
     x.add_argument("--kind", help="sprite kind name (default: character name)"); x.add_argument("--out", help="output folder (default: characters/<name>/export_game)")
@@ -1106,6 +1109,7 @@ def build_parser() -> argparse.ArgumentParser:
     x = ss.add_parser("render", help="every clip in every direction -> frames folder (+ animations.json, manifest.json) that export / export-game read")
     _render_args(x); x.add_argument("-o", "--out", required=True); x.add_argument("--clips", default=None, help="comma list (default idle,walk,run,attack,cast,hit,death)")
     x.add_argument("--directions", default=None, help="comma list of S,SE,E,NE,N,NW,W,SW (default all)"); x.add_argument("--passes", action="store_true", help="also normal and depth frames")
+    x.add_argument("--no-parts", dest="parts", action="store_false", help="skip the frame_NNN.parts.png part-id masks and the manifest's part table")
     x.add_argument("--gif", action="store_true", help="also a GIF per clip and direction")
     x = ss.add_parser("preview", help="a looping GIF of one clip in one direction"); _render_args(x)
     x.add_argument("--clip", default="idle"); x.add_argument("--direction", default="S"); x.add_argument("-o", "--out", default=None)
@@ -1113,6 +1117,7 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("-o", "--out", required=True); x.add_argument("--clips", default=None); x.add_argument("--directions", default=None); x.add_argument("--columns", type=int, default=8)
     x = ss.add_parser("still", help="one frame of the file (its own animation rules, no clip); with --game-objects also an objects.json entry"); _render_args(x)
     x.add_argument("-o", "--out", required=True); x.add_argument("--frame", type=int, default=0); x.add_argument("--direction", default="S"); x.add_argument("--passes", action="store_true")
+    x.add_argument("--no-parts", dest="parts", action="store_false", help="skip the <stem>.parts.png part-id mask")
     x.add_argument("--game-objects", dest="game_objects", default=None, metavar="OBJECTS_JSON", help="add the PNG to the game's art/objects/objects.json (png, ox, oy, hr)")
     x.add_argument("--name", default=None, help="the objects.json key (default: the file's name)"); x.add_argument("--hr", type=float, default=2.0, help="texels per world px (2 for the game's objects)")
     x = ss.add_parser("object", help="a file as a game object: trimmed PNGs with foot anchors per direction, <name>.json, optional objects.json entries"); _render_args(x)
@@ -1120,6 +1125,7 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--directions", default=None, help="comma list (default S); the first is also written as <name>.png"); x.add_argument("--frame", type=int, default=0)
     x.add_argument("--game-objects", dest="game_objects", default=None, metavar="OBJECTS_JSON"); x.add_argument("--hr", type=float, default=2.0)
     x = ss.add_parser("turntable", help="a solid file spinning through 48 views (GIF) plus its 8 game views"); _render_args(x); x.add_argument("-o", "--out", required=True)
+    x.add_argument("--no-parts", dest="parts", action="store_false", help="skip the <stem>_parts/ part-id masks")
     x = ss.add_parser("validate", help="check a .shapes.json and summarise it"); x.add_argument("file"); x.add_argument("--json", action="store_true")
     x = ss.add_parser("template", help="the author pose (bone heads and tails) for a figure height, to draw shapes around")
     x.add_argument("--height", type=int, default=120); x.add_argument("-o", "--out", default=None, help="write the table as JSON"); x.add_argument("--png", default=None, help="write a stick figure"); x.add_argument("--json", action="store_true")

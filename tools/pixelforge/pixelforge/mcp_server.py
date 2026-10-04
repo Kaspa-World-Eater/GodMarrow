@@ -270,9 +270,10 @@ def build_server():
 
     @mcp.tool()
     def render_shape_sprite(file: str, out_dir: str, style: str = "godmarrow", clips: str = "", directions: str = "", elevation: float = -1.0,
-                            passes: bool = False, gif: bool = False) -> dict:
+                            passes: bool = False, gif: bool = False, parts: bool = True) -> dict:
         """Render a .shapes.json (a character or object drawn by code) with the motion clips: every clip in every direction as real
         frames into out_dir/<clip>_<DIR>/frame_NNN.png (+ animations.json, manifest.json: what export / export_game read).
+        parts: also frame_NNN.parts.png per frame (the part index per pixel, 0 = empty) and the part table in the manifest.
         style: a look preset (figure height, ramp length, outline). clips/directions: comma lists (defaults: the game's seven clips, all 8).
         elevation: camera degrees above level (-1 = the file's). gif: also a GIF per clip and direction."""
         from . import shape_rig, shape_tools, shapes as S
@@ -283,12 +284,13 @@ def build_server():
             return {"ok": False, "problems": problems}
         cl = [c.strip() for c in clips.split(",") if c.strip()] or list(shape_rig.GAME_CLIPS)
         di = [d.strip().upper() for d in directions.split(",") if d.strip()] or list(shape_rig.DIRECTIONS)
-        r = shape_tools.render_set(doc, out_dir, clips=cl, directions=di, style=style or None, elevation=None if elevation < 0 else elevation, passes=passes)
+        r = shape_tools.render_set(doc, out_dir, clips=cl, directions=di, style=style or None, elevation=None if elevation < 0 else elevation, passes=passes,
+                                   parts=parts)
         if gif:
             from PIL import Image
             for c in cl:
                 for d in di:
-                    files = sorted((Path(out_dir) / f"{c}_{d}").glob("frame_*.png"))
+                    files = sorted((Path(out_dir) / f"{c}_{d}").glob("frame_[0-9][0-9][0-9].png"))
                     save_gif([Image.open(f).convert("RGBA") for f in files], Path(out_dir) / f"{c}_{d}.gif", fps=r["fps"][c], zoom=3, background=(94, 93, 98, 255))
         return r
 
