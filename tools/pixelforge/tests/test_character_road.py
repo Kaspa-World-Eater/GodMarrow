@@ -205,3 +205,88 @@ def test_compare_lays_painting_and_sprite_side_by_side_per_view(tmp_path, capsys
     json.dump(_plain_doc(), open(tmp_path / "p.shapes.json", "w"))
     main(["shapes", "compare", str(tmp_path / "p.shapes.json"), "--ref", str(tmp_path / "sheet.png"), "-o", str(tmp_path / "c2.png"), "--height", "120", "--views", "front,side"])
     assert "overlap" in capsys.readouterr().out and (tmp_path / "c2.png").exists()
+
+
+# ------------------------------------------------------------------------------------------- 4. the format traps
+def _ring_doc(**ring):
+    cx, ground = 69.0, 134.0
+    return {"size": [138, 138], "height": 120, "ground": ground, "axis": [cx, 0], "materials": {}, "parts": {},
+            "shapes": [{"name": "thigh.L", "kind": "capsule", "a": [cx - 6, 72, 0], "b": [cx - 6, 98, 0], "r": 4, "material": "cloth", "bone": "thigh.L"},
+                       {"name": "shin.L", "kind": "capsule", "a": [cx - 6, 98, 0], "b": [cx - 6, 127, 0], "r": 3, "material": "cloth", "bone": "shin.L"},
+                       {"name": "cape", "kind": "ring", "y": [32, 122], "rx": 10, "rz": 9, "thickness": 1.6, "material": "cloth", "bone": "spine.003", **ring}]}
+
+
+def test_back_strip_is_the_clear_spelling_of_the_old_keep_back():
+    a = _ring_doc(keep={"back": 2.42}); b = _ring_doc(keep={"back_strip": round(np.pi - 2.42, 6)})
+    fa = S.render_still(a, phi=0.0).rgba; fb = S.render_still(b, phi=0.0).rgba
+    assert np.array_equal(fa[..., 3] > 0, fb[..., 3] > 0)
+    # the strip is a strip (12 units wide here); the old key with the strip's number keeps nearly the whole ring round the legs
+    cape = 2
+    extent = lambda doc: np.ptp(np.nonzero(S.render_still(doc, phi=0.0).pid == cape)[1]) + 1
+    wrong = _ring_doc(keep={"back": 0.72})                             # what the first build wrote: the cape wrapped round the legs
+    assert extent(b) <= 14 and extent(wrong) >= 19
+    assert S.validate(_ring_doc(keep={"sideways": 1})) and not S.validate(b)
+    w = S.warnings(a)
+    assert len(w) == 1 and "keep.back" in w[0] and "back_strip 0.72" in w[0]
+    assert S.warnings(b) == []
+
+
+def test_warning_when_a_cloth_ring_would_hide_the_legs():
+    w = S.warnings(_ring_doc())
+    assert len(w) == 1 and "covers the legs" in w[0] and "knee" in w[0]
+    assert S.warnings(_ring_doc(y=[32, 90])) == []                                        # above the knee
+    assert S.warnings(_ring_doc(y=[32, 90], hem={"depth": 20})) and "covers the legs" in S.warnings(_ring_doc(y=[32, 90], hem={"depth": 20}))[0]
+    assert S.warnings(_ring_doc(open={"angle": 0.5, "below": 60})) == []                   # an open front shows the legs
+    assert S.warnings(_ring_doc(keep={"front": 0.3})) == []
+    legless = _ring_doc(); legless["shapes"] = legless["shapes"][2:]
+    assert S.warnings(legless) == []                                                       # nothing to hide
+    assert S.warnings(_ring_doc(bone="shin.L", y=[100, 126])) == []                        # a greave rides the leg
+    r = T.validate_file(S.ASSETS / "characters" / "keeper.shapes.json")
+    assert r["ok"] and any("underskirt" in x for x in r["warnings"])                     # the Keeper's long underskirt: a robe, said once
+
+
+def test_warning_when_a_hanging_part_rides_a_limb_without_upright_from():
+    doc = _ring_doc()
+    doc["parts"] = {"planks_L": {"bone": "thigh.L", "hang": 0.3}}
+    doc["shapes"].append({"name": "plank", "kind": "box", "centre": [60, 85, 12], "half": [2.5, 18, 1], "material": "wood5", "part": "planks_L"})
+    w = [x for x in S.warnings(doc) if "upright_from" in x]
+    assert len(w) == 1 and "planks_L" in w[0] and "thigh.L" in w[0] and "lies flat" in w[0]
+    doc["parts"]["planks_L"]["upright_from"] = "hips"
+    assert not [x for x in S.warnings(doc) if "upright_from" in x]
+    doc["parts"] = {}
+    doc["shapes"][-1] = {"name": "plate", "kind": "box", "centre": [60, 85, 12], "half": [2.5, 8, 1], "material": "wood5", "bone": "forearm.L", "hang": 0.5}
+    w = [x for x in S.warnings(doc) if "upright_from" in x]
+    assert len(w) == 1 and "plate" in w[0] and "forearm.L" in w[0]
+    doc["shapes"][-1]["bone"] = "hips"
+    assert not [x for x in S.warnings(doc) if "upright_from" in x]                        # the body, not a limb
+    hemo = S.load_shapes(S.ASSETS / "characters" / "hemomancer.shapes.json")
+    assert not [x for x in S.warnings(hemo) if "upright_from" in x or "keep.back" in x]
+
+
+def test_warning_when_a_centre_has_the_wrong_number_of_dimensions():
+    cx = 69.0
+    base = {"size": [138, 138], "height": 120, "ground": 134, "axis": [cx, 0], "materials": {}, "shapes": []}
+    d2 = {**base, "shapes": [{"name": "head", "kind": "ellipsoid", "centre": [cx, 20], "radii": [6, 7, 6], "material": "skin"}]}
+    d3 = {**base, "shapes": [{"name": "head", "kind": "ellipsoid", "centre": [cx, 20, 0], "radii": [6, 7, 6], "material": "skin"}]}
+    assert not S.validate(d2)
+    w = S.warnings(d2)
+    assert len(w) == 1 and "ellipsoid takes a 3D centre" in w[0] and "only a prism's is 2D" in w[0]
+    assert np.array_equal(S.render_still(d2).rgba, S.render_still(d3).rgba)              # z taken as the axis'
+    box2 = {**base, "shapes": [{"name": "b", "kind": "box", "centre": [cx, 20], "half": [4, 4, 4], "material": "wood5", "rotate": {"y": 30}}]}
+    assert not S.validate(box2) and "box takes a 3D centre" in S.warnings(box2)[0] and S.render_still(box2).stats["filled"] > 0
+    p3 = {**base, "shapes": [{"name": "arch", "kind": "prism", "centre": [cx, 40, 9], "radii": [7, 6], "z": [8, 10], "material": "wood5"}]}
+    p2 = {**base, "shapes": [{"name": "arch", "kind": "prism", "centre": [cx, 40], "radii": [7, 6], "z": [8, 10], "material": "wood5"}]}
+    assert not S.validate(p3) and not S.validate(p2)
+    w = S.warnings(p3)
+    assert len(w) == 1 and "prism's centre is 2D" in w[0] and S.warnings(p2) == []
+    assert np.array_equal(S.render_still(p3).rgba, S.render_still(p2).rgba)
+    assert "its depth comes from z" in S.validate({**base, "shapes": [{"kind": "prism", "centre": [1], "radii": [7, 6], "z": [8, 10]}]})[0]
+
+
+def test_cli_validate_prints_the_warnings(tmp_path, capsys):
+    json.dump(_ring_doc(keep={"back": 2.42}), open(tmp_path / "c.shapes.json", "w"))
+    main(["shapes", "validate", str(tmp_path / "c.shapes.json")])
+    out = capsys.readouterr().out
+    assert out.startswith("ok:") and "warnings" in out and "back_strip" in out
+    r = T.validate_file(tmp_path / "c.shapes.json")
+    assert r["ok"] and len(r["warnings"]) == 1

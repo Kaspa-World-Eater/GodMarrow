@@ -423,6 +423,13 @@ def sd_ring(P, cx, cz, rx, rz):
     return (np.hypot((P[:, 0] - cx) / rx, (P[:, 2] - cz) / rz) - 1) * np.minimum(rx, rz)
 
 
+def _c3(spec: dict, axis: tuple[float, float]) -> np.ndarray:
+    """A shape's centre as [x, y, z]: a 2D centre (the prism's form, written on another kind by mistake) is put on
+    the body axis' z. The validator warns about it; the render goes on."""
+    c = [float(v) for v in spec["centre"]]
+    return np.array(c[:3] if len(c) >= 3 else c + [float(axis[1])], float)
+
+
 def _lin(spec, y, y0):
     """``[r0, k]``: radius r0 at y0 growing k per unit down; a number: constant."""
     if isinstance(spec, (int, float)):
@@ -448,7 +455,7 @@ class Prim:
         if spec.get("rotate"):                        # a turned shape: the box of its turned corners
             lo, hi = self.bbox
             corners = np.array([[x, y, z] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])])
-            about = np.array(spec["rotate"].get("about", spec.get("centre", spec.get("a", [axis[0], 0, axis[1]]))), float)
+            about = np.array(spec["rotate"].get("about", spec.get("a", [axis[0], 0, axis[1]])) if "centre" not in spec or "about" in spec["rotate"] else _c3(spec, axis), float)
             R = rotation(spec["rotate"])
             turned = (corners - about) @ R.T + about
             self.bbox = np.array([turned.min(0), turned.max(0)])
@@ -458,17 +465,17 @@ class Prim:
         s = self.spec
         k = self.kind
         if k == "ellipsoid":
-            c, r = np.array(s["centre"], float), np.array(s["radii"], float)
+            c, r = _c3(s, self.axis), np.array(s["radii"], float)
             return np.array([c - r, c + r])
         if k == "capsule":
             a, b = np.array(s["a"], float), np.array(s["b"], float)
             r = max(_radii(s))
             return np.array([np.minimum(a, b) - r, np.maximum(a, b) + r])
         if k == "box":
-            c, h = np.array(s["centre"], float), np.array(s["half"], float)
+            c, h = _c3(s, self.axis), np.array(s["half"], float)
             return np.array([c - h, c + h])
         if k == "prism":
-            c, r = np.array(s["centre"], float), np.array(s["radii"], float)
+            c, r = np.array(s["centre"][:2], float), np.array(s["radii"], float)        # a prism's centre is 2D; its z comes from "z"
             z0, z1 = s["z"]
             return np.array([[c[0] - r[0], c[1] - r[1], z0], [c[0] + r[0], c[1] + r[1], z1]])
         if k == "ring":
@@ -493,7 +500,7 @@ class Prim:
         rot = self.spec.get("rotate")
         if not rot:
             return P
-        about = np.array(rot.get("about", self.spec.get("centre", self.spec.get("a", [self.axis[0], 0, self.axis[1]]))), float)
+        about = np.array(rot.get("about", self.spec.get("a", [self.axis[0], 0, self.axis[1]])) if "centre" not in self.spec or "about" in rot else _c3(self.spec, self.axis), float)
         R = rotation(rot)
         return (P - about) @ R + about           # R is orthonormal: @ R is the inverse rotation of the points
 
@@ -515,14 +522,14 @@ class Prim:
         s = self.spec
         k = self.kind
         if k == "ellipsoid":
-            return sd_ellipsoid(P, np.array(s["centre"], float), np.array(s["radii"], float))
+            return sd_ellipsoid(P, _c3(s, self.axis), np.array(s["radii"], float))
         if k == "capsule":
             ra, rb = _radii(s)
             return sd_capsule(P, np.array(s["a"], float), np.array(s["b"], float), ra, rb)
         if k == "box":
-            return sd_box(P, np.array(s["centre"], float), np.array(s["half"], float), float(s.get("round", 0)))
+            return sd_box(P, _c3(s, self.axis), np.array(s["half"], float), float(s.get("round", 0)))
         if k == "prism":
-            c, r = np.array(s["centre"], float), np.array(s["radii"], float)
+            c, r = np.array(s["centre"][:2], float), np.array(s["radii"], float)
             z0, z1 = s["z"]
             e = (np.hypot((P[:, 0] - c[0]) / r[0], (P[:, 1] - c[1]) / r[1]) - 1) * min(r)
             return np.maximum.reduce([e, z0 - P[:, 2], P[:, 2] - z1])
@@ -563,9 +570,11 @@ class Prim:
             below = float(op.get("below", s["y"][0]))
             parts.append(np.where(P[:, 1] > below, (float(op.get("angle", 0.36)) - np.abs(a)) * r, -9.0))
         keep = s.get("keep")
-        if keep:                                         # keep only the back (|a| > angle) or the front
+        if keep:                                         # keep only a strip down the back, or the front
             r = np.hypot(P[:, 0] - cx, P[:, 2] - cz)
-            if "back" in keep:
+            if "back_strip" in keep:                     # the half-width of the strip (radians either side of straight back)
+                parts.append((math.pi - float(keep["back_strip"]) - np.abs(a)) * r)
+            if "back" in keep:                           # the old key: everything more than this far from the front (a wedge cut from the FRONT)
                 parts.append((float(keep["back"]) - np.abs(a)) * r)
             if "front" in keep:
                 parts.append((np.abs(a) - float(keep["front"])) * r)
@@ -668,7 +677,7 @@ def rule_mask(rule: dict, P: np.ndarray, prim: Prim) -> np.ndarray:
             if hi is not None:
                 m &= v < hi
         elif key in ("dx", "dy", "dz"):
-            c = np.array(prim.spec.get("centre", prim.spec.get("a", [0, 0, 0])), float)
+            c = _c3(prim.spec, prim.axis) if "centre" in prim.spec else np.array(prim.spec.get("a", [0, 0, 0]), float)
             v = {"dx": x - c[0], "dy": y - c[1], "dz": z - c[2]}[key]
             lo, hi = val
             if lo is not None:
@@ -1435,16 +1444,18 @@ def validate(doc: dict, library: dict | None = None) -> list[str]:
             bad.append(f"{tag}: a poly needs at least three points")
         if kind == "ellipse" and not (len(s.get("centre", [])) == 2 and len(s.get("radii", [])) == 2):
             bad.append(f"{tag}: an ellipse needs centre [x, y] and radii [rx, ry]")
-        if kind == "ellipsoid" and not (len(s.get("centre", [])) == 3 and len(s.get("radii", [])) == 3):
+        if kind == "ellipsoid" and not (len(s.get("centre", [])) in (2, 3) and len(s.get("radii", [])) == 3):
             bad.append(f"{tag}: an ellipsoid needs centre [x, y, z] and radii [rx, ry, rz]")
         if kind == "capsule" and not (len(s.get("a", [])) == 3 and len(s.get("b", [])) == 3):
             bad.append(f"{tag}: a capsule needs a [x, y, z], b [x, y, z] and r")
-        if kind == "box" and not (len(s.get("centre", [])) == 3 and len(s.get("half", [])) == 3):
+        if kind == "box" and not (len(s.get("centre", [])) in (2, 3) and len(s.get("half", [])) == 3):
             bad.append(f"{tag}: a box needs centre [x, y, z] and half [hx, hy, hz]")
         if kind == "ring" and not (len(s.get("y", [])) == 2 and "rx" in s):
             bad.append(f"{tag}: a ring needs y [top, bottom] and rx (a number or [r0, growth per unit])")
-        if kind == "prism" and not (len(s.get("centre", [])) == 2 and len(s.get("radii", [])) == 2 and len(s.get("z", [])) == 2):
-            bad.append(f"{tag}: a prism needs centre [x, y], radii [rx, ry] and z [z0, z1]")
+        if kind == "prism" and not (len(s.get("centre", [])) in (2, 3) and len(s.get("radii", [])) == 2 and len(s.get("z", [])) == 2):
+            bad.append(f"{tag}: a prism needs centre [x, y] (its depth comes from z [z0, z1]), radii [rx, ry] and z [z0, z1]")
+        if kind == "ring" and isinstance(s.get("keep"), dict) and not set(s["keep"]) <= {"back", "back_strip", "front"}:
+            bad.append(f"{tag}: keep takes back_strip (the half-width of a strip down the back), front, or the old back")
         if kind == "union":
             if not isinstance(s.get("of"), list) or not s["of"]:
                 bad.append(f"{tag}: a union needs 'of': a list of shapes")
@@ -1484,6 +1495,76 @@ def validate(doc: dict, library: dict | None = None) -> list[str]:
     if mode == "solid" and "ground" not in doc:
         bad.append("a solid file needs 'ground' (the y of the ground line in its units)")
     return bad
+
+
+LIMB_BONES = ("thigh", "shin", "foot", "toe", "upper_arm", "forearm", "hand")
+KNEE_FRACTION = 0.29          # the knee's height above the ground as a fraction of the figure's, when no skeleton is at hand
+
+
+def _shape_tag(i: int, s: dict) -> str:
+    return f"shape {i} ({s.get('name', s.get('kind', '?'))})"
+
+
+def warnings(doc: dict, knee_y: float | None = None) -> list[str]:
+    """The traps a valid file can still carry (the ones that made the Hemomancer's first rounds wrong), in plain words
+    with the fix: ``keep.back`` (backwards: it cuts a wedge from the front; ``back_strip`` is the strip down the back),
+    a full ring reaching below the knee (it hides the legs in every clip), a hanging part on a limb bone without
+    ``upright_from`` (a raised knee lays it flat), and a centre written in the wrong number of dimensions (a prism's
+    is 2D, every other kind's 3D). ``knee_y`` is the knee's y in file units (the skeleton's shin head; estimated from
+    the height when not given)."""
+    out: list[str] = []
+    if not isinstance(doc, dict) or not isinstance(doc.get("shapes"), list) or mode_of(doc) != "solid":
+        return out
+    size = doc.get("size") or [0, 0]
+    height = float(doc.get("height", size[1]))
+    ground = float(doc.get("ground", size[1] - 1))
+    if knee_y is None:
+        knee_y = ground - KNEE_FRACTION * height
+    parts = doc.get("parts") or {}
+
+    def bone_of(s: dict) -> str | None:
+        return s.get("bone") or (parts.get(s.get("part"), {}).get("bone") if s.get("part") else None)
+
+    leg_bones = {b for b in (bone_of(s) for s in doc["shapes"] if isinstance(s, dict)) if b and b.split(".")[0] in ("thigh", "shin")}
+    for i, s in enumerate(doc["shapes"]):
+        if not isinstance(s, dict):
+            continue
+        tag = _shape_tag(i, s)
+        kind = s.get("kind", "poly")
+        keep = s.get("keep") if isinstance(s.get("keep"), dict) else {}
+        if "back" in keep:
+            a = float(keep["back"])
+            out.append(f"{tag}: keep.back {a:g} is the old key and reads backwards (it keeps everything more than {a:g} rad from the front, "
+                       f"a wedge cut out of the FRONT); write keep.back_strip {max(math.pi - a, 0):.2f} (the half-width of the strip down the back)")
+        if kind == "ring" and leg_bones and not keep and not s.get("open"):
+            y = s.get("y") or [0, 0]
+            hem = float(y[1]) + float((s.get("hem") or {}).get("depth", 0))
+            bone = bone_of(s) or ""
+            if hem > knee_y and bone.split(".")[0] not in ("thigh", "shin", "foot", "toe"):
+                out.append(f"{tag}: a full ring down to y {hem:g} (below the knee at {knee_y:.1f}) covers the legs in every clip: right for a robe, "
+                           f"wrong over bare or armoured legs; then keep a strip (keep.back_strip / keep.front), open the front (open), split it per leg, "
+                           f"or end it above the knee")
+        if "centre" in s and isinstance(s["centre"], list):
+            n = len(s["centre"])
+            if kind == "prism" and n == 3:
+                out.append(f"{tag}: a prism's centre is 2D [x, y] (its depth is z [z0, z1]); the third value {s['centre'][2]!r} is ignored")
+            elif kind in ("ellipsoid", "box") and n == 2:
+                out.append(f"{tag}: a {kind} takes a 3D centre [x, y, z]; only a prism's is 2D. z was taken as the body axis' ({(doc.get('axis') or [0, 0.0])[1]:g})")
+        bone = bone_of(s)
+        hang = s.get("hang", parts.get(s.get("part"), {}).get("hang", 1.0) if s.get("part") else 1.0)
+        ub = s.get("upright_from") or (parts.get(s.get("part"), {}).get("upright_from") if s.get("part") else None)
+        if not s.get("part") and bone and isinstance(hang, (int, float)) and hang < 1.0 and bone.split(".")[0] in LIMB_BONES and not ub:
+            out.append(f"{tag}: hangs (hang {hang:g}) from {bone} without upright_from: when a clip raises that limb the shape lies flat along it; "
+                       f"add \"upright_from\": \"hips\" (or the bone it should hang straight from)")
+    for name, part in parts.items():
+        if not isinstance(part, dict):
+            continue
+        bone = part.get("bone") or ""
+        hang = part.get("hang", 1.0)
+        if isinstance(hang, (int, float)) and hang < 1.0 and bone.split(".")[0] in LIMB_BONES and not part.get("upright_from"):
+            out.append(f"part {name!r}: hangs (hang {hang:g}) from {bone} without upright_from: when a clip raises that limb the part lies flat along it "
+                       f"(the Hemomancer's plank skirt locked rigid in the attack lunge); add \"upright_from\": \"hips\"")
+    return out
 
 
 def file_summary(doc: dict) -> dict:

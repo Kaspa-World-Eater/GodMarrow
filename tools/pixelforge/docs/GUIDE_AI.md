@@ -299,7 +299,7 @@ pixelforge shapes draft "..." -o x.shapes.json --from-measure M.json           #
 pixelforge shapes measure FRONT.png [SIDE.png] [BACK.png] -o M.json           # painting to shapes 1: silhouette widths per height band + landmarks (head, shoulders, chest, waist, hips, hem, limb widths; fractions of the height)
 pixelforge shapes sample-materials FRONT.png --model x.shapes.json [-o y.shapes.json] [--only skin,cloth]   # painting to shapes 2: the painting's colours under each material's region -> that material's ramp (OKLab k-means), written into the model
 pixelforge shapes compare x.shapes.json --ref SHEET.png -o cmp.png [--height 195] [--views front,side,back]   # painting beside sprite at one height per view (front/S, side/E, back/N) with the silhouette overlap
-pixelforge shapes validate FILE                                            # problems in plain words, or a summary (mode, shapes, materials, bones, unbound shapes)
+pixelforge shapes validate FILE                                            # problems in plain words, or a summary (mode, shapes, materials, bones, unbound shapes); then the warnings: the traps a valid file can carry (keep.back, a full ring below the knee, a hanging part on a limb without upright_from, a centre in the wrong number of dimensions)
 pixelforge shapes still FILE -o out.png [--frame 40] [--direction SE] [--passes] [--game-objects art/objects/objects.json --name chest --hr 2]
 pixelforge shapes object FILE -o art/objects/chest [--directions S,SE,E] [--game-objects art/objects/objects.json]   # trimmed PNGs with foot anchors + <name>.json
 pixelforge shapes preview FILE --clip walk --direction E [--style gothic_hd] [-o walk_E.gif]   # a looping GIF of one clip and direction
@@ -419,8 +419,10 @@ preset's frame count is what to look at.
   the body lies down; by default "lying down" is judged by the part's own bone, and `"upright_from": "hips"` judges it by
   another bone instead, so plates hung on a thigh keep hanging when the knee comes up instead of locking to the thigh:
   the Hemomancer's plank skirt, `planks_L` / `planks_R` on `thigh.L` / `thigh.R`). A shape may carry `bone`, `lag`,
-  `hang` and `upright_from` itself instead. `keep` on a ring is easy to misread: `{"back": a}` keeps `|angle| > a`,
-  i.e. it cuts a wedge of half-angle a out of the FRONT; a strip down the back of half-width w is `{"back": 3.1416 - w}`.
+  `hang` and `upright_from` itself instead. `keep` on a ring: `{"back_strip": w}` keeps a strip down the back of
+  half-width w radians (a cape; 0.72 is the Hemomancer's), `{"front": a}` the front within a radians (a tabard). The
+  old `{"back": a}` still works but reads backwards (it keeps `|angle| > a`, a wedge cut out of the FRONT; the
+  Hemomancer's cape wrapped round the legs with it) and `shapes validate` says so, with the `back_strip` to write.
 - `lights`: `{"at": [x, y, z], "radius": 30, "strength": 1.0, "pulse": 0.2, "colour": "#7dff78"}`; with `"bone"` or
   `"prim"` the point rides that bone or shape; `{"from": "flicker", "radius": 3.2, "strength": 0.7, "every": 3}` puts a
   small light on every third glowing-crack pixel. Flat files use `[x, y]` and may add `"breathe": true` and `"rim": true`.
@@ -437,7 +439,7 @@ preset's frame count is what to look at.
 `box` (`centre`, `half`, `round`), `prism` (an ellipse in x/y extruded along z: `centre`, `radii`, `z`), `ring` (an
 elliptical tube around the axis: `y` [top, bottom], `rx` and `rz` as a number or `[r0, growth per unit down]`,
 `thickness` for a shell, `hem` `{"tongues", "depth", "seed"}` for a ragged hem, `open` `{"angle", "below"}` for an
-open front, `keep` `{"back": a}` or `{"front": a}` to keep one side, `holes` `{"p", "band", "seed"}`, `cz`), `union`
+open front, `keep` `{"back_strip": w}` or `{"front": a}` to keep one side (the old `{"back": a}` is deprecated), `holes` `{"p", "band", "seed"}`, `cz`), `union`
 (`of`: a list of shapes, each checked like a shape). Any shape takes `clip_y` [top, bottom] (+ `hem`), `rotate`
 `{"x", "y", "z", "about"}` in degrees, `carve: true` (empties what it covers in every body; the hood's face opening,
 a skull's sockets), `material`, `t` (a tone offset), `lift`, `spec_t`, `emit` (`flicker` for cracks, `pulse` for
@@ -523,7 +525,7 @@ front, gold trim where the opening ends, a crimson sash in an angle band and gol
 
 The breastplate is an ellipsoid with lames, a ridge, rivets and glowing cracks (`"material": "soul", "emit":
 "flicker"` along `crack` lines, lit by the `{"from": "flicker"}` light); the hood is a `union` of an ellipsoid and a
-capsule with a `prism` `carve` for the face and a `flat` void behind it; the cape keeps only its back (`keep.back`),
+capsule with a `prism` `carve` for the face and a `flat` void behind it; the cape keeps only its back (`keep.back_strip`),
 has holes near the hem and a gold skull `bitmap` by angle; the staff fire is a `flame` effect at `[85.5, 12, 4]`, the
 soul orb an emissive ellipsoid with `"emit": "steady"`. The Keeper (`assets/shapes/characters/keeper.shapes.json`,
 58 shapes) is the same language around the 120 px author pose: a weathered straw cone as a shell ring tilted back

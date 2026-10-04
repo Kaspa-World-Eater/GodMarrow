@@ -1679,7 +1679,7 @@
     "seed": 5
    },
    "keep": {
-    "back": 1.75
+    "back_strip": 1.3916
    },
    "holes": {
     "p": 0.07,

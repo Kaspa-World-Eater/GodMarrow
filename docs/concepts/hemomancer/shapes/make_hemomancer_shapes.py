@@ -112,7 +112,7 @@ add(name="mantle", kind="ring", y=[32, 49], rx=[10.6, 0.6], rz=[8.2, 0.26], thic
 add(name="tabard", kind="ring", y=[37, 118], rx=[9.0, 0.05], rz=[9.0, 0.085], thickness=1.4, keep={"front": 0.3},
     hem={"tongues": 5, "depth": 8, "seed": 3}, material="mantle", part="tabard", bump={"folds": [0.4, 5, 0.5]},
     rules=[{"every_angle": [7, 0], "t": -1}, {"hash": [0.03, 17, 2], "material": "blood", "t": -1}, {"hem_band": [0, 4], "material": "blood", "t": -1, "hash": [0.3, 18, 2]}])
-add(name="cape", kind="ring", y=[32, 122], rx=[10.0, 0.07], rz=[9.2, 0.095], thickness=1.6, keep={"back": 2.42},
+add(name="cape", kind="ring", y=[32, 122], rx=[10.0, 0.07], rz=[9.2, 0.095], thickness=1.6, keep={"back_strip": 0.7216},
     hem={"tongues": 7, "depth": 9, "seed": 6}, material="mantle", part="cape", bump={"folds": [0.5, 6, 1.5]},
     rules=[{"every_angle": [11, 0], "t": -1}, {"hash": [0.02, 19, 2], "material": "blood", "px": [90, None]}, {"hem_band": [0, 4], "t": -1}])
 

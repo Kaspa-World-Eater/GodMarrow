@@ -574,6 +574,8 @@ def cmd_shapes(a) -> None:
             _emit(a, r)
         else:
             print(("ok: " if r["ok"] else "problems:\n  ") + ("\n  ".join(r["problems"]) if r["problems"] else f"{r['mode']} file, {r['shapes']} shapes, materials {', '.join(r['materials'])}, bones {len(r.get('bones', []))}"))
+            if r.get("warnings"):
+                print("warnings (it renders, but look):\n  " + "\n  ".join(r["warnings"]))
         if not r["ok"]:
             sys.exit(1)
         return
@@ -633,6 +635,8 @@ def cmd_shapes(a) -> None:
     if problems:
         print("the file has problems:\n  " + "\n  ".join(problems), file=sys.stderr)
         sys.exit(1)
+    for w in S.warnings(doc):
+        print("warning: " + w, file=sys.stderr)
     # a character renders at the game's hero height unless a preset or a scale is named; objects keep their own size
     style = a.style or (shape_tools.default_style_for(doc) if a.scale is None else None)
     if sub == "render":

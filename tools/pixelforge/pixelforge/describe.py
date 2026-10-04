@@ -429,7 +429,7 @@ def draft_shapes(text: str, out: str | Path | None = None, height: int = 120, me
         # a hood: a crown over the top of the head and a ring round its back and sides, open at the face
         add(name="hood_crown", kind="ellipsoid", centre=[cx, top_y + 4.5, -0.8], radii=[8.4, 7.0, 8.8], clip_y=[None, top_y + 5.5], material=head_mat, bone="head",
             bump={"folds": [0.35, 7, 1.0]}, rules=[{"y": [top_y + 3, None], "front": 0.9, "t": -2}, {"back": 0.1, "t": -1}])
-        add(name="hood", kind="ring", y=[top_y + 3, head_y + 9], rx=[8.2, 0.1], rz=[7.8, 0.08], thickness=2.0, keep={"back": 0.95}, material=head_mat, bone="head",
+        add(name="hood", kind="ring", y=[top_y + 3, head_y + 9], rx=[8.2, 0.1], rz=[7.8, 0.08], thickness=2.0, keep={"back_strip": 2.1916}, material=head_mat, bone="head",
             bump={"folds": [0.4, 7, 1.0]}, rules=[{"every_y": [4, 0], "t": -1}, {"hem_band": [0, 1.5], "t": -1}])
     read.append(("a hooded " if hooded else "a wrapped " if wrapped else "a helmed " if helm else "a bare ") + "head")
     glow = next((SHAPE_GLOWS[w] for w in words if w in SHAPE_GLOWS and re.search(r"\b(eyes?|glow|glowing|burning)\b", t)), None)
@@ -495,12 +495,12 @@ def draft_shapes(text: str, out: str | Path | None = None, height: int = 120, me
         read.append(f"a long {sk_mat} skirt" + (" (tattered)" if "tattered" in t else ""))
     if re.search(r"\b(cape|cloak|mantle)\b", t):
         cp_mat = _material_near(words, "cape|cloak|mantle", "cape6")
-        add(name="cape", kind="ring", y=[sp3 - 2, ground - 12], rx=[12, 0.17], rz=[9.8, 0.12], thickness=1.6, hem={"tongues": 18, "depth": 6, "seed": 5}, keep={"back": 1.75},
+        add(name="cape", kind="ring", y=[sp3 - 2, ground - 12], rx=[12, 0.17], rz=[9.8, 0.12], thickness=1.6, hem={"tongues": 18, "depth": 6, "seed": 5}, keep={"back_strip": 1.3916},
             material=cp_mat, part="cape", bump={"folds": [0.4, 7, 0.3]}, **({"holes": {"p": 0.07, "band": 16}} if re.search(r"\b(tattered|torn|ragged)\b", t) else {}))
         parts["cape"] = {"bone": "spine.003", "lag": {"frames": 2, "sway": 0.7}, "hang": 0.35}
         read.append(f"a cape ({cp_mat})")
     if re.search(r"\b(veil|wrappings|shawl)\b", t):
-        add(name="veil", kind="ring", y=[head_y + 3, hips_y - 2], rx=[8.0, 0.14], rz=[7.6, 0.08], thickness=1.6, hem={"tongues": 9, "depth": 14, "seed": 6}, keep={"back": 1.95},
+        add(name="veil", kind="ring", y=[head_y + 3, hips_y - 2], rx=[8.0, 0.14], rz=[7.6, 0.08], thickness=1.6, hem={"tongues": 9, "depth": 14, "seed": 6}, keep={"back_strip": 1.1916},
             holes={"p": 0.1, "band": 26, "seed": 3}, material="wrap", t=-1, part="veil", bump={"folds": [0.5, 6, 1.0]})
         parts["veil"] = {"bone": "spine.003", "lag": {"frames": 2, "sway": 0.45}, "hang": 0.35}
         read.append("a long veil down the back")

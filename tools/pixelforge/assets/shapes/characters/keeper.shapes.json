@@ -441,7 +441,7 @@
     "seed": 6
    },
    "keep": {
-    "back": 1.95
+    "back_strip": 1.1916
    },
    "holes": {
     "p": 0.1,

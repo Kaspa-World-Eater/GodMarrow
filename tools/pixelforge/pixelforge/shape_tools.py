@@ -322,12 +322,18 @@ def validate_file(path: str | Path) -> dict:
     except Exception as e:
         return {"ok": False, "file": str(path), "problems": [f"not readable as JSON: {e}"]}
     problems = S.validate(doc)
-    out = {"ok": not problems, "file": str(path), "problems": problems}
+    out = {"ok": not problems, "file": str(path), "problems": problems, "warnings": []}
     if not problems:
         out.update(S.file_summary(doc))
         if S.mode_of(doc) == "solid":
             bones = out["bones"]
             tracks = R.load_joints()
+            try:
+                skel = R.skeleton_for(doc, tracks)
+                knee = float(skel.pos[skel.index["shin.L"]][1]) if "shin.L" in skel.index else None
+            except Exception:
+                knee = None
+            out["warnings"] = S.warnings(doc, knee)
             unknown = [b for b in bones if b not in tracks.index]
             if unknown:
                 out["ok"] = False; out["problems"] = [f"unknown bones {unknown}; the library has {tracks.names}"]
