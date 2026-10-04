@@ -439,9 +439,15 @@ def cmd_tiles3d(a) -> None:
     _emit(a, make_tiles3d(a.material, a.second, a.name, a.out, tiles=a.tiles, seed=a.seed, ppu=a.ppu, res_dir=a.res_dir))
 
 
+HERO_NOTE = ("note: 'hero' is the old cutout road (cutouts -> Blender -> Mixamo -> renders). Characters are shape sprites now: "
+             "'pixelforge shapes draft|measure|render' and the Forge's Characters bench (pass --cutout to silence this).")
+
+
 def cmd_hero(a) -> None:
     from .hero import make_hero
 
+    if not getattr(a, "cutout", False):
+        print(HERO_NOTE, file=sys.stderr)
     _emit(a, make_hero(a.sheet, a.name, a.project, describe=a.describe or "", to_game=a.to_game, kind=a.kind, display_name=a.display_name,
                        style=a.style, per_clip=a.per_clip, tolerance=a.tolerance, model_mode=a.model_mode, clips=a.clips, passes=a.passes))
 
@@ -935,7 +941,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--res-dir", default="res://art/tiles"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_tiles3d)
 
-    s = sub.add_parser("hero", help="a turnaround sheet -> a hero in the game, in one go (split, palette, model, rig, render, pixelate, export)")
+    s = sub.add_parser("hero", help="THE OLD CUTOUT ROAD: a turnaround sheet -> a hero in the game, in one go (split, palette, model, rig, render, pixelate, export). Characters are shape sprites: see 'shapes'")
+    s.add_argument("--cutout", action="store_true", help="I know this is the old cutout road; skip the note")
     s.add_argument("sheet"); s.add_argument("name"); s.add_argument("--project", default="forge", help="Forge project folder (made if missing)")
     s.add_argument("--describe", help="one sentence about the character"); s.add_argument("--to-game", help="the game's art/sprites folder (Godmarrow atlas); omit for plain Godot files")
     s.add_argument("--kind", help="atlas name in the game (default: the name)"); s.add_argument("--display-name")

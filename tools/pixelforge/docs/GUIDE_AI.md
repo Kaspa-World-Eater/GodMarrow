@@ -8,12 +8,29 @@ sync with the app the person is looking at.
 
 ## Mental model
 
+**Characters are shape sprites.** That is the character road (since 2026-10-02; the Forge app's Characters bench and
+`pixelforge shapes ...` are it), and the one to take for every hero, creature and NPC:
+
+```
+sentence / painting  ──►  .shapes.json  ──►  pixel frames (8 directions, every clip)  ──►  the game's atlas
+  shapes draft            validate, still,      shapes render / project render-shapes          project export-game
+  shapes measure          preview, compare                 (godmarrow preset, 195 px)             (+ skins.json entry)
+```
+
+A painting is the reference: `shapes measure` reads its widths into a measurements file that `shapes draft
+--from-measure` sizes the figure from, `shapes sample-materials` takes its colours into the ramps, `shapes compare`
+lays it beside the sprite. Nothing is cut out or carved. See "Shape sprites" below for the format and every command.
+
+**The old road** (below: cutouts → palette → Blender model → Mixamo → renders → pixelate) stays for props (`object`)
+and for reference. `pixelforge hero` runs it in one go and prints a note saying so (pass `--cutout` to silence it);
+it is what made Hemomancer test 1 a blob, and it is not the way to make a character any more.
+
 ```
 Midjourney image(s)  ──►  cutouts  ──►  palette  ──►  [3D model ─► Mixamo ─► renders]  ──►  pixel frames  ──►  Godot files
    (person)               split       palette        model     rig(person)   render         pixelate           export
 ```
 
-Two paths share the first steps:
+Two paths of the old road share the first steps:
 
 - **Quick path** (no Blender): one image → `still` → sprite, procedural
   animation, Godot export. Use it to show results fast and to judge the look.
@@ -24,10 +41,10 @@ Steps needing a person (you cannot do them): making Midjourney images and
 installing Blender. Everything else is yours; the pipeline runs unattended.
 Mixamo is optional (mocap upgrade), never required.
 
-- **Shape sprites** (the character road since 2026-10-02, no painting, no Blender): you write a `.shapes.json`
-  (shapes with materials, bound to bones), the renderer draws it as pixel art and the motion clips give every frame
-  in 8 directions. See "Shape sprites" below; `pixelforge shapes --help`; the step-by-step procedure for a fresh
-  session is the game repository's `docs/GUIDE_SESSION.md`.
+- **Shape sprites** (the character road, no cutout, no Blender): you write a `.shapes.json` (shapes with materials,
+  bound to bones), the renderer draws it as pixel art and the motion clips give every frame in 8 directions, at the
+  game's hero height by default. See "Shape sprites" below; `pixelforge shapes --help`; the step-by-step procedure
+  for a fresh session is the game repository's `docs/GUIDE_SESSION.md`.
 
 ## Install / environment
 
@@ -153,7 +170,7 @@ blender -b --python pixelforge/blender/gen_tree.py -- --out dead.glb --kind dead
 pixelforge prompt --world object|building|tree|ground|effect|ui|icons|portrait --describe "..." --sref <hero sheet url>   # style-locked world prompts
 pixelforge artlist -o docs/ART_ORDER.md --sref <hero sheet url>                   # the Act I art order with every prompt
 pixelforge object <sheet.png> <name> -o art/objects --height 1.2 [--views 3] [--top plan.png] [--canopy] [--game-objects objects.json]   # painted sheet -> carved, painted, filmed, pixelated prop (the hero way); --top carves the footprint and paints the top; --canopy for trees
-pixelforge hero <sheet.png> <name> --describe "..." --project ./forge --to-game <game>/art/sprites           # a hero sheet -> the game, one command
+pixelforge hero <sheet.png> <name> --describe "..." --project ./forge --to-game <game>/art/sprites           # THE OLD CUTOUT ROAD in one command (prints a note; --cutout silences it). Characters: pixelforge shapes
 ```
 
 **The world is painted, then built: objects get the same treatment as heroes.** `prompt --world`

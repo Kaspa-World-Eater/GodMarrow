@@ -1,8 +1,14 @@
 # PixelForge — the short guide
 
-Turn Midjourney pictures into real pixel-art characters, animated, seen from 8 directions, ready for the game; and
-objects, spells, tiles, icons, portraits, frames, sounds and music. Runs on any Windows laptop. No graphics card
-needed. No paid tools. No Mixamo.
+Make real pixel-art characters, animated, seen from 8 directions, ready for the game; and objects, spells, tiles,
+icons, portraits, frames, sounds and music. Runs on any Windows laptop. No graphics card needed. No paid tools. No
+Mixamo.
+
+**Characters are made as shape models** (the **Characters** bench below, or `pixelforge shapes` from a prompt): a
+small file of solids on a standard skeleton that the Forge draws as pixel art and moves with the motion clips, at the
+game's hero size. A painting is the reference the model is measured against, not the thing that gets cut up. The
+older way (cut the painting out, build a 3D figure in Blender, film it) is still in the classic Studio and in the
+`pixelforge hero` command, which says so when you run it; it is for props and for comparison, not for a character.
 
 ## The Forge app (start here)
 
@@ -98,7 +104,10 @@ Everything below is the older window, **PixelForge Studio (classic)**: a step li
 tool. The app above covers the everyday jobs; the Studio keeps the full editors (cutout, skin with layers and the
 clone brush, colour, effects with per-view attachments, the spell designer, the skill-tree editor) and every tool form.
 
-### How a character is made
+### How a character was made on the old road
+
+This is the cutout → Blender road. Characters are shape models now (see "Characters drawn by code" below and the
+Characters bench); these steps stay for props, portraits and comparison.
 
 1. **New project** → pick an empty folder (one project per game).
 2. **+ Add character** → name it, write one sentence about it.

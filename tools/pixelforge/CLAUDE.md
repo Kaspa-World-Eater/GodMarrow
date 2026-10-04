@@ -1,7 +1,16 @@
 # PixelForge
 
-Pixel-art sprite pipeline (Midjourney image → cutouts → optional 3D via
-Blender + Mixamo → 8-direction renders → palette-locked pixel frames → Godot).
+Pixel-art sprite pipeline for Godmarrow. **The character road is shape
+sprites**: a `.shapes.json` of solids on the standard skeleton → the renderer
+draws it as pixel art → the motion clips give every frame in 8 directions →
+`export-game`. `pixelforge shapes ...` (template, draft, measure, compare,
+sample-materials, validate, still, preview, render) and the Forge app's
+Characters bench are that road, and characters default to the game's hero
+height (the `godmarrow` preset, 195 px). The old road (Midjourney image →
+cutouts → 3D via Blender + Mixamo → renders → pixel frames), reached by
+`pixelforge hero` and the classic Studio's steps, stays for props and for
+reference; `hero` says so when run. A painting is measured (`shapes measure`)
+and compared against (`shapes compare`), never carved, for a character.
 
 - **Operating the pipeline for a user:** read `docs/GUIDE_AI.md` first. It has
   every command, the project layout, the standard procedure and the failure

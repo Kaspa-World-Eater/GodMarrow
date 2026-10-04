@@ -10,9 +10,15 @@ browser build in `web/` is the reference). Before touching anything:
 3. `docs/wiki/` — the design wiki (start at `00-start-here.md`, then
    `01-rules-and-decisions.md`).
 4. `tools/pixelforge/NOTES.md` and `tools/pixelforge/docs/GUIDE_AI.md` — the
-   asset forge (Midjourney concept → carved 3D → 8-direction pixel sprites in
-   this game's own atlas format). `tools/pixelforge/.gdignore` keeps Godot out
-   of it; run it with Python from `tools/pixelforge/`.
+   asset forge. **Characters are shape sprites** (`.shapes.json` files of
+   solids on the standard skeleton, rendered as pixel art and moved by the
+   motion clips from 8 directions): `pixelforge shapes ...` and the Forge
+   app's Characters bench are the character road, at the game's hero height
+   (the `godmarrow` preset, 195 px). `pixelforge hero` and the cutout → Blender
+   → Mixamo chain are the **old** road (it made the Hemomancer blob); a painting
+   is the reference a shape file is measured from (`shapes measure`, `shapes
+   compare`), not the source. `tools/pixelforge/.gdignore` keeps Godot out of
+   it; run it with Python from `tools/pixelforge/`.
 
 Never invent where a reference exists: the browser build decides look and
 behaviour. Test with `tools/smoke.sh OUT` before calling a change done.
