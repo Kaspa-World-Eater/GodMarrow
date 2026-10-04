@@ -99,7 +99,7 @@ func _set_tile(w: float) -> void:
 	rebuild()
 
 func _build_edges() -> void:
-	state_line("Tiles · edges · %s" % (("sixteen transition tiles between %s and %s, one per edge bitmask" % [String(state["texture"]).get_file(), String(state["second"]).get_file()]) if String(state["second"]) != "" else "no second material yet: choose one (or drop it here) for the transition tiles"))
+	state_line("Tiles · edges · %s" % (("sixteen transition tiles between %s and %s, one per edge bitmask" % [String(state["texture"]).get_file(), String(state["second"]).get_file()]) if String(state["second"]) != "" else "no second material yet: choose one (or drop it here) for the transition tiles"), "", 2)
 	add_spacer()
 	add_rack(_common_levers(), 8)
 	add_choices(standard_choices([{"label": "Blend with", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; paintings"]), func(p): push_undo(); state["second"] = p; make(); rebuild(), "Choose the second material")},

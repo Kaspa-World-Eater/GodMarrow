@@ -30,7 +30,7 @@ Music: the rack and the cue cards. Settings: Window, Folders, Style (cards with 
 Every bench: Keep, Render all, Undo (JSON snapshots of `state`), Reset, Start over (one question in the window),
 Advanced (plain sliders with finer steps and the fine values).
 
-**Verified (cloud, xvfb, no GPU).** `forge/tools/screens.sh`: 36 screens at 1280x720, 0 SCRIPT ERRORs
+**Verified (cloud, xvfb, no GPU).** `forge/tools/screens.sh`: 37 screens at 1280x720, 0 SCRIPT ERRORs
 (`docs/screens/forgeapp/`); `tools/check_scripts.gd`: 20 scripts, 0 failed; the Keeper walkthrough through
 `--script` (drop the model, still, idle S and E, Render all in 75 s, the Frames tab, Export sheets), 0 errors; 161
 pytest green (`tests/test_forge.py` 13).

@@ -89,13 +89,13 @@ func build_tab(i: int) -> void:
 		return
 	match i:
 		0:
-			state_line("Interface · frames · %s · a 9-slice with %d px of each edge kept, and the StyleBox the game loads" % [String(state["image"]).get_file(), int(state["mid"])])
+			state_line("Interface · frames · %s · a 9-slice with %d px of each edge kept, and the StyleBox the game loads" % [String(state["image"]).get_file(), int(state["mid"])], "", 2)
 			add_spacer()
 			var lm := W.Lever.new()
 			lm.init("edge", (float(state["mid"]) - 2.0) / 30.0, 6.0 / 30.0, func(v): return "%d px" % int(round(2 + v * 30)), Callable(), func(v): _setv("mid", round(2 + v * 30)))
 			add_rack([lm], 8)
 		1:
-			state_line("Interface · icons · %s · %d art px a cell, drawn at %dx and 1x · names in reading order" % [String(state["image"]).get_file(), int(state["cell"]), int(state["scale"])])
+			state_line("Interface · icons · %s · %d art px a cell, drawn at %dx and 1x · names in reading order" % [String(state["image"]).get_file(), int(state["cell"]), int(state["scale"])], "", 2)
 			add_spacer()
 			var lc := W.Lever.new()
 			lc.init("cell", (float(state["cell"]) - 8.0) / 24.0, 4.0 / 24.0, func(v): return "%d px" % int(round(8 + v * 24)), Callable(), func(v): _setv("cell", round(8 + v * 24)))

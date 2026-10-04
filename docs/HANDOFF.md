@@ -641,7 +641,7 @@ Godmarrow stays on hold.
 
 **What.** The Forge app (`tools/pixelforge/forge`, Godot 4.7, built to `docs/mockups/forge_app_v8.html`) is on main.
 The owner's words: "anything not ready mark as under construction, make everything else work, push what we have ready
-now". State: every screen and tab renders with 0 SCRIPT ERRORs (`forge/tools/screens.sh`, 36 shots at 1280x720 under
+now". State: every screen and tab renders with 0 SCRIPT ERRORs (`forge/tools/screens.sh`, 37 shots at 1280x720 under
 xvfb, in `docs/screens/forgeapp/`); 20 scripts parse (`tools/check_scripts.gd`); the Characters bench runs end to end
 through the `--script` walkthrough (`forge/scripts/driver.gd`): drop `assets/shapes/characters/keeper.shapes.json`
 → `project new/add/import-shapes` → `shapes still` (the standing picture with its lights) → Motion tab `shapes render`
@@ -667,7 +667,7 @@ Windows) and returns `{"ok": false, "error": "Godot was not found and the downlo
 Docs: GUIDE_HUMANS (the benches, keys, what is under construction), GUIDE_AI (the per-bench command table, the test
 hooks, the driver lines), `docs/track_notes/forgeapp.md`.
 
-**Verified.** 161 pytest green (about 2 min 20 s); `check_scripts.gd` 20/0; the sweep 36/36 at 0 errors (with sample
+**Verified.** 161 pytest green (about 2 min 20 s); `check_scripts.gd` 20/0; the sweep 37/37 at 0 errors (with sample
 paintings for tiles, a panel and the Keeper's front for the portrait); the Keeper walkthrough above. Not run here:
 *Put it in the game* / *See it in the game* (they need the game's import pass and a run under xvfb; both were run on
 this branch on 2026-10-01 for the object and character roads, unchanged since), the Windows launchers (no Windows
