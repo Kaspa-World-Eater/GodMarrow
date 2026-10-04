@@ -707,3 +707,38 @@ the Age of the Last Breath). Everything saved on branch `track/codex`: `docs/cod
 brief for whichever session takes it (decisions, state of the nine chapter drafts, the approved bestiary, conflicts to
 settle, order of work). The world page he was shown: https://claude.ai/artifact/HzgvhkQv63mo9YPmrSXfvn. `data/codex.json`
 on main is unchanged. This session returns to PixelForge.
+
+### 7.18 2026-10-04, track/music: the music editor (engine, CLI, the Music bench, the Forge theme)
+
+**What.** `pixelforge/music.py` became the package `tools/pixelforge/pixelforge/music/` (the old module is
+`music/score.py`, the game's 21 cues unchanged; `from pixelforge import music` still gives CUES, make_music,
+render_cue, write_sheet, write_blips and the rest). New: the song model (`song.py`), harmony (`theory.py`), the
+SNES-style voice set (`synth.py`: 49 presets in 12 families, 6 drum kits), the renderer (`render.py`: 8-voice
+stealing, crunch, bit depth, SPC-style echo, hall, seamless loops, WAV/OGG; a bar renders ~10x faster than real
+time), the composer (`compose.py`: 13 genres, 8 moods, motif and development, a counter-line, voiced pads, bass
+styles, sparkle arpeggios, drum tables, a bridge in a new key, intro and cadence; deterministic per seed), 30 edit
+operations (`edit.py`), the library (`library.py` + `music/library/*.song.json`: 26 pieces over dungeon synth,
+gothic orchestral, chiptune, dark ambient, battle, boss, tavern, town, title, victory, sorrow, exploration,
+synthwave, plus the hand-written Forge theme and its working / done variants), `blips.py`, `measure.py`. CLI
+`pixelforge music new|compose|render|play-bar|export|edit|list|load|info|measure|build-library|blips` (all `--json`);
+MCP `compose_music`, `edit_song`, `render_song`, `music_library`. The Forge's Music bench rewritten
+(`forge/scripts/screens/music.gd`, `forge/scripts/music_canvas.gd`): Tracks, Pattern (grid + piano roll, click and
+keyboard, running cursor, live re-render), Song, Library, Export; every control is one `music edit` op on
+`<project>/music/current.song.json`. `forge_home/working/done.ogg` and the `ui_*.ogg` blips re-rendered (the confirm
+is a two-note bell). Docs: GUIDE_HUMANS "The Music bench" (every control), GUIDE_AI (verbs, song format, ops),
+`docs/track_notes/music_editor.md` (measurements).
+
+**Verified.** 178 pytest green (`tests/test_music.py` 13: model round trip, theory, every instrument, a bar faster
+than real time, the voice limit, composer determinism over every genre, melody shape, scale lock, every edit op,
+library load/render and recipe parity, the theme's key and tempo, export, the CLI verbs); `check_scripts.gd` 21/0;
+`ONLY=music forge/tools/screens.sh` five tabs at 1280x720, 0 errors (`docs/screens/forgeapp/music_*.png`); the theme
+measured against `docs/refs/forge_music_reference.mp3`: C# minor both, centroid 302 vs 310 Hz, RMS 0.085 vs 0.127.
+Audio for the owner: `docs/screens/forgeapp/audio/` (forge_home, gothic_black_cathedral, chip_lantern_run,
+boss_the_ossuarch). Not done here: listening (no ears in this session: the numbers stand in), the Windows launch, a
+gamepad on the grid.
+
+**How to resume.** `cd tools/pixelforge && PIXELFORGE_NO_UPDATE=1 python -m pytest -q`; `godot --headless --path
+tools/pixelforge/forge --script res://tools/check_scripts.gd`; `pixelforge forge -- --screen=music`. Next: the
+owner's listening pass on the theme and three samples; map the describe line's mood words to `music compose`; a
+chord lane; swing.
+
