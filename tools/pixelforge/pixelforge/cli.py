@@ -564,7 +564,7 @@ def cmd_describe(a) -> None:
 
 
 def cmd_shapes(a) -> None:
-    """pixelforge shapes render|preview|sheet|still|object|turntable|validate|template|draft|joints"""
+    """pixelforge shapes render|preview|sheet|still|object|turntable|compare|validate|template|draft|measure|sample-materials|joints"""
     from . import shape_rig, shape_tools, shapes as S
 
     sub = a.shapes_cmd
@@ -588,9 +588,35 @@ def cmd_shapes(a) -> None:
             if a.out:
                 print("written", a.out)
         return
+    if sub == "measure":
+        from . import shape_measure
+        r = shape_measure.measure_views(a.front, a.side, a.back, a.out)
+        if a.json:
+            _emit(a, r)
+        else:
+            lm = r["landmarks"]
+            print(f"figure {r['height_px']} px tall in {', '.join(r['views'])}; as fractions of the height:")
+            for k in ("head", "shoulders", "chest", "waist", "hips", "hem"):
+                v = lm[k]
+                print(f"  {k:10s} y {v['y']:.2f}  w {v['w']:.3f}" + (f"  d {v['d']:.3f}" if v.get("d") else "") + ("  (skirted)" if v.get("skirted") else ""))
+            print(f"  leg w {lm['leg']['w']:.3f}  arm w {lm['arm']['w']:.3f}" + (f"\nwritten {r['file']}" if r.get("file") else " (add -o M.json to write it)"))
+        return
+    if sub == "sample-materials":
+        from . import shape_measure
+        doc = S.load_shapes(a.model)
+        r = shape_measure.sample_materials(a.front, doc, a.out or a.model, height=a.height, only=[m.strip() for m in a.only.split(",")] if a.only else None)
+        if a.json:
+            _emit(a, r)
+        else:
+            for name, v in r["materials"].items():
+                print(f"  {name:12s} {' '.join(v['ramp'])}  ({v['pixels']} px)")
+            for sk in r["skipped"]:
+                print("  skipped " + sk)
+            print(f"written {r['file']}")
+        return
     if sub == "draft":
         from . import describe
-        r = describe.draft_shapes(a.text, out=a.out, height=a.height)
+        r = describe.draft_shapes(a.text, out=a.out, height=a.height, measure=a.from_measure)
         if a.json:
             _emit(a, r)
         else:
@@ -657,6 +683,14 @@ def cmd_shapes(a) -> None:
     elif sub == "turntable":
         r = shape_tools.turntable(doc, a.out, frames=a.frames or 48, style=style, scale=a.scale, steps=a.steps, outline=a.outline or "style", elevation=a.elevation, zoom=a.zoom)
         _emit(a, r) if a.json else print(f"{r['gif']} ({r['frames']} views) and {r['views']}")
+    elif sub == "compare":
+        from . import shape_measure
+        views = [v.strip() for v in a.views.split(",") if v.strip()] if a.views else None
+        r = shape_measure.compare(doc, a.ref, a.out, height=a.height, views=views, elevation=a.elevation or 0.0, zoom=a.zoom)
+        if a.json:
+            _emit(a, r)
+        else:
+            print(f"{r['out']}: " + "; ".join(f"{k} ({v['direction']}) overlap {v['silhouette_iou']:.2f}" for k, v in r["views"].items()))
 
 
 def cmd_game_preview(a) -> None:
@@ -1063,6 +1097,17 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--height", type=int, default=120); x.add_argument("-o", "--out", default=None, help="write the table as JSON"); x.add_argument("--png", default=None, help="write a stick figure"); x.add_argument("--json", action="store_true")
     x = ss.add_parser("draft", help="describe it: a sentence -> a starter .shapes.json (a humanoid with the costume words as parts and materials)")
     x.add_argument("text"); x.add_argument("-o", "--out", default=None); x.add_argument("--height", type=int, default=120); x.add_argument("--json", action="store_true")
+    x.add_argument("--from-measure", dest="from_measure", default=None, metavar="M.json", help="size the head, torso, belt, skirt, cape and limbs from a 'shapes measure' file")
+    x = ss.add_parser("measure", help="painting to shapes: read the figure's silhouette widths per height band from its views (cutouts on a transparent or plain background) into a measurements JSON")
+    x.add_argument("front"); x.add_argument("side", nargs="?", default=None); x.add_argument("back", nargs="?", default=None)
+    x.add_argument("-o", "--out", default=None, help="write the measurements here (what draft --from-measure reads)"); x.add_argument("--json", action="store_true")
+    x = ss.add_parser("sample-materials", help="painting to shapes: the painting's colours under each material's region become that material's ramp (OKLab k-means), written into the model")
+    x.add_argument("front"); x.add_argument("--model", required=True, help="the .shapes.json to colour"); x.add_argument("-o", "--out", default=None, help="write here instead of in place")
+    x.add_argument("--height", type=int, default=240, help="the px height the model is matched to the painting at"); x.add_argument("--only", default=None, help="comma list of materials to sample (default all)")
+    x.add_argument("--json", action="store_true")
+    x = ss.add_parser("compare", help="painting beside sprite at one height, per view (front/S, side/E, back/N), with the silhouette overlap"); _render_args(x)
+    x.add_argument("--ref", required=True, help="the concept sheet (three views) or one view, on a plain or transparent background"); x.add_argument("-o", "--out", required=True)
+    x.add_argument("--height", type=int, default=195, help="the px height both are shown at (195 = the game's heroes)"); x.add_argument("--views", default=None, help="the sheet's view names in order, e.g. front,side,back")
     x = ss.add_parser("joints", help="re-export the joint tracks of the motion clips from the animation library (numpy, no Blender)")
     x.add_argument("--glb", default=None); x.add_argument("-o", "--out", default=None); x.add_argument("--fps", type=int, default=24); x.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_shapes)

@@ -290,10 +290,27 @@ def build_server():
         return shape_tools.template_file(height, out or None, png or None)
 
     @mcp.tool()
-    def draft_shapes(text: str, out: str = "", height: int = 120) -> dict:
+    def draft_shapes(text: str, out: str = "", height: int = 120, measure: str = "") -> dict:
         """Describe it: a sentence -> a starter .shapes.json (a humanoid on the author pose; costume words become parts and materials).
-        Edit the file, then render_shape_sprite."""
-        return api.draft_shapes(text, out=out or None, height=height)
+        measure: a measurements file from measure_views sizes the figure from the painting. Edit the file, then render_shape_sprite."""
+        return api.draft_shapes(text, out=out or None, height=height, measure=measure or None)
+
+    @mcp.tool()
+    def measure_views(front: str, side: str = "", back: str = "", out: str = "") -> dict:
+        """Painting to shapes: the figure's silhouette widths per height band and its landmarks (head, shoulders, chest, waist, hips,
+        hem, limb widths; fractions of the height) from the front (and side, back) view cutouts, written to out for draft_shapes."""
+        return api.measure_views(front, side or None, back or None, out or None)
+
+    @mcp.tool()
+    def sample_materials(front: str, model: str, out: str = "", height: int = 240) -> dict:
+        """Painting to shapes: the painting's colours under each material's region of the model become that material's ramp (OKLab
+        k-means), written into the .shapes.json (in place unless out is given)."""
+        return api.sample_materials(front, model, out or None, height)
+
+    @mcp.tool()
+    def compare_shapes(model: str, ref: str, out: str, height: int = 195, views: str = "") -> dict:
+        """Painting beside sprite at one height per view (front/S, side/E, back/N) as a PNG, with the silhouette overlap per view."""
+        return api.compare_shapes(model, ref, out, height, views or None)
 
     @mcp.tool()
     def import_shapes(project: str, character: str, file: str) -> dict:

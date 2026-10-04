@@ -178,9 +178,13 @@ pose until it has somewhere to go, so nothing crawls or boils between frames. No
 per clip. One file serves both sizes: the small-size variant keeps the silhouette and drops the detail. Objects (a chest, a skull, a dead tree)
 are the same kind of file without bones, rendered as a still with a foot point for the game.
 
-The painting is the reference for the costume, not the source. Writing the file is a job for the AI assistant (the
-necromancer and the Keeper under `assets/shapes/` are the examples); you judge the result and ask for changes in
-plain words ("the hat is too bright", "make the skirt longer"). To look: `pixelforge shapes preview FILE --clip walk
+The painting is the reference for the costume, not the source, and the Forge can read it: **measure** takes the
+figure's widths from the front, side and back views and sizes the starting model to them, **sample materials** takes
+the painting's colours into the model's ramps, and **compare** puts painting and model side by side at one height so
+you can see what is still off (`pixelforge shapes measure`, `sample-materials`, `compare`; the assistant runs them).
+Writing the file is a job for the AI assistant (the necromancer, the Keeper and the Hemomancer under `assets/shapes/`
+are the examples); you judge the result and ask for changes in plain words ("the hat is too bright", "make the skirt
+longer"). To look: `pixelforge shapes preview FILE --clip walk
 --direction E` makes a GIF; `pixelforge shapes sheet FILE -o sheet.png` a contact sheet; `pixelforge shapes
 turntable FILE -o turn.gif` a spin. To put one in the game: `pixelforge project import-shapes <character> FILE -p
 <project folder>`, then **render-shapes** and **export-game** as usual (the step-by-step list for an assistant is

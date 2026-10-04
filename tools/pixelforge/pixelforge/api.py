@@ -932,11 +932,34 @@ def validate_shapes(path: str | Path) -> dict:
     return shape_tools.validate_file(path)
 
 
-def draft_shapes(text: str, out: str | Path | None = None, height: int = 120) -> dict:
+def draft_shapes(text: str, out: str | Path | None = None, height: int = 120, measure: str | Path | None = None) -> dict:
     """Describe-it for shape sprites: a sentence -> a starter .shapes.json (a humanoid on the author pose with the
-    costume words mapped to parts and materials), written to ``out`` when given."""
+    costume words mapped to parts and materials), written to ``out`` when given; ``measure`` (a measurements file
+    from :func:`measure_views`) sizes it from the painting."""
     from . import describe
-    return describe.draft_shapes(text, out=out, height=height)
+    return describe.draft_shapes(text, out=out, height=height, measure=measure)
+
+
+def measure_views(front: str | Path, side: str | Path | None = None, back: str | Path | None = None, out: str | Path | None = None) -> dict:
+    """Painting to shapes, step one: the figure's silhouette widths per height band and its landmarks from the
+    front (and side, back) views, as a measurements file for ``draft_shapes(measure=...)``."""
+    from . import shape_measure
+    return shape_measure.measure_views(front, side, back, out)
+
+
+def sample_materials(front: str | Path, model: str | Path, out: str | Path | None = None, height: int = 240) -> dict:
+    """Painting to shapes, step two: the painting's colours under each material's region, as that material's ramp
+    (OKLab k-means), written into the shape file (in place unless ``out`` is given)."""
+    from . import shape_measure, shapes as S
+    doc = S.load_shapes(model)
+    return shape_measure.sample_materials(front, doc, out or model, height=height)
+
+
+def compare_shapes(model: str | Path, ref: str | Path, out: str | Path, height: int = 195, views: str | None = None) -> dict:
+    """Painting beside sprite at one height, per view, with the silhouette overlap per view."""
+    from . import shape_measure, shapes as S
+    vs = [v.strip() for v in views.split(",") if v.strip()] if views else None
+    return shape_measure.compare(S.load_shapes(model), ref, out, height=height, views=vs)
 
 
 # ------------------------------------------------------------------- run-all

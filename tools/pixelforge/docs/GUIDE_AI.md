@@ -295,6 +295,10 @@ pip install -e tools/pixelforge   # once, from the repository root. Without inst
 
 pixelforge shapes template [--height 120] [-o tpl.json] [--png tpl.png]   # the author pose: every bone's head and tail, to draw around
 pixelforge shapes draft "a hooded necromancer with a bone staff and green glowing eyes" -o necro.shapes.json   # a starter humanoid from a sentence
+pixelforge shapes draft "..." -o x.shapes.json --from-measure M.json           # the same, its head, torso, belt, skirt, cape and limbs sized from a measured painting
+pixelforge shapes measure FRONT.png [SIDE.png] [BACK.png] -o M.json           # painting to shapes 1: silhouette widths per height band + landmarks (head, shoulders, chest, waist, hips, hem, limb widths; fractions of the height)
+pixelforge shapes sample-materials FRONT.png --model x.shapes.json [-o y.shapes.json] [--only skin,cloth]   # painting to shapes 2: the painting's colours under each material's region -> that material's ramp (OKLab k-means), written into the model
+pixelforge shapes compare x.shapes.json --ref SHEET.png -o cmp.png [--height 195] [--views front,side,back]   # painting beside sprite at one height per view (front/S, side/E, back/N) with the silhouette overlap
 pixelforge shapes validate FILE                                            # problems in plain words, or a summary (mode, shapes, materials, bones, unbound shapes)
 pixelforge shapes still FILE -o out.png [--frame 40] [--direction SE] [--passes] [--game-objects art/objects/objects.json --name chest --hr 2]
 pixelforge shapes object FILE -o art/objects/chest [--directions S,SE,E] [--game-objects art/objects/objects.json]   # trimmed PNGs with foot anchors + <name>.json
@@ -326,13 +330,25 @@ square with the ground at the bottom. The frames folder's `manifest.json` carrie
 `template_file`). MCP: `render_shape_sprite`, `preview_shape_sprite`, `shape_sheet`, `shape_object`,
 `validate_shapes`, `shape_template`, `draft_shapes`, `import_shapes`, `render_shapes`.
 
+**Painting to shapes.** With a concept sheet, do not copy it by eye: cut it into views (a transparent PNG per view,
+or plain-background views; the Hemomancer's are `docs/concepts/hemomancer/test1/front.png`, `side.png`, `back.png`),
+`shapes measure` them into a measurements file, `shapes draft "<the costume words>" --from-measure M.json` for a
+figure already the painting's proportions, `shapes sample-materials FRONT.png --model x.shapes.json` for its colours
+(the model is rendered over the front view at one height; every render pixel knows its shape and so its material, and
+the painting's pixels under each material become its ramp), then `shapes compare x.shapes.json --ref SHEET.png -o
+cmp.png` after every round: painting and sprite side by side per view, feet on one line, with the silhouette overlap
+(the Hemomancer's committed file scores about 0.7 per view; a drafted-and-sampled figure starts near that and reads
+as the right mass and colours before a single shape is placed by hand). A sheet whose figures stand on a painted
+floor splits as one figure: give `compare` the cleaned sheet (the views on paper) or the views one by one.
+
 ### The procedure for an AI
 
 1. `pixelforge shapes template --height 120 --png tpl.png` (a file is authored at one height, 120 units, and rendered
    at any; a character renders at the game's hero height, the `godmarrow` preset's 195 px, whenever no `--style` or
    `--scale` is given, and `export-game` warns when a set's figure height is not the game's for its category). Read the bone table: every bone's head and tail in file units, y down, x across, z
    toward the viewer, the figure facing you, its left hand on +x. The ground line and the body axis are in the table.
-2. Write the file around those bones (or start from `shapes draft "<sentence>"` and edit): a shape per body part
+2. Write the file around those bones (or start from `shapes draft "<sentence>" [--from-measure M.json]` and edit, and
+   `shapes sample-materials` for the colours): a shape per body part
    bound to its bone, garments as rings that `hang`, details as rules. Use the material library by name or add your
    own ramps. Leave no gap between shapes in the author pose (a waist between the chest and the belt): a bend or a
    fall opens it.

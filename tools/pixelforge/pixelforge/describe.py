@@ -386,10 +386,12 @@ def _material_near(words: list[str], noun_pattern: str, default: str) -> str:
     return default
 
 
-def draft_shapes(text: str, out: str | Path | None = None, height: int = 120) -> dict:
+def draft_shapes(text: str, out: str | Path | None = None, height: int = 120, measure: str | Path | dict | None = None) -> dict:
     """A sentence -> a starter solid .shapes.json: a humanoid drawn around the author pose, with the costume words of
     the sentence as parts (hat, hood, cape, cloak, robe, skirt, armour, pauldrons, belt, boots, staff, sword, shield,
-    gourds, cords) in the materials the words name. It is a draft to edit: move the shapes, change the ramps."""
+    gourds, cords) in the materials the words name. It is a draft to edit: move the shapes, change the ramps. With
+    ``measure`` (a measurements file or dict from ``shapes measure``) the head, torso, belt, skirt, cape and limbs are
+    sized from the painting's widths instead of the template's."""
     from . import shape_rig
 
     t = text.lower()
@@ -525,6 +527,11 @@ def draft_shapes(text: str, out: str | Path | None = None, height: int = 120) ->
         "view": {"elevation": 12}, "outline": "#0a080c", "skeleton": {"height": height, "ground": ground, "cx": cx}, "materials": {}, "parts": parts,
         "shapes": shapes, "effects": [], "lights": lights, "shadow": {"radii": [22, 4.2], "colour": "#4b4a4f"},
     }
+    if measure:
+        from .shape_measure import apply_measurements
+        m = json.loads(Path(measure).read_text()) if not isinstance(measure, dict) else measure
+        apply_measurements(doc, m)
+        read.append("sized from the measured painting")
     result = {"what": "shapes", "doc": doc, "read": read, "shapes": len(shapes)}
     if out:
         Path(out).parent.mkdir(parents=True, exist_ok=True)
