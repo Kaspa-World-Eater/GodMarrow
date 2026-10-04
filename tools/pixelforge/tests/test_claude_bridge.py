@@ -359,3 +359,24 @@ def test_cli_claude_log_and_undo(project, monkeypatch, capsys):
     assert u["ok"] and S.load(project / "music" / "current.song.json")["tempo"] == 72.0
     main(["claude", "status"])
     assert "ready" in capsys.readouterr().out
+
+
+def test_forge_benches_carry_the_claude_hooks():
+    """Every workbench script answers the describe line: the base has the line, the run and the undo; each bench its reload."""
+    forge = CB.PF_ROOT / "forge"
+    base = (forge / "scripts/screen.gd").read_text()
+    for name in ["add_describe_line", "_describe", "on_claude_done", "on_claude_undone", "claude_context", "_highlight_changed", "claude_snapshot",
+                 '"describe", "--bench"', '"claude", "undo"']:
+        assert name in base, name
+    for screen in ["characters", "music", "effects", "tiles", "interface", "sound"]:
+        text = (forge / "scripts/screens" / f"{screen}.gd").read_text()
+        assert "func on_claude_done" in text and "func claude_context" in text, screen
+    chars = (forge / "scripts/screens/characters.gd").read_text()
+    assert '"midjourney", "fetch"' in chars and "Paint it in Midjourney" in chars and "Copy prompt" in chars
+    assert "Fetch a prop sheet of nine" in (forge / "scripts/screens/objects.gd").read_text()
+    app = (forge / "scripts/app.gd").read_text()
+    assert '"claude", "status"' in app and '"claude", "register"' in app and "Claude: working" in app and "install Claude Code" in app
+    for walk in ["describe_walk.txt", "describe_walk_music.txt"]:
+        assert (forge / "tools" / walk).exists()
+    assert "describe_walk.txt characters.jsonl" in (forge / "tools/screens.sh").read_text()
+    assert "claude register" in (CB.PF_ROOT / "install.bat").read_text()

@@ -51,3 +51,17 @@ for t in Tracks Pattern Song Library Export; do shoot music_${t,,} "--screen=mus
 for t in Window Folders Style; do shoot settings_${t,,} "--screen=settings --tab=$t" 4; done
 shoot settings_computer "--screen=settings --tab=3" 12
 shoot log "--screen=home --log=1" 3
+# the Claude line, with the mock Claude standing in for Claude Code (tests/claude_mock/*.jsonl); the walkthroughs in describe_walk*.txt
+walk() {  # name script mock
+  local name=$1 script=$2 mock=$3
+  [ -n "${ONLY:-}" ] && [[ "$name" != "$ONLY"* ]] && return 0
+  [ -f "$PROJECT/project.json" ] || "$PY" -m pixelforge.cli project new "$PROJECT" --name Forge --json >/dev/null
+  local tmp; tmp=$(mktemp); sed "s#OUT#$OUT#g" "$HERE/tools/$script" > "$tmp"
+  local log; log=$(PIXELFORGE_CLAUDE="mock:$HERE/../tests/claude_mock/$mock" PIXELFORGE_MOCK_DELAY=${MOCK_DELAY:-0.5} timeout 500 xvfb-run -a -s "-screen 0 ${RES}x24" \
+    "$GODOT" --path "$HERE" --rendering-driver opengl3 --resolution "$RES" -- --nosound --project="$PROJECT" --python="$PY" ${GAME:+--game=$GAME} --script="$tmp" 2>&1)
+  rm -f "$tmp"
+  echo "$name | errors $(echo "$log" | grep -cE 'SCRIPT ERROR|SHADER ERROR|handle_crash') | shots $(echo "$log" | grep -c '^SHOT ')"
+  [ -n "${VERBOSE:-}" ] && echo "$log" | grep -E 'SCRIPT|SHOT|LOG   ->|ERROR' | head -60
+}
+walk describe_characters describe_walk.txt characters.jsonl
+walk describe_music describe_walk_music.txt music.jsonl

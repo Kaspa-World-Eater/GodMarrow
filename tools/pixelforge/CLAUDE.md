@@ -19,7 +19,8 @@ and compared against (`shapes compare`), never carved, for a character.
   `gui.py` (the classic Tkinter Studio), `cli.py`, `mcp_server.py` and the
   Forge app (`forge/`, a Godot 4.7 project started by `forge_launch.py` /
   `pixelforge forge`; it only runs CLI commands, never the pipeline itself)
-  are wrappers over it.
+  are wrappers over it. `claude_bridge.py` is Claude on the bench: the Forge's describe line hands a sentence to the
+  Claude Code CLI, which works through `mcp_server.py`'s tools (`docs/GUIDE_AI.md`, "Claude on the bench").
   Image algorithms: `grid.py` (pixel-grid detection), `palette.py` (OKLab
   k-means), `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`
   (procedural effects), `transform.py` (RotSprite), `sheet.py` (split

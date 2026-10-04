@@ -1000,6 +1000,74 @@ func _exit_tree() -> void:
 	if canvas and is_instance_valid(canvas):
 		canvas.queue_free()
 
+# ------------------------------------------------------------------ Claude on the bench
+func claude_context() -> Dictionary:
+	var ctx := {}
+	if String(state.get("path", "")) != "":
+		ctx["song"] = String(state["path"])
+	return ctx
+
+## every note of the song as "lane/step/pitch" keys, to see what Claude added
+func _note_keys() -> Dictionary:
+	var out := {}
+	if not has_song():
+		return out
+	for pn in song()["patterns"]:
+		for ln in song()["patterns"][pn]["notes"]:
+			for n in song()["patterns"][pn]["notes"][ln]:
+				out["%s/%s/%d/%d" % [pn, ln, int(n["s"]), int(n["p"])]] = true
+	return out
+
+func _describe() -> void:
+	_notes_before = _note_keys()
+	super()
+
+var _notes_before := {}
+
+## the song file is read again; the notes that are new light up on the grid; the sound follows when it was playing
+func on_claude_done(_r: Dictionary) -> void:
+	var path := String(state.get("path", ""))
+	if path == "" or not FileAccess.file_exists(path):
+		var cur := music_dir().path_join("current.song.json")
+		if FileAccess.file_exists(cur):
+			state["path"] = cur
+			path = cur
+		else:
+			return
+	var keep_pattern := String(state.get("pattern", ""))
+	var keep_bar := int(state.get("bar", 0))
+	var keep_section := int(state.get("section", 0))
+	_load_file(path)
+	if song()["patterns"].has(keep_pattern):
+		state["pattern"] = keep_pattern
+		state["bar"] = clampi(keep_bar, 0, int(pat()["bars"]) - 1)
+		state["section"] = clampi(keep_section, 0, song()["sections"].size() - 1)
+	var now := _note_keys()
+	var fresh := []
+	for k in now:
+		if not _notes_before.has(k):
+			fresh.append(k)
+	_notes_before = {}
+	canvas.highlight = fresh
+	canvas.queue_redraw()
+	if not fresh.is_empty():
+		get_tree().create_timer(4.0).timeout.connect(func():
+			if is_instance_valid(canvas):
+				canvas.highlight = []
+				canvas.queue_redraw())
+	_sync_canvas()
+	if player.playing:
+		dirty_audio = true
+		_render_current()
+
+func on_claude_undone() -> void:
+	var path := String(state.get("path", ""))
+	if path != "" and FileAccess.file_exists(path):
+		_load_file(path)
+		if player.playing:
+			dirty_audio = true
+			_render_current()
+
 # ------------------------------------------------------------------ the keyboard framing
 func _set_grid_focus(on: bool) -> void:
 	grid_focus = on
@@ -1012,6 +1080,10 @@ func _set_grid_focus(on: bool) -> void:
 		app.set_hint(hint_text)
 
 func on_key(ev: InputEvent) -> bool:
+	if describe_key(ev):
+		return true
+	if describe and is_instance_valid(describe) and describe.has_focus():
+		return false
 	if name_edit and is_instance_valid(name_edit) and name_edit.has_focus():
 		if ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
 			name_edit.release_focus()
