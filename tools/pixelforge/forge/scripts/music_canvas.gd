@@ -189,7 +189,7 @@ func _draw_pattern() -> void:
 			var is_root := ((p - root) % 12 + 12) % 12 == 0
 			var sc := in_scale(p)
 			draw_rect(Rect2(GRID_X, y, 16 * CELL_W, ROLL_ROW), (Color(T.ACCENT, 0.16) if is_root else Color(T.BONE, 0.07)) if sc else T.WELL)
-			if is_root or r == rows - 1 or (r == 0 and not in_scale(p + 1) and p % 12 != root):
+			if (is_root or (r == 0 and not in_scale(p + 1) and p % 12 != root)) and y + 7 <= size.y:
 				_text(GRID_X - 4 - _text_w(note_name(p)), y + 6, note_name(p), T.ACCENT if is_root else T.DIM)
 			if p == cursor_pitch:
 				draw_rect(Rect2(0, y, GRID_X - 1, ROLL_ROW), Color(T.ACCENT, 0.18))
