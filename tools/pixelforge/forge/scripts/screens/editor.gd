@@ -437,6 +437,13 @@ func _build_effects() -> void:
 	if a.is_empty():
 		_effects_library()
 	else:
+		var ax := int(a["x"])
+		var ay := int(a["y"])
+		add_cyclers([
+			{"label": "x", "value": str(ax), "left": func(): set_anchor_fields(anchor_sel, {"x": ax - 1}), "right": func(): set_anchor_fields(anchor_sel, {"x": ax + 1}), "set": func(t): set_anchor_fields(anchor_sel, {"x": int(t)})},
+			{"label": "y", "value": str(ay), "left": func(): set_anchor_fields(anchor_sel, {"y": ay - 1}), "right": func(): set_anchor_fields(anchor_sel, {"y": ay + 1}), "set": func(t): set_anchor_fields(anchor_sel, {"y": int(t)})},
+			{"label": "frame", "value": str(int(a["frame"]) + 1), "left": func(): pass, "right": func(): pass},
+		])
 		var ls := W.Lever.new()
 		ls.init("scale", clampf((float(a["scale"]) - 0.25) / 2.75, 0.0, 1.0), 0.75 / 2.75, func(v): return "x" + T.fmt(0.25 + v * 2.75, 2), Callable(), func(v): set_anchor_fields(anchor_sel, {"scale": snappedf(0.25 + v * 2.75, 0.05)}))
 		var lr := W.Wheel.new()

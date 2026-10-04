@@ -924,7 +924,7 @@ func _build_frames() -> void:
 	add_cyclers([
 		{"label": "clip", "value": clip, "left": func(): _pick_clip(_cycle(CLIPS, clip, -1)), "right": func(): _pick_clip(_cycle(CLIPS, clip, 1))},
 		{"label": "facing", "value": String(state["direction"]), "left": func(): _pick_direction(_cycle(DIRS, String(state["direction"]), -1)), "right": func(): _pick_direction(_cycle(DIRS, String(state["direction"]), 1))},
-		{"label": "fps", "value": T.fmt(fps, 1), "left": func(): _set_fps(fps - 1.0), "right": func(): _set_fps(fps + 1.0)},
+		{"label": "fps", "value": T.fmt(fps, 1), "left": func(): _set_fps(fps - 1.0), "right": func(): _set_fps(fps + 1.0), "set": func(t): _set_fps(float(t))},
 		{"label": "onion skin", "value": "on" if state.get("onion", false) else "off", "left": func(): _set_onion(false), "right": func(): _set_onion(true)},
 		{"label": "scene light", "value": ["off", "sprite only", "on"][app.scene.light_mode], "left": func(): _set_scene_light(app.scene.light_mode - 1), "right": func(): _set_scene_light(app.scene.light_mode + 1)},
 	])
