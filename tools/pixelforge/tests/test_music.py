@@ -288,14 +288,15 @@ def test_library_pieces_load_and_render():
 def test_forge_theme_is_dungeon_synth_in_the_reference_key():
     s = L.load_piece("forge_home")
     assert S.key_text(s) == "C# minor" and 66 <= s["tempo"] <= 76 and s["genre"] == "dungeon_synth" and s["theme"] == "godmarrow"
-    assert s["lanes"]["sparkle"]["instrument"] in ("bells_glass", "celesta", "music_box")
+    assert s["lanes"]["sparkle"]["instrument"].startswith("bells") and s["lanes"]["sparkle"]["volume"] < 0.3   # a bell or two, low in the mix
     assert any(sec["transpose"] for sec in s["sections"])       # the bridge changes key
     assert s["patterns"]["A"]["notes"]["lead"] and s["patterns"]["A"]["notes"]["counter"]
     assert 40 < S.total_seconds(s) < 130
     lead = s["patterns"]["A"]["notes"]["lead"]
     assert max(n["p"] for n in lead) <= 72 and min(n["l"] for n in lead) >= 1.5      # a broad low melody, not a jig
     assert s["lanes"]["bass"]["instrument"] == "bass_sub" and all(n["l"] > 16 for n in s["patterns"]["A"]["notes"]["bass"])   # the drone
-    assert s["lanes"]["counter"]["instrument"].startswith("guitar")                       # the sparse plucked figure
+    assert s["lanes"]["counter"]["instrument"] == "choir_chant" and s["lanes"]["pad"]["instrument"] == "organ_gothic" and s["lanes"]["lead"]["instrument"] == "brass_low"
+    assert len(s["patterns"]["A"]["notes"]["sparkle"]) <= 8                                 # no constant bells
 
 
 def test_export_writes_wav_and_song(tmp_path):
