@@ -626,6 +626,17 @@ the chest and each held step re-draws them; the margin under 0.12 is what the th
 breath. The holds are a half pixel laggier than before (a body may be drawn up to 1.5 px from its true place). The
 import step runs on every preview (seconds when the project is already imported).
 
+### 7.12 2026-10-02 (cloud session, near end of context)
+Main has the shape-sprite engine (67f3cec, 149 tests). The Forge app is being built to the approved mockup on
+`track/forgeapp` (worktree /home/user/wt/forgeapp; brief = docs/mockups/forge_app_v8.html + docs/track_notes/gui_look.md
+and the other track notes). If this session dies, whatever reached origin/track/forgeapp is the state: merge main into it,
+read its HANDOFF entry and docs/track_notes/forgeapp.md, run tests and the app's --screen/--shot hooks, then a
+builder/reviewer round against the mockup, then merge to main. After the app: the Keeper's second authoring pass
+(sharper limbs, readable skirt, more accents), then objects/effects/tiles through the engine (docs/PLAN.md phases).
+Godmarrow stays on hold.
+
+**2026-10-02 (cloud):** the Forge app build (track/forgeapp) was stopped by the account's weekly usage limit (resets 2026-10-04 18:00 UTC) about 70 minutes in; its work is committed as WIP on origin/track/forgeapp. Resume per 7.12 after the reset.
+
 ### 7.13 2026-10-04, track/forgeapp: the Forge app shipped to main (benches that work, the rest marked under construction)
 
 **What.** The Forge app (`tools/pixelforge/forge`, Godot 4.7, built to `docs/mockups/forge_app_v8.html`) is on main.
