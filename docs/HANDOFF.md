@@ -697,3 +697,13 @@ Rendered at the `godmarrow` preset (195 px) and exported over `art/sprites/hemom
 `upright_from` bone (thigh-hung plates judge "lying down" by the hips), default unchanged, 37 shape tests green; GUIDE_AI
 documents it and the `keep.back` trap. The full write-up, pictures, GIFs, what is still short and the list of what
 PixelForge needs so the first build is right: `docs/concepts/hemomancer/shapes/README.md`.
+
+
+**7.15 (2026-10-04, PixelForge session): the lore rewrite is handed over.** Derek rewrote the cosmology (the Reliquary an
+unknowable corpse; gods are beliefs that grew bodies and starve when forgotten; a Dark Souls previous age of dragon gods,
+feasting colossi, the ooze tower, the scythe-armed skeleton, demons, iron citadels, the clam god, soul eaters, our vampire,
+a starving dracolich, lords, dead cities; the necromancy core back; the classes' orders are cults among many; this age is
+the Age of the Last Breath). Everything saved on branch `track/codex`: `docs/codex/LORE_REWRITE_GUIDE.md` is the complete
+brief for whichever session takes it (decisions, state of the nine chapter drafts, the approved bestiary, conflicts to
+settle, order of work). The world page he was shown: https://claude.ai/artifact/HzgvhkQv63mo9YPmrSXfvn. `data/codex.json`
+on main is unchanged. This session returns to PixelForge.
