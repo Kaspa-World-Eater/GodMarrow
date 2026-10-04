@@ -23,15 +23,21 @@ INSTRUMENTS: dict[str, dict] = {
     "strings_dark": {"kind": "strings", "attack": 0.2, "release": 0.6, "cut": 800, "family": "strings", "words": "low strings, dark and slow"},
     "strings_fast": {"kind": "strings", "attack": 0.03, "release": 0.12, "cut": 2200, "family": "strings", "words": "short bowed strings for ostinatos"},
     "cello": {"kind": "strings", "attack": 0.08, "release": 0.3, "cut": 1000, "voices": 2, "family": "strings", "words": "a single cello, close"},
+    "strings_ens": {"kind": "strings", "attack": 0.06, "release": 0.3, "cut": 2600, "ensemble": True, "family": "strings", "words": "a looped string ensemble with chorus, the late-SNES one"},
+    "orch_hit": {"kind": "hit", "family": "brass", "words": "an orchestral hit: brass, strings and a timpani thump in one strike"},
     # brass
     "brass_horn": {"kind": "brass", "attack": 0.06, "release": 0.25, "cut": 1500, "family": "brass", "words": "a French horn, round"},
     "brass_stab": {"kind": "brass", "attack": 0.015, "release": 0.08, "cut": 2600, "bend": 0.6, "family": "brass", "words": "a brass section's stab"},
     "trumpet": {"kind": "brass", "attack": 0.03, "release": 0.12, "cut": 3200, "bend": 0.4, "family": "brass", "words": "a trumpet, bright"},
     "tuba": {"kind": "brass", "attack": 0.05, "release": 0.2, "cut": 700, "family": "brass", "words": "a tuba's low breath"},
+    "brass_low": {"kind": "brass", "attack": 0.1, "release": 0.45, "cut": 900, "bend": 0.2, "family": "brass", "words": "low brass in unison: horns and trombones, slow and heavy"},
     # choir
     "choir_ahh": {"kind": "choir", "vowel": "a", "attack": 0.25, "release": 0.5, "family": "choir", "words": "a choir on 'ah'"},
     "choir_ooh": {"kind": "choir", "vowel": "o", "attack": 0.3, "release": 0.6, "family": "choir", "words": "a choir on 'oh', darker"},
     "choir_men": {"kind": "choir", "vowel": "u", "attack": 0.35, "release": 0.7, "family": "choir", "words": "men's voices, low and hollow"},
+    "choir_dark": {"kind": "choir", "vowel": "o", "attack": 0.4, "release": 0.9, "dark": True, "family": "choir", "words": "a dark choir, brooding, far back"},
+    "choir_chant": {"kind": "choir", "vowel": "u", "attack": 0.08, "release": 0.3, "family": "choir", "words": "a male choir chanting: short, re-struck notes"},
+    "choir_alien": {"kind": "choir", "vowel": "u", "attack": 0.6, "release": 1.4, "alien": True, "family": "choir", "words": "an alien choir: shifted formants, a slow wide wobble"},
     # bells and mallets
     "bells_glass": {"kind": "glass", "decay": 2.4, "family": "bells", "words": "glass bells: the sparkle"},
     "bells_tubular": {"kind": "bell", "decay": 3.5, "family": "bells", "words": "tubular bells, church-sized"},
@@ -39,9 +45,11 @@ INSTRUMENTS: dict[str, dict] = {
     "vibraphone": {"kind": "mallet", "decay": 1.6, "tremolo": 4.5, "family": "bells", "words": "a vibraphone with its motor on"},
     "marimba": {"kind": "mallet", "decay": 0.5, "tremolo": 0.0, "family": "bells", "words": "a marimba, woody"},
     "celesta": {"kind": "glass", "decay": 1.6, "bright": 1.1, "family": "bells", "words": "a celesta"},
+    "bells_chapel": {"kind": "bell", "decay": 2.6, "family": "bells", "words": "chapel bells, close and dark"},
     # organ and keys
     "organ_cathedral": {"kind": "organ", "bars": [1.0, 0.6, 0.4, 0.5, 0.2, 0.25], "attack": 0.04, "release": 0.25, "family": "organ", "words": "a cathedral organ, full"},
     "organ_reed": {"kind": "organ", "bars": [0.8, 0.3, 0.9, 0.2, 0.5, 0.1], "attack": 0.02, "release": 0.1, "family": "organ", "words": "a reed organ, nasal"},
+    "organ_gothic": {"kind": "organ", "bars": [1.0, 0.85, 0.7, 0.65, 0.5, 0.45], "attack": 0.06, "release": 0.5, "chorus": 7.0, "family": "organ", "words": "a gothic organ, every stop out, chorused"},
     "piano_electric": {"kind": "epiano", "decay": 1.4, "family": "keys", "words": "an electric piano, FM-style"},
     "harpsichord": {"kind": "pluck", "bright": 0.9, "sustain": 0.25, "nasal": True, "family": "keys", "words": "a harpsichord"},
     # plucked
@@ -49,6 +57,7 @@ INSTRUMENTS: dict[str, dict] = {
     "lute": {"kind": "pluck", "bright": 0.8, "sustain": 0.35, "nasal": True, "family": "plucked", "words": "a lute, nasal and quick"},
     "guitar_steel": {"kind": "pluck", "bright": 0.6, "sustain": 0.55, "family": "plucked", "words": "a steel-string guitar"},
     "pizzicato": {"kind": "pluck", "bright": 0.4, "sustain": 0.2, "family": "plucked", "words": "plucked strings, short"},
+    "guitar_nylon": {"kind": "pluck", "bright": 0.42, "sustain": 0.65, "family": "plucked", "words": "a nylon guitar, warm and close: the dark acoustic figure"},
     # bass
     "bass_synth": {"kind": "bass", "cut": 900, "sub": 0.5, "family": "bass", "words": "a synth bass with a sub octave"},
     "bass_pick": {"kind": "pluckbass", "bright": 0.5, "family": "bass", "words": "a picked bass"},
@@ -70,6 +79,7 @@ INSTRUMENTS: dict[str, dict] = {
     "pad_dark": {"kind": "pad", "cut": 700, "attack": 0.5, "release": 1.0, "family": "pads", "words": "a dark breathing pad"},
     "pad_glass": {"kind": "pad", "cut": 2400, "attack": 0.3, "release": 0.8, "glass": True, "family": "pads", "words": "a glassy pad with chorus"},
     "pad_synthwave": {"kind": "pad", "cut": 1600, "attack": 0.08, "release": 0.4, "detune": 12, "family": "pads", "words": "a wide 80s pad"},
+    "pad_dream": {"kind": "pad", "cut": 1900, "attack": 0.7, "release": 1.6, "wide": True, "family": "pads", "words": "a wide dreamy pad: chorused triangles and a sine, slow to bloom"},
     "timpani": {"kind": "timpani", "family": "drums", "words": "a timpani roll's single hit"},
     # drum kits
     "drums_rock": {"kind": "kit", "kick_f": 60, "snare": 0.6, "weight": 1.0, "family": "drums", "words": "a rock kit with weight"},
@@ -78,6 +88,7 @@ INSTRUMENTS: dict[str, dict] = {
     "drums_taiko": {"kind": "kit", "kick_f": 42, "snare": 0.3, "weight": 1.4, "taiko": True, "family": "drums", "words": "taiko drums, deep"},
     "drums_electro": {"kind": "kit", "kick_f": 52, "snare": 0.7, "weight": 1.0, "electro": True, "family": "drums", "words": "an 80s drum machine"},
     "drums_brush": {"kind": "kit", "kick_f": 58, "snare": 0.35, "weight": 0.7, "brush": True, "family": "drums", "words": "brushes, quiet"},
+    "drums_epic": {"kind": "kit", "kick_f": 40, "snare": 0.3, "weight": 1.6, "taiko": True, "orch": True, "family": "drums", "words": "timpani and great drums, far and heavy"},
 }
 
 FAMILIES = ["strings", "brass", "choir", "bells", "organ", "keys", "plucked", "bass", "lead", "winds", "pads", "drums"]
@@ -112,8 +123,13 @@ def _strings(p, midi, dur, vel, tone, rate, rng):
     sig /= len(dets)
     cut = p.get("cut", 1400) * (0.5 + tone * 1.5)
     t = np.arange(n) / rate
-    sweep = cut * (0.45 + 0.55 * np.clip(t / max(p.get("attack", 0.1) * 2, 0.05), 0, 1))
-    sig = sweep_filter(sig, "lowpass", sweep, rate, 0.8, block=512)
+    if p.get("ensemble"):
+        # a looped sample's steady timbre: a fixed band, a chorus that wobbles the whole, no filter sweep
+        sig = filt(sig, "lowpass", cut, rate, 0.7)
+        sig = sig * (1.0 + 0.08 * np.sin(2 * np.pi * 0.9 * t + rng.random() * 6)).astype(np.float32)
+    else:
+        sweep = cut * (0.45 + 0.55 * np.clip(t / max(p.get("attack", 0.1) * 2, 0.05), 0, 1))
+        sig = sweep_filter(sig, "lowpass", sweep, rate, 0.8, block=512)
     return sig * adsr(n, rate, p.get("attack", 0.1), 0.3, 0.85, rel, dur) * _vel(vel)
 
 
@@ -139,14 +155,15 @@ def _choir(p, midi, dur, vel, tone, rate, rng):
     n = _n(dur, rel, rate)
     f = midi_hz(midi)
     src = np.zeros(n, np.float32)
+    alien = p.get("alien", False)
     for c in (-11, 0, 12):
-        fv = dsp.vibrato(f * 2 ** (c / 1200), n, rate, 0.005, 4.6 + rng.random() * 0.8, 0.3)
+        fv = dsp.vibrato(f * 2 ** (c / 1200), n, rate, 0.014 if alien else 0.005, (1.8 if alien else 4.6) + rng.random() * 0.8, 0.3)
         src += osc("saw", fv, n, rate, phase=rng.random())
     src /= 3
     sig = np.zeros(n, np.float32)
     for fr, a in VOWELS.get(p.get("vowel", "a"), VOWELS["a"]):
-        sig += filt(src, "bandpass", fr * (0.85 + tone * 0.3), rate, 6.0) * a * 3.0
-    sig = filt(sig, "lowpass", 2500 + tone * 2500, rate, 0.7)
+        sig += filt(src, "bandpass", fr * (0.85 + tone * 0.3) * (1.35 if alien else 1.0), rate, 6.0) * a * 3.0
+    sig = filt(sig, "lowpass", (1600 if p.get("dark") else 2500) + tone * 2500, rate, 0.7)
     return sig * adsr(n, rate, p.get("attack", 0.25), 0.4, 0.9, rel, dur) * _vel(vel) * 0.9
 
 
@@ -198,9 +215,10 @@ def _organ(p, midi, dur, vel, tone, rate, rng):
     bars = p.get("bars", [1.0, 0.6, 0.4, 0.5, 0.2, 0.25])
     ratios = (1, 2, 3, 4, 6, 8)
     sig = np.zeros(n, np.float32)
+    ch = p.get("chorus", 3.0)
     for i, (r, a) in enumerate(zip(ratios, bars)):
         w = a * (1.0 if i < 2 else 0.4 + tone * 1.2)
-        for c in (-3, 3):
+        for c in (-ch, ch):
             sig += osc("sine", f * r * 2 ** (c / 1200), n, rate, phase=rng.random()) * w * 0.5
     sig /= sum(bars)
     sig = filt(sig, "lowpass", 2400 + tone * 5000, rate, 0.6)
@@ -334,17 +352,41 @@ def _pad(p, midi, dur, vel, tone, rate, rng):
     f = midi_hz(midi)
     det = p.get("detune", 6)
     sig = np.zeros(n, np.float32)
-    for c in (-det, det):
-        sig += osc("saw" if not p.get("glass") else "tri", f * 2 ** (c / 1200), n, rate, phase=rng.random())
-    if p.get("glass"):
-        sig += osc("sine", f * 2, n, rate) * 0.4
-    sig /= 2.2
+    if p.get("wide"):
+        t_ = np.arange(n) / rate
+        for c in (-13, -5, 4, 12):
+            fv = f * 2 ** (c / 1200) * (1 + 0.0025 * np.sin(2 * np.pi * (0.3 + abs(c) * 0.02) * t_ + rng.random() * 6))
+            sig += osc("tri", fv, n, rate, phase=rng.random()) * 0.6
+        sig += osc("sine", f, n, rate) * 0.8 + osc("sine", f * 2, n, rate) * 0.25
+        sig /= 3.2
+    else:
+        for c in (-det, det):
+            sig += osc("saw" if not p.get("glass") else "tri", f * 2 ** (c / 1200), n, rate, phase=rng.random())
+        if p.get("glass"):
+            sig += osc("sine", f * 2, n, rate) * 0.4
+        sig /= 2.2
     t = np.arange(n) / rate
     cut = p.get("cut", 700) * (0.5 + tone * 1.6)
     breathe = cut * (1 + 0.35 * np.sin(0.4 * t + rng.random() * 6))
     sig = sweep_filter(sig, "lowpass", np.maximum(breathe, 80), rate, 1.2, block=1024)
-    sig = filt(sig, "highpass", 60, rate, 0.7)
+    sig = filt(sig, "highpass", 110 if p.get("wide") else 60, rate, 0.7)
     return sig * adsr(n, rate, p.get("attack", 0.5), 0.0, 1.0, rel, dur) * _vel(vel)
+
+
+def _hit(p, midi, dur, vel, tone, rate, rng):
+    """The orchestral hit: a brass-and-strings chord struck once (root, fifth, octave) with a timpani thump under it."""
+    n = int(0.9 * rate)
+    f = midi_hz(midi)
+    t = np.arange(n) / rate
+    sig = np.zeros(n, np.float32)
+    for r, w in ((1.0, 1.0), (1.5, 0.7), (2.0, 0.6), (0.5, 0.5)):
+        for c in (-8, 0, 7):
+            sig += osc("saw", f * r * 2 ** (c / 1200), n, rate, phase=rng.random()) * w
+    sig = filt(sig / 9, "lowpass", 1800 + tone * 2200, rate, 0.9) * exp_decay(n, rate, 0.55)
+    thump = osc("sine", f * 0.5 * (1 + 0.6 * np.exp(-t / 0.05)), n, rate) * exp_decay(n, rate, 0.4) * 0.8
+    noise = filt(rng.uniform(-1, 1, n).astype(np.float32), "lowpass", 2500, rate) * exp_decay(n, rate, 0.03) * 0.5
+    out = (sig + thump + noise) * np.minimum(t / 0.004, 1.0)
+    return (dsp.saturate(out, 0.3) * _vel(vel) * 0.9).astype(np.float32)
 
 
 def _timpani(p, midi, dur, vel, tone, rate, rng):
@@ -359,7 +401,7 @@ def _timpani(p, midi, dur, vel, tone, rate, rng):
 
 GENERATORS = {"strings": _strings, "brass": _brass, "choir": _choir, "glass": _glass, "bell": _bell, "mallet": _mallet, "organ": _organ,
               "epiano": _epiano, "pluck": _pluck, "pluckbass": _pluckbass, "bass": _bass, "subbass": _subbass, "chip": _chip,
-              "flute": _flute, "pad": _pad, "timpani": _timpani}
+              "flute": _flute, "pad": _pad, "timpani": _timpani, "hit": _hit}
 
 
 def render_note(preset: str, midi: int, dur: float, vel: float, tone: float, rate: int, rng: np.random.Generator) -> np.ndarray:

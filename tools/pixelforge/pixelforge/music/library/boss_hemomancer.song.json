@@ -9,7 +9,7 @@
  "scale_lock": true,
  "lanes": {
   "lead": {
-   "instrument": "lead_sync",
+   "instrument": "organ_reed",
    "volume": 0.85,
    "tone": 0.5,
    "pan": 0.0,
@@ -33,7 +33,7 @@
    "solo": false
   },
   "bass": {
-   "instrument": "bass_synth",
+   "instrument": "tuba",
    "volume": 0.8,
    "tone": 0.5,
    "pan": 0.0,
@@ -6884,7 +6884,8 @@
   "echo_tone": 0.5,
   "reverb": 0.3,
   "reverb_size": 1.6,
-  "master": 1.0
+  "master": 1.0,
+  "snes": 0.7
  },
  "motif": [
   {
@@ -6948,5 +6949,6 @@
    "l": 8.0
   }
  ],
+ "theme": "godmarrow",
  "words": "faster, meaner; the hungarian minor in the bridge"
 }

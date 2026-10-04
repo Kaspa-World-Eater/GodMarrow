@@ -9,7 +9,7 @@
  "scale_lock": true,
  "lanes": {
   "lead": {
-   "instrument": "flute_wood",
+   "instrument": "harp",
    "volume": 0.85,
    "tone": 0.5,
    "pan": 0.0,
@@ -4856,7 +4856,8 @@
   "echo_tone": 0.5,
   "reverb": 0.3,
   "reverb_size": 1.4,
-  "master": 1.0
+  "master": 1.0,
+  "snes": 0.7
  },
  "motif": [
   {
@@ -4884,5 +4885,6 @@
    "l": 8.0
   }
  ],
- "words": "the same walk, in the dark"
+ "theme": "godmarrow",
+ "words": "the same walk, further down"
 }
