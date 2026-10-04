@@ -382,7 +382,11 @@ preset's frame count is what to look at.
   drag it, never further than `max` of the part's height, fading out while the bone is still) and an optional
   `hang` (1 = rigid with the bone; 0.25 = takes the bone's position and turn but a quarter of its tilt, pivoting
   where the part attaches, so a skirt hangs from the hips instead of swinging with the pelvis; the damping fades as
-  the body lies down). A shape may carry `bone`, `lag` and `hang` itself instead.
+  the body lies down; by default "lying down" is judged by the part's own bone, and `"upright_from": "hips"` judges it by
+  another bone instead, so plates hung on a thigh keep hanging when the knee comes up instead of locking to the thigh:
+  the Hemomancer's plank skirt, `planks_L` / `planks_R` on `thigh.L` / `thigh.R`). A shape may carry `bone`, `lag`,
+  `hang` and `upright_from` itself instead. `keep` on a ring is easy to misread: `{"back": a}` keeps `|angle| > a`,
+  i.e. it cuts a wedge of half-angle a out of the FRONT; a strip down the back of half-width w is `{"back": 3.1416 - w}`.
 - `lights`: `{"at": [x, y, z], "radius": 30, "strength": 1.0, "pulse": 0.2, "colour": "#7dff78"}`; with `"bone"` or
   `"prim"` the point rides that bone or shape; `{"from": "flicker", "radius": 3.2, "strength": 0.7, "every": 3}` puts a
   small light on every third glowing-crack pixel. Flat files use `[x, y]` and may add `"breathe": true` and `"rim": true`.

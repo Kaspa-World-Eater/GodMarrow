@@ -327,7 +327,7 @@ class Poser:
             self._shifts[key] = (target - self.floor() + pull) / max(ce, 0.2)
         return self._shifts[key]
 
-    def bone_delta(self, bone: str, t: float, shift: float = 0.0, hang: float = 1.0, pivot: np.ndarray | None = None,
+    def bone_delta(self, bone: str, t: float, shift: float = 0.0, hang: float = 1.0, pivot: np.ndarray | None = None, upright_from: str | None = None,
                    hold: bool = True) -> tuple[np.ndarray, np.ndarray]:
         """(R, t) carrying ``bone`` from the author pose to the clip pose at ``t``, the ground shift added. With ``hang``
         below 1 the bone's tilt is damped and the shape hangs from ``pivot`` (its attachment point, in the author
@@ -340,7 +340,13 @@ class Poser:
         tr = pos[j] - R @ self.skel.pos[j]
         piv = self.skel.pos[j] if pivot is None else np.asarray(pivot, float)
         if hang < 1.0:
-            upright = float(np.clip((R @ np.array([0.0, 1.0, 0.0]))[1], 0.0, 1.0))
+            # how upright the body is decides hanging vs lying; by default the bone's own tilt, or another bone's
+            # (``upright_from``: plates hung on a thigh judge it by the hips, so a raised knee does not lay them flat)
+            Ru = R
+            if upright_from and upright_from in self.skel.index:
+                ju = self.skel.index[upright_from]
+                Ru = rot[ju] @ self.skel.rot[ju].T
+            upright = float(np.clip((Ru @ np.array([0.0, 1.0, 0.0]))[1], 0.0, 1.0))
             Rh = damp_tilt(R, hang + (1.0 - hang) * (1.0 - upright))
             tr = (R @ piv + tr) - Rh @ piv
             R = Rh
@@ -428,19 +434,21 @@ class Poser:
             bone, lag, hang = _bone_and_lag(p.spec, self.parts)
             if not bone or bone not in self.skel.index:
                 continue
+            part = self.parts.get(p.spec.get("part"), {}) if p.spec.get("part") else {}
+            ub = p.spec.get("upright_from", part.get("upright_from"))
             piv = self._pivot(p) if hang < 1.0 else None
             snap_at = self.pivot_of(bone, hang, p)
             move = self.bone_move(bone, t, shift)
-            R, tr = self.bone_delta(bone, t, shift, hang, piv)
+            R, tr = self.bone_delta(bone, t, shift, hang, piv, upright_from=ub)
             if lag:
                 # a loose part: where its bone's late pose and velocity would drag the hem, as a vector...
-                Rr, trr = self.bone_delta(bone, t, shift, hang, piv, hold=False)
+                Rr, trr = self.bone_delta(bone, t, shift, hang, piv, upright_from=ub, hold=False)
                 lo, hi = self.box_of(p)
                 y0, y1 = float(lo[1]), float(hi[1])
                 tl = t - float(lag.get("frames", 2))
                 if not self.loop:
                     tl = max(tl, 0.0)
-                R1, t1 = self.bone_delta(bone, tl, shift, hang, piv, hold=False)
+                R1, t1 = self.bone_delta(bone, tl, shift, hang, piv, upright_from=ub, hold=False)
                 hem = np.array([(lo[0] + hi[0]) / 2, y1, (lo[2] + hi[2]) / 2])
                 j = self.skel.index[bone]
                 v = self.pose(t)[0][j] - self.pose(t - 1)[0][j]

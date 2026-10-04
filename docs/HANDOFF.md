@@ -687,3 +687,13 @@ passes `--top`/`--bottom` to every Blender script but `blender/fit_template.py` 
 arguments: --top"), so the humanoid fit never ran; it now accepts and ignores them. Also on Derek's PC since 2026-10-04:
 a fresh clone at `C:\Users\derek\GodMarrow`, the self-updating Desktop icons Godmarrow / PixelForge / PixelForge Studio
 (classic) from `install.bat`, Derek's art gathered in `Desktop\Godmarrow Art`.
+
+**derek-33, 2026-10-04 (later): the Hemomancer as a shape sprite, in the game.** Test 1 (cutout road) was a blob, so the
+Hemomancer was rebuilt the current way: `tools/pixelforge/assets/shapes/characters/hemomancer.shapes.json` (173 shapes,
+written by `docs/concepts/hemomancer/shapes/make_hemomancer_shapes.py`), matched to Derek's sheet over three rounds (colours,
+proportions, then his notes: shorter crown spikes, spiked iron greaves, chains, more detail; the plank skirt split per leg).
+Rendered at the `godmarrow` preset (195 px) and exported over `art/sprites/hemomancer.*`; `skins.json` maps
+`hemomancer` to it (the hero loader otherwise prefers `hemomancer_unclipped`). Engine: `shape_rig.py` takes a part's
+`upright_from` bone (thigh-hung plates judge "lying down" by the hips), default unchanged, 37 shape tests green; GUIDE_AI
+documents it and the `keep.back` trap. The full write-up, pictures, GIFs, what is still short and the list of what
+PixelForge needs so the first build is right: `docs/concepts/hemomancer/shapes/README.md`.
