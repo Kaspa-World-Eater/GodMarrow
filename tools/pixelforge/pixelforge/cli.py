@@ -671,7 +671,10 @@ def cmd_game_preview(a) -> None:
 def cmd_forge(a) -> None:
     """``pixelforge forge``: open the Forge app (the Godot front end; forge_launch finds or fetches Godot)."""
     from .forge_launch import launch
+    from .self_update import restart_if_updated, update
 
+    if not a.no_update:
+        restart_if_updated(update(log=None if a.json else print))
     r = launch(godot=a.godot, project=a.project, screen=a.screen, windowed=a.windowed, extra=a.extra, wait=a.wait, log=None if a.json else print)
     _emit(a, r)
     if not r.get("ok"):
@@ -768,6 +771,20 @@ def cmd_skilltree(a) -> None:
 
 
 def cmd_studio(a) -> None:
+    """``pixelforge studio``: the classic window. Updates first; without ``--classic`` it opens the Forge app (the
+    finished product) when that is present, so every old desktop icon lands on the newest look."""
+    from .self_update import restart_if_updated, update
+
+    if not a.no_update:
+        restart_if_updated(update(log=print))
+    if not a.classic:
+        from .forge_launch import forge_dir, launch
+
+        if (forge_dir() / "project.godot").exists():
+            r = launch(project=a.project, log=print)
+            if r.get("ok"):
+                return
+            print(r.get("error", "the Forge did not open") + " Opening the classic window instead.")
     from .gui import main as gui_main
 
     gui_main(a.project)
@@ -1059,6 +1076,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--screen", default=None, help="open a screen directly: home characters creatures objects effects tiles interface sound music settings")
     s.add_argument("--windowed", action="store_true"); s.add_argument("--wait", action="store_true", help="block until the app closes")
     s.add_argument("--json", action="store_true"); s.add_argument("extra", nargs="*", help="more arguments for the app (after --)")
+    s.add_argument("--no-update", action="store_true", help="do not pull the latest PixelForge first")
     s.set_defaults(func=cmd_forge)
 
     s = sub.add_parser("effect", help="painted spell / missile art (Midjourney, on black) -> an animated game effect in the vfx layout")
@@ -1133,8 +1151,10 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_styles)
 
-    s = sub.add_parser("studio", help="open the desktop app")
+    s = sub.add_parser("studio", help="open PixelForge (updates first; the Forge app, or the classic window with --classic)")
     s.add_argument("project", nargs="?")
+    s.add_argument("--classic", action="store_true", help="the older window with every form")
+    s.add_argument("--no-update", action="store_true", help="do not pull the latest PixelForge first")
     s.set_defaults(func=cmd_studio)
 
     s = sub.add_parser("mcp", help="run the MCP server for Claude Desktop / Claude Code")

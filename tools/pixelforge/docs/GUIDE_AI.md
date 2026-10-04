@@ -643,7 +643,7 @@ After new files land in the game the app runs `game-preview --import` (a headles
 loaders see them.
 
 **Under construction** (said on the bench itself): Creatures (no beast rig); the painting road (cutouts, Blender,
-Mixamo) and the full editors stay in the classic Studio (`pixelforge studio`).
+Mixamo) and the full editors stay in the classic Studio (`pixelforge studio --classic`; plain `pixelforge studio` updates and opens the Forge).
 
 **Test hooks (after `--`):** `--screen=NAME` opens a screen directly (home, characters, creatures, objects, effects,
 tiles, interface, sound, music, settings) with `--tab=NAME`, `--model=FILE` (a shape model onto the bench),

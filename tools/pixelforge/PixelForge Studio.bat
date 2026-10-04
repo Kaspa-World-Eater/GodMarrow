@@ -16,4 +16,4 @@ if exist ..\..\.git (
     )
   )
 )
-start "" ".venv\Scripts\pythonw.exe" -m pixelforge.cli studio %*
+start "" ".venv\Scripts\pythonw.exe" -m pixelforge.cli studio --classic %*

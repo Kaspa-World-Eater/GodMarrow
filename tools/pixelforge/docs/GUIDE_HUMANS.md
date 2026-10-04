@@ -81,9 +81,11 @@ assistant never disagree, because the app only ever runs the same commands.
 **Playing the game.** The **Godmarrow** icon on the desktop (made by `install.bat`; or `Play Godmarrow.bat` in the
 Godmarrow folder) gets the latest version first, finds Godot 4 or downloads it (free, once), and starts the game.
 
-**Updating.** The **PixelForge** icon gets the latest version every time it opens (a quiet `git pull`), and so does
-the classic Studio's icon. **`Update PixelForge.bat`** in the folder does the same by hand and then opens the Forge.
-The game and the Forge live in one folder, so one update brings both.
+**Updating.** PixelForge updates itself every time it opens: the program pulls the latest version (a quiet
+`git pull`), installs anything new, and restarts on the new code before the window appears. This happens whichever
+icon starts it, old or new, because the update is inside the program, not the shortcut. An icon made by an older
+`install.bat` opens the Forge too (the classic window is `pixelforge studio --classic`). **`Update PixelForge.bat`**
+does the same by hand. The game and the Forge live in one folder, so one update brings both.
 4. Double-click an icon. If the app does not open, run **`PixelForge.bat`**; if the classic window does not, run
    **`PixelForge Studio.bat`**; a crash is written to `studio_error.log` next to it.
 

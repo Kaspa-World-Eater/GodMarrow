@@ -238,3 +238,59 @@ def test_describe_sends_world_things_to_their_own_path():
     home = (FORGE / "scripts/screens/home.gd").read_text()
     for k in ["object", "building", "tree", "topdown", "ground", "ui", "icons", "portrait", "missile", "spell_frames", "effect"]:
         assert f'"{k}"' in home, k
+
+
+def test_self_update_skips_outside_git_and_when_told(monkeypatch, tmp_path):
+    from pixelforge import self_update
+    monkeypatch.delenv("PIXELFORGE_NO_UPDATE", raising=False); monkeypatch.delenv(self_update.RESTART_FLAG, raising=False)
+    assert self_update.update(tmp_path)["updated"] is False
+    monkeypatch.setenv("PIXELFORGE_NO_UPDATE", "1")
+    assert self_update.update()["note"] == "update skipped"
+
+
+def test_self_update_pulls_and_reports_new_commits(monkeypatch, tmp_path):
+    from pixelforge import self_update
+    (tmp_path / ".git").mkdir()
+    monkeypatch.delenv("PIXELFORGE_NO_UPDATE", raising=False); monkeypatch.delenv(self_update.RESTART_FLAG, raising=False)
+    monkeypatch.setattr(self_update.shutil, "which", lambda name: "/usr/bin/git")
+    heads = iter(["aaa", "bbb"])
+    calls = []
+
+    class R:
+        def __init__(self, out="", code=0):
+            self.stdout, self.stderr, self.returncode = out, "", code
+
+    def fake_git(root, *args, timeout=90):
+        calls.append(args)
+        return R(next(heads)) if args[0] == "rev-parse" else R()
+    monkeypatch.setattr(self_update, "_git", fake_git)
+    monkeypatch.setattr(self_update.subprocess, "run", lambda *a, **k: R())
+    r = self_update.update(tmp_path, pip=True)
+    assert r["updated"] is True and r["before"] == "aaa" and r["after"] == "bbb"
+    assert ("pull", "--ff-only", "--quiet") in calls
+    # no new commits: nothing to do, never raises
+    heads = iter(["ccc", "ccc"])
+    assert self_update.update(tmp_path, pip=False)["note"] == "already the latest"
+
+
+def test_restart_runs_the_same_command_once(monkeypatch):
+    from pixelforge import self_update
+    seen = {}
+
+    def call(cmd, env=None):
+        seen["cmd"], seen["env"] = cmd, env
+        return 7
+    monkeypatch.setattr(self_update.subprocess, "call", call)
+    self_update.restart_if_updated({"updated": False})
+    assert not seen
+    with pytest.raises(SystemExit) as e:
+        self_update.restart_if_updated({"updated": True}, argv=["forge", "--windowed"])
+    assert e.value.code == 7 and seen["cmd"][-2:] == ["forge", "--windowed"] and seen["env"][self_update.RESTART_FLAG] == "1"
+
+
+def test_studio_and_forge_parsers_take_no_update_and_classic():
+    p = build_parser()
+    a = p.parse_args(["studio", "--classic", "--no-update"])
+    assert a.classic and a.no_update
+    a = p.parse_args(["forge", "--no-update"])
+    assert a.no_update
