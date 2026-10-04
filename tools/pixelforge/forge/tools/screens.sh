@@ -62,6 +62,7 @@ walk() {  # name script mock
   rm -f "$tmp"
   echo "$name | errors $(echo "$log" | grep -cE 'SCRIPT ERROR|SHADER ERROR|handle_crash') | shots $(echo "$log" | grep -c '^SHOT ')"
   [ -n "${VERBOSE:-}" ] && echo "$log" | grep -E 'SCRIPT|SHOT|LOG   ->|ERROR' | head -60
+  return 0
 }
 walk describe_characters describe_walk.txt characters.jsonl
 walk describe_music describe_walk_music.txt music.jsonl
