@@ -64,9 +64,58 @@ opens Effects with it playing; "a slow sombre act 2 wilds tune" opens the music 
   bench; a creature dropped there stands on the humanoid skeleton.
 - **The painting road** (a Midjourney sheet cut out, carved in Blender, filmed and pixelated) is not in the Forge:
   it is the classic Studio's, below. The Forge's Reference tab shows a painting beside the model, nothing more.
-- **The fix-up editors** (the cutout editor, the skin editor with layers and the clone brush, the colour editor)
-  stay in the classic Studio. The Forge's Frames tab paints single pixels only.
+- **The cutout editor** (the painting road's masks) stays in the classic Studio. The pixel editor itself is in the
+  Forge now: see *The editor* below.
 - **The Play tile** is gone; *See it in the game* on a bench does the same with the thing you made.
+
+### The editor
+
+*Edit* on a character's **Frames** tab opens the pixel editor on that clip and direction (every frame the engine
+rendered); *Edit* on the Effects, Tiles and Interface export tabs opens it on the picture that bench made; a picture
+dropped on the editor opens too. The picture window is the canvas: the wheel zooms in whole steps about the pointer,
+a middle-drag (or the pan tool, or Space and drag) pans, a left click uses the tool, a right click picks the colour
+under the pointer. The tabs along the text box:
+
+- **Paint.** The tools as pixel icons with their keys: **pencil** (P), **brush** (B, size with `[` and `]` or the size
+  cycler), **eraser** (E), **fill** (G; contiguous, or global with the fill cycler or alt-click), **line** (N),
+  **rect** (U) and **ellipse** (O; outline or filled with the shape cycler), **wand** (W; the tolerance cycler is an
+  OKLab distance), **lasso** (L), **select** (M, a rectangle), **move** (V; drag the selection, alt-drag copies, the
+  arrow keys nudge it, shift for tens), **clone** (S; alt-click sets the source, then paint; the offset follows the
+  brush; the source may be another frame or direction, chosen on the Carry tab), **pick** (I, the eyedropper: anything
+  on screen, the reference too), **pan** (H). Shift adds to a selection, alt subtracts; Ctrl+A selects all, Ctrl+D
+  none, Ctrl+I inverts, Delete clears the selection, Esc drops it. X swaps the two colours. `,` and `.` step frames.
+  Under the tools: the frame strip (click a frame; drag a thumbnail to reorder the clip), then *Save*, *Undo*, *Redo*,
+  *Select all*, *Deselect*, *Clear*, *Mirror*. Every cycler's value can be typed: click the number, type, Enter (arrows
+  step, shift for tens). That goes for every lever and wheel in the app too: click the value under it.
+- **Colour.** The picker: a hue by lightness field at the saturation lever's value, the hex line, the sprite's palette
+  as swatches (click one; the current slot is framed) and the words for the colour under the pointer: slot, hex,
+  OKLab. The **palette lock** is on by default: *locked* snaps anything you paint to the nearest palette colour and
+  says which; *open* lets a new colour in knowingly and counts what was added (the added swatches are ringed in gold).
+  The palette is the frame set's own colours.
+- **Layers.** Each frame has a base (the file), a paint layer (what you add; kept beside the frame) and any layers you
+  add; click a layer's name to paint on it, its value to show or hide it; the opacity lever, *Merge down*, *Delete
+  layer*, *Lock*, *Mirror* and *Flip* (the whole frame, or the selection). The **reference painting** is a dimmable
+  overlay (the reference lever, or drop a painting on the editor); **onion skin** shows the previous and next frames.
+- **History.** Every change, without limit, as a list: click one to go back to it (the later ones stay, greyed, until
+  you change something new). Undo is Ctrl+Z, redo Ctrl+Y or Ctrl+Shift+Z.
+- **Carry.** Paint on one frame, then *Carry to this clip*, *Carry to the other directions* or *Carry everywhere*: the
+  last change on this frame is laid on the other frames by part where the render wrote part masks, else by position
+  (a painted pixel lands where the target has the figure; an erased one where it has a pixel). The strip shows every
+  frame it landed on with the count; it is one history entry, so *Undo* takes it all back. The clone source cycler
+  lives here too.
+- **Effects.** The library (the effects bench's kinds and spell presets): drag one onto the figure to anchor it there;
+  it follows the clip and the directions. Drag an anchor to move it, its edge to scale, its handle to rotate; drag it
+  off the figure to detach; right-click it for its levers (scale, rotation, strength, speed). Anchors are saved in the
+  frame data (`frames/anchors.json`); *Bake anchors* writes the list beside the export and into the export's JSON (the
+  game does not read them yet).
+
+*Save* (Ctrl+S) flattens the visible layers into the frame files, so the export and the game see what you painted.
+Leaving with unsaved work asks once, on the text box's own line.
+
+**Choosing a file** anywhere opens the Forge's own browser in the text box: Pictures, Downloads, Desktop, Documents,
+the project and recent files on the left, the folder's entries with thumbnails in the middle (the highlighted picture
+shows in the picture window), the filter cycler (pictures, models, sounds, everything) at the top right, the typed
+path at the foot. **Exit** is on Home and in the top line, beside the window / full screen switch.
 
 **Settings** has the window / full screen switch, the window's scale, the sounds and the music with their levels,
 reduced motion, the project and game folders, Blender (for the classic road), the style preset cards with animated

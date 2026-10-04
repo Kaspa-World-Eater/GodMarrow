@@ -20,14 +20,12 @@ var clip_frames: Array = []    # the textures of the clip showing
 var full_render := false       # the whole set is rendered (frames/ is complete)
 var frame_i := 0
 var retime := {}               # Frames tab edits: {"<clip>_<DIR>": {"hold": {i: n}, "deleted": [i], "mirror": false}}
-var paint_colour := ""
-var painting_mode := false
 
 func build() -> void:
 	tabs = PackedStringArray(["Reference", "Model", "Materials", "Motion", "Frames", "Export"])
 	hint_text = "Esc back · LB/RB tabs"
 	if state.is_empty():
-		state = {"name": "", "title": "", "model_file": "", "painting": String(args.get("painting", "")), "direction": "S", "clip": "idle",
+		state = {"name": "", "title": "", "model_file": "", "painting": String(args.get("painting", "")), "direction": String(args.get("direction", "S")), "clip": String(args.get("clip", "idle")),
 			"part": "", "shape": -1, "material": "", "emissive": 0, "exported": "", "in_game": false, "shot": ""}
 	library = app.backend.read_json(app.backend.pf_root.path_join("assets/shapes/materials.json"))
 	tab = 0 if state["painting"] != "" else 1
@@ -914,8 +912,8 @@ func _build_frames() -> void:
 	var shown := _apply_retime(clip_frames)
 	var fi := clampi(frame_i, 0, maxi(shown.size() - 1, 0))
 	frame_i = fi
-	state_line("%s · frames · %s %s · frame %d of %d%s%s" % [String(state["title"]), clip, String(state["direction"]), fi + 1, shown.size(),
-		"" if full_render else " (preview render)", (" · painting with %s" % paint_colour) if painting_mode else ""])
+	state_line("%s · frames · %s %s · frame %d of %d%s" % [String(state["title"]), clip, String(state["direction"]), fi + 1, shown.size(),
+		"" if full_render else " (preview render)"])
 	var tl := W.Timeline.new()
 	tl.setup(shown, fi, app, func(i): frame_i = i; app.scene.playing = false; app.scene.set_frame(i))
 	var r: Dictionary = retime.get(key, {})
@@ -926,7 +924,7 @@ func _build_frames() -> void:
 	add_cyclers([
 		{"label": "clip", "value": clip, "left": func(): _pick_clip(_cycle(CLIPS, clip, -1)), "right": func(): _pick_clip(_cycle(CLIPS, clip, 1))},
 		{"label": "facing", "value": String(state["direction"]), "left": func(): _pick_direction(_cycle(DIRS, String(state["direction"]), -1)), "right": func(): _pick_direction(_cycle(DIRS, String(state["direction"]), 1))},
-		{"label": "fps", "value": T.fmt(fps, 1), "left": func(): _set_fps(fps - 1.0), "right": func(): _set_fps(fps + 1.0)},
+		{"label": "fps", "value": T.fmt(fps, 1), "left": func(): _set_fps(fps - 1.0), "right": func(): _set_fps(fps + 1.0), "set": func(t): _set_fps(float(t))},
 		{"label": "onion skin", "value": "on" if state.get("onion", false) else "off", "left": func(): _set_onion(false), "right": func(): _set_onion(true)},
 		{"label": "scene light", "value": ["off", "sprite only", "on"][app.scene.light_mode], "left": func(): _set_scene_light(app.scene.light_mode - 1), "right": func(): _set_scene_light(app.scene.light_mode + 1)},
 	])
@@ -936,7 +934,7 @@ func _build_frames() -> void:
 		{"label": "Hold", "cb": _hold_frame},
 		{"label": "Delete", "cb": _delete_frame},
 		{"label": "Mirror %s" % _mirror_of(String(state["direction"])), "cb": _mirror_direction},
-		{"label": "Paint" if not painting_mode else "Stop painting", "cb": _toggle_paint},
+		{"label": "Edit", "cb": _edit_frames},
 		{"label": "Redo frame", "cb": func(): _frames_dirty = true; show_clip(true)},
 	]
 	add_choices(standard_choices(items, false))
@@ -1030,40 +1028,15 @@ func _mirror_direction() -> void:
 	show_clip()
 	app.say("%s %s is now %s mirrored." % [clip, d, other])
 
-func _toggle_paint() -> void:
-	painting_mode = not painting_mode
-	if painting_mode:
-		var ramp := _ramp_of(String(state.get("material", _used_materials()[0] if not _used_materials().is_empty() else "")))
-		paint_colour = String(ramp[ramp.size() / 2]) if not ramp.is_empty() else "#d9d2bc"
-		app.scene.playing = false
-		app.set_hint("click the picture to paint %s on this frame; Esc stops" % paint_colour)
-	else:
-		app.set_hint(hint_text)
-	rebuild()
-
-## a click on the picture window while painting: a brush dab through the skin ops, on this frame's file
-func on_key(ev: InputEvent) -> bool:
-	if painting_mode and ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-		var p: Vector2 = ev.position - app.scene.position
-		if not Rect2(Vector2.ZERO, app.scene.size).has_point(p):
-			return false
-		var o: Vector2 = app.scene._sprite_origin()
-		var at := (p - o)
-		var src := _source_index(frame_i)
-		var dir := String(state.get("frames_dir", ""))
-		var file := dir.path_join("frame_%03d.png" % src)
-		if not FileAccess.file_exists(file):
-			return true
-		var ops := JSON.stringify([{"op": "paint", "at": [int(at.x), int(at.y)], "color": paint_colour, "radius": 1}])
-		run(["skin", file, ops], "painting frame %d" % (src + 1), func(r: Dictionary):
-			if r.get("ok", false):
-				_load_clip(dir, float(state.get("fps", 12.0)))
-				app.scene.set_frame(frame_i), false)
-		return true
-	if painting_mode and ev is InputEventKey and ev.pressed and ev.keycode == KEY_ESCAPE:
-		_toggle_paint()
-		return true
-	return false
+## the editor on this clip and direction (the frame set the engine rendered); Esc comes back to this tab
+func _edit_frames() -> void:
+	var dir := String(state.get("frames_dir", ""))
+	if dir == "" or not DirAccess.dir_exists_absolute(dir):
+		app.say("Render the clip first; the editor works on its frames.")
+		return
+	args = {"character": String(state["name"]), "tab": "Frames", "clip": String(state["clip"]), "direction": String(state["direction"])}
+	app.go("editor", {"frames": dir.get_base_dir(), "clip": String(state["clip"]), "direction": String(state["direction"]), "frame": str(_source_index(frame_i)),
+		"reference": String(state.get("painting", "")), "name": String(state["name"]), "title": String(state["title"]), "export": char_dir().path_join("export_game")})
 
 ## --- Export
 func _build_export() -> void:

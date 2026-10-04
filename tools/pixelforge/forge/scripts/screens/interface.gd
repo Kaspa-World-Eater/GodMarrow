@@ -109,7 +109,7 @@ func build_tab(i: int) -> void:
 			lh.init("head", (float(state["head"]) - 0.2) / 0.4, 0.35, func(v): return "%d%%" % int(round((0.2 + v * 0.4) * 100)), Callable(), func(v): _setv("head", snappedf(0.2 + v * 0.4, 0.02)))
 			add_rack([lh], 8)
 	add_choices(standard_choices([{"label": "Another painting", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; paintings"]), func(p): on_drop(PackedStringArray([p])), "Choose the painting")},
-		{"label": "Put it in the game", "cb": _put_in_game}], false))
+		{"label": "Put it in the game", "cb": _put_in_game}, {"label": "Edit", "cb": _edit_picture}], false))
 
 func _build_fonts() -> void:
 	state_line("Interface · fonts · the Forge's faces: Jacquard 12 for the banner, VT323 for the text, Silkscreen for tiny marks (all OFL)", "", 2)
@@ -187,3 +187,11 @@ func on_drop(paths: PackedStringArray) -> void:
 		tab = 0
 	make()
 	rebuild()
+
+## the editor on the picture the bench made last (every pixel tool, the palette lock on its colours)
+func _edit_picture() -> void:
+	var png := String(state.get("last_png", ""))
+	if png == "" or not FileAccess.file_exists(png):
+		app.say("Nothing drawn yet to edit.")
+		return
+	app.go("editor", {"image": png, "title": thing_name()})

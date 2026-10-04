@@ -119,7 +119,7 @@ func _dice() -> void:
 func _build_export() -> void:
 	state_line("Tiles · export · %s" % ("in the game's tiles" if String(state.get("exported", "")) != "" else "Keep writes the strip, its json and the TileSet into the game's art/tiles"))
 	add_spacer()
-	add_choices(standard_choices([{"label": "Put it in the game", "cb": _put_in_game}], false))
+	add_choices(standard_choices([{"label": "Put it in the game", "cb": _put_in_game}, {"label": "Edit", "cb": _edit_picture}], false))
 
 func _put_in_game() -> void:
 	if not app.backend.game_ok():
@@ -185,3 +185,11 @@ func on_drop(paths: PackedStringArray) -> void:
 		state["second"] = p
 	make()
 	rebuild()
+
+## the editor on the picture the bench made last (every pixel tool, the palette lock on its colours)
+func _edit_picture() -> void:
+	var png := String(state.get("last_png", ""))
+	if png == "" or not FileAccess.file_exists(png):
+		app.say("Nothing drawn yet to edit.")
+		return
+	app.go("editor", {"image": png, "title": tile_name()})

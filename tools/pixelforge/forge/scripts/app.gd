@@ -23,6 +23,7 @@ const SCREENS := {
 	"sound": "res://scripts/screens/sound.gd",
 	"music": "res://scripts/screens/music.gd",
 	"settings": "res://scripts/screens/settings.gd",
+	"editor": "res://scripts/screens/editor.gd",
 }
 const CANVAS := Vector2(640, 360)
 const PIC := Rect2(22, 27, 596, 140)
@@ -42,6 +43,9 @@ var scene: Scene
 var stack: Array = []           # [name, args] of the screens under the current one
 var current: Control = null
 var layer: Control              # where the screen's text box content lives
+var pic_layer: Control          # over the picture window, for a screen's own view (the editor's canvas)
+var browser: Control = null     # the in-app file browser while it is up
+var exit_asked := false
 var tabs_ctrl: W.Tabs
 var envs_ctrl: W.Choices
 var foot_project: Label
@@ -94,6 +98,13 @@ func _ready() -> void:
 	add_child(scene)
 	scene.set_env(String(args.get("env", cfg.get("env", "dungeon"))))
 	scene.set_light_mode(int(args.get("light", cfg.get("light", 2))))
+	# a screen's own view over the picture window (the editor's canvas lives here)
+	pic_layer = Control.new()
+	pic_layer.position = PIC.position
+	pic_layer.size = PIC.size
+	pic_layer.mouse_filter = Control.MOUSE_FILTER_PASS
+	pic_layer.clip_contents = true
+	add_child(pic_layer)
 	# the text box's content layer
 	layer = Control.new()
 	layer.position = TEXTBOX.position
@@ -148,10 +159,11 @@ func _ready() -> void:
 	audio.set_state("home")
 	if args.has("log"):
 		get_tree().create_timer(float(args.get("log", "1"))).timeout.connect(func(): if not drawer.visible: toggle_log())
-	if args.has("script"):
+	if args.has("script") or args.has("edits"):
 		var d: Node = load("res://scripts/driver.gd").new()
 		d.app = self
-		d.path = String(args["script"])
+		d.path = String(args.get("script", ""))
+		d.json_path = String(args.get("edits", ""))
 		add_child(d)
 
 # ------------------------------------------------------------------ the foot line
@@ -258,14 +270,17 @@ func _draw_chrome() -> void:
 	var ltxt := "log"
 	var mx := CANVAS.x - 36 - T.text_width(mtxt, T.SMALL_SIZE) - 26 - T.text_width(ltxt, T.SMALL_SIZE)
 	c.draw_rect(Rect2(mx - 4, 14, T.text_width(mtxt, T.SMALL_SIZE) + 8, 12), T.INK)
-	c.draw_string(f, Vector2(mx, 24), mtxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT if audio.music_on else T.DIM)
+	c.draw_string(f, Vector2(mx, 24), mtxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT if audio.music_on else T.BONE)
 	var lx := CANVAS.x - 36 - T.text_width(ltxt, T.SMALL_SIZE)
 	c.draw_rect(Rect2(lx - 4, 14, T.text_width(ltxt, T.SMALL_SIZE) + 8, 12), T.INK)
-	c.draw_string(f, Vector2(lx, 24), ltxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT if drawer.visible else T.DIM)
-	# the window toggle, left
+	c.draw_string(f, Vector2(lx, 24), ltxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT if drawer.visible else T.BONE)
+	# the window toggle and exit, left
 	var wtxt := "window" if is_fullscreen() else "full screen"
 	c.draw_rect(Rect2(32, 14, T.text_width(wtxt, T.SMALL_SIZE) + 8, 12), T.INK)
-	c.draw_string(f, Vector2(36, 24), wtxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.DIM)
+	c.draw_string(f, Vector2(36, 24), wtxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.BONE)
+	var ex := 36 + T.text_width(wtxt, T.SMALL_SIZE) + 22
+	c.draw_rect(Rect2(ex - 4, 14, T.text_width("exit", T.SMALL_SIZE) + 8, 12), T.INK)
+	c.draw_string(f, Vector2(ex, 24), "exit", HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.BONE)
 
 ## the title line's toggles are text; a click on them
 func _title_click(p: Vector2) -> bool:
@@ -286,7 +301,20 @@ func _title_click(p: Vector2) -> bool:
 	if p.x >= 32 and p.x <= 40 + ww:
 		toggle_fullscreen()
 		return true
+	var ex := 36 + ww + 22
+	if p.x >= ex - 4 and p.x <= ex + T.text_width("exit", T.SMALL_SIZE) + 4:
+		request_exit()
+		return true
 	return false
+
+## leaving: straight out, or one plain line in the text box when the bench has unsaved work
+func request_exit() -> void:
+	if current and current.has_method("has_unsaved") and current.has_unsaved() and not exit_asked:
+		exit_asked = true
+		current.confirm("Unsaved work on the bench. Leave without saving?", func(): get_tree().quit())
+		return
+	save_cfg()
+	get_tree().quit()
 
 # ------------------------------------------------------------------ screens
 func go(name: String, a: Dictionary = {}) -> void:
@@ -303,6 +331,7 @@ func back() -> void:
 		return
 	if current and current.pending_confirm.size() > 0:
 		current.pending_confirm = {}
+		exit_asked = false
 		current.rebuild()
 		audio.blip("back")
 		return
@@ -618,6 +647,10 @@ func remember_last(kind: String, info: Dictionary) -> void:
 func _unhandled_input(ev: InputEvent) -> void:
 	if transitioning:
 		return
+	if browser and is_instance_valid(browser):
+		if browser.key(ev):
+			get_viewport().set_input_as_handled()
+		return
 	if current and current.on_key(ev):
 		get_viewport().set_input_as_handled()
 		return
@@ -673,36 +706,26 @@ func _on_files_dropped(paths: PackedStringArray) -> void:
 		current.on_drop(paths)
 
 # ------------------------------------------------------------------ helpers for screens
-## pick a file with the system dialog when there is one, else the Forge's own dark one
+## pick a file: the Forge's own browser over the text box (editor/browser.gd); every "Choose a file" comes here
 func choose_file(filters: PackedStringArray, on_pick: Callable, title: String = "Choose a painting") -> void:
-	var fd := FileDialog.new()
-	fd.title = title
-	fd.file_mode = FileDialog.FILE_MODE_OPEN_FILE
-	fd.access = FileDialog.ACCESS_FILESYSTEM
-	fd.filters = filters
-	fd.use_native_dialog = true
-	fd.size = Vector2i(520, 300)
-	fd.current_dir = String(cfg.get("last_dir", OS.get_system_dir(OS.SYSTEM_DIR_PICTURES)))
-	fd.file_selected.connect(func(p: String):
-		cfg["last_dir"] = p.get_base_dir()
-		save_cfg()
-		on_pick.call(p)
-		fd.queue_free())
-	fd.canceled.connect(func(): fd.queue_free())
-	add_child(fd)
-	fd.popup_centered()
+	_open_browser(filters, on_pick, title, false)
 
 func choose_dir(on_pick: Callable, title: String = "Choose a folder") -> void:
-	var fd := FileDialog.new()
-	fd.title = title
-	fd.file_mode = FileDialog.FILE_MODE_OPEN_DIR
-	fd.access = FileDialog.ACCESS_FILESYSTEM
-	fd.use_native_dialog = true
-	fd.size = Vector2i(520, 300)
-	fd.dir_selected.connect(func(p: String): on_pick.call(p); fd.queue_free())
-	fd.canceled.connect(func(): fd.queue_free())
-	add_child(fd)
-	fd.popup_centered()
+	_open_browser(PackedStringArray([]), on_pick, title, true)
+
+func _open_browser(filters: PackedStringArray, on_pick: Callable, title: String, want_dir: bool) -> void:
+	if browser and is_instance_valid(browser):
+		browser.close()
+	var b: Control = load("res://scripts/editor/browser.gd").new()
+	b.position = TEXTBOX.position
+	b.size = TEXTBOX.size
+	add_child(b)
+	move_child(b, drawer.get_index())
+	browser = b
+	b.open(self, filters, func(p):
+		browser = null
+		on_pick.call(p), func(): browser = null, title, want_dir)
+	audio.blip("tab")
 
 func _exit_tree() -> void:
 	Input.set_custom_mouse_cursor(null)

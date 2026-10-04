@@ -32,6 +32,7 @@ func build_tab(_i: int) -> void:
 	for c in CHOICES:
 		items.append({"label": c[0], "cb": app.go.bind(c[1])})
 	add_choices(items, 3)
+	add_choices([{"label": "Exit", "cb": func(): app.request_exit()}])
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	row.custom_minimum_size = Vector2(0, 18)
