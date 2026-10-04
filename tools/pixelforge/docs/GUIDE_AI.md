@@ -441,6 +441,10 @@ preset's frame count is what to look at.
   small light on every third glowing-crack pixel. Flat files use `[x, y]` and may add `"breathe": true` and `"rim": true`.
 - `shadow`: `{"radii": [rx, ry], "colour": "#4b4a4f"}`, a checkerboard ellipse on the ground under the axis (or `"at"`);
   `null` for an object.
+- `clips`: a per-model clip map, game clip to library clip: `{"attack": "punch"}` plays the library's planted
+  forward thrust as this model's attack (the stock `attack` is a wide kicking lunge; `jab` is the left-hand thrust;
+  the Hemomancer uses `punch`). The frames folder and the game's anim keep the game's name; `shapes validate` rejects
+  a map to a clip the library lacks.
 - `effects` (emissive sprites stamped last, never shaded): `flame` (`height`, `width`, `fall`, `flicker`,
   `sway_from`), `orb` (`radius`, `grow`, `period`), `pixels` (`points`, `step` or `steps` + `pulse`), `runes`
   (stitches flowing down a robe opening: `x`, `y`, `count`, `dy`, `spread`, `period`, `lit`, `speed`), `motes`

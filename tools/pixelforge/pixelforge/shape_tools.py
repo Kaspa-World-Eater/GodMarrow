@@ -70,8 +70,8 @@ def render_set(doc: dict, out_dir: str | Path, *, clips=R.GAME_CLIPS, directions
     t0 = time.time()
     solid = S.mode_of(doc) == "solid"
     for clip in clips:
-        if not tracks.has(clip):
-            raise ValueError(f"unknown clip {clip!r}; the library has {tracks.clips}")
+        if not tracks.has(R.clip_source(doc, clip)):
+            raise ValueError(f"unknown clip {R.clip_source(doc, clip)!r} (for {clip!r}); the library has {tracks.clips}")
     # each clip gets the canvas it needs (a death lies down past the file's width); every frame is padded to one square
     widths = {clip: (R.canvas_width(doc, [clip], tracks) if solid else float(doc["size"][0])) for clip in clips}
     width = max(widths.values())
@@ -337,6 +337,11 @@ def validate_file(path: str | Path) -> dict:
             unknown = [b for b in bones if b not in tracks.index]
             if unknown:
                 out["ok"] = False; out["problems"] = [f"unknown bones {unknown}; the library has {tracks.names}"]
+            bad_clips = [f"{k} -> {v}" for k, v in (doc.get("clips") or {}).items() if not tracks.has(str(v))]
+            if bad_clips:
+                out["ok"] = False; out["problems"] = out["problems"] + [f"clips map to unknown library clips: {bad_clips}; the library has {tracks.clips}"]
+            if doc.get("clips"):
+                out["clips"] = dict(doc["clips"])
             parts = doc.get("parts") or {}
             unbound = [s.get("name", i) for i, s in enumerate(doc["shapes"]) if not s.get("bone") and not (s.get("part") and parts.get(s["part"], {}).get("bone")) and not s.get("carve")]
             out["unbound_shapes"] = unbound

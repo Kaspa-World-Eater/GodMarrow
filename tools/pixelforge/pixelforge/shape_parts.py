@@ -284,12 +284,12 @@ def cape_parts(part: str = "cape", bone: str = "spine.003") -> dict:
     return {part: {"bone": bone, "lag": {"frames": 2, "sway": 0.7}, "hang": 0.3}}
 
 
-def chest_chain(name: str = "chestchain", points: list | None = None, *, shoulder=(81, 36.5, 11.0), hip=(60, 61, 13.0), bow: float = 1.5,
-                material: str = "chain", bone: str = "spine.002") -> list[dict]:
-    """A chain across the chest from one shoulder to the other hip, in front of the mantle and the locs (``z`` 11-13
-    at 120 units; raise it when hair or cloth hides it facing south). ``points`` gives the path outright; without it
-    the chain bows ``bow`` units out from the straight line between ``shoulder`` and ``hip``."""
+def chest_chain(name: str = "chestchain", points: list | None = None, *, shoulder=(81, 36.5, 13.0), hip=(60, 61, 15.0), bow: float = 1.5,
+                material: str = "chain", bone: str = "spine.002", link=(1.8, 1.15, 0.65), thin=(1.8, 0.6, 1.0)) -> list[dict]:
+    """A chain across the chest from one shoulder to the other hip, in front of the mantle, the locs and a tabard
+    (``z`` 13-15.5 at 120 units; lower z hid it under the Hemomancer's locs facing south). ``points`` gives the path
+    outright; without it the chain bows ``bow`` units out from the straight line between ``shoulder`` and ``hip``."""
     if points is None:
         mid = [(shoulder[k] + hip[k]) / 2 for k in range(3)]
         points = [list(shoulder), [mid[0], mid[1], mid[2] + bow], list(hip)]
-    return chain(name, points, material=material, bone=bone)
+    return chain(name, points, material=material, bone=bone, link=link, thin=thin)

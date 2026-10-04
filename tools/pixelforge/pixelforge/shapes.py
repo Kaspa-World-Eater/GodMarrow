@@ -1494,6 +1494,8 @@ def validate(doc: dict, library: dict | None = None) -> list[str]:
             bad.append(f"effect {i}: unknown kind {ef.get('kind')!r}")
     if mode == "solid" and "ground" not in doc:
         bad.append("a solid file needs 'ground' (the y of the ground line in its units)")
+    if "clips" in doc and not (isinstance(doc["clips"], dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in doc["clips"].items())):
+        bad.append("clips must map game clip names to library clip names, e.g. {\"attack\": \"punch\"}")
     return bad
 
 

@@ -532,12 +532,20 @@ def canvas_width(doc: dict, clips, tracks: JointTracks | None = None) -> float:
     js = np.array(sorted(margin)); ms = np.array([margin[j] for j in js])
     reach = 0.0
     for clip in clips:
+        clip = clip_source(doc, clip)
         if not tracks.has(clip):
             continue
         for t in range(tracks.frames(clip)):
             pos, _ = skel.clip_pose(clip, float(t))
             reach = max(reach, float(np.max(np.hypot(pos[js, 0] - cx, pos[js, 2] - cz) + ms)))
     return float(max(doc["size"][0], 2 * math.ceil(reach + 2)))
+
+
+def clip_source(doc: dict, clip: str) -> str:
+    """The library clip a game clip is played from: the file's ``clips`` map (``{"attack": "punch"}`` gives a model
+    a thrust instead of the stock swing) or the clip itself."""
+    m = doc.get("clips") or {}
+    return str(m.get(clip, clip))
 
 
 def frame_times(n_src: int, n_out: int | None, loop: bool) -> list[float]:
@@ -567,7 +575,7 @@ def render_clip(doc: dict, clip: str, direction: str = "S", *, tracks: JointTrac
     model = model or S.Model(doc, scale, steps)
     skel = skeleton_for(doc, tracks)
     elev = float(doc.get("view", {}).get("elevation", 0.0)) if elevation is None else float(elevation)
-    poser = Poser(model, skel, clip, lock, view=(phi, elev), turn_step=turn_step)
+    poser = Poser(model, skel, clip_source(doc, clip), lock, view=(phi, elev), turn_step=turn_step)
     oc = S.outline_colour(doc, outline)
     times = frame_times(poser.n_src, max_frames, poser.loop)
     poser.prepare(times)
@@ -654,13 +662,14 @@ def render_clip_flat(doc: dict, clip: str, direction: str = "S", *, tracks: Join
                      outline="auto", max_frames: int | None = None) -> dict:
     tracks = tracks or load_joints()
     skel = skeleton_for(doc, tracks)
-    n_src = tracks.frames(clip); loop = tracks.loop(clip)
+    src = clip_source(doc, clip)
+    n_src = tracks.frames(src); loop = tracks.loop(src)
     times = frame_times(n_src, max_frames, loop)
     mirror = direction in ("N", "NW", "NE")
     M = S.build_materials(doc, steps)
     frames = []
     for k, t in enumerate(times):
-        tf = flat_transforms(doc, skel, clip, t, direction)
+        tf = flat_transforms(doc, skel, src, t, direction)
         d2 = dict(doc); d2["_view"] = direction
         frames.append(S.render_flat(d2, k, scale=scale, steps=steps, outline=outline, materials=M, transforms=tf, mirror=mirror).rgba)
     return {"frames": frames, "fps": round(tracks.fps * len(times) / n_src, 3), "times": times, "loop": loop, "clip": clip, "direction": direction,

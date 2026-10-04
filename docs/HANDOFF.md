@@ -707,3 +707,28 @@ the Age of the Last Breath). Everything saved on branch `track/codex`: `docs/cod
 brief for whichever session takes it (decisions, state of the nine chapter drafts, the approved bestiary, conflicts to
 settle, order of work). The world page he was shown: https://claude.ai/artifact/HzgvhkQv63mo9YPmrSXfvn. `data/codex.json`
 on main is unchanged. This session returns to PixelForge.
+
+### 7.17 2026-10-04, track/pf-fixes: the first build comes out right (what the Hemomancer taught, in PixelForge)
+
+**What.** The seven fixes the Hemomancer README asked for, each a commit on `track/pf-fixes` (not merged):
+(1) the docs point at the shape road (both CLAUDE.md, GUIDE_AI, GUIDE_HUMANS) and `pixelforge hero` says it is the
+old cutout road unless `--cutout`; (2) a character renders at the game's hero height (`godmarrow`, 195 px) by
+default, `project new` and the Forge app default to it, and `export-game` warns when a set's figure height is not the
+game's for its category; (3) painting to shapes: `shapes measure`, `shapes draft --from-measure`, `shapes
+sample-materials`, `shapes compare` (`pixelforge/shape_measure.py`; the Hemomancer's committed file scores about 0.7
+silhouette overlap per view against Derek's cleaned sheet, a drafted-and-sampled figure about the same before a shape
+is placed by hand); (4) `keep.back_strip` with the old key deprecated, and validator warnings for a ring that covers
+the legs, a hanging part on a limb without `upright_from`, and centres in the wrong number of dimensions (which now
+render instead of crashing); (5) the parts kit `pixelforge/shape_parts.py` (chains, spikes, rivets, plank skirt per
+leg, greaves, shackles, locs, back cape), the Hemomancer generator rewritten on it and a test that regenerates the
+committed file from it, `shapes draft` building the pieces from the nouns; (6) `export-game` writes the `skins.json`
+entry and `entities/hero.gd` prefers a PixelForge set over `<kind>_unclipped` (`Data.is_pixelforge_set`); (7) the
+Hemomancer's "still short" pass: a face that reads (brow, two eye pixels, a beard mass), the chest chain in front of
+the locs, a tall round shield arch, and `"clips": {"attack": "punch"}` (a per-model clip map, new) so his attack is
+the planted thrust; re-rendered to `docs/concepts/hemomancer/shapes/*_2026-10-04b.*` and re-exported over
+`art/sprites/hemomancer.*`. `docs/track_notes/shapes.md` has the app-side list.
+
+**Verified.** `tests/test_character_road.py` (22 tests) with the whole suite green; the compare pictures by eye;
+the GDScript by reading only (no Godot on the box). **Not done:** cloth is still kinematic; the Forge app's
+Reference tab does not yet call measure / compare (the commands exist; the track note says what to show).
+

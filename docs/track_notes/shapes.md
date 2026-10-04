@@ -93,3 +93,41 @@ are pixel for pixel the frame before; a walk frame differs in 32-37% (the legs, 
 the hat rows left over after a whole-pixel shift; a static model moved by a fraction of a pixel renders identically.
 Every frame of idle, walk, run, attack, cast, hit and death is one piece in all eight directions; the lowest foot
 pixel is on one row in every walk and idle frame in every direction, and the run's airborne frames lift.
+
+## The character-road fixes (2026-10-04, track/pf-fixes: what the Hemomancer's first build taught)
+
+The Hemomancer's shape README (`docs/concepts/hemomancer/shapes/README.md`, "Why the first build was a blob") listed
+what let a character go down the old cutout road and come out a blob; these landed in PixelForge, and the app's
+pages should show them:
+
+- **The road is signposted.** Both CLAUDE.md files, GUIDE_AI and GUIDE_HUMANS say characters are shape sprites;
+  `pixelforge hero` prints a note that it is the old cutout road (`--cutout` silences it). The Characters bench is the
+  character road; nothing on it should offer cutouts.
+- **The game's size by default.** A character (a solid file whose shapes ride bones) renders at the `godmarrow`
+  preset (195 px) whenever no `--style` or `--scale` is named; objects keep their own size. `project new` and the
+  Forge app default to `godmarrow`. `export-game` returns `warnings` (and writes it into the character's notes) when
+  the frames' figure height is not the game's for the category (hero 195, within 10%): the Export tab should show it
+  in gold before *Put it in the game*.
+- **Painting to shapes** (`pixelforge/shape_measure.py`): `shapes measure FRONT [SIDE] [BACK] -o M.json` (silhouette
+  widths per 2% band and the landmarks: head, shoulders, chest, waist, hips, hem, limb widths, as fractions of the
+  height), `shapes draft "..." --from-measure M.json` (the template's rings and limbs sized from them), `shapes
+  sample-materials FRONT --model X.shapes.json` (the painting's colours under each material's region become its ramp,
+  OKLab k-means), `shapes compare X.shapes.json --ref SHEET -o cmp.png` (painting beside sprite per view at one
+  height, with the silhouette overlap). The Reference tab is this: drop the sheet, measure, draft, sample, and the
+  compare picture with the overlap numbers as the checks line. MCP: `measure_views`, `sample_materials`,
+  `compare_shapes`, `draft_shapes(measure=)`.
+- **Format traps.** `keep: {"back_strip": w}` replaces the backwards `keep.back` (still read, with a deprecation
+  warning naming the `back_strip` to write). `shapes.warnings(doc)` (in `validate_file` as `warnings`, printed by
+  `shapes validate` and to stderr by every shapes command): a full ring below the knee that covers the legs, a hanging
+  part on a limb bone without `upright_from`, a prism centre in 3D or an ellipsoid / box centre in 2D (both now
+  render; the validator says what was assumed). The Model tab should list them under the model name.
+- **The parts kit** (`pixelforge/shape_parts.py`): chains, chain loops, rivet rows, spike rings and rows, a plank
+  skirt split per leg (with its parts), greaves with knee cops and spikes, thigh plates, shackles with a broken chain,
+  locs, a back cape; `shapes draft` builds them from the nouns (crown, locs, chains, shackles, planks, greaves,
+  rivets, cape). The Hemomancer generator is the worked example and the test regenerates the committed file from it.
+- **The game install.** `export-game` into `art/sprites` writes the `skins.json` entry (`--skin-for CLASS` for a set
+  that stands in for another class), and the hero loader (`entities/hero.gd`, `Data.is_pixelforge_set`) prefers a
+  PixelForge set over `<kind>_unclipped`, so a new build is used as soon as it lands.
+- **A per-model clip map.** `"clips": {"attack": "punch"}` in the file plays another library clip as a game clip
+  (the Hemomancer's attack is the planted thrust); the Motion tab's clip picker should show the mapping and offer the
+  library's clips for each game clip.

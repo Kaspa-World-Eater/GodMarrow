@@ -35,14 +35,19 @@ S = []
 def add(**k): S.append(k)
 
 # ---- head, face, crown
+# the face at 195 px: a brow ridge over a two-unit shadow, sockets with a light pixel each (the eyes), the nose, the
+# mouth as a dark line, and the beard as its own black mass under the chin instead of specks
 add(name="head", kind="ellipsoid", centre=[CX, 22.5, 0.6], radii=[5.6, 7.6, 6.2], material="darkskin", bone="head", rules=[
-    {"y": [19.6, 21.0], "z": [4.0, None], "t": -2},                                                   # brow shadow
-    {"z": [4.5, None], "near": [[[66.9, 22.4, None], [71.1, 22.4, None]], 0.9], "t": -3},            # eye sockets
+    {"y": [18.6, 19.5], "z": [4.0, None], "x": [65.5, 72.5], "t": 1},                                # brow ridge, lit
+    {"y": [19.5, 21.4], "z": [3.6, None], "x": [65.0, 73.0], "t": -2},                                # brow shadow
+    {"z": [4.3, None], "near": [[[66.9, 22.5, None], [71.1, 22.5, None]], 1.15], "t": -3},           # eye sockets
+    {"z": [4.6, None], "near": [[[66.9, 22.6, None], [71.1, 22.6, None]], 0.6], "t": 2},             # the eyes: a light pixel in each socket
     {"x": [68.4, 69.6], "y": [22, 25.5], "z": [5.5, None], "t": 1},                                  # nose
-    {"y": [26.5, 27.5], "z": [4.0, None], "x": [67, 71], "t": -2},                                    # mouth
-    {"y": [27.5, 30.5], "z": [3.0, None], "hash": [0.55, 71, 1], "t": -2},                           # beard
+    {"y": [26.3, 27.3], "z": [4.0, None], "x": [67, 71], "t": -3},                                    # mouth
     {"z": [4.0, None], "near": [[[65.6, 24.2, None], [72.4, 24.2, None]], 0.9], "t": 1},             # cheekbones
     ])
+add(name="beard", kind="ellipsoid", centre=[CX, 29.2, 3.2], radii=[4.4, 3.4, 3.4], material="locs", bone="head",
+    rules=[{"every_y": [2, 0], "t": -1}, {"dy": [None, -2.2], "x": [67.6, 70.4], "t": -2}, {"hash": [0.2, 71, 1], "t": 1}])
 add(name="hair_cap", kind="ellipsoid", centre=[CX, 19.3, -1.3], radii=[6.3, 6.2, 6.7], material="locs", bone="head",
     rules=[{"every_angle": [9, 0], "t": -1}, {"y": [None, 15], "t": 1}])
 add(name="crown_band", kind="ring", y=[15.6, 18.4], rx=6.7, rz=6.9, cz=-0.4, thickness=1.2, material="rustiron", bone="head",
@@ -110,13 +115,14 @@ def plank_rules(i, h, seed):
             {"dy": [None, -h + 1.5], "t": 1}, {"dy": [h - 2.0, None], "t": -1}]
 S += K.plank_skirt("plank", CX, 67, [22, 46, 70, 94, 118, 142, 166, -166, -142, -118, -94, -70, -46, -22], radius=12.2, about_z=-0.6, tilt=4,
                    heights=(17, 20.5), rnd=rnd, rules=plank_rules)
+# the shield: planks with a tall round arch on top (the arch is a half-ellipse 10 units high, so it reads round at 195 px)
 add(name="shield", kind="union", material="plank", part="shield", rotate={"x": 9, "about": [CX, 76, 14.0]},
-    of=[{"kind": "box", "centre": [CX, 78, 14.0], "half": [7.4, 17, 1.0], "round": 0.5},
-        {"kind": "prism", "centre": [CX, 61], "radii": [7.4, 6.5], "z": [13.0, 15.0]}],
+    of=[{"kind": "box", "centre": [CX, 80, 14.0], "half": [7.4, 15, 1.0], "round": 0.5},
+        {"kind": "prism", "centre": [CX, 65], "radii": [7.4, 10.0], "z": [13.0, 15.0]}],
     rules=[{"every_x": [4, 2], "t": -3}, {"near": [[[65.5, 68, None], [72.5, 68, None], [69, 84, None]], 0.9], "t": -3},
            {"x": [65.0, 66.0], "y": [69, 82], "material": "blood"}, {"x": [72.0, 73.0], "y": [69, 79], "material": "blood"},
            {"x": [68.5, 69.5], "y": [85, 93], "material": "blood"}, {"hash": [0.025, 61, 2], "material": "blood", "t": -1},
-           {"y": [None, 57.5], "t": 1}, {"hash": [0.04, 62, 2], "t": -3, "px": [90, None]}])
+           {"y": [None, 59.0], "t": 1}, {"hash": [0.04, 62, 2], "t": -3, "px": [90, None]}])
 add(name="shield_strap", kind="capsule", a=[CX - 6, 57, 12.4], b=[CX - 11, 42, 9.0], r=0.8, material="leather5", part="shield", px=[90, None])
 
 # ---- iron: spiked greaves, knee cops, thigh plates; shackles with a broken chain; chains
@@ -124,8 +130,9 @@ for s_ in ("L", "R"):
     S += K.greave(s_, CX, top=101.0, bottom=124.0, z=3.6, knee_y=98.6, wear_seed=81)
     S += K.thigh_plate(s_, CX, y=86.0, z=4.0)
     S += K.shackle(s_, CX)
-# a chain across the chest, shoulder to hip, and one round the waist over the planks with two loops hanging in front
-S += K.chest_chain("chestchain", [[81, 36.5, 11.0], [75, 43, 12.8], [67, 52, 13.0], [60, 61, 13.0]])
+# a chain across the chest, shoulder to hip, in front of the locs and the tabard (z 13-15.5, bigger links so it reads
+# facing south), and one round the waist over the planks with two loops hanging in front
+S += K.chest_chain("chestchain", [[81, 36.5, 13.0], [75, 43, 15.0], [67, 52, 15.5], [60, 61, 15.0]], link=(1.8, 1.15, 0.65), thin=(1.8, 0.6, 1.0))
 add(name="waistchain", kind="ring", y=[70.2, 72.6], rx=15.2, rz=14.0, cz=-0.6, thickness=1.6, material="chain", bone="hips",
     rules=[{"every_angle": [38, 0], "t": -2}, {"every_angle": [38, 1], "t": 1}])
 for side in (1, -1):
@@ -149,6 +156,8 @@ spec = {
         "shield": {"bone": "spine.001", "lag": {"frames": 1, "sway": 0.3}, "hang": 0.6},
     },
     "shapes": S,
+    # the stock attack is a wide kicking lunge; the library's punch is a planted forward thrust of the right hand, his
+    "clips": {"attack": "punch"},
     "effects": [], "lights": [],
     "shadow": {"radii": [22, 4.2], "colour": "#4b4a4f"},
 }

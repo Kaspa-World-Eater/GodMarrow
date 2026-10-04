@@ -416,3 +416,49 @@ def test_the_games_hero_loader_prefers_the_pixelforge_set_over_unclipped():
     meta = json.loads((REPO / "art" / "sprites" / "hemomancer.json").read_text())["meta"]
     assert meta.get("source") == "pixelforge"
     assert json.loads((REPO / "art" / "sprites" / "skins.json").read_text()).get("hemomancer") == "hemomancer"
+
+
+# ------------------------------------------------------------------------------------------- 7. the Hemomancer pass
+def test_a_model_can_map_a_game_clip_to_another_library_clip(tmp_path):
+    tracks = R.load_joints()
+    keeper = S.load_shapes(S.ASSETS / "characters" / "keeper.shapes.json")
+    mapped = {**keeper, "clips": {"attack": "punch"}}
+    assert R.clip_source(mapped, "attack") == "punch" and R.clip_source(mapped, "walk") == "walk" and R.clip_source(keeper, "attack") == "attack"
+    model = S.Model(keeper, 0.5)
+    a = R.render_clip(mapped, "attack", "S", tracks=tracks, model=model, scale=0.5, max_frames=3)
+    b = R.render_clip(keeper, "punch", "S", tracks=tracks, model=model, scale=0.5, max_frames=3)
+    assert a["clip"] == "attack" and a["fps"] == b["fps"] and np.array_equal(a["frames"][1], b["frames"][1])
+    c = R.render_clip(keeper, "attack", "S", tracks=tracks, model=model, scale=0.5, max_frames=3)
+    assert c["fps"] != a["fps"] or not np.array_equal(c["frames"][1], a["frames"][1])
+    assert R.canvas_width(mapped, ["attack"], tracks) <= R.canvas_width(keeper, ["attack"], tracks)      # a planted thrust reaches less than the lunge
+    bad = {**keeper, "clips": {"attack": "haymaker"}}
+    json.dump({k: v for k, v in bad.items() if not k.startswith("_")}, open(tmp_path / "b.shapes.json", "w"))
+    v = T.validate_file(tmp_path / "b.shapes.json")
+    assert not v["ok"] and "haymaker" in v["problems"][0]
+    assert S.validate({**keeper, "clips": ["attack"]})
+    r = T.render_set(mapped, tmp_path / "fr", clips=["attack"], directions=["S"], style="rendered_arpg", max_frames=2)
+    assert r["ok"] and (tmp_path / "fr" / "attack_S" / "frame_001.png").exists()                           # the folder keeps the game's name
+
+
+def test_the_hemomancer_still_short_pass():
+    doc = S.load_shapes(S.ASSETS / "characters" / "hemomancer.shapes.json")
+    by = {s["name"]: s for s in doc["shapes"]}
+    assert doc["clips"] == {"attack": "punch"}
+    assert "beard" in by and by["beard"]["material"] == "locs" and by["beard"]["bone"] == "head"                # the beard is a mass, not specks
+    head = by["head"]["rules"]
+    assert any(r.get("t") == 2 and r.get("near") and len(r["near"][0]) == 2 for r in head)                     # two eye pixels
+    assert any(r.get("t") == -2 and r.get("y", [0])[0] < 20 for r in head)                                       # the brow shadow
+    assert all(s["centre"][2] >= 13.0 for n, s in by.items() if n.startswith("chestchain"))                    # the chain in front of the locs
+    arch = next(o for o in by["shield"]["of"] if o["kind"] == "prism")
+    assert arch["radii"][1] >= 9.0 and len(arch["centre"]) == 2                                                   # a tall round arch
+    assert not T.validate_file(S.ASSETS / "characters" / "hemomancer.shapes.json")["warnings"]
+    # facing S the chest chain shows: at least a few dozen chain pixels on the front
+    model = S.Model(doc, 195 / 120)
+    fr = model.render(0, 0.0, 12, None, outline=None, shadow=None)
+    chain_ids = [s_i for s_i, s in enumerate(doc["shapes"]) if s["name"].startswith("chestchain")]
+    assert np.isin(fr.pid, chain_ids).sum() >= 40
+    eyes = [i for i, s in enumerate(doc["shapes"]) if s["name"] == "head"]
+    head_px = fr.pid == eyes[0]
+    # the lit eye pixels are lighter than the sockets round them: the head carries at least two pixels of its brightest two steps near the eye line
+    ys, xs = np.nonzero(head_px)
+    assert len(ys) > 50

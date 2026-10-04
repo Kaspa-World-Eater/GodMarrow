@@ -64,7 +64,35 @@ python -m pixelforge project render-shapes hemomancer -p <project> --style godma
 python -m pixelforge project export-game hemomancer --kind hemomancer --out ../../art/sprites --category hero --name Hemomancer -p <project>
 ```
 
-## Still short
+## Pass 3 (2026-10-04, track/pf-fixes): the "still short" list
+
+| | |
+|---|---|
+| ![four views pass 3](four_views_2026-10-04b.png) | Pass 3 at 195 px: S, SE, E, N |
+
+Animated, all 8 directions: `walk_2026-10-04b.gif`, `attack_2026-10-04b.gif` (the earlier `walk.gif` / `attack.gif`
+are pass 2).
+
+- **The face reads**: a lit brow ridge over a two-unit brow shadow, eye sockets with a light pixel each (two eye
+  pixels at 195 px), the nose, and the beard as its own black mass under the chin (`beard`, an ellipsoid in the locs'
+  material) instead of specks that read as noise.
+- **The chest chain shows facing south**: raised to z 13-15.5 (in front of the front locs and the tabard) with
+  bigger links; it is now a visible diagonal from the right shoulder to the left hip.
+- **The shield's arch is round**: the box ends at y 65 and the arch is a half-ellipse 10 units tall (radii 7.4 x 10)
+  instead of 6.5, so it reads as an arch at 195 px, not a square top.
+- **The attack is his**: the file carries `"clips": {"attack": "punch"}` (new: a per-model clip map; the renderer
+  plays the library's `punch`, a planted forward thrust of the right hand with the shield arm back, as the game's
+  `attack`). The stock `attack` (a wide kicking lunge) is gone from his set; `jab` (the left-hand thrust) was the other
+  candidate, and the library has no heavy overhead.
+- Still kinematic cloth (it swings late, it does not fold).
+
+The generator now builds the iron, the locs, the chains, the plank skirt and the cape from the parts kit
+(`tools/pixelforge/pixelforge/shape_parts.py`); `tests/test_character_road.py` regenerates the file from it and
+checks the pass-3 shapes. `pixelforge shapes compare hemomancer.shapes.json --ref ../test1/sheet_clean.png -o cmp.png`
+lays him beside Derek's sheet (about 0.7 silhouette overlap per view; give it the cleaned sheet: the original's sand
+floor joins the three figures into one).
+
+## Still short (before pass 3)
 
 The face is a few pixels and reads as a dark shape; the chest chain is mostly lost under the locs and the red strip
 facing south; the shield's arched top reads square; the attack is the stock clip (a wide kicking lunge) and does not
@@ -93,3 +121,8 @@ road since 2026-10-02 (HANDOFF 7.8). What let that happen, and the fixes, in ord
    `<kind>_unclipped` file. *Fix:* the export writes the skins entry, and the PixelForge set wins over `_unclipped`.
 7. **The old road was untested on real Blender.** Two crashes on the way (`check_spec` on the front-only spec, and
    `fit_template.py` rejecting `--top`), fixed in 3fc4fd8.
+
+Items 1-6 landed in PixelForge on 2026-10-04 (track/pf-fixes; HANDOFF 7.17): the docs and `hero` point at shapes, a
+character renders at 195 px by default and `export-game` warns otherwise, `shapes measure` / `draft --from-measure` /
+`sample-materials` / `compare`, `keep.back_strip` and the validator warnings, the parts kit, and the skins entry with
+the loader preferring the PixelForge set.
