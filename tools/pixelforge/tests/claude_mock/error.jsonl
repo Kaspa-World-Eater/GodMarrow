@@ -1,0 +1,2 @@
+{"type":"system","subtype":"init","cwd":"{project}","session_id":"mock","tools":[],"mcp_servers":[{"name":"pixelforge","status":"connected"}],"model":"mock"}
+{"type":"result","subtype":"error_during_execution","is_error":true,"result":"Not logged in. Please run /login","total_cost_usd":0.0,"session_id":"mock"}
