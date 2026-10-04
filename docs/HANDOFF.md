@@ -625,3 +625,45 @@ on this fresh worktree with Godot 4.7.2 imported the project, ran under `xvfb-ru
 the chest and each held step re-draws them; the margin under 0.12 is what the thresholds give without freezing the
 breath. The holds are a half pixel laggier than before (a body may be drawn up to 1.5 px from its true place). The
 import step runs on every preview (seconds when the project is already imported).
+
+### 7.13 2026-10-04, track/forgeapp: the Forge app shipped to main (benches that work, the rest marked under construction)
+
+**What.** The Forge app (`tools/pixelforge/forge`, Godot 4.7, built to `docs/mockups/forge_app_v8.html`) is on main.
+The owner's words: "anything not ready mark as under construction, make everything else work, push what we have ready
+now". State: every screen and tab renders with 0 SCRIPT ERRORs (`forge/tools/screens.sh`, 36 shots at 1280x720 under
+xvfb, in `docs/screens/forgeapp/`); 20 scripts parse (`tools/check_scripts.gd`); the Characters bench runs end to end
+through the `--script` walkthrough (`forge/scripts/driver.gd`): drop `assets/shapes/characters/keeper.shapes.json`
+→ `project new/add/import-shapes` → `shapes still` (the standing picture with its lights) → Motion tab `shapes render`
+idle S and idle E (the facing wheel) → *Render all* (`project render-shapes`, 75 s for 7 clips in 8 directions) →
+Frames tab (24 frames) → *Export sheets* (`project export-game`: `keeper.png` + `keeper.json`, 2.8 MB), 0 errors.
+Benches that work: Characters (Reference, Model, Materials, Motion, Frames, Export), Objects (the chest / skull / dead
+tree examples: Model, Materials, Behaviour, Export through `shapes still` / `shapes object`), Effects (`vfx`, `spell`,
+`effect`; the strip plays in the picture window), Tiles (`tiles`), Interface (`ui9`, `icons`, `portrait`, the Fonts
+page), Sound (`sfx`, the wave drawn), Music (`music list` loads the cue cards; the rack renders and plays), Settings
+(window, folders, style cards with animated strips, `doctor`), Home (the nine choices, Describe it, drops), the log
+drawer, the six grounds, the scene-light lever. **Under construction, said on the bench in gold:** Creatures (no beast
+rig; the characters' bench on the humanoid skeleton). Not in the Forge at all, by design (the guides say so): the
+painting road (cutouts, Blender, Mixamo) and the full editors, which stay in the classic Studio.
+
+Fixes this round: debug prints removed; every state line that overflowed the text box shortened or given a second
+line (the Export tabs of Characters and Objects lost their tall rack for a facing / scene-light cycler row so the
+choices fit); the facing wheel refreshes the tab's words; Creatures says "Under construction". Launchers: `PixelForge.bat`
+pulls main (`git pull --ff-only`, then `pip install -e .` when HEAD moved) and opens the Forge (`pixelforge forge`),
+printing a plain line and pausing when it cannot; `install.bat` makes the **PixelForge** icon (→ PixelForge.bat) and
+**PixelForge Studio (classic)** (→ PixelForge Studio.bat, main's self-updating launcher); `Update PixelForge.bat`
+ends by opening the Forge. `forge_launch.py` downloads Godot 4.7.2 into `tools/godot` when none is found (win64 zip on
+Windows) and returns `{"ok": false, "error": "Godot was not found and the download failed (...)"}` as a plain line.
+Docs: GUIDE_HUMANS (the benches, keys, what is under construction), GUIDE_AI (the per-bench command table, the test
+hooks, the driver lines), `docs/track_notes/forgeapp.md`.
+
+**Verified.** 161 pytest green (about 2 min 20 s); `check_scripts.gd` 20/0; the sweep 36/36 at 0 errors (with sample
+paintings for tiles, a panel and the Keeper's front for the portrait); the Keeper walkthrough above. Not run here:
+*Put it in the game* / *See it in the game* (they need the game's import pass and a run under xvfb; both were run on
+this branch on 2026-10-01 for the object and character roads, unchanged since), the Windows launchers (no Windows
+here; the batch files follow main's `PixelForge Studio.bat` line for line), the native file dialog, a gamepad.
+
+**How to resume.** `git pull`; `cd tools/pixelforge && python -m pytest -q`; `godot --headless --path
+tools/pixelforge/forge --script res://tools/check_scripts.gd`; the sweep and the walkthrough as GUIDE_AI's Forge
+section says. Next, in the owner's order: watch the first full run on the laptop (the Godot download, the first
+*Put it in the game*); the Keeper's second authoring pass; the beast rig for Creatures; then objects / effects / tiles
+through the engine (PLAN.md phases 3-4).

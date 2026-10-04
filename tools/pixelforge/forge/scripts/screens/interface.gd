@@ -82,7 +82,7 @@ func build_tab(i: int) -> void:
 	if String(state["image"]) == "":
 		state_line(["The bench is empty. Drop a painted panel or frame: the margins are found and a stretching 9-slice comes out.",
 			"The bench is empty. Drop one flat-lay painting of items: each becomes an inventory icon at 4x and 1x.",
-			"The bench is empty. Drop a front-view cutout: the head and shoulders become portraits at 48 and 96 px."][i])
+			"The bench is empty. Drop a front-view cutout: the head and shoulders become portraits at 48 and 96 px."][i], "", 2)
 		add_spacer()
 		add_choices([{"label": "Choose a painting", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; paintings"]), func(p): on_drop(PackedStringArray([p])), "Choose the painting")},
 			{"label": "Describe one", "cb": func(): app.go("home")}])
@@ -112,7 +112,7 @@ func build_tab(i: int) -> void:
 		{"label": "Put it in the game", "cb": _put_in_game}], false))
 
 func _build_fonts() -> void:
-	state_line("Interface · fonts · the Forge's faces: Jacquard 12 for the banner, VT323 for the text, Silkscreen for tiny marks (all OFL)")
+	state_line("Interface · fonts · the Forge's faces: Jacquard 12 for the banner, VT323 for the text, Silkscreen for tiny marks (all OFL)", "", 2)
 	add_spacer()
 	add_choices(standard_choices([], false))
 

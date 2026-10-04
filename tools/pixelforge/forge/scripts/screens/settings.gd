@@ -86,7 +86,7 @@ func _reset_all() -> void:
 ## --- Folders
 func _build_folders() -> void:
 	state_line("Settings · folders · project %s · game %s · Blender %s" % [app.backend.project_name() if app.backend.project_name() != "" else "none", "found" if app.backend.game_ok() else "not found", _blender_state()])
-	dim_line("The project folder holds everything the Forge makes; the game folder is where Put it in the game writes; Blender is only for the painting road.")
+	dim_line("The project folder holds everything the Forge makes; the game folder is where Put it in the game writes; Blender is only for the painting road.", 2)
 	add_spacer()
 	add_choices([
 		{"label": "Choose project", "cb": func(): app.choose_dir(func(p):
@@ -130,7 +130,7 @@ func _download_blender() -> void:
 ## --- Style: the preset cards with their animated examples
 func _build_style() -> void:
 	var name := app.style_name
-	state_line("Settings · style · %s · one look per game: figure height, palette, outline, bands, frame counts" % String(STYLE_TITLES.get(name, name)))
+	state_line("Settings · style · %s · one look per game: figure height, palette, outline, bands" % String(STYLE_TITLES.get(name, name)))
 	var items := []
 	for st in STYLES:
 		items.append({"label": String(STYLE_TITLES.get(st, st)), "line": st.replace("_", " "), "on": st == name, "cb": func(): _set_style(st)})

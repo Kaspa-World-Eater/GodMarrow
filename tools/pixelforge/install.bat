@@ -28,13 +28,13 @@ echo Creating the desktop shortcuts...
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ws = New-Object -ComObject WScript.Shell; $d = [Environment]::GetFolderPath('Desktop');" ^
   "$s = $ws.CreateShortcut((Join-Path $d 'PixelForge.lnk'));" ^
-  "$s.TargetPath = (Join-Path '%CD%' '.venv\Scripts\pythonw.exe');" ^
-  "$s.Arguments = '-m pixelforge.cli forge'; $s.WorkingDirectory = '%CD%';" ^
+  "$s.TargetPath = (Join-Path '%CD%' 'PixelForge.bat');" ^
+  "$s.Arguments = ''; $s.WorkingDirectory = '%CD%'; $s.WindowStyle = 7;" ^
   "$s.IconLocation = (Join-Path '%CD%' 'assets\pixelforge.ico') + ',0';" ^
-  "$s.Description = 'PixelForge - paintings in, game art out'; $s.Save();" ^
+  "$s.Description = 'PixelForge - updates itself, then opens the Forge'; $s.Save();" ^
   "$s = $ws.CreateShortcut((Join-Path $d 'PixelForge Studio (classic).lnk'));" ^
-  "$s.TargetPath = (Join-Path '%CD%' '.venv\Scripts\pythonw.exe');" ^
-  "$s.Arguments = '-m pixelforge.cli studio'; $s.WorkingDirectory = '%CD%';" ^
+  "$s.TargetPath = (Join-Path '%CD%' 'PixelForge Studio.bat');" ^
+  "$s.Arguments = ''; $s.WorkingDirectory = '%CD%'; $s.WindowStyle = 7;" ^
   "$s.IconLocation = (Join-Path '%CD%' 'assets\pixelforge.ico') + ',0';" ^
   "$s.Description = 'PixelForge Studio (classic) - the older window with every form'; $s.Save()" ^
   && echo   Desktop shortcuts created. || echo   (could not create the shortcuts; use "PixelForge.bat" and "PixelForge Studio.bat")
@@ -55,5 +55,5 @@ python -m pixelforge.cli doctor
 echo.
 echo Done. Double-click the "PixelForge" icon on your desktop to start (full screen, guided).
 echo "PixelForge Studio (classic)" is the older window with every form.
-echo Blender (free) does the 3D part: the app downloads it for you when a step needs it.
+echo Blender (free) is only for the painting road: Settings in the app can download it.
 pause

@@ -101,9 +101,7 @@ func _model_loaded() -> void:
 	state["title"] = String(doc.get("name", state["name"])).capitalize()
 	full_render = FileAccess.file_exists(char_dir().path_join("frames").path_join("animations.json"))
 	retime = app.backend.read_json(char_dir().path_join("frames").path_join("retime.json"))
-	print("DBG model_loaded tab=", tab)
 	rebuild()
-	print("DBG rebuilt")
 	if tab in [3, 4]:
 		show_clip()
 	else:
@@ -145,7 +143,6 @@ var _frames_dirty := true
 
 ## the frames of the chosen clip and direction: from the full render when there is one, else a quick preview render
 func show_clip(force_render: bool = false) -> void:
-	print("DBG show_clip has_model=", has_model(), " job=", job, " dirty=", _frames_dirty, " tab=", tab)
 	if not has_model():
 		return
 	var clip := String(state["clip"])
@@ -263,7 +260,8 @@ func direction_wheel() -> Control:
 			if tab in [3, 4]:
 				show_clip()
 			else:
-				refresh_preview())
+				refresh_preview()
+			call_deferred("rebuild"))
 	w.hint = "left and right turn the model"
 	return w
 
@@ -1072,8 +1070,12 @@ func _build_export() -> void:
 	var exported := String(state.get("exported", ""))
 	var line := "%s · export · %s" % [String(state["title"]), ("sheets written%s" % (", in the game" if state.get("in_game", false) else "")) if exported != "" else ("the full set is rendered; the sheets can be written" if full_render else "Render all first, then the sheets")]
 	state_line(line)
-	dim_line("The in-game shot is in the picture window." if (state.get("shot", "") != "" and FileAccess.file_exists(String(state["shot"]))) else "Put it in the game copies the sheets into the game's art; See it in the game opens the game with it on the moor.", 2)
-	add_rack([direction_wheel(), scene_light_lever()], 8)
+	dim_line("The in-game shot is in the picture window." if (state.get("shot", "") != "" and FileAccess.file_exists(String(state["shot"]))) else "Put it in the game copies the sheets into the game's art; See it opens the game.")
+	add_cyclers([
+		{"label": "facing", "value": String(state["direction"]), "left": func(): _pick_direction(_cycle(DIRS, String(state["direction"]), -1)), "right": func(): _pick_direction(_cycle(DIRS, String(state["direction"]), 1))},
+		{"label": "scene light", "value": ["off", "sprite only", "on"][app.scene.light_mode], "left": func(): _set_scene_light(app.scene.light_mode - 1), "right": func(): _set_scene_light(app.scene.light_mode + 1)},
+	])
+	add_spacer()
 	var items := [
 		{"label": "Export sheets", "cb": _export_sheets},
 		{"label": "Put it in the game", "cb": _put_in_game},

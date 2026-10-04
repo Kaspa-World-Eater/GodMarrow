@@ -176,7 +176,7 @@ func on_drop(paths: PackedStringArray) -> void:
 ## --- Layers: a spell as a strip of layer cards, each with its knobs
 func _build_layers() -> void:
 	if spell.is_empty():
-		state_line("Effects · layers · a spell is layered effects: fire under a burst under embers. Pick a preset to start from.")
+		state_line("Effects · layers · a spell is layered effects: fire under a burst under embers. Pick a preset to start from.", "", 2)
 		add_cyclers([
 			{"label": "preset", "value": String(state["preset"]), "left": func(): state["preset"] = _cycle(SPELL_PRESETS, String(state["preset"]), -1); rebuild(), "right": func(): state["preset"] = _cycle(SPELL_PRESETS, String(state["preset"]), 1); rebuild()},
 		])
@@ -272,7 +272,7 @@ func _randomise_spell() -> void:
 
 ## --- Looks: the palette swatches and the style's own rules
 func _build_looks() -> void:
-	state_line("Effects · looks · %s palette · the style preset %s decides bands, glow and haze unless the levers say otherwise" % [String(state["palette"]), app.style_name.replace("_", " ")])
+	state_line("Effects · looks · %s palette · %s sets bands, glow and haze; a lever overrides it" % [String(state["palette"]), app.style_name.replace("_", " ")])
 	var items := []
 	for pal in PALETTES:
 		items.append({"label": ("* " if pal == String(state["palette"]) else "") + pal, "cb": func(): _set_str("palette", pal)})
@@ -290,7 +290,7 @@ func _build_looks() -> void:
 
 ## --- Missile: a flying thing with its headings
 func _build_missile() -> void:
-	state_line("Effects · missile · %s in %s · %d headings · the game picks the row nearest its heading" % [String(state["missile"]), String(state["palette"]), int(state["rotations"])])
+	state_line("Effects · missile · %s in %s · %d headings; the game picks the row nearest its own" % [String(state["missile"]), String(state["palette"]), int(state["rotations"])])
 	add_cyclers([
 		{"label": "missile", "value": String(state["missile"]), "left": func(): _set_str("missile", _cycle(MISSILES, String(state["missile"]), -1)), "right": func(): _set_str("missile", _cycle(MISSILES, String(state["missile"]), 1))},
 		{"label": "headings", "value": str(int(state["rotations"])), "left": func(): _setv("rotations", 8 if int(state["rotations"]) == 16 else 16), "right": func(): _setv("rotations", 16 if int(state["rotations"]) == 8 else 8)},
@@ -302,7 +302,7 @@ func _build_missile() -> void:
 ## --- Export
 func _build_export() -> void:
 	var exported := String(state.get("exported", ""))
-	state_line("Effects · export · %s" % ("in the game's effects" if exported != "" else "Keep writes the strip and its json into the game's art/fx; the add-on plays it at the hero"))
+	state_line("Effects · export · %s" % ("in the game's effects" if exported != "" else "Keep writes the strip and its json into the game's art/fx; the add-on plays it at the hero"), "", 2)
 	dim_line("The in-game shot is in the picture window." if (state.get("shot", "") != "" and FileAccess.file_exists(String(state["shot"]))) else "See it in the game plays it at the hero on the moor.")
 	add_spacer()
 	add_choices(standard_choices([{"label": "Put it in the game", "cb": _put_in_game}, {"label": "See it in the game", "cb": _see_in_game}], false))

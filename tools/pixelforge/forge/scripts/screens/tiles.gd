@@ -50,7 +50,7 @@ func make(out_dir: String = "", then: Callable = Callable()) -> void:
 
 func build_tab(i: int) -> void:
 	if String(state["texture"]) == "":
-		state_line("The bench is empty. Drop a painted ground texture (the seamless kind) here; a second one makes the transition tiles between them.")
+		state_line("The bench is empty. Drop a painted ground texture (the seamless kind) here; a second one makes the transition tiles between them.", "", 2)
 		add_spacer()
 		add_choices([{"label": "Choose a texture", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; paintings"]), func(p): on_drop(PackedStringArray([p])), "Choose the ground texture")},
 			{"label": "Describe one", "cb": func(): app.go("home")}])

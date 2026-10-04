@@ -156,12 +156,14 @@ func _set_height(h: float) -> void:
 ## --- Export: the object's PNGs with foot anchors into the project, the game, and a look in the game
 func _build_export() -> void:
 	var exported := String(state.get("exported", ""))
-	state_line("%s · export · %s" % [String(state["title"]), ("written%s" % (", in the game's objects" if state.get("in_game", false) else "")) if exported != "" else "trimmed PNGs with foot anchors per facing, and an objects.json entry for the game"])
+	state_line("%s · export · %s" % [String(state["title"]), ("written%s" % (", in the game's objects" if state.get("in_game", false) else "")) if exported != "" else "PNGs with foot anchors per facing, plus an objects.json entry"])
 	dim_line("The in-game shot is in the picture window." if (state.get("shot", "") != "" and FileAccess.file_exists(String(state["shot"]))) else "Facings: S alone for a ground object, or all eight for one the world turns.")
 	add_cyclers([
 		{"label": "facings", "value": String(state.get("dirs", "S")), "left": func(): _toggle_dirs(), "right": func(): _toggle_dirs()},
+		{"label": "facing", "value": String(state["direction"]), "left": func(): _pick_direction(_cycle(OBJ_DIRS, String(state["direction"]), -1)), "right": func(): _pick_direction(_cycle(OBJ_DIRS, String(state["direction"]), 1))},
+		{"label": "scene light", "value": ["off", "sprite only", "on"][app.scene.light_mode], "left": func(): _set_scene_light(app.scene.light_mode - 1), "right": func(): _set_scene_light(app.scene.light_mode + 1)},
 	])
-	add_rack([direction_wheel(), scene_light_lever()], 8)
+	add_spacer()
 	add_choices(standard_choices([
 		{"label": "Export PNGs", "cb": _export_sheets},
 		{"label": "Put it in the game", "cb": _put_in_game},

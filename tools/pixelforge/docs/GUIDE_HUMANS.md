@@ -6,52 +6,65 @@ needed. No paid tools. No Mixamo.
 
 ## The Forge app (start here)
 
-Double-click **PixelForge** on the desktop (or `PixelForge.bat` in the `tools\pixelforge` folder). It opens full
-screen, in the game's own look, and shows nine tiles:
+Double-click **PixelForge** on the desktop (or `PixelForge.bat` in the `tools\pixelforge` folder; from a prompt,
+`pixelforge forge`). It gets the latest version first, then opens full screen in an old dungeon-menu framing: an
+ornate pixel frame, a picture window above (the thing on the bench, standing in a dungeon, crypt, moor, fen, snow or a
+plain grey ground, chosen at the foot of the screen), and a text box below with the bench's words, its levers and
+wheels, and its choices. Home has nine choices and a describe line:
 
-**Make a character · Make an object · Make a spell or effect · Make tiles and ground · Make icons, portraits and UI ·
-Make sounds and music · Fix up a picture · Play the game · Settings**
+**Characters · Creatures · Objects · Effects · Tiles and ground · Interface · Sound · Music · Settings**
 
-Pick a tile and follow the path. Every screen has one big teal button (the next thing to do), a picture of what you
-get, a line saying what happens next, and a strip along the top showing where you are. **Esc** (or the gamepad's B
-button) always goes one screen back. The arrow keys, Enter and a gamepad work everywhere; so does the mouse.
+The arrow keys, Enter and a gamepad (d-pad, A, B, LB/RB for the tabs) work everywhere; so does the mouse. **Esc** (or
+B) goes back. **F11** switches between full screen and a window. **Ctrl+L** opens the log (exactly what ran and what
+it said; Ctrl+C copies it). Every bench has tabs along the top of the text box and the same bottom line: **Keep**,
+**Render all**, **Undo**, **Reset** (this tab's levers back to their defaults), **Start over** (one plain question,
+inside the window) and **Advanced** (the same values as plain sliders with finer steps).
 
-**Make a character.** Drop your painting onto the window (or press *Choose a painting*). That is all you set up: the
-Forge cuts the figure out, locks its colours, builds the 3D figure, gives it its moves, films it from 8 directions,
-turns the film into pixels and packs the game files, one after another, lighting up the strip as it goes. Filming is
-the slow part (ten minutes or more on a laptop). Then you see it walk: turn the dial to any direction, pick a move.
-Press **Put it in the game**, then **See it in the game**: the game opens with your character on the moor.
-The first time, the Build step stops with a card: Blender does the 3D part. Press **Download Blender for me** (free,
-380 MB, no installer) and the path carries on by itself. There is also a "no 3D for now" road that makes a still
-sprite that breathes.
+**Characters** (the heart of it). A character is a *shape model*, a `.shapes.json` file of solids with materials,
+rendered as pixel art by the engine and moved by the motion clips (idle, walk, run, attack, cast, hit, death) from
+eight directions. Drop a model file on the window (`assets\shapes\characters\keeper.shapes.json` is the Keeper) or
+press *Start from the Keeper*. The tabs: **Reference** (the model beside a reference painting, with the checks that
+say what to change), **Model** (pick a part and a solid, move and scale it, change its material, hide it),
+**Materials** (every material's colour ramp with hue, lightness, contrast and steps; each light's glow kind, colour,
+strength, pulse and radius; *Randomise* for a variant, *Champion* saves a recolour beside the model), **Motion** (the
+clip and the facing, the lag, sway and hang of the loose parts, the turn and move steps, the camera; *Render clip*
+draws the one you are looking at, **Render all** every clip in every direction), **Frames** (the frame strip: hold or
+delete a frame, mirror a direction, paint a pixel, onion skin), **Export** (*Export sheets* writes the game's sheets;
+*Put it in the game* copies them into the game's art; *See it in the game* opens the game with the character on the
+moor; *Take it out* puts the earlier files back). Every edit is written into the model file, so an assistant editing
+the same file by hand sees what you did, and you see what it did.
 
-**Make an object.** Drop a painting of a barrel, a gravestone, a dead tree, a banner. It is cut out, given its
-footprint, and pressed to the game's pixels. Choose whether it stays still, sways like a tree, flutters like a banner
-or flickers like a flame, then put it in the game's object list. **See it in the game** stands one beside the hero on
-the moor for a look; the world builder places it for good.
+**Objects.** The same engine without bones: a chest, a skull, a dead tree (examples on the bench), or any object's
+shape model. Model and Materials as above; **Behaviour** has the camera, the world scale, the shadow and the height;
+**Export** writes the PNGs with foot anchors (S alone, or all eight facings) and the entry for the game's object list.
 
-**Make a spell or effect.** Pick a shape (missile, nova, wall, burst, armour, and more) or one of the game's whole
-spells, then a look (the game's colour ramps). Watch it play. Put it in the game and **See it**: it plays at the hero
-on the moor.
+**Effects.** **Shape** picks a procedural effect (wisp, fire, smoke, burst, nova, bolt and the rest) in a palette,
+with its size, frames, speed, bands, glow and haze; **Layers** builds a whole spell from stacked effects (presets to
+start from); **Looks** is the palette row; **Missile** the flying things with their headings; **Export** puts it in the
+game's effects and plays it at the hero. *From a painting* (or a drop) reads a painted effect instead.
 
-**Make tiles and ground.** Drop a painted ground texture; it becomes iso diamonds with variants and edge tiles.
-**Make icons, portraits and UI.** Icons from one flat-lay painting; a portrait from a front view; a stretching
-frame from a painted panel. **Make sounds and music.** Pick a place in the game, hear its cue, ask for another tune,
-keep it; or make the eighteen small sounds. **Fix up a picture.** Click where the fix goes: recolour (the shading
-stays), glow, erase, restore the original, smooth. Undo takes a click back; Keep saves it with the original beside it.
+**Tiles and ground.** Drop a painted ground texture: iso diamonds with variants; a second texture makes the edge tiles.
+**Interface.** A painted panel becomes a stretching 9-slice frame; one flat-lay painting becomes inventory icons; a
+front-view cutout becomes portraits. **Sound.** Eighteen pads with pitch, length, grit, tone and the wave; Play hears
+it, Keep puts it in the game. **Music.** Every place in the game as a cue, with a rack of real controls (tempo, key,
+mode, metre, tune, wind, echo, the drone); Play renders twenty seconds; Keep writes the loop into the game.
 
-**Describe it.** The bar at the top of the first screen takes plain words: "a wisp lantern spell, pale blue, slow,
-with embers" opens the spell path with that spell playing; "make the left eye teal with a pale glow" opens the fix-up
-path; "a slow sombre act 2 wilds tune" renders it. Something to paint first opens the path that will take the
-painting, with the Midjourney prompt ready to copy: "a grave knight with a rusted helm" opens Make a character, "a
-wooden barrel" Make an object, "mossy stone ground" the tiles, "a portrait of the gravekeeper" the portraits.
+**Describe it.** The line on Home takes plain words: "a hooded necromancer with a skull-topped staff burning green"
+drafts a shape model and opens the Characters bench with it; "a wisp lantern spell, pale blue, slow, with embers"
+opens Effects with it playing; "a slow sombre act 2 wilds tune" opens the music rack on that cue.
 
-**Advanced, not hidden.** Every screen has an *Advanced* fold with the step's real settings and their usual values
-(the same ones the command line takes), closed until you open it; when it is longer than the screen, the bar on the
-right scrolls it. **Log** at the top right shows exactly what ran. When a step stops, a card says why in plain words
-and offers the fix; *Try again* on the card runs that step again.
-**Settings** has the window / full screen switch (also F11), the sounds, the folders, what this computer has, and
-the button to open **PixelForge Studio (classic)**, the older window with every form.
+**Under construction** (the bench says so itself, in gold, and nothing on it crashes):
+- **Creatures.** The beast rig (four legs, a tail, wings) is not in the engine yet. The bench is the characters'
+  bench; a creature dropped there stands on the humanoid skeleton.
+- **The painting road** (a Midjourney sheet cut out, carved in Blender, filmed and pixelated) is not in the Forge:
+  it is the classic Studio's, below. The Forge's Reference tab shows a painting beside the model, nothing more.
+- **The fix-up editors** (the cutout editor, the skin editor with layers and the clone brush, the colour editor)
+  stay in the classic Studio. The Forge's Frames tab paints single pixels only.
+- **The Play tile** is gone; *See it in the game* on a bench does the same with the thing you made.
+
+**Settings** has the window / full screen switch, the window's scale, the sounds and the music with their levels,
+reduced motion, the project and game folders, Blender (for the classic road), the style preset cards with animated
+examples, and what this computer has.
 
 Everything the app makes lands in a project folder it creates for you (Documents\PixelForge\Forge) and, when you
 say so, in the game's art. An AI assistant can do every one of these things through the command line; the app and the
@@ -68,9 +81,9 @@ assistant never disagree, because the app only ever runs the same commands.
 **Playing the game.** The **Godmarrow** icon on the desktop (made by `install.bat`; or `Play Godmarrow.bat` in the
 Godmarrow folder) gets the latest version first, finds Godot 4 or downloads it (free, once), and starts the game.
 
-**Updating.** The Studio checks for a newer version when it opens and shows one button, **Update and restart**. The same
-is in Help > Update PixelForge, and **`Update PixelForge.bat`** in the folder does it from outside the app. The game and
-the Forge live in one folder, so one update brings both.
+**Updating.** The **PixelForge** icon gets the latest version every time it opens (a quiet `git pull`), and so does
+the classic Studio's icon. **`Update PixelForge.bat`** in the folder does the same by hand and then opens the Forge.
+The game and the Forge live in one folder, so one update brings both.
 4. Double-click an icon. If the app does not open, run **`PixelForge.bat`**; if the classic window does not, run
    **`PixelForge Studio.bat`**; a crash is written to `studio_error.log` next to it.
 

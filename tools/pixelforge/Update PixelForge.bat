@@ -8,5 +8,15 @@ if exist .venv\Scripts\python.exe (
   echo Installing anything new (a moment)...
   .venv\Scripts\python.exe -m pip install -q -e . >nul 2>nul
 )
-echo Done. Starting PixelForge Studio...
-start "" ".venv\Scripts\pythonw.exe" -m pixelforge.cli studio
+echo Done. Starting PixelForge...
+if exist .venv\Scripts\python.exe (
+  set "PY=.venv\Scripts\python.exe"
+) else (
+  where py >nul 2>nul && (set "PY=py -3") || (set "PY=python")
+)
+%PY% -m pixelforge.cli forge
+if errorlevel 1 (
+  echo.
+  echo The Forge could not start. "PixelForge Studio.bat" opens the classic window instead.
+  pause
+)

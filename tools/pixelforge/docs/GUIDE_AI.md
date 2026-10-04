@@ -610,64 +610,69 @@ palette and a fixed scale so all frames match.
 
 ## The Forge app (tools/pixelforge/forge): what it is to an assistant
 
-The person's face of PixelForge is a Godot 4.7 project at `tools/pixelforge/forge/` (full screen, the game's fonts
-and frames, nine tiles, guided paths). **It never reimplements the pipeline**: every action is one CLI command run as
-`python -u -c "<boot>" <pixelforge root> <command> ... --json` in a thread (`forge/scripts/backend.gd`), its output
-read line by line (the `PF_PROGRESS` lines drive the progress strip; everything lands in the log drawer) and the last
-JSON object printed is the result. A `{"ok": false, "error": ...}` is shown as a card with the fix the message
-names ("Blender was not found" gets a *Download Blender for me* button that runs `project blender-download`). So the
-project.json the app works on is the same one you work on; `status --json` tells both of you where a character is.
+The person's face of PixelForge is a Godot 4.7 project at `tools/pixelforge/forge/` (full screen, an ornate pixel
+frame, a picture window above and a text box with tabs, levers and choices below; the approved brief is the game
+repository's `docs/mockups/forge_app_v8.html`). **It never reimplements the pipeline**: every action is one CLI
+command run as `python -u -c "<boot>" <pixelforge root> <command> ... --json` in a thread
+(`forge/scripts/backend.gd`), its output read line by line (the `PF_PROGRESS` lines drive the progress bar;
+everything lands in the log drawer, Ctrl+L) and the last JSON object printed is the result. A
+`{"ok": false, "error": ...}` is shown as one plain line. So the project folder the app works on is the same one you
+work on, and a character's model file is the same `.shapes.json` you edit by hand.
 
 Start it: `pixelforge forge [--project P] [--screen S] [--windowed]` (`pixelforge/forge_launch.py` finds Godot with
 `game_preview.find_godot`, fetches it into `tools/godot` when there is none, and passes `--python=<this interpreter>`
-and `--game=<the game>` to the app), or `PixelForge.bat`. The game is `forge_launch.game_dir()`: `PIXELFORGE_GAME`,
-else the nearest `project.godot` above `tools/pixelforge` (the repository root); never the Forge's own folder, which
-has a `project.godot` too (the app's `backend.gd` refuses it as well: a project named PixelForge is not the game).
-What the app runs, per tile:
+and `--game=<the game>` to the app), or `PixelForge.bat` (which pulls the latest version first). The game is
+`forge_launch.game_dir()`: `PIXELFORGE_GAME`, else the nearest `project.godot` above `tools/pixelforge` (the
+repository root); never the Forge's own folder, which has a `project.godot` too (the app's `backend.gd` refuses it as
+well: a project named PixelForge is not the game). What the app runs, per bench:
 
-| tile | commands |
+| bench | commands |
 |---|---|
-| Make a character | `project new` (first use; style godmarrow) · `project add` · `project import <name> sheet|front` · `project run <name> split|palette|model|rig|render|pixelate` with the Advanced flags (`--tolerance --views --colors --model-mode --height --clips --per-clip --elevation --passes --actions --outline`) · `project export-game` · `project preview-gif` · `project export-game --out <game>/art/sprites` · `game-preview --import` · `game-preview --skin <kind> [--shot]` · the no-3D road: `project still <name> --view front --animate idle --export` |
-| Make an object | `prop <painting> <name> -o <project>/objects [--sway canopy|banner|flame ...]`, then the same with `-o <game>/art/objects --game-objects <game>/art/objects/objects.json --hr 2`; Advanced "carve in 3D" uses `object`; `game-preview --place <name>` stands it beside the hero on the moor (the game's `--place` hook; nothing is saved) |
-| Make a spell or effect | `vfx <kind> <name> -o <project>/fx --palette <look> --gif [--frames --fps --size --bands --seed --glow --rotations]` or `spell new <name> --preset <p>`; into the game with `-o <game>/art/fx` (missiles get `--rotations 16`); `game-preview --fx <name>` |
-| Make tiles and ground | `tiles <texture> <name> -o <project>/tiles [--second --variants --tile --colors --seed]`, then `-o <game>/art/tiles` |
-| Make icons, portraits and UI | `icons`, `portrait`, `ui9` into `<project>/items|portraits|ui`, then the game's folders |
-| Make sounds and music | `music list` · `music <cue> -o <project>/music --seconds 20 [--seed --set ...]` · `music <cue> -o <game>/audio/music --seconds 120 --format ogg` · `sfx all` |
-| Fix up a picture | `skin <image> '<ops>' -o <project>/fix/<file>` after every click (recolor, glow, erase, restore, smooth at a point); Keep = `skin <image> '<ops>'` in place (a .bak is kept); the ops can be saved as JSON for you to replay |
-| Describe it | `describe "<words>" --json` → `what` picks the path: `spell` → the spell path with it playing, `skin` → fix up, `music` → sounds and music, `prompt` → the path that will take the painting (a character-sheet prompt → Make a character; a world prompt → its kind: object/building/tree/topdown → Make an object, ground → tiles, ui/icons/portrait → the UI path, missile/spell_frames/effect → the spell path), with a *Copy the prompt* button on its first screen; spells export with `describe ... -o <folder>` |
-| Play the game | `game-preview --play` (the plain game); Advanced: `game-preview --cls <order>` |
-| Settings | `doctor --json`, `project blender-download`, `project set --blender` |
+| Characters | `project new` (first use) · `project add <name>` · `project import-shapes <name> <file>` (a dropped or chosen `.shapes.json`, copied into `characters/<name>/shapes/`) · `shapes still <model> -o previews/still_<dir>.png --direction D --style S --zoom 1` (the standing picture; `--json` gives the foot anchor and the lights) · `shapes render <model> -o previews/frames --clips C --directions D --style S` (one clip for the Motion and Frames tabs) · `project render-shapes <name> --style S` (Render all) · `project export-game <name> --kind K --name N --out <dir>` (Export sheets; Put it in the game uses `--out <game>/art/sprites`) · `game-preview --import` · `game-preview --skin K [--shot]` · `project reset <name>` (Start over) · `skin <frame.png> '[{"op":"paint",...}]'` (the Frames tab's paint) · `prompt --describe ... --kind sheet_px` (Copy prompt). Every lever writes the model file (`doc`): solid offsets and scales, materials, ramps (OK-HSL hue / lightness / contrast / steps over the imported ramp), lights, the glow effects, `parts.*.lag`, `view.turn_step / move_step / elevation`. |
+| Creatures | under construction: the same bench, the humanoid skeleton; `assets/shapes/necromancer_3d.shapes.json` as the example |
+| Objects | the model copied into `objects/<name>/` · `shapes still <model> --frame F --direction D` · `shapes object <model> -o <dir> --name N --directions S[,...] --style S --hr 2 [--game-objects <game>/art/objects/objects.json]` · `game-preview --place N` |
+| Effects | `vfx <kind> <name> -o <project>/fx --palette P --frames --fps --bands --seed --glow --haze --style S [--size W H] [--rotations 8|16]` · `spell new <name> -o fx --preset P` / `spell render <file> -o fx` (Layers) · `effect <painting> <name> -o fx --kind loop` (a painted effect) · into the game with `-o <game>/art/fx` · `game-preview --fx <name>` |
+| Tiles and ground | `tiles <texture> <name> -o <project>/tiles --variants --seed --style S [--second --colors --tile W H]`, then `-o <game>/art/tiles` |
+| Interface | `ui9 <panel> <name> -o ui --mid M` · `icons <flatlay> -o items --cell C --scale K` · `portrait <front> <name> -o portraits --head H --sizes 48 96`, then the game's folders |
+| Sound | `sfx <pad> -o <project>/sfx --set freq_mul= decay_mul= crush= lowpass= wave= --seed N`; Keep: `-o <game>/art/sfx` · `sfx all` |
+| Music | `music list` · `music <cue> -o <project>/music --seconds 20 [--seed --set bpm= sc= root= steps= drone=[...] ...]` · Keep: `-o <game>/audio/music --seconds 120 --format ogg` · `music all` |
+| Describe it | `describe "<words>" --json`: `what` picks the bench (`shapes` → Characters with the drafted `doc`, `spell` → Effects, `music` → Music, `prompt` → the bench that will take the painting) |
+| Settings | `doctor --json`, `project set --style S`, `project set --blender PATH`, `project blender-download` |
 
 After new files land in the game the app runs `game-preview --import` (a headless `godot --import` pass) so the game's
 loaders see them.
 
-**Screenshots of the app (test hooks, after `--`):** `--screen=NAME` opens a screen directly (home, settings, play,
-character, object, spell, tiles, ui, sound, fix), `--project=PATH` and `--game=PATH` choose the folders, `--python=`
-the interpreter, `--shot=PATH --shot_t=S` saves the window after S seconds and quits (read back from the screen and
-cropped to the window, so the letterbox shows as the person sees it; where the screen cannot be read it falls back to
-the viewport texture, and the `SHOT` line it prints says which), `--windowed` and `--nosound`, `--toggle=window`
-(flip full screen / window after a second, as the header button does), `--describe=WORDS --go` (type into the
-Describe-it bar and press *Make it*; quote the argument). Per path: `--character=NAME` (continue one), `--drop=FILE`
-(as if dropped), `--shape=nova --look=frost --play` (spell), `--kind=portrait|icons|frame` (ui), `--cue=a1_wild
-[--silent]` (sound), `--advanced` (the fold open), `--autoput` (the character and object roads press *Put it in the
-game* and *Take a screenshot* by themselves). A relative `--shot` path is resolved against the app's folder, so pass
-absolute ones (`forge/tools/screens.sh OUT [WxH]` shoots the whole set and absolutises OUT). Under xvfb:
+**Under construction** (said on the bench itself): Creatures (no beast rig); the painting road (cutouts, Blender,
+Mixamo) and the full editors stay in the classic Studio (`pixelforge studio`).
+
+**Test hooks (after `--`):** `--screen=NAME` opens a screen directly (home, characters, creatures, objects, effects,
+tiles, interface, sound, music, settings) with `--tab=NAME`, `--model=FILE` (a shape model onto the bench),
+`--painting=FILE`, `--env=dungeon|crypt|moor|fen|snow|plain`, `--light=0|1|2`, `--advanced`; `--project=PATH` and
+`--game=PATH` choose the folders, `--python=` the interpreter; `--shot=PATH --shot_t=S [--shot_n=N]` saves the
+window after S seconds and quits; `--windowed`, `--nosound`, `--nomusic`, `--reduced`, `--log[=S]`.
+`--script=FILE` drives a whole walkthrough, one line per step (`forge/scripts/driver.gd` lists them: `go SCREEN
+k=v`, `tab NAME`, `drop FILE`, `choose LABEL`, `set CONTROL VALUE`, `key ...`, `waitjob [S]`, `shot PATH`,
+`dumplog`, `quit`); this is how the Characters bench is verified end to end (drop the Keeper, Render all, Export
+sheets). `forge/tools/screens.sh OUT [WxH]` shoots every screen and prints `name | errors N`. Under xvfb:
 
 ```
-timeout 300 xvfb-run -a -s "-screen 0 1280x720x24" godot --path tools/pixelforge/forge --rendering-driver opengl3 \
-  --windowed --resolution 1280x720 -- --windowed --nosound --project=/tmp/forge_project \
-  --screen=spell --shape=nova --look=frost --play --shot=/tmp/spell.png --shot_t=12
+timeout 600 xvfb-run -a -s "-screen 0 1280x720x24" godot --path tools/pixelforge/forge --rendering-driver opengl3 \
+  --resolution 1280x720 -- --nosound --project=/tmp/forge_project --python=python \
+  --screen=characters --model=assets/shapes/characters/keeper.shapes.json --tab=Motion --shot=/tmp/motion.png --shot_t=12
 godot --headless --path tools/pixelforge/forge --script res://tools/check_scripts.gd    # every script parses
 ```
 
 `game-preview --shot` and `--wait` give the game 180 s (`--timeout S`, or `PIXELFORGE_GAME_TIMEOUT`); past that the
 result is a plain `{"ok": false, "error": "The game took more than 3 minutes..."}`, not a traceback, and the app shows
-it as a card. The game's own hooks it uses: `--skin`, `--fx`, `--attach`, `--place=a,b` (the Forge's objects stood
-beside the hero), `--shot`.
+it as a line. The game's own hooks it uses: `--skin`, `--fx`, `--place=a,b` (the Forge's objects stood beside the
+hero), `--shot`.
 
-The app's own files: `forge/scripts/theme.gd` (the look), `widgets.gd`, `backend.gd` (the CLI runner), `app.gd`
-(screens, transitions, log drawer), `screen.gd` and `quest.gd` (the base of every path), `screens/`, `quests/`. No
-`.import` files and no `class_name`: everything loads from plain files, so the folder runs without an editor pass.
+The app's own files: `forge/scripts/theme.gd` (the look), `px.gd` (the pixel-drawn frame, controls and cursor),
+`widgets.gd` (levers, wheels, pulls, choices, tabs, cards, the timeline), `scene.gd` (the picture window and its
+grounds), `backend.gd` (the CLI runner), `app.gd` (the shell, the selector, the dissolve, the log drawer), `screen.gd`
+(the base of every bench: tabs, racks, undo, Reset, Start over), `screens/*.gd` (one per bench), `driver.gd` (the
+walkthrough). No `.import` files and no `class_name`: everything loads from plain files, so the folder runs without
+an editor pass.
 
 ## MCP server
 

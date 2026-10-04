@@ -32,6 +32,14 @@ func build() -> void:
 				cues = r.get("cues", [])
 				rebuild())
 
+## a line cut at a word to fit the text box
+static func _fit(s: String, n: int) -> String:
+	if s.length() <= n:
+		return s
+	var cut := s.substr(0, n)
+	var sp := cut.rfind(" ")
+	return (cut.substr(0, sp) if sp > n / 2 else cut).rstrip(",;:") + " ..."
+
 func music_dir() -> String:
 	return app.backend.out_dir("music")
 
@@ -73,7 +81,7 @@ func build_tab(i: int) -> void:
 		return
 	var cue := String(state["cue"])
 	var info := cue_info(cue)
-	state_line("Music · %s · %s" % [String(info.get("title", cue)), String(info.get("description", "")) if not cues.is_empty() else "the cue table is loading"])
+	state_line("Music · %s · %s" % [String(info.get("title", cue)), _fit(String(info.get("description", "")), 60) if not cues.is_empty() else "the cue table is loading"])
 	var root := int(knob("root", 50))
 	var mode := knob_str("sc", "aeol")
 	var steps := int(knob("steps", 8))
