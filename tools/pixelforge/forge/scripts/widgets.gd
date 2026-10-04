@@ -5,6 +5,44 @@ const PX := preload("res://scripts/px.gd")
 ## what the selector moves through: the choices line, the tab row, a rack of controls, the ground picker. Each
 ## implements item_count / item_rect / set_sel / activate / step, so the app's one selector drives them all.
 
+## a typed number over a control's value: Enter commits, Esc leaves, up and down step (shift: tens)
+class NumberEntry:
+	extends LineEdit
+	var on_commit: Callable
+	var step_size := 1.0
+	func open(host: Control, rect: Rect2, value: String, commit: Callable, step: float = 1.0) -> void:
+		on_commit = commit
+		step_size = step
+		text = value
+		position = rect.position
+		size = rect.size
+		max_length = 12
+		host.add_child(self)
+		grab_focus()
+		select_all()
+		text_submitted.connect(func(t: String): _done(t))
+		focus_exited.connect(func(): queue_free())
+	func _gui_input(ev: InputEvent) -> void:
+		if ev is InputEventKey and ev.pressed:
+			if ev.keycode == KEY_ESCAPE:
+				release_focus()
+				accept_event()
+			elif ev.keycode in [KEY_UP, KEY_DOWN]:
+				var n := _num(text)
+				n += (step_size if ev.keycode == KEY_UP else -step_size) * (10.0 if ev.shift_pressed else 1.0)
+				text = T.fmt(n, 2 if step_size < 1.0 else 0)
+				accept_event()
+	func _done(t: String) -> void:
+		if on_commit.is_valid():
+			on_commit.call(_num(t))
+		release_focus()
+	## the first number in a string ("+3", "x1.20", "12 frames", "50%", "-15 deg")
+	static func _num(s: String) -> float:
+		var r := RegEx.new()
+		r.compile("[-+]?\\d*\\.?\\d+")
+		var m := r.search(s)
+		return float(m.get_string()) if m else 0.0
+
 ## the selector's home: a line of text choices, in a grid of columns (Home) or flowing with the words' widths and
 ## wrapping (the choices line, the cyclers, the ground picker); the chosen one in the accent colour with the arrow
 class Choices:
@@ -23,6 +61,12 @@ class Choices:
 	var wrap_width := 0.0           # flow: wrap to the next row past this width (0 = never)
 	var pos: Array = []             # flow: the item positions
 	var rows_n := 1
+	var drag_start: Callable        # (i, global_pos): an item picked up and carried out of the row
+	var drag_move: Callable         # (global_pos)
+	var drag_end: Callable          # (global_pos)
+	var _press_i := -1
+	var _press_at := Vector2.ZERO
+	var _dragging := false
 	func setup(list: Array, columns: int = 3, a: Node = null) -> void:
 		items = list
 		cols = maxi(columns, 1)
@@ -117,8 +161,20 @@ class Choices:
 			var cb: Callable = it.get("cb", Callable())
 			if cb.is_valid():
 				cb.call()
+			elif it.has("set") and (it["set"] as Callable).is_valid():
+				edit_value(i)
 			elif it.has("right") and (it["right"] as Callable).is_valid():
 				(it["right"] as Callable).call()
+	## a cycler's value, typed: a number entry over the value's words
+	func edit_value(i: int) -> void:
+		var it: Dictionary = items[i]
+		if not it.has("set"):
+			return
+		var p := item_pos(i)
+		var lab := String(it.get("label", "")) + " "
+		var lw := T.text_width(lab, font_size)
+		var e := NumberEntry.new()
+		e.open(self, Rect2(p.x + lw, p.y - 1, maxf(T.text_width("< %s >" % String(it["value"]), font_size), 40), row_h + 2), String(it["value"]), func(n): (it["set"] as Callable).call(str(n)))
 	## a cycler item ({label, value, left, right}) takes left and right; the others pass
 	func step(_delta: int, dir: String) -> bool:
 		if sel < 0 or sel >= items.size():
@@ -159,14 +215,56 @@ class Choices:
 				draw_string(f, Vector2(p.x, y), String(it["label"]), HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, c)
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseMotion:
+			if _press_i >= 0 and drag_start.is_valid():
+				if not _dragging and ev.position.distance_to(_press_at) > 4.0:
+					_dragging = true
+					drag_start.call(_press_i, get_global_mouse_position())
+				if _dragging and drag_move.is_valid():
+					drag_move.call(get_global_mouse_position())
+				return
 			var i := _hit(ev.position)
 			if i >= 0 and (i != sel or not active) and app:
 				app.focus_on(self, i, true)
-		elif ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-			var i := _hit(ev.position)
-			if i >= 0 and app:
-				app.focus_on(self, i, false)
-				app.select_current()
+		elif ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
+			if ev.pressed:
+				var i := _hit(ev.position)
+				if i < 0:
+					return
+				if drag_start.is_valid():
+					_press_i = i
+					_press_at = ev.position
+					_dragging = false
+					if app:
+						app.focus_on(self, i, false)
+					return
+				if items[i].has("set") and _on_value(i, ev.position):
+					if app:
+						app.focus_on(self, i, false)
+					edit_value(i)
+					return
+				if app:
+					app.focus_on(self, i, false)
+					app.select_current()
+			else:
+				if _press_i >= 0:
+					var was := _dragging
+					var i := _press_i
+					_press_i = -1
+					_dragging = false
+					if was:
+						if drag_end.is_valid():
+							drag_end.call(get_global_mouse_position())
+					elif app:
+						app.focus_on(self, i, false)
+						app.select_current()
+	## the click landed on a cycler's value (the "< v >" part), not its name
+	func _on_value(i: int, p: Vector2) -> bool:
+		var it: Dictionary = items[i]
+		if not it.has("value"):
+			return false
+		var q := item_pos(i)
+		var lw := T.text_width(String(it.get("label", "")) + " ", font_size)
+		return p.x >= q.x + lw
 	func _hit(p: Vector2) -> int:
 		for i in items.size():
 			var q := item_pos(i)
@@ -424,10 +522,41 @@ class Knob:
 		var y := ts.y + 8
 		draw_string(f, Vector2(0, y), label, HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, T.ACCENT if hot else T.DIM)
 		draw_string(f, Vector2(0, y + 10), value_text(), HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, T.ACCENT)
+	## the number a typed value means: the control's own words for 0 and 1 give the range, so "+3" or "12 frames" land right
+	func set_from_number(n: float) -> void:
+		var lo := NumberEntry._num(String(fmt.call(0.0))) if fmt.is_valid() else 0.0
+		var hi := NumberEntry._num(String(fmt.call(1.0))) if fmt.is_valid() else 1.0
+		if absf(hi - lo) < 1e-9:
+			return
+		set_value((n - lo) / (hi - lo))
+		if app:
+			app.audio.blip("ratchet")
+	func value_rect() -> Rect2:
+		return Rect2(0, tex_size.y * zoom + 10, size.x, 12)
+	func typed_step() -> float:
+		var lo := NumberEntry._num(String(fmt.call(0.0))) if fmt.is_valid() else 0.0
+		var hi := NumberEntry._num(String(fmt.call(1.0))) if fmt.is_valid() else 1.0
+		return 0.1 if absf(hi - lo) <= 2.0 else 1.0
+	func edit_value() -> void:
+		if not fmt.is_valid():
+			return
+		var e := NumberEntry.new()
+		e.open(self, value_rect(), value_text(), set_from_number, typed_step())
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton:
+			if ev.pressed and ev.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+				step(1 if ev.button_index == MOUSE_BUTTON_WHEEL_UP else -1, "up" if ev.button_index == MOUSE_BUTTON_WHEEL_UP else "down")
+				if on_commit.is_valid():
+					on_commit.call(value)
+				accept_event()
+				return
 			if ev.button_index == MOUSE_BUTTON_LEFT:
 				if ev.pressed:
+					if value_rect().has_point(ev.position) and fmt.is_valid():
+						if app and rack:
+							app.focus_on(rack, rack.controls.find(self), false)
+						edit_value()
+						return
 					var now := Time.get_ticks_msec()
 					if now - last_click < 350:
 						reset()
@@ -505,6 +634,14 @@ class Wheel:
 		return false
 	func reset() -> void:
 		set_angle(default_angle)
+	func set_from_number(n: float) -> void:
+		set_angle(n)
+		if app:
+			app.audio.blip("ratchet")
+	func value_rect() -> Rect2:
+		return Rect2(0, 22 * zoom + 14, size.x, 12)
+	func typed_step() -> float:
+		return 1.0
 	func _draw() -> void:
 		var tex := texture()
 		var ts := tex.get_size() * zoom
@@ -680,8 +817,18 @@ class PxSlider:
 		draw_texture_rect(tex, Rect2(64, 4, track_w, 7), false)
 		draw_string(f, Vector2(64 + track_w + 4, 12), value_text(), HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT)
 	func _gui_input(ev: InputEvent) -> void:
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+			step(1, "right" if ev.button_index == MOUSE_BUTTON_WHEEL_UP else "left")
+			accept_event()
+			return
 		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
 			if ev.pressed:
+				if ev.position.x >= 64 + track_w + 2:
+					if app and rack:
+						app.focus_on(rack, rack.controls.find(self), false)
+					var e := NumberEntry.new()
+					e.open(self, Rect2(64 + track_w + 2, -1, maxf(size.x - 64 - track_w - 2, 40), 16), T.fmt(value, places), func(n): set_value(n); commit(), 1.0 if places == 0 else pow(10.0, -places))
+					return
 				var now := Time.get_ticks_msec()
 				if now - last_click < 350:
 					reset()
@@ -834,6 +981,10 @@ class Timeline:
 	var on_pick: Callable
 	var thumb := 36
 	var marks := {}                 # frame index -> a letter (H hold, X deleted, M mirrored)
+	var on_reorder: Callable        # (from, to): a thumbnail dragged to another place
+	var _drag_i := -1
+	var _drag_to := -1
+	var _press_x := 0.0
 	func setup(list: Array, cur: int, a: Node, cb: Callable) -> void:
 		texs = list
 		current = cur
@@ -876,15 +1027,37 @@ class Timeline:
 				draw_rect(Rect2(i * cell, 0, cell - 1, 1), T.ACCENT)
 				draw_rect(Rect2(i * cell, thumb - 1, cell - 1, 1), T.ACCENT)
 			var m := String(marks.get(i, ""))
-			draw_string(f, Vector2(i * cell, thumb + 12), str(i + 1) + m, HORIZONTAL_ALIGNMENT_CENTER, cell, T.SMALL_SIZE, T.ACCENT if i == current else T.DIM)
+			draw_string(f, Vector2(i * cell, thumb + 12), str(i + 1) + m, HORIZONTAL_ALIGNMENT_CENTER, cell, T.SMALL_SIZE, T.ACCENT if i == current else T.BONE)
+		if _drag_to >= 0 and _drag_i >= 0 and _drag_to != _drag_i:
+			var x: float = _drag_to * cell + (cell - 1 if _drag_to > _drag_i else 0)
+			draw_rect(Rect2(x - 1, 0, 2, thumb), T.GH)
 	func _gui_input(ev: InputEvent) -> void:
-		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT and texs.size() > 0:
+		if texs.is_empty():
+			return
+		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
 			var i := clampi(int(ev.position.x / _cell()), 0, texs.size() - 1)
-			if app:
-				app.focus_on(self, i, false)
-			set_sel(i)
-			if app:
-				app.audio.blip("ratchet")
+			if ev.pressed:
+				if app:
+					app.focus_on(self, i, false)
+				set_sel(i)
+				if app:
+					app.audio.blip("ratchet")
+				if on_reorder.is_valid():
+					_drag_i = i
+					_drag_to = -1
+					_press_x = ev.position.x
+			else:
+				if _drag_i >= 0 and _drag_to >= 0 and _drag_to != _drag_i and on_reorder.is_valid():
+					on_reorder.call(_drag_i, _drag_to)
+					if app:
+						app.audio.blip("clunk")
+				_drag_i = -1
+				_drag_to = -1
+				queue_redraw()
+		elif ev is InputEventMouseMotion and _drag_i >= 0:
+			if absf(ev.position.x - _press_x) > 6.0:
+				_drag_to = clampi(int(ev.position.x / _cell()), 0, texs.size() - 1)
+				queue_redraw()
 
 ## a card row (cue cards, pads, preset cards): name + a line, in columns; selectable
 class Cards:

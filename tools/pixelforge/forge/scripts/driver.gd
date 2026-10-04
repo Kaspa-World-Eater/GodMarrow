@@ -18,14 +18,22 @@ extends Node
 ##   say TEXT                print a line to the terminal
 ##   geometry                print the picture window's, the text box's and the rows' rects (a check hook)
 ##   dumplog                 print the backend's log so far
+##   edit COMMAND...          one editor command (the Editor screen's exec_line: GUIDE_AI lists them); prints EDIT {result}
+##   edits FILE               a JSON file of editor commands: ["tool brush", "stroke 4 4 9 4", ...] or [{"cmd": "stroke", "args": [4, 4, 9, 4]}]
 ##   quit
+## --edits=FILE on the command line runs a JSON file of editor commands by itself (the screen must be the editor), then quits.
 
 var app: Node
 var path := ""
+var json_path := ""
 var lines: PackedStringArray = []
 var i := 0
 
 func _ready() -> void:
+	if json_path != "":
+		lines = PackedStringArray(["edits " + json_path, "quit"])
+		call_deferred("_run")
+		return
 	var f := FileAccess.open(path, FileAccess.READ)
 	if f == null:
 		push_error("no script at " + path)
@@ -107,6 +115,13 @@ func _run() -> void:
 			"dumplog":
 				for l in app.backend.log_lines:
 					print("LOG ", l)
+			"edit":
+				_edit(arg)
+				await _settle(0.1)
+			"edits":
+				for l in _json_lines(arg):
+					_edit(l)
+					await _settle(0.05)
 			"quit":
 				get_tree().quit()
 				return
@@ -114,6 +129,34 @@ func _run() -> void:
 				print("SCRIPT unknown: ", line)
 	print("SCRIPT done")
 	get_tree().quit()
+
+## one editor command, on the Editor screen (or the Characters bench's Frames tab when it hosts one)
+func _edit(line: String) -> void:
+	var ed = app.current
+	if ed == null or not ed.has_method("exec_line"):
+		print("EDIT {\"ok\": false, \"error\": \"the editor is not open\"}")
+		return
+	var r: Dictionary = ed.exec_line(line)
+	print("EDIT ", JSON.stringify(r))
+
+## the lines of a JSON command file: strings, or {"cmd": ..., "args": [...]}
+static func _json_lines(file: String) -> PackedStringArray:
+	var out: PackedStringArray = []
+	var f := FileAccess.open(file, FileAccess.READ)
+	if f == null:
+		print("EDIT no file at ", file)
+		return out
+	var d = JSON.parse_string(f.get_as_text())
+	var list: Array = d if d is Array else (d.get("commands", []) if d is Dictionary else [])
+	for item in list:
+		if item is String:
+			out.append(item)
+		elif item is Dictionary:
+			var words := [String(item.get("cmd", ""))]
+			for a in item.get("args", []):
+				words.append(str(a))
+			out.append(" ".join(PackedStringArray(words)))
+	return out
 
 func _geometry() -> void:
 	print("GEOM scene ", app.scene.position, " ", app.scene.size, " layer ", app.layer.position, " ", app.layer.size, " tabs ", app.tabs_ctrl.position, " ", app.tabs_ctrl.size, " visible ", app.tabs_ctrl.visible)

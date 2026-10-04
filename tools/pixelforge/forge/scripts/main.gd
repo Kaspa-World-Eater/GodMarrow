@@ -8,6 +8,7 @@ extends Node
 ##   --screen=NAME [--tab=NAME --model=FILE --advanced --env=NAME --light=0|1|2 ...]   open a screen directly (test hook)
 ##   --shot=PATH [--shot_t=S] [--shot_n=N]   save the window to PATH after S seconds (default 2), N frames 0.1 s apart, then quit
 ##   --script=FILE   drive a sequence of inputs (scripts/driver.gd lists the lines), then quit
+##   --edits=FILE    run a JSON file of editor commands on the open editor (--screen=editor ...), then quit
 ##   --log[=S]       open the log drawer after S seconds
 
 var app: Control
