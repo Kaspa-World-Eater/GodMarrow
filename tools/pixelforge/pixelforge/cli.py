@@ -345,7 +345,7 @@ def cmd_project(a) -> None:
         elif sub == "import":
             _emit(a, api.import_source(project, a.character, a.kind, a.file))
         elif sub == "export-game":
-            _emit(a, api.export_game(project, a.character, kind=a.kind, out_dir=a.out, category=a.category, display_name=a.name))
+            _emit(a, api.export_game(project, a.character, kind=a.kind, out_dir=a.out, category=a.category, display_name=a.name, skin_for=a.skin_for))
         elif sub == "import-shapes":
             _emit(a, api.import_shapes(project, a.character, a.file))
         elif sub == "render-shapes":
@@ -956,6 +956,7 @@ def build_parser() -> argparse.ArgumentParser:
     x = ps.add_parser("export-game", help="export in Godmarrow's art/sprites format (+ normal/depth sets)"); x.add_argument("character")
     x.add_argument("--kind", help="sprite kind name (default: character name)"); x.add_argument("--out", help="output folder (default: characters/<name>/export_game)")
     x.add_argument("--category", default="hero"); x.add_argument("--name", help="display name")
+    x.add_argument("--skin-for", dest="skin_for", default=None, metavar="CLASS", help="the game class this set stands in for in art/sprites/skins.json (default: the kind itself); written when --out is the game's sprites folder")
     x = ps.add_parser("check", help="the automatic checks on a character's cutouts, carve and frames (plain English)"); x.add_argument("character")
     x = ps.add_parser("run-all", help="run every remaining automatic step"); x.add_argument("character", nargs="?", help="omit with --all"); x.add_argument("--all", action="store_true", help="every character in the project, in turn")
     x = ps.add_parser("still", help="quick path: one image -> sprite (-> animation -> export)"); x.add_argument("character")

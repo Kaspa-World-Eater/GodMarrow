@@ -55,6 +55,32 @@ GAME_FIGURE_HEIGHTS = {"hero": 195}
 HEIGHT_TOLERANCE = 0.10
 
 
+def write_skins_entry(out_dir: str | Path, kind: str, skin_for: str | None = None, *, always: bool = False) -> dict | None:
+    """Add or update the game's ``art/sprites/skins.json`` entry that makes the hero loader use this set: ``{"<class>":
+    "<kind>"}`` (``skin_for`` is the class the set stands in for; the kind itself when not given). Written when the
+    out folder already has a ``skins.json`` or is the game's ``sprites`` folder (or ``always``); a plain export
+    folder gets none. Returns ``{"file", "key", "kind", "changed"}`` or None when nothing was written."""
+    out_dir = Path(out_dir)
+    sk = out_dir / "skins.json"
+    if not (always or sk.exists() or out_dir.name == "sprites"):
+        return None
+    data = {}
+    if sk.exists():
+        try:
+            data = json.loads(sk.read_text())
+        except json.JSONDecodeError:
+            data = {}
+        if not isinstance(data, dict):
+            data = {}
+    key = skin_for or kind
+    changed = data.get(key) != kind
+    data[key] = kind
+    if changed or not sk.exists():
+        data.setdefault("_about", "which sprite set stands in for a kind; the PixelForge hero builds replace the old painter sets here")
+        sk.write_text(json.dumps(data, indent=1) + "\n")
+    return {"file": str(sk), "key": key, "kind": kind, "changed": changed}
+
+
 def figure_height_of(frames_dir: str | Path, manifest: dict | None = None) -> float | None:
     """The height in sprite px of the standing figure in a frames folder: for a shape render the file's height times
     the render scale (both in the manifest); otherwise the opaque height of the first idle frame facing S (or of the

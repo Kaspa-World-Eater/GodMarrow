@@ -376,3 +376,43 @@ def test_draft_calls_the_kit_from_its_nouns(tmp_path):
     plain = describe.draft_shapes("a warrior with a sword")["doc"]
     assert not any(s["name"].startswith(("plank", "greave", "loc_", "chestchain", "shackle")) for s in plain["shapes"])
     assert T.still(S.load_shapes(tmp_path / "k.shapes.json"), tmp_path / "k.png", direction="S", style="gothic_hd")["filled"] > 3000
+
+
+# ------------------------------------------------------------------------------------------- 6. the skins entry
+def test_export_game_writes_the_skins_entry_into_the_games_sprites_folder(tmp_path):
+    from pixelforge.godmarrow_export import write_skins_entry
+    plain = tmp_path / "export"; plain.mkdir()
+    assert write_skins_entry(plain, "x") is None and not (plain / "skins.json").exists()      # a plain export folder: nothing
+    sprites = tmp_path / "art" / "sprites"; sprites.mkdir(parents=True)
+    r = write_skins_entry(sprites, "hemomancer")
+    assert r["changed"] and json.loads((sprites / "skins.json").read_text())["hemomancer"] == "hemomancer"
+    (sprites / "skins.json").write_text(json.dumps({"_about": "x", "animancer": "mystic"}))
+    r = write_skins_entry(sprites, "keeper_shapes", skin_for="miasmancer")
+    data = json.loads((sprites / "skins.json").read_text())
+    assert data == {"_about": "x", "animancer": "mystic", "miasmancer": "keeper_shapes"} and r["key"] == "miasmancer"
+    assert write_skins_entry(sprites, "keeper_shapes", skin_for="miasmancer")["changed"] is False
+    other = tmp_path / "other"; other.mkdir(); (other / "skins.json").write_text("{}")
+    assert write_skins_entry(other, "k")["file"].endswith("skins.json")                      # an existing skins.json anywhere is kept up
+    # through the project road
+    api.new_project(tmp_path / "proj", "p", style="rendered_arpg")
+    from pixelforge.project import Project
+    project = Project.load(tmp_path / "proj")
+    api.add_character(project, "keeper", "the keeper")
+    api.import_shapes(project, "keeper", S.ASSETS / "characters" / "keeper.shapes.json")
+    api.render_shapes(project, "keeper", clips="idle", directions="S")
+    g = api.export_game(project, "keeper", kind="keeper_shapes", out_dir=sprites, skin_for="miasmancer")
+    assert g["skins"]["key"] == "miasmancer" and json.loads((sprites / "skins.json").read_text())["miasmancer"] == "keeper_shapes" and "--cls=miasmancer" in g["godot"]
+    g = api.export_game(project, "keeper", kind="keeper_shapes", out_dir=tmp_path / "game")
+    assert g["skins"] is None
+
+
+def test_the_games_hero_loader_prefers_the_pixelforge_set_over_unclipped():
+    hero = (REPO / "entities" / "hero.gd").read_text()
+    data = (REPO / "core" / "data.gd").read_text()
+    assert "func is_pixelforge_set(kind: String) -> bool:" in data and '"pixelforge"' in data
+    line = next(l for l in hero.splitlines() if "_unclipped.json" in l and l.strip().startswith("if "))
+    assert "Data.skin_for(c) == c" in line and "not Data.is_pixelforge_set(c)" in line
+    # the committed Hemomancer set is such a build, and skins.json names it
+    meta = json.loads((REPO / "art" / "sprites" / "hemomancer.json").read_text())["meta"]
+    assert meta.get("source") == "pixelforge"
+    assert json.loads((REPO / "art" / "sprites" / "skins.json").read_text()).get("hemomancer") == "hemomancer"

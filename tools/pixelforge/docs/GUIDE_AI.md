@@ -108,7 +108,7 @@ pixelforge project run <character> render [--frame-step 2] [--elevation 30] [--p
 pixelforge project run <character> pixelate [--outline auto|none|#hex]
 pixelforge project preview-gif <character> [--clip walk] [--dir S]     # previews/<clip>_<dir>.gif
 pixelforge project run <character> export        # generic Godot SpriteFrames (.tres/.tscn)
-pixelforge project export-game <character> --kind <kind> [--name "Display Name"]   # GODMARROW format: art/sprites/<kind>.png|json (+ _normal/_depth sets)
+pixelforge project export-game <character> --kind <kind> [--name "Display Name"] [--out <game>/art/sprites] [--skin-for <class>]   # GODMARROW format: art/sprites/<kind>.png|json (+ _normal/_depth sets); into the game's sprites folder it also writes the skins.json entry {"<class or kind>": "<kind>"} and warns when the figure is not the game's height
 pixelforge project run-all <character>            # runs the remaining automatic steps, stops where blocked
 pixelforge project run <character> render --passes color,normal,depth   # also render lighting maps (slower: 3 renders per frame)
 
@@ -313,7 +313,7 @@ pixelforge project add <character> -p <folder>
 pixelforge project import-shapes <character> FILE -p <folder>      # the character now renders from the file; the painting steps are skipped
 pixelforge project render-shapes <character> -p <folder> [--style S] [--clips ...] [--directions ...]   # frames/<clip>_<DIR>/frame_NNN.png + animations.json + renders/manifest.json
 pixelforge project run <character> shapes -p <folder>              # the same as a step; run-all runs it when the character has a shape file
-pixelforge project export-game <character> --kind <kind> -p <folder>   # unchanged: the game's atlas with foot anchors, from those frames
+pixelforge project export-game <character> --kind <kind> -p <folder> [--out <game>/art/sprites] [--skin-for <class>]   # the game's atlas with foot anchors, from those frames; into art/sprites it also writes the skins.json entry (the hero loader prefers a PixelForge set over <kind>_unclipped) and warns when the figure is not 195 px
 pixelforge project preview-shapes <character> --clip idle --direction S -p <folder>
 ```
 

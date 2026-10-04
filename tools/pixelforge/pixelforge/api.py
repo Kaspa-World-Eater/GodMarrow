@@ -786,14 +786,16 @@ def export(project: Project, name: str, fps: float | None = None) -> dict:
 
 # ------------------------------------------------------------- game export
 def export_game(project: Project, name: str, kind: str | None = None, out_dir: str | Path | None = None, category: str = "hero", display_name: str | None = None,
-                log=None) -> dict:
+                log=None, skin_for: str | None = None) -> dict:
     """Export in Godmarrow's own sprite-set format (``art/sprites/<kind>.png|json``),
     plus ``<kind>_normal`` / ``<kind>_depth`` sets when those passes were rendered.
 
     The result carries ``warnings``: the frames' figure height is checked against the game's preset for the
     category (a hero is 195 px, the ``godmarrow`` look), so a set rendered at another look is called out before it
-    goes into the game at the wrong size."""
-    from .godmarrow_export import export_godmarrow, height_warning
+    goes into the game at the wrong size. When the out folder is the game's ``art/sprites`` (or has a
+    ``skins.json``), the ``skins.json`` entry ``{"<skin_for or kind>": "<kind>"}`` is written too, so the hero
+    loader uses this set instead of an older ``<kind>_unclipped`` one (``skins`` in the result)."""
+    from .godmarrow_export import export_godmarrow, height_warning, write_skins_entry
 
     c = project.character(name)
     kind = kind or c.name
@@ -815,11 +817,15 @@ def export_game(project: Project, name: str, kind: str | None = None, out_dir: s
     if hw:
         warnings.append(hw)
         (log or print)("warning: " + hw)
+    skins = write_skins_entry(out, kind, skin_for) if category == "hero" else None
+    if skins and log:
+        log(f"skins.json: {skins['key']} -> {skins['kind']}")
     c.done["export"] = True
     c.notes["export_game"] = f"{r['color']['frames']} frames, sheet {r['color']['sheet']}" + (f"; WARNING {hw}" if hw else "")
     c.notes["export_game_json"] = str(r["color"]["json"])
     project.save()
-    return {"ok": True, "character": c.name, "kind": kind, **r, "warnings": warnings, "godot": f"copy {out}/* into the game's art/sprites/ and run with --skin={kind}"}
+    return {"ok": True, "character": c.name, "kind": kind, **r, "warnings": warnings, "skins": skins,
+            "godot": f"copy {out}/* into the game's art/sprites/ and run with --skin={kind}" if not skins else f"in the game: --cls={skins['key']} (skins.json maps it to {kind})"}
 
 
 def reset_character(project: Project, name: str, keep_sources: bool = True, steps: list[str] | None = None) -> dict:

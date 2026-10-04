@@ -60,7 +60,9 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 	cls = c
 	tp = at
 	var kind := c
-	if ResourceLoader.exists("res://art/sprites/%s_unclipped.json" % c):
+	# the old painter variant "<kind>_unclipped" only when nothing newer stands in: no skins.json entry for the class
+	# (Data.skin_for) and no PixelForge build of the class's own set (meta.source "pixelforge")
+	if Data.skin_for(c) == c and not Data.is_pixelforge_set(c) and ResourceLoader.exists("res://art/sprites/%s_unclipped.json" % c):
 		kind = c + "_unclipped"
 	for a in OS.get_cmdline_user_args():   # --skin=ossuarch: a look test of another body on this order's moves
 		if a.begins_with("--skin=") and FileAccess.file_exists("res://art/sprites/%s.json" % a.substr(7)):

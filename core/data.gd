@@ -47,6 +47,26 @@ func skin_for(kind: String) -> String:
 		return str(_skins[base])
 	return kind
 
+var _pf_sets := {}
+
+func is_pixelforge_set(kind: String) -> bool:
+	## whether art/sprites/<kind>.json is a PixelForge build (its meta says "source": "pixelforge"): the hero loader
+	## prefers such a set over the old "<kind>_unclipped" painter variant, so a new build is used as soon as it lands.
+	if _pf_sets.has(kind):
+		return _pf_sets[kind]
+	var ok := false
+	var path := "res://art/sprites/%s.json" % kind
+	if FileAccess.file_exists(path):
+		var f := FileAccess.open(path, FileAccess.READ)
+		if f:
+			var d = JSON.parse_string(f.get_as_text())
+			if d is Dictionary:
+				var meta = d.get("meta", {})
+				if meta is Dictionary:
+					ok = str(meta.get("source", "")) == "pixelforge"
+	_pf_sets[kind] = ok
+	return ok
+
 func sprite_set(kind: String) -> SpriteSet:
 	kind = skin_for(kind)
 	if _sets.has(kind):
