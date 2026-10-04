@@ -64,7 +64,7 @@ var gi := -1
 var sel_t := 0.0
 var flash := -1.0
 var hover_drop := false
-var style_name := "gothic_hd"
+var style_name := "godmarrow"
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -139,7 +139,7 @@ func _ready() -> void:
 	add_child(dissolve)
 	Input.set_custom_mouse_cursor(PX.cursor(), Input.CURSOR_ARROW, Vector2(0, 0))
 	get_window().files_dropped.connect(_on_files_dropped)
-	style_name = backend.project_style(String(cfg.get("style", "gothic_hd")))
+	style_name = backend.project_style(String(cfg.get("style", "godmarrow")))
 	_foot_update()
 	var first := String(args.get("screen", "home"))
 	if not SCREENS.has(first):

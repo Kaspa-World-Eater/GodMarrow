@@ -118,7 +118,7 @@ func ensure_project(style: String, on_done: Callable = Callable()) -> void:
 	run(["project", "new", project_dir, "--name", "Forge", "--style", style], "project new", on_done)
 
 ## the style the project is set to (project.json), else the default
-func project_style(fallback: String = "gothic_hd") -> String:
+func project_style(fallback: String = "godmarrow") -> String:
 	var d := read_json(project_dir.path_join("project.json"))
 	var s = d.get("settings", {}).get("style", d.get("style", ""))
 	if s is String and s != "":

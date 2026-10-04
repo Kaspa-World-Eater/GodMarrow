@@ -18,9 +18,26 @@ from PIL import Image, ImageDraw
 from . import shapes as S
 from . import shape_rig as R
 from .spritesheet import save_gif
-from .styles import Style, get_style
+from .styles import CHARACTER_STYLE, Style, get_style
 
 GREY = (94, 93, 98, 255)
+
+
+def is_character(doc: dict) -> bool:
+    """A solid file whose shapes ride bones (directly or through parts): a figure the clips move, not an object."""
+    if S.mode_of(doc) != "solid":
+        return False
+    parts = doc.get("parts") or {}
+    for sh in doc.get("shapes", []):
+        if sh.get("bone") or (sh.get("part") and parts.get(sh["part"], {}).get("bone")):
+            return True
+    return False
+
+
+def default_style_for(doc: dict) -> str | None:
+    """The preset a file renders with when none is named: a character takes the game's hero height
+    (:data:`pixelforge.styles.CHARACTER_STYLE`, 195 px); an object or a flat file keeps its own size (None)."""
+    return CHARACTER_STYLE if is_character(doc) else None
 
 
 def options_for(doc: dict, style: str | Style | None, scale: float | None = None, steps: int | None = None, outline=None,

@@ -31,7 +31,7 @@ from .rig import estimate_skeleton, write_skeleton
 from .prompts import PROMPT_KINDS, RULES, build_all
 from .sheet import cutout, normalize_heights, split_sheet
 from .spritesheet import pack, save_gif
-from .styles import STYLES, DEFAULT_STYLE, Style, get_style, options_for_style, style_table
+from .styles import STYLES, DEFAULT_PROJECT_STYLE, DEFAULT_STYLE, Style, get_style, options_for_style, style_table
 
 BLENDER_DIR = Path(__file__).parent / "blender"
 
@@ -41,7 +41,7 @@ class StepError(RuntimeError):
 
 
 # ------------------------------------------------------------------ projects
-def new_project(root: str | Path, name: str, style: str = "hd") -> dict:
+def new_project(root: str | Path, name: str, style: str = DEFAULT_PROJECT_STYLE) -> dict:
     get_style(style)
     p = Project.create(root, name, style=style)
     return {"ok": True, "project": str(p.file), **p.summary()}
@@ -785,10 +785,15 @@ def export(project: Project, name: str, fps: float | None = None) -> dict:
 
 
 # ------------------------------------------------------------- game export
-def export_game(project: Project, name: str, kind: str | None = None, out_dir: str | Path | None = None, category: str = "hero", display_name: str | None = None) -> dict:
+def export_game(project: Project, name: str, kind: str | None = None, out_dir: str | Path | None = None, category: str = "hero", display_name: str | None = None,
+                log=None) -> dict:
     """Export in Godmarrow's own sprite-set format (``art/sprites/<kind>.png|json``),
-    plus ``<kind>_normal`` / ``<kind>_depth`` sets when those passes were rendered."""
-    from .godmarrow_export import export_godmarrow
+    plus ``<kind>_normal`` / ``<kind>_depth`` sets when those passes were rendered.
+
+    The result carries ``warnings``: the frames' figure height is checked against the game's preset for the
+    category (a hero is 195 px, the ``godmarrow`` look), so a set rendered at another look is called out before it
+    goes into the game at the wrong size."""
+    from .godmarrow_export import export_godmarrow, height_warning
 
     c = project.character(name)
     kind = kind or c.name
@@ -805,11 +810,16 @@ def export_game(project: Project, name: str, kind: str | None = None, out_dir: s
     st = style_of(project, c)
     r = export_godmarrow(frames, manifest, out, kind, category=category, display_name=display_name or c.name, extra_passes=extra,
                          max_frames=st.clip_frames, extra_meta={"style": st.name, "pixel_step": st.pixel_step, "figure_height": st.figure_height})
+    warnings = []
+    hw = height_warning(frames, manifest, category)
+    if hw:
+        warnings.append(hw)
+        (log or print)("warning: " + hw)
     c.done["export"] = True
-    c.notes["export_game"] = f"{r['color']['frames']} frames, sheet {r['color']['sheet']}"
+    c.notes["export_game"] = f"{r['color']['frames']} frames, sheet {r['color']['sheet']}" + (f"; WARNING {hw}" if hw else "")
     c.notes["export_game_json"] = str(r["color"]["json"])
     project.save()
-    return {"ok": True, "character": c.name, "kind": kind, **r, "godot": f"copy {out}/* into the game's art/sprites/ and run with --skin={kind}"}
+    return {"ok": True, "character": c.name, "kind": kind, **r, "warnings": warnings, "godot": f"copy {out}/* into the game's art/sprites/ and run with --skin={kind}"}
 
 
 def reset_character(project: Project, name: str, keep_sources: bool = True, steps: list[str] | None = None) -> dict:

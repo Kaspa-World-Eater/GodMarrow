@@ -172,6 +172,8 @@ STYLES: dict[str, Style] = {
 }
 
 DEFAULT_STYLE = "hd"
+DEFAULT_PROJECT_STYLE = "godmarrow"     # a new project is for the game unless it says otherwise: heroes 195 px, every colour kept
+CHARACTER_STYLE = "godmarrow"           # a shape character renders at the game's hero height when no preset is named
 LOOKS = [k for k, v in STYLES.items() if v.group == "look"]
 FIELDS = [f.name for f in fields(Style)]
 

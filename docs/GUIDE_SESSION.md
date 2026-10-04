@@ -59,7 +59,8 @@ Every command prints what it did; `--json` gives the same as a dict. `<name>` is
 (`keeper`, `warden`), `<folder>` a project folder of your choosing.
 
 ```
-# the author pose: every bone's head and tail in file units, to draw shapes around (120 px tall for the gothic look)
+# the author pose: every bone's head and tail in file units, to draw shapes around (a file is authored at 120 units and
+# rendered at any size; the game draws heroes at 195 px, the godmarrow preset, which is the default for a character)
 pixelforge shapes template --height 120 -o tpl.json --png tpl.png
 
 # a starter file from a sentence: a humanoid on the author pose, the costume words as parts and materials
@@ -67,16 +68,16 @@ pixelforge shapes draft "a shrine keeper with a wide straw hat, violet wrappings
 
 # check it, look at it standing (front and side), look at it moving
 pixelforge shapes validate <name>.shapes.json
-pixelforge shapes still <name>.shapes.json -o still_S.png --direction S --style gothic_hd --zoom 3
-pixelforge shapes still <name>.shapes.json -o still_E.png --direction E --style gothic_hd --zoom 3
-pixelforge shapes preview <name>.shapes.json --clip walk --direction E --style gothic_hd -o walk_E.gif
-pixelforge shapes sheet <name>.shapes.json -o sheet.png --clips idle,walk --style gothic_hd
+pixelforge shapes still <name>.shapes.json -o still_S.png --direction S --style godmarrow --zoom 3
+pixelforge shapes still <name>.shapes.json -o still_E.png --direction E --style godmarrow --zoom 3
+pixelforge shapes preview <name>.shapes.json --clip walk --direction E --style godmarrow -o walk_E.gif
+pixelforge shapes sheet <name>.shapes.json -o sheet.png --clips idle,walk --style godmarrow
 
 # edit the file (see 5), repeat the three looks until it passes (see 6); then every clip in every direction
-pixelforge shapes render <name>.shapes.json -o frames --style gothic_hd --gif
+pixelforge shapes render <name>.shapes.json -o frames --style godmarrow --gif
 
 # into the game's format through a project (the exporter adds the foot anchors)
-pixelforge project new <folder> --style gothic_hd
+pixelforge project new <folder> --style godmarrow
 pixelforge project add <name> -p <folder>
 pixelforge project import-shapes <name> <name>.shapes.json -p <folder>
 pixelforge project render-shapes <name> -p <folder>
@@ -114,7 +115,7 @@ The file is the sprite. Every shape is named; change numbers, re-render, look. T
   where the hem ends (`y` of the skirt ring), the held thing. Then the materials (the ramps), then details (rules).
 - **Too bright / too dark.** Swap the material (`straw` is a weathered brown; the library's `gold6` is bright) or add a
   file material that aliases a library ramp with `"lift": -0.1`. Tone offsets: `"t": -1` on a shape or a rule.
-- **The eyes do not show.** The eye rule's `near` radius (1.4 at 120 px gives a 3 px glow; 0.6 with `"t": 1` on
+- **The eyes do not show.** The eye rule's `near` radius (1.4 in file units gives a 3 px glow at 120 px, 5 at 195; 0.6 with `"t": 1` on
   top for the hot core) and the hat's tilt (`rotate.x`, 16 degrees lifts the brim at the front).
 - **A part floats or detaches when it moves.** Garments and hanging things get `"hang"` on their part (0.25 for a
   skirt, 0.35 for a veil or cape, 0.5 for gourds): they take the bone's position and turn but only that fraction of
@@ -155,7 +156,7 @@ Judge the pictures, not the numbers alone; the numbers are what the tests check.
   directions; in the run the planted frames sit on that row and the airborne frames lift; the contact shadow never
   moves.
 - Hems, veils and cords swing after the body by a frame or two; the hat stays on the head in the attack.
-- The eyes show under the brim in the front and three-quarter views at the gothic size (120 px).
+- The eyes show under the brim in the front and three-quarter views at the game's size (195 px, `godmarrow`).
 - At the small size (76 px, `rendered_arpg`) the figure still reads as a silhouette: hat, shoulders, hem.
 - The exported atlas's frames sit on their anchors (`dy + h` within a few px of 0) and the game shows the figure on
   the moor at the right height (`--skin`).

@@ -80,7 +80,7 @@ func _reset_all() -> void:
 		app.audio.music_volume = 0.6
 		app.set_music(true)
 		app.backend.setup(app.args, app.cfg)
-		app.set_style(app.backend.project_style("gothic_hd"))
+		app.set_style(app.backend.project_style("godmarrow"))
 		rebuild())
 
 ## --- Folders

@@ -221,7 +221,7 @@ def build_server():
         return recolor_file(image, out, mapping=m, hue=hue, lightness=lightness, chroma=chroma)
 
     @mcp.tool()
-    def render_shape_sprite(file: str, out_dir: str, style: str = "gothic_hd", clips: str = "", directions: str = "", elevation: float = -1.0,
+    def render_shape_sprite(file: str, out_dir: str, style: str = "godmarrow", clips: str = "", directions: str = "", elevation: float = -1.0,
                             passes: bool = False, gif: bool = False) -> dict:
         """Render a .shapes.json (a character or object drawn by code) with the motion clips: every clip in every direction as real
         frames into out_dir/<clip>_<DIR>/frame_NNN.png (+ animations.json, manifest.json: what export / export_game read).
@@ -245,13 +245,13 @@ def build_server():
         return r
 
     @mcp.tool()
-    def preview_shape_sprite(file: str, out: str, clip: str = "idle", direction: str = "S", style: str = "gothic_hd", elevation: float = -1.0) -> dict:
+    def preview_shape_sprite(file: str, out: str, clip: str = "idle", direction: str = "S", style: str = "godmarrow", elevation: float = -1.0) -> dict:
         """A looping GIF of one clip in one direction from a .shapes.json, to judge the look and the motion."""
         from . import shape_tools, shapes as S
         return shape_tools.gif_of(S.load_shapes(file), clip, direction.upper(), out, style=style or None, elevation=None if elevation < 0 else elevation)
 
     @mcp.tool()
-    def shape_sheet(file: str, out: str, clips: str = "idle,walk", directions: str = "", style: str = "gothic_hd", columns: int = 8) -> dict:
+    def shape_sheet(file: str, out: str, clips: str = "idle,walk", directions: str = "", style: str = "godmarrow", columns: int = 8) -> dict:
         """A contact sheet PNG of a .shapes.json: a row per clip and direction, `columns` frames each."""
         from . import shape_rig, shape_tools, shapes as S
         doc = S.load_shapes(file)
@@ -266,7 +266,7 @@ def build_server():
         return shape_tools.contact_sheet(rows, out, columns=columns)
 
     @mcp.tool()
-    def shape_object(file: str, out_dir: str, name: str = "", directions: str = "S", style: str = "gothic_hd", game_objects: str = "", hr: float = 2.0) -> dict:
+    def shape_object(file: str, out_dir: str, name: str = "", directions: str = "S", style: str = "godmarrow", game_objects: str = "", hr: float = 2.0) -> dict:
         """A .shapes.json (a chest, a skull, a tree) as a game object: a trimmed PNG per direction with its foot anchor into out_dir,
         <name>.json beside them, and entries in the game's art/objects/objects.json when game_objects names it (hr = texels per world px)."""
         from . import shape_tools, shapes as S

@@ -19,7 +19,7 @@ from .quantize import DITHER_MODES
 from .project import SOURCE_KINDS
 from .prompts import PROMPT_KINDS, RULES, build_all, build_prompt
 from .spritesheet import pack, save_gif, slice_sheet
-from .styles import DEFAULT_STYLE, LOOKS, STYLES, describe_style, get_style, options_for_style, style_table
+from .styles import DEFAULT_PROJECT_STYLE, DEFAULT_STYLE, LOOKS, STYLES, describe_style, get_style, options_for_style, style_table
 from .transform import flip, rotate, spin_frames, turn
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".gif"}
@@ -607,7 +607,8 @@ def cmd_shapes(a) -> None:
     if problems:
         print("the file has problems:\n  " + "\n  ".join(problems), file=sys.stderr)
         sys.exit(1)
-    style = a.style or None
+    # a character renders at the game's hero height unless a preset or a scale is named; objects keep their own size
+    style = a.style or (shape_tools.default_style_for(doc) if a.scale is None else None)
     if sub == "render":
         clips = [c.strip() for c in a.clips.split(",")] if a.clips else list(shape_rig.GAME_CLIPS)
         dirs = [d.strip().upper() for d in a.directions.split(",")] if a.directions else list(shape_rig.DIRECTIONS)
@@ -888,7 +889,7 @@ def build_parser() -> argparse.ArgumentParser:
     common.add_argument("--project", "-p", help="project folder (default: current folder or a parent)")
     common.add_argument("--json", action="store_true", help="machine-readable output")
     ps = s.add_subparsers(dest="project_cmd", required=True, parser_class=lambda **kw: argparse.ArgumentParser(parents=[common], **kw))
-    x = ps.add_parser("new", help="create a project folder"); x.add_argument("folder"); x.add_argument("--name"); x.add_argument("--style", choices=sorted(STYLES), default=DEFAULT_STYLE)
+    x = ps.add_parser("new", help="create a project folder"); x.add_argument("folder"); x.add_argument("--name"); x.add_argument("--style", choices=sorted(STYLES), default=DEFAULT_PROJECT_STYLE, help="the look (default godmarrow: the game's, heroes 195 px)")
     ps.add_parser("status", help="what is done, what is next")
     x = ps.add_parser("reset", help="start a character over: delete what the steps made, keep the paintings and the shape file"); x.add_argument("character")
     x.add_argument("--all", action="store_true", help="also the imported paintings and the shape file"); x.add_argument("--steps", default=None, help="only these parts, e.g. frames,renders,export_game (redo from here)")
@@ -1032,8 +1033,8 @@ def build_parser() -> argparse.ArgumentParser:
     ss = s.add_subparsers(dest="shapes_cmd", required=True)
     def _render_args(x, out_default=None):
         x.add_argument("file", help="a .shapes.json")
-        x.add_argument("--style", default=None, help="a look preset: figure height, ramp length (bands) and outline rule (e.g. gothic_hd, rendered_arpg)")
-        x.add_argument("--scale", type=float, default=None, help="render scale instead of the preset's (1 = the file's own size)")
+        x.add_argument("--style", default=None, help="a look preset: figure height, ramp length (bands) and outline rule (default for a character: godmarrow, the game's 195 px; objects: the file's own size; also gothic_hd, rendered_arpg, ...)")
+        x.add_argument("--scale", type=float, default=None, help="render scale instead of the preset's (1 = the file's own size; given, no preset is assumed)")
         x.add_argument("--steps", type=int, default=None, help="ramp length instead of the preset's (0/omitted = each ramp's own)")
         x.add_argument("--outline", default=None, help="none | auto | #rrggbb (default: the preset's rule)")
         x.add_argument("--elevation", type=float, default=None, help="camera degrees above level (default: the file's view)")

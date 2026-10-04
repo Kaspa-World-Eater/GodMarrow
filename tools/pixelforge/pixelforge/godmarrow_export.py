@@ -49,6 +49,41 @@ HERO_ANIMS = {
     "run": ("run", 24),
 }
 MAX_SHEET = 4096   # a sheet never grows past this on either side; more frames go on further sheets
+# the figure height (sprite px) the game draws each category at: a hero is the godmarrow preset's 195 px. A set
+# rendered at another look (gothic_hd's 120) stands in the game a head too short, which is what export_game warns about.
+GAME_FIGURE_HEIGHTS = {"hero": 195}
+HEIGHT_TOLERANCE = 0.10
+
+
+def figure_height_of(frames_dir: str | Path, manifest: dict | None = None) -> float | None:
+    """The height in sprite px of the standing figure in a frames folder: for a shape render the file's height times
+    the render scale (both in the manifest); otherwise the opaque height of the first idle frame facing S (or of the
+    first frame found). None when there is nothing to measure."""
+    manifest = manifest or {}
+    if manifest.get("figure_height") and manifest.get("render_scale"):
+        return float(manifest["figure_height"]) * float(manifest["render_scale"])
+    frames_dir = Path(frames_dir)
+    sample = next(iter(sorted(frames_dir.glob("idle_S/frame_*.png"))), None) or next(frames_dir.glob("*/frame_000.png"), None)
+    if sample is None:
+        return None
+    alpha = np.asarray(Image.open(sample).convert("RGBA"))[..., 3]
+    rows = np.nonzero(alpha.any(axis=1))[0]
+    return float(rows.max() - rows.min() + 1) if len(rows) else None
+
+
+def height_warning(frames_dir: str | Path, manifest: dict | None, category: str) -> str | None:
+    """A plain sentence when the frames' figure height is not the game's for ``category`` (within
+    :data:`HEIGHT_TOLERANCE`), else None. Categories the game has no fixed height for never warn."""
+    want = GAME_FIGURE_HEIGHTS.get(category)
+    if not want:
+        return None
+    have = figure_height_of(frames_dir, manifest)
+    if have is None:
+        return None
+    if abs(have - want) / want <= HEIGHT_TOLERANCE:
+        return None
+    return (f"the frames' figure is about {have:.0f} px tall but the game draws a {category} at {want} px (the godmarrow preset): "
+            f"it will stand {'short' if have < want else 'tall'} in the game. Render with --style godmarrow (or the project's style set to it) and export again.")
 
 
 def resample_indices(n_src: int, n_dst: int, loop: bool) -> list[int]:

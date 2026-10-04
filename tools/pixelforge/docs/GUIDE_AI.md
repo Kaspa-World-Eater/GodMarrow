@@ -328,8 +328,9 @@ square with the ground at the bottom. The frames folder's `manifest.json` carrie
 
 ### The procedure for an AI
 
-1. `pixelforge shapes template --height 120 --png tpl.png` (120 for the gothic hi-res look; a file is authored at one
-   height and rendered at any). Read the bone table: every bone's head and tail in file units, y down, x across, z
+1. `pixelforge shapes template --height 120 --png tpl.png` (a file is authored at one height, 120 units, and rendered
+   at any; a character renders at the game's hero height, the `godmarrow` preset's 195 px, whenever no `--style` or
+   `--scale` is given, and `export-game` warns when a set's figure height is not the game's for its category). Read the bone table: every bone's head and tail in file units, y down, x across, z
    toward the viewer, the figure facing you, its left hand on +x. The ground line and the body axis are in the table.
 2. Write the file around those bones (or start from `shapes draft "<sentence>"` and edit): a shape per body part
    bound to its bone, garments as rings that `hang`, details as rules. Use the material library by name or add your
@@ -338,8 +339,8 @@ square with the ground at the bottom. The frames folder's `manifest.json` carrie
 3. `pixelforge shapes validate FILE`, then `shapes still FILE -o f.png --direction S` and `--direction E` to judge the
    figure, `shapes preview FILE --clip walk --direction E` to judge the motion, `--clip attack` and `--clip death`
    to find parts that detach. Fix what reads wrong: silhouette first (the hat, the shoulders, the hem), then
-   materials, then details.
-4. `pixelforge shapes render FILE -o frames --style gothic_hd` or, in a project, `project import-shapes` +
+   materials, then details. With a painting: `shapes compare FILE --ref sheet.png -o cmp.png` (below).
+4. `pixelforge shapes render FILE -o frames` (the `godmarrow` size) or, in a project, `project import-shapes` +
    `project render-shapes` + `project export-game --kind <kind>` (each with `-p <folder>`); copy the atlas into the
    game's `art/sprites/` and look with `pixelforge game-preview --skin <kind> --shot shot.png` (it imports the project's assets first,
    which takes minutes on a fresh checkout and seconds after; on a box without a display it runs the game under

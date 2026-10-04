@@ -274,7 +274,8 @@ punchy the colours are, how soft the edges are, how effects glow, how many frame
 and the size of a ground tile. Seven looks ship, each with an animated example of the Shrine Keeper in that look
 (`assets/styles/<look>.gif`; all of them side by side with their numbers in `assets/styles/styles_sheet.png`):
 
-- **Godmarrow**: the game's own look, 195 px tall, every colour kept, the dark edge.
+- **Godmarrow**: the game's own look, 195 px tall, every colour kept, the dark edge. The default: a character made
+  as a shape model renders at this size unless you pick another, and *Export sheets* warns when a set is not this tall.
 - **Gothic hi-res**: large finely drawn figures (120 px), dark gothic palette, soft shading, no outline.
 - **Rendered ARPG**: 76 px figures that look rendered, cool dark palette of 28 colours, no outline.
 - **SNES 16-bit**: chunky 56 px figures, 16 colours, hard outline, three flat shading bands in clean colour areas
