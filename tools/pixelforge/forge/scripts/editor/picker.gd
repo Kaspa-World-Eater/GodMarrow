@@ -38,8 +38,11 @@ func setup(ed, a: Node) -> void:
 	hex = LineEdit.new()
 	hex.text = Pal.hex(editor.colour)
 	hex.max_length = 7
-	hex.position = Vector2(FIELD_W * ZOOM + 72, 2)
+	hex.position = Vector2(FIELD_W * ZOOM + 72, 0)
 	hex.size = Vector2(72, 18)
+	hex.custom_minimum_size = Vector2(72, 18)
+	hex.add_theme_font_size_override("font_size", T.SMALL_SIZE)
+	hex.add_theme_constant_override("minimum_character_width", 7)
 	hex.text_submitted.connect(func(t: String):
 		if Color.html_is_valid(t):
 			editor.set_colour(Color.html(t))
@@ -107,18 +110,17 @@ func _draw() -> void:
 	draw_rect(Rect2(mx - 3, my - 3, 7, 7), T.BLACK, false, 1.0)
 	draw_rect(Rect2(mx - 2, my - 2, 5, 5), Color.WHITE, false, 1.0)
 	# the two colours, under the hex line
-	var cx := FIELD_W * ZOOM + 72
-	draw_rect(Rect2(cx, 24, 20, 14), c)
-	draw_rect(Rect2(cx, 24, 20, 14), T.BLACK, false, 1.0)
-	draw_rect(Rect2(cx + 22, 24, 12, 14), editor.colour2)
-	draw_rect(Rect2(cx + 22, 24, 12, 14), T.BLACK, false, 1.0)
-	draw_string(f, Vector2(cx + 38, 35), "X swaps", HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.BONE)
+	var cx := FIELD_W * ZOOM + 150
+	draw_rect(Rect2(cx, 2, 20, 14), c)
+	draw_rect(Rect2(cx, 2, 20, 14), T.BLACK, false, 1.0)
+	draw_rect(Rect2(cx + 22, 2, 12, 14), editor.colour2)
+	draw_rect(Rect2(cx + 22, 2, 12, 14), T.BLACK, false, 1.0)
+	draw_string(f, Vector2(cx + 40, 13), "X swaps the two", HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.BONE)
 	# the palette's swatches, from under the two colours
 	var pal: Pal = editor.doc.palette
 	var cur := pal.slot_of(c)
 	for i in pal.size():
 		var r := _swatch_rect(i)
-		r.position.y += 18
 		draw_rect(r, pal.colours[i])
 		if i == cur:
 			draw_rect(r.grow(1), T.GH, false, 1.0)
@@ -140,7 +142,6 @@ func _swatch_at(p: Vector2) -> int:
 	var pal: Pal = editor.doc.palette
 	for i in pal.size():
 		var r := _swatch_rect(i)
-		r.position.y += 18
 		if r.has_point(p):
 			return i
 	return -1

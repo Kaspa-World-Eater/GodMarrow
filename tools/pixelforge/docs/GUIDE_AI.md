@@ -632,7 +632,7 @@ well: a project named PixelForge is not the game). What the app runs, per bench:
 
 | bench | commands |
 |---|---|
-| Characters | `project new` (first use) · `project add <name>` · `project import-shapes <name> <file>` (a dropped or chosen `.shapes.json`, copied into `characters/<name>/shapes/`) · `shapes still <model> -o previews/still_<dir>.png --direction D --style S --zoom 1` (the standing picture; `--json` gives the foot anchor and the lights) · `shapes render <model> -o previews/frames --clips C --directions D --style S` (one clip for the Motion and Frames tabs) · `project render-shapes <name> --style S` (Render all) · `project export-game <name> --kind K --name N --out <dir>` (Export sheets; Put it in the game uses `--out <game>/art/sprites`) · `game-preview --import` · `game-preview --skin K [--shot]` · `project reset <name>` (Start over) · `skin <frame.png> '[{"op":"paint",...}]'` (the Frames tab's paint) · `prompt --describe ... --kind sheet_px` (Copy prompt). Every lever writes the model file (`doc`): solid offsets and scales, materials, ramps (OK-HSL hue / lightness / contrast / steps over the imported ramp), lights, the glow effects, `parts.*.lag`, `view.turn_step / move_step / elevation`. |
+| Characters | `project new` (first use) · `project add <name>` · `project import-shapes <name> <file>` (a dropped or chosen `.shapes.json`, copied into `characters/<name>/shapes/`) · `shapes still <model> -o previews/still_<dir>.png --direction D --style S --zoom 1` (the standing picture; `--json` gives the foot anchor and the lights) · `shapes render <model> -o previews/frames --clips C --directions D --style S` (one clip for the Motion and Frames tabs) · `project render-shapes <name> --style S` (Render all) · `project export-game <name> --kind K --name N --out <dir>` (Export sheets; Put it in the game uses `--out <game>/art/sprites`) · `game-preview --import` · `game-preview --skin K [--shot]` · `project reset <name>` (Start over) · the Frames tab's *Edit* (the editor below, on `previews/frames` or `frames/`) · `prompt --describe ... --kind sheet_px` (Copy prompt). Every lever writes the model file (`doc`): solid offsets and scales, materials, ramps (OK-HSL hue / lightness / contrast / steps over the imported ramp), lights, the glow effects, `parts.*.lag`, `view.turn_step / move_step / elevation`. |
 | Creatures | under construction: the same bench, the humanoid skeleton; `assets/shapes/necromancer_3d.shapes.json` as the example |
 | Objects | the model copied into `objects/<name>/` · `shapes still <model> --frame F --direction D` · `shapes object <model> -o <dir> --name N --directions S[,...] --style S --hr 2 [--game-objects <game>/art/objects/objects.json]` · `game-preview --place N` |
 | Effects | `vfx <kind> <name> -o <project>/fx --palette P --frames --fps --bands --seed --glow --haze --style S [--size W H] [--rotations 8|16]` · `spell new <name> -o fx --preset P` / `spell render <file> -o fx` (Layers) · `effect <painting> <name> -o fx --kind loop` (a painted effect) · into the game with `-o <game>/art/fx` · `game-preview --fx <name>` |
@@ -657,7 +657,9 @@ window after S seconds and quits; `--windowed`, `--nosound`, `--nomusic`, `--red
 `--script=FILE` drives a whole walkthrough, one line per step (`forge/scripts/driver.gd` lists them: `go SCREEN
 k=v`, `tab NAME`, `drop FILE`, `choose LABEL`, `set CONTROL VALUE`, `key ...`, `waitjob [S]`, `shot PATH`,
 `dumplog`, `quit`); this is how the Characters bench is verified end to end (drop the Keeper, Render all, Export
-sheets). `forge/tools/screens.sh OUT [WxH]` shoots every screen and prints `name | errors N`. Under xvfb:
+sheets). `forge/tools/screens.sh OUT [WxH]` shoots every screen and prints `name | errors N`; `godot --headless --path
+tools/pixelforge/forge --script res://tools/test_editor.gd` runs the editor's own checks (palette lock, fill, wand,
+undo/redo, clone offset, carry by frame index, anchors, the command line). Under xvfb:
 
 ```
 timeout 600 xvfb-run -a -s "-screen 0 1280x720x24" godot --path tools/pixelforge/forge --rendering-driver opengl3 \
@@ -677,6 +679,43 @@ grounds), `backend.gd` (the CLI runner), `app.gd` (the shell, the selector, the 
 (the base of every bench: tabs, racks, undo, Reset, Start over), `screens/*.gd` (one per bench), `driver.gd` (the
 walkthrough). No `.import` files and no `class_name`: everything loads from plain files, so the folder runs without
 an editor pass.
+
+### The editor's commands (the same functions a person clicks)
+
+The pixel editor (`forge/scripts/screens/editor.gd`, with the plain classes under `forge/scripts/editor/`: palette,
+pixels, document, history, carry, anchors) is opened by the Frames tab's *Edit*, by *Edit* on the Effects / Tiles /
+Interface export tabs, or directly: `--screen=editor --frames=<root> --clip=idle --direction=S [--frame=N]
+[--reference=PAINTING] [--name=keeper]`, `--screen=editor --image=FILE`, or `--screen=editor --model=FILE
+[--directions=S,E,N]` (renders the model's idle frames into the project's previews first). Every command below is one
+driver line `edit <command>` (`--script=FILE`), one entry of a JSON command file (`edits FILE` in a script, or
+`--edits=FILE` on the command line: `["tool brush", "stroke 4 4 9 4"]` or `[{"cmd": "stroke", "args": [4, 4, 9, 4]}]`),
+and in code `exec_line("...")`. Each prints `EDIT {json}` with `"ok"` and what it did. Points are frame pixels, frames
+are 1-based.
+
+| command | what |
+|---|---|
+| `info` | the open set: root, key, frame, size, tool, colour, lock, the palette (hex), selection count, layers, history, anchors, unsaved |
+| `tool NAME` | pencil, brush, eraser, fill, line, rect, ellipse, wand, lasso, select, move, clone, eyedropper, hand |
+| `colour #hex` / `colour SLOT` | the colour; while `lock locked` an off-palette colour is snapped (the result says `snapped` and the slot); `lock open` adds it (`added`) |
+| `size N` · `tolerance 0..1` · `global on|off` · `filled on|off` · `lock locked|open` | the brush size, the wand / fill tolerance (OKLab), global fill, filled shapes, the palette lock |
+| `frame N` · `direction D` · `clip NAME` | which frame the tools work on |
+| `stroke x y [x y ...]` | paint along the points with the tool (pencil, brush, eraser, clone); line / rect / ellipse use the first and last point |
+| `fill x y [global]` | the fill at a point |
+| `select rect x y w h [add|sub]` · `select wand x y [tol] [add|sub]` · `select lasso x y x y x y ... [add|sub]` · `select all|none|invert` | the selection (every tool then works inside it) |
+| `clear` · `move dx dy [copy]` · `mirror` · `flip` | clear, nudge (or copy) the selection; mirror left-right or flip top-bottom (the selection, else the frame) |
+| `clone_source x y [frame N] [direction D] [clip C]` | the clone stamp's source point, on this or another frame; the offset is fixed by the next stroke |
+| `undo` · `redo` · `history [N]` | the history; `history` lists it, `history N` leaves exactly N entries applied (0 = as opened) |
+| `carry clip|directions|all` | carry the last change on this frame; the result lists `landed` (key, frame, count) and `by` (part or position) |
+| `layer` · `layer add NAME` · `layer merge` · `layer delete` · `layer pick NAME` · `layer visible NAME on|off` · `layer opacity NAME 0..1` · `layer lock NAME on|off` | the layers of this frame |
+| `onion on|off` · `reference FILE|off` · `reference dim 0..1` | the onion skin and the reference overlay |
+| `anchor` · `anchor add EFFECT x y` · `anchor move ID x y` · `anchor scale ID k` · `anchor rotate ID deg` · `anchor direction ID all|S|E...` · `anchor lever ID NAME v` · `anchor remove ID` · `bake` | the effect anchors (`anchors.json` in the frame root); bake writes `<name>.anchors.json` beside the export and an `effects` key into the export's JSON |
+| `zoom N` · `pan x y` · `fit` | the canvas (no effect headless) |
+| `pixel x y` | the pixel's hex, palette slot, OKLab, part id (-1 without part masks) |
+| `save` | flatten the visible layers into the frame files (and `.layers/` for the paint layer), save the anchors |
+
+Frame data the editor writes: `<root>/<clip>_<DIR>/frame_NNN.png` (on save), `<root>/.layers/<clip>_<DIR>/frame_NNN.paint.png`,
+`<root>/anchors.json`. It reads `<root>/<clip>_<DIR>/frame_NNN.parts.png` as part-id masks when the render writes them
+(it does not yet: carry and anchors fall back to position, the result says `"by": "position"`).
 
 ## MCP server
 

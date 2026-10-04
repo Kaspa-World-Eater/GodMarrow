@@ -28,6 +28,10 @@ for t in Reference Model Materials Motion Frames Export; do
   shoot characters_${t,,} "--screen=characters --model=$KEEPER --tab=$t ${PAINTING:+--painting=$PAINTING}" 12
 done
 shoot characters_advanced "--screen=characters --model=$KEEPER --tab=Motion --advanced" 12
+# the editor on the Keeper's idle frames (S, E and N rendered first so Carry has somewhere to land)
+for t in Paint Colour Layers History Carry Effects; do
+  shoot editor_${t,,} "--screen=editor --model=$KEEPER --directions=S,E,N --tab=$t" 16
+done
 shoot creatures "--screen=creatures" 3
 for t in Model Materials Behaviour Export; do
   shoot objects_${t,,} "--screen=objects --model=$CHEST --tab=$t --env=crypt" 8

@@ -707,3 +707,34 @@ the Age of the Last Breath). Everything saved on branch `track/codex`: `docs/cod
 brief for whichever session takes it (decisions, state of the nine chapter drafts, the approved bestiary, conflicts to
 settle, order of work). The world page he was shown: https://claude.ai/artifact/HzgvhkQv63mo9YPmrSXfvn. `data/codex.json`
 on main is unchanged. This session returns to PixelForge.
+
+### 7.16 2026-10-04, track/editor: the pixel editor in the Forge
+
+**What.** A pixel editor on the Characters bench's Frames tab (*Edit*, on the clip and direction the engine rendered)
+and on any picture (*Edit* on the Effects / Tiles / Interface export tabs, or a drop), in the approved look. Tools:
+pencil, brush with size, eraser, fill (contiguous and global), line, rectangle, ellipse, wand (OKLab tolerance), lasso,
+rectangle select (shift adds, alt subtracts), move (alt copies; arrows nudge), clone stamp (alt-click the source, on
+this or another frame or direction; the offset follows the brush), eyedropper (anything on screen), pan; the palette
+lock (the frame set's colours; locked snaps and says which slot, open adds and counts); layers (base, paint, more;
+merge, delete, lock, opacity, mirror, flip; the reference painting as a dimmable overlay; onion skin); unlimited undo
+and redo with a clickable history list; **Carry** (the last change laid on the clip and the other directions by frame
+index, by part when part masks exist else by position; a review strip; one undoable entry); **effect anchors** dragged
+from the library onto the figure (move, scale by the edge, rotate by the handle, detach by dropping off the figure,
+right-click for levers; saved in `frames/anchors.json`; *Bake anchors* is a stub that writes the list beside the
+export and into its JSON). Shell: typed numbers on every lever, wheel, slider and cycler (click the value; arrows
+step, shift tens); the wheel nudges levers; the in-app file browser behind every "Choose a file" (places, thumbnails,
+filter, recent, a preview in the picture window); *Exit* on Home and in the top line with one confirm line when work is
+unsaved; drag a frame thumbnail to reorder. Every action is a command: driver `edit ...` lines, a JSON command file
+(`edits FILE`, `--edits=FILE`), `exec_line` in code; GUIDE_AI has the table. Docs: GUIDE_HUMANS (*The editor*),
+GUIDE_AI (the commands), `docs/track_notes/editor.md`.
+
+**Verified.** `tools/test_editor.gd` 106 checks green headless (OKLab, the lock, fill, wand, masks, undo/redo round
+trip, clone offset, carry by frame index, anchors, the command line); `check_scripts.gd` 32/0; the sweep with six
+editor shots on the Keeper's idle S/E/N frames (`docs/screens/forgeapp/editor_*.png`); a `--script` walkthrough that
+paints, selects with the wand, carries to E and N (57 px landed), anchors a wisp, undoes; Characters → Frames → *Edit*
+→ paint → Esc back to the Frames tab. 165 pytest unchanged (the Python side is untouched).
+
+**Short.** The engine writes no part masks yet (`frame_NNN.parts.png`): carry and anchors go by position until it does
+(the reader is in place). Baking anchors only lists them. Not tried here: a real mouse (the drag-and-drop of effects,
+the handles, the number entry and the wheel nudge are built to Godot's input model but were exercised only through the
+command line and the driver); a gamepad; Windows.

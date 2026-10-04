@@ -204,11 +204,11 @@ class Choices:
 			var p := item_pos(i)
 			var on := active and i == sel
 			var it: Dictionary = items[i]
-			var c := T.ACCENT if on else (T.DIM if (dim_unselected and it.get("dim", false)) or it.get("dim", false) else T.BONE)
+			var c := T.ACCENT if on else (T.FRAME if (dim_unselected and it.get("dim", false)) or it.get("dim", false) else T.BONE)
 			var y := p.y + (13 if font_size >= T.TEXT_SIZE else 11)
 			if it.has("value"):
 				var lab := String(it.get("label", "")) + " "
-				draw_string(f, Vector2(p.x, y), lab, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, T.DIM)
+				draw_string(f, Vector2(p.x, y), lab, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, T.FRAME)
 				var lw := T.text_width(lab, font_size)
 				draw_string(f, Vector2(p.x + lw, y), "< %s >" % String(it["value"]), HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, T.ACCENT if on else T.BONE)
 			else:
@@ -982,6 +982,7 @@ class Timeline:
 	var thumb := 36
 	var marks := {}                 # frame index -> a letter (H hold, X deleted, M mirrored)
 	var on_reorder: Callable        # (from, to): a thumbnail dragged to another place
+	var max_cell := 0               # a strip of few frames keeps its cells this wide (0 = share the width)
 	var _drag_i := -1
 	var _drag_to := -1
 	var _press_x := 0.0
@@ -998,7 +999,8 @@ class Timeline:
 	func columns() -> int:
 		return maxi(texs.size(), 1)
 	func _cell() -> float:
-		return floor(size.x / maxi(texs.size(), 1)) if texs.size() > 0 else 40.0
+		var c := floor(size.x / maxi(texs.size(), 1)) if texs.size() > 0 else 40.0
+		return minf(c, max_cell) if max_cell > 0 else c
 	func item_rect(i: int) -> Rect2:
 		return Rect2(position + Vector2(i * _cell(), thumb + 2), Vector2(_cell(), 12))
 	func set_sel(i: int) -> void:

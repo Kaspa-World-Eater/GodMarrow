@@ -305,7 +305,7 @@ func _build_export() -> void:
 	state_line("Effects · export · %s" % ("in the game's effects" if exported != "" else "Keep writes the strip and its json into the game's art/fx; the add-on plays it at the hero"), "", 2)
 	dim_line("The in-game shot is in the picture window." if (state.get("shot", "") != "" and FileAccess.file_exists(String(state["shot"]))) else "See it in the game plays it at the hero on the moor.")
 	add_spacer()
-	add_choices(standard_choices([{"label": "Put it in the game", "cb": _put_in_game}, {"label": "See it in the game", "cb": _see_in_game}], false))
+	add_choices(standard_choices([{"label": "Put it in the game", "cb": _put_in_game}, {"label": "See it in the game", "cb": _see_in_game}, {"label": "Edit", "cb": _edit_picture}], false))
 
 func _put_in_game() -> void:
 	if not app.backend.game_ok():
@@ -409,3 +409,11 @@ func add_cyclers(items: Array) -> Control:
 static func _cycle(list: Array, cur, delta: int):
 	var i := list.find(cur)
 	return list[posmod(i + delta, list.size())] if not list.is_empty() else cur
+
+## the editor on the picture the bench made last (every pixel tool, the palette lock on its colours)
+func _edit_picture() -> void:
+	var png := String(state.get("last_png", ""))
+	if png == "" or not FileAccess.file_exists(png):
+		app.say("Nothing drawn yet to edit.")
+		return
+	app.go("editor", {"image": png, "title": effect_name()})

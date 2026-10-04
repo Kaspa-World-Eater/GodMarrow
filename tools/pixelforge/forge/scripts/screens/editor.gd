@@ -20,7 +20,7 @@ const Picker := preload("res://scripts/editor/picker.gd")
 ##   --screen=editor --model=FILE          render the model's idle S first (as the Characters bench does), then edit
 
 const TOOLS := ["pencil", "brush", "eraser", "fill", "line", "rect", "ellipse", "wand", "lasso", "select", "move", "clone", "eyedropper", "hand"]
-const TOOL_NAMES := {"pencil": "pencil", "brush": "brush", "eraser": "eraser", "fill": "fill", "line": "line", "rect": "rectangle", "ellipse": "ellipse",
+const TOOL_NAMES := {"pencil": "pencil", "brush": "brush", "eraser": "eraser", "fill": "fill", "line": "line", "rect": "rect", "ellipse": "ellipse",
 	"wand": "wand", "lasso": "lasso", "select": "select", "move": "move", "clone": "clone", "eyedropper": "pick", "hand": "pan"}
 const TOOL_KEYS := {KEY_P: "pencil", KEY_B: "brush", KEY_E: "eraser", KEY_G: "fill", KEY_N: "line", KEY_U: "rect", KEY_O: "ellipse",
 	KEY_W: "wand", KEY_L: "lasso", KEY_M: "select", KEY_V: "move", KEY_S: "clone", KEY_I: "eyedropper", KEY_H: "hand"}
@@ -117,6 +117,21 @@ func _exit_tree() -> void:
 	if app and is_instance_valid(app):
 		app.scene.visible = true
 
+## the colour to start with: the palette's slot nearest a mid lightness (never a colour the set lacks)
+func _start_colour() -> void:
+	var pal := doc.palette
+	if pal.size() == 0:
+		return
+	var best := 0
+	var best_d := 1e9
+	for i in pal.size():
+		var d := absf(pal.labs[i].x - 0.55)
+		if d < best_d:
+			best_d = d
+			best = i
+	colour = pal.colours[best]
+	colour2 = pal.colours[pal.nearest(Color.BLACK)]
+
 func open_frames(root: String, clip: String, dir: String) -> bool:
 	history = Hist.new()
 	anchors = Anchors.new()
@@ -124,6 +139,7 @@ func open_frames(root: String, clip: String, dir: String) -> bool:
 		_say("No frames at %s." % root)
 		return false
 	anchors.load(root)
+	_start_colour()
 	if title == "":
 		title = root.get_base_dir().get_file().capitalize()
 	last_carry = {}
@@ -136,6 +152,7 @@ func open_image(path: String) -> bool:
 		_say("The Forge cannot read %s." % path.get_file())
 		return false
 	anchors.load(path.get_base_dir())
+	_start_colour()
 	if title == "":
 		title = path.get_file()
 	return true
@@ -151,7 +168,8 @@ func _render_model(path: String) -> void:
 	var out := app.backend.out_dir("characters").path_join(char_name).path_join("previews").path_join("frames")
 	var clip := String(args.get("clip", "idle"))
 	var dir := String(args.get("direction", "S"))
-	run(["shapes", "render", path, "-o", out, "--clips", clip, "--directions", dir, "--style", app.style_name], "rendering %s %s" % [clip, dir], func(r: Dictionary):
+	var dirs := String(args.get("directions", dir))
+	run(["shapes", "render", path, "-o", out, "--clips", clip, "--directions", dirs, "--style", app.style_name], "rendering %s %s" % [clip, dirs], func(r: Dictionary):
 		if not r.get("ok", false):
 			return
 		if open_frames(out, clip, dir):
@@ -219,7 +237,7 @@ func _state_words() -> String:
 	if bool(r["snapped"]):
 		cw += " (snaps to %s)" % Pal.hex(r["colour"])
 	var sel := "" if doc.selection.is_empty() else " · %d px selected" % Px.mask_count(doc.selection)
-	var where := ("%s · %d x %d" % [title, doc.width, doc.height]) if doc.single else ("%s · %s %s · frame %d of %d" % [title, Doc.clip_of(doc.key), Doc.dir_of(doc.key), doc.index + 1, doc.count()])
+	var where := ("%s · %d x %d" % [title, doc.width, doc.height]) if doc.single else ("%s · frame %d of %d" % [title, doc.index + 1, doc.count()])
 	return "%s · %s %d px · %s · %s%s%s" % [where, TOOL_NAMES.get(tool, tool), brush_size, cw, doc.palette.mode, sel, (" · unsaved" if has_unsaved() else "")]
 
 # ------------------------------------------------------------------ the tabs
@@ -268,7 +286,6 @@ func _build_paint() -> void:
 		{"label": "tolerance", "value": T.fmt(tolerance, 2), "left": func(): set_tolerance(tolerance - 0.02), "right": func(): set_tolerance(tolerance + 0.02), "set": func(t): set_tolerance(float(t))},
 		{"label": "lock", "value": doc.palette.mode, "left": func(): set_lock(Pal.OPEN if doc.palette.mode == Pal.LOCKED else Pal.LOCKED), "right": func(): set_lock(Pal.OPEN if doc.palette.mode == Pal.LOCKED else Pal.LOCKED)},
 		{"label": "onion", "value": "on" if doc.onion else "off", "left": func(): set_onion(not doc.onion), "right": func(): set_onion(not doc.onion)},
-		{"label": "reference", "value": ("%d%%" % int(round(doc.reference_alpha * 100))) if doc.reference_on else "off", "left": func(): set_reference_dim(doc.reference_alpha - 0.1), "right": func(): set_reference_dim(doc.reference_alpha + 0.1), "set": func(t): set_reference_dim(float(t) / 100.0)},
 	])
 	_strip()
 	if doc.single:
@@ -281,8 +298,6 @@ func _build_paint() -> void:
 		{"label": "Deselect", "cb": func(): deselect()},
 		{"label": "Clear", "cb": func(): clear_selection()},
 		{"label": "Mirror", "cb": func(): mirror(true)},
-		{"label": "Flip", "cb": func(): mirror(false)},
-		{"label": "Swap colours", "cb": swap_colours},
 	])
 
 ## a row of cyclers (the Characters bench's), with typed values where the item has `set`
@@ -322,6 +337,7 @@ func _build_layers() -> void:
 			"left": func(): pick_layer(li), "right": func(): toggle_layer(li)})
 	items.append({"label": "reference", "value": ("%d%%" % int(round(doc.reference_alpha * 100))) if doc.reference_on else ("none" if doc.reference == null else "off"),
 		"left": func(): set_reference_dim(doc.reference_alpha - 0.1), "right": func(): set_reference_dim(doc.reference_alpha + 0.1)})
+	items.append({"label": "onion skin", "value": "on" if doc.onion else "off", "left": func(): set_onion(not doc.onion), "right": func(): set_onion(not doc.onion)})
 	var c := W.Choices.new()
 	c.font_size = T.TEXT_SIZE
 	c.arrow_gap = 18
@@ -384,7 +400,7 @@ func _build_carry() -> void:
 	var e = _last_paint_entry()
 	var what := "nothing painted on this frame yet" if e == null else "the last change here: %s, %d px" % [e.label, e.touched]
 	state_line("%s · carry · %s" % [title, what])
-	dim_line("Carry lays it on the clip's other frames and on the same frame of the other directions, by part when the render has part masks, else by position. One history entry; Undo takes it back.", 2)
+	dim_line("It lands on the clip's other frames and on the same frame of the other directions: by part where the render has part masks, else by position. One history entry; Undo takes it back.", 2)
 	add_cyclers([
 		{"label": "clone source", "value": _clone_words(), "left": func(): _step_clone_source(-1), "right": func(): _step_clone_source(1)},
 	])
@@ -397,6 +413,7 @@ func _build_carry() -> void:
 			texs.append(ImageTexture.create_from_image(L["thumb"]))
 			tl.marks[k] = "  %s %d" % [Doc.dir_of(String(L["key"])), int(L["count"])]
 			k += 1
+		tl.max_cell = 72
 		tl.setup(texs, 0, app, func(_i): pass)
 		tl.custom_minimum_size = Vector2(0, 38)
 		add_extra(tl, false)
@@ -416,7 +433,32 @@ func _build_effects() -> void:
 	var line := "%s · effects · drag one from the library onto the figure; it follows the clip and the directions. Right-click an anchor for its levers; drag it off the figure to detach." % title
 	if not a.is_empty():
 		line = "%s · effects · %s anchored at %d, %d on frame %d · scale x%s · %s deg" % [title, String(a["effect"]), int(a["x"]), int(a["y"]), int(a["frame"]) + 1, T.fmt(float(a["scale"]), 2), T.fmt(float(a["rotation"]), 0)]
-	state_line(line, "", 2)
+	state_line(line, "", 1 if not a.is_empty() else 2)
+	if a.is_empty():
+		_effects_library()
+	else:
+		var ls := W.Lever.new()
+		ls.init("scale", clampf((float(a["scale"]) - 0.25) / 2.75, 0.0, 1.0), 0.75 / 2.75, func(v): return "x" + T.fmt(0.25 + v * 2.75, 2), Callable(), func(v): set_anchor_fields(anchor_sel, {"scale": snappedf(0.25 + v * 2.75, 0.05)}))
+		var lr := W.Wheel.new()
+		lr.init_wheel("rotation", float(a["rotation"]), 0.0, func(d): return "%d deg" % int(round(d)), Callable(), func(d): set_anchor_fields(anchor_sel, {"rotation": round(d)}))
+		var levers: Dictionary = a.get("levers", {})
+		var lst := W.Lever.new()
+		lst.init("strength", clampf(float(levers.get("strength", 1.0)) / 2.0, 0.0, 1.0), 0.5, func(v): return T.fmt(v * 2.0, 2), Callable(), func(v): set_anchor_lever(anchor_sel, "strength", snappedf(v * 2.0, 0.05)))
+		var lsp := W.Lever.new()
+		lsp.init("speed", clampf(float(levers.get("speed", 1.0)) / 2.0, 0.0, 1.0), 0.5, func(v): return T.fmt(v * 2.0, 2), Callable(), func(v): set_anchor_lever(anchor_sel, "speed", snappedf(v * 2.0, 0.05)))
+		add_rack([ls, lr, lst, lsp], 8)
+	var ch := []
+	if not a.is_empty():
+		ch.append({"label": "Detach", "cb": func(): remove_anchor(anchor_sel)})
+		ch.append({"label": "This direction only" if String(a.get("dir", "all")) == "all" else "Every direction", "cb": func(): set_anchor_fields(anchor_sel, {"dir": Doc.dir_of(doc.key) if String(a.get("dir", "all")) == "all" else "all"})})
+		ch.append({"label": "Library", "cb": func(): anchor_sel = -1; rebuild(); refresh()})
+	ch.append({"label": "Bake anchors", "cb": bake})
+	ch.append({"label": "Undo", "cb": undo})
+	ch.append({"label": "Save", "cb": save})
+	add_choices(ch)
+
+## the library: the effects bench's kinds and spell presets as words to pick up and drop on the picture
+func _effects_library() -> void:
 	var cards := W.Choices.new()
 	cards.font_size = T.SMALL_SIZE
 	cards.arrow_gap = 12
@@ -432,29 +474,9 @@ func _build_effects() -> void:
 	cards.drag_move = func(pos): _drag_effect_move(pos)
 	cards.drag_end = func(pos): _drag_effect_end(pos)
 	add_extra(cards)
-	if not a.is_empty():
-		var ls := W.Lever.new()
-		ls.init("scale", clampf((float(a["scale"]) - 0.25) / 2.75, 0.0, 1.0), 0.75 / 2.75, func(v): return "x" + T.fmt(0.25 + v * 2.75, 2), Callable(), func(v): set_anchor_fields(anchor_sel, {"scale": snappedf(0.25 + v * 2.75, 0.05)}))
-		var lr := W.Wheel.new()
-		lr.init_wheel("rotation", float(a["rotation"]), 0.0, func(d): return "%d deg" % int(round(d)), Callable(), func(d): set_anchor_fields(anchor_sel, {"rotation": round(d)}))
-		var levers: Dictionary = a.get("levers", {})
-		var lst := W.Lever.new()
-		lst.init("strength", clampf(float(levers.get("strength", 1.0)) / 2.0, 0.0, 1.0), 0.5, func(v): return T.fmt(v * 2.0, 2), Callable(), func(v): set_anchor_lever(anchor_sel, "strength", snappedf(v * 2.0, 0.05)))
-		var lsp := W.Lever.new()
-		lsp.init("speed", clampf(float(levers.get("speed", 1.0)) / 2.0, 0.0, 1.0), 0.5, func(v): return T.fmt(v * 2.0, 2), Callable(), func(v): set_anchor_lever(anchor_sel, "speed", snappedf(v * 2.0, 0.05)))
-		add_rack([ls, lr, lst, lsp], 8)
-	else:
-		var n := anchors.on_frame(doc.key).size()
-		small_line("%d anchor%s on this clip%s" % [n, "" if n == 1 else "s", "" if n == 0 else " · click one on the picture to pick it"], T.BONE)
-		add_spacer()
-	var ch := []
-	if not a.is_empty():
-		ch.append({"label": "Detach", "cb": func(): remove_anchor(anchor_sel)})
-		ch.append({"label": "This direction only" if String(a.get("dir", "all")) == "all" else "Every direction", "cb": func(): set_anchor_fields(anchor_sel, {"dir": Doc.dir_of(doc.key) if String(a.get("dir", "all")) == "all" else "all"})})
-	ch.append({"label": "Bake anchors", "cb": bake})
-	ch.append({"label": "Undo", "cb": undo})
-	ch.append({"label": "Save", "cb": save})
-	add_choices(ch)
+	var n := anchors.on_frame(doc.key).size()
+	small_line("%d anchor%s on this clip%s" % [n, "" if n == 1 else "s", "" if n == 0 else " · click one on the picture to pick it"], T.BONE)
+	add_spacer()
 
 # ------------------------------------------------------------------ settings
 func set_tool(t: String) -> Dictionary:
@@ -1021,8 +1043,11 @@ func add_anchor(effect: String, p: Vector2i) -> Dictionary:
 		return {"ok": false, "error": "no effect named %s in the library" % effect}
 	var f := doc.current()
 	var part := Doc.part_at(doc.parts_of(f), p.x, p.y)
-	var made := {}
-	_anchor_entry("anchor " + effect, func(): made = anchors.add(effect, doc.key, doc.index, p.x, p.y, part))
+	var before := anchors.snapshot()
+	var made := anchors.add(effect, doc.key, doc.index, p.x, p.y, part)
+	anchors.save()
+	history.begin("anchor " + effect, doc.selection)
+	_commit_extra({"anchors_before": before, "anchors_after": anchors.snapshot()})
 	anchor_sel = int(made.get("id", -1))
 	if not headless:
 		if tab != 5:
