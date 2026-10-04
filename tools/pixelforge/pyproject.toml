@@ -25,7 +25,10 @@ train = [
 pixelforge = "pixelforge.cli:main"
 
 [tool.setuptools]
-packages = ["pixelforge"]
+packages = ["pixelforge", "pixelforge.music", "pixelforge.blender"]
+
+[tool.setuptools.package-data]
+pixelforge = ["music/library/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

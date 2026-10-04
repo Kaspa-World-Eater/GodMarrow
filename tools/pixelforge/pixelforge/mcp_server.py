@@ -158,6 +158,54 @@ def build_server():
         return {"cues": music.cue_table(), "knobs": music.FIELDS, "modes": list(music.SC)}
 
     @mcp.tool()
+    def compose_music(out_path: str, genre: str = "dungeon_synth", mood: str = "", key: str = "", tempo: float = 0, bars: int = 32, seed: int = 1,
+                      title: str = "", render: bool = False, fmt: str = "wav") -> dict:
+        """A new piece as an editable song file (JSON): genre (dungeon_synth gothic_orchestral chiptune dark_ambient battle boss tavern
+        town title victory sorrow exploration synthwave), mood (dark hopeful tense calm heroic sombre playful eerie), key like 'C# minor',
+        tempo (0 = the genre's), length in bars, seed. With render, also the audio beside it. Then edit_song / render_song."""
+        from .music import compose as C, render as R, song as S
+        s = C.compose(genre, mood, key or None, tempo or None, bars, seed, title or None)
+        path = S.save(s, out_path)
+        r = {"ok": True, "song": path, **S.summary(s)}
+        if render:
+            from pathlib import Path
+            r["render"] = R.export(s, Path(path).parent, Path(path).name.replace(".song.json", "").replace(".json", ""), fmt=fmt)
+        return r
+
+    @mcp.tool()
+    def edit_song(song_path: str, ops: list[dict], out_path: str = "") -> dict:
+        """Apply edit operations to a song file (see `pixelforge music edit --help`: set_note, remove_note, clear, copy, paste, transpose,
+        reverse, double, halve, humanise, quantise, set_lane, mute, solo, set_tempo, set_key, scale_lock, set_fx, pattern_add/remove/rename,
+        section_add/remove/move/set, generate_bar, generate_lane, title). Writes back (or to out_path)."""
+        from .music import edit as E, song as S
+        s = S.load(song_path)
+        extra = {}
+        for op in ops:
+            s, res = E.apply_with_result(s, op)
+            extra.update(res)
+        path = S.save(s, out_path or song_path)
+        return {"ok": True, "song": path, "applied": [o.get("op") for o in ops], **extra, **S.summary(s)}
+
+    @mcp.tool()
+    def render_song(song_path: str, out_dir: str, name: str = "", fmt: str = "wav", loop: bool = True, section: int = -1, bar: int = -1) -> dict:
+        """Render a song file to WAV/OGG (+ a spectrogram PNG). With section/bar set, one looping bar instead (what the editor plays)."""
+        from pathlib import Path
+        from .music import render as R, song as S
+        s = S.load(song_path)
+        if section >= 0:
+            x = R.render_bar(s, section, max(bar, 0)) if bar >= 0 else R.render_section(s, section)
+            wav = Path(out_dir) / (name or "bar.wav")
+            return {"ok": True, "files": [R.write_wav(x, wav if str(wav).endswith(".wav") else wav.with_suffix(".wav"), s["fx"]["rate"])]}
+        return R.export(s, out_dir, name or None, fmt=fmt, loop=loop)
+
+    @mcp.tool()
+    def music_library(genre: str = "") -> dict:
+        """The premade pieces (editable song files, by genre), the genres, moods, instruments, scales, lanes, effects and edit operations."""
+        from .music import compose as C, edit as E, library as L, song as S, synth, theory
+        return {"pieces": L.list_pieces(genre or None), "genres": C.genre_table(), "moods": list(C.MOODS), "instruments": synth.instrument_table(),
+                "scales": list(theory.SCALES), "lanes": S.LANES, "fx": S.FX_FIELDS, "ops": E.OPS, "library_dir": str(L.LIBRARY_DIR)}
+
+    @mcp.tool()
     def music_sheet(path: str) -> dict:
         """Write the editable sheet (every cue's knobs) to a JSON file; edit it and pass it to make_music."""
         from . import music
