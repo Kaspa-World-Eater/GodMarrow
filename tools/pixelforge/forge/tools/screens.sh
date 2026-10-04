@@ -5,7 +5,7 @@
 # bundled Keeper); PAINTING a reference painting, GROUND and MUD ground textures, PANEL a painted panel, FLATLAY a
 # flat lay, FRONT a front cutout: optional, each opens its bench with it. GAME is the game folder (default: found
 # above the Forge). Each shot prints "name | errors N" (N must be 0). The app's test hooks are listed in
-# forge/scripts/main.gd.
+# forge/scripts/main.gd. ONLY=music shoots only the names that start with "music" (any prefix works).
 set -u
 OUT=${1:?OUTDIR}; RES=${2:-1280x720}
 GODOT=${GODOT:-godot}; PROJECT=${PROJECT:?PROJECT}; PY=${PY:-python}
@@ -16,6 +16,7 @@ mkdir -p "$OUT"
 OUT=$(cd "$OUT" && pwd)   # absolute: Godot resolves a relative --shot against the project folder
 shoot() {  # name "args" seconds
   local name=$1 args=$2 t=$3
+  [ -n "${ONLY:-}" ] && [[ "$name" != "$ONLY"* ]] && return 0
   local log; log=$(timeout 400 xvfb-run -a -s "-screen 0 ${RES}x24" "$GODOT" --path "$HERE" --rendering-driver opengl3 --resolution "$RES" \
     -- --nosound --project="$PROJECT" --python="$PY" ${GAME:+--game=$GAME} --shot="$OUT/$name.png" --shot_t=$t $args 2>&1)
   echo "$name | errors $(echo "$log" | grep -cE 'SCRIPT ERROR|SHADER ERROR|handle_crash')"
@@ -42,8 +43,7 @@ shoot interface_frames "--screen=interface ${PANEL:+--painting=$PANEL}" 8
 [ -n "${FRONT:-}" ] && shoot interface_portraits "--screen=interface --painting=$FRONT --tab=Portraits" 10
 shoot interface_fonts "--screen=interface --tab=Fonts" 3
 shoot sound "--screen=sound" 6
-shoot music "--screen=music" 6
-shoot music_cues "--screen=music --tab=Cues" 6
+for t in Tracks Pattern Song Library Export; do shoot music_${t,,} "--screen=music --tab=$t" 9; done
 for t in Window Folders Style; do shoot settings_${t,,} "--screen=settings --tab=$t" 4; done
 shoot settings_computer "--screen=settings --tab=3" 12
 shoot log "--screen=home --log=1" 3
