@@ -341,6 +341,19 @@ cmp.png` after every round: painting and sprite side by side per view, feet on o
 as the right mass and colours before a single shape is placed by hand). A sheet whose figures stand on a painted
 floor splits as one figure: give `compare` the cleaned sheet (the views on paper) or the views one by one.
 
+**The parts kit** (`pixelforge/shape_parts.py`): the costume pieces the Hemomancer needed, as functions returning
+shape lists in the 120-unit author pose, so the next character calls them instead of writing 170 entries: `chain(name,
+points)` (links alternating face-on / edge-on), `chain_loop`, `chest_chain`, `rivet_row(y=|dy=, every, z_from)` (a rule),
+`spike_ring` and `upright_spikes` (a crown, with small-size twins), `spike_row`, `plank_skirt(name, cx, belt_y, degs)` +
+`plank_skirt_parts()` (the front planks ride each thigh with `upright_from` the hips, the back planks the hips),
+`greave(side, cx)` (a riveted plate, a knee cop, the spike rows) and `thigh_plate`, `shackle(side, cx)` (with a broken
+chain), `locs(name, cx)` + `locs_parts()` (strands following the mantle), `back_cape(...)` + `cape_parts()`. Their
+default materials (`locs chain rustiron plank`) are in the library. `shapes draft` calls them from the nouns of the
+line: `crown` (+ `spiked`), `locs` / `dreadlocks`, `chains`, `shackles` / `manacles`, `planks` / `plank skirt`,
+`greaves` (+ `spiked`), `rivets` / `riveted` / `studded`, `cape`. The worked example is
+`docs/concepts/hemomancer/shapes/make_hemomancer_shapes.py` (the whole Hemomancer from the kit plus its body, face,
+crimson and shield; `tests/test_character_road.py` checks it regenerates the committed file).
+
 ### The procedure for an AI
 
 1. `pixelforge shapes template --height 120 --png tpl.png` (a file is authored at one height, 120 units, and rendered

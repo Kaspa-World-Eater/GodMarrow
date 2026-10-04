@@ -392,7 +392,7 @@ def draft_shapes(text: str, out: str | Path | None = None, height: int = 120, me
     gourds, cords) in the materials the words name. It is a draft to edit: move the shapes, change the ramps. With
     ``measure`` (a measurements file or dict from ``shapes measure``) the head, torso, belt, skirt, cape and limbs are
     sized from the painting's widths instead of the template's."""
-    from . import shape_rig
+    from . import shape_parts as K, shape_rig
 
     t = text.lower()
     words = re.findall(r"[a-z']+", t)
@@ -495,10 +495,56 @@ def draft_shapes(text: str, out: str | Path | None = None, height: int = 120, me
         read.append(f"a long {sk_mat} skirt" + (" (tattered)" if "tattered" in t else ""))
     if re.search(r"\b(cape|cloak|mantle)\b", t):
         cp_mat = _material_near(words, "cape|cloak|mantle", "cape6")
-        add(name="cape", kind="ring", y=[sp3 - 2, ground - 12], rx=[12, 0.17], rz=[9.8, 0.12], thickness=1.6, hem={"tongues": 18, "depth": 6, "seed": 5}, keep={"back_strip": 1.3916},
-            material=cp_mat, part="cape", bump={"folds": [0.4, 7, 0.3]}, **({"holes": {"p": 0.07, "band": 16}} if re.search(r"\b(tattered|torn|ragged)\b", t) else {}))
-        parts["cape"] = {"bone": "spine.003", "lag": {"frames": 2, "sway": 0.7}, "hang": 0.35}
+        shapes.append(K.back_cape("cape", y=(sp3 - 2, ground - 12), rx=(12, 0.17), rz=(9.8, 0.12), thickness=1.6, strip=1.3916, hem={"tongues": 18, "depth": 6, "seed": 5},
+                                  material=cp_mat, part="cape", bump={"folds": [0.4, 7, 0.3]}, rules=[{"every_angle": [11, 0], "t": -1}, {"hem_band": [0, 3], "t": -1}],
+                                  holes={"p": 0.07, "band": 16} if re.search(r"\b(tattered|torn|ragged)\b", t) else None))
+        parts.update(K.cape_parts("cape"))
+        parts["cape"]["hang"] = 0.35
         read.append(f"a cape ({cp_mat})")
+    # the parts kit: the pieces the Hemomancer needed, from their nouns
+    spiked = bool(re.search(r"\b(spiked|spikes|spiky)\b", t))
+    if re.search(r"\b(crown|circlet|diadem)\b", t):
+        crown_mat = _material_near(words, "crown|circlet|diadem", "iron7")
+        cy = top_y + 3.5
+        add(name="crown_band", kind="ring", y=[cy - 1.4, cy + 1.4], rx=6.7, rz=6.9, cz=-0.4, thickness=1.2, material=crown_mat, bone="head",
+            rules=[{"every_angle": [10, 0], "t": -1}, {"y": [cy - 1.4, cy - 0.6], "t": 1}])
+        if spiked:
+            shapes.extend(K.spike_ring("spike", cx, cy, -0.4, 6.4, [(90, 8, 0.5), (-90, 8, 0.5), (155, 6, 0.3), (-155, 6, 0.3)], material=crown_mat))
+            shapes.extend(K.upright_spikes("upright", cx, -0.4, cy - 0.5, [(0, cy - 14), (40, cy - 12.5), (-40, cy - 12.5), (180, cy - 13)], material=crown_mat))
+        read.append(("a spiked " if spiked else "a ") + f"crown ({crown_mat})")
+    if re.search(r"\b(locs|dreadlocks|dreads|braids)\b", t):
+        shapes.extend(K.locs("loc", cx, head_y=(head_y + top_y) / 2 - 1))
+        parts.update(K.locs_parts())
+        read.append("locs down the back and in front of the shoulders")
+    if re.search(r"\bchains?\b", t) and not re.search(r"\b(shackles?|manacles?)\b.*\bchains?\b", t):
+        shapes.extend(K.chest_chain("chestchain", shoulder=(cx + 12, sp3 + 2, 8.0), hip=(cx - 9, hips_y - 6, 10.0)))
+        read.append("a chain across the chest")
+    if re.search(r"\b(shackles?|manacles?|fetters?)\b", t):
+        for side in ("L", "R"):
+            fa = B[f"forearm.{side}"]["tail"]
+            shapes.extend(K.shackle(side, cx, wrist=(abs(fa[0] - cx) + cx, fa[1] - 2, fa[2])))
+        read.append("iron shackles at the wrists with broken chains")
+    if re.search(r"\bplanks?\b", t):
+        belt_y = hips_y - 3
+        knee_y = B["shin.L"]["head"][1]
+        h = (knee_y + 2 - belt_y) / 2
+        shapes.extend(K.plank_skirt("plank", cx, belt_y, [22, 46, 70, 94, 118, 142, 166, -166, -142, -118, -94, -70, -46, -22], radius=12.2, heights=(h, h),
+                                    material=_material_near(words, "planks?", "wood5")))
+        parts.update(K.plank_skirt_parts())
+        read.append("a plank skirt, the front planks on each leg")
+    if re.search(r"\bgreaves?\b", t):
+        sh = B["shin.L"]
+        for side in ("L", "R"):
+            shapes.extend(K.greave(side, cx, leg_x=abs(sh["head"][0] - cx) + cx, top=sh["head"][1] + 3, bottom=sh["tail"][1] - 3, z=3.6, knee_y=sh["head"][1] + 0.7,
+                                   material=_material_near(words, "greaves?", "iron7"), spikes=spiked))
+        read.append(("spiked " if spiked else "") + "iron greaves")
+    if re.search(r"\b(rivets?|riveted|studded)\b", t):
+        for s_ in shapes:
+            if s_.get("kind") == "ellipsoid" and s_.get("name", "").startswith("pauldron"):
+                s_.setdefault("rules", []).append(K.rivet_row(dy=(-1.0, 0.0), every=3, which=0, z_from=1.0))
+            if s_.get("name") == "chest" and has_armour:
+                s_.setdefault("rules", []).append(K.rivet_row(y=sp2 + 2, every=4, which=1, z_from=4.0))
+        read.append("rivet rows on the plate")
     if re.search(r"\b(veil|wrappings|shawl)\b", t):
         add(name="veil", kind="ring", y=[head_y + 3, hips_y - 2], rx=[8.0, 0.14], rz=[7.6, 0.08], thickness=1.6, hem={"tongues": 9, "depth": 14, "seed": 6}, keep={"back_strip": 1.1916},
             holes={"p": 0.1, "band": 26, "seed": 3}, material="wrap", t=-1, part="veil", bump={"folds": [0.5, 6, 1.0]})

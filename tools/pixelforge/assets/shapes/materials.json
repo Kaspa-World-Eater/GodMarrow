@@ -396,5 +396,60 @@
    "#e2f6ff"
   ],
   "emissive": true
+ },
+ "locs": {
+  "ramp": [
+   "#050506",
+   "#0c0c0f",
+   "#151519",
+   "#1f1f25",
+   "#2b2b33"
+  ],
+  "texture": "weave",
+  "texture_strength": 0.3,
+  "_note": "black locs / braids (the parts kit's locs)"
+ },
+ "chain": {
+  "ramp": [
+   "#121110",
+   "#26231f",
+   "#3d3832",
+   "#5a534a",
+   "#7d7468",
+   "#a89d8e"
+  ],
+  "spec": true,
+  "spec_t": 0.8,
+  "texture": "scratch",
+  "texture_strength": 0.3,
+  "_note": "worn iron chain links (the parts kit's chains and shackle chains)"
+ },
+ "rustiron": {
+  "ramp": [
+   "#0e0c0b",
+   "#201b18",
+   "#363029",
+   "#504840",
+   "#6f655a",
+   "#958a7c"
+  ],
+  "spec": true,
+  "spec_t": 0.9,
+  "texture": "scratch",
+  "texture_strength": 0.4,
+  "_note": "rusted plate (the parts kit's greaves, shackles, spikes)"
+ },
+ "plank": {
+  "ramp": [
+   "#0f0d0d",
+   "#1c1919",
+   "#2b2726",
+   "#3c3735",
+   "#504945",
+   "#675e59"
+  ],
+  "texture": "grain",
+  "texture_strength": 0.6,
+  "_note": "weathered warm-grey planks (the parts kit's plank skirt)"
  }
 }

@@ -190,7 +190,9 @@ turntable FILE -o turn.gif` a spin. To put one in the game: `pixelforge project 
 <project folder>`, then **render-shapes** and **export-game** as usual (the step-by-step list for an assistant is
 `docs/GUIDE_SESSION.md` in the game repository). "Describe it" can draft a starting file from a sentence
 (`pixelforge shapes draft "a knight in steel plate with a sword and a crimson cape" -o knight.shapes.json`): a
-mannequin with the right pieces, to be shaped by hand or by the assistant.
+mannequin with the right pieces, to be shaped by hand or by the assistant. It knows the pieces the Hemomancer needed
+(a spiked crown, locs, chains, shackles, a plank skirt, spiked greaves, rivets, a back cape) and builds them from a kit,
+so the next character with any of them starts with them in place.
 
 ## Describe it, get it
 

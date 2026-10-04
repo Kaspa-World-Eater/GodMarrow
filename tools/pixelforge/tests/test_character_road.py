@@ -290,3 +290,89 @@ def test_cli_validate_prints_the_warnings(tmp_path, capsys):
     assert out.startswith("ok:") and "warnings" in out and "back_strip" in out
     r = T.validate_file(tmp_path / "c.shapes.json")
     assert r["ok"] and len(r["warnings"]) == 1
+
+
+# ------------------------------------------------------------------------------------------- 5. the parts kit
+GENERATOR = REPO / "docs" / "concepts" / "hemomancer" / "shapes" / "make_hemomancer_shapes.py"
+
+
+def _close(x, y, path=""):
+    import math
+    if isinstance(x, dict) and isinstance(y, dict):
+        if set(x) != set(y):
+            return [f"{path}: keys {sorted(set(x) ^ set(y))}"]
+        return sum((_close(x[k], y[k], path + "/" + str(k)) for k in x), [])
+    if isinstance(x, list) and isinstance(y, list):
+        if len(x) != len(y):
+            return [f"{path}: len {len(x)} vs {len(y)}"]
+        return sum((_close(p, q, path + f"[{i}]") for i, (p, q) in enumerate(zip(x, y))), [])
+    if isinstance(x, (int, float)) and isinstance(y, (int, float)) and not isinstance(x, bool) and not isinstance(y, bool):
+        return [] if math.isclose(x, y, abs_tol=1e-6) else [f"{path}: {x} vs {y}"]
+    return [] if x == y else [f"{path}: {x!r} vs {y!r}"]
+
+
+def test_the_hemomancer_generator_on_the_kit_writes_the_committed_file(tmp_path):
+    import subprocess, sys
+    out = tmp_path / "hemo.shapes.json"
+    proc = subprocess.run([sys.executable, str(GENERATOR), "--out", str(out)], capture_output=True, text=True, cwd=str(HERE.parent), timeout=120)
+    assert proc.returncode == 0, proc.stderr[-1500:]
+    made = json.loads(out.read_text())
+    committed = json.loads((S.ASSETS / "characters" / "hemomancer.shapes.json").read_text())
+    by_name = lambda d: {s["name"]: s for s in d["shapes"]}
+    assert set(by_name(made)) == set(by_name(committed)) and len(made["shapes"]) == len(committed["shapes"])
+    diffs = []
+    for name, sh in by_name(committed).items():
+        diffs += _close(sh, by_name(made)[name], name)
+    diffs += _close({k: v for k, v in committed.items() if k != "shapes"}, {k: v for k, v in made.items() if k != "shapes"}, "doc")
+    assert diffs == [], diffs[:12]
+    # the shape order may differ by part; the picture does not
+    a = S.render_still(S.load_shapes(out)).rgba; b = S.render_still(committed).rgba
+    assert np.array_equal(a, b)
+    assert "clips" not in made or made["clips"].get("attack") in (None, "punch", "jab", "attack")
+
+
+def test_the_kit_functions_make_the_pieces():
+    from pixelforge import shape_parts as K
+    links = K.chain("c", [[0, 0, 0], [10, 0, 0], [10, 10, 0]], bone="hips")
+    assert len(links) == 10 and links[0]["radii"] == [1.5, 0.95, 0.55] and links[1]["radii"] == [1.5, 0.5, 0.9]      # across, then down
+    assert links[5]["radii"][1] == 1.5 and all(l["bone"] == "hips" for l in links) and {l["t"] for l in links} == {-1, 1}
+    assert K.rivet_row(y=103, every=3, z_from=3.0) == {"y": [102.5, 103.5], "every_x": [3, 0], "z": [3.0, None], "rivet": True, "px": [90, None]}
+    assert K.rivet_row(dy=(-7, -6)) == {"dy": [-7, -6], "every_x": [3, 0], "rivet": True, "px": [90, None]}
+    spikes = K.spike_ring("spike", 69.0, 17.0, -0.4, 6.4, [(90, 10, 0.5)])
+    assert [s["name"] for s in spikes] == ["spike0", "spike0_s"] and spikes[0]["px"] == [90, None] and spikes[1]["px"] == [None, 90]
+    assert spikes[0]["b"][0] == pytest.approx(69 + 16.4) and spikes[0]["b"][1] == 16.5
+    planks = K.plank_skirt("plank", 69.0, 67, [22, 94, 166, -166, -94, -22], heights=(18, 18))
+    assert [p["part"] for p in planks] == ["planks_L", "planks_L", "planks_back", "planks_back", "planks_R", "planks_R"]
+    assert all(p["rotate"]["about"] == [69.0, 67, -0.6] and p["half"][1] == 18 for p in planks)
+    parts = K.plank_skirt_parts()
+    assert parts["planks_L"]["bone"] == "thigh.L" and parts["planks_L"]["upright_from"] == "hips" and parts["planks_back"]["bone"] == "hips"
+    gr = K.greave("R", 69.0)
+    names = [g["name"] for g in gr]
+    assert names[:2] == ["greave.R", "kneecop.R"] and names[2] == "legspike0.R" and len(gr) == 10
+    assert gr[0]["centre"][0] == pytest.approx(69 - 6.04) and any(r.get("rivet") for r in gr[0]["rules"])
+    assert len(K.greave("L", 69.0, spikes=False, knee_cop=False, rivets=False)) == 1
+    sh = K.shackle("L", 69.0)
+    assert sh[0]["name"] == "shackle.L" and sh[1]["name"] == "wristchainL_0" and all(s["bone"] == "forearm.L" for s in sh)
+    lo = K.locs("loc", 69.0)
+    assert len(lo) == 9 * 2 + 6 * 2 and {s["part"] for s in lo} == {"locs", "locs_front"} and set(K.locs_parts()) == {"locs", "locs_front"}
+    cape = K.back_cape("cape", strip=0.72, holes={"p": 0.1, "band": 10})
+    assert cape["keep"] == {"back_strip": 0.72} and cape["holes"]["p"] == 0.1 and K.cape_parts()["cape"]["hang"] == 0.3
+    doc = {"size": [138, 138], "height": 120, "ground": 134, "axis": [69.0, 0], "materials": {}, "parts": {**parts, **K.locs_parts(), **K.cape_parts()},
+           "shapes": links + spikes + planks + gr + sh + lo + [cape] + K.chest_chain() + K.thigh_plate("L", 69.0) + K.chain_loop("loop", 69.0, 72, rx=15, rz=14, deg0=20, deg1=80, part="planks_back")}
+    assert S.validate(doc) == [] and S.render_still(doc).stats["filled"] > 500       # the library carries the kit's materials
+
+
+def test_draft_calls_the_kit_from_its_nouns(tmp_path):
+    from pixelforge import describe
+    r = describe.draft_shapes("a hemomancer with a spiked iron crown, locs, chains, iron shackles, a plank skirt, spiked riveted greaves and a black cape",
+                              out=tmp_path / "k.shapes.json")
+    names = {s["name"] for s in r["doc"]["shapes"]}
+    assert {"crown_band", "spike0", "upright0", "loc_b0_0", "loc_f0_1", "chestchain0", "shackle.L", "wristchainR_0", "plank0", "plank13", "greave.L", "legspike0.R", "kneecop.R", "cape"} <= names
+    assert {"planks_L", "planks_R", "planks_back", "locs", "locs_front", "cape"} <= set(r["doc"]["parts"]) and r["doc"]["parts"]["planks_L"]["upright_from"] == "hips"
+    read = " ".join(r["read"])
+    assert "spiked crown" in read and "locs" in read and "chain across the chest" in read and "shackles" in read and "plank skirt" in read and "spiked iron greaves" in read
+    v = T.validate_file(tmp_path / "k.shapes.json")
+    assert v["ok"] and v["unbound_shapes"] == [] and not [w for w in v["warnings"] if "upright_from" in w or "keep.back" in w]
+    plain = describe.draft_shapes("a warrior with a sword")["doc"]
+    assert not any(s["name"].startswith(("plank", "greave", "loc_", "chestchain", "shackle")) for s in plain["shapes"])
+    assert T.still(S.load_shapes(tmp_path / "k.shapes.json"), tmp_path / "k.png", direction="S", style="gothic_hd")["filled"] > 3000
