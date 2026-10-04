@@ -40,12 +40,11 @@ func _show_style() -> void:
 
 ## --- Window
 func _build_window() -> void:
-	state_line("Settings · window · %s · sounds %s · music %s" % ["full screen" if app.is_fullscreen() else "a window", "on" if app.audio.sounds_on else "off", "on" if app.audio.music_on else "off"])
+	state_line("Settings · window · %s · sounds %s · music %s" % ["full screen" if app.is_fullscreen() else "a window", app.audio.level, "on" if app.audio.music_on else "off"])
 	var scale := int(app.cfg.get("scale", 2))
 	add_cyclers([
 		{"label": "screen", "value": "full" if app.is_fullscreen() else "window", "left": func(): app.toggle_fullscreen(); rebuild(), "right": func(): app.toggle_fullscreen(); rebuild()},
 		{"label": "window scale", "value": "%dx" % scale, "left": func(): _set_scale(scale - 1), "right": func(): _set_scale(scale + 1)},
-		{"label": "sounds", "value": "on" if app.audio.sounds_on else "off", "left": func(): app.set_sounds(false); rebuild(), "right": func(): app.set_sounds(true); rebuild()},
 		{"label": "music", "value": "on" if app.audio.music_on else "off", "left": func(): app.set_music(false); rebuild(), "right": func(): app.set_music(true); rebuild()},
 		{"label": "motion", "value": "reduced" if app.reduced_motion else "full", "left": func(): _set_reduced(true), "right": func(): _set_reduced(false)},
 	])
@@ -53,7 +52,10 @@ func _build_window() -> void:
 	ls.init("sound level", app.audio.sound_volume, 0.8, func(v): return "%d%%" % int(round(v * 100)), func(v): app.audio.sound_volume = v, func(v): app.cfg["sound_volume"] = v; app.save_cfg(); app.audio.blip("confirm"))
 	var lm := W.Lever.new()
 	lm.init("music level", app.audio.music_volume, 0.6, func(v): return "%d%%" % int(round(v * 100)), func(v): app.audio.music_volume = v, func(v): app.cfg["music_volume"] = v; app.save_cfg())
-	add_rack([ls, lm, scene_light_lever()], 8)
+	var lq := W.Lever3.new()
+	lq.init_lever3("sounds", ["off", "quiet", "full"].find(app.audio.level), 1, PackedStringArray(["off", "quiet", "full"]), func(stop): app.set_sound_level(["off", "quiet", "full"][int(stop)]))
+	lq.hint = "off, quiet (the cursor blip, the select click, back) or full (the levers and wheels too); a finished step never sounds"
+	add_rack([lq, ls, lm, scene_light_lever()], 8)
 	add_choices([{"label": "Reset settings", "cb": _reset_all}, {"label": "Back", "cb": func(): app.back()}])
 
 func _set_scale(k: int) -> void:
@@ -75,7 +77,7 @@ func _reset_all() -> void:
 		var keep_last = app.cfg.get("last", {})
 		app.cfg = {"last": keep_last}
 		app.save_cfg()
-		app.audio.sounds_on = true
+		app.set_sound_level("quiet")
 		app.audio.sound_volume = 0.8
 		app.audio.music_volume = 0.6
 		app.set_music(true)

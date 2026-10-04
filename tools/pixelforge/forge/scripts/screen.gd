@@ -360,12 +360,8 @@ func run(args: Array, words: String, on_done: Callable, with_progress: bool = tr
 		if progress and is_instance_valid(progress):
 			progress.queue_free()
 			progress = null
-		if r.get("ok", false):
-			app.audio.set_state("done")
-			app.audio.blip("done")
-		else:
-			app.audio.set_state("home")
-			app.audio.blip("fail")
+		app.audio.set_state("home")
+		if not r.get("ok", false):
 			app.say(plain_error(r))
 		app.set_hint(hint_text)
 		on_done.call(r))

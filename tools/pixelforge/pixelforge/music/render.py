@@ -73,7 +73,14 @@ def render_plan(song: dict, plan: list[dict], *, loop: bool = False, lanes: list
     total_n = body_n + int(tail * rate)
     rng = np.random.default_rng((seed if seed is not None else int(song.get("seed", 1))) * 7919 + 11)
     events = events_for(song, plan, lanes)
+    snes = float(np.clip(fx.get("snes", 0.7), 0.0, 1.0))
     voices = int(fx.get("voices", 8))
+    if snes >= 0.5 and voices == 0:
+        voices = 8
+    # every voice as a looped sample through the SPC's output: band-limited, a little grain
+    voice_cut = 16000.0 - snes * 9500.0
+    if voice_cut > rate / 2 - 200:
+        voice_cut = rate / 2 - 200
     # render every note, in time order, stealing the oldest voice past the limit
     rendered: list[tuple[int, np.ndarray, dict]] = []     # (start sample, mono signal, event)
     active: list[int] = []                                # indices into `rendered` still sounding
@@ -83,6 +90,9 @@ def render_plan(song: dict, plan: list[dict], *, loop: bool = False, lanes: list
             continue
         gate = max(e["l"] * step - 0.01, 0.03)
         sig = synth.render_note(e["preset"], e["p"], gate, e["v"], e["tone"], rate, rng)
+        if snes > 0.05 and len(sig) > 8:
+            sig = dsp.filt(sig, "lowpass", voice_cut, rate, 0.7)
+            sig = (sig + snes * 0.25 * (np.tanh(sig * 2.2) / 2.2 - sig)).astype(np.float32)
         active = [k for k in active if rendered[k][0] + len(rendered[k][1]) > i0]
         if voices > 0 and len(active) >= voices:
             oldest = min(active, key=lambda k: rendered[k][0])
@@ -122,10 +132,14 @@ def render_plan(song: dict, plan: list[dict], *, loop: bool = False, lanes: list
 def master(mix: np.ndarray, song: dict, rng) -> np.ndarray:
     fx = song["fx"]
     rate = int(fx["rate"])
-    x = dsp.saturate(mix, float(fx.get("crunch", 0.2)))
-    x = dsp.bit_depth(x, int(fx.get("bits", 16)))
+    snes = float(np.clip(fx.get("snes", 0.7), 0.0, 1.0))
+    x = dsp.saturate(mix, float(fx.get("crunch", 0.2)) + snes * 0.08)
+    x = dsp.bit_depth(x, min(int(fx.get("bits", 16)), int(round(16 - 4 * snes))))
     beat = 60.0 / float(song["tempo"])
-    x = dsp.echo(x, rate, float(fx.get("echo_beats", 0.75)) * beat, float(fx.get("echo_feedback", 0.35)), float(fx.get("echo", 0.25)), float(fx.get("echo_tone", 0.5)))
+    x = dsp.echo(x, rate, float(fx.get("echo_beats", 0.75)) * beat, float(fx.get("echo_feedback", 0.35)), float(fx.get("echo", 0.25)) * (1.0 + 0.3 * snes), float(fx.get("echo_tone", 0.5)) * (1.0 - 0.3 * snes))
+    if snes > 0.05:
+        for c in range(2):
+            x[:, c] = dsp.filt(x[:, c], "lowpass", 16000.0 - snes * 8000.0, rate, 0.6)
     x = dsp.hall(x, rate, float(fx.get("reverb_size", 1.6)), float(fx.get("reverb", 0.3)), rng)
     x = x[: len(mix)]
     return (x * float(fx.get("master", 1.0))).astype(np.float32)

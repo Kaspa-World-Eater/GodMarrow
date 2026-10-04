@@ -117,7 +117,9 @@ the project and recent files on the left, the folder's entries with thumbnails i
 shows in the picture window), the filter cycler (pictures, models, sounds, everything) at the top right, the typed
 path at the foot. **Exit** is on Home and in the top line, beside the window / full screen switch.
 
-**Settings** has the window / full screen switch, the window's scale, the sounds and the music with their levels,
+**Settings** has the window / full screen switch, the window's scale, the sounds (a lever with three stops: off,
+quiet, full; quiet is the default and keeps only the cursor blip, the select click and the back thud; nothing ever
+sounds when a step finishes), the music, their levels,
 reduced motion, the project and game folders, Blender (for the classic road), the style preset cards with animated
 examples, and what this computer has.
 
@@ -222,8 +224,11 @@ harpsichord), plucked (harp, lute, steel guitar, pizzicato), bass (synth, pick, 
 pulse 12, saw, triangle, sync), winds (wooden flute, pan flute, ocarina, oboe), pads (dark, glass, synthwave); the
 drums lane cycles kits (rock, orchestral, chip, taiko, electro, brush). Levers, each with its number under it:
 **level** 0-100, **tone** (duller to brighter), **pan** (L 100 .. centre .. R 100). Chain pulls: **mute**, **solo**
-(solo wins). *Hear lane* plays the lane alone; *Generate lane* writes a new line for it in the song's genre;
-*Clear lane* empties it in the current pattern. *Reset* puts the lane's levers back to level 80, tone 50, centre.
+(solo wins). The **SNES** lever is the whole song's SNES-ness: it band-limits every voice like a looped sample
+through the console's output filter, adds its grain and echo and caps the voices at eight; 70 is where it sounds like
+the console without turning to mush, 0 is clean. *Hear lane* plays the lane alone; *Generate lane* writes a new line
+for it in the song's genre; *Clear lane* empties it in the current pattern. *Reset* puts the lane's levers back to
+level 80, tone 50, centre.
 
 **Pattern.** The picture shows the chosen bar: the six lanes as rows of sixteen cells (notes as bars, brighter for
 louder) and under them the piano roll of the chosen lane (rows are semitones, the scale's rows lit, the root marked
@@ -252,8 +257,11 @@ no limit) and the **32 kHz** pull (off is 44.1 kHz). Choices: *Play part*, *Play
 *Remove*, *Left / Right* (move it), *New pattern* (empty, four bars, chained). *Reset* puts the sound back to clean
 defaults.
 
-**Library.** The premade pieces by genre (dungeon synth, gothic orchestral, chiptune, dark ambient, battle, boss,
-tavern, town, title, victory, sorrow, exploration, synthwave) and the Forge's three loops; *genre* filters the list;
+**Library.** The premade pieces in two sets: *godmarrow* (the game's dark set: dungeon synth, gothic orchestral,
+gothic march, barbarian epic, dark acoustic, ambient dread, gothic rock, dark ambient, battle, boss, sorrow,
+exploration, title; all minor-mode, in the late-SNES orchestral voices) and *general* (bright pieces for other games:
+chiptune, tavern, town, victory, synthwave), plus the Forge's own loops. The *set* cycler opens on the game's set
+for a gothic project and has *show all*; *genre* filters further;
 **Enter** on a name loads it onto the bench (it is a song, not a recording: everything in it can be edited). To
 write a new piece choose a *genre*, a *mood* (dark, hopeful, tense, calm, heroic, sombre, playful, eerie) and a
 *seed*, then **Compose**; **Dice** rolls another seed. A composed piece has a chord progression, a motif the lead

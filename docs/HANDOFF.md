@@ -818,3 +818,13 @@ frame count, `--no-parts`, still and turntable, the flat path, the CLI flag); `t
 
 **How to resume.** `cd tools/pixelforge && PIXELFORGE_NO_UPDATE=1 python -m pytest -q`. Next: the editor could read
 the manifest's `"parts"` to name the part under the cursor; anchors could ride a part id.
+**7.18, revision round (2026-10-04, later).** The home theme rewritten to the owner's references (Conan the
+Barbarian and Demon's Crest under dungeon synth; Diablo 2, Super Metroid and Castlevania as genres for the game's
+set): C# minor at 66, a drone, a chanting choir, a gothic organ, far timpani, a broad low-brass melody, a bell or two
+a bar; centroid 323 Hz against the reference's 310, same key. Five new genres with their voices and a `godmarrow`
+library piece each (34 pieces; chiptune, tavern, town, victory and synthwave are tagged `general`). `fx.snes` (the
+Tracks tab's SNES lever) for the late-SNES sample character; the Library tab opens on the game's set with a show-all;
+the interface is quiet by default (Settings: sounds off / quiet / full; nothing sounds on a finished step; the done
+loop never plays on a step). Samples: `docs/screens/forgeapp/audio/` forge_home (30 s), epic_the_last_cairn,
+acoustic_the_hanging_road, gothic_the_crest_procession.
+

@@ -145,8 +145,8 @@ def run(a) -> dict:
             r["files"] = [R.write_wav(x, folder / "bar.wav", s["fx"]["rate"])]
         return r
     if verb == "list":
-        pieces = L.list_pieces(a.genre)
-        return {"ok": True, "pieces": pieces, "genres": C.genre_table(), "moods": list(C.MOODS), "instruments": synth.instrument_table(),
+        pieces = L.list_pieces(a.genre, theme=getattr(a, "theme", None))
+        return {"ok": True, "pieces": pieces, "themes": ["godmarrow", "general"], "genres": C.genre_table(), "moods": list(C.MOODS), "instruments": synth.instrument_table(),
                 "scales": list(theory.SCALES), "scale_intervals": theory.SCALES, "drums": theory.DRUMS, "lanes": S.LANES, "fx": S.FX_FIELDS, "ops": E.OPS, "count": len(pieces)}
     if verb == "load":
         name = a.rest[0] if a.rest else ""
@@ -178,9 +178,9 @@ def run(a) -> dict:
 def print_plain(r: dict, verb: str) -> None:
     """The non-JSON output: short tables for list, one line for the rest."""
     if verb == "list":
-        print(f"{'piece':30s} {'genre':18s} {'key':16s} {'bpm':>4s} {'bars':>4s}  {'secs':>5s}  what it is")
+        print(f"{'piece':30s} {'theme':10s} {'genre':18s} {'key':16s} {'bpm':>4s} {'bars':>4s}  {'secs':>5s}  what it is")
         for p in r["pieces"]:
-            print(f"{p['name']:30s} {p['genre']:18s} {p['key']:16s} {p['tempo']:4.0f} {p['bars']:4d}  {p['seconds']:5.0f}  {p.get('words', '')}")
+            print(f"{p['name']:30s} {p.get('theme', ''):10s} {p['genre']:18s} {p['key']:16s} {p['tempo']:4.0f} {p['bars']:4d}  {p['seconds']:5.0f}  {p.get('words', '')}")
         print("\ngenres: " + ", ".join(g["name"] for g in r["genres"]))
         print("moods: " + ", ".join(r["moods"]))
         print("instruments: " + ", ".join(i["name"] for i in r["instruments"]))

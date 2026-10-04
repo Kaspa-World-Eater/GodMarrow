@@ -80,7 +80,9 @@ func _ready() -> void:
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 	audio = Audio.new()
-	audio.sounds_on = not args.has("nosound") and bool(cfg.get("sounds", true))
+	audio.set_level(String(cfg.get("sound_level", "quiet" if bool(cfg.get("sounds", true)) else "off")))
+	if args.has("nosound"):
+		audio.sounds_on = false
 	audio.sound_volume = float(cfg.get("sound_volume", 0.8))
 	audio.music_volume = float(cfg.get("music_volume", 0.6))
 	audio.music_on = not args.has("nomusic") and not args.has("nosound") and bool(cfg.get("music", true))
@@ -626,8 +628,13 @@ func set_music(on: bool) -> void:
 	chrome.queue_redraw()
 
 func set_sounds(on: bool) -> void:
-	audio.sounds_on = on
-	cfg["sounds"] = on
+	set_sound_level("quiet" if on else "off")
+
+## the sounds level: off | quiet (the cursor blip, the select click, back) | full (levers, wheels, pulls, drops too)
+func set_sound_level(l: String) -> void:
+	audio.set_level(l)
+	cfg["sound_level"] = audio.level
+	cfg["sounds"] = audio.level != "off"
 	save_cfg()
 
 func set_style(name: String) -> void:

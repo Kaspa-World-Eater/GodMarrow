@@ -85,8 +85,14 @@ def measure(path: str | Path) -> dict:
         if lag < len(ac):
             cands.append((float(ac[lag] / (ac[0] + 1e-12)), bpm))
     cands.sort(reverse=True)
-    out["tempo_bpm"] = cands[0][1] if cands else None
-    out["tempo_strength"] = round(cands[0][0], 3) if cands else None
+    best = cands[0] if cands else None
+    # the strongest lag is often the half or double of the felt tempo: prefer the strongest in 80..170 when it is close
+    inside = [c for c in cands if 80 <= c[1] <= 170]
+    if best and inside and inside[0][0] >= best[0] * 0.6 and abs(inside[0][1] - best[1]) > 8:
+        best = inside[0]
+    out["tempo_bpm"] = best[1] if best else None
+    out["tempo_strength"] = round(best[0], 3) if best else None
+    out["tempo_candidates"] = [{"bpm": b, "score": round(sc, 3)} for sc, b in cands[:5]]
     out["onsets_per_second"] = round(float((d > np.percentile(d, 90)).sum() / (len(d) / fps)), 2)
     return out
 

@@ -2330,7 +2330,8 @@
   "echo_tone": 0.5,
   "reverb": 0.7,
   "reverb_size": 3.5,
-  "master": 1.0
+  "master": 1.0,
+  "snes": 0.7
  },
  "motif": [
   {
@@ -2370,5 +2371,6 @@
    "l": 8.0
   }
  ],
+ "theme": "godmarrow",
  "words": "a low drone, a men's choir, nothing hurried"
 }

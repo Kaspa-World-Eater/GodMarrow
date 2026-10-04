@@ -32,7 +32,7 @@ LANE_DEFAULT_INSTRUMENT = {"lead": "lead_square", "counter": "strings_dark", "pa
 LANE_OCTAVE = {"lead": 5, "counter": 4, "pad": 4, "bass": 2, "sparkle": 6, "drums": 0}
 
 FX_DEFAULTS = {"rate": 32000, "bits": 16, "voices": 8, "crunch": 0.2, "echo": 0.25, "echo_beats": 0.75, "echo_feedback": 0.35,
-               "echo_tone": 0.5, "reverb": 0.3, "reverb_size": 1.6, "master": 1.0}
+               "echo_tone": 0.5, "reverb": 0.3, "reverb_size": 1.6, "master": 1.0, "snes": 0.7}
 FX_FIELDS = {
     "rate": "sample rate: 32000 is the SNES's, 44100 is CD",
     "bits": "bit depth 6..16: fewer bits is more crunch",
@@ -45,6 +45,7 @@ FX_FIELDS = {
     "reverb": "hall level 0..1",
     "reverb_size": "hall length in seconds, 0.3..4",
     "master": "the whole mix's gain before the limiter",
+    "snes": "SNES-ness 0..1: band-limits every voice like a looped sample through the SPC's Gaussian filter, adds its grain and echo, caps the voices at 8 past 0.5; 0.7 sounds like the console without turning to mush",
 }
 
 
@@ -80,6 +81,7 @@ def normalise(song: dict) -> dict:
     s.setdefault("genre", "")
     s.setdefault("mood", "")
     s.setdefault("seed", 1)
+    s.setdefault("theme", "")
     s["tempo"] = float(s.get("tempo", 110.0))
     if not 20 <= s["tempo"] <= 300:
         raise SongError(f"tempo {s['tempo']} is outside 20..300")
@@ -180,7 +182,7 @@ def key_text(song: dict) -> str:
 def summary(song: dict) -> dict:
     """The facts a list or a card shows: JSON-safe."""
     notes = sum(len(v) for p in song["patterns"].values() for v in p["notes"].values())
-    return {"title": song.get("title", ""), "genre": song.get("genre", ""), "mood": song.get("mood", ""), "tempo": song["tempo"],
+    return {"title": song.get("title", ""), "genre": song.get("genre", ""), "mood": song.get("mood", ""), "theme": song.get("theme", ""), "tempo": song["tempo"],
             "key": key_text(song), "bars": total_bars(song), "seconds": round(total_seconds(song), 1), "patterns": list(song["patterns"]),
             "sections": [f"{s['name']}:{s['pattern']}x{s['repeat']}" + (f"{s['transpose']:+d}" if s["transpose"] else "") for s in song["sections"]],
             "notes": notes, "instruments": {ln: song["lanes"][ln]["instrument"] for ln in LANES}, "seed": song.get("seed", 1)}

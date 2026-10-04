@@ -862,9 +862,14 @@ on the drums lane: 36 kick, 38 snare, 37 stick, 39 clap, 42 hat, 46 open hat, 41
 --lanes lead,bass]`, `play-bar <song> [--pattern P --bar B | --section S [--bar B] | --bars N] [-o dir --lanes --play]`
 (writes `bar.wav`, reports `render_seconds` and `faster_than_real_time`), `export <song> -o <dir> --name N`, `edit
 <song> --op ... [--ops-file f.json] [-o out.json] [--render-bar]`, `list [--genre]`, `load <piece> -o <song>`, `info
-<song>`, `measure <audio>...`, `build-library`, `blips -o <dir>`. Genres: dungeon_synth, gothic_orchestral, chiptune,
-dark_ambient, battle, boss, tavern, town, title, victory, sorrow, exploration, synthwave. Moods: dark, hopeful,
-tense, calm, heroic, sombre, playful, eerie. The same seed, genre, mood, key and tempo always give the same piece.
+<song>`, `measure <audio>...`, `build-library`, `blips -o <dir>`. Genres: dungeon_synth, gothic_orchestral,
+gothic_march (an organ-and-choir march, chromatic harmony, bells), barbarian_epic (low brass and timpani, a chanting
+choir, a broad melody over a pedal), dark_acoustic (a repeated guitar figure over a drone, distant drums, no release),
+ambient_dread (bass pulses, clustered pads, an alien choir, long silences), gothic_rock (harpsichord figures, a
+sixteenth-note bass, baroque turns), chiptune, dark_ambient, battle, boss, tavern, town, title, victory, sorrow,
+exploration, synthwave. Moods: dark, hopeful, tense, calm, heroic, sombre, playful, eerie. The same seed, genre,
+mood, key and tempo always give the same piece. Library pieces carry a `theme`: `godmarrow` (the dark set) or
+`general` (bright pieces for other games); `music list --theme godmarrow`.
 
 **Operations** (`--op` as JSON or as words `name key=value ...`; the docstring of `music/edit.py` has the table): `set_note pattern lane step pitch [vel length] [free]`, `remove_note`, `set_velocity`, `set_length`,
 `clear [lane] [bar|steps]`, `copy` (returns `clipboard`), `paste at clipboard`, `transpose semitones [in_scale] [bar]`,
@@ -879,14 +884,20 @@ and out-of-range values come back as `{"ok": false, "error": "..."}` in plain wo
 brass_horn, brass_stab, trumpet, tuba, choir_ahh/ooh/men, bells_glass, bells_tubular, music_box, vibraphone, marimba,
 celesta, organ_cathedral, organ_reed, piano_electric, harpsichord, harp, lute, guitar_steel, pizzicato, bass_synth,
 bass_pick, bass_sub, bass_slap, lead_square, lead_pulse25, lead_pulse12, lead_saw, lead_tri, lead_sync, flute_wood,
-flute_pan, ocarina, oboe, pad_dark, pad_glass, pad_synthwave, timpani; kits drums_rock/orch/chip/taiko/electro/brush
-(the drums lane only). The chain is the SNES's in spirit: `voices` notes at once (a ninth cuts the oldest), lane mix,
-`crunch` saturation, `bits`, the SPC-style echo, a short hall, a limiter; `rate` 32000 by default.
+flute_pan, ocarina, oboe, pad_dark, pad_glass, pad_dream, pad_synthwave, timpani, strings_ens (the looped chorused
+ensemble), orch_hit, brass_low, choir_chant, choir_dark, choir_alien, organ_gothic, bells_chapel, guitar_nylon; kits
+drums_rock/orch/chip/taiko/electro/brush/epic (the drums lane only). The chain is the SNES's: `fx.snes` (0..1, 0.7 by
+default; the Tracks tab's SNES lever) band-limits every voice like a looped sample through the SPC's output filter,
+adds grain and echo and caps the voices at eight; then `voices`, the lane mix, `crunch`, `bits`, the SPC-style echo,
+a short hall, a limiter; `rate` 32000 by default.
 
-**The Forge's theme** is `library/forge_home.song.json` (hand-written: C# minor at 72, i VI III VII, a bridge in
-the iv key, the bells as the one bright thing); `pixelforge music forge -o forge/assets/audio --format ogg` renders
-the three loops the app plays, `music blips` its interface sounds. Measured against `docs/refs/forge_music_reference.mp3`
-(`music measure`): both C# minor; spectral centroid 302 Hz against 310; RMS 0.085 against 0.127 (the game's loudness).
+**The Forge's theme** is `library/forge_home.song.json` (hand-written: C# minor at 66; a sub-bass drone, a chanting
+male choir, a gothic organ and far timpani under a broad low-brass melody stated, stated again climbing, lifted a
+minor third in the bridge; a bell or two a bar, low); `pixelforge music forge -o forge/assets/audio --format ogg`
+renders the loops the app plays, `music blips` its interface sounds (forge_done is the music bench's cadence; no step
+plays it). Measured against `docs/refs/forge_music_reference.mp3` (`music measure`): both C# minor; spectral
+centroid 323 Hz against 310; RMS 0.076 against 0.127 (the game's loudness); the autocorrelation tempo reads 135 for a
+piece written at 66 (the chant's 3+3+2 figure doubles it; the reference reads 103 with no beat at all).
 
 **In the app:** `--screen=music [--tab=Tracks|Pattern|Song|Library|Export] [--song=FILE | --library=NAME]`; the bench
 keeps `<project>/music/current.song.json` and runs `music edit` for every change and `music play-bar` for every sound

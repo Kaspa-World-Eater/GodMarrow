@@ -37,7 +37,7 @@ func build() -> void:
 	hint_text = "Space plays · G the grid · Esc back"
 	if state.is_empty():
 		state = {"song": {}, "path": "", "pattern": "", "bar": 0, "lane": "lead", "section": 0, "step": 0, "pitch": 73, "length": 2.0, "vel": 0.8,
-				 "loop": "bar", "genre": "all", "mood": "dark", "seed": 7, "name": "", "clipboard": [], "exported": "", "humanise": 0.4, "live": true, "piece": ""}
+				 "loop": "bar", "genre": "all", "mood": "dark", "seed": 7, "name": "", "clipboard": [], "exported": "", "humanise": 0.4, "live": true, "piece": "", "theme": ""}
 	player = AudioStreamPlayer.new()
 	add_child(player)
 	canvas = Canvas.new()
@@ -225,7 +225,10 @@ func _tracks_tab() -> void:
 	pm.init_pull("mute", bool(li.get("mute", false)), false, Callable(), func(on): _op({"op": "mute", "lane": ln, "on": on}, func(): lane_info(ln)["mute"] = on))
 	var ps := W.Pull.new()
 	ps.init_pull("solo", bool(li.get("solo", false)), false, Callable(), func(on): _op({"op": "solo", "lane": ln, "on": on}, func(): lane_info(ln)["solo"] = on))
-	controls.append_array([lv, lt, lp, pm, ps])
+	var ls := W.Lever.new()
+	ls.init("SNES", float(song()["fx"].get("snes", 0.7)), 0.7, func(v): return "%d" % int(round(v * 100)), Callable(), func(v): _fx("snes", snappedf(v, 0.05)))
+	ls.hint = "SNES-ness: the sample band, the grain, the echo and the eight voices together; 70 sounds like the console"
+	controls.append_array([lv, lt, lp, pm, ps, ls])
 	add_rack(controls, 8)
 	add_choices(standard_choices([{"label": "Stop" if player.playing else "Play", "cb": _play_or_stop}, {"label": "Hear lane", "cb": _audition_lane},
 		{"label": "Generate lane", "cb": _generate_lane}, {"label": "Clear lane", "cb": func(): _op({"op": "clear", "pattern": pat_name(), "lane": ln}, func(): pat()["notes"][ln] = [])}], false))
@@ -334,20 +337,30 @@ func _move_section(si: int, delta: int) -> void:
 		return
 	_op({"op": "section_move", "index": si, "to": to}, func(): state["section"] = to)
 
+## the theme set the Library shows first: the game's dark set for a gothic project, the general one otherwise
+func _default_theme() -> String:
+	var style := app.backend.project_style(String(app.cfg.get("style", "gothic_hd")))
+	return "godmarrow" if (app.backend.game_ok() or style in ["godmarrow", "gothic_hd"]) else "general"
+
 func _library_tab() -> void:
 	var pieces: Array = table.get("pieces", [])
 	var genre := String(state["genre"])
+	if String(state["theme"]) == "":
+		state["theme"] = _default_theme()
+	var theme := String(state["theme"])
 	var shown := []
 	for p in pieces:
-		if genre == "all" or String(p.get("genre", "")) == genre:
+		if (genre == "all" or String(p.get("genre", "")) == genre) and (theme == "all" or String(p.get("theme", "")) == theme):
 			shown.append(p)
-	state_line("Library · %d pieces%s · each an editable song · Compose: a new one from genre, mood, seed" % [shown.size(), "" if genre == "all" else " of " + genre.replace("_", " ")])
+	state_line("Library · %d pieces%s · set: %s · each an editable song · Compose: a new one from genre, mood, seed" % [shown.size(), "" if genre == "all" else " of " + genre.replace("_", " "), "all" if theme == "all" else theme + (" (the game's dark set)" if theme == "godmarrow" else " (for brighter games)")])
 	var genres := ["all"]
 	for g in table.get("genres", []):
 		genres.append(String(g["name"]))
 	var moods: Array = table.get("moods", ["dark"])
 	var mood := String(state["mood"])
+	var themes := ["godmarrow", "general", "all"]
 	add_cyclers([
+		{"label": "set", "value": "show all" if theme == "all" else theme, "left": func(): _set_state("theme", _cycle(themes, theme, -1)), "right": func(): _set_state("theme", _cycle(themes, theme, 1))},
 		{"label": "genre", "value": genre.replace("_", " "), "left": func(): _set_state("genre", _cycle(genres, genre, -1)), "right": func(): _set_state("genre", _cycle(genres, genre, 1))},
 		{"label": "mood", "value": mood, "left": func(): _set_state("mood", _cycle(moods, mood, -1)), "right": func(): _set_state("mood", _cycle(moods, mood, 1))},
 		{"label": "seed", "value": str(int(state["seed"])), "left": func(): _set_state("seed", maxi(int(state["seed"]) - 1, 1)), "right": func(): _set_state("seed", int(state["seed"]) + 1)},
@@ -357,7 +370,7 @@ func _library_tab() -> void:
 		var nm := String(p["name"])
 		items.append({"label": String(p.get("title", nm)), "cb": func(): _load_library(nm), "dim": nm != String(state["name"])})
 	if items.is_empty():
-		items.append({"label": "the library is loading" if table.is_empty() else "no pieces of this genre", "cb": func(): pass})
+		items.append({"label": "the library is loading" if table.is_empty() else "no pieces of this genre in this set: show all", "cb": func(): pass})
 	var c := W.Choices.new()
 	c.font_size = T.SMALL_SIZE
 	c.arrow_gap = 12
@@ -384,7 +397,7 @@ func _library_card() -> void:
 	var lines: PackedStringArray = []
 	if s.has("words"):
 		lines.append(String(s["words"]))
-	lines.append("genre %s, mood %s, seed %d" % [String(s.get("genre", "")).replace("_", " "), String(s.get("mood", "")), int(s.get("seed", 0))])
+	lines.append("genre %s, mood %s, seed %d%s" % [String(s.get("genre", "")).replace("_", " "), String(s.get("mood", "")), int(s.get("seed", 0)), (", set " + String(s["theme"])) if String(s.get("theme", "")) != "" else ""])
 	var inst := []
 	for ln in LANES:
 		inst.append("%s: %s" % [ln, String(s["lanes"][ln]["instrument"]).replace("_", " ")])
@@ -964,7 +977,7 @@ func reset() -> void:
 			var defaults := {"volume": 0.8, "tone": 0.5, "pan": 0.0, "mute": false, "solo": false}
 			_op({"op": "set_lane", "lane": ln, "volume": 0.8, "tone": 0.5, "pan": 0.0, "mute": false, "solo": false}, func(): lane_info(ln).merge(defaults, true))
 		2:
-			var defaults := {"crunch": 0.2, "bits": 16, "echo": 0.25, "reverb": 0.3, "reverb_size": 1.6, "voices": 8, "rate": 32000}
+			var defaults := {"crunch": 0.2, "bits": 16, "echo": 0.25, "reverb": 0.3, "reverb_size": 1.6, "voices": 8, "rate": 32000, "snes": 0.7}
 			for k in defaults:
 				pending_ops.append({"op": "set_fx", "name": k, "value": defaults[k]})
 				song()["fx"][k] = defaults[k]
