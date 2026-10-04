@@ -726,7 +726,7 @@ window after S seconds and quits; `--windowed`, `--nosound`, `--nomusic`, `--red
 `--script=FILE` drives a whole walkthrough, one line per step (`forge/scripts/driver.gd` lists them: `go SCREEN
 k=v`, `tab NAME`, `drop FILE`, `choose LABEL`, `set CONTROL VALUE`, `key ...`, `waitjob [S]`, `shot PATH`,
 `dumplog`, `quit`); this is how the Characters bench is verified end to end (drop the Keeper, Render all, Export
-sheets). `forge/tools/screens.sh OUT [WxH]` shoots every screen and prints `name | errors N`; `godot --headless --path
+sheets), and how the Claude line is (`forge/tools/describe_walk*.txt` with the mock, `screens.sh`'s `describe_*`). `forge/tools/screens.sh OUT [WxH]` shoots every screen and prints `name | errors N`; `godot --headless --path
 tools/pixelforge/forge --script res://tools/test_editor.gd` runs the editor's own checks (palette lock, fill, wand,
 undo/redo, clone offset, carry by frame index, anchors, the command line). Under xvfb:
 
@@ -798,6 +798,89 @@ back to position and the result says `"by": "position"`.
 ```json
 {"mcpServers": {"pixelforge": {"command": "pixelforge", "args": ["mcp"]}}}
 ```
+
+## Claude on the bench (pixelforge/claude_bridge.py)
+
+Every Forge bench has a describe line that hands one sentence to the **Claude Code CLI** (`claude`), which works through
+this package's MCP server on the same project. The bridge is `pixelforge/claude_bridge.py`; the CLI verbs:
+
+| verb | what |
+|---|---|
+| `pixelforge describe --bench characters|creatures|objects|effects|tiles|interface|music|sound -p <project> "words" [--context JSON] [--timeout S] [--dry-run] --json` | one job on a bench: snapshot, `claude -p`, progress lines, the result (below) |
+| `pixelforge claude status [--json]` | `{"ok", "state": ready | not_found | not_signed_in, "sentence", "exe", "version", "registered"}` (the title line's words) |
+| `pixelforge claude register [--python P]` | `claude mcp add -s user pixelforge -- <python> -m pixelforge.cli mcp`, idempotent (`claude mcp get pixelforge` first); `install.bat` and the Forge's first launch call it |
+| `pixelforge claude log [-p P] [--lines N]` | the last job's log (`<project>/claude/logs/<stamp>_<bench>.jsonl`: the command, every stream event, the stderr tail) |
+| `pixelforge claude undo <manifest>` | put a run's snapshot back (the bench's Undo): the snapshot's files restored, files made since under the bench's roots removed |
+| `pixelforge midjourney fetch --prompt "..." | --kind K --describe "..." [--image clay.png] -o DIR -p P [--pick best|all] [--timeout 900] [--dry-run] --json` | Claude in Chrome paints it on midjourney.com and downloads the picks into DIR (below) |
+| `pixelforge midjourney prompt --kind K --describe "..."` | the prompt a fetch would use: the character kinds of prompts.py, `turnaround` (world_prompts' object sheet), `props9` (a sheet of nine) |
+
+**The command the bridge builds** (`build_command`): `claude -p --output-format stream-json --verbose --mcp-config
+<project>/claude/mcp_config.json --tools Read --allowedTools mcp__pixelforge,Read --permission-prompts none
+--append-system-prompt <prompt> --add-dir <project> --strict-mcp-config --max-budget-usd 3 "<words>"`. The MCP config
+names this interpreter (`sys.executable -m pixelforge.cli mcp`, `PYTHONPATH` = this package's parent), so the server
+runs without an install. `--tools Read` strips every other built-in tool; `--allowedTools` pre-approves the server's
+tools and Read; `--permission-prompts none` denies anything else (nothing can prompt in print mode); the budget is
+`PIXELFORGE_CLAUDE_BUDGET` (dollars; `0` = no flag). The Midjourney step adds `--chrome` and `mcp__claude-in-chrome`
+to the allowed tools and drops `--strict-mcp-config` (the extension's server must stay). The executable is found
+through `PIXELFORGE_CLAUDE`, PATH, then the usual install places (`~/.local/bin`, `%APPDATA%\npm`,
+`%LOCALAPPDATA%\Programs\claude`, ...). `PIXELFORGE_CLAUDE=mock:<script.jsonl>` swaps in the mock (below).
+
+**The system prompt contract** (`system_prompt`): the bench and the project folder; what is on the bench
+(`bench_sentence`: the model file, the character, the painting, the frames folder, the current song, the effect and
+palette, the spell file, the texture, the picture, the pad, the look preset, the project's characters; the Forge sends
+these as `--context`, the bridge fills the rest from `project.json` and the folder); the bench's tools (`BENCH_TOOLS`,
+MCP names); the game's rules for art and words (`STYLE_RULES`) and the banned words (`BANNED_WORDS`, HANDOFF section 4);
+the conduct ("a bench hand, not a chat": no questions back, one job, the fewest calls, nothing beyond the line, nothing
+written by hand, British spelling); and the ending: one line of JSON, nothing after it:
+
+```json
+{"did": ["short past-tense sentences"], "changed": ["absolute paths of files made or changed"], "notes": "one or two plain sentences for the person"}
+```
+
+**The result** (`run` / `describe --bench --json`): `{"ok", "did", "changed", "notes", "summary", "log", "snapshot",
+"progress", "seconds", "cost_usd", "detected"}`. `changed` is the summary's list united with what the bridge saw change
+on disk (`file_state` before and after, `claude/` skipped); `snapshot` is the undo manifest; for Characters and Objects
+the describe verb adds `model_file`, `about` and `prompts` (prompts.py's set, or `turnaround` + `props9`) with
+`prompt_titles`. On failure `{"ok": false, "error": "<one sentence>"}`: *Claude Code was not found...*, *not signed
+in...*, *did not finish within N s; it was stopped*, *stopped at the spending limit*, *Chrome is not connected...*,
+*Midjourney asked for a sign-in or a check*. While it runs, the verb prints `PF_PROGRESS step=claude done=N total=0
+note=<words with + for spaces>` on stderr for every tool call (`tool_words`: `draft_shapes` → *drafting the model*,
+`edit_song` → one line per op, *setting tempo 76*; a Read → *reading current.song.json*; an unknown tool → its name
+in words); the Forge shows them on the progress strip and the foot, and pulses the title line.
+
+**The mock** (`tests/claude_mock/*.jsonl`, `mock_main`): a .jsonl of stream-json events, with control lines
+`{"mock": "run", "args": [pixelforge words]}` (the CLI runs, so a bench really changes), `{"mock": "sleep",
+"seconds": S}`, `{"mock": "exit", "code": N}`; `{project} {bench} {text} {slug} {pf_root}` are filled in. The bridge
+runs it as a subprocess (`python -m pixelforge.claude_bridge mock ...`) through the same reader, so the stream, the
+progress, the summary, the timeout and the snapshot are all exercised without the real CLI; `PIXELFORGE_MOCK_DELAY`
+paces it. `tests/test_claude_bridge.py` and the Forge's sweep (`screens.sh`: `describe_characters`,
+`describe_music`, from `forge/tools/describe_walk*.txt`) use it.
+
+**When you ARE the Claude on the bench** (a session started by the describe line): the system prompt says the bench
+and what is on it; believe it. Call `status` when you need the project's facts; use the bench's tools and no others;
+one job, the fewest calls that do what the line says; do not render the whole set unless asked (render_shapes takes
+a minute); never write a file by hand (Read is for looking); keep the sentence's words out of the banned list; end
+with the JSON line and nothing after it, with every file you touched in `changed` by absolute path. A line you cannot
+do with these tools: do nothing and say why in `notes`. On the Midjourney step: one prompt, one grid, the upscales,
+the downloads into the folder given, stop; never pass a sign-in or a check, say so instead.
+
+**The Forge's side** (`forge/scripts/screen.gd`): `add_describe_line` on every workbench; `_describe` snapshots the
+rack's values, `push_undo`, runs `describe --bench <screen> -p <project> "<words>" --context <claude_context()>`;
+`on_progress` handles `step=claude`; on success `state["claude_snapshot"]` is set, `on_claude_done(r)` (each bench
+reloads what changed: Characters re-reads the model file or imports a new one and takes the prompts; Music re-reads
+the song and rings the new notes; Effects takes a spell file or a strip; Tiles / Interface / Sound show the files),
+then `rebuild` and `_highlight_changed` (levers whose value text changed are lit for 2.5 s). `undo()` on a state with
+`claude_snapshot` runs `claude undo <manifest>` and `on_claude_undone()`; `redo()` refuses to re-run Claude.
+`app.gd` runs `claude status` at launch (`claude_state`, the title label `claude_label()`), registers when needed,
+and `set_claude_working(words)` drives the pulse. Driver: `type TEXT` on any bench feeds the Claude line.
+
+**The Midjourney step on the owner's PC needs**: Chrome or Edge (not WSL) open; the Claude in Chrome extension
+(1.0.36+) installed and signed in with the same Anthropic account as the CLI; Claude Code signed in with `/login`
+(an API key or `setup-token` keeps Chrome integration off); midjourney.com signed in in that Chrome; one
+`claude --chrome` session run by hand first (the one-time dialog, the site permission for midjourney.com). The bridge
+reads the init event's `mcp_servers` for `claude-in-chrome` and stops with *Chrome is not connected...* when it is
+missing. This step was built to the documented behaviour of `claude --chrome` and exercised only through the mock
+here (no Chrome, no Midjourney in the cloud session).
 
 ## Don'ts
 

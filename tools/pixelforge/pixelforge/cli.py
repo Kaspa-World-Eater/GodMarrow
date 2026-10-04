@@ -546,9 +546,99 @@ def cmd_music(a) -> None:
     _emit(a, r)
 
 
+def _claude_progress(words: str, n: list) -> None:
+    """A progress line for the Forge while Claude works: the words with + for spaces (the app splits on spaces)."""
+    n[0] += 1
+    print(f"PF_PROGRESS step=claude done={n[0]} total=0 note={words.replace(' ', '+')}", file=sys.stderr, flush=True)
+
+
+def describe_on_bench(bench: str, project: str, text: str, context: dict | None = None, timeout: float = 600.0, dry_run: bool = False) -> dict:
+    """`pixelforge describe --bench B --project P "text"`: Claude Code does the job through PixelForge's MCP tools (claude_bridge.run),
+    then the Characters and Objects results carry the Midjourney prompts for the thing on the bench."""
+    import json as _json
+    from . import claude_bridge as CB
+    count = [0]
+    r = CB.run(bench, project, text, ctx=context, on_progress=lambda w: _claude_progress(w, count), timeout=timeout, dry_run=dry_run)
+    if r.get("dry_run") or not r.get("ok"):
+        return r
+    if bench in ("characters", "creatures", "objects"):
+        about = text
+        models = [f for f in r.get("changed", []) if f.endswith(".shapes.json") and Path(f).exists()]
+        models.sort(key=lambda f: 0 if ("/characters/" in f.replace("\\", "/") or "/objects/" in f.replace("\\", "/")) else 1)
+        if models:
+            r["model_file"] = models[0]
+            try:
+                got = str(_json.loads(Path(models[0]).read_text(encoding="utf-8")).get("about", "") or "")
+                about = got.split(":", 1)[1].strip() if got.lower().startswith("drafted from:") else (got or about)
+            except (OSError, _json.JSONDecodeError):
+                pass
+        if bench == "objects":
+            r["prompts"] = {"turnaround": CB.midjourney_prompt("turnaround", about), "props9": CB.midjourney_prompt("props9", about)}
+            r["prompt_titles"] = {"turnaround": "Object turnaround (three views)", "props9": "A prop sheet of nine"}
+        else:
+            r["prompts"] = build_all(about)
+            r["prompt_titles"] = {k.key: k.title for k in PROMPT_KINDS}
+        r["about"] = about
+    return r
+
+
+def cmd_claude(a) -> None:
+    """pixelforge claude status | register | log | undo <manifest>"""
+    from . import claude_bridge as CB
+    sub = a.claude_cmd
+    if sub == "status":
+        r = CB.status()
+    elif sub == "register":
+        r = CB.register(python=a.python)
+    elif sub == "log":
+        r = CB.last_log(a.project, a.lines)
+    else:
+        r = CB.restore(a.manifest)
+    if getattr(a, "json", False):
+        _emit(a, r)
+    elif sub == "log" and r.get("ok"):
+        print(r["log"])
+        print("\n".join(r["tail"]))
+    elif sub == "undo" and r.get("ok"):
+        print(f"restored {len(r['restored'])} files, removed {len(r['removed'])} ({r['bench']})")
+    else:
+        print(r.get("sentence") or r.get("note") or r.get("error") or r)
+
+
+def cmd_midjourney(a) -> None:
+    """pixelforge midjourney fetch --prompt "..." | --kind K --describe "..." [--image X] --out DIR --project P [--pick best|all]"""
+    from . import claude_bridge as CB
+    prompt = a.prompt or CB.midjourney_prompt(a.kind, a.describe or "")
+    if a.midjourney_cmd == "prompt":
+        _emit(a, {"ok": True, "kind": a.kind, "prompt": prompt}) if a.json else print(prompt)
+        return
+    count = [0]
+    r = CB.fetch_midjourney(prompt, a.out, a.project, image=a.image, pick=a.pick, on_progress=lambda w: _claude_progress(w, count), timeout=a.timeout, dry_run=a.dry_run)
+    if a.json:
+        _emit(a, r)
+    elif r.get("ok"):
+        print("\n".join(r.get("files", [])) + ("\n" + r["notes"] if r.get("notes") else ""))
+    else:
+        print(r.get("error", "stopped"))
+        sys.exit(1)
+
+
 def cmd_describe(a) -> None:
     from . import describe
 
+    if getattr(a, "bench", None):
+        import json as _json
+        ctx = _json.loads(a.context) if getattr(a, "context", None) else None
+        r = describe_on_bench(a.bench, a.project or ".", a.text, ctx, timeout=a.timeout, dry_run=a.dry_run)
+        if a.json:
+            _emit(a, r)
+        elif r.get("dry_run"):
+            print(" ".join(r["command"]))
+        elif r.get("ok"):
+            print("\n".join(r.get("did", [])) + ("\n" + r["notes"] if r.get("notes") else ""))
+        else:
+            print(r.get("error", "stopped"))
+        return
     d = describe.draft(a.text, image=a.image, what=a.as_)
     if d["what"] == "spell" and a.out:
         from . import spell as S
@@ -1093,7 +1183,32 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--image", help="the cutout / sprite the words are about (locates eyes, hands, lantern...)"); s.add_argument("--as", dest="as_", choices=["spell", "skin", "prompt", "music"], default=None)
     s.add_argument("-o", "--out", default=None, help="spell / music: export here"); s.add_argument("--apply", action="store_true", help="skin: apply the ops to --image")
     s.add_argument("--seconds", type=float, default=60.0); s.add_argument("--json", action="store_true")
+    s.add_argument("--bench", choices=["characters", "creatures", "objects", "effects", "tiles", "interface", "music", "sound"], default=None,
+                   help="Claude on the bench: Claude Code does the job through PixelForge's MCP tools on --project (the Forge's describe line)")
+    s.add_argument("-p", "--project", default=None, help="the project folder (with --bench)"); s.add_argument("--context", default=None, help="JSON: what is on the bench (model_file, song, effect...)")
+    s.add_argument("--timeout", type=float, default=600.0); s.add_argument("--dry-run", dest="dry_run", action="store_true", help="only build the claude command")
     s.set_defaults(func=cmd_describe)
+
+    s = sub.add_parser("claude", help="Claude Code on the bench: status | register (the MCP server, once) | log | undo <manifest>")
+    cs = s.add_subparsers(dest="claude_cmd", required=True)
+    x = cs.add_parser("status", help="ready / not found / not signed in, in a sentence"); x.add_argument("--json", action="store_true")
+    x = cs.add_parser("register", help="`claude mcp add -s user pixelforge -- <python> -m pixelforge.cli mcp` (idempotent)"); x.add_argument("--python", default=None); x.add_argument("--json", action="store_true")
+    x = cs.add_parser("log", help="the last job's log"); x.add_argument("-p", "--project", default="."); x.add_argument("--lines", type=int, default=40); x.add_argument("--json", action="store_true")
+    x = cs.add_parser("undo", help="put a snapshot back (the manifest a describe --bench result names)"); x.add_argument("manifest"); x.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_claude)
+
+    s = sub.add_parser("midjourney", help="Midjourney through the owner's Chrome (Claude in Chrome): fetch a painting for a prompt, or print the prompt")
+    ms = s.add_subparsers(dest="midjourney_cmd", required=True)
+    for name in ("fetch", "prompt"):
+        x = ms.add_parser(name, help="paint it and download the picks into --out" if name == "fetch" else "the prompt a fetch would use")
+        x.add_argument("--prompt", default=None, help="the whole prompt; or --kind with --describe")
+        x.add_argument("--kind", default="sheet_px", help="sheet sheet_px sheet4 sheet_t front back sprite item | turnaround | props9")
+        x.add_argument("--describe", default=None, help="the one-sentence description the kind's template takes")
+        x.add_argument("--image", default=None, help="an image prompt (a clay view of the model)")
+        x.add_argument("-o", "--out", default="midjourney"); x.add_argument("-p", "--project", default=".")
+        x.add_argument("--pick", choices=["best", "all"], default="best"); x.add_argument("--timeout", type=float, default=900.0)
+        x.add_argument("--dry-run", dest="dry_run", action="store_true"); x.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_midjourney)
 
     s = sub.add_parser("shapes", help="shape sprites: characters and objects drawn by code (.shapes.json) rendered as pixel art with real frame animation in 8 directions")
     ss = s.add_subparsers(dest="shapes_cmd", required=True)

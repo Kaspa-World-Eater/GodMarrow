@@ -171,6 +171,20 @@ func _build_export() -> void:
 		{"label": "Take it out", "cb": _take_out},
 	], false))
 
+## the Reference tab's painting choices for an object: a turnaround (three views) or a prop sheet of nine
+func midjourney_label() -> String:
+	return "Fetch a turnaround"
+
+func midjourney_kind() -> String:
+	return String(state.get("prompt_kind", "turnaround")) if state.get("prompts", {}).has(String(state.get("prompt_kind", ""))) else "turnaround"
+
+func _build_reference() -> void:
+	super()
+	if choices and is_instance_valid(choices):
+		var items: Array = choices.items.duplicate()
+		items.insert(2, {"label": "Fetch a prop sheet of nine", "cb": func(): _paint_in_midjourney("props9")})
+		choices.setup(items, 1, app)
+
 func _toggle_dirs() -> void:
 	state["dirs"] = "all" if String(state.get("dirs", "S")) == "S" else "S"
 	rebuild()

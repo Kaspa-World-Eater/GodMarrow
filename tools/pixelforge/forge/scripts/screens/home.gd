@@ -8,7 +8,6 @@ const CHOICES := [
 	["Effects", "effects"], ["Tiles and ground", "tiles"], ["Interface", "interface"],
 	["Sound", "sound"], ["Music", "music"], ["Settings", "settings"],
 ]
-var describe: LineEdit
 var reading := false
 
 func build() -> void:

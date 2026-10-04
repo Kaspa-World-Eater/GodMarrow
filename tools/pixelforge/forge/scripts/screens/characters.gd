@@ -277,9 +277,26 @@ func _build_reference() -> void:
 	state_line("%s · reference. %s" % [String(state["title"]), summary])
 	var checks := _checks()
 	dim_line(checks)
-	add_rack([direction_wheel(), scene_light_lever()], 8)
+	# one row of cyclers (the facing and the scene light as on Export; the prompt when a describe run brought the set), so the
+	# two rows of choices and the Claude line fit under them
+	var cy := []
+	var prompts: Dictionary = state.get("prompts", {})
+	if not prompts.is_empty():
+		var kinds: Array = prompts.keys()
+		var kind := String(state.get("prompt_kind", kinds[0]))
+		if not prompts.has(kind):
+			kind = String(kinds[0])
+		state["prompt_kind"] = kind
+		var titles: Dictionary = state.get("prompt_titles", {})
+		cy.append({"label": "prompt", "value": String(titles.get(kind, kind)).split(" (")[0], "left": func(): state["prompt_kind"] = _cycle(kinds, kind, -1); rebuild(),
+			"right": func(): state["prompt_kind"] = _cycle(kinds, kind, 1); rebuild()})
+	cy.append({"label": "facing", "value": String(state["direction"]), "left": func(): _pick_direction(_cycle(DIRS, String(state["direction"]), -1)), "right": func(): _pick_direction(_cycle(DIRS, String(state["direction"]), 1))})
+	cy.append({"label": "scene light", "value": ["off", "sprite only", "on"][app.scene.light_mode], "left": func(): _set_scene_light(app.scene.light_mode - 1), "right": func(): _set_scene_light(app.scene.light_mode + 1)})
+	add_cyclers(cy)
+	add_spacer()
 	var items := [
 		{"label": "Copy prompt", "cb": _copy_prompt},
+		{"label": midjourney_label(), "cb": _paint_in_midjourney},
 		{"label": "Another painting", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; paintings"]), func(p):
 			state["painting"] = p
 			rebuild()
@@ -321,13 +338,142 @@ func _checks() -> String:
 		return "Checks clean: feet on the ground, one piece in every direction, no shimmer between held poses."
 	return "What to change: " + " ".join(PackedStringArray(notes))
 
+## the description the prompts are built from: the describe line's words, else the file's "about", else the title
+func about_text() -> String:
+	var a := String(state.get("about", ""))
+	if a == "":
+		a = String(doc.get("about", state["title"]))
+	if a.to_lower().begins_with("drafted from:"):
+		a = a.split(":", true, 1)[1].strip_edges()
+	return a
+
+## the prompt kind the Reference tab's cycler shows (a describe result brought the whole set), else the pixel-styled sheet
+func current_prompt_kind() -> String:
+	return String(state.get("prompt_kind", "sheet_px"))
+
 func _copy_prompt() -> void:
-	var about := String(doc.get("about", state["title"]))
-	run(["prompt", "--describe", about, "--kind", "sheet_px"], "building the prompt", func(r: Dictionary):
+	var prompts: Dictionary = state.get("prompts", {})
+	var kind := current_prompt_kind()
+	if prompts.has(kind):
+		DisplayServer.clipboard_set(String(prompts[kind]))
+		app.say("The %s prompt is on the clipboard." % kind.replace("_", " "))
+		return
+	run(["prompt", "--describe", about_text(), "--kind", kind], "building the prompt", func(r: Dictionary):
 		if r.get("ok", false):
 			DisplayServer.clipboard_set(String(r.get("prompt", "")))
-			app.say("The pixel-styled sheet prompt is on the clipboard.")
+			app.say("The %s prompt is on the clipboard." % kind.replace("_", " "))
 		, false)
+
+# ------------------------------------------------------------------ Claude on the bench
+func claude_context() -> Dictionary:
+	var ctx := {}
+	if has_model():
+		ctx["model_file"] = model_path()
+		ctx["character"] = String(state["name"])
+	if String(state.get("painting", "")) != "":
+		ctx["painting"] = String(state["painting"])
+	if String(state.get("frames_dir", "")) != "":
+		ctx["frames_dir"] = String(state["frames_dir"])
+	return ctx
+
+## Claude's run is done: a model it made or changed goes on the bench (the file is the truth: the levers' edits start again
+## from it), the prompts it brought go to the Reference tab
+func on_claude_done(r: Dictionary) -> void:
+	if r.has("prompts") and r["prompts"] is Dictionary and not r["prompts"].is_empty():
+		state["prompts"] = r["prompts"]
+		state["prompt_titles"] = r.get("prompt_titles", {})
+		state["prompt_kind"] = "sheet_px" if r["prompts"].has("sheet_px") else String(r["prompts"].keys()[0])
+		state["about"] = String(r.get("about", ""))
+	var f := String(r.get("model_file", pick_changed(r, ".shapes.json")))
+	if f == "":
+		f = pick_changed(r, ".shapes.json")
+	if f != "" and FileAccess.file_exists(f):
+		var name := f.get_file().split(".")[0]
+		state.erase("edits"); state.erase("ramps"); state.erase("lights"); state.erase("motion")
+		if has_model() and f.simplify_path() == model_path().simplify_path():
+			_frames_dirty = true
+			_model_loaded()
+		elif f.simplify_path() == _model_path_of(name).simplify_path():
+			state["name"] = name
+			_frames_dirty = true
+			tab = 0
+			_model_loaded()
+		else:
+			tab = 0
+			import_model(f)
+	elif has_model():
+		_frames_dirty = true
+		_model_loaded()
+
+func _model_path_of(name: String) -> String:
+	var keep := String(state["name"])
+	state["name"] = name
+	var p := model_path()
+	state["name"] = keep
+	return p
+
+## Undo put the model file back as it was before Claude: read it again (or clear the bench when it made the model)
+func on_claude_undone() -> void:
+	state.erase("edits"); state.erase("ramps"); state.erase("lights"); state.erase("motion")
+	if String(state.get("name", "")) != "" and FileAccess.file_exists(model_path()):
+		_frames_dirty = true
+		_model_loaded()
+	else:
+		doc = {}
+		orig = {}
+		clip_frames = []
+		state["name"] = ""
+		state["model_file"] = ""
+		app.scene.clear()
+
+## --- Midjourney through the owner's Chrome (Claude in Chrome): the bench's prompt and its clay view, the painting onto the Reference tab
+func midjourney_label() -> String:
+	return "Paint it in Midjourney"
+
+func midjourney_kind() -> String:
+	return current_prompt_kind()
+
+func reference_dir() -> String:
+	var d := char_dir().path_join("reference")
+	DirAccess.make_dir_recursive_absolute(d)
+	return d
+
+func _paint_in_midjourney(kind: String = "") -> void:
+	if job != null:
+		app.say("Still working on the last thing.")
+		return
+	var st: Dictionary = app.claude_state
+	if not st.is_empty() and not st.get("ok", false):
+		say_notes(String(st.get("sentence", "Claude Code is not ready.")) + " Copy prompt and drop the painting on the bench instead.")
+		rebuild()
+		return
+	if kind == "":
+		kind = midjourney_kind()
+	var prompts: Dictionary = state.get("prompts", {})
+	var a := ["midjourney", "fetch", "-o", reference_dir(), "-p", app.backend.project_dir, "--kind", kind]
+	if prompts.has(kind):
+		a += ["--prompt", String(prompts[kind])]
+	else:
+		a += ["--describe", about_text()]
+	var clay := previews_dir().path_join("still_%s.png" % String(state["direction"]))
+	if FileAccess.file_exists(clay):
+		a += ["--image", clay]
+	say_notes("Watch the browser: a Chrome tab opens on midjourney.com and Claude works it at a human pace. One job; it can take a few minutes.")
+	rebuild()
+	app.set_claude_working("opening Chrome")
+	run(a, "Claude paints it in Midjourney", func(r: Dictionary):
+		app.set_claude_working("")
+		if not r.get("ok", false):
+			say_notes("Midjourney: " + plain_error(r) + " Copy prompt and drop the painting on the bench instead.")
+			rebuild()
+			return
+		var files: Array = r.get("files", [])
+		if not files.is_empty():
+			state["painting"] = String(files[0])
+			tab = 0
+		say_notes("The painting is on the Reference tab. " + String(r.get("notes", "")))
+		rebuild()
+		refresh_preview())
 
 ## --- Model: the solid list
 func _build_model() -> void:

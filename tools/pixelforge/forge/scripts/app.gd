@@ -69,6 +69,8 @@ var sel_t := 0.0
 var flash := -1.0
 var hover_drop := false
 var style_name := "godmarrow"
+var claude_state := {}          # `claude status --json`: ok, state (ready | not_found | not_signed_in), sentence
+var claude_working := ""        # the current progress line while Claude works on a bench ("" when idle)
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -154,6 +156,7 @@ func _ready() -> void:
 	get_window().files_dropped.connect(_on_files_dropped)
 	style_name = backend.project_style(String(cfg.get("style", "godmarrow")))
 	_foot_update()
+	_claude_status()
 	var first := String(args.get("screen", "home"))
 	if not SCREENS.has(first):
 		first = "home"
@@ -271,6 +274,19 @@ func _draw_chrome() -> void:
 	var mtxt := "music " + ("on" if audio.music_on else "off")
 	var ltxt := "log"
 	var mx := CANVAS.x - 36 - T.text_width(mtxt, T.SMALL_SIZE) - 26 - T.text_width(ltxt, T.SMALL_SIZE)
+	# Claude's state, left of the music toggle: an ember pulse while it works
+	var ctxt := claude_label()
+	var cw := T.text_width(ctxt, T.SMALL_SIZE)
+	var cx := mx - 22 - cw
+	var ccol := T.BONE
+	if claude_working != "":
+		ccol = T.GH if int(sel_t * 6.0) % 2 == 0 else T.ACCENT
+	elif claude_state.get("ok", false):
+		ccol = T.ACCENT
+	elif not claude_state.is_empty():
+		ccol = T.GOLD
+	c.draw_rect(Rect2(cx - 4, 14, cw + 8, 12), T.INK)
+	c.draw_string(f, Vector2(cx, 24), ctxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, ccol)
 	c.draw_rect(Rect2(mx - 4, 14, T.text_width(mtxt, T.SMALL_SIZE) + 8, 12), T.INK)
 	c.draw_string(f, Vector2(mx, 24), mtxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT if audio.music_on else T.BONE)
 	var lx := CANVAS.x - 36 - T.text_width(ltxt, T.SMALL_SIZE)
@@ -317,6 +333,39 @@ func request_exit() -> void:
 		return
 	save_cfg()
 	get_tree().quit()
+
+## "Claude: ready / working / not found / not signed in", for the title line
+func claude_label() -> String:
+	if claude_working != "":
+		return "Claude: working"
+	if claude_state.is_empty():
+		return "Claude: ..." if backend.python_ok() else "Claude: no Python"
+	match String(claude_state.get("state", "")):
+		"ready":
+			return "Claude: ready"
+		"not_signed_in":
+			return "Claude: not signed in"
+		_:
+			return "Claude: not found (install Claude Code)"
+
+## `claude status --json` once at launch; when ready but PixelForge's tools are not registered, `claude register` does it
+func _claude_status() -> void:
+	if not backend.python_ok():
+		return
+	backend.run(["claude", "status"], "claude status", func(r: Dictionary):
+		claude_state = r
+		chrome.queue_redraw()
+		if r.get("ok", false) and not r.get("registered", true):
+			backend.run(["claude", "register"], "claude register", func(r2: Dictionary):
+				if r2.get("ok", false):
+					claude_state["registered"] = true))
+
+## a bench's Claude run reports its progress here (the title line pulses; the words go to the foot)
+func set_claude_working(words: String) -> void:
+	claude_working = words
+	if words != "":
+		foot_hint.text = "Claude: " + words
+	chrome.queue_redraw()
 
 # ------------------------------------------------------------------ screens
 func go(name: String, a: Dictionary = {}) -> void:
@@ -552,7 +601,7 @@ func _process(dt: float) -> void:
 		toast_t -= dt
 		if toast_t <= 0.0:
 			toast.visible = false
-	if int(sel_t * 4.0) % 2 == 0:
+	if int(sel_t * 4.0) % 2 == 0 or claude_working != "":
 		chrome.queue_redraw()
 
 # ------------------------------------------------------------------ the log drawer

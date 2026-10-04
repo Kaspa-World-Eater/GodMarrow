@@ -24,6 +24,10 @@ python -m pip install --upgrade pip >nul
 echo Installing PixelForge (a minute or two)...
 pip install -e . || (echo install failed & pause & exit /b 1)
 pip install mcp >nul 2>nul
+where claude >nul 2>nul && (
+  echo Telling Claude Code about PixelForge's tools (claude mcp add pixelforge)...
+  python -m pixelforge.cli claude register
+) || echo   Claude Code is not installed: the Claude line on the benches will say so. Install it from claude.com/claude-code and run this again.
 echo Creating the desktop shortcuts...
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$ws = New-Object -ComObject WScript.Shell; $d = [Environment]::GetFolderPath('Desktop');" ^

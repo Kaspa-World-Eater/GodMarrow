@@ -1,0 +1,4 @@
+{"type":"system","subtype":"init","cwd":"{project}","session_id":"mock","tools":[],"mcp_servers":[{"name":"pixelforge","status":"connected"}],"model":"mock"}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t1","name":"mcp__pixelforge__render_shapes","input":{"project":"{project}","character":"{slug}"}}]}}
+{"mock":"sleep","seconds":30}
+{"type":"result","subtype":"success","is_error":false,"result":"{\"did\": [\"late\"], \"changed\": [], \"notes\": \"\"}","total_cost_usd":0.0,"session_id":"mock"}

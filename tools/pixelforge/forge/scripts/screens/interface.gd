@@ -167,6 +167,31 @@ func do_start_over() -> void:
 func on_state_restored() -> void:
 	make()
 
+# ------------------------------------------------------------------ Claude on the bench
+func claude_context() -> Dictionary:
+	var ctx := {"out_dir": out_dir(), "kind": ["frame", "icons", "portrait", "fonts"][tab]}
+	if String(state["image"]) != "":
+		ctx["image"] = String(state["image"])
+	return ctx
+
+## the picture Claude cut (a 9-slice, icons, a portrait) shows in the window
+func on_claude_done(r: Dictionary) -> void:
+	var png := pick_changed(r, ".png", out_dir())
+	if png == "":
+		png = pick_changed(r, ".png")
+	if png == "":
+		if String(state["image"]) != "":
+			make()
+		return
+	state["last_png"] = png
+	var t := tex(png)
+	if t:
+		app.scene.show_picture(t, "%s · by Claude" % png.get_file().get_basename())
+
+func on_claude_undone() -> void:
+	if String(state["image"]) != "":
+		make()
+
 func on_tab() -> void:
 	if tab == 3:
 		_show_fonts()
