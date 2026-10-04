@@ -52,8 +52,8 @@ game's effects and plays it at the hero. *From a painting* (or a drop) reads a p
 **Tiles and ground.** Drop a painted ground texture: iso diamonds with variants; a second texture makes the edge tiles.
 **Interface.** A painted panel becomes a stretching 9-slice frame; one flat-lay painting becomes inventory icons; a
 front-view cutout becomes portraits. **Sound.** Eighteen pads with pitch, length, grit, tone and the wave; Play hears
-it, Keep puts it in the game. **Music.** Every place in the game as a cue, with a rack of real controls (tempo, key,
-mode, metre, tune, wind, echo, the drone); Play renders twenty seconds; Keep writes the loop into the game.
+it, Keep puts it in the game. **Music.** A music editor: tracks, a 16-step grid with a piano roll, the song's parts, a library of premade
+pieces across genres, and Keep as a game cue. The full manual is below, "The Music bench".
 
 **Describe it.** The line on Home takes plain words: "a hooded necromancer with a skull-topped staff burning green"
 drafts a shape model and opens the Characters bench with it; "a wisp lantern spell, pale blue, slow, with embers"
@@ -201,16 +201,72 @@ iso ground tiles, UI frames, sound effects, music, recolours (champion / unique 
 compares, a skill-tree editor, and a one-click install of the loaders into any Godot project. Each is a small form:
 pick the picture, name it, press Run. An AI assistant can run every one from the command line too.
 
-**Music** writes the game's score: a looping cue for every act's camp, wilds and depths, five boss cues and the
-title, all played by synthesised instruments (a twelve-string, lutes, log drums, flutes, strings, horns, choir,
-bells, drums, drones and wind) through a long reverb. Nothing is sampled or copied; every note is generated. Pick a
-cue, press Run, and it plays; the picture is its waveform and spectrogram. Every cue has a **seed**: a different
-number is a different tune for the same place, so you can audition tunes until one feels right. **Knobs** change
-tempo (`bpm=90`), key (`root=45`), mode (`sc=phr` for darker, `sc=hij` for eastern), levels and the drone. To edit
-everything at once choose the cue **sheet**: it writes `music_sheet.json` with every cue's knobs; change the numbers
-in any text editor, then run **all** with that sheet. Loops are seamless (the reverb tail is folded into the start)
-and every cue sits at the same loudness. Format `ogg` makes small files for the game when ffmpeg is installed;
-otherwise WAV, which Godot also plays.
+**Music** in the classic Studio's Tools window is the game's older score (21 looping cues: `music a1_town`,
+`music all`, the cue sheet). The Forge app has the music editor proper; it is described next.
+
+## The Music bench (the Forge app)
+
+Open **Music** on Home. The Forge's own theme is on the bench: a *song* of six lanes (lead, counter, pad, bass,
+sparkle, drums), *patterns* of 16-step bars, and *parts* (sections) that chain the patterns into a piece. Everything
+you do is written to `<project>/music/current.song.json`; **Keep** renders it into the game. The picture window
+is the editor's canvas; the text box holds the controls. **Space** plays and stops on every tab; the running cursor
+is a one-pixel line. What plays is the **loop** cycler: *bar* (the bar shown, the quickest way to hear an edit),
+*pattern* (every bar of it), *section* (one part), *song* (all of it). While it plays, each change renders the bar
+again in well under its length and the sound swaps on the beat.
+
+**Tracks.** One column per lane in the picture: instrument, note count, level meter, pan, tone, `m` for muted, `s`
+for solo. Click a column (or the *lane* cycler) to pick it. *instrument* cycles the named SNES-style presets of that
+lane's family: strings (warm, dark, fast, cello), brass (horn, stab, trumpet, tuba), choir (ahh, ooh, men), bells
+(glass, tubular, music box, vibraphone, marimba, celesta), organ (cathedral, reed), keys (electric piano,
+harpsichord), plucked (harp, lute, steel guitar, pizzicato), bass (synth, pick, sub, slap), leads (square, pulse 25,
+pulse 12, saw, triangle, sync), winds (wooden flute, pan flute, ocarina, oboe), pads (dark, glass, synthwave); the
+drums lane cycles kits (rock, orchestral, chip, taiko, electro, brush). Levers, each with its number under it:
+**level** 0-100, **tone** (duller to brighter), **pan** (L 100 .. centre .. R 100). Chain pulls: **mute**, **solo**
+(solo wins). *Hear lane* plays the lane alone; *Generate lane* writes a new line for it in the song's genre;
+*Clear lane* empties it in the current pattern. *Reset* puts the lane's levers back to level 80, tone 50, centre.
+
+**Pattern.** The picture shows the chosen bar: the six lanes as rows of sixteen cells (notes as bars, brighter for
+louder) and under them the piano roll of the chosen lane (rows are semitones, the scale's rows lit, the root marked
+and named; for the drums the rows are kick, snare, stick, clap, hat, open hat, three toms, crash, ride). **Click**
+a cell to place a note of the current *length* and *velocity* (a click on a note removes it; right-click removes);
+the mouse wheel scrolls the roll by pitch, shift-wheel by octaves; a click on a lane row picks the lane. **Keyboard:**
+*Grid* (or **G**) hands the keys to the grid: arrows move the cursor (left and right past the bar's edge turn the
+bar), **Enter** places or removes, **Delete** removes, **[ ]** change the note's length, **- =** its velocity,
+**PgUp PgDn** jump an octave, **Tab** the next lane, **Esc** gives the keys back to the choices. Cyclers: *pattern*,
+*bar*, *lane*, *note* (the pitch the keyboard places; with the lock on it steps through the scale), *length* (a
+quarter step to a whole bar), *velocity* 10-100, *lock* (scale lock: a placed or transposed note snaps to the key;
+off, any note), *loop*. The operations line: **Place** (the cursor's note), **Copy bar / Paste bar** (the lane's
+bar, pasted into the bar shown), **Up / Down** (a scale step), **Octave + / -**, **Reverse** (the bar backwards),
+**Double** (the pattern twice as fast, repeated to fill), **Halve** (twice as slow; the pattern grows), **Humanise**
+(small timing and loudness changes), **Quantise** (back onto the grid), **Clear bar**, **Generate bar** (the
+composer writes the bar in every lane over the pattern's chords), **Generate lane**, **Add pattern** (a copy of this
+one, chained at the end). Undo is everywhere (Ctrl+Z, the Undo choice).
+
+**Song.** The picture shows the parts as boxes in a row (name, pattern, repeats, `+n` when a part is transposed:
+that is how a bridge changes key), a bar ruler and the playhead. Cyclers: *part*, *plays* (which pattern), *x*
+(repeats), *shift* (semitones), *key* (the root), *scale* (major, minor, dorian, phrygian, lydian, mixolydian,
+harmonic minor, hungarian minor, phrygian dominant, pentatonics, blues, whole tone). Levers: **tempo** 40-200 bpm,
+**crunch** (soft saturation: the warm distortion of the old hardware's output stage), **bits** 4-16, **echo** (the
+SPC-style echo), **hall** and **hall size**, **voices** (how many notes may sound at once; 8 is the SNES, "all" is
+no limit) and the **32 kHz** pull (off is 44.1 kHz). Choices: *Play part*, *Play all*, *Add part* (after this one),
+*Remove*, *Left / Right* (move it), *New pattern* (empty, four bars, chained). *Reset* puts the sound back to clean
+defaults.
+
+**Library.** The premade pieces by genre (dungeon synth, gothic orchestral, chiptune, dark ambient, battle, boss,
+tavern, town, title, victory, sorrow, exploration, synthwave) and the Forge's three loops; *genre* filters the list;
+**Enter** on a name loads it onto the bench (it is a song, not a recording: everything in it can be edited). To
+write a new piece choose a *genre*, a *mood* (dark, hopeful, tense, calm, heroic, sombre, playful, eerie) and a
+*seed*, then **Compose**; **Dice** rolls another seed. A composed piece has a chord progression, a motif the lead
+states and develops, a counter-line answering it, a pad, a bass that pedals or walks, a sparkle lane of high
+arpeggios, drums with fills, and a bridge in another key.
+
+**Export.** Type the cue's *name* (the field; Enter keeps it). **Keep** writes `<name>.ogg` and `<name>.song.json`
+into the game's `audio/music`, as a seamless loop at the game's loudness. *Save song* writes the song file alone
+into the project's music folder; *WAV* and *OGG* render there too and show the waveform and spectrogram. *Play
+whole* renders and plays the entire piece.
+
+*Start over* puts the Forge's theme back on the bench; what was kept in the game stays. Every control here is one
+`pixelforge music ...` command (GUIDE_AI lists them), so an assistant can do the same without the window.
 
 ### Describe it, get it
 ## Characters drawn by code (shape sprites)

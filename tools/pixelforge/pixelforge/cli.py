@@ -510,8 +510,21 @@ def cmd_sfx(a) -> None:
 
 def cmd_music(a) -> None:
     from . import music
+    from .music import cli as MC
 
-    if a.cue == "list":
+    if a.cue in MC.VERBS:
+        try:
+            r = MC.run(a)
+        except (music.song.SongError, music.edit.EditError, FileNotFoundError, ValueError, KeyError) as e:
+            r = {"ok": False, "error": str(e).strip("'")}
+        if a.json:
+            _emit(a, r)
+        else:
+            MC.print_plain(r, a.cue)
+        if not r.get("ok", True):
+            raise SystemExit(1)
+        return
+    if a.cue == "list-cues":
         rows = music.cue_table()
         if a.json:
             _emit(a, {"ok": True, "cues": rows, "knobs": music.FIELDS})
@@ -523,9 +536,6 @@ def cmd_music(a) -> None:
         return
     if a.cue == "sheet":
         _emit(a, music.write_sheet(a.sheet_out or str(Path(a.out) / "music_sheet.json")))
-        return
-    if a.cue == "blips":
-        _emit(a, music.write_blips(a.out, fmt=a.format))
         return
     r = music.make_music(a.cue, a.out, seconds=a.seconds, seed=a.seed, overrides=music.parse_overrides(a.set), act=a.act,
                          sheet=a.sheet, fmt=a.format, preview=not a.no_preview, log=lambda m: print(m, flush=True) if not a.json else None)
@@ -1050,15 +1060,28 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_sfx)
 
-    s = sub.add_parser("music", help="the score: 21 seeded, looping cues (town / wild / deep per act, bosses, title) -> WAV/OGG + preview PNG")
-    s.add_argument("cue", help="a cue key, 'all', 'act' (with --act), 'forge' (the Forge app's three loops), 'blips' (its interface sounds), 'list' (the table), or 'sheet' (write the editable JSON)")
-    s.add_argument("-o", "--out", default="art/music"); s.add_argument("--seconds", type=float, default=120.0, help="loop length")
-    s.add_argument("--seed", type=int, default=None, help="another tune for the same place"); s.add_argument("--act", type=int, default=None)
-    s.add_argument("--set", action="append", default=[], metavar="KNOB=VALUE", help="override a knob: bpm=90 sc=phr root=45 drone=[38,0.03,300] (repeatable)")
-    s.add_argument("--sheet", default=None, help="a sheet JSON from 'music sheet' with your edits"); s.add_argument("--sheet-out", default=None)
+    s = sub.add_parser("music", help="the music editor: new | compose | render | play-bar | export | edit | list | load | info | measure | build-library | blips, and the game's score (a cue key, all, act, sheet, list-cues)")
+    s.add_argument("cue", help="a verb (new compose render play-bar export edit list load info measure build-library blips) or, for the game's score, a cue key, 'all', 'act' (with --act), 'sheet', 'list-cues'")
+    s.add_argument("rest", nargs="*", help="the verb's arguments: the song file (new/render/play-bar/export/edit/info), a library name (load), audio files (measure)")
+    s.add_argument("-o", "--out", default="art/music", help="the folder (or the .json path for compose/edit/load)")
+    s.add_argument("--title", default=None); s.add_argument("--key", default=None, help="'C# minor', 'D dorian'"); s.add_argument("--tempo", type=float, default=None)
+    s.add_argument("--bars", type=int, default=None, help="new: the first pattern's bars; compose: the length to aim for; play-bar: how many bars")
+    s.add_argument("--genre", default=None, help="compose: " + ", ".join(["dungeon_synth", "gothic_orchestral", "chiptune", "dark_ambient", "battle", "boss", "tavern", "town", "title", "victory", "sorrow", "exploration", "synthwave"]) + "; list: filter")
+    s.add_argument("--mood", default=None, help="compose: dark hopeful tense calm heroic sombre playful eerie")
+    s.add_argument("--name", default=None, help="render/export: the file name without its ending")
+    s.add_argument("--lanes", default=None, help="render/play-bar: only these lanes, comma-separated")
+    s.add_argument("--section", type=int, default=None); s.add_argument("--bar", type=int, default=None); s.add_argument("--pattern", default=None)
+    s.add_argument("--op", action="append", default=[], help="edit: an operation as JSON or words ('transpose pattern=A semitones=2'); repeatable")
+    s.add_argument("--ops-file", default=None, help="edit: a JSON list of operations")
+    s.add_argument("--render", action="store_true", help="compose: also render the piece"); s.add_argument("--render-bar", action="store_true", help="edit: also render the edited pattern to bar.wav")
+    s.add_argument("--no-loop", action="store_true", help="render: a plain ending instead of a seamless loop")
+    s.add_argument("--seconds", type=float, default=120.0, help="the game's score: loop length")
+    s.add_argument("--seed", type=int, default=None, help="compose: which piece; the score: another tune for the same place"); s.add_argument("--act", type=int, default=None)
+    s.add_argument("--set", action="append", default=[], metavar="KNOB=VALUE", help="the score: override a knob: bpm=90 sc=phr root=45 drone=[38,0.03,300] (repeatable)")
+    s.add_argument("--sheet", default=None, help="the score: a sheet JSON from 'music sheet' with your edits"); s.add_argument("--sheet-out", default=None)
     s.add_argument("--format", choices=["wav", "ogg", "both"], default="wav", help="ogg needs ffmpeg")
     s.add_argument("--no-preview", action="store_true", help="skip the waveform + spectrogram PNG")
-    s.add_argument("--play", action="store_true", help="play the (last) cue when done"); s.add_argument("--json", action="store_true")
+    s.add_argument("--play", action="store_true", help="play the result when done"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_music)
 
     s = sub.add_parser("describe", help="describe it, get it: plain words -> a spell, skin edits, a prompt or a music cue (a draft to adjust)")

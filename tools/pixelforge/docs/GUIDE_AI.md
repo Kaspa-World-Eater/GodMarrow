@@ -153,10 +153,15 @@ pixelforge game-preview --play                                                  
 pixelforge forge [--screen spell] [--windowed]                                     # the Forge app (the person's face of all this; see below)
 pixelforge spell new fireball -o art/fx --preset fireball --gif                   # a layered spell: strip + json + gif + editable .spell.json
 pixelforge skin views/front.png '[{"op":"recolor","at":[220,51],"to":"#5ae6d2","range":0.12,"radius":30}]'   # headless skin edit (ops: recolor glow paint erase restore region smooth clone)
-pixelforge music list                                                              # the score's 21 cues (act, place, tempo, key, mode, seed) and the knobs
-pixelforge music all -o art/music [--seconds 120] [--format ogg]                   # every cue as a seamless loop + spectrogram PNG + music.json
-pixelforge music a1_wild --seed 5 --set bpm=64 --set sc=phr --play                 # another tune for a place, with knobs, and hear it
-pixelforge music sheet -o art/music; pixelforge music all --sheet art/music/music_sheet.json   # the editor: a JSON of every knob, edited, rendered
+pixelforge music compose -o out/piece.song.json --genre battle --mood tense --key "E minor" --seed 12 --render   # a new piece as an editable song (+ audio)
+pixelforge music edit out/piece.song.json --op 'transpose pattern=A semitones=2' --op '{"op":"set_lane","lane":"lead","instrument":"brass_horn"}'   # edit operations (see below)
+pixelforge music play-bar out/piece.song.json --pattern A --bar 0 -o out [--play]   # one looping bar as WAV, in well under its length
+pixelforge music render out/piece.song.json -o out --name piece --format ogg        # the whole piece: seamless loop + PNG + the song beside it
+pixelforge music export out/piece.song.json -o <game>/audio/music --name a1_town    # Keep: into the game as <name>.ogg + <name>.song.json
+pixelforge music list [--genre boss]                                               # the library, genres, moods, instruments, scales, lanes, fx, ops
+pixelforge music load forge_home -o out/forge_home.song.json                       # a library piece to edit
+pixelforge music measure docs/refs/forge_music_reference.mp3 out/piece.wav         # loudness, bands, centroid, key, tempo; the first is the reference
+pixelforge music list-cues; pixelforge music a1_wild --seed 5 --set bpm=64 --play   # the game's older score (21 cues, the knob sheet) is unchanged
 pixelforge portrait views/front.png mystic -o art/portraits [--sizes 48 96]        # head-and-shoulders portraits
 pixelforge compare before.png after.png -o cmp.png                                 # strip (+GIF for frame folders) + mean difference
 pixelforge doctor [--project <folder>]                                             # what works on this machine, with fixes
@@ -692,7 +697,7 @@ well: a project named PixelForge is not the game). What the app runs, per bench:
 | Tiles and ground | `tiles <texture> <name> -o <project>/tiles --variants --seed --style S [--second --colors --tile W H]`, then `-o <game>/art/tiles` |
 | Interface | `ui9 <panel> <name> -o ui --mid M` · `icons <flatlay> -o items --cell C --scale K` · `portrait <front> <name> -o portraits --head H --sizes 48 96`, then the game's folders |
 | Sound | `sfx <pad> -o <project>/sfx --set freq_mul= decay_mul= crush= lowpass= wave= --seed N`; Keep: `-o <game>/art/sfx` · `sfx all` |
-| Music | `music list` · `music <cue> -o <project>/music --seconds 20 [--seed --set bpm= sc= root= steps= drone=[...] ...]` · Keep: `-o <game>/audio/music --seconds 120 --format ogg` · `music all` |
+| Music | `music list` (the table) · `music load <piece> -o <project>/music/current.song.json` · every control: `music edit <song> --op <json>` · every sound: `music play-bar <song> --pattern P --bar B` / `--section S` / `music render <song> --name preview` · Compose: `music compose -o <song> --genre G --mood M --seed N --bars 32` · Keep: `music export <song> -o <game>/audio/music --name <name> --format ogg` |
 | Describe it | `describe "<words>" --json`: `what` picks the bench (`shapes` → Characters with the drafted `doc`, `spell` → Effects, `music` → Music, `prompt` → the bench that will take the painting) |
 | Settings | `doctor --json`, `project set --style S`, `project set --blender PATH`, `project blender-download` |
 
@@ -817,3 +822,60 @@ person. Ask them to sign in to Adobe in the browser you open; then:
 
 If marker placement fails twice, fall back to telling the person the
 positions above and let them drag; it takes them a minute.
+
+## The music editor (pixelforge/music): the song format, the verbs, the operations
+
+The engine is the package `pixelforge/music/` (`song`, `theory`, `synth`, `render`, `compose`, `edit`, `library`,
+`blips`, `measure`; `score` is the game's older 21-cue generator, unchanged; the old names still import from
+`pixelforge.music`). The Forge app's Music bench and the CLI call the same functions; a song is one JSON file:
+
+```json
+{"title": "The Sunken Stair", "genre": "dungeon_synth", "mood": "dark", "seed": 11,
+ "tempo": 72, "root": 1, "scale": "minor", "scale_lock": true,
+ "lanes": {"lead": {"instrument": "flute_wood", "volume": 0.85, "tone": 0.5, "pan": 0.0, "mute": false, "solo": false}, "...": "counter pad bass sparkle drums"},
+ "patterns": {"A": {"bars": 4, "chords": [0, 5, 2, 6], "notes": {"lead": [{"s": 0, "p": 61, "v": 0.8, "l": 4}], "drums": [{"s": 0, "p": 36, "v": 0.9, "l": 1}]}}},
+ "sections": [{"name": "A", "pattern": "A", "repeat": 2, "transpose": 0}, {"name": "B", "pattern": "B", "repeat": 1, "transpose": 5}],
+ "fx": {"rate": 32000, "bits": 14, "voices": 8, "crunch": 0.25, "echo": 0.3, "echo_beats": 1.5, "echo_feedback": 0.4, "echo_tone": 0.35, "reverb": 0.55, "reverb_size": 2.6, "master": 1.0}}
+```
+
+A bar is 16 steps (a step a sixteenth in 4/4). A note: `s` step inside the pattern, `p` MIDI pitch (a drum number
+on the drums lane: 36 kick, 38 snare, 37 stick, 39 clap, 42 hat, 46 open hat, 41/45/48 toms, 49 crash, 51 ride),
+`v` velocity 0..1, `l` length in steps, optional `o` offset (humanise). `root` is a pitch class (1 = C#); `key`
+("C# minor") is accepted in a hand-written file. `chords` (scale degrees, one a bar) are what `generate_bar` and
+`generate_lane` harmonise over. A section's `transpose` moves everything but the drums: that is a key change.
+`scale_lock` governs edits (placing, transposing snap to the key), never the render.
+
+**Verbs** (`pixelforge music <verb> ... --json`): `new <song> [--title --tempo --key --bars]`, `compose [-o <song>]
+--genre --mood --key --tempo --bars --seed [--render]`, `render <song> [-o dir --name --format wav|ogg|both --no-loop
+--lanes lead,bass]`, `play-bar <song> [--pattern P --bar B | --section S [--bar B] | --bars N] [-o dir --lanes --play]`
+(writes `bar.wav`, reports `render_seconds` and `faster_than_real_time`), `export <song> -o <dir> --name N`, `edit
+<song> --op ... [--ops-file f.json] [-o out.json] [--render-bar]`, `list [--genre]`, `load <piece> -o <song>`, `info
+<song>`, `measure <audio>...`, `build-library`, `blips -o <dir>`. Genres: dungeon_synth, gothic_orchestral, chiptune,
+dark_ambient, battle, boss, tavern, town, title, victory, sorrow, exploration, synthwave. Moods: dark, hopeful,
+tense, calm, heroic, sombre, playful, eerie. The same seed, genre, mood, key and tempo always give the same piece.
+
+**Operations** (`--op` as JSON or as words `name key=value ...`; the docstring of `music/edit.py` has the table): `set_note pattern lane step pitch [vel length] [free]`, `remove_note`, `set_velocity`, `set_length`,
+`clear [lane] [bar|steps]`, `copy` (returns `clipboard`), `paste at clipboard`, `transpose semitones [in_scale] [bar]`,
+`reverse`, `double`, `halve`, `humanise [amount seed]`, `quantise [grid]`, `set_lane lane [instrument volume tone pan
+mute solo]`, `mute`, `solo`, `set_tempo`, `set_key key|root scale [snap]`, `scale_lock on`, `set_fx name value`,
+`pattern_add [name bars copy_of add_section]`, `pattern_remove`, `pattern_rename`, `section_add pattern [name repeat
+transpose at]`, `section_remove index`, `section_move index to`, `section_set index [pattern repeat transpose name]`,
+`generate_bar pattern bar [seed lanes]`, `generate_lane pattern lane [seed]`, `title`. Unknown names, lanes, patterns
+and out-of-range values come back as `{"ok": false, "error": "..."}` in plain words.
+
+**Instruments** (`music list` → `instruments`, each with its family and words): strings_warm/dark/fast, cello,
+brass_horn, brass_stab, trumpet, tuba, choir_ahh/ooh/men, bells_glass, bells_tubular, music_box, vibraphone, marimba,
+celesta, organ_cathedral, organ_reed, piano_electric, harpsichord, harp, lute, guitar_steel, pizzicato, bass_synth,
+bass_pick, bass_sub, bass_slap, lead_square, lead_pulse25, lead_pulse12, lead_saw, lead_tri, lead_sync, flute_wood,
+flute_pan, ocarina, oboe, pad_dark, pad_glass, pad_synthwave, timpani; kits drums_rock/orch/chip/taiko/electro/brush
+(the drums lane only). The chain is the SNES's in spirit: `voices` notes at once (a ninth cuts the oldest), lane mix,
+`crunch` saturation, `bits`, the SPC-style echo, a short hall, a limiter; `rate` 32000 by default.
+
+**The Forge's theme** is `library/forge_home.song.json` (hand-written: C# minor at 72, i VI III VII, a bridge in
+the iv key, the bells as the one bright thing); `pixelforge music forge -o forge/assets/audio --format ogg` renders
+the three loops the app plays, `music blips` its interface sounds. Measured against `docs/refs/forge_music_reference.mp3`
+(`music measure`): both C# minor; spectral centroid 302 Hz against 310; RMS 0.085 against 0.127 (the game's loudness).
+
+**In the app:** `--screen=music [--tab=Tracks|Pattern|Song|Library|Export] [--song=FILE | --library=NAME]`; the bench
+keeps `<project>/music/current.song.json` and runs `music edit` for every change and `music play-bar` for every sound
+(`ONLY=music forge/tools/screens.sh OUT` shoots the five tabs). Tests: `tests/test_music.py`.
