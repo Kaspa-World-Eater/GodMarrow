@@ -1,6 +1,7 @@
 extends Node2D
-## A townsfolk figure (Maren, Ysolde, Brannoc, Esk, the Stranger; Nell): one still frame from art/sprites/npc_<role>,
-## never mirrored, a ground shadow 2 world px below the feet (the web's ztObjSprite townsfolk). No marker over the head.
+## A townsfolk figure (Maren, Ysolde, Brannoc, Esk, the Stranger; Nell) from art/sprites/npc_<role>, never mirrored, a
+## ground shadow 2 world px below the feet (the web's ztObjSprite townsfolk). No marker over the head. A hand-drawn set
+## (8 views, many idle frames) faces the camera and plays its idle; an old one-frame set stands as it always did.
 
 var role := ""
 var spr: Sprite2D
@@ -20,16 +21,21 @@ func setup(r: String, at: Vector2, tex_kind: String = "") -> void:
 	add_child(sh)
 	var kind := tex_kind if tex_kind != "" else "npc_" + r
 	if ResourceLoader.exists("res://art/sprites/%s.json" % kind):
-		var a := AnimSprite.new(Data.sprite_set(kind))
-		a.view = "front"
+		var set: SpriteSet = Data.sprite_set(kind)
+		var a := AnimSprite.new(set)
+		a.view = "down" if set.has_view("down") else "front"
 		a.face = 1
 		a.play("idle")
-		a.step(0.0)
+		a.step(randf() * 3.0)       # each starts at its own point in the loop, so the camp does not breathe in step
 		spr = a
 	else:
 		spr = Sprite2D.new()
 		spr.centered = false
 	add_child(spr)
+
+func _process(dt: float) -> void:
+	if spr is AnimSprite:
+		(spr as AnimSprite).step(dt)
 
 ## the figure's rect in canvas coordinates (for clicks)
 func click_rect() -> Rect2:

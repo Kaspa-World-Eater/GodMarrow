@@ -1,0 +1,1618 @@
+{
+ "name": "maren",
+ "about": "Maren the Gravekeeper, the camp's trader, drawn by hand from her Midjourney sheet: gaunt, grey-haired, a hard tired face; grey wool with a scarf-cowl; a long stained leather apron; a grave-spade across her back; a satchel of candles; heavy gloves and boots. Drawn around the 120 px author pose.",
+ "mode": "solid",
+ "size": [
+  138,
+  138
+ ],
+ "height": 120,
+ "ground": 134,
+ "axis": [
+  69.0,
+  0
+ ],
+ "view": {
+  "elevation": 12
+ },
+ "outline": "#080706",
+ "skeleton": {
+  "height": 120,
+  "ground": 134,
+  "cx": 69.0
+ },
+ "materials": {
+  "paleskin": {
+   "ramp": [
+    "#231c1b",
+    "#3a2f2c",
+    "#544541",
+    "#6d5a54",
+    "#857068",
+    "#9c867c"
+   ]
+  },
+  "greyhair": {
+   "ramp": [
+    "#1f1e1e",
+    "#343232",
+    "#4a4747",
+    "#625e5d",
+    "#7b7675"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.3
+  },
+  "wool": {
+   "ramp": [
+    "#0e0f0e",
+    "#181a19",
+    "#232624",
+    "#2f3330",
+    "#3c403c",
+    "#4b504b"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.45
+  },
+  "apron": {
+   "ramp": [
+    "#0e0807",
+    "#19100c",
+    "#251812",
+    "#322017",
+    "#3f291d",
+    "#4d3224"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.35,
+   "runs": {
+    "colour_from": "dirtstain",
+    "density": 0.25,
+    "length": [
+     2,
+     5
+    ]
+   }
+  },
+  "dirtstain": {
+   "ramp": [
+    "#120c08",
+    "#1f150e",
+    "#2e2016",
+    "#3c2b1e"
+   ]
+  },
+  "strap": {
+   "ramp": [
+    "#120a07",
+    "#22130c",
+    "#341e13",
+    "#48291a",
+    "#5c3624"
+   ]
+  },
+  "glove": {
+   "ramp": [
+    "#0f0d0c",
+    "#1c1917",
+    "#2b2623",
+    "#3b3430",
+    "#4c443e"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.3
+  },
+  "boot": {
+   "ramp": [
+    "#0d0a09",
+    "#1a1411",
+    "#2a201b",
+    "#3a2c25",
+    "#4b3a30"
+   ]
+  },
+  "spadewood": {
+   "ramp": [
+    "#110a07",
+    "#1d120c",
+    "#2b1b12",
+    "#392419",
+    "#472d20"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.5
+  },
+  "iron": {
+   "ramp": [
+    "#0e0e0f",
+    "#1f1f21",
+    "#333436",
+    "#4a4b4e",
+    "#626468",
+    "#7d8085"
+   ],
+   "spec": true,
+   "spec_t": 0.85,
+   "texture": "scratch",
+   "texture_strength": 0.3
+  },
+  "wax": {
+   "ramp": [
+    "#4a4232",
+    "#6e634b",
+    "#968a6c",
+    "#bcb08f",
+    "#ddd2b2"
+   ]
+  }
+ },
+ "parts": {
+  "tunic": {
+   "bone": "hips",
+   "lag": {
+    "frames": 2,
+    "sway": 0.5
+   },
+   "hang": 0.3
+  },
+  "apron": {
+   "bone": "spine.001",
+   "lag": {
+    "frames": 1,
+    "sway": 0.3
+   },
+   "hang": 0.4
+  },
+  "spade": {
+   "bone": "spine.003",
+   "lag": {
+    "frames": 1,
+    "sway": 0.2
+   }
+  },
+  "satchel": {
+   "bone": "hips",
+   "lag": {
+    "frames": 1,
+    "sway": 0.5
+   },
+   "hang": 0.5
+  }
+ },
+ "shapes": [
+  {
+   "name": "head",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    22.5,
+    0.6
+   ],
+   "radii": [
+    5.0,
+    7.2,
+    5.6
+   ],
+   "material": "paleskin",
+   "bone": "head",
+   "rules": [
+    {
+     "y": [
+      18.6,
+      19.4
+     ],
+     "z": [
+      3.6,
+      null
+     ],
+     "x": [
+      65.8,
+      72.2
+     ],
+     "t": -1
+    },
+    {
+     "z": [
+      3.8,
+      null
+     ],
+     "near": [
+      [
+       [
+        67.1,
+        21.8,
+        null
+       ],
+       [
+        70.9,
+        21.8,
+        null
+       ]
+      ],
+      1.0
+     ],
+     "t": -3
+    },
+    {
+     "z": [
+      4.2,
+      null
+     ],
+     "near": [
+      [
+       [
+        67.1,
+        21.9,
+        null
+       ],
+       [
+        70.9,
+        21.9,
+        null
+       ]
+      ],
+      0.5
+     ],
+     "t": 1
+    },
+    {
+     "x": [
+      68.5,
+      69.5
+     ],
+     "y": [
+      21.5,
+      24.8
+     ],
+     "z": [
+      4.9,
+      null
+     ],
+     "t": 1
+    },
+    {
+     "x": [
+      68.0,
+      70.5
+     ],
+     "y": [
+      24.8,
+      25.6
+     ],
+     "z": [
+      4.4,
+      null
+     ],
+     "t": -2
+    },
+    {
+     "z": [
+      3.4,
+      null
+     ],
+     "near": [
+      [
+       [
+        65.4,
+        24.8,
+        null
+       ],
+       [
+        72.6,
+        24.8,
+        null
+       ]
+      ],
+      0.6
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      26.2,
+      27.2
+     ],
+     "z": [
+      3.6,
+      null
+     ],
+     "x": [
+      66.8,
+      71.2
+     ],
+     "t": -3
+    },
+    {
+     "hash": [
+      0.06,
+      31,
+      1
+     ],
+     "t": -1,
+     "px": [
+      90,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "hair",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    20.0,
+    -1.4
+   ],
+   "radii": [
+    5.3,
+    5.2,
+    5.6
+   ],
+   "material": "greyhair",
+   "bone": "head",
+   "rules": [
+    {
+     "every_angle": [
+      14,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      null,
+      16.0
+     ],
+     "t": 1
+    },
+    {
+     "z": [
+      2.6,
+      null
+     ],
+     "y": [
+      18.8,
+      null
+     ],
+     "material": "paleskin"
+    },
+    {
+     "z": [
+      2.6,
+      null
+     ],
+     "y": [
+      17.6,
+      18.8
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "neck",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    32,
+    0
+   ],
+   "b": [
+    69.0,
+    27.5,
+    0.2
+   ],
+   "r": [
+    2.8,
+    2.6
+   ],
+   "material": "paleskin",
+   "bone": "neck"
+  },
+  {
+   "name": "cowl",
+   "kind": "ring",
+   "y": [
+    27.5,
+    36.5
+   ],
+   "rx": [
+    6.0,
+    0.5
+   ],
+   "rz": [
+    6.0,
+    0.45
+   ],
+   "thickness": 2.6,
+   "material": "wool",
+   "bone": "spine.003",
+   "bump": {
+    "folds": [
+     0.6,
+     7,
+     1.0
+    ]
+   },
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      27.5,
+      28.5
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "chest",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    45,
+    0.2
+   ],
+   "radii": [
+    9.4,
+    11.6,
+    6.6
+   ],
+   "material": "wool",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "hash": [
+      0.5,
+      3,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "waist",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    55,
+    -0.2
+   ],
+   "b": [
+    69.0,
+    69,
+    -0.8
+   ],
+   "r": [
+    7.8,
+    8.8
+   ],
+   "material": "wool",
+   "bone": "spine.001"
+  },
+  {
+   "name": "delt.L",
+   "kind": "ellipsoid",
+   "centre": [
+    79.0,
+    38.0,
+    -1.2
+   ],
+   "radii": [
+    4.2,
+    4.2,
+    4.4
+   ],
+   "material": "wool",
+   "bone": "shoulder.L"
+  },
+  {
+   "name": "upper_arm.L",
+   "kind": "capsule",
+   "a": [
+    79.5,
+    37.0,
+    -3.0
+   ],
+   "b": [
+    84.0,
+    54.0,
+    -3.8
+   ],
+   "r": [
+    3.3,
+    2.9
+   ],
+   "material": "wool",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "hash": [
+      0.5,
+      5,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "forearm.L",
+   "kind": "capsule",
+   "a": [
+    84.0,
+    54.0,
+    -3.8
+   ],
+   "b": [
+    87.4,
+    70.4,
+    -0.8
+   ],
+   "r": [
+    3.2,
+    2.5
+   ],
+   "material": "wool",
+   "bone": "forearm.L",
+   "rules": [
+    {
+     "y": [
+      54,
+      58
+     ],
+     "t": 1
+    },
+    {
+     "y": [
+      57.5,
+      58.5
+     ],
+     "t": -2
+    },
+    {
+     "dy": [
+      7,
+      null
+     ],
+     "material": "glove"
+    }
+   ]
+  },
+  {
+   "name": "hand.L",
+   "kind": "ellipsoid",
+   "centre": [
+    88.0,
+    73.8,
+    0.2
+   ],
+   "radii": [
+    2.7,
+    3.4,
+    2.4
+   ],
+   "material": "glove",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "finger0.L",
+   "kind": "capsule",
+   "a": [
+    86.6,
+    75.8,
+    0.6
+   ],
+   "b": [
+    86.39,
+    80.0,
+    1.4
+   ],
+   "r": [
+    0.8,
+    0.6
+   ],
+   "material": "glove",
+   "bone": "hand.L",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger1.L",
+   "kind": "capsule",
+   "a": [
+    88.0,
+    75.8,
+    0.6
+   ],
+   "b": [
+    88.0,
+    80.0,
+    1.4
+   ],
+   "r": [
+    0.8,
+    0.6
+   ],
+   "material": "glove",
+   "bone": "hand.L",
+   "t": 0,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger2.L",
+   "kind": "capsule",
+   "a": [
+    89.4,
+    75.8,
+    0.6
+   ],
+   "b": [
+    89.61,
+    80.0,
+    1.4
+   ],
+   "r": [
+    0.8,
+    0.6
+   ],
+   "material": "glove",
+   "bone": "hand.L",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "thigh.L",
+   "kind": "capsule",
+   "a": [
+    73.6,
+    70.5,
+    0.1
+   ],
+   "b": [
+    73.6,
+    97.6,
+    -0.1
+   ],
+   "r": [
+    4.2,
+    3.4
+   ],
+   "material": "wool",
+   "bone": "thigh.L"
+  },
+  {
+   "name": "shin.L",
+   "kind": "capsule",
+   "a": [
+    73.6,
+    97.6,
+    -0.1
+   ],
+   "b": [
+    73.6,
+    126.6,
+    -2.4
+   ],
+   "r": [
+    3.6,
+    3.2
+   ],
+   "material": "boot",
+   "bone": "shin.L",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      null,
+      104
+     ],
+     "material": "wool"
+    },
+    {
+     "y": [
+      104,
+      106
+     ],
+     "material": "strap"
+    }
+   ]
+  },
+  {
+   "name": "foot.L",
+   "kind": "box",
+   "centre": [
+    73.6,
+    131.2,
+    2.8
+   ],
+   "half": [
+    3.4,
+    2.6,
+    6.0
+   ],
+   "round": 1.4,
+   "material": "boot",
+   "bone": "foot.L",
+   "rules": [
+    {
+     "dy": [
+      1.4,
+      null
+     ],
+     "t": -2
+    },
+    {
+     "dz": [
+      4.0,
+      null
+     ],
+     "y": [
+      null,
+      130.0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "delt.R",
+   "kind": "ellipsoid",
+   "centre": [
+    59.0,
+    38.0,
+    -1.2
+   ],
+   "radii": [
+    4.2,
+    4.2,
+    4.4
+   ],
+   "material": "wool",
+   "bone": "shoulder.R"
+  },
+  {
+   "name": "upper_arm.R",
+   "kind": "capsule",
+   "a": [
+    58.5,
+    37.0,
+    -3.0
+   ],
+   "b": [
+    54.0,
+    54.0,
+    -3.8
+   ],
+   "r": [
+    3.3,
+    2.9
+   ],
+   "material": "wool",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "hash": [
+      0.5,
+      5,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "forearm.R",
+   "kind": "capsule",
+   "a": [
+    54.0,
+    54.0,
+    -3.8
+   ],
+   "b": [
+    50.599999999999994,
+    70.4,
+    -0.8
+   ],
+   "r": [
+    3.2,
+    2.5
+   ],
+   "material": "wool",
+   "bone": "forearm.R",
+   "rules": [
+    {
+     "y": [
+      54,
+      58
+     ],
+     "t": 1
+    },
+    {
+     "y": [
+      57.5,
+      58.5
+     ],
+     "t": -2
+    },
+    {
+     "dy": [
+      7,
+      null
+     ],
+     "material": "glove"
+    }
+   ]
+  },
+  {
+   "name": "hand.R",
+   "kind": "ellipsoid",
+   "centre": [
+    50.0,
+    73.8,
+    0.2
+   ],
+   "radii": [
+    2.7,
+    3.4,
+    2.4
+   ],
+   "material": "glove",
+   "bone": "hand.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "finger0.R",
+   "kind": "capsule",
+   "a": [
+    51.400000000000006,
+    75.8,
+    0.6
+   ],
+   "b": [
+    51.61,
+    80.0,
+    1.4
+   ],
+   "r": [
+    0.8,
+    0.6
+   ],
+   "material": "glove",
+   "bone": "hand.R",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger1.R",
+   "kind": "capsule",
+   "a": [
+    50.0,
+    75.8,
+    0.6
+   ],
+   "b": [
+    50.0,
+    80.0,
+    1.4
+   ],
+   "r": [
+    0.8,
+    0.6
+   ],
+   "material": "glove",
+   "bone": "hand.R",
+   "t": 0,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger2.R",
+   "kind": "capsule",
+   "a": [
+    48.599999999999994,
+    75.8,
+    0.6
+   ],
+   "b": [
+    48.39,
+    80.0,
+    1.4
+   ],
+   "r": [
+    0.8,
+    0.6
+   ],
+   "material": "glove",
+   "bone": "hand.R",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "thigh.R",
+   "kind": "capsule",
+   "a": [
+    64.4,
+    70.5,
+    0.1
+   ],
+   "b": [
+    64.4,
+    97.6,
+    -0.1
+   ],
+   "r": [
+    4.2,
+    3.4
+   ],
+   "material": "wool",
+   "bone": "thigh.R"
+  },
+  {
+   "name": "shin.R",
+   "kind": "capsule",
+   "a": [
+    64.4,
+    97.6,
+    -0.1
+   ],
+   "b": [
+    64.4,
+    126.6,
+    -2.4
+   ],
+   "r": [
+    3.6,
+    3.2
+   ],
+   "material": "boot",
+   "bone": "shin.R",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      null,
+      104
+     ],
+     "material": "wool"
+    },
+    {
+     "y": [
+      104,
+      106
+     ],
+     "material": "strap"
+    }
+   ]
+  },
+  {
+   "name": "foot.R",
+   "kind": "box",
+   "centre": [
+    64.4,
+    131.2,
+    2.8
+   ],
+   "half": [
+    3.4,
+    2.6,
+    6.0
+   ],
+   "round": 1.4,
+   "material": "boot",
+   "bone": "foot.R",
+   "rules": [
+    {
+     "dy": [
+      1.4,
+      null
+     ],
+     "t": -2
+    },
+    {
+     "dz": [
+      4.0,
+      null
+     ],
+     "y": [
+      null,
+      130.0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "tunic",
+   "kind": "ring",
+   "y": [
+    64,
+    112
+   ],
+   "rx": [
+    9.4,
+    0.08
+   ],
+   "rz": [
+    8.2,
+    0.06
+   ],
+   "thickness": 1.6,
+   "hem": {
+    "tongues": 11,
+    "depth": 3,
+    "seed": 4
+   },
+   "open": {
+    "angle": 0.18,
+    "below": 92
+   },
+   "material": "wool",
+   "part": "tunic",
+   "bump": {
+    "folds": [
+     0.5,
+     9,
+     1.4
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      9,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.04,
+      7,
+      2
+     ],
+     "t": -2,
+     "px": [
+      90,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "apron",
+   "kind": "ring",
+   "y": [
+    36,
+    114
+   ],
+   "rx": [
+    9.8,
+    0.05
+   ],
+   "rz": [
+    7.4,
+    0.06
+   ],
+   "thickness": 1.3,
+   "keep": {
+    "front": 1.05
+   },
+   "hem": {
+    "tongues": 5,
+    "depth": 3,
+    "seed": 2
+   },
+   "material": "apron",
+   "part": "apron",
+   "bump": {
+    "folds": [
+     0.3,
+     5,
+     0.6
+    ]
+   },
+   "rules": [
+    {
+     "hem_band": [
+      0,
+      22
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      6
+     ],
+     "material": "dirtstain"
+    },
+    {
+     "y": [
+      62,
+      64.5
+     ],
+     "material": "strap",
+     "t": 1
+    },
+    {
+     "hash": [
+      0.05,
+      9,
+      2
+     ],
+     "t": -2,
+     "px": [
+      90,
+      null
+     ]
+    },
+    {
+     "y": [
+      36,
+      38
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "strapL",
+   "kind": "capsule",
+   "a": [
+    63.5,
+    37,
+    6.4
+   ],
+   "b": [
+    62.4,
+    30,
+    3.6
+   ],
+   "r": 0.9,
+   "material": "strap",
+   "bone": "spine.003",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "strapR",
+   "kind": "capsule",
+   "a": [
+    74.5,
+    37,
+    6.4
+   ],
+   "b": [
+    75.6,
+    30,
+    3.6
+   ],
+   "r": 0.9,
+   "material": "strap",
+   "bone": "spine.003",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "sling",
+   "kind": "capsule",
+   "a": [
+    77.0,
+    32,
+    4.5
+   ],
+   "b": [
+    60.0,
+    62,
+    6.8
+   ],
+   "r": 0.9,
+   "material": "strap",
+   "bone": "spine.002",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "buckle",
+   "kind": "box",
+   "centre": [
+    68.0,
+    47.5,
+    7.6
+   ],
+   "half": [
+    1.2,
+    1.2,
+    0.5
+   ],
+   "material": "iron",
+   "bone": "spine.002",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "spade_haft",
+   "kind": "capsule",
+   "a": [
+    79.5,
+    17,
+    -8.6
+   ],
+   "b": [
+    59.5,
+    76,
+    -8.0
+   ],
+   "r": [
+    1.1,
+    1.0
+   ],
+   "material": "spadewood",
+   "part": "spade",
+   "rules": [
+    {
+     "every_y": [
+      6,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "spade_grip",
+   "kind": "capsule",
+   "a": [
+    77.6,
+    15.0,
+    -8.6
+   ],
+   "b": [
+    82.4,
+    16.6,
+    -8.6
+   ],
+   "r": 0.9,
+   "material": "spadewood",
+   "part": "spade"
+  },
+  {
+   "name": "spade_grip_l",
+   "kind": "capsule",
+   "a": [
+    77.6,
+    15.0,
+    -8.6
+   ],
+   "b": [
+    79.0,
+    19.0,
+    -8.6
+   ],
+   "r": 0.8,
+   "material": "spadewood",
+   "part": "spade"
+  },
+  {
+   "name": "spade_grip_r",
+   "kind": "capsule",
+   "a": [
+    82.4,
+    16.6,
+    -8.6
+   ],
+   "b": [
+    80.6,
+    20.0,
+    -8.6
+   ],
+   "r": 0.8,
+   "material": "spadewood",
+   "part": "spade"
+  },
+  {
+   "name": "spade_blade",
+   "kind": "box",
+   "centre": [
+    58.4,
+    82,
+    -8.0
+   ],
+   "half": [
+    4.0,
+    6.4,
+    0.6
+   ],
+   "round": 0.8,
+   "material": "iron",
+   "part": "spade",
+   "rotate": {
+    "z": -18,
+    "about": [
+     58.4,
+     82,
+     -8.0
+    ]
+   },
+   "rules": [
+    {
+     "dy": [
+      3.5,
+      null
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.12,
+      3,
+      2
+     ],
+     "t": -2
+    },
+    {
+     "dy": [
+      null,
+      -5.0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "satchel",
+   "kind": "box",
+   "centre": [
+    80.6,
+    78,
+    3.0
+   ],
+   "half": [
+    3.4,
+    4.0,
+    2.4
+   ],
+   "round": 1.0,
+   "material": "strap",
+   "part": "satchel",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -2.4
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      -2.6,
+      -1.6
+     ],
+     "t": -2
+    },
+    {
+     "x": [
+      80,
+      81
+     ],
+     "material": "iron",
+     "px": [
+      90,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "candle0",
+   "kind": "capsule",
+   "a": [
+    79.0,
+    74.5,
+    2.6
+   ],
+   "b": [
+    79.0,
+    70.5,
+    2.6
+   ],
+   "r": 0.55,
+   "material": "wax",
+   "part": "satchel",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "candle1",
+   "kind": "capsule",
+   "a": [
+    80.6,
+    74.5,
+    2.6
+   ],
+   "b": [
+    80.6,
+    69.1,
+    2.6
+   ],
+   "r": 0.55,
+   "material": "wax",
+   "part": "satchel",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "candle2",
+   "kind": "capsule",
+   "a": [
+    82.1,
+    74.5,
+    2.6
+   ],
+   "b": [
+    82.1,
+    71.1,
+    2.6
+   ],
+   "r": 0.55,
+   "material": "wax",
+   "part": "satchel",
+   "px": [
+    90,
+    null
+   ]
+  }
+ ],
+ "clips": {
+  "attack": "punch",
+  "idle": "talk"
+ },
+ "effects": [],
+ "lights": [],
+ "shadow": {
+  "radii": [
+   18,
+   3.8
+  ],
+  "colour": "#4b4a4f"
+ },
+ "detail": {
+  "head": {
+   "file": "maren.detail/head.png"
+  },
+  "hair": {
+   "file": "maren.detail/hair.png"
+  },
+  "neck": {
+   "file": "maren.detail/neck.png"
+  },
+  "cowl": {
+   "file": "maren.detail/cowl.png"
+  },
+  "chest": {
+   "file": "maren.detail/chest.png"
+  },
+  "waist": {
+   "file": "maren.detail/waist.png"
+  },
+  "delt.L": {
+   "file": "maren.detail/delt.L.png"
+  },
+  "upper_arm.L": {
+   "file": "maren.detail/upper_arm.L.png"
+  },
+  "forearm.L": {
+   "file": "maren.detail/forearm.L.png"
+  },
+  "thigh.L": {
+   "file": "maren.detail/thigh.L.png"
+  },
+  "delt.R": {
+   "file": "maren.detail/delt.R.png"
+  },
+  "upper_arm.R": {
+   "file": "maren.detail/upper_arm.R.png"
+  },
+  "forearm.R": {
+   "file": "maren.detail/forearm.R.png"
+  },
+  "thigh.R": {
+   "file": "maren.detail/thigh.R.png"
+  },
+  "tunic": {
+   "file": "maren.detail/tunic.png"
+  },
+  "buckle": {
+   "file": "maren.detail/buckle.png"
+  },
+  "spade": {
+   "file": "maren.detail/spade.png"
+  }
+ }
+}
