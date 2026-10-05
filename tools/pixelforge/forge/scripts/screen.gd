@@ -242,13 +242,14 @@ func add_progress() -> Control:
 ## the standard choices every workbench has, plus the tab's own in front
 func standard_choices(front: Array = [], with_render_all: bool = true) -> Array:
 	var items := front.duplicate()
-	items.append({"label": "Keep", "cb": keep})
+	items.append({"label": "Keep", "cb": keep, "hint": "Keep · write this into the game"})
 	if with_render_all:
-		items.append({"label": "Render all", "cb": render_all})
-	items.append({"label": "Undo", "cb": undo})
-	items.append({"label": "Reset", "cb": reset})
-	items.append({"label": "Start over", "cb": start_over})
-	items.append({"label": "Advanced" if not advanced_open else "Levers", "cb": toggle_advanced})
+		items.append({"label": "Render all", "cb": render_all, "hint": "Render all · every clip and direction"})
+	items.append({"label": "Undo", "cb": undo, "hint": "Undo · the last change on this bench (Ctrl+Z)"})
+	items.append({"label": "Reset", "cb": reset, "hint": "Reset · this tab's controls back to their defaults"})
+	items.append({"label": "Start over", "cb": start_over, "hint": "Start over · throw this bench's work away (it asks first)"})
+	items.append({"label": "Advanced" if not advanced_open else "Levers", "cb": toggle_advanced, "hint": "Advanced · the same values as plain sliders with finer steps"})
+	items.append({"label": "?", "cb": func(): app.show_callouts(), "hint": "? · what each control on this bench does"})
 	return items
 
 # ------------------------------------------------------------------ the standard actions (override what applies)

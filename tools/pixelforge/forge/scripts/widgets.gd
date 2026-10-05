@@ -1,6 +1,7 @@
 extends RefCounted
 const T := preload("res://scripts/theme.gd")
 const PX := preload("res://scripts/px.gd")
+const F := preload("res://scripts/frame.gd")
 ## scripts/widgets.gd: the controls the text box is built from, every one drawn as pixels (px.gd). A "group" is
 ## what the selector moves through: the choices line, the tab row, a rack of controls, the ground picker. Each
 ## implements item_count / item_rect / set_sel / activate / step, so the app's one selector drives them all.
@@ -43,6 +44,64 @@ class NumberEntry:
 		var m := r.search(s)
 		return float(m.get_string()) if m else 0.0
 
+## a line of small text with a one-pixel dark edge, for the foot line on the wooden sill (clips to its width)
+class EdgedLabel:
+	extends Control
+	var text := "":
+		set(v):
+			text = v
+			queue_redraw()
+	var colour := T.DIM
+	var font_size := T.SMALL_SIZE
+	func _init() -> void:
+		clip_contents = true
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+	func _draw() -> void:
+		var f := T.font("text")
+		var at := Vector2(1, 11 if font_size <= T.SMALL_SIZE else 13)
+		for o in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1), Vector2(1, 1)]:
+			draw_string(f, at + o, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, T.BLACK)
+		draw_string(f, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, colour)
+
+## a crisp one-pixel outline round a rect (four fills; an unfilled draw_rect lands between pixels)
+static func outline(ci: CanvasItem, r: Rect2, c: Color) -> void:
+	ci.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), c)
+	ci.draw_rect(Rect2(r.position.x, r.end.y - 1, r.size.x, 1), c)
+	ci.draw_rect(Rect2(r.position, Vector2(1, r.size.y)), c)
+	ci.draw_rect(Rect2(r.end.x - 1, r.position.y, 1, r.size.y), c)
+
+## the colour of an interactive word: ember always; brighter when chosen, white while pressed, duller when dim
+static func ember(on: bool, pressed: bool = false, dim: bool = false) -> Color:
+	if pressed:
+		return Color("#ffffff")
+	if on:
+		return Color(F.GOLD[4])
+	if dim:
+		return Color(F.GOLD[2])
+	return T.ACCENT
+
+## a carved iron plaque behind a choice: lit top edge, dark foot; the chosen one has a gold edge and a 1-px glow;
+## pressed, the edges swap so it sinks
+static func plaque(ci: CanvasItem, r: Rect2, on: bool, pressed: bool) -> void:
+	ci.draw_rect(r, Color(F.IRON[2] if on else F.IRON[1]))
+	var top := Color(F.GOLD[3] if on else F.IRON[3])
+	var bot := Color(F.IRON[0])
+	if pressed:
+		top = Color(F.IRON[0])
+		bot = Color(F.GOLD[2])
+	ci.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), top)
+	ci.draw_rect(Rect2(r.position, Vector2(1, r.size.y)), top)
+	ci.draw_rect(Rect2(r.position.x, r.end.y - 1, r.size.x, 1), bot)
+	ci.draw_rect(Rect2(r.end.x - 1, r.position.y, 1, r.size.y), bot)
+	if on and not pressed:
+		outline(ci, Rect2(r.position - Vector2(1, 1), r.size + Vector2(2, 2)), Color(F.GOLD[1]))
+
+## the small gold chevrons beside a wheel or a cycler that say "this turns"
+static func chevrons(ci: CanvasItem, lx: float, rx: float, cy: float, c: Color) -> void:
+	for k in 3:
+		ci.draw_rect(Rect2(lx + 2 - k, cy - k, 1, 1), c); ci.draw_rect(Rect2(lx + 2 - k, cy + k, 1, 1), c)
+		ci.draw_rect(Rect2(rx - 2 + k, cy - k, 1, 1), c); ci.draw_rect(Rect2(rx - 2 + k, cy + k, 1, 1), c)
+
 ## the selector's home: a line of text choices, in a grid of columns (Home) or flowing with the words' widths and
 ## wrapping (the choices line, the cyclers, the ground picker); the chosen one in the accent colour with the arrow
 class Choices:
@@ -64,6 +123,10 @@ class Choices:
 	var drag_start: Callable        # (i, global_pos): an item picked up and carried out of the row
 	var drag_move: Callable         # (global_pos)
 	var drag_end: Callable          # (global_pos)
+	var edge := false               # a one-pixel dark edge behind the words (the foot line, on the wooden sill)
+	var plates := true              # carved plaques behind the words (off on the foot line)
+	var hover_i := -1
+	var hover_value := false        # the mouse is over a cycler's typable value
 	var _press_i := -1
 	var _press_at := Vector2.ZERO
 	var _dragging := false
@@ -73,6 +136,9 @@ class Choices:
 		app = a
 		sel = 0
 		mouse_filter = Control.MOUSE_FILTER_STOP
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		if not mouse_exited.is_connected(_unhover):
+			mouse_exited.connect(_unhover)
 		_layout()
 		resized.connect(_layout)
 		queue_redraw()
@@ -191,6 +257,21 @@ class Choices:
 				app.audio.blip("ratchet")
 			return true
 		return false
+	func _unhover() -> void:
+		hover_i = -1
+		hover_value = false
+		queue_redraw()
+	## the hint bar's line for item i: what it is and how to change it
+	func hint_of(i: int) -> String:
+		if i < 0 or i >= items.size():
+			return ""
+		var it: Dictionary = items[i]
+		if it.has("hint"):
+			return String(it["hint"])
+		var lab := String(it.get("label", ""))
+		if it.has("value"):
+			return lab + (" · left and right change it; click the value to type" if it.has("set") else " · left and right change it")
+		return lab + " · Enter or click"
 	func label_of(i: int) -> String:
 		return String(items[i].get("label", "")) if i >= 0 and i < items.size() else ""
 	func index_of(label: String) -> int:
@@ -198,21 +279,50 @@ class Choices:
 			if String(items[i].get("label", "")).to_lower() == label.to_lower():
 				return i
 		return -1
+	func _text(f: Font, at: Vector2, s: String, c: Color) -> void:
+		if edge:
+			for o in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1), Vector2(1, 1)]:
+				draw_string(f, at + o, s, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, T.BLACK)
+		draw_string(f, at, s, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, c)
 	func _draw() -> void:
 		var f := T.font("text")
+		var pressed: bool = app != null and app.get("flash") != null and float(app.flash) >= 0.0
 		for i in items.size():
 			var p := item_pos(i)
 			var on := active and i == sel
 			var it: Dictionary = items[i]
-			var c := T.ACCENT if on else (T.FRAME if (dim_unselected and it.get("dim", false)) or it.get("dim", false) else T.BONE)
+			var is_dim: bool = it.get("dim", false)
 			var y := p.y + (13 if font_size >= T.TEXT_SIZE else 11)
+			var w := 0.0
+			var x0 := p.x
 			if it.has("value"):
+				# a cycler: its name is a label (grey); its value is the interactive part, on a plaque
 				var lab := String(it.get("label", "")) + " "
-				draw_string(f, Vector2(p.x, y), lab, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, T.FRAME)
+				_text(f, Vector2(p.x, y), lab, T.DIM)
 				var lw := T.text_width(lab, font_size)
-				draw_string(f, Vector2(p.x + lw, y), "< %s >" % String(it["value"]), HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, T.ACCENT if on else T.BONE)
+				var vs := "< %s >" % String(it["value"])
+				var vw := T.text_width(vs, font_size)
+				if plates:
+					plaque(self, Rect2(p.x + lw - 3, p.y, vw + 6, row_h - 1), on, on and pressed)
+				_text(f, Vector2(p.x + lw, y), vs, ember(on, on and pressed, is_dim))
+				if hover_i == i and hover_value and it.has("set"):
+					# the caret box: this value can be typed
+					outline(self, Rect2(p.x + lw - 4, p.y - 1, vw + 8, row_h + 1), Color(F.GOLD[3]))
+					draw_rect(Rect2(p.x + lw + vw + 1, p.y + 3, 1, row_h - 7), Color(F.GOLD[4]))
+				x0 = p.x + lw
+				w = vw
 			else:
-				draw_string(f, Vector2(p.x, y), String(it["label"]), HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, c)
+				w = T.text_width(String(it["label"]), font_size)
+				if plates:
+					plaque(self, Rect2(p.x - 4, p.y, w + 8, row_h - 1), on, on and pressed)
+				_text(f, Vector2(p.x, y), String(it["label"]), ember(on, on and pressed, is_dim))
+			if on and not plates:
+				# the ember underline: a dotted line of dark gold under the chosen words
+				var uy := minf(y + 2, p.y + row_h - 1)
+				var x := x0
+				while x < x0 + w:
+					draw_rect(Rect2(x, uy, 1, 1), Color(F.GOLD[1]))
+					x += 2
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseMotion:
 			if _press_i >= 0 and drag_start.is_valid():
@@ -223,6 +333,12 @@ class Choices:
 					drag_move.call(get_global_mouse_position())
 				return
 			var i := _hit(ev.position)
+			var hv := i >= 0 and items[i].has("set") and _on_value(i, ev.position)
+			if i != hover_i or hv != hover_value:
+				hover_i = i
+				hover_value = hv
+				mouse_default_cursor_shape = Control.CURSOR_IBEAM if hv else Control.CURSOR_POINTING_HAND
+				queue_redraw()
 			if i >= 0 and (i != sel or not active) and app:
 				app.focus_on(self, i, true)
 		elif ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
@@ -331,6 +447,7 @@ class Tabs:
 		app = a
 		on_pick = cb
 		mouse_filter = Control.MOUSE_FILTER_STOP
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		_layout()
 		queue_redraw()
 	func _layout() -> void:
@@ -367,6 +484,8 @@ class Tabs:
 		set_sel(i)
 	func step(_delta: int, _dir: String) -> bool:
 		return false
+	func hint_of(i: int) -> String:
+		return (names[i] if i >= 0 and i < names.size() else "") + " tab · LB and RB, Tab, or click"
 	func _draw() -> void:
 		if xs.size() != names.size():
 			_layout()
@@ -375,18 +494,30 @@ class Tabs:
 		for i in names.size():
 			var on := i == current
 			var w := T.text_width(names[i])
-			# the field under the name cuts the rim; the chosen one is a well open to the text box below
-			draw_rect(Rect2(xs[i] - 5, 0, w + 10, h), T.WELL if on else T.INK)
+			# a wooden sign hanging from the stone on two short chains; the chosen one is the lit plank, hung a
+			# pixel higher and taller so it stands proud of the others
+			var r := Rect2(xs[i] - 6, 1 if on else 3, w + 12, (h - 1) if on else (h - 3))
+			for cx in [r.position.x + 3, r.end.x - 4]:
+				draw_rect(Rect2(cx, 0, 1, r.position.y), Color(F.IRON[4]))
+				draw_rect(Rect2(cx, r.position.y, 1, 1), Color(F.IRON[6]))
 			if on:
-				draw_rect(Rect2(xs[i] - 6, 0, w + 12, 1), T.BLACK)
-				draw_rect(Rect2(xs[i] - 6, 0, 1, h), T.BLACK)
-				draw_rect(Rect2(xs[i] + w + 5, 0, 1, h), T.BLACK)
-				draw_rect(Rect2(xs[i] - 5, 1, w + 10, 2), T.FRAME2)
-				draw_rect(Rect2(xs[i] - 5, 1, 2, h - 1), T.FRAME2)
-				draw_rect(Rect2(xs[i] + w + 3, 1, 2, h - 1), T.FRAME2)
-			draw_string(f, Vector2(xs[i], h - 3), names[i], HORIZONTAL_ALIGNMENT_LEFT, -1, T.TEXT_SIZE, T.ACCENT if on else T.DIM)
-			if i < names.size() - 1:
-				draw_rect(Rect2(xs[i] + w + 10, floorf(h / 2.0) - 1, 2, 2), T.FRAME2)
+				draw_rect(Rect2(r.position.x + 1, r.end.y - 1, r.size.x, 1), Color(F.IRON[0]))
+			draw_rect(r, Color(F.WOOD[4] if on else F.WOOD[2]))
+			draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), Color(F.WOOD[6] if on else F.WOOD[4]))
+			draw_rect(Rect2(r.position, Vector2(1, r.size.y)), Color(F.WOOD[5] if on else F.WOOD[3]))
+			draw_rect(Rect2(r.position.x, r.end.y - 1, r.size.x, 1), Color(F.WOOD[0]))
+			draw_rect(Rect2(r.end.x - 1, r.position.y, 1, r.size.y), Color(F.WOOD[1]))
+			var gx := r.position.x + 2
+			while gx < r.end.x - 3:
+				draw_rect(Rect2(gx, r.end.y - 4, 2, 1), Color(F.WOOD[3] if on else F.WOOD[1]))
+				gx += 5
+			if on:
+				draw_rect(Rect2(r.position.x + 1, r.position.y + 1, r.size.x - 2, 1), Color(F.GOLD[3]))
+				draw_rect(Rect2(r.position.x + 1, r.position.y + 1, 1, r.size.y - 2), Color(F.GOLD[2]))
+			var col := Color(F.GOLD[4]) if on else T.ACCENT
+			for o in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1), Vector2(1, 1)]:
+				draw_string(f, Vector2(xs[i], h - 3) + o, names[i], HORIZONTAL_ALIGNMENT_LEFT, -1, T.TEXT_SIZE, T.BLACK)
+			draw_string(f, Vector2(xs[i], h - 3), names[i], HORIZONTAL_ALIGNMENT_LEFT, -1, T.TEXT_SIZE, col)
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
 			for i in names.size():
@@ -453,6 +584,10 @@ class Rack:
 			if c.label.to_lower() == n.to_lower():
 				return c
 		return null
+	func hint_of(i: int) -> String:
+		if i >= 0 and i < controls.size() and controls[i].has_method("how"):
+			return controls[i].how()
+		return ""
 
 ## the base of a pixel control: a texture drawn at 2x, a name and a value under it, a value in [0, 1] or an angle
 class Knob:
@@ -474,6 +609,8 @@ class Knob:
 	var zoom := 2
 	var tex_size := Vector2(14, 26)
 	var hint := ""
+	var hover := false              # the mouse is over the control: its handle lights, a glow round it
+	var hover_value := false        # the mouse is over the value: a caret box says it can be typed
 	func init(name: String, v: float, def: float, f: Callable, change: Callable, commit: Callable = Callable()) -> void:
 		label = name
 		value = v
@@ -482,15 +619,41 @@ class Knob:
 		on_change = change
 		on_commit = commit
 		mouse_filter = Control.MOUSE_FILTER_STOP
+		mouse_default_cursor_shape = Control.CURSOR_DRAG
 		size = Vector2(maxf(tex_size.x * zoom, 56), tex_size.y * zoom + 20)
+		if not mouse_entered.is_connected(_enter):
+			mouse_entered.connect(_enter)
+			mouse_exited.connect(_leave)
 		queue_redraw()
+	func _enter() -> void:
+		hover = true
+		queue_redraw()
+	func _leave() -> void:
+		hover = false
+		hover_value = false
+		queue_redraw()
+	func lit() -> bool:
+		return hot or hover
+	## the hint bar's line: what this is and how to change it
+	func how() -> String:
+		return "%s · drag up or down, scroll, or click the value to type" % label
 	func set_hot(h: bool) -> void:
 		hot = h
 		queue_redraw()
 	func value_text() -> String:
 		return String(fmt.call(value)) if fmt.is_valid() else String.num(value, 2)
 	func texture() -> Texture2D:
-		return PX.lever(value, int(tex_size.x), int(tex_size.y), hot)
+		return PX.lever(value, int(tex_size.x), int(tex_size.y), lit())
+	## the glow round a lit control and the caret box over a hovered value
+	func _affordances(tex_rect: Rect2) -> void:
+		if lit():
+			outline(self, Rect2(tex_rect.position - Vector2(1, 1), tex_rect.size + Vector2(2, 2)), Color(F.GOLD[1]))
+		if hover_value and fmt.is_valid():
+			var vr := value_rect()
+			var vw := T.text_width(value_text(), T.SMALL_SIZE)
+			var vx := floorf((size.x - vw) / 2.0)
+			outline(self, Rect2(vx - 3, vr.position.y - 1, vw + 7, vr.size.y + 1), Color(F.GOLD[3]))
+			draw_rect(Rect2(vx + vw + 1, vr.position.y + 2, 1, vr.size.y - 5), Color(F.GOLD[4]))
 	func set_value(v: float, commit: bool = true) -> void:
 		var nv := clampf(v, 0.0, 1.0)
 		if absf(nv - value) < 1e-6:
@@ -518,10 +681,11 @@ class Knob:
 		var ts := tex.get_size() * zoom
 		var x := floorf((size.x - ts.x) / 2.0)
 		draw_texture_rect(tex, Rect2(x, 0, ts.x, ts.y), false)
+		_affordances(Rect2(x, 0, ts.x, ts.y))
 		var f := T.font("text")
 		var y := ts.y + 8
-		draw_string(f, Vector2(0, y), label, HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, T.ACCENT if hot else T.DIM)
-		draw_string(f, Vector2(0, y + 10), value_text(), HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, T.ACCENT)
+		draw_string(f, Vector2(0, y), label, HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, T.BONE if lit() else T.DIM)
+		draw_string(f, Vector2(0, y + 10), value_text(), HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, ember(lit()))
 	## the number a typed value means: the control's own words for 0 and 1 give the range, so "+3" or "12 frames" land right
 	func set_from_number(n: float) -> void:
 		var lo := NumberEntry._num(String(fmt.call(0.0))) if fmt.is_valid() else 0.0
@@ -575,8 +739,14 @@ class Knob:
 					if dragging and changed and on_commit.is_valid():
 						on_commit.call(value)
 					dragging = false
-		elif ev is InputEventMouseMotion and dragging:
-			_drag(ev.position)
+		elif ev is InputEventMouseMotion:
+			var hv := fmt.is_valid() and value_rect().has_point(ev.position)
+			if hv != hover_value:
+				hover_value = hv
+				mouse_default_cursor_shape = Control.CURSOR_IBEAM if hv else Control.CURSOR_DRAG
+				queue_redraw()
+			if dragging:
+				_drag(ev.position)
 	func _drag(p: Vector2) -> void:
 		var v := drag_value + (drag_from.y - p.y) / 56.0
 		if absf(v - value) >= 0.01:
@@ -603,8 +773,11 @@ class Wheel:
 		default_angle = def
 		init(name, (a + 180.0) / 360.0, (def + 180.0) / 360.0, f, change, commit)
 		size = Vector2(56, 22 * zoom + 28)
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	func texture() -> Texture2D:
-		return PX.wheel(angle, 22, hot)
+		return PX.wheel(angle, 22, lit())
+	func how() -> String:
+		return "%s · drag the wheel round, scroll, or type a direction" % label
 	func value_text() -> String:
 		return String(fmt.call(angle)) if fmt.is_valid() else "%d" % int(round(angle))
 	func set_angle(a: float, commit: bool = true) -> void:
@@ -647,10 +820,19 @@ class Wheel:
 		var ts := tex.get_size() * zoom
 		var x := floorf((size.x - ts.x) / 2.0)
 		draw_texture_rect(tex, Rect2(x, 4, ts.x, ts.y), false)
+		if lit():
+			# the arrows: this turns
+			chevrons(self, x - 6, x + ts.x + 5, 4 + ts.y / 2.0, Color(F.GOLD[3]))
+		if hover_value and fmt.is_valid():
+			var vr := value_rect()
+			var vw := T.text_width(value_text(), T.SMALL_SIZE)
+			var vx := floorf((size.x - vw) / 2.0)
+			outline(self, Rect2(vx - 3, vr.position.y - 1, vw + 7, vr.size.y + 1), Color(F.GOLD[3]))
+			draw_rect(Rect2(vx + vw + 1, vr.position.y + 2, 1, vr.size.y - 5), Color(F.GOLD[4]))
 		var f := T.font("text")
 		var y := ts.y + 12
-		draw_string(f, Vector2(0, y), label, HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, T.ACCENT if hot else T.DIM)
-		draw_string(f, Vector2(0, y + 10), value_text(), HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, T.ACCENT)
+		draw_string(f, Vector2(0, y), label, HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, T.BONE if lit() else T.DIM)
+		draw_string(f, Vector2(0, y + 10), value_text(), HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, ember(lit()))
 	func _drag(p: Vector2) -> void:
 		var c := Vector2(size.x / 2.0, 4 + 22 * zoom / 2.0)
 		var a := rad_to_deg((p - c).angle()) + 90.0
@@ -666,13 +848,24 @@ class Wheel:
 class Pull:
 	extends Knob
 	var on := false
+	var sway_t := 0.0               # the chain swings for a moment after a pull
 	func init_pull(name: String, v: bool, def: bool, change: Callable, commit: Callable = Callable()) -> void:
 		tex_size = Vector2(12, 26)
 		on = v
 		init(name, 1.0 if v else 0.0, 1.0 if def else 0.0, Callable(), change, commit)
 		size = Vector2(56, 26 * zoom + 20)
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	func texture() -> Texture2D:
-		return PX.pull(on, 12, 26, hot)
+		var sw := 0
+		if sway_t > 0.0:
+			sw = [1, 0, -1, 0][int(sway_t * 8.0) % 4]
+		return PX.pull(on, 12, 26, lit(), sw)
+	func how() -> String:
+		return "%s · click or Enter pulls the chain" % label
+	func _process(dt: float) -> void:
+		if sway_t > 0.0:
+			sway_t -= dt
+			queue_redraw()
 	func value_text() -> String:
 		return "on" if on else "off"
 	func set_on(v: bool) -> void:
@@ -680,6 +873,8 @@ class Pull:
 			return
 		on = v
 		value = 1.0 if on else 0.0
+		if app and not app.reduced_motion:
+			sway_t = 1.0
 		if on_change.is_valid():
 			on_change.call(on)
 		if on_commit.is_valid():
@@ -714,7 +909,9 @@ class Lever3:
 		stops = names
 		init(name, v / 2.0, def / 2.0, Callable(), change)
 	func texture() -> Texture2D:
-		return PX.lever3(stop, 14, 26, hot)
+		return PX.lever3(stop, 14, 26, lit())
+	func how() -> String:
+		return "%s · click cycles it; up and down step" % label
 	func value_text() -> String:
 		return stops[clampi(stop, 0, stops.size() - 1)]
 	func set_stop(s: int) -> void:
@@ -764,6 +961,7 @@ class PxSlider:
 	var changed := false
 	var track_w := 60
 	var last_click := 0
+	var hover := false
 	func init(name: String, v: float, l: float, h: float, def: float, p: int, change: Callable) -> void:
 		label = name
 		value = v
@@ -773,7 +971,12 @@ class PxSlider:
 		places = p
 		on_change = change
 		mouse_filter = Control.MOUSE_FILTER_STOP
+		mouse_default_cursor_shape = Control.CURSOR_DRAG
 		size = Vector2(140, 16)
+		mouse_entered.connect(func(): hover = true; queue_redraw())
+		mouse_exited.connect(func(): hover = false; queue_redraw())
+	func how() -> String:
+		return "%s · drag, left and right, or click the number to type" % label
 	func frac() -> float:
 		return 0.0 if hi == lo else clampf((value - lo) / (hi - lo), 0.0, 1.0)
 	func set_hot(h: bool) -> void:
@@ -812,10 +1015,12 @@ class PxSlider:
 		return T.fmt(value, places)
 	func _draw() -> void:
 		var f := T.font("text")
-		draw_string(f, Vector2(0, 12), label, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT if hot else T.DIM)
-		var tex := PX.slider(frac(), track_w, hot)
+		draw_string(f, Vector2(0, 12), label, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.BONE if (hot or hover) else T.DIM)
+		var tex := PX.slider(frac(), track_w, hot or hover)
 		draw_texture_rect(tex, Rect2(64, 4, track_w, 7), false)
-		draw_string(f, Vector2(64 + track_w + 4, 12), value_text(), HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT)
+		if hot or hover:
+			outline(self, Rect2(63, 3, track_w + 2, 9), Color(F.GOLD[1]))
+		draw_string(f, Vector2(64 + track_w + 4, 12), value_text(), HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, ember(hot or hover))
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton and ev.pressed and ev.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			step(1, "right" if ev.button_index == MOUSE_BUTTON_WHEEL_UP else "left")
@@ -915,6 +1120,7 @@ class RampRow:
 		colors = cs
 		on_pick = pick
 		mouse_filter = Control.MOUSE_FILTER_STOP
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		compact = name == ""
 		size = Vector2(maxi(cs.size(), 1) * 8 + 4, 13) if compact else Vector2(180, 13)
 	func set_hot(h: bool) -> void:
@@ -923,6 +1129,8 @@ class RampRow:
 	func activate() -> void:
 		if on_pick.is_valid():
 			on_pick.call(ramp_name)
+	func how() -> String:
+		return ("the %s ramp" % ramp_name if ramp_name != "" else "this ramp") + " · Enter or click picks it"
 	func step(_delta: int, _dir: String) -> bool:
 		return false
 	func _draw() -> void:
@@ -992,8 +1200,11 @@ class Timeline:
 		app = a
 		on_pick = cb
 		mouse_filter = Control.MOUSE_FILTER_STOP
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		custom_minimum_size = Vector2(0, thumb + 14)
 		queue_redraw()
+	func hint_of(i: int) -> String:
+		return "frame %d · click picks it" % (i + 1) + (", drag it to reorder" if on_reorder.is_valid() else "")
 	func item_count() -> int:
 		return texs.size()
 	func columns() -> int:
