@@ -44,6 +44,10 @@ func _ready() -> void:
 		Game.cls = args["cls"]
 	if args.has("hour"):
 		Game.clock = float(args["hour"]) * Game.day_len
+	if args.has("zseed"):   # tests: every zone at this exported seed (tools/zone_export/compare.mjs, side by side)
+		for zid in Data.zone_index().get("zones", {}):
+			if int(args["zseed"]) in Data.zone_seeds(zid):
+				Game.zone_seeds[zid] = int(args["zseed"])
 	if Game.force_new:
 		args["new"] = "1"
 		Game.force_new = false
