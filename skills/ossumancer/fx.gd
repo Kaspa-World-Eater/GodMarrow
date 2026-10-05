@@ -14,6 +14,9 @@ const BONE_M := Color8(196, 188, 164)
 const BONE_D := Color8(140, 132, 112)
 const GRIT := Color8(92, 86, 74)
 
+var rings: Array = []     # D2's Bone Spear trail (BoneSpearTrail): rings left along the flight, expanding and fading
+var ring_t := 0.0
+var spear_lights: Array = []   # a small cold light that rides each spear (D2R lights the dark round it)
 var spear_cv: Node2D       # the spears' own canvas: unshaded, so the night never dims them (D2R's spear lights itself)
 
 func _ready() -> void:
@@ -31,8 +34,17 @@ func _ready() -> void:
 	add_child(over)
 	over.add_child(spear_cv)
 	spear_cv.draw.connect(_draw_spears)
+	for i in 4:
+		var pl := PointLight2D.new()
+		pl.color = Color(0.72, 0.84, 1.0)
+		pl.energy = 0.9
+		pl.visible = false
+		pl.set_meta("dark_r", 16.0)
+		add_child(pl)
+		spear_lights.append(pl)
 
-func _process(_dt: float) -> void:
+func _process(dt: float) -> void:
+	_spear_trail(dt)
 	if book == null or (book.fx_air != self and book.fx_floor != self):
 		queue_free()
 		return
@@ -171,10 +183,43 @@ static func _spear_frames() -> Array:
 	return d.get("frames", []) if d is Dictionary else []
 const STREAK := Color(0.78, 0.88, 1.0)
 
+func _spear_trail(dt: float) -> void:
+	if floor_mode or book == null:
+		return
+	for r in rings:
+		r["t"] += dt
+	rings = rings.filter(func(r): return r["t"] < 0.28)
+	ring_t -= dt
+	var k := 0
+	for sp in book.spears:
+		if sp["small"]:
+			continue
+		var u: Vector2 = Iso.to_screen(sp["v"].normalized()).normalized()
+		if ring_t <= 0.0:
+			rings.append({"c": S(sp["tp"], 8.0), "u": u, "t": 0.0, "tier": int(sp.get("tier", 0))})
+		if k < spear_lights.size():
+			spear_lights[k].position = S(sp["tp"])
+			spear_lights[k].visible = true
+			k += 1
+	if ring_t <= 0.0:
+		ring_t = 0.016
+	for j in range(k, spear_lights.size()):
+		spear_lights[j].visible = false
+
 func _draw_spears() -> void:
 	if floor_mode or SPEAR_TEX == null or book == null or book.zone == null or book.hero == null:
 		return
 	var hero = book.hero
+	for r in rings:
+		var q: float = r["t"] / 0.28
+		var rad: float = (4.0 + 18.0 * q) * (1.0 + 0.15 * r["tier"])
+		var u: Vector2 = r["u"]
+		var n := Vector2(-u.y, u.x)
+		var pts := PackedVector2Array()
+		for a_i in 21:
+			var aa := a_i / 20.0 * TAU
+			pts.append(r["c"] + n * cos(aa) * rad + u * sin(aa) * rad * 0.32)
+		spear_cv.draw_polyline(pts, Color(STREAK, 0.85 * (1.0 - q) * (1.0 - q)), 2.6 - 1.2 * q)
 	for sp in book.spears:
 		if sp["small"]:
 			continue
