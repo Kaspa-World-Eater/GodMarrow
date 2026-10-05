@@ -50,17 +50,33 @@ place's stone (the crypt's green-grey, the moor's brown, the snow's frosted blue
 place's light; the **scene light** lever on the bench still turns the window's own light off, to the sprite's own
 lights only, or on.
 
-**Characters** (the heart of it). **Start from a painting.** Drop a Midjourney picture on the window (on Home or on
-the Characters bench) and it stands in the picture window as the reference, as it is: nothing is cut out of it and
-nothing is drafted from it. Drop a shape model (`.shapes.json`) or press *Choose a model file*, or *Start from the
-Keeper*, and the model stands beside the painting; **Compare** shows the two side by side at one height with the
-silhouette overlap, **Open in editor** renders the idle clip and opens the pixel editor on it. Writing the model is
-Claude's job (the describe line hands it the painting and your words); yours is to judge and ask for changes in plain
-words. A character is a *shape model*, a `.shapes.json` file of solids with materials,
-rendered as pixel art by the engine and moved by the motion clips (idle, walk, run, attack, cast, hit, death) from
-eight directions. You can also drop a model file on the window (`assets\shapes\characters\keeper.shapes.json` is
-the Keeper) or press *Start from the Keeper*. The tabs: **Reference** (the model beside the picture, with the overlap
-line and the checks that say what to change), **Model** (pick a part and a solid, move and scale it, change its material, hide it),
+**Characters** (the heart of it). **Drop a painting: Claude draws it.** Drop a Midjourney painting on the window (on
+Home or on the Characters bench), or press *Choose a painting* and pick it in the Forge's own browser (Downloads,
+Pictures, Desktop and a Midjourney folder are one click away; the newest files are at the top). The painting is placed
+beside the bench exactly as it is: it is the reference and nothing is done to it (no cutting out, no pixelating, no
+converting; the file is copied untouched into the character's folder). Then Claude Code draws the character against
+it, the way the Hemomancer was made: it writes a small generator script of solids on the standard skeleton, runs it,
+renders the figure from the front, the side and the back, lays it beside your painting and looks, and does that in
+rounds (three by default), each round fixing what the compare picture shows. The state line reads the rounds as they
+go ("round 2 · front 0.81 · the shoulder plates") and nothing appears on the bench until they finish; then the model
+stands facing south beside the painting, the Reference tab lists the rounds and their overlap ("round 1 front 0.50 ·
+round 2 front 0.64 · round 3 front 0.69 (best)"), and the choices are **Another round** (type a note on the Claude line
+first: "longer sleeves, a bigger hat", then press it or Enter), **Compare** (painting beside sprite per view at one
+height, with the overlap), **Render all**, **Open in editor** and **Export**. A sentence typed on the Claude line of an
+empty Characters bench draws a character from the words alone (one round, no painting to compare with). The loop
+stops early when the overlap reaches 0.85 or when two rounds in a row bring nothing better. Every round's script, model,
+stills and compare picture are kept under the character's `author\round_N\` folder, so nothing is lost and a round can
+be read later. A round takes a few minutes of Claude Code's time and some of your plan's usage (the same budget as the
+Claude line).
+
+**Without Claude Code** the bench says so in one plain line (*Claude Code is needed to draw...*) and keeps the painting
+as the reference; **Use as reference only** leaves it there beside whatever model you drop or start from (the Keeper,
+the necromancer, a `.shapes.json` of your own). Nothing is drafted automatically any more: the old measure-and-draft
+step is a command for assistants (`pixelforge character from-picture`), never the bench.
+
+You can also drop a model file on the window (`assets\shapes\characters\keeper.shapes.json` is
+the Keeper) or press *Start from the Keeper*. The tabs: **Reference** (the model beside the painting, the rounds and
+the overlap line), **Model** (pick a part and a solid, move and scale it, change its material, hide it),
 **Materials** (every material's colour ramp with hue, lightness, contrast and steps; each light's glow kind, colour,
 strength, pulse and radius; *Randomise* for a variant, *Champion* saves a recolour beside the model), **Motion** (the
 clip and the facing, the lag, sway and hang of the loose parts, the turn and move steps, the camera; *Render clip*
@@ -68,7 +84,10 @@ draws the one you are looking at, **Render all** every clip in every direction),
 delete a frame, mirror a direction, paint a pixel, onion skin), **Export** (*Export sheets* writes the game's sheets;
 *Put it in the game* copies them into the game's art; *See it in the game* opens the game with the character on the
 moor; *Take it out* puts the earlier files back). Every edit is written into the model file, so an assistant editing
-the same file by hand sees what you did, and you see what it did.
+the same file by hand sees what you did, and you see what it did. A character is a *shape model*, a `.shapes.json`
+file of solids with materials,
+rendered as pixel art by the engine and moved by the motion clips (idle, walk, run, attack, cast, hit, death) from
+eight directions.
 
 **Objects.** The same engine without bones: a chest, a skull, a dead tree (examples on the bench), or any object's
 shape model. Model and Materials as above; **Behaviour** has the camera, the world scale, the shadow and the height;
@@ -98,7 +117,7 @@ the steps and the Forge carries them out while you watch (see *Jobs* below).
 - **Creatures.** The beast rig (four legs, a tail, wings) is not in the engine yet. The bench is the characters'
   bench; a creature dropped there stands on the humanoid skeleton.
 - **The old painting road** (a Midjourney sheet cut out, carved in Blender, filmed and pixelated) is not in the
-  Forge: it is the classic Studio's, below. In the Forge a picture becomes a shape model (*Start from a picture*,
+  Forge: it is the classic Studio's, below. In the Forge a painting is the reference and Claude draws the shape model against it (*Drop a painting*,
   above); the Reference tab compares the two.
 - **The cutout editor** (the painting road's masks) stays in the classic Studio. The pixel editor itself is in the
   Forge now: see *The editor* below.
@@ -182,6 +201,16 @@ terminal, run `claude`, sign in with your Anthropic account, close it. `install.
 PixelForge's tools (`claude mcp add pixelforge`); the Forge does the same on its first launch if it finds it has not
 been done. The title line tells you where you stand: **Claude: ready**, **Claude: not found (install Claude Code)**
 or **Claude: not signed in**. A line typed before it is ready answers with the same sentence and the fix.
+
+**When the line does nothing: run the doctor first.** Press **Doctor** on Home (or click *Claude: not found* /
+*not signed in* on the title line or the foot, which opens it), or in a terminal `pixelforge claude doctor`. It checks
+six things in order and prints pass or fail for each with one sentence on the fix: (1) the `claude` program is found
+and its version, (2) it is signed in with your account (an API key alone is not enough: run `claude` and type
+`/login`), (3) PixelForge's tools are registered with it (it registers them on the spot and says so), (4) PixelForge's
+own tool server starts and answers, (5) one real round trip: it asks Claude to set the tempo of a scratch song to 80
+and checks that the song file changed (a few seconds; the full log path is printed if it fails), (6) whether Chrome is
+there for the Midjourney road (optional). The lines stay on Home until the next run. The first failed step is the one
+to fix; run it again after.
 
 **When it fails.** The bench says so in one plain line, never a pop-up: *Claude Code was not found...*, *not signed
 in...*, *Claude did not finish within 600 s; it was stopped...*, *Claude stopped at the spending limit for one job*.

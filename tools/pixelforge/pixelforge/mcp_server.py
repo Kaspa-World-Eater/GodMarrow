@@ -441,6 +441,46 @@ def build_server():
         return api.compare_shapes(model, ref, out, height, views or None)
 
     @mcp.tool()
+    def shape_still(file: str, out: str, direction: str = "S", style: str = "", zoom: int = 1) -> dict:
+        """One standing picture of a .shapes.json facing a direction (S front, E the character's side, N back): what to look at between
+        passes when authoring. Returns the png and its size."""
+        try:
+            return api.shape_still(file, out, direction, style or None, zoom)
+        except (api.StepError, KeyError, ValueError) as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
+    def add_part(file: str, part: str, args: str = "{}", out: str = "") -> dict:
+        """Append a piece of the parts kit to a .shapes.json: part is the kit function (chain chain_loop chest_chain spike_ring upright_spikes
+        spike_row plank_skirt greave thigh_plate shackle locs back_cape), args its keyword arguments as a JSON object (an int rnd seeds the
+        random). The parts entries the piece needs are added. Validated, written in place (or to out)."""
+        try:
+            return api.add_part(file, part, args, out or None)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
+    def edit_shapes(file: str, ops: str, out: str = "") -> dict:
+        """Small edits to a .shapes.json without rewriting it: ops is a JSON list of {"op": "set", "shape": NAME, "key": K, "value": V} (a key
+        with dots reaches inside: rotate.x), {"op": "remove", "shape": NAME}, {"op": "add", "shape": {...}}, {"op": "material", "name": N,
+        "spec": {...}}, {"op": "part", "name": N, "spec": {...}}, {"op": "doc", "key": K, "value": V}. Validated; an edit that leaves
+        problems is refused with them in words."""
+        try:
+            return api.edit_shapes(file, ops, out or None)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
+    def character_author(name: str, project: str, painting: str = "", sentence: str = "", rounds: int = 0, target: float = 0.85, note: str = "") -> dict:
+        """THE CHARACTER LOOP: Claude Code hand-authors a shape model from a painting (or a sentence) in rounds, each rendered and scored
+        against the painting; the best round's model becomes the character's. (Not for use from inside an authoring round.)"""
+        from . import author_loop
+        try:
+            return author_loop.author(name or None, project, painting=painting or None, sentence=sentence or None, rounds=rounds or None, target=target, note=note or None)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
     def character_from_picture(picture: str, project: str, name: str = "", style: str = "godmarrow", text: str = "") -> dict:
         """The picture road in one go: a Midjourney picture (one figure or a turnaround sheet; several files joined with ';' are the
         views front;side;back) is cut out, measured, drafted as a shape model sized and coloured from it, imported into the project

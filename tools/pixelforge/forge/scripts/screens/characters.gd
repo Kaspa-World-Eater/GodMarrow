@@ -1,8 +1,10 @@
 extends "res://scripts/screen.gd"
-## Characters: a shape model (.shapes.json) through the shape-sprite engine. A picture dropped or chosen here (a Midjourney
-## figure or a turnaround sheet, or a sheet's views as several files) goes down the picture road by itself: `character
-## from-picture` cuts it out, measures it, drafts and colours a shape model from it, imports it and draws the still and
-## the compare picture; the model lands on the bench facing S with the painting beside it. Tabs: Reference (the compare screen),
+## Characters: a shape model (.shapes.json) through the shape-sprite engine. A picture dropped or chosen here is the
+## reference and nothing else: it is shown as it is (downscaled for the window, never cut, quantised or converted) and
+## Claude Code draws the model against it in rounds (`character author`: a generator script, rendered and compared
+## each round; nothing appears on the bench until the rounds finish). A sentence on the describe line draws from the
+## words; with a model on the bench it is the note for another round. Without Claude Code the picture stays as the
+## reference and the bench says Claude is needed to draw. Tabs: Reference (the compare screen),
 ## Model (the solid list: select a solid, move and scale it, change its material), Materials (ramps and emissives),
 ## Motion (clips and the lag / sway / hang levers, the direction wheel), Frames (the frame editor), Export (sheets,
 ## put it in the game, see it in the game). The file is the state: every edit is a change to the model file in the
@@ -31,7 +33,7 @@ func build() -> void:
 	if state.is_empty():
 		state = {"name": "", "title": "", "model_file": "", "painting": String(args.get("painting", "")), "direction": String(args.get("direction", "S")), "clip": String(args.get("clip", "idle")),
 			"part": "", "shape": -1, "material": "", "emissive": 0, "exported": "", "in_game": false, "shot": "",
-			"pictures": [], "compare": "", "road_warnings": [], "judgement": "", "road_views": [], "road_error": ""}
+			"pictures": [], "compare": "", "road_warnings": [], "judgement": "", "rounds": [], "road_error": "", "needs_claude": false, "author_words": ""}
 	library = app.backend.read_json(app.backend.pf_root.path_join("assets/shapes/materials.json"))
 	tab = 0 if state["painting"] != "" else 1
 	tab_from_args()
@@ -40,14 +42,15 @@ func build() -> void:
 		start_from_pictures(_paths_of(args["pictures"]))
 	elif args.has("model"):
 		import_model(String(args["model"]))
-	elif args.has("draft") and args["draft"] is Dictionary and args["draft"].has("doc"):
-		_import_draft(args["draft"])
+	elif args.has("describe") and String(args["describe"]) != "" and String((args.get("draft", {}) if args.get("draft") is Dictionary else {}).get("what", "shapes")) != "skin":
+		# a sentence from Home: Claude draws it (the automatic draft from the words never appears on the bench)
+		_author_from_sentence(String(args["describe"]))
 	elif args.has("character"):
 		_open_character(String(args["character"]))
 	elif args.has("painting"):
-		app.scene.show_compare(tex(String(args["painting"])), null, "the reference")
+		app.scene.show_compare(painting_tex(String(args["painting"])), null, "the reference")
 
-# ------------------------------------------------------------------ the picture road
+# ------------------------------------------------------------------ the reference and the author loop
 static func _paths_of(v) -> PackedStringArray:
 	if v is PackedStringArray:
 		return v
@@ -55,9 +58,32 @@ static func _paths_of(v) -> PackedStringArray:
 		return PackedStringArray(v)
 	return PackedStringArray(String(v).split(";", false))
 
-## a picture (one figure or a turnaround sheet) or a sheet's views as several files becomes a character: one command,
-## `character from-picture`, does the whole road (cut, measure, draft, sample materials, check, import, draw); its
-## progress words run on the state line; the drafted model lands on the bench facing S with the painting beside it
+## the painting as a texture for the window: downscaled with plain filtering when it is bigger than the window needs,
+## never quantised, never cut out, never pixelated; the file on disk is not touched
+static func painting_tex(path: String) -> Texture2D:
+	if path == "" or not FileAccess.file_exists(path):
+		return null
+	var img := Image.load_from_file(path)
+	if img == null:
+		return null
+	var w := img.get_width()
+	var h := img.get_height()
+	var limit := 720.0
+	if w > limit or h > limit:
+		var k := minf(limit / w, limit / h)
+		img.resize(maxi(int(round(w * k)), 1), maxi(int(round(h * k)), 1), Image.INTERPOLATE_LANCZOS)
+	return ImageTexture.create_from_image(img)
+
+## is Claude Code there to draw? (the mock counts; the title line's status is the truth once it is in)
+func claude_ready() -> bool:
+	var st: Dictionary = app.claude_state
+	return st.is_empty() or bool(st.get("ok", false))
+
+const NEEDS_CLAUDE := "Claude Code is needed to draw; the picture is on the bench as the reference. Install it (claude.com/claude-code), run `claude` once to sign in, drop the picture again."
+
+## a picture dropped or chosen is the reference, and nothing else is done to it: it is placed beside the bench as it is,
+## and Claude draws the model against it in rounds (`character author`); the rounds' words run on the state line and
+## nothing appears on the bench until they finish. Without Claude: the plain line, and "Use as reference only".
 func start_from_pictures(paths: PackedStringArray) -> void:
 	var pics: PackedStringArray = []
 	for p in paths:
@@ -72,24 +98,86 @@ func start_from_pictures(paths: PackedStringArray) -> void:
 	state["pictures"] = Array(pics)
 	state["painting"] = pics[0]
 	state["road_error"] = ""
+	state["needs_claude"] = false
 	tab = 0
+	app.scene.show_compare(painting_tex(pics[0]), null, "the reference")
+	if not claude_ready():
+		state["needs_claude"] = true
+		rebuild()
+		say_notes(NEEDS_CLAUDE)
+		return
 	rebuild()
-	app.scene.show_compare(tex(pics[0]), null, "the picture · reading it")
+	if pics.size() > 1:
+		app.say("Several pictures: the first is the painting Claude draws from.", 4.0)
+	_run_author(["--painting", pics[0]], "Claude draws from the painting")
+
+## a sentence: a new character from the words when the bench is empty, else the note for another round
+func _author_from_sentence(text: String) -> void:
+	if text.strip_edges() == "":
+		return
+	if has_model():
+		_another_round(text)
+		return
+	if not claude_ready():
+		state["needs_claude"] = true
+		rebuild()
+		say_notes(NEEDS_CLAUDE)
+		return
+	_run_author(["--sentence", text], "Claude draws from the words")
+
+## another round on the model on the bench, with the person's note (the describe line's words)
+func _another_round(note: String = "") -> void:
+	if not has_model() or not claude_ready():
+		if has_model():
+			say_notes(NEEDS_CLAUDE)
+			rebuild()
+		return
+	var a := [String(state["name"]), "--rounds", "1"]
+	if String(state.get("painting", "")) != "" and FileAccess.file_exists(String(state["painting"])):
+		a += ["--painting", String(state["painting"])]
+	if note.strip_edges() != "":
+		a += ["--note", note.strip_edges()]
+	_run_author(a, "another round" + (": " + note.strip_edges() if note.strip_edges() != "" else ""))
+
+## `character author`: the rounds run in the backend; the state line carries each round's words; the result lands the
+## model on the bench facing S with the painting beside it and the round scores on the Reference tab
+func _run_author(extra: Array, words: String) -> void:
+	if job != null:
+		app.say("Still working on the last thing.")
+		return
+	state["author_words"] = words
 	var style := app.style_name
 	app.backend.ensure_project(style, func(_r):
 		if not is_inside_tree():
 			return
-		var cmd := ["character", "from-picture"]
-		cmd.append_array(Array(pics))
+		var cmd := ["character", "author"]
+		cmd.append_array(extra)
 		cmd.append_array(["-p", app.backend.project_dir, "--style", style])
-		run(cmd, "reading the picture", func(r: Dictionary):
+		app.set_claude_working("starting")
+		if describe and is_instance_valid(describe):
+			describe.editable = false
+		run(cmd, words, func(r: Dictionary):
+			app.set_claude_working("")
+			if describe and is_instance_valid(describe):
+				describe.editable = true
 			if not r.get("ok", false):
-				_road_failed(r)
+				_author_failed(r)
 				return
-			_road_done(r)))
+			_author_done(r)))
 
-## the road's progress lines carry `what` (the step's words); the render's carry clip and dir
+## the loop's progress lines carry `note` (the round's words); the render's carry clip and dir
 func on_progress(info: Dictionary) -> void:
+	if String(info.get("step", "")) == "author":
+		var words := String(info.get("note", "")).replace("+", " ")
+		busy_words = words
+		state["author_words"] = words
+		if progress and is_instance_valid(progress):
+			progress.set_progress(int(info.get("done", "0")), int(info.get("total", "1")), words)
+		if state_label and is_instance_valid(state_label):
+			state_label.set_text("Claude draws: %s" % words)
+		app.set_claude_working(words)
+		app.set_hint("working: " + words)
+		return
 	if not info.has("what"):
 		super.on_progress(info)
 		return
@@ -100,65 +188,99 @@ func on_progress(info: Dictionary) -> void:
 	if progress and is_instance_valid(progress):
 		progress.set_progress(int(info.get("done", "0")), int(info.get("total", "1")), words)
 	if state_label and is_instance_valid(state_label):
-		state_label.set_text("Starting from the picture: %s..." % words)
+		state_label.set_text("%s..." % words)
 	app.set_hint("working: " + words)
 
-func _road_done(r: Dictionary) -> void:
+func _author_done(r: Dictionary) -> void:
 	state["name"] = String(r.get("character", ""))
 	state["title"] = String(r.get("title", state["name"])).capitalize()
 	state["compare"] = String(r.get("compare", ""))
-	state["road_warnings"] = r.get("warnings", [])
 	state["judgement"] = String(r.get("judgement", ""))
-	state["road_views"] = r.get("views", [])
+	state["rounds"] = r.get("rounds", [])
+	state["road_warnings"] = []
 	state["road_error"] = ""
+	state["needs_claude"] = false
 	state["exported"] = ""
 	state["in_game"] = false
+	if String(r.get("painting", "")) != "":
+		state["painting"] = String(r["painting"])
 	state.erase("edits"); state.erase("ramps"); state.erase("lights"); state.erase("motion")
 	retime = {}
 	clip_frames = []
 	_frames_dirty = true
 	undo_stack = []
 	redo_stack = []
+	_claude_text = ""
 	tab = 0
 	_model_loaded()
-	app.say("%s: %d shapes drafted from the %s." % [String(state["title"]), int(r.get("shapes", 0)), {"sheet": "sheet", "files": "views"}.get(String(r.get("kind", "")), "picture")], 5.0)
+	var n: int = state["rounds"].size()
+	var score = r.get("score", null)
+	say_notes("%s: Claude drew it in %d round%s%s. %s" % [String(state["title"]), n, "s" if n != 1 else "", (" · overlap %.2f" % float(score)) if score != null else "", String(r.get("stopped", ""))])
 
-## the road stopped: its words stay on the bench (the toast fades; the state line does not)
-func _road_failed(r: Dictionary) -> void:
-	state["road_error"] = plain_error(r)
+## the loop stopped: its words stay on the bench (the toast fades; the state line does not)
+func _author_failed(r: Dictionary) -> void:
+	var err := plain_error(r)
+	if "Claude Code was not found" in err or "not signed in" in err:
+		state["needs_claude"] = true          # the plain line, not an error: the picture stays as the reference
+		state["road_error"] = ""
+		say_notes(NEEDS_CLAUDE)
+	else:
+		state["road_error"] = err
 	rebuild()
 	if has_model():
 		refresh_preview()
 
-## one step of the road again on this character: measure (the saved cutouts size the model again), sample (the colours
-## again) or compare (the pictures only); each ends with the still and the compare picture
-func _road_again(step: String) -> void:
-	if not has_model():
+## the describe line on this bench is the author's: a sentence draws a new character; with a model on the bench it is
+## the note for another round (the base class's describe --bench never runs here)
+func _describe() -> void:
+	if describe == null:
 		return
-	var words: String = {"measure": "measuring", "sample": "sampling materials", "compare": "drawing the compare picture"}[step]
-	run(["character", step, String(state["name"]), "-p", app.backend.project_dir, "--style", app.style_name], words, func(r: Dictionary):
-		if not r.get("ok", false):
-			return
-		state["compare"] = String(r.get("compare", state["compare"]))
-		state["judgement"] = String(r.get("judgement", ""))
-		if not r.get("warnings", []).is_empty():
-			state["road_warnings"] = r.get("warnings", [])
-		if step != "compare":
-			doc = app.backend.read_json(model_path())
-			orig = app.backend.read_json(model_path())
-			_frames_dirty = true
+	var text := describe.text.strip_edges()
+	if text == "":
+		return
+	if job != null:
+		app.say("Still working on the last thing.")
+		return
+	if not app.backend.python_ok():
+		app.say("Python was not found; see Settings.")
+		return
+	if not claude_ready():
+		say_notes(String(app.claude_state.get("sentence", "Claude Code is not ready.")))
 		rebuild()
-		if step == "compare":
-			_show_compare_picture()
+		return
+	_author_from_sentence(text)
+
+## the round scores, one line: "round 1 front 0.50 · round 2 front 0.64 · round 3 front 0.69 (best)"
+func _rounds_line() -> String:
+	var rounds: Array = state.get("rounds", [])
+	if rounds.is_empty():
+		return ""
+	var best := -1
+	var best_score := -1.0
+	for h in rounds:
+		if h.get("score", null) != null and float(h["score"]) > best_score:
+			best_score = float(h["score"]); best = int(h["round"])
+	var bits: PackedStringArray = []
+	for h in rounds:
+		var words := ""
+		if h.has("error") and String(h.get("error", "")) != "":
+			words = "stopped"
+		elif h.get("score", null) == null:
+			words = "%d shapes" % int(h.get("shapes", 0))
 		else:
-			refresh_preview()
-		app.say({"measure": "Measured again; the model is sized from the cutouts.", "sample": "Materials sampled from the picture again.", "compare": "The compare picture is in the window."}[step]))
+			var vs: Dictionary = h.get("views", {})
+			var parts: PackedStringArray = []
+			for k in vs:
+				parts.append("%s %.2f" % [String(k), float(vs[k])])
+			words = " ".join(parts)
+		bits.append("round %d %s%s" % [int(h["round"]), words, " (best)" if int(h["round"]) == best and best >= 0 else ""])
+	return "Claude's rounds: " + " · ".join(bits)
 
 ## the compare picture: the painting's views beside the sprite's matching directions at one height, with the overlap
 func _show_compare_picture() -> void:
 	var t := tex(String(state.get("compare", "")))
 	if t == null:
-		app.say("No compare picture yet: drop a picture, or press Compare with a reference on the bench.")
+		app.say("No compare picture yet: drop a picture and Claude draws against it.")
 		return
 	app.scene.show_picture(t, "%s · painting beside sprite per view · %s" % [String(state["title"]), String(state.get("judgement", ""))])
 
@@ -213,16 +335,6 @@ func import_model(path: String) -> void:
 				if not r3.get("ok", false):
 					return
 				_model_loaded(), false)))
-
-func _import_draft(draft: Dictionary) -> void:
-	var d: Dictionary = draft["doc"]
-	var name := slug(String(d.get("name", "draft")))
-	var tmp := app.backend.out_dir("drafts").path_join(name + ".shapes.json")
-	app.backend.write_json(tmp, d)
-	import_model(tmp)
-	var reads: Array = draft.get("read", [])
-	if not reads.is_empty():
-		app.say("Read: " + ", ".join(PackedStringArray(reads)), 6.0)
 
 func _open_character(name: String) -> void:
 	state["name"] = name
@@ -353,7 +465,7 @@ func _apply_retime(frames: Array) -> Array:
 	return out if not out.is_empty() else frames
 
 func _show_compare(sprite: Texture2D) -> void:
-	var painting := tex(String(state["painting"]))
+	var painting := painting_tex(String(state["painting"]))
 	app.scene.show_compare(painting, sprite, "the reference · the sprite at game size" if painting else "no reference painting · the sprite at game size")
 
 # ------------------------------------------------------------------ the tabs
@@ -377,21 +489,30 @@ func on_tab() -> void:
 		refresh_preview()
 
 func _build_empty() -> void:
-	var line := "The bench is empty. Drop a picture (one figure, or a turnaround sheet) and it becomes a character by itself; or drop a shape model (.shapes.json), or describe one on Home."
+	var line := "The bench is empty. Drop a painting and Claude draws it as a shape model in rounds; or type the character on the line below; or drop a shape model (.shapes.json)."
 	var err := String(state.get("road_error", ""))
+	var needs := bool(state.get("needs_claude", false))
 	if err != "":
-		line = "The picture did not become a character: " + err + " Try another picture, or a model file."
+		line = "Claude did not finish the character: " + err + " Try again, or drop a model file."
+	elif needs:
+		line = NEEDS_CLAUDE
 	elif String(state.get("painting", "")) != "":
-		line = "The picture is on the bench. Drop a shape model (.shapes.json) to stand beside it, draft one from a sentence on Home, or start from the Keeper."
-	state_line(line, "Gold" if err != "" else "", 2)
+		line = "The painting is on the bench as the reference. Claude draws against it when you drop it again, or drop a shape model (.shapes.json) to stand beside it."
+	state_line(line, "Gold" if (err != "" or needs) else "", 2)
 	add_spacer()
-	add_choices([
-		{"label": "Choose a picture", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; pictures"]), func(p): start_from_pictures(PackedStringArray([p])), "Choose a picture")},
+	var items := []
+	if needs or (String(state.get("painting", "")) != "" and err == ""):
+		items.append({"label": "Use as reference only", "cb": func():
+			state["needs_claude"] = false
+			rebuild()
+			app.scene.show_compare(painting_tex(String(state["painting"])), null, "the reference")})
+	items.append_array([
+		{"label": "Choose a painting", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; paintings"]), func(p): start_from_pictures(PackedStringArray([p])), "Choose a painting")},
 		{"label": "Choose a model file", "cb": func(): app.choose_file(PackedStringArray(["*.json ; shape models"]), import_model, "Choose a shape model")},
 		{"label": "Start from the Keeper", "cb": func(): import_model(app.backend.pf_root.path_join("assets/shapes/characters/keeper.shapes.json"))},
 		{"label": "Start from the necromancer", "cb": func(): import_model(app.backend.pf_root.path_join("assets/shapes/necromancer_3d.shapes.json"))},
-		{"label": "Describe one", "cb": func(): app.go("home")},
 	])
+	add_choices(items)
 
 ## a row of cyclers: [{label, value, left, right}] and plain choices, in the small face
 func add_cyclers(items: Array) -> Control:
@@ -444,13 +565,16 @@ func set_light_stop(s: int) -> void:
 func _build_reference() -> void:
 	var judgement := String(state.get("judgement", ""))
 	var err := String(state.get("road_error", ""))
+	var rounds_line := _rounds_line()
 	if err != "":
-		state_line("%s · reference. The picture did not become a new character: %s" % [String(state["title"]), err], "Gold", 2)
+		state_line("%s · reference. Claude did not finish the round: %s" % [String(state["title"]), err], "Gold", 2)
+	elif bool(state.get("needs_claude", false)):
+		state_line("%s · reference. %s" % [String(state["title"]), NEEDS_CLAUDE], "Gold", 2)
 	elif judgement != "":
-		state_line("%s · from the picture. %s" % [String(state["title"]), judgement], "", 2)
+		state_line("%s · drawn by Claude. %s" % [String(state["title"]), judgement], "", 2)
 	else:
 		state_line("%s · reference. %s" % [String(state["title"]), _summary()])
-	dim_line(_checks(), 2)
+	dim_line(rounds_line if rounds_line != "" else _checks(), 2)
 	# one row of cyclers (the facing and the scene light as on Export; the prompt when a describe run brought the set), so the
 	# rows of choices and the Claude line fit under them
 	var cy := []
@@ -468,15 +592,14 @@ func _build_reference() -> void:
 	cy.append({"label": "scene light", "value": ["off", "sprite only", "on"][app.scene.light_mode], "left": func(): _set_scene_light(app.scene.light_mode - 1), "right": func(): _set_scene_light(app.scene.light_mode + 1)})
 	add_cyclers(cy)
 	add_spacer()
-	var from_picture: bool = not state.get("road_views", []).is_empty()
 	var items := []
+	items.append({"label": "Another round", "cb": _another_round_from_line})
 	if String(state.get("compare", "")) != "":
 		items.append({"label": "Compare", "cb": _show_compare_picture})
-	if from_picture:
-		items.append({"label": "Measure again", "cb": func(): _road_again("measure")})
-		items.append({"label": "Sample materials again", "cb": func(): _road_again("sample")})
+	items.append({"label": "Render all", "cb": render_all})
 	items.append({"label": "Open in editor", "cb": _open_in_editor})
-	items.append({"label": "Start from a picture", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; pictures"]), func(p): start_from_pictures(PackedStringArray([p])), "Choose a picture")})
+	items.append({"label": "Export", "cb": _export_after_render})
+	items.append({"label": "Draw from a painting", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; paintings"]), func(p): start_from_pictures(PackedStringArray([p])), "Choose a painting")})
 	items.append({"label": "Use as reference only", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; paintings"]), func(p):
 		state["painting"] = p
 		rebuild()
@@ -485,8 +608,33 @@ func _build_reference() -> void:
 	items.append({"label": midjourney_label(), "cb": _paint_in_midjourney})
 	add_choices(standard_choices(items, false))
 	if String(state["painting"]) == "":
-		hint_text = "drop a picture anywhere: it becomes a character"
+		hint_text = "drop a painting anywhere: Claude draws it"
 	app.set_hint(hint_text)
+
+## Another round: the describe line's words are the note; with nothing typed the line takes the focus
+func _another_round_from_line() -> void:
+	var note := _claude_text.strip_edges()
+	if note == "" and describe and is_instance_valid(describe):
+		describe.grab_focus()
+		app.say_hint("type your note on the line, then Enter: Claude does another round")
+		return
+	_another_round(note)
+
+## Export: the sheets, rendering the whole set first when it is not yet
+func _export_after_render() -> void:
+	if full_render:
+		_export_sheets()
+		return
+	if not has_model() or job != null:
+		return
+	save_doc()
+	run(["project", "render-shapes", String(state["name"]), "--style", app.style_name, "-p", app.backend.project_dir], "rendering every clip in every direction", func(r: Dictionary):
+		if not r.get("ok", false):
+			return
+		full_render = true
+		_frames_dirty = false
+		retime = {}
+		_export_sheets())
 
 func _summary() -> String:
 	var n: int = doc.get("shapes", []).size()
@@ -1617,7 +1765,7 @@ func on_state_restored() -> void:
 	else:
 		refresh_preview()
 
-## a model file is imported; a picture (or several: a sheet's views) goes down the picture road and becomes a character
+## a model file is imported; a picture is the reference and Claude draws against it
 func on_drop(paths: PackedStringArray) -> void:
 	if paths.is_empty():
 		return

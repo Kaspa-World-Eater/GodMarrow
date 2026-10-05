@@ -56,7 +56,7 @@ walk() {  # name script mock
   local name=$1 script=$2 mock=$3
   [ -n "${ONLY:-}" ] && [[ "$name" != "$ONLY"* ]] && return 0
   [ -f "$PROJECT/project.json" ] || "$PY" -m pixelforge.cli project new "$PROJECT" --name Forge --json >/dev/null
-  local tmp; tmp=$(mktemp); sed "s#OUT#$OUT#g" "$HERE/tools/$script" > "$tmp"
+  local tmp; tmp=$(mktemp); sed -e "s#OUT#$OUT#g" -e "s#PICTURE#${PICTURE:-$HERE/../assets/styles/keeper_front.png}#g" "$HERE/tools/$script" > "$tmp"
   local log; log=$(PIXELFORGE_CLAUDE="mock:$HERE/../tests/claude_mock/$mock" PIXELFORGE_MOCK_DELAY=${MOCK_DELAY:-0.5} timeout 500 xvfb-run -a -s "-screen 0 ${RES}x24" \
     "$GODOT" --path "$HERE" --rendering-driver opengl3 --resolution "$RES" -- --nosound --project="$PROJECT" --python="$PY" ${GAME:+--game=$GAME} --script="$tmp" 2>&1)
   rm -f "$tmp"
@@ -64,6 +64,7 @@ walk() {  # name script mock
   [ -n "${VERBOSE:-}" ] && echo "$log" | grep -E 'SCRIPT|SHOT|LOG   ->|ERROR' | head -60
   return 0
 }
+walk author_characters author_walk.txt author.jsonl
 walk describe_characters describe_walk.txt characters.jsonl
 walk describe_music describe_walk_music.txt music.jsonl
 walk jobs jobs_walk.txt plan.jsonl

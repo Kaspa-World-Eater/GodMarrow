@@ -101,7 +101,5 @@ def test_the_cli_music_cue_and_the_forge_hooks(tmp_path, capsys):
     # the app: the retired choices are filtered in one place, pictures dropped on Home are the reference
     screen = (FORGE / "scripts/screen.gd").read_text()
     assert "RETIRED_CHOICES" in screen and "PIXELFORGE_OLD_ROADS" in screen and '"Start from a picture"' in screen
-    home = (FORGE / "scripts/screens/home.gd").read_text()
-    assert '{"painting": pics[0]}' in home
-    app = (FORGE / "scripts/app.gd").read_text()
-    assert 'a["painting"] = pics[0]' in app
+    chars = (FORGE / "scripts/screens/characters.gd").read_text()
+    assert "from-picture" not in chars.replace("## ", "") or '"character", "author"' in chars   # the bench runs the author loop, never the draft

@@ -1,0 +1,20 @@
+# The character loop on the bench with the mock Claude (PIXELFORGE_CLAUDE=mock:tests/claude_mock/author.jsonl; screens.sh and
+# acceptance.sh run it, swapping OUT for the shot folder and PICTURE for the painting): a painting dropped on Home goes to the
+# Characters bench as the reference, Claude's rounds run with their words on the state line and nothing on the bench, then
+# the model stands facing S beside the painting with the round scores on the Reference tab; Compare shows the picture.
+go home
+wait 0.5
+drop PICTURE
+wait 2.5
+shot OUT/author_working.png
+waitjob 600
+wait 5
+shot OUT/author_done.png
+choose Compare
+wait 0.8
+shot OUT/author_compare.png
+tab Model
+wait 0.8
+shot OUT/author_model.png
+dumplog
+quit
