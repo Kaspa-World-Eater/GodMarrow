@@ -416,9 +416,10 @@ func _land_blow() -> void:
 	if w and w.is_ranged():
 		var m := act_target
 		if m == null or m.dead:
-			m = Combat.nearest_monster(zone, mouse_tile(), 3.0)
+			m = Combat.nearest_monster(zone, mouse_tile(), 1.2)
 		var to := m.tp if m else mouse_tile()
-		var mi: Missile = Missile.fire(zone, tp + (to - tp).normalized() * 0.4, to, 11.0, d * st.skill_mult(), "magic", "hero", "bolt")
+		# the wand's bolt is the weapon's own blow: physical, through armour, x1.15 on the skill multiplier (t_v17.js)
+		var mi: Missile = Missile.fire(zone, tp + (to - tp).normalized() * 0.4, to, 11.0, d * st.skill_mult() * 1.15, "phys", "hero", "bolt")
 		mi.height = 70.0
 		return
 	d *= st.melee_mult() * act_mult * (skills.melee_k() if skills.has_method("melee_k") else 1.0)

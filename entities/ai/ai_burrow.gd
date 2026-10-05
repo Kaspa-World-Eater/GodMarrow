@@ -2,7 +2,8 @@ extends "res://entities/ai/brain.gd"
 ## VEIN-WORMS (Mire and Elder too): severed arteries that swim in the soil. Awake, a worm dives (untargetable, takes
 ## nothing: m.buried) and runs at you under the ground, the soil rippling over it. Beneath you it waits 0.75 s and
 ## bursts up (x1.4 in 0.95 yd), lashes (0.35 s, reach 1.3) while you stay close, and dives again after 2.8 s. It cannot
-## dig through stone: roads and flagstones (tiles 1 and 14) stop it, and on them it circles you at 3 yd.
+## dig through stone: roads, flagstones, dungeon floors and pillars (tiles 1, 14, 6, 9; zc_combat22.js isStone) stop it, and
+## on them it circles you at 3 yd.
 ## Tell: the soil ripples (no surfacing marker since v0.55). zc_combat22.js AI22.burrow.
 
 var spot := Vector2.ZERO
@@ -20,7 +21,7 @@ func tick(m: Monster, dt: float) -> void:
 
 static func stone(z: Zone, p: Vector2) -> bool:
 	var ty := z.type_at(p)
-	return ty == 1 or ty == 14
+	return ty == 1 or ty == 14 or ty == 6 or ty == 9
 
 func _can(m: Monster, p: Vector2) -> bool:
 	# (a worm stranded on stone, where it surfaced, may crawl off it)

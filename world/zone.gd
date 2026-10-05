@@ -7,7 +7,7 @@ extends Node2D
 signal built
 
 const SOLID_TYPES := [2, 3, 4, 5, 7, 8, 9, 10, 15]
-const SIGHT_TYPES := [2, 3, 5, 7, 8, 9, 10, 15]
+const SIGHT_TYPES := [2, 5, 7, 8, 9, 10, 15]   # rocks (3) are low: skills and shots pass over them (b_core.js lineClear, d_play.js losPoint)
 const WALLISH := [5, 7, 10, 15]
 
 var id := ""
