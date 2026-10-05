@@ -751,14 +751,16 @@ def fetch_midjourney(prompt: str, out_dir: str | Path, project: str | Path, imag
     # download): fetch every picture the hand listed by its address, straight into the folder
     import re as _re, urllib.request as _ur
     urls = list(r.get("images") or [])
-    urls += _re.findall(r"https://cdn\.midjourney\.com/[^\s\"']+?\.(?:png|webp|jpe?g)", json.dumps(r))
+    urls += _re.findall(r"https://cdn\.midjourney\.com/[0-9a-f-]{36}/[0-9]_[0-9]\.(?:png|webp|jpe?g)", json.dumps(r))
     for i, u in enumerate(dict.fromkeys(urls)):
         dst = out / f"mj_{Path(u).parent.name[:8]}_{Path(u).stem}{Path(u).suffix}"
         if dst.exists():
             files.append(str(dst)); continue
         try:
-            req = _ur.Request(u, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36",
-                                          "Referer": "https://www.midjourney.com/"})
+            # the CDN turns away anything that doesn't look like the page's own image request (403 without the Sec-Fetch headers)
+            req = _ur.Request(u, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+                                          "Referer": "https://www.midjourney.com/", "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+                                          "Sec-Fetch-Dest": "image", "Sec-Fetch-Mode": "no-cors", "Sec-Fetch-Site": "same-site"})
             dst.write_bytes(_ur.urlopen(req, timeout=60).read())
             files.append(str(dst))
         except Exception as e:   # noqa: BLE001
