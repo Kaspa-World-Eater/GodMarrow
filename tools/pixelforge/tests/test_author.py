@@ -240,7 +240,7 @@ def test_the_bench_runs_the_loop_and_never_the_automatic_draft():
     forge = HERE.parent / "forge"
     bench = (forge / "scripts/screens/characters.gd").read_text()
     for must in ['"character", "author"', "Another round", "Render all", "Open in editor", '"Export"', "Use as reference only", "NEEDS_CLAUDE", "Claude Code is needed to draw",
-                 "painting_tex", "INTERPOLATE_LANCZOS", "_rounds_line", 'step=="author"'.replace("==", '", "")) == "'), "--note", "--sentence", "--painting"]:
+                 "painting_tex", "INTERPOLATE_LANCZOS", "_rounds_line", 'String(info.get("step", "")) == "author"', "--note", "--sentence", "--painting"]:
         assert must in bench, must
     for gone in ["from-picture", "_import_draft", "Measure again", "Sample materials again", "_road_again", "character_redo"]:
         assert gone not in bench, gone
