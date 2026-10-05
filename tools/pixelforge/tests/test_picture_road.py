@@ -207,5 +207,6 @@ def test_the_docs_and_the_bench_know_the_road():
     ai = (HERE.parent / "docs" / "GUIDE_AI.md").read_text()
     humans = (HERE.parent / "docs" / "GUIDE_HUMANS.md").read_text()
     assert "character from-picture" in ai and "Start from a picture" in humans
+    # the bench no longer runs the road: a dropped picture is the reference and Claude draws against it (test_author.py)
     bench = (HERE.parent / "forge" / "scripts" / "screens" / "characters.gd").read_text()
-    assert '"character", "from-picture"' in bench and "Use as reference only" in bench and "Measure again" in bench
+    assert '"character", "author"' in bench and "Use as reference only" in bench and "from-picture" not in bench and "Measure again" not in bench

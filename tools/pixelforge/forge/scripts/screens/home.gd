@@ -299,8 +299,7 @@ func on_drop(paths: PackedStringArray) -> void:
 	if p.ends_with(".shapes.json") or p.ends_with(".json"):
 		app.go("characters", {"model": p})
 		return
-	# a picture is a character's: the Characters bench cuts it out, measures it, drafts and colours a shape model from
-	# it and stands the model beside it (several pictures at once are a sheet's views: front, side, back)
+	# a picture is a character's reference: the Characters bench places it as it is and Claude draws the model against it
 	var pics: PackedStringArray = []
 	for q in paths:
 		if q.get_extension().to_lower() in ["png", "jpg", "jpeg", "webp", "bmp", "gif"]:

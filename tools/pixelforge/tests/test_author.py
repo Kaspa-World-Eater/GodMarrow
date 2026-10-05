@@ -232,3 +232,23 @@ def test_the_mock_controls_copy_and_run_python(tmp_path, monkeypatch):
     assert r["ok"] and (tmp_path / "shapes" / "g.py").exists() and (tmp_path / "shapes" / "out.txt").read_text() == "made"
     first = json.loads(Path(r["log"]).read_text().splitlines()[0])
     assert first["bench"] == "author"
+
+
+# ------------------------------------------------------------------------------------------- the bench
+def test_the_bench_runs_the_loop_and_never_the_automatic_draft():
+    """A dropped picture is the reference; Claude draws; the old road's draft, measure and sample choices are gone from the bench."""
+    forge = HERE.parent / "forge"
+    bench = (forge / "scripts/screens/characters.gd").read_text()
+    for must in ['"character", "author"', "Another round", "Render all", "Open in editor", '"Export"', "Use as reference only", "NEEDS_CLAUDE", "Claude Code is needed to draw",
+                 "painting_tex", "INTERPOLATE_LANCZOS", "_rounds_line", 'step=="author"'.replace("==", '", "")) == "'), "--note", "--sentence", "--painting"]:
+        assert must in bench, must
+    for gone in ["from-picture", "_import_draft", "Measure again", "Sample materials again", "_road_again", "character_redo"]:
+        assert gone not in bench, gone
+    assert "author_walk.txt author.jsonl" in (forge / "tools/screens.sh").read_text() and (forge / "tools/author_walk.txt").exists()
+    home = (forge / "scripts/screens/home.gd").read_text()
+    assert "Claude draws the model against it" in home
+
+
+def test_none_pretends_claude_is_absent(monkeypatch):
+    monkeypatch.setenv("PIXELFORGE_CLAUDE", "none")
+    assert CB.find_claude() is None and CB.status()["state"] == "not_found"

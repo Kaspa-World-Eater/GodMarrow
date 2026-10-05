@@ -95,8 +95,11 @@ def _candidates() -> list[Path]:
 
 
 def find_claude(hint: str | None = None) -> str | None:
-    """The ``claude`` executable: ``hint``, ``PIXELFORGE_CLAUDE`` (unless a mock), PATH, then the usual install places."""
+    """The ``claude`` executable: ``hint``, ``PIXELFORGE_CLAUDE`` (unless a mock), PATH, then the usual install places.
+    ``PIXELFORGE_CLAUDE=none`` pretends there is none (the bench's no-Claude state, for tests and screenshots)."""
     env = os.environ.get("PIXELFORGE_CLAUDE", "")
+    if env.strip().lower() == "none":
+        return None
     for c in [hint, env if not env.startswith("mock:") else ""]:
         if c and Path(c).exists():
             return str(c)
