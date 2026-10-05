@@ -39,6 +39,9 @@ var claude_notes := ""          # the last run's notes, shown on the state line 
 var claude_notes_until := 0
 var _values_before := {}        # control values before a Claude run, for the highlight
 var _claude_text := ""
+var _queued: Callable           # a request made while a job ran; it runs when the job ends (the last one wins)
+var _request_gen := 0           # the debounce: a request that a newer one followed within its delay never runs
+var _ticket := 0                # the newest request's number; a result that comes back for an older one is stale
 
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_PASS
@@ -565,7 +568,59 @@ func run(args: Array, words: String, on_done: Callable, with_progress: bool = tr
 		if not r.get("ok", false):
 			app.say(plain_error(r))
 		app.set_hint(hint_text)
-		on_done.call(r))
+		on_done.call(r)
+		_job_ended())
+
+## after a job: the request that waited for it runs now (unless on_done started another job; then after that one)
+func _job_ended() -> void:
+	if job == null and _queued.is_valid():
+		var q := _queued
+		_queued = Callable()
+		q.call()
+
+## a picture request that can come faster than the pipeline answers (the facing wheel turned through several
+## facings, a lever nudged while a render runs): it waits `delay` seconds so a quick run of requests asks once,
+## for the last; it waits for a running job instead of being dropped; and a newer request replaces one waiting.
+## Every request takes a new ticket; a step that started under an older ticket finds `fresh()` false when its
+## result comes back and leaves the picture window alone.
+func request(what: Callable, delay: float = 0.2) -> void:
+	_ticket += 1
+	_request_gen += 1
+	var g := _request_gen
+	if delay > 0.0 and is_inside_tree():
+		await get_tree().create_timer(delay).timeout
+		if g != _request_gen or not is_inside_tree():
+			return
+	if job != null:
+		_queued = what
+		return
+	what.call()
+
+## the ticket a step starts under (compare with fresh() when its result arrives)
+func ticket() -> int:
+	return _ticket
+
+## true while no newer request has been made since `t` was taken
+func fresh(t: int) -> bool:
+	return t == _ticket
+
+## true while a request waits for the running job
+func has_queued() -> bool:
+	return _queued.is_valid()
+
+## after a rebuild, the selector back on the control or the choice with these words (a turned wheel, a cycler)
+func refocus(label: String) -> void:
+	for g in groups:
+		if g.has_method("by_name"):
+			var c = g.by_name(label)
+			if c != null:
+				app.focus_on(g, g.controls.find(c), false)
+				return
+		if g.has_method("index_of"):
+			var k: int = g.index_of(label)
+			if k >= 0:
+				app.focus_on(g, k, false)
+				return
 
 func on_progress(info: Dictionary) -> void:
 	if String(info.get("step", "")) == "claude":
