@@ -166,6 +166,34 @@ func set_fade(a: float) -> void:
 static func _alpha(t: float, mx: float) -> float:
 	return clampf(minf((mx - t) / 0.9, t / 1.3), 0.0, 1.0)
 
+## The hour turning, as the browser announced it (zv_time24.js HOUR_TXT): a banner and a line, outdoors only.
+const HOUR_TXT := {
+	"day": ["DAY", "The sun is on the Hide. The pyres burn hot.", Color8(232, 216, 168)],
+	"dusk": ["DUSK", "The Hide bleeds. Everything hunts faster; the Hands come out.", Color8(224, 96, 64)],
+	"night": ["NIGHT", "Keep to the light. The breath walks.", Color8(142, 160, 216)],
+	"dawn": ["DAWN", "The long shadows. Bone stands straighter; the mourners weep.", Color8(224, 184, 120)],
+}
+var _hour := "-"   # "-" until the first look: entering a zone never announces, only the hour turning does
+var _hour_due := ""   # an hour turned while other words were up: said once the screen is clear
+
+func _hours() -> void:
+	var m := get_parent()
+	var z = m.get("zone") if m else null
+	var h := ""
+	if z and is_instance_valid(z) and z.d.get("outdoor", false):
+		h = Game.hour_name()
+	if h != _hour and h != "" and _hour != "-" and _hour != "":
+		_hour_due = h
+	if h == "":
+		_hour_due = ""   # gone under: the hour is not told there
+	_hour = h
+	if _hour_due != "" and _ban_t <= 0.0 and _wh_t <= 0.0:
+		var t: Array = HOUR_TXT.get(_hour_due, [])
+		_hour_due = ""
+		if not t.is_empty():
+			banner(t[0], t[2], 2.4)
+			whisper("", t[1], 3.0)
+
 func _process(dt: float) -> void:
 	# the title and the Reading stand over the world: its words wait (their clocks held) until the pilgrim rises
 	var cs := get_tree().current_scene
@@ -173,6 +201,7 @@ func _process(dt: float) -> void:
 	visible = not held
 	if held:
 		return
+	_hours()
 	_bark_t = maxf(0.0, _bark_t - dt)
 	_wh_t = maxf(0.0, _wh_t - dt)
 	_ban_t = maxf(0.0, _ban_t - dt)
