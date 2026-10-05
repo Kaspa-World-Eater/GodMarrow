@@ -324,13 +324,14 @@ def test_the_hemomancer_generator_on_the_kit_writes_the_committed_file(tmp_path)
     proc = subprocess.run([sys.executable, str(GENERATOR), "--out", str(out)], capture_output=True, text=True, cwd=str(HERE.parent), timeout=120)
     assert proc.returncode == 0, proc.stderr[-1500:]
     made = json.loads(out.read_text())
-    committed = json.loads((S.ASSETS / "characters" / "hemomancer.shapes.json").read_text())
+    committed = S.load_shapes(S.ASSETS / "characters" / "hemomancer.shapes.json")      # with its path: the detail textures beside it load
     by_name = lambda d: {s["name"]: s for s in d["shapes"]}
     assert set(by_name(made)) == set(by_name(committed)) and len(made["shapes"]) == len(committed["shapes"])
     diffs = []
     for name, sh in by_name(committed).items():
         diffs += _close(sh, by_name(made)[name], name)
-    diffs += _close({k: v for k, v in committed.items() if k != "shapes"}, {k: v for k, v in made.items() if k != "shapes"}, "doc")
+    diffs += _close({k: v for k, v in committed.items() if k not in ("shapes", "detail", "_file")}, {k: v for k, v in made.items() if k not in ("shapes", "detail")}, "doc")
+    assert set(made.get("detail", {})) == set(committed.get("detail", {}))      # the stock detail layer, written beside each
     assert diffs == [], diffs[:12]
     # the shape order may differ by part; the picture does not
     a = S.render_still(S.load_shapes(out)).rgba; b = S.render_still(committed).rgba

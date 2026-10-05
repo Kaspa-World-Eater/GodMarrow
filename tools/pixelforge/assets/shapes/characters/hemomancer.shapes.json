@@ -53,7 +53,15 @@
     "#8a4a52"
    ],
    "texture": "weave",
-   "texture_strength": 0.4
+   "texture_strength": 0.4,
+   "runs": {
+    "colour_from": "blood",
+    "density": 0.35,
+    "length": [
+     2,
+     6
+    ]
+   }
   },
   "blood": {
    "ramp": [
@@ -73,7 +81,15 @@
     "#c2b19c"
    ],
    "texture": "weave",
-   "texture_strength": 0.5
+   "texture_strength": 0.5,
+   "runs": {
+    "colour_from": "blood",
+    "density": 0.7,
+    "length": [
+     3,
+     8
+    ]
+   }
   },
   "plank": {
    "ramp": [
@@ -85,7 +101,15 @@
     "#675e59"
    ],
    "texture": "grain",
-   "texture_strength": 0.6
+   "texture_strength": 0.6,
+   "runs": {
+    "colour_from": "blood",
+    "density": 0.5,
+    "length": [
+     2,
+     6
+    ]
+   }
   },
   "legwrap": {
    "ramp": [
@@ -96,7 +120,15 @@
     "#5f412e"
    ],
    "texture": "weave",
-   "texture_strength": 0.5
+   "texture_strength": 0.5,
+   "runs": {
+    "colour_from": "blood",
+    "density": 0.5,
+    "length": [
+     3,
+     8
+    ]
+   }
   },
   "chain": {
    "ramp": [
@@ -2036,27 +2068,6 @@
      "t": -1
     },
     {
-     "hash": [
-      0.16,
-      31,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "y": [
-      64,
-      69
-     ],
-     "hash": [
-      0.45,
-      33,
-      2
-     ],
-     "material": "blood",
-     "t": -1
-    },
-    {
      "y": [
       54,
       56.5
@@ -2300,23 +2311,6 @@
       102
      ],
      "t": -2
-    },
-    {
-     "y": [
-      117,
-      126
-     ],
-     "hash": [
-      0.25,
-      41,
-      2
-     ],
-     "material": "blood",
-     "t": -1,
-     "px": [
-      90,
-      null
-     ]
     }
    ]
   },
@@ -2467,27 +2461,6 @@
       2,
       0
      ],
-     "t": -1
-    },
-    {
-     "hash": [
-      0.16,
-      32,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "y": [
-      64,
-      69
-     ],
-     "hash": [
-      0.45,
-      33,
-      2
-     ],
-     "material": "blood",
      "t": -1
     },
     {
@@ -2734,23 +2707,6 @@
       102
      ],
      "t": -2
-    },
-    {
-     "y": [
-      117,
-      126
-     ],
-     "hash": [
-      0.25,
-      41,
-      2
-     ],
-     "material": "blood",
-     "t": -1,
-     "px": [
-      90,
-      null
-     ]
     }
    ]
   },
@@ -2902,18 +2858,6 @@
      "t": -1
     },
     {
-     "hash": [
-      0.025,
-      13,
-      2
-     ],
-     "material": "blood",
-     "px": [
-      90,
-      null
-     ]
-    },
-    {
      "every_y": [
       5,
       1
@@ -2971,28 +2915,6 @@
       0
      ],
      "t": -1
-    },
-    {
-     "hash": [
-      0.03,
-      17,
-      2
-     ],
-     "material": "blood",
-     "t": -1
-    },
-    {
-     "hem_band": [
-      0,
-      4
-     ],
-     "material": "blood",
-     "t": -1,
-     "hash": [
-      0.3,
-      18,
-      2
-     ]
     }
    ]
   },
@@ -3036,18 +2958,6 @@
       0
      ],
      "t": -1
-    },
-    {
-     "hash": [
-      0.02,
-      19,
-      2
-     ],
-     "material": "blood",
-     "px": [
-      90,
-      null
-     ]
     },
     {
      "hem_band": [
@@ -3127,27 +3037,6 @@
      ]
     },
     {
-     "hash": [
-      0.015,
-      150,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      11.78133637612455,
-      null
-     ],
-     "hash": [
-      0.25,
-      250,
-      2
-     ],
-     "material": "blood",
-     "t": -1
-    },
-    {
      "dy": [
       null,
       -16.28133637612455
@@ -3201,27 +3090,6 @@
       90,
       null
      ]
-    },
-    {
-     "hash": [
-      0.015,
-      151,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      13.019860320161246,
-      null
-     ],
-     "hash": [
-      0.25,
-      251,
-      2
-     ],
-     "material": "blood",
-     "t": -1
     },
     {
      "dy": [
@@ -3279,27 +3147,6 @@
      ]
     },
     {
-     "hash": [
-      0.015,
-      152,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      11.173562596864201,
-      null
-     ],
-     "hash": [
-      0.25,
-      252,
-      2
-     ],
-     "material": "blood",
-     "t": -1
-    },
-    {
      "dy": [
       null,
       -15.673562596864201
@@ -3353,27 +3200,6 @@
       90,
       null
      ]
-    },
-    {
-     "hash": [
-      0.015,
-      153,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      11.163039382162147,
-      null
-     ],
-     "hash": [
-      0.25,
-      253,
-      2
-     ],
-     "material": "blood",
-     "t": -1
     },
     {
      "dy": [
@@ -3431,27 +3257,6 @@
      ]
     },
     {
-     "hash": [
-      0.015,
-      154,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      12.013632502160867,
-      null
-     ],
-     "hash": [
-      0.25,
-      254,
-      2
-     ],
-     "material": "blood",
-     "t": -1
-    },
-    {
      "dy": [
       null,
       -16.513632502160867
@@ -3505,27 +3310,6 @@
       90,
       null
      ]
-    },
-    {
-     "hash": [
-      0.015,
-      155,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      12.8924005993625,
-      null
-     ],
-     "hash": [
-      0.25,
-      255,
-      2
-     ],
-     "material": "blood",
-     "t": -1
     },
     {
      "dy": [
@@ -3583,27 +3367,6 @@
      ]
     },
     {
-     "hash": [
-      0.015,
-      156,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      12.960900469544846,
-      null
-     ],
-     "hash": [
-      0.25,
-      256,
-      2
-     ],
-     "material": "blood",
-     "t": -1
-    },
-    {
      "dy": [
       null,
       -17.460900469544846
@@ -3657,27 +3420,6 @@
       90,
       null
      ]
-    },
-    {
-     "hash": [
-      0.015,
-      157,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      11.36069499355257,
-      null
-     ],
-     "hash": [
-      0.25,
-      257,
-      2
-     ],
-     "material": "blood",
-     "t": -1
     },
     {
      "dy": [
@@ -3735,27 +3477,6 @@
      ]
     },
     {
-     "hash": [
-      0.015,
-      158,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      12.303391399540061,
-      null
-     ],
-     "hash": [
-      0.25,
-      258,
-      2
-     ],
-     "material": "blood",
-     "t": -1
-    },
-    {
      "dy": [
       null,
       -16.80339139954006
@@ -3809,27 +3530,6 @@
       90,
       null
      ]
-    },
-    {
-     "hash": [
-      0.015,
-      159,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      12.975289025966852,
-      null
-     ],
-     "hash": [
-      0.25,
-      259,
-      2
-     ],
-     "material": "blood",
-     "t": -1
     },
     {
      "dy": [
@@ -3887,27 +3587,6 @@
      ]
     },
     {
-     "hash": [
-      0.015,
-      160,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      12.737450732897223,
-      null
-     ],
-     "hash": [
-      0.25,
-      260,
-      2
-     ],
-     "material": "blood",
-     "t": -1
-    },
-    {
      "dy": [
       null,
       -17.237450732897223
@@ -3961,27 +3640,6 @@
       90,
       null
      ]
-    },
-    {
-     "hash": [
-      0.015,
-      161,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      13.720300712432824,
-      null
-     ],
-     "hash": [
-      0.25,
-      261,
-      2
-     ],
-     "material": "blood",
-     "t": -1
     },
     {
      "dy": [
@@ -4039,27 +3697,6 @@
      ]
     },
     {
-     "hash": [
-      0.015,
-      162,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      13.049466522276735,
-      null
-     ],
-     "hash": [
-      0.25,
-      262,
-      2
-     ],
-     "material": "blood",
-     "t": -1
-    },
-    {
      "dy": [
       null,
       -17.549466522276735
@@ -4113,27 +3750,6 @@
       90,
       null
      ]
-    },
-    {
-     "hash": [
-      0.015,
-      163,
-      2
-     ],
-     "material": "blood"
-    },
-    {
-     "dy": [
-      12.265538245805981,
-      null
-     ],
-     "hash": [
-      0.25,
-      263,
-      2
-     ],
-     "material": "blood",
-     "t": -1
     },
     {
      "dy": [
@@ -4258,15 +3874,6 @@
       93
      ],
      "material": "blood"
-    },
-    {
-     "hash": [
-      0.025,
-      61,
-      2
-     ],
-     "material": "blood",
-     "t": -1
     },
     {
      "y": [
@@ -6069,5 +5676,349 @@
    4.2
   ],
   "colour": "#4b4a4f"
+ },
+ "detail": {
+  "head": {
+   "file": "hemomancer.detail/head.png"
+  },
+  "beard": {
+   "file": "hemomancer.detail/beard.png"
+  },
+  "hair_cap": {
+   "file": "hemomancer.detail/hair_cap.png"
+  },
+  "crown_band": {
+   "file": "hemomancer.detail/crown_band.png"
+  },
+  "spike0": {
+   "file": "hemomancer.detail/spike0.png"
+  },
+  "spike0_s": {
+   "file": "hemomancer.detail/spike0_s.png"
+  },
+  "spike1": {
+   "file": "hemomancer.detail/spike1.png"
+  },
+  "spike1_s": {
+   "file": "hemomancer.detail/spike1_s.png"
+  },
+  "spike2": {
+   "file": "hemomancer.detail/spike2.png"
+  },
+  "spike2_s": {
+   "file": "hemomancer.detail/spike2_s.png"
+  },
+  "spike3": {
+   "file": "hemomancer.detail/spike3.png"
+  },
+  "spike3_s": {
+   "file": "hemomancer.detail/spike3_s.png"
+  },
+  "upright0": {
+   "file": "hemomancer.detail/upright0.png"
+  },
+  "upright0_s": {
+   "file": "hemomancer.detail/upright0_s.png"
+  },
+  "upright1": {
+   "file": "hemomancer.detail/upright1.png"
+  },
+  "upright1_s": {
+   "file": "hemomancer.detail/upright1_s.png"
+  },
+  "upright2": {
+   "file": "hemomancer.detail/upright2.png"
+  },
+  "upright2_s": {
+   "file": "hemomancer.detail/upright2_s.png"
+  },
+  "upright3": {
+   "file": "hemomancer.detail/upright3.png"
+  },
+  "upright3_s": {
+   "file": "hemomancer.detail/upright3_s.png"
+  },
+  "neck": {
+   "file": "hemomancer.detail/neck.png"
+  },
+  "locs": {
+   "file": "hemomancer.detail/locs.png"
+  },
+  "locs_front": {
+   "file": "hemomancer.detail/locs_front.png"
+  },
+  "chest": {
+   "file": "hemomancer.detail/chest.png"
+  },
+  "waist": {
+   "file": "hemomancer.detail/waist.png"
+  },
+  "delt.L": {
+   "file": "hemomancer.detail/delt.L.png"
+  },
+  "upper_arm.L": {
+   "file": "hemomancer.detail/upper_arm.L.png"
+  },
+  "forearm.L": {
+   "file": "hemomancer.detail/forearm.L.png"
+  },
+  "hand.L": {
+   "file": "hemomancer.detail/hand.L.png"
+  },
+  "hand_s.L": {
+   "file": "hemomancer.detail/hand_s.L.png"
+  },
+  "finger0.L": {
+   "file": "hemomancer.detail/finger0.L.png"
+  },
+  "finger1.L": {
+   "file": "hemomancer.detail/finger1.L.png"
+  },
+  "finger2.L": {
+   "file": "hemomancer.detail/finger2.L.png"
+  },
+  "thigh.L": {
+   "file": "hemomancer.detail/thigh.L.png"
+  },
+  "shin.L": {
+   "file": "hemomancer.detail/shin.L.png"
+  },
+  "foot.L": {
+   "file": "hemomancer.detail/foot.L.png"
+  },
+  "toe.L": {
+   "file": "hemomancer.detail/toe.L.png"
+  },
+  "delt.R": {
+   "file": "hemomancer.detail/delt.R.png"
+  },
+  "upper_arm.R": {
+   "file": "hemomancer.detail/upper_arm.R.png"
+  },
+  "forearm.R": {
+   "file": "hemomancer.detail/forearm.R.png"
+  },
+  "hand.R": {
+   "file": "hemomancer.detail/hand.R.png"
+  },
+  "hand_s.R": {
+   "file": "hemomancer.detail/hand_s.R.png"
+  },
+  "finger0.R": {
+   "file": "hemomancer.detail/finger0.R.png"
+  },
+  "finger1.R": {
+   "file": "hemomancer.detail/finger1.R.png"
+  },
+  "finger2.R": {
+   "file": "hemomancer.detail/finger2.R.png"
+  },
+  "thigh.R": {
+   "file": "hemomancer.detail/thigh.R.png"
+  },
+  "shin.R": {
+   "file": "hemomancer.detail/shin.R.png"
+  },
+  "foot.R": {
+   "file": "hemomancer.detail/foot.R.png"
+  },
+  "toe.R": {
+   "file": "hemomancer.detail/toe.R.png"
+  },
+  "cowl": {
+   "file": "hemomancer.detail/cowl.png"
+  },
+  "mantle": {
+   "file": "hemomancer.detail/mantle.png"
+  },
+  "tabard": {
+   "file": "hemomancer.detail/tabard.png"
+  },
+  "cape": {
+   "file": "hemomancer.detail/cape.png"
+  },
+  "belt": {
+   "file": "hemomancer.detail/belt.png"
+  },
+  "planks_L": {
+   "file": "hemomancer.detail/planks_L.png"
+  },
+  "planks_back": {
+   "file": "hemomancer.detail/planks_back.png"
+  },
+  "planks_R": {
+   "file": "hemomancer.detail/planks_R.png"
+  },
+  "shield": {
+   "file": "hemomancer.detail/shield.png"
+  },
+  "greave.L": {
+   "file": "hemomancer.detail/greave.L.png"
+  },
+  "kneecop.L": {
+   "file": "hemomancer.detail/kneecop.L.png"
+  },
+  "legspike0.L": {
+   "file": "hemomancer.detail/legspike0.L.png"
+  },
+  "legspike1.L": {
+   "file": "hemomancer.detail/legspike1.L.png"
+  },
+  "legspike2.L": {
+   "file": "hemomancer.detail/legspike2.L.png"
+  },
+  "legspike3.L": {
+   "file": "hemomancer.detail/legspike3.L.png"
+  },
+  "legspike4.L": {
+   "file": "hemomancer.detail/legspike4.L.png"
+  },
+  "legspike5.L": {
+   "file": "hemomancer.detail/legspike5.L.png"
+  },
+  "legspike6.L": {
+   "file": "hemomancer.detail/legspike6.L.png"
+  },
+  "legspike7.L": {
+   "file": "hemomancer.detail/legspike7.L.png"
+  },
+  "thighplate.L": {
+   "file": "hemomancer.detail/thighplate.L.png"
+  },
+  "thighspike.L": {
+   "file": "hemomancer.detail/thighspike.L.png"
+  },
+  "shackle.L": {
+   "file": "hemomancer.detail/shackle.L.png"
+  },
+  "wristchainL_0": {
+   "file": "hemomancer.detail/wristchainL_0.png"
+  },
+  "wristchainL_1": {
+   "file": "hemomancer.detail/wristchainL_1.png"
+  },
+  "wristchainL_2": {
+   "file": "hemomancer.detail/wristchainL_2.png"
+  },
+  "wristchainL_3": {
+   "file": "hemomancer.detail/wristchainL_3.png"
+  },
+  "wristchainL_4": {
+   "file": "hemomancer.detail/wristchainL_4.png"
+  },
+  "wristchainL_5": {
+   "file": "hemomancer.detail/wristchainL_5.png"
+  },
+  "wristchainL_6": {
+   "file": "hemomancer.detail/wristchainL_6.png"
+  },
+  "greave.R": {
+   "file": "hemomancer.detail/greave.R.png"
+  },
+  "kneecop.R": {
+   "file": "hemomancer.detail/kneecop.R.png"
+  },
+  "legspike0.R": {
+   "file": "hemomancer.detail/legspike0.R.png"
+  },
+  "legspike1.R": {
+   "file": "hemomancer.detail/legspike1.R.png"
+  },
+  "legspike2.R": {
+   "file": "hemomancer.detail/legspike2.R.png"
+  },
+  "legspike3.R": {
+   "file": "hemomancer.detail/legspike3.R.png"
+  },
+  "legspike4.R": {
+   "file": "hemomancer.detail/legspike4.R.png"
+  },
+  "legspike5.R": {
+   "file": "hemomancer.detail/legspike5.R.png"
+  },
+  "legspike6.R": {
+   "file": "hemomancer.detail/legspike6.R.png"
+  },
+  "legspike7.R": {
+   "file": "hemomancer.detail/legspike7.R.png"
+  },
+  "thighplate.R": {
+   "file": "hemomancer.detail/thighplate.R.png"
+  },
+  "thighspike.R": {
+   "file": "hemomancer.detail/thighspike.R.png"
+  },
+  "shackle.R": {
+   "file": "hemomancer.detail/shackle.R.png"
+  },
+  "wristchainR_0": {
+   "file": "hemomancer.detail/wristchainR_0.png"
+  },
+  "wristchainR_1": {
+   "file": "hemomancer.detail/wristchainR_1.png"
+  },
+  "wristchainR_2": {
+   "file": "hemomancer.detail/wristchainR_2.png"
+  },
+  "wristchainR_3": {
+   "file": "hemomancer.detail/wristchainR_3.png"
+  },
+  "wristchainR_4": {
+   "file": "hemomancer.detail/wristchainR_4.png"
+  },
+  "wristchainR_5": {
+   "file": "hemomancer.detail/wristchainR_5.png"
+  },
+  "wristchainR_6": {
+   "file": "hemomancer.detail/wristchainR_6.png"
+  },
+  "chestchain0": {
+   "file": "hemomancer.detail/chestchain0.png"
+  },
+  "chestchain1": {
+   "file": "hemomancer.detail/chestchain1.png"
+  },
+  "chestchain2": {
+   "file": "hemomancer.detail/chestchain2.png"
+  },
+  "chestchain3": {
+   "file": "hemomancer.detail/chestchain3.png"
+  },
+  "chestchain4": {
+   "file": "hemomancer.detail/chestchain4.png"
+  },
+  "chestchain5": {
+   "file": "hemomancer.detail/chestchain5.png"
+  },
+  "chestchain6": {
+   "file": "hemomancer.detail/chestchain6.png"
+  },
+  "chestchain7": {
+   "file": "hemomancer.detail/chestchain7.png"
+  },
+  "chestchain8": {
+   "file": "hemomancer.detail/chestchain8.png"
+  },
+  "chestchain9": {
+   "file": "hemomancer.detail/chestchain9.png"
+  },
+  "chestchain10": {
+   "file": "hemomancer.detail/chestchain10.png"
+  },
+  "chestchain11": {
+   "file": "hemomancer.detail/chestchain11.png"
+  },
+  "chestchain12": {
+   "file": "hemomancer.detail/chestchain12.png"
+  },
+  "chestchain13": {
+   "file": "hemomancer.detail/chestchain13.png"
+  },
+  "chestchain14": {
+   "file": "hemomancer.detail/chestchain14.png"
+  },
+  "waistchain": {
+   "file": "hemomancer.detail/waistchain.png"
+  }
  }
 }

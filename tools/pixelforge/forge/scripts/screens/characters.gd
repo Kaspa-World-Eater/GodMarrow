@@ -348,6 +348,7 @@ func _model_loaded() -> void:
 	doc = app.backend.read_json(model_path())
 	orig = app.backend.read_json(model_path())
 	state["model_file"] = model_path()
+	app.cfg["last_character"] = {"name": String(state["name"]), "model": model_path()}   # the Detail bench and Build on Home take it
 	state["title"] = String(doc.get("name", state["name"])).capitalize()
 	full_render = FileAccess.file_exists(char_dir().path_join("frames").path_join("animations.json"))
 	retime = app.backend.read_json(char_dir().path_join("frames").path_join("retime.json"))

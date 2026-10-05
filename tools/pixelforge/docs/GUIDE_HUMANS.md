@@ -443,6 +443,39 @@ folder>` does the whole road (import, every clip in eight directions with the pa
 game's atlas, `skins.json`, the height check); the steps on their own are **import-shapes**, **render-shapes** and
 **export-game** (the step-by-step list for an assistant is `docs/GUIDE_SESSION.md` in the game repository).
 
+## Detail: the painted detail that rides the parts
+
+A model renders as clean pieces; the painting has a face, muscle, folds, grain, wraps and worn iron on them. Those
+are the **detail layer**: a small texture painted once on each part, in the part's own coordinates, that the Forge
+draws into every frame from every direction, so a brow turns with the head and a fold swings with the cape. The
+texture never holds colours, only steps up or down the part's own colour ramp, so the character keeps its palette.
+
+- **Stock first.** `pixelforge shapes detail <model.shapes.json> --stock` gives every part a start from its
+  material: a face on a head of skin (brow, sockets, nose, cheekbones), muscle on a bare chest and belly and the light
+  down the arms, hanging folds on a cape and wrapped folds on a cowl, grain and bleeding nail holes on planks, wraps on
+  bandages and leg-cloth, worn edges and rivets on iron, strands in hair. The textures land beside the model in a
+  `<name>.detail` folder; the model names them under `"detail"`.
+- **Then paint.** On Home press **Detail bench** (it opens on the last model you had on the Characters bench, or the
+  Keeper; *Choose a model file* takes another). The picture window shows the part's texture unwrapped at pixel scale on
+  the left (the front is the middle of the strip, the top its top row) and the figure on the right. Pick the **part**,
+  a **tool** (the pencil, or a brush of 2, 3 or 4), and a **shade** from the chips under the texture (three steps down
+  to three up the material's ramp; the red chip is a *seed*, where blood starts to run). Left drag paints, right drag
+  erases, **Undo** takes a stroke back, **Stock** puts the stock texture back, **Clear part** empties it. After every
+  stroke the figure on the right redraws with the change; the **facing** cycler turns it.
+- **Blood runs.** A material that bleeds (`"runs"` in the model, the Hemomancer's cloth, planks and bandages) drips
+  downward from its seeds in every frame, in the blood's own colours, staying on the part as it moves. Paint a seed
+  where a wound or a hole is; without any, a part bleeds a little from its top.
+- **The light.** The `godmarrow` look lights every piece from the upper left, creases where pieces meet, inks the edge
+  between them and puts a faint lit rim on the light side, all in the ramps' own steps (no glow, no red light). Other
+  looks leave it off.
+- **To the game in one go.** `pixelforge project build <character> -p <project folder>` (or **Build** on Home) imports
+  the model, renders every clip the game plays (idle, walk, two attacks, cast, hit, death, dodge) from eight sides with
+  the detail and the light, writes the game's sheets and `skins.json`, and says plainly if the figure is not 195 px
+  tall. The lines it prints are what Home shows in the picture window.
+
+The pictures: `docs/screens/forge/hemomancer_detail_compare.png` and `keeper_detail_compare.png` in the game
+repository (the painting, the flat model, the model with its stock detail, and with the light).
+
 ## Describe it, get it
 
 The **Describe it…** button (also Ctrl+D, and Tools > Describe it): say what you want in plain words and the Forge

@@ -560,7 +560,7 @@ def frame_times(n_src: int, n_out: int | None, loop: bool) -> list[float]:
 def render_clip(doc: dict, clip: str, direction: str = "S", *, tracks: JointTracks | None = None, model: S.Model | None = None,
                 scale: float = 1.0, steps: int | None = None, outline="auto", elevation: float | None = None, max_frames: int | None = None,
                 square: bool | int = False, passes: bool = False, lock: bool | None = None, turn_step: float | None = None,
-                snap: bool = True) -> dict:
+                snap: bool = True, look: dict | None = None) -> dict:
     """Every frame of one clip facing one direction. Returns ``{"frames": [rgba, ...], "fps": f, "times": [...], "normal": [...],
     "depth": [...], "parts": [uint16 part-index masks, ...]}``; the fps keeps the clip's real duration when it was thinned to ``max_frames``. ``square`` pads
     each frame to a square canvas (True: the larger side; a number: that side) with the ground kept at the bottom.
@@ -572,7 +572,7 @@ def render_clip(doc: dict, clip: str, direction: str = "S", *, tracks: JointTrac
     phi = math.radians(DIRECTIONS[direction])
     if S.mode_of(doc) == "flat":
         return render_clip_flat(doc, clip, direction, tracks=tracks, scale=scale, steps=steps, outline=outline, max_frames=max_frames)
-    model = model or S.Model(doc, scale, steps)
+    model = model or S.Model(doc, scale, steps, look=look)
     skel = skeleton_for(doc, tracks)
     elev = float(doc.get("view", {}).get("elevation", 0.0)) if elevation is None else float(elevation)
     poser = Poser(model, skel, clip_source(doc, clip), lock, view=(phi, elev), turn_step=turn_step)

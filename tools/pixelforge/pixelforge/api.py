@@ -883,7 +883,8 @@ def import_shapes(project: Project, name: str, path: str | Path) -> dict:
 
 
 def render_shapes(project: Project, name: str, preset: str | None = None, clips: list[str] | str | None = None, directions: list[str] | str | None = None,
-                  elevation: float | None = None, passes: bool = False, log=None, progress=None, parts: bool = True) -> dict:
+                  elevation: float | None = None, passes: bool = False, log=None, progress=None, parts: bool = True,
+                  frames_per_clip: dict | None = None) -> dict:
     """Render a character's shape sprite with the motion clips into the frames layout the export steps read
     (``frames/<clip>_<DIR>/frame_NNN.png`` + ``animations.json``, and ``renders/manifest.json`` for the foot anchors).
     ``preset`` (a look) gives the figure height, the ramp length and the outline rule; the project's style when omitted.
@@ -907,7 +908,7 @@ def render_shapes(project: Project, name: str, preset: str | None = None, clips:
         if old.is_dir():
             shutil.rmtree(old)
     r = shape_tools.render_set(doc, frames, clips=clips, directions=directions, style=st, elevation=elevation, passes=passes, log=log, progress=progress,
-                               parts=parts)
+                               parts=parts, frames_per_clip=frames_per_clip)
     renders = project.sub(c.name, "renders")
     shutil.copy(frames / "manifest.json", renders / "manifest.json")
     if passes:
@@ -1042,3 +1043,91 @@ def run_until_blocked(project: Project, name: str, log=None) -> dict:
 
 def which_python() -> str:
     return sys.executable
+
+
+# ------------------------------------------------------------- one command from a shape file to the game
+# the game's fixed animation set for a hero (docs/FORGE_FROM_THE_GAME.md section 4): Forge clip -> frames rendered
+BUILD_CLIPS = {"idle": 8, "walk": 8, "attack": 8, "punch": 8, "cast": 8, "hit": 6, "death": 8, "roll": 8}
+# the game anim each clip becomes (godmarrow_export.HERO_ANIMS): idle walk atk atk2 cast hit death dodge
+
+
+def build_character(project: Project, name: str, shapes: str | Path | None = None, *, game: str | Path | None = None, kind: str | None = None,
+                    skin_for: str | None = None, preset: str | None = None, display_name: str | None = None, dry_run: bool = False,
+                    log=None, progress=None) -> dict:
+    """``pixelforge project build <character>``: a changed shape file to the game in one go. Import the model
+    (``shapes``, or the character's own), render the fixed animation set in eight views with the detail layer and the
+    style's light and ink (the ``godmarrow`` preset unless ``preset`` says otherwise), export the game's atlas, write
+    or update ``skins.json`` when the out folder is the game's ``art/sprites`` (``game`` names the game; found above the
+    project otherwise), and check the figure's height (a hero is 195 px). One JSON-serialisable result: every path
+    written under ``paths``, the steps run, and the ``warnings`` in plain words. ``dry_run`` lists the steps and
+    writes nothing."""
+    from .game_preview import find_game
+    from .godmarrow_export import GAME_FIGURE_HEIGHTS, HERO_ANIMS, figure_height_of, height_warning
+
+    say = log or (lambda m: None)
+    c = project.character(name) if name in project.characters else None
+    src = Path(shapes) if shapes else (shapes_file(project, name) if c is not None else None)
+    game_dir = find_game(game) if game else find_game(project.root)
+    out_dir = (game_dir / "art" / "sprites") if game_dir else project.sub(name, "export_game")
+    st = get_style(preset) if preset else (style_of(project, c) if c is not None else get_style(DEFAULT_PROJECT_STYLE))
+    clips = list(BUILD_CLIPS)
+    steps = [
+        {"step": "import-shapes", "what": f"validate and copy {src} into the project" if src else "no shape file: give one (shapes=...) or import one first"},
+        {"step": "render-shapes", "what": f"{len(clips)} clips ({', '.join(f'{k} {v}' for k, v in BUILD_CLIPS.items())} frames) x 8 views at {st.figure_height} px "
+                                         f"with the detail layer and the look of {st.name} (" + ", ".join(k for k in ("form_light", "creases", "ink", "rim") if getattr(st, k)) + ")"},
+        {"step": "export-game", "what": f"the atlas and JSON into {out_dir}" + (" and the skins.json entry" if game_dir else " (no game found: no skins.json)")},
+        {"step": "height-check", "what": f"a hero must stand {GAME_FIGURE_HEIGHTS['hero']} px"},
+    ]
+    result = {"ok": True, "character": name, "style": st.name, "game": str(game_dir) if game_dir else None, "out": str(out_dir), "steps": steps,
+              "paths": {}, "warnings": [], "dry_run": dry_run, "clips": {k: HERO_ANIMS.get(k, (k, 0))[0] for k in clips}}
+    if dry_run:
+        return result
+    if src is None or not Path(src).exists():
+        raise StepError(f"no shape file for {name}: pass one (project build {name} FILE) or import one first")
+    if c is None:
+        add_character(project, name, "")
+        c = project.character(name)
+    say("importing the model")
+    r = import_shapes(project, name, src)
+    result["paths"]["shapes"] = r["file"]
+    # the second attack: a file that plays punch as its attack gets the jab for atk2, so the two differ
+    doc = json.loads(Path(r["file"]).read_text())
+    cm = dict(doc.get("clips") or {})
+    if cm.get("attack") == "punch" and "punch" not in cm:
+        cm["punch"] = "jab"
+        doc["clips"] = cm
+        Path(r["file"]).write_text(json.dumps({k: v for k, v in doc.items() if not k.startswith("_")}, indent=1) + "\n")
+        result["warnings"].append("attack plays the punch, so the second attack (atk2) plays the jab")
+    det = doc.get("detail") or {}
+    if not det:
+        result["warnings"].append("the model has no detail layer: run `pixelforge shapes detail FILE --stock` to start one (the figure renders flat)")
+    say("rendering the clips")
+    rr = render_shapes(project, name, preset=st.name, clips=clips, log=log, progress=progress, frames_per_clip=BUILD_CLIPS)
+    result["paths"]["frames"] = rr["frames_dir"]
+    result["paths"]["manifest"] = str(project.sub(name, "renders") / "manifest.json")
+    result["render"] = {"frames": rr["frames"], "fps": rr["fps"], "seconds": rr["seconds"], "size": rr["size"]}
+    say("exporting for the game")
+    er = export_game(project, name, kind=kind, out_dir=out_dir, category="hero", display_name=display_name, log=log, skin_for=skin_for)
+    result["paths"]["sheet"] = str(er["color"]["png"]) if isinstance(er.get("color"), dict) else None
+    result["paths"]["json"] = str(er["color"]["json"]) if isinstance(er.get("color"), dict) else None
+    result["kind"] = er["kind"]
+    if er.get("skins"):
+        result["paths"]["skins"] = er["skins"]["file"]
+        result["skins"] = er["skins"]
+    else:
+        result["warnings"].append(f"no skins.json entry: {out_dir} is not the game's art/sprites folder (pass --game <folder>)")
+    result["warnings"] += [w for w in er.get("warnings", []) if w not in result["warnings"]]
+    frames = project.sub(name, "frames")
+    manifest = json.loads(Path(result["paths"]["manifest"]).read_text())
+    have = figure_height_of(frames, manifest)
+    hw = height_warning(frames, manifest, "hero")
+    result["height"] = {"figure_px": round(have, 1) if have else None, "wanted_px": GAME_FIGURE_HEIGHTS["hero"], "ok": hw is None}
+    if hw and hw not in result["warnings"]:
+        result["warnings"].append(hw)
+    result["lines"] = [f"{name}: {len(clips)} clips x 8 views at {st.figure_height} px ({st.name}), {sum(rr['frames'].values())} frames in {rr['seconds']} s",
+                       f"atlas {result['paths']['sheet']}", f"skins.json: {er['skins']['key']} -> {er['skins']['kind']}" if er.get("skins") else "skins.json: not written",
+                       f"height {result['height']['figure_px']} px" + (" (right)" if hw is None else " (WRONG: see the warning)")] + ["warning: " + w for w in result["warnings"]]
+    for line in result["lines"]:
+        say(line)
+    return result
+

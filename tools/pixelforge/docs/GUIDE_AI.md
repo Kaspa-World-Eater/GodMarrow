@@ -301,6 +301,8 @@ pixelforge project import-shapes <character> FILE -p <folder>      # the charact
 pixelforge project render-shapes <character> -p <folder> [--style S] [--clips ...] [--directions ...] [--no-parts]   # frames/<clip>_<DIR>/frame_NNN.png (+ frame_NNN.parts.png) + animations.json + renders/manifest.json (with "parts")
 pixelforge project run <character> shapes -p <folder>              # the same as a step; run-all runs it when the character has a shape file
 pixelforge project export-game <character> --kind <kind> -p <folder> [--out <game>/art/sprites] [--skin-for <class>]   # the game's atlas with foot anchors, from those frames; into art/sprites it also writes the skins.json entry (the hero loader prefers a PixelForge set over <kind>_unclipped) and warns when the figure is not 195 px
+pixelforge project build <character> [FILE] -p <folder> [--game <game>] [--kind K] [--skin-for CLASS] [--dry-run] --json   # ONE COMMAND to the game: import-shapes, the fixed animation set in 8 views with the detail layer and the light, export-game, skins.json, the height check
+pixelforge shapes detail FILE [--stock [--replace]] [--part NAME --from PNG | --part NAME --stock] [--clear [--part NAME]] [--list] [--json]   # the detail layer: painted textures that ride the parts (below)
 pixelforge project preview-shapes <character> --clip idle --direction S -p <folder>
 ```
 
@@ -311,6 +313,63 @@ length (`shading_bands`; 0 keeps each ramp's own) and the outline rule (`none` /
 that reaches past the file's canvas (the death lies down) gets a wider one; every frame of a set is padded to one
 square with the ground at the bottom. The frames folder's `manifest.json` carries `elevation: 0` for the anchor maths
 (the frames are already projected) and `view_elevation` for the camera the frames were seen from.
+
+**The detail layer (3.1 of the game's note): painted detail that rides the parts.** A part may carry a small texture
+in its own surface coordinates, read by the renderer per pixel in every frame and direction, so a brow, a fold, a
+nail hole or a rivet turns and bends with its part under the rig instead of being painted on afterwards. The file's
+`"detail"` map keys a texture by **part name** (the names of `part_table` / `manifest.json["parts"]`: a named part,
+or a lone shape's name): `{"head": {"file": "hemomancer.detail/head.png"}, "plank0": {"rows": [[0, -1, 0], ...]}}`.
+A `file` is a grey PNG beside the shape file (`<name>.detail/<part>.png`; 128 is no change, 32 per step, so 96 is one
+step down and 192 two up, 0 is a run seed; a transparent texel is no change); `rows` is the same grid inline, whole
+numbers from -4 (the seed) to 3. **Texels are ramp-step offsets, never colours**: the renderer adds the texel to the
+step the light chose and clips to the material's ramp, so the palette never grows (`tests/test_detail.py` holds the
+render to the ramps). Coordinates: **u** runs round the shape's long axis (0..1 across the texture's columns, the
+front at the middle column, the figure's left at three quarters, the back at both edges), **v** down it (the top row
+is the top of the part, the last row its hem). The long axis is a capsule's `a` → `b`, a ring's the body axis,
+otherwise the shape's longest extent (`"detail_axis": "x" | "y" | "z"` on a shape overrides); a turned shape is
+unwrapped in its own frame. A part of several shapes samples one texture in each shape's own coordinates (a head of a
+skull and a jaw both read the face texture about their own axis). Each voxel's (u, v) is read once at voxelising;
+the texel lookup is one cheap pass per texture set (`Model.set_detail` swaps textures without voxelising again, which
+is what the Detail bench does after every stroke).
+
+`pixelforge shapes detail FILE` lists the parts with their material, class, natural texture size and texture;
+`--stock` gives every part without one its material's stock detail (`--replace` redoes them; `--part NAME --stock`
+one part); `--part NAME --from PNG` sets one from a painted grey PNG of any size; `--clear [--part NAME]` drops them.
+The stock classes (`pixelforge/shape_detail.py`, from the material's `detail` key in `assets/shapes/materials.json`
+or, failing that, its name): `face` (a head of skin: brow ridge, sockets, the nose's ridge and shadow, cheekbones, the
+mouth, scaled to the head), `skin` (the breastbone and pectorals' edge on a chest, the spine and shoulder blades on its
+back, the belly's bands on a waist, the light down a limb), `cloth` (hanging folds; wrapped folds on a cowl, mantle,
+shawl, hood or veil; a ragged dark hem; run seeds when the material bleeds), `wood` (grain, dark edges, nail holes
+that are run seeds), `bandage` (wraps wound with a slant; seeds when it bleeds), `metal` (a lit top edge, a dark
+bottom edge, rivets with a shadow, scratches), `hair` (strands). The painter starts from these on the Detail bench.
+`project build` warns when a model has no detail layer.
+
+**Light and ink (3.2): the look of the `godmarrow` preset.** Four style keys (`styles.py`: `form_light`, `creases`,
+`ink`, `rim`; `options_for(...)["look"]`), all on for `godmarrow`, all off for every other preset, so a render with
+them off is the old render bit for bit (`tests/test_detail.py` keeps the hashes). `form_light`: a ramp step up toward
+each piece's upper-left on the screen and a step down toward its lower-right (from the piece's screen box that frame,
+pieces under 4 px keep their steps); `creases`: one step darker where a nearer piece overlaps this one; `ink`: the
+near side of a deep overlap (the contour the renderer already draws) takes the outline colour, never a new colour;
+`rim`: a one-step lit rim along the silhouette's light side. Quantised to the ramps: no gradient, no glow, no red
+light; the light never adds a pixel.
+
+**Blood runs (3.3).** A material option: `"runs": {"colour_from": "blood", "density": 0.35, "length": [2, 6]}` (the
+named material's ramp only; `validate` checks it). From every visible **seed** a drip goes straight down the screen,
+over the same part only, its length from the seed's own hash (so it holds still from frame to frame and rides the
+part); the bead a step up, the tail a step down, in the named ramp. Seeds are the texels of value -4 in the part's
+detail texture (grey 0 in the PNG; the stock cloth, wood and bandage textures place them when the material bleeds: a
+nail hole bleeds) or, for a part with none painted, a few columns at the part's top. The Hemomancer's cloth, planks,
+bandages and leg-cloth bleed this way instead of in random specks.
+
+**One build command (3.4).** `pixelforge project build <character> [FILE] -p <folder> [--game <game>] [--kind K]
+[--skin-for CLASS] [--style S] [--dry-run] --json` (`api.build_character`): import-shapes → render the fixed set
+(`idle walk attack punch cast hit death roll` → the game's `idle walk atk atk2 cast hit death dodge`; 8 frames each,
+`hit` 6; a file whose attack plays `punch` gets the `jab` for `atk2`) in 8 views at the style's height with the detail
+layer and the look → export-game into the game's `art/sprites` (found above the project, or `--game`) with the
+`skins.json` entry → the height check (a hero is 195 px; the warning from `godmarrow_export.height_warning`). One
+result: `paths` (shapes, frames, manifest, sheet, json, skins), `steps`, `warnings`, `height`, `lines` (what the Forge's
+Home shows after **Build**). `--dry-run` lists the steps and writes nothing. With this the game session can retire its
+paint-over scripts (`tools/paintover/*`).
 
 **Part ids.** Every rendered frame comes with `frame_NNN.parts.png` beside it (`shapes render`, `render-shapes`,
 `render_shape_sprite`; `shapes still` writes `<stem>.parts.png`, `shapes turntable` a `<stem>_parts/` folder; all take
@@ -809,6 +868,8 @@ well: a project named PixelForge is not the game). What the app runs, per bench:
 
 | bench | commands |
 |---|---|
+| Detail | `--screen=detail --model=FILE [--part=NAME] [--direction=D]` (from Home's **Detail bench**, the last model on the Characters bench or the Keeper): `shapes detail FILE --list --json` (the parts, each with its material, class, ramp, natural size and texture PNG) · the texture unwrapped at pixel scale on the left of the picture window (u round the part, the front at the middle; v down it; the shade chips under it are the material's ramp steps as offsets -3..+3 plus the run seed), the figure on the right · pencil / brush 2, 3, 4 · after every stroke `shapes detail FILE --part NAME --from <previews>/paint_<part>.png` then `shapes still FILE -o <previews>/still_<D>.png --direction D --style S --zoom 1` as a request (the ticket rule) · Stock (`--part NAME --stock`), Clear part, Undo (every stroke), the facing cycler, Exit. `forge/tools/test_detail.gd` checks the grey rule, the footprints and undo headless. |
+| Home | **Build**: `project build <last character> -p <project> [--game <game>] --json`; the result's `lines` go in the picture window, the first warning on the state line (no pop-up). **Detail bench** opens the Detail screen on the last model. |
 | Characters | a picture dropped or chosen, on Home or on the bench, is the reference beside the model (`--painting`; the automatic picture road is retired, its choices and lines are off the bench unless `PIXELFORGE_OLD_ROADS=1`) · `Compare` shows `previews/compare.png` · `Open in editor` renders idle and opens the editor · `project new` (first use) · `project add <name>` · `project import-shapes <name> <file>` (a dropped or chosen `.shapes.json`, copied into `characters/<name>/shapes/`) · `shapes still <model> -o previews/still_<dir>.png --direction D --style S --zoom 1` (the standing picture; `--json` gives the foot anchor and the lights) · `shapes render <model> -o previews/frames --clips C --directions D --style S` (one clip for the Motion and Frames tabs) · `project render-shapes <name> --style S` (Render all) · `project export-game <name> --kind K --name N --out <dir>` (Export sheets; Put it in the game uses `--out <game>/art/sprites`) · `game-preview --import` · `game-preview --skin K [--shot]` · `project reset <name>` (Start over) · the Frames tab's *Edit* (the editor below, on `previews/frames` or `frames/`) · `prompt --describe ... --kind sheet_px` (Copy prompt). Every lever writes the model file (`doc`): solid offsets and scales, materials, ramps (OK-HSL hue / lightness / contrast / steps over the imported ramp), lights, the glow effects, `parts.*.lag`, `view.turn_step / move_step / elevation`. |
 | Creatures | under construction: the same bench, the humanoid skeleton; `assets/shapes/necromancer_3d.shapes.json` as the example |
 | Objects | the model copied into `objects/<name>/` · `shapes still <model> --frame F --direction D` · `shapes object <model> -o <dir> --name N --directions S[,...] --style S --hr 2 [--game-objects <game>/art/objects/objects.json]` · `game-preview --place N` |

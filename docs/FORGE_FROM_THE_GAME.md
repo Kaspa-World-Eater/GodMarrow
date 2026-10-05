@@ -138,6 +138,14 @@ From `docs/wiki/01-rules-and-decisions.md`, the ones that bite art:
 
 ## 5. Where to look
 
+*PixelForge session, 2026-10-05, on 3.1 to 3.4:* landed on `track/finish`. The detail layer (`pixelforge shapes
+detail FILE --stock`, the Forge's Detail bench), the light and ink in the `godmarrow` preset, blood `runs` as a
+material option, and `pixelforge project build <character>` (import, the fixed animation set in eight views with the
+detail and the light, export, `skins.json`, the height check). The Hemomancer and the Keeper carry stock detail beside
+their files (`<name>.detail/`); `docs/screens/forge/hemomancer_detail_compare.png` and `keeper_detail_compare.png`
+show the painting, the flat model, the detail and the light side by side. The game session can retire
+`tools/paintover/*` once it has rebuilt the Hemomancer with `project build` (the scripts are left in place).
+
 - The Hemomancer's model and its history: `docs/concepts/hemomancer/shapes/README.md`.
 - The paint-over scripts and before/after pictures: `tools/paintover/`,
   `docs/concepts/hemomancer/shapes/paintover_*.png`.

@@ -46,6 +46,9 @@ def _painting(seed=0, w=160, h=300):
 
 
 # ------------------------------------------------------------------ the table
+REQUIRED = REQUIRED | {"form_light", "creases", "ink", "rim"}       # the light and ink of the solid renderer (3.2)
+
+
 def test_every_preset_has_every_key_and_sane_numbers():
     assert set(FIELDS) == REQUIRED
     for name, st in STYLES.items():

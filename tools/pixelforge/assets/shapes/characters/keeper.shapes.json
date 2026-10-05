@@ -32,7 +32,8 @@
     "#6b5a40"
    ],
    "texture": "grain",
-   "texture_strength": 0.5
+   "texture_strength": 0.5,
+   "detail": "hair"
   }
  },
  "parts": {
@@ -2396,5 +2397,112 @@
    4.2
   ],
   "colour": "#4b4a4f"
+ },
+ "detail": {
+  "head": {
+   "file": "keeper.detail/head.png"
+  },
+  "neck": {
+   "file": "keeper.detail/neck.png"
+  },
+  "veil": {
+   "file": "keeper.detail/veil.png"
+  },
+  "veil_long": {
+   "file": "keeper.detail/veil_long.png"
+  },
+  "chest": {
+   "file": "keeper.detail/chest.png"
+  },
+  "waist": {
+   "file": "keeper.detail/waist.png"
+  },
+  "pauldron.L": {
+   "file": "keeper.detail/pauldron.L.png"
+  },
+  "upper_arm.L": {
+   "file": "keeper.detail/upper_arm.L.png"
+  },
+  "bracer.L": {
+   "file": "keeper.detail/bracer.L.png"
+  },
+  "hand.L": {
+   "file": "keeper.detail/hand.L.png"
+  },
+  "hand_s.L": {
+   "file": "keeper.detail/hand_s.L.png"
+  },
+  "finger0.L": {
+   "file": "keeper.detail/finger0.L.png"
+  },
+  "finger1.L": {
+   "file": "keeper.detail/finger1.L.png"
+  },
+  "finger2.L": {
+   "file": "keeper.detail/finger2.L.png"
+  },
+  "thigh.L": {
+   "file": "keeper.detail/thigh.L.png"
+  },
+  "shin.L": {
+   "file": "keeper.detail/shin.L.png"
+  },
+  "foot.L": {
+   "file": "keeper.detail/foot.L.png"
+  },
+  "toe.L": {
+   "file": "keeper.detail/toe.L.png"
+  },
+  "pauldron.R": {
+   "file": "keeper.detail/pauldron.R.png"
+  },
+  "upper_arm.R": {
+   "file": "keeper.detail/upper_arm.R.png"
+  },
+  "bracer.R": {
+   "file": "keeper.detail/bracer.R.png"
+  },
+  "hand.R": {
+   "file": "keeper.detail/hand.R.png"
+  },
+  "hand_s.R": {
+   "file": "keeper.detail/hand_s.R.png"
+  },
+  "finger0.R": {
+   "file": "keeper.detail/finger0.R.png"
+  },
+  "finger1.R": {
+   "file": "keeper.detail/finger1.R.png"
+  },
+  "finger2.R": {
+   "file": "keeper.detail/finger2.R.png"
+  },
+  "thigh.R": {
+   "file": "keeper.detail/thigh.R.png"
+  },
+  "shin.R": {
+   "file": "keeper.detail/shin.R.png"
+  },
+  "foot.R": {
+   "file": "keeper.detail/foot.R.png"
+  },
+  "toe.R": {
+   "file": "keeper.detail/toe.R.png"
+  },
+  "tassets": {
+   "file": "keeper.detail/tassets.png"
+  },
+  "yoke": {
+   "file": "keeper.detail/yoke.png"
+  },
+  "skirt": {
+   "file": "keeper.detail/skirt.png"
+  },
+  "underskirt": {
+   "file": "keeper.detail/underskirt.png"
+  },
+  "hat": {
+   "file": "keeper.detail/hat.png"
+  }
  }
 }

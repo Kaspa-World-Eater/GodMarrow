@@ -43,7 +43,10 @@ func build_tab(_i: int) -> void:
 	for c in CHOICES:
 		items.append({"label": c[0], "cb": app.go.bind(c[1])})
 	add_choices(items, 3)
-	var bottom := [{"label": "Doctor", "cb": _doctor}, {"label": "Exit", "cb": func(): app.request_exit()}]
+	var bottom := [
+		{"label": "Detail bench", "cb": _open_detail, "hint": "Detail bench · paint the detail that rides a part of the last model on the bench (or the Keeper)"},
+		{"label": "Build", "cb": _build, "hint": "Build · the last character on the bench to the game in one go: every clip in eight views with the detail and the light, the atlas, skins.json, the height check"},
+		{"label": "Doctor", "cb": _doctor}, {"label": "Exit", "cb": func(): app.request_exit()}]
 	jobs_text = null
 	if doctoring:
 		state_line("Checking Claude on the bench: the executable, the sign-in, the registration, the MCP server, one real round trip. The checks land in the picture window.", "", 2)
@@ -251,6 +254,44 @@ static func _prompt_screen(r: Dictionary, a: Dictionary) -> String:
 		"missile", "spell_frames", "effect":
 			return "effects"
 	return "characters"
+
+# ------------------------------------------------------------------ the Detail bench and Build (docs/FORGE_FROM_THE_GAME.md 3.1, 3.4)
+func _last_character() -> Dictionary:
+	var lc = app.cfg.get("last_character", {})
+	return lc if lc is Dictionary else {}
+
+func _open_detail() -> void:
+	var lc := _last_character()
+	var model := String(lc.get("model", ""))
+	if model != "" and FileAccess.file_exists(model):
+		app.go("detail", {"model": model})
+	else:
+		app.go("detail", {})
+
+## `project build <character>`: the result's lines in the picture window; a warning stays on the state line (no pop-up)
+func _build() -> void:
+	var lc := _last_character()
+	var name := String(lc.get("name", ""))
+	if name == "":
+		app.say("Open a character on the Characters bench first; Build takes the last one.")
+		return
+	if not app.backend.python_ok():
+		app.say("Python was not found; see Settings.")
+		return
+	var cmd := ["project", "build", name, "-p", app.backend.project_dir]
+	if app.backend.game_ok():
+		cmd += ["--game", app.backend.game_dir]
+	run(cmd, "building %s for the game" % name, func(r: Dictionary):
+		if not r.get("ok", false):
+			return
+		var lines := PackedStringArray(["%s built" % name])
+		for l in r.get("lines", []):
+			lines.append(String(l))
+		app.scene.show_text(lines, "build")
+		var warnings: Array = r.get("warnings", [])
+		if not warnings.is_empty():
+			app.say(String(warnings[0]), 8.0)
+		app.remember_last("characters", {"title": name.capitalize(), "note": "built for the game", "png": "", "lines": r.get("lines", [])}))
 
 # ------------------------------------------------------------------ the Jobs panel
 ## the jobs to show: the ones running under this Forge first (live), then the project's list from disk (job list --json)
