@@ -13,7 +13,7 @@ extends "res://skills/ossumancer/tree_carapace.gd"
 ## Notches: every stroke cuts notches in what it strikes (1, 2 or 3 by tier). Nine closes the count: with Tally, the
 ## closing blow lands at double force. (The kept curse and the other curses come later.)
 
-const BLADE_T := [0.32, 0.78]          # seconds to reach tier 2 and tier 3 (before the level's speed-up)
+const BLADE_T := [0.22, 0.55]          # seconds to reach tier 2 and tier 3 (before the level's speed-up)
 const BLADE_POISE := [5.0, 7.0, 9.0]   # poise to fill each tier
 const BLADE_K := [1.0, 1.45, 2.1]      # damage of each tier's stroke, times the blade's own multiplier
 

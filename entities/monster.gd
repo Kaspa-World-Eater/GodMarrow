@@ -80,6 +80,7 @@ func setup(z: Zone, m: Dictionary) -> void:
 			sk = kind + "@" + rank
 	spr = AnimSprite.new(Data.sprite_set(sk))
 	add_child(spr)
+	_true_size()
 	spr.play("idle")
 	spr.t = randf()
 	spr.face = 1 if randf() < 0.5 else -1
@@ -88,6 +89,17 @@ func setup(z: Zone, m: Dictionary) -> void:
 	position = Iso.to_screen(tp)
 	add_to_group("monsters")
 	brain = Brain.make(self)
+
+## true size (Derek 2026-10-05: "I want the world true to size"). One yard is about 100 px on screen and a man stands
+## about two yards (the heroes, ~200 px). The browser's creature sprites were drawn about a quarter too small (a Husk
+## ~1.25 yd, a Warden ~1.5): they are drawn at true size here. Bosses and the PixelForge sets (already true) keep theirs.
+const TRUE_SIZE := 1.3
+func _true_size() -> void:
+	if boss or spr.set == null:
+		return
+	if str(spr.set.meta.get("source", "")) == "pixelforge":
+		return
+	spr.scale = Vector2(TRUE_SIZE, TRUE_SIZE)
 
 func _numbers() -> void:
 	var r := rank if rank in ["normal", "champion", "unique", "minion", "boss"] else "normal"

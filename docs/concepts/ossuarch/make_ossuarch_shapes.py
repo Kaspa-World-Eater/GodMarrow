@@ -214,7 +214,7 @@ spec = {
              "tally notches in nines; a long tattered teal cloak to the ground.",
     "mode": "solid", "size": [150, 170], "height": 120, "ground": 166, "axis": [CX, 0],
     "view": {"elevation": 12, "contrast": 1.4, "light": [-0.78, -0.62, 0.22]}, "outline": "#030305",
-    "skeleton": {"height": 128, "ground": 166, "cx": CX},
+    "skeleton": {"height": 120, "ground": 166, "cx": CX},   # true size: the standard man (Derek 2026-10-05); his helm makes him tall
     "materials": M,
     "parts": {
         "plume": {"bone": "head", "lag": {"frames": 2, "sway": 1.0}, "hang": 0.7},
