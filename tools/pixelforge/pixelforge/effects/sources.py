@@ -195,7 +195,7 @@ def _curve(kind: str, a: np.ndarray) -> np.ndarray:
     if kind == "fade_in":
         return a
     if kind == "grow_slow_shrink_fast":
-        return np.where(a < 0.7, (a / 0.7) ** 0.6, 1.0 - ((a - 0.7) / 0.3) ** 1.5)
+        return np.where(a < 0.7, (np.minimum(a, 0.7) / 0.7) ** 0.6, 1.0 - (np.clip(a - 0.7, 0, 0.3) / 0.3) ** 1.5)
     if kind == "pop":  # big at once, then shrinks
         return (1.0 - a) ** 0.5
     if kind == "s":

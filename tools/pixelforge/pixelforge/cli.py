@@ -835,6 +835,56 @@ def cmd_effect(a) -> None:
                          seed=a.seed, gif=not a.no_gif, tolerance=a.tolerance, atlas_dir=a.atlas))
 
 
+def cmd_effects(a) -> None:
+    """The effects engine: list | render NAME | graph FILE | preview NAME (a GIF beside the strip)."""
+    import json
+    from . import effects as E
+
+    def levers_of(pairs):
+        out = {}
+        for kv in pairs or []:
+            if "=" not in kv:
+                raise SystemExit(f"--lever takes k=v, not {kv!r}")
+            k, v = kv.split("=", 1)
+            out[k.strip()] = float(v)
+        return out
+
+    if a.action == "list":
+        t = E.library_table()
+        if a.family:
+            t["effects"] = [e for e in t["effects"] if e["family"] == a.family]
+        if getattr(a, "json", False):
+            _emit(a, t)
+            return
+        for fam in t["families"]:
+            rows = [e for e in t["effects"] if e["family"] == fam]
+            if rows:
+                print(f"{fam}:")
+                for e in rows:
+                    print(f"  {e['name']:14s} levers {', '.join(e['levers'])}  {e['frames']} frames at {e['fps']:g}  {e['size'][0]}x{e['size'][1]}{'' if e['loop'] else '  one-shot'}")
+        print(f"{len(t['effects'])} effects, {len(t['nodes'])} nodes, {len(t['palettes'])} palettes")
+        return
+    if a.action in ("render", "preview"):
+        from .effects.compat import resolve_kind
+        effect, lv0, pal = resolve_kind(a.name)
+        lv = {**lv0, **levers_of(a.lever)}
+        palette = a.palette or pal
+        r = E.render_effect(effect, a.out, levers=lv, size=tuple(a.size) if a.size else None, frames=a.frames, fps=a.fps, seed=a.seed,
+                            gif=a.gif or a.action == "preview", rotations=a.rotations, out_name=a.as_name or a.name, palette=palette)
+        _emit(a, r)
+        return
+    if a.action == "graph":
+        g = json.loads(Path(a.name).read_text())
+        name = a.as_name or Path(a.name).stem.replace(".graph", "")
+        r = E.render_graph(g, name, a.out, levers=levers_of(a.lever), size=tuple(a.size) if a.size else None, frames=a.frames, fps=a.fps, seed=a.seed,
+                           gif=a.gif, rotations=a.rotations)
+        _emit(a, r)
+        return
+    if a.action == "nodes":
+        _emit(a, {"ok": True, "nodes": E.node_table()})
+        return
+
+
 def cmd_spell(a) -> None:
     from . import spell
 
@@ -1289,6 +1339,15 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--width", type=int, default=None, help="game pixels across (default: the painting's own size)"); s.add_argument("--rotations", type=int, default=0, help="missiles: N headings")
     s.add_argument("--seed", type=int, default=1); s.add_argument("--tolerance", type=float, default=0.1); s.add_argument("--no-gif", action="store_true"); s.add_argument("--atlas", default=None); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_effect)
+
+    s = sub.add_parser("effects", help="the effects engine: list | render NAME | graph FILE | preview NAME (GIF) | nodes; levers by name")
+    s.add_argument("action", choices=["list", "render", "graph", "preview", "nodes"]); s.add_argument("name", nargs="?", default="", help="render/preview: an effect (or an old vfx kind); graph: a .graph.json")
+    s.add_argument("-o", "--out", default="art/fx"); s.add_argument("--lever", action="append", metavar="K=V", help="a lever, repeatable: --lever size=1.4 --lever speed=0.8")
+    s.add_argument("--as", dest="as_name", default="", help="the output name (default: the effect's)"); s.add_argument("--family", default="", help="list: one family")
+    s.add_argument("--palette", default="", help="swap every ramp: a palette name or dark->bright hex list a,b,c")
+    s.add_argument("--size", type=int, nargs=2, metavar=("W", "H")); s.add_argument("--frames", type=int, default=None); s.add_argument("--fps", type=float, default=None); s.add_argument("--seed", type=int, default=None)
+    s.add_argument("--gif", action="store_true"); s.add_argument("--rotations", type=int, default=0, help="a missile sheet with N headings"); s.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_effects)
 
     s = sub.add_parser("spell", help="spell designer: layered effects (fire + burst + embers...) -> strip + json (+ gif, atlas)")
     s.add_argument("action", choices=["new", "render", "presets"]); s.add_argument("name", nargs="?", default="fireball", help="new: the spell's name; render: a .spell.json")

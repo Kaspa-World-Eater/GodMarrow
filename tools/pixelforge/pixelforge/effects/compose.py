@@ -249,18 +249,53 @@ def picture(ctx: Context, path: str, frames: int = 1, scale: float = 1.0) -> np.
     return out
 
 
-@node("effect", "compose", "A whole library effect as one layer, rendered on this canvas with its levers; dx, dy move it, scale sizes it, start delays it (frames).", returns="image")
-def effect(ctx: Context, name: str, levers: dict | None = None, dx: float = 0.0, dy: float = 0.0, scale: float = 1.0, start: int = 0, seed: int = 0) -> np.ndarray:
+@node("effect", "compose",
+      "A whole library effect as one layer: rendered at its own size (times scale) for this many frames, set down with its anchor at the canvas "
+      "anchor + (dx, dy) px, turned by angle, flipped with flip_x; start delays it (frames; a one-shot stays dark before); palette swaps its ramps; "
+      "levers are the effect's own.", returns="image")
+def effect(ctx: Context, name: str, levers: dict | None = None, dx: float = 0.0, dy: float = 0.0, scale: float = 1.0, start: int = 0, seed: int = 0,
+           angle: float = 0.0, flip_x: bool = False, palette: str | None = None) -> np.ndarray:
     from .library import get_effect
     g = get_effect(name)
-    sub = Context(ctx.w, ctx.h, ctx.frames, ctx.fps, ctx.seed + int(seed), {**g.get("levers", {}), **(levers or {})}, ctx.anchor)
-    sub.levers = {k: (v["default"] if isinstance(v, dict) else v) for k, v in sub.levers.items()}
-    img, _, _ = evaluate({**g["graph"], "levers": {}}, sub.levers, ctx=sub)
-    if dx or dy or scale != 1.0:
-        img = transform(ctx, img, dx=dx, dy=dy, scale=scale)
+    graph = dict(g["graph"])
+    if palette:
+        graph["nodes"] = [({**n, "colours": palette} if n["op"] == "ramp" else n) for n in graph["nodes"]]
+    ew, eh = graph["size"]
+    sw, sh = max(1, int(round(ew * scale))), max(1, int(round(eh * scale)))
+    lv = {**{k: (v["default"] if isinstance(v, dict) else v) for k, v in g.get("levers", {}).items()}, **(levers or {})}
+    sub = Context(sw, sh, ctx.frames, ctx.fps, ctx.seed + int(seed), lv, (int(graph["anchor"][0] * scale), int(graph["anchor"][1] * scale)))
+    img, _, _ = evaluate({**graph, "size": [sw, sh], "frames": ctx.frames, "levers": {}}, lv, ctx=sub)
+    if img.ndim == 3:
+        a = (img >= 0.35).astype(np.uint8) * 255
+        grey = (np.clip(img, 0, 1) * 255).astype(np.uint8)
+        img = np.stack([grey, grey, grey, a], -1)
+    out = np.zeros((ctx.frames, ctx.h, ctx.w, 4), np.uint8)
+    ax, ay = sub.anchor
+    for t in range(ctx.frames):
+        im = PILImage.fromarray(img[t], "RGBA")
+        px, py = ax, ay
+        if flip_x:
+            im = im.transpose(PILImage.FLIP_LEFT_RIGHT)
+            px = im.width - ax
+        if angle:
+            w0, h0 = im.width, im.height
+            im = im.rotate(angle, resample=PILImage.NEAREST, expand=True)
+            # the anchor turned with the picture
+            c, s_ = math.cos(math.radians(angle)), math.sin(math.radians(angle))
+            rx, ry = px - w0 / 2, py - h0 / 2
+            px, py = im.width / 2 + rx * c + ry * s_, im.height / 2 - rx * s_ + ry * c
+        canvas = PILImage.new("RGBA", (ctx.w, ctx.h), (0, 0, 0, 0))
+        canvas.paste(im, (int(round(ctx.anchor[0] + dx - px)), int(round(ctx.anchor[1] + dy - py))), im)
+        out[t] = np.asarray(canvas)
     if start:
-        img = np.roll(img, int(start), axis=0)
-    return img
+        s0 = int(start)
+        if graph.get("loop", True):
+            out = np.roll(out, s0, axis=0)
+        else:
+            held = np.zeros_like(out)
+            held[s0:] = out[: max(0, ctx.frames - s0)]
+            out = held
+    return out
 
 
 @node("empty", "compose", "A clear canvas (image).", returns="image")
