@@ -121,7 +121,8 @@ func _open_chest(e: Dictionary) -> void:
 	mem["open"] = true
 	e["live"] = false
 	e["name"] = ""
-	_swap(e["node"], "chest_open")
+	if is_instance_valid(e["node"]):
+		_swap(e["node"], "chest_open")
 	Sfx.play("chest")
 	var L = _loot()
 	if L and L.has_method("open_chest"):

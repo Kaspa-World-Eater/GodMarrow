@@ -1,0 +1,1284 @@
+{
+ "name": "husk",
+ "about": "The Husk (hollow), drawn by hand from its Midjourney sheet: a tall gaunt dead thing, a skull deep in a hood of wrapped grave-cloth, the cloth wound round neck and shoulders, sinew bound in strips, very long thin arms with clawed hands past the knees, rags hanging in long points to the ground.",
+ "mode": "solid",
+ "size": [
+  138,
+  138
+ ],
+ "height": 120,
+ "ground": 134,
+ "axis": [
+  69.0,
+  0
+ ],
+ "view": {
+  "elevation": 12
+ },
+ "outline": "#050404",
+ "skeleton": {
+  "height": 120,
+  "ground": 134,
+  "cx": 69.0
+ },
+ "materials": {
+  "cloth": {
+   "ramp": [
+    "#141110",
+    "#211c18",
+    "#2f2822",
+    "#3d352d",
+    "#4b4238",
+    "#5a5044",
+    "#6a5f51"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.55
+  },
+  "sinew": {
+   "ramp": [
+    "#120e0c",
+    "#1f1915",
+    "#2d241e",
+    "#3b3027",
+    "#4a3d31",
+    "#594a3c"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.5
+  },
+  "skull": {
+   "ramp": [
+    "#2a241d",
+    "#463d32",
+    "#64584a",
+    "#82755f",
+    "#9d9077",
+    "#b7aa90"
+   ]
+  },
+  "void": {
+   "ramp": [
+    "#050404",
+    "#0b0908",
+    "#14100e"
+   ]
+  },
+  "claw": {
+   "ramp": [
+    "#0d0b0a",
+    "#1d1915",
+    "#332c25",
+    "#4b4136"
+   ]
+  }
+ },
+ "parts": {
+  "mantle": {
+   "bone": "spine.003",
+   "lag": {
+    "frames": 1,
+    "sway": 0.5
+   },
+   "hang": 0.5
+  },
+  "rags": {
+   "bone": "hips",
+   "lag": {
+    "frames": 2,
+    "sway": 0.8
+   },
+   "hang": 0.3
+  }
+ },
+ "shapes": [
+  {
+   "name": "skull",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    20.4,
+    5.4
+   ],
+   "radii": [
+    3.7,
+    4.6,
+    3.6
+   ],
+   "material": "skull",
+   "bone": "head",
+   "rules": [
+    {
+     "z": [
+      7.0,
+      null
+     ],
+     "near": [
+      [
+       [
+        67.4,
+        19.8,
+        null
+       ],
+       [
+        70.6,
+        19.8,
+        null
+       ]
+      ],
+      1.0
+     ],
+     "material": "void"
+    },
+    {
+     "z": [
+      7.6,
+      null
+     ],
+     "near": [
+      [
+       [
+        69.0,
+        22.0,
+        null
+       ],
+       [
+        69.0,
+        22.0,
+        null
+       ]
+      ],
+      0.6
+     ],
+     "material": "void"
+    },
+    {
+     "y": [
+      23.6,
+      null
+     ],
+     "every_x": [
+      1,
+      0
+     ],
+     "material": "void"
+    }
+   ]
+  },
+  {
+   "name": "jaw",
+   "kind": "capsule",
+   "a": [
+    67.2,
+    24.6,
+    6.6
+   ],
+   "b": [
+    70.8,
+    24.6,
+    6.6
+   ],
+   "r": 1.0,
+   "material": "skull",
+   "bone": "head",
+   "rules": [
+    {
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "hood",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    20.0,
+    1.6
+   ],
+   "radii": [
+    7.0,
+    8.6,
+    7.0
+   ],
+   "material": "cloth",
+   "bone": "head",
+   "rules": [
+    {
+     "z": [
+      4.4,
+      null
+     ],
+     "near": [
+      [
+       [
+        69.0,
+        17.0,
+        null
+       ],
+       [
+        69.0,
+        26.0,
+        null
+       ]
+      ],
+      4.2
+     ],
+     "material": "void",
+     "t": 0
+    },
+    {
+     "every_angle": [
+      11,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.06,
+      4,
+      2
+     ],
+     "t": -2,
+     "px": [
+      90,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "hood_peak",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    15.0,
+    0.4
+   ],
+   "b": [
+    69.0,
+    12.2,
+    -1.2
+   ],
+   "r": [
+    5.4,
+    3.4
+   ],
+   "material": "cloth",
+   "bone": "head"
+  },
+  {
+   "name": "wrap0",
+   "kind": "ring",
+   "y": [
+    25.0,
+    30.200000000000003
+   ],
+   "rx": [
+    7.2,
+    0.0
+   ],
+   "rz": [
+    6.8,
+    0.0
+   ],
+   "cz": 1.8,
+   "thickness": 2.4,
+   "material": "cloth",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "every_angle": [
+      9,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.08,
+      5,
+      0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "wrap1",
+   "kind": "ring",
+   "y": [
+    28.799999999999997,
+    34.0
+   ],
+   "rx": [
+    8.8,
+    0.0
+   ],
+   "rz": [
+    7.6,
+    0.0
+   ],
+   "cz": 1.0,
+   "thickness": 2.4,
+   "material": "cloth",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "every_angle": [
+      9,
+      1
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.08,
+      5,
+      1
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "wrap2",
+   "kind": "ring",
+   "y": [
+    32.8,
+    38.0
+   ],
+   "rx": [
+    10.0,
+    0.0
+   ],
+   "rz": [
+    8.0,
+    0.0
+   ],
+   "cz": 0.2,
+   "thickness": 2.4,
+   "material": "cloth",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "every_angle": [
+      9,
+      2
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.08,
+      5,
+      2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "wrap3",
+   "kind": "ring",
+   "y": [
+    36.6,
+    41.800000000000004
+   ],
+   "rx": [
+    10.6,
+    0.0
+   ],
+   "rz": [
+    8.0,
+    0.0
+   ],
+   "cz": -0.6,
+   "thickness": 2.4,
+   "material": "cloth",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "every_angle": [
+      9,
+      3
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.08,
+      5,
+      3
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "mantle",
+   "kind": "ring",
+   "y": [
+    36,
+    50
+   ],
+   "rx": [
+    9.0,
+    0.12
+   ],
+   "rz": [
+    7.4,
+    0.06
+   ],
+   "thickness": 1.6,
+   "hem": {
+    "tongues": 9,
+    "depth": 16,
+    "seed": 2
+   },
+   "holes": {
+    "p": 0.1,
+    "band": 16,
+    "seed": 4
+   },
+   "open": {
+    "angle": 1.1,
+    "below": 40
+   },
+   "material": "cloth",
+   "part": "mantle",
+   "bump": {
+    "folds": [
+     0.5,
+     8,
+     1.8
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      8,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "chest",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    44.0,
+    -0.6
+   ],
+   "radii": [
+    8.0,
+    9.4,
+    5.6
+   ],
+   "material": "sinew",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "z": [
+      3.0,
+      null
+     ],
+     "every_y": [
+      3,
+      1
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "waist",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    52,
+    -0.4
+   ],
+   "b": [
+    69.0,
+    66,
+    -1.4
+   ],
+   "r": [
+    5.0,
+    6.0
+   ],
+   "material": "sinew",
+   "bone": "spine.001",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "rags",
+   "kind": "ring",
+   "y": [
+    56,
+    92
+   ],
+   "rx": [
+    6.6,
+    0.05
+   ],
+   "rz": [
+    5.4,
+    0.04
+   ],
+   "thickness": 1.4,
+   "hem": {
+    "tongues": 11,
+    "depth": 40,
+    "seed": 6
+   },
+   "holes": {
+    "p": 0.12,
+    "band": 30,
+    "seed": 7
+   },
+   "material": "cloth",
+   "part": "rags",
+   "bump": {
+    "folds": [
+     0.6,
+     9,
+     2.0
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      7,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      3
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "rags_over",
+   "kind": "ring",
+   "y": [
+    54,
+    78
+   ],
+   "rx": [
+    7.6,
+    0.06
+   ],
+   "rz": [
+    6.2,
+    0.05
+   ],
+   "cz": 0.4,
+   "thickness": 1.4,
+   "hem": {
+    "tongues": 8,
+    "depth": 26,
+    "seed": 13
+   },
+   "material": "cloth",
+   "part": "rags",
+   "bump": {
+    "folds": [
+     0.6,
+     7,
+     2.0
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      6,
+      1
+     ],
+     "t": 1
+    },
+    {
+     "hem_band": [
+      0,
+      3
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "upper_arm.L",
+   "kind": "capsule",
+   "a": [
+    80.4,
+    36.0,
+    -4.0
+   ],
+   "b": [
+    84.6,
+    55.0,
+    -4.8
+   ],
+   "r": [
+    2.6,
+    1.9
+   ],
+   "material": "sinew",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "elbow.L",
+   "kind": "ellipsoid",
+   "centre": [
+    84.6,
+    55.0,
+    -4.8
+   ],
+   "radii": [
+    2.0,
+    2.0,
+    2.0
+   ],
+   "material": "sinew",
+   "bone": "upper_arm.L"
+  },
+  {
+   "name": "forearm.L",
+   "kind": "capsule",
+   "a": [
+    84.6,
+    55.0,
+    -4.8
+   ],
+   "b": [
+    88.6,
+    75.0,
+    -0.8
+   ],
+   "r": [
+    1.8,
+    1.6
+   ],
+   "material": "sinew",
+   "bone": "forearm.L",
+   "rules": [
+    {
+     "y": [
+      68,
+      null
+     ],
+     "every_y": [
+      1,
+      0
+     ],
+     "material": "cloth"
+    }
+   ]
+  },
+  {
+   "name": "hand.L",
+   "kind": "ellipsoid",
+   "centre": [
+    89.4,
+    79.0,
+    0.0
+   ],
+   "radii": [
+    2.4,
+    3.6,
+    1.6
+   ],
+   "material": "sinew",
+   "bone": "hand.L"
+  },
+  {
+   "name": "finger0.L",
+   "kind": "capsule",
+   "a": [
+    87.60000000000001,
+    81.6,
+    0.2
+   ],
+   "b": [
+    86.52000000000001,
+    90.0,
+    1.8
+   ],
+   "r": [
+    0.6,
+    0.35
+   ],
+   "material": "sinew",
+   "bone": "hand.L",
+   "px": [
+    90,
+    null
+   ],
+   "rules": [
+    {
+     "y": [
+      87.0,
+      null
+     ],
+     "material": "claw"
+    }
+   ]
+  },
+  {
+   "name": "finger1.L",
+   "kind": "capsule",
+   "a": [
+    88.80000000000001,
+    81.6,
+    0.2
+   ],
+   "b": [
+    88.44000000000001,
+    90.0,
+    1.8
+   ],
+   "r": [
+    0.6,
+    0.35
+   ],
+   "material": "sinew",
+   "bone": "hand.L",
+   "px": [
+    90,
+    null
+   ],
+   "rules": [
+    {
+     "y": [
+      87.0,
+      null
+     ],
+     "material": "claw"
+    }
+   ]
+  },
+  {
+   "name": "finger2.L",
+   "kind": "capsule",
+   "a": [
+    90.0,
+    81.6,
+    0.2
+   ],
+   "b": [
+    90.36,
+    90.0,
+    1.8
+   ],
+   "r": [
+    0.6,
+    0.35
+   ],
+   "material": "sinew",
+   "bone": "hand.L",
+   "px": [
+    90,
+    null
+   ],
+   "rules": [
+    {
+     "y": [
+      87.0,
+      null
+     ],
+     "material": "claw"
+    }
+   ]
+  },
+  {
+   "name": "finger3.L",
+   "kind": "capsule",
+   "a": [
+    91.2,
+    81.6,
+    0.2
+   ],
+   "b": [
+    92.28,
+    90.0,
+    1.8
+   ],
+   "r": [
+    0.6,
+    0.35
+   ],
+   "material": "sinew",
+   "bone": "hand.L",
+   "px": [
+    90,
+    null
+   ],
+   "rules": [
+    {
+     "y": [
+      87.0,
+      null
+     ],
+     "material": "claw"
+    }
+   ]
+  },
+  {
+   "name": "thigh.L",
+   "kind": "capsule",
+   "a": [
+    73.0,
+    69.7,
+    0.1
+   ],
+   "b": [
+    73.0,
+    97.3,
+    -0.1
+   ],
+   "r": [
+    2.6,
+    2.0
+   ],
+   "material": "sinew",
+   "bone": "thigh.L"
+  },
+  {
+   "name": "shin.L",
+   "kind": "capsule",
+   "a": [
+    73.0,
+    97.3,
+    -0.1
+   ],
+   "b": [
+    73.0,
+    126.8,
+    -2.4
+   ],
+   "r": [
+    1.9,
+    1.6
+   ],
+   "material": "sinew",
+   "bone": "shin.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "foot.L",
+   "kind": "box",
+   "centre": [
+    73.0,
+    131.0,
+    2.6
+   ],
+   "half": [
+    2.4,
+    2.0,
+    5.0
+   ],
+   "round": 1.4,
+   "material": "sinew",
+   "bone": "foot.L",
+   "rules": [
+    {
+     "dy": [
+      1.2,
+      null
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "upper_arm.R",
+   "kind": "capsule",
+   "a": [
+    57.599999999999994,
+    36.0,
+    -4.0
+   ],
+   "b": [
+    53.400000000000006,
+    55.0,
+    -4.8
+   ],
+   "r": [
+    2.6,
+    1.9
+   ],
+   "material": "sinew",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "elbow.R",
+   "kind": "ellipsoid",
+   "centre": [
+    53.400000000000006,
+    55.0,
+    -4.8
+   ],
+   "radii": [
+    2.0,
+    2.0,
+    2.0
+   ],
+   "material": "sinew",
+   "bone": "upper_arm.R"
+  },
+  {
+   "name": "forearm.R",
+   "kind": "capsule",
+   "a": [
+    53.400000000000006,
+    55.0,
+    -4.8
+   ],
+   "b": [
+    49.400000000000006,
+    75.0,
+    -0.8
+   ],
+   "r": [
+    1.8,
+    1.6
+   ],
+   "material": "sinew",
+   "bone": "forearm.R",
+   "rules": [
+    {
+     "y": [
+      68,
+      null
+     ],
+     "every_y": [
+      1,
+      0
+     ],
+     "material": "cloth"
+    }
+   ]
+  },
+  {
+   "name": "hand.R",
+   "kind": "ellipsoid",
+   "centre": [
+    48.599999999999994,
+    79.0,
+    0.0
+   ],
+   "radii": [
+    2.4,
+    3.6,
+    1.6
+   ],
+   "material": "sinew",
+   "bone": "hand.R"
+  },
+  {
+   "name": "finger0.R",
+   "kind": "capsule",
+   "a": [
+    50.39999999999999,
+    81.6,
+    0.2
+   ],
+   "b": [
+    51.47999999999999,
+    90.0,
+    1.8
+   ],
+   "r": [
+    0.6,
+    0.35
+   ],
+   "material": "sinew",
+   "bone": "hand.R",
+   "px": [
+    90,
+    null
+   ],
+   "rules": [
+    {
+     "y": [
+      87.0,
+      null
+     ],
+     "material": "claw"
+    }
+   ]
+  },
+  {
+   "name": "finger1.R",
+   "kind": "capsule",
+   "a": [
+    49.19999999999999,
+    81.6,
+    0.2
+   ],
+   "b": [
+    49.55999999999999,
+    90.0,
+    1.8
+   ],
+   "r": [
+    0.6,
+    0.35
+   ],
+   "material": "sinew",
+   "bone": "hand.R",
+   "px": [
+    90,
+    null
+   ],
+   "rules": [
+    {
+     "y": [
+      87.0,
+      null
+     ],
+     "material": "claw"
+    }
+   ]
+  },
+  {
+   "name": "finger2.R",
+   "kind": "capsule",
+   "a": [
+    48.0,
+    81.6,
+    0.2
+   ],
+   "b": [
+    47.64,
+    90.0,
+    1.8
+   ],
+   "r": [
+    0.6,
+    0.35
+   ],
+   "material": "sinew",
+   "bone": "hand.R",
+   "px": [
+    90,
+    null
+   ],
+   "rules": [
+    {
+     "y": [
+      87.0,
+      null
+     ],
+     "material": "claw"
+    }
+   ]
+  },
+  {
+   "name": "finger3.R",
+   "kind": "capsule",
+   "a": [
+    46.8,
+    81.6,
+    0.2
+   ],
+   "b": [
+    45.72,
+    90.0,
+    1.8
+   ],
+   "r": [
+    0.6,
+    0.35
+   ],
+   "material": "sinew",
+   "bone": "hand.R",
+   "px": [
+    90,
+    null
+   ],
+   "rules": [
+    {
+     "y": [
+      87.0,
+      null
+     ],
+     "material": "claw"
+    }
+   ]
+  },
+  {
+   "name": "thigh.R",
+   "kind": "capsule",
+   "a": [
+    65.0,
+    69.7,
+    0.1
+   ],
+   "b": [
+    65.0,
+    97.3,
+    -0.1
+   ],
+   "r": [
+    2.6,
+    2.0
+   ],
+   "material": "sinew",
+   "bone": "thigh.R"
+  },
+  {
+   "name": "shin.R",
+   "kind": "capsule",
+   "a": [
+    65.0,
+    97.3,
+    -0.1
+   ],
+   "b": [
+    65.0,
+    126.8,
+    -2.4
+   ],
+   "r": [
+    1.9,
+    1.6
+   ],
+   "material": "sinew",
+   "bone": "shin.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "foot.R",
+   "kind": "box",
+   "centre": [
+    65.0,
+    131.0,
+    2.6
+   ],
+   "half": [
+    2.4,
+    2.0,
+    5.0
+   ],
+   "round": 1.4,
+   "material": "sinew",
+   "bone": "foot.R",
+   "rules": [
+    {
+     "dy": [
+      1.2,
+      null
+     ],
+     "t": -2
+    }
+   ]
+  }
+ ],
+ "clips": {
+  "walk": "walk_hunched",
+  "attack": "attack"
+ },
+ "effects": [],
+ "shadow": {
+  "radii": [
+   16,
+   3.6
+  ],
+  "colour": "#4b4a4f"
+ },
+ "detail": {
+  "hood": {
+   "file": "husk.detail/hood.png"
+  },
+  "hood_peak": {
+   "file": "husk.detail/hood_peak.png"
+  },
+  "wrap0": {
+   "file": "husk.detail/wrap0.png"
+  },
+  "wrap1": {
+   "file": "husk.detail/wrap1.png"
+  },
+  "wrap2": {
+   "file": "husk.detail/wrap2.png"
+  },
+  "wrap3": {
+   "file": "husk.detail/wrap3.png"
+  },
+  "mantle": {
+   "file": "husk.detail/mantle.png"
+  },
+  "rags": {
+   "file": "husk.detail/rags.png"
+  }
+ }
+}

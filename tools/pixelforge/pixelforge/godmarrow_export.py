@@ -227,6 +227,18 @@ def export_godmarrow(
             ma = meta_anims.setdefault(anim, {"frames": n_dst, "views": []})
             if view not in ma["views"]:
                 ma["views"].append(view)
+        # the wind-up (the game's creatures play "wind" before every blow, the tell): the attack's first half, the
+        # pull-back; the game stretches it to each creature's wind-up time
+        if "atk" in meta_anims and "wind" not in meta_anims:
+            n_wind = max(2, meta_anims["atk"]["frames"] // 2)
+            for key, fr in [(k, f) for k, f in packed_frames if k.startswith("atk/")]:
+                _, view, i = key.split("/")
+                if int(i) < n_wind:
+                    wk = f"wind/{view}/{i}"
+                    packed_frames.append((wk, fr))
+                    idx[wk] = list(idx[key])
+            meta_anims["wind"] = {"frames": n_wind, "views": list(meta_anims["atk"]["views"])}
+            anim_fps["wind"] = anim_fps.get("atk", clip_fps)
         for ma in meta_anims.values():
             ma["views"].sort(key=VIEW_ORDER.index)
         meta_anims["__fps__"] = anim_fps

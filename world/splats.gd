@@ -58,5 +58,13 @@ func _ellipse(c: Vector2, rx: float, ry: float, col: Color) -> void:
 	var pts := PackedVector2Array()
 	for i in 14:
 		var a := TAU * i / 14.0
-		pts.append((c + Vector2(cos(a) * rx, sin(a) * ry)).snapped(Vector2(Iso.WPX, Iso.WPX)))
+		var q := (c + Vector2(cos(a) * rx, sin(a) * ry)).snapped(Vector2(Iso.WPX, Iso.WPX))
+		if pts.is_empty() or (q != pts[pts.size() - 1] and q != pts[0]):
+			pts.append(q)
+	if pts.size() < 3 or Geometry2D.triangulate_polygon(pts).is_empty():
+		# a drop too small for the pixel grid to hold its outline: a block of art pixels instead
+		var W := Iso.WPX
+		var hs := Vector2(maxf(W, snappedf(rx, W)), maxf(W, snappedf(ry, W)))
+		draw_rect(Rect2((c - hs).snapped(Vector2(W, W)), hs * 2.0), col)
+		return
 	draw_colored_polygon(pts, col)

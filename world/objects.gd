@@ -30,6 +30,12 @@ static func attach(main: Node, zone: Node, hero: Node) -> void:
 			t.set("main", main)
 			t.set("which", a.trim_prefix("--objtest="))
 			main.add_child(t)
+		# the walker: a scripted pilgrim through Act I (world/objects/walker.gd)
+		if (a == "--walk" or a.begins_with("--walk=")) and main.get_node_or_null("Walker") == null:
+			var w := Node.new()
+			w.set_script(load("res://world/objects/walker.gd"))
+			w.set("main", main)
+			main.add_child(w)
 	var mgr := zone.get_node_or_null("WorldObjects")
 	if mgr:
 		mgr.rebind(hero)

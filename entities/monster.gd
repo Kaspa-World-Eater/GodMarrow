@@ -348,7 +348,8 @@ func step_toward(p: Vector2, dt: float, spd: float = -1.0) -> bool:
 	return true
 
 func look(dir: Vector2) -> void:
-	var r := AnimSprite.mon_view(dir, face)
+	# a hand-drawn set (PixelForge, eight views) turns eight ways; the old painted sets have front and back only
+	var r := AnimSprite.hero_view(dir, face, spr.set) if spr and spr.set and spr.set.has_view("side") else AnimSprite.mon_view(dir, face)
 	if r[0] != "":
 		view = r[0]
 		face = r[1]
