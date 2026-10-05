@@ -3,14 +3,17 @@
 Pixel-art sprite pipeline for Godmarrow. **The character road is shape
 sprites**: a `.shapes.json` of solids on the standard skeleton → the renderer
 draws it as pixel art → the motion clips give every frame in 8 directions →
-`export-game`. `pixelforge shapes ...` (template, draft, measure, compare,
+`export-game`. `pixelforge shapes ...` (template, measure, compare, detail,
 sample-materials, validate, still, preview, render) and the Forge app's
 Characters bench are that road, and characters default to the game's hero
-height (the `godmarrow` preset, 195 px). The old road (Midjourney image →
-cutouts → 3D via Blender + Mixamo → renders → pixel frames), reached by
-`pixelforge hero` and the classic Studio's steps, stays for props and for
-reference; `hero` says so when run. A painting is measured (`shapes measure`)
-and compared against (`shapes compare`), never carved, for a character.
+height (the `godmarrow` preset, 195 px). Claude authors the model by hand
+against the painting; `shapes detail` paints the detail layer that rides the
+parts; `project build <character>` takes a model to the game. The old road
+(cutouts → 3D via Blender + Mixamo → renders), the kit props, the automatic
+drafts (`shapes draft`, `character from-picture`) and the old music generator
+are retired behind `PIXELFORGE_OLD_ROADS=1` (`old_roads.py`). A painting is
+measured (`shapes measure`) and compared against (`shapes compare`), never
+carved or drafted from, for a character.
 
 - **Operating the pipeline for a user:** read `docs/GUIDE_AI.md` first. It has
   every command, the project layout, the standard procedure and the failure

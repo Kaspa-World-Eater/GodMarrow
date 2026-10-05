@@ -44,6 +44,30 @@ var _queued: Callable           # a request made while a job ran; it runs when t
 var _request_gen := 0           # the debounce: a request that a newer one followed within its delay never runs
 var _ticket := 0                # the newest request's number; a result that comes back for an older one is stale
 
+## the retired roads (docs/FORGE_FROM_THE_GAME.md section 2; pixelforge/old_roads.py): the automatic drafting of a character
+## from a picture or a sentence. Their choices and hints stay off every bench unless the environment sets
+## PIXELFORGE_OLD_ROADS=1, the same flag the command line honours.
+const RETIRED_CHOICES := ["Choose a picture", "Start from a picture", "Measure again", "Sample materials again"]
+const RETIRED_LINES := {
+	"Drop a picture (one figure, or a turnaround sheet) and it becomes a character by itself; or drop a shape model (.shapes.json), or describe one on Home.":
+		"Drop a shape model (.shapes.json), start from the Keeper, or drop a painting to stand beside the model as its reference.",
+	"Drop a shape model (.shapes.json) to stand beside it, draft one from a sentence on Home, or start from the Keeper.":
+		"Drop a shape model (.shapes.json) to stand beside it, or start from the Keeper; Claude authors the model by hand against it.",
+}
+
+static func old_roads_on() -> bool:
+	var v := OS.get_environment("PIXELFORGE_OLD_ROADS").strip_edges().to_lower()
+	return v in ["1", "true", "yes", "on"]
+
+## the words of a line with the retired roads' sentences replaced (a bench's own text passes through)
+static func retire_text(text: String) -> String:
+	if old_roads_on():
+		return text
+	for k in RETIRED_LINES:
+		if text.contains(k):
+			return text.replace(k, RETIRED_LINES[k])
+	return text
+
 func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_PASS
 
@@ -178,7 +202,7 @@ func state_line(text: String, variation: String = "", lines: int = 1) -> Control
 		c = T.DIM
 	elif variation == "Accent":
 		c = T.ACCENT
-	l.init(text, c, lines)
+	l.init(retire_text(text), c, lines)
 	rows.add_child(l)
 	state_label = l
 	return l
@@ -272,6 +296,12 @@ func add_spacer() -> void:
 
 ## the choices line: [{label, cb}] in `cols` columns
 func add_choices(items: Array, cols: int = 0) -> Control:
+	if not old_roads_on():
+		var kept := []
+		for it in items:
+			if not (it is Dictionary and String(it.get("label", "")) in RETIRED_CHOICES):
+				kept.append(it)
+		items = kept
 	var c := W.Choices.new()
 	if cols > 0:
 		c.setup(items, cols, app)

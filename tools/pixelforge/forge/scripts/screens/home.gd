@@ -70,7 +70,7 @@ func build_tab(_i: int) -> void:
 	describe.placeholder_text = "a hooded necromancer with a skull-topped staff burning green"
 	describe.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	describe.text_submitted.connect(func(_t): _describe())
-	describe.focus_entered.connect(func(): app.say_hint("Enter drafts it and opens its workbench; Esc leaves the line"))
+	describe.focus_entered.connect(func(): app.say_hint("Enter opens the workbench for it; Esc leaves the line"))
 	describe.focus_exited.connect(func(): app.set_hint(hint_text))
 	row.add_child(describe)
 	rows.add_child(row)
@@ -299,8 +299,8 @@ func on_drop(paths: PackedStringArray) -> void:
 	if p.ends_with(".shapes.json") or p.ends_with(".json"):
 		app.go("characters", {"model": p})
 		return
-	# a picture is a character's: the Characters bench cuts it out, measures it, drafts and colours a shape model from
-	# it and stands the model beside it (several pictures at once are a sheet's views: front, side, back)
+	# a picture is a character's reference: the Characters bench stands it beside the model, as it is (the automatic
+	# draft from a picture is a retired road; with PIXELFORGE_OLD_ROADS=1 the old road takes the pictures again)
 	var pics: PackedStringArray = []
 	for q in paths:
 		if q.get_extension().to_lower() in ["png", "jpg", "jpeg", "webp", "bmp", "gif"]:
@@ -308,4 +308,7 @@ func on_drop(paths: PackedStringArray) -> void:
 	if pics.is_empty():
 		app.say("That is not a picture the Forge can read (PNG, JPG or WEBP).")
 		return
-	app.go("characters", {"pictures": pics})
+	if old_roads_on():
+		app.go("characters", {"pictures": pics})
+	else:
+		app.go("characters", {"painting": pics[0]})

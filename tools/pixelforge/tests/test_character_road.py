@@ -19,6 +19,7 @@ REPO = HERE.parents[2]
 def test_hero_prints_the_old_road_note_unless_cutout(monkeypatch, capsys):
     import pixelforge.hero as hero
 
+    monkeypatch.setenv("PIXELFORGE_OLD_ROADS", "1")      # the retired cutout road, reopened for the test
     monkeypatch.setattr(hero, "make_hero", lambda *a, **k: {"ok": True, "stub": True})
     main(["hero", "sheet.png", "x", "--json"])
     err = capsys.readouterr().err
@@ -32,7 +33,8 @@ def test_docs_point_at_the_shape_road():
         text = f.read_text().lower()
         assert "shape" in text and ("character road" in text or "characters are shape" in text or "characters are made as shape" in text), f
     ai = (HERE.parent / "docs" / "GUIDE_AI.md").read_text()
-    assert "old" in ai.split("pixelforge hero <sheet.png>")[1].split("\n")[0].lower()
+    assert "## Retired roads" in ai and "PIXELFORGE_OLD_ROADS" in ai.split("## Retired roads")[1]      # the cutout road is named only there
+    assert "pixelforge hero" not in ai.split("## Retired roads")[0]
 
 
 # ------------------------------------------------------------------------------------------- 2. the game's default height
@@ -150,8 +152,13 @@ def test_draft_from_measure_sizes_the_rings_and_limbs(tmp_path, capsys):
     assert skirt["rx"][0] + skirt["rx"][1] * (skirt["y"][1] - skirt["y"][0]) == pytest.approx(m["hem"]["w"] * H / 2, abs=0.1)
     assert by(sized, "belt")["rx"] == pytest.approx(m["hips"]["w"] * H / 2, abs=0.02)
     assert "measured" in sized and not S.validate(sized)
-    # the CLI road
-    main(["shapes", "draft", "a warrior in a long robe", "-o", str(tmp_path / "w.shapes.json"), "--from-measure", str(tmp_path / "m.json")])
+    # the CLI road (retired: it answers only with the flag set)
+    import os
+    os.environ["PIXELFORGE_OLD_ROADS"] = "1"
+    try:
+        main(["shapes", "draft", "a warrior in a long robe", "-o", str(tmp_path / "w.shapes.json"), "--from-measure", str(tmp_path / "m.json")])
+    finally:
+        os.environ.pop("PIXELFORGE_OLD_ROADS", None)
     assert "sized from the measured painting" in capsys.readouterr().out and (tmp_path / "w.shapes.json").exists()
 
 

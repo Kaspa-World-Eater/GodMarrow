@@ -590,6 +590,10 @@ def draft(text: str, image: str | Path | None = None, what: str | None = None) -
     """The dispatcher: ``what`` forces spell | skin | prompt | music | shapes; otherwise the words decide."""
     what = what or classify(text)
     if what == "shapes":
+        from .old_roads import old_roads_on, retired_line
+        if not old_roads_on():
+            # the automatic draft is retired: the words go to the Characters bench as a description, not as a model
+            return {"what": "shapes", "ok": True, "text": text, "read": ["a character to author by hand as a shape model"], "retired": retired_line("draft")}
         return draft_shapes(text)
     if what == "skin":
         return draft_skin(text, image)

@@ -1976,3 +1976,18 @@ before anything else in §7.
   rewrite with manuals (User Manual, Operator Manual for AI, Reference, Art Direction, Developer Guide), written as a
   shipped product with no history in it.
 - The game is another session's (`docs/GAME_HANDOFF.md`); the lore is another's (`docs/codex/LORE_REWRITE_GUIDE.md`).
+
+**7.32 (2026-10-05, PixelForge session, `track/finish`): the cuts the game asked for (`docs/FORGE_FROM_THE_GAME.md`
+section 2).** The roads that drew characters or props by themselves are behind one environment flag,
+`PIXELFORGE_OLD_ROADS=1` (`tools/pixelforge/pixelforge/old_roads.py`): `pixelforge hero` (the cutout road), `prop3d`
+and `tiles3d` with the fetched kits, `shapes draft` and `character from-picture|measure|sample|compare` (the drafts),
+the describe line's shape drafts, and the old music generator (`music/score.py`). Without the flag each entry point
+prints one line that names the flag and stops (`--json` gives `{"ok": false, "retired": ...}`); the Forge app honours
+the same variable (`screen.gd` drops the retired choices, a picture dropped on Home or the Characters bench is the
+reference and nothing else). `shapes measure`, `sample-materials` and `compare` stay as tools. The music keeps one
+engine: the game's 21 cues (`music <cue> | all | act`, `tools/make_music.py`) render from the song library through
+`music/cues.py` (a cue → song table, `audio/music/cues.json` overrides it) as `.ogg`/`.wav` with `music.json`, the
+files the game loads today. The guides' main flow no longer names the retired roads; a "Retired roads" paragraph at
+the end of each names the flag. Tests of the retired roads are `skipif` on the flag; `tests/test_old_roads.py` covers
+the guards, the cue table and a cue render.
+

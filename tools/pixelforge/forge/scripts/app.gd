@@ -1181,6 +1181,22 @@ func _on_files_dropped(paths: PackedStringArray) -> void:
 	chrome.queue_redraw()
 	if current:
 		audio.blip("drop")
+		if current.screen_name == "characters" and not current.old_roads_on():
+			# a picture dropped on the Characters bench is the reference and nothing else (the automatic draft from a
+			# picture is retired): the bench opens again with it beside whatever model stands there
+			var pics: PackedStringArray = []
+			for q in paths:
+				if q.get_extension().to_lower() in ["png", "jpg", "jpeg", "webp", "bmp", "gif"]:
+					pics.append(q)
+			if not pics.is_empty():
+				var a: Dictionary = current.args.duplicate()
+				a.erase("pictures")
+				a["painting"] = pics[0]
+				var model_file := String(current.state.get("model_file", ""))
+				if model_file != "" and not a.has("character"):
+					a["model"] = model_file
+				_show("characters", a, false)
+				return
 		current.on_drop(paths)
 
 # ------------------------------------------------------------------ helpers for screens

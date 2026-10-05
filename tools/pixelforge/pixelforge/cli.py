@@ -434,6 +434,7 @@ def cmd_prop(a) -> None:
 
 
 def cmd_tiles3d(a) -> None:
+    from .old_roads import retired; retired("tiles3d", a)
     from .tiles3d import make_tiles3d
 
     _emit(a, make_tiles3d(a.material, a.second, a.name, a.out, tiles=a.tiles, seed=a.seed, ppu=a.ppu, res_dir=a.res_dir))
@@ -444,6 +445,7 @@ HERO_NOTE = ("note: 'hero' is the old cutout road (cutouts -> Blender -> Mixamo 
 
 
 def cmd_hero(a) -> None:
+    from .old_roads import retired; retired("hero", a)
     from .hero import make_hero
 
     if not getattr(a, "cutout", False):
@@ -471,6 +473,7 @@ def cmd_artlist(a) -> None:
 
 
 def cmd_prop3d(a) -> None:
+    from .old_roads import retired; retired("prop3d", a)
     from .prop3d import make_prop3d
 
     r = make_prop3d(a.model, a.name, a.out, height=a.height, yaw=a.yaw, ppu=a.ppu, reference=a.reference, strength=a.strength, scale=a.scale,
@@ -797,6 +800,7 @@ def cmd_shapes(a) -> None:
         return
     if sub == "draft":
         from . import describe
+        from .old_roads import retired; retired("draft", a)
         r = describe.draft_shapes(a.text, out=a.out, height=a.height, measure=a.from_measure)
         if a.json:
             _emit(a, r)
@@ -888,6 +892,7 @@ def cmd_character(a) -> None:
     from . import api, picture_road
 
     sub = a.character_cmd
+    from .old_roads import retired; retired("from-picture", a)
     progress = _picture_progress if a.json else None
     log = None if a.json else print
     try:

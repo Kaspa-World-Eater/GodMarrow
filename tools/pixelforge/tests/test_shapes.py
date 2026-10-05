@@ -442,7 +442,15 @@ def test_cli_shapes_commands(tmp_path, capsys):
     assert "2 clips x 2 directions" in capsys.readouterr().out
     main(["shapes", "template", "--height", "100", "--json"])
     assert json.loads(capsys.readouterr().out)["height"] == 100
-    main(["shapes", "draft", "a knight with a sword", "-o", str(tmp_path / "d.shapes.json")])
+    with pytest.raises(SystemExit):                      # the draft is retired: one line and exit 2
+        main(["shapes", "draft", "a knight with a sword", "-o", str(tmp_path / "d.shapes.json")])
+    assert "retired" in capsys.readouterr().err and not (tmp_path / "d.shapes.json").exists()
+    import os
+    os.environ["PIXELFORGE_OLD_ROADS"] = "1"
+    try:
+        main(["shapes", "draft", "a knight with a sword", "-o", str(tmp_path / "d.shapes.json")])
+    finally:
+        os.environ.pop("PIXELFORGE_OLD_ROADS", None)
     assert (tmp_path / "d.shapes.json").exists()
     with pytest.raises(SystemExit):
         main(["shapes", "validate", str(tmp_path / "d.shapes.json").replace("d.shapes", "missing")])

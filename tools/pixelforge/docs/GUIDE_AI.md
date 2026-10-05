@@ -12,39 +12,21 @@ sync with the app the person is looking at.
 `pixelforge shapes ...` are it), and the one to take for every hero, creature and NPC:
 
 ```
-sentence / painting  ──►  .shapes.json  ──►  pixel frames (8 directions, every clip)  ──►  the game's atlas
-  shapes draft            validate, still,      shapes render / project render-shapes          project export-game
-  shapes measure          preview, compare                 (godmarrow preset, 195 px)             (+ skins.json entry)
+painting (the reference)  ──►  .shapes.json, written by hand  ──►  pixel frames (8 directions, every clip)  ──►  the game's atlas
+  shapes measure, compare       validate, still, preview,         shapes render / project render-shapes          project export-game
+  shapes sample-materials       detail (the painted layer)        (godmarrow preset, 195 px, light and ink)       (+ skins.json entry)
+                                                                  or all of it: project build <character>
 ```
 
-A painting is the reference: `shapes measure` reads its widths into a measurements file that `shapes draft
---from-measure` sizes the figure from, `shapes sample-materials` takes its colours into the ramps, `shapes compare`
-lays it beside the sprite. Nothing is cut out or carved. See "Shape sprites" below for the format and every command.
+A painting is the reference and nothing else: `shapes measure` reads its widths into a measurements file, `shapes
+sample-materials` takes its colours into the ramps, `shapes compare` lays it beside the sprite with the silhouette
+overlap. Nothing is cut out, carved or drafted from it: **Claude authors the model by hand** against the painting (a
+generator script in the character's folder, three rounds of still, compare, edit; the Hemomancer is the worked example,
+`docs/concepts/hemomancer/shapes/README.md`), then paints the detail layer (`shapes detail`) and builds it for the game
+(`project build`). See "Shape sprites" below for the format and every command. Steps needing a person: making
+Midjourney paintings. Everything else is yours; the pipeline runs unattended, and no Blender or Mixamo is involved.
 
-**The old road** (below: cutouts → palette → Blender model → Mixamo → renders → pixelate) stays for props (`object`)
-and for reference. `pixelforge hero` runs it in one go and prints a note saying so (pass `--cutout` to silence it);
-it is what made Hemomancer test 1 a blob, and it is not the way to make a character any more.
-
-```
-Midjourney image(s)  ──►  cutouts  ──►  palette  ──►  [3D model ─► Mixamo ─► renders]  ──►  pixel frames  ──►  Godot files
-   (person)               split       palette        model     rig(person)   render         pixelate           export
-```
-
-Two paths of the old road share the first steps:
-
-- **Quick path** (no Blender): one image → `still` → sprite, procedural
-  animation, Godot export. Use it to show results fast and to judge the look.
-- **Full path**: sheet → model → Mixamo (person) → render → pixelate → export.
-  Gives every animation from 8 directions with one consistent look.
-
-Steps needing a person (you cannot do them): making Midjourney images and
-installing Blender. Everything else is yours; the pipeline runs unattended.
-Mixamo is optional (mocap upgrade), never required.
-
-- **Shape sprites** (the character road, no cutout, no Blender): you write a `.shapes.json` (shapes with materials,
-  bound to bones), the renderer draws it as pixel art and the motion clips give every frame in 8 directions, at the
-  game's hero height by default. See "Shape sprites" below; `pixelforge shapes --help`; the step-by-step procedure
-  for a fresh session is the game repository's `docs/GUIDE_SESSION.md`.
+The roads that drew characters automatically (the cutout road, the drafts) are retired: "Retired roads" at the end.
 
 ## Install / environment
 
@@ -169,34 +151,27 @@ pixelforge music export out/piece.song.json -o <game>/audio/music --name a1_town
 pixelforge music list [--genre boss]                                               # the library, genres, moods, instruments, scales, lanes, fx, ops
 pixelforge music load forge_home -o out/forge_home.song.json                       # a library piece to edit
 pixelforge music measure docs/refs/forge_music_reference.mp3 out/piece.wav         # loudness, bands, centroid, key, tempo; the first is the reference
-pixelforge music list-cues; pixelforge music a1_wild --seed 5 --set bpm=64 --play   # the game's older score (21 cues, the knob sheet) is unchanged
+pixelforge music list-cues; pixelforge music a1_wild --play; pixelforge music act --act 2; pixelforge music all -o <game>/audio/music --format ogg   # the game's 21 cues, each a library song (music/cues.py maps cue -> song; <out>/cues.json overrides)
 pixelforge portrait views/front.png mystic -o art/portraits [--sizes 48 96]        # head-and-shoulders portraits
 pixelforge compare before.png after.png -o cmp.png                                 # strip (+GIF for frame folders) + mean difference
 pixelforge doctor [--project <folder>]                                             # what works on this machine, with fixes
 pixelforge godot-addon <godot project>                                             # PFSpriteSet / PFFx / PFObjects loaders into addons/pixelforge
-pixelforge prop3d <model.glb|.fbx|.obj> <name> -o art/objects --height 3.4 [--game-objects objects.json]   # REAL props: game camera, lantern light rig, grime + bump, graded to the painting, pixelated
-pixelforge tiles3d grass stone moor_grass -o art/tiles [--tiles 6]                 # ground rendered in 3D with the same light; 36 variants + 16 lit transitions + TileSet
-blender -b --python pixelforge/blender/gen_tree.py -- --out dead.glb --kind dead|pine|willow --seed 3 --height 5   # grown trees (no add-on)
 ```
 
 ```
 pixelforge prompt --world object|building|tree|ground|effect|ui|icons|portrait --describe "..." --sref <hero sheet url>   # style-locked world prompts
 pixelforge artlist -o docs/ART_ORDER.md --sref <hero sheet url>                   # the Act I art order with every prompt
-pixelforge object <sheet.png> <name> -o art/objects --height 1.2 [--views 3] [--top plan.png] [--canopy] [--game-objects objects.json]   # painted sheet -> carved, painted, filmed, pixelated prop (the hero way); --top carves the footprint and paints the top; --canopy for trees
-pixelforge hero <sheet.png> <name> --describe "..." --project ./forge --to-game <game>/art/sprites           # THE OLD CUTOUT ROAD in one command (prints a note; --cutout silences it). Characters: pixelforge shapes
+pixelforge object <sheet.png> <name> -o art/objects --height 1.2 [--views 3] [--top plan.png] [--canopy] [--game-objects objects.json]   # painted sheet -> carved, painted, filmed, pixelated prop; --top carves the footprint and paints the top; --canopy for trees
 ```
 
-**The world is painted, then built: objects get the same treatment as heroes.** `prompt --world`
-writes Midjourney prompts with one fixed style block (measured from the Hollow Mystic painting) and `--sref` to the
-hero sheet, asking for exactly the views the Forge carves from; `object` runs the hero chain on the result (cut out ->
-visual hull from the views -> painting projected on -> game camera + lantern rig -> mild grade -> pixels -> objects.json).
-`docs/ART_ORDER.md` in the game lists Act I's assets in the order to paint them. `prop3d` on CC0 kits is the fallback
-geometry until a painting exists for that asset.
+**The world is painted, then built: objects are shape files too.** `prompt --world` writes Midjourney prompts with
+one fixed style block (measured from the Hollow Mystic painting) and `--sref` to the hero sheet; an object is then a
+solid `.shapes.json` without bones (`shapes object`, `shapes still --game-objects`), the chest under
+`assets/shapes/objects/` is the example. `docs/ART_ORDER.md` in the game lists Act I's assets in the order to paint
+them. The kit props and 3D ground (`prop3d`, `tiles3d`, the fetched CC0 kits) are retired: the game does not place them.
 
 **The quality bar: Diablo II Resurrected / Path of Exile, not clip art.** Flat painted stand-ins
-are out. Props and buildings come from real geometry: CC0 kits (Kenney graveyard / castle / nature / mini-dungeon,
-fetched by `tools/make_props3d.py`), grown trees, or a model carved from a painting; all through `prop3d`, whose
-look is: orthographic camera 30° above with the object turned to the iso diagonal, a warm key from the upper left,
+are out. The old 3D prop look (`prop3d`, behind the flag) was: orthographic camera 30° above with the object turned to the iso diagonal, a warm key from the upper left,
 cold teal fill and rim, dark world, ambient occlusion, procedural grime + bump + top dust on every material, then
 `grade.py` (lightness curve to the Hollow Mystic painting's median 0.35, chroma to ~0.035, shadows toward teal,
 pure blues turned teal, fine grain), 2x render pressed down with a box filter, dark 1 px outline. Scale: `--ppu 108`
@@ -307,13 +282,9 @@ pip install -e tools/pixelforge   # once, from the repository root. Without inst
                                   # (file paths then start from tools/pixelforge; from the repository root, python -m pixelforge does not find this checkout's package)
 
 pixelforge shapes template [--height 120] [-o tpl.json] [--png tpl.png]   # the author pose: every bone's head and tail, to draw around
-pixelforge shapes draft "a hooded necromancer with a bone staff and green glowing eyes" -o necro.shapes.json   # a starter humanoid from a sentence
-pixelforge shapes draft "..." -o x.shapes.json --from-measure M.json           # the same, its head, torso, belt, skirt, cape and limbs sized from a measured painting
 pixelforge shapes measure FRONT.png [SIDE.png] [BACK.png] -o M.json           # painting to shapes 1: silhouette widths per height band + landmarks (head, shoulders, chest, waist, hips, hem, limb widths; fractions of the height)
 pixelforge shapes sample-materials FRONT.png --model x.shapes.json [-o y.shapes.json] [--only skin,cloth]   # painting to shapes 2: the painting's colours under each material's region -> that material's ramp (OKLab k-means), written into the model
 pixelforge shapes compare x.shapes.json --ref SHEET.png -o cmp.png [--height 195] [--views front,side,back]   # painting beside sprite at one height per view (front/S, side/E, back/N) with the silhouette overlap
-pixelforge character from-picture PICTURE [PICTURE ...] -p <folder> [--name N] [--style godmarrow] [--text "..."] --json   # THE PICTURE ROAD in one go: cut, measure, draft --from-measure, sample-materials, validate, import-shapes, still S + compare (below)
-pixelforge character measure|sample|compare <character> -p <folder> [--json]   # one step of the road again on a character it made (the saved cutouts), ending with the still and the compare picture
 pixelforge shapes validate FILE                                            # problems in plain words, or a summary (mode, shapes, materials, bones, unbound shapes); then the warnings: the traps a valid file can carry (keep.back, a full ring below the knee, a hanging part on a limb without upright_from, a centre in the wrong number of dimensions)
 pixelforge shapes still FILE -o out.png [--frame 40] [--direction SE] [--passes] [--game-objects art/objects/objects.json --name chest --hr 2]
 pixelforge shapes object FILE -o art/objects/chest [--directions S,SE,E] [--game-objects art/objects/objects.json]   # trimmed PNGs with foot anchors + <name>.json
@@ -353,9 +324,9 @@ reads a mask back, `Frame.parts` holds it in memory. The editor's carry matches 
 `api.preview_shapes`, `api.validate_shapes`, `api.draft_shapes`; file-level tools in `pixelforge.shape_tools`
 (`render_set`, `gif_of`, `contact_sheet`, `turntable`, `still`, `export_object`, `add_game_object`, `validate_file`,
 `template_file`). MCP: `render_shape_sprite`, `preview_shape_sprite`, `shape_sheet`, `shape_object`,
-`validate_shapes`, `shape_template`, `draft_shapes`, `import_shapes`, `render_shapes`.
+`validate_shapes`, `shape_template`, `import_shapes`, `render_shapes`.
 
-**The picture road in one command.** `pixelforge character from-picture PICTURE -p <folder> --json` is what the
+**The picture road (retired; `PIXELFORGE_OLD_ROADS=1` reopens it, see "Retired roads").** `pixelforge character from-picture PICTURE -p <folder> --json` is what the
 Characters bench runs when a picture is dropped on it, and what to run yourself before anything by hand. It reads the
 picture (several files are the views in order: front, side, back), tells a single figure from a turnaround sheet (two
 or more figures of about one height side by side; `sheet.split_sheet`, falling back to one figure when the pieces are
@@ -384,16 +355,16 @@ draft's named shapes in the model as it is now; sample re-colours; compare only 
 `forge/tools/picture_road.sh OUT` (drops the Keeper's front on Home under xvfb, ends with the model on the bench, the
 compare picture and the browser; `docs/screens/forgeapp/picture_road_*.png`).
 
-**Painting to shapes, step by step.** The same road by hand, when one step wants a different setting: cut the sheet into views (a transparent PNG per view,
-or plain-background views; the Hemomancer's are `docs/concepts/hemomancer/test1/front.png`, `side.png`, `back.png`),
-`shapes measure` them into a measurements file, `shapes draft "<the costume words>" --from-measure M.json` for a
-figure already the painting's proportions, `shapes sample-materials FRONT.png --model x.shapes.json` for its colours
-(the model is rendered over the front view at one height; every render pixel knows its shape and so its material, and
-the painting's pixels under each material become its ramp), then `shapes compare x.shapes.json --ref SHEET.png -o
-cmp.png` after every round: painting and sprite side by side per view, feet on one line, with the silhouette overlap
-(the Hemomancer's committed file scores about 0.7 per view; a drafted-and-sampled figure starts near that and reads
-as the right mass and colours before a single shape is placed by hand). A sheet whose figures stand on a painted
-floor splits as one figure: give `compare` the cleaned sheet (the views on paper) or the views one by one.
+**Painting to shapes, by hand (the road).** Cut the sheet into views (a transparent PNG per view, or plain-background
+views; the Hemomancer's are `docs/concepts/hemomancer/test1/front.png`, `side.png`, `back.png`), `shapes measure` them
+into a measurements file and read the landmarks (head, shoulders, chest, waist, hips, hem, limb widths as fractions of
+the height) while you write the file around the author pose, `shapes sample-materials FRONT.png --model x.shapes.json`
+for its colours (the model is rendered over the front view at one height; every render pixel knows its shape and so
+its material, and the painting's pixels under each material become its ramp), then `shapes compare x.shapes.json --ref
+SHEET.png -o cmp.png` after every round: painting and sprite side by side per view, feet on one line, with the
+silhouette overlap (the Hemomancer's committed file scores about 0.7 per view). A sheet whose figures stand on a
+painted floor splits as one figure: give `compare` the cleaned sheet (the views on paper) or the views one by one.
+Measure, sample and compare are tools you use while building by hand; nothing they make is ever shown as a result.
 
 **The parts kit** (`pixelforge/shape_parts.py`): the costume pieces the Hemomancer needed, as functions returning
 shape lists in the 120-unit author pose, so the next character calls them instead of writing 170 entries: `chain(name,
@@ -402,9 +373,7 @@ points)` (links alternating face-on / edge-on), `chain_loop`, `chest_chain`, `ri
 `plank_skirt_parts()` (the front planks ride each thigh with `upright_from` the hips, the back planks the hips),
 `greave(side, cx)` (a riveted plate, a knee cop, the spike rows) and `thigh_plate`, `shackle(side, cx)` (with a broken
 chain), `locs(name, cx)` + `locs_parts()` (strands following the mantle), `back_cape(...)` + `cape_parts()`. Their
-default materials (`locs chain rustiron plank`) are in the library. `shapes draft` calls them from the nouns of the
-line: `crown` (+ `spiked`), `locs` / `dreadlocks`, `chains`, `shackles` / `manacles`, `planks` / `plank skirt`,
-`greaves` (+ `spiked`), `rivets` / `riveted` / `studded`, `cape`. The worked example is
+default materials (`locs chain rustiron plank`) are in the library. Call them from your generator script. The worked example is
 `docs/concepts/hemomancer/shapes/make_hemomancer_shapes.py` (the whole Hemomancer from the kit plus its body, face,
 crimson and shield; `tests/test_character_road.py` checks it regenerates the committed file).
 
@@ -414,8 +383,8 @@ crimson and shield; `tests/test_character_road.py` checks it regenerates the com
    at any; a character renders at the game's hero height, the `godmarrow` preset's 195 px, whenever no `--style` or
    `--scale` is given, and `export-game` warns when a set's figure height is not the game's for its category). Read the bone table: every bone's head and tail in file units, y down, x across, z
    toward the viewer, the figure facing you, its left hand on +x. The ground line and the body axis are in the table.
-2. Write the file around those bones (or start from `shapes draft "<sentence>" [--from-measure M.json]` and edit, and
-   `shapes sample-materials` for the colours): a shape per body part
+2. Write the file around those bones (a Python generator script in the character's folder is the habit; `shapes
+   sample-materials` for the colours): a shape per body part
    bound to its bone, garments as rings that `hang`, details as rules. Use the material library by name or add your
    own ramps. Leave no gap between shapes in the author pose (a waist between the chest and the belt): a bend or a
    fall opens it.
@@ -712,25 +681,18 @@ over every old kind and spell preset; the CLI verbs). GIFs for judging: `docs/sc
 
 ## The standard procedure
 
-1. `status --json`. Read `characters.<name>.next` and `done`.
-2. If there is no character: ask the person for a one-sentence description
-   (silhouette, materials, colors, 3–5 signature details) or write one from
-   their reference image, then `add`.
-3. `prompts <name> --json`. Give the person **prompt A** (sheet) and **prompt C**
-   (sprite) verbatim, plus the rules. Ask for the upscaled PNGs.
-4. `import <name> sheet <file>` and `import <name> style <file>` (any others they made).
-5. `still <name> --view style --animate idle --export` — show them the result
-   immediately (`sprites/style_x4.png`, `anim/idle/preview.gif`). Adjust the
-   style tier if they want chunkier/finer (`set --style ...`, rerun).
-6. `run-all <name>`. It runs split → palette → model → rig → render →
-   pixelate → export without stopping (only Blender missing stops it).
-   Rendering prints `PF_PROGRESS` lines; ~1 s per frame on CPU, so 6 clips x
-   8 directions is 10-20 minutes. Run it in the background and check back.
-7. Optional mocap upgrade: if the person provides Mixamo FBX files in
-   `mixamo/`, rerun `rig` (then render/pixelate/export); they replace the
-   built-in clips.
-8. Tell the person where the Godot files are (`export/`) and how to use them
-   (copy the folder to `res://sprites/<name>/`, instance `<name>.tscn`).
+1. `project status -p <folder> --json`. Read `characters.<name>.next` and `done`.
+2. The painting is the reference: the person drops it on the Characters bench or names it. `shapes measure` its
+   views; `shapes compare` is your judge from now on.
+3. Author the model by hand (section "Shape sprites"): a generator script in the character's folder writes
+   `<name>.shapes.json` around the author pose; `shapes validate`, `shapes still` front/side/back, `shapes compare`
+   against the painting, edit, three rounds or until the overlap is at the Hemomancer's level (about 0.7).
+4. `shapes detail <file> --stock`, then paint what the stock detail misses (the Detail bench, or `--part NAME --from
+   PNG`); `shapes sample-materials` for the painting's colours.
+5. `project build <name> -p <folder> [--game <game>]`: import, render every clip in 8 directions with detail, light
+   and ink, export the atlas, write `skins.json`, check the height (a hero is 195 px). Rendering prints `PF_PROGRESS`
+   lines; run it in the background and check back. `--dry-run` lists the steps.
+6. Show the person the compare picture and the frames; fix pixels in the editor (carry propagates by part); build again.
 
 ## Checking quality (do this, don't assume)
 
@@ -761,28 +723,6 @@ over every old kind and spell preset; the CLI verbs). GIFs for judging: `docs/sc
 | `--ppu ... clips this character` (render warning) | this character is bigger than the shared scale allows; re-render with `--frame-step` unchanged after deleting `ppu` from the *smaller* characters, or accept |
 | `Blender failed (exit N)` | read the last lines printed; usually a missing image path or an FBX that isn't from Mixamo |
 
-## What the 3D step actually does (so you can explain it)
-
-**Humanoid first.** When the sheet has a side view and the silhouette shows legs, the
-model step starts from the bundled CC0 mannequin (`assets/animations/quaternius_ual_standard.glb`: a human mesh
-already skinned to the armature that drives its 46 clips), fuses its jointed pieces into one skin, poses its arms down
-to the sheet's A-pose (the angle that best matches the painting), shrink-wraps it onto the hull carved from the
-painting, carries the fit back to the rest pose through the skin weights, and paints the art onto it in that pose.
-The rig step then keeps that armature and takes the clips directly (no retargeting). Clean knees, elbows and hands,
-and the body still matches the painting's silhouette. `fit_template.py` prints `PF_FALLBACK` for a robe or a skirt
-(no legs in the silhouette) and the carved hull is used instead, as before. Settings: `model_mode` on the character =
-`auto` (default) | `template` (force the fit, e.g. a short robe) | `hull`. The old description follows.
-
-
-`model` builds an "inflated cutout": the front-view silhouette is put on a
-grid, each cell's distance from the edge decides how much it bulges forward and
-backward, and the front/back images are camera-projected onto the surface as
-its texture. Crude up close; convincing at sprite scale. Mixamo auto-rigs it
-because it is a humanoid silhouette. `render` circles an orthographic camera
-30° above the ground around the animated model, framing every frame of every
-action identically. `pixelate` then converts each render with the locked
-palette and a fixed scale so all frames match.
-
 ## The Forge app (tools/pixelforge/forge): what it is to an assistant
 
 The person's face of PixelForge is a Godot 4.7 project at `tools/pixelforge/forge/` (full screen, an ornate pixel
@@ -803,7 +743,7 @@ well: a project named PixelForge is not the game). What the app runs, per bench:
 
 | bench | commands |
 |---|---|
-| Characters | `character from-picture <pictures...> -p P --style S` (a picture dropped or chosen, on Home or on the bench: the whole picture road, the progress words on the state line; then `Compare` shows `previews/compare.png`, `Measure again` / `Sample materials again` run `character measure|sample <name>`, `Open in editor` renders idle and opens the editor, `Use as reference only` is the old painting-beside-the-model) · `project new` (first use) · `project add <name>` · `project import-shapes <name> <file>` (a dropped or chosen `.shapes.json`, copied into `characters/<name>/shapes/`) · `shapes still <model> -o previews/still_<dir>.png --direction D --style S --zoom 1` (the standing picture; `--json` gives the foot anchor and the lights) · `shapes render <model> -o previews/frames --clips C --directions D --style S` (one clip for the Motion and Frames tabs) · `project render-shapes <name> --style S` (Render all) · `project export-game <name> --kind K --name N --out <dir>` (Export sheets; Put it in the game uses `--out <game>/art/sprites`) · `game-preview --import` · `game-preview --skin K [--shot]` · `project reset <name>` (Start over) · the Frames tab's *Edit* (the editor below, on `previews/frames` or `frames/`) · `prompt --describe ... --kind sheet_px` (Copy prompt). Every lever writes the model file (`doc`): solid offsets and scales, materials, ramps (OK-HSL hue / lightness / contrast / steps over the imported ramp), lights, the glow effects, `parts.*.lag`, `view.turn_step / move_step / elevation`. |
+| Characters | a picture dropped or chosen, on Home or on the bench, is the reference beside the model (`--painting`; the automatic picture road is retired, its choices and lines are off the bench unless `PIXELFORGE_OLD_ROADS=1`) · `Compare` shows `previews/compare.png` · `Open in editor` renders idle and opens the editor · `project new` (first use) · `project add <name>` · `project import-shapes <name> <file>` (a dropped or chosen `.shapes.json`, copied into `characters/<name>/shapes/`) · `shapes still <model> -o previews/still_<dir>.png --direction D --style S --zoom 1` (the standing picture; `--json` gives the foot anchor and the lights) · `shapes render <model> -o previews/frames --clips C --directions D --style S` (one clip for the Motion and Frames tabs) · `project render-shapes <name> --style S` (Render all) · `project export-game <name> --kind K --name N --out <dir>` (Export sheets; Put it in the game uses `--out <game>/art/sprites`) · `game-preview --import` · `game-preview --skin K [--shot]` · `project reset <name>` (Start over) · the Frames tab's *Edit* (the editor below, on `previews/frames` or `frames/`) · `prompt --describe ... --kind sheet_px` (Copy prompt). Every lever writes the model file (`doc`): solid offsets and scales, materials, ramps (OK-HSL hue / lightness / contrast / steps over the imported ramp), lights, the glow effects, `parts.*.lag`, `view.turn_step / move_step / elevation`. |
 | Creatures | under construction: the same bench, the humanoid skeleton; `assets/shapes/necromancer_3d.shapes.json` as the example |
 | Objects | the model copied into `objects/<name>/` · `shapes still <model> --frame F --direction D` · `shapes object <model> -o <dir> --name N --directions S[,...] --style S --hr 2 [--game-objects <game>/art/objects/objects.json]` · `game-preview --place N` |
 | Effects | `effects list --json` (the table the tabs are built from) · `effects render <effect> -o <project>/fx --as <name> --lever k=v ... --seed N [--palette P --bands B --frames F --fps X]` (Effect, Looks) · Layers: the stack written to `<project>/fx/<name>.graph.json` (one `effect` node per layer under a `layers` node) and `effects graph <file> -o fx --as <name>` · `effect <painting> <name> -o fx --kind loop` (a dropped painting) · into the game with `-o <game>/art/fx` · `game-preview --fx <name>` |
@@ -811,7 +751,7 @@ well: a project named PixelForge is not the game). What the app runs, per bench:
 | Interface | `ui9 <panel> <name> -o ui --mid M` · `icons <flatlay> -o items --cell C --scale K` · `portrait <front> <name> -o portraits --head H --sizes 48 96`, then the game's folders |
 | Sound | `sfx <pad> -o <project>/sfx --set freq_mul= decay_mul= crush= lowpass= wave= --seed N`; Keep: `-o <game>/art/sfx` · `sfx all` |
 | Music | `music list` (the table) · `music load <piece> -o <project>/music/current.song.json` · every control: `music edit <song> --op <json>` · every sound: `music play-bar <song> --pattern P --bar B` / `--section S` / `music render <song> --name preview` · Compose: `music compose -o <song> --genre G --mood M --seed N --bars 32` · Keep: `music export <song> -o <game>/audio/music --name <name> --format ogg` |
-| Describe it | `describe "<words>" --json`: `what` picks the bench (`shapes` → Characters with the drafted `doc`, `spell` → Effects, `music` → Music, `prompt` → the bench that will take the painting); `benches` with two or more names starts a job instead (`job start "<words>" -p <project> [--game G]`; Home's Jobs panel then runs `job list`, `job approve ID --run`, `job resume ID`, `job cancel ID`, and Report opens `--job_report=<report.json>` on the job's bench) |
+| Describe it | `describe "<words>" --json`: `what` picks the bench (`shapes` → Characters with the words as the description, no draft, `spell` → Effects, `music` → Music, `prompt` → the bench that will take the painting); `benches` with two or more names starts a job instead (`job start "<words>" -p <project> [--game G]`; Home's Jobs panel then runs `job list`, `job approve ID --run`, `job resume ID`, `job cancel ID`, and Report opens `--job_report=<report.json>` on the job's bench) |
 | Settings | `doctor --json`, `project set --style S`, `project set --blender PATH`, `project blender-download` |
 
 After new files land in the game the app runs `game-preview --import` (a headless `godot --import` pass) so the game's
@@ -822,7 +762,7 @@ Mixamo) and the full editors stay in the classic Studio (`pixelforge studio --cl
 
 **Test hooks (after `--`):** `--screen=NAME` opens a screen directly (home, characters, creatures, objects, effects,
 tiles, interface, sound, music, settings) with `--tab=NAME`, `--model=FILE` (a shape model onto the bench),
-`--painting=FILE` (a reference beside the model), `--pictures=A;B` (down the picture road), `--env=dungeon|crypt|moor|fen|snow|plain`, `--light=0|1|2`, `--advanced`; `--project=PATH` and
+`--painting=FILE` (a reference beside the model), `--pictures=A;B` (down the retired picture road; only with `PIXELFORGE_OLD_ROADS=1`), `--env=dungeon|crypt|moor|fen|snow|plain`, `--light=0|1|2`, `--advanced`; `--project=PATH` and
 `--game=PATH` choose the folders, `--python=` the interpreter; `--shot=PATH --shot_t=S [--shot_n=N]` saves the
 window after S seconds and quits; `--windowed`, `--nosound`, `--nomusic`, `--reduced`, `--log[=S]`.
 `--script=FILE` drives a whole walkthrough, one line per step (`forge/scripts/driver.gd` lists them: `go SCREEN
@@ -1130,37 +1070,13 @@ outside, tool and claude steps, the report, the CLI); the Forge's `jobs` walkthr
 - Don't download or install a program for the owner, and don't start a detached or background process; a job is a
   child process and its state on disk is how it survives a restart.
 
-## Doing the Mixamo step yourself (local session with a browser)
-
-If you run on the person's computer with a browser tool (Playwright/Chromium in
-Claude Code, or the Chrome extension), you can do the rig step instead of the
-person. Ask them to sign in to Adobe in the browser you open; then:
-
-1. Open https://www.mixamo.com/#/?page=1&type=Character → **Upload Character** →
-   choose `characters/<name>/model/<name>.fbx`.
-2. Auto-rigger, *Orient*: the model must face forward (hood point up, front
-   toward you). Click **Next**.
-3. *Markers*: drag the circles onto the model. For a robed humanoid without
-   visible legs: chin just under the face opening (~30% from the top), wrists
-   on the hand tips at the sides (~55% down), elbows halfway between shoulder
-   and wrist, knees on the robe at ~75% down left and right, groin at the
-   centre ~60% down. Skeleton LOD: Standard. **Next**, wait for the preview,
-   **Next**, **Finish**.
-4. Animations tab: search and select each of `Idle`, `Walking` (tick **In
-   Place**), `Running` (In Place), `Standing Melee Attack Downward` or
-   `Sword And Shield Slash`, `Hit Reaction`, `Standing Death Forward`.
-5. **Download** each: Format *FBX Binary(.fbx)*, Frames per Second *30*, Keyframe
-   Reduction *none*. Skin: **With Skin** for the FIRST download only, **Without
-   Skin** for all others. Save every file to `characters/<name>/mixamo/`.
-6. `pixelforge project run-all <name>`.
-
-If marker placement fails twice, fall back to telling the person the
-positions above and let them drag; it takes them a minute.
-
 ## The music editor (pixelforge/music): the song format, the verbs, the operations
 
 The engine is the package `pixelforge/music/` (`song`, `theory`, `synth`, `render`, `compose`, `edit`, `library`,
-`blips`, `measure`; `score` is the game's older 21-cue generator, unchanged; the old names still import from
+`blips`, `measure`, `cues` (the game's 21 cues as library songs: `CUE_SONGS` maps `a<act>_town|wild|deep`, `boss<act>`
+and `title` to a song by the place's mood; `make_music(cue|all|act, out_dir, fmt=...)` renders them under the cue's
+name with `music.json`, `<out_dir>/cues.json` re-maps without code); `score` is the old generator behind
+`PIXELFORGE_OLD_ROADS=1`; the old names still import from
 `pixelforge.music`). The Forge app's Music bench and the CLI call the same functions; a song is one JSON file:
 
 ```json
@@ -1224,3 +1140,16 @@ piece written at 66 (the chant's 3+3+2 figure doubles it; the reference reads 10
 **In the app:** `--screen=music [--tab=Tracks|Pattern|Song|Library|Export] [--song=FILE | --library=NAME]`; the bench
 keeps `<project>/music/current.song.json` and runs `music edit` for every change and `music play-bar` for every sound
 (`ONLY=music forge/tools/screens.sh OUT` shoots the five tabs). Tests: `tests/test_music.py`.
+
+## Retired roads
+
+Four roads made characters or props automatically and led to the blob the owner kept seeing. Their code stays in the
+package, but nothing in the Forge app, this guide's procedure or the command line reaches them unless the environment
+sets **`PIXELFORGE_OLD_ROADS=1`** (`pixelforge/old_roads.py`; the Forge honours the same variable): `pixelforge hero`
+(the cutout road: split → palette → Blender model → Mixamo → renders → pixelate → export, with its `project run <name>
+split|palette|model|rig|render|pixelate` steps and the Mixamo instructions), `prop3d` and `tiles3d` with the fetched
+CC0 kits (`tools/make_props3d.py`), `shapes draft` and `character from-picture|measure|sample|compare` (the drafts: a
+mannequin sized to a silhouette) with the describe line's shape drafts, and the old music generator (`music/score.py`:
+`music <cue> --set ... --sheet ...`; the cues now come from the song library). Without the flag each entry point prints
+one line that names the flag and stops; with `--json` it returns `{"ok": false, "error": ..., "retired": <road>}`.
+
