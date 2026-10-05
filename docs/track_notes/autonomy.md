@@ -35,7 +35,7 @@ to just type something and Claude figures it out." The Forge is a window onto th
   planner): status is honest about what is installed, every adapter's commands and output parsing, the `.mod` header
   read back, the map converters, the MCP registration, the CLI; ffmpeg's GIF and ImageMagick's strip for real; plan
   parsing and validation, order, the approval pause and resume, the fix retry, failure with skipped dependants, resume
-  after an interruption, cancel from outside, the report. 278 pytest green in all.
+  after an interruption, cancel from outside, the report. 278 pytest green on the track, 303 after the merge with main (the Diablo 2 bridge brought its own).
 - Godot: `check_scripts` 33/0, `test_editor` 106/0, `test_scene` 21/0; the `jobs` walkthrough at 0 errors with five
   shots (`docs/screens/forgeapp/jobs_running.png`, `jobs_waiting.png`, `jobs_rendering.png`, `jobs_done.png`,
   `jobs_report.png`).

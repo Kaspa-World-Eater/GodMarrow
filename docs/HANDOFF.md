@@ -884,7 +884,7 @@ with Resume. Docs: GUIDE_HUMANS *Jobs*, *Tools we use instead of building* (the 
 rule: check the table and the adapters before building a step; tell the owner when a free tool exists), *Jobs* (plan
 format, runner contract, report, how a planning session behaves); `docs/track_notes/autonomy.md`.
 
-**Verified.** 278 pytest green (`tests/test_tool_adapters.py`, `tests/test_jobs.py` with the mock planner
+**Verified.** 303 pytest green (278 on the track before the merge with main) (`tests/test_tool_adapters.py`, `tests/test_jobs.py` with the mock planner
 `tests/claude_mock/plan.jsonl`; ffmpeg and ImageMagick for real); `check_scripts` 33/0, `test_editor` 106/0,
 `test_scene` 21/0; the `jobs` walkthrough (`forge/tools/jobs_walk.txt`) at 0 errors:
 `docs/screens/forgeapp/jobs_{running,waiting,rendering,done,report}.png`. **Left for the owner's machine on

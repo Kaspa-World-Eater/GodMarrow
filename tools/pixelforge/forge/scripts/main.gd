@@ -40,6 +40,8 @@ static func cfg_path() -> String:
 	return OS.get_user_data_dir().path_join("forge_settings.json")
 
 static func _load_cfg() -> Dictionary:
+	if not FileAccess.file_exists(cfg_path()):
+		return {}
 	var f := FileAccess.open(cfg_path(), FileAccess.READ)
 	if f:
 		var d = JSON.parse_string(f.get_as_text())
