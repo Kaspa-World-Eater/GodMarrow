@@ -66,3 +66,4 @@ walk() {  # name script mock
 }
 walk describe_characters describe_walk.txt characters.jsonl
 walk describe_music describe_walk_music.txt music.jsonl
+walk jobs jobs_walk.txt plan.jsonl

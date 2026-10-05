@@ -9,11 +9,15 @@ const CHOICES := [
 	["Sound", "sound"], ["Music", "music"], ["Settings", "settings"],
 ]
 var reading := false
+var job_i := 0                  # which job the Jobs panel shows when there are several (newest first)
+var jobs_text: Control = null   # the panel's two small lines, updated in place while a job runs
 
 func build() -> void:
 	hint_text = "drop a painting anywhere"
 	rebuild()
 	_show_last()
+	# the project's jobs (a Forge reopened shows the ones it can resume)
+	app.refresh_jobs(func(): if is_inside_tree(): rebuild())
 
 func build_tab(_i: int) -> void:
 	var last: Dictionary = app.cfg.get("last", {})
@@ -25,13 +29,35 @@ func build_tab(_i: int) -> void:
 		line = "The forge is lit, but Python was not found: run install.bat once, or set it in Settings."
 	else:
 		line = "The forge is lit. The bench is clear: pick what to make, drop a painting, or describe it below."
-	state_line(line, "", 2)
+	var jobs := _jobs()
+	state_line(line, "", 1 if not jobs.is_empty() else 2)
 	add_spacer()
 	var items := []
 	for c in CHOICES:
 		items.append({"label": c[0], "cb": app.go.bind(c[1])})
 	add_choices(items, 3)
-	add_choices([{"label": "Exit", "cb": func(): app.request_exit()}])
+	var bottom := [{"label": "Exit", "cb": func(): app.request_exit()}]
+	jobs_text = null
+	if not jobs.is_empty():
+		job_i = clampi(job_i, 0, jobs.size() - 1)
+		var j: Dictionary = jobs[job_i]
+		var l := W.PxText.new()
+		l.init(_jobs_lines(), T.DIM, 2, T.SMALL_SIZE)
+		rows.add_child(l)
+		jobs_text = l
+		var st := String(j.get("state", ""))
+		if jobs.size() > 1:
+			bottom.append({"label": "job", "value": "%d of %d" % [job_i + 1, jobs.size()], "left": func(): job_i = posmod(job_i - 1, jobs.size()); rebuild(),
+				"right": func(): job_i = posmod(job_i + 1, jobs.size()); rebuild()})
+		if st == "waiting":
+			bottom.append({"label": "Approve", "cb": func(): _approve(j)})
+		if st in ["interrupted", "failed", "planned"]:
+			bottom.append({"label": "Resume", "cb": func(): app.resume_job(String(j["id"])); rebuild()})
+		if st in ["running", "waiting", "interrupted", "planned"]:
+			bottom.append({"label": "Cancel", "cb": func(): app.cancel_job(String(j["id"])); rebuild()})
+		if String(j.get("report_json", "")) != "" or st in ["done", "failed", "cancelled"]:
+			bottom.append({"label": "Report", "cb": func(): _report(j)})
+	add_choices(bottom)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	row.custom_minimum_size = Vector2(0, 18)
@@ -113,6 +139,18 @@ func _described(r: Dictionary, text: String) -> void:
 	if not r.get("ok", true) and not r.has("what"):
 		app.say(String(r.get("error", "Could not read that.")))
 		return
+	# a sentence that spans two or more benches is a job: Claude writes the plan, the runner carries it out while Home watches
+	var benches: Array = r.get("benches", [])
+	if benches.size() >= 2:
+		var st: Dictionary = app.claude_state
+		if not st.is_empty() and not st.get("ok", false):
+			app.say(String(st.get("sentence", "Claude Code is not ready.")))
+			return
+		app.start_job(text)
+		describe.text = ""
+		app.say("A job across %d benches: Claude writes the plan." % benches.size(), 4.0)
+		rebuild()
+		return
 	var what := String(r.get("what", "spell"))
 	var a := {"describe": text, "draft": r}
 	var screen := "effects"
@@ -152,6 +190,107 @@ static func _prompt_screen(r: Dictionary, a: Dictionary) -> String:
 		"missile", "spell_frames", "effect":
 			return "effects"
 	return "characters"
+
+# ------------------------------------------------------------------ the Jobs panel
+## the jobs to show: the ones running under this Forge first (live), then the project's list from disk (job list --json)
+func _jobs() -> Array:
+	var out := []
+	var seen := {}
+	for rec in app.job_runs:
+		var id := String(rec.get("id", ""))
+		var row := {"id": id, "title": rec["title"], "state": "running", "done": rec["done"], "total": rec["total"], "last": rec["last"], "waiting": "", "bench": "", "report_json": ""}
+		for j in app.jobs_list:
+			if String(j.get("id", "")) == id and id != "":
+				row["bench"] = j.get("bench", "")
+				row["report_json"] = j.get("report_json", "")
+				row["title"] = j.get("title", rec["title"])
+		out.append(row)
+		if id != "":
+			seen[id] = true
+	for j in app.jobs_list:
+		if not seen.has(String(j.get("id", ""))):
+			out.append(j)
+	return out
+
+static func state_words(j: Dictionary) -> String:
+	match String(j.get("state", "")):
+		"running":
+			return "running"
+		"waiting":
+			return "waiting for approval"
+		"done":
+			return "done"
+		"failed":
+			return "done, with a step that could not be done"
+		"cancelled":
+			return "stopped"
+		"interrupted":
+			return "interrupted"
+		"planned":
+			return "not started"
+	return String(j.get("state", ""))
+
+## two small lines: the job and its state with the step count; then what it is doing, waits for, or made
+func _jobs_lines() -> String:
+	var jobs := _jobs()
+	if jobs.is_empty():
+		return ""
+	job_i = clampi(job_i, 0, jobs.size() - 1)
+	var j: Dictionary = jobs[job_i]
+	var total := int(j.get("total", 0))
+	var head := "job · %s · %s" % [state_words(j), String(j.get("title", ""))]
+	if total > 0:
+		head += " · step %d of %d" % [mini(int(j.get("done", 0)) + (1 if String(j.get("state", "")) == "running" else 0), total), total]
+	if jobs.size() > 1:
+		head = "%d jobs · " % jobs.size() + head.trim_prefix("job · ")
+	var second := ""
+	match String(j.get("state", "")):
+		"running":
+			second = String(j.get("last", "working"))
+		"waiting":
+			second = "next: %s · Approve runs it, Cancel stops the job" % String(j.get("waiting", ""))
+		"done":
+			second = "%d made · Report shows it on the %s bench" % [int(j.get("made", int(j.get("done", 0)))), String(j.get("bench", "")).replace("_", " ")]
+		"failed":
+			second = "%d made, %d could not · Report says why · Resume tries again" % [int(j.get("made", 0)), int(j.get("could_not", 0))]
+		"interrupted":
+			second = "the Forge closed while it ran · Resume carries on from the last finished step"
+		"cancelled":
+			second = "%d made before it stopped · Report shows them" % int(j.get("made", 0))
+		_:
+			second = String(j.get("last", ""))
+	return head + "\n" + second
+
+## a job's progress line changed (app.job_runs): the panel's words, in place
+func on_job_progress() -> void:
+	if jobs_text and is_instance_valid(jobs_text):
+		jobs_text.set_text(_jobs_lines())
+	elif not app.job_runs.is_empty():
+		rebuild()
+
+## a job finished, waits, or stopped: the panel and its choices again
+func on_job_done(_r: Dictionary) -> void:
+	if is_inside_tree():
+		rebuild()
+
+func _approve(j: Dictionary) -> void:
+	var id := String(j.get("id", ""))
+	if id == "":
+		return
+	app.approve_job(id)
+	app.say("Approved: %s" % String(j.get("waiting", "the step")), 3.0)
+	rebuild()
+
+## the report opens on the bench it concerns, with its pictures in the window
+func _report(j: Dictionary) -> void:
+	var path := String(j.get("report_json", ""))
+	if path == "":
+		app.say("No report yet.")
+		return
+	var bench := String(j.get("bench", ""))
+	if not bench in ["characters", "creatures", "objects", "effects", "tiles", "interface", "sound", "music"]:
+		bench = "effects"
+	app.go(bench, {"job_report": path})
 
 func on_drop(paths: PackedStringArray) -> void:
 	if paths.is_empty():
