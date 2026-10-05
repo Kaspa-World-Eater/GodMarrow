@@ -307,6 +307,8 @@ pixelforge shapes draft "..." -o x.shapes.json --from-measure M.json           #
 pixelforge shapes measure FRONT.png [SIDE.png] [BACK.png] -o M.json           # painting to shapes 1: silhouette widths per height band + landmarks (head, shoulders, chest, waist, hips, hem, limb widths; fractions of the height)
 pixelforge shapes sample-materials FRONT.png --model x.shapes.json [-o y.shapes.json] [--only skin,cloth]   # painting to shapes 2: the painting's colours under each material's region -> that material's ramp (OKLab k-means), written into the model
 pixelforge shapes compare x.shapes.json --ref SHEET.png -o cmp.png [--height 195] [--views front,side,back]   # painting beside sprite at one height per view (front/S, side/E, back/N) with the silhouette overlap
+pixelforge character from-picture PICTURE [PICTURE ...] -p <folder> [--name N] [--style godmarrow] [--text "..."] --json   # THE PICTURE ROAD in one go: cut, measure, draft --from-measure, sample-materials, validate, import-shapes, still S + compare (below)
+pixelforge character measure|sample|compare <character> -p <folder> [--json]   # one step of the road again on a character it made (the saved cutouts), ending with the still and the compare picture
 pixelforge shapes validate FILE                                            # problems in plain words, or a summary (mode, shapes, materials, bones, unbound shapes); then the warnings: the traps a valid file can carry (keep.back, a full ring below the knee, a hanging part on a limb without upright_from, a centre in the wrong number of dimensions)
 pixelforge shapes still FILE -o out.png [--frame 40] [--direction SE] [--passes] [--game-objects art/objects/objects.json --name chest --hr 2]
 pixelforge shapes object FILE -o art/objects/chest [--directions S,SE,E] [--game-objects art/objects/objects.json]   # trimmed PNGs with foot anchors + <name>.json
@@ -348,7 +350,36 @@ reads a mask back, `Frame.parts` holds it in memory. The editor's carry matches 
 `template_file`). MCP: `render_shape_sprite`, `preview_shape_sprite`, `shape_sheet`, `shape_object`,
 `validate_shapes`, `shape_template`, `draft_shapes`, `import_shapes`, `render_shapes`.
 
-**Painting to shapes.** With a concept sheet, do not copy it by eye: cut it into views (a transparent PNG per view,
+**The picture road in one command.** `pixelforge character from-picture PICTURE -p <folder> --json` is what the
+Characters bench runs when a picture is dropped on it, and what to run yourself before anything by hand. It reads the
+picture (several files are the views in order: front, side, back), tells a single figure from a turnaround sheet (two
+or more figures of about one height side by side; `sheet.split_sheet`, falling back to one figure when the pieces are
+a body and a held thing), cuts the figure(s) out into RGBA cutouts under `characters/<name>/source/` (`front.png`,
+`side.png`, `back.png`, and the picture itself as `picture.<ext>` or `sheet.<ext>`), measures them
+(`shapes/<name>.measure.json`), drafts a humanoid from the picture's words sized by the measurements (the name and the
+sentence come from `--name` / `--text`, else from the file's name: Midjourney writes the prompt into it, and the
+account name and the download id are dropped; a hem as wide as the hips to the ground adds "in a long robe" when no
+skirt word is there), samples the front view's colours into the materials, validates (problems stop the road as a
+plain `error`; warnings are returned), imports the model into the project as a character
+(`characters/<name>/shapes/<name>.shapes.json`) and draws `previews/still_S.png` (the game's height, with `anchor` and
+`lights` for the bench) and `previews/compare.png`. It prints `PF_PROGRESS step=picture what=<words_with_underscores>
+done=N total=8` as it goes (`reading_the_picture`, `cutting_the_figure`, `measuring`, `drafting`, `drafting_17_shapes`,
+`sampling_materials`, `checking`, `importing`, `drawing`, `done`). The result: `character`, `model`, `still`, `compare`,
+`measure`, `cutouts` (view -> file), `kind` (`single` / `sheet` / `files`), `views`, `sentence`, `read` (what the draft
+understood), `shapes`, `materials` (the ramps it sampled), `warnings` (plain words: a front view only, a robe added, a
+material with too few pixels under it, a validator warning, an existing character drafted again), `overlap` (view ->
+silhouette intersection over union) and `judgement`, one honest line from the overlaps ("Silhouette overlap front
+0.71: the right mass; the details want a hand"; >= 0.78 close, >= 0.62 the right mass, >= 0.45 a rough start, below
+that check the cutout). Deterministic (the k-means is seeded) and a few seconds on a front view: the Keeper's front
+(`assets/styles/keeper_front.png`, 228 x 400) gives 17 shapes and 0.71 in about 2 s headless, 4 s inside the app.
+`character measure|sample|compare <name> -p <folder>` runs one step again on the saved cutouts (measure re-sizes the
+draft's named shapes in the model as it is now; sample re-colours; compare only draws). API: `picture_road.from_picture`,
+`picture_road.redo`; MCP: `character_from_picture(picture, project, name, style, text)` (several files joined with
+`;`), `character_redo(project, character, step)`. Tests: `tests/test_picture_road.py`. The app walkthrough:
+`forge/tools/picture_road.sh OUT` (drops the Keeper's front on Home under xvfb, ends with the model on the bench, the
+compare picture and the browser; `docs/screens/forgeapp/picture_road_*.png`).
+
+**Painting to shapes, step by step.** The same road by hand, when one step wants a different setting: cut the sheet into views (a transparent PNG per view,
 or plain-background views; the Hemomancer's are `docs/concepts/hemomancer/test1/front.png`, `side.png`, `back.png`),
 `shapes measure` them into a measurements file, `shapes draft "<the costume words>" --from-measure M.json` for a
 figure already the painting's proportions, `shapes sample-materials FRONT.png --model x.shapes.json` for its colours
@@ -703,7 +734,7 @@ well: a project named PixelForge is not the game). What the app runs, per bench:
 
 | bench | commands |
 |---|---|
-| Characters | `project new` (first use) · `project add <name>` · `project import-shapes <name> <file>` (a dropped or chosen `.shapes.json`, copied into `characters/<name>/shapes/`) · `shapes still <model> -o previews/still_<dir>.png --direction D --style S --zoom 1` (the standing picture; `--json` gives the foot anchor and the lights) · `shapes render <model> -o previews/frames --clips C --directions D --style S` (one clip for the Motion and Frames tabs) · `project render-shapes <name> --style S` (Render all) · `project export-game <name> --kind K --name N --out <dir>` (Export sheets; Put it in the game uses `--out <game>/art/sprites`) · `game-preview --import` · `game-preview --skin K [--shot]` · `project reset <name>` (Start over) · the Frames tab's *Edit* (the editor below, on `previews/frames` or `frames/`) · `prompt --describe ... --kind sheet_px` (Copy prompt). Every lever writes the model file (`doc`): solid offsets and scales, materials, ramps (OK-HSL hue / lightness / contrast / steps over the imported ramp), lights, the glow effects, `parts.*.lag`, `view.turn_step / move_step / elevation`. |
+| Characters | `character from-picture <pictures...> -p P --style S` (a picture dropped or chosen, on Home or on the bench: the whole picture road, the progress words on the state line; then `Compare` shows `previews/compare.png`, `Measure again` / `Sample materials again` run `character measure|sample <name>`, `Open in editor` renders idle and opens the editor, `Use as reference only` is the old painting-beside-the-model) · `project new` (first use) · `project add <name>` · `project import-shapes <name> <file>` (a dropped or chosen `.shapes.json`, copied into `characters/<name>/shapes/`) · `shapes still <model> -o previews/still_<dir>.png --direction D --style S --zoom 1` (the standing picture; `--json` gives the foot anchor and the lights) · `shapes render <model> -o previews/frames --clips C --directions D --style S` (one clip for the Motion and Frames tabs) · `project render-shapes <name> --style S` (Render all) · `project export-game <name> --kind K --name N --out <dir>` (Export sheets; Put it in the game uses `--out <game>/art/sprites`) · `game-preview --import` · `game-preview --skin K [--shot]` · `project reset <name>` (Start over) · the Frames tab's *Edit* (the editor below, on `previews/frames` or `frames/`) · `prompt --describe ... --kind sheet_px` (Copy prompt). Every lever writes the model file (`doc`): solid offsets and scales, materials, ramps (OK-HSL hue / lightness / contrast / steps over the imported ramp), lights, the glow effects, `parts.*.lag`, `view.turn_step / move_step / elevation`. |
 | Creatures | under construction: the same bench, the humanoid skeleton; `assets/shapes/necromancer_3d.shapes.json` as the example |
 | Objects | the model copied into `objects/<name>/` · `shapes still <model> --frame F --direction D` · `shapes object <model> -o <dir> --name N --directions S[,...] --style S --hr 2 [--game-objects <game>/art/objects/objects.json]` · `game-preview --place N` |
 | Effects | `vfx <kind> <name> -o <project>/fx --palette P --frames --fps --bands --seed --glow --haze --style S [--size W H] [--rotations 8|16]` · `spell new <name> -o fx --preset P` / `spell render <file> -o fx` (Layers) · `effect <painting> <name> -o fx --kind loop` (a painted effect) · into the game with `-o <game>/art/fx` · `game-preview --fx <name>` |
@@ -722,11 +753,11 @@ Mixamo) and the full editors stay in the classic Studio (`pixelforge studio --cl
 
 **Test hooks (after `--`):** `--screen=NAME` opens a screen directly (home, characters, creatures, objects, effects,
 tiles, interface, sound, music, settings) with `--tab=NAME`, `--model=FILE` (a shape model onto the bench),
-`--painting=FILE`, `--env=dungeon|crypt|moor|fen|snow|plain`, `--light=0|1|2`, `--advanced`; `--project=PATH` and
+`--painting=FILE` (a reference beside the model), `--pictures=A;B` (down the picture road), `--env=dungeon|crypt|moor|fen|snow|plain`, `--light=0|1|2`, `--advanced`; `--project=PATH` and
 `--game=PATH` choose the folders, `--python=` the interpreter; `--shot=PATH --shot_t=S [--shot_n=N]` saves the
 window after S seconds and quits; `--windowed`, `--nosound`, `--nomusic`, `--reduced`, `--log[=S]`.
 `--script=FILE` drives a whole walkthrough, one line per step (`forge/scripts/driver.gd` lists them: `go SCREEN
-k=v`, `tab NAME`, `drop FILE`, `choose LABEL`, `set CONTROL VALUE`, `key ...`, `waitjob [S]`, `shot PATH`,
+k=v`, `tab NAME`, `drop FILE[;FILE]`, `choose LABEL`, `set CONTROL VALUE`, `key ...`, `waitjob [S]`, `shot PATH`,
 `dumplog`, `quit`); this is how the Characters bench is verified end to end (drop the Keeper, Render all, Export
 sheets), and how the Claude line is (`forge/tools/describe_walk*.txt` with the mock, `screens.sh`'s `describe_*`). `forge/tools/screens.sh OUT [WxH]` shoots every screen and prints `name | errors N`; `godot --headless --path
 tools/pixelforge/forge --script res://tools/test_editor.gd` runs the editor's own checks (palette lock, fill, wand,

@@ -903,3 +903,46 @@ pass and the redesign document were started and stopped before commit; both brie
 melee, Diablo 2 and Path of Exile systems, Godmarrow's designs, nothing flashes, Diablo 2 is not a base), and how the
 merged Diablo 2 bridge works are in `docs/GAME_HANDOFF.md`. The lore rewrite's guide is `docs/codex/LORE_REWRITE_GUIDE.md`
 on `track/codex`. This session continues on PixelForge only.
+
+### 7.24 2026-10-05, track/picture-road: a Midjourney picture becomes a character by itself (the picture road)
+
+**What.** The owner: "Should I be able to grab an image and it just gets to work?" Yes, now. One command,
+`pixelforge character from-picture PICTURE [PICTURE ...] -p P [--name N] [--style godmarrow] [--text "..."] --json`
+(`tools/pixelforge/pixelforge/picture_road.py`), does the whole road with `PF_PROGRESS what=` lines: tells a single
+figure from a turnaround sheet (`sheet.split_sheet`, two or more figures of about one height; a body with a held
+thing beside it stays one figure), cuts the figure(s) into RGBA cutouts under `characters/<name>/source/`, measures
+them, drafts a humanoid from the picture's words (the name and the sentence from `--name`/`--text` or the file name,
+which Midjourney writes the prompt into; the account name and the download id dropped; "in a long robe" added when
+the hem is as wide as the hips to the ground) sized by the measurements, samples the front view's colours into the
+materials, validates (problems stop it in plain words, warnings are returned), imports the model as a character,
+draws `previews/still_S.png` and `previews/compare.png`, and returns the model, the still, the compare picture, the
+cutouts, the warnings, the overlap per view and one honest judgement line. `character measure|sample|compare <name>`
+runs one step again on the saved cutouts. MCP `character_from_picture`, `character_redo`. The Characters bench runs
+it for any picture dropped or chosen (several files are a sheet's views; Home routes every picture there), with the
+progress words on the state line, then the drafted model on the bench facing S, the picture beside it, the judgement
+and the warnings as lines, and the choices `Compare`, `Measure again`, `Sample materials again`, `Open in editor`,
+`Start from a picture`, `Use as reference only` (the old reference-beside-the-model). The in-app browser: Downloads /
+Pictures / Desktop / Documents resolve on Windows with the plain `USERPROFILE` and OneDrive paths as fallbacks, a
+`Midjourney` place when a folder of that name sits under one of them, newest files first (N or the header word
+toggles), thumbnails and previews decoded on a worker thread (a big webp never blocks the frame), long names elided
+in the middle, `__pycache__` and dot-files hidden. `driver.gd` `drop A;B` drops several files.
+
+**Verified** (after the merge of main's Claude hookup, music, facing fix and Diablo bridge into the track; the
+Reference tab keeps both sides' choices). 273 pytest green (`tests/test_picture_road.py` 12: the file-name words and names, the Keeper's front
+through the road with the project's state and the progress words in order, determinism, the steps again, a synthetic
+three-view sheet named like a Midjourney download, the views as separate files, a held thing beside the body, an
+existing character drafted again, the failures in words, the CLI's progress lines and exits, the docs and the bench);
+`check_scripts.gd` 33/0; `test_editor.gd` 106/0; `test_scene.gd` 21/0; `forge/tools/picture_road.sh` under xvfb, errors 0: the Keeper's
+front dropped on Home ends with 17 shapes on the bench, silhouette overlap front 0.71 ("the right mass; the details
+want a hand"), 4.8 s in the app (2 s headless), `docs/screens/forgeapp/picture_road_{working,reference,compare,model}.png`
+and `file_browser.png` refreshed after the merge (the reference shot shows the prompt choices from main beside the road's). A synthetic three-view sheet (1300 x 820) takes about 10 s; everything is under
+the two-minute line. Not done here: a side view of the Keeper (the front alone gives no depth, and the warning says
+so); running the road on a real Midjourney download on Windows (the places and the webp thumbnails are built for it
+and tested under xvfb with a fake home).
+
+**How to resume.** `cd tools/pixelforge && PIXELFORGE_NO_UPDATE=1 python -m pytest -q`; `godot --headless --path
+tools/pixelforge/forge --script res://tools/check_scripts.gd`; `GODOT=... PROJECT=/tmp/p forge/tools/picture_road.sh
+/tmp/out`; `pixelforge character from-picture <picture> -p <project> --json`. Next: a second round that moves the
+draft's shapes toward the measured profile row by row (the overlap is 0.7 on a draft; the Hemomancer's hand-made file
+is 0.7 too, so the next gains are in the silhouette, not the colours); the side view from a single front picture by
+symmetry; the sheet's quarter view feeding the SE direction.

@@ -336,14 +336,18 @@ def _views_of(ref: str | Path, names: list[str] | None = None, tolerance: float 
     return {v.name: figure_rgba(v.image, tolerance) for v in views}
 
 
-def compare(doc: dict, ref: str | Path, out: str | Path, *, height: int = 195, views: list[str] | None = None, elevation: float = 0.0,
-            zoom: int = 1, tolerance: float = 0.08) -> dict:
+def compare(doc: dict, ref: str | Path | None, out: str | Path, *, height: int = 195, views: list[str] | None = None, elevation: float = 0.0,
+            zoom: int = 1, tolerance: float = 0.08, paintings: dict[str, np.ndarray] | None = None) -> dict:
     """Painting beside sprite, per view, at one height: each of the sheet's views (front, side, back) scaled to
     ``height`` px next to the file rendered facing the matching direction (S, E, N) at that height, feet on one
     line, with the silhouette overlap (intersection over union of the two masks, fitted to one box) per view. The
     painting is seen straight on, so the sprite is too (``elevation`` 0) unless told otherwise.
-    ``pixelforge shapes compare X.shapes.json --ref SHEET.png -o cmp.png``."""
-    paintings = _views_of(ref, views, tolerance)
+    ``pixelforge shapes compare X.shapes.json --ref SHEET.png -o cmp.png``. ``paintings`` (view name -> RGBA cutout) stands
+    in for ``ref`` when the views are already cut (the picture road keeps them under the character's ``source/``)."""
+    if paintings is None:
+        if ref is None:
+            raise ValueError("compare needs a reference picture or the cut views")
+        paintings = _views_of(ref, views, tolerance)
     doc = {**doc, "shadow": None}                       # the painting has no ground shadow; the overlap is of the figures
     scale = float(height) / float(doc.get("height", doc["size"][1]))
     model = S.Model(doc, scale) if S.mode_of(doc) == "solid" else None

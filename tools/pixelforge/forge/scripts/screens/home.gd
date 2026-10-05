@@ -299,10 +299,13 @@ func on_drop(paths: PackedStringArray) -> void:
 	if p.ends_with(".shapes.json") or p.ends_with(".json"):
 		app.go("characters", {"model": p})
 		return
-	var img := Image.load_from_file(p)
-	if img == null:
-		app.say("That is not a picture the Forge can read.")
+	# a picture is a character's: the Characters bench cuts it out, measures it, drafts and colours a shape model from
+	# it and stands the model beside it (several pictures at once are a sheet's views: front, side, back)
+	var pics: PackedStringArray = []
+	for q in paths:
+		if q.get_extension().to_lower() in ["png", "jpg", "jpeg", "webp", "bmp", "gif"]:
+			pics.append(q)
+	if pics.is_empty():
+		app.say("That is not a picture the Forge can read (PNG, JPG or WEBP).")
 		return
-	# a wide picture is a turnaround sheet (a character's reference); a tall one an object's
-	var wide := img.get_width() >= img.get_height() * 1.6
-	app.go("characters" if wide else "objects", {"painting": p})
+	app.go("characters", {"pictures": pics})

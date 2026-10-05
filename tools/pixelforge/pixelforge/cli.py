@@ -878,6 +878,37 @@ def cmd_shapes(a) -> None:
             print(f"{r['out']}: " + "; ".join(f"{k} ({v['direction']}) overlap {v['silhouette_iou']:.2f}" for k, v in r["views"].items()))
 
 
+def _picture_progress(step: str, done: int, total: int) -> None:
+    """The road's progress line (stderr, like ``_progress``): ``what`` carries the step's words with underscores."""
+    print(f"PF_PROGRESS step=picture what={step.replace(' ', '_')} done={done} total={total}", file=sys.stderr, flush=True)
+
+
+def cmd_character(a) -> None:
+    """pixelforge character from-picture|measure|sample|compare: a picture becomes a character in one go, and the steps again."""
+    from . import api, picture_road
+
+    sub = a.character_cmd
+    progress = _picture_progress if a.json else None
+    log = None if a.json else print
+    try:
+        if sub == "from-picture":
+            r = picture_road.from_picture(a.picture, a.project, a.name, style=a.style, height=a.height, text=a.text, progress=progress, log=log)
+        else:
+            r = picture_road.redo(a.project, a.character, sub, style=a.style, progress=progress, log=log)
+    except api.StepError as e:
+        _emit(a, {"ok": False, "error": str(e)})
+        raise SystemExit(2)
+    if a.json:
+        _emit(a, r)
+        return
+    if sub == "from-picture":
+        print(f"{r['character']}: {r['shapes']} shapes drafted from the {r['kind']} ({', '.join(r['views'])}); read " + "; ".join(r["read"]))
+    print(f"model {r['model']}\nstill {r['still']}\ncompare {r['compare']}")
+    for w in r["warnings"]:
+        print("warning: " + w)
+    print(r["judgement"])
+
+
 def cmd_game_preview(a) -> None:
     from . import api
     from .game_preview import import_game, preview_in_game
@@ -1362,6 +1393,23 @@ def build_parser() -> argparse.ArgumentParser:
     x = ss.add_parser("joints", help="re-export the joint tracks of the motion clips from the animation library (numpy, no Blender)")
     x.add_argument("--glb", default=None); x.add_argument("-o", "--out", default=None); x.add_argument("--fps", type=int, default=24); x.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_shapes)
+
+    s = sub.add_parser("character", help="THE PICTURE ROAD: a Midjourney picture (one figure or a turnaround sheet) -> cutouts, measured, a shape model drafted and coloured from it, imported into the project, drawn beside the painting")
+    cs = s.add_subparsers(dest="character_cmd", required=True)
+    x = cs.add_parser("from-picture", help="the whole road in one go: cut, measure, draft, sample materials, check, import, draw a still and the compare picture")
+    x.add_argument("picture", nargs="+", help="one picture (a figure, or a sheet with the views side by side) or the views as separate files: front [side] [back]")
+    x.add_argument("--name", default=None, help="the character's name (default: the picture's file name, which Midjourney writes the prompt into)")
+    x.add_argument("-p", "--project", required=True, help="the project folder (made when it does not exist)")
+    x.add_argument("--style", default=DEFAULT_PROJECT_STYLE, choices=sorted(STYLES), help="the look the still and the compare picture are drawn at (default godmarrow, the game's 195 px)")
+    x.add_argument("--height", type=int, default=120, help="the file's author height in units (default 120)")
+    x.add_argument("--text", default=None, help="the costume sentence the draft reads instead of the file name's words")
+    x.add_argument("--json", action="store_true")
+    for name, helptext in (("measure", "measure the saved cutouts again and size the model's rings and limbs from them, then draw"),
+                           ("sample", "take the front view's colours into the model's ramps again, then draw"),
+                           ("compare", "the still and the compare picture again (painting beside sprite per view, with the overlap)")):
+        x = cs.add_parser(name, help=helptext)
+        x.add_argument("character"); x.add_argument("-p", "--project", required=True); x.add_argument("--style", default=None, choices=sorted(STYLES)); x.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_character)
 
     s = sub.add_parser("game-preview", help="see it in the game: launch Godot with a skin, effects or attachments on the moor (or take a screenshot)")
     s.add_argument("--game", default=None, help="the Godot project folder (found upward from here when omitted)"); s.add_argument("--godot", default=None)
