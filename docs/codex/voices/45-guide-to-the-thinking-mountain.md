@@ -1,0 +1,35 @@
+# What the Guide Would Say on the Road to the Brow, for Those Who Cannot Hear Him
+
+*This came to me through three pairs of hands from past the white country, rolled tight inside the cut end of a pilgrim's rope; the trader who put it into our tongue for me said the place it comes from has no word for the Hide, and he had to borrow ours to say so.*
+
+Read this at the last hearth, where it is still quiet. Past the hearth the wind takes every word out of my mouth before it reaches the pilgrim behind me, and I have stopped shouting. All I would tell you on the road is here. Keep the leaf inside your coat, against the skin. Do not carry it above the Shelf. Writing is thought up there, the same as you are, and I want it to say the same thing when you come down.
+
+**The rope.** You are tied to me and to each other, waist to waist, one body's length between. On the road the rope is the only speech. One pull: stop. Two pulls: come on. Three pulls: sit where you are and put your hands over your eyes. A long pull that does not end: I am coming back along the rope to you; stand still. If the rope goes slack and stays slack, wait. Do not untie. I have found every pilgrim who untied. Some of them I found sitting.
+
+**What to bring.** A coat. Flat bread for nine days; you will eat on four of them. Two water skins; you will not want the snow. A blindfold of dark cloth. One small thing of your own that you know by touch alone, a pebble you have worn or a knot you tie without looking, to hold in your fist on the way down.
+
+**What to leave at the hearth.** Every tally stick. Every letter. Every cord whose knots mean something, every carving with a mark cut in it. A thing with a meaning in it is thought by the Brow along with you, and comes down meaning something else. A woman of my mother's seasons carried up the knotted cord of her household's debts. She brought it down and every knot had moved, and her household paid what the cord said, because it was her cord. Leave the names of your dead here too, if you can. You cannot. I know. Try.
+
+**The road.** Four days from the hearth to the Brow's foot: the dry river, then the grey shelf of stone we call the Lip. There are cairns along both sides. The cairns on your right hand are the guides before me; set a stone on each as you pass. The cairns on your left hand are nobody's. Set nothing on them, and do not read the shape of them.
+
+**The first stage, at the Lip.** You will feel noticed, as in a full room when someone has turned toward you and you have not yet seen who. This is the Brow finding you among the stones. Some weep here. It passes by nightfall.
+
+**The second stage, at the Shelf.** The wind is worst here, and the thinking begins to slow. A thought you start on one ridge you will finish on the next, an hour later. You will lose count of your steps and find it again higher up, larger than the steps you took. Do not argue with it. Leave this leaf in the hollow under the flat stone with the others.
+
+**The third stage, at the Fold.** Blindfold on. Here the Brow has you in mind. You will remember things you did not live: being cold for a very long time, on purpose; the weight of snow as a kind of company; a slowness that is a pleasure. You will know where each stone of the slope lies without seeing it, and your feet will go there. You will be very still inside, and the stillness will be correct.
+
+**The fourth stage, at the Seat.** A hollow below the summit, wide enough for nine, worn smooth by sitting. I bring you into it and pull three times, and you sit. Here you are thought whole. I cannot set it down for you. I have been thought at the Seat eleven times and come down eleven times, and each time I came down with fewer words for it. What pilgrims say on the way down is this: that they were turned over, the way a hand turns a stone to see its other face, and set down again. That the Brow was gentle and wanted nothing from them. That it thinks very few things, and each one for a very long time, and they had been one of them, and it was glad of them.
+
+**Coming down.** I pull long. Stand. Keep the blindfold on until the Shelf, and keep your small thing in your fist. On the way down you will find thoughts in you that are not yours, plain ones, about weight and about the patience of cold. They fade by the hearth. A few keep one for life; it does no harm. You will also have lost a word. It will be a small one. Everyone who goes up in a season loses the same word, and the valley has to say it for them until the next. This season it is ________. I write it as a gap, because the ones who come down cannot bear to see it written. They say it itches.
+
+**Those who do not want to come down.** Some will not stand when I pull. I pull three times long, which is the last thing I am able to say to anyone. If they still sit, I untie them and go down without them. That is the guides' law and I keep it. They stay warm in the hollow longer than a body stays warm, and snow will not lie on them, and then one season it does. Their families do not say they died. They say they are kept in mind. The cairns on the left hand are theirs, and they have no names in the valley, because the Brow has them now, and a name thought by the Brow comes down meaning something else.
+
+**The stranger.** In my first season with the rope, a man came up the river road from further off than any road we know. At every rest he put his palms flat on the ground and took them away again and frowned, as though the ground had failed to do something he expected of it. He said that in his country the ground was warm. He said his people lived on the skin of a god, and the god was dead under them, and the dead there did not stay down. He wanted to ask the Brow whose body it was.
+
+He went up fourth on my rope. At the Seat the Brow thought him with the rest of us, and the ones who sat beside him came down all saying the same thing. That the Brow turned him over longer than any of them, and set him down, and picked him up again. That it went looking in itself for a place where he would fit, and had none. That it tried to think a god, and had nothing to think one with, never having had one or been one. That it tried to think *dead* of so large a thing, and could only think snow on stone. That it tried to think warm ground, and something lying under it a very long time, and kept almost having the thought, the way you almost have a word, and losing it.
+
+He came down with his palms torn from pressing them to the Seat, and went back along the river road. I think his people were sick in the head, or he was. The Brow knows the shape of all there is under the sky, and it did not know his god. That is answer enough.
+
+Only this. Since that season, one or two from every Seat come down and, at the first hearth, put their palms flat on the floor and keep them there. They ask what is under it. I tell them: the ground. They nod, and keep their palms there, and
+
+*(Below, in another hand:)* She went up at the thaw with no rope. The rope signals stand as she gave them. Her cairn is on the
