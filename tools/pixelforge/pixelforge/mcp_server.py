@@ -457,7 +457,35 @@ def build_server():
         api.animate_still(p, character, view, [preset])
         return api.export(p, character)
 
+    # ---- the free-tool adapters (pixelforge/tools): one MCP tool each, plus the honest status list
+    from . import tools as TOOLS
+
+    @mcp.tool()
+    def tools_status() -> dict:
+        """Every free tool the Forge can use (Aseprite, LibreSprite, Pixelorama, Furnace, Blender, ffmpeg, ImageMagick, rembg, Tiled, LDtk, Godot; Mixamo and
+        Midjourney are websites): found or not on this computer, its version, what it does for us, its licence and the install step. Nothing is installed by this server."""
+        return TOOLS.status()
+
+    for _name in TOOLS.ADAPTERS:
+        register_tool_adapter(mcp, _name)
+
     return mcp
+
+
+def register_tool_adapter(mcp, name: str):
+    """`tool_<name>(action, params)` on the server: the adapter's actions behind one MCP tool whose description lists them."""
+    from . import tools as TOOLS
+
+    def tool_fn(action: str = "status", params: str = "{}") -> dict:
+        try:
+            p = json.loads(params) if params else {}
+        except json.JSONDecodeError as e:
+            return {"ok": False, "error": f"params is not JSON: {e}"}
+        return TOOLS.run(name, action, p if isinstance(p, dict) else {})
+
+    tool_fn.__name__ = f"tool_{name}"
+    tool_fn.__doc__ = TOOLS.mcp_description(name)
+    return mcp.tool(name=f"tool_{name}", description=TOOLS.mcp_description(name))(tool_fn)
 
 
 def main() -> None:

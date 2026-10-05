@@ -293,22 +293,26 @@ class PxText:
 	func set_text(t: String) -> void:
 		text = t
 		queue_redraw()
+	## the words wrapped to the width, at most max_lines; a "\n" in the text starts a new line
 	func _wrap() -> PackedStringArray:
 		if max_lines <= 1:
-			return PackedStringArray([text])
+			return PackedStringArray([text.split("\n")[0]])
 		var out: PackedStringArray = []
-		var line := ""
-		for word in text.split(" "):
-			var trial := word if line == "" else line + " " + word
-			if T.text_width(trial, font_size) > size.x and line != "":
+		for para in text.split("\n"):
+			if out.size() >= max_lines:
+				break
+			var line := ""
+			for word in para.split(" "):
+				var trial := word if line == "" else line + " " + word
+				if T.text_width(trial, font_size) > size.x and line != "":
+					out.append(line)
+					line = word
+					if out.size() >= max_lines:
+						break
+				else:
+					line = trial
+			if out.size() < max_lines and line != "":
 				out.append(line)
-				line = word
-				if out.size() >= max_lines:
-					break
-			else:
-				line = trial
-		if out.size() < max_lines and line != "":
-			out.append(line)
 		return out
 	func _draw() -> void:
 		var f := T.font("text")

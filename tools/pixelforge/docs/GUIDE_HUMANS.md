@@ -57,7 +57,9 @@ pieces across genres, and Keep as a game cue. The full manual is below, "The Mus
 
 **Describe it.** The line on Home takes plain words: "a hooded necromancer with a skull-topped staff burning green"
 drafts a shape model and opens the Characters bench with it; "a wisp lantern spell, pale blue, slow, with embers"
-opens Effects with it playing; "a slow sombre act 2 wilds tune" opens the music rack on that cue.
+opens Effects with it playing; "a slow sombre act 2 wilds tune" opens the music rack on that cue. A sentence that
+names two or more benches ("a pale wisp effect, a hit sound and a short crypt tune") starts a **job**: Claude plans
+the steps and the Forge carries them out while you watch (see *Jobs* below).
 
 **Under construction** (the bench says so itself, in gold, and nothing on it crashes):
 - **Creatures.** The beast rig (four legs, a tail, wings) is not in the engine yet. The bench is the characters'
@@ -185,6 +187,59 @@ Reference tab beside the model when it is done.
 
 The fallback is always there: **Copy prompt**, paste it in Midjourney yourself, upscale, save the PNG, and drop the
 file on the bench. The bench says so whenever the browser road is closed.
+
+## Jobs: one sentence across several benches
+
+The describe line on Home takes a sentence that spans benches: *"a pale wisp effect, a hit sound and a short crypt
+tune"*. When two or more benches are named, the Forge does not open one bench; it starts a **job**. Claude writes a
+plan (one step per thing: the command, what it makes, how it is checked), and the Forge carries the plan out step by
+step while you watch. Home shows a **Jobs** panel under the nine choices: *running* with the step it is on and what it
+is doing right now; *waiting for approval* with the step that waits (a step that writes into the game, opens a program
+for hand work, or renders a whole character pauses first); *done* with how many things were made. The bottom row has
+what applies: **Approve** (runs the waiting step and carries on), **Cancel** (stops the job; what was made stays),
+**Resume** (a job the Forge was closed on, or one that stopped at a step that could not be done) and **Report**.
+When there are several jobs a *job* cycler picks one.
+
+**The report** opens on the bench the job concerns, with the pictures in the picture window (*Next picture* cycles
+them): what was made and where, what could not be done and why, in plain lines. Esc or *Back to bench* leaves it. The
+same report is a file: `<project>\jobs\<id>\report.md` (with the pictures) and `report.json`.
+
+**A step that fails** is tried once more after Claude is asked to fix it (a flag, a name, a path); if it still cannot
+be done, the step is marked, the steps that needed it are skipped, the rest go on, and the report says why. **Closing
+the Forge** while a job runs stops it (a job is the Forge's own child process; nothing runs in the background): on the
+next launch Home shows it as *interrupted* with **Resume**, which carries on from the last finished step. Everything a
+job knows is in its folder under `<project>\jobs\`, so nothing is lost between launches.
+
+From a prompt the same job is `pixelforge job start "..." -p <project>` with `job list | status | log | approve | cancel
+| resume | report`; `--approve none` runs without pauses.
+
+## Tools we use instead of building
+
+The Forge does not reinvent what a good free tool already does. It finds the tools below when they are installed, uses
+them where they fit (a job can call them, the benches will grow their buttons for them), and tells you in one sentence
+how to install one that is missing, with the official page. **It never downloads or installs a program for you**: that
+stays your own step, on your own machine. `pixelforge tools status` prints the honest list for this computer: found or
+not, the version, what it does for us, and the install sentence. Settings will show the same list.
+
+| tool | what it does for us | official download page | licence |
+|---|---|---|---|
+| Aseprite | hand edits of a frame set (open, draw, close; the frames come back), sprite sheets and batch exports from its command line, Lua scripts | https://www.aseprite.org/download/ (or Steam) | proprietary (paid binary; the source is free to build yourself) |
+| LibreSprite | the free fork of Aseprite 1.x: hand edits of frames, the same command line for sheets and exports (its scripts are JavaScript) | https://libresprite.github.io/#!/downloads | GPL-2.0 |
+| Pixelorama | a free pixel editor for hand edits; no command line, so open-and-wait only | https://orama-interactive.itch.io/pixelorama | MIT |
+| Furnace | a chiptune tracker: our songs exported as ProTracker .mod open in it; its command line renders a tracker file to WAV through real chip emulation | https://github.com/tildearrow/furnace/releases | GPL-2.0 |
+| Blender | the 3D step of the old road (hull, rig, 8-direction renders) and any headless script | https://www.blender.org/download/ | GPL-2.0-or-later |
+| ffmpeg | GIFs and MP4s of frame folders at whole-pixel zoom, WAV to OGG for the game, facts about a media file (ffprobe) | https://ffmpeg.org/download.html | LGPL-2.1-or-later (GPL builds exist) |
+| ImageMagick | strips and contact sheets from frames, format conversions, whole-pixel scaling, identify (version 6 and 7) | https://imagemagick.org/script/download.php | ImageMagick License (Apache-2.0 compatible) |
+| rembg | cut a painting's subject from its background before the cutout steps or a prop (it fetches its own model file, about 170 MB, on first use) | https://github.com/danielgatis/rembg (`pip install rembg[cli]`) | MIT |
+| Tiled | map editing by hand; `--export-map` to JSON; a Tiled map as one plain layout JSON for the game (YATI imports .tmx/.tmj into Godot directly) | https://www.mapeditor.org/download.html | GPL-2.0-or-later (libtiled BSD) |
+| LDtk | level editing by hand (no command line); a .ldtk level as one plain layout JSON for the game (godot-ldtk-importer imports it directly) | https://ldtk.io/download/ | MIT |
+| Godot | the engine: the headless import of new art, the Forge's own checks, the game opened with a skin or an effect for a look or a screenshot | https://godotengine.org/download/ | MIT |
+| Claude Code | the Claude on every bench and the planner of jobs (`pixelforge/claude_bridge.py`) | https://claude.com/claude-code | a paid plan (Anthropic's terms) |
+| Mixamo | a website: auto-rigging and motion clips for the old road's FBX; the shape-sprite road needs none of it | https://www.mixamo.com/ | free with an Adobe account (Adobe's terms) |
+| Midjourney | a website: the reference paintings, through Claude in Chrome or a copied prompt | https://www.midjourney.com/ | a paid subscription (Midjourney's terms) |
+
+Set a path by hand when a tool lives somewhere unusual: `PIXELFORGE_ASEPRITE`, `PIXELFORGE_FFMPEG`, `PIXELFORGE_FURNACE`
+and so on (the tool's name in capitals).
 
 ## Install (once)
 

@@ -623,6 +623,83 @@ def cmd_midjourney(a) -> None:
         sys.exit(1)
 
 
+def cmd_tools(a) -> None:
+    """pixelforge tools status | explain <tool> | run <tool> <action> [--params JSON]"""
+    from . import tools as T
+    if a.tools_cmd == "status":
+        r = T.status(with_version=not getattr(a, "quick", False))
+        _emit(a, r) if a.json else print(T.format_status(r))
+    elif a.tools_cmd == "explain":
+        try:
+            mod = T.get(a.tool)
+        except KeyError as e:
+            r = {"ok": False, "error": str(e)}
+        else:
+            r = {"ok": True, "tool": mod.NAME, "found": mod.find() is not None, "install": mod.explain_missing(), "home": mod.HOME, "licence": mod.LICENCE, "what": mod.WHAT,
+                 "actions": T.actions_of(mod)}
+        _emit(a, r) if a.json else print(r.get("install") or r.get("error"))
+    else:
+        import json as _json
+        params = _json.loads(a.params) if a.params else {}
+        r = T.run(a.tool, a.action, params)
+        _emit(a, r) if a.json else print(_json.dumps(r, indent=1, default=str))
+        if not r.get("ok", False):
+            sys.exit(1)
+
+
+def _job_progress(job_id: str, done: int, total: int, words: str) -> None:
+    """The runner's progress for the Forge: `PF_PROGRESS step=job id=... done=i total=n note=words+with+pluses` on stderr."""
+    print(f"PF_PROGRESS step=job id={job_id} done={done} total={total} note={str(words).replace(' ', '+')}", file=sys.stderr, flush=True)
+
+
+def cmd_job(a) -> None:
+    """pixelforge job start "sentence" -p P [--approve steps|none] [--plan FILE] [--no-run] | list | status ID | log ID | approve ID [--step S] [--run] | cancel ID | resume ID | report ID"""
+    import json as _json
+    from . import jobs as J
+    sub = a.job_cmd
+    project = a.project or "."
+    try:
+        if sub == "start":
+            plan = _json.loads(Path(a.plan).read_text(encoding="utf-8")) if getattr(a, "plan", None) else None
+            r = J.start(project, a.text, approve=a.approve, plan=plan, game=a.game or "", run_now=not a.no_run, on_progress=_job_progress)
+        elif sub == "list":
+            r = J.list_jobs(project)
+        elif sub == "status":
+            r = {"ok": True, **J.status(project, a.id)}
+        elif sub == "log":
+            r = J.tail_log(project, a.id, a.lines)
+        elif sub == "approve":
+            r = J.approve(project, a.id, a.step)
+            if r.get("ok") and a.run:
+                r = J.resume(project, a.id, on_progress=_job_progress)
+        elif sub == "cancel":
+            r = J.cancel(project, a.id)
+        elif sub == "resume":
+            r = J.resume(project, a.id, on_progress=_job_progress)
+        else:
+            r = J.write_report(project, a.id)
+    except FileNotFoundError as e:
+        r = {"ok": False, "error": str(e)}
+    if a.json:
+        _emit(a, r)
+        return
+    if not r.get("ok", False):
+        print(r.get("error", "stopped"))
+        sys.exit(1)
+    if sub == "list":
+        for j in r["jobs"]:
+            print(f"{j['id']}  {j['state']:11s} {j['done']}/{j['total']}  {j['title']}" + (f"  (waiting: {j['waiting']})" if j["waiting"] else ""))
+        if not r["jobs"]:
+            print("no jobs yet")
+    elif sub == "log":
+        print("\n".join(r["tail"]))
+    elif sub == "report":
+        print(Path(r["report"]).read_text(encoding="utf-8"))
+    else:
+        print(f"{r.get('id', '')}  {r.get('state', '')}  {r.get('done', 0)}/{r.get('total', 0)}  {r.get('title', '')}" + (f"\nwaiting for approval: {r['waiting']}" if r.get("waiting") else "")
+              + (f"\nreport: {r['report']}" if r.get("report") else ""))
+
+
 def cmd_describe(a) -> None:
     from . import describe
 
@@ -640,6 +717,8 @@ def cmd_describe(a) -> None:
             print(r.get("error", "stopped"))
         return
     d = describe.draft(a.text, image=a.image, what=a.as_)
+    from .jobs import benches_in
+    d["benches"] = benches_in(a.text)       # two or more: the Forge's Home starts a job instead of opening one bench
     if d["what"] == "spell" and a.out:
         from . import spell as S
         d["export"] = S.export_spell(d["spell"], a.out, gif=True)
@@ -1196,6 +1275,28 @@ def build_parser() -> argparse.ArgumentParser:
     x = cs.add_parser("log", help="the last job's log"); x.add_argument("-p", "--project", default="."); x.add_argument("--lines", type=int, default=40); x.add_argument("--json", action="store_true")
     x = cs.add_parser("undo", help="put a snapshot back (the manifest a describe --bench result names)"); x.add_argument("manifest"); x.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_claude)
+
+    s = sub.add_parser("tools", help="the free tools the Forge uses instead of building their work: status (found or not, version, the install sentence) | explain <tool> | run <tool> <action>")
+    ts = s.add_subparsers(dest="tools_cmd", required=True)
+    x = ts.add_parser("status", help="every tool, found or not, with its version and the install step"); x.add_argument("--quick", action="store_true", help="skip the version calls"); x.add_argument("--json", action="store_true")
+    x = ts.add_parser("explain", help="the install step for one tool, in a sentence"); x.add_argument("tool"); x.add_argument("--json", action="store_true")
+    x = ts.add_parser("run", help="one adapter action: pixelforge tools run ffmpeg gif --params '{\"frames_dir\": \"...\"}'"); x.add_argument("tool"); x.add_argument("action")
+    x.add_argument("--params", default="", help="the action's parameters as a JSON object"); x.add_argument("--json", action="store_true")
+    s.set_defaults(func=cmd_tools)
+
+    s = sub.add_parser("job", help="a job: one sentence -> a plan of steps (Claude writes it) carried out while the Forge watches: start | list | status | log | approve | cancel | resume | report")
+    js = s.add_subparsers(dest="job_cmd", required=True)
+    jc = argparse.ArgumentParser(add_help=False); jc.add_argument("-p", "--project", default=None); jc.add_argument("--json", action="store_true")
+    x = js.add_parser("start", parents=[jc], help="plan and run a job from a sentence"); x.add_argument("text"); x.add_argument("--approve", choices=["steps", "none"], default="steps", help="steps: pause at the steps the plan marks; none: never pause")
+    x.add_argument("--plan", default=None, help="a plan JSON of your own instead of asking Claude"); x.add_argument("--game", default=None, help="the game folder steps may write into"); x.add_argument("--no-run", action="store_true", help="write the plan only")
+    js.add_parser("list", parents=[jc], help="every job of the project with its state")
+    x = js.add_parser("status", parents=[jc], help="one job: its steps and their states"); x.add_argument("id")
+    x = js.add_parser("log", parents=[jc], help="the job's log"); x.add_argument("id"); x.add_argument("--lines", type=int, default=40)
+    x = js.add_parser("approve", parents=[jc], help="approve the step a job waits at (then `resume`, or --run here)"); x.add_argument("id"); x.add_argument("--step", default=None); x.add_argument("--run", action="store_true")
+    x = js.add_parser("cancel", parents=[jc], help="stop a job"); x.add_argument("id")
+    x = js.add_parser("resume", parents=[jc], help="carry on from the last finished step"); x.add_argument("id")
+    x = js.add_parser("report", parents=[jc], help="write and print the report"); x.add_argument("id")
+    s.set_defaults(func=cmd_job)
 
     s = sub.add_parser("midjourney", help="Midjourney through the owner's Chrome (Claude in Chrome): fetch a painting for a prompt, or print the prompt")
     ms = s.add_subparsers(dest="midjourney_cmd", required=True)

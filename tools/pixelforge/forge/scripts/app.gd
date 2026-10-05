@@ -71,6 +71,8 @@ var hover_drop := false
 var style_name := "godmarrow"
 var claude_state := {}          # `claude status --json`: ok, state (ready | not_found | not_signed_in), sentence
 var claude_working := ""        # the current progress line while Claude works on a bench ("" when idle)
+var jobs_list: Array = []       # `job list --json`: the project's jobs, newest first (id, title, state, done, total, waiting, last, bench, report_json)
+var job_runs: Array = []        # the jobs running under this Forge right now: {id, title, last, done, total, job (the Backend.Job)}
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -92,7 +94,7 @@ func _ready() -> void:
 	backend = Backend.new()
 	backend.setup(args, cfg)
 	add_child(backend)
-	backend.progress.connect(func(_j, info): if current and current.has_method("on_progress"): current.on_progress(info))
+	backend.progress.connect(_on_progress)
 	backend.line.connect(func(_j, _l): _log_follow())
 	# the picture window
 	scene = Scene.new()
@@ -157,6 +159,7 @@ func _ready() -> void:
 	style_name = backend.project_style(String(cfg.get("style", "godmarrow")))
 	_foot_update()
 	_claude_status()
+	refresh_jobs()
 	var first := String(args.get("screen", "home"))
 	if not SCREENS.has(first):
 		first = "home"
@@ -366,6 +369,91 @@ func set_claude_working(words: String) -> void:
 	if words != "":
 		foot_hint.text = "Claude: " + words
 	chrome.queue_redraw()
+
+# ------------------------------------------------------------------ jobs (pixelforge job ...: a sentence that spans benches)
+## every PF_PROGRESS line: a job's lines keep its record here (the Home panel reads them); the rest goes to the screen
+func _on_progress(j, info: Dictionary) -> void:
+	if String(info.get("step", "")) == "job":
+		var words := String(info.get("note", "")).replace("+", " ")
+		for rec in job_runs:
+			if rec["job"] == j:
+				if String(info.get("id", "")) != "":
+					rec["id"] = String(info["id"])
+				rec["done"] = int(info.get("done", "0"))
+				rec["total"] = int(info.get("total", "0"))
+				rec["last"] = words
+		say_hint("job: " + words)
+		if current and current.has_method("on_job_progress"):
+			current.on_job_progress()
+		return
+	if current and current.has_method("on_progress"):
+		current.on_progress(info)
+
+## `job list --json`, kept in jobs_list; cb runs when it is in (Home rebuilds)
+func refresh_jobs(cb: Callable = Callable()) -> void:
+	if not backend.python_ok() or not backend.project_exists():
+		jobs_list = []
+		if cb.is_valid():
+			cb.call()
+		return
+	backend.run(["job", "list", "-p", backend.project_dir], "job list", func(r: Dictionary):
+		if r.get("ok", false):
+			jobs_list = r.get("jobs", [])
+		if cb.is_valid():
+			cb.call())
+
+## one sentence that spans benches becomes a job: Claude writes the plan, the runner carries it out as this Forge's child
+func start_job(sentence: String) -> void:
+	var a := ["job", "start", sentence, "-p", backend.project_dir]
+	if backend.game_ok():
+		a += ["--game", backend.game_dir]
+	_run_job(a, sentence)
+
+func approve_job(id: String) -> void:
+	_run_job(["job", "approve", id, "--run", "-p", backend.project_dir], job_title(id))
+
+func resume_job(id: String) -> void:
+	_run_job(["job", "resume", id, "-p", backend.project_dir], job_title(id))
+
+## stop: the runner under this Forge is killed (it is our child), and the job's state on disk says cancelled
+func cancel_job(id: String) -> void:
+	for rec in job_runs.duplicate():
+		if String(rec["id"]) == id and rec["job"] != null:
+			backend.cancel(rec["job"])
+	backend.run(["job", "cancel", id, "-p", backend.project_dir], "job cancel", func(_r: Dictionary):
+		refresh_jobs(func(): if current and current.has_method("on_job_done"): current.on_job_done({"ok": true, "state": "cancelled", "id": id})))
+
+func _run_job(a: Array, title: String) -> void:
+	var rec := {"id": "", "title": title, "last": "planning", "done": 0, "total": 0, "job": null}
+	for x in a:
+		if x is String and String(x).begins_with("20") and String(x).length() >= 15:
+			rec["id"] = String(x)     # approve / resume carry the id already
+	rec["job"] = backend.run(a, "job: " + title, func(r: Dictionary): _job_done(rec, r))
+	job_runs.append(rec)
+	audio.set_state("working")
+	if current and current.has_method("on_job_progress"):
+		current.on_job_progress()
+
+func _job_done(rec: Dictionary, r: Dictionary) -> void:
+	job_runs.erase(rec)
+	if job_runs.is_empty():
+		audio.set_state("home")
+	set_hint(hint_text)
+	if not r.get("ok", false):
+		say(String(r.get("error", "The job stopped.")).split("\n")[0])
+	refresh_jobs(func(): if current and current.has_method("on_job_done"): current.on_job_done(r))
+
+func job_title(id: String) -> String:
+	for j in jobs_list:
+		if String(j.get("id", "")) == id:
+			return String(j.get("title", id))
+	return id
+
+func job_running(id: String) -> bool:
+	for rec in job_runs:
+		if String(rec["id"]) == id or (id == "" and rec["job"] != null):
+			return true
+	return false
 
 # ------------------------------------------------------------------ screens
 func go(name: String, a: Dictionary = {}) -> void:
