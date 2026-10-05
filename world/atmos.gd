@@ -2,27 +2,24 @@ class_name Atmos
 extends CanvasLayer
 ## The world's breath (zz_atmos62.js), drawn over the dark and lit by it (the dark layer's light_at): five layers that
 ## live in the world and take their colour from the light round them, never red.
-##  1. mist banks drifting over the ground, bright only where a lantern or fire reaches them;
+## (The mist banks and the cloud shadows were dithered blobs that popped up over the screen; the user hated them and
+## they were taken out, 2026-10-05.)
 ##  2. dust turning in the hero's lantern light;
 ##  3. soul-lights: a few pale wandering lights in the open at dusk and night, each lighting the ground under it;
 ##  4. leaves shaken loose on the moor and in the woods, tumbling on the wind;
-##  5. cloud shadows sliding over the land by day.
-## One shared gust (Game.wind) moves mist, leaves, dust and clouds.
+## One shared gust (Game.wind) moves leaves, dust and the flames.
 
 const WPX := 4.0             # screen px per world px
 var zone: Zone
 var hero: Hero
 var dark: DarkLayer
 var canvas: Node2D
-var mist: Array = []
 var dust: Array = []
 var souls: Array = []
 var leaves: Array = []
-var clouds: Array = []
 var embers: Array = []       # dusk: embers lifting off the ash (orange motes, never a light)
 var motes: Array = []        # dawn: gold dust in the long light
-var dapple: Array = []       # the woods by day: patches of light through the canopy, drifting
-var add_canvas: Node2D       # the additive layer (dapple, motes)
+var add_canvas: Node2D       # the additive layer (the dawn's motes)
 var air: Node2D
 var flames: Node2D           # world/flames.gd: halos at every flame (in the world), embers and smoke (drawn here)
 var gust := 0.0
@@ -30,9 +27,7 @@ var gust_t := 0.0
 var gust_v := 0.0
 var t := 0.0
 var last_cam := Vector2.INF
-var _mist_tex: Array = []     # (instance caches: static Resources crash Godot at exit)
-var _cloud_tex: Texture2D
-var _halo: Texture2D
+var _halo: Texture2D          # (instance cache: static Resources crash Godot at exit)
 
 func _ready() -> void:
 	layer = 6
@@ -47,23 +42,18 @@ func _ready() -> void:
 	add_canvas.material = mat
 	add_canvas.draw.connect(_draw_add)
 	add_child(add_canvas)
-	if _mist_tex.is_empty():
-		_mist_tex = [_blob(110, 30, 1.1), _blob(84, 24, 1.0), _blob(150, 40, 1.3)]
-		_cloud_tex = _blob(220, 110, 0.9)
+	if _halo == null:
 		_halo = _blob(9, 9, 1.5)
 
 func bind(z: Zone, h: Hero, d: DarkLayer) -> void:
 	zone = z
 	hero = h
 	dark = d
-	mist.clear()
 	dust.clear()
 	souls.clear()
 	leaves.clear()
-	clouds.clear()
 	embers.clear()
 	motes.clear()
-	dapple.clear()
 	if flames and is_instance_valid(flames):
 		flames.queue_free()
 	flames = load("res://world/flames.gd").new()
@@ -125,14 +115,6 @@ func _process(dt: float) -> void:
 	for sm in zone.sway_mats.values():
 		sm.set_shader_parameter("wind", wind)
 	var c := hero.tp
-	# 1. mist banks round the camera, anchored to the ground
-	var want := 18 if _fenish() else (int(round(6 + 8 * night)) if outdoor else 8)
-	while mist.size() < want:
-		mist.append({"p": c + Vector2(randf_range(-10, 10), randf_range(-10, 10)), "k": randi() % 3, "t": 0.0, "life": randf_range(18, 40), "d": randf_range(0.5, 1.0), "ph": randf() * 6.0})
-	for m in mist:
-		m["t"] += dt
-		m["p"] += Vector2(wind * 0.35, -wind * 0.12) * dt
-	mist = mist.filter(func(m): return m["t"] < m["life"] and m["p"].distance_to(c) < 15.0)
 	# 2. dust in the lantern light
 	if not hero.dead:
 		while dust.size() < 10:
@@ -186,15 +168,7 @@ func _process(dt: float) -> void:
 		l["v"].x += (wind * 24.0 * WPX - l["v"].x) * minf(1.0, dt)
 		l["p"] += Vector2(l["v"].x + sin(t * 2.3 + l["ph"]) * 6.0 * WPX, l["v"].y + cos(t * 1.7 + l["ph"]) * 3.0 * WPX) * dt - dcam
 	leaves = leaves.filter(func(l): return l["t"] < l["life"] and l["p"].x > -120 and l["p"].x < vs.x + 120 and l["p"].y < vs.y + 80)
-	# 5. clouds: only in the open by day
-	var cw := 2 if outdoor and dk > 0.2 else 0
-	while clouds.size() < cw:
-		clouds.append({"p": Vector2(randf_range(-vs.x * 0.6, vs.x * 0.9), randf_range(-160, vs.y)), "s": randf_range(0.9, 1.6), "t": 0.0, "life": randf_range(40, 70)})
-	for k in clouds:
-		k["t"] += dt
-		k["p"] += Vector2((4.0 + wind * 8.0) * WPX, 1.2 * WPX) * dt - dcam
-	clouds = clouds.filter(func(k): return k["t"] < k["life"] and k["p"].x < vs.x + 800 and k["p"].y < vs.y + 480)
-	# dusk embers, dawn motes, the canopy's dapple (screen space, carried with the camera)
+	# dusk embers and dawn motes (screen space, carried with the camera)
 	var hr := Game.hour_name() if outdoor else ""
 	if hr == "dusk" and randf() < 6.0 * dt and embers.size() < 30:
 		embers.append({"p": Vector2(randf_range(0, vs.x), randf_range(vs.y * 0.3, vs.y)), "v": Vector2(randf_range(-4, 4), randf_range(-14, -6)) * WPX, "t": 0.0, "life": randf_range(2.5, 5.0), "ph": randf() * 6.0})
@@ -208,15 +182,6 @@ func _process(dt: float) -> void:
 		mo["t"] += dt
 		mo["p"] += Vector2(wind * 6.0 * WPX + sin(t * 0.8 + mo["ph"]) * 2.0 * WPX, -1.5 * WPX + cos(t * 0.6 + mo["ph"]) * 1.5 * WPX) * dt - dcam
 	motes = motes.filter(func(mo): return mo["t"] < mo["life"])
-	var wd := 5 if (outdoor and _woody() and zone.d.get("theme", "") != "moor" and dk > 0.4) else 0
-	while dapple.size() < wd:
-		dapple.append({"p": Vector2(randf_range(-200, vs.x), randf_range(-100, vs.y)), "s": randf_range(0.6, 1.3), "t": 0.0, "life": randf_range(12, 24), "k": randi() % 3})
-	for dp in dapple:
-		dp["t"] += dt
-		dp["p"] += Vector2((2.0 + wind * 5.0) * WPX, 0.6 * WPX) * dt - dcam
-	dapple = dapple.filter(func(dp): return dp["t"] < dp["life"] and dp["p"].x < vs.x + 400)
-	if wd == 0:
-		dapple.clear()
 	canvas.queue_redraw()
 	add_canvas.queue_redraw()
 
@@ -230,24 +195,6 @@ func _draw_all() -> void:
 	var vs := canvas.get_viewport().get_visible_rect().size
 	var outdoor: bool = zone.d.get("outdoor", false)
 	var dk := Game.day_k() if outdoor else 0.0
-	# 5. clouds: a gentle shade drifting over the ground
-	for k in clouds:
-		var f := minf(1.0, minf(k["t"] / 6.0, (k["life"] - k["t"]) / 6.0)) * clampf((dk - 0.2) * 2.0, 0.0, 1.0)
-		var sz: Vector2 = _cloud_tex.get_size() * WPX * float(k["s"])
-		canvas.draw_texture_rect(_cloud_tex, Rect2(k["p"], sz), false, Color(0.1, 0.1, 0.16, 0.16 * f))
-	# 1. mist: its brightness is the light it sits in
-	for m in mist:
-		var tex: Texture2D = _mist_tex[m["k"]]
-		var sz2: Vector2 = tex.get_size() * WPX
-		var p: Vector2 = xf * Iso.to_screen(m["p"])
-		if p.x > vs.x + sz2.x or p.y > vs.y + sz2.y or p.x < -sz2.x or p.y < -sz2.y:
-			continue
-		var L := _light(p)
-		var l: float = L[0]
-		var lc: Color = L[1]
-		var f2: float = minf(1.0, minf(m["t"] / 5.0, (m["life"] - m["t"]) / 5.0)) * m["d"] * (0.6 + 0.4 * sin(t * 0.4 + m["ph"]))
-		var col := Color((130.0 * lc.r * l + 44.0) / 255.0, (136.0 * lc.g * l + 50.0) / 255.0, (144.0 * lc.b * l + 62.0) / 255.0, minf(0.26, (0.06 + 0.16 * minf(1.3, l)) * f2))
-		canvas.draw_texture_rect(tex, Rect2(p - sz2 / 2.0, sz2), false, col)
 	# 2. dust in the lantern light
 	if not hero.dead:
 		var lp: Vector2 = xf * (hero.position + Vector2(28, -90))
@@ -330,16 +277,11 @@ func _draw_all() -> void:
 			canvas.draw_rect(Rect2(p5 + Vector2(0, WPX), Vector2(WPX, WPX)), c5)
 
 
-## the additive layer: the canopy's dapple and the dawn's gold dust (light added, never a glow on an attack)
+## the additive layer: the dawn's gold dust (light added, never a glow on an attack)
 func _draw_add() -> void:
 	if zone == null or not is_instance_valid(zone):
 		return
 	var dk := Game.day_k() if zone.d.get("outdoor", false) else 0.0
-	for dp in dapple:
-		var f := minf(1.0, minf(dp["t"] / 4.0, (dp["life"] - dp["t"]) / 4.0)) * dk
-		var tex: Texture2D = _mist_tex[dp["k"]]
-		var sz: Vector2 = Vector2(tex.get_height(), tex.get_height()) * WPX * 2.2 * float(dp["s"])
-		add_canvas.draw_texture_rect(tex, Rect2(dp["p"], sz), false, Color(0.16, 0.15, 0.09, 0.5 * f))
 	for mo in motes:
 		var f2 := minf(1.0, minf(mo["t"] / 0.8, (mo["life"] - mo["t"]) / 1.2)) * (0.6 + 0.4 * sin(t * 3.0 + mo["ph"]))
 		add_canvas.draw_rect(Rect2((mo["p"] as Vector2).snapped(Vector2(WPX, WPX)), Vector2(WPX, WPX)), Color(0.5, 0.4, 0.18, 0.7 * f2))
