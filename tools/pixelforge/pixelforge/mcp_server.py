@@ -332,6 +332,64 @@ def build_server():
         """Check a .shapes.json: problems in plain words, or a summary (mode, shapes, materials, bones, unbound shapes)."""
         return api.validate_shapes(file)
 
+    # ---------------------------------------------------------------- Diablo 2 (pixelforge.d2)
+    @mcp.tool()
+    def d2_doctor(project: str = "") -> dict:
+        """Diablo 2 on this computer: the install (classic or Resurrected) and how it was found, the extractor (MPQ Editor / smpq), the local
+        reference folder and what is in it, the d2animdata tool. Every missing piece comes with what to install or set."""
+        from .d2.cli import doctor
+        return doctor(project or None)
+
+    @mcp.tool()
+    def d2_fetch_tools(project: str = "") -> dict:
+        """Fetch the free tools the Diablo 2 steps lean on: Ladik's MPQ Editor (Windows) into the reference folder's tools, d2animdata with pip."""
+        from .d2.extract import fetch_tools
+        from .d2.paths import reference_dir
+        return fetch_tools(reference_dir(project or None))
+
+    @mcp.tool()
+    def d2_list(project: str = "") -> dict:
+        """What the install (or the reference folder) has: character, monster and object tokens, palettes, tables."""
+        from .d2.source import D2Source
+        return {"ok": True, **D2Source(project=project or None).describe()}
+
+    @mcp.tool()
+    def d2_import(token: str, out_dir: str, project: str = "", act: int = 1, weapon_class: str = "", variant: str = "LIT") -> dict:
+        """Diablo 2's sprites of one token (NE the Necromancer, SK a skeleton...) into our frames layout under out_dir (outside the repository:
+        they are Blizzard's pixels), coloured with the act palette; the set then opens on the Characters bench like any frames."""
+        from .d2.importer import import_token
+        from .d2.source import D2Source
+        return import_token(token, out_dir, D2Source(project=project or None), act=act, weapon_class=weapon_class or None, variant=variant)
+
+    @mcp.tool()
+    def d2_export_mod(frames_dir: str, token: str, mod_name: str, out_root: str, target: str = "character", layout: str = "direct", act: int = 1,
+                      height: int = 0, project: str = "") -> dict:
+        """Our frames as a Diablo 2 mod: quantised to the act palette (the colour loss reported), DCC + COF per mode, AnimData.d2 records, the mod
+        folder (layout direct = classic `-direct -txt`, d2r = `mods/NAME/NAME.mpq` with `-mod NAME -txt`), read back whole. target character
+        replaces a player token's animations; monster adds a skin with MonStats rows. height resamples the figure to that many px (lossy)."""
+        from .d2.modexport import export_mod
+        from .d2.source import D2Source
+        return export_mod(frames_dir, token, mod_name, out_root, target=target, layout=layout, act=act, height=height or None, source=D2Source(project=project or None))
+
+    @mcp.tool()
+    def d2_play(character: str, project: str, token: str = "NE", mod_name: str = "", height: int = 0, launch: bool = True) -> dict:
+        """Play him in Diablo 2: find the install, build the character's mod into it, write the launch shortcut and start the game. Only when the
+        person asked for it in so many words (the Forge asks in its window first)."""
+        from .d2.play import play
+        return play(character, project, token=token, mod_name=mod_name or None, yes=True, launch=launch, height=height or None)
+
+    @mcp.tool()
+    def d2_port_skills(class_name: str, out_dir: str, count: int = 3, project: str = "") -> dict:
+        """The first skills of a Godmarrow class as Skills.txt and SkillDesc.txt rows on the nearest Diablo 2 templates (whole tables when the game's
+        are in the reference folder, else fragments), with what each row cannot say."""
+        from .d2.port import port_skills
+        from .d2.source import D2Source
+        try:
+            src = D2Source(project=project or None)
+        except Exception:  # noqa: BLE001 - without a source the port writes fragments
+            src = None
+        return port_skills(class_name, out_dir, count=count, source=src)
+
     @mcp.tool()
     def shape_template(height: int = 120, out: str = "", png: str = "") -> dict:
         """The author pose for a figure height: every bone's head and tail in file units (what to draw shapes around), optionally

@@ -1461,6 +1461,9 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--no-update", action="store_true", help="do not pull the latest PixelForge first")
     s.set_defaults(func=cmd_studio)
 
+    from .d2.cli import add_parser as _add_d2
+    _add_d2(sub)
+
     s = sub.add_parser("mcp", help="run the MCP server for Claude Desktop / Claude Code")
     s.set_defaults(func=cmd_mcp)
 

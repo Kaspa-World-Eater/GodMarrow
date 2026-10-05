@@ -897,3 +897,9 @@ Blender (absent in the cloud; built to their documented command lines, tested th
 crypt tune" -p <project>` then `job approve <id> --run`; `ONLY=jobs GODOT=... PROJECT=... PY=python
 forge/tools/screens.sh OUT`. On the laptop: `pixelforge tools status` first (install what the table names, by hand),
 then a real job from Home with Claude Code signed in, watched.
+
+**7.29 (2026-10-05, PixelForge session): the game handed over.** Derek: "your job is just PixelForge." The combat-feel
+pass and the redesign document were started and stopped before commit; both briefs, Derek's decisions (Mana's souls-like
+melee, Diablo 2 and Path of Exile systems, Godmarrow's designs, nothing flashes, Diablo 2 is not a base), and how the
+merged Diablo 2 bridge works are in `docs/GAME_HANDOFF.md`. The lore rewrite's guide is `docs/codex/LORE_REWRITE_GUIDE.md`
+on `track/codex`. This session continues on PixelForge only.

@@ -12,6 +12,7 @@ dependencies = ["numpy>=1.24", "pillow>=10", "scipy>=1.10"]
 
 [project.optional-dependencies]
 dev = ["pytest>=7"]
+d2 = ["d2animdata>=0.2"]   # the free AnimData.d2 tool the Diablo 2 bridge prefers (a built-in reader stands in without it)
 train = [
   "torch>=2.2",
   "diffusers>=0.30",
@@ -25,7 +26,7 @@ train = [
 pixelforge = "pixelforge.cli:main"
 
 [tool.setuptools]
-packages = ["pixelforge", "pixelforge.music", "pixelforge.blender", "pixelforge.tools"]
+packages = ["pixelforge", "pixelforge.music", "pixelforge.blender", "pixelforge.tools", "pixelforge.d2"]
 
 [tool.setuptools.package-data]
 pixelforge = ["music/library/*.json"]
