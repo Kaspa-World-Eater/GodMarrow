@@ -13,7 +13,13 @@
   0
  ],
  "view": {
-  "elevation": 12
+  "elevation": 12,
+  "contrast": 1.4,
+  "light": [
+   -0.78,
+   -0.62,
+   0.22
+  ]
  },
  "outline": "#030305",
  "skeleton": {
@@ -36,6 +42,8 @@
     "#706563",
     "#4f7a6a"
    ],
+   "texture": "grain",
+   "texture_strength": 0.35,
    "spec": true,
    "spec_t": 0.84,
    "rim_edge": true
@@ -54,6 +62,8 @@
     "#978b88",
     "#86b8a3"
    ],
+   "texture": "grain",
+   "texture_strength": 0.3,
    "spec": true,
    "spec_t": 0.8,
    "rim_edge": true
@@ -189,14 +199,44 @@
    "rules": [
     {
      "z": [
-      5.2,
+      5.0,
       null
      ],
      "y": [
-      44.2,
-      45.6
+      43.8,
+      45.8
      ],
      "material": "void"
+    },
+    {
+     "z": [
+      5.6,
+      null
+     ],
+     "y": [
+      47.2,
+      50.4
+     ],
+     "every_x": [
+      2,
+      0
+     ],
+     "every_y": [
+      2,
+      0
+     ],
+     "material": "void"
+    },
+    {
+     "z": [
+      5.0,
+      null
+     ],
+     "y": [
+      42.6,
+      43.8
+     ],
+     "t": 2
     },
     {
      "z": [
@@ -280,19 +320,19 @@
    "name": "brow_band",
    "kind": "ring",
    "y": [
-    40.4,
-    42.4
+    40.8,
+    42.0
    ],
    "rx": [
-    6.9,
+    7.2,
     0.0
    ],
    "rz": [
-    7.3,
+    7.6,
     0.0
    ],
    "cz": 0.8,
-   "thickness": 1.2,
+   "thickness": 1.0,
    "material": "bone",
    "bone": "head",
    "rules": [
@@ -804,12 +844,12 @@
    ],
    "b": [
     77.4,
-    6.0,
+    6.4,
     -5.0
    ],
    "r": [
-    1.4,
-    3.6
+    1.3,
+    4.2
    ],
    "material": "plume",
    "part": "plume",
@@ -841,11 +881,11 @@
    ],
    "b": [
     78.80000000000001,
-    -0.5999999999999996,
+    -1.0,
     -7.6
    ],
    "r": [
-    1.5,
+    1.7,
     0.25
    ],
    "material": "plume",
@@ -865,12 +905,12 @@
     -5.0
    ],
    "b": [
-    82.60000000000001,
-    0.8000000000000007,
-    -6.4
+    82.4,
+    0.40000000000000036,
+    -6.6
    ],
    "r": [
-    1.2,
+    1.4,
     0.25
    ],
    "material": "plume",
@@ -890,12 +930,12 @@
     -5.0
    ],
    "b": [
-    76.0,
-    1.0,
+    75.80000000000001,
+    0.6000000000000005,
     -8.4
    ],
    "r": [
-    1.1,
+    1.3,
     0.25
    ],
    "material": "plume",
@@ -915,12 +955,12 @@
     -5.0
    ],
    "b": [
-    84.2,
-    3.2,
-    -5.4
+    84.80000000000001,
+    2.8000000000000003,
+    -5.6
    ],
    "r": [
-    0.9,
+    1.1,
     0.25
    ],
    "material": "plume",
@@ -940,9 +980,84 @@
     -5.0
    ],
    "b": [
-    74.60000000000001,
-    3.0000000000000004,
-    -6.8
+    73.80000000000001,
+    2.6000000000000005,
+    -7.0
+   ],
+   "r": [
+    1.0,
+    0.25
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "flame_lick5",
+   "kind": "capsule",
+   "a": [
+    77.4,
+    5.4,
+    -5.0
+   ],
+   "b": [
+    80.60000000000001,
+    -1.7999999999999998,
+    -9.4
+   ],
+   "r": [
+    1.0,
+    0.25
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "flame_lick6",
+   "kind": "capsule",
+   "a": [
+    77.4,
+    5.4,
+    -5.0
+   ],
+   "b": [
+    86.4,
+    4.800000000000001,
+    -4.4
+   ],
+   "r": [
+    0.8,
+    0.25
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "flame_lick7",
+   "kind": "capsule",
+   "a": [
+    77.4,
+    5.4,
+    -5.0
+   ],
+   "b": [
+    72.4,
+    4.6000000000000005,
+    -6.0
    ],
    "r": [
     0.8,
@@ -1162,14 +1277,50 @@
     },
     {
      "x": [
-      74.5,
-      75.5
+      74.4,
+      75.6
      ],
      "z": [
       7.0,
       null
      ],
-     "material": "ironw"
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "y": [
+      76.0,
+      77.0
+     ],
+     "every_x": [
+      3,
+      1
+     ],
+     "z": [
+      5.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.06,
+      3,
+      5
+     ],
+     "t": -2
+    },
+    {
+     "hash": [
+      0.03,
+      2,
+      9
+     ],
+     "t": 2
     }
    ]
   },
@@ -1195,6 +1346,25 @@
       0
      ],
      "t": -1
+    },
+    {
+     "y": [
+      84.5,
+      85.5
+     ],
+     "every_x": [
+      3,
+      0
+     ],
+     "z": [
+      4.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
     }
    ]
   },
@@ -1280,11 +1450,206 @@
    "bone": "hips"
   },
   {
+   "name": "pouch0",
+   "kind": "box",
+   "centre": [
+    66.4,
+    98.0,
+    6.8
+   ],
+   "half": [
+    2.4,
+    3.0,
+    1.6
+   ],
+   "round": 0.8,
+   "material": "leather",
+   "bone": "hips",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.6
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      -1.4,
+      -0.8
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "pouch1",
+   "kind": "box",
+   "centre": [
+    84.4,
+    98.0,
+    6.0
+   ],
+   "half": [
+    2.4,
+    3.0,
+    1.6
+   ],
+   "round": 0.8,
+   "material": "leather",
+   "bone": "hips",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.6
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      -1.4,
+      -0.8
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "relic_bone",
+   "kind": "capsule",
+   "a": [
+    63.4,
+    94.0,
+    2.0
+   ],
+   "b": [
+    61.6,
+    117.0,
+    3.4
+   ],
+   "r": [
+    1.7,
+    1.5
+   ],
+   "material": "bone",
+   "part": "skirt"
+  },
+  {
+   "name": "relic_knob",
+   "kind": "ellipsoid",
+   "centre": [
+    61.5,
+    118.2,
+    3.4
+   ],
+   "radii": [
+    2.4,
+    1.8,
+    1.9
+   ],
+   "material": "bone",
+   "part": "skirt"
+  },
+  {
+   "name": "relic_wrap",
+   "kind": "capsule",
+   "a": [
+    63.0,
+    98.0,
+    2.2
+   ],
+   "b": [
+    62.1,
+    110.0,
+    2.9
+   ],
+   "r": [
+    2.1,
+    1.9
+   ],
+   "material": "cloth",
+   "part": "skirt",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "tabard",
+   "kind": "ring",
+   "y": [
+    94,
+    122
+   ],
+   "rx": [
+    11.2,
+    0.05
+   ],
+   "rz": [
+    10.0,
+    0.05
+   ],
+   "cz": 0.4,
+   "thickness": 1.4,
+   "keep": {
+    "front": 0.42
+   },
+   "hem": {
+    "tongues": 5,
+    "depth": 16,
+    "seed": 11
+   },
+   "holes": {
+    "p": 0.08,
+    "band": 14,
+    "seed": 2
+   },
+   "material": "cloth",
+   "part": "skirt",
+   "bump": {
+    "folds": [
+     0.6,
+     5,
+     1.6
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      5,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      6
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
    "name": "mail_skirt",
    "kind": "ring",
    "y": [
     94,
-    120
+    110
    ],
    "rx": [
     10.6,
@@ -1296,7 +1661,7 @@
    ],
    "thickness": 1.4,
    "keep": {
-    "front": 0.7
+    "front": 0.95
    },
    "hem": {
     "tongues": 9,
@@ -1560,6 +1925,32 @@
    "px": [
     90,
     null
+   ]
+  },
+  {
+   "name": "baldric",
+   "kind": "capsule",
+   "a": [
+    86.0,
+    60.0,
+    5.0
+   ],
+   "b": [
+    66.0,
+    92.0,
+    9.6
+   ],
+   "r": 1.3,
+   "material": "leather",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "every_y": [
+      6,
+      0
+     ],
+     "material": "ironw"
+    }
    ]
   },
   {
@@ -2511,31 +2902,66 @@
    "name": "pauldron0.L",
    "kind": "ellipsoid",
    "centre": [
-    89.0,
-    59.0,
+    89.4,
+    59.4,
     -0.8
    ],
    "radii": [
-    10.0,
-    4.8,
-    10.0
+    11.4,
+    6.0,
+    11.0
    ],
    "material": "iron",
    "bone": "upper_arm.L",
    "rules": [
-    {
-     "dy": [
-      null,
-      -2.2
-     ],
-     "material": "ironw"
-    },
     {
      "every_angle": [
       16,
       0
      ],
      "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      0
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      7
+     ],
+     "t": -2
     }
    ]
   },
@@ -2543,31 +2969,66 @@
    "name": "pauldron1.L",
    "kind": "ellipsoid",
    "centre": [
-    90.6,
-    63.6,
-    -1.2000000000000002
+    91.4,
+    65.60000000000001,
+    -1.4
    ],
    "radii": [
-    8.8,
-    4.8,
-    9.0
+    7.2,
+    3.4,
+    7.6000000000000005
    ],
    "material": "iron",
    "bone": "upper_arm.L",
    "rules": [
-    {
-     "dy": [
-      null,
-      -2.2
-     ],
-     "material": "ironw"
-    },
     {
      "every_angle": [
       16,
       1
      ],
      "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      1
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      8
+     ],
+     "t": -2
     }
    ]
   },
@@ -2575,31 +3036,66 @@
    "name": "pauldron2.L",
    "kind": "ellipsoid",
    "centre": [
-    92.2,
-    68.2,
-    -1.6
+    93.4,
+    70.60000000000001,
+    -2.0
    ],
    "radii": [
-    7.6,
-    4.8,
-    8.0
+    6.4,
+    3.4,
+    6.800000000000001
    ],
    "material": "iron",
    "bone": "upper_arm.L",
    "rules": [
-    {
-     "dy": [
-      null,
-      -2.2
-     ],
-     "material": "ironw"
-    },
     {
      "every_angle": [
       16,
       2
      ],
      "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      2
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      9
+     ],
+     "t": -2
     }
    ]
   },
@@ -2656,15 +3152,30 @@
     5.0,
     4.6
    ],
-   "material": "mail",
+   "material": "iron",
    "bone": "upper_arm.L",
    "rules": [
     {
-     "every_y": [
-      1,
-      0
+     "dy": [
+      6.0,
+      7.2
      ],
-     "t": -1
+     "t": -3
+    },
+    {
+     "dy": [
+      7.2,
+      null
+     ],
+     "material": "ironw"
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      2
+     ],
+     "t": -2
     }
    ]
   },
@@ -2706,10 +3217,30 @@
    "rules": [
     {
      "every_y": [
-      4,
+      5,
       0
      ],
-     "t": -1
+     "t": -3
+    },
+    {
+     "x": [
+      94.3,
+      95.7
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      3
+     ],
+     "t": -2
     }
    ]
   },
@@ -2731,7 +3262,23 @@
     5.4
    ],
    "material": "ironw",
-   "bone": "forearm.L"
+   "bone": "forearm.L",
+   "rules": [
+    {
+     "dy": [
+      1.6,
+      null
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      null,
+      -1.6
+     ],
+     "t": -1
+    }
+   ]
   },
   {
    "name": "gauntlet.L",
@@ -2878,31 +3425,66 @@
    "name": "pauldron0.R",
    "kind": "ellipsoid",
    "centre": [
-    61.0,
-    59.0,
+    60.599999999999994,
+    59.4,
     -0.8
    ],
    "radii": [
-    10.0,
-    4.8,
-    10.0
+    11.4,
+    6.0,
+    11.0
    ],
    "material": "iron",
    "bone": "upper_arm.R",
    "rules": [
-    {
-     "dy": [
-      null,
-      -2.2
-     ],
-     "material": "ironw"
-    },
     {
      "every_angle": [
       16,
       0
      ],
      "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      0
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      7
+     ],
+     "t": -2
     }
    ]
   },
@@ -2910,31 +3492,66 @@
    "name": "pauldron1.R",
    "kind": "ellipsoid",
    "centre": [
-    59.400000000000006,
-    63.6,
-    -1.2000000000000002
+    58.599999999999994,
+    65.60000000000001,
+    -1.4
    ],
    "radii": [
-    8.8,
-    4.8,
-    9.0
+    7.2,
+    3.4,
+    7.6000000000000005
    ],
    "material": "iron",
    "bone": "upper_arm.R",
    "rules": [
-    {
-     "dy": [
-      null,
-      -2.2
-     ],
-     "material": "ironw"
-    },
     {
      "every_angle": [
       16,
       1
      ],
      "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      1
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      8
+     ],
+     "t": -2
     }
    ]
   },
@@ -2942,31 +3559,66 @@
    "name": "pauldron2.R",
    "kind": "ellipsoid",
    "centre": [
-    57.8,
-    68.2,
-    -1.6
+    56.599999999999994,
+    70.60000000000001,
+    -2.0
    ],
    "radii": [
-    7.6,
-    4.8,
-    8.0
+    6.4,
+    3.4,
+    6.800000000000001
    ],
    "material": "iron",
    "bone": "upper_arm.R",
    "rules": [
-    {
-     "dy": [
-      null,
-      -2.2
-     ],
-     "material": "ironw"
-    },
     {
      "every_angle": [
       16,
       2
      ],
      "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      2
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      9
+     ],
+     "t": -2
     }
    ]
   },
@@ -3023,15 +3675,30 @@
     5.0,
     4.6
    ],
-   "material": "mail",
+   "material": "iron",
    "bone": "upper_arm.R",
    "rules": [
     {
-     "every_y": [
-      1,
-      0
+     "dy": [
+      6.0,
+      7.2
      ],
-     "t": -1
+     "t": -3
+    },
+    {
+     "dy": [
+      7.2,
+      null
+     ],
+     "material": "ironw"
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      2
+     ],
+     "t": -2
     }
    ]
   },
@@ -3073,10 +3740,30 @@
    "rules": [
     {
      "every_y": [
-      4,
+      5,
       0
      ],
-     "t": -1
+     "t": -3
+    },
+    {
+     "x": [
+      54.3,
+      55.7
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      3
+     ],
+     "t": -2
     }
    ]
   },
@@ -3098,7 +3785,23 @@
     5.4
    ],
    "material": "ironw",
-   "bone": "forearm.R"
+   "bone": "forearm.R",
+   "rules": [
+    {
+     "dy": [
+      1.6,
+      null
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      null,
+      -1.6
+     ],
+     "t": -1
+    }
+   ]
   },
   {
    "name": "gauntlet.R",
@@ -3242,31 +3945,216 @@
    ]
   },
   {
+   "name": "growth0",
+   "kind": "ellipsoid",
+   "centre": [
+    90.6,
+    56.0,
+    4.0
+   ],
+   "radii": [
+    2.4200000000000004,
+    1.87,
+    2.2
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "hash": [
+      0.2,
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "growth1",
+   "kind": "ellipsoid",
+   "centre": [
+    93.0,
+    57.6,
+    2.4
+   ],
+   "radii": [
+    1.9800000000000002,
+    1.53,
+    1.8
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "hash": [
+      0.2,
+      1,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "growth2",
+   "kind": "ellipsoid",
+   "centre": [
+    89.19999999999999,
+    58.4,
+    5.6
+   ],
+   "radii": [
+    1.6500000000000001,
+    1.275,
+    1.5
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "hash": [
+      0.2,
+      1,
+      2
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "growth3",
+   "kind": "ellipsoid",
+   "centre": [
+    94.19999999999999,
+    55.6,
+    0.6
+   ],
+   "radii": [
+    1.54,
+    1.19,
+    1.4
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "hash": [
+      0.2,
+      1,
+      3
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "growth4",
+   "kind": "ellipsoid",
+   "centre": [
+    91.8,
+    59.6,
+    4.4
+   ],
+   "radii": [
+    1.32,
+    1.02,
+    1.2
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "hash": [
+      0.2,
+      1,
+      4
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "spur",
+   "kind": "capsule",
+   "a": [
+    93.6,
+    56.0,
+    3.0
+   ],
+   "b": [
+    96.4,
+    50.6,
+    1.6
+   ],
+   "r": [
+    1.1,
+    0.25
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L"
+  },
+  {
+   "name": "spur_tip",
+   "kind": "capsule",
+   "a": [
+    96.4,
+    50.6,
+    1.6
+   ],
+   "b": [
+    97.6,
+    49.6,
+    0.4
+   ],
+   "r": [
+    0.3,
+    0.15
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L"
+  },
+  {
    "name": "thigh.L",
    "kind": "capsule",
    "a": [
-    81.4,
+    81.8,
     98.5,
     0.1
    ],
    "b": [
-    81.4,
-    127.5,
+    81.6,
+    124.0,
     -0.1
    ],
    "r": [
-    7.0,
-    6.0
+    6.2,
+    5.2
    ],
    "material": "iron",
    "bone": "thigh.L",
    "rules": [
     {
-     "every_y": [
-      5,
-      2
+     "dy": [
+      7.0,
+      8.4
      ],
-     "t": -1
+     "t": -3
+    },
+    {
+     "dy": [
+      8.4,
+      null
+     ],
+     "material": "ironw"
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      1
+     ],
+     "t": -2
     }
    ]
   },
@@ -3279,9 +4167,9 @@
     3.2
    ],
    "radii": [
-    5.2,
-    5.0,
-    4.0
+    5.6,
+    5.4,
+    4.6
    ],
    "material": "ironw",
    "bone": "shin.L",
@@ -3292,6 +4180,24 @@
       0
      ],
      "t": -1
+    },
+    {
+     "x": [
+      80.80000000000001,
+      82.0
+     ],
+     "z": [
+      6.0,
+      null
+     ],
+     "t": 2
+    },
+    {
+     "dy": [
+      3.4,
+      null
+     ],
+     "t": -2
     }
    ]
   },
@@ -3325,8 +4231,8 @@
     -2.4
    ],
    "r": [
-    5.8,
-    4.9
+    5.2,
+    4.2
    ],
    "material": "iron",
    "bone": "shin.L",
@@ -3340,7 +4246,35 @@
       3.0,
       null
      ],
-     "material": "ironw"
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "y": [
+      132.5,
+      133.5
+     ],
+     "every_x": [
+      3,
+      0
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      4
+     ],
+     "t": -2
     }
    ]
   },
@@ -3401,28 +4335,43 @@
    "name": "thigh.R",
    "kind": "capsule",
    "a": [
-    68.6,
+    68.2,
     98.5,
     0.1
    ],
    "b": [
-    68.6,
-    127.5,
+    68.4,
+    124.0,
     -0.1
    ],
    "r": [
-    7.0,
-    6.0
+    6.2,
+    5.2
    ],
    "material": "iron",
    "bone": "thigh.R",
    "rules": [
     {
-     "every_y": [
-      5,
-      2
+     "dy": [
+      7.0,
+      8.4
      ],
-     "t": -1
+     "t": -3
+    },
+    {
+     "dy": [
+      8.4,
+      null
+     ],
+     "material": "ironw"
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      1
+     ],
+     "t": -2
     }
    ]
   },
@@ -3435,9 +4384,9 @@
     3.2
    ],
    "radii": [
-    5.2,
-    5.0,
-    4.0
+    5.6,
+    5.4,
+    4.6
    ],
    "material": "ironw",
    "bone": "shin.R",
@@ -3448,6 +4397,24 @@
       0
      ],
      "t": -1
+    },
+    {
+     "x": [
+      68.0,
+      69.19999999999999
+     ],
+     "z": [
+      6.0,
+      null
+     ],
+     "t": 2
+    },
+    {
+     "dy": [
+      3.4,
+      null
+     ],
+     "t": -2
     }
    ]
   },
@@ -3481,8 +4448,8 @@
     -2.4
    ],
    "r": [
-    5.8,
-    4.9
+    5.2,
+    4.2
    ],
    "material": "iron",
    "bone": "shin.R",
@@ -3496,7 +4463,35 @@
       3.0,
       null
      ],
-     "material": "ironw"
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "y": [
+      132.5,
+      133.5
+     ],
+     "every_x": [
+      3,
+      0
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      4
+     ],
+     "t": -2
     }
    ]
   },
@@ -3636,6 +4631,9 @@
   "pauldron_edge.L": {
    "file": "ossuarch.detail/pauldron_edge.L.png"
   },
+  "upper_arm.L": {
+   "file": "ossuarch.detail/upper_arm.L.png"
+  },
   "couter.L": {
    "file": "ossuarch.detail/couter.L.png"
   },
@@ -3671,6 +4669,9 @@
   },
   "pauldron_edge.R": {
    "file": "ossuarch.detail/pauldron_edge.R.png"
+  },
+  "upper_arm.R": {
+   "file": "ossuarch.detail/upper_arm.R.png"
   },
   "couter.R": {
    "file": "ossuarch.detail/couter.R.png"

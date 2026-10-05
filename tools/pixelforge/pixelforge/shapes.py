@@ -939,6 +939,9 @@ class Model:
         self.doc = doc
         self.scale = float(scale)
         self.look = {k: bool((look or {}).get(k, False)) for k in LOOK_KEYS}
+        self.contrast = float((doc.get("view") or {}).get("contrast", 1.0))
+        lv = (doc.get("view") or {}).get("light")             # the file's own key light, as [x, y, z] (y down, z toward the viewer)
+        self.light = (np.asarray(lv, float) / np.linalg.norm(lv)) if lv else LIGHT
         self.M = materials or build_materials(doc, steps)
         self.mat_names = list(self.M)
         self.axis = tuple(doc.get("axis", [doc["size"][0] / 2, 0.0]))
@@ -1211,10 +1214,13 @@ class Model:
         n = self.lengths[mat]
         spec = self.spec[mat]
         amb = np.where(spec, 0.2, 0.16)
-        diff = np.clip(nnx * LIGHT[0] + nny * LIGHT[1] + nnz * LIGHT[2], 0, None)
+        L = self.light
+        diff = np.clip(nnx * L[0] + nny * L[1] + nnz * L[2], 0, None)
         val = amb + (1 - amb) * diff + sh.lift[v]
         if self.look["bounce"]:                           # light thrown back up from the ground onto the faces that turn down
             val = val + 0.11 * np.clip(nny, 0, 1)
+        if self.contrast != 1.0:                          # the file's "view": {"contrast": k}: deeper darks, brighter lights
+            val = 0.42 + (val - 0.42) * self.contrast
         cv.mat[ys, xs] = mat; cv.lit[ys, xs] = diff
         idx_spec = np.where(diff > sh.spec_t[v], n - 1, np.clip(np.floor(val * (n - 1)), 0, n - 2))
         idx_mat = np.clip(np.floor(val * n), 0, n - 1)
@@ -1264,10 +1270,10 @@ class Model:
             shad = np.zeros(len(ys), bool)
             z0 = zb[ys, xs]
             for t in range(2, int(round(7 * s)) + 1):
-                y2 = np.round(ys + LIGHT[1] * t).astype(int); x2 = np.round(xs + LIGHT[0] * t).astype(int)
+                y2 = np.round(ys + L[1] * t).astype(int); x2 = np.round(xs + L[0] * t).astype(int)
                 inside = (y2 >= 0) & (y2 < H) & (x2 >= 0) & (x2 < W)
                 y2 = np.clip(y2, 0, H - 1); x2 = np.clip(x2, 0, W - 1)
-                hit = inside & (vid[y2, x2] >= 0) & (pidf[y2, x2] != pidf[ys, xs]) & (zb[y2, x2] > z0 + LIGHT[2] * t + 0.8 * s)
+                hit = inside & (vid[y2, x2] >= 0) & (pidf[y2, x2] != pidf[ys, xs]) & (zb[y2, x2] > z0 + L[2] * t + 0.8 * s)
                 shad |= hit
             shad &= (diff > 0.12) & ~(near_edge | near_edge2)
             idx = np.where(shad, np.maximum(idx - 1, 0), idx)
