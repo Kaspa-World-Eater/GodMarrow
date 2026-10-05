@@ -44,10 +44,13 @@ the same file by hand sees what you did, and you see what it did.
 shape model. Model and Materials as above; **Behaviour** has the camera, the world scale, the shadow and the height;
 **Export** writes the PNGs with foot anchors (S alone, or all eight facings) and the entry for the game's object list.
 
-**Effects.** **Shape** picks a procedural effect (wisp, fire, smoke, burst, nova, bolt and the rest) in a palette,
-with its size, frames, speed, bands, glow and haze; **Layers** builds a whole spell from stacked effects (presets to
-start from); **Looks** is the palette row; **Missile** the flying things with their headings; **Export** puts it in the
-game's effects and plays it at the hero. *From a painting* (or a drop) reads a painted effect instead.
+**Effects.** Every effect is a saved recipe with two or three levers (a flame has size, heat and speed; rain has amount,
+slant and speed), so the rack shows exactly those; the picture window plays the loop at game size and at 3x. **Effect**
+is the levers, with frames and fps beside them; **Layers** stacks effects on one canvas (a flame under sparks under
+smoke), each layer with its place, scale, start frame, opacity and blend; **Looks** swaps the palette and the ramp's
+bands; **Pick** browses the library by family (fire, spark, blood, weather, water, magic, bone, soul, weird) and plays
+each one as you land on it; **Export** puts it in the game's effects and plays it at the hero. *Advanced* shows the fine
+sliders and the chain of nodes the effect is built from. See "Effects" below for the whole library.
 
 **Tiles and ground.** Drop a painted ground texture: iso diamonds with variants; a second texture makes the edge tiles.
 **Interface.** A painted panel becomes a stretching 9-slice frame; one flat-lay painting becomes inventory icons; a
@@ -103,7 +106,7 @@ under the pointer. The tabs along the text box:
   (a painted pixel lands where the target has the figure; an erased one where it has a pixel). The strip shows every
   frame it landed on with the count; it is one history entry, so *Undo* takes it all back. The clone source cycler
   lives here too.
-- **Effects.** The library (the effects bench's kinds and spell presets): drag one onto the figure to anchor it there;
+- **Effects.** The library (the effects engine's saved effects, by name): drag one onto the figure to anchor it there;
   it follows the clip and the directions. Drag an anchor to move it, its edge to scale, its handle to rotate; drag it
   off the figure to detach; right-click it for its levers (scale, rotation, strength, speed). Anchors are saved in the
   frame data (`frames/anchors.json`); *Bake anchors* writes the list beside the export and into the export's JSON (the
@@ -444,6 +447,45 @@ sticking out of the carve, white pixels or size jumps in the frames. Small white
 cloth's colour automatically. `pixelforge project check <character>` prints the same list any time.
 
 ### Knobs you might touch
+## Effects
+
+The effects engine draws pixel effects from recipes, not from paintings: each effect is a small graph of nodes (noise
+sources, shapes, a particle emitter, shaping, colour, composition, a few small simulations) that renders, for one seed,
+the same eight frames every time, in well under a second, using only the colours of its own ramp. The house rules come
+from the fire recipe: things grow slowly and shrink fast; flames break into S and C licks; light sits at the source and
+darkens outward; loops are eight frames at twelve a second unless an effect needs more.
+
+**The library** (`pixelforge effects list`; the Effects bench's *Pick* tab; every one has a GIF in
+`docs/screens/effects/`):
+
+| family | effects |
+|---|---|
+| fire | flame, torch, candle, ember |
+| spark | spark burst, sparkle, flare, arc (the discharge between two points), saber |
+| blood | blood spray, blood pool, drips (a lever slides them from blood to water) |
+| weather | rain, snow, dust motes, fog |
+| water | waterfall |
+| magic | poison cloud, portal, holy beam |
+| bone | bone shards, marrow-light (a bone glowing through its cracks) |
+| soul | soul wisps, soul-fire (green, flame-shaped), soul drain (threads pulled from a figure into a point) |
+| weird | phosphorus (a cold green-white glow clinging to surfaces, flaring when disturbed, smears fading, drips burning), haze (heat shimmer that bends what is behind it), echo (ghost copies trailing and fading), unlight (a dark glow eating light), miasma (a veil of mouths that drifts and recoils from light), eye-ooze (a mass with blinking eyes), tally marks (scratches appearing one by one and bleeding), bell-ring (expanding rings bending what they cross) |
+
+Two of them, haze and bell-ring, are displacement sheets rather than pictures: the game's shader reads their red and
+green as offsets, and the GIF preview shows them bending a stone wall.
+
+**On the bench.** Pick an effect, move its levers (type a number over a lever's value for an exact one), roll the seed
+with *Dice*, and *Keep*. *Layers* stacks several: *Add layer* takes the effect on the bench; each layer has its own
+effect, place, scale, start, opacity and blend, and the stack renders as one strip. *Looks* swaps every ramp for one of
+the game's palettes and sets how many steps the ramp has (fewer bands, flatter; the colours stay the palette's). A
+painting dropped on the bench still goes down the painted road (`effect`). The editor's Effects tab drags the same
+names onto a figure as anchors.
+
+**From the command line** (an assistant does the same): `pixelforge effects render flame -o art/fx --lever size=1.3
+--lever heat=1.2 --gif`, `pixelforge effects preview soul_fire --gif` for a quick look, `pixelforge effects graph
+mine.graph.json` for a graph of your own, `pixelforge effects list` for the names and levers. The old words still work
+(`pixelforge effects render fire` draws the flame; `wisp`, `burst`, `bolt` and the rest map to their new effects), and
+the old `vfx` and `spell` commands run as before.
+
 ## The look (styles)
 
 A **style** is one choice that fixes everything about how a painting becomes game art: how tall a figure stands in
