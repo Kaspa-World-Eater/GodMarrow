@@ -52,15 +52,22 @@ func _model_loaded() -> void:
 	rebuild()
 	refresh_preview()
 
-## the object's standing picture: the file's own frame (its animation rules) facing the chosen direction
+## the object's standing picture: the file's own frame (its animation rules) facing the chosen direction. A request
+## (see characters.gd refresh_preview): quick turns draw the last facing once, and a stale render is ignored.
 func refresh_preview() -> void:
 	if not has_model():
+		return
+	request(_render_still)
+
+func _render_still() -> void:
+	if not has_model() or not is_inside_tree():
 		return
 	var d := String(state["direction"])
 	var fr := int(state.get("frame", 0))
 	var out := previews_dir().path_join("still_%s_%d.png" % [d, fr])
+	var t_ := ticket()
 	run(["shapes", "still", model_path(), "-o", out, "--direction", d, "--frame", str(fr), "--style", app.style_name, "--zoom", "1"], "drawing the object", func(r: Dictionary):
-		if not r.get("ok", false):
+		if not r.get("ok", false) or not fresh(t_) or d != String(state["direction"]) or fr != int(state.get("frame", 0)):
 			return
 		var t := tex(String(r.get("png", out)))
 		if t == null:

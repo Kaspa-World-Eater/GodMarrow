@@ -114,16 +114,24 @@ func save_doc() -> void:
 		app.backend.write_json(model_path(), doc)
 
 # ------------------------------------------------------------------ the picture window
-## a standing picture of the model facing the chosen direction, with its lights on the backdrop
+## a standing picture of the model facing the chosen direction, with its lights on the backdrop. A request, not a
+## run: a wheel turned through several facings draws the last one once; a turn made while a render runs waits for
+## it instead of being dropped; a render that comes back after a newer request is stale and leaves the window alone.
 func refresh_preview() -> void:
 	if not has_model():
 		return
 	if tab in [3, 4] and not clip_frames.is_empty() and not _frames_dirty:
 		return
+	request(_render_still)
+
+func _render_still() -> void:
+	if not has_model() or not is_inside_tree():
+		return
 	var d := String(state["direction"])
 	var out := previews_dir().path_join("still_%s.png" % d)
+	var t_ := ticket()
 	run(["shapes", "still", model_path(), "-o", out, "--direction", d, "--style", app.style_name, "--zoom", "1"], "drawing the model", func(r: Dictionary):
-		if not r.get("ok", false):
+		if not r.get("ok", false) or not fresh(t_) or d != String(state["direction"]):
 			return
 		var t := tex(String(r.get("png", out)))
 		if t == null:
@@ -150,15 +158,25 @@ func show_clip(force_render: bool = false) -> void:
 	var preview_dir := previews_dir().path_join("frames").path_join(key)
 	var src := frames_dir if (full_render and DirAccess.dir_exists_absolute(frames_dir)) else preview_dir
 	if force_render or not DirAccess.dir_exists_absolute(src) or _frames_dirty:
-		var out := previews_dir().path_join("frames")
-		run(["shapes", "render", model_path(), "-o", out, "--clips", clip, "--directions", d, "--style", app.style_name], "rendering %s %s" % [clip, d], func(r: Dictionary):
-			if not r.get("ok", false):
-				return
-			_frames_dirty = false
-			_load_clip(preview_dir, r.get("fps", {}).get(clip, 12.0)))
+		request(_render_clip)
 		return
 	var anims := app.backend.read_json(src.get_base_dir().path_join("animations.json"))
 	_load_clip(src, float(anims.get("clip_fps", {}).get(clip, 12.0)))
+
+## a quick preview render of the chosen clip and direction (the same request rules as the still: see refresh_preview)
+func _render_clip() -> void:
+	if not has_model() or not is_inside_tree():
+		return
+	var clip := String(state["clip"])
+	var d := String(state["direction"])
+	var preview_dir := previews_dir().path_join("frames").path_join("%s_%s" % [clip, d])
+	var out := previews_dir().path_join("frames")
+	var t_ := ticket()
+	run(["shapes", "render", model_path(), "-o", out, "--clips", clip, "--directions", d, "--style", app.style_name], "rendering %s %s" % [clip, d], func(r: Dictionary):
+		if not r.get("ok", false) or not fresh(t_) or clip != String(state["clip"]) or d != String(state["direction"]):
+			return
+		_frames_dirty = false
+		_load_clip(preview_dir, r.get("fps", {}).get(clip, 12.0)))
 
 func _load_clip(dir: String, fps: float) -> void:
 	clip_frames = frame_textures(dir)
@@ -251,15 +269,22 @@ static func _cycle(list: Array, cur, delta: int):
 func direction_wheel() -> Control:
 	var w := W.Wheel.new()
 	var idx := DIRS.find(String(state["direction"]))
-	w.init_wheel("facing", idx * 45.0 if idx >= 0 else 0.0, 0.0, func(a): return DIRS[posmod(int(round(a / 45.0)), 8)], Callable(), func(a):
+	# the wheel keeps its fine angle across the rebuild a turn causes (so three presses make a facing, every time);
+	# the facing's centre when a cycler or undo moved the facing without it
+	var a0 := idx * 45.0 if idx >= 0 else 0.0
+	var kept := float(state.get("wheel_angle", a0))
+	if DIRS[posmod(int(round(kept / 45.0)), 8)] == String(state["direction"]):
+		a0 = kept
+	w.init_wheel("facing", a0, 0.0, func(a): return DIRS[posmod(int(round(a / 45.0)), 8)], Callable(), func(a):
 		var d: String = DIRS[posmod(int(round(a / 45.0)), 8)]
+		state["wheel_angle"] = a
 		if d != String(state["direction"]):
 			state["direction"] = d
 			if tab in [3, 4]:
 				show_clip()
 			else:
 				refresh_preview()
-			call_deferred("rebuild"))
+			call_deferred("_rebuild_turned"))
 	w.hint = "left and right turn the model"
 	return w
 
@@ -867,7 +892,12 @@ func _pick_direction(d) -> void:
 		show_clip()
 	else:
 		refresh_preview()
+	_rebuild_turned()
+
+## the tab's words again after a turn, the selector staying on the facing control so the next press turns further
+func _rebuild_turned() -> void:
 	rebuild()
+	refocus("facing")
 
 ## a motion lever: the lag of every loose part, its sway, the hang, the holds, the camera
 func _set_motion(key: String, value: float) -> void:
