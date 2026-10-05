@@ -180,13 +180,14 @@ def invert(ctx: Context, field: Field) -> Field:
     return (1.0 - np.asarray(field, np.float32)).astype(np.float32)
 
 
-@node("gain", "math", "field * mult + lift, clipped; power bends the middle (2 darkens, 0.5 lightens).")
-def gain(ctx: Context, field: Field, mult: float = 1.0, lift: float = 0.0, power: float = 1.0) -> Field:
-    f = np.clip(np.asarray(field, np.float32) * mult + lift, 0, 1)
-    return (f ** power).astype(np.float32)
+@node("gain", "math", "field * mult + lift, clipped; power bends the middle (2 darkens, 0.5 lightens). inside = true lifts only where the field is lit (above level), so a lift never floods the canvas.")
+def gain(ctx: Context, field: Field, mult: float = 1.0, lift: float = 0.0, power: float = 1.0, inside: bool = False, level: float = 0.02) -> Field:
+    f = np.asarray(field, np.float32)
+    lifted = f * mult + (lift * (f > level) if inside else lift)
+    return (np.clip(lifted, 0, 1) ** power).astype(np.float32)
 
 
-@node("pulse", "math", "Multiply a field by a wave over the loop: 1 - depth .. 1, ``beats`` per loop (breathing, flicker).")
+@node("pulse", "math", "Multiply a field by a wave over the loop: 1 - depth .. 1, ``beats`` per loop; shape sine | saw (rising) | saw_down (fading) | flicker (random per frame).")
 def pulse(ctx: Context, field: Field, depth: float = 0.3, beats: int = 1, shape: str = "sine", seed: int = 0, _id: str = "") -> Field:
     ph = ctx.phase() * 2 * np.pi * max(1, int(beats))
     if shape == "flicker":
@@ -194,6 +195,8 @@ def pulse(ctx: Context, field: Field, depth: float = 0.3, beats: int = 1, shape:
         wave = rng.random(ctx.frames).astype(np.float32)
     elif shape == "saw":
         wave = (ph / (2 * np.pi)) % 1.0
+    elif shape == "saw_down":
+        wave = 1.0 - (ph / (2 * np.pi)) % 1.0
     else:
         wave = 0.5 + 0.5 * np.sin(ph)
     k = 1.0 - depth * (1.0 - wave)

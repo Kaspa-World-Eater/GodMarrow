@@ -24,10 +24,11 @@ def _grads(rng: np.random.Generator, shape: tuple) -> np.ndarray:
     return g / np.maximum(n, 1e-6)
 
 
-def _coords(w: int, h: int, frames: int, cells: float, tcells: int, phase: tuple[float, float, float] = (0.0, 0.0, 0.0)):
-    """Lattice coordinates for every (t, y, x) sample; the lattice has cx x cy x ct cells over the whole field."""
+def _coords(w: int, h: int, frames: int, cells: float, tcells: int, phase: tuple[float, float, float] = (0.0, 0.0, 0.0), stretch: float = 1.0):
+    """Lattice coordinates for every (t, y, x) sample; the lattice has cx x cy x ct cells over the whole field.
+    ``stretch`` > 1 makes the cells taller than wide (vertical streaks: falling water, rain); < 1 wider (banks)."""
     cx = max(1, int(round(cells)))
-    cy = max(1, int(round(cells * h / max(w, 1))))
+    cy = max(1, int(round(cells * h / max(w, 1) / max(stretch, 1e-3))))
     ct = max(1, int(tcells))
     xs = (np.arange(w, dtype=np.float32) + 0.5) / w * cx + phase[0]
     ys = (np.arange(h, dtype=np.float32) + 0.5) / h * cy + phase[1]
@@ -36,10 +37,10 @@ def _coords(w: int, h: int, frames: int, cells: float, tcells: int, phase: tuple
     return X, Y, T, (cx, cy, ct)
 
 
-def _gradient_noise(w: int, h: int, frames: int, cells: float, tcells: int, rng: np.random.Generator, phase=(0.0, 0.0, 0.0), skew: float = 0.0) -> np.ndarray:
+def _gradient_noise(w: int, h: int, frames: int, cells: float, tcells: int, rng: np.random.Generator, phase=(0.0, 0.0, 0.0), skew: float = 0.0, stretch: float = 1.0) -> np.ndarray:
     """One octave of periodic 3D gradient noise in -1..1. ``skew`` shifts every other lattice row by half a cell
     (a triangular lattice: the simplex look without the square grid's diagonal bias)."""
-    X, Y, T, (cx, cy, ct) = _coords(w, h, frames, cells, tcells, phase)
+    X, Y, T, (cx, cy, ct) = _coords(w, h, frames, cells, tcells, phase, stretch)
     if skew:
         X = X + skew * 0.5 * (np.floor(Y) % 2)
     g = _grads(rng, (ct, cy, cx))
@@ -60,13 +61,13 @@ def _gradient_noise(w: int, h: int, frames: int, cells: float, tcells: int, rng:
 
 
 def fbm(w: int, h: int, frames: int, *, cells: float = 4.0, tcells: int = 1, octaves: int = 3, gain: float = 0.5, lacunarity: float = 2.0,
-        seed: int = 0, skew: float = 0.0, ridged_: bool = False) -> np.ndarray:
+        seed: int = 0, skew: float = 0.0, ridged_: bool = False, stretch: float = 1.0) -> np.ndarray:
     """Fractal sum of gradient noise octaves, normalised to 0..1."""
     rng = np.random.default_rng(seed)
     out = np.zeros((frames, h, w), np.float32)
     amp, total, c, tc = 1.0, 0.0, float(cells), int(tcells)
     for _ in range(max(1, int(octaves))):
-        n = _gradient_noise(w, h, frames, c, tc, rng, skew=skew)
+        n = _gradient_noise(w, h, frames, c, tc, rng, skew=skew, stretch=stretch)
         if ridged_:
             n = 1.0 - np.abs(n)
             n = n * n * 2.0 - 1.0
@@ -79,20 +80,20 @@ def fbm(w: int, h: int, frames: int, *, cells: float = 4.0, tcells: int = 1, oct
     return np.clip(out * 0.5 + 0.5, 0.0, 1.0).astype(np.float32)
 
 
-def perlin(w: int, h: int, frames: int, *, cells: float = 4.0, tcells: int = 1, octaves: int = 3, gain: float = 0.5, seed: int = 0) -> np.ndarray:
+def perlin(w: int, h: int, frames: int, *, cells: float = 4.0, tcells: int = 1, octaves: int = 3, gain: float = 0.5, seed: int = 0, stretch: float = 1.0) -> np.ndarray:
     """Periodic Perlin (gradient lattice) noise with ``octaves`` of detail; ``tcells`` beats per loop in time."""
-    return fbm(w, h, frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=seed)
+    return fbm(w, h, frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=seed, stretch=stretch)
 
 
-def simplex(w: int, h: int, frames: int, *, cells: float = 4.0, tcells: int = 1, octaves: int = 3, gain: float = 0.5, seed: int = 0) -> np.ndarray:
+def simplex(w: int, h: int, frames: int, *, cells: float = 4.0, tcells: int = 1, octaves: int = 3, gain: float = 0.5, seed: int = 0, stretch: float = 1.0) -> np.ndarray:
     """Gradient noise on a triangular lattice (rows offset by half a cell): the simplex look, free of the square
     grid's diagonal bias, still periodic."""
-    return fbm(w, h, frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=seed, skew=1.0)
+    return fbm(w, h, frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=seed, skew=1.0, stretch=stretch)
 
 
-def ridged(w: int, h: int, frames: int, *, cells: float = 4.0, tcells: int = 1, octaves: int = 4, gain: float = 0.55, seed: int = 0) -> np.ndarray:
+def ridged(w: int, h: int, frames: int, *, cells: float = 4.0, tcells: int = 1, octaves: int = 4, gain: float = 0.55, seed: int = 0, stretch: float = 1.0) -> np.ndarray:
     """Ridged multifractal: sharp bright creases (flame licks, cracks, veins)."""
-    return fbm(w, h, frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=seed, ridged_=True)
+    return fbm(w, h, frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=seed, ridged_=True, stretch=stretch)
 
 
 def value(w: int, h: int, frames: int, *, cells: float = 4.0, tcells: int = 1, seed: int = 0) -> np.ndarray:

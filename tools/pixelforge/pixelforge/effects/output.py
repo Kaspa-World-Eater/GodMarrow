@@ -107,7 +107,7 @@ def backdrop(w: int, h: int, seed: int = 3) -> np.ndarray:
     return np.concatenate([rgb, np.full((h, w, 1), 255, np.uint8)], -1)
 
 
-def apply_displacement(frames: list[np.ndarray], scene: np.ndarray | None = None, range_px: float = 4.0) -> list[np.ndarray]:
+def apply_displacement(frames: list[np.ndarray], scene: np.ndarray | None = None, range_px: float = 6.0) -> list[np.ndarray]:
     """What the game's shader does: sample the backdrop shifted by the sheet's (R, G) offsets, scaled by its alpha."""
     h, w = frames[0].shape[:2]
     scene = backdrop(w, h) if scene is None else scene

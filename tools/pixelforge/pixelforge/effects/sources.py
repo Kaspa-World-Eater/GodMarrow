@@ -13,14 +13,14 @@ from .graph import Context, Field, node
 _NOISE_DOC = "cells across the width ({} per loop in time); octaves of detail; the same seed, the same field."
 
 
-@node("perlin", "source", "Perlin gradient noise, tileable in space and time. cells across the width, tcells beats per loop, octaves of detail.")
-def perlin(ctx: Context, cells: float = 4.0, tcells: int = 1, octaves: int = 3, gain: float = 0.5, seed: int = 0, _id: str = "") -> Field:
-    return N.perlin(ctx.w, ctx.h, ctx.frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=ctx.node_seed(f"{_id}:{seed}"))
+@node("perlin", "source", "Perlin gradient noise, tileable in space and time. cells across the width, tcells beats per loop, octaves of detail; stretch > 1 tall cells (streaks).")
+def perlin(ctx: Context, cells: float = 4.0, tcells: int = 1, octaves: int = 3, gain: float = 0.5, seed: int = 0, stretch: float = 1.0, _id: str = "") -> Field:
+    return N.perlin(ctx.w, ctx.h, ctx.frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=ctx.node_seed(f"{_id}:{seed}"), stretch=stretch)
 
 
 @node("simplex", "source", "Simplex-style noise (triangular lattice, no square-grid bias), tileable; cells, tcells, octaves.")
-def simplex(ctx: Context, cells: float = 4.0, tcells: int = 1, octaves: int = 3, gain: float = 0.5, seed: int = 0, _id: str = "") -> Field:
-    return N.simplex(ctx.w, ctx.h, ctx.frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=ctx.node_seed(f"{_id}:{seed}"))
+def simplex(ctx: Context, cells: float = 4.0, tcells: int = 1, octaves: int = 3, gain: float = 0.5, seed: int = 0, stretch: float = 1.0, _id: str = "") -> Field:
+    return N.simplex(ctx.w, ctx.h, ctx.frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=ctx.node_seed(f"{_id}:{seed}"), stretch=stretch)
 
 
 @node("cellular", "source", "Worley cells: mode f1 (dark at the points), f2f1 (bright walls), id (flat value per cell); drift per loop.")
@@ -29,8 +29,8 @@ def cellular(ctx: Context, cells: float = 4.0, mode: str = "f1", drift: float = 
 
 
 @node("ridged", "source", "Ridged multifractal noise: sharp bright creases for licks, cracks and veins; tileable.")
-def ridged(ctx: Context, cells: float = 4.0, tcells: int = 1, octaves: int = 4, gain: float = 0.55, seed: int = 0, _id: str = "") -> Field:
-    return N.ridged(ctx.w, ctx.h, ctx.frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=ctx.node_seed(f"{_id}:{seed}"))
+def ridged(ctx: Context, cells: float = 4.0, tcells: int = 1, octaves: int = 4, gain: float = 0.55, seed: int = 0, stretch: float = 1.0, _id: str = "") -> Field:
+    return N.ridged(ctx.w, ctx.h, ctx.frames, cells=cells, tcells=tcells, octaves=octaves, gain=gain, seed=ctx.node_seed(f"{_id}:{seed}"), stretch=stretch)
 
 
 @node("value_noise", "source", "Soft value noise: blobs between random lattice values; tileable.")
@@ -215,7 +215,7 @@ CURVES = ("linear", "flat", "fade_out", "fade_in", "grow_slow_shrink_fast", "pop
       "stick), sub (a dict of emitter params for children born when a particle dies or lands). Returns a bundle: v, age, height, dist, speed.",
       returns="bundle")
 def emitter(ctx: Context, x: float = 0.5, y: float = 0.9, jitter: float = 0.0, shape: str = "point", count: int = 24, life: int = 8, life_jitter: float = 0.3,
-            angle: float = -90.0, spread: float = 30.0, speed: float = 2.0, speed_jitter: float = 0.3, speed_curve: str = "linear",
+            angle: float = -90.0, spread: float = 30.0, speed: float = 2.0, speed_jitter: float = 0.3, speed_curve: str = "flat",
             size: float = 2.0, size_jitter: float = 0.3, size_end: float = 0.0, size_curve: str = "grow_slow_shrink_fast",
             gravity: float = 0.0, drag: float = 0.0, turbulence: float = 0.0, flow: np.ndarray | None = None, spin: float = 0.0,
             trail: int = 0, ground: float = 0.0, bounce: float = 0.0, stick: bool = False, sub: dict | None = None, burst: bool = False,
@@ -302,10 +302,17 @@ def emitter(ctx: Context, x: float = 0.5, y: float = 0.9, jitter: float = 0.0, s
             r = max(sz0[i] * (_curve(size_curve, np.float32(a)) * (1 - size_end) + size_end), 0.15)
             _disc(out, t, X, Y, qx, qy, r, a, soft, src_y, bx[i], by[i], spd[i])
             if trail > 0 and s > 0:
+                # the trail: earlier positions, each segment filled with sub-steps so a fast particle leaves a streak, not dots
                 for k in range(1, min(trail, s) + 1):
                     fade = (1 - k / (trail + 1)) * 0.8
-                    _disc(out, t, X, Y, px[s - k, i], py[s - k, i], r * (1 - 0.5 * k / (trail + 1)), a, soft, src_y, bx[i], by[i], spd[i], fade,
-                          spin_turn=np.radians(spin) * k)
+                    rk = r * (1 - 0.5 * k / (trail + 1))
+                    ax, ay = px[s - k, i], py[s - k, i]
+                    bx2, by2 = px[s - k + 1, i], py[s - k + 1, i]
+                    nsub = max(1, int(np.ceil(np.hypot(bx2 - ax, by2 - ay) / max(rk * 1.2, 0.8))))
+                    for j in range(nsub):
+                        u = j / nsub
+                        _disc(out, t, X, Y, ax * (1 - u) + bx2 * u, ay * (1 - u) + by2 * u, rk, a, soft, src_y, bx[i], by[i], spd[i], fade,
+                              spin_turn=np.radians(spin) * k)
     if sub:
         children = _children(ctx, sub, px, py, lives, landed_at, birth, n, rng, _id)
         if children is not None:
@@ -408,7 +415,7 @@ def flame_body(ctx: Context, x: float = 0.5, y: float = 0.92, width: float = 0.5
         eat = (nt * 0.9 + pt * 0.8 - 0.2) * (h1 ** 0.85) * sharp
         core = inside ** 3.0 * (1.0 - h1) ** 0.8 * 0.3            # the inner tongue: brighter, reaching up the middle
         v = inside ** 0.8 * (1.0 - 0.5 * h1) + core - eat
-        v = np.where(hgt <= 1.2, v, 0.0)
+        v = np.where((hgt <= 1.2) & (Y <= base_y + 1.0), v, 0.0)
         out[t] = np.clip(v, 0, 1)
     return out
 
