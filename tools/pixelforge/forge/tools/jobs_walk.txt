@@ -1,0 +1,24 @@
+# A job from Home, end to end with the mock Claude as the planner (PIXELFORGE_CLAUDE=mock:tests/claude_mock/plan.jsonl; screens.sh
+# runs it, swapping OUT for the shot folder): a sentence that spans three benches typed on Home, the Jobs panel while the plan
+# is written and the steps run, the pause at the approval step, Approve, the running render, done, then the report on the bench.
+go home
+wait 1
+type a pale wisp effect, a hit sound and a short crypt tune
+wait 3
+shot OUT/jobs_running.png
+waitjob 120
+wait 1.5
+shot OUT/jobs_waiting.png
+choose Approve
+wait 3.5
+shot OUT/jobs_rendering.png
+waitjob 120
+wait 1.5
+shot OUT/jobs_done.png
+choose Report
+wait 1.5
+shot OUT/jobs_report.png
+key esc
+wait 1
+dumplog
+quit

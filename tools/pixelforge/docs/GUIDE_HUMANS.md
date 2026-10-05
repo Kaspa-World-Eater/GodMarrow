@@ -26,11 +26,25 @@ it said; Ctrl+C copies it). Every bench has tabs along the top of the text box a
 **Render all**, **Undo**, **Reset** (this tab's levers back to their defaults), **Start over** (one plain question,
 inside the window) and **Advanced** (the same values as plain sliders with finer steps).
 
-**Characters** (the heart of it). A character is a *shape model*, a `.shapes.json` file of solids with materials,
+**Characters** (the heart of it). **Start from a picture.** Drop a Midjourney picture on the window (on Home or on
+the Characters bench), or press *Choose a picture* and pick it in the Forge's own browser (Downloads, Pictures, Desktop
+and a Midjourney folder are one click away; the newest files are at the top), and the Forge gets to work by itself:
+the state line says what it is doing ("cutting the figure", "measuring", "drafting 17 shapes", "sampling materials",
+"drawing") and a few seconds later the drafted character stands on the bench facing south with the picture beside
+it. One figure or a turnaround sheet (two or more figures side by side) both work; a sheet's views as separate files
+can be dropped together. The Reference tab then says how close it got in one honest line ("Silhouette overlap front
+0.71: the right mass; the details want a hand") and what is worth knowing ("measured as the front view only; a side
+view would give the depth"); **Compare** shows the picture and the sprite side by side at one height, **Measure
+again** and **Sample materials again** redo those steps on the model as it is now, **Open in editor** renders the idle
+clip and opens the pixel editor on it, **Use as reference only** puts a painting beside the model without drafting
+(the old behaviour). The character's name comes from the file's name (Midjourney writes your prompt into it) and the
+costume words in it shape the draft, so a download named `…_a_hooded_necromancer_with_a_bone_staff_….png` arrives
+hooded, with a staff. If the picture has no figure on a plain or transparent background the bench says so, in words,
+and nothing else happens. A character is a *shape model*, a `.shapes.json` file of solids with materials,
 rendered as pixel art by the engine and moved by the motion clips (idle, walk, run, attack, cast, hit, death) from
-eight directions. Drop a model file on the window (`assets\shapes\characters\keeper.shapes.json` is the Keeper) or
-press *Start from the Keeper*. The tabs: **Reference** (the model beside a reference painting, with the checks that
-say what to change), **Model** (pick a part and a solid, move and scale it, change its material, hide it),
+eight directions. You can also drop a model file on the window (`assets\shapes\characters\keeper.shapes.json` is
+the Keeper) or press *Start from the Keeper*. The tabs: **Reference** (the model beside the picture, with the overlap
+line and the checks that say what to change), **Model** (pick a part and a solid, move and scale it, change its material, hide it),
 **Materials** (every material's colour ramp with hue, lightness, contrast and steps; each light's glow kind, colour,
 strength, pulse and radius; *Randomise* for a variant, *Champion* saves a recolour beside the model), **Motion** (the
 clip and the facing, the lag, sway and hang of the loose parts, the turn and move steps, the camera; *Render clip*
@@ -57,13 +71,16 @@ pieces across genres, and Keep as a game cue. The full manual is below, "The Mus
 
 **Describe it.** The line on Home takes plain words: "a hooded necromancer with a skull-topped staff burning green"
 drafts a shape model and opens the Characters bench with it; "a wisp lantern spell, pale blue, slow, with embers"
-opens Effects with it playing; "a slow sombre act 2 wilds tune" opens the music rack on that cue.
+opens Effects with it playing; "a slow sombre act 2 wilds tune" opens the music rack on that cue. A sentence that
+names two or more benches ("a pale wisp effect, a hit sound and a short crypt tune") starts a **job**: Claude plans
+the steps and the Forge carries them out while you watch (see *Jobs* below).
 
 **Under construction** (the bench says so itself, in gold, and nothing on it crashes):
 - **Creatures.** The beast rig (four legs, a tail, wings) is not in the engine yet. The bench is the characters'
   bench; a creature dropped there stands on the humanoid skeleton.
-- **The painting road** (a Midjourney sheet cut out, carved in Blender, filmed and pixelated) is not in the Forge:
-  it is the classic Studio's, below. The Forge's Reference tab shows a painting beside the model, nothing more.
+- **The old painting road** (a Midjourney sheet cut out, carved in Blender, filmed and pixelated) is not in the
+  Forge: it is the classic Studio's, below. In the Forge a picture becomes a shape model (*Start from a picture*,
+  above); the Reference tab compares the two.
 - **The cutout editor** (the painting road's masks) stays in the classic Studio. The pixel editor itself is in the
   Forge now: see *The editor* below.
 - **The Play tile** is gone; *See it in the game* on a bench does the same with the thing you made.
@@ -185,6 +202,59 @@ Reference tab beside the model when it is done.
 
 The fallback is always there: **Copy prompt**, paste it in Midjourney yourself, upscale, save the PNG, and drop the
 file on the bench. The bench says so whenever the browser road is closed.
+
+## Jobs: one sentence across several benches
+
+The describe line on Home takes a sentence that spans benches: *"a pale wisp effect, a hit sound and a short crypt
+tune"*. When two or more benches are named, the Forge does not open one bench; it starts a **job**. Claude writes a
+plan (one step per thing: the command, what it makes, how it is checked), and the Forge carries the plan out step by
+step while you watch. Home shows a **Jobs** panel under the nine choices: *running* with the step it is on and what it
+is doing right now; *waiting for approval* with the step that waits (a step that writes into the game, opens a program
+for hand work, or renders a whole character pauses first); *done* with how many things were made. The bottom row has
+what applies: **Approve** (runs the waiting step and carries on), **Cancel** (stops the job; what was made stays),
+**Resume** (a job the Forge was closed on, or one that stopped at a step that could not be done) and **Report**.
+When there are several jobs a *job* cycler picks one.
+
+**The report** opens on the bench the job concerns, with the pictures in the picture window (*Next picture* cycles
+them): what was made and where, what could not be done and why, in plain lines. Esc or *Back to bench* leaves it. The
+same report is a file: `<project>\jobs\<id>\report.md` (with the pictures) and `report.json`.
+
+**A step that fails** is tried once more after Claude is asked to fix it (a flag, a name, a path); if it still cannot
+be done, the step is marked, the steps that needed it are skipped, the rest go on, and the report says why. **Closing
+the Forge** while a job runs stops it (a job is the Forge's own child process; nothing runs in the background): on the
+next launch Home shows it as *interrupted* with **Resume**, which carries on from the last finished step. Everything a
+job knows is in its folder under `<project>\jobs\`, so nothing is lost between launches.
+
+From a prompt the same job is `pixelforge job start "..." -p <project>` with `job list | status | log | approve | cancel
+| resume | report`; `--approve none` runs without pauses.
+
+## Tools we use instead of building
+
+The Forge does not reinvent what a good free tool already does. It finds the tools below when they are installed, uses
+them where they fit (a job can call them, the benches will grow their buttons for them), and tells you in one sentence
+how to install one that is missing, with the official page. **It never downloads or installs a program for you**: that
+stays your own step, on your own machine. `pixelforge tools status` prints the honest list for this computer: found or
+not, the version, what it does for us, and the install sentence. Settings will show the same list.
+
+| tool | what it does for us | official download page | licence |
+|---|---|---|---|
+| Aseprite | hand edits of a frame set (open, draw, close; the frames come back), sprite sheets and batch exports from its command line, Lua scripts | https://www.aseprite.org/download/ (or Steam) | proprietary (paid binary; the source is free to build yourself) |
+| LibreSprite | the free fork of Aseprite 1.x: hand edits of frames, the same command line for sheets and exports (its scripts are JavaScript) | https://libresprite.github.io/#!/downloads | GPL-2.0 |
+| Pixelorama | a free pixel editor for hand edits; no command line, so open-and-wait only | https://orama-interactive.itch.io/pixelorama | MIT |
+| Furnace | a chiptune tracker: our songs exported as ProTracker .mod open in it; its command line renders a tracker file to WAV through real chip emulation | https://github.com/tildearrow/furnace/releases | GPL-2.0 |
+| Blender | the 3D step of the old road (hull, rig, 8-direction renders) and any headless script | https://www.blender.org/download/ | GPL-2.0-or-later |
+| ffmpeg | GIFs and MP4s of frame folders at whole-pixel zoom, WAV to OGG for the game, facts about a media file (ffprobe) | https://ffmpeg.org/download.html | LGPL-2.1-or-later (GPL builds exist) |
+| ImageMagick | strips and contact sheets from frames, format conversions, whole-pixel scaling, identify (version 6 and 7) | https://imagemagick.org/script/download.php | ImageMagick License (Apache-2.0 compatible) |
+| rembg | cut a painting's subject from its background before the cutout steps or a prop (it fetches its own model file, about 170 MB, on first use) | https://github.com/danielgatis/rembg (`pip install rembg[cli]`) | MIT |
+| Tiled | map editing by hand; `--export-map` to JSON; a Tiled map as one plain layout JSON for the game (YATI imports .tmx/.tmj into Godot directly) | https://www.mapeditor.org/download.html | GPL-2.0-or-later (libtiled BSD) |
+| LDtk | level editing by hand (no command line); a .ldtk level as one plain layout JSON for the game (godot-ldtk-importer imports it directly) | https://ldtk.io/download/ | MIT |
+| Godot | the engine: the headless import of new art, the Forge's own checks, the game opened with a skin or an effect for a look or a screenshot | https://godotengine.org/download/ | MIT |
+| Claude Code | the Claude on every bench and the planner of jobs (`pixelforge/claude_bridge.py`) | https://claude.com/claude-code | a paid plan (Anthropic's terms) |
+| Mixamo | a website: auto-rigging and motion clips for the old road's FBX; the shape-sprite road needs none of it | https://www.mixamo.com/ | free with an Adobe account (Adobe's terms) |
+| Midjourney | a website: the reference paintings, through Claude in Chrome or a copied prompt | https://www.midjourney.com/ | a paid subscription (Midjourney's terms) |
+
+Set a path by hand when a tool lives somewhere unusual: `PIXELFORGE_ASEPRITE`, `PIXELFORGE_FFMPEG`, `PIXELFORGE_FURNACE`
+and so on (the tool's name in capitals).
 
 ## Install (once)
 
@@ -350,10 +420,12 @@ pose until it has somewhere to go, so nothing crawls or boils between frames. No
 per clip. One file serves both sizes: the small-size variant keeps the silhouette and drops the detail. Objects (a chest, a skull, a dead tree)
 are the same kind of file without bones, rendered as a still with a foot point for the game.
 
-The painting is the reference for the costume, not the source, and the Forge can read it: **measure** takes the
-figure's widths from the front, side and back views and sizes the starting model to them, **sample materials** takes
-the painting's colours into the model's ramps, and **compare** puts painting and model side by side at one height so
-you can see what is still off (`pixelforge shapes measure`, `sample-materials`, `compare`; the assistant runs them).
+The painting is the reference for the costume, not the source, and the Forge reads it by itself: dropping a picture
+on the Characters bench runs `pixelforge character from-picture`, which cuts the figure out, **measures** the figure's
+widths from the front (and side and back) views and sizes the starting model to them, **samples materials** (the
+painting's colours into the model's ramps) and **compares** painting and model side by side at one height with an
+overlap number per view, so you can see what is still off (the steps on their own: `pixelforge shapes measure`,
+`sample-materials`, `compare`; the assistant runs them too).
 Writing the file is a job for the AI assistant (the necromancer, the Keeper and the Hemomancer under `assets/shapes/`
 are the examples); you judge the result and ask for changes in plain words ("the hat is too bright", "make the skirt
 longer"). To look: `pixelforge shapes preview FILE --clip walk

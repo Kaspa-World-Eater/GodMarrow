@@ -10,7 +10,7 @@ extends Node
 ##   set NAME VALUE          a rack control by name: a lever 0..1, a wheel in degrees, a pull on|off, the scene light 0|1|2
 ##   env NAME                the ground
 ##   light 0|1|2             the scene-light lever
-##   drop PATH               as if the file were dropped on the window
+##   drop PATH[;PATH...]     as if the file (or the files, ; between them) were dropped on the window
 ##   type TEXT               into the describe line (Home) and press Enter
 ##   waitjob [S]             wait until the pipeline is idle (at most S seconds, default 600)
 ##   music on|off
@@ -90,7 +90,7 @@ func _run() -> void:
 				if app.current and app.current.has_method("set_light_stop"):
 					app.current.set_light_stop(int(arg))
 			"drop":
-				app._on_files_dropped(PackedStringArray([arg]))
+				app._on_files_dropped(PackedStringArray(arg.split(";", false)))
 				await _settle()
 			"type":
 				if app.current and app.current.has_method("_describe") and app.current.describe:

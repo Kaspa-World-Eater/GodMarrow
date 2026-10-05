@@ -39,6 +39,7 @@ var claude_notes := ""          # the last run's notes, shown on the state line 
 var claude_notes_until := 0
 var _values_before := {}        # control values before a Claude run, for the highlight
 var _claude_text := ""
+var report_view := {}           # a job's report shown on this bench (args.job_report): {"rep": the report.json, "pic": index}
 var _queued: Callable           # a request made while a job ran; it runs when the job ends (the last one wins)
 var _request_gen := 0           # the debounce: a request that a newer one followed within its delay never runs
 var _ticket := 0                # the newest request's number; a result that comes back for an older one is stale
@@ -63,6 +64,8 @@ func setup(a: App, name_: String, arguments: Dictionary) -> void:
 	if args.has("advanced"):
 		advanced_open = true
 	build()
+	if args.has("job_report"):
+		show_job_report(String(args["job_report"]))
 
 ## the --tab argument, once the screen has named its tabs (screens call this after setting `tabs`)
 func tab_from_args() -> void:
@@ -89,6 +92,14 @@ func rebuild() -> void:
 	groups = []
 	state_label = null
 	describe = null
+	if not report_view.is_empty() and pending_confirm.is_empty():
+		report_view = {}          # Esc (or Back to bench) closed the report: the bench's own tab again
+	if not report_view.is_empty():
+		_build_report()
+		app.set_tabs(tabs, tab, self)
+		app.set_groups(groups)
+		app.set_hint("Esc back to the bench")
+		return
 	build_tab(tab)
 	if has_describe_line() and _content_height() + 14 <= App.TEXTBOX.size.y - 3:
 		add_describe_line()
@@ -346,6 +357,63 @@ func confirm(question: String, yes: Callable) -> void:
 	add_choices([{"label": "Yes", "cb": func(): pending_confirm = {}; yes.call()}, {"label": "No", "cb": func(): pending_confirm = {}; rebuild()}])
 	app.set_groups(groups)
 	app.focus_on(choices, 1, false)
+
+# ------------------------------------------------------------------ a job's report, on the bench it concerns
+## the report.json of a job (pixelforge/jobs.py): what was made (with pictures in the window), what could not be, and why
+func show_job_report(path: String) -> void:
+	var rep := app.backend.read_json(path)
+	if rep.is_empty():
+		app.say("The report could not be read.")
+		return
+	var pics := []
+	for p in rep.get("pictures", []):
+		if String(p).to_lower().ends_with(".png") and FileAccess.file_exists(String(p)):
+			pics.append(String(p))
+	report_view = {"rep": rep, "pics": pics, "pic": 0, "path": path}
+	pending_confirm = {"report": path}     # Esc leaves the report the way it leaves a question
+	rebuild()
+	_show_report_picture()
+
+func _build_report() -> void:
+	var rep: Dictionary = report_view["rep"]
+	var made: Array = rep.get("made", [])
+	var could: Array = rep.get("could_not", [])
+	var state_word := {"done": "finished", "failed": "finished; a step could not be done", "cancelled": "stopped", "waiting": "waiting for approval",
+		"interrupted": "interrupted", "running": "running"}.get(String(rep.get("state", "")), String(rep.get("state", "")))
+	state_line("Job · %s · %s · %d made%s" % [String(rep.get("title", "")), state_word, made.size(), (", %d could not" % could.size()) if not could.is_empty() else ""], "Gold")
+	var lines := []
+	for m in made.slice(0, 4):
+		var files: Array = m.get("files", [])
+		var names := []
+		for f in files.slice(0, 2):
+			names.append(String(f).get_file())
+		lines.append("+ %s%s" % [String(m.get("title", "")), (": " + ", ".join(PackedStringArray(names))) if not names.is_empty() else ""])
+	for c in could.slice(0, 3):
+		lines.append("- %s: %s" % [String(c.get("title", "")), String(c.get("why", "")).split("\n")[0]])
+	if String(rep.get("notes", "")) != "":
+		lines.append(String(rep["notes"]))
+	var l := W.PxText.new()
+	l.init("\n".join(PackedStringArray(lines)), T.DIM, mini(maxi(lines.size(), 1), 5), T.SMALL_SIZE)
+	rows.add_child(l)
+	add_spacer()
+	var items := []
+	var pics: Array = report_view["pics"]
+	if pics.size() > 1:
+		items.append({"label": "Next picture", "cb": func(): report_view["pic"] = (int(report_view["pic"]) + 1) % pics.size(); _show_report_picture(); rebuild()})
+	items.append({"label": "Back to bench", "cb": func(): pending_confirm = {}; rebuild(); on_state_restored()})
+	items.append({"label": "Home", "cb": func(): pending_confirm = {}; report_view = {}; app.home()})
+	add_choices(items)
+
+func _show_report_picture() -> void:
+	var pics: Array = report_view.get("pics", [])
+	var rep: Dictionary = report_view.get("rep", {})
+	if pics.is_empty():
+		app.scene.show_text(PackedStringArray([String(rep.get("title", "the job")), "no pictures in this report"]), "job report")
+		return
+	var i := clampi(int(report_view.get("pic", 0)), 0, pics.size() - 1)
+	var t := tex(pics[i])
+	if t:
+		app.scene.show_picture(t, "%s · %d of %d" % [String(pics[i]).get_file(), i + 1, pics.size()])
 
 # ------------------------------------------------------------------ Claude on the bench
 ## workbenches have the line; Home, Settings and the editor do not
