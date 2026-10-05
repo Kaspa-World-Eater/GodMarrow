@@ -28,7 +28,8 @@ S or all eight, the objects.json entry). Effects: Shape, Layers (a spell from pr
 Tiles: Source, Edges, Variants, Export. Interface: Frames (ui9), Icons, Portraits, Fonts. Sound: the eighteen pads.
 Music: the rack and the cue cards. Settings: Window, Folders, Style (cards with animated strips), This computer.
 Every bench: Keep, Render all, Undo (JSON snapshots of `state`), Reset, Start over (one question in the window),
-Advanced (plain sliders with finer steps and the fine values).
+Advanced (plain sliders with finer steps and the fine values), and a *Claude:* line (track/claude, `claude_bench.md`:
+the sentence goes to Claude Code through PixelForge's MCP tools; Undo puts its files back).
 
 **Verified (cloud, xvfb, no GPU).** `forge/tools/screens.sh`: 37 screens at 1280x720, 0 SCRIPT ERRORs
 (`docs/screens/forgeapp/`); `tools/check_scripts.gd`: 20 scripts, 0 failed; the Keeper walkthrough through

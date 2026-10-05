@@ -1,0 +1,8 @@
+# a canned stream for the Music bench: slows the song to 76 and darkens the sound
+{"type":"system","subtype":"init","cwd":"{project}","session_id":"mock","tools":["Read","mcp__pixelforge__edit_song"],"mcp_servers":[{"name":"pixelforge","status":"connected"}],"model":"mock"}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t1","name":"Read","input":{"file_path":"{project}/music/current.song.json"}}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t1","content":"..."}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t2","name":"mcp__pixelforge__edit_song","input":{"song_path":"{project}/music/current.song.json","ops":[{"op":"set_tempo","tempo":76},{"op":"set_fx","name":"crunch","value":0.35},{"op":"set_note","pattern":"A","lane":"lead","step":0,"pitch":61,"vel":0.8,"length":4}]}}]}}
+{"mock":"run","args":["music","edit","{project}/music/current.song.json","--op","{\"op\": \"set_tempo\", \"tempo\": 76}","--op","{\"op\": \"set_fx\", \"name\": \"crunch\", \"value\": 0.35}","--op","{\"op\": \"set_note\", \"pattern\": \"A\", \"lane\": \"lead\", \"step\": 0, \"pitch\": 61, \"vel\": 0.8, \"length\": 4}"]}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t2","content":"ok"}]}}
+{"type":"result","subtype":"success","is_error":false,"duration_ms":2500,"num_turns":2,"result":"{\"did\": [\"set the tempo to 76\", \"added a little crunch\", \"placed a low note at the start of A\"], \"changed\": [\"{project}/music/current.song.json\"], \"notes\": \"Slower and darker: 76 bpm, more crunch, a held root note opening the lead.\"}","total_cost_usd":0.05,"session_id":"mock"}

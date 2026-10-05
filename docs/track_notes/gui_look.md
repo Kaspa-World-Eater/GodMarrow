@@ -141,3 +141,97 @@ music plays in the app from the first interaction (a toggle in the title bar, vo
 family (docs/track_notes/gui_look.md, music reference), rendered by music.py; the mockup carries a procedural
 in-browser stand-in (detuned pads in C# minor over a drone, breathing lowpass, sparse pentatonic bell sparkles
 through a long reverb) that states the intent.
+
+## The look pass (2026-10-05, track/look): higher fidelity, same design
+
+The owner: "the theme of the entire forge is still that low pixel look, should be higher fidelity"; "the pixel look
+is still too blocky"; "it's not clear what you can click or change, it's confusing to navigate or edit anything";
+"make sure the look of the forge stays how I wanted it: the SNES look and interface, and readable". The design did
+not change (the mockup `docs/mockups/forge_app_v8.html`, the reference `docs/refs/forge_gui_reference.png`); the
+drawing did. Everything is drawn at the app's 640x360 logic resolution, one image pixel per logic pixel, integer
+scaled on screen (2x at 1280x720 and 1366x768), in 16-bit-style ramps of seven tones; nothing is anti-aliased.
+
+**The frame** (`forge/scripts/frame.gd`, one cached image per environment):
+- carved stone bands in blocks of about 30 px with a lit top-left bevel, a dark foot, mortar joints, chips bitten
+  from the corners, a wandering crack through a third of the blocks, grain speckle, moss in the lower joints (more
+  near the floor), frost on the upper faces in the snow;
+- an iron strap round the outside with a lit bead, a groove and rivets every 16 px; iron window rims three pixels
+  thick with rivets every 24 px and corner plates; a dithered recess shadow inside each window so it reads as set in;
+- sconces: two torches on the side bands, two candles on the bottom band. Their flames are real frames (eight,
+  10 fps, `Frame.flame_frames`), and each flame re-shades the stone round it in dither at four levels
+  (`Frame.light_patch`) so the light breathes with the flame; reduced motion holds frame 0 at level 2;
+- a worn wooden sill under the text box (two planks, grain, knots, worn lighter in the middle, nails at the ends);
+  the foot line sits on it;
+- the banner's keystone: a carved plaque with a gold inlay line and studs, the title in blackletter at 36 px (the
+  mockup's 48 css px in an 860 px frame) with a one-pixel dark edge;
+- corner details: a skull on the top-left quoin, a moth top-right, a key on a nail bottom-left, a rat bottom-right;
+  chains of three links hanging from rings on the four corner plates;
+- per-environment materials: `Frame.ENV` gives each ground (dungeon, crypt, moor, fen, snow, plain) its own
+  stone ramp, moss ramp and amount, and light colour; the scene-light lever still drives the picture window's light.
+- **Anchors for effects**: `Frame.anchors()` names points in logic pixels (`torch_left`, `torch_right`,
+  `candle_left`, `candle_right`, `brazier`, `banner`, `corner_tl..br`, `sill_left/right`, `chain_tl..br`,
+  `drip_1..6` along the top band); `app.frame_anchors()` hands them out. Torches, braziers and drips land there.
+
+**The controls** (`px.gd`, each a tiny canvas drawn at 1 px and shown at 2x): levers in iron bracket plates with a
+dithered ramp, four rivets, a carved slot with a lit lower lip, a scale beside it, a gold-and-bone grip over an iron
+bar; the three-stop lever with notches at its stops; toothed valve wheels (twelve teeth cut into the rim, a worn
+face with a groove, four spokes, the gold one marking the angle, a hub); chain pulls (bracket, links, a wooden T-grip
+with gold caps) that sway for a second after a pull; sliders as iron channels with a gold stud; the selector is a
+16x14 dagger (gold pommel and guard, a wrapped grip, a steel blade) whose edge highlight moves on a two-frame
+shimmer when it lands (`shimmer` in app.gd), with the old three-frame white flash on select.
+
+**Affordances** (the second complaint):
+- ember means clickable; bone or grey means a label. Every choice sits on a carved iron plaque with a lit top edge
+  and a dark foot; the one in hand has a gold edge and a 1-px glow; pressed, the edges swap so it sinks. A cycler's
+  name is grey, its `< value >` is ember on a plaque; hovering the value shows a caret box (it can be typed).
+  Cards (Settings > Style) are ember too, the chosen one on a plaque.
+- hover and pressed states on every control: a lever, wheel or pull lights its handle and gets a gold outline;
+  a slider its track; a ramp swatch its outline; a tab sign lifts a pixel with a gold line; the title line's plates
+  light gold and sink for a moment when clicked. The pointer is a pixel hand over anything clickable
+  (`PX.cursor_hand`), a closed grab hand over anything dragged (`PX.cursor_grab`), an I-beam over a typable value.
+- **the hint line** on the wooden sill names the thing in hand or under the pointer and how to change it
+  ("size · drag up or down, scroll, or click the value to type"; "Keep · write this into the game";
+  "Materials tab · LB and RB, Tab, or click"). Groups give it through `hint_of(i)`, controls through `how()`;
+  `app.hover_hint(h)` sets it while the pointer rests and clears it back to the selection.
+- **"?"**: a choice on every bench (and a plate on the title line) overlays labelled callouts: a tag by every group
+  saying how it is worked, a tag over every lever, a legend of the keys. Any key or click closes it. It shows itself
+  once the first time a bench opens (`help_seen` in the settings file; `--help` forces it; never under the test
+  hooks).
+- **breadcrumbs** on the title line: `< back` (always there, dull on Home), then the screens under this one as
+  plates (each a click back to it), this screen and its tab in bone. The oldest crumbs drop when they would run
+  into the keystone. `go_back_to(k)` is what a crumb does.
+- the status words (project, style, Claude's state) moved to a dark ledger strip on the bottom band, between the
+  candles, so the sill holds the hint whole; the ground picker stays on the sill's right.
+
+**Readability**: VT323 at 16 px for the body and 12 px for names, values and the foot (the mockup's sizes in the
+640 canvas; body never smaller); a one-pixel dark edge behind every light word that sits on stone or wood (the
+banner, the title line, the sill, the status strip, the tab signs; `EdgedLabel`, `_edged`); checked at 1280x720
+and 1366x768 (both 2x, the second letterboxed).
+
+**Test hooks**: `--hover=x,y` (logic pixels) warps the mouse there 1.2 s in so a screenshot shows the hover
+state (`docs/screens/forgeapp/hover_lever.png`); `look_before_after.png` and `look_vs_mockup.png` beside it.
+Controls kept their sizes and positions; typed numbers and the mouse paths are unchanged (`test_editor.gd` 106,
+`test_scene.gd` 21, `check_scripts.gd` 34/0).
+
+### The three critique rounds (what read plain or unreadable, and what changed)
+
+**Round 1** (the first sweep, 48 shots at 1280x720 and 1366x768): the Claude state on the title line ran into the
+keystone on every bench (moved to the status strip on the bottom band); the status words squeezed the hint line to a
+few characters ("Esc back · LB/RB" cut; "drop a painting :" cut), so the foot became two lines, the hint whole on the
+sill; the Settings > Style cards and the Frames tab's frame numbers were bone though every one can be clicked (ember
+now, the chosen one bright on a plaque); a cycler's name touched its value plaque ("glow< eyes >"; a 3-px gap now);
+the editor shots came out empty because the editor's three-direction render takes longer than the 16 s wait under
+load (24 s now). Pre-existing and left: the Materials tab is full and loses its choices line; the Reference tab's
+checks line is cut at one line; the Interface Frames choices wrap to a second row that the box clips by two pixels.
+
+**Round 2** (re-shots, the hover shot): the hover hint vanished a moment after the pointer landed, because the bench
+rebuilt after its render and `set_hint` wrote the selection's words back (the pointer's words now persist through
+rebuilds until it leaves: `hover_words`); the editor's tool names were bone (ember now); the hover shot shows the
+lit lever, its gold outline and "size · drag up or down, scroll, or click the value to type" on the sill.
+
+**Round 3** (the "?" overlay): the callouts drew once at the bench's opening and never followed the rebuilt bench
+(no lever tags at all; `set_groups` redraws them now); the per-lever tags were wider than their columns and overlapped
+("drag up or dow|drag up or dow"), so each control carries one word (drag / turn / pull / cycle) and one long tag under
+the rack says the rest; the ground tag hid behind the key legend (it sits on the sill now, left of "ground"); the tabs
+tag covered the Export sign (it sits on the picture window's foot now). `docs/screens/forgeapp/callouts.png` is the
+result.

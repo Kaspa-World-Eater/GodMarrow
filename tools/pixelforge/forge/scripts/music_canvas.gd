@@ -35,6 +35,7 @@ var grid_focus := false
 var section := 0
 var card_lines: PackedStringArray = []
 var card_title := ""
+var highlight: Array = []        # "pattern/lane/step/pitch" keys of notes to ring in gold (what Claude just added)
 var hover := Vector2(-1, -1)
 var on_cell: Callable            # (step, pitch, button)   a click in the roll
 var on_lane: Callable            # (lane, step)            a click in the lanes overview (step -1 from the tracks view)
@@ -181,6 +182,8 @@ func _draw_pattern() -> void:
 					var c := T.ACCENT
 					c.a = 0.4 + float(n["v"]) * 0.6
 					draw_rect(Rect2(GRID_X + s0 * CELL_W + 1, y + 1, CELL_W - 3, DRUM_ROW - 3), c)
+					if not highlight.is_empty() and ("%s/drums/%d/%d" % [pattern, int(n["s"]), num]) in highlight:
+						draw_rect(Rect2(GRID_X + s0 * CELL_W, y, CELL_W - 1, DRUM_ROW - 1), T.GH, false, 1.0)
 	else:
 		var rows := roll_rows()
 		for r in rows:
@@ -208,6 +211,8 @@ func _draw_pattern() -> void:
 			c.a = 0.45 + float(n["v"]) * 0.55
 			draw_rect(Rect2(x, y, w, ROLL_ROW - 1), c)
 			draw_rect(Rect2(x, y, 1, ROLL_ROW - 1), T.GH)
+			if not highlight.is_empty() and ("%s/%s/%d/%d" % [pattern, lane, int(n["s"]), p]) in highlight:
+				draw_rect(Rect2(x - 1, y - 1, w + 2, ROLL_ROW + 1), T.GH, false, 1.0)
 		# notes above or below the window: small marks in the margin
 		var above := 0
 		var below := 0

@@ -170,6 +170,43 @@ func do_start_over() -> void:
 func on_state_restored() -> void:
 	make()
 
+# ------------------------------------------------------------------ Claude on the bench
+func claude_context() -> Dictionary:
+	var ctx := {"out_dir": tiles_dir()}
+	if String(state["texture"]) != "":
+		ctx["texture"] = String(state["texture"])
+	if String(state["second"]) != "":
+		ctx["second"] = String(state["second"])
+	return ctx
+
+## the tile strip Claude cut shows as the patch, its knobs read back from the json beside it
+func on_claude_done(r: Dictionary) -> void:
+	var png := pick_changed(r, ".png", tiles_dir())
+	if png == "":
+		png = pick_changed(r, ".png")
+	if png == "":
+		if String(state["texture"]) != "":
+			make()
+		return
+	var meta := app.backend.read_json(png.get_basename() + ".json")
+	var t := tex(png)
+	if t == null:
+		return
+	state["last_png"] = png
+	state["last_meta"] = meta
+	if meta.has("source") and FileAccess.file_exists(String(meta["source"])):
+		state["texture"] = String(meta["source"])
+	if meta.has("variants"):
+		state["variants"] = int(meta["variants"])
+	if meta.has("seed"):
+		state["seed"] = int(meta["seed"])
+	state["name"] = png.get_file().get_basename()
+	app.scene.show_tiles(t, meta, "%s · %d tiles" % [tile_name(), int(meta.get("tiles", meta.get("count", 0)))])
+
+func on_claude_undone() -> void:
+	if String(state["texture"]) != "":
+		make()
+
 func on_drop(paths: PackedStringArray) -> void:
 	if paths.is_empty():
 		return

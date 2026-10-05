@@ -6,6 +6,7 @@
    "title": "The Sunken Stair",
    "genre": "dungeon_synth",
    "mood": "dark",
+   "theme": "godmarrow",
    "tempo": 72.0,
    "key": "C# minor",
    "bars": 34,
@@ -26,10 +27,10 @@
     "A3:A3x1",
     "end:endx1"
    ],
-   "notes": 417,
+   "notes": 404,
    "instruments": {
-    "lead": "choir_ahh",
-    "counter": "cello",
+    "lead": "flute_wood",
+    "counter": "guitar_nylon",
     "pad": "choir_men",
     "bass": "bass_sub",
     "sparkle": "celesta",
@@ -44,6 +45,7 @@
    "title": "Candle Hall",
    "genre": "dungeon_synth",
    "mood": "eerie",
+   "theme": "godmarrow",
    "tempo": 66.0,
    "key": "E phrygian",
    "bars": 34,
@@ -60,18 +62,18 @@
     "intro:introx1",
     "A:Ax2",
     "A2:A2x2",
-    "B:Bx2+5",
+    "B:Bx2-4",
     "A3:A3x1",
     "end:endx1"
    ],
-   "notes": 408,
+   "notes": 390,
    "instruments": {
-    "lead": "lead_tri",
-    "counter": "strings_dark",
-    "pad": "choir_men",
-    "bass": "bass_synth",
+    "lead": "brass_low",
+    "counter": "cello",
+    "pad": "strings_ens",
+    "bass": "bass_pick",
     "sparkle": "bells_glass",
-    "drums": "drums_taiko"
+    "drums": "drums_epic"
    },
    "seed": 23,
    "words": "a phrygian hall, choir under, a music box far off"
@@ -82,6 +84,7 @@
    "title": "Black Cathedral",
    "genre": "gothic_orchestral",
    "mood": "dark",
+   "theme": "godmarrow",
    "tempo": 84.0,
    "key": "D minor",
    "bars": 34,
@@ -120,6 +123,7 @@
    "title": "Requiem for a Lantern",
    "genre": "gothic_orchestral",
    "mood": "sombre",
+   "theme": "godmarrow",
    "tempo": 78.0,
    "key": "G minor",
    "bars": 34,
@@ -142,9 +146,9 @@
    ],
    "notes": 637,
    "instruments": {
-    "lead": "strings_warm",
+    "lead": "strings_ens",
     "counter": "brass_horn",
-    "pad": "strings_dark",
+    "pad": "strings_ens",
     "bass": "bass_sub",
     "sparkle": "celesta",
     "drums": "drums_orch"
@@ -153,11 +157,51 @@
    "words": "a slow requiem: cello line, choir, harp"
   },
   {
+   "name": "gothic_the_crest_procession",
+   "file": "gothic_the_crest_procession.song.json",
+   "title": "The Crest Procession",
+   "genre": "gothic_march",
+   "mood": "dark",
+   "theme": "godmarrow",
+   "tempo": 92.0,
+   "key": "D harmonic minor",
+   "bars": 34,
+   "seconds": 88.7,
+   "patterns": [
+    "A",
+    "A2",
+    "B",
+    "A3",
+    "intro",
+    "end"
+   ],
+   "sections": [
+    "intro:introx1",
+    "A:Ax2",
+    "A2:A2x2",
+    "B:Bx2+3",
+    "A3:A3x1",
+    "end:endx1"
+   ],
+   "notes": 640,
+   "instruments": {
+    "lead": "brass_horn",
+    "counter": "choir_dark",
+    "pad": "strings_dark",
+    "bass": "cello",
+    "sparkle": "bells_tubular",
+    "drums": "drums_taiko"
+   },
+   "seed": 15,
+   "words": "a gothic organ-and-choir march: chromatic harmony, chapel bells, the field snare, a deep hall"
+  },
+  {
    "name": "chip_lantern_run",
    "file": "chip_lantern_run.song.json",
    "title": "Lantern Run",
    "genre": "chiptune",
    "mood": "playful",
+   "theme": "general",
    "tempo": 150.0,
    "key": "C major",
    "bars": 34,
@@ -187,7 +231,7 @@
     "drums": "drums_chip"
    },
    "seed": 8,
-   "words": "a quick pulse lead over a triangle bass; the noise channel keeps time"
+   "words": "a quick pulse lead over a triangle bass; the noise channel keeps time (for a brighter game than this one)"
   },
   {
    "name": "chip_crypt_crawler",
@@ -195,6 +239,7 @@
    "title": "Crypt Crawler",
    "genre": "chiptune",
    "mood": "tense",
+   "theme": "general",
    "tempo": 140.0,
    "key": "A minor",
    "bars": 34,
@@ -232,6 +277,7 @@
    "title": "The Breathing Dark",
    "genre": "dark_ambient",
    "mood": "eerie",
+   "theme": "godmarrow",
    "tempo": 54.0,
    "key": "F phrygian",
    "bars": 26,
@@ -253,7 +299,7 @@
    ],
    "notes": 325,
    "instruments": {
-    "lead": "flute_pan",
+    "lead": "strings_dark",
     "counter": "choir_men",
     "pad": "choir_men",
     "bass": "bass_sub",
@@ -269,6 +315,7 @@
    "title": "Salt and Bone",
    "genre": "dark_ambient",
    "mood": "dark",
+   "theme": "godmarrow",
    "tempo": 58.0,
    "key": "B minor",
    "bars": 26,
@@ -306,6 +353,7 @@
    "title": "Iron Teeth",
    "genre": "battle",
    "mood": "tense",
+   "theme": "godmarrow",
    "tempo": 152.0,
    "key": "E minor",
    "bars": 34,
@@ -328,11 +376,11 @@
    ],
    "notes": 1521,
    "instruments": {
-    "lead": "brass_stab",
+    "lead": "trumpet",
     "counter": "brass_horn",
     "pad": "brass_stab",
-    "bass": "bass_pick",
-    "sparkle": "strings_fast",
+    "bass": "tuba",
+    "sparkle": "harp",
     "drums": "drums_orch"
    },
    "seed": 12,
@@ -343,7 +391,8 @@
    "file": "battle_the_charge.song.json",
    "title": "The Charge",
    "genre": "battle",
-   "mood": "heroic",
+   "mood": "dark",
+   "theme": "godmarrow",
    "tempo": 160.0,
    "key": "D minor",
    "bars": 34,
@@ -364,17 +413,17 @@
     "A:Ax1",
     "end:endx1"
    ],
-   "notes": 1513,
+   "notes": 1502,
    "instruments": {
-    "lead": "lead_square",
-    "counter": "lead_pulse25",
-    "pad": "brass_stab",
-    "bass": "bass_pick",
-    "sparkle": "harpsichord",
+    "lead": "trumpet",
+    "counter": "strings_fast",
+    "pad": "strings_fast",
+    "bass": "tuba",
+    "sparkle": "harp",
     "drums": "drums_rock"
    },
    "seed": 44,
-   "words": "a heroic battle theme that climbs into its bridge"
+   "words": "a battle theme that climbs into its bridge"
   },
   {
    "name": "boss_the_ossuarch",
@@ -382,6 +431,7 @@
    "title": "The Ossuarch",
    "genre": "boss",
    "mood": "dark",
+   "theme": "godmarrow",
    "tempo": 132.0,
    "key": "G phrygian",
    "bars": 34,
@@ -405,11 +455,11 @@
    ],
    "notes": 1061,
    "instruments": {
-    "lead": "trumpet",
+    "lead": "orch_hit",
     "counter": "tuba",
     "pad": "choir_men",
-    "bass": "tuba",
-    "sparkle": "lead_pulse12",
+    "bass": "bass_pick",
+    "sparkle": "harp",
     "drums": "drums_taiko"
    },
    "seed": 7,
@@ -421,6 +471,7 @@
    "title": "Hemomancer",
    "genre": "boss",
    "mood": "tense",
+   "theme": "godmarrow",
    "tempo": 144.0,
    "key": "C# phrygian",
    "bars": 34,
@@ -444,10 +495,10 @@
    ],
    "notes": 1106,
    "instruments": {
-    "lead": "lead_sync",
+    "lead": "organ_reed",
     "counter": "tuba",
     "pad": "strings_dark",
-    "bass": "bass_synth",
+    "bass": "tuba",
     "sparkle": "harpsichord",
     "drums": "drums_taiko"
    },
@@ -460,6 +511,7 @@
    "title": "The Crooked Cup",
    "genre": "tavern",
    "mood": "playful",
+   "theme": "general",
    "tempo": 118.0,
    "key": "G major",
    "bars": 34,
@@ -497,6 +549,7 @@
    "title": "Last Candle Inn",
    "genre": "tavern",
    "mood": "calm",
+   "theme": "general",
    "tempo": 108.0,
    "key": "D mixolydian",
    "bars": 34,
@@ -534,6 +587,7 @@
    "title": "Moor Camp",
    "genre": "town",
    "mood": "hopeful",
+   "theme": "general",
    "tempo": 96.0,
    "key": "A dorian",
    "bars": 34,
@@ -572,6 +626,7 @@
    "title": "An-Vhar Hold",
    "genre": "town",
    "mood": "calm",
+   "theme": "general",
    "tempo": 88.0,
    "key": "F major",
    "bars": 34,
@@ -610,6 +665,7 @@
    "title": "Godmarrow",
    "genre": "title",
    "mood": "dark",
+   "theme": "godmarrow",
    "tempo": 80.0,
    "key": "C# minor",
    "bars": 42,
@@ -648,6 +704,7 @@
    "title": "The Lantern Wraith",
    "genre": "title",
    "mood": "sombre",
+   "theme": "godmarrow",
    "tempo": 76.0,
    "key": "E minor",
    "bars": 42,
@@ -670,7 +727,7 @@
    ],
    "notes": 600,
    "instruments": {
-    "lead": "strings_warm",
+    "lead": "strings_ens",
     "counter": "cello",
     "pad": "choir_men",
     "bass": "cello",
@@ -686,6 +743,7 @@
    "title": "The Gate Opens",
    "genre": "victory",
    "mood": "heroic",
+   "theme": "general",
    "tempo": 132.0,
    "key": "D major",
    "bars": 10,
@@ -720,6 +778,7 @@
    "title": "Small Mercy",
    "genre": "victory",
    "mood": "hopeful",
+   "theme": "general",
    "tempo": 124.0,
    "key": "G lydian",
    "bars": 10,
@@ -754,6 +813,7 @@
    "title": "The Empty Chair",
    "genre": "sorrow",
    "mood": "sombre",
+   "theme": "godmarrow",
    "tempo": 62.0,
    "key": "A minor",
    "bars": 34,
@@ -792,6 +852,7 @@
    "title": "Ash Letter",
    "genre": "sorrow",
    "mood": "dark",
+   "theme": "godmarrow",
    "tempo": 58.0,
    "key": "F minor",
    "bars": 34,
@@ -829,11 +890,12 @@
    "file": "explore_the_fen_road.song.json",
    "title": "The Fen Road",
    "genre": "exploration",
-   "mood": "hopeful",
-   "tempo": 108.0,
-   "key": "D dorian",
+   "mood": "sombre",
+   "theme": "godmarrow",
+   "tempo": 104.0,
+   "key": "D minor",
    "bars": 34,
-   "seconds": 75.6,
+   "seconds": 78.5,
    "patterns": [
     "A",
     "A2",
@@ -846,21 +908,21 @@
     "intro:introx1",
     "A:Ax2",
     "A2:A2x2",
-    "B:Bx2+5",
+    "B:Bx2+7",
     "A3:A3x1",
     "end:endx1"
    ],
-   "notes": 833,
+   "notes": 792,
    "instruments": {
-    "lead": "flute_wood",
-    "counter": "strings_warm",
+    "lead": "strings_ens",
+    "counter": "pizzicato",
     "pad": "strings_warm",
-    "bass": "bass_synth",
+    "bass": "pizzicato",
     "sparkle": "music_box",
     "drums": "drums_rock"
    },
    "seed": 14,
-   "words": "walking music: a steady bass, a curious lead"
+   "words": "walking music in the dark: a steady bass, a wary lead"
   },
   {
    "name": "explore_under_the_barrows",
@@ -868,6 +930,7 @@
    "title": "Under the Barrows",
    "genre": "exploration",
    "mood": "eerie",
+   "theme": "godmarrow",
    "tempo": 100.0,
    "key": "G minor",
    "bars": 34,
@@ -890,7 +953,7 @@
    ],
    "notes": 769,
    "instruments": {
-    "lead": "flute_wood",
+    "lead": "harp",
     "counter": "strings_warm",
     "pad": "strings_warm",
     "bass": "bass_pick",
@@ -898,7 +961,163 @@
     "drums": "drums_brush"
    },
    "seed": 35,
-   "words": "the same walk, in the dark"
+   "words": "the same walk, further down"
+  },
+  {
+   "name": "epic_the_last_cairn",
+   "file": "epic_the_last_cairn.song.json",
+   "title": "The Last Cairn",
+   "genre": "barbarian_epic",
+   "mood": "sombre",
+   "theme": "godmarrow",
+   "tempo": 68.0,
+   "key": "D minor",
+   "bars": 34,
+   "seconds": 120.0,
+   "patterns": [
+    "A",
+    "A2",
+    "B",
+    "A3",
+    "intro",
+    "end"
+   ],
+   "sections": [
+    "intro:introx1",
+    "A:Ax2",
+    "A2:A2x2",
+    "B:Bx2+5",
+    "A3:A3x1",
+    "end:endx1"
+   ],
+   "notes": 401,
+   "instruments": {
+    "lead": "brass_low",
+    "counter": "choir_chant",
+    "pad": "choir_men",
+    "bass": "bass_sub",
+    "sparkle": "bells_chapel",
+    "drums": "drums_epic"
+   },
+   "seed": 18,
+   "words": "low brass and timpani, a male choir chanting under a broad melody over a pedal; tragic and grand"
+  },
+  {
+   "name": "acoustic_the_hanging_road",
+   "file": "acoustic_the_hanging_road.song.json",
+   "title": "The Hanging Road",
+   "genre": "dark_acoustic",
+   "mood": "dark",
+   "theme": "godmarrow",
+   "tempo": 74.0,
+   "key": "E phrygian",
+   "bars": 34,
+   "seconds": 110.3,
+   "patterns": [
+    "A",
+    "A2",
+    "B",
+    "A3",
+    "intro",
+    "end"
+   ],
+   "sections": [
+    "intro:introx1",
+    "A:Ax2",
+    "A2:A2x2",
+    "B:Bx1+1",
+    "A3:A3x1",
+    "A2:A2x1",
+    "end:endx1"
+   ],
+   "notes": 394,
+   "instruments": {
+    "lead": "guitar_steel",
+    "counter": "guitar_nylon",
+    "pad": "strings_dark",
+    "bass": "bass_pick",
+    "sparkle": "bells_glass",
+    "drums": "drums_taiko"
+   },
+   "seed": 24,
+   "words": "a dark nylon-guitar figure that repeats and barely moves, a drone, distant drums; no release"
+  },
+  {
+   "name": "dread_the_deep_vein",
+   "file": "dread_the_deep_vein.song.json",
+   "title": "The Deep Vein",
+   "genre": "ambient_dread",
+   "mood": "eerie",
+   "theme": "godmarrow",
+   "tempo": 56.0,
+   "key": "F phrygian",
+   "bars": 26,
+   "seconds": 111.4,
+   "patterns": [
+    "A",
+    "A2",
+    "B",
+    "A3",
+    "intro",
+    "end"
+   ],
+   "sections": [
+    "intro:introx1",
+    "A:Ax2",
+    "B:Bx2-1",
+    "A2:A2x1",
+    "end:endx1"
+   ],
+   "notes": 328,
+   "instruments": {
+    "lead": "bells_glass",
+    "counter": "choir_alien",
+    "pad": "pad_dark",
+    "bass": "bass_sub",
+    "sparkle": "music_box",
+    "drums": "drums_taiko"
+   },
+   "seed": 30,
+   "words": "slow dread for the deep places: bass pulses, clustered pads, an alien choir, long silences"
+  },
+  {
+   "name": "rock_the_bone_stair",
+   "file": "rock_the_bone_stair.song.json",
+   "title": "The Bone Stair",
+   "genre": "gothic_rock",
+   "mood": "tense",
+   "theme": "godmarrow",
+   "tempo": 152.0,
+   "key": "A harmonic minor",
+   "bars": 34,
+   "seconds": 53.7,
+   "patterns": [
+    "A",
+    "A2",
+    "B",
+    "A3",
+    "intro",
+    "end"
+   ],
+   "sections": [
+    "A:Ax2",
+    "A2:A2x2",
+    "B:Bx2+3",
+    "A3:A3x1",
+    "A2:A2x1",
+    "end:endx1"
+   ],
+   "notes": 1622,
+   "instruments": {
+    "lead": "brass_stab",
+    "counter": "lead_pulse25",
+    "pad": "organ_reed",
+    "bass": "bass_pick",
+    "sparkle": "bells_chapel",
+    "drums": "drums_rock"
+   },
+   "seed": 36,
+   "words": "driving gothic rock: harpsichord figures, a sixteenth-note bass, a dark heroic line with turns"
   },
   {
    "name": "synth_neon_crypt",
@@ -906,6 +1125,7 @@
    "title": "Neon Crypt",
    "genre": "synthwave",
    "mood": "dark",
+   "theme": "general",
    "tempo": 112.0,
    "key": "A minor",
    "bars": 34,
@@ -944,6 +1164,7 @@
    "title": "Lantern Drive",
    "genre": "synthwave",
    "mood": "heroic",
+   "theme": "general",
    "tempo": 118.0,
    "key": "E minor",
    "bars": 34,
@@ -982,10 +1203,11 @@
    "title": "Forge, at rest",
    "genre": "dungeon_synth",
    "mood": "dark",
-   "tempo": 72.0,
+   "theme": "godmarrow",
+   "tempo": 66.0,
    "key": "C# minor",
    "bars": 20,
-   "seconds": 66.7,
+   "seconds": 72.7,
    "patterns": [
     "intro",
     "A",
@@ -996,20 +1218,20 @@
     "intro:introx1",
     "A:Ax1",
     "A2:A2x1",
-    "B:Bx1+5",
+    "B:Bx1+3",
     "A3:A2x1"
    ],
-   "notes": 224,
+   "notes": 225,
    "instruments": {
-    "lead": "choir_ahh",
-    "counter": "strings_dark",
-    "pad": "organ_cathedral",
+    "lead": "brass_low",
+    "counter": "choir_chant",
+    "pad": "organ_gothic",
     "bass": "bass_sub",
-    "sparkle": "bells_glass",
-    "drums": "drums_taiko"
+    "sparkle": "bells_chapel",
+    "drums": "drums_epic"
    },
    "seed": 21,
-   "words": "dungeon synth: organ and dark strings in C# minor, a choir carrying the motif, glass bells high above; the bridge in the fourth"
+   "words": "dungeon synth in mood, slow and tragic: a drone, a chanting choir and a gothic organ under a broad low-brass melody, timpani far off, a bell or two; the bridge lifts a minor third"
   },
   {
    "name": "forge_working",
@@ -1017,29 +1239,30 @@
    "title": "Forge, working",
    "genre": "dungeon_synth",
    "mood": "dark",
-   "tempo": 76.0,
+   "theme": "godmarrow",
+   "tempo": 66.0,
    "key": "C# minor",
    "bars": 12,
-   "seconds": 37.9,
+   "seconds": 43.6,
    "patterns": [
     "W",
     "W2"
    ],
    "sections": [
     "W:Wx2",
-    "W2:W2x1+5"
+    "W2:W2x1+3"
    ],
-   "notes": 131,
+   "notes": 104,
    "instruments": {
-    "lead": "strings_dark",
-    "counter": "strings_dark",
-    "pad": "organ_cathedral",
+    "lead": "brass_low",
+    "counter": "choir_chant",
+    "pad": "organ_gothic",
     "bass": "bass_sub",
-    "sparkle": "bells_glass",
-    "drums": "drums_taiko"
+    "sparkle": "bells_chapel",
+    "drums": "drums_epic"
    },
    "seed": 22,
-   "words": "the theme thinned to its bones over a heartbeat, for a job that is running"
+   "words": "the theme thinned to its drone, its chant and a heartbeat, for a job that is running"
   },
   {
    "name": "forge_done",
@@ -1047,27 +1270,28 @@
    "title": "Forge, done",
    "genre": "dungeon_synth",
    "mood": "dark",
-   "tempo": 66.0,
+   "theme": "godmarrow",
+   "tempo": 62.0,
    "key": "C# minor",
    "bars": 4,
-   "seconds": 14.5,
+   "seconds": 15.5,
    "patterns": [
     "D"
    ],
    "sections": [
     "D:Dx1"
    ],
-   "notes": 32,
+   "notes": 41,
    "instruments": {
-    "lead": "choir_ahh",
-    "counter": "strings_dark",
-    "pad": "organ_cathedral",
+    "lead": "brass_low",
+    "counter": "choir_chant",
+    "pad": "organ_gothic",
     "bass": "bass_sub",
-    "sparkle": "bells_glass",
-    "drums": "drums_taiko"
+    "sparkle": "bells_chapel",
+    "drums": "drums_epic"
    },
    "seed": 23,
-   "words": "the cadence: the dominant, the tonic held, the bells falling"
+   "words": "the cadence: the melody's last phrase, the tonic held"
   }
  ]
 }

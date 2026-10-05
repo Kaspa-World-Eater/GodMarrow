@@ -52,7 +52,8 @@ var compare_zoom := 3
 var text_lines: PackedStringArray = []
 var tiles_tex: Texture2D = null
 var tiles_meta := {}
-var figure_zoom := 1
+var figure_zoom := 1                # whole numbers; a thing taller than the window stands at a half or a quarter (see figure_scale)
+var figure_h := 0.0                 # the thing's painted height above its foot point, in picture pixels
 var turntable := true
 var ruler := true
 
@@ -114,14 +115,44 @@ func clear() -> void:
 	caption = ""
 	queue_redraw()
 
-## one rendered picture of the thing, standing on the floor; `anchor` = its foot point; `lts` = its lights
+## one rendered picture of the thing, standing on the floor; `anchor` = its foot point; `lts` = its lights.
+## The window holds one still: this one replaces whatever stood there (there is no list of sprites to pile up).
 func show_still(tex: Texture2D, anchor: Vector2, lts: Array = [], cap: String = "") -> void:
 	clear()
 	mode = "still"
 	still_tex = tex
 	still_anchor = anchor
+	figure_h = _painted_height(tex, anchor.y)
 	lights = lts
 	caption = cap
+
+## how tall the thing stands above its foot point: the first painted row to the foot (a picture is mostly air)
+static func _painted_height(tex: Texture2D, foot: float) -> float:
+	if tex == null:
+		return foot
+	var img := tex.get_image()
+	if img == null or img.is_empty():
+		return foot
+	var r := img.get_used_rect()
+	return foot - r.position.y if r.size.y > 0 else foot
+
+## how many figures the next draw paints in the window: one still, one frame (three with onion skin), else none
+func figures() -> int:
+	if mode == "still" and still_tex:
+		return 1
+	if mode == "frames" and not frames.is_empty():
+		return 3 if onion and frames.size() > 1 else 1
+	return 0
+
+## the figure's zoom in the window: `figure_zoom`, halved while the thing stands taller than the floor line
+## (a godmarrow hero is 195 px, the window 140: he stands at a half, whole, instead of cut off at the shoulders)
+func figure_scale() -> float:
+	var h := figure_h if mode in ["still", "frames"] else 0.0
+	var room := floorf(size.y * 0.9) - 4.0
+	var z := float(figure_zoom)
+	while z > 0.25 and h * z > room and room > 0.0:
+		z *= 0.5
+	return z
 
 ## the frames of a clip, playing; ground_y / axis_x from the clip's render
 func show_frames(texs: Array, fps: float, gy: float, ax: float, lts: Array = [], cap: String = "") -> void:
@@ -131,6 +162,7 @@ func show_frames(texs: Array, fps: float, gy: float, ax: float, lts: Array = [],
 	frame_fps = maxf(fps, 0.1)
 	ground_y = gy
 	axis_x = ax
+	figure_h = _painted_height(texs[0] if not texs.is_empty() else null, gy)
 	lights = lts
 	caption = cap
 	frame_t = 0.0
@@ -200,14 +232,15 @@ func _process(dt: float) -> void:
 ## where the sprite's own lights sit, in scene pixels, for the shader
 func _push_lights() -> void:
 	var origin := _sprite_origin()
+	var z := figure_scale()
 	var n := mini(lights.size(), 4)
 	mat.set_shader_parameter("nlights", n if mode in ["still", "frames"] else 0)
 	var kinds := Vector4(0, 0, 0, 0)
 	for i in n:
 		var li: Dictionary = lights[i]
-		var p := (origin + Vector2(float(li.get("x", 0)), float(li.get("y", 0)))) / CHUNK
+		var p := (origin + Vector2(float(li.get("x", 0)), float(li.get("y", 0))) * z) / CHUNK
 		var strength := float(li.get("strength", 1.0)) * 1.3
-		var radius := maxf(float(li.get("radius", 20)) * 1.6, 6.0) / CHUNK
+		var radius := maxf(float(li.get("radius", 20)) * z * 1.6, 6.0) / CHUNK
 		mat.set_shader_parameter("la%d" % i, Vector4(p.x, p.y, radius, strength))
 		var c := Color(str(li.get("colour", "#7dff78")))
 		mat.set_shader_parameter("lc%d" % i, Vector3(c.r, c.g, c.b))
@@ -219,16 +252,18 @@ func _push_lights() -> void:
 func _sprite_origin() -> Vector2:
 	var floor_y := floorf(size.y * 0.9)
 	var cx := floorf(size.x * 0.5)
+	var z := figure_scale()
 	if mode == "still" and still_tex:
-		return Vector2(cx - floor(still_anchor.x * figure_zoom), floor_y - floor(still_anchor.y * figure_zoom))
+		return Vector2(cx - floor(still_anchor.x * z), floor_y - floor(still_anchor.y * z))
 	if mode == "frames" and not frames.is_empty():
-		return Vector2(cx - floor(axis_x * figure_zoom), floor_y - floor(ground_y * figure_zoom))
+		return Vector2(cx - floor(axis_x * z), floor_y - floor(ground_y * z))
 	return Vector2(cx, floor_y)
 
 # ------------------------------------------------------------------ drawing
 func _draw() -> void:
 	var w := size.x
 	var h := size.y
+	var cap := caption
 	if mode == "picture":
 		ground.visible = false
 		draw_rect(Rect2(0, 0, w, h), T.WELL)
@@ -255,25 +290,28 @@ func _draw() -> void:
 	else:
 		ground.visible = true
 		_draw_scene_overlay()
+		var z := figure_scale()
 		if mode == "still" and still_tex:
 			var o := _sprite_origin()
-			draw_texture_rect(still_tex, Rect2(o, still_tex.get_size() * figure_zoom), false)
+			draw_texture_rect(still_tex, Rect2(o, (still_tex.get_size() * z).floor()), false)
 		elif mode == "frames" and not frames.is_empty():
 			var o := _sprite_origin()
 			var tex: Texture2D = frames[frame_i]
 			if onion and frames.size() > 1:
 				var prev: Texture2D = frames[posmod(frame_i - 1, frames.size())]
 				var next: Texture2D = frames[posmod(frame_i + 1, frames.size())]
-				draw_texture_rect(prev, Rect2(o, prev.get_size() * figure_zoom), false, Color(0.5, 0.7, 1.0, 0.35))
-				draw_texture_rect(next, Rect2(o, next.get_size() * figure_zoom), false, Color(1.0, 0.6, 0.5, 0.35))
-			draw_texture_rect(tex, Rect2(o, tex.get_size() * figure_zoom), false)
+				draw_texture_rect(prev, Rect2(o, (prev.get_size() * z).floor()), false, Color(0.5, 0.7, 1.0, 0.35))
+				draw_texture_rect(next, Rect2(o, (next.get_size() * z).floor()), false, Color(1.0, 0.6, 0.5, 0.35))
+			draw_texture_rect(tex, Rect2(o, (tex.get_size() * z).floor()), false)
 			if ruler:
 				_draw_ruler()
-	if caption != "":
+		if z < 1.0 and cap != "":
+			cap += " · at a half" if z >= 0.5 else " · at a quarter"
+	if cap != "":
 		var f := T.font("text")
-		var cw := f.get_string_size(caption, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE).x
+		var cw := f.get_string_size(cap, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE).x
 		draw_rect(Rect2(w - cw - 8, h - 14, cw + 6, 13), Color(T.INK, 0.8))
-		draw_string(f, Vector2(w - cw - 5, h - 4), caption, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.DIM)
+		draw_string(f, Vector2(w - cw - 5, h - 4), cap, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.DIM)
 
 ## the parts of the scene drawn over the shader: the torch flames, the motes and the turntable
 func _draw_scene_overlay() -> void:
@@ -286,10 +324,11 @@ func _draw_scene_overlay() -> void:
 		var fy := floorf(size.y * 0.9)
 		var cx := floorf(size.x * 0.5)
 		var rx := 46.0
+		var z := figure_scale()
 		if mode == "still" and still_tex:
-			rx = maxf(still_tex.get_width() * figure_zoom * 0.34, 30.0)
+			rx = maxf(still_tex.get_width() * z * 0.34, 30.0)
 		elif mode == "frames" and not frames.is_empty():
-			rx = maxf(frames[0].get_width() * figure_zoom * 0.3, 30.0)
+			rx = maxf(frames[0].get_width() * z * 0.3, 30.0)
 		PX.draw_disc(self, cx, fy + 2, rx, rx * 0.22, Color(e["pal"][1]), Color(e["pal"][0]), CHUNK)
 		PX.draw_disc(self, cx, fy + 2, rx * 0.86, rx * 0.22 * 0.86, Color(e["pal"][2]), Color(e["pal"][1]), CHUNK)
 		if o.y > 0.0:

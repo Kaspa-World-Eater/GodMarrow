@@ -36,6 +36,11 @@ DRUM_PATTERNS = {
     "victory": {"kick": "x...x...x...x...", "snare": "x.o.x.o.x.o.xxxx", "crash": "x...............", "hat": "..x...x...x...x."},
     "sorrow": {"kick": "x...............", "tom_low": "........o.......", "ride": "....o.......o..."},
     "ambient": {"tom_low": "x...............", "ride": "........o......."},
+    "procession": {"kick": "x.......x.......", "snare": "x..ox.o.x..ox.oo", "tom_low": "......x.......x.", "crash": "x..............."},
+    "epic": {"timpani": "x.......x.......", "tom_low": "....o.......x...", "crash": "x..............."},
+    "distant": {"tom_low": "x.......o.......", "shaker": "..o...o...o...o.", "stick": "............o..."},
+    "pulse": {"kick": "x.......x.......", "tom_low": "............o..."},
+    "gothic_rock": {"kick": "x..x..x.x..x..x.", "snare": "....x.......x...", "hat": "x.x.x.x.x.x.x.x.", "crash": "x..............."},
     "none": {},
 }
 
@@ -45,8 +50,8 @@ GENRES: dict[str, dict] = {
         "words": "slow, dark, hall-wide; organ and strings, bells high over a drone bass", "tempo": (62, 80),
         "scales": ["minor", "phrygian", "dorian"], "progressions": [[0, 5, 2, 6], [0, 3, 6, 0], [0, 5, 3, 6], [0, 6, 5, 4]],
         "bridge": [[3, 0, 6, 4], [5, 2, 3, 0], [1, 4, 0, 6]], "modulate": [3, -4, 5],
-        "instruments": {"lead": ["flute_wood", "choir_ahh", "lead_tri"], "counter": ["strings_dark", "cello"], "pad": ["organ_cathedral", "pad_dark", "choir_men"],
-                        "bass": ["bass_sub", "bass_synth"], "sparkle": ["bells_glass", "celesta", "music_box"], "drums": ["drums_taiko"]},
+        "instruments": {"lead": ["choir_ahh", "flute_wood", "strings_ens", "brass_low"], "counter": ["strings_dark", "cello", "guitar_nylon"], "pad": ["organ_cathedral", "pad_dark", "choir_men", "strings_ens"],
+                        "bass": ["bass_sub", "bass_pick"], "sparkle": ["bells_glass", "celesta", "music_box"], "drums": ["drums_taiko", "drums_epic"]},
         "drums": "taiko_slow", "bass": "pedal", "sparkle": "sparse", "lead_density": 0.45, "lead_octave": 5, "counter": "answer", "pad_rhythm": "whole",
         "chord_kind": "triad", "fx": {"reverb": 0.55, "reverb_size": 2.6, "echo": 0.3, "echo_beats": 1.5, "crunch": 0.25, "bits": 14, "rate": 32000},
         "structure": ["intro", "A", "A2", "B", "A3", "end"],
@@ -55,7 +60,7 @@ GENRES: dict[str, dict] = {
         "words": "strings and brass in a cathedral, choir under, timpani with weight", "tempo": (76, 100),
         "scales": ["minor", "harmonic_minor"], "progressions": [[0, 5, 3, 4], [0, 3, 6, 4], [0, 6, 5, 4], [0, 2, 5, 4]],
         "bridge": [[3, 6, 2, 4], [5, 3, 0, 4]], "modulate": [3, 5, -2],
-        "instruments": {"lead": ["strings_warm", "brass_horn", "choir_ahh"], "counter": ["cello", "tuba", "brass_horn"], "pad": ["choir_men", "strings_dark", "organ_cathedral"],
+        "instruments": {"lead": ["strings_ens", "brass_horn", "choir_ahh"], "counter": ["cello", "tuba", "brass_horn"], "pad": ["choir_men", "strings_ens", "organ_cathedral"],
                         "bass": ["cello", "tuba", "bass_sub"], "sparkle": ["harp", "bells_tubular", "celesta"], "drums": ["drums_orch"]},
         "drums": "march", "bass": "root5", "sparkle": "arp8", "lead_density": 0.55, "lead_octave": 5, "counter": "answer", "pad_rhythm": "whole",
         "chord_kind": "seventh", "fx": {"reverb": 0.5, "reverb_size": 2.4, "echo": 0.15, "crunch": 0.2, "bits": 16, "rate": 32000},
@@ -75,7 +80,7 @@ GENRES: dict[str, dict] = {
         "words": "almost no pulse; low pads, breath, far bells", "tempo": (50, 66),
         "scales": ["phrygian", "minor", "hungarian_minor"], "progressions": [[0, 0, 1, 0], [0, 5, 0, 6], [0, 1, 0, 3]],
         "bridge": [[3, 3, 0, 0], [6, 5, 0, 0]], "modulate": [-4, 1, 3],
-        "instruments": {"lead": ["choir_ooh", "pad_glass", "flute_pan"], "counter": ["strings_dark", "choir_men"], "pad": ["pad_dark", "choir_men"],
+        "instruments": {"lead": ["choir_ooh", "flute_pan", "strings_dark"], "counter": ["strings_dark", "choir_men"], "pad": ["pad_dark", "choir_men"],
                         "bass": ["bass_sub"], "sparkle": ["bells_glass", "bells_tubular"], "drums": ["drums_taiko", "drums_brush"]},
         "drums": "ambient", "bass": "pedal", "sparkle": "sparse", "lead_density": 0.25, "lead_octave": 4, "counter": "sustain", "pad_rhythm": "whole",
         "chord_kind": "add9", "fx": {"reverb": 0.7, "reverb_size": 3.5, "echo": 0.35, "echo_beats": 2.0, "crunch": 0.15, "bits": 16, "rate": 32000},
@@ -85,8 +90,8 @@ GENRES: dict[str, dict] = {
         "words": "driving drums, brass stabs, a saw lead, strings running sixteenths", "tempo": (138, 170),
         "scales": ["minor", "harmonic_minor", "phrygian"], "progressions": [[0, 0, 5, 4], [0, 6, 5, 4], [0, 3, 5, 4], [0, 1, 0, 4]],
         "bridge": [[3, 4, 5, 4], [5, 6, 0, 4]], "modulate": [5, 3, 7],
-        "instruments": {"lead": ["lead_saw", "brass_stab", "trumpet", "lead_square"], "counter": ["strings_fast", "brass_horn", "lead_pulse25"], "pad": ["strings_fast", "brass_stab", "organ_reed"],
-                        "bass": ["bass_synth", "bass_slap", "bass_pick"], "sparkle": ["harpsichord", "lead_pulse12", "strings_fast"], "drums": ["drums_rock", "drums_orch"]},
+        "instruments": {"lead": ["brass_stab", "trumpet", "strings_ens", "lead_saw"], "counter": ["strings_fast", "brass_horn", "orch_hit"], "pad": ["strings_fast", "brass_stab", "organ_reed"],
+                        "bass": ["bass_pick", "bass_synth", "tuba"], "sparkle": ["harpsichord", "strings_fast", "harp"], "drums": ["drums_rock", "drums_orch"]},
         "drums": "battle", "bass": "pump", "sparkle": "arp16", "lead_density": 0.85, "lead_octave": 5, "counter": "answer", "pad_rhythm": "stab8",
         "chord_kind": "triad", "fx": {"reverb": 0.2, "reverb_size": 1.0, "echo": 0.2, "echo_beats": 0.5, "crunch": 0.4, "bits": 12, "rate": 32000},
         "structure": ["A", "A2", "B", "A3", "A", "end"],
@@ -95,8 +100,8 @@ GENRES: dict[str, dict] = {
         "words": "heavier and stranger than battle: tritones, the choir, a pedal that will not move", "tempo": (120, 150),
         "scales": ["phrygian", "hungarian_minor", "harmonic_minor"], "progressions": [[0, 1, 0, 6], [0, 0, 1, 4], [0, 5, 1, 0], [0, 6, 1, 4]],
         "bridge": [[3, 1, 4, 4], [6, 1, 0, 0]], "modulate": [1, 6, -5],
-        "instruments": {"lead": ["brass_stab", "lead_sync", "organ_reed", "trumpet"], "counter": ["choir_ahh", "strings_fast", "tuba"], "pad": ["choir_men", "organ_cathedral", "strings_dark"],
-                        "bass": ["bass_synth", "tuba", "bass_slap"], "sparkle": ["harpsichord", "bells_tubular", "lead_pulse12"], "drums": ["drums_rock", "drums_taiko", "drums_orch"]},
+        "instruments": {"lead": ["brass_stab", "organ_reed", "trumpet", "orch_hit"], "counter": ["choir_ahh", "strings_fast", "tuba"], "pad": ["choir_men", "organ_cathedral", "strings_dark"],
+                        "bass": ["tuba", "bass_pick", "bass_synth"], "sparkle": ["harpsichord", "bells_tubular", "harp"], "drums": ["drums_rock", "drums_taiko", "drums_orch"]},
         "drums": "boss", "bass": "octaves", "sparkle": "arp8", "lead_density": 0.7, "lead_octave": 4, "counter": "answer", "pad_rhythm": "half",
         "chord_kind": "power", "fx": {"reverb": 0.3, "reverb_size": 1.6, "echo": 0.25, "echo_beats": 0.75, "crunch": 0.5, "bits": 12, "rate": 32000},
         "structure": ["intro", "A", "A2", "B", "A3", "A2", "end"],
@@ -125,7 +130,7 @@ GENRES: dict[str, dict] = {
         "words": "the piece that opens the game: a slow statement, then the theme in full", "tempo": (72, 96),
         "scales": ["minor", "dorian", "harmonic_minor"], "progressions": [[0, 5, 3, 6], [0, 3, 5, 4], [0, 6, 3, 4], [0, 5, 6, 4]],
         "bridge": [[3, 6, 0, 4], [5, 3, 1, 4]], "modulate": [3, 5, -4],
-        "instruments": {"lead": ["brass_horn", "strings_warm", "choir_ahh", "flute_wood"], "counter": ["cello", "strings_dark", "choir_ooh"], "pad": ["strings_warm", "choir_men", "organ_cathedral"],
+        "instruments": {"lead": ["brass_horn", "strings_ens", "choir_ahh", "flute_wood"], "counter": ["cello", "strings_dark", "choir_ooh"], "pad": ["strings_ens", "choir_men", "organ_cathedral"],
                         "bass": ["cello", "bass_sub", "tuba"], "sparkle": ["bells_glass", "harp", "celesta"], "drums": ["drums_orch", "drums_taiko"]},
         "drums": "march", "bass": "pedal", "sparkle": "arp8", "lead_density": 0.5, "lead_octave": 5, "counter": "answer", "pad_rhythm": "whole",
         "chord_kind": "seventh", "fx": {"reverb": 0.5, "reverb_size": 2.4, "echo": 0.2, "echo_beats": 1.0, "crunch": 0.2, "bits": 16, "rate": 32000},
@@ -145,7 +150,7 @@ GENRES: dict[str, dict] = {
         "words": "a slow minor piece: piano, cello, a far choir; space between the notes", "tempo": (56, 76),
         "scales": ["minor", "dorian", "harmonic_minor"], "progressions": [[0, 5, 3, 4], [0, 2, 5, 4], [0, 6, 3, 0], [5, 3, 0, 4]],
         "bridge": [[3, 0, 5, 4], [1, 4, 0, 0]], "modulate": [3, -4, -2],
-        "instruments": {"lead": ["piano_electric", "cello", "flute_wood", "choir_ooh"], "counter": ["cello", "strings_dark", "piano_electric"], "pad": ["strings_dark", "choir_men", "pad_dark"],
+        "instruments": {"lead": ["piano_electric", "cello", "flute_wood", "choir_ooh"], "counter": ["cello", "strings_dark", "harp"], "pad": ["strings_ens", "choir_men", "strings_dark"],
                         "bass": ["cello", "bass_sub", "bass_pick"], "sparkle": ["piano_electric", "celesta", "bells_glass"], "drums": ["drums_brush", "drums_taiko"]},
         "drums": "sorrow", "bass": "pedal", "sparkle": "sparse", "lead_density": 0.4, "lead_octave": 5, "counter": "sustain", "pad_rhythm": "whole",
         "chord_kind": "seventh", "fx": {"reverb": 0.55, "reverb_size": 2.8, "echo": 0.2, "echo_beats": 1.5, "crunch": 0.1, "bits": 16, "rate": 32000},
@@ -155,11 +160,61 @@ GENRES: dict[str, dict] = {
         "words": "walking music: a steady pulse, a curious lead, the chords always moving on", "tempo": (96, 120),
         "scales": ["dorian", "minor", "mixolydian", "lydian"], "progressions": [[0, 6, 5, 3], [0, 3, 6, 4], [0, 2, 3, 6], [0, 5, 6, 4]],
         "bridge": [[3, 6, 2, 4], [5, 1, 3, 6]], "modulate": [5, -4, 7, 3],
-        "instruments": {"lead": ["lead_tri", "flute_wood", "harp", "ocarina"], "counter": ["pizzicato", "lute", "strings_warm"], "pad": ["pad_glass", "strings_warm", "organ_reed"],
-                        "bass": ["bass_pick", "bass_synth", "pizzicato"], "sparkle": ["marimba", "harp", "music_box"], "drums": ["drums_brush", "drums_rock"]},
+        "instruments": {"lead": ["flute_wood", "harp", "ocarina", "strings_ens"], "counter": ["pizzicato", "lute", "strings_warm"], "pad": ["strings_ens", "strings_warm", "organ_reed"],
+                        "bass": ["bass_pick", "pizzicato", "cello"], "sparkle": ["marimba", "harp", "music_box"], "drums": ["drums_brush", "drums_rock"]},
         "drums": "town", "bass": "walk", "sparkle": "arp8", "lead_density": 0.6, "lead_octave": 5, "counter": "answer", "pad_rhythm": "half",
         "chord_kind": "seventh", "fx": {"reverb": 0.3, "reverb_size": 1.4, "echo": 0.2, "echo_beats": 0.75, "crunch": 0.2, "bits": 16, "rate": 32000},
         "structure": ["intro", "A", "A2", "B", "A3", "end"],
+    },
+    "gothic_march": {
+        "words": "an organ-and-choir march: brooding chromatic harmony, chapel bells, a field snare, a deep hall", "tempo": (84, 104),
+        "scales": ["harmonic_minor", "minor", "phrygian"], "progressions": [[0, 6, 5, 4], [0, 1, 0, 4], [0, 5, 1, 4], [0, 3, 1, 0], [0, 6, 1, 4]],
+        "bridge": [[3, 1, 4, 4], [5, 1, 0, 4], [1, 4, 0, 0]], "modulate": [1, 3, 6],
+        "instruments": {"lead": ["organ_gothic", "choir_dark", "brass_horn", "choir_ahh"], "counter": ["choir_dark", "cello", "tuba"], "pad": ["organ_gothic", "choir_men", "strings_dark"],
+                        "bass": ["tuba", "bass_sub", "cello"], "sparkle": ["bells_chapel", "bells_tubular", "harp"], "drums": ["drums_orch", "drums_taiko"]},
+        "drums": "procession", "bass": "root5", "sparkle": "offbeat", "lead_density": 0.5, "lead_octave": 4, "counter": "answer", "pad_rhythm": "half",
+        "chord_kind": "triad", "fx": {"reverb": 0.6, "reverb_size": 3.2, "echo": 0.2, "echo_beats": 1.0, "crunch": 0.3, "bits": 14, "rate": 32000},
+        "structure": ["intro", "A", "A2", "B", "A3", "end"],
+    },
+    "barbarian_epic": {
+        "words": "slow heavy low brass and timpani, a male-choir chant, a broad modal melody over a pedal; tragic and grand", "tempo": (60, 80),
+        "scales": ["minor", "dorian", "phrygian"], "progressions": [[0, 6, 0, 5], [0, 3, 6, 0], [0, 5, 6, 0], [0, 0, 6, 5]],
+        "bridge": [[3, 6, 4, 0], [5, 3, 6, 4]], "modulate": [3, -2, 5],
+        "instruments": {"lead": ["brass_low", "brass_horn", "choir_men"], "counter": ["choir_chant", "choir_men"], "pad": ["strings_ens", "choir_men", "strings_dark"],
+                        "bass": ["tuba", "bass_sub"], "sparkle": ["bells_tubular", "bells_chapel"], "drums": ["drums_epic"]},
+        "drums": "epic", "bass": "drone", "sparkle": "sparse", "lead_density": 0.35, "lead_octave": 3, "counter": "chant", "pad_rhythm": "whole",
+        "chord_kind": "power", "fx": {"reverb": 0.6, "reverb_size": 3.2, "echo": 0.15, "echo_beats": 1.0, "crunch": 0.3, "bits": 14, "rate": 32000},
+        "structure": ["intro", "A", "A2", "B", "A3", "end"],
+    },
+    "dark_acoustic": {
+        "words": "a dark acoustic-guitar figure repeated and barely varied, a drone, distant percussion, tension without release", "tempo": (64, 84),
+        "scales": ["phrygian", "minor", "harmonic_minor"], "progressions": [[0, 0, 0, 1], [0, 0, 6, 0], [0, 1, 0, 0], [0, 0, 5, 0]],
+        "bridge": [[3, 3, 1, 0], [5, 5, 6, 0]], "modulate": [-2, 1, 5],
+        "instruments": {"lead": ["guitar_nylon", "guitar_steel", "lute"], "counter": ["harp", "guitar_nylon"], "pad": ["pad_dark", "strings_dark", "choir_dark"],
+                        "bass": ["bass_sub", "bass_pick"], "sparkle": ["bells_glass", "harp"], "drums": ["drums_taiko", "drums_brush"]},
+        "drums": "distant", "bass": "drone", "sparkle": "sparse", "lead_density": 0.6, "lead_octave": 4, "counter": "none", "pad_rhythm": "whole",
+        "chord_kind": "power", "ostinato": True, "cadence": False, "fx": {"reverb": 0.5, "reverb_size": 2.8, "echo": 0.35, "echo_beats": 1.5, "echo_feedback": 0.4, "crunch": 0.25, "bits": 14, "rate": 32000},
+        "structure": ["intro", "A", "A2", "B", "A3", "A2", "end"],
+    },
+    "ambient_dread": {
+        "words": "slow ambient dread: deep bass pulses, dissonant pads, a sparse echoing motif, long silences, an alien choir", "tempo": (48, 64),
+        "scales": ["phrygian", "hungarian_minor", "minor"], "progressions": [[0, 1, 0, 0], [0, 0, 5, 0], [0, 6, 1, 0]],
+        "bridge": [[1, 1, 0, 0], [3, 1, 0, 0]], "modulate": [1, -1, 6],
+        "instruments": {"lead": ["choir_alien", "flute_pan", "bells_glass"], "counter": ["choir_alien", "strings_dark"], "pad": ["choir_alien", "strings_dark", "pad_dark"],
+                        "bass": ["bass_sub"], "sparkle": ["bells_glass", "music_box"], "drums": ["drums_taiko"]},
+        "drums": "pulse", "bass": "drone", "sparkle": "sparse", "lead_density": 0.25, "lead_octave": 5, "counter": "sustain", "pad_rhythm": "whole",
+        "chord_kind": "cluster", "rests": 3.0, "cadence": False, "fx": {"reverb": 0.7, "reverb_size": 3.8, "echo": 0.5, "echo_beats": 2.0, "echo_feedback": 0.5, "crunch": 0.2, "bits": 14, "rate": 32000},
+        "structure": ["intro", "A", "B", "A2", "end"],
+    },
+    "gothic_rock": {
+        "words": "driving gothic rock: harpsichord and organ figures, a fast arpeggiated bass, a heroic dark melody with baroque turns", "tempo": (140, 168),
+        "scales": ["harmonic_minor", "minor"], "progressions": [[0, 6, 5, 4], [0, 3, 4, 0], [0, 5, 3, 4], [0, 6, 3, 4]],
+        "bridge": [[3, 6, 2, 4], [5, 6, 0, 4]], "modulate": [5, 3, -2],
+        "instruments": {"lead": ["lead_saw", "organ_reed", "harpsichord", "brass_stab"], "counter": ["harpsichord", "organ_reed", "lead_pulse25"], "pad": ["organ_reed", "organ_gothic", "strings_fast"],
+                        "bass": ["bass_pick", "bass_synth"], "sparkle": ["harpsichord", "bells_chapel"], "drums": ["drums_rock"]},
+        "drums": "gothic_rock", "bass": "arp16", "sparkle": "arp16", "lead_density": 0.75, "lead_octave": 5, "counter": "answer", "pad_rhythm": "stab8",
+        "chord_kind": "triad", "turns": True, "fx": {"reverb": 0.3, "reverb_size": 1.6, "echo": 0.2, "echo_beats": 0.5, "crunch": 0.45, "bits": 12, "rate": 32000},
+        "structure": ["A", "A2", "B", "A3", "A2", "end"],
     },
     "synthwave": {
         "words": "octave bass, gated pads, a sync lead, the drum machine", "tempo": (100, 124),
@@ -282,7 +337,7 @@ def motif(ctx: _Ctx, chords: list[int], speed: str, octave: int) -> list[dict]:
             elif ctx.rng.random() < 0.3:
                 direction = -direction
             pitch = ctx.clamp(pitch, lo, hi)
-        rest = (not strong) and ctx.rng.random() < (0.12 / max(ctx.density, 0.3)) and not last and i > 0
+        rest = (not strong or ctx.rules.get("rests", 1.0) > 2) and ctx.rng.random() < (0.12 * ctx.rules.get("rests", 1.0) / max(ctx.density, 0.3)) and not last and i > 0
         if not rest:
             vel = 0.85 if strong else 0.65 + 0.15 * ctx.rng.random()
             notes.append(_note(s, pitch, vel, ln - (0.5 if ln > 1 and not last else 0.0)))
@@ -304,7 +359,7 @@ def develop(ctx: _Ctx, mot: list[dict], chords: list[int], from_degree: int, to_
             p = theory.step_in_scale(first, -(d - d0), ctx.root, ctx.scale)
         p = ctx.step_scale(p, shift)
         out.append({**n, "p": p})
-    if cadence and out:
+    if cadence and out and ctx.rules.get("cadence", True):
         bar = min(out[-1]["s"] // 16, len(chords) - 1)
         out[-1]["p"] = ctx.nearest_chord_tone(out[-1]["p"], chords[bar])
         out[-1]["l"] = max(out[-1]["l"], 6.0)
@@ -316,7 +371,13 @@ def ornament(ctx: _Ctx, notes: list[dict], chords: list[int]) -> list[dict]:
     out = []
     top = max((n["p"] for n in notes), default=60)
     for n in notes:
-        if n["l"] >= 4 and ctx.rng.random() < 0.5:
+        if n["l"] >= 4 and ctx.rules.get("turns") and ctx.rng.random() < 0.6:
+            # a baroque turn into the long note: upper neighbour, the note, lower neighbour, then the note held
+            up, down = ctx.step_scale(n["p"], 1), ctx.step_scale(n["p"], -1)
+            for k, p in enumerate((up, n["p"], down)):
+                out.append(_note(n["s"] + k, p, n["v"] * 0.8, 1.0))
+            out.append({**n, "s": n["s"] + 3, "l": n["l"] - 3.5})
+        elif n["l"] >= 4 and ctx.rng.random() < 0.5:
             half = n["l"] / 2
             nb = ctx.step_scale(n["p"], -1 if ctx.rng.random() < 0.6 else 1)
             out.append({**n, "l": half - 0.5})
@@ -332,6 +393,22 @@ def lead_for_pattern(ctx: _Ctx, chords: list[int], speed: str, octave: int, mot:
     """A 4-bar lead over `chords`: the motif (bars 1-2) and its development (bars 3-4). Returns (notes, motif)."""
     mot = mot or motif(ctx, chords, speed, octave)
     bars = max(len(chords), 2)
+    if ctx.rules.get("ostinato"):
+        # the hypnotic figure: the motif's first bar over every chord, barely varied, never resolved
+        figure = [n for n in mot if n["s"] < 16] or mot[:3]
+        notes = []
+        for bar in range(bars):
+            shifted = develop(ctx, figure, chords, chords[0], chords[min(bar, len(chords) - 1)], cadence=False, invert=(variation == "bridge"))
+            for k, n in enumerate(shifted):
+                if bar == bars - 1 and variation == "vary" and k == len(shifted) - 1:
+                    n = {**n, "p": ctx.step_scale(n["p"], -1)}
+                if bar == bars - 1 and k == len(shifted) - 1 and ctx.rng.random() < 0.5:
+                    continue
+                notes.append({**n, "s": n["s"] + bar * 16})
+        lo = 12 * (octave + 1) + ctx.root - 5
+        for n in notes:
+            n["p"] = ctx.clamp(n["p"], lo, lo + 24)
+        return notes, mot
     notes = list(mot) if variation != "bridge" else develop(ctx, mot, chords, chords[0], chords[0], cadence=False, invert=True)
     if bars >= 4:
         dev = develop(ctx, mot, chords[2:], chords[0], chords[2], cadence=True, invert=variation == "bridge" and ctx.rng.random() < 0.5)
@@ -362,6 +439,16 @@ def counter_for(ctx: _Ctx, lead: list[dict], chords: list[int], bars: int, mode:
     last_lead = None
     for bar in range(bars):
         ch = chords[min(bar, len(chords) - 1)]
+        if mode == "chant":
+            # the choir's chant: the chord's root re-struck in a march rhythm, the fifth when the lead holds the root
+            tones = ctx.chord_tones(ch, octave)
+            p = tones[0]
+            if any(lead_at.get(bar * 16 + k, -1) % 12 == p % 12 for k in range(0, 16, 4)) and len(tones) > 1:
+                p = tones[1]
+            for k, ch_ in enumerate("x..x..x.x...x..."):
+                if ch_ == "x":
+                    out.append(_note(bar * 16 + k, p, 0.62 if k % 8 == 0 else 0.5, 2.5))
+            continue
         if mode == "sustain":
             tones = ctx.chord_tones(ch, octave)
             p = ctx.nearest_chord_tone(pitch, ch) if bar else tones[0]
@@ -432,6 +519,16 @@ def bass_for(ctx: _Ctx, chords: list[int], bars: int, style: str) -> list[dict]:
         third = ctx.clamp(third, root, root + 11)
         next_root = ctx.clamp(theory.degree_to_midi(ctx.root, ctx.scale, nxt, octave), 12 * 3 + ctx.root - 7, 12 * 3 + ctx.root + 5)
         b = bar * 16
+        if style == "drone":
+            # the pedal that will not move: the first chord's root, two bars a note
+            pedal = ctx.clamp(theory.degree_to_midi(ctx.root, ctx.scale, chords[0], octave), 12 * 3 + ctx.root - 7, 12 * 3 + ctx.root + 5)
+            if bar % 2 == 0:
+                out.append(_note(b, pedal, 0.8, 31.5 if bar + 1 < bars else 15.5))
+            continue
+        if style == "arp16":
+            for k in range(16):
+                out.append(_note(b + k, (root, fifth, root + 12, fifth)[k % 4], 0.8 if k % 4 == 0 else 0.6, 0.9))
+            continue
         if style == "pedal":
             out.append(_note(b, root, 0.8, 15.5))
             if bar % 4 == 3:

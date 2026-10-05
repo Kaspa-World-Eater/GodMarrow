@@ -1,0 +1,2 @@
+{"type":"system","subtype":"init","cwd":"{project}","session_id":"mock","tools":["Read"],"mcp_servers":[{"name":"pixelforge","status":"connected"}],"model":"mock"}
+{"type":"result","subtype":"success","is_error":false,"result":"nothing","total_cost_usd":0.0,"session_id":"mock"}

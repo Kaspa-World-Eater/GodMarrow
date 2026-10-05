@@ -63,45 +63,6 @@ class EdgedLabel:
 			draw_string(f, at + o, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, T.BLACK)
 		draw_string(f, at, text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, colour)
 
-## a crisp one-pixel outline round a rect (four fills; an unfilled draw_rect lands between pixels)
-static func outline(ci: CanvasItem, r: Rect2, c: Color) -> void:
-	ci.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), c)
-	ci.draw_rect(Rect2(r.position.x, r.end.y - 1, r.size.x, 1), c)
-	ci.draw_rect(Rect2(r.position, Vector2(1, r.size.y)), c)
-	ci.draw_rect(Rect2(r.end.x - 1, r.position.y, 1, r.size.y), c)
-
-## the colour of an interactive word: ember always; brighter when chosen, white while pressed, duller when dim
-static func ember(on: bool, pressed: bool = false, dim: bool = false) -> Color:
-	if pressed:
-		return Color("#ffffff")
-	if on:
-		return Color(F.GOLD[4])
-	if dim:
-		return Color(F.GOLD[2])
-	return T.ACCENT
-
-## a carved iron plaque behind a choice: lit top edge, dark foot; the chosen one has a gold edge and a 1-px glow;
-## pressed, the edges swap so it sinks
-static func plaque(ci: CanvasItem, r: Rect2, on: bool, pressed: bool) -> void:
-	ci.draw_rect(r, Color(F.IRON[2] if on else F.IRON[1]))
-	var top := Color(F.GOLD[3] if on else F.IRON[3])
-	var bot := Color(F.IRON[0])
-	if pressed:
-		top = Color(F.IRON[0])
-		bot = Color(F.GOLD[2])
-	ci.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), top)
-	ci.draw_rect(Rect2(r.position, Vector2(1, r.size.y)), top)
-	ci.draw_rect(Rect2(r.position.x, r.end.y - 1, r.size.x, 1), bot)
-	ci.draw_rect(Rect2(r.end.x - 1, r.position.y, 1, r.size.y), bot)
-	if on and not pressed:
-		outline(ci, Rect2(r.position - Vector2(1, 1), r.size + Vector2(2, 2)), Color(F.GOLD[1]))
-
-## the small gold chevrons beside a wheel or a cycler that say "this turns"
-static func chevrons(ci: CanvasItem, lx: float, rx: float, cy: float, c: Color) -> void:
-	for k in 3:
-		ci.draw_rect(Rect2(lx + 2 - k, cy - k, 1, 1), c); ci.draw_rect(Rect2(lx + 2 - k, cy + k, 1, 1), c)
-		ci.draw_rect(Rect2(rx - 2 + k, cy - k, 1, 1), c); ci.draw_rect(Rect2(rx - 2 + k, cy + k, 1, 1), c)
-
 ## the selector's home: a line of text choices, in a grid of columns (Home) or flowing with the words' widths and
 ## wrapping (the choices line, the cyclers, the ground picker); the chosen one in the accent colour with the arrow
 class Choices:
@@ -303,19 +264,19 @@ class Choices:
 				var vs := "< %s >" % String(it["value"])
 				var vw := T.text_width(vs, font_size)
 				if plates:
-					plaque(self, Rect2(p.x + lw - 3, p.y, vw + 6, row_h - 1), on, on and pressed)
-				_text(f, Vector2(p.x + lw, y), vs, ember(on, on and pressed, is_dim))
+					PX.plaque(self, Rect2(p.x + lw, p.y, vw + 6, row_h - 1), on, on and pressed)
+				_text(f, Vector2(p.x + lw + 3, y), vs, PX.ember(on, on and pressed, is_dim))
 				if hover_i == i and hover_value and it.has("set"):
 					# the caret box: this value can be typed
-					outline(self, Rect2(p.x + lw - 4, p.y - 1, vw + 8, row_h + 1), Color(F.GOLD[3]))
-					draw_rect(Rect2(p.x + lw + vw + 1, p.y + 3, 1, row_h - 7), Color(F.GOLD[4]))
+					PX.outline(self, Rect2(p.x + lw - 1, p.y - 1, vw + 8, row_h + 1), Color(F.GOLD[3]))
+					draw_rect(Rect2(p.x + lw + vw + 4, p.y + 3, 1, row_h - 7), Color(F.GOLD[4]))
 				x0 = p.x + lw
 				w = vw
 			else:
 				w = T.text_width(String(it["label"]), font_size)
 				if plates:
-					plaque(self, Rect2(p.x - 4, p.y, w + 8, row_h - 1), on, on and pressed)
-				_text(f, Vector2(p.x, y), String(it["label"]), ember(on, on and pressed, is_dim))
+					PX.plaque(self, Rect2(p.x - 4, p.y, w + 8, row_h - 1), on, on and pressed)
+				_text(f, Vector2(p.x, y), String(it["label"]), PX.ember(on, on and pressed, is_dim))
 			if on and not plates:
 				# the ember underline: a dotted line of dark gold under the chosen words
 				var uy := minf(y + 2, p.y + row_h - 1)
@@ -333,7 +294,7 @@ class Choices:
 					drag_move.call(get_global_mouse_position())
 				return
 			var i := _hit(ev.position)
-			var hv := i >= 0 and items[i].has("set") and _on_value(i, ev.position)
+			var hv: bool = i >= 0 and items[i].has("set") and _on_value(i, ev.position)
 			if i != hover_i or hv != hover_value:
 				hover_i = i
 				hover_value = hv
@@ -441,6 +402,7 @@ class Tabs:
 	var app: Node = null
 	var on_pick: Callable
 	var xs: PackedFloat32Array = []
+	var hover_i := -1
 	func setup(list: PackedStringArray, cur: int, a: Node, cb: Callable) -> void:
 		names = list
 		current = cur
@@ -448,8 +410,20 @@ class Tabs:
 		on_pick = cb
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		if not mouse_exited.is_connected(_unhover):
+			mouse_exited.connect(_unhover)
 		_layout()
 		queue_redraw()
+	func _unhover() -> void:
+		hover_i = -1
+		if app:
+			app.hover_hint("")
+		queue_redraw()
+	func _hit(x: float) -> int:
+		for i in names.size():
+			if x >= xs[i] - 6 and x <= xs[i] + T.text_width(names[i]) + 6:
+				return i
+		return -1
 	func _layout() -> void:
 		xs = []
 		var f := T.font("text")
@@ -493,10 +467,11 @@ class Tabs:
 		var h := size.y
 		for i in names.size():
 			var on := i == current
+			var hov := i == hover_i and not on
 			var w := T.text_width(names[i])
 			# a wooden sign hanging from the stone on two short chains; the chosen one is the lit plank, hung a
-			# pixel higher and taller so it stands proud of the others
-			var r := Rect2(xs[i] - 6, 1 if on else 3, w + 12, (h - 1) if on else (h - 3))
+			# pixel higher and taller so it stands proud of the others; a hovered one lifts a pixel
+			var r := Rect2(xs[i] - 6, 1 if on else (2 if hov else 3), w + 12, (h - 1) if on else ((h - 2) if hov else (h - 3)))
 			for cx in [r.position.x + 3, r.end.x - 4]:
 				draw_rect(Rect2(cx, 0, 1, r.position.y), Color(F.IRON[4]))
 				draw_rect(Rect2(cx, r.position.y, 1, 1), Color(F.IRON[6]))
@@ -514,20 +489,28 @@ class Tabs:
 			if on:
 				draw_rect(Rect2(r.position.x + 1, r.position.y + 1, r.size.x - 2, 1), Color(F.GOLD[3]))
 				draw_rect(Rect2(r.position.x + 1, r.position.y + 1, 1, r.size.y - 2), Color(F.GOLD[2]))
-			var col := Color(F.GOLD[4]) if on else T.ACCENT
+			if hov:
+				draw_rect(Rect2(r.position.x + 1, r.position.y + 1, r.size.x - 2, 1), Color(F.GOLD[2]))
+			var col := Color(F.GOLD[4]) if (on or hov) else T.ACCENT
 			for o in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1), Vector2(1, 1)]:
 				draw_string(f, Vector2(xs[i], h - 3) + o, names[i], HORIZONTAL_ALIGNMENT_LEFT, -1, T.TEXT_SIZE, T.BLACK)
 			draw_string(f, Vector2(xs[i], h - 3), names[i], HORIZONTAL_ALIGNMENT_LEFT, -1, T.TEXT_SIZE, col)
 	func _gui_input(ev: InputEvent) -> void:
-		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-			for i in names.size():
-				if ev.position.x >= xs[i] - 4 and ev.position.x <= xs[i] + T.text_width(names[i]) + 4:
-					if app:
-						app.focus_on(self, i, false)
-					set_sel(i)
-					if app:
-						app.audio.blip("tab")
-					return
+		if ev is InputEventMouseMotion:
+			var i := _hit(ev.position.x)
+			if i != hover_i:
+				hover_i = i
+				if app:
+					app.hover_hint(hint_of(i) if i >= 0 else "")
+				queue_redraw()
+		elif ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			var i := _hit(ev.position.x)
+			if i >= 0:
+				if app:
+					app.focus_on(self, i, false)
+				set_sel(i)
+				if app:
+					app.audio.blip("tab")
 
 ## a rack of pixel controls laid in equal columns; each control: name, value under it; the selector moves across
 class Rack:
@@ -627,10 +610,14 @@ class Knob:
 		queue_redraw()
 	func _enter() -> void:
 		hover = true
+		if app:
+			app.hover_hint(how())
 		queue_redraw()
 	func _leave() -> void:
 		hover = false
 		hover_value = false
+		if app:
+			app.hover_hint("")
 		queue_redraw()
 	func lit() -> bool:
 		return hot or hover
@@ -647,12 +634,12 @@ class Knob:
 	## the glow round a lit control and the caret box over a hovered value
 	func _affordances(tex_rect: Rect2) -> void:
 		if lit():
-			outline(self, Rect2(tex_rect.position - Vector2(1, 1), tex_rect.size + Vector2(2, 2)), Color(F.GOLD[1]))
+			PX.outline(self, Rect2(tex_rect.position - Vector2(1, 1), tex_rect.size + Vector2(2, 2)), Color(F.GOLD[1]))
 		if hover_value and fmt.is_valid():
 			var vr := value_rect()
 			var vw := T.text_width(value_text(), T.SMALL_SIZE)
 			var vx := floorf((size.x - vw) / 2.0)
-			outline(self, Rect2(vx - 3, vr.position.y - 1, vw + 7, vr.size.y + 1), Color(F.GOLD[3]))
+			PX.outline(self, Rect2(vx - 3, vr.position.y - 1, vw + 7, vr.size.y + 1), Color(F.GOLD[3]))
 			draw_rect(Rect2(vx + vw + 1, vr.position.y + 2, 1, vr.size.y - 5), Color(F.GOLD[4]))
 	func set_value(v: float, commit: bool = true) -> void:
 		var nv := clampf(v, 0.0, 1.0)
@@ -664,6 +651,9 @@ class Knob:
 		if commit and on_commit.is_valid():
 			on_commit.call(value)
 		queue_redraw()
+	## what on_commit is given (a Wheel gives its angle in degrees, not the 0..1 value)
+	func commit_value():
+		return value
 	func activate() -> void:
 		if app:
 			app.say_hint(hint if hint != "" else "up and down turn %s; B leaves it" % label)
@@ -685,7 +675,7 @@ class Knob:
 		var f := T.font("text")
 		var y := ts.y + 8
 		draw_string(f, Vector2(0, y), label, HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, T.BONE if lit() else T.DIM)
-		draw_string(f, Vector2(0, y + 10), value_text(), HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, ember(lit()))
+		draw_string(f, Vector2(0, y + 10), value_text(), HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, PX.ember(lit()))
 	## the number a typed value means: the control's own words for 0 and 1 give the range, so "+3" or "12 frames" land right
 	func set_from_number(n: float) -> void:
 		var lo := NumberEntry._num(String(fmt.call(0.0))) if fmt.is_valid() else 0.0
@@ -709,9 +699,7 @@ class Knob:
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton:
 			if ev.pressed and ev.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-				step(1 if ev.button_index == MOUSE_BUTTON_WHEEL_UP else -1, "up" if ev.button_index == MOUSE_BUTTON_WHEEL_UP else "down")
-				if on_commit.is_valid():
-					on_commit.call(value)
+				step(1 if ev.button_index == MOUSE_BUTTON_WHEEL_UP else -1, "up" if ev.button_index == MOUSE_BUTTON_WHEEL_UP else "down")   # step commits
 				accept_event()
 				return
 			if ev.button_index == MOUSE_BUTTON_LEFT:
@@ -737,7 +725,7 @@ class Knob:
 						app.focus_on(rack, rack.controls.find(self), false)
 				else:
 					if dragging and changed and on_commit.is_valid():
-						on_commit.call(value)
+						on_commit.call(commit_value())
 					dragging = false
 		elif ev is InputEventMouseMotion:
 			var hv := fmt.is_valid() and value_rect().has_point(ev.position)
@@ -780,6 +768,8 @@ class Wheel:
 		return "%s · drag the wheel round, scroll, or type a direction" % label
 	func value_text() -> String:
 		return String(fmt.call(angle)) if fmt.is_valid() else "%d" % int(round(angle))
+	func commit_value():
+		return angle
 	func set_angle(a: float, commit: bool = true) -> void:
 		var na := a
 		if wrap:
@@ -822,17 +812,17 @@ class Wheel:
 		draw_texture_rect(tex, Rect2(x, 4, ts.x, ts.y), false)
 		if lit():
 			# the arrows: this turns
-			chevrons(self, x - 6, x + ts.x + 5, 4 + ts.y / 2.0, Color(F.GOLD[3]))
+			PX.chevrons(self, x - 6, x + ts.x + 5, 4 + ts.y / 2.0, Color(F.GOLD[3]))
 		if hover_value and fmt.is_valid():
 			var vr := value_rect()
 			var vw := T.text_width(value_text(), T.SMALL_SIZE)
 			var vx := floorf((size.x - vw) / 2.0)
-			outline(self, Rect2(vx - 3, vr.position.y - 1, vw + 7, vr.size.y + 1), Color(F.GOLD[3]))
+			PX.outline(self, Rect2(vx - 3, vr.position.y - 1, vw + 7, vr.size.y + 1), Color(F.GOLD[3]))
 			draw_rect(Rect2(vx + vw + 1, vr.position.y + 2, 1, vr.size.y - 5), Color(F.GOLD[4]))
 		var f := T.font("text")
 		var y := ts.y + 12
 		draw_string(f, Vector2(0, y), label, HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, T.BONE if lit() else T.DIM)
-		draw_string(f, Vector2(0, y + 10), value_text(), HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, ember(lit()))
+		draw_string(f, Vector2(0, y + 10), value_text(), HORIZONTAL_ALIGNMENT_CENTER, size.x, T.SMALL_SIZE, PX.ember(lit()))
 	func _drag(p: Vector2) -> void:
 		var c := Vector2(size.x / 2.0, 4 + 22 * zoom / 2.0)
 		var a := rad_to_deg((p - c).angle()) + 90.0
@@ -973,8 +963,8 @@ class PxSlider:
 		mouse_filter = Control.MOUSE_FILTER_STOP
 		mouse_default_cursor_shape = Control.CURSOR_DRAG
 		size = Vector2(140, 16)
-		mouse_entered.connect(func(): hover = true; queue_redraw())
-		mouse_exited.connect(func(): hover = false; queue_redraw())
+		mouse_entered.connect(func(): hover = true; queue_redraw(); if app: app.hover_hint(how()))
+		mouse_exited.connect(func(): hover = false; queue_redraw(); if app: app.hover_hint(""))
 	func how() -> String:
 		return "%s · drag, left and right, or click the number to type" % label
 	func frac() -> float:
@@ -1019,8 +1009,8 @@ class PxSlider:
 		var tex := PX.slider(frac(), track_w, hot or hover)
 		draw_texture_rect(tex, Rect2(64, 4, track_w, 7), false)
 		if hot or hover:
-			outline(self, Rect2(63, 3, track_w + 2, 9), Color(F.GOLD[1]))
-		draw_string(f, Vector2(64 + track_w + 4, 12), value_text(), HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, ember(hot or hover))
+			PX.outline(self, Rect2(63, 3, track_w + 2, 9), Color(F.GOLD[1]))
+		draw_string(f, Vector2(64 + track_w + 4, 12), value_text(), HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, PX.ember(hot or hover))
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton and ev.pressed and ev.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			step(1, "right" if ev.button_index == MOUSE_BUTTON_WHEEL_UP else "left")
@@ -1123,6 +1113,9 @@ class RampRow:
 		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		compact = name == ""
 		size = Vector2(maxi(cs.size(), 1) * 8 + 4, 13) if compact else Vector2(180, 13)
+		mouse_entered.connect(func(): hover = true; queue_redraw(); if app: app.hover_hint(how()))
+		mouse_exited.connect(func(): hover = false; queue_redraw(); if app: app.hover_hint(""))
+	var hover := false
 	func set_hot(h: bool) -> void:
 		hot = h
 		queue_redraw()
@@ -1138,10 +1131,10 @@ class RampRow:
 		var tex := PX.ramp(colors)
 		if compact:
 			draw_texture_rect(tex, Rect2(2, 1, tex.get_width(), tex.get_height() * 2 - 2), false)
-			if on or hot:
-				draw_rect(Rect2(0, 0, tex.get_width() + 4, 13), T.ACCENT if on else T.GD, false, 1.0)
+			if on or hot or hover:
+				PX.outline(self, Rect2(0, 0, tex.get_width() + 4, 13), Color(F.GOLD[4]) if on else (Color(F.GOLD[3]) if hover else T.GD))
 			return
-		draw_string(f, Vector2(0, 11), ramp_name, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT if (on or hot) else T.DIM)
+		draw_string(f, Vector2(0, 11), ramp_name, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, PX.ember(on or hot or hover))
 		draw_texture_rect(tex, Rect2(70, 1, tex.get_width(), tex.get_height() * 2 - 2), false)
 		draw_rect(Rect2(0, 12, size.x, 1), T.RULE)
 	func _gui_input(ev: InputEvent) -> void:
@@ -1240,7 +1233,7 @@ class Timeline:
 				draw_rect(Rect2(i * cell, 0, cell - 1, 1), T.ACCENT)
 				draw_rect(Rect2(i * cell, thumb - 1, cell - 1, 1), T.ACCENT)
 			var m := String(marks.get(i, ""))
-			draw_string(f, Vector2(i * cell, thumb + 12), str(i + 1) + m, HORIZONTAL_ALIGNMENT_CENTER, cell, T.SMALL_SIZE, T.ACCENT if i == current else T.BONE)
+			draw_string(f, Vector2(i * cell, thumb + 12), str(i + 1) + m, HORIZONTAL_ALIGNMENT_CENTER, cell, T.SMALL_SIZE, PX.ember(i == current))   # every frame can be picked: ember, the one in hand bright
 		if _drag_to >= 0 and _drag_i >= 0 and _drag_to != _drag_i:
 			var x: float = _drag_to * cell + (cell - 1 if _drag_to > _drag_i else 0)
 			draw_rect(Rect2(x - 1, 0, 2, thumb), T.GH)
@@ -1285,5 +1278,9 @@ class Cards:
 			var p := item_pos(i)
 			var on := active and i == sel
 			var chosen: bool = items[i].get("on", false)
-			draw_string(f, Vector2(p.x, p.y + 13), String(items[i]["label"]), HORIZONTAL_ALIGNMENT_LEFT, -1, T.TEXT_SIZE, T.ACCENT if (on or chosen) else T.BONE)
+			# every card can be picked, so every name is ember; the one in hand or in use is the bright gold on a plaque
+			var w := T.text_width(String(items[i]["label"]), T.TEXT_SIZE)
+			if on or chosen:
+				PX.plaque(self, Rect2(p.x - 4, p.y, w + 8, 16), true, on and app != null and app.get("flash") != null and float(app.flash) >= 0.0)
+			draw_string(f, Vector2(p.x, p.y + 13), String(items[i]["label"]), HORIZONTAL_ALIGNMENT_LEFT, -1, T.TEXT_SIZE, PX.ember(on or chosen))
 			draw_string(f, Vector2(p.x, p.y + 24), String(items[i].get("line", "")), HORIZONTAL_ALIGNMENT_LEFT, _col_w() - 20, T.SMALL_SIZE, T.DIM)

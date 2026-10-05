@@ -1,5 +1,6 @@
 extends RefCounted
 const T := preload("res://scripts/theme.gd")
+const F := preload("res://scripts/frame.gd")
 ## scripts/px.gd: the controls drawn one pixel at a time (the dagger selector, levers, wheels, chain pulls, the
 ## three-stop lever, sliders, ramps, dice), as Images turned into textures and cached. The frame itself is frame.gd.
 ## Nothing here is anti-aliased: a control is a tiny canvas drawn at 1 px and shown at a whole multiple, in the
@@ -48,7 +49,6 @@ static func arrow(shimmer: int = 0) -> Texture2D:
 	var key := "dagger%d" % shimmer
 	if _cache.has(key):
 		return _cache[key]
-	var F := preload("res://scripts/frame.gd")
 	var pal := {"k": F.IRON[0], "P": F.GOLD[4], "G": F.GOLD[3], "g": F.GOLD[1], "w": F.BONE[3], "b": F.WOOD[2],
 		"S": F.IRON[6], "s": F.IRON[5], "m": F.IRON[4], "d": F.IRON[2]}
 	var img := _blank(16, 14)
@@ -117,7 +117,6 @@ static func cursor() -> Texture2D:
 
 ## the iron bracket plate every lever stands in: a dithered vertical ramp, a bevel, four rivets
 static func _plate(img: Image, w: int, h: int) -> void:
-	var F := preload("res://scripts/frame.gd")
 	for y in h:
 		for x in w:
 			var f := float(y) / maxf(h - 1, 1.0)
@@ -149,7 +148,6 @@ static func _plate(img: Image, w: int, h: int) -> void:
 
 ## the carved slot down the plate's middle, with its lit lower lip
 static func _slot(img: Image, w: int, h: int) -> void:
-	var F := preload("res://scripts/frame.gd")
 	var x0 := int(w / 2) - 2
 	for y in range(4, h - 4):
 		_px(img, x0, y, Color(F.IRON[0])); _px(img, x0 + 1, y, Color("#000000")); _px(img, x0 + 2, y, Color("#000000")); _px(img, x0 + 3, y, Color(F.IRON[1]))
@@ -158,7 +156,6 @@ static func _slot(img: Image, w: int, h: int) -> void:
 
 ## the handle: a gold-and-bone grip over an iron bar, a shadow under it
 static func _handle(img: Image, w: int, y0: int, hot: bool) -> void:
-	var F := preload("res://scripts/frame.gd")
 	for x in range(1, w - 1):
 		_px(img, x, y0 + 2, Color(F.IRON[5])); _px(img, x, y0 + 3, Color(F.IRON[3])); _px(img, x, y0 + 4, Color(F.IRON[1]))
 	for x in range(2, w - 2):
@@ -177,7 +174,6 @@ static func lever(v: float, w: int = 14, h: int = 28, hot: bool = false) -> Text
 	var key := "lever%d_%d_%d_%s" % [w, h, q, hot]
 	if _cache.has(key):
 		return _cache[key]
-	var F := preload("res://scripts/frame.gd")
 	var img := _blank(w, h)
 	_plate(img, w, h)
 	_slot(img, w, h)
@@ -195,7 +191,6 @@ static func lever3(v: int, w: int = 14, h: int = 28, hot: bool = false) -> Textu
 	var key := "lever3_%d_%d_%s" % [h, v, hot]
 	if _cache.has(key):
 		return _cache[key]
-	var F := preload("res://scripts/frame.gd")
 	var img := _blank(w, h)
 	_plate(img, w, h)
 	_slot(img, w, h)
@@ -215,7 +210,6 @@ static func wheel(a: float, size: int = 22, hot: bool = false) -> Texture2D:
 	var key := "wheel%d_%d_%s" % [size, q, hot]
 	if _cache.has(key):
 		return _cache[key]
-	var F := preload("res://scripts/frame.gd")
 	var img := _blank(size, size)
 	var cx := (size - 1) / 2.0
 	var cy := (size - 1) / 2.0
@@ -285,7 +279,6 @@ static func pull(on: bool, w: int = 12, h: int = 30, hot: bool = false, sway: in
 	var key := "pull_%d_%s_%s_%d" % [h, on, hot, sway]
 	if _cache.has(key):
 		return _cache[key]
-	var F := preload("res://scripts/frame.gd")
 	var img := _blank(w, h)
 	for x in range(2, w - 2):
 		_px(img, x, 0, Color(F.IRON[5])); _px(img, x, 1, Color(F.IRON[2])); _px(img, x, 2, Color(F.IRON[0]))
@@ -323,7 +316,6 @@ static func slider(v: float, w: int = 60, hot: bool = false) -> Texture2D:
 	var key := "slider%d_%d_%s" % [w, q, hot]
 	if _cache.has(key):
 		return _cache[key]
-	var F := preload("res://scripts/frame.gd")
 	var img := _blank(w, 7)
 	for x in w:
 		_px(img, x, 2, Color(F.IRON[0])); _px(img, x, 3, Color(F.IRON[1])); _px(img, x, 4, Color(F.IRON[3]))
@@ -388,3 +380,43 @@ static func draw_disc(ci: CanvasItem, cx: float, cy: float, rx: float, ry: float
 					ci.draw_rect(Rect2(x, y, px, px), c1)
 			x += px
 		y += px
+
+# ------------------------------------------------------------------ the shared affordances (words, plaques, outlines)
+## a crisp one-pixel outline round a rect (four fills; an unfilled draw_rect lands between pixels)
+static func outline(ci: CanvasItem, r: Rect2, c: Color) -> void:
+	ci.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), c)
+	ci.draw_rect(Rect2(r.position.x, r.end.y - 1, r.size.x, 1), c)
+	ci.draw_rect(Rect2(r.position, Vector2(1, r.size.y)), c)
+	ci.draw_rect(Rect2(r.end.x - 1, r.position.y, 1, r.size.y), c)
+
+## the colour of an interactive word: ember always; brighter when chosen, white while pressed, duller when dim
+static func ember(on: bool, pressed: bool = false, dim: bool = false) -> Color:
+	if pressed:
+		return Color("#ffffff")
+	if on:
+		return Color(F.GOLD[4])
+	if dim:
+		return Color(F.GOLD[2])
+	return T.ACCENT
+
+## a carved iron plaque behind a choice: lit top edge, dark foot; the chosen one has a gold edge and a 1-px glow;
+## pressed, the edges swap so it sinks
+static func plaque(ci: CanvasItem, r: Rect2, on: bool, pressed: bool) -> void:
+	ci.draw_rect(r, Color(F.IRON[2] if on else F.IRON[1]))
+	var top := Color(F.GOLD[3] if on else F.IRON[3])
+	var bot := Color(F.IRON[0])
+	if pressed:
+		top = Color(F.IRON[0])
+		bot = Color(F.GOLD[2])
+	ci.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), top)
+	ci.draw_rect(Rect2(r.position, Vector2(1, r.size.y)), top)
+	ci.draw_rect(Rect2(r.position.x, r.end.y - 1, r.size.x, 1), bot)
+	ci.draw_rect(Rect2(r.end.x - 1, r.position.y, 1, r.size.y), bot)
+	if on and not pressed:
+		outline(ci, Rect2(r.position - Vector2(1, 1), r.size + Vector2(2, 2)), Color(F.GOLD[1]))
+
+## the small gold chevrons beside a wheel or a cycler that say "this turns"
+static func chevrons(ci: CanvasItem, lx: float, rx: float, cy: float, c: Color) -> void:
+	for k in 3:
+		ci.draw_rect(Rect2(lx + 2 - k, cy - k, 1, 1), c); ci.draw_rect(Rect2(lx + 2 - k, cy + k, 1, 1), c)
+		ci.draw_rect(Rect2(rx - 2 + k, cy - k, 1, 1), c); ci.draw_rect(Rect2(rx - 2 + k, cy + k, 1, 1), c)

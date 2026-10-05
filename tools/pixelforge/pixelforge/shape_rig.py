@@ -562,7 +562,7 @@ def render_clip(doc: dict, clip: str, direction: str = "S", *, tracks: JointTrac
                 square: bool | int = False, passes: bool = False, lock: bool | None = None, turn_step: float | None = None,
                 snap: bool = True) -> dict:
     """Every frame of one clip facing one direction. Returns ``{"frames": [rgba, ...], "fps": f, "times": [...], "normal": [...],
-    "depth": [...]}``; the fps keeps the clip's real duration when it was thinned to ``max_frames``. ``square`` pads
+    "depth": [...], "parts": [uint16 part-index masks, ...]}``; the fps keeps the clip's real duration when it was thinned to ``max_frames``. ``square`` pads
     each frame to a square canvas (True: the larger side; a number: that side) with the ground kept at the bottom.
     ``turn_step`` (degrees) and ``snap`` are the two rules that keep the pixels still between poses: bones turn in
     steps and bodies move by whole pixels (see :class:`Poser` and :meth:`pixelforge.shapes.Model.render`)."""
@@ -579,7 +579,7 @@ def render_clip(doc: dict, clip: str, direction: str = "S", *, tracks: JointTrac
     oc = S.outline_colour(doc, outline)
     times = frame_times(poser.n_src, max_frames, poser.loop)
     poser.prepare(times)
-    frames, normals, depths = [], [], []
+    frames, normals, depths, parts = [], [], [], []
     for k, t in enumerate(times):
         tf = poser.transforms(t)
         anchors, effects, lights = poser.anchors(t, tf)
@@ -590,20 +590,22 @@ def render_clip(doc: dict, clip: str, direction: str = "S", *, tracks: JointTrac
         if side:
             rgba = squared(rgba, model.W, model.H, side)
         frames.append(rgba)
+        parts.append(squared(fr.parts, model.W, model.H, side) if side else fr.parts)
         if passes:
             normals.append(squared(fr.normal, model.W, model.H, side) if side else fr.normal)
             depths.append(squared(fr.depth, model.W, model.H, side) if side else fr.depth)
     fps = tracks.fps * len(times) / poser.n_src
     return {"frames": frames, "fps": round(fps, 3), "times": times, "loop": poser.loop, "clip": clip, "direction": direction,
-            "normal": normals, "depth": depths, "ground_y": (model.ground * model.scale) + ((side - model.H) if side else 0),
+            "normal": normals, "depth": depths, "parts": parts, "ground_y": (model.ground * model.scale) + ((side - model.H) if side else 0),
             "axis_x": side / 2 if side else model.W / 2}
 
 
 def squared(rgba: np.ndarray, W: int, H: int, side: int | None = None) -> np.ndarray:
     """Pad a frame to a square canvas of ``side`` (the larger side when not given) with the body axis (the canvas
-    centre column) kept at the centre and the ground at the same distance from the bottom."""
+    centre column) kept at the centre and the ground at the same distance from the bottom. Works for an RGBA frame
+    and for a 2D mask (a parts image) alike."""
     side = max(W, H, int(side or 0))
-    out = np.zeros((side, side, 4), np.uint8)
+    out = np.zeros((side, side) + rgba.shape[2:], rgba.dtype)
     ox = (side - W) // 2; oy = side - H
     out[oy:oy + H, ox:ox + W] = rgba
     return out
@@ -667,13 +669,14 @@ def render_clip_flat(doc: dict, clip: str, direction: str = "S", *, tracks: Join
     times = frame_times(n_src, max_frames, loop)
     mirror = direction in ("N", "NW", "NE")
     M = S.build_materials(doc, steps)
-    frames = []
+    frames, parts = [], []
     for k, t in enumerate(times):
         tf = flat_transforms(doc, skel, src, t, direction)
         d2 = dict(doc); d2["_view"] = direction
-        frames.append(S.render_flat(d2, k, scale=scale, steps=steps, outline=outline, materials=M, transforms=tf, mirror=mirror).rgba)
+        fr = S.render_flat(d2, k, scale=scale, steps=steps, outline=outline, materials=M, transforms=tf, mirror=mirror)
+        frames.append(fr.rgba); parts.append(fr.parts)
     return {"frames": frames, "fps": round(tracks.fps * len(times) / n_src, 3), "times": times, "loop": loop, "clip": clip, "direction": direction,
-            "normal": [], "depth": [], "ground_y": float(doc.get("ground", doc["size"][1] - 1)) * scale, "axis_x": doc["size"][0] / 2 * scale}
+            "normal": [], "depth": [], "parts": parts, "ground_y": float(doc.get("ground", doc["size"][1] - 1)) * scale, "axis_x": doc["size"][0] / 2 * scale}
 
 
 # ---------------------------------------------------------------------------------------------- the template

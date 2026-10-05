@@ -1,5 +1,6 @@
 extends Control
 const T := preload("res://scripts/theme.gd")
+const PX := preload("res://scripts/px.gd")
 const Icons := preload("res://scripts/editor/icons.gd")
 ## scripts/editor/toolrow.gd: the editor's tools as a row of pixel icons with their names under them, a selector
 ## group like any other (item_count / item_rect / set_sel / activate / step), the chosen tool framed in gold.
@@ -79,7 +80,7 @@ func _draw() -> void:
 			draw_rect(Rect2(ix - 2, -1, iw + 4, iw + 2), T.INK)
 			draw_rect(Rect2(ix - 2, -1, iw + 4, iw + 2), T.G, false, 1.0)
 		draw_texture_rect(Icons.tool_icon(name, hot or on), Rect2(ix, 0, iw, iw), false)
-		draw_string(f, Vector2(x, iw + 11), String(labels.get(name, name)), HORIZONTAL_ALIGNMENT_CENTER, cell, T.SMALL_SIZE, T.ACCENT if (on or hot) else T.BONE)
+		draw_string(f, Vector2(x, iw + 11), String(labels.get(name, name)), HORIZONTAL_ALIGNMENT_CENTER, cell, T.SMALL_SIZE, PX.ember(on or hot))   # every tool can be picked: ember, the one in hand bright
 
 func _gui_input(ev: InputEvent) -> void:
 	if ev is InputEventMouseMotion:
