@@ -237,6 +237,26 @@ def build_server():
         return make_effect(image, name, out_dir, kind=kind, preset=preset, frames=frames, width=width or None, rotations=rotations)
 
     @mcp.tool()
+    def render_effect(name: str, out_dir: str, levers_json: str = "", palette: str = "", frames: int = 0, fps: float = 0.0, seed: int = 0, gif: bool = True, rotations: int = 0) -> dict:
+        """A library effect (list_effects names them; an old vfx kind works too) -> strip + json (+ GIF) in the vfx layout the add-on plays.
+        levers_json: {"size": 1.2, "speed": 0.8} over the effect's own levers; palette swaps every ramp (a name or hex list a,b,c)."""
+        from . import effects as E
+        from .effects.compat import resolve_kind
+        effect, lv0, pal = resolve_kind(name)
+        lv = {**lv0, **(json.loads(levers_json) if levers_json else {})}
+        return E.render_effect(effect, out_dir, levers=lv, frames=frames or None, fps=fps or None, seed=seed or None, gif=gif, rotations=rotations, out_name=name, palette=palette or pal)
+
+    @mcp.tool()
+    def list_effects(family: str = "") -> dict:
+        """The effects library by family (fire spark blood weather water magic bone soul weird): each effect's levers (default, min, max), timing, size
+        and node chain; plus every node op with its parameters and the palette names."""
+        from . import effects as E
+        t = E.library_table()
+        if family:
+            t["effects"] = [e for e in t["effects"] if e["family"] == family]
+        return t
+
+    @mcp.tool()
     def make_spell(name: str, out_dir: str, preset: str = "fireball", layers_json: str = "", gif: bool = True) -> dict:
         """A layered spell effect -> strip + json (+ gif). preset: fireball | ward | soul_drain | bone_shatter | lightning_strike.
         layers_json: optional JSON list of layers [{kind, palette, scale, x, y, rotation, start, speed, opacity, blend, seed}] replacing the preset's."""

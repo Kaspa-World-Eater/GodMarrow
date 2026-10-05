@@ -728,7 +728,7 @@ the locs, a tall round shield arch, and `"clips": {"attack": "punch"}` (a per-mo
 the planted thrust; re-rendered to `docs/concepts/hemomancer/shapes/*_2026-10-04b.*` and re-exported over
 `art/sprites/hemomancer.*`. `docs/track_notes/shapes.md` has the app-side list.
 
-**Verified.** `tests/test_character_road.py` (22 tests) with the whole suite green; the compare pictures by eye;
+**Verified.** `tests/test_character_road.py` (22 tests) with the whole suite 354 green; the compare pictures by eye;
 the GDScript by reading only (no Godot on the box). **Not done:** cloth is still kinematic; the Forge app's
 Reference tab does not yet call measure / compare (the commands exist; the track note says what to show).
 
@@ -1819,6 +1819,31 @@ per-site permission, the time a grid takes).
 tools/pixelforge/forge --script res://tools/check_scripts.gd`; `ONLY=describe GODOT=... PROJECT=... PY=python
 forge/tools/screens.sh OUT`. On the laptop: `pixelforge claude status`, then a line on the Music bench first (cheap,
 visible), then Characters, then **Paint it in Midjourney** with the browser in view.
+### 7.22 2026-10-05, track/effects: the effects engine (nodes in a graph, the library with levers, the Effects bench)
+
+**What.** `tools/pixelforge/pixelforge/effects/`: pure NumPy nodes composed in a JSON graph (80 ops: tileable noise
+sources, shapes, an emitter with life curves, gravity, drag, turbulence, trails, ground collision and sub-emitters;
+shaping; OKLab-locked colour with ramps, cycling and dither; layers with blend modes, depth and sprite stacking,
+Voronoi fracture, path scatter, mirrors; smoke, rope and cloth sims; sheets, GIFs and displacement maps), deterministic
+per seed, eight frames at 64x64 in under 0.1 s. The library: 33 saved graphs in 9 families with two or three levers
+each (flame, torch, candle, ember, spark_burst, sparkle, flare, arc, saber, blood_spray, blood_pool, drips, rain, snow,
+dust_motes, fog, waterfall, poison_cloud, portal, holy_beam, bone_shards, marrow_light, soul_wisps, soul_fire,
+soul_drain, phosphorus, haze, echo, unlight, miasma, eye_ooze, tally_marks, bell_ring), each with a GIF in
+`docs/screens/effects/`, four critique rounds over every family. CLI `pixelforge effects list|render|graph|preview|nodes`
+(`--lever k=v`, `--palette`, `--bands`, `--json`); MCP `render_effect`, `list_effects`. The shim (`effects/compat.py`)
+runs the old `vfx` kinds and `spell` files through the engine with the old signatures. The Forge's Effects bench
+rewritten on the graph (Effect: the saved effect's own levers; Layers: a graph file of `effect` nodes; Looks: palette
+and bands; Pick: the library by family, playing as chosen; Advanced: the chain); the editor's anchor library carries
+the new names with the old words mapped. Docs: GUIDE_HUMANS "Effects", GUIDE_AI "The effects engine",
+`docs/track_notes/effects_engine.md`.
+
+**Verified.** `tests/test_effects.py` 93 green (every node family; every library effect renders, in palette,
+deterministic, on time, moved by its levers; the shim; the CLI), the whole suite 354 green; `check_scripts` 33/0,
+`test_editor` 106/0, `test_scene` 21/0; `ONLY=effects screens.sh` five tabs at 0 errors.
+
+**How to resume.** `cd tools/pixelforge && PIXELFORGE_NO_UPDATE=1 python -m pytest -q tests/test_effects.py`;
+`pixelforge effects preview flame --gif`; `pixelforge forge -- --screen=effects`. Next: the game reading the editor's
+anchors; a sprite-stacking and a fracture effect in the library; the owner's look at the GIFs in the game's light.
 
 ### 7.23 2026-10-05, track/facing-bug: the facing wheel ("multiple stacked models")
 

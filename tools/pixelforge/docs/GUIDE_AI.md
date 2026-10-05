@@ -150,6 +150,11 @@ pixelforge project check <character>                                            
 pixelforge sfx all -o art/sfx [--variations 3]                                     # 18 synthesised sound presets -> WAV
 pixelforge effect spear.png bone_spear -o art/fx --kind missile --rotations 16     # painted missile art -> spinning, chip-shedding, 16-heading effect
 pixelforge vfx bone_spear bone_spear -o art/fx --rotations 16 --gif        # a spinning bone spear, 16 headings, in the manner of the classic missiles
+pixelforge effects list [--family fire] [--json]                                   # the effects engine's library: names, families, levers, node chains, palettes
+pixelforge effects render flame -o art/fx --lever size=1.3 --lever heat=1.2 [--palette frost --bands 5 --seed 7 --gif --json]   # a library effect (an old vfx kind works too)
+pixelforge effects preview soul_fire -o art/fx --gif                               # the strip + json + a GIF to look at
+pixelforge effects graph mine.graph.json -o art/fx [--lever k=v] [--gif]           # any graph file (the format below)
+pixelforge effects nodes --json                                                    # every node op with its parameters
 pixelforge describe "a wisp lantern spell, pale blue, slow, with embers" -o art/fx   # plain words -> a spell (or skin ops / prompt / music cue)
 pixelforge game-preview --skin keeper --attach [--shot shot.png]                   # launch the game with the set (and its attached effects) on the hero
 pixelforge game-preview --play                                                     # the plain game; --import = a headless import pass so new art files are seen
@@ -624,6 +629,70 @@ backward swing of loose parts; secondary motion is kinematic (a held swing), not
 tilt damping, not cloth: a fallen body's skirt lies along the legs (the damping fades with the tilt) but never
 crumples.
 
+## The effects engine (pixelforge/effects): the graph format, the nodes, the commands
+
+`pixelforge.effects` draws effects from graphs of pure NumPy nodes. `render_effect(name, out_dir, levers=, palette=,
+bands=, seed=, frames=, fps=, gif=)` renders a library effect to `<out_dir>/<name>.png|json` (+ GIF) in the `vfx`
+layout the add-on and SheetFx read; `render_graph(graph, name, out_dir, ...)` renders any graph; `list_effects()` /
+`library_table()` give the library; `node_table()` every op. Deterministic per seed (each node's dice are the seed and
+the node id hashed together); eight frames at 64x64 take well under a second; every colour on a sheet is a step of a
+ramp in the graph and nothing else (the tests check it); alpha is hard unless a node asks for a glow.
+
+**A graph** is JSON:
+
+```json
+{"size": [48, 64], "frames": 8, "fps": 12, "seed": 1, "loop": true, "anchor": [24, 60],
+ "levers": {"size": 1.0, "heat": 1.0},
+ "nodes": [{"id": "body", "op": "flame_body", "width": "0.55 * $size", "licks": 2.5},
+           {"id": "ramp", "op": "ramp", "colours": "fire", "bands": 6},
+           {"id": "img",  "op": "paint", "field": "@body", "ramp": "@ramp", "cut": 0.12, "gamma": "2.0 / $heat"}],
+ "out": "@img"}
+```
+
+Nodes evaluate in list order, each once. A parameter that is a string starting with `@` is another node's output (it
+must come earlier); one containing `$` is arithmetic over the levers (`+ - * / **`, `min max abs int round sqrt clamp`,
+nothing else); anything else is passed as it is. Values between nodes are a **field** (float32 (T, H, W) in 0..1), a
+**vector field** ((T, H, W, 2) in pixels), an **image** (uint8 (T, H, W, 4)), a **ramp** (a LUT) or a **bundle** (the
+emitter's dict of fields: `v` coverage, `age`, `height`, `dist`, `speed`). `out` names the graph's result; a bare field
+renders grey so a half-built graph still shows. Library entries (`effects/library.py`) add `name`, `family`, `doc` and
+`levers` as `{default, min, max, label}` (two or three per effect; that is the editor's library format).
+
+**Nodes** (`pixelforge effects nodes --json` lists them with parameters and one-line docs; 80 ops):
+
+- sources: `perlin` `simplex` `ridged` `value_noise` (tileable in space and time; `cells`, `tcells` beats per loop,
+  `octaves`, `stretch` > 1 for tall cells), `cellular` (f1 | f2f1 | id), `flow` (curl noise, divergence free, vectors),
+  `blue` (blue-noise dots), `scroll` / `scroll_vectors`, `emitter` (particles with life curves for size and speed,
+  `gravity`, `drag`, `turbulence` from a flow field, `spin`, `trail` as streaks, `ground` with `bounce` or `stick`, `sub`
+  emitters born at death or landing, `burst`; a bundle), `take` (one field of a bundle), `flame_body` (the house flame),
+  `bolt` (the arc's jagged path), `threads`, `eyes`, `mouths`.
+- shapes: `circle` `ring` `line` `polygon` `text` `gradient` `radial` `radial_vectors` `constant`.
+- shaping: `erode` `dilate` `warp` (along a vector field) `displace_by` `threshold` `licks` `mask_height` `mask_age`
+  `outline` `inner_glow` `shadow` `pixel_blur` `blur` `posterize`.
+- maths and time: `mul` `add` `sub` `max` `min` `invert` `gain` (`inside` keeps a lift within the lit area) `pulse`
+  (sine | saw | saw_down | flicker) `time_shift` `hold_frames` `shift` `flip` `reverse` `after` `wipe` `alpha_of`
+  `lightness_of`.
+- colour: `ramp` (a palette name or hex list, `bands`, `reverse`, `shift`, `lift`), `paint` (field or bundle -> image;
+  `by` age | height | dist | speed, `reverse_by`, `cut`, `gamma`, `dither`), `palette_lock` (OKLab nearest), `palette_cycle`,
+  `dither`, `tint`, `darken`, `displacement_map` (R, G offsets, alpha the strength: haze and bell-ring ship this way).
+- composition: `layers` (blends normal add screen multiply subtract behind lighten darken mask erase, opacities),
+  `blend`, `transform`, `depth_stack`, `sprite_stack`, `fracture` (Voronoi shards), `path_scatter`, `mirror`,
+  `polar_mirror`, `picture` (a PNG or strip from disk), `effect` (a whole library effect as a layer, at its own size,
+  with `levers`, `dx dy scale angle flip_x start palette`; an old vfx kind name works), `empty`, `echo`.
+- sims: `smoke` (density carried by a flow field), `rope` (verlet chain), `cloth` (a flag).
+
+Palettes: `effects.PALETTES` (wisp lantern fire soul_fire phosphorus miasma bone marrow smoke ash blood frost amber iron
+silver poison holy paper rain water white black unlight arc saber spark ooze mouth), dark to bright.
+
+**The shim** (`effects/compat.py`): `make_vfx(kind, name, out_dir, ...)` with `vfx.make_vfx`'s signature, `render_spell`
+/ `export_spell` / `new_spell` with `spell`'s, and `spell_graph(spell)` (a spell file as a graph of `effect` layers).
+`KIND_MAP` says which effect an old kind means (fire -> flame, wisp -> soul_wisps, bolt -> arc, bone_spear -> saber
+in bone ...); `effects render <old kind>` and the `effect` node accept the old words. `pixelforge.vfx` and
+`pixelforge.spell` themselves are unchanged.
+
+**Tests**: `tests/test_effects.py` (every node family; every library effect renders, stays in its ramps, is
+deterministic, keeps its timing, moves under its first lever, and renders in under 2.5 s; the graph errors; the shim
+over every old kind and spell preset; the CLI verbs). GIFs for judging: `docs/screens/effects/<name>.gif`.
+
 ## Godmarrow specifics (the game this forge serves)
 
 - Project style `godmarrow` (`pixelforge project set --style godmarrow`): ~195 px standing height, **every colour kept** (no palette reduction), the dark 1 px edge, crisp sampling. Use it for every game character; the other looks exist to compare and for other games.
@@ -737,7 +806,7 @@ well: a project named PixelForge is not the game). What the app runs, per bench:
 | Characters | `character from-picture <pictures...> -p P --style S` (a picture dropped or chosen, on Home or on the bench: the whole picture road, the progress words on the state line; then `Compare` shows `previews/compare.png`, `Measure again` / `Sample materials again` run `character measure|sample <name>`, `Open in editor` renders idle and opens the editor, `Use as reference only` is the old painting-beside-the-model) · `project new` (first use) · `project add <name>` · `project import-shapes <name> <file>` (a dropped or chosen `.shapes.json`, copied into `characters/<name>/shapes/`) · `shapes still <model> -o previews/still_<dir>.png --direction D --style S --zoom 1` (the standing picture; `--json` gives the foot anchor and the lights) · `shapes render <model> -o previews/frames --clips C --directions D --style S` (one clip for the Motion and Frames tabs) · `project render-shapes <name> --style S` (Render all) · `project export-game <name> --kind K --name N --out <dir>` (Export sheets; Put it in the game uses `--out <game>/art/sprites`) · `game-preview --import` · `game-preview --skin K [--shot]` · `project reset <name>` (Start over) · the Frames tab's *Edit* (the editor below, on `previews/frames` or `frames/`) · `prompt --describe ... --kind sheet_px` (Copy prompt). Every lever writes the model file (`doc`): solid offsets and scales, materials, ramps (OK-HSL hue / lightness / contrast / steps over the imported ramp), lights, the glow effects, `parts.*.lag`, `view.turn_step / move_step / elevation`. |
 | Creatures | under construction: the same bench, the humanoid skeleton; `assets/shapes/necromancer_3d.shapes.json` as the example |
 | Objects | the model copied into `objects/<name>/` · `shapes still <model> --frame F --direction D` · `shapes object <model> -o <dir> --name N --directions S[,...] --style S --hr 2 [--game-objects <game>/art/objects/objects.json]` · `game-preview --place N` |
-| Effects | `vfx <kind> <name> -o <project>/fx --palette P --frames --fps --bands --seed --glow --haze --style S [--size W H] [--rotations 8|16]` · `spell new <name> -o fx --preset P` / `spell render <file> -o fx` (Layers) · `effect <painting> <name> -o fx --kind loop` (a painted effect) · into the game with `-o <game>/art/fx` · `game-preview --fx <name>` |
+| Effects | `effects list --json` (the table the tabs are built from) · `effects render <effect> -o <project>/fx --as <name> --lever k=v ... --seed N [--palette P --bands B --frames F --fps X]` (Effect, Looks) · Layers: the stack written to `<project>/fx/<name>.graph.json` (one `effect` node per layer under a `layers` node) and `effects graph <file> -o fx --as <name>` · `effect <painting> <name> -o fx --kind loop` (a dropped painting) · into the game with `-o <game>/art/fx` · `game-preview --fx <name>` |
 | Tiles and ground | `tiles <texture> <name> -o <project>/tiles --variants --seed --style S [--second --colors --tile W H]`, then `-o <game>/art/tiles` |
 | Interface | `ui9 <panel> <name> -o ui --mid M` · `icons <flatlay> -o items --cell C --scale K` · `portrait <front> <name> -o portraits --head H --sizes 48 96`, then the game's folders |
 | Sound | `sfx <pad> -o <project>/sfx --set freq_mul= decay_mul= crush= lowpass= wave= --seed N`; Keep: `-o <game>/art/sfx` · `sfx all` |
@@ -825,8 +894,8 @@ back to position and the result says `"by": "position"`.
 `pixelforge mcp` runs an MCP server (stdio) with tools `new_project`, `status`,
 `configure`, `list_styles`, `set_style`, `style_demo`, `add_character`, `prompts`, `import_image`, `run_step`, `run_all`,
 `quick_sprite`, the shape-sprite tools `render_shape_sprite`, `preview_shape_sprite`, `shape_sheet`, `shape_object`,
-`validate_shapes`, `shape_template`, `draft_shapes`, `import_shapes`, `render_shapes` (and the tool-by-tool ones named above: `make_effect`,
-`make_tiles`, `make_spell`, ...). Claude Desktop config:
+`validate_shapes`, `shape_template`, `draft_shapes`, `import_shapes`, `render_shapes`, the effects engine's `render_effect` and
+`list_effects` (and the tool-by-tool ones named above: `make_effect`, `make_tiles`, `make_spell`, ...). Claude Desktop config:
 
 ```json
 {"mcpServers": {"pixelforge": {"command": "pixelforge", "args": ["mcp"]}}}

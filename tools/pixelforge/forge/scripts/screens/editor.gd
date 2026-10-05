@@ -464,7 +464,7 @@ func _build_effects() -> void:
 	ch.append({"label": "Save", "cb": save})
 	add_choices(ch)
 
-## the library: the effects bench's kinds and spell presets as words to pick up and drop on the picture
+## the library: the effects engine's saved effects as words to pick up and drop on the picture
 func _effects_library() -> void:
 	var cards := W.Choices.new()
 	cards.font_size = T.SMALL_SIZE
@@ -1046,8 +1046,10 @@ func _anchor_entry(label: String, change: Callable) -> void:
 	_commit_extra({"anchors_before": before, "anchors_after": anchors.snapshot()})
 
 func add_anchor(effect: String, p: Vector2i) -> Dictionary:
-	if not Anchors.LIBRARY.has(effect):
+	var known := Anchors.resolve(effect)
+	if known == "":
 		return {"ok": false, "error": "no effect named %s in the library" % effect}
+	effect = known
 	var f := doc.current()
 	var part := Doc.part_at(doc.parts_of(f), p.x, p.y)
 	var before := anchors.snapshot()

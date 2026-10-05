@@ -1,43 +1,78 @@
 extends "res://scripts/screen.gd"
-## Effects: the procedural effect sheets (`pixelforge vfx`) and the layered spells (`pixelforge spell`) as an
-## instrument (docs/track_notes/spell_rack.md). Tabs: Shape · Layers · Looks · Missile · Export. Every knob is a flag
-## of the same command an assistant runs; the picture window plays the strip at game size and 3x.
+## Effects: the effects engine (`pixelforge effects`) as an instrument. A saved effect is a graph with two or three
+## levers; the rack shows exactly those. Tabs: Effect (the levers) · Layers (effects stacked on one canvas) · Looks
+## (ramp bands and palette) · Pick (the library by family, each playing in the picture window as it is chosen) ·
+## Export. Advanced shows the graph's node chain under the fine sliders. Every control is a flag of the same command
+## an assistant runs (`effects render NAME --lever k=v`, `effects graph FILE`); the picture window plays the strip.
 
-const KINDS := ["fire", "smoke", "wisp", "burst", "embers", "ring", "bolt", "slash", "circle", "cloud", "shards", "pillar", "decal", "drip", "flash", "ward",
-	"vortex", "rain", "ashfall", "fog", "lightning", "swarm", "chain", "rune", "pool", "cookie", "nova", "firewall", "bone_burst",
-	"bone_armor_front", "bone_armor_back", "bone_shard_aura_front", "bone_shard_aura_back"]
-const MISSILES := ["bone_spear", "teeth", "ice_bolt", "fire_bolt"]
-const PALETTES := ["wisp", "lantern", "miasma", "bone", "smoke", "blood", "frost", "amber", "iron", "silver", "poison", "paper", "rain", "white", "black"]
-const SPELL_PRESETS := ["fireball", "ward", "soul_drain", "bone_shatter", "lightning_strike"]
+const BLENDS := ["normal", "add", "screen", "lighten", "multiply", "behind"]
+const FALLBACK_FAMILIES := ["fire", "spark", "blood", "weather", "water", "magic", "bone", "soul", "weird"]
 
-var spell := {}            # the spell json when the Layers tab made one
-var spell_file := ""
+static var table := {}      # from `effects list --json`: families, effects (name, family, doc, levers, nodes...), palettes, nodes
+var by_name := {}           # effect name -> its row of the table
 
 func build() -> void:
-	tabs = PackedStringArray(["Shape", "Layers", "Looks", "Missile", "Export"])
+	tabs = PackedStringArray(["Effect", "Layers", "Looks", "Pick", "Export"])
 	hint_text = "Esc back · LB/RB tabs"
 	if state.is_empty():
-		state = {"kind": "wisp", "palette": "wisp", "frames": 8, "fps": 10.0, "bands": 6, "seed": 1, "glow": "auto", "haze": "auto", "size": 48,
-			"rotations": 16, "missile": "bone_spear", "preset": "fireball", "layer": 0, "name": "", "exported": ""}
-	if args.has("draft") and args["draft"] is Dictionary and String(args["draft"].get("what", "")) == "spell":
-		_take_draft(args["draft"])
-	if args.has("kind"):
-		state["kind"] = String(args["kind"])
+		state = {"effect": "flame", "levers": {}, "palette": "", "bands": 0, "seed": 1, "frames": 0, "fps": 0.0, "family": "fire",
+			"layers": [], "layer": 0, "name": "", "exported": ""}
+	if args.has("effect"):
+		state["effect"] = String(args["effect"])
 	if args.has("palette"):
 		state["palette"] = String(args["palette"])
+	if args.has("draft") and args["draft"] is Dictionary and String(args["draft"].get("what", "")) == "spell":
+		_take_draft(args["draft"])
 	tab_from_args()
+	_index()
 	rebuild()
-	preview()
+	if table.is_empty():
+		_load_table()
+	else:
+		preview()
 
-## Describe-it's spell draft: its layers become the Layers tab's spell
+## the library table once per app run (the names, families, levers and node chains the tabs show)
+func _load_table() -> void:
+	if not app.backend.python_ok():
+		return
+	run(["effects", "list", "--json"], "reading the effects library", func(r: Dictionary):
+		if r.get("ok", false):
+			table = r
+			_index()
+			rebuild()
+			preview(), false)
+
+func _index() -> void:
+	by_name = {}
+	for e in table.get("effects", []):
+		by_name[String(e["name"])] = e
+
+func families() -> Array:
+	var f: Array = table.get("families", FALLBACK_FAMILIES)
+	return f if not f.is_empty() else FALLBACK_FAMILIES
+
+func names(family: String = "all") -> Array:
+	var out := []
+	for e in table.get("effects", []):
+		if family == "all" or String(e["family"]) == family:
+			out.append(String(e["name"]))
+	return out if not out.is_empty() else [String(state["effect"])]
+
+func row() -> Dictionary:
+	return by_name.get(String(state["effect"]), {})
+
+## Describe-it's spell draft: its layers (old kinds or effect names) become the Layers tab's stack
 func _take_draft(d: Dictionary) -> void:
 	if d.has("spell") and d["spell"] is Dictionary:
-		spell = d["spell"]
-		state["name"] = String(spell.get("name", "spell"))
-		var layers: Array = spell.get("layers", [])
-		if not layers.is_empty():
-			state["kind"] = String(layers[0].get("kind", state["kind"]))
-			state["palette"] = String(layers[0].get("palette", state["palette"]))
+		var sp: Dictionary = d["spell"]
+		state["name"] = String(sp.get("name", "spell"))
+		var layers := []
+		for L in sp.get("layers", []):
+			layers.append({"effect": String(L.get("kind", "flame")), "palette": String(L.get("palette", "")), "scale": float(L.get("scale", 1.0)),
+				"x": float(L.get("x", 0)), "y": float(L.get("y", 0)), "start": int(L.get("start", 0)), "opacity": float(L.get("opacity", 1.0)),
+				"blend": "add" if String(L.get("blend", "normal")) == "add" else "normal", "seed": int(L.get("seed", 1)), "levers": {}})
+		state["layers"] = layers
+		state["layer"] = 0
 		tab = 1
 		var reads: Array = d.get("read", [])
 		if not reads.is_empty():
@@ -48,27 +83,65 @@ func fx_dir() -> String:
 
 func effect_name() -> String:
 	var n := String(state.get("name", ""))
-	return n if n != "" else String(state["kind"])
+	return n if n != "" else String(state["effect"])
 
-## the strip: `vfx <kind> <name> ... --json`, then the picture window plays it
+# ------------------------------------------------------------------ rendering
+## the arguments of `effects render` for the current effect: its levers, seed, timing, palette, bands
+func render_args(out: String) -> Array:
+	var a := ["effects", "render", String(state["effect"]), "-o", out, "--as", effect_name(), "--seed", str(int(state["seed"]))]
+	var levers: Dictionary = state.get("levers", {})
+	for k in levers:
+		a += ["--lever", "%s=%s" % [k, T.fmt(float(levers[k]), 3)]]
+	if String(state["palette"]) != "":
+		a += ["--palette", String(state["palette"])]
+	if int(state.get("bands", 0)) > 0:
+		a += ["--bands", str(int(state["bands"]))]
+	if int(state.get("frames", 0)) > 0:
+		a += ["--frames", str(int(state["frames"]))]
+	if float(state.get("fps", 0.0)) > 0.0:
+		a += ["--fps", str(float(state["fps"]))]
+	return a
+
+## the Layers tab's stack as a graph file: one `effect` node per layer, stacked by `layers`
+func layers_graph() -> Dictionary:
+	var nodes := []
+	var images := []
+	var blends := []
+	var opacities := []
+	var i := 0
+	for L in state.get("layers", []):
+		var id := "l%d" % i
+		var n := {"id": id, "op": "effect", "name": String(L.get("effect", "flame")), "levers": L.get("levers", {}), "dx": float(L.get("x", 0)), "dy": float(L.get("y", 0)),
+			"scale": float(L.get("scale", 1.0)), "start": int(L.get("start", 0)), "seed": int(L.get("seed", 1))}
+		if String(L.get("palette", "")) != "":
+			n["palette"] = String(L["palette"])
+		nodes.append(n)
+		images.append("@" + id)
+		blends.append(String(L.get("blend", "normal")))
+		opacities.append(float(L.get("opacity", 1.0)))
+		i += 1
+	nodes.append({"id": "final", "op": "layers", "images": images, "blends": blends, "opacities": opacities})
+	return {"size": [96, 72], "frames": 12, "fps": 12.0, "loop": true, "seed": int(state["seed"]), "anchor": [48, 68], "levers": {}, "nodes": nodes, "out": "@final"}
+
 func preview() -> void:
-	if not app.backend.python_ok():
+	if not app.backend.python_ok() or table.is_empty():
 		return
-	if tab == 1 and not spell.is_empty():
-		_preview_spell()
-		return
-	var kind := String(state["missile"] if tab == 3 else state["kind"])
-	var a := ["vfx", kind, effect_name() if tab != 3 else String(state["missile"]), "-o", fx_dir(), "--palette", String(state["palette"]),
-		"--frames", str(int(state["frames"])), "--fps", str(float(state["fps"])), "--bands", str(int(state["bands"])), "--seed", str(int(state["seed"])),
-		"--glow", String(state["glow"]), "--haze", String(state["haze"]), "--style", app.style_name]
-	if tab == 3:
-		a += ["--rotations", str(int(state["rotations"]))]
-	if int(state.get("size", 0)) > 0 and tab != 3:
-		a += ["--size", str(int(state["size"])), str(int(state["size"]))]
-	run(a, "drawing the effect", func(r: Dictionary):
-		if not r.get("ok", false):
+	request(func():
+		var t := ticket()
+		if tab == 1 and not (state.get("layers", []) as Array).is_empty():
+			_preview_layers(t)
 			return
-		_show(String(r.get("png", "")), String(r.get("json", "")))
+		run(render_args(fx_dir()), "drawing the effect", func(r: Dictionary):
+			if r.get("ok", false) and fresh(t):
+				_show(String(r.get("png", "")), String(r.get("json", "")))
+			, false))
+
+func _preview_layers(t: int) -> void:
+	var path := fx_dir().path_join(effect_name() + ".graph.json")
+	app.backend.write_json(path, layers_graph())
+	run(["effects", "graph", path, "-o", fx_dir(), "--as", effect_name()], "drawing the layers", func(r: Dictionary):
+		if r.get("ok", false) and fresh(t):
+			_show(String(r.get("png", "")), String(r.get("json", "")))
 		, false)
 
 func _show(png: String, meta_file: String) -> void:
@@ -78,204 +151,202 @@ func _show(png: String, meta_file: String) -> void:
 	var meta := app.backend.read_json(meta_file)
 	state["last_png"] = png
 	state["last_meta"] = meta
-	app.scene.show_strip(t, meta, "%s · %s · %d frames at %s a second" % [String(meta.get("name", effect_name())), String(state["palette"]), int(meta.get("frames", 0)), T.fmt(float(meta.get("fps", 0)), 1)])
-
-func _preview_spell() -> void:
-	spell_file = fx_dir().path_join(String(spell.get("name", "spell")) + ".spell.json")
-	app.backend.write_json(spell_file, spell)
-	run(["spell", "render", spell_file, "-o", fx_dir()], "drawing the spell", func(r: Dictionary):
-		if not r.get("ok", false):
-			return
-		_show(String(r.get("png", "")), String(r.get("json", "")))
-		, false)
+	var pal := String(state["palette"])
+	app.scene.show_strip(t, meta, "%s · %s · %d frames at %s a second · %d colours" % [String(meta.get("name", effect_name())), pal if pal != "" else "its own palette",
+		int(meta.get("frames", 0)), T.fmt(float(meta.get("fps", 0)), 1), (meta.get("palette", []) as Array).size()])
 
 # ------------------------------------------------------------------ the tabs
 func build_tab(i: int) -> void:
+	if table.is_empty():
+		state_line("Effects · the library is loading")
+		add_spacer()
+		add_choices(standard_choices([], false))
+		return
 	match i:
-		0: _build_shape()
+		0: _build_effect()
 		1: _build_layers()
 		2: _build_looks()
-		3: _build_missile()
+		3: _build_pick()
 		4: _build_export()
 
 func on_tab() -> void:
 	preview()
 
-func _knob_levers() -> Array:
-	var controls := []
-	var ls := W.Lever.new()
-	ls.init("size", (float(state["size"]) - 16.0) / 112.0, 32.0 / 112.0, func(v): return "%d px" % int(round(16 + v * 112)), Callable(), func(v): _setv("size", round(16 + v * 112)))
-	var lf := W.Lever.new()
-	lf.init("frames", (float(state["frames"]) - 4.0) / 28.0, 4.0 / 28.0, func(v): return "%d" % int(round(4 + v * 28)), Callable(), func(v): _setv("frames", round(4 + v * 28)))
-	var lp := W.Lever.new()
-	lp.init("speed", (float(state["fps"]) - 4.0) / 20.0, 6.0 / 20.0, func(v): return "%d fps" % int(round(4 + v * 20)), Callable(), func(v): _setv("fps", round(4 + v * 20)))
-	var lb := W.Lever.new()
-	lb.init("bands", (float(state["bands"]) - 2.0) / 10.0, 4.0 / 10.0, func(v): return "%d" % int(round(2 + v * 10)), Callable(), func(v): _setv("bands", round(2 + v * 10)))
-	var lg := W.Lever3.new()
-	lg.init_lever3("glow", {"off": 0, "auto": 1, "on": 2}[String(state["glow"])], 1, PackedStringArray(["off", "auto", "on"]), func(s): _set_str("glow", ["off", "auto", "on"][s]))
-	var lh := W.Lever3.new()
-	lh.init_lever3("haze", {"off": 0, "auto": 1, "on": 2}[String(state["haze"])], 1, PackedStringArray(["off", "auto", "on"]), func(s): _set_str("haze", ["off", "auto", "on"][s]))
-	controls.append_array([ls, lf, lp, lb, lg, lh])
-	return controls
-
-func _setv(key: String, value: float) -> void:
+func _setv(key: String, value) -> void:
 	push_undo()
 	state[key] = value
 	preview()
 	rebuild()
 
-## the Advanced fold: the seed to 999 and the exact size
+func _set_lever(key: String, value: float) -> void:
+	push_undo()
+	var levers: Dictionary = state.get("levers", {})
+	levers[key] = value
+	state["levers"] = levers
+	preview()
+	rebuild()
+
+func _set_effect(name: String) -> void:
+	push_undo()
+	state["effect"] = name
+	state["levers"] = {}
+	state["name"] = ""
+	preview()
+	rebuild()
+
+## the effect's own levers as a rack of Levers: default, min and max from the library; the typed number lands in its range
+func lever_controls() -> Array:
+	var out := []
+	var e := row()
+	var levers: Dictionary = e.get("levers", {})
+	var current: Dictionary = state.get("levers", {})
+	for k in levers:
+		var spec: Dictionary = levers[k]
+		var lo := float(spec.get("min", 0.0))
+		var hi := float(spec.get("max", 1.0))
+		var def := float(spec.get("default", lo))
+		var v := float(current.get(k, def))
+		var l := W.Lever.new()
+		var span := maxf(hi - lo, 1e-6)
+		l.init(String(spec.get("label", k)), clampf((v - lo) / span, 0.0, 1.0), clampf((def - lo) / span, 0.0, 1.0),
+			func(u): return T.fmt(lo + u * span, 2), Callable(), func(u): _set_lever(k, snappedf(lo + u * span, 0.01)))
+		out.append(l)
+	return out
+
+func _timing_controls() -> Array:
+	var e := row()
+	var fr := int(state.get("frames", 0))
+	var def_fr := int(e.get("frames", 8))
+	var fps := float(state.get("fps", 0.0))
+	var def_fps := float(e.get("fps", 12.0))
+	var lf := W.Lever.new()
+	lf.init("frames", ((fr if fr > 0 else def_fr) - 4.0) / 28.0, (def_fr - 4.0) / 28.0, func(v): return "%d" % int(round(4 + v * 28)), Callable(), func(v): _setv("frames", int(round(4 + v * 28))))
+	var lp := W.Lever.new()
+	lp.init("fps", ((fps if fps > 0.0 else def_fps) - 4.0) / 20.0, (def_fps - 4.0) / 20.0, func(v): return "%d fps" % int(round(4 + v * 20)), Callable(), func(v): _setv("fps", float(round(4 + v * 20))))
+	return [lf, lp]
+
+## the Advanced fold: the seed exact and the ramp bands
 func advanced_extra() -> Array:
-	if tab in [1, 4]:
+	if tab in [1, 3, 4]:
 		return []
 	return [
-		fine_slider("seed exact", float(state["seed"]), 1.0, 999.0, 1.0, 0, func(v): _setv("seed", round(v))),
-		fine_slider("size exact", float(state["size"]), 16.0, 128.0, 48.0, 0, func(v): _setv("size", round(v)), func(v): return "%d px" % int(v)),
+		fine_slider("seed exact", float(state["seed"]), 1.0, 999.0, 1.0, 0, func(v): _setv("seed", int(round(v)))),
+		fine_slider("bands", float(state.get("bands", 0)), 0.0, 12.0, 0.0, 0, func(v): _setv("bands", int(round(v))), func(v): return "the ramp's" if int(v) == 0 else "%d" % int(v)),
 	]
 
-func _set_str(key: String, value: String) -> void:
-	push_undo()
-	state[key] = value
-	preview()
-	rebuild()
+func chain_text() -> String:
+	var e := row()
+	var ops: Array = e.get("nodes", [])
+	return "chain: " + " > ".join(PackedStringArray(ops)) if not ops.is_empty() else ""
 
 func _dice() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
 	_setv("seed", rng.randi_range(1, 999))
 
-## --- Shape
-func _build_shape() -> void:
-	var kind := String(state["kind"])
-	state_line("Effects · shape · %s in %s · seed %d" % [kind, String(state["palette"]), int(state["seed"])])
+## --- Effect: the saved effect's levers
+func _build_effect() -> void:
+	var e := row()
+	var name := String(state["effect"])
+	state_line("Effects · %s (%s) · seed %d · %s" % [name, String(e.get("family", "")), int(state["seed"]), String(e.get("doc", ""))], "", 2)
+	var list := names(String(state["family"]))
 	add_cyclers([
-		{"label": "shape", "value": kind, "left": func(): _set_str("kind", _cycle(KINDS, kind, -1)), "right": func(): _set_str("kind", _cycle(KINDS, kind, 1))},
-		{"label": "palette", "value": String(state["palette"]), "left": func(): _set_str("palette", _cycle(PALETTES, String(state["palette"]), -1)), "right": func(): _set_str("palette", _cycle(PALETTES, String(state["palette"]), 1))},
-		{"label": "seed", "value": str(int(state["seed"])), "left": func(): _setv("seed", maxi(int(state["seed"]) - 1, 1)), "right": func(): _setv("seed", int(state["seed"]) + 1)},
+		{"label": "effect", "value": name, "left": func(): _set_effect(_cycle(list, name, -1)), "right": func(): _set_effect(_cycle(list, name, 1))},
+		{"label": "seed", "value": str(int(state["seed"])), "left": func(): _setv("seed", maxi(int(state["seed"]) - 1, 1)), "right": func(): _setv("seed", int(state["seed"]) + 1), "set": func(t): _setv("seed", maxi(int(t), 1))},
 	])
-	var controls := _knob_levers()
+	if advanced_open:
+		dim_line(chain_text())
+	var controls := lever_controls() + _timing_controls()
 	controls.append(scene_light_lever())
 	add_rack(controls, 8)
-	add_choices(standard_choices([{"label": "Dice", "cb": _dice}, {"label": "From a painting", "cb": _from_painting}], false))
+	add_choices(standard_choices([{"label": "Dice", "cb": _dice}, {"label": "Pick effect", "cb": func(): set_tab(3)}], false))
 
-func _from_painting() -> void:
-	app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; paintings"]), func(p): on_drop(PackedStringArray([p])), "Choose the painted effect")
-
-## a painted effect (Midjourney, on black) through `effect`: the painted road
-func on_drop(paths: PackedStringArray) -> void:
-	if paths.is_empty():
-		return
-	var p := paths[0]
-	var name := slug(p.get_file().get_basename())
-	run(["effect", p, name, "-o", fx_dir(), "--kind", "loop", "--frames", str(int(state["frames"])), "--fps", str(float(state["fps"])), "--seed", str(int(state["seed"]))], "reading the painted effect", func(r: Dictionary):
-		if not r.get("ok", false):
-			return
-		state["name"] = name
-		_show(String(r.get("png", "")), String(r.get("json", ""))))
-
-## --- Layers: a spell as a strip of layer cards, each with its knobs
+## --- Layers: effects stacked on one canvas, each a card with its own place, scale, start, blend
 func _build_layers() -> void:
-	if spell.is_empty():
-		state_line("Effects · layers · a spell is layered effects: fire under a burst under embers. Pick a preset to start from.", "", 2)
-		add_cyclers([
-			{"label": "preset", "value": String(state["preset"]), "left": func(): state["preset"] = _cycle(SPELL_PRESETS, String(state["preset"]), -1); rebuild(), "right": func(): state["preset"] = _cycle(SPELL_PRESETS, String(state["preset"]), 1); rebuild()},
-		])
+	var layers: Array = state.get("layers", [])
+	if layers.is_empty():
+		state_line("Effects · layers · stack effects on one canvas: a flame under sparks under smoke. Add the effect on the bench to start.", "", 2)
 		add_spacer()
-		add_choices(standard_choices([{"label": "New spell", "cb": _new_spell}], false))
+		add_choices(standard_choices([{"label": "Add layer", "cb": _add_layer}], false))
 		return
-	var layers: Array = spell.get("layers", [])
-	var li := clampi(int(state["layer"]), 0, maxi(layers.size() - 1, 0))
+	var li := clampi(int(state["layer"]), 0, layers.size() - 1)
 	state["layer"] = li
-	var L: Dictionary = layers[li] if not layers.is_empty() else {}
-	state_line("Effects · layers · %s · layer %d of %d: %s in %s" % [String(spell.get("name", "spell")), li + 1, layers.size(), String(L.get("kind", "")), String(L.get("palette", ""))])
+	var L: Dictionary = layers[li]
+	var eff := String(L.get("effect", ""))
+	state_line("Effects · layers · %s · layer %d of %d: %s · %s" % [effect_name(), li + 1, layers.size(), eff, String(L.get("blend", "normal"))])
+	var all := names()
 	add_cyclers([
-		{"label": "layer", "value": str(li + 1), "left": func(): state["layer"] = posmod(li - 1, maxi(layers.size(), 1)); rebuild(), "right": func(): state["layer"] = posmod(li + 1, maxi(layers.size(), 1)); rebuild()},
-		{"label": "kind", "value": String(L.get("kind", "")), "left": func(): _set_layer("kind", _cycle(KINDS, String(L.get("kind", "")), -1)), "right": func(): _set_layer("kind", _cycle(KINDS, String(L.get("kind", "")), 1))},
-		{"label": "palette", "value": String(L.get("palette", "")), "left": func(): _set_layer("palette", _cycle(PALETTES, String(L.get("palette", "")), -1)), "right": func(): _set_layer("palette", _cycle(PALETTES, String(L.get("palette", "")), 1))},
-		{"label": "blend", "value": String(L.get("blend", "normal")), "left": func(): _set_layer("blend", "add" if String(L.get("blend", "normal")) == "normal" else "normal"), "right": func(): _set_layer("blend", "add" if String(L.get("blend", "normal")) == "normal" else "normal")},
+		{"label": "layer", "value": str(li + 1), "left": func(): state["layer"] = posmod(li - 1, layers.size()); rebuild(), "right": func(): state["layer"] = posmod(li + 1, layers.size()); rebuild()},
+		{"label": "effect", "value": eff, "left": func(): _set_layer("effect", _cycle(all, eff, -1)), "right": func(): _set_layer("effect", _cycle(all, eff, 1))},
+		{"label": "blend", "value": String(L.get("blend", "normal")), "left": func(): _set_layer("blend", _cycle(BLENDS, String(L.get("blend", "normal")), -1)), "right": func(): _set_layer("blend", _cycle(BLENDS, String(L.get("blend", "normal")), 1))},
 	])
 	var controls := []
 	var lsc := W.Lever.new()
 	lsc.init("scale", (float(L.get("scale", 1.0)) - 0.25) / 2.75, 0.75 / 2.75, func(v): return "x" + T.fmt(0.25 + v * 2.75, 2), Callable(), func(v): _set_layer("scale", snappedf(0.25 + v * 2.75, 0.05)))
-	var lsp := W.Lever.new()
-	lsp.init("speed", (float(L.get("speed", 1.0)) - 0.25) / 2.75, 0.75 / 2.75, func(v): return "x" + T.fmt(0.25 + v * 2.75, 2), Callable(), func(v): _set_layer("speed", snappedf(0.25 + v * 2.75, 0.05)))
+	var lx := W.Lever.new()
+	lx.init("x", (float(L.get("x", 0)) + 40.0) / 80.0, 0.5, func(v): return "%+d" % int(round(v * 80 - 40)), Callable(), func(v): _set_layer("x", round(v * 80 - 40)))
+	var ly := W.Lever.new()
+	ly.init("y", (float(L.get("y", 0)) + 40.0) / 80.0, 0.5, func(v): return "%+d" % int(round(v * 80 - 40)), Callable(), func(v): _set_layer("y", round(v * 80 - 40)))
+	var lst := W.Lever.new()
+	lst.init("start", float(L.get("start", 0)) / 12.0, 0.0, func(v): return "%d fr" % int(round(v * 12)), Callable(), func(v): _set_layer("start", int(round(v * 12))))
 	var lop := W.Lever.new()
 	lop.init("opacity", float(L.get("opacity", 1.0)), 1.0, func(v): return T.fmt(v, 2), Callable(), func(v): _set_layer("opacity", snappedf(v, 0.05)))
-	var lx := W.Lever.new()
-	lx.init("x", (float(L.get("x", 0)) + 32.0) / 64.0, 0.5, func(v): return "%+d" % int(round(v * 64 - 32)), Callable(), func(v): _set_layer("x", round(v * 64 - 32)))
-	var ly := W.Lever.new()
-	ly.init("y", (float(L.get("y", 0)) + 32.0) / 64.0, 0.5, func(v): return "%+d" % int(round(v * 64 - 32)), Callable(), func(v): _set_layer("y", round(v * 64 - 32)))
-	var lr := W.Wheel.new()
-	lr.init_wheel("rotation", float(L.get("rotation", 0.0)), 0.0, func(a): return "%d" % int(round(a)), Callable(), func(a): _set_layer("rotation", round(a)))
-	var lst := W.Lever.new()
-	lst.init("start", float(L.get("start", 0)) / 12.0, 0.0, func(v): return "%d fr" % int(round(v * 12)), Callable(), func(v): _set_layer("start", round(v * 12)))
 	var lsd := W.Lever.new()
 	lsd.init("seed", float(L.get("seed", 1)) / 99.0, 1.0 / 99.0, func(v): return "%d" % int(round(v * 99)), Callable(), func(v): _set_layer("seed", maxi(int(round(v * 99)), 1)))
-	controls.append_array([lsc, lsp, lop, lx, ly, lr, lst, lsd])
+	controls.append_array([lsc, lx, ly, lst, lop, lsd])
 	add_rack(controls, 8)
-	add_choices(standard_choices([{"label": "Add layer", "cb": _add_layer}, {"label": "Remove layer", "cb": _remove_layer}, {"label": "Randomise", "cb": _randomise_spell}], false))
-
-func _new_spell() -> void:
-	var name := String(state["preset"])
-	run(["spell", "new", name, "-o", fx_dir(), "--preset", String(state["preset"])], "making the spell", func(r: Dictionary):
-		if not r.get("ok", false):
-			return
-		spell_file = String(r.get("spell", ""))
-		spell = app.backend.read_json(spell_file)
-		state["name"] = name
-		state["layer"] = 0
-		_show(String(r.get("png", "")), String(r.get("json", "")))
-		rebuild())
+	add_choices(standard_choices([{"label": "Add layer", "cb": _add_layer}, {"label": "Remove layer", "cb": _remove_layer}, {"label": "Dice", "cb": _dice_layers}], false))
 
 func _set_layer(key: String, value) -> void:
-	var layers: Array = spell.get("layers", [])
+	var layers: Array = state.get("layers", [])
 	var li := int(state["layer"])
 	if li < 0 or li >= layers.size():
 		return
 	push_undo()
 	layers[li][key] = value
-	state["spell"] = spell
-	_preview_spell()
+	preview()
 	rebuild()
 
 func _add_layer() -> void:
 	push_undo()
-	var layers: Array = spell.get("layers", [])
-	layers.append({"kind": "embers", "palette": String(state["palette"]), "scale": 1.0, "x": 0, "y": 0, "rotation": 0.0, "start": 0, "speed": 1.0, "opacity": 1.0, "blend": "add", "seed": layers.size() + 1})
-	spell["layers"] = layers
+	var layers: Array = state.get("layers", [])
+	layers.append({"effect": String(state["effect"]), "palette": String(state["palette"]), "levers": (state.get("levers", {}) as Dictionary).duplicate(), "scale": 1.0, "x": 0.0, "y": 0.0,
+		"start": 0, "opacity": 1.0, "blend": "normal" if layers.is_empty() else "add", "seed": layers.size() + 1})
+	state["layers"] = layers
 	state["layer"] = layers.size() - 1
-	state["spell"] = spell
-	_preview_spell()
+	if state["name"] == "":
+		state["name"] = "stack"
+	preview()
 	rebuild()
 
 func _remove_layer() -> void:
-	var layers: Array = spell.get("layers", [])
-	if layers.size() <= 1:
-		app.say("A spell keeps at least one layer.")
+	var layers: Array = state.get("layers", [])
+	if layers.is_empty():
 		return
 	push_undo()
 	layers.remove_at(int(state["layer"]))
 	state["layer"] = 0
-	state["spell"] = spell
-	_preview_spell()
+	preview()
 	rebuild()
 
-func _randomise_spell() -> void:
+func _dice_layers() -> void:
 	push_undo()
 	var rng := RandomNumberGenerator.new()
 	rng.randomize()
-	for L in spell.get("layers", []):
+	for L in state.get("layers", []):
 		L["seed"] = rng.randi_range(1, 99)
-	state["spell"] = spell
-	_preview_spell()
+	preview()
 	app.say("New seeds for every layer; Undo takes them back.")
 
-## --- Looks: the palette swatches and the style's own rules
+## --- Looks: the palette swatches and the ramp's bands
 func _build_looks() -> void:
-	state_line("Effects · looks · %s palette · %s sets bands, glow and haze; a lever overrides it" % [String(state["palette"]), app.style_name.replace("_", " ")])
-	var items := []
-	for pal in PALETTES:
-		items.append({"label": ("* " if pal == String(state["palette"]) else "") + pal, "cb": func(): _set_str("palette", pal)})
+	var pal := String(state["palette"])
+	var bands := int(state.get("bands", 0))
+	state_line("Effects · looks · %s · %s · every colour on the sheet is a step of the ramp and nothing else" % ["its own palette" if pal == "" else pal + " palette", "the ramp's bands" if bands == 0 else "%d bands" % bands], "", 2)
+	var items := [{"label": ("* " if pal == "" else "") + "its own", "cb": func(): _setv("palette", "")}]
+	for p in table.get("palettes", []):
+		var pn := String(p)
+		items.append({"label": ("* " if pn == pal else "") + pn, "cb": func(): _setv("palette", pn)})
 	var c := W.Choices.new()
 	c.font_size = T.SMALL_SIZE
 	c.arrow_gap = 12
@@ -285,19 +356,33 @@ func _build_looks() -> void:
 	c.setup(items, 1, app)
 	c.row_h = 13
 	add_extra(c)
-	add_rack(_knob_levers(), 8)
+	var lb := W.Lever.new()
+	lb.init("bands", float(bands) / 12.0, 0.0, func(v): return "ramp's" if int(round(v * 12)) == 0 else "%d" % int(round(v * 12)), Callable(), func(v): _setv("bands", int(round(v * 12))))
+	add_rack([lb] + lever_controls(), 8)
 	add_choices(standard_choices([{"label": "Dice", "cb": _dice}], false))
 
-## --- Missile: a flying thing with its headings
-func _build_missile() -> void:
-	state_line("Effects · missile · %s in %s · %d headings; the game picks the row nearest its own" % [String(state["missile"]), String(state["palette"]), int(state["rotations"])])
+## --- Pick: the library by family; choosing one plays it in the picture window
+func _build_pick() -> void:
+	var e := row()
+	if String(state["family"]) == "all" and e.has("family"):
+		state["family"] = String(e["family"])   # open on the current effect's family; "all" is a turn of the cycler away
+	var fam := String(state["family"])
+	state_line("Effects · pick · %s · %s: %s" % ["every family" if fam == "all" else fam, String(state["effect"]), String(e.get("doc", ""))], "", 2)
+	var fams := ["all"] + families()
 	add_cyclers([
-		{"label": "missile", "value": String(state["missile"]), "left": func(): _set_str("missile", _cycle(MISSILES, String(state["missile"]), -1)), "right": func(): _set_str("missile", _cycle(MISSILES, String(state["missile"]), 1))},
-		{"label": "headings", "value": str(int(state["rotations"])), "left": func(): _setv("rotations", 8 if int(state["rotations"]) == 16 else 16), "right": func(): _setv("rotations", 16 if int(state["rotations"]) == 8 else 8)},
-		{"label": "palette", "value": String(state["palette"]), "left": func(): _set_str("palette", _cycle(PALETTES, String(state["palette"]), -1)), "right": func(): _set_str("palette", _cycle(PALETTES, String(state["palette"]), 1))},
+		{"label": "family", "value": fam, "left": func(): state["family"] = _cycle(fams, fam, -1); rebuild(), "right": func(): state["family"] = _cycle(fams, fam, 1); rebuild()},
 	])
-	add_rack(_knob_levers(), 8)
-	add_choices(standard_choices([{"label": "Dice", "cb": _dice}], false))
+	var items := []
+	for n in names(fam):
+		var nm := String(n)
+		var er: Dictionary = by_name.get(nm, {})
+		items.append({"label": nm, "line": String(er.get("family", "")) + " · " + ", ".join(PackedStringArray((er.get("levers", {}) as Dictionary).keys())), "on": nm == String(state["effect"]),
+			"cb": func(): _set_effect(nm)})
+	var cards := W.Cards.new()
+	cards.font_size = T.SMALL_SIZE
+	cards.setup_cards(items, 4, app)
+	add_extra(cards)
+	add_choices(standard_choices([{"label": "Use it", "cb": func(): set_tab(0)}, {"label": "Add as layer", "cb": func(): _add_layer(); set_tab(1)}], false))
 
 ## --- Export
 func _build_export() -> void:
@@ -313,14 +398,12 @@ func _put_in_game() -> void:
 		return
 	var out := app.game_art("fx")
 	var a: Array
-	if not spell.is_empty() and spell_file != "":
-		a = ["spell", "render", spell_file, "-o", out]
+	if not (state.get("layers", []) as Array).is_empty():
+		var path := fx_dir().path_join(effect_name() + ".graph.json")
+		app.backend.write_json(path, layers_graph())
+		a = ["effects", "graph", path, "-o", out, "--as", effect_name()]
 	else:
-		var kind := String(state["kind"])
-		a = ["vfx", kind, effect_name(), "-o", out, "--palette", String(state["palette"]), "--frames", str(int(state["frames"])), "--fps", str(float(state["fps"])),
-			"--bands", str(int(state["bands"])), "--seed", str(int(state["seed"])), "--glow", String(state["glow"]), "--haze", String(state["haze"]), "--style", app.style_name]
-		if kind in MISSILES:
-			a += ["--rotations", str(int(state["rotations"]))]
+		a = render_args(out)
 	run(a, "putting it in the game", func(r: Dictionary):
 		if not r.get("ok", false):
 			return
@@ -332,7 +415,7 @@ func _see_in_game() -> void:
 	if not app.backend.game_ok():
 		app.say("No game folder is set; see Settings.")
 		return
-	var name := effect_name() if spell.is_empty() else String(spell.get("name", "spell"))
+	var name := effect_name()
 	if app.args.has("script"):
 		var shot := fx_dir().path_join("in_game.png")
 		run(["game-preview", "--fx", name, "--shot", shot, "--shot-t", "6", "--game", app.backend.game_dir, "--godot", app.backend.godot], "the game takes a look", func(r: Dictionary):
@@ -346,49 +429,29 @@ func _see_in_game() -> void:
 
 # ------------------------------------------------------------------ Claude on the bench
 func claude_context() -> Dictionary:
-	var ctx := {"effect": String(state["kind"]), "palette": String(state["palette"]), "fx_dir": fx_dir()}
-	if spell_file != "":
-		ctx["spell"] = spell_file
-	return ctx
+	return {"effect": String(state["effect"]), "levers": state.get("levers", {}), "palette": String(state["palette"]), "fx_dir": fx_dir(), "layers": state.get("layers", [])}
 
-## a spell file Claude wrote goes to the Layers tab; a strip it drew plays in the window with its knobs read back from its json
+## a strip Claude drew plays in the window, its effect and levers read back from its json
 func on_claude_done(r: Dictionary) -> void:
-	var sp := pick_changed(r, ".spell.json")
-	if sp != "":
-		spell_file = sp
-		spell = app.backend.read_json(sp)
-		state["spell"] = spell
-		state["name"] = String(spell.get("name", "spell"))
-		state["layer"] = 0
-		tab = 1
-		_preview_spell()
-		return
 	var png := pick_changed(r, ".png", fx_dir())
 	if png == "":
 		png = pick_changed(r, ".png")
 	if png != "":
 		var meta_file := png.get_basename() + ".json"
 		var meta := app.backend.read_json(meta_file)
-		if meta.has("kind") and KINDS.has(String(meta["kind"])):
-			state["kind"] = String(meta["kind"])
-		for k in ["palette"]:
-			if meta.has(k):
-				state[k] = String(meta[k])
-		for k in ["frames", "bands", "seed"]:
-			if meta.has(k):
-				state[k] = int(meta[k])
-		if meta.has("fps"):
-			state["fps"] = float(meta["fps"])
+		if meta.has("effect") and by_name.has(String(meta["effect"])):
+			state["effect"] = String(meta["effect"])
+		if meta.has("levers") and meta["levers"] is Dictionary:
+			state["levers"] = meta["levers"]
+		if meta.has("seed"):
+			state["seed"] = int(meta["seed"])
 		state["name"] = String(meta.get("name", png.get_file().get_basename()))
 		_show(png, meta_file)
+		rebuild()
 		return
 	preview()
 
 func on_claude_undone() -> void:
-	if spell_file != "" and not FileAccess.file_exists(spell_file):
-		spell = {}
-		spell_file = ""
-		state.erase("spell")
 	preview()
 
 # ------------------------------------------------------------------ the standard actions
@@ -404,13 +467,15 @@ func render_all() -> void:
 
 func reset() -> void:
 	push_undo()
-	for k in ["frames", "fps", "bands", "seed", "size"]:
-		state[k] = {"frames": 8, "fps": 10.0, "bands": 6, "seed": 1, "size": 48}[k]
-	state["glow"] = "auto"
-	state["haze"] = "auto"
-	if tab == 1 and not spell.is_empty():
-		spell = {}
-		spell_file = ""
+	state["levers"] = {}
+	state["seed"] = 1
+	state["frames"] = 0
+	state["fps"] = 0.0
+	state["bands"] = 0
+	state["palette"] = ""
+	if tab == 1:
+		state["layers"] = []
+		state["layer"] = 0
 	rebuild()
 	preview()
 	app.audio.blip("clunk")
@@ -424,16 +489,12 @@ func do_start_over() -> void:
 	if da:
 		for f in da.get_files():
 			DirAccess.remove_absolute(d.path_join(f))
-	spell = {}
-	spell_file = ""
 	state = {}
 	undo_stack = []
 	redo_stack = []
 	build()
 
 func on_state_restored() -> void:
-	if state.has("spell") and state["spell"] is Dictionary:
-		spell = state["spell"]
 	preview()
 
 func scene_light_lever() -> Control:
@@ -456,6 +517,18 @@ func add_cyclers(items: Array) -> Control:
 static func _cycle(list: Array, cur, delta: int):
 	var i := list.find(cur)
 	return list[posmod(i + delta, list.size())] if not list.is_empty() else cur
+
+## a painted effect (Midjourney, on black) through `effect`: the painted road
+func on_drop(paths: PackedStringArray) -> void:
+	if paths.is_empty():
+		return
+	var p := paths[0]
+	var name := slug(p.get_file().get_basename())
+	run(["effect", p, name, "-o", fx_dir(), "--kind", "loop", "--frames", "8", "--fps", "12", "--seed", str(int(state["seed"]))], "reading the painted effect", func(r: Dictionary):
+		if not r.get("ok", false):
+			return
+		state["name"] = name
+		_show(String(r.get("png", "")), String(r.get("json", ""))))
 
 ## the editor on the picture the bench made last (every pixel tool, the palette lock on its colours)
 func _edit_picture() -> void:
