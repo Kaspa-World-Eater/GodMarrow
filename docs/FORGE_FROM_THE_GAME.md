@@ -5,6 +5,44 @@ have a bunch of shit that's useless, like the automatic drawing which just makes
 answer, from what the game actually loads and from making the Hemomancer. The Forge is yours; this is a request,
 and Derek decides.*
 
+## 0. Update, 2026-10-05: the character road is now painting → 3D model
+
+Derek's verdict on the samples: "better than anything so far". The road that makes the model is
+`tools/pixelforge/model3d.py`:
+```
+.venv/Scripts/python model3d.py NAME --front F.png [--side S.png] [--back B.png]    (or --sheet SHEET.png)
+```
+1. **The shape:** Hunyuan3D-2's free Hugging Face demo makes it from the front view, about 20 s. A token in
+   `~/.huggingface/token` gives more daily GPU time.
+2. **Blender** (`pixelforge/blender/model_from_views.py`) cleans it, removing sliver triangles and crumbs.
+3. **Colour from the painting:** the painting's own views are projected onto the shape.
+   - Each point is ray-tested, and the view it faces squarely wins.
+   - The picture the shape was made from counts most.
+   - The one side view is mirrored for the other side; a missing back is the front mirrored.
+   - Hidden points are filled from their neighbours.
+4. **Reduced** to about 120k faces with vertex colour, which is plenty at 195 px.
+5. **Judging pictures:** `NAME_views.png` and `NAME_size.png`.
+
+Samples: `docs/concepts/hemomancer/model3d/hemomancer_views.png`,
+`docs/concepts/tree_test/model3d/ash_oak_views.png`.
+
+**Tried and dropped:**
+- TRELLIS (`trellis_gen.py`): squat and murky.
+- Hunyuan's own texturing: broken on their server.
+- A texture bake from the full model: its rays hit the wrong layer where cloth and planks lie close.
+- Silhouette-search alignment: worse than the plain height-and-centre match.
+
+**What this means for the Forge.** The model no longer has to be authored. What the game needs from the Forge is
+everything after the model:
+- rig: fit the standard skeleton and weight it;
+- animate: the motion library;
+- film 8 directions at game scale with the game camera;
+- pixelate and finish;
+- `export-game`, and `objects.json` for props.
+
+Section 3.1 (painted detail riding the parts) and 3.2 (light and ink in the renderer) matter much less now, because
+the model carries its painting. The shape road and the auto-drafts in section 2 are now clearly the ones to retire.
+
 ## 1. What the game uses today (checked in the code, 2026-10-05)
 
 In real play the Godot build reads exactly two things the Forge makes:
