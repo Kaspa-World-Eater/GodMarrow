@@ -5,7 +5,8 @@ title Godmarrow
 rem 1. the latest game and Forge, when this folder came from git and git is installed
 where git >nul 2>nul && if exist .git (
   echo Checking for updates...
-  git pull --ff-only
+  git pull --ff-only --quiet >nul 2>nul || (git checkout -- "*.import" >nul 2>nul & git pull --ff-only --quiet || echo Could not update ^(see the message above^); starting the version you have.)
+  for /f %%h in ('git rev-parse --short HEAD') do echo Version %%h
 )
 rem 2. find Godot 4: PIXELFORGE_GODOT, the folder tools\godot, PATH, the usual places
 set GODOT=

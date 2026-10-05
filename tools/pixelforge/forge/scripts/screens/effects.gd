@@ -344,6 +344,53 @@ func _see_in_game() -> void:
 		app.backend.run(["game-preview", "--fx", name, "--game", app.backend.game_dir, "--godot", app.backend.godot], "the game opens", Callable())
 		app.say("The game is opening with %s at the hero." % name)
 
+# ------------------------------------------------------------------ Claude on the bench
+func claude_context() -> Dictionary:
+	var ctx := {"effect": String(state["kind"]), "palette": String(state["palette"]), "fx_dir": fx_dir()}
+	if spell_file != "":
+		ctx["spell"] = spell_file
+	return ctx
+
+## a spell file Claude wrote goes to the Layers tab; a strip it drew plays in the window with its knobs read back from its json
+func on_claude_done(r: Dictionary) -> void:
+	var sp := pick_changed(r, ".spell.json")
+	if sp != "":
+		spell_file = sp
+		spell = app.backend.read_json(sp)
+		state["spell"] = spell
+		state["name"] = String(spell.get("name", "spell"))
+		state["layer"] = 0
+		tab = 1
+		_preview_spell()
+		return
+	var png := pick_changed(r, ".png", fx_dir())
+	if png == "":
+		png = pick_changed(r, ".png")
+	if png != "":
+		var meta_file := png.get_basename() + ".json"
+		var meta := app.backend.read_json(meta_file)
+		if meta.has("kind") and KINDS.has(String(meta["kind"])):
+			state["kind"] = String(meta["kind"])
+		for k in ["palette"]:
+			if meta.has(k):
+				state[k] = String(meta[k])
+		for k in ["frames", "bands", "seed"]:
+			if meta.has(k):
+				state[k] = int(meta[k])
+		if meta.has("fps"):
+			state["fps"] = float(meta["fps"])
+		state["name"] = String(meta.get("name", png.get_file().get_basename()))
+		_show(png, meta_file)
+		return
+	preview()
+
+func on_claude_undone() -> void:
+	if spell_file != "" and not FileAccess.file_exists(spell_file):
+		spell = {}
+		spell_file = ""
+		state.erase("spell")
+	preview()
+
 # ------------------------------------------------------------------ the standard actions
 func keep() -> void:
 	if tab == 4:

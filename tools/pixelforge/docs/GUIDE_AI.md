@@ -74,6 +74,7 @@ operations as tools (see the end of this file).
     model/   <name>_rigged.blend                               after `rig`
     renders/ manifest.json <action>/<dir>/frame_NNN.png        Blender output, RGBA, render_size px
     frames/  animations.json <action>_<dir>/frame_NNN.png      pixel art frames (sprite size)
+             <clip>_<DIR>/frame_NNN.parts.png                  shape road: the part index per pixel (0 = empty), paletted PNG
     sprites/ <view>.png <view>_x4.png                          quick-path stills
     anim/    <preset>/frame_NNN.png preview.gif                quick-path procedural clips
     export/  <name>.png .json .tres .tscn                      Godot 4 files
@@ -318,7 +319,7 @@ pixelforge shapes joints [--fps 24]                                        # re-
 pixelforge project new <folder> --style gothic_hd
 pixelforge project add <character> -p <folder>
 pixelforge project import-shapes <character> FILE -p <folder>      # the character now renders from the file; the painting steps are skipped
-pixelforge project render-shapes <character> -p <folder> [--style S] [--clips ...] [--directions ...]   # frames/<clip>_<DIR>/frame_NNN.png + animations.json + renders/manifest.json
+pixelforge project render-shapes <character> -p <folder> [--style S] [--clips ...] [--directions ...] [--no-parts]   # frames/<clip>_<DIR>/frame_NNN.png (+ frame_NNN.parts.png) + animations.json + renders/manifest.json (with "parts")
 pixelforge project run <character> shapes -p <folder>              # the same as a step; run-all runs it when the character has a shape file
 pixelforge project export-game <character> --kind <kind> -p <folder> [--out <game>/art/sprites] [--skin-for <class>]   # the game's atlas with foot anchors, from those frames; into art/sprites it also writes the skins.json entry (the hero loader prefers a PixelForge set over <kind>_unclipped) and warns when the figure is not 195 px
 pixelforge project preview-shapes <character> --clip idle --direction S -p <folder>
@@ -330,8 +331,18 @@ length (`shading_bands`; 0 keeps each ramp's own) and the outline rule (`none` /
 `clip_frames`); the clip keeps its real duration, so the fps written for it is `24 * frames / clip frames`. A clip
 that reaches past the file's canvas (the death lies down) gets a wider one; every frame of a set is padded to one
 square with the ground at the bottom. The frames folder's `manifest.json` carries `elevation: 0` for the anchor maths
-(the frames are already projected) and `view_elevation` for the camera the frames were seen from. API:
-`api.import_shapes`, `api.render_shapes(project, name, preset, clips, directions, elevation, passes)`,
+(the frames are already projected) and `view_elevation` for the camera the frames were seen from.
+
+**Part ids.** Every rendered frame comes with `frame_NNN.parts.png` beside it (`shapes render`, `render-shapes`,
+`render_shape_sprite`; `shapes still` writes `<stem>.parts.png`, `shapes turntable` a `<stem>_parts/` folder; all take
+`--no-parts`): a paletted PNG whose pixel value is the part index, 0 = empty, palette entry i = grey level i with index 0
+transparent (so a reader that expands the palette sees `r8 == index`, alpha 0 for empty); 16-bit greyscale only when a
+file has 256 parts or more. The manifest carries the table under `"parts"`: `[{"index": 1, "name": "hat", "group":
+"head", "material": "straw", "shapes": [0, 1]}, ...]`, one entry per named part (all its shapes) and one per shape
+without a part (under the shape's name); `group` is the bone it rides, `"static"` when none. Outline pixels take the
+part beside them; shadow and glow pixels are 0. `shapes.part_table(doc)` builds the table, `shape_tools.load_parts(png)`
+reads a mask back, `Frame.parts` holds it in memory. The editor's carry matches by these masks (`"by": "part"`). API:
+`api.import_shapes`, `api.render_shapes(project, name, preset, clips, directions, elevation, passes, parts=True)`,
 `api.preview_shapes`, `api.validate_shapes`, `api.draft_shapes`; file-level tools in `pixelforge.shape_tools`
 (`render_set`, `gif_of`, `contact_sheet`, `turntable`, `still`, `export_object`, `add_game_object`, `validate_file`,
 `template_file`). MCP: `render_shape_sprite`, `preview_shape_sprite`, `shape_sheet`, `shape_object`,
@@ -746,7 +757,7 @@ window after S seconds and quits; `--windowed`, `--nosound`, `--nomusic`, `--red
 `--script=FILE` drives a whole walkthrough, one line per step (`forge/scripts/driver.gd` lists them: `go SCREEN
 k=v`, `tab NAME`, `drop FILE[;FILE]`, `choose LABEL`, `set CONTROL VALUE`, `key ...`, `waitjob [S]`, `shot PATH`,
 `dumplog`, `quit`); this is how the Characters bench is verified end to end (drop the Keeper, Render all, Export
-sheets). `forge/tools/screens.sh OUT [WxH]` shoots every screen and prints `name | errors N`; `godot --headless --path
+sheets), and how the Claude line is (`forge/tools/describe_walk*.txt` with the mock, `screens.sh`'s `describe_*`). `forge/tools/screens.sh OUT [WxH]` shoots every screen and prints `name | errors N`; `godot --headless --path
 tools/pixelforge/forge --script res://tools/test_editor.gd` runs the editor's own checks (palette lock, fill, wand,
 undo/redo, clone offset, carry by frame index, anchors, the command line). Under xvfb:
 
@@ -803,8 +814,9 @@ are 1-based.
 | `save` | flatten the visible layers into the frame files (and `.layers/` for the paint layer), save the anchors |
 
 Frame data the editor writes: `<root>/<clip>_<DIR>/frame_NNN.png` (on save), `<root>/.layers/<clip>_<DIR>/frame_NNN.paint.png`,
-`<root>/anchors.json`. It reads `<root>/<clip>_<DIR>/frame_NNN.parts.png` as part-id masks when the render writes them
-(it does not yet: carry and anchors fall back to position, the result says `"by": "position"`).
+`<root>/anchors.json`. It reads `<root>/<clip>_<DIR>/frame_NNN.parts.png` as part-id masks (the shape road writes them
+by default; see "Part ids" under shape sprites), so carry reports `"by": "part"`; without them carry and anchors fall
+back to position and the result says `"by": "position"`.
 
 ## MCP server
 
@@ -817,6 +829,89 @@ Frame data the editor writes: `<root>/<clip>_<DIR>/frame_NNN.png` (on save), `<r
 ```json
 {"mcpServers": {"pixelforge": {"command": "pixelforge", "args": ["mcp"]}}}
 ```
+
+## Claude on the bench (pixelforge/claude_bridge.py)
+
+Every Forge bench has a describe line that hands one sentence to the **Claude Code CLI** (`claude`), which works through
+this package's MCP server on the same project. The bridge is `pixelforge/claude_bridge.py`; the CLI verbs:
+
+| verb | what |
+|---|---|
+| `pixelforge describe --bench characters|creatures|objects|effects|tiles|interface|music|sound -p <project> "words" [--context JSON] [--timeout S] [--dry-run] --json` | one job on a bench: snapshot, `claude -p`, progress lines, the result (below) |
+| `pixelforge claude status [--json]` | `{"ok", "state": ready | not_found | not_signed_in, "sentence", "exe", "version", "registered"}` (the title line's words) |
+| `pixelforge claude register [--python P]` | `claude mcp add -s user pixelforge -- <python> -m pixelforge.cli mcp`, idempotent (`claude mcp get pixelforge` first); `install.bat` and the Forge's first launch call it |
+| `pixelforge claude log [-p P] [--lines N]` | the last job's log (`<project>/claude/logs/<stamp>_<bench>.jsonl`: the command, every stream event, the stderr tail) |
+| `pixelforge claude undo <manifest>` | put a run's snapshot back (the bench's Undo): the snapshot's files restored, files made since under the bench's roots removed |
+| `pixelforge midjourney fetch --prompt "..." | --kind K --describe "..." [--image clay.png] -o DIR -p P [--pick best|all] [--timeout 900] [--dry-run] --json` | Claude in Chrome paints it on midjourney.com and downloads the picks into DIR (below) |
+| `pixelforge midjourney prompt --kind K --describe "..."` | the prompt a fetch would use: the character kinds of prompts.py, `turnaround` (world_prompts' object sheet), `props9` (a sheet of nine) |
+
+**The command the bridge builds** (`build_command`): `claude -p --output-format stream-json --verbose --mcp-config
+<project>/claude/mcp_config.json --tools Read --allowedTools mcp__pixelforge,Read --permission-prompts none
+--append-system-prompt <prompt> --add-dir <project> --strict-mcp-config --max-budget-usd 3 "<words>"`. The MCP config
+names this interpreter (`sys.executable -m pixelforge.cli mcp`, `PYTHONPATH` = this package's parent), so the server
+runs without an install. `--tools Read` strips every other built-in tool; `--allowedTools` pre-approves the server's
+tools and Read; `--permission-prompts none` denies anything else (nothing can prompt in print mode); the budget is
+`PIXELFORGE_CLAUDE_BUDGET` (dollars; `0` = no flag). The Midjourney step adds `--chrome` and `mcp__claude-in-chrome`
+to the allowed tools and drops `--strict-mcp-config` (the extension's server must stay). The executable is found
+through `PIXELFORGE_CLAUDE`, PATH, then the usual install places (`~/.local/bin`, `%APPDATA%\npm`,
+`%LOCALAPPDATA%\Programs\claude`, ...). `PIXELFORGE_CLAUDE=mock:<script.jsonl>` swaps in the mock (below).
+
+**The system prompt contract** (`system_prompt`): the bench and the project folder; what is on the bench
+(`bench_sentence`: the model file, the character, the painting, the frames folder, the current song, the effect and
+palette, the spell file, the texture, the picture, the pad, the look preset, the project's characters; the Forge sends
+these as `--context`, the bridge fills the rest from `project.json` and the folder); the bench's tools (`BENCH_TOOLS`,
+MCP names); the game's rules for art and words (`STYLE_RULES`) and the banned words (`BANNED_WORDS`, HANDOFF section 4);
+the conduct ("a bench hand, not a chat": no questions back, one job, the fewest calls, nothing beyond the line, nothing
+written by hand, British spelling); and the ending: one line of JSON, nothing after it:
+
+```json
+{"did": ["short past-tense sentences"], "changed": ["absolute paths of files made or changed"], "notes": "one or two plain sentences for the person"}
+```
+
+**The result** (`run` / `describe --bench --json`): `{"ok", "did", "changed", "notes", "summary", "log", "snapshot",
+"progress", "seconds", "cost_usd", "detected"}`. `changed` is the summary's list united with what the bridge saw change
+on disk (`file_state` before and after, `claude/` skipped); `snapshot` is the undo manifest; for Characters and Objects
+the describe verb adds `model_file`, `about` and `prompts` (prompts.py's set, or `turnaround` + `props9`) with
+`prompt_titles`. On failure `{"ok": false, "error": "<one sentence>"}`: *Claude Code was not found...*, *not signed
+in...*, *did not finish within N s; it was stopped*, *stopped at the spending limit*, *Chrome is not connected...*,
+*Midjourney asked for a sign-in or a check*. While it runs, the verb prints `PF_PROGRESS step=claude done=N total=0
+note=<words with + for spaces>` on stderr for every tool call (`tool_words`: `draft_shapes` → *drafting the model*,
+`edit_song` → one line per op, *setting tempo 76*; a Read → *reading current.song.json*; an unknown tool → its name
+in words); the Forge shows them on the progress strip and the foot, and pulses the title line.
+
+**The mock** (`tests/claude_mock/*.jsonl`, `mock_main`): a .jsonl of stream-json events, with control lines
+`{"mock": "run", "args": [pixelforge words]}` (the CLI runs, so a bench really changes), `{"mock": "sleep",
+"seconds": S}`, `{"mock": "exit", "code": N}`; `{project} {bench} {text} {slug} {pf_root}` are filled in. The bridge
+runs it as a subprocess (`python -m pixelforge.claude_bridge mock ...`) through the same reader, so the stream, the
+progress, the summary, the timeout and the snapshot are all exercised without the real CLI; `PIXELFORGE_MOCK_DELAY`
+paces it. `tests/test_claude_bridge.py` and the Forge's sweep (`screens.sh`: `describe_characters`,
+`describe_music`, from `forge/tools/describe_walk*.txt`) use it.
+
+**When you ARE the Claude on the bench** (a session started by the describe line): the system prompt says the bench
+and what is on it; believe it. Call `status` when you need the project's facts; use the bench's tools and no others;
+one job, the fewest calls that do what the line says; do not render the whole set unless asked (render_shapes takes
+a minute); never write a file by hand (Read is for looking); keep the sentence's words out of the banned list; end
+with the JSON line and nothing after it, with every file you touched in `changed` by absolute path. A line you cannot
+do with these tools: do nothing and say why in `notes`. On the Midjourney step: one prompt, one grid, the upscales,
+the downloads into the folder given, stop; never pass a sign-in or a check, say so instead.
+
+**The Forge's side** (`forge/scripts/screen.gd`): `add_describe_line` on every workbench; `_describe` snapshots the
+rack's values, `push_undo`, runs `describe --bench <screen> -p <project> "<words>" --context <claude_context()>`;
+`on_progress` handles `step=claude`; on success `state["claude_snapshot"]` is set, `on_claude_done(r)` (each bench
+reloads what changed: Characters re-reads the model file or imports a new one and takes the prompts; Music re-reads
+the song and rings the new notes; Effects takes a spell file or a strip; Tiles / Interface / Sound show the files),
+then `rebuild` and `_highlight_changed` (levers whose value text changed are lit for 2.5 s). `undo()` on a state with
+`claude_snapshot` runs `claude undo <manifest>` and `on_claude_undone()`; `redo()` refuses to re-run Claude.
+`app.gd` runs `claude status` at launch (`claude_state`, the title label `claude_label()`), registers when needed,
+and `set_claude_working(words)` drives the pulse. Driver: `type TEXT` on any bench feeds the Claude line.
+
+**The Midjourney step on the owner's PC needs**: Chrome or Edge (not WSL) open; the Claude in Chrome extension
+(1.0.36+) installed and signed in with the same Anthropic account as the CLI; Claude Code signed in with `/login`
+(an API key or `setup-token` keeps Chrome integration off); midjourney.com signed in in that Chrome; one
+`claude --chrome` session run by hand first (the one-time dialog, the site permission for midjourney.com). The bridge
+reads the init event's `mcp_servers` for `claude-in-chrome` and stops with *Chrome is not connected...* when it is
+missing. This step was built to the documented behaviour of `claude --chrome` and exercised only through the mock
+here (no Chrome, no Midjourney in the cloud session).
 
 ## Don'ts
 
@@ -881,9 +976,14 @@ on the drums lane: 36 kick, 38 snare, 37 stick, 39 clap, 42 hat, 46 open hat, 41
 --lanes lead,bass]`, `play-bar <song> [--pattern P --bar B | --section S [--bar B] | --bars N] [-o dir --lanes --play]`
 (writes `bar.wav`, reports `render_seconds` and `faster_than_real_time`), `export <song> -o <dir> --name N`, `edit
 <song> --op ... [--ops-file f.json] [-o out.json] [--render-bar]`, `list [--genre]`, `load <piece> -o <song>`, `info
-<song>`, `measure <audio>...`, `build-library`, `blips -o <dir>`. Genres: dungeon_synth, gothic_orchestral, chiptune,
-dark_ambient, battle, boss, tavern, town, title, victory, sorrow, exploration, synthwave. Moods: dark, hopeful,
-tense, calm, heroic, sombre, playful, eerie. The same seed, genre, mood, key and tempo always give the same piece.
+<song>`, `measure <audio>...`, `build-library`, `blips -o <dir>`. Genres: dungeon_synth, gothic_orchestral,
+gothic_march (an organ-and-choir march, chromatic harmony, bells), barbarian_epic (low brass and timpani, a chanting
+choir, a broad melody over a pedal), dark_acoustic (a repeated guitar figure over a drone, distant drums, no release),
+ambient_dread (bass pulses, clustered pads, an alien choir, long silences), gothic_rock (harpsichord figures, a
+sixteenth-note bass, baroque turns), chiptune, dark_ambient, battle, boss, tavern, town, title, victory, sorrow,
+exploration, synthwave. Moods: dark, hopeful, tense, calm, heroic, sombre, playful, eerie. The same seed, genre,
+mood, key and tempo always give the same piece. Library pieces carry a `theme`: `godmarrow` (the dark set) or
+`general` (bright pieces for other games); `music list --theme godmarrow`.
 
 **Operations** (`--op` as JSON or as words `name key=value ...`; the docstring of `music/edit.py` has the table): `set_note pattern lane step pitch [vel length] [free]`, `remove_note`, `set_velocity`, `set_length`,
 `clear [lane] [bar|steps]`, `copy` (returns `clipboard`), `paste at clipboard`, `transpose semitones [in_scale] [bar]`,
@@ -898,14 +998,20 @@ and out-of-range values come back as `{"ok": false, "error": "..."}` in plain wo
 brass_horn, brass_stab, trumpet, tuba, choir_ahh/ooh/men, bells_glass, bells_tubular, music_box, vibraphone, marimba,
 celesta, organ_cathedral, organ_reed, piano_electric, harpsichord, harp, lute, guitar_steel, pizzicato, bass_synth,
 bass_pick, bass_sub, bass_slap, lead_square, lead_pulse25, lead_pulse12, lead_saw, lead_tri, lead_sync, flute_wood,
-flute_pan, ocarina, oboe, pad_dark, pad_glass, pad_synthwave, timpani; kits drums_rock/orch/chip/taiko/electro/brush
-(the drums lane only). The chain is the SNES's in spirit: `voices` notes at once (a ninth cuts the oldest), lane mix,
-`crunch` saturation, `bits`, the SPC-style echo, a short hall, a limiter; `rate` 32000 by default.
+flute_pan, ocarina, oboe, pad_dark, pad_glass, pad_dream, pad_synthwave, timpani, strings_ens (the looped chorused
+ensemble), orch_hit, brass_low, choir_chant, choir_dark, choir_alien, organ_gothic, bells_chapel, guitar_nylon; kits
+drums_rock/orch/chip/taiko/electro/brush/epic (the drums lane only). The chain is the SNES's: `fx.snes` (0..1, 0.7 by
+default; the Tracks tab's SNES lever) band-limits every voice like a looped sample through the SPC's output filter,
+adds grain and echo and caps the voices at eight; then `voices`, the lane mix, `crunch`, `bits`, the SPC-style echo,
+a short hall, a limiter; `rate` 32000 by default.
 
-**The Forge's theme** is `library/forge_home.song.json` (hand-written: C# minor at 72, i VI III VII, a bridge in
-the iv key, the bells as the one bright thing); `pixelforge music forge -o forge/assets/audio --format ogg` renders
-the three loops the app plays, `music blips` its interface sounds. Measured against `docs/refs/forge_music_reference.mp3`
-(`music measure`): both C# minor; spectral centroid 302 Hz against 310; RMS 0.085 against 0.127 (the game's loudness).
+**The Forge's theme** is `library/forge_home.song.json` (hand-written: C# minor at 66; a sub-bass drone, a chanting
+male choir, a gothic organ and far timpani under a broad low-brass melody stated, stated again climbing, lifted a
+minor third in the bridge; a bell or two a bar, low); `pixelforge music forge -o forge/assets/audio --format ogg`
+renders the loops the app plays, `music blips` its interface sounds (forge_done is the music bench's cadence; no step
+plays it). Measured against `docs/refs/forge_music_reference.mp3` (`music measure`): both C# minor; spectral
+centroid 323 Hz against 310; RMS 0.076 against 0.127 (the game's loudness); the autocorrelation tempo reads 135 for a
+piece written at 66 (the chant's 3+3+2 figure doubles it; the reference reads 103 with no beat at all).
 
 **In the app:** `--screen=music [--tab=Tracks|Pattern|Song|Library|Export] [--song=FILE | --library=NAME]`; the bench
 keeps `<project>/music/current.song.json` and runs `music edit` for every change and `music play-bar` for every sound

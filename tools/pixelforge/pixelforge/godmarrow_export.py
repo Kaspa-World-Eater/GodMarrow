@@ -89,7 +89,7 @@ def figure_height_of(frames_dir: str | Path, manifest: dict | None = None) -> fl
     if manifest.get("figure_height") and manifest.get("render_scale"):
         return float(manifest["figure_height"]) * float(manifest["render_scale"])
     frames_dir = Path(frames_dir)
-    sample = next(iter(sorted(frames_dir.glob("idle_S/frame_*.png"))), None) or next(frames_dir.glob("*/frame_000.png"), None)
+    sample = next(iter(sorted(frames_dir.glob("idle_S/frame_[0-9][0-9][0-9].png"))), None) or next(frames_dir.glob("*/frame_000.png"), None)
     if sample is None:
         return None
     alpha = np.asarray(Image.open(sample).convert("RGBA"))[..., 3]
@@ -211,12 +211,12 @@ def export_godmarrow(
             if d not in DIR_TO_VIEW or clip not in anim_map:
                 continue
             anim, cap = anim_map[clip]
-            n_src_files = len(list(clip_dir.glob("frame_*.png")))
+            n_src_files = len(list(clip_dir.glob("frame_[0-9][0-9][0-9].png")))
             n_dst = min(int(cap), n_src_files) if n_src_files else int(cap)
             src_fps = float(per_clip_fps.get(clip, clip_fps))
             anim_fps[anim] = src_fps * n_dst / max(n_src_files, 1) if n_src_files else clip_fps
             view = DIR_TO_VIEW[d]
-            files = sorted(clip_dir.glob("frame_*.png"))
+            files = sorted(clip_dir.glob("frame_[0-9][0-9][0-9].png"))
             loop = anim in ("idle", "walk", "run")
             for i, si in enumerate(resample_indices(len(files), n_dst, loop)):
                 rgba = np.asarray(Image.open(files[si]).convert("RGBA"))

@@ -28,7 +28,7 @@ drop $PICTURE
 wait 1.2
 shot $OUT/picture_road_working.png
 waitjob 300
-wait 1.0
+wait 5.5
 shot $OUT/picture_road_reference.png
 choose Compare
 wait 0.8

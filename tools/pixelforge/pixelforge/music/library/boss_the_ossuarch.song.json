@@ -9,7 +9,7 @@
  "scale_lock": true,
  "lanes": {
   "lead": {
-   "instrument": "trumpet",
+   "instrument": "orch_hit",
    "volume": 0.85,
    "tone": 0.5,
    "pan": 0.0,
@@ -33,7 +33,7 @@
    "solo": false
   },
   "bass": {
-   "instrument": "tuba",
+   "instrument": "bass_pick",
    "volume": 0.8,
    "tone": 0.5,
    "pan": 0.0,
@@ -41,7 +41,7 @@
    "solo": false
   },
   "sparkle": {
-   "instrument": "lead_pulse12",
+   "instrument": "harp",
    "volume": 0.5,
    "tone": 0.5,
    "pan": 0.35,
@@ -6614,7 +6614,8 @@
   "echo_tone": 0.5,
   "reverb": 0.3,
   "reverb_size": 1.6,
-  "master": 1.0
+  "master": 1.0,
+  "snes": 0.7
  },
  "motif": [
   {
@@ -6666,5 +6667,6 @@
    "l": 8.0
   }
  ],
+ "theme": "godmarrow",
  "words": "a pedal that will not move, tritones in the brass, the choir"
 }

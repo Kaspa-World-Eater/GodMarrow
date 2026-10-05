@@ -260,6 +260,21 @@ class Canvas:
         out[m, 0] = out[m, 1] = out[m, 2] = g.astype(np.uint8); out[m, 3] = 255
         return out
 
+    def parts_pass(self, lut: np.ndarray) -> np.ndarray:
+        """The part index of every pixel (uint16, 0 = empty): ``lut[pid + 1]`` for the painted pixels, and an outline
+        pixel takes the part of a body pixel beside it, so the whole silhouette the editor paints on is covered."""
+        parts = lut[self.pid + 1].astype(np.uint16)
+        parts[self.fill == 0] = 0
+        edge = self.fill == 2
+        if edge.any():
+            body = (self.fill == 1) | (self.fill == 3)
+            ys, xs = np.nonzero(edge)
+            for dy, dx in ((0, -1), (0, 1), (-1, 0), (1, 0)):
+                y2 = np.clip(ys + dy, 0, self.H - 1); x2 = np.clip(xs + dx, 0, self.W - 1)
+                hit = body[y2, x2]
+                parts[ys[hit], xs[hit]] = parts[y2[hit], x2[hit]]
+        return parts
+
 
 # ---------------------------------------------------------------------------------------------- the flat path
 class Mask(np.ndarray):
@@ -836,6 +851,7 @@ class Model:
         self.spec = np.zeros(len(self.M), bool); self.emissive = np.zeros(len(self.M), bool)
         for i, m in enumerate(self.M.values()):
             self.table[i, :m.steps] = m.ramp; self.lengths[i] = m.steps; self.spec[i] = m.spec; self.emissive[i] = m.emissive
+        self.part_table, self.part_lut = part_table(doc)
         self.stats = {"shapes": len(self.prims), "voxels": int(len(self.shell.pos)), "size": [self.W, self.H], "scale": self.scale}
 
     def set_width(self, width: float | None) -> None:
@@ -1118,6 +1134,7 @@ class Model:
         rgba = cv.compose(shadow_mask, shadow_colour)
         fr = Frame(rgba, proj, {"filled": int(m.sum())})
         fr.pid = cv.pid
+        fr.parts = cv.parts_pass(self.part_lut)
         if passes:
             fr.normal = cv.normal_pass()
             fr.depth = cv.depth_pass(zb[m].max() if m.any() else 1, zb[m].min() if m.any() else 0)
@@ -1185,6 +1202,7 @@ class Frame:
     normal: np.ndarray | None = None
     depth: np.ndarray | None = None
     pid: np.ndarray | None = None         # the shape index that painted each pixel (-1 none): for tests and diagnostics
+    parts: np.ndarray | None = None       # the part index of each pixel (uint16, 0 = empty; see :func:`part_table`)
 
 
 # ---------------------------------------------------------------------------------------------- effects
@@ -1320,8 +1338,9 @@ def render_flat(doc: dict, frame: int = 0, *, scale: float = 1.0, steps: int | N
     pt = Painter(cv, M, oy=oy, texture=texture, ao=contact)
     anim = doc.get("animation", {})
     b = breath(frame, int(anim.get("breathe", {}).get("period", 10)), int(anim.get("breathe", {}).get("amount", 1)))
-    parts = doc.get("parts", {})
     xc = W0 / 2
+    table, lut = part_table(doc)
+    sid_shape: list[int] = []                 # the painter's shape ids (what ``pid`` holds) -> the file's shape index
 
     def place(points, spec):
         dx, dy = _offset(spec, frame, b)
@@ -1335,7 +1354,7 @@ def render_flat(doc: dict, frame: int = 0, *, scale: float = 1.0, steps: int | N
             pts = [(2 * xc - x, y) for x, y in pts]
         return pts
 
-    for spec in doc["shapes"]:
+    for si_, spec in enumerate(doc["shapes"]):
         kind = spec.get("kind", "poly")
         if "views" in spec and doc.get("_view") not in spec["views"]:
             continue
@@ -1357,6 +1376,7 @@ def render_flat(doc: dict, frame: int = 0, *, scale: float = 1.0, steps: int | N
             continue
         else:
             raise ValueError(f"unknown flat shape kind {kind!r}")
+        sid_shape.append(si_)
         if "flat" in spec:
             pt.flat(mask, hexrgb(spec["flat"]))
             continue
@@ -1385,7 +1405,10 @@ def render_flat(doc: dict, frame: int = 0, *, scale: float = 1.0, steps: int | N
         rx, ry = sh.get("radii", [W0 / 3, 4])
         shadow_mask = cv.shadow(at[0] * scale, (at[1] + oy) * scale, rx * scale, ry * scale)
         shadow_colour = hexrgb(sh.get("colour", "#3c3b40"))
-    return Frame(cv.compose(shadow_mask, shadow_colour), {}, {"shapes": pt.shape_count, "filled": int((cv.fill == 1).sum())})
+    fr = Frame(cv.compose(shadow_mask, shadow_colour), {}, {"shapes": pt.shape_count, "filled": int((cv.fill == 1).sum())})
+    fr.pid = cv.pid
+    fr.parts = cv.parts_pass(np.concatenate([[0], lut[np.asarray(sid_shape, int) + 1]]) if sid_shape else lut[:1])
+    return fr
 
 
 def outline_colour(doc: dict, outline) -> np.ndarray | None:
@@ -1567,6 +1590,38 @@ def warnings(doc: dict, knee_y: float | None = None) -> list[str]:
             out.append(f"part {name!r}: hangs (hang {hang:g}) from {bone} without upright_from: when a clip raises that limb the part lies flat along it "
                        f"(the Hemomancer's plank skirt locked rigid in the attack lunge); add \"upright_from\": \"hips\"")
     return out
+
+
+def part_table(doc: dict) -> tuple[list[dict], np.ndarray]:
+    """The parts of a file as the editor sees them: a table of ``{"index", "name", "group", "material", "shapes"}``
+    (index 1 upward; 0 is empty) and a lookup ``lut[shape_index + 1] -> part index`` (``lut[0]`` is 0 for no shape).
+    A named part (``"part": "hat"``) is one entry for all its shapes; a shape without a part is its own entry under
+    its name. ``group`` is the bone the part rides (the part's, else the shape's), ``"static"`` when none; ``material``
+    the first shape's. The same table goes into ``manifest.json`` under ``"parts"`` and the per-frame
+    ``frame_NNN.parts.png`` holds the indices."""
+    parts = doc.get("parts") or {}
+    table: list[dict] = []
+    by_key: dict[tuple, int] = {}
+    names: set[str] = set()
+    lut = np.zeros(len(doc.get("shapes", [])) + 1, np.int64)
+    for i, s in enumerate(doc.get("shapes", [])):
+        if not isinstance(s, dict) or s.get("carve"):
+            continue
+        part = s.get("part")
+        key = ("part", part) if part else ("shape", i)
+        if key not in by_key:
+            name = part or s.get("name", f"shape{i}")
+            if name in names:
+                name = f"{name}#{i}"
+            names.add(name)
+            bone = (parts.get(part, {}) if part else {}).get("bone") if part else s.get("bone")
+            if part and not bone:
+                bone = s.get("bone")
+            table.append({"index": len(table) + 1, "name": name, "group": bone or "static", "material": s.get("material", "cloth"), "shapes": []})
+            by_key[key] = len(table)
+        table[by_key[key] - 1]["shapes"].append(i)
+        lut[i + 1] = by_key[key]
+    return table, lut
 
 
 def file_summary(doc: dict) -> dict:

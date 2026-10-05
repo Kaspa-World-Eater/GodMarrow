@@ -185,3 +185,25 @@ func do_start_over() -> void:
 
 func on_state_restored() -> void:
 	pass
+
+# ------------------------------------------------------------------ Claude on the bench
+func claude_context() -> Dictionary:
+	return {"pad": String(state["pad"]), "out_dir": sfx_dir()}
+
+## the sound Claude made plays, and its wave is drawn
+func on_claude_done(r: Dictionary) -> void:
+	var wav := pick_changed(r, ".wav", sfx_dir())
+	if wav == "":
+		wav = pick_changed(r, ".wav")
+	if wav == "":
+		return
+	var pad := wav.get_file().get_basename()
+	for p in PADS:
+		if pad.begins_with(p):
+			state["pad"] = p
+	var s := AudioStreamWAV.load_from_file(wav)
+	if s and app.audio.sounds_on:
+		player.stream = s
+		player.volume_db = linear_to_db(maxf(app.audio.sound_volume, 0.01))
+		player.play()
+	_draw_wave(wav)

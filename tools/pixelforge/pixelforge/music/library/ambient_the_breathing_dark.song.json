@@ -9,7 +9,7 @@
  "scale_lock": true,
  "lanes": {
   "lead": {
-   "instrument": "flute_pan",
+   "instrument": "strings_dark",
    "volume": 0.85,
    "tone": 0.5,
    "pan": 0.0,
@@ -2186,7 +2186,8 @@
   "echo_tone": 0.5,
   "reverb": 0.7,
   "reverb_size": 3.5,
-  "master": 1.0
+  "master": 1.0,
+  "snes": 0.7
  },
  "motif": [
   {
@@ -2214,5 +2215,6 @@
    "l": 8.0
   }
  ],
+ "theme": "godmarrow",
  "words": "pads and breath; a far bell now and then"
 }

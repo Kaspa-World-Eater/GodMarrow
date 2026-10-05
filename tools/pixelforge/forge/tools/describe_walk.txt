@@ -1,0 +1,19 @@
+# The Claude line, end to end with the mock Claude (PIXELFORGE_CLAUDE=mock:tests/claude_mock/<bench>.jsonl; screens.sh
+# runs it, swapping OUT for the shot folder and picking the mock per bench): a sentence typed on Characters, the working
+# state, the drafted model standing in the window with the prompts on the Reference tab, Copy prompt, Undo (the files
+# go back), then the same on Music (tempo 76, the new note ringed).
+go characters
+wait 1
+type a hooded necromancer with a skull-topped staff burning green
+wait 1.6
+shot OUT/describe_characters_working.png
+waitjob 180
+wait 4
+shot OUT/describe_characters_done.png
+choose Copy prompt
+wait 0.6
+choose Undo
+waitjob 60
+wait 1.5
+shot OUT/describe_characters_undone.png
+quit

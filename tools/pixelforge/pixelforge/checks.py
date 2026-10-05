@@ -107,7 +107,7 @@ def check_spec(spec: dict) -> dict:
 
 def check_frames(render_dir: str | Path, sample: int = 24) -> dict:
     render_dir = Path(render_dir)
-    files = sorted(render_dir.glob("*/*/frame_*.png"))
+    files = sorted(render_dir.glob("*/*/frame_[0-9][0-9][0-9].png"))
     out = {"ok": True, "issues": [], "frames": len(files)}
     if not files:
         return {"ok": False, "issues": ["no frames rendered"], "frames": 0}
@@ -148,7 +148,7 @@ def check_character(project, name: str) -> dict:
     if spec.exists():
         res["spec"] = check_spec(json.loads(spec.read_text()))
     renders = project.sub(name, "renders")
-    if renders.exists() and any(renders.glob("*/*/frame_*.png")):
+    if renders.exists() and any(renders.glob("*/*/frame_[0-9][0-9][0-9].png")):
         res["frames"] = check_frames(renders)
     for k in ("views", "spec", "frames"):
         if k in res:

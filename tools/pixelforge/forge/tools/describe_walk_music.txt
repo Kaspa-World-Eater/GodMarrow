@@ -1,0 +1,17 @@
+# the Music half of the Claude walkthrough (its own run so the mock script can be the music one)
+go music
+waitjob 60
+wait 1
+tab Pattern
+wait 0.5
+type slower, 76 bpm, darker
+wait 1.4
+shot OUT/describe_music_working.png
+waitjob 120
+wait 1.5
+shot OUT/describe_music_done.png
+choose Undo
+waitjob 60
+wait 1
+dumplog
+quit

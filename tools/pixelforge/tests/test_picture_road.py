@@ -191,6 +191,13 @@ def test_cli_failures_exit_2_with_json(tmp_path, capsys):
     assert e.value.code == 2
     r = json.loads(capsys.readouterr().out)
     assert r["ok"] is False and "not a picture" in r["error"]
+    # a step again before any road: the project is not there yet
+    with pytest.raises(SystemExit):
+        main(["character", "measure", "nobody", "-p", str(tmp_path / "proj"), "--json"])
+    assert "No project" in json.loads(capsys.readouterr().out)["error"]
+    # a step again on a name the project has never seen
+    main(["project", "new", str(tmp_path / "proj"), "--json"])
+    capsys.readouterr()
     with pytest.raises(SystemExit):
         main(["character", "measure", "nobody", "-p", str(tmp_path / "proj"), "--json"])
     assert "No character nobody" in json.loads(capsys.readouterr().out)["error"]
