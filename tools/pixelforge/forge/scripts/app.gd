@@ -210,6 +210,10 @@ func _build_foot() -> void:
 	foot_project = _foot_label("")
 	foot_style = _foot_label("")
 	foot_claude = _foot_label("")
+	foot_claude.gui_input.connect(func(ev: InputEvent):
+		# a click on "Claude  not found / not signed in" opens the doctor
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT and not claude_state.is_empty() and not claude_state.get("ok", false):
+			open_doctor())
 	foot_hint = _foot_label("")
 	foot_hint.colour = T.BONE
 	envs_ctrl = W.Choices.new()
@@ -227,6 +231,10 @@ func _build_foot() -> void:
 	envs_ctrl.plates = false
 	add_child(envs_ctrl)
 	_foot_layout()
+
+## the doctor on Home: `claude doctor` runs there and its lines stay on the bench
+func open_doctor() -> void:
+	go("home", {"doctor": "1"})
 
 func _foot_label(text: String) -> Control:
 	var l := W.EdgedLabel.new()
@@ -366,6 +374,11 @@ func _title_items() -> Array:
 	var bw := T.text_width("< back", T.SMALL_SIZE) + 10
 	out.append({"label": "< back", "rect": Rect2(30, y, bw, h), "col": Color(Frame.GOLD[2]) if at_home else T.ACCENT, "cb": back})
 	x = 30 + bw + 10
+	if not claude_state.is_empty() and not claude_state.get("ok", false):
+		# Claude is not ready: "doctor" in gold beside back; it says why, step by step (Home runs it and shows the lines)
+		var dw := T.text_width("doctor", T.SMALL_SIZE) + 10
+		out.append({"label": "doctor", "rect": Rect2(x, y, dw, h), "col": Color(Frame.GOLD[4]), "cb": open_doctor})
+		x += dw + 10
 	var crumbs := _crumbs()
 	# drop the oldest crumbs when they would run into the keystone
 	var limit := minf(Frame.plaque_rect().position.x - 6, right_edge)

@@ -963,6 +963,35 @@ def sample_materials(front: str | Path, model: str | Path, out: str | Path | Non
     return shape_measure.sample_materials(front, doc, out or model, height=height)
 
 
+def shape_still(file: str | Path, out: str | Path, direction: str = "S", style: str | None = None, zoom: int = 1) -> dict:
+    """One standing picture of a shape file facing ``direction`` (what the authoring Claude looks at between passes)."""
+    from . import shape_tools, shapes as S
+    doc = S.load_shapes(file)
+    return shape_tools.still(doc, out, direction=direction, style=style or shape_tools.default_style_for(doc), zoom=zoom, parts=False)
+
+
+def add_part(file: str | Path, part: str, args: dict | str | None = None, out: str | Path | None = None) -> dict:
+    """A piece of the parts kit appended to a shape file (``shape_tools.add_part``); ``args`` as a dict or a JSON string."""
+    from . import shape_tools
+    if isinstance(args, str):
+        args = json.loads(args) if args.strip() else {}
+    try:
+        return shape_tools.add_part(file, part, args, out)
+    except (ValueError, TypeError) as e:
+        raise StepError(str(e)) from None
+
+
+def edit_shapes(file: str | Path, ops: list | str, out: str | Path | None = None) -> dict:
+    """Small edits to a shape file (``shape_tools.edit_shapes``); ``ops`` as a list or a JSON string."""
+    from . import shape_tools
+    if isinstance(ops, str):
+        ops = json.loads(ops)
+    try:
+        return shape_tools.edit_shapes(file, list(ops), out)
+    except (ValueError, TypeError, KeyError) as e:
+        raise StepError(str(e)) from None
+
+
 def compare_shapes(model: str | Path, ref: str | Path, out: str | Path, height: int = 195, views: str | None = None) -> dict:
     """Painting beside sprite at one height, per view, with the silhouette overlap per view."""
     from . import shape_measure, shapes as S

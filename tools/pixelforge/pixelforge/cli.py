@@ -590,6 +590,15 @@ def cmd_claude(a) -> None:
         r = CB.status()
     elif sub == "register":
         r = CB.register(python=a.python)
+    elif sub == "doctor":
+        r = CB.doctor(a.project, timeout=a.timeout, log=None if a.json else print, round_trip=not a.no_round_trip)
+        if a.json:
+            _emit(a, r)
+        else:
+            print(r["sentence"])
+        if not r["ok"]:
+            raise SystemExit(1)
+        return
     elif sub == "log":
         r = CB.last_log(a.project, a.lines)
     else:
@@ -883,13 +892,38 @@ def _picture_progress(step: str, done: int, total: int) -> None:
     print(f"PF_PROGRESS step=picture what={step.replace(' ', '_')} done={done} total={total}", file=sys.stderr, flush=True)
 
 
+def _author_progress(words: str, round_no: int, done: int, total: int) -> None:
+    """The loop's progress line for the Forge: ``PF_PROGRESS step=author round=N done=D total=T note=words+with+pluses``."""
+    print(f"PF_PROGRESS step=author round={round_no} done={done} total={total} note={words.replace(' ', '+')}", file=sys.stderr, flush=True)
+
+
 def cmd_character(a) -> None:
-    """pixelforge character from-picture|measure|sample|compare: a picture becomes a character in one go, and the steps again."""
+    """pixelforge character author|from-picture|measure|sample|compare: Claude draws a character in rounds; the old automatic road and its steps stay as tools."""
     from . import api, picture_road
 
     sub = a.character_cmd
     progress = _picture_progress if a.json else None
     log = None if a.json else print
+    if sub == "author":
+        from . import author_loop
+        try:
+            r = author_loop.author(a.name, a.project, painting=a.painting, sentence=a.sentence, rounds=a.rounds, target=a.target, style=a.style, note=a.note,
+                                   timeout=a.timeout, progress=_author_progress if a.json else None, log=log, dry_run=a.dry_run)
+        except api.StepError as e:
+            _emit(a, {"ok": False, "error": str(e)})
+            raise SystemExit(2)
+        if a.json or r.get("dry_run"):
+            _emit(a, r)
+        else:
+            for h in r["rounds"]:
+                print(f"round {h['round']}: " + (h["error"] if h.get("error") else " ".join(f"{k} {v:.2f}" for k, v in h["views"].items()) or f"{h.get('shapes', 0)} shapes")
+                      + (f" ({h['focus']})" if h.get("focus") else ""))
+            print(f"{r['character']}: best round {r['best']}, score {r['score']}, stopped: {r['stopped']}" if r.get("ok") else "stopped: " + r.get("error", ""))
+            if r.get("model"):
+                print(f"model {r['model']}\nstill {r['still']}\ncompare {r['compare']}")
+        if not r.get("ok"):
+            raise SystemExit(2)
+        return
     try:
         if sub == "from-picture":
             r = picture_road.from_picture(a.picture, a.project, a.name, style=a.style, height=a.height, text=a.text, progress=progress, log=log)
@@ -1354,6 +1388,9 @@ def build_parser() -> argparse.ArgumentParser:
     x = cs.add_parser("status", help="ready / not found / not signed in, in a sentence"); x.add_argument("--json", action="store_true")
     x = cs.add_parser("register", help="`claude mcp add -s user pixelforge -- <python> -m pixelforge.cli mcp` (idempotent)"); x.add_argument("--python", default=None); x.add_argument("--json", action="store_true")
     x = cs.add_parser("log", help="the last job's log"); x.add_argument("-p", "--project", default="."); x.add_argument("--lines", type=int, default=40); x.add_argument("--json", action="store_true")
+    x = cs.add_parser("doctor", help="why does the describe line do nothing? six checks in order, pass or fail with the fix: the executable, signed in, registered, the MCP server, a real round trip, Chrome (optional)")
+    x.add_argument("-p", "--project", default=None); x.add_argument("--timeout", type=float, default=180.0, help="seconds the round trip may take")
+    x.add_argument("--no-round-trip", dest="no_round_trip", action="store_true", help="skip the real call to Claude Code (step 5)"); x.add_argument("--json", action="store_true")
     x = cs.add_parser("undo", help="put a snapshot back (the manifest a describe --bench result names)"); x.add_argument("manifest"); x.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_claude)
 
@@ -1444,8 +1481,20 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--glb", default=None); x.add_argument("-o", "--out", default=None); x.add_argument("--fps", type=int, default=24); x.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_shapes)
 
-    s = sub.add_parser("character", help="THE PICTURE ROAD: a Midjourney picture (one figure or a turnaround sheet) -> cutouts, measured, a shape model drafted and coloured from it, imported into the project, drawn beside the painting")
+    s = sub.add_parser("character", help="THE CHARACTER LOOP: Claude Code hand-authors a shape model against a painting (author); the old automatic picture road (from-picture) and its steps stay as reference tools")
     cs = s.add_subparsers(dest="character_cmd", required=True)
+    x = cs.add_parser("author", help="Claude draws it: a generator script against the painting (or a sentence), rendered and scored per round, until the target or no improvement in two rounds")
+    x.add_argument("name", nargs="?", default=None, help="the character's name (default: from the painting's file name, else the sentence's first words)")
+    x.add_argument("-p", "--project", required=True, help="the project folder (made when it does not exist)")
+    x.add_argument("--painting", default=None, help="the reference painting (kept untouched under the character's source/)")
+    x.add_argument("--sentence", default=None, help="the character in words (with or without a painting)")
+    x.add_argument("--rounds", type=int, default=None, help="rounds at most (default 3 with a painting, 1 without; an existing character carries on from its last round)")
+    x.add_argument("--target", type=float, default=0.85, help="the silhouette overlap the loop stops at (default 0.85)")
+    x.add_argument("--note", default=None, help="the person's note for the next round (the bench's Another round)")
+    x.add_argument("--style", default=DEFAULT_PROJECT_STYLE, choices=sorted(STYLES), help="the look the stills are drawn at (default godmarrow)")
+    x.add_argument("--timeout", type=float, default=1800.0, help="seconds a round may take")
+    x.add_argument("--dry-run", dest="dry_run", action="store_true", help="build the first round's command and brief, call nothing")
+    x.add_argument("--json", action="store_true")
     x = cs.add_parser("from-picture", help="the whole road in one go: cut, measure, draft, sample materials, check, import, draw a still and the compare picture")
     x.add_argument("picture", nargs="+", help="one picture (a figure, or a sheet with the views side by side) or the views as separate files: front [side] [back]")
     x.add_argument("--name", default=None, help="the character's name (default: the picture's file name, which Midjourney writes the prompt into)")

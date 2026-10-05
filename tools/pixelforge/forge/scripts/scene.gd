@@ -394,6 +394,10 @@ func _draw_compare() -> void:
 		_draw_picture(compare_left, Rect2(2, 2, half - 4, h - 16), 0)
 	if compare_right:
 		var ts := compare_right.get_size()
+		if ts.y > h - 16 or ts.x > half - 12:
+			# a still taller than the pane (a 195 px figure on its canvas in a small window): fitted whole, like the painting
+			_draw_picture(compare_right, Rect2(half + 2, 2, half - 4, h - 16), 0)
+			return
 		var z := clampi(compare_zoom, 1, 4)
 		while z > 1 and (ts.x * z + ts.x > half - 12 or ts.y * z > h - 16):
 			z -= 1
