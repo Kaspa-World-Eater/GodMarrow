@@ -816,3 +816,234 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+# ---------------------------------------------------------------- the doctor: why does the describe line do nothing?
+DOCTOR_STEPS = ("executable", "signed_in", "registered", "server", "round_trip", "chrome")
+
+
+def _step(name: str, ok: bool, words: str, fix: str = "", optional: bool = False, **extra) -> dict:
+    return {"step": name, "ok": bool(ok), "optional": optional, "words": words, "fix": fix, **extra}
+
+
+def _api_key_only(exe: str) -> bool | None:
+    """True when ``claude auth status --json`` says the sign-in is an API key alone (``/login`` not done)."""
+    try:
+        r = _call([exe, "auth", "status", "--json"], 30)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    m = re.search(r"\{.*\}", r.stdout + r.stderr, re.S)
+    if not m:
+        return None
+    try:
+        d = json.loads(m.group(0))
+    except json.JSONDecodeError:
+        return None
+    method = str(d.get("authMethod", d.get("method", d.get("auth_method", "")))).lower().replace("_", "").replace("-", "")
+    return method in ("apikey", "api") if method else None
+
+
+def mcp_server_check(timeout: float = 60.0) -> dict:
+    """Start PixelForge's MCP server the way Claude Code does (``python -m pixelforge.cli mcp`` over stdio), say hello
+    (``initialize``), list its tools and call ``list_styles``; one dict: ``ok``, ``tools`` (how many), ``words``."""
+    try:
+        import mcp  # noqa: F401
+    except ImportError:
+        return {"ok": False, "words": "The MCP server cannot start: the 'mcp' package is not installed.", "fix": "Run install.bat again, or `pip install mcp` in the Forge's Python."}
+    cmd = server_command()
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(PF_ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+    env.setdefault("PYTHONIOENCODING", "utf-8")
+    try:
+        proc = subprocess.Popen(cmd, env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", bufsize=1,
+                                **({"creationflags": getattr(subprocess, "CREATE_NO_WINDOW", 0)} if os.name == "nt" else {}))
+    except OSError as e:
+        return {"ok": False, "words": f"The MCP server could not be started ({e}).", "fix": "Set the Forge's Python in Settings, or run install.bat again."}
+    q: Queue = Queue()
+    threading.Thread(target=_reader, args=(proc.stdout, q), daemon=True).start()
+    t0 = time.time()
+
+    def send(msg: dict) -> None:
+        proc.stdin.write(json.dumps(msg) + "\n")
+        proc.stdin.flush()
+
+    def wait_for(id_: int) -> dict | None:
+        while time.time() - t0 < timeout:
+            try:
+                line = q.get(timeout=0.25)
+            except Empty:
+                if proc.poll() is not None:
+                    return None
+                continue
+            if line is None:
+                return None
+            try:
+                ev = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(ev, dict) and ev.get("id") == id_:
+                return ev
+        return None
+
+    try:
+        send({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "pixelforge-doctor", "version": "1"}}})
+        hello = wait_for(1)
+        if hello is None or "result" not in hello:
+            return {"ok": False, "words": "The MCP server started but did not answer the hello within the time.", "fix": f"Run `{' '.join(cmd)}` in a terminal and read its first lines; the log drawer (Ctrl+L) has the Forge's side."}
+        send({"jsonrpc": "2.0", "method": "notifications/initialized"})
+        send({"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}})
+        tools = wait_for(2)
+        names = [t.get("name", "") for t in ((tools or {}).get("result") or {}).get("tools", [])]
+        send({"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "list_styles", "arguments": {}}})
+        answer = wait_for(3)
+        ok = bool(answer and "result" in answer and not (answer["result"] or {}).get("isError"))
+        if not ok:
+            return {"ok": False, "tools": len(names), "words": f"The MCP server lists {len(names)} tools but a call to list_styles did not come back.",
+                    "fix": "Run `pixelforge list-styles` in a terminal; if that works, run install.bat again."}
+        return {"ok": True, "tools": len(names), "words": f"PixelForge's MCP server starts and answers: {len(names)} tools, list_styles came back in {time.time() - t0:.1f} s."}
+    finally:
+        try:
+            proc.stdin.close()
+        except OSError:
+            pass
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+def find_browser() -> str | None:
+    """A Chrome or Edge executable, for the Midjourney road (optional)."""
+    for name in ("google-chrome", "google-chrome-stable", "chrome", "chromium", "chromium-browser", "msedge", "microsoft-edge"):
+        w = shutil.which(name)
+        if w:
+            return w
+    for env in ("PROGRAMFILES", "PROGRAMFILES(X86)", "LOCALAPPDATA"):
+        base = os.environ.get(env)
+        if base:
+            for rel in (r"Google\Chrome\Application\chrome.exe", r"Microsoft\Edge\Application\msedge.exe"):
+                p = Path(base) / rel
+                if p.exists():
+                    return str(p)
+    for p in (Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"), Path("/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge")):
+        if p.exists():
+            return str(p)
+    return None
+
+
+def doctor(project: str | Path | None = None, timeout: float = 180.0, log=None, round_trip: bool = True) -> dict:
+    """Why does the describe line do nothing? Six checks in order, each a pass or a fail with one sentence on how to fix it:
+    (1) the claude executable and its version, (2) signed in (not an API key alone), (3) PixelForge's MCP server registered
+    with it (registered on the spot when not), (4) the MCP server itself starts and answers, (5) a real round trip: ``describe
+    --bench music "set tempo 80"`` on a scratch project, the song file must change (with the time limit and the log path),
+    (6) Chrome for the Midjourney road, reported but optional. ``pixelforge claude doctor``."""
+    import tempfile
+
+    steps: list[dict] = []
+    say = log or (lambda s: None)
+    mock = mock_script()
+    exe = "mock" if mock else find_claude()
+    # 1. the executable
+    if mock:
+        steps.append(_step("executable", True, f"A mock stands in for Claude Code ({mock}); the real executable is not checked.", exe=exe))
+    elif exe:
+        v = version(exe)
+        steps.append(_step("executable", True, f"Claude Code found at {exe}" + (f", version {v}" if v else ", version unknown") + ".", exe=exe, version=v))
+    else:
+        steps.append(_step("executable", False, "Claude Code was not found on PATH or in the usual places.",
+                           "Install it from claude.com/claude-code, open a terminal and run `claude` once; or set PIXELFORGE_CLAUDE to the executable."))
+    say(_line_of(steps[-1], 1))
+    found = steps[-1]["ok"]
+    # 2. signed in
+    if not found:
+        steps.append(_step("signed_in", False, "Not checked: no Claude Code.", "Fix step 1 first.", skipped=True))
+    elif mock:
+        steps.append(_step("signed_in", True, "The mock is always signed in."))
+    else:
+        s = signed_in(exe)
+        key_only = _api_key_only(exe) if s else None
+        if s is False:
+            steps.append(_step("signed_in", False, "Claude Code is installed but not signed in.", "Open a terminal, run `claude`, and type /login to sign in with your Anthropic account once."))
+        elif key_only:
+            steps.append(_step("signed_in", False, "Claude Code is using an API key alone, not a signed-in account.",
+                               "Run `claude` and type /login to sign in; an API key alone keeps the browser integration and some tools off."))
+        elif s is None:
+            steps.append(_step("signed_in", True, "Whether Claude Code is signed in could not be read (`claude auth status` gave no answer); the round trip below tells.",
+                               "If step 5 fails at sign-in: run `claude` and type /login."))
+        else:
+            steps.append(_step("signed_in", True, "Signed in" + (" (ANTHROPIC_API_KEY is also set in the environment; the account sign-in wins)." if os.environ.get("ANTHROPIC_API_KEY") else ".")))
+    say(_line_of(steps[-1], 2))
+    # 3. registered
+    if not found:
+        steps.append(_step("registered", False, "Not checked: no Claude Code.", "Fix step 1 first.", skipped=True))
+    elif mock:
+        steps.append(_step("registered", True, "The mock needs no registration."))
+    elif registered(exe):
+        steps.append(_step("registered", True, "PixelForge's MCP server is registered with Claude Code (`claude mcp get pixelforge`)."))
+    else:
+        r = register(exe)
+        cmd = " ".join([exe, "mcp", "add", "-s", "user", SERVER_NAME, "--"] + server_command())
+        if r.get("ok"):
+            steps.append(_step("registered", True, "PixelForge's MCP server was not registered; it is now (registered just now).", registered_now=True))
+        else:
+            steps.append(_step("registered", False, "PixelForge's MCP server is not registered with Claude Code and registering it failed: " + str(r.get("error", "")),
+                               f"Run in a terminal: {cmd}"))
+    say(_line_of(steps[-1], 3))
+    # 4. the server itself
+    srv = mcp_server_check(min(timeout, 90.0))
+    steps.append(_step("server", srv["ok"], srv["words"], srv.get("fix", ""), tools=srv.get("tools", 0)))
+    say(_line_of(steps[-1], 4))
+    # 5. the round trip
+    if not round_trip:
+        steps.append(_step("round_trip", True, "Skipped (no round trip asked).", skipped=True))
+    elif not found or not steps[1]["ok"] or not srv["ok"]:
+        steps.append(_step("round_trip", False, "Not run: the steps above must pass first.", "Fix the failed step above, then run the doctor again.", skipped=True))
+    else:
+        scratch = Path(tempfile.mkdtemp(prefix="pixelforge_doctor_"))
+        try:
+            from .api import new_project
+            from .music import library as L, song as SONG
+            new_project(scratch, "doctor", "godmarrow")
+            (scratch / "music").mkdir(exist_ok=True)
+            song_path = scratch / "music" / "current.song.json"
+            SONG.save(L.load_piece("forge_home"), song_path)
+            before = song_path.read_bytes()
+            tempo_before = SONG.load(song_path).get("tempo")
+            r = run("music", scratch, "set tempo 80", on_progress=lambda w: say("   " + w), timeout=min(timeout, 600.0), snapshot_files=False)
+            log_path = r.get("log", "")
+            if not r.get("ok"):
+                steps.append(_step("round_trip", False, f"The round trip stopped: {r.get('error', 'no answer')}", f"The full log is {log_path}; `pixelforge claude log -p {scratch}` prints it.", log=log_path))
+            else:
+                after = song_path.read_bytes()
+                tempo_after = SONG.load(song_path).get("tempo")
+                if after != before:
+                    steps.append(_step("round_trip", True, f"A real round trip works: \"set tempo 80\" on a scratch song went through Claude Code and PixelForge's tools, "
+                                       f"the song file changed (tempo {tempo_before:g} to {tempo_after:g}) in {r.get('seconds', 0)} s.", log=log_path, seconds=r.get("seconds", 0)))
+                else:
+                    steps.append(_step("round_trip", False, "Claude Code answered but the song file did not change: its tool calls did not reach PixelForge's server.",
+                                       f"Read the log {log_path}: look for the pixelforge server's status in the first (init) event; run install.bat again to re-register.", log=log_path))
+        except Exception as e:  # noqa: BLE001 - the doctor reports, never crashes
+            steps.append(_step("round_trip", False, f"The round trip could not be set up: {e}", "Run install.bat again; the Forge's Python is missing a piece."))
+        # the scratch project stays (a few small files under the temp folder) so the log it names can be read
+    say(_line_of(steps[-1], 5))
+    # 6. chrome
+    b = find_browser()
+    if b:
+        steps.append(_step("chrome", True, f"A browser for the Midjourney road is there ({b}); the Claude in Chrome extension must be installed and signed in inside it.", optional=True, browser=b))
+    else:
+        steps.append(_step("chrome", True, "No Chrome or Edge was found: the Midjourney road is off (optional; everything else works without it).",
+                           "Install Chrome and the Claude in Chrome extension if you want the Forge to paint in Midjourney for you.", optional=True))
+    say(_line_of(steps[-1], 6))
+    required = [s for s in steps if not s["optional"]]
+    ok = all(s["ok"] for s in required)
+    first_bad = next((s for s in required if not s["ok"]), None)
+    sentence = "Claude on the bench works end to end." if ok else f"The describe line cannot work yet: step {steps.index(first_bad) + 1} ({first_bad['step'].replace('_', ' ')}) failed. {first_bad['fix']}"
+    return {"ok": ok, "steps": steps, "sentence": sentence, "lines": [_line_of(s, i + 1) for i, s in enumerate(steps)], "mock": bool(mock), "mock_script": mock or ""}
+
+
+def _line_of(step: dict, n: int) -> str:
+    """One line per check for a terminal and the bench: 'N. pass  words' or 'N. FAIL  words  -> fix'."""
+    mark = "pass" if step["ok"] else "FAIL"
+    if step.get("optional") and not step["ok"]:
+        mark = "note"
+    return f"{n}. {mark}  {step['words']}" + (f"  -> {step['fix']}" if step.get("fix") and not step["ok"] else "")

@@ -189,6 +189,16 @@ PixelForge's tools (`claude mcp add pixelforge`); the Forge does the same on its
 been done. The title line tells you where you stand: **Claude: ready**, **Claude: not found (install Claude Code)**
 or **Claude: not signed in**. A line typed before it is ready answers with the same sentence and the fix.
 
+**When the line does nothing: run the doctor first.** Press **Doctor** on Home (or click *Claude: not found* /
+*not signed in* on the title line or the foot, which opens it), or in a terminal `pixelforge claude doctor`. It checks
+six things in order and prints pass or fail for each with one sentence on the fix: (1) the `claude` program is found
+and its version, (2) it is signed in with your account (an API key alone is not enough: run `claude` and type
+`/login`), (3) PixelForge's tools are registered with it (it registers them on the spot and says so), (4) PixelForge's
+own tool server starts and answers, (5) one real round trip: it asks Claude to set the tempo of a scratch song to 80
+and checks that the song file changed (a few seconds; the full log path is printed if it fails), (6) whether Chrome is
+there for the Midjourney road (optional). The lines stay on Home until the next run. The first failed step is the one
+to fix; run it again after.
+
 **When it fails.** The bench says so in one plain line, never a pop-up: *Claude Code was not found...*, *not signed
 in...*, *Claude did not finish within 600 s; it was stopped...*, *Claude stopped at the spending limit for one job*.
 Every run is written to `<project>\claude\logs\` (`pixelforge claude log` prints the last one; Ctrl+L shows the

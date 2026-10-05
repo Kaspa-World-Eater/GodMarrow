@@ -590,6 +590,15 @@ def cmd_claude(a) -> None:
         r = CB.status()
     elif sub == "register":
         r = CB.register(python=a.python)
+    elif sub == "doctor":
+        r = CB.doctor(a.project, timeout=a.timeout, log=None if a.json else print, round_trip=not a.no_round_trip)
+        if a.json:
+            _emit(a, r)
+        else:
+            print(r["sentence"])
+        if not r["ok"]:
+            raise SystemExit(1)
+        return
     elif sub == "log":
         r = CB.last_log(a.project, a.lines)
     else:
@@ -1379,6 +1388,9 @@ def build_parser() -> argparse.ArgumentParser:
     x = cs.add_parser("status", help="ready / not found / not signed in, in a sentence"); x.add_argument("--json", action="store_true")
     x = cs.add_parser("register", help="`claude mcp add -s user pixelforge -- <python> -m pixelforge.cli mcp` (idempotent)"); x.add_argument("--python", default=None); x.add_argument("--json", action="store_true")
     x = cs.add_parser("log", help="the last job's log"); x.add_argument("-p", "--project", default="."); x.add_argument("--lines", type=int, default=40); x.add_argument("--json", action="store_true")
+    x = cs.add_parser("doctor", help="why does the describe line do nothing? six checks in order, pass or fail with the fix: the executable, signed in, registered, the MCP server, a real round trip, Chrome (optional)")
+    x.add_argument("-p", "--project", default=None); x.add_argument("--timeout", type=float, default=180.0, help="seconds the round trip may take")
+    x.add_argument("--no-round-trip", dest="no_round_trip", action="store_true", help="skip the real call to Claude Code (step 5)"); x.add_argument("--json", action="store_true")
     x = cs.add_parser("undo", help="put a snapshot back (the manifest a describe --bench result names)"); x.add_argument("manifest"); x.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_claude)
 
