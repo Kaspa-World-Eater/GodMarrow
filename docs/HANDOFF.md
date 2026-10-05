@@ -2108,3 +2108,11 @@ the surface coordinates, a texel turning with its part, the colours within the r
 runs on one part in the blood ramp, the Hemomancer bleeding in runs not specks, the stock grids, the CLI, `project
 build --dry-run` and the whole road into a scratch game); `check_scripts.gd` 35/0, `test_detail.gd` 20/0,
 `test_editor.gd` 106/0, `test_scene.gd` 21/0; `screens.sh` home and detail at 0 errors.
+
+**Decision, 2026-10-05 (Derek, after the animated side-by-side at https://claude.ai/artifact/L7oZu5aNzDkUaqgbdsY2Zg):**
+"The hand drawn is just way better. That settles it and is the path forward." Characters, creatures and objects are
+hand-drawn shape models (`.shapes.json`, drawn by Claude against the painting, rendered by the Forge), as the Hemomancer
+was. The painting-made-3D road (`tools/pixelforge/model3d.py`, `model_from_views.py`, `rig_model.py`, `trellis_gen.py`)
+was tried the same day. It was closest to the painting standing still, but in motion its fused shell stretched and
+smeared. It is not used; the scripts stay as a record. The game session now draws models for the game (characters,
+creatures, objects), redraws the terrain, and fixes and improves the code (`docs/ACT1_PLAN.md`).
