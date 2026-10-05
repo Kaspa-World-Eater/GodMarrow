@@ -83,18 +83,89 @@
   },
   "veil": {
    "ramp": [
-    "#2a2630",
-    "#423d48",
-    "#5d5862",
-    "#79747e",
-    "#958f98",
-    "#b0aab1",
-    "#c8c2c7",
-    "#dcd7da",
-    "#ece8e9"
+    "#242027",
+    "#38333c",
+    "#4f4952",
+    "#67616a",
+    "#7f7982",
+    "#97919a",
+    "#aea8af",
+    "#c1bbc0",
+    "#d1ccce"
    ],
    "texture": "weave",
    "texture_strength": 0.5
+  },
+  "hatblk": {
+   "ramp": [
+    "#030304",
+    "#070709",
+    "#0c0c0f",
+    "#121216",
+    "#19191e",
+    "#212127",
+    "#2b2b33",
+    "#383843",
+    "#6c6c80"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.35,
+   "rim_edge": true
+  },
+  "silver": {
+   "ramp": [
+    "#2a2c33",
+    "#474a54",
+    "#6a6e7a",
+    "#9196a2",
+    "#b8bdc7",
+    "#dde1e8",
+    "#ffffff"
+   ],
+   "spec": true,
+   "spec_t": 0.75
+  },
+  "eyew": {
+   "ramp": [
+    "#8e8a8c",
+    "#b9b5b5",
+    "#dcd8d6",
+    "#f4f1ee"
+   ]
+  },
+  "skin": {
+   "ramp": [
+    "#2a1e1c",
+    "#43302c",
+    "#5e453e",
+    "#7a5c52",
+    "#957467",
+    "#ad8b7c"
+   ]
+  },
+  "hair": {
+   "ramp": [
+    "#040305",
+    "#0a090c",
+    "#121116",
+    "#1b1a21",
+    "#25242d",
+    "#31303b",
+    "#41414f",
+    "#5a5b6e",
+    "#7c7e94"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.6
+  },
+  "hairw": {
+   "ramp": [
+    "#3c3a40",
+    "#5e5b62",
+    "#827e85",
+    "#a6a1a7",
+    "#c9c4c8"
+   ]
   },
   "mask": {
    "ramp": [
@@ -196,15 +267,6 @@
     "#68605a"
    ]
   },
-  "eye": {
-   "ramp": [
-    "#3a0d5c",
-    "#6a1fa0",
-    "#a14be0",
-    "#d59bff"
-   ],
-   "emissive": true
-  },
   "void": {
    "ramp": [
     "#020103",
@@ -221,6 +283,22 @@
     "sway": 0.6
    },
    "hang": 0.5
+  },
+  "hair": {
+   "bone": "head",
+   "lag": {
+    "frames": 1,
+    "sway": 0.5
+   },
+   "hang": 0.6
+  },
+  "hair_tail": {
+   "bone": "spine.003",
+   "lag": {
+    "frames": 2,
+    "sway": 1.0
+   },
+   "hang": 0.25
   },
   "skirt": {
    "bone": "hips",
@@ -254,14 +332,14 @@
       null
      ],
      "y": [
-      27.0,
-      31.2
+      28.0,
+      31.6
      ],
      "x": [
-      70.8,
-      79.2
+      70.6,
+      79.4
      ],
-     "material": "void"
+     "material": "skin"
     },
     {
      "z": [
@@ -269,14 +347,14 @@
       null
      ],
      "y": [
-      28.0,
-      30.2
+      29.2,
+      30.8
      ],
      "x": [
       71.6,
       73.8
      ],
-     "material": "eye"
+     "material": "eyew"
     },
     {
      "z": [
@@ -284,14 +362,14 @@
       null
      ],
      "y": [
-      28.0,
-      30.2
+      29.2,
+      30.8
      ],
      "x": [
       76.2,
       78.4
      ],
-     "material": "eye"
+     "material": "eyew"
     }
    ]
   },
@@ -308,7 +386,7 @@
     1.3,
     18.0
    ],
-   "material": "straw",
+   "material": "hatblk",
    "bone": "head",
    "rules": [
     {
@@ -345,7 +423,7 @@
     6.4,
     1.0
    ],
-   "material": "straw",
+   "material": "hatblk",
    "bone": "head",
    "rules": [
     {
@@ -357,6 +435,151 @@
      "t": -1
     }
    ]
+  },
+  {
+   "name": "hat_edge",
+   "kind": "ring",
+   "y": [
+    20.0,
+    20.9
+   ],
+   "rx": [
+    19.3,
+    0.0
+   ],
+   "rz": [
+    18.3,
+    0.0
+   ],
+   "cz": 0.4,
+   "thickness": 0.9,
+   "material": "silver",
+   "bone": "head",
+   "rules": [
+    {
+     "every_angle": [
+      48,
+      0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "tassel_knot",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    14.0,
+    0.2
+   ],
+   "radii": [
+    1.4,
+    1.2,
+    1.4
+   ],
+   "material": "violet",
+   "bone": "head"
+  },
+  {
+   "name": "tassel0",
+   "kind": "capsule",
+   "a": [
+    75.6,
+    14.2,
+    0.38
+   ],
+   "b": [
+    79.0,
+    17.5,
+    0.8
+   ],
+   "r": [
+    0.6,
+    0.3
+   ],
+   "material": "violet",
+   "part": "hair"
+  },
+  {
+   "name": "tassel1",
+   "kind": "capsule",
+   "a": [
+    75.6,
+    14.2,
+    0.020000000000000018
+   ],
+   "b": [
+    79.6,
+    17.06,
+    -0.39999999999999997
+   ],
+   "r": [
+    0.6,
+    0.3
+   ],
+   "material": "violet",
+   "part": "hair"
+  },
+  {
+   "name": "tassel2",
+   "kind": "capsule",
+   "a": [
+    75.6,
+    14.2,
+    0.62
+   ],
+   "b": [
+    78.39999999999999,
+    17.28,
+    1.5999999999999999
+   ],
+   "r": [
+    0.6,
+    0.3
+   ],
+   "material": "violet",
+   "part": "hair"
+  },
+  {
+   "name": "tassel3",
+   "kind": "capsule",
+   "a": [
+    75.6,
+    14.2,
+    -0.27999999999999997
+   ],
+   "b": [
+    79.39999999999999,
+    16.73,
+    -1.4000000000000001
+   ],
+   "r": [
+    0.6,
+    0.3
+   ],
+   "material": "violet",
+   "part": "hair"
+  },
+  {
+   "name": "tassel4",
+   "kind": "capsule",
+   "a": [
+    75.6,
+    14.2,
+    0.14
+   ],
+   "b": [
+    78.6,
+    17.83,
+    0.0
+   ],
+   "r": [
+    0.6,
+    0.3
+   ],
+   "material": "violet",
+   "part": "hair"
   },
   {
    "name": "hat_cord",
@@ -379,46 +602,33 @@
    "name": "veil",
    "kind": "ring",
    "y": [
-    21.0,
-    44
+    31.4,
+    37.4
    ],
    "rx": [
-    7.0,
-    0.34
+    6.0,
+    0.12
    ],
    "rz": [
-    7.0,
-    0.26
+    6.2,
+    0.1
    ],
-   "cz": 0.4,
-   "thickness": 1.4,
-   "open": {
-    "angle": 0.62,
-    "below": 21.0
+   "cz": 0.8,
+   "thickness": 1.0,
+   "keep": {
+    "front": 1.15
    },
    "hem": {
-    "tongues": 10,
-    "depth": 10,
+    "tongues": 5,
+    "depth": 2.6,
     "seed": 5
-   },
-   "holes": {
-    "p": 0.06,
-    "band": 10,
-    "seed": 2
    },
    "material": "veil",
    "part": "veil",
-   "bump": {
-    "folds": [
-     0.5,
-     8,
-     1.6
-    ]
-   },
    "rules": [
     {
      "every_angle": [
-      7,
+      10,
       0
      ],
      "t": -1
@@ -426,18 +636,18 @@
     {
      "hem_band": [
       0,
-      2
+      1.2
      ],
      "t": -2
     },
     {
      "hash": [
-      0.22,
+      0.2,
       2,
       7
      ],
      "y": [
-      36.0,
+      33.0,
       null
      ],
      "material": "violet"
@@ -453,51 +663,888 @@
    ]
   },
   {
-   "name": "veil_front",
-   "kind": "ring",
-   "y": [
+   "name": "veil_tieR",
+   "kind": "capsule",
+   "a": [
+    69.4,
+    31.0,
+    1.4
+   ],
+   "b": [
+    70.0,
     30.6,
-    46
+    -3.6
    ],
-   "rx": [
-    6.0,
-    0.24
-   ],
-   "rz": [
-    6.4,
-    0.2
-   ],
-   "cz": 0.6,
-   "thickness": 1.2,
-   "keep": {
-    "front": 0.7
-   },
-   "hem": {
-    "tongues": 5,
-    "depth": 8,
-    "seed": 13
-   },
+   "r": 0.5,
    "material": "veil",
-   "part": "veil",
+   "bone": "head"
+  },
+  {
+   "name": "veil_tieL",
+   "kind": "capsule",
+   "a": [
+    80.6,
+    31.0,
+    1.4
+   ],
+   "b": [
+    80.0,
+    30.6,
+    -3.6
+   ],
+   "r": 0.5,
+   "material": "veil",
+   "bone": "head"
+  },
+  {
+   "name": "hair_back",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    24.0,
+    -3.8
+   ],
+   "b": [
+    75.0,
+    36.0,
+    -6.4
+   ],
+   "r": [
+    6.0,
+    3.6
+   ],
+   "material": "hair",
+   "part": "hair",
    "rules": [
     {
-     "every_angle": [
-      6,
+     "y": [
+      null,
+      25.6
+     ],
+     "material": "hairw"
+    },
+    {
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "hair_tie",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    37.0,
+    -8.6
+   ],
+   "radii": [
+    2.6,
+    1.4,
+    2.2
+   ],
+   "material": "rope",
+   "part": "hair"
+  },
+  {
+   "name": "braid0",
+   "kind": "ellipsoid",
+   "centre": [
+    74.1,
+    39.0,
+    -10.6
+   ],
+   "radii": [
+    3.0,
+    2.6,
+    2.7
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid1",
+   "kind": "ellipsoid",
+   "centre": [
+    75.91714285714286,
+    43.14285714285714,
+    -10.985714285714286
+   ],
+   "radii": [
+    2.914285714285714,
+    2.6,
+    2.6228571428571428
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
       1
      ],
      "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid2",
+   "kind": "ellipsoid",
+   "centre": [
+    74.23714285714286,
+    47.285714285714285,
+    -11.371428571428572
+   ],
+   "radii": [
+    2.8285714285714287,
+    2.6,
+    2.545714285714286
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
     },
     {
-     "hash": [
-      0.18,
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid3",
+   "kind": "ellipsoid",
+   "centre": [
+    75.95142857142858,
+    51.42857142857143,
+    -11.757142857142856
+   ],
+   "radii": [
+    2.742857142857143,
+    2.6,
+    2.468571428571429
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid4",
+   "kind": "ellipsoid",
+   "centre": [
+    74.37428571428572,
+    55.57142857142857,
+    -12.142857142857142
+   ],
+   "radii": [
+    2.657142857142857,
+    2.6,
+    2.3914285714285715
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid5",
+   "kind": "ellipsoid",
+   "centre": [
+    75.98571428571428,
+    59.714285714285715,
+    -12.528571428571428
+   ],
+   "radii": [
+    2.5714285714285716,
+    2.6,
+    2.3142857142857145
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid6",
+   "kind": "ellipsoid",
+   "centre": [
+    74.51142857142857,
+    63.857142857142854,
+    -12.914285714285715
+   ],
+   "radii": [
+    2.4857142857142858,
+    2.6,
+    2.237142857142857
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid7",
+   "kind": "ellipsoid",
+   "centre": [
+    76.02,
+    68.0,
+    -13.3
+   ],
+   "radii": [
+    2.4,
+    2.6,
+    2.16
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid8",
+   "kind": "ellipsoid",
+   "centre": [
+    74.64857142857143,
+    72.14285714285714,
+    -13.685714285714285
+   ],
+   "radii": [
+    2.3142857142857145,
+    2.6,
+    2.082857142857143
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid9",
+   "kind": "ellipsoid",
+   "centre": [
+    76.05428571428571,
+    76.28571428571429,
+    -14.071428571428571
+   ],
+   "radii": [
+    2.2285714285714286,
+    2.6,
+    2.005714285714286
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid10",
+   "kind": "ellipsoid",
+   "centre": [
+    74.78571428571429,
+    80.42857142857143,
+    -14.457142857142857
+   ],
+   "radii": [
+    2.142857142857143,
+    2.6,
+    1.9285714285714286
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid11",
+   "kind": "ellipsoid",
+   "centre": [
+    76.08857142857143,
+    84.57142857142857,
+    -14.842857142857142
+   ],
+   "radii": [
+    2.057142857142857,
+    2.6,
+    1.8514285714285712
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid12",
+   "kind": "ellipsoid",
+   "centre": [
+    74.92285714285715,
+    88.71428571428571,
+    -15.228571428571428
+   ],
+   "radii": [
+    1.9714285714285715,
+    2.6,
+    1.7742857142857145
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid13",
+   "kind": "ellipsoid",
+   "centre": [
+    76.12285714285714,
+    92.85714285714286,
+    -15.614285714285714
+   ],
+   "radii": [
+    1.8857142857142857,
+    2.6,
+    1.697142857142857
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid14",
+   "kind": "ellipsoid",
+   "centre": [
+    75.05999999999999,
+    97.0,
+    -16.0
+   ],
+   "radii": [
+    1.8,
+    2.6,
+    1.62
+   ],
+   "material": "hair",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "braid_cord",
+   "kind": "ellipsoid",
+   "centre": [
+    75.6,
+    98.6,
+    -16.2
+   ],
+   "radii": [
+    1.6,
+    1.0,
+    1.4
+   ],
+   "material": "rope",
+   "part": "hair_tail"
+  },
+  {
+   "name": "braid_end",
+   "kind": "capsule",
+   "a": [
+    75.6,
+    99.4,
+    -16.2
+   ],
+   "b": [
+    75.9,
+    105.0,
+    -16.8
+   ],
+   "r": [
+    1.2,
+    0.3
+   ],
+   "material": "hair",
+   "part": "hair_tail"
+  },
+  {
+   "name": "braid_tie0",
+   "kind": "ellipsoid",
+   "centre": [
+    75.13448275862069,
+    52.0,
+    -12.210344827586207
+   ],
+   "radii": [
+    2.2,
+    0.8,
+    1.9
+   ],
+   "material": "rope",
+   "part": "hair_tail"
+  },
+  {
+   "name": "braid_tal0",
+   "kind": "box",
+   "centre": [
+    72.93448275862069,
+    55.800000000000004,
+    -14.810344827586206
+   ],
+   "half": [
+    2.2,
+    4.2,
+    0.25
+   ],
+   "round": 0.15,
+   "material": "paper",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "x": [
+      73.13448275862069,
+      73.9344827586207
+     ],
+     "every_y": [
       2,
-      9
+      1
      ],
+     "material": "ink"
+    },
+    {
+     "dy": [
+      1.8000000000000003,
+      2.9000000000000004
+     ],
+     "material": "seal"
+    }
+   ]
+  },
+  {
+   "name": "braid_tie1",
+   "kind": "ellipsoid",
+   "centre": [
+    75.3,
+    68.0,
+    -13.700000000000001
+   ],
+   "radii": [
+    2.2,
+    0.8,
+    1.9
+   ],
+   "material": "rope",
+   "part": "hair_tail"
+  },
+  {
+   "name": "braid_tal1",
+   "kind": "box",
+   "centre": [
+    77.5,
+    72.19999999999999,
+    -16.3
+   ],
+   "half": [
+    2.2,
+    4.6,
+    0.25
+   ],
+   "round": 0.15,
+   "material": "paper",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "x": [
+      76.49999999999999,
+      77.3
+     ],
+     "every_y": [
+      2,
+      1
+     ],
+     "material": "ink"
+    },
+    {
+     "dy": [
+      2.2,
+      3.3000000000000003
+     ],
+     "material": "seal"
+    }
+   ]
+  },
+  {
+   "name": "braid_tie2",
+   "kind": "ellipsoid",
+   "centre": [
+    75.46551724137932,
+    84.0,
+    -15.189655172413794
+   ],
+   "radii": [
+    2.2,
+    0.8,
+    1.9
+   ],
+   "material": "rope",
+   "part": "hair_tail"
+  },
+  {
+   "name": "braid_tal2",
+   "kind": "box",
+   "centre": [
+    73.26551724137931,
+    87.6,
+    -17.789655172413795
+   ],
+   "half": [
+    2.2,
+    4.0,
+    0.25
+   ],
+   "round": 0.15,
+   "material": "paper",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "x": [
+      73.46551724137932,
+      74.26551724137933
+     ],
+     "every_y": [
+      2,
+      1
+     ],
+     "material": "ink"
+    },
+    {
+     "dy": [
+      1.6,
+      2.7
+     ],
+     "material": "seal"
+    }
+   ]
+  },
+  {
+   "name": "braid_tie3",
+   "kind": "ellipsoid",
+   "centre": [
+    75.6351724137931,
+    100.4,
+    -16.71655172413793
+   ],
+   "radii": [
+    2.2,
+    0.8,
+    1.9
+   ],
+   "material": "rope",
+   "part": "hair_tail"
+  },
+  {
+   "name": "braid_tal3",
+   "kind": "box",
+   "centre": [
+    77.8351724137931,
+    105.0,
+    -19.31655172413793
+   ],
+   "half": [
+    2.2,
+    5.0,
+    0.25
+   ],
+   "round": 0.15,
+   "material": "paper",
+   "part": "hair_tail",
+   "rules": [
+    {
+     "x": [
+      76.83517241379309,
+      77.6351724137931
+     ],
+     "every_y": [
+      2,
+      1
+     ],
+     "material": "ink"
+    },
+    {
+     "dy": [
+      2.6,
+      3.7
+     ],
+     "material": "seal"
+    }
+   ]
+  },
+  {
+   "name": "lockR",
+   "kind": "capsule",
+   "a": [
+    70.2,
+    24.0,
+    3.6
+   ],
+   "b": [
+    69.4,
+    41.0,
+    5.6
+   ],
+   "r": [
+    1.8,
+    0.6
+   ],
+   "material": "hair",
+   "part": "hair",
+   "rules": [
+    {
      "y": [
-      38.0,
-      null
+      null,
+      25.4
      ],
-     "material": "violet"
+     "material": "hairw"
+    },
+    {
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "lockL",
+   "kind": "capsule",
+   "a": [
+    79.8,
+    24.0,
+    3.6
+   ],
+   "b": [
+    80.6,
+    41.0,
+    5.6
+   ],
+   "r": [
+    1.8,
+    0.6
+   ],
+   "material": "hair",
+   "part": "hair",
+   "rules": [
+    {
+     "y": [
+      null,
+      25.4
+     ],
+     "material": "hairw"
+    },
+    {
+     "every_x": [
+      1,
+      0
+     ],
+     "t": -1
     }
    ]
   },
@@ -588,17 +1635,169 @@
      "material": "lace"
     },
     {
-     "x": [
-      74.4,
-      75.6
+     "every_y": [
+      6,
+      2
      ],
-     "z": [
-      6.0,
-      null
-     ],
-     "t": 2
+     "material": "silver",
+     "t": -1
     }
    ]
+  },
+  {
+   "name": "bustR",
+   "kind": "ellipsoid",
+   "centre": [
+    71.0,
+    49.6,
+    6.2
+   ],
+   "radii": [
+    4.6,
+    4.2,
+    3.6
+   ],
+   "material": "lacquer",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -3
+    },
+    {
+     "every_y": [
+      3,
+      1
+     ],
+     "every_x": [
+      2,
+      0
+     ],
+     "material": "lace"
+    },
+    {
+     "dy": [
+      null,
+      -1.6
+     ],
+     "material": "silver",
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "bustL",
+   "kind": "ellipsoid",
+   "centre": [
+    79.0,
+    49.6,
+    6.2
+   ],
+   "radii": [
+    4.6,
+    4.2,
+    3.6
+   ],
+   "material": "lacquer",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -3
+    },
+    {
+     "every_y": [
+      3,
+      1
+     ],
+     "every_x": [
+      2,
+      0
+     ],
+     "material": "lace"
+    },
+    {
+     "dy": [
+      null,
+      -1.6
+     ],
+     "material": "silver",
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "cleavage",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    41.8,
+    7.4
+   ],
+   "b": [
+    75.0,
+    47.4,
+    9.0
+   ],
+   "r": [
+    2.2,
+    0.5
+   ],
+   "material": "skin",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "x": [
+      74.6,
+      75.4
+     ],
+     "y": [
+      44.0,
+      null
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "necklineR",
+   "kind": "capsule",
+   "a": [
+    69.4,
+    41.0,
+    6.0
+   ],
+   "b": [
+    74.4,
+    48.4,
+    9.4
+   ],
+   "r": 0.45,
+   "material": "silver",
+   "bone": "spine.003"
+  },
+  {
+   "name": "necklineL",
+   "kind": "capsule",
+   "a": [
+    80.6,
+    41.0,
+    6.0
+   ],
+   "b": [
+    75.6,
+    48.4,
+    9.4
+   ],
+   "r": 0.45,
+   "material": "silver",
+   "bone": "spine.003"
   },
   {
    "name": "do_low",
@@ -1156,10 +2355,6 @@
       3.9,
       5.1
      ],
-     "x": [
-      78.60000000000001,
-      80.2
-     ],
      "material": "seal"
     },
     {
@@ -1204,10 +2399,6 @@
       2.6999999999999997,
       3.9
      ],
-     "x": [
-      81.8,
-      83.39999999999999
-     ],
      "material": "seal"
     },
     {
@@ -1224,13 +2415,13 @@
    "name": "tal_chest",
    "kind": "box",
    "centre": [
-    69.6,
-    50.0,
-    9.6
+    66.8,
+    51.0,
+    8.0
    ],
    "half": [
     2.2,
-    5.0,
+    4.0,
     0.25
    ],
    "round": 0.15,
@@ -1238,8 +2429,8 @@
    "rules": [
     {
      "x": [
-      69.19999999999999,
-      70.0
+      66.39999999999999,
+      67.2
      ],
      "every_y": [
       2,
@@ -1249,19 +2440,15 @@
     },
     {
      "dy": [
-      3.4,
-      4.6
-     ],
-     "x": [
-      68.8,
-      70.39999999999999
+      2.4,
+      3.6
      ],
      "material": "seal"
     },
     {
      "dy": [
       null,
-      -4.4
+      -3.4
      ],
      "t": -2
     }
@@ -1299,10 +2486,6 @@
      "dy": [
       2.9,
       4.1
-     ],
-     "x": [
-      74.2,
-      75.8
      ],
      "material": "seal"
     },
@@ -1525,6 +2708,212 @@
    ]
   },
   {
+   "name": "bandolier",
+   "kind": "capsule",
+   "a": [
+    64.4,
+    41.0,
+    6.4
+   ],
+   "b": [
+    85.8,
+    67.0,
+    8.6
+   ],
+   "r": 1.3,
+   "material": "rope",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "bgourd0_top",
+   "kind": "ellipsoid",
+   "centre": [
+    68.25200000000001,
+    47.48,
+    9.196
+   ],
+   "radii": [
+    1.6,
+    1.6,
+    1.4
+   ],
+   "material": "gourd",
+   "bone": "spine.002"
+  },
+  {
+   "name": "bgourd0",
+   "kind": "ellipsoid",
+   "centre": [
+    68.25200000000001,
+    50.68,
+    9.196
+   ],
+   "radii": [
+    2.5,
+    2.6,
+    2.2
+   ],
+   "material": "gourd",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -0.6
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "urn1",
+   "kind": "ellipsoid",
+   "centre": [
+    72.96000000000001,
+    54.8,
+    9.68
+   ],
+   "radii": [
+    2.6,
+    2.9899999999999998,
+    2.3400000000000003
+   ],
+   "material": "gourd",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.04
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      -0.3,
+      0.3
+     ],
+     "material": "silver",
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "urn1_lid",
+   "kind": "ellipsoid",
+   "centre": [
+    72.96000000000001,
+    51.809999999999995,
+    9.68
+   ],
+   "radii": [
+    1.56,
+    0.78,
+    1.56
+   ],
+   "material": "silver",
+   "bone": "spine.002"
+  },
+  {
+   "name": "bgourd2_top",
+   "kind": "ellipsoid",
+   "centre": [
+    77.668,
+    58.92,
+    10.164
+   ],
+   "radii": [
+    1.6,
+    1.6,
+    1.4
+   ],
+   "material": "gourd",
+   "bone": "spine.002"
+  },
+  {
+   "name": "bgourd2",
+   "kind": "ellipsoid",
+   "centre": [
+    77.668,
+    62.120000000000005,
+    10.164
+   ],
+   "radii": [
+    2.5,
+    2.6,
+    2.2
+   ],
+   "material": "gourd",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -0.6
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "urn3",
+   "kind": "ellipsoid",
+   "centre": [
+    82.376,
+    66.24000000000001,
+    10.648000000000001
+   ],
+   "radii": [
+    2.6,
+    2.9899999999999998,
+    2.3400000000000003
+   ],
+   "material": "gourd",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.04
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      -0.3,
+      0.3
+     ],
+     "material": "silver",
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "urn3_lid",
+   "kind": "ellipsoid",
+   "centre": [
+    82.376,
+    63.25000000000001,
+    10.648000000000001
+   ],
+   "radii": [
+    1.56,
+    0.78,
+    1.56
+   ],
+   "material": "silver",
+   "bone": "spine.002"
+  },
+  {
    "name": "sode0.L",
    "kind": "box",
    "centre": [
@@ -1718,6 +3107,377 @@
    "bone": "upper_arm.L"
   },
   {
+   "name": "sode_cap.L",
+   "kind": "ellipsoid",
+   "centre": [
+    89.4,
+    43.2,
+    -0.4
+   ],
+   "radii": [
+    5.4,
+    2.6,
+    8.0
+   ],
+   "material": "lacquer",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      0.9,
+      null
+     ],
+     "material": "silver"
+    },
+    {
+     "dy": [
+      -0.2,
+      0.6
+     ],
+     "every_z": [
+      3,
+      1
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "sode_rim0.L",
+   "kind": "box",
+   "centre": [
+    94.0,
+    46.3,
+    -0.4
+   ],
+   "half": [
+    0.3,
+    0.5,
+    7.5
+   ],
+   "round": 0.15,
+   "material": "silver",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "t": -2
+    },
+    {
+     "every_z": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "sode_rim1.L",
+   "kind": "box",
+   "centre": [
+    95.1,
+    49.9,
+    -0.4
+   ],
+   "half": [
+    0.3,
+    0.5,
+    7.5
+   ],
+   "round": 0.15,
+   "material": "silver",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "t": -2
+    },
+    {
+     "every_z": [
+      3,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "sode_rim2.L",
+   "kind": "box",
+   "centre": [
+    96.2,
+    53.5,
+    -0.4
+   ],
+   "half": [
+    0.3,
+    0.5,
+    7.5
+   ],
+   "round": 0.15,
+   "material": "silver",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "t": -2
+    },
+    {
+     "every_z": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "sode_rim3.L",
+   "kind": "box",
+   "centre": [
+    97.3,
+    57.099999999999994,
+    -0.4
+   ],
+   "half": [
+    0.3,
+    0.5,
+    7.5
+   ],
+   "round": 0.15,
+   "material": "silver",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "t": -2
+    },
+    {
+     "every_z": [
+      3,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "sode_crest.L",
+   "kind": "ellipsoid",
+   "centre": [
+    93.6,
+    50.0,
+    6.8
+   ],
+   "radii": [
+    0.6,
+    2.2,
+    2.2
+   ],
+   "material": "silver",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "near": [
+      [
+       [
+        null,
+        50.0,
+        6.8
+       ],
+       [
+        null,
+        50.0,
+        6.8
+       ]
+      ],
+      1.0
+     ],
+     "material": "violet"
+    }
+   ]
+  },
+  {
+   "name": "sode_tassel0.L",
+   "kind": "capsule",
+   "a": [
+    94.4,
+    58.0,
+    -5.6
+   ],
+   "b": [
+    94.8,
+    64.0,
+    -5.199999999999999
+   ],
+   "r": [
+    0.7,
+    0.4
+   ],
+   "material": "violet",
+   "part": "hair"
+  },
+  {
+   "name": "sode_tassel1.L",
+   "kind": "capsule",
+   "a": [
+    94.4,
+    58.0,
+    5.6
+   ],
+   "b": [
+    94.8,
+    64.0,
+    6.0
+   ],
+   "r": [
+    0.7,
+    0.4
+   ],
+   "material": "violet",
+   "part": "hair"
+  },
+  {
+   "name": "tal_sode0.L",
+   "kind": "box",
+   "centre": [
+    94.9,
+    49.9,
+    -2.4
+   ],
+   "half": [
+    0.25,
+    4.5,
+    2.0
+   ],
+   "round": 0.15,
+   "material": "paper",
+   "rules": [
+    {
+     "z": [
+      -2.8,
+      -2.0
+     ],
+     "every_y": [
+      2,
+      1
+     ],
+     "material": "ink"
+    },
+    {
+     "dy": [
+      2.9,
+      4.1
+     ],
+     "material": "seal"
+    },
+    {
+     "dy": [
+      null,
+      -3.9
+     ],
+     "t": -2
+    }
+   ],
+   "bone": "upper_arm.L"
+  },
+  {
+   "name": "tal_sode1.L",
+   "kind": "box",
+   "centre": [
+    94.7,
+    50.5,
+    2.6
+   ],
+   "half": [
+    0.25,
+    3.5,
+    2.0
+   ],
+   "round": 0.15,
+   "material": "paper",
+   "rules": [
+    {
+     "z": [
+      2.2,
+      3.0
+     ],
+     "every_y": [
+      2,
+      1
+     ],
+     "material": "ink"
+    },
+    {
+     "dy": [
+      1.9,
+      3.1
+     ],
+     "material": "seal"
+    },
+    {
+     "dy": [
+      null,
+      -2.9
+     ],
+     "t": -2
+    }
+   ],
+   "bone": "upper_arm.L"
+  },
+  {
+   "name": "tal_sodef.L",
+   "kind": "box",
+   "centre": [
+    91.4,
+    48.6,
+    7.6
+   ],
+   "half": [
+    2.2,
+    4.0,
+    0.25
+   ],
+   "round": 0.15,
+   "material": "paper",
+   "rules": [
+    {
+     "x": [
+      91.0,
+      91.80000000000001
+     ],
+     "every_y": [
+      2,
+      1
+     ],
+     "material": "ink"
+    },
+    {
+     "dy": [
+      2.4,
+      3.6
+     ],
+     "material": "seal"
+    },
+    {
+     "dy": [
+      null,
+      -3.4
+     ],
+     "t": -2
+    }
+   ],
+   "bone": "upper_arm.L"
+  },
+  {
    "name": "upper_arm.L",
    "kind": "capsule",
    "a": [
@@ -1782,7 +3542,8 @@
       1.0,
       null
      ],
-     "t": 2
+     "material": "silver",
+     "t": -1
     }
    ]
   },
@@ -2041,10 +3802,11 @@
     },
     {
      "dy": [
-      5.0,
+      5.2,
       null
      ],
-     "t": 1
+     "material": "silver",
+     "t": -1
     }
    ]
   },
@@ -2324,6 +4086,377 @@
    "bone": "upper_arm.R"
   },
   {
+   "name": "sode_cap.R",
+   "kind": "ellipsoid",
+   "centre": [
+    60.599999999999994,
+    43.2,
+    -0.4
+   ],
+   "radii": [
+    5.4,
+    2.6,
+    8.0
+   ],
+   "material": "lacquer",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.2
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      0.9,
+      null
+     ],
+     "material": "silver"
+    },
+    {
+     "dy": [
+      -0.2,
+      0.6
+     ],
+     "every_z": [
+      3,
+      1
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "sode_rim0.R",
+   "kind": "box",
+   "centre": [
+    56.0,
+    46.3,
+    -0.4
+   ],
+   "half": [
+    0.3,
+    0.5,
+    7.5
+   ],
+   "round": 0.15,
+   "material": "silver",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "t": -2
+    },
+    {
+     "every_z": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "sode_rim1.R",
+   "kind": "box",
+   "centre": [
+    54.900000000000006,
+    49.9,
+    -0.4
+   ],
+   "half": [
+    0.3,
+    0.5,
+    7.5
+   ],
+   "round": 0.15,
+   "material": "silver",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "t": -2
+    },
+    {
+     "every_z": [
+      3,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "sode_rim2.R",
+   "kind": "box",
+   "centre": [
+    53.8,
+    53.5,
+    -0.4
+   ],
+   "half": [
+    0.3,
+    0.5,
+    7.5
+   ],
+   "round": 0.15,
+   "material": "silver",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "t": -2
+    },
+    {
+     "every_z": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "sode_rim3.R",
+   "kind": "box",
+   "centre": [
+    52.7,
+    57.099999999999994,
+    -0.4
+   ],
+   "half": [
+    0.3,
+    0.5,
+    7.5
+   ],
+   "round": 0.15,
+   "material": "silver",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "t": -2
+    },
+    {
+     "every_z": [
+      3,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "sode_crest.R",
+   "kind": "ellipsoid",
+   "centre": [
+    56.400000000000006,
+    50.0,
+    6.8
+   ],
+   "radii": [
+    0.6,
+    2.2,
+    2.2
+   ],
+   "material": "silver",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "near": [
+      [
+       [
+        null,
+        50.0,
+        6.8
+       ],
+       [
+        null,
+        50.0,
+        6.8
+       ]
+      ],
+      1.0
+     ],
+     "material": "violet"
+    }
+   ]
+  },
+  {
+   "name": "sode_tassel0.R",
+   "kind": "capsule",
+   "a": [
+    55.599999999999994,
+    58.0,
+    -5.6
+   ],
+   "b": [
+    55.2,
+    64.0,
+    -5.199999999999999
+   ],
+   "r": [
+    0.7,
+    0.4
+   ],
+   "material": "violet",
+   "part": "hair"
+  },
+  {
+   "name": "sode_tassel1.R",
+   "kind": "capsule",
+   "a": [
+    55.599999999999994,
+    58.0,
+    5.6
+   ],
+   "b": [
+    55.2,
+    64.0,
+    6.0
+   ],
+   "r": [
+    0.7,
+    0.4
+   ],
+   "material": "violet",
+   "part": "hair"
+  },
+  {
+   "name": "tal_sode0.R",
+   "kind": "box",
+   "centre": [
+    55.099999999999994,
+    49.9,
+    -2.4
+   ],
+   "half": [
+    0.25,
+    4.5,
+    2.0
+   ],
+   "round": 0.15,
+   "material": "paper",
+   "rules": [
+    {
+     "z": [
+      -2.8,
+      -2.0
+     ],
+     "every_y": [
+      2,
+      1
+     ],
+     "material": "ink"
+    },
+    {
+     "dy": [
+      2.9,
+      4.1
+     ],
+     "material": "seal"
+    },
+    {
+     "dy": [
+      null,
+      -3.9
+     ],
+     "t": -2
+    }
+   ],
+   "bone": "upper_arm.R"
+  },
+  {
+   "name": "tal_sode1.R",
+   "kind": "box",
+   "centre": [
+    55.3,
+    50.5,
+    2.6
+   ],
+   "half": [
+    0.25,
+    3.5,
+    2.0
+   ],
+   "round": 0.15,
+   "material": "paper",
+   "rules": [
+    {
+     "z": [
+      2.2,
+      3.0
+     ],
+     "every_y": [
+      2,
+      1
+     ],
+     "material": "ink"
+    },
+    {
+     "dy": [
+      1.9,
+      3.1
+     ],
+     "material": "seal"
+    },
+    {
+     "dy": [
+      null,
+      -2.9
+     ],
+     "t": -2
+    }
+   ],
+   "bone": "upper_arm.R"
+  },
+  {
+   "name": "tal_sodef.R",
+   "kind": "box",
+   "centre": [
+    58.599999999999994,
+    48.6,
+    7.6
+   ],
+   "half": [
+    2.2,
+    4.0,
+    0.25
+   ],
+   "round": 0.15,
+   "material": "paper",
+   "rules": [
+    {
+     "x": [
+      58.199999999999996,
+      58.99999999999999
+     ],
+     "every_y": [
+      2,
+      1
+     ],
+     "material": "ink"
+    },
+    {
+     "dy": [
+      2.4,
+      3.6
+     ],
+     "material": "seal"
+    },
+    {
+     "dy": [
+      null,
+      -3.4
+     ],
+     "t": -2
+    }
+   ],
+   "bone": "upper_arm.R"
+  },
+  {
    "name": "upper_arm.R",
    "kind": "capsule",
    "a": [
@@ -2388,7 +4521,8 @@
       1.0,
       null
      ],
-     "t": 2
+     "material": "silver",
+     "t": -1
     }
    ]
   },
@@ -2647,10 +4781,11 @@
     },
     {
      "dy": [
-      5.0,
+      5.2,
       null
      ],
-     "t": 1
+     "material": "silver",
+     "t": -1
     }
    ]
   },
@@ -2747,14 +4882,53 @@
   "colour": "#4b4a4f"
  },
  "detail": {
+  "hat_edge": {
+   "file": "keeper_hd.detail/hat_edge.png"
+  },
+  "tassel_knot": {
+   "file": "keeper_hd.detail/tassel_knot.png"
+  },
+  "hair": {
+   "file": "keeper_hd.detail/hair.png"
+  },
   "veil": {
    "file": "keeper_hd.detail/veil.png"
+  },
+  "veil_tieR": {
+   "file": "keeper_hd.detail/veil_tieR.png"
+  },
+  "veil_tieL": {
+   "file": "keeper_hd.detail/veil_tieL.png"
+  },
+  "hair_tail": {
+   "file": "keeper_hd.detail/hair_tail.png"
   },
   "do": {
    "file": "keeper_hd.detail/do.png"
   },
+  "bustR": {
+   "file": "keeper_hd.detail/bustR.png"
+  },
+  "bustL": {
+   "file": "keeper_hd.detail/bustL.png"
+  },
+  "cleavage": {
+   "file": "keeper_hd.detail/cleavage.png"
+  },
+  "necklineR": {
+   "file": "keeper_hd.detail/necklineR.png"
+  },
+  "necklineL": {
+   "file": "keeper_hd.detail/necklineL.png"
+  },
   "do_low": {
    "file": "keeper_hd.detail/do_low.png"
+  },
+  "urn1_lid": {
+   "file": "keeper_hd.detail/urn1_lid.png"
+  },
+  "urn3_lid": {
+   "file": "keeper_hd.detail/urn3_lid.png"
   },
   "sode0.L": {
    "file": "keeper_hd.detail/sode0.L.png"
@@ -2770,6 +4944,24 @@
   },
   "sode_cord.L": {
    "file": "keeper_hd.detail/sode_cord.L.png"
+  },
+  "sode_cap.L": {
+   "file": "keeper_hd.detail/sode_cap.L.png"
+  },
+  "sode_rim0.L": {
+   "file": "keeper_hd.detail/sode_rim0.L.png"
+  },
+  "sode_rim1.L": {
+   "file": "keeper_hd.detail/sode_rim1.L.png"
+  },
+  "sode_rim2.L": {
+   "file": "keeper_hd.detail/sode_rim2.L.png"
+  },
+  "sode_rim3.L": {
+   "file": "keeper_hd.detail/sode_rim3.L.png"
+  },
+  "sode_crest.L": {
+   "file": "keeper_hd.detail/sode_crest.L.png"
   },
   "upper_arm.L": {
    "file": "keeper_hd.detail/upper_arm.L.png"
@@ -2806,6 +4998,24 @@
   },
   "sode_cord.R": {
    "file": "keeper_hd.detail/sode_cord.R.png"
+  },
+  "sode_cap.R": {
+   "file": "keeper_hd.detail/sode_cap.R.png"
+  },
+  "sode_rim0.R": {
+   "file": "keeper_hd.detail/sode_rim0.R.png"
+  },
+  "sode_rim1.R": {
+   "file": "keeper_hd.detail/sode_rim1.R.png"
+  },
+  "sode_rim2.R": {
+   "file": "keeper_hd.detail/sode_rim2.R.png"
+  },
+  "sode_rim3.R": {
+   "file": "keeper_hd.detail/sode_rim3.R.png"
+  },
+  "sode_crest.R": {
+   "file": "keeper_hd.detail/sode_crest.R.png"
   },
   "upper_arm.R": {
    "file": "keeper_hd.detail/upper_arm.R.png"
