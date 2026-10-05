@@ -94,6 +94,8 @@ pixelforge project new <folder> [--name N] [--style godmarrow|gothic_hd|rendered
 pixelforge project status --json
 pixelforge project set [--style S [--character C]] [--blender PATH] [--directions 8] [--render-size 256] [--godot-res-dir res://sprites]
 pixelforge styles [--json]                       # the look presets and every number each fixes
+pixelforge tools status [--json]                 # the free tools (Aseprite, ffmpeg, Furnace, Tiled...): found or not, version, the install sentence; see "Tool adapters"
+pixelforge job start "<sentence>" -p P           # one sentence across benches -> Claude's plan, carried out step by step; job list|status|log|approve|cancel|resume|report; see "Jobs"
 pixelforge styles --demo OUT [--source front.png] [--only snes,indie] [--effect wisp]   # a GIF per look + contact sheet + styles.json
 
 pixelforge project add <character> --describe "<one sentence>"
@@ -709,7 +711,7 @@ well: a project named PixelForge is not the game). What the app runs, per bench:
 | Interface | `ui9 <panel> <name> -o ui --mid M` · `icons <flatlay> -o items --cell C --scale K` · `portrait <front> <name> -o portraits --head H --sizes 48 96`, then the game's folders |
 | Sound | `sfx <pad> -o <project>/sfx --set freq_mul= decay_mul= crush= lowpass= wave= --seed N`; Keep: `-o <game>/art/sfx` · `sfx all` |
 | Music | `music list` (the table) · `music load <piece> -o <project>/music/current.song.json` · every control: `music edit <song> --op <json>` · every sound: `music play-bar <song> --pattern P --bar B` / `--section S` / `music render <song> --name preview` · Compose: `music compose -o <song> --genre G --mood M --seed N --bars 32` · Keep: `music export <song> -o <game>/audio/music --name <name> --format ogg` |
-| Describe it | `describe "<words>" --json`: `what` picks the bench (`shapes` → Characters with the drafted `doc`, `spell` → Effects, `music` → Music, `prompt` → the bench that will take the painting) |
+| Describe it | `describe "<words>" --json`: `what` picks the bench (`shapes` → Characters with the drafted `doc`, `spell` → Effects, `music` → Music, `prompt` → the bench that will take the painting); `benches` with two or more names starts a job instead (`job start "<words>" -p <project> [--game G]`; Home's Jobs panel then runs `job list`, `job approve ID --run`, `job resume ID`, `job cancel ID`, and Report opens `--job_report=<report.json>` on the job's bench) |
 | Settings | `doctor --json`, `project set --style S`, `project set --blender PATH`, `project blender-download` |
 
 After new files land in the game the app runs `game-preview --import` (a headless `godot --import` pass) so the game's
@@ -882,6 +884,139 @@ reads the init event's `mcp_servers` for `claude-in-chrome` and stops with *Chro
 missing. This step was built to the documented behaviour of `claude --chrome` and exercised only through the mock
 here (no Chrome, no Midjourney in the cloud session).
 
+## Tool adapters (pixelforge/tools): what we use instead of building
+
+**The rule for every session: before building a step, check this table and `pixelforge tools status`. If a free tool
+already does the work, use its adapter (or add one in the same shape) and tell the owner that the tool exists, found
+or not, with its install sentence. Do not write a GIF encoder, a sprite-sheet packer, a tracker or a map editor.**
+
+| tool | what it does for us | official download page | licence |
+|---|---|---|---|
+| Aseprite | hand edits of a frame set (open, draw, close; the frames come back), sprite sheets and batch exports from its command line, Lua scripts | https://www.aseprite.org/download/ (or Steam) | proprietary (paid binary; the source is free to build yourself) |
+| LibreSprite | the free fork of Aseprite 1.x: hand edits of frames, the same command line for sheets and exports (its scripts are JavaScript) | https://libresprite.github.io/#!/downloads | GPL-2.0 |
+| Pixelorama | a free pixel editor for hand edits; no command line, so open-and-wait only | https://orama-interactive.itch.io/pixelorama | MIT |
+| Furnace | a chiptune tracker: our songs exported as ProTracker .mod open in it; its command line renders a tracker file to WAV through real chip emulation | https://github.com/tildearrow/furnace/releases | GPL-2.0 |
+| Blender | the 3D step of the old road (hull, rig, 8-direction renders) and any headless script | https://www.blender.org/download/ | GPL-2.0-or-later |
+| ffmpeg | GIFs and MP4s of frame folders at whole-pixel zoom, WAV to OGG for the game, facts about a media file (ffprobe) | https://ffmpeg.org/download.html | LGPL-2.1-or-later (GPL builds exist) |
+| ImageMagick | strips and contact sheets from frames, format conversions, whole-pixel scaling, identify (version 6 and 7) | https://imagemagick.org/script/download.php | ImageMagick License (Apache-2.0 compatible) |
+| rembg | cut a painting's subject from its background before the cutout steps or a prop (it fetches its own model file, about 170 MB, on first use) | https://github.com/danielgatis/rembg (`pip install rembg[cli]`) | MIT |
+| Tiled | map editing by hand; `--export-map` to JSON; a Tiled map as one plain layout JSON for the game (YATI imports .tmx/.tmj into Godot directly) | https://www.mapeditor.org/download.html | GPL-2.0-or-later (libtiled BSD) |
+| LDtk | level editing by hand (no command line); a .ldtk level as one plain layout JSON for the game (godot-ldtk-importer imports it directly) | https://ldtk.io/download/ | MIT |
+| Godot | the engine: the headless import of new art, the Forge's own checks, the game opened with a skin or an effect for a look or a screenshot | https://godotengine.org/download/ | MIT |
+| Claude Code | the Claude on every bench and the planner of jobs (`pixelforge/claude_bridge.py`) | https://claude.com/claude-code | a paid plan (Anthropic's terms) |
+| Mixamo | a website: auto-rigging and motion clips for the old road's FBX; the shape-sprite road needs none of it | https://www.mixamo.com/ | free with an Adobe account (Adobe's terms) |
+| Midjourney | a website: the reference paintings, through Claude in Chrome or a copied prompt | https://www.midjourney.com/ | a paid subscription (Midjourney's terms) |
+
+**The package.** One module per tool in `pixelforge/tools/`, all with the same face: `NAME TITLE WHAT HOME LICENCE
+INSTALL`, `find()` (only what is installed: `PIXELFORGE_<NAME>`, PATH, the usual folders per platform; Blender and
+Godot wrap `api.find_blender` and `game_preview.find_godot`), `version(exe)`, `run(action, **params)` (dispatch over
+`ACTIONS`; a missing tool answers `{"ok": false, "missing": true, "error": <the install sentence>}`, never a traceback;
+the actions in `OFFLINE_ACTIONS` run without the program: `status`, Furnace's `export_mod`, Tiled's and LDtk's
+`to_godot`), `explain_missing()`. `tools.status()` is the honest list; `tools.run(name, action, params)` the one
+entry; `tools.actions_of(mod)` the signatures in words. Two rules are kept on purpose and are the owner's own steps
+on his machine: **nothing is downloaded or installed** (the Blender download under Settings is the one exception and
+runs only when he asks for it), and **nothing runs detached**: a program opened for hand work (`_base.wait_for`) is a
+child process that the adapter waits on and that ends with the Forge or the CLI.
+
+| adapter | actions |
+|---|---|
+| `aseprite` | `open(frames_dir \| files, fps)` builds one .aseprite from the frames through a Lua import script (`import_script`), opens Aseprite and waits, then `-b --save-as frame_{frame000}.png` writes the frames back and `changed` names them · `build_sprite` · `sheet(frames, out_png, out_json, sheet_type)` (`--sheet --data --format json-array`) · `export(sprite, out_dir, stem)` · `script(lua, files, params)` (`--script-param k=v --script`) |
+| `libresprite` | the same command line; `open` opens the frame files themselves (no Lua: its scripts are JavaScript) and names what was saved over · `sheet` · `export` |
+| `pixelorama` | `open(frames_dir \| files)` only (open-and-wait; it has no batch command line) |
+| `furnace` | `export_mod(song, out)` (offline: `music/mod_export.py`, a ProTracker .mod: lead+sparkle, counter+pad, bass, drums on four channels; looped single-cycle waves for the instruments, our own drum hits as PCM; MIDI 60 on C-2; velocity as Cxx, note ends as volume 0, the tempo as Fxx) · `open(song)` (export, open Furnace, wait) · `render(song_file, out_wav, loops)` (`furnace -output out.wav -loops N file`; a .song.json is exported first) |
+| `blender` | `run_script(script, args, blend)` (`blender -b [blend] --python script -- args`; a bare name is looked up under `pixelforge/blender/`; the `PF_` lines come back as notes) |
+| `ffmpeg` | `gif(frames_dir, out, fps, zoom)` (`palettegen=reserve_transparent=1`, `paletteuse=dither=none`, `scale=...:flags=neighbor`) · `video(frames_dir, out, fps, zoom)` (libx264, yuv420p) · `convert_audio(src, out, quality)` (OGG through libvorbis) · `info(file)` (ffprobe JSON) |
+| `imagemagick` | `strip(frames \| files, out)` (`+append`) · `montage(frames, out, columns)` (`montage -tile Nx -geometry +0+0 -background none`) · `convert(src, out)` · `scale(src, out, factor)` (`-filter point -resize N%`) · `identify(file)`; `magick` (7) or `convert` / `montage` / `identify` (6) |
+| `rembg` | `cutout(src, out, model)` (`rembg i -m u2net src out`; the `rembg` command or `python -m rembg` in this interpreter) |
+| `tiled` | `open(file)` · `export(src, out, fmt)` (`tiled --export-map json in.tmx out.tmj`) · `to_godot(map_json, out)` (offline: `_maps.from_tiled`) |
+| `ldtk` | `open(file)` · `to_godot(ldtk_file, out, level)` (offline: `_maps.from_ldtk`); its version is read from a .ldtk file (`appBuildId`), the program prints none |
+| `godot` | `import(project)` · `run_script(project, script)` (`--headless --script res://...`) · `screenshot(game, out, skin, fx, zone, place)` (game_preview) |
+| `mixamo`, `midjourney` | `status` only: websites; the install sentence says the browser road |
+
+The plain map layout both map adapters write (`_maps.py`): `{"tool", "size": [w, h], "tile": [tw, th], "orientation",
+"tilesets": [{"name", "firstgid", "image", "columns"}], "layers": [{"name", "kind": tiles | intgrid | auto, "size",
+"cells": rows of ids (0 empty; Tiled gids with the flip bits stripped; LDtk tile ids + 1 over the intgrid value)}],
+"objects": [{"name", "type", "x", "y", "width", "height", "layer", "properties"}]}`. For a full import into Godot, YATI
+(Tiled) and godot-ldtk-importer (LDtk) are the free add-ons; this layout is for the Forge's own placement data.
+
+**CLI and MCP.** `pixelforge tools status [--quick] [--json]` · `tools explain <tool>` · `tools run <tool> <action>
+--params '{...}' --json`. On the MCP server every adapter is one tool, `tool_<name>(action, params)` (params a JSON
+object), and `tools_status()` is the list; the tool's description names its actions and the official page.
+
+## Jobs (pixelforge/jobs.py): one sentence into a plan of steps, carried out while the Forge watches
+
+`pixelforge job start "a pale wisp effect, a hit sound and a short crypt tune" -p <project> [--approve steps|none]
+[--plan FILE] [--game DIR] [--no-run] --json` · `job list` · `job status ID` · `job log ID [--lines N]` · `job approve
+ID [--step S] [--run]` · `job cancel ID` · `job resume ID` · `job report ID`. The Forge's Home starts one when the
+describe sentence names two or more benches (`describe` now returns `benches`, from `jobs.benches_in`).
+
+**The plan** is JSON. Claude writes it through the bridge (`ask_plan`: `claude_bridge.run("job", ...)` with the
+planner's system prompt, `plan_prompt`: the step kinds, the pipeline cheat-sheet (`PIPELINE_CHEATSHEET`), the tool
+adapters found on this computer with their actions (`tools_sentence`; the missing ones are named so no step uses
+them), the benches, the rules, the JSON ending; the mock `tests/claude_mock/plan.jsonl` stands in). Or it is given
+with `--plan` (yours, by hand). `normalise_plan` fills ids and defaults and the `<project>` / `<game>` placeholders;
+`validate_plan` refuses a plan without steps, a duplicate id, a kind outside `pipeline | tool | claude`, a pipeline
+step without a command (or one that names `forge`, `studio`, `mcp`, `job`, `claude`), a tool step without `tool` and
+`action`, a claude step without `bench` and `text`, and a banned word anywhere in a step.
+
+```json
+{"title": "a wisp, a hit and a crypt tune", "notes": "one sentence for the person, or empty",
+ "steps": [
+  {"id": "s1", "title": "a pale wisp effect", "kind": "pipeline", "command": ["vfx", "wisp", "pale_wisp", "-o", "<project>/fx", "--palette", "wisp"],
+   "inputs": [], "outputs": ["<project>/fx/pale_wisp.png"], "check": {"exists": ["<project>/fx/pale_wisp.png"]}, "approve": false, "bench": "effects"},
+  {"id": "s2", "title": "a gif of it", "kind": "tool", "tool": "ffmpeg", "action": "gif", "params": {"frames_dir": "<project>/fx/pale_wisp", "out": "<project>/fx/pale_wisp.gif"},
+   "inputs": ["<project>/fx/pale_wisp.png"], "outputs": ["<project>/fx/pale_wisp.gif"], "check": {}, "approve": false, "bench": "effects"},
+  {"id": "s3", "title": "slower, darker", "kind": "claude", "bench": "music", "text": "slower, 76 bpm, darker", "inputs": [], "outputs": [], "approve": false, "bench": "music"},
+  {"id": "s4", "title": "render the tune", "kind": "pipeline", "command": ["music", "render", "<project>/music/current.song.json", "-o", "<project>/music", "--name", "crypt"],
+   "inputs": ["<project>/music/current.song.json"], "outputs": ["<project>/music/crypt.wav"], "check": {"exists": ["<project>/music/crypt.wav"]}, "approve": true, "bench": "music"}]}
+```
+
+A step: `id`, `title` (short words the Forge shows), `kind`, its payload (`command`: the words after `pixelforge`,
+`--json` added for you; or `tool` + `action` + `params`; or `bench` + `text` for the Claude of that bench through the
+bridge), `inputs` (outputs of earlier steps it needs; a failed step's outputs make its dependants `skipped`), `outputs`
+(files or folders it makes; they must exist afterwards), `check` (`{"exists": [paths]}` or `{"min_files": N, "in":
+folder}`; a step whose command said ok but whose check fails has failed), `approve` (true pauses the job before the
+step until `job approve`; `--approve none` turns every pause off), `bench` (where the report opens).
+
+**The runner's contract** (`run_job`): an ordinary child process of whoever started it (the Forge's backend, a
+terminal), never detached; it stops when its parent stops. On disk under `<project>/jobs/<id>/`: `plan.json`,
+`state.json` (`state`: planned | running | waiting | done | failed | cancelled; `current`; the runner's `pid`; the
+`cancel` flag; `approved`; per step `status` pending | running | done | failed | skipped, `attempts`, `error`,
+`outputs`, `pictures`, `fixed`), `log.jsonl` (one event a line: planned, started, step, done, failed, skipped, fix,
+retry, waiting, approved, resumed, cancelled), `steps/<id>/result_N.json` and `stdout_N.txt` per attempt (and the
+strip PNG of a frames folder), `report.md` and `report.json`. Steps run in order; a done step is never run again. A
+pipeline step is `python -m pixelforge.cli <words> --json` with the package on the path; its `PF_PROGRESS` lines
+become the job's. A failed step is tried once more: `ask_fix` sends the step, the error and the command's last lines
+to Claude with `fix_prompt` and takes back the corrected step (same id; `give_up` or no answer means the same step is
+tried once more as it was), the plan file is updated and the report says *(fixed once)*; a second failure marks it
+failed and skips what needed its outputs; the job ends `failed` with the rest done. A `cancel` flag written to
+`state.json` by another process (`job cancel`) is honoured before the next step (the Forge also kills its own child).
+`display_state` reads `running` with a dead pid as **interrupted**: `job list` marks it resumable, `job resume` carries
+on from the first unfinished step (failed and skipped steps are tried again; approvals already given stay). Progress:
+`PF_PROGRESS step=job id=<id> done=<i> total=<n> note=<words>` on stderr; the planning phase has an empty id.
+
+**The report** (`write_report`, written at every stop): `report.json` = `{"title", "sentence", "state", "project",
+"made": [{"step", "title", "bench", "files", "pictures", "fixed"}], "could_not": [{"step", "title", "bench", "why"}],
+"pictures", "waiting", "notes", "bench"}`; `report.md` the same for people, with the pictures as relative links.
+Pictures (`pictures_of`): PNG/GIF outputs, pictures a result names (`png`, `gif`, `files`, `changed`), and a strip of
+the first eight frames of a frames folder. The Forge opens the report on `bench` (`--screen=<bench> --job_report=<report.json>`
+works as a test hook too).
+
+**When you ARE the planner** (a session started by `job start`): believe the system prompt's list of tools found;
+plan nothing with a missing one (say so in `notes`); one thing per step; every step with its outputs and a check;
+paths under `<project>`; `approve: true` for steps that write into the game, open a program, or render a whole
+character; a short tune is 8 or 16 bars; end with the one line of JSON. **When you are the fixer**: change the least
+that the error asks for, keep the id, or give up in one sentence.
+
+**Verified here** (no Aseprite, Furnace, Tiled, LDtk or Blender on this machine; ffmpeg, ImageMagick, rembg and Godot
+present): `tests/test_tool_adapters.py` (command construction and output parsing with mocks for every adapter, the
+honest status, the .mod file read back, the map converters, the MCP registration, the CLI; ffmpeg and ImageMagick
+also for real), `tests/test_jobs.py` (plan parsing and validation, the mock planner, order, the approval pause and
+resume, the fix retry, the no-fix failure with skipped dependants, resume after an interruption, the cancel flag from
+outside, tool and claude steps, the report, the CLI); the Forge's `jobs` walkthrough (`forge/tools/jobs_walk.txt`,
+`screens.sh`: `docs/screens/forgeapp/jobs_running.png`, `jobs_waiting.png`, `jobs_rendering.png`, `jobs_done.png`,
+`jobs_report.png`).
+
 ## Don'ts
 
 - Don't edit `project.json` by hand while the app is open; use the commands.
@@ -890,6 +1025,10 @@ here (no Chrome, no Midjourney in the cloud session).
 - Don't re-run `render` for a tweak that `pixelate` can do (style, outline).
 - Don't promise animation from Midjourney alone: frame-to-frame consistency
   needs the 3D path.
+- Don't build what a free tool in the table above already does; check `pixelforge tools status` and the adapters
+  first, and tell the owner when a tool exists.
+- Don't download or install a program for the owner, and don't start a detached or background process; a job is a
+  child process and its state on disk is how it survives a restart.
 
 ## Doing the Mixamo step yourself (local session with a browser)
 
