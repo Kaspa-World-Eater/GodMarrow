@@ -141,6 +141,8 @@ def test_sfx_presets_write_wav(tmp_path):
     assert len(r2["files"]) == 3
 
 
+@pytest.mark.skipif(not __import__("pixelforge.old_roads", fromlist=["old_roads_on"]).old_roads_on(),
+                    reason="the old music generator is a retired road; set PIXELFORGE_OLD_ROADS=1 to test it")
 def test_music_cues_render_loop_and_sheet(tmp_path):
     import json
     import wave

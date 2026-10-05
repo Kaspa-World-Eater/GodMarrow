@@ -10,6 +10,11 @@ import pytest
 from PIL import Image, ImageDraw
 
 from pixelforge import picture_road as PR, shapes as S
+from pixelforge.old_roads import FLAG, old_roads_on
+
+# the picture road is a retired road (docs/FORGE_FROM_THE_GAME.md section 2): these tests cover only it, so they run
+# when the environment reopens it
+pytestmark = pytest.mark.skipif(not old_roads_on(), reason=f"the picture road is retired; set {FLAG}=1 to test it")
 from pixelforge.api import StepError
 from pixelforge.cli import main
 from pixelforge.project import Project

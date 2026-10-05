@@ -22,11 +22,17 @@ rnd = random.Random(7)
 M = {
     "darkskin": {"ramp": ["#0d0907", "#1a120e", "#291d17", "#3a2a22", "#4e3a30", "#654c41"]},
     "locs":     {"ramp": ["#050506", "#0c0c0f", "#151519", "#1f1f25", "#2b2b33"], "texture": "weave", "texture_strength": 0.3},
-    "mantle":   {"ramp": ["#180a0c", "#2b1115", "#421b20", "#5a262c", "#72353c", "#8a4a52"], "texture": "weave", "texture_strength": 0.4},
+    # blood runs (docs/FORGE_FROM_THE_GAME.md 3.3): the cloth, the planks and the wraps bleed in drips from the seeds the
+    # detail layer paints (and from the top of a part without seeds), never in random specks
+    "mantle":   {"ramp": ["#180a0c", "#2b1115", "#421b20", "#5a262c", "#72353c", "#8a4a52"], "texture": "weave", "texture_strength": 0.4,
+                 "runs": {"colour_from": "blood", "density": 0.35, "length": [2, 6]}},
     "blood":    {"ramp": ["#1c0204", "#360508", "#55090d", "#760f12", "#951a19"]},
-    "bandage":  {"ramp": ["#3a2b25", "#5e4a3f", "#83705f", "#a69380", "#c2b19c"], "texture": "weave", "texture_strength": 0.5},
-    "plank":    {"ramp": ["#0f0d0d", "#1c1919", "#2b2726", "#3c3735", "#504945", "#675e59"], "texture": "grain", "texture_strength": 0.6},
-    "legwrap":  {"ramp": ["#160e0a", "#261911", "#38251a", "#4b3223", "#5f412e"], "texture": "weave", "texture_strength": 0.5},
+    "bandage":  {"ramp": ["#3a2b25", "#5e4a3f", "#83705f", "#a69380", "#c2b19c"], "texture": "weave", "texture_strength": 0.5,
+                 "runs": {"colour_from": "blood", "density": 0.7, "length": [3, 8]}},
+    "plank":    {"ramp": ["#0f0d0d", "#1c1919", "#2b2726", "#3c3735", "#504945", "#675e59"], "texture": "grain", "texture_strength": 0.6,
+                 "runs": {"colour_from": "blood", "density": 0.5, "length": [2, 6]}},
+    "legwrap":  {"ramp": ["#160e0a", "#261911", "#38251a", "#4b3223", "#5f412e"], "texture": "weave", "texture_strength": 0.5,
+                 "runs": {"colour_from": "blood", "density": 0.5, "length": [3, 8]}},
     "chain":    {"ramp": ["#121110", "#26231f", "#3d3832", "#5a534a", "#7d7468", "#a89d8e"], "spec": True, "spec_t": 0.8, "texture": "scratch", "texture_strength": 0.3},
     "rustiron": {"ramp": ["#0e0c0b", "#201b18", "#363029", "#504840", "#6f655a", "#958a7c"], "spec": True, "spec_t": 0.9, "texture": "scratch", "texture_strength": 0.4},
 }
@@ -74,8 +80,7 @@ for s, sg in (("L", 1), ("R", -1)):
     add(name=f"upper_arm.{s}", kind="capsule", a=[X(82.02), 36.24, -4.44], b=[X(85.89), 54.45, -4.76], r=[4.6, 3.8], material="darkskin", bone=f"upper_arm.{s}",
         rules=[{"hash": [0.05, 4, 2], "t": -1, "px": [90, None]}])
     add(name=f"forearm.{s}", kind="capsule", a=[X(85.89), 54.45, -4.76], b=[X(89.74), 72.08, -0.68], r=[4.3, 3.3], material="bandage", bone=f"forearm.{s}",
-        rules=[{"every_y": [2, 0], "t": -1}, {"hash": [0.16, 31 if sg > 0 else 32, 2], "material": "blood"},
-               {"y": [64, 69], "hash": [0.45, 33, 2], "material": "blood", "t": -1}, {"y": [54, 56.5], "t": -2}])
+        rules=[{"every_y": [2, 0], "t": -1}, {"y": [54, 56.5], "t": -2}])
     add(name=f"hand.{s}", kind="ellipsoid", centre=[X(90.2), 75.2, 0.2], radii=[2.9, 3.6, 2.5], material="darkskin", bone=f"hand.{s}",
         rules=[{"every_y": [2, 0], "t": -1}, {"hash": [0.2, 35, 2], "material": "blood"}], px=[90, None])
     add(name=f"hand_s.{s}", kind="ellipsoid", centre=[X(90.2), 75.2, 0.2], radii=[3.3, 4.1, 2.9], material="darkskin", bone=f"hand.{s}",
@@ -87,7 +92,7 @@ for s, sg in (("L", 1), ("R", -1)):
     add(name=f"thigh.{s}", kind="capsule", a=[X(75.04), 70.76, 0.09], b=[X(75.04), 97.92, -0.1], r=[5.0, 4.0], material="legwrap", bone=f"thigh.{s}",
         rules=[{"every_y": [5, 2], "t": -1}])
     add(name=f"shin.{s}", kind="capsule", a=[X(75.04), 97.92, -0.09], b=[X(75.04), 126.97, -2.43], r=[4.2, 3.0], material="legwrap", bone=f"shin.{s}",
-        rules=[{"every_y": [3, 0], "t": -1}, {"every_y": [3, 1], "t": 1}, {"y": [99, 102], "t": -2}, {"y": [117, 126], "hash": [0.25, 41, 2], "material": "blood", "t": -1, "px": [90, None]}])
+        rules=[{"every_y": [3, 0], "t": -1}, {"every_y": [3, 1], "t": 1}, {"y": [99, 102], "t": -2}, ])
     add(name=f"foot.{s}", kind="box", centre=[X(75.04), 131.4, 3.0], half=[3.4, 2.4, 6.4], round=1.3, material="darkskin", bone=f"foot.{s}",
         rules=[{"every_z": [3, 0], "material": "legwrap", "t": -1}, {"dy": [1.3, None], "material": "leather5", "t": -2}, {"dz": [4.5, None], "y": [None, 130.6], "t": 1}])
     add(name=f"toe.{s}", kind="ellipsoid", centre=[X(75.04), 132.0, 9.6], radii=[3.0, 1.8, 2.7], material="darkskin", bone=f"foot.{s}", rules=[{"dy": [0.6, None], "material": "leather5", "t": -2}])
@@ -97,21 +102,20 @@ add(name="cowl", kind="ring", y=[30.5, 35], rx=7.0, rz=7.2, cz=0.2, thickness=2.
     bump={"folds": [0.5, 6, 1.0]}, rules=[{"every_y": [2, 0], "t": -1}, {"y": [30.5, 31.5], "t": 1}])
 add(name="mantle", kind="ring", y=[32, 49], rx=[10.6, 0.6], rz=[8.2, 0.26], thickness=2.4, hem={"tongues": 13, "depth": 6, "seed": 4},
     material="mantle", part="mantle", bump={"folds": [0.5, 9, 2.0]},
-    rules=[{"hem_band": [0, 1.5], "t": -1}, {"hash": [0.025, 13, 2], "material": "blood", "px": [90, None]}, {"every_y": [5, 1], "hash": [0.4, 14, 2], "t": -1, "px": [90, None]}])
+    rules=[{"hem_band": [0, 1.5], "t": -1}, {"every_y": [5, 1], "hash": [0.4, 14, 2], "t": -1, "px": [90, None]}])
 add(name="tabard", kind="ring", y=[37, 118], rx=[9.0, 0.05], rz=[9.0, 0.085], thickness=1.4, keep={"front": 0.3},
     hem={"tongues": 5, "depth": 8, "seed": 3}, material="mantle", part="tabard", bump={"folds": [0.4, 5, 0.5]},
-    rules=[{"every_angle": [7, 0], "t": -1}, {"hash": [0.03, 17, 2], "material": "blood", "t": -1}, {"hem_band": [0, 4], "material": "blood", "t": -1, "hash": [0.3, 18, 2]}])
+    rules=[{"every_angle": [7, 0], "t": -1}])
 S.append(K.back_cape("cape", y=(32, 122), rx=(10.0, 0.07), rz=(9.2, 0.095), thickness=1.6, strip=round(math.pi - 2.42, 4),
                      hem={"tongues": 7, "depth": 9, "seed": 6}, material="mantle", part="cape", bump={"folds": [0.5, 6, 1.5]},
-                     rules=[{"every_angle": [11, 0], "t": -1}, {"hash": [0.02, 19, 2], "material": "blood", "px": [90, None]}, {"hem_band": [0, 4], "t": -1}]))
+                     rules=[{"every_angle": [11, 0], "t": -1}, {"hem_band": [0, 4], "t": -1}]))
 
 # ---- belt, plank skirt, plank shield
 add(name="belt", kind="ring", y=[65.5, 70.5], rx=12.0, rz=10.6, cz=-0.8, material="leather5", bone="hips",
     rules=[{"every_angle": [14, 0], "t": 1}, {"y": [67.5, 68.5], "t": -1}])
 def plank_rules(i, h, seed):
     """Weathered planks: scratches, blood specks, blood soaked up from the bottom end, a lit top and a dark hem."""
-    return [{"hash": [0.05, seed, 2], "t": -3, "px": [90, None]}, {"hash": [0.015, seed + 100, 2], "material": "blood"},
-            {"dy": [h - 6, None], "hash": [0.25, seed + 200, 2], "material": "blood", "t": -1},
+    return [{"hash": [0.05, seed, 2], "t": -3, "px": [90, None]},
             {"dy": [None, -h + 1.5], "t": 1}, {"dy": [h - 2.0, None], "t": -1}]
 S += K.plank_skirt("plank", CX, 67, [22, 46, 70, 94, 118, 142, 166, -166, -142, -118, -94, -70, -46, -22], radius=12.2, about_z=-0.6, tilt=4,
                    heights=(17, 20.5), rnd=rnd, rules=plank_rules)
@@ -121,7 +125,7 @@ add(name="shield", kind="union", material="plank", part="shield", rotate={"x": 9
         {"kind": "prism", "centre": [CX, 65], "radii": [7.4, 10.0], "z": [13.0, 15.0]}],
     rules=[{"every_x": [4, 2], "t": -3}, {"near": [[[65.5, 68, None], [72.5, 68, None], [69, 84, None]], 0.9], "t": -3},
            {"x": [65.0, 66.0], "y": [69, 82], "material": "blood"}, {"x": [72.0, 73.0], "y": [69, 79], "material": "blood"},
-           {"x": [68.5, 69.5], "y": [85, 93], "material": "blood"}, {"hash": [0.025, 61, 2], "material": "blood", "t": -1},
+           {"x": [68.5, 69.5], "y": [85, 93], "material": "blood"},
            {"y": [None, 59.0], "t": 1}, {"hash": [0.04, 62, 2], "t": -3, "px": [90, None]}])
 add(name="shield_strap", kind="capsule", a=[CX - 6, 57, 12.4], b=[CX - 11, 42, 9.0], r=0.8, material="leather5", part="shield", px=[90, None])
 
@@ -163,3 +167,11 @@ spec = {
 }
 json.dump(spec, open(OUT, "w"), indent=1)
 print("wrote", OUT, len(S), "shapes")
+# the detail layer: the stock textures per material beside the file (<name>.detail/<part>.png); paint over them on
+# the Forge's Detail bench or with `pixelforge shapes detail`
+try:
+    from pixelforge import shape_detail, shapes as PS
+    r = shape_detail.stock(PS.load_shapes(OUT), replace=True)
+    print("stock detail for", r["count"], "parts")
+except ImportError:
+    print("pixelforge not importable: run `pixelforge shapes detail", OUT, "--stock` for the detail layer")

@@ -66,9 +66,11 @@ def test_project_road_with_a_drafted_file(tmp_path):
     assert g["ok"] and (tmp_path / "game" / "warden_shapes.png").exists() and (tmp_path / "game" / "warden_shapes.json").exists()
 
 
-def test_cli_sequence(tmp_path, capsys):
+def test_cli_sequence(tmp_path, capsys, monkeypatch):
     from pixelforge.cli import main
+    monkeypatch.setenv("PIXELFORGE_OLD_ROADS", "1")      # the draft is a retired road; the file it writes still renders
     main(["shapes", "draft", SENTENCE, "-o", str(tmp_path / "w.shapes.json")])
+    monkeypatch.delenv("PIXELFORGE_OLD_ROADS")
     main(["shapes", "validate", str(tmp_path / "w.shapes.json")])
     assert "ok" in capsys.readouterr().out
     main(["shapes", "still", str(tmp_path / "w.shapes.json"), "-o", str(tmp_path / "w_S.png"), "--direction", "S", "--style", "gothic_hd"])

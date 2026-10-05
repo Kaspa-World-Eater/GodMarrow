@@ -25,6 +25,7 @@ const SCREENS := {
 	"music": "res://scripts/screens/music.gd",
 	"settings": "res://scripts/screens/settings.gd",
 	"editor": "res://scripts/screens/editor.gd",
+	"detail": "res://scripts/screens/detail.gd",
 }
 const CANVAS := Vector2(640, 360)
 const PIC := Rect2(22, 27, 596, 140)

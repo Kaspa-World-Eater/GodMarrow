@@ -34,6 +34,7 @@ for t in Paint Colour Layers History Carry Effects; do
   shoot editor_${t,,} "--screen=editor --model=$KEEPER --directions=S,E,N --tab=$t" 24
 done
 shoot creatures "--screen=creatures" 3
+shoot detail "--screen=detail --model=$KEEPER --part=hat" 14
 for t in Model Materials Behaviour Export; do
   shoot objects_${t,,} "--screen=objects --model=$CHEST --tab=$t --env=crypt" 8
 done

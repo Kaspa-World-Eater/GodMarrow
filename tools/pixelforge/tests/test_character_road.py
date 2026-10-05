@@ -19,6 +19,7 @@ REPO = HERE.parents[2]
 def test_hero_prints_the_old_road_note_unless_cutout(monkeypatch, capsys):
     import pixelforge.hero as hero
 
+    monkeypatch.setenv("PIXELFORGE_OLD_ROADS", "1")      # the retired cutout road, reopened for the test
     monkeypatch.setattr(hero, "make_hero", lambda *a, **k: {"ok": True, "stub": True})
     main(["hero", "sheet.png", "x", "--json"])
     err = capsys.readouterr().err
@@ -32,7 +33,8 @@ def test_docs_point_at_the_shape_road():
         text = f.read_text().lower()
         assert "shape" in text and ("character road" in text or "characters are shape" in text or "characters are made as shape" in text), f
     ai = (HERE.parent / "docs" / "GUIDE_AI.md").read_text()
-    assert "old" in ai.split("pixelforge hero <sheet.png>")[1].split("\n")[0].lower()
+    assert "## Retired roads" in ai and "PIXELFORGE_OLD_ROADS" in ai.split("## Retired roads")[1]      # the cutout road is named only there
+    assert "pixelforge hero" not in ai.split("## Retired roads")[0]
 
 
 # ------------------------------------------------------------------------------------------- 2. the game's default height
@@ -150,8 +152,13 @@ def test_draft_from_measure_sizes_the_rings_and_limbs(tmp_path, capsys):
     assert skirt["rx"][0] + skirt["rx"][1] * (skirt["y"][1] - skirt["y"][0]) == pytest.approx(m["hem"]["w"] * H / 2, abs=0.1)
     assert by(sized, "belt")["rx"] == pytest.approx(m["hips"]["w"] * H / 2, abs=0.02)
     assert "measured" in sized and not S.validate(sized)
-    # the CLI road
-    main(["shapes", "draft", "a warrior in a long robe", "-o", str(tmp_path / "w.shapes.json"), "--from-measure", str(tmp_path / "m.json")])
+    # the CLI road (retired: it answers only with the flag set)
+    import os
+    os.environ["PIXELFORGE_OLD_ROADS"] = "1"
+    try:
+        main(["shapes", "draft", "a warrior in a long robe", "-o", str(tmp_path / "w.shapes.json"), "--from-measure", str(tmp_path / "m.json")])
+    finally:
+        os.environ.pop("PIXELFORGE_OLD_ROADS", None)
     assert "sized from the measured painting" in capsys.readouterr().out and (tmp_path / "w.shapes.json").exists()
 
 
@@ -317,13 +324,14 @@ def test_the_hemomancer_generator_on_the_kit_writes_the_committed_file(tmp_path)
     proc = subprocess.run([sys.executable, str(GENERATOR), "--out", str(out)], capture_output=True, text=True, cwd=str(HERE.parent), timeout=120)
     assert proc.returncode == 0, proc.stderr[-1500:]
     made = json.loads(out.read_text())
-    committed = json.loads((S.ASSETS / "characters" / "hemomancer.shapes.json").read_text())
+    committed = S.load_shapes(S.ASSETS / "characters" / "hemomancer.shapes.json")      # with its path: the detail textures beside it load
     by_name = lambda d: {s["name"]: s for s in d["shapes"]}
     assert set(by_name(made)) == set(by_name(committed)) and len(made["shapes"]) == len(committed["shapes"])
     diffs = []
     for name, sh in by_name(committed).items():
         diffs += _close(sh, by_name(made)[name], name)
-    diffs += _close({k: v for k, v in committed.items() if k != "shapes"}, {k: v for k, v in made.items() if k != "shapes"}, "doc")
+    diffs += _close({k: v for k, v in committed.items() if k not in ("shapes", "detail", "_file")}, {k: v for k, v in made.items() if k not in ("shapes", "detail")}, "doc")
+    assert set(made.get("detail", {})) == set(committed.get("detail", {}))      # the stock detail layer, written beside each
     assert diffs == [], diffs[:12]
     # the shape order may differ by part; the picture does not
     a = S.render_still(S.load_shapes(out)).rgba; b = S.render_still(committed).rgba

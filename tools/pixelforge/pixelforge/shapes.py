@@ -19,6 +19,20 @@ outline round the silhouette, emissive pixels stamped last, point lights tinting
 threshold, a dithered contact shadow on the ground. Every colour comes from the ramps; nothing is blended between
 palette steps except the light tints, which the preset can switch off.
 
+**The detail layer** (solid files): a part may carry a small painted texture in its own surface coordinates
+(``"detail": {"head": {"file": "x.detail/head.png"}}``; cylindrical about the shape's long axis, u around it with the
+front at the middle, v along it from the top). Its texels are ramp-step offsets (-3..+3; the special value -4 is a
+seed for blood runs), never colours: the renderer reads each voxel's (u, v) once, looks the texel up per pixel in
+every frame and direction and moves the ramp step by it, so a brow, a fold or a nail hole turns and bends with its
+part under the rig and the palette never grows. :mod:`pixelforge.shape_detail` writes the stock textures per material.
+
+**The look** (``look``, from the style: ``form_light``, ``creases``, ``ink``, ``rim``; all on in the ``godmarrow``
+preset, all off by default so an older render is bit for bit the same): form light shifts each piece's steps up on
+its upper-left and down on its lower-right, a crease darkens one step where a nearer piece overlaps, the contour on
+the near side of that edge is inked with the outline colour (never a new colour), and a one-step lit rim runs along
+the silhouette on the light side. Blood ``runs`` (a material option) drip from the seeds down the screen over the
+same part. All of it is quantised to the ramps: no smooth shading, no red light, no glow.
+
 Sizes: a file is authored at its own ``height`` (the figure's native height in units). A render at ``scale``
 multiplies everything, so the voxel grid and the masks follow the output resolution; the preset's ``figure_height``
 divided by the file's height gives the scale. The preset's ``shading_bands`` resamples every ramp to that many
@@ -42,6 +56,10 @@ SOLID_KINDS = ("ellipsoid", "capsule", "box", "ring", "prism", "union")
 EMIT_CODES = {"none": 0, "flicker": 1, "pulse": 2, "steady": 3, "soft": 4}
 TEXTURES = ("none", "weave", "fur", "scratch", "grain")
 DEFAULT_OUTLINE = "#08060a"
+DETAIL_MAX = 3                 # a detail texel moves the ramp step by at most this much either way
+DETAIL_SEED = -4               # the texel value that seeds a blood run (and reads as the darkest step)
+DETAIL_CLASSES = ("none", "face", "skin", "cloth", "wood", "bandage", "metal", "hair")
+LOOK_KEYS = ("form_light", "creases", "ink", "rim")
 
 
 # ---------------------------------------------------------------------------------------------- colours and ramps
@@ -84,6 +102,8 @@ class Material:
     texture: str = "none"
     texture_strength: float = 0.0
     lift: float = 0.0
+    detail: str = "none"             # the stock detail class (face skin cloth wood bandage metal hair), "none" = inferred from the name
+    runs: dict | None = None         # blood runs: {"colour_from": material, "density": 0..1, "length": [lo, hi] px}
 
     @property
     def steps(self) -> int:
@@ -92,11 +112,17 @@ class Material:
     def resampled(self, n: int | None) -> "Material":
         if not n or n == len(self.ramp):
             return self
-        return Material(self.name, extend_ramp(self.ramp, n), self.emissive, self.spec, self.spec_t, self.texture, self.texture_strength, self.lift)
+        return Material(self.name, extend_ramp(self.ramp, n), self.emissive, self.spec, self.spec_t, self.texture, self.texture_strength, self.lift,
+                        self.detail, self.runs)
 
     def as_dict(self) -> dict:
-        return {"ramp": [rgbhex(c) for c in self.ramp], "emissive": self.emissive, "spec": self.spec, "spec_t": self.spec_t,
-                "texture": self.texture, "texture_strength": self.texture_strength, "lift": self.lift}
+        d = {"ramp": [rgbhex(c) for c in self.ramp], "emissive": self.emissive, "spec": self.spec, "spec_t": self.spec_t,
+             "texture": self.texture, "texture_strength": self.texture_strength, "lift": self.lift}
+        if self.detail != "none":
+            d["detail"] = self.detail
+        if self.runs:
+            d["runs"] = dict(self.runs)
+        return d
 
 
 def load_library(path: str | Path = LIBRARY_FILE) -> dict:
@@ -114,9 +140,10 @@ def _material(name: str, spec: dict, library: dict, depth: int = 0) -> Material:
         return _material(name, merged, library, depth + 1)
     if not ramp or len(ramp) < 2:
         raise ValueError(f"material {name!r} needs a ramp of at least two colours")
+    runs = spec.get("runs")
     return Material(name, np.array([hexrgb(c) for c in ramp]), bool(spec.get("emissive", False)), bool(spec.get("spec", False)),
                     float(spec.get("spec_t", 0.88)), str(spec.get("texture", "none")), float(spec.get("texture_strength", 0.0)),
-                    float(spec.get("lift", 0.0)))
+                    float(spec.get("lift", 0.0)), str(spec.get("detail", "none")), dict(runs) if isinstance(runs, dict) else None)
 
 
 def build_materials(doc: dict, steps: int | None = None, library: dict | None = None) -> dict[str, Material]:
@@ -616,6 +643,45 @@ class Prim:
             return d.min(0)
         return self.sd(P)
 
+    # ---- surface coordinates for the detail layer
+    def axis_frame(self) -> tuple[np.ndarray, np.ndarray, float, np.ndarray, np.ndarray]:
+        """The frame the detail texture is unwrapped in, in the shape's local space: (origin, the unit long axis d,
+        the half-length along it, e1, e2) with e2 the viewer's z projected off the axis (so u = 0.5 faces the front)
+        and e1 = d x e2 (toward the figure's left). A capsule's axis runs a -> b; a ring's is the body axis; every
+        other kind's is its longest extent (``detail_axis`` = "x" | "y" | "z" overrides)."""
+        sp = self.spec
+        if self.kind == "capsule":
+            a, b = np.array(sp["a"], float), np.array(sp["b"], float)
+            d = b - a
+            ln = float(np.linalg.norm(d))
+            d = d / ln if ln > 1e-9 else np.array([0.0, 1.0, 0.0])
+            o, half = (a + b) / 2, max(ln / 2, 1e-6)
+        elif self.kind == "ring":
+            y0, y1 = float(sp["y"][0]), float(sp["y"][1]) + float((sp.get("hem") or {}).get("depth", 0))
+            cx, cz = self.axis
+            o = np.array([cx, (y0 + y1) / 2, float(sp.get("cz", cz))]); d = np.array([0.0, 1.0, 0.0]); half = max((y1 - y0) / 2, 1e-6)
+        else:
+            lo, hi = self._bbox()
+            o = (lo + hi) / 2
+            ext = (hi - lo) / 2
+            k = {"x": 0, "y": 1, "z": 2}.get(str(sp.get("detail_axis", "")), int(np.argmax(ext)))
+            d = np.zeros(3); d[k] = 1.0; half = max(float(ext[k]), 1e-6)
+        ref = np.array([0.0, 0.0, 1.0]) if abs(d[2]) < 0.9 else np.array([0.0, -1.0, 0.0])
+        e2 = ref - d * float(d @ ref)
+        e2 /= np.linalg.norm(e2) + 1e-9
+        e1 = np.cross(d, e2)
+        return o, d, half, e1, e2
+
+    def surface_uv(self, P: np.ndarray) -> np.ndarray:
+        """(u, v) per point: u around the long axis (0..1, the front at 0.5, the figure's left at 0.75), v along it
+        from the top (0) to the bottom (1). Points are file-space; a turned shape is unwrapped in its own frame."""
+        Q = self._local(P)
+        o, d, half, e1, e2 = self.axis_frame()
+        q = Q - o
+        u = np.arctan2(q @ e1, q @ e2) / (2 * math.pi) + 0.5
+        v = np.clip((q @ d) / half * 0.5 + 0.5, 0.0, 1.0)
+        return np.stack([u % 1.0, v], 1).astype(np.float32)
+
     def normals(self, P: np.ndarray, e: float = 0.5) -> np.ndarray:
         n = np.empty_like(P)
         for k in range(3):
@@ -826,17 +892,21 @@ class Shell:
     spec_t: np.ndarray
     prim: np.ndarray
     flats: list[np.ndarray] = field(default_factory=list)
+    uv: np.ndarray | None = None          # (n, 2) surface coordinates for the detail layer
 
 
 class Model:
     """A solid shape sprite voxelised once at a scale, ready to render from any direction and pose."""
 
     def __init__(self, doc: dict, scale: float = 1.0, steps: int | None = None, materials: dict[str, Material] | None = None,
-                 width: float | None = None):
+                 width: float | None = None, look: dict | None = None, detail: dict | None = None):
         """``width`` (file units) widens the canvas beyond the file's ``size`` for clips that reach past it (a death
-        that lies down); the body axis stays at the canvas centre and the ground line where the file put it."""
+        that lies down); the body axis stays at the canvas centre and the ground line where the file put it. ``look``
+        switches the render's light and ink (:data:`LOOK_KEYS`; all off when None, so the render is the plain one).
+        ``detail`` is the detail layer's textures by part name (int8 arrays of step offsets); None loads the file's."""
         self.doc = doc
         self.scale = float(scale)
+        self.look = {k: bool((look or {}).get(k, False)) for k in LOOK_KEYS}
         self.M = materials or build_materials(doc, steps)
         self.mat_names = list(self.M)
         self.axis = tuple(doc.get("axis", [doc["size"][0] / 2, 0.0]))
@@ -852,7 +922,60 @@ class Model:
         for i, m in enumerate(self.M.values()):
             self.table[i, :m.steps] = m.ramp; self.lengths[i] = m.steps; self.spec[i] = m.spec; self.emissive[i] = m.emissive
         self.part_table, self.part_lut = part_table(doc)
-        self.stats = {"shapes": len(self.prims), "voxels": int(len(self.shell.pos)), "size": [self.W, self.H], "scale": self.scale}
+        self.detail = detail if detail is not None else load_detail(doc)
+        self._detail_cache: tuple[np.ndarray, np.ndarray] | None = None
+        self.stats = {"shapes": len(self.prims), "voxels": int(len(self.shell.pos)), "size": [self.W, self.H], "scale": self.scale,
+                      "detail": sorted(self.detail)}
+
+    # ---- the detail layer
+    def set_detail(self, textures: dict) -> None:
+        """Swap the detail textures (by part name) without voxelising again: the bench paints and re-renders."""
+        self.detail = dict(textures)
+        self._detail_cache = None
+
+    def detail_steps(self) -> tuple[np.ndarray, np.ndarray]:
+        """Per voxel: the detail texel's step offset (int8) and whether it is a run seed. Each voxel's (u, v) was read
+        once from its own shape; the texel is looked up here, in the part's texture, so a changed texture is one cheap
+        pass and the render samples per pixel by the voxel that won it."""
+        if self._detail_cache is not None:
+            return self._detail_cache
+        sh = self.shell
+        n = len(sh.pos)
+        off = np.zeros(n, np.int8)
+        seed = np.zeros(n, bool)
+        names = {e["name"]: e["index"] for e in self.part_table}
+        if sh.uv is not None and n:
+            part_of = self.part_lut[sh.prim + 1]
+            for name, tex in self.detail.items():
+                pi = names.get(name)
+                if pi is None:
+                    continue
+                t = np.asarray(tex, np.int8)
+                if t.ndim != 2 or t.size == 0:
+                    continue
+                sel = np.nonzero(part_of == pi)[0]
+                if len(sel) == 0:
+                    continue
+                H, W = t.shape
+                col = (np.floor(sh.uv[sel, 0] * W).astype(int)) % W
+                row = np.clip(np.floor(sh.uv[sel, 1] * H).astype(int), 0, H - 1)
+                val = t[row, col]
+                seed[sel] = val == DETAIL_SEED
+                off[sel] = np.clip(val, -DETAIL_MAX, DETAIL_MAX)
+        # a material with runs and no seeds painted on a part seeds the part's top by default
+        runs_mat = {i for i, m in enumerate(self.M.values()) if m.runs}
+        if runs_mat and sh.uv is not None and n:
+            part_of = self.part_lut[sh.prim + 1]
+            for pi in np.unique(part_of):
+                sel = np.nonzero(part_of == pi)[0]
+                if not np.isin(sh.mat[sel], list(runs_mat)).any() or seed[sel].any():
+                    continue
+                # a few columns only (a seed per column of the part's top would drip as one sheet)
+                spots = hash2(np.floor(sh.uv[sel, 0] * 40) + float(pi) * 7.3, 5.0) < 0.1
+                top = sel[(sh.uv[sel, 1] < 0.06) & np.isin(sh.mat[sel], list(runs_mat)) & spots]
+                seed[top] = True
+        self._detail_cache = (off, seed)
+        return self._detail_cache
 
     def set_width(self, width: float | None) -> None:
         """Change the canvas width (file units, never below the file's own); the voxels are untouched."""
@@ -913,12 +1036,14 @@ class Model:
         nrm = np.zeros((n, 3)); mat = np.zeros(n, np.int32); tone = np.zeros(n, np.int8); emit = np.zeros(n, np.int8)
         rivet = np.zeros(n, bool); flat = np.full(n, -1, np.int32); lift = np.zeros(n); spec_t = np.full(n, 0.88)
         flats: list[np.ndarray] = []
+        uv = np.zeros((n, 2), np.float32)
         for p in self.prims:
             sel = np.nonzero(prim_of == p.index)[0]
             if len(sel) == 0:
                 continue
             Pp = P[sel]
             nrm[sel] = p.normals(Pp)
+            uv[sel] = p.surface_uv(Pp)
             base = p.spec.get("material", "cloth")
             mat[sel] = self._mat_index(base, p)
             tone[sel] = int(p.spec.get("t", 0))
@@ -948,7 +1073,7 @@ class Model:
                     lift[idx] = float(rule["lift"])
                 if "spec_t" in rule:
                     spec_t[idx] = float(rule["spec_t"])
-        return Shell(P, nrm, mat, tone, emit, rivet, flat, lift, spec_t, prim_of, flats)
+        return Shell(P, nrm, mat, tone, emit, rivet, flat, lift, spec_t, prim_of, flats, uv)
 
     def _mat_index(self, name: str, prim: Prim) -> int:
         if name not in self.M:
@@ -1050,7 +1175,20 @@ class Model:
         idx = np.where(spec, idx_spec, idx_mat).astype(int)
         if not shade:
             idx = n // 2
-        idx = np.clip(idx + sh.tone[v] - inn.astype(int), 0, n - 1)
+        idx = idx + sh.tone[v] - inn.astype(int)
+        look = self.look
+        if look["form_light"]:
+            idx = idx + self._form_light(ys, xs, sh.prim[v], s)
+        if look["rim"]:                                   # a one-step lit rim along the silhouette's light side
+            up = np.clip(ys - 1, 0, H - 1); left = np.clip(xs - 1, 0, W - 1)
+            rimm = ((vid[up, xs] < 0) | (vid[ys, left] < 0)) & (diff > 0.25) & ~inn
+            idx = idx + rimm.astype(int)
+        if self.detail or any(m.runs for m in self.M.values()):
+            doff, dseed = self.detail_steps()
+            idx = idx + doff[v]
+        else:
+            dseed = None
+        idx = np.clip(idx, 0, n - 1)
         # contours: the neighbour belongs to another shape well behind this one
         thr = contour * s
         pidf = cv.pid
@@ -1059,8 +1197,22 @@ class Model:
             y2 = np.clip(ys + dy, 0, H - 1); x2 = np.clip(xs + dx, 0, W - 1)
             return (vid[y2, x2] >= 0) & (zb[y2, x2] < zb[ys, xs] - thr) & (pidf[y2, x2] != pidf[ys, xs])
 
-        idx = np.where(behind(0, 1) | behind(1, 0), 0, np.where(behind(0, -1) | behind(-1, 0), np.minimum(idx, 1), idx))
+        near_edge = behind(0, 1) | behind(1, 0)
+        near_edge2 = behind(0, -1) | behind(-1, 0)
+        idx = np.where(near_edge, 0, np.where(near_edge2, np.minimum(idx, 1), idx))
+        if look["creases"]:                               # the far side of an overlap sits one step in the near piece's shadow
+            def nearer(dy, dx):
+                y2 = np.clip(ys + dy, 0, H - 1); x2 = np.clip(xs + dx, 0, W - 1)
+                return (vid[y2, x2] >= 0) & (zb[y2, x2] > zb[ys, xs] + 0.5 * s) & (pidf[y2, x2] != pidf[ys, xs])
+            crease = (nearer(0, 1) | nearer(1, 0) | nearer(0, -1) | nearer(-1, 0)) & ~(near_edge | near_edge2)
+            idx = np.where(crease, np.maximum(idx - 1, 0), idx)
         colour = self.table[mat, idx]
+        if look["ink"]:                                   # the near side of a deep overlap, inked with the outline colour
+            ink = outline if outline is not None else None
+            if ink is not None:
+                colour = np.where((near_edge | near_edge2)[:, None], ink, colour)
+            else:
+                colour = np.where((near_edge | near_edge2)[:, None], self.table[mat, 0], colour)
         # emissive voxels: the ramp step is a rule of the frame, not of the light
         em = sh.emit[v]
         if em.any():
@@ -1090,6 +1242,8 @@ class Model:
             by = np.clip(ry + max(1, int(round(s))), 0, H - 1)
             okk = (cv.fill[by, rx] == 1) & ~np.isin(by * W + rx, ry * W + rx)
             cv.col[by[okk], rx[okk]] = self.table[sh.mat[vid[by[okk], rx[okk]]], 0]
+        if dseed is not None and dseed[v].any():
+            self._runs(cv, ys, xs, v, vid, dseed, frame)
         if outline is not None:
             cv.outline(outline)
         # projected anchors for lights, effects and the shadow (a 3D "at" of an effect projects the same way)
@@ -1139,6 +1293,65 @@ class Model:
             fr.normal = cv.normal_pass()
             fr.depth = cv.depth_pass(zb[m].max() if m.any() else 1, zb[m].min() if m.any() else 0)
         return fr
+
+    def _form_light(self, ys: np.ndarray, xs: np.ndarray, prim: np.ndarray, s: float) -> np.ndarray:
+        """Form light from the upper left on each piece: a step up toward a shape's upper-left on the screen and a
+        step down toward its lower-right, from the shape's screen box this frame; pieces under 4 px either way keep
+        their steps. Quantised to -1, 0, +1: no gradient, no new colour."""
+        k = np.searchsorted(np.unique(prim), prim)
+        m = int(k.max()) + 1 if len(k) else 0
+        if m == 0:
+            return np.zeros(0, int)
+        x0 = np.full(m, 1e9); x1 = np.full(m, -1e9); y0 = np.full(m, 1e9); y1 = np.full(m, -1e9)
+        np.minimum.at(x0, k, xs); np.maximum.at(x1, k, xs); np.minimum.at(y0, k, ys); np.maximum.at(y1, k, ys)
+        hw = (x1 - x0) / 2; hh = (y1 - y0) / 2
+        mx = (x0 + x1) / 2; my = (y0 + y1) / 2
+        big = (hw >= 2 * s) & (hh >= 2 * s)
+        g = -0.9 * (xs - mx[k]) / np.maximum(hw[k], 1) - 0.6 * (ys - my[k]) / np.maximum(hh[k], 1)
+        shift = np.where(g > 0.55, 1, np.where(g < -0.55, -1, 0))
+        return np.where(big[k], shift, 0)
+
+    def _runs(self, cv: "Canvas", ys, xs, v, vid, dseed, frame: int) -> None:
+        """Blood runs: from every visible seed voxel of a material with ``runs`` a drip goes straight down the screen
+        over the same part, its length from the seed's own hash (so it holds still from frame to frame and rides the
+        part), in the named material's ramp only (the bead a step up, the tail a step down)."""
+        sh = self.shell
+        s = self.scale
+        W, H = self.W, self.H
+        part_of = self.part_lut[sh.prim + 1]
+        runs_of = {i: m.runs for i, m in enumerate(self.M.values()) if m.runs}
+        seeds = np.nonzero(dseed[v])[0]
+        for mi, spec in runs_of.items():
+            src = spec.get("colour_from", "blood")
+            if src not in self.M:
+                continue
+            ci = self.mat_names.index(src)
+            ln = int(self.lengths[ci]); mid = ln // 2
+            lo, hi = (list(spec.get("length", [2, 6])) + [6])[:2]
+            dens = float(spec.get("density", 0.3))
+            sel = seeds[sh.mat[v[seeds]] == mi]
+            if len(sel) == 0:
+                continue
+            vox = v[sel]
+            keep = hash2(vox * 0.731, 3.0) < dens
+            sel, vox = sel[keep], vox[keep]
+            if len(sel) == 0:
+                continue
+            L = np.round((float(lo) + hash2(vox * 1.17, 9.0) * (float(hi) - float(lo))) * s).astype(int)
+            L = np.maximum(L, 1)
+            sy, sx, sp = ys[sel], xs[sel], part_of[sh.prim[vox]]
+            cv.col[sy, sx] = self.table[ci, min(mid + 1, ln - 1)]
+            kmax = int(L.max())
+            for k in range(1, kmax + 1):
+                on = L >= k
+                y2 = sy[on] + k
+                okk = y2 < H
+                y2, x2, p2, L2 = y2[okk], sx[on][okk], sp[on][okk], L[on][okk]
+                there = vid[y2, x2]
+                good = (there >= 0) & (cv.fill[y2, x2] == 1) & (part_of[sh.prim[np.where(there >= 0, there, 0)]] == p2)
+                y2, x2, L2 = y2[good], x2[good], L2[good]
+                step = np.where(k > L2 * 2 // 3, max(mid - 1, 0), mid)
+                cv.col[y2, x2] = self.table[ci, step]
 
     def _close_cracks(self, vid: np.ndarray, zb: np.ndarray, s: float) -> None:
         """Close the one-pixel cracks a voxel shell leaves when it is seen at a slant: a pixel that is empty, or far
@@ -1427,6 +1640,67 @@ def load_shapes(path: str | Path) -> dict:
     return doc
 
 
+# ---- the detail layer on disk
+def detail_dir(doc: dict) -> Path | None:
+    """The folder the file's detail textures live in: ``<name>.detail/`` beside the shape file (None without a file)."""
+    f = doc.get("_file")
+    if not f:
+        return None
+    f = Path(f)
+    stem = f.name[:-len(".shapes.json")] if f.name.endswith(".shapes.json") else f.stem
+    return f.parent / f"{stem}.detail"
+
+
+def encode_detail(tex: np.ndarray) -> np.ndarray:
+    """Step offsets (int8, -3..+3, the seed -4) -> the grey levels a detail PNG holds: 128 is no change, 32 per step,
+    0 is a seed. The same rule in the Forge's Detail bench, so a PNG painted there reads back exactly."""
+    t = np.asarray(tex, int)
+    g = np.clip(128 + np.clip(t, -DETAIL_MAX, DETAIL_MAX) * 32, 1, 255)
+    return np.where(t == DETAIL_SEED, 0, g).astype(np.uint8)
+
+
+def decode_detail(grey: np.ndarray) -> np.ndarray:
+    """Grey levels -> step offsets (see :func:`encode_detail`); an RGBA image's transparent texels are no change."""
+    a = np.asarray(grey)
+    if a.ndim == 3:
+        alpha = a[..., 3] if a.shape[2] == 4 else None
+        a = a[..., 0]
+    else:
+        alpha = None
+    t = np.clip(np.round((a.astype(int) - 128) / 32), -DETAIL_MAX, DETAIL_MAX).astype(np.int8)
+    t = np.where(a == 0, DETAIL_SEED, t).astype(np.int8)
+    if alpha is not None:
+        t = np.where(alpha < 128, 0, t).astype(np.int8)
+    return t
+
+
+def load_detail(doc: dict) -> dict[str, np.ndarray]:
+    """The file's ``detail`` entries as int8 arrays by part name: ``{"file": "x.detail/head.png"}`` (a grey PNG,
+    relative to the shape file) or ``{"rows": [[...], ...]}`` inline. Missing files are skipped (``validate`` names them)."""
+    out: dict[str, np.ndarray] = {}
+    det = doc.get("detail") or {}
+    if not isinstance(det, dict):
+        return out
+    base = Path(doc["_file"]).parent if doc.get("_file") else None
+    for name, entry in det.items():
+        if not isinstance(entry, dict):
+            continue
+        if isinstance(entry.get("rows"), list) and entry["rows"]:
+            try:
+                out[name] = np.clip(np.array(entry["rows"], int), DETAIL_SEED, DETAIL_MAX).astype(np.int8)
+            except (ValueError, TypeError):
+                continue
+        elif entry.get("file"):
+            f = Path(entry["file"])
+            if not f.is_absolute() and base is not None:
+                f = base / f
+            if f.exists():
+                from PIL import Image
+                im = Image.open(f)
+                out[name] = decode_detail(np.asarray(im.convert("RGBA") if im.mode in ("RGBA", "LA", "P") else im.convert("L")))
+    return out
+
+
 def mode_of(doc: dict) -> str:
     if doc.get("mode") in ("flat", "solid"):
         return doc["mode"]
@@ -1517,6 +1791,45 @@ def validate(doc: dict, library: dict | None = None) -> list[str]:
             bad.append(f"effect {i}: unknown kind {ef.get('kind')!r}")
     if mode == "solid" and "ground" not in doc:
         bad.append("a solid file needs 'ground' (the y of the ground line in its units)")
+    for mname, mspec in (doc.get("materials") or {}).items():
+        if not isinstance(mspec, dict):
+            continue
+        if "detail" in mspec and mspec["detail"] not in DETAIL_CLASSES:
+            bad.append(f"material {mname!r}: detail class {mspec['detail']!r} not in {DETAIL_CLASSES}")
+        runs = mspec.get("runs")
+        if runs is not None:
+            if not isinstance(runs, dict):
+                bad.append(f"material {mname!r}: runs must be an object like {{\"colour_from\": \"blood\", \"density\": 0.3, \"length\": [2, 6]}}")
+            else:
+                if runs.get("colour_from", "blood") not in M:
+                    bad.append(f"material {mname!r}: runs.colour_from names unknown material {runs.get('colour_from', 'blood')!r}")
+                if "density" in runs and not (isinstance(runs["density"], (int, float)) and 0 <= runs["density"] <= 1):
+                    bad.append(f"material {mname!r}: runs.density must be 0..1")
+                if "length" in runs and not (isinstance(runs["length"], (list, tuple)) and len(runs["length"]) == 2 and all(isinstance(x, (int, float)) and x >= 0 for x in runs["length"])):
+                    bad.append(f"material {mname!r}: runs.length must be [lo, hi] pixels")
+    det = doc.get("detail")
+    if det is not None:
+        if not isinstance(det, dict):
+            bad.append("detail must be an object: part name -> {\"file\": \"<name>.detail/<part>.png\"} or {\"rows\": [[...]]}")
+        else:
+            names = {e["name"] for e in part_table(doc)[0]}
+            base = Path(doc["_file"]).parent if doc.get("_file") else None
+            for name, entry in det.items():
+                if name not in names:
+                    bad.append(f"detail: {name!r} is not a part of this file (parts: {', '.join(sorted(names))})")
+                    continue
+                if not isinstance(entry, dict) or not (entry.get("file") or entry.get("rows")):
+                    bad.append(f"detail {name!r}: needs 'file' (a grey PNG beside the shape file) or 'rows' (lists of step offsets)")
+                    continue
+                if entry.get("rows") is not None:
+                    rows = entry["rows"]
+                    ok = isinstance(rows, list) and rows and all(isinstance(r, list) and len(r) == len(rows[0]) and len(r) > 0 for r in rows) and \
+                        all(isinstance(x, int) and DETAIL_SEED <= x <= DETAIL_MAX for r in rows for x in r)
+                    if not ok:
+                        bad.append(f"detail {name!r}: rows must be equal-length lists of whole numbers from {DETAIL_SEED} (a run seed) to {DETAIL_MAX}")
+    for i, sshape in enumerate(doc["shapes"]):
+        if isinstance(sshape, dict) and "detail_axis" in sshape and sshape["detail_axis"] not in ("x", "y", "z"):
+            bad.append(f"{_shape_tag(i, sshape)}: detail_axis must be x, y or z")
     if "clips" in doc and not (isinstance(doc["clips"], dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in doc["clips"].items())):
         bad.append("clips must map game clip names to library clip names, e.g. {\"attack\": \"punch\"}")
     return bad
@@ -1581,6 +1894,14 @@ def warnings(doc: dict, knee_y: float | None = None) -> list[str]:
         if not s.get("part") and bone and isinstance(hang, (int, float)) and hang < 1.0 and bone.split(".")[0] in LIMB_BONES and not ub:
             out.append(f"{tag}: hangs (hang {hang:g}) from {bone} without upright_from: when a clip raises that limb the shape lies flat along it; "
                        f"add \"upright_from\": \"hips\" (or the bone it should hang straight from)")
+    base = Path(doc["_file"]).parent if doc.get("_file") else None
+    for name, entry in (doc.get("detail") or {}).items() if isinstance(doc.get("detail"), dict) else []:
+        if isinstance(entry, dict) and entry.get("file") and base is not None:
+            f = Path(entry["file"])
+            f = f if f.is_absolute() else base / f
+            if not f.exists():
+                out.append(f"detail {name!r}: the texture file {entry['file']!r} is not beside the shape file (the part renders flat; "
+                           f"`pixelforge shapes detail FILE --stock` makes one, or copy the <name>.detail folder with the file)")
     for name, part in parts.items():
         if not isinstance(part, dict):
             continue
@@ -1639,12 +1960,14 @@ def preset_scale(doc: dict, figure_height: int | None) -> float:
 
 
 def render_still(doc: dict, frame: int = 0, *, scale: float = 1.0, steps: int | None = None, outline="auto", phi: float = 0.0,
-                 elevation: float | None = None, texture: bool = False, passes: bool = False, model: Model | None = None) -> Frame:
+                 elevation: float | None = None, texture: bool = False, passes: bool = False, model: Model | None = None,
+                 look: dict | None = None) -> Frame:
     """One frame of a file without a rig: the flat path with its own animation rules, or the solid model turned to
-    ``phi`` with its effects, lights and shadow at their authored places."""
+    ``phi`` with its effects, lights and shadow at their authored places. ``look`` (the style's light and ink keys)
+    is used when no ``model`` is given."""
     if mode_of(doc) == "flat":
         return render_flat(doc, frame, scale=scale, steps=steps, outline=outline, texture=texture)
-    model = model or Model(doc, scale, steps)
+    model = model or Model(doc, scale, steps, look=look)
     elev = float(doc.get("view", {}).get("elevation", 0.0)) if elevation is None else float(elevation)
     return model.render(frame, phi, elev, None, outline=outline_colour(doc, outline), lights=doc.get("lights"), effects=doc.get("effects"),
                         shadow=doc.get("shadow"), passes=passes)

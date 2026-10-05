@@ -6,9 +6,11 @@ Mixamo.
 
 **Characters are made as shape models** (the **Characters** bench below, or `pixelforge shapes` from a prompt): a
 small file of solids on a standard skeleton that the Forge draws as pixel art and moves with the motion clips, at the
-game's hero size. A painting is the reference the model is measured against, not the thing that gets cut up. The
-older way (cut the painting out, build a 3D figure in Blender, film it) is still in the classic Studio and in the
-`pixelforge hero` command, which says so when you run it; it is for props and for comparison, not for a character.
+game's hero size. Claude writes that file by hand against your painting, the way a sculptor builds a figure; the
+painting is the reference the model is measured and compared against, never the thing that gets cut up or traced.
+The older ways (cutting the painting out and filming a 3D figure, or drafting a mannequin from a sentence or a
+picture) are retired: they made blobs. Their commands are kept behind a switch for the curious ("Retired roads", at
+the end).
 
 ## The Forge app (start here)
 
@@ -106,7 +108,7 @@ it, Keep puts it in the game. **Music.** A music editor: tracks, a 16-step grid 
 pieces across genres, and Keep as a game cue. The full manual is below, "The Music bench".
 
 **Describe it.** The line on Home takes plain words: "a hooded necromancer with a skull-topped staff burning green"
-drafts a shape model and opens the Characters bench with it; "a wisp lantern spell, pale blue, slow, with embers"
+opens the Characters bench with those words for Claude to author the model from; "a wisp lantern spell, pale blue, slow, with embers"
 opens Effects with it playing; "a slow sombre act 2 wilds tune" opens the music rack on that cue. A sentence that
 names two or more benches ("a pale wisp effect, a hit sound and a short crypt tune") starts a **job**: Claude plans
 the steps and the Forge carries them out while you watch (see *Jobs* below).
@@ -330,46 +332,8 @@ Everything below is the older window, **PixelForge Studio (classic)**: a step li
 tool. The app above covers the everyday jobs; the Studio keeps the full editors (cutout, skin with layers and the
 clone brush, colour, effects with per-view attachments, the spell designer, the skill-tree editor) and every tool form.
 
-### How a character was made on the old road
-
-This is the cutout → Blender road. Characters are shape models now (see "Characters drawn by code" below and the
-Characters bench); these steps stay for props, portraits and comparison.
-
-1. **New project** → pick an empty folder (one project per game).
-2. **+ Add character** → name it, write one sentence about it.
-3. **Step 1** → click **Copy A: sheet** → paste into Midjourney. You get front, side and back in one picture.
-   Upscale it and save the PNG. (Copy **A2** for a four-view sheet: better 3D. Copy **A3** for a plan sheet, top view and underside,
-   when the character has a wide hat or shoulders: the camera looks down on everyone, and this is the only view that paints the top. Copy **C** for a single pixel-style
-   picture: better colours.)
-4. **Step 2** → choose that PNG as the character sheet (and the C picture if you made one).
-5. Click **▶ Run all automatic steps** and wait. The log at the bottom shows what is happening. Filming from 8
-   directions is the slow part (a few minutes on a laptop).
-6. **Step 8 → Preview animation**: watch any move from any direction. **Save GIF** if you want to show someone.
-7. **Step 9 → Export for Godmarrow**: type the kind name (for example `mystic`), click, and copy the files it names
-   into the game's `art/sprites` folder. Other Godot games: **Export** gives a SpriteFrames and a scene.
-
-### Fixing a bad cutout (step 3)
-
-The automatic cutout is usually right. When it is not (background stuck to the figure, a sleeve cut off):
-
-- Click **Edit front** (or side / back). Left-drag **erases**, right-drag **puts pixels back**, **Magic erase**
-  removes one patch of colour with a click. **Undo** undoes. **Save**.
-- Or **Open folder** and edit the PNG in any paint program, then **Reload**.
-- If it found the wrong number of figures, set **Figures on the sheet** to 3 or 4 and run split again. Loosen the
-  tolerance if background remains; tighten it if the figure loses parts.
-- Then run steps 4 and 5 again (click them on the left).
-
-### Quick path, one picture → one sprite
-
-For a first look, bosses, portraits, items. No Blender. Click **★ Quick path** in the step list, pick the picture
-and an animation (sway, hover, flame...), click **Make sprite + animate + export**.
-
-### The Continue button
-
-The step list marks what is done (grey tick), what is next (teal arrow) and what is still to do. **Continue** opens the
-next step and runs it when it is automatic; it only stops on the two steps that need you (the prompts and the
-pictures). **Run all automatic steps** does every remaining step in one go. The bar at the bottom shows what is
-happening; the log shows the details. Checks that found something are listed under the buttons in gold.
+The Studio's step list (cutout, palette, Blender model, rig, film, pixelate) is the retired cutout road; its steps
+only run with the switch named under "Retired roads".
 
 ### Other things the Forge makes (the **Tools** button)
 
@@ -378,8 +342,8 @@ iso ground tiles, UI frames, sound effects, music, recolours (champion / unique 
 compares, a skill-tree editor, and a one-click install of the loaders into any Godot project. Each is a small form:
 pick the picture, name it, press Run. An AI assistant can run every one from the command line too.
 
-**Music** in the classic Studio's Tools window is the game's older score (21 looping cues: `music a1_town`,
-`music all`, the cue sheet). The Forge app has the music editor proper; it is described next.
+**Music** in the classic Studio's Tools window renders the game's cues (`music a1_town`, `music all`): each cue is
+a song from the library of the music editor, which is described next.
 
 ## The Music bench (the Forge app)
 
@@ -466,29 +430,57 @@ pose until it has somewhere to go, so nothing crawls or boils between frames. No
 per clip. One file serves both sizes: the small-size variant keeps the silhouette and drops the detail. Objects (a chest, a skull, a dead tree)
 are the same kind of file without bones, rendered as a still with a foot point for the game.
 
-The painting is the reference for the costume, not the source, and the Forge reads it by itself: dropping a picture
-on the Characters bench runs `pixelforge character from-picture`, which cuts the figure out, **measures** the figure's
-widths from the front (and side and back) views and sizes the starting model to them, **samples materials** (the
-painting's colours into the model's ramps) and **compares** painting and model side by side at one height with an
-overlap number per view, so you can see what is still off (the steps on their own: `pixelforge shapes measure`,
-`sample-materials`, `compare`; the assistant runs them too).
+The painting is the reference for the costume, not the source. The assistant **measures** the figure's widths from
+its views (`pixelforge shapes measure`), writes the model by hand against them, **samples materials** (the painting's
+colours into the model's ramps, `sample-materials`) and **compares** painting and model side by side at one height
+with an overlap number per view (`compare`), so you both can see what is still off.
 Writing the file is a job for the AI assistant (the necromancer, the Keeper and the Hemomancer under `assets/shapes/`
 are the examples); you judge the result and ask for changes in plain words ("the hat is too bright", "make the skirt
 longer"). To look: `pixelforge shapes preview FILE --clip walk
 --direction E` makes a GIF; `pixelforge shapes sheet FILE -o sheet.png` a contact sheet; `pixelforge shapes
-turntable FILE -o turn.gif` a spin. To put one in the game: `pixelforge project import-shapes <character> FILE -p
-<project folder>`, then **render-shapes** and **export-game** as usual (the step-by-step list for an assistant is
-`docs/GUIDE_SESSION.md` in the game repository). "Describe it" can draft a starting file from a sentence
-(`pixelforge shapes draft "a knight in steel plate with a sword and a crimson cape" -o knight.shapes.json`): a
-mannequin with the right pieces, to be shaped by hand or by the assistant. It knows the pieces the Hemomancer needed
-(a spiked crown, locs, chains, shackles, a plank skirt, spiked greaves, rivets, a back cape) and builds them from a kit,
-so the next character with any of them starts with them in place.
+turntable FILE -o turn.gif` a spin. To put one in the game: `pixelforge project build <character> -p <project
+folder>` does the whole road (import, every clip in eight directions with the painted detail and the light, the
+game's atlas, `skins.json`, the height check); the steps on their own are **import-shapes**, **render-shapes** and
+**export-game** (the step-by-step list for an assistant is `docs/GUIDE_SESSION.md` in the game repository).
+
+## Detail: the painted detail that rides the parts
+
+A model renders as clean pieces; the painting has a face, muscle, folds, grain, wraps and worn iron on them. Those
+are the **detail layer**: a small texture painted once on each part, in the part's own coordinates, that the Forge
+draws into every frame from every direction, so a brow turns with the head and a fold swings with the cape. The
+texture never holds colours, only steps up or down the part's own colour ramp, so the character keeps its palette.
+
+- **Stock first.** `pixelforge shapes detail <model.shapes.json> --stock` gives every part a start from its
+  material: a face on a head of skin (brow, sockets, nose, cheekbones), muscle on a bare chest and belly and the light
+  down the arms, hanging folds on a cape and wrapped folds on a cowl, grain and bleeding nail holes on planks, wraps on
+  bandages and leg-cloth, worn edges and rivets on iron, strands in hair. The textures land beside the model in a
+  `<name>.detail` folder; the model names them under `"detail"`.
+- **Then paint.** On Home press **Detail bench** (it opens on the last model you had on the Characters bench, or the
+  Keeper; *Choose a model file* takes another). The picture window shows the part's texture unwrapped at pixel scale on
+  the left (the front is the middle of the strip, the top its top row) and the figure on the right. Pick the **part**,
+  a **tool** (the pencil, or a brush of 2, 3 or 4), and a **shade** from the chips under the texture (three steps down
+  to three up the material's ramp; the red chip is a *seed*, where blood starts to run). Left drag paints, right drag
+  erases, **Undo** takes a stroke back, **Stock** puts the stock texture back, **Clear part** empties it. After every
+  stroke the figure on the right redraws with the change; the **facing** cycler turns it.
+- **Blood runs.** A material that bleeds (`"runs"` in the model, the Hemomancer's cloth, planks and bandages) drips
+  downward from its seeds in every frame, in the blood's own colours, staying on the part as it moves. Paint a seed
+  where a wound or a hole is; without any, a part bleeds a little from its top.
+- **The light.** The `godmarrow` look lights every piece from the upper left, creases where pieces meet, inks the edge
+  between them and puts a faint lit rim on the light side, all in the ramps' own steps (no glow, no red light). Other
+  looks leave it off.
+- **To the game in one go.** `pixelforge project build <character> -p <project folder>` (or **Build** on Home) imports
+  the model, renders every clip the game plays (idle, walk, two attacks, cast, hit, death, dodge) from eight sides with
+  the detail and the light, writes the game's sheets and `skins.json`, and says plainly if the figure is not 195 px
+  tall. The lines it prints are what Home shows in the picture window.
+
+The pictures: `docs/screens/forge/hemomancer_detail_compare.png` and `keeper_detail_compare.png` in the game
+repository (the painting, the flat model, the model with its stock detail, and with the light).
 
 ## Describe it, get it
 
 The **Describe it…** button (also Ctrl+D, and Tools > Describe it): say what you want in plain words and the Forge
-drafts it and opens it in the right editor. "Draw a hooded necromancer with a bone staff as shapes" drafts a shape
-sprite (see above). "A wisp lantern spell, pale blue, slow, with embers" becomes a spell in
+drafts it and opens it in the right editor. "Draw a hooded necromancer with a bone staff as shapes" opens the
+Characters bench with the words for Claude (no automatic draft). "A wisp lantern spell, pale blue, slow, with embers" becomes a spell in
 the spell designer with those layers. "Make the left eye teal with a pale glow" finds the eye on the chosen picture
 and opens the skin editor with the change made (Undo if it read you wrong). "A grave knight with a rusted helm" gives
 the Midjourney prompt. "A slow sombre act 2 wilds tune with more wind" renders and plays that cue. It is a draft from
@@ -647,3 +639,15 @@ Everything the app does is also a command. Tell Claude:
 
 It can run every step, read the same `project.json`, and tell you when it needs
 you (Midjourney images, Mixamo).
+
+## Retired roads
+
+Some of the Forge's older ways of making things drew characters by themselves, and what they drew were blobs: the
+cutout road (`pixelforge hero` and the Studio's step list: cut the painting out, build a 3D figure in Blender, film
+it), the kit props and 3D ground (`prop3d`, `tiles3d`), the automatic drafts (`shapes draft`, `character
+from-picture`, a picture dropped on the bench becoming a character by itself) and the old music generator. They are
+switched off: their buttons are gone from the app and their commands answer with one line. If you ever want one
+back, set the environment variable `PIXELFORGE_OLD_ROADS=1` before starting the Forge or the command line; nothing
+else changes. The game's music still renders: each cue (`music a1_town`, `music all`) is now a song from the music
+editor's library, and `audio/music/cues.json` lets you say which song plays where.
+

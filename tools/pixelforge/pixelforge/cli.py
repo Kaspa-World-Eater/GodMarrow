@@ -348,6 +348,14 @@ def cmd_project(a) -> None:
             _emit(a, api.export_game(project, a.character, kind=a.kind, out_dir=a.out, category=a.category, display_name=a.name, skin_for=a.skin_for))
         elif sub == "import-shapes":
             _emit(a, api.import_shapes(project, a.character, a.file))
+        elif sub == "build":
+            r = api.build_character(project, a.character, a.file, game=a.game, kind=a.kind, skin_for=a.skin_for, preset=a.style, display_name=a.name,
+                                    dry_run=a.dry_run, log=None if a.json else print, progress=_progress if a.json else None)
+            if a.json:
+                _emit(a, r)
+            elif a.dry_run:
+                for st in r["steps"]:
+                    print(f"{st['step']:14s} {st['what']}")
         elif sub == "render-shapes":
             _emit(a, api.render_shapes(project, a.character, preset=a.style, clips=a.clips, directions=a.directions, elevation=a.elevation, passes=a.passes, parts=a.parts,
                                        log=None if a.json else print, progress=_progress if a.json else None))
@@ -434,6 +442,7 @@ def cmd_prop(a) -> None:
 
 
 def cmd_tiles3d(a) -> None:
+    from .old_roads import retired; retired("tiles3d", a)
     from .tiles3d import make_tiles3d
 
     _emit(a, make_tiles3d(a.material, a.second, a.name, a.out, tiles=a.tiles, seed=a.seed, ppu=a.ppu, res_dir=a.res_dir))
@@ -444,6 +453,7 @@ HERO_NOTE = ("note: 'hero' is the old cutout road (cutouts -> Blender -> Mixamo 
 
 
 def cmd_hero(a) -> None:
+    from .old_roads import retired; retired("hero", a)
     from .hero import make_hero
 
     if not getattr(a, "cutout", False):
@@ -471,6 +481,7 @@ def cmd_artlist(a) -> None:
 
 
 def cmd_prop3d(a) -> None:
+    from .old_roads import retired; retired("prop3d", a)
     from .prop3d import make_prop3d
 
     r = make_prop3d(a.model, a.name, a.out, height=a.height, yaw=a.yaw, ppu=a.ppu, reference=a.reference, strength=a.strength, scale=a.scale,
@@ -806,12 +817,33 @@ def cmd_shapes(a) -> None:
         return
     if sub == "draft":
         from . import describe
+        from .old_roads import retired; retired("draft", a)
         r = describe.draft_shapes(a.text, out=a.out, height=a.height, measure=a.from_measure)
         if a.json:
             _emit(a, r)
         else:
             print("I read: " + "; ".join(r["read"]))
             print(f"{len(r['doc']['shapes'])} shapes" + (f", written {r['file']}" if r.get("file") else " (add -o file.shapes.json to write it)"))
+        return
+    if sub == "detail":
+        from . import shape_detail
+        r = shape_detail.detail_command(a.file, stock_all=a.stock, part=a.part, from_png=a.from_png, clear_all=a.clear, replace=a.replace, list_only=a.list)
+        if a.json:
+            _emit(a, r)
+        elif not r.get("ok", True):
+            print(r.get("error", "stopped"), file=sys.stderr)
+        elif "parts" in r:
+            print(f"{'part':18s} {'material':12s} {'class':8s} {'size':8s} texture")
+            for row in r["parts"]:
+                print(f"{row['name']:18s} {row['material']:12s} {row['class']:8s} {row['size'][0]:>3d}x{row['size'][1]:<3d}  {row['png'] or ('inline' if row['rows'] else '-')}")
+        elif "written" in r:
+            print(f"{r['count']} parts given stock detail" + (f"; no stock for: {', '.join(x['part'] for x in r['skipped'])}" if r["skipped"] else "") + f" -> {r['file']}")
+        elif "cleared" in r:
+            print(f"cleared {len(r['cleared'])} textures")
+        else:
+            print(f"{r['part']}: {r['file']} ({r['size'][0]}x{r['size'][1]})")
+        if not r.get("ok", True):
+            sys.exit(1)
         return
     if sub == "joints":
         from . import joints
@@ -849,7 +881,7 @@ def cmd_shapes(a) -> None:
         clips = [c.strip() for c in a.clips.split(",")] if a.clips else ["idle", "walk"]
         dirs = [d.strip().upper() for d in a.directions.split(",")] if a.directions else list(shape_rig.DIRECTIONS)
         opt = shape_tools.options_for(doc, style, a.scale, a.steps, a.outline or "style", a.elevation)
-        model = S.Model(doc, opt["scale"], opt["steps"]) if S.mode_of(doc) == "solid" else None
+        model = S.Model(doc, opt["scale"], opt["steps"], look=opt["look"]) if S.mode_of(doc) == "solid" else None
         tracks = shape_rig.load_joints()
         rows = []
         for clip in clips:
@@ -902,6 +934,8 @@ def cmd_character(a) -> None:
     from . import api, picture_road
 
     sub = a.character_cmd
+    if sub != "author":
+        from .old_roads import retired; retired("from-picture", a)
     progress = _picture_progress if a.json else None
     log = None if a.json else print
     if sub == "author":
@@ -1245,6 +1279,12 @@ def build_parser() -> argparse.ArgumentParser:
     x = ps.add_parser("preview-gif", help="a looping GIF of one move from one direction (previews/<clip>_<dir>.gif)"); x.add_argument("character")
     x.add_argument("--clip", default="walk"); x.add_argument("--dir", default="S", help="S SW W NW N NE E SE")
     x = ps.add_parser("import-shapes", help="give a character a shape sprite (.shapes.json); it then renders with 'run <character> shapes' or render-shapes"); x.add_argument("character"); x.add_argument("file")
+    x = ps.add_parser("build", help="one command from a shape file to the game: import-shapes, render the fixed animation set in 8 views with the detail layer and the light, export-game, skins.json, the height check")
+    x.add_argument("character"); x.add_argument("file", nargs="?", default=None, help="the .shapes.json (default: the character's own)")
+    x.add_argument("--game", default=None, help="the game folder (default: found above the project); its art/sprites gets the set and the skins.json entry")
+    x.add_argument("--kind", default=None, help="the sprite kind (default: the character's name)"); x.add_argument("--skin-for", dest="skin_for", default=None, metavar="CLASS")
+    x.add_argument("--style", default=None, help="a look preset (default: the project's, godmarrow)"); x.add_argument("--name", default=None, help="display name")
+    x.add_argument("--dry-run", dest="dry_run", action="store_true", help="list the steps, write nothing")
     x = ps.add_parser("render-shapes", help="render the character's shape sprite with the motion clips into frames (then export / export-game as usual)")
     x.add_argument("character"); x.add_argument("--style", default=None, help="a look preset (default: the character's / project's)"); x.add_argument("--clips", default=None); x.add_argument("--directions", default=None)
     x.add_argument("--elevation", type=float, default=None); x.add_argument("--passes", action="store_true")
@@ -1477,6 +1517,11 @@ def build_parser() -> argparse.ArgumentParser:
     x = ss.add_parser("compare", help="painting beside sprite at one height, per view (front/S, side/E, back/N), with the silhouette overlap"); _render_args(x)
     x.add_argument("--ref", required=True, help="the concept sheet (three views) or one view, on a plain or transparent background"); x.add_argument("-o", "--out", required=True)
     x.add_argument("--height", type=int, default=195, help="the px height both are shown at (195 = the game's heroes)"); x.add_argument("--views", default=None, help="the sheet's view names in order, e.g. front,side,back")
+    x = ss.add_parser("detail", help="the detail layer: painted textures that ride the parts. --stock fills every part without one from its material's class; --part NAME --from PNG sets one; --clear; nothing = list")
+    x.add_argument("file"); x.add_argument("--stock", action="store_true", help="stock detail for every part that has none (with --part: that part again)")
+    x.add_argument("--part", default=None); x.add_argument("--from", dest="from_png", default=None, metavar="PNG", help="a grey PNG of step offsets (128 = none, 32 per step, 0 = a run seed)")
+    x.add_argument("--clear", action="store_true", help="drop every texture (with --part: one)"); x.add_argument("--replace", action="store_true", help="--stock: redo parts that already have one")
+    x.add_argument("--list", action="store_true"); x.add_argument("--json", action="store_true")
     x = ss.add_parser("joints", help="re-export the joint tracks of the motion clips from the animation library (numpy, no Blender)")
     x.add_argument("--glb", default=None); x.add_argument("-o", "--out", default=None); x.add_argument("--fps", type=int, default=24); x.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_shapes)

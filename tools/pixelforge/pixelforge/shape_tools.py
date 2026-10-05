@@ -77,6 +77,7 @@ def options_for(doc: dict, style: str | Style | None, scale: float | None = None
         "elevation": elevation,
         "max_frames": st.clip_frames if st else 24,
         "style": st.name if st else None,
+        "look": {k: bool(getattr(st, k)) for k in S.LOOK_KEYS} if st else None,     # the light and ink of the preset
     }
     if out["outline"] in ("", "none"):
         out["outline"] = None
@@ -85,7 +86,7 @@ def options_for(doc: dict, style: str | Style | None, scale: float | None = None
 
 def render_set(doc: dict, out_dir: str | Path, *, clips=R.GAME_CLIPS, directions=tuple(R.DIRECTIONS), style=None, scale=None, steps=None,
                outline="style", elevation=None, max_frames=None, passes: bool = False, square: bool = True, lock=None, log=None, progress=None,
-               parts: bool = True) -> dict:
+               parts: bool = True, frames_per_clip: dict | None = None) -> dict:
     """Render every clip in every direction into ``out_dir/<clip>_<DIR>/frame_NNN.png`` and write
     ``animations.json`` (fps per clip) and ``manifest.json`` (what the game export needs). With ``parts`` (the default)
     every frame also gets ``frame_NNN.parts.png`` (the part index per pixel, 0 = empty: what the editor's carry matches
@@ -103,15 +104,16 @@ def render_set(doc: dict, out_dir: str | Path, *, clips=R.GAME_CLIPS, directions
     # each clip gets the canvas it needs (a death lies down past the file's width); every frame is padded to one square
     widths = {clip: (R.canvas_width(doc, [clip], tracks) if solid else float(doc["size"][0])) for clip in clips}
     width = max(widths.values())
-    model = S.Model(doc, opt["scale"], opt["steps"]) if solid else None
+    model = S.Model(doc, opt["scale"], opt["steps"], look=opt["look"]) if solid else None
     side = int(max(round(width * opt["scale"]), round(doc["size"][1] * opt["scale"]))) if square else False
     clip_fps, counts, sizes = {}, {}, {}
     for clip in clips:
         if model is not None:
             model.set_width(widths[clip])
+        clip_cap = int((frames_per_clip or {}).get(clip, cap))        # the game's fixed set: so many frames per clip
         for d in directions:
             res = R.render_clip(doc, clip, d, tracks=tracks, model=model, scale=opt["scale"], steps=opt["steps"], outline=opt["outline"],
-                                elevation=opt["elevation"], max_frames=cap, square=side, passes=passes, lock=lock)
+                                elevation=opt["elevation"], max_frames=clip_cap, square=side, passes=passes, lock=lock)
             folder = out_dir / f"{clip}_{d}"
             folder.mkdir(exist_ok=True)
             for old in folder.glob("frame_*.png"):
@@ -159,7 +161,7 @@ def gif_of(doc: dict, clip: str, direction: str, out: str | Path, *, style=None,
     opt = options_for(doc, style, scale, steps, outline, elevation)
     cap = int(max_frames) if max_frames else opt["max_frames"]
     res = R.render_clip(doc, clip, direction, tracks=tracks, model=model, scale=opt["scale"], steps=opt["steps"], outline=opt["outline"],
-                        elevation=opt["elevation"], max_frames=cap)
+                        elevation=opt["elevation"], max_frames=cap, look=opt["look"])
     out = Path(out); out.parent.mkdir(parents=True, exist_ok=True)
     save_gif(res["frames"], out, fps=res["fps"], zoom=zoom, background=background)
     return {"ok": True, "gif": str(out), "frames": len(res["frames"]), "fps": res["fps"], "size": list(res["frames"][0].shape[1::-1])}
@@ -211,7 +213,7 @@ def turntable(doc: dict, out: str | Path, *, frames: int = 48, style=None, scale
     if S.mode_of(doc) != "solid":
         raise ValueError("a turntable needs a solid file")
     opt = options_for(doc, style, scale, steps, outline, elevation)
-    model = S.Model(doc, opt["scale"], opt["steps"])
+    model = S.Model(doc, opt["scale"], opt["steps"], look=opt["look"])
     elev = float(doc.get("view", {}).get("elevation", 0.0)) if opt["elevation"] is None else opt["elevation"]
     oc = S.outline_colour(doc, opt["outline"])
     out = Path(out); out.parent.mkdir(parents=True, exist_ok=True)
@@ -262,7 +264,7 @@ def still(doc: dict, out: str | Path, *, frame: int = 0, direction: str = "S", s
     With ``parts`` (the default) the part-index mask is written beside it as ``<stem>.parts.png`` (at the same zoom)
     and the part table returned under ``"part_table"``."""
     opt = options_for(doc, style, scale, steps, outline, elevation)
-    model = S.Model(doc, opt["scale"], opt["steps"]) if S.mode_of(doc) == "solid" else None
+    model = S.Model(doc, opt["scale"], opt["steps"], look=opt["look"]) if S.mode_of(doc) == "solid" else None
     fr = S.render_still(doc, frame, scale=opt["scale"], steps=opt["steps"], outline=opt["outline"], phi=math.radians(R.DIRECTIONS[direction]),
                         elevation=opt["elevation"], passes=passes, model=model)
     out = Path(out); out.parent.mkdir(parents=True, exist_ok=True)
@@ -336,7 +338,7 @@ def export_object(doc: dict, out_dir: str | Path, name: str | None = None, *, di
     opt = options_for(doc, style, scale or 1.0, steps, outline, elevation)
     out_dir = Path(out_dir); out_dir.mkdir(parents=True, exist_ok=True)
     key = name or S.file_summary(doc)["name"]
-    model = S.Model(doc, opt["scale"], opt["steps"]) if S.mode_of(doc) == "solid" else None
+    model = S.Model(doc, opt["scale"], opt["steps"], look=opt["look"]) if S.mode_of(doc) == "solid" else None
     views, entries = {}, {}
     for i, d in enumerate(directions):
         d = d.upper()
