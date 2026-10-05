@@ -7,7 +7,5 @@
  "npc_vendor": "npc_vendor",
  "npc_giver": "npc_giver",
  "npc_smith": "npc_smith",
- "npc_stranger": "npc_stranger",
- "hollow": "hollow_hd",
- "hound": "hound_hd"
+ "npc_stranger": "npc_stranger"
 }
