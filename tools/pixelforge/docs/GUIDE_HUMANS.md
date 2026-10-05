@@ -26,11 +26,25 @@ it said; Ctrl+C copies it). Every bench has tabs along the top of the text box a
 **Render all**, **Undo**, **Reset** (this tab's levers back to their defaults), **Start over** (one plain question,
 inside the window) and **Advanced** (the same values as plain sliders with finer steps).
 
-**Characters** (the heart of it). A character is a *shape model*, a `.shapes.json` file of solids with materials,
+**Characters** (the heart of it). **Start from a picture.** Drop a Midjourney picture on the window (on Home or on
+the Characters bench), or press *Choose a picture* and pick it in the Forge's own browser (Downloads, Pictures, Desktop
+and a Midjourney folder are one click away; the newest files are at the top), and the Forge gets to work by itself:
+the state line says what it is doing ("cutting the figure", "measuring", "drafting 17 shapes", "sampling materials",
+"drawing") and a few seconds later the drafted character stands on the bench facing south with the picture beside
+it. One figure or a turnaround sheet (two or more figures side by side) both work; a sheet's views as separate files
+can be dropped together. The Reference tab then says how close it got in one honest line ("Silhouette overlap front
+0.71: the right mass; the details want a hand") and what is worth knowing ("measured as the front view only; a side
+view would give the depth"); **Compare** shows the picture and the sprite side by side at one height, **Measure
+again** and **Sample materials again** redo those steps on the model as it is now, **Open in editor** renders the idle
+clip and opens the pixel editor on it, **Use as reference only** puts a painting beside the model without drafting
+(the old behaviour). The character's name comes from the file's name (Midjourney writes your prompt into it) and the
+costume words in it shape the draft, so a download named `…_a_hooded_necromancer_with_a_bone_staff_….png` arrives
+hooded, with a staff. If the picture has no figure on a plain or transparent background the bench says so, in words,
+and nothing else happens. A character is a *shape model*, a `.shapes.json` file of solids with materials,
 rendered as pixel art by the engine and moved by the motion clips (idle, walk, run, attack, cast, hit, death) from
-eight directions. Drop a model file on the window (`assets\shapes\characters\keeper.shapes.json` is the Keeper) or
-press *Start from the Keeper*. The tabs: **Reference** (the model beside a reference painting, with the checks that
-say what to change), **Model** (pick a part and a solid, move and scale it, change its material, hide it),
+eight directions. You can also drop a model file on the window (`assets\shapes\characters\keeper.shapes.json` is
+the Keeper) or press *Start from the Keeper*. The tabs: **Reference** (the model beside the picture, with the overlap
+line and the checks that say what to change), **Model** (pick a part and a solid, move and scale it, change its material, hide it),
 **Materials** (every material's colour ramp with hue, lightness, contrast and steps; each light's glow kind, colour,
 strength, pulse and radius; *Randomise* for a variant, *Champion* saves a recolour beside the model), **Motion** (the
 clip and the facing, the lag, sway and hang of the loose parts, the turn and move steps, the camera; *Render clip*
@@ -62,8 +76,9 @@ opens Effects with it playing; "a slow sombre act 2 wilds tune" opens the music 
 **Under construction** (the bench says so itself, in gold, and nothing on it crashes):
 - **Creatures.** The beast rig (four legs, a tail, wings) is not in the engine yet. The bench is the characters'
   bench; a creature dropped there stands on the humanoid skeleton.
-- **The painting road** (a Midjourney sheet cut out, carved in Blender, filmed and pixelated) is not in the Forge:
-  it is the classic Studio's, below. The Forge's Reference tab shows a painting beside the model, nothing more.
+- **The old painting road** (a Midjourney sheet cut out, carved in Blender, filmed and pixelated) is not in the
+  Forge: it is the classic Studio's, below. In the Forge a picture becomes a shape model (*Start from a picture*,
+  above); the Reference tab compares the two.
 - **The cutout editor** (the painting road's masks) stays in the classic Studio. The pixel editor itself is in the
   Forge now: see *The editor* below.
 - **The Play tile** is gone; *See it in the game* on a bench does the same with the thing you made.
@@ -283,10 +298,12 @@ pose until it has somewhere to go, so nothing crawls or boils between frames. No
 per clip. One file serves both sizes: the small-size variant keeps the silhouette and drops the detail. Objects (a chest, a skull, a dead tree)
 are the same kind of file without bones, rendered as a still with a foot point for the game.
 
-The painting is the reference for the costume, not the source, and the Forge can read it: **measure** takes the
-figure's widths from the front, side and back views and sizes the starting model to them, **sample materials** takes
-the painting's colours into the model's ramps, and **compare** puts painting and model side by side at one height so
-you can see what is still off (`pixelforge shapes measure`, `sample-materials`, `compare`; the assistant runs them).
+The painting is the reference for the costume, not the source, and the Forge reads it by itself: dropping a picture
+on the Characters bench runs `pixelforge character from-picture`, which cuts the figure out, **measures** the figure's
+widths from the front (and side and back) views and sizes the starting model to them, **samples materials** (the
+painting's colours into the model's ramps) and **compares** painting and model side by side at one height with an
+overlap number per view, so you can see what is still off (the steps on their own: `pixelforge shapes measure`,
+`sample-materials`, `compare`; the assistant runs them too).
 Writing the file is a job for the AI assistant (the necromancer, the Keeper and the Hemomancer under `assets/shapes/`
 are the examples); you judge the result and ask for changes in plain words ("the hat is too bright", "make the skirt
 longer"). To look: `pixelforge shapes preview FILE --clip walk

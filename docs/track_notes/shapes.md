@@ -116,6 +116,14 @@ pages should show them:
   height, with the silhouette overlap). The Reference tab is this: drop the sheet, measure, draft, sample, and the
   compare picture with the overlap numbers as the checks line. MCP: `measure_views`, `sample_materials`,
   `compare_shapes`, `draft_shapes(measure=)`.
+  **Done on track/picture-road (2026-10-05):** `pixelforge character from-picture` (`pixelforge/picture_road.py`) is
+  the whole road in one command with `PF_PROGRESS what=` lines, and the Characters bench runs it for any picture
+  dropped or chosen (Home routes every picture there). The Reference tab shows the judgement line, the warnings,
+  `Compare`, `Measure again`, `Sample materials again`, `Open in editor`, `Use as reference only`. The in-app browser
+  resolves Downloads / Pictures / Desktop on Windows (with the plain and OneDrive paths as fallbacks), adds a
+  Midjourney place, sorts newest first, decodes thumbnails and previews on a worker thread and elides long names;
+  a drop of several files is a sheet's views. Numbers: the Keeper's front gives 17 shapes, overlap 0.71, in 2 s
+  headless and 4 s in the app; a synthetic three-view sheet (1300 x 820) in about 10 s.
 - **Format traps.** `keep: {"back_strip": w}` replaces the backwards `keep.back` (still read, with a deprecation
   warning naming the `back_strip` to write). `shapes.warnings(doc)` (in `validate_file` as `warnings`, printed by
   `shapes validate` and to stderr by every shapes command): a full ring below the knee that covers the legs, a hanging

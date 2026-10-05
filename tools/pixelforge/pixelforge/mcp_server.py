@@ -361,6 +361,27 @@ def build_server():
         return api.compare_shapes(model, ref, out, height, views or None)
 
     @mcp.tool()
+    def character_from_picture(picture: str, project: str, name: str = "", style: str = "godmarrow", text: str = "") -> dict:
+        """The picture road in one go: a Midjourney picture (one figure or a turnaround sheet; several files joined with ';' are the
+        views front;side;back) is cut out, measured, drafted as a shape model sized and coloured from it, imported into the project
+        as a character, and drawn as a still (S) and a compare picture with the silhouette overlap per view and a judgement line."""
+        from . import picture_road
+        try:
+            return picture_road.from_picture([p for p in picture.split(";") if p], project, name or None, style=style, text=text or None)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
+    def character_redo(project: str, character: str, step: str) -> dict:
+        """One step of the picture road again on a character it made: measure (resize from the saved cutouts), sample (colours again)
+        or compare (the pictures only); each ends with the still and the compare picture."""
+        from . import picture_road
+        try:
+            return picture_road.redo(project, character, step)
+        except api.StepError as e:
+            return {"ok": False, "error": str(e)}
+
+    @mcp.tool()
     def import_shapes(project: str, character: str, file: str) -> dict:
         """Give a project character a shape sprite (.shapes.json); render_shapes then replaces the painting steps."""
         try:

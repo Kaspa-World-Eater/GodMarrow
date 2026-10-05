@@ -1,5 +1,8 @@
 extends "res://scripts/screen.gd"
-## Characters: a shape model (.shapes.json) through the shape-sprite engine. Tabs: Reference (the compare screen),
+## Characters: a shape model (.shapes.json) through the shape-sprite engine. A picture dropped or chosen here (a Midjourney
+## figure or a turnaround sheet, or a sheet's views as several files) goes down the picture road by itself: `character
+## from-picture` cuts it out, measures it, drafts and colours a shape model from it, imports it and draws the still and
+## the compare picture; the model lands on the bench facing S with the painting beside it. Tabs: Reference (the compare screen),
 ## Model (the solid list: select a solid, move and scale it, change its material), Materials (ramps and emissives),
 ## Motion (clips and the lag / sway / hang levers, the direction wheel), Frames (the frame editor), Export (sheets,
 ## put it in the game, see it in the game). The file is the state: every edit is a change to the model file in the
@@ -11,6 +14,7 @@ const CLIPS := ["idle", "walk", "run", "attack", "cast", "hit", "death"]
 const GLOW_KINDS := ["flame", "orb", "eyes", "runes", "embers", "crackle"]
 const ENGINE_GLOWS := {"flame": "flame", "orb": "orb", "eyes": "", "runes": "runes", "embers": "motes"}
 const SHAPE_KINDS := ["ellipsoid", "capsule", "box", "ring", "prism", "union"]
+const IMAGE_EXTS := ["png", "jpg", "jpeg", "webp", "bmp", "gif"]
 
 var doc := {}                  # the model file, as a dictionary (the state the levers edit)
 var orig := {}                 # the file as imported (what Reset returns a shape or ramp to)
@@ -26,12 +30,15 @@ func build() -> void:
 	hint_text = "Esc back · LB/RB tabs"
 	if state.is_empty():
 		state = {"name": "", "title": "", "model_file": "", "painting": String(args.get("painting", "")), "direction": String(args.get("direction", "S")), "clip": String(args.get("clip", "idle")),
-			"part": "", "shape": -1, "material": "", "emissive": 0, "exported": "", "in_game": false, "shot": ""}
+			"part": "", "shape": -1, "material": "", "emissive": 0, "exported": "", "in_game": false, "shot": "",
+			"pictures": [], "compare": "", "road_warnings": [], "judgement": "", "road_views": [], "road_error": ""}
 	library = app.backend.read_json(app.backend.pf_root.path_join("assets/shapes/materials.json"))
 	tab = 0 if state["painting"] != "" else 1
 	tab_from_args()
 	rebuild()
-	if args.has("model"):
+	if args.has("pictures"):
+		start_from_pictures(_paths_of(args["pictures"]))
+	elif args.has("model"):
 		import_model(String(args["model"]))
 	elif args.has("draft") and args["draft"] is Dictionary and args["draft"].has("doc"):
 		_import_draft(args["draft"])
@@ -39,6 +46,139 @@ func build() -> void:
 		_open_character(String(args["character"]))
 	elif args.has("painting"):
 		app.scene.show_compare(tex(String(args["painting"])), null, "the reference")
+
+# ------------------------------------------------------------------ the picture road
+static func _paths_of(v) -> PackedStringArray:
+	if v is PackedStringArray:
+		return v
+	if v is Array:
+		return PackedStringArray(v)
+	return PackedStringArray(String(v).split(";", false))
+
+## a picture (one figure or a turnaround sheet) or a sheet's views as several files becomes a character: one command,
+## `character from-picture`, does the whole road (cut, measure, draft, sample materials, check, import, draw); its
+## progress words run on the state line; the drafted model lands on the bench facing S with the painting beside it
+func start_from_pictures(paths: PackedStringArray) -> void:
+	var pics: PackedStringArray = []
+	for p in paths:
+		if p.get_extension().to_lower() in IMAGE_EXTS and FileAccess.file_exists(p):
+			pics.append(p)
+	if pics.is_empty():
+		app.say("That is not a picture the Forge can read (PNG, JPG or WEBP).")
+		return
+	if job != null:
+		app.say("Still working on the last thing.")
+		return
+	state["pictures"] = Array(pics)
+	state["painting"] = pics[0]
+	state["road_error"] = ""
+	tab = 0
+	rebuild()
+	app.scene.show_compare(tex(pics[0]), null, "the picture · reading it")
+	var style := app.style_name
+	app.backend.ensure_project(style, func(_r):
+		if not is_inside_tree():
+			return
+		var cmd := ["character", "from-picture"]
+		cmd.append_array(Array(pics))
+		cmd.append_array(["-p", app.backend.project_dir, "--style", style])
+		run(cmd, "reading the picture", func(r: Dictionary):
+			if not r.get("ok", false):
+				_road_failed(r)
+				return
+			_road_done(r)))
+
+## the road's progress lines carry `what` (the step's words); the render's carry clip and dir
+func on_progress(info: Dictionary) -> void:
+	if not info.has("what"):
+		super.on_progress(info)
+		return
+	var words := String(info["what"]).replace("_", " ")
+	if words == "done":
+		return
+	busy_words = words
+	if progress and is_instance_valid(progress):
+		progress.set_progress(int(info.get("done", "0")), int(info.get("total", "1")), words)
+	if state_label and is_instance_valid(state_label):
+		state_label.set_text("Starting from the picture: %s..." % words)
+	app.set_hint("working: " + words)
+
+func _road_done(r: Dictionary) -> void:
+	state["name"] = String(r.get("character", ""))
+	state["title"] = String(r.get("title", state["name"])).capitalize()
+	state["compare"] = String(r.get("compare", ""))
+	state["road_warnings"] = r.get("warnings", [])
+	state["judgement"] = String(r.get("judgement", ""))
+	state["road_views"] = r.get("views", [])
+	state["road_error"] = ""
+	state["exported"] = ""
+	state["in_game"] = false
+	state.erase("edits"); state.erase("ramps"); state.erase("lights"); state.erase("motion")
+	retime = {}
+	clip_frames = []
+	_frames_dirty = true
+	undo_stack = []
+	redo_stack = []
+	tab = 0
+	_model_loaded()
+	app.say("%s: %d shapes drafted from the %s." % [String(state["title"]), int(r.get("shapes", 0)), {"sheet": "sheet", "files": "views"}.get(String(r.get("kind", "")), "picture")], 5.0)
+
+## the road stopped: its words stay on the bench (the toast fades; the state line does not)
+func _road_failed(r: Dictionary) -> void:
+	state["road_error"] = plain_error(r)
+	rebuild()
+	if has_model():
+		refresh_preview()
+
+## one step of the road again on this character: measure (the saved cutouts size the model again), sample (the colours
+## again) or compare (the pictures only); each ends with the still and the compare picture
+func _road_again(step: String) -> void:
+	if not has_model():
+		return
+	var words: String = {"measure": "measuring", "sample": "sampling materials", "compare": "drawing the compare picture"}[step]
+	run(["character", step, String(state["name"]), "-p", app.backend.project_dir, "--style", app.style_name], words, func(r: Dictionary):
+		if not r.get("ok", false):
+			return
+		state["compare"] = String(r.get("compare", state["compare"]))
+		state["judgement"] = String(r.get("judgement", ""))
+		if not r.get("warnings", []).is_empty():
+			state["road_warnings"] = r.get("warnings", [])
+		if step != "compare":
+			doc = app.backend.read_json(model_path())
+			orig = app.backend.read_json(model_path())
+			_frames_dirty = true
+		rebuild()
+		if step == "compare":
+			_show_compare_picture()
+		else:
+			refresh_preview()
+		app.say({"measure": "Measured again; the model is sized from the cutouts.", "sample": "Materials sampled from the picture again.", "compare": "The compare picture is in the window."}[step]))
+
+## the compare picture: the painting's views beside the sprite's matching directions at one height, with the overlap
+func _show_compare_picture() -> void:
+	var t := tex(String(state.get("compare", "")))
+	if t == null:
+		app.say("No compare picture yet: drop a picture, or press Compare with a reference on the bench.")
+		return
+	app.scene.show_picture(t, "%s · painting beside sprite per view · %s" % [String(state["title"]), String(state.get("judgement", ""))])
+
+## the editor on the idle clip facing the bench's direction, rendered first when it is not yet
+func _open_in_editor() -> void:
+	if not has_model():
+		return
+	state["clip"] = "idle"
+	var d := String(state["direction"])
+	var preview_dir := previews_dir().path_join("frames").path_join("idle_%s" % d)
+	if DirAccess.dir_exists_absolute(preview_dir) and not _frames_dirty:
+		_load_clip(preview_dir, 12.0)
+		_edit_frames()
+		return
+	run(["shapes", "render", model_path(), "-o", previews_dir().path_join("frames"), "--clips", "idle", "--directions", d, "--style", app.style_name], "rendering idle %s for the editor" % d, func(r: Dictionary):
+		if not r.get("ok", false):
+			return
+		_frames_dirty = false
+		_load_clip(preview_dir, float(r.get("fps", {}).get("idle", 12.0)))
+		_edit_frames())
 
 # ------------------------------------------------------------------ getting a model onto the bench
 func char_dir() -> String:
@@ -219,12 +359,16 @@ func on_tab() -> void:
 		refresh_preview()
 
 func _build_empty() -> void:
-	var line := "The bench is empty. Drop a shape model (.shapes.json) or a reference painting here, or describe one on Home."
-	if String(state.get("painting", "")) != "":
-		line = "The reference is on the bench. Drop a shape model (.shapes.json) to stand beside it, draft one from a sentence on Home, or start from the Keeper."
-	state_line(line, "", 2)
+	var line := "The bench is empty. Drop a picture (one figure, or a turnaround sheet) and it becomes a character by itself; or drop a shape model (.shapes.json), or describe one on Home."
+	var err := String(state.get("road_error", ""))
+	if err != "":
+		line = "The picture did not become a character: " + err + " Try another picture, or a model file."
+	elif String(state.get("painting", "")) != "":
+		line = "The picture is on the bench. Drop a shape model (.shapes.json) to stand beside it, draft one from a sentence on Home, or start from the Keeper."
+	state_line(line, "Gold" if err != "" else "", 2)
 	add_spacer()
 	add_choices([
+		{"label": "Choose a picture", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; pictures"]), func(p): start_from_pictures(PackedStringArray([p])), "Choose a picture")},
 		{"label": "Choose a model file", "cb": func(): app.choose_file(PackedStringArray(["*.json ; shape models"]), import_model, "Choose a shape model")},
 		{"label": "Start from the Keeper", "cb": func(): import_model(app.backend.pf_root.path_join("assets/shapes/characters/keeper.shapes.json"))},
 		{"label": "Start from the necromancer", "cb": func(): import_model(app.backend.pf_root.path_join("assets/shapes/necromancer_3d.shapes.json"))},
@@ -273,21 +417,37 @@ func set_light_stop(s: int) -> void:
 
 ## --- Reference: the compare screen
 func _build_reference() -> void:
-	var summary := _summary()
-	state_line("%s · reference. %s" % [String(state["title"]), summary])
-	var checks := _checks()
-	dim_line(checks)
-	add_rack([direction_wheel(), scene_light_lever()], 8)
-	var items := [
-		{"label": "Copy prompt", "cb": _copy_prompt},
-		{"label": "Another painting", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; paintings"]), func(p):
-			state["painting"] = p
-			rebuild()
-			refresh_preview(), "Choose the reference painting")},
-	]
+	var judgement := String(state.get("judgement", ""))
+	var err := String(state.get("road_error", ""))
+	if err != "":
+		state_line("%s · reference. The picture did not become a new character: %s" % [String(state["title"]), err], "Gold", 2)
+	elif judgement != "":
+		state_line("%s · from the picture. %s" % [String(state["title"]), judgement], "", 2)
+	else:
+		state_line("%s · reference. %s" % [String(state["title"]), _summary()])
+	dim_line(_checks(), 2)
+	add_cyclers([
+		{"label": "facing", "value": String(state["direction"]), "left": func(): _pick_direction(_cycle(DIRS, String(state["direction"]), -1)), "right": func(): _pick_direction(_cycle(DIRS, String(state["direction"]), 1))},
+		{"label": "scene light", "value": ["off", "sprite only", "on"][app.scene.light_mode], "left": func(): _set_scene_light(app.scene.light_mode - 1), "right": func(): _set_scene_light(app.scene.light_mode + 1)},
+	])
+	add_spacer()
+	var from_picture: bool = not state.get("road_views", []).is_empty()
+	var items := []
+	if String(state.get("compare", "")) != "":
+		items.append({"label": "Compare", "cb": _show_compare_picture})
+	if from_picture:
+		items.append({"label": "Measure again", "cb": func(): _road_again("measure")})
+		items.append({"label": "Sample materials again", "cb": func(): _road_again("sample")})
+	items.append({"label": "Open in editor", "cb": _open_in_editor})
+	items.append({"label": "Start from a picture", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; pictures"]), func(p): start_from_pictures(PackedStringArray([p])), "Choose a picture")})
+	items.append({"label": "Use as reference only", "cb": func(): app.choose_file(PackedStringArray(["*.png, *.jpg, *.jpeg, *.webp ; paintings"]), func(p):
+		state["painting"] = p
+		rebuild()
+		refresh_preview(), "Choose a painting to stand beside the model")})
+	items.append({"label": "Copy prompt", "cb": _copy_prompt})
 	add_choices(standard_choices(items, false))
 	if String(state["painting"]) == "":
-		hint_text = "drop the reference painting anywhere"
+		hint_text = "drop a picture anywhere: it becomes a character"
 	app.set_hint(hint_text)
 
 func _summary() -> String:
@@ -307,6 +467,12 @@ func _summary() -> String:
 
 ## what to change: the file's own checks, as plain lines
 func _checks() -> String:
+	var road: Array = state.get("road_warnings", [])
+	if not road.is_empty():
+		var ws: PackedStringArray = []
+		for w in road:
+			ws.append(String(w))
+		return "Worth knowing: " + " ".join(ws)
 	var notes := []
 	if String(state["painting"]) == "":
 		notes.append("No painting on the bench: drop one to compare against.")
@@ -1279,24 +1445,21 @@ func on_state_restored() -> void:
 	else:
 		refresh_preview()
 
+## a model file is imported; a picture (or several: a sheet's views) goes down the picture road and becomes a character
 func on_drop(paths: PackedStringArray) -> void:
 	if paths.is_empty():
 		return
-	var p := paths[0]
-	if p.ends_with(".json"):
-		import_model(p)
+	var pics: PackedStringArray = []
+	for p in paths:
+		if p.ends_with(".json"):
+			import_model(p)
+			return
+		if p.get_extension().to_lower() in IMAGE_EXTS:
+			pics.append(p)
+	if pics.is_empty():
+		app.say("That is not a picture the Forge can read (PNG, JPG or WEBP), nor a shape model (.shapes.json).")
 		return
-	var img := Image.load_from_file(p)
-	if img == null:
-		app.say("That is not a picture the Forge can read.")
-		return
-	state["painting"] = p
-	tab = 0
-	rebuild()
-	if has_model():
-		refresh_preview()
-	else:
-		app.scene.show_compare(tex(p), null, "the reference")
+	start_from_pictures(pics)
 
 func can_leave() -> bool:
 	return true
