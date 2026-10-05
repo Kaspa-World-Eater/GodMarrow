@@ -960,6 +960,10 @@ class Model:
         for i, (name, m) in enumerate(self.M.items()):
             o = doc_mats.get(name, {}).get("outline") if isinstance(doc_mats.get(name), dict) else None
             self.mat_outline[i] = hexrgb(o) if o else np.asarray(m.ramp[0], float)
+        # "rim_edge": the material's last ramp step is kept for its silhouette edges only (a cool rim light, the colour of
+        # the edge the light catches); ordinary shading stops one step short of it
+        self.rim_edge = np.array([bool(doc_mats.get(name, {}).get("rim_edge")) if isinstance(doc_mats.get(name), dict) else False
+                                  for name in self.M], bool)
         self.part_table, self.part_lut = part_table(doc)
         self.detail = detail if detail is not None else load_detail(doc)
         self._detail_cache: tuple[np.ndarray, np.ndarray] | None = None
@@ -1231,6 +1235,14 @@ class Model:
         else:
             dseed = None
         idx = np.clip(idx, 0, n - 1)
+        re_m = self.rim_edge[mat]
+        if re_m.any():                                    # rim_edge materials: the top step only on the silhouette
+            def empty(dy, dx):
+                y2 = np.clip(ys + dy, 0, H - 1); x2 = np.clip(xs + dx, 0, W - 1)
+                return vid[y2, x2] < 0
+            sil = empty(0, 1) | empty(0, -1) | empty(-1, 0) | empty(1, 0)
+            side = np.abs(nnx) > 0.55                      # the rim catches only the edges that turn away to the sides
+            idx = np.where(re_m, np.where(sil & side & ~inn, n - 1, np.minimum(idx, n - 2)), idx)
         # contours: the neighbour belongs to another shape well behind this one
         thr = contour * s
         pidf = cv.pid
