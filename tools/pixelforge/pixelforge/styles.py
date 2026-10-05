@@ -122,6 +122,16 @@ STYLES: dict[str, Style] = {
         fx_bands=6, fx_glow="auto", fx_haze=False, fx_frames=8, fx_fps=10.0,
         anim_frames=8, anim_fps=8.0, clip_frames=24, tile_width=72, tile_height=36, tile_hr=2,
     ),
+    "godmarrow_px": _look(
+        "godmarrow_px", "Godmarrow pixel scale",
+        "The Tithe-Hand's grain (Derek 2026-10-05): heroes rendered small, about 80 px tall, every pixel chosen, and drawn "
+        "enlarged in the game to true size, as the browser's creatures are. The same light and ink as the godmarrow look.",
+        figure_height=80, pixel_step=1, colors=0, palette_lock=True, dither="none", shading_bands=0,
+        saturation=1.0, contrast=1.0, outline="auto", edge="crisp",
+        form_light=True, creases=True, ink=True, rim=True, shadow=True, bounce=True, mat_outline=True,
+        fx_bands=6, fx_glow="auto", fx_haze=False, fx_frames=8, fx_fps=10.0,
+        anim_frames=8, anim_fps=8.0, clip_frames=24, tile_width=72, tile_height=36, tile_hr=2,
+    ),
     "gothic_hd": _look(
         "gothic_hd", "Gothic hi-res",
         "Large, finely drawn figures about 120 px tall on a dark gothic palette with gold and bone accents; soft "

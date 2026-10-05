@@ -9,6 +9,7 @@
  "npc_smith": "npc_smith",
  "npc_stranger": "npc_stranger",
  "ossuarch_hd": "ossuarch_hd",
- "ossumancer": "ossuarch_hd",
- "keeper_hd": "keeper_hd"
+ "ossumancer": "ossuarch_px",
+ "keeper_hd": "keeper_hd",
+ "ossuarch_px": "ossuarch_px"
 }

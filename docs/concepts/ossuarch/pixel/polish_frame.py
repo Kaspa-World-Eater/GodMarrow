@@ -131,6 +131,76 @@ if helm_rows:
         for x in range(hx0 + 1, hx0 + 3):
             out[hy + 1, x, :3] = IRON[7]                 # the dome's light
             out[hy + 2, x - 1 if x > hx0 + 1 else x, :3] = IRON[6]
+# ---------------------------------------------------------------- by body part (the renderer says which part every pixel is)
+PART = json.load(open(os.path.join(HERE, "base_part.json")))
+def part(x, y):
+    return PART[y][x] if 0 <= y < len(PART) and 0 <= x < len(PART[y]) else ""
+def setc(x, y, c):
+    if 0 <= x < W and 0 <= y < H and out[y, x, 3] > 0:
+        out[y, x, :3] = np.clip(c, 0, 255)
+
+# the pauldrons: hard plate, not lumps. Each lame a lit top row, a body, and a black line under it.
+for side in ("L", "R"):
+    pix = [(x, y) for y in range(H) for x in range(W) if part(x, y).startswith("pauldron") and part(x, y).endswith(side)]
+    if not pix:
+        continue
+    ytop = min(y for x, y in pix)
+    for (x, y) in pix:
+        # three lames: only each lame's lower edge is a dark line; its face keeps its own light, lit on the left
+        rowi = (y - ytop) % 5
+        lit = part(x - 1, y) == "" or not part(x - 1, y).startswith("pauldron")
+        face = int(J[y, x]) if K[y, x] == "iron" else 3
+        c = IRON[0] if rowi == 4 else IRON[min(8, face + (2 if lit else 0) + (1 if rowi == 0 else 0))]
+        setc(x, y, c)
+    # a rivet on each lame's face
+    xs = sorted(set(x for x, y in pix))
+    xm = xs[len(xs) // 3]
+    for k in range(3):
+        y = ytop + 1 + 4 * k
+        if (xm, y) in pix:
+            setc(xm, y, IRON[8])
+
+# the legs: each its own lit edge and shaded edge, a bright knee, so they stand apart from the cloak
+for (x, y) in [(x, y) for y in range(H) for x in range(W) if part(x, y).split(".")[0] in ("thigh", "knee", "greave", "sabaton", "sabaton_toe")]:
+    me = part(x, y).split(".")[-1]
+    left = part(x - 1, y).split(".")[-1] != me or part(x - 1, y).split(".")[0] not in ("thigh", "knee", "greave", "sabaton")
+    right = part(x + 1, y).split(".")[-1] != me or part(x + 1, y).split(".")[0] not in ("thigh", "knee", "greave", "sabaton")
+    if left:
+        setc(x, y, IRON[6])
+    elif right:
+        setc(x, y, IRON[1])
+for side in ("L", "R"):
+    kp = [(x, y) for y in range(H) for x in range(W) if part(x, y) == "knee." + side]
+    if kp:
+        x0 = min(x for x, y in kp); y0 = min(y for x, y in kp)
+        setc(x0 + 1, y0 + 1, IRON[8]); setc(x0 + 2, y0 + 1, IRON[7])
+
+# the cloak: long hanging folds, light ridge then shadowed hollow, wavering down
+for (x, y) in [(x, y) for y in range(H) for x in range(W) if part(x, y) in ("cloak", "mantle")]:
+    # broad folds, not stripes: a fold every 7 px, its hollow one step darker, its ridge one step lighter
+    ph = (x + int(2.0 * np.sin(y * 0.12 + x * 0.3))) % 7
+    base = int(J[y, x]) if K[y, x] == "cloth" else 2
+    if ph == 0:
+        setc(x, y, CLOTH[max(0, base - 1)])
+    elif ph == 4:
+        setc(x, y, CLOTH[min(6, base + 1)])
+
+# the plume: redrawn as one pale flame, a bright core up the light side, licks tearing off the top
+pp = [(x, y) for y in range(H) for x in range(W) if part(x, y) == "plume"]
+if pp:
+    px0 = min(x for x, y in pp); px1 = max(x for x, y in pp); py0 = min(y for x, y in pp); py1 = max(y for x, y in pp)
+    for (x, y) in pp:
+        u = (x - px0) / max(1, px1 - px0)
+        t = (y - py0) / max(1, py1 - py0)
+        k = 5 if u < 0.3 and t > 0.3 else (4 if u < 0.55 else (3 if u < 0.8 else 2))
+        if t < 0.2:
+            k = min(k, 3)
+        setc(x, y, PLUME[k])
+    for (dx, dy, k) in ((1, -1, 3), (2, -2, 2), (px1 - px0 + 1, 1, 2), (px1 - px0 + 2, 0, 1), (-1, 2, 2)):
+        x, y = px0 + dx, py0 + dy
+        if 0 <= x < W and 0 <= y < H:
+            out[y, x, :3] = PLUME[k]; out[y, x, 3] = 255
+
 # ---------------------------------------------------------------- placed by hand (coordinates read off a 10x grid of this frame)
 def put(x, y, c):
     if 0 <= x < W and 0 <= y < H and out[y, x, 3] > 0:

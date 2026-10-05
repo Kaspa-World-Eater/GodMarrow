@@ -14,6 +14,10 @@ const BONE_M := Color8(196, 188, 164)
 const BONE_D := Color8(140, 132, 112)
 const GRIT := Color8(92, 86, 74)
 
+var wisps: Array = []     # the plume's strands drifting up off its tip (the dust that never comes down): {p, v, t, life}
+var wisp_t := 0.0
+var steps: Array = []     # pale dust where his steps fall: {p, t}
+var step_t := 0.0
 var rings: Array = []     # D2's Bone Spear trail (BoneSpearTrail): rings left along the flight, expanding and fading
 var ring_t := 0.0
 var spear_lights: Array = []   # a small cold light that rides each spear (D2R lights the dark round it)
@@ -45,6 +49,7 @@ func _ready() -> void:
 
 func _process(dt: float) -> void:
 	_spear_trail(dt)
+	_his_air(dt)
 	if book == null or (book.fx_air != self and book.fx_floor != self):
 		queue_free()
 		return
@@ -135,6 +140,7 @@ func _draw() -> void:
 			pass                                      # drawn on the unshaded canvas (_draw_spears)
 		else:
 			lance(S(hero.tp, 4.0 + 10.0 * rise) + side * 16.0, u2, tier, 0.55 + 0.45 * grow)
+	_draw_air()
 	_draw_blade(hero)
 	# Charnel Cages: ribs curving up round the ring, lumpy arms gripping inside
 	for c in book.cages:
@@ -183,6 +189,46 @@ static func _spear_frames() -> Array:
 	var d = JSON.parse_string(FileAccess.get_file_as_string("res://art/fx/bone_spear.json"))
 	return d.get("frames", []) if d is Dictionary else []
 const STREAK := Color(0.78, 0.88, 1.0)
+
+## his own air (the Bone Spear treatment for the man himself): ghostly strands rise off the tip of his plume and
+## drift up and back, never down; pale dust lifts where his heavy steps fall
+func _his_air(dt: float) -> void:
+	if floor_mode or book == null or book.hero == null or not is_instance_valid(book.hero):
+		return
+	var hero = book.hero
+	var r: Rect2 = hero.spr.get_rect()
+	var tip: Vector2 = hero.position + Vector2(r.position.x + r.size.x * (0.48 if hero.spr.face > 0 else 0.52), r.position.y + 6.0)
+	wisp_t -= dt
+	if wisp_t <= 0.0 and not hero.dead:
+		wisp_t = 0.12
+		wisps.append({"p": tip + Vector2(randf_range(-5, 5), randf_range(0, 6)), "v": Vector2(randf_range(-6, 10), randf_range(-26, -16)),
+			"t": 0.0, "life": randf_range(1.0, 1.6), "w": randf_range(0.6, 1.4)})
+	for w in wisps:
+		w["t"] += dt
+		w["v"].x += sin(w["t"] * 3.0 + w["w"] * 5.0) * 14.0 * dt
+		w["p"] += w["v"] * dt
+	wisps = wisps.filter(func(w): return w["t"] < w["life"])
+	if hero.walking and not hero.dead:
+		step_t -= dt
+		if step_t <= 0.0:
+			step_t = 0.36
+			steps.append({"p": hero.position + Vector2(randf_range(-8, 8), 2), "t": 0.0})
+	for st in steps:
+		st["t"] += dt
+	steps = steps.filter(func(st): return st["t"] < 0.7)
+
+func _draw_air() -> void:
+	for st in steps:
+		var k: float = 1.0 - st["t"] / 0.7
+		for i in 4:
+			var a: float = i * 1.7 + st["t"] * 2.0
+			var q: Vector2 = st["p"] + Vector2(cos(a) * (4.0 + 14.0 * (1.0 - k)), -2.0 - 6.0 * (1.0 - k) + sin(a) * 2.0)
+			px(q, Color(BONE_D, 0.45 * k))
+	for w in wisps:
+		var k: float = 1.0 - w["t"] / w["life"]
+		var c := Color(0.78, 0.94, 0.86, 0.55 * k * k)
+		px(w["p"], c)
+		px(w["p"] + Vector2(-w["v"].x * 0.06, 3.0), Color(c, c.a * 0.6))
 
 func _spear_trail(dt: float) -> void:
 	if floor_mode or book == null:

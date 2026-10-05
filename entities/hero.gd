@@ -68,6 +68,10 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 		if a.begins_with("--skin=") and FileAccess.file_exists("res://art/sprites/%s.json" % a.substr(7)):
 			kind = a.substr(7)
 	spr = AnimSprite.new(Data.sprite_set(kind))
+	# a set drawn at the Tithe-Hand's grain (the godmarrow_px look, ~80 px) is shown enlarged to the heroes' true size
+	var fh := float(spr.set.meta.get("figure_height", 195)) if spr.set else 195.0
+	if fh > 0.0 and fh < 150.0:
+		spr.scale = Vector2(195.0 / fh, 195.0 / fh)
 	spr.view = "down"
 	add_child(spr)
 	add_child(load("res://entities/hero_rim.gd").new(self, spr))   # the edge the nearest flame lights (heroRim37)
