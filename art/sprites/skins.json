@@ -6,5 +6,6 @@
  "mystic_hd": "mystic_hd",
  "npc_vendor": "npc_vendor",
  "npc_giver": "npc_giver",
- "npc_smith": "npc_smith"
+ "npc_smith": "npc_smith",
+ "npc_stranger": "npc_stranger"
 }

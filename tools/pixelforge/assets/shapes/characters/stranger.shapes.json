@@ -1,0 +1,1252 @@
+{
+ "name": "stranger",
+ "about": "The Stranger, drawn by hand from his Midjourney sheet: tall and thin in black, a tall peaked wide-brimmed hat, no face but a long pale grey-green visage, a shoulder cape over a long coat to the ground, belts at the waist, grey ringed hands, a fan of old cards in the right and a lantern burning green in the left.",
+ "mode": "solid",
+ "size": [
+  138,
+  138
+ ],
+ "height": 126,
+ "ground": 134,
+ "axis": [
+  69.0,
+  0
+ ],
+ "view": {
+  "elevation": 12
+ },
+ "outline": "#020303",
+ "skeleton": {
+  "height": 126,
+  "ground": 134,
+  "cx": 69.0
+ },
+ "materials": {
+  "black": {
+   "ramp": [
+    "#060708",
+    "#0c0e0f",
+    "#131617",
+    "#1b1f20",
+    "#24292a",
+    "#2f3536"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.4
+  },
+  "felt": {
+   "ramp": [
+    "#050606",
+    "#0b0c0d",
+    "#121415",
+    "#1a1d1e",
+    "#232728"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.4
+  },
+  "visage": {
+   "ramp": [
+    "#141a17",
+    "#212b26",
+    "#303d36",
+    "#425249",
+    "#56685d",
+    "#6c8072"
+   ]
+  },
+  "hand": {
+   "ramp": [
+    "#121212",
+    "#1f1f1f",
+    "#2e2d2c",
+    "#3e3c3a",
+    "#504d4a"
+   ]
+  },
+  "strap": {
+   "ramp": [
+    "#070707",
+    "#111111",
+    "#1b1a19",
+    "#262422"
+   ]
+  },
+  "brass": {
+   "ramp": [
+    "#2a2010",
+    "#4a3a1c",
+    "#6d5629",
+    "#927438",
+    "#b4914a"
+   ],
+   "spec": true,
+   "spec_t": 0.8
+  },
+  "iron": {
+   "ramp": [
+    "#0b0b0c",
+    "#18191b",
+    "#28292c",
+    "#3b3d41"
+   ],
+   "spec": true,
+   "spec_t": 0.85
+  },
+  "green": {
+   "ramp": [
+    "#0f3a12",
+    "#18621c",
+    "#228c27",
+    "#36b83a",
+    "#6ee26a"
+   ]
+  },
+  "card": {
+   "ramp": [
+    "#2a2412",
+    "#4a3f1e",
+    "#6d5c2c",
+    "#8f7a3c",
+    "#ae9650"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.5
+  }
+ },
+ "parts": {
+  "coat": {
+   "bone": "hips",
+   "lag": {
+    "frames": 2,
+    "sway": 0.5
+   },
+   "hang": 0.55
+  },
+  "cape": {
+   "bone": "spine.003",
+   "lag": {
+    "frames": 1,
+    "sway": 0.4
+   },
+   "hang": 0.5
+  },
+  "lantern": {
+   "bone": "hand.L",
+   "lag": {
+    "frames": 1,
+    "sway": 0.6
+   },
+   "hang": 0.6,
+   "upright_from": "hips"
+  },
+  "cards": {
+   "bone": "hand.R",
+   "lag": {
+    "frames": 0,
+    "sway": 0.0
+   }
+  }
+ },
+ "shapes": [
+  {
+   "name": "brim",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    13.2,
+    0.6
+   ],
+   "radii": [
+    16.0,
+    1.3,
+    15.0
+   ],
+   "material": "felt",
+   "bone": "head",
+   "rules": [
+    {
+     "hash": [
+      0.06,
+      4,
+      2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "crown",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    12.0,
+    0.4
+   ],
+   "b": [
+    70.0,
+    2.0,
+    -1.6
+   ],
+   "r": [
+    6.2,
+    2.4
+   ],
+   "material": "felt",
+   "bone": "head",
+   "rules": [
+    {
+     "y": [
+      9.5,
+      11.5
+     ],
+     "material": "strap"
+    }
+   ]
+  },
+  {
+   "name": "head",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    19.0,
+    0.2
+   ],
+   "radii": [
+    5.0,
+    6.0,
+    5.0
+   ],
+   "material": "black",
+   "bone": "head"
+  },
+  {
+   "name": "visage",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    15.0,
+    3.4
+   ],
+   "b": [
+    69.0,
+    28.0,
+    5.6
+   ],
+   "r": [
+    2.6,
+    1.2
+   ],
+   "material": "visage",
+   "bone": "head",
+   "rules": [
+    {
+     "every_y": [
+      5,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "hair.L",
+   "kind": "capsule",
+   "a": [
+    73.0,
+    15.0,
+    -0.8
+   ],
+   "b": [
+    73.2,
+    26.0,
+    -1.2
+   ],
+   "r": [
+    1.4,
+    0.8
+   ],
+   "material": "black",
+   "bone": "head"
+  },
+  {
+   "name": "hair.R",
+   "kind": "capsule",
+   "a": [
+    65.0,
+    15.0,
+    -0.8
+   ],
+   "b": [
+    64.8,
+    26.0,
+    -1.2
+   ],
+   "r": [
+    1.4,
+    0.8
+   ],
+   "material": "black",
+   "bone": "head"
+  },
+  {
+   "name": "hood",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    30.0,
+    -6.0
+   ],
+   "radii": [
+    7.0,
+    6.0,
+    4.4
+   ],
+   "material": "black",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "every_angle": [
+      14,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "collar",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    34,
+    0.0
+   ],
+   "b": [
+    69.0,
+    25,
+    1.0
+   ],
+   "r": [
+    5.6,
+    4.6
+   ],
+   "material": "black",
+   "bone": "neck"
+  },
+  {
+   "name": "chest",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    40.0,
+    -0.4
+   ],
+   "radii": [
+    9.0,
+    10.0,
+    6.8
+   ],
+   "material": "black",
+   "bone": "spine.003"
+  },
+  {
+   "name": "waist",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    50,
+    -0.4
+   ],
+   "b": [
+    69.0,
+    66,
+    -1.8
+   ],
+   "r": [
+    7.6,
+    8.2
+   ],
+   "material": "black",
+   "bone": "spine.001"
+  },
+  {
+   "name": "coat",
+   "kind": "ring",
+   "y": [
+    48,
+    131
+   ],
+   "rx": [
+    8.4,
+    0.11
+   ],
+   "rz": [
+    7.4,
+    0.095
+   ],
+   "thickness": 1.6,
+   "hem": {
+    "tongues": 16,
+    "depth": 5,
+    "seed": 3
+   },
+   "material": "black",
+   "part": "coat",
+   "bump": {
+    "folds": [
+     0.6,
+     9,
+     1.8
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      9,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    },
+    {
+     "hash": [
+      0.06,
+      9,
+      3
+     ],
+     "t": 1,
+     "px": [
+      90,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "coat_under",
+   "kind": "ring",
+   "y": [
+    66,
+    130
+   ],
+   "rx": [
+    7.4,
+    0.09
+   ],
+   "rz": [
+    6.4,
+    0.08
+   ],
+   "thickness": 1.4,
+   "material": "black",
+   "part": "coat"
+  },
+  {
+   "name": "cape",
+   "kind": "ring",
+   "y": [
+    26,
+    54
+   ],
+   "rx": [
+    11.0,
+    0.3
+   ],
+   "rz": [
+    9.4,
+    0.24
+   ],
+   "thickness": 1.6,
+   "hem": {
+    "tongues": 10,
+    "depth": 4,
+    "seed": 5
+   },
+   "material": "black",
+   "part": "cape",
+   "bump": {
+    "folds": [
+     0.5,
+     7,
+     1.6
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      8,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "belt",
+   "kind": "ring",
+   "y": [
+    57,
+    60
+   ],
+   "rx": [
+    8.8,
+    0.0
+   ],
+   "rz": [
+    7.8,
+    0.0
+   ],
+   "thickness": 1.6,
+   "material": "strap",
+   "bone": "hips"
+  },
+  {
+   "name": "belt2",
+   "kind": "ring",
+   "y": [
+    62,
+    64.4
+   ],
+   "rx": [
+    9.0,
+    0.0
+   ],
+   "rz": [
+    8.0,
+    0.0
+   ],
+   "thickness": 1.4,
+   "material": "strap",
+   "bone": "hips"
+  },
+  {
+   "name": "buckle",
+   "kind": "box",
+   "centre": [
+    69.0,
+    58.5,
+    8.6
+   ],
+   "half": [
+    1.4,
+    1.6,
+    0.5
+   ],
+   "round": 0.3,
+   "material": "brass",
+   "bone": "hips"
+  },
+  {
+   "name": "baldric",
+   "kind": "capsule",
+   "a": [
+    76.0,
+    33.0,
+    6.4
+   ],
+   "b": [
+    62.6,
+    57.0,
+    8.2
+   ],
+   "r": 0.9,
+   "material": "strap",
+   "bone": "spine.002"
+  },
+  {
+   "name": "disc",
+   "kind": "ellipsoid",
+   "centre": [
+    73.6,
+    45.0,
+    7.8
+   ],
+   "radii": [
+    2.0,
+    2.0,
+    0.8
+   ],
+   "material": "brass",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "near": [
+      [
+       [
+        73.6,
+        45.0,
+        null
+       ],
+       [
+        73.6,
+        45.0,
+        null
+       ]
+      ],
+      0.8
+     ],
+     "material": "iron"
+    }
+   ]
+  },
+  {
+   "name": "hang_strap",
+   "kind": "capsule",
+   "a": [
+    66.0,
+    60.0,
+    8.4
+   ],
+   "b": [
+    65.6,
+    84.0,
+    9.0
+   ],
+   "r": 0.7,
+   "material": "strap",
+   "part": "coat"
+  },
+  {
+   "name": "upper_arm.L",
+   "kind": "capsule",
+   "a": [
+    79.6,
+    33.0,
+    -3.6
+   ],
+   "b": [
+    83.0,
+    50.5,
+    -4.4
+   ],
+   "r": [
+    3.4,
+    3.2
+   ],
+   "material": "black",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "forearm.L",
+   "kind": "capsule",
+   "a": [
+    83.0,
+    50.5,
+    -4.4
+   ],
+   "b": [
+    87.6,
+    66.0,
+    -1.4
+   ],
+   "r": [
+    3.4,
+    4.0
+   ],
+   "material": "black",
+   "bone": "forearm.L"
+  },
+  {
+   "name": "cuff.L",
+   "kind": "capsule",
+   "a": [
+    87.0,
+    63.0,
+    -1.8
+   ],
+   "b": [
+    87.9,
+    67.6,
+    -0.9
+   ],
+   "r": 4.4,
+   "material": "black",
+   "bone": "forearm.L",
+   "rules": [
+    {
+     "y": [
+      null,
+      64
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "hand.L",
+   "kind": "ellipsoid",
+   "centre": [
+    91.2,
+    72.4,
+    0.0
+   ],
+   "radii": [
+    2.2,
+    3.4,
+    1.8
+   ],
+   "material": "hand",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      72,
+      73.2
+     ],
+     "x": [
+      90.4,
+      null
+     ],
+     "material": "brass"
+    }
+   ]
+  },
+  {
+   "name": "finger0.L",
+   "kind": "capsule",
+   "a": [
+    90.0,
+    74.4,
+    0.3
+   ],
+   "b": [
+    89.96000000000001,
+    79.4,
+    1.0
+   ],
+   "r": [
+    0.6,
+    0.45
+   ],
+   "material": "hand",
+   "bone": "hand.L",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger1.L",
+   "kind": "capsule",
+   "a": [
+    91.2,
+    74.4,
+    0.3
+   ],
+   "b": [
+    91.4,
+    79.4,
+    1.0
+   ],
+   "r": [
+    0.6,
+    0.45
+   ],
+   "material": "hand",
+   "bone": "hand.L",
+   "t": 0,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger2.L",
+   "kind": "capsule",
+   "a": [
+    92.4,
+    74.4,
+    0.3
+   ],
+   "b": [
+    92.84,
+    79.4,
+    1.0
+   ],
+   "r": [
+    0.6,
+    0.45
+   ],
+   "material": "hand",
+   "bone": "hand.L",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "thigh.L",
+   "kind": "capsule",
+   "a": [
+    74.0,
+    67.6,
+    0.1
+   ],
+   "b": [
+    74.0,
+    96.1,
+    -0.1
+   ],
+   "r": [
+    2.4,
+    2.0
+   ],
+   "material": "black",
+   "bone": "thigh.L"
+  },
+  {
+   "name": "shin.L",
+   "kind": "capsule",
+   "a": [
+    74.0,
+    96.1,
+    -0.1
+   ],
+   "b": [
+    74.0,
+    126.6,
+    -2.5
+   ],
+   "r": [
+    1.9,
+    1.7
+   ],
+   "material": "black",
+   "bone": "shin.L"
+  },
+  {
+   "name": "boot.L",
+   "kind": "box",
+   "centre": [
+    74.0,
+    130.6,
+    3.4
+   ],
+   "half": [
+    3.0,
+    2.4,
+    6.4
+   ],
+   "round": 1.6,
+   "material": "felt",
+   "bone": "foot.L"
+  },
+  {
+   "name": "upper_arm.R",
+   "kind": "capsule",
+   "a": [
+    58.400000000000006,
+    33.0,
+    -3.6
+   ],
+   "b": [
+    55.0,
+    50.5,
+    -4.4
+   ],
+   "r": [
+    3.4,
+    3.2
+   ],
+   "material": "black",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "every_y": [
+      4,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "forearm.R",
+   "kind": "capsule",
+   "a": [
+    55.0,
+    50.5,
+    -4.4
+   ],
+   "b": [
+    50.400000000000006,
+    66.0,
+    -1.4
+   ],
+   "r": [
+    3.4,
+    4.0
+   ],
+   "material": "black",
+   "bone": "forearm.R"
+  },
+  {
+   "name": "cuff.R",
+   "kind": "capsule",
+   "a": [
+    51.0,
+    63.0,
+    -1.8
+   ],
+   "b": [
+    50.099999999999994,
+    67.6,
+    -0.9
+   ],
+   "r": 4.4,
+   "material": "black",
+   "bone": "forearm.R",
+   "rules": [
+    {
+     "y": [
+      null,
+      64
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "hand.R",
+   "kind": "ellipsoid",
+   "centre": [
+    46.8,
+    72.4,
+    0.0
+   ],
+   "radii": [
+    2.2,
+    3.4,
+    1.8
+   ],
+   "material": "hand",
+   "bone": "hand.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      72,
+      73.2
+     ],
+     "x": [
+      null,
+      47.599999999999994
+     ],
+     "material": "brass"
+    }
+   ]
+  },
+  {
+   "name": "finger0.R",
+   "kind": "capsule",
+   "a": [
+    48.0,
+    74.4,
+    0.3
+   ],
+   "b": [
+    48.03999999999999,
+    79.4,
+    1.0
+   ],
+   "r": [
+    0.6,
+    0.45
+   ],
+   "material": "hand",
+   "bone": "hand.R",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger1.R",
+   "kind": "capsule",
+   "a": [
+    46.8,
+    74.4,
+    0.3
+   ],
+   "b": [
+    46.599999999999994,
+    79.4,
+    1.0
+   ],
+   "r": [
+    0.6,
+    0.45
+   ],
+   "material": "hand",
+   "bone": "hand.R",
+   "t": 0,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger2.R",
+   "kind": "capsule",
+   "a": [
+    45.599999999999994,
+    74.4,
+    0.3
+   ],
+   "b": [
+    45.16,
+    79.4,
+    1.0
+   ],
+   "r": [
+    0.6,
+    0.45
+   ],
+   "material": "hand",
+   "bone": "hand.R",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "thigh.R",
+   "kind": "capsule",
+   "a": [
+    64.0,
+    67.6,
+    0.1
+   ],
+   "b": [
+    64.0,
+    96.1,
+    -0.1
+   ],
+   "r": [
+    2.4,
+    2.0
+   ],
+   "material": "black",
+   "bone": "thigh.R"
+  },
+  {
+   "name": "shin.R",
+   "kind": "capsule",
+   "a": [
+    64.0,
+    96.1,
+    -0.1
+   ],
+   "b": [
+    64.0,
+    126.6,
+    -2.5
+   ],
+   "r": [
+    1.9,
+    1.7
+   ],
+   "material": "black",
+   "bone": "shin.R"
+  },
+  {
+   "name": "boot.R",
+   "kind": "box",
+   "centre": [
+    64.0,
+    130.6,
+    3.4
+   ],
+   "half": [
+    3.0,
+    2.4,
+    6.4
+   ],
+   "round": 1.6,
+   "material": "felt",
+   "bone": "foot.R"
+  },
+  {
+   "name": "bail",
+   "kind": "capsule",
+   "a": [
+    91.6,
+    76.0,
+    1.0
+   ],
+   "b": [
+    91.6,
+    79.0,
+    1.0
+   ],
+   "r": 0.4,
+   "material": "iron",
+   "part": "lantern",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "lamp_cap",
+   "kind": "box",
+   "centre": [
+    91.6,
+    80.0,
+    1.0
+   ],
+   "half": [
+    3.0,
+    1.0,
+    3.0
+   ],
+   "round": 0.6,
+   "material": "iron",
+   "part": "lantern"
+  },
+  {
+   "name": "lamp",
+   "kind": "box",
+   "centre": [
+    91.6,
+    85.4,
+    1.0
+   ],
+   "half": [
+    2.7,
+    4.6,
+    2.7
+   ],
+   "round": 0.4,
+   "material": "green",
+   "part": "lantern",
+   "rules": [
+    {
+     "every_x": [
+      3,
+      0
+     ],
+     "material": "iron"
+    },
+    {
+     "dy": [
+      3.8,
+      null
+     ],
+     "material": "iron"
+    }
+   ]
+  },
+  {
+   "name": "cards",
+   "kind": "box",
+   "centre": [
+    45.6,
+    77.0,
+    2.6
+   ],
+   "half": [
+    2.8,
+    4.0,
+    0.5
+   ],
+   "round": 0.2,
+   "material": "card",
+   "part": "cards",
+   "rules": [
+    {
+     "every_x": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.2,
+      2,
+      1
+     ],
+     "t": 1
+    }
+   ]
+  }
+ ],
+ "clips": {
+  "attack": "punch"
+ },
+ "effects": [],
+ "lights": [
+  {
+   "name": "lantern",
+   "part": "lantern",
+   "at": [
+    91.6,
+    85.4,
+    1.0
+   ],
+   "radius": 11,
+   "strength": 0.7,
+   "pulse": 0.2,
+   "colour": "#4fd04a"
+  }
+ ],
+ "shadow": {
+  "radii": [
+   18,
+   3.8
+  ],
+  "colour": "#4b4a4f"
+ },
+ "detail": {
+  "buckle": {
+   "file": "stranger.detail/buckle.png"
+  },
+  "disc": {
+   "file": "stranger.detail/disc.png"
+  },
+  "lantern": {
+   "file": "stranger.detail/lantern.png"
+  }
+ }
+}
