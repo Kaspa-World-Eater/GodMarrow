@@ -14,11 +14,31 @@ const BONE_M := Color8(196, 188, 164)
 const BONE_D := Color8(140, 132, 112)
 const GRIT := Color8(92, 86, 74)
 
+var spear_cv: Node2D       # the spears' own canvas: unshaded, so the night never dims them (D2R's spear lights itself)
+
+func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST   # the rendered spear keeps its pixels
+	spear_cv = Node2D.new()
+	spear_cv.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	var mat := CanvasItemMaterial.new()
+	mat.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
+	spear_cv.material = mat
+	# above the dark layer (world/dark_layer.gd is CanvasLayer 5), following the camera like the world: D2R's spear
+	# lights itself, so the night and the lanterns' warmth never dim or tint it
+	var over := CanvasLayer.new()
+	over.layer = 6
+	over.follow_viewport_enabled = true
+	add_child(over)
+	over.add_child(spear_cv)
+	spear_cv.draw.connect(_draw_spears)
+
 func _process(_dt: float) -> void:
 	if book == null or (book.fx_air != self and book.fx_floor != self):
 		queue_free()
 		return
 	queue_redraw()
+	if spear_cv:
+		spear_cv.queue_redraw()
 
 static func S(tp: Vector2, z: float = 0.0) -> Vector2:
 	return Iso.to_screen(tp) + Vector2(0, -z * 4.0)
@@ -84,6 +104,8 @@ func _draw() -> void:
 		var u: Vector2 = Iso.to_screen(sp["v"].normalized()).normalized()
 		if sp["small"]:
 			sliver(c - u * 9.0, c + u * 9.0, BONE_M)
+		elif SPEAR_TEX != null:
+			pass                                      # drawn on the unshaded canvas (_draw_spears)
 		else:
 			lance(c, u, int(sp.get("tier", 0)), 1.0)
 	# the lance growing at his side while he charges it
@@ -97,7 +119,10 @@ func _draw() -> void:
 		var u2: Vector2 = Iso.to_screen(dir.normalized() if dir.length() > 0.05 else Vector2(1, 1).normalized()).normalized()
 		var side := Vector2(-u2.y, u2.x) * (1.0 if u2.x >= 0.0 else -1.0)
 		var rise := clampf(ch["t"] / 0.2, 0.0, 1.0)
-		lance(S(hero.tp, 4.0 + 10.0 * rise) + side * 16.0, u2, tier, 0.55 + 0.45 * grow)
+		if SPEAR_TEX != null:
+			pass                                      # drawn on the unshaded canvas (_draw_spears)
+		else:
+			lance(S(hero.tp, 4.0 + 10.0 * rise) + side * 16.0, u2, tier, 0.55 + 0.45 * grow)
 	# Charnel Cages: ribs curving up round the ring, lumpy arms gripping inside
 	for c in book.cages:
 		var k: float = clampf((c["max"] - c["t"]) / 0.15, 0.0, 1.0) * clampf(c["t"] / 0.3, 0.0, 1.0)
@@ -132,7 +157,99 @@ func _draw() -> void:
 		draw_string(font, pw + Vector2(-wd / 2.0, 0), w["s"], HORIZONTAL_ALIGNMENT_LEFT, -1, 22, Color(w["col"], kw))
 
 
-## a lance of packed bone along u, after D2's Bone Spear but solid bone in our colours: a long barbed head tapering
+## The Bone Spear after Diablo II Resurrected's (2026-10-05, Derek: "very very close to the bone spear in d2r"): the
+## rendered spear (docs/concepts/bone_spear: a jagged spike of pale cold bone, knuckled like a spine, barbs swept back),
+## the heading nearest its flight out of 32, and in flight D2R's pale blue-white streak tapering away behind it with a
+## few wisps curling off it and a faint cold halo. Bigger with each tier of the charge.
+static var SPEAR_TEX: Texture2D = load("res://art/fx/bone_spear.png") if ResourceLoader.exists("res://art/fx/bone_spear.png") else null
+static var SPEAR_FR: Array = _spear_frames()
+
+static func _spear_frames() -> Array:
+	if not FileAccess.file_exists("res://art/fx/bone_spear.json"):
+		return []
+	var d = JSON.parse_string(FileAccess.get_file_as_string("res://art/fx/bone_spear.json"))
+	return d.get("frames", []) if d is Dictionary else []
+const STREAK := Color(0.78, 0.88, 1.0)
+
+func _draw_spears() -> void:
+	if floor_mode or SPEAR_TEX == null or book == null or book.zone == null or book.hero == null:
+		return
+	var hero = book.hero
+	for sp in book.spears:
+		if sp["small"]:
+			continue
+		var c := S(sp["tp"], 8.0)
+		var u: Vector2 = Iso.to_screen(sp["v"].normalized()).normalized()
+		spear(c, u, int(sp.get("tier", 0)), 1.0, true)
+	if not book.charging.is_empty():
+		var ch: Dictionary = book.charging
+		var tier: int = ch["tier"]
+		var nxt: float = book.LANCE_T[mini(tier, 2)]
+		var prev: float = 0.0 if tier == 0 else book.LANCE_T[tier - 1]
+		var grow := 1.0 if tier >= 3 else clampf((ch["t"] - prev) / maxf(0.01, nxt - prev), 0.0, 1.0)
+		var dir: Vector2 = ch["at"] - hero.tp
+		var u2: Vector2 = Iso.to_screen(dir.normalized() if dir.length() > 0.05 else Vector2(1, 1).normalized()).normalized()
+		var side := Vector2(-u2.y, u2.x) * (1.0 if u2.x >= 0.0 else -1.0)
+		var rise := clampf(ch["t"] / 0.2, 0.0, 1.0)
+		spear(S(hero.tp, 4.0 + 10.0 * rise) + side * 16.0, u2, tier, 0.55 + 0.45 * grow, false)
+
+func spear(c: Vector2, u: Vector2, tier: int, k: float, flying: bool) -> void:
+	var cv: Node2D = spear_cv
+	var sc := (1.0 + 0.18 * tier) * k
+	var ang := rad_to_deg(u.angle())
+	var best = null
+	var bd := 999.0
+	for f in SPEAR_FR:
+		var d := absf(wrapf(float(f["angle"]) - ang, -180.0, 180.0))
+		if d < bd:
+			bd = d
+			best = f
+	if best == null:
+		return
+	var r: Array = best["rect"]
+	var an: Array = best["anchor"]
+	var half_len := float(maxf(r[2], r[3])) * 0.5 * sc
+	if flying:
+		var t: float = book.time
+		var n := Vector2(-u.y, u.x)
+		# the streak: a long pale taper behind the spear, brightest where it leaves the tail
+		var L := half_len * 3.0
+		var w0 := (5.5 + 1.5 * tier) * sc
+		var pts := PackedVector2Array()
+		var cols := PackedColorArray()
+		var tail := c - u * half_len * 0.7
+		for i in 9:
+			var q := float(i) / 8.0
+			var wq := w0 * (1.0 - q) + 0.5
+			pts.append(tail - u * L * q + n * wq)
+			cols.append(Color(STREAK, 0.6 * (1.0 - q) * (1.0 - q * 0.3)))
+		for i in range(8, -1, -1):
+			var q := float(i) / 8.0
+			var wq := w0 * (1.0 - q) + 0.5
+			pts.append(tail - u * L * q - n * wq)
+			cols.append(Color(STREAK, 0.6 * (1.0 - q) * (1.0 - q * 0.3)))
+		cv.draw_polygon(pts, cols)
+		# the core line of the streak, brighter and thin
+		cv.draw_line(tail, tail - u * L * 0.55, Color(1, 1, 1, 0.55), 2.0)
+		# wisps curling away off the streak
+		for wi in 3:
+			var ph := t * 9.0 + wi * 2.1
+			var a := tail - u * (L * (0.2 + 0.25 * wi))
+			var b := a - u * 10.0 + n * sin(ph) * (5.0 + 3.0 * wi)
+			cv.draw_line(a, b, Color(STREAK, 0.25), 1.0)
+		# a faint cold halo round the spear itself
+		for ring in 2:
+			var hp := PackedVector2Array()
+			for a_i in 18:
+				var aa := a_i / 18.0 * TAU
+				hp.append(c + u * cos(aa) * (half_len + 4.0 - ring * 3.0) + n * sin(aa) * (w0 + 3.0 - ring * 1.5))
+			cv.draw_colored_polygon(hp, Color(STREAK, 0.1))
+	cv.draw_set_transform(c, 0.0, Vector2(sc, sc))
+	cv.draw_texture_rect_region(SPEAR_TEX, Rect2(-float(an[0]), -float(an[1]), r[2], r[3]), Rect2(r[0], r[1], r[2], r[3]))
+	cv.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+## (the old drawing, kept for a build without the rendered spear) a lance of packed bone along u, after D2's Bone Spear but solid bone in our colours: a long barbed head tapering
 ## to a hard point, a thin shaft knuckled like a spine, a light edge on the upper side and shade below, a dark
 ## outline. From tier 1 a faint warmth of marrow about it that deepens with each tier (the user asked for this
 ## subtle glow, 2026-09-30); at tier 3 amber marrow shows through the core of the shaft.
