@@ -29,6 +29,16 @@ var arrive := {}
 var markers := {}
 var wall_nodes: Array = []
 var hero_ref: Hero
+## posts: what stands on the ground and blocks a body without filling its tile (graves, chests, statues, braziers,
+## the camp's folk...), as circles in tile units, hashed by tile. The user asked for solid objects (2026-10-05): the
+## web let bodies walk through every prop. Paths are weighted round them, not walled off, so a grave never closes a road.
+var posts := {}               # Vector2i -> Array of [Vector2 centre, float radius]
+const POST_R := {
+	"grave": 0.32, "cairn": 0.38, "brazier": 0.3, "stump": 0.36, "coffin": 0.42, "pillar": 0.45, "gibbet": 0.34,
+	"bell": 0.45, "railing": 0.3, "rubble": 0.3,
+	"chest": 0.42, "shrine": 0.45, "lantern": 0.34, "statue": 0.55, "altar": 0.55, "vendor": 0.3,
+	"statue_saint": 0.5, "statue_angel": 0.5, "cage": 0.45, "cage2": 0.45, "tent": 0.9, "campfire": 0.42,
+	"org_ribs": 0.4, "org_eye": 0.35}
 
 static func rle(a: Array, n: int) -> PackedByteArray:
 	var out := PackedByteArray()
@@ -74,6 +84,7 @@ func load_zone(zid: String, zseed: int) -> void:
 	connections = d.get("connections", [])
 	objects = d.get("objects", [])
 	lanterns = markers.get("lanterns", [])
+	_posts()
 	floor_layer = Node2D.new()
 	floor_layer.z_index = -50
 	add_child(floor_layer)
@@ -108,24 +119,79 @@ func is_solid(t: Vector2) -> bool:
 func blocks_sight(t: Vector2) -> bool:
 	return SIGHT_TYPES.has(type_at(t))
 
-## a body of radius r moving from p by v, sliding along solid tiles (the web moves x and y separately)
+## a body of radius r moving from p by v, sliding along solid tiles (the web moves x and y separately) and round posts
 func move(p: Vector2, v: Vector2, r: float = 0.25) -> Vector2:
 	var q := p
 	var nx := Vector2(p.x + v.x, p.y)
-	if not _blocked(nx, r):
+	if not _blocked(nx, r, q):
 		q.x = nx.x
 	var ny := Vector2(q.x, q.y + v.y)
-	if not _blocked(ny, r):
+	if not _blocked(ny, r, q):
 		q.y = ny.y
+	if q == p and v.length_squared() > 1e-8:
+		# stopped dead against a post: slide along its edge instead
+		var hit = _post_hit(p + v, r, p)
+		if hit != null:
+			var n: Vector2 = (p - (hit[0] as Vector2)).normalized()
+			var tv := v - n * v.dot(n)
+			if tv.length_squared() > 1e-8 and not _blocked(p + tv, r, p):
+				q = p + tv
 	return q
 
-func _blocked(p: Vector2, r: float) -> bool:
-	return is_solid(p + Vector2(r, 0)) or is_solid(p + Vector2(-r, 0)) or is_solid(p + Vector2(0, r)) or is_solid(p + Vector2(0, -r))
+## the circle's edge, eight points round it (four let a body cut a corner), and the posts
+func _blocked(p: Vector2, r: float, from: Vector2 = Vector2.INF) -> bool:
+	if is_solid(p):
+		return true
+	var k := r * 0.7071
+	for o in [Vector2(r, 0), Vector2(-r, 0), Vector2(0, r), Vector2(0, -r), Vector2(k, k), Vector2(-k, k), Vector2(k, -k), Vector2(-k, -k)]:
+		if is_solid(p + o):
+			return true
+	return _post_hit(p, r, from) != null
+
+## the post a body of radius r at p would stand in; one it already stands in only stops it coming nearer
+func _post_hit(p: Vector2, r: float, from: Vector2 = Vector2.INF):
+	var c := Vector2i(int(floor(p.x)), int(floor(p.y)))
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			var a = posts.get(c + Vector2i(dx, dy))
+			if a == null:
+				continue
+			for po in a:
+				var rr: float = po[1] + r
+				var d := p.distance_to(po[0])
+				if d < rr and (from == Vector2.INF or d < from.distance_to(po[0]) - 0.0001):
+					return po
+	return null
+
+func add_post(tp: Vector2, r: float) -> void:
+	var c := Vector2i(int(floor(tp.x)), int(floor(tp.y)))
+	if not posts.has(c):
+		posts[c] = []
+	posts[c].append([tp, r])
+	if c.x >= 0 and c.y >= 0 and c.x < w and c.y < h and not astar.is_point_solid(c):
+		astar.set_point_weight_scale(c, 6.0)
+
+func _posts() -> void:
+	posts.clear()
+	for o in d.get("props", []):
+		if POST_R.has(o.get("kind", "")):
+			add_post(Vector2(o["x"], o["y"]), POST_R[o["kind"]])
+	for o in d.get("objects", []):
+		if POST_R.has(o.get("type", "")):
+			add_post(Vector2(o["x"], o["y"]), POST_R[o["type"]])
+	for o in d.get("decor", []):
+		if POST_R.has(o.get("key", "")):
+			add_post(Vector2(o["x"], o["y"]), POST_R[o["key"]])
+
+## is there room for a body of radius r at p (tiles and posts)
+func room_at(p: Vector2, r: float = 0.25) -> bool:
+	return not _blocked(p, r)
 
 func line_clear(a: Vector2, b: Vector2) -> bool:
 	var n := int(ceil(a.distance_to(b) * 3.0))
 	for i in range(1, n + 1):
-		if is_solid(a.lerp(b, float(i) / n)):
+		var q := a.lerp(b, float(i) / n)
+		if is_solid(q) or _post_hit(q, 0.15) != null:
 			return false
 	return true
 

@@ -173,6 +173,8 @@ func _build_altar(o: Dictionary, tp: Vector2, mem: Dictionary) -> void:
 func _add(ty: String, o: Dictionary, node: Node2D, nm: String, live: bool = true) -> Dictionary:
 	var e := {"type": ty, "o": o, "i": int(o.get("i", -1)), "tp": Vector2(o["x"], o["y"]), "node": node, "name": nm,
 		"reach": REACH.get(ty, 1.5), "live": live}
+	if ty == "npc" and zone:   # the camp's folk stand their ground (the zone's own objects are posts already)
+		zone.add_post(e["tp"], 0.3)
 	things.append(e)
 	return e
 

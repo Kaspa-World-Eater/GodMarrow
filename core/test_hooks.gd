@@ -16,6 +16,7 @@ extends RefCounted
 ##   --place=NAME[,NAME]      the Forge's objects (art/objects/objects.json) stood beside the pilgrim for a look, nothing saved
 ##   --shot=PATH [--shot_t=S] [--shot_n=N]   save the screen to PATH after S seconds (default 4), N frames 0.25 s apart
 ##                            (PATH_1.png ...), then quit. Needs a window (not --headless). --hour=0..1 sets the hour.
+##   --show=collision         draw what blocks a body: solid tiles (red diamonds) and posts (yellow rings)
 ##   --hide=dark,atmos,sky    switch those overlays off (the dark and light map, the air, the weather),
 ##                            to judge a sprite or an effect in its plain paint
 
@@ -58,6 +59,8 @@ static func run(g) -> void:
 	if a.has("wisps") and g.hero.skills.has_method("spawn_wisp"):
 		for i in int(a["wisps"]):
 			g.hero.skills.spawn_wisp()
+	if a.get("show", "") == "collision":
+		_show_collision(g)
 	if a.has("shot"):
 		_shot(g, a)
 	if a.has("arena"):
@@ -75,6 +78,36 @@ static func run(g) -> void:
 			g.hud.toggle_panel(a["panel"])
 		else:
 			Bus.panel_requested.emit(a["panel"], "Maren the Gravekeeper" if a["panel"] == "vendor" else "Brannoc of the Nail")
+
+## what blocks: a node in the zone's ground layer, redrawn as the camera moves
+static func _show_collision(g) -> void:
+	var z: Zone = g.zone
+	var n := Node2D.new()
+	n.z_index = 4000
+	n.z_as_relative = false
+	z.add_child(n)
+	n.draw.connect(func():
+		var c: Vector2 = g.hero.tp
+		for y in range(int(c.y) - 14, int(c.y) + 15):
+			for x in range(int(c.x) - 14, int(c.x) + 15):
+				if z.is_solid(Vector2(x + 0.5, y + 0.5)):
+					var pts := PackedVector2Array([Iso.to_screen(Vector2(x, y)), Iso.to_screen(Vector2(x + 1, y)), Iso.to_screen(Vector2(x + 1, y + 1)), Iso.to_screen(Vector2(x, y + 1)), Iso.to_screen(Vector2(x, y))])
+					n.draw_polyline(pts, Color(1, 0.2, 0.2, 0.8), 2.0)
+		for k in z.posts:
+			if (Vector2(k) - c).length() > 16.0:
+				continue
+			for po in z.posts[k]:
+				var ring := PackedVector2Array()
+				for i in 25:
+					var a2 := TAU * i / 24.0
+					ring.append(Iso.to_screen((po[0] as Vector2) + Vector2(cos(a2), sin(a2)) * float(po[1])))
+				n.draw_polyline(ring, Color(1, 0.9, 0.2, 0.95), 2.0)
+		var hr := PackedVector2Array()
+		for i in 25:
+			var a3 := TAU * i / 24.0
+			hr.append(Iso.to_screen(c + Vector2(cos(a3), sin(a3)) * float(g.hero.radius)))
+		n.draw_polyline(hr, Color(0.3, 1, 0.5, 0.95), 2.0))
+	g.get_tree().process_frame.connect(func(): if is_instance_valid(n): n.queue_redraw())
 
 ## the balance arena: a ring of creatures, every order's skills logging what they dealt
 static func _arena(g, a: Dictionary) -> void:
