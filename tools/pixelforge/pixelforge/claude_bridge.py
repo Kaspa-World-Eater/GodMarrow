@@ -49,13 +49,17 @@ STYLE_RULES = [
     "No animals and no animal words. Copper, not pennies; lands and leagues; no weekday names.",
     "Characters are shape sprites (.shapes.json) rendered by PixelForge at the game's hero height (the godmarrow preset, 195 px); a painting is a reference to measure against, never carved.",
     "OKLab for every colour distance; a transform never adds a colour outside the sprite's palette.",
+    "Diablo 2: Blizzard's files never enter the repository. Everything read from the game lives in the local reference folder (d2_doctor names it); "
+    "our sprites and our mod files are ours. When a Diablo 2 step fails, say what to install or set in plain words (the tool's error does).",
 ]
 BANNED_WORDS = ["cooldown", "dps", "proc", "aggro", "loot", "buff", "nerf", "stun", "lightning", "mana", "rot", "cell", "virus", "DNA", "organism", "biology"]
 
 # what each bench is for, and the tools that belong to it (the names are the MCP server's)
 BENCH_TOOLS = {
     "characters": "draft_shapes, measure_views, sample_materials, compare_shapes, validate_shapes, shape_template, import_shapes, render_shapes, "
-                  "preview_shape_sprite, shape_sheet, add_character, prompts, status, export_game",
+                  "preview_shape_sprite, shape_sheet, add_character, prompts, status, export_game; Diablo 2: d2_doctor (the game, the extractor, the "
+                  "reference folder), d2_fetch_tools, d2_list, d2_import (their sprites into our frames), d2_export_mod, d2_play (build the mod into the "
+                  "install and start the game; the person has already agreed when the line says so), d2_port_skills",
     "creatures": "the characters' tools (the humanoid skeleton stands in for the beast rig, which is not in the engine yet)",
     "objects": "draft_shapes (an object is a .shapes.json without bones), validate_shapes, shape_object, preview_shape_sprite, make_prop",
     "effects": "make_effect (kinds: fire smoke wisp burst embers ring bolt slash circle cloud shards pillar decal drip flash ward vortex rain ashfall fog "
