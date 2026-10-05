@@ -1945,3 +1945,34 @@ Derek's order: finish and polish Act I before anything new. The plan, with his o
   browser and Godot side by side (`compare.mjs`). `core/data.gd` reads the gz files; `--zseed=S` loads a given seed.
 - **Browser parity:** the palisade (posts along the run, lashings, the odd skull), the death splats, and corpses that
   darken and sink.
+
+
+**7.31 (2026-10-05, PixelForge session): the standing direction, for any session that picks this up.** Read this
+before anything else in §7.
+
+- **The character road is: Claude draws, the Forge renders.** Claude Code (on the owner's PC, reached from the Forge's
+  describe line or a dropped painting) hand-authors the shape model as a full 3D model against the painting, in rounds
+  with the compare picture, by writing a generator script the way `docs/concepts/hemomancer/shapes/` was made. The
+  Forge renders eight directions and every clip, lets pixels be fixed in the editor and carried by part, and exports.
+  **Every automatic drawing step is dropped from the visible flow**: the measure-and-draft road (`character
+  from-picture`'s draft), the old inflated-cutout road, the painting projection, quick_sprite on a dropped picture.
+  They remain only as tools Claude may call. The owner's words: "Claude hand drawing was better than the automatic
+  shit." Never show an automatically drawn character as a result.
+- **A dropped picture is the reference and nothing else**: shown as it is, stored untouched, never pixelated or
+  converted.
+- **Effects, music, tiles, interface** are the Forge's generators, driven by the describe line, and stay.
+- **In flight on `track/refine`** (commits land as it goes): `pixelforge character author` (the authoring loop with
+  rounds, scoped Write/Bash for the generator script, the authoring prompt in `prompts_author.py`), the bench flow,
+  `forge/tools/acceptance.sh` (the Keeper from his painting to a game screenshot, mock Claude), and `pixelforge claude
+  doctor` (finds, sign-in, registration, MCP start, a real describe round-trip, Chrome), because the owner reports the
+  describe line does nothing on his PC and nothing here can exercise the real Claude Code.
+- **The acceptance test is the owner running the Keeper on his machine.** If the result is at the Hemomancer's level,
+  the tool works; if not, stop building the character road and say so. No further rebuilds of it on a session's own
+  initiative. The owner: "I don't want to waste any more tokens on this if it's just a big failure."
+- **Main holds** (0fe3f4d and after): the editor, the music editor and library, Claude on every bench, part ids, the
+  facing fix, the pipeline fixes and parts kit, the Diablo 2 bridge, the look pass with affordances, the effects
+  engine (33 effects), picture-in (to be cut back per above), adapters and jobs. 408 tests.
+- **After the character road is settled**: the frame art's fidelity round (stone, iron, sconces), then the clean
+  rewrite with manuals (User Manual, Operator Manual for AI, Reference, Art Direction, Developer Guide), written as a
+  shipped product with no history in it.
+- The game is another session's (`docs/GAME_HANDOFF.md`); the lore is another's (`docs/codex/LORE_REWRITE_GUIDE.md`).
