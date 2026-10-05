@@ -135,6 +135,7 @@ func _draw() -> void:
 			pass                                      # drawn on the unshaded canvas (_draw_spears)
 		else:
 			lance(S(hero.tp, 4.0 + 10.0 * rise) + side * 16.0, u2, tier, 0.55 + 0.45 * grow)
+	_draw_blade(hero)
 	# Charnel Cages: ribs curving up round the ring, lumpy arms gripping inside
 	for c in book.cages:
 		var k: float = clampf((c["max"] - c["t"]) / 0.15, 0.0, 1.0) * clampf(c["t"] / 0.3, 0.0, 1.0)
@@ -378,3 +379,81 @@ func lance(c: Vector2, u: Vector2, tier: int, k: float) -> void:
 				for b in 2:
 					var q2: Vector2 = c + u * (i - 1 - b) * P + n * side * (sw + 2 + b) * P
 					draw_rect(Rect2(Vector2(floorf(q2.x / P) * P, floorf(q2.y / P) * P), Vector2(P, P)), BONE if side > 0 else BONE_D)
+
+
+## The Bone Blade (skills/ossumancer/tree_count.gd): while he charges, bone grows out over the head of his weapon, longer
+## and more crooked with each tier, and three small bone pips under him fill; each stroke leaves its mark: the thrust a
+## straight streak, the cleave an arc of slivers, the split a cracked line in the ground with shards thrown up.
+func _blade_shape(base: Vector2, u: Vector2, length: float, width: float, crook: float) -> void:
+	var n := Vector2(-u.y, u.x)
+	var pts := PackedVector2Array()
+	var segs := 7
+	for i in segs + 1:                        # the upper edge, base to tip, bending toward the crook
+		var q := float(i) / segs
+		pts.append(base + u * length * q + n * (width * (1.0 - q) + crook * sin(q * PI) * length * 0.06))
+	for i in range(segs, -1, -1):              # the lower edge back, with notches cut in it
+		var q := float(i) / segs
+		var notch := 0.35 if i % 2 == 1 and i < segs else 0.0
+		pts.append(base + u * length * q - n * (width * (1.0 - q) * (1.0 - notch) - crook * sin(q * PI) * length * 0.06))
+	draw_colored_polygon(pts, BONE_M)
+	draw_polyline(pts, Color(0.16, 0.14, 0.12), 1.5)
+	draw_line(base + n * width * 0.5, base + u * length * 0.92, BONE, 1.5)   # the lit ridge
+
+func _draw_blade(hero) -> void:
+	if not book.has_method("tick_blade"):
+		return
+	var ch: Dictionary = book.bcharge
+	if not ch.is_empty():
+		var tier: int = ch["tier"]
+		var nxt: float = book.BLADE_T[mini(tier, 1)]
+		var prev: float = 0.0 if tier == 0 else book.BLADE_T[tier - 1]
+		var grow := 1.0 if tier >= 2 else clampf((ch["t"] - prev) / maxf(0.01, nxt - prev), 0.0, 1.0)
+		var dir: Vector2 = ch["at"] - hero.tp
+		var u: Vector2 = Iso.to_screen(dir.normalized() if dir.length() > 0.05 else Vector2(1, 1).normalized()).normalized()
+		var hand := S(hero.tp, 14.0) + u * 22.0
+		var length := (26.0 + 16.0 * tier + 14.0 * grow * (1.0 if tier < 2 else 0.0)) * (1.0 + 0.04 * tier)
+		_blade_shape(hand, u, length, 4.0 + tier * 1.5, float(tier))
+		# the gauge: three bone pips under his feet, filling
+		var foot := S(hero.tp) + Vector2(0, 14)
+		for i in 3:
+			var c := foot + Vector2((i - 1) * 16.0, 0)
+			var full := i < tier or (i == tier and tier == 2)
+			var part := 1.0 if i < tier else (grow if i == tier else 0.0)
+			draw_rect(Rect2(c - Vector2(6, 2), Vector2(12, 4)), Color(0.12, 0.11, 0.1, 0.8))
+			draw_rect(Rect2(c - Vector2(6, 2), Vector2(12.0 * (1.0 if full else part), 4)), BONE if full else BONE_D)
+	for f in book.blade_fx:
+		var k: float = 1.0 - f["t"] / 0.5
+		match f["kind"]:
+			"thrust":
+				var u1: Vector2 = Iso.to_screen(f["dir"]).normalized()
+				var a1 := S(f["tp"], 12.0)
+				draw_line(a1, a1 + u1 * f["reach"] * 70.0, Color(BONE, 0.8 * k), 3.0 * k + 1.0)
+				draw_line(a1, a1 + u1 * f["reach"] * 70.0, Color(1, 1, 1, 0.5 * k), 1.0)
+			"cleave":
+				var c2 := S(f["tp"], 10.0)
+				var base_a: float = Iso.to_screen(f["dir"]).angle()
+				for i in 13:
+					var ang := base_a - 1.2 + i * 0.2
+					var r: float = f["reach"] * 62.0 + 10.0
+					var d := Vector2(cos(ang), sin(ang) * 0.55)
+					sliver(c2 + d * r * (0.55 + 0.25 * (1.0 - k)), c2 + d * r, Color(BONE_M, k))
+			"split", "split_flash":
+				if f["kind"] == "split":
+					var u3: Vector2 = Iso.to_screen(f["dir"]).normalized()
+					var p0 := S(f["tp"])
+					var L3: float = f["len"] * Iso.to_screen(f["dir"]).length()
+					var n3 := Vector2(-u3.y, u3.x)
+					var last := p0
+					for i in range(1, 13):
+						var q := float(i) / 12.0
+						var p := p0 + u3 * L3 * q + n3 * sin(q * 37.0) * 3.0
+						draw_line(last, p, Color(0.08, 0.07, 0.06, 0.9 * k), 3.0)
+						draw_line(last + Vector2(0, -1), p + Vector2(0, -1), Color(BONE_D, 0.7 * k), 1.0)
+						last = p
+						if i % 2 == 0:
+							sliver(p, p + Vector2(sin(i * 7.1) * 6.0, -10.0 - 8.0 * k), Color(BONE, k))
+			"close":
+				var c4 := S(f["tp"], 30.0)
+				for i in 9:
+					var ang4 := i / 9.0 * TAU
+					draw_line(c4, c4 + Vector2(cos(ang4), sin(ang4) * 0.6) * (10.0 + 14.0 * (1.0 - k)), Color(1, 1, 1, 0.8 * k), 1.5)

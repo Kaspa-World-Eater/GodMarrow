@@ -62,6 +62,7 @@ var spear_casts: Array = []  # {at (tile), t}: a spear just thrown, for the flas
 var spears: Array = []        # {tp, v, t, dmg, hit: {}, splint, main, small}
 var words: Array = []         # small words over the world: {tp, s, t, col}
 var cages: Array = []         # Charnel Cages: {tp, R, t, max, dps, tick, drain}
+var blade_fx: Array = []      # the Bone Blade's strokes for the eye: {kind, tp, dir, reach|len, t, tier}
 var spikes_fx: Array = []     # spurs bursting from a wound: {tp, a, len, t}
 var rains: Array = []         # Bone Rain: {tp, R, t, dmg, spawn, drops: [{tp, z}]}
 var siph_fx: Array = []       # Marrow Siphon's cone and the marrow drawn home: {tp, dir, R, t} / {from, t}

@@ -53,7 +53,7 @@ func _cast(id: String, a: Vector2, target) -> bool:
 			cast_len = 0.3
 			return true
 		"blade":
-			return strike_blade(a, target)
+			return cast_blade(a, target)
 		"barmor":
 			return cast_armor()
 		"offering":
@@ -156,6 +156,10 @@ func tick(dt: float) -> void:
 	tick_fusing(dt)
 	tick_dead(dt)
 	tick_charge(dt)
+	tick_blade(dt)
+	for f in blade_fx:
+		f["t"] += dt
+	blade_fx = blade_fx.filter(func(f): return f["t"] < 0.5)
 	tick_spears(dt)
 	tick_cages(dt)
 	tick_rains(dt)
@@ -242,6 +246,8 @@ func _autocast(dt: float) -> void:
 		hero._start_act(cast_anim, cast_len)
 		if id == "spear" and not charging.is_empty():
 			charging["goal"] = randi() % 4
+		if id == "blade" and not bcharge.is_empty():
+			bcharge["goal"] = randi() % 3
 		if id in ["colossus", "host", "aura"]:
 			auto_hold = id
 			auto_hold_t = 2.0

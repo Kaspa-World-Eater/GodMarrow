@@ -41,6 +41,7 @@ func _build() -> void:
 				["Screen shake: " + _on(Settings.screen_shake), "t:screen_shake"],
 				["Auto attack: " + _on(Settings.auto_attack), "t:auto_attack"],
 				["Hold to charge heavy attacks: " + _on(Settings.hold_heavy), "t:hold_heavy"],
+				["Charge melee techniques: " + _on(Settings.charge_melee), "t:charge_melee"],
 				["Music: %d%%" % roundi(Settings.music_vol * 100), "v:music_vol"],
 				["Sound: %d%%" % roundi(Settings.sfx_vol * 100), "v:sfx_vol"],
 				["The title: " + String(Settings.TITLE_NAMES[Settings.title_scene]), "title_scene"],

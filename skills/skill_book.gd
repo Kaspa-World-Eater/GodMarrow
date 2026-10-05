@@ -51,7 +51,8 @@ func _load() -> void:
 func _on_kill(_m) -> void:
 	pass
 
-## test args shared by every order: --learn=all[:L] or --learn=id,id[:L] (hard points, default 10), --autocast[=id,id]
+## test args shared by every order: --learn=all[:L] or --learn=id,id[:L] (hard points, default 10), --autocast[=id,id],
+## --right=id / --left=id (bind a skill to a mouse button)
 func _read_args() -> void:
 	for a in OS.get_cmdline_user_args():
 		var kv: PackedStringArray = a.trim_prefix("--").split("=")
@@ -68,6 +69,10 @@ func _read_args() -> void:
 				for id in ids:
 					if data.has(id):
 						hard[id] = clampi(L, 1, 20)
+			"right":                       # bind a skill to a mouse button at the start (tests, the playtest launchers)
+				right = v
+			"left":
+				left = v
 			"autocast":
 				auto_on = true
 				if v != "":
