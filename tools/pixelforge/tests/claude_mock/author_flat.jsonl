@@ -1,0 +1,9 @@
+# the mock author that never improves: every round writes round 1's figure, so the loop's "no improvement in two rounds" rule stops it
+{"type":"system","subtype":"init","cwd":"{project}","session_id":"mock","tools":["Read","Write","Bash"],"mcp_servers":[{"name":"pixelforge","status":"connected"}],"model":"mock"}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t2","name":"Write","input":{"file_path":"{script}","content":"# the generator"}}]}}
+{"mock":"copy","from":"{pf_root}/tests/claude_mock/author_generator.py","to":"{script}"}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t2","content":"ok"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t3","name":"Bash","input":{"command":"python \"{script}\" --round 1 --out \"{model}\""}}]}}
+{"mock":"python","args":["{script}","--round","1","--out","{model}"]}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t3","content":"wrote the model"}]}}
+{"type":"result","subtype":"success","is_error":false,"duration_ms":4000,"num_turns":2,"result":"{\"did\": [\"wrote the generator again\"], \"changed\": [\"{script}\", \"{model}\"], \"notes\": \"The same figure.\", \"focus\": \"the body\"}","total_cost_usd":0.2,"session_id":"mock"}

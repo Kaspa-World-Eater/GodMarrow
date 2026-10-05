@@ -35,7 +35,7 @@ SERVER_NAME = "pixelforge"
 MCP_ALLOW = "mcp__pixelforge"                             # every tool of PixelForge's MCP server
 CHROME_SERVER = "claude-in-chrome"
 CHROME_ALLOW = "mcp__claude-in-chrome"
-BENCHES = ("characters", "creatures", "objects", "effects", "tiles", "interface", "music", "sound", "midjourney")
+BENCHES = ("characters", "creatures", "objects", "effects", "tiles", "interface", "music", "sound", "midjourney", "author")
 DEFAULT_TIMEOUT = 600.0
 MIDJOURNEY_TIMEOUT = 900.0
 LOG_DIR = "claude/logs"
@@ -293,17 +293,28 @@ def allowed_tools(chrome: bool = False) -> list[str]:
     return out
 
 
+def author_tools(folder: str | Path) -> tuple[list[str], list[str]]:
+    """The tools the authoring Claude gets (``character author``): Read anywhere in the project, Write and Edit only under
+    ``folder`` (the character's ``shapes/``, where the generator script and the model live), Bash only to run Python
+    (the script), and PixelForge's MCP tools. Returns (``--tools``, ``--allowedTools``)."""
+    f = Path(folder).resolve().as_posix().rstrip("/")
+    tools = ["Read", "Write", "Edit", "Bash"]
+    allowed = [MCP_ALLOW, "Read", f"Write(//{f.lstrip('/')}/**)", f"Edit(//{f.lstrip('/')}/**)", "Bash(python *)", "Bash(python3 *)", "Bash(py *)"]
+    return tools, allowed
+
+
 def budget() -> str | None:
     v = os.environ.get("PIXELFORGE_CLAUDE_BUDGET", "3")
     return v if v and v != "0" else None
 
 
 def build_command(exe: str, bench: str, project: Path, text: str, mcp_cfg: Path, chrome: bool = False, ctx: dict | None = None,
-                  prompt: str | None = None, add_dirs: list[str] | None = None) -> list[str]:
+                  prompt: str | None = None, add_dirs: list[str] | None = None, tools: list[str] | None = None, allowed: list[str] | None = None) -> list[str]:
     """The claude command line: print mode, streamed JSON, PixelForge's MCP server only, Read plus the server's tools pre-approved,
-    anything else denied, the bench's system prompt appended."""
+    anything else denied, the bench's system prompt appended. ``tools`` / ``allowed`` widen the built-in tools (the author
+    loop's Write, Edit and Bash scoped to one folder, :func:`author_tools`)."""
     cmd = [exe, "-p", "--output-format", "stream-json", "--verbose", "--mcp-config", str(mcp_cfg),
-           "--tools", "Read", "--allowedTools", ",".join(allowed_tools(chrome)), "--permission-prompts", "none",
+           "--tools", ",".join(tools or ["Read"]), "--allowedTools", ",".join(allowed or allowed_tools(chrome)), "--permission-prompts", "none",
            "--append-system-prompt", prompt if prompt is not None else system_prompt(bench, project, ctx), "--add-dir", str(project)]
     for d in add_dirs or []:
         cmd += ["--add-dir", str(d)]
@@ -331,6 +342,8 @@ _WORDS = {
     "make_tiles": "cutting the tiles", "make_ui_frame": "cutting the frame", "make_icons": "cutting the icons", "make_portrait": "cutting the portrait",
     "make_sfx": "making the {preset} sound", "make_prop": "cutting the prop", "recolor": "recolouring", "edit_skin": "editing the skin", "describe": "reading the words",
     "list_styles": "reading the looks", "set_style": "setting the look", "doctor": "checking the computer",
+    "shape_still": "drawing a still facing {direction}", "add_part": "adding {part}", "edit_shapes": "editing the model",
+    "Write": "writing {file}", "Edit": "editing {file}", "Bash": "running the script",
     "Read": "reading {file}", "navigate": "opening {host}", "type": "typing", "click": "clicking", "screenshot": "looking at the page",
     "upload_file": "attaching the picture", "download": "downloading", "scroll": "scrolling", "find": "finding {query}", "read_page": "reading the page",
 }
@@ -397,9 +410,12 @@ def parse_summary(text: str) -> dict | None:
         return None
     did = found.get("did", [])
     changed = found.get("changed", [])
-    return {"did": [str(x) for x in (did if isinstance(did, list) else [did])],
-            "changed": [str(x) for x in (changed if isinstance(changed, list) else [changed])],
-            "notes": str(found.get("notes", "")).strip()}
+    out = {"did": [str(x) for x in (did if isinstance(did, list) else [did])],
+           "changed": [str(x) for x in (changed if isinstance(changed, list) else [changed])],
+           "notes": str(found.get("notes", "")).strip()}
+    if found.get("focus"):
+        out["focus"] = str(found["focus"]).strip()
+    return out
 
 
 def result_text(ev: dict) -> str:
@@ -416,7 +432,7 @@ _SNAP_MAX = 6_000_000
 
 def bench_roots(bench: str) -> list[str]:
     """The project sub-folders a bench's Claude run may change (what Undo restores)."""
-    return {"characters": ["characters", "drafts", "project.json"], "creatures": ["characters", "drafts", "project.json"],
+    return {"characters": ["characters", "drafts", "project.json"], "creatures": ["characters", "drafts", "project.json"], "author": ["characters", "project.json"],
             "objects": ["objects", "drafts", "project.json"], "music": ["music"], "effects": ["fx"], "tiles": ["tiles"],
             "interface": ["ui", "items", "portraits"], "sound": ["sfx"], "midjourney": []}.get(bench, [])
 
@@ -545,15 +561,18 @@ def _plain_failure(text: str, chrome: bool) -> str | None:
 
 def run(bench: str, project: str | Path, text: str, ctx: dict | None = None, on_progress=None, timeout: float = DEFAULT_TIMEOUT,
         dry_run: bool = False, chrome: bool = False, exe: str | None = None, prompt: str | None = None, add_dirs: list[str] | None = None,
-        snapshot_files: bool = True, watch_dir: str | Path | None = None) -> dict:
-    """One job on a bench. Returns {"ok", "did", "changed", "notes", "summary", "log", "snapshot", "progress", "seconds", "cost_usd"} or an error sentence."""
+        snapshot_files: bool = True, watch_dir: str | Path | None = None, tools: list[str] | None = None, allowed: list[str] | None = None,
+        cwd: str | Path | None = None, mock_vars: dict | None = None, log_name: str | None = None) -> dict:
+    """One job on a bench. Returns {"ok", "did", "changed", "notes", "summary", "log", "snapshot", "progress", "seconds", "cost_usd"} or an error sentence.
+    ``tools`` / ``allowed`` widen the built-in tools (the author loop); ``cwd`` is where Claude runs (the project by default);
+    ``mock_vars`` are extra ``{placeholders}`` the mock fills (``round``, ``name``, ``shapes_dir``, ...)."""
     project = Path(project).resolve()
     ctx = {**default_context(bench, project), **(ctx or {})}
     mock = mock_script()
     exe = "mock" if mock else find_claude(exe)
     cfg_dir = project / "claude"
     mcp_cfg = cfg_dir / "mcp_config.json" if dry_run else write_mcp_config(cfg_dir)
-    cmd = build_command(exe or "claude", bench, project, text, mcp_cfg, chrome=chrome, ctx=ctx, prompt=prompt, add_dirs=add_dirs)
+    cmd = build_command(exe or "claude", bench, project, text, mcp_cfg, chrome=chrome, ctx=ctx, prompt=prompt, add_dirs=add_dirs, tools=tools, allowed=allowed)
     if dry_run:
         return {"ok": True, "dry_run": True, "command": cmd, "system_prompt": cmd[cmd.index("--append-system-prompt") + 1], "mcp_config": str(mcp_cfg), "exe": exe or ""}
     if not exe:
@@ -563,7 +582,7 @@ def run(bench: str, project: str | Path, text: str, ctx: dict | None = None, on_
     stamp = time.strftime("%Y%m%d_%H%M%S")
     log_dir = project / LOG_DIR
     log_dir.mkdir(parents=True, exist_ok=True)
-    log_path = log_dir / f"{stamp}_{bench}.jsonl"
+    log_path = log_dir / f"{stamp}_{log_name or bench}.jsonl"
     manifest = snapshot(project, bench) if snapshot_files and bench_roots(bench) else None
     watch = Path(watch_dir).resolve() if watch_dir else project
     before = file_state(watch)
@@ -572,6 +591,9 @@ def run(bench: str, project: str | Path, text: str, ctx: dict | None = None, on_
     env["PYTHONPATH"] = str(PF_ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")   # the server and the mock find the package
     env["PF_BRIDGE_BENCH"] = bench
     env["PF_BRIDGE_PROJECT"] = str(project)
+    if mock_vars:
+        env["PF_BRIDGE_VARS"] = json.dumps({k: str(v) for k, v in mock_vars.items()})
+    run_dir = Path(cwd) if cwd else project
     t0 = time.time()
     progress: list[str] = []
     events: list[dict] = []
@@ -580,7 +602,7 @@ def run(bench: str, project: str | Path, text: str, ctx: dict | None = None, on_
     with log_path.open("w", encoding="utf-8") as log:
         log.write(json.dumps({"command": cmd, "bench": bench, "project": str(project), "text": text, "chrome": chrome, "started": stamp}) + "\n")
         try:
-            proc = _popen(cmd, project if project.exists() else PF_ROOT, env)
+            proc = _popen(cmd, run_dir if run_dir.exists() else PF_ROOT, env)
         except OSError as e:
             return {"ok": False, "error": f"Claude Code could not be started ({e}).", "log": str(log_path)}
         q: Queue = Queue()
@@ -737,11 +759,17 @@ def _subst(line: str, vars_: dict) -> str:
 
 def mock_main(script: str, bench: str, project: str, text: str) -> int:
     """Emit a canned stream-json from a .jsonl script. Lines are events, or controls: {"mock": "sleep", "seconds": S},
-    {"mock": "run", "args": [pixelforge words]} (runs the CLI so the bench really changes), {"mock": "exit", "code": N}.
-    Placeholders {project} {bench} {text} {slug} {pf_root} are filled in every line."""
+    {"mock": "run", "args": [pixelforge words]} (runs the CLI so the bench really changes), {"mock": "copy", "from": A, "to": B}
+    (a file written, as Write would), {"mock": "python", "args": [script, ...]} (the script run, as Bash would), {"mock": "exit",
+    "code": N}. Placeholders {project} {bench} {text} {slug} {pf_root} are filled in every line, plus whatever the caller put in
+    ``PF_BRIDGE_VARS`` (the author loop's {round} {name} {shapes_dir} {round_dir})."""
     delay = float(os.environ.get("PIXELFORGE_MOCK_DELAY", "0.15"))
     slug = re.sub(r"[^a-z0-9]+", "_", " ".join(text.lower().split()[:3])).strip("_") or "thing"
     vars_ = {"project": project, "bench": bench, "text": text, "slug": slug, "pf_root": str(PF_ROOT)}
+    try:
+        vars_.update(json.loads(os.environ.get("PF_BRIDGE_VARS", "") or "{}"))
+    except json.JSONDecodeError:
+        pass
     raw = Path(script).read_text(encoding="utf-8")
     for line in raw.splitlines():
         line = _subst(line.strip(), vars_)
@@ -758,6 +786,13 @@ def mock_main(script: str, bench: str, project: str, text: str) -> int:
                 env = dict(os.environ)
                 env["PYTHONPATH"] = str(PF_ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
                 subprocess.run([sys.executable, "-m", "pixelforge.cli"] + [str(a) for a in ev.get("args", [])], env=env, capture_output=True, text=True)
+            elif ev["mock"] == "copy":
+                dst = Path(ev["to"]); dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(ev["from"], dst)
+            elif ev["mock"] == "python":
+                env = dict(os.environ)
+                env["PYTHONPATH"] = str(PF_ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+                subprocess.run([sys.executable] + [str(a) for a in ev.get("args", [])], env=env, capture_output=True, text=True)
             elif ev["mock"] == "exit":
                 sys.stdout.flush()
                 return int(ev.get("code", 0))

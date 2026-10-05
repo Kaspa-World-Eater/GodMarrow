@@ -1,0 +1,17 @@
+# the mock author: one round of `character author`. Writes the fixed generator into the character's shapes folder (as Write
+# would), runs it for this round (as Bash would), validates, and ends with the JSON line. Placeholders from the loop:
+# {round} {name} {shapes_dir} {round_dir} {model} {script} {painting} {pf_root}. Round N's script draws more than round N-1's.
+{"type":"system","subtype":"init","cwd":"{project}","session_id":"mock","tools":["Read","Write","Edit","Bash","mcp__pixelforge__validate_shapes"],"mcp_servers":[{"name":"pixelforge","status":"connected"}],"model":"mock"}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t1","name":"Read","input":{"file_path":"{painting}"}}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t1","content":"(the painting)"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t2","name":"Write","input":{"file_path":"{script}","content":"# the generator"}}]}}
+{"mock":"copy","from":"{pf_root}/tests/claude_mock/author_generator.py","to":"{script}"}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t2","content":"ok"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t3","name":"Bash","input":{"command":"python \"{script}\" --round {round} --out \"{model}\""}}]}}
+{"mock":"python","args":["{script}","--round","{round}","--out","{model}"]}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t3","content":"wrote the model"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t4","name":"mcp__pixelforge__validate_shapes","input":{"file":"{model}"}}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t4","content":"ok"}]}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t5","name":"mcp__pixelforge__shape_still","input":{"file":"{model}","out":"{round_dir}/claude_still_S.png","direction":"S"}}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t5","content":"ok"}]}}
+{"type":"result","subtype":"success","is_error":false,"duration_ms":9000,"num_turns":5,"result":"{\"did\": [\"wrote the generator script\", \"ran it and validated the model\", \"looked at the still facing south\"], \"changed\": [\"{script}\", \"{model}\"], \"notes\": \"Round {round}: the figure stands; what reads is in the compare picture.\", \"focus\": \"round {round} of the figure\"}","total_cost_usd":0.4,"session_id":"mock"}
