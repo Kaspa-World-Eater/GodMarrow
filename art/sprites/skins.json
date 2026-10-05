@@ -4,5 +4,6 @@
  "miasmancer": "keeper",
  "hemomancer": "hemomancer",
  "mystic_hd": "mystic_hd",
- "npc_vendor": "npc_vendor"
+ "npc_vendor": "npc_vendor",
+ "npc_giver": "npc_giver"
 }

@@ -728,7 +728,8 @@ def midjourney_system_prompt(prompt: str, out_dir: Path, image: str | None, pick
         + "Then close nothing; leave the tab for the person.",
         f"The prompt: {prompt}",
         "Do not change the prompt's words. Do not add 'pixel art'. Do not touch other tabs.",
-        'Finish with one line of JSON and nothing after it: {"did": [...], "changed": ["absolute paths of the files downloaded"], "notes": "what you picked and why, or why it stopped"}.',
+        "For every picture you downloaded, also read its full-size address (the image's src or the open-image link: https://cdn.midjourney.com/<job id>/0_<n>.png) and list it under \"images\": Chrome may file the download somewhere else, and the Forge fetches the pictures from those addresses itself.",
+        'Finish with one line of JSON and nothing after it: {"did": [...], "changed": ["absolute paths of the files downloaded"], "images": ["https://cdn.midjourney.com/..."], "notes": "what you picked and why, or why it stopped"}.',
     ])
 
 
@@ -746,6 +747,22 @@ def fetch_midjourney(prompt: str, out_dir: str | Path, project: str | Path, imag
     if r.get("dry_run"):
         return r
     files = [p for p in r.get("changed", []) if Path(p).suffix.lower() in (".png", ".jpg", ".jpeg", ".webp") and Path(p).exists()]
+    # Chrome files Midjourney's downloads where it likes (the Downloads folder, or nowhere when it blocks a second
+    # download): fetch every picture the hand listed by its address, straight into the folder
+    import re as _re, urllib.request as _ur
+    urls = list(r.get("images") or [])
+    urls += _re.findall(r"https://cdn\.midjourney\.com/[^\s\"']+?\.(?:png|webp|jpe?g)", json.dumps(r))
+    for i, u in enumerate(dict.fromkeys(urls)):
+        dst = out / f"mj_{Path(u).parent.name[:8]}_{Path(u).stem}{Path(u).suffix}"
+        if dst.exists():
+            files.append(str(dst)); continue
+        try:
+            req = _ur.Request(u, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36",
+                                          "Referer": "https://www.midjourney.com/"})
+            dst.write_bytes(_ur.urlopen(req, timeout=60).read())
+            files.append(str(dst))
+        except Exception as e:   # noqa: BLE001
+            r.setdefault("fetch_errors", []).append(f"{u}: {e}")
     r["files"] = sorted(set(files))
     if r.get("ok") and not r["files"]:
         r["ok"] = False

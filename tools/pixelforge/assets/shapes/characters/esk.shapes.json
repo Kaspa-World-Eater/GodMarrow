@@ -1,0 +1,1277 @@
+{
+ "name": "esk",
+ "about": "Warden-Crone Esk, the camp's keeper of errands, drawn by hand from her Midjourney sheet: bent double under a rag hood with only dark in it, torn grey funeral rags hanging to the ground in strips, thin rag-wrapped arms, a tall staff of bound bone with an iron lantern hanging from its crook, feet wrapped in strips.",
+ "mode": "solid",
+ "size": [
+  138,
+  138
+ ],
+ "height": 120,
+ "ground": 134,
+ "axis": [
+  69.0,
+  0
+ ],
+ "view": {
+  "elevation": 12
+ },
+ "outline": "#060708",
+ "skeleton": {
+  "height": 100,
+  "ground": 134,
+  "cx": 69.0
+ },
+ "materials": {
+  "rag": {
+   "ramp": [
+    "#151a1d",
+    "#20272b",
+    "#2c3439",
+    "#394348",
+    "#475258",
+    "#56636a",
+    "#69767c"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.5
+  },
+  "ragpale": {
+   "ramp": [
+    "#262c30",
+    "#343c41",
+    "#444d53",
+    "#556067",
+    "#68737a",
+    "#7d888e",
+    "#939ea3"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.5
+  },
+  "void": {
+   "ramp": [
+    "#020203",
+    "#060607",
+    "#0b0b0d"
+   ]
+  },
+  "greyskin": {
+   "ramp": [
+    "#141414",
+    "#232322",
+    "#353331",
+    "#474441",
+    "#5a5652",
+    "#6e6964"
+   ]
+  },
+  "wrap": {
+   "ramp": [
+    "#2a2a28",
+    "#3f3e3b",
+    "#56544f",
+    "#6d6a64",
+    "#85817a",
+    "#9c978f"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.5
+  },
+  "bonewrap": {
+   "ramp": [
+    "#3a3530",
+    "#57504a",
+    "#766d63",
+    "#958a7d",
+    "#b3a796",
+    "#cfc3b0"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.5
+  },
+  "iron": {
+   "ramp": [
+    "#0c0c0d",
+    "#1b1c1e",
+    "#2d2f32",
+    "#414448",
+    "#575b60"
+   ],
+   "spec": true,
+   "spec_t": 0.85
+  },
+  "glass": {
+   "ramp": [
+    "#3a3222",
+    "#5e4f30",
+    "#87713f",
+    "#b39652",
+    "#d9bc6e"
+   ]
+  }
+ },
+ "parts": {
+  "rags_top": {
+   "bone": "spine.003",
+   "lag": {
+    "frames": 1,
+    "sway": 0.4
+   },
+   "hang": 0.5
+  },
+  "rags": {
+   "bone": "hips",
+   "lag": {
+    "frames": 2,
+    "sway": 0.7
+   },
+   "hang": 0.25
+  },
+  "rags_out": {
+   "bone": "spine.001",
+   "lag": {
+    "frames": 2,
+    "sway": 0.9
+   },
+   "hang": 0.3
+  },
+  "staff": {
+   "bone": "hand.R",
+   "lag": {
+    "frames": 0,
+    "sway": 0.0
+   }
+  }
+ },
+ "shapes": [
+  {
+   "name": "head",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    40.0,
+    3.4
+   ],
+   "radii": [
+    4.4,
+    5.2,
+    4.6
+   ],
+   "material": "void",
+   "bone": "head"
+  },
+  {
+   "name": "hood",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    38.0,
+    2.0
+   ],
+   "radii": [
+    8.6,
+    9.0,
+    9.0
+   ],
+   "material": "ragpale",
+   "bone": "head",
+   "rules": [
+    {
+     "z": [
+      6.4,
+      null
+     ],
+     "near": [
+      [
+       [
+        69.0,
+        40.0,
+        null
+       ],
+       [
+        69.0,
+        44.5,
+        null
+       ]
+      ],
+      3.6
+     ],
+     "material": "void"
+    },
+    {
+     "z": [
+      5.6,
+      null
+     ],
+     "near": [
+      [
+       [
+        69.0,
+        39.5,
+        null
+       ],
+       [
+        69.0,
+        45.0,
+        null
+       ]
+      ],
+      4.6
+     ],
+     "t": -1
+    },
+    {
+     "every_angle": [
+      12,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      2
+     ],
+     "t": -2,
+     "px": [
+      90,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "hood_tip",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    31.0,
+    6.0
+   ],
+   "b": [
+    69.0,
+    35.0,
+    10.0
+   ],
+   "r": [
+    3.6,
+    1.6
+   ],
+   "material": "ragpale",
+   "bone": "head"
+  },
+  {
+   "name": "neck",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    50,
+    -0.4
+   ],
+   "b": [
+    69.0,
+    45,
+    0.2
+   ],
+   "r": [
+    3.0,
+    2.8
+   ],
+   "material": "void",
+   "bone": "neck"
+  },
+  {
+   "name": "hump",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    55,
+    -3.4
+   ],
+   "radii": [
+    11.0,
+    9.6,
+    9.0
+   ],
+   "material": "ragpale",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "chest",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    62,
+    0.0
+   ],
+   "radii": [
+    8.6,
+    8.6,
+    6.4
+   ],
+   "material": "rag",
+   "bone": "spine.002"
+  },
+  {
+   "name": "waist",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    67,
+    -0.6
+   ],
+   "b": [
+    69.0,
+    81,
+    -2.0
+   ],
+   "r": [
+    7.4,
+    8.2
+   ],
+   "material": "rag",
+   "bone": "spine.001"
+  },
+  {
+   "name": "hoodfall",
+   "kind": "ring",
+   "y": [
+    44,
+    70
+   ],
+   "rx": [
+    9.4,
+    0.32
+   ],
+   "rz": [
+    9.4,
+    0.28
+   ],
+   "cz": -0.6,
+   "thickness": 1.8,
+   "hem": {
+    "tongues": 14,
+    "depth": 9,
+    "seed": 2
+   },
+   "open": {
+    "angle": 0.85,
+    "below": 52
+   },
+   "material": "ragpale",
+   "part": "rags_top",
+   "bump": {
+    "folds": [
+     0.5,
+     8,
+     2.0
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      8,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "upper_arm.L",
+   "kind": "capsule",
+   "a": [
+    79.8,
+    52.5,
+    -3.7
+   ],
+   "b": [
+    83.1,
+    67.7,
+    -4.0
+   ],
+   "r": [
+    2.8,
+    2.4
+   ],
+   "material": "ragpale",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "forearm.L",
+   "kind": "capsule",
+   "a": [
+    83.1,
+    67.7,
+    -4.0
+   ],
+   "b": [
+    86.3,
+    82.4,
+    -0.6
+   ],
+   "r": [
+    2.4,
+    1.9
+   ],
+   "material": "wrap",
+   "bone": "forearm.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "hand.L",
+   "kind": "ellipsoid",
+   "centre": [
+    86.8,
+    84.8,
+    0.0
+   ],
+   "radii": [
+    2.2,
+    2.8,
+    1.9
+   ],
+   "material": "greyskin",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "finger0.L",
+   "kind": "capsule",
+   "a": [
+    85.6,
+    86.6,
+    0.4
+   ],
+   "b": [
+    85.36,
+    90.6,
+    1.2
+   ],
+   "r": [
+    0.55,
+    0.4
+   ],
+   "material": "greyskin",
+   "bone": "hand.L",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger1.L",
+   "kind": "capsule",
+   "a": [
+    86.8,
+    86.6,
+    0.4
+   ],
+   "b": [
+    86.8,
+    90.6,
+    1.2
+   ],
+   "r": [
+    0.55,
+    0.4
+   ],
+   "material": "greyskin",
+   "bone": "hand.L",
+   "t": 0,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger2.L",
+   "kind": "capsule",
+   "a": [
+    88.0,
+    86.6,
+    0.4
+   ],
+   "b": [
+    88.24,
+    90.6,
+    1.2
+   ],
+   "r": [
+    0.55,
+    0.4
+   ],
+   "material": "greyskin",
+   "bone": "hand.L",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "thigh.L",
+   "kind": "capsule",
+   "a": [
+    74.0,
+    81.3,
+    0.1
+   ],
+   "b": [
+    74.0,
+    103.9,
+    -0.1
+   ],
+   "r": [
+    3.2,
+    2.6
+   ],
+   "material": "rag",
+   "bone": "thigh.L"
+  },
+  {
+   "name": "shin.L",
+   "kind": "capsule",
+   "a": [
+    74.0,
+    103.9,
+    -0.1
+   ],
+   "b": [
+    74.0,
+    128.1,
+    -2.0
+   ],
+   "r": [
+    2.4,
+    2.2
+   ],
+   "material": "wrap",
+   "bone": "shin.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "foot.L",
+   "kind": "box",
+   "centre": [
+    74.0,
+    131.0,
+    2.8
+   ],
+   "half": [
+    3.0,
+    2.2,
+    5.0
+   ],
+   "round": 1.5,
+   "material": "wrap",
+   "bone": "foot.L",
+   "rules": [
+    {
+     "every_z": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      1.3,
+      null
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "upper_arm.R",
+   "kind": "capsule",
+   "a": [
+    58.2,
+    52.5,
+    -3.7
+   ],
+   "b": [
+    54.900000000000006,
+    67.7,
+    -4.0
+   ],
+   "r": [
+    2.8,
+    2.4
+   ],
+   "material": "ragpale",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "forearm.R",
+   "kind": "capsule",
+   "a": [
+    54.900000000000006,
+    67.7,
+    -4.0
+   ],
+   "b": [
+    51.7,
+    82.4,
+    -0.6
+   ],
+   "r": [
+    2.4,
+    1.9
+   ],
+   "material": "wrap",
+   "bone": "forearm.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "hand.R",
+   "kind": "ellipsoid",
+   "centre": [
+    51.2,
+    84.8,
+    0.0
+   ],
+   "radii": [
+    2.2,
+    2.8,
+    1.9
+   ],
+   "material": "greyskin",
+   "bone": "hand.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "finger0.R",
+   "kind": "capsule",
+   "a": [
+    52.400000000000006,
+    86.6,
+    0.4
+   ],
+   "b": [
+    52.64,
+    90.6,
+    1.2
+   ],
+   "r": [
+    0.55,
+    0.4
+   ],
+   "material": "greyskin",
+   "bone": "hand.R",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger1.R",
+   "kind": "capsule",
+   "a": [
+    51.2,
+    86.6,
+    0.4
+   ],
+   "b": [
+    51.2,
+    90.6,
+    1.2
+   ],
+   "r": [
+    0.55,
+    0.4
+   ],
+   "material": "greyskin",
+   "bone": "hand.R",
+   "t": 0,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger2.R",
+   "kind": "capsule",
+   "a": [
+    50.0,
+    86.6,
+    0.4
+   ],
+   "b": [
+    49.760000000000005,
+    90.6,
+    1.2
+   ],
+   "r": [
+    0.55,
+    0.4
+   ],
+   "material": "greyskin",
+   "bone": "hand.R",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "thigh.R",
+   "kind": "capsule",
+   "a": [
+    64.0,
+    81.3,
+    0.1
+   ],
+   "b": [
+    64.0,
+    103.9,
+    -0.1
+   ],
+   "r": [
+    3.2,
+    2.6
+   ],
+   "material": "rag",
+   "bone": "thigh.R"
+  },
+  {
+   "name": "shin.R",
+   "kind": "capsule",
+   "a": [
+    64.0,
+    103.9,
+    -0.1
+   ],
+   "b": [
+    64.0,
+    128.1,
+    -2.0
+   ],
+   "r": [
+    2.4,
+    2.2
+   ],
+   "material": "wrap",
+   "bone": "shin.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "foot.R",
+   "kind": "box",
+   "centre": [
+    64.0,
+    131.0,
+    2.8
+   ],
+   "half": [
+    3.0,
+    2.2,
+    5.0
+   ],
+   "round": 1.5,
+   "material": "wrap",
+   "bone": "foot.R",
+   "rules": [
+    {
+     "every_z": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      1.3,
+      null
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "rags_in",
+   "kind": "ring",
+   "y": [
+    60,
+    116
+   ],
+   "rx": [
+    9.8,
+    0.05
+   ],
+   "rz": [
+    8.8,
+    0.05
+   ],
+   "thickness": 1.6,
+   "hem": {
+    "tongues": 22,
+    "depth": 12,
+    "seed": 6
+   },
+   "holes": {
+    "p": 0.06,
+    "band": 30,
+    "seed": 3
+   },
+   "open": {
+    "angle": 0.2,
+    "below": 104
+   },
+   "material": "rag",
+   "part": "rags",
+   "bump": {
+    "folds": [
+     0.6,
+     11,
+     2.0
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      7,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      3
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "rags_out",
+   "kind": "ring",
+   "y": [
+    56,
+    98
+   ],
+   "rx": [
+    10.8,
+    0.07
+   ],
+   "rz": [
+    9.8,
+    0.06
+   ],
+   "cz": -0.6,
+   "thickness": 1.6,
+   "hem": {
+    "tongues": 16,
+    "depth": 16,
+    "seed": 9
+   },
+   "holes": {
+    "p": 0.08,
+    "band": 28,
+    "seed": 5
+   },
+   "material": "ragpale",
+   "part": "rags_out",
+   "bump": {
+    "folds": [
+     0.6,
+     9,
+     2.4
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      9,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    },
+    {
+     "every_y": [
+      6,
+      2
+     ],
+     "hash": [
+      0.4,
+      11,
+      2
+     ],
+     "t": 1,
+     "px": [
+      90,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "staff",
+   "kind": "capsule",
+   "a": [
+    51.7,
+    133.0,
+    0.6
+   ],
+   "b": [
+    52.1,
+    30.0,
+    -0.2
+   ],
+   "r": [
+    1.0,
+    1.3
+   ],
+   "material": "bonewrap",
+   "part": "staff",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      null,
+      42
+     ],
+     "t": 1
+    },
+    {
+     "hash": [
+      0.1,
+      4,
+      2
+     ],
+     "t": -2,
+     "px": [
+      90,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "staff_knob",
+   "kind": "ellipsoid",
+   "centre": [
+    52.2,
+    28.0,
+    -0.2
+   ],
+   "radii": [
+    2.4,
+    2.8,
+    2.2
+   ],
+   "material": "bonewrap",
+   "part": "staff",
+   "rules": [
+    {
+     "every_angle": [
+      20,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "crook",
+   "kind": "capsule",
+   "a": [
+    52.2,
+    28.0,
+    -0.2
+   ],
+   "b": [
+    46.7,
+    29.0,
+    -0.2
+   ],
+   "r": [
+    1.0,
+    0.8
+   ],
+   "material": "bonewrap",
+   "part": "staff"
+  },
+  {
+   "name": "lantern_cord",
+   "kind": "capsule",
+   "a": [
+    46.7,
+    29.0,
+    -0.2
+   ],
+   "b": [
+    46.7,
+    33.5,
+    -0.2
+   ],
+   "r": 0.35,
+   "material": "iron",
+   "part": "staff",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "lantern_cap",
+   "kind": "box",
+   "centre": [
+    46.7,
+    34.4,
+    -0.2
+   ],
+   "half": [
+    2.2,
+    0.8,
+    2.2
+   ],
+   "round": 0.4,
+   "material": "iron",
+   "part": "staff"
+  },
+  {
+   "name": "lantern",
+   "kind": "box",
+   "centre": [
+    46.7,
+    38.6,
+    -0.2
+   ],
+   "half": [
+    1.9,
+    3.4,
+    1.9
+   ],
+   "round": 0.3,
+   "material": "glass",
+   "part": "staff",
+   "rules": [
+    {
+     "every_x": [
+      2,
+      0
+     ],
+     "material": "iron"
+    },
+    {
+     "dy": [
+      2.8,
+      null
+     ],
+     "material": "iron"
+    }
+   ]
+  }
+ ],
+ "clips": {
+  "walk": "walk_hunched",
+  "attack": "punch"
+ },
+ "effects": [],
+ "lights": [
+  {
+   "name": "lantern",
+   "part": "staff",
+   "at": [
+    46.7,
+    38.6,
+    -0.2
+   ],
+   "radius": 9,
+   "strength": 0.6,
+   "pulse": 0.15,
+   "colour": "#d9a95a"
+  }
+ ],
+ "shadow": {
+  "radii": [
+   18,
+   3.8
+  ],
+  "colour": "#4b4a4f"
+ },
+ "detail": {
+  "hood": {
+   "file": "esk.detail/hood.png"
+  },
+  "hood_tip": {
+   "file": "esk.detail/hood_tip.png"
+  },
+  "hump": {
+   "file": "esk.detail/hump.png"
+  },
+  "chest": {
+   "file": "esk.detail/chest.png"
+  },
+  "waist": {
+   "file": "esk.detail/waist.png"
+  },
+  "rags_top": {
+   "file": "esk.detail/rags_top.png"
+  },
+  "upper_arm.L": {
+   "file": "esk.detail/upper_arm.L.png"
+  },
+  "forearm.L": {
+   "file": "esk.detail/forearm.L.png"
+  },
+  "hand.L": {
+   "file": "esk.detail/hand.L.png"
+  },
+  "finger0.L": {
+   "file": "esk.detail/finger0.L.png"
+  },
+  "finger1.L": {
+   "file": "esk.detail/finger1.L.png"
+  },
+  "finger2.L": {
+   "file": "esk.detail/finger2.L.png"
+  },
+  "thigh.L": {
+   "file": "esk.detail/thigh.L.png"
+  },
+  "shin.L": {
+   "file": "esk.detail/shin.L.png"
+  },
+  "foot.L": {
+   "file": "esk.detail/foot.L.png"
+  },
+  "upper_arm.R": {
+   "file": "esk.detail/upper_arm.R.png"
+  },
+  "forearm.R": {
+   "file": "esk.detail/forearm.R.png"
+  },
+  "hand.R": {
+   "file": "esk.detail/hand.R.png"
+  },
+  "finger0.R": {
+   "file": "esk.detail/finger0.R.png"
+  },
+  "finger1.R": {
+   "file": "esk.detail/finger1.R.png"
+  },
+  "finger2.R": {
+   "file": "esk.detail/finger2.R.png"
+  },
+  "thigh.R": {
+   "file": "esk.detail/thigh.R.png"
+  },
+  "shin.R": {
+   "file": "esk.detail/shin.R.png"
+  },
+  "foot.R": {
+   "file": "esk.detail/foot.R.png"
+  },
+  "rags": {
+   "file": "esk.detail/rags.png"
+  },
+  "rags_out": {
+   "file": "esk.detail/rags_out.png"
+  },
+  "staff": {
+   "file": "esk.detail/staff.png"
+  }
+ }
+}
