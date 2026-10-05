@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from pixelforge import claude_bridge as CB
-from pixelforge.cli import build_parser, describe_on_bench
+from pixelforge.cli import build_parser, describe_on_bench, main
 
 MOCKS = Path(__file__).resolve().parent / "claude_mock"
 
@@ -381,3 +381,81 @@ def test_forge_benches_carry_the_claude_hooks():
         assert (forge / "tools" / walk).exists()
     assert "describe_walk.txt characters.jsonl" in (forge / "tools/screens.sh").read_text()
     assert "claude register" in (CB.PF_ROOT / "install.bat").read_text()
+
+
+# ---------------------------------------------------------------- the doctor
+def test_doctor_with_the_mock_passes_every_step_in_words(monkeypatch, capsys):
+    use_mock(monkeypatch, "music.jsonl")
+    r = CB.doctor()
+    assert r["ok"] and r["mock"] and [s["step"] for s in r["steps"]] == list(CB.DOCTOR_STEPS) and all(s["ok"] for s in r["steps"])
+    assert "mock stands in" in r["steps"][0]["words"] and "always signed in" in r["steps"][1]["words"] and "needs no registration" in r["steps"][2]["words"]
+    assert r["steps"][3]["words"].startswith("PixelForge's MCP server starts and answers:") and r["steps"][3]["tools"] > 50
+    s5 = r["steps"][4]
+    assert "real round trip works" in s5["words"] and "song file changed" in s5["words"] and "tempo 66 to 76" in s5["words"] and Path(s5["log"]).exists()
+    assert r["steps"][5]["optional"] and ("Midjourney road" in r["steps"][5]["words"])
+    assert r["sentence"] == "Claude on the bench works end to end." and r["lines"][0].startswith("1. pass  ") and r["lines"][4].startswith("5. pass  ")
+    main(["claude", "doctor"])
+    out = capsys.readouterr().out
+    assert "1. pass" in out and "5. pass" in out and out.strip().endswith("Claude on the bench works end to end.")
+
+
+def test_doctor_without_claude_fails_at_step_one_with_the_install_sentence(monkeypatch, capsys):
+    monkeypatch.setenv("PIXELFORGE_CLAUDE", "none")
+    r = CB.doctor(round_trip=True)
+    s = r["steps"]
+    assert not r["ok"] and not s[0]["ok"] and "not found" in s[0]["words"] and "claude.com/claude-code" in s[0]["fix"] and "run `claude` once" in s[0]["fix"]
+    assert s[1]["skipped"] and s[2]["skipped"] and s[4]["skipped"] and "Fix step 1 first" in s[1]["fix"] and s[3]["ok"]
+    assert r["sentence"].startswith("The describe line cannot work yet: step 1 (executable) failed. Install it from claude.com/claude-code")
+    assert r["lines"][0].startswith("1. FAIL  ") and "  -> Install it" in r["lines"][0]
+    with pytest.raises(SystemExit) as e:
+        main(["claude", "doctor", "--json"])
+    assert e.value.code == 1 and json.loads(capsys.readouterr().out)["ok"] is False
+
+
+def test_doctor_not_signed_in_api_key_and_unregistered_wordings(monkeypatch):
+    monkeypatch.delenv("PIXELFORGE_CLAUDE", raising=False)
+    monkeypatch.setattr(CB, "find_claude", lambda hint=None: "/x/claude")
+    monkeypatch.setattr(CB, "version", lambda exe: "9.9.9 (Claude Code)")
+    monkeypatch.setattr(CB, "mcp_server_check", lambda timeout=60.0: {"ok": True, "tools": 77, "words": "PixelForge's MCP server starts and answers: 77 tools."})
+    # not signed in
+    monkeypatch.setattr(CB, "signed_in", lambda exe: False)
+    monkeypatch.setattr(CB, "registered", lambda exe: True)
+    r = CB.doctor(round_trip=False)
+    assert r["steps"][0]["ok"] and "version 9.9.9" in r["steps"][0]["words"]
+    assert not r["steps"][1]["ok"] and "not signed in" in r["steps"][1]["words"] and "/login" in r["steps"][1]["fix"] and "step 2 (signed in) failed" in r["sentence"]
+    # an API key alone
+    monkeypatch.setattr(CB, "signed_in", lambda exe: True)
+    monkeypatch.setattr(CB, "_api_key_only", lambda exe: True)
+    r = CB.doctor(round_trip=False)
+    assert not r["steps"][1]["ok"] and "API key alone" in r["steps"][1]["words"] and "/login" in r["steps"][1]["fix"]
+    # signed in, not registered: registered on the spot
+    monkeypatch.setattr(CB, "_api_key_only", lambda exe: False)
+    monkeypatch.setattr(CB, "registered", lambda exe: False)
+    monkeypatch.setattr(CB, "register", lambda exe=None, python=None, scope="user": {"ok": True, "registered": True})
+    r = CB.doctor(round_trip=False)
+    assert r["steps"][1]["ok"] and r["steps"][1]["words"].startswith("Signed in") and r["steps"][2]["ok"] and "registered just now" in r["steps"][2]["words"] and r["steps"][2]["registered_now"]
+    # registering failed: the command to run by hand
+    monkeypatch.setattr(CB, "register", lambda exe=None, python=None, scope="user": {"ok": False, "error": "`claude mcp add` stopped: no"})
+    r = CB.doctor(round_trip=False)
+    assert not r["steps"][2]["ok"] and "registering it failed" in r["steps"][2]["words"] and "mcp add -s user pixelforge --" in r["steps"][2]["fix"]
+    assert r["steps"][4]["skipped"] and "no round trip asked" in r["steps"][4]["words"]
+
+
+def test_doctor_round_trip_failure_names_the_log(monkeypatch):
+    use_mock(monkeypatch, "error.jsonl")
+    r = CB.doctor()
+    s5 = r["steps"][4]
+    assert not r["ok"] and not s5["ok"] and "round trip stopped" in s5["words"] and "not signed in" in s5["words"].lower() and "The full log is" in s5["fix"] and Path(s5["log"]).exists()
+    assert "step 5 (round trip) failed" in r["sentence"]
+    # a server that does not start: the pip sentence
+    monkeypatch.setattr(CB, "server_command", lambda python=None: [sys.executable, "-c", "import sys; sys.exit(3)"])
+    srv = CB.mcp_server_check(timeout=5)
+    assert not srv["ok"] and "did not answer" in srv["words"] and "in a terminal" in srv["fix"]
+
+
+def test_the_forge_offers_the_doctor():
+    forge = CB.PF_ROOT / "forge"
+    home = (forge / "scripts/screens/home.gd").read_text()
+    assert '"Doctor"' in home and '["claude", "doctor", "--json"]' in home and "doctor_lines" in home
+    app = (forge / "scripts/app.gd").read_text()
+    assert "open_doctor" in app and '"doctor"' in app and "foot_claude.gui_input" in app

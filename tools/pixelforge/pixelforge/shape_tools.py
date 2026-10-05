@@ -409,3 +409,99 @@ def template_file(height: int = 120, out: str | Path | None = None, png: str | P
         Image.fromarray(R.stick_figure(tpl, 3), "RGBA").save(png)
         tpl["png"] = str(png)
     return tpl
+
+
+# ------------------------------------------------------------------------------------------------ the author's small edits
+_PART_PARTS = {"plank_skirt": "plank_skirt_parts", "locs": "locs_parts", "back_cape": "cape_parts"}
+
+
+def add_part(path: str | Path, part: str, args: dict | None = None, out: str | Path | None = None) -> dict:
+    """A piece from the parts kit (:mod:`pixelforge.shape_parts`) appended to a file: ``part`` is the kit function's name
+    (``chain``, ``chain_loop``, ``chest_chain``, ``spike_ring``, ``upright_spikes``, ``spike_row``, ``plank_skirt``, ``greave``,
+    ``thigh_plate``, ``shackle``, ``locs``, ``back_cape``), ``args`` its keyword arguments (a ``rnd`` of an int seeds the random). The
+    ``parts`` entries a piece needs (the plank skirt's, the locs', the cape's) are added when the file lacks them. The file is validated
+    and written (to ``out`` when given). For a change of one value use :func:`edit_shapes`."""
+    import random
+
+    from . import shape_parts as K
+
+    if part.startswith("_") or part in ("mirror", "on_ellipse", "rivet_row") or not hasattr(K, part) or part.endswith("_parts"):
+        raise ValueError(f"{part!r} is not a piece of the kit; the pieces are chain chain_loop chest_chain spike_ring upright_spikes spike_row plank_skirt greave thigh_plate shackle locs back_cape")
+    doc = S.load_shapes(path)
+    args = dict(args or {})
+    if "rnd" in args and not isinstance(args["rnd"], random.Random):
+        args["rnd"] = random.Random(int(args["rnd"]))
+    made = getattr(K, part)(**args)
+    new = [made] if isinstance(made, dict) else list(made)
+    doc.setdefault("shapes", []).extend(new)
+    if part in _PART_PARTS:
+        doc.setdefault("parts", {})
+        for k, v in getattr(K, _PART_PARTS[part])().items():
+            doc["parts"].setdefault(k, v)
+    dst, check = _check_and_write(doc, Path(out) if out else Path(path), "the file would have problems")
+    return {"ok": True, "file": str(dst), "part": part, "added": [s.get("name", "") for s in new], "shapes": len(doc["shapes"]), "warnings": check.get("warnings", [])}
+
+
+def edit_shapes(path: str | Path, ops: list[dict], out: str | Path | None = None) -> dict:
+    """Small edits to a file without rewriting it by hand: ``ops`` is a list of ``{"op": ..., ...}``:
+    ``{"op": "set", "shape": NAME, "key": K, "value": V}`` (one field of a named shape; a key with dots reaches inside, ``rotate.x``),
+    ``{"op": "remove", "shape": NAME}``, ``{"op": "add", "shape": {...}}``, ``{"op": "material", "name": N, "spec": {...}}``,
+    ``{"op": "part", "name": N, "spec": {...}}``, ``{"op": "doc", "key": K, "value": V}`` (a top-level field: ``clips``, ``view``, ``shadow``).
+    Validated and written (to ``out`` when given); an edit that leaves problems is refused with them in words."""
+    doc = S.load_shapes(path)
+    by_name = {s.get("name", ""): s for s in doc.get("shapes", [])}
+    applied = []
+    for op in ops:
+        kind = str(op.get("op", ""))
+        if kind == "set":
+            sh = by_name.get(str(op.get("shape", "")))
+            if sh is None:
+                raise ValueError(f"no shape named {op.get('shape')!r}")
+            keys = str(op["key"]).split(".")
+            tgt = sh
+            for k in keys[:-1]:
+                tgt = tgt.setdefault(k, {})
+            tgt[keys[-1]] = op.get("value")
+            applied.append(f"{op['shape']}.{op['key']}")
+        elif kind == "remove":
+            sh = by_name.pop(str(op.get("shape", "")), None)
+            if sh is None:
+                raise ValueError(f"no shape named {op.get('shape')!r}")
+            doc["shapes"] = [s for s in doc["shapes"] if s is not sh]
+            applied.append(f"-{op['shape']}")
+        elif kind == "add":
+            sh = dict(op.get("shape") or {})
+            if not sh.get("kind"):
+                raise ValueError("an added shape needs a kind")
+            doc.setdefault("shapes", []).append(sh)
+            by_name[sh.get("name", "")] = sh
+            applied.append(f"+{sh.get('name', sh['kind'])}")
+        elif kind == "material":
+            doc.setdefault("materials", {})[str(op["name"])] = dict(op.get("spec") or {})
+            applied.append(f"material {op['name']}")
+        elif kind == "part":
+            doc.setdefault("parts", {})[str(op["name"])] = dict(op.get("spec") or {})
+            applied.append(f"part {op['name']}")
+        elif kind == "doc":
+            doc[str(op["key"])] = op.get("value")
+            applied.append(f"doc.{op['key']}")
+        else:
+            raise ValueError(f"unknown op {kind!r}; the ops are set remove add material part doc")
+    dst, check = _check_and_write(doc, Path(out) if out else Path(path), "the edit would leave problems")
+    return {"ok": True, "file": str(dst), "applied": applied, "shapes": len(doc.get("shapes", [])), "warnings": check.get("warnings", [])}
+
+
+def _check_and_write(doc: dict, dst: Path, why: str) -> tuple[Path, dict]:
+    """The full file check (:func:`validate_file`: the format, the bones, the clip map) on a temporary copy; written to ``dst`` only
+    when it passes, so a refused change leaves the file as it was."""
+    tmp = dst.with_name(dst.stem + ".checking.json")
+    tmp.write_text(json.dumps({k: v for k, v in doc.items() if not k.startswith("_")}, indent=1))
+    try:
+        check = validate_file(tmp)
+        if not check["ok"]:
+            raise ValueError(why + ": " + "; ".join(check["problems"]))
+        tmp.replace(dst)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
+    return dst, check

@@ -35,7 +35,7 @@ SERVER_NAME = "pixelforge"
 MCP_ALLOW = "mcp__pixelforge"                             # every tool of PixelForge's MCP server
 CHROME_SERVER = "claude-in-chrome"
 CHROME_ALLOW = "mcp__claude-in-chrome"
-BENCHES = ("characters", "creatures", "objects", "effects", "tiles", "interface", "music", "sound", "midjourney")
+BENCHES = ("characters", "creatures", "objects", "effects", "tiles", "interface", "music", "sound", "midjourney", "author")
 DEFAULT_TIMEOUT = 600.0
 MIDJOURNEY_TIMEOUT = 900.0
 LOG_DIR = "claude/logs"
@@ -95,8 +95,11 @@ def _candidates() -> list[Path]:
 
 
 def find_claude(hint: str | None = None) -> str | None:
-    """The ``claude`` executable: ``hint``, ``PIXELFORGE_CLAUDE`` (unless a mock), PATH, then the usual install places."""
+    """The ``claude`` executable: ``hint``, ``PIXELFORGE_CLAUDE`` (unless a mock), PATH, then the usual install places.
+    ``PIXELFORGE_CLAUDE=none`` pretends there is none (the bench's no-Claude state, for tests and screenshots)."""
     env = os.environ.get("PIXELFORGE_CLAUDE", "")
+    if env.strip().lower() == "none":
+        return None
     for c in [hint, env if not env.startswith("mock:") else ""]:
         if c and Path(c).exists():
             return str(c)
@@ -293,17 +296,28 @@ def allowed_tools(chrome: bool = False) -> list[str]:
     return out
 
 
+def author_tools(folder: str | Path) -> tuple[list[str], list[str]]:
+    """The tools the authoring Claude gets (``character author``): Read anywhere in the project, Write and Edit only under
+    ``folder`` (the character's ``shapes/``, where the generator script and the model live), Bash only to run Python
+    (the script), and PixelForge's MCP tools. Returns (``--tools``, ``--allowedTools``)."""
+    f = Path(folder).resolve().as_posix().rstrip("/")
+    tools = ["Read", "Write", "Edit", "Bash"]
+    allowed = [MCP_ALLOW, "Read", f"Write(//{f.lstrip('/')}/**)", f"Edit(//{f.lstrip('/')}/**)", "Bash(python *)", "Bash(python3 *)", "Bash(py *)"]
+    return tools, allowed
+
+
 def budget() -> str | None:
     v = os.environ.get("PIXELFORGE_CLAUDE_BUDGET", "3")
     return v if v and v != "0" else None
 
 
 def build_command(exe: str, bench: str, project: Path, text: str, mcp_cfg: Path, chrome: bool = False, ctx: dict | None = None,
-                  prompt: str | None = None, add_dirs: list[str] | None = None) -> list[str]:
+                  prompt: str | None = None, add_dirs: list[str] | None = None, tools: list[str] | None = None, allowed: list[str] | None = None) -> list[str]:
     """The claude command line: print mode, streamed JSON, PixelForge's MCP server only, Read plus the server's tools pre-approved,
-    anything else denied, the bench's system prompt appended."""
+    anything else denied, the bench's system prompt appended. ``tools`` / ``allowed`` widen the built-in tools (the author
+    loop's Write, Edit and Bash scoped to one folder, :func:`author_tools`)."""
     cmd = [exe, "-p", "--output-format", "stream-json", "--verbose", "--mcp-config", str(mcp_cfg),
-           "--tools", "Read", "--allowedTools", ",".join(allowed_tools(chrome)), "--permission-prompts", "none",
+           "--tools", ",".join(tools or ["Read"]), "--allowedTools", ",".join(allowed or allowed_tools(chrome)), "--permission-prompts", "none",
            "--append-system-prompt", prompt if prompt is not None else system_prompt(bench, project, ctx), "--add-dir", str(project)]
     for d in add_dirs or []:
         cmd += ["--add-dir", str(d)]
@@ -331,6 +345,8 @@ _WORDS = {
     "make_tiles": "cutting the tiles", "make_ui_frame": "cutting the frame", "make_icons": "cutting the icons", "make_portrait": "cutting the portrait",
     "make_sfx": "making the {preset} sound", "make_prop": "cutting the prop", "recolor": "recolouring", "edit_skin": "editing the skin", "describe": "reading the words",
     "list_styles": "reading the looks", "set_style": "setting the look", "doctor": "checking the computer",
+    "shape_still": "drawing a still facing {direction}", "add_part": "adding {part}", "edit_shapes": "editing the model",
+    "Write": "writing {file}", "Edit": "editing {file}", "Bash": "running the script",
     "Read": "reading {file}", "navigate": "opening {host}", "type": "typing", "click": "clicking", "screenshot": "looking at the page",
     "upload_file": "attaching the picture", "download": "downloading", "scroll": "scrolling", "find": "finding {query}", "read_page": "reading the page",
 }
@@ -397,9 +413,12 @@ def parse_summary(text: str) -> dict | None:
         return None
     did = found.get("did", [])
     changed = found.get("changed", [])
-    return {"did": [str(x) for x in (did if isinstance(did, list) else [did])],
-            "changed": [str(x) for x in (changed if isinstance(changed, list) else [changed])],
-            "notes": str(found.get("notes", "")).strip()}
+    out = {"did": [str(x) for x in (did if isinstance(did, list) else [did])],
+           "changed": [str(x) for x in (changed if isinstance(changed, list) else [changed])],
+           "notes": str(found.get("notes", "")).strip()}
+    if found.get("focus"):
+        out["focus"] = str(found["focus"]).strip()
+    return out
 
 
 def result_text(ev: dict) -> str:
@@ -416,7 +435,7 @@ _SNAP_MAX = 6_000_000
 
 def bench_roots(bench: str) -> list[str]:
     """The project sub-folders a bench's Claude run may change (what Undo restores)."""
-    return {"characters": ["characters", "drafts", "project.json"], "creatures": ["characters", "drafts", "project.json"],
+    return {"characters": ["characters", "drafts", "project.json"], "creatures": ["characters", "drafts", "project.json"], "author": ["characters", "project.json"],
             "objects": ["objects", "drafts", "project.json"], "music": ["music"], "effects": ["fx"], "tiles": ["tiles"],
             "interface": ["ui", "items", "portraits"], "sound": ["sfx"], "midjourney": []}.get(bench, [])
 
@@ -545,15 +564,18 @@ def _plain_failure(text: str, chrome: bool) -> str | None:
 
 def run(bench: str, project: str | Path, text: str, ctx: dict | None = None, on_progress=None, timeout: float = DEFAULT_TIMEOUT,
         dry_run: bool = False, chrome: bool = False, exe: str | None = None, prompt: str | None = None, add_dirs: list[str] | None = None,
-        snapshot_files: bool = True, watch_dir: str | Path | None = None) -> dict:
-    """One job on a bench. Returns {"ok", "did", "changed", "notes", "summary", "log", "snapshot", "progress", "seconds", "cost_usd"} or an error sentence."""
+        snapshot_files: bool = True, watch_dir: str | Path | None = None, tools: list[str] | None = None, allowed: list[str] | None = None,
+        cwd: str | Path | None = None, mock_vars: dict | None = None, log_name: str | None = None) -> dict:
+    """One job on a bench. Returns {"ok", "did", "changed", "notes", "summary", "log", "snapshot", "progress", "seconds", "cost_usd"} or an error sentence.
+    ``tools`` / ``allowed`` widen the built-in tools (the author loop); ``cwd`` is where Claude runs (the project by default);
+    ``mock_vars`` are extra ``{placeholders}`` the mock fills (``round``, ``name``, ``shapes_dir``, ...)."""
     project = Path(project).resolve()
     ctx = {**default_context(bench, project), **(ctx or {})}
     mock = mock_script()
     exe = "mock" if mock else find_claude(exe)
     cfg_dir = project / "claude"
     mcp_cfg = cfg_dir / "mcp_config.json" if dry_run else write_mcp_config(cfg_dir)
-    cmd = build_command(exe or "claude", bench, project, text, mcp_cfg, chrome=chrome, ctx=ctx, prompt=prompt, add_dirs=add_dirs)
+    cmd = build_command(exe or "claude", bench, project, text, mcp_cfg, chrome=chrome, ctx=ctx, prompt=prompt, add_dirs=add_dirs, tools=tools, allowed=allowed)
     if dry_run:
         return {"ok": True, "dry_run": True, "command": cmd, "system_prompt": cmd[cmd.index("--append-system-prompt") + 1], "mcp_config": str(mcp_cfg), "exe": exe or ""}
     if not exe:
@@ -563,7 +585,7 @@ def run(bench: str, project: str | Path, text: str, ctx: dict | None = None, on_
     stamp = time.strftime("%Y%m%d_%H%M%S")
     log_dir = project / LOG_DIR
     log_dir.mkdir(parents=True, exist_ok=True)
-    log_path = log_dir / f"{stamp}_{bench}.jsonl"
+    log_path = log_dir / f"{stamp}_{log_name or bench}.jsonl"
     manifest = snapshot(project, bench) if snapshot_files and bench_roots(bench) else None
     watch = Path(watch_dir).resolve() if watch_dir else project
     before = file_state(watch)
@@ -572,6 +594,9 @@ def run(bench: str, project: str | Path, text: str, ctx: dict | None = None, on_
     env["PYTHONPATH"] = str(PF_ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")   # the server and the mock find the package
     env["PF_BRIDGE_BENCH"] = bench
     env["PF_BRIDGE_PROJECT"] = str(project)
+    if mock_vars:
+        env["PF_BRIDGE_VARS"] = json.dumps({k: str(v) for k, v in mock_vars.items()})
+    run_dir = Path(cwd) if cwd else project
     t0 = time.time()
     progress: list[str] = []
     events: list[dict] = []
@@ -580,7 +605,7 @@ def run(bench: str, project: str | Path, text: str, ctx: dict | None = None, on_
     with log_path.open("w", encoding="utf-8") as log:
         log.write(json.dumps({"command": cmd, "bench": bench, "project": str(project), "text": text, "chrome": chrome, "started": stamp}) + "\n")
         try:
-            proc = _popen(cmd, project if project.exists() else PF_ROOT, env)
+            proc = _popen(cmd, run_dir if run_dir.exists() else PF_ROOT, env)
         except OSError as e:
             return {"ok": False, "error": f"Claude Code could not be started ({e}).", "log": str(log_path)}
         q: Queue = Queue()
@@ -737,11 +762,17 @@ def _subst(line: str, vars_: dict) -> str:
 
 def mock_main(script: str, bench: str, project: str, text: str) -> int:
     """Emit a canned stream-json from a .jsonl script. Lines are events, or controls: {"mock": "sleep", "seconds": S},
-    {"mock": "run", "args": [pixelforge words]} (runs the CLI so the bench really changes), {"mock": "exit", "code": N}.
-    Placeholders {project} {bench} {text} {slug} {pf_root} are filled in every line."""
+    {"mock": "run", "args": [pixelforge words]} (runs the CLI so the bench really changes), {"mock": "copy", "from": A, "to": B}
+    (a file written, as Write would), {"mock": "python", "args": [script, ...]} (the script run, as Bash would), {"mock": "exit",
+    "code": N}. Placeholders {project} {bench} {text} {slug} {pf_root} are filled in every line, plus whatever the caller put in
+    ``PF_BRIDGE_VARS`` (the author loop's {round} {name} {shapes_dir} {round_dir})."""
     delay = float(os.environ.get("PIXELFORGE_MOCK_DELAY", "0.15"))
     slug = re.sub(r"[^a-z0-9]+", "_", " ".join(text.lower().split()[:3])).strip("_") or "thing"
     vars_ = {"project": project, "bench": bench, "text": text, "slug": slug, "pf_root": str(PF_ROOT)}
+    try:
+        vars_.update(json.loads(os.environ.get("PF_BRIDGE_VARS", "") or "{}"))
+    except json.JSONDecodeError:
+        pass
     raw = Path(script).read_text(encoding="utf-8")
     for line in raw.splitlines():
         line = _subst(line.strip(), vars_)
@@ -758,6 +789,13 @@ def mock_main(script: str, bench: str, project: str, text: str) -> int:
                 env = dict(os.environ)
                 env["PYTHONPATH"] = str(PF_ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
                 subprocess.run([sys.executable, "-m", "pixelforge.cli"] + [str(a) for a in ev.get("args", [])], env=env, capture_output=True, text=True)
+            elif ev["mock"] == "copy":
+                dst = Path(ev["to"]); dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy(ev["from"], dst)
+            elif ev["mock"] == "python":
+                env = dict(os.environ)
+                env["PYTHONPATH"] = str(PF_ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+                subprocess.run([sys.executable] + [str(a) for a in ev.get("args", [])], env=env, capture_output=True, text=True)
             elif ev["mock"] == "exit":
                 sys.stdout.flush()
                 return int(ev.get("code", 0))
@@ -778,3 +816,234 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+# ---------------------------------------------------------------- the doctor: why does the describe line do nothing?
+DOCTOR_STEPS = ("executable", "signed_in", "registered", "server", "round_trip", "chrome")
+
+
+def _step(name: str, ok: bool, words: str, fix: str = "", optional: bool = False, **extra) -> dict:
+    return {"step": name, "ok": bool(ok), "optional": optional, "words": words, "fix": fix, **extra}
+
+
+def _api_key_only(exe: str) -> bool | None:
+    """True when ``claude auth status --json`` says the sign-in is an API key alone (``/login`` not done)."""
+    try:
+        r = _call([exe, "auth", "status", "--json"], 30)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    m = re.search(r"\{.*\}", r.stdout + r.stderr, re.S)
+    if not m:
+        return None
+    try:
+        d = json.loads(m.group(0))
+    except json.JSONDecodeError:
+        return None
+    method = str(d.get("authMethod", d.get("method", d.get("auth_method", "")))).lower().replace("_", "").replace("-", "")
+    return method in ("apikey", "api") if method else None
+
+
+def mcp_server_check(timeout: float = 60.0) -> dict:
+    """Start PixelForge's MCP server the way Claude Code does (``python -m pixelforge.cli mcp`` over stdio), say hello
+    (``initialize``), list its tools and call ``list_styles``; one dict: ``ok``, ``tools`` (how many), ``words``."""
+    try:
+        import mcp  # noqa: F401
+    except ImportError:
+        return {"ok": False, "words": "The MCP server cannot start: the 'mcp' package is not installed.", "fix": "Run install.bat again, or `pip install mcp` in the Forge's Python."}
+    cmd = server_command()
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(PF_ROOT) + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+    env.setdefault("PYTHONIOENCODING", "utf-8")
+    try:
+        proc = subprocess.Popen(cmd, env=env, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding="utf-8", bufsize=1,
+                                **({"creationflags": getattr(subprocess, "CREATE_NO_WINDOW", 0)} if os.name == "nt" else {}))
+    except OSError as e:
+        return {"ok": False, "words": f"The MCP server could not be started ({e}).", "fix": "Set the Forge's Python in Settings, or run install.bat again."}
+    q: Queue = Queue()
+    threading.Thread(target=_reader, args=(proc.stdout, q), daemon=True).start()
+    t0 = time.time()
+
+    def send(msg: dict) -> None:
+        proc.stdin.write(json.dumps(msg) + "\n")
+        proc.stdin.flush()
+
+    def wait_for(id_: int) -> dict | None:
+        while time.time() - t0 < timeout:
+            try:
+                line = q.get(timeout=0.25)
+            except Empty:
+                if proc.poll() is not None:
+                    return None
+                continue
+            if line is None:
+                return None
+            try:
+                ev = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(ev, dict) and ev.get("id") == id_:
+                return ev
+        return None
+
+    try:
+        send({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "pixelforge-doctor", "version": "1"}}})
+        hello = wait_for(1)
+        if hello is None or "result" not in hello:
+            return {"ok": False, "words": "The MCP server started but did not answer the hello within the time.", "fix": f"Run `{' '.join(cmd)}` in a terminal and read its first lines; the log drawer (Ctrl+L) has the Forge's side."}
+        send({"jsonrpc": "2.0", "method": "notifications/initialized"})
+        send({"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}})
+        tools = wait_for(2)
+        names = [t.get("name", "") for t in ((tools or {}).get("result") or {}).get("tools", [])]
+        send({"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "list_styles", "arguments": {}}})
+        answer = wait_for(3)
+        ok = bool(answer and "result" in answer and not (answer["result"] or {}).get("isError"))
+        if not ok:
+            return {"ok": False, "tools": len(names), "words": f"The MCP server lists {len(names)} tools but a call to list_styles did not come back.",
+                    "fix": "Run `pixelforge list-styles` in a terminal; if that works, run install.bat again."}
+        return {"ok": True, "tools": len(names), "words": f"PixelForge's MCP server starts and answers: {len(names)} tools, list_styles came back in {time.time() - t0:.1f} s."}
+    finally:
+        try:
+            proc.stdin.close()
+        except OSError:
+            pass
+        try:
+            proc.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+
+
+def find_browser() -> str | None:
+    """A Chrome or Edge executable, for the Midjourney road (optional)."""
+    for name in ("google-chrome", "google-chrome-stable", "chrome", "chromium", "chromium-browser", "msedge", "microsoft-edge"):
+        w = shutil.which(name)
+        if w:
+            return w
+    for env in ("PROGRAMFILES", "PROGRAMFILES(X86)", "LOCALAPPDATA"):
+        base = os.environ.get(env)
+        if base:
+            for rel in (r"Google\Chrome\Application\chrome.exe", r"Microsoft\Edge\Application\msedge.exe"):
+                p = Path(base) / rel
+                if p.exists():
+                    return str(p)
+    for p in (Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"), Path("/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge")):
+        if p.exists():
+            return str(p)
+    return None
+
+
+def doctor(project: str | Path | None = None, timeout: float = 180.0, log=None, round_trip: bool = True) -> dict:
+    """Why does the describe line do nothing? Six checks in order, each a pass or a fail with one sentence on how to fix it:
+    (1) the claude executable and its version, (2) signed in (not an API key alone), (3) PixelForge's MCP server registered
+    with it (registered on the spot when not), (4) the MCP server itself starts and answers, (5) a real round trip: ``describe
+    --bench music "set tempo 80"`` on a scratch project, the song file must change (with the time limit and the log path),
+    (6) Chrome for the Midjourney road, reported but optional. ``pixelforge claude doctor``."""
+    import tempfile
+
+    steps: list[dict] = []
+    say = log or (lambda s: None)
+    mock = mock_script()
+    exe = "mock" if mock else find_claude()
+    # 1. the executable
+    if mock:
+        steps.append(_step("executable", True, f"A mock stands in for Claude Code ({mock}); the real executable is not checked.", exe=exe))
+    elif exe:
+        v = version(exe)
+        steps.append(_step("executable", True, f"Claude Code found at {exe}" + (f", version {v}" if v else ", version unknown") + ".", exe=exe, version=v))
+    else:
+        steps.append(_step("executable", False, "Claude Code was not found on PATH or in the usual places.",
+                           "Install it from claude.com/claude-code, open a terminal and run `claude` once; or set PIXELFORGE_CLAUDE to the executable."))
+    say(_line_of(steps[-1], 1))
+    found = steps[-1]["ok"]
+    # 2. signed in
+    if not found:
+        steps.append(_step("signed_in", False, "Not checked: no Claude Code.", "Fix step 1 first.", skipped=True))
+    elif mock:
+        steps.append(_step("signed_in", True, "The mock is always signed in."))
+    else:
+        s = signed_in(exe)
+        key_only = _api_key_only(exe) if s else None
+        if s is False:
+            steps.append(_step("signed_in", False, "Claude Code is installed but not signed in.", "Open a terminal, run `claude`, and type /login to sign in with your Anthropic account once."))
+        elif key_only:
+            steps.append(_step("signed_in", False, "Claude Code is using an API key alone, not a signed-in account.",
+                               "Run `claude` and type /login to sign in; an API key alone keeps the browser integration and some tools off."))
+        elif s is None:
+            steps.append(_step("signed_in", True, "Whether Claude Code is signed in could not be read (`claude auth status` gave no answer); the round trip below tells.",
+                               "If step 5 fails at sign-in: run `claude` and type /login."))
+        else:
+            steps.append(_step("signed_in", True, "Signed in" + (" (ANTHROPIC_API_KEY is also set in the environment; the account sign-in wins)." if os.environ.get("ANTHROPIC_API_KEY") else ".")))
+    say(_line_of(steps[-1], 2))
+    # 3. registered
+    if not found:
+        steps.append(_step("registered", False, "Not checked: no Claude Code.", "Fix step 1 first.", skipped=True))
+    elif mock:
+        steps.append(_step("registered", True, "The mock needs no registration."))
+    elif registered(exe):
+        steps.append(_step("registered", True, "PixelForge's MCP server is registered with Claude Code (`claude mcp get pixelforge`)."))
+    else:
+        r = register(exe)
+        cmd = " ".join([exe, "mcp", "add", "-s", "user", SERVER_NAME, "--"] + server_command())
+        if r.get("ok"):
+            steps.append(_step("registered", True, "PixelForge's MCP server was not registered; it is now (registered just now).", registered_now=True))
+        else:
+            steps.append(_step("registered", False, "PixelForge's MCP server is not registered with Claude Code and registering it failed: " + str(r.get("error", "")),
+                               f"Run in a terminal: {cmd}"))
+    say(_line_of(steps[-1], 3))
+    # 4. the server itself
+    srv = mcp_server_check(min(timeout, 90.0))
+    steps.append(_step("server", srv["ok"], srv["words"], srv.get("fix", ""), tools=srv.get("tools", 0)))
+    say(_line_of(steps[-1], 4))
+    # 5. the round trip
+    if not round_trip:
+        steps.append(_step("round_trip", True, "Skipped (no round trip asked).", skipped=True))
+    elif not found or not steps[1]["ok"] or not srv["ok"]:
+        steps.append(_step("round_trip", False, "Not run: the steps above must pass first.", "Fix the failed step above, then run the doctor again.", skipped=True))
+    else:
+        scratch = Path(tempfile.mkdtemp(prefix="pixelforge_doctor_"))
+        try:
+            from .api import new_project
+            from .music import library as L, song as SONG
+            new_project(scratch, "doctor", "godmarrow")
+            (scratch / "music").mkdir(exist_ok=True)
+            song_path = scratch / "music" / "current.song.json"
+            SONG.save(L.load_piece("forge_home"), song_path)
+            before = song_path.read_bytes()
+            tempo_before = SONG.load(song_path).get("tempo")
+            r = run("music", scratch, "set tempo 80", on_progress=lambda w: say("   " + w), timeout=min(timeout, 600.0), snapshot_files=False)
+            log_path = r.get("log", "")
+            if not r.get("ok"):
+                steps.append(_step("round_trip", False, f"The round trip stopped: {r.get('error', 'no answer')}", f"The full log is {log_path}; `pixelforge claude log -p {scratch}` prints it.", log=log_path))
+            else:
+                after = song_path.read_bytes()
+                tempo_after = SONG.load(song_path).get("tempo")
+                if after != before:
+                    steps.append(_step("round_trip", True, f"A real round trip works: \"set tempo 80\" on a scratch song went through Claude Code and PixelForge's tools, "
+                                       f"the song file changed (tempo {tempo_before:g} to {tempo_after:g}) in {r.get('seconds', 0)} s.", log=log_path, seconds=r.get("seconds", 0)))
+                else:
+                    steps.append(_step("round_trip", False, "Claude Code answered but the song file did not change: its tool calls did not reach PixelForge's server.",
+                                       f"Read the log {log_path}: look for the pixelforge server's status in the first (init) event; run install.bat again to re-register.", log=log_path))
+        except Exception as e:  # noqa: BLE001 - the doctor reports, never crashes
+            steps.append(_step("round_trip", False, f"The round trip could not be set up: {e}", "Run install.bat again; the Forge's Python is missing a piece."))
+        # the scratch project stays (a few small files under the temp folder) so the log it names can be read
+    say(_line_of(steps[-1], 5))
+    # 6. chrome
+    b = find_browser()
+    if b:
+        steps.append(_step("chrome", True, f"A browser for the Midjourney road is there ({b}); the Claude in Chrome extension must be installed and signed in inside it.", optional=True, browser=b))
+    else:
+        steps.append(_step("chrome", True, "No Chrome or Edge was found: the Midjourney road is off (optional; everything else works without it).",
+                           "Install Chrome and the Claude in Chrome extension if you want the Forge to paint in Midjourney for you.", optional=True))
+    say(_line_of(steps[-1], 6))
+    required = [s for s in steps if not s["optional"]]
+    ok = all(s["ok"] for s in required)
+    first_bad = next((s for s in required if not s["ok"]), None)
+    sentence = "Claude on the bench works end to end." if ok else f"The describe line cannot work yet: step {steps.index(first_bad) + 1} ({first_bad['step'].replace('_', ' ')}) failed. {first_bad['fix']}"
+    return {"ok": ok, "steps": steps, "sentence": sentence, "lines": [_line_of(s, i + 1) for i, s in enumerate(steps)], "mock": bool(mock), "mock_script": mock or ""}
+
+
+def _line_of(step: dict, n: int) -> str:
+    """One line per check for a terminal and the bench: 'N. pass  words' or 'N. FAIL  words  -> fix'."""
+    mark = "pass" if step["ok"] else "FAIL"
+    if step.get("optional") and not step["ok"]:
+        mark = "note"
+    return f"{n}. {mark}  {step['words']}" + (f"  -> {step['fix']}" if step.get("fix") and not step["ok"] else "")

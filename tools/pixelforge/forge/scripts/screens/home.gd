@@ -11,6 +11,10 @@ const CHOICES := [
 var reading := false
 var job_i := 0                  # which job the Jobs panel shows when there are several (newest first)
 var jobs_text: Control = null   # the panel's two small lines, updated in place while a job runs
+var doctor_lines: PackedStringArray = []   # `claude doctor`'s lines: one a check, shown in the picture window after Doctor
+var doctor_sentence := ""                   # its last line: works end to end, or the first failed step and its fix (the state line)
+var doctor_ok := false
+var doctoring := false
 
 func build() -> void:
 	hint_text = "drop a painting anywhere"
@@ -22,7 +26,9 @@ func build() -> void:
 func build_tab(_i: int) -> void:
 	var last: Dictionary = app.cfg.get("last", {})
 	var line := "The forge is lit."
-	if last.has("info"):
+	if doctoring or doctor_sentence != "":
+		pass
+	elif last.has("info"):
 		var info: Dictionary = last["info"]
 		line = "The forge is lit. On the bench: %s, %s." % [String(info.get("title", "the last thing made")), String(info.get("note", "finished")).to_lower()]
 	elif not app.backend.python_ok():
@@ -30,14 +36,19 @@ func build_tab(_i: int) -> void:
 	else:
 		line = "The forge is lit. The bench is clear: pick what to make, drop a painting, or describe it below."
 	var jobs := _jobs()
-	state_line(line, "", 1 if not jobs.is_empty() else 2)
+	if not (doctoring or doctor_sentence != ""):
+		state_line(line, "", 1 if not jobs.is_empty() else 2)
 	add_spacer()
 	var items := []
 	for c in CHOICES:
 		items.append({"label": c[0], "cb": app.go.bind(c[1])})
 	add_choices(items, 3)
-	var bottom := [{"label": "Exit", "cb": func(): app.request_exit()}]
+	var bottom := [{"label": "Doctor", "cb": _doctor}, {"label": "Exit", "cb": func(): app.request_exit()}]
 	jobs_text = null
+	if doctoring:
+		state_line("Checking Claude on the bench: the executable, the sign-in, the registration, the MCP server, one real round trip. The checks land in the picture window.", "", 2)
+	elif doctor_sentence != "":
+		state_line("Doctor: " + doctor_sentence, "" if doctor_ok else "Gold", 2)
 	if not jobs.is_empty():
 		job_i = clampi(job_i, 0, jobs.size() - 1)
 		var j: Dictionary = jobs[job_i]
@@ -74,6 +85,8 @@ func build_tab(_i: int) -> void:
 	describe.focus_exited.connect(func(): app.set_hint(hint_text))
 	row.add_child(describe)
 	rows.add_child(row)
+	if args.has("doctor") and not doctoring and doctor_lines.is_empty():
+		call_deferred("_doctor")
 	if args.has("describe"):
 		describe.text = String(args["describe"])
 		if args.has("go"):
@@ -115,6 +128,54 @@ func _show_last() -> void:
 				app.scene.show_picture(t)
 			return
 	# nothing yet: the bench stands empty in the chosen ground
+
+## long check lines folded at a width so they fit the picture window
+static func _wrapped(lines: PackedStringArray, width: int) -> PackedStringArray:
+	var out: PackedStringArray = []
+	for l in lines:
+		var cur := ""
+		for w in String(l).split(" "):
+			if cur != "" and cur.length() + 1 + w.length() > width:
+				out.append(cur)
+				cur = "      " + w
+			else:
+				cur = w if cur == "" else cur + " " + w
+		if cur != "":
+			out.append(cur)
+	return out
+
+## Doctor: `claude doctor --json`, six checks in order with the fix for the one that fails; the lines stay on the bench
+func _doctor() -> void:
+	if doctoring:
+		return
+	if not app.backend.python_ok():
+		app.say("Python was not found; see Settings.")
+		return
+	doctoring = true
+	doctor_lines = []
+	doctor_sentence = ""
+	rebuild()
+	app.scene.show_text(PackedStringArray(["Checking Claude on the bench..."]), "the doctor")
+	app.set_hint("the doctor checks Claude on the bench; the round trip takes a few seconds")
+	app.backend.run(["claude", "doctor", "--json"], "claude doctor", func(r: Dictionary):
+		doctoring = false
+		if not is_inside_tree():
+			return
+		doctor_lines = []
+		for l in r.get("lines", []):
+			# one row a check: the mock's path and a long fix are cut so the rows stay on the bench (the terminal has them whole)
+			var line := String(l).replace(" (" + String(r.get("mock_script", "")) + ")", "")
+			if line.length() > 112:
+				line = line.substr(0, 109) + "..."
+			doctor_lines.append(line)
+		if doctor_lines.is_empty():
+			doctor_lines = PackedStringArray(["The doctor could not run: " + String(r.get("error", "no answer")) + ". Run `pixelforge claude doctor` in a terminal."])
+		doctor_sentence = String(r.get("sentence", "The doctor is done."))
+		doctor_ok = bool(r.get("ok", false))
+		app.scene.show_text(_wrapped(doctor_lines, 84), "Claude on the bench: the doctor's six checks")
+		app.say(doctor_sentence, 6.0)
+		app._claude_status()
+		rebuild())
 
 ## the classifier: say what you want, the right workbench opens with a draft
 func _describe() -> void:
@@ -299,8 +360,7 @@ func on_drop(paths: PackedStringArray) -> void:
 	if p.ends_with(".shapes.json") or p.ends_with(".json"):
 		app.go("characters", {"model": p})
 		return
-	# a picture is a character's: the Characters bench cuts it out, measures it, drafts and colours a shape model from
-	# it and stands the model beside it (several pictures at once are a sheet's views: front, side, back)
+	# a picture is a character's reference: the Characters bench places it as it is and Claude draws the model against it
 	var pics: PackedStringArray = []
 	for q in paths:
 		if q.get_extension().to_lower() in ["png", "jpg", "jpeg", "webp", "bmp", "gif"]:
