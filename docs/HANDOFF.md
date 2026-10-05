@@ -865,3 +865,10 @@ visible), then Characters, then **Paint it in Midjourney** with the browser in v
 ### 7.23 2026-10-05, track/facing-bug: the facing wheel ("multiple stacked models")
 
 **What.** The picture window never held more than one still (`scene.show_still` replaces; `tools/test_scene.gd`, 21 checks, proves it headless); what the owner saw was the `godmarrow` figure (195 px) standing cut off at the shoulders in the 140 px window, and a wheel whose turns got lost: `screen.run` dropped every request made while a render ran ("Still working"), so a quick turn through four facings drew only the first, the wheel's mouse drag and scroll committed a 0..1 value the facing read as degrees (always S), and a render that came back after a newer turn still landed. Fixed: `screen.request()` (a 0.2 s debounce, the request waits for the running job, the last one wins, a ticket marks older results stale) behind `refresh_preview` / the clip render on Characters, Creatures and Objects; the Knob commits `commit_value()` (a Wheel's angle) and steps commit once; the wheel keeps its angle across the rebuild and the selector stays on it; `scene.figure_scale()` stands a figure taller than the floor line at a half (caption "· at a half"), lights scaled with it. Reproduced and verified under xvfb with `--script` (four `set facing` in a row: one render, the last; keys: one facing per three presses); `check_scripts` 33/0, `test_editor` 106/0, `test_scene` 21/0, pytest 200; `characters_model.png` and `objects_model.png` re-shot.
+
+
+**7.29 (2026-10-05, PixelForge session): the game handed over.** Derek: "your job is just PixelForge." The combat-feel
+pass and the redesign document were started and stopped before commit; both briefs, Derek's decisions (Mana's souls-like
+melee, Diablo 2 and Path of Exile systems, Godmarrow's designs, nothing flashes, Diablo 2 is not a base), and how the
+merged Diablo 2 bridge works are in `docs/GAME_HANDOFF.md`. The lore rewrite's guide is `docs/codex/LORE_REWRITE_GUIDE.md`
+on `track/codex`. This session continues on PixelForge only.
