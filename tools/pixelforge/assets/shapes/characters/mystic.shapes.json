@@ -1,0 +1,2690 @@
+{
+ "name": "mystic",
+ "about": "The Hollow Mystic (sheet_c2451ff8_3, 'Servant of the Veiled Crone') as a solid shape sprite drawn by hand: a peaked hood with only dark in it, a wide weathered teal shawl sewn with brass coins and torn at the hem, an open teal coat to the ground over a long brown robe, pale cords looped over the chest with a ring, strings of beads and coins at the shawl's edges, dark clawed hands, a pouch at the hip. Drawn around the 120 px author pose.",
+ "mode": "solid",
+ "size": [
+  138,
+  138
+ ],
+ "height": 120,
+ "ground": 134,
+ "axis": [
+  69.0,
+  0
+ ],
+ "view": {
+  "elevation": 12
+ },
+ "outline": "#060809",
+ "skeleton": {
+  "height": 120,
+  "ground": 134,
+  "cx": 69.0
+ },
+ "materials": {
+  "slate": {
+   "ramp": [
+    "#0a1010",
+    "#121b1b",
+    "#1b2828",
+    "#253535",
+    "#314444",
+    "#3f5655",
+    "#506a69"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.45
+  },
+  "robe": {
+   "ramp": [
+    "#0f0907",
+    "#1a100c",
+    "#261812",
+    "#332118",
+    "#412b1f",
+    "#503628"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.35
+  },
+  "void": {
+   "ramp": [
+    "#010102",
+    "#040405",
+    "#08080a",
+    "#0d0d10"
+   ]
+  },
+  "brass": {
+   "ramp": [
+    "#1a130a",
+    "#302414",
+    "#4b3a20",
+    "#6c5530",
+    "#927546",
+    "#b89a62"
+   ],
+   "spec": true,
+   "spec_t": 0.85,
+   "texture": "scratch",
+   "texture_strength": 0.3
+  },
+  "cord": {
+   "ramp": [
+    "#24403f",
+    "#3f6b69",
+    "#62a09c",
+    "#8dc9c4",
+    "#bde6e1",
+    "#e2f7f4"
+   ]
+  },
+  "bead": {
+   "ramp": [
+    "#0b0807",
+    "#1a1411",
+    "#2d2420",
+    "#43372f",
+    "#5b4b3f"
+   ],
+   "spec": true,
+   "spec_t": 0.8
+  },
+  "claw": {
+   "ramp": [
+    "#080606",
+    "#120e0d",
+    "#1e1816",
+    "#2b2320",
+    "#3a302b"
+   ]
+  }
+ },
+ "parts": {
+  "shawl": {
+   "bone": "spine.003",
+   "lag": {
+    "frames": 1,
+    "sway": 0.4
+   },
+   "hang": 0.55
+  },
+  "coat": {
+   "bone": "hips",
+   "lag": {
+    "frames": 2,
+    "sway": 0.8
+   },
+   "hang": 0.3
+  },
+  "robe": {
+   "bone": "hips",
+   "lag": {
+    "frames": 2,
+    "sway": 0.6
+   },
+   "hang": 0.25
+  },
+  "cords": {
+   "bone": "spine.002",
+   "lag": {
+    "frames": 2,
+    "sway": 0.5
+   },
+   "hang": 0.4
+  },
+  "beads": {
+   "bone": "spine.003",
+   "lag": {
+    "frames": 2,
+    "sway": 0.8
+   },
+   "hang": 0.5
+  },
+  "pouch": {
+   "bone": "hips",
+   "lag": {
+    "frames": 1,
+    "sway": 0.5
+   },
+   "hang": 0.5
+  }
+ },
+ "shapes": [
+  {
+   "name": "head",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    23.0,
+    0.6
+   ],
+   "radii": [
+    5.4,
+    7.2,
+    5.8
+   ],
+   "material": "void",
+   "bone": "head"
+  },
+  {
+   "name": "hood",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    22.5,
+    -0.6
+   ],
+   "radii": [
+    7.6,
+    9.8,
+    7.8
+   ],
+   "material": "slate",
+   "bone": "head",
+   "rules": [
+    {
+     "z": [
+      2.0,
+      null
+     ],
+     "near": [
+      [
+       [
+        69.0,
+        21.0,
+        null
+       ],
+       [
+        69.0,
+        28.5,
+        null
+       ]
+      ],
+      4.6
+     ],
+     "t": 1
+    },
+    {
+     "z": [
+      2.6,
+      null
+     ],
+     "near": [
+      [
+       [
+        69.0,
+        21.5,
+        null
+       ],
+       [
+        69.0,
+        28.5,
+        null
+       ]
+      ],
+      3.7
+     ],
+     "material": "void"
+    },
+    {
+     "every_angle": [
+      11,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.02,
+      3,
+      1
+     ],
+     "material": "brass",
+     "px": [
+      90,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "hood_peak",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    16.5,
+    -3.6
+   ],
+   "b": [
+    69.0,
+    11.0,
+    -7.2
+   ],
+   "r": [
+    4.2,
+    1.0
+   ],
+   "material": "slate",
+   "bone": "head",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "hood_fall",
+   "kind": "ring",
+   "y": [
+    24,
+    40
+   ],
+   "rx": [
+    7.6,
+    0.25
+   ],
+   "rz": [
+    7.4,
+    0.2
+   ],
+   "thickness": 1.4,
+   "keep": {
+    "back_strip": 2.04
+   },
+   "material": "slate",
+   "bone": "neck",
+   "rules": [
+    {
+     "every_angle": [
+      9,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hash": [
+      0.02,
+      5,
+      1
+     ],
+     "material": "brass",
+     "px": [
+      90,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "neck",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    33,
+    0
+   ],
+   "b": [
+    69.0,
+    28,
+    0.2
+   ],
+   "r": [
+    3.0,
+    2.8
+   ],
+   "material": "void",
+   "bone": "neck"
+  },
+  {
+   "name": "chest",
+   "kind": "ellipsoid",
+   "centre": [
+    69.0,
+    46,
+    0.2
+   ],
+   "radii": [
+    9.6,
+    12.0,
+    6.6
+   ],
+   "material": "robe",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "waist",
+   "kind": "capsule",
+   "a": [
+    69.0,
+    56,
+    -0.2
+   ],
+   "b": [
+    69.0,
+    70,
+    -1.0
+   ],
+   "r": [
+    8.0,
+    8.6
+   ],
+   "material": "robe",
+   "bone": "spine.001"
+  },
+  {
+   "name": "delt.L",
+   "kind": "ellipsoid",
+   "centre": [
+    80.0,
+    38.6,
+    -1.6
+   ],
+   "radii": [
+    4.6,
+    4.4,
+    4.6
+   ],
+   "material": "slate",
+   "bone": "shoulder.L"
+  },
+  {
+   "name": "upper_arm.L",
+   "kind": "capsule",
+   "a": [
+    80.5,
+    37.5,
+    -3.6
+   ],
+   "b": [
+    85.4,
+    54.4,
+    -4.4
+   ],
+   "r": [
+    3.4,
+    3.0
+   ],
+   "material": "slate",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "forearm.L",
+   "kind": "capsule",
+   "a": [
+    85.4,
+    54.4,
+    -4.4
+   ],
+   "b": [
+    89.0,
+    71.5,
+    -0.8
+   ],
+   "r": [
+    3.2,
+    2.4
+   ],
+   "material": "robe",
+   "bone": "forearm.L",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      5.5,
+      null
+     ],
+     "material": "slate",
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "hand.L",
+   "kind": "ellipsoid",
+   "centre": [
+    89.8,
+    74.6,
+    0.2
+   ],
+   "radii": [
+    2.5,
+    3.2,
+    2.1
+   ],
+   "material": "claw",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "finger0.L",
+   "kind": "capsule",
+   "a": [
+    88.0,
+    76.6,
+    0.6
+   ],
+   "b": [
+    87.46,
+    82.6,
+    2.2
+   ],
+   "r": [
+    0.7,
+    0.35
+   ],
+   "material": "claw",
+   "bone": "hand.L",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "claw0.L",
+   "kind": "capsule",
+   "a": [
+    87.46,
+    82.6,
+    2.2
+   ],
+   "b": [
+    87.36999999999999,
+    84.0,
+    3.6
+   ],
+   "r": [
+    0.4,
+    0.15
+   ],
+   "material": "claw",
+   "bone": "hand.L",
+   "t": -2,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger1.L",
+   "kind": "capsule",
+   "a": [
+    89.2,
+    76.6,
+    0.6
+   ],
+   "b": [
+    89.02,
+    84.0,
+    2.2
+   ],
+   "r": [
+    0.7,
+    0.35
+   ],
+   "material": "claw",
+   "bone": "hand.L",
+   "t": 0,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "claw1.L",
+   "kind": "capsule",
+   "a": [
+    89.02,
+    84.0,
+    2.2
+   ],
+   "b": [
+    88.99,
+    85.4,
+    3.6
+   ],
+   "r": [
+    0.4,
+    0.15
+   ],
+   "material": "claw",
+   "bone": "hand.L",
+   "t": -2,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger2.L",
+   "kind": "capsule",
+   "a": [
+    90.39999999999999,
+    76.6,
+    0.6
+   ],
+   "b": [
+    90.58,
+    83.6,
+    2.2
+   ],
+   "r": [
+    0.7,
+    0.35
+   ],
+   "material": "claw",
+   "bone": "hand.L",
+   "t": 0,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "claw2.L",
+   "kind": "capsule",
+   "a": [
+    90.58,
+    83.6,
+    2.2
+   ],
+   "b": [
+    90.61,
+    85.0,
+    3.6
+   ],
+   "r": [
+    0.4,
+    0.15
+   ],
+   "material": "claw",
+   "bone": "hand.L",
+   "t": -2,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger3.L",
+   "kind": "capsule",
+   "a": [
+    91.6,
+    76.6,
+    0.6
+   ],
+   "b": [
+    92.14,
+    82.19999999999999,
+    2.2
+   ],
+   "r": [
+    0.7,
+    0.35
+   ],
+   "material": "claw",
+   "bone": "hand.L",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "claw3.L",
+   "kind": "capsule",
+   "a": [
+    92.14,
+    82.19999999999999,
+    2.2
+   ],
+   "b": [
+    92.23,
+    83.6,
+    3.6
+   ],
+   "r": [
+    0.4,
+    0.15
+   ],
+   "material": "claw",
+   "bone": "hand.L",
+   "t": -2,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "thumb.L",
+   "kind": "capsule",
+   "a": [
+    88.0,
+    74.5,
+    1.4
+   ],
+   "b": [
+    86.8,
+    78.6,
+    3.0
+   ],
+   "r": [
+    0.7,
+    0.4
+   ],
+   "material": "claw",
+   "bone": "hand.L",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "thigh.L",
+   "kind": "capsule",
+   "a": [
+    74.5,
+    70.8,
+    0.1
+   ],
+   "b": [
+    74.5,
+    97.9,
+    -0.1
+   ],
+   "r": [
+    3.0,
+    2.4
+   ],
+   "material": "robe",
+   "bone": "thigh.L"
+  },
+  {
+   "name": "shin.L",
+   "kind": "capsule",
+   "a": [
+    74.5,
+    97.9,
+    -0.1
+   ],
+   "b": [
+    74.5,
+    126.9,
+    -2.4
+   ],
+   "r": [
+    2.4,
+    2.0
+   ],
+   "material": "robe",
+   "bone": "shin.L"
+  },
+  {
+   "name": "foot.L",
+   "kind": "box",
+   "centre": [
+    74.5,
+    131.6,
+    3.0
+   ],
+   "half": [
+    3.0,
+    2.2,
+    5.6
+   ],
+   "round": 1.2,
+   "material": "claw",
+   "bone": "foot.L"
+  },
+  {
+   "name": "delt.R",
+   "kind": "ellipsoid",
+   "centre": [
+    58.0,
+    38.6,
+    -1.6
+   ],
+   "radii": [
+    4.6,
+    4.4,
+    4.6
+   ],
+   "material": "slate",
+   "bone": "shoulder.R"
+  },
+  {
+   "name": "upper_arm.R",
+   "kind": "capsule",
+   "a": [
+    57.5,
+    37.5,
+    -3.6
+   ],
+   "b": [
+    52.599999999999994,
+    54.4,
+    -4.4
+   ],
+   "r": [
+    3.4,
+    3.0
+   ],
+   "material": "slate",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "forearm.R",
+   "kind": "capsule",
+   "a": [
+    52.599999999999994,
+    54.4,
+    -4.4
+   ],
+   "b": [
+    49.0,
+    71.5,
+    -0.8
+   ],
+   "r": [
+    3.2,
+    2.4
+   ],
+   "material": "robe",
+   "bone": "forearm.R",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      5.5,
+      null
+     ],
+     "material": "slate",
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "hand.R",
+   "kind": "ellipsoid",
+   "centre": [
+    48.2,
+    74.6,
+    0.2
+   ],
+   "radii": [
+    2.5,
+    3.2,
+    2.1
+   ],
+   "material": "claw",
+   "bone": "hand.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "finger0.R",
+   "kind": "capsule",
+   "a": [
+    50.0,
+    76.6,
+    0.6
+   ],
+   "b": [
+    50.540000000000006,
+    82.6,
+    2.2
+   ],
+   "r": [
+    0.7,
+    0.35
+   ],
+   "material": "claw",
+   "bone": "hand.R",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "claw0.R",
+   "kind": "capsule",
+   "a": [
+    50.540000000000006,
+    82.6,
+    2.2
+   ],
+   "b": [
+    50.63000000000001,
+    84.0,
+    3.6
+   ],
+   "r": [
+    0.4,
+    0.15
+   ],
+   "material": "claw",
+   "bone": "hand.R",
+   "t": -2,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger1.R",
+   "kind": "capsule",
+   "a": [
+    48.8,
+    76.6,
+    0.6
+   ],
+   "b": [
+    48.980000000000004,
+    84.0,
+    2.2
+   ],
+   "r": [
+    0.7,
+    0.35
+   ],
+   "material": "claw",
+   "bone": "hand.R",
+   "t": 0,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "claw1.R",
+   "kind": "capsule",
+   "a": [
+    48.980000000000004,
+    84.0,
+    2.2
+   ],
+   "b": [
+    49.010000000000005,
+    85.4,
+    3.6
+   ],
+   "r": [
+    0.4,
+    0.15
+   ],
+   "material": "claw",
+   "bone": "hand.R",
+   "t": -2,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger2.R",
+   "kind": "capsule",
+   "a": [
+    47.60000000000001,
+    76.6,
+    0.6
+   ],
+   "b": [
+    47.42,
+    83.6,
+    2.2
+   ],
+   "r": [
+    0.7,
+    0.35
+   ],
+   "material": "claw",
+   "bone": "hand.R",
+   "t": 0,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "claw2.R",
+   "kind": "capsule",
+   "a": [
+    47.42,
+    83.6,
+    2.2
+   ],
+   "b": [
+    47.39,
+    85.0,
+    3.6
+   ],
+   "r": [
+    0.4,
+    0.15
+   ],
+   "material": "claw",
+   "bone": "hand.R",
+   "t": -2,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "finger3.R",
+   "kind": "capsule",
+   "a": [
+    46.400000000000006,
+    76.6,
+    0.6
+   ],
+   "b": [
+    45.86,
+    82.19999999999999,
+    2.2
+   ],
+   "r": [
+    0.7,
+    0.35
+   ],
+   "material": "claw",
+   "bone": "hand.R",
+   "t": -1,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "claw3.R",
+   "kind": "capsule",
+   "a": [
+    45.86,
+    82.19999999999999,
+    2.2
+   ],
+   "b": [
+    45.769999999999996,
+    83.6,
+    3.6
+   ],
+   "r": [
+    0.4,
+    0.15
+   ],
+   "material": "claw",
+   "bone": "hand.R",
+   "t": -2,
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "thumb.R",
+   "kind": "capsule",
+   "a": [
+    50.0,
+    74.5,
+    1.4
+   ],
+   "b": [
+    51.2,
+    78.6,
+    3.0
+   ],
+   "r": [
+    0.7,
+    0.4
+   ],
+   "material": "claw",
+   "bone": "hand.R",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "thigh.R",
+   "kind": "capsule",
+   "a": [
+    63.5,
+    70.8,
+    0.1
+   ],
+   "b": [
+    63.5,
+    97.9,
+    -0.1
+   ],
+   "r": [
+    3.0,
+    2.4
+   ],
+   "material": "robe",
+   "bone": "thigh.R"
+  },
+  {
+   "name": "shin.R",
+   "kind": "capsule",
+   "a": [
+    63.5,
+    97.9,
+    -0.1
+   ],
+   "b": [
+    63.5,
+    126.9,
+    -2.4
+   ],
+   "r": [
+    2.4,
+    2.0
+   ],
+   "material": "robe",
+   "bone": "shin.R"
+  },
+  {
+   "name": "foot.R",
+   "kind": "box",
+   "centre": [
+    63.5,
+    131.6,
+    3.0
+   ],
+   "half": [
+    3.0,
+    2.2,
+    5.6
+   ],
+   "round": 1.2,
+   "material": "claw",
+   "bone": "foot.R"
+  },
+  {
+   "name": "robe",
+   "kind": "ring",
+   "y": [
+    40,
+    133
+   ],
+   "rx": [
+    8.4,
+    0.14
+   ],
+   "rz": [
+    7.0,
+    0.105
+   ],
+   "thickness": 1.6,
+   "hem": {
+    "tongues": 18,
+    "depth": 3,
+    "seed": 5
+   },
+   "material": "robe",
+   "part": "robe",
+   "bump": {
+    "folds": [
+     0.4,
+     9,
+     1.0
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      8,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      30
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      6
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "coat",
+   "kind": "ring",
+   "y": [
+    38,
+    134
+   ],
+   "rx": [
+    9.6,
+    0.165
+   ],
+   "rz": [
+    8.2,
+    0.12
+   ],
+   "thickness": 1.6,
+   "keep": {
+    "back_strip": 2.72
+   },
+   "hem": {
+    "tongues": 12,
+    "depth": 4,
+    "seed": 9
+   },
+   "holes": {
+    "p": 0.05,
+    "band": 14,
+    "seed": 4
+   },
+   "material": "slate",
+   "part": "coat",
+   "bump": {
+    "folds": [
+     0.5,
+     7,
+     1.5
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      10,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      40
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      18
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      8
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      3
+     ],
+     "material": "robe",
+     "t": -2
+    },
+    {
+     "hash": [
+      0.012,
+      9,
+      1
+     ],
+     "material": "brass",
+     "px": [
+      90,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "shawl",
+   "kind": "ring",
+   "y": [
+    29,
+    72
+   ],
+   "rx": [
+    9.0,
+    0.42
+   ],
+   "rz": [
+    8.2,
+    0.22
+   ],
+   "thickness": 2.0,
+   "hem": {
+    "tongues": 17,
+    "depth": 12,
+    "seed": 7
+   },
+   "open": {
+    "angle": 0.5,
+    "below": 34
+   },
+   "holes": {
+    "p": 0.05,
+    "band": 16,
+    "seed": 8
+   },
+   "material": "slate",
+   "part": "shawl",
+   "bump": {
+    "folds": [
+     0.5,
+     9,
+     2.0
+    ]
+   },
+   "rules": [
+    {
+     "every_y": [
+      5,
+      1
+     ],
+     "hash": [
+      0.4,
+      14,
+      2
+     ],
+     "t": -1,
+     "px": [
+      90,
+      null
+     ]
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    },
+    {
+     "hash": [
+      0.025,
+      21,
+      1
+     ],
+     "material": "brass",
+     "px": [
+      90,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.008,
+      23,
+      1
+     ],
+     "material": "brass",
+     "t": 2,
+     "px": [
+      90,
+      null
+     ]
+    },
+    {
+     "y": [
+      29,
+      33
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "loop0_0",
+   "kind": "capsule",
+   "a": [
+    64.5,
+    34.5,
+    8.6
+   ],
+   "b": [
+    65.2,
+    46.6,
+    9.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop0_1",
+   "kind": "capsule",
+   "a": [
+    65.2,
+    46.6,
+    9.6
+   ],
+   "b": [
+    66.0,
+    56.5,
+    8.4
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop0_2",
+   "kind": "capsule",
+   "a": [
+    66.0,
+    56.5,
+    8.4
+   ],
+   "b": [
+    70.39999999999999,
+    46.6,
+    9.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop0_3",
+   "kind": "capsule",
+   "a": [
+    70.39999999999999,
+    46.6,
+    9.6
+   ],
+   "b": [
+    73.5,
+    34.5,
+    8.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop1_0",
+   "kind": "capsule",
+   "a": [
+    64.5,
+    34.5,
+    8.6
+   ],
+   "b": [
+    64.24000000000001,
+    48.8,
+    9.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop1_1",
+   "kind": "capsule",
+   "a": [
+    64.24000000000001,
+    48.8,
+    9.6
+   ],
+   "b": [
+    71.6,
+    60.5,
+    8.4
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop1_2",
+   "kind": "capsule",
+   "a": [
+    71.6,
+    60.5,
+    8.4
+   ],
+   "b": [
+    75.84,
+    48.8,
+    9.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop1_3",
+   "kind": "capsule",
+   "a": [
+    75.84,
+    48.8,
+    9.6
+   ],
+   "b": [
+    73.5,
+    34.5,
+    8.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop2_0",
+   "kind": "capsule",
+   "a": [
+    64.5,
+    34.5,
+    8.6
+   ],
+   "b": [
+    66.92,
+    51.0,
+    9.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop2_1",
+   "kind": "capsule",
+   "a": [
+    66.92,
+    51.0,
+    9.6
+   ],
+   "b": [
+    67.8,
+    64.5,
+    8.4
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop2_2",
+   "kind": "capsule",
+   "a": [
+    67.8,
+    64.5,
+    8.4
+   ],
+   "b": [
+    70.11999999999999,
+    51.0,
+    9.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop2_3",
+   "kind": "capsule",
+   "a": [
+    70.11999999999999,
+    51.0,
+    9.6
+   ],
+   "b": [
+    73.5,
+    34.5,
+    8.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop3_0",
+   "kind": "capsule",
+   "a": [
+    64.5,
+    34.5,
+    8.6
+   ],
+   "b": [
+    67.03999999999999,
+    44.95,
+    9.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop3_1",
+   "kind": "capsule",
+   "a": [
+    67.03999999999999,
+    44.95,
+    9.6
+   ],
+   "b": [
+    72.6,
+    53.5,
+    8.4
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop3_2",
+   "kind": "capsule",
+   "a": [
+    72.6,
+    53.5,
+    8.4
+   ],
+   "b": [
+    73.84,
+    44.95,
+    9.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop3_3",
+   "kind": "capsule",
+   "a": [
+    73.84,
+    44.95,
+    9.6
+   ],
+   "b": [
+    73.5,
+    34.5,
+    8.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop4_0",
+   "kind": "capsule",
+   "a": [
+    64.5,
+    34.5,
+    8.6
+   ],
+   "b": [
+    64.56,
+    47.7,
+    9.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop4_1",
+   "kind": "capsule",
+   "a": [
+    64.56,
+    47.7,
+    9.6
+   ],
+   "b": [
+    69.4,
+    58.5,
+    8.4
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop4_2",
+   "kind": "capsule",
+   "a": [
+    69.4,
+    58.5,
+    8.4
+   ],
+   "b": [
+    73.75999999999999,
+    47.7,
+    9.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "loop4_3",
+   "kind": "capsule",
+   "a": [
+    73.75999999999999,
+    47.7,
+    9.6
+   ],
+   "b": [
+    73.5,
+    34.5,
+    8.6
+   ],
+   "r": 0.55,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "ring",
+   "kind": "ring",
+   "y": [
+    58.0,
+    59.6
+   ],
+   "rx": 2.8,
+   "rz": 2.8,
+   "cz": 8.8,
+   "thickness": 0.8,
+   "material": "cord",
+   "part": "cords",
+   "rotate": {
+    "x": 82,
+    "about": [
+     69.0,
+     58.8,
+     9.4
+    ]
+   },
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "tail_0",
+   "kind": "capsule",
+   "a": [
+    69.4,
+    60,
+    8.8
+   ],
+   "b": [
+    69.8,
+    70,
+    9.4
+   ],
+   "r": 0.5,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "tail_1",
+   "kind": "capsule",
+   "a": [
+    69.8,
+    70,
+    9.4
+   ],
+   "b": [
+    69.2,
+    79,
+    9.6
+   ],
+   "r": 0.5,
+   "material": "cord",
+   "part": "cords",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "beadsL00",
+   "kind": "ellipsoid",
+   "centre": [
+    84.0,
+    63.0,
+    -1.5
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL01",
+   "kind": "ellipsoid",
+   "centre": [
+    84.0,
+    65.66666666666667,
+    -1.4166666666666667
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL02",
+   "kind": "ellipsoid",
+   "centre": [
+    84.0,
+    68.33333333333333,
+    -1.3333333333333333
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL03",
+   "kind": "ellipsoid",
+   "centre": [
+    84.0,
+    71.0,
+    -1.25
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL04",
+   "kind": "ellipsoid",
+   "centre": [
+    84.0,
+    73.66666666666667,
+    -1.1666666666666667
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL05",
+   "kind": "ellipsoid",
+   "centre": [
+    84.0,
+    76.33333333333333,
+    -1.0833333333333333
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "coinL0",
+   "kind": "ellipsoid",
+   "centre": [
+    84.0,
+    81.0,
+    -0.9
+   ],
+   "radii": [
+    1.6,
+    1.6,
+    0.5
+   ],
+   "material": "brass",
+   "part": "beads",
+   "t": 1
+  },
+  {
+   "name": "beadsL10",
+   "kind": "ellipsoid",
+   "centre": [
+    87.5,
+    66.5,
+    4.5
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL11",
+   "kind": "ellipsoid",
+   "centre": [
+    87.5,
+    69.0,
+    4.5625
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL12",
+   "kind": "ellipsoid",
+   "centre": [
+    87.5,
+    71.5,
+    4.625
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL13",
+   "kind": "ellipsoid",
+   "centre": [
+    87.5,
+    74.0,
+    4.6875
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL14",
+   "kind": "ellipsoid",
+   "centre": [
+    87.5,
+    76.5,
+    4.75
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL15",
+   "kind": "ellipsoid",
+   "centre": [
+    87.5,
+    79.0,
+    4.8125
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL16",
+   "kind": "ellipsoid",
+   "centre": [
+    87.5,
+    81.5,
+    4.875
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL17",
+   "kind": "ellipsoid",
+   "centre": [
+    87.5,
+    84.0,
+    4.9375
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "coinL1",
+   "kind": "ellipsoid",
+   "centre": [
+    87.5,
+    88.5,
+    5.1
+   ],
+   "radii": [
+    1.6,
+    1.6,
+    0.5
+   ],
+   "material": "brass",
+   "part": "beads",
+   "t": 1
+  },
+  {
+   "name": "beadsL20",
+   "kind": "ellipsoid",
+   "centre": [
+    80.5,
+    66.0,
+    -1.5
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL21",
+   "kind": "ellipsoid",
+   "centre": [
+    80.5,
+    69.25,
+    -1.375
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL22",
+   "kind": "ellipsoid",
+   "centre": [
+    80.5,
+    72.5,
+    -1.25
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsL23",
+   "kind": "ellipsoid",
+   "centre": [
+    80.5,
+    75.75,
+    -1.125
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "coinL2",
+   "kind": "ellipsoid",
+   "centre": [
+    80.5,
+    81.0,
+    -0.9
+   ],
+   "radii": [
+    1.6,
+    1.6,
+    0.5
+   ],
+   "material": "brass",
+   "part": "beads",
+   "t": 1
+  },
+  {
+   "name": "beadsR00",
+   "kind": "ellipsoid",
+   "centre": [
+    54.0,
+    63.0,
+    -1.5
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR01",
+   "kind": "ellipsoid",
+   "centre": [
+    54.0,
+    65.66666666666667,
+    -1.4166666666666667
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR02",
+   "kind": "ellipsoid",
+   "centre": [
+    54.0,
+    68.33333333333333,
+    -1.3333333333333333
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR03",
+   "kind": "ellipsoid",
+   "centre": [
+    54.0,
+    71.0,
+    -1.25
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR04",
+   "kind": "ellipsoid",
+   "centre": [
+    54.0,
+    73.66666666666667,
+    -1.1666666666666667
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR05",
+   "kind": "ellipsoid",
+   "centre": [
+    54.0,
+    76.33333333333333,
+    -1.0833333333333333
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "coinR0",
+   "kind": "ellipsoid",
+   "centre": [
+    54.0,
+    81.0,
+    -0.9
+   ],
+   "radii": [
+    1.6,
+    1.6,
+    0.5
+   ],
+   "material": "brass",
+   "part": "beads",
+   "t": 1
+  },
+  {
+   "name": "beadsR10",
+   "kind": "ellipsoid",
+   "centre": [
+    50.5,
+    66.5,
+    4.5
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR11",
+   "kind": "ellipsoid",
+   "centre": [
+    50.5,
+    69.0,
+    4.5625
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR12",
+   "kind": "ellipsoid",
+   "centre": [
+    50.5,
+    71.5,
+    4.625
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR13",
+   "kind": "ellipsoid",
+   "centre": [
+    50.5,
+    74.0,
+    4.6875
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR14",
+   "kind": "ellipsoid",
+   "centre": [
+    50.5,
+    76.5,
+    4.75
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR15",
+   "kind": "ellipsoid",
+   "centre": [
+    50.5,
+    79.0,
+    4.8125
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR16",
+   "kind": "ellipsoid",
+   "centre": [
+    50.5,
+    81.5,
+    4.875
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR17",
+   "kind": "ellipsoid",
+   "centre": [
+    50.5,
+    84.0,
+    4.9375
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "coinR1",
+   "kind": "ellipsoid",
+   "centre": [
+    50.5,
+    88.5,
+    5.1
+   ],
+   "radii": [
+    1.6,
+    1.6,
+    0.5
+   ],
+   "material": "brass",
+   "part": "beads",
+   "t": 1
+  },
+  {
+   "name": "beadsR20",
+   "kind": "ellipsoid",
+   "centre": [
+    57.5,
+    66.0,
+    -1.5
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR21",
+   "kind": "ellipsoid",
+   "centre": [
+    57.5,
+    69.25,
+    -1.375
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR22",
+   "kind": "ellipsoid",
+   "centre": [
+    57.5,
+    72.5,
+    -1.25
+   ],
+   "radii": [
+    1.1,
+    1.1,
+    1.1
+   ],
+   "material": "bead",
+   "t": 1,
+   "part": "beads"
+  },
+  {
+   "name": "beadsR23",
+   "kind": "ellipsoid",
+   "centre": [
+    57.5,
+    75.75,
+    -1.125
+   ],
+   "radii": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "material": "bead",
+   "t": -1,
+   "part": "beads"
+  },
+  {
+   "name": "coinR2",
+   "kind": "ellipsoid",
+   "centre": [
+    57.5,
+    81.0,
+    -0.9
+   ],
+   "radii": [
+    1.6,
+    1.6,
+    0.5
+   ],
+   "material": "brass",
+   "part": "beads",
+   "t": 1
+  },
+  {
+   "name": "pouch",
+   "kind": "ellipsoid",
+   "centre": [
+    58.5,
+    78,
+    6.2
+   ],
+   "radii": [
+    3.4,
+    4.0,
+    2.6
+   ],
+   "material": "leather5",
+   "part": "pouch",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -2.5
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      77.0,
+      78.0
+     ],
+     "material": "brass"
+    }
+   ]
+  }
+ ],
+ "clips": {
+  "attack": "punch"
+ },
+ "effects": [],
+ "lights": [],
+ "shadow": {
+  "radii": [
+   20,
+   4.0
+  ],
+  "colour": "#4b4a4f"
+ },
+ "detail": {
+  "chest": {
+   "file": "mystic.detail/chest.png"
+  },
+  "waist": {
+   "file": "mystic.detail/waist.png"
+  },
+  "forearm.L": {
+   "file": "mystic.detail/forearm.L.png"
+  },
+  "thigh.L": {
+   "file": "mystic.detail/thigh.L.png"
+  },
+  "shin.L": {
+   "file": "mystic.detail/shin.L.png"
+  },
+  "forearm.R": {
+   "file": "mystic.detail/forearm.R.png"
+  },
+  "thigh.R": {
+   "file": "mystic.detail/thigh.R.png"
+  },
+  "shin.R": {
+   "file": "mystic.detail/shin.R.png"
+  },
+  "robe": {
+   "file": "mystic.detail/robe.png"
+  },
+  "pouch": {
+   "file": "mystic.detail/pouch.png"
+  }
+ }
+}
