@@ -22,9 +22,31 @@ wheels, and its choices. Home has nine choices and a describe line:
 
 The arrow keys, Enter and a gamepad (d-pad, A, B, LB/RB for the tabs) work everywhere; so does the mouse. **Esc** (or
 B) goes back. **F11** switches between full screen and a window. **Ctrl+L** opens the log (exactly what ran and what
-it said; Ctrl+C copies it). Every bench has tabs along the top of the text box and the same bottom line: **Keep**,
-**Render all**, **Undo**, **Reset** (this tab's levers back to their defaults), **Start over** (one plain question,
-inside the window) and **Advanced** (the same values as plain sliders with finer steps).
+it said; Ctrl+C copies it). Every bench has tabs along the top of the text box (wooden signs; the lit one is the tab
+you are on) and the same bottom line: **Keep**, **Render all**, **Undo**, **Reset** (this tab's levers back to their
+defaults), **Start over** (one plain question, inside the window), **Advanced** (the same values as plain sliders with
+finer steps) and **?**.
+
+**What you can click.** Ember gold means you can click or change it; bone and grey are labels. Choices sit on small
+iron plaques; the one in hand has a gold edge and the dagger beside it. Levers, wheels and chain pulls light up and
+get a gold outline when the pointer is over them (the pointer becomes a hand; a grab hand while you drag). A value
+under a lever, or a `< value >` on a line, can be typed: click it and a caret appears.
+
+**The hint line.** The line on the wooden sill at the foot always names the thing in hand (or under the pointer) and
+how to change it: "size · drag up or down, scroll, or click the value to type". Look there whenever you are unsure.
+
+**The "?" choice.** On every bench, **?** (also the small plate on the title line) lays labelled callouts over the
+bench: a tag by every group and lever saying how it is worked, and the keys. Any key or click clears it. It shows
+itself the first time you open each bench.
+
+**Where you are.** The title line reads like a path: **< back**, then the screens under this one, then this screen
+and its tab. Click any earlier name to go back there; **< back** is always there.
+
+**The ground.** The picture window shows the thing on the bench standing in a place: dungeon, crypt, moor, fen, snow
+or a plain grey (for judging colours), chosen on the sill's right. The frame round the window is carved from that
+place's stone (the crypt's green-grey, the moor's brown, the snow's frosted blue-grey) and its torches throw that
+place's light; the **scene light** lever on the bench still turns the window's own light off, to the sprite's own
+lights only, or on.
 
 **Characters** (the heart of it). **Start from a picture.** Drop a Midjourney picture on the window (on Home or on
 the Characters bench), or press *Choose a picture* and pick it in the Forge's own browser (Downloads, Pictures, Desktop

@@ -5,6 +5,7 @@ const W := preload("res://scripts/widgets.gd")
 const Backend := preload("res://scripts/backend.gd")
 const Audio := preload("res://scripts/audio.gd")
 const Scene := preload("res://scripts/scene.gd")
+const Frame := preload("res://scripts/frame.gd")
 ## scripts/app.gd: the shell, in the framing of docs/mockups/forge_app_v8.html. One ornate pixel frame with the
 ## banner set into its top edge, the picture window above, the text box below with the tabs on its top edge, the
 ## foot line with the project, the style, a hint and the ground picker. Holds the Backend, the audio graph, the
@@ -30,6 +31,8 @@ const PIC := Rect2(22, 27, 596, 140)
 const TEXTBOX := Rect2(22, 183, 596, 136)
 const TABS_H := 14
 const FOOT_Y := 322
+const STATUS_Y := 341           # the status words on the bottom band, between the candles
+const STATUS_X := 58
 const DISSOLVE_STEPS := 4
 const DISSOLVE_FPS := 24.0
 
@@ -48,9 +51,14 @@ var browser: Control = null     # the in-app file browser while it is up
 var exit_asked := false
 var tabs_ctrl: W.Tabs
 var envs_ctrl: W.Choices
-var foot_project: Label
-var foot_style: Label
-var foot_hint: Label
+var foot_project: Control
+var foot_style: Control
+var foot_claude: Control        # "Claude  ready" on the foot line (gold when something is wrong, a pulse while it works)
+var foot_hint: Control
+var callouts: Control = null    # the "?" overlay while it shows
+var title_ctrl: Control         # the title line's strip (hover, clicks)
+var title_hover := ""           # the title item under the pointer
+var title_press := ""           # the title item just clicked (its plate sinks for a moment)
 var chrome: Control             # the border, banner, window rims, title-line toggles
 var selector: Control           # the arrow overlay
 var dissolve: ColorRect
@@ -61,14 +69,18 @@ var toast: Label
 var toast_t := 0.0
 var transitioning := false
 var hint_text := ""
+var hover_words := ""           # the hint for the control under the pointer, while it rests there (wins over the selection's)
 var reduced_motion := false
 # the selector
 var groups: Array = []
 var gi := -1
 var sel_t := 0.0
 var flash := -1.0
+var shimmer := -1.0             # the dagger's two-frame shimmer after a move
 var hover_drop := false
 var style_name := "godmarrow"
+var flame_frame := 0           # the sconces' flames: eight frames at 10 fps
+var flame_t := 0.0
 var claude_state := {}          # `claude status --json`: ok, state (ready | not_found | not_signed_in), sentence
 var claude_working := ""        # the current progress line while Claude works on a bench ("" when idle)
 var jobs_list: Array = []       # `job list --json`: the project's jobs, newest first (id, title, state, done, total, waiting, last, bench, report_json)
@@ -119,12 +131,15 @@ func _ready() -> void:
 	layer.clip_contents = true
 	add_child(layer)
 	_build_foot()
+	_build_title_strip()
 	# the chrome over everything: border, banner, rims, the title-line toggles
 	chrome = Control.new()
 	chrome.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	chrome.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	chrome.draw.connect(_draw_chrome)
 	add_child(chrome)
+	for n in [foot_project, foot_style, foot_claude, foot_hint, get_node("GroundLabel"), envs_ctrl]:
+		move_child(n, chrome.get_index() + 1)
 	# the tabs, set into the text box's top rim (drawn over the chrome: each name's field cuts the rim under it)
 	tabs_ctrl = W.Tabs.new()
 	tabs_ctrl.position = Vector2(TEXTBOX.position.x, TEXTBOX.position.y - TABS_H + 1)
@@ -155,6 +170,8 @@ func _ready() -> void:
 	dissolve.visible = false
 	add_child(dissolve)
 	Input.set_custom_mouse_cursor(PX.cursor(), Input.CURSOR_ARROW, Vector2(0, 0))
+	Input.set_custom_mouse_cursor(PX.cursor_hand(), Input.CURSOR_POINTING_HAND, Vector2(10, 0))
+	Input.set_custom_mouse_cursor(PX.cursor_grab(), Input.CURSOR_DRAG, Vector2(12, 12))
 	get_window().files_dropped.connect(_on_files_dropped)
 	style_name = backend.project_style(String(cfg.get("style", "godmarrow")))
 	_foot_update()
@@ -167,6 +184,11 @@ func _ready() -> void:
 	audio.set_state("home")
 	if args.has("log"):
 		get_tree().create_timer(float(args.get("log", "1"))).timeout.connect(func(): if not drawer.visible: toggle_log())
+	if args.has("hover"):
+		# test hook: --hover=x,y puts the mouse there (logic pixels) so a screenshot shows the hover state
+		var parts := String(args["hover"]).split(",")
+		if parts.size() == 2:
+			get_tree().create_timer(1.2).timeout.connect(_hover_to.bind(Vector2(float(parts[0]), float(parts[1]))))
 	if args.has("script") or args.has("edits"):
 		var d: Node = load("res://scripts/driver.gd").new()
 		d.app = self
@@ -174,12 +196,22 @@ func _ready() -> void:
 		d.json_path = String(args.get("edits", ""))
 		add_child(d)
 
+## the mouse moved to a logic point, and the controls told (the hover state follows the pointer)
+func _hover_to(p: Vector2) -> void:
+	var wp: Vector2 = get_viewport().get_screen_transform() * p
+	Input.warp_mouse(wp)
+	var ev := InputEventMouseMotion.new()
+	ev.position = wp
+	ev.global_position = wp
+	Input.parse_input_event(ev)
+
 # ------------------------------------------------------------------ the foot line
 func _build_foot() -> void:
 	foot_project = _foot_label("")
 	foot_style = _foot_label("")
+	foot_claude = _foot_label("")
 	foot_hint = _foot_label("")
-	foot_hint.clip_text = true
+	foot_hint.colour = T.BONE
 	envs_ctrl = W.Choices.new()
 	envs_ctrl.font_size = T.SMALL_SIZE
 	envs_ctrl.arrow_gap = 11
@@ -191,48 +223,47 @@ func _build_foot() -> void:
 	envs_ctrl.setup(items, 6, self)
 	envs_ctrl.row_h = 14
 	envs_ctrl.dim_unselected = true
+	envs_ctrl.edge = true
+	envs_ctrl.plates = false
 	add_child(envs_ctrl)
 	_foot_layout()
 
-func _foot_label(text: String) -> Label:
-	var l := Label.new()
+func _foot_label(text: String) -> Control:
+	var l := W.EdgedLabel.new()
 	l.position = Vector2(0, FOOT_Y)
 	l.size = Vector2(100, 14)
 	l.text = text
-	l.theme_type_variation = "SmallDim"
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(l)
 	return l
 
-## the foot flows: project, style, the hint (clipped to what is left), the ground picker on the right
+## the foot is two lines: the sill carries the hint (what the thing in hand does and how to change it) and the ground
+## picker; the bottom band, between the candles, carries the status words (project, style, Claude)
 func _foot_layout() -> void:
 	var gap := 12.0
 	var env_w := envs_ctrl.flow_width()
 	envs_ctrl.size = Vector2(env_w, 14)
 	envs_ctrl.position = Vector2(TEXTBOX.end.x - env_w, FOOT_Y)
 	var ground_x := envs_ctrl.position.x - T.text_width("ground", T.SMALL_SIZE) - 6
-	var x := TEXTBOX.position.x
-	foot_project.position.x = x
-	foot_project.size.x = T.text_width(foot_project.text, T.SMALL_SIZE) + 2
-	x += foot_project.size.x + gap
-	foot_style.position.x = x
-	foot_style.size.x = T.text_width(foot_style.text, T.SMALL_SIZE) + 2
-	x += foot_style.size.x + gap
-	foot_hint.position.x = x
-	foot_hint.size.x = maxf(ground_x - gap - x, 10)
+	foot_hint.position = Vector2(TEXTBOX.position.x, FOOT_Y)
+	foot_hint.size.x = maxf(ground_x - gap - TEXTBOX.position.x, 10)
+	var x := STATUS_X
+	for l in [foot_project, foot_style, foot_claude]:
+		l.position = Vector2(x, STATUS_Y)
+		l.size.x = T.text_width(l.text, T.SMALL_SIZE) + 2
+		x += l.size.x + gap
 	if not has_node("GroundLabel"):
 		var gl := _foot_label("ground")
 		gl.name = "GroundLabel"
-		gl.theme_type_variation = "Small"
-		gl.add_theme_color_override("font_color", T.BONE)
-	var gl: Label = get_node("GroundLabel")
+		gl.colour = T.BONE
+	var gl: Control = get_node("GroundLabel")
 	gl.position = Vector2(ground_x, FOOT_Y)
 	gl.size.x = T.text_width("ground", T.SMALL_SIZE) + 2
 
 func _foot_update() -> void:
 	foot_project.text = "project  " + (backend.project_name() if backend.project_name() != "" else "none")
 	foot_style.text = "style  " + style_name.replace("_", " ")
-	foot_hint.text = hint_text
+	_foot_claude()
+	_show_hint(hint_text)
 	for i in envs_ctrl.items.size():
 		envs_ctrl.items[i]["dim"] = Scene.ENV_ORDER[i] != scene.env
 	envs_ctrl.queue_redraw()
@@ -240,92 +271,247 @@ func _foot_update() -> void:
 
 func _pick_env(e: String) -> void:
 	scene.set_env(e)
+	chrome.queue_redraw()
 	cfg["env"] = e
 	save_cfg()
 	_foot_update()
 
 func set_hint(t: String) -> void:
 	hint_text = t
-	foot_hint.text = t
+	_show_hint(t)
 
 func say_hint(t: String) -> void:
 	foot_hint.text = t
 
+## the pointer rests on a control: the hint names it; "" when it leaves (back to the thing in hand)
+func hover_hint(h: String) -> void:
+	hover_words = h
+	if h != "":
+		foot_hint.text = h
+	else:
+		_hint_focus()
+
+## the hint line shows the words, unless the pointer rests on something (its words stay until it leaves)
+func _show_hint(t: String) -> void:
+	foot_hint.text = hover_words if hover_words != "" else t
+
 # ------------------------------------------------------------------ the chrome
+## the frame (frame.gd) for the chosen ground, the sconces' light and flames, the banner on its keystone, the title
+## line's toggles on iron nameplates
 func _draw_chrome() -> void:
 	var c := chrome
-	# the window rims: a dark line inside a black one
-	for r in [PIC, TEXTBOX]:
-		c.draw_rect(Rect2(r.position - Vector2(3, 3), r.size + Vector2(6, 6)), T.BLACK, false, 1.0)
-		c.draw_rect(Rect2(r.position - Vector2(2, 2), r.size + Vector2(4, 4)), T.FRAME2, false, 2.0)
+	c.draw_texture(Frame.frame(scene.env), Vector2.ZERO)
+	# the sconces: the stone round each flame re-shaded at the flame's light level, then the flame's frame
+	var sc := Frame.sconces()
+	for i in sc.size():
+		var s: Dictionary = sc[i]
+		var fi := (flame_frame + i * 3) % 8
+		var breath := 0.5 + 0.5 * sin(sel_t * (1.7 if i % 2 == 0 else 1.3) + i)
+		var lvl := Frame.flame_level(fi, breath) if not reduced_motion else 2
+		if lvl > 0:
+			c.draw_texture(Frame.light_patch(scene.env, s, lvl), Vector2(s["patch"].position))
+		var frames: Array = Frame.flame_frames(String(s["kind"]))
+		var tex: Texture2D = frames[fi if not reduced_motion else 0]
+		var at: Vector2i = s["at"]
+		c.draw_texture(tex, Vector2(at.x - tex.get_width() / 2, at.y - tex.get_height() + (1 if s["kind"] == "torch" else 0)))
 	# a hovering file: the frame answers
 	if hover_drop:
 		c.draw_rect(Rect2(PIC.position - Vector2(2, 2), PIC.size + Vector2(4, 4)), T.ACCENT, false, 2.0)
-	# the border, at 2 screen pixels per border pixel, with the banner's gap
-	var border := PX.border(int(CANVAS.x / 2), int(CANVAS.y / 2))
-	c.draw_texture_rect(border, Rect2(Vector2.ZERO, CANVAS), false)
-	# the banner: blackletter, set into the top edge
+	# a dark ledger strip behind the status words on the bottom band (stone is busy; the words stay readable)
+	var sx := float(STATUS_X) - 4.0
+	var ex := foot_claude.position.x + foot_claude.size.x + 4.0
+	c.draw_rect(Rect2(sx, STATUS_Y - 1, ex - sx, 15), Color(0, 0, 0, 0.5))
+	c.draw_rect(Rect2(sx, STATUS_Y - 1, ex - sx, 1), Color(0, 0, 0, 0.8))
+	c.draw_rect(Rect2(sx, STATUS_Y + 13, ex - sx, 1), Color(Frame.IRON[3], 0.5))
+	# the banner: blackletter on the keystone, a dark edge behind it
 	var bf := T.font("black")
 	var title := "PixelForge"
 	var tw := bf.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, T.BANNER_SIZE).x
 	var bx := floorf((CANVAS.x - tw) / 2.0)
-	c.draw_rect(Rect2(bx - 10, 0, tw + 20, 22), T.INK)
-	c.draw_string(bf, Vector2(bx + 2, 20), title, HORIZONTAL_ALIGNMENT_LEFT, -1, T.BANNER_SIZE, T.BLACK)
-	c.draw_string(bf, Vector2(bx, 18), title, HORIZONTAL_ALIGNMENT_LEFT, -1, T.BANNER_SIZE, T.FRAME)
-	# the title line's toggles, right of the banner: music and the log
+	_edged(c, bf, Vector2(bx, 23), title, T.BANNER_SIZE, T.FRAME, T.BLACK)
+	# the title line: the back plate and the breadcrumbs on the left, the toggles on the right
 	var f := T.font("text")
-	var mtxt := "music " + ("on" if audio.music_on else "off")
-	var ltxt := "log"
-	var mx := CANVAS.x - 36 - T.text_width(mtxt, T.SMALL_SIZE) - 26 - T.text_width(ltxt, T.SMALL_SIZE)
-	# Claude's state, left of the music toggle: an ember pulse while it works
-	var ctxt := claude_label()
-	var cw := T.text_width(ctxt, T.SMALL_SIZE)
-	var cx := mx - 22 - cw
-	var ccol := T.BONE
-	if claude_working != "":
-		ccol = T.GH if int(sel_t * 6.0) % 2 == 0 else T.ACCENT
-	elif claude_state.get("ok", false):
-		ccol = T.ACCENT
-	elif not claude_state.is_empty():
-		ccol = T.GOLD
-	c.draw_rect(Rect2(cx - 4, 14, cw + 8, 12), T.INK)
-	c.draw_string(f, Vector2(cx, 24), ctxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, ccol)
-	c.draw_rect(Rect2(mx - 4, 14, T.text_width(mtxt, T.SMALL_SIZE) + 8, 12), T.INK)
-	c.draw_string(f, Vector2(mx, 24), mtxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT if audio.music_on else T.BONE)
-	var lx := CANVAS.x - 36 - T.text_width(ltxt, T.SMALL_SIZE)
-	c.draw_rect(Rect2(lx - 4, 14, T.text_width(ltxt, T.SMALL_SIZE) + 8, 12), T.INK)
-	c.draw_string(f, Vector2(lx, 24), ltxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.ACCENT if drawer.visible else T.BONE)
-	# the window toggle and exit, left
-	var wtxt := "window" if is_fullscreen() else "full screen"
-	c.draw_rect(Rect2(32, 14, T.text_width(wtxt, T.SMALL_SIZE) + 8, 12), T.INK)
-	c.draw_string(f, Vector2(36, 24), wtxt, HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.BONE)
-	var ex := 36 + T.text_width(wtxt, T.SMALL_SIZE) + 22
-	c.draw_rect(Rect2(ex - 4, 14, T.text_width("exit", T.SMALL_SIZE) + 8, 12), T.INK)
-	c.draw_string(f, Vector2(ex, 24), "exit", HORIZONTAL_ALIGNMENT_LEFT, -1, T.SMALL_SIZE, T.BONE)
+	for it in _title_items():
+		var r: Rect2 = it["rect"]
+		var lab := String(it["label"])
+		var hov := lab == title_hover and (it["cb"] as Callable).is_valid()
+		var prs := lab == title_press
+		if it.get("plate", true):
+			_nameplate(c, r, hov, prs)
+		var col: Color = it["col"]
+		if prs:
+			col = Color("#ffffff")
+		elif hov:
+			col = Color(Frame.GOLD[4])
+		_edged(c, f, Vector2(r.position.x + 5, 23 + (1 if prs else 0)), lab, T.SMALL_SIZE, col, T.BLACK)
 
-## the title line's toggles are text; a click on them
+## the title line's items: {label, rect, col, cb, plate}; the crumbs are clickable (each goes back to its screen)
+func _title_items() -> Array:
+	var out := []
+	var y := 12.0
+	var h := 13.0
+	# right side, laid from the right edge: exit, window, log, music, ?
+	var x := CANVAS.x - 30.0
+	for it in [["exit", request_exit, T.ACCENT], ["window" if is_fullscreen() else "full screen", toggle_fullscreen, T.ACCENT],
+			["log", toggle_log, Color(Frame.GOLD[4]) if drawer.visible else T.ACCENT],
+			["music " + ("on" if audio.music_on else "off"), func(): set_music(not audio.music_on), Color(Frame.GOLD[4]) if audio.music_on else T.ACCENT],
+			["?", show_callouts, Color(Frame.GOLD[4]) if (callouts and callouts.visible) else T.ACCENT]]:
+		var w := T.text_width(String(it[0]), T.SMALL_SIZE) + 10
+		x -= w
+		out.append({"label": it[0], "rect": Rect2(x, y, w, h), "col": it[2], "cb": it[1]})
+		x -= 8
+	var right_edge := x
+	# left side: back, then the crumbs
+	var at_home: bool = current == null or (current.screen_name == "home" and stack.is_empty())
+	var bw := T.text_width("< back", T.SMALL_SIZE) + 10
+	out.append({"label": "< back", "rect": Rect2(30, y, bw, h), "col": Color(Frame.GOLD[2]) if at_home else T.ACCENT, "cb": back})
+	x = 30 + bw + 10
+	var crumbs := _crumbs()
+	# drop the oldest crumbs when they would run into the keystone
+	var limit := minf(Frame.plaque_rect().position.x - 6, right_edge)
+	while crumbs.size() > 1:
+		var total := 0.0
+		for cr in crumbs:
+			total += T.text_width(String(cr["label"]), T.SMALL_SIZE) + 10 + 10
+		if x + total <= limit:
+			break
+		crumbs.pop_front()
+	for k in crumbs.size():
+		var cr: Dictionary = crumbs[k]
+		var w := T.text_width(String(cr["label"]), T.SMALL_SIZE) + 10
+		var last := k == crumbs.size() - 1
+		out.append({"label": cr["label"], "rect": Rect2(x, y, w, h), "col": T.BONE if last else T.ACCENT, "cb": cr.get("cb", Callable()), "plate": not last})
+		x += w
+		if not last:
+			out.append({"label": ">", "rect": Rect2(x, y, 10, h), "col": T.DIM, "cb": Callable(), "plate": false})
+			x += 10
+	return out
+
+## where we are: the screens under this one (clickable: back to them), this screen, its tab
+func _crumbs() -> Array:
+	var out := []
+	for k in stack.size():
+		var nm := String(stack[k][0])
+		if nm == "home":
+			continue
+		out.append({"label": _crumb_name(nm), "cb": go_back_to.bind(k)})
+	if current:
+		out.append({"label": _crumb_name(current.screen_name)})
+		if tabs_ctrl.visible and tabs_ctrl.current >= 0 and tabs_ctrl.current < tabs_ctrl.names.size():
+			out.append({"label": tabs_ctrl.names[tabs_ctrl.current]})
+	return out
+
+static func _crumb_name(nm: String) -> String:
+	if nm == "editor":
+		return "Edit"
+	if nm == "tiles":
+		return "Tiles"
+	return nm.capitalize()
+
+## back to the k-th screen under this one (a crumb clicked)
+func go_back_to(k: int) -> void:
+	if transitioning or k < 0 or k >= stack.size():
+		return
+	if current and not current.can_leave():
+		return
+	var target: Array = stack[k]
+	stack.resize(k)
+	audio.blip("back")
+	_show(target[0], target[1], true)
+
+## light text with a one-pixel dark edge behind it (the frame's stone and wood are busy)
+static func _edged(ci: CanvasItem, f: Font, at: Vector2, s: String, size: int, col: Color, edge: Color) -> void:
+	for o in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1), Vector2(1, 1)]:
+		ci.draw_string(f, at + o, s, HORIZONTAL_ALIGNMENT_LEFT, -1, size, edge)
+	ci.draw_string(f, at, s, HORIZONTAL_ALIGNMENT_LEFT, -1, size, col)
+
+## a small iron nameplate: dark plate, lit top edge, dark foot, a rivet at each end; hovered, a gold edge; pressed,
+## the lit and dark edges swap so it sinks
+static func _nameplate(ci: CanvasItem, r: Rect2, hov: bool = false, prs: bool = false) -> void:
+	ci.draw_rect(r, Color(Frame.IRON[2] if hov else Frame.IRON[1]))
+	var top := Color(Frame.GOLD[3] if hov else Frame.IRON[4])
+	var bot := Color(Frame.IRON[0])
+	if prs:
+		top = Color(Frame.IRON[0])
+		bot = Color(Frame.IRON[4])
+	ci.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), top)
+	ci.draw_rect(Rect2(r.position, Vector2(1, r.size.y)), top)
+	ci.draw_rect(Rect2(r.position.x, r.end.y - 1, r.size.x, 1), bot)
+	ci.draw_rect(Rect2(r.end.x - 1, r.position.y, 1, r.size.y), bot)
+	for x in [r.position.x + 2, r.end.x - 4]:
+		ci.draw_rect(Rect2(x, r.position.y + 2, 1, 1), Color(Frame.IRON[6]))
+		ci.draw_rect(Rect2(x + 1, r.position.y + 3, 1, 1), Color(Frame.IRON[0]))
+		ci.draw_rect(Rect2(x, r.end.y - 4, 1, 1), Color(Frame.IRON[5]))
+		ci.draw_rect(Rect2(x + 1, r.end.y - 3, 1, 1), Color(Frame.IRON[0]))
+
+## named points on the frame (torches, candles, brazier, drips, corners) for effects placed on it later
+func frame_anchors() -> Dictionary:
+	return Frame.anchors()
+
+## the title line is a strip that takes the mouse: hover lights an item and names it on the hint line, a click works it
+func _build_title_strip() -> void:
+	title_ctrl = Control.new()
+	title_ctrl.position = Vector2(0, 8)
+	title_ctrl.size = Vector2(CANVAS.x, 20)
+	title_ctrl.mouse_filter = Control.MOUSE_FILTER_STOP
+	title_ctrl.gui_input.connect(_title_input)
+	title_ctrl.mouse_exited.connect(func(): _title_hover(""))
+	add_child(title_ctrl)
+
+func _title_input(ev: InputEvent) -> void:
+	var p: Vector2 = ev.position + title_ctrl.position
+	if ev is InputEventMouseMotion:
+		var hit := ""
+		for it in _title_items():
+			var r: Rect2 = it["rect"]
+			if (it["cb"] as Callable).is_valid() and r.grow(2).has_point(p):
+				hit = String(it["label"])
+		_title_hover(hit)
+	elif ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT and not transitioning:
+		_title_click(p)
+
+func _title_hover(label: String) -> void:
+	if label == title_hover:
+		return
+	title_hover = label
+	title_ctrl.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if label != "" else Control.CURSOR_ARROW
+	hover_hint(_title_hint(label))
+	chrome.queue_redraw()
+
+## what a title item does, for the hint line
+func _title_hint(label: String) -> String:
+	match label:
+		"":
+			return ""
+		"< back":
+			return "back · the screen under this one (Esc or B)"
+		"?":
+			return "? · labelled callouts over this bench; any key closes them"
+		"log":
+			return "log · the drawer of what the Forge did (Ctrl+L)"
+		"exit":
+			return "exit · leave the Forge (it asks when work is unsaved)"
+		"full screen":
+			return "full screen · fill the screen, pixels whole"
+		"window":
+			return "window · the Forge in a window instead"
+	if label.begins_with("music"):
+		return label + " · the Forge's own tune; the volume is in Settings"
+	return label + " · back to this screen"
+
+## the title line's items are clickable
 func _title_click(p: Vector2) -> bool:
-	if p.y < 12 or p.y > 28:
-		return false
-	var mtxt := "music " + ("on" if audio.music_on else "off")
-	var mw := T.text_width(mtxt, T.SMALL_SIZE)
-	var lw := T.text_width("log", T.SMALL_SIZE)
-	var mx := CANVAS.x - 36 - mw - 26 - lw
-	var lx := CANVAS.x - 36 - lw
-	if p.x >= mx - 4 and p.x <= mx + mw + 4:
-		set_music(not audio.music_on)
-		return true
-	if p.x >= lx - 4 and p.x <= lx + lw + 4:
-		toggle_log()
-		return true
-	var ww := T.text_width("window" if is_fullscreen() else "full screen", T.SMALL_SIZE)
-	if p.x >= 32 and p.x <= 40 + ww:
-		toggle_fullscreen()
-		return true
-	var ex := 36 + ww + 22
-	if p.x >= ex - 4 and p.x <= ex + T.text_width("exit", T.SMALL_SIZE) + 4:
-		request_exit()
-		return true
+	for it in _title_items():
+		var r: Rect2 = it["rect"]
+		if r.grow(2).has_point(p):
+			var cb: Callable = it["cb"]
+			if cb.is_valid():
+				audio.blip("confirm")
+				title_press = String(it["label"])
+				chrome.queue_redraw()
+				get_tree().create_timer(0.12).timeout.connect(func(): title_press = ""; chrome.queue_redraw())
+				cb.call()
+			return true
 	return false
 
 ## leaving: straight out, or one plain line in the text box when the bench has unsaved work
@@ -337,7 +523,20 @@ func request_exit() -> void:
 	save_cfg()
 	get_tree().quit()
 
-## "Claude: ready / working / not found / not signed in", for the title line
+## the foot's Claude word: a label in the label grey, gold when something wants doing, an ember pulse while it works
+func _foot_claude() -> void:
+	foot_claude.text = claude_label().replace(": ", "  ").replace(" (install Claude Code)", "")
+	var col := T.DIM
+	if claude_working != "":
+		col = Color(Frame.GOLD[4]) if int(sel_t * 6.0) % 2 == 0 else T.ACCENT
+	elif not claude_state.is_empty() and not claude_state.get("ok", false):
+		col = Color(Frame.GOLD[4])
+	elif claude_state.is_empty() and not backend.python_ok():
+		col = Color(Frame.GOLD[4])
+	foot_claude.colour = col
+	foot_claude.queue_redraw()
+
+## "Claude: ready / working / not found / not signed in", for the foot line
 func claude_label() -> String:
 	if claude_working != "":
 		return "Claude: working"
@@ -357,7 +556,7 @@ func _claude_status() -> void:
 		return
 	backend.run(["claude", "status"], "claude status", func(r: Dictionary):
 		claude_state = r
-		chrome.queue_redraw()
+		_foot_update()
 		if r.get("ok", false) and not r.get("registered", true):
 			backend.run(["claude", "register"], "claude register", func(r2: Dictionary):
 				if r2.get("ok", false):
@@ -368,7 +567,7 @@ func set_claude_working(words: String) -> void:
 	claude_working = words
 	if words != "":
 		foot_hint.text = "Claude: " + words
-	chrome.queue_redraw()
+	_foot_update()
 
 # ------------------------------------------------------------------ jobs (pixelforge job ...: a sentence that spans benches)
 ## every PF_PROGRESS line: a job's lines keep its record here (the Home panel reads them); the rest goes to the screen
@@ -492,6 +691,7 @@ func home() -> void:
 	_show("home", {}, true)
 
 func _show(name: String, a: Dictionary, animate: bool) -> void:
+	hover_words = ""
 	transitioning = true
 	if animate and not reduced_motion:
 		await _dissolve(true)
@@ -513,8 +713,17 @@ func _show(name: String, a: Dictionary, animate: bool) -> void:
 	else:
 		dissolve.visible = false
 	transitioning = false
+	chrome.queue_redraw()
 	s.on_enter()
 	_first_focus()
+	# the first time a bench opens, its callouts show once (not under the test hooks, unless --help asks)
+	var seen: Dictionary = cfg.get("help_seen", {})
+	var testing := args.has("shot") or args.has("script") or args.has("edits")
+	if name != "home" and (args.has("help") or (not testing and not seen.has(name))):
+		seen[name] = true
+		cfg["help_seen"] = seen
+		save_cfg()
+		show_callouts()
 
 ## the pixel dissolve: a Bayer-threshold wipe over the frame, four steps at 24 fps each way
 func _dissolve(inward: bool) -> void:
@@ -532,9 +741,12 @@ func set_tabs(names: PackedStringArray, cur: int, screen: Control) -> void:
 		return
 	tabs_ctrl.visible = true
 	tabs_ctrl.setup(names, cur, self, func(i): screen.set_tab(i))
+	chrome.queue_redraw()
 
 func set_groups(gs: Array) -> void:
 	groups = []
+	if callouts and is_instance_valid(callouts):
+		callouts.queue_redraw()   # the bench rebuilt under the callouts: their tags follow the new groups
 	if tabs_ctrl.visible:
 		groups.append(tabs_ctrl)
 	groups.append_array(gs)
@@ -568,6 +780,9 @@ func focus_on(g: Control, i: int, from_hover: bool) -> void:
 	g.set_sel(i)
 	if moved and from_hover:
 		audio.cursor("right")
+	if moved:
+		shimmer = 0.0
+	_hint_focus()
 	selector.queue_redraw()
 
 func _sel_of(g: Control) -> int:
@@ -583,6 +798,19 @@ func _sel_of(g: Control) -> int:
 
 func current_group() -> Control:
 	return groups[gi] if gi >= 0 and gi < groups.size() else null
+
+## the hint bar names the thing under the selector and how to change it
+func _hint_focus() -> void:
+	var g := current_group()
+	if g == null:
+		_show_hint(hint_text)
+		return
+	var h := ""
+	if g == envs_ctrl:
+		h = "ground · the place the thing stands in; click or Enter"
+	elif g.has_method("hint_of"):
+		h = String(g.hint_of(_sel_of(g)))
+	_show_hint(h if h != "" else hint_text)
 
 func select_current() -> void:
 	var g := current_group()
@@ -640,6 +868,8 @@ func move(dir: String) -> void:
 							ni = clampi(((ng.item_count() - 1) / ng.columns()) * ng.columns() + (i % cols), 0, ng.item_count() - 1)
 					ng.set_sel(ni)
 					audio.cursor(dir)
+					shimmer = 0.0
+					_hint_focus()
 					selector.queue_redraw()
 					return
 				k += step
@@ -648,6 +878,8 @@ func move(dir: String) -> void:
 		return
 	g.set_sel(j)
 	audio.cursor(dir)
+	shimmer = 0.0
+	_hint_focus()
 	selector.queue_redraw()
 
 func next_tab(delta: int) -> void:
@@ -673,7 +905,9 @@ func _draw_selector() -> void:
 	elif g == envs_ctrl:
 		at = r.position + Vector2(-13, 0)
 	var nudge := 0 if reduced_motion else (int(sel_t * 4.0) % 2)
-	var tex := PX.arrow()
+	var tex := PX.arrow(0)
+	if shimmer >= 0.0 and not reduced_motion:
+		tex = PX.arrow(int(shimmer * 12.0) % 2)
 	if flash >= 0.0:
 		tex = PX.arrow_flash(int(flash * 12.0))
 	selector.draw_texture_rect(tex, Rect2(at + Vector2(nudge, 0), Vector2(16, 14)), false)
@@ -684,13 +918,111 @@ func _process(dt: float) -> void:
 		flash += dt
 		if flash > 0.25:
 			flash = -1.0
+	if shimmer >= 0.0:
+		shimmer += dt
+		if shimmer > 0.34:
+			shimmer = -1.0
 	selector.queue_redraw()
 	if toast_t > 0.0:
 		toast_t -= dt
 		if toast_t <= 0.0:
 			toast.visible = false
-	if int(sel_t * 4.0) % 2 == 0 or claude_working != "":
+	if not reduced_motion:
+		flame_t += dt
+		var fi := int(flame_t * 10.0) % 8
+		if fi != flame_frame:
+			flame_frame = fi
+			chrome.queue_redraw()
+	elif int(sel_t * 4.0) % 2 == 0:
 		chrome.queue_redraw()
+	if claude_working != "" and int(sel_t * 6.0) % 2 != int((sel_t - dt) * 6.0) % 2:
+		_foot_claude()
+
+# ------------------------------------------------------------------ the "?" callouts
+## labelled callouts over the bench: a tag by every group saying how it is worked, a legend of the keys; any key
+## or click closes it
+func show_callouts() -> void:
+	if callouts and is_instance_valid(callouts):
+		callouts.queue_free()
+		callouts = null
+		chrome.queue_redraw()
+		return
+	var o := Control.new()
+	o.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	o.mouse_filter = Control.MOUSE_FILTER_STOP
+	o.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	o.draw.connect(_draw_callouts.bind(o))
+	o.gui_input.connect(func(ev): if ev is InputEventMouseButton and ev.pressed: show_callouts())
+	add_child(o)
+	move_child(o, dissolve.get_index())
+	callouts = o
+	audio.blip("tab")
+	chrome.queue_redraw()
+
+func _draw_callouts(o: Control) -> void:
+	var f := T.font("text")
+	# a dither over the text box so the tags stand out
+	var tb := TEXTBOX
+	var y := tb.position.y
+	while y < tb.end.y:
+		var x := tb.position.x + (2 if int(y) % 4 == 0 else 0)
+		while x < tb.end.x:
+			o.draw_rect(Rect2(x, y, 1, 1), Color(0, 0, 0, 0.55))
+			x += 4
+		y += 2
+	var tags := []
+	for g in groups:
+		if not g.visible or g.item_count() == 0:
+			continue
+		var words := ""
+		var at := Vector2.ZERO
+		if g == tabs_ctrl:
+			# above the signs, on the picture window's foot, so no tab name is covered
+			words = "tabs: LB and RB, Tab, or click"
+			at = Vector2(PIC.end.x - T.text_width(words, T.SMALL_SIZE) - 14, PIC.end.y - 15)
+		elif g == envs_ctrl:
+			words = "ground: the place it stands in"
+			at = Vector2(get_node("GroundLabel").position.x - T.text_width(words, T.SMALL_SIZE) - 18, FOOT_Y + 1)
+		elif g is W.SliderRack:
+			words = "sliders: drag, or click the number to type"
+			at = layer.position + g.position + Vector2(g.size.x - T.text_width(words, T.SMALL_SIZE) - 14, 1)
+		elif g is W.RampRack:
+			words = "ramps: Enter or click picks one"
+			at = layer.position + g.position + Vector2(g.size.x - T.text_width(words, T.SMALL_SIZE) - 14, 0)
+		elif g is W.Rack:
+			# one short word over each control (the columns are narrow), the long form in one tag under the rack
+			for c in g.controls:
+				var how := "drag"
+				if c is W.Wheel:
+					how = "turn"
+				elif c is W.Pull:
+					how = "pull"
+				elif c is W.Lever3:
+					how = "cycle"
+				tags.append([how, layer.position + g.position + c.position + Vector2(floorf((c.size.x - T.text_width(how, T.SMALL_SIZE) - 10) / 2.0), 2)])
+			words = "levers: drag up or down, or scroll; wheels: drag round; type a value: click the number under it"
+			at = layer.position + g.position + Vector2(g.size.x - T.text_width(words, T.SMALL_SIZE) - 14, g.size.y - 14)
+		elif g is W.Timeline:
+			words = "frames: click one, drag to reorder"
+			at = layer.position + g.position + Vector2(g.size.x - T.text_width(words, T.SMALL_SIZE) - 14, 0)
+		elif g is W.Choices:
+			var cyc := false
+			for it in g.items:
+				if it.has("value"):
+					cyc = true
+			words = "< > left and right change it; click a value to type" if cyc else "choices: Enter or click; the dagger marks the one in hand"
+			at = layer.position + g.position + Vector2(g.size.x - T.text_width(words, T.SMALL_SIZE) - 14, -1)
+		if words != "":
+			tags.append([words, at])
+	tags.append(["Esc or B: back   arrows or d-pad: move   Enter or A: choose   Ctrl+L: the log   click or any key closes this", Vector2(TEXTBOX.position.x + 6, TEXTBOX.end.y - 16)])
+	for tg in tags:
+		var w := T.text_width(String(tg[0]), T.SMALL_SIZE) + 10
+		var p: Vector2 = tg[1]
+		p.x = clampf(p.x, 4.0, CANVAS.x - w - 4.0)
+		var r := Rect2(p, Vector2(w, 13))
+		o.draw_rect(r, Color(Frame.IRON[1]))
+		PX.outline(o, r, Color(Frame.GOLD[3]))
+		_edged(o, f, Vector2(r.position.x + 5, r.position.y + 11), String(tg[0]), T.SMALL_SIZE, Color(Frame.GOLD[4]), T.BLACK)
 
 # ------------------------------------------------------------------ the log drawer
 func _build_drawer() -> void:
@@ -791,6 +1123,11 @@ func remember_last(kind: String, info: Dictionary) -> void:
 func _unhandled_input(ev: InputEvent) -> void:
 	if transitioning:
 		return
+	if callouts and is_instance_valid(callouts):
+		if (ev is InputEventKey and ev.pressed) or (ev is InputEventJoypadButton and ev.pressed):
+			show_callouts()
+			get_viewport().set_input_as_handled()
+		return
 	if browser and is_instance_valid(browser):
 		if browser.key(ev):
 			get_viewport().set_input_as_handled()
@@ -838,9 +1175,6 @@ func _unhandled_input(ev: InputEvent) -> void:
 		elif ev.keycode == KEY_C and ev.ctrl_pressed and drawer.visible:
 			DisplayServer.clipboard_set("\n".join(backend.log_lines))
 			say("Copied the log.")
-	elif ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-		if _title_click(ev.position):
-			get_viewport().set_input_as_handled()
 
 func _on_files_dropped(paths: PackedStringArray) -> void:
 	hover_drop = false

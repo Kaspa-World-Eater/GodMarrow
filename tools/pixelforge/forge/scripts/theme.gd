@@ -27,7 +27,7 @@ const GD := Color("#6b4f25")
 
 const TEXT_SIZE := 16           # VT323 in the 640x360 canvas (32 px on a 1280x720 screen)
 const SMALL_SIZE := 12          # names and values under the controls
-const BANNER_SIZE := 24         # Jacquard 12 at 2x its grid
+const BANNER_SIZE := 36         # Jacquard 12 at 3x its grid (the mockup's 48 css px in an 860 px frame = 36 in the 640 canvas)
 
 static var _fonts := {}
 static var _theme: Theme = null
@@ -70,6 +70,10 @@ static func theme() -> Theme:
 	t.set_font_size("font_size", "Small", SMALL_SIZE)
 	t.set_font_size("font_size", "SmallDim", SMALL_SIZE)
 	t.set_color("font_color", "SmallDim", DIM)
+	# the foot line sits on the frame's wooden sill: a one-pixel dark edge keeps it readable
+	for v in ["Small", "SmallDim"]:
+		t.set_color("font_outline_color", v, BLACK)
+		t.set_constant("outline_size", v, 1)
 	var le := StyleBoxFlat.new()
 	le.bg_color = WELL
 	le.set_border_width_all(0)
