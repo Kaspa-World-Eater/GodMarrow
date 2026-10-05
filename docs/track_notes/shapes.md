@@ -149,3 +149,33 @@ pages should show them:
   before, 4.34 s after (medians of four), under the noise. Trap closed on the way: every reader of a frames folder
   globbed `frame_*.png`, which the masks match; they glob `frame_[0-9][0-9][0-9].png` now (the Forge's folder listings
   skip `.parts.`), and the e2e GIF test caught it.
+
+
+## The character loop (2026-10-05, track/refine): Claude draws, the Forge renders and compares
+
+The owner's verdict on the picture road: "Claude hand drawing was better." The measured draft gave the right mass and
+nothing else; the hand-authored Hemomancer (a generator script, three rounds against the painting with the compare
+picture) read as the character. So the automatic measure-and-draft step is out of the visible flow (it stays as
+`character from-picture`, `shapes measure`, `shapes sample-materials`: reference tools an assistant may call) and the
+bench's road is `pixelforge character author` (`pixelforge/author_loop.py`): the painting goes untouched into
+`characters/<name>/source/painting.<ext>` (the reference; never cut, quantised or converted), Claude Code writes and
+runs a generator script in `characters/<name>/shapes/` (Write, Edit and Bash granted for that folder only, plus the
+MCP tools: `validate_shapes`, `shape_still`, `compare_shapes`, `shape_template`, the new `add_part` and `edit_shapes`;
+`measure_views` and `sample_materials` as reference), the loop renders S / E / N stills and the compare picture, scores
+the silhouette overlap per view, keeps every round under `author/round_N/` (script, model, stills, compare,
+`round.json`), and stops at the target (0.85), after two rounds without a better score, or when the rounds run out.
+`prompts_author.py` is the brief: the method step by step, the Hemomancer generator excerpted, the parts kit, the
+traps, what reads at 195 px, how to use the compare picture, the owner's standard. The mock author
+(`tests/claude_mock/author.jsonl` + `author_generator.py`) scores 0.50, 0.64, 0.69 against the Keeper's front.
+
+What the app shows: a dropped or chosen painting is placed beside the bench as it is (downscaled for the window with
+plain filtering) and the rounds run with their words on the state line ("Claude draws: round 2 · front 0.64 · round 2
+of the figure"); nothing appears on the bench until they finish; then the model faces S beside the painting, the
+Reference tab carries "Claude's rounds: round 1 front 0.50 · round 2 front 0.64 · round 3 front 0.69 (best)" and the
+choices Another round (the Claude line's words are the note), Compare, Render all, Open in editor, Export. The Claude
+line on an empty Characters bench draws from the words. Without Claude Code: "Claude Code is needed to draw; the
+picture is on the bench as the reference..." and Use as reference only; `PIXELFORGE_CLAUDE=none` pretends Claude is
+absent for shots and tests. `pixelforge claude doctor` (Home's Doctor, the title line's *doctor* when Claude is not
+ready) says why the describe line does nothing: six checks with the fix each, including a real round trip.
+Verified: one real round on this box (a monk from a sentence, 58 s, the contract followed to the letter) and one real
+doctor run (a real tempo change through Claude Code in 8.4 s); everything else through the mock.

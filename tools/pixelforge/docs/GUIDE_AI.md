@@ -312,7 +312,8 @@ pixelforge shapes draft "..." -o x.shapes.json --from-measure M.json           #
 pixelforge shapes measure FRONT.png [SIDE.png] [BACK.png] -o M.json           # painting to shapes 1: silhouette widths per height band + landmarks (head, shoulders, chest, waist, hips, hem, limb widths; fractions of the height)
 pixelforge shapes sample-materials FRONT.png --model x.shapes.json [-o y.shapes.json] [--only skin,cloth]   # painting to shapes 2: the painting's colours under each material's region -> that material's ramp (OKLab k-means), written into the model
 pixelforge shapes compare x.shapes.json --ref SHEET.png -o cmp.png [--height 195] [--views front,side,back]   # painting beside sprite at one height per view (front/S, side/E, back/N) with the silhouette overlap
-pixelforge character from-picture PICTURE [PICTURE ...] -p <folder> [--name N] [--style godmarrow] [--text "..."] --json   # THE PICTURE ROAD in one go: cut, measure, draft --from-measure, sample-materials, validate, import-shapes, still S + compare (below)
+pixelforge character author [NAME] -p <folder> [--painting P.png] [--sentence "..."] [--rounds 3] [--target 0.85] [--note "..."] [--dry-run] --json   # THE CHARACTER LOOP: Claude Code hand-authors the model against the painting in rounds (the author contract, below)
+pixelforge character from-picture PICTURE [PICTURE ...] -p <folder> [--name N] [--style godmarrow] [--text "..."] --json   # the old automatic road (cut, measure, draft --from-measure, sample-materials, import, compare): a reference tool, never the bench
 pixelforge character measure|sample|compare <character> -p <folder> [--json]   # one step of the road again on a character it made (the saved cutouts), ending with the still and the compare picture
 pixelforge shapes validate FILE                                            # problems in plain words, or a summary (mode, shapes, materials, bones, unbound shapes); then the warnings: the traps a valid file can carry (keep.back, a full ring below the knee, a hanging part on a limb without upright_from, a centre in the wrong number of dimensions)
 pixelforge shapes still FILE -o out.png [--frame 40] [--direction SE] [--passes] [--game-objects art/objects/objects.json --name chest --hr 2]
@@ -355,8 +356,11 @@ reads a mask back, `Frame.parts` holds it in memory. The editor's carry matches 
 `template_file`). MCP: `render_shape_sprite`, `preview_shape_sprite`, `shape_sheet`, `shape_object`,
 `validate_shapes`, `shape_template`, `draft_shapes`, `import_shapes`, `render_shapes`.
 
-**The picture road in one command.** `pixelforge character from-picture PICTURE -p <folder> --json` is what the
-Characters bench runs when a picture is dropped on it, and what to run yourself before anything by hand. It reads the
+**The old automatic road, kept as a reference tool.** `pixelforge character from-picture PICTURE -p <folder> --json`
+was what the Characters bench ran when a picture was dropped (2026-10-05, track/picture-road); the owner's verdict was
+that the hand-authored Hemomancer read as the character and the measured draft read as a mass ("Claude hand drawing
+was better"), so the bench runs the author loop now (below) and this command, with `shapes measure` and `shapes
+sample-materials`, stays for an assistant that wants the numbers or the sampled ramps to check its eye against. It reads the
 picture (several files are the views in order: front, side, back), tells a single figure from a turnaround sheet (two
 or more figures of about one height side by side; `sheet.split_sheet`, falling back to one figure when the pieces are
 a body and a held thing), cuts the figure(s) out into RGBA cutouts under `characters/<name>/source/` (`front.png`,
@@ -407,6 +411,67 @@ line: `crown` (+ `spiked`), `locs` / `dreadlocks`, `chains`, `shackles` / `manac
 `greaves` (+ `spiked`), `rivets` / `riveted` / `studded`, `cape`. The worked example is
 `docs/concepts/hemomancer/shapes/make_hemomancer_shapes.py` (the whole Hemomancer from the kit plus its body, face,
 crimson and shield; `tests/test_character_road.py` checks it regenerates the committed file).
+
+### The author contract: `pixelforge character author` (pixelforge/author_loop.py, prompts_author.py)
+
+The character road of the Forge from 2026-10-05 (track/refine): a painting (or a sentence) is handed to Claude Code,
+which hand-authors the shape model the way the Hemomancer was made, and the loop renders, compares and scores each
+round. The Characters bench runs it for every painting dropped or chosen and for every sentence on its Claude line.
+
+**The loop.** `author(name, project, painting=, sentence=, rounds=, target=0.85, note=, progress=)`:
+the painting is copied *untouched* to `characters/<name>/source/painting.<ext>` (the reference: never cut, measured or
+converted by the loop; `compare` and `measure_views` read it on the fly); then per round N: the brief + the round's
+message go to `claude_bridge.run("author", ...)` with `--tools Read,Write,Edit,Bash` and `--allowedTools
+mcp__pixelforge,Read,Write(//<shapes>/**),Edit(//<shapes>/**),Bash(python *),Bash(python3 *),Bash(py *)`
+(`author_tools`: writing and running only inside `characters/<name>/shapes/`); Claude leaves
+`shapes/make_<name>_shapes.py` and `shapes/<name>.shapes.json`; the loop validates the file, renders `still_S/E/N.png`
+and `compare.png` (silhouette intersection over union per view; the mean is the round's score), copies the script and
+the model into `characters/<name>/author/round_N/` with `round.json` (score, views, focus, notes, did, seconds, cost,
+log), adopts the model as the character's, and keeps the best round's still and compare in `previews/` for the bench.
+Stops: the score reaches `target`; or two rounds running bring no better score; or the rounds are used up (3 with a
+painting, 1 without: nothing to score against). An existing character carries on from its next round number (the
+bench's **Another round**, with `--note`). `author/author.json` is the summary. Progress: `progress(words, round, done,
+total)`; the CLI prints `PF_PROGRESS step=author round=N done=D total=T note=<words with + for spaces>` for the round's
+start, every tool Claude calls ("round 2 · writing make_x_shapes.py") and the score line ("round 2 · front 0.81 · the
+shoulder plates", the `focus` from Claude's ending JSON). Result: `character`, `model`, `painting`, `views`, `rounds`
+(the records), `best`, `score`, `overlap`, `target`, `stopped` ("target reached" / "no improvement in two rounds" /
+"rounds done" / "claude stopped"), `judgement`, `still`, `compare`, `summary`, `seconds`; `ok` false with `error` when
+no round left a valid model (Claude not found / not signed in / stopped). `--dry-run` returns the command, the brief
+and the round text without calling Claude. MCP: `character_author(name, project, painting, sentence, rounds, target,
+note)`. The mock (`PIXELFORGE_CLAUDE=mock:tests/claude_mock/author.jsonl`, `author_generator.py`) writes a fixed
+generator per round that scores 0.50, 0.64, 0.69 against the Keeper's front; `author_flat.jsonl` never improves.
+Tests: `tests/test_author.py`. The walkthrough: `forge/tools/author_walk.txt`; the acceptance:
+`forge/tools/acceptance.sh OUT` (the mock through author, idle and walk in eight directions, export into a scratch copy
+of the game, a headless game shot with the skin, the bench walkthrough, the no-Claude state; `errors 0`).
+
+**The brief** (`prompts_author.system_prompt`, the most important text of the road; read it before changing anything
+about the loop): who the authoring Claude is and where it works; THE METHOD (a generator script that emits the file,
+with loops for the repeated pieces and the parts kit; round 1 from the painting: the author pose first, name the costume
+top to bottom, body then garments then kit then face and details, run, validate, three stills, compare, look, fix
+silhouette first; rounds 2 and 3 from the compare picture; the owner's standard, "Claude hand drawing was better";
+measure and sample as reference only); THE WORKED EXAMPLE (the Hemomancer generator excerpted: materials, the face
+rules, the two sides in one loop, the narrow tabard and cape, the plank skirt, greaves, shackles, chest chain, the
+spec; what each of its rounds changed); THE PARTS KIT (every function with its arguments, the library materials, the
+shape kinds and the rule language in short); THE TRAPS (`keep.back` reads backwards: `back_strip`; `upright_from` for
+a part hung on a limb; a full ring below the knee hides the legs; `prism` takes a 2D centre; gaps open in a bend;
+speckle is noise, blood and wear are stains; 120 units author, 195 px render; the face at 195 px; z in front of the
+hair and cloth; a seeded random; the clip map); WHAT READS AT 195 PX (silhouette, then three or four material regions
+in contrast, then one or two details; one unit is 1.6 px; thresholds; how to read the compare picture row by row and
+what to do about each difference; do not chase the number past what the eye agrees with); the game's rules and the
+banned words; CONDUCT (the folder, the tools, no questions, one round, British spelling, no model names, the JSON
+ending with `did`, `changed`, `notes`, `focus`). `round_text` is the message per round: round 1 draws; later rounds
+get the last round's overlap per view, its compare picture and stills, Claude's own notes, and the person's note.
+
+**When you ARE the authoring Claude** (a session started by `character author`): the brief is the whole method; follow
+it in order. Read the painting and the author pose before writing a line. Write the generator script (a materials
+table, `S = []`, `add(**k)`, loops for the sides and the repeated pieces, `K.<piece>(...)` from the kit, `json.dump`
+at the end, `--out` from argv) in the shapes folder named in the brief, run it with Python, `validate_shapes`,
+`shape_still` S / E / N into the round folder, `compare_shapes` against the painting, Read the pictures, fix what they
+show (silhouette first), run again, and end with the one JSON line. Never write outside the shapes folder; never
+render the whole set; never touch the painting; never set the file's height to 195 or render with another style; put
+`focus` in the ending (three to six words: what the round worked on) because it is what the person reads on the state
+line. On a later round, read the compare picture before changing anything and do what the person's note says first.
+The real round made on this box (a monk from a sentence) took 58 s and followed exactly this order.
 
 ### The procedure for an AI
 

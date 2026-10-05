@@ -21,6 +21,9 @@ and compared against (`shapes compare`), never carved, for a character.
   `pixelforge forge`; it only runs CLI commands, never the pipeline itself)
   are wrappers over it. `claude_bridge.py` is Claude on the bench: the Forge's describe line hands a sentence to the
   Claude Code CLI, which works through `mcp_server.py`'s tools (`docs/GUIDE_AI.md`, "Claude on the bench").
+  `author_loop.py` is the character loop (`pixelforge character author`): Claude Code hand-authors a shape model
+  against a painting in rounds, with `prompts_author.py` as its brief (the Hemomancer method); the Characters bench
+  runs it for every painting dropped. `claude doctor` says why the describe line does nothing (six checks).
   Image algorithms: `grid.py` (pixel-grid detection), `palette.py` (OKLab
   k-means), `quantize.py`, `cleanup.py`, `pixelate.py`, `animate.py`
   (procedural effects), `transform.py` (RotSprite), `sheet.py` (split

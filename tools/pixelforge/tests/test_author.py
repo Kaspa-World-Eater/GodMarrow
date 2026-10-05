@@ -252,3 +252,14 @@ def test_the_bench_runs_the_loop_and_never_the_automatic_draft():
 def test_none_pretends_claude_is_absent(monkeypatch):
     monkeypatch.setenv("PIXELFORGE_CLAUDE", "none")
     assert CB.find_claude() is None and CB.status()["state"] == "not_found"
+
+
+def test_the_acceptance_script_covers_the_road():
+    sh = (HERE.parent / "forge" / "tools" / "acceptance.sh").read_text()
+    for must in ["character author keeper", "render-shapes keeper --clips idle,walk", "export-game keeper", "game-preview --skin keeper", "author_walk.txt",
+                 "PIXELFORGE_CLAUDE=none", "acceptance_compare.png", "acceptance_game.png", "cmp -s"]:
+        assert must in sh, must
+    ai = (HERE.parent / "docs" / "GUIDE_AI.md").read_text()
+    assert "### The author contract" in ai and "When you ARE the authoring Claude" in ai and "claude doctor" in ai
+    humans = (HERE.parent / "docs" / "GUIDE_HUMANS.md").read_text()
+    assert "Drop a painting: Claude draws it" in humans and "run the doctor first" in humans

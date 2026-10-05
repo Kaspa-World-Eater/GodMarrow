@@ -1930,6 +1930,63 @@ draft's shapes toward the measured profile row by row (the overlap is 0.7 on a d
 is 0.7 too, so the next gains are in the silhouette, not the colours); the side view from a single front picture by
 symmetry; the sheet's quarter view feeding the SE direction.
 
+### 7.30 2026-10-05, track/refine: the character loop (Claude draws the model against the painting), the untouched reference, the doctor
+
+**What.** The owner's verdict on the picture road: "Claude hand drawing was better", and "remove the thing that is
+auto-pixelating the pictures I'm dropping in." So the automatic measure-and-draft step is out of the visible flow (it
+stays as `character from-picture` / `shapes measure` / `shapes sample-materials`, reference tools an assistant may
+call) and the character road is **`pixelforge character author NAME -p P [--painting P.png] [--sentence "..."]
+[--rounds 3] [--target 0.85] [--note "..."] --json`** (`tools/pixelforge/pixelforge/author_loop.py`): the painting is
+copied byte for byte into `characters/<name>/source/painting.<ext>` and nothing is derived from it (no cutout, no
+measurement file, no quantised copy; the bench shows it downscaled with plain filtering); Claude Code writes and runs a
+generator script in `characters/<name>/shapes/` (the Hemomancer method: a materials table, a shape list, loops for the
+sides and the repeated pieces, the parts kit; Write, Edit and Bash are granted for that folder only, plus the MCP
+tools, with the new `shape_still`, `add_part`, `edit_shapes`), the loop validates, renders S / E / N stills and the
+compare picture, scores the silhouette overlap per view, keeps every round under `author/round_N/` (script, model,
+stills, compare, `round.json`), adopts the best, and stops at the target, after two rounds without a better score, or
+when the rounds run out (3 with a painting, 1 from a sentence). `prompts_author.py` is the brief and the most important
+text of the road: the method step by step, the Hemomancer generator excerpted, the parts kit, the traps (`keep.back`,
+`upright_from`, the ring below the knee, the prism centre, gaps, speckle vs stains, 120 vs 195, the face, z in front,
+a seeded random, the clip map), what reads at 195 px and how to read the compare picture, the game's rules, the
+conduct and the JSON ending with `focus` (the words the state line shows). The bench (`forge/scripts/screens/characters.gd`):
+a dropped or chosen painting is placed as the reference and the rounds run with their words on the state line
+("Claude draws: round 2 · front 0.64 · round 2 of the figure"); nothing appears until they finish; then the model faces
+S beside the painting, the Reference tab lists "Claude's rounds: round 1 front 0.50 · round 2 front 0.64 · round 3
+front 0.69 (best)" and offers Another round (the Claude line's words as the note), Compare, Render all, Open in editor,
+Export; the Claude line on an empty bench draws from a sentence; without Claude Code the plain line "Claude Code is
+needed to draw; the picture is on the bench as the reference..." and Use as reference only (`PIXELFORGE_CLAUDE=none`
+pretends it is absent). Home's sentence no longer opens the bench with an automatic draft. **`pixelforge claude
+doctor`** (Home's Doctor; the gold *doctor* on the title line and a click on the foot's Claude label when it is not
+ready): six checks in order with the fix each: the executable and version; signed in (an API key alone fails, `/login`);
+registered (registered on the spot and said so); the MCP server started over stdio and answering `list_styles`; one real
+round trip (`describe --bench music "set tempo 80"` on a scratch project whose song file must change, the log path on
+failure); Chrome, optional. The checks land in the picture window, the sentence on the state line.
+
+**Verified.** 429 pytest green (`tests/test_author.py` 16: three mock rounds with rising scores 0.50 / 0.64 / 0.69 and
+the bookkeeping, the painting byte-identical with nothing derived, another round with the note, stop at the target,
+stop after two flat rounds, a sentence alone, Claude stopping in words, the scoped tools in the command, the brief's
+contents and no banned or model words, `add_part` / `edit_shapes` / `shape_still` and a refused edit leaving the file
+alone, the CLI's progress lines, the mock's `copy` and `python` controls, the bench's wiring, the acceptance script;
+`test_claude_bridge.py` +5 for the doctor's wording per step). `check_scripts.gd` 34/0, `test_editor.gd` 106/0,
+`test_scene.gd` 21/0. **`forge/tools/acceptance.sh`** (`docs/screens/forgeapp/acceptance_*.png`): the Keeper's front
+through `author` with the mock (3 rounds, scores [0.5, 0.637, 0.686], 21 progress lines, the painting untouched), idle
+and walk in eight directions (24 frames each, 30 s), export into a scratch copy of the game (384 frames, the `skins.json`
+entry, no height warning), a headless game screenshot on the Moor with `--skin keeper` (the mock Keeper standing by the
+lantern), the bench walkthrough (the painting dropped on Home, the rounds' words, the model beside the painting, Compare)
+and the no-Claude state, errors 0. Real calls made on this box, once each: `character author nc --sentence "a monk"`
+against the real Claude Code (58 s; it read the template, wrote the generator, ran it, validated, rendered the three
+stills, read them, edited and ran again, ended with the JSON: the contract to the letter) and `claude doctor` (a real
+tempo change 66 to 80 through Claude Code in 8.4 s). The automatic draft never appears on the bench
+(`test_picture_road.test_the_docs_and_the_bench_know_the_road` now asserts its absence).
+
+**How to resume.** `cd tools/pixelforge && PIXELFORGE_NO_UPDATE=1 python -m pytest -q`; the three Godot checks;
+`GODOT=... IMPORTED=<an imported .godot> forge/tools/acceptance.sh /tmp/out`; `PIXELFORGE_CLAUDE=mock:tests/claude_mock/author.jsonl
+python -m pixelforge character author keeper -p /tmp/p --painting assets/styles/keeper_front.png`. On the owner's PC the
+first real painting round is the thing to watch: a round is several minutes and some dollars of plan usage (the
+bridge's budget flag, `PIXELFORGE_CLAUDE_BUDGET`, caps one call at 3 by default; a round is one call). Next: the brief's
+example could carry a second worked character; the compare score could take the side view's depth into the target;
+the Reference tab could show each round's compare picture under a cycler.
+
 ## 8. The game session, 2026-10-05: Act I first
 
 Derek's order: finish and polish Act I before anything new. The plan, with his open choices (which frictions), is
