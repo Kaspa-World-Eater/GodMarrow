@@ -348,6 +348,7 @@ def test_cli_claude_log_and_undo(project, monkeypatch, capsys):
     (project / "music").mkdir()
     from pixelforge.music import library as L, song as S
     S.save(L.load_piece("forge_home"), project / "music" / "current.song.json")
+    tempo0 = S.load(project / "music" / "current.song.json")["tempo"]
     main(["describe", "--bench", "music", "-p", str(project), "slower", "--json"])
     r = json.loads(capsys.readouterr().out)
     assert r["ok"] and S.load(project / "music" / "current.song.json")["tempo"] == 76.0
@@ -356,7 +357,7 @@ def test_cli_claude_log_and_undo(project, monkeypatch, capsys):
     assert log["ok"] and log["log"].endswith("_music.jsonl") and log["lines"] > 3
     main(["claude", "undo", r["snapshot"], "--json"])
     u = json.loads(capsys.readouterr().out)
-    assert u["ok"] and S.load(project / "music" / "current.song.json")["tempo"] == 72.0
+    assert u["ok"] and S.load(project / "music" / "current.song.json")["tempo"] == tempo0
     main(["claude", "status"])
     assert "ready" in capsys.readouterr().out
 
