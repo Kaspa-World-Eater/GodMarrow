@@ -239,6 +239,9 @@ func die(from: Vector2 = Vector2.INF) -> void:
 	else:
 		spr.play("death", true, false)
 	corpse_t = 30.0
+	var sp = load("res://world/splats.gd").at(zone)   # the ground it bleeds or scatters bone into (za_death21.js)
+	if sp:
+		sp.death(kind, tp, radius > 0.35)
 	if brain:
 		brain.on_death(self)
 	if not mods.is_empty():
@@ -251,6 +254,12 @@ func _physics_process(dt: float) -> void:
 	if dead:
 		spr.step(dt)
 		corpse_t -= dt
+		# the corpse darkens, browns and sinks as it lies (za_death21.js: brightness 0.62 -> 0.28, saturation down,
+		# sepia up, a flattening of 45% from 4 s after death to 10 s before it goes)
+		var rot := clampf((26.0 - corpse_t) / 20.0, 0.0, 1.0)
+		var br := 0.62 - 0.34 * rot
+		modulate = Color(br * (1.0 + 0.12 * rot), br * (1.0 + 0.04 * rot), br * (1.0 - 0.1 * rot), modulate.a)
+		spr.scale.y = absf(spr.scale.x) * (1.0 - 0.45 * rot)
 		if corpse_t < 0.0:
 			modulate.a = maxf(0.0, modulate.a - dt * 0.2)
 			if modulate.a <= 0.0:

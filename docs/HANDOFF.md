@@ -872,3 +872,20 @@ pass and the redesign document were started and stopped before commit; both brie
 melee, Diablo 2 and Path of Exile systems, Godmarrow's designs, nothing flashes, Diablo 2 is not a base), and how the
 merged Diablo 2 bridge works are in `docs/GAME_HANDOFF.md`. The lore rewrite's guide is `docs/codex/LORE_REWRITE_GUIDE.md`
 on `track/codex`. This session continues on PixelForge only.
+
+
+## 8. The game session, 2026-10-05: Act I first
+
+Derek's order: finish and polish Act I before anything new. The plan, with his open choices (which frictions), is
+`docs/ACT1_PLAN.md`. Done so far, each step smoke-tested at 0 errors:
+- **The screen cleared:** the dark layer's haze strips, the mist puffs and banks, the cloud and canopy blobs, the
+  light bars laid over the vaults and the woods, and the near-dark foreground are all gone (`world/atmos.gd`,
+  `world/air37.gd`, `world/dark_layer.gd`; `world/foreground.gd` deleted).
+- **Solid objects:** graves, cairns, braziers, coffins, pillars, chests, shrines, lantern-stones, statues, altars,
+  tents, campfires and the camp's folk are posts (`world/zone.gd` `posts`/`add_post`); bodies test a circle of eight
+  points; `--show=collision` draws what blocks. The waystone ring is left open (solid fangs would seal the pit).
+- **Random maps:** the first exporter was lost, so `tools/zone_export/` rebuilds it (see its README). It writes every Act I
+  zone at 20 seeds (`data/zones/<id>_s1001..1020.json.gz`), checks they are walkable (`check.py`), and captures the
+  browser and Godot side by side (`compare.mjs`). `core/data.gd` reads the gz files; `--zseed=S` loads a given seed.
+- **Browser parity:** the palisade (posts along the run, lashings, the odd skull), the death splats, and corpses that
+  darken and sink.

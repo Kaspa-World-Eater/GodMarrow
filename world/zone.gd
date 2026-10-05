@@ -354,6 +354,9 @@ func _walls() -> void:
 		b.top_tex = Assets.tex(Assets.meta["wtex"][tk]) if tk != "" and Assets.meta["wtex"].has(tk) else null
 		b.show_left = not WALLISH.has(type_at(Vector2(x + 0.5, y + 1.5)))
 		b.show_right = not WALLISH.has(type_at(Vector2(x + 1.5, y + 0.5)))
+		if t == 10:   # which way the fence runs (zt_env32.js ztPalisade)
+			b.along = Vector2i(1 if type_at(Vector2(x + 1.5, y + 0.5)) == 10 or type_at(Vector2(x - 0.5, y + 0.5)) == 10 else 0,
+				1 if type_at(Vector2(x + 0.5, y + 1.5)) == 10 or type_at(Vector2(x + 0.5, y - 0.5)) == 10 else 0)
 		b.position = Iso.to_screen(Vector2(x + 0.5, y + 0.5))
 		sorted.add_child(b)
 		wall_nodes.append(b)

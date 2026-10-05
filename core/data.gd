@@ -17,8 +17,15 @@ func zone_index() -> Dictionary:
 		_json["zones_index"] = JSON.parse_string(f.get_as_text()) if f else {}
 	return _json["zones_index"]
 
+## a zone as tools/zone_export wrote it: data/zones/<id>_s<seed>.json.gz (gzip), or a plain .json
 func zone(id: String, seed: int) -> Dictionary:
-	var f := FileAccess.open("res://data/zones/%s_s%d.json" % [id, seed], FileAccess.READ)
+	var base := "res://data/zones/%s_s%d.json" % [id, seed]
+	if FileAccess.file_exists(base + ".gz"):
+		var raw := FileAccess.get_file_as_bytes(base + ".gz")
+		var txt := raw.decompress_dynamic(-1, FileAccess.COMPRESSION_GZIP).get_string_from_utf8()
+		var j = JSON.parse_string(txt)
+		return j if j is Dictionary else {}
+	var f := FileAccess.open(base, FileAccess.READ)
 	return JSON.parse_string(f.get_as_text()) if f else {}
 
 func zone_seeds(id: String) -> Array:
