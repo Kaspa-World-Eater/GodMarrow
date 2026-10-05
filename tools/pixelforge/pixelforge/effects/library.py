@@ -60,8 +60,9 @@ def library_table() -> dict:
 
 
 def render_effect(name: str, out_dir: str | Path, *, levers: dict | None = None, size=None, frames=None, fps=None, seed=None, gif: bool = False,
-                  rotations: int = 0, out_name: str = "", palette: str | None = None) -> dict:
-    """Render a library effect to ``<out_dir>/<name>.png|json`` (+ GIF). ``palette`` swaps every ramp's colours (a palette name or hex list)."""
+                  rotations: int = 0, out_name: str = "", palette: str | None = None, bands: int | None = None) -> dict:
+    """Render a library effect to ``<out_dir>/<name>.png|json`` (+ GIF). ``palette`` swaps every ramp's colours (a palette name or hex list);
+    ``bands`` sets every ramp's step count (fewer = flatter, more = smoother)."""
     from .output import render_graph
     e = get_effect(name)
     lv = {k: float(v) for k, v in (levers or {}).items()}
@@ -69,8 +70,9 @@ def render_effect(name: str, out_dir: str | Path, *, levers: dict | None = None,
     if unknown:
         return {"ok": False, "error": f"{name} has no lever named {', '.join(unknown)}; its levers are {', '.join(e['levers'])}"}
     graph = e["graph"]
-    if palette:
-        graph = {**graph, "nodes": [({**n, "colours": palette} if n["op"] == "ramp" else n) for n in graph["nodes"]]}
+    if palette or bands:
+        patch = {**({"colours": palette} if palette else {}), **({"bands": int(bands)} if bands else {})}
+        graph = {**graph, "nodes": [({**n, **patch} if n["op"] == "ramp" else n) for n in graph["nodes"]]}
     r = render_graph(graph, out_name or name, out_dir, levers=lv, size=size, frames=frames, fps=fps, seed=seed, gif=gif, rotations=rotations,
                      kind=name, extra={"family": e["family"], "effect": name, "displacement": bool(e.get("displacement"))})
     r["effect"] = name

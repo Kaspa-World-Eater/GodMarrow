@@ -255,9 +255,13 @@ def picture(ctx: Context, path: str, frames: int = 1, scale: float = 1.0) -> np.
       "levers are the effect's own.", returns="image")
 def effect(ctx: Context, name: str, levers: dict | None = None, dx: float = 0.0, dy: float = 0.0, scale: float = 1.0, start: int = 0, seed: int = 0,
            angle: float = 0.0, flip_x: bool = False, palette: str | None = None) -> np.ndarray:
+    from .compat import resolve_kind
     from .library import get_effect
+    name, lv_old, pal_old = resolve_kind(name)
     g = get_effect(name)
     graph = dict(g["graph"])
+    levers = {**lv_old, **(levers or {})}
+    palette = palette or pal_old
     if palette:
         graph["nodes"] = [({**n, "colours": palette} if n["op"] == "ramp" else n) for n in graph["nodes"]]
     ew, eh = graph["size"]

@@ -1,13 +1,24 @@
 extends RefCounted
 const Doc := preload("res://scripts/editor/document.gd")
 ## scripts/editor/anchors.gd: effects dropped on a frame. An anchor is a point on the figure where an effect from
-## the library (the effects bench's kinds and spell presets) sits; it follows through the clip and the directions
+## the library (the effects engine's saved graphs) sits; it follows through the clip and the directions
 ## by frame index, and by its part's centroid when the render wrote part masks. Anchors live in the project's frame
 ## data (`<root>/anchors.json`) so the export can bake them; `bake` writes the list into the export's JSON (a stub:
 ## the game does not read it yet).
 
-const LIBRARY := ["fire", "smoke", "wisp", "burst", "embers", "ring", "bolt", "slash", "circle", "cloud", "shards", "pillar", "flash", "ward",
-	"vortex", "lightning", "swarm", "rune", "pool", "nova", "fireball", "soul_drain", "bone_shatter", "lightning_strike"]
+const LIBRARY := ["flame", "torch", "candle", "ember", "spark_burst", "sparkle", "flare", "arc", "saber", "blood_spray", "blood_pool", "drips", "rain", "snow",
+	"dust_motes", "fog", "waterfall", "poison_cloud", "portal", "holy_beam", "bone_shards", "marrow_light", "soul_wisps", "soul_fire", "soul_drain", "phosphorus",
+	"haze", "echo", "unlight", "miasma", "eye_ooze", "tally_marks", "bell_ring"]
+## the old effect words (the first library and the vfx kinds) and the effect each means now
+const LEGACY := {"fire": "flame", "smoke": "poison_cloud", "wisp": "soul_wisps", "burst": "spark_burst", "embers": "ember", "ring": "portal", "bolt": "arc", "slash": "saber",
+	"circle": "portal", "cloud": "poison_cloud", "shards": "bone_shards", "pillar": "holy_beam", "flash": "flare", "ward": "portal", "vortex": "portal", "swarm": "dust_motes",
+	"rune": "sparkle", "pool": "blood_pool", "nova": "spark_burst", "fireball": "flame", "bone_shatter": "bone_shards", "lightning_strike": "arc", "lightning": "arc", "drip": "drips"}
+
+## the library name an effect word means (old words mapped; "" when it is nothing we know)
+static func resolve(effect: String) -> String:
+	if LIBRARY.has(effect):
+		return effect
+	return String(LEGACY.get(effect, ""))
 
 var root := ""
 var list: Array = []     # [{id, effect, clip, dir, frame, x, y, scale, rotation, part, levers}]

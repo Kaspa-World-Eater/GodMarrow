@@ -37,8 +37,8 @@ shoot creatures "--screen=creatures" 3
 for t in Model Materials Behaviour Export; do
   shoot objects_${t,,} "--screen=objects --model=$CHEST --tab=$t --env=crypt" 8
 done
-for t in Shape Layers Looks Missile Export; do
-  shoot effects_${t,,} "--screen=effects --tab=$t" 8
+for t in Effect Layers Looks Pick Export; do
+  shoot effects_${t,,} "--screen=effects --tab=$t" 10
 done
 shoot tiles_empty "--screen=tiles" 3
 [ -n "${GROUND:-}" ] && for t in Source Edges Variants Export; do shoot tiles_${t,,} "--screen=tiles --painting=$GROUND --tab=$t" 10; done

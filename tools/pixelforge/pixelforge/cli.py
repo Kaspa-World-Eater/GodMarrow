@@ -870,7 +870,7 @@ def cmd_effects(a) -> None:
         lv = {**lv0, **levers_of(a.lever)}
         palette = a.palette or pal
         r = E.render_effect(effect, a.out, levers=lv, size=tuple(a.size) if a.size else None, frames=a.frames, fps=a.fps, seed=a.seed,
-                            gif=a.gif or a.action == "preview", rotations=a.rotations, out_name=a.as_name or a.name, palette=palette)
+                            gif=a.gif or a.action == "preview", rotations=a.rotations, out_name=a.as_name or a.name, palette=palette, bands=a.bands)
         _emit(a, r)
         return
     if a.action == "graph":
@@ -1344,7 +1344,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("action", choices=["list", "render", "graph", "preview", "nodes"]); s.add_argument("name", nargs="?", default="", help="render/preview: an effect (or an old vfx kind); graph: a .graph.json")
     s.add_argument("-o", "--out", default="art/fx"); s.add_argument("--lever", action="append", metavar="K=V", help="a lever, repeatable: --lever size=1.4 --lever speed=0.8")
     s.add_argument("--as", dest="as_name", default="", help="the output name (default: the effect's)"); s.add_argument("--family", default="", help="list: one family")
-    s.add_argument("--palette", default="", help="swap every ramp: a palette name or dark->bright hex list a,b,c")
+    s.add_argument("--palette", default="", help="swap every ramp: a palette name or dark->bright hex list a,b,c"); s.add_argument("--bands", type=int, default=None, help="every ramp's step count")
     s.add_argument("--size", type=int, nargs=2, metavar=("W", "H")); s.add_argument("--frames", type=int, default=None); s.add_argument("--fps", type=float, default=None); s.add_argument("--seed", type=int, default=None)
     s.add_argument("--gif", action="store_true"); s.add_argument("--rotations", type=int, default=0, help="a missile sheet with N headings"); s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_effects)
