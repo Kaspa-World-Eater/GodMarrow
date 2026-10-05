@@ -896,14 +896,15 @@ Pictures / Desktop / Documents resolve on Windows with the plain `USERPROFILE` a
 toggles), thumbnails and previews decoded on a worker thread (a big webp never blocks the frame), long names elided
 in the middle, `__pycache__` and dot-files hidden. `driver.gd` `drop A;B` drops several files.
 
-**Verified.** 212 pytest green (`tests/test_picture_road.py` 12: the file-name words and names, the Keeper's front
+**Verified** (after the merge of main's Claude hookup, music, facing fix and Diablo bridge into the track; the
+Reference tab keeps both sides' choices). 273 pytest green (`tests/test_picture_road.py` 12: the file-name words and names, the Keeper's front
 through the road with the project's state and the progress words in order, determinism, the steps again, a synthetic
 three-view sheet named like a Midjourney download, the views as separate files, a held thing beside the body, an
 existing character drafted again, the failures in words, the CLI's progress lines and exits, the docs and the bench);
-`check_scripts.gd` 33/0; `test_editor.gd` 106/0; `forge/tools/picture_road.sh` under xvfb, errors 0: the Keeper's
+`check_scripts.gd` 33/0; `test_editor.gd` 106/0; `test_scene.gd` 21/0; `forge/tools/picture_road.sh` under xvfb, errors 0: the Keeper's
 front dropped on Home ends with 17 shapes on the bench, silhouette overlap front 0.71 ("the right mass; the details
 want a hand"), 4.8 s in the app (2 s headless), `docs/screens/forgeapp/picture_road_{working,reference,compare,model}.png`
-and `file_browser.png` refreshed. A synthetic three-view sheet (1300 x 820) takes about 10 s; everything is under
+and `file_browser.png` refreshed after the merge (the reference shot shows the prompt choices from main beside the road's). A synthetic three-view sheet (1300 x 820) takes about 10 s; everything is under
 the two-minute line. Not done here: a side view of the Keeper (the front alone gives no depth, and the warning says
 so); running the road on a real Midjourney download on Windows (the places and the webp thumbnails are built for it
 and tested under xvfb with a fake home).
