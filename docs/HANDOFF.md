@@ -2048,3 +2048,63 @@ files the game loads today. The guides' main flow no longer names the retired ro
 the end of each names the flag. Tests of the retired roads are `skipif` on the flag; `tests/test_old_roads.py` covers
 the guards, the cue table and a cue render.
 
+
+**7.33 (2026-10-05, PixelForge session, `track/finish`): the detail layer that rides the parts (`docs/FORGE_FROM_THE_GAME.md`
+3.1).** A part of a shape file may carry a small texture in its own surface coordinates (`"detail": {"head": {"file":
+"hemomancer.detail/head.png"}}` or inline `rows`; u round the part's long axis with the front at the middle, v down it;
+`Prim.axis_frame` / `surface_uv` in `tools/pixelforge/pixelforge/shapes.py`, `detail_axis` on a shape overrides the
+axis). Its texels are **ramp-step offsets, never colours** (a grey PNG: 128 no change, 32 per step, 0 a blood seed;
+`encode_detail` / `decode_detail`), added to the step the light chose and clipped to the material's ramp, so the
+palette never grows. Each voxel's (u, v) is read once at voxelising; the texel lookup is one numpy pass per texture
+set (`Model.detail_steps`, `Model.set_detail` for the bench), sampled per pixel by the voxel that won it, so it turns
+and bends with the part in `render_still`, the turnaround and every clip. `validate` checks the map, `warnings` names a
+missing PNG. Stock detail per material class in `pixelforge/shape_detail.py` (`face`, `skin`, `cloth`, `wood`,
+`bandage`, `metal`, `hair`; the class from the material's `detail` key in `assets/shapes/materials.json` or its name;
+the texture sized to the part's extent at 195 px): `pixelforge shapes detail FILE [--stock [--replace]] [--part NAME
+--from PNG | --part NAME --stock] [--clear [--part NAME]] [--list] [--json]`. Applied to the Hemomancer and the Keeper
+(`assets/shapes/characters/<name>.detail/`, `<name>_flat.shapes.json` kept beside each for the comparison tests; the
+Hemomancer's generator writes the stock layer when it runs). The Forge's **Detail bench** (`forge/scripts/screens/detail.gd`,
+from Home's *Detail bench* on the last model of the Characters bench or the Keeper): the part's texture unwrapped at
+pixel scale on the left, the figure on the right, part / tool (pencil, brush 2 3 4) / facing / shade cyclers, the ramp's
+steps as chips plus the seed, left drag paints, right drag erases, Undo, Stock, Clear part, Choose a model file, Exit,
+"?"; every stroke writes the PNG through `shapes detail --part --from` and re-renders the still through the request and
+ticket rule of `screen.gd`. Pictures: `docs/screens/forge/hemomancer_detail_compare.png`, `keeper_detail_compare.png`
+(the painting | flat | detail | detail + light; `shape_detail.compare_picture`), `docs/screens/forgeapp/detail.png`.
+
+**7.34 (2026-10-05, `track/finish`): light and ink as a style setting (3.2).** Four keys on every preset in
+`styles.py` (`form_light`, `creases`, `ink`, `rim`; `shape_tools.options_for(...)["look"]`, `Model(look=...)`), all on
+for `godmarrow`, off for every other preset, so a render with them off is the old render bit for bit (hashes in
+`tests/test_detail.py`). `form_light`: a ramp step up toward each piece's upper-left on the screen and a step down
+toward its lower-right from the piece's screen box that frame (pieces under 4 px keep their steps); `creases`: one step
+darker where a nearer piece overlaps; `ink`: the near side of a deep overlap takes the outline colour (or the part's
+darkest step), never a new colour; `rim`: one step up along the silhouette's light side. Quantised to the ramps: no
+gradient, no glow, no red light (tests: rendered colours ⊆ the materials' ramps + outline + shadow; the godmarrow
+render differs from the flat; each key alone changes the picture within the ramps).
+
+**7.35 (2026-10-05, `track/finish`): blood runs (3.3).** A material option `"runs": {"colour_from": "blood",
+"density": 0.35, "length": [2, 6]}` (`validate` checks the named material exists): from every visible seed texel (-4 in
+the detail texture, grey 0 in the PNG; the stock cloth, wood and bandage textures place them when the material bleeds)
+a drip goes straight down the screen over the same part, its length from the seed's own hash so it holds still from
+frame to frame and rides the part, the bead a step up and the tail a step down in the named ramp only (`Model._runs`).
+A part with no seed painted bleeds a little from a few columns at its top. The Hemomancer's mantle, tabard, cape,
+planks, bandages and leg-cloth bleed this way; the random blood speck rules are gone from the generator
+(`docs/concepts/hemomancer/shapes/make_hemomancer_shapes.py`).
+
+**7.36 (2026-10-05, `track/finish`): one command from a shape file to the game (3.4).** `pixelforge project build
+<character> [FILE] -p <folder> [--game <game>] [--kind K] [--skin-for CLASS] [--style S] [--dry-run] --json`
+(`api.build_character`): import-shapes → the fixed set (`idle walk attack punch cast hit death roll` → `idle walk atk
+atk2 cast hit death dodge`, 8 frames each and `hit` 6; a file whose attack is the punch gets the jab for `atk2`) in 8
+views at the style's height with the detail layer and the look → export-game into the game's `art/sprites` (found
+above the project or `--game`) with the `skins.json` entry (`godmarrow_export`) → the height check
+(`godmarrow_export.height_warning`, a hero is 195 px). One JSON result: `paths` (shapes, frames, manifest, sheet,
+json, skins), `steps`, `warnings` (no detail layer; no game for `skins.json`; the height), `height`, `lines`. Home's
+**Build** runs it through the driver on the last character of the bench and shows the lines in the picture window, the
+first warning on the state line, no pop-up. **The game session can retire `tools/paintover/*`** once it has rebuilt
+the Hemomancer with `project build` (the scripts are left in place; the detail and the light are render steps now).
+
+Verified for 7.33 to 7.36: 443 pytest green, 13 skipped (`tests/test_detail.py` 15: the PNG round trip, `validate`,
+the surface coordinates, a texel turning with its part, the colours within the ramps, the detail riding the rig,
+`set_detail` without voxelising, the look off bit for bit, the presets, each key within the ramps, no red light, the
+runs on one part in the blood ramp, the Hemomancer bleeding in runs not specks, the stock grids, the CLI, `project
+build --dry-run` and the whole road into a scratch game); `check_scripts.gd` 35/0, `test_detail.gd` 20/0,
+`test_editor.gd` 106/0, `test_scene.gd` 21/0; `screens.sh` home and detail at 0 errors.
