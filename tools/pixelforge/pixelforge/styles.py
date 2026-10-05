@@ -13,8 +13,10 @@ Every field can still be overridden where a step takes an argument.
 
 from __future__ import annotations
 
+import json
 import re
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass, fields, replace
+from pathlib import Path
 
 DITHERS = ("none", "bayer", "floyd")
 EDGES = ("soft", "crisp", "hard")          # cell average (flat areas, small looks) | median of the inner half | near the cell centre (noisy, crunchy)
@@ -180,13 +182,43 @@ FIELDS = [f.name for f in fields(Style)]
 _HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
 
 
+OVERRIDES_FILE = Path(__file__).resolve().parent.parent / "assets" / "styles" / "overrides.json"
+
+
+def _overrides() -> dict:
+    """Measured values laid over a preset (``assets/styles/overrides.json``: ``{preset: {field: value}}``), written only
+    by a step asked to (``pixelforge d2 measure --write-preset``); absent, every preset is as coded."""
+    try:
+        d = json.loads(OVERRIDES_FILE.read_text())
+        return d if isinstance(d, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def write_override(name: str, values: dict) -> dict:
+    """Set ``values`` over preset ``name`` in the overrides file (only known fields); returns what is now laid over it."""
+    if name not in STYLES:
+        raise ValueError(f"unknown style {name!r}; choose from {sorted(STYLES)}")
+    cur = _overrides()
+    mine = cur.get(name, {})
+    mine.update({k: v for k, v in values.items() if k in FIELDS and k not in ("name", "title", "description", "group")})
+    cur[name] = mine
+    OVERRIDES_FILE.parent.mkdir(parents=True, exist_ok=True)
+    OVERRIDES_FILE.write_text(json.dumps(cur, indent=1) + "\n")
+    return {"file": str(OVERRIDES_FILE), "preset": name, "values": mine}
+
+
 def get_style(name: str | Style) -> Style:
     if isinstance(name, Style):
         return name
     try:
-        return STYLES[name]
+        st = STYLES[name]
     except KeyError:
         raise ValueError(f"unknown style {name!r}; choose from {sorted(STYLES)}") from None
+    over = _overrides().get(name)
+    if over:
+        st = replace(st, **{k: type(getattr(st, k))(v) for k, v in over.items() if k in FIELDS and k not in ("name", "title", "description", "group")})
+    return st
 
 
 def validate(style: Style) -> list[str]:

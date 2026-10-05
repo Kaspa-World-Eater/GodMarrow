@@ -16,7 +16,7 @@ extends RefCounted
 ##   --place=NAME[,NAME]      the Forge's objects (art/objects/objects.json) stood beside the pilgrim for a look, nothing saved
 ##   --shot=PATH [--shot_t=S] [--shot_n=N]   save the screen to PATH after S seconds (default 4), N frames 0.25 s apart
 ##                            (PATH_1.png ...), then quit. Needs a window (not --headless). --hour=0..1 sets the hour.
-##   --hide=dark,atmos,sky,fore   switch those overlays off (the dark and light map, the air, the weather, the near dark),
+##   --hide=dark,atmos,sky    switch those overlays off (the dark and light map, the air, the weather),
 ##                            to judge a sprite or an effect in its plain paint
 
 const PANELS := ["choir", "golem", "char", "skills", "inv", "journal", "board"]

@@ -41,6 +41,31 @@ sparkly high notes, playing on launch. The SNES look kept, readable, pixel-drawn
 Bands (dB re total): reference 20-60 -11.9, 60-120 -7.7, 120-250 -5.1, 250-500 -5.4, 500-1k -8.3, 1-2k -18.2, 2-4k
 -31.6; theme 20-60 -5.9, 60-120 -4.4, 120-250 -9.5, 250-500 -10.2, 500-1k -9.1, 1-2k -14.3, 2-4k -19.2 (the bells).
 
+## Revision round (2026-10-04, later)
+
+The owner's references for the home theme and the game's set: the Conan the Barbarian score (slow low brass and
+timpani, a male-choir chant, a broad modal melody over a pedal), Diablo 2 (a dark repeated guitar figure, drones,
+distant percussion), Demon's Crest (gothic organ and choir, minor marches, bells, heavy reverb), Super Metroid (ambient
+dread, bass pulses, dissonant pads, an alien choir), Castlevania (driving gothic rock, harpsichord, a sixteenth-note
+bass, baroque turns). Each is a genre now (`barbarian_epic`, `dark_acoustic`, `gothic_march`, `ambient_dread`,
+`gothic_rock`) with its voices (`brass_low`, `choir_chant`, `choir_dark`, `choir_alien`, `organ_gothic`, `bells_chapel`,
+`guitar_nylon`, `strings_ens`, `orch_hit`, `drums_epic`) and a library piece tagged `godmarrow`. The home theme is
+Demon's Crest and Conan under dungeon synth: C# minor at 66, a drone, the chant, a gothic organ, far timpani, the
+low-brass melody, a bell or two a bar, low. "Not so much synth": `fx.snes` (the Tracks tab's SNES lever, 0.7 by
+default) band-limits every voice like a looped sample, adds grain and echo and caps the voices at eight; the godmarrow
+genres lean on the sample-like voices with one synth colour each at most. Library pieces carry a `theme` (godmarrow /
+general); the Library tab opens on the game's set with a show-all. Interface sounds: a level off / quiet / full (quiet
+by default: cursor blip, select click, back), no sound on a finished step, no done loop on a step.
+
+| | reference | forge_home | epic_the_last_cairn | acoustic_the_hanging_road | gothic_the_crest_procession |
+|---|---|---|---|---|---|
+| key (estimator) | C# minor | C# minor | D minor | C major (written E phrygian) | A minor (written D harmonic minor) |
+| tempo written / estimator | - / 103 | 66 / 135 | 68 / 69 | 74 / 151 | 92 / 198 |
+| centroid | 310 Hz | 323 Hz | 140 Hz | 292 Hz | 263 Hz |
+| RMS | 0.127 | 0.076 | 0.078 | 0.088 | 0.083 |
+
+The estimator's tempo doubles on figures that re-strike (the chant, the guitar); the written tempo is the truth.
+
 ## Still short
 
 - Chords are inferred from the pad when a hand-written pattern has none; a chord lane in the editor would be clearer.

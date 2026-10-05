@@ -131,3 +131,13 @@ pages should show them:
 - **A per-model clip map.** `"clips": {"attack": "punch"}` in the file plays another library clip as a game clip
   (the Hemomancer's attack is the planted thrust); the Motion tab's clip picker should show the mapping and offer the
   library's clips for each game clip.
+- **Part ids** (track/partids). `Canvas.pid` (the shape that painted each pixel) was already there; `Canvas.parts_pass`
+  turns it into a per-pixel part index through `shapes.part_table(doc)` (one entry per named part, one per shape
+  without a part; `group` = the bone, `material` = the first shape's) and gives outline pixels the part beside them.
+  `Frame.parts` carries it; `render_clip` returns `"parts"`; `shape_tools.save_parts` writes `frame_NNN.parts.png` as
+  a paletted PNG (entry i = grey i, index 0 transparent; 16-bit grey from 256 parts) and `render_set` puts the table in
+  `manifest.json["parts"]`; `still` writes `<stem>.parts.png` (zoomed with the picture), `turntable` a `<stem>_parts/`
+  folder. All on by default, `parts=False` / `--no-parts` off. Cost: the Keeper's idle S (24 frames at 195 px) 4.37 s
+  before, 4.34 s after (medians of four), under the noise. Trap closed on the way: every reader of a frames folder
+  globbed `frame_*.png`, which the masks match; they glob `frame_[0-9][0-9][0-9].png` now (the Forge's folder listings
+  skip `.parts.`), and the e2e GIF test caught it.

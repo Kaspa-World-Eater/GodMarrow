@@ -138,6 +138,8 @@ def chord(root: int, scale: str, degree: int, octave: int = 3, kind: str = "tria
         offs = [0, 3, 4]
     elif kind == "add9":
         offs = [0, 2, 4, 8]
+    elif kind == "cluster":
+        offs = [0, 1, 4]
     else:
         offs = [0, 2, 4]
     notes = [degree_to_midi(root, scale, degree + o, octave) for o in offs]

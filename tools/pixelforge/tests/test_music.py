@@ -79,9 +79,24 @@ def test_voice_limit_cuts_the_oldest_note():
     s["patterns"]["A"]["notes"]["pad"] = [{"s": 0, "p": 48 + k, "v": 0.8, "l": 16} for k in range(12)]
     s["fx"]["reverb"] = 0.0
     s["fx"]["echo"] = 0.0
+    s["fx"]["snes"] = 0.0
     full = R.render_plan(S.normalise({**s, "fx": {**s["fx"], "voices": 0}}), R.timeline(s))
     limited = R.render_plan(S.normalise({**s, "fx": {**s["fx"], "voices": 8}}), R.timeline(s))
     assert float(np.abs(limited[8000:]).mean()) < float(np.abs(full[8000:]).mean())
+
+
+def test_snes_ness_band_limits_and_caps_the_voices():
+    s = C.compose("gothic_orchestral", "dark", "D minor", 84, 8, 5)
+    assert s["fx"]["snes"] == 0.7
+    clean = R.render_bar(S.normalise({**s, "fx": {**s["fx"], "snes": 0.0, "voices": 0}}), 1, 0)
+    snes = R.render_bar(S.normalise({**s, "fx": {**s["fx"], "snes": 1.0, "voices": 0}}), 1, 0)
+    spec_c = np.abs(np.fft.rfft(clean[:, 0].astype(np.float64)))
+    spec_s = np.abs(np.fft.rfft(snes[:, 0].astype(np.float64)))
+    f = np.fft.rfftfreq(len(clean), 1 / 32000)
+    high = f > 9000
+    assert spec_s[high].sum() / spec_s.sum() < spec_c[high].sum() / spec_c.sum() * 0.5    # the top band is gone, as on the console
+    assert np.isfinite(snes).all() and float(np.abs(snes).max()) <= 1.0
+    assert "snes" in S.FX_FIELDS
 
 
 def test_composer_is_deterministic_per_seed_and_covers_every_genre():
@@ -245,8 +260,18 @@ def test_library_pieces_load_and_render():
     names = {p["name"] for p in pieces}
     assert len(pieces) >= 27 and {"forge_home", "forge_working", "forge_done"} <= names
     genres = {p["genre"] for p in pieces}
-    for g in ["dungeon_synth", "gothic_orchestral", "chiptune", "dark_ambient", "battle", "boss", "tavern", "town", "title", "victory", "sorrow", "exploration", "synthwave"]:
+    for g in ["dungeon_synth", "gothic_orchestral", "gothic_march", "barbarian_epic", "dark_acoustic", "ambient_dread", "gothic_rock", "chiptune", "dark_ambient",
+              "battle", "boss", "tavern", "town", "title", "victory", "sorrow", "exploration", "synthwave"]:
         assert g in genres, g
+    # the theme sets: the game's set is minor-mode and never chiptune; the bright pieces are general
+    for p in pieces:
+        assert p["theme"] in ("godmarrow", "general"), p["name"]
+        if p["theme"] == "godmarrow":
+            sc = L.load_piece(p["name"])["scale"]
+            assert theory.SCALES[sc][2] == 3 and p["genre"] != "chiptune", (p["name"], sc)
+        if p["genre"] in ("chiptune", "tavern", "town", "victory", "synthwave"):
+            assert p["theme"] == "general", p["name"]
+    assert L.list_pieces(theme="godmarrow") and all(p["theme"] == "general" for p in L.list_pieces(theme="general"))
     for p in pieces:
         s = L.load_piece(p["name"])
         assert s["title"] and S.total_bars(s) >= 2
@@ -262,11 +287,16 @@ def test_library_pieces_load_and_render():
 
 def test_forge_theme_is_dungeon_synth_in_the_reference_key():
     s = L.load_piece("forge_home")
-    assert S.key_text(s) == "C# minor" and 60 <= s["tempo"] <= 84 and s["genre"] == "dungeon_synth"
-    assert s["lanes"]["sparkle"]["instrument"] in ("bells_glass", "celesta", "music_box")
+    assert S.key_text(s) == "C# minor" and 66 <= s["tempo"] <= 76 and s["genre"] == "dungeon_synth" and s["theme"] == "godmarrow"
+    assert s["lanes"]["sparkle"]["instrument"].startswith("bells") and s["lanes"]["sparkle"]["volume"] < 0.3   # a bell or two, low in the mix
     assert any(sec["transpose"] for sec in s["sections"])       # the bridge changes key
     assert s["patterns"]["A"]["notes"]["lead"] and s["patterns"]["A"]["notes"]["counter"]
-    assert 50 < S.total_seconds(s) < 130
+    assert 40 < S.total_seconds(s) < 130
+    lead = s["patterns"]["A"]["notes"]["lead"]
+    assert max(n["p"] for n in lead) <= 72 and min(n["l"] for n in lead) >= 1.5      # a broad low melody, not a jig
+    assert s["lanes"]["bass"]["instrument"] == "bass_sub" and all(n["l"] > 16 for n in s["patterns"]["A"]["notes"]["bass"])   # the drone
+    assert s["lanes"]["counter"]["instrument"] == "choir_chant" and s["lanes"]["pad"]["instrument"] == "organ_gothic" and s["lanes"]["lead"]["instrument"] == "brass_low"
+    assert len(s["patterns"]["A"]["notes"]["sparkle"]) <= 8                                 # no constant bells
 
 
 def test_export_writes_wav_and_song(tmp_path):

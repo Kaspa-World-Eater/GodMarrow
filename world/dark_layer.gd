@@ -46,7 +46,6 @@ var scan_t := 0.0
 var flash_next := 0.0          # the far flash (zz_zz_cine76.js): rare, at night, on open ground, never in town
 var flash_t0 := -9.0
 var mood := 1.0               # the lantern's mood (zz_zz_cine76): shrinks and stutters when the wound is deep, gutters in a boss fight
-var _haze_h := -1
 var keep := 1.0               # the dim wick and what the lantern keeps (zz_zz_study82), applied after the 5.4 cap
 var boss_m: Node = null
 var t := 0.0
@@ -358,30 +357,9 @@ func _process(dt: float) -> void:
 	mat.set_shader_parameter("g_bri", g.get("bri", 1.0))
 	mat.set_shader_parameter("g_hi", Vector4(hi.r, hi.g, hi.b, lerpf(g["hi"][1], N["hi"][1], n)))
 	mat.set_shader_parameter("g_lo", Vector4(lo.r, lo.g, lo.b, lerpf(g["lo"][1], N["lo"][1], n)))
-	var hz: Array = g.get("hz", [Color.BLACK, 0.0])
-	var dusk := outdoor and Game.hour_name() == "dusk"
-	var hzc: Color = Color8(90, 88, 110) if dusk else hz[0]
-	# the haze: three dithered strips drifting with the camera (drawHaze37); v59 halves every land's haze
-	var ha: float = 0.1 if dusk else float(hz[1]) * 0.5
-	var hh := 60 if dusk else 64
-	mat.set_shader_parameter("g_haze", Vector4(hzc.r, hzc.g, hzc.b, ha if outdoor else 0.0))
-	if ha > 0.005:
-		if _haze_h != hh:
-			_haze_h = hh
-			mat.set_shader_parameter("haze_tex", _haze_strip(hh))
-		var camw := (vp.get_canvas_transform().affine_inverse() * Vector2.ZERO) / 4.0
-		var VH := vis.size.y / (4.0 * sc)
-		var hy := Vector4(0, 0, 0, hh)
-		var hx := Vector4.ZERO
-		var hav := Vector4.ZERO
-		for i in 3:
-			var par := 0.35 + i * 0.25
-			hy[i] = roundf(VH * (0.28 + i * 0.26) - fmod(camw.y * par, 40.0) + sin(t * 0.1 + i) * 6.0)
-			hx[i] = -roundf(fposmod(camw.x * par + t * (3.0 + i * 2.0), 256.0))
-			hav[i] = 0.7 + 0.3 * sin(t * 0.13 + i * 2.0)
-		mat.set_shader_parameter("haze_y", hy)
-		mat.set_shader_parameter("haze_x", hx)
-		mat.set_shader_parameter("haze_a", hav)
+	# no haze: the web's three dithered strips drifting over the screen (drawHaze37) read as fog popping up over the
+	# view; the user hated them (2026-10-05). The shader's haze stays off.
+	mat.set_shader_parameter("g_haze", Vector4.ZERO)
 	var am := zone.ambient_at(Game.phase())
 	mat.set_shader_parameter("amb", Vector3(am.r, am.g, am.b))
 	lm_mat.set_shader_parameter("amb", Vector3(am.r, am.g, am.b))
@@ -468,30 +446,3 @@ func light_at(vp_pt: Vector2) -> Array:
 	var lum := 1.0 - last_A * dark
 	return [lum, col.lerp(Color(0.62, 0.66, 0.78), dark)]
 
-## hazeStrip37 (y_light21.js:412-421): a long strip of dithered density, 256 art px, alpha in four levels of 70
-static func _haze_strip(h: int) -> Texture2D:
-	var F = load("res://fx/flame.gd")
-	var w := 256
-	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
-	var vn := func(u: float, v: float) -> float:
-		var i := int(floor(u))
-		var j := int(floor(v))
-		var fu := u - i
-		var fv := v - j
-		var su := fu * fu * (3.0 - 2.0 * fu)
-		var sv := fv * fv * (3.0 - 2.0 * fv)
-		var h00: float = F.hash2(posmod(i, 16), j)
-		var h10: float = F.hash2(posmod(i + 1, 16), j)
-		var h01: float = F.hash2(posmod(i, 16), j + 1)
-		var h11: float = F.hash2(posmod(i + 1, 16), j + 1)
-		return (h00 + (h10 - h00) * su) * (1.0 - sv) + (h01 + (h11 - h01) * su) * sv
-	for j in h:
-		for i in w:
-			var env := sin(j / float(h) * PI)
-			var n: float = vn.call(i / 16.0, j / 10.0) * 0.65 + vn.call(i / 6.0, j / 4.0 + 7.0) * 0.35
-			var v := maxf(0.0, env * (n * 2.4 - 1.05)) * 3.2
-			var b := (float(F.BAY4[((j & 3) << 2) + (i & 3)]) + 0.5) / 16.0
-			var lv := mini(3, int(v) + (1 if (v - int(v) - 0.3) * 2.5 > b else 0))
-			if lv > 0:
-				img.set_pixel(i, j, Color(1, 1, 1, lv * 70.0 / 255.0))
-	return ImageTexture.create_from_image(img)

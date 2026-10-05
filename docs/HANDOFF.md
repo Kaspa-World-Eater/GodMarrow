@@ -796,3 +796,79 @@ tools/pixelforge/forge --script res://tools/check_scripts.gd`; `pixelforge forge
 owner's listening pass on the theme and three samples; map the describe line's mood words to `music compose`; a
 chord lane; swing.
 
+### 7.20 2026-10-04, track/partids: part-id masks from the shape road, so the editor's carry matches by part
+
+**Done.** Every frame the shape road renders gets `frame_NNN.parts.png` beside it: a paletted PNG whose pixel value is
+the part index (0 = empty; palette entry i is grey level i with index 0 transparent, so the editor's `Doc.part_at`
+reads `r8` as the part and alpha 0 as empty; 16-bit greyscale only from 256 parts up). The part table goes into
+`manifest.json` under `"parts"` (`index`, `name`, `group` = the bone, `material`, `shapes`): one entry per named part,
+one per shape without a part. `shapes.part_table`, `Canvas.parts_pass`, `Frame.parts`, `render_clip["parts"]`,
+`shape_tools.save_parts` / `load_parts`; `render_set`, `still` (`<stem>.parts.png`, zoomed with the picture) and
+`turntable` (`<stem>_parts/`) write them, `api.render_shapes(parts=True)`, `--no-parts` on `shapes render|still|turntable`
+and `project render-shapes`, `render_shape_sprite(parts=)` on MCP. Outline pixels take the part beside them. The frames
+readers (`godmarrow_export`, `api` previews/export, `checks`, `gui`, the GIF options, the Forge's folder listings) match
+`frame_NNN.png` only, so the masks are never counted as frames.
+
+**Verified.** 209 pytest green (`tests/test_part_ids.py` 9: the table, a mask per frame whose values map to the table,
+the hat's pixels are the hat part, empty pixels 0, outline coverage, the manifest round trip and the game export's
+frame count, `--no-parts`, still and turntable, the flat path, the CLI flag); `test_editor.gd` 106/0,
+`check_scripts.gd` 33/0. The editor's carry run headless on a Keeper idle S/E/N set rendered with parts (`--screen=editor
+--frames=... --edits=...`): a 3 px stroke on the hat carried to 4 frames, 12 px, `"by": "part"`; `pixel` reports
+`part: 1`. No editor change was needed. Render time: the Keeper's idle S 4.37 s before, 4.34 s after (medians of four).
+
+**How to resume.** `cd tools/pixelforge && PIXELFORGE_NO_UPDATE=1 python -m pytest -q`. Next: the editor could read
+the manifest's `"parts"` to name the part under the cursor; anchors could ride a part id.
+**7.18, revision round (2026-10-04, later).** The home theme rewritten to the owner's references (Conan the
+Barbarian and Demon's Crest under dungeon synth; Diablo 2, Super Metroid and Castlevania as genres for the game's
+set): C# minor at 66, a drone, a chanting choir, a gothic organ, far timpani, a broad low-brass melody, a bell or two
+a bar; centroid 323 Hz against the reference's 310, same key. Five new genres with their voices and a `godmarrow`
+library piece each (34 pieces; chiptune, tavern, town, victory and synthwave are tagged `general`). `fx.snes` (the
+Tracks tab's SNES lever) for the late-SNES sample character; the Library tab opens on the game's set with a show-all;
+the interface is quiet by default (Settings: sounds off / quiet / full; nothing sounds on a finished step; the done
+loop never plays on a step). Samples: `docs/screens/forgeapp/audio/` forge_home (30 s), epic_the_last_cairn,
+acoustic_the_hanging_road, gothic_the_crest_procession.
+
+
+### 7.19 2026-10-04, track/claude: Claude on the bench, and Midjourney through the owner's Chrome
+
+**What.** Claude Code wired into the Forge: every workbench has a *Claude:* line (`/`); the sentence goes to
+`pixelforge describe --bench <bench> -p <project> "<words>"`, which runs the Claude Code CLI in print mode with
+PixelForge's own MCP server as its only tools (`pixelforge/claude_bridge.py`: `claude -p --output-format stream-json
+--mcp-config ... --tools Read --allowedTools mcp__pixelforge,Read --permission-prompts none --strict-mcp-config
+--max-budget-usd 3 --append-system-prompt <the bench, the project, what is on the bench, the style rules, the banned
+words, the JSON ending>`). The title line reads *Claude: ready / working (ember pulse) / not found / not signed in*;
+the strip says what it is doing (*drafting the model*, *setting tempo 76*); when done the bench reloads, the levers
+it moved light, new notes are ringed, its notes sit on the state line, and **Undo** puts the files back from the
+snapshot the run took (`<project>/claude/undo/`, `pixelforge claude undo`). Characters gets the Midjourney prompts
+(a *prompt* cycler, **Copy prompt**) and **Paint it in Midjourney**; Objects **Fetch a turnaround** / **Fetch a prop
+sheet of nine**: `pixelforge midjourney fetch` runs the bridge with `--chrome` and a procedure prompt for the Claude
+in Chrome extension (one job, human pace; the painting lands on the Reference tab). `pixelforge claude status |
+register | log | undo`; `install.bat` and the Forge's first launch register the server (`claude mcp add -s user
+pixelforge -- <python> -m pixelforge.cli mcp`). A mock (`PIXELFORGE_CLAUDE=mock:<jsonl>`) stands in for the CLI in
+tests and the sweep. Docs: GUIDE_HUMANS *Claude on the bench* and *Midjourney through your browser* (the first-run
+procedure, what fails and what to do), GUIDE_AI *Claude on the bench* (the command, the system prompt contract, the
+summary JSON, how a session should behave when it is the Claude on the bench), `docs/track_notes/claude_bench.md`.
+
+**Verified.** 225 pytest green (`tests/test_claude_bridge.py` 25); `check_scripts.gd` 33/0; the sweep's
+`describe_characters` and `describe_music` walkthroughs at 0 errors (`docs/screens/forgeapp/describe_*.png`); one
+real `claude -p` stream read to confirm the event shapes. **Not exercised:** the Chrome step itself (no Chrome, no
+Midjourney here): built to the documented `--chrome` behaviour; the owner's PC needs Chrome open with the Claude in
+Chrome extension (1.0.36+) signed in, Claude Code signed in through `/login` (not an API key), midjourney.com signed
+in, and one `claude --chrome` session by hand first. Watch the first run (print mode pairing with the extension, the
+per-site permission, the time a grid takes).
+
+**How to resume.** `cd tools/pixelforge && PIXELFORGE_NO_UPDATE=1 python -m pytest -q`; `godot --headless --path
+tools/pixelforge/forge --script res://tools/check_scripts.gd`; `ONLY=describe GODOT=... PROJECT=... PY=python
+forge/tools/screens.sh OUT`. On the laptop: `pixelforge claude status`, then a line on the Music bench first (cheap,
+visible), then Characters, then **Paint it in Midjourney** with the browser in view.
+
+### 7.23 2026-10-05, track/facing-bug: the facing wheel ("multiple stacked models")
+
+**What.** The picture window never held more than one still (`scene.show_still` replaces; `tools/test_scene.gd`, 21 checks, proves it headless); what the owner saw was the `godmarrow` figure (195 px) standing cut off at the shoulders in the 140 px window, and a wheel whose turns got lost: `screen.run` dropped every request made while a render ran ("Still working"), so a quick turn through four facings drew only the first, the wheel's mouse drag and scroll committed a 0..1 value the facing read as degrees (always S), and a render that came back after a newer turn still landed. Fixed: `screen.request()` (a 0.2 s debounce, the request waits for the running job, the last one wins, a ticket marks older results stale) behind `refresh_preview` / the clip render on Characters, Creatures and Objects; the Knob commits `commit_value()` (a Wheel's angle) and steps commit once; the wheel keeps its angle across the rebuild and the selector stays on it; `scene.figure_scale()` stands a figure taller than the floor line at a half (caption "· at a half"), lights scaled with it. Reproduced and verified under xvfb with `--script` (four `set facing` in a row: one render, the last; keys: one facing per three presses); `check_scripts` 33/0, `test_editor` 106/0, `test_scene` 21/0, pytest 200; `characters_model.png` and `objects_model.png` re-shot.
+
+
+**7.29 (2026-10-05, PixelForge session): the game handed over.** Derek: "your job is just PixelForge." The combat-feel
+pass and the redesign document were started and stopped before commit; both briefs, Derek's decisions (Mana's souls-like
+melee, Diablo 2 and Path of Exile systems, Godmarrow's designs, nothing flashes, Diablo 2 is not a base), and how the
+merged Diablo 2 bridge works are in `docs/GAME_HANDOFF.md`. The lore rewrite's guide is `docs/codex/LORE_REWRITE_GUIDE.md`
+on `track/codex`. This session continues on PixelForge only.

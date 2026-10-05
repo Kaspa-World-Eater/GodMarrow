@@ -4,17 +4,13 @@ extends Node2D
 ## atmosphere's layer, over the dark (world/atmos.gd makes one and calls bind).
 ## - the fen's fireflies: a quarter of its motes, a dithered green-white glow that breathes (y_light21.js:387);
 ## - the underground's slow dust, pale specks drifting down (y_light21.js:388);
-## - pale shafts of light through cracks in the vaults, anchored to certain floor tiles, dithered, with motes falling
-##   through them and a cold pool where they land (y_light21.js:433-466, 154);
-## - torn mist puffs drifting across the ground (ztMist): the fen always, the moor more by night, a little in the vaults;
-## - the dawn's long low rays (zz_env.js:66-72; the dusk's rays are red and are left out by the user's rule, as are the
-##   orange night embers over the moor);
+## - a cold pool of light on certain vault floor tiles, under a crack, with motes falling into it (y_light21.js:154);
 ## - by day, a few bright motes hanging in the light (zz_env.js:74-79);
 ## - moonlit clearings (zz_zz_moon86.js:13-56): two or three in each outdoor place lie under a gap in the cloud; at night
 ##   motes fall slowly there, and standing in one your poise comes back half again as fast and your wounds close a
 ##   little (the web's pool of moonlight never reached its dark layer in v105, so there is none here either);
-## - light through the canopy (zz_zz_moon86.js:58-74): in the woods by day, long pale shafts slant down through the
-##   leaves, drifting as the crowns move, dust turning in them; gone at dusk.
+## Taken out 2026-10-05 (the user: the fog that pops up on the screen, the bars of light): the mist puffs, the shafts
+## drawn as bars over the vaults, the dawn rays and the canopy shafts. They were laid over the screen, not in the world.
 
 const Flame = preload("res://fx/flame.gd")
 const PX := 4.0
@@ -25,22 +21,17 @@ const FLOOR := 6
 var zone: Zone
 var hero
 var clearings: Array = []    # {tp, s, said}
-var woods := false
 const R_MOON := 2.3
 var dark
 var kind := "moor"           # moor | fen | deep (atmosKind)
 var outdoor := false
 var t := 0.0
 var motes: Array = []        # fireflies and dust (screen px, carried by the camera)
-var mist: Array = []         # {tp, k, s, a, t, life, z}
 var dmotes: Array = []       # day motes (screen px)
 var last_cam := Vector2.INF
 var pools: Array = []        # PointLights under the shafts (the dark layer opens a pool for each)
 var cracks: Array = []       # the floor tiles under a crack in the vault (found once per place)
-var add: Node2D              # what is laid on as light (shafts, rays, the fireflies' glow)
-static var _mist: Array = []
-static var _shaft: Texture2D
-static var _rays: Texture2D
+var add: Node2D              # what is laid on as light (the motes in the cracks' light, the fireflies' glow)
 
 func bind(z: Zone, d, h = null) -> void:
 	zone = z
@@ -50,13 +41,11 @@ func bind(z: Zone, d, h = null) -> void:
 	var th := str(z.d.get("theme", ""))
 	kind = "fen" if th == "fen" else ("moor" if th == "moor" or th == "" else "deep")
 	motes.clear()
-	mist.clear()
 	dmotes.clear()
 	last_cam = Vector2.INF
 	pools.clear()
 	cracks.clear()
 	var land := z.id + str(z.d.get("theme", ""))
-	woods = outdoor and RegEx.create_from_string("wood|root|tree|fern|hunter|gully|grove|forest").search(land) != null and not RegEx.create_from_string("fen|bog|drowned|mire|marsh").search(land) and not RegEx.create_from_string("burnt|ash_shore|heath").search(z.id)
 	_find_clearings()
 	if not outdoor and kind == "deep":
 		for y in int(z.h):
@@ -103,18 +92,6 @@ func _process(dt: float) -> void:
 			m["p"] += Vector2(sin(t * 0.4 + m["s"]) * 2.0, m["vy"]) * PX * dt
 		m["p"] -= dcam
 	motes = motes.filter(func(m): return m["t"] < m["life"] and Rect2(Vector2(-80, -80), vs + Vector2(160, 120)).has_point(m["p"]))
-	# the mist puffs, born round the view and wandering across it
-	var tl := Iso.to_tile(cam)
-	var n := 0 if Settings.fewer_fx else (16 if kind == "fen" else (11 if outdoor else 6))
-	while mist.size() < n:
-		mist.append({"tp": tl + Vector2(randf_range(-12, 12), randf_range(-12, 12)), "k": randi() % 3, "s": randf() * TAU, "a": 0.5 + randf() * 0.5, "t": 0.0, "life": 14.0 + randf() * 10.0, "z": 1.0 + randf() * 4.0})
-	for q in mist:
-		q["t"] += dt
-		q["tp"] += Vector2(0.12 + sin(t * 0.2 + q["s"]) * 0.06, -(0.05 + cos(t * 0.17 + q["s"]) * 0.05)) * dt
-		if q["t"] > q["life"] or (q["tp"] as Vector2).distance_to(tl) > 16.0:
-			q["tp"] = tl + Vector2(randf_range(-12, 12), randf_range(4, 12))
-			q["t"] = 0.0
-			q["life"] = 14.0 + randf() * 10.0
 	# day motes in the open
 	if outdoor and dk > 0.3:
 		while dmotes.size() < 14:
@@ -209,91 +186,6 @@ func _shaft_pools(xf: Transform2D, vs: Vector2) -> void:
 			l.position = Iso.to_screen(Vector2(s[0] + 0.5, s[1] + 0.5))
 			l.set_meta("dark_r", 24.0 * s[2])
 
-static func shaft_tex() -> Texture2D:
-	if _shaft:
-		return _shaft
-	var w := 64
-	var h := 150
-	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
-	for j in h:
-		var k := j / float(h)
-		var cx := 12.0 + (1.0 - k) * 36.0
-		var hw := 5.0 + k * 9.0 + (1.0 - k) * 4.0
-		for i in w:
-			var u := absf(i - cx) / hw
-			if u >= 1.0:
-				continue
-			var streak := 0.75 + 0.25 * sin(i * 0.9 + j * 0.25)
-			var v := (1.0 - u * u) * pow(k, 1.3) * streak * 3.0
-			var b := (float(Flame.BAY4[((j & 3) << 2) + (i & 3)]) + 0.5) / 16.0
-			var lv := mini(3, int(v) + (1 if (v - int(v) - 0.3) * 2.5 > b else 0))
-			if lv <= 0:
-				continue
-			img.set_pixel(i, j, Color8(150, 164, 196, lv * 34))
-	_shaft = ImageTexture.create_from_image(img)
-	return _shaft
-
-static func mist_tex(k: int) -> Texture2D:
-	if _mist.size() > k:
-		return _mist[k]
-	while _mist.size() <= k:
-		var i0 := _mist.size()
-		var w := 64 + i0 * 24
-		var h := 10 + i0 * 3
-		var seed := i0 * 17
-		var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
-		var vn := func(u: float, v: float) -> float:
-			var i := int(floor(u))
-			var j := int(floor(v))
-			var fu := u - i
-			var fv := v - j
-			var su := fu * fu * (3.0 - 2.0 * fu)
-			var sv := fv * fv * (3.0 - 2.0 * fv)
-			var a := Flame.hash2(i + seed, j)
-			var b2 := Flame.hash2(i + 1 + seed, j)
-			var c2 := Flame.hash2(i + seed, j + 1)
-			var d2 := Flame.hash2(i + 1 + seed, j + 1)
-			return (a + (b2 - a) * su) * (1.0 - sv) + (c2 + (d2 - c2) * su) * sv
-		for j in h:
-			for i in w:
-				var dx := (i - w / 2.0) / (w / 2.0)
-				var dy := (j - h / 2.0) / (h / 2.0)
-				var d := dx * dx + dy * dy
-				if d > 1.0:
-					continue
-				var n: float = vn.call(i / 9.0, j / 3.0) * 0.7 + vn.call(i / 3.5, j / 1.6 + 5.0) * 0.3
-				var v := ((1.0 - d) * 1.3 + n - 0.95) * 2.2
-				var b := (float(Flame.BAY4[((j & 3) << 2) + (i & 3)]) + 0.5) / 16.0
-				var lv := mini(2, int(v) + (1 if (v - int(v) - 0.3) * 2.5 > b else 0))
-				if lv <= 0:
-					continue
-				img.set_pixel(i, j, Color8(196, 206, 214, 150 if lv > 1 else 80))
-		_mist.append(ImageTexture.create_from_image(img))
-	return _mist[k]
-
-static func rays_tex() -> Texture2D:
-	if _rays:
-		return _rays
-	var w := 170
-	var h := 380
-	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
-	for j in h:
-		var k := j / float(h)
-		var cx := w - 26.0 - k * (w - 52.0)
-		var hw := 10.0 + k * 16.0
-		for i in w:
-			var u := absf(i - cx) / hw
-			if u >= 1.0:
-				continue
-			var v := (1.0 - u * u) * (0.35 + 0.65 * sin(k * PI)) * (0.8 + 0.2 * sin(i * 0.7 + j * 0.13)) * 3.0
-			var b := (float(Flame.BAY4[((j & 3) << 2) + (i & 3)]) + 0.5) / 16.0
-			var lv := mini(3, int(v) + (1 if (v - int(v) - 0.3) * 2.5 > b else 0))
-			if lv <= 0:
-				continue
-			img.set_pixel(i, j, Color8(236, 206, 140, lv * 30))
-	_rays = ImageTexture.create_from_image(img)
-	return _rays
-
 # ------------------------------------------------------------------ drawing
 func _draw() -> void:
 	if zone == null or not is_instance_valid(zone):
@@ -301,23 +193,6 @@ func _draw() -> void:
 	var vs := _vs()
 	var xf := _xf()
 	var dk := Game.day_k() if outdoor else 0.0
-	# the mist: only over open ground (not on walls, nor on water but in the fen)
-	var base := 0.2 if kind == "fen" else (0.08 + 0.12 * (1.0 - dk) if outdoor else 0.06)
-	for q in mist:
-		var tp: Vector2 = q["tp"]
-		var ty := zone.type_at(tp.floor())
-		if ty in TALL or (kind != "fen" and ty == WATER):
-			continue
-		var fade: float = minf(1.0, minf(q["t"] / 3.0, (q["life"] - q["t"]) / 3.0))
-		var img := mist_tex(q["k"])
-		var sz := img.get_size() * PX
-		var p: Vector2 = xf * (Iso.to_screen(tp) - Vector2(0, q["z"] * PX))
-		if not Rect2(Vector2(-320, -80), vs + Vector2(640, 160)).has_point(p):
-			continue
-		var col := Color(1, 1, 1, base * q["a"] * fade)
-		draw_texture_rect(img, Rect2(((p - sz / 2.0) / PX).round() * PX, sz), false, col)
-		if q["k"] == 2:
-			draw_texture_rect(img, Rect2(((p - sz / 2.0) / PX + Vector2(20.0 + sin(t * 0.3 + q["s"]) * 6.0, -2.0)).round() * PX, sz), false, col)
 	# fireflies and dust
 	for m in motes:
 		var fade := minf(1.0, minf(m["t"] / 0.6, (m["life"] - m["t"]) / 0.8))
@@ -344,29 +219,20 @@ func _draw() -> void:
 				var q := Vector2(roundf(p.x / PX + sin(t + i) * 2.0), roundf(p.y / PX - 40.0 * (1.0 - ph))) * PX
 				draw_rect(Rect2(q, Vector2(PX, PX)), Color(Color("#dde6f4"), 0.5 * sin(ph * PI) * nk))
 
-## what is laid on as light: the shafts, the dawn rays, the fireflies' glow
+## what is laid on as light: motes falling into the cracks' light, the fireflies' glow
 func _draw_add() -> void:
 	if zone == null or not is_instance_valid(zone):
 		return
 	var vs := _vs()
 	var xf := _xf()
 	var dk := Game.day_k() if outdoor else 0.0
-	# the vault shafts (laid on with screen: a light that brightens, never darkens)
+	# the cracks in the vaults: motes falling into the cold pool (the bar of light over them is gone)
 	for s in _shaft_tiles(xf, vs):
 		var p: Vector2 = xf * Iso.to_screen(Vector2(s[0] + 0.5, s[1] + 0.5))
-		var tex := shaft_tex()
-		add.draw_texture_rect(tex, Rect2(((p / PX).round() + Vector2(-12, -150 + 4)) * PX, Vector2(64, 150) * PX), false, Color(1, 1, 1, 0.6 * s[2]))
 		for i in 4:
 			var k := fmod(t * 0.08 + i * 0.27 + s[0] * 0.1, 1.0)
 			var mp := (p / PX).round() + Vector2(36.0 - k * 34.0 + sin(i * 5.0) * 4.0, -146.0 + k * 140.0)
 			add.draw_rect(Rect2(mp.round() * PX, Vector2(PX, PX)), Color(Color("#eef0ff"), 0.6 * sin(k * PI)))
-	# dawn: long low rays through the trees (the dusk's are red: left out)
-	if outdoor and Game.hour_name() == "dawn":
-		var k := sin((Game.phase() - 0.9) / 0.1 * PI)
-		var r := rays_tex()
-		for i in 3:
-			var x := roundf((480.0 * 0.12 + i * 480.0 * 0.3 + sin(t * 0.13 + i) * 18.0) - fmod(last_cam.x / PX * 0.3, 60.0))
-			add.draw_texture_rect(r, Rect2(Vector2(x, -10) * PX, r.get_size() * PX), false, Color(1, 1, 1, 0.5 * k * (0.7 + 0.3 * sin(t * 0.4 + i * 2.0))))
 	if kind == "fen":
 		for m in motes:
 			var fade := minf(1.0, minf(m["t"] / 0.6, (m["life"] - m["t"]) / 0.8))
@@ -374,25 +240,3 @@ func _draw_add() -> void:
 			var p: Vector2 = ((m["p"] as Vector2) / PX).round() * PX
 			var g := Flame.dither_glow(4, Color8(150, 255, 110))
 			add.draw_texture_rect(g, Rect2(p - Vector2(4, 4) * PX, g.get_size() * PX), false, Color(1, 1, 1, 0.5 * b * fade * (1.2 - dk * 0.6)))
-	# light through the canopy: long pale shafts slanting down, world-anchored and drifting, dust turning in them
-	if woods and dk >= 0.25 and not Settings.fewer_fx:
-		var a0 := 0.11 * minf(1.0, (dk - 0.25) / 0.4)
-		var span := 190.0
-		var camx := (xf.affine_inverse() * Vector2.ZERO).x / PX
-		var off := fmod(fmod(camx * 0.9, span) + span, span)
-		var VH := vs.y / PX
-		for i in range(-2, 5):
-			var x0 := i * span - off + 60.0 + sin(t * 0.13 + i) * 6.0
-			var w := 22.0 + float(posmod(posmod(i * 37, 3) + 3, 3)) * 12.0
-			var br := 0.7 + 0.3 * sin(t * 0.21 + i * 1.7)
-			var c0 := Color(244 / 255.0, 232 / 255.0, 200 / 255.0, a0 * br)
-			var c1 := Color(244 / 255.0, 232 / 255.0, 200 / 255.0, 0.0)
-			var pts := PackedVector2Array([Vector2(x0, -10), Vector2(x0 + w, -10), Vector2(x0 + w + 110, VH + 10), Vector2(x0 + 110, VH + 10)])
-			for k in pts.size():
-				pts[k] *= PX
-			add.draw_polygon(pts, PackedColorArray([c0, c0, c1, c1]))
-			for n in 6:
-				var u := fmod(t * 0.05 + n * 0.19 + i * 0.3, 1.0)
-				var px := x0 + w * 0.5 + u * 110.0 + sin(t * 0.7 + n) * 4.0
-				var py := -10.0 + u * (VH + 20.0)
-				add.draw_rect(Rect2(Vector2(roundf(px), roundf(py)) * PX, Vector2(PX, PX)), Color(Color("#f6ecd2"), 0.5 * sin(u * PI) * dk))

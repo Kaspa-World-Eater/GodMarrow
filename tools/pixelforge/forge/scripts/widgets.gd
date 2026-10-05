@@ -501,6 +501,9 @@ class Knob:
 		if commit and on_commit.is_valid():
 			on_commit.call(value)
 		queue_redraw()
+	## what on_commit is given (a Wheel gives its angle in degrees, not the 0..1 value)
+	func commit_value():
+		return value
 	func activate() -> void:
 		if app:
 			app.say_hint(hint if hint != "" else "up and down turn %s; B leaves it" % label)
@@ -545,9 +548,7 @@ class Knob:
 	func _gui_input(ev: InputEvent) -> void:
 		if ev is InputEventMouseButton:
 			if ev.pressed and ev.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-				step(1 if ev.button_index == MOUSE_BUTTON_WHEEL_UP else -1, "up" if ev.button_index == MOUSE_BUTTON_WHEEL_UP else "down")
-				if on_commit.is_valid():
-					on_commit.call(value)
+				step(1 if ev.button_index == MOUSE_BUTTON_WHEEL_UP else -1, "up" if ev.button_index == MOUSE_BUTTON_WHEEL_UP else "down")   # step commits
 				accept_event()
 				return
 			if ev.button_index == MOUSE_BUTTON_LEFT:
@@ -573,7 +574,7 @@ class Knob:
 						app.focus_on(rack, rack.controls.find(self), false)
 				else:
 					if dragging and changed and on_commit.is_valid():
-						on_commit.call(value)
+						on_commit.call(commit_value())
 					dragging = false
 		elif ev is InputEventMouseMotion and dragging:
 			_drag(ev.position)
@@ -607,6 +608,8 @@ class Wheel:
 		return PX.wheel(angle, 22, hot)
 	func value_text() -> String:
 		return String(fmt.call(angle)) if fmt.is_valid() else "%d" % int(round(angle))
+	func commit_value():
+		return angle
 	func set_angle(a: float, commit: bool = true) -> void:
 		var na := a
 		if wrap:

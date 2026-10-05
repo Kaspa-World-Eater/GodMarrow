@@ -1,9 +1,10 @@
 extends Node
-## scripts/audio.gd: the Forge's sound graph. Two music players crossfade between the family's three loops
-## (forge_home, forge_working, forge_done: assets/audio, rendered by `pixelforge music forge`); a small pool plays
-## the interface sounds (`pixelforge music blips`): a square-wave cursor blip (higher for right and down, lower for
-## left and up), a two-note confirm, a scrape for a lever, a ratchet for a wheel, a clunk for a chain pull, a thud
-## for back. Volumes come from Settings; everything is silent with --nosound or the mute switch.
+## scripts/audio.gd: the Forge's sound graph. Two music players crossfade between the family's loops (forge_home,
+## forge_working: assets/audio, rendered by `pixelforge music forge`; forge_done is kept for the music bench and never
+## plays on a finished step); a small pool plays the interface sounds (`pixelforge music blips`). The sounds level
+## (Settings: off / quiet / full, quiet by default) decides which: quiet keeps the cursor blip, the select click and
+## the back thud only; full adds the lever scrape, the wheel ratchet, the chain clunk and the drop. Nothing plays
+## when a render or a step finishes, at any level. Everything is silent with --nosound.
 
 const LOOPS := {"home": "forge_home", "working": "forge_working", "done": "forge_done"}
 const BLIPS := ["cursor_hi", "cursor_lo", "confirm", "back", "scrape", "ratchet", "clunk", "done", "fail", "drop", "tab"]
@@ -11,6 +12,7 @@ const GAIN := {"cursor_hi": -14.0, "cursor_lo": -14.0, "confirm": -10.0, "back":
 	"done": -12.0, "fail": -10.0, "drop": -8.0, "tab": -14.0}
 
 var sounds_on := true
+var level := "quiet"           # off | quiet | full
 var music_on := true
 var sound_volume := 0.8        # 0..1
 var music_volume := 0.6        # 0..1
@@ -62,8 +64,19 @@ func loaded() -> Dictionary:
 	return {"missing": missing, "streams": streams.size()}
 
 # ------------------------------------------------------------------ interface sounds
+const QUIET := ["cursor_hi", "cursor_lo", "confirm", "back"]
+const NEVER := ["done", "fail"]
+
+func set_level(l: String) -> void:
+	level = l if l in ["off", "quiet", "full"] else "quiet"
+	sounds_on = level != "off"
+
 func blip(name: String, pitch: float = 1.0) -> void:
-	if not sounds_on or sound_volume <= 0.0:
+	if not sounds_on or sound_volume <= 0.0 or level == "off" or name in NEVER:
+		return
+	if name == "tab":
+		name = "cursor_lo"
+	if level == "quiet" and not name in QUIET:
 		return
 	var now := Time.get_ticks_msec() / 1000.0
 	if now - float(last.get(name, -9.0)) < 0.03:
@@ -75,7 +88,7 @@ func blip(name: String, pitch: float = 1.0) -> void:
 	for p in pool:
 		if not p.playing:
 			p.stream = s
-			p.volume_db = float(GAIN.get(name, -12.0)) + linear_to_db(maxf(sound_volume, 0.01))
+			p.volume_db = float(GAIN.get(name, -12.0)) + linear_to_db(maxf(sound_volume, 0.01)) + (-6.0 if level == "quiet" else 0.0)
 			p.pitch_scale = pitch
 			p.play()
 			return
@@ -86,6 +99,8 @@ func cursor(dir: String) -> void:
 
 # ------------------------------------------------------------------ music
 func set_state(s: String) -> void:
+	if s == "done":
+		s = "home"   # a finished step is quiet: the home loop simply carries on
 	if s == state:
 		return
 	state = s

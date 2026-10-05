@@ -6,7 +6,6 @@ var zone: Zone
 var hero: Hero
 var cam: Camera2D
 var eye: CamDirector
-var fore: Foreground
 var sky: Weather
 var sound: Soundscape
 var far: FarPilgrims
@@ -76,8 +75,6 @@ func _ready() -> void:
 	add_child(far)
 	Bus.monster_killed.connect(func(_m): Sfx.play("fall"))
 	sky.snd = sound
-	fore = Foreground.new()
-	add_child(fore)
 	cam = Camera2D.new()
 	cam.position_smoothing_enabled = true
 	cam.position_smoothing_speed = 8.0
@@ -163,8 +160,6 @@ func enter(zid: String, from: String) -> void:
 	Sfx.set_room(not zone.d.get("outdoor", false))
 	if OS.has_environment("GM_FARNOW"):
 		far.wait = 0.5
-	if not OS.has_environment("GM_NOFORE"):
-		fore.bind(zone, hero, dark)
 	if hud and hud.has_method("bind"):
 		hud.bind(hero, zone)
 		# a new pilgrim opens on the skill page to spend the first point

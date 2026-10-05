@@ -50,8 +50,12 @@ and dimmed choices use the bone-grey FRAME tone instead of DIM for contrast.
 
 ## Short, and what is stubbed
 
-- Part ids: the engine does not write `frame_NNN.parts.png` yet, so carry and anchors match by position; the reader
-  is in place (`document.parts_of`, `Doc.part_at`) and switches on when the render writes them.
+- Part ids: the shape road writes `frame_NNN.parts.png` with every frame (track/partids; a paletted PNG, palette entry
+  i = grey i, index 0 transparent, so `Doc.part_at`'s `r8` is the part and alpha 0 is empty); the reader
+  (`document.parts_of`, `Doc.part_at`) needed no change and carry reports `"by": "part"` on a rendered set (checked
+  headless: a 3 px stroke on the Keeper's hat carried to 4 frames, 12 px). Frames rendered before that, or with
+  `--no-parts`, still carry by position. The part table is in the set's `manifest.json` under `"parts"`; the editor
+  does not read it yet (a name for the `pixel` command's part id would come from there).
 - Baking anchors writes the list (`<name>.anchors.json`, `effects` in the export JSON); nothing draws them in the game.
 - Layers blend "normal" only, with opacity; no blend modes.
 - The lever labels are the app's SMALL size (12 px in the 640x360 canvas, 24 px on screen): about 10% smaller than the

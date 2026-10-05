@@ -1,6 +1,6 @@
 """The Forge app's interface sounds, in the family's voice (docs/track_notes/gui_look.md, "Motion and sound
 discipline"): a square-wave cursor blip (higher for right and down, lower for left and up), a two-note confirm (a
-short low note, then its fifth, both plain bells: never a sweep, never a laser), an iron scrape for a lever, a ratchet
+single short bell click: never a sweep, never a laser), an iron scrape for a lever, a ratchet
 tick for a wheel, a chain's clunk, a low thud for back, a soft bell for a finished job, a dull knock for a stopped
 one, and a drop. Mono float32 at 44.1 kHz."""
 
@@ -54,9 +54,7 @@ def _pad_to(x: np.ndarray, n: int) -> np.ndarray:
 
 def forge_blips() -> dict[str, np.ndarray]:
     rng = np.random.default_rng(3)
-    confirm_lo = _notes([(523.25, 0.07)], "bell", vol=0.5, decay=0.05)                       # C5
-    confirm_hi = _notes([(783.99, 0.16)], "bell", vol=0.45, decay=0.12)                      # G5, a fifth up
-    confirm = np.concatenate([confirm_lo, np.zeros(int(0.015 * RATE), np.float32), confirm_hi])
+    confirm = _notes([(659.26, 0.055)], "bell", vol=0.45, decay=0.035)                      # one short click of a bell, E5
     blips = {
         "cursor_hi": _notes([(880.0, 0.045), (1320.0, 0.04)], vol=0.35, decay=0.03),
         "cursor_lo": _notes([(660.0, 0.045), (990.0, 0.04)], vol=0.35, decay=0.03),

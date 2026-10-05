@@ -4520,7 +4520,8 @@
   "echo_tone": 0.5,
   "reverb": 0.35,
   "reverb_size": 1.6,
-  "master": 1.0
+  "master": 1.0,
+  "snes": 0.7
  },
  "motif": [
   {
@@ -4572,5 +4573,6 @@
    "l": 8.0
   }
  ],
+ "theme": "general",
  "words": "harp and strings; the place you rest"
 }

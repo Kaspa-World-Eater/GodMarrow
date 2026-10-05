@@ -52,15 +52,22 @@ func _model_loaded() -> void:
 	rebuild()
 	refresh_preview()
 
-## the object's standing picture: the file's own frame (its animation rules) facing the chosen direction
+## the object's standing picture: the file's own frame (its animation rules) facing the chosen direction. A request
+## (see characters.gd refresh_preview): quick turns draw the last facing once, and a stale render is ignored.
 func refresh_preview() -> void:
 	if not has_model():
+		return
+	request(_render_still)
+
+func _render_still() -> void:
+	if not has_model() or not is_inside_tree():
 		return
 	var d := String(state["direction"])
 	var fr := int(state.get("frame", 0))
 	var out := previews_dir().path_join("still_%s_%d.png" % [d, fr])
+	var t_ := ticket()
 	run(["shapes", "still", model_path(), "-o", out, "--direction", d, "--frame", str(fr), "--style", app.style_name, "--zoom", "1"], "drawing the object", func(r: Dictionary):
-		if not r.get("ok", false):
+		if not r.get("ok", false) or not fresh(t_) or d != String(state["direction"]) or fr != int(state.get("frame", 0)):
 			return
 		var t := tex(String(r.get("png", out)))
 		if t == null:
@@ -170,6 +177,20 @@ func _build_export() -> void:
 		{"label": "See it in the game", "cb": _see_in_game},
 		{"label": "Take it out", "cb": _take_out},
 	], false))
+
+## the Reference tab's painting choices for an object: a turnaround (three views) or a prop sheet of nine
+func midjourney_label() -> String:
+	return "Fetch a turnaround"
+
+func midjourney_kind() -> String:
+	return String(state.get("prompt_kind", "turnaround")) if state.get("prompts", {}).has(String(state.get("prompt_kind", ""))) else "turnaround"
+
+func _build_reference() -> void:
+	super()
+	if choices and is_instance_valid(choices):
+		var items: Array = choices.items.duplicate()
+		items.insert(2, {"label": "Fetch a prop sheet of nine", "cb": func(): _paint_in_midjourney("props9")})
+		choices.setup(items, 1, app)
 
 func _toggle_dirs() -> void:
 	state["dirs"] = "all" if String(state.get("dirs", "S")) == "S" else "S"
