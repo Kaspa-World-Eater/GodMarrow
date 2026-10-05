@@ -57,6 +57,8 @@ var rise_t := 0.5             # until the next one may claw up
 var colossus = null           # the Ossuary Colossus (skills/ossumancer/colossus.gd), or null
 var host := {}                # the Bone Host on him: {n, pool}
 # spells in flight
+var spear_hits: Array = []   # {at (tile), dir (screen), t}: where a Bone Spear pierced something, for its burst (fx.gd)
+var spear_casts: Array = []  # {at (tile), t}: a spear just thrown, for the flash at the hand
 var spears: Array = []        # {tp, v, t, dmg, hit: {}, splint, main, small}
 var words: Array = []         # small words over the world: {tp, s, t, col}
 var cages: Array = []         # Charnel Cages: {tp, R, t, max, dps, tick, drain}

@@ -21,7 +21,8 @@ CHAR = os.environ.get('KEEPER_CHAR', r'C:/Users/derek/PixelForge Projects/godmar
 SHAPES = os.path.join(ROOT, 'tools', 'pixelforge', 'assets', 'shapes', 'characters', 'keeper_hd.shapes.json')
 ID, MAT = parts_of(SHAPES)
 BY = lambda *mats: [i for i, m in MAT.items() if m in mats]
-VEIL, ROBE, ROPE, PLATE, CLAY, PAPER, STRAW = BY('veil'), BY('robe'), BY('rope'), BY('plate'), BY('clay'), BY('paper'), BY('straw')
+VEIL, ROBE, ROPE, PLATE, CLAY, PAPER, STRAW = BY('veil'), BY('cloth'), BY('rope'), BY('lacquer'), BY('gourd'), BY('paper'), BY('straw')
+WRAP = BY('wrap')
 LILAC = np.array([150.0, 120.0, 160.0])
 STAIN = np.array([70.0, 28.0, 96.0])
 CHIP = np.array([128.0, 112.0, 136.0])
@@ -122,14 +123,32 @@ def straw(f):
             f.mul(m & ((f.xx * 2 + f.yy) % 5 == 2), 0.8)
 
 
+def lacquer(f):
+    """black lacquer: a hard cool glint along the lit upper edges of each piece, and the lames' seams kept dark"""
+    for i in PLATE:
+        m = f.mask([i])
+        if m.sum() < 6:
+            continue
+        up, left, down, right = edges(m)
+        f.set((up | left) & (hashp(f.xx, f.yy, i) < 0.5), (120, 118, 140), 0.35)
+        f.mul(down | right, 0.65)
+
+
+def wraps(f):
+    for i in WRAP:
+        m = f.mask([i])
+        if m.any():
+            f.mul(m & ((f.yy * 2 + f.xx) % 4 == 0), 0.7)       # the slanting turns of the binding
+
+
 def paint(rgba, parts, view):
     f = Frame(rgba, parts, view)
-    hanging(f, ROBE, 9, 1.18, 0.6, sheen=LILAC, w=0.12)
+    lacquer(f)
+    wraps(f)
     veil(f)
     hem(f, ROBE, STAIN, 6, 0.45)
     hem(f, VEIL, (20, 14, 24), 3, 0.5)
     rope(f)
-    plates(f)
     jars(f)
     paper(f)
     straw(f)

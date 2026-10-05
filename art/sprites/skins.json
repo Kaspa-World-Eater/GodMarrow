@@ -1,7 +1,7 @@
 {
  "_about": "which sprite set stands in for a kind; the PixelForge hero builds replace the old painter sets here",
  "animancer": "mystic_hd",
- "miasmancer": "keeper",
+ "miasmancer": "keeper_hd",
  "hemomancer": "hemomancer",
  "mystic_hd": "mystic_hd",
  "npc_vendor": "npc_vendor",
@@ -9,5 +9,6 @@
  "npc_smith": "npc_smith",
  "npc_stranger": "npc_stranger",
  "ossuarch_hd": "ossuarch_hd",
- "ossumancer": "ossuarch_hd"
+ "ossumancer": "ossuarch_hd",
+ "keeper_hd": "keeper_hd"
 }

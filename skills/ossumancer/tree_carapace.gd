@@ -144,6 +144,7 @@ func _throw_lance(a: Vector2, tier: int) -> void:
 	spears.append({"tp": o + dir * 0.3, "v": dir * (13.0 + tier), "t": 0.75 + 0.12 * tier, "dmg": spear_dmg() * LANCE_K[tier], "hit": {},
 		"splint": K("splinter") > 0 or tier >= 2, "main": true, "small": false, "pierce": 0, "tier": tier, "R": 0.2 + 0.08 * tier, "opt": echo_opt()})
 	Sfx.play("cast_mirror", 0.6 + 0.1 * tier, 0.75 - 0.08 * tier)
+	spear_casts.append({"at": o + dir * 0.3, "t": 0.0, "tier": tier})
 	if tier >= 2:
 		Game.shake(1.0 + tier)
 
@@ -210,6 +211,8 @@ func tick_spears(dt: float) -> void:
 				opt["from"] = s["tp"] - s["v"].normalized()
 				hurt(m, s["dmg"], s.get("id", "spear"), opt)
 				dust(m.tp, 3)
+				if s["main"]:
+					spear_hits.append({"at": m.tp, "v": s["v"], "t": 0.0, "tier": int(s.get("tier", 0))})
 				var tier: int = int(s.get("tier", 0))
 				if s["main"] and (K("impale") > 0 or tier >= 3) and m.rank != "boss":
 					m.stun = maxf(m.stun, 0.6 + 0.2 * tier)

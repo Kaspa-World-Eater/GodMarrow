@@ -186,6 +186,12 @@ const STREAK := Color(0.78, 0.88, 1.0)
 func _spear_trail(dt: float) -> void:
 	if floor_mode or book == null:
 		return
+	for h in book.spear_hits:
+		h["t"] += dt
+	book.spear_hits = book.spear_hits.filter(func(h): return h["t"] < 0.3)
+	for c in book.spear_casts:
+		c["t"] += dt
+	book.spear_casts = book.spear_casts.filter(func(c): return c["t"] < 0.22)
 	for r in rings:
 		r["t"] += dt
 	rings = rings.filter(func(r): return r["t"] < 0.28)
@@ -220,6 +226,33 @@ func _draw_spears() -> void:
 			var aa := a_i / 20.0 * TAU
 			pts.append(r["c"] + n * cos(aa) * rad + u * sin(aa) * rad * 0.32)
 		spear_cv.draw_polyline(pts, Color(STREAK, 0.85 * (1.0 - q) * (1.0 - q)), 2.6 - 1.2 * q)
+	# the flash at his hand as a spear leaves it: a pale ring opening and a few slivers of bone flung forward
+	for cst in book.spear_casts:
+		var q: float = cst["t"] / 0.22
+		var cc := S(cst["at"], 8.0)
+		var rr := 6.0 + 20.0 * q
+		var ring := PackedVector2Array()
+		for a_i in 19:
+			var aa := a_i / 18.0 * TAU
+			ring.append(cc + Vector2(cos(aa) * rr, sin(aa) * rr * 0.5))
+		spear_cv.draw_polyline(ring, Color(STREAK, 0.8 * (1.0 - q)), 2.0)
+		spear_cv.draw_circle(cc, 5.0 * (1.0 - q), Color(1, 1, 1, 0.5 * (1.0 - q)))
+	# where a spear pierces: a burst of bone splinters flung on along its path and out to the sides, and a pale ring
+	for h in book.spear_hits:
+		var q2: float = h["t"] / 0.3
+		var hc := S(h["at"], 10.0)
+		var u3: Vector2 = Iso.to_screen(h["v"].normalized()).normalized()
+		var r2 := 4.0 + 16.0 * q2
+		var ring2 := PackedVector2Array()
+		for a_i in 19:
+			var aa2 := a_i / 18.0 * TAU
+			ring2.append(hc + Vector2(cos(aa2) * r2, sin(aa2) * r2 * 0.5))
+		spear_cv.draw_polyline(ring2, Color(STREAK, 0.7 * (1.0 - q2)), 1.5)
+		for k in 7:
+			var ang := u3.angle() + (k - 3) * 0.42 + sin(k * 12.9898) * 0.15
+			var d := Vector2(cos(ang), sin(ang) * 0.6)
+			var a2 := hc + d * (6.0 + 26.0 * q2 * (0.7 + 0.1 * k))
+			spear_cv.draw_line(a2, a2 + d * (5.0 - 3.0 * q2), Color(0.93, 0.95, 0.97, 1.0 - q2), 2.0)
 	for sp in book.spears:
 		if sp["small"]:
 			continue
