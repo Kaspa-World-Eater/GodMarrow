@@ -52,6 +52,9 @@ class Style:
     creases: bool = False             # one step darker where a nearer piece overlaps this one
     ink: bool = False                 # the near side of a deep overlap inked with the outline colour
     rim: bool = False                 # a one-step lit rim along the silhouette's light side
+    shadow: bool = False              # pieces cast short shadows along the key light (the sculpt kit's light)
+    bounce: bool = False              # a little light from below on the faces that turn down
+    mat_outline: bool = False         # each material outlined in its own dark colour, broken where the key light strikes
     # --- effects
     fx_bands: int = 6                 # colour bands of a procedural effect
     fx_glow: str = "auto"             # auto | on | off: the soft halo under fire, wisps and magic
@@ -115,7 +118,7 @@ STYLES: dict[str, Style] = {
         "with glow only on magic, lanterns and wisps.",
         figure_height=195, pixel_step=1, colors=0, palette_lock=True, dither="none", shading_bands=0,
         saturation=1.0, contrast=1.0, outline="auto", edge="crisp",
-        form_light=True, creases=True, ink=True, rim=True,
+        form_light=True, creases=True, ink=True, rim=True, shadow=True, bounce=True, mat_outline=True,
         fx_bands=6, fx_glow="auto", fx_haze=False, fx_frames=8, fx_fps=10.0,
         anim_frames=8, anim_fps=8.0, clip_frames=24, tile_width=72, tile_height=36, tile_hr=2,
     ),
@@ -336,7 +339,7 @@ def describe_style(style: str | Style) -> str:
         f"  effects {st.fx_bands} bands, glow {st.fx_glow}, haze {'on' if st.fx_haze else 'off'}, "
         f"{st.fx_frames} frames @ {st.fx_fps:g} fps",
         f"  loops {st.anim_frames} frames @ {st.anim_fps:g} fps, game clips up to {st.clip_frames} frames",
-        "  shape models: " + (", ".join(k.replace("_", " ") for k in ("form_light", "creases", "ink", "rim") if getattr(st, k)) or "the plain render"),
+        "  shape models: " + (", ".join(k.replace("_", " ") for k in ("form_light", "creases", "ink", "rim", "shadow", "bounce", "mat_outline") if getattr(st, k)) or "the plain render"),
         f"  ground tile {st.tile_width}x{st.tile_height} texels at {st.tile_hr} per world px",
     ]
     return "\n".join(rows)

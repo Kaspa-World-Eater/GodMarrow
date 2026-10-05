@@ -1074,7 +1074,7 @@ def build_character(project: Project, name: str, shapes: str | Path | None = Non
     steps = [
         {"step": "import-shapes", "what": f"validate and copy {src} into the project" if src else "no shape file: give one (shapes=...) or import one first"},
         {"step": "render-shapes", "what": f"{len(clips)} clips ({', '.join(f'{k} {v}' for k, v in BUILD_CLIPS.items())} frames) x 8 views at {st.figure_height} px "
-                                         f"with the detail layer and the look of {st.name} (" + ", ".join(k for k in ("form_light", "creases", "ink", "rim") if getattr(st, k)) + ")"},
+                                         f"with the detail layer and the look of {st.name} (" + ", ".join(k for k in ("form_light", "creases", "ink", "rim", "shadow", "bounce", "mat_outline") if getattr(st, k)) + ")"},
         {"step": "export-game", "what": f"the atlas and JSON into {out_dir}" + (" and the skins.json entry" if game_dir else " (no game found: no skins.json)")},
         {"step": "height-check", "what": f"a hero must stand {GAME_FIGURE_HEIGHTS['hero']} px"},
     ]

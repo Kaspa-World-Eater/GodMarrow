@@ -237,7 +237,10 @@ def test_each_look_key_changes_the_render_within_the_ramps(keeper):
         fr = m.render(0, 0.0, 12.0, outline=S.hexrgb(keeper["outline"])).rgba
         assert (fr != base).any(-1).sum() > 20, k
         assert not (_colours(fr) - _ramp_set(keeper, m)), k
-        assert np.array_equal(fr[..., 3] > 0, base[..., 3] > 0), k       # the light never adds pixels (no glow, no trail)
+        # the light never adds pixels (no glow, no trail); the material outline may leave a gap where the key light strikes
+        assert not ((fr[..., 3] > 0) & ~(base[..., 3] > 0)).any(), k
+        if k != "mat_outline":
+            assert np.array_equal(fr[..., 3] > 0, base[..., 3] > 0), k
 
 
 def test_no_red_light_the_rim_is_a_ramp_step(keeper):
@@ -345,7 +348,7 @@ def test_project_build_dry_run_and_the_whole_road(tmp_path, capsys):
     assert r["ok"] and set(r["paths"]) >= {"shapes", "frames", "manifest", "sheet", "json", "skins"}
     assert (game / "art" / "sprites" / "small.png").exists() and json.loads((game / "art" / "sprites" / "skins.json").read_text())["small"] == "small"
     meta = json.loads((game / "art" / "sprites" / "small.json").read_text())["meta"]
-    assert set(meta["anims"]) == {"idle", "walk", "atk", "atk2", "cast", "hit", "death", "dodge"}
+    assert set(meta["anims"]) == {"idle", "walk", "atk", "atk2", "cast", "hit", "death", "dodge", "wind"}   # wind: the attack's first half
     assert meta["anims"]["hit"]["frames"] == 6 and meta["anims"]["walk"]["frames"] == 8 and len(meta["anims"]["walk"]["views"]) == 8
     assert not r["height"]["ok"] and any("195 px" in w for w in r["warnings"]) and any("no detail layer" in w for w in r["warnings"])
     assert all(isinstance(line, str) for line in r["lines"]) and json.dumps(r)

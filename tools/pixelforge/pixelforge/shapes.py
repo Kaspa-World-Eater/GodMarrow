@@ -59,7 +59,12 @@ DEFAULT_OUTLINE = "#08060a"
 DETAIL_MAX = 3                 # a detail texel moves the ramp step by at most this much either way
 DETAIL_SEED = -4               # the texel value that seeds a blood run (and reads as the darkest step)
 DETAIL_CLASSES = ("none", "face", "skin", "cloth", "wood", "bandage", "metal", "hair")
-LOOK_KEYS = ("form_light", "creases", "ink", "rim")
+LOOK_KEYS = ("form_light", "creases", "ink", "rim", "shadow", "bounce", "mat_outline")
+# the browser sculpt kit's light (web/triune_desktop/src/zs_monB.js, the Tithe-Hand's standard), on top of the four above:
+#   shadow       pieces cast short shadows along the key light onto the pieces behind them (screen-space, a step darker)
+#   bounce       a little light from below on the faces that turn down
+#   mat_outline  each material outlines itself in its own darkest colour (or its "outline"), and the outline breaks
+#                where the key light strikes the silhouette
 
 
 # ---------------------------------------------------------------------------------------------- colours and ramps
@@ -197,6 +202,8 @@ class Canvas:
         self.depth = np.full((self.H, self.W), -1e9, float)
         self.normal = np.zeros((self.H, self.W, 3), float)
         self.normal[..., 2] = 1.0
+        self.mat = np.full((self.H, self.W), -1, np.int32)     # the material of each painted pixel (mat_outline)
+        self.lit = np.zeros((self.H, self.W), float)           # its key-light term (mat_outline breaks where it is high)
         self.glow: list[tuple[int, int, np.ndarray]] = []
         yy, xx = np.mgrid[0:self.H, 0:self.W]
         self.bayer = BAYER[yy & 3, xx & 3]
@@ -211,6 +218,31 @@ class Canvas:
         self.col[edge] = colour
         self.fill[edge] = 2
         return int(edge.sum())
+
+    def outline_mat(self, colours: np.ndarray, break_at: float = 0.82) -> int:
+        """The sculpt kit's outline: each empty pixel beside the figure takes the outline colour of the material it
+        borders (``colours[mat]``), preferring the piece below or to the right of it; where that piece faces the key
+        light hard on the light side (upper left), the line breaks and the pixel stays empty."""
+        body = (self.fill == 1) | (self.fill == 3)
+        empty = self.fill == 0
+        H, W = self.H, self.W
+        mat_n = np.full((H, W), -1, np.int32); lit_n = np.zeros((H, W)); light_side = np.zeros((H, W), bool)
+        # neighbours in order of preference: right, below (the edge is on the light side), then left, above
+        for dy, dx, ls in ((0, 1, True), (1, 0, True), (0, -1, False), (-1, 0, False)):
+            src_y = slice(max(dy, 0), H + min(dy, 0)); dst_y = slice(max(-dy, 0), H - max(dy, 0))
+            src_x = slice(max(dx, 0), W + min(dx, 0)); dst_x = slice(max(-dx, 0), W - max(dx, 0))
+            nb_body = np.zeros((H, W), bool); nb_body[dst_y, dst_x] = body[src_y, src_x]
+            take = nb_body & (mat_n < 0)
+            nm = np.full((H, W), -1, np.int32); nm[dst_y, dst_x] = self.mat[src_y, src_x]
+            nl = np.zeros((H, W)); nl[dst_y, dst_x] = self.lit[src_y, src_x]
+            mat_n = np.where(take, nm, mat_n); lit_n = np.where(take, nl, lit_n)
+            light_side = np.where(take, ls, light_side)
+        edge = empty & (mat_n >= 0)
+        broken = edge & light_side & (lit_n > break_at)
+        draw = edge & ~broken
+        self.col[draw] = colours[mat_n[draw]]
+        self.fill[draw] = 2
+        return int(draw.sum())
 
     def emit(self, x: float, y: float, colour: np.ndarray, size: int | None = None) -> None:
         """An emissive pixel (a block of ``size`` at scale > 1), stamped last, on top of everything."""
@@ -921,6 +953,13 @@ class Model:
         self.spec = np.zeros(len(self.M), bool); self.emissive = np.zeros(len(self.M), bool)
         for i, m in enumerate(self.M.values()):
             self.table[i, :m.steps] = m.ramp; self.lengths[i] = m.steps; self.spec[i] = m.spec; self.emissive[i] = m.emissive
+        # each material's outline (mat_outline): its file "outline", else its own darkest step (the sculpt kit's coloured
+        # line instead of one flat black, and never a colour the file does not have)
+        self.mat_outline = np.zeros((len(self.M), 3))
+        doc_mats = doc.get("materials", {}) if isinstance(doc.get("materials"), dict) else {}
+        for i, (name, m) in enumerate(self.M.items()):
+            o = doc_mats.get(name, {}).get("outline") if isinstance(doc_mats.get(name), dict) else None
+            self.mat_outline[i] = hexrgb(o) if o else np.asarray(m.ramp[0], float)
         self.part_table, self.part_lut = part_table(doc)
         self.detail = detail if detail is not None else load_detail(doc)
         self._detail_cache: tuple[np.ndarray, np.ndarray] | None = None
@@ -1170,6 +1209,9 @@ class Model:
         amb = np.where(spec, 0.2, 0.16)
         diff = np.clip(nnx * LIGHT[0] + nny * LIGHT[1] + nnz * LIGHT[2], 0, None)
         val = amb + (1 - amb) * diff + sh.lift[v]
+        if self.look["bounce"]:                           # light thrown back up from the ground onto the faces that turn down
+            val = val + 0.11 * np.clip(nny, 0, 1)
+        cv.mat[ys, xs] = mat; cv.lit[ys, xs] = diff
         idx_spec = np.where(diff > sh.spec_t[v], n - 1, np.clip(np.floor(val * (n - 1)), 0, n - 2))
         idx_mat = np.clip(np.floor(val * n), 0, n - 1)
         idx = np.where(spec, idx_spec, idx_mat).astype(int)
@@ -1206,6 +1248,17 @@ class Model:
                 return (vid[y2, x2] >= 0) & (zb[y2, x2] > zb[ys, xs] + 0.5 * s) & (pidf[y2, x2] != pidf[ys, xs])
             crease = (nearer(0, 1) | nearer(1, 0) | nearer(0, -1) | nearer(-1, 0)) & ~(near_edge | near_edge2)
             idx = np.where(crease, np.maximum(idx - 1, 0), idx)
+        if look["shadow"]:                                # cast shadow: march toward the key light; a nearer piece in the way shades this pixel
+            shad = np.zeros(len(ys), bool)
+            z0 = zb[ys, xs]
+            for t in range(2, int(round(7 * s)) + 1):
+                y2 = np.round(ys + LIGHT[1] * t).astype(int); x2 = np.round(xs + LIGHT[0] * t).astype(int)
+                inside = (y2 >= 0) & (y2 < H) & (x2 >= 0) & (x2 < W)
+                y2 = np.clip(y2, 0, H - 1); x2 = np.clip(x2, 0, W - 1)
+                hit = inside & (vid[y2, x2] >= 0) & (pidf[y2, x2] != pidf[ys, xs]) & (zb[y2, x2] > z0 + LIGHT[2] * t + 0.8 * s)
+                shad |= hit
+            shad &= (diff > 0.12) & ~(near_edge | near_edge2)
+            idx = np.where(shad, np.maximum(idx - 1, 0), idx)
         colour = self.table[mat, idx]
         if look["ink"]:                                   # the near side of a deep overlap, inked with the outline colour
             ink = outline if outline is not None else None
@@ -1245,7 +1298,10 @@ class Model:
         if dseed is not None and dseed[v].any():
             self._runs(cv, ys, xs, v, vid, dseed, frame)
         if outline is not None:
-            cv.outline(outline)
+            if self.look["mat_outline"]:
+                cv.outline_mat(self.mat_outline)
+            else:
+                cv.outline(outline)
         # projected anchors for lights, effects and the shadow (a 3D "at" of an effect projects the same way)
         proj = {}
         for name, pt in (anchors or {}).items():
