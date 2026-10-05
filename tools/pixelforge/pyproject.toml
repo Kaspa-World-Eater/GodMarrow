@@ -25,7 +25,7 @@ train = [
 pixelforge = "pixelforge.cli:main"
 
 [tool.setuptools]
-packages = ["pixelforge", "pixelforge.music", "pixelforge.blender"]
+packages = ["pixelforge", "pixelforge.music", "pixelforge.blender", "pixelforge.tools"]
 
 [tool.setuptools.package-data]
 pixelforge = ["music/library/*.json"]

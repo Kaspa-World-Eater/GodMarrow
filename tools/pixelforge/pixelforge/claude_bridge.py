@@ -639,7 +639,7 @@ def run(bench: str, project: str | Path, text: str, ctx: dict | None = None, on_
     text_out = result_text(result_ev) if result_ev else ""
     summary = parse_summary(text_out) if text_out else None
     out: dict = {"bench": bench, "text": text, "log": str(log_path), "progress": progress, "seconds": seconds, "detected": detected,
-                 "cost_usd": (result_ev or {}).get("total_cost_usd", 0.0), "exe": exe}
+                 "cost_usd": (result_ev or {}).get("total_cost_usd", 0.0), "exe": exe, "result_text": text_out}
     if manifest:
         out["snapshot"] = manifest["manifest"]
     if error is None and result_ev is None:
