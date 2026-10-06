@@ -75,7 +75,9 @@ func _process(dt: float) -> void:
 	var ixf := get_viewport().get_canvas_transform().affine_inverse()
 	_view = Rect2(ixf * Vector2.ZERO, Vector2.ZERO).expand(ixf * get_viewport_rect().size)
 	# embers and smoke from every flame on screen (none on a slower machine)
-	var w2 := sin(t * 0.37) * 4.0 + 3.0
+	# the one wind (core/gust.gd): smoke and embers go with each gust, and the flames bow and gutter in it
+	Gust.step(dt)
+	var w2 := sin(t * 0.37) * 2.0 + 1.5 + Gust.dir() * Gust.k() * 16.0
 	for s in ([] if Settings.fewer_fx else src):
 		var at: Vector2 = s["at"]
 		if not _on_screen(at, 160.0):
@@ -92,7 +94,7 @@ func _process(dt: float) -> void:
 	for e in emb:
 		e["t"] += dt
 		e["vy"] *= 1.0 - 0.35 * dt
-		e["p"] += Vector2(e["vx"] + sin(t * 3.0 + e["s"]) * 10.0, e["vy"]) * PX * dt
+		e["p"] += Vector2(e["vx"] + sin(t * 3.0 + e["s"]) * 10.0 + w2 * 1.6, e["vy"]) * PX * dt
 	for s in smk:
 		s["t"] += dt
 		s["p"] += Vector2(s["vx"] + sin(t * 0.8 + s["s"]) * 3.0, s["vy"]) * PX * dt
@@ -114,6 +116,8 @@ func _draw() -> void:
 		if not _on_screen(at, 80.0):
 			continue
 		var f: float = Flame.smooth(s["seed"])
+		var gk := Gust.k()
+		f *= 1.0 - 0.32 * gk * (0.5 + 0.5 * sin(t * (11.0 + 9.0 * gk) + float(s["seed"]) * 3.0))
 		var h := _halo_of(s["kind"])
 		var g := Flame.dither_glow(h[0], h[1])
 		var sz := g.get_size() * PX
