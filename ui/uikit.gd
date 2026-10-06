@@ -40,6 +40,17 @@ static func tab_col(cls: String, t: int) -> Color:
 static func font(kind: String) -> Font:
 	if _fonts.has(kind):
 		return _fonts[kind]
+	# (Cursemark assets): Cursemark's own faces (cursemark/fonts, converted from its BFNT by the fork's tools): the gothic
+	# pixel face for titles and small capitals, Barlow for the reading text, Lookout for the tiny labels; whole-step scaled
+	var cmf: String = {"pixel": "lookout_7", "book": "barlow_17", "italic": "barlow_17", "sc": "gothic_12"}.get(kind, "barlow_17")
+	if FileAccess.file_exists("res://cursemark/fonts/%s.fnt" % cmf):
+		var bf := FontFile.new()
+		if bf.load_bitmap_font(ProjectSettings.globalize_path("res://cursemark/fonts/%s.fnt" % cmf)) == OK:
+			bf.fixed_size_scale_mode = TextServer.FIXED_SIZE_SCALE_INTEGER_ONLY
+			bf.antialiasing = TextServer.FONT_ANTIALIASING_NONE
+			bf.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
+			_fonts[kind] = bf
+			return bf
 	var file: String = {"pixel": "Silkscreen-Regular.ttf", "book": "IMFeENrm28P.ttf", "italic": "IMFeENit28P.ttf", "sc": "IMFeENsc28P.ttf"}.get(kind, "IMFeENrm28P.ttf")
 	var path := "res://art/fonts/" + file
 	var f: FontFile = null
@@ -74,6 +85,11 @@ static func tex(path: String) -> Texture2D:
 	return t
 
 static func skill_icon(id: String, state: String = "lit") -> Texture2D:
+	if cm():   # (Cursemark assets): its own icons (ui/cm_hud.gd ICONS)
+		var H = load("res://ui/cm_hud.gd")
+		var ct: AtlasTexture = H.tex(H.ICONS.get(id, "icons/talisman_blank"))
+		if ct:
+			return ct
 	var p := "res://art/icons/%s%s.png" % [id, "" if state == "lit" else "@" + state]
 	var t := tex(p)
 	if t == null and state != "lit":
@@ -216,10 +232,42 @@ static func page_tex(w: int, h: int, tint: Color) -> Texture2D:
 	return t
 
 static func page(ci: CanvasItem, x: float, y: float, w: int, h: int, tint: Color) -> void:
+	if cm():
+		nine(ci, "inventory/frame", R(x, y, w, h), 10)
+		return
 	ci.draw_texture_rect(page_tex(w, h, tint), R(x, y, w, h), false)
+
+# ------------------------------------------------------------------ (Cursemark assets) its own window pieces
+static func cm() -> bool:
+	return FileAccess.file_exists("res://cursemark/raw/data.cdb")
+
+## a Cursemark UI piece stretched over r with its corners kept (m: the corner, in art px), at 3 screen px an art px
+static func nine(ci: CanvasItem, name: String, r: Rect2, m: int, mod := Color.WHITE) -> void:
+	var at: AtlasTexture = load("res://ui/cm_hud.gd").tex(name)
+	if at == null:
+		ci.draw_rect(r, Color(0.08, 0.07, 0.09))
+		return
+	var k := 3.0
+	var src := at.region
+	var mm := float(m)
+	var dm := mm * k
+	var xs := [r.position.x, r.position.x + dm, r.end.x - dm, r.end.x]
+	var ys := [r.position.y, r.position.y + dm, r.end.y - dm, r.end.y]
+	var us := [src.position.x, src.position.x + mm, src.end.x - mm, src.end.x]
+	var vs := [src.position.y, src.position.y + mm, src.end.y - mm, src.end.y]
+	for j in 3:
+		for i in 3:
+			var d := Rect2(xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j])
+			var s2 := Rect2(us[i], vs[j], us[i + 1] - us[i], vs[j + 1] - vs[j])
+			if d.size.x > 0.0 and d.size.y > 0.0:
+				ci.draw_texture_rect_region(at.atlas, d, s2, mod)
 
 ## an engraved rule with a diamond at each end
 static func rule(ci: CanvasItem, x: float, y: float, w: float, c: Color) -> void:
+	if cm():
+		var rr := R(x - 2, y - 2, w + 4, 5)
+		nine(ci, "divider_thick", Rect2(rr.position.x, rr.position.y, rr.size.x, 24.0), 4)
+		return
 	rect(ci, x, y, w, 1, INK)
 	rect(ci, x, y + 1, w, 1, Color(c, 0.5))
 	rect(ci, x - 2, y - 1, 3, 3, c)
@@ -229,6 +277,9 @@ static func rule(ci: CanvasItem, x: float, y: float, w: float, c: Color) -> void
 
 ## an inset field: dark seam top-left, lit bottom-right
 static func recess(ci: CanvasItem, x: float, y: float, w: float, h: float, fill: Color = Color("#1a1518")) -> void:
+	if cm():
+		nine(ci, "inventory/slot", R(x - 1, y - 1, w + 2, h + 2), 4)
+		return
 	rect(ci, x - 1, y - 1, w + 2, h + 2, SEAM)
 	rect(ci, x, y, w, h, fill)
 	rect(ci, x, y, w, 1, Color("#0c0a0e"))
@@ -238,6 +289,11 @@ static func recess(ci: CanvasItem, x: float, y: float, w: float, h: float, fill:
 
 ## a carved stud (a raised stone button)
 static func stud(ci: CanvasItem, x: float, y: float, w: float, h: float, label: String = "", on: bool = true, col: Color = TEXT, hover: bool = false) -> void:
+	if cm():
+		nine(ci, "button_hover" if hover else ("button_up" if on else "button_down"), R(x, y, w, h), 4)
+		if label != "":
+			text(ci, label, x + w / 2.0, y + h - 3, col if on else FAINT, 0, "pixel", 8, false)
+		return
 	rect(ci, x, y, w, h, SEAM)
 	rect(ci, x + 1, y + 1, w - 2, h - 2, Color("#4a4258") if hover else (Color("#3a3446") if on else Color("#1f1c24")))
 	rect(ci, x + 1, y + 1, w - 2, 1, Color("#6a6478") if on else Color("#2e2a36"))

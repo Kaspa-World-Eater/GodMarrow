@@ -31,6 +31,7 @@ func setup(r: String, at: Vector2, tex_kind: String = "") -> void:
 	else:
 		spr = Sprite2D.new()
 		spr.centered = false
+	spr.scale *= Iso.FIG
 	add_child(spr)
 
 func _process(dt: float) -> void:
@@ -42,4 +43,4 @@ func click_rect() -> Rect2:
 	if spr == null or spr.texture == null:
 		return Rect2(global_position - Vector2(40, 180), Vector2(80, 190))
 	var r := spr.get_rect()
-	return Rect2(spr.global_position + r.position, r.size)
+	return Rect2(spr.global_position + r.position * spr.scale, r.size * spr.scale)

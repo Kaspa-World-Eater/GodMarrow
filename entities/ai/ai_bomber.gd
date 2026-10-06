@@ -15,7 +15,7 @@ func think(m: Monster, h: Hero, dt: float) -> void:
 	var d := m.tp.distance_to(h.tp)
 	if state == "wind":
 		var k := clampf(t / wind, 0.0, 1.0)
-		m.spr.scale = Vector2(1.0 + 0.12 * k, 1.0 + 0.08 * k)
+		m.spr.scale = m.base_scale * Vector2(1.0 + 0.12 * k, 1.0 + 0.08 * k)
 		if t > wind:
 			burst(m, h)
 		return
@@ -37,11 +37,11 @@ func burst(m: Monster, h: Hero) -> void:
 	if hero_open(h) and m.tp.distance_to(h.tp) < 1.9:
 		Combat.hit_hero(h, dmg, "magic", m.tp, {"src": Combat.who(m) + "|its burst"})
 	hit_allies(m.get_tree(), m.tp, 1.9, dmg, "magic", m.tp)
-	m.spr.scale = Vector2.ONE
+	m.spr.scale = m.base_scale
 	m.die(m.tp)
 
 func interrupted(m: Monster) -> void:
-	m.spr.scale = Vector2.ONE
+	m.spr.scale = m.base_scale
 	super.interrupted(m)
 
 func _anim(m: Monster, dt: float) -> void:

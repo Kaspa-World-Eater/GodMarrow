@@ -61,7 +61,28 @@ static func play(name: String, vol: float = 1.0, pitch: float = 1.0) -> void:
 	if me != null and is_instance_valid(me):
 		me._play(name, vol, pitch)
 
+## (Cursemark assets): every sound is Cursemark's (Derek 2026-10-05: "just use cursemarks sounds for everything").
+## Our names map to its sound ids (cursemark/raw/sounds); a footstep takes its ground's own step.
+static var cm := false
+const CM := {
+	"hit": "attack_sword_hit", "heavy": "attack_axe_hit", "hurt": "player_take_hit", "fall": "enemy_die",
+	"fall_body": "enemy_die", "break": "item_crate_break", "break_iron": "item_crate_break", "glass": "item_pot_smash",
+	"roll": "player_roll", "chest": "item_chest_open", "hinge": "item_chest_open", "lid": "item_chest_open",
+	"coins": "item_essence_pickup", "leather": "item_rune_pickup", "page_open": "menu_open", "page_close": "menu_close",
+	"draw_blade": "attack_sword_swipe", "latch": "item_lever", "swing": "attack_sword_swipe", "drink": "item_botyl_drink",
+	"kindle": "impact_blessing", "shrine": "impact_blessing", "passage": "impact_exit", "bell_far": "impact_level",
+	"cast": "player_cancel_spell", "cast_soul": "spell_carnifex", "cast_mirror": "spell_glacine",
+	"cast_thread": "spell_viperia", "step_stone": "player_footstep_stone", "step_ash": "player_footstep_dirt",
+	"step_leaf": "player_footstep_grass", "step_wet": "player_footstep_water", "level": "impact_upgrade",
+	"die": "player_die", "pickup": "item_rune_pickup", "click": "menu_click", "error": "menu_error",
+}
+
 func _play(name: String, vol: float, pitch: float) -> void:
+	if cm:
+		var id: String = str(CM.get(name, ""))
+		if id != "":
+			load("res://core/cm_sound.gd").play(self, id, linear_to_db(maxf(0.0001, vol * float(Settings.sfx_vol))) + (-8.0 if name.begins_with("step_") else 0.0), pitch)
+		return
 	if LAYERS.has(name):
 		for l in LAYERS[name]:
 			if float(l[1]) <= 0.0:

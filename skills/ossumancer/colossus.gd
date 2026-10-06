@@ -139,7 +139,7 @@ func _physics_process(dt: float) -> void:
 			m.tp = book.zone.move(m.tp, dv.normalized() * (radius + m.radius - dv.length()) * 0.6, m.radius)
 	position = Iso.to_screen(tp)
 	var sc := minf(1.25, 0.72 + 0.05 * n) * (1.0 + 0.12 * grow)
-	spr.scale = Vector2(sc, sc)
+	spr.scale = Vector2(sc, sc) * Iso.FIG
 	spr.position.y = -lift
 	spr.view = view
 	spr.face = face

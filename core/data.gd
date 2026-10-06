@@ -78,6 +78,10 @@ func sprite_set(kind: String) -> SpriteSet:
 	kind = skin_for(kind)
 	if _sets.has(kind):
 		return _sets[kind]
+	if kind.begins_with("cm:"):   # (Cursemark assets): a Cursemark character's atlas (world/cm_sprites.gd)
+		var cs: SpriteSet = load("res://world/cm_sprites.gd").sprite_set(kind.trim_prefix("cm:"))
+		_sets[kind] = cs
+		return cs
 	var s := SpriteSet.new()
 	s.load_kind(kind)
 	_sets[kind] = s

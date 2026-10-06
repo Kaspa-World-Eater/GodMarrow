@@ -18,3 +18,6 @@ tools/godot/
 
 # AI-made 3D models (large; kept on the PC until reduced for the sprite pipeline)
 docs/concepts/**/*.glb
+
+# Cursemark (Derek owns it; local only, NEVER commit or publish): extracted by the GodMarrow-Cursemark fork tools
+/cursemark/

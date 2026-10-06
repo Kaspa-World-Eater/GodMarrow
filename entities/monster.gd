@@ -78,6 +78,10 @@ func setup(z: Zone, m: Dictionary) -> void:
 	if rank == "champion" or rank == "unique":
 		if ResourceLoader.exists("res://art/sprites/%s@%s.json" % [kind, rank]):
 			sk = kind + "@" + rank
+	# (Cursemark assets): the creature in Cursemark's body (Derek 2026-10-05: "take assets from this game and put them
+	# into godmarrow"), its own kind's brain and numbers kept
+	if CM_BODY.has(kind) and FileAccess.file_exists("res://cursemark/raw/data.cdb"):
+		sk = "cm:" + str(CM_BODY[kind])
 	spr = AnimSprite.new(Data.sprite_set(sk))
 	add_child(spr)
 	_true_size()
@@ -94,12 +98,40 @@ func setup(z: Zone, m: Dictionary) -> void:
 ## about two yards (the heroes, ~200 px). The browser's creature sprites were drawn about a quarter too small (a Husk
 ## ~1.25 yd, a Warden ~1.5): they are drawn at true size here. Bosses and the PixelForge sets (already true) keep theirs.
 const TRUE_SIZE := 1.3
+## our kinds in Cursemark's bodies, chosen by what each does and is: the Husk a Forsaken peasant, the Weeper a skeleton
+## archer, the Gasp a Bound wraith, the Warden a Crusader justiciar, the Pyre-Saint a fire-handed ritualist, the
+## Bellwether a charging chevalier, the Vein-Borer a carrion-eater waking from the ground, the Wick-Saint a corrupted
+## carrion-wing, the Duelist a headsman, the Ossuary Matron the Tithe Takers... (the Tithe-Hand keeps its own body)
+const CM_BODY := {
+	"hollow": "forsaken_plebian", "drowned": "bound_widow", "kneeler": "forsaken_maniac", "a5_sapper": "forsaken_executioner",
+	"archer": "forsaken_archer", "ossarcher": "forsaken_archer", "dune_kite": "starspawn_injector",
+	"caster": "bound_wraith", "bogwitch": "fungal_priest", "chorister": "cultist_ratcatcher", "chalk_wraith": "bound_wraith",
+	"bloat": "fungal_colonizer", "bloatling": "corrupted_crawler",
+	"knight": "crusader_justiciar", "calc_knight": "crusader_purifier", "trunk_thing": "blighted_effigy",
+	"pyre": "crusader_ritualist", "bell": "forsaken_chevalier", "marrow_ghoul": "starspawn_eviscerator",
+	"worm": "blighted_carrioneater", "leech": "corrupted_tentacle", "veinworm_elder": "blighted_root", "chalk_worm": "blighted_root",
+	"moth": "corrupted_crow", "moth_saint": "corrupted_crow",
+	"marrow": "crusader_headsman", "oath_blade": "cultist_bloodform", "stalker_crone": "bound_phantom",
+	"boss": "crusader_osric", "matron": "cultist_tithetaker",
+}
+
+var base_scale := Vector2.ONE * Iso.FIG   # the body's drawn size (a swelling or a breath works from it)
+
 func _true_size() -> void:
+	if spr.set != null and str(spr.set.meta.get("source", "")) == "cursemark":
+		spr.scale = Vector2(4, 4) * Iso.FIG   # a Cursemark pixel is 4 units: its man about our man's height
+		base_scale = spr.scale
+		cm_body = true
+		var fm := ShaderMaterial.new()
+		fm.shader = load("res://shaders/cm_flash.gdshader")
+		spr.material = fm
+		return
 	if boss or spr.set == null:
 		return
 	if str(spr.set.meta.get("source", "")) == "pixelforge":
 		return
-	spr.scale = Vector2(TRUE_SIZE, TRUE_SIZE)
+	spr.scale = Vector2(TRUE_SIZE, TRUE_SIZE) * Iso.FIG
+	base_scale = spr.scale
 
 func _numbers() -> void:
 	var r := rank if rank in ["normal", "champion", "unique", "minion", "boss"] else "normal"
@@ -231,7 +263,16 @@ func on_hit(d: float, elem: String, from: Vector2, opts: Dictionary) -> void:
 	if from != Vector2.INF:
 		dir = (Iso.to_screen(tp) - Iso.to_screen(from)).normalized()
 	if not opts.get("dot", false):
-		Fx.blood(zone.sorted, position + Vector2(0, -40), dir, 3)
+		if cm_body:
+			# (Cursemark assets): its hit spark where the blow lands; flesh bleeds, spirits and constructs don't
+			var CmFx = load("res://world/cm_fx.gd")
+			CmFx.play(zone.sorted, "hit" if d >= hp_max * 0.15 else "hit_small", position + Vector2(randf_range(-10, 10), -90),
+				{"rot": dir.angle(), "fps": 24.0, "z": 30, "scale": 0.8})
+			var cms := str(CM_BODY.get(kind, ""))
+			if not (cms.begins_with("bound") or cms.contains("totem") or cms.contains("tree")):
+				Fx.blood(zone.sorted, position + Vector2(0, -40), dir, 2)
+		else:
+			Fx.blood(zone.sorted, position + Vector2(0, -40), dir, 3)
 	if Settings.damage_numbers:
 		Fx.number(zone.sorted, position + Vector2(0, -110), d)
 
@@ -262,9 +303,26 @@ func die(from: Vector2 = Vector2.INF) -> void:
 	z_index = -5
 
 # ------------------------------------------------------------------ the frame
+## (Cursemark assets): knockback (Cursemark's EnemyReactions: an impulse away from the blow, doubled on the killing
+## one), in yards a second, spent quickly
+var push := Vector2.ZERO
+
+func knock(from: Vector2, speed_yd: float) -> void:
+	var dir := (tp - from).normalized() if tp.distance_to(from) > 0.01 else Vector2.RIGHT
+	var mass := 4.0 if boss else (1.6 if rank == "champion" else 1.0)
+	push += dir * speed_yd / mass
+
 func _physics_process(dt: float) -> void:
+	if push.length_squared() > 0.0004:
+		tp = zone.move(tp, push * dt, radius)
+		position = Iso.to_screen(tp)
+		push = push.move_toward(Vector2.ZERO, (14.0 + push.length() * 6.0) * dt)
 	if dead:
 		spr.step(dt)
+		if cm_body and bounce_t < 0.25:
+			bounce_t = maxf(0.0, bounce_t) + dt
+			var v := clampf(bounce_t / 0.25, 0.0, 1.0)
+			spr.position.y = -40.0 * (1.0 - pow(2.0 * v - 1.0, 2.0))
 		corpse_t -= dt
 		# the corpse darkens, browns and sinks as it lies (za_death21.js: brightness 0.62 -> 0.28, saturation down,
 		# sepia up, a flattening of 45% from 4 s after death to 10 s before it goes)
@@ -301,6 +359,10 @@ func _physics_process(dt: float) -> void:
 		if not mods.is_empty():
 			Affixes.tick(self, dt)
 		if brain.state != _heard_state:
+			# (Cursemark assets): a blow drawn back shows Cursemark's aim mark over it, so it can be read and rolled
+			if cm_body and str(brain.state) in ["wind", "lwind", "cwind", "swind", "charge"]:
+				var CmFx = load("res://world/cm_fx.gd")
+				CmFx.play(self, "enemy_aim", Vector2(0, -float(spr.get_rect().size.y) * 4.0 - 30.0), {"fps": 16.0, "z": 40, "scale": 0.8})
 			_heard_state = brain.state
 			_voice(_heard_state)
 	spr.face = face
@@ -310,9 +372,28 @@ func _physics_process(dt: float) -> void:
 		shadow.position = Vector2(0, z_lift)
 		shadow.visible = not buried
 	spr.visible = not buried
+	if cm_body:
+		_cm_presence(dt)
 	if hit_flash > 0.0:
 		hit_flash -= dt
-		spr.self_modulate = Color(1.35, 1.2, 1.15) if hit_flash > 0.0 and Settings.hit_flash else Color.WHITE
+		if cm_body:
+			# Cursemark fills a struck body with white for a blink (shaders/cm_flash.gdshader)
+			if spr.material is ShaderMaterial:
+				spr.material.set_shader_parameter("flash", (0.9 if hit_flash > 0.06 else 0.5) if hit_flash > 0.0 and Settings.hit_flash else 0.0)
+		else:
+			spr.self_modulate = Color(1.35, 1.2, 1.15) if hit_flash > 0.0 and Settings.hit_flash else Color.WHITE
+
+## (Cursemark assets): a body drawn by Cursemark. Most stand on a single frame, so a standing creature breathes (a slow
+## swell and settle, each on its own beat); the killing blow throws it up in a short arc before it falls.
+var cm_body := false
+var _breath := randf() * TAU
+var bounce_t := -1.0
+
+func _cm_presence(dt: float) -> void:
+	_breath += dt * 2.4
+	var still: bool = spr.anim == "idle" and spr.frame_count() <= 1
+	var k := 1.0 + (0.03 * sin(_breath) if still else 0.0)
+	spr.scale = Vector2(4.0 * (1.0 - (k - 1.0) * 0.5), 4.0 * k) * Iso.FIG
 
 func _tick_status(dt: float) -> void:
 	stun = maxf(0.0, stun - dt)

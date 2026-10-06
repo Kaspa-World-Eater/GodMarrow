@@ -16,6 +16,8 @@ func _init(s: SpriteSet = null) -> void:
 	set = s
 	centered = false
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	if s and str(s.meta.get("source", "")) == "cursemark":   # (Cursemark assets): a Cursemark pixel is 4 units
+		scale = Vector2.ONE * float(s.meta["scale"])
 
 func play(a: String, restart: bool = false, looping: bool = true) -> void:
 	if a == anim and not restart:

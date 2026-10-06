@@ -119,7 +119,18 @@ func _panel(path: String) -> Control:
 	return p
 
 # ------------------------------------------------------------------ binding
+var cm_hud: Control           # (Cursemark assets): Cursemark's HUD (ui/cm_hud.gd), in place of our bar
+
 func bind(h: Hero, z: Zone) -> void:
+	if Sfx.cm:
+		if cm_hud == null:
+			cm_hud = load("res://ui/cm_hud.gd").new(self)
+			root.add_child(cm_hud)
+			root.move_child(cm_hud, 0)
+		cm_hud.bind(h, z)
+		bar.visible = false
+		if dial:
+			dial.visible = false
 	hero = h
 	zone = z
 	if boss and (not is_instance_valid(boss) or boss.zone != z):
@@ -563,6 +574,10 @@ func item_tip(it: Item) -> Array:
 	return lines
 
 func item_icon(it: Item) -> Texture2D:
+	if Sfx.cm:   # (Cursemark assets): its own pictures (ui/cm_hud.gd ITEM_ICONS)
+		var ct: Texture2D = load("res://ui/cm_hud.gd").item_tex(it)
+		if ct:
+			return ct
 	if _loot and _loot.has_method("icon_for"):
 		var t = _loot.icon_for(it)
 		if t is Texture2D:

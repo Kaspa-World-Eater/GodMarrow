@@ -26,6 +26,7 @@ var title_t := 0.0
 var reading_open := false    # ui/reading.gd is up: a new pilgrim is being read before the walk
 var pending_load := {}        # a save waiting to be poured into the first hero (Continue)
 const SaveIO := preload("res://core/save.gd")
+var cm_audio: Node        # (Cursemark assets): world/cm_audio.gd
 const TestHooks := preload("res://core/test_hooks.gd")
 
 func _ready() -> void:
@@ -74,6 +75,11 @@ func _ready() -> void:
 	add_child(sky)
 	sound = Soundscape.new(self)
 	add_child(sound)
+	# (Cursemark assets): when Cursemark's files are here (cursemark/, local only), its sound and music are the game's
+	Sfx.cm = FileAccess.file_exists("res://cursemark/raw/data.cdb")
+	if Sfx.cm:
+		cm_audio = load("res://world/cm_audio.gd").new(self)
+		add_child(cm_audio)
 	add_child(Sfx.new())
 	far = FarPilgrims.new(self)
 	add_child(far)
@@ -162,6 +168,8 @@ func enter(zid: String, from: String) -> void:
 	sky.bind(zone, hero, dark)
 	far.bind(zone, hero)
 	Sfx.set_room(not zone.d.get("outdoor", false))
+	if cm_audio:
+		cm_audio.bind(zone)
 	if OS.has_environment("GM_FARNOW"):
 		far.wait = 0.5
 	if hud and hud.has_method("bind"):

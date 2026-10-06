@@ -128,6 +128,13 @@ func _swap(key: String) -> void:
 func _process(dt: float) -> void:
 	if main == null:
 		return
+	if Sfx.cm:
+		# (Cursemark assets): Cursemark's music and air play (world/cm_audio.gd); ours fall silent
+		for p in [mus_a, mus_b, wind_p, rain_p, hum_p, fire_p]:
+			if p and p.playing:
+				p.stop()
+		mus_key = ""
+		return
 	boss_gone_t = maxf(0.0, boss_gone_t - dt)
 	var key := _pick()
 	if key != mus_key:

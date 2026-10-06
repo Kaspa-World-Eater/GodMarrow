@@ -72,6 +72,7 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 	var fh := float(spr.set.meta.get("figure_height", 195)) if spr.set else 195.0
 	if fh > 0.0 and fh < 150.0:
 		spr.scale = Vector2(195.0 / fh, 195.0 / fh)
+	spr.scale *= Iso.FIG
 	spr.view = "down"
 	add_child(spr)
 	add_child(load("res://entities/hero_rim.gd").new(self, spr))   # the edge the nearest flame lights (heroRim37)

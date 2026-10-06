@@ -8,6 +8,11 @@ const WPX := 4.0            # Godot units per web world px
 const HX := 18.0 * WPX      # 72
 const HY := 9.0 * WPX       # 36
 
+## how large a figure stands against the world (Derek 2026-10-05: "the hero seems too big and the world feels too
+## small, everything should be larger"): every body is drawn at this against the ground, so the land, its walls and
+## its keeps read larger round them. One number for all of them: the hero, the creatures, the folk, the summoned.
+const FIG := 0.78
+
 static func to_screen(t: Vector2) -> Vector2:
 	return Vector2((t.x - t.y) * HX, (t.x + t.y) * HY)
 

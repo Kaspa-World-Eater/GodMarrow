@@ -31,6 +31,7 @@ func setup_numbers() -> void:
 func _ready() -> void:
 	add_to_group("allies")
 	spr = AnimSprite.new(Data.sprite_set("skeleton_" + load_id))
+	spr.scale *= Iso.FIG
 	spr.play("idle")
 	add_child(spr)
 	var sh := Polygon2D.new()

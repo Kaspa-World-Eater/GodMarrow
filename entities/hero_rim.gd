@@ -53,6 +53,7 @@ func _process(_dt: float) -> void:
 		visible = false
 		return
 	texture = src.texture
+	scale = src.scale            # the rim lies on the body at the body's own size
 	offset = src.offset
 	flip_h = src.flip_h
 	position = src.position
