@@ -34,7 +34,8 @@ func _process(_dt: float) -> void:
 		var at: Vector2 = best["at"] if best.has("at") else Iso.to_screen(best["tp"])
 		dir = at - (hero.position + Vector2(0, -20 * 4))
 		col = best["rgb"] if best.has("rgb") else Color8(255, 150, 72)
-		a = minf(0.85, 0.95 * (1.0 - bd * 0.8) * load("res://fx/flame.gd").smooth(best["seed"]))
+		# a hint of the flame along the edge, not a line round him (Derek 2026-10-05: the outline "shouldn't pop so much")
+		a = minf(0.3, 0.34 * (1.0 - bd * 0.8) * load("res://fx/flame.gd").smooth(best["seed"]))
 	else:
 		var out: bool = zone.d.get("outdoor", false)
 		var k := Game.day_k() if out else 0.0
@@ -42,13 +43,13 @@ func _process(_dt: float) -> void:
 			visible = false
 			return
 		col = Color8(150, 170, 225) if out else Color8(140, 150, 190)
-		a = 0.32 * (1.0 - k)
+		a = 0.14 * (1.0 - k)
 	if a <= 0.01:
 		visible = false
 		return
 	visible = true
 	dir = dir.normalized()
-	var o := Vector2(roundf(dir.x * 2.0), roundf(dir.y * 2.0))
+	var o := Vector2(roundf(dir.x * 1.2), roundf(dir.y * 1.2))
 	if o == Vector2.ZERO:
 		visible = false
 		return
