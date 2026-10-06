@@ -519,44 +519,95 @@ func phosphor(from_tile: Vector2, to_tile: Vector2) -> void:
 	_ensure_sky()
 	var a := Iso.to_screen(from_tile) + Vector2(0, -90)
 	var b := Iso.to_screen(to_tile) + Vector2(0, -60)
-	var side := Vector2(-(b - a).y, (b - a).x).normalized() * randf_range(-1.0, 1.0)
-	wisps.append({"p": a, "v": (b - a).normalized() * 220.0 + side * 260.0, "to": b, "t": 0.0, "done": false})
+	wisps.append({"p": a, "base": a, "from": a, "to": b, "t": 0.0, "u": 0.0, "done": false, "seed": randf() * 50.0,
+		"speed": randf_range(0.45, 0.7), "trail": [], "loop": randf() < 0.5})
 
+## a wisp moves like a spirit: its course is a slow curve from its source to its mark, but it does not keep to it: it
+## wanders off the line and back (two slow sines), bobs, hesitates (its pace ebbs and surges), and once on the way may
+## turn a small loop; near its mark it quickens and dives
 func _tick_wisps(dt: float) -> void:
 	for w in wisps:
 		w["t"] += dt
-		var to: Vector2 = w["to"] - w["p"]
-		w["v"] = w["v"].lerp(to.normalized() * 520.0, minf(1.0, dt * 3.5))
-		w["p"] += w["v"] * dt
-		for k in 9:
-			_phos.append({"q": w["p"] + Vector2(randf_range(-7, 7), randf_range(-7, 7)), "t": 0.0, "life": randf_range(0.5, 1.6)})
-		if to.length() < 16.0 or w["t"] > 2.5:
+		var t: float = w["t"]
+		var sd: float = w["seed"]
+		var surge := 0.55 + 0.45 * sin(t * 2.3 + sd) * sin(t * 0.9 + sd * 2.0)            # it ebbs and surges
+		w["u"] = minf(1.0, w["u"] + dt * w["speed"] * (0.35 + surge) * (1.0 + 2.0 * pow(w["u"], 3.0)))
+		var u: float = w["u"]
+		var a: Vector2 = w["from"]
+		var b: Vector2 = w["to"]
+		var side := Vector2(-(b - a).y, (b - a).x).normalized()
+		var arc := sin(u * PI) * 70.0 * (1.0 if fmod(sd, 2.0) < 1.0 else -1.0)
+		var base := a.lerp(b, u) + side * arc + Vector2(0, -sin(u * PI) * 40.0)
+		var wander := side * (sin(t * 3.1 + sd) * 18.0 + sin(t * 7.3 + sd * 3.0) * 5.0) * (1.0 - u * 0.8)
+		var bob := Vector2(0, sin(t * 5.0 + sd) * 6.0)
+		if w["loop"] and u > 0.3 and u < 0.55:
+			var lk := (u - 0.3) / 0.25 * TAU
+			wander += Vector2(cos(lk) - 1.0, sin(lk)) * 22.0
+		var np: Vector2 = base + wander + bob
+		var vel: Vector2 = (np - w["p"]) / maxf(dt, 0.001)
+		w["p"] = np
+		w["trail"].push_front(np)
+		if w["trail"].size() > 10:
+			w["trail"].pop_back()
+		# soul dust shed behind it: more when it moves fast
+		var n := 2 + int(vel.length() / 160.0)
+		for k in n:
+			_phos.append({"q": np + Vector2(randf_range(-6, 6), randf_range(-6, 6)), "t": 0.0, "life": randf_range(0.8, 2.2),
+				"v": Vector2(randf_range(-8, 8), randf_range(6, 20)), "ph": randf() * TAU, "glint": randf() < 0.18})
+		if u >= 1.0:
 			w["done"] = true
-			for k in 26:
-				var a := randf() * TAU
-				_phos.append({"q": w["p"] + Vector2(cos(a), sin(a) * 0.6) * randf_range(4, 40), "t": 0.0, "life": randf_range(0.3, 1.0)})
-			_flash_at_screen(w["p"], Color(0.75, 0.9, 1.0), 0.2)
+			for k in 40:
+				var aa := randf() * TAU
+				_phos.append({"q": np + Vector2(cos(aa), sin(aa) * 0.6) * randf_range(4, 46), "t": 0.0, "life": randf_range(0.6, 1.8),
+					"v": Vector2(cos(aa), sin(aa)) * randf_range(10, 40), "ph": randf() * TAU, "glint": randf() < 0.3})
+			_flash_at_screen(np, Color(0.75, 0.9, 1.0), 0.25)
 	wisps = wisps.filter(func(w): return not w["done"])
 	for s in _phos:
 		s["t"] += dt
-		s["q"].y -= 12.0 * dt
+		s["q"] += s["v"] * dt                                  # soul dust settles slowly, drifting
+		s["v"] *= 1.0 - 1.5 * dt
+		s["v"].x += Gust.dir() * Gust.k() * 10.0 * dt
 	_phos = _phos.filter(func(s): return s["t"] < s["life"])
 	while _phos.size() > 2400:
 		_phos.pop_front()
 
 func _draw_wisps(cv: CanvasItem) -> void:
+	var now := Time.get_ticks_msec() / 1000.0
 	for s in _phos:
 		var u: float = s["t"] / s["life"]
-		if randf() < 0.25 + u * 0.4:
-			continue                                         # twinkling: each spark flickers off and on
-		var col := Color(1.0, 1.0, 1.0, 1.0 - u).lerp(Color(0.5, 0.7, 1.0, 0.8 * (1.0 - u)), smoothstep(0.0, 0.6, u))
-		cv.draw_rect(Rect2((s["q"] / PX).floor() * PX, Vector2(PX, PX)), col)
+		var tw := 0.5 + 0.5 * sin(now * 14.0 + s["ph"])        # scintillation: each mote twinkles on its own beat
+		if tw < 0.35:
+			continue
+		var col := Color(1.0, 1.0, 1.0, (1.0 - u)).lerp(Color(0.55, 0.72, 1.0, 0.85 * (1.0 - u)), smoothstep(0.0, 0.7, u))
+		var q: Vector2 = (s["q"] / PX).floor() * PX
+		cv.draw_rect(Rect2(q, Vector2(PX, PX)), col)
+		if s["glint"] and tw > 0.88 and u < 0.7:             # a cross-shaped glint at the peak of its twinkle
+			var gc := Color(1, 1, 1, 0.7 * (1.0 - u))
+			for o in [Vector2(PX, 0), Vector2(-PX, 0), Vector2(0, PX), Vector2(0, -PX)]:
+				cv.draw_rect(Rect2(q + o, Vector2(PX, PX)), gc)
 	for w in wisps:
 		var c: Vector2 = (w["p"] / PX).floor() * PX
-		cv.draw_rect(Rect2(c - Vector2(PX * 4, PX * 3), Vector2(PX * 9, PX * 7)), Color(0.45, 0.65, 1.0, 0.16))
-		cv.draw_rect(Rect2(c - Vector2(PX * 2, PX * 2), Vector2(PX * 5, PX * 5)), Color(0.55, 0.75, 1.0, 0.4))
-		cv.draw_rect(Rect2(c - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(0.85, 0.94, 1.0, 0.9))
+		var br := 0.75 + 0.25 * sin(now * 6.0 + w["seed"])       # it breathes
+		# the ghostly tail: the last few places it was, a fading teardrop
+		var tr: Array = w["trail"]
+		for i in tr.size():
+			var k := 1.0 - float(i) / tr.size()
+			var q: Vector2 = (tr[i] / PX).floor() * PX
+			var rr := int(1 + 2 * k)
+			cv.draw_rect(Rect2(q - Vector2(rr, rr) * PX * 0.5, Vector2(rr, rr) * PX), Color(0.6, 0.78, 1.0, 0.18 * k))
+		# the glow: three soft rings, then the radiant white core
+		for ring in [[7, 0.07], [5, 0.12], [3, 0.3]]:
+			var R: int = ring[0]
+			for yy in range(-R, R + 1):
+				for xx in range(-R, R + 1):
+					if xx * xx + yy * yy <= R * R:
+						cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.55, 0.75, 1.0, ring[1] * br))
+		cv.draw_rect(Rect2(c - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(0.9, 0.96, 1.0, 0.95))
 		cv.draw_rect(Rect2(c, Vector2(PX, PX)), Color(1, 1, 1))
+		cv.draw_rect(Rect2(c + Vector2(0, -PX * 2), Vector2(PX, PX)), Color(1, 1, 1, 0.6 * br))
+		cv.draw_rect(Rect2(c + Vector2(0, PX * 2), Vector2(PX, PX)), Color(1, 1, 1, 0.6 * br))
+		cv.draw_rect(Rect2(c + Vector2(-PX * 2, 0), Vector2(PX, PX)), Color(1, 1, 1, 0.6 * br))
+		cv.draw_rect(Rect2(c + Vector2(PX * 2, 0), Vector2(PX, PX)), Color(1, 1, 1, 0.6 * br))
 
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
