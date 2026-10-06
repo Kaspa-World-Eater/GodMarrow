@@ -421,6 +421,18 @@ func _draw_arcs(cv: CanvasItem) -> void:
 			_px_path(_jag(a, b, 6.0), Color(0.75, 0.85, 1.0, 0.9 * k), 1, cv)
 
 # ------------------------------------------------------------------ miasma
+## miasma is ghostly: it glows faintly of itself, so it lies on a layer over the darkness (layer 5) that still moves
+## with the world (follow_viewport), and the night does not grade it
+var _ghost: CanvasLayer
+
+func _ghost_layer() -> CanvasLayer:
+	if _ghost == null:
+		_ghost = CanvasLayer.new()
+		_ghost.layer = 6
+		_ghost.follow_viewport_enabled = true
+		add_child(_ghost)
+	return _ghost
+
 ## the breath (shaders/miasma.gdshader): a low creeping body with tendrils and surfacing faces; "cloud" is taller and
 ## thicker (a choking cloud), "breath" low and wide
 var miasmas: Array = []
@@ -433,7 +445,6 @@ func miasma(p: Vector2, r: float = 2.0, secs: float = 10.0, kind: String = "brea
 	n.size = (Vector2(hw * 2.3, hw + rh) / PX).ceil() * PX
 	var q := Iso.to_screen(p)
 	n.position = ((q - Vector2(n.size.x * 0.5, rh + hw * 0.5)) / PX).floor() * PX
-	n.z_index = 2
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/miasma.gdshader")
 	m.set_shader_parameter("seed", randf() * 30.0)
@@ -443,7 +454,7 @@ func miasma(p: Vector2, r: float = 2.0, secs: float = 10.0, kind: String = "brea
 	m.set_shader_parameter("thick", 1.0 if kind == "breath" else 1.5)
 	m.set_shader_parameter("drift", Vector2(Gust.dir() * (0.6 + Gust.k()), 0.25))
 	n.material = m
-	add_child(n)
+	_ghost_layer().add_child(n)
 	miasmas.append({"node": n, "t": 0.0, "secs": secs})
 
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
