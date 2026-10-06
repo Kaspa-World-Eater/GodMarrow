@@ -65,6 +65,8 @@ static func run(g) -> void:
 		_shot(g, a)
 	if a.has("groundfire"):
 		_ground_fires(g)                 # --groundfire: three fires set burning near the pilgrim (to see them spread)
+	if a.has("burn"):
+		_burn_test(g, String(a.get("burn", "hollow")))   # --burn[=KIND]: three creatures beside the pilgrim die by fire
 	if a.has("impacts"):
 		_impacts(g)                      # --impacts: blows landing beside the pilgrim (world/impacts.gd), to see them
 	if a.has("weather"):
@@ -356,3 +358,22 @@ static func _impacts(g) -> void:
 		I.of(g.zone).hit(g.hero.tp + Vector2(1.4, 0.4), g.hero.tp, i % 2 == 1, "bone" if i % 3 == 0 else "flesh")
 		i += 1
 		await tree.create_timer(0.45).timeout
+
+
+static func _burn_test(g, kind: String) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	if kind == "" or kind == "1":
+		kind = "hollow"
+	var c: Vector2 = g.hero.tp
+	var ms: Array = []
+	for o in [Vector2(2.0, 0.4), Vector2(0.6, 2.2), Vector2(2.6, 2.0)]:
+		var m = Brain.spawn(g.zone, kind, c + o, 6, "normal", "burn", -1.0)
+		if m:
+			m.speed = 0.0
+			ms.append(m)
+	await tree.create_timer(0.6).timeout
+	for m in ms:
+		if is_instance_valid(m) and not m.dead:
+			Combat.hit_monster(m, 9999.0, "fire", c, {})
+		await tree.create_timer(0.35).timeout

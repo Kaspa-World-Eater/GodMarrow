@@ -291,6 +291,50 @@ func on_hit(d: float, elem: String, from: Vector2, opts: Dictionary) -> void:
 func add_dot(dps: float, secs: float, elem: String) -> void:
 	dots.append({"dps": dps, "t": secs, "elem": elem, "tick": 0.5})
 
+## burning out (shaders/burn.gdshader): a body killed by fire chars, its ember cracks glow and cool, it crumbles to ash
+## from the top over a few seconds, smoking and shedding embers; the fire's light dims with it
+var last_elem := ""
+var burn_k := -1.0
+var _burn_light: PointLight2D
+
+func _start_burn() -> void:
+	burn_k = 0.0
+	spr.set_index(mini(1, spr.frame_count() - 1))
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/burn.gdshader")
+	m.set_shader_parameter("seed", randf() * 50.0)
+	spr.material = m
+	_burn_light = PointLight2D.new()
+	_burn_light.color = Color(1.0, 0.5, 0.2)
+	_burn_light.set_meta("dark_r", 22.0)
+	_burn_light.set_meta("dark_far", 1.5)
+	_burn_light.position = Vector2(0, -40)
+	_burn_light.enabled = false
+	add_child(_burn_light)
+
+func _tick_burn(dt: float) -> void:
+	burn_k = minf(1.0, burn_k + dt / 7.0)
+	var m := spr.material as ShaderMaterial
+	if m:
+		m.set_shader_parameter("burn", burn_k)
+		m.set_shader_parameter("t", Time.get_ticks_msec() / 1000.0)
+		var at := spr.texture as AtlasTexture
+		if at and at.atlas:
+			var sz := at.atlas.get_size()
+			m.set_shader_parameter("region", Vector4(at.region.position.x / sz.x, at.region.position.y / sz.y, at.region.size.x / sz.x, at.region.size.y / sz.y))
+	if _burn_light:
+		_burn_light.visible = burn_k < 0.9
+		_burn_light.set_meta("dark_r", 22.0 * (1.0 - burn_k * 0.7))
+	# embers and ash off the body, and the smoke (world/impacts.gd's chips, light and grey)
+	if randf() < dt * 14.0 * (1.0 - burn_k * 0.6):
+		var I = load("res://world/impacts.gd").of(zone)
+		I.ash(tp + Vector2(randf_range(-0.3, 0.3), randf_range(-0.3, 0.3)), burn_k)
+	if burn_k >= 1.0:
+		corpse_t = minf(corpse_t, 3.0)
+		modulate.a = maxf(0.0, modulate.a - dt * 0.6)
+		if modulate.a <= 0.0:
+			queue_free()
+
 func die(from: Vector2 = Vector2.INF) -> void:
 	if dead:
 		return
@@ -304,6 +348,8 @@ func die(from: Vector2 = Vector2.INF) -> void:
 	else:
 		spr.play("death", true, false)
 	corpse_t = 30.0
+	if last_elem == "fire":
+		_start_burn()
 	var sp = load("res://world/splats.gd").at(zone)   # the ground it bleeds or scatters bone into (za_death21.js)
 	if sp:
 		sp.death(kind, tp, radius > 0.35)
@@ -330,12 +376,16 @@ func _physics_process(dt: float) -> void:
 		position = Iso.to_screen(tp)
 		push = push.move_toward(Vector2.ZERO, (14.0 + push.length() * 6.0) * dt)
 	if dead:
-		spr.step(dt)
+		if burn_k < 0.0:
+			spr.step(dt)     # a burning body holds its fall (Cursemark's death shrinks it to a remnant; it burns out instead)
 		if cm_body and bounce_t < 0.25:
 			bounce_t = maxf(0.0, bounce_t) + dt
 			var v := clampf(bounce_t / 0.25, 0.0, 1.0)
 			spr.position.y = -40.0 * (1.0 - pow(2.0 * v - 1.0, 2.0))
 		corpse_t -= dt
+		if burn_k >= 0.0:
+			_tick_burn(dt)
+			return
 		# the corpse darkens, browns and sinks as it lies (za_death21.js: brightness 0.62 -> 0.28, saturation down,
 		# sepia up, a flattening of 45% from 4 s after death to 10 s before it goes)
 		var rot := clampf((26.0 - corpse_t) / 20.0, 0.0, 1.0)

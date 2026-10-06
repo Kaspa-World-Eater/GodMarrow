@@ -47,6 +47,7 @@ static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vec
 		var kind := "bone" if str(m.kind) in ["hollow", "marrow", "knight", "bell", "archer"] else "flesh"
 		load("res://world/impacts.gd").of(m.zone).hit(m.tp, from, heavy_hit, kind)
 	if m.hp <= 0.0:
+		m.last_elem = elem
 		m.die(from)
 	return d
 

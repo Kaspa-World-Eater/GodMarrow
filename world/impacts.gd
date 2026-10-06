@@ -9,6 +9,7 @@ var zone
 var chips: Array = []      # {p (tile), z (px up), v (tile/s), vz, col, t, life, rest}
 var cracks: Array = []     # {pts (screen), t, life}
 var flashes: Array = []    # {light, t, life, e}
+var motes: Array = []      # embers and ash rising off what burns: {q (screen), v, t, life, ember}
 var bursts: Array = []     # {c (screen), rays [[dir, len]], col, t}
 var stains: Array = []     # {q (screen), w, t, life}
 
@@ -45,6 +46,15 @@ func hit(p: Vector2, from: Vector2, heavy: bool, kind: String = "flesh") -> void
 		"col": Color(1.0, 0.95, 0.8) if kind == "bone" else Color(1.0, 0.82, 0.6)})
 	if heavy:
 		_crack(p, away)
+
+## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
+func ash(p: Vector2, k: float) -> void:
+	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
+	var ember := randf() < 0.6 - 0.4 * k
+	motes.append({"q": q, "v": Vector2(randf_range(-8, 8), -randf_range(30, 70) if ember else -randf_range(10, 25)), "t": 0.0,
+		"life": randf_range(0.8, 1.8) if ember else randf_range(2.0, 3.5), "ember": ember, "smoke": not ember and randf() < 0.3})
+	while motes.size() > 220:
+		motes.pop_front()
 
 func _flash(p: Vector2, col: Color, life: float, r: float) -> void:
 	var pl := PointLight2D.new()
@@ -95,6 +105,12 @@ func _process(dt: float) -> void:
 			else:
 				c["rest"] = true
 	chips = chips.filter(func(c): return c["t"] < c["life"])
+	for mo in motes:
+		mo["t"] += dt
+		mo["v"].x += Gust.dir() * Gust.k() * 40.0 * dt + sin(mo["t"] * 3.0 + mo["q"].y * 0.05) * 6.0 * dt
+		mo["q"] += mo["v"] * dt
+		mo["v"].y *= 1.0 - 0.6 * dt
+	motes = motes.filter(func(mo): return mo["t"] < mo["life"])
 	for b in bursts:
 		b["t"] += dt
 	bursts = bursts.filter(func(b): return b["t"] < 0.1)
@@ -116,6 +132,20 @@ func _process(dt: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	for mo in motes:
+		var u: float = mo["t"] / mo["life"]
+		var mq: Vector2 = (mo["q"] / PX).floor() * PX
+		if mo["ember"]:
+			var hot := 1.0 - u
+			draw_rect(Rect2(mq, Vector2(PX, PX)), Color(1.0, 0.45 + 0.4 * hot, 0.15 + 0.3 * hot * hot, 1.0 - u * u))
+		elif mo["smoke"]:
+			var r := int(1 + u * 3)
+			for yy in range(-r, r + 1):
+				for xx in range(-r, r + 1):
+					if xx * xx + yy * yy <= r * r and (int(mq.x / PX) + xx + int(mq.y / PX) + yy) % 2 == 0:
+						draw_rect(Rect2(mq + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.16, 0.15, 0.15, 0.35 * (1.0 - u)))
+		else:
+			draw_rect(Rect2(mq, Vector2(PX, PX)), Color(0.45, 0.43, 0.41, 0.7 * (1.0 - u)))
 	for st in stains:
 		var sa: float = 1.0 - smoothstep(0.6, 1.0, st["t"] / st["life"])
 		var sq: Vector2 = (st["q"] / PX).floor() * PX
