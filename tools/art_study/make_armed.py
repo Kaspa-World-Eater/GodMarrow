@@ -21,7 +21,7 @@ BLADE = 40.0           # a third of his 120: an arming sword
 MATERIALS = {
     # steel: violet-black shadow -> cool greys -> a warm white edge (hue shift ~12 degrees a step)
     "steel": {"ramp": ["#0a0912", "#15151f", "#232430", "#363844", "#4d5059", "#686b70", "#8a8b88", "#b3b0a2", "#ddd6c0", "#fff6dc"],
-              "texture": "scratch", "texture_strength": 0.25, "spec": True, "spec_t": 0.72, "rim_edge": True},
+              "texture": "scratch", "texture_strength": 0.25, "spec": True, "spec_t": 0.6, "rim_edge": True, "lift": 0.35, "detail": "metal"},
     # old oak, darkened: plum shadows, warm brown mids, a dry ochre light
     "oak": {"ramp": ["#0f0709", "#1d0e0d", "#2c1712", "#3f2216", "#55301b", "#6b4122", "#82552e", "#9c6c3c"],
             "texture": "grain", "texture_strength": 0.45},

@@ -161,8 +161,10 @@
    "texture": "scratch",
    "texture_strength": 0.25,
    "spec": true,
-   "spec_t": 0.72,
-   "rim_edge": true
+   "spec_t": 0.6,
+   "rim_edge": true,
+   "lift": 0.35,
+   "detail": "metal"
   },
   "oak": {
    "ramp": [
