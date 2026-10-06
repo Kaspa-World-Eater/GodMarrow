@@ -22,6 +22,20 @@ ink on warm paper", art made by generators), and it beat the dithered-block look
 7. **Whole world pixels.** Still 4 px cells, still the art grid. The paint is in the pixel art, not instead of it.
 8. **Still alive.** Everything moves a little: the wind in the strokes, lapping edges, breathing glows.
 
+9. **Hue-shift every ramp.** Darks lean blue-violet, lights lean warm. A ramp that only gets lighter looks dead.
+10. **Light tells the story.** A cool key (moonlight) plus a warm local light (fire, lantern), each casting shadows.
+    The light's temperature tints the tone, in steps, as a painter mixes it.
+11. **Iso light comes from the screen's upper left.** In world terms that is -x and a little +y: the faces toward
+    the viewer's left are lit, the faces toward the right fall in shade. Get this wrong and every prop reads black.
+12. **Form before texture.** Build props as real form (the title's height field, ray-cast), so tops, faces,
+    occlusion and cast shadows are true. Texture (blocks, flutes, carving, streaks) goes on after and stays gentle.
+13. **Contact.** Darken where things meet the ground (ambient occlusion), let grass and moss grow over the feet of
+    things, and give silhouettes a lit rim against what is behind them.
+14. **Detail where it counts.** Lit edges, chips, carving and moss on the props; the open ground stays quiet.
+
+Lessons from the first ruins pass (Derek: "you can do better"): props on a black void with no shadow or contact,
+one-hue ramps, and fine texture noise all read as cheap. `tools/art_study/painted_scene.py` is the reference now.
+
 ## The order of work
 
 1. Finish the current agenda in this standard (environment: snow, grass, ruins, stone; cloth; pulsing flesh; armour
