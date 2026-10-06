@@ -88,7 +88,7 @@ def main():
             continue
         src = os.path.join(raw if os.path.isdir(os.path.join(raw, d)) else root, d)
         for f in fr:
-            cur = os.path.join(src, f'frame_{f:03d}.png')
+            cur = os.path.join(root, d, f'frame_{f:03d}.png')        # paint over the painted frame (the hand pass ran first)
             if not os.path.exists(cur):
                 continue
             prev_p = np.asarray(Image.open(os.path.join(src, f'frame_{f - 1:03d}.parts.png'))).astype(np.int32)
