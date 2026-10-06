@@ -1,0 +1,227 @@
+{
+ "about": "The one-handed sword strike, keyed (tools/art_study/STUDY.md): the strongest poses of the library's Sword_Attack, one per game frame, pushed further. 0 ready, 1 the wind-up held (the body twisted back, weight on the back leg), 2-3 the strike (blade rising, then crossing), 4 the follow-through past the target and low (held: the hit lands here), 5-7 the recovery.",
+ "base": [
+  "attack",
+  2
+ ],
+ "loop": false,
+ "keys": [
+  {
+   "hold": 1,
+   "from": [
+    "attack",
+    2
+   ]
+  },
+  {
+   "hold": 1,
+   "from": [
+    "attack",
+    6
+   ],
+   "move": [
+    0,
+    -0.02,
+    -0.03
+   ],
+   "turn": {
+    "spine.001": [
+     [
+      "y",
+      -14
+     ],
+     [
+      "x",
+      -5
+     ]
+    ],
+    "upper_arm.R": [
+     [
+      "x",
+      -10
+     ]
+    ]
+   },
+   "aim": {
+    "upper_arm.L": [
+     0.25,
+     -0.85,
+     0.35
+    ],
+    "forearm.L": [
+     -0.35,
+     0.15,
+     0.9
+    ]
+   }
+  },
+  {
+   "hold": 1,
+   "from": [
+    "attack",
+    8
+   ],
+   "turn": {
+    "spine.001": [
+     [
+      "y",
+      -6
+     ]
+    ]
+   },
+   "aim": {
+    "upper_arm.L": [
+     0.25,
+     -0.85,
+     0.35
+    ],
+    "forearm.L": [
+     -0.35,
+     0.15,
+     0.9
+    ]
+   }
+  },
+  {
+   "hold": 1,
+   "from": [
+    "attack",
+    10
+   ],
+   "move": [
+    0,
+    -0.03,
+    0.04
+   ],
+   "turn": {
+    "spine.001": [
+     [
+      "y",
+      10
+     ],
+     [
+      "x",
+      6
+     ]
+    ]
+   },
+   "aim": {
+    "upper_arm.L": [
+     0.25,
+     -0.85,
+     0.35
+    ],
+    "forearm.L": [
+     -0.35,
+     0.15,
+     0.9
+    ]
+   }
+  },
+  {
+   "hold": 1,
+   "from": [
+    "attack",
+    12
+   ],
+   "move": [
+    0,
+    -0.05,
+    0.07
+   ],
+   "turn": {
+    "spine.001": [
+     [
+      "y",
+      16
+     ],
+     [
+      "x",
+      12
+     ]
+    ],
+    "head": [
+     [
+      "x",
+      -6
+     ]
+    ]
+   },
+   "aim": {
+    "upper_arm.L": [
+     0.25,
+     -0.85,
+     0.35
+    ],
+    "forearm.L": [
+     -0.35,
+     0.15,
+     0.9
+    ]
+   }
+  },
+  {
+   "hold": 1,
+   "from": [
+    "attack",
+    16
+   ],
+   "move": [
+    0,
+    -0.03,
+    0.04
+   ],
+   "turn": {
+    "spine.001": [
+     [
+      "y",
+      8
+     ],
+     [
+      "x",
+      6
+     ]
+    ]
+   },
+   "aim": {
+    "upper_arm.L": [
+     0.25,
+     -0.85,
+     0.35
+    ],
+    "forearm.L": [
+     -0.35,
+     0.15,
+     0.9
+    ]
+   }
+  },
+  {
+   "hold": 1,
+   "from": [
+    "attack",
+    22
+   ],
+   "turn": {},
+   "aim": {
+    "upper_arm.L": [
+     0.25,
+     -0.85,
+     0.35
+    ],
+    "forearm.L": [
+     -0.35,
+     0.15,
+     0.9
+    ]
+   }
+  },
+  {
+   "hold": 1,
+   "from": [
+    "attack",
+    30
+   ]
+  }
+ ]
+}

@@ -93,3 +93,27 @@ Bowl title (tools/title_study/, its method in the memory note "godmarrow-title-m
   on the back leg, hips and shoulders counter-rotated), one sharp smear frame along the blade's arc, follow-through
   1 px past contact with the cloak still travelling, recover. Silhouette-test every key.
 - then E1-E4 above.
+
+## Round 2: a keyed rig (2026-10-06; Derek: "you might need to create a new rig system and alter his animations")
+
+**Why the frames looked weightless:** they are driven by a generic mocap clip (Quaternius Sword_Attack, 38 frames),
+sampled EVENLY down to the game's 8. Even sampling skips the key poses: the wind-up's peak, the strike, the low
+follow-through each fall between samples, so every frame is an in-between.
+
+**What I built (tools/pixelforge/pixelforge/keyed.py, pose_view.py):**
+- a keyed clip is a list of poses held for N frames, written beside the library (assets/animations/keyed/*.json)
+  and loaded with it, so `clips: {"attack": "strike"}` in a shapes file plays it in all 8 directions;
+- each key may start from a chosen library frame (`from`), then push it: `turn` (rotate a joint and everything below
+  it about world axes), `aim` (point a bone along a world direction: the easy control for arms), `move` (the body);
+- `python -m pixelforge.pose_view CLIP OUT.png` draws the skeleton front and side for every key, with the sword
+  hand's facing, so a pose is judged in seconds, not after a render.
+- strike.json: 0 ready, 1 the wind-up peak pushed further back (held), 2 rising, 3 crossing, 4 the low follow-through
+  pushed further forward (held: the hit lands here), 5-7 recovery; the off arm brought in to a guard.
+
+**What it does not fix (seen on the render):**
+- From E/SE the sword arm is on the FAR side, behind the cloak: the blow is hidden. Needs a deliberate choice: show
+  the weapon side in the side views, or turn the body more toward the camera in the strike keys.
+- The limbs are still stacked tubes in the shapes file. Keys cannot give anatomy; the model needs tapered forearms,
+  gauntlets, a pauldron with a real silhouette (exercise E1) before posing pays off fully.
+- No weapon art yet (by design: the weapon is drawn by what he holds). Next: export the hand.R socket (position and
+  blade angle per frame, from the rig) so the game draws the held weapon on the frames.

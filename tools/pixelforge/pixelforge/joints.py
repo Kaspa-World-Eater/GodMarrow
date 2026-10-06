@@ -347,4 +347,7 @@ def load_joints(path: str | Path = JOINTS_FILE) -> JointTracks:
         else:
             raise FileNotFoundError(f"no joint tracks at {path} and no animation library at {LIBRARY} to export them from")
     with gzip.open(path, "rt") as fh:
-        return JointTracks(json.load(fh))
+        tr = JointTracks(json.load(fh))
+    from .keyed import add_keyed      # posed clips (assets/animations/keyed) beside the library's
+    add_keyed(tr)
+    return tr
