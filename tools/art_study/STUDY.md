@@ -422,3 +422,57 @@ out of the game. What copying it taught:
     outline). Fix: blades at least 3 px, bone thickening at the tips, weight only on the lower contour. The cast
     shadow had been exaggerated for the ripples; on a tall thing that made a night-long shadow. The sun height for
     casting was raised.
+
+## Round 11: trees (2026-10-06; Derek: "study trees next and learn to draw them")
+My earlier trees failed (cones; then "trees look like shit, don't use conifers"; then blob crowns on stick
+limbs). This round learns the tree from the inside out, one exercise at a time, each graded before the next.
+
+### How a tree is built (botany a painter needs)
+- **Area is conserved at every fork** (Leonardo's rule): the cross-sections of the branches after a fork add up to
+  the one before it, r^2 = r1^2 + r2^2. So limbs never stay thick and then sprout sticks: the taper is continuous,
+  and a fork into two equal limbs leaves each about 0.7 of the parent's width.
+- **The smaller branch bends away more.** At a fork the dominant limb carries on nearly straight; the lesser one
+  leaves at a wide angle (40-70 degrees). Equal forks split symmetrically (a Y); unequal forks look like a limb
+  carrying on with a branch coming off it.
+- **Each fork turns** (the branches spiral round the axis, roughly 137 degrees each time), so a tree is never flat.
+- **Broadleaf trees are decurrent:** the trunk loses itself in a few great limbs, which spread; the crown is wide
+  and rounded, made of the masses those limbs carry. (Conifers keep one leader, excurrent: Derek has ruled them out.)
+- **Gesture.** Limbs reach up toward the light (phototropism), long ones sag under their own weight and turn up at
+  the tip; old trees lean and twist; the trunk flares into its roots (buttresses), and the roots run out into the
+  ground and dive.
+- **Bark** runs in ridges and furrows along the grain, twisting slightly; it is darker and deeper in the furrows,
+  lit on the ridges; crotches (the inside of a fork) gather a dark wrinkled collar.
+
+### How painters draw them
+- **Silhouette first, then masses, then light, then edges.** A crown is one big shape, then three to seven masses
+  (each a clump of foliage on one limb), each lit like a rough ball: lit top, half-tone side, dark underside.
+- **Sky holes.** Gaps where the background shows through the crown, smaller near the middle; through them, limbs.
+- **Detail only on the light side and the silhouette.** The shadow side is flat and simple; the leaf texture is
+  in the lit planes and the broken edge.
+- **The underside of a crown is dark** and casts shadow on the trunk under it; the trunk is often lit only below
+  the crown.
+- **Values in groups:** three or four values per tree, not twenty.
+- **For a high three-quarter game view** the crown's top plane faces the camera: more of it is lit, and less trunk
+  shows; the cast shadow on the ground carries much of the reading.
+
+### Exercises
+1. The skeleton: a bare broadleaf tree, its structure alone (gesture lines, then volumes, then painted).
+2. Crown masses as a value study, on that skeleton.
+3. The full broadleaf tree in the game's view, painted.
+4. Its kin: a dead gnarled tree, a burnt one, a young one.
+
+### Exercise 1 done: the skeleton (`tree_anatomy.py`)
+- **Scale is the first fact here too.** Derek: "true to scale so trees need to be large ... the hero small relative
+  to them". The hero is 195 x 0.78 screen px = 38 world px, about 2 yards. An old broadleaf is about 16 yards
+  (15 m): around 350 world px, taller than the 270 px a 1080p screen shows. So in the game's own view the crown leaves
+  the frame. The player walks among trunks and under limbs, and reads the canopy by its shadow lace on the ground.
+  Seen from the game's camera, a tree in front of the hero rises past the top of the screen.
+- **Faults found and fixed on the way:** a sapling's proportions (thin trunk, a narrow vase), not an old tree's
+  spread; too few twigs (a bare crown is mostly a haze of sub-pixel twigs, mixed with what is behind them); every
+  great limb leaving one point, like sticks in a stump (they leave at staggered heights, born inside the trunk); an
+  open end at the top of the trunk (the trunk swells at the fork and carries on as the leader); a void behind the tree
+  (in the game's high view the ground is behind everything); ground strokes that read as rain.
+- **Derek's ruling on variety:** "trees come in many forms, many shapes, many species, many age groups. This is true
+  for all plants. Whereas ruins and fortresses will be fixed." So the exercises grow a population, not one tree:
+  species with their own habits (the spreading broadleaf, a weeping one, a tall narrow one, a gnarled thorn), each at
+  every age (sapling, young, mature, ancient, dying, dead).
