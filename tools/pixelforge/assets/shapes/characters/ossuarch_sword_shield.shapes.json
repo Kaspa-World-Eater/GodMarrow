@@ -1,0 +1,4958 @@
+{
+ "name": "Ossuarch (sword and shield)",
+ "about": "The Ossuarch, from Derek's painting (ossuarch_009202c4_2): black plate, a tall pointed iron helm with a slit visor, a bone brow band and nine vertebrae up its spike, a pale green plume rising from the tip; a dark teal hood and mantle; nine charm bones on the chest and belt; a mail skirt between plate tassets; great layered pauldrons with bone rims cut with tally notches in nines; a long tattered teal cloak to the ground.",
+ "mode": "solid",
+ "size": [
+  150,
+  170
+ ],
+ "height": 120,
+ "ground": 166,
+ "axis": [
+  75.0,
+  0
+ ],
+ "view": {
+  "elevation": 12,
+  "contrast": 1.4,
+  "light": [
+   -0.78,
+   -0.62,
+   0.22
+  ]
+ },
+ "outline": "#030305",
+ "skeleton": {
+  "height": 120,
+  "ground": 166,
+  "cx": 75.0
+ },
+ "materials": {
+  "iron": {
+   "ramp": [
+    "#040404",
+    "#080708",
+    "#0d0c0c",
+    "#131212",
+    "#1a1818",
+    "#22201f",
+    "#2c2928",
+    "#3a3534",
+    "#4f4746",
+    "#706563",
+    "#4f7a6a"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.35,
+   "spec": true,
+   "spec_t": 0.84,
+   "rim_edge": true
+  },
+  "ironw": {
+   "ramp": [
+    "#060606",
+    "#0b0a0a",
+    "#121111",
+    "#1a1818",
+    "#232120",
+    "#2e2b2a",
+    "#3c3837",
+    "#524b4a",
+    "#706866",
+    "#978b88",
+    "#86b8a3"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.3,
+   "spec": true,
+   "spec_t": 0.8,
+   "rim_edge": true
+  },
+  "cloth": {
+   "ramp": [
+    "#030505",
+    "#060a09",
+    "#0a100f",
+    "#0e1715",
+    "#121f1c",
+    "#172823",
+    "#1d332c",
+    "#22302a",
+    "#3a6656"
+   ],
+   "rim_edge": true,
+   "texture": "weave",
+   "texture_strength": 0.45
+  },
+  "bone": {
+   "ramp": [
+    "#2a1518",
+    "#46262a",
+    "#683c3b",
+    "#8c574f",
+    "#ad7563",
+    "#c9937b",
+    "#ddb096",
+    "#ebc8b0",
+    "#f4dcc8",
+    "#fbede0"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.4
+  },
+  "plume": {
+   "ramp": [
+    "#0f211c",
+    "#173229",
+    "#20463a",
+    "#2c5d4d",
+    "#3c7863",
+    "#52957d",
+    "#6fb298",
+    "#94ccb4",
+    "#bce3d0",
+    "#e0f4ea"
+   ]
+  },
+  "mail": {
+   "ramp": [
+    "#040304",
+    "#090707",
+    "#0f0c0b",
+    "#161210",
+    "#1e1916",
+    "#26201c",
+    "#3a6656"
+   ],
+   "rim_edge": true,
+   "spec": true,
+   "spec_t": 0.8
+  },
+  "leather": {
+   "ramp": [
+    "#0a0606",
+    "#140c0b",
+    "#1f1411",
+    "#2b1c17",
+    "#38251d",
+    "#463024"
+   ]
+  },
+  "void": {
+   "ramp": [
+    "#010102",
+    "#030305",
+    "#06060a"
+   ]
+  },
+  "steel": {
+   "ramp": [
+    "#0a0912",
+    "#15151f",
+    "#232430",
+    "#363844",
+    "#4d5059",
+    "#686b70",
+    "#8a8b88",
+    "#b3b0a2",
+    "#ddd6c0",
+    "#fff6dc"
+   ],
+   "texture": "scratch",
+   "texture_strength": 0.25,
+   "spec": true,
+   "spec_t": 0.72,
+   "rim_edge": true
+  },
+  "oak": {
+   "ramp": [
+    "#0f0709",
+    "#1d0e0d",
+    "#2c1712",
+    "#3f2216",
+    "#55301b",
+    "#6b4122",
+    "#82552e",
+    "#9c6c3c"
+   ],
+   "texture": "grain",
+   "texture_strength": 0.45
+  },
+  "grip": {
+   "ramp": [
+    "#0c0606",
+    "#190c0a",
+    "#28140f",
+    "#3b2016",
+    "#4f2d1d",
+    "#663d27"
+   ],
+   "texture": "weave",
+   "texture_strength": 0.4
+  }
+ },
+ "parts": {
+  "plume": {
+   "bone": "head",
+   "lag": {
+    "frames": 2,
+    "sway": 1.0,
+    "max": 0.4,
+    "flutter": 0.15,
+    "phase": 1.2
+   },
+   "hang": 0.7
+  },
+  "mantle": {
+   "bone": "spine.003",
+   "lag": {
+    "frames": 1,
+    "sway": 0.4,
+    "max": 0.2
+   },
+   "hang": 0.6
+  },
+  "skirt": {
+   "bone": "hips",
+   "lag": {
+    "frames": 1,
+    "sway": 0.5,
+    "max": 0.25,
+    "flutter": 0.08,
+    "phase": 0.6
+   },
+   "hang": 0.35
+  },
+  "cloak": {
+   "bone": "spine.002",
+   "lag": {
+    "frames": 2,
+    "sway": 1.3,
+    "max": 0.35,
+    "flutter": 0.12
+   },
+   "hang": 0.3
+  }
+ },
+ "shapes": [
+  {
+   "name": "helm",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    45.0,
+    0.8
+   ],
+   "radii": [
+    7.0,
+    9.0,
+    7.4
+   ],
+   "material": "iron",
+   "bone": "head",
+   "rules": [
+    {
+     "z": [
+      5.0,
+      null
+     ],
+     "y": [
+      43.8,
+      45.8
+     ],
+     "material": "void"
+    },
+    {
+     "z": [
+      5.6,
+      null
+     ],
+     "y": [
+      47.2,
+      50.4
+     ],
+     "every_x": [
+      2,
+      0
+     ],
+     "every_y": [
+      2,
+      0
+     ],
+     "material": "void"
+    },
+    {
+     "z": [
+      5.0,
+      null
+     ],
+     "y": [
+      42.6,
+      43.8
+     ],
+     "t": 2
+    },
+    {
+     "z": [
+      5.6,
+      null
+     ],
+     "x": [
+      74.4,
+      75.6
+     ],
+     "y": [
+      45.6,
+      50.0
+     ],
+     "material": "void"
+    },
+    {
+     "every_angle": [
+      14,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "helm_ridge",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    52.0,
+    6.8
+   ],
+   "b": [
+    75.0,
+    37.0,
+    5.2
+   ],
+   "r": [
+    1.0,
+    0.8
+   ],
+   "material": "ironw",
+   "bone": "head"
+  },
+  {
+   "name": "cheek_l",
+   "kind": "box",
+   "centre": [
+    79.6,
+    49.0,
+    4.0
+   ],
+   "half": [
+    1.8,
+    3.4,
+    2.4
+   ],
+   "round": 1.0,
+   "material": "iron",
+   "bone": "head"
+  },
+  {
+   "name": "cheek_r",
+   "kind": "box",
+   "centre": [
+    70.4,
+    49.0,
+    4.0
+   ],
+   "half": [
+    1.8,
+    3.4,
+    2.4
+   ],
+   "round": 1.0,
+   "material": "iron",
+   "bone": "head"
+  },
+  {
+   "name": "brow_band",
+   "kind": "ring",
+   "y": [
+    40.8,
+    42.0
+   ],
+   "rx": [
+    7.2,
+    0.0
+   ],
+   "rz": [
+    7.6,
+    0.0
+   ],
+   "cz": 0.8,
+   "thickness": 1.0,
+   "material": "bone",
+   "bone": "head",
+   "rules": [
+    {
+     "every_angle": [
+      36,
+      0
+     ],
+     "t": -3
+    },
+    {
+     "every_angle": [
+      9,
+      8
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "crown",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    37.6,
+    0.4
+   ],
+   "radii": [
+    4.4,
+    3.2,
+    4.6
+   ],
+   "material": "ironw",
+   "bone": "head",
+   "rules": [
+    {
+     "every_angle": [
+      8,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "spike",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    36.0,
+    0.2
+   ],
+   "b": [
+    75.0,
+    19.0,
+    -1.0
+   ],
+   "r": [
+    2.4,
+    0.7
+   ],
+   "material": "iron",
+   "bone": "head",
+   "rules": [
+    {
+     "every_angle": [
+      6,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      null,
+      26.0
+     ],
+     "material": "ironw"
+    }
+   ]
+  },
+  {
+   "name": "finial",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    18.6,
+    -1.0
+   ],
+   "radii": [
+    1.5,
+    1.3,
+    1.5
+   ],
+   "material": "bone",
+   "bone": "head"
+  },
+  {
+   "name": "vert0",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    35.5,
+    -3.2
+   ],
+   "radii": [
+    1.5,
+    0.875,
+    1.25
+   ],
+   "material": "bone",
+   "bone": "head",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -0.2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "vert0_sp",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    35.5,
+    -3.2
+   ],
+   "b": [
+    75.0,
+    34.9,
+    -4.825
+   ],
+   "r": [
+    0.5625,
+    0.25
+   ],
+   "material": "bone",
+   "bone": "head"
+  },
+  {
+   "name": "vert1",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    33.5625,
+    -2.975
+   ],
+   "radii": [
+    1.41,
+    0.8225,
+    1.175
+   ],
+   "material": "bone",
+   "bone": "head",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -0.2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "vert1_sp",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    33.5625,
+    -2.975
+   ],
+   "b": [
+    75.0,
+    32.9625,
+    -4.5025
+   ],
+   "r": [
+    0.52875,
+    0.23500000000000001
+   ],
+   "material": "bone",
+   "bone": "head"
+  },
+  {
+   "name": "vert2",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    31.625,
+    -2.75
+   ],
+   "radii": [
+    1.32,
+    0.77,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "head",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -0.2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "vert2_sp",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    31.625,
+    -2.75
+   ],
+   "b": [
+    75.0,
+    31.025,
+    -4.18
+   ],
+   "r": [
+    0.49500000000000005,
+    0.22000000000000003
+   ],
+   "material": "bone",
+   "bone": "head"
+  },
+  {
+   "name": "vert3",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    29.6875,
+    -2.525
+   ],
+   "radii": [
+    1.2299999999999998,
+    0.7174999999999999,
+    1.025
+   ],
+   "material": "bone",
+   "bone": "head",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -0.2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "vert3_sp",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    29.6875,
+    -2.525
+   ],
+   "b": [
+    75.0,
+    29.0875,
+    -3.8575
+   ],
+   "r": [
+    0.46125,
+    0.205
+   ],
+   "material": "bone",
+   "bone": "head"
+  },
+  {
+   "name": "vert4",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    27.75,
+    -2.3000000000000003
+   ],
+   "radii": [
+    1.14,
+    0.6649999999999999,
+    0.95
+   ],
+   "material": "bone",
+   "bone": "head",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -0.2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "vert4_sp",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    27.75,
+    -2.3000000000000003
+   ],
+   "b": [
+    75.0,
+    27.15,
+    -3.535
+   ],
+   "r": [
+    0.4275,
+    0.19
+   ],
+   "material": "bone",
+   "bone": "head"
+  },
+  {
+   "name": "vert5",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    25.8125,
+    -2.075
+   ],
+   "radii": [
+    1.05,
+    0.6124999999999999,
+    0.875
+   ],
+   "material": "bone",
+   "bone": "head",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -0.2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "vert5_sp",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    25.8125,
+    -2.075
+   ],
+   "b": [
+    75.0,
+    25.2125,
+    -3.2125000000000004
+   ],
+   "r": [
+    0.39375,
+    0.17500000000000002
+   ],
+   "material": "bone",
+   "bone": "head"
+  },
+  {
+   "name": "vert6",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    23.875,
+    -1.85
+   ],
+   "radii": [
+    0.96,
+    0.5599999999999999,
+    0.8
+   ],
+   "material": "bone",
+   "bone": "head",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -0.2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "vert6_sp",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    23.875,
+    -1.85
+   ],
+   "b": [
+    75.0,
+    23.275,
+    -2.89
+   ],
+   "r": [
+    0.36000000000000004,
+    0.16000000000000003
+   ],
+   "material": "bone",
+   "bone": "head"
+  },
+  {
+   "name": "vert7",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    21.9375,
+    -1.625
+   ],
+   "radii": [
+    0.87,
+    0.5075,
+    0.725
+   ],
+   "material": "bone",
+   "bone": "head",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -0.2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "vert7_sp",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    21.9375,
+    -1.625
+   ],
+   "b": [
+    75.0,
+    21.3375,
+    -2.5675
+   ],
+   "r": [
+    0.32625,
+    0.145
+   ],
+   "material": "bone",
+   "bone": "head"
+  },
+  {
+   "name": "vert8",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    20.0,
+    -1.4
+   ],
+   "radii": [
+    0.78,
+    0.45499999999999996,
+    0.65
+   ],
+   "material": "bone",
+   "bone": "head",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -0.2
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "vert8_sp",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    20.0,
+    -1.4
+   ],
+   "b": [
+    75.0,
+    19.4,
+    -2.245
+   ],
+   "r": [
+    0.29250000000000004,
+    0.13
+   ],
+   "material": "bone",
+   "bone": "head"
+  },
+  {
+   "name": "flame_body",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    16.0,
+    -1.2
+   ],
+   "b": [
+    77.4,
+    6.4,
+    -5.0
+   ],
+   "r": [
+    1.3,
+    4.2
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "y": [
+      null,
+      10.0
+     ],
+     "t": 1
+    },
+    {
+     "hash": [
+      0.1,
+      2,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "flame_lick0",
+   "kind": "capsule",
+   "a": [
+    77.4,
+    5.4,
+    -5.0
+   ],
+   "b": [
+    78.80000000000001,
+    -1.0,
+    -7.6
+   ],
+   "r": [
+    1.7,
+    0.25
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "flame_lick1",
+   "kind": "capsule",
+   "a": [
+    77.4,
+    5.4,
+    -5.0
+   ],
+   "b": [
+    82.4,
+    0.40000000000000036,
+    -6.6
+   ],
+   "r": [
+    1.4,
+    0.25
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "flame_lick2",
+   "kind": "capsule",
+   "a": [
+    77.4,
+    5.4,
+    -5.0
+   ],
+   "b": [
+    75.80000000000001,
+    0.6000000000000005,
+    -8.4
+   ],
+   "r": [
+    1.3,
+    0.25
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "flame_lick3",
+   "kind": "capsule",
+   "a": [
+    77.4,
+    5.4,
+    -5.0
+   ],
+   "b": [
+    84.80000000000001,
+    2.8000000000000003,
+    -5.6
+   ],
+   "r": [
+    1.1,
+    0.25
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "flame_lick4",
+   "kind": "capsule",
+   "a": [
+    77.4,
+    5.4,
+    -5.0
+   ],
+   "b": [
+    73.80000000000001,
+    2.6000000000000005,
+    -7.0
+   ],
+   "r": [
+    1.0,
+    0.25
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "flame_lick5",
+   "kind": "capsule",
+   "a": [
+    77.4,
+    5.4,
+    -5.0
+   ],
+   "b": [
+    80.60000000000001,
+    -1.7999999999999998,
+    -9.4
+   ],
+   "r": [
+    1.0,
+    0.25
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "flame_lick6",
+   "kind": "capsule",
+   "a": [
+    77.4,
+    5.4,
+    -5.0
+   ],
+   "b": [
+    86.4,
+    4.800000000000001,
+    -4.4
+   ],
+   "r": [
+    0.8,
+    0.25
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "flame_lick7",
+   "kind": "capsule",
+   "a": [
+    77.4,
+    5.4,
+    -5.0
+   ],
+   "b": [
+    72.4,
+    4.6000000000000005,
+    -6.0
+   ],
+   "r": [
+    0.8,
+    0.25
+   ],
+   "material": "plume",
+   "part": "plume",
+   "rules": [
+    {
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "neck",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    60.0,
+    -1.0
+   ],
+   "b": [
+    75.0,
+    52.0,
+    0.2
+   ],
+   "r": [
+    5.4,
+    4.6
+   ],
+   "material": "mail",
+   "bone": "neck",
+   "rules": [
+    {
+     "every_y": [
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "hood",
+   "kind": "ring",
+   "y": [
+    51,
+    61
+   ],
+   "rx": [
+    7.6,
+    0.24
+   ],
+   "rz": [
+    8.0,
+    0.22
+   ],
+   "cz": -0.8,
+   "thickness": 2.6,
+   "material": "cloth",
+   "bone": "spine.003",
+   "bump": {
+    "folds": [
+     0.7,
+     8,
+     2.4
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      7,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      null,
+      54
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "scarf_fold",
+   "kind": "capsule",
+   "a": [
+    67.0,
+    58.0,
+    5.0
+   ],
+   "b": [
+    82.0,
+    62.0,
+    6.2
+   ],
+   "r": [
+    2.6,
+    2.2
+   ],
+   "material": "cloth",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "every_x": [
+      3,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "hood_back",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    52.0,
+    -6.4
+   ],
+   "radii": [
+    7.6,
+    6.4,
+    4.2
+   ],
+   "material": "cloth",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "every_angle": [
+      12,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "mantle",
+   "kind": "ring",
+   "y": [
+    58,
+    74
+   ],
+   "rx": [
+    15.0,
+    0.12
+   ],
+   "rz": [
+    10.6,
+    0.1
+   ],
+   "cz": -1.2,
+   "thickness": 1.8,
+   "keep": {
+    "back_strip": 2.3
+   },
+   "hem": {
+    "tongues": 11,
+    "depth": 8,
+    "seed": 4
+   },
+   "material": "cloth",
+   "part": "mantle",
+   "bump": {
+    "folds": [
+     0.6,
+     9,
+     2.4
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      8,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "chest",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    70.0,
+    0.4
+   ],
+   "radii": [
+    13.4,
+    12.0,
+    9.4
+   ],
+   "material": "iron",
+   "bone": "spine.003",
+   "rules": [
+    {
+     "z": [
+      6.0,
+      null
+     ],
+     "every_y": [
+      5,
+      1
+     ],
+     "t": -1
+    },
+    {
+     "x": [
+      74.4,
+      75.6
+     ],
+     "z": [
+      7.0,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "y": [
+      76.0,
+      77.0
+     ],
+     "every_x": [
+      3,
+      1
+     ],
+     "z": [
+      5.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.06,
+      3,
+      5
+     ],
+     "t": -2
+    },
+    {
+     "hash": [
+      0.03,
+      2,
+      9
+     ],
+     "t": 2
+    }
+   ]
+  },
+  {
+   "name": "plackart",
+   "kind": "ellipsoid",
+   "centre": [
+    75.0,
+    81.0,
+    2.2
+   ],
+   "radii": [
+    10.4,
+    6.2,
+    7.6
+   ],
+   "material": "iron",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "every_y": [
+      3,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "y": [
+      84.5,
+      85.5
+     ],
+     "every_x": [
+      3,
+      0
+     ],
+     "z": [
+      4.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    }
+   ]
+  },
+  {
+   "name": "waist",
+   "kind": "capsule",
+   "a": [
+    75.0,
+    84.0,
+    -0.4
+   ],
+   "b": [
+    75.0,
+    96.0,
+    -1.6
+   ],
+   "r": [
+    10.0,
+    11.4
+   ],
+   "material": "mail",
+   "bone": "spine.001",
+   "rules": [
+    {
+     "every_y": [
+      1,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "every_x": [
+      1,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "belt",
+   "kind": "ring",
+   "y": [
+    91.5,
+    95.5
+   ],
+   "rx": [
+    11.2,
+    0.0
+   ],
+   "rz": [
+    9.6,
+    0.0
+   ],
+   "thickness": 1.8,
+   "material": "leather",
+   "bone": "hips",
+   "rules": [
+    {
+     "every_angle": [
+      18,
+      0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "buckle",
+   "kind": "box",
+   "centre": [
+    75.0,
+    93.5,
+    10.2
+   ],
+   "half": [
+    2.0,
+    2.0,
+    0.6
+   ],
+   "round": 0.4,
+   "material": "ironw",
+   "bone": "hips"
+  },
+  {
+   "name": "pouch0",
+   "kind": "box",
+   "centre": [
+    66.4,
+    98.0,
+    6.8
+   ],
+   "half": [
+    2.4,
+    3.0,
+    1.6
+   ],
+   "round": 0.8,
+   "material": "leather",
+   "bone": "hips",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.6
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      -1.4,
+      -0.8
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "pouch1",
+   "kind": "box",
+   "centre": [
+    84.4,
+    98.0,
+    6.0
+   ],
+   "half": [
+    2.4,
+    3.0,
+    1.6
+   ],
+   "round": 0.8,
+   "material": "leather",
+   "bone": "hips",
+   "rules": [
+    {
+     "dy": [
+      null,
+      -1.6
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      -1.4,
+      -0.8
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "relic_bone",
+   "kind": "capsule",
+   "a": [
+    63.4,
+    94.0,
+    2.0
+   ],
+   "b": [
+    61.6,
+    117.0,
+    3.4
+   ],
+   "r": [
+    1.7,
+    1.5
+   ],
+   "material": "bone",
+   "part": "skirt"
+  },
+  {
+   "name": "relic_knob",
+   "kind": "ellipsoid",
+   "centre": [
+    61.5,
+    118.2,
+    3.4
+   ],
+   "radii": [
+    2.4,
+    1.8,
+    1.9
+   ],
+   "material": "bone",
+   "part": "skirt"
+  },
+  {
+   "name": "relic_wrap",
+   "kind": "capsule",
+   "a": [
+    63.0,
+    98.0,
+    2.2
+   ],
+   "b": [
+    62.1,
+    110.0,
+    2.9
+   ],
+   "r": [
+    2.1,
+    1.9
+   ],
+   "material": "cloth",
+   "part": "skirt",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "tabard",
+   "kind": "ring",
+   "y": [
+    94,
+    122
+   ],
+   "rx": [
+    11.2,
+    0.05
+   ],
+   "rz": [
+    10.0,
+    0.05
+   ],
+   "cz": 0.4,
+   "thickness": 1.4,
+   "keep": {
+    "front": 0.42
+   },
+   "hem": {
+    "tongues": 5,
+    "depth": 16,
+    "seed": 11
+   },
+   "holes": {
+    "p": 0.08,
+    "band": 14,
+    "seed": 2
+   },
+   "material": "cloth",
+   "part": "skirt",
+   "bump": {
+    "folds": [
+     0.6,
+     5,
+     1.6
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      5,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      6
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "mail_skirt",
+   "kind": "ring",
+   "y": [
+    94,
+    110
+   ],
+   "rx": [
+    10.6,
+    0.06
+   ],
+   "rz": [
+    9.4,
+    0.05
+   ],
+   "thickness": 1.4,
+   "keep": {
+    "front": 0.95
+   },
+   "hem": {
+    "tongues": 9,
+    "depth": 3,
+    "seed": 2
+   },
+   "material": "mail",
+   "part": "skirt",
+   "rules": [
+    {
+     "every_y": [
+      1,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "every_x": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      2
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "tasset0.L",
+   "kind": "box",
+   "centre": [
+    84.0,
+    98.0,
+    3.6
+   ],
+   "half": [
+    5.4,
+    3.6,
+    2.6
+   ],
+   "round": 1.2,
+   "material": "iron",
+   "bone": "thigh.L",
+   "rules": [
+    {
+     "dy": [
+      2.4,
+      null
+     ],
+     "material": "ironw"
+    }
+   ]
+  },
+  {
+   "name": "tasset1.L",
+   "kind": "box",
+   "centre": [
+    84.6,
+    105.0,
+    3.0
+   ],
+   "half": [
+    5.800000000000001,
+    3.6,
+    2.6
+   ],
+   "round": 1.2,
+   "material": "iron",
+   "bone": "thigh.L",
+   "rules": [
+    {
+     "dy": [
+      2.4,
+      null
+     ],
+     "material": "ironw"
+    }
+   ]
+  },
+  {
+   "name": "tasset2.L",
+   "kind": "box",
+   "centre": [
+    85.2,
+    112.0,
+    2.4000000000000004
+   ],
+   "half": [
+    6.2,
+    3.6,
+    2.6
+   ],
+   "round": 1.2,
+   "material": "iron",
+   "bone": "thigh.L",
+   "rules": [
+    {
+     "dy": [
+      2.4,
+      null
+     ],
+     "material": "ironw"
+    }
+   ]
+  },
+  {
+   "name": "tasset0.R",
+   "kind": "box",
+   "centre": [
+    66.0,
+    98.0,
+    3.6
+   ],
+   "half": [
+    5.4,
+    3.6,
+    2.6
+   ],
+   "round": 1.2,
+   "material": "iron",
+   "bone": "thigh.R",
+   "rules": [
+    {
+     "dy": [
+      2.4,
+      null
+     ],
+     "material": "ironw"
+    }
+   ]
+  },
+  {
+   "name": "tasset1.R",
+   "kind": "box",
+   "centre": [
+    65.4,
+    105.0,
+    3.0
+   ],
+   "half": [
+    5.800000000000001,
+    3.6,
+    2.6
+   ],
+   "round": 1.2,
+   "material": "iron",
+   "bone": "thigh.R",
+   "rules": [
+    {
+     "dy": [
+      2.4,
+      null
+     ],
+     "material": "ironw"
+    }
+   ]
+  },
+  {
+   "name": "tasset2.R",
+   "kind": "box",
+   "centre": [
+    64.8,
+    112.0,
+    2.4000000000000004
+   ],
+   "half": [
+    6.2,
+    3.6,
+    2.6
+   ],
+   "round": 1.2,
+   "material": "iron",
+   "bone": "thigh.R",
+   "rules": [
+    {
+     "dy": [
+      2.4,
+      null
+     ],
+     "material": "ironw"
+    }
+   ]
+  },
+  {
+   "name": "cloak",
+   "kind": "ring",
+   "y": [
+    62,
+    142
+   ],
+   "rx": [
+    15.0,
+    0.2
+   ],
+   "rz": [
+    12.0,
+    0.12
+   ],
+   "cz": -2.4,
+   "thickness": 1.8,
+   "keep": {
+    "back_strip": 2.4
+   },
+   "hem": {
+    "tongues": 15,
+    "depth": 22,
+    "seed": 7
+   },
+   "holes": {
+    "p": 0.08,
+    "band": 26,
+    "seed": 3
+   },
+   "material": "cloth",
+   "part": "cloak",
+   "bump": {
+    "folds": [
+     0.7,
+     11,
+     2.8
+    ]
+   },
+   "rules": [
+    {
+     "every_angle": [
+      7,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "hem_band": [
+      0,
+      3
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "charm_cord",
+   "kind": "capsule",
+   "a": [
+    66.0,
+    61.0,
+    7.2
+   ],
+   "b": [
+    83.6,
+    61.4,
+    7.4
+   ],
+   "r": 0.45,
+   "material": "leather",
+   "bone": "spine.003",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "baldric",
+   "kind": "capsule",
+   "a": [
+    86.0,
+    60.0,
+    5.0
+   ],
+   "b": [
+    66.0,
+    92.0,
+    9.6
+   ],
+   "r": 1.3,
+   "material": "leather",
+   "bone": "spine.002",
+   "rules": [
+    {
+     "every_y": [
+      6,
+      0
+     ],
+     "material": "ironw"
+    }
+   ]
+  },
+  {
+   "name": "charm_chest0_cord",
+   "kind": "capsule",
+   "a": [
+    67.2,
+    60.0,
+    7.196
+   ],
+   "b": [
+    67.2,
+    62.4,
+    7.596
+   ],
+   "r": 0.3,
+   "material": "leather",
+   "bone": "spine.003",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "charm_chest0",
+   "kind": "capsule",
+   "a": [
+    67.2,
+    62.4,
+    7.596
+   ],
+   "b": [
+    65.8,
+    71.4,
+    7.796
+   ],
+   "r": [
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest0_top-1",
+   "kind": "ellipsoid",
+   "centre": [
+    66.05,
+    62.4,
+    7.796
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest0_top1",
+   "kind": "ellipsoid",
+   "centre": [
+    68.35000000000001,
+    62.4,
+    7.796
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest0_bot-1",
+   "kind": "ellipsoid",
+   "centre": [
+    64.64999999999999,
+    71.4,
+    7.996
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest0_bot1",
+   "kind": "ellipsoid",
+   "centre": [
+    66.95,
+    71.4,
+    7.996
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest1_cord",
+   "kind": "capsule",
+   "a": [
+    71.6,
+    61.2,
+    7.9879999999999995
+   ],
+   "b": [
+    71.6,
+    63.6,
+    8.388
+   ],
+   "r": 0.3,
+   "material": "leather",
+   "bone": "spine.003",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "charm_chest1",
+   "kind": "capsule",
+   "a": [
+    71.6,
+    63.6,
+    8.388
+   ],
+   "b": [
+    72.39999999999999,
+    76.6,
+    8.588
+   ],
+   "r": [
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest1_top-1",
+   "kind": "ellipsoid",
+   "centre": [
+    70.44999999999999,
+    63.6,
+    8.588
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest1_top1",
+   "kind": "ellipsoid",
+   "centre": [
+    72.75,
+    63.6,
+    8.588
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest1_bot-1",
+   "kind": "ellipsoid",
+   "centre": [
+    71.24999999999999,
+    76.6,
+    8.787999999999998
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest1_bot1",
+   "kind": "ellipsoid",
+   "centre": [
+    73.55,
+    76.6,
+    8.787999999999998
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest2_cord",
+   "kind": "capsule",
+   "a": [
+    75.6,
+    61.800000000000004,
+    8.491999999999999
+   ],
+   "b": [
+    75.6,
+    64.2,
+    8.892
+   ],
+   "r": 0.3,
+   "material": "leather",
+   "bone": "spine.003",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "charm_chest2",
+   "kind": "capsule",
+   "a": [
+    75.6,
+    64.2,
+    8.892
+   ],
+   "b": [
+    77.8,
+    75.2,
+    9.091999999999999
+   ],
+   "r": [
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest2_top-1",
+   "kind": "ellipsoid",
+   "centre": [
+    74.44999999999999,
+    64.2,
+    9.091999999999999
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest2_top1",
+   "kind": "ellipsoid",
+   "centre": [
+    76.75,
+    64.2,
+    9.091999999999999
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest2_bot-1",
+   "kind": "ellipsoid",
+   "centre": [
+    76.64999999999999,
+    75.2,
+    9.291999999999998
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest2_bot1",
+   "kind": "ellipsoid",
+   "centre": [
+    78.95,
+    75.2,
+    9.291999999999998
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest3_cord",
+   "kind": "capsule",
+   "a": [
+    77.0,
+    61.800000000000004,
+    8.24
+   ],
+   "b": [
+    77.0,
+    64.2,
+    8.64
+   ],
+   "r": 0.3,
+   "material": "leather",
+   "bone": "spine.003",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "charm_chest3",
+   "kind": "capsule",
+   "a": [
+    77.0,
+    64.2,
+    8.64
+   ],
+   "b": [
+    75.4,
+    78.7,
+    8.84
+   ],
+   "r": [
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest3_top-1",
+   "kind": "ellipsoid",
+   "centre": [
+    75.85,
+    64.2,
+    8.84
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest3_top1",
+   "kind": "ellipsoid",
+   "centre": [
+    78.15,
+    64.2,
+    8.84
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest3_bot-1",
+   "kind": "ellipsoid",
+   "centre": [
+    74.25,
+    78.7,
+    9.04
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest3_bot1",
+   "kind": "ellipsoid",
+   "centre": [
+    76.55000000000001,
+    78.7,
+    9.04
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest4_cord",
+   "kind": "capsule",
+   "a": [
+    82.0,
+    60.6,
+    7.34
+   ],
+   "b": [
+    82.0,
+    63.0,
+    7.74
+   ],
+   "r": 0.3,
+   "material": "leather",
+   "bone": "spine.003",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "charm_chest4",
+   "kind": "capsule",
+   "a": [
+    82.0,
+    63.0,
+    7.74
+   ],
+   "b": [
+    83.2,
+    71.0,
+    7.94
+   ],
+   "r": [
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest4_top-1",
+   "kind": "ellipsoid",
+   "centre": [
+    80.85,
+    63.0,
+    7.94
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest4_top1",
+   "kind": "ellipsoid",
+   "centre": [
+    83.15,
+    63.0,
+    7.94
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest4_bot-1",
+   "kind": "ellipsoid",
+   "centre": [
+    82.05,
+    71.0,
+    8.14
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_chest4_bot1",
+   "kind": "ellipsoid",
+   "centre": [
+    84.35000000000001,
+    71.0,
+    8.14
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "spine.003"
+  },
+  {
+   "name": "charm_belt0_cord",
+   "kind": "capsule",
+   "a": [
+    68.2,
+    94.6,
+    9.58
+   ],
+   "b": [
+    68.2,
+    97.0,
+    9.98
+   ],
+   "r": 0.3,
+   "material": "leather",
+   "bone": "hips",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "charm_belt0",
+   "kind": "capsule",
+   "a": [
+    68.2,
+    97.0,
+    9.98
+   ],
+   "b": [
+    67.2,
+    107.0,
+    10.18
+   ],
+   "r": [
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt0_top-1",
+   "kind": "ellipsoid",
+   "centre": [
+    67.05,
+    97.0,
+    10.18
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt0_top1",
+   "kind": "ellipsoid",
+   "centre": [
+    69.35000000000001,
+    97.0,
+    10.18
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt0_bot-1",
+   "kind": "ellipsoid",
+   "centre": [
+    66.05,
+    107.0,
+    10.379999999999999
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt0_bot1",
+   "kind": "ellipsoid",
+   "centre": [
+    68.35000000000001,
+    107.0,
+    10.379999999999999
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt1_cord",
+   "kind": "capsule",
+   "a": [
+    72.6,
+    94.6,
+    10.24
+   ],
+   "b": [
+    72.6,
+    97.0,
+    10.64
+   ],
+   "r": 0.3,
+   "material": "leather",
+   "bone": "hips",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "charm_belt1",
+   "kind": "capsule",
+   "a": [
+    72.6,
+    97.0,
+    10.64
+   ],
+   "b": [
+    73.19999999999999,
+    111.0,
+    10.84
+   ],
+   "r": [
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt1_top-1",
+   "kind": "ellipsoid",
+   "centre": [
+    71.44999999999999,
+    97.0,
+    10.84
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt1_top1",
+   "kind": "ellipsoid",
+   "centre": [
+    73.75,
+    97.0,
+    10.84
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt1_bot-1",
+   "kind": "ellipsoid",
+   "centre": [
+    72.04999999999998,
+    111.0,
+    11.04
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt1_bot1",
+   "kind": "ellipsoid",
+   "centre": [
+    74.35,
+    111.0,
+    11.04
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt2_cord",
+   "kind": "capsule",
+   "a": [
+    76.6,
+    94.6,
+    10.36
+   ],
+   "b": [
+    76.6,
+    97.0,
+    10.76
+   ],
+   "r": 0.3,
+   "material": "leather",
+   "bone": "hips",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "charm_belt2",
+   "kind": "capsule",
+   "a": [
+    76.6,
+    97.0,
+    10.76
+   ],
+   "b": [
+    75.8,
+    109.0,
+    10.959999999999999
+   ],
+   "r": [
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt2_top-1",
+   "kind": "ellipsoid",
+   "centre": [
+    75.44999999999999,
+    97.0,
+    10.959999999999999
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt2_top1",
+   "kind": "ellipsoid",
+   "centre": [
+    77.75,
+    97.0,
+    10.959999999999999
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt2_bot-1",
+   "kind": "ellipsoid",
+   "centre": [
+    74.64999999999999,
+    109.0,
+    11.159999999999998
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt2_bot1",
+   "kind": "ellipsoid",
+   "centre": [
+    76.95,
+    109.0,
+    11.159999999999998
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt3_cord",
+   "kind": "capsule",
+   "a": [
+    81.0,
+    94.6,
+    9.7
+   ],
+   "b": [
+    81.0,
+    97.0,
+    10.1
+   ],
+   "r": 0.3,
+   "material": "leather",
+   "bone": "hips",
+   "px": [
+    90,
+    null
+   ]
+  },
+  {
+   "name": "charm_belt3",
+   "kind": "capsule",
+   "a": [
+    81.0,
+    97.0,
+    10.1
+   ],
+   "b": [
+    82.4,
+    112.0,
+    10.299999999999999
+   ],
+   "r": [
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt3_top-1",
+   "kind": "ellipsoid",
+   "centre": [
+    79.85,
+    97.0,
+    10.299999999999999
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt3_top1",
+   "kind": "ellipsoid",
+   "centre": [
+    82.15,
+    97.0,
+    10.299999999999999
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt3_bot-1",
+   "kind": "ellipsoid",
+   "centre": [
+    81.25,
+    112.0,
+    10.499999999999998
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "charm_belt3_bot1",
+   "kind": "ellipsoid",
+   "centre": [
+    83.55000000000001,
+    112.0,
+    10.499999999999998
+   ],
+   "radii": [
+    1.3,
+    1.25,
+    1.1
+   ],
+   "material": "bone",
+   "bone": "hips"
+  },
+  {
+   "name": "pauldron0.L",
+   "kind": "ellipsoid",
+   "centre": [
+    89.4,
+    59.4,
+    -0.8
+   ],
+   "radii": [
+    11.4,
+    6.0,
+    11.0
+   ],
+   "material": "iron",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "every_angle": [
+      16,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      0
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      7
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "pauldron1.L",
+   "kind": "ellipsoid",
+   "centre": [
+    91.4,
+    65.60000000000001,
+    -1.4
+   ],
+   "radii": [
+    7.2,
+    3.4,
+    7.6000000000000005
+   ],
+   "material": "iron",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "every_angle": [
+      16,
+      1
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      1
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      8
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "pauldron2.L",
+   "kind": "ellipsoid",
+   "centre": [
+    93.4,
+    70.60000000000001,
+    -2.0
+   ],
+   "radii": [
+    6.4,
+    3.4,
+    6.800000000000001
+   ],
+   "material": "iron",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "every_angle": [
+      16,
+      2
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      2
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      9
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "pauldron_edge.L",
+   "kind": "capsule",
+   "a": [
+    81.6,
+    58.6,
+    6.0
+   ],
+   "b": [
+    94.4,
+    61.2,
+    4.2
+   ],
+   "r": [
+    0.8,
+    0.7
+   ],
+   "material": "ironw",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "every_x": [
+      2,
+      0
+     ],
+     "t": -3
+    },
+    {
+     "every_x": [
+      18,
+      17
+     ],
+     "t": -6
+    }
+   ]
+  },
+  {
+   "name": "upper_arm.L",
+   "kind": "capsule",
+   "a": [
+    89.0,
+    64.0,
+    -4.7
+   ],
+   "b": [
+    93.0,
+    81.2,
+    -5.1
+   ],
+   "r": [
+    5.0,
+    4.6
+   ],
+   "material": "iron",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "dy": [
+      6.0,
+      7.2
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      7.2,
+      null
+     ],
+     "material": "ironw"
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      2
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "couter.L",
+   "kind": "ellipsoid",
+   "centre": [
+    93.4,
+    81.2,
+    -4.6
+   ],
+   "radii": [
+    4.6,
+    4.4,
+    4.6
+   ],
+   "material": "ironw",
+   "bone": "forearm.L"
+  },
+  {
+   "name": "vambrace.L",
+   "kind": "capsule",
+   "a": [
+    93.0,
+    82.5,
+    -4.8
+   ],
+   "b": [
+    96.8,
+    98.5,
+    -0.9
+   ],
+   "r": [
+    4.8,
+    4.2
+   ],
+   "material": "iron",
+   "bone": "forearm.L",
+   "rules": [
+    {
+     "every_y": [
+      5,
+      0
+     ],
+     "t": -3
+    },
+    {
+     "x": [
+      94.3,
+      95.7
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      3
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "gauntlet_cuff.L",
+   "kind": "capsule",
+   "a": [
+    96.4,
+    96.0,
+    -1.2
+   ],
+   "b": [
+    97.2,
+    100.4,
+    -0.6
+   ],
+   "r": [
+    5.2,
+    5.4
+   ],
+   "material": "ironw",
+   "bone": "forearm.L",
+   "rules": [
+    {
+     "dy": [
+      1.6,
+      null
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      null,
+      -1.6
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "gauntlet.L",
+   "kind": "ellipsoid",
+   "centre": [
+    97.8,
+    103.6,
+    0.0
+   ],
+   "radii": [
+    3.8,
+    4.4,
+    3.2
+   ],
+   "material": "iron",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "finger0.L",
+   "kind": "capsule",
+   "a": [
+    96.3,
+    106.0,
+    0.4
+   ],
+   "b": [
+    96.275,
+    110.4,
+    1.2
+   ],
+   "r": [
+    0.9,
+    0.7
+   ],
+   "material": "iron",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "finger1.L",
+   "kind": "capsule",
+   "a": [
+    97.3,
+    106.0,
+    0.4
+   ],
+   "b": [
+    97.425,
+    110.4,
+    1.2
+   ],
+   "r": [
+    0.9,
+    0.7
+   ],
+   "material": "iron",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "finger2.L",
+   "kind": "capsule",
+   "a": [
+    98.3,
+    106.0,
+    0.4
+   ],
+   "b": [
+    98.575,
+    110.4,
+    1.2
+   ],
+   "r": [
+    0.9,
+    0.7
+   ],
+   "material": "iron",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "finger3.L",
+   "kind": "capsule",
+   "a": [
+    99.3,
+    106.0,
+    0.4
+   ],
+   "b": [
+    99.725,
+    110.4,
+    1.2
+   ],
+   "r": [
+    0.9,
+    0.7
+   ],
+   "material": "iron",
+   "bone": "hand.L",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "pauldron0.R",
+   "kind": "ellipsoid",
+   "centre": [
+    60.599999999999994,
+    59.4,
+    -0.8
+   ],
+   "radii": [
+    11.4,
+    6.0,
+    11.0
+   ],
+   "material": "iron",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "every_angle": [
+      16,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      0
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      7
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "pauldron1.R",
+   "kind": "ellipsoid",
+   "centre": [
+    58.599999999999994,
+    65.60000000000001,
+    -1.4
+   ],
+   "radii": [
+    7.2,
+    3.4,
+    7.6000000000000005
+   ],
+   "material": "iron",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "every_angle": [
+      16,
+      1
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      1
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      8
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "pauldron2.R",
+   "kind": "ellipsoid",
+   "centre": [
+    56.599999999999994,
+    70.60000000000001,
+    -2.0
+   ],
+   "radii": [
+    6.4,
+    3.4,
+    6.800000000000001
+   ],
+   "material": "iron",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "every_angle": [
+      16,
+      2
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      2.6,
+      3.6
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      3.6,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "dy": [
+      2.9,
+      3.4
+     ],
+     "every_x": [
+      3,
+      2
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      9
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "pauldron_edge.R",
+   "kind": "capsule",
+   "a": [
+    68.4,
+    58.6,
+    6.0
+   ],
+   "b": [
+    55.599999999999994,
+    61.2,
+    4.2
+   ],
+   "r": [
+    0.8,
+    0.7
+   ],
+   "material": "ironw",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "every_x": [
+      2,
+      0
+     ],
+     "t": -3
+    },
+    {
+     "every_x": [
+      18,
+      17
+     ],
+     "t": -6
+    }
+   ]
+  },
+  {
+   "name": "upper_arm.R",
+   "kind": "capsule",
+   "a": [
+    61.0,
+    64.0,
+    -4.7
+   ],
+   "b": [
+    57.0,
+    81.2,
+    -5.1
+   ],
+   "r": [
+    5.0,
+    4.6
+   ],
+   "material": "iron",
+   "bone": "upper_arm.R",
+   "rules": [
+    {
+     "dy": [
+      6.0,
+      7.2
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      7.2,
+      null
+     ],
+     "material": "ironw"
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      2
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "couter.R",
+   "kind": "ellipsoid",
+   "centre": [
+    56.599999999999994,
+    81.2,
+    -4.6
+   ],
+   "radii": [
+    4.6,
+    4.4,
+    4.6
+   ],
+   "material": "ironw",
+   "bone": "forearm.R"
+  },
+  {
+   "name": "vambrace.R",
+   "kind": "capsule",
+   "a": [
+    57.0,
+    82.5,
+    -4.8
+   ],
+   "b": [
+    53.2,
+    98.5,
+    -0.9
+   ],
+   "r": [
+    4.8,
+    4.2
+   ],
+   "material": "iron",
+   "bone": "forearm.R",
+   "rules": [
+    {
+     "every_y": [
+      5,
+      0
+     ],
+     "t": -3
+    },
+    {
+     "x": [
+      54.3,
+      55.7
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      3
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "gauntlet_cuff.R",
+   "kind": "capsule",
+   "a": [
+    53.599999999999994,
+    96.0,
+    -1.2
+   ],
+   "b": [
+    52.8,
+    100.4,
+    -0.6
+   ],
+   "r": [
+    5.2,
+    5.4
+   ],
+   "material": "ironw",
+   "bone": "forearm.R",
+   "rules": [
+    {
+     "dy": [
+      1.6,
+      null
+     ],
+     "t": 1
+    },
+    {
+     "dy": [
+      null,
+      -1.6
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "gauntlet.R",
+   "kind": "ellipsoid",
+   "centre": [
+    52.2,
+    103.6,
+    0.0
+   ],
+   "radii": [
+    3.8,
+    4.4,
+    3.2
+   ],
+   "material": "iron",
+   "bone": "hand.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "finger0.R",
+   "kind": "capsule",
+   "a": [
+    53.7,
+    106.0,
+    0.4
+   ],
+   "b": [
+    53.724999999999994,
+    110.4,
+    1.2
+   ],
+   "r": [
+    0.9,
+    0.7
+   ],
+   "material": "iron",
+   "bone": "hand.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "finger1.R",
+   "kind": "capsule",
+   "a": [
+    52.7,
+    106.0,
+    0.4
+   ],
+   "b": [
+    52.575,
+    110.4,
+    1.2
+   ],
+   "r": [
+    0.9,
+    0.7
+   ],
+   "material": "iron",
+   "bone": "hand.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "finger2.R",
+   "kind": "capsule",
+   "a": [
+    51.7,
+    106.0,
+    0.4
+   ],
+   "b": [
+    51.425,
+    110.4,
+    1.2
+   ],
+   "r": [
+    0.9,
+    0.7
+   ],
+   "material": "iron",
+   "bone": "hand.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "finger3.R",
+   "kind": "capsule",
+   "a": [
+    50.7,
+    106.0,
+    0.4
+   ],
+   "b": [
+    50.275000000000006,
+    110.4,
+    1.2
+   ],
+   "r": [
+    0.9,
+    0.7
+   ],
+   "material": "iron",
+   "bone": "hand.R",
+   "rules": [
+    {
+     "every_y": [
+      2,
+      0
+     ],
+     "t": 1
+    }
+   ]
+  },
+  {
+   "name": "growth0",
+   "kind": "ellipsoid",
+   "centre": [
+    90.6,
+    56.0,
+    4.0
+   ],
+   "radii": [
+    2.4200000000000004,
+    1.87,
+    2.2
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "hash": [
+      0.2,
+      1,
+      0
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "growth1",
+   "kind": "ellipsoid",
+   "centre": [
+    93.0,
+    57.6,
+    2.4
+   ],
+   "radii": [
+    1.9800000000000002,
+    1.53,
+    1.8
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "hash": [
+      0.2,
+      1,
+      1
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "growth2",
+   "kind": "ellipsoid",
+   "centre": [
+    89.19999999999999,
+    58.4,
+    5.6
+   ],
+   "radii": [
+    1.6500000000000001,
+    1.275,
+    1.5
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "hash": [
+      0.2,
+      1,
+      2
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "growth3",
+   "kind": "ellipsoid",
+   "centre": [
+    94.19999999999999,
+    55.6,
+    0.6
+   ],
+   "radii": [
+    1.54,
+    1.19,
+    1.4
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "hash": [
+      0.2,
+      1,
+      3
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "growth4",
+   "kind": "ellipsoid",
+   "centre": [
+    91.8,
+    59.6,
+    4.4
+   ],
+   "radii": [
+    1.32,
+    1.02,
+    1.2
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L",
+   "rules": [
+    {
+     "hash": [
+      0.2,
+      1,
+      4
+     ],
+     "t": -1
+    }
+   ]
+  },
+  {
+   "name": "spur",
+   "kind": "capsule",
+   "a": [
+    93.6,
+    56.0,
+    3.0
+   ],
+   "b": [
+    96.4,
+    50.6,
+    1.6
+   ],
+   "r": [
+    1.1,
+    0.25
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L"
+  },
+  {
+   "name": "spur_tip",
+   "kind": "capsule",
+   "a": [
+    96.4,
+    50.6,
+    1.6
+   ],
+   "b": [
+    97.6,
+    49.6,
+    0.4
+   ],
+   "r": [
+    0.3,
+    0.15
+   ],
+   "material": "bone",
+   "bone": "upper_arm.L"
+  },
+  {
+   "name": "thigh.L",
+   "kind": "capsule",
+   "a": [
+    81.8,
+    98.5,
+    0.1
+   ],
+   "b": [
+    81.6,
+    124.0,
+    -0.1
+   ],
+   "r": [
+    6.2,
+    5.2
+   ],
+   "material": "iron",
+   "bone": "thigh.L",
+   "rules": [
+    {
+     "dy": [
+      7.0,
+      8.4
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      8.4,
+      null
+     ],
+     "material": "ironw"
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      1
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "knee.L",
+   "kind": "ellipsoid",
+   "centre": [
+    81.4,
+    127.5,
+    3.2
+   ],
+   "radii": [
+    5.6,
+    5.4,
+    4.6
+   ],
+   "material": "ironw",
+   "bone": "shin.L",
+   "rules": [
+    {
+     "every_angle": [
+      8,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "x": [
+      80.80000000000001,
+      82.0
+     ],
+     "z": [
+      6.0,
+      null
+     ],
+     "t": 2
+    },
+    {
+     "dy": [
+      3.4,
+      null
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "knee_wing.L",
+   "kind": "ellipsoid",
+   "centre": [
+    84.6,
+    127.5,
+    1.6
+   ],
+   "radii": [
+    2.2,
+    3.4,
+    2.6
+   ],
+   "material": "iron",
+   "bone": "shin.L"
+  },
+  {
+   "name": "greave.L",
+   "kind": "capsule",
+   "a": [
+    81.4,
+    130.0,
+    -0.2
+   ],
+   "b": [
+    81.4,
+    157.0,
+    -2.4
+   ],
+   "r": [
+    5.2,
+    4.2
+   ],
+   "material": "iron",
+   "bone": "shin.L",
+   "rules": [
+    {
+     "x": [
+      80.80000000000001,
+      82.0
+     ],
+     "z": [
+      3.0,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "y": [
+      132.5,
+      133.5
+     ],
+     "every_x": [
+      3,
+      0
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      4
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "sabaton.L",
+   "kind": "box",
+   "centre": [
+    81.4,
+    161.6,
+    3.6
+   ],
+   "half": [
+    5.0,
+    3.2,
+    8.2
+   ],
+   "round": 2.2,
+   "material": "iron",
+   "bone": "foot.L",
+   "rules": [
+    {
+     "every_z": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      2.2,
+      null
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "sabaton_toe.L",
+   "kind": "capsule",
+   "a": [
+    81.4,
+    162.6,
+    8.0
+   ],
+   "b": [
+    81.4,
+    163.6,
+    12.4
+   ],
+   "r": [
+    2.6,
+    1.0
+   ],
+   "material": "ironw",
+   "bone": "foot.L"
+  },
+  {
+   "name": "thigh.R",
+   "kind": "capsule",
+   "a": [
+    68.2,
+    98.5,
+    0.1
+   ],
+   "b": [
+    68.4,
+    124.0,
+    -0.1
+   ],
+   "r": [
+    6.2,
+    5.2
+   ],
+   "material": "iron",
+   "bone": "thigh.R",
+   "rules": [
+    {
+     "dy": [
+      7.0,
+      8.4
+     ],
+     "t": -3
+    },
+    {
+     "dy": [
+      8.4,
+      null
+     ],
+     "material": "ironw"
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      1
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "knee.R",
+   "kind": "ellipsoid",
+   "centre": [
+    68.6,
+    127.5,
+    3.2
+   ],
+   "radii": [
+    5.6,
+    5.4,
+    4.6
+   ],
+   "material": "ironw",
+   "bone": "shin.R",
+   "rules": [
+    {
+     "every_angle": [
+      8,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "x": [
+      68.0,
+      69.19999999999999
+     ],
+     "z": [
+      6.0,
+      null
+     ],
+     "t": 2
+    },
+    {
+     "dy": [
+      3.4,
+      null
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "knee_wing.R",
+   "kind": "ellipsoid",
+   "centre": [
+    65.4,
+    127.5,
+    1.6
+   ],
+   "radii": [
+    2.2,
+    3.4,
+    2.6
+   ],
+   "material": "iron",
+   "bone": "shin.R"
+  },
+  {
+   "name": "greave.R",
+   "kind": "capsule",
+   "a": [
+    68.6,
+    130.0,
+    -0.2
+   ],
+   "b": [
+    68.6,
+    157.0,
+    -2.4
+   ],
+   "r": [
+    5.2,
+    4.2
+   ],
+   "material": "iron",
+   "bone": "shin.R",
+   "rules": [
+    {
+     "x": [
+      68.0,
+      69.19999999999999
+     ],
+     "z": [
+      3.0,
+      null
+     ],
+     "material": "ironw",
+     "t": 1
+    },
+    {
+     "y": [
+      132.5,
+      133.5
+     ],
+     "every_x": [
+      3,
+      0
+     ],
+     "z": [
+      2.0,
+      null
+     ],
+     "rivet": true,
+     "px": [
+      150,
+      null
+     ]
+    },
+    {
+     "hash": [
+      0.05,
+      3,
+      4
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "sabaton.R",
+   "kind": "box",
+   "centre": [
+    68.6,
+    161.6,
+    3.6
+   ],
+   "half": [
+    5.0,
+    3.2,
+    8.2
+   ],
+   "round": 2.2,
+   "material": "iron",
+   "bone": "foot.R",
+   "rules": [
+    {
+     "every_z": [
+      2,
+      0
+     ],
+     "t": -1
+    },
+    {
+     "dy": [
+      2.2,
+      null
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "sabaton_toe.R",
+   "kind": "capsule",
+   "a": [
+    68.6,
+    162.6,
+    8.0
+   ],
+   "b": [
+    68.6,
+    163.6,
+    12.4
+   ],
+   "r": [
+    2.6,
+    1.0
+   ],
+   "material": "ironw",
+   "bone": "foot.R"
+  },
+  {
+   "name": "sword_grip",
+   "kind": "capsule",
+   "a": [
+    52.2,
+    106.5,
+    -2.5
+   ],
+   "b": [
+    52.2,
+    106.5,
+    3.6
+   ],
+   "r": [
+    1.1,
+    1.1
+   ],
+   "material": "grip",
+   "bone": "hand.R"
+  },
+  {
+   "name": "sword_pommel",
+   "kind": "ellipsoid",
+   "centre": [
+    52.2,
+    106.5,
+    -3.5999999999999996
+   ],
+   "radii": [
+    1.7,
+    1.7,
+    1.5
+   ],
+   "material": "steel",
+   "bone": "hand.R"
+  },
+  {
+   "name": "sword_guard",
+   "kind": "box",
+   "centre": [
+    52.2,
+    106.5,
+    4.3
+   ],
+   "half": [
+    0.9,
+    5.2,
+    0.8
+   ],
+   "material": "steel",
+   "bone": "hand.R"
+  },
+  {
+   "name": "sword_blade",
+   "kind": "box",
+   "centre": [
+    52.2,
+    106.5,
+    25.0
+   ],
+   "half": [
+    0.45,
+    1.7,
+    20.0
+   ],
+   "material": "steel",
+   "bone": "hand.R",
+   "rules": [
+    {
+     "dy": [
+      -0.5,
+      0.5
+     ],
+     "t": -2
+    }
+   ]
+  },
+  {
+   "name": "sword_tip",
+   "kind": "ellipsoid",
+   "centre": [
+    52.2,
+    106.5,
+    45.5
+   ],
+   "radii": [
+    0.45,
+    1.3,
+    2.4
+   ],
+   "material": "steel",
+   "bone": "hand.R"
+  },
+  {
+   "name": "shield_board",
+   "kind": "ellipsoid",
+   "centre": [
+    101.5,
+    93.0,
+    1.5
+   ],
+   "radii": [
+    1.3,
+    13.0,
+    10.0
+   ],
+   "material": "oak",
+   "bone": "forearm.L",
+   "clip_y": [
+    null,
+    102.5
+   ]
+  },
+  {
+   "name": "shield_point",
+   "kind": "ellipsoid",
+   "centre": [
+    101.5,
+    102.0,
+    1.5
+   ],
+   "radii": [
+    1.3,
+    5.5,
+    5.0
+   ],
+   "material": "oak",
+   "bone": "forearm.L"
+  },
+  {
+   "name": "shield_rim",
+   "kind": "ellipsoid",
+   "centre": [
+    101.8,
+    93.0,
+    1.5
+   ],
+   "radii": [
+    1.0,
+    13.6,
+    10.6
+   ],
+   "material": "ironw",
+   "bone": "forearm.L",
+   "clip_y": [
+    null,
+    102.5
+   ]
+  },
+  {
+   "name": "shield_boss",
+   "kind": "ellipsoid",
+   "centre": [
+    103.1,
+    92.0,
+    1.5
+   ],
+   "radii": [
+    1.4,
+    2.6,
+    2.6
+   ],
+   "material": "steel",
+   "bone": "forearm.L"
+  }
+ ],
+ "clips": {
+  "attack": "strike"
+ },
+ "effects": [],
+ "shadow": {
+  "radii": [
+   24,
+   5.0
+  ],
+  "colour": "#4b4a4f"
+ },
+ "detail": {
+  "helm": {
+   "file": "ossuarch.detail/helm.png"
+  },
+  "helm_ridge": {
+   "file": "ossuarch.detail/helm_ridge.png"
+  },
+  "cheek_l": {
+   "file": "ossuarch.detail/cheek_l.png"
+  },
+  "cheek_r": {
+   "file": "ossuarch.detail/cheek_r.png"
+  },
+  "crown": {
+   "file": "ossuarch.detail/crown.png"
+  },
+  "spike": {
+   "file": "ossuarch.detail/spike.png"
+  },
+  "hood": {
+   "file": "ossuarch.detail/hood.png"
+  },
+  "scarf_fold": {
+   "file": "ossuarch.detail/scarf_fold.png"
+  },
+  "hood_back": {
+   "file": "ossuarch.detail/hood_back.png"
+  },
+  "mantle": {
+   "file": "ossuarch.detail/mantle.png"
+  },
+  "chest": {
+   "file": "ossuarch.detail/chest.png"
+  },
+  "plackart": {
+   "file": "ossuarch.detail/plackart.png"
+  },
+  "buckle": {
+   "file": "ossuarch.detail/buckle.png"
+  },
+  "tasset0.L": {
+   "file": "ossuarch.detail/tasset0.L.png"
+  },
+  "tasset1.L": {
+   "file": "ossuarch.detail/tasset1.L.png"
+  },
+  "tasset2.L": {
+   "file": "ossuarch.detail/tasset2.L.png"
+  },
+  "tasset0.R": {
+   "file": "ossuarch.detail/tasset0.R.png"
+  },
+  "tasset1.R": {
+   "file": "ossuarch.detail/tasset1.R.png"
+  },
+  "tasset2.R": {
+   "file": "ossuarch.detail/tasset2.R.png"
+  },
+  "cloak": {
+   "file": "ossuarch.detail/cloak.png"
+  },
+  "pauldron0.L": {
+   "file": "ossuarch.detail/pauldron0.L.png"
+  },
+  "pauldron1.L": {
+   "file": "ossuarch.detail/pauldron1.L.png"
+  },
+  "pauldron2.L": {
+   "file": "ossuarch.detail/pauldron2.L.png"
+  },
+  "pauldron_edge.L": {
+   "file": "ossuarch.detail/pauldron_edge.L.png"
+  },
+  "upper_arm.L": {
+   "file": "ossuarch.detail/upper_arm.L.png"
+  },
+  "couter.L": {
+   "file": "ossuarch.detail/couter.L.png"
+  },
+  "vambrace.L": {
+   "file": "ossuarch.detail/vambrace.L.png"
+  },
+  "gauntlet_cuff.L": {
+   "file": "ossuarch.detail/gauntlet_cuff.L.png"
+  },
+  "gauntlet.L": {
+   "file": "ossuarch.detail/gauntlet.L.png"
+  },
+  "finger0.L": {
+   "file": "ossuarch.detail/finger0.L.png"
+  },
+  "finger1.L": {
+   "file": "ossuarch.detail/finger1.L.png"
+  },
+  "finger2.L": {
+   "file": "ossuarch.detail/finger2.L.png"
+  },
+  "finger3.L": {
+   "file": "ossuarch.detail/finger3.L.png"
+  },
+  "pauldron0.R": {
+   "file": "ossuarch.detail/pauldron0.R.png"
+  },
+  "pauldron1.R": {
+   "file": "ossuarch.detail/pauldron1.R.png"
+  },
+  "pauldron2.R": {
+   "file": "ossuarch.detail/pauldron2.R.png"
+  },
+  "pauldron_edge.R": {
+   "file": "ossuarch.detail/pauldron_edge.R.png"
+  },
+  "upper_arm.R": {
+   "file": "ossuarch.detail/upper_arm.R.png"
+  },
+  "couter.R": {
+   "file": "ossuarch.detail/couter.R.png"
+  },
+  "vambrace.R": {
+   "file": "ossuarch.detail/vambrace.R.png"
+  },
+  "gauntlet_cuff.R": {
+   "file": "ossuarch.detail/gauntlet_cuff.R.png"
+  },
+  "gauntlet.R": {
+   "file": "ossuarch.detail/gauntlet.R.png"
+  },
+  "finger0.R": {
+   "file": "ossuarch.detail/finger0.R.png"
+  },
+  "finger1.R": {
+   "file": "ossuarch.detail/finger1.R.png"
+  },
+  "finger2.R": {
+   "file": "ossuarch.detail/finger2.R.png"
+  },
+  "finger3.R": {
+   "file": "ossuarch.detail/finger3.R.png"
+  },
+  "thigh.L": {
+   "file": "ossuarch.detail/thigh.L.png"
+  },
+  "knee.L": {
+   "file": "ossuarch.detail/knee.L.png"
+  },
+  "knee_wing.L": {
+   "file": "ossuarch.detail/knee_wing.L.png"
+  },
+  "greave.L": {
+   "file": "ossuarch.detail/greave.L.png"
+  },
+  "sabaton.L": {
+   "file": "ossuarch.detail/sabaton.L.png"
+  },
+  "sabaton_toe.L": {
+   "file": "ossuarch.detail/sabaton_toe.L.png"
+  },
+  "thigh.R": {
+   "file": "ossuarch.detail/thigh.R.png"
+  },
+  "knee.R": {
+   "file": "ossuarch.detail/knee.R.png"
+  },
+  "knee_wing.R": {
+   "file": "ossuarch.detail/knee_wing.R.png"
+  },
+  "greave.R": {
+   "file": "ossuarch.detail/greave.R.png"
+  },
+  "sabaton.R": {
+   "file": "ossuarch.detail/sabaton.R.png"
+  },
+  "sabaton_toe.R": {
+   "file": "ossuarch.detail/sabaton_toe.R.png"
+  }
+ }
+}

@@ -117,3 +117,16 @@ follow-through each fall between samples, so every frame is an in-between.
   gauntlets, a pauldron with a real silhouette (exercise E1) before posing pays off fully.
 - No weapon art yet (by design: the weapon is drawn by what he holds). Next: export the hand.R socket (position and
   blade angle per frame, from the rig) so the game draws the held weapon on the frames.
+
+**Derek on the repaint (2026-10-06):** "the armor should not look like tubes. You should have edges and filigree and
+designs." And: "we can make his model extremely articulated and detailed since all we need is frames." So the model
+gets real plate construction: every plate with a hard bevelled edge (a lit lip and a dark underside), overlapping
+lames instead of capsules, raised filigree and engraved designs on the pauldrons, couters, greaves and helm, rivets,
+and the paint pass sharpens all of it frame by frame. Render cost is no object; only the frames ship.
+
+**E1 result (iron ramp):** the iron's ramp topped out at #706563 (value 0.4), so no light could ever make a highlight.
+New ramp: violet-black shadows, neutral mids, warm lights to #8a7060, the worn edge (ironw) to #b0927a. On a still
+the pauldrons and gauntlets now catch the lantern; subtle at 195 px, right in direction. Apply with the repaint.
+Derek, same day: "This is true for everything. A muscle, a vein, a leather strap, a plume, a fine, everything." Every
+material gets its own construction and detail, not only the armour: muscle masses and the veins over them, straps
+with stitched edges, buckles and wear, the plume's barbs and shafts, cloth weave and fraying, bone ridges.
