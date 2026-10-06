@@ -30,7 +30,8 @@ func hit(p: Vector2, from: Vector2, heavy: bool, kind: String = "flesh") -> void
 	var cols: Array = {"bone": [Color("#d6cdb4"), Color("#a69a80"), Color("#6e6452")],
 		"stone": [Color("#8a8276"), Color("#5e574e"), Color("#3c3731")],
 		"flesh": [Color("#7a1414"), Color("#4e0c0c"), Color("#2e0808")],
-		"ice": [Color("#e6f4ff"), Color("#a8cfee"), Color("#5f8fbf")]}.get(kind, [Color("#7a1414")])
+		"ice": [Color("#e6f4ff"), Color("#a8cfee"), Color("#5f8fbf")],
+		"rot": [Color("#5a6a2a"), Color("#3a4418"), Color("#6a3a4a")]}.get(kind, [Color("#7a1414")])
 	for i in n:
 		var a := away.rotated(randf_range(-0.9, 0.9))
 		chips.append({"p": p, "z": 40.0 + randf() * 30.0, "v": a * randf_range(1.2, 3.4) * (1.4 if heavy else 1.0),
@@ -321,6 +322,30 @@ func _draw_arcs(cv: CanvasItem) -> void:
 			var b := a + Vector2(randf_range(-24, 24), randf_range(-24, 24))
 			_px_path(_jag(a, b, 6.0), Color(0.75, 0.85, 1.0, 0.9 * k), 1, cv)
 
+# ------------------------------------------------------------------ miasma
+## the breath (shaders/miasma.gdshader): a low creeping body with tendrils and surfacing faces; "cloud" is taller and
+## thicker (a choking cloud), "breath" low and wide
+var miasmas: Array = []
+
+func miasma(p: Vector2, r: float = 2.0, secs: float = 10.0, kind: String = "breath") -> void:
+	var hw := r * Iso.HX
+	var rh := (70.0 if kind == "breath" else 150.0) * (0.6 + r * 0.25)
+	var n := ColorRect.new()
+	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	n.size = (Vector2(hw * 2.3, hw + rh) / PX).ceil() * PX
+	var q := Iso.to_screen(p)
+	n.position = ((q - Vector2(n.size.x * 0.5, rh + hw * 0.5)) / PX).floor() * PX
+	n.z_index = 2
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/miasma.gdshader")
+	m.set_shader_parameter("seed", randf() * 30.0)
+	m.set_shader_parameter("half_px", Vector2(hw, hw * 0.5))
+	m.set_shader_parameter("rect_size", n.size)
+	m.set_shader_parameter("rise_h", rh)
+	n.material = m
+	add_child(n)
+	miasmas.append({"node": n, "t": 0.0, "secs": secs})
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -413,6 +438,14 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	for mi in miasmas:
+		mi["t"] += dt
+		var mm: ShaderMaterial = mi["node"].material
+		mm.set_shader_parameter("t", mi["t"])
+		mm.set_shader_parameter("life", smoothstep(0.0, 1.5, mi["t"]) * (1.0 - smoothstep(mi["secs"] - 3.0, mi["secs"], mi["t"])))
+		if mi["t"] >= mi["secs"]:
+			mi["node"].queue_free()
+	miasmas = miasmas.filter(func(mi): return mi["t"] < mi["secs"])
 	for ar in arcs:
 		ar["t"] += dt
 	arcs = arcs.filter(func(ar): return ar["t"] < ar["life"])

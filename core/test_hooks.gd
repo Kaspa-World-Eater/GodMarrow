@@ -379,9 +379,12 @@ static func _burn_test(g, kind: String) -> void:
 	var bone := kind.begins_with("bone")
 	var ice := kind.begins_with("ice")
 	var zap := kind.begins_with("chain")
-	if bone or ice or zap:
+	var rot := kind.begins_with("rot")
+	if bone or ice or zap or rot:
 		kind = "knight"
 	var c: Vector2 = g.hero.tp
+	if rot:
+		load("res://world/impacts.gd").of(g.zone).miasma(c + Vector2(-2.5, 1.5), 2.4, 30.0, "breath")
 	var ms: Array = []
 	for o in [Vector2(2.0, 0.4), Vector2(0.6, 2.2), Vector2(2.6, 2.0)]:
 		var m = Brain.spawn(g.zone, kind, c + o, 6, "normal", "burn", -1.0)
@@ -413,7 +416,7 @@ static func _burn_test(g, kind: String) -> void:
 			await tree.create_timer(0.45).timeout
 	for m in ms:
 		if is_instance_valid(m) and not m.dead:
-			Combat.hit_monster(m, 9999.0, "cold" if ice else ("ltng" if zap else ("phys" if (bleed or bone) else "fire")), c, {"bone": bone})
+			Combat.hit_monster(m, 9999.0, "miasma" if rot else "cold" if ice else ("ltng" if zap else ("phys" if (bleed or bone) else "fire")), c, {"bone": bone})
 		await tree.create_timer(0.35).timeout
 
 

@@ -300,6 +300,7 @@ var calc_k := -1.0
 var _spurs: Node2D
 
 var frost_k := 0.0
+var rot_k := -1.0
 
 func cold_hit(dmg: float) -> void:
 	frost_k = minf(1.0, frost_k + 0.25 + dmg / maxf(1.0, hp_max))
@@ -430,6 +431,9 @@ func die(from: Vector2 = Vector2.INF) -> void:
 		load("res://world/impacts.gd").of(zone).soul(position, "pale")
 	if last_elem == "fire":
 		_start_burn()
+	elif last_elem in ["miasma", "poison"]:
+		rot_k = 0.0                           # it swells green, then bursts in a cloud of its own breath
+		spr.set_index(mini(1, spr.frame_count() - 1))
 	elif last_elem == "cold" or frost_k > 0.6:
 		# frozen through: it shatters (shards that keep the ice's colour, a ring of frost where it stood)
 		var I = load("res://world/impacts.gd").of(zone)
@@ -468,6 +472,18 @@ func _physics_process(dt: float) -> void:
 		push = push.move_toward(Vector2.ZERO, (14.0 + push.length() * 6.0) * dt)
 	if cm_body:
 		_tick_ossify(dt)
+	if dead and rot_k >= 0.0:
+		rot_k += dt / 1.6
+		var sw := 1.0 + 0.25 * smoothstep(0.0, 1.0, rot_k) + 0.04 * sin(rot_k * 40.0) * rot_k
+		spr.scale = base_scale * Vector2(sw * 1.1, sw)
+		modulate = Color(1.0, 1.0, 1.0).lerp(Color(0.62, 0.78, 0.42), minf(1.0, rot_k))
+		if rot_k >= 1.0:
+			var I = load("res://world/impacts.gd").of(zone)
+			I.miasma(tp, 1.6, 9.0, "cloud")
+			for k in 3:
+				I.hit(tp + Vector2(randf_range(-0.2, 0.2), randf_range(-0.2, 0.2)), Vector2.INF, true, "rot")
+			queue_free()
+		return
 	if dead and calc_k >= 0.0:
 		calc_k = minf(1.0, calc_k + dt / 2.2)
 		(spr.material as ShaderMaterial).set_shader_parameter("growth", 1.0)
