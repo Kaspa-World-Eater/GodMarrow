@@ -81,6 +81,9 @@ LITTER = [ramp("#1a1010", "#2d1a14", "#45281a", "#5e3820", "#784a28", "#93602f")
           ramp("#140f10", "#221a19", "#332623", "#45342d", "#584238", "#6c5244")]     # grey-brown, old and dry
 MOSS = ramp("#0c140f", "#142116", "#1e311b", "#2b4321", "#3b5527")
 TWIG = ramp("#120d0e", "#251c1a", "#3e3029", "#5c4a3c")
+EARTH = ramp("#16121a", "#211b20", "#2d2427", "#3a2f2e", "#483a35", "#58473f", "#6a5649")   # cooler, greyer than the leaves
+ROOT = ramp("#1a1210", "#3a2a20", "#5a4430")
+PEBBLE = ramp("#1c1b20", "#2e2c31", "#433f43", "#5b5556", "#77706c")
 STONE = ramp("#16161c", "#24232b", "#35333b", "#4a464c", "#625c5e")
 LIGHT = np.array([-0.6, -0.5, 0.62])                                     # screen upper left (the y here is screen-down)
 LIGHT = LIGHT / np.linalg.norm(LIGHT)
@@ -102,80 +105,83 @@ def pworley(x, y, n, seed):
 
 
 def main_0(seed=0):
-    """the floor of a dying wood: a carpet of fallen leaves in layers, the old dark ones under the new;
-    returns the albedo and the height (for the light)"""
-    from scipy import ndimage as nd
-    # ---- form: drifts a finger deep and the scoops between
-    hgt = (pfbm(XX, YY, 2, seed + 10) - 0.5) * 6.0 + (pfbm(XX, YY, 5, seed + 11) - 0.5) * 2.0
+    """the floor of a dying wood, designed as the dune was: big form in clean tones first, then leaves drawn one by
+    one (hand-made stamps, litter_stamps.py) where the light falls on them, sparse and soft in the shade.
+    Returns the albedo and the height."""
+    from litter_stamps import LEAVES, TWIGS
+    rr = np.random.default_rng(seed + 300)
+    # ---- 1. the form: mounds of litter over roots and the hollows between, 20-60 px across
+    hgt = (pfbm(XX, YY, 2, seed + 10) - 0.5) * 7.0 + (pfbm(XX, YY, 4, seed + 11) - 0.5) * 2.5
     hp_ = np.pad(hgt, 1, mode="wrap")
     gyf, gxf = np.gradient(hp_)
     nf = np.dstack([-gxf[1:-1, 1:-1], -gyf[1:-1, 1:-1] * 2.0, np.ones_like(hgt)])
     nf /= np.linalg.norm(nf, axis=2, keepdims=True)
-    form = np.clip((nf * LIGHT).sum(2), 0, 1) - 0.62 + (hgt / 9.0) * 0.25          # lit faces and drift tops up, scoops down
-    # ---- humus under all, dark
-    hv = 0.38 + form * 0.8 + (BAY - 0.5) * 0.05
-    img = HUMUS[np.clip((hv * len(HUMUS)).astype(int), 0, len(HUMUS) - 1)]
-    layer = np.full((TH, TW), -1.0)
-    # ---- the leaves, laid in order: the oldest first (darkest, blackening), the newest last (lighter, lit rims)
-    famf = pfbm(XX, YY, 2, seed + 17)                                    # which leaves this part of the floor gets
-    cover = np.clip(0.9 + (pfbm(XX, YY, 4, seed + 18) - 0.5) * 0.6, 0, 1)
-    rr = np.random.default_rng(seed + 60)
-    N = 3600
-    lx, ly = rr.uniform(0, TW, N), rr.uniform(0, TH, N)
-    ts = np.sort(rr.uniform(0, 1, N))                                    # the order of their falling
-    for k in range(N):
-        cx, cy, t = lx[k], ly[k], ts[k]
-        ci, cj = int(cx) % TW, int(cy) % TH
-        if rr.random() > cover[cj, ci]:
+    lit = np.clip((nf * LIGHT).sum(2), 0, 1)
+    form = lit - 0.62 + (hgt / 7.0) * 0.2
+    # four clean tone groups across the form (dither only where one meets the next)
+    tone = np.clip(np.round((0.5 + form * 1.6) * 4 + (BAY - 0.5) * 0.35), 0, 4).astype(int)    # 0..4
+    base_i = np.array([1, 2, 2, 3, 4])[tone]                              # its index on a litter ramp
+    # the ground's colour: a smooth blend between rust and brown (never hard regions), a touch of olive in the damp
+    famf = pfbm(XX, YY, 2, seed + 17)
+    wr = np.clip((famf - 0.35) / 0.3, 0, 1)
+    wr = np.round(wr * 2 + (BAY - 0.5) * 0.3) / 2
+    img = LITTER[0][base_i] * (1 - wr[..., None]) + LITTER[1][base_i] * wr[..., None]
+    # a dry brush along the contours (mostly level on the 2:1 ground)
+    brush = pnoise(XX, YY, 20, 80, seed + 18)
+    img = img * (1 + ((brush > 0.72) * 0.06 - (brush < 0.2) * 0.06))[..., None]
+    # the hollows: humus showing, a clean dark shape
+    hollow = (hgt < -1.9) & (pnoise(XX, YY, 40, 20, seed + 19) > 0.35)
+    img[hollow] = HUMUS[np.clip(base_i[hollow], 0, len(HUMUS) - 1)]
+    # ---- 2. the leaves, drawn one by one, spaced so each reads; dense and crisp on the lit slopes, sparse in shade
+    taken = np.zeros((TH, TW), bool)
+    placed = 0
+    for _ in range(9000):
+        x, y = rr.integers(0, TW), rr.integers(0, TH)
+        g = tone[y, x]
+        if rr.random() > [0.04, 0.08, 0.18, 0.34, 0.42][g]:
             continue
-        # this leaf's kind: drawn from the local mix, so kinds mingle leaf by leaf (no hard regions)
-        fm = famf[cj, ci]
-        pr = np.array([0.45 + (0.5 - fm) * 0.5, 0.45, 0.03 + max(fm - 0.6, 0) * 0.5, 0.07])
-        pr = np.clip(pr, 0.02, None)
-        fam = rr.choice(4, p=pr / pr.sum())
+        st = LEAVES[rr.integers(0, len(LEAVES))]
+        if rr.random() < 0.5:
+            st = [row[::-1].replace("H", "h").replace("D", "H").replace("h", "D") for row in st]   # mirrored: light still from the left
+            st = [row.replace("H", "L") for row in st]
+        h_, w_ = len(st), len(st[0])
+        ys = [(y + j) % TH for j in range(h_)]
+        xs = [(x + i) % TW for i in range(w_)]
+        if taken[np.ix_([(y + j) % TH for j in range(-1, h_ + 1)], [(x + i) % TW for i in range(-1, w_ + 1)])].sum() > 0:
+            continue
+        fam = 0 if rr.random() > famf[y, x] else 1
+        if rr.random() < 0.08:
+            fam = 2 if rr.random() < 0.5 else 3
         rp = LITTER[fam]
-        ang = rr.uniform(0, np.pi)
-        ln, wd = rr.uniform(2.5, 4.5), rr.uniform(1.2, 2.0)
-        off = t * 0.08 + rr.uniform(-0.035, 0.035)
-        for dy in range(-3, 4):
-            for dx in range(-4, 5):
-                px, py = int(cx) + dx, int(cy) + dy
-                ux, uy = px + 0.5 - cx, (py + 0.5 - cy) * 2.0
-                u = ux * np.cos(ang) + uy * np.sin(ang)
-                w_ = -ux * np.sin(ang) + uy * np.cos(ang)
-                if abs(u) > ln:
+        soft = g <= 1                                                     # in shade: the lights held down
+        for j, row in enumerate(st):
+            for i, ch in enumerate(row):
+                if ch == ".":
                     continue
-                half = wd * max(1 - (u / ln) ** 2, 0) ** 0.6
-                if abs(w_) > half:
+                py, px = ys[j], xs[i]
+                if ch == "S":
+                    if not taken[py, px]:
+                        img[py, px] = img[py, px] * 0.72
                     continue
-                pi, pj = px % TW, py % TH
-                vv = 0.46 + form[pj, pi] * 0.85 + off
-                if t > 0.8 and form[pj, pi] > 0.0 and (w_ < -half * 0.5 or u < -ln * 0.65):
-                    vv += 0.14                                          # a new leaf's upper-left rim
-                if abs(w_) < 0.35 and ln > 3.2:
-                    vv -= 0.06                                          # the midrib
-                img[pj, pi] = rp[int(np.clip(vv * len(rp), 0, len(rp) - 1))]
-                layer[pj, pi] = t
-    # each leaf lies a hair above the one beneath: where a newer leaf's edge meets an older, the older is shadowed
-    lay = layer
-    newer = np.roll(np.roll(lay, 1, axis=0), 1, axis=1)
-    shad = (newer > lay + 0.04) & (lay >= 0)
-    img[shad] = img[shad] * 0.72                                        # a crisp hair of shadow under each newer leaf
-    hgt = hgt + np.clip(layer, 0, 1) * 0.35                              # the newest leaves stand a little proud
-    # ---- twigs: few, long enough to read
-    tx_, ty_, tr = scatter(6, seed + 70)
-    for k in range(len(tx_)):
-        ang = tr.uniform(-0.6, 0.6) + (0 if k % 2 else 0.9)
-        ln = tr.uniform(9, 16)
-        for i in range(int(ln * 1.5)):
-            f = i / (ln * 1.5)
-            px = int(tx_[k] + np.cos(ang) * ln * f) % TW
-            py = int(ty_[k] + np.sin(ang) * ln * f * 0.5 + np.sin(f * 6) * 0.4) % TH
-            img[py, px] = TWIG[1]
-            if i % 3 != 2:
-                img[(py - 1) % TH, px] = img[(py - 1) % TH, px] * 0.4 + TWIG[3] * 0.6
-            img[(py + 1) % TH, px] = img[(py + 1) % TH, px] * 0.7
-            hgt[py, px] += 0.3
+                off = {"H": 2, "L": 1, "B": 0, "D": -1}[ch]
+                if soft:
+                    off = min(off, 0) if off > 0 else off
+                img[py, px] = rp[int(np.clip(base_i[py, px] + off, 0, len(rp) - 1))]
+                taken[py, px] = True
+        placed += 1
+    # ---- 3. a few twigs, the same way
+    for _ in range(3):
+        st = TWIGS[rr.integers(0, len(TWIGS))]
+        x, y = rr.integers(0, TW), rr.integers(0, TH)
+        for j, row in enumerate(st):
+            for i, ch in enumerate(row):
+                if ch == ".":
+                    continue
+                py, px = (y + j) % TH, (x + i) % TW
+                if ch == "S":
+                    img[py, px] = img[py, px] * 0.65
+                else:
+                    img[py, px] = TWIG[{"L": 3, "B": 1}[ch]]
     return np.clip(img, 0, 1), hgt
 
 
@@ -211,24 +217,178 @@ def lit_preview(alb, hgt, path, hero_at=(240, 150), t=0.0):
     out[body & ~np.roll(body, 1, axis=1)] = hexc("#6a4a3a")
     lampm = np.hypot(u - 8, w_ - 15) < 1.6
     out[lampm] = hexc("#f4c070")
-    Image.fromarray((np.clip(out, 0, 1) * 255).astype(np.uint8)).resize((GW * 4, GH * 4), Image.NEAREST).save(path)
+    Image.fromarray((np.clip(out, 0, 1) * 255).astype(np.uint8)).resize((GW * 4, GH * 4), Image.NEAREST).save(path, **({"lossless": True} if path.endswith(".webp") else {}))
+
+
+def dirt_0(seed=0):
+    """bare earth where the litter has been cleared: dark damp soil, fine roots running through it, small stones
+    pressed in, a few leaves; its own gentle form"""
+    from scipy import ndimage as nd
+    hgt = (pfbm(XX, YY, 3, seed + 210) - 0.5) * 5.0 + (pfbm(XX, YY, 9, seed + 211) - 0.5) * 1.5
+    hp_ = np.pad(hgt, 1, mode="wrap")
+    gyf, gxf = np.gradient(hp_)
+    nf = np.dstack([-gxf[1:-1, 1:-1], -gyf[1:-1, 1:-1] * 2.0, np.ones_like(hgt)])
+    nf /= np.linalg.norm(nf, axis=2, keepdims=True)
+    form = np.clip((nf * LIGHT).sum(2), 0, 1) - 0.62 + (hgt / 5.0) * 0.2
+    crumb = (pnoise(XX, YY, 80, 40, seed + 212) - 0.5) * 0.06                 # the soil's crumb
+    v = 0.5 + form * 0.8 + crumb + (BAY - 0.5) * 0.05
+    img = EARTH[np.clip((v * len(EARTH)).astype(int), 0, len(EARTH) - 1)]
+    # fine roots: thin, wandering, half-buried, catching the light on their upper side
+    rr = np.random.default_rng(seed + 220)
+    for k in range(7):
+        x, y = rr.uniform(0, TW), rr.uniform(0, TH)
+        ang = rr.uniform(0, 2 * np.pi)
+        for i in range(rr.integers(20, 45)):
+            ang += rr.normal(0, 0.25)
+            x, y = x + np.cos(ang), y + np.sin(ang) * 0.5
+            px, py = int(x) % TW, int(y) % TH
+            img[py, px] = ROOT[1]
+            if i % 2 == 0:
+                img[(py - 1) % TH, px] = img[(py - 1) % TH, px] * 0.5 + ROOT[2] * 0.5
+    # pebbles pressed into the soil: a lit crown, a dark crescent under
+    for k in range(26):
+        x, y = rr.uniform(0, TW), rr.uniform(0, TH)
+        rx, ry = rr.uniform(0.8, 1.8), rr.uniform(0.5, 0.9)
+        tone = rr.uniform(0.3, 0.6)
+        for dy in range(-2, 3):
+            for dx in range(-3, 4):
+                px, py = int(x) + dx, int(y) + dy
+                q = ((px + 0.5 - x) / rx) ** 2 + ((py + 0.5 - y) / ry) ** 2
+                if q < 1:
+                    up = (px + 0.5 - x) / rx * -0.5 + (py + 0.5 - y) / ry * -0.5
+                    vv = tone + up * 0.3
+                    img[py % TH, px % TW] = PEBBLE[int(np.clip(vv * len(PEBBLE), 0, len(PEBBLE) - 1))]
+                elif q < 1.9 and py + 0.5 > y:
+                    img[py % TH, px % TW] = img[py % TH, px % TW] * 0.65
+    # a few leaves blown in
+    for k in range(14):
+        x, y = rr.uniform(0, TW), rr.uniform(0, TH)
+        ang, f_ = rr.uniform(0, np.pi), rr.integers(0, 2)
+        for u in np.arange(-2.5, 2.6, 0.5):
+            for w_ in np.arange(-1.2, 1.21, 0.4):
+                if abs(w_) > 1.3 * max(1 - (u / 2.6) ** 2, 0) ** 0.6:
+                    continue
+                px = int(x + u * np.cos(ang) - w_ * np.sin(ang)) % TW
+                py = int(y + (u * np.sin(ang) + w_ * np.cos(ang)) * 0.5) % TH
+                img[py, px] = LITTER[f_][3 if w_ < 0 else 2]
+    return np.clip(img, 0, 1), hgt
+
+
+def compose(mains, dirt, GW=960, GH=540, seed=1):
+    """the ground as the game would lay it, with the tricks against repetition:
+    - the world cut into jittered patches (~3 tiles), each taking one of the main variants at its own random offset;
+    - the patches' borders frayed by a warp, so no edge is straight;
+    - a macro wash far larger than a tile: wetter and darker here, redder and drier there, greener in the damp;
+    - bare patches (the dirt class) in irregular shapes, the litter banked a little lighter round them, the edge of
+      the earth pooled dark."""
+    yy, xx = np.mgrid[0:GH, 0:GW].astype(float)
+    rr = np.random.default_rng(seed)
+    # jittered patch centres (voronoi), each a variant and an offset
+    cell = 110.0
+    gx_, gy_ = np.meshgrid(np.arange(-1, GW / cell + 2), np.arange(-1, GH / (cell * 0.5) + 2))
+    cx = (gx_ + rr.uniform(0.15, 0.85, gx_.shape)).ravel() * cell
+    cy = (gy_ + rr.uniform(0.15, 0.85, gy_.shape)).ravel() * cell * 0.5
+    var = rr.integers(0, len(mains), cx.size)
+    offx, offy = rr.integers(0, TW, cx.size), rr.integers(0, TH, cx.size)
+    wx = xx + (vn2(xx / 23, yy / 12, 3) - 0.5) * 22                     # the fray
+    wy = yy + (vn2(xx / 23 + 7, yy / 12, 4) - 0.5) * 11
+    best = np.full((GH, GW), 1e9)
+    pid = np.zeros((GH, GW), int)
+    for k in range(cx.size):
+        d = np.hypot(wx - cx[k], (wy - cy[k]) * 2.0)
+        m = d < best
+        best = np.where(m, d, best)
+        pid = np.where(m, k, pid)
+    out = np.zeros((GH, GW, 3))
+    for k in np.unique(pid):
+        m = pid == k
+        tx = ((xx[m] + offx[k]) % TW).astype(int)
+        ty = ((yy[m] + offy[k]) % TH).astype(int)
+        out[m] = mains[var[k]][ty, tx]
+    # bare patches: irregular, frayed
+    from scipy import ndimage as nd
+    bare_f = vn2(xx / 110, yy / 55, 11) * 0.6 + vn2(xx / 30, yy / 15, 12) * 0.28 + vn2(xx / 9, yy / 4.5, 13) * 0.12
+    core = bare_f > 0.7
+    # the edge is not a line: leaves stray over the earth, thinning leaf by leaf (a leaf-sized cell decides each)
+    dist = nd.distance_transform_edt(core)                                 # how far inside the bare ground
+    leafcell = _Q[(np.floor(xx / 3.0).astype(int) * 7) % 512, (np.floor(yy / 1.5).astype(int) * 13) % 512]
+    bare = core & (leafcell < np.clip(dist / 7.0, 0, 1) * 1.1)
+    dx_ = (xx % TW).astype(int)
+    dy_ = (yy % TH).astype(int)
+    out[bare] = dirt[dy_[bare], dx_[bare]]
+    over = np.roll(np.roll(~bare, 1, axis=0), 1, axis=1) & bare            # a hair of shadow where a leaf's edge overhangs
+    out[over] = out[over] * 0.8
+    # the macro wash
+    wet = vn2(xx / 380, yy / 190, 21)
+    warm = vn2(xx / 300, yy / 150, 22)
+    out = out * (0.82 + wet[..., None] * 0.3)
+    out = out * (1 + (warm[..., None] - 0.5) * np.array([0.16, 0.0, -0.12]))
+    green = np.clip((vn2(xx / 260, yy / 130, 23) - 0.62) * 3, 0, 1)
+    out = out * (1 + green[..., None] * np.array([-0.08, 0.1, -0.05]))
+    return np.clip(out, 0, 1)
+
+
+_Q = np.random.default_rng(99).random((512, 512))
+
+
+def vn2(x, y, seed):
+    """world-scale value noise (not periodic) for the composition"""
+    x = x + seed * 17.3
+    y = y + seed * 9.1
+    xi, yi = np.floor(x).astype(int), np.floor(y).astype(int)
+    xf, yf = x - xi, y - yi
+    u, v = xf * xf * (3 - 2 * xf), yf * yf * (3 - 2 * yf)
+    def h(a, b):
+        return _Q[a % 512, b % 512]
+    return (h(xi, yi) * (1 - u) + h(xi + 1, yi) * u) * (1 - v) + (h(xi, yi + 1) * (1 - u) + h(xi + 1, yi + 1) * u) * v
+
+
+def light_view(base, path, hero_at, crop=None, zoom=4, t=0.0):
+    """the ground under the game's lights (flat cold moon, the hero's lantern, stepped) with the hero for scale"""
+    GH, GW = base.shape[:2]
+    yy, xx = np.mgrid[0:GH, 0:GW].astype(float)
+    lpx, lpy = hero_at[0] + 8, hero_at[1]
+    dist = np.hypot(lpx - xx, (lpy - yy) * 2.0)
+    lamp = 1 / (1 + (dist / 90.0) ** 2.2)
+    bay = np.tile(B4, (GH // 4 + 1, GW // 4 + 1))[:GH, :GW]
+    l_step = np.round(np.clip(lamp * 1.3 + (bay - 0.5) * 0.1, 0, 1.2) * 6) / 6
+    out = base * (0.42 * np.array([0.62, 0.68, 0.86]) + l_step[..., None] * np.array([1.0, 0.72, 0.4]) * 1.25)
+    hx, hy = hero_at
+    u, w_ = xx - hx, hy - yy
+    body = ((w_ >= 0) & (w_ < 32) & (np.abs(u) < 3.0 + (32 - w_) * 0.12)) | (np.hypot(u - 0.5, w_ - 34.5) < 3.4) | ((w_ > 24) & (w_ < 32) & (np.abs(u) < 6.2 - (w_ - 24) * 0.3))
+    shadow = (np.hypot((u + 7) / 10.0, (w_ + 1) / 2.2) < 1) & ~body
+    out[shadow] *= 0.55
+    out[body] = hexc("#14111a")
+    out[body & ~np.roll(body, 1, axis=1)] = hexc("#6a4a3a")
+    out[np.hypot(u - 8, w_ - 15) < 1.6] = hexc("#f4c070")
+    if crop is not None:
+        x0, y0, cw, ch = crop
+        out = out[y0:y0 + ch, x0:x0 + cw]
+    Image.fromarray((np.clip(out, 0, 1) * 255).astype(np.uint8)).resize((out.shape[1] * zoom, out.shape[0] * zoom), Image.NEAREST).save(path, **({"lossless": True} if path.endswith(".webp") else {}))
 
 
 def save(img, path):
-    Image.fromarray((img * 255).astype(np.uint8)).resize((TW * 2, TH * 2), Image.NEAREST).save(path)
+    Image.fromarray((img * 255).astype(np.uint8)).resize((TW * 2, TH * 2), Image.NEAREST).save(path, **({"lossless": True} if path.endswith(".webp") else {}))
 
 
 def preview(img, path):
     """3 x 3 repeats at the game's zoom (4 screen px per world px), so the seams and the repetition show"""
     big = np.tile(img, (3, 3, 1))
-    Image.fromarray((big * 255).astype(np.uint8)).resize((big.shape[1] * 4, big.shape[0] * 4), Image.NEAREST).save(path)
+    Image.fromarray((big * 255).astype(np.uint8)).resize((big.shape[1] * 4, big.shape[0] * 4), Image.NEAREST).save(path, **({"lossless": True} if path.endswith(".webp") else {}))
 
 
 if __name__ == "__main__":
     out = sys.argv[1] if len(sys.argv) > 1 else "."
     os.makedirs(out, exist_ok=True)
-    t, h = main_0()
-    save(t, os.path.join(out, "wood_main_0.webp"))
-    preview(t, os.path.join(out, "wood_main_0_tiled.png"))
-    lit_preview(t, h, os.path.join(out, "wood_main_0_lit.png"))
+    mains = []
+    for k in range(4):
+        t, h = main_0(seed=k * 101)
+        save(t, os.path.join(out, "wood_main_%d.webp" % k))
+        mains.append(t)
+    d, _ = dirt_0()
+    save(d, os.path.join(out, "wood_dirt_0.webp"))
+    preview(d, os.path.join(out, "wood_dirt_0_tiled.png"))
+    g = compose(mains, d)
+    light_view(g, os.path.join(out, "wood_wide.png"), (480, 290), zoom=2)
+    light_view(g, os.path.join(out, "wood_game.png"), (480, 290), crop=(240, 155, 480, 270), zoom=4)
     print("saved")

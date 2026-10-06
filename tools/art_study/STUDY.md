@@ -514,3 +514,15 @@ Wood `main_0`, the floor of a dying wood. Four wrong turns before it read:
    shade as a smooth per-pixel value, the leaves only nudging it (+-0.04), a crisp hair of shadow under each newer leaf.
 4. The humus near-black between the leaves: every gap a hole. **Neighbours close in value**: humus one step under the
    leaves, cover nearly full. Contrast is saved for form and focus.
+- **Graded C- (Derek: "needs much more work and refining to even get close to even the desert tile").** Why the
+  dune worked and the litter didn't: the dune had a designed value structure (big forms, each lit plane and shadow one
+  clean tone, the texture subordinate and following the form, a few story details at legible size); the litter was a
+  uniform field of small marks, a texture filter, not a painting. Redesign: (1) form first in four clean tone groups,
+  dither only at their meeting; (2) leaves DRAWN, not generated: eight hand-made stamps (`litter_stamps.py`), each a
+  single leaf at the 2:1 angle with a lit rim, body, dark underside and a cast shadow, set down with spacing so each
+  reads, dense on the lit slopes and soft and sparse in the shade; (3) ground colour blended smoothly rust to brown.
+- **Against the repeat** (Derek: "what's the plan to get rid of the obvious patterns?"): four main variants laid in
+  jittered patches each at its own random offset (texture bombing), the patch borders frayed; a macro wash far larger
+  than a tile (wet/dry, red/brown, green in the damp); bare earth as its own class in eroded patches whose edge is
+  broken leaf by leaf; sticks, stones, grass clumps as crafted scatter sprites (the zone's scatter layer), never baked
+  into a tile. Tiles are saved lossless (lossy WebP smeared the pixels).
