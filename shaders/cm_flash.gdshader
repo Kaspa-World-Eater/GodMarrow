@@ -8,6 +8,7 @@ uniform vec3 lamp_dir = vec3(0.0, 0.0, 1.0);   // toward the lantern, screen spa
 uniform float lamp_k = 0.0;                    // how near and bright the lantern is to this body, 0..1
 uniform float sky_k = 0.3;                     // the cold of the sky / the vault
 uniform bool face_left = false;
+uniform float erase = 0.0;          // 0..1 radiance: the body washed out to white-gold, features first
 uniform float mstain = 0.0;         // 0..1 the miasma's violet stain climbing from the feet
 uniform float veins = 0.0;          // 0..1 dark veins swelling and pulsing (blood magic)
 uniform float corrode = 0.0;         // 0..1 acid pitting
@@ -76,6 +77,15 @@ void fragment() {
 			if (piece + fu.y * 0.6 < line) c.a = 0.0;
 		}
 		c.rgb = col;
+	}
+	if (erase > 0.0 && c.a > 0.0) {
+		vec2 te = floor(UV / TEXTURE_PIXEL_SIZE);
+		float le = dot(c.rgb, vec3(0.3, 0.59, 0.11));
+		float de = B4[(int(te.y) & 3) * 4 + (int(te.x) & 3)] / 16.0;
+		float amt = clamp(erase * 1.5 - vn(te * 0.2 + 3.0) * 0.5 + (1.0 - le) * 0.25, 0.0, 1.0);   // the dark goes first
+		float lift = le * (1.0 - amt) + amt;
+		vec3 wg = lift > 0.85 ? vec3(1.0, 0.99, 0.93) : lift > 0.65 ? vec3(1.0, 0.89, 0.62) : lift > 0.45 ? vec3(0.9, 0.7, 0.38) : vec3(0.58, 0.4, 0.2);
+		if (amt > de) c.rgb = wg;
 	}
 	if (mstain > 0.0 && c.a > 0.0) {
 		vec2 ts = floor(UV / TEXTURE_PIXEL_SIZE);

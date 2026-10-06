@@ -181,6 +181,7 @@ func _ensure_sky() -> void:
 
 func _draw_sky() -> void:
 	_draw_souls(sky)
+	_draw_radiance(sky)
 	_draw_miasma2(sky)
 	_draw_slash(sky)
 	_draw_blood(sky)
@@ -1539,6 +1540,137 @@ func _draw_miasma2(cv: CanvasItem) -> void:
 				if w < 0.35:
 					cv.draw_rect(Rect2((tr[i] / PX).floor() * PX + Vector2(PX, 0), Vector2(PX, PX)), Color(MIASMA_COL.r, MIASMA_COL.g, MIASMA_COL.b, al * 0.35))
 
+# ------------------------------------------------------------------ radiance (the open hand: erasing light)
+## the wiki (05-class-empty-hand.md): "noon with no shadow: white fire, glare, a brightness so complete it leaves
+## nothing to see"; the Peak's gold leaf "gives back so much light that the face beneath it disappears".
+## glare: a patch of the world washed out (shaders/radiance_glare.gdshader, on the ghost layer so it erases even the
+## night); lance: a shaft of white noon driven from a to b, gold at its skin, gold leaf shaken off it; halo: a ring of
+## gold-leaf flakes turning round a point, each flake thinning to a line as it turns edge-on; leaf: gold leaf falling,
+## see-sawing, flashing as it catches the light
+var glares: Array = []     # {node, light, t, secs}
+var lances: Array = []     # {a, b (screen), t, secs}
+var halos: Array = []      # {c, R, t, secs, n}
+var leaves: Array = []     # {q, v, t, life, ph}
+
+func glare(p: Vector2, r: float = 1.6, secs: float = 3.0) -> void:
+	var n := ColorRect.new()
+	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	n.size = (Vector2(r * Iso.HX * 2.4, r * Iso.HX * 1.2 + 60.0) / PX).ceil() * PX
+	var q := Iso.to_screen(p)
+	n.position = ((q - n.size * 0.5 - Vector2(0, 20)) / PX).floor() * PX
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/radiance_glare.gdshader")
+	m.set_shader_parameter("seed", randf() * 40.0)
+	m.set_shader_parameter("rect_size", n.size)
+	m.set_shader_parameter("life", 0.0)
+	n.material = m
+	_ghost_layer().add_child(n)
+	var pl := PointLight2D.new()
+	pl.color = Color(1.0, 0.92, 0.7)
+	pl.set_meta("dark_r", r * Iso.HX * 1.1)
+	pl.set_meta("dark_far", 1.6)
+	pl.set_meta("dark_core", 0.6)
+	pl.position = q
+	pl.enabled = false
+	add_child(pl)
+	glares.append({"node": n, "light": pl, "t": 0.0, "secs": secs, "p": p, "r": r})
+
+func lance(from_tile: Vector2, to_tile: Vector2, secs: float = 0.55) -> void:
+	_ensure_sky()
+	lances.append({"a": Iso.to_screen(from_tile) + Vector2(0, -60), "b": Iso.to_screen(to_tile) + Vector2(0, -40), "t": 0.0, "secs": secs})
+	glare(to_tile, 0.8, 1.2)
+
+func halo(p: Vector2, r: float = 0.9, secs: float = 4.0) -> void:
+	_ensure_sky()
+	halos.append({"c": Iso.to_screen(p) + Vector2(0, -96), "R": r * Iso.HX, "t": 0.0, "secs": secs, "n": 16})
+
+func gold_leaf(p: Vector2, r: float = 1.2, n: int = 10) -> void:
+	_ensure_sky()
+	var c := Iso.to_screen(p)
+	for i in n:
+		leaves.append({"q": c + Vector2(randf_range(-r, r) * Iso.HX, randf_range(-160, -60)), "v": Vector2(0, randf_range(14, 24)),
+			"t": 0.0, "life": randf_range(2.5, 4.0), "ph": randf() * TAU, "ground": c.y + randf_range(-r, r) * Iso.HY})
+
+func _tick_radiance(dt: float) -> void:
+	for gl in glares:
+		gl["t"] += dt
+		var u: float = gl["t"] / gl["secs"]
+		var lf: float = (1.0 - pow(1.0 - minf(1.0, u / 0.08), 3.0)) * (1.0 - smoothstep(0.65, 1.0, u))   # it flares, then fades slow
+		var mt: ShaderMaterial = gl["node"].material
+		mt.set_shader_parameter("t", gl["t"])
+		mt.set_shader_parameter("life", lf)
+		gl["light"].visible = lf > 0.05
+		if randf() < dt * 6.0 * lf:
+			gold_leaf(gl["p"], gl["r"] * 0.7, 1)
+		if u >= 1.0:
+			gl["node"].queue_free()
+			gl["light"].queue_free()
+	glares = glares.filter(func(gl): return gl["t"] < gl["secs"])
+	for ln in lances:
+		ln["t"] += dt
+		if ln["t"] < 0.2 and randf() < dt * 40.0:
+			var f := randf()
+			var q: Vector2 = (ln["a"] as Vector2).lerp(ln["b"], f)
+			leaves.append({"q": q, "v": Vector2(randf_range(-30, 30), randf_range(-40, 10)), "t": 0.0, "life": randf_range(1.2, 2.2), "ph": randf() * TAU, "ground": q.y + 60.0})
+	lances = lances.filter(func(ln): return ln["t"] < ln["secs"])
+	for h in halos:
+		h["t"] += dt
+	halos = halos.filter(func(h): return h["t"] < h["secs"])
+	for lf2 in leaves:
+		lf2["t"] += dt
+		lf2["v"].y = minf(lf2["v"].y + 10.0 * dt, 30.0)
+		lf2["q"] += Vector2(sin(lf2["t"] * 2.6 + lf2["ph"]) * 24.0 + Gust.dir() * Gust.k() * 14.0, lf2["v"].y) * dt   # see-sawing down
+		if lf2["q"].y >= lf2["ground"]:
+			lf2["q"].y = lf2["ground"]
+			lf2["v"].y = 0.0
+	leaves = leaves.filter(func(lf2): return lf2["t"] < lf2["life"])
+
+func _draw_radiance(cv: CanvasItem) -> void:
+	for ln in lances:
+		var u: float = ln["t"] / ln["secs"]
+		var reach := minf(1.0, u / 0.12)                       # driven out in a blink, then it thins and goes
+		var a: Vector2 = ln["a"]
+		var b: Vector2 = a.lerp(ln["b"], reach)
+		var w := 3.0 * (1.0 - smoothstep(0.3, 1.0, u)) + 0.8 * sin(ln["t"] * 60.0) * (1.0 - u)
+		var dirv := (b - a).normalized()
+		var side := Vector2(-dirv.y, dirv.x)
+		var n := int(a.distance_to(b) / PX)
+		for k in n + 1:
+			var q := a + dirv * k * PX
+			var ww := int(ceil(w))
+			for j in range(-ww - 1, ww + 2):
+				var aj := absi(j)
+				var col: Color
+				if aj <= ww / 2:
+					col = Color(1, 1, 0.96)
+				elif aj <= ww:
+					col = Color(1.0, 0.86, 0.5)
+				else:
+					col = Color(0.9, 0.6, 0.25, 0.6)
+				col.a *= 1.0 - smoothstep(0.5, 1.0, u)
+				cv.draw_rect(Rect2(((q + side * j * PX) / PX).floor() * PX, Vector2(PX, PX)), col)
+	for h in halos:
+		var fa: float = smoothstep(0.0, 0.4, h["t"]) * (1.0 - smoothstep(h["secs"] - 0.8, h["secs"], h["t"]))
+		for i in h["n"]:
+			var ang: float = h["t"] * 1.4 + i / float(h["n"]) * TAU
+			var q: Vector2 = h["c"] + Vector2(cos(ang) * h["R"], sin(ang) * h["R"] * 0.35)
+			var turn := absf(sin(h["t"] * 5.0 + i * 1.3))             # a flake turning: broad, then edge-on
+			var c0 := (q / PX).floor() * PX
+			var front := sin(ang) > 0.0
+			var col := Color(1.0, 0.86, 0.5, fa) if turn > 0.5 else Color(0.75, 0.5, 0.2, fa)
+			if turn > 0.92:
+				col = Color(1, 1, 0.95, fa)                                # it catches the light
+			cv.draw_rect(Rect2(c0, Vector2(PX * (3.0 if turn > 0.5 else 1.0), PX * 2.0)), Color(col.r, col.g, col.b, col.a * (1.0 if front else 0.55)))
+	for lf2 in leaves:
+		var u: float = lf2["t"] / lf2["life"]
+		var turn := absf(sin(lf2["t"] * 6.0 + lf2["ph"]))
+		var c0: Vector2 = (lf2["q"] / PX).floor() * PX
+		var al := 1.0 - smoothstep(0.7, 1.0, u)
+		var col := Color(1.0, 0.84, 0.45, al) if turn > 0.4 else Color(0.7, 0.48, 0.2, al)
+		if turn > 0.94:
+			col = Color(1, 1, 0.95, al)
+		cv.draw_rect(Rect2(c0, Vector2(PX * (2.0 if turn > 0.4 else 1.0), PX)), col)
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -1634,6 +1766,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_radiance(dt)
 	_tick_miasma2(dt)
 	_tick_slash(dt)
 	_tick_blood(dt)
