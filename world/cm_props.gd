@@ -5,36 +5,43 @@ extends RefCounted
 ## A Cursemark pixel is the world's pixel here (4 units); its props are drawn round their middle, ours on a foot, so
 ## each is lifted onto its foot.
 
-## the start of our key -> Cursemark's doodads (the first that exists, in turn by place)
+## the start of our key -> Cursemark's doodads (the first that exists, in turn by place), and how much larger it stands
+## than Cursemark drew it (Derek 2026-10-05: "make the world objects large so it feels like we are exploring wilderness")
 const MAP := [
-	["sp_oldgrowth_stump", ["plains/stump_big", "plains/stump_small"]],
-	["sp_oldgrowth_fallen", ["forest/fallen_tree"]],
-	["sp_oldgrowth_snag", ["plains/dead_tree", "forest/tree_dark"]],
-	["sp_oldgrowth", ["forest/tree", "forest/tree_dark"]],
-	["sp_ashoak_stump", ["plains/stump_small", "plains/stump_big"]],
-	["sp_ashoak_fallen", ["forest/fallen_tree"]],
-	["sp_ashoak_snag", ["plains/dead_tree"]],
-	["sp_ashoak", ["plains/small_tree", "plains/birch_tree"]],
-	["sp_bogcypress_stump", ["plains/stump_big"]],
-	["sp_bogcypress", ["forest/tree_dark", "forest/tree"]],
-	["sp_mourncypress_stump", ["plains/stump_big"]],
-	["sp_mourncypress", ["forest/tree_dark"]],
-	["sp_yew_stump", ["plains/stump_small"]],
-	["sp_yew", ["forest/tree"]],
-	["sp_charpine_stump", ["plains/stump_small", "plains/stump_big"]],
-	["sp_charpine", ["plains/dead_tree"]],
-	["sp_willow", ["forest/tree", "forest/tree_dark"]],
-	["grave", ["headstone"]],
-	["rk", ["plains/rock"]],
-	["shrub", ["plains/bush_med", "plains/bush_small", "forest/shrub"]],
-	["p_railing", ["fence_h"]],
-	["p_candles", ["candle"]],
-	["p_cobweb", ["forest/spiderweb"]],
-	["p_fungus", ["forest/mushroom_cap"]],
-	["p_lily", ["lilypad"]],
-	["p_rubble", ["rubble", "ruins_debris"]],
-	["p_cairn", ["rubble"]],
+	["sp_oldgrowth_stump", ["plains/stump_big", "plains/stump_small"], 1.25],
+	["sp_oldgrowth_fallen", ["forest/fallen_tree"], 1.3],
+	["sp_oldgrowth_snag", ["plains/dead_tree", "forest/tree_dark"], 1.45],
+	["sp_oldgrowth", ["forest/tree", "forest/tree_dark"], 1.45],
+	["sp_ashoak_stump", ["plains/stump_small", "plains/stump_big"], 1.25],
+	["sp_ashoak_fallen", ["forest/fallen_tree"], 1.3],
+	["sp_ashoak_snag", ["plains/dead_tree"], 1.35],
+	["sp_ashoak", ["plains/small_tree", "plains/birch_tree"], 1.45],
+	["sp_bogcypress_stump", ["plains/stump_big"], 1.25],
+	["sp_bogcypress", ["forest/tree_dark", "forest/tree"], 1.45],
+	["sp_mourncypress_stump", ["plains/stump_big"], 1.25],
+	["sp_mourncypress", ["forest/tree_dark"], 1.45],
+	["sp_yew_stump", ["plains/stump_small"], 1.25],
+	["sp_yew", ["forest/tree"], 1.45],
+	["sp_charpine_stump", ["plains/stump_small", "plains/stump_big"], 1.25],
+	["sp_charpine", ["plains/dead_tree"], 1.35],
+	["sp_willow", ["forest/tree", "forest/tree_dark"], 1.45],
+	["grave", ["headstone"], 1.1],
+	["rk", ["plains/rock"], 1.25],
+	["shrub", ["plains/bush_med", "plains/bush_small", "forest/shrub"], 1.2],
+	["p_railing", ["fence_h"], 1.0],
+	["p_candles", ["candle"], 1.0],
+	["p_cobweb", ["forest/spiderweb"], 1.0],
+	["p_fungus", ["forest/mushroom_cap"], 1.0],
+	["p_lily", ["lilypad"], 1.0],
+	["p_rubble", ["rubble", "ruins_debris"], 1.0],
+	["p_cairn", ["rubble"], 1.0],
 ]
+
+static func scale_for(key: String) -> float:
+	for m in MAP:
+		if key.begins_with(m[0]):
+			return float(m[2])
+	return 1.0
 
 static func region_for(key: String, x: float, y: float) -> String:
 	for m in MAP:

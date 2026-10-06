@@ -366,6 +366,14 @@ func _walls() -> void:
 ## small piece the generator placed there, so it stands only where its footprint is clear of walls, structures, the
 ## lanterns and gates, and the other big things (Derek: "randomly intersecting"); otherwise the place is left empty.
 var _cm_taken: Array = []
+const NO_PROP := [4, 5, 7, 8, 9, 10, 15]
+
+static func _prop_rank(key: String) -> int:
+	for i in PROP_RANK.size():
+		if key.contains(PROP_RANK[i]):
+			return i
+	return PROP_RANK.size()
+const PROP_RANK := ["landmark", "ancient", "mature", "dead", "dying", "young", "fallen", "snag", "grave", "rk", "stump", "sapling"]
 
 func _cm_room(t: Vector2, r: float) -> bool:
 	var rr := maxf(0.3, r * 0.75)
@@ -373,7 +381,9 @@ func _cm_room(t: Vector2, r: float) -> bool:
 	for yy in range(-n, n + 1):
 		for xx in range(-n, n + 1):
 			var q := t + Vector2(xx, yy)
-			if Vector2(xx, yy).length() <= rr + 0.5 and (is_solid(q) or type_at(q) == 7):
+			# only what a prop must not stand in: walls, cliffs, fog, pillars, palisades, water (a tree's own tile, a
+			# rock's, are where the generator put it)
+			if Vector2(xx, yy).length() <= rr + 0.5 and NO_PROP.has(type_at(q)):
 				return false
 	for e in _cm_taken:
 		if t.distance_to(e[0]) < (r + float(e[1])) * 0.8:
@@ -391,7 +401,11 @@ func _sprites() -> void:
 			_cm_taken.append([Vector2(o["x"], o["y"]), 1.6])
 		for L in lanterns:
 			_cm_taken.append([Vector2(L["x"], L["y"]), 2.0])
-	for s in d.get("sprites", []):
+	# the great trees take their ground first, then the young, then the small things between them
+	var order: Array = d.get("sprites", []).duplicate()
+	if Sfx.cm:
+		order.sort_custom(func(a, b): return _prop_rank(str(a.get("key", ""))) < _prop_rank(str(b.get("key", ""))))
+	for s in order:
 		var tex: Texture2D = null
 		var ox := 0.0
 		var oy := 0.0
@@ -405,8 +419,11 @@ func _sprites() -> void:
 			var cn: Node2D = load("res://world/cm_props.gd").node_for(key, float(s["x"]), float(s["y"]), bool(s.get("flip", false)))
 			if cn:
 				var fr: Dictionary = cn.frames[0]
-				var foot_r: float = (fr["rect"] as Rect2).size.x * 4.0 / 144.0 * 0.5 * 0.7   # a tile is 144 px across
+				var big: float = load("res://world/cm_props.gd").scale_for(key) * (0.92 + 0.16 * fposmod(float(s["x"]) * 7.31 + float(s["y"]) * 3.17, 1.0))
+				var foot_r: float = (fr["rect"] as Rect2).size.x * 4.0 / 144.0 * 0.5 * 0.7 * big   # a tile is 144 px across
 				var tp := Vector2(s["x"], s["y"])
+				if OS.has_environment("GM_PROPDBG"):
+					print("PROP ", key, " r ", snappedf(foot_r, 0.01), " ok ", _cm_room(tp, foot_r))
 				if not _cm_room(tp, foot_r):
 					cn.queue_free()
 					continue
@@ -417,7 +434,7 @@ func _sprites() -> void:
 				var cd: float = float(s.get("d", float(s["x"]) + float(s["y"])))
 				ch.position = Vector2(ca.x, cd * Iso.HY)
 				cn.position = Vector2(0, ca.y - cd * Iso.HY)
-				cn.scale = Vector2.ONE * float(s.get("scale", 1.0))
+				cn.scale = Vector2.ONE * float(s.get("scale", 1.0)) * big
 				ch.add_child(cn)
 				ch.set_meta("item", s.get("item", ""))
 				sorted.add_child(ch)
