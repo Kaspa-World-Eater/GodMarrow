@@ -463,90 +463,101 @@ func _stat_name(k: String) -> String:
 	return {"spi": "Essence", "ene": "Essence", "vit": "Vitality", "con": "Constitution", "dex": "Constitution"}.get(k, k)
 
 func skill_tip(id: String, more: bool = false) -> Array:
+	# Diablo's order (Derek 2026-10-05: "I hate the current tool tips with the blue subtext. Make them more Diablo like but
+	# have that cool description still"): the name; the lore in italic and what it does; Current Level and its numbers;
+	# the cost; Next Level; what lends it strength; what it still needs, in red. White and bone and gold, never blue.
 	if hero == null:
 		return []
 	if id == "attack" or id == "":
-		return [["Attack", U.TEXT], ["Strike with what you hold.", U.MUTED]]
+		return [["Attack", U.TEXT], ["Strike with what you hold.", U.MUTED, "italic"]]
 	var sb := hero.skills
 	var s: Dictionary = sb.data.get(id, {})
 	if s.is_empty():
 		return [[id, U.TEXT]]
-	var full := more or Input.is_key_pressed(KEY_SHIFT)
+	var WHITE := Color("#e6e0d2")
+	var BONE := Color("#b8ad96")
+	var GOLDT := Color("#c8a860")
 	var L := sb.lvl(id)
 	var hl := int(sb.hard.get(id, 0))
-	var col := U.tab_col(sb.cls, int(s.get("tab", 0)))
 	var passive: bool = s.get("kind", "cast") == "passive"
-	var lines: Array = [[str(s.get("name", id)) + (" · level %d" % L if L > 0 else ""), col]]
+	var lines: Array = [[str(s.get("name", id)), GOLDT]]
+	var lore := str(s.get("lore", ""))
+	var desc := str(s.get("description", "")).replace("[Passive] ", "").replace("[Passive]", "")
+	for l in U.wrap(lore if lore != "" else desc, 150, "italic", 7.5).slice(0, 4):
+		lines.append([l, BONE, "italic"])
+	if lore != "" and desc != "" and desc != lore:
+		for l in U.wrap(desc, 150, "book", 7.5).slice(0, 3):
+			lines.append([l, WHITE])
 	if passive:
-		lines.append(["[Passive]", U.DIM])
+		lines.append(["Passive", BONE])
 	var ready := hero.st.level >= int(s.get("required_level", 1))
 	for p in s.get("prerequisites", []):
 		if sb.hard.get(p, 0) <= 0:
 			ready = false
-	if not full:
-		for l in U.wrap(str(s.get("lore", s.get("description", ""))), 150, "book", 7.5).slice(0, 4):
-			lines.append([l, U.MUTED])
-	else:
-		for l in U.wrap(str(s.get("description", "")), 150, "book", 7.5).slice(0, 4):
-			lines.append([l, U.MUTED])
+	# what it costs
 	var c := sb.cost(id)
 	var pc := sb.poise_cost(id)
 	var ctext := ""
 	if sb.cls == "monk":
-		# the hourglass: Radiance pours amber sand, Absence black sand (a share of the bulb); Destroyer spends poise
 		var tb := int(s.get("tab", 0))
 		if tb == 2 and c > 0.0:
 			pc = roundf(c * (1.2 if id == "kthousand" else 0.6))
 		elif c > 0.0:
-			ctext = "Pours %s sand · %d%% of the bulb" % ["amber" if tb == 0 else "black", roundi(minf(25.0, 5.0 * c * (3.0 if id in ["kdawn", "keclipse"] else 1.0) / 12.8))]
-			if s.get("kind", "") == "hold":
-				ctext += " a second"
+			ctext = "Pours %s sand: %d%% of the bulb" % ["amber" if tb == 0 else "black", roundi(minf(25.0, 5.0 * c * (3.0 if id in ["kdawn", "keclipse"] else 1.0) / 12.8))]
 	elif c > 0.0:
-		ctext = "%s %.1f" % [hero.st.res_name(), c]
+		ctext = "%s Cost: %s" % [hero.st.res_name(), ("%.1f" % c).trim_suffix(".0")]
 		if s.get("kind", "") == "hold":
 			ctext += " a second"
 	if pc > 0.0:
-		ctext += (" · " if ctext != "" else "") + "Poise %d" % roundi(pc)
-	if ctext != "":
-		lines.append([ctext, U.GOLD_D])
+		ctext += (", " if ctext != "" else "") + "Poise Cost: %d" % roundi(pc)
 	var lv: Dictionary = s.get("levels", {})
 	var now: Dictionary = lv.get(str(clampi(maxi(L, 1), 1, 20)), {})
 	if L > 0 and sb.has_method("info"):
 		var live: String = sb.info(id)
 		if live != "":
-			now = {"text": live}   # the order's own live numbers (the sky, the glass) over the web's samples
-	if full:
-		lines.append([str(s.get("kind_text", "")), U.DIM])
-		if now.has("text"):
-			lines.append([("Now: " if L > 0 else "Level 1: ") + str(now["text"]), U.BLUE])
-		if L > 0 and hl < int(s.get("max_hard_level", 20)):
-			var nx: Dictionary = lv.get(str(clampi(L + 1, 1, 20)), {})
-			if nx.has("text") and L + 1 <= 20:
-				lines.append(["Next: " + str(nx["text"]), Color("#6f7bd8")])
-		if L > hl:
-			lines.append(["%d points + %d from what you carry" % [hl, L - hl], U.BLUE])
-		for pk in s.get("perks", []):
+			now = {"text": live}
+	lines.append(["", WHITE])
+	lines.append([("Current Level: %d" % L) if L > 0 else "Not yet learned", WHITE])
+	if L > hl:
+		lines.append(["(%d from what you carry)" % (L - hl), BONE])
+	if now.has("text"):
+		for part in str(now["text"]).split(" · "):
+			lines.append([part.strip_edges(), WHITE])
+	if ctext != "":
+		lines.append([ctext, WHITE])
+	if L > 0 and hl < int(s.get("max_hard_level", 20)) and L + 1 <= 20:
+		var nx: Dictionary = lv.get(str(clampi(L + 1, 1, 20)), {})
+		if nx.has("text"):
+			lines.append(["", WHITE])
+			lines.append(["Next Level", WHITE])
+			for part in str(nx["text"]).split(" · "):
+				lines.append([part.strip_edges(), BONE])
+	var syn: Array = s.get("synergies", [])
+	if not syn.is_empty():
+		lines.append(["", WHITE])
+		lines.append(["Receives Bonuses From", WHITE])
+		for sy in syn:
+			var pts := int(sb.hard.get(sy.get("from", ""), 0))
+			lines.append(["%s: +%d%% a level (%d)" % [str(sy.get("from_name", "")), int(sy.get("per_hard_point_pct", 0)), pts], GOLDT if pts > 0 else BONE])
+	var perks: Array = s.get("perks", [])
+	if not perks.is_empty() and (more or Input.is_key_pressed(KEY_SHIFT)):
+		lines.append(["", WHITE])
+		for pk in perks:
 			var on := perk_on(id, pk)
-			var need := "lv %d" % int(pk.get("skill_level", 1))
+			var need := "level %d" % int(pk.get("skill_level", 1))
 			var rs = pk.get("requires_stat")
 			if rs is Dictionary:
-				need += " + %d %s" % [int(rs.get("value", 0)), _stat_name(str(rs.get("stat", "")))]
-			lines.append([("+ " if on else "- ") + str(pk.get("name", "")) + ("" if on else " (%s)" % need), U.GOLD_D if on else U.DIM])
-			for l in U.wrap(str(pk.get("text", "")), 140, "book", 7.5).slice(0, 2):
-				lines.append(["   " + l, U.MUTED if on else U.FAINT])
-		for sy in s.get("synergies", []):
-			var pts := int(sb.hard.get(sy.get("from", ""), 0))
-			lines.append(["+%d%% per point in %s (%d)" % [int(sy.get("per_hard_point_pct", 0)), str(sy.get("from_name", "")), pts], Color("#b48ad9") if pts > 0 else U.DIM])
-	else:
-		if now.has("text"):
-			lines.append([("Now: " if L > 0 else "Level 1: ") + str(now["text"]), U.BLUE])
+				need += " and %d %s" % [int(rs.get("value", 0)), _stat_name(str(rs.get("stat", "")))]
+			lines.append([str(pk.get("name", "")) + ("" if on else " (at %s)" % need), GOLDT if on else BONE])
+			for l in U.wrap(str(pk.get("text", "")).replace("[Passive] ", ""), 140, "book", 7.5).slice(0, 2):
+				lines.append([l, WHITE if on else BONE])
+	elif not perks.is_empty():
+		lines.append(["Shift: its perks", BONE])
 	if not ready:
 		if hero.st.level < int(s.get("required_level", 1)):
-			lines.append(["Requires level %d" % int(s.get("required_level", 1)), U.RED])
+			lines.append(["Required Level: %d" % int(s.get("required_level", 1)), U.RED])
 		else:
 			lines.append(["Requires " + ", ".join(s.get("prerequisite_names", [])), U.RED])
-	if not full:
-		lines.append(["shift: the numbers, perks and synergies", U.FAINT])
 	return lines
 
 # ------------------------------------------------------------------ items: icons and tooltips (items/loot.gd if it has them)
@@ -859,6 +870,11 @@ func _draw_top() -> void:
 	if cursor_item:
 		var sz := Vector2(cursor_item.grid) * 48.0
 		draw_item(top, cursor_item, Rect2(mp - sz / 2.0, sz))
+	# --tipskill=ID (tests): that skill's tooltip pinned near the middle, for a screenshot
+	for ua in OS.get_cmdline_user_args():
+		if ua.begins_with("--tipskill="):
+			tip = skill_tip(ua.substr(11).trim_suffix("+"), ua.ends_with("+"))
+			mp = Vector2(560, 120)
 	if not tip.is_empty():
 		U.tooltip(top, tip, mp, top.get_viewport_rect().size, top.get_viewport_rect().size.y - 136.0)
 

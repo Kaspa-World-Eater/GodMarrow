@@ -370,16 +370,17 @@ static func tooltip(ci: CanvasItem, lines: Array, mouse: Vector2, view: Vector2,
 	var norm: Array = []
 	for l in lines:
 		if l is Array:
-			norm.append([str(l[0]), l[1] if l.size() > 1 and l[1] is Color else (Color(l[1]) if l.size() > 1 and l[1] is String else TEXT)])
+			# [text, colour, face]: the face is optional ("italic" for a skill's or an item's lore)
+			norm.append([str(l[0]), l[1] if l.size() > 1 and l[1] is Color else (Color(l[1]) if l.size() > 1 and l[1] is String else TEXT), str(l[2]) if l.size() > 2 else ""])
 		else:
-			norm.append([str(l), TEXT])
+			norm.append([str(l), TEXT, ""])
 	var fs := 30
-	var ft := font("book")
-	var fsc := font("sc")
+	var ft := font("own_book")      # Diablo's carved serif is near our IM Fell; the Cursemark face has no italic
+	var fsc := font("own_sc")
 	var lh := 34.0
 	var w := 0.0
 	for i in norm.size():
-		var f := fsc if i == 0 else ft
+		var f: Font = fsc if i == 0 else (font("own_" + norm[i][2]) if norm[i][2] != "" else ft)
 		w = maxf(w, f.get_string_size(norm[i][0], HORIZONTAL_ALIGNMENT_LEFT, -1, fs + (4 if i == 0 else 0)).x)
 	w += 48.0
 	var h := norm.size() * lh + 30.0
@@ -391,18 +392,11 @@ static func tooltip(ci: CanvasItem, lines: Array, mouse: Vector2, view: Vector2,
 		y = bar_top - h - 8.0
 	x = maxf(0, x)
 	y = maxf(0, y)
-	var qc: Color = norm[0][1]
-	ci.draw_rect(Rect2(x, y, w, h), Color(0.024, 0.02, 0.035, 0.96))
-	ci.draw_rect(Rect2(x + 2, y + 2, w - 4, h - 4), Color("#050407"), false, 4.0)
-	ci.draw_rect(Rect2(x + 6, y + 6, w - 12, h - 12), Color("#4a4458"), false, 2.0)
-	ci.draw_rect(Rect2(x + 16, y + 48, w - 32, 3), Color(qc, 0.6))
-	ci.draw_rect(Rect2(x + 16, y + 48, 12, 3), qc)
-	ci.draw_rect(Rect2(x + w - 28, y + 48, 12, 3), qc)
-	for c in [Vector2(x + 8, y + 8), Vector2(x + w - 16, y + 8), Vector2(x + 8, y + h - 16), Vector2(x + w - 16, y + h - 16)]:
-		ci.draw_rect(Rect2(c, Vector2(8, 8)), Color("#8a8698"))
-		ci.draw_rect(Rect2(c, Vector2(4, 4)), Color("#d0ccdc"))
+	# Diablo's box (Derek 2026-10-05: "more Diablo like"): a plain dark glass over the world, no frame, every line
+	# centred; the name in its colour on top
+	ci.draw_rect(Rect2(x, y, w, h), Color(0.01, 0.008, 0.012, 0.86))
 	for i in norm.size():
-		var f := fsc if i == 0 else ft
+		var f: Font = fsc if i == 0 else (font("own_" + norm[i][2]) if norm[i][2] != "" else ft)
 		var sz := fs + (4 if i == 0 else 0)
 		var s: String = smart(norm[i][0])
 		var tw := f.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, sz).x
