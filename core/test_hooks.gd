@@ -63,6 +63,8 @@ static func run(g) -> void:
 		_show_collision(g)
 	if a.has("shot"):
 		_shot(g, a)
+	if a.has("groundfire"):
+		_ground_fires(g)                 # --groundfire: three fires set burning near the pilgrim (to see them spread)
 	if a.has("weather"):
 		# --weather: a spell of weather at its height now (ash on the moor, a shower in the fen)
 		var Wt = load("res://world/weather.gd")
@@ -326,3 +328,14 @@ static func _swing_loop(g) -> void:
 		if g.hero.act == "":
 			g.hero._start_attack(null, g.hero.tp + Vector2(1.0, -1.0))
 		await tree.create_timer(0.7).timeout
+
+
+static func _ground_fires(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.5).timeout
+	var AW = load("res://entities/ai/ai_world.gd")
+	var w = AW.of(g.zone)
+	var c: Vector2 = g.hero.tp
+	for o in [Vector2(2.2, 0.6), Vector2(1.0, 2.4), Vector2(3.0, 2.2)]:
+		w.fire(c + o, 1.3, 0.0, 30.0)
+		await tree.create_timer(0.5).timeout

@@ -97,7 +97,9 @@ func fire(p: Vector2, r: float, dps: float, secs: float, owner: Object = null) -
 		return
 	fires.append({"p": p, "R": r, "dps": dps, "t": secs, "max": secs, "tick": 0.0, "s": randf() * 9.0, "who": Combat.who(owner) if owner is Monster else ""})
 	while fires.size() > 60:
-		fires.pop_front()
+		var old: Dictionary = fires.pop_front()
+		if old.has("node") and is_instance_valid(old["node"]):
+			old["node"].queue_free()
 
 func ripple(p: Vector2) -> void:
 	ripples.append({"p": p + Vector2(randf_range(-0.15, 0.15), randf_range(-0.15, 0.15)), "t": 0.9})
@@ -157,6 +159,9 @@ func _physics_process(dt: float) -> void:
 				h.set_meta("ground_hurt", Time.get_ticks_msec() + 330)
 				Combat.hit_hero(h, f["dps"] * 0.35, "magic", f["p"], {"src": f.get("who", "") + "|its fire" if f.get("who", "") != "" else "fire on the ground"})
 			Brain.hit_allies(get_tree(), f["p"], f["R"], f["dps"] * 0.35, "magic", f["p"])
+	for f in fires:
+		if f["t"] <= 0.0 and f.has("node") and is_instance_valid(f["node"]):
+			f["node"].queue_free()
 	fires = fires.filter(func(f): return f["t"] > 0.0)
 	for r in ripples:
 		r["t"] -= dt
@@ -350,7 +355,46 @@ func _draw() -> void:
 		elif tl.has("lane"):
 			_dust_lane(tl["lane"], tl["dir"], tl["len"], tl["half"], tl["k"], sd)
 
+## the fire as liquid (shaders/ground_fire.gdshader): it runs out from where it fell, burns, gutters as it dies
 func _draw_fire(f: Dictionary) -> void:
+	var R: float = f["R"]
+	var hw := R * Iso.HX * 1.1
+	var hh := R * Iso.HY * 1.1
+	var fh := 40.0 + R * 26.0
+	if not f.has("node"):
+		var rr := ColorRect.new()
+		rr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var m := ShaderMaterial.new()
+		m.shader = load("res://shaders/ground_fire.gdshader")
+		m.set_shader_parameter("seed", float(f["s"]))
+		rr.material = m
+		rr.size = Vector2(ceilf((hw * 2.0 + 16.0) / 4.0) * 4.0, ceilf((hh * 2.0 + fh) / 4.0) * 4.0)
+		add_child(rr)
+		# its light, pooled on the ground round it by the dark layer (and so on everything standing near)
+		var pl := PointLight2D.new()
+		pl.color = Color(1.0, 0.55, 0.22)
+		pl.set_meta("dark_r", 34.0 * R)
+		pl.set_meta("dark_far", 1.7)
+		pl.set_meta("dark_core", 0.2)
+		pl.position = Vector2(rr.size.x * 0.5, fh + hh)
+		pl.enabled = false
+		rr.add_child(pl)
+		f["node"] = rr
+		f["born"] = clock
+	var node: ColorRect = f["node"]
+	var q := Iso.to_screen(f["p"])
+	node.position = Vector2(roundf((q.x - node.size.x * 0.5) / 4.0) * 4.0, roundf((q.y - hh - fh) / 4.0) * 4.0)
+	var mt: ShaderMaterial = node.material
+	var age: float = clock - float(f["born"])
+	mt.set_shader_parameter("t", age)
+	mt.set_shader_parameter("spread", 1.0 - pow(1.0 - minf(1.0, age / 0.9), 3.0))
+	mt.set_shader_parameter("life", clampf(f["t"] / 1.2, 0.0, 1.0) * (0.9 + 0.1 * sin(clock * 7.0 + f["s"])))
+	mt.set_shader_parameter("half_px", Vector2(hw, hh))
+	mt.set_shader_parameter("flame_h", fh)
+	mt.set_shader_parameter("wind", Game.wind)
+	mt.set_shader_parameter("rect_size", node.size)
+
+func _draw_fire_old(f: Dictionary) -> void:
 	var q := Iso.to_screen(f["p"])
 	var a: float = minf(1.0, f["t"] / 0.6)
 	var R: float = f["R"]
