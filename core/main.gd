@@ -126,6 +126,7 @@ func enter(zid: String, from: String) -> void:
 		at = Vector2(zone.arrive[from]["x"], zone.arrive[from]["y"])
 	else:
 		at = Vector2(zone.markers["start"]["x"], zone.markers["start"]["y"])
+	at = _clear_of_folk(at)
 	hero = Hero.new()
 	hero.st = old_stats
 	hero.skills = old_skills
@@ -270,6 +271,22 @@ func _exit_tree() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED:
 		save_game()
+
+## an arrival never on top of someone: the nearest spot a step clear of every townsfolk and thing standing there
+func _clear_of_folk(at: Vector2) -> Vector2:
+	var near := func(p: Vector2) -> bool:
+		for o in zone.objects:
+			if Vector2(float(o.get("x", -99)), float(o.get("y", -99))).distance_to(p) < 1.3:
+				return true
+		return false
+	if not near.call(at):
+		return at
+	for r in [1.2, 1.8, 2.4, 3.0]:
+		for i in 12:
+			var q: Vector2 = at + Vector2(cos(i * TAU / 12.0), sin(i * TAU / 12.0)) * r
+			if not near.call(q) and zone.room_at(q, 0.3):
+				return q
+	return at
 
 func _process(_dt: float) -> void:
 	if hero == null or zone == null or travelling:

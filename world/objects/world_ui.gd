@@ -76,7 +76,9 @@ static func font(path: String) -> Font:
 	# (Cursemark assets): its faces (ui/uikit.gd font): small capitals in the gothic pixel face, the rest in Barlow
 	var U = load("res://ui/uikit.gd")
 	if FileAccess.file_exists("res://cursemark/fonts/barlow_17.fnt"):
-		var cf: Font = U.font("sc" if path == F_CAPS else "small")   # the world's lines in the smaller face: 22 px, not 34
+		# names and banners in Cursemark's gothic; what is spoken and written in our own IM Fell (as the title and the
+		# tooltips), so the words of the world read as one hand
+		var cf: Font = U.font("sc") if path == F_CAPS else U.font("own_italic" if path == F_ITALIC else "own_book")
 		_fonts[path] = cf
 		return cf
 	var f: Font = null
@@ -226,7 +228,7 @@ func _fit_plate(p: ColorRect, l: Label, a: float, named: bool) -> void:
 		p.color.a = 0.0
 		return
 	var lines := maxi(1, l.get_line_count())
-	var h := lines * 34.0 + (40.0 if named else 12.0)
+	var h := lines * maxf(34.0, float(l.get_line_height())) + (40.0 if named else 14.0)
 	var vp := get_viewport().get_visible_rect().size
 	var gp := l.get_global_rect()
 	p.position = Vector2(vp.x * 0.5 - 620, gp.position.y - (36.0 if named else 6.0))
