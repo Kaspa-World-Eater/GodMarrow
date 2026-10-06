@@ -456,6 +456,13 @@ class Poser:
                 sway = float(lag.get("sway", 0.6))
                 d = ((R1 @ hem + t1) - (Rr @ hem + trr)) * k - v * sway * np.array([1.0, 0.5, 1.0]) * k
                 d = d + np.array([0.0, 0.0, -self.drift * sway])
+                # flutter: in a looping clip the hem also swings with the gait (two beats a cycle, a step each), so a
+                # cloak lives in a walk even when the clip barely moves the body; a fraction of the part's height
+                fl = float(lag.get("flutter", 0.0))
+                if fl > 0.0 and self.loop and self.n_src > 1:
+                    ph = 2.0 * math.pi * 2.0 * t / float(self.n_src) + float(lag.get("phase", 0.0))
+                    hgt = max(y1 - y0, 1.0)
+                    d = d + np.array([math.sin(ph) * 0.6, 0.0, -abs(math.cos(ph)) * 0.8 - 0.2]) * fl * hgt
                 lim = float(lag.get("max", DEFAULT_LAG["max"])) * max(y1 - y0, 1.0)
                 n = float(np.linalg.norm(d))
                 if n > lim:
