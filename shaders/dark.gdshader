@@ -21,6 +21,7 @@ uniform float dark_a = 0.82;
 uniform vec3 dark_rgb = vec3(0.031, 0.051, 0.106);
 uniform float tint_a = 0.25;
 uniform float cell = 4.0;
+uniform float snap_n = 22.0;     // steps per channel for the final snap (0 = off)
 uniform vec3 amb = vec3(1.0);        // the land's shade by the hour (the web's ambient), lifted inside the pools
 uniform float amb_lift = 0.35;
 // the land's grade (zz_grade55.js): saturation, contrast, brightness; cool from above and warm from below (soft light);
@@ -196,5 +197,10 @@ void fragment() {
 	col *= 1.0 + rake;
 	col = mix(col, dark_rgb, dark_a * vq);
 	col += halo;
+	// one ramp for everything (the title's lesson): every colour on screen, whoever drew it, snapped to the same steps
+	// with the same 4x4 dither on the world's pixel grid, so Cursemark's art, ours and the effects sit as one picture
+	if (snap_n > 0.0) {
+		col = floor(col * snap_n + th) / snap_n;
+	}
 	COLOR = vec4(col, 1.0);
 }
