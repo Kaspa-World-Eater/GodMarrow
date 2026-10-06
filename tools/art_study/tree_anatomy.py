@@ -66,13 +66,15 @@ class Tree:
         self.k = scale
         self.pieces = []
         self.forks = []                                                 # (point, radius) of every fork
+        self.piece_mass = []                                            # each piece's great limb (-1: trunk, roots)
         self.leafpts = []                                               # (point, mass): where leaves grow (twig ends)
         base = np.array([0.0, 0.0, -0.05])
         lean = unit(np.array([0.12, -0.08, 1.0]))
         # the foot flares into the roots before the trunk proper
         K = scale
         self.pieces.append((base, base + lean * 0.5 * K, 0.5 * K, 0.37 * K, 0.0, 0.5 * K, 9.0))
-        self.limb(base + lean * 0.5 * K, lean, 0.37 * K, 2.4 * K, 0, 0.5 * K, 0.0)
+        self.piece_mass.append(-1)
+        self.limb(base + lean * 0.5 * K, lean, 0.37 * K, 2.4 * K, 0, 0.5 * K, 0.0, mass=-1)
         # buttress roots: run out from the flare and dive
         for k in range(6):
             az = k * 1.05 + self.rr.normal(0, 0.25)
@@ -82,6 +84,7 @@ class Tree:
             end = mid + unit(d + np.array([0, 0, -0.6])) * 0.7 * K
             self.pieces.append((p0, mid, 0.22 * K, 0.11 * K, 0.0, 0.5 * K, 9.0))
             self.pieces.append((mid, end, 0.11 * K, 0.03 * K, 0.5 * K, 1.2 * K, 9.0))
+            self.piece_mass += [-1, -1]
         # turn the whole tree on its trunk (a painter chooses the angle: no great limb pointed down the line of sight)
         if turn:
             c, s_ = np.cos(turn), np.sin(turn)
@@ -107,6 +110,7 @@ class Tree:
                 ba, bb = max(0.0, 1 - i / 2.0), max(0.0, 1 - (i + 1) / 2.0)
                 ra, rb = ra * (1 - ba) + r_in * ba, rb * (1 - bb) + r_in * bb
             self.pieces.append((q, q2, ra, rb, s + L * i / n, s + L * f, L * i / n))
+            self.piece_mass.append(mass)
             if rb < 0.03:
                 self.leafpts.append((q2, mass))
             q = q2

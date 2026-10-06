@@ -496,3 +496,21 @@ limbs). This round learns the tree from the inside out, one exercise at a time, 
   seen end-on, and a foreshortened limb reads as a broken stump. Turned on its trunk (the best of four turns, chosen
   by eye), the tree shows its fan of great limbs plainly. Also, the leader now takes over the trunk's own width
   where it starts, so there is no separate collar to stick out.
+
+## Round 12: ground tiles, one at a time (2026-10-06; Derek: "Are you using tiles from in game? If not you need to
+craft some to perfection first ... 1 at a time ... enough variety to create the scene seamlessly and beautiful";
+"The world you craft is only as good as its foundation")
+The game's format: each ground class is a seamless 320x160 texture laid in screen space at 2 texels per world px
+(160x80 world px, ~4.4 tiles), two "main" variants mixed by noise, borders frayed (`shaders/ground_iso.gdshader`).
+`tools/art_study/tiles_wood.py` paints them in whole world pixels with periodic noise, and judges each one in a
+game-size view under a flat cold moon and the hero's lantern (the ground shader has no normals, so the form has to
+be in the albedo).
+
+Wood `main_0`, the floor of a dying wood. Four wrong turns before it read:
+1. Thousands of true-size leaves at full contrast: **speckle**. Baked-in stones: the **repeat** shows at once (stones
+   belong in the scatter, not in a tile).
+2. Drifts as hard-edged masses in different colours: **camouflage**.
+3. Each leaf with its own random value, as large as the form's: still noise. **Form first**: the drifts' light and
+   shade as a smooth per-pixel value, the leaves only nudging it (+-0.04), a crisp hair of shadow under each newer leaf.
+4. The humus near-black between the leaves: every gap a hole. **Neighbours close in value**: humus one step under the
+   leaves, cover nearly full. Contrast is saved for form and focus.

@@ -17,6 +17,7 @@ Shown as: 1 masses (each mass one flat tone), 2 values (the four groups), 3 pain
   python tools/art_study/tree_foliage.py OUT.png
 """
 import sys
+from types import SimpleNamespace
 import numpy as np
 from PIL import Image
 from tree_anatomy import Tree, vn, hexc, unit, to_screen, BARK, GROUND, KX, KY, KZ, VIEW, SUN, hero
@@ -84,22 +85,29 @@ def _hash(a, b, s):
     return (h & 0xFFFF) / 65535.0
 
 
-def render(tree, clumps, mode, W, H, ox, oy):
+def render(tree, clumps, mode, W, H, ox, oy, ground=None):
+    """ground: optional (points, normals) per pixel from a shaped floor (forest_floor.cast); flat otherwise"""
     SY, SX = np.mgrid[0:H, 0:W].astype(float)
-    gx = ((SY - oy) / KY + (SX - ox) / KX) / 2
-    gy = ((SY - oy) / KY - (SX - ox) / KX) / 2
-    gpts = np.stack([gx, gy, np.zeros_like(gx)], -1)
+    if ground is None:
+        gx = ((SY - oy) / KY + (SX - ox) / KX) / 2
+        gy = ((SY - oy) / KY - (SX - ox) / KX) / 2
+        gpts = np.stack([gx, gy, np.zeros_like(gx)], -1)
+        gnrm = np.zeros((H, W, 3))
+        gnrm[..., 2] = 1
+    else:
+        gpts, gnrm = ground
+        gx, gy = gpts[..., 0], gpts[..., 1]
     zbuf = gpts @ VIEW
     kind = np.zeros((H, W), int)                                        # 0 ground, 1 bark, 2 leaf
-    nrm = np.zeros((H, W, 3))
-    nrm[..., 2] = 1
+    nrm = gnrm.copy()
     P3 = gpts.copy()
     rad = np.zeros((H, W))
     width = np.zeros((H, W))
     sval = np.zeros((H, W))
     tval = np.zeros((H, W))
     # ---- bark (as exercise 1)
-    for (p0, p1, r0, r1, s0, s1, fk) in tree.pieces:
+    pid = np.full((H, W), -1)
+    for pi, (p0, p1, r0, r1, s0, s1, fk) in enumerate(tree.pieces):
         t = unit(p1 - p0)
         b1 = np.cross(t, VIEW)
         if np.linalg.norm(b1) < 1e-6:
@@ -137,6 +145,7 @@ def render(tree, clumps, mode, W, H, ox, oy):
             nrm[y0:y1, x0:x1][upd] = n3[upd]
             P3[y0:y1, x0:x1][upd] = pt[upd]
             kind[y0:y1, x0:x1][upd] = 1
+            pid[y0:y1, x0:x1][upd] = pi
             rad[y0:y1, x0:x1][upd] = r
             width[y0:y1, x0:x1][upd] = rpx
             sval[y0:y1, x0:x1][upd] = s0 + (s1 - s0) * f
@@ -218,6 +227,8 @@ def render(tree, clumps, mode, W, H, ox, oy):
     # sun-flecks: light coming through the gaps in the leaves, on the ground and the trunk
     fleck = shadowed & (kind != 2) & (vn(P3[..., 0] * 1.7 + 3, P3[..., 1] * 1.7) > 0.74)
     shadowed = shadowed & ~fleck
+    if mode == "raw":                                                  # the buffers, for another painter
+        return SimpleNamespace(**locals())
     ndl = np.clip((nrm * SUN).sum(-1), 0, 1)
     lv = np.where(shadowed & (kind == 2), ndl * 0.45, np.where(shadowed, ndl * 0.22, ndl))
     lm = kind == 2
