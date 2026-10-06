@@ -8,6 +8,7 @@ uniform vec3 lamp_dir = vec3(0.0, 0.0, 1.0);   // toward the lantern, screen spa
 uniform float lamp_k = 0.0;                    // how near and bright the lantern is to this body, 0..1
 uniform float sky_k = 0.3;                     // the cold of the sky / the vault
 uniform bool face_left = false;
+uniform float corrode = 0.0;         // 0..1 acid pitting
 uniform float frost = 0.0;           // 0..1 the glaze of ice climbing from the feet
 uniform float growth = 0.0;          // bone growth (shaders/ossify.gdshader's method): 0..1 of the body crusted
 uniform vec2 origin = vec2(0.5, 0.5);
@@ -73,6 +74,14 @@ void fragment() {
 			if (piece + fu.y * 0.6 < line) c.a = 0.0;
 		}
 		c.rgb = col;
+	}
+	if (corrode > 0.0) {
+		vec2 tq2 = floor(UV / TEXTURE_PIXEL_SIZE);
+		float pit = vn(tq2 * 0.45 + 31.0);
+		if (pit > 1.0 - corrode * 0.55) {
+			float deep = (pit - (1.0 - corrode * 0.55)) / max(0.01, corrode * 0.55);
+			c.rgb = deep > 0.5 ? vec3(0.08, 0.1, 0.03) : mix(c.rgb * 0.5, vec3(0.5, 0.75, 0.12), 0.7);   // the pit, its sizzling rim
+		}
 	}
 	if (frost > 0.0) {
 		vec2 tq = floor(UV / TEXTURE_PIXEL_SIZE);

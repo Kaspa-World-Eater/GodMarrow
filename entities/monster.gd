@@ -312,6 +312,10 @@ var calc_k := -1.0
 var _spurs: Node2D
 
 var frost_k := 0.0
+var corrode_k := 0.0
+
+func acid_hit(dmg: float) -> void:
+	corrode_k = minf(1.0, corrode_k + 0.2 + dmg / maxf(1.0, hp_max))
 var rot_k := -1.0
 var gut_k := -1.0
 
@@ -342,6 +346,15 @@ func _tick_ossify(dt: float) -> void:
 	if not dead:
 		frost_k = maxf(0.0, frost_k - dt * 0.08)
 	m.set_shader_parameter("frost", frost_k)
+	if not dead:
+		corrode_k = maxf(0.0, corrode_k - dt * 0.06)
+	m.set_shader_parameter("corrode", corrode_k)
+	if corrode_k > 0.15 and randf() < dt * 10.0 * corrode_k:
+		var I = load("res://world/impacts.gd").of(zone)
+		var r := spr.get_rect()
+		var q := position + spr.position + (r.position + Vector2(randf() * r.size.x, randf() * r.size.y * 0.7)) * spr.scale.abs()
+		I.wsmoke.append({"q": q, "v": Vector2(randf_range(-6, 6), -randf_range(16, 30)), "t": 0.0, "life": randf_range(0.8, 1.4), "r": randf_range(1.5, 2.5), "ph": randf() * TAU, "col": Color(0.55, 0.75, 0.3)})
+		I._ensure_sky()
 	m.set_shader_parameter("origin", _oss_origin)
 	m.set_shader_parameter("oseed", float(get_instance_id() % 97))
 	var at := spr.texture as AtlasTexture

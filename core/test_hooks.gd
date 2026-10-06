@@ -71,6 +71,8 @@ static func run(g) -> void:
 		_zap(g)                          # --zap: ball lightning, charged ground and spark novas round the pilgrim
 	if a.has("bonefx"):
 		_bonefx(g)                       # --bonefx: bone spears, bone rain and a rib cage round the pilgrim
+	if a.has("acidfx"):
+		_acidfx(g)                       # --acidfx: acid globs, drips and corroding creatures
 	if a.has("magic"):
 		_magic(g)                        # --magic: phosphor wisps flung at points round the pilgrim
 	if a.has("acid"):
@@ -527,3 +529,23 @@ static func _bonefx(g) -> void:
 		await tree.create_timer(0.6).timeout
 		I.bone_rain(c + Vector2(-1.8, 1.4), 2.0, 20, 1.6)
 		await tree.create_timer(3.0).timeout
+
+
+static func _acidfx(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	var I = load("res://world/impacts.gd").of(g.zone)
+	var c: Vector2 = g.hero.tp
+	var ms: Array = []
+	for o in [Vector2(-1.6, 2.2), Vector2(-0.6, 2.8)]:
+		var m = Brain.spawn(g.zone, "knight", c + o, 6, "normal", "acid", -1.0)
+		if m:
+			m.speed = 0.0
+			ms.append(m)
+	I.acid_drip(c + Vector2(2.8, -0.5), 0.8, 30.0)
+	while is_instance_valid(g) and g.hero:
+		I.acid_glob(c, c + Vector2(3.0, 1.8))
+		for m in ms:
+			if is_instance_valid(m) and not m.dead:
+				Combat.hit_monster(m, 1.0, "acid", c, {})
+		await tree.create_timer(1.4).timeout

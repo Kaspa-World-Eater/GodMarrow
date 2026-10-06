@@ -179,6 +179,7 @@ func _ensure_sky() -> void:
 
 func _draw_sky() -> void:
 	_draw_souls(sky)
+	_draw_acid(sky)
 	_draw_bone(sky)
 	_draw_zap(sky)
 	_draw_ice(sky)
@@ -663,7 +664,8 @@ func _draw_wisps(cv: CanvasItem) -> void:
 				var gy := posmod(int(c0.y) + yy, 4)
 				var th := float([0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5][gy * 4 + gx]) / 16.0
 				if (1.0 - e) * (1.0 - u) * 1.4 > th:
-					cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.62, 0.72, 0.9, 0.16 * (1.0 - u)))
+					var sc: Color = m.get("col", Color(0.62, 0.72, 0.9))
+					cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(sc.r, sc.g, sc.b, 0.16 * (1.0 - u) * (2.0 if m.has("col") else 1.0)))
 	# tendrils: thin curling lines that drift back and dissolve (pixels drop out from the tip inward)
 	for tn in wtend:
 		var u: float = tn["t"] / tn["life"]
@@ -686,6 +688,8 @@ func _draw_wisps(cv: CanvasItem) -> void:
 		if tw < 0.35:
 			continue
 		var col := Color(1.0, 1.0, 1.0, (1.0 - u)).lerp(Color(0.55, 0.72, 1.0, 0.85 * (1.0 - u)), smoothstep(0.0, 0.7, u))
+		if s.get("acid", false):
+			col = Color(0.62, 0.86, 0.2, 1.0 - u)
 		var q: Vector2 = (s["q"] / PX).floor() * PX
 		cv.draw_rect(Rect2(q, Vector2(PX, PX)), col)
 		if s["glint"] and tw > 0.88 and u < 0.7:             # a cross-shaped glint at the peak of its twinkle
@@ -1058,6 +1062,78 @@ func _draw_bone(cv: CanvasItem) -> void:
 			var q := c0 + Vector2(randi_range(-5, 5), randi_range(-14, 0))
 			cv.draw_rect(Rect2(q * PX, Vector2(PX, PX)), Color(0.55, 0.85, 1.0, 0.25 * (1.0 - crumble)))
 
+# ------------------------------------------------------------------ acid, more forms
+## an acid glob: a swollen green drop arcing through the air, dripping as it flies; it bursts where it lands into a
+## splatter of droplets (each a small sizzling pool) round a central pool
+var globs: Array = []      # {a, b (screen), t, secs, h}
+## acid dripping from above (a broken vessel, a corroded ceiling): drops in long fall, each leaving a hissing spot
+var drips2: Array = []     # {x, y, ground, v, t}
+
+func acid_glob(from_tile: Vector2, to_tile: Vector2) -> void:
+	_ensure_sky()
+	var a := Iso.to_screen(from_tile) + Vector2(0, -70)
+	var b := Iso.to_screen(to_tile)
+	globs.append({"a": a, "b": b, "tile": to_tile, "t": 0.0, "secs": maxf(0.35, a.distance_to(b) / 700.0), "h": 120.0})
+
+func acid_drip(p: Vector2, r: float = 1.0, secs: float = 6.0) -> void:
+	_ensure_sky()
+	var c := Iso.to_screen(p)
+	for i in int(10 * r * secs / 3.0):
+		var a := randf() * TAU
+		var d := randf() * r * Iso.HX * 0.6
+		var g := c + Vector2(cos(a) * d, sin(a) * d * 0.5)
+		drips2.append({"q": g + Vector2(0, -randf_range(300, 500)), "ground": g, "v": 0.0, "t": -randf() * secs})
+
+func _tick_acid(dt: float) -> void:
+	for gb in globs:
+		gb["t"] += dt
+		var u: float = minf(1.0, gb["t"] / gb["secs"])
+		gb["p"] = gb["a"].lerp(gb["b"], u) + Vector2(0, -4.0 * gb["h"] * u * (1.0 - u))
+		if randf() < dt * 30.0:
+			_phos.append({"q": gb["p"], "t": 0.0, "life": 0.35, "v": Vector2(randf_range(-10, 10), 60), "ph": 0.0, "glint": false, "acid": true})
+		if u >= 1.0:
+			gb["done"] = true
+			acid(gb["tile"], 0.9, 7.0)
+			for k in 7:
+				var aa := randf() * TAU
+				acid(gb["tile"] + Vector2(cos(aa), sin(aa)) * randf_range(0.6, 1.3), randf_range(0.2, 0.35), randf_range(4.0, 6.0))
+			for k in 10:
+				var aa := randf() * TAU
+				chips.append({"p": gb["tile"], "z": 10.0, "v": Vector2(cos(aa), sin(aa)) * randf_range(1.0, 3.0), "vz": randf_range(60, 140),
+					"col": [Color("#b8e040"), Color("#6a9a18"), Color("#3a5a10")][randi() % 3], "t": 0.0, "life": 1.5, "rest": false, "bounced": false, "big": false})
+	globs = globs.filter(func(gb): return not gb.get("done", false))
+	for dr in drips2:
+		dr["t"] += dt
+		if dr["t"] < 0.0:
+			continue
+		if not dr.get("landed", false):
+			dr["v"] += 1400.0 * dt
+			dr["q"].y += dr["v"] * dt
+			if dr["q"].y >= dr["ground"].y:
+				dr["landed"] = true
+				acid(Iso.to_tile(dr["ground"]), randf_range(0.15, 0.3), randf_range(3.0, 5.0))
+	drips2 = drips2.filter(func(dr): return not dr.get("landed", false))
+
+func _draw_acid(cv: CanvasItem) -> void:
+	for gb in globs:
+		if not gb.has("p"):
+			continue
+		var c: Vector2 = (gb["p"] / PX).floor() * PX
+		for yy in range(-3, 4):
+			for xx in range(-3, 4):
+				var e := xx * xx + yy * yy
+				if e <= 9:
+					var col := Color(0.42, 0.66, 0.1) if e > 4 else Color(0.64, 0.86, 0.2)
+					if xx <= -1 and yy <= -1 and e <= 4:
+						col = Color(0.88, 1.0, 0.55)
+					cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), col)
+	for dr in drips2:
+		if dr["t"] < 0.0:
+			continue
+		var q: Vector2 = (dr["q"] / PX).floor() * PX
+		cv.draw_rect(Rect2(q, Vector2(PX, PX * 3)), Color(0.55, 0.8, 0.15, 0.9))
+		cv.draw_rect(Rect2(q + Vector2(0, PX * 2), Vector2(PX, PX)), Color(0.85, 1.0, 0.5))
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -1153,6 +1229,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_acid(dt)
 	_tick_bone(dt)
 	_tick_zap(dt)
 	_tick_ice(dt)

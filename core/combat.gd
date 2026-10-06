@@ -34,6 +34,8 @@ static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vec
 	m.on_hit(d, elem, from, opts)
 	if elem == "ltng" and m.zone and not opts.get("dot", false):
 		load("res://world/impacts.gd").of(m.zone).crackle(m, 0.9)
+	if elem == "acid" and m.has_method("acid_hit"):
+		m.acid_hit(d)
 	if elem == "cold" and m.has_method("cold_hit"):
 		m.cold_hit(d)
 	if opts.get("bone", false) and m.has_method("bone_hit"):
