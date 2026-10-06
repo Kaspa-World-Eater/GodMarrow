@@ -1884,9 +1884,10 @@ func _tick_lakes(dt: float) -> void:
 ## walks through. kind: "grass" (green), "dead" (straw and grey), "ash" (grey stalks of a burnt field)
 var meadows: Array = []    # {node, p, R}
 const MEADOW_PAL := {
-	"grass": [Color("#0f140c"), Color("#232e17"), Color("#3a4a22"), Color("#5e6e34"), Color("#9a9e55")],
-	"dead": [Color("#17130e"), Color("#30271a"), Color("#4f4128"), Color("#78673f"), Color("#ad9c6a")],
-	"ash": [Color("#121113"), Color("#252326"), Color("#3b383a"), Color("#5c5755"), Color("#8c857d")],
+	# hue-shifted (the painted standard): the darks lean blue-violet, the lights lean warm
+	"grass": [Color("#0d1219"), Color("#16211d"), Color("#2a3d23"), Color("#55692d"), Color("#a3a457")],
+	"dead": [Color("#121219"), Color("#25221f"), Color("#4a4029"), Color("#7d6c3c"), Color("#c4b26b")],
+	"ash": [Color("#0e0e15"), Color("#201f27"), Color("#38353b"), Color("#5e5856"), Color("#958c80")],
 }
 
 func meadow(p: Vector2, r: float = 2.0, kind: String = "grass", tall: float = 36.0) -> Node:
