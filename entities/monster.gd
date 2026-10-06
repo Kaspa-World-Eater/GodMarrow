@@ -117,14 +117,26 @@ const CM_BODY := {
 
 var base_scale := Vector2.ONE * Iso.FIG   # the body's drawn size (a swelling or a breath works from it)
 
+## every creature carries the effects shader (shaders/cm_flash.gdshader: the bone crust, the frost glaze, the flash),
+## so every death can play on every body, Cursemark's or ours; the lantern lighting in it stays off for ours (no
+## normal maps: lamp_k is only set for Cursemark bodies)
+var fx_body := false
+
+func _fx_shader() -> void:
+	if spr.material == null:
+		var fm := ShaderMaterial.new()
+		fm.shader = load("res://shaders/cm_flash.gdshader")
+		spr.material = fm
+	fx_body = true
+
 func _true_size() -> void:
+	if spr.set != null and str(spr.set.meta.get("source", "")) != "cursemark":
+		_fx_shader()
 	if spr.set != null and str(spr.set.meta.get("source", "")) == "cursemark":
 		spr.scale = Vector2(4, 4) * Iso.FIG   # a Cursemark pixel is 4 units: its man about our man's height
 		base_scale = spr.scale
 		cm_body = true
-		var fm := ShaderMaterial.new()
-		fm.shader = load("res://shaders/cm_flash.gdshader")
-		spr.material = fm
+		_fx_shader()
 		return
 	if boss or spr.set == null:
 		return
@@ -514,7 +526,7 @@ func _physics_process(dt: float) -> void:
 		tp = zone.move(tp, push * dt, radius)
 		position = Iso.to_screen(tp)
 		push = push.move_toward(Vector2.ZERO, (14.0 + push.length() * 6.0) * dt)
-	if cm_body:
+	if fx_body:
 		_tick_ossify(dt)
 	if dead and gut_k >= 0.0:
 		# lumps swell under the skin, each on its own throb, faster and harder; the body darkens and reddens; it splits
@@ -626,8 +638,8 @@ func _physics_process(dt: float) -> void:
 		_cm_light()
 	if hit_flash > 0.0:
 		hit_flash -= dt
-		if cm_body:
-			# Cursemark fills a struck body with white for a blink (shaders/cm_flash.gdshader)
+		if fx_body:
+			# a struck body fills with white for a blink, as Cursemark's do (shaders/cm_flash.gdshader)
 			if spr.material is ShaderMaterial:
 				spr.material.set_shader_parameter("flash", (0.9 if hit_flash > 0.06 else 0.5) if hit_flash > 0.0 and Settings.hit_flash else 0.0)
 		else:

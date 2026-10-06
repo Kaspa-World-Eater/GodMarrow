@@ -378,6 +378,10 @@ static func _burn_test(g, kind: String) -> void:
 	var bleed := kind.begins_with("bleed")
 	if bleed:
 		kind = "hollow"
+	var forced := ""                             # --burn=bone:hound picks the creature
+	if kind.contains(":"):
+		forced = kind.split(":")[1]
+		kind = kind.split(":")[0]
 	var bone := kind.begins_with("bone")
 	var ice := kind.begins_with("ice")
 	var zap := kind.begins_with("chain")
@@ -387,6 +391,8 @@ static func _burn_test(g, kind: String) -> void:
 		kind = "hollow"
 	if bone or ice or zap or rot:
 		kind = "knight"
+	if forced != "":
+		kind = forced
 	var c: Vector2 = g.hero.tp
 	if rot:
 		load("res://world/impacts.gd").of(g.zone).miasma(c + Vector2(0.8, 1.8), 2.6, 30.0, "breath")
