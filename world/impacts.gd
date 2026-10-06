@@ -876,7 +876,7 @@ func _tick_zap(dt: float) -> void:
 			var d: float = randf() * f["R"]
 			var q: Vector2 = f["c"] + Vector2(cos(a) * d, sin(a) * d * 0.5)
 			var a2 := a + randf_range(-1.5, 1.5)
-			f["arcs"].append([_jag(q, q + Vector2(cos(a2), sin(a2) * 0.5) * randf_range(16, 44), 6.0), 0.1])
+			f["arcs"].append([_jag(q, q + Vector2(cos(a2), sin(a2) * 0.5) * randf_range(30, 80), 7.0), 0.12])
 		for ar in f["arcs"]:
 			ar[1] -= dt
 		f["arcs"] = f["arcs"].filter(func(ar): return ar[1] > 0.0)
@@ -889,6 +889,14 @@ func _draw_zap(cv: CanvasItem) -> void:
 	var now := Time.get_ticks_msec() / 1000.0
 	for f in fields:
 		var fade: float = 1.0 - smoothstep(f["secs"] - 1.0, f["secs"], f["t"])
+		var fc: Vector2 = (f["c"] / PX).floor()
+		var Rg := int(f["R"] / PX)
+		var hum := 0.75 + 0.25 * sin(now * 13.0)
+		for yy in range(-Rg / 2, Rg / 2 + 1):
+			for xx in range(-Rg, Rg + 1):
+				var e := pow(float(xx) / Rg, 2) + pow(float(yy) / (Rg * 0.5), 2)
+				if e <= 1.0 and posmod(xx + yy, 2) == 0:
+					cv.draw_rect(Rect2((fc + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.45, 0.6, 1.0, 0.13 * (1.0 - e) * fade * hum))
 		for k in 70:                                          # static: a sparse crawl of pale points over the patch
 			var a := fmod(k * 2.39996 + now * (0.5 + k % 3), TAU)
 			var d: float = f["R"] * sqrt(fmod(k * 0.618, 1.0))
@@ -899,18 +907,18 @@ func _draw_zap(cv: CanvasItem) -> void:
 			_px_path(ar[0], Color(0.5, 0.65, 1.0, 0.45 * fade), 2, cv)
 			_px_path(ar[0], Color(1, 1, 1, fade), 1, cv)
 	for b in balls:
-		var c: Vector2 = (b["p"] / PX).floor() * PX
+		var c: Vector2 = ((b["p"] + Vector2(randf_range(-2, 2), randf_range(-2, 2))) / PX).floor() * PX
 		var fl := 0.7 + 0.3 * sin(now * 40.0 + b["t"])
-		for ring in [[10, 0.08], [7, 0.16], [4, 0.35], [2, 0.7]]:
+		for ring in [[14, 0.06], [10, 0.12], [6, 0.28], [3, 0.75]]:
 			var R: int = ring[0]
 			for yy in range(-R, R + 1):
 				for xx in range(-R, R + 1):
 					if xx * xx + yy * yy <= R * R:
 						cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.6, 0.75, 1.0, ring[1] * fl))
-		for k in 4:                                           # its surface crawls with tiny arcs
+		for k in 7:                                           # its surface crawls with arcs, some reaching out
 			var a := now * (3.0 + k) + k * 1.7
-			var e1 := c + Vector2(cos(a), sin(a)) * 3.0 * PX
-			var e2 := c + Vector2(cos(a + 1.2), sin(a + 1.2)) * 5.0 * PX
+			var e1 := c + Vector2(cos(a), sin(a)) * 4.0 * PX
+			var e2 := c + Vector2(cos(a + 1.2), sin(a + 1.2)) * (7.0 + 5.0 * float(k % 3 == 0)) * PX
 			_px_path(_jag(e1, e2, 5.0), Color(0.9, 0.95, 1.0, 0.9), 1, cv)
 		cv.draw_rect(Rect2(c - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(1, 1, 1))
 		if b["lash"].size() == 2 and b["lash"][1] > 0.0:
