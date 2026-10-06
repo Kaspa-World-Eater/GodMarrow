@@ -89,6 +89,8 @@ static func run(g) -> void:
 		_meleefx(g)                      # --meleefx: the pilgrim's string and a charged heavy on creatures at sword's length
 	if a.has("lakefx"):
 		_lakefx(g)                       # --lakefx: a painted water lake and a blood lake, creatures wading through
+	if a.has("meadowfx"):
+		_meadowfx(g)                     # --meadowfx: painted meadows (green, dead, ash) swaying, creatures wading through
 	if a.has("magic"):
 		_magic(g)                        # --magic: phosphor wisps flung at points round the pilgrim
 	if a.has("acid"):
@@ -748,5 +750,20 @@ static func _lakefx(g) -> void:
 	await tree.create_timer(0.5).timeout
 	for o in [Vector2(7.0, -3.0), Vector2(7.2, 3.6)]:
 		var m = Brain.spawn(g.zone, "hollow", c + o, 6, "normal", "lake", 1e6)
+		if m:
+			m.dmg = Vector2.ZERO
+
+
+static func _meadowfx(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.0).timeout
+	var I = load("res://world/impacts.gd").of(g.zone)
+	var c: Vector2 = g.hero.tp
+	I.meadow(c + Vector2(2.6, -0.4), 2.6, "grass", 52.0)
+	I.meadow(c + Vector2(0.2, 2.8), 2.0, "dead", 44.0)
+	I.meadow(c + Vector2(-2.4, 0.2), 1.8, "ash", 36.0)
+	await tree.create_timer(0.4).timeout
+	for o in [Vector2(5.4, -0.8), Vector2(0.6, 5.4)]:
+		var m = Brain.spawn(g.zone, "hollow", c + o, 6, "normal", "meadow", 1e6)
 		if m:
 			m.dmg = Vector2.ZERO

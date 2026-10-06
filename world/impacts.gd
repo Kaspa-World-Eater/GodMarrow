@@ -1879,6 +1879,69 @@ func _tick_lakes(dt: float) -> void:
 		m.set_shader_parameter("wind", Vector2(Gust.dir(), Gust.k()))
 	lakes = lakes.filter(func(lk): return is_instance_valid(lk["node"]))
 
+# ------------------------------------------------------------------ meadows (painted: shaders/meadow.gdshader)
+## standing grass: blades swaying with the one wind in waves rolling across the patch, parting round anything that
+## walks through. kind: "grass" (green), "dead" (straw and grey), "ash" (grey stalks of a burnt field)
+var meadows: Array = []    # {node, p, R}
+const MEADOW_PAL := {
+	"grass": [Color("#0f140c"), Color("#232e17"), Color("#3a4a22"), Color("#5e6e34"), Color("#9a9e55")],
+	"dead": [Color("#17130e"), Color("#30271a"), Color("#4f4128"), Color("#78673f"), Color("#ad9c6a")],
+	"ash": [Color("#121113"), Color("#252326"), Color("#3b383a"), Color("#5c5755"), Color("#8c857d")],
+}
+
+func meadow(p: Vector2, r: float = 2.0, kind: String = "grass", tall: float = 36.0) -> Node:
+	var hw := r * Iso.HX
+	var n := ColorRect.new()
+	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	n.size = (Vector2(hw * 2.0 + 32.0, hw + tall + 8.0) / PX).ceil() * PX
+	var q := Iso.to_screen(p)
+	n.position = ((q - Vector2(n.size.x * 0.5, n.size.y - hw * 0.5)) / PX).floor() * PX
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/meadow.gdshader")
+	m.set_shader_parameter("seed", randf() * 40.0)
+	m.set_shader_parameter("rect_size", n.size)
+	m.set_shader_parameter("half_px", Vector2(hw, hw * 0.5))
+	m.set_shader_parameter("blade_h", tall)
+	m.set_shader_parameter("world_ofs", n.position)
+	var pal: Array = MEADOW_PAL.get(kind, MEADOW_PAL["grass"])
+	for i in 5:
+		m.set_shader_parameter("c%d" % i, Vector3(pal[i].r, pal[i].g, pal[i].b))
+	n.material = m
+	if zone and zone.get("floor_layer"):
+		zone.floor_layer.add_child(n)
+	else:
+		add_child(n)
+	meadows.append({"node": n, "p": p, "R": r, "t": 0.0})
+	return n
+
+func _tick_meadows(dt: float) -> void:
+	if meadows.is_empty():
+		return
+	var bodies: Array = get_tree().get_nodes_in_group("monsters").filter(func(m): return is_instance_valid(m) and not m.dead and m.zone == zone)
+	var sc = get_tree().current_scene
+	var h = sc.get("hero") if sc else null
+	if h and is_instance_valid(h):
+		bodies.append(h)
+	for md in meadows:
+		var n: ColorRect = md["node"]
+		if not is_instance_valid(n):
+			continue
+		md["t"] += dt
+		var arr: Array = []
+		for b in bodies:
+			if arr.size() >= 6:
+				break
+			if b.tp.distance_to(md["p"]) < md["R"] + 1.0:
+				var sp: Vector2 = Iso.to_screen(b.tp) - n.position
+				arr.append(Vector4(sp.x, sp.y, 34.0, 1.0))
+		while arr.size() < 6:
+			arr.append(Vector4(0, 0, 0, 0))
+		var m: ShaderMaterial = n.material
+		m.set_shader_parameter("bodies", arr)
+		m.set_shader_parameter("t", md["t"])
+		m.set_shader_parameter("wind", Vector2(Gust.dir(), Gust.k()))
+	meadows = meadows.filter(func(md): return is_instance_valid(md["node"]))
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -1975,6 +2038,7 @@ func _process(dt: float) -> void:
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
 	_tick_lakes(dt)
+	_tick_meadows(dt)
 	_tick_absence(dt)
 	_tick_radiance(dt)
 	_tick_miasma2(dt)
