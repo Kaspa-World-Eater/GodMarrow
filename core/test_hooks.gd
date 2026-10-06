@@ -65,6 +65,8 @@ static func run(g) -> void:
 		_shot(g, a)
 	if a.has("groundfire"):
 		_ground_fires(g)                 # --groundfire: three fires set burning near the pilgrim (to see them spread)
+	if a.has("bolt"):
+		_bolt(g)                         # --bolt: lightning beside the pilgrim every two seconds
 	if a.has("blaze"):
 		_blaze(g)                        # --blaze: radiant blazes beside the pilgrim, one after another
 	if a.has("wildfire"):
@@ -414,3 +416,14 @@ static func _blaze(g) -> void:
 	while is_instance_valid(g) and g.hero:
 		I.blaze(g.hero.tp + Vector2(2.2, 0.8), 3.0, 1.0)
 		await tree.create_timer(3.6).timeout
+
+
+static func _bolt(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	var I = load("res://world/impacts.gd").of(g.zone)
+	var i := 0
+	while is_instance_valid(g) and g.hero:
+		I.lightning(g.hero.tp + Vector2(2.0 + (i % 3) * 0.8, 0.6 + (i % 2)))
+		i += 1
+		await tree.create_timer(2.0).timeout

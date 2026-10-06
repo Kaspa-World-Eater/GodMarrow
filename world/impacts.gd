@@ -73,6 +73,89 @@ func blaze(p: Vector2, secs: float = 3.0, size: float = 1.0) -> void:
 	add_child(pl)
 	blazes.append({"node": r, "light": pl, "t": 0.0, "secs": secs, "p": p, "size": size})
 
+## lightning (Derek: "lightning ... be very creative"): a bolt from the sky (or from a to b) as a jagged path in whole
+## pixels with forks, a white core and a blue halo; it strikes, goes dark for a breath, strikes again; the ground flashes
+## blue-white; where it struck, a Lichtenberg fern is burnt into the ground, glowing then cooling to black.
+var bolts: Array = []      # {pts: [screen], forks: [[screen]], t, life}
+var ferns: Array = []      # {c (screen), arms: [[screen]], t, life}
+
+func lightning(to: Vector2, from_sky: bool = true, from: Vector2 = Vector2.INF) -> void:
+	var b := Iso.to_screen(to)
+	var a: Vector2 = (b + Vector2(randf_range(-160, 160), -900)) if from_sky or from == Vector2.INF else Iso.to_screen(from) + Vector2(0, -60)
+	if sky == null:
+		sky = Node2D.new()
+		sky.z_index = 1000
+		sky.z_as_relative = false
+		sky.draw.connect(_draw_sky)
+		add_child(sky)
+	bolts.append({"pts": _jag(a, b, 22.0), "forks": [], "t": 0.0, "life": 0.5})
+	var bl: Dictionary = bolts[-1]
+	for i in 3:
+		var k := randi_range(3, bl["pts"].size() - 3)
+		var s0: Vector2 = bl["pts"][k]
+		var dirv: Vector2 = (b - a).normalized().rotated(randf_range(-0.9, 0.9))
+		bl["forks"].append(_jag(s0, s0 + dirv * randf_range(60, 160), 14.0))
+	_flash(to, Color(0.7, 0.8, 1.0), 0.35, 140.0)
+	_fern(b)
+	Game.shake(4.0)
+
+func _jag(a: Vector2, b: Vector2, step: float) -> Array:
+	var pts: Array = [a]
+	var n := maxi(3, int(a.distance_to(b) / step))
+	var side := Vector2(-(b - a).y, (b - a).x).normalized()
+	for i in range(1, n):
+		var u := float(i) / n
+		pts.append(a.lerp(b, u) + side * randf_range(-1.0, 1.0) * step * 0.9 * sin(u * PI))
+	pts.append(b)
+	return pts
+
+func _fern(c: Vector2) -> void:
+	var arms: Array = []
+	for i in 7:
+		var ang := randf() * TAU
+		var p := c
+		var arm: Array = []
+		for k in int(randf_range(6, 12)):
+			ang += randf_range(-0.6, 0.6)
+			p += Vector2(cos(ang), sin(ang) * 0.5) * PX * 2.0
+			arm.append(p)
+			if randf() < 0.3:
+				var q := p
+				var a2 := ang + randf_range(-1.2, 1.2)
+				for j in 3:
+					q += Vector2(cos(a2), sin(a2) * 0.5) * PX * 1.5
+					arm.append(q)
+		arms.append(arm)
+	ferns.append({"c": c, "arms": arms, "t": 0.0, "life": 18.0})
+	while ferns.size() > 12:
+		ferns.pop_front()
+
+var sky: Node2D           # the bolts' own layer, above every figure
+
+func _draw_sky() -> void:
+	for bl in bolts:
+		var t: float = bl["t"]
+		# two strikes with a dark breath between: 0-0.12 and 0.2-0.42
+		if not (t < 0.12 or (t > 0.2 and t < 0.42)):
+			continue
+		_px_path(bl["pts"], Color(0.45, 0.6, 1.0, 0.55), 3, sky)
+		for f in bl["forks"]:
+			_px_path(f, Color(0.45, 0.6, 1.0, 0.45), 2, sky)
+		_px_path(bl["pts"], Color(1.0, 1.0, 1.0, 1.0), 1, sky)
+		for f in bl["forks"]:
+			_px_path(f, Color(0.85, 0.92, 1.0, 0.85), 1, sky)
+
+func _px_path(pts: Array, col: Color, w: int, cv: CanvasItem = null) -> void:
+	if cv == null:
+		cv = self
+	for i in pts.size() - 1:
+		var a: Vector2 = pts[i]
+		var b: Vector2 = pts[i + 1]
+		var n := maxi(1, int(a.distance_to(b) / PX))
+		for k in n + 1:
+			var q := (a.lerp(b, float(k) / n) / PX).floor() * PX
+			cv.draw_rect(Rect2(q - Vector2(w / 2, w / 2) * PX, Vector2(w, w) * PX), col)
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -145,6 +228,14 @@ func _process(dt: float) -> void:
 			bz["node"].queue_free()
 			bz["light"].queue_free()
 	blazes = blazes.filter(func(bz): return bz["t"] < bz["secs"])
+	for bl in bolts:
+		bl["t"] += dt
+	bolts = bolts.filter(func(bl): return bl["t"] < bl["life"])
+	if sky:
+		sky.queue_redraw()
+	for fn in ferns:
+		fn["t"] += dt
+	ferns = ferns.filter(func(fn): return fn["t"] < fn["life"])
 	for mo in motes:
 		mo["t"] += dt
 		mo["v"].x += Gust.dir() * Gust.k() * 40.0 * dt + sin(mo["t"] * 3.0 + mo["q"].y * 0.05) * 6.0 * dt
@@ -172,6 +263,14 @@ func _process(dt: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	for fn in ferns:
+		var u: float = fn["t"] / fn["life"]
+		var hot := clampf(1.0 - fn["t"] / 1.5, 0.0, 1.0)
+		var col := Color(0.04, 0.04, 0.06, 0.75 * (1.0 - smoothstep(0.6, 1.0, u))).lerp(Color(0.75, 0.85, 1.0, 1.0), hot)
+		for arm in fn["arms"]:
+			for q in arm:
+				draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), col)
+
 	for mo in motes:
 		var u: float = mo["t"] / mo["life"]
 		var mq: Vector2 = (mo["q"] / PX).floor() * PX
