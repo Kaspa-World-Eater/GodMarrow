@@ -44,12 +44,12 @@ void fragment() {
 		float lv = dens * 3.0 + d * 0.25;
 		vec3 fog = lv > 2.2 ? vec3(0.36, 0.32, 0.74) : lv > 1.4 ? vec3(0.24, 0.2, 0.58) : vec3(0.14, 0.11, 0.4);
 		// ghostly: thin, the world shows through it
-		float cover = clamp(dens * 0.55, 0.0, 0.45);
+		float cover = clamp(dens * 0.41, 0.0, 0.34);   // 25% more transparent (Derek)
 		vec3 col = mix(under * vec3(0.85, 0.8, 1.0), fog * 0.7, cover);
 		// pale wisps winding through it: thin ridges of a slow, stretched noise, glowing lavender
 		// the faintest glow, breathing (a slow pulse through its heart)
 		float pulse = 0.5 + 0.5 * sin(t * 1.3 + a * 4.0);
-		col += vec3(0.1, 0.07, 0.18) * smoothstep(0.3, 0.9, dens) * (0.35 + 0.65 * pulse);
+		col += vec3(0.075, 0.052, 0.135) * smoothstep(0.3, 0.9, dens) * (0.35 + 0.65 * pulse);
 		// faces: they surface pale, glowing faintly, their eyes and mouth hollow, and sink again
 		if (dens > 0.35) {
 			vec2 cell = floor(px / 44.0);

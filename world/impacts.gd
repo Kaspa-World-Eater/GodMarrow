@@ -550,13 +550,13 @@ func _tick_wisps(dt: float) -> void:
 		var vel: Vector2 = (np - w["p"]) / maxf(dt, 0.001)
 		w["p"] = np
 		w["trail"].push_front(np)
-		if w["trail"].size() > 10:
+		if w["trail"].size() > 34:
 			w["trail"].pop_back()
 		# soul dust shed behind it: more when it moves fast
-		var n := 2 + int(vel.length() / 160.0)
+		var n := 1 + int(vel.length() / 260.0)
 		for k in n:
 			_phos.append({"q": np + Vector2(randf_range(-6, 6), randf_range(-6, 6)), "t": 0.0, "life": randf_range(0.8, 2.2),
-				"v": Vector2(randf_range(-8, 8), randf_range(6, 20)), "ph": randf() * TAU, "glint": randf() < 0.18})
+				"v": Vector2(randf_range(-6, 6), -randf_range(4, 14)), "ph": randf() * TAU, "glint": randf() < 0.05})
 		if u >= 1.0:
 			w["done"] = true
 			for k in 40:
@@ -589,28 +589,34 @@ func _draw_wisps(cv: CanvasItem) -> void:
 			for o in [Vector2(PX, 0), Vector2(-PX, 0), Vector2(0, PX), Vector2(0, -PX)]:
 				cv.draw_rect(Rect2(q + o, Vector2(PX, PX)), gc)
 	for w in wisps:
-		var c: Vector2 = (w["p"] / PX).floor() * PX
-		var br := 0.75 + 0.25 * sin(now * 6.0 + w["seed"])       # it breathes
-		# the ghostly tail: the last few places it was, a fading teardrop
+		# a spirit, not a star: it phases (fades in and out, now and then almost gone), its small soft light trailing
+		# a long smoky tail that undulates behind it, thinning to nothing; faint echoes of it linger where it passed
+		var t: float = w["t"]
+		var sd: float = w["seed"]
+		var phase := 0.55 + 0.45 * sin(t * 2.7 + sd) * sin(t * 1.1 + sd * 1.7)
+		phase = clampf(phase, 0.4, 1.0)
 		var tr: Array = w["trail"]
 		for i in tr.size():
 			var k := 1.0 - float(i) / tr.size()
-			var q: Vector2 = (tr[i] / PX).floor() * PX
-			var rr := int(1 + 2 * k)
-			cv.draw_rect(Rect2(q - Vector2(rr, rr) * PX * 0.5, Vector2(rr, rr) * PX), Color(0.6, 0.78, 1.0, 0.18 * k))
-		# the glow: three soft rings, then the radiant white core
-		for ring in [[7, 0.07], [5, 0.12], [3, 0.3]]:
-			var R: int = ring[0]
-			for yy in range(-R, R + 1):
-				for xx in range(-R, R + 1):
-					if xx * xx + yy * yy <= R * R:
-						cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.55, 0.75, 1.0, ring[1] * br))
-		cv.draw_rect(Rect2(c - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(0.9, 0.96, 1.0, 0.95))
+			var q: Vector2 = tr[i]
+			if i > 0:
+				var dirv: Vector2 = (tr[i - 1] - q).normalized()
+				q += Vector2(-dirv.y, dirv.x) * sin(i * 0.55 - t * 9.0) * (1.0 + 7.0 * (1.0 - k))   # the tail undulates
+			q = (q / PX).floor() * PX
+			var wdt := int(1 + 3.0 * k * k)
+			for j in range(-wdt + 1, wdt):
+				cv.draw_rect(Rect2(q + Vector2(j * PX, 0), Vector2(PX, PX)), Color(0.62, 0.8, 1.0, 0.42 * k * phase))
+			if i % 9 == 4:                                       # an echo of it, lingering faintly
+				cv.draw_rect(Rect2(q - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(0.7, 0.85, 1.0, 0.07 * k * phase))
+		var c: Vector2 = (w["p"] / PX).floor() * PX
+		for yy in range(-7, 8):
+			for xx in range(-7, 8):
+				var e := float(xx * xx + yy * yy)
+				if e <= 49.0:
+					cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.55, 0.78, 1.0, 0.32 * pow(1.0 - e / 49.0, 2.0) * phase))
+		cv.draw_rect(Rect2(c - Vector2(PX, 0), Vector2(PX * 3, PX)), Color(0.85, 0.94, 1.0, 0.8 * phase))
+		cv.draw_rect(Rect2(c - Vector2(0, PX), Vector2(PX, PX * 3)), Color(0.85, 0.94, 1.0, 0.8 * phase))
 		cv.draw_rect(Rect2(c, Vector2(PX, PX)), Color(1, 1, 1))
-		cv.draw_rect(Rect2(c + Vector2(0, -PX * 2), Vector2(PX, PX)), Color(1, 1, 1, 0.6 * br))
-		cv.draw_rect(Rect2(c + Vector2(0, PX * 2), Vector2(PX, PX)), Color(1, 1, 1, 0.6 * br))
-		cv.draw_rect(Rect2(c + Vector2(-PX * 2, 0), Vector2(PX, PX)), Color(1, 1, 1, 0.6 * br))
-		cv.draw_rect(Rect2(c + Vector2(PX * 2, 0), Vector2(PX, PX)), Color(1, 1, 1, 0.6 * br))
 
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
