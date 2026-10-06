@@ -96,10 +96,53 @@ func fire(p: Vector2, r: float, dps: float, secs: float, owner: Object = null) -
 	if zone.is_solid(p) or zone.type_at(p) == 12:
 		return
 	fires.append({"p": p, "R": r, "dps": dps, "t": secs, "max": secs, "tick": 0.0, "s": randf() * 9.0, "who": Combat.who(owner) if owner is Monster else ""})
-	while fires.size() > 60:
+	while fires.size() > 90:
 		var old: Dictionary = fires.pop_front()
 		if old.has("node") and is_instance_valid(old["node"]):
 			old["node"].queue_free()
+
+## a running flame front (Derek 2026-10-06: fire as "a spreading flaming"): dry ground catches and the fire runs across it,
+## readily downwind (the one wind, core/gust.gd), slowly against it; wet ground, water, stone and walls stop it. Each
+## tile that catches is a small patch of the liquid fire (fire()), and when it burns out it leaves scorch with dying
+## embers (world/splats.gd). A blaze is capped at `cap` tiles. dps hurts what stands in it, as any ground fire.
+const BURNS := [0, 11, 14]          # grass, dirt (dry tufts), flagstones' cracks; not road, mud, shallows, water
+var blazes: Array = []              # {cells: {Vector2i: age}, done: {Vector2i: true}, cap, dps, t}
+
+func wildfire(p: Vector2, cap: int = 60, dps: float = 6.0) -> void:
+	var c := Vector2i(int(floor(p.x)), int(floor(p.y)))
+	if not BURNS.has(zone.type_at(Vector2(c) + Vector2(0.5, 0.5))):
+		return
+	blazes.append({"cells": {c: 0.0}, "done": {c: true}, "cap": cap, "dps": dps, "t": 0.0})
+	fire(Vector2(c) + Vector2(0.5, 0.5), 1.05, dps, 2.6)
+
+func _tick_blazes(dt: float) -> void:
+	var wind := Vector2(Gust.dir(), 0.35).normalized() * (0.4 + Gust.k())   # mostly across the screen, a little down it
+	for b in blazes:
+		b["t"] += dt
+		var nxt := {}
+		for c in b["cells"]:
+			var age: float = b["cells"][c] + dt
+			if age >= 2.4:
+				var sp = load("res://world/splats.gd").at(zone)
+				if sp and sp.has_method("scorch"):
+					sp.scorch(Vector2(c) + Vector2(0.5, 0.5))
+				continue
+			nxt[c] = age
+			if age > 0.5 and b["done"].size() < int(b["cap"]) and randf() < dt * 2.2:
+				for o in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 1), Vector2i(-1, -1), Vector2i(1, -1), Vector2i(-1, 1)]:
+					var n: Vector2i = c + o
+					if b["done"].has(n):
+						continue
+					var tile := Vector2(n) + Vector2(0.5, 0.5)
+					if not BURNS.has(zone.type_at(tile)) or zone.is_solid(tile):
+						continue
+					var down := Vector2(o).normalized().dot(wind)
+					if randf() < 0.18 + 0.5 * maxf(0.0, down):
+						b["done"][n] = true
+						nxt[n] = 0.0
+						fire(tile + Vector2(randf_range(-0.2, 0.2), randf_range(-0.2, 0.2)), 1.05, b["dps"], 2.6)
+		b["cells"] = nxt
+	blazes = blazes.filter(func(b): return not b["cells"].is_empty())
 
 func ripple(p: Vector2) -> void:
 	ripples.append({"p": p + Vector2(randf_range(-0.15, 0.15), randf_range(-0.15, 0.15)), "t": 0.9})
@@ -148,6 +191,7 @@ func _physics_process(dt: float) -> void:
 	clock += dt
 	var h: Hero = zone.hero_ref
 	var alive_h := h != null and is_instance_valid(h) and not h.dead
+	_tick_blazes(dt)
 	# fires
 	for f in fires:
 		f["t"] -= dt

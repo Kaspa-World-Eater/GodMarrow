@@ -28,6 +28,12 @@ func death(kind: String, p: Vector2, big: bool) -> void:
 		list.pop_front()
 	queue_redraw()
 
+## scorched ground where a fire has run: a char stain with a few embers that die in the first seconds; lasts a minute
+func scorch(p: Vector2) -> void:
+	list.append({"p": p + Vector2(randf_range(-0.15, 0.15), randf_range(-0.15, 0.15)), "r": 0.42 + randf() * 0.12, "t": 60.0, "seed": randf() * 9.0, "col": "s"})
+	while list.size() > 240:
+		list.pop_front()
+
 func _process(dt: float) -> void:
 	if list.is_empty():
 		return
@@ -44,6 +50,19 @@ func _draw() -> void:
 		if s["col"] == "b":
 			draw_rect(Rect2(q, Vector2(2, 1) * W), Color(210 / 255.0, 200 / 255.0, 180 / 255.0, 0.8 * a))
 			draw_rect(Rect2(q + Vector2(1, 1) * W, Vector2(W, W)), Color(120 / 255.0, 112 / 255.0, 100 / 255.0, 0.8 * a))
+			continue
+		if s["col"] == "s":
+			var sa := minf(1.0, float(s["t"]) / 12.0)
+			var sr: float = float(s["r"]) * Iso.HX
+			_ellipse(q, sr, sr * 0.5, Color(0.05, 0.035, 0.03, 0.72 * sa))
+			_ellipse(q, sr * 0.6, sr * 0.3, Color(0.03, 0.02, 0.02, 0.5 * sa))
+			var hot := clampf((float(s["t"]) - 52.0) / 8.0, 0.0, 1.0)     # embers in the first eight seconds
+			if hot > 0.0:
+				for i in 5:
+					var ea: float = float(s["seed"]) * 3.0 + i * 2.3
+					var ep := q + Vector2(cos(ea), sin(ea) * 0.5) * sr * (0.2 + 0.15 * i)
+					if sin(Time.get_ticks_msec() * 0.006 + i * 1.7 + float(s["seed"])) > -0.3:
+						draw_rect(Rect2(ep.snapped(Vector2(W, W)), Vector2(W, W)), Color(1.0, 0.45 + 0.3 * hot, 0.15, hot))
 			continue
 		var c := Color8(70, 80, 30) if s["col"] == "g" else Color8(70, 8, 14)
 		c.a = 0.75 * a

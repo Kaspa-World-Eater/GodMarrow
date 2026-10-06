@@ -65,6 +65,8 @@ static func run(g) -> void:
 		_shot(g, a)
 	if a.has("groundfire"):
 		_ground_fires(g)                 # --groundfire: three fires set burning near the pilgrim (to see them spread)
+	if a.has("wildfire"):
+		_wildfire(g)                     # --wildfire: grass set alight beside the pilgrim, to watch the front run
 	if a.has("burn"):
 		_burn_test(g, String(a.get("burn", "hollow")))   # --burn[=KIND]: three creatures beside the pilgrim die by fire
 	if a.has("impacts"):
@@ -377,3 +379,14 @@ static func _burn_test(g, kind: String) -> void:
 		if is_instance_valid(m) and not m.dead:
 			Combat.hit_monster(m, 9999.0, "fire", c, {})
 		await tree.create_timer(0.35).timeout
+
+
+static func _wildfire(g) -> void:
+	await g.get_tree().create_timer(1.2).timeout
+	var w = load("res://entities/ai/ai_world.gd").of(g.zone)
+	var c: Vector2 = g.hero.tp
+	for r in range(2, 8):
+		for o in [Vector2(r, 0), Vector2(0, r), Vector2(-r, 0), Vector2(0, -r), Vector2(r, r)]:
+			if w.BURNS.has(g.zone.type_at(c + o)):
+				w.wildfire(c + o, 70, 0.0)
+				return
