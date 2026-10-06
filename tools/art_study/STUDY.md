@@ -366,3 +366,26 @@ How anatomy is dreamed (invented, but believable):
   takes it; it shows tendons as ridges where it is thin.
 - **Design the silhouette deliberately.** Draw the outline as a sequence of designed curves (each with a direction
   and a speed), then build the forms to fit it, not the other way round.
+
+## Round 9: a master study of Derek's dracolich reference (2026-10-06; "literally draw the image I gave you")
+
+Drawn by measurement from the painting (values, form direction, the breaks between forms), as a student copies with
+a grid; `tools/art_study/master_study.py`. The painting is someone else's signed work: the study stays private and
+out of the game. What copying it taught:
+- **Scale and viewpoint.** A low viewpoint: the arms in the foreground are huge, the skull small (about a sixth of the
+  picture's height) at the top of a long neck. Smallness of the head against bulk is what makes it read as colossal.
+- **The gesture.** One long curve: from the near claw up the arm, through the shoulder, up the spiked neck to the
+  skull turning back toward us. Everything else hangs off that line.
+- **The defining feature, drawn.** The chest's chasm is a long, slightly bent oval of black; the ribs are separate
+  tapered shapes along both lips, irregularly spaced, curving in and down, only their tips catching light. They read
+  as teeth because they are pale points against the darkest dark in the picture.
+- **Texture by number.** Not a few spikes but dozens, all sizes, in loose rows, each a small pale wedge with a dark
+  underside. Peeling hide is many small light flecks on the top planes only.
+- **Lost edges.** Most of the body is not outlined at all: big dark masses melt into the dark ground. Only planes
+  turned to the light get an edge. The eye is led by where the edges are, so they are few.
+- **Values.** Five steps at most: the black of the chasm and the orbits, the near-black body, the dark-mid of the
+  arms, the mist behind, and the bone. The bone is the only high value, so it is the focus.
+- **The skull.** Seen nearly from the front, the orbits and nasal openings are big dark shapes, the jaw hangs open
+  with long fangs, and the horns branch like antlers; the light comes from the upper right onto its top planes.
+- **The arms.** Bony, the wrist knobs and knuckles hard; the hide wound round them in strap-like strips; the claws
+  dark, each with one hard highlight.
