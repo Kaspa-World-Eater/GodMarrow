@@ -21,6 +21,7 @@ var add_big: Node2D
 var grain: Node2D
 var grain_tex: Array = []
 var lit: ColorRect              # the live-lit chapel, or null (then the captured painting stands)
+var dust: Array = []           # specks in the cold shaft, seen only where it catches them
 var _w := Vector4.ONE
 var _w4 := 1.0
 var cand: Array = []           # the web's candles: [x, base y, height, width] in chapel px
@@ -177,6 +178,16 @@ func _process(dt: float) -> void:
 		m["y"] += m["vy"] * dt
 	motes = motes.filter(func(m): return m["t"] < m["life"] and m["y"] < 272.0 and m["y"] > -4.0)
 	_light_w()
+	# dust turning in the cold shaft from high on the left (the shaft: zp_title.js ttBuildShaft)
+	while dust.size() < 34:
+		dust.append({"x": randf_range(250.0, 420.0), "y": randf_range(-10.0, 200.0), "ph": randf() * TAU, "v": randf_range(1.5, 4.0)})
+	for dd in dust:
+		dd["ph"] += dt * 0.6
+		dd["y"] += dd["v"] * dt
+		dd["x"] += (sin(dd["ph"]) * 1.2 + Gust.dir() * Gust.k() * 9.0 - 0.6) * dt
+		if dd["y"] > 230.0 or dd["x"] < 200.0 or dd["x"] > 470.0:
+			dd["y"] = randf_range(-10.0, 20.0)
+			dd["x"] = randf_range(280.0, 420.0)
 	fx.queue_redraw()
 	fx_back.queue_redraw()
 	add_fx.queue_redraw()
@@ -327,6 +338,12 @@ func _draw_add() -> void:
 	for n in cand.size():
 		var c: Array = cand[n]
 		_glow_at(add_fx, float(c[0]) + 0.5, float(c[1]) - float(c[2]) - 4.0, 10.0 + _fl(n) * 3.0, Color8(255, 150, 70), 0.2)
+	for dd in dust:
+		var bd: float = ((dd["x"] - 312.0) - (dd["y"] - 30.0) * 0.5) / 1.118
+		var sa: float = clampf(1.0 - absf(bd) / 30.0, 0.0, 1.0) * clampf(1.15 - dd["y"] / 170.0, 0.0, 1.0)
+		if sa > 0.08:
+			var dp := Vector2(roundf(dd["x"]), roundf(dd["y"])) * K
+			add_fx.draw_rect(Rect2(dp, Vector2(K, K)), Color(0.8 * sa, 0.88 * sa, 1.0 * sa))
 	for m in motes:
 		var a: float = maxf(0.0, 1.0 - m["t"] / m["life"]) if m["ember"] else minf(1.0, m["t"]) * 0.5
 		var p := Vector2(roundf(m["x"]), roundf(m["y"])) * K
