@@ -389,3 +389,21 @@ out of the game. What copying it taught:
   with long fangs, and the horns branch like antlers; the light comes from the upper right onto its top planes.
 - **The arms.** Bony, the wrist knobs and knuckles hard; the hide wound round them in strap-like strips; the claws
   dark, each with one hard highlight.
+
+## Round 10: the bone desert, one ground at a time (2026-10-06; Derek: "do them one at a time, like the rules.. go back and study all of the art notes")
+- **I broke the rule I wrote.** Asked for the desert tiles, I made six grounds at once on a pale sheet, then tuned them
+  together. Each came out half-designed. Now: one ground (the Bleached Dune, `painted_dune.py`), its brief written
+  from the lore first, finished, graded, and only then the next (chalk flat, bone bedrock, scree, marrow seep, sand
+  over bone; the six-at-once sheet `painted_bone_desert.py` stays only as a sketch of the list).
+- **Scale is the first fact.** My studies used a 16x8 tile; the game's tile (a yard) is 36x18 world px
+  (`core/iso.gd`). At the wrong scale the ripples fell 4 px apart and broke into dashes and speckle. Read the
+  projection from the code before drawing a single pixel.
+- **Flat ground needs no ray-cast.** Projecting each pixel straight onto the plane removed a jitter the height march
+  made in the light; keep the cast for things that stand up (shards, props).
+- **A feature is either there or not.** Ripples faded by a soft mask left a field of dying half-ripples, each a broken
+  dash. A sharp mask (smoothstep over a narrow band) gives clean rippled patches and quiet smooth brows.
+- **Specks are not detail.** Grit and bone flecks as scattered pixels read as noise; the grit became a quiet tint in
+  the troughs, the flecks very rare.
+- **Story marks must cross the grain.** The pilgrim's track first ran along the crests and read as another ripple;
+  run with the wind, it cuts across them and reads at once. Prints shaped as feet (ball, arch, heel), shallow, with
+  the wind filling the older ones.
