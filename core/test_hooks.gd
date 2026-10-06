@@ -65,6 +65,8 @@ static func run(g) -> void:
 		_shot(g, a)
 	if a.has("groundfire"):
 		_ground_fires(g)                 # --groundfire: three fires set burning near the pilgrim (to see them spread)
+	if a.has("magic"):
+		_magic(g)                        # --magic: phosphor wisps flung at points round the pilgrim
 	if a.has("acid"):
 		_acid(g)                         # --acid: acid pools beside the pilgrim
 	if a.has("bolt"):
@@ -380,6 +382,9 @@ static func _burn_test(g, kind: String) -> void:
 	var ice := kind.begins_with("ice")
 	var zap := kind.begins_with("chain")
 	var rot := kind.begins_with("rot")
+	var gut := kind.begins_with("gut")
+	if gut:
+		kind = "hollow"
 	if bone or ice or zap or rot:
 		kind = "knight"
 	var c: Vector2 = g.hero.tp
@@ -416,7 +421,7 @@ static func _burn_test(g, kind: String) -> void:
 			await tree.create_timer(0.45).timeout
 	for m in ms:
 		if is_instance_valid(m) and not m.dead:
-			Combat.hit_monster(m, 9999.0, "miasma" if rot else "cold" if ice else ("ltng" if zap else ("phys" if (bleed or bone) else "fire")), c, {"bone": bone})
+			Combat.hit_monster(m, 9999.0, "blood" if gut else "miasma" if rot else "cold" if ice else ("ltng" if zap else ("phys" if (bleed or bone) else "fire")), c, {"bone": bone})
 		await tree.create_timer(0.35).timeout
 
 
@@ -457,3 +462,15 @@ static func _acid(g) -> void:
 	I.acid(g.hero.tp + Vector2(2.0, 0.8), 1.4, 20.0)
 	await g.get_tree().create_timer(0.6).timeout
 	I.acid(g.hero.tp + Vector2(0.4, 2.6), 0.9, 20.0)
+
+
+static func _magic(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	var I = load("res://world/impacts.gd").of(g.zone)
+	var i := 0
+	while is_instance_valid(g) and g.hero:
+		for k in 3:
+			I.phosphor(g.hero.tp, g.hero.tp + Vector2(2.5 + k * 0.6, 1.5 - k * 1.2 + (i % 2)))
+		i += 1
+		await tree.create_timer(1.1).timeout

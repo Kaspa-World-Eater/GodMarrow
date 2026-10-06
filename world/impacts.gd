@@ -85,12 +85,7 @@ var ferns: Array = []      # {c (screen), arms: [[screen]], t, life}
 func lightning(to: Vector2, from_sky: bool = true, from: Vector2 = Vector2.INF) -> void:
 	var b := Iso.to_screen(to)
 	var a: Vector2 = (b + Vector2(randf_range(-160, 160), -900)) if from_sky or from == Vector2.INF else Iso.to_screen(from) + Vector2(0, -60)
-	if sky == null:
-		sky = Node2D.new()
-		sky.z_index = 1000
-		sky.z_as_relative = false
-		sky.draw.connect(_draw_sky)
-		add_child(sky)
+	_ensure_sky()
 	bolts.append({"pts": _jag(a, b, 22.0), "forks": [], "t": 0.0, "life": 0.72})
 	var bl: Dictionary = bolts[-1]
 	for i in 6:
@@ -178,14 +173,13 @@ var sky: Node2D           # the bolts' own layer, above every figure
 
 func _ensure_sky() -> void:
 	if sky == null:
-		sky = Node2D.new()
-		sky.z_index = 1000
-		sky.z_as_relative = false
+		sky = Node2D.new()                 # light: drawn over the darkness on the ghost layer (the night does not grade it)
 		sky.draw.connect(_draw_sky)
-		add_child(sky)
+		_ghost_layer().add_child(sky)
 
 func _draw_sky() -> void:
 	_draw_souls(sky)
+	_draw_wisps(sky)
 	_draw_arcs(sky)
 	for bl in bolts:
 		var t: float = bl["t"]
@@ -495,6 +489,75 @@ func _draw_breaths() -> void:
 			if (i % 2 == 0) or w < 0.25:
 				_breath_cv.draw_rect(Rect2(q, Vector2(PX, PX)), Color(0.78, 0.72, 1.0, al))
 
+# ------------------------------------------------------------------ the burst (blood)
+## a body bursts: a ring of gore thrown wide (heavy chunks and blood), a spray of fine droplets, a red flash, a pool
+## larger than a death's, and the ground spattered all round
+func gut_burst(p: Vector2) -> void:
+	for k in 4:
+		hit(p + Vector2(randf_range(-0.2, 0.2), randf_range(-0.2, 0.2)), p + Vector2(randf_range(-1, 1), randf_range(-1, 1)), true, "flesh")
+	for i in 26:
+		var a := randf() * TAU
+		chips.append({"p": p, "z": 50.0, "v": Vector2(cos(a), sin(a)) * randf_range(2.0, 6.0), "vz": randf_range(80.0, 220.0),
+			"col": [Color("#a01818"), Color("#6a0c0c"), Color("#c8b0a0")][randi() % 3], "t": 0.0, "life": randf_range(4.0, 7.0),
+			"rest": false, "bounced": false, "big": randf() < 0.5, "stain": true})
+	_flash(p, Color(1.0, 0.3, 0.25), 0.25, 50.0)
+	var sp = load("res://world/splats.gd").at(zone)
+	if sp:
+		sp._pool(p, 1.6, false)
+		for i in 10:
+			sp.list.append({"p": p + Vector2(randf_range(-1.6, 1.6), randf_range(-1.2, 1.2)), "r": 0.06 + randf() * 0.12, "t": 30.0, "seed": randf() * 9.0, "col": "r"})
+	Game.shake(3.0)
+
+# ------------------------------------------------------------------ pure magic: phosphor wisps
+## Derek: "pure magic should look like the wisps, with the shimmering white phosphorus ghostly blue-white trails".
+## A wisp: a white-hot point that curves toward its mark; its trail is a long ribbon of phosphor sparks that linger,
+## twinkle on and off and fade from white through ghost-blue; it bursts in a scatter of sparks
+var wisps: Array = []      # {p, v, to (screen), t, trail: [[pos, born]], done}
+var _phos: Array = []      # lingering sparks: {q, t, life}
+
+func phosphor(from_tile: Vector2, to_tile: Vector2) -> void:
+	_ensure_sky()
+	var a := Iso.to_screen(from_tile) + Vector2(0, -90)
+	var b := Iso.to_screen(to_tile) + Vector2(0, -60)
+	var side := Vector2(-(b - a).y, (b - a).x).normalized() * randf_range(-1.0, 1.0)
+	wisps.append({"p": a, "v": (b - a).normalized() * 220.0 + side * 260.0, "to": b, "t": 0.0, "done": false})
+
+func _tick_wisps(dt: float) -> void:
+	for w in wisps:
+		w["t"] += dt
+		var to: Vector2 = w["to"] - w["p"]
+		w["v"] = w["v"].lerp(to.normalized() * 520.0, minf(1.0, dt * 3.5))
+		w["p"] += w["v"] * dt
+		for k in 9:
+			_phos.append({"q": w["p"] + Vector2(randf_range(-7, 7), randf_range(-7, 7)), "t": 0.0, "life": randf_range(0.5, 1.6)})
+		if to.length() < 16.0 or w["t"] > 2.5:
+			w["done"] = true
+			for k in 26:
+				var a := randf() * TAU
+				_phos.append({"q": w["p"] + Vector2(cos(a), sin(a) * 0.6) * randf_range(4, 40), "t": 0.0, "life": randf_range(0.3, 1.0)})
+			_flash_at_screen(w["p"], Color(0.75, 0.9, 1.0), 0.2)
+	wisps = wisps.filter(func(w): return not w["done"])
+	for s in _phos:
+		s["t"] += dt
+		s["q"].y -= 12.0 * dt
+	_phos = _phos.filter(func(s): return s["t"] < s["life"])
+	while _phos.size() > 2400:
+		_phos.pop_front()
+
+func _draw_wisps(cv: CanvasItem) -> void:
+	for s in _phos:
+		var u: float = s["t"] / s["life"]
+		if randf() < 0.25 + u * 0.4:
+			continue                                         # twinkling: each spark flickers off and on
+		var col := Color(1.0, 1.0, 1.0, 1.0 - u).lerp(Color(0.5, 0.7, 1.0, 0.8 * (1.0 - u)), smoothstep(0.0, 0.6, u))
+		cv.draw_rect(Rect2((s["q"] / PX).floor() * PX, Vector2(PX, PX)), col)
+	for w in wisps:
+		var c: Vector2 = (w["p"] / PX).floor() * PX
+		cv.draw_rect(Rect2(c - Vector2(PX * 4, PX * 3), Vector2(PX * 9, PX * 7)), Color(0.45, 0.65, 1.0, 0.16))
+		cv.draw_rect(Rect2(c - Vector2(PX * 2, PX * 2), Vector2(PX * 5, PX * 5)), Color(0.55, 0.75, 1.0, 0.4))
+		cv.draw_rect(Rect2(c - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(0.85, 0.94, 1.0, 0.9))
+		cv.draw_rect(Rect2(c, Vector2(PX, PX)), Color(1, 1, 1))
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -590,6 +653,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_wisps(dt)
 	_tick_breaths(dt)
 	_tick_screen_flash(dt)
 	for mi in miasmas:

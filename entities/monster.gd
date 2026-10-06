@@ -301,6 +301,7 @@ var _spurs: Node2D
 
 var frost_k := 0.0
 var rot_k := -1.0
+var gut_k := -1.0
 
 func cold_hit(dmg: float) -> void:
 	frost_k = minf(1.0, frost_k + 0.25 + dmg / maxf(1.0, hp_max))
@@ -335,9 +336,48 @@ func _tick_ossify(dt: float) -> void:
 	if at and at.atlas:
 		var sz := at.atlas.get_size()
 		m.set_shader_parameter("region", Vector4(at.region.position.x / sz.x, at.region.position.y / sz.y, at.region.size.x / sz.x, at.region.size.y / sz.y))
+	# the ghost-light of the bone (as Diablo II's): a pale cyan breath round the crusted body, over the darkness
+	if ossify > 0.08 or calc_k >= 0.0:
+		if _ghost_glow == null:
+			_ghost_glow = Node2D.new()
+			_ghost_glow.draw.connect(_draw_ghost_glow)
+			load("res://world/impacts.gd").of(zone)._ghost_layer().add_child(_ghost_glow)
+		_ghost_glow.global_position = global_position
+		_ghost_glow.queue_redraw()
+	elif _ghost_glow:
+		_ghost_glow.queue_free()
+		_ghost_glow = null
 	if _spurs:
 		_spurs.visible = ossify > 0.25 and calc_k < 0.4
 		_spurs.queue_redraw()
+
+var _ghost_glow: Node2D
+
+func _exit_tree() -> void:
+	if _ghost_glow and is_instance_valid(_ghost_glow):
+		_ghost_glow.queue_free()
+
+func _draw_ghost_glow() -> void:
+	var r := spr.get_rect()
+	var sc := spr.scale.abs()
+	var box := Rect2(spr.position + r.position * sc, r.size * sc)
+	var k: float = ossify if calc_k < 0.0 else 1.0 - calc_k
+	var pulse := 0.6 + 0.4 * sin(Time.get_ticks_msec() * 0.004 + float(get_instance_id() % 7))
+	var c := box.get_center() - Vector2(0, box.size.y * 0.12)
+	var rx := box.size.x * 0.62
+	var ry := box.size.y * 0.55
+	var n := 0
+	for yy in range(int(-ry), int(ry), 4):
+		for xx in range(int(-rx), int(rx), 4):
+			var e := pow(xx / rx, 2) + pow(yy / ry, 2)
+			if e > 1.0:
+				continue
+			n += 1
+			var dens := (1.0 - e) * k * pulse
+			# a soft halo: every cell, its light falling off toward the rim in four steps (pixel rings, no screen door)
+			var lv := floorf(dens * 4.0) / 4.0
+			if lv > 0.0:
+				_ghost_glow.draw_rect(Rect2(c + Vector2(xx, yy) - Vector2(2, 2), Vector2(4, 4)), Color(0.6, 0.9, 1.0, 0.07 + 0.16 * lv))
 
 ## bone spurs through the outline: pale spikes from the body's edges, longer as the growth spreads
 func _draw_spurs() -> void:
@@ -367,7 +407,8 @@ func _draw_spurs() -> void:
 				var q := p + Vector2(-dir.y, dir.x) * ww * 4.0
 				q = (q / 4.0).floor() * 4.0
 				var lit := ww <= 0
-				_spurs.draw_rect(Rect2(q, Vector2(4, 4)), Color(0.86, 0.85, 0.82) if lit else Color(0.42, 0.41, 0.42))
+				_spurs.draw_rect(Rect2(q - Vector2(4, 0), Vector2(12, 4)), Color(0.55, 0.85, 1.0, 0.18))     # ghost-light round it
+				_spurs.draw_rect(Rect2(q, Vector2(4, 4)), Color(0.88, 0.94, 0.96) if lit else Color(0.46, 0.52, 0.58))
 		_spurs.draw_rect(Rect2(((base + dir * ln) / 4.0).floor() * 4.0, Vector2(4, 4)), Color(1, 0.98, 0.92))
 
 ## burning out (shaders/burn.gdshader): a body killed by fire chars, its ember cracks glow and cool, it crumbles to ash
@@ -431,6 +472,9 @@ func die(from: Vector2 = Vector2.INF) -> void:
 		load("res://world/impacts.gd").of(zone).soul(position, "pale")
 	if last_elem == "fire":
 		_start_burn()
+	elif last_elem == "blood":
+		gut_k = 0.0                           # tumours swell through it, then it bursts
+		spr.set_index(mini(1, spr.frame_count() - 1))
 	elif last_elem in ["miasma", "poison"]:
 		rot_k = 0.0                           # it swells green, then bursts in a cloud of its own breath
 		spr.set_index(mini(1, spr.frame_count() - 1))
@@ -472,6 +516,19 @@ func _physics_process(dt: float) -> void:
 		push = push.move_toward(Vector2.ZERO, (14.0 + push.length() * 6.0) * dt)
 	if cm_body:
 		_tick_ossify(dt)
+	if dead and gut_k >= 0.0:
+		# lumps swell under the skin, each on its own throb, faster and harder; the body darkens and reddens; it splits
+		gut_k += dt / 1.4
+		var th := sin(gut_k * gut_k * 60.0)
+		var lump := Vector2(1.0 + 0.22 * gut_k + 0.07 * th * gut_k, 1.0 + 0.12 * gut_k - 0.05 * th * gut_k)
+		spr.scale = base_scale * lump
+		spr.skew = 0.06 * sin(gut_k * 23.0) * gut_k
+		modulate = Color(1, 1, 1).lerp(Color(1.0, 0.55, 0.5), gut_k)
+		if gut_k >= 1.0:
+			var I = load("res://world/impacts.gd").of(zone)
+			I.gut_burst(tp)
+			queue_free()
+		return
 	if dead and rot_k >= 0.0:
 		# the breath drawn out (Derek: "their breath is being sucked out of their bodies, and ethereal"): pale violet
 		# threads pulled from the mouth; the body arches back, withers, greys and goes thin as glass; at the end an
@@ -501,6 +558,8 @@ func _physics_process(dt: float) -> void:
 		if calc_k >= 1.0:
 			modulate.a = maxf(0.0, modulate.a - dt * 1.5)
 			if modulate.a <= 0.0:
+				if _ghost_glow:
+					_ghost_glow.queue_free()
 				queue_free()
 		return
 	if dead:

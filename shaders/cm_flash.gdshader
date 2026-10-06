@@ -61,6 +61,8 @@ void fragment() {
 				if (vein > 0.94 - d * 0.03) col = vec3(0.16, 0.12, 0.11);
 				// the raw spreading edge: a pink-grey band, its lip lit
 				if (inside < 0.06) col = mix(vec3(0.55, 0.36, 0.36), vec3(0.88, 0.8, 0.72), step(0.5, d));
+			// the ghost-light in it (as Diablo II's bone spells): a pale cyan breath along the crust, pulsing
+			col += vec3(0.22, 0.36, 0.42) * (0.55 + 0.45 * sin(TIME * 3.0 + lp * 8.0)) * smoothstep(0.0, 0.25, inside);
 			}
 		}
 		// breaking apart when calcified dead: pieces along the cracks fall away from the top down
