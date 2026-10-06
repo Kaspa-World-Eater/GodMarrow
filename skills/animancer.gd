@@ -312,7 +312,7 @@ func _views() -> void:
 		fx_air = FxNode.new()
 		fx_air.book = self
 		fx_air.z_index = 40
-		zone.add_child(fx_air)
+		load("res://world/impacts.gd").of(zone)._ghost_layer().add_child(fx_air)
 	for w in wisps:
 		_wisp_view(w)
 	if great != null:

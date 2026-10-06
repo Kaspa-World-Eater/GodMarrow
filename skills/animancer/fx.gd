@@ -15,11 +15,98 @@ const BIND := Color("#d6cfbf")
 const SOUL := Color(0.9, 0.95, 0.98)
 const GLASS := Color(0.81, 0.91, 0.98)
 
-func _process(_dt: float) -> void:
+## soul dust shed by the threads: motes that drift off the wire, twinkle and go out
+var dust: Array = []       # {q (screen), v, t, life, glint}
+var _dt := 0.016
+
+func _process(dt: float) -> void:
 	if book == null or book.fx_air != self and book.fx_floor != self:
 		queue_free()
 		return
+	_dt = dt
+	for d in dust:
+		d["t"] += dt
+		d["q"] += d["v"] * dt
+		d["v"] = d["v"] * (1.0 - dt * 1.2) + Vector2(sin(d["t"] * 5.0 + d["q"].y * 0.05) * 10.0, -6.0) * dt
+	dust = dust.filter(func(d): return d["t"] < d["life"])
 	queue_redraw()
+
+func shed(p: Vector2, n: int = 1, v: float = 12.0) -> void:
+	for i in n:
+		dust.append({"q": p, "v": Vector2(randf_range(-v, v), randf_range(-v * 1.4, v * 0.3)), "t": 0.0,
+			"life": randf_range(0.5, 1.2), "glint": randf() < 0.25})
+
+## the soul-wire: the user's "more pizzazz" for every thread. A one-cell core of the thread's colour with a cold halo
+## either side, soul-light pulses running along it (flow > 0 runs a to b, < 0 back), a white glint with a cross where a
+## pulse peaks, optional knotted beads, a twang (a plucked tremble, decaying), and soul dust shed off it as it hangs.
+func wire(a: Vector2, b: Vector2, s: float, col: Color, flow: float = 1.0, twang: float = 0.0, beads: int = 0) -> void:
+	var mid := (a + b) * 0.5 + Vector2(0, s)
+	var n := maxi(2, int((a.distance_to(mid) + mid.distance_to(b)) / 4.0))
+	var g := global_position
+	var t0: float = book.time if book else 0.0
+	var nrm := Vector2(-(b - a).y, (b - a).x).normalized()
+	var seen := {}
+	var pts: Array = []
+	for i in n + 1:
+		var t := i / float(n)
+		var p := a.lerp(mid, t).lerp(mid.lerp(b, t), t)
+		if twang > 0.0:
+			p += nrm * sin(t * PI) * sin(t0 * 38.0) * twang
+		var key := Vector2i(int(floor((p.x + g.x) / 4.0)), int(floor((p.y + g.y) / 4.0)))
+		if seen.has(key):
+			continue
+		seen[key] = true
+		pts.append([p, t, i])
+	var halo := Color(lerpf(col.r, 0.55, 0.6), lerpf(col.g, 0.78, 0.6), 1.0, 0.2 * col.a)
+	for e in pts:                                          # the halo, under everything
+		cell(e[0] + Vector2(0, -4), halo)
+		cell(e[0] + Vector2(0, 4), halo)
+		# the ghost strand: a dim double of the thread, swaying off it and back, as if its spirit lags the wire
+		var gp: Vector2 = e[0] + nrm * 4.0 * (1.5 + sin(t0 * 2.3 + e[1] * 6.0) * 1.5) * sin(e[1] * PI)
+		cell(gp, Color(0.7, 0.86, 1.0, 0.22 * col.a))
+	var step := maxi(1, n / maxi(1, beads)) if beads > 0 else 0
+	for e in pts:
+		var p: Vector2 = e[0]
+		var t: float = e[1]
+		var sh := 0.8 + 0.2 * sin(t * 9.0 - t0 * 4.0)
+		var pulse := 0.0
+		if flow != 0.0:
+			var ph := fposmod(t * 2.0 - t0 * flow * 1.2, 1.0)
+			pulse = pow(maxf(0.0, 1.0 - absf(ph - 0.5) * 7.0), 2.0)
+		var core := col.lerp(Color(1, 1, 1), pulse)
+		cell(p, Color(core.r, core.g, core.b, minf(1.0, col.a * sh + pulse * 0.5)))
+		if pulse > 0.75:                                   # the pulse: a little soul riding the wire, a cross of light
+			for yy in range(-2, 3):
+				for xx in range(-2, 3):
+					var dd := absi(xx) + absi(yy)
+					if dd > 0 and dd <= 2:
+						cell(p + Vector2(xx, yy) * 4.0, Color(0.75, 0.9, 1.0, (0.5 if dd == 1 else 0.18) * col.a))
+			cell(p, Color(1, 1, 1, col.a))
+			if randf() < _dt * 6.0:
+				shed(p, 1, 16.0)
+		if step > 0 and e[2] % step == 0 and t > 0.05 and t < 0.95:   # a knot on the thread
+			cell(p + Vector2(-4, -4), Color(col.r * 0.6, col.g * 0.6, col.b * 0.6, col.a), 2.0, 2.0)
+			cell(p + Vector2(-4, -4), Color(1, 1, 1, col.a * 0.9))
+		if randf() < _dt * 0.35 * col.a:                    # soul dust drifting off the wire
+			shed(p)
+
+## a thread snapping or let go: it dissolves into a little cloud of soul dust along its length
+func burst(a: Vector2, b: Vector2, s: float, n: int = 14) -> void:
+	var mid := (a + b) * 0.5 + Vector2(0, s)
+	for i in n:
+		var t := randf()
+		shed(a.lerp(mid, t).lerp(mid.lerp(b, t), t), 1, 28.0)
+
+func _draw_dust() -> void:
+	var t0: float = book.time if book else 0.0
+	for d in dust:
+		var u: float = d["t"] / d["life"]
+		var tw := 0.55 + 0.45 * sin(t0 * 22.0 + d["life"] * 40.0)
+		var col := Color(1, 1, 1, (1.0 - u) * tw).lerp(Color(0.6, 0.78, 1.0, 0.8 * (1.0 - u) * tw), smoothstep(0.0, 0.6, u))
+		cell(d["q"], col)
+		if d["glint"] and tw > 0.85 and u < 0.5:
+			for o in [Vector2(-4, 0), Vector2(4, 0), Vector2(0, -4), Vector2(0, 4)]:
+				cell(d["q"] + o, Color(0.75, 0.88, 1.0, 0.4 * (1.0 - u)))
 
 static func S(tp: Vector2, z: float = 0.0) -> Vector2:
 	return Iso.to_screen(tp) + Vector2(0, -z * 4.0)
@@ -83,6 +170,7 @@ func _draw() -> void:
 		_floor()
 	else:
 		_air()
+		_draw_dust()
 
 # ------------------------------------------------------------------ on the ground
 func _floor() -> void:
@@ -150,7 +238,12 @@ func _air() -> void:
 			var m = e
 			if not is_instance_valid(m) or m.dead:
 				continue
-			sag(pa, S(m.tp, 11), (2.0 + k * 12.0) * 4.0, Color(BIND.r, BIND.g, BIND.b, al))
+			var sg := (2.0 + k * 12.0) * 4.0
+			wire(pa, S(m.tp, 11), sg, Color(BIND.r, BIND.g, BIND.b, minf(1.0, al * 1.4)), -0.7, 3.0 * k, 4)
+			if bd["done"] and not bd.get("fx_burst", false):
+				burst(pa, S(m.tp, 11), sg)
+		if bd["done"]:
+			bd["fx_burst"] = true
 		if not bd["done"]:   # the knot on the held one
 			cell(S(A.tp, 12) + Vector2(-4, 0), Color(BIND.r, BIND.g, BIND.b, 0.7), 2.0, 2.0)
 	# Soul Leash: pale threads from the wisps to what they hold
@@ -162,20 +255,30 @@ func _air() -> void:
 		var f: float = minf(1.0, th["life"] / 0.3) * minf(1.0, (th["max"] - th["life"]) / 0.12 + 0.2)
 		var a := S(Vector2(s.x, s.y), s.z)
 		var e := S(m.tp, 10)
-		sag(a, e, (8.0 + 4.0 * sin(b.time * 3.0 + a.x * 0.025)) * 4.0, Color(THREAD.r, THREAD.g, THREAD.b, 0.38 * f))
+		wire(e, a, (8.0 + 4.0 * sin(b.time * 3.0 + a.x * 0.025)) * 4.0, Color(THREAD.r, THREAD.g, THREAD.b, 0.75 * f), 1.0)
 	# snags: a wisp's strike catches a thread on the foe
 	for sn in b.snags:
 		var m2 = sn["m"]
 		if not is_instance_valid(m2) or m2.dead:
 			continue
 		var k2: float = 1.0 - sn["t"] / sn["dur"]
-		sag(S(sn["tp"], 9), S(m2.tp, 10), (6.0 * k2 + 1.0) * 4.0, Color(SNAG.r, SNAG.g, SNAG.b, 0.5 * k2))
+		var pe := S(m2.tp, 10)
+		wire(S(sn["tp"], 9), pe, (6.0 * k2 + 1.0) * 4.0, Color(SNAG.r, SNAG.g, SNAG.b, 0.85 * k2), 2.0, 7.0 * k2 * k2)
+		cell(pe + Vector2(-4, -4), Color(1, 1, 1, k2), 2.0, 2.0)                       # the barb
+		if k2 < 0.12 and not sn.get("fx_burst", false):
+			sn["fx_burst"] = true
+			shed(pe, 8, 30.0)
 	# needles: a short pale dash that runs out and is gone
 	for n in b.needles:
 		var k3: float = n["t"] / n["dur"]
 		var s1: float = n["end"] * k3
 		var s0: float = maxf(0.0, s1 - 0.7)
-		pix_line(S(n["tp"] + n["d"] * s0, 10), S(n["tp"] + n["d"] * s1, 10), Color(0.722, 0.816, 0.871, 0.5 * (1.0 - k3 * 0.5)))   # #b8d0de
+		var nh := S(n["tp"] + n["d"] * s1, 10)
+		wire(S(n["tp"] + n["d"] * maxf(0.0, s1 - 1.6), 10), nh, 4.0, Color(0.722, 0.816, 0.871, 0.7 * (1.0 - k3 * 0.5)), 3.0)   # #b8d0de
+		pix_line(S(n["tp"] + n["d"] * s0, 10), nh, Color(0.95, 0.98, 1.0, 0.9 * (1.0 - k3 * 0.5)))
+		cell(nh + Vector2(-4, -4), Color(1, 1, 1, 0.5 * (1.0 - k3)), 2.0, 2.0)
+		if randf() < _dt * 25.0:
+			shed(nh, 1, 10.0)
 	# sparks: motes like the wisps themselves
 	for sp in b.sparks:
 		var tr: Array = sp.get("trail", [])
@@ -188,7 +291,9 @@ func _air() -> void:
 	# Needle and Thread: the darting wisp, and a thread left hanging where it turned
 	for dl in b.dart_lines:
 		var k4: float = dl["t"] / 0.35
-		draw_line(S(dl["a"], dl["za"]), S(dl["b"], dl["zb"]), Color(0.78, 0.86, 0.9, 0.4 * k4), 1.5)
+		wire(S(dl["a"], dl["za"]), S(dl["b"], dl["zb"]), (1.0 - k4) * 20.0, Color(0.78, 0.86, 0.9, 0.75 * k4), 1.5)
+		if randf() < _dt * 20.0 * (1.0 - k4):
+			burst(S(dl["a"], dl["za"]), S(dl["b"], dl["zb"]), (1.0 - k4) * 20.0, 1)
 	for d in b.darts:
 		mote(S(d["tp"], d["z"]), 6.0 if not d.get("small", false) else 4.0, Color(0.92, 0.97, 1.0, 0.95))
 	# Spool: the slow white orb and its shards

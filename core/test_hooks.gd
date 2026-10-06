@@ -75,6 +75,8 @@ static func run(g) -> void:
 		_acidfx(g)                       # --acidfx: acid globs, drips and corroding creatures
 	if a.has("bloodfx"):
 		_bloodfx(g)                      # --bloodfx: blood whips, sprays, boiling blood and veined creatures
+	if a.has("threadfx"):
+		_threadfx(g)                     # --threadfx (Mystic): soul leashes, a binding, snags, needles and hanging darts
 	if a.has("magic"):
 		_magic(g)                        # --magic: phosphor wisps flung at points round the pilgrim
 	if a.has("acid"):
@@ -163,6 +165,8 @@ static func _arena(g, a: Dictionary) -> void:
 			m.brain.wake(m)
 		elif m:
 			m.dmg = Vector2.ZERO
+			m.hp = 1e6
+			m.hp_max = 1e6
 			m.speed = 0.0
 	hero.st.hp = hero.st.life_max()
 	if a.has("sigils"):
@@ -572,3 +576,31 @@ static func _bloodfx(g) -> void:
 				Combat.hit_monster(m, 1.0, "blood", c, {})
 				await tree.create_timer(0.5).timeout
 		await tree.create_timer(0.8).timeout
+
+
+static func _threadfx(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	var b = g.hero.skills
+	if not "threads" in b:
+		return
+	var c: Vector2 = g.hero.tp
+	var ms: Array = []
+	for o in [Vector2(3.0, 0.4), Vector2(2.6, 2.2), Vector2(0.8, 3.2), Vector2(-1.4, 2.8)]:
+		var m = Brain.spawn(g.zone, "hollow", c + o, 6, "normal", "thread", 1e7)
+		if m:
+			m.speed = 0.0
+			m.dmg = Vector2.ZERO
+			m.hp = 1e6
+			m.hp_max = 1e6
+			ms.append(m)
+	while is_instance_valid(g) and g.hero:
+		for m in ms.slice(0, 2):
+			b.threads.append({"src": null, "m": m, "life": 2.6, "max": 2.6, "tick": 99.0, "k": 0.65, "freed": false})
+		b.binds.append({"a": ms[2], "bound": [ms[3]], "t": 0.0, "dur": 0.55, "dmg": 0.0, "done": false, "fade": 0.0})
+		await tree.create_timer(0.5).timeout
+		if b.wisps.size() > 0:
+			b.snags.append({"w": b.wisps[0], "m": ms[1], "tp": b.wisps[0].tp, "t": 0.0, "dur": 0.5})
+		b.needles.append({"tp": c, "d": Vector2(1, -0.3).normalized(), "end": 4.0, "t": 0.0, "dur": 0.05 + 4.0 * 0.035})
+		b.dart_lines.append({"a": c + Vector2(-0.5, 0.5), "za": 12.0, "b": ms[3].tp, "zb": 9.0, "t": 0.35})
+		await tree.create_timer(2.4).timeout
