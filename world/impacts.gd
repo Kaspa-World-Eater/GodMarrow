@@ -518,7 +518,8 @@ func gut_burst(p: Vector2) -> void:
 var wisps: Array = []      # {p, v, to (screen), t, trail: [[pos, born]], done}
 var _phos: Array = []
 var wsmoke: Array = []     # {q, v, t, life, r, ph}
-var wtend: Array = []      # {q, dir, len, t, life, ph, curl}      # lingering sparks: {q, t, life}
+var wtend: Array = []
+var wghosts: Array = []    # {q, t, life}: where a wisp blinked out, a fading image of it      # {q, dir, len, t, life, ph, curl}      # lingering sparks: {q, t, life}
 
 func phosphor(from_tile: Vector2, to_tile: Vector2) -> void:
 	_ensure_sky()
@@ -535,20 +536,49 @@ func _tick_wisps(dt: float) -> void:
 		w["t"] += dt
 		var t: float = w["t"]
 		var sd: float = w["seed"]
-		var surge := 0.55 + 0.45 * sin(t * 2.3 + sd) * sin(t * 0.9 + sd * 2.0)            # it ebbs and surges
-		w["u"] = minf(1.0, w["u"] + dt * w["speed"] * (0.35 + surge) * (1.0 + 2.0 * pow(w["u"], 3.0)))
+		# a spirit's pace: it drifts, lingers (hovering almost still), then glides on; near the end it is drawn in
+		var linger := smoothstep(0.55, 0.95, sin(t * 1.3 + sd) * 0.5 + 0.5)
+		var pace := lerpf(1.0, 0.12, linger) * (1.0 + 2.5 * pow(w["u"], 4.0))
+		w["u"] = minf(1.0, w["u"] + dt * w["speed"] * 0.75 * pace)
+		# the blink: now and then it thins to nothing and is somewhere further along, a ghost of it left behind
+		w["blink"] = float(w.get("blink", -1.0))
+		w["next_blink"] = float(w.get("next_blink", randf_range(0.6, 1.4)))
+		if w["blink"] < 0.0 and t > w["next_blink"] and w["u"] < 0.8:
+			w["blink"] = 0.0
+			wghosts.append({"q": w["p"], "t": 0.0, "life": 0.7})
+		var vis := 1.0
+		if w["blink"] >= 0.0:
+			w["blink"] += dt
+			var bk: float = w["blink"]
+			if bk < 0.1:
+				vis = 1.0 - bk / 0.1
+			elif bk < 0.22:
+				vis = 0.0
+				if not w.get("jumped", false):
+					w["u"] = minf(0.95, w["u"] + randf_range(0.07, 0.13))
+					w["jumped"] = true
+			elif bk < 0.36:
+				vis = (bk - 0.22) / 0.14
+			else:
+				w["blink"] = -1.0
+				w["jumped"] = false
+				w["next_blink"] = t + randf_range(0.7, 1.6)
+		w["vis"] = vis
 		var u: float = w["u"]
 		var a: Vector2 = w["from"]
 		var b: Vector2 = w["to"]
-		var side := Vector2(-(b - a).y, (b - a).x).normalized()
-		var arc := sin(u * PI) * 70.0 * (1.0 if fmod(sd, 2.0) < 1.0 else -1.0)
+		var fwd := (b - a).normalized()
+		var side := Vector2(-fwd.y, fwd.x)
+		var arc := sin(u * PI) * 60.0 * (1.0 if fmod(sd, 2.0) < 1.0 else -1.0)
 		var base := a.lerp(b, u) + side * arc + Vector2(0, -sin(u * PI) * 40.0)
-		var wander := side * (sin(t * 3.1 + sd) * 18.0 + sin(t * 7.3 + sd * 3.0) * 5.0) * (1.0 - u * 0.8)
-		var bob := Vector2(0, sin(t * 5.0 + sd) * 6.0)
-		if w["loop"] and u > 0.3 and u < 0.55:
-			var lk := (u - 0.3) / 0.25 * TAU
-			wander += Vector2(cos(lk) - 1.0, sin(lk)) * 22.0
-		var np: Vector2 = base + wander + bob
+		# a lazy spiral round its course: across it and up/down (the "down" half is behind its path: dimmer, smaller)
+		var sp_t := t * 2.2 + sd
+		var R := 26.0 * (1.0 - u * 0.7)
+		var helix := side * cos(sp_t) * R + Vector2(0, sin(sp_t) * R * 0.45)
+		w["depth"] = 0.5 + 0.5 * sin(sp_t)                    # 1 in front, 0 behind
+		# a slow sway, like something carried on a current underwater
+		var sway := side * sin(t * 0.8 + sd * 2.0) * 14.0 + Vector2(0, sin(t * 1.1 + sd) * 7.0)
+		var np: Vector2 = base + helix + sway
 		var vel: Vector2 = (np - w["p"]) / maxf(dt, 0.001)
 		w["p"] = np
 		w["trail"].push_front(np)
@@ -591,11 +621,25 @@ func _tick_wisps(dt: float) -> void:
 		tn["t"] += dt
 		tn["q"] += (tn["dir"] * 14.0 + Vector2(0, -8.0)) * dt
 	wtend = wtend.filter(func(tn): return tn["t"] < tn["life"])
+	for gh in wghosts:
+		gh["t"] += dt
+		gh["q"].y -= 10.0 * dt
+	wghosts = wghosts.filter(func(gh): return gh["t"] < gh["life"])
 	while _phos.size() > 2400:
 		_phos.pop_front()
 
 func _draw_wisps(cv: CanvasItem) -> void:
 	var now := Time.get_ticks_msec() / 1000.0
+	# the ghosts a wisp leaves where it blinked out: a pale ring opening and fading, rising a little
+	for gh in wghosts:
+		var gu: float = gh["t"] / gh["life"]
+		var gc: Vector2 = (gh["q"] / PX).floor()
+		var gr := 3 + int(gu * 4.0)
+		for k in 16:
+			var ang := k / 16.0 * TAU
+			var qq := gc + Vector2(round(cos(ang) * gr), round(sin(ang) * gr * 0.8))
+			cv.draw_rect(Rect2(qq * PX, Vector2(PX, PX)), Color(0.7, 0.85, 1.0, 0.4 * (1.0 - gu)))
+		cv.draw_rect(Rect2(gc * PX, Vector2(PX, PX)), Color(0.85, 0.94, 1.0, 0.5 * (1.0 - gu)))
 	# smoke: soft dithered puffs, pale blue-grey, swelling as they thin
 	for m in wsmoke:
 		var u: float = m["t"] / m["life"]
@@ -645,7 +689,8 @@ func _draw_wisps(cv: CanvasItem) -> void:
 		var t: float = w["t"]
 		var sd: float = w["seed"]
 		var phase := 0.55 + 0.45 * sin(t * 2.7 + sd) * sin(t * 1.1 + sd * 1.7)
-		phase = clampf(phase, 0.4, 1.0)
+		phase = clampf(phase, 0.4, 1.0) * float(w.get("vis", 1.0)) * (0.55 + 0.45 * float(w.get("depth", 1.0)))
+		var orb_r := int(round(5.0 + 2.0 * float(w.get("depth", 1.0))))
 		var tr: Array = w["trail"]
 		for i in tr.size():
 			var k := 1.0 - float(i) / tr.size()
@@ -660,11 +705,12 @@ func _draw_wisps(cv: CanvasItem) -> void:
 			if i % 9 == 4:                                       # an echo of it, lingering faintly
 				cv.draw_rect(Rect2(q - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(0.7, 0.85, 1.0, 0.07 * k * phase))
 		var c: Vector2 = (w["p"] / PX).floor() * PX
-		for yy in range(-7, 8):
-			for xx in range(-7, 8):
+		var rr2 := float(orb_r * orb_r)
+		for yy in range(-orb_r, orb_r + 1):
+			for xx in range(-orb_r, orb_r + 1):
 				var e := float(xx * xx + yy * yy)
-				if e <= 49.0:
-					cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.55, 0.78, 1.0, 0.32 * pow(1.0 - e / 49.0, 2.0) * phase))
+				if e <= rr2:
+					cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.55, 0.78, 1.0, 0.32 * pow(1.0 - e / rr2, 2.0) * phase))
 		cv.draw_rect(Rect2(c - Vector2(PX, 0), Vector2(PX * 3, PX)), Color(0.85, 0.94, 1.0, 0.8 * phase))
 		cv.draw_rect(Rect2(c - Vector2(0, PX), Vector2(PX, PX * 3)), Color(0.85, 0.94, 1.0, 0.8 * phase))
 		cv.draw_rect(Rect2(c, Vector2(PX, PX)), Color(1, 1, 1))
