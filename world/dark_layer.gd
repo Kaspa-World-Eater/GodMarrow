@@ -155,6 +155,15 @@ func _process(dt: float) -> void:
 		flash_next = maxf(flash_next, t + 20.0)
 	A *= 1.0 - 0.6 * fv
 	var dark_rgb := Color8(8, 13, 27) if outdoor else Color8(8, 9, 20)
+	# the hours' own colours (Derek 2026-10-05: "get the day and night cycle tuned"): dusk sinks through a wine dark,
+	# dawn through a cold rose-grey; the night's dark is lifted a little toward the moon, so it reads as moonlight
+	var hn := Game.hour_name()
+	var du := sin(PI * (1.0 - dk)) if (outdoor and hn == "dusk") else 0.0
+	var dw := sin(PI * dk) if (outdoor and hn == "dawn") else 0.0
+	if outdoor:
+		dark_rgb = dark_rgb.lerp(Color8(12, 19, 38), 1.0 - dk)
+		dark_rgb = dark_rgb.lerp(Color8(34, 14, 22), du * 0.7)
+		dark_rgb = dark_rgb.lerp(Color8(30, 24, 34), dw * 0.6)
 	var vp := get_viewport()
 	var xf := vp.get_screen_transform() * vp.get_canvas_transform()
 	var sc := xf.get_scale().x
@@ -357,12 +366,22 @@ func _process(dt: float) -> void:
 	mat.set_shader_parameter("g_sat", lerpf(g["sat"], N["sat"], n))
 	mat.set_shader_parameter("g_con", lerpf(g["con"], N["con"], n))
 	mat.set_shader_parameter("g_bri", g.get("bri", 1.0))
-	mat.set_shader_parameter("g_hi", Vector4(hi.r, hi.g, hi.b, lerpf(g["hi"][1], N["hi"][1], n)))
-	mat.set_shader_parameter("g_lo", Vector4(lo.r, lo.g, lo.b, lerpf(g["lo"][1], N["lo"][1], n)))
+	var hia: float = lerpf(g["hi"][1], N["hi"][1], n)
+	var loa: float = lerpf(g["lo"][1], N["lo"][1], n)
+	# the low sun at dusk: the lit side burns orange, the shadows go red; at dawn a pale rose on the lit side
+	var dcol := Game.hour_name()
+	var duk := sin(PI * (1.0 - dk)) if (outdoor and dcol == "dusk") else 0.0
+	var dwk := sin(PI * dk) if (outdoor and dcol == "dawn") else 0.0
+	hi = hi.lerp(Color8(232, 128, 64), duk * 0.75).lerp(Color8(196, 150, 160), dwk * 0.6)
+	lo = lo.lerp(Color8(150, 40, 36), duk * 0.7)
+	hia = lerpf(hia, 0.3, maxf(duk, dwk * 0.7))
+	loa = lerpf(loa, 0.24, duk)
+	mat.set_shader_parameter("g_hi", Vector4(hi.r, hi.g, hi.b, hia))
+	mat.set_shader_parameter("g_lo", Vector4(lo.r, lo.g, lo.b, loa))
 	# no haze: the web's three dithered strips drifting over the screen (drawHaze37) read as fog popping up over the
 	# view; the user hated them (2026-10-05). The shader's haze stays off.
 	mat.set_shader_parameter("g_haze", Vector4.ZERO)
-	var am := zone.ambient_at(Game.phase())
+	var am := zone.ambient_at(Game.web_phase())   # the sky colours were sampled on the web's hours
 	mat.set_shader_parameter("amb", Vector3(am.r, am.g, am.b))
 	lm_mat.set_shader_parameter("amb", Vector3(am.r, am.g, am.b))
 

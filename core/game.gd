@@ -3,8 +3,8 @@ extends Node
 
 var cls := "animancer"
 var seed := 0
-var day_len := 600.0
-var clock := 0.12 * 600.0
+var day_len := 720.0
+var clock := 0.12 * 720.0
 var zone_seeds := {}       # zone id -> exported seed chosen for this run (maps are random per new game)
 var visited := {}
 var skip_title := false      # a new pilgrim chosen on the title reloads the scene straight into play
@@ -37,29 +37,46 @@ func phase() -> float:
 		return 0.78
 	return fmod(clock / day_len, 1.0)
 
-## the hour: day to 0.55, dusk to 0.66, night to 0.9, dawn to 1.0 (a 600 s day)
+## the hour (Derek 2026-10-05: "get the day and night cycle tuned"): a 12-minute day, the light longer in going and
+## coming: day to 0.44, a long red dusk to 0.58, night to 0.88, a slow grey dawn to 1.0
+const DAY_END := 0.44
+const DUSK_END := 0.58
+const NIGHT_END := 0.88
+
 func hour_name() -> String:
 	var p := phase()
-	if p < 0.55:
+	if p < DAY_END:
 		return "day"
-	if p < 0.66:
+	if p < DUSK_END:
 		return "dusk"
-	if p < 0.9:
+	if p < NIGHT_END:
 		return "night"
 	return "dawn"
+
+## the browser's hour for this one (its sky colours were sampled on a 0.55 / 0.66 / 0.9 day): each part stretched
+func web_phase() -> float:
+	var p := phase()
+	if p < DAY_END:
+		return p / DAY_END * 0.55
+	if p < DUSK_END:
+		return 0.55 + (p - DAY_END) / (DUSK_END - DAY_END) * 0.11
+	if p < NIGHT_END:
+		return 0.66 + (p - DUSK_END) / (NIGHT_END - DUSK_END) * 0.24
+	return 0.9 + (p - NIGHT_END) / (1.0 - NIGHT_END) * 0.1
 
 func hour_speed() -> float:
 	return {"dusk": 1.12, "night": 1.05, "dawn": 0.95}.get(hour_name(), 1.0)
 
 func day_k() -> float:
+	# eased at both ends, so the light never turns a corner
 	var p := phase()
-	if p < 0.55:
+	if p < DAY_END:
 		return 1.0
-	if p < 0.66:
-		return 1.0 - (p - 0.55) / 0.11
-	if p < 0.9:
+	if p < DUSK_END:
+		return 1.0 - smoothstep(DAY_END, DUSK_END, p)
+	if p < NIGHT_END:
 		return 0.0
-	return (p - 0.9) / 0.1
+	return smoothstep(NIGHT_END, 1.0, p)
 
 ## hit-stop: freeze the frame for a few hundredths of a second on heavy blows (checklist section 1)
 var _stop := 0.0
