@@ -208,3 +208,23 @@ pixels, lit by and lighting the scene.
   creature's own death animation can fight the effect (Cursemark's shrinks the body): hold the frame while it burns.
 - shaders/blood_pool.gdshader: blood that runs, seeps, glints toward the lantern, dries. Lesson: a pool under a body is
   hidden by it; it must run out past the body to read.
+
+## Derek's list, 2026-10-06 (be as inventive as with the fire; the heat shimmer is the bar for detail)
+- Armour by silhouette: each PIECE has its own outline (pointed, scalloped, flanged lames; a flared greave top), not
+  only the whole figure.
+- Elements and skills: blood splashes where it fits; BONE GROWTH spreading over enemies like a cancer (bone skills);
+  lightning; soul magic; wisps; ice; acid; miasma; then the rest.
+- Environment: grass, ruins, stone, snow, water, blood lakes, anything.
+- Fabric that moves; skin that pulses (living flesh: veins, breathing masses), everything alive.
+Ideas to carry (my notes):
+- Bone growth: ivory crust creeping over a body from where it was struck, spurs pushing out through the silhouette,
+  a dry crackle; at death the body calcifies white, splits along its cracks and falls apart into bone dust.
+- Lightning: a forked bolt drawn in whole pixels, its afterimage burnt into the screen for a frame, the ground lit
+  blue-white for a blink, scorched fern-shaped marks (Lichtenberg) left on the ground.
+- Ice: frost growing in feathers across the ground, a body glazing over from its feet, breath fogging; shattering
+  into shards that keep their colour.
+- Acid: a bubbling pool that eats the ground's colour away, fumes that bend the light (the shimmer, green), bodies
+  pitting and smoking.
+- Souls: pale threads pulled out of the dying toward the lantern, faces in the drift, cold light.
+- Water: ripples where anything steps, reflections of the lantern and figures, rain rings.
+- Blood lakes: the pool shader at the size of a lake, slow churn, bodies half-sunk.
