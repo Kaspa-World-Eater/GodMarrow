@@ -476,7 +476,7 @@ func _physics_process(dt: float) -> void:
 		rot_k += dt / 1.6
 		var sw := 1.0 + 0.25 * smoothstep(0.0, 1.0, rot_k) + 0.04 * sin(rot_k * 40.0) * rot_k
 		spr.scale = base_scale * Vector2(sw * 1.1, sw)
-		modulate = Color(1.0, 1.0, 1.0).lerp(Color(0.62, 0.78, 0.42), minf(1.0, rot_k))
+		modulate = Color(1.0, 1.0, 1.0).lerp(Color(0.66, 0.5, 0.8), minf(1.0, rot_k))   # purple, never green (wiki)
 		if rot_k >= 1.0:
 			var I = load("res://world/impacts.gd").of(zone)
 			I.miasma(tp, 1.6, 9.0, "cloud")

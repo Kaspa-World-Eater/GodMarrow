@@ -31,7 +31,7 @@ func hit(p: Vector2, from: Vector2, heavy: bool, kind: String = "flesh") -> void
 		"stone": [Color("#8a8276"), Color("#5e574e"), Color("#3c3731")],
 		"flesh": [Color("#7a1414"), Color("#4e0c0c"), Color("#2e0808")],
 		"ice": [Color("#e6f4ff"), Color("#a8cfee"), Color("#5f8fbf")],
-		"rot": [Color("#5a6a2a"), Color("#3a4418"), Color("#6a3a4a")]}.get(kind, [Color("#7a1414")])
+		"rot": [Color("#6a4a7a"), Color("#3e2a4a"), Color("#6a3a4a")]}.get(kind, [Color("#7a1414")])
 	for i in n:
 		var a := away.rotated(randf_range(-0.9, 0.9))
 		chips.append({"p": p, "z": 40.0 + randf() * 30.0, "v": a * randf_range(1.2, 3.4) * (1.4 if heavy else 1.0),
@@ -329,7 +329,7 @@ var miasmas: Array = []
 
 func miasma(p: Vector2, r: float = 2.0, secs: float = 10.0, kind: String = "breath") -> void:
 	var hw := r * Iso.HX
-	var rh := (70.0 if kind == "breath" else 150.0) * (0.6 + r * 0.25)
+	var rh := (60.0 if kind == "breath" else 140.0) * (0.6 + r * 0.25)
 	var n := ColorRect.new()
 	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	n.size = (Vector2(hw * 2.3, hw + rh) / PX).ceil() * PX
@@ -342,6 +342,8 @@ func miasma(p: Vector2, r: float = 2.0, secs: float = 10.0, kind: String = "brea
 	m.set_shader_parameter("half_px", Vector2(hw, hw * 0.5))
 	m.set_shader_parameter("rect_size", n.size)
 	m.set_shader_parameter("rise_h", rh)
+	m.set_shader_parameter("thick", 1.0 if kind == "breath" else 1.5)
+	m.set_shader_parameter("drift", Vector2(Gust.dir() * (0.6 + Gust.k()), 0.25))
 	n.material = m
 	add_child(n)
 	miasmas.append({"node": n, "t": 0.0, "secs": secs})
