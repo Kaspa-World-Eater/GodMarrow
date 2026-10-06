@@ -194,3 +194,17 @@ Lessons:
   end first, then the edges have somewhere to go.
 - **Size.** At 195 px a 7-pixel knot barely resolves; filigree belongs to the hand pass on the frames (pixel by pixel)
   and to larger renders (portraits, the title); the model carries the big forms: plate breaks, lips, ridges, rivets.
+
+## Effects library, progress (2026-10-06)
+Built on one method: a value field (warped fbm) snapped to a short ramp with the 4x4 ordered dither, in whole world
+pixels, lit by and lighting the scene.
+- shaders/ground_fire.gdshader: fire as liquid (spreads, veins, tongues, scorch).
+- entities/ai/ai_world.gd wildfire(): a running flame front over dry ground, with the wind; scorch with dying embers.
+- shaders/radiant_blaze.gdshader: the incinerating radiant blaze (white core, gold body, torn tongues, heat shimmer
+  read from the screen). Lesson: a column at full heat saturates to one tone; the hot core must be narrow and the
+  body torn by a second, faster noise, or it reads as a solid bar.
+- shaders/burn.gdshader: the burning corpse (char, ember cracks, crumble to ash from the top). Lessons: cracks must be
+  sized to the SPRITE's texel grid (Cursemark bodies are small textures drawn x4, so the noise scale doubles); and a
+  creature's own death animation can fight the effect (Cursemark's shrinks the body): hold the frame while it burns.
+- shaders/blood_pool.gdshader: blood that runs, seeps, glints toward the lantern, dries. Lesson: a pool under a body is
+  hidden by it; it must run out past the body to read.
