@@ -259,6 +259,20 @@ func _spear_trail(dt: float) -> void:
 	for j in range(k, spear_lights.size()):
 		spear_lights[j].visible = false
 
+## a ring in whole pixels (dotted, every other point), not a smooth line over the picture
+func _px_ring(pts: PackedVector2Array, col: Color) -> void:
+	var seen := {}
+	for i in pts.size() - 1:
+		var a: Vector2 = pts[i]
+		var b: Vector2 = pts[i + 1]
+		var steps := maxi(1, int(a.distance_to(b) / 4.0))
+		for j in steps:
+			var q := (a.lerp(b, float(j) / steps) / 4.0).floor()
+			if seen.has(q) or int(q.x + q.y) % 2 == 1:
+				continue
+			seen[q] = true
+			spear_cv.draw_rect(Rect2(q * 4.0, Vector2(4, 4)), col)
+
 func _draw_spears() -> void:
 	if floor_mode or SPEAR_TEX == null or book == null or book.zone == null or book.hero == null:
 		return
@@ -272,7 +286,7 @@ func _draw_spears() -> void:
 		for a_i in 21:
 			var aa := a_i / 20.0 * TAU
 			pts.append(r["c"] + n * cos(aa) * rad + u * sin(aa) * rad * 0.32)
-		spear_cv.draw_polyline(pts, Color(STREAK, 0.85 * (1.0 - q) * (1.0 - q)), 2.6 - 1.2 * q)
+		_px_ring(pts, Color(STREAK, 0.85 * (1.0 - q) * (1.0 - q)))
 	# the flash at his hand as a spear leaves it: a pale ring opening and a few slivers of bone flung forward
 	for cst in book.spear_casts:
 		var q: float = cst["t"] / 0.22
@@ -282,7 +296,7 @@ func _draw_spears() -> void:
 		for a_i in 19:
 			var aa := a_i / 18.0 * TAU
 			ring.append(cc + Vector2(cos(aa) * rr, sin(aa) * rr * 0.5))
-		spear_cv.draw_polyline(ring, Color(STREAK, 0.8 * (1.0 - q)), 2.0)
+		_px_ring(ring, Color(STREAK, 0.8 * (1.0 - q)))
 		spear_cv.draw_circle(cc, 5.0 * (1.0 - q), Color(1, 1, 1, 0.5 * (1.0 - q)))
 	# where a spear pierces: a burst of bone splinters flung on along its path and out to the sides, and a pale ring
 	for h in book.spear_hits:
@@ -294,7 +308,7 @@ func _draw_spears() -> void:
 		for a_i in 19:
 			var aa2 := a_i / 18.0 * TAU
 			ring2.append(hc + Vector2(cos(aa2) * r2, sin(aa2) * r2 * 0.5))
-		spear_cv.draw_polyline(ring2, Color(STREAK, 0.7 * (1.0 - q2)), 1.5)
+		_px_ring(ring2, Color(STREAK, 0.7 * (1.0 - q2)))
 		for k in 7:
 			var ang := u3.angle() + (k - 3) * 0.42 + sin(k * 12.9898) * 0.15
 			var d := Vector2(cos(ang), sin(ang) * 0.6)
@@ -318,6 +332,8 @@ func _draw_spears() -> void:
 		var rise := clampf(ch["t"] / 0.2, 0.0, 1.0)
 		spear(S(hero.tp, 4.0 + 10.0 * rise) + side * 16.0, u2, tier, 0.55 + 0.45 * grow, false)
 
+const B4 := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
+
 func spear(c: Vector2, u: Vector2, tier: int, k: float, flying: bool) -> void:
 	var cv: Node2D = spear_cv
 	var sc := (1.0 + 0.18 * tier) * k
@@ -337,40 +353,35 @@ func spear(c: Vector2, u: Vector2, tier: int, k: float, flying: bool) -> void:
 	if flying:
 		var t: float = book.time
 		var n := Vector2(-u.y, u.x)
-		# the streak: a long pale taper behind the spear, brightest where it leaves the tail
+		# the streak, in whole pixels (the title's method): a taper behind the spear thinned by the 4x4 ordered dither,
+		# so it fades in steps as everything else does, never a smooth smear laid over the picture
 		var L := half_len * 3.0
-		var w0 := (5.5 + 1.5 * tier) * sc
-		var pts := PackedVector2Array()
-		var cols := PackedColorArray()
+		var w0 := (4.0 + 1.2 * tier) * sc
 		var tail := c - u * half_len * 0.7
-		for i in 9:
-			var q := float(i) / 8.0
-			var wq := w0 * (1.0 - q) + 0.5
-			pts.append(tail - u * L * q + n * wq)
-			cols.append(Color(STREAK, 0.6 * (1.0 - q) * (1.0 - q * 0.3)))
-		for i in range(8, -1, -1):
-			var q := float(i) / 8.0
-			var wq := w0 * (1.0 - q) + 0.5
-			pts.append(tail - u * L * q - n * wq)
-			cols.append(Color(STREAK, 0.6 * (1.0 - q) * (1.0 - q * 0.3)))
-		cv.draw_polygon(pts, cols)
-		# the core line of the streak, brighter and thin
-		cv.draw_line(tail, tail - u * L * 0.55, Color(1, 1, 1, 0.55), 2.0)
-		# wisps curling away off the streak
-		for wi in 3:
-			var ph := t * 9.0 + wi * 2.1
-			var a := tail - u * (L * (0.2 + 0.25 * wi))
-			var b := a - u * 10.0 + n * sin(ph) * (5.0 + 3.0 * wi)
-			cv.draw_line(a, b, Color(STREAK, 0.25), 1.0)
-		# a faint cold halo round the spear itself
-		for ring in 2:
-			var hp := PackedVector2Array()
-			for a_i in 18:
-				var aa := a_i / 18.0 * TAU
-				hp.append(c + u * cos(aa) * (half_len + 4.0 - ring * 3.0) + n * sin(aa) * (w0 + 3.0 - ring * 1.5))
-			cv.draw_colored_polygon(hp, Color(STREAK, 0.1))
+		var q0 := 0.0
+		while q0 <= 1.0:
+			var wq := w0 * (1.0 - q0) + 1.0
+			var dens := (1.0 - q0) * (1.0 - q0 * 0.4)
+			var o := -wq
+			while o <= wq:
+				var pp := tail - u * L * q0 + n * o
+				var g := Vector2i(int(floorf(pp.x / 4.0)), int(floorf(pp.y / 4.0)))
+				var th := float(B4[(g.y & 3) * 4 + (g.x & 3)]) / 16.0
+				var edge := absf(o) / maxf(1.0, wq)
+				if dens * (1.0 - edge * 0.7) > th:
+					cv.draw_rect(Rect2(Vector2(g) * 4.0, Vector2(4, 4)), Color(STREAK, 0.85) if edge < 0.35 and q0 < 0.4 else Color(STREAK, 0.5))
+				o += 4.0
+			q0 += 4.0 / maxf(8.0, L)
+		# its shadow on the ground below, a dithered smudge that runs with it
+		var gnd: Vector2 = c + Vector2(0, 8.0 * 4.0)
+		for sx in range(-int(half_len / 4.0), int(half_len / 4.0) + 1):
+			var sp2 := gnd + u * float(sx) * 4.0 * 0.9
+			var gg := Vector2i(int(floorf(sp2.x / 4.0)), int(floorf(sp2.y / 4.0)))
+			if (gg.x + gg.y) % 2 == 0:
+				cv.draw_rect(Rect2(Vector2(gg) * 4.0, Vector2(4, 4)), Color(0, 0, 0, 0.28))
 	cv.draw_set_transform(c, 0.0, Vector2(sc, sc))
-	cv.draw_texture_rect_region(SPEAR_TEX, Rect2(-float(an[0]), -float(an[1]), r[2], r[3]), Rect2(r[0], r[1], r[2], r[3]))
+	# bone, not paper: toned down from white so it takes the scene's light rather than glowing on top of it
+	cv.draw_texture_rect_region(SPEAR_TEX, Rect2(-float(an[0]), -float(an[1]), r[2], r[3]), Rect2(r[0], r[1], r[2], r[3]), Color(0.88, 0.85, 0.78))
 	cv.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 

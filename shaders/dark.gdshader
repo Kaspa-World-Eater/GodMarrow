@@ -21,7 +21,7 @@ uniform float dark_a = 0.82;
 uniform vec3 dark_rgb = vec3(0.031, 0.051, 0.106);
 uniform float tint_a = 0.25;
 uniform float cell = 4.0;
-uniform float snap_n = 22.0;     // steps per channel for the final snap (0 = off)
+uniform float snap_n = 32.0;     // steps per channel for the final snap (0 = off)
 uniform vec3 amb = vec3(1.0);        // the land's shade by the hour (the web's ambient), lifted inside the pools
 uniform float amb_lift = 0.35;
 // the land's grade (zz_grade55.js): saturation, contrast, brightness; cool from above and warm from below (soft light);
