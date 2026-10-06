@@ -119,6 +119,7 @@ func _ready() -> void:
 	_glow = _linear_glow()
 
 func _process(dt: float) -> void:
+	Gust.step(dt)
 	var t: float = T.t
 	for c in cards:
 		var want := 1.0 if c["o"] >= 0 and (T.mode == "main" or T.mode == "order") and (T.fig_hover == c["o"] or T.order_i == c["o"]) else 0.0
@@ -162,7 +163,7 @@ func _process(dt: float) -> void:
 			motes.append({"x": 290.0 + randf() * 120.0, "y": -2.0, "vx": randf_range(-1, 2), "vy": 3.0 + randf() * 4.0, "t": 0.0, "life": 20.0, "ember": false})
 	for m in motes:
 		m["t"] += dt
-		m["x"] += (m["vx"] + sin(t * 1.3 + m["y"] * 0.1) * (3.0 if m["ember"] else 1.5)) * dt
+		m["x"] += (m["vx"] + sin(t * 1.3 + m["y"] * 0.1) * (3.0 if m["ember"] else 1.5) + Gust.dir() * Gust.k() * (26.0 if m["ember"] else 12.0)) * dt
 		m["y"] += m["vy"] * dt
 	motes = motes.filter(func(m): return m["t"] < m["life"] and m["y"] < 272.0 and m["y"] > -4.0)
 	fx.queue_redraw()
@@ -205,7 +206,10 @@ func _linear_glow() -> Texture2D:
 
 func _fl(s: float) -> float:
 	var t: float = T.t
-	return 0.5 + 0.5 * sin(t * 9.0 + s) * sin(t * 5.3 + s * 2.0)
+	# a gust makes every flame flicker faster and dip (Gust: the one wind)
+	var g := Gust.k()
+	var f := 0.5 + 0.5 * sin(t * (9.0 + 14.0 * g) + s) * sin(t * (5.3 + 9.0 * g) + s * 2.0)
+	return f * (1.0 - 0.45 * g)
 
 func _glow_at(n: CanvasItem, x: float, y: float, r: float, rgb: Color, a: float) -> void:
 	n.draw_texture_rect(_glow, Rect2((x - r) * K, (y - r) * K, r * 2.0 * K, r * 2.0 * K), false, Color(rgb.r * a, rgb.g * a, rgb.b * a, 1.0))
@@ -215,13 +219,17 @@ func _glow_at(n: CanvasItem, x: float, y: float, r: float, rgb: Color, a: float)
 func _flame(n: CanvasItem, cx: float, top: float, k: float, seed: float) -> void:
 	var t: float = T.t
 	var fy := top - 2.0
-	var lean := roundf(sin(t * 5.0 + seed) * 0.8 + k * 0.4)
-	var tall := 3.0 + (1.0 if sin(t * 11.0 + seed * 3.0) > 0.3 else 0.0)
+	var g := Gust.k()
+	# the breeze lays the flame over and shortens it; in a hard gust its core gutters out for a moment
+	var lean := roundf(sin(t * 5.0 + seed) * 0.8 + k * 0.4 + Gust.dir() * g * (2.2 + sin(t * 13.0 + seed) * 0.8))
+	var tall := 3.0 + (1.0 if sin(t * 11.0 + seed * 3.0) > 0.3 else 0.0) - roundf(g * 1.6)
+	var gutter := g > 0.55 and sin(t * 17.0 + seed * 5.0) > 0.4
 	var R := func(x: float, y: float, w: float, h: float, c: Color) -> void:
 		n.draw_rect(Rect2(x * K, y * K, w * K, h * K), c)
 	R.call(cx + lean, fy - tall - 1.0, 1, 2, Color("#7a2a10")); R.call(cx - 1.0, fy - 2.0, 3, 3, Color("#7a2a10"))
 	R.call(cx + lean, fy - tall, 1, tall, Color("#d0601c")); R.call(cx, fy - 2.0, 1, 3, Color("#d0601c"))
-	R.call(cx, fy - 1.0, 1, 2, Color("#ffc070"))
+	if not gutter:
+		R.call(cx, fy - 1.0, 1, 2, Color("#ffc070"))
 	R.call(cx, fy + 1.0, 1, 1, Color("#2a3080"))
 
 func _draw_fx() -> void:

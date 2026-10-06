@@ -16,6 +16,7 @@ var players: Array = []        # [current, previous]
 var cur_id := ""
 var amb_p: AudioStreamPlayer
 var _streams := {}
+var wind_p: AudioStreamPlayer     # the mournful wind under everything outdoors and in the chapel, swelling with Gust
 
 func _init(m) -> void:
 	main = m
@@ -28,6 +29,11 @@ func _ready() -> void:
 		players.append(p)
 	amb_p = AudioStreamPlayer.new()
 	add_child(amb_p)
+	wind_p = AudioStreamPlayer.new()
+	wind_p.stream = load("res://audio/amb/wind.ogg")
+	if wind_p.stream is AudioStreamOggVorbis:
+		(wind_p.stream as AudioStreamOggVorbis).loop = true
+	add_child(wind_p)
 
 ## Godmarrow's lands in Cursemark's music and air: the theme of the land, the fight's own track, the camp's shrine theme
 ## inside its safe circle, a boss's own (Derek 2026-10-05: our score "loops the same beat"; all sound is Cursemark's)
@@ -95,6 +101,26 @@ func _ambient(id: String) -> void:
 		amb_p.play()
 
 func _process(dt: float) -> void:
+	Gust.step(dt)
+	_wind(dt)
+	# the title (the Seer's bowl): the shrine's theme, slowed and low, quiet under the wind (Derek 2026-10-05: "a mournful
+	# wind and a slow mournful, somewhat quiet, dreadful temple-like tune playing lightly in the background")
+	if main and main.get("title_open") == true:
+		if cur_id != "music_shrine":
+			_swap("music_shrine")
+			amb_p.stop()
+		var ta: AudioStreamPlayer = players[0]
+		ta.pitch_scale = 0.84
+		ta.volume_db = move_toward(ta.volume_db, linear_to_db(maxf(0.0001, float(Settings.music_vol) * 0.32)), 20.0 * dt)
+		var tb: AudioStreamPlayer = players[1]
+		tb.volume_db = move_toward(tb.volume_db, -60.0, 30.0 * dt)
+		if not ta.playing:
+			var tt: Array = _track(cur_id)
+			if tt[1]:
+				ta.stream = tt[1]
+				ta.play()
+		return
+	(players[0] as AudioStreamPlayer).pitch_scale = 1.0
 	var z = main.zone if main else null
 	if z == null:
 		for p in players:
@@ -139,6 +165,23 @@ func _process(dt: float) -> void:
 		if tr[1]:
 			a.stream = tr[1]
 			a.play()
+
+## the wind: always there in the chapel and out of doors, low; it rises with each gust and falls away after
+func _wind(dt: float) -> void:
+	if wind_p == null or wind_p.stream == null:
+		return
+	var z = main.zone if main else null
+	var title: bool = main != null and main.get("title_open") == true
+	var outdoor: bool = z != null and z.d.get("outdoor", false)
+	var on := title or outdoor
+	if on and not wind_p.playing:
+		wind_p.play(randf() * 20.0)
+	var g := Gust.k()
+	var lin := (0.08 + 0.42 * g) * (1.0 if title else 0.8) if on else 0.0
+	wind_p.volume_db = move_toward(wind_p.volume_db, linear_to_db(maxf(0.0001, lin * float(Settings.sfx_vol))), 24.0 * dt)
+	wind_p.pitch_scale = 0.9 + 0.12 * g
+	if not on and wind_p.volume_db < -50.0:
+		wind_p.stop()
 
 func _swap(id: String) -> void:
 	cur_id = id
