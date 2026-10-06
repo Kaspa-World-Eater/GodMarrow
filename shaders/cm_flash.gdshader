@@ -8,6 +8,7 @@ uniform vec3 lamp_dir = vec3(0.0, 0.0, 1.0);   // toward the lantern, screen spa
 uniform float lamp_k = 0.0;                    // how near and bright the lantern is to this body, 0..1
 uniform float sky_k = 0.3;                     // the cold of the sky / the vault
 uniform bool face_left = false;
+uniform float veins = 0.0;          // 0..1 dark veins swelling and pulsing (blood magic)
 uniform float corrode = 0.0;         // 0..1 acid pitting
 uniform float frost = 0.0;           // 0..1 the glaze of ice climbing from the feet
 uniform float growth = 0.0;          // bone growth (shaders/ossify.gdshader's method): 0..1 of the body crusted
@@ -74,6 +75,12 @@ void fragment() {
 			if (piece + fu.y * 0.6 < line) c.a = 0.0;
 		}
 		c.rgb = col;
+	}
+	if (veins > 0.0 && c.a > 0.0) {
+		vec2 tv = floor(UV / TEXTURE_PIXEL_SIZE);
+		float vv = 1.0 - abs(vn(tv * 0.22 + 7.0) * 2.0 - 1.0);
+		float beat = pow(0.5 + 0.5 * sin(TIME * 7.0), 3.0);
+		if (vv > 0.92 - veins * 0.08) c.rgb = mix(c.rgb, mix(vec3(0.28, 0.02, 0.05), vec3(0.85, 0.12, 0.12), beat * veins), 0.8);
 	}
 	if (corrode > 0.0) {
 		vec2 tq2 = floor(UV / TEXTURE_PIXEL_SIZE);

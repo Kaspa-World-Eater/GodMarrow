@@ -49,6 +49,8 @@ func hit(p: Vector2, from: Vector2, heavy: bool, kind: String = "flesh") -> void
 		"col": Color(1.0, 0.95, 0.8) if kind == "bone" else Color(1.0, 0.82, 0.6)})
 	if heavy:
 		_crack(p, away)
+		if kind == "flesh":
+			spray(p, away, 0.6)
 
 ## the incinerating radiant blaze (shaders/radiant_blaze.gdshader): a white-gold column at tile p for secs, its light
 ## strong while it burns; embers and ash thrown up off it
@@ -179,6 +181,7 @@ func _ensure_sky() -> void:
 
 func _draw_sky() -> void:
 	_draw_souls(sky)
+	_draw_blood(sky)
 	_draw_acid(sky)
 	_draw_bone(sky)
 	_draw_zap(sky)
@@ -1134,6 +1137,97 @@ func _draw_acid(cv: CanvasItem) -> void:
 		cv.draw_rect(Rect2(q, Vector2(PX, PX * 3)), Color(0.55, 0.8, 0.15, 0.9))
 		cv.draw_rect(Rect2(q + Vector2(0, PX * 2), Vector2(PX, PX)), Color(0.85, 1.0, 0.5))
 
+# ------------------------------------------------------------------ blood, more forms (the Hemomancer's)
+## an arterial spray: a wound pumps a jet of droplets in pulses (three beats, each weaker), arcing and spattering
+var sprays: Array = []     # {p (tile), dir (tile), t, secs}
+## a blood whip: a thick red lash cracking out along a curve from the caster, flinging droplets at its tip
+var whips: Array = []      # {a, b (screen), t, secs, side}
+## boiling blood: a pool that seethes, bubbles swelling and bursting, a red steam rising off it
+var boils: Array = []      # {p, node, t, secs}
+
+func spray(p: Vector2, dir: Vector2, secs: float = 0.9) -> void:
+	sprays.append({"p": p, "dir": dir.normalized(), "t": 0.0, "secs": secs})
+
+func blood_whip(from_tile: Vector2, to_tile: Vector2) -> void:
+	_ensure_sky()
+	whips.append({"a": Iso.to_screen(from_tile) + Vector2(0, -70), "b": Iso.to_screen(to_tile) + Vector2(0, -40), "tile": to_tile,
+		"t": 0.0, "secs": 0.35, "side": 1.0 if randf() < 0.5 else -1.0, "hit": false, "from": from_tile})
+
+func boil(p: Vector2, r: float = 1.4, secs: float = 8.0) -> void:
+	_ensure_sky()
+	var sp = load("res://world/splats.gd").at(zone)
+	if sp:
+		sp._pool(p, r, false)
+	boils.append({"p": p, "c": Iso.to_screen(p), "R": r * Iso.HX, "t": 0.0, "secs": secs, "bub": []})
+
+func _tick_blood(dt: float) -> void:
+	for sr in sprays:
+		sr["t"] += dt
+		var u: float = sr["t"] / sr["secs"]
+		var beat := pow(maxf(0.0, sin(u * 3.0 * PI)), 2.0) * (1.0 - u * 0.7)      # three pulses, weakening
+		for k in int(beat * 4.0):
+			var d: Vector2 = (sr["dir"] as Vector2).rotated(randf_range(-0.25, 0.25))
+			chips.append({"p": sr["p"], "z": 55.0, "v": d * randf_range(1.5, 3.2) * (0.6 + beat), "vz": randf_range(40, 110),
+				"col": [Color("#a01818"), Color("#6a0c0c")][randi() % 2], "t": 0.0, "life": randf_range(3.0, 6.0),
+				"rest": false, "bounced": false, "big": false, "stain": true})
+	sprays = sprays.filter(func(sr): return sr["t"] < sr["secs"])
+	for wh in whips:
+		wh["t"] += dt
+		if not wh["hit"] and wh["t"] > wh["secs"] * 0.55:
+			wh["hit"] = true
+			spray(wh["tile"], wh["tile"] - wh["from"], 0.5)
+			hit(wh["tile"], wh["from"], true, "flesh")
+	whips = whips.filter(func(wh): return wh["t"] < wh["secs"])
+	for bo in boils:
+		bo["t"] += dt
+		if randf() < dt * 9.0:
+			var a := randf() * TAU
+			var d: float = sqrt(randf()) * bo["R"] * 0.8
+			bo["bub"].append({"q": bo["c"] + Vector2(cos(a) * d, sin(a) * d * 0.5), "t": 0.0, "life": randf_range(0.4, 0.9), "r": randf_range(2, 4)})
+		for bb in bo["bub"]:
+			bb["t"] += dt
+			if bb["t"] >= bb["life"] and not bb.get("popped", false):
+				bb["popped"] = true
+				wsmoke.append({"q": bb["q"], "v": Vector2(randf_range(-6, 6), -randf_range(20, 40)), "t": 0.0, "life": randf_range(0.8, 1.5), "r": 2.0, "ph": randf() * TAU, "col": Color(0.7, 0.2, 0.2)})
+		bo["bub"] = bo["bub"].filter(func(bb): return bb["t"] < bb["life"] + 0.15)
+	boils = boils.filter(func(bo): return bo["t"] < bo["secs"])
+
+func _draw_blood(cv: CanvasItem) -> void:
+	for wh in whips:
+		var u: float = wh["t"] / wh["secs"]
+		var reach := minf(1.0, u * 2.2)                       # it cracks out fast, then the lash falls back
+		var slack := maxf(0.0, u - 0.55) / 0.45
+		var a: Vector2 = wh["a"]
+		var b: Vector2 = wh["b"]
+		var side: Vector2 = Vector2(-(b - a).y, (b - a).x).normalized() * wh["side"]
+		var n := 28
+		for k in int(n * reach):
+			var f := float(k) / n
+			var q := a.lerp(b, f) + side * sin(f * PI) * 50.0 * (1.0 - slack) + Vector2(0, f * f * 60.0 * slack)
+			var w := 3 if f < 0.5 else (2 if f < 0.85 else 1)
+			for j in range(-w + 1, w):
+				var col := Color(0.62, 0.06, 0.08) if j == 0 else Color(0.36, 0.02, 0.04)
+				if j == 0 and k % 4 == 0:
+					col = Color(0.9, 0.3, 0.28)                 # wet glints along it
+				cv.draw_rect(Rect2(((q + side * j * PX) / PX).floor() * PX, Vector2(PX, PX)), col)
+	for bo in boils:
+		for bb in bo["bub"]:
+			var bu: float = bb["t"] / bb["life"]
+			var c: Vector2 = (bb["q"] / PX).floor() * PX
+			var r := int(bb["r"] * minf(1.0, bu * 1.2))
+			if bb.get("popped", false):
+				for k in 8:
+					var ang := k / 8.0 * TAU
+					cv.draw_rect(Rect2(c + (Vector2(cos(ang), sin(ang) * 0.6) * (r + 2) * PX / PX).floor() * PX, Vector2(PX, PX)), Color(0.85, 0.25, 0.22, 0.8))
+				continue
+			for yy in range(-r, r + 1):
+				for xx in range(-r, r + 1):
+					if xx * xx + yy * yy <= r * r:
+						var col := Color(0.55, 0.05, 0.08)
+						if xx <= -r / 2 and yy <= -r / 2:
+							col = Color(0.95, 0.45, 0.4)               # the bubble's lit skin
+						cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), col)
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -1229,6 +1323,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_blood(dt)
 	_tick_acid(dt)
 	_tick_bone(dt)
 	_tick_zap(dt)

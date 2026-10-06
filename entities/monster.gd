@@ -313,6 +313,7 @@ var _spurs: Node2D
 
 var frost_k := 0.0
 var corrode_k := 0.0
+var veins_k := 0.0
 
 func acid_hit(dmg: float) -> void:
 	corrode_k = minf(1.0, corrode_k + 0.2 + dmg / maxf(1.0, hp_max))
@@ -349,6 +350,9 @@ func _tick_ossify(dt: float) -> void:
 	if not dead:
 		corrode_k = maxf(0.0, corrode_k - dt * 0.06)
 	m.set_shader_parameter("corrode", corrode_k)
+	if not dead:
+		veins_k = maxf(0.0, veins_k - dt * 0.07)
+	m.set_shader_parameter("veins", veins_k)
 	if corrode_k > 0.15 and randf() < dt * 10.0 * corrode_k:
 		var I = load("res://world/impacts.gd").of(zone)
 		var r := spr.get_rect()
