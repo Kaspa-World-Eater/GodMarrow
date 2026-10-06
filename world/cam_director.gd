@@ -23,13 +23,17 @@ func _init(m: Node, c: Camera2D) -> void:
 	main = m
 	cam = c
 
+## the frame's distance (Derek 2026-10-05: "the world feels too small"): a step back, so more of the land is seen round
+## the figure, as D2's frame holds it
+const BASE := 0.88
+
 ## a new zone: from a gate we open looking into the land; from the lantern (or the first waking) we sink down onto you
 func arrive(zone, hero, from: String) -> void:
 	lead = Vector2.ZERO
 	last_pos = hero.position
 	boss_off = Vector2.ZERO
 	fall = 0.0
-	cam.zoom = Vector2.ONE
+	cam.zoom = Vector2.ONE * BASE
 	arr_t = 0.0
 	if from == "" or from == "__lantern":
 		arr_from = Vector2(0, -150)
@@ -96,6 +100,6 @@ func update(dt: float, hero, boss, zone = null) -> Vector2:
 	# 5. the fall: a slow push in on the body; the frame drifts down to the ground where you lie
 	fall = clampf(fall + (dt / 3.0 if hero.dead else -dt * 2.0), 0.0, 1.0)
 	var fk := fall * fall * (3.0 - 2.0 * fall)
-	cam.zoom = Vector2.ONE * (1.0 + 0.12 * fk)
+	cam.zoom = Vector2.ONE * BASE * (1.0 + 0.12 * fk)
 	var fo := Vector2(0, 30.0 * fk)
 	return hero.position + Vector2(0, -40) + lead * (1.0 - fk) + arr + (boss_off + poi) * (1.0 - fk) + fo

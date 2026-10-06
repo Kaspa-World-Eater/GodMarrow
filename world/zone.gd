@@ -372,6 +372,20 @@ func _sprites() -> void:
 		if key.begins_with("p_crows"):
 			key = key.replace("p_crows", "p_offering")   # no animals in the world: the crow props become offerings
 		var set_name: String = s.get("set", "w55")
+		# (Cursemark assets): the trees, stones, graves and small things in Cursemark's art (world/cm_props.gd)
+		if Sfx.cm and set_name != "landmark":
+			var cn: Node2D = load("res://world/cm_props.gd").node_for(key, float(s["x"]), float(s["y"]), bool(s.get("flip", false)))
+			if cn:
+				var ch := Node2D.new()
+				var ca := Iso.to_screen(Vector2(s["x"], s["y"]))
+				var cd: float = float(s.get("d", float(s["x"]) + float(s["y"])))
+				ch.position = Vector2(ca.x, cd * Iso.HY)
+				cn.position = Vector2(0, ca.y - cd * Iso.HY)
+				cn.scale = Vector2.ONE * float(s.get("scale", 1.0))
+				ch.add_child(cn)
+				ch.set_meta("item", s.get("item", ""))
+				sorted.add_child(ch)
+				continue
 		if set_name == "landmark":
 			tex = load("res://art/landmarks/%s.webp" % key) if ResourceLoader.exists("res://art/landmarks/%s.webp" % key) else null
 			var lm := _landmark_meta(key)

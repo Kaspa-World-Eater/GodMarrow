@@ -779,11 +779,13 @@ func _draw_over() -> void:
 			over.draw_string(fi, Vector2(cx - lw / 2, y + 76), line, HORIZONTAL_ALIGNMENT_LEFT, -1, 40, Color(0.78, 0.74, 0.66, 0.85 * a))
 	# said lines, above the bar
 	var my := vs.y - 56.0 * U.S
+	if cm_hud and cm_hud.visible:
+		my = vs.y - 240.0          # (Cursemark assets): above its taller HUD, in its reading face
 	for i in range(msgs.size() - 1, -1, -1):
 		var mm: Dictionary = msgs[i]
 		var a := clampf(minf(mm["t"] * 4.0, (mm["max"] - mm["t"]) * 2.0), 0.0, 1.0)
 		var s := str(mm["text"])
-		var f := U.font("pixel")
+		var f := U.font("book" if cm_hud and cm_hud.visible else "pixel")
 		var w := f.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 32).x
 		over.draw_rect(Rect2(cx - w / 2 - 24, my - 34, w + 48, 46), Color(0.024, 0.02, 0.03, 0.7 * a))
 		over.draw_string(f, Vector2(cx - w / 2 + 3, my + 3), s, HORIZONTAL_ALIGNMENT_LEFT, -1, 32, Color(0, 0, 0, a))

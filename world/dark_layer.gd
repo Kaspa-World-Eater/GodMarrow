@@ -134,7 +134,9 @@ func _process(dt: float) -> void:
 	keep += (hero.lamp_keep() - keep) * minf(1.0, dt * 4.8)   # 0.08 a frame at 60 (zz_zz_study82.js:19)
 	var outdoor: bool = zone.d.get("outdoor", false)
 	var dk := Game.day_k() if outdoor else 0.0
-	var A := (0.82 - 0.5 * dk * dk) if outdoor else 0.84
+	# the night's floor: the land stays faintly there beyond the lantern (Derek: "I'm not saying pitch black. Maybe the
+	# very very edges"): 0.72 where the web has 0.82
+	var A := (0.72 - 0.4 * dk * dk) if outdoor else 0.84
 	# the far flash: two flickers, a quick one, a gap, a longer one fading; the land stands up out of the dark
 	var nk := clampf((1.0 - dk - 0.4) / 0.6, 0.0, 1.0) if outdoor else 0.0
 	var fv := 0.0
