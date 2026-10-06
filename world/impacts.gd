@@ -47,6 +47,32 @@ func hit(p: Vector2, from: Vector2, heavy: bool, kind: String = "flesh") -> void
 	if heavy:
 		_crack(p, away)
 
+## the incinerating radiant blaze (shaders/radiant_blaze.gdshader): a white-gold column at tile p for secs, its light
+## strong while it burns; embers and ash thrown up off it
+var blazes: Array = []
+
+func blaze(p: Vector2, secs: float = 3.0, size: float = 1.0) -> void:
+	var r := ColorRect.new()
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	r.size = Vector2(200, 320) * size
+	var q := Iso.to_screen(p)
+	r.position = ((q - Vector2(r.size.x * 0.5, r.size.y - 16)) / PX).floor() * PX
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/radiant_blaze.gdshader")
+	m.set_shader_parameter("seed", randf() * 40.0)
+	m.set_shader_parameter("rect_size", r.size)
+	r.material = m
+	add_child(r)
+	var pl := PointLight2D.new()
+	pl.color = Color(1.0, 0.8, 0.5)
+	pl.set_meta("dark_r", 70.0 * size)
+	pl.set_meta("dark_far", 1.8)
+	pl.set_meta("dark_core", 0.35)
+	pl.position = q + Vector2(0, -60)
+	pl.enabled = false
+	add_child(pl)
+	blazes.append({"node": r, "light": pl, "t": 0.0, "secs": secs, "p": p, "size": size})
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -105,6 +131,20 @@ func _process(dt: float) -> void:
 			else:
 				c["rest"] = true
 	chips = chips.filter(func(c): return c["t"] < c["life"])
+	for bz in blazes:
+		bz["t"] += dt
+		var u: float = bz["t"] / bz["secs"]
+		var lf: float = smoothstep(0.0, 0.12, u) * (1.0 - smoothstep(0.75, 1.0, u))
+		var mt: ShaderMaterial = bz["node"].material
+		mt.set_shader_parameter("t", bz["t"])
+		mt.set_shader_parameter("life", lf)
+		bz["light"].visible = lf > 0.05
+		if randf() < dt * 30.0 * lf:
+			ash(bz["p"] + Vector2(randf_range(-0.4, 0.4), randf_range(-0.4, 0.4)), 0.0)
+		if u >= 1.0:
+			bz["node"].queue_free()
+			bz["light"].queue_free()
+	blazes = blazes.filter(func(bz): return bz["t"] < bz["secs"])
 	for mo in motes:
 		mo["t"] += dt
 		mo["v"].x += Gust.dir() * Gust.k() * 40.0 * dt + sin(mo["t"] * 3.0 + mo["q"].y * 0.05) * 6.0 * dt
