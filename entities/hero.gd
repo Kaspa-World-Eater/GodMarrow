@@ -41,6 +41,14 @@ var string_idle := 0.0
 var invuln := 0.0
 var roll_dir := Vector2.ZERO
 var charge := 0.0          # heavy wind-up held
+# the body in a blow (Derek 2026-10-05: "melee animations to have the weight and push and pull feeling like he's actually
+# swinging a sword"): drawn back and settled, then thrown forward and stretched into the step, a freeze where it lands,
+# a recoil, and back. On top of the painted frames, pivoting at the feet.
+var spr_base := Vector2.ONE
+var act_dir := Vector2.RIGHT   # the blow's way on the screen
+var lunge := Vector2.ZERO      # the step the blow carries (tiles), taken during the strike
+var lunge_done := 0.0
+var blow_landed := false
 var holding_attack := false
 var hold_t := 0.0          # how long the attack button has been held (heavy wind-up after 0.18 s)
 var heavy_pm := 0.0        # a released heavy: its poise-damage multiplier (x2 -> x3.5); 0 for other blows
@@ -73,6 +81,7 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 	if fh > 0.0 and fh < 150.0:
 		spr.scale = Vector2(195.0 / fh, 195.0 / fh)
 	spr.scale *= Iso.FIG
+	spr_base = spr.scale
 	spr.view = "down"
 	add_child(spr)
 	add_child(load("res://entities/hero_rim.gd").new(self, spr))   # the edge the nearest flame lights (heroRim37)
@@ -246,6 +255,8 @@ func _physics_process(dt: float) -> void:
 		_act(dt)
 		_sync()
 		return
+	if not holding_attack and (spr.position != Vector2.ZERO or spr.skew != 0.0):
+		_body_rest()
 	if holding_attack:
 		# winding up: creep toward the target at 35% (in _walk), the blow drawn back
 		if target and not target.dead and tp.distance_to(target.tp) - target.radius > _reach():
@@ -258,6 +269,14 @@ func _physics_process(dt: float) -> void:
 		spr.face = face
 		spr.play("heavy" if spr.set.has("heavy") else "atk", false, false)
 		spr.set_index(mini(1, spr.frame_count() - 1))
+		# coiled: drawn back and low, deeper as the charge fills, trembling at the full
+		var aim: Vector2 = target.tp if target and not target.dead else mouse_tile()
+		var sd := (Iso.to_screen(aim) - Iso.to_screen(tp)).normalized()
+		var ck := charge
+		var tremble := (sin(Time.get_ticks_msec() * 0.06) * 1.5 if ck >= 0.99 else 0.0)
+		spr.position = -sd * (6.0 + 12.0 * ck + tremble) * Vector2(1.0, 0.5)
+		spr.scale = spr_base * Vector2(1.0 + 0.06 * ck, 1.0 - 0.06 * ck)
+		spr.skew = -0.14 * ck * signf(sd.x if absf(sd.x) > 0.2 else float(face))
 		_sync()
 		return
 	# auto-attack (an option; off by default on desktop): an idle pilgrim turns on what comes near
@@ -369,7 +388,11 @@ func _start_attack(m: Monster, at: Vector2) -> void:
 	if string_i == 2:
 		spend_poise(4.0)
 	Sfx.play("swing", 0.8 if string_i < 2 else 1.0, 1.0 if string_i < 2 else 0.82)
-	tp = zone.move(tp, (at - tp).normalized() * float(s[2]), radius)
+	# the step goes with the strike, not before the wind-up
+	act_dir = (Iso.to_screen(at) - Iso.to_screen(tp)).normalized()
+	lunge = (at - tp).normalized() * float(s[2])
+	lunge_done = 0.0
+	blow_landed = false
 	string_i = (string_i + 1) % 3
 	string_idle = 0.0
 
@@ -401,6 +424,7 @@ func _act(dt: float) -> void:
 			if not act_done and act_t >= act_len * act_hit_at:
 				act_done = true
 				_land_blow()
+			_blow_body()
 		"roll":
 			tp = zone.move(tp, roll_dir * 8.5 * dt, radius)
 		"stun":
@@ -409,8 +433,58 @@ func _act(dt: float) -> void:
 		act = ""
 		heavy_pm = 0.0
 		spr.fps_override = 0.0
+		_body_rest()
 		if act_target and act_target.dead:
 			target = null
+
+## the swing's weight on the body (see act_dir): pull, throw, freeze, recoil
+func _blow_body() -> void:
+	var w: Item = _weapon()
+	if w and w.is_ranged():
+		_body_rest()
+		return
+	var u := clampf(act_t / maxf(0.001, act_len), 0.0, 1.0)
+	var h := act_hit_at
+	var big := 1.6 if (act_mult > 1.5 or act == "heavy" or heavy_pm > 0.0) else 1.0
+	var pull := 10.0 * big
+	var throw := 18.0 * big
+	var off := 0.0
+	var sq := 0.0                 # + squat and wide, - tall and thin
+	var lean := 0.0
+	var pe := h * 0.6
+	if u < pe:
+		var k := smoothstep(0.0, pe, u)
+		off = -pull * k
+		sq = 0.05 * k * big
+		lean = -0.07 * k * big
+	elif u < h:
+		var k := (u - pe) / maxf(0.001, h - pe)
+		k = k * k                                         # it gathers, then goes
+		off = lerpf(-pull, throw, k)
+		sq = lerpf(0.05 * big, -0.06 * big, k)
+		lean = lerpf(-0.07 * big, 0.11 * big, k)
+		var step := k - lunge_done
+		if step > 0.0 and lunge != Vector2.ZERO:
+			tp = zone.move(tp, lunge * step, radius)
+			lunge_done = k
+	else:
+		if lunge_done < 1.0 and lunge != Vector2.ZERO:
+			tp = zone.move(tp, lunge * (1.0 - lunge_done), radius)
+			lunge_done = 1.0
+		var k := (u - h) / maxf(0.001, 1.0 - h)
+		# the follow-through: a touch past, then home; a landed blow jars back first
+		var jar := (-6.0 * big if blow_landed else 4.0 * big) * sin(minf(1.0, k * 3.0) * PI)
+		off = throw * (1.0 - smoothstep(0.0, 1.0, k)) + jar
+		sq = -0.06 * big * (1.0 - k) + 0.03 * big * sin(minf(1.0, k * 2.5) * PI)
+		lean = 0.11 * big * (1.0 - smoothstep(0.0, 1.0, k))
+	spr.position = act_dir * off * Vector2(1.0, 0.5)
+	spr.scale = spr_base * Vector2(1.0 + sq, 1.0 - sq)
+	spr.skew = lean * signf(act_dir.x if absf(act_dir.x) > 0.2 else float(face))
+
+func _body_rest() -> void:
+	spr.position = Vector2.ZERO
+	spr.scale = spr_base
+	spr.skew = 0.0
 
 func _land_blow() -> void:
 	var w: Item = _weapon()
@@ -434,6 +508,9 @@ func _land_blow() -> void:
 		if heavy_pm > 0.0:
 			o_hit["poise"] = d * heavy_pm
 		var dealt: float = Combat.hit_monster(m2, d, "phys", tp, o_hit)
+		blow_landed = true
+		Game.hitstop(0.03)            # every blow that lands holds the frame a breath (the heavy ones longer, below)
+		Game.shake(0.8)
 		Sfx.play("heavy" if (act_mult > 1.5 or heavy_pm > 0.0 or o_hit.get("finisher", false)) else "hit")
 		skills.on_weapon_hit(m2, dealt)
 		if o_hit.get("finisher", false):

@@ -63,6 +63,10 @@ static func run(g) -> void:
 		_show_collision(g)
 	if a.has("shot"):
 		_shot(g, a)
+	if a.has("swing"):
+		_swing_loop(g)                   # --swing: the pilgrim swings at the air to the east every 0.7 s (to film blows)
+	if a.has("auto_attack"):
+		Settings.auto_attack = true      # --auto_attack: the pilgrim turns on what comes near (to film blows)
 	if a.has("arena"):
 		await _arena(g, a)
 	if a.has("boardtest") and g.hero.st.arc:
@@ -247,7 +251,7 @@ static func _shot(g, a: Dictionary) -> void:
 		var p := path if n == 1 else path.get_basename() + "_%d.png" % i
 		g.get_viewport().get_texture().get_image().save_png(p)
 		if i < n - 1:
-			await tree.create_timer(0.25).timeout
+			await tree.create_timer(float(a.get("shot_dt", "0.25"))).timeout
 	tree.quit()
 
 ## PixelForge's "See it in the game" for an object (--place=a,b): each stands a few tiles from the pilgrim, drawn
@@ -306,3 +310,12 @@ static func _forge_preview(g, a: Dictionary) -> void:
 			var nodes := PFFx.spawn_attachments(g.hero, set.fx_dir(fx_dir), set, "down", 1.0, 2)
 			g.hero.set_meta("forge_attachments", nodes)
 			print("FORGE attachments: ", nodes.size())
+
+
+static func _swing_loop(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(2.0).timeout
+	while is_instance_valid(g) and g.hero and not g.hero.dead:
+		if g.hero.act == "":
+			g.hero._start_attack(null, g.hero.tp + Vector2(1.0, -1.0))
+		await tree.create_timer(0.7).timeout

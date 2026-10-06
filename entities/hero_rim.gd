@@ -58,6 +58,7 @@ func _process(_dt: float) -> void:
 	offset = src.offset
 	flip_h = src.flip_h
 	position = src.position
+	skew = src.skew
 	if flip_h:
 		o.x = -o.x
 	var m := material as ShaderMaterial
