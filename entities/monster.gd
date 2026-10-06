@@ -133,6 +133,12 @@ func _true_size() -> void:
 	spr.scale = Vector2(TRUE_SIZE, TRUE_SIZE) * Iso.FIG
 	base_scale = spr.scale
 
+## the web's ease (data/monsters.json scaling.ease_measured_husk) against ours: the factor to multiply its numbers by
+static func ease_k(l: int) -> float:
+	var web := 0.5 if l <= 5 else (0.5 + 0.1 * (l - 5) if l <= 10 else minf(1.2, 1.0 + 0.0133 * (l - 10)))
+	var ours := 0.5 if l <= 5 else (0.5 + 0.05 * (l - 5) if l <= 10 else (0.75 + 0.025 * (l - 10) if l <= 20 else minf(1.2, 1.0 + 0.02 * (l - 20))))
+	return ours / web
+
 func _numbers() -> void:
 	var r := rank if rank in ["normal", "champion", "unique", "minion", "boss"] else "normal"
 	var row: Dictionary = kd.get("scaled", {}).get(r, {}).get(str(clampi(level, 1, 99)), {})
@@ -149,6 +155,12 @@ func _numbers() -> void:
 		xp = int(row.get("xp", 1))
 	if info.has("hp"):
 		hp_max = float(info["hp"])     # the export's own spawned life wins (packs, uniques, bosses)
+	# the curve, stretched (2026-10-06; Derek: "slightly easier since it'll have difficulty changes, but gear will
+	# change power levels"): the web's ease() doubles a creature between levels 5 and 10, inside Act 1. Here it climbs
+	# from 0.5 at 5 to 0.75 at 10, 1.0 at 20 and 1.2 at 30, so the wall comes with the gear and the later difficulties.
+	var ek := ease_k(level)
+	hp_max = maxf(1.0, roundf(hp_max * ek))
+	dmg *= ek * (0.85 if level > 5 else 1.0)   # their blows a little lighter than their life
 	hp = hp_max
 	radius = float(info.get("r", kd.get("radius", 0.3)))
 	var rr = kd.get("resists_at_spawn")
