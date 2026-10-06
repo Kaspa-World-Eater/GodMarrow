@@ -3,7 +3,7 @@ extends Control
 ##  bottom left: the kneeling knight's frame; its orb fills red with life, draining from the top
 ##  bottom right: the goddess statue; a pale orb in her halo holds Marrow
 ##  bottom centre: the dragon's skill frame (left skill, the belt's draught, right skill); a hair of experience under it
-##  above the knight: shards as Cursemark's energy pips; the tall curse-meter is poise
+##  above the knight: shards as Cursemark's energy pips, poise a slim bone rule under them
 ##  by the frame: the pack, the map, the notebook (journal); the belt's draughts with their counts
 ##  overhead: a boss's bar at the top; Cursemark's small health bars over the wounded; its cursor
 ## Clicks go where the old bar sent them (ui/hud.gd): skills open the picker, menus open panels, draughts drink.
@@ -147,9 +147,6 @@ func _draw() -> void:
 	piece_fill("hud/health_orb", orb_p, lf, S, Color(pulse, pulse, pulse))
 	piece("hud/player_frame", L)
 	_num(str(maxi(0, ceili(st.hp))), L + Vector2(64.5, 112) * S, Color(0.95, 0.75, 0.72))
-	# poise: the tall curse-meter beside the knight, filling from the bottom
-	var G := L + Vector2(150 * S - 6, 117 * S - 75 * S - 30)
-	piece_fill("hud/cursemark_bar", G, clampf(st.poise / maxf(1.0, st.poise_max()), 0.0, 1.0), S * 0.62)
 	# shards (the Ossuarch's): Cursemark's energy pips in a row above the knight, five shards a pip
 	var book = hero.skills
 	if book and book.get("shards") != null:
@@ -163,6 +160,14 @@ func _draw() -> void:
 				piece("hud/energy_pip", pp)
 			elif float(i) < full:
 				piece("hud/energy_pip", pp, S, Color(1, 1, 1, 0.4))
+	# poise (our own, not Cursemark's curse-meter; Derek: "the resource bar for poise ... doesnt seem right"): a slim bone
+	# rule under the pips. It drains as blows land and you are near to being staggered; it flushes red when it breaks.
+	var pk: float = clampf(st.poise / maxf(1.0, st.poise_max()), 0.0, 1.0)
+	var pr := Rect2(L + Vector2(12, 50) * S, Vector2(56 * S, 2 * S))
+	draw_rect(pr.grow(S), Color(0.03, 0.025, 0.03, 0.85))
+	var pc := Color(0.86, 0.82, 0.7) if pk > 0.3 else Color(0.82, 0.3, 0.22).lerp(Color(0.86, 0.82, 0.7), pk / 0.3)
+	draw_rect(Rect2(pr.position, Vector2(pr.size.x * pk, pr.size.y)), pc)
+	draw_rect(Rect2(pr.position, Vector2(pr.size.x * pk, S * 0.67)), Color(1, 1, 0.95, 0.35))
 	# Marrow: the pale orb in the goddess's halo
 	var R := _frame_r()
 	var rf: float = clampf(st.res / maxf(1.0, st.res_max()), 0.0, 1.0)
@@ -280,7 +285,7 @@ func hit_test(p: Vector2) -> String:
 			return "belt%d" % i
 	var M := _frame_l() + Vector2(150 * S + 30, 117 * S - 60 * S)
 	for j in 3:
-		if Rect2(M + Vector2(10, 4 + j * 18) * S, Vector2(16, 16) * S).has_point(p):
+		if Rect2(M + Vector2(-6, 2 + j * 18) * S, Vector2(18, 18) * S).has_point(p):   # where the icons are drawn
 			return "menu%d" % j
 	var L := _frame_l()
 	if Rect2(L, Vector2(150, 117) * S).has_point(p) or Rect2(_frame_r(), Vector2(122, 81) * S).has_point(p) or Rect2(K, Vector2(126, 81) * S).has_point(p):
