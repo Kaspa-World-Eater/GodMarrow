@@ -180,3 +180,17 @@ becomes the base for a family:
   dragged, drying darker over time; the same field and dither, red ramps.
 - Then bone (splinters, dust, marrow glow), miasma (heavy creeping breath, as on the title), void, radiance, cold,
   poison, lightning; and movements for every creature family, each judged filled black first.
+
+## Round 4: plate, not tubes (2026-10-06)
+make_armed.py armour_pass(): every plate a lit lip and a dark underside at its ends (+4/-3 tones), a raised ridge
+down its front, lames, rivets; bone-inlay knotwork bitmaps on the greaves, breastplate and pauldrons; the E1 iron ramp.
+img/r4_armour_before_after.png: left before, middle after (S), right after (SE).
+
+Lessons:
+- **Debug render first.** The first pass changed nothing visible: painted in flat debug colours, most lips landed
+  where other plates cover them (the knee cop over the greave's top, the sabaton over its foot, the pauldron and the
+  couter over the arm's ends). Detail must be placed on the surface that SHOWS, per view.
+- **The ramp limits everything.** On a ramp that tops out at value 0.4, a +2 tone step is invisible. Brighten the lit
+  end first, then the edges have somewhere to go.
+- **Size.** At 195 px a 7-pixel knot barely resolves; filigree belongs to the hand pass on the frames (pixel by pixel)
+  and to larger renders (portraits, the title); the model carries the big forms: plate breaks, lips, ridges, rivets.

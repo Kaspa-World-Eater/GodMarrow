@@ -56,11 +56,57 @@ def shield() -> list:
     ]
 
 
+# ------------------------------------------------------------------ the armour pass (art study: plate, not tubes)
+# Derek: "the armor should not look like tubes. You should have edges and filigree and designs." Every plate gets a lit
+# lip and a dark underside at its ends (a hard bevelled edge), a raised ridge down its front, lames on the long pieces,
+# rivets at the ends; the greaves, the breastplate and the pauldrons carry a knotwork of bone inlaid in the iron.
+KNOT = ["0010100", "0101010", "1001001", "0101010", "0010100", "0001000", "0010100", "0101010", "1001001", "0101010", "0010100"]
+KNOT_SMALL = ["01010", "10101", "01010", "00100", "01010", "10101", "01010"]
+PLATES = ("upper_arm.", "vambrace.", "thigh.", "greave.")
+
+
+def armour_pass(shapes: list) -> None:
+    for s in shapes:
+        if s.get("material") not in ("iron", "ironw"):
+            continue
+        n = s["name"]
+        rules = s.setdefault("rules", [])
+        if s["kind"] == "capsule" and n.startswith(PLATES):
+            y0, y1 = sorted([s["a"][1], s["b"][1]])
+            # only where it shows: the knee cop covers a greave's top, the sabaton its foot, the pauldron and couter
+            # the arm's ends (the debug render, art study round 4)
+            m0, m1 = {"greave.": (6.0, 7.0), "upper_arm.": (6.0, 2.0), "vambrace.": (3.0, 2.0), "thigh.": (4.0, 4.0)}[n.split(".")[0] + "."]
+            y0, y1 = y0 + m0, y1 - m1
+            x0 = (s["a"][0] + s["b"][0]) / 2.0
+            rules += [
+                {"y": [y0, y0 + 1.2], "t": 4},            # the top lip catches the light
+                {"y": [y0 + 1.2, y0 + 2.2], "t": -3},     # and throws a shadow under it
+                {"y": [y1 - 2.2, y1 - 1.2], "t": 3},
+                {"y": [y1 - 1.2, y1], "t": -3},
+                {"front": 0.2, "y": [y0 + 2.2, y1 - 2.2], "t": 2},     # the raised ridge down the front
+                {"every_y": [4, 1], "y": [y0 + 3.0, y1 - 3.0], "t": -1},  # lames
+                {"near": [[[x0 - 2.2, y0 + 3.0, None], [x0 + 2.2, y0 + 3.0, None], [x0 - 2.2, y1 - 3.0, None], [x0 + 2.2, y1 - 3.0, None]], 0.6],
+                 "front": 1.0, "rivet": True},
+            ]
+            if n.startswith("greave."):
+                rules.append({"bitmap": {"rows": KNOT, "y": y0 + 3.0, "by": "x", "x": x0, "scale": 1.0}, "front": 0.9,
+                              "material": "bone", "t": 0})
+        elif n.startswith("pauldron0.") or n == "chest":
+            c = s["centre"]
+            rows, y = (KNOT, c[1] - 15.0) if n == "chest" else (KNOT_SMALL, c[1] - 3.5)
+            rules.append({"bitmap": {"rows": rows, "y": y, "by": "x", "x": c[0], "scale": 1.0}, "front": 1.4, "material": "bone", "t": 0})
+            rules.append({"dy": [None, -(s["radii"][1] - 1.2)], "t": 4})      # the plate's top rim lit
+
+
 def main():
     d = json.loads(SRC.read_text(encoding="utf8"))
     d["name"] = "Ossuarch (sword and shield)"
     d["materials"].update(MATERIALS)
     d["shapes"] = [s for s in d["shapes"] if not s["name"].startswith(("sword_", "shield_"))] + sword() + shield()
+    armour_pass(d["shapes"])
+    # the iron ramp from exercise E1: violet-black shadows to a warm worn edge (the old one stopped at value 0.4)
+    d["materials"]["iron"]["ramp"] = ["#040308", "#08060d", "#0e0b13", "#151119", "#1d181f", "#272026", "#342b2e", "#463a3a", "#5e4d48", "#8a7060", "#4f7a6a"]
+    d["materials"]["ironw"]["ramp"] = ["#06050a", "#0c0a10", "#141118", "#1d1920", "#28222a", "#352d33", "#473c3e", "#5f504d", "#806a5f", "#b0927a"]
     # the silhouette study (STUDY.md round 3): the cloak hangs BEHIND him, open at the front, so the planted legs read
     # as two shapes with a gap (it wrapped three quarters of the way round: back_strip 2.4 rad either side of the back)
     for s in d["shapes"]:
