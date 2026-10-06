@@ -151,7 +151,8 @@
    "bone": "head",
    "lag": {
     "frames": 2,
-    "sway": 1.0
+    "sway": 1.0,
+    "max": 0.4
    },
    "hang": 0.7
   },
@@ -159,7 +160,8 @@
    "bone": "spine.003",
    "lag": {
     "frames": 1,
-    "sway": 0.4
+    "sway": 0.4,
+    "max": 0.2
    },
    "hang": 0.6
   },
@@ -167,7 +169,8 @@
    "bone": "hips",
    "lag": {
     "frames": 1,
-    "sway": 0.5
+    "sway": 0.5,
+    "max": 0.25
    },
    "hang": 0.35
   },
@@ -175,7 +178,8 @@
    "bone": "spine.002",
    "lag": {
     "frames": 2,
-    "sway": 0.8
+    "sway": 1.3,
+    "max": 0.35
    },
    "hang": 0.3
   }
