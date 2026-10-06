@@ -82,6 +82,13 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 		spr.scale = Vector2(195.0 / fh, 195.0 / fh)
 	spr.scale *= Iso.FIG
 	spr_base = spr.scale
+	# lit by the lantern through the sheet's normal map, when there is one (art/sprites/<kind>_n.png)
+	var nsheet := "res://art/sprites/%s_n.png" % kind
+	if ResourceLoader.exists(nsheet) or FileAccess.file_exists(nsheet):
+		var hm := ShaderMaterial.new()
+		hm.shader = load("res://shaders/hero_lit.gdshader")
+		hm.set_shader_parameter("normal_sheet", load(nsheet) if ResourceLoader.exists(nsheet) else ImageTexture.create_from_image(Image.load_from_file(ProjectSettings.globalize_path(nsheet))))
+		spr.material = hm
 	spr.view = "down"
 	add_child(spr)
 	add_child(load("res://entities/hero_rim.gd").new(self, spr))   # the edge the nearest flame lights (heroRim37)
@@ -144,6 +151,7 @@ func _shadow() -> void:
 
 func _sync() -> void:
 	position = Iso.to_screen(tp)
+	_lit_tick()
 
 func mouse_tile() -> Vector2:
 	return Iso.to_tile(get_global_mouse_position())
@@ -480,6 +488,23 @@ func _blow_body() -> void:
 	spr.position = act_dir * off * Vector2(1.0, 0.5)
 	spr.scale = spr_base * Vector2(1.0 + sq, 1.0 - sq)
 	spr.skew = lean * signf(act_dir.x if absf(act_dir.x) > 0.2 else float(face))
+
+## the light on the pilgrim: their lantern where it hangs, the sky's cold by the hour
+func _lit_tick() -> void:
+	if not (spr.material is ShaderMaterial):
+		return
+	var m: ShaderMaterial = spr.material
+	var lp := Vector2(-28.0 * float(face), -120.0)
+	if lantern and is_instance_valid(lantern):
+		lp = lantern.global_position - global_position + Vector2(0, -30)
+	var body := Vector2(0, -80)
+	var dv := lp - body
+	var out: bool = zone != null and zone.d.get("outdoor", false)
+	var night := 1.0 - (Game.day_k() if out else 0.0)
+	m.set_shader_parameter("lamp_dir", Vector3(dv.x, dv.y, 70.0))
+	m.set_shader_parameter("lamp_k", (0.35 + 0.4 * night) * (lantern.glow if lantern and is_instance_valid(lantern) else 1.0))
+	m.set_shader_parameter("sky_k", 0.2 + 0.5 * night if out else 0.25)
+	m.set_shader_parameter("face_left", spr.flip_h)
 
 func _body_rest() -> void:
 	spr.position = Vector2.ZERO
