@@ -798,7 +798,7 @@ func _draw_over() -> void:
 		var mm: Dictionary = msgs[i]
 		var a := clampf(minf(mm["t"] * 4.0, (mm["max"] - mm["t"]) * 2.0), 0.0, 1.0)
 		var s := str(mm["text"])
-		var f := U.font("book" if cm_hud and cm_hud.visible else "pixel")
+		var f := U.font("own_italic")      # the world's lines in our own hand (as the speech and the tooltips)
 		var w := f.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 32).x
 		over.draw_rect(Rect2(cx - w / 2 - 24, my - 34, w + 48, 46), Color(0.024, 0.02, 0.03, 0.7 * a))
 		over.draw_string(f, Vector2(cx - w / 2 + 3, my + 3), s, HORIZONTAL_ALIGNMENT_LEFT, -1, 32, Color(0, 0, 0, a))
