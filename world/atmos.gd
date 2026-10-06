@@ -109,6 +109,9 @@ func _process(dt: float) -> void:
 	gust_v = maxf(0.0, gust_v - dt * 0.35)
 	gust += ((0.25 + gust_v) - gust) * minf(1.0, dt * 1.5)
 	var wind := (sin(t * 0.21) * 0.5 + 0.8) * gust
+	# one wind for everything (core/gust.gd): the gust you hear is the gust that bends the grass and the flames
+	Gust.step(dt)
+	wind = 0.2 + 1.3 * Gust.k()
 	Game.wind = wind
 	if zone.ground_mat:
 		zone.ground_mat.set_shader_parameter("wind", wind)

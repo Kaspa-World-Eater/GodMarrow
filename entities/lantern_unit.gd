@@ -105,4 +105,37 @@ func _burn() -> void:
 		g *= 1.0 - 0.2 * pow(w, 1.5) * beat                               # a pulse that deepens
 		if w > 0.7 and fmod(t * (1.3 + w), 1.0) < 0.06 * w:
 			g *= 0.82                                                     # near death it stutters
-	glow = clampf(g, 0.35, 1.25)
+	# (Derek 2026-10-05: "a gentle slight pulse and flare ... tie it to mechanics like life or danger"):
+	# a slow breath even when all is well; a flare when something wakes near and hunts you, then a tremor while it does;
+	# a dip when a gust strikes the glass
+	g *= 1.0 + 0.035 * sin(t * 1.15) * sin(t * 0.47 + 0.6)
+	var near := _danger()
+	if near and not _was_hunted:
+		flare = 1.0
+	_was_hunted = near
+	flare = maxf(0.0, flare - get_process_delta_time() * 0.9)
+	g *= 1.0 + 0.22 * flare * flare
+	if near:
+		g *= 1.0 + 0.04 * sin(t * 23.0) * sin(t * 7.0)
+	g *= 1.0 - 0.1 * Gust.k() * (0.5 + 0.5 * sin(t * 11.0))
+	glow = clampf(g, 0.35, 1.3)
+
+var flare := 0.0
+var _was_hunted := false
+var _danger_t := 0.0
+var _danger_v := false
+
+## something awake and hunting within 8 yards (checked a few times a second)
+func _danger() -> bool:
+	_danger_t -= get_process_delta_time()
+	if _danger_t > 0.0:
+		return _danger_v
+	_danger_t = 0.25
+	_danger_v = false
+	if hero == null or hero.dead:
+		return false
+	for m in get_tree().get_nodes_in_group("monsters"):
+		if not m.dead and m.get("awake") and m.tp.distance_to(hero.tp) < 8.0:
+			_danger_v = true
+			break
+	return _danger_v
