@@ -65,6 +65,8 @@ static func run(g) -> void:
 		_shot(g, a)
 	if a.has("groundfire"):
 		_ground_fires(g)                 # --groundfire: three fires set burning near the pilgrim (to see them spread)
+	if a.has("icefx"):
+		_icefx(g)                        # --icefx: a frost nova, freezing mist and ice shards round the pilgrim
 	if a.has("magic"):
 		_magic(g)                        # --magic: phosphor wisps flung at points round the pilgrim
 	if a.has("acid"):
@@ -480,3 +482,18 @@ static func _magic(g) -> void:
 			I.phosphor(g.hero.tp, g.hero.tp + Vector2(2.5 + k * 0.6, 1.5 - k * 1.2 + (i % 2)))
 		i += 1
 		await tree.create_timer(1.1).timeout
+
+
+static func _icefx(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	var I = load("res://world/impacts.gd").of(g.zone)
+	var c: Vector2 = g.hero.tp
+	I.cold_mist(c + Vector2(-1.5, 2.0), 2.2, 20.0)
+	while is_instance_valid(g) and g.hero:
+		I.frost_nova(c + Vector2(2.5, 1.0), 3.0)
+		await tree.create_timer(0.8).timeout
+		for k in 3:
+			I.ice_shard(c, c + Vector2(3.5, -1.0 + k * 1.2))
+			await tree.create_timer(0.15).timeout
+		await tree.create_timer(2.0).timeout

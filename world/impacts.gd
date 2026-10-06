@@ -179,6 +179,7 @@ func _ensure_sky() -> void:
 
 func _draw_sky() -> void:
 	_draw_souls(sky)
+	_draw_ice(sky)
 	_draw_wisps(sky)
 	_draw_arcs(sky)
 	for bl in bolts:
@@ -715,6 +716,113 @@ func _draw_wisps(cv: CanvasItem) -> void:
 		cv.draw_rect(Rect2(c - Vector2(0, PX), Vector2(PX, PX * 3)), Color(0.85, 0.94, 1.0, minf(1.0, 1.12 * phase)))
 		cv.draw_rect(Rect2(c, Vector2(PX, PX)), Color(1, 1, 1))
 
+# ------------------------------------------------------------------ ice, more forms
+## a frost nova: a ring of cold rolls outward over the ground, a white crest of crystals at its front, frost left
+## behind it; where it passes, rime glitters a moment
+var novas: Array = []      # {c (screen), R (px), t, secs}
+## freezing mist: low cold breath that rolls and settles, pale blue, glittering with ice crystals that catch the light
+var chills: Array = []     # {q, v, t, life, r}
+var glints: Array = []     # {q, t, life}
+## an ice shard in flight: a long crystal, a white point, frost motes shed behind it; it bursts in shards and frost
+var shards: Array = []     # {p, to, v, t}
+
+func frost_nova(p: Vector2, R: float = 3.5) -> void:
+	_ensure_sky()
+	novas.append({"c": Iso.to_screen(p), "R": R * Iso.HX, "t": 0.0, "secs": 0.7, "p": p, "Rt": R, "left": false})
+	_flash(p, Color(0.65, 0.85, 1.0), 0.3, 60.0)
+
+func cold_mist(p: Vector2, r: float = 2.0, secs: float = 6.0) -> void:
+	_ensure_sky()
+	var c := Iso.to_screen(p)
+	for i in int(18 * r):
+		var a := randf() * TAU
+		var d := randf() * r * Iso.HX
+		chills.append({"q": c + Vector2(cos(a) * d, sin(a) * d * 0.5), "v": Vector2(randf_range(-10, 10), randf_range(-3, 3)),
+			"t": -randf() * 1.0, "life": secs * randf_range(0.6, 1.0), "r": randf_range(3.0, 6.0)})
+
+func ice_shard(from_tile: Vector2, to_tile: Vector2) -> void:
+	_ensure_sky()
+	var a := Iso.to_screen(from_tile) + Vector2(0, -70)
+	var b := Iso.to_screen(to_tile) + Vector2(0, -40)
+	shards.append({"p": a, "to": b, "v": (b - a).normalized() * 900.0, "t": 0.0, "tile": to_tile})
+
+func _tick_ice(dt: float) -> void:
+	for nv in novas:
+		nv["t"] += dt
+		if not nv["left"] and nv["t"] > nv["secs"] * 0.6:
+			nv["left"] = true
+			frost(nv["p"], nv["Rt"] * 0.8, 8.0)
+	novas = novas.filter(func(nv): return nv["t"] < nv["secs"])
+	for ch in chills:
+		ch["t"] += dt
+		ch["q"] += (ch["v"] + Vector2(Gust.dir() * Gust.k() * 18.0, 0)) * dt
+		if ch["t"] > 0.0 and randf() < dt * 0.6:
+			glints.append({"q": ch["q"] + Vector2(randf_range(-12, 12), randf_range(-8, 4)), "t": 0.0, "life": randf_range(0.25, 0.6)})
+	chills = chills.filter(func(ch): return ch["t"] < ch["life"])
+	for gl in glints:
+		gl["t"] += dt
+	glints = glints.filter(func(gl): return gl["t"] < gl["life"])
+	for sh in shards:
+		sh["t"] += dt
+		sh["p"] += sh["v"] * dt
+		for k in 2:
+			glints.append({"q": sh["p"] + Vector2(randf_range(-4, 4), randf_range(-4, 4)), "t": 0.0, "life": randf_range(0.2, 0.5)})
+		if sh["p"].distance_to(sh["to"]) < 24.0 or sh["t"] > 1.5:
+			sh["done"] = true
+			for k in 3:
+				hit(sh["tile"], sh["tile"] - (sh["v"] as Vector2).normalized(), true, "ice")
+			frost(sh["tile"], 0.9, 5.0)
+	shards = shards.filter(func(sh): return not sh.get("done", false))
+
+func _draw_ice(cv: CanvasItem) -> void:
+	for ch in chills:
+		if ch["t"] < 0.0:
+			continue
+		var u: float = ch["t"] / ch["life"]
+		var a: float = sin(u * PI) * 0.38
+		var c0: Vector2 = (ch["q"] / PX).floor()
+		var R := int(ch["r"] + u * 3.0)
+		for yy in range(-R / 2, R / 2 + 1):
+			for xx in range(-R, R + 1):
+				var e := pow(float(xx) / R, 2) + pow(float(yy) / (R * 0.5), 2)
+				if e > 1.0:
+					continue
+				var th := float([0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5][posmod(int(c0.y) + yy, 4) * 4 + posmod(int(c0.x) + xx, 4)]) / 16.0
+				if (1.0 - e) * 1.3 > th:
+					cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.7, 0.85, 1.0, a))
+	for gl in glints:
+		var gu: float = gl["t"] / gl["life"]
+		var q: Vector2 = (gl["q"] / PX).floor() * PX
+		var gc := Color(1, 1, 1, 1.0 - gu)
+		cv.draw_rect(Rect2(q, Vector2(PX, PX)), gc)
+		if gu < 0.4:
+			for o in [Vector2(PX, 0), Vector2(-PX, 0), Vector2(0, PX), Vector2(0, -PX)]:
+				cv.draw_rect(Rect2(q + o, Vector2(PX, PX)), Color(0.7, 0.88, 1.0, 0.6 * (1.0 - gu)))
+	for nv in novas:
+		var u: float = nv["t"] / nv["secs"]
+		var r: float = nv["R"] * (1.0 - pow(1.0 - u, 2.5))
+		var n := int(12 + r / 5.0)
+		for k in n:
+			var ang := k / float(n) * TAU
+			var q: Vector2 = ((nv["c"] + Vector2(cos(ang) * r, sin(ang) * r * 0.5)) / PX).floor() * PX
+			var crest := 1.0 - u
+			cv.draw_rect(Rect2(q, Vector2(PX, PX)), Color(0.92, 0.97, 1.0, crest))
+			if k % 3 == 0:                                   # crystals jutting up at the crest
+				for h in int(2 + 3 * crest):
+					cv.draw_rect(Rect2(q - Vector2(0, (h + 1) * PX), Vector2(PX, PX)), Color(0.75, 0.9, 1.0, crest * (1.0 - h * 0.2)))
+			var q2: Vector2 = ((nv["c"] + Vector2(cos(ang) * r * 0.85, sin(ang) * r * 0.425)) / PX).floor() * PX
+			cv.draw_rect(Rect2(q2, Vector2(PX, PX)), Color(0.5, 0.72, 1.0, 0.5 * crest))
+	for sh in shards:
+		var d: Vector2 = (sh["v"] as Vector2).normalized()
+		var side := Vector2(-d.y, d.x)
+		for k in 9:
+			var w := 1 if k < 6 else 0
+			var q: Vector2 = sh["p"] - d * k * PX
+			for j in range(-w, w + 1):
+				var c := Color(0.92, 0.97, 1.0) if j == 0 else (Color(0.55, 0.78, 1.0) if j < 0 else Color(0.3, 0.48, 0.8))
+				cv.draw_rect(Rect2(((q + side * j * PX) / PX).floor() * PX, Vector2(PX, PX)), c)
+		cv.draw_rect(Rect2(((sh["p"] + d * PX) / PX).floor() * PX, Vector2(PX, PX)), Color(1, 1, 1))
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -810,6 +918,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_ice(dt)
 	_tick_wisps(dt)
 	_tick_breaths(dt)
 	_tick_screen_flash(dt)
