@@ -37,6 +37,16 @@ const MAP := [
 	["p_cairn", ["rubble"], 1.0],
 ]
 
+static var _mats := {}
+
+static func _lit_mat(flip: bool) -> ShaderMaterial:
+	if not _mats.has(flip):
+		var m := ShaderMaterial.new()
+		m.shader = load("res://shaders/cm_prop_lit.gdshader")
+		m.set_shader_parameter("flipped", flip)
+		_mats[flip] = m
+	return _mats[flip]
+
 static func scale_for(key: String) -> float:
 	for m in MAP:
 		if key.begins_with(m[0]):
@@ -79,6 +89,7 @@ static func node_for(key: String, x: float, y: float, flip: bool) -> Node2D:
 	if G.has(reg):
 		node.glow = G[reg]
 	node.setup()
+	node.spr.material = _lit_mat(flip)   # lit by the lantern through its normal map (shaders/cm_prop_lit.gdshader)
 	# lift it onto its foot: the bottom of its frame at 0
 	var f: Dictionary = A[reg][0]
 	var bottom: float = (f["off"] as Vector2).y - (f["orig"] as Vector2).y * 0.5 + (f["rect"] as Rect2).size.y

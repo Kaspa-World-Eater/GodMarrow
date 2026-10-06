@@ -32,3 +32,18 @@ Data="*res://core/data.gd"
 Game="*res://core/game.gd"
 Bus="*res://core/bus.gd"
 Settings="*res://core/settings.gd"
+
+[shader_globals]
+
+lamp_world={
+"type": "vec2",
+"value": Vector2(0, 0)
+}
+lamp_reach={
+"type": "float",
+"value": 0.0
+}
+lamp_night={
+"type": "float",
+"value": 0.0
+}
