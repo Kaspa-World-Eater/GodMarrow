@@ -701,7 +701,7 @@ func _draw_wisps(cv: CanvasItem) -> void:
 			q = (q / PX).floor() * PX
 			var wdt := int(1 + 3.0 * k * k)
 			for j in range(-wdt + 1, wdt):
-				cv.draw_rect(Rect2(q + Vector2(j * PX, 0), Vector2(PX, PX)), Color(0.62, 0.8, 1.0, 0.42 * k * phase))
+				cv.draw_rect(Rect2(q + Vector2(j * PX, 0), Vector2(PX, PX)), Color(0.62, 0.8, 1.0, 0.59 * k * phase))
 			if i % 9 == 4:                                       # an echo of it, lingering faintly
 				cv.draw_rect(Rect2(q - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(0.7, 0.85, 1.0, 0.07 * k * phase))
 		var c: Vector2 = (w["p"] / PX).floor() * PX
@@ -710,9 +710,9 @@ func _draw_wisps(cv: CanvasItem) -> void:
 			for xx in range(-orb_r, orb_r + 1):
 				var e := float(xx * xx + yy * yy)
 				if e <= rr2:
-					cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.55, 0.78, 1.0, 0.32 * pow(1.0 - e / rr2, 2.0) * phase))
-		cv.draw_rect(Rect2(c - Vector2(PX, 0), Vector2(PX * 3, PX)), Color(0.85, 0.94, 1.0, 0.8 * phase))
-		cv.draw_rect(Rect2(c - Vector2(0, PX), Vector2(PX, PX * 3)), Color(0.85, 0.94, 1.0, 0.8 * phase))
+					cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.55, 0.78, 1.0, 0.45 * pow(1.0 - e / rr2, 2.0) * phase))   # glow +40% (Derek)
+		cv.draw_rect(Rect2(c - Vector2(PX, 0), Vector2(PX * 3, PX)), Color(0.85, 0.94, 1.0, minf(1.0, 1.12 * phase)))
+		cv.draw_rect(Rect2(c - Vector2(0, PX), Vector2(PX, PX * 3)), Color(0.85, 0.94, 1.0, minf(1.0, 1.12 * phase)))
 		cv.draw_rect(Rect2(c, Vector2(PX, PX)), Color(1, 1, 1))
 
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
