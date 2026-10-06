@@ -516,7 +516,9 @@ func gut_burst(p: Vector2) -> void:
 ## A wisp: a white-hot point that curves toward its mark; its trail is a long ribbon of phosphor sparks that linger,
 ## twinkle on and off and fade from white through ghost-blue; it bursts in a scatter of sparks
 var wisps: Array = []      # {p, v, to (screen), t, trail: [[pos, born]], done}
-var _phos: Array = []      # lingering sparks: {q, t, life}
+var _phos: Array = []
+var wsmoke: Array = []     # {q, v, t, life, r, ph}
+var wtend: Array = []      # {q, dir, len, t, life, ph, curl}      # lingering sparks: {q, t, life}
 
 func phosphor(from_tile: Vector2, to_tile: Vector2) -> void:
 	_ensure_sky()
@@ -552,6 +554,14 @@ func _tick_wisps(dt: float) -> void:
 		w["trail"].push_front(np)
 		if w["trail"].size() > 34:
 			w["trail"].pop_back()
+		# ghostly smoke shed behind it (puffs that swell, drift and thin away) and now and then a thin tendril that
+		# peels off, drifts behind and dissolves
+		if randf() < dt * 22.0:
+			wsmoke.append({"q": np, "v": -vel.normalized() * randf_range(10, 30) + Vector2(0, -randf_range(4, 12)), "t": 0.0, "life": randf_range(1.0, 2.0), "r": randf_range(2.0, 3.5), "ph": randf() * TAU})
+		if randf() < dt * 3.5:
+			var back := -vel.normalized()
+			var tside := Vector2(-back.y, back.x) * (1.0 if randf() < 0.5 else -1.0)
+			wtend.append({"q": np, "dir": (back + tside * randf_range(0.3, 0.9)).normalized(), "len": randf_range(40, 90), "t": 0.0, "life": randf_range(1.0, 1.8), "ph": randf() * TAU, "curl": randf_range(-1.0, 1.0)})
 		# soul dust shed behind it: more when it moves fast
 		var n := 1 + int(vel.length() / 260.0)
 		for k in n:
@@ -571,11 +581,52 @@ func _tick_wisps(dt: float) -> void:
 		s["v"] *= 1.0 - 1.5 * dt
 		s["v"].x += Gust.dir() * Gust.k() * 10.0 * dt
 	_phos = _phos.filter(func(s): return s["t"] < s["life"])
+	for m in wsmoke:
+		m["t"] += dt
+		m["q"] += m["v"] * dt
+		m["v"] *= 1.0 - 1.2 * dt
+		m["v"].x += (sin(m["t"] * 2.0 + m["ph"]) * 14.0 + Gust.dir() * Gust.k() * 20.0) * dt
+	wsmoke = wsmoke.filter(func(m): return m["t"] < m["life"])
+	for tn in wtend:
+		tn["t"] += dt
+		tn["q"] += (tn["dir"] * 14.0 + Vector2(0, -8.0)) * dt
+	wtend = wtend.filter(func(tn): return tn["t"] < tn["life"])
 	while _phos.size() > 2400:
 		_phos.pop_front()
 
 func _draw_wisps(cv: CanvasItem) -> void:
 	var now := Time.get_ticks_msec() / 1000.0
+	# smoke: soft dithered puffs, pale blue-grey, swelling as they thin
+	for m in wsmoke:
+		var u: float = m["t"] / m["life"]
+		var R := int(m["r"] + u * 4.0)
+		var c0: Vector2 = (m["q"] / PX).floor()
+		for yy in range(-R, R + 1):
+			for xx in range(-R, R + 1):
+				var e := float(xx * xx + yy * yy) / float(R * R)
+				if e > 1.0:
+					continue
+				var gx := posmod(int(c0.x) + xx, 4)
+				var gy := posmod(int(c0.y) + yy, 4)
+				var th := float([0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5][gy * 4 + gx]) / 16.0
+				if (1.0 - e) * (1.0 - u) * 1.4 > th:
+					cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.62, 0.72, 0.9, 0.16 * (1.0 - u)))
+	# tendrils: thin curling lines that drift back and dissolve (pixels drop out from the tip inward)
+	for tn in wtend:
+		var u: float = tn["t"] / tn["life"]
+		var L: float = tn["len"] * (0.4 + 0.6 * minf(1.0, u * 3.0))
+		var dirv: Vector2 = tn["dir"]
+		var p: Vector2 = tn["q"]
+		var steps := int(L / PX)
+		for k in steps:
+			var f := float(k) / maxf(1.0, steps)
+			dirv = dirv.rotated(tn["curl"] * 0.08 + sin(now * 3.0 + tn["ph"] + k * 0.4) * 0.05)
+			p += dirv * PX
+			if f > 1.0 - u * 1.3:                                  # dissolving from the tip
+				continue
+			if randf() < u * 0.6:
+				continue
+			cv.draw_rect(Rect2((p / PX).floor() * PX, Vector2(PX, PX)), Color(0.7, 0.84, 1.0, 0.5 * (1.0 - f) * (1.0 - u)))
 	for s in _phos:
 		var u: float = s["t"] / s["life"]
 		var tw := 0.5 + 0.5 * sin(now * 14.0 + s["ph"])        # scintillation: each mote twinkles on its own beat
