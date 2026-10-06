@@ -163,8 +163,14 @@ def f32(v):
     return float(np.float32(v))
 
 
-def build():
+def build(rec=None):
+    """rec: a dict to fill with the light layers (chapel_light.py) as the painting is made"""
     w, hgt = W, H
+    phase = ['wall']
+    if rec is not None:
+        rec['k'] = np.zeros((hgt, w, 5)); rec['pre0'] = np.zeros((hgt, w)); rec['cold'] = np.zeros((hgt, w)); rec['mult'] = np.zeros((hgt, w))
+        rec['add'] = np.zeros((hgt, w)); rec['rf'] = np.zeros((hgt, w)); rec['g'] = np.zeros((hgt, w)); rec['speck'] = np.zeros((hgt, w))
+        rec['over'] = np.zeros((hgt, w, 4)); rec['crack'] = np.zeros((hgt, w)); rec['stain'] = np.zeros((hgt, w)); rec['shaft'] = np.zeros((hgt, w, 3))
     N = w * hgt
     Hm = [0.0] * N
     Cv = [0] * N
@@ -179,6 +185,8 @@ def build():
         if i < 0 or j < 0 or i >= w or j >= hgt:
             return
         D[j, i, 0] = cb(col[0]); D[j, i, 1] = cb(col[1]); D[j, i, 2] = cb(col[2]); D[j, i, 3] = 255
+        if rec is not None and phase[0] == 'detail':
+            rec['over'][j, i] = (D[j, i, 0], D[j, i, 1], D[j, i, 2], 255)
 
     def dith(i, j):
         return B4[(j & 3) * 4 + (i & 3)]
@@ -288,7 +296,9 @@ def build():
         for i in range(w):
             o = j * w + i
             if Cv[o]:
+                phase[0] = 'detail'
                 put(i, j, STONE[3] if not Cv[o - w] else ((22, 14, 30) if hash_(i, j) < 0.25 else STONE[0]))
+                phase[0] = 'wall'
                 continue
             hx = (Hm[o + 1] - Hm[o - 1]) * 0.8 if 0 < i < w - 1 else 0
             hy = (Hm[o + w] - Hm[o - w]) * 0.8 if 0 < j < HZ - 1 else 0
@@ -296,12 +306,15 @@ def build():
             nx, ny, nz = -hx / nl, -hy / nl, 1 / nl
             val = 0.008 + max(0, -nx * 0.55 - ny * 0.62 + nz * 0.4) ** 2 * 0.07
             red = 0
-            for L in LIGHTS:
+            sky = val
+            for li, L in enumerate(LIGHTS):
                 lx, ly, lz = L["x"] - i, L["y"] - j, L["z"] - Hm[o]
                 d = math.hypot(lx, ly, lz)
                 ndl = max(0, (nx * lx + ny * ly + nz * lz) / d)
                 k = ndl ** 1.5 * L["i"] / (1 + (d / L["r"]) ** 2)
                 val += k * 0.8
+                if rec is not None:
+                    rec['k'][j, i, li] = k
                 if L.get("red"):
                     red += k * 1.6
             bd = abs((i - 312) - (j - 30) * 0.5) / 1.118
@@ -310,11 +323,18 @@ def build():
             val += cold
             cf = cold / (val + 0.0001)
             ao = clamp(1 + (Hm[o] - Bl[o]) * 0.2, 0.15, 1.25)
-            val *= ao * vign(i, j) * (1 if Fm[o] else 0.72 + 0.4 * noise(i * 0.45, j * 0.025 + 30))
+            mlt = ao * vign(i, j) * (1 if Fm[o] else 0.72 + 0.4 * noise(i * 0.45, j * 0.025 + 30))
+            val *= mlt
             if j == HZ - 1 or j == HZ - 2:
                 val *= 0.35
+                mlt *= 0.35
+            if rec is not None:
+                rec['pre0'][j, i] = sky + cold; rec['cold'][j, i] = cold; rec['mult'][j, i] = mlt; rec['g'][j, i] = 0.8
+                rec['rf'][j, i] = 1 if ny > 0 else 0.4
+                rec['speck'][j, i] = (1 if hash_(i, j + 5) > 0.985 else 0) - (1 if hash_(i + 3, j) > 0.97 else 0)
             cc = rgb(i, j, val, min(0.8, red * (1 if ny > 0 else 0.4)))
             put(i, j, (cc[0] * (1 - 0.4 * cf), cc[1] * (1 - 0.12 * cf), min(255, cc[2] * (1 + 0.35 * cf))) if cf > 0.05 else cc)
+    phase[0] = 'detail'
     F = FS
     ey = GY + jround(2 * F)
 
@@ -364,6 +384,7 @@ def build():
             put(px, py, IRON[2 if a > 3.14 else 4])
             a += 0.25
     chain(262, 58); chain(270, 36); chain(418, 46); chain(470, 72)
+    phase[0] = 'floor'
     vpY = HZ - 300
     rows = [HZ, HZ + 8, HZ + 20, HZ + 37, HZ + 60, HZ + 92, 999]
     for j in range(HZ, hgt):
@@ -374,28 +395,38 @@ def build():
         roff = hash_(r, 17) * 50
         for i in range(w):
             val = 0.02
-            for L in LIGHTS:
+            for li, L in enumerate(LIGHTS):
                 dx = L["x"] - i
                 dy = (L["y"] + 14 - j) * 2.1
-                val += L["i"] * 0.5 / (1 + (dx * dx + dy * dy) / (L["r"] * L["r"] * 0.9))
+                c_ = L["i"] * 0.5 / (1 + (dx * dx + dy * dy) / (L["r"] * L["r"] * 0.9))
+                val += c_
+                if rec is not None:
+                    rec['k'][j, i, li] = c_
+            v_base = val
+            mf, af = 1.0, 0.0
             vx = GX + (i - GX) * sc + roff
             cell = math.floor(vx / 52)
             inx = jmod(jmod(vx, 52) + 52, 52)
-            val *= 0.72 + (fbm(i * 0.12, j * 0.3) - 0.5) * 0.55 + (hash_(cell, r + 40) - 0.5) * 0.25
+            pm = 0.72 + (fbm(i * 0.12, j * 0.3) - 0.5) * 0.55 + (hash_(cell, r + 40) - 0.5) * 0.25
+            val *= pm; mf *= pm
             if j == rows[r] and r > 0:
-                val *= 0.2
+                val *= 0.2; mf *= 0.2
             elif j == rows[r] + 1 and r > 0:
-                val *= 1.25
+                val *= 1.25; mf *= 1.25
             if inx < sc * 1.2:
-                val *= 0.25
+                val *= 0.25; mf *= 0.25
             elif inx < sc * 2.4:
-                val *= 1.2
+                val *= 1.2; mf *= 1.2
             if j == HZ:
-                val = val * 1.5 + 0.06
+                val = val * 1.5 + 0.06; mf *= 1.5; af = 0.06
             sh = math.hypot((i - BX) / (ORX + 12), (j - BY - 22) / (ORY + 10))
             if sh < 1:
-                val *= 0.3 + 0.6 * sh * sh
-            val *= vign(i, j)
+                val *= 0.3 + 0.6 * sh * sh; mf *= 0.3 + 0.6 * sh * sh; af *= 0.3 + 0.6 * sh * sh
+            vg_ = vign(i, j)
+            val *= vg_; mf *= vg_; af *= vg_
+            if rec is not None:
+                rec['pre0'][j, i] = 0.02; rec['mult'][j, i] = mf; rec['add'][j, i] = af; rec['g'][j, i] = 1.0
+                rec['speck'][j, i] = (1 if hash_(i, j + 5) > 0.985 else 0) - (1 if hash_(i + 3, j) > 0.97 else 0)
             put(i, j, rgb(i, j, val, 0))
     flat = D.reshape(-1)
 
@@ -409,6 +440,8 @@ def build():
             o = (jround(py) * w + jround(px)) * 4
             if 0 < o < flat.size:
                 scale_at(o, 0.4); scale_at(o + 1, 0.4); scale_at(o + 2, 0.4)
+                if rec is not None:
+                    rec['crack'][o // 4 // w, (o // 4) % w] += 1
             px += 1
             py += (hash_(q, k + 7) - 0.5) * 1.3
             q += 1
@@ -420,6 +453,9 @@ def build():
                     o = ((sy + j) * w + sx + i) * 4
                     if 0 <= o < flat.size:
                         flat[o] = cb(flat[o] * 0.7 + 14); flat[o + 1] = cb(flat[o + 1] * 0.35); flat[o + 2] = cb(flat[o + 2] * 0.4)
+                        if rec is not None:
+                            rec['stain'][o // 4 // w, (o // 4) % w] += 1
+    phase[0] = 'detail'
     stain(300, 160, 18, 5, 1); stain(410, 172, 10, 3, 2); stain(280, 262, 24, 6, 3); stain(398, 258, 14, 4, 4); stain(215, 190, 9, 3, 5)
 
     def inE(i, j, cx, cy, rx, ry):
@@ -524,6 +560,8 @@ def build():
             if q < 0.6:
                 continue
             al = (60 if q > 1.8 else 38 if q > 1.1 else 20) / 255
+            if rec is not None:
+                rec['shaft'][j, i] = (70 * al, 84 * al, 110 * al)
             D[j, i, 0] = cb(D[j, i, 0] + 70 * al); D[j, i, 1] = cb(D[j, i, 1] + 84 * al); D[j, i, 2] = cb(D[j, i, 2] + 110 * al)
     return D.astype(np.uint8)
 

@@ -20,6 +20,9 @@ var add_fx: Node2D
 var add_big: Node2D
 var grain: Node2D
 var grain_tex: Array = []
+var lit: ColorRect              # the live-lit chapel, or null (then the captured painting stands)
+var _w := Vector4.ONE
+var _w4 := 1.0
 var cand: Array = []           # the web's candles: [x, base y, height, width] in chapel px
 var blood: ColorRect
 var breath: ColorRect
@@ -52,6 +55,13 @@ func _ready() -> void:
 	mir.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	mir.draw.connect(_draw_mirror.bind(mir, bg.texture))
 	add_child(mir)
+	# the chapel lit live (shaders/title_chapel.gdshader): the candles' flicker and the wind truly light the god's face
+	lit = _lit_chapel()
+	if lit:
+		bg.visible = false
+		mir.visible = false
+		add_child(lit)
+		move_child(lit, 0)
 	var meta = JSON.parse_string(FileAccess.get_file_as_string("res://art/ui/title_bowl.json"))
 	var pal := PackedVector3Array()
 	if meta is Dictionary:
@@ -166,6 +176,7 @@ func _process(dt: float) -> void:
 		m["x"] += (m["vx"] + sin(t * 1.3 + m["y"] * 0.1) * (3.0 if m["ember"] else 1.5) + Gust.dir() * Gust.k() * (26.0 if m["ember"] else 12.0)) * dt
 		m["y"] += m["vy"] * dt
 	motes = motes.filter(func(m): return m["t"] < m["life"] and m["y"] < 272.0 and m["y"] > -4.0)
+	_light_w()
 	fx.queue_redraw()
 	fx_back.queue_redraw()
 	add_fx.queue_redraw()
@@ -178,6 +189,59 @@ func _snap(p: Vector2) -> Vector2:
 func _card_xform(c: Dictionary) -> Transform2D:
 	var L: float = c["lift"]
 	return Transform2D(lerpf(c["rot"], 0.0, L), Vector2(CW * K / 54.0, CH * K * lerpf(0.55, 1.0, L) / 84.0), 0.0, c["at"] + Vector2(0, -70.0 * L))
+
+const STONE := ["#030204", "#070609", "#0c0a0d", "#121014", "#1a1619", "#231d1d", "#2e2521", "#3c3027", "#4e3d2e", "#654e37", "#826443", "#a27f52"]
+
+func _layer(name: String) -> Texture2D:
+	var raw := FileAccess.get_file_as_bytes("res://art/ui/title_light/%s.bin.gz" % name)
+	if raw.is_empty():
+		return null
+	var data := raw.decompress(480 * 270 * 16, FileAccess.COMPRESSION_GZIP)
+	if data.size() != 480 * 270 * 16:
+		return null
+	return ImageTexture.create_from_image(Image.create_from_data(480, 270, false, Image.FORMAT_RGBAF, data))
+
+func _lit_chapel() -> ColorRect:
+	var mats := {}
+	for n in ["kA", "kB", "kC", "kD", "kE"]:
+		var t := _layer(n)
+		if t == null:
+			return null
+		mats[n] = t
+	var ov := Image.load_from_file(ProjectSettings.globalize_path("res://art/ui/title_light/over.png"))
+	if ov == null:
+		return null
+	var r := ColorRect.new()
+	r.position = Vector2(-SHIFT * K, 0)
+	r.size = Vector2(1920, 1080)
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/title_chapel.gdshader")
+	for n in mats:
+		m.set_shader_parameter(n, mats[n])
+	m.set_shader_parameter("over", ImageTexture.create_from_image(ov))
+	var pal := PackedVector3Array()
+	for c in STONE:
+		var cc := Color(c)
+		pal.append(Vector3(cc.r, cc.g, cc.b))
+	m.set_shader_parameter("stone", pal)
+	r.material = m
+	return r
+
+## each light's strength this frame: the clusters breathe with their candles and sink in a gust, the blood's glow
+## swells slowly, the front stubs flicker on their own
+func _light_w() -> void:
+	if lit == null:
+		return
+	var t: float = T.t
+	var m: ShaderMaterial = lit.material
+	# eased, so the stone breathes with the flames rather than sparkling with every flicker
+	var want := Vector4(0.9 + 0.2 * _fl(1), 0.9 + 0.2 * _fl(2), 1.0 + 0.08 * sin(t * 0.55), 0.85 + 0.3 * _fl(11))
+	var e := minf(1.0, get_process_delta_time() * 6.0)
+	_w = _w.lerp(want, e)
+	_w4 = lerpf(_w4, 0.85 + 0.3 * _fl(12), e)
+	m.set_shader_parameter("w03", _w)
+	m.set_shader_parameter("w4", _w4)
 
 ## the web's hash (b_core.js), so the grain falls where it fell there
 static func whash(x: int, y: int) -> float:
