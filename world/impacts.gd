@@ -179,6 +179,7 @@ func _ensure_sky() -> void:
 
 func _draw_sky() -> void:
 	_draw_souls(sky)
+	_draw_zap(sky)
 	_draw_ice(sky)
 	_draw_wisps(sky)
 	_draw_arcs(sky)
@@ -823,6 +824,107 @@ func _draw_ice(cv: CanvasItem) -> void:
 				cv.draw_rect(Rect2(((q + side * j * PX) / PX).floor() * PX, Vector2(PX, PX)), c)
 		cv.draw_rect(Rect2(((sh["p"] + d * PX) / PX).floor() * PX, Vector2(PX, PX)), Color(1, 1, 1))
 
+# ------------------------------------------------------------------ lightning, more forms
+## ball lightning: a writhing orb of charge drifting low, its surface crawling with tiny arcs, now and then lashing an
+## arc down to the ground (a spark where it lands); it hums, flickers and finally bursts
+var balls: Array = []      # {p (screen), v, t, secs, next}
+## a charged ground: static crawling over a patch of earth, short arcs leaping between points, blue-white flickers
+var fields: Array = []     # {c (screen), R, t, secs}
+## a spark nova: a ring of short arcs bursting outward, each forking as it goes
+var snovas: Array = []     # {c, t, secs, rays}
+
+func ball_lightning(p: Vector2, secs: float = 5.0) -> void:
+	_ensure_sky()
+	balls.append({"p": Iso.to_screen(p) + Vector2(0, -60), "v": Vector2(randf_range(-30, 30), 0), "t": 0.0, "secs": secs, "next": 0.2, "lash": []})
+
+func charged_ground(p: Vector2, r: float = 1.8, secs: float = 6.0) -> void:
+	_ensure_sky()
+	fields.append({"c": Iso.to_screen(p), "R": r * Iso.HX, "t": 0.0, "secs": secs, "arcs": []})
+
+func spark_nova(p: Vector2, r: float = 2.6) -> void:
+	_ensure_sky()
+	var c := Iso.to_screen(p) + Vector2(0, -20)
+	var rays: Array = []
+	for i in 14:
+		var a := i / 14.0 * TAU + randf_range(-0.15, 0.15)
+		rays.append(_jag(c, c + Vector2(cos(a), sin(a) * 0.55) * r * Iso.HX * randf_range(0.8, 1.1), 12.0))
+	snovas.append({"c": c, "t": 0.0, "secs": 0.45, "rays": rays})
+	_flash(p, Color(0.7, 0.8, 1.0), 0.3, 90.0)
+
+func _tick_zap(dt: float) -> void:
+	for b in balls:
+		b["t"] += dt
+		b["v"] = b["v"].lerp(Vector2(sin(b["t"] * 1.3) * 40.0 + Gust.dir() * Gust.k() * 30.0, cos(b["t"] * 1.7) * 14.0), minf(1.0, dt * 2.0))
+		b["p"] += b["v"] * dt
+		b["next"] -= dt
+		if b["next"] <= 0.0:
+			b["next"] = randf_range(0.15, 0.6)
+			var gnd: Vector2 = b["p"] + Vector2(randf_range(-50, 50), 60 + randf_range(-6, 10))
+			b["lash"] = [_jag(b["p"], gnd, 9.0), 0.12]
+			for k in 3:
+				_phos.append({"q": gnd + Vector2(randf_range(-6, 6), randf_range(-3, 3)), "t": 0.0, "life": randf_range(0.2, 0.5), "v": Vector2(randf_range(-30, 30), -randf_range(20, 60)), "ph": randf() * TAU, "glint": true})
+		if b["lash"].size() == 2:
+			b["lash"][1] -= dt
+		if b["t"] >= b["secs"]:
+			b["done"] = true
+			spark_nova(Iso.to_tile(b["p"] + Vector2(0, 60)), 1.6)
+	balls = balls.filter(func(b): return not b.get("done", false))
+	for f in fields:
+		f["t"] += dt
+		if randf() < dt * 40.0:
+			var a := randf() * TAU
+			var d: float = randf() * f["R"]
+			var q: Vector2 = f["c"] + Vector2(cos(a) * d, sin(a) * d * 0.5)
+			var a2 := a + randf_range(-1.5, 1.5)
+			f["arcs"].append([_jag(q, q + Vector2(cos(a2), sin(a2) * 0.5) * randf_range(16, 44), 6.0), 0.1])
+		for ar in f["arcs"]:
+			ar[1] -= dt
+		f["arcs"] = f["arcs"].filter(func(ar): return ar[1] > 0.0)
+	fields = fields.filter(func(f): return f["t"] < f["secs"])
+	for n in snovas:
+		n["t"] += dt
+	snovas = snovas.filter(func(n): return n["t"] < n["secs"])
+
+func _draw_zap(cv: CanvasItem) -> void:
+	var now := Time.get_ticks_msec() / 1000.0
+	for f in fields:
+		var fade: float = 1.0 - smoothstep(f["secs"] - 1.0, f["secs"], f["t"])
+		for k in 70:                                          # static: a sparse crawl of pale points over the patch
+			var a := fmod(k * 2.39996 + now * (0.5 + k % 3), TAU)
+			var d: float = f["R"] * sqrt(fmod(k * 0.618, 1.0))
+			if sin(now * 30.0 + k * 3.1) > 0.2:
+				var q: Vector2 = f["c"] + Vector2(cos(a) * d, sin(a) * d * 0.5)
+				cv.draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), Color(0.75, 0.86, 1.0, 0.85 * fade))
+		for ar in f["arcs"]:
+			_px_path(ar[0], Color(0.5, 0.65, 1.0, 0.45 * fade), 2, cv)
+			_px_path(ar[0], Color(1, 1, 1, fade), 1, cv)
+	for b in balls:
+		var c: Vector2 = (b["p"] / PX).floor() * PX
+		var fl := 0.7 + 0.3 * sin(now * 40.0 + b["t"])
+		for ring in [[10, 0.08], [7, 0.16], [4, 0.35], [2, 0.7]]:
+			var R: int = ring[0]
+			for yy in range(-R, R + 1):
+				for xx in range(-R, R + 1):
+					if xx * xx + yy * yy <= R * R:
+						cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.6, 0.75, 1.0, ring[1] * fl))
+		for k in 4:                                           # its surface crawls with tiny arcs
+			var a := now * (3.0 + k) + k * 1.7
+			var e1 := c + Vector2(cos(a), sin(a)) * 3.0 * PX
+			var e2 := c + Vector2(cos(a + 1.2), sin(a + 1.2)) * 5.0 * PX
+			_px_path(_jag(e1, e2, 5.0), Color(0.9, 0.95, 1.0, 0.9), 1, cv)
+		cv.draw_rect(Rect2(c - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(1, 1, 1))
+		if b["lash"].size() == 2 and b["lash"][1] > 0.0:
+			_px_path(b["lash"][0], Color(0.5, 0.65, 1.0, 0.5), 3, cv)
+			_px_path(b["lash"][0], Color(1, 1, 1, 1), 1, cv)
+	for n in snovas:
+		var u: float = n["t"] / n["secs"]
+		for ray in n["rays"]:
+			var m := int(ray.size() * minf(1.0, u * 2.5))
+			var part: Array = ray.slice(int(ray.size() * maxf(0.0, u * 2.0 - 1.0)), max(2, m))
+			if part.size() >= 2:
+				_px_path(part, Color(0.5, 0.65, 1.0, 0.5 * (1.0 - u)), 3, cv)
+				_px_path(part, Color(1, 1, 1, 1.0 - u * 0.6), 1, cv)
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -918,6 +1020,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_zap(dt)
 	_tick_ice(dt)
 	_tick_wisps(dt)
 	_tick_breaths(dt)
