@@ -286,3 +286,60 @@ emaciation (temporal hollowing, buccal fat loss, zygomatic prominence).
    the nasolabial folds from the wings past the portal's corners.
 3. Stains running down from the brow, the eye's rim and the lips; lichen in rosettes on up-facing planes only.
 4. The hand: three segments in proportion, knuckles as knots.
+
+## Round 6: depth, and how things sit in it (2026-10-06; Derek: "depth is a valuable lesson then, and how things interact with depth")
+
+The ghost-flame first looked pasted on: a light drawn over a surface rather than inside it. What put it inside:
+- **Occlusion.** Whatever is in front hides what is behind. The flame's root went down behind the socket's lower rim,
+  so it climbs out of the dark instead of sitting on the face. A thing in a hole is half hidden by the hole's lip.
+- **Light from within.** A light in a cavity lights the cavity's walls, and most the wall that faces it (the upper
+  wall, lit from below). The depth behind the light stays dark. Light thrown upward onto the underside of a ledge
+  is the strongest single sign of "inside and below".
+- **Shadowing by form.** What the rim keeps the light off (the cheek under the socket) stays dark: the light obeys
+  the same geometry as everything else.
+- **Transparency in steps.** Thin parts of a glow let the surface show through; only the core is opaque.
+- **The same holds everywhere:** grass in front of a wall's foot, the water's line on stone, a step meeting a
+  doorway, a reflection that breaks with distance. Depth is told by overlap, by contact (dark where things meet), by
+  light that respects the forms, and by atmosphere (mist thicker further off and low down).
+
+## Round 7: building a head in layers (bone, muscle, skin)
+
+Sculptors build an écorché from the inside: the skull, then the muscles laid on it, then fat and skin over all.
+Each layer decides what the next can do. The face's surface is the skin's envelope over everything beneath.
+
+### Bone (the skull)
+- The cranium's dome, and the face hung under its front: the frontal bone with its brow ridge; the orbits (deep
+  rounded-square holes, the upper rim sharp and overhanging); the nasal bones (only the upper third of the nose; the
+  rest is cartilage) and the pear-shaped nasal aperture beneath them; the zygoma (cheekbone) with its arch running
+  back to the ear; the maxilla carrying the upper teeth; the mandible, a U with its ramus rising to the ear, its angle,
+  its body and the chin's mental protuberance. The teeth sit in two arches: the "muzzle" is their curve.
+
+### Muscle (laid on the bone)
+- **Temporalis:** a fan filling the temple from the skull's side down under the arch to the jaw. Starved, it
+  wastes: the temple sinks and the arch stands out.
+- **Masseter:** a thick block from the arch down to the jaw's angle; it squares the lower face. Wasted, the angle
+  shows as bone.
+- **Frontalis:** a thin sheet on the forehead (horizontal folds when raised).
+- **Orbicularis oculi:** a flat ring round the eye, the lids its inner part; it makes the soft lower rim and the
+  crow's feet.
+- **Zygomaticus major and minor:** bands from the cheekbone down to the mouth's corner: the cheek's front ridge.
+- **Buccinator:** deep in the cheek between the jaws, under the buccal fat; when the fat goes, the cheek falls in
+  onto it.
+- **Orbicularis oris:** the ring of the lips, standing on the teeth's curve.
+
+### Fat and skin
+- Fat pads fill the hollows between muscles: the temples, under the cheekbones (buccal), round the eyes. Skin drapes
+  over all of it, softening every edge by about its own thickness.
+- **Starved:** the fat goes first, so the skin falls straight onto muscle and bone; the muscles waste after. The
+  surface then follows the skull nearly everywhere, bridging the hollows taut: temple sunk, arch and orbital rims
+  sharp, cheeks fallen in between the arch and the jaw, the teeth's curve showing through the lips, the jaw's angle
+  and the cords of the neck stark.
+
+### How I will build heads from now on
+1. A skull height field from its parts (cranium, brow, orbits, nasal aperture, zygoma and arch, maxilla, mandible,
+   teeth).
+2. Muscles as soft volumes on the skull (temporalis, masseter, frontalis, orbicularis oculi and oris, zygomatici,
+   buccinator), each a shape following its origin and insertion.
+3. Fat pads in the hollows, scaled by how fed the creature is (a Famine: nearly none).
+4. Skin: an envelope over the maximum of those layers, smoothed by its thickness and drawn taut over hollows.
+5. Then the material (stone, flesh), weathering and light.
