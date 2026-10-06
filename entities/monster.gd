@@ -416,7 +416,20 @@ func _draw_ghost_glow() -> void:
 			# a soft halo: every cell, its light falling off toward the rim in four steps (pixel rings, no screen door)
 			var lv := floorf(dens * 4.0) / 4.0
 			if lv > 0.0:
-				_ghost_glow.draw_rect(Rect2(c + Vector2(xx, yy) - Vector2(2, 2), Vector2(4, 4)), Color(0.6, 0.9, 1.0, 0.07 + 0.16 * lv))
+				_ghost_glow.draw_rect(Rect2(c + Vector2(xx, yy) - Vector2(2, 2), Vector2(4, 4)), Color(0.42, 0.8, 1.0, 0.08 + 0.26 * lv))
+	# soul-motes rising through the halo (Diablo II's bone spells): pale cells drifting up and winking out
+	var now := Time.get_ticks_msec() / 1000.0
+	var sd := float(get_instance_id() % 97)
+	for i in int(4 + k * 8):
+		var ph := fmod(now * (0.35 + fmod(i * 0.137, 0.3)) + i * 0.618 + sd, 1.0)
+		var mx := (fmod(i * 0.381 + sd * 0.1, 1.0) * 2.0 - 1.0) * rx * 0.8 + sin(now * 2.0 + i) * 4.0
+		var my := ry * 0.8 - ph * ry * 1.9
+		var q := (c + Vector2(mx, my) - Vector2(2, 2)).snapped(Vector2(4, 4))
+		var al := sin(PI * ph) * k
+		_ghost_glow.draw_rect(Rect2(q, Vector2(4, 4)), Color(0.85, 0.98, 1.0, 0.85 * al))
+		if al > 0.7 and i % 3 == 0:
+			for o in [Vector2(-4, 0), Vector2(4, 0), Vector2(0, -4), Vector2(0, 4)]:
+				_ghost_glow.draw_rect(Rect2(q + o, Vector2(4, 4)), Color(0.6, 0.9, 1.0, 0.35 * al))
 
 ## bone spurs through the outline: pale spikes from the body's edges, longer as the growth spreads
 func _draw_spurs() -> void:
