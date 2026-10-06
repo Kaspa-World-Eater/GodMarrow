@@ -21,3 +21,4 @@ docs/concepts/**/*.glb
 
 # Cursemark (Derek owns it; local only, NEVER commit or publish): extracted by the GodMarrow-Cursemark fork tools
 /cursemark/
+tools/art_study/private/
