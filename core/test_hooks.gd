@@ -85,6 +85,8 @@ static func run(g) -> void:
 		_radfx(g)                        # --radfx: radiance: the glare, lances, a turning halo, gold leaf, erased creatures
 	if a.has("voidfx"):
 		_voidfx(g)                       # --voidfx: absence: a hush, black sand, a gate, a pinch, creatures unmade
+	if a.has("meleefx"):
+		_meleefx(g)                      # --meleefx: the pilgrim's string and a charged heavy on creatures at sword's length
 	if a.has("magic"):
 		_magic(g)                        # --magic: phosphor wisps flung at points round the pilgrim
 	if a.has("acid"):
@@ -706,3 +708,29 @@ static func _voidfx(g) -> void:
 				Combat.hit_monster(m, 0.5, "void", c, {"dot": true})
 		n += 1
 		await tree.create_timer(0.6).timeout
+
+
+static func _meleefx(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	var h = g.hero
+	var c: Vector2 = h.tp
+	var ms: Array = []
+	for o in [Vector2(1.1, 0.3), Vector2(0.4, 1.2)]:
+		var m = Brain.spawn(g.zone, "hollow", c + o, 6, "normal", "melee", 1e6)
+		if m:
+			m.speed = 0.0
+			m.dmg = Vector2.ZERO
+			ms.append(m)
+	var k := 0
+	while is_instance_valid(g) and g.hero:
+		var m = ms[(k / 4) % ms.size()]
+		if g.hero.act == "" and is_instance_valid(m):
+			if k % 4 == 3:
+				g.hero.target = m
+				g.hero.charge = 1.0
+				g.hero._release_heavy(1.0)
+			else:
+				g.hero._start_attack(m, m.tp)
+			k += 1
+		await tree.create_timer(0.15).timeout

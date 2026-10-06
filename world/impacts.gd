@@ -1251,7 +1251,7 @@ func slash(at: Vector2, dir: Vector2, kind: int = 0, heavy: bool = false, reach:
 	var base := dir.angle()
 	var span := (3.4 if heavy else 2.8)
 	var sgn := 1.0 if kind != 1 else -1.0
-	slashes.append({"at": at, "dir": dir.normalized(), "c": Iso.to_screen(at) + Vector2(0, -38), "R": reach * (1.15 if heavy else 0.95),
+	slashes.append({"at": at, "dir": dir.normalized(), "c": Iso.to_screen(at) + Vector2(0, -78), "R": reach * (1.15 if heavy else 0.95),
 		"a0": base - span * 0.5 * sgn, "a1": base + span * 0.5 * sgn, "t": 0.0, "kind": kind, "heavy": heavy, "struck": false})
 
 func cut(p: Vector2, dir: Vector2, heavy: bool = false) -> void:
