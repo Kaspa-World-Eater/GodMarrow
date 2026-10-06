@@ -61,11 +61,12 @@ GRASS, DIRT, FLAGS, STONE, GRAVE, MUD, DRY = 0, 1, 2, 3, 4, 5, 6
 MAT_RAMP = {GRASS: "grass", DIRT: "dirt", FLAGS: "flags", STONE: "stone", GRAVE: "stone", MUD: "mud", DRY: "dry"}
 
 # ------------------------------------------------------------------ the world
-N, R = 30, 12                  # tiles, cells per tile
+N, R = 44, 12                  # tiles, cells per tile
+OFF = 12.0                     # the world runs from -OFF, so it fills the frame's corners
 G = N * R
 KZ = 8.0                       # logical px per tile of height; a tile is 16 x 8 logical px
 gy, gx = np.mgrid[0:G, 0:G]
-WX, WY = (gx + 0.5) / R, (gy + 0.5) / R
+WX, WY = (gx + 0.5) / R - OFF, (gy + 0.5) / R - OFF
 Hm = np.zeros((G, G))
 Mat = np.full((G, G), GRASS)
 Tag = np.zeros((G, G), int)    # which prop a cell belongs to (pillars: 10+i, graves: 20+i, wall: 1)
@@ -79,7 +80,7 @@ on_path = pd < 1.25 + (fbm(WX * 0.7, WY * 0.7) - 0.5) * 0.5
 Mat[(pd < 2.0 + fbm(WX * 0.5 + 3, WY * 0.5) * 0.8) & ~on_path] = DIRT
 Mat[(fbm(WX * 0.35 + 7, WY * 0.35) > 0.62) & (Mat == GRASS)] = DRY
 # flagstones on the path: jittered voronoi, each stone a little proud, the joints sunk
-pts = np.array([(i + RNG.random() * 0.9, j + RNG.random() * 0.8) for i in np.arange(0, N, 1.25) for j in np.arange(0, N, 1.0)])
+pts = np.array([(i + RNG.random() * 0.9, j + RNG.random() * 0.8) for i in np.arange(-OFF, N - OFF, 1.25) for j in np.arange(-OFF, N - OFF, 1.0)])
 from scipy.spatial import cKDTree  # noqa: E402
 tree = cKDTree(pts)
 dd, ii = tree.query(np.stack([WX.ravel(), WY.ravel()], 1), k=2)
@@ -88,7 +89,16 @@ sid = ii[:, 0].reshape(G, G)
 missing = (_P[sid % 1024, (sid * 7) % 1024] < 0.12)                  # a few stones gone, earth showing
 Mat[on_path & ~missing] = FLAGS
 Mat[on_path & missing] = DIRT
-Hm += np.where(on_path & ~missing, 0.05 * np.clip(gap / 0.12, 0, 1), 0.0)
+Hm += np.where(on_path & ~missing, 0.07 * np.clip(gap / 0.1, 0, 1), 0.0)
+joint = on_path & ~missing & (gap < 0.1)
+Mat[joint] = DIRT
+# stones half-sunk in the grass
+for k in range(26):
+    cx, cy = RNG.random() * 24 - 1, RNG.random() * 24 - 2
+    rr_ = 0.12 + RNG.random() * 0.18
+    m = (np.hypot(WX - cx, (WY - cy) * 1.2) < rr_) & (Mat == GRASS)
+    Hm[m] += 0.08 + RNG.random() * 0.06
+    Mat[m] = FLAGS
 # mud hollow and puddle
 md = np.hypot(WX - 15.0, (WY - 15.6) * 1.3)
 Mat[md < 1.6 + (fbm(WX, WY) - 0.5) * 0.6] = MUD
@@ -163,9 +173,12 @@ grave(7.0, 16.2, 0.8, 1.5, 22)
 # a brazier on a short drum, its fire the warm light
 BRZ = (12.6, 12.4)
 d = np.hypot(WX - BRZ[0], WY - BRZ[1])
-Hm[d < 0.36] = np.maximum(Hm[d < 0.36], 1.05)
-Mat[d < 0.32] = STONE
-Tag[d < 0.32] = 30
+Hm[d < 0.3] = np.maximum(Hm[d < 0.3], 0.95)
+bowl = d < 0.5
+Hm[bowl] = np.maximum(Hm[bowl], np.where(d[bowl] > 0.38, 1.22, 1.08))   # a rim, the coals sunk inside
+Mat[d < 0.5] = STONE
+Tag[d < 0.5] = 30
+coals = d < 0.38
 LAMP = np.array([BRZ[0], BRZ[1], 1.55])
 
 # a softened copy for normals
@@ -180,10 +193,10 @@ GY, GX = np.gradient(Hb, 1.0 / R)
 
 
 def H_at(x, y):
-    ix = np.clip((x * R).astype(int), 0, G - 1)
-    iy = np.clip((y * R).astype(int), 0, G - 1)
+    ix = np.clip(((x + OFF) * R).astype(int), 0, G - 1)
+    iy = np.clip(((y + OFF) * R).astype(int), 0, G - 1)
     out = Hm[iy, ix]
-    return np.where((x < 0) | (y < 0) | (x >= N) | (y >= N), -9.0, out)
+    return np.where((x < -OFF) | (y < -OFF) | (x >= N - OFF) | (y >= N - OFF), -9.0, out)
 
 
 # ------------------------------------------------------------------ the camera: iso ray-cast
@@ -194,6 +207,8 @@ SY, SX = np.mgrid[0:H, 0:W].astype(float)
 sx, sy = SX + 0.5 - CX0, SY + 0.5 - CY0
 DZ = 1.0 / 20
 ZMAX = 7.0
+def cell(x, y):
+    return min(G - 1, max(0, int((y + OFF) * R))), min(G - 1, max(0, int((x + OFF) * R)))
 hit = np.zeros((H, W), bool)
 hz = np.zeros((H, W))
 hx = np.zeros((H, W))
@@ -206,8 +221,8 @@ for z in np.arange(ZMAX, -0.6, -DZ):
     new = (~hit) & (h >= z)
     hit |= new
     hz[new], hx[new], hy[new] = z, x[new], y[new]
-ix = np.clip((hx * R).astype(int), 0, G - 1)
-iy = np.clip((hy * R).astype(int), 0, G - 1)
+ix = np.clip(((hx + OFF) * R).astype(int), 0, G - 1)
+iy = np.clip(((hy + OFF) * R).astype(int), 0, G - 1)
 hh = Hm[iy, ix]
 top = (hh - hz) < DZ * 1.6
 hz = np.where(top, hh, hz)
@@ -272,7 +287,9 @@ alb += tooth
 # grass and dry: wind strokes, darker clumps
 gm = (mat == GRASS) | (mat == DRY)
 st = vn((hx * 0.8 + hy * 0.4) * 3.0, (hy * 0.8 - hx * 0.4) * 14.0)
-alb += np.where(gm, (st - 0.5) * 0.2 + (fbm(hx * 0.8, hy * 0.8) - 0.5) * 0.22 - 0.05, 0)
+alb += np.where(gm, (st - 0.5) * 0.2 + (fbm(hx * 0.8, hy * 0.8) - 0.5) * 0.26 - 0.05, 0)
+clump = gm & (vn(hx * 3.5 + 11, hy * 3.5) > 0.7)
+alb += np.where(clump, -0.12, 0)                                        # darker clumps of thicker grass
 # dirt: long strokes, pebbles (a lit top and a pooled dark under)
 dm = (mat == DIRT) | (mat == MUD)
 alb += np.where(dm, (vn(hx * 2.0, hy * 9.0) - 0.5) * 0.18, 0)
@@ -283,8 +300,7 @@ fm = (mat == FLAGS) & top
 gp = gap[iy, ix]
 stone_tone = (_P[sid[iy, ix] % 1024, 3] - 0.5) * 0.22
 alb += np.where(fm, stone_tone + (vn(hx * 1.5, hy * 1.5) - 0.5) * 0.08, 0)
-alb += np.where(fm & (gp < 0.09), -0.5, 0)
-alb += np.where(fm & (gp >= 0.09) & (gp < 0.16) & (np.roll(gp, -1, 0) < gp), 0.14, 0)   # each stone's lit edge
+alb += np.where(fm & (gp < 0.17), 0.1, 0)                               # each stone's worn, lit rim
 # wall faces: courses of blocks, staggered; mortar sunk; each block's top edge lit and corners chipped
 wm = (tag == 1) & ~top
 u_face = np.where(np.abs(nrm[..., 1]) > np.abs(nrm[..., 0]), hx, hy)
@@ -297,6 +313,12 @@ alb += np.where(wm & ((cy_in < 0.09) | (bx < 0.05)), -0.5, 0)               # mo
 alb += np.where(wm & (cy_in > 0.86), 0.18, 0)                             # the block's lit top edge
 chip = wm & (cy_in > 0.78) & (bx < 0.2) & (vn(blk_id * 3.0, 1.0) > 0.5)
 alb += np.where(chip, -0.3, 0)
+for (cx, cy, r, tg) in pillars:
+    m = (tag == tg) & ~top
+    ang = np.arctan2(hy - cy, hx - cx)
+    sv = np.sin(ang * 8)
+    alb[m & (sv > 0.35)] -= 0.16
+    alb[m & (sv > -0.05) & (sv <= 0.35)] += 0.1
 # rain-streaks down every stone face
 sm = ((mat == STONE) | (mat == GRAVE)) & ~top
 alb += np.where(sm, (vn(u_face * 6.0, hz * 0.8) - 0.5) * 0.14, 0)
@@ -318,7 +340,7 @@ for (cx, cy, w, h, tg) in graves:
         alb[m & letters] -= 0.35
 # moss: on stone tops and in the lower courses where water sits; in the path's joints
 moss = ((mat == STONE) | (mat == GRAVE)) & ((top & (fbm(hx * 2, hy * 2) > 0.56)) | (~top & (hz < 0.45) & (fbm(hx * 3, hz * 3 + hy) > 0.62)))
-moss |= fm & (gp < 0.1) & (fbm(hx * 2 + 4, hy * 2) > 0.5)
+moss |= (mat == DIRT) & on_path[iy, ix] & (fbm(hx * 2 + 4, hy * 2) > 0.45)       # moss in the joints
 moss_m = moss & (mat != GRASS)
 
 # the rim: a prop pixel whose neighbour up or to the left is much further back (the silhouette's lit edge)
@@ -331,7 +353,8 @@ rim = (propm & (behind_l | behind_u) & (ndl_m > 0.05)).astype(float)
 def shade(flick=1.0):
     stone = (mat == STONE) | (mat == GRAVE) | (mat == FLAGS)
     amb = 0.14 + 0.08 * nrm[..., 2] + stone * 0.06
-    I = amb * (1 - ao * 0.75) + ndl_m * np.where(stone, 1.0, 0.42) + ndl_w * 1.2 * flick
+    bounce = stone * (1 - np.abs(nrm[..., 2])) * np.clip(1.2 - hz * 0.25, 0.3, 1) * 0.14     # light thrown back up off the ground into shade
+    I = amb * (1 - ao * 0.75) + bounce + ndl_m * np.where(stone, 1.0, 0.42) + ndl_w * 1.2 * flick
     I = I + rim * 0.22                                               # the lit rim where a prop's edge meets what is behind
     v = I * 0.78 + alb + (bay - 0.5) * 0.035
     rgb = np.zeros((H, W, 3))
@@ -356,6 +379,10 @@ def shade(flick=1.0):
     wr = np.round(np.clip(wr, 0, 1) * 3) / 3
     tint = np.dstack([0.86 + wr * 0.34, 0.92 + wr * 0.02, 1.06 - wr * 0.3])
     rgb = np.clip(rgb * tint, 0, 1)
+    cm = coals[iy, ix] & top
+    glow = 0.5 + 0.5 * flick + (vn(hx * 9, hy * 9) - 0.5) * 0.6
+    cr = ramp("#2a0a06", "#6a1a08", "#b23a10", "#e87020", "#ffc060")
+    rgb[cm] = cr[np.clip((glow[cm] * 3.2).astype(int), 0, 4)]
     rgb[~hit] = hexc("#07070b")
     return rgb, v
 
@@ -366,9 +393,9 @@ def to_screen(x, y, z=0.0):
 
 
 tufts = []
-for k in range(1400):
-    x, y = RNG.random() * N, RNG.random() * N
-    ixx, iyy = int(x * R), int(y * R)
+for k in range(2200):
+    x, y = RNG.random() * 26 - 1, RNG.random() * 26 - 2
+    iyy, ixx = cell(x, y)
     mt = Mat[iyy, ixx]
     if mt not in (GRASS, DRY) or Tag[iyy, ixx] != 0:
         continue
@@ -380,7 +407,7 @@ for k in range(1400):
 
 def draw_tufts(rgb, v, sway):
     for (x, y, mt, near, r0) in tufts:
-        sxp, syp = to_screen(x, y, Hm[int(y * R), int(x * R)])
+        sxp, syp = to_screen(x, y, Hm[cell(x, y)])
         bxp, byp = int(sxp), int(syp)
         if not (0 <= bxp < W and 0 <= byp < H):
             continue
@@ -414,7 +441,7 @@ for k in range(16):
 def draw_ivy(rgb, sway):
     rp = RAMPS["moss"]
     for (x, y, r0) in ivy:
-        hcol = Hm[min(G - 1, int(y * R) - 1), min(G - 1, int(x * R) - 1)]
+        hcol = Hm[cell(x - 0.09, y - 0.09)]
         if hcol < 0.8 or fbm(np.array([x * 1.3]), np.array([y * 1.3]))[0] < 0.5:
             continue
         sxp, syp = to_screen(x, y, hcol)
@@ -453,13 +480,67 @@ def draw_fire(rgb, t):
                 rgb[fy + yy, fx + xx] = np.clip(p * 1.25 + np.array([0.08, 0.03, 0.0]), 0, 1)
 
 
+flowers = []
+for k in range(9):                                   # a few drifts of flowers, not a scatter
+    cx, cy = RNG.random() * 22, RNG.random() * 22 - 1
+    kind = RNG.random()
+    for j in range(14):
+        x, y = cx + RNG.normal(0, 0.55), cy + RNG.normal(0, 0.4)
+        if Mat[cell(x, y)] in (GRASS, DRY) and Tag[cell(x, y)] == 0:
+            flowers.append((x, y, kind))
+
+
+def draw_flowers(rgb, sway):
+    pale = [np.array(hexc("#cfc8b4")), np.array(hexc("#9e93b8")), np.array(hexc("#e8e2cf"))]
+    for (x, y, r0) in flowers:
+        sxp, syp = to_screen(x, y, Hm[cell(x, y)])
+        stem = 2 + int((x * 7.3 + y * 3.1) % 3)
+        px_ = int(sxp + sway * 0.6)
+        py_ = int(syp) - stem
+        if 0 <= px_ < W - 1 and 1 <= py_ < H and depth[py_, px_] < x + y + 0.15:
+            lit = 1.0 if ndl_m[min(H - 1, int(syp)), min(W - 1, int(sxp))] > 0.2 else 0.62
+            c = pale[int(r0 * 3)] * lit
+            rgb[py_, px_] = c                                   # the bloom: a lit head, its shaded side
+            rgb[py_, px_ + 1] = c * 0.62
+            for k in range(1, stem):
+                rgb[py_ + k, px_] = RAMPS["grass"][2]
+
+
+def draw_mist(rgb, t):
+    # a low ground mist lying in the hollows, drifting; cool, in stepped dithered layers, under the props' knees
+    n = fbm(hx * 0.45 + t * 0.06, hy * 0.45 - t * 0.03)
+    low = np.clip(1.0 - hz * 1.6, 0, 1) * np.clip(1.0 - (Hb[iy, ix] + 0.05) * 6.0, 0.25, 1)   # thickest in the hollows
+    dens = np.clip((n - 0.4) * 2.4, 0, 1) * low * hit
+    lv = dens + (bay - 0.5) * 0.08                       # solid layers; the dither only where one meets the next
+    step = np.where(lv > 0.55, 0.36, np.where(lv > 0.3, 0.22, np.where(lv > 0.12, 0.1, 0.0)))
+    mc = np.array(hexc("#5d6a86"))
+    a = step[..., None]
+    rgb[:] = rgb * (1 - a) + mc * a
+
+
+def draw_embers(rgb, t):
+    fx, fy = to_screen(BRZ[0], BRZ[1], 1.15)
+    er = np.random.default_rng(5)
+    for k in range(14):
+        ph = er.random()
+        life = 1.6 + er.random()
+        u = ((t + ph * life) % life) / life
+        x = fx + np.sin(u * 7 + k) * 3 * u + er.normal(0, 2)
+        y = fy - 6 - u * 40
+        if 0 <= int(x) < W and 0 <= int(y) < H and u < 0.9:
+            rgb[int(y), int(x)] = np.array(hexc("#ffd080")) if u < 0.3 else np.array(hexc("#d06020")) * (1.1 - u)
+
+
 def frame(t):
     flick = 0.85 + 0.15 * np.sin(t * 11) * np.sin(t * 4.3 + 1)
     sway = np.sin(t * 2.2) * 0.8 + 0.4
     rgb, v = shade(flick)
+    draw_mist(rgb, t)
     draw_tufts(rgb, v, sway)
+    draw_flowers(rgb, sway)
     draw_ivy(rgb, sway)
     draw_fire(rgb, t)
+    draw_embers(rgb, t)
     return rgb
 
 
