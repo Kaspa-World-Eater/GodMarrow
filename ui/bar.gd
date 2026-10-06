@@ -240,6 +240,38 @@ func _process(dt: float) -> void:
 	queue_redraw()
 	front.queue_redraw()
 
+## (Cursemark assets) Derek liked Cursemark's orbs: its red life orb and its orb laid on bone for Marrow (ui/cm_hud.gd
+## marrow_tex), filling the glass wells from the bottom. A slow swell of light breathes in them; the glass shader is hidden.
+func _cm_orbs() -> void:
+	var on: bool = Sfx.cm and hud != null and hud.hero != null and hud.hero.st != null and hud.hero.cls != "monk"
+	glass_l.visible = not on
+	glass_r.visible = not on
+	if not on:
+		return
+	var H = load("res://ui/cm_hud.gd")
+	var st: HeroStats = hud.hero.st
+	var lt: AtlasTexture = H.tex("hud/health_orb")
+	var lf := clampf(st.hp / maxf(1.0, st.life_max()), 0.0, 1.0)
+	var rf := clampf(st.res / maxf(1.0, st.res_max()), 0.0, 1.0)
+	var breathe := 1.0 + 0.05 * sin(t * 1.7)
+	if lt:
+		_orb_fill(lt.atlas, lt.region, ORB_L, lf, Color(breathe, breathe, breathe))
+	var mt: Texture2D = H.marrow_tex() if hud.hero.cls == "ossumancer" else lt
+	if mt:
+		var reg := Rect2(Vector2.ZERO, mt.get_size()) if mt is ImageTexture else lt.region
+		var tint := Color(breathe, breathe, breathe) if hud.hero.cls == "ossumancer" else Color(0.45 * breathe, 0.6 * breathe, 1.3)
+		_orb_fill(mt if mt is ImageTexture else lt.atlas, reg, ORB_R, rf, tint)
+
+func _orb_fill(tx: Texture2D, reg: Rect2, c: Vector2, f: float, mod: Color) -> void:
+	var D := ORB_RAD * 2.0 * U.S
+	var p := _L(c.x, c.y) - Vector2(D, D) * 0.5
+	draw_circle(_L(c.x, c.y), D * 0.5, Color(0.03, 0.02, 0.03))
+	if f <= 0.0:
+		return
+	var keep := f * reg.size.y
+	draw_texture_rect_region(tx, Rect2(p + Vector2(0, D * (1.0 - f)), Vector2(D, D * f)),
+		Rect2(reg.position.x, reg.position.y + reg.size.y - keep, reg.size.x, keep), mod)
+
 func _L(x: float, y: float) -> Vector2:
 	return Vector2(x, y - Y0) * U.S
 
@@ -250,6 +282,7 @@ func _draw() -> void:
 	var panel := U.tex("res://art/ui/h55_DP_panel.png")
 	if panel:
 		draw_texture_rect(panel, Rect2(0, 0, 1920, 216), false)
+	_cm_orbs()
 	var hous := U.tex("res://art/ui/h55_DP_housA.png")
 	if hous:
 		draw_texture_rect(hous, Rect2(_L(425, 216), Vector2(220, 216)), false)

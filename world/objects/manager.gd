@@ -52,23 +52,18 @@ func _sweep() -> void:
 				m.queue_free()
 
 func _proximity() -> void:
-	# waystones: stand in one and it learns you; at the centre the travel panel opens
+	# Derek 2026-10-05: "I hate how things open a screen when you walk by them." Walking by only marks a thing: the
+	# waystone learns your step and a passed lantern-stone is remembered, with a sound and one short line. Its panel, its
+	# inscription and the lantern's rest open only when you click it (manager_use.gd _interact).
 	if waystone:
 		var d := hero.tp.distance_to(waystone.tp)
 		if d < 3.2 and Q.kindle_wp(zone.id):
 			Sfx.play("shrine", 0.8, 0.8)
 			Bus.say.emit("%s knows your step." % zone.d.get("name", "The waystone"), 2.5)
-			if ui:
-				ui.speak(String(waystone.o.get("name", "Waystone")), String(waystone.o.get("vInscr", "")), -1.0, true)
-		if d < 1.1:
-			if not wp_near:
-				wp_near = true
-				_open_waystones()
-		elif d > 2.4:
+		if d > 2.4 and wp_near:
 			wp_near = false
 			if ui and ui.panel_open():
 				ui.close_panel()
-	# lantern-stones: remember every one passed within 6 yd; touch one to be restored
 	for e in things:
 		if e["type"] != "lantern":
 			continue
@@ -76,11 +71,12 @@ func _proximity() -> void:
 		var key := "%s:%d" % [zone.id, int(e["o"].get("idx", 0))]
 		if d < 6.0 and not Q.state()["lanterns"].has(key):
 			Q.state()["lanterns"][key] = {"zone": zone.id, "x": e["tp"].x, "y": e["tp"].y, "name": e["name"]}
-		if d < 1.3 and not lantern_latch.get(key, false):
-			lantern_latch[key] = true
-			_touch_lantern(e)
-		elif d > 3.0:
+			Sfx.play("kindle", 0.5, 1.1)
+			Bus.say.emit("%s: remembered." % e["name"], 2.2)
+		if d > 3.0 and lantern_latch.get(key, false):
 			lantern_latch[key] = false
+			if ui and ui.panel_open():
+				ui.close_panel()
 
 func _hover() -> void:
 	var h = _thing_at_mouse()

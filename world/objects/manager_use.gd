@@ -19,6 +19,7 @@ func _interact(e: Dictionary) -> void:
 		"altar":
 			_wake_altar(e)
 		"wp":
+			wp_near = true
 			_open_waystones()
 		"relic":
 			_take_relic(e)
@@ -96,6 +97,7 @@ func _talk(e: Dictionary) -> void:
 				_say("The Stranger", Q.bark(act_n, "stranger"))
 
 func _touch_lantern(e: Dictionary) -> void:
+	lantern_latch["%s:%d" % [zone.id, int(e["o"].get("idx", 0))]] = true
 	var st := hero.st
 	st.hp = st.life_max()
 	st.res = st.res_max()

@@ -122,7 +122,9 @@ func _panel(path: String) -> Control:
 var cm_hud: Control           # (Cursemark assets): Cursemark's HUD (ui/cm_hud.gd), in place of our bar
 
 func bind(h: Hero, z: Zone) -> void:
-	if Sfx.cm:
+	# Derek 2026-10-05: "The HUD looks bad.. our old one was better ... I like the mana orb and health orb": our bar
+	# stays, with Cursemark's two orbs in its wells (ui/bar.gd _cm_orbs). ui/cm_hud.gd is kept but no longer shown.
+	if false:
 		if cm_hud == null:
 			cm_hud = load("res://ui/cm_hud.gd").new(self)
 			root.add_child(cm_hud)
