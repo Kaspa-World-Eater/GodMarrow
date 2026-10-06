@@ -3,19 +3,12 @@ extends Node2D
 ## art/ui/title_bowl.png, 480x270 shown x4): the dead god's stone face sunk in the wall, weeping blood into a tarnished
 ## bronze bowl. A drop swells on the chin and falls; rings spread in the blood and bend the reflection of whoever looks
 ## down into it (shaders/title_blood.gdshader); the god's dying breath spills over the altar (title_breath.gdshader);
-## candles gutter, embers rise, ash falls. Round the bowl a spill of tarot cards, five face up: the orders.
+## candles gutter, embers rise, ash falls.
 ## The stage API (ui/title.gd): order_at(p), label_at(i), hint(); T is the title (mode, fig_hover, order_i, t).
 
 const K := 4.0
 const MARROW := Color("#c9974a")
-const CARDS := [
-	# order index (-1 = face down), emblem, at (chapel px), turn
-	[-1, "", Vector2(266, 180), 0.62], [-1, "", Vector2(416, 178), -0.5], [-1, "", Vector2(222, 232), 0.25],
-	[-1, "", Vector2(460, 232), -0.35], [-1, "", Vector2(308, 256), 0.95], [-1, "", Vector2(378, 257), -0.8],
-	[-1, "", Vector2(252, 212), 1.3],
-	[0, "drop", Vector2(240, 204), -0.4], [1, "mirror", Vector2(280, 240), -0.18], [2, "skull", Vector2(340, 249), 0.04],
-	[3, "breath", Vector2(400, 240), 0.2], [4, "bowl", Vector2(440, 204), 0.42],
-]
+const CARDS := []   # Derek 2026-10-05: "Remove the cards. They were never a good fit."
 const SHIFT := -100.0
 const CW := 21.0
 const CH := 33.0
@@ -24,6 +17,10 @@ var T
 var fx: Node2D
 var fx_back: Node2D
 var add_fx: Node2D
+var add_big: Node2D
+var grain: Node2D
+var grain_tex: Array = []
+var cand: Array = []           # the web's candles: [x, base y, height, width] in chapel px
 var blood: ColorRect
 var breath: ColorRect
 var cards: Array = []
@@ -37,7 +34,7 @@ var chin := Vector2.ZERO
 var _glow: Texture2D
 
 func hint() -> String:
-	return "Or turn a card beside the bowl."
+	return ""
 
 func _ready() -> void:
 	_glow = Lights.radial(128)
@@ -60,6 +57,7 @@ func _ready() -> void:
 	if meta is Dictionary:
 		for c in meta.get("candles", []):
 			candles.append(Vector2(float(c[0]), float(c[1]) - float(c[2])) * K + Vector2(2, -2))
+			cand.append(c)
 		var f: Array = meta.get("face", [340, 64, 125])
 		chin = Vector2(float(f[0]) - 1.0, float(f[2]))
 		for c in meta.get("blood", []):
@@ -89,16 +87,36 @@ func _ready() -> void:
 	for c in CARDS:
 		var tex: Texture2D = back if c[0] < 0 else load("res://art/reading/cards/%s.png" % c[1])
 		cards.append({"o": c[0], "at": (c[2] as Vector2) * K, "rot": c[3], "lift": 0.0, "tex": tex, "ph": randf() * TAU})
+	# the web's order (zp_title.js drawTitleScene): the big candle glows and the blood's red bounce, added; the flames;
+	# the small glows round each flame and the embers and ash, added; the film grain over all
+	add_big = Node2D.new()
+	add_big.material = _add_mat()
+	add_big.draw.connect(_draw_add_big)
+	add_child(add_big)
 	fx = Node2D.new()
 	fx.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	fx.draw.connect(_draw_fx)
 	add_child(fx)
 	add_fx = Node2D.new()
-	var mat := CanvasItemMaterial.new()
-	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
-	add_fx.material = mat
+	add_fx.material = _add_mat()
+	add_fx.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	add_fx.draw.connect(_draw_add)
 	add_child(add_fx)
+	grain = Node2D.new()
+	grain.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	grain.position.x = -SHIFT * K
+	grain.draw.connect(_draw_grain)
+	add_child(grain)
+	for f in 4:
+		var im := Image.create(480, 270, false, Image.FORMAT_RGBA8)
+		for i in 480 * 270:
+			var r := whash(i, f * 31 + 7)
+			if r < 0.07:
+				im.set_pixel(i % 480, i / 480, Color(0, 0, 0, 70.0 / 255.0))
+			elif r > 0.988:
+				im.set_pixel(i % 480, i / 480, Color(200 / 255.0, 170 / 255.0, 140 / 255.0, 18.0 / 255.0))
+		grain_tex.append(ImageTexture.create_from_image(im))
+	_glow = _linear_glow()
 
 func _process(dt: float) -> void:
 	var t: float = T.t
@@ -116,7 +134,7 @@ func _process(dt: float) -> void:
 			d["done"] = true
 			rings.append({"x": d["x"], "y": d["ty"], "r": 0.0, "t": 0.0})
 			for k in 6:
-				sparks.append({"x": d["x"], "y": d["ty"], "vx": randf_range(-17, 17), "vy": -34.0 - randf() * 34.0, "t": 0.0})
+				sparks.append({"x": d["x"], "y": d["ty"], "vx": (randf() - 0.5) * 34.0, "vy": -34.0 - randf() * 34.0, "t": 0.0})
 			if randf() < 0.7:
 				Sfx.play("glass", 0.08, randf_range(2.0, 2.4))
 	drops = drops.filter(func(d): return not d.get("done", false))
@@ -150,6 +168,8 @@ func _process(dt: float) -> void:
 	fx.queue_redraw()
 	fx_back.queue_redraw()
 	add_fx.queue_redraw()
+	add_big.queue_redraw()
+	grain.queue_redraw()
 
 func _snap(p: Vector2) -> Vector2:
 	return Vector2(floorf(p.x / K) * K, floorf(p.y / K) * K)
@@ -158,46 +178,95 @@ func _card_xform(c: Dictionary) -> Transform2D:
 	var L: float = c["lift"]
 	return Transform2D(lerpf(c["rot"], 0.0, L), Vector2(CW * K / 54.0, CH * K * lerpf(0.55, 1.0, L) / 84.0), 0.0, c["at"] + Vector2(0, -70.0 * L))
 
+## the web's hash (b_core.js), so the grain falls where it fell there
+static func whash(x: int, y: int) -> float:
+	var h := (x * 374761393 + y * 668265263) & 0xFFFFFFFF
+	h = ((h ^ (h >> 13)) * 1274126177) & 0xFFFFFFFF
+	return float((h ^ (h >> 16)) & 0xFFFFFFFF) / 4294967295.0
+
+func _add_mat() -> CanvasItemMaterial:
+	var m := CanvasItemMaterial.new()
+	m.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	return m
+
+## the web's glow(): a radial gradient from the colour at its middle to nothing at r, linear
+func _linear_glow() -> Texture2D:
+	var g := Gradient.new()
+	g.set_color(0, Color(1, 1, 1, 1))
+	g.set_color(1, Color(1, 1, 1, 0))
+	var gt := GradientTexture2D.new()
+	gt.gradient = g
+	gt.fill = GradientTexture2D.FILL_RADIAL
+	gt.fill_from = Vector2(0.5, 0.5)
+	gt.fill_to = Vector2(1.0, 0.5)
+	gt.width = 256
+	gt.height = 256
+	return gt
+
+func _fl(s: float) -> float:
+	var t: float = T.t
+	return 0.5 + 0.5 * sin(t * 9.0 + s) * sin(t * 5.3 + s * 2.0)
+
+func _glow_at(n: CanvasItem, x: float, y: float, r: float, rgb: Color, a: float) -> void:
+	n.draw_texture_rect(_glow, Rect2((x - r) * K, (y - r) * K, r * 2.0 * K, r * 2.0 * K), false, Color(rgb.r * a, rgb.g * a, rgb.b * a, 1.0))
+
+## a candle's flame (zp_title.js ttDrawFlame): a dark tongue, an orange body leaning with the draught, a hot core,
+## a blue root
+func _flame(n: CanvasItem, cx: float, top: float, k: float, seed: float) -> void:
+	var t: float = T.t
+	var fy := top - 2.0
+	var lean := roundf(sin(t * 5.0 + seed) * 0.8 + k * 0.4)
+	var tall := 3.0 + (1.0 if sin(t * 11.0 + seed * 3.0) > 0.3 else 0.0)
+	var R := func(x: float, y: float, w: float, h: float, c: Color) -> void:
+		n.draw_rect(Rect2(x * K, y * K, w * K, h * K), c)
+	R.call(cx + lean, fy - tall - 1.0, 1, 2, Color("#7a2a10")); R.call(cx - 1.0, fy - 2.0, 3, 3, Color("#7a2a10"))
+	R.call(cx + lean, fy - tall, 1, tall, Color("#d0601c")); R.call(cx, fy - 2.0, 1, 3, Color("#d0601c"))
+	R.call(cx, fy - 1.0, 1, 2, Color("#ffc070"))
+	R.call(cx, fy + 1.0, 1, 1, Color("#2a3080"))
+
 func _draw_fx() -> void:
-	var order := range(cards.size())
-	order.sort_custom(func(a, b): return cards[a]["lift"] < cards[b]["lift"] if absf(cards[a]["lift"] - cards[b]["lift"]) > 0.01 else cards[a]["at"].y < cards[b]["at"].y)
-	for i in order:
-		var c: Dictionary = cards[i]
-		var L: float = c["lift"]
-		fx.draw_set_transform(c["at"] + Vector2(6, 8), c["rot"], Vector2(CW * K / 54.0, CH * K * 0.55 / 84.0))
-		fx.draw_rect(Rect2(-27, -42, 54, 84), Color(0, 0, 0, 0.45 + 0.1 * L))
-		fx.draw_set_transform_matrix(_card_xform(c))
-		var near_bowl: float = clampf(1.0 - (c["at"] as Vector2).distance_to(Vector2(1360, 800)) / 700.0, 0.0, 1.0)
-		var lit: float = (0.5 + 0.25 * near_bowl + 0.08 * T._flick(c["ph"])) + 0.45 * L
-		var dim := 0.6 if (T.mode == "main" and T.fig_hover >= 0 and c["o"] != T.fig_hover) else 1.0
-		fx.draw_texture_rect(c["tex"], Rect2(-27, -42, 54, 84), false, Color(lit * dim * 1.05, lit * dim * 0.9, lit * dim * 0.75))
-		if c["o"] >= 0 and L > 0.05:
-			fx.draw_rect(Rect2(-28, -43, 56, 86), Color(MARROW, 0.7 * L), false, 1.0)
-	fx.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	for m in motes:
-		var a: float = clampf(1.0 - m["t"] / m["life"], 0.0, 1.0)
-		var p := Vector2(floorf(m["x"]), floorf(m["y"])) * K
-		fx.draw_rect(Rect2(p, Vector2(K, K)), Color(1.0, 0.62 + 0.3 * a, 0.3, a) if m["ember"] else Color(0.42, 0.4, 0.44, 0.45))
+	for n in cand.size():
+		var c: Array = cand[n]
+		_flame(fx, float(c[0]), float(c[1]) - float(c[2]), _fl(n), n * 1.7)
 
 func _draw_back() -> void:
-	for i in candles.size():
-		var c: Vector2 = candles[i]
-		var g: float = T._flick(i * 1.7)
-		fx_back.draw_rect(Rect2(_snap(c + Vector2(0, -8)), Vector2(K, 8 + roundf(g) * 4)), Color("#ecc47e"))
-		fx_back.draw_rect(Rect2(_snap(c + Vector2(0, -12 - g * 4)), Vector2(K, K)), Color("#fff2c0"))
+	# the drop swelling on the god's chin, then falling, and the crowns it throws up
 	var sw := clampf(1.0 - drop_t / 2.4, 0.0, 1.0)
 	if sw > 0.3:
-		fx_back.draw_rect(Rect2(Vector2(chin.x, chin.y + 1.0) * K, Vector2(K, K * (1.0 if sw < 0.75 else 2.0))), Color("#84181c"))
+		fx_back.draw_rect(Rect2(Vector2(chin.x, chin.y) * K, Vector2(K, K * (2.0 if sw > 0.75 else 1.0))), Color("#5e1016"))
+		if sw > 0.75:
+			fx_back.draw_rect(Rect2(Vector2(chin.x, chin.y + 1.0) * K, Vector2(K, K)), Color("#b83026"))
 	for d in drops:
-		fx_back.draw_rect(Rect2(Vector2(chin.x, floorf(d["y"])) * K, Vector2(K, K * 2)), Color("#84181c"))
+		var x := roundf(d["x"])
+		var y := roundf(d["y"])
+		fx_back.draw_rect(Rect2(Vector2(x, y - 3.0) * K, Vector2(K, 3.0 * K)), Color("#420a10"))
+		fx_back.draw_rect(Rect2(Vector2(x, y) * K, Vector2(K, 2.0 * K)), Color("#84181c"))
+		fx_back.draw_rect(Rect2(Vector2(x, y) * K, Vector2(K, K)), Color("#e8704e"))
 	for sp in sparks:
-		fx_back.draw_rect(Rect2(Vector2(floorf(sp["x"]), floorf(sp["y"])) * K, Vector2(K, K)), Color("#b83026"))
+		fx_back.draw_rect(Rect2(Vector2(roundf(sp["x"]), roundf(sp["y"])) * K, Vector2(K, K)), Color("#b83026") if sp["t"] < 0.15 else Color("#5e1016"))
+
+func _draw_add_big() -> void:
+	var o := Color8(255, 120, 50)
+	_glow_at(add_big, 238, 142, 80 + _fl(1) * 6, o, 0.09 + _fl(1) * 0.025)
+	_glow_at(add_big, 452, 142, 80 + _fl(2) * 6, o, 0.09 + _fl(2) * 0.025)
+	_glow_at(add_big, 340, 202, 95, Color8(140, 16, 20), 0.08)
 
 func _draw_add() -> void:
-	for i in candles.size():
-		var c: Vector2 = candles[i]
-		var r: float = 36.0 + 10.0 * T._flick(i * 1.7)
-		add_fx.draw_texture_rect(_glow, Rect2(c + Vector2(-r, -r - 8), Vector2(r * 2, r * 2)), false, Color(1.0, 0.6, 0.3, 0.2))
+	for n in cand.size():
+		var c: Array = cand[n]
+		_glow_at(add_fx, float(c[0]) + 0.5, float(c[1]) - float(c[2]) - 4.0, 10.0 + _fl(n) * 3.0, Color8(255, 150, 70), 0.2)
+	for m in motes:
+		var a: float = maxf(0.0, 1.0 - m["t"] / m["life"]) if m["ember"] else minf(1.0, m["t"]) * 0.5
+		var p := Vector2(roundf(m["x"]), roundf(m["y"])) * K
+		var col := Color(1.0 * a, (120.0 + floorf(a * 60.0)) / 255.0 * a, 50.0 / 255.0 * a) if m["ember"] else Color(160 / 255.0 * a * 0.5, 140 / 255.0 * a * 0.5, 120 / 255.0 * a * 0.5)
+		add_fx.draw_rect(Rect2(p, Vector2(K, K)), col)
+
+func _draw_grain() -> void:
+	if grain_tex.is_empty():
+		return
+	var t: float = T.t
+	var g: Texture2D = grain_tex[int(floorf(t * 14.0)) % 4]
+	grain.draw_texture_rect(g, Rect2(0, 0, 480 * K, 270 * K), false)
 
 ## the strip right of the chapel: its own left side, mirrored about the face (x 340)
 func _draw_mirror(n: Node2D, tex: Texture2D) -> void:

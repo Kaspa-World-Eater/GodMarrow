@@ -42,6 +42,13 @@ static func font(kind: String) -> Font:
 		return _fonts[kind]
 	# (Cursemark assets): Cursemark's own faces (cursemark/fonts, converted from its BFNT by the fork's tools): the gothic
 	# pixel face for titles and small capitals, Barlow for the reading text, Lookout for the tiny labels; whole-step scaled
+	# "own_<kind>": always Godmarrow's own face (the title keeps its IM Fell lettering)
+	if kind.begins_with("own_"):
+		var k2 := kind.substr(4)
+		var file2: String = {"pixel": "Silkscreen-Regular.ttf", "book": "IMFeENrm28P.ttf", "italic": "IMFeENit28P.ttf", "sc": "IMFeENsc28P.ttf"}.get(k2, "IMFeENrm28P.ttf")
+		var f2: Font = load("res://art/fonts/" + file2) if ResourceLoader.exists("res://art/fonts/" + file2) else ThemeDB.fallback_font
+		_fonts[kind] = f2
+		return f2
 	var cmf: String = {"pixel": "lookout_7", "book": "barlow_17", "italic": "barlow_17", "sc": "gothic_12", "small": "barlow_11"}.get(kind, "barlow_17")
 	if FileAccess.file_exists("res://cursemark/fonts/%s.fnt" % cmf):
 		var bf := FontFile.new()

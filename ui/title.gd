@@ -106,10 +106,17 @@ func _build() -> void:
 			var last := SaveIO.latest()
 			if last != "":
 				rows.append(["Continue: " + _order_name(last), "continue"])
+			rows.append(["A New Pilgrim", "orders"])
 			rows.append(["The Codex", "codex"])
 			rows.append(["Options", "options"])
-			rows.append(["Those Who Lent Their Hands", "credits"])
+		# Derek 2026-10-05: the credits page is gone from the title ("unnecessary"); they live in CREDITS.md
 			rows.append(["Leave", "leave"])
+		"orders":
+			# the orders that walk, named on the blood (Derek 2026-10-05: the cards "were never a good fit")
+			for i in PILGRIMS.size():
+				if PILGRIMS[i][6]:
+					rows.append([PILGRIMS[i][2], "order%d" % i])
+			rows.append(["Back", "back"])
 		"order":
 			var p: Array = PILGRIMS[order_i]
 			if p[6]:
@@ -130,7 +137,7 @@ func _order_name(kind: String) -> String:
 	return kind
 
 func _row_rect(i: int) -> Rect2:
-	if mode == "main":
+	if mode == "main" or mode == "orders":
 		# centred, as the web casts them (zz_title54.js:33-41: CX 240, Y0 184, DY 12 on the 480 grid)
 		var y := (184.0 - maxf(0.0, rows.size() - 4) * 6.0 + i * 12.0) * K
 		var w := _label_w(rows[i][0])
@@ -144,7 +151,7 @@ func _menu_cx() -> float:
 
 ## a choice's width on screen (the web: the word in 8 px IM Fell SC x1.12, plus 18)
 func _label_w(s: String) -> float:
-	return ceilf(U.font("sc").get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 32).x * 1.12) + 18.0 * K
+	return ceilf(U.font("own_sc").get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 32).x * 1.12) + 18.0 * K
 
 # ------------------------------------------------------------------ living
 
@@ -290,6 +297,11 @@ func _act(a: String) -> void:
 			if main.hud and main.hud.pause:
 				main.hud.pause.open()
 				main.hud.pause.page = "options"
+		"orders":
+			Sfx.play("page_open", 0.7)
+			mode = "orders"
+			_build()
+			hover = 0
 		"credits":
 			Sfx.play("page_open", 0.7)
 			mode = "credits"
@@ -337,9 +349,9 @@ func _draw_order(a: float) -> void:
 	var vs := root.get_viewport_rect().size
 	var p: Array = PILGRIMS[order_i]
 	var info: Dictionary = ORDER.get(p[0], {})
-	var sc := U.font("sc")
-	var fi := U.font("italic")
-	var fb := U.font("book")
+	var sc := U.font("own_sc")
+	var fi := U.font("own_italic")
+	var fb := U.font("own_book")
 	# the portrait, and the dark it stands in
 	var pr := Rect2(1060, 110, 760, 900)
 	var tex := _portrait(String(info.get("portrait", "")))
@@ -380,7 +392,7 @@ func _draw_ui() -> void:
 	var fade_in := clampf(t / 2.5, 0.0, 1.0)
 	var out := clampf(leaving / 1.2, 0.0, 1.0) if leaving >= 0.0 else 0.0
 	var a := 1.0 - out
-	if mode == "main":
+	if mode == "main" or mode == "orders":
 		_draw_main(a)
 		_draw_veils(vs, fade_in, out)
 		return
@@ -391,9 +403,9 @@ func _draw_ui() -> void:
 		root.draw_rect(Rect2(Vector2.ZERO, vs), Color(0, 0, 0, 0.72 * a))
 	root.draw_rect(Rect2(0, 0, vs.x, 70), Color(0, 0, 0, 0.5))
 	root.draw_rect(Rect2(0, vs.y - 50, vs.x, 50), Color(0, 0, 0, 0.5))
-	var sc := U.font("sc")
-	var fi := U.font("italic")
-	var fb := U.font("book")
+	var sc := U.font("own_sc")
+	var fi := U.font("own_italic")
+	var fb := U.font("own_book")
 	var x := 150.0
 	var y := 300.0
 	for c in "GODMARROW":
@@ -452,7 +464,7 @@ func _draw_veils(vs: Vector2, fade_in: float, out: float) -> void:
 # ------------------------------------------------------------------ the web's title (zz_title54.js)
 
 func _tick_main(dt: float) -> void:
-	if mode != "main":
+	if mode != "main" and mode != "orders":
 		return
 	var sel := maxi(hover, 0)
 	for i in rows.size():
@@ -479,7 +491,7 @@ func _draw_main(a: float) -> void:
 	# a dark band behind the title
 	for y in 50:
 		root.draw_rect(Rect2(0, y * K, vs.x, K), Color(4 / 255.0, 3 / 255.0, 6 / 255.0, 0.55 * (1.0 - y / 50.0) * a))
-	var sc := U.font("sc")
+	var sc := U.font("own_sc")
 	var tt: Texture2D = bronze.cast("title", "GODMARROW", sc, int(22 * K), int(2 * K), "title", int(300 * K), int(34 * K), int(25 * K))
 	if tt:
 		root.draw_texture(tt, Vector2(960.0 - 150.0 * K, 1.0 * K), Color(1, 1, 1, a))
@@ -497,10 +509,8 @@ func _draw_main(a: float) -> void:
 		R.call(239 + roundf(sin(t * 0.7)), 36, 1, 1, "#050303")
 	else:
 		R.call(235, 36, 10, 1, "#c08644")
-	var fi := U.font("italic")
-	var lede := "The god is dead, and has not finished dying."
-	root.draw_string(fi, Vector2(2, 49.5 * K), lede, HORIZONTAL_ALIGNMENT_CENTER, vs.x, int(7 * K), Color(5 / 255.0, 3 / 255.0, 4 / 255.0, a))
-	root.draw_string(fi, Vector2(0, 49 * K), lede, HORIZONTAL_ALIGNMENT_CENTER, vs.x, int(7 * K), Color(Color("#8f7a5c"), a))
+	var fi := U.font("own_italic")
+	# (no line under the name: Derek 2026-10-05 did not like "The god is dead..." there)
 	# the choices, cast in old pitted bronze; the chosen one rubbed bright, a sigil turning on either side
 	var sel := maxi(hover, 0)
 	for i in rows.size():

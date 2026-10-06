@@ -18,11 +18,17 @@ func _ready() -> void:
 	if c.load("user://settings.cfg") == OK:
 		for k in ["damage_numbers", "hit_flash", "screen_shake", "auto_attack", "hold_heavy", "charge_melee", "music_vol", "sfx_vol", "title_scene", "fewer_fx"]:
 			set(k, c.get_value("opt", k, get(k)))
+		# Derek 2026-10-05: the Seer's bowl ("the face and the blood pool") is the title; once, every saved choice
+		# returns to it (it can be changed again in Options)
+		if int(c.get_value("opt", "title_v", 0)) < 2:
+			title_scene = "bowl"
+			save()
 	if not title_scene in TITLE_SCENES:
-		title_scene = "stranger"
+		title_scene = "bowl"
 
 func save() -> void:
 	var c := ConfigFile.new()
 	for k in ["damage_numbers", "hit_flash", "screen_shake", "auto_attack", "hold_heavy", "charge_melee", "music_vol", "sfx_vol", "title_scene", "fewer_fx"]:
 		c.set_value("opt", k, get(k))
+	c.set_value("opt", "title_v", 2)
 	c.save("user://settings.cfg")

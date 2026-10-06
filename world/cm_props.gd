@@ -30,8 +30,6 @@ const MAP := [
 	["p_railing", ["fence_h"]],
 	["p_candles", ["candle"]],
 	["p_cobweb", ["forest/spiderweb"]],
-	["p_cloth", ["plains/banner"]],
-	["p_banner", ["plains/banner"]],
 	["p_fungus", ["forest/mushroom_cap"]],
 	["p_lily", ["lilypad"]],
 	["p_rubble", ["rubble", "ruins_debris"]],
