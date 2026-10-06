@@ -387,34 +387,71 @@ def head_relief():
     Rh += 0.1 * gauss((Y - rim) / 0.05) * (AX < fw_ + 0.05)        # the rim's thick hem
     Rh -= np.clip(TOPY + 0.45 - Y, 0, 1) * 0.5                     # the peak
     # ---- the face
-    q = AX / np.maximum(fw_, 1e-3)
-    R = 0.62 - q ** 2.4 * 0.42
-    R -= np.clip(rim + 0.18 - Y, 0, 1) * 1.2                       # the brow recedes under the cowl's rim
-    R += 0.14 * gauss((Y + 0.27) / 0.05) * (AX < 0.76)             # the brow ridge
-    cart = (AX < 0.17) & (Y > -0.6) & (Y < -0.4)                  # a name-panel on the brow
+    # ---- the face, built in layers (STUDY.md round 7): the skull, the muscles on it, the fat in its hollows (a
+    # Famine has almost none), and the skin drawn taut over all. The carving and the weather come after.
+    def _soft(a_, k_):
+        out_ = a_.copy()
+        for _ in range(k_):
+            out_ = (out_ + np.roll(out_, 1, 0) + np.roll(out_, -1, 0) + np.roll(out_, 1, 1) + np.roll(out_, -1, 1)) / 5
+        return out_
+    def blob(cx_, cy_, rx_, ry_):
+        return gauss(np.hypot((X - cx_) / rx_, (Y - cy_) / ry_))
+    def mblob(cx_, cy_, rx_, ry_):
+        return np.maximum(blob(cx_, cy_, rx_, ry_), blob(-cx_, cy_, rx_, ry_))
+    def band(x0_, y0_, x1_, y1_, w_):                               # a strap between two points, both sides
+        out_ = np.zeros_like(X)
+        for sg in (-1, 1):
+            px_, py_ = X * sg - x0_, Y - y0_
+            dx_, dy_ = x1_ - x0_, y1_ - y0_
+            tt = np.clip((px_ * dx_ + py_ * dy_) / (dx_ * dx_ + dy_ * dy_), 0, 1)
+            d_ = np.hypot(px_ - tt * dx_, py_ - tt * dy_)
+            out_ = np.maximum(out_, gauss(d_ / w_) * np.sin(np.pi * np.clip(tt, 0.02, 0.98)) ** 0.5)
+        return out_
+    # -- bone: the cranium's front, the brow, the orbits, the nasal bones and the opening beneath, the cheekbones and
+    #    their arches, the temple's hollow behind them, the upper jaw over the teeth, the jaw
+    S = 0.5 * np.clip(1 - (X / 0.9) ** 2 - ((Y + 0.3) / 0.85) ** 2, 0, 1) ** 0.5
+    S += 0.18 * np.clip(1 - ((Y + 0.27) / np.where(Y > -0.27, 0.035, 0.1)) ** 2, 0, 1) * np.clip((0.76 - AX) / 0.12, 0, 1)   # brow, a sharp lower edge
+    orb = ((AX - 0.36) / 0.2) ** 4 + ((Y + 0.08) / 0.14) ** 4
+    S -= 0.42 * np.clip(1 - orb, 0, 1) ** 0.3                          # the orbits, steep-walled
+    S += 0.1 * gauss(X / 0.035) * ((Y > -0.22) & (Y < 0.1)) * np.clip((0.1 - Y) / 0.08, 0.3, 1)   # the nasal bones
+    S += 0.16 * mblob(0.6, 0.07, 0.1, 0.07)                           # the zygoma's body
+    arch_ = (np.abs(Y - 0.05) < 0.035) & (AX > 0.6) & (AX < 0.93)
+    S += np.where(arch_, 0.1, 0.0)                                    # the arch, standing proud
+    S -= 0.16 * mblob(0.8, -0.3, 0.1, 0.22)                           # the temporal fossa behind it
+    S += 0.22 * np.clip(1 - (X / 0.36) ** 2, 0, 1) ** 0.5 * ((Y > 0.3) & (Y < 0.58))   # the maxilla over the teeth's curve
+    jw_ = np.interp(Y, [0.55, 0.62, 0.8, 0.95, 1.0], [0.6, 0.62, 0.5, 0.3, 0.0])
+    S = np.maximum(S, np.where((AX < jw_) & (Y > 0.55), 0.24 * np.clip(1 - (AX / np.maximum(jw_, 1e-3)) ** 2, 0, 1) ** 0.4 + 0.06 * blob(0, 0.9, 0.14, 0.06), -1))
+    S += 0.08 * band(0.68, 0.1, 0.62, 0.62, 0.04)                      # the ramus rising to the ear
+    S += 0.04 * gauss((Y - (0.95 - (AX - 0.2) * 0.62)) / 0.025) * ((AX > 0.18) & (AX < 0.62))   # the jaw's lower edge
+    # -- muscle (a starved god's, wasted to a third)
+    MW = 0.35
+    M = np.zeros_like(X)
+    M += 0.16 * mblob(0.78, -0.25, 0.12, 0.26)                        # temporalis, filling the temple (wasted: sunk)
+    M += 0.14 * band(0.7, 0.1, 0.62, 0.62, 0.07)                      # masseter, the block from the arch to the angle
+    M += 0.03 * np.clip((-0.3 - Y) / 0.2, 0, 1) * (AX < 0.7)          # frontalis, a thin sheet
+    M += 0.07 * np.exp(-((np.sqrt(np.maximum(orb, 0)) - 1.15) / 0.3) ** 2) * (Y > -0.2)   # orbicularis oculi: the soft lower rim
+    M += 0.08 * band(0.58, 0.12, 0.3, 0.52, 0.045)                    # zygomaticus, cheekbone to the mouth's corner
+    M += 0.05 * mblob(0.46, 0.42, 0.1, 0.12)                          # buccinator, deep in the cheek
+    M += 0.06 * np.exp(-((np.hypot(X / 0.27, (Y - 0.56) / 0.12) - 1) / 0.35) ** 2)   # orbicularis oris, round the lips
+    # -- fat (almost none)
+    FED = 0.08
+    Fp = 0.12 * mblob(0.78, -0.25, 0.12, 0.2) + 0.16 * mblob(0.48, 0.38, 0.12, 0.13) + 0.06 * mblob(0.4, 0.1, 0.12, 0.06)
+    # -- skin: an envelope over bone and what lies on it, drawn taut across the hollows, softened by its thickness
+    E = np.maximum(S + 0.015, S + M * MW + Fp * FED)
+    E = np.maximum(E, _soft(E, 4) - 0.05)                             # taut: it bridges the narrow pits a little
+    E = _soft(E, 2)
+    R = E * 1.15 + 0.06 - (np.clip(AX / np.maximum(fw_, 1e-3), 0, 1) ** 3) * 0.2   # the sides turning away
+    R -= np.clip(rim + 0.18 - Y, 0, 1) * 1.2                          # the brow going under the cowl's rim
+    cart = (AX < 0.17) & (Y > -0.6) & (Y < -0.4)                      # a name-panel on the brow
     cart_in = (AX < 0.13) & (Y > -0.57) & (Y < -0.43)
     R = np.where(cart & ~cart_in, R + 0.04, R)
     R = np.where(cart_in, R - 0.03 + (vn(X * 60, Y * 8) - 0.5) * 0.012, R)       # its name chiselled out, rough
-    R += 0.15 * gauss(np.hypot((AX - 0.62) / 0.1, (Y - 0.08) / 0.07))   # the cheekbone's body (zygoma)
-    arch = gauss((Y - 0.05 + (AX - 0.62) * 0.15) / 0.035) * np.clip((AX - 0.6) / 0.05, 0, 1) * (AX < fw_)
-    R += 0.07 * arch                                                # its arch running back toward the ear, a hard ledge
-    R -= 0.24 * gauss(np.hypot((AX - 0.5) / 0.13, (Y - 0.36) / 0.15))  # the cheek fallen in beneath it (buccal)
-    R += 0.07 * np.clip(1 - (X / 0.38) ** 2, 0, 1) * np.clip((Y - 0.33) / 0.08, 0, 1) * np.clip((0.92 - Y) / 0.1, 0, 1)   # the muzzle over the teeth
-    jaw = gauss((Y - (0.95 - (AX - 0.2) * 0.62)) / 0.03) * ((AX > 0.18) & (AX < 0.62))
-    R += 0.05 * jaw                                                 # the jaw's line, drawn tight
-    for sgn in (-1, 1):                                             # the folds from the nose's wings past the portal
-        nl = np.abs((X * sgn - 0.12) - (Y - 0.28) * (0.2 / 0.34))
-        fold = gauss(nl / 0.02) * ((Y > 0.27) & (Y < 0.66))
-        R -= 0.045 * fold * np.clip((0.66 - Y) / 0.2, 0, 1)
-        R += 0.035 * gauss((nl + 0.03) / 0.02) * ((Y > 0.27) & (Y < 0.66)) * ((X * sgn - 0.12) < (Y - 0.28) * (0.2 / 0.34))
     # the eyes: the left a half-lidded stone eye; the right broken out
     # the socket: a hard upper rim under the brow, a soft lower one sloping out to the cheek
-    rl = np.hypot((X + 0.36) / 0.21, (Y + 0.08) / 0.13)
-    R -= 0.16 * np.clip(1 - rl * rl, 0, 1) ** 0.7 * np.where(Y < -0.08, 1.0, 0.75)
     ex, ey = (X + 0.36) / 0.17, (Y + 0.075) / 0.07
     al_ = np.clip(1 - ex * ex, 0, 1) ** 0.7
     almond = (np.abs(ex) < 1) & (np.abs(ey) < al_)  # the eye: an almond, pointed at its corners
-    R += np.where(almond, 0.09 * np.clip(1 - ex * ex - ey * ey * 0.5, 0, 1) ** 0.5, 0)    # the eyeball, set back
+    R += np.where(almond, 0.3 * np.clip(1 - ex * ex - ey * ey * 0.5, 0, 1) ** 0.5, 0)    # the eyeball, set back in the orbit
     lid_y = -0.2 + ex * 0.08                                         # cast down: the lid hangs to below the middle
     lid = almond & (ey < lid_y + 0.25)
     R = np.where(lid, R + 0.05 + 0.02 * np.clip(1 - ex * ex, 0, 1), R)   # the heavy upper lid
@@ -427,12 +464,16 @@ def head_relief():
     rr = np.hypot((X - 0.36) / 0.2, (Y + 0.09) / 0.13)
     broke = rr < 1 + (vn(X * 20, Y * 20) - 0.5) * 0.25
     R = np.where(broke, R - 0.45 * np.clip(1 - rr * rr, 0.3, 1), R)  # broken out, ragged
-    # the nose: long and straight, its tip gone
-    nw = np.interp(Y, [-0.24, -0.1, 0.12, 0.24], [0.045, 0.055, 0.075, 0.085])
-    nh = np.interp(Y, [-0.26, -0.12, 0.0, 0.16, 0.24, 0.26], [0.0, 0.1, 0.18, 0.26, 0.2, 0.0])
-    R += nh * np.clip(np.minimum(1.0, (1 - AX / nw) * 2.2), 0, 1)        # a wedge: flat top, side planes
-    R += 0.07 * gauss(np.hypot((AX - 0.1) / 0.04, (Y - 0.26) / 0.04))   # the wings
-    nasal = np.hypot(X / 0.07, (Y - 0.3) / 0.05) < 1
+    # the nose: the bridge is the nasal bones under the skin; the cartilage and the tip broken away, the skull's
+    # pear-shaped opening shows beneath
+    # the cartilage carries the nose on down from the bones: a wedge with a flat top and side planes, its tip broken
+    # off in a ragged line; under the break, two small dark hollows where the nostrils were
+    nw = np.interp(Y, [-0.2, 0.0, 0.15, 0.24], [0.04, 0.055, 0.075, 0.085])
+    brk = 0.22 + (vn(X * 40, 3.0) - 0.5) * 0.05
+    nh = np.interp(Y, [-0.22, -0.1, 0.05, 0.18], [0.0, 0.08, 0.16, 0.22]) * (Y < brk)
+    R += nh * np.clip(np.minimum(1.0, (1 - AX / nw) * 2.4), 0, 1)
+    R += 0.05 * gauss(np.hypot((AX - 0.09) / 0.035, (Y - 0.24) / 0.035))      # what is left of the wings
+    nasal = (np.hypot((AX - 0.035) / 0.03, (Y - 0.27) / 0.03) < 1)
     R = np.where(nasal, R - 0.15, R)
     # the mouth: cut into a squared portal
     portal = (AX < 0.19) & (Y > 0.48) & (Y < SILL + 0.06)
