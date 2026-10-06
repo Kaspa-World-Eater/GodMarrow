@@ -360,8 +360,14 @@ func _tick_ossify(dt: float) -> void:
 		mstain_k = maxf(0.0, mstain_k - dt * 0.03)
 	m.set_shader_parameter("mstain", mstain_k)
 	if not dead:
-		erase_k = maxf(0.0, erase_k - dt * 0.12)
+		erase_k = maxf(0.0, erase_k - dt * 0.04)
 	m.set_shader_parameter("erase", erase_k)
+	if erase_k > 0.2 and randf() < dt * 8.0 * erase_k:    # gold leaf and glints lifting off the erased part
+		var I3 = load("res://world/impacts.gd").of(zone)
+		var r3 := spr.get_rect()
+		var q3 := position + spr.position + (r3.position + Vector2(randf() * r3.size.x, r3.size.y * (1.0 - randf() * erase_k))) * spr.scale.abs()
+		I3._ensure_sky()
+		I3.leaves.append({"q": q3, "v": Vector2(randf_range(-8, 8), -randf_range(30, 50)), "t": 0.0, "life": randf_range(0.8, 1.4), "ph": randf() * TAU, "ground": q3.y + 400.0})
 	if not dead:
 		unmade_k = maxf(0.0, unmade_k - dt * 0.08)
 	m.set_shader_parameter("unmade", unmade_k)

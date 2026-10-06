@@ -90,10 +90,19 @@ void fragment() {
 		vec2 te = floor(UV / TEXTURE_PIXEL_SIZE);
 		float le = dot(c.rgb, vec3(0.3, 0.59, 0.11));
 		float de = B4[(int(te.y) & 3) * 4 + (int(te.x) & 3)] / 16.0;
-		float amt = clamp(erase * 1.5 - vn(te * 0.2 + 3.0) * 0.5 + (1.0 - le) * 0.25, 0.0, 1.0);   // the dark goes first
-		float lift = le * (1.0 - amt) + amt;
-		vec3 wg = lift > 0.85 ? vec3(1.0, 0.99, 0.93) : lift > 0.65 ? vec3(1.0, 0.89, 0.62) : lift > 0.45 ? vec3(0.9, 0.7, 0.38) : vec3(0.58, 0.4, 0.2);
-		if (amt > de) c.rgb = wg;
+		// Derek: like the miasma's stain, it climbs the body from the feet; behind its edge the dark goes first
+		float ey = clamp((UV.y - region.y) / max(region.w, 1e-5), 0.0, 1.0);
+		float edge = 1.0 - erase * 1.05 + (vn(te * 0.2 + 3.0) - 0.5) * 0.24 + sin(te.x * 0.9 + TIME * 6.0) * 0.025;
+		float below = ey - edge;
+		if (below > 0.0) {
+			float amt = clamp(below * 5.0 + (1.0 - le) * 0.35, 0.0, 1.0);
+			float lift = le * (1.0 - amt) + amt;
+			vec3 wg = lift > 0.85 ? vec3(1.0, 0.99, 0.93) : lift > 0.65 ? vec3(1.0, 0.89, 0.62) : lift > 0.45 ? vec3(0.9, 0.7, 0.38) : vec3(0.58, 0.4, 0.2);
+			if (amt > de) c.rgb = wg;
+			if (below < 0.035) c.rgb = vec3(1.0, 1.0, 0.96);                        // its burning lip, white fire
+		} else if (below > -0.05 && de < 0.5 + 0.5 * sin(TIME * 9.0 + te.x)) {
+			c.rgb = mix(c.rgb, vec3(1.0, 0.86, 0.5), 0.55);                          // the glare reaching just ahead of it
+		}
 	}
 	if (mstain > 0.0 && c.a > 0.0) {
 		vec2 ts = floor(UV / TEXTURE_PIXEL_SIZE);

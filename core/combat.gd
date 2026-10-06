@@ -37,7 +37,7 @@ static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vec
 	if elem == "void" and m.get("unmade_k") != null:
 		m.unmade_k = minf(1.0, m.unmade_k + 0.2 + d / maxf(1.0, m.hp_max))
 	if elem == "radiance" and m.get("erase_k") != null:
-		m.erase_k = minf(1.0, m.erase_k + 0.22 + d / maxf(1.0, m.hp_max))
+		m.erase_k = minf(1.0, m.erase_k + 0.1 + d / maxf(1.0, m.hp_max))
 	if (elem == "miasma" or elem == "poison") and m.get("mstain_k") != null:
 		m.mstain_k = minf(1.0, m.mstain_k + 0.12 + d / maxf(1.0, m.hp_max))
 	if elem == "blood" and m.get("veins_k") != null:
