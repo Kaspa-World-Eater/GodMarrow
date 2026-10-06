@@ -36,6 +36,13 @@ ink on warm paper", art made by generators), and it beat the dithered-block look
 Lessons from the first ruins pass (Derek: "you can do better"): props on a black void with no shadow or contact,
 one-hue ramps, and fine texture noise all read as cheap. `tools/art_study/painted_scene.py` is the reference now.
 
+## The masterwork rule (Derek, 2026-10-06)
+
+"Every piece must be crafted as a masterwork piece of art. Nothing skipped, no speeding through. Every detail
+individually crafted." No mock-ups shown as results; no primitive stand-ins (cones for trees, tubes for limbs, blobs for
+crowns); every element (each tree, window, stone, tuft) designed as its own thing; everything in this standard applied
+every time, not only on the pieces that get a second pass.
+
 ## The order of work
 
 1. Finish the current agenda in this standard (environment: snow, grass, ruins, stone; cloth; pulsing flesh; armour
