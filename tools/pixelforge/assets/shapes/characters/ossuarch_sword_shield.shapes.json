@@ -1922,7 +1922,7 @@
    "cz": -2.4,
    "thickness": 1.8,
    "keep": {
-    "back_strip": 2.4
+    "back_strip": 1.75
    },
    "hem": {
     "tongues": 15,

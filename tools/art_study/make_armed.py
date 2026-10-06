@@ -61,6 +61,11 @@ def main():
     d["name"] = "Ossuarch (sword and shield)"
     d["materials"].update(MATERIALS)
     d["shapes"] = [s for s in d["shapes"] if not s["name"].startswith(("sword_", "shield_"))] + sword() + shield()
+    # the silhouette study (STUDY.md round 3): the cloak hangs BEHIND him, open at the front, so the planted legs read
+    # as two shapes with a gap (it wrapped three quarters of the way round: back_strip 2.4 rad either side of the back)
+    for s in d["shapes"]:
+        if s["name"] == "cloak":
+            s["keep"] = {"back_strip": 1.75}
     # the silhouette study (STUDY.md round 3): the armed stance, legs apart and the sword out from the body, as his idle
     d["clips"] = dict(d.get("clips") or {}, attack="strike", idle="attack_idle")
     DST.write_bytes(json.dumps(d, indent=1, ensure_ascii=False).encode("utf8"))

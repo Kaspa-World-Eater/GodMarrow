@@ -165,3 +165,18 @@ To do (applying it):
 - Every attack key keeps the blade outside the silhouette; the follow-through angles the blade forward and down,
   clear of the cloak.
 - The steel's highlight is the brightest value on the figure; one saturated accent (the green plume already is).
+
+**Cloak opened (armed variant):** back_strip 2.4 -> 1.75 rad. In colour the planted legs now read from every view;
+filled black, the cloak behind still fills the gap between the legs. Next: a shorter, split back hem.
+
+## The effects library (Derek 2026-10-06: "your liquid fire looks good but fire comes in many forms ... blood can
+borrow from it too. You'll need many types of effects and animations, movements")
+The liquid fire's method (a flowing value field snapped to a short ramp with the ordered dither, lit and lighting)
+becomes the base for a family:
+- Fire: the spreading ground fire (done); a running flame front that eats along grass and wood; an incinerating
+  radiant blaze (white-gold core, heat shimmer, a body burning out from inside); a burnt corpse or object: charring,
+  glowing ember cracks, ash flaking off and drifting, the shape slumping, smoke.
+- Blood: pools that run and seep along the ground's low places, spurts and arcs on hits, drips, smears where a body is
+  dragged, drying darker over time; the same field and dither, red ramps.
+- Then bone (splinters, dust, marrow glow), miasma (heavy creeping breath, as on the title), void, radiance, cold,
+  poison, lightning; and movements for every creature family, each judged filled black first.
