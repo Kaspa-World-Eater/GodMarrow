@@ -16,6 +16,7 @@ var players: Array = []        # [current, previous]
 var cur_id := ""
 var amb_p: AudioStreamPlayer
 var _streams := {}
+var rain_p: AudioStreamPlayer     # Cursemark's rain, while a shower passes (world/weather.gd)
 var wind_p: AudioStreamPlayer     # the mournful wind under everything outdoors and in the chapel, swelling with Gust
 
 func _init(m) -> void:
@@ -30,6 +31,8 @@ func _ready() -> void:
 	amb_p = AudioStreamPlayer.new()
 	add_child(amb_p)
 	wind_p = AudioStreamPlayer.new()
+	rain_p = AudioStreamPlayer.new()
+	add_child(rain_p)
 	wind_p.stream = load("res://audio/amb/wind.ogg")
 	if wind_p.stream is AudioStreamOggVorbis:
 		(wind_p.stream as AudioStreamOggVorbis).loop = true
@@ -182,6 +185,21 @@ func _wind(dt: float) -> void:
 	wind_p.pitch_scale = 0.9 + 0.12 * g
 	if not on and wind_p.volume_db < -50.0:
 		wind_p.stop()
+	# the shower's sound
+	var rk: float = load("res://world/weather.gd").rain_now(z) if z else 0.0
+	if rk > 0.01 and not rain_p.playing:
+		var j = JSON.parse_string(load("res://core/cm_data.gd").text(RAW + "sounds/ambient/ambient_rain.json"))
+		if j is Dictionary and not j.get("sounds", []).is_empty():
+			var st := AudioStreamOggVorbis.load_from_file(RAW + str(j["sounds"][0].get("file", "")))
+			if st:
+				st.loop = true
+				rain_p.stream = st
+				rain_p.volume_db = -60.0
+				rain_p.play()
+	if rain_p.playing:
+		rain_p.volume_db = move_toward(rain_p.volume_db, linear_to_db(maxf(0.0001, rk * 1.4 * float(Settings.sfx_vol))), 12.0 * dt)
+		if rk <= 0.01 and rain_p.volume_db < -50.0:
+			rain_p.stop()
 
 func _swap(id: String) -> void:
 	cur_id = id

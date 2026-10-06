@@ -63,6 +63,40 @@ func bind(z: Zone, h: Hero, d: DarkLayer) -> void:
 	woody = outdoor and (th.contains("wood") or th.contains("root") or th.contains("fern") or th.contains("grove"))
 	beat_ph = float(hash(zone.id) % 1000) / 1000.0 * TAU
 
+## the spell of weather (kept across zones, so walking through a gate does not change the sky)
+static var spell_on := false
+static var spell_t := 70.0         # until the next change
+static var spell_len := 0.0
+static var spell_age := 0.0
+static var spell_k := 0.0          # 0..1 eased in and out
+static var spell_peak := 0.5
+
+func _spell(dt: float) -> void:
+	spell_t -= dt
+	if spell_on:
+		spell_age += dt
+		var rise := smoothstep(0.0, 15.0, spell_age)
+		var fade := 1.0 - smoothstep(spell_len - 18.0, spell_len, spell_age)
+		spell_k = rise * fade
+		if spell_age >= spell_len:
+			spell_on = false
+			spell_k = 0.0
+			spell_t = randf_range(150.0, 360.0)
+	elif spell_t <= 0.0:
+		spell_on = true
+		spell_age = 0.0
+		spell_len = randf_range(55.0, 130.0)
+		spell_peak = randf_range(0.3, 0.6)
+
+## how hard it is raining now (0..1), for the sound (world/cm_audio.gd)
+static func rain_now(z) -> float:
+	if z == null or not z.d.get("outdoor", false):
+		return 0.0
+	var th: String = str(z.d.get("theme", "")) + " " + z.id
+	if th.contains("fen") or th.contains("bog") or th.contains("drown") or th.contains("marsh"):
+		return spell_k * spell_peak
+	return 0.0
+
 func _light(p: Vector2) -> Array:
 	return dark.light_at(p) if dark else [0.5, Color(0.62, 0.66, 0.78)]
 
@@ -78,8 +112,11 @@ func _process(dt: float) -> void:
 	if dcam.length() > 300.0:   # a cut, not a pan
 		dcam = Vector2.ZERO
 	var wind := Game.wind
-	# the swell: showers and ash-falls come and go over a minute or two, never quite to nothing
-	beat = clampf(0.55 + 0.35 * sin(t * 0.05 + beat_ph) + 0.15 * sin(t * 0.13 + beat_ph * 2.0), 0.08, 1.0)
+	# random and sparse (Derek 2026-10-05: "get some random but sparse weather effects. Don't make the screen get
+	# cluttered"): the sky is mostly clear; now and then a spell of ash or a shower comes over for a minute or two,
+	# eases in, peaks at about half the old fall, and passes
+	_spell(dt)
+	beat = spell_k * spell_peak
 	# --- ash
 	if kind == "ash":
 		var want := int(190 * beat)

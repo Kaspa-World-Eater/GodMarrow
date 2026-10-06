@@ -63,6 +63,13 @@ static func run(g) -> void:
 		_show_collision(g)
 	if a.has("shot"):
 		_shot(g, a)
+	if a.has("weather"):
+		# --weather: a spell of weather at its height now (ash on the moor, a shower in the fen)
+		var Wt = load("res://world/weather.gd")
+		Wt.spell_on = true
+		Wt.spell_age = 20.0
+		Wt.spell_len = 120.0
+		Wt.spell_peak = 0.6
 	if a.has("swing"):
 		_swing_loop(g)                   # --swing: the pilgrim swings at the air to the east every 0.7 s (to film blows)
 	if a.has("auto_attack"):
