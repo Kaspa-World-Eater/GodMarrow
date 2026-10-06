@@ -79,6 +79,8 @@ static func run(g) -> void:
 		_threadfx(g)                     # --threadfx (Mystic): soul leashes, a binding, snags, needles and hanging darts
 	if a.has("slashfx"):
 		_slashfx(g)                      # --slashfx: each kind of slash in turn (sweep, back-sweep, overhead, heavy) and cuts
+	if a.has("miasmafx"):
+		_miasmafx(g)                     # --miasmafx: a gyre, swelling bladders, breathing vents and stained creatures
 	if a.has("magic"):
 		_magic(g)                        # --magic: phosphor wisps flung at points round the pilgrim
 	if a.has("acid"):
@@ -622,3 +624,28 @@ static func _slashfx(g) -> void:
 		I.cut(c + d * 1.2, d, kind >= 2)
 		await tree.create_timer(0.5).timeout
 		k += 1
+
+
+static func _miasmafx(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	var I = load("res://world/impacts.gd").of(g.zone)
+	var c: Vector2 = g.hero.tp
+	var ms: Array = []
+	for o in [Vector2(1.3, -0.1), Vector2(0.3, 1.1)]:
+		var m = Brain.spawn(g.zone, "hollow", c + o, 6, "normal", "miasma", 1e6)
+		if m:
+			m.speed = 0.0
+			m.dmg = Vector2.ZERO
+			ms.append(m)
+	I.gyre(c + Vector2(2.8, 0.2), 1.6, 40.0)
+	I.vent(c + Vector2(1.6, 2.6), 40.0)
+	var n := 0
+	while is_instance_valid(g) and g.hero:
+		if n % 6 == 0:
+			I.bladder(c + Vector2(3.2, 2.2), 2.4)
+		for m in ms:
+			if is_instance_valid(m) and not m.dead:
+				Combat.hit_monster(m, 0.5, "miasma", c, {"dot": true})
+		n += 1
+		await tree.create_timer(0.6).timeout

@@ -314,6 +314,7 @@ var _spurs: Node2D
 var frost_k := 0.0
 var corrode_k := 0.0
 var veins_k := 0.0
+var mstain_k := 0.0
 
 func acid_hit(dmg: float) -> void:
 	corrode_k = minf(1.0, corrode_k + 0.2 + dmg / maxf(1.0, hp_max))
@@ -353,6 +354,15 @@ func _tick_ossify(dt: float) -> void:
 	if not dead:
 		veins_k = maxf(0.0, veins_k - dt * 0.07)
 	m.set_shader_parameter("veins", veins_k)
+	if not dead:
+		mstain_k = maxf(0.0, mstain_k - dt * 0.03)
+	m.set_shader_parameter("mstain", mstain_k)
+	if mstain_k > 0.2 and randf() < dt * 6.0 * mstain_k:   # the sickness breathing off the stained part
+		var I2 = load("res://world/impacts.gd").of(zone)
+		var r2 := spr.get_rect()
+		var q2 := position + spr.position + (r2.position + Vector2(randf() * r2.size.x, r2.size.y * (1.0 - randf() * mstain_k))) * spr.scale.abs()
+		I2.wsmoke.append({"q": q2, "v": Vector2(randf_range(-5, 5), -randf_range(10, 22)), "t": 0.0, "life": randf_range(1.0, 1.6), "r": randf_range(1.5, 2.4), "ph": randf() * TAU, "col": Color(0.66, 0.54, 0.98)})
+		I2._ensure_sky()
 	if corrode_k > 0.15 and randf() < dt * 10.0 * corrode_k:
 		var I = load("res://world/impacts.gd").of(zone)
 		var r := spr.get_rect()

@@ -8,6 +8,7 @@ uniform vec3 lamp_dir = vec3(0.0, 0.0, 1.0);   // toward the lantern, screen spa
 uniform float lamp_k = 0.0;                    // how near and bright the lantern is to this body, 0..1
 uniform float sky_k = 0.3;                     // the cold of the sky / the vault
 uniform bool face_left = false;
+uniform float mstain = 0.0;         // 0..1 the miasma's violet stain climbing from the feet
 uniform float veins = 0.0;          // 0..1 dark veins swelling and pulsing (blood magic)
 uniform float corrode = 0.0;         // 0..1 acid pitting
 uniform float frost = 0.0;           // 0..1 the glaze of ice climbing from the feet
@@ -75,6 +76,19 @@ void fragment() {
 			if (piece + fu.y * 0.6 < line) c.a = 0.0;
 		}
 		c.rgb = col;
+	}
+	if (mstain > 0.0 && c.a > 0.0) {
+		vec2 ts = floor(UV / TEXTURE_PIXEL_SIZE);
+		float sy = clamp((UV.y - region.y) / max(region.w, 1e-5), 0.0, 1.0);
+		float edge = 1.0 - mstain * 0.95 + (vn(ts * 0.18 + 5.0) - 0.5) * 0.22 + sin(ts.x * 0.7 + TIME * 1.3) * 0.02;
+		if (sy > edge) {
+			float l3 = dot(c.rgb, vec3(0.3, 0.59, 0.11));
+			vec3 bruise = mix(vec3(0.1, 0.07, 0.24), vec3(0.44, 0.38, 0.74), clamp(l3 * 1.5, 0.0, 1.0));
+			float blot = vn(ts * 0.35 + 17.0);
+			if (blot > 0.72) bruise *= 0.6;                                    // darker blotches in it
+			c.rgb = mix(c.rgb, bruise, 0.7);
+			if (sy - edge < 0.03) c.rgb = mix(c.rgb, vec3(0.6, 0.52, 1.0), 0.55 + 0.25 * sin(TIME * 2.2));   // its creeping lip, faintly lit
+		}
 	}
 	if (veins > 0.0 && c.a > 0.0) {
 		vec2 tv = floor(UV / TEXTURE_PIXEL_SIZE);

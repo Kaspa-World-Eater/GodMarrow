@@ -181,6 +181,7 @@ func _ensure_sky() -> void:
 
 func _draw_sky() -> void:
 	_draw_souls(sky)
+	_draw_miasma2(sky)
 	_draw_slash(sky)
 	_draw_blood(sky)
 	_draw_acid(sky)
@@ -1391,6 +1392,153 @@ func _draw_slash(cv: CanvasItem) -> void:
 			if 1.0 - u > th:
 				cv.draw_rect(Rect2(cellp * PX, Vector2(PX, PX)), Color(0.85, 0.82, 0.74, 0.9))
 
+# ------------------------------------------------------------------ miasma, more forms
+## a gyre: the breath gathering into a slow turning wheel of violet haze, wisps spiralling in toward a heart that
+## glows faintly and pulses; dithered puffs, ghostly, no line anywhere
+var gyres: Array = []      # {c (screen), R, t, secs, puffs}
+## a bladder: a swollen violet sac on the ground, its skin veined, swelling with slow breaths until it bursts with a
+## sigh, a ring of breath thrown out and a low patch of miasma left where it was
+var bladders: Array = []   # {p (tile), c (screen), t, swell, burst}
+## a vent: a crack in the ground exhaling thin violet threads in slow sighs, rising and curling and thinning away
+var vents: Array = []      # {c, t, secs, threads}
+const MIASMA_COL := Color(0.66, 0.54, 0.98)
+
+func gyre(p: Vector2, r: float = 1.8, secs: float = 8.0) -> void:
+	_ensure_sky()
+	gyres.append({"c": Iso.to_screen(p) + Vector2(0, -24), "R": r * Iso.HX, "t": 0.0, "secs": secs, "puffs": []})
+
+func bladder(p: Vector2, swell: float = 2.2) -> void:
+	_ensure_sky()
+	bladders.append({"p": p, "c": Iso.to_screen(p), "t": 0.0, "swell": swell, "burst": false, "seed": randf() * 10.0})
+
+func vent(p: Vector2, secs: float = 10.0) -> void:
+	_ensure_sky()
+	vents.append({"c": Iso.to_screen(p), "t": 0.0, "secs": secs, "threads": [], "next": 0.0})
+
+func _tick_miasma2(dt: float) -> void:
+	for g in gyres:
+		g["t"] += dt
+		var fade: float = 1.0 - smoothstep(g["secs"] - 1.5, g["secs"], g["t"])
+		if fade > 0.2 and randf() < dt * 30.0:
+			g["puffs"].append({"a": float(randi() % 3) / 3.0 * TAU + g["t"] * 1.1 + randf_range(-0.25, 0.25), "r": g["R"] * randf_range(0.85, 1.05),
+				"h": randf_range(-4, 4), "t": 0.0, "life": randf_range(1.8, 2.8), "s": randf_range(2.5, 4.5)})
+		for pf in g["puffs"]:
+			pf["t"] += dt
+			pf["a"] += dt * (0.9 + 40.0 / maxf(8.0, pf["r"]))     # faster as it nears the heart
+			pf["r"] = maxf(0.0, pf["r"] - dt * g["R"] * 0.35)
+			pf["h"] -= dt * 6.0
+		g["puffs"] = g["puffs"].filter(func(pf): return pf["t"] < pf["life"] and pf["r"] > 3.0)
+	gyres = gyres.filter(func(g): return g["t"] < g["secs"])
+	for bl in bladders:
+		bl["t"] += dt
+		if not bl["burst"] and bl["t"] >= bl["swell"]:
+			bl["burst"] = true
+			bl["bt"] = 0.0
+			miasma(bl["p"], 1.3, 6.0, "breath")
+			for k in 18:                                       # the sigh: a ring of breath thrown out low
+				var a := k / 18.0 * TAU
+				wsmoke.append({"q": bl["c"] + Vector2(cos(a) * 8.0, sin(a) * 4.0 - 6.0), "v": Vector2(cos(a) * 70.0, sin(a) * 35.0 - 8.0),
+					"t": 0.0, "life": randf_range(1.0, 1.6), "r": randf_range(2.0, 3.2), "ph": randf() * TAU, "col": MIASMA_COL})
+			for k in 8:                                        # shreds of the sac's skin
+				var a2 := randf() * TAU
+				chips.append({"p": bl["p"], "z": 8.0, "v": Vector2(cos(a2), sin(a2)) * randf_range(0.8, 2.0), "vz": randf_range(40, 110),
+					"col": [Color("#5a3f6e"), Color("#3a2848"), Color("#8a6aa0")][randi() % 3], "t": 0.0, "life": 3.0, "rest": false, "bounced": false, "big": false})
+		if bl["burst"]:
+			bl["bt"] += dt
+	bladders = bladders.filter(func(bl): return not bl["burst"] or bl["bt"] < 0.6)
+	for v in vents:
+		v["t"] += dt
+		v["next"] -= dt
+		if v["t"] < v["secs"] - 1.0 and v["next"] <= 0.0:
+			v["next"] = randf_range(0.12, 0.35)
+			var a := randf_range(-2.0, -1.1)
+			v["threads"].append({"p": v["c"] + Vector2(randf_range(-14, 14), randf_range(-3, 3)), "v": Vector2(cos(a), sin(a)) * randf_range(20, 36),
+				"t": 0.0, "life": randf_range(1.8, 2.8), "trail": [], "ph": randf() * TAU})
+		for th in v["threads"]:
+			th["t"] += dt
+			th["v"] += Vector2(sin(th["t"] * 2.6 + th["ph"]) * 26.0 + Gust.dir() * Gust.k() * 20.0, -8.0) * dt
+			th["p"] += th["v"] * dt
+			th["trail"].push_front(th["p"])
+			if th["trail"].size() > 26:
+				th["trail"].pop_back()
+		v["threads"] = v["threads"].filter(func(th): return th["t"] < th["life"])
+	vents = vents.filter(func(v): return v["t"] < v["secs"] or v["threads"].size() > 0)
+
+## a soft dithered puff of the breath: solid cells kept or dropped on the Bayer grid, so it reads as haze in pixels
+func _haze(cv: CanvasItem, c: Vector2, r: float, col: Color, a: float) -> void:
+	var c0 := (c / PX).floor()
+	var R := int(ceil(r))
+	for yy in range(-R, R + 1):
+		for xx in range(-R, R + 1):
+			var e := (xx * xx + yy * yy) / maxf(1.0, r * r)
+			if e > 1.0:
+				continue
+			var q := c0 + Vector2(xx, yy)
+			var th: float = (B4[posmod(int(q.y), 4) * 4 + posmod(int(q.x), 4)] + 0.5) / 16.0
+			if a * (1.0 - e) > th:
+				cv.draw_rect(Rect2(q * PX, Vector2(PX, PX)), Color(col.r, col.g, col.b, 0.3))
+			elif a * (1.0 - e) > th * 0.4:
+				cv.draw_rect(Rect2(q * PX, Vector2(PX, PX)), Color(col.r, col.g, col.b, 0.1))   # the haze's thin undercoat
+
+func _draw_miasma2(cv: CanvasItem) -> void:
+	var now := Time.get_ticks_msec() / 1000.0
+	for g in gyres:
+		var fade: float = smoothstep(0.0, 1.0, g["t"]) * (1.0 - smoothstep(g["secs"] - 1.5, g["secs"], g["t"]))
+		for pf in g["puffs"]:
+			var u: float = pf["t"] / pf["life"]
+			var q: Vector2 = g["c"] + Vector2(cos(pf["a"]) * pf["r"], sin(pf["a"]) * pf["r"] * 0.5 + pf["h"])
+			_haze(cv, q, pf["s"] * (0.6 + 0.4 * (pf["r"] / g["R"])), MIASMA_COL, fade * sin(PI * u) * 0.9)
+		var pulse := 0.5 + 0.5 * sin(now * 2.2)                 # the heart: the faintest glow, breathing
+		_haze(cv, g["c"], 4.0 + pulse * 1.5, Color(0.8, 0.7, 1.0), fade * (0.35 + 0.25 * pulse))
+	for bl in bladders:
+		var c: Vector2 = (bl["c"] / PX).floor()
+		if bl["burst"]:
+			var u: float = bl["bt"] / 0.6                      # the torn sac, collapsing
+			for xx in range(-3, 4):
+				if randf() > u:
+					cv.draw_rect(Rect2((c + Vector2(xx, 0)) * PX, Vector2(PX, PX)), Color(0.24, 0.16, 0.3, 1.0 - u))
+			continue
+		var k: float = bl["t"] / bl["swell"]
+		var breath := 0.5 + 0.5 * sin(bl["t"] * (3.0 + k * 9.0))   # its breaths quicken as it nears bursting
+		var rx := 4.0 + k * 4.0 + breath * 0.9
+		var ry := 3.0 + k * 4.0 + breath * 1.0
+		for yy in range(-int(ry * 2), 1):
+			for xx in range(-int(rx) - 1, int(rx) + 2):
+				var ex := xx / rx
+				var ey := (yy + ry) / ry
+				var e := ex * ex + ey * ey
+				if e > 1.0:
+					continue
+				var col := Color(0.42, 0.3, 0.52)
+				if ex < -0.2 and ey < -0.2 and e < 0.55:
+					col = Color(0.72, 0.6, 0.86)                      # the lit, stretched skin
+				elif e > 0.75:
+					col = Color(0.2, 0.12, 0.26)                      # its dark rim
+				var vv := absf(sin(xx * 1.7 + bl["seed"]) * 2.0 + yy * 0.6)
+				if vv < 0.3 and e < 0.8:
+					col = col.lerp(Color(0.85, 0.55, 0.95), 0.4 + 0.6 * breath * k)   # veins, glowing as it strains
+				cv.draw_rect(Rect2((c + Vector2(xx, yy)) * PX, Vector2(PX, PX)), col)
+		if k > 0.6 and randf() < 0.3:                      # it leaks a little before it goes
+			wsmoke.append({"q": bl["c"] + Vector2(randf_range(-8, 8), -ry * PX), "v": Vector2(randf_range(-5, 5), -randf_range(12, 22)),
+				"t": 0.0, "life": 1.0, "r": 1.6, "ph": randf() * TAU, "col": MIASMA_COL})
+	for v in vents:
+		var c1: Vector2 = (v["c"] / PX).floor()
+		for xx in range(-4, 5):                              # the crack itself, a faint violet light down in it
+			var yy := int(round(sin(xx * 1.3) * 0.8))
+			cv.draw_rect(Rect2((c1 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.12, 0.08, 0.14))
+			if absi(xx) < 3:
+				cv.draw_rect(Rect2((c1 + Vector2(xx, yy - 1)) * PX, Vector2(PX, PX)), Color(0.7, 0.55, 1.0, 0.25 + 0.15 * sin(now * 2.0 + xx)))
+		for th in v["threads"]:
+			var u: float = th["t"] / th["life"]
+			var tr: Array = th["trail"]
+			for i in tr.size():
+				var w := float(i) / tr.size()
+				var al := (1.0 - w) * sin(PI * minf(1.0, u * 1.2)) * 0.85
+				if i % 2 == 0 or w < 0.3:
+					cv.draw_rect(Rect2((tr[i] / PX).floor() * PX, Vector2(PX, PX)), Color(MIASMA_COL.r, MIASMA_COL.g, MIASMA_COL.b, al))
+				if w < 0.35:
+					cv.draw_rect(Rect2((tr[i] / PX).floor() * PX + Vector2(PX, 0), Vector2(PX, PX)), Color(MIASMA_COL.r, MIASMA_COL.g, MIASMA_COL.b, al * 0.35))
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -1486,6 +1634,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_miasma2(dt)
 	_tick_slash(dt)
 	_tick_blood(dt)
 	_tick_acid(dt)
