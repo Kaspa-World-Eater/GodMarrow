@@ -65,6 +65,8 @@ static func run(g) -> void:
 		_shot(g, a)
 	if a.has("groundfire"):
 		_ground_fires(g)                 # --groundfire: three fires set burning near the pilgrim (to see them spread)
+	if a.has("acid"):
+		_acid(g)                         # --acid: acid pools beside the pilgrim
 	if a.has("bolt"):
 		_bolt(g)                         # --bolt: lightning beside the pilgrim every two seconds
 	if a.has("blaze"):
@@ -435,3 +437,11 @@ static func _bolt(g) -> void:
 		I.lightning(g.hero.tp + Vector2(2.0 + (i % 3) * 0.8, 0.6 + (i % 2)))
 		i += 1
 		await tree.create_timer(2.0).timeout
+
+
+static func _acid(g) -> void:
+	await g.get_tree().create_timer(1.2).timeout
+	var I = load("res://world/impacts.gd").of(g.zone)
+	I.acid(g.hero.tp + Vector2(2.0, 0.8), 1.4, 20.0)
+	await g.get_tree().create_timer(0.6).timeout
+	I.acid(g.hero.tp + Vector2(0.4, 2.6), 0.9, 20.0)

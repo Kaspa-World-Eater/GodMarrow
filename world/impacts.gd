@@ -177,6 +177,35 @@ func frost(p: Vector2, r: float = 1.6, secs: float = 9.0) -> void:
 	frosts.append({"node": n, "t": 0.0, "secs": secs})
 	_flash(p, Color(0.6, 0.8, 1.0), 0.25, 40.0)
 
+## an acid pool (shaders/acid.gdshader): it spreads, bubbles and fumes for secs, then sinks away
+var acids: Array = []
+
+func acid(p: Vector2, r: float = 1.3, secs: float = 8.0) -> void:
+	var hw := r * Iso.HX
+	var fh := 60.0 + r * 30.0
+	var n := ColorRect.new()
+	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	n.size = (Vector2(hw * 2.4, hw + fh) / PX).ceil() * PX
+	var q := Iso.to_screen(p)
+	n.position = ((q - Vector2(n.size.x * 0.5, fh + hw * 0.5)) / PX).floor() * PX
+	n.z_index = -1
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/acid.gdshader")
+	m.set_shader_parameter("seed", randf() * 30.0)
+	m.set_shader_parameter("half_px", Vector2(hw, hw * 0.5))
+	m.set_shader_parameter("rect_size", n.size)
+	m.set_shader_parameter("fume_h", fh)
+	n.material = m
+	add_child(n)
+	var pl := PointLight2D.new()
+	pl.color = Color(0.6, 0.95, 0.3)
+	pl.set_meta("dark_r", 24.0 * r)
+	pl.set_meta("dark_far", 1.4)
+	pl.position = q
+	pl.enabled = false
+	add_child(pl)
+	acids.append({"node": n, "light": pl, "t": 0.0, "secs": secs})
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -249,6 +278,16 @@ func _process(dt: float) -> void:
 			bz["node"].queue_free()
 			bz["light"].queue_free()
 	blazes = blazes.filter(func(bz): return bz["t"] < bz["secs"])
+	for ac in acids:
+		ac["t"] += dt
+		var am: ShaderMaterial = ac["node"].material
+		am.set_shader_parameter("t", ac["t"])
+		am.set_shader_parameter("spread", 1.0 - pow(1.0 - minf(1.0, ac["t"] / 0.8), 3.0))
+		am.set_shader_parameter("fade", 1.0 - smoothstep(ac["secs"] - 2.0, ac["secs"], ac["t"]))
+		if ac["t"] >= ac["secs"]:
+			ac["node"].queue_free()
+			ac["light"].queue_free()
+	acids = acids.filter(func(ac): return ac["t"] < ac["secs"])
 	for fr in frosts:
 		fr["t"] += dt
 		var fm: ShaderMaterial = fr["node"].material
