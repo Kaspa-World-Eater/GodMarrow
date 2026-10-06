@@ -369,6 +369,9 @@ static func _burn_test(g, kind: String) -> void:
 	await tree.create_timer(1.2).timeout
 	if kind == "" or kind == "1":
 		kind = "hollow"
+	var bleed := kind.begins_with("bleed")
+	if bleed:
+		kind = "hollow"
 	var c: Vector2 = g.hero.tp
 	var ms: Array = []
 	for o in [Vector2(2.0, 0.4), Vector2(0.6, 2.2), Vector2(2.6, 2.0)]:
@@ -379,7 +382,7 @@ static func _burn_test(g, kind: String) -> void:
 	await tree.create_timer(0.6).timeout
 	for m in ms:
 		if is_instance_valid(m) and not m.dead:
-			Combat.hit_monster(m, 9999.0, "fire", c, {})
+			Combat.hit_monster(m, 9999.0, "phys" if bleed else "fire", c, {})
 		await tree.create_timer(0.35).timeout
 
 

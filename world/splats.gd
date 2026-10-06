@@ -22,11 +22,59 @@ func death(kind: String, p: Vector2, big: bool) -> void:
 		for i in 4:
 			list.append({"p": p + Vector2(randf_range(-0.4, 0.4), randf_range(-0.3, 0.3)), "r": 0.06, "t": 45.0, "seed": randf() * 9.0, "col": "b"})
 	else:
-		for i in 3 + (3 if big else 0):
-			list.append({"p": p + Vector2(randf_range(-0.35, 0.35), randf_range(-0.25, 0.25)), "r": 0.12 + randf() * 0.22, "t": 26.0, "seed": randf() * 9.0, "col": "g" if kind.contains("bloat") else "r"})
+		# a pool that runs out from where it fell (shaders/blood_pool.gdshader), and a few spatters round it
+		_pool(p + Vector2(randf_range(-0.2, 0.2), 0.25), 0.9 + (0.4 if big else 0.0) + randf() * 0.25, kind.contains("bloat"))
+		for i in 2 + (2 if big else 0):
+			list.append({"p": p + Vector2(randf_range(-0.6, 0.6), randf_range(-0.45, 0.45)), "r": 0.06 + randf() * 0.1, "t": 26.0, "seed": randf() * 9.0, "col": "g" if kind.contains("bloat") else "r"})
 	while list.size() > 140:
 		list.pop_front()
 	queue_redraw()
+
+## blood pools (at most 36; the oldest dries and goes first)
+var pools: Array = []
+
+func _pool(p: Vector2, r: float, bile: bool) -> void:
+	var hw := r * Iso.HX
+	var rr := ColorRect.new()
+	rr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rr.size = (Vector2(hw * 2.9, hw * 1.5) / 4.0).ceil() * 4.0
+	var q := Iso.to_screen(p)
+	rr.position = ((q - rr.size * 0.5) / 4.0).floor() * 4.0
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/blood_pool.gdshader")
+	m.set_shader_parameter("seed", randf() * 30.0)
+	m.set_shader_parameter("half_px", Vector2(hw, hw * 0.5))
+	m.set_shader_parameter("rect_size", rr.size)
+	if bile:
+		m.set_shader_parameter("tint", Vector3(0.75, 1.9, 0.5))
+	rr.material = m
+	add_child(rr)
+	pools.append({"node": rr, "t": 0.0, "life": 40.0})
+	while pools.size() > 36:
+		var old: Dictionary = pools.pop_front()
+		if is_instance_valid(old["node"]):
+			old["node"].queue_free()
+
+func _tick_pools(dt: float) -> void:
+	var sc = get_tree().current_scene
+	var h = sc.get("hero") if sc else null
+	for pl in pools:
+		pl["t"] += dt
+		var n: ColorRect = pl["node"]
+		if not is_instance_valid(n):
+			continue
+		var u: float = pl["t"]
+		var m: ShaderMaterial = n.material
+		m.set_shader_parameter("t", u)
+		m.set_shader_parameter("spread", 1.0 - pow(1.0 - minf(1.0, u / 2.2), 3.0))
+		m.set_shader_parameter("dry", smoothstep(8.0, 32.0, u))
+		m.set_shader_parameter("fade", 1.0 - smoothstep(pl["life"] - 6.0, pl["life"], u))
+		if h and is_instance_valid(h):
+			m.set_shader_parameter("light_dir", ((h.position + Vector2(0, -150)) - (n.position + n.size * 0.5)).normalized())
+	for pl in pools:
+		if pl["t"] >= pl["life"] and is_instance_valid(pl["node"]):
+			pl["node"].queue_free()
+	pools = pools.filter(func(pl): return pl["t"] < pl["life"])
 
 ## scorched ground where a fire has run: a char stain with a few embers that die in the first seconds; lasts a minute
 func scorch(p: Vector2) -> void:
@@ -35,6 +83,7 @@ func scorch(p: Vector2) -> void:
 		list.pop_front()
 
 func _process(dt: float) -> void:
+	_tick_pools(dt)
 	if list.is_empty():
 		return
 	for s in list:
