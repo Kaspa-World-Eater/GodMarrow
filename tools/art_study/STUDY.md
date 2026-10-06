@@ -343,3 +343,26 @@ Each layer decides what the next can do. The face's surface is the skin's envelo
 3. Fat pads in the hollows, scaled by how fed the creature is (a Famine: nearly none).
 4. Skin: an envelope over the maximum of those layers, smoothed by its thickness and drawn taut over hollows.
 5. Then the material (stone, flesh), weathering and light.
+
+## Round 8: dreaming anatomy, not tubes (2026-10-06; Derek: "You need to learn to dream anatomy. You keep making tubes")
+
+The failure: every creature I built was capsules and ellipsoids, so every limb is a tube, every joint a ball, every
+form symmetric about its own axis, and the silhouette two parallel lines. That is what reads as a toy.
+
+How anatomy is dreamed (invented, but believable):
+- **Start from function.** A limb is levers (bones) moved by masses (muscles) that cross the joints. Every mass has
+  an origin, a belly and an insertion; it is fat where it pulls from, thin where it ends in tendon.
+- **Bellies are lopsided.** A muscle rises fast on one side and falls slowly on the other; the high point is near
+  its origin, not its middle. Opposing masses on the two sides of a limb peak at different heights, so the outline is
+  never two parallel lines: it zig-zags, a curve against a straight, the curve on one side opposite a straight on the
+  other.
+- **Overlap.** Masses lie over each other and the nearer one's edge casts a small shadow into the next. That overlap
+  is most of what makes form read as built rather than inflated.
+- **Pinch and swell.** Joints pinch (tendons and bone only), bellies swell between them. At the joint the bone breaks
+  the surface as a hard landmark (the elbow's point, the wrist's knobs, the knuckles); everywhere else is soft.
+- **Planes, not cylinders.** A limb's cross-section is a rounded box or a wedge, not a circle; the front plane, the
+  side plane and the turn between them catch light in steps.
+- **Skin and its folds.** Skin bunches on the inside of a bend and stretches on the outside; it hangs where gravity
+  takes it; it shows tendons as ridges where it is thin.
+- **Design the silhouette deliberately.** Draw the outline as a sequence of designed curves (each with a direction
+  and a speed), then build the forms to fit it, not the other way round.
