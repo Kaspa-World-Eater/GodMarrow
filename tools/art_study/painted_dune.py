@@ -56,12 +56,14 @@ def hexc(s):
 DUST = np.array([hexc(c) for c in ("#4a4058", "#685d72", "#8a7f8c", "#aca1a4", "#c9bfb6", "#e0d7c6", "#efe8d6", "#faf5e8")])
 GRIT = hexc("#5e5048")                                                 # the heavier grains, darker, browner
 FLECK = hexc("#fffaf0")
+# the vertebra's own bone: warmer and older than the dust round it, umber in its shade, pitted
+BONE = np.array([hexc(c) for c in ("#2c2026", "#4a3a38", "#6e5a4c", "#94806a", "#b8a488", "#d6c6a6", "#ece0c4", "#fbf4e2")])
 
 TILES = 8                                                             # the field shown: TILES x TILES
 TW, TH = 36, 18                                                        # one tile (a yard) in world px: core/iso.gd
-W, H = TILES * TW + 8, TILES * TH + 8
+W, H = TILES * TW + 8, TILES * TH + 30
 SY, SX = np.mgrid[0:H, 0:W].astype(float)
-OX, OY = W / 2, 4
+OX, OY = W / 2, 18
 # each art pixel straight down onto the ground plane (open ground: no need to cast rays)
 WX = ((SY + 0.5 - OY) / (TH / 2) + (SX + 0.5 - OX) / (TW / 2)) / 2
 WY = ((SY + 0.5 - OY) / (TH / 2) - (SX + 0.5 - OX) / (TW / 2)) / 2
@@ -77,10 +79,15 @@ def along_across(x, y):
     return x * WIND[0] + y * WIND[1], -x * WIND[1] + y * WIND[0]
 
 
+_dr = np.random.default_rng(12)
+DISLOC = [(_dr.uniform(0.5, 7.5), _dr.uniform(0.5, 7.5), 1 if k % 2 else -1) for k in range(9)]
+
+
 def ripple_phase(x, y):
     a, c = along_across(x, y)
+    fork = sum(sg * np.arctan2(y - dy, x - dx) / (2 * np.pi) for dx, dy, sg in DISLOC)
     # crests wander (low warp) and fork (a faster warp that tears the phase so two crests run into one)
-    return a / LAM + (fbm(x * 0.22, y * 0.22) - 0.5) * 3.0 + (vn(c * 0.9 + 4, a * 0.25) - 0.5) * 1.1
+    return a / LAM + fork + (fbm(x * 0.22, y * 0.22) - 0.5) * 3.0 + (vn(c * 0.9 + 4, a * 0.25) - 0.5) * 1.1
 
 
 def ripple_profile(r):
@@ -104,13 +111,54 @@ for i in range(1, len(_path)):
         PRINTS.append((_path[i] + np.array([-d[1], d[0]]) * 0.11 * side, d, float(np.clip(_path_t[i] / TILES, 0, 1))))
 
 
-def height(x, y):
+VERT = (5.7, 2.4, 0.5)                                                  # where it lies, and its turn
+
+
+def _seg(u, v, p0, p1, w0, w1):
+    """distance-based blade from p0 to p1, width w0 tapering to w1; returns 0..1 thickness"""
+    d = np.array(p1) - np.array(p0)
+    L = np.hypot(*d)
+    tt = np.clip(((u - p0[0]) * d[0] + (v - p0[1]) * d[1]) / (L * L), 0, 1)
+    px, py = p0[0] + d[0] * tt, p0[1] + d[1] * tt
+    w = w0 + (w1 - w0) * tt
+    return np.clip(1 - (np.hypot(u - px, v - py) / w) ** 2, 0, 1)
+
+
+def bone_h(x, y):
+    vx, vy, th = VERT
+    SC = 2.3                                                            # a god's vertebra: about a yard long
+    u = ((x - vx) * np.cos(th) + (y - vy) * np.sin(th)) / SC
+    v = (-(x - vx) * np.sin(th) + (y - vy) * np.cos(th)) / SC
+    # the body (centrum): a short drum, its end face cupped so a ring of rim catches the light
+    d = np.hypot(u / 1.0, v / 0.85)
+    centrum = np.sqrt(np.clip(1 - (d / 0.21) ** 2, 0, 1)) * 0.12
+    centrum = centrum - np.clip(1 - (d / 0.13) ** 2, 0, 1) * 0.03
+    # the arch behind it, thick, round the canal (the canal left open: sand and shadow in it)
+    ring = np.hypot(u - 0.29, v / 0.9)
+    arch = np.clip(1 - np.abs(ring - 0.1) / 0.055, 0, 1) ** 0.5 * 0.09
+    # the processes: broad blades, swelling to knobbed ends (bone thickens where muscle held it)
+    def blade(p0, p1, w0, w1, hgt, knob):
+        b = _seg(u, v, p0, p1, w0, w1) ** 0.5 * hgt
+        k = np.sqrt(np.clip(1 - (np.hypot(u - p1[0], v - p1[1]) / knob) ** 2, 0, 1)) * hgt * 1.05
+        return np.maximum(b, k)
+    spine = blade((0.38, 0.0), (0.74, 0.1), 0.085, 0.05, 0.075, 0.06)
+    wing1 = blade((0.24, 0.07), (0.3, 0.33), 0.08, 0.05, 0.07, 0.065)
+    wing2 = blade((0.24, -0.07), (0.33, -0.32), 0.08, 0.05, 0.07, 0.065) * np.clip((0.3 + v) / 0.12 + 0.6, 0.0, 1)  # its tip sinking into the sand
+    return np.maximum.reduce([centrum, arch, spine, wing1, wing2]) * 1.9
+
+
+def height(x, y, want_bone=False):
     a, c = along_across(x, y)
+    va, vc = along_across(VERT[0], VERT[1])
+    da, dc = a - va, c - vc
+    tail = 0.09 * np.exp(-(dc / (0.45 + np.clip(da, 0, None) * 0.1)) ** 2) * np.exp(-np.clip(da - 1.0, 0, None) / 1.4) * np.clip((da - 0.5) / 0.5, 0, 1)
+    scour = -0.04 * np.exp(-((np.hypot(da + 0.2, dc * 0.8) - 0.75) / 0.22) ** 2) * (da < 0.3)
     swell = np.sin((a * 0.75 + c * 0.2) + (fbm(x * 0.15 + 3, y * 0.15) - 0.5) * 2.4) * 0.3
     brow = np.clip((swell / 0.3 + 0.15) * 1.6, 0, 1)                   # the smooth brows: ripples fade on the swell's tops
     rk = np.clip((fbm(x * 0.3 + 7, y * 0.3) - 0.42) / 0.1, 0, 1)
     amp = 0.03 * rk * rk * (3 - 2 * rk) * (1 - brow * 0.85)
-    h = swell + ripple_profile(ripple_phase(x, y) % 1.0) * amp
+    near = np.clip((np.hypot(da, dc) - 0.6) / 1.0, 0, 1)                         # the ripples die out round the bone
+    h = swell + ripple_profile(ripple_phase(x, y) % 1.0) * amp * near + tail + scour
     for (p, d, age) in PRINTS:
         fill = 1.0 - age * 0.8
         u = (x - p[0]) * d[0] + (y - p[1]) * d[1]
@@ -122,11 +170,30 @@ def height(x, y):
         toe = np.exp(-(((u - 0.14) / 0.04) ** 2 + (v / 0.06) ** 2))
         h = h - (np.clip(1.2 - e, 0, 1) * 0.028 + heel * 0.012 + toe * 0.01) * fill                  # pressed in, the heel deepest
         h = h + np.exp(-((np.sqrt(e) - 1.3) / 0.25) ** 2) * 0.01 * fill      # a low rim of pushed sand
-    return h
+    bone = swell + bone_h(x, y) - 0.05                                     # the bone stands where it clears the sand
+    if want_bone:
+        return bone > h + 0.004
+    return np.maximum(h, bone)
 
 
-def ground(t):
-    x, y = WX, WY
+_STILL = {}
+
+
+def still():
+    """everything that does not move, painted once"""
+    if _STILL:
+        return _STILL
+    KZ = 22.0
+    x, y = WX.copy(), WY.copy()
+    got = np.zeros_like(WX, bool)
+    for z in np.arange(0.62, -0.42, -0.02):
+        px = ((SY + 0.5 + z * KZ - OY) / (TH / 2) + (SX + 0.5 - OX) / (TW / 2)) / 2
+        py = ((SY + 0.5 + z * KZ - OY) / (TH / 2) - (SX + 0.5 - OX) / (TW / 2)) / 2
+        hh = height(px, py)
+        new = ~got & (hh >= z)
+        x[new], y[new] = px[new], py[new]
+        got |= new
+    _STILL["xy"] = (x, y)
     e = 0.02
     h = height(x, y)
     hx_ = (height(x + e, y) - height(x - e, y)) / (2 * e)
@@ -136,45 +203,75 @@ def ground(t):
     sun = np.array([-0.6, 0.38, 0.70])
     sun /= np.linalg.norm(sun)
     ndl = np.clip((n * sun).sum(2), 0, 1)
-    # cast shadow: march toward the sun across the ripples (they are low: short march)
+    # cast shadow: march toward the sun (long enough for the bone's shadow to fall across the sand)
     shade = np.zeros_like(h, bool)
-    for k in range(1, 9):
-        s = k * 0.03
-        shade |= height(x + sun[0] * s, y + sun[1] * s) > h + sun[2] * s * 0.18 + 0.002
+    for k in range(1, 22):
+        s_ = k * 0.03
+        shade |= height(x + sun[0] * s_, y + sun[1] * s_) > h + sun[2] * s_ * 0.4 + 0.002
     lit = np.where(shade, ndl * 0.3, ndl)
     sky = n[..., 2] * 0.16                                              # the pale sky fills every face a little
     a, c = along_across(x, y)
     r = ripple_phase(x, y) % 1.0
-    # paint: the ripples laid as dry-brush strokes along the crests; a broad paper tooth fixed to the world
+    bone = height(x, y, want_bone=True)
+    # contact: the sand darkens where it meets the bone
+    from scipy import ndimage as nd
+    near_bone = nd.binary_dilation(bone, iterations=2) & ~bone
+    # paint: dry-brush strokes along the crests; broad washes laid wet, a paper tooth fixed to the world
     stroke = (vn(c * 0.8 + 11, a * 4.0) - 0.5) * 0.045
+    wash = (fbm(x * 0.17 + 20, y * 0.17 + 4) - 0.5) * 0.12
     tooth = (vn(x * 1.4, y * 1.4) - 0.5) * 0.05 + (vn(x * 4.5 + 5, y * 4.5) - 0.5) * 0.025
-    v = 0.12 + lit * 0.72 + sky + stroke + tooth
-    v = v + (BAY - 0.5) * 0.05                                          # dither: only tips values already near a step
+    jitter = (vn(c * 1.6 + 3, a * 9.0) - 0.5) * 0.07                   # tone edges broken by the brush, not a grid
+    v = 0.12 + lit * 0.72 + sky + stroke + wash + tooth + jitter
+    v = np.where(near_bone, v - 0.12, v)
     idx = np.clip((v * len(DUST)).astype(int), 0, len(DUST) - 1)
     rgb = DUST[idx]
+    # pigment pooled where a wash ends: a darker band just inside the swell's shade, where light turns to shadow
+    sw_lit = np.clip(0.12 + lit * 0.72 + sky + wash, 0, 1)
+    pool = (sw_lit > 0.5) & (sw_lit < 0.56) & ~bone
+    rgb[pool] = DUST[np.clip(idx[pool] - 1, 0, len(DUST) - 1)]
     # the sun's temperature: the lit tones a step warmer, the shade a step cooler (in steps, as mixed)
     warmk = (lit > 0.55)[..., None]
     rgb = np.where(warmk, rgb * np.array([1.025, 1.0, 0.955]), rgb * np.array([0.975, 0.985, 1.03]))
-    # pooled grit in the troughs (the heavy grains settle where the lee meets the next stoss), a lit lip on each crest
+    # grit pooled in the troughs, a lit lip along each crest's sunward side
     rippled = fbm(x * 0.3 + 7, y * 0.3) > 0.5
-    trough = rippled & (r < 0.1)
+    trough = rippled & (r < 0.1) & ~bone
     rgb[trough] = rgb[trough] * 0.82 + GRIT * 0.18
-    lip = rippled & (r > 0.66) & (r < 0.72) & (lit > 0.5)
+    lip = rippled & (r > 0.58) & (r < 0.72) & (lit > 0.4) & ~bone
     rgb[lip] = DUST[np.clip(idx[lip] + 1, 0, len(DUST) - 1)]
-    # flecks of bone not yet ground fine: rare, each a pale point with its shadow pixel below it
+    # flecks of bone not yet ground fine: rare
     fl = (vn(x * 5.1, y * 5.1) > 0.965) & (vn(x * 31.0, y * 31.0) > 0.8) & (r > 0.2) & (r < 0.65)
     rgb[fl] = FLECK
     below = np.roll(fl, 1, axis=0) & ~fl
     rgb[below] = DUST[2]
-    # the wind: dust lifting off the crests in thin streaks running downwind, stepped see-through
+    # the vertebra: its own ramp, lit by the same sun; pitted; a dark line where it turns from the light
+    vb = np.clip(0.1 + lit * 0.8 + sky * 0.6 + (vn(x * 14, y * 14) - 0.5) * 0.08, 0, 0.999)
+    bi = (vb * len(BONE)).astype(int)
+    pits = bone & (vn(x * 30 + 7, y * 30) > 0.78)
+    bi = np.where(pits, np.maximum(bi - 2, 0), bi)
+    rgb[bone] = BONE[bi[bone]]
+    under = bone & ~np.roll(bone, -1, axis=0)                           # the lower contour only: weight, not a wire
+    rgb[under & (lit < 0.6)] = BONE[2]
+    rim = bone & ~nd.binary_erosion(bone) & (lit >= 0.5)
+    rgb[rim] = BONE[7]
+    _STILL.update(rgb=rgb, a=a, c=c, r=r, rippled=rippled, bone=bone)
+    return _STILL
+
+
+def ground(t):
+    st = still()
+    rgb = st["rgb"].copy()
+    a, c, r = st["a"], st["c"], st["r"]
+    # the wind: dust lifting off the crests in thin streaks running downwind, stepped see-through; it parts
+    # round the bone and spills past it
     drift = vn(a * 0.7 - t * 3.0, c * 7.0) * 0.7 + vn(a * 1.6 - t * 5.0, c * 13.0) * 0.3
-    crest = np.clip(1 - np.abs(r - 0.72) / 0.35, 0, 1) * rippled
+    crest = np.clip(1 - np.abs(r - 0.72) / 0.35, 0, 1) * st["rippled"]
     dust = np.clip((drift - 0.62) * 4, 0, 1) * (0.35 + crest * 0.65)
-    a1 = np.where(dust > 0.6, 0.45, np.where(dust > 0.25, 0.22, 0.0)) * (BAY < 0.85)
+    a1 = np.where(dust > 0.6, 0.45, np.where(dust > 0.25, 0.22, 0.0)) * (BAY < 0.85) * ~st["bone"]
     rgb = rgb * (1 - a1[..., None]) + DUST[7] * a1[..., None]
-    # the edge of the field: the sheet behind it (the game's dark), with a contact line
+    x, y = st["xy"]
+    inside = (x >= 0) & (y >= 0) & (x < TILES) & (y < TILES)
     out = np.zeros((H, W, 3)) + hexc("#16131a")
-    out[INSIDE] = rgb[INSIDE]
+    out[inside] = rgb[inside]
     return np.clip(out, 0, 1)
 
 

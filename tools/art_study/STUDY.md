@@ -407,3 +407,18 @@ out of the game. What copying it taught:
 - **Story marks must cross the grain.** The pilgrim's track first ran along the crests and read as another ripple;
   run with the wind, it cuts across them and reads at once. Prints shaped as feet (ball, arch, heel), shallow, with
   the wind filling the older ones.
+- **Refine pass (Derek: "refine it again").** Skeptic's list, worst first, and what answered it:
+  - *Ripples combed parallel* → nine phase dislocations (atan2 terms), so crests fork in Y-junctions as real
+    ripples do.
+  - *A flat empty lower half* → a broad wet wash under everything, and pigment pooled in a band where the swell's
+    light turns to shade.
+  - *Checkerboard in the shade* → Bayer dither replaced by stroke-shaped jitter along the crests.
+  - *Nothing said "bone"* → one vertebra of a god, about a yard long, half-buried. It has a body with a cupped end
+    face, the arch round an open canal, and three processes swelling to knobbed ends, one tip sinking. Upwind the
+    wind scours a hollow; downwind it leaves a sand tail; the ripples die out round it.
+  - *A flat plane* → a short vertical ray-cast (22 px of screen per yard of height): the swell's real height now
+    bends the field's edge, and the bone stands up.
+  - Mistakes on the way: the bone first came out a cookie on stick legs (processes one pixel wide, a dark wire
+    outline). Fix: blades at least 3 px, bone thickening at the tips, weight only on the lower contour. The cast
+    shadow had been exaggerated for the ripples; on a tall thing that made a night-long shadow. The sun height for
+    casting was raised.
