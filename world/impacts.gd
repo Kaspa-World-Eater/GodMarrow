@@ -362,12 +362,15 @@ func _draw_souls(cv: CanvasItem) -> void:
 			var q: Vector2 = (tr[i] / PX).floor() * PX
 			if (int(q.x / PX) + int(q.y / PX) + i) % 2 == 0 or u < 0.3:
 				cv.draw_rect(Rect2(q, Vector2(PX, PX)), Color(0.6, 0.85, 1.0, 0.7 * (1.0 - u)))
+		# a soul: no face (Derek: no little skulls), a small spirit-mote like the wisps, faint, breathing
 		var c: Vector2 = (so["p"] / PX).floor() * PX
-		cv.draw_rect(Rect2(c - Vector2(PX, PX * 2), Vector2(PX * 3, PX * 4)), Color(0.8, 0.95, 1.0, 0.9))
-		cv.draw_rect(Rect2(c - Vector2(PX * 2, PX), Vector2(PX * 5, PX * 2)), Color(0.7, 0.9, 1.0, 0.55))
-		cv.draw_rect(Rect2(c + Vector2(-PX, -PX), Vector2(PX, PX)), Color(0.05, 0.08, 0.14, 0.95))
-		cv.draw_rect(Rect2(c + Vector2(PX, -PX), Vector2(PX, PX)), Color(0.05, 0.08, 0.14, 0.95))
-		cv.draw_rect(Rect2(c + Vector2(0, PX), Vector2(PX, PX)), Color(0.05, 0.08, 0.14, 0.7))
+		var br := 0.7 + 0.3 * sin(so["t"] * 7.0 + so["seed"])
+		for yy in range(-3, 4):
+			for xx in range(-3, 4):
+				var e := xx * xx + yy * yy
+				if e <= 9:
+					cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.55, 0.75, 1.0, (0.16 if e > 4 else 0.3) * br))
+		cv.draw_rect(Rect2(c, Vector2(PX, PX)), Color(1, 1, 1, 0.95))
 
 # ------------------------------------------------------------------ lightning's other forms
 ## an arc leaping between two points (chain lightning), and a body crackling with charge for a while
