@@ -296,6 +296,7 @@ func _process(_dt: float) -> void:
 	var lamp_on: bool = not hero.dead
 	RenderingServer.global_shader_parameter_set("lamp_world", hero.position + Vector2(-20.0 * float(hero.face), -150.0))
 	RenderingServer.global_shader_parameter_set("lamp_reach", hero.light_radius() * Iso.HX * 1.6 if lamp_on else 0.0)
+	RenderingServer.global_shader_parameter_set("world_wind", Game.wind)
 	RenderingServer.global_shader_parameter_set("lamp_night", 1.0 - (Game.day_k() if zone.d.get("outdoor", false) else 0.0))
 	if title_open:
 		# the title's slow drift over the camp: wide, unhurried, never quite repeating

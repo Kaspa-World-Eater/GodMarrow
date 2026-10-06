@@ -39,13 +39,23 @@ const MAP := [
 
 static var _mats := {}
 
-static func _lit_mat(flip: bool) -> ShaderMaterial:
-	if not _mats.has(flip):
+static func _lit_mat(flip: bool, sway: float = 0.0) -> ShaderMaterial:
+	var key := "%s/%.1f" % [flip, sway]
+	if not _mats.has(key):
 		var m := ShaderMaterial.new()
 		m.shader = load("res://shaders/cm_prop_lit.gdshader")
 		m.set_shader_parameter("flipped", flip)
-		_mats[flip] = m
-	return _mats[flip]
+		m.set_shader_parameter("sway", sway)
+		_mats[key] = m
+	return _mats[key]
+
+## how far a kind's top bends in the wind (trees and bushes; stone, graves and stumps stand still)
+static func _sway_of(key: String) -> float:
+	if key.begins_with("sp_") and not key.contains("stump") and not key.contains("fallen"):
+		return 1.6 if not key.contains("sapling") else 1.2
+	if key.begins_with("shrub"):
+		return 1.0
+	return 0.0
 
 static func scale_for(key: String) -> float:
 	for m in MAP:
@@ -89,7 +99,7 @@ static func node_for(key: String, x: float, y: float, flip: bool) -> Node2D:
 	if G.has(reg):
 		node.glow = G[reg]
 	node.setup()
-	node.spr.material = _lit_mat(flip)   # lit by the lantern through its normal map (shaders/cm_prop_lit.gdshader)
+	node.spr.material = _lit_mat(flip, _sway_of(key))   # lit by the lantern through its normal map (shaders/cm_prop_lit.gdshader)
 	# lift it onto its foot: the bottom of its frame at 0
 	var f: Dictionary = A[reg][0]
 	var bottom: float = (f["off"] as Vector2).y - (f["orig"] as Vector2).y * 0.5 + (f["rect"] as Rect2).size.y

@@ -5,11 +5,19 @@ shader_type canvas_item;
 global uniform vec2 lamp_world;
 global uniform float lamp_reach;    // screen px
 global uniform float lamp_night;    // 0 by day .. 1 at night
+global uniform float world_wind;    // the one wind (core/gust.gd via Game.wind)
 uniform bool flipped = false;
+uniform float sway = 0.0;           // how far a top bends, in the sprite's own px (trees, bushes; 0 for stone)
 varying vec2 world;
 
 void vertex() {
 	world = (MODEL_MATRIX * vec4(VERTEX, 0.0, 1.0)).xy;
+	if (sway > 0.0 && VERTEX.y < 0.5) {      // the top edge bends; the foot stays where it stands
+		vec2 origin = (MODEL_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xy;
+		float beat = origin.x * 0.0123 + origin.y * 0.0071;
+		float s = sin(TIME * 1.1 + beat) * 0.7 + sin(TIME * 2.5 + beat * 1.7) * 0.3;
+		VERTEX.x += (s * 0.6 + 0.6) * sway * world_wind;
+	}
 }
 
 void fragment() {

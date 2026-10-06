@@ -43,6 +43,10 @@ lamp_reach={
 "type": "float",
 "value": 0.0
 }
+world_wind={
+"type": "float",
+"value": 0.5
+}
 lamp_night={
 "type": "float",
 "value": 0.0
