@@ -181,6 +181,7 @@ func _ensure_sky() -> void:
 
 func _draw_sky() -> void:
 	_draw_souls(sky)
+	_draw_slash(sky)
 	_draw_blood(sky)
 	_draw_acid(sky)
 	_draw_bone(sky)
@@ -1228,6 +1229,168 @@ func _draw_blood(cv: CanvasItem) -> void:
 							col = Color(0.95, 0.45, 0.4)               # the bubble's lit skin
 						cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), col)
 
+# ------------------------------------------------------------------ melee: slashes and echoes
+## a slash: the blade's smear, a crescent swept round the striker on the ground's plane (so it lies in the world, an
+## ellipse, not a sticker on the screen). The head is white-hot steel, the body pale steel thinning to a cold blue at
+## the inner edge, the tail dithering away; two echoes (afterimages of the blade) trail it, bluer and fainter. The
+## crescent is thickest just behind the head, needle-thin at the tail. kind 0 sweeps one way, 1 the other, 2 is the
+## overhead: an upright arc in the blow's own plane, from over the shoulder down into the ground ahead, where it
+## strikes dust and a ring of force. Heavy blows are wider, longer, and leave three echoes.
+var slashes: Array = []    # {c, at, dir, R, a0, a1, t, kind, heavy}
+## a cut: where the blade met flesh, a bright line laid across the body against the stroke, and speed-lines bursting
+var cuts: Array = []       # {c, d, t, heavy}
+var rings: Array = []      # {c, R, t, secs}
+const B4 := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
+const SWIPE := 0.1         # how long the blade takes to cross the arc
+
+func slash(at: Vector2, dir: Vector2, kind: int = 0, heavy: bool = false, reach: float = 1.5) -> void:
+	_ensure_sky()
+	var base := dir.angle()
+	var span := (3.4 if heavy else 2.8)
+	var sgn := 1.0 if kind != 1 else -1.0
+	slashes.append({"at": at, "dir": dir.normalized(), "c": Iso.to_screen(at) + Vector2(0, -38), "R": reach * (1.15 if heavy else 0.95),
+		"a0": base - span * 0.5 * sgn, "a1": base + span * 0.5 * sgn, "t": 0.0, "kind": kind, "heavy": heavy, "struck": false})
+
+func cut(p: Vector2, dir: Vector2, heavy: bool = false) -> void:
+	_ensure_sky()
+	cuts.append({"c": Iso.to_screen(p) + Vector2(0, -40), "d": (Iso.to_screen(p + dir) - Iso.to_screen(p)).normalized(), "t": 0.0, "heavy": heavy})
+
+## the point on a slash's arc at angle-param f (0 tail .. 1 head side), at radius scale k, in screen space
+func _slash_pt(sl: Dictionary, a: float, k: float) -> Vector2:
+	if sl["kind"] == 2:
+		# the overhead: phi runs from over the shoulder (behind, high) to down into the ground ahead
+		var phi := lerpf(1.9, -0.35, a)
+		var R: float = sl["R"] * k
+		var h := Iso.to_screen(sl["dir"] * R * cos(phi)) - Iso.to_screen(Vector2.ZERO)
+		return sl["c"] + h + Vector2(0, -sin(phi) * R * Iso.HX * 0.75 + 44.0 * (1.0 - clampf(sin(phi) + 0.6, 0.0, 1.0)) * 0.0)
+	var ang := lerpf(sl["a0"], sl["a1"], a)
+	return sl["c"] + Iso.to_screen(Vector2(cos(ang), sin(ang)) * sl["R"] * k) - Iso.to_screen(Vector2.ZERO)
+
+func _tick_slash(dt: float) -> void:
+	for sl in slashes:
+		sl["t"] += dt
+		var head := minf(1.0, sl["t"] / SWIPE)
+		if sl["t"] < SWIPE and randf() < dt * 60.0:          # glints thrown off the edge as it goes
+			var q := _slash_pt(sl, head, 1.0)
+			_phos.append({"q": q, "t": 0.0, "life": randf_range(0.15, 0.35), "v": (q - sl["c"]).normalized() * randf_range(40, 90), "ph": 0.0, "glint": randf() < 0.4})
+		if sl["kind"] == 2 and not sl["struck"] and sl["t"] >= SWIPE:
+			sl["struck"] = true                              # the overhead buries itself in the ground: dust, a ring
+			var gp: Vector2 = sl["at"] + sl["dir"] * sl["R"] * 0.9
+			rings.append({"c": Iso.to_screen(gp), "R": (1.6 if sl["heavy"] else 1.1) * Iso.HX, "t": 0.0, "secs": 0.32})
+			for k in (6 if sl["heavy"] else 3):
+				hit(gp + Vector2(randf_range(-0.3, 0.3), randf_range(-0.3, 0.3)), Vector2.INF, false, "stone")
+			Game.shake(3.0 if sl["heavy"] else 1.6)
+	slashes = slashes.filter(func(sl): return sl["t"] < 0.42)
+	for ct in cuts:
+		ct["t"] += dt
+	cuts = cuts.filter(func(ct): return ct["t"] < 0.2)
+	for rg in rings:
+		rg["t"] += dt
+	rings = rings.filter(func(rg): return rg["t"] < rg["secs"])
+
+## one crescent of the smear, its head at hd and tail at tl (0..1 along the arc), alpha scale al, cold (0..1) shifts
+## it toward the echo's blue
+func _crescent(cv: CanvasItem, sl: Dictionary, tl: float, hd: float, al: float, cold: float) -> void:
+	if hd - tl < 0.01:
+		return
+	var L: float = (_slash_pt(sl, hd, 1.0) - _slash_pt(sl, tl, 1.0)).length()
+	var n := maxi(3, int(L / PX * 1.3))
+	var W := (6.0 if sl["heavy"] else 4.0)
+	var seen := {}
+	for i in n + 1:
+		var f := i / float(n)                             # 0 at the tail, 1 at the head
+		var a := lerpf(tl, hd, f)
+		var w := W * sin(PI * pow(f, 0.55)) + 0.6          # thickest just behind the head
+		var o := _slash_pt(sl, a, 1.0)
+		var inn := _slash_pt(sl, a, 0.74)
+		var band := maxf(1.0, o.distance_to(inn) / PX)      # the band's depth in cells, filled from the edge in
+		var steps := int(ceil(band * w / W))
+		for k in steps:
+			var q := o.lerp(inn, k / band)
+			var cellp := (q / PX).floor()
+			var key := Vector2i(cellp)
+			if seen.has(key):
+				continue
+			seen[key] = true
+			var kk := k / maxf(1.0, float(steps))           # 0 at the cutting edge, 1 at the inner edge
+			var col: Color
+			if k == 0 and f > 0.55:
+				col = Color(1, 1, 1)                          # the white-hot edge near the head
+			elif kk < 0.45:
+				col = Color(0.86, 0.9, 0.95)
+			else:
+				col = Color(0.5, 0.62, 0.85)
+			col = col.lerp(Color(0.45, 0.6, 1.0), cold)
+			var aa := al * minf(1.0, f * 2.6) * (1.0 - kk * kk * 0.6)
+			# dither the fade on the grid: a cell is drawn whole or not at all (the title's method)
+			var th: float = (B4[(posmod(int(cellp.y), 4)) * 4 + posmod(int(cellp.x), 4)] + 0.5) / 16.0
+			if aa > th * 0.9:
+				cv.draw_rect(Rect2(cellp * PX, Vector2(PX, PX)), Color(col.r, col.g, col.b, minf(1.0, 0.55 + aa * 0.45)))
+
+func _draw_slash(cv: CanvasItem) -> void:
+	for sl in slashes:
+		var t: float = sl["t"]
+		var echoes := [[0.0, 1.0, 0.0], [0.03, 0.5, 0.6], [0.06, 0.26, 1.0]]
+		if sl["heavy"]:
+			echoes.append([0.09, 0.14, 1.0])
+		for e in range(echoes.size() - 1, -1, -1):
+			var te: float = t - echoes[e][0]
+			if te <= 0.0:
+				continue
+			var hd := 1.0 - pow(1.0 - minf(1.0, te / SWIPE), 2.0)   # it snaps across, easing out
+			var len0 := 0.75 if sl["heavy"] else 0.6
+			var shrink := clampf((te - SWIPE) / 0.22, 0.0, 1.0)     # once across, the tail catches up to the head
+			var tl := maxf(0.0, hd - len0 * (1.0 - shrink))
+			var al: float = echoes[e][1] * (1.0 - shrink * 0.6)
+			if e == 0 and te >= SWIPE * 0.8 and te < SWIPE * 0.8 + 0.035:
+				al = 2.0                                          # the impact frame: drawn whole, no dither
+			_crescent(cv, sl, tl, hd, al, echoes[e][2])
+	for ct in cuts:
+		var u: float = ct["t"] / 0.2
+		var d: Vector2 = ct["d"]
+		var nrm := Vector2(-d.y, d.x)
+		var L := (70.0 if ct["heavy"] else 48.0) * (0.5 + 0.5 * minf(1.0, u * 5.0))
+		var lines := [nrm.rotated(0.5)] if not ct["heavy"] else [nrm.rotated(0.6), nrm.rotated(-0.6)]
+		if u < 0.3:                                        # the impact star: a white diamond and four long rays
+			var sr := int((5.0 if ct["heavy"] else 3.0) * (1.0 - u / 0.3) + 1.0)
+			var c0: Vector2 = (ct["c"] / PX).floor()
+			for yy in range(-sr, sr + 1):
+				for xx in range(-sr, sr + 1):
+					var dd := absi(xx) + absi(yy)
+					if dd <= sr and (dd <= sr / 2 or xx == 0 or yy == 0):
+						cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(1, 1, 1) if dd <= sr / 2 else Color(0.75, 0.85, 1.0, 0.9))
+			for k in range(sr, sr * 3):
+				for o in [Vector2(k, 0), Vector2(-k, 0), Vector2(0, k * 0.6), Vector2(0, -k * 0.6)]:
+					cv.draw_rect(Rect2((c0 + o.floor()) * PX, Vector2(PX, PX)), Color(0.85, 0.92, 1.0, 0.7 * (1.0 - float(k) / (sr * 3))))
+		for ln in lines:
+			var n := int(L / PX)
+			var side := Vector2(-ln.y, ln.x)
+			for k in range(-n, n + 1):
+				var q: Vector2 = ct["c"] + ln * k * PX
+				var edge := absf(k) / float(n)
+				if u > 0.4 and edge > 1.0 - (u - 0.4) / 0.6:
+					continue
+				var thick := 1 if edge > 0.55 else 2           # a rent through the air, tapered at both ends
+				for j in thick:
+					cv.draw_rect(Rect2(((q + side * j * PX) / PX).floor() * PX, Vector2(PX, PX)), Color(1, 1, 1, 1.0 - u * 0.5) if (edge < 0.6 and j == 0) else Color(0.62, 0.74, 1.0, 0.85 - u * 0.6))
+		for k in (8 if ct["heavy"] else 5):               # speed-lines bursting from the cut along the stroke
+			var ang := d.angle() + (k - 2.0) * 0.32
+			var r0 := 10.0 + u * 70.0
+			for j in 3:
+				var q: Vector2 = ct["c"] + Vector2(cos(ang), sin(ang) * 0.7) * (r0 + j * PX)
+				cv.draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), Color(0.9, 0.95, 1.0, (1.0 - u) * 0.8))
+	for rg in rings:
+		var u: float = rg["t"] / rg["secs"]
+		var R: float = rg["R"] * (0.3 + 0.7 * (1.0 - pow(1.0 - u, 3.0)))
+		var n := int(R * 0.5)
+		for k in n:
+			var ang := k / float(n) * TAU
+			var q: Vector2 = rg["c"] + Vector2(cos(ang) * R, sin(ang) * R * 0.5)
+			var cellp := (q / PX).floor()
+			var th: float = (B4[(posmod(int(cellp.y), 4)) * 4 + posmod(int(cellp.x), 4)] + 0.5) / 16.0
+			if 1.0 - u > th:
+				cv.draw_rect(Rect2(cellp * PX, Vector2(PX, PX)), Color(0.85, 0.82, 0.74, 0.9))
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -1323,6 +1486,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_slash(dt)
 	_tick_blood(dt)
 	_tick_acid(dt)
 	_tick_bone(dt)

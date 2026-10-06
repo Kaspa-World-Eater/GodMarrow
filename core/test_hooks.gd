@@ -77,6 +77,8 @@ static func run(g) -> void:
 		_bloodfx(g)                      # --bloodfx: blood whips, sprays, boiling blood and veined creatures
 	if a.has("threadfx"):
 		_threadfx(g)                     # --threadfx (Mystic): soul leashes, a binding, snags, needles and hanging darts
+	if a.has("slashfx"):
+		_slashfx(g)                      # --slashfx: each kind of slash in turn (sweep, back-sweep, overhead, heavy) and cuts
 	if a.has("magic"):
 		_magic(g)                        # --magic: phosphor wisps flung at points round the pilgrim
 	if a.has("acid"):
@@ -604,3 +606,19 @@ static func _threadfx(g) -> void:
 		b.needles.append({"tp": c, "d": Vector2(1, -0.3).normalized(), "end": 4.0, "t": 0.0, "dur": 0.05 + 4.0 * 0.035})
 		b.dart_lines.append({"a": c + Vector2(-0.5, 0.5), "za": 12.0, "b": ms[3].tp, "zb": 9.0, "t": 0.35})
 		await tree.create_timer(2.4).timeout
+
+
+static func _slashfx(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	var I = load("res://world/impacts.gd").of(g.zone)
+	var c: Vector2 = g.hero.tp + Vector2(1.6, -1.6)
+	var d := Vector2(1, 0.6).normalized()
+	var k := 0
+	while is_instance_valid(g) and g.hero:
+		var kind := k % 4
+		I.slash(c, d, mini(kind, 2), kind == 3, 1.5)
+		await tree.create_timer(0.12).timeout
+		I.cut(c + d * 1.2, d, kind >= 2)
+		await tree.create_timer(0.5).timeout
+		k += 1

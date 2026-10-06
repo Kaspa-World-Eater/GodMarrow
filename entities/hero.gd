@@ -49,6 +49,8 @@ var act_dir := Vector2.RIGHT   # the blow's way on the screen
 var lunge := Vector2.ZERO      # the step the blow carries (tiles), taken during the strike
 var lunge_done := 0.0
 var blow_landed := false
+var slash_done := false         # the blade's smear has been laid for this blow
+var act_aim := Vector2.RIGHT    # the blow's way on the ground (tiles)
 var holding_attack := false
 var hold_t := 0.0          # how long the attack button has been held (heavy wind-up after 0.18 s)
 var heavy_pm := 0.0        # a released heavy: its poise-damage multiplier (x2 -> x3.5); 0 for other blows
@@ -398,6 +400,7 @@ func _start_attack(m: Monster, at: Vector2) -> void:
 	Sfx.play("swing", 0.8 if string_i < 2 else 1.0, 1.0 if string_i < 2 else 0.82)
 	# the step goes with the strike, not before the wind-up
 	act_dir = (Iso.to_screen(at) - Iso.to_screen(tp)).normalized()
+	act_aim = (at - tp).normalized() if at.distance_to(tp) > 0.05 else Vector2(face, 0)
 	lunge = (at - tp).normalized() * float(s[2])
 	lunge_done = 0.0
 	blow_landed = false
@@ -411,6 +414,7 @@ func _start_act(a: String, secs: float) -> void:
 	act = a
 	act_t = 0.0
 	act_len = maxf(0.08, secs)
+	slash_done = false
 	act_done = false
 	var anim := a
 	if a == "swing":
@@ -445,6 +449,12 @@ func _act(dt: float) -> void:
 		spr.step(dt)
 	match act:
 		"atk", "atk2", "atk3", "heavy", "swing":
+			# the blade's smear, laid as the rushed frames begin (BLOW_TIME: the strike crosses 0.30-0.42)
+			if not slash_done and act_t >= act_len * (act_hit_at * 0.62) and not (_weapon() and _weapon().is_ranged()):
+				slash_done = true
+				var big_blow := act == "heavy" or act_mult > 1.5
+				var kind := 2 if (act == "atk3" or act == "heavy") else (1 if act == "atk2" else 0)
+				load("res://world/impacts.gd").of(zone).slash(tp, act_aim, kind, big_blow, _reach())
 			if not act_done and act_t >= act_len * act_hit_at:
 				act_done = true
 				_land_blow()
@@ -550,6 +560,7 @@ func _land_blow() -> void:
 			o_hit["poise"] = d * heavy_pm
 		var dealt: float = Combat.hit_monster(m2, d, "phys", tp, o_hit)
 		blow_landed = true
+		load("res://world/impacts.gd").of(zone).cut(m2.tp, act_aim, o_hit["heavy"])
 		Game.hitstop(0.03)            # every blow that lands holds the frame a breath (the heavy ones longer, below)
 		Game.shake(0.8)
 		Sfx.play("heavy" if (act_mult > 1.5 or heavy_pm > 0.0 or o_hit.get("finisher", false)) else "hit")
@@ -726,6 +737,7 @@ func _release_heavy(slow: float) -> void:
 	_face(to)
 	spend_poise(lerpf(12.0, 24.0, k))
 	_start_act("heavy" if spr.set.has("heavy") else "atk", 0.55 * lerpf(1.1, 1.5, k) * (1.3 if slow > 1.0 else 1.0) / st.attack_speed())
+	act_aim = to.normalized() if to.length() > 0.01 else Vector2(face, 0)
 	act_target = target if target and not target.dead else null
 	act_hit_at = 0.35
 	act_mult = lerpf(1.25, 2.0, k)
