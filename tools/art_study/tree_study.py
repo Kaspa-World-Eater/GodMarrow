@@ -107,20 +107,28 @@ def frame(t, W=500, H=260):
             ys, xs = np.nonzero(mm)
             # the fire stands on the mass's upper edge
             cols = np.unique(xs)
-            topline = [(c, ys[xs == c].min() + 4) for c in cols[::3]]
+            def smooth_line(pts_, k=9):
+                arr = np.array(pts_, float)
+                if len(arr) > k:
+                    ker = np.ones(k) / k
+                    pad = np.pad(arr[:, 1], k // 2, mode="edge")
+                    arr[:, 1] = np.convolve(pad, ker, mode="valid")[:len(arr)]
+                return [tuple(q) for q in arr]
+            topline = smooth_line([(c, ys[xs == c].min() + 4) for c in cols[::2]])
             if len(topline) > 2:
                 heat = np.maximum(heat, fire_field(xx, yy, topline, 40 + (len(cols) * 0.5), t, seed=k * 3 + mi) * (0.9 if state == 0 else 1.0))
                 if state == 1:                                          # engulfed: fire standing on rows all through the crown
                     for band in (0.35, 0.65):
                         row = []
-                        for c in cols[::3]:
+                        for c in cols[::2]:
                             ycol = ys[xs == c]
                             row.append((c, ycol.min() + (ycol.max() - ycol.min()) * band))
+                        row = smooth_line(row, 13)
                         heat = np.maximum(heat, fire_field(xx, yy, row, 30, t + band * 3, seed=k * 3 + mi + band * 10) * 0.85)
                 # fire inside the mass: seams of heat between the clumps, the strongest near the top where it breaks out
-                ridge = 1 - np.abs(vn(xx * 0.09 + t * 0.25 + mi, yy * 0.11 - t * 0.7) * 2 - 1)
-                inner = np.clip((ridge - 0.6) * 2.6, 0, 1) * np.clip(1.1 - (yy - ys.min()) / 70.0, 0.3, 1)
-                heat = np.maximum(heat, np.where(mm, inner * 0.8, 0))
+                gaps = vn(xx * 0.16 + mi * 5, yy * 0.16) * 0.6 + vn(xx * 0.45, yy * 0.45 - t * 0.8) * 0.4
+                inner = np.clip((gaps - 0.52) * 2.4, 0, 1) * np.clip(1.1 - (yy - ys.min()) / 70.0, 0.4, 1)
+                heat = np.maximum(heat, np.where(mm, inner * 0.62, 0))
         heat_all = np.maximum(heat_all, heat)
         layers.append((tree, masses, burning, state, heat))
     rgb = glow(rgb, heat_all, 0.6)
@@ -143,8 +151,11 @@ def frame(t, W=500, H=260):
             rgb[mm] = col[mm]
             rgb[curl] = FIRE[3]
     # smoke rising off the burnt tree
-    sm = (np.abs(xx - 415 + (236 - yy) * 0.4) < 6 + (236 - yy) * 0.12) & (yy < 150) & (fbm(xx * 0.05 + t * 0.3, yy * 0.04 + t * 0.6) > 0.5)
-    rgb[sm & (bay < 0.6)] = rgb[sm & (bay < 0.6)] * 0.5 + np.array(hexc("#2a2422")) * 0.5
+    cxs = 415 - (150 - yy) * 0.45 - np.clip(150 - yy, 0, None) ** 1.3 * 0.02
+    wid = 6 + np.clip(150 - yy, 0, None) * 0.25
+    dens = np.clip(1 - np.abs(xx - cxs) / wid + (fbm(xx * 0.03 + t * 0.2, yy * 0.025 + t * 0.5) - 0.5) * 1.2, 0, 1) * (yy < 160) * np.clip((yy + 10) / 120, 0, 1)
+    a_ = np.where(dens > 0.6, 0.45, np.where(dens > 0.3, 0.25, np.where(dens > 0.1, 0.1, 0)))
+    rgb = rgb * (1 - a_[..., None]) + np.array(hexc("#2e2826")) * a_[..., None]
     rgb = paint_fire(rgb, heat_all, bay)
     return np.clip(rgb, 0, 1)
 

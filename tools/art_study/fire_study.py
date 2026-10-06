@@ -51,8 +51,9 @@ def fire_field(xx, yy, base_pts, height, t, wind=-0.35, seed=0.0, breath=1.0):
     bp = np.array(base_pts, float)
     # the fuel line: for each pixel, how far along and above it (taking the line as roughly horizontal)
     xs, ys = bp[:, 0], bp[:, 1]
-    base_y = np.interp(xx, xs, ys, left=-9999, right=-9999)
-    base_y = np.where(base_y < -9000, np.nan, base_y)
+    base_y = np.interp(xx, xs, ys)                                   # held level past the ends
+    past = np.maximum(xs.min() - xx, xx - xs.max())                  # how far beyond the fuel's ends
+    end_fade = np.clip(1 - past / max((xs.max() - xs.min()) * 0.25 + 6, 6), 0, 1) ** 1.5
     rise = (base_y - yy) / height                                    # 0 at the fuel .. 1 at the reach
     span = (xs.max() - xs.min()) / 2
     cx = (xs.max() + xs.min()) / 2
@@ -74,7 +75,7 @@ def fire_field(xx, yy, base_pts, height, t, wind=-0.35, seed=0.0, breath=1.0):
     h_ = body * (1 - np.clip(rise, 0, 1.4) * 0.85) * 1.02 * breath + core_ * 0.32
     h_ += (turb - 0.5) * 0.9 * np.clip(rise + 0.2, 0, 1)
     h_ -= np.clip(rise - 0.25, 0, 1) * (1 - licks) * 0.9                # licks: gaps tear open, pieces break off
-    h_ = np.where(np.isnan(base_y) | (rise < -0.06), 0, h_)
+    h_ = np.where(rise < -0.06, 0, h_) * end_fade
     h_ -= np.clip(-rise, 0, 1) * 8                                   # nothing below the fuel
     return np.nan_to_num(np.clip(h_, 0, 1.2), nan=0.0)
 
