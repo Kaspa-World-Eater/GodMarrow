@@ -457,6 +457,44 @@ func miasma(p: Vector2, r: float = 2.0, secs: float = 10.0, kind: String = "brea
 	_ghost_layer().add_child(n)
 	miasmas.append({"node": n, "t": 0.0, "secs": secs})
 
+# ------------------------------------------------------------------ breath drawn out (the miasma death)
+## Derek: "their breath is being sucked out of their bodies and ethereal". Pale violet threads pulled from the mouth,
+## curling up and away, thinning to nothing; drawn on the ghost layer (they glow faintly of themselves)
+var breaths: Array = []     # {p (screen), v, t, life, trail}
+var _breath_cv: Node2D
+
+func breath_out(mouth: Vector2, k: float) -> void:
+	if _breath_cv == null:
+		_breath_cv = Node2D.new()
+		_breath_cv.draw.connect(_draw_breaths)
+		_ghost_layer().add_child(_breath_cv)
+	var a := randf_range(-2.4, -0.7)
+	breaths.append({"p": mouth + Vector2(randf_range(-4, 4), randf_range(-4, 4)), "v": Vector2(cos(a), sin(a)) * randf_range(40, 90) * (0.6 + k),
+		"t": 0.0, "life": randf_range(1.0, 1.8), "trail": [], "ph": randf() * TAU})
+
+func _tick_breaths(dt: float) -> void:
+	for b in breaths:
+		b["t"] += dt
+		b["v"] += Vector2(sin(b["t"] * 4.0 + b["ph"]) * 60.0 + Gust.dir() * Gust.k() * 40.0, -30.0) * dt
+		b["p"] += b["v"] * dt
+		b["trail"].push_front(b["p"])
+		if b["trail"].size() > 18:
+			b["trail"].pop_back()
+	breaths = breaths.filter(func(b): return b["t"] < b["life"])
+	if _breath_cv:
+		_breath_cv.queue_redraw()
+
+func _draw_breaths() -> void:
+	for b in breaths:
+		var u: float = b["t"] / b["life"]
+		var tr: Array = b["trail"]
+		for i in tr.size():
+			var w := float(i) / tr.size()
+			var q: Vector2 = (tr[i] / PX).floor() * PX
+			var al := (1.0 - w) * (1.0 - u) * 0.8
+			if (i % 2 == 0) or w < 0.25:
+				_breath_cv.draw_rect(Rect2(q, Vector2(PX, PX)), Color(0.78, 0.72, 1.0, al))
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -552,6 +590,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_breaths(dt)
 	_tick_screen_flash(dt)
 	for mi in miasmas:
 		mi["t"] += dt

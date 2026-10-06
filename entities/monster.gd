@@ -473,15 +473,23 @@ func _physics_process(dt: float) -> void:
 	if cm_body:
 		_tick_ossify(dt)
 	if dead and rot_k >= 0.0:
-		rot_k += dt / 1.6
-		var sw := 1.0 + 0.25 * smoothstep(0.0, 1.0, rot_k) + 0.04 * sin(rot_k * 40.0) * rot_k
-		spr.scale = base_scale * Vector2(sw * 1.1, sw)
-		modulate = Color(1.0, 1.0, 1.0).lerp(Color(0.66, 0.5, 0.8), minf(1.0, rot_k))   # purple, never green (wiki)
+		# the breath drawn out (Derek: "their breath is being sucked out of their bodies, and ethereal"): pale violet
+		# threads pulled from the mouth; the body arches back, withers, greys and goes thin as glass; at the end an
+		# outline of it lifts away and dissolves into the haze
+		rot_k += dt / 2.6
+		var I = load("res://world/impacts.gd").of(zone)
+		var top: float = spr.get_rect().position.y * absf(spr.scale.y)
+		var mouth := position + Vector2(0, top * 0.82)
+		if rot_k < 0.85 and randf() < dt * 40.0:
+			I.breath_out(mouth, rot_k)
+		var wither := smoothstep(0.0, 1.0, rot_k)
+		spr.scale = base_scale * Vector2(1.0 - 0.18 * wither, 1.0 + 0.04 * sin(rot_k * 9.0) * (1.0 - wither) - 0.08 * wither)
+		spr.skew = -0.12 * sin(minf(1.0, rot_k * 2.0) * PI * 0.5) * (1.0 - wither * 0.5)      # thrown back as it is drawn out
+		modulate = Color(1, 1, 1).lerp(Color(0.62, 0.6, 0.78), wither)
+		modulate.a = 1.0 - smoothstep(0.55, 1.0, rot_k) * 0.85
 		if rot_k >= 1.0:
-			var I = load("res://world/impacts.gd").of(zone)
-			I.miasma(tp, 1.6, 9.0, "cloud")
-			for k in 3:
-				I.hit(tp + Vector2(randf_range(-0.2, 0.2), randf_range(-0.2, 0.2)), Vector2.INF, true, "rot")
+			I.soul(position, "breath")
+			I.miasma(tp, 0.9, 5.0, "breath")
 			queue_free()
 		return
 	if dead and calc_k >= 0.0:

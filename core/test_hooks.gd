@@ -384,7 +384,7 @@ static func _burn_test(g, kind: String) -> void:
 		kind = "knight"
 	var c: Vector2 = g.hero.tp
 	if rot:
-		load("res://world/impacts.gd").of(g.zone).miasma(c + Vector2(-2.5, 1.5), 2.4, 30.0, "breath")
+		load("res://world/impacts.gd").of(g.zone).miasma(c + Vector2(0.8, 1.8), 2.6, 30.0, "breath")
 	var ms: Array = []
 	for o in [Vector2(2.0, 0.4), Vector2(0.6, 2.2), Vector2(2.6, 2.0)]:
 		var m = Brain.spawn(g.zone, kind, c + o, 6, "normal", "burn", -1.0)
