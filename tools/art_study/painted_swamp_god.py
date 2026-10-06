@@ -584,7 +584,7 @@ def head_relief():
     rgb *= np.array([0.86, 0.92, 1.06])
     sock_r = broke & face
     r = rr
-    return np.clip(rgb, 0, 1), show, n, xx, yy, X, Y, sock_r, I
+    return np.clip(rgb, 0, 1), show, n, xx, yy, X, Y, sock_r, I, RR
 
 
 HEAD = head_relief()
@@ -604,48 +604,72 @@ for j in range(HH):
 
 
 def draw_head(rgb, t):
-    hrgb, show, n, xx, yy, X, Y, sock_r, I = HEAD
+    hrgb, show, n, xx, yy, X, Y, sock_r, I, RR = HEAD
     pulse = 0.75 + 0.25 * np.sin(t * 2.0) * np.sin(t * 0.7 + 1)
     out = hrgb.copy()
-    # the ghost-flame kept in the broken socket (Derek: "that ghostly flame look"): cold tongues rising out of it,
-    # white at the root, going to pale cyan and then a deep teal at their tips, torn by a fast noise that runs
-    # upward, licking up over the brow; curls of ghost-smoke above them; its cold light flickering on the face
-    sx_c = np.mean(xx[sock_r]); sy_c = np.mean(yy[sock_r]) + 3
+    # the ghost-flame burning down inside the broken socket (Derek: "it doesn't look like it's coming from a hollow
+    # socket, more like you pasted the inferno on top"). Three things make a fire sit inside a hollow: its root is
+    # hidden behind the socket's lower rim, so it climbs up out of the dark; it lights the hollow from within (the
+    # inner walls, and the underside of the brow above it, lit from below); and its cool tongues are thin enough
+    # to see the stone through, only the core solid. The cheek under the rim gets little of its light.
+    ys, xs = np.nonzero(sock_r)
+    sx_c = xs.mean()
+    s_top, s_bot = ys.min(), ys.max()
+    s_w = (xs.max() - xs.min()) / 2.0
+    root_y = s_bot - (s_bot - s_top) * 0.3                            # the flame's root, down in the hollow
     fl = 0.8 + 0.2 * np.sin(t * 13) * np.sin(t * 7.3 + 1)
-    dxp = (xx - sx_c) / 11.0
-    up = (sy_c - yy) / 50.0                                          # 0 at the root .. 1 at the tongues' reach
-    sway_ = np.sin(t * 3.1 + up * 4) * up * 0.35
-    body = np.clip(1 - np.abs(dxp - sway_) / (1.05 - up * 0.6), 0, 1)
-    # tongues: the noise stretched upward and racing up, so the flame tears into separate licks
-    tongues = vn((xx - sx_c) * 0.42, yy * 0.11 + t * 7.0) * 0.55 + vn((xx - sx_c) * 0.9 + 5, yy * 0.22 + t * 12.0) * 0.45
-    lick = np.clip(np.sin((xx - sx_c) * 0.55 + t * 2.0) * 0.5 + 0.5, 0, 1)        # three or four tongues side by side
-    near_ = np.clip(body * 3.0, 0, 1)                                # the tongues only where the flame is
-    heat = body * (1 - up) * 1.4 + ((tongues - 0.5) * 1.1 * (0.3 + up) + lick * up * 0.35) * near_
-    heat = np.where((up > -0.12) & (up < 1.1), heat, 0) * fl
-    fc = ramp("#0e3a44", "#1f6f7c", "#4fb0bc", "#9fe4ea", "#effcfc")
-    lvh = np.clip((heat - 0.32) * 3.6, -1, 4.99)
-    flame = (lvh >= 0) & show
-    # its cold light on the stone round it, stepped
-    dd = np.hypot(xx - sx_c, (yy - sy_c + 8) * 1.1)
-    g = np.clip(1 - dd / 30.0, 0, 1) ** 2 * fl
-    lv = np.round(np.clip(g * 1.1, 0, 0.6) * 4) / 4
-    gc = np.array(hexc("#7fd0d8"))
-    out = np.where((lv > 0)[..., None], out * (1 - lv[..., None] * 0.4) + gc * lv[..., None] * 0.45, out)
-    out[sock_r] = np.array(hexc("#06181c"))                          # the socket's depth, dark behind the flame
-    out[flame] = fc[lvh[flame].astype(int)]
-    # ghost-smoke curling off the tongues' tips
+    # its light, from a point down in the socket, by the carved surface's own angles
+    zf = RR[int(root_y), int(sx_c)] + 0.02
+    Lx, Ly, Lz = sx_c - xx, (root_y - 4) - yy, (zf - RR) * 44.0
+    Ld = np.sqrt(Lx * Lx + Ly * Ly + Lz * Lz) + 1e-3
+    lit = np.clip((n[..., 0] * Lx + n[..., 1] * Ly + n[..., 2] * Lz) / Ld, 0, 1) / (1 + (Ld / 24.0) ** 2) * fl * 1.5
+    below = (yy > root_y + 2) & ~sock_r                                # under the lower rim: the rim keeps the light off
+    lit = np.where(below, lit * 0.25, lit)
+    rim_d = np.hypot((xx - sx_c) / max(s_w, 1), (yy - (s_top + s_bot) / 2) / max((s_bot - s_top) / 2, 1))
+    # inside the hollow: the depth behind the flame dark; a ring of inner wall near the rim catching the light,
+    # strongest on the upper wall (it faces down into the fire), weaker on the lower
+    upper = yy < (s_top + s_bot) / 2
+    wall = np.clip((rim_d - 0.5) / 0.38, 0, 1) * np.where(upper, 1.0, 0.45) * fl
+    lit = np.where(sock_r, wall, lit)
+    lv = np.round(np.clip(lit * 1.6, 0, 0.85) * 4) / 4
+    gc = np.array(hexc("#7fd8e0"))
+    out[sock_r] = np.array(hexc("#03090b"))                           # the hollow's depth
+    out = np.where((lv > 0)[..., None] & show[..., None], out * (1 - lv[..., None] * 0.55) + gc * lv[..., None] * 0.6, out)
+    # the flame: tongues torn from a fast upward noise, the width of the socket, rising out of it and over the brow
+    dxp = (xx - sx_c) / max(s_w * 0.85, 4.0)
+    up = (root_y - yy) / 44.0
+    sway_ = np.sin(t * 3.1 + up * 5) * up * 0.3
+    body = np.clip(1 - np.abs(dxp - sway_) / (1.0 - up * 0.65), 0, 1)
+    near_ = np.clip(body * 3.0, 0, 1)
+    tongues = vn((xx - sx_c) * 0.5, yy * 0.12 + t * 7.5) * 0.55 + vn((xx - sx_c) * 1.1 + 5, yy * 0.25 + t * 12.5) * 0.45
+    split = np.clip(np.abs(np.sin((xx - sx_c) * 0.42 + np.sin(t * 2.3) * 1.2)), 0, 1)   # gaps between the tongues
+    heat = body * (1 - up * 0.8) * 1.75 + ((tongues - 0.5) * 1.3 * (0.3 + up)) * near_ - (1 - split) * up * 0.5
+    heat = np.where((up > -0.02) & (up < 1.1), heat, 0) * fl
+    hidden = (yy > root_y - 1) & ~sock_r                               # the root, behind the lower rim
+    fc = ramp("#0b2f38", "#1b6672", "#46a8b4", "#9ae2e8", "#effcfc")
+    lvh = np.clip((heat - 0.28) * 3.9, -1, 4.99)
+    fm = (lvh >= 0) & show & ~hidden
+    bay_ = B4[yy.astype(int) % 4, xx.astype(int) % 4]
+    for k in range(5):
+        m = fm & (lvh.astype(int) == k)
+        if k <= 1:
+            m &= bay_ < (0.45 if k == 0 else 0.75)                     # the cool outer tongues thin: the stone through them
+            out[m] = out[m] * 0.45 + fc[k] * 0.55 * 1.6
+        else:
+            out[m] = fc[k]
+    out = np.clip(out, 0, 1)
+    # ghost-smoke off the tongues' tips, and motes breaking off and rising
     for k in range(4):
         ph = (t * 0.6 + k * 0.25) % 1.0
         cx_s = sx_c + np.sin(ph * 5 + k * 2) * 5 * ph
-        cy_s = sy_c - 30 - ph * 26
+        cy_s = root_y - 40 - ph * 24
         rr_s = 2 + ph * 4
-        sm = (np.hypot(xx - cx_s, (yy - cy_s) * 1.3) < rr_s) & show & (B4[yy.astype(int) % 4, xx.astype(int) % 4] < (1 - ph) * 0.5)
-        out[sm] = out[sm] * 0.55 + np.array(hexc("#6a9ea4")) * 0.45
-    # motes of the ghost-light breaking off the tongues and rising, winking out
-    for k in range(7):
-        ph = (t * 0.9 + k * 0.143) % 1.0
-        mx = int(sx_c + np.sin(ph * 7 + k * 1.9) * (4 + ph * 9))
-        my = int(sy_c - 38 - ph * 40)
+        sm = (np.hypot(xx - cx_s, (yy - cy_s) * 1.3) < rr_s) & show & (bay_ < (1 - ph) * 0.45)
+        out[sm] = out[sm] * 0.6 + np.array(hexc("#5e9298")) * 0.4
+    for k in range(6):
+        ph = (t * 0.9 + k * 0.167) % 1.0
+        mx = int(sx_c + np.sin(ph * 7 + k * 1.9) * (3 + ph * 8))
+        my = int(root_y - 30 - ph * 36)
         if 0 <= mx < HW and 0 <= my < HH and show[my, mx] and ph < 0.85:
             out[my, mx] = np.array(hexc("#dffafa")) if ph < 0.4 else np.array(hexc("#6fc4cc"))
     for j in range(HH):
