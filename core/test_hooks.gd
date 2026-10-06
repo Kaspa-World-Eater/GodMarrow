@@ -136,7 +136,7 @@ static func _arena(g, a: Dictionary) -> void:
 	for i in n:
 		var ang := float(i) / n * TAU
 		var at: Vector2 = hero.tp + Vector2(cos(ang), sin(ang)) * (3.0 + (i % 3))
-		var m = Brain.spawn(g.zone, a.get("arena_kind", "husk"), at, int(a.get("arena_lvl", "12")), String(a.get("arena_rank", "normal")), "arena", -1.0 if live else 1e7)
+		var m = Brain.spawn(g.zone, a.get("arena_kind", "hollow"), at, int(a.get("arena_lvl", "12")), String(a.get("arena_rank", "normal")), "arena", -1.0 if live else 1e7)
 		if m and live:
 			m.brain.wake(m)
 		elif m:

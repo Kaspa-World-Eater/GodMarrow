@@ -374,6 +374,7 @@ func _physics_process(dt: float) -> void:
 	spr.visible = not buried
 	if cm_body:
 		_cm_presence(dt)
+		_cm_light()
 	if hit_flash > 0.0:
 		hit_flash -= dt
 		if cm_body:
@@ -382,6 +383,27 @@ func _physics_process(dt: float) -> void:
 				spr.material.set_shader_parameter("flash", (0.9 if hit_flash > 0.06 else 0.5) if hit_flash > 0.0 and Settings.hit_flash else 0.0)
 		else:
 			spr.self_modulate = Color(1.35, 1.2, 1.15) if hit_flash > 0.0 and Settings.hit_flash else Color.WHITE
+
+## the body lit by the pilgrim's lantern through its own normal map (shaders/cm_flash.gdshader)
+func _cm_light() -> void:
+	if not (spr.material is ShaderMaterial):
+		return
+	var m: ShaderMaterial = spr.material
+	var h = zone.hero_ref if zone else null
+	var k := 0.0
+	var dir := Vector3(0, 0, 1)
+	if h != null and is_instance_valid(h) and not h.dead:
+		var lamp: Vector2 = h.position + Vector2(-20 * float(h.face), -150)
+		var body: Vector2 = position + Vector2(0, -60)
+		var dv := lamp - body
+		dir = Vector3(dv.x, dv.y, 120.0)
+		var reach: float = maxf(2.0, h.light_radius())
+		var night := 1.0 - (Game.day_k() if zone.d.get("outdoor", false) else 0.0)
+		k = clampf(1.15 - tp.distance_to(h.tp) / reach, 0.0, 1.0) * (0.45 + 0.55 * night)
+	m.set_shader_parameter("lamp_dir", dir)
+	m.set_shader_parameter("lamp_k", k)
+	m.set_shader_parameter("sky_k", 0.25 + 0.45 * (1.0 - Game.day_k()) if zone.d.get("outdoor", false) else 0.2)
+	m.set_shader_parameter("face_left", spr.flip_h)
 
 ## (Cursemark assets): a body drawn by Cursemark. Most stand on a single frame, so a standing creature breathes (a slow
 ## swell and settle, each on its own beat); the killing blow throws it up in a short arc before it falls.
