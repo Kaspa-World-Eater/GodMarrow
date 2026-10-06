@@ -31,6 +31,7 @@ func hit(p: Vector2, from: Vector2, heavy: bool, kind: String = "flesh") -> void
 		"stone": [Color("#8a8276"), Color("#5e574e"), Color("#3c3731")],
 		"flesh": [Color("#7a1414"), Color("#4e0c0c"), Color("#2e0808")],
 		"ice": [Color("#e6f4ff"), Color("#a8cfee"), Color("#5f8fbf")],
+		"spark": [Color("#ffffff"), Color("#c8dcff"), Color("#7a9ae0")],
 		"rot": [Color("#6a4a7a"), Color("#3e2a4a"), Color("#6a3a4a")]}.get(kind, [Color("#7a1414")])
 	for i in n:
 		var a := away.rotated(randf_range(-0.9, 0.9))
@@ -90,16 +91,57 @@ func lightning(to: Vector2, from_sky: bool = true, from: Vector2 = Vector2.INF) 
 		sky.z_as_relative = false
 		sky.draw.connect(_draw_sky)
 		add_child(sky)
-	bolts.append({"pts": _jag(a, b, 22.0), "forks": [], "t": 0.0, "life": 0.5})
+	bolts.append({"pts": _jag(a, b, 22.0), "forks": [], "t": 0.0, "life": 0.72})
 	var bl: Dictionary = bolts[-1]
-	for i in 3:
-		var k := randi_range(3, bl["pts"].size() - 3)
+	for i in 6:
+		var k := randi_range(2, bl["pts"].size() - 3)
 		var s0: Vector2 = bl["pts"][k]
-		var dirv: Vector2 = (b - a).normalized().rotated(randf_range(-0.9, 0.9))
-		bl["forks"].append(_jag(s0, s0 + dirv * randf_range(60, 160), 14.0))
-	_flash(to, Color(0.7, 0.8, 1.0), 0.35, 140.0)
+		var dirv: Vector2 = (b - a).normalized().rotated(randf_range(-1.1, 1.1))
+		var f: Array = _jag(s0, s0 + dirv * randf_range(80, 220), 12.0)
+		bl["forks"].append(f)
+		if randf() < 0.6:                                   # a twig off the fork
+			var s1: Vector2 = f[randi_range(1, f.size() - 2)]
+			bl["forks"].append(_jag(s1, s1 + dirv.rotated(randf_range(-1.2, 1.2)) * randf_range(30, 80), 8.0))
+	_flash(to, Color(0.75, 0.85, 1.0), 0.45, 280.0)
+	_screen_flash()
+	for k in 4:
+		hit(to + Vector2(randf_range(-0.3, 0.3), randf_range(-0.3, 0.3)), Vector2.INF, true, "spark")
 	_fern(b)
 	Game.shake(4.0)
+
+var _flash_layer: CanvasLayer
+var _flash_rect: ColorRect
+var _flash_t := -1.0
+
+func _screen_flash() -> void:
+	if _flash_layer == null:
+		_flash_layer = CanvasLayer.new()
+		_flash_layer.layer = 40
+		_flash_rect = ColorRect.new()
+		_flash_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_flash_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		_flash_rect.color = Color(0.8, 0.88, 1.0, 0.0)
+		_flash_layer.add_child(_flash_rect)
+		add_child(_flash_layer)
+	_flash_t = 0.0
+
+func _tick_screen_flash(dt: float) -> void:
+	if _flash_t < 0.0 or _flash_rect == null:
+		return
+	_flash_t += dt
+	var t := _flash_t
+	var a := 0.0
+	if t < 0.05:
+		a = 0.55
+	elif t < 0.14:
+		a = 0.12
+	elif t < 0.2:
+		a = 0.4
+	elif t < 0.5:
+		a = 0.4 * (1.0 - (t - 0.2) / 0.3)
+	else:
+		_flash_t = -1.0
+	_flash_rect.color.a = a
 
 func _jag(a: Vector2, b: Vector2, step: float) -> Array:
 	var pts: Array = [a]
@@ -149,13 +191,18 @@ func _draw_sky() -> void:
 		var t: float = bl["t"]
 		# two strikes with a dark breath between: 0-0.12 and 0.2-0.42
 		if not (t < 0.12 or (t > 0.2 and t < 0.42)):
+			if t >= 0.42:
+				# the afterimage: a dark blue ghost of the stroke burnt on the eye, fading
+				var gk: float = 1.0 - (t - 0.42) / 0.3
+				_px_path(bl["pts"], Color(0.2, 0.28, 0.6, 0.5 * gk), 2, sky)
 			continue
-		_px_path(bl["pts"], Color(0.45, 0.6, 1.0, 0.55), 3, sky)
+		_px_path(bl["pts"], Color(0.35, 0.5, 1.0, 0.3), 7, sky)
+		_px_path(bl["pts"], Color(0.55, 0.7, 1.0, 0.6), 4, sky)
 		for f in bl["forks"]:
-			_px_path(f, Color(0.45, 0.6, 1.0, 0.45), 2, sky)
-		_px_path(bl["pts"], Color(1.0, 1.0, 1.0, 1.0), 1, sky)
+			_px_path(f, Color(0.45, 0.6, 1.0, 0.5), 3, sky)
+		_px_path(bl["pts"], Color(1.0, 1.0, 1.0, 1.0), 2, sky)
 		for f in bl["forks"]:
-			_px_path(f, Color(0.85, 0.92, 1.0, 0.85), 1, sky)
+			_px_path(f, Color(0.88, 0.94, 1.0, 0.95), 1, sky)
 
 func _px_path(pts: Array, col: Color, w: int, cv: CanvasItem = null) -> void:
 	if cv == null:
@@ -440,6 +487,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_screen_flash(dt)
 	for mi in miasmas:
 		mi["t"] += dt
 		var mm: ShaderMaterial = mi["node"].material
