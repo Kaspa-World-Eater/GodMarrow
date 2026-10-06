@@ -1805,6 +1805,80 @@ func _draw_absence(cv: CanvasItem) -> void:
 				if xx * xx + yy * yy <= dr * dr:
 					cv.draw_rect(Rect2((c1 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.01, 0.005, 0.02) if xx * xx + yy * yy < dr * dr - 1 else Color(0.36, 0.3, 0.46))
 
+# ------------------------------------------------------------------ lakes (painted: shaders/lake.gdshader)
+## water or blood lying in the ground, on the floor layer (under every figure, lit by the night like the ground).
+## Rings spread where anything wades through it (the pilgrim, creatures) and where drops fall; blood bubbles now and
+## then. kind: "water" or "blood".
+var lakes: Array = []      # {node, p, R (tiles), kind, rings: [[x, y, age, str]], last: {id: pos}}
+
+func lake(p: Vector2, r: float = 2.0, kind: String = "water") -> Node:
+	var hw := r * Iso.HX
+	var n := ColorRect.new()
+	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	n.size = (Vector2(hw * 2.6, hw * 1.4) / PX).ceil() * PX
+	var q := Iso.to_screen(p)
+	n.position = ((q - n.size * 0.5) / PX).floor() * PX
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/lake.gdshader")
+	m.set_shader_parameter("seed", randf() * 40.0)
+	m.set_shader_parameter("rect_size", n.size)
+	m.set_shader_parameter("half_px", Vector2(hw, hw * 0.5))
+	m.set_shader_parameter("kind", 1 if kind == "blood" else 0)
+	m.set_shader_parameter("world_ofs", n.position)
+	n.material = m
+	if zone and zone.get("floor_layer"):
+		zone.floor_layer.add_child(n)
+	else:
+		add_child(n)
+	lakes.append({"node": n, "p": p, "R": r, "kind": kind, "rings": [], "last": {}, "t": 0.0})
+	return n
+
+func _lake_ring(lk: Dictionary, tile: Vector2, strength: float) -> void:
+	var n: ColorRect = lk["node"]
+	var sp := Iso.to_screen(tile) - n.position
+	lk["rings"].append([sp.x, sp.y, 0.0, strength])
+	while lk["rings"].size() > 8:
+		lk["rings"].pop_front()
+
+func _tick_lakes(dt: float) -> void:
+	var bodies: Array = []
+	if zone:
+		bodies = get_tree().get_nodes_in_group("monsters").filter(func(m): return is_instance_valid(m) and not m.dead and m.zone == zone)
+		var sc = get_tree().current_scene
+		var h = sc.get("hero") if sc else null
+		if h and is_instance_valid(h):
+			bodies.append(h)
+	for lk in lakes:
+		var n: ColorRect = lk["node"]
+		if not is_instance_valid(n):
+			continue
+		lk["t"] += dt
+		var blood: bool = lk["kind"] == "blood"
+		for b in bodies:
+			var dv: Vector2 = b.tp - lk["p"]
+			if dv.length() > lk["R"] * 0.8:
+				continue
+			var id: int = b.get_instance_id()
+			var last: Vector2 = lk["last"].get(id, Vector2.INF)
+			if last == Vector2.INF or last.distance_to(b.tp) > (0.35 if blood else 0.25):
+				lk["last"][id] = b.tp
+				_lake_ring(lk, b.tp, 1.0)
+		if randf() < dt * (1.2 if blood else 0.7):          # a drop falling in, or blood bubbling up
+			var a := randf() * TAU
+			var d: float = sqrt(randf()) * lk["R"] * 0.6
+			_lake_ring(lk, lk["p"] + Vector2(cos(a), sin(a)) * d, 0.5 if blood else 0.6)
+		for rg in lk["rings"]:
+			rg[2] += dt
+		lk["rings"] = lk["rings"].filter(func(rg): return rg[2] < 1.6)
+		var arr: Array = []
+		for i in 8:
+			arr.append(Vector4(lk["rings"][i][0], lk["rings"][i][1], lk["rings"][i][2], lk["rings"][i][3]) if i < lk["rings"].size() else Vector4(0, 0, 0, 0))
+		var m: ShaderMaterial = n.material
+		m.set_shader_parameter("ripples", arr)
+		m.set_shader_parameter("t", lk["t"])
+		m.set_shader_parameter("wind", Vector2(Gust.dir(), Gust.k()))
+	lakes = lakes.filter(func(lk): return is_instance_valid(lk["node"]))
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -1900,6 +1974,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_lakes(dt)
 	_tick_absence(dt)
 	_tick_radiance(dt)
 	_tick_miasma2(dt)
