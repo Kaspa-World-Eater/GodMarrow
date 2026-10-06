@@ -316,6 +316,7 @@ var corrode_k := 0.0
 var veins_k := 0.0
 var mstain_k := 0.0
 var erase_k := 0.0
+var unmade_k := 0.0
 
 func acid_hit(dmg: float) -> void:
 	corrode_k = minf(1.0, corrode_k + 0.2 + dmg / maxf(1.0, hp_max))
@@ -361,6 +362,9 @@ func _tick_ossify(dt: float) -> void:
 	if not dead:
 		erase_k = maxf(0.0, erase_k - dt * 0.12)
 	m.set_shader_parameter("erase", erase_k)
+	if not dead:
+		unmade_k = maxf(0.0, unmade_k - dt * 0.08)
+	m.set_shader_parameter("unmade", unmade_k)
 	if mstain_k > 0.2 and randf() < dt * 6.0 * mstain_k:   # the sickness breathing off the stained part
 		var I2 = load("res://world/impacts.gd").of(zone)
 		var r2 := spr.get_rect()

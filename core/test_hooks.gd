@@ -83,6 +83,8 @@ static func run(g) -> void:
 		_miasmafx(g)                     # --miasmafx: a gyre, swelling bladders, breathing vents and stained creatures
 	if a.has("radfx"):
 		_radfx(g)                        # --radfx: radiance: the glare, lances, a turning halo, gold leaf, erased creatures
+	if a.has("voidfx"):
+		_voidfx(g)                       # --voidfx: absence: a hush, black sand, a gate, a pinch, creatures unmade
 	if a.has("magic"):
 		_magic(g)                        # --magic: phosphor wisps flung at points round the pilgrim
 	if a.has("acid"):
@@ -675,5 +677,32 @@ static func _radfx(g) -> void:
 		for m in ms:
 			if is_instance_valid(m) and not m.dead:
 				Combat.hit_monster(m, 0.5, "radiance", c, {"dot": true})
+		n += 1
+		await tree.create_timer(0.6).timeout
+
+
+static func _voidfx(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	var I = load("res://world/impacts.gd").of(g.zone)
+	var c: Vector2 = g.hero.tp
+	var ms: Array = []
+	for o in [Vector2(1.3, -0.1), Vector2(0.3, 1.1)]:
+		var m = Brain.spawn(g.zone, "hollow", c + o, 6, "normal", "void", 1e6)
+		if m:
+			m.speed = 0.0
+			m.dmg = Vector2.ZERO
+			ms.append(m)
+	var n := 0
+	while is_instance_valid(g) and g.hero:
+		if n % 8 == 0:
+			I.hush(c + Vector2(3.0, 1.2), 1.4, 4.4)
+		if n % 4 == 1:
+			I.gate(c + Vector2(3.4, -1.2))
+		if n % 4 == 3:
+			I.pinch(c + Vector2(1.0, 2.4))
+		for m in ms:
+			if is_instance_valid(m) and not m.dead:
+				Combat.hit_monster(m, 0.5, "void", c, {"dot": true})
 		n += 1
 		await tree.create_timer(0.6).timeout

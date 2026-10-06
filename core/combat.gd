@@ -34,6 +34,8 @@ static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vec
 	m.on_hit(d, elem, from, opts)
 	if elem == "ltng" and m.zone and not opts.get("dot", false):
 		load("res://world/impacts.gd").of(m.zone).crackle(m, 0.9)
+	if elem == "void" and m.get("unmade_k") != null:
+		m.unmade_k = minf(1.0, m.unmade_k + 0.2 + d / maxf(1.0, m.hp_max))
 	if elem == "radiance" and m.get("erase_k") != null:
 		m.erase_k = minf(1.0, m.erase_k + 0.22 + d / maxf(1.0, m.hp_max))
 	if (elem == "miasma" or elem == "poison") and m.get("mstain_k") != null:

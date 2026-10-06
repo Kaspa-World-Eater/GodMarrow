@@ -181,6 +181,7 @@ func _ensure_sky() -> void:
 
 func _draw_sky() -> void:
 	_draw_souls(sky)
+	_draw_absence(sky)
 	_draw_radiance(sky)
 	_draw_miasma2(sky)
 	_draw_slash(sky)
@@ -1671,6 +1672,139 @@ func _draw_radiance(cv: CanvasItem) -> void:
 			col = Color(1, 1, 0.95, al)
 		cv.draw_rect(Rect2(c0, Vector2(PX * (2.0 if turn > 0.4 else 1.0), PX)), col)
 
+# ------------------------------------------------------------------ absence (the closed hand: erasing dark)
+## the wiki: "Absence, the closed hand, erases with dark: the palm that swallows, the pinch, the gate that closes over
+## the sun"; its sand is black and pours up, "falling the wrong way".
+## hush: a hole in the world (shaders/absence_hush.gdshader) drawing the scene in and draining it to nothing; black
+## sand: grains rising off the ground, quickening upward, each with a short trail; gate: two dark leaves closing over a
+## spot until the dark is a line, then shut, sand thrown up; pinch: the air pinched to a point, dark streaks drawn in
+var hushes: Array = []     # {node, t, secs, p, r}
+var bsand: Array = []      # {q, v, t, life}
+var gates: Array = []      # {c, H, W, t, secs}
+var pinches: Array = []    # {c, t, secs, rays}
+
+func hush(p: Vector2, r: float = 1.4, secs: float = 4.0) -> void:
+	_ensure_sky()
+	var n := ColorRect.new()
+	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	n.size = (Vector2(r * Iso.HX * 2.0 * 1.6, r * Iso.HX * 1.6) / PX).ceil() * PX
+	var q := Iso.to_screen(p)
+	n.position = ((q - n.size * 0.5) / PX).floor() * PX
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/absence_hush.gdshader")
+	m.set_shader_parameter("seed", randf() * 40.0)
+	m.set_shader_parameter("rect_size", n.size)
+	m.set_shader_parameter("life", 0.0)
+	n.material = m
+	_ghost_layer().add_child(n)
+	hushes.append({"node": n, "t": 0.0, "secs": secs, "p": p, "r": r})
+
+func black_sand(p: Vector2, r: float = 0.8, n: int = 12) -> void:
+	_ensure_sky()
+	var c := Iso.to_screen(p)
+	for i in n:
+		var a := randf() * TAU
+		var d := sqrt(randf()) * r * Iso.HX
+		bsand.append({"q": c + Vector2(cos(a) * d, sin(a) * d * 0.5), "v": Vector2(randf_range(-6, 6), -randf_range(10, 30)), "t": -randf() * 0.4,
+			"life": randf_range(1.0, 1.8), "tr": []})
+
+func gate(p: Vector2, secs: float = 0.7) -> void:
+	_ensure_sky()
+	gates.append({"c": Iso.to_screen(p) + Vector2(0, -60), "p": p, "H": 150.0, "W": 70.0, "t": 0.0, "secs": secs, "shut": false})
+
+func pinch(p: Vector2) -> void:
+	_ensure_sky()
+	var rays: Array = []
+	for i in 10:
+		rays.append([randf() * TAU, randf_range(40, 70)])
+	pinches.append({"c": Iso.to_screen(p) + Vector2(0, -50), "p": p, "t": 0.0, "secs": 0.45, "rays": rays, "done": false})
+
+func _tick_absence(dt: float) -> void:
+	for hs in hushes:
+		hs["t"] += dt
+		var u: float = hs["t"] / hs["secs"]
+		var lf: float = smoothstep(0.0, 0.25, u) * (1.0 - smoothstep(0.75, 1.0, u))   # it opens slow, closes slow
+		var mt: ShaderMaterial = hs["node"].material
+		mt.set_shader_parameter("t", hs["t"])
+		mt.set_shader_parameter("life", lf)
+		if randf() < dt * 14.0 * lf:
+			black_sand(hs["p"], hs["r"] * 0.8, 1)
+		if u >= 1.0:
+			hs["node"].queue_free()
+	hushes = hushes.filter(func(hs): return hs["t"] < hs["secs"])
+	for sd in bsand:
+		sd["t"] += dt
+		if sd["t"] < 0.0:
+			continue
+		sd["v"].y -= 120.0 * dt                                # falling the wrong way, quickening
+		sd["v"].x += sin(sd["t"] * 5.0 + sd["q"].x) * 10.0 * dt
+		sd["q"] += sd["v"] * dt
+		sd["tr"].push_front(sd["q"])
+		if sd["tr"].size() > 4:
+			sd["tr"].pop_back()
+	bsand = bsand.filter(func(sd): return sd["t"] < sd["life"])
+	for gt in gates:
+		gt["t"] += dt
+		if not gt["shut"] and gt["t"] >= gt["secs"] * 0.7:
+			gt["shut"] = true
+			black_sand(gt["p"], 0.5, 20)
+			Game.shake(1.5)
+	gates = gates.filter(func(gt): return gt["t"] < gt["secs"])
+	for pc in pinches:
+		pc["t"] += dt
+		if not pc["done"] and pc["t"] >= pc["secs"] * 0.6:
+			pc["done"] = true
+			black_sand(pc["p"], 0.3, 8)
+	pinches = pinches.filter(func(pc): return pc["t"] < pc["secs"])
+
+func _draw_absence(cv: CanvasItem) -> void:
+	for sd in bsand:
+		if sd["t"] < 0.0:
+			continue
+		var u: float = sd["t"] / sd["life"]
+		var tr: Array = sd["tr"]
+		for i in tr.size():
+			var col := Color(0.03, 0.02, 0.04, (1.0 - u) * (1.0 - i * 0.22))
+			if i == 0 and fmod(sd["t"] * 7.0 + sd["life"] * 13.0, 1.0) < 0.35:
+				col = Color(0.5, 0.44, 0.58, 1.0 - u)               # a grain catching what little light there is
+			cv.draw_rect(Rect2((tr[i] / PX).floor() * PX, Vector2(PX, PX)), col)
+	for gt in gates:
+		var u: float = gt["t"] / gt["secs"]
+		var close := pow(minf(1.0, u / 0.7), 2.2)              # the leaves close, slow then fast
+		var W: float = gt["W"] * (1.0 - close) + 4.0
+		var H: float = gt["H"] * (1.0 - 0.3 * close)
+		var fade := 1.0 - smoothstep(0.7, 1.0, u)
+		var c0: Vector2 = (gt["c"] / PX).floor()
+		var hy := int(H / PX / 2.0)
+		for yy in range(-hy, hy + 1):
+			var f := float(yy) / hy
+			var hw := int(W / PX / 2.0 * sqrt(maxf(0.0, 1.0 - f * f)))   # an eye shape, pointed top and bottom
+			for xx in range(-hw, hw + 1):
+				var col := Color(0.015, 0.01, 0.025, fade)
+				if absi(xx) == hw:
+					col = Color(0.62, 0.54, 0.78, fade)              # the leaves' edges, catching what light is left
+				elif absi(xx) == hw - 1:
+					col = Color(0.2, 0.16, 0.28, fade)
+				cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), col)
+	for pc in pinches:
+		var u: float = pc["t"] / pc["secs"]
+		var c: Vector2 = pc["c"]
+		for ry in pc["rays"]:
+			var r0: float = ry[1] * (1.0 - u)
+			var r1: float = maxf(0.0, r0 - 18.0)
+			var dirv := Vector2(cos(ry[0]), sin(ry[0]) * 0.6)
+			var n := int((r0 - r1) / PX)
+			for k in n:
+				var q := c + dirv * (r1 + k * PX)
+				var lead := k == n - 1                                 # the outer tip of each streak is lit, the rest is dark
+				cv.draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), Color(0.6, 0.52, 0.76, 1.0 - u * 0.5) if lead else Color(0.02, 0.015, 0.03, 0.9 * (1.0 - u * 0.5)))
+		var dr := int(3.0 * sin(PI * u))
+		var c1 := (c / PX).floor()
+		for yy in range(-dr, dr + 1):
+			for xx in range(-dr, dr + 1):
+				if xx * xx + yy * yy <= dr * dr:
+					cv.draw_rect(Rect2((c1 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.01, 0.005, 0.02) if xx * xx + yy * yy < dr * dr - 1 else Color(0.36, 0.3, 0.46))
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -1766,6 +1900,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_absence(dt)
 	_tick_radiance(dt)
 	_tick_miasma2(dt)
 	_tick_slash(dt)
