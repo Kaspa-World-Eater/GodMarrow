@@ -233,7 +233,58 @@ func frost(p: Vector2, r: float = 1.6, secs: float = 9.0) -> void:
 	n.material = m
 	add_child(n)
 	frosts.append({"node": n, "t": 0.0, "secs": secs})
+	spikes(p, r)
 	_flash(p, Color(0.6, 0.8, 1.0), 0.25, 40.0)
+
+## ice spikes bursting up out of the ground: faceted prisms in whole pixels (a lit face, a shaded face, a white edge
+## and tip), a cluster that shoots up fast and leans out from its centre, then cracks and sinks as the ice melts
+var spike_sets: Array = []
+
+func spikes(p: Vector2, r: float = 1.0, secs: float = 6.0) -> void:
+	var c := Iso.to_screen(p)
+	var list: Array = []
+	for i in int(3 + r * 2.5):
+		var a := randf() * TAU
+		var d := randf() * r * Iso.HX * 0.5
+		var base := c + Vector2(cos(a) * d, sin(a) * d * 0.5)
+		var lean := Vector2(cos(a), -1.8).normalized() * randf_range(0.2, 0.5) + Vector2(0, -1)
+		list.append({"b": base, "dir": lean.normalized(), "h": randf_range(40, 110) * (1.0 - d / (r * Iso.HX * 0.5 + 1.0) * 0.5), "w": randf_range(18, 30)})
+	list.sort_custom(func(x, y): return x["b"].y < y["b"].y)
+	spike_sets.append({"list": list, "t": 0.0, "secs": secs})
+
+func _draw_spikes() -> void:
+	for ss in spike_sets:
+		var t: float = ss["t"]
+		var g := 1.0 - pow(1.0 - minf(1.0, t / 0.18), 3.0)                 # shoots up fast
+		var sink := smoothstep(ss["secs"] - 1.5, ss["secs"], t)
+		for sp in ss["list"]:
+			var h: float = sp["h"] * g * (1.0 - sink)
+			if h < 4.0:
+				continue
+			var b: Vector2 = sp["b"]
+			var dirv: Vector2 = sp["dir"]
+			var side := Vector2(-dirv.y, dirv.x)
+			var w: float = sp["w"]
+			var tip := b + dirv * h
+			# fill the prism pixel by pixel: across from -w/2 to w/2 tapering to the tip
+			var n := int(h / PX)
+			for k in n:
+				var u := float(k) / n
+				var half := w * 0.5 * (1.0 - u)
+				var cpos := b + dirv * (u * h)
+				var m := int(ceil(half / PX))
+				for j in range(-m, m + 1):
+					var q := ((cpos + side * j * PX) / PX).floor() * PX
+					var col := Color(0.62, 0.8, 1.0, 0.92) if j < 0 else Color(0.28, 0.42, 0.72, 0.92)
+					if j == 0:
+						col = Color(0.92, 0.98, 1.0, 0.95)                    # the ridge catches the light
+					elif abs(j) == m:
+						col = Color(0.12, 0.2, 0.42, 0.95)                    # the dark edge
+					draw_rect(Rect2(q, Vector2(PX, PX)), col)
+			draw_rect(Rect2((tip / PX).floor() * PX, Vector2(PX, PX)), Color(1, 1, 1))
+			if sink > 0.0:                                                 # cracks as it melts
+				var cq := ((b + dirv * h * 0.5) / PX).floor() * PX
+				draw_rect(Rect2(cq, Vector2(PX * 2, PX)), Color(0.05, 0.08, 0.16, sink))
 
 ## an acid pool (shaders/acid.gdshader): it spreads, bubbles and fumes for secs, then sinks away
 var acids: Array = []
@@ -477,6 +528,9 @@ func _process(dt: float) -> void:
 			ac["node"].queue_free()
 			ac["light"].queue_free()
 	acids = acids.filter(func(ac): return ac["t"] < ac["secs"])
+	for ss in spike_sets:
+		ss["t"] += dt
+	spike_sets = spike_sets.filter(func(ss): return ss["t"] < ss["secs"])
 	for fr in frosts:
 		fr["t"] += dt
 		var fm: ShaderMaterial = fr["node"].material
@@ -539,6 +593,7 @@ func _process(dt: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+	_draw_spikes()
 	for fn in ferns:
 		var u: float = fn["t"] / fn["life"]
 		var hot := clampf(1.0 - fn["t"] / 1.5, 0.0, 1.0)
