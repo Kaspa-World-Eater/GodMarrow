@@ -134,7 +134,7 @@ func hurt(m, dmg: float, id: String, o: Dictionary = {}) -> float:
 			dmg /= maxf(0.01, float(o["echo"]))
 	else:
 		m.set_meta("o_struck", time)
-	var opts := {}
+	var opts := {"bone": true}      # every Ossuarch blow is bone: it grows on what it strikes (entities/monster.gd bone_hit)
 	if o.get("melee", false):
 		opts["melee"] = true
 	if o.has("poise"):

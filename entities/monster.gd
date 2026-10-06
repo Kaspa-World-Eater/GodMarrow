@@ -291,6 +291,76 @@ func on_hit(d: float, elem: String, from: Vector2, opts: Dictionary) -> void:
 func add_dot(dps: float, secs: float, elem: String) -> void:
 	dots.append({"dps": dps, "t": secs, "elem": elem, "tick": 0.5})
 
+## bone growth (Derek 2026-10-06: "bone growth like cancer"): every bone blow crusts the body from the side it came from
+## (the creature shader's growth); it recedes slowly unless struck again; spurs push out through the silhouette as it
+## spreads; killed while overgrown, the body calcifies and breaks apart into bone dust instead of falling
+var ossify := 0.0
+var _oss_origin := Vector2(0.5, 0.5)
+var calc_k := -1.0
+var _spurs: Node2D
+
+func bone_hit(from: Vector2, dmg: float) -> void:
+	if dead:
+		return
+	if ossify <= 0.02:
+		var sv: Vector2 = (Iso.to_screen(from) - Iso.to_screen(tp)).normalized() if from != Vector2.INF else Vector2.ZERO
+		_oss_origin = Vector2(0.5 + 0.35 * sv.x * float(face), 0.45 + 0.3 * sv.y)
+	ossify = minf(1.0, ossify + 0.12 + dmg / maxf(1.0, hp_max) * 0.6)
+	if _spurs == null:
+		_spurs = Node2D.new()
+		_spurs.z_index = 1
+		_spurs.draw.connect(_draw_spurs)
+		add_child(_spurs)
+	_spurs.set_meta("seed", randi() % 997)
+
+func _tick_ossify(dt: float) -> void:
+	if not (spr.material is ShaderMaterial):
+		return
+	var m := spr.material as ShaderMaterial
+	if not dead:
+		ossify = maxf(0.0, ossify - dt * 0.05)
+	m.set_shader_parameter("growth", ossify)
+	m.set_shader_parameter("origin", _oss_origin)
+	m.set_shader_parameter("oseed", float(get_instance_id() % 97))
+	var at := spr.texture as AtlasTexture
+	if at and at.atlas:
+		var sz := at.atlas.get_size()
+		m.set_shader_parameter("region", Vector4(at.region.position.x / sz.x, at.region.position.y / sz.y, at.region.size.x / sz.x, at.region.size.y / sz.y))
+	if _spurs:
+		_spurs.visible = ossify > 0.25 and calc_k < 0.4
+		_spurs.queue_redraw()
+
+## bone spurs through the outline: pale spikes from the body's edges, longer as the growth spreads
+func _draw_spurs() -> void:
+	var r := spr.get_rect()
+	var sc := spr.scale
+	var box := Rect2(spr.position + r.position * sc, r.size * sc)
+	var sd: int = int(_spurs.get_meta("seed", 1))
+	var n := int(3 + ossify * 7)
+	var L := (10.0 + ossify * 30.0)
+	for i in n:
+		var h1 := fmod(sin(float(sd + i * 31)) * 43758.5453, 1.0)
+		var h2 := fmod(sin(float(sd * 3 + i * 17)) * 24634.6345, 1.0)
+		h1 = absf(h1); h2 = absf(h2)
+		var side := i % 3
+		var base := Vector2(box.position.x + box.size.x * (0.15 + 0.7 * h1), box.position.y + box.size.y * (0.2 + 0.55 * h2))
+		var dir := Vector2(-1.0 if side == 0 else (1.0 if side == 1 else (h1 - 0.5)), -0.6 - h2 * 0.6).normalized()
+		if side == 0:
+			base.x = box.position.x + box.size.x * 0.22
+		elif side == 1:
+			base.x = box.position.x + box.size.x * 0.78
+		var ln := L * (0.6 + 0.6 * h2)
+		var steps := int(ln / 4.0)
+		for k in steps:
+			var w := int(ceilf((1.0 - float(k) / steps) * 2.0))
+			var p := ((base + dir * k * 4.0) / 4.0).floor() * 4.0
+			for ww in range(-w + 1, w):
+				var q := p + Vector2(-dir.y, dir.x) * ww * 4.0
+				q = (q / 4.0).floor() * 4.0
+				var lit := ww <= 0
+				_spurs.draw_rect(Rect2(q, Vector2(4, 4)), Color(0.86, 0.85, 0.82) if lit else Color(0.42, 0.41, 0.42))
+		_spurs.draw_rect(Rect2(((base + dir * ln) / 4.0).floor() * 4.0, Vector2(4, 4)), Color(1, 0.98, 0.92))
+
 ## burning out (shaders/burn.gdshader): a body killed by fire chars, its ember cracks glow and cool, it crumbles to ash
 ## from the top over a few seconds, smoking and shedding embers; the fire's light dims with it
 var last_elem := ""
@@ -350,6 +420,9 @@ func die(from: Vector2 = Vector2.INF) -> void:
 	corpse_t = 30.0
 	if last_elem == "fire":
 		_start_burn()
+	elif ossify > 0.35 and spr.material is ShaderMaterial:
+		calc_k = 0.0                          # calcified: it breaks apart instead of falling
+		spr.set_index(mini(1, spr.frame_count() - 1))
 	var sp = load("res://world/splats.gd").at(zone)   # the ground it bleeds or scatters bone into (za_death21.js)
 	if sp:
 		sp.death(kind, tp, radius > 0.35)
@@ -375,6 +448,19 @@ func _physics_process(dt: float) -> void:
 		tp = zone.move(tp, push * dt, radius)
 		position = Iso.to_screen(tp)
 		push = push.move_toward(Vector2.ZERO, (14.0 + push.length() * 6.0) * dt)
+	if cm_body:
+		_tick_ossify(dt)
+	if dead and calc_k >= 0.0:
+		calc_k = minf(1.0, calc_k + dt / 2.2)
+		(spr.material as ShaderMaterial).set_shader_parameter("growth", 1.0)
+		(spr.material as ShaderMaterial).set_shader_parameter("dead_k", calc_k)
+		if randf() < dt * 18.0 * (1.0 - calc_k * 0.5):
+			load("res://world/impacts.gd").of(zone).hit(tp + Vector2(randf_range(-0.3, 0.3), randf_range(-0.3, 0.3)), Vector2.INF, false, "bone")
+		if calc_k >= 1.0:
+			modulate.a = maxf(0.0, modulate.a - dt * 1.5)
+			if modulate.a <= 0.0:
+				queue_free()
+		return
 	if dead:
 		if burn_k < 0.0:
 			spr.step(dt)     # a burning body holds its fall (Cursemark's death shrinks it to a remnant; it burns out instead)

@@ -32,6 +32,8 @@ static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vec
 	var pd: float = opts.get("poise", d) * STAGGER
 	m.add_poise_damage(pd, bool(opts.get("heavy", false)))
 	m.on_hit(d, elem, from, opts)
+	if opts.get("bone", false) and m.has_method("bone_hit"):
+		m.bone_hit(from, d)
 	if not m.mods.is_empty():
 		Affixes.on_struck(m, d, opts)
 	# (Cursemark assets) weight: a melee blow shoves what it strikes (Cursemark's knockback), a heavy one further, a
