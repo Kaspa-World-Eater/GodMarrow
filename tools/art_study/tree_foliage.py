@@ -50,7 +50,7 @@ def clumps_of(tree, cell=0.62, seed=4):
     keep = []
     for c, R, m in cl:
         shell = np.linalg.norm((c - cen) * [1, 1, 1.3]) / far
-        if c[2] < top * 0.5 or shell < 0.32:
+        if c[2] < top * 0.56 or shell < 0.32:
             continue
         keep.append((c, R, m))
     return keep
@@ -277,7 +277,7 @@ def render(tree, clumps, mode, W, H, ox, oy):
 
 
 def main(out):
-    tree = Tree(16, scale=1.55)
+    tree = Tree(16, scale=1.55, turn=2.6)
     clumps = clumps_of(tree)
     W, H = 640, 580
     ox, oy = W / 2 - 10, H - 60

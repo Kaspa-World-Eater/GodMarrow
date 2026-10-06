@@ -61,7 +61,7 @@ class Tree:
     """a list of limb pieces: (p0, p1, r0, r1, s0, s1, fork) in yards; s = length along the limb (for the bark);
     fork = the distance of p0 from the fork it grew from (for the crotch collar)"""
 
-    def __init__(self, seed=7, scale=2.6):
+    def __init__(self, seed=7, scale=2.6, turn=0.0):
         self.rr = np.random.default_rng(seed)
         self.k = scale
         self.pieces = []
@@ -82,8 +82,15 @@ class Tree:
             end = mid + unit(d + np.array([0, 0, -0.6])) * 0.7 * K
             self.pieces.append((p0, mid, 0.22 * K, 0.11 * K, 0.0, 0.5 * K, 9.0))
             self.pieces.append((mid, end, 0.11 * K, 0.03 * K, 0.5 * K, 1.2 * K, 9.0))
+        # turn the whole tree on its trunk (a painter chooses the angle: no great limb pointed down the line of sight)
+        if turn:
+            c, s_ = np.cos(turn), np.sin(turn)
+            R = np.array([[c, -s_, 0], [s_, c, 0], [0, 0, 1.0]])
+            self.pieces = [(R @ a, R @ b, r0, r1, s0, s1, fk) for (a, b, r0, r1, s0, s1, fk) in self.pieces]
+            self.forks = [(R @ a, r) for (a, r) in self.forks]
+            self.leafpts = [(R @ a, m) for (a, m) in self.leafpts]
 
-    def limb(self, p, d, r, L, depth, s, phi, mass=0):
+    def limb(self, p, d, r, L, depth, s, phi, mass=0, r_in=None):
         rr = self.rr
         n = max(3, int(L / 0.3))
         r_end = r * (0.86 if depth else 0.8)
@@ -96,6 +103,9 @@ class Tree:
             d = unit(d + np.array([0, 0, up - sag]) + rr.normal(0, 0.07, 3))
             q2 = q + d * (L / n)
             ra, rb = r + (r_end - r) * (i / n), r + (r_end - r) * f
+            if r_in is not None:                                       # the leader takes over the parent's width
+                ba, bb = max(0.0, 1 - i / 2.0), max(0.0, 1 - (i + 1) / 2.0)
+                ra, rb = ra * (1 - ba) + r_in * ba, rb * (1 - bb) + r_in * bb
             self.pieces.append((q, q2, ra, rb, s + L * i / n, s + L * f, L * i / n))
             if rb < 0.03:
                 self.leafpts.append((q2, mass))
@@ -110,7 +120,6 @@ class Tree:
         fr = np.sort(fr)[::-1]
         # the fork swells, then tapers into the leader: no open end
         rc0 = r_end * np.sqrt(fr[0])
-        self.pieces.append((q, q + d * r_end * 1.2, r_end, rc0, s, s + r_end * 1.2, 0.0))
         side = unit(np.cross(d, np.array([0.31, 0.17, 0.93])))
         up2 = unit(np.cross(side, d))
         phi += np.radians(137.5)
@@ -127,8 +136,9 @@ class Tree:
                 Lc = rr.uniform(2.0, 2.6) * self.k
             Lc = max(Lc, 0.22)
             q0 = q - d * (j * 0.3 * self.k if depth == 0 else 0.0)           # great limbs staggered down the trunk
-            q0 = (q0 + d * r_end * 1.2 * (j == 0)) - dc * rc * 0.9               # born inside the parent, not stuck on
-            self.limb(q0, dc, rc, Lc, depth + 1, s, ph, j if depth == 0 else mass)
+            if j:
+                q0 = q0 - dc * rc * 0.9                                      # born inside the parent, not stuck on
+            self.limb(q0, dc, rc, Lc, depth + 1, s, ph, j if depth == 0 else mass, r_end if j == 0 else None)
 
 
 def to_screen(p, ox, oy):

@@ -492,3 +492,7 @@ limbs). This round learns the tree from the inside out, one exercise at a time, 
 - **Bounce only on the mass's lower silhouette.** Applied to every clump's edge, it outlined each one like a pillow.
 - **Leaf texture:** small leaves (4 px cells), each lit on its upper left, with dark gaps; on the lit and half
   planes only. At 3 px it was yellow speckle.
+- **Choose the angle.** The trunk looked snapped: a great limb pointed straight down the line of sight, so it was
+  seen end-on, and a foreshortened limb reads as a broken stump. Turned on its trunk (the best of four turns, chosen
+  by eye), the tree shows its fan of great limbs plainly. Also, the leader now takes over the trunk's own width
+  where it starts, so there is no separate collar to stick out.
