@@ -66,6 +66,7 @@ class Tree:
         self.k = scale
         self.pieces = []
         self.forks = []                                                 # (point, radius) of every fork
+        self.leafpts = []                                               # (point, mass): where leaves grow (twig ends)
         base = np.array([0.0, 0.0, -0.05])
         lean = unit(np.array([0.12, -0.08, 1.0]))
         # the foot flares into the roots before the trunk proper
@@ -82,7 +83,7 @@ class Tree:
             self.pieces.append((p0, mid, 0.22 * K, 0.11 * K, 0.0, 0.5 * K, 9.0))
             self.pieces.append((mid, end, 0.11 * K, 0.03 * K, 0.5 * K, 1.2 * K, 9.0))
 
-    def limb(self, p, d, r, L, depth, s, phi):
+    def limb(self, p, d, r, L, depth, s, phi, mass=0):
         rr = self.rr
         n = max(3, int(L / 0.3))
         r_end = r * (0.86 if depth else 0.8)
@@ -96,6 +97,8 @@ class Tree:
             q2 = q + d * (L / n)
             ra, rb = r + (r_end - r) * (i / n), r + (r_end - r) * f
             self.pieces.append((q, q2, ra, rb, s + L * i / n, s + L * f, L * i / n))
+            if rb < 0.03:
+                self.leafpts.append((q2, mass))
             q = q2
         s += L
         if r_end < 0.009 or depth > 16:
@@ -125,7 +128,7 @@ class Tree:
             Lc = max(Lc, 0.22)
             q0 = q - d * (j * 0.3 * self.k if depth == 0 else 0.0)           # great limbs staggered down the trunk
             q0 = (q0 + d * r_end * 1.2 * (j == 0)) - dc * rc * 0.9               # born inside the parent, not stuck on
-            self.limb(q0, dc, rc, Lc, depth + 1, s, ph)
+            self.limb(q0, dc, rc, Lc, depth + 1, s, ph, j if depth == 0 else mass)
 
 
 def to_screen(p, ox, oy):

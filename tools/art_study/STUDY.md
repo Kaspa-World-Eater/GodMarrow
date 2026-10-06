@@ -476,3 +476,19 @@ limbs). This round learns the tree from the inside out, one exercise at a time, 
   for all plants. Whereas ruins and fortresses will be fixed." So the exercises grow a population, not one tree:
   species with their own habits (the spreading broadleaf, a weeping one, a tall narrow one, a gnarled thorn), each at
   every age (sapling, young, mature, ancient, dying, dead).
+
+### Exercise 2, first pass: the crown in leaf (`tree_foliage.py`)
+- **True scale cuts both ways.** At first my "true scale" tree came out 34 yards tall, twice an old broadleaf. Now it
+  is about 18 yards (400 world px, ten heroes) on a trunk about a yard across.
+- **Design the silhouette; don't accept the dice.** Forty trees were grown and scored on crown balance over the trunk,
+  width to height (about 1.3) and height. The best four were drawn as value studies side by side and chosen by eye
+  (seed 16: a broad dome).
+- **Light the mass, not the clump.** Each pixel's normal is 80% the great limb's whole mass and 20% its own clump.
+  At 38% the crown was a bunch of grapes, each clump with its own lit cap.
+- **The shade side is a dark mid-tone, not black.** Sky light fills the inside of the crown; self-shadow at 45%,
+  not 22%. The value groups were moved up the ramp.
+- **The crown is a shell.** Leaves don't grow deep in its own shade or low on the trunk under it; removing those
+  clumps took away the dangling blobs.
+- **Bounce only on the mass's lower silhouette.** Applied to every clump's edge, it outlined each one like a pillow.
+- **Leaf texture:** small leaves (4 px cells), each lit on its upper left, with dark gaps; on the lit and half
+  planes only. At 3 px it was yellow speckle.
