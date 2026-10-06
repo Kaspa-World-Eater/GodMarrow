@@ -808,7 +808,7 @@ func _draw_over() -> void:
 		var fi := U.font("italic")
 		var s := "The lantern carries you back."
 		var w := fi.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, 44).x
-		over.draw_string(fi, Vector2(cx - w / 2, vs.y / 2 + 170)   # under the banner, not across it, s, HORIZONTAL_ALIGNMENT_LEFT, -1, 44, Color("#a39d8c"))
+		over.draw_string(fi, Vector2(cx - w / 2, vs.y / 2 + 170), s, HORIZONTAL_ALIGNMENT_LEFT, -1, 44, Color("#a39d8c"))   # under the banner, not across it
 
 ## a dark band fading out at both ends (the web's banner gradient), in stripes
 func _band(r: Rect2, a: float) -> void:
