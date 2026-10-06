@@ -66,6 +66,10 @@ def main():
     for s in d["shapes"]:
         if s["name"] == "cloak":
             s["keep"] = {"back_strip": 1.75}
+            # shorter, in deep ragged tongues: the hem ends about the knee so the gap between the legs stays open in
+            # silhouette, the tongues still trail to mid-shin (it ran to 142 of a 166 ground line)
+            s["y"] = [62, 126]
+            s["hem"] = {"tongues": 9, "depth": 20, "seed": 7}
     # the silhouette study (STUDY.md round 3): the armed stance, legs apart and the sword out from the body, as his idle
     d["clips"] = dict(d.get("clips") or {}, attack="strike", idle="attack_idle")
     DST.write_bytes(json.dumps(d, indent=1, ensure_ascii=False).encode("utf8"))

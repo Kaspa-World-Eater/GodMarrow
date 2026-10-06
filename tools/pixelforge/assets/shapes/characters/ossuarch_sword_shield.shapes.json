@@ -1909,7 +1909,7 @@
    "kind": "ring",
    "y": [
     62,
-    142
+    126
    ],
    "rx": [
     15.0,
@@ -1925,8 +1925,8 @@
     "back_strip": 1.75
    },
    "hem": {
-    "tongues": 15,
-    "depth": 22,
+    "tongues": 9,
+    "depth": 20,
     "seed": 7
    },
    "holes": {
