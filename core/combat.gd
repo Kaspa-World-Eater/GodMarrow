@@ -41,6 +41,11 @@ static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vec
 		shove = 1.6 + (2.6 if opts.get("heavy", false) else 0.0) + (3.0 if opts.get("finisher", false) else 0.0)
 	if shove > 0.0 and m.has_method("knock"):
 		m.knock(from, shove * (2.0 if m.hp <= 0.0 else 1.0))
+	# the world answers a solid blow: a flash, chips thrown, a crack under the heavy ones (world/impacts.gd)
+	if (opts.get("melee", false) or d >= 12.0) and not opts.get("dot", false) and m.zone:
+		var heavy_hit: bool = opts.get("heavy", false) or opts.get("finisher", false) or m.hp <= 0.0
+		var kind := "bone" if str(m.kind) in ["hollow", "marrow", "knight", "bell", "archer"] else "flesh"
+		load("res://world/impacts.gd").of(m.zone).hit(m.tp, from, heavy_hit, kind)
 	if m.hp <= 0.0:
 		m.die(from)
 	return d

@@ -65,6 +65,8 @@ static func run(g) -> void:
 		_shot(g, a)
 	if a.has("groundfire"):
 		_ground_fires(g)                 # --groundfire: three fires set burning near the pilgrim (to see them spread)
+	if a.has("impacts"):
+		_impacts(g)                      # --impacts: blows landing beside the pilgrim (world/impacts.gd), to see them
 	if a.has("weather"):
 		# --weather: a spell of weather at its height now (ash on the moor, a shower in the fen)
 		var Wt = load("res://world/weather.gd")
@@ -326,7 +328,11 @@ static func _swing_loop(g) -> void:
 	await tree.create_timer(2.0).timeout
 	while is_instance_valid(g) and g.hero and not g.hero.dead:
 		if g.hero.act == "":
-			g.hero._start_attack(null, g.hero.tp + Vector2(1.0, -1.0))
+			var m = Combat.nearest_monster(g.zone, g.hero.tp, 2.6)
+			if m:
+				g.hero._start_attack(m, m.tp)
+			else:
+				g.hero._start_attack(null, g.hero.tp + Vector2(1.0, -1.0))
 		await tree.create_timer(0.7).timeout
 
 
@@ -339,3 +345,14 @@ static func _ground_fires(g) -> void:
 	for o in [Vector2(2.2, 0.6), Vector2(1.0, 2.4), Vector2(3.0, 2.2)]:
 		w.fire(c + o, 1.3, 0.0, 30.0)
 		await tree.create_timer(0.5).timeout
+
+
+static func _impacts(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.5).timeout
+	var I = load("res://world/impacts.gd")
+	var i := 0
+	while is_instance_valid(g) and g.hero:
+		I.of(g.zone).hit(g.hero.tp + Vector2(1.4, 0.4), g.hero.tp, i % 2 == 1, "bone" if i % 3 == 0 else "flesh")
+		i += 1
+		await tree.create_timer(0.45).timeout
