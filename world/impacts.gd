@@ -179,6 +179,7 @@ func _ensure_sky() -> void:
 
 func _draw_sky() -> void:
 	_draw_souls(sky)
+	_draw_bone(sky)
 	_draw_zap(sky)
 	_draw_ice(sky)
 	_draw_wisps(sky)
@@ -236,7 +237,12 @@ func frost(p: Vector2, r: float = 1.6, secs: float = 9.0) -> void:
 ## and tip), a cluster that shoots up fast and leans out from its centre, then cracks and sinks as the ice melts
 var spike_sets: Array = []
 
-func spikes(p: Vector2, r: float = 1.0, secs: float = 6.0) -> void:
+const SPIKE_PAL := {
+	"ice": [Color(0.62, 0.8, 1.0, 0.92), Color(0.28, 0.42, 0.72, 0.92), Color(0.92, 0.98, 1.0, 0.95), Color(0.12, 0.2, 0.42, 0.95)],
+	"bone": [Color(0.86, 0.84, 0.78, 1.0), Color(0.48, 0.47, 0.48, 1.0), Color(0.97, 0.96, 0.92, 1.0), Color(0.16, 0.15, 0.17, 1.0)],
+}
+
+func spikes(p: Vector2, r: float = 1.0, secs: float = 6.0, pal: String = "ice") -> void:
 	var c := Iso.to_screen(p)
 	var list: Array = []
 	for i in int(3 + r * 2.5):
@@ -246,7 +252,7 @@ func spikes(p: Vector2, r: float = 1.0, secs: float = 6.0) -> void:
 		var lean := Vector2(cos(a), -1.8).normalized() * randf_range(0.2, 0.5) + Vector2(0, -1)
 		list.append({"b": base, "dir": lean.normalized(), "h": randf_range(40, 110) * (1.0 - d / (r * Iso.HX * 0.5 + 1.0) * 0.5), "w": randf_range(18, 30)})
 	list.sort_custom(func(x, y): return x["b"].y < y["b"].y)
-	spike_sets.append({"list": list, "t": 0.0, "secs": secs})
+	spike_sets.append({"list": list, "t": 0.0, "secs": secs, "pal": pal})
 
 func _draw_spikes() -> void:
 	for ss in spike_sets:
@@ -271,11 +277,12 @@ func _draw_spikes() -> void:
 				var m := int(ceil(half / PX))
 				for j in range(-m, m + 1):
 					var q := ((cpos + side * j * PX) / PX).floor() * PX
-					var col := Color(0.62, 0.8, 1.0, 0.92) if j < 0 else Color(0.28, 0.42, 0.72, 0.92)
+					var P: Array = SPIKE_PAL[ss.get("pal", "ice")]
+					var col: Color = P[0] if j < 0 else P[1]
 					if j == 0:
-						col = Color(0.92, 0.98, 1.0, 0.95)                    # the ridge catches the light
+						col = P[2]                                            # the ridge catches the light
 					elif abs(j) == m:
-						col = Color(0.12, 0.2, 0.42, 0.95)                    # the dark edge
+						col = P[3]                                            # the dark edge
 					draw_rect(Rect2(q, Vector2(PX, PX)), col)
 			draw_rect(Rect2((tip / PX).floor() * PX, Vector2(PX, PX)), Color(1, 1, 1))
 			if sink > 0.0:                                                 # cracks as it melts
@@ -933,6 +940,124 @@ func _draw_zap(cv: CanvasItem) -> void:
 				_px_path(part, Color(0.5, 0.65, 1.0, 0.5 * (1.0 - u)), 3, cv)
 				_px_path(part, Color(1, 1, 1, 1.0 - u * 0.6), 1, cv)
 
+# ------------------------------------------------------------------ bone, more forms
+## bone spears: ivory spikes burst out of the ground in a cluster (the ice spikes' prisms in bone), a ghost-light
+## breathing round them and dust thrown up where they broke the earth; they crumble back after a while
+func bone_spears(p: Vector2, r: float = 1.2, secs: float = 5.0) -> void:
+	spikes(p, r * 1.6, secs, "bone")
+	for k in 4:
+		hit(p + Vector2(randf_range(-0.4, 0.4), randf_range(-0.3, 0.3)), Vector2.INF, false, "stone")
+	ghost_light(p, r * 1.3, secs)
+	Game.shake(2.0)
+
+## the pale ghost-light round bone magic (Diablo II's): a soft cyan halo on the ghost layer, breathing, fading out
+var glows: Array = []      # {c (screen), R, t, secs}
+
+func ghost_light(p: Vector2, r: float, secs: float) -> void:
+	_ensure_sky()
+	glows.append({"c": Iso.to_screen(p) + Vector2(0, -30), "R": r * Iso.HX, "t": 0.0, "secs": secs})
+
+## bone rain: shards of bone falling from the dark, each a pale streak with a cyan breath, driving into the ground and
+## standing there a while, a puff of grit where it lands
+var bshards: Array = []    # {q, v, land_y, t, stuck, life, ang}
+
+func bone_rain(p: Vector2, r: float = 2.4, n: int = 22, secs: float = 2.0) -> void:
+	_ensure_sky()
+	var c := Iso.to_screen(p)
+	for i in n:
+		var a := randf() * TAU
+		var d := sqrt(randf()) * r * Iso.HX
+		var ground := c + Vector2(cos(a) * d, sin(a) * d * 0.5)
+		var drop := randf_range(380, 620)
+		var tilt := randf_range(-0.25, 0.25)
+		bshards.append({"q": ground + Vector2(tilt * drop, -drop), "v": Vector2(-tilt, 1.0).normalized() * randf_range(900, 1200),
+			"ground": ground, "t": -randf() * secs, "stuck": false, "life": randf_range(2.5, 4.0), "ang": Vector2(-tilt, 1.0).normalized()})
+
+## a rib cage: curved ribs rise out of the ground round a mark and close over it, then crumble
+var cages: Array = []      # {c, R, t, secs}
+
+func rib_cage(p: Vector2, r: float = 1.1, secs: float = 4.0) -> void:
+	_ensure_sky()
+	cages.append({"c": Iso.to_screen(p), "R": r * Iso.HX, "t": 0.0, "secs": secs})
+	for k in 3:
+		hit(p, Vector2.INF, false, "stone")
+
+func _tick_bone(dt: float) -> void:
+	for gl in glows:
+		gl["t"] += dt
+	glows = glows.filter(func(gl): return gl["t"] < gl["secs"])
+	for b in bshards:
+		b["t"] += dt
+		if b["t"] < 0.0:
+			continue
+		if not b["stuck"]:
+			b["q"] += b["v"] * dt
+			if b["q"].y >= b["ground"].y:
+				b["q"] = b["ground"]
+				b["stuck"] = true
+				b["t"] = 0.0
+				for k in 2:
+					hit(Iso.to_tile(b["ground"]), Vector2.INF, false, "bone")
+		elif b["t"] > b["life"]:
+			b["done"] = true
+	bshards = bshards.filter(func(b): return not b.get("done", false))
+	for cg in cages:
+		cg["t"] += dt
+	cages = cages.filter(func(cg): return cg["t"] < cg["secs"])
+
+func _bone_px(cv: CanvasItem, q: Vector2, lit: bool, a: float = 1.0) -> void:
+	cv.draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), Color(0.9, 0.88, 0.82, a) if lit else Color(0.5, 0.49, 0.5, a))
+
+func _draw_bone(cv: CanvasItem) -> void:
+	var now := Time.get_ticks_msec() / 1000.0
+	for gl in glows:
+		var u: float = gl["t"] / gl["secs"]
+		var fa := smoothstep(0.0, 0.15, u) * (1.0 - smoothstep(0.7, 1.0, u)) * (0.75 + 0.25 * sin(now * 4.0))
+		var c0: Vector2 = (gl["c"] / PX).floor()
+		var R := int(gl["R"] / PX)
+		for yy in range(-R, R + 1):
+			for xx in range(-R, R + 1):
+				var e := pow(float(xx) / R, 2) + pow(float(yy) / (R * 0.7), 2)
+				if e <= 1.0:
+					cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.55, 0.85, 1.0, 0.14 * (1.0 - e) * fa))
+	for b in bshards:
+		if b["t"] < 0.0:
+			continue
+		var dirv: Vector2 = b["ang"]
+		var L := 7 if b["stuck"] else 12
+		var a: float = 1.0 if not b["stuck"] else 1.0 - smoothstep(b["life"] - 0.8, b["life"], b["t"])
+		for k in L:
+			var q: Vector2 = b["q"] - dirv * k * PX * (1.0 if b["stuck"] else 1.6)
+			if b["stuck"] and k < 2:
+				continue                                         # its point is in the ground
+			_bone_px(cv, q, k % 3 != 2, a)
+			if not b["stuck"]:
+				cv.draw_rect(Rect2((q / PX).floor() * PX - Vector2(PX, 0), Vector2(PX * 3, PX)), Color(0.55, 0.85, 1.0, 0.12))
+	for cg in cages:
+		var u: float = cg["t"] / cg["secs"]
+		var rise := 1.0 - pow(1.0 - minf(1.0, cg["t"] / 0.35), 3.0)
+		var crumble := smoothstep(0.8, 1.0, u)
+		var R: float = cg["R"]
+		for i in 8:
+			var ang := i / 8.0 * TAU
+			var base: Vector2 = cg["c"] + Vector2(cos(ang) * R, sin(ang) * R * 0.5)
+			var H := 90.0 * rise
+			var steps := int(H / PX)
+			for k in steps:
+				var f := float(k) / maxf(1.0, steps)
+				if randf() < crumble * 1.4 * (1.0 - f + 0.3):
+					continue
+				var inward: Vector2 = (cg["c"] - base) * (f * f * 0.85)          # the rib curves in over the mark
+				var q: Vector2 = base + inward + Vector2(0, -f * H)
+				_bone_px(cv, q, i % 2 == 0, 1.0)
+				_bone_px(cv, q + Vector2(PX, 0), false, 0.9)
+			var kn: Vector2 = base + Vector2(0, -2)
+			cv.draw_rect(Rect2((kn / PX).floor() * PX - Vector2(PX, 0), Vector2(PX * 3, PX * 2)), Color(0.82, 0.8, 0.74))
+		var c0: Vector2 = (cg["c"] / PX).floor()
+		for k in 10:                                             # ghost-light inside the cage
+			var q := c0 + Vector2(randi_range(-5, 5), randi_range(-14, 0))
+			cv.draw_rect(Rect2(q * PX, Vector2(PX, PX)), Color(0.55, 0.85, 1.0, 0.25 * (1.0 - crumble)))
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -1028,6 +1153,7 @@ func _process(dt: float) -> void:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	_tick_souls(dt)
+	_tick_bone(dt)
 	_tick_zap(dt)
 	_tick_ice(dt)
 	_tick_wisps(dt)

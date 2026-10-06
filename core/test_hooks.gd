@@ -69,6 +69,8 @@ static func run(g) -> void:
 		_icefx(g)                        # --icefx: a frost nova, freezing mist and ice shards round the pilgrim
 	if a.has("zap"):
 		_zap(g)                          # --zap: ball lightning, charged ground and spark novas round the pilgrim
+	if a.has("bonefx"):
+		_bonefx(g)                       # --bonefx: bone spears, bone rain and a rib cage round the pilgrim
 	if a.has("magic"):
 		_magic(g)                        # --magic: phosphor wisps flung at points round the pilgrim
 	if a.has("acid"):
@@ -511,3 +513,17 @@ static func _zap(g) -> void:
 	while is_instance_valid(g) and g.hero:
 		I.spark_nova(c + Vector2(2.8, 2.4), 2.4)
 		await tree.create_timer(1.6).timeout
+
+
+static func _bonefx(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	var I = load("res://world/impacts.gd").of(g.zone)
+	var c: Vector2 = g.hero.tp
+	while is_instance_valid(g) and g.hero:
+		I.bone_spears(c + Vector2(2.6, 0.6), 1.2, 4.0)
+		await tree.create_timer(0.7).timeout
+		I.rib_cage(c + Vector2(0.4, 2.8), 1.0, 3.5)
+		await tree.create_timer(0.6).timeout
+		I.bone_rain(c + Vector2(-1.8, 1.4), 2.0, 20, 1.6)
+		await tree.create_timer(3.0).timeout
