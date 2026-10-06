@@ -299,6 +299,11 @@ var _oss_origin := Vector2(0.5, 0.5)
 var calc_k := -1.0
 var _spurs: Node2D
 
+var frost_k := 0.0
+
+func cold_hit(dmg: float) -> void:
+	frost_k = minf(1.0, frost_k + 0.25 + dmg / maxf(1.0, hp_max))
+
 func bone_hit(from: Vector2, dmg: float) -> void:
 	if dead:
 		return
@@ -320,6 +325,9 @@ func _tick_ossify(dt: float) -> void:
 	if not dead:
 		ossify = maxf(0.0, ossify - dt * 0.05)
 	m.set_shader_parameter("growth", ossify)
+	if not dead:
+		frost_k = maxf(0.0, frost_k - dt * 0.08)
+	m.set_shader_parameter("frost", frost_k)
 	m.set_shader_parameter("origin", _oss_origin)
 	m.set_shader_parameter("oseed", float(get_instance_id() % 97))
 	var at := spr.texture as AtlasTexture
@@ -420,6 +428,14 @@ func die(from: Vector2 = Vector2.INF) -> void:
 	corpse_t = 30.0
 	if last_elem == "fire":
 		_start_burn()
+	elif last_elem == "cold" or frost_k > 0.6:
+		# frozen through: it shatters (shards that keep the ice's colour, a ring of frost where it stood)
+		var I = load("res://world/impacts.gd").of(zone)
+		for k in 3:
+			I.hit(tp + Vector2(randf_range(-0.2, 0.2), randf_range(-0.2, 0.2)), from, true, "ice")
+		I.frost(tp, 1.2, 7.0)
+		visible = false
+		corpse_t = 0.5
 	elif ossify > 0.35 and spr.material is ShaderMaterial:
 		calc_k = 0.0                          # calcified: it breaks apart instead of falling
 		spr.set_index(mini(1, spr.frame_count() - 1))

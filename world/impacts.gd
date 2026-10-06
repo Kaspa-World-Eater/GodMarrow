@@ -29,7 +29,8 @@ func hit(p: Vector2, from: Vector2, heavy: bool, kind: String = "flesh") -> void
 	var n := 16 if heavy else 10
 	var cols: Array = {"bone": [Color("#d6cdb4"), Color("#a69a80"), Color("#6e6452")],
 		"stone": [Color("#8a8276"), Color("#5e574e"), Color("#3c3731")],
-		"flesh": [Color("#7a1414"), Color("#4e0c0c"), Color("#2e0808")]}.get(kind, [Color("#7a1414")])
+		"flesh": [Color("#7a1414"), Color("#4e0c0c"), Color("#2e0808")],
+		"ice": [Color("#e6f4ff"), Color("#a8cfee"), Color("#5f8fbf")]}.get(kind, [Color("#7a1414")])
 	for i in n:
 		var a := away.rotated(randf_range(-0.9, 0.9))
 		chips.append({"p": p, "z": 40.0 + randf() * 30.0, "v": a * randf_range(1.2, 3.4) * (1.4 if heavy else 1.0),
@@ -156,6 +157,26 @@ func _px_path(pts: Array, col: Color, w: int, cv: CanvasItem = null) -> void:
 			var q := (a.lerp(b, float(k) / n) / PX).floor() * PX
 			cv.draw_rect(Rect2(q - Vector2(w / 2, w / 2) * PX, Vector2(w, w) * PX), col)
 
+## frost on the ground (shaders/frost.gdshader): feathers grow out from p for a second, glitter, then melt back
+var frosts: Array = []
+
+func frost(p: Vector2, r: float = 1.6, secs: float = 9.0) -> void:
+	var hw := r * Iso.HX
+	var n := ColorRect.new()
+	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	n.size = (Vector2(hw * 2.2, hw * 1.1) / PX).ceil() * PX
+	n.position = ((Iso.to_screen(p) - n.size * 0.5) / PX).floor() * PX
+	n.z_index = -1
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/frost.gdshader")
+	m.set_shader_parameter("seed", randf() * 30.0)
+	m.set_shader_parameter("half_px", Vector2(hw, hw * 0.5))
+	m.set_shader_parameter("rect_size", n.size)
+	n.material = m
+	add_child(n)
+	frosts.append({"node": n, "t": 0.0, "secs": secs})
+	_flash(p, Color(0.6, 0.8, 1.0), 0.25, 40.0)
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -228,6 +249,15 @@ func _process(dt: float) -> void:
 			bz["node"].queue_free()
 			bz["light"].queue_free()
 	blazes = blazes.filter(func(bz): return bz["t"] < bz["secs"])
+	for fr in frosts:
+		fr["t"] += dt
+		var fm: ShaderMaterial = fr["node"].material
+		fm.set_shader_parameter("t", fr["t"])
+		fm.set_shader_parameter("grow", 1.0 - pow(1.0 - minf(1.0, fr["t"] / 1.2), 3.0))
+		fm.set_shader_parameter("melt", smoothstep(fr["secs"] - 3.0, fr["secs"], fr["t"]))
+		if fr["t"] >= fr["secs"]:
+			fr["node"].queue_free()
+	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
 	for bl in bolts:
 		bl["t"] += dt
 	bolts = bolts.filter(func(bl): return bl["t"] < bl["life"])
