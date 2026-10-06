@@ -259,6 +259,20 @@ func _spear_trail(dt: float) -> void:
 	for j in range(k, spear_lights.size()):
 		spear_lights[j].visible = false
 
+## a line and a disc in whole pixels (the world's grid), for sparks and splinters
+func _px_line(cv: CanvasItem, a: Vector2, b: Vector2, col: Color) -> void:
+	var steps := maxi(1, int(a.distance_to(b) / 4.0))
+	for j in steps + 1:
+		var q := (a.lerp(b, float(j) / steps) / 4.0).floor()
+		cv.draw_rect(Rect2(q * 4.0, Vector2(4, 4)), col)
+
+func _px_disc(cv: CanvasItem, c: Vector2, r: float, col: Color) -> void:
+	var n := int(ceilf(r / 4.0))
+	for y in range(-n, n + 1):
+		for x in range(-n, n + 1):
+			if Vector2(x, y).length() * 4.0 <= r:
+				cv.draw_rect(Rect2(((c / 4.0).floor() + Vector2(x, y)) * 4.0, Vector2(4, 4)), col)
+
 ## a ring in whole pixels (dotted, every other point), not a smooth line over the picture
 func _px_ring(pts: PackedVector2Array, col: Color) -> void:
 	var seen := {}
@@ -297,7 +311,7 @@ func _draw_spears() -> void:
 			var aa := a_i / 18.0 * TAU
 			ring.append(cc + Vector2(cos(aa) * rr, sin(aa) * rr * 0.5))
 		_px_ring(ring, Color(STREAK, 0.8 * (1.0 - q)))
-		spear_cv.draw_circle(cc, 5.0 * (1.0 - q), Color(1, 1, 1, 0.5 * (1.0 - q)))
+		_px_disc(spear_cv, cc, 5.0 * (1.0 - q), Color(1, 1, 1, 0.5 * (1.0 - q)))
 	# where a spear pierces: a burst of bone splinters flung on along its path and out to the sides, and a pale ring
 	for h in book.spear_hits:
 		var q2: float = h["t"] / 0.3
@@ -313,7 +327,7 @@ func _draw_spears() -> void:
 			var ang := u3.angle() + (k - 3) * 0.42 + sin(k * 12.9898) * 0.15
 			var d := Vector2(cos(ang), sin(ang) * 0.6)
 			var a2 := hc + d * (6.0 + 26.0 * q2 * (0.7 + 0.1 * k))
-			spear_cv.draw_line(a2, a2 + d * (5.0 - 3.0 * q2), Color(0.93, 0.95, 0.97, 1.0 - q2), 2.0)
+			_px_line(spear_cv, a2, a2 + d * (5.0 - 3.0 * q2), Color(0.93, 0.95, 0.97, 1.0 - q2))
 	for sp in book.spears:
 		if sp["small"]:
 			continue
@@ -484,8 +498,7 @@ func _draw_blade(hero) -> void:
 			"thrust":
 				var u1: Vector2 = Iso.to_screen(f["dir"]).normalized()
 				var a1 := S(f["tp"], 12.0)
-				draw_line(a1, a1 + u1 * f["reach"] * 70.0, Color(BONE, 0.8 * k), 3.0 * k + 1.0)
-				draw_line(a1, a1 + u1 * f["reach"] * 70.0, Color(1, 1, 1, 0.5 * k), 1.0)
+				_px_line(self, a1, a1 + u1 * f["reach"] * 70.0, Color(BONE, 0.8 * k))
 			"cleave":
 				var c2 := S(f["tp"], 10.0)
 				var base_a: float = Iso.to_screen(f["dir"]).angle()
@@ -513,4 +526,4 @@ func _draw_blade(hero) -> void:
 				var c4 := S(f["tp"], 30.0)
 				for i in 9:
 					var ang4 := i / 9.0 * TAU
-					draw_line(c4, c4 + Vector2(cos(ang4), sin(ang4) * 0.6) * (10.0 + 14.0 * (1.0 - k)), Color(1, 1, 1, 0.8 * k), 1.5)
+					_px_line(self, c4, c4 + Vector2(cos(ang4), sin(ang4) * 0.6) * (10.0 + 14.0 * (1.0 - k)), Color(1, 1, 1, 0.8 * k))
