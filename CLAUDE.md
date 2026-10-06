@@ -20,5 +20,9 @@ browser build in `web/` is the reference). Before touching anything:
    compare`), not the source. `tools/pixelforge/.gdignore` keeps Godot out of
    it; run it with Python from `tools/pixelforge/`.
 
+**The painted standard** (`docs/PAINTED_STANDARD.md`, Derek 2026-10-06): everything
+from now on is painted like the lake test (broad tones, pooled wet edges, dry-brush
+strokes, a paper tooth fixed to the world). Read it before making any art or effect.
+
 Never invent where a reference exists: the browser build decides look and
 behaviour. Test with `tools/smoke.sh OUT` before calling a change done.
