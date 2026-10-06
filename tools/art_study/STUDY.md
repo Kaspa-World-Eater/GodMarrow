@@ -231,3 +231,58 @@ Ideas to carry (my notes):
 Derek, later: "Work on shadows at some point too, and radiance and absence. And all the skill tree types" (every
 order's trees: the Animancer's mirrors and wisps, the Hemomancer's blood, the Miasmancer's rot, the Empty Hand's
 radiance and absence and sand, the Ossuarch's bone and the soul).
+
+## Round 5: faces, carving and anatomy (2026-10-06; Derek: "the stones should be more irregular and the lines less intense. Do a study on face structures and carving, and body anatomy, both in art form like statues and real anatomy")
+
+Sources read: the Asaro head (planes for light), the Loomis construction, the Bayon's stone faces, medical notes on
+emaciation (temporal hollowing, buccal fat loss, zygomatic prominence).
+
+### The head's structure (real anatomy)
+- **Proportions.** The eyes sit at half the head's height (crown to chin), not high on it. The face divides into
+  thirds: hairline to brow, brow to the base of the nose, nose to chin. The eye is about a fifth of the face's width,
+  with one eye's width between the two. The nose's base is as wide as the gap between the eyes; the mouth's corners
+  fall under the pupils.
+- **Bone sets the planes.** Four masses carry every face: the brow ridge (the frontal bone's shelf over the eyes),
+  the zygomatic bone and its arch (the cheekbone running back toward the ear), the maxilla and the dental arch (the
+  "muzzle", a cylinder round the teeth that the lips lie on), and the mandible (jaw angle, jawline, chin box).
+- **The eye socket** is a hole with a hard upper rim that overhangs and a soft lower rim that slopes out to the cheek.
+  The eyeball is a sphere set back in it; the lids wrap the sphere, the upper lid thicker and casting shadow.
+- **The nose** is a wedge: a flat-topped bridge with two side planes, a ball at the tip, wings (alae) flaring at its
+  base, and the septum under it.
+- **The mouth** sits on the muzzle's cylinder, so it curves back at its corners; the upper lip is a flat plane facing
+  down (dark), the lower lip a plane facing up (lit), with a shadow under it.
+- **Starvation** takes the fat first and the muscle after: the temples sink (the temporal hollow), and the frontal
+  process and arch of the zygoma stand out as a hard edge with shadow behind; the buccal pads go, so the cheeks fall
+  in under the cheekbones; the eyes sink back in their sockets; skin draws tight over the jaw and the dental arch, so
+  the muzzle reads as the teeth beneath; the nasolabial fold cuts from the nose's wing to past the mouth's corner.
+
+### The head as a statue (carving)
+- **Asaro's lesson:** light reads planes, not curves. A carved face is a few large planes meeting at a few hard edges
+  (brow, cheekbone, jaw, nose's ridge) and everything else is soft. Put the hard edges where the bone is.
+- **Monumental faces simplify.** The Bayon's faces, Egyptian colossi, the moai: big calm planes, eyes as incised
+  almonds or drilled pupils, lips as two clean bands, ornament (diadems, earrings) as the identity. Detail is spent on
+  a few things; the rest is broad.
+- **Built faces.** The Bayon's faces are stacked sandstone blocks, carved after setting, mortarless. The blocks are not
+  a grid: courses run roughly level but every block is its own size, and the carving crosses the joints as if they
+  were not there. Joints are thin dark hairlines, not grooves; weather softens the blocks' edges and the joints read
+  only where light rakes them. Some blocks shift, some fall.
+- **Weathering follows gravity and water.** Stains run down from every ledge (the brow, the eye's lower rim, the
+  lips' corners); lichen grows in rosettes on what faces up and toward the light; moss in what stays wet (joints,
+  under ledges, the waterline); edges round off; the deepest cuts stay sharpest.
+
+### The body (for the hands and what comes later)
+- **The hand:** the fingers' three bones shorten toward the tip (about 1 : 0.6 : 0.45), the knuckles are the widest
+  points, the back of the hand shows the tendons as ridges; starved, the knuckles stand out as knots and the spaces
+  between the metacarpals sink.
+- **Statues of bodies** reduce muscle to masses with clean boundaries; the joints (knees, elbows, wrists) are where
+  the hard edges go.
+
+### What I will change in the Famine
+1. Irregular blocks: each stone its own size and shape, courses only roughly level; mortarless hairline joints at low
+   contrast; weathered, rounded edges; the carving runs across the joints.
+2. Rebuild the face on the bones: a hard brow shelf overhanging the sockets and a soft lower rim; the eyeball set back;
+   the zygomatic arch running back from the cheekbone with the temple sunk above it and the cheek fallen in below; the
+   muzzle as a cylinder with the mouth's portal cut into it; the jaw's angle and line; the nose as a wedge with wings;
+   the nasolabial folds from the wings past the portal's corners.
+3. Stains running down from the brow, the eye's rim and the lips; lichen in rosettes on up-facing planes only.
+4. The hand: three segments in proportion, knuckles as knots.

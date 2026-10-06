@@ -309,7 +309,7 @@ for sx_ in (-1, 1):
     alb[godm & (tag == 1) & tear] -= 0.16 * (1 - (fv[godm & (tag == 1) & tear] - 0.02) / 0.28)
 for i, (off, tall, rad) in enumerate(fingers):
     m = (tag == 4 + i) & ~top
-    for kz in (tall * 0.42, tall * 0.7):
+    for kz in (tall * 0.49, tall * 0.78):
         alb[m & (np.abs(hz - kz) < 0.07)] -= 0.28                   # a knuckle's crease
         alb[m & (np.abs(hz - kz - 0.11) < 0.04)] += 0.1             # the swell above it, lit
     if i != 3:
@@ -395,31 +395,43 @@ def head_relief():
     cart_in = (AX < 0.13) & (Y > -0.57) & (Y < -0.43)
     R = np.where(cart & ~cart_in, R + 0.04, R)
     R = np.where(cart_in, R - 0.03 + (vn(X * 60, Y * 8) - 0.5) * 0.012, R)       # its name chiselled out, rough
-    R += 0.15 * gauss(np.hypot((AX - 0.62) / 0.1, (Y - 0.08) / 0.07))   # cheekbones
-    R -= 0.22 * gauss(np.hypot((AX - 0.48) / 0.13, (Y - 0.36) / 0.14))  # the cheeks hollow
-    for fx in (0.3, 0.5):                                          # hunger folds, long, down the cheeks
-        fold = gauss((AX - fx - (Y - 0.1) * 0.06) / 0.018) * ((Y > 0.12) & (Y < 0.78))
-        R -= 0.06 * fold
-        R += 0.03 * gauss((AX - fx + 0.03 - (Y - 0.1) * 0.06) / 0.018) * ((Y > 0.12) & (Y < 0.78))
+    R += 0.15 * gauss(np.hypot((AX - 0.62) / 0.1, (Y - 0.08) / 0.07))   # the cheekbone's body (zygoma)
+    arch = gauss((Y - 0.05 + (AX - 0.62) * 0.15) / 0.035) * np.clip((AX - 0.6) / 0.05, 0, 1) * (AX < fw_)
+    R += 0.07 * arch                                                # its arch running back toward the ear, a hard ledge
+    R -= 0.24 * gauss(np.hypot((AX - 0.5) / 0.13, (Y - 0.36) / 0.15))  # the cheek fallen in beneath it (buccal)
+    R += 0.07 * np.clip(1 - (X / 0.38) ** 2, 0, 1) * np.clip((Y - 0.33) / 0.08, 0, 1) * np.clip((0.92 - Y) / 0.1, 0, 1)   # the muzzle over the teeth
+    jaw = gauss((Y - (0.95 - (AX - 0.2) * 0.62)) / 0.03) * ((AX > 0.18) & (AX < 0.62))
+    R += 0.05 * jaw                                                 # the jaw's line, drawn tight
+    for sgn in (-1, 1):                                             # the folds from the nose's wings past the portal
+        nl = np.abs((X * sgn - 0.12) - (Y - 0.28) * (0.2 / 0.34))
+        fold = gauss(nl / 0.02) * ((Y > 0.27) & (Y < 0.66))
+        R -= 0.045 * fold * np.clip((0.66 - Y) / 0.2, 0, 1)
+        R += 0.035 * gauss((nl + 0.03) / 0.02) * ((Y > 0.27) & (Y < 0.66)) * ((X * sgn - 0.12) < (Y - 0.28) * (0.2 / 0.34))
     # the eyes: the left a half-lidded stone eye; the right broken out
-    rl = np.hypot((X + 0.36) / 0.2, (Y + 0.09) / 0.12)
-    R -= 0.18 * np.clip(1 - rl * rl, 0, 1) ** 0.5                     # its socket
-    ball = np.hypot((X + 0.36) / 0.15, (Y + 0.08) / 0.09)
-    R += 0.2 * np.clip(1 - ball * ball, 0, 1) ** 0.5                  # the eyeball, smooth stone
-    lid = (ball < 1.15) & (Y < -0.085 + (X + 0.36) ** 2 * 0.5)        # the heavy upper lid down over half of it
-    R = np.where(lid, R + 0.05, R)
-    lidline = (np.abs(Y - (-0.085 + (X + 0.36) ** 2 * 0.5)) < 0.012) & (ball < 1.1)
-    pupil = (np.abs(np.hypot((X + 0.36) / 0.045, (Y + 0.055) / 0.04) - 1) < 0.28) & ~lid      # a ring cut for the pupil
-    R = np.where(pupil, R - 0.03, R)
-    lowlid = (np.abs(Y - (-0.0 - (X + 0.36) ** 2 * 0.4)) < 0.014) & (ball < 1.15)
-    R = np.where(lowlid, R + 0.03, R)
+    # the socket: a hard upper rim under the brow, a soft lower one sloping out to the cheek
+    rl = np.hypot((X + 0.36) / 0.21, (Y + 0.08) / 0.13)
+    R -= 0.16 * np.clip(1 - rl * rl, 0, 1) ** 0.7 * np.where(Y < -0.08, 1.0, 0.75)
+    ex, ey = (X + 0.36) / 0.17, (Y + 0.075) / 0.07
+    al_ = np.clip(1 - ex * ex, 0, 1) ** 0.7
+    almond = (np.abs(ex) < 1) & (np.abs(ey) < al_)  # the eye: an almond, pointed at its corners
+    R += np.where(almond, 0.09 * np.clip(1 - ex * ex - ey * ey * 0.5, 0, 1) ** 0.5, 0)    # the eyeball, set back
+    lid_y = -0.2 + ex * 0.08                                         # cast down: the lid hangs to below the middle
+    lid = almond & (ey < lid_y + 0.25)
+    R = np.where(lid, R + 0.05 + 0.02 * np.clip(1 - ex * ex, 0, 1), R)   # the heavy upper lid
+    lidline = almond & (np.abs(ey - (lid_y + 0.25)) < 0.16)          # its edge, incised
+    crease = (np.abs(ey - (-al_ - 0.35)) < 0.16) & (np.abs(ex) < 0.95)   # the crease above, cut
+    R = np.where(crease, R - 0.025, R)
+    lowlid = (np.abs(ey - al_) < 0.18) & (np.abs(ex) < 0.95)
+    R = np.where(lowlid, R + 0.02, R)
+    pupil = np.zeros_like(R, bool)
     rr = np.hypot((X - 0.36) / 0.2, (Y + 0.09) / 0.13)
     broke = rr < 1 + (vn(X * 20, Y * 20) - 0.5) * 0.25
     R = np.where(broke, R - 0.45 * np.clip(1 - rr * rr, 0.3, 1), R)  # broken out, ragged
     # the nose: long and straight, its tip gone
     nw = np.interp(Y, [-0.24, -0.1, 0.12, 0.24], [0.045, 0.055, 0.075, 0.085])
     nh = np.interp(Y, [-0.26, -0.12, 0.0, 0.16, 0.24, 0.26], [0.0, 0.1, 0.18, 0.26, 0.2, 0.0])
-    R += nh * np.clip(1 - (X / nw) ** 2, 0, 1) ** 0.7
+    R += nh * np.clip(np.minimum(1.0, (1 - AX / nw) * 2.2), 0, 1)        # a wedge: flat top, side planes
+    R += 0.07 * gauss(np.hypot((AX - 0.1) / 0.04, (Y - 0.26) / 0.04))   # the wings
     nasal = np.hypot(X / 0.07, (Y - 0.3) / 0.05) < 1
     R = np.where(nasal, R - 0.15, R)
     # the mouth: cut into a squared portal
@@ -443,26 +455,34 @@ def head_relief():
     cr = (crack > 0.965) & face & (X > 0.15)                         # cracks on the broken side only
     R = np.where(cr, R - 0.05, R)
     RR = np.where(face, R, Rh)
-    # ---- masonry (Derek: "make the stones individually carved"): courses of blocks, joints staggered; each block
-    # swells a little and is chamfered at its edges, its own tone, some corners chipped, a few blocks missing
-    CH_ = np.where(face, 0.19, 0.105)                               # a course's height: the face's finer stone is bigger
-    ci = np.floor((Y - TOPY) / CH_)
-    cv_ = (Y - TOPY) / CH_ - ci                                     # 0..1 down the course
-    bw = (0.2 + _P[(ci.astype(int) * 31) % 1024, 7] * 0.12) * np.where(face, 1.9, 1.0)
-    off_ = _P[(ci.astype(int) * 17) % 1024, 9] * 2.0
-    bu = (X + 3 + off_) / bw
-    bi = np.floor(bu)
-    cu = bu - bi                                                    # 0..1 across the block
-    bid = (bi.astype(int) * 131 + ci.astype(int) * 17) % 1024
-    jw = np.where(face, 0.025, 0.08)                                # hairline joints across the face
-    joint = (cv_ < jw * 1.3) | (cu < jw * 0.8)
-    edge_d = np.minimum(np.minimum(cv_, 1 - cv_) / 0.22, np.minimum(cu, 1 - cu) / 0.12)
-    swell = np.clip(edge_d, 0, 1) ** 0.5
-    RR = RR + np.where(joint, np.where(face, -0.012, -0.035), (swell - 1) * np.where(face, 0.006, 0.02)) * show
-    chip = hood & (~joint) & (_P[bid, 11] > 0.72) & (cu > 0.72) & (cv_ < 0.4) & ((cu - 0.72) * 1.4 + (0.4 - cv_) > 0.3)
-    RR = np.where(chip, RR - 0.04, RR)
-    missing = hood & (_P[bid, 13] > 0.94) & (Y > TOPY + 0.4)        # a few blocks of the cowl fallen out
-    RR = np.where(missing, RR - 0.18, RR)
+    # ---- masonry, irregular (Derek: "more irregular and the lines less intense"; STUDY.md round 5, the Bayon):
+    # stones of every size fitted without mortar, courses only roughly level, hairline joints that read only where
+    # the light rakes them, edges weathered round, the carving running straight across the joints
+    from scipy.spatial import cKDTree
+    rgs = np.random.default_rng(31)
+    pts = []
+    yv = TOPY - 0.05
+    while yv < HEAD_WL + 0.1:
+        chh = rgs.uniform(0.07, 0.15) if yv < -0.6 else rgs.uniform(0.13, 0.26)
+        xv = -1.8 + rgs.uniform(0, 0.2)
+        while xv < 1.8:
+            bwid = rgs.uniform(0.12, 0.34) * (1.0 if yv < -0.6 else 1.6)
+            pts.append((xv + bwid / 2, (yv + chh / 2 + rgs.normal(0, chh * 0.12)) * 1.6))
+            xv += bwid
+        yv += chh
+    pts = np.array(pts)
+    tree = cKDTree(pts)
+    dd_, ii_ = tree.query(np.stack([X.ravel(), Y.ravel() * 1.6], 1), k=2)
+    gap_ = ((dd_[:, 1] - dd_[:, 0])).reshape(X.shape)
+    bid = (ii_[:, 0].reshape(X.shape) * 7) % 1024
+    joint = gap_ < np.where(face, 0.008, 0.012)
+    round_ = np.clip(gap_ / 0.05, 0, 1) ** 0.5                       # each stone's edge worn round
+    RR = RR + np.where(joint, -0.012, (round_ - 1) * np.where(face, 0.004, 0.012)) * show
+    chip = hood & (_P[bid, 11] > 0.8) & (gap_ < 0.04) & (vn(X * 30, Y * 30) > 0.5)
+    RR = np.where(chip, RR - 0.02, RR)
+    missing = hood & (_P[bid, 13] > 0.95) & (Y > TOPY + 0.4)        # a few stones of the cowl fallen out
+    RR = np.where(missing, RR - 0.16, RR)
+    cv_ = np.zeros_like(X)
     RR = np.where(show, RR, -1.0)
     # ---- light: normals, the moon from the upper left, real self-shadow, occlusion
     gy_, gx_ = np.gradient(RR)
@@ -489,9 +509,12 @@ def head_relief():
     alb = np.where(hood, alb - 0.04 + (vn(xx * 0.05, yy * 0.015 + 3) - 0.5) * 0.1, alb)   # the cowl: rain-streaked
     tear = (np.abs(X + 0.36 - np.sin(Y * 20) * 0.006) < 0.016 + (Y - 0.02) * 0.03) & (Y > 0.02) & (Y < 0.4)
     alb = np.where(tear & face, alb - 0.12, alb)                    # a dark stain run down from the stone eye
-    alb = alb + (_P[bid, 15] - 0.5) * np.where(face, 0.05, 0.12)   # each block its own stone
-    alb = np.where(joint, alb - np.where(face, 0.06, 0.12), alb)
-    alb = alb - np.clip(cv_ - 0.75, 0, 1) * np.where(face, 0.04, 0.16)   # the foot of each block in its own shadow
+    alb = alb + (_P[bid, 15] - 0.5) * np.where(face, 0.04, 0.09)   # each stone its own, a little
+    alb = np.where(joint, alb - np.where(face, 0.025, 0.05), alb)   # hairlines, low contrast
+    # stains run down from every ledge: the brow, the eye's lower rim, the lips' corners
+    for (sx0, sy0, ln_) in ((-0.36, 0.0, 0.32), (0.36, 0.0, 0.34), (-0.26, 0.5, 0.3), (0.26, 0.5, 0.3)):
+        stn = (np.abs(X - sx0 - np.sin(Y * 30 + sx0 * 9) * 0.008) < 0.02 + (Y - sy0) * 0.04) & (Y > sy0) & (Y < sy0 + ln_)
+        alb = np.where(stn & face, alb - 0.07 * np.clip(1 - (Y - sy0) / ln_, 0, 1), alb)
     v = I * 0.86 + alb + (bay_ - 0.5) * 0.035
     rgb = RAMPS["god"][np.clip((v * 6).astype(int), 0, 5)]
     tide = show & (y0 > HEAD_WL - 0.13)
@@ -499,7 +522,8 @@ def head_relief():
     moss = show & hood & (fbm(xx * 0.07, yy * 0.07) > 0.56) & (n[..., 1] < -0.1)
     moss |= show & face & (np.abs(Y - rim) < 0.06) & (fbm(xx * 0.1 + 4, yy * 0.1) > 0.5)
     rgb[moss] = RAMPS["moss"][np.clip((v[moss] * 6).astype(int), 0, 5)]
-    lich = show & (vn(xx * 0.35 + 3, yy * 0.35) > 0.8) & (fbm(xx * 0.05 + 2, yy * 0.05) > 0.62) & ~tide & ~moss & ~portal & ~broke
+    ros = vn(xx * 0.22 + 3, yy * 0.22)
+    lich = show & (ros > 0.78) & (n[..., 1] < -0.15) & (fbm(xx * 0.05 + 2, yy * 0.05) > 0.55) & ~tide & ~moss & ~portal & ~broke
     rgb[lich] = np.array(hexc("#8b8f72")) * np.clip(v[lich] * 1.5, 0.45, 1.0)[..., None]
     rgb[teeth] = RAMPS["teeth"][np.clip(((I[teeth] * 0.6 + 0.08) * 6).astype(int), 0, 5)]
     rgb[lidline] *= 0.5
@@ -511,7 +535,8 @@ def head_relief():
     rgb[cf_bot & show] *= 0.5
     rgb[cart_in & show] = rgb[cart_in & show] * 0.85 + np.array(hexc("#3a3f3c")) * 0.15
     rgb[missing & show] = RAMPS["god"][0] * 1.2                     # the dark behind a fallen block
-    rgb[joint & hood & show & ~moss & (fbm(xx * 0.12 + 7, yy * 0.12) > 0.62)] = RAMPS["moss"][2]    # moss in the joints
+    jm = joint & hood & show & ~moss & (fbm(xx * 0.12 + 7, yy * 0.12) > 0.64)
+    rgb[jm] = rgb[jm] * 0.5 + RAMPS["moss"][2] * 0.5                 # moss in a few joints
     # the cowl's hem: a carved border of lozenges along the opening
     hem = hood & (AX < fw_ + 0.13) & (Y > rim - 0.02)
     lz = (np.abs(((Y * 9) % 1) - 0.5) + np.abs(((AX - fw_) / 0.13) - 0.5) * 0.8) < 0.32
@@ -534,11 +559,11 @@ def head_relief():
     rgb[edge_lit] = np.clip(rgb[edge_lit] * 1.25, 0, 1)
     # old moss hanging in strands from the cowl's rim, creepers down its sides
     rg = np.random.default_rng(9)
-    for k in range(26):
+    for k in range(11):
         sxk = rg.uniform(-0.9, 0.9)
         rx_ = int(HW / 2 + sxk * FW)
         ry_ = int((-0.62 + 0.16 * sxk * sxk + 0.02 - TOPY) * FH)
-        L_ = int(rg.uniform(4, 16))
+        L_ = int(rg.uniform(3, 12) * (1.6 if k % 4 == 0 else 1.0))
         for j in range(L_):
             px_, py_ = rx_ + int(round(np.sin(j * 0.6 + k) * 0.6)), ry_ + j
             if 0 <= px_ < HW and 0 <= py_ < HH and show[py_, px_]:
@@ -582,16 +607,47 @@ def draw_head(rgb, t):
     hrgb, show, n, xx, yy, X, Y, sock_r, I = HEAD
     pulse = 0.75 + 0.25 * np.sin(t * 2.0) * np.sin(t * 0.7 + 1)
     out = hrgb.copy()
-    # the ghost-light kept in the right socket: it fills the socket and falls on the cheek and brow round it
-    sx_c = np.mean(xx[sock_r]); sy_c = np.mean(yy[sock_r])
-    dd = np.hypot(xx - sx_c, (yy - sy_c) * 1.2)
-    g = np.clip(1 - dd / 26.0, 0, 1) ** 2 * pulse
-    lv = np.round(np.clip(g * 1.1, 0, 0.75) * 4) / 4
-    gc = np.array(hexc("#9fe0e8"))
-    out = np.where((lv > 0)[..., None], out * (1 - lv[..., None] * 0.45) + gc * lv[..., None] * 0.5, out)
-    dc = np.hypot(xx - sx_c, (yy - sy_c) * 1.1)
-    out[sock_r & (dc < 5 + pulse)] = np.array(hexc("#7cc4cc"))                   # a pale light down in the socket
-    out[sock_r & (dc < 2.2 + pulse * 0.8)] = np.array(hexc("#d8f6f8"))
+    # the ghost-flame kept in the broken socket (Derek: "that ghostly flame look"): cold tongues rising out of it,
+    # white at the root, going to pale cyan and then a deep teal at their tips, torn by a fast noise that runs
+    # upward, licking up over the brow; curls of ghost-smoke above them; its cold light flickering on the face
+    sx_c = np.mean(xx[sock_r]); sy_c = np.mean(yy[sock_r]) + 3
+    fl = 0.8 + 0.2 * np.sin(t * 13) * np.sin(t * 7.3 + 1)
+    dxp = (xx - sx_c) / 11.0
+    up = (sy_c - yy) / 50.0                                          # 0 at the root .. 1 at the tongues' reach
+    sway_ = np.sin(t * 3.1 + up * 4) * up * 0.35
+    body = np.clip(1 - np.abs(dxp - sway_) / (1.05 - up * 0.6), 0, 1)
+    # tongues: the noise stretched upward and racing up, so the flame tears into separate licks
+    tongues = vn((xx - sx_c) * 0.42, yy * 0.11 + t * 7.0) * 0.55 + vn((xx - sx_c) * 0.9 + 5, yy * 0.22 + t * 12.0) * 0.45
+    lick = np.clip(np.sin((xx - sx_c) * 0.55 + t * 2.0) * 0.5 + 0.5, 0, 1)        # three or four tongues side by side
+    near_ = np.clip(body * 3.0, 0, 1)                                # the tongues only where the flame is
+    heat = body * (1 - up) * 1.4 + ((tongues - 0.5) * 1.1 * (0.3 + up) + lick * up * 0.35) * near_
+    heat = np.where((up > -0.12) & (up < 1.1), heat, 0) * fl
+    fc = ramp("#0e3a44", "#1f6f7c", "#4fb0bc", "#9fe4ea", "#effcfc")
+    lvh = np.clip((heat - 0.32) * 3.6, -1, 4.99)
+    flame = (lvh >= 0) & show
+    # its cold light on the stone round it, stepped
+    dd = np.hypot(xx - sx_c, (yy - sy_c + 8) * 1.1)
+    g = np.clip(1 - dd / 30.0, 0, 1) ** 2 * fl
+    lv = np.round(np.clip(g * 1.1, 0, 0.6) * 4) / 4
+    gc = np.array(hexc("#7fd0d8"))
+    out = np.where((lv > 0)[..., None], out * (1 - lv[..., None] * 0.4) + gc * lv[..., None] * 0.45, out)
+    out[sock_r] = np.array(hexc("#06181c"))                          # the socket's depth, dark behind the flame
+    out[flame] = fc[lvh[flame].astype(int)]
+    # ghost-smoke curling off the tongues' tips
+    for k in range(4):
+        ph = (t * 0.6 + k * 0.25) % 1.0
+        cx_s = sx_c + np.sin(ph * 5 + k * 2) * 5 * ph
+        cy_s = sy_c - 30 - ph * 26
+        rr_s = 2 + ph * 4
+        sm = (np.hypot(xx - cx_s, (yy - cy_s) * 1.3) < rr_s) & show & (B4[yy.astype(int) % 4, xx.astype(int) % 4] < (1 - ph) * 0.5)
+        out[sm] = out[sm] * 0.55 + np.array(hexc("#6a9ea4")) * 0.45
+    # motes of the ghost-light breaking off the tongues and rising, winking out
+    for k in range(7):
+        ph = (t * 0.9 + k * 0.143) % 1.0
+        mx = int(sx_c + np.sin(ph * 7 + k * 1.9) * (4 + ph * 9))
+        my = int(sy_c - 38 - ph * 40)
+        if 0 <= mx < HW and 0 <= my < HH and show[my, mx] and ph < 0.85:
+            out[my, mx] = np.array(hexc("#dffafa")) if ph < 0.4 else np.array(hexc("#6fc4cc"))
     for j in range(HH):
         Y_ = HY0 + j
         if not (0 <= Y_ < H):
