@@ -4769,7 +4769,8 @@
   }
  ],
  "clips": {
-  "attack": "strike"
+  "attack": "strike",
+  "idle": "attack_idle"
  },
  "effects": [],
  "shadow": {

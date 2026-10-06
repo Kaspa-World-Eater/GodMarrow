@@ -61,7 +61,8 @@ def main():
     d["name"] = "Ossuarch (sword and shield)"
     d["materials"].update(MATERIALS)
     d["shapes"] = [s for s in d["shapes"] if not s["name"].startswith(("sword_", "shield_"))] + sword() + shield()
-    d["clips"] = dict(d.get("clips") or {}, attack="strike")
+    # the silhouette study (STUDY.md round 3): the armed stance, legs apart and the sword out from the body, as his idle
+    d["clips"] = dict(d.get("clips") or {}, attack="strike", idle="attack_idle")
     DST.write_bytes(json.dumps(d, indent=1, ensure_ascii=False).encode("utf8"))
     print("wrote", DST)
 
