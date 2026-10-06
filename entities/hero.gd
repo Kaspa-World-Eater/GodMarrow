@@ -422,11 +422,27 @@ func _start_act(a: String, secs: float) -> void:
 	spr.play(anim, true, false)
 	spr.fps_override = spr.frame_count() / act_len
 
+## the blow's frames in uneven time (SLYNYRD Pixelblog 56; the art study, tools/art_study/STUDY.md): the wind-up held,
+## the strike rushed through, the follow-through held where the blow lands (act_hit_at 0.5), the return quick. Even
+## spacing is what made the swing feel weightless.
+const BLOW_TIME := [0.10, 0.20, 0.06, 0.06, 0.22, 0.14, 0.12, 0.10]
+
 func _act(dt: float) -> void:
 	act_t += dt
 	spr.view = view
 	spr.face = face
-	spr.step(dt)
+	if act in ["atk", "atk2", "atk3", "heavy", "swing"] and spr.frame_count() == BLOW_TIME.size() and not (_weapon() and _weapon().is_ranged()):
+		var u := clampf(act_t / maxf(0.001, act_len), 0.0, 0.999)
+		var acc := 0.0
+		var fi := 0
+		for i in BLOW_TIME.size():
+			acc += BLOW_TIME[i]
+			if u < acc:
+				fi = i
+				break
+		spr.set_index(fi)
+	else:
+		spr.step(dt)
 	match act:
 		"atk", "atk2", "atk3", "heavy", "swing":
 			if not act_done and act_t >= act_len * act_hit_at:

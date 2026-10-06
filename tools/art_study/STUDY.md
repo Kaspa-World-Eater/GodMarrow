@@ -56,3 +56,40 @@ Bowl title (tools/title_study/, its method in the memory note "godmarrow-title-m
 - E2: a bone (the spurs, the Mantle): ivory ramp shifting from grey-violet shadows to warm cream lights.
 - E3: a cloak fold (the green plume, the mantle cloth): saturated mid-tones, desaturated ends.
 - E4: the six-frame sword strike at SLYNYRD's timings, on a simple figure, then on him.
+
+## Round 1b: form, weight and feel (Derek: "Study form as well. What makes a 2D frame move and have weight and feel")
+
+**Form in a still frame**
+- Line of action: one curve through the whole figure; arrange the body along it. A straight figure is a dead one.
+- Weight must go somewhere: the weight-bearing leg's hip rises, that shoulder drops (contrapposto), the spine curves,
+  the head tilts to balance. Shoulders and hips are never parallel in a living pose.
+- Silhouette test: fill the figure black; the action must still read. Arms clear of the body, weapon clear of both.
+- Solid drawing: know the centre of mass and the limb chains from every angle; no cheating in gameplay views.
+
+**What makes frames move with weight (12 principles, as games use them)**
+- Timing is the single biggest factor; speed reads as weight (fast = light). Ease in and out; a sword is "fast in,
+  slow out": instant response, heavy follow-through.
+- Anticipation sells weight but costs responsiveness: keep the player's short, give creatures long ones (telegraphs).
+- Follow-through and overlap: parts move at different rates; cloak, plume, chains and hair keep going after the body
+  stops (Street Fighter III: one frame of flutter at the bottom of the trouser legs makes an idle live).
+- Arcs: limbs and weapons travel on curves; a break in an arc reads as a snap (use only on purpose).
+- Squash and stretch: even one pixel of compression on landing or striking.
+- Overshoot: the striking limb passes its stop point, then settles (Street Fighter III: the kick's overshoot and the
+  slow-down at its end give it apparent power).
+- Exaggeration, kept consistent across every action.
+- Secondary action layered on, never lengthening the gameplay window.
+
+**Critique of the Ossuarch's attack (atk/side, 8 frames)**
+1. No weapon in the frames: he swings empty arms. The Bone Blade must be painted into every attack frame.
+2. Limbs read as stacked tubes (the shape model shows through): no anatomy for weight to live in.
+3. Phases exist (1-2 wind up, 3-5 lunge low, 6 recoil, 7-8 return) but frame 2 turns to face the viewer mid-swing:
+   the arc breaks.
+4. No smear frame; and the engine played the 8 frames at EVEN speed.
+   Fixed in code (entities/hero.gd BLOW_TIME): 10/20/6/6/22/14/12/10 % of the swing: the wind-up held, the strike
+   rushed, the follow-through held on the hit.
+
+**Next exercises (round 2)**
+- E0: repaint atk/side as a 6-key strike with the Bone Blade: anticipation (blade drawn back over the shoulder, weight
+  on the back leg, hips and shoulders counter-rotated), one sharp smear frame along the blade's arc, follow-through
+  1 px past contact with the cloak still travelling, recover. Silhouette-test every key.
+- then E1-E4 above.
