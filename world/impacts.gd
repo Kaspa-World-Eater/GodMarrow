@@ -1942,6 +1942,71 @@ func _tick_meadows(dt: float) -> void:
 		m.set_shader_parameter("wind", Vector2(Gust.dir(), Gust.k()))
 	meadows = meadows.filter(func(md): return is_instance_valid(md["node"]))
 
+# ------------------------------------------------------------------ snowfields (painted: shaders/snowfield.gdshader)
+## wind-scoured snow with spindrift streaming across it; footprints pressed in where anything walks (left, right, left,
+## a stride apart), filling back in over a dozen seconds
+var snowfields: Array = []  # {node, p, R, prints: [[x, y, age]], last: {id: [pos, side]}}
+
+func snowfield(p: Vector2, r: float = 2.4) -> Node:
+	var hw := r * Iso.HX
+	var n := ColorRect.new()
+	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	n.size = (Vector2(hw * 2.6, hw * 1.4) / PX).ceil() * PX
+	var q := Iso.to_screen(p)
+	n.position = ((q - n.size * 0.5) / PX).floor() * PX
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/snowfield.gdshader")
+	m.set_shader_parameter("seed", randf() * 40.0)
+	m.set_shader_parameter("rect_size", n.size)
+	m.set_shader_parameter("half_px", Vector2(hw, hw * 0.5))
+	m.set_shader_parameter("world_ofs", n.position)
+	n.material = m
+	if zone and zone.get("floor_layer"):
+		zone.floor_layer.add_child(n)
+	else:
+		add_child(n)
+	snowfields.append({"node": n, "p": p, "R": r, "prints": [], "last": {}, "t": 0.0})
+	return n
+
+func _tick_snowfields(dt: float) -> void:
+	if snowfields.is_empty():
+		return
+	var bodies: Array = get_tree().get_nodes_in_group("monsters").filter(func(m): return is_instance_valid(m) and not m.dead and m.zone == zone)
+	var sc = get_tree().current_scene
+	var h = sc.get("hero") if sc else null
+	if h and is_instance_valid(h):
+		bodies.append(h)
+	for sf in snowfields:
+		var n: ColorRect = sf["node"]
+		if not is_instance_valid(n):
+			continue
+		sf["t"] += dt
+		for b in bodies:
+			if b.tp.distance_to(sf["p"]) > sf["R"] * 0.85:
+				continue
+			var id: int = b.get_instance_id()
+			var lst: Array = sf["last"].get(id, [Vector2.INF, 1.0])
+			if lst[0] == Vector2.INF or (lst[0] as Vector2).distance_to(b.tp) > 0.32:
+				var mv: Vector2 = (b.tp - lst[0]).normalized() if lst[0] != Vector2.INF else Vector2.RIGHT
+				var side: float = -lst[1]
+				var foot: Vector2 = b.tp + Vector2(-mv.y, mv.x) * 0.09 * side
+				var sp: Vector2 = Iso.to_screen(foot) - n.position
+				sf["prints"].append([sp.x, sp.y, 0.0])
+				sf["last"][id] = [b.tp, side]
+		for pr in sf["prints"]:
+			pr[2] += dt
+		sf["prints"] = sf["prints"].filter(func(pr): return pr[2] < 14.0)
+		while sf["prints"].size() > 32:
+			sf["prints"].pop_front()
+		var arr: Array = []
+		for i in 32:
+			arr.append(Vector4(sf["prints"][i][0], sf["prints"][i][1], sf["prints"][i][2], 1.0) if i < sf["prints"].size() else Vector4(0, 0, 0, 0))
+		var m: ShaderMaterial = n.material
+		m.set_shader_parameter("prints", arr)
+		m.set_shader_parameter("t", sf["t"])
+		m.set_shader_parameter("wind", Vector2(Gust.dir(), Gust.k()))
+	snowfields = snowfields.filter(func(sf): return is_instance_valid(sf["node"]))
+
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
 	var q := Iso.to_screen(p) - Vector2(randf_range(-10, 10), randf_range(20, 90) * (1.0 - k * 0.6))
@@ -2039,6 +2104,7 @@ func _process(dt: float) -> void:
 	_tick_souls(dt)
 	_tick_lakes(dt)
 	_tick_meadows(dt)
+	_tick_snowfields(dt)
 	_tick_absence(dt)
 	_tick_radiance(dt)
 	_tick_miasma2(dt)
