@@ -74,7 +74,19 @@ func is_pixelforge_set(kind: String) -> bool:
 	_pf_sets[kind] = ok
 	return ok
 
+## (Cursemark assets): our summoned bodies in Cursemark's (Derek, in the fork: "needs to use the cursemarks assets for
+## minions"): its own skeletal minion, its skeleton executioner and archer, a Bound wraith, a heap of skulls
+const CM_SKINS := {
+	"skeleton_shield": "cm:minion_skeleton", "skeleton_flail": "cm:minion_skeleton",
+	"skeleton_greatsword": "cm:forsaken_executioner", "skeleton_halberd": "cm:forsaken_executioner",
+	"skeleton_bow": "cm:forsaken_archer", "skeleton_mage": "cm:bound_wraith",
+	"colossus_shield": "cm:blighted_amalgam", "colossus_flail": "cm:blighted_amalgam",
+	"colossus_scythe": "cm:blighted_amalgam", "colossus_swords": "cm:blighted_amalgam",
+}
+
 func sprite_set(kind: String) -> SpriteSet:
+	if Sfx.cm and CM_SKINS.has(kind):
+		kind = CM_SKINS[kind]
 	kind = skin_for(kind)
 	if _sets.has(kind):
 		return _sets[kind]

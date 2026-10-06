@@ -42,7 +42,7 @@ static func font(kind: String) -> Font:
 		return _fonts[kind]
 	# (Cursemark assets): Cursemark's own faces (cursemark/fonts, converted from its BFNT by the fork's tools): the gothic
 	# pixel face for titles and small capitals, Barlow for the reading text, Lookout for the tiny labels; whole-step scaled
-	var cmf: String = {"pixel": "lookout_7", "book": "barlow_17", "italic": "barlow_17", "sc": "gothic_12"}.get(kind, "barlow_17")
+	var cmf: String = {"pixel": "lookout_7", "book": "barlow_17", "italic": "barlow_17", "sc": "gothic_12", "small": "barlow_11"}.get(kind, "barlow_17")
 	if FileAccess.file_exists("res://cursemark/fonts/%s.fnt" % cmf):
 		var bf := FontFile.new()
 		if bf.load_bitmap_font(ProjectSettings.globalize_path("res://cursemark/fonts/%s.fnt" % cmf)) == OK:

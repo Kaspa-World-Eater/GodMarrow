@@ -220,7 +220,7 @@ func _draw_all() -> void:
 		canvas.draw_rect(Rect2(p4 + Vector2(2 * WPX, 0), Vector2(WPX, 2 * WPX)), Color(0.9, 0.96, 0.93, 0.5 * f4 * b))
 	# eye-shine (zz_zz_cine76.js): beyond the pool, what watches you shows as two points catching the lantern
 	var night := (1.0 - dk) if outdoor else 1.0
-	if night >= 0.35 and not hero.dead:
+	if night >= 0.35 and not hero.dead and not Sfx.cm:     # (Cursemark assets): world/cm_eyes.gd has the eyes
 		var F: Vector2 = hero.lantern.tp if hero.lantern and is_instance_valid(hero.lantern) else hero.tp
 		var R: float = hero.light_radius() * 0.55
 		var lc: Color = Color8(255, 214, 170)

@@ -76,7 +76,7 @@ static func font(path: String) -> Font:
 	# (Cursemark assets): its faces (ui/uikit.gd font): small capitals in the gothic pixel face, the rest in Barlow
 	var U = load("res://ui/uikit.gd")
 	if FileAccess.file_exists("res://cursemark/fonts/barlow_17.fnt"):
-		var cf: Font = U.font("sc" if path == F_CAPS else "book")
+		var cf: Font = U.font("sc" if path == F_CAPS else "small")   # the world's lines in the smaller face: 22 px, not 34
 		_fonts[path] = cf
 		return cf
 	var f: Font = null

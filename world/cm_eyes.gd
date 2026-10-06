@@ -1,5 +1,5 @@
 extends CanvasLayer
-## Eyes in the dark (the fork; its own design, from Derek's rulings: eyes identify monsters, the eyeless are the jump
+## Eyes in the dark (Cursemark assets; its own design, from Derek's rulings: eyes identify monsters, the eyeless are the jump
 ## scares; wiki 06 §3: what you can't see does the work). Drawn over the dark (cm_night is layer 5).
 ##  - Each faction's eyes are its own: you learn what is out there before it steps into the light.
 ##  - Only beyond your pool, only from what faces you, mostly by night; they catch the lantern harder the nearer they
@@ -51,7 +51,7 @@ func _faction(sprite: String) -> String:
 
 ## the eye point of a body: a fifth of the way down its stance, at the middle of what is drawn on that row
 func _head_of(m) -> Vector2:
-	var key := str(m.info.get("cm_sprite", ""))
+	var key := str(m.CM_BODY.get(m.kind, ""))
 	if _head.has(key):
 		return _head[key]
 	var p := Vector2(0, -10)
@@ -77,15 +77,15 @@ func _head_of(m) -> Vector2:
 func _draw_eyes() -> void:
 	var z = main.zone
 	var h = main.hero
-	if z == null or not is_instance_valid(z) or not z.d.has("cm") or h == null or not is_instance_valid(h) or h.dead:
+	if z == null or not is_instance_valid(z) or not Sfx.cm or h == null or not is_instance_valid(h) or h.dead:
 		return
 	var now := Time.get_ticks_msec() / 1000.0
 	var night := 1.0 - smoothstep(0.35, 0.8, Game.day_k())
 	var R: float = h.light_radius()
 	for m in get_tree().get_nodes_in_group("monsters"):
-		if m.dead or m.buried or not m.info.has("cm_sprite"):
+		if m.dead or m.buried or not m.cm_body:
 			continue
-		var sprite := str(m.info["cm_sprite"])
+		var sprite := str(m.CM_BODY.get(m.kind, ""))
 		var d: float = m.tp.distance_to(h.tp)
 		var st: Dictionary = state.get(m, {})
 		if st.is_empty():
@@ -104,9 +104,9 @@ func _draw_eyes() -> void:
 			continue
 		if d < R * 0.9 or d > R * 3.4:
 			continue
-		# facing you (a body only faces left or right)
-		var dx: float = h.tp.x - m.tp.x
-		if absf(dx) > 0.5 and signf(dx) != float(m.face):
+		# facing you (a body only faces left or right on the screen)
+		var dx: float = Iso.to_screen(h.tp).x - Iso.to_screen(m.tp).x
+		if absf(dx) > 40.0 and signf(dx) != float(m.face):
 			continue
 		var L: Dictionary = LOOK[fac]
 		var bl: Array = L["blink"]
@@ -123,24 +123,25 @@ func _draw_eyes() -> void:
 		var eye := _head_of(m)
 		if m.face < 0:
 			eye.x = -eye.x
-		var base: Vector2 = m.position + m.spr.position + eye * PX
+		var sk: float = absf(m.spr.scale.x)
+		var base: Vector2 = m.position + m.spr.position + eye * sk
 		# a hunting creature's eyes turn toward you; a spirit's drift
 		var look := Vector2.ZERO
 		if hunting:
-			look = (h.tp - m.tp).normalized() * PX
+			look = (Iso.to_screen(h.tp) - Iso.to_screen(m.tp)).normalized() * sk
 		if float(L["drift"]) > 0.0:
-			look += Vector2(sin(now * 0.7 + float(st["s"])), cos(now * 0.53 + float(st["s"]))) * PX * float(L["drift"])
+			look += Vector2(sin(now * 0.7 + float(st["s"])), cos(now * 0.53 + float(st["s"]))) * sk * float(L["drift"])
 		var c: Color = L["col"]
 		if OS.get_cmdline_user_args().has("--eyes_debug"):
 			canvas.draw_rect(Rect2(m.position - Vector2(6, 6), Vector2(12, 12)), Color(1, 0, 0))
 			canvas.draw_rect(Rect2(base - Vector2(6, 6), Vector2(12, 12)), Color(0, 1, 0))
 			print("EYE ", sprite, " fac ", fac, " head ", eye, " a ", a)
 		for p in L["pts"]:
-			var q: Vector2 = base + look + Vector2(float(p[0]) * (-1.0 if m.face < 0 else 1.0), float(p[1])) * PX
-			q = (q / PX).floor() * PX
-			canvas.draw_rect(Rect2(q, Vector2(PX, PX)), Color(c.r, c.g, c.b, a))
+			var q: Vector2 = base + look + Vector2(float(p[0]) * (-1.0 if m.face < 0 else 1.0), float(p[1])) * sk
+			q = (q / sk).floor() * sk
+			canvas.draw_rect(Rect2(q, Vector2(sk, sk)), Color(c.r, c.g, c.b, a))
 			# a faint halo pixel round each, so they read as light, not paint
-			canvas.draw_rect(Rect2(q - Vector2(PX, 0), Vector2(PX * 3, PX)), Color(c.r, c.g, c.b, a * 0.18))
+			canvas.draw_rect(Rect2(q - Vector2(sk, 0), Vector2(sk * 3, sk)), Color(c.r, c.g, c.b, a * 0.18))
 	# forget the gone
 	for k in state.keys():
 		if not is_instance_valid(k):

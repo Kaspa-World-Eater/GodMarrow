@@ -34,6 +34,13 @@ static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vec
 	m.on_hit(d, elem, from, opts)
 	if not m.mods.is_empty():
 		Affixes.on_struck(m, d, opts)
+	# (Cursemark assets) weight: a melee blow shoves what it strikes (Cursemark's knockback), a heavy one further, a
+	# finisher hard; the killing blow throws the body twice as far. Bosses barely give (their mass, monster.knock).
+	var shove := 0.0
+	if opts.get("melee", false) and from != Vector2.INF:
+		shove = 1.6 + (2.6 if opts.get("heavy", false) else 0.0) + (3.0 if opts.get("finisher", false) else 0.0)
+	if shove > 0.0 and m.has_method("knock"):
+		m.knock(from, shove * (2.0 if m.hp <= 0.0 else 1.0))
 	if m.hp <= 0.0:
 		m.die(from)
 	return d

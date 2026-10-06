@@ -80,6 +80,7 @@ func _ready() -> void:
 	if Sfx.cm:
 		cm_audio = load("res://world/cm_audio.gd").new(self)
 		add_child(cm_audio)
+		add_child(load("res://world/cm_eyes.gd").new(self))   # eyes in the dark, by faction (in place of the old eye-shine)
 	add_child(Sfx.new())
 	far = FarPilgrims.new(self)
 	add_child(far)
