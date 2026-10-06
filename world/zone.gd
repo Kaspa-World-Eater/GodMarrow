@@ -390,8 +390,13 @@ func _cm_room(t: Vector2, r: float) -> bool:
 			return false
 	return true
 
+var see: Node                  # world/see_through.gd: big props thin while they hide the pilgrim
+
 func _sprites() -> void:
 	_cm_taken.clear()
+	see = load("res://world/see_through.gd").new()
+	see.zone = self
+	add_child(see)
 	if Sfx.cm:
 		for s in d.get("sprites", []):
 			if str(s.get("set", "")) == "landmark":
@@ -429,6 +434,7 @@ func _sprites() -> void:
 					continue
 				if foot_r > 0.45:
 					_cm_taken.append([tp, foot_r])
+					see.props.append([null, cn])
 				var ch := Node2D.new()
 				var ca := Iso.to_screen(Vector2(s["x"], s["y"]))
 				var cd: float = float(s.get("d", float(s["x"]) + float(s["y"])))
@@ -438,6 +444,8 @@ func _sprites() -> void:
 				ch.add_child(cn)
 				ch.set_meta("item", s.get("item", ""))
 				sorted.add_child(ch)
+				if not see.props.is_empty() and see.props[-1][1] == cn:
+					see.props[-1][0] = ch
 				continue
 		if Sfx.cm and set_name != "landmark":
 			# ours too: nothing grows through a structure, a lantern or a gate
