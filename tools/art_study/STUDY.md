@@ -133,3 +133,35 @@ with stitched edges, buckles and wear, the plume's barbs and shafts, cloth weave
 Derek: "We don't need perfect 3D models, we need the illusion of it." The model is scaffolding for form, light and
 motion; the illusion (edges, filigree, glints, the readable silhouette) is made in the paint on each frame. Spend
 effort where the eye lands, fake the rest.
+
+## Round 3: silhouettes (2026-10-06; Derek: "Study silhouettes to learn what things should look like")
+
+Reading: a silhouette is the figure filled black; "if the silhouette reads, it works". It carries proportion,
+gesture, line of action and NEGATIVE SPACE (the gaps inside and around the shape). Shape language: circles soft,
+squares solid, triangles aggressive. Test every key pose filled black.
+
+Study: Blasphemous (the Penitent One and the Custodian of the Stained Glass, from The Spriters Resource, kept out of
+the repo) and Demon's Crest (Firebrand), against our frames filled black (img/r3_silhouettes_ours.png: top his
+current sheet, below the keyed sword-and-shield strike).
+
+What the Penitent One does that we don't:
+- Thin, angular limbs on strong diagonals; a wide stance with open space between the legs in every frame.
+- The weapon is a long line far outside the body; it is the brightest thing in the frame (cyan steel highlights).
+- One saturated accent (the red sash) against cool grey-teal armour; the cone helm is the signature and is never lost.
+Firebrand: hard yellow lights on every muscle mass over warm orange, small blue accents at wrist and ankle, the
+wings as two big readable shapes, asymmetric poses.
+
+Ours, filled black:
+1. Idle and walk are a block with a spike: the cloak swallows the legs; there is no negative space anywhere.
+2. The old attack: empty arms out like a scarecrow.
+3. The keyed strike reads (lunge, blade out, cloak as a long triangle) except the follow-through, where the blade
+   is lost inside the mass.
+4. The helm's spike and the plume are a strong signature: keep and protect them.
+
+To do (applying it):
+- The cloak opens at the front and hangs BEHIND the legs, so the legs show as two shapes with a gap; its hem is a
+  ragged, notched edge, not a straight line.
+- An idle with weight: the weight on one leg, the sword held out from the body, the shield arm off the torso.
+- Every attack key keeps the blade outside the silhouette; the follow-through angles the blade forward and down,
+  clear of the cloak.
+- The steel's highlight is the brightest value on the figure; one saturated accent (the green plume already is).
