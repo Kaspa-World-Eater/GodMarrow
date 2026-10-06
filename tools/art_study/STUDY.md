@@ -130,3 +130,6 @@ the pauldrons and gauntlets now catch the lantern; subtle at 195 px, right in di
 Derek, same day: "This is true for everything. A muscle, a vein, a leather strap, a plume, a fine, everything." Every
 material gets its own construction and detail, not only the armour: muscle masses and the veins over them, straps
 with stitched edges, buckles and wear, the plume's barbs and shafts, cloth weave and fraying, bone ridges.
+Derek: "We don't need perfect 3D models, we need the illusion of it." The model is scaffolding for form, light and
+motion; the illusion (edges, filigree, glints, the readable silhouette) is made in the paint on each frame. Spend
+effort where the eye lands, fake the rest.
