@@ -35,7 +35,7 @@ func hit(p: Vector2, from: Vector2, heavy: bool, kind: String = "flesh") -> void
 		"rot": [Color("#6a4a7a"), Color("#3e2a4a"), Color("#6a3a4a")]}.get(kind, [Color("#7a1414")])
 	for i in n:
 		var a := away.rotated(randf_range(-0.9, 0.9))
-		chips.append({"p": p, "z": 40.0 + randf() * 30.0, "v": a * randf_range(1.2, 3.4) * (1.4 if heavy else 1.0),
+		chips.append({"p": p, "z": 40.0 + randf() * 30.0, "v": a * randf_range(1.2, 3.4) * (1.4 if heavy else 1.0) * (0.5 if kind == "flesh" else 1.0),
 			"vz": randf_range(60.0, 160.0) * (1.3 if heavy else 1.0), "col": cols[randi() % cols.size()], "t": 0.0,
 			"life": randf_range(2.5, 5.0), "rest": false, "bounced": false, "big": randf() < 0.35, "stain": kind == "flesh" and randf() < 0.6})
 	while chips.size() > 160:
@@ -500,15 +500,15 @@ func gut_burst(p: Vector2) -> void:
 		hit(p + Vector2(randf_range(-0.2, 0.2), randf_range(-0.2, 0.2)), p + Vector2(randf_range(-1, 1), randf_range(-1, 1)), true, "flesh")
 	for i in 26:
 		var a := randf() * TAU
-		chips.append({"p": p, "z": 50.0, "v": Vector2(cos(a), sin(a)) * randf_range(2.0, 6.0), "vz": randf_range(80.0, 220.0),
+		chips.append({"p": p, "z": 50.0, "v": Vector2(cos(a), sin(a)) * randf_range(1.0, 3.0), "vz": randf_range(80.0, 220.0),
 			"col": [Color("#a01818"), Color("#6a0c0c"), Color("#c8b0a0")][randi() % 3], "t": 0.0, "life": randf_range(4.0, 7.0),
 			"rest": false, "bounced": false, "big": randf() < 0.5, "stain": true})
 	_flash(p, Color(1.0, 0.3, 0.25), 0.25, 50.0)
 	var sp = load("res://world/splats.gd").at(zone)
 	if sp:
-		sp._pool(p, 1.6, false)
+		sp._pool(p, 0.8, false)
 		for i in 10:
-			sp.list.append({"p": p + Vector2(randf_range(-1.6, 1.6), randf_range(-1.2, 1.2)), "r": 0.06 + randf() * 0.12, "t": 30.0, "seed": randf() * 9.0, "col": "r"})
+			sp.list.append({"p": p + Vector2(randf_range(-0.8, 0.8), randf_range(-0.6, 0.6)), "r": 0.06 + randf() * 0.12, "t": 30.0, "seed": randf() * 9.0, "col": "r"})
 	Game.shake(3.0)
 
 # ------------------------------------------------------------------ pure magic: phosphor wisps

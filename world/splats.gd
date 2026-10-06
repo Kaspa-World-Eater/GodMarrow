@@ -23,9 +23,9 @@ func death(kind: String, p: Vector2, big: bool) -> void:
 			list.append({"p": p + Vector2(randf_range(-0.4, 0.4), randf_range(-0.3, 0.3)), "r": 0.06, "t": 45.0, "seed": randf() * 9.0, "col": "b"})
 	else:
 		# a pool that runs out from where it fell (shaders/blood_pool.gdshader), and a few spatters round it
-		_pool(p + Vector2(randf_range(-0.2, 0.2), 0.25), 0.9 + (0.4 if big else 0.0) + randf() * 0.25, kind.contains("bloat"))
+		_pool(p + Vector2(randf_range(-0.1, 0.1), 0.15), (0.9 + (0.4 if big else 0.0) + randf() * 0.25) * 0.5, kind.contains("bloat"))
 		for i in 2 + (2 if big else 0):
-			list.append({"p": p + Vector2(randf_range(-0.6, 0.6), randf_range(-0.45, 0.45)), "r": 0.06 + randf() * 0.1, "t": 26.0, "seed": randf() * 9.0, "col": "g" if kind.contains("bloat") else "r"})
+			list.append({"p": p + Vector2(randf_range(-0.3, 0.3), randf_range(-0.22, 0.22)), "r": 0.06 + randf() * 0.1, "t": 26.0, "seed": randf() * 9.0, "col": "g" if kind.contains("bloat") else "r"})
 	while list.size() > 140:
 		list.pop_front()
 	queue_redraw()
