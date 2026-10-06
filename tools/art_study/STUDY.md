@@ -228,3 +228,6 @@ Ideas to carry (my notes):
 - Souls: pale threads pulled out of the dying toward the lantern, faces in the drift, cold light.
 - Water: ripples where anything steps, reflections of the lantern and figures, rain rings.
 - Blood lakes: the pool shader at the size of a lake, slow churn, bodies half-sunk.
+Derek, later: "Work on shadows at some point too, and radiance and absence. And all the skill tree types" (every
+order's trees: the Animancer's mirrors and wisps, the Hemomancer's blood, the Miasmancer's rot, the Empty Hand's
+radiance and absence and sand, the Ossuarch's bone and the soul).

@@ -32,6 +32,8 @@ static func hit_monster(m: Monster, dmg: float, elem: String = "phys", from: Vec
 	var pd: float = opts.get("poise", d) * STAGGER
 	m.add_poise_damage(pd, bool(opts.get("heavy", false)))
 	m.on_hit(d, elem, from, opts)
+	if elem == "ltng" and m.zone and not opts.get("dot", false):
+		load("res://world/impacts.gd").of(m.zone).crackle(m, 0.9)
 	if elem == "cold" and m.has_method("cold_hit"):
 		m.cold_hit(d)
 	if opts.get("bone", false) and m.has_method("bone_hit"):

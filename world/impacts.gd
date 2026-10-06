@@ -133,7 +133,17 @@ func _fern(c: Vector2) -> void:
 
 var sky: Node2D           # the bolts' own layer, above every figure
 
+func _ensure_sky() -> void:
+	if sky == null:
+		sky = Node2D.new()
+		sky.z_index = 1000
+		sky.z_as_relative = false
+		sky.draw.connect(_draw_sky)
+		add_child(sky)
+
 func _draw_sky() -> void:
+	_draw_souls(sky)
+	_draw_arcs(sky)
 	for bl in bolts:
 		var t: float = bl["t"]
 		# two strikes with a dark breath between: 0-0.12 and 0.2-0.42
@@ -205,6 +215,111 @@ func acid(p: Vector2, r: float = 1.3, secs: float = 8.0) -> void:
 	pl.enabled = false
 	add_child(pl)
 	acids.append({"node": n, "light": pl, "t": 0.0, "secs": secs})
+
+# ------------------------------------------------------------------ souls (the lantern keeps them: Derek's ruling)
+## a soul pulled out of the dying: a pale wisp with two dark hollows for eyes and a mouth, rising, then drawn along a
+## curve into the pilgrim's lantern, a dithered tail behind it; the lantern flares a little as it takes it
+var souls: Array = []      # {p (screen), v, t, trail: [screen], seed, kind}
+
+func soul(at: Vector2, kind: String = "pale") -> void:
+	_ensure_sky()
+	souls.append({"p": at + Vector2(0, -50), "v": Vector2(randf_range(-30, 30), -randf_range(60, 110)), "t": 0.0, "trail": [], "seed": randf() * 9.0, "kind": kind})
+
+func _tick_souls(dt: float) -> void:
+	var sc = get_tree().current_scene
+	var h = sc.get("hero") if sc else null
+	var tgt := Vector2.INF
+	if h and is_instance_valid(h) and not h.dead:
+		tgt = h.lantern.global_position if h.get("lantern") and is_instance_valid(h.lantern) else h.position + Vector2(-20, -130)
+	for so in souls:
+		so["t"] += dt
+		var t: float = so["t"]
+		var pull := smoothstep(0.5, 1.6, t)
+		var wob := Vector2(sin(t * 7.0 + so["seed"]) * 30.0, cos(t * 5.0 + so["seed"]) * 12.0)
+		if tgt != Vector2.INF:
+			var to: Vector2 = tgt - so["p"]
+			so["v"] = so["v"].lerp(to.normalized() * (120.0 + 380.0 * pull), minf(1.0, dt * (1.0 + 5.0 * pull)))
+			if to.length() < 14.0 and t > 0.6:
+				so["done"] = true
+				_flash_at_screen(tgt, Color(0.75, 0.95, 1.0), 0.25)
+				if h.get("lantern") and is_instance_valid(h.lantern):
+					h.lantern.flare = maxf(h.lantern.flare, 0.6)
+		else:
+			so["v"].y -= 30.0 * dt
+		so["p"] += (so["v"] + wob * (1.0 - pull)) * dt
+		so["trail"].push_front(so["p"])
+		if so["trail"].size() > 14:
+			so["trail"].pop_back()
+	souls = souls.filter(func(so): return not so.get("done", false) and so["t"] < 6.0)
+
+func _flash_at_screen(q: Vector2, col: Color, life: float) -> void:
+	var pl := PointLight2D.new()
+	pl.color = col
+	pl.set_meta("dark_r", 26.0)
+	pl.position = q
+	pl.enabled = false
+	add_child(pl)
+	flashes.append({"light": pl, "t": 0.0, "life": life})
+
+func _draw_souls(cv: CanvasItem) -> void:
+	for so in souls:
+		var tr: Array = so["trail"]
+		for i in tr.size():
+			var u := float(i) / tr.size()
+			var q: Vector2 = (tr[i] / PX).floor() * PX
+			if (int(q.x / PX) + int(q.y / PX) + i) % 2 == 0 or u < 0.3:
+				cv.draw_rect(Rect2(q, Vector2(PX, PX)), Color(0.6, 0.85, 1.0, 0.7 * (1.0 - u)))
+		var c: Vector2 = (so["p"] / PX).floor() * PX
+		cv.draw_rect(Rect2(c - Vector2(PX, PX * 2), Vector2(PX * 3, PX * 4)), Color(0.8, 0.95, 1.0, 0.9))
+		cv.draw_rect(Rect2(c - Vector2(PX * 2, PX), Vector2(PX * 5, PX * 2)), Color(0.7, 0.9, 1.0, 0.55))
+		cv.draw_rect(Rect2(c + Vector2(-PX, -PX), Vector2(PX, PX)), Color(0.05, 0.08, 0.14, 0.95))
+		cv.draw_rect(Rect2(c + Vector2(PX, -PX), Vector2(PX, PX)), Color(0.05, 0.08, 0.14, 0.95))
+		cv.draw_rect(Rect2(c + Vector2(0, PX), Vector2(PX, PX)), Color(0.05, 0.08, 0.14, 0.7))
+
+# ------------------------------------------------------------------ lightning's other forms
+## an arc leaping between two points (chain lightning), and a body crackling with charge for a while
+var arcs: Array = []       # {a, b (screen), t, life}
+var crackles: Array = []   # {node, t, life}
+
+func arc(a: Vector2, b: Vector2) -> void:
+	_ensure_sky()
+	arcs.append({"a": a, "b": b, "t": 0.0, "life": 0.3})
+	_flash_at_screen(b, Color(0.7, 0.8, 1.0), 0.15)
+
+func crackle(m: Node2D, secs: float = 1.2) -> void:
+	_ensure_sky()
+	crackles.append({"node": m, "t": 0.0, "life": secs})
+
+## chain lightning: from tile a to each target in turn, each crackling after
+func chain(a: Vector2, targets: Array) -> void:
+	var prev := Iso.to_screen(a) + Vector2(0, -80)
+	for m in targets:
+		if not is_instance_valid(m):
+			continue
+		var q: Vector2 = m.position + Vector2(0, -60)
+		arc(prev, q)
+		crackle(m, 1.0)
+		prev = q
+
+func _draw_arcs(cv: CanvasItem) -> void:
+	for ar in arcs:
+		var pts := _jag(ar["a"], ar["b"], 14.0)
+		_px_path(pts, Color(0.45, 0.6, 1.0, 0.5), 3, cv)
+		_px_path(pts, Color(1, 1, 1, 1), 1, cv)
+	for cr in crackles:
+		var n = cr["node"]
+		if not is_instance_valid(n) or n.get("spr") == null:
+			continue
+		var r: Rect2 = n.spr.get_rect()
+		var sc: Vector2 = n.spr.scale.abs()
+		var box := Rect2(n.position + n.spr.position + r.position * sc, r.size * sc)
+		var k: float = 1.0 - cr["t"] / cr["life"]
+		for i in int(2 + 3 * k):
+			if randf() > 0.6:
+				continue
+			var a := box.position + Vector2(randf(), randf()) * box.size
+			var b := a + Vector2(randf_range(-24, 24), randf_range(-24, 24))
+			_px_path(_jag(a, b, 6.0), Color(0.75, 0.85, 1.0, 0.9 * k), 1, cv)
 
 ## something burning sheds an ember or a flake of ash (and now and then a curl of smoke); k: how far it has burnt
 func ash(p: Vector2, k: float) -> void:
@@ -297,6 +412,15 @@ func _process(dt: float) -> void:
 		if fr["t"] >= fr["secs"]:
 			fr["node"].queue_free()
 	frosts = frosts.filter(func(fr): return fr["t"] < fr["secs"])
+	_tick_souls(dt)
+	for ar in arcs:
+		ar["t"] += dt
+	arcs = arcs.filter(func(ar): return ar["t"] < ar["life"])
+	for cr in crackles:
+		cr["t"] += dt
+	crackles = crackles.filter(func(cr): return cr["t"] < cr["life"])
+	if sky:
+		sky.queue_redraw()
 	for bl in bolts:
 		bl["t"] += dt
 	bolts = bolts.filter(func(bl): return bl["t"] < bl["life"])

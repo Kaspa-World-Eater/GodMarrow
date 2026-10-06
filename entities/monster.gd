@@ -426,6 +426,8 @@ func die(from: Vector2 = Vector2.INF) -> void:
 	else:
 		spr.play("death", true, false)
 	corpse_t = 30.0
+	if zone:
+		load("res://world/impacts.gd").of(zone).soul(position, "pale")
 	if last_elem == "fire":
 		_start_burn()
 	elif last_elem == "cold" or frost_k > 0.6:

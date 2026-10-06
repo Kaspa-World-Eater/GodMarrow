@@ -378,7 +378,8 @@ static func _burn_test(g, kind: String) -> void:
 		kind = "hollow"
 	var bone := kind.begins_with("bone")
 	var ice := kind.begins_with("ice")
-	if bone or ice:
+	var zap := kind.begins_with("chain")
+	if bone or ice or zap:
 		kind = "knight"
 	var c: Vector2 = g.hero.tp
 	var ms: Array = []
@@ -388,6 +389,14 @@ static func _burn_test(g, kind: String) -> void:
 			m.speed = 0.0
 			ms.append(m)
 	await tree.create_timer(0.6).timeout
+	if zap:
+		var I2 = load("res://world/impacts.gd").of(g.zone)
+		for k in 4:
+			I2.chain(c, ms)
+			for m in ms:
+				if is_instance_valid(m) and not m.dead:
+					Combat.hit_monster(m, 1.0, "ltng", c, {})
+			await tree.create_timer(0.6).timeout
 	if ice:
 		load("res://world/impacts.gd").of(g.zone).frost(c + Vector2(1.6, 1.2), 2.4, 12.0)
 		for k in 6:
@@ -404,7 +413,7 @@ static func _burn_test(g, kind: String) -> void:
 			await tree.create_timer(0.45).timeout
 	for m in ms:
 		if is_instance_valid(m) and not m.dead:
-			Combat.hit_monster(m, 9999.0, "cold" if ice else ("phys" if (bleed or bone) else "fire"), c, {"bone": bone})
+			Combat.hit_monster(m, 9999.0, "cold" if ice else ("ltng" if zap else ("phys" if (bleed or bone) else "fire")), c, {"bone": bone})
 		await tree.create_timer(0.35).timeout
 
 
