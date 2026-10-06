@@ -415,7 +415,40 @@ func _cm_presence(dt: float) -> void:
 	_breath += dt * 2.4
 	var still: bool = spr.anim == "idle" and spr.frame_count() <= 1
 	var k := 1.0 + (0.03 * sin(_breath) if still else 0.0)
-	spr.scale = Vector2(4.0 * (1.0 - (k - 1.0) * 0.5), 4.0 * k) * Iso.FIG
+	# a blow's weight in the body (as the pilgrim's, entities/hero.gd _blow_body): drawn back through the wind-up, thrown
+	# at what it strikes, a recoil, home. Most of Cursemark's creatures stand on one frame, so this is their swing.
+	var off := 0.0
+	var sq := 0.0
+	var lean := 0.0
+	if brain and not dead and stun <= 0.0:
+		var bs: String = str(brain.get("state"))
+		var bst: float = float(brain.get("st")) if brain.get("st") != null else 0.0
+		if bs == "wind":
+			var wl: float = maxf(0.05, float(brain.get("wind")))
+			var u := clampf(1.0 - bst / wl, 0.0, 1.0)
+			off = -10.0 * smoothstep(0.0, 1.0, u)
+			sq = 0.05 * u
+			lean = -0.09 * u
+			if u > 0.85:
+				off += sin(Time.get_ticks_msec() * 0.08) * 1.5   # the shiver before it lets go
+		elif bs == "strike":
+			var u2 := clampf(1.0 - bst / 0.18, 0.0, 1.0)
+			off = lerpf(-10.0, 18.0, minf(1.0, u2 * 2.5))
+			sq = -0.06
+			lean = 0.12
+		elif bs == "recover":
+			var rl: float = maxf(0.05, float(brain.get("rec")) if brain.get("rec") != null else 0.4)
+			var u3 := clampf(1.0 - bst / rl, 0.0, 1.0)
+			off = 18.0 * (1.0 - smoothstep(0.0, 1.0, u3))
+			sq = -0.06 * (1.0 - u3)
+			lean = 0.12 * (1.0 - smoothstep(0.0, 1.0, u3))
+	var aim_v: Vector2 = brain.get("aim") if brain and brain.get("aim") is Vector2 else tp + Vector2(float(face), 0)
+	var sd := (Iso.to_screen(aim_v) - Iso.to_screen(tp)).normalized()
+	if bounce_t < 0.0:
+		spr.position = sd * off * Vector2(1.0, 0.5)
+	spr.skew = lean * signf(sd.x if absf(sd.x) > 0.2 else float(face))
+	k += -sq
+	spr.scale = Vector2(4.0 * (1.0 - (k - 1.0) * 0.5) * (1.0 + sq * 0.5), 4.0 * k) * Iso.FIG
 
 func _tick_status(dt: float) -> void:
 	stun = maxf(0.0, stun - dt)
