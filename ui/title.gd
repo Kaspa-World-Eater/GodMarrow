@@ -51,6 +51,8 @@ var order_i := -1                  # the order whose page is open
 var portraits := {}
 var confirm_new := false
 var t := 0.0
+var still_t := 0.0                # how long nothing has moved: the words sink into the blood, and the face in it shows
+var sink := 0.0                   # 0 = the words risen, 1 = sunk
 var leaving := -1.0
 var codex: Control
 var _test_done := false
@@ -196,6 +198,7 @@ func _fig_at(p: Vector2) -> int:
 	return stage.order_at(p) if stage else -1
 
 func _gui(ev: InputEvent) -> void:
+	still_t = 0.0
 	if leaving >= 0.0 or mode == "draw":
 		return
 	if ev is InputEventMouseMotion:
@@ -224,6 +227,7 @@ func _gui(ev: InputEvent) -> void:
 				_open_order(f)
 
 func _unhandled_key_input(ev: InputEvent) -> void:
+	still_t = 0.0
 	if leaving >= 0.0 or mode == "draw" or not root.visible or not (ev is InputEventKey) or not ev.pressed:
 		return
 	if ev.keycode == KEY_ESCAPE and mode != "main":
@@ -465,7 +469,10 @@ func _draw_veils(vs: Vector2, fade_in: float, out: float) -> void:
 
 func _tick_main(dt: float) -> void:
 	if mode != "main" and mode != "orders":
+		sink = 0.0
 		return
+	still_t += dt
+	sink = move_toward(sink, 1.0 if still_t > 6.0 else 0.0, dt * (0.35 if still_t > 6.0 else 4.0))
 	var sel := maxi(hover, 0)
 	for i in rows.size():
 		var id: String = rows[i][1]
@@ -511,7 +518,10 @@ func _draw_main(a: float) -> void:
 		R.call(235, 36, 10, 1, "#c08644")
 	var fi := U.font("own_italic")
 	# (no line under the name: Derek 2026-10-05 did not like "The god is dead..." there)
-	# the choices, cast in old pitted bronze; the chosen one rubbed bright, a sigil turning on either side
+	# the choices, cast in old pitted bronze; the chosen one rubbed bright, a sigil turning on either side. When nothing
+	# has moved for a while they sink into the blood (still_t), so the hooded face in it can be seen; any touch raises them
+	var a_main := a
+	a = a * (1.0 - 0.9 * sink)
 	var sel := maxi(hover, 0)
 	for i in rows.size():
 		var r := _row_rect(i)
@@ -532,6 +542,7 @@ func _draw_main(a: float) -> void:
 					var aa := an + q * 1.047
 					R.call(roundf(sx + cos(aa) * 3.0), roundf(sy + sin(aa) * 3.0), 1, 1, "#553418" if q % 2 else "#945e2e")
 				R.call(sx, sy, 1, 1, "#2a4735")
+	a = a_main
 	for d in drops:
 		var dx := roundf(float(d["x"]) / K)
 		var dy := roundf(float(d["y"]) / K)
