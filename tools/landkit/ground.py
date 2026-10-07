@@ -66,12 +66,23 @@ def ash(px, py, seed=0):
     ac = -px * w[1] + py * w[0]
     broad = fbm(px * 0.11 + seed, py * 0.11)                              # the big pools of tone
     col = _mix(ASH_COOL, ASH_WARM, np.clip(broad * 1.6 - 0.3, 0, 1))
-    drift = vn(al * 0.35 + seed * 3, ac * 2.2)                            # drifts: long, banked along the wind
-    col = col * (0.88 + drift[..., None] * 0.2)
+    ml = np.array([-0.94, 0.34])                                         # toward the moon on the ground (world -x, a little +y)
+
+    def surf(x, y):
+        a1 = x * w[0] + y * w[1]
+        c1 = -x * w[1] + y * w[0]
+        big = vn(a1 * 0.3 + seed * 3, c1 * 1.4) * 0.6 + vn(a1 * 0.7 + 9, c1 * 3.0) * 0.25
+        rip = np.sin(c1 * 8 + vn(a1 * 0.6, c1 * 0.6) * 5) * 0.035 * (vn(x * 0.3 + 11, y * 0.3) > 0.5)
+        return big + rip
+    hgt = surf(px, py)
+    slope = (hgt - surf(px + ml[0] * 0.08, py + ml[1] * 0.08)) / 0.08     # >0: falling toward the moon = facing it
+    lit_ = np.clip(0.5 + slope * 1.6, 0, 1)
+    col = col * (0.78 + lit_[..., None] * 0.4)
+    crest = slope > 0.22
+    col = np.where(crest[..., None], col * 1.08, col)                   # the lit crests of the drifts
+    drift = hgt
     ripple = np.sin(ac * 9 + vn(al * 0.6, ac * 0.6) * 5)                  # wind ripples, faint, only on the soft drift
     soft = vn(px * 0.3 + 11, py * 0.3) > 0.5
-    col = np.where((soft & (ripple > 0.7))[..., None], col * 1.06, col)
-    col = np.where((soft & (ripple < -0.8))[..., None], col * 0.93, col)
     # crust: plates of dried ash, cracked; only where it has crusted
     wx = px + (fbm(px * 0.9 + 3, py * 0.9) - 0.5) * 0.9                  # warped, so no lattice shows
     wy = py + (fbm(px * 0.9, py * 0.9 + 8) - 0.5) * 0.9
@@ -86,7 +97,7 @@ def ash(px, py, seed=0):
     # grit: cinders (dark, a few), bone (pale, rarer); each speck its own
     g1, _, gid, _, _ = cells(px, py, 0.16, seed + 77, 1.0)
     r = h1(gid, 1, seed)
-    cinder = (r < 0.07) & (g1 < 0.02 + h1(gid, 2, seed) * 0.025)
+    cinder = (r < 0.018) & (g1 < 0.02 + h1(gid, 2, seed) * 0.02)
     bone = (r > 0.985) & (g1 < 0.03)
     col = np.where(cinder[..., None], ASH_DARK * 0.8, col)
     col = np.where(bone[..., None], ASH_PALE * 1.25, col)
@@ -107,82 +118,144 @@ def _bounds(n, lo, hi, seed, base, var):
     return np.array(b)
 
 
-def flags(qa, qp, px, py, seed=0):
-    """flagstones laid in courses across the courtyard: each course its own depth, each stone its own length, tone,
-    tilt; the corners chipped, some cracked across, some sunk and filled with ash, a few gone; ash and grime packed in
-    the joints; the stones worn round at their edges. Returns the albedo and each stone's small rise (for the
-    caller's light)."""
+STONE_FAMILY = np.array([[0.38, 0.345, 0.3], [0.33, 0.325, 0.33], [0.37, 0.315, 0.27], [0.35, 0.33, 0.31]])   # buff, grey, rusted, plain
+LICHEN = np.array([0.43, 0.44, 0.39])
+
+
+def _layout(qa, qp, seed):
+    """where each slab lies: wandering courses of random-rectangular paving, every slab its own size"""
     qa = qa + (fbm(qp * 0.12 + seed, 3.3) - 0.5) * 1.4                   # the courses wander as they were laid by hand
     qp = qp + (fbm(qa * 0.2 + seed, 7.7) - 0.5) * 0.5
     rows = _bounds(0, -30, 60, seed + 5, 1.3, 0.35)
     ri = np.clip(np.searchsorted(rows, qa) - 1, 0, len(rows) - 2)
     r0, r1 = rows[ri], rows[ri + 1]
-    va = (qa - r0) / (r1 - r0)                                           # across the course 0..1
-    # along the course: each course its own run of stone lengths, offset by its own amount
+    va = (qa - r0) / (r1 - r0)
     off = h1(ri, 9, seed) * 1.7
     length = 1.5 + h1(ri, 4, seed) * 0.9
     sq = (qp + off) / length
     si = np.floor(sq).astype(np.int64)
-    # stones vary in length: shift the joint by a per-joint amount
-    jshift = (h1(ri, si, seed + 2) - 0.5) * 0.5
     fr = sq - si
-    left = fr < jshift
+    left = fr < (h1(ri, si, seed + 2) - 0.5) * 0.5
     si = np.where(left, si - 1, si)
     fr = np.where(left, fr + 1, fr)
-    jnext2 = (h1(ri, si + 1, seed + 2) - 0.5) * 0.5
-    past = fr > 1 + jnext2
+    past = fr > 1 + (h1(ri, si + 1, seed + 2) - 0.5) * 0.5
     si = np.where(past, si + 1, si)
     fr = np.where(past, fr - 1, fr)
     lo = (h1(ri, si, seed + 2) - 0.5) * 0.5
     hi = 1 + (h1(ri, si + 1, seed + 2) - 0.5) * 0.5
-    vb = (fr - lo) / (hi - lo)                                           # along the stone 0..1
-    sid = ri * 1009 + si
-    # the stone's own make
-    tone = 0.66 + h1(sid, 11, seed) * 0.42
-    bed = h1(sid, 12, seed) > 0.7
-    base = np.where(bed[..., None], STONE_B, STONE) * tone[..., None]
-    tilt_a = (h1(sid, 13, seed) - 0.5) * 0.25
-    tilt_b = (h1(sid, 14, seed) - 0.5) * 0.25
-    rise = tilt_a * (va - 0.5) + tilt_b * (vb - 0.5)
+    vb = (fr - lo) / (hi - lo)
+    A = r1 - r0
+    B = (hi - lo) * length
+    return dict(sid=ri * 1009 + si, va=va, vb=vb, A=A, B=B)
+
+
+def _stone(qa, qp, px, py, seed, heave, path):
+    """one slab's real surface, in yards: settled, tipped, its arrises rounded where feet went and sharp elsewhere,
+    dished by wear, spalled, cracked with the pieces offset; the joint below it all"""
+    L = _layout(qa, qp, seed)
+    sid, va, vb, A, B = L["sid"], L["va"], L["vb"], L["A"], L["B"]
     fate = h1(sid, 15, seed)
-    sunk = (fate > 0.86) & (fate < 0.95)
-    gone = fate >= 0.95
-    # the joint: a gap at each edge, wider where the stones have shifted; the edges worn round
-    wa = (r1 - r0) * np.minimum(va, 1 - va)                               # yards to the course's edge
-    wb = (hi - lo) * length * np.minimum(vb, 1 - vb)                      # yards to the stone's end
-    gap = 0.02 + h1(sid, 16, seed) * 0.03
-    ed = np.minimum(wa, wb) + (vn(px * 6 + seed, py * 6) - 0.5) * 0.05   # ragged, worn edges
-    # chipped corners: each corner its own bite
-    cbite = np.zeros(qa.shape)
+    sunk = (fate > 0.88) & (fate < 0.955)
+    gone = fate >= 0.955
+    hv = np.zeros(qa.shape) if heave is None else heave
+    settle = (h1(sid, 30, seed) - 0.5) * 0.06 - sunk * 0.05 + hv * h1(sid, 31, seed) * 0.16
+    ta = (h1(sid, 13, seed) - 0.5) * 0.05 + np.sign(h1(sid, 13, seed) - 0.5) * hv * 0.12
+    tb = (h1(sid, 14, seed) - 0.5) * 0.05 + np.sign(h1(sid, 14, seed) - 0.5) * hv * 0.12
+    h = settle + ta * (va - 0.5) * A + tb * (vb - 0.5) * B
+    ea, eb = A * np.minimum(va, 1 - va), B * np.minimum(vb, 1 - vb)
+    ed = np.minimum(ea, eb) + (vn(px * 9 + seed, py * 9) - 0.5) * 0.025
+    gap = 0.022 + h1(sid, 16, seed) * 0.03 + hv * 0.04
+    # corner bites
     for k, (ca, cb) in enumerate(((0, 0), (0, 1), (1, 0), (1, 1))):
-        bite = h1(sid, 20 + k, seed) ** 3 * 0.32
-        da = (r1 - r0) * np.abs(va - ca)
-        db = (hi - lo) * length * np.abs(vb - cb)
-        cbite = np.maximum(cbite, bite - (da + db) * 0.8 - (vn(qa * 9 + k, qp * 9) - 0.5) * 0.06)
-    joint = (ed < gap) | (cbite > 0)
-    col = base * (1 + rise[..., None] * 1.3)
-    wear = np.clip(1 - (ed - gap) / 0.09, 0, 1)                          # rounded off at the edges: darker as it falls
-    col = col * (1 - wear[..., None] * 0.22)
-    # the surface: worn smooth in the middle, pitted, stained
-    pit = vn(px * 14 + seed, py * 14) > 0.8
-    col = np.where(pit[..., None], col * 0.84, col)
-    stain = fbm(px * 0.6 + 50, py * 0.6) - 0.45
-    col = col * (1 - np.clip(stain, 0, 0.3)[..., None] * np.array([0.5, 0.65, 0.7]))
-    grain = (vn(px * 30 + seed, py * 30) - 0.5) * 0.08 + (vn(qa * 3 + 1, qp * 3) - 0.5) * 0.05
-    col = col * (1 + grain[..., None])
-    # cracks across some: a wandering line from edge to edge
-    ck = h1(sid, 17, seed) > 0.62
-    cpos = 0.25 + h1(sid, 18, seed) * 0.5 + (vn(vb * 4 + h1(sid, 19, seed) * 50, 0.5) - 0.5) * 0.35
-    crack = ck & (np.abs(va - cpos) < 0.022 / np.maximum(r1 - r0, 0.3))
-    col = np.where(crack[..., None], col * 0.42, col)
-    # sunk: settled into the ash, ash blown over it; gone: only ash where it was
+        bite = h1(sid, 20 + k, seed) ** 3 * 0.28
+        ed = np.minimum(ed, (A * np.abs(va - ca) + B * np.abs(vb - cb)) * 0.8 - bite + gap * (bite > 0.01) * 0 + 0.0 * k
+                        + np.where(bite > 0.02, 0.0, 9.0))
+    rr_ = 0.025 + path * 0.07                                            # arrises: round on the path, sharp off it
+    h = h - np.clip(1 - (ed - gap) / rr_, 0, 1) ** 2 * rr_ * 0.55
+    rad2 = ((va - 0.5) * 2) ** 2 + ((vb - 0.5) * 2) ** 2
+    dish = path * 0.035 * np.clip(1 - rad2 * 0.8, 0, 1)
+    h = h - dish
+    # spalls: shallow scalloped hollows with sharp rims
+    spall = np.zeros(qa.shape, bool)
+    for k in range(2):
+        on = h1(sid, 40 + k, seed) > 0.55
+        cu, cv = h1(sid, 42 + k, seed), h1(sid, 44 + k, seed)
+        r = 0.07 + h1(sid, 46 + k, seed) * 0.16
+        d = np.hypot((va - cu) * A, (vb - cv) * B) + (vn(px * 14 + k * 7, py * 14) - 0.5) * 0.05
+        inside = on & (d < r)
+        h = h - np.where(inside, 0.014 * np.clip((r - d) / 0.025, 0, 1), 0)
+        spall |= inside
+    # a crack across the short span (more of them where the flesh heaves), the far piece dropped
+    ck = h1(sid, 17, seed) < 0.3 + hv * 0.6
+    long_a = A > B
+    u_ = np.where(long_a, va, vb)
+    w_ = np.where(long_a, vb, va)
+    cpos = 0.25 + h1(sid, 18, seed) * 0.5 + (vn(w_ * 3 + h1(sid, 19, seed) * 50, 0.5) - 0.5) * 0.3
+    span = np.where(long_a, A, B)
+    cd = (u_ - cpos) * span
+    crack = ck & (np.abs(cd) < 0.012)
+    h = h - np.where(ck & (cd > 0), 0.01 + hv * 0.03, 0) - np.where(crack, 0.03, 0)
+    joint = ed < gap
+    h = np.where(joint, -0.07, h)
+    h = np.where(gone, -0.05 + (vn(px * 2, py * 2) - 0.5) * 0.02, h)
+    return h, dict(L, ed=ed, gap=gap, joint=joint, gone=gone, sunk=sunk, spall=spall, crack=crack, ck=ck, cd=cd,
+                   dish=dish, settle=settle)
+
+
+def flags(qa, qp, px, py, seed=0, heave=None, moon=np.array([-0.62, 0.22, 0.75])):
+    """old paving, built as real form (STUDY.md round 14): each slab its own height (settled, tipped, the proud edge
+    against its neighbour), arrises rounded where feet went and sharp elsewhere, dished by wear with water lying in the
+    dishes, spalls with sharp rims and paler stone inside, cracks with the pieces offset; lit through its own normals.
+    Its colour set by the same causes: its bed (buff, grey, rusted) with bedding lines, paler and smoother on the path,
+    tooled off it, darker and glinting where wet, grime at the low edges, lichen rosettes on the high dry stones, dark
+    ash in the joints. Returns colour (already lit by the moon on its small forms), height, joints."""
+    path = np.clip((fbm(px * 0.3 + 7, py * 0.3) - 0.45) * 4, 0, 1)        # where feet went, long ago
+    e = 0.025
+    h, I = _stone(qa, qp, px, py, seed, heave, path)
+    hx, _ = _stone(qa + e, qp, px + e, py, seed, heave, path)
+    hy, _ = _stone(qa, qp + e, px, py + e, seed, heave, path)
+    n = np.dstack([-(hx - h) / e, -(hy - h) / e, np.ones(h.shape)])
+    n = n / np.linalg.norm(n, axis=2, keepdims=True)
+    flat = max(float(moon[2]), 0.1)
+    ndl = np.clip((n * moon).sum(2), 0, 1)
+    shade = np.clip((0.3 + ndl) / (0.3 + flat), 0.35, 1.7)
+    sid, va, vb, A, B = I["sid"], I["va"], I["vb"], I["A"], I["B"]
+    fam = STONE_FAMILY[(h1(sid, 11, seed) * 4).astype(int) % 4]
+    col = fam * (0.82 + h1(sid, 12, seed)[..., None] * 0.3)
+    ang = h1(sid, 33, seed) * np.pi
+    bedc = (va * A * np.cos(ang) + vb * B * np.sin(ang))
+    bedl = np.sin(bedc * (9 + h1(sid, 34, seed) * 10) + vn(bedc * 2, h1(sid, 35, seed) * 9) * 3)
+    col = col * (1 + bedl[..., None] * 0.035)                             # bedding lines across the slab
+    rust = (h1(sid, 11, seed) * 4).astype(int) % 4 == 2
+    col = np.where((rust & (bedl > 0.6))[..., None], col * np.array([1.06, 0.96, 0.86]), col)
+    col = col * (1 + path[..., None] * 0.09)                             # worn paler on the path
+    tool = (path < 0.2) & (h1(sid, 36, seed) > 0.45) & (np.sin((va * A + vb * B) * 55) > 0.82)
+    col = np.where(tool[..., None], col * 0.93, col)                     # tooling, surviving off the path
+    col = np.where(I["spall"][..., None], col * 1.12 + 0.01, col)       # fresh stone in the spalls
+    low = np.clip(1 - (I["ed"] - I["gap"]) / 0.14, 0, 1) * (I["settle"] < 0)
+    col = col * (1 - low[..., None] * np.array([0.25, 0.28, 0.3]))       # grime gathered at the low edges
+    lich = (I["settle"] > 0.01) & (path < 0.15) & (h1(sid, 37, seed) > 0.6)
+    lc = cells(px, py, 0.35, seed + 50, 1.0)
+    rosette = lich & (lc[0] < 0.04 + h1(lc[2], 1, seed) * 0.06) & (h1(lc[2], 2, seed) > 0.5)
+    col = np.where(rosette[..., None], _mix(col, LICHEN, np.where(lc[0] < 0.02, 0.4, 0.75)), col)
+    wet = (I["dish"] > 0.02) & (fbm(px * 0.8 + 3, py * 0.8) > 0.5)
+    col = np.where(wet[..., None], col * 0.68, col)                     # water lying in the dishes
+    grain = (vn(px * 26 + seed, py * 26) - 0.5) * 0.05 * (1 - path)
+    col = col * (1 + grain[..., None]) * shade[..., None]
+    hv_ = (n + np.array([0.7, 0.7, 0.6])) / 1.0
+    hv_ = (moon + np.array([0.62, 0.62, 0.48]))
+    hv_ = hv_ / np.linalg.norm(hv_)
+    spec = np.clip((n * hv_).sum(2), 0, 1) ** 60
+    col = col + np.where(wet, spec * 0.35 + 0.02, spec * 0.03)[..., None] * np.array([0.8, 0.85, 0.95])
+    cr = I["crack"]
+    col = np.where(cr[..., None], col * 0.3, col)
     a_ = ash(px, py, seed + 3)
-    col = np.where(sunk[..., None], _mix(col * 0.8, a_, np.clip(vn(px * 3, py * 3) * 1.2 - 0.1, 0, 1)), col)
-    col = np.where(gone[..., None], a_ * 0.82, col)
-    jc = _mix(ASH_DARK * 1.2, a_ * 0.75, vn(px * 5, py * 5))
-    col = np.where((joint & ~gone)[..., None], jc, col)
-    height = np.where(joint | gone, -0.04, np.where(sunk, -0.03, rise * 0.1))
-    return np.clip(col, 0, 1), height
+    col = np.where(I["sunk"][..., None], _mix(col, a_, np.clip(vn(px * 3, py * 3) * 1.2 - 0.2, 0, 1)), col)
+    col = np.where(I["gone"][..., None], a_ * 0.8, col)
+    jd = np.clip(1 - I["ed"] / np.maximum(I["gap"], 1e-3), 0, 1)
+    jc = _mix(a_ * 0.55, ASH_DARK * 0.55, jd)
+    col = np.where((I["joint"] & ~I["gone"])[..., None], jc, col)
+    return np.clip(col, 0, 1), h, I["joint"] & ~I["gone"]
 
 
 SKIN = np.array([0.36, 0.12, 0.14])

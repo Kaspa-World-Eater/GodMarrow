@@ -655,3 +655,5 @@ softened.
 
   Proved by A*: a path from the hero round the log and behind the plate (`wood_collision.py`). A bug on the way: the
   heap held cost + guess, and treating that as the cost so far rejected every node after the first.
+
+## Round 14 onward: see chapters/ (chapters/README.md is the index; Round 14 is chapter 1, detail and nuance)

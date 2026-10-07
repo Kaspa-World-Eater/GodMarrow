@@ -177,3 +177,18 @@ Worst first: the pool, the floating vein, the light.
     light thrown up into the shade); growth lines only in the light; stain only down grooves and keel.
 52. The fangs quieter: crazing few and long, growth lines faint, the dither only right at tone borders; broad tones carry the form.
    Graded (51-52): the fangs read as painted ivory: broad light, a firm turn, warm reflected light in the shade, each broken its own way. Still to do: their shade side a little flat; snapped caps could be rougher.
+   RULES CHECK (reminder, 52): rules and lore re-read. The ground graded: the ash flat dirty concrete with too many
+   black cinder dots and no form; the flags pale smeared slabs, no stone readable; the flesh still glittering by
+   the socket. Worst: the ash and the flags.
+53. The ash given form: drifts and wind ripples lit on the moon's side and shaded on the far side, the crests lit;
+    cinders a quarter as many.
+54. Each flagstone reads: a bright lip on its moonward edges, a dark fall on its near and right edges; the stone
+    darker and more varied, worn paler where feet went long ago.
+   Graded (53-54): the ash has form (drifts lit, few cinders); the flags still smeared: pale joints, a thin ash wash over too much.
+55. The flags' joints darker and a little wider, packed with old ash; the drift over the yard pulled back, its thin edge narrower.
+   Derek: "The ground looks pretty bad still". Why: the flags ran square to the screen, so in this camera they
+   read as a brick wall painted flat; the flesh one same-sized net everywhere, no big shapes; no transitions, only
+   hard cut-outs. Plan: A the flags re-laid; B the edges feathered; C the flesh in big folds.
+56. The flags laid on the world's own axes (diamonds in this camera: a floor); near the flesh the stones heave,
+    tip and crack, and the flesh comes up through their joints first.
+57. The paving rebuilt as real form (STUDY chapter 1): each slab its own height (settle, tip, proud edges), arrises round on the path and sharp off it, dished by wear with water lying, spalls, offset cracks; lit through its own normals; colour from the same causes (bed, path, tooling, grime, lichen, wet). Better, still far from real. Derek ordered real-world studies first (chapters 02, 03).

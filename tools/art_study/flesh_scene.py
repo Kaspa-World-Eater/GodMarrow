@@ -214,6 +214,7 @@ def stamp(W, w):
     spread = np.maximum(spread, np.clip(r, 0, 1) * 0.8)                   # the swell itself: flesh
     spread = spread + (fbm(X * 0.8, Y * 0.8) - 0.5) * 0.5
     W["putrid"] = spread > 0.15
+    W["fdist"] = nd.distance_transform_edt(~W["putrid"]) * ws.RES        # yards to the nearest flesh
     W["thread"] = (spread > -0.08) & (spread <= 0.15)                       # a narrow band where it creeps into the ash
     e = ((X - POOL[0][0]) / POOL[1]) ** 2 + ((Y - POOL[0][1]) / POOL[2]) ** 2
     W["pool"] = (e + (vn(X * 3, Y * 3) - 0.5) * 0.3) < 1
@@ -235,12 +236,15 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     qa = (px - C[0]) * AX[0] + (py - C[1]) * AX[1]
     qp = (px - C[0]) * PERP[0] + (py - C[1]) * PERP[1]
     yard = (np.abs(qp) < YARD[0] + (vn(qa * 0.5, 3) - 0.5) * 1.6) & (qa > YARD[1]) & (qa < YARD[2])
-    fcol, fh = groundgen.flags(qa, qp, px, py, seed=2)
-    drift = fbm(px * 0.45, py * 0.45) > 0.6 - np.clip(np.abs(qp) - 4.5, 0, 3) * 0.08   # ash drifted over the flags
+    fd = ws.look(W, W["fdist"], px, py)
+    heave = np.clip(1 - fd / 2.2, 0, 1) ** 1.5                            # the flesh pushing up under the stones
+    fcol, fh, fj = groundgen.flags(px - C[0] + 0.37, py - C[1] + 0.81, px, py, seed=2, heave=heave, moon=ws.SUN)
+    pcol0, _ = groundgen.flesh(px, py, seed=1, moon=ws.SUN)
+    fcol = np.where((fj & (heave > 0.12 + (vn(px * 2, py * 2) - 0.5) * 0.3))[..., None], pcol0 * 0.8, fcol)   # flesh in the joints
+    drift = fbm(px * 0.45, py * 0.45) > 0.67 - np.clip(np.abs(qp) - 4.5, 0, 3) * 0.08  # ash drifted over the flags
     lay = yard & ~drift
-    k = np.where(lay[..., None], k * (1 + fh[..., None] * 2.5), k)
     alb = np.where(lay[..., None], fcol, alb)
-    edge_ = yard & drift & (fbm(px * 0.45, py * 0.45) < 0.66 - np.clip(np.abs(qp) - 4.5, 0, 3) * 0.08)
+    edge_ = yard & drift & (fbm(px * 0.45, py * 0.45) < 0.69 - np.clip(np.abs(qp) - 4.5, 0, 3) * 0.08)
     alb = np.where(edge_[..., None], alb * 0.6 + fcol * 0.4, alb)              # the stones showing through thin ash
     pm = ws.look(W, W["putrid"], px, py) > 0
     pcol, pwet = groundgen.flesh(px, py, seed=1, moon=ws.SUN)
