@@ -40,3 +40,29 @@ Brief in ruin_scene.py's header, from the Hollow Wood's lore (the hunter's accou
    Graded: stripe persists. Measured (normals, facing, cord mask per pixel): on a 0.31 yd trunk a cord is 5 px wide
    across its face, the giants' vein width on a thin tree: a fat dark band, not a vein.
 10. Shared bark: vein width in proportion to the trunk (r / 0.9, 0.3..1.2).
+   Derek: "the hero is standing through the ground and rock that he should be walking on, so if it curves, he must
+   follow along. The stone needs more work." Five refinements asked for.
+11. The hero stands on the highest surface within his footprint (stand_height), and the surface he stands on (within
+    his footprint, no higher than his soles) never hides him; the engine's rule, so every scene keeps it.
+   Graded: he stands on the surface. Stone FAIL: walls read as modern brick (equal blocks, regular half-bond, clean
+   edges, every block one tone).
+12. Ancient ashlar: even courses but blocks of many lengths with joints where they fell; edges worn round; each block
+    its own stone, warmer or cooler; spalled faces; water stains running down from the broken tops; lichen rosettes
+    (grey-green, a few rust) on the moonward faces.
+   Graded: blocks differ (tone, temperature, stains, lichen, spalls). FAIL: bed joints dark and identical every course
+   (striped); vertical joints barely read; the piers plain drums.
+13. Joints softened and broken where mortar is gone, vertical joints wider; the piers as architecture: square plinth,
+    round moulding, a fluted shaft of drums (twelve flutes), the top sheared on one tilted plane with a paler rough
+    fracture.
+   Graded: piers read as architecture (plinth, moulding, fluted drums, plane-sheared tops); joints no longer stripe.
+   FAIL: the nave floor a perfect evenly lit grid, and (Derek's new rule) not a game tile.
+14. The church floor as a game tile (tools/art_study/tiles_ruin.py, church_flags, seamless 320x160): flags 0.89 yd
+    dividing the iso period exactly, each its own stone and temperature, some laid double, broad trodden wear, cracks
+    with lit lips, sunk damp flags, now and then one gone to earth, moss in the joints, leaves drifted. The scene lays
+    it under its own light; the wood's ground set takes it as its flags (build_set.py).
+   Derek: "he still looks like he's going through the stone mound because it's become transparent." Measured: he
+   stood astride a step's edge (half his footprint on the step top at 0.34, half over ground falling to -0.14); the
+   max height lifted him over thin air, and not hiding anything below his soles made the step look transparent.
+15. A body stands on one whole level surface (engine rule settle_hero): if the footprint straddles an edge he takes
+    the nearest level spot within half a yard; he stands at its median height; only that surface is kept from
+    hiding him.

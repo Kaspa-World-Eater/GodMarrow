@@ -113,6 +113,9 @@ def stone_value(v, a, b, c):
     return (np.sin(a * 12.9898 + b * 78.233 + c * 37.719) * 43758.5453) % 1.0
 
 
+_TILES = {}
+
+
 def paint_ruin(img, m, v, n, px, py, pz, o, W, L):
     side = L["side"]
     lx, ly = to_local(px, py)
@@ -123,25 +126,48 @@ def paint_ruin(img, m, v, n, px, py, pz, o, W, L):
     top_h = FR.at(FR.H, lx, ly, 0.0)
     bay = ws.tw.B4[(np.arange(m.shape[0])[:, None] % 4), (np.arange(m.shape[1])[None, :] % 4)]
     sv = np.minimum(v * 0.95 + 0.04, 0.74)                               # stone keeps its coursing even in the lantern's glare
-    # ---- walls: courses and blocks in the wall's own coordinates
+    # ---- walls: ancient ashlar in the wall's own coordinates. Courses even (the masons kept their levels), but each
+    # block its own length and its joints where they fell; edges worn round by centuries; each block its own stone,
+    # warmer or cooler; some faces spalled where the skin fell away; water stains running down from the broken tops;
+    # lichen blooming on the faces the moon finds
     wall = m & (RU == ruin.BLOCK)
     course = np.floor(h / ruin.COURSE)
-    stag = (course % 2) * 0.47
-    blen = 0.86 + stone_value(0, course, wid, 1) * 0.2
-    bu = (U + stag) / blen
-    bi = np.floor(bu)
-    fu, fh = bu - bi, h / ruin.COURSE - course
-    jit = (stone_value(0, bi, course, wid) - 0.5) * 0.12
-    joint = (fu < 0.06) | (fu > 0.97) | (fh < 0.1)
-    chamfer_lit = fh > 0.86
-    chamfer_dk = (fh < 0.2) & ~joint
-    chip = (vn(U * 9 + course, h * 9) > 0.8) & ((fu < 0.18) | (fu > 0.85)) & ((fh > 0.7) | (fh < 0.3))
-    tex = (vn(U * 6, h * 6) - 0.5) * 0.05 + (vn(U * 20, h * 20) - 0.5) * 0.025   # the stone's own grain, quiet
-    wv = sv + jit + tex + chamfer_lit * 0.06 - chamfer_dk * 0.05 - chip * 0.08
+    fh = h / ruin.COURSE - course
+    # block joints: a run of lengths per course, from a hashed walk along it (0.55..1.5 yd)
+    cu = U + stone_value(0, course, wid, 3) * 1.7                      # each course starts its run elsewhere
+    seg = np.floor(cu / 0.52)
+    starts = (stone_value(0, seg, course, 23) > 0.42)                 # where a joint falls
+    fseg = cu / 0.52 - seg
+    joint_v = starts & (fseg < 0.13)
+    bid = np.where(starts, seg, seg - 1) + course * 131 + wid * 977
+    jit = (stone_value(0, bid, 1, 1) - 0.5) * 0.14
+    warm = stone_value(0, bid, 2, 5)                                  # some blocks warmer, some colder
+    edge_round = np.clip(1 - np.minimum(fh, 1 - fh) / 0.16, 0, 1) ** 2  # worn edges darken toward the joint
+    joint_h = fh < 0.08 + (vn(U * 6, course) - 0.5) * 0.06            # the bed joint, uneven where mortar fell out
+    joint = joint_h | joint_v
+    spall = (stone_value(0, bid, 3, 9) > 0.86) & (vn(U * 5, h * 5) > 0.45)   # the skin fallen off a face
+    tex = (vn(U * 6, h * 6) - 0.5) * 0.05 + (vn(U * 20, h * 20) - 0.5) * 0.03
+    pits = (vn(U * 34, h * 34) > 0.86) * -0.06
+    wv = sv + jit + tex + pits - edge_round * 0.07 + (fh > 0.84) * 0.05 - spall * 0.09
     face = wall & side
-    img[face] = R_STONE[np.clip((wv * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][face]
-    jm = face & joint
-    img[jm] = R_STONE[np.clip(((sv - 0.22) * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][jm]   # pigment pooled in the joint
+    idx = np.clip((wv * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)
+    col = R_STONE[idx]
+    col = col * np.where((warm > 0.66)[..., None], np.array([1.05, 1.0, 0.93]), np.where((warm < 0.25)[..., None], np.array([0.94, 0.98, 1.06]), 1.0))
+    img[face] = col[face]
+    jm = face & (joint_h | joint_v)
+    jm = jm & ~(joint_h & (vn(U * 4 + course, course * 1.3) > 0.62))  # where the mortar has gone the courses run together
+    img[jm] = R_STONE[np.clip(((sv - 0.17) * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][jm]   # pigment pooled in the joint
+    spl = face & spall & (fh < 0.22) & ~jm                           # a spall's lower lip catches the light
+    img[spl] = np.minimum(img[spl] * 1.15, 1)
+    # water stains: dark streaks running down from the broken tops, where rain has run for centuries
+    stain = face & (vn(U * 7.5 + wid, 0.5) > 0.62) & ((top_h - h) < 0.6 + vn(U * 3, 2) * 2.6) & (vn(U * 7.5 + wid, h * 0.35) > 0.4)
+    img[stain] = img[stain] * np.array([0.82, 0.84, 0.86])
+    # lichen on the faces the moon finds: pale grey-green rosettes, a few rust ones
+    lit_f = np.clip(n[..., 0] * ws.SUN[0] + n[..., 1] * ws.SUN[1], 0, 1)
+    lich = face & (lit_f > 0.25) & (vn(U * 11 + 3, h * 11) > 0.84) & ~jm
+    img[lich] = img[lich] * 0.55 + np.array([0.46, 0.5, 0.42]) * 0.45
+    rust = face & (lit_f > 0.25) & (vn(U * 13 + 9, h * 13 + 4) > 0.9) & ~jm
+    img[rust] = img[rust] * 0.5 + np.array([0.55, 0.36, 0.18]) * 0.5
     # the wall tops: rubble core under a cap of moss
     tops = wall & ~side & (vn(px * 4 + 2, py * 4) > 0.38)               # moss in patches on the broken tops, not a cap
     img[wall & ~side] = R_STONE[np.clip(((sv - 0.04 + (vn(px * 12, py * 12) - 0.5) * 0.1) * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][wall & ~side]
@@ -170,25 +196,42 @@ def paint_ruin(img, m, v, n, px, py, pz, o, W, L):
     img[stem & ~leaf] = R_IVY[1]
     # ---- the piers: drums with their joints, flutes on the face, moss at the foot
     pier = m & (RU == ruin.PIER)
-    drum = np.floor(h / 0.62)
-    pj = (h / 0.62 - drum) < 0.08
-    pv = sv + (stone_value(0, drum, np.floor(lx * 3), 3) - 0.5) * 0.08 + (vn(lx * 20, h * 8) - 0.5) * 0.04
+    # which pier, and where round it: the flutes are cut in its own frame
+    pcx = np.zeros(lx.shape)
+    pcy = np.zeros(lx.shape)
+    best = np.full(lx.shape, 9.0)
+    for (cx_, cy_, r_, tall_) in FI["piers"]:
+        d_ = np.hypot(lx - cx_, ly - cy_)
+        nb = d_ < best
+        best = np.where(nb, d_, best)
+        pcx, pcy = np.where(nb, cx_, pcx), np.where(nb, cy_, pcy)
+    pang = np.arctan2(ly - pcy, lx - pcx)
+    shaft = pier & (best < 0.52) & (h > 0.62)
+    drum = np.floor((h - 0.62) / 0.7)
+    pj = shaft & (((h - 0.62) / 0.7 - drum) < 0.07)
+    flute = shaft & (np.cos(pang * 12) > 0.55)                        # twelve flutes: each groove turned from the light
+    pv = sv + (stone_value(0, drum, pcx * 7 + pcy, 3) - 0.5) * 0.08 + (vn(pang * 3, h * 6) - 0.5) * 0.04
+    pv = pv - flute * 0.1 + (shaft & (np.cos(pang * 12) < -0.6)) * 0.04
     img[pier] = R_STONE[np.clip((pv * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][pier]
-    img[pier & pj & side] = R_STONE[1]
-    pm = pier & (~side | (h < 0.5 + vn(lx * 8, ly * 8) * 0.4))
+    img[pj & side] = R_STONE[np.clip(((sv - 0.17) * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][pj & side]
+    frac = pier & ~side & (best < 0.52) & (h > 0.7)                    # the fracture: fresher, paler stone, rough
+    img[frac] = R_STONE[np.clip(((v + 0.08 + (vn(lx * 30, ly * 30) - 0.5) * 0.12) * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][frac]
+    plin = pier & (best >= 0.52) & side                                 # the plinth's faces: one block each, worn
+    img[plin] = R_STONE[np.clip(((sv - 0.04 + (vn(lx * 8, h * 8) - 0.5) * 0.08) * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][plin]
+    pm = pier & ((~side & ~frac & (vn(lx * 9, ly * 9) > 0.35)) | (side & (h < 0.3 + vn(lx * 8, ly * 8) * 0.35)))
     img[pm] = R_MOSSW[np.clip(((v * 0.85) * len(R_MOSSW)).astype(int), 0, len(R_MOSSW) - 1)][pm]
-    # ---- the nave floor: flags with dark joints filled with moss, some lifted, cracked
+    # ---- the nave floor: the game's own church-floor tile (tiles_ruin.church_flags), laid where the world puts it
+    # (its screen position on the ground plane) and lit by this scene's moon, lantern and candle
     flag = m & (RU == ruin.FLAG)
-    fx_, fy_ = (lx + 50) / 0.62, (ly + 50) / 0.62
-    fi, fj = np.floor(fx_), np.floor(fy_)
-    ffu, ffv = fx_ - fi, fy_ - fj
-    fjnt = (ffu < 0.08) | (ffv < 0.08)
-    fvv = sv * 0.9 + (stone_value(0, fi, fj, 5) - 0.5) * 0.12 + (vn(lx * 12, ly * 12) - 0.5) * 0.04
-    img[flag] = R_STONE[np.clip((fvv * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][flag]
-    jfill = flag & fjnt
-    img[jfill] = R_MOSSW[np.clip(((v * 0.75) * len(R_MOSSW)).astype(int), 0, len(R_MOSSW) - 1)][jfill]
-    crack = flag & (np.abs(np.sin(lx * 3.1 + vn(ly * 2, 1) * 4) * 0.3 - (ly - fj * 0.62 + 50 - 0.31)) < 0.02) & (stone_value(0, fi, fj, 11) > 0.7)
-    img[crack] = R_STONE[1]
+    if "flags" not in _TILES:
+        import tiles_ruin
+        _TILES["flags"] = tiles_ruin.church_flags(seed=0)[0]
+    T_ = _TILES["flags"]
+    gx_s = ((px - py) * ws.KX) % T_.shape[1]
+    gy_s = ((px + py) * ws.KY) % T_.shape[0]
+    alb = T_[gy_s.astype(int) % T_.shape[0], gx_s.astype(int) % T_.shape[1]]
+    lightk = np.clip(0.5 + v * 1.05, 0.35, 1.45)
+    img[flag] = np.clip(alb[flag] * lightk[flag][:, None], 0, 1)
     # ---- steps, altar, fallen stones
     for mat_, darker in ((ruin.STEP, -0.02), (ruin.ALTAR, 0.0), (ruin.RUBBLE, -0.04)):
         mm = m & (RU == mat_)

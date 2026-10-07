@@ -547,6 +547,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
 
     LDEP = np.full((GH, GW), -1e9)
     _LIVE["ldep"] = LDEP
+    _LIVE["pz"] = pz
 
     def put(sx, sy, col, depth):
         i, j = int(sy), int(sx)
@@ -892,6 +893,34 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     return np.clip(img, 0, 1)
 
 
+def _footprint(W, x, y):
+    fa = np.linspace(0, 2 * np.pi, 12, endpoint=False)
+    return look(W, W["H"], np.concatenate([[x], x + np.cos(fa) * 0.22]), np.concatenate([[y], y + np.sin(fa) * 0.22]))
+
+
+def settle_hero(W):
+    """a body stands on one whole surface, never astride a ledge: if his footprint straddles an edge (a step, a stone,
+    a bank), he takes the nearest level spot within half a yard, wholly on the step or wholly on the ground"""
+    global HERO
+    best, bd = None, 9.0
+    for r in np.arange(0.0, 0.55, 0.05):
+        for a in np.linspace(0, 2 * np.pi, max(1, int(r * 40)), endpoint=False):
+            x, y = HERO[0] + np.cos(a) * r, HERO[1] + np.sin(a) * r
+            h = _footprint(W, x, y)
+            if np.ptp(h) < 0.06 and r < bd:
+                best, bd = (x, y), r
+        if best is not None:
+            break
+    if best is not None:
+        HERO = np.array(best)
+
+
+def stand_height(W):
+    """he stands ON the surface under him, following it as it rises and falls (settle_hero has put him on one whole
+    surface)"""
+    return float(np.median(_footprint(W, HERO[0], HERO[1])))
+
+
 def the_ossuarch(big, W, px, py, anim="idle/front_l/0"):
     """the game's own Ossuarch (art/sprites/ossuarch_hd), drawn as the game draws a hero: at screen resolution, the
     sheet scaled by Iso.FIG (0.78), his foot on his tile; hidden wherever something nearer the camera stands"""
@@ -908,7 +937,7 @@ def the_ossuarch(big, W, px, py, anim="idle/front_l/0"):
     nfr = nfr.resize(fr.size, Image.NEAREST)
     ox = GW / 2 - (FOCUS[0] - FOCUS[1]) * KX
     oy = GH / 2 - (FOCUS[0] + FOCUS[1]) * KY
-    hz = float(look(W, W["H"], np.array(HERO[0]), np.array(HERO[1])))
+    hz = stand_height(W)
     fx = ((HERO[0] - HERO[1]) * KX + ox) * 4
     fy = ((HERO[0] + HERO[1]) * KY + oy - hz * KZ) * 4
     X0, Y0 = int(fx + dx * k), int(fy + dy * k)
@@ -927,6 +956,9 @@ def the_ossuarch(big, W, px, py, anim="idle/front_l/0"):
     dep = (px + py)
     hd = HERO[0] + HERO[1]
     front = dep > hd + 0.35
+    if "pz" in _LIVE:                                                   # what he stands on never hides him
+        under = (np.hypot(px - HERO[0], py - HERO[1]) < 0.3) & (np.abs(_LIVE["pz"] - hz) < 0.06)   # only the surface he is on
+        front &= ~under
     if "ldep" in _LIVE:
         front |= _LIVE["ldep"] > hd + 0.05                                  # grass and ferns standing nearer than his feet
     nearer = np.kron(front, np.ones((4, 4))).astype(bool)
@@ -954,7 +986,7 @@ def the_ossuarch(big, W, px, py, anim="idle/front_l/0"):
 def hero_at(img, W, px, py):
     ox = GW / 2 - (FOCUS[0] - FOCUS[1]) * KX
     oy = GH / 2 - (FOCUS[0] + FOCUS[1]) * KY
-    hz = float(look(W, W["H"], np.array(HERO[0]), np.array(HERO[1])))
+    hz = stand_height(W)
     hx = (HERO[0] - HERO[1]) * KX + ox
     hy = (HERO[0] + HERO[1]) * KY + oy - hz * KZ
     SY, SX = np.mgrid[0:GH, 0:GW].astype(float)
@@ -977,6 +1009,7 @@ def animate(out, n=24):
     W = build(w)
     for f in BUILD_HOOKS:
         f(W, w)
+    settle_hero(W)
     px, py, pz, SX, SY = cast(W)
     globals()["w"] = w
     frames = []
@@ -1000,6 +1033,7 @@ def main(out):
     W = build(w)
     for f in BUILD_HOOKS:
         f(W, w)
+    settle_hero(W)
     px, py, pz, SX, SY = cast(W)
     L = shade(W, px, py, pz, SX, SY)
     globals()["w"] = w

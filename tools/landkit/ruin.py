@@ -73,14 +73,22 @@ def chapel(seed=1, length=15.0, width=9.0, thick=1.1, full=(6.5, 8.5, 7.5, 9.0))
             cx, cy = -hx + length * (0.22 + j * 0.19), side * (hy - 2.2)
             r = 0.5
             tall = (side == 1 and j == 1)
-            top = (8.5 if tall else rr.uniform(0.8, 4.2)) - (fbm(X * 3 + j, Y * 3 + side) - 0.3) * 0.6
+            h0 = 8.5 if tall else rr.uniform(0.8, 4.2)
+            # stone breaks on a plane: the top sheared off at a tilt, a little rough along the fracture
+            ta = rr.uniform(0, 2 * np.pi)
+            tilt = rr.uniform(0.35, 0.9)
+            top = h0 + ((X - cx) * np.cos(ta) + (Y - cy) * np.sin(ta)) * tilt + (vn((X - cx) * 9 + j, (Y - cy) * 9) - 0.5) * 0.08
             d = np.hypot(X - cx, Y - cy)
             m = d < r
             H = np.where(m, np.maximum(H, top), H)
             M = np.where(m, PIER, M)
-            base = (d < r + 0.2) & ~m & inside
-            H = np.where(base, np.maximum(H, 0.32), H)
-            M = np.where(base, PIER, M)
+            # its foot: a square plinth half a yard high, a round moulding on it
+            plinth = (np.maximum(np.abs(X - cx), np.abs(Y - cy)) < r + 0.24) & ~m
+            H = np.where(plinth, np.maximum(H, 0.5), H)
+            M = np.where(plinth, PIER, M)
+            torus = (d < r + 0.11) & ~m
+            H = np.where(torus, np.maximum(H, 0.5 + np.sqrt(np.clip(0.11 ** 2 - (d - r) ** 2, 0, None)) * 1.4), H)
+            M = np.where(torus, PIER, M)
             piers.append((cx, cy, r, tall))
     # the altar: one long block at the east end, its top split
     alt = (np.abs(X - (hx - 1.8)) < 0.5) & (np.abs(Y) < 1.2)            # an altar a yard high, a man's reach
