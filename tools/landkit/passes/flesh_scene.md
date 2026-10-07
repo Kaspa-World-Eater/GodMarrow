@@ -338,3 +338,5 @@ Worst first: the pool, the floating vein, the light.
    RULES CHECK (reminder, 97): rules and lore re-read. Worst (Derek): the eye still set on top of the ground.
 98. The eye sunk lower, the rolls round its foot higher, the near crest over its lower lid: it rises out of the ground.
    Graded (98): the eye comes up out of the ground: the near roll covers its lower lid, it looks up from within the folds; the near roll dark (turned from the moon).
+99. The rib's bone as form: low ridges along it where muscle once held, weathering cracks along the grain cut in as grooves; light adds (the fires and the ember glow raise it), then tints.
+   Graded (99): the rib's form is real now, but it hangs ~4.5 yd up above the fires' reach with its face turned from the passage's glow, so it stays a dark silhouette band. Needs a light that reaches it (a rim from the ember glow behind) to read.

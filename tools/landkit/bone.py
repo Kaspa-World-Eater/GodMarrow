@@ -63,6 +63,10 @@ def _tube(P, o):
     tan = AB / np.sqrt(L2)[:, None]
     along = np.abs((off * tan[None]).sum(-1))                           # past a segment's end: count it
     d = np.maximum((np.hypot(ob / ra, on / rb) - 1) * np.minimum(ra, rb), along)
+    thx = np.arctan2(on, ob)                                              # FORM IS LAW: bone's own surface as geometry
+    kx = np.arange(len(A))[None] + t
+    d = d - 0.018 * np.cos(thx * 3 + kx * 0.25) * np.minimum(ra, rb) / 0.35     # low ridges along it, where muscle held
+    d = d + 0.014 * (np.abs(vn(thx * 3 + o['seed'], kx * 1.6) - 0.5) < 0.05)     # weathering cracks along the grain, cut in
     i = np.argmin(d, axis=1)
     j = np.arange(len(i))
     return (d[j, i].reshape(sh), s[j, i].reshape(sh), np.arctan2(on[j, i], ob[j, i]).reshape(sh))
@@ -176,7 +180,8 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ambient=0.15, tol=0.5)
             warm += (np.clip((N * (v_ / dist[:, None])).sum(-1), 0, 1) * att)[:, None] * np.array(lc) * 0.8
         # cavities darken (orbits, nose, the underside): ambient occlusion from the distance a little way out
         occ = np.clip(sdf(Pv + N * 0.12, o) / 0.12, 0, 1)
-        val = val * (0.55 + 0.45 * occ)
+        wl = warm.mean(1)
+        val = (val + np.clip(wl, 0, 0.5) * 0.6) * (0.55 + 0.45 * occ)          # light adds, then tints
         yx = (ys[vis], xs[vis])
         bay = BAYER[yx[0] % 4, yx[1] % 4]
         q = val * len(R_BONE)
@@ -199,7 +204,7 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ambient=0.15, tol=0.5)
             col = np.where(sin_[:, None], SINEW * (0.55 + val[:, None] * 0.9) * (0.8 + (np.sin(th * 30 + s * 200) > 0)[:, None] * 0.35), col)
             seep = (ends < 0.2) & (vn(th * 4 + 9, s * 30) > 0.58) & ~sin_ & (N[:, 2] < 0.4)
             col = np.where(seep[:, None], col * np.array([0.6, 0.35, 0.3]), col)
-        col = col * (1 + warm * 1.3) + spec[:, None]
+        col = col * (1 + (warm - wl[:, None]) * 0.8) + spec[:, None]
         rim = (np.clip(1 - N @ VIEW, 0, 1) ** 3) * (N[:, 0] < 0) * sk
         col = col + rim[:, None] * np.array([0.1, 0.11, 0.13])
         img[yx] = np.clip(col, 0, 1)
