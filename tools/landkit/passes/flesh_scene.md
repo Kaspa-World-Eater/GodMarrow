@@ -309,3 +309,12 @@ Worst first: the pool, the floating vein, the light.
 88. Removed: the stalagmites, the wall's broken stump (its rubble kept), every fang (fang.py kept as an asset), the fallen drums and their capital (column.py kept), the cloud (the beam's glow in the air, the mist, the distance haze; the dust motes and the grade kept). Rubble and debris along the vein where it broke the floor up.
    Derek: "remove the other rock pillar, and the broken pillar. remove all the teeth. remove the cloud stuff. the rubble and debris is fine, maybe some more of that around the vein. then do another study on stone and caves, because it looks cartoony ... not using enough pixels"; "remove the drums too"; "is it a static scene or game tiles?"; "it's 1 dimensional, there's no depth, no 3D ... why do these tiles look so different and low pixel count".
 88. Removed: the stalagmites, the wall's broken stump (its rubble kept), every fang (fang.py kept), the fallen drums and capital (column.py kept), the cloud (the beam's glow in the air, the mist, the distance haze). Rubble and debris along the vein.
+   RULES CHECK (reminder, 88): MASTER_RULES now with section 0, FORM IS LAW. The floor fails it: the paving's height and
+   the flesh's lumps stopped at the colour; the world's height a smooth sheet.
+89. FORM IS LAW applied to the floor: every paving stone's real height (dome, tilt, proud edge, joints, cracks, sunk and
+    gone stones) and the flesh's (a swell rising through its cracks, each lump a dome, creases sunk) put into the
+    world's height field, so the moon and the lamps light it and it casts and catches shadow; the generators no
+    longer shade themselves (selfshade off), the renderer's light does it from the form.
+   Graded (89): 3D at last (lit tops, shaded sides, stones casting on their neighbours, the flesh sunk dark between) but over-heaved: the cracks run everywhere, so every stone tipped: a boulder field, not a courtyard.
+90. The relief gentler; the heave only near the god's own parts (eye, vein, pool), a little lift at the cracks' edges.
+   Graded (90): an old paved courtyard with real depth: worn stones lit on their tops with soft shadows between, the god's flesh swelling up out of the cracks as raised ridges catching the lantern. The form reads.

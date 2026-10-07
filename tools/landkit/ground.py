@@ -300,7 +300,15 @@ def _poly(px, py, seed, heave, path):
                    cx=cx, cy=cy, wx=wx, wy=wy)
 
 
-def paving_poly(px, py, seed=0, heave=None, path=None, moon=np.array([-0.62, 0.22, 0.75])):
+def paving_height(px, py, seed=0, heave=None, path=None):
+    """the paving's real height in yards, for the world's height field (MASTER_RULES section 0)"""
+    hv = np.zeros(px.shape) if heave is None else heave
+    pth = np.zeros(px.shape) if path is None else path
+    h, I = _poly(px, py, seed, hv, pth)
+    return h, I
+
+
+def paving_poly(px, py, seed=0, heave=None, path=None, moon=np.array([-0.62, 0.22, 0.75]), selfshade=True):
     """dark basalt polygon paving, built from chapter 2: pillowed stones, hairline joints packed with pale ash, the old
     processional way polished paler and bluer and catching the moon, the weathered rind warm on stones off the way,
     sparse vesicle pits, rare lichen on the high dry stones; where the flesh heaves under, the stones lift and tip
@@ -314,7 +322,7 @@ def paving_poly(px, py, seed=0, heave=None, path=None, moon=np.array([-0.62, 0.2
     n = np.dstack([-(hx - h) / e, -(hy - h) / e, np.ones(h.shape)])
     n = n / np.linalg.norm(n, axis=2, keepdims=True)
     ndl = np.clip((n * moon).sum(2), 0, 1)
-    shade = np.clip((0.25 + ndl) / (0.25 + max(float(moon[2]), 0.1)), 0.3, 1.8)
+    shade = np.clip((0.25 + ndl) / (0.25 + max(float(moon[2]), 0.1)), 0.3, 1.8) if selfshade else np.ones(px.shape)
     cid = I["cid"]
     tone = 0.8 + h1(cid, 8, seed) * 0.38
     kind = h1(cid, 22, seed)
@@ -361,7 +369,18 @@ CREASE = np.array([0.1, 0.02, 0.04])
 VEIN = np.array([0.2, 0.05, 0.13])
 
 
-def flesh(px, py, seed=0, moon=np.array([-0.62, 0.22, 0.75])):
+def flesh_height(px, py, seed=1):
+    """the flesh's real lumps (yards): each a dome, the larger folds' creases sunk"""
+    f1, f2, cid, cx, cy = cells(px, py, 0.5 + vn(px * 0.3, py * 0.3) * 0.3, seed + 3, 0.9)
+    rad = (f1 + f2) * 0.5 + 1e-4
+    t = np.clip(f1 / rad, 0, 1)
+    dome = np.sqrt(np.clip(1 - t * t, 0, 1)) * (0.05 + h1(cid, 6, seed) * 0.05)
+    g1, g2, _, _, _ = cells(px, py, 1.5, seed + 9, 0.95)
+    crease = np.clip(1 - (g2 - g1) / 0.12, 0, 1) * 0.06
+    return dome - crease
+
+
+def flesh(px, py, seed=0, moon=np.array([-0.62, 0.22, 0.75]), selfshade=True):
     """the god's skin breaking through the ash: swollen lumps of every size, deep creases between the larger folds,
     veins netting it, bruised and rotting in patches; the tops of the swellings wet and shining. Returns the albedo
     and a wet mask (where the caller adds the sheen)."""
@@ -378,7 +397,7 @@ def flesh(px, py, seed=0, moon=np.array([-0.62, 0.22, 0.75])):
     dome = np.sqrt(np.clip(1 - t * t, 0, 1))
     nx, ny = (px - cx) / rad, (py - cy) / rad
     lit = np.clip(nx * moon[0] + ny * moon[1] + dome * moon[2], 0, 1)
-    col = col * (0.62 + lit[..., None] * 0.55) * (0.9 + h1(cid, 5, seed)[..., None] * 0.2)
+    col = col * ((0.62 + lit[..., None] * 0.55) if selfshade else 0.92) * (0.9 + h1(cid, 5, seed)[..., None] * 0.2)
     seam = (f2 - f1) < 0.03
     col = np.where(seam[..., None], col * 0.6, col)
     # the larger folds: deep creases

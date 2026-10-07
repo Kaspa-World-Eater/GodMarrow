@@ -346,6 +346,23 @@ def stamp(W, w):
     spread = spread + (vn(X * 3, Y * 3) - 0.5) * 0.15
     W["putrid"] = spread > 0.15
     W["fdist"] = nd.distance_transform_edt(~W["putrid"]) * ws.RES        # yards to the nearest flesh
+    # FORM IS LAW (MASTER_RULES section 0; Derek: "it's 1 dimensional, there's no depth to it, no 3D"): the floor's real
+    # height goes into the world, so the moon and the lamps light it and it casts and catches shadow: every paving
+    # stone's dome, tilt and proud edge and the joints between; the flesh swelling up through its cracks, lumped
+    free = W["tag"] == 0
+    qa2 = (X - C[0]) * AX[0] + (Y - C[1]) * AX[1]
+    qp2 = (X - C[0]) * PERP[0] + (Y - C[1]) * PERP[1]
+    soft2 = np.clip((YARD[0] + (vn(qa2 * 0.5, 3) - 0.5) * 1.6 - np.abs(qp2)) / 1.8, 0, 1) * np.clip((qa2 - YARD[1]) / 1.2, 0, 1) * np.clip((YARD[2] - qa2) / 1.2, 0, 1)
+    heave2 = np.clip(near * 1.3, 0, 1) ** 1.6                              # heaved only near the god's own parts
+    way2 = np.clip(1 - (np.abs(qp2) - 1.2 - (vn(qa2 * 0.4, 5) - 0.5) * 0.8) / 1.2, 0, 1) * (qa2 > YARD[1] - 1)
+    hp, _ = groundgen.paving_height(X, Y, seed=2, heave=heave2, path=way2)
+    hp = hp * 1.05                                                         # the stones' relief, true to worn old paving
+    fl_ = np.clip(spread, 0, 1)
+    hf = fl_ * 0.16 + groundgen.flesh_height(X, Y, seed=1) * (W["putrid"])     # the flesh swelling up out of the cracks
+    floor = np.where(W["putrid"], hf, hp * soft2)
+    H2 = W["H"] + np.where(free, floor, 0.0)
+    W["H"] = H2
+    W["Hrest"] = H2
     W["thread"] = (spread > -0.08) & (spread <= 0.15)                       # a narrow band where it creeps into the ash
     e = ((X - POOL[0][0]) / POOL[1]) ** 2 + ((Y - POOL[0][1]) / POOL[2]) ** 2
     W["pool"] = (e + (vn(X * 3, Y * 3) - 0.5) * 0.3) < 1
@@ -422,9 +439,9 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     qp = (px - C[0]) * PERP[0] + (py - C[1]) * PERP[1]
     yard = (np.abs(qp) < YARD[0] + (vn(qa * 0.5, 3) - 0.5) * 1.6) & (qa > YARD[1]) & (qa < YARD[2])
     fd = ws.look(W, W["fdist"], px, py)
-    heave = np.clip(1 - fd / 1.3, 0, 1) ** 1.6                            # the flesh pushing up under the stones, near it
+    heave = np.clip(1 - fd / 0.6, 0, 1) ** 1.6 * 0.6                      # a little lift at the cracks' edges (the big heave is in the form)
     way = np.clip(1 - (np.abs(qp) - 1.2 - (vn(qa * 0.4, 5) - 0.5) * 0.8) / 1.2, 0, 1) * (qa > YARD[1] - 1)   # the old processional way to the gate
-    fcol, fh, fj = groundgen.paving_poly(px, py, seed=2, heave=heave, path=way, moon=ws.SUN)
+    fcol, fh, fj = groundgen.paving_poly(px, py, seed=2, heave=heave, path=way, moon=ws.SUN, selfshade=False)
     pcol0, _ = groundgen.flesh(px, py, seed=1, moon=ws.SUN)
     fcol = np.where((fj & (heave > 0.3 + (vn(px * 2, py * 2) - 0.5) * 0.3))[..., None], pcol0 * 0.8, fcol)   # flesh in the joints
     # the paving runs out under the ash gradually (chapter 2: ash fills the lows first): thick ash, then thin ash with the
@@ -436,7 +453,7 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     alb = alb * cov[..., None] + fcol * (1 - cov[..., None])
     yard = soft > 0
     pm = ws.look(W, W["putrid"], px, py) > 0
-    pcol, pwet = groundgen.flesh(px, py, seed=1, moon=ws.SUN)
+    pcol, pwet = groundgen.flesh(px, py, seed=1, moon=ws.SUN, selfshade=False)
     alb = np.where(pm[..., None], pcol, alb)
     fd_ = ws.look(W, W["fdist"], px, py)                                    # its edge feathers: a thin film of flesh over the stone
     feather = np.clip(1 - fd_ / 0.5, 0, 1) * (vn(px * 4 + 2, py * 4) * 0.6 + 0.4) * ~pm
