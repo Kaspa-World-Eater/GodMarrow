@@ -93,7 +93,15 @@ COLS = []
 for _side, _hs in ((-1, (4.6, 2.2, 5.4, 1.4)), (1, (5.0, 3.6, 0.9, 0.6))):
     for _j, _a in enumerate((2.0, 4.7, 7.4, 10.1)):
         COLS.append((C + AX * _a + PERP * _side * 5.8, _hs[_j], 40 + _j + (_side > 0) * 10))
-DRUMS = [(C + AX * 8.9 + PERP * 7.1, 0.5, 1.1), (C + AX * 11.6 + PERP * 6.4, 1.9, 0.9), (C + AX * 6.2 - PERP * 7.4, 2.6, 1.0)]
+_FALL = (AX * 0.9 + PERP * 0.35) / np.linalg.norm(AX * 0.9 + PERP * 0.35)       # the quake threw it this way
+_FALL_A = float(np.arctan2(_FALL[1], _FALL[0]))
+_STUMP = C + AX * 7.4 + PERP * 5.8
+DRUMS = [(_STUMP + _FALL * (1.25 + k * 0.82) + PERP * (0.08 * (-1) ** k), _FALL_A + (0.22, -0.15, 0.3)[k], 0.72) for k in range(3)] \
+    + [(C + AX * 6.2 - PERP * 7.4, 2.6, 1.0)]
+CAPITAL = _STUMP + _FALL * 4.3                                              # landed furthest, upside down
+# the collapsed wall on the left (chapter 2, Rievaulx and every fallen wall): a ragged stump of dressed courses, its
+# small core rubble heaped in a ridge at its foot, its big dressed blocks thrown further out, all half buried in ash
+WALL_P = -8.7
 YARD = (7.4, 1.0, 14.5)                       # half-width across, and its extent along the axis
 VEIN = [EYE[0] + AX * 1.5 - PERP * 1.6, POOL[0] - AX * 1.6, C + AX * 3.6 - PERP * 1.2, C + AX * 3.0 - PERP * 2.4]
 R_STONE = ws.ramp("#131218", "#211f28", "#312e37", "#443f46", "#5a5455", "#726a66", "#8d8379")
@@ -161,7 +169,7 @@ def shape_plan(w):
     H = np.maximum(H, wall + cols_)
     w.cave = wall > 0.4
     # two great stalagmites in the near corners: dark shapes framing the shot
-    for (pa, pp, hh, rr0, sd) in ((14.2, -8.2, 7.5, 1.5, 3), (15.0, 7.6, 9.0, 1.8, 4), (12.8, -10.6, 4.0, 1.1, 5)):
+    for (pa, pp, hh, rr0, sd) in ((15.6, -9.8, 6.0, 1.15, 3), (16.2, 9.6, 7.0, 1.3, 4)):
         p0 = C + AX * pa + PERP * pp
         d = np.hypot(X - p0[0], Y - p0[1]) * (1 + (fbm(X * 1.2 + sd, Y * 1.2) - 0.5) * 0.5)
         stal = hh * np.clip(1 - d / rr0, 0, 1) ** 0.55
@@ -210,6 +218,57 @@ def stamp(W, w):
             H = np.where(mm, z, H)
             W["tag"] = np.where(mm, 790 + i, W["tag"])
         W["obj"][790 + i] = dict(kind="column", base=g, c=p, h=hgt)
+    qa_ = (X - C[0]) * AX[0] + (Y - C[1]) * AX[1]
+    qp_ = (X - C[0]) * PERP[0] + (Y - C[1]) * PERP[1]
+    rr = np.random.default_rng(77)
+    # the stump: coursed dressed blocks 0.45 high, 0.9 long; its top stepped and ragged, block by block
+    on_wall = (np.abs(qp_ - WALL_P) < 0.45) & (qa_ > 1.5) & (qa_ < 10.5)
+    blk = np.floor((qa_ - 1.5) / 0.9).astype(int)
+    course_h = np.array([rr.integers(1, 5) for _ in range(12)]) * 0.45 + 0.1
+    wtop = np.where(on_wall, course_h[np.clip(blk, 0, 11)] + gat(C + AX * 6 + PERP * WALL_P) - 0.2, -9.0)
+    m = on_wall & (wtop > H)
+    H = np.where(m, wtop, H)
+    W["tag"] = np.where(m, 870, W["tag"])
+    W["obj"][870] = dict(kind="rubble", fam=1, base=0.0, wall=True)
+    # the rubble: the near ridge of small core stones, then the big dressed blocks thrown out
+    k_ = 0
+    for j in range(150):
+        big = j < 22
+        a_ = rr.uniform(2.0, 10.0)
+        off = rr.uniform(0.55, 1.4) if not big else rr.uniform(1.3, 2.4)        # small ones near, big ones far
+        p = C + AX * a_ + PERP * (WALL_P + off)
+        if big:
+            hx, hy, hz = rr.uniform(0.35, 0.5), rr.uniform(0.2, 0.26), rr.uniform(0.18, 0.24)
+        else:
+            hx = hy = rr.uniform(0.08, 0.17)
+            hz = hx * rr.uniform(0.7, 1.1)
+        yaw = rr.uniform(0, np.pi)
+        lx = (X - p[0]) * np.cos(yaw) + (Y - p[1]) * np.sin(yaw)
+        ly = -(X - p[0]) * np.sin(yaw) + (Y - p[1]) * np.cos(yaw)
+        box = np.maximum(np.abs(lx) - hx, np.abs(ly) - hy)
+        if not (box < 0.05).any():
+            continue
+        rnd = 0.04 if big else 0.06
+        prof = np.clip(-box / rnd, 0, 1) ** 0.5
+        g = gat(p) - hz * rr.uniform(0.25, 0.6)                                # sunk in the ash
+        top = g + hz * 2 * prof + (vn(X * 8 + j, Y * 8) - 0.5) * (0.02 if big else 0.05)
+        m = (box < 0) & (top > H)
+        H = np.where(m, top, H)
+        W["tag"] = np.where(m, 871 + k_, W["tag"])
+        W["obj"][871 + k_] = dict(kind="rubble", fam=int(rr.integers(0, 3)), base=g, wall=False, big=big)
+        k_ += 1
+    # the capital, upside down where it landed furthest: the square abacus slab, the cushioned echinus under it
+    d = np.hypot(X - CAPITAL[0], Y - CAPITAL[1])
+    lx = (X - CAPITAL[0]) * np.cos(_FALL_A) + (Y - CAPITAL[1]) * np.sin(_FALL_A)
+    ly = -(X - CAPITAL[0]) * np.sin(_FALL_A) + (Y - CAPITAL[1]) * np.cos(_FALL_A)
+    g = gat(CAPITAL)
+    ech = np.where(d < 0.62, g + 0.15 + np.sqrt(np.clip(0.62 ** 2 - d ** 2, 0, None)) * 0.55, -9.0)
+    aba = np.where(np.maximum(np.abs(lx), np.abs(ly)) < 0.72, g + 0.15 + 0.3 * np.clip((0.72 - np.maximum(np.abs(lx), np.abs(ly))) / 0.05, 0, 1), -9.0)
+    cap = np.maximum(ech, np.where(d < 0.62, -9.0, aba))
+    m = cap > H
+    H = np.where(m, cap, H)
+    W["tag"] = np.where(m, 869, W["tag"])
+    W["obj"][869] = dict(kind="rubble", fam=1, base=g, wall=False, big=True)
     for i, (p, a, L_) in enumerate(DRUMS):
         dirv = np.array([np.cos(a), np.sin(a)])
         along = (X - p[0]) * dirv[0] + (Y - p[1]) * dirv[1]
@@ -866,6 +925,28 @@ def paint_drum(img, m, v, n, px, py, pz, o, W, L):
 
 ws.PAINTERS["column"] = paint_column
 ws.PAINTERS["drum"] = paint_drum
+R_RUBBLE = [ws.ramp("#0e0d12", "#1a181e", "#27242a", "#36323a", "#47424a", "#5a5459"),          # basalt
+            ws.ramp("#17151d", "#26232c", "#3a3539", "#524b4a", "#6d655d", "#8a8073"),          # pale limestone
+            ws.ramp("#130b0c", "#231314", "#341d1b", "#4a2a24", "#5f3a2f", "#764b3a")]          # red tuff
+
+
+def paint_rubble(img, m, v, n, px, py, pz, o, W, L):
+    R = R_RUBBLE[o["fam"]]
+    hh = vn(px * 3 + o["fam"] * 7, py * 3) * 0.12
+    sv = np.clip(v * 0.95 + hh - 0.04 + L["lamp"] * 0.5, 0, 0.99)
+    img[m] = R[np.clip((sv * len(R)).astype(int), 0, len(R) - 1)][m]
+    top = m & (n[..., 2] > 0.85) & (vn(px * 7, py * 7) > 0.45)
+    img[top] = img[top] * 0.45 + np.array([0.36, 0.35, 0.34]) * 0.55 * np.clip(v[top] + 0.35, 0, 1)[:, None]   # ash on the tops
+    lich = m & (vn(px * 13 + 3, py * 13 + pz * 13) > 0.83)
+    img[lich] = img[lich] * 0.6 + np.array([0.4, 0.41, 0.37]) * 0.4 * np.clip(v[lich] + 0.3, 0, 1)[:, None]
+    if o.get("wall"):
+        qa_ = (px - C[0]) * AX[0] + (py - C[1]) * AX[1]
+        course = (np.abs(((pz + 0.1) / 0.45) % 1.0) < 0.07) | (np.abs((((qa_ - 1.5) / 0.9) + np.floor((pz + 0.1) / 0.45) * 0.5) % 1.0) < 0.05)
+        img[m & course & L["side"]] = img[m & course & L["side"]] * 0.45      # the courses and joints of the dressed blocks
+    return img
+
+
+ws.PAINTERS["rubble"] = paint_rubble
 ws.GROUND = ground
 ws.FOREST_LIFE = False
 ws.LIVING.append(mycelium)

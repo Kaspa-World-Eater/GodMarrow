@@ -274,3 +274,12 @@ Worst first: the pool, the floating vein, the light.
     lamp catch them, dark beyond); two dried thorn bushes by the fallen drums (forking twigs, thorns); a dead vine up
     the front pillar, its leaves curled brown. Each a true thin 3D stroke, depth-tested.
    Graded (75): the dead grass tufts read in the joints round the shaft and in the lantern's pool (first: none placed, the shaft falls on flesh; and all of it near-black off the light); the thorn bushes and the vine too dark to read where they stand. Next: let the thorns and vine catch a light; then more going on in the ruins.
+   RULES CHECK (reminder, 75): rules and lore re-read; checklist: the ruins thin (Derek: "the ruins need more going on"): the worst open item. Chapter 2: a collapsed wall (stump, near rubble ridge, far dressed blocks), drums in one fall line, the capital furthest, islands of stone in ash.
+76. More going on in the ruins (chapter 2): a collapsed wall on the left (a ragged stump of dressed courses, its top
+    stepped block by block; its small core rubble heaped in a ridge at its foot; its big dressed blocks thrown further
+    out; all half sunk in ash, ash on their tops, lichen, the courses cut in the stump's face); the fallen column's
+    drums laid in ONE fall line from its stump, the capital upside down where it landed furthest (abacus slab, the
+    cushioned echinus).
+   Graded (76): the ruins built but unseen: the wall and rubble, and the drums' fall line, lie under the two great foreground stalagmites (flat black blobs).
+77. The stalagmites smaller and pushed deep into the corners (framing, not swallowing); the fall line turned toward us; the wall brought in.
+   Graded (77): the ruins show: the wall's stump at the far left with its rubble heaped behind the front pillar, the fallen column's drums in a line toward the lower right with the capital furthest. The stalagmites now out of frame entirely: the near corners lost their dark framing (to restore, smaller). The rubble reads as lumps more than dressed blocks.
