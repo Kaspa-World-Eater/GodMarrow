@@ -46,3 +46,14 @@ their heads toward the ring; white caps on the flat stones).
    near the huts' walls and cave-ins (they read as misplaced).
 10. The dead on the open floor only, clear of huts and bin; the slumps larger and low on the banks where the eye meets
     them.
+
+## Rules check after pass 10 (the reminder; every checklist line)
+Lore in the piece: Cap Hollow's pickers gone, the Ribcage Bough, the dead turning their heads to the ring with the
+hunter's sticks, white caps on the flat stone, the hide and its veins toward the ring, the weeping vein-trees.
+1 Brief PASS. 2 Scale PASS (huts 4x3, ribs 10-14 yd, bodies 1.8 yd). 3 Form PARTIAL (ribs smooth tusks).
+4 Light PARTIAL (the fire leads; ribs cast no shadows; no moon shafts through the ribs). 5 Values PARTIAL (the
+lantern-lit hut face washed flat; roofs camo). 6 Ramps PASS. 7 Paint PARTIAL. 8 Contact PASS (bones seated, stones).
+9 Detail PARTIAL (ribs, roofs). 10 Life NOT CHECKED (animate). 11 As the player sees it: PARTIAL. 12 Skeptic: the
+church has the stronger stone; this one the stronger story.
+2b: tiles not yet built (trodden ash; hide through soil); objects not exported to the game.
+Worst failure: the ribs (the god's presence carries the scene). Waiting for Derek's go.
