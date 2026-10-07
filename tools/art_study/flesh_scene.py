@@ -36,6 +36,7 @@ import fang as fanggen                       # noqa: E402
 import vessel                                # noqa: E402
 import bone as bonegen                       # noqa: E402
 import column as colgen                      # noqa: E402
+import gate as gategen                       # noqa: E402
 import kit                                   # noqa: E402
 
 # THE CAVERN. The courtyard lies in a cavern under the Moor (the lore: "the god held a room open inside itself, wide as
@@ -73,10 +74,11 @@ kit.SKY = lambda P: shaft(P[..., 0], P[..., 1], P[..., 2])
 ws.HERO = C + AX * 8.2 - PERP * 0.8
 
 GATE = C + AX * 0.9                          # the doorway's centre at the swell's foot
-GATE_W, PYLON_R, PYLON_H = 3.2, 1.0, 4.6
+GATE_W, PYLON_R, PYLON_H = 5.0, 1.0, 4.6
+POST_U, POST_HU, POST_HR, POST_H = 3.4, 0.9, 0.8, 8.5     # the megalith posts
 # the teeth: one row across the back, the gate built into it; its posts are the two greatest fangs
 FANGS = [(GATE + AX * 0.15 + PERP * o, h, r, 60 + i) for i, (o, h, r) in enumerate(
-    [(-9.6, 3.6, 0.85), (-7.4, 4.6, 1.0), (-4.9, 5.8, 1.2), (-2.75, 7.2, 1.35), (2.75, 7.0, 1.35), (4.9, 6.0, 1.2), (7.4, 4.4, 1.0), (9.6, 3.4, 0.85)])]
+    [(-9.8, 4.6, 1.0), (-7.5, 5.8, 1.2), (-5.6, 7.2, 1.35), (5.6, 7.0, 1.35), (7.5, 6.0, 1.2), (9.8, 4.4, 1.0)])]
 TF = [toothgen.tooth("fang", s, height=h, R=r, half=2.6) for (_, h, r, s) in FANGS]   # (their gum collars)
 FG = []                                      # the fangs themselves (landkit fang.py), made in stamp()
 PORE = (C + AX * 9.6 + PERP * 4.6, 1.7)
@@ -218,18 +220,12 @@ def stamp(W, w):
         H = np.where(mm, z, H)
         W["tag"] = np.where(mm, 810 + i, W["tag"])
         W["obj"][810 + i] = dict(kind="drum", base=g, c=p, a=a)
-    # the iron doors, fallen ajar into the passage: each a great leaf leaning back
+    # the megalith posts (landkit gate.py draws them; here their mass for shadows and for what they hide)
     for sgn in (-1, 1):
-        hu = sgn * GATE_W / 2
-        a = 0.55
-        t = (u - hu) * -sgn * np.cos(a) + r * np.sin(a)
-        nrm = -(u - hu) * -sgn * np.sin(a) + r * np.cos(a)
-        m = (t > 0) & (t < GATE_W / 2 * 0.95) & (np.abs(nrm) < 0.09) & (r > -0.1)
-        hd = gbase + 3.6 - t * 0.6
-        mm = m & (hd > H)
-        H = np.where(mm, hd, H)
-        W["tag"] = np.where(mm, 765 + (sgn > 0), W["tag"])
-        W["obj"][765 + (sgn > 0)] = dict(kind="door", base=gbase)
+        m = (np.abs(u - sgn * POST_U) < POST_HU) & (np.abs(r) < POST_HR)
+        H = np.where(m, np.maximum(H, gbase + POST_H - 0.3), H)
+        W["tag"] = np.where(m, 765 + (sgn > 0), W["tag"])
+        W["obj"][765 + (sgn > 0)] = dict(kind="rwall", base=gbase, a=0.0, p=GATE)
     # the ruin round the cyst
     for i, (p, a) in enumerate(RUIN):
         tang = np.array([-np.sin(a), np.cos(a)])
@@ -272,10 +268,11 @@ def stamp(W, w):
     # pillars with pustules emitting a sickly yellow light")
     SICK.clear()
     W["tendrils"] = []
-    for i, (p, hgt, sd) in enumerate(COLS):
+    climbers = [(p, hgt, sd, W["obj"][790 + i]["base"], 0.6) for i, (p, hgt, sd) in enumerate(COLS)]
+    climbers += [(GATE + PERP * sg * POST_U - AX * 0.0, 3.4, 300 + (sg > 0), gbase - 0.3, 1.25) for sg in (-1, 1)]
+    for (p, hgt, sd, g, prad) in climbers:
         if hgt < 1.0:
             continue
-        g = W["obj"][790 + i]["base"]
         rr = np.random.default_rng(sd + 500)
         for k in range(2):
             a0 = rr.uniform(0, 2 * np.pi)
@@ -285,10 +282,10 @@ def stamp(W, w):
             for s_ in np.linspace(0, 1, 90):
                 if s_ < 0.12:                                                    # out of the ground and up the plinth
                     f_ = s_ / 0.12
-                    rad, z = 1.05 - f_ * 0.4, g - 0.15 + f_ * 0.62
+                    rad, z = prad + 0.45 - f_ * 0.45, g - 0.15 + f_ * 0.62
                 else:
                     f_ = (s_ - 0.12) / 0.88
-                    rad, z = 0.6, g + 0.47 + f_ * (top - g - 0.47)
+                    rad, z = prad, g + 0.47 + f_ * (top - g - 0.47)
                 a = a0 + spin * (z - g) + np.sin(s_ * 17 + sd) * 0.12
                 pts.append((p[0] + np.cos(a) * rad, p[1] + np.sin(a) * rad, z))
             pts = np.array(pts)
@@ -298,7 +295,7 @@ def stamp(W, w):
             for s_ in np.linspace(0, 1, 40):
                 z = pts[j0][2] + s_ * rr.uniform(0.8, 1.4)
                 a = np.arctan2(pts[j0][1] - p[1], pts[j0][0] - p[0]) - spin * s_ * 1.6
-                bp.append((p[0] + np.cos(a) * 0.58, p[1] + np.sin(a) * 0.58, min(z, top + 0.3)))
+                bp.append((p[0] + np.cos(a) * (prad - 0.02), p[1] + np.sin(a) * (prad - 0.02), min(z, top + 0.3)))
             W["tendrils"].append((np.array(bp), 0.08, sd * 10 + k + 5))
             for j in rr.choice(np.arange(15, 88), size=int(rr.integers(2, 5)), replace=False):
                 q = pts[j]
@@ -307,6 +304,7 @@ def stamp(W, w):
                 pr = rr.uniform(0.1, 0.2)
                 SICK.append((q + out * (0.08 + pr * 0.55), pr, rr.uniform(0, 6.28)))
     ws.LIGHTS.append((GATE[0] - AX[0] * 0.6, GATE[1] - AX[1] * 0.6, gbase + 1.2, 3.2))   # the glow from within the gate
+    ws.LIGHTS.append((GATE[0] - AX[0] * 2.2, GATE[1] - AX[1] * 2.2, gbase + 2.4, 4.5))   # and deeper in: it backlights the grille
 
 
 _TILES = {}
@@ -362,7 +360,7 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     deep = dw & (gr > 0.6)
     br_ = 0.75 + 0.25 * np.sin(ws_T[0] * 6.28)
     glow_ = np.clip(1 - np.abs(gr - 1.6) / 1.4, 0, 1) * (1 - np.clip(np.abs(ws.look(W, W["gate_u"], px, py)) / (GATE_W / 2), 0, 1) ** 2)
-    out = np.where(deep[..., None], out + np.array([0.26, 0.14, 0.05]) * (glow_ * br_)[..., None], out)
+    out = np.where(deep[..., None], out + np.array([0.42, 0.22, 0.07]) * (glow_ * br_)[..., None], out)
     wet_ = gl & pm & pwet
     out[wet_] = np.minimum(out[wet_] * 1.45 + np.array([0.05, 0.04, 0.05]), 1)   # the swollen tops wet and shining
     sheen = gl & rim & (L["moon"] > 0.55) & (vn(px * 12, py * 12) > 0.66)
@@ -530,6 +528,15 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     lts = lts + [(tuple(q), tuple(SICKC * (0.18 + pr * 1.0)), 0.7 + pr * 2.5) for (q, pr, ph) in SICK]
     for f in sorted(FG, key=lambda q: q["c"][0] + q["c"][1]):           # the fangs, ray-marched (landkit fang.py)
         fanggen.draw(img, zb, dep, ws.to_px, f, lts, ws.SUN, ambient=0.15)
+    # the gate (landkit gate.py): two megaliths, a grille leaf ajar and one torn off its upper hinge and sagging
+    gb_ = W["gbase"]
+    gshapes = []
+    for sgn in (-1, 1):
+        gshapes.append(gategen.post(GATE + PERP * sgn * POST_U, PERP, -AX, gb_ - 0.3, POST_HU, POST_HR, POST_H, seed=70 + (sgn > 0),
+                                    hinge_u=-sgn * POST_HU))
+    gshapes.append(gategen.leaf(GATE - PERP * (POST_U - POST_HU), PERP, -AX, gb_ - 0.05, 2.45, 6.2, 0.6, 0.0, seed=81))
+    gshapes.append(gategen.leaf(GATE + PERP * (POST_U - POST_HU), -PERP, -AX, gb_ - 0.35, 2.45, 6.2, 1.15, 0.16, seed=82))
+    gategen.draw(img, zb, dep, ws.to_px, gshapes, lts, ws.SUN)
     # the colonnade and its fallen drums (landkit column.py, from chapter 2)
     shapes = []
     for i, (p, hgt, sd) in enumerate(COLS):
@@ -551,11 +558,11 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     # the gate's arch (landkit bone.py): a great rib of the god laid from fang to fang over the doors, its heads bound
     # to the teeth with old sinew; a skull hung at its keystone, looking out over the courtyard
     gb = W["gbase"]
-    pa = GATE + PERP * -2.35 - AX * 0.15
-    pb = GATE + PERP * 2.35 - AX * 0.15
-    arch = bonegen.rib((pa[0], pa[1], gb + 3.95), (pb[0], pb[1], gb + 3.85), 0.85, 0.42, 0.3, seed=12)
-    kp = GATE - AX * 0.02
-    sk = bonegen.skull((kp[0], kp[1], gb + 4.55), 0.62, (AX[0] + 0.1, AX[1], -0.35), seed=4)
+    pa = GATE + PERP * -(POST_U + 0.3) + AX * (POST_HR + 0.35)
+    pb = GATE + PERP * (POST_U + 0.3) + AX * (POST_HR + 0.35)
+    arch = bonegen.rib((pa[0], pa[1], gb + 4.6), (pb[0], pb[1], gb + 4.45), 0.55, 0.45, 0.32, seed=12)
+    kp = GATE + AX * (POST_HR + 0.45)
+    sk = bonegen.skull((kp[0], kp[1], gb + 4.45), 0.62, (AX[0] + 0.1, AX[1], -0.35), seed=4)
     bonegen.draw(img, zb, dep, ws.to_px, [arch, sk], lts, ws.SUN)
     # pustules on the flesh: each swells, shines, bursts, heals
     rr = np.random.default_rng(71)

@@ -235,3 +235,14 @@ Worst first: the pool, the floating vein, the light.
    Graded (65): the pustules' light flooded the whole cavern yellow (25 lights reaching yards, summed), the fangs washed; the tendrils thin red threads, unreadable.
 66. Each pustule's light a small local pool (short reach, weak), on the ray-cast pieces too; the tendrils thicker, the pustules larger, the air's glow fainter.
    Graded (66): the pustules read as glowing yellow beads on red tendrils climbing the pillars, each a small sickly pool; the moon's shaft still keeps the eye the star. Tendrils could be meatier and more fibrous (chapter 3). Next: the gate (Derek approved the plan).
+   RULES CHECK (reminder, 66): MASTER_RULES and the Moor's lore re-read (the kneelers who sang inside the god: the gate's frieze). Checklist: 3 Form: the gate the last flat stand-in (box doors, a passage); worst by Derek's order now: the gate (approved).
+67. THE GATE rebuilt (landkit gate.py, Derek's approved plan; lore: the mouth's door, the kneelers): two megalith posts of
+    black basalt (1.8 x 1.6 x 8.5 yd, rough-hewn, leaning a little, out of the frame), a frieze of kneeling figures in a
+    long file across each, worn nearly smooth; ash on the ledges, flesh climbing from the foot, lichen, rust running
+    down below each hinge pin; a 5-yard doorway; two grille leaves of forged square bars (rails riveted at every
+    crossing, a heavy frame, spear points), one ajar, one torn off its upper hinge and sagging into the flesh; the iron
+    scaled, rust blooming where water sat, flaking along the grain. The fangs re-spaced so the posts stand between
+    them; the rib lashed across the posts' faces as a trophy, the skull hung at its middle.
+   Graded (67): imposing at last (two black megaliths out of the frame, the rib lashed across); but lichen in camouflage blotches, the frieze unseen (relief under a pixel, in darkness), the grille lost black on black.
+68. The grille backlit: the ember glow stronger and a second light deeper in the passage, so the bars stand black against it; the frieze cut twice as deep; tendrils climb the posts too, their pustules lighting the kneelers from below; lichen small and few.
+   Graded (68): the grille reads, black bars and rust against the ember glow deep in the passage; tendrils and pustules climb the posts. Still failing: the kneelers' frieze unseen (its face turned from every light); the rib reads as a plank; the leaves' rails and spear points lost in the dark.
