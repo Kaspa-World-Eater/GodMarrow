@@ -116,6 +116,17 @@ func is_solid(t: Vector2) -> bool:
 		return true
 	return solid[y * w + x] == 1
 
+## a prop's own tile given back to the ground (world/landkit.gd: its posts are its base now, the true shape of it)
+func free_tile(c: Vector2i) -> void:
+	if c.x < 0 or c.y < 0 or c.x >= w or c.y >= h:
+		return
+	var i := c.y * w + c.x
+	if not int(types[i]) in [2, 3]:
+		return
+	types[i] = 0
+	solid[i] = 0
+	astar.set_point_solid(c, false)
+
 func blocks_sight(t: Vector2) -> bool:
 	return SIGHT_TYPES.has(type_at(t))
 
@@ -170,6 +181,29 @@ func add_post(tp: Vector2, r: float) -> void:
 	posts[c].append([tp, r])
 	if c.x >= 0 and c.y >= 0 and c.x < w and c.y < h and not astar.is_point_solid(c):
 		astar.set_point_weight_scale(c, 6.0)
+
+## cover (Derek 2026-10-06, tools/art_study/ecosystems/README.md "Objects in combat"): what a shot meets on its way.
+## Each entry [tp, r, height yd, material, holder]; a missile flying lower than an object's height stops in it
+## (world/landkit.gd answers the strike by its material: arrows stick in wood, fire takes dry wood, stone throws grit).
+var cover := {}
+
+func add_cover(tp: Vector2, r: float, h: float, material: String, holder: Node) -> void:
+	var c := Vector2i(int(floor(tp.x)), int(floor(tp.y)))
+	if not cover.has(c):
+		cover[c] = []
+	cover[c].append([tp, r, h, material, holder])
+
+func cover_hit(p: Vector2, h: float):
+	var c := Vector2i(int(floor(p.x)), int(floor(p.y)))
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			var a = cover.get(c + Vector2i(dx, dy))
+			if a == null:
+				continue
+			for e in a:
+				if float(e[2]) >= h and p.distance_to(e[0]) < float(e[1]):
+					return e
+	return null
 
 func _posts() -> void:
 	posts.clear()

@@ -61,6 +61,8 @@ static func run(g) -> void:
 			g.hero.skills.spawn_wisp()
 	if a.has("near"):
 		_near(g, String(a["near"]))      # --near=log|rootplate|stump|snag|tree|rock: stand beside the nearest landkit piece
+	if a.has("covertest"):
+		_covertest(g)                    # --covertest (with --near): shots loosed through the piece, to see cover answer
 	if a.get("show", "") == "collision":
 		_show_collision(g)
 	if a.has("shot"):
@@ -158,6 +160,7 @@ static func _near(g, kind: String) -> void:
 	var dep: float = c.position.y / Iso.HY
 	var dx: float = c.position.x / Iso.HX
 	var tp := Vector2((dep + dx) * 0.5, (dep - dx) * 0.5) + off
+	g.set_meta("near_piece", tp - off)
 	var free := tp
 	for ring in range(0, 12):                  # the nearest open ground (not water, not inside a post)
 		var got := false
@@ -178,6 +181,34 @@ static func _near(g, kind: String) -> void:
 	g.cam.position = g.eye.update(0.016, hero, null, g.zone)
 	g.cam.reset_smoothing()
 	print("NEAR ", kind, " ", c.get_meta("landkit"), " at ", tp)
+
+static func _covertest(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.0).timeout
+	var c: Vector2 = g.get_meta("near_piece", g.hero.tp)
+	var nb := 0
+	var best = null
+	for k in g.zone.cover:
+		for e in g.zone.cover[k]:
+			nb += 1
+			if best == null or c.distance_to(e[0]) < c.distance_to(best[0]):
+				best = e
+	print("COVERTEST entries ", nb, " aim ", c, " nearest ", best[0] if best else null, " r ", best[1] if best else 0, " ", best[3] if best else "")
+	var from: Vector2 = c + Vector2(-3.0, 3.0)
+	for dv in [Vector2(-3, 3), Vector2(3, -3), Vector2(3, 3), Vector2(-3, -3), Vector2(0, 4), Vector2(4, 0), Vector2(0, -4), Vector2(-4, 0)]:
+		var ok := true
+		for i in 30:                         # a clear line up to the piece (no wall tile on the way)
+			var q: Vector2 = (c + dv).lerp(c, float(i) / 30.0)
+			if q.distance_to(c) > 1.4 and g.zone.blocks_sight(q):
+				ok = false
+				break
+		if ok:
+			from = c + dv
+			break
+	for k in [["phys", "needle"], ["fire", "orb"], ["phys", "bolt"], ["magic", "orb"]]:
+		var mi := Missile.fire(g.zone, from, c, 8.0, 0.0, k[0], "monster", k[1])
+		mi.life = 3.0
+		await tree.create_timer(0.7).timeout
 
 static func _show_collision(g) -> void:
 	var z: Zone = g.zone

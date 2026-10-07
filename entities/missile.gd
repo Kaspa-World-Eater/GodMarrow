@@ -49,13 +49,22 @@ func _physics_process(dt: float) -> void:
 	var n := 3
 	for i in n:
 		tp += vel * dt / n
+		var cv = zone.cover_hit(tp, height / (21.0 * Iso.WPX))   # a tree, a log, a stone in its way (world/landkit.gd)
+		if cv != null:
+			Landkit.struck(zone, cv, tp, vel, elem, look, height)
+			queue_free()
+			return
 		if zone.blocks_sight(tp) and zone.type_at(tp) != 4:
+			if OS.has_environment("GM_COVERDBG"):
+				print("MISSILE wall ", tp, " type ", zone.type_at(tp))
 			queue_free()
 			return
 		if _collide():
 			return
 	position = Iso.to_screen(tp)
 	queue_redraw()
+	if life <= 0.0 and OS.has_environment("GM_COVERDBG"):
+		print("MISSILE spent ", tp)
 	if life <= 0.0:
 		queue_free()
 

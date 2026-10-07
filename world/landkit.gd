@@ -166,9 +166,12 @@ static func place(zone, s: String, name: String, tp: Vector2, dep: float, flip: 
 		sh.z_index = -90
 		sh.modulate.a = 0.45
 		zone.add_child(sh)
+	var cov := float(meta.get("cover", 0.0))
 	for p in posts:
 		var q := tp + (Vector2(p[1], p[0]) if flip else Vector2(p[0], p[1]))
 		zone.add_post(q, float(p[2]))
+		if cov > 0.0:
+			zone.add_cover(q, float(p[2]), cov, str(meta.get("material", "")), holders[0])
 	var big := float(meta.get("height", 0.0)) > 2.5
 	if big and zone.see != null:
 		for h in holders:
@@ -187,6 +190,10 @@ static func take(zone, s: String, spr: Dictionary) -> bool:
 	var tp := Vector2(x, y)
 	var dep := float(spr.get("d", x + y))
 	var flip := bool(spr.get("flip", false))
+	# the generator stood a solid tile under every prop; the piece's own posts are its base now (none when it found
+	# no room: then there is nothing there to walk into)
+	var tl = spr.get("tile", [int(floor(x)), int(floor(y))])
+	zone.free_tile(Vector2i(int(tl[0]), int(tl[1])))
 	if role == "log":
 		# the fresh falls of the big trees still hold their root plates up at the butt
 		var cls := 1 + absi(int(x * 13.0 + y * 7.0)) % 5
@@ -210,6 +217,50 @@ static func take(zone, s: String, spr: Dictionary) -> bool:
 		elif role in ["tree_giant", "tree_middle"]:
 			_life_round(zone, s, tp, 0.0, flip, 0)
 	return true
+
+## a shot stopped in cover: the object answers by what it is made of. Arrows and bolts stand in wood a while;
+## fire takes dry deadwood and runs out over the litter, smoulders in wet; stone throws grit and the shot breaks
+static func struck(zone, e: Array, p: Vector2, vel: Vector2, elem: String, look: String, height: float) -> void:
+	var mat: String = e[3]
+	if OS.has_environment("GM_COVERDBG"):
+		print("COVER ", mat, " ", elem, " ", look, " at ", p)
+	var AW = load("res://entities/ai/ai_world.gd")
+	var w = AW.of(zone)
+	var face: Vector2 = p - vel.normalized() * 0.08
+	if mat.begins_with("wood") or mat == "earth_roots":
+		if elem == "fire":
+			if mat == "wood_dead_dry" or mat == "wood_living" and randf() < 0.35:
+				w.fire(e[0], float(e[1]) + 0.5, 4.0, 9.0)
+				w.wildfire(e[0] + vel.normalized() * -(float(e[1]) + 0.6), 24, 4.0)
+			else:
+				w.fire(face, 0.5, 2.0, 3.0)                # wet wood: it smoulders and goes out
+		elif look in ["arrow", "bolt", "needle"]:
+			var st := Stuck.new()
+			st.dir = (Iso.to_screen(p + vel.normalized()) - Iso.to_screen(p)).normalized()
+			st.h = height
+			var a := Iso.to_screen(face)
+			st.position = a
+			zone.sorted.add_child(st)
+		w.grit_burst(face, Color(0.42, 0.32, 0.22), 4, 0.4, height)
+	elif mat == "stone":
+		w.grit_burst(face, Color(0.55, 0.54, 0.52), 7, 0.6, height)
+	Sfx.play("hit" if mat == "stone" else "break", 0.35, randf_range(0.8, 1.1))
+
+## an arrow standing in the wood it struck, its fletching out; gone after a while
+class Stuck extends Node2D:
+	var dir := Vector2.RIGHT
+	var h := 60.0
+	var t := 9.0
+	func _process(dt: float) -> void:
+		t -= dt
+		if t < 1.0:
+			modulate.a = maxf(t, 0.0)
+		if t <= 0.0:
+			queue_free()
+	func _draw() -> void:
+		var o := Vector2(0, -h) - dir * 4.0
+		draw_line(o - dir * 16.0, o + dir * 4.0, Color(0.62, 0.55, 0.44), 3.0)
+		draw_line(o - dir * 16.0, o - dir * 12.0 + dir.orthogonal() * 4.0, Color(0.75, 0.72, 0.66), 2.0)
 
 ## the floor life a fallen log, a stump or a great foot makes round itself
 static func _life_round(zone, s: String, tp: Vector2, L: float, flip: bool, cls: int) -> void:
