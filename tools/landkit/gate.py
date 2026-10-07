@@ -80,7 +80,14 @@ def _post_sdf(P, o):
     r = q[..., 0] * o["er"][0] + q[..., 1] * o["er"][1]
     z = q[..., 2]
     u = u - z * 0.02                                                                      # leaning a little
-    rough = (fbm(u * 1.5 + o["seed"], z * 1.5 + r) - 0.5) * 0.14 + (vn(u * 6, z * 6 + r * 6) - 0.5) * 0.03
+    # rough-hewn (chapter 4): the faces cut in chisel facets, each a small flat plane at its own angle, so each takes its
+    # own tone in the light; over a slow bulge where the block was never squared true
+    import ground as _g
+    fs_ = u + r * 1.3
+    c1, c2, cid, ccx, ccz = _g.cells(fs_, z, 0.34, o["seed"] + 40, 0.9)
+    tl = (_g.h1(cid, 1, o["seed"]) - 0.5) * 0.35 * (fs_ - ccx) + (_g.h1(cid, 2, o["seed"]) - 0.5) * 0.35 * (z - ccz)
+    facet = 0.035 + tl - np.clip(0.02 - (c2 - c1) * 0.5, 0, None) * 1.5          # each scoop a plane; a ridge where scoops meet
+    rough = (fbm(u * 0.6 + o["seed"], z * 0.6 + r) - 0.5) * 0.12 + facet
     dx = np.abs(u) - o["hu"] - rough
     dy = np.abs(r) - o["hr"] - rough
     dz = np.abs(z - o["h"] / 2) - o["h"] / 2
