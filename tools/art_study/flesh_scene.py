@@ -164,7 +164,7 @@ def shape_plan(w):
     # the eye rises out of the ground rather than sitting on it (Derek: "blend the eyelid flesh down and have folds")
     near_side = 0.75 + 0.45 * np.clip(((X - EYE[0][0]) * AX[0] + (Y - EYE[0][1]) * AX[1]) / (EYE[1] * 1.5), -1, 1)
     lump_ = 0.75 + 0.5 * vn(ang * 2.5 + d * 0.8, d * 1.3)
-    rolls = sum(hk * np.exp(-((d - EYE[1] * rk) / wk) ** 2) for (rk, hk, wk) in ((1.12, 1.05, 0.32), (1.45, 0.7, 0.3), (1.8, 0.4, 0.3)))
+    rolls = sum(hk * np.exp(-((d - EYE[1] * rk) / wk) ** 2) for (rk, hk, wk) in ((1.05, 1.45, 0.3), (1.4, 0.9, 0.3), (1.75, 0.5, 0.3)))
     H = H + rolls * near_side * lump_ + folds + wrink - np.clip(1 - d / (EYE[1] * 1.0), 0, 1) * 0.35
     e = ((X - POOL[0][0]) / POOL[1]) ** 2 + ((Y - POOL[0][1]) / POOL[2]) ** 2
     lvl = float(H[np.unravel_index(np.argmin(e), e.shape)]) - 0.12
@@ -891,7 +891,7 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     ec, er_ = EYE
     g = gh(ec[0], ec[1])
     Ry = er_ * 0.95
-    centre = (ec[0], ec[1], g + Ry * 0.12)
+    centre = (ec[0], ec[1], g - Ry * 0.12)                                  # sunk: it rises out of the ground
     blink = np.clip(1 - np.abs((T - 0.62) / 0.13), 0, 1) ** 0.8
     gz = np.array([AX[0] * 0.25 + PERP[0] * 0.3, AX[1] * 0.25 + PERP[1] * 0.3, 1.0])
     eyegen.draw(img, zb, dep, ws.to_px, centre, Ry, gz, blink, lts, ws.SUN, seed=3, ambient=0.16, aperture=(0.84, 0.4))

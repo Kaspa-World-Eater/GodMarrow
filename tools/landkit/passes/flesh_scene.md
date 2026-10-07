@@ -335,3 +335,6 @@ Worst first: the pool, the floating vein, the light.
    Graded (95-96): one warm stone (walls, rubble, floor); the eye lower in rolls of flesh, its lids the floor's flesh; still a little like a ball set on top. The gate posts flat blotch.
 97. The gate posts rough-hewn (chapter 4): their faces cut in chisel facets, each a small flat plane at its own angle (its own tone in the fires' light), ridges where the scoops meet, over a slow bulge where the block was never squared true.
    Graded (97): the posts read as hewn stone (chisel facets catching the fires, ridges where they meet, the kneelers' band). Still flat: the bone rib across them; the eye still a little set on top.
+   RULES CHECK (reminder, 97): rules and lore re-read. Worst (Derek): the eye still set on top of the ground.
+98. The eye sunk lower, the rolls round its foot higher, the near crest over its lower lid: it rises out of the ground.
+   Graded (98): the eye comes up out of the ground: the near roll covers its lower lid, it looks up from within the folds; the near roll dark (turned from the moon).
