@@ -32,6 +32,8 @@ import tooth as toothgen                     # noqa: E402
 import fungus                                # noqa: E402
 import ground as groundgen                   # noqa: E402
 import eye as eyegen                         # noqa: E402
+import fang as fanggen                       # noqa: E402
+import vessel                                # noqa: E402
 from wood_ecosystem import vn, fbm           # noqa: E402
 
 C = np.array([20.0, 19.0])
@@ -45,7 +47,8 @@ GATE_W, PYLON_R, PYLON_H = 3.2, 1.0, 4.6
 # the teeth: one row across the back, the gate built into it; its posts are the two greatest fangs
 FANGS = [(GATE + AX * 0.15 + PERP * o, h, r, 60 + i) for i, (o, h, r) in enumerate(
     [(-9.6, 3.6, 0.85), (-7.4, 4.6, 1.0), (-4.9, 5.8, 1.2), (-2.75, 7.2, 1.35), (2.75, 7.0, 1.35), (4.9, 6.0, 1.2), (7.4, 4.4, 1.0), (9.6, 3.4, 0.85)])]
-TF = [toothgen.tooth("fang", s, height=h, R=r, half=2.6) for (_, h, r, s) in FANGS]
+TF = [toothgen.tooth("fang", s, height=h, R=r, half=2.6) for (_, h, r, s) in FANGS]   # (their gum collars)
+FG = []                                      # the fangs themselves (landkit fang.py), made in stamp()
 PORE = (C + AX * 9.6 + PERP * 4.6, 1.7)
 RUIN = []                                    # the cyst and its ruin: saved for later (Derek)
 EYE = (C + AX * 8.6 + PERP * 3.4, 1.7)               # where the cyst was, looking up at the sky
@@ -130,11 +133,18 @@ def stamp(W, w):
     X, Y = W["X"], W["Y"]
     H = W["H"].copy()
     gat = lambda p: float(W["H"][int((p[1] - W["y0"]) / ws.RES), int((p[0] - W["x0"]) / ws.RES)])
+    FG.clear()
     for k, (F, info) in enumerate(TF):
         lx, ly = to_fang(k, X, Y)
         inside = (np.abs(lx) < F.half) & (np.abs(ly) < F.half)
-        fh = np.where(inside, F.at(F.H, lx, ly), -9.0)
+        gum = np.where(inside & (F.at(F.M, lx, ly, 0) == toothgen.GUM), F.at(F.H, lx, ly), -9.0)
         base = gat(FANGS[k][0]) - 0.35
+        f = fanggen.make(FANGS[k][0], base, FANGS[k][1], FANGS[k][2], FANGS[k][3], AX, PERP)
+        FG.append(f)
+        near = np.hypot(X - f["c"][0], Y - f["c"][1]) < f["R"] * 1.3 + f["h"] * 0.25
+        en = np.full(X.shape, -9.0)
+        en[near] = fanggen.heightfield(X[near][None, :], Y[near][None, :], f)[0] - base
+        fh = np.maximum(gum, en)
         m = (fh > 0.0) & (base + fh > H)
         H = np.where(m, base + fh, H)
         W["tag"] = np.where(m, 700 + k, W["tag"])
@@ -257,7 +267,7 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     deep = dw & (gr > 0.6)
     br_ = 0.75 + 0.25 * np.sin(ws_T[0] * 6.28)
     glow_ = np.clip(1 - np.abs(gr - 1.6) / 1.4, 0, 1) * (1 - np.clip(np.abs(ws.look(W, W["gate_u"], px, py)) / (GATE_W / 2), 0, 1) ** 2)
-    out = np.where(deep[..., None], out + np.array([0.32, 0.04, 0.03]) * (glow_ * br_)[..., None], out)
+    out = np.where(deep[..., None], out + np.array([0.26, 0.14, 0.05]) * (glow_ * br_)[..., None], out)
     wet_ = gl & pm & pwet
     out[wet_] = np.minimum(out[wet_] * 1.45 + np.array([0.05, 0.04, 0.05]), 1)   # the swollen tops wet and shining
     sheen = gl & rim & (L["moon"] > 0.55) & (vn(px * 12, py * 12) > 0.66)
@@ -378,6 +388,9 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     GH, GW = img.shape[:2]
     dep = px + py
     zb = np.full((GH, GW), -1e9)
+    lts = [((lx, ly, lz), (0.95, 0.6, 0.32), rch * 1.4) for (lx, ly, lz, rch) in ws.LIGHTS]
+    for f in sorted(FG, key=lambda q: q["c"][0] + q["c"][1]):           # the fangs, ray-marched (landkit fang.py)
+        fanggen.draw(img, zb, dep, ws.to_px, f, lts, ws.SUN, ambient=0.15)
     gh = lambda x, y: float(ws.look(W, W["H"], np.array(x), np.array(y)))
     on_flesh = ws.look(W, W["putrid"], px, py) > 0
     # the flesh breathes: a slow swell of light and dark rolling across it
@@ -466,41 +479,10 @@ def living_flesh(img, w, W, px, py, pz, L, T):
                     img[jy, jx] = np.clip(np.array([0.7, 0.62, 0.3]) * k_, 0, 1)
         else:
             img[iy, ix - 1: ix + 2] = np.array([0.08, 0.03, 0.04])
-    # the vein: up out of the ground and under again, pulses running along it to the gate
-    n_ = len(VP)
-    for i in range(n_):
-        s = i / (n_ - 1)
-        lift = max(0.0, np.sin(s * np.pi * 3.5 + 0.4)) * 0.26        # humping out of the ground, never floating
-        if lift <= 0.02:
-            continue
-        x, y = VP[i]
-        g = gh(x, y)
-        pulse = np.exp(-((((s * 6 - T * 2) % 1.0) - 0.5) / 0.08) ** 2)
-        r = 0.2 * (1 + 0.45 * pulse)
-        z = g + lift
-        sx, sy = ws.to_px((x, y, z))
-        rx, ry = r * 18, r * 15
-        for yy in range(int(sy - ry - 1), int(sy + ry + 2)):
-            for xx in range(int(sx - rx - 1), int(sx + rx + 2)):
-                if not (0 <= yy < GH and 0 <= xx < GW):
-                    continue
-                u_, v_ = (xx + 0.5 - sx) / rx, (yy + 0.5 - sy) / ry
-                q2 = u_ * u_ + v_ * v_
-                if q2 > 1:
-                    continue
-                d = x + y + np.sqrt(1 - q2) * r
-                if v_ * r + (z - r) * 0 > (lift - 0.05) * 1.0 and v_ > 0.4 and lift < r:
-                    continue
-                if d < dep[yy, xx] - 0.25 or d <= zb[yy, xx]:
-                    continue
-                zb[yy, xx] = d
-                lm = max(0.0, -u_ * 0.6 - v_ * 0.6 + np.sqrt(1 - q2) * 0.5)
-                col = np.array([0.12, 0.03, 0.07]) + np.array([0.22, 0.05, 0.08]) * lm + np.array([0.3, 0.03, 0.04]) * pulse * 0.8
-                if v_ < -0.55 and u_ < 0:
-                    col = col + 0.12
-                img[yy, xx] = np.clip(col * (0.5 + L["lamp"][yy, xx] * 1.0 + L["moon"][yy, xx] * 0.35), 0, 1)
-                if v_ > 0.7 and yy + 2 < GH and zb[yy + 2, xx] < d - 0.3:
-                    img[yy + 2, xx] = img[yy + 2, xx] * 0.55                   # its shadow on the ground beside it
+    # the vein (landkit vessel.py): a true tube, threading in and out of the ground, its pulse running to the gate
+    if "vein3" not in W:
+        W["vein3"] = vessel.path(VP[::2], gh, seed=5, humps=2.5, depth=0.6, lift=0.42, r0=0.3)
+    vessel.draw(img, zb, dep, ws.to_px, W["vein3"], 0.3, T, lts, ws.SUN, seed=5, ground=gh)
     # capillaries: fine dark threads branching off the vein into the ground, pulsing faintly with it
     cr = np.random.default_rng(55)
     for i in range(0, len(VP), 9):
@@ -522,7 +504,6 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     centre = (ec[0], ec[1], g + Ry * 0.12)
     blink = np.clip(1 - np.abs((T - 0.62) / 0.13), 0, 1) ** 0.8
     gz = np.array([AX[0] * 0.25 + PERP[0] * 0.3, AX[1] * 0.25 + PERP[1] * 0.3, 1.0])
-    lts = [((lx, ly, lz), (0.95, 0.6, 0.32), rch * 1.4) for (lx, ly, lz, rch) in ws.LIGHTS]
     eyegen.draw(img, zb, dep, ws.to_px, centre, Ry, gz, blink, lts, ws.SUN, seed=3, ambient=0.16, aperture=(0.84, 0.4))
     sx0, sy0 = ws.to_px(centre)
     R = Ry * 18.0 * 0.62

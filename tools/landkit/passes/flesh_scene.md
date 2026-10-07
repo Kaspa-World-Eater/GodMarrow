@@ -111,3 +111,43 @@ Worst first: the pool, the floating vein, the light.
     8 Contact: the lids' foot into the socket; still weak where columns meet flags.
     10 Life: blink, runs, pool rings, breathing wave, vein pulse: not yet checked animated.
     11 Seen as the player: Ossuarch for scale, game camera. 12 Skeptic: worst difference now the fangs, then the vein.
+   Lore read for the fangs: the hermit of the Fallen Watchtower, "a ring of broken stones there, shaped like teeth,
+   round a pit of warm ash ... There was a sandal at the edge, and blood dried on the stones"; and "black glass forms
+   where a Husk's blood ran into the ash". Rules check: section 6 says no red light; the gate's red glow broke it.
+41. The fangs ray-marched (landkit fang.py): an oval section, five ridges and a keel, the snapped tip showing
+    dentin, growth lines, crazing, stain in the grooves, tartar at the gum, blood smeared low and running in
+    threads to beads, gloss and a lit rim; the height field sampled from the same shape for shadows. The gate's
+    glow made a dim amber (no red light).
+   Graded (41): real form at last, but the blood ketchup-bright and everywhere, a dither checker over all the
+   enamel, the shape a flared traffic cone.
+42. The fang's body full and near-parallel low, tapering hard to a point that hooks back and aside; the dither only
+    where tones meet; the blood dark red-black, a low smear and a few thin threads.
+   Graded (42): fangs at last, ivory, hooked, wet; but a chrome stripe down the shade side, the checker still in
+   broad areas, the tartar a tan band, a clean line where they meet the flesh.
+43. The warm highlight soft and weak in the shade (no chrome); dither only right at tone borders; the tartar patchy;
+    the flesh climbing each fang's foot, lumpy and wet, with a dark lip where it ends.
+   Graded (43): the fangs clean ivory, the flesh climbing them; but its edge a smooth band.
+44. The flesh's edge on each fang torn and ragged, tongues of it reaching up the enamel.
+45. The vein rebuilt (landkit vessel.py): a true lit tube of dense spheres along a meandering 3D path that dives
+    under the ground (hidden by depth) and humps out; blue-violet skin striated along it, valves swelling every
+    yard and more, the pulse a travelling bulge with a dull red flush, the moon along its top, warm light on its flank.
+   Graded (44-45): the fang's flesh ragged; the vein round and lit at last, but a thin hose with hooked ends lying
+   on the flesh, too straight.
+46. The vein thicker and mostly a half-buried ridge under the skin, arching clear only at its crests and diving
+    right under at its troughs; meandering on its own scale; the flesh pressed dark along both its sides.
+   Graded (46): thick and lying in the flesh, but in grub segments (valve creases), each dive ending in a round cap.
+47. The valves a faint swelling far apart, no crease; the skin closing over the vein wherever it nears the ground,
+    so it sinks into the flesh rather than ending.
+   Graded (47): overcorrected: the skin swallowed nearly all of the vein.
+48. The ridge raised (its top two-thirds above the skin), the skin closing only right at the ground line.
+   RULES CHECK at 48 (end of the 40-pass run), MASTER_RULES section 4:
+    1 Brief: met for eye, fangs, vein, pool, gate, courtyard; the lore's sandal and black glass NOT yet placed.
+    3 Form: eye, fangs, vein now true 3D (eye.py, fang.py, vessel.py). FAILS: doors flat panels, columns smooth and
+      blue, the bone arch a plain tube.
+    5 Values: the flesh field still busy at mid-distance.
+    7 Paint: ground unique everywhere (ground.py); the fangs' flesh skirt a regular red sawtooth (worst new fault).
+    8 Contact: fangs' feet in flesh (too regular), the vein pressed into the flesh; columns on flags still weak.
+    10 Life: still not checked animated (blink, runs, pulse, breathing, gate glow).
+    11 MASTER_RULES 2b.6 (tiles 320x160 with variants) conflicts with Derek's newer "every piece unique": ground.py
+      generates per world position; asked Derek to confirm the rule change before rewriting 2b.6.
+    12 Skeptic, worst first: the fang skirts, then the doors and arch, then the columns.
