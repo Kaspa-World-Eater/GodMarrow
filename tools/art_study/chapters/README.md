@@ -9,5 +9,5 @@ before starting it (MASTER_RULES section 1). `../STUDY.md` keeps the older round
 | Chapter | Covers | Use it for |
 |---|---|---|
 | [01 Detail and nuance](01-detail-and-nuance.md) | What detail is (history, causes), the three scales, correlated variation, edges; old paving, column stone, teeth, wrought iron, ash | Every piece: the first check |
-| 02 Ruins, ash, rock and scree (in work) | Famous ruins and how their stone aged; volcanic and burnt ash ground; rock types and how they break; scree and rubble | Ground generators, ruins, rocks, rubble |
-| 03 Teeth, sinew and muscle (in work) | Tooth anatomy and surfaces, broken teeth; tendon, ligament, fascia, dried sinew; muscle fibre, fascicles, rot | Fangs, bone and sinew, the god's flesh |
+| [02 Ruins, ash, rock and scree](02-ruins-ash-rock-scree.md) | Famous ruins and how their stone aged; volcanic and burnt ash ground; rock types and how they break; scree and rubble | Ground generators, ruins, rocks, rubble |
+| [03 Teeth, sinew, muscle and flesh](03-teeth-sinew-muscle.md) | Tooth anatomy and surfaces, broken teeth; tendon, ligament, fascia, dried sinew; muscle fibre, fascicles, rot | Fangs, bone and sinew, the god's flesh |
