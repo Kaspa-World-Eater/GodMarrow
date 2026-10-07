@@ -38,7 +38,8 @@ def path(pts2d, ground, seed=1, humps=3.5, depth=0.35, lift=0.3, r0=0.24):
     return np.column_stack([P, z])
 
 
-def draw(img, zb, dep_scene, to_px, P, r0, T, lights, moon, seed=1, tol=0.06, ground=None):
+def draw(img, zb, dep_scene, to_px, P, r0, T, lights, moon, seed=1, tol=0.06, ground=None, ramp_=None, taper=False):
+    R_ = R_VEIN if ramp_ is None else ramp_
     GH, GW = img.shape[:2]
     n = len(P)
     seg = np.linalg.norm(np.diff(P, axis=0), axis=1)
@@ -49,6 +50,8 @@ def draw(img, zb, dep_scene, to_px, P, r0, T, lights, moon, seed=1, tol=0.06, gr
         valve = np.exp(-(((s % 2.6) - 1.3) / 0.18) ** 2) * 0.1              # its valves, a faint swelling, far apart
         pulse = np.exp(-((((s * 0.5 - T * 2) % 1.0) - 0.5) / 0.07) ** 2)
         r = r0 * (1 + valve + 0.4 * pulse) * (0.9 + 0.2 * vn(s * 0.8 + seed, 1))
+        if taper:
+            r = r * (1 - 0.75 * i / max(n - 1, 1))                              # thinning to its creeping tip
         sx, sy = to_px((x, y, z))
         rp = r * KX
         if ground is not None and z - ground(x, y) < r * 0.6:
@@ -92,8 +95,8 @@ def draw(img, zb, dep_scene, to_px, P, r0, T, lights, moon, seed=1, tol=0.06, gr
                 # striations along it: fine lines round the tube's angle
                 ang = np.arctan2(v_, u_)
                 stri = 0.06 * np.sin(ang * 9 + s * 0.6 + vn(s * 3 + seed, ang) * 2)
-                idx = int(np.clip((val + stri) * len(R_VEIN), 0, len(R_VEIN) - 1))
-                col = R_VEIN[idx].copy()
+                idx = int(np.clip((val + stri) * len(R_), 0, len(R_) - 1))
+                col = R_[idx].copy()
                 col = col + np.array([0.25, 0.02, 0.04]) * pulse * (0.4 + k * 0.6)   # the pulse: a dull red flush
                 col = col * (1 + warm * 1.3) + spec * np.array([0.7, 0.66, 0.75])
                 if ground is not None:                                        # the skin closes over it near the ground

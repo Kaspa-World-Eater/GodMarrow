@@ -228,3 +228,10 @@ Worst first: the pool, the floating vein, the light.
     star), the pilgrim at the edge of its light, wider and brighter; the beam fuller; the dust a few soft motes.
    Bug (64): the columns' and drums' ground was read at their centres AFTER they were stamped into the height field, so each shaft began on top of its own column and the drums floated; the old flat paint showed beneath. Fixed: the ground saved at stamping.
    Graded (64): a scene at last: the eye glistening in the moon's shaft, the pilgrim at the edge of its light, the beam with dust, darkness round, the stalagmites framing. (The fangs measured dark, 0.1-0.2: the preview misled.) Next: the gore tendrils up the pillars with pustules giving a sickly yellow light; the stalagmites need form.
+65. Gore tendrils up the pillars (Derek): raw-flesh ropes out of the ground at each plinth, spiralling up the shafts,
+    thinning to creeping tips, a branch forking off the other way (vessel.py with a gore ramp and taper); pustules
+    along them (chapter 3): tense domes, a creamy yellow centre under a glossy cap with a wet glint, a red halo, each
+    breathing slowly; each a sickly yellow light on the ground and on every ray-cast piece, its glow hanging in the air.
+   Graded (65): the pustules' light flooded the whole cavern yellow (25 lights reaching yards, summed), the fangs washed; the tendrils thin red threads, unreadable.
+66. Each pustule's light a small local pool (short reach, weak), on the ray-cast pieces too; the tendrils thicker, the pustules larger, the air's glow fainter.
+   Graded (66): the pustules read as glowing yellow beads on red tendrils climbing the pillars, each a small sickly pool; the moon's shaft still keeps the eye the star. Tendrils could be meatier and more fibrous (chapter 3). Next: the gate (Derek approved the plan).
