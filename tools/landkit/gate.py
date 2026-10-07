@@ -200,7 +200,8 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ambient=0.1, tol=0.6):
             dist = np.linalg.norm(v_, axis=-1)
             att = 1 / (1 + (dist / reach) ** 2)
             warm += (np.clip((N * (v_ / dist[:, None])).sum(-1), 0, 1) * att)[:, None] * np.array(lc)
-        val = (ambient + ndl * 0.6 + np.clip(N[:, 2], 0, 1) * 0.03) * (0.55 + 0.45 * occ)
+        wl = warm.mean(1)                                                            # light adds: dark stone lit is no longer dark
+        val = (ambient + ndl * 0.6 + wl * 1.1 + np.clip(N[:, 2], 0, 1) * 0.03) * (0.55 + 0.45 * occ)
         yx = (ys[vis], xs[vis])
         seed = o["seed"]
         if o["kind"] == "post":
@@ -238,7 +239,7 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ambient=0.1, tol=0.6):
             col = np.where((fib & (vn(a * 3 + 7, z * 0.5) > 0.6))[:, None], col * 0.7 + RUST_D * 0.3, col)
             runs = (z < 3.0) & (np.abs(np.sin(a * 31 + seed)) > 0.96)
             col = np.where(runs[:, None], col * 0.7 + RUST_D * 0.3, col)
-        col = col * (1 + warm * 1.3)
+        col = col * (1 + (warm - wl[:, None]) * 1.6)                                 # tinted by the light's colour
         spec = np.clip(N @ hm, 0, 1) ** (12 if o["kind"] == "leaf" else 30) * (0.08 if o["kind"] == "leaf" else 0.03) * sk
         col = col + spec[:, None]
         rim = (np.clip(1 - N @ VIEW, 0, 1) ** 3) * (N[:, 0] < 0) * sk

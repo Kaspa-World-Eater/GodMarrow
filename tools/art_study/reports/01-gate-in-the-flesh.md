@@ -109,6 +109,18 @@ messages. The lore read for it:
     their anathyrosis faces. They read as old columns at once. **What failed first:** an exposure mask that leaned on
     occlusion bleached the whole top like a sock, and the shaded side had no sky or bounce light, so the flutes
     vanished into flat blue.
+16. **A cavern lit by one shaft** (passes 62 to 64): darkness everywhere, one moon shaft through a hole in the roof
+    falling on the eye (the star), the beam visible with dust in it. It turned a lit diorama into a shot.
+    **What failed first:** with the usual low moon the hole sat over the side wall, which shadowed the whole floor
+    (fix: a high moon, still from the upper left); the moon's highlight, rim and tip glow weren't gated by the shaft,
+    so every piece glowed as under an open sky; the dust was a starfield.
+17. **Local lights from the story** (passes 65, 66, 69): the pustules' sickly pools (first they flooded the cavern
+    yellow: 25 lights with long reach summed), the banked offering-fires from the lore lighting the kneelers, the
+    ember glow in the passage backlighting the grille so the bars stand black against it.
+18. **Light must ADD** (bug of pass 69): multiplying a dark material by a light's colour leaves it dark; light raises
+    the value first, then tints.
+19. **Stamped height and ray-cast pieces must agree on the ground** (bug of pass 64): read an object's ground before
+    it is stamped, or its ray-cast twin stands on top of itself.
 13. **Reading the lore for one true detail** gave the gate its brief (the mouth's door) and the fangs their dried
     blood.
 

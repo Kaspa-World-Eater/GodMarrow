@@ -305,10 +305,17 @@ def stamp(W, w):
                 SICK.append((q + out * (0.08 + pr * 0.55), pr, rr.uniform(0, 6.28)))
     ws.LIGHTS.append((GATE[0] - AX[0] * 0.6, GATE[1] - AX[1] * 0.6, gbase + 1.2, 3.2))   # the glow from within the gate
     ws.LIGHTS.append((GATE[0] - AX[0] * 2.2, GATE[1] - AX[1] * 2.2, gbase + 2.4, 4.5))   # and deeper in: it backlights the grille
+    # the banked offering-fires at the posts' feet (the lore: "Bank it, Tam. Ash over the coals ... we keep the fire
+    # low on the Cheek"): their low light thrown up the posts' faces onto the kneelers
+    for sg in (-1, 1):
+        fp = GATE + PERP * sg * POST_U + AX * (POST_HR + 0.9)
+        FIRES.append(fp)
+        ws.LIGHTS.append((fp[0], fp[1], gbase + 0.35, 2.6))
 
 
 _TILES = {}
 SICK = []                                    # the pustules' sickly lights: (position xyz, radius, phase)
+FIRES = []                                   # the banked offering-fires at the posts' feet
 SICKC = np.array([0.72, 0.8, 0.22])
 ws_T = [0.0]                                 # the loop's time, for the ground's own motion
 
@@ -549,6 +556,28 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     for (tp, tr, tsd) in W["tendrils"]:                                  # the gore tendrils: raw flesh, wet, pulsing
         vessel.draw(img, zb, dep, ws.to_px, tp, tr, T, lts, ws.SUN, seed=tsd, tol=0.35, ramp_=R_GORE, taper=True)
     pustules(img, zb, dep, T)
+    for k_, fp in enumerate(FIRES):                                       # the banked fires: coals under a crust of ash, a thread of smoke
+        g0 = gh(fp[0], fp[1]) if False else W["gbase"]
+        rr = np.random.default_rng(900 + k_)
+        for c_ in range(40):
+            a, rd = rr.uniform(0, 6.283), np.sqrt(rr.uniform(0, 1)) * 0.45
+            x, y = fp[0] + np.cos(a) * rd, fp[1] + np.sin(a) * rd * 0.8
+            sx, sy = ws.to_px((x, y, g0 + 0.08 + (0.45 - rd) * 0.2))
+            ix, iy = int(round(sx)), int(round(sy))
+            if not (0 <= iy < GH and 0 <= ix < GW) or dep[iy, ix] > x + y + 0.3:
+                continue
+            heat = 0.5 + 0.5 * np.sin(T * 6.283 * rr.uniform(1, 3) + c_)
+            if rr.random() < 0.55:
+                img[iy, ix] = np.array([0.32, 0.3, 0.29]) * (0.6 + heat * 0.3)            # the ash crust over them
+            else:
+                img[iy, ix] = np.clip(np.array([0.9, 0.38, 0.08]) * (0.5 + heat * 0.6), 0, 1)   # a coal showing through
+        for j in range(26):                                               # the thread of smoke, leaning in the draught
+            z = g0 + 0.3 + j * 0.12
+            x = fp[0] + np.sin(j * 0.5 + T * 6.283) * 0.06 + j * 0.012
+            sx, sy = ws.to_px((x, fp[1], z))
+            ix, iy = int(round(sx)), int(round(sy))
+            if 0 <= iy < GH and 0 <= ix < GW and dep[iy, ix] <= x + fp[1] + 0.3:
+                img[iy, ix] = img[iy, ix] * 0.8 + np.array([0.3, 0.29, 0.3]) * 0.2 * (1 - j / 26)
     gh = lambda x, y: float(ws.look(W, W["H"], np.array(x), np.array(y)))
     on_flesh = ws.look(W, W["putrid"], px, py) > 0
     # the flesh breathes: a slow swell of light and dark rolling across it
@@ -560,7 +589,7 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     gb = W["gbase"]
     pa = GATE + PERP * -(POST_U + 0.3) + AX * (POST_HR + 0.35)
     pb = GATE + PERP * (POST_U + 0.3) + AX * (POST_HR + 0.35)
-    arch = bonegen.rib((pa[0], pa[1], gb + 4.6), (pb[0], pb[1], gb + 4.45), 0.55, 0.45, 0.32, seed=12)
+    arch = bonegen.rib((pa[0], pa[1], gb + 4.6), (pb[0], pb[1], gb + 4.45), 0.85, 0.32, 0.36, seed=12)
     kp = GATE + AX * (POST_HR + 0.45)
     sk = bonegen.skull((kp[0], kp[1], gb + 4.45), 0.62, (AX[0] + 0.1, AX[1], -0.35), seed=4)
     bonegen.draw(img, zb, dep, ws.to_px, [arch, sk], lts, ws.SUN)
