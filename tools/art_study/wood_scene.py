@@ -45,6 +45,7 @@ DEPTH_V = DEPTH_V / np.linalg.norm(DEPTH_V)
 
 
 _CACHE = {}
+_LIVE = {}                                                                 # the living layers' depths, for the hero
 
 
 def build(w):
@@ -240,7 +241,9 @@ def shade(W, px, py, pz, SX, SY, t=0.0):
             n = np.where(m[..., None], nl, n)
     # the moon through the canopy: the gap bright, the rest dim but for flecks that move as the leaves move
     canopy = look(W, W["light"], px, py)
-    flk = (vn(px * 1.3 + np.sin(t * 6.28) * 0.4, py * 1.3 + np.cos(t * 6.28) * 0.3) > 0.7)
+    ox_, oy_ = np.cos(t * 6.283) * 0.9, np.sin(t * 6.283) * 0.6           # the canopy swaying overhead, a loop
+    flk = (vn(px * 1.3 + ox_, py * 1.3 + oy_) > 0.7)
+    leafsh = vn(px * 0.55 + ox_ * 0.7, py * 0.55 + oy_ * 0.7) * 0.6 + vn(px * 1.4 + ox_, py * 1.4 + oy_) * 0.4
     moonlit = np.clip(0.42 + canopy * 0.75, 0, 1) + flk * 0.4 * (canopy < 0.6)        # forms must still read under the leaves
     ndl = np.clip((n * SUN).sum(2), 0, 1)
     sx0, sy0, sz0 = px + n[..., 0] * 0.12, py + n[..., 1] * 0.12, pz + n[..., 2] * 0.12
@@ -249,6 +252,7 @@ def shade(W, px, py, pz, SX, SY, t=0.0):
         s = k * 0.08
         sh |= look(W, H, sx0 + SUN[0] * s, sy0 + SUN[1] * s, -50.0) > sz0 + SUN[2] * s + 0.03
     moon = ndl * np.where(sh, 0.12, 1.0) * np.clip(moonlit, 0, 1)
+    moon = moon * np.where((leafsh > 0.56) & (canopy > 0.45), 0.45, 1.0)   # moving leaf shadows where the moon comes down
     # the lantern
     lamp = np.array([HERO[0] + 0.25, HERO[1] - 0.25, look(W, H, np.array(HERO[0]), np.array(HERO[1])) + 0.7])
     lx0, ly0, lz0 = px + n[..., 0] * 0.12, py + n[..., 1] * 0.12, pz + n[..., 2] * 0.12
@@ -259,7 +263,7 @@ def shade(W, px, py, pz, SX, SY, t=0.0):
     for k in range(1, 24):
         f = k / 24
         lsh |= look(W, H, lx0 + (lamp[0] - lx0) * f, ly0 + (lamp[1] - ly0) * f, -50.0) > lz0 + (lamp[2] - lz0) * f + 0.03
-    breath = 1 + 0.05 * np.sin(t * 6.28 * 2) + 0.03 * np.sin(t * 6.28 * 5)
+    breath = 1 + 0.09 * np.sin(t * 6.28 * 2) + 0.05 * np.sin(t * 6.28 * 5 + 1) + 0.04 * np.sin(t * 6.28 * 11)
     lampk = np.clip((n * lu).sum(2), 0, 1) ** 0.7 / (1 + (ld / (2.6 * breath)) ** 2) * np.where(lsh, 0.1, 1.0)
     ao = np.clip((nd.gaussian_filter(H, 8) - H) * 2.5, 0, 1)
     ao_px = look(W, ao, px, py) * (~side)
@@ -464,12 +468,25 @@ def to_px(p3):
     return (p3[0] - p3[1]) * KX + ox, (p3[0] + p3[1]) * KY + oy - p3[2] * KZ
 
 
+def gust(T):
+    """the one wind: a steady breath, and once a loop a gust passes through (rises and falls over a fifth of the loop)"""
+    d = min(abs(T - 0.6), 1 - abs(T - 0.6))
+    return 1.0 + 1.6 * np.exp(-(d / 0.09) ** 2)
+
+
+def drift(fn, T, period=1.0):
+    """a seamless looping drift: two copies of a moving field, cross-faded so frame 0 and the last frame meet"""
+    return fn(T) * (1 - T) + fn(T - period) * T
+
+
 def living(img, w, W, px, py, pz, L, t=0.0):
+    T = t                                                                # the loop's time (t is reused below)
     """drawn piece by piece; each lit by the light where it stands, hidden by what is nearer the camera"""
     from forest_floor import FROND, CAP
     from scatter_wood import grass_clump, paste
     rr = np.random.default_rng(21)
     dep = px + py
+    bay_l = tw.B4[(np.arange(GH)[:, None] % 4), (np.arange(GW)[None, :] % 4)]
     gh = lambda x, y: float(look(W, W["H"], np.array(x), np.array(y)))
 
     def light_at(x, y):
@@ -477,10 +494,14 @@ def living(img, w, W, px, py, pz, L, t=0.0):
         i, j = int(np.clip(sy, 0, GH - 1)), int(np.clip(sx, 0, GW - 1))
         return 0.3 + L["moon"][i, j] * 0.9 + L["lamp"][i, j] * 1.6, (i, j)
 
+    LDEP = np.full((GH, GW), -1e9)
+    _LIVE["ldep"] = LDEP
+
     def put(sx, sy, col, depth):
         i, j = int(sy), int(sx)
         if 0 <= i < GH and 0 <= j < GW and dep[i, j] <= depth + 0.15:
             img[i, j] = col
+            LDEP[i, j] = max(LDEP[i, j], depth)
     # first the fresh fall (everything that grows comes up through it): leaves placed by the ecology, thick where the litter lies deep and in the drifts, few where
     # it is thin; each a drawn stamp, lit by the light where it lies
     from litter_stamps import LEAVES
@@ -529,7 +550,8 @@ def living(img, w, W, px, py, pz, L, t=0.0):
             prev = None
             for i in range(18):
                 t = i / 17
-                x, y = xx + dg[0] * ln * t, yy + dg[1] * ln * t
+                swy = np.sin(2 * np.pi * T * 2 - (xx - yy) * 0.9) * 0.16 * t * t * gust(T)
+                x, y = xx + dg[0] * ln * t + swy, yy + dg[1] * ln * t - swy
                 z = gh(xx, yy) + hg * 4 * t * (1 - t) * (1 if t < 0.5 else 1.15)
                 sx, sy = to_px((x, y, z))
                 col = FROND[4] * k * 0.9
@@ -558,6 +580,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
                     img[yy_, xx_] *= (1 - a)
                 else:
                     img[yy_, xx_] = spr[j, i, :3] * k
+                    LDEP[yy_, xx_] = max(LDEP[yy_, xx_], depth)
     tgm = look(W, W["tag"], px, py) != 0                                # never drawn over a trunk, a log, the plate
     # grass and saplings in the gap: crowding its brightest heart, thinning to its edge, in tufts
     gx, gy, gr = w.gap
@@ -573,8 +596,8 @@ def living(img, w, W, px, py, pz, L, t=0.0):
             continue
         k, (i, j) = light_at(x, y)
         sx, sy = to_px((x, y, gh(x, y)))
-        wave = np.sin(2 * np.pi * t * 2 - (x - y) * 0.9)                # a wave rolling across with the wind
-        fr_ = 0 if wave < -0.35 else (2 if wave > 0.35 else 1)
+        wave = np.sin(2 * np.pi * T * 2 - (x - y) * 0.9) * gust(T)      # a wave rolling across with the wind
+        fr_ = 0 if wave < -0.3 else (2 if wave > 0.3 else 1)
         paste_d(clumps[rr.integers(0, 6)][fr_], sx, sy, min(k, 1.3), x + y)
     for (x, y) in w.sapl:
         if abs(x - FOCUS[0]) > 9 or abs(y - FOCUS[1]) > 9 or look(W, W["tag"], np.array(x), np.array(y)) != 0:
@@ -583,7 +606,8 @@ def living(img, w, W, px, py, pz, L, t=0.0):
         hgt = rr.uniform(0.8, 1.8)
         z0 = gh(x, y)
         b = to_px((x, y, z0))
-        tp = to_px((x + 0.05, y, z0 + hgt))
+        sw_ = np.sin(2 * np.pi * T * 2 - (x - y) * 0.9) * 0.14 * gust(T)
+        tp = to_px((x + 0.05 + sw_, y - sw_, z0 + hgt))
         for q in np.linspace(0, 1, 30):
             put(b[0] + (tp[0] - b[0]) * q, b[1] + (tp[1] - b[1]) * q, R_BARK[3] * k, x + y)
         for lf in range(10):                                            # a sapling's few leaves, in pairs up the stem
@@ -653,12 +677,12 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     # leaves drifting down out of the canopy, swaying side to side; their shadows close on them as they come down
     from litter_stamps import LEAVES
     rf = np.random.default_rng(91)
-    for q in range(8):
-        lx, ly = FOCUS[0] + rf.uniform(-5, 5), FOCUS[1] + rf.uniform(-5, 5)
+    for q in range(22):
+        lx, ly = FOCUS[0] + rf.uniform(-7, 7), FOCUS[1] + rf.uniform(-7, 7)
         ph = rf.uniform(0, 1)
-        u = (t + ph) % 1.0
+        u = (T + ph) % 1.0
         z = (1 - u) * 6.0
-        sw = np.sin(u * 14 + ph * 7) * 0.35
+        sw = np.sin(u * 14 + ph * 7) * 0.35 + u * 0.8 * gust(T)
         g = gh(lx, ly)
         sx_, sy_ = to_px((lx + sw, ly - sw, g))
         if 0 <= int(sy_) < GH and 0 <= int(sx_) < GW:
@@ -674,11 +698,41 @@ def living(img, w, W, px, py, pz, L, t=0.0):
                 yy_, xx_ = int(lsy) + j - 2, int(lsx) + i - 3
                 if 0 <= yy_ < GH and 0 <= xx_ < GW:
                     img[yy_, xx_] = rp[int(np.clip(4 + {"H": 2, "L": 1, "B": 0, "D": -1, "P": 3, "V": 1}[ch], 0, 7))] * min(k_, 1.4)
+    g_now = gust(T)
+    rb = np.random.default_rng(57)
+    for q in range(26):
+        bx, by = FOCUS[0] + rb.uniform(-8, 8), FOCUS[1] + rb.uniform(-8, 8)
+        run = (T * 3.0 + rb.uniform(0, 1)) % 1.0                         # each leaf's skitter across the floor
+        k_lift = np.clip((g_now - 1.3) / 1.0, 0, 1)
+        if k_lift <= 0:
+            continue
+        ex, ey = bx + run * 2.2 * k_lift, by - run * 2.2 * k_lift          # blown toward the screen's right
+        hop = abs(np.sin(run * 12)) * 0.25 * k_lift
+        g = gh(ex, ey)
+        sx_, sy_ = to_px((ex, ey, g + hop))
+        st = LEAVES[(q + int(run * 10)) % len(LEAVES)]
+        k_, _ = light_at(ex, ey)
+        for j, row in enumerate(st):
+            for i, ch in enumerate(row):
+                if ch in ".S":
+                    continue
+                yy_, xx_ = int(sy_) + j - 2, int(sx_) + i - 3
+                if 0 <= yy_ < GH and 0 <= xx_ < GW and dep[yy_, xx_] <= ex + ey + 0.2:
+                    img[yy_, xx_] = tw.LITTER[q % 2][int(np.clip(4 + {"H": 2, "L": 1, "B": 0, "D": -1, "P": 3, "V": 1}[ch], 0, 7))] * min(k_, 1.4)
+    # the ground mist: low wisps drifting with the wind through the hollows and the gap, see-through, stepped
+    wetv = look(W, W["wet"], px, py)
+    low = np.clip(1 - (pz - look(W, W["H"], px, py) * 0) / 0.9, 0, 1) * (pz < 1.2)
+    def field(TT):
+        return fbm(px * 0.35 - TT * 1.6, py * 0.35 + TT * 1.6) * 0.65 + fbm(px * 0.9 - TT * 2.4, py * 0.9 + TT * 2.4) * 0.35
+    mist = drift(field, T)
+    dens = np.clip((mist - 0.5) * 3.0 + wetv * 0.4 - 0.15, 0, 1) * low
+    a_ = np.where(dens > 0.55, 0.3, np.where(dens > 0.25, 0.16, 0.0)) * (bay_l > 0.2)
+    img = img * (1 - a_[..., None]) + np.array([0.42, 0.46, 0.55]) * (0.35 + L["moon"][..., None] * 0.6 + L["lamp"][..., None] * np.array([1.2, 0.9, 0.5])) * a_[..., None]
     # spores turning slowly in the lantern's light, each catching it a moment and gone
     lamp = (HERO[0] + 0.25, HERO[1] - 0.25)
     for q in range(16):
         ph = rf.uniform(0, 1)
-        u = (t * rf.uniform(0.5, 1.2) + ph) % 1.0
+        u = (T * rf.integers(1, 3) + ph) % 1.0
         ax_, ay_ = lamp[0] + rf.uniform(-1.2, 1.2), lamp[1] + rf.uniform(-1.2, 1.2)
         zz = gh(*lamp) + 0.3 + u * 1.8
         sx_, sy_ = to_px((ax_ + np.sin(u * 6.28 + ph * 9) * 0.25, ay_, zz))
@@ -720,8 +774,18 @@ def the_ossuarch(big, W, px, py, anim="idle/front_l/0"):
     lit = 0.55 * np.array([0.78, 0.82, 0.95]) + (0.3 + 0.6 * lam)[..., None] * np.array([1.0, 0.82, 0.6]) * 0.75
     a[..., :3] = a[..., :3] * lit + np.array([0.5, 0.6, 0.85]) * (sky ** 4)[..., None] * 0.12
     dep = (px + py)
-    nearer = np.kron(dep > HERO[0] + HERO[1] + 0.35, np.ones((4, 4))).astype(bool)
+    hd = HERO[0] + HERO[1]
+    front = dep > hd + 0.35
+    if "ldep" in _LIVE:
+        front |= _LIVE["ldep"] > hd + 0.05                                  # grass and ferns standing nearer than his feet
+    nearer = np.kron(front, np.ones((4, 4))).astype(bool)
     B = np.array(big).astype(float) / 255
+    # his weight on the ground: a soft dark pool under his feet, the litter pressed (stepped, as painted)
+    yyg, xxg = np.mgrid[0:B.shape[0], 0:B.shape[1]]
+    dd = np.hypot((xxg - fx) / 34.0, (yyg - fy) / 10.0)
+    pool = np.where(dd < 0.6, 0.55, np.where(dd < 1.0, 0.75, 1.0))
+    pool = np.where(nearer, 1.0, pool)
+    B[..., :3] *= pool[..., None]
     hh, ww = a.shape[:2]
     for j in range(hh):
         yy = Y0 + j

@@ -83,3 +83,16 @@ stumps and on snags.
 - **Scene:** first complete pass plus three refinement passes, animated, with collision proved.
 - **Next:** the root plate's form, the near half of the log, the left log and the mound; then convert every object
   to landkit.
+
+## Living layers (the scene's motion)
+- **The one wind, with a gust once a loop.** Grass, ferns and saplings sway in a wave rolling with it. At the gust,
+  leaves lift off the floor and skitter.
+- **The canopy overhead swaying:** leaf shadows slide over the moonlit floor, and the moonflecks move with them.
+- **Ground mist** drifts through the hollows and the gap.
+- **Leaves** fall, fluttering.
+- **Spores** turn in the lantern's light, and the lantern breathes.
+- **Light rays** at dawn and dusk through the gaps (see the shared rules in the README).
+
+**Two bugs on the way.** The fern loop reused the time variable's name, which froze every layer drawn after it. Then
+the hero was drawn over the grass in front of his feet; the living layers now keep their depth so what grows nearer
+the camera covers him, and a contact shadow grounds him.

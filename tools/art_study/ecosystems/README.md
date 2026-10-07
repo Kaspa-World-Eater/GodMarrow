@@ -57,3 +57,33 @@ the organs of Act V, the more of that body shows through every ecosystem.
 | III | The Parasitic Fen of Shog-Mire (flesh, blood) | flesh fen, mangroves, blood delta, brood-banks | `shog`, `shogdeep` |
 | IV | The Frigid Heights of An-Vhar (breath) | foothill conifers, glass passes, wind-scoured ridges | `anvhar`, `anvdeep` |
 | V | The Descent (the body) | calcified highway, cavities, the cerebrum | `a5` |
+
+## Rules every ecosystem shares
+
+### Light rays, by the hour (Derek: "light rays occasionally … based on the time of day … as a rule when seed
+generating")
+In life, shafts of light (crepuscular rays, god rays) show only when three things meet:
+- **a low light:** sun or moon near the horizon (dawn, dusk, a low moon), so the shafts slant long;
+- **openings for it:** gaps in a canopy, a broken roof, a window, a cleft in rock;
+- **something in the air to catch it:** mist, smoke, dust, spores, falling snow, chalk on the wind.
+
+So rays are a rule, not decoration. When generating a land from its seed, the generator puts rays where:
+- the hour's light is low enough (strongest at dawn and dusk, faint silver under a low moon, none at noon or in
+  starless dark);
+- the ecosystem has openings (canopy gaps, ruins' windows, rib-shade in the Ossa, the cracks of a cave);
+- the air holds something (the wet map's mist, the burning forest's smoke, the Ossa's blown dust, spores in a fungal
+  wood).
+
+**How rays are painted:** stepped, see-through bands along the light's direction. The motes inside them drift with
+the wind; the bands breathe as the canopy moves; they're never a glow laid over the screen.
+
+**Per ecosystem:**
+| Ecosystem | Rays |
+|---|---|
+| Old growth | Through the gaps at dawn and dusk; spores turning in them. |
+| Conifer | Long and thin through the spires in morning mist. |
+| Rainforest | Diffuse, green, in the dripping air. |
+| Burning forest | Through the smoke, orange. |
+| Deserts | Through dust in the rib-shade. |
+| Ruins | Through the broken roofs and windows. |
+| Highlands | Through blown snow. |
