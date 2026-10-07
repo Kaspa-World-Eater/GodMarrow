@@ -57,6 +57,7 @@ LIVING = []              # f(img, w, W, px, py, pz, L, T): more living layers, d
 GROUND_LIFE_OK = None    # f(x, y) -> bool: where grass may grow (a ruin keeps its bare ring and its stone clear)
 RIM = (1.35, (0.025, 0.025, 0.03))   # the moonlit rim on objects: strength and cool lift
 FOREST_LIFE = True       # the wood's own living layers (the leaf fall, falling and skittering leaves, the wisp-fire)
+NORMAL_BLUR = 1.0        # cells of blur on the height before its normals (a scene with small stones wants little: blur pillows)
 MOONLIT = None           # f(px, py, pz, t) -> 0..1: a scene's own reach of the moon (a cavern's shaft)
 GROUND = None            # f(img, W, px, py, pz, SX, SY, L, v, gl) -> img: another land's ground tiles over the wood's
 
@@ -252,7 +253,7 @@ def cast(W, t=None):
 
 def shade(W, px, py, pz, SX, SY, t=0.0):
     H, tag = W["H"], W["tag"]
-    Hs = nd.gaussian_filter(H, 1.0)
+    Hs = nd.gaussian_filter(H, NORMAL_BLUR) if NORMAL_BLUR > 0 else H
     gy_, gx_ = np.gradient(Hs, RES)
     hh = look(W, H, px, py)
     tg = look(W, tag, px, py)

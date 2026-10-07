@@ -264,7 +264,7 @@ BASALT_RIND = np.array([0.3, 0.26, 0.22])       # the old weathered rind, warm
 FINES = np.array([0.5, 0.49, 0.47])             # pale ash fines packed in the joints
 
 
-def _poly(px, py, seed, heave, path):
+def _poly(px, py, seed, heave, path, facet=False):
     """the polygon paving's height (chapter 2, Pompeii): irregular 4-7 sided stones 0.45-1 yd, fitted tight, each
     pillowed by wear with its arrises rounded, settled its own way, tipped and lifted by the flesh pushing under"""
     wx = px + (vn(px * 0.9 + seed, py * 0.9) - 0.5) * 0.35                # warped so no lattice shows
@@ -280,10 +280,25 @@ def _poly(px, py, seed, heave, path):
     pillow = np.clip((ed - gap) / rr_, 0, 1)
     pillow = pillow * pillow * (3 - 2 * pillow)
     h = pillow * (0.035 + path * 0.015)
+    if facet:                                                              # chapter 4: a stone is a flat tilted plane with a bevel and
+        bev = 0.05 + path * 0.03                                           # planar chips, never a dome (a small dome pillow-shades)
+        h = -np.clip(1 - (ed - gap) / bev, 0, 1) * 0.028
     settle = (h1(cid, 4, seed) - 0.5) * 0.04 + heave * h1(cid, 5, seed) * 0.18
     ta = (h1(cid, 6, seed) - 0.5) * 0.04 + np.sign(h1(cid, 6, seed) - 0.5) * heave * 0.22
     tb = (h1(cid, 7, seed) - 0.5) * 0.04 + np.sign(h1(cid, 7, seed) - 0.5) * heave * 0.22
+    if facet:                                                              # each stone its own tilt, 2 to 8 degrees: the tones of a mosaic
+        ta = ta + (h1(cid, 16, seed) - 0.5) * 0.16
+        tb = tb + (h1(cid, 17, seed) - 0.5) * 0.16
     h = h + settle + ta * (wx - cx) + tb * (wy - cy)
+    if facet:                                                              # planar chips at the edges and corners, each facing its own way
+        for k in range(3):
+            on = h1(cid, 50 + k, seed) > 0.45
+            a = h1(cid, 53 + k, seed) * 6.283
+            proj = (wx - cx) * np.cos(a) + (wy - cy) * np.sin(a)
+            r0 = 0.16 + h1(cid, 56 + k, seed) * 0.16
+            sl_ = 0.3 + h1(cid, 59 + k, seed) * 0.45
+            top_here = settle + ta * (wx - cx) + tb * (wy - cy)
+            h = np.where(on, np.minimum(h, top_here - np.clip(proj - r0, 0, None) * sl_), h)
     fate = h1(cid, 20, seed)
     sunk = (fate > 0.86) & (fate < 0.93)
     gone = fate >= 0.955
@@ -300,11 +315,11 @@ def _poly(px, py, seed, heave, path):
                    cx=cx, cy=cy, wx=wx, wy=wy)
 
 
-def paving_height(px, py, seed=0, heave=None, path=None):
+def paving_height(px, py, seed=0, heave=None, path=None, facet=False):
     """the paving's real height in yards, for the world's height field (MASTER_RULES section 0)"""
     hv = np.zeros(px.shape) if heave is None else heave
     pth = np.zeros(px.shape) if path is None else path
-    h, I = _poly(px, py, seed, hv, pth)
+    h, I = _poly(px, py, seed, hv, pth, facet)
     return h, I
 
 

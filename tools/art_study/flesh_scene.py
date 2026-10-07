@@ -73,6 +73,7 @@ def shaft(x, y, z):
 
 
 ws.MOONLIT = lambda px, py, pz, t: shaft(px, py, pz)
+ws.NORMAL_BLUR = 0.35                        # chapter 4: never blur small stones' normals (it pillows them)
 kit.SKY = lambda P: shaft(P[..., 0], P[..., 1], P[..., 2])
 ws.HERO = C + AX * 8.2 - PERP * 0.8
 
@@ -285,6 +286,20 @@ def stamp(W, w):
         ci = np.clip(np.round(W["X"] / we_.RES - 0.5).astype(int), 0, cave.shape[1] - 1)
         u_r, r_r = gate_q(X, Y)
         m = (cave[ri, ci] | ((r_r > 0.35) & (np.abs(u_r) > GATE_W / 2 + 0.2))) & (W["tag"] == 0)   # the walls, and the old rock behind the gate
+        # FORM IS LAW on the walls too (Derek: "why can't we apply that to everything? look at the flat shitty texture of
+        # the back walls"): columnar basalt (chapter 4: a lava cavern's walls; Fingal's Cave): every column a real prism,
+        # its flat top at its own broken height, bevelled at its arris, so the walls' light and shadow come from form
+        import ground as _g
+        c1, c2, cid_, ccx, ccy = _g.cells(X, Y, 0.62, 77, 0.55)
+        ci_ = np.clip(((ccy - W["y0"]) / ws.RES).astype(int), 0, H.shape[0] - 1)
+        cj_ = np.clip(((ccx - W["x0"]) / ws.RES).astype(int), 0, H.shape[1] - 1)
+        hc = H[ci_, cj_]                                                     # the wall's height at the column's heart
+        step = (_g.h1(cid_, 3, 77) - 0.5) * 1.1 + (_g.h1(cid_, 4, 77) > 0.82) * -0.9   # broken at its own height, some snapped low
+        top = hc + step
+        tilt = (_g.h1(cid_, 5, 77) - 0.5) * 0.25 * (X - ccx) + (_g.h1(cid_, 6, 77) - 0.5) * 0.25 * (Y - ccy)
+        edge_ = (c2 - c1) * 0.5
+        col_h = top + tilt - np.clip(1 - edge_ / 0.06, 0, 1) * 0.07 - (edge_ < 0.015) * 0.25   # the bevel; the joint between columns
+        H = np.where(m & (hc > 0.6), np.maximum(col_h, H * 0.4), H)
         W["tag"] = np.where(m, 868, W["tag"])
         W["obj"][868] = dict(kind="rubble", fam=0, base=0.0, wall=False, big=True)
     for i, (p, a, L_) in enumerate(DRUMS):
@@ -356,7 +371,7 @@ def stamp(W, w):
     soft2 = np.clip((YARD[0] + (vn(qa2 * 0.5, 3) - 0.5) * 1.6 - np.abs(qp2)) / 1.8, 0, 1) * np.clip((qa2 - YARD[1]) / 1.2, 0, 1) * np.clip((YARD[2] - qa2) / 1.2, 0, 1)
     heave2 = np.clip(near * 1.3, 0, 1) ** 1.6                              # heaved only near the god's own parts
     way2 = np.clip(1 - (np.abs(qp2) - 1.2 - (vn(qa2 * 0.4, 5) - 0.5) * 0.8) / 1.2, 0, 1) * (qa2 > YARD[1] - 1)
-    hp, _ = groundgen.paving_height(X, Y, seed=2, heave=heave2, path=way2)
+    hp, _ = groundgen.paving_height(X, Y, seed=2, heave=heave2, path=way2, facet=True)
     hp = hp * 1.05                                                         # the stones' relief, true to worn old paving
     fl_ = np.clip(spread, 0, 1)
     hf = fl_ * 0.16 + groundgen.flesh_height(X, Y, seed=1) * (W["putrid"])     # the flesh swelling up out of the cracks
@@ -1040,7 +1055,7 @@ R_RUBBLE = [ws.ramp("#0e0d12", "#1a181e", "#27242a", "#36323a", "#47424a", "#5a5
 
 def paint_rubble(img, m, v, n, px, py, pz, o, W, L):
     R = R_RUBBLE[o["fam"]]
-    hh = vn(px * 3 + o["fam"] * 7, py * 3) * 0.12
+    hh = vn(px * 3 + o["fam"] * 7, py * 3) * 0.05                       # (the form carries it now: little painted blotch)
     lt = L["moon"] * (0.35 + np.clip(n[..., 2], 0, 1) * 0.3) + L["lamp"] * 0.7      # the cavern's own light, nothing else
     sv = np.clip(0.06 + lt * 0.8 + hh - 0.04 + (v - 0.5) * 0.12, 0, 0.99)
     img[m] = R[np.clip((sv * len(R)).astype(int), 0, len(R) - 1)][m]
