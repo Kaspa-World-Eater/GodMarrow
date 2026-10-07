@@ -169,7 +169,7 @@ def shape_plan(w):
     H = np.maximum(H, wall + cols_)
     w.cave = wall > 0.4
     # two great stalagmites in the near corners: dark shapes framing the shot
-    for (pa, pp, hh, rr0, sd) in ((15.6, -9.8, 6.0, 1.15, 3), (16.2, 9.6, 7.0, 1.3, 4)):
+    for (pa, pp, hh, rr0, sd) in ((14.9, -9.0, 4.6, 0.95, 3), (15.5, 8.9, 5.4, 1.05, 4)):
         p0 = C + AX * pa + PERP * pp
         d = np.hypot(X - p0[0], Y - p0[1]) * (1 + (fbm(X * 1.2 + sd, Y * 1.2) - 0.5) * 0.5)
         stal = hh * np.clip(1 - d / rr0, 0, 1) ** 0.55
@@ -269,6 +269,14 @@ def stamp(W, w):
     H = np.where(m, cap, H)
     W["tag"] = np.where(m, 869, W["tag"])
     W["obj"][869] = dict(kind="rubble", fam=1, base=g, wall=False, big=True)
+    cave = getattr(w, "cave", None)                                       # the cavern's rock: walls and stalagmites, basalt
+    if cave is not None:
+        import wood_ecosystem as we_
+        ri = np.clip(np.round(W["Y"] / we_.RES - 0.5).astype(int), 0, cave.shape[0] - 1)
+        ci = np.clip(np.round(W["X"] / we_.RES - 0.5).astype(int), 0, cave.shape[1] - 1)
+        m = cave[ri, ci] & (W["tag"] == 0)
+        W["tag"] = np.where(m, 868, W["tag"])
+        W["obj"][868] = dict(kind="rubble", fam=0, base=0.0, wall=False, big=True)
     for i, (p, a, L_) in enumerate(DRUMS):
         dirv = np.array([np.cos(a), np.sin(a)])
         along = (X - p[0]) * dirv[0] + (Y - p[1]) * dirv[1]
@@ -404,6 +412,9 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     pm = ws.look(W, W["putrid"], px, py) > 0
     pcol, pwet = groundgen.flesh(px, py, seed=1, moon=ws.SUN)
     alb = np.where(pm[..., None], pcol, alb)
+    fd_ = ws.look(W, W["fdist"], px, py)                                    # its edge feathers: a thin film of flesh over the stone
+    feather = np.clip(1 - fd_ / 0.5, 0, 1) * (vn(px * 4 + 2, py * 4) * 0.6 + 0.4) * ~pm
+    alb = alb * (1 - feather[..., None] * 0.6) + pcol * 0.75 * feather[..., None] * 0.6
     # the fungal threads: sparse wandering lines (contours of a slow noise), only in the band where the flesh creeps
     # (the mycelium is drawn as living strands, threading in and out of the ground: see mycelium())
     d = ws.look(W, W["pore"], px, py)
@@ -612,7 +623,7 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     for i, (p, a, L_) in enumerate(DRUMS):
         g0 = W["obj"][810 + i]["base"]
         shapes.append(colgen.drum((p[0], p[1], g0 + 0.32), (np.cos(a), np.sin(a)), 0.5, L_, seed=90 + i))
-    colgen.draw(img, zb, dep, ws.to_px, sorted(shapes, key=lambda o: (o.get("b", o.get("c"))[0] + o.get("b", o.get("c"))[1])), lts, ws.SUN)
+    colgen.draw(img, zb, dep, ws.to_px, sorted(shapes, key=lambda o: (o.get("b", o.get("c"))[0] + o.get("b", o.get("c"))[1])), lts, ws.SUN, ambient=0.07)
     for (tp, tr, tsd) in W["tendrils"]:                                  # the gore tendrils: raw flesh, wet, pulsing
         vessel.draw(img, zb, dep, ws.to_px, tp, tr, T, lts, ws.SUN, seed=tsd, tol=0.35, ramp_=R_GORE, taper=True)
     pustules(img, zb, dep, T)
@@ -626,6 +637,8 @@ def living_flesh(img, w, W, px, py, pz, L, T):
         lv += 0.6 / (1 + (dl / 2.4) ** 2)
         for fp in FIRES:
             lv += 0.5 / (1 + (np.hypot(P[0] - fp[0], P[1] - fp[1]) / 1.6) ** 2)
+        for (q, pr, ph) in SICK:                                           # the pustules' sickly light too
+            lv += 0.45 / (1 + (np.linalg.norm(P - q) / (0.6 + pr * 2)) ** 2)
         return min(lv, 1.2)
     pr_ = np.random.default_rng(404)
     put = 0
@@ -989,6 +1002,21 @@ def beam(img, w, W, px, py, pz, L, T):
     return np.clip(img, 0, 1)
 
 
+def atmosphere(img, w, W, px, py, pz, L, T):
+    """one air for the whole cavern: a dim haze deepening with distance, so the far things sink back together, and one
+    gentle grade so every material sits in one palette (Derek: "nothing really blends smoothly")"""
+    dep = px + py
+    dn = (dep - dep.min()) / max(np.ptp(dep), 1e-6)
+    a = 0.42 * (1 - dn) ** 1.6
+    haze = np.array([0.055, 0.04, 0.05])
+    img = img * (1 - a[..., None]) + haze * a[..., None]
+    lum = img.mean(2, keepdims=True)
+    img = lum + (img - lum) * 0.86                                         # one palette: a little less of each colour's own
+    img = img * np.array([1.02, 0.985, 0.97])
+    return np.clip(img, 0, 1)
+
+
+ws.LIVING.append(atmosphere)
 ws.LIVING.append(beam)
 
 

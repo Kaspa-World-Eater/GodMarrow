@@ -162,15 +162,17 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ground=None, ambient=0
         lit = np.clip((ndl - 0.03) / 0.25, 0, 1)
         val = ambient + lit * 0.4 + ndl * 0.25
         occ = np.clip(sdf(Pv + N * 0.06, o) / 0.06, 0, 1)                  # flute bottoms and joints a little shut in
-        sky = np.clip(N[:, 2] * 0.5 + 0.5, 0, 1) * 0.1 * (1 - lit)          # the sky's soft light in the shade
-        refl = np.clip(-N[:, 2] * 0.5 + 0.5, 0, 1) * 0.06 * (1 - lit)       # light thrown up from the ground
-        val = (val + sky + refl) * (0.5 + 0.5 * occ)                       # flute bottoms and joints shut in
+        sk = skylit(Pv)
+        sky = np.clip(N[:, 2] * 0.5 + 0.5, 0, 1) * 0.1 * (1 - lit) * sk     # the sky's soft light in the shade: only under the open sky
+        refl = np.clip(-N[:, 2] * 0.5 + 0.5, 0, 1) * 0.04 * (1 - lit)       # light thrown up from the ground
         warm = np.zeros((len(Pv), 3))
         for (lp, lc, reach) in lights:
             v_ = np.array(lp) - Pv
             dist = np.linalg.norm(v_, axis=-1)
             att = 1 / (1 + (dist / reach) ** 2)
             warm += (np.clip((N * (v_ / dist[:, None])).sum(-1), 0, 1) * att)[:, None] * np.array(lc) * 0.8
+        wl = warm.mean(1)
+        val = (val + sky + refl + np.clip(wl, 0, 0.5) * 0.55) * (0.5 + 0.5 * occ)   # light adds; flute bottoms shut in
         yx = (ys[vis], xs[vis])
         q = val * len(R_LIME)
         q = np.where(np.abs(q - np.round(q)) < 0.04, q + BAYER[yx[0] % 4, yx[1] % 4] * 0.7, q)
@@ -178,7 +180,7 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ground=None, ambient=0
         # causes: rain exposure (up and open) bleaches and sugars; shelter crusts black
         expo = np.clip((N[:, 2] - 0.45) * 2, 0, 1) * occ                   # only faces that truly look up
         sugar = (vn(Pv[:, 0] * 30 + seed, Pv[:, 1] * 30 + Pv[:, 2] * 30) - 0.5) * 0.12 * expo
-        col = col * (1 + expo[:, None] * 0.12 + sugar[:, None])
+        col = col * (1 + expo[:, None] * 0.05 + sugar[:, None] * 0.5)
         shelter = np.clip(0.55 - occ, 0, 1) * 2 * (N[:, 0] + N[:, 1] < 0.4)
         if o["kind"] == "drum":
             shelter = np.maximum(shelter, np.clip(-N[:, 2] - 0.2, 0, 1))    # its underside
@@ -187,7 +189,7 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ground=None, ambient=0
         if o["kind"] == "shaft":
             _, th, z, joint, top = _shaft_sdf(Pv, o)
             brk = z > top - 0.12
-            col = np.where(brk[:, None], col * 1.12 + 0.02, col)            # the fresh break, paler
+            col = np.where(brk[:, None], col * 1.05, col)                   # the fresh break, a little paler
             streak = (np.abs(np.sin(th * 23 + seed)) > 0.93) & (z > top - 1.6 - vn(th * 4, 1) * 1.2) & ~brk
             col = np.where(streak[:, None], col * 0.72, col)                # runs down from the break
             fb = (np.abs(((th * NFL / (2 * np.pi)) % 1.0) - 0.5) > 0.33) == False
@@ -208,8 +210,7 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ground=None, ambient=0
             col = np.where(rough[:, None], col * (0.82 + (vn(Pv[:, 0] * 25, Pv[:, 1] * 25 + Pv[:, 2] * 25)[:, None] - 0.5) * 0.3), col)
             band = face & (rr_ >= 0.8)
             col = np.where(band[:, None], col * 1.1, col)                   # the smooth contact band
-        col = col * (1 + warm * 1.2) + (refl[:, None] * np.array([0.5, 0.2, 0.18]))   # the flesh's warmth below
-        sk = skylit(Pv)
+        col = col * (1 + (warm - wl[:, None]) * 0.8) + (refl[:, None] * np.array([0.5, 0.2, 0.18]))   # tinted by the light; the flesh's warmth below
         spec = np.clip(N @ hm, 0, 1) ** 20 * 0.05 * sk
         col = col + spec[:, None]
         rim = (np.clip(1 - N @ VIEW, 0, 1) ** 3) * (N[:, 0] < 0) * sk

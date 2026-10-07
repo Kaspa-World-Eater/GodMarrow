@@ -38,28 +38,57 @@ def _stroke(img, zb, dep, to_px, a, b, c0, c1, light, n=None):
         f = k / n
         P = a + (b - a) * f
         lv = light(P)
-        _dot(img, zb, dep, to_px, P, (c0 * (1 - f) + c1 * f) * (0.28 + lv * 0.9))
+        _dot(img, zb, dep, to_px, P, (c0 * (1 - f) + c1 * f) * (0.1 + min(lv, 0.75) * 0.85))
 
 
 def grass(img, zb, dep, to_px, root, n, height, seed, light, wind=(0.3, -0.1)):
+    """one dead tuft, its own: the species, size, lean, colour and wear all from its seed, so no two alike"""
     rr = np.random.default_rng(seed)
     root = np.array(root, float)
-    for i in range(n):
-        a = rr.uniform(0, 6.283)
-        lean = rr.uniform(0.15, 0.6)
-        L = height * rr.uniform(0.5, 1.0)
-        base = root + np.array([np.cos(a), np.sin(a), 0]) * rr.uniform(0, 0.05)
-        broken = rr.random() < 0.3
-        pts = [base]
-        for k in range(1, 6):
-            f = k / 5
-            if broken and f > 0.6:                                     # snapped, the top folded over and hanging
-                pts.append(pts[-1] + np.array([np.cos(a) * 0.05 + wind[0] * 0.03, np.sin(a) * 0.05, -L * 0.12]))
-                continue
-            pts.append(base + np.array([np.cos(a) * lean * f * f * L + wind[0] * f * f * L * 0.4,
-                                        np.sin(a) * lean * f * f * L + wind[1] * f * f * L * 0.4, L * f]))
+    kind = rr.choice(["tussock", "tussock", "stalk", "fern", "fallen"])
+    tone = rr.choice([0, 1, 2, 3])
+    base_c = [STRAW, np.array([0.5, 0.49, 0.45]), np.array([0.46, 0.36, 0.24]), np.array([0.22, 0.17, 0.15])][tone]
+    root_c = base_c * 0.45
+
+    def blade(b0, a, lean, L, curl=0.0, steps=6):
+        pts = [b0]
+        for k in range(1, steps + 1):
+            f = k / steps
+            ang = a + curl * f * f
+            pts.append(b0 + np.array([np.cos(ang) * lean * f * f * L + wind[0] * f * f * L * 0.35,
+                                      np.sin(ang) * lean * f * f * L + wind[1] * f * f * L * 0.35, L * f * (1 - curl * 0.15 * f)]))
         for k in range(len(pts) - 1):
-            _stroke(img, zb, dep, to_px, pts[k], pts[k + 1], STRAW_D if k == 0 else STRAW * (0.85 + 0.1 * k / 5), STRAW, light, n=6)
+            f = k / (len(pts) - 1)
+            _stroke(img, zb, dep, to_px, pts[k], pts[k + 1], root_c * (1 - f) + base_c * f, base_c * (0.9 + 0.2 * f), light, n=4)
+        return pts[-1]
+
+    if kind == "tussock":
+        for i in range(int(rr.integers(8, 20))):
+            a = rr.normal(np.arctan2(wind[1], wind[0]), 0.9)
+            b0 = root + np.array([rr.normal(0, 0.04), rr.normal(0, 0.04), 0])
+            L = height * rr.uniform(0.35, 1.0)
+            if rr.random() < 0.25:                                          # flattened, lying over
+                L *= 0.4
+                blade(b0, a, 2.2, L)
+            else:
+                blade(b0, a, rr.uniform(0.1, 0.7), L)
+    elif kind == "stalk":
+        for i in range(int(rr.integers(1, 4))):
+            b0 = root + np.array([rr.normal(0, 0.05), rr.normal(0, 0.05), 0])
+            top = blade(b0, rr.uniform(0, 6.28), rr.uniform(0.05, 0.25), height * rr.uniform(1.0, 1.6), steps=8)
+            for j in range(int(rr.integers(4, 9))):                        # the seed head, burst
+                _dot(img, zb, dep, to_px, top + rr.normal(0, 0.035, 3), base_c * 1.15 * (0.12 + light(top) * 0.9))
+    elif kind == "fern":
+        for i in range(int(rr.integers(3, 6))):
+            a = rr.uniform(0, 6.28)
+            blade(root, a, rr.uniform(0.4, 0.9), height * rr.uniform(0.6, 1.0), curl=rr.uniform(1.5, 3.0), steps=8)   # curled in on itself
+    else:                                                                   # dead stems fallen in a jumble
+        for i in range(int(rr.integers(4, 9))):
+            a = rr.uniform(0, 6.28)
+            L = height * rr.uniform(0.6, 1.3)
+            b0 = root + np.array([rr.normal(0, 0.1), rr.normal(0, 0.1), 0.01])
+            b1 = b0 + np.array([np.cos(a) * L, np.sin(a) * L, rr.uniform(0, 0.03)])
+            _stroke(img, zb, dep, to_px, b0, b1, base_c * 0.7, base_c, light, n=8)
 
 
 def thorn(img, zb, dep, to_px, root, height, seed, light):
