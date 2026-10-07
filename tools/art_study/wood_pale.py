@@ -25,7 +25,8 @@ def pale_bark(img, m, v, n, px, py, pz, o, along=None, arc=None, lichen=True):
         ground = float(ws.look(W, W["Hrest"], np.array(o["c"][0]), np.array(o["c"][1])))
         along = pz - ground
     bole = m & (n[..., 2] < 0.35) & (along > 0.9)                       # its round side, above the flare
-    seed = int(abs(o["c"][0] * 131 + o["c"][1] * 71)) % 997
+    cc_ = o["c"] if "c" in o else o["a"]                                 # a log has its start, not a centre
+    seed = int(abs(cc_[0] * 131 + cc_[1] * 71)) % 997
     form = bark.form_value(n, ws.SUN)
     vb = np.clip(form * (0.55 + v * 0.75), 0, 0.99)                     # the pale form, under the scene's own light
     vb = vb * (1 - np.clip((along - 5.0) / 14.0, 0, 0.32))                # climbing into the canopy's shade
