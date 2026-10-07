@@ -142,7 +142,7 @@ def main_0(seed=0):
     for _ in range(9000):
         x, y = rr.integers(0, TW), rr.integers(0, TH)
         g = tone[y, x]
-        if rr.random() > [0.04, 0.08, 0.18, 0.34, 0.42][g]:
+        if rr.random() > [0.02, 0.04, 0.08, 0.13, 0.16][g]:
             continue
         wts = np.array([1, 1, 1, 0.7, 0.8, 0.6, 0.6, 0.7, 1.6, 1.4, 0.08, 1.2])          # oak and folded leaves most; a skeleton rarely
         st = LEAVES[rr.choice(len(LEAVES), p=wts / wts.sum())]

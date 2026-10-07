@@ -591,3 +591,20 @@ softened.
    the mounds and the trodden. Density follows the maps.
 4. **Repetition dies by itself** when the floor is the consequence of a placed history rather than a texture.
 5. **The ground tile is only the base:** humus and the litter's tone and form. Everything with a SHAPE is placed.
+
+### Round 13, in practice: the scene from the plan (`wood_scene.py`)
+- **Checked against my own notes** (Derek: "are you applying the techniques you've learned?"). I wasn't, and the
+  checklist in `docs/PAINTED_STANDARD.md` now makes it mechanical. The mistakes this round were all forgotten
+  lessons:
+  - the moon from the wrong side (rule 11 says -x and a little +y);
+  - shadow marches from the surface with no normal offset (the ruins taught it), so every trunk shadowed itself;
+  - lookups past the world grid clamped to its edge, extruding a trunk into a wall;
+  - a depth test written backwards (nearer the camera is LARGER x + y), which hid every fern and blade.
+- **Forms must read under a canopy.** Too faithful a "5% of daylight" leaves trunks as navy poles. A painter keeps
+  a moonlit baseline, a sky fill from above, bounce from the floor onto every wall, and a lit rim on the moon-side
+  edge.
+- **The tile is a quiet base; the ecology places the rest.** Fresh leaves are scatter placed by litter depth (thick
+  in pits and the windward drifts, thin on mounds), drawn first, so grass, ferns and saplings come up through them.
+  With the bright leaves baked into the tile, depth could never show.
+- **Show what the ecology made.** The windward drift of litter was on the log's far side; the scene's wind was turned
+  so the story faces the camera.

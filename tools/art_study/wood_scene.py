@@ -115,7 +115,20 @@ def build(w):
         H = np.where(m, top, H)
         tag[m] = 100 + ti
         obj[100 + ti] = dict(kind=kind, c=np.array([tx, ty]), r=r)
-    return dict(X=X, Y=Y, H=H, mat=mat, tag=tag, obj=obj, water=water, light=light, wet=wet, x0=x0, y0=y0, n=n)
+    # the litter, as the ecology lays it: banked into a drift against the windward side of every log (a real ridge,
+    # a hand high, that catches the moon), deep and fresh in the pits, thin over the mounds
+    from wood_ecosystem import WIND
+    logm = (tag >= 200) & (tag < 300)
+    sh_c = (-WIND[1] * 0.45 / RES, -WIND[0] * 0.45 / RES)
+    up = nd.shift(logm.astype(float), sh_c, order=0)
+    ridge = nd.gaussian_filter(up, 4) * (~logm)
+    H = np.where(tag == 0, H + ridge * 0.16, H)
+    litt = map_coordinates(w.litter, gi, order=1, mode="nearest") + ridge * 0.8
+    rel = H - nd.gaussian_filter(H, 30)
+    litt = litt - np.clip(rel, 0, None) * 1.5 + np.clip(-rel, 0, None) * 1.2
+    bare = (rel > 0.12) & (tag == 0) & (litt < 0.45)
+    mat[bare & (mat != 1)] = 2
+    return dict(X=X, Y=Y, H=H, mat=mat, tag=tag, obj=obj, water=water, light=light, wet=wet, x0=x0, y0=y0, n=n, litt=litt)
 
 
 def look(W, A, x, y, outside=None):
@@ -223,7 +236,17 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
     floor = tw.compose(mains, dirt, GW=GW, GH=GH)
     gl = (tg == 0) & ~water
     k_light = (0.25 + L["moon"][..., None] * 0.9 * MOON_C + L["lamp"][..., None] * 1.5 * LAMP_C) * (1 - L["ao"][..., None] * 0.35)
-    img[gl] = (floor * k_light)[gl]
+    # the litter's depth on the tile: deep and fresh (warmer, lighter, the new leaves on top), thin (the dark humus showing)
+    litt = look(W, W["litt"], px, py)
+    deep = np.clip((litt - 0.75) * 2.5, 0, 1)
+    thin = np.clip((0.5 - litt) * 3, 0, 1)
+    eco = floor * (1 + deep[..., None] * np.array([0.22, 0.12, 0.0])) * (1 - thin[..., None] * 0.3)
+    # the bare mineral soil of the mounds: the dirt tile, a cooler grey-brown
+    barem = gl & (mat == 2)
+    dx_ = (SX % tw.TW).astype(int)
+    dy_ = (SY % tw.TH).astype(int)
+    eco[barem] = dirt[dy_[barem], dx_[barem]] * 1.1
+    img[gl] = (eco * k_light)[gl]
     mossm = gl & (mat == 1)
     cush = (vn(px * 9, py * 9) - 0.5) * 0.12
     img[mossm] = R_MOSS[np.clip(((v + cush) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 1)][mossm]
@@ -326,6 +349,32 @@ def living(img, w, W, px, py, pz, L):
         i, j = int(sy), int(sx)
         if 0 <= i < GH and 0 <= j < GW and dep[i, j] <= depth + 0.15:
             img[i, j] = col
+    # first the fresh fall (everything that grows comes up through it): leaves placed by the ecology, thick where the litter lies deep and in the drifts, few where
+    # it is thin; each a drawn stamp, lit by the light where it lies
+    from litter_stamps import LEAVES
+    litt_px = look(W, W["litt"], px, py)
+    tgm0 = look(W, W["tag"], px, py)
+    for _ in range(int(GW * GH / 9)):
+        sx, sy = rr.integers(2, GW - 8), rr.integers(2, GH - 6)
+        if tgm0[sy, sx] != 0:
+            continue
+        dl = litt_px[sy, sx]
+        if rr.random() > np.clip((dl - 0.7) * 1.6, 0.03, 0.85):
+            continue
+        st = LEAVES[rr.integers(0, len(LEAVES) - 1)]
+        fam = 0 if rr.random() < 0.55 else 1
+        k = 0.3 + L["moon"][sy, sx] * 0.9 + L["lamp"][sy, sx] * 1.6
+        rp = tw.LITTER[fam]
+        for j, row in enumerate(st):
+            for i, ch in enumerate(row):
+                yy_, xx_ = sy + j, sx + i
+                if ch == "." or not (0 <= yy_ < GH and 0 <= xx_ < GW) or tgm0[yy_, xx_] != 0:
+                    continue
+                if ch == "S":
+                    img[yy_, xx_] *= 0.75
+                    continue
+                off = {"H": 2, "L": 1, "B": 0, "D": -1, "P": 3, "V": 1}[ch]
+                img[yy_, xx_] = rp[int(np.clip(3 + off, 0, 7))] * k
     # ferns: in the damp, in clumps of fronds arching out
     fernpts = np.argwhere(w.fern[::6, ::6]) * 0.6 + 0.05
     for (yy, xx) in fernpts[rr.permutation(len(fernpts))[:60]]:

@@ -116,8 +116,8 @@ pieces.
 |---|---|
 | Ecosystem study (old growth: ages, gaps, dead wood, decay classes, pits and mounds, nurse logs, light, wet, floor layers, fungi) | done, `STUDY.md` round 13 |
 | The plan generator: placement → light/wet maps → floor derivation | `wood_ecosystem.py`, first version |
-| The painted scene from the plan (height field, moon + lantern with shadows, rims, bounce, living layers) | `wood_scene.py`, first version; Derek: "looking fantastic … still needs a ton of work" |
-| Ground tiles in the game's format, with the anti-repetition tricks | `tiles_wood.py`; C, needs much more |
+| The painted scene from the plan (height field, moon + lantern with shadows, rims, bounce, living layers) | `wood_scene.py`; Derek: "looking fantastic … still needs a ton of work". The floor now carries the ecology: litter by depth (windward drifts, pits deep, mounds bare), fresh leaves as placed scatter under the grass |
+| Ground tiles in the game's format, with the anti-repetition tricks | `tiles_wood.py`; C. Now a quiet base (the fresh fall moved to placed scatter); repaint still due |
 | Crafted pieces: grass clumps (sway frames), leaf and twig stamps | first versions (`scatter_wood.py`, `litter_stamps.py`) |
 | The history simulation (centuries of birth, growth, death, decay) | not started |
 | Export to Godot (classes, scatter, props, light map) | not started |

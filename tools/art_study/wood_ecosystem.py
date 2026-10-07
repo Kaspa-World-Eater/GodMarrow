@@ -23,7 +23,7 @@ from scipy import ndimage as nd
 N = 40.0                     # yards across the patch
 RES = 0.1                    # yards per cell
 G = int(N / RES)
-WIND = np.array([0.8, 0.6]) / 1.0
+WIND = np.array([0.7, -0.7])                 # blowing toward the screen's right (x - y)
 _P = np.random.default_rng(12).random((1024, 1024))
 
 
