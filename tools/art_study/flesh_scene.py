@@ -38,6 +38,7 @@ import bone as bonegen                       # noqa: E402
 import column as colgen                      # noqa: E402
 import gate as gategen                       # noqa: E402
 import deadplants                            # noqa: E402
+import remains                               # noqa: E402
 import kit                                   # noqa: E402
 
 # THE CAVERN. The courtyard lies in a cavern under the Moor (the lore: "the god held a room open inside itself, wide as
@@ -680,6 +681,25 @@ def living_flesh(img, w, W, px, py, pz, L, T):
         g0 = W["obj"][792]["base"]
         vp = [(cp[0] + np.cos(0.4 + z * 2.1) * 0.56, cp[1] + np.sin(0.4 + z * 2.1) * 0.56, g0 + 0.45 + z) for z in np.linspace(0, chg - 0.8, 70)]
         deadplants.vine(img, zb, dep, ws.to_px, vp, 700, plight)
+    # the bits and pieces of the dead (Derek: "add some bits and pieces of skeleton"; landkit remains.scatter): those who
+    # came to the gate and did not go in. One by the great fang with the hermit's sandal and the blood dried on the stones
+    bone_c = np.array([0.8, 0.76, 0.66])
+    groups = [(GATE + AX * 2.4 - PERP * 1.6, 0.3, 11, 12, False),      # at the gate's foot: one who nearly reached it
+              (EYE[0] - AX * 2.4 - PERP * 1.9, 1.2, 12, 9, False),     # by the eye, the flesh taking them
+              (C + AX * 5.2 + PERP * (WALL_P + 1.5), 2.0, 13, 5, False),   # among the rubble
+              (np.array(ws.HERO) + AX * 1.1 - PERP * 1.5, 0.7, 14, 8, False),   # in the lantern's pool, on the stones
+              (FANGS[2][0] + AX * 1.9 + PERP * 0.4, 2.6, 15, 4, True)]     # by the great fang: the sandal, the blood
+    for (o_, yaw, sd, n_, snd) in groups:
+        parts = remains.scatter(sd, n_, 0.75, sandal=snd)
+        remains.draw_parts(img, dep, ws.to_px, o_, yaw, gh_, parts, plight, bone_c=bone_c, zb=zb)
+        if snd:                                                          # blood dried on the stones: dark brown flecks and a smear
+            br = np.random.default_rng(sd)
+            for j in range(70):
+                x, y = o_[0] + br.normal(0, 0.45), o_[1] + br.normal(0, 0.3)
+                sx, sy = ws.to_px((x, y, gh_(x, y)))
+                ix, iy = int(round(sx)), int(round(sy))
+                if 0 <= iy < GH and 0 <= ix < GW and dep[iy, ix] <= x + y + 0.25:
+                    img[iy, ix] = img[iy, ix] * 0.5 + np.array([0.12, 0.04, 0.03]) * 0.5
     for k_, fp in enumerate(FIRES):                                       # the banked fires: coals under a crust of ash, a thread of smoke
         g0 = gh(fp[0], fp[1]) if False else W["gbase"]
         rr = np.random.default_rng(900 + k_)

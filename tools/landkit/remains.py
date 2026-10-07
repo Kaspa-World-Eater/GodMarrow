@@ -116,3 +116,80 @@ def paint_body(img, m, v, n, lx, ly, lz, M, info, side):
     strip = st & (np.abs(lz - 0.62) < 0.05)
     img[strip] = R_STRIP[1]
     return img
+
+
+def scatter(seed=1, n=12, spread=0.9, sandal=False):
+    """bits and pieces: a body long scattered (Derek 2026-10-07: "add some bits and pieces of skeleton"); the skull
+    rolled off on its own, long bones apart, a run of vertebrae, loose ribs, a jaw, a hip; perhaps a sandal (the
+    hermit's lore: "a sandal at the edge, and blood dried on the stones"). Local yards, z up. [(kind, points, width)]"""
+    rr = np.random.default_rng(seed)
+    parts = [("skull", [(rr.uniform(-spread, spread), rr.uniform(-spread, spread), 0.08)], 0.12)]
+    if rr.random() < 0.6:
+        parts.append(("jaw", [(rr.uniform(-spread, spread), rr.uniform(-spread, spread), 0.03)], 0.05))
+    for i in range(n):
+        k = rr.choice(["long", "long", "rib", "rib", "rib", "verts", "hip"])
+        x, y = rr.uniform(-spread, spread), rr.uniform(-spread, spread)
+        a = rr.uniform(0, 6.283)
+        if k == "long":                                                  # a femur, a shin, an arm bone
+            L = rr.uniform(0.28, 0.48)
+            parts.append(("long", [(x, y, 0.03), (x + np.cos(a) * L, y + np.sin(a) * L, 0.03)], 1))
+        elif k == "rib":                                                 # a loose rib, curved
+            c = rr.uniform(0.15, 0.25)
+            pts = [(x + np.cos(a + t * 1.4) * c, y + np.sin(a + t * 1.4) * c, 0.02 + np.sin(t * 3.1) * 0.03) for t in np.linspace(0, 1, 5)]
+            parts.append(("rib", pts, 1))
+        elif k == "verts":                                               # a run of vertebrae, still strung
+            pts = [(x + np.cos(a) * t * 0.05, y + np.sin(a) * t * 0.05, 0.03) for t in range(int(rr.integers(3, 7)))]
+            parts.append(("verts", pts, 1))
+        else:
+            parts.append(("pelvis", [(x, y, 0.04)], 0.1))
+    if sandal:
+        parts.append(("sandal", [(rr.uniform(-spread, spread) * 1.4, rr.uniform(-spread, spread) * 1.4, 0.01)], rr.uniform(0, 6.283)))
+    return parts
+
+
+def draw_parts(img, dep, to_px, origin, yaw, ground, parts, light, bone_c=None, zb=None):
+    """plot parts at their true small size, a pixel or two each; ground(x, y) -> z; light(P) -> 0..1"""
+    GH, GW = img.shape[:2]
+    bone_c = R_BONE[6] if bone_c is None else bone_c
+    c_, s_ = np.cos(yaw), np.sin(yaw)
+
+    def w(lx, ly):
+        return origin[0] + lx * c_ - ly * s_, origin[1] + lx * s_ + ly * c_
+
+    def plot(lx, ly, lz, col, shadow=True):
+        x, y = w(lx, ly)
+        z = ground(x, y) + lz
+        sx, sy = to_px((x, y, z))
+        ix, iy = int(round(sx)), int(round(sy))
+        if 0 <= iy < GH and 0 <= ix < GW and dep[iy, ix] <= x + y + 0.25 and (zb is None or zb[iy, ix] <= x + y + 0.3):
+            if shadow and iy + 1 < GH:
+                img[iy + 1, ix] = img[iy + 1, ix] * 0.6                    # each bone seated in what it lies on
+            k = 0.2 + min(light(np.array([x, y, z])), 0.9) * 0.9
+            img[iy, ix] = np.clip(np.array(col) * k, 0, 1)
+    for (kind, pts, wd) in parts:
+        if kind in ("skull", "pelvis", "jaw"):
+            (lx, ly, lz), r = pts[0], wd
+            for ax in np.arange(-r, r + 0.001, 0.025):
+                for ay in np.arange(-r * 0.8, r * 0.8 + 0.001, 0.025):
+                    if (ax / r) ** 2 + (ay / (r * 0.8)) ** 2 > 1:
+                        continue
+                    plot(lx + ax, ly + ay, lz, bone_c * ((1.3 if kind == "skull" else 1.05) if (ax + ay) < 0 else 0.8))
+            if kind == "skull":                                          # the sockets
+                for sy_ in (-0.035, 0.035):
+                    plot(lx - 0.04, ly + sy_, lz + 0.02, (0.0, 0.0, 0.0), False)
+            continue
+        if kind == "sandal":                                             # a worn sole, its thongs: dark leather
+            (lx, ly, lz), a = pts[0], wd
+            for t in np.linspace(-0.13, 0.13, 8):
+                for u in np.linspace(-0.04, 0.04, 3):
+                    plot(lx + np.cos(a) * t - np.sin(a) * u, ly + np.sin(a) * t + np.cos(a) * u, lz, np.array([0.3, 0.2, 0.13]), False)
+            for t in (-0.04, 0.05):
+                plot(lx + np.cos(a) * t, ly + np.sin(a) * t, lz + 0.03, np.array([0.22, 0.14, 0.09]), False)
+            continue
+        for a_, b_ in zip(pts[:-1], pts[1:]):
+            n_ = max(int(np.hypot(b_[0] - a_[0], b_[1] - a_[1]) / 0.03), 2)
+            for t in np.linspace(0, 1, n_):
+                lx, ly = a_[0] + (b_[0] - a_[0]) * t, a_[1] + (b_[1] - a_[1]) * t
+                knob = 1.15 if (kind == "long" and (t < 0.12 or t > 0.88)) else 1.0
+                plot(lx, ly, a_[2] + (b_[2] - a_[2]) * t, bone_c * (0.85 if kind == "rib" else 1.0) * knob)
+    return img
