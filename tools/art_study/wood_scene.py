@@ -145,12 +145,12 @@ def build(w):
         d = np.hypot(X - tx, Y - ty)
         ang = np.arctan2(Y - ty, X - tx)
         nb = 5 if kind in ("giant", "middle") else 0
-        butt = (np.cos(ang * nb + ti) * 0.5 + 0.5) ** 3 if nb else 0
-        flare = r * (1 + 0.6 * np.exp(-0 / 1.0)) + butt * r * 0.6
+        butt = (np.cos(ang * nb + ti + np.sin(ang * 3 + ti) * 0.4) * 0.5 + 0.5) ** 7 if nb else 0   # root ridges, narrow and uneven
+        flare = r * 1.25 + butt * r * 1.5
         hgt = {"giant": 16.0, "middle": 14.0, "young": 12.0, "snag": 7.0, "stump": 0.8}[kind]
         foot = d < flare
         # the flare: wide at the ground, reaching the trunk's own radius a yard up
-        z_at = np.where(d <= r, hgt, np.clip((flare - d) / np.maximum(flare - r, 1e-3), 0, 1) * 1.0)
+        z_at = np.where(d <= r, hgt, np.clip((flare - d) / np.maximum(flare - r, 1e-3), 0, 1) ** 2.2 * (0.6 + butt * 0.9))   # a concave sweep up out of the roots
         if kind == "stump":
             z_at = np.where(d <= r, 0.8 + (fbm(X * 4, Y * 4) - 0.5) * 0.15 - np.clip(1 - d / (r * 0.6), 0, 1) * 0.25, z_at)
         if kind == "snag":
@@ -266,6 +266,34 @@ def shade(W, px, py, pz, SX, SY, t=0.0):
     return dict(n=n, side=side, tg=tg, moon=moon, lamp=lampk, ao=ao_px, ndl=ndl, sh=sh, canopy=canopy)
 
 
+def paint_bark(img, m, v, n, px, py, pz, o, along=None, arc=None, lichen=True):
+    """old broadleaf bark, as the big study trees had it (tree_anatomy.py): fissures as long cells running with the
+    wood and twisting a little, deep on the thick trunk; lit ridges between; plates at a larger scale (some darker,
+    some lighter); moss climbing the north side from the foot; pale lichen blotches on the lit side; damp streaks
+    running down. along/arc: coordinates on the wood (yards); for a standing trunk, height and arc round it."""
+    if along is None:
+        ang = np.arctan2(py - o["c"][1], px - o["c"][0])
+        arc = ang * o["r"]
+        along = pz
+    grain = vn(arc * 15.0 + along * 0.35, along * 1.6)                  # long cells up the trunk, twisting
+    fine = vn(arc * 34.0 + along * 0.5, along * 3.6)
+    furrow = (grain < 0.32) | ((fine < 0.22) & (grain < 0.45))
+    ridge = (grain > 0.68) & (fine > 0.45)
+    plates = (vn(arc * 2.6 + 5, along * 0.9) - 0.5) * 0.12                # bark plates, a little lighter or darker
+    streak = (vn(arc * 7.0, along * 0.25 + 3) > 0.78) * -0.07              # damp running down
+    bv = v + plates + streak - furrow * 0.18 + ridge * 0.1
+    img[m] = R_BARK[np.clip((bv * len(R_BARK)).astype(int), 0, len(R_BARK) - 1)][m]
+    deep = m & furrow & (grain < 0.18)
+    img[deep] = R_BARK[1]                                                   # the bottom of the deepest fissures
+    away = np.clip(-(n[..., 0] * SUN[0] + n[..., 1] * SUN[1]), 0, 1)     # the side turned from the moon (north)
+    mossy = m & (along < 0.5 + away * 1.6 + (vn(arc * 4, along * 2) - 0.5) * 0.8) & (vn(arc * 6, along * 3) > 0.42) & ~(furrow & (grain < 0.25))
+    img[mossy] = R_MOSS[np.clip(((v[mossy] * 0.75 + (fine[mossy] - 0.5) * 0.12) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 2)]
+    lit_side = np.clip(n[..., 0] * SUN[0] + n[..., 1] * SUN[1], 0, 1)
+    lich = m & ~mossy & (lit_side > 0.3) & (vn(arc * 5 + 9, along * 4) > 0.8) & ~furrow & lichen
+    img[lich] = np.array([0.42, 0.46, 0.4]) * np.clip(v[lich] * 1.2 + 0.2, 0.3, 1)[:, None]
+    return img
+
+
 def paint(W, px, py, pz, SX, SY, L, t=0.0):
     tg, side, n = L["tg"], L["side"], L["n"]
     mat = look(W, W["mat"], px, py)
@@ -313,18 +341,7 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
         if not m.any():
             continue
         if o["kind"] in ("giant", "middle", "young"):
-            ang = np.arctan2(py - o["c"][1], px - o["c"][0])
-            nc = 18 if o["kind"] == "giant" else 10
-            cu = ang * nc / (2 * np.pi) + vn(pz * 0.6, ang * 3) * 0.8           # around the trunk, wandering
-            row = np.floor(pz / 0.45 + np.floor(cu) * 0.37)                      # the ridges break into staggered blocks
-            fu = cu - np.floor(cu)
-            fz = (pz / 0.45 + np.floor(cu) * 0.37) - row
-            furrow = (np.abs(fu - 0.5) > 0.38) | (fz < 0.08)                     # the fissures between the blocks
-            ridge_top = (fz > 0.08) & (fz < 0.22) & ~furrow                      # each block's upper edge catches the light
-            bv = v - furrow * 0.24 + ridge_top * 0.07 + (vn(ang * 6, pz * 4) - 0.5) * 0.05
-            img[m] = R_BARK[np.clip((bv * len(R_BARK)).astype(int), 0, len(R_BARK) - 1)][m]
-            low = m & (pz < 0.6 + (vn(ang * 3, pz) - 0.5) * 0.5) & (vn(ang * 5, pz * 3) > 0.4)   # moss on the foot
-            img[low] = R_MOSS[np.clip((v[low] * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 1)]
+            img = paint_bark(img, m, v, n, px, py, pz, o)
         elif o["kind"] == "snag":
             ang = np.arctan2(py - o["c"][1], px - o["c"][0])
             crack = np.sin(ang * 11 + vn(pz * 0.5, ang) * 3) > 0.75                 # long cracks up the grey wood
@@ -341,18 +358,15 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
             img[topm] = R_WOOD[np.clip(((v - ring * 0.08) * len(R_WOOD)).astype(int), 0, len(R_WOOD) - 1)][topm]
             heart = topm & (np.hypot(px - o["c"][0], py - o["c"][1]) < o["r"] * 0.55)
             img[heart] = R_SOIL[1]                                                  # the soft heart gone to crumb
-            img[sidem] = R_BARK[np.clip((v[sidem] * len(R_BARK)).astype(int), 0, len(R_BARK) - 1)]
+            img = paint_bark(img, sidem, v * 0.9, n, px, py, pz, o)
         elif o["kind"] == "log":
             cls = o["cls"]
             rel_a = (px - o["a"][0]) * o["d"][0] + (py - o["a"][1]) * o["d"][1]
             if cls <= 2:
                 lat = (px - o["a"][0]) * -o["d"][1] + (py - o["a"][1]) * o["d"][0]
                 around = np.arcsin(np.clip(lat / o["r"], -1, 1))
-                fiss = np.sin(around * 14 + vn(rel_a * 1.5, around * 2) * 3.0) > 0.6     # fissures along the grain
-                loose = (vn(rel_a * 2.2 + 4, around * 3) > 0.84)                      # small plates of bark lifted away
-                bv = v * 0.8 - fiss * 0.16
-                img[m] = R_BARK[np.clip((bv * len(R_BARK)).astype(int), 0, len(R_BARK) - 1)][m]
-                bare_w = m & loose
+                img = paint_bark(img, m, v * 0.72, n, px, py, pz, o, along=rel_a, arc=around * o["r"], lichen=False)   # damp in the litter: darker
+                bare_w = m & (vn(rel_a * 2.2 + 4, around * 3) > 0.84)                  # small plates of bark lifted away
                 img[bare_w] = R_WOOD[np.clip(((v[bare_w] - 0.05) * len(R_WOOD)).astype(int), 0, len(R_WOOD) - 1)]
             else:
                 lat3 = (px - o["a"][0]) * -o["d"][1] + (py - o["a"][1]) * o["d"][0]
@@ -418,6 +432,10 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
             img[el] = np.minimum(img[el] * 1.3, 1)
             stones = m & (vn(px * 11, pz * 11) > 0.85)
             img[stones] = tw.PEBBLE[np.clip(((v[stones] + 0.1) * len(tw.PEBBLE)).astype(int), 0, len(tw.PEBBLE) - 1)]
+    # ---- the night air: the further from the viewer, the more cool dark air between (stepped, dithered)
+    far = np.clip(((HERO[0] + HERO[1]) + 4.0 - (px + py)) / 10.0, 0, 0.5)
+    far = np.round((far + (bay - 0.5) * 0.08) * 8) / 8
+    img = img * (1 - far[..., None]) + np.array([0.06, 0.075, 0.11]) * far[..., None]
     # ---- the light's temperature, stepped
     warm = L["lamp"] > 0.15
     img[warm & (tg != 0)] = img[warm & (tg != 0)] * np.array([1.15, 1.0, 0.78])
@@ -425,9 +443,14 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
     img[cool] = img[cool] * np.array([0.95, 0.97, 1.05])
     # ---- rims: an object's edge against what is behind it, where the moon reaches it
     dep = px + py
-    left_far = (np.roll(tg, 1, axis=1) != tg) & (np.roll(dep, 1, axis=1) < dep - 0.4)
-    rim = (tg != 0) & (left_far | np.roll(left_far, -1, axis=1) & (tg == np.roll(tg, -1, axis=1)))
-    img[rim] = np.minimum(img[rim] * 1.5 + np.array([0.03, 0.035, 0.05]), 1)
+    lit_side = np.clip(n[..., 0] * SUN[0] + n[..., 1] * SUN[1], 0, 1)
+    for k in np.unique(tg):
+        if k == 0 or k >= 400:
+            continue
+        mk = tg == k
+        edge = mk & ~np.roll(mk, 1, axis=1) & (np.roll(dep, 1, axis=1) < dep - 0.3)
+        rim = edge & ((lit_side > 0.15) | (L["moon"] > 0.25))
+        img[rim] = np.minimum(img[rim] * 1.45 + np.array([0.03, 0.035, 0.05]), 1)
     return np.clip(img, 0, 1)
 
 
@@ -481,8 +504,17 @@ def living(img, w, W, px, py, pz, L, t=0.0):
                 off = {"H": 2, "L": 1, "B": 0, "D": -1, "P": 3, "V": 1}[ch]
                 img[yy_, xx_] = rp[int(np.clip(3 + off, 0, 7))] * k
     # ferns: in the damp, in clumps of fronds arching out
-    fernpts = np.argwhere(w.fern[::6, ::6]) * 0.6 + 0.05
-    for (yy, xx) in fernpts[rr.permutation(len(fernpts))[:60]]:
+    fernpts = []
+    for _ in range(4000):
+        x, y = FOCUS[0] + rr.uniform(-8, 8), FOCUS[1] + rr.uniform(-8, 8)
+        wv = float(look(W, W["wet"], np.array(x), np.array(y)))
+        lv_ = float(look(W, W["light"], np.array(x), np.array(y)))
+        if look(W, W["tag"], np.array(x), np.array(y)) == 0 and not look(W, W["water"], np.array(x), np.array(y))                 and rr.random() < np.clip((wv - 0.45) * 2.0, 0, 1) * (lv_ < 0.65) * 0.25:
+            fernpts.append((y, x))
+        if len(fernpts) >= 40:
+            break
+    fernpts.sort(key=lambda q: q[0] + q[1])
+    for (yy, xx) in fernpts:
         if abs(xx - FOCUS[0]) > 9 or abs(yy - FOCUS[1]) > 9:
             continue
         k, _ = light_at(xx, yy)
