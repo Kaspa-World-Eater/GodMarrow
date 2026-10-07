@@ -17,3 +17,7 @@ Tile passes: ash_0 1 (seam: ripples not periodic; too banded), 2 (whole-period r
    jaundiced white threaded red, a dark wet iris, the moon in its pupil); veins breaching the ash, running in from
    the Moor to the gum, diving under it in places.
    Graded: the god everywhere now: a jaw of teeth in its gum, the eye in the ash looking up, hide where the ash blew off, veins running in. FAIL: hide patches flat pink carpets (no form, no hairs read); veins flat lines like paths; the eye a clean cartoon ellipse; the Broken Kneeler missing; the lantern a box.
+6. The Broken Kneeler (landkit kneeler.py): a colossal robed stone figure kneeling toward the pit on the Jaw's rise, knees sunk in the ash, one arm broken at the elbow, the other hand at its breast, its head broken off and lying face up before it; robe folds, cracks, paler breaks, lichen, ash on the ledges.
+   Graded: the Kneeler stood off the frame (only a slab showed).
+7. The Kneeler brought into view beside the ring, kneeling toward the pit; the Sighing Lantern to the left to balance.
+   Graded: the Kneeler stands at the ring's right, a hooded robed stone figure facing the pit; its robe folds render as dark slits like windows; the fallen head unclear. Still open: hide flat pink; veins read as paths; the eye too clean; the lantern a box; the molars' gum-line stain streaks read as grilles.

@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import wood_scene as ws                      # noqa: E402
 import tiles_moor                            # noqa: E402
 import tooth as toothgen                     # noqa: E402
+import kneeler as kneelgen                   # noqa: E402
 from wood_ecosystem import vn, fbm           # noqa: E402
 
 C = np.array([20.0, 19.0])                   # the pit's heart
@@ -34,7 +35,10 @@ PERP = np.array([1.0, -1.0]) / np.sqrt(2)    # across (screen right)
 RING_R, PIT_R = 5.4, 3.2
 ws.FOCUS = C + AX * 1.4
 ws.HERO = C + AX * 6.6 - PERP * 0.6
-LANTERN = C + AX * 3.2 + PERP * 7.2
+LANTERN = C + AX * 3.4 - PERP * 7.4
+KNEEL_AT = C - AX * 0.6 + PERP * 7.6                # beside the ring on the rise, kneeling toward the pit
+KF, KI = kneelgen.kneeler(3, s=1.0)
+KNEEL_TURN = float(np.arctan2(*(C - KNEEL_AT)[::-1]))
 
 # the teeth: fangs and molars alternating round the ring, a gap where the road comes in (toward the viewer)
 TEETH = []
@@ -97,6 +101,16 @@ def stamp(W, w):
         H = np.where(m, base + fh, H)
         W["tag"] = np.where(m, 700 + k, W["tag"])
         W["obj"][700 + k] = dict(kind="tooth", k=k, base=base)
+    # the Broken Kneeler, facing the pit
+    dx, dy = X - KNEEL_AT[0], Y - KNEEL_AT[1]
+    klx, kly = dx * np.cos(KNEEL_TURN) + dy * np.sin(KNEEL_TURN), -dx * np.sin(KNEEL_TURN) + dy * np.cos(KNEEL_TURN)
+    inside = (np.abs(klx) < KF.half) & (np.abs(kly) < KF.half)
+    kh = np.where(inside, KF.at(KF.H, klx, kly), -9.0)
+    kb = float(W["H"][int((KNEEL_AT[1] - W["y0"]) / ws.RES), int((KNEEL_AT[0] - W["x0"]) / ws.RES)]) - 0.3
+    mk = (kh > 0.0) & (kb + kh > H)
+    H = np.where(mk, kb + kh, H)
+    W["tag"] = np.where(mk, 770, W["tag"])
+    W["obj"][770] = dict(kind="kneeler", base=kb)
     # the Sighing Lantern's stone: a squat block, a man's waist high
     lx, ly = X - LANTERN[0], Y - LANTERN[1]
     st = (np.abs(lx) < 0.45) & (np.abs(ly) < 0.45)
@@ -278,6 +292,18 @@ ws.WOOD_HOOKS += [shape_plan]
 ws.BUILD_HOOKS += [stamp]
 ws.PAINTERS["tooth"] = paint_tooth
 ws.PAINTERS["lstone"] = paint_lstone
+
+
+def paint_kneel(img, m, v, n, px, py, pz, o, W, L):
+    dx, dy = px - KNEEL_AT[0], py - KNEEL_AT[1]
+    klx, kly = dx * np.cos(KNEEL_TURN) + dy * np.sin(KNEEL_TURN), -dx * np.sin(KNEEL_TURN) + dy * np.cos(KNEEL_TURN)
+    M = KF.at(KF.M, klx, kly, 0)
+    c, s_ = np.cos(KNEEL_TURN), np.sin(KNEEL_TURN)
+    nl = np.dstack([n[..., 0] * c + n[..., 1] * s_, -n[..., 0] * s_ + n[..., 1] * c, n[..., 2]])
+    return kneelgen.paint_kneeler(img, m, v, nl, klx, kly, pz - o["base"], M, KI, L["side"])
+
+
+ws.PAINTERS["kneeler"] = paint_kneel
 ws.GROUND = ground
 ws.FOREST_LIFE = False                       # no Wood on the Moor: no leaf fall
 ws.LIVING.append(living_moor)
