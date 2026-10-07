@@ -39,6 +39,7 @@ import column as colgen                      # noqa: E402
 import gate as gategen                       # noqa: E402
 import deadplants                            # noqa: E402
 import remains                               # noqa: E402
+import blood as bloodfx                      # noqa: E402
 import kit                                   # noqa: E402
 
 # THE CAVERN. The courtyard lies in a cavern under the Moor (the lore: "the god held a room open inside itself, wide as
@@ -364,6 +365,13 @@ def stamp(W, w):
     W["H"] = H2
     W["Hrest"] = H2
     W["thread"] = (spread > -0.08) & (spread <= 0.15)                       # a narrow band where it creeps into the ash
+    W["spread"] = spread
+    vm = np.zeros(X.shape, bool)                                             # yards to the vein's path (its blood seeps from it)
+    for q in VP:
+        i_, j_ = int((q[1] - W["y0"]) / ws.RES), int((q[0] - W["x0"]) / ws.RES)
+        if 0 <= i_ < vm.shape[0] and 0 <= j_ < vm.shape[1]:
+            vm[i_, j_] = True
+    W["vdist"] = nd.distance_transform_edt(~vm) * ws.RES
     e = ((X - POOL[0][0]) / POOL[1]) ** 2 + ((Y - POOL[0][1]) / POOL[2]) ** 2
     W["pool"] = (e + (vn(X * 3, Y * 3) - 0.5) * 0.3) < 1
     W["pore"] = np.full(X.shape, 99.0)
@@ -472,6 +480,20 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     alb = np.where(hole[..., None], np.array([0.06, 0.02, 0.03]) * (1 - depth_[..., None] * 0.9), alb)
     out = img.copy()
     out[gl] = np.clip(alb * k, 0, 1)[gl]
+    # the blood along the vein (Derek: "dither the blood within the blood effect along the veins"; the game's own blood,
+    # landkit blood.py = shaders/blood_pool.gdshader): it seeps out either side of the vein in lobes and fingers and
+    # down the cracks beside it, the short red ramp through the ordered dither, wet at its heart and toward the
+    # lantern, drying brown and cracking at its edges
+    vd = ws.look(W, W["vdist"], px, py)
+    be = bloodfx.edge(px, py, seed=3, reach=0.5)
+    sp_ = ws.look(W, W["spread"], px, py)
+    in_crack = pm & (vd < 2.6)
+    bm = gl & ((vd < be) | in_crack) & ~(ws.look(W, W["pool"], px, py) > 0)
+    depth_b = np.where(vd < be, np.clip(1 - vd / np.maximum(be, 1e-3), 0, 1), np.clip(sp_ * 0.6, 0, 1) * np.clip(1 - vd / 2.6, 0, 1))
+    dry_b = np.clip(vd / 2.0 + (vn(px * 2, py * 2) - 0.5) * 0.5, 0, 1)
+    lt_b = L["moon"] + L["lamp"]
+    bcol = bloodfx.shade(depth_b, px, py, SX, SY, ws_T[0], dry_b, light_side=np.clip(L["lamp"] * 2, 0, 1), light=lt_b)
+    out[bm] = bcol[bm]
     # the doorway: the passage into the swell going to black within a yard or two
     dw = ws.look(W, W["doorway"], px, py) > 0
     gr = ws.look(W, W["gate_r"], px, py)
