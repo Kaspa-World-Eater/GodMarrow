@@ -283,6 +283,142 @@ def dirt_0(seed=0):
     return np.clip(img, 0, 1), hgt
 
 
+PACKED = ramp("#17131a", "#221c21", "#2e2629", "#3b3231", "#4a3f3b", "#5a4e48", "#6c5f57", "#7f7066")   # earth trodden hard
+RBARK = ramp("#16110f", "#2a201b", "#41332a")                                 # a root's bark, darker than the soil's lights
+WOODP = ramp("#2a1d16", "#4a3324", "#6e5038", "#93714f", "#b39370")                  # root bark rubbed to the wood
+WET = ramp("#0d0e14", "#151820", "#20242d", "#2e333c")                               # water standing in a hollow
+
+
+def path_0(seed=0):
+    """the trodden way through the wood: earth packed hard and worn smooth by feet, crazed into plates where it has
+    dried; the litter kicked off it (a few leaves trodden flat); water standing in a puddle or two with the sky in
+    its far rim and a ring of slick mud; stones the feet have bared and worn flat; and the roots that cross it, thick
+    and half-buried, lit along their backs, dark in their bellies, scuffed to pale wood where the feet strike.
+    Designed the way main_0 was: the form in four clean tones first (dither only where one meets the next), then
+    each thing drawn into it. No ruts: a path runs every way across the tiles, so nothing here may point."""
+    from litter_stamps import LEAVES
+    rr = np.random.default_rng(seed + 400)
+    # ---- 1. the form: broad, shallow, packed; the light reads its height more than its slope
+    hgt = (pfbm(XX, YY, 2, seed + 401) - 0.5) * 4.0 + (pfbm(XX, YY, 5, seed + 402) - 0.5) * 1.0
+    hp_ = np.pad(hgt, 1, mode="wrap")
+    gyf, gxf = np.gradient(hp_)
+    nf = np.dstack([-gxf[1:-1, 1:-1], -gyf[1:-1, 1:-1] * 2.0, np.ones_like(hgt)])
+    nf /= np.linalg.norm(nf, axis=2, keepdims=True)
+    lit = np.clip((nf * LIGHT).sum(2), 0, 1)
+    form = (lit - 0.62) * 0.5 + (hgt / 4.0) * 0.36
+    # the hard earth crazed into plates, each a touch its own tone
+    f1, f2, pid = pworley(XX, YY, 140, seed + 405)
+    pj = (_P[(pid * 37 + seed) % 4096] - 0.5) * 0.45
+    tone = np.clip(np.round((0.5 + form * 1.7) * 4 + pj + (BAY - 0.5) * 0.2), 0, 4).astype(int)
+    base_i = np.array([1, 2, 3, 4, 5])[tone]
+    img = PACKED[base_i].copy()
+    dry = (hgt > 0.5) & (pnoise(XX, YY, 6, 3, seed + 407) > 0.45)              # crazed only on the driest crowns
+    crack = dry & ((f2 - f1) < 0.45)
+    img[crack] = PACKED[np.clip(base_i[crack] - 2, 0, 7)]
+    plate_rim = dry & ((f2 - f1) > 0.55) & ((f2 - f1) < 1.25) & (tone >= 2)
+    img[plate_rim] = PACKED[np.clip(base_i[plate_rim] + 1, 0, 7)]
+    # polish: the highest crowns rubbed to a cooler grey
+    polish = (hgt > 1.0) & (tone >= 3) & (pnoise(XX, YY, 20, 10, seed + 406) > 0.5)
+    img[polish] = img[polish] * 0.8 + np.array([0.45, 0.43, 0.43]) * 0.2
+    # damp in the low places: darker, a little cold
+    damp = hgt < -0.9
+    img[damp] = img[damp] * 0.8 + np.array([0.04, 0.05, 0.08]) * 0.2
+    # ---- 2. puddles: a slick ring of mud, the water, the sky in its far rim, a dark lip on the near bank
+    wob_f = pnoise(XX, YY, 32, 16, seed + 410)
+    for k in range(2):
+        cx, cy = rr.uniform(0, TW), rr.uniform(0, TH)
+        rx, ry = rr.uniform(7, 12), rr.uniform(3.0, 4.6)
+        def q_at(px, py):
+            return ((px + 0.5 - cx) / rx) ** 2 + ((py + 0.5 - cy) / ry) ** 2 + (wob_f[py % TH, px % TW] - 0.5) * 0.5
+        for dy in range(-7, 8):
+            for dx in range(-16, 17):
+                px, py = int(cx) + dx, int(cy) + dy
+                q = q_at(px, py)
+                X_, Y_ = px % TW, py % TH
+                if q < 1.0:
+                    img[Y_, X_] = WET[int(np.clip(1 + (1 - q) * 2.6, 0, 3))]
+                    if q_at(px, py - 1) >= 1.0:                                       # the far rim: the sky in it
+                        img[Y_, X_] = np.array([0.33, 0.37, 0.44]) if abs(dx) < rx * 0.6 else WET[3]
+                elif q < 1.7:
+                    img[Y_, X_] = PACKED[1] if (px + py) % 3 else PACKED[0]          # slick mud round it
+                    if q_at(px, py - 1) < 1.0:
+                        img[Y_, X_] = PACKED[0]                                     # the near lip, in shadow
+    # ---- 3. roots across it: centrelines first, then every pixel by its distance to them
+    for k in range(3):
+        x, y = rr.uniform(0, TW), rr.uniform(0, TH)
+        ang = rr.uniform(0, 2 * np.pi)
+        wid = rr.uniform(3.6, 5.4)
+        n = int(rr.integers(80, 130))
+        pts = []
+        for i in range(n):
+            ang += rr.normal(0, 0.09) + np.sin(i * 0.11 + k) * 0.03
+            x, y = x + np.cos(ang), y + np.sin(ang) * 0.5
+            pts.append((x, y, wid * (0.35 + 0.65 * np.sin(np.pi * i / (n - 1)) ** 0.5)))
+        P = np.array(pts)
+        lo_x, hi_x = int(P[:, 0].min() - 6), int(P[:, 0].max() + 7)
+        lo_y, hi_y = int(P[:, 1].min() - 5), int(P[:, 1].max() + 6)
+        gy, gx = np.mgrid[lo_y:hi_y, lo_x:hi_x].astype(float) + 0.5
+        best = np.full(gx.shape, 1e9)
+        side = np.zeros(gx.shape)
+        wloc = np.zeros(gx.shape)
+        along = np.zeros(gx.shape)
+        for i, (px_, py_, w_) in enumerate(P):
+            dd = np.hypot(gx - px_, (gy - py_) * 2.0)
+            m = dd < best
+            best = np.where(m, dd, best)
+            side = np.where(m, gy - py_, side)
+            wloc = np.where(m, w_, wloc)
+            along = np.where(m, i, along)
+        body = best < wloc
+        u = np.clip(side * 2.0 / np.maximum(wloc, 0.5), -1, 1)                   # -1 its back (up the screen) .. +1 its belly
+        rt = np.where(u < -0.55, 2, np.where(u < 0.25, 1, 0))
+        sc_k = (along.astype(int) * 7 + k * 13) % 29
+        scuff = body & (u > -0.75) & (u < -0.05) & (sc_k < 4) & (wloc > wid * 0.7)   # worn pale in a few spots on its back
+        shadow = ~body & (best < wloc + 1.6) & (side > 0)
+        for (yy, xx) in zip(*np.nonzero(body | shadow)):
+            Y_, X_ = (yy + lo_y) % TH, (xx + lo_x) % TW
+            if body[yy, xx]:
+                img[Y_, X_] = WOODP[2 if u[yy, xx] < -0.4 else 1] if scuff[yy, xx] else RBARK[rt[yy, xx]]
+            else:
+                img[Y_, X_] = img[Y_, X_] * 0.55
+    # ---- 4. stones bared and worn flat: a broad lit top, a bevel, a hard dark edge under
+    for k in range(5):
+        x, y = rr.uniform(0, TW), rr.uniform(0, TH)
+        rx, ry = rr.uniform(3.6, 6.2), rr.uniform(1.9, 3.0)
+        tone_s = rr.uniform(0.42, 0.62)
+        for dy in range(-5, 6):
+            for dx in range(-8, 9):
+                px, py = int(x) + dx, int(y) + dy
+                q = ((px + 0.5 - x) / rx) ** 2 + ((py + 0.5 - y) / ry) ** 2
+                if q < 1:
+                    top = q < 0.45
+                    v_ = tone_s + (0.18 if top else 0.0) - (py + 0.5 - y) / ry * 0.1 - (px + 0.5 - x) / rx * 0.06
+                    img[py % TH, px % TW] = PEBBLE[int(np.clip(v_ * len(PEBBLE), 0, len(PEBBLE) - 1))]
+                elif q < 1.8 and py + 0.5 > y:
+                    img[py % TH, px % TW] = img[py % TH, px % TW] * 0.55
+    # ---- 5. heel scuffs on the dry ground: a dark crescent, its inner edge caught by the light
+    for k in range(14):
+        x, y = int(rr.integers(0, TW)), int(rr.integers(0, TH))
+        if hgt[y, x] < -0.3:
+            continue
+        for dx in range(-2, 3):
+            img[(y + (1 if abs(dx) == 2 else 0)) % TH, (x + dx) % TW] *= 0.72
+            if abs(dx) < 2:
+                img[(y - 1) % TH, (x + dx) % TW] = np.minimum(img[(y - 1) % TH, (x + dx) % TW] * 1.12, 1)
+    # ---- 6. a few leaves trodden flat into it, one tone down, broken
+    for k in range(9):
+        st = LEAVES[rr.integers(0, len(LEAVES))]
+        x, y = int(rr.integers(0, TW)), int(rr.integers(0, TH))
+        rp = LITTER[rr.integers(0, 3)]
+        for j, row in enumerate(st):
+            for i, ch in enumerate(row):
+                if ch in ".SV" or rr.random() < 0.2:
+                    continue
+                off = {"H": 2, "L": 1, "B": 0, "D": -1, "P": 2}.get(ch, 0)
+                img[(y + j) % TH, (x + i) % TW] = rp[int(np.clip(2 + off, 0, 7))]
+    return np.clip(img, 0, 1), hgt
+
+
 def compose(mains, dirt, GW=960, GH=540, seed=1):
     """the ground as the game would lay it, with the tricks against repetition:
     - the world cut into jittered patches (~3 tiles), each taking one of the main variants at its own random offset;

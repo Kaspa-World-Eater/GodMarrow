@@ -4302,6 +4302,10 @@
   ],
   "dirt": [
    "ground/dirt_0.webp"
+  ],
+  "road": [
+   "ground/path_0.webp",
+   "ground/path_1.webp"
   ]
  }
 }

@@ -89,6 +89,11 @@ def old_growth(out):
     d, _ = tw.dirt_0()
     tw.save(d, os.path.join(gd, "dirt_0.webp"))
     ground["dirt"].append("ground/dirt_0.webp")
+    ground["road"] = []
+    for k in range(2):                                     # the trodden way, in place of the old cobbles
+        t, _ = tw.path_0(seed=k * 57)
+        tw.save(t, os.path.join(gd, "path_%d.webp" % k))
+        ground["road"].append("ground/path_%d.webp" % k)
     print("ground", flush=True)
     pieces = {}
     for f in sorted(glob.glob(os.path.join(out, "*.json"))):
