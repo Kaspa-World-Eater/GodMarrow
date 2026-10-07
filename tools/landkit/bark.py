@@ -50,13 +50,13 @@ def veins(r, seed, arc, along, top=24.0):
             if depth < 1 and rr.random() < 0.004:                       # it branches as it climbs
                 cord(a + rr.choice([-1, 1]) * w * 0.8, z, min(z + rr.uniform(2, 7), top), w * 0.7, depth + 1)
     for k in range(int(rr.integers(4, 6))):
-        cord(rr.uniform(0, circ), 0.0, rr.uniform(min(10, top * 0.6), top), rr.uniform(0.065, 0.11), 0)
+        cord(rr.uniform(0, circ), 0.0, rr.uniform(min(10, top * 0.6), top), rr.uniform(0.065, 0.11) * float(np.clip(r / 0.9, 0.3, 1.2)), 0)   # veins in proportion to the trunk
     ai = np.clip(((arc % circ) / RES).astype(int), 0, nA - 1)
     zi = np.clip((along / RES).astype(int), 0, nZ - 1)
     return D[zi, ai], S[zi, ai]
 
 
-def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0, scar_band=(4.5, 15.0)):
+def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0, scar_band=(4.5, 15.0), px_per_yd=18.0):
     """the pale vein-bark onto img where `wood` (the bole: `bole`, its round side above the flare); v the light"""
     ndl = n[..., 0] * moon[0] + n[..., 1] * moon[1]
     grain = vn(arc * 15.0 + along * 0.35, along * 1.6)
@@ -68,13 +68,18 @@ def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0
     img[wood] = R_BARK[np.clip((bv * len(R_BARK)).astype(int), 0, len(R_BARK) - 1)][wood]
     # the veins: raised cords, dark and warm in the cord, lit along the edge toward the moon, a thin shadow beyond
     vd, vside = veins(r, seed, arc, along, top)
-    cord = wood & bole & (vd < 1.0)
-    vt = np.clip(v * 0.75 + (vside * (ndl > 0)) * 0.25, 0, 0.99)
+    facing = (n[..., 0] + n[..., 1]) / np.sqrt(2)                       # toward the eye (the iso view is +x +y)
+    cord = wood & bole & (vd < 1.0) & (facing > 0.45)                   # a vein turning away is lost, not squashed
+    # a cord one or two pixels wide cannot hold a lit edge, a dark middle and a cast shadow: it breaks into a checker.
+    # So a thin cord is one clean tone, dark and warm, following the trunk's light; the edge and shadow come in only
+    # where the cord is wide enough on the screen to carry them (px_per_yd: screen pixels across a yard of bark)
+    vt = np.clip(v * 0.7 + 0.05, 0, 0.99)
     img[cord] = R_VEIN[np.clip((vt[cord] * len(R_VEIN)).astype(int), 0, len(R_VEIN) - 1)]
-    vlit = cord & (vside < -0.3) & (ndl > 0.1)
-    img[vlit] = np.minimum(R_BARK[np.clip((v[vlit] * len(R_BARK)).astype(int) + 1, 0, len(R_BARK) - 1)] * 1.05, 1)
-    vsh = wood & bole & (vd >= 1.0) & (vd < 1.7) & (vside > 0)
-    img[vsh] = img[vsh] * 0.8
+    if px_per_yd * 0.09 >= 3.0:
+        vlit = cord & (vside < -0.3) & (ndl > 0.1)
+        img[vlit] = np.minimum(R_BARK[np.clip((v[vlit] * len(R_BARK)).astype(int) + 1, 0, len(R_BARK) - 1)] * 1.05, 1)
+        vsh = wood & bole & (vd >= 1.0) & (vd < 1.7) & (vside > 0) & (facing > 0.45)
+        img[vsh] = img[vsh] * 0.8
     # the ground's wet drawn up into the foot, deeper on the side turned from the moon
     away = np.clip(-ndl, 0, 1)
     damp = wood & (along < 0.35 + away * 0.5 + (vn(arc * 5, 1) - 0.5) * 0.3)

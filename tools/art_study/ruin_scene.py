@@ -30,7 +30,7 @@ from wood_ecosystem import vn, fbm           # noqa: E402
 
 C = np.array([15.0, 13.0])                   # the church's centre in the wood's plan
 SEED = 3
-ws.FOCUS = np.array([13.8, 18.2])
+ws.FOCUS = np.array([13.0, 17.0])
 ws.HERO = np.array([15.0, 22.15])            # on the threshold, among the arch's fallen stones
 
 R_STONE = ws.ramp("#131218", "#211f28", "#312e37", "#443f46", "#5a5455", "#726a66", "#8d8379", "#a69a8b")
@@ -39,7 +39,9 @@ R_IVY = ws.ramp("#070c0b", "#0d1712", "#142216", "#1c2f1a", "#283e1f", "#365027"
 R_PALE = ws.ramp("#16131a", "#28232a", "#3d3639", "#554c4b", "#6f655f", "#8b7f75", "#a89a8c", "#c2b5a3")
 R_VEIN = ws.ramp("#1d1218", "#33202a", "#4d3036", "#694643")
 
-FR, FI = ruin.chapel(SEED)
+# the walls toward the camera broken low, the far ones standing high: the eye looks in (walls: 0 and 2 far, 1 and 3,
+# the door's, near)
+FR, FI = ruin.chapel(SEED, full=(9.0, 2.6, 8.0, 3.6))
 
 
 def to_local(x, y):
@@ -58,6 +60,11 @@ def clear_plan(w):
     the canopy open over the roofless nave"""
     keep = lambda x, y, r: footprint_dist(np.array(x), np.array(y)) > r
     w.trees = [t for t in w.trees if keep(t[0], t[1], 2.2)]
+    # the forest towers (Derek: small trees mostly dead): the young become snags or go
+    w.trees = [((t[0], t[1], "snag", 0.45, 0.0) if t[2] == "young" and int(t[0] * 7 + t[1] * 3) % 3 == 0 else t)
+               for t in w.trees if t[2] != "young" or int(t[0] * 7 + t[1] * 3) % 3 == 0]
+    # the tenth trunk by the door, in the frame: it holds the candle
+    w.trees.append((C[0] - 3.4, C[1] + FI["length"] / 2 + 2.4, "middle", 0.5, 5.0))
     logs = []
     for lg in w.logs:
         ax, ay, bx, by = lg[:4]
@@ -115,7 +122,7 @@ def paint_ruin(img, m, v, n, px, py, pz, o, W, L):
     h = pz - o["base"]
     top_h = FR.at(FR.H, lx, ly, 0.0)
     bay = ws.tw.B4[(np.arange(m.shape[0])[:, None] % 4), (np.arange(m.shape[1])[None, :] % 4)]
-    sv = v * 0.95 + 0.04
+    sv = np.minimum(v * 0.95 + 0.04, 0.74)                               # stone keeps its coursing even in the lantern's glare
     # ---- walls: courses and blocks in the wall's own coordinates
     wall = m & (RU == ruin.BLOCK)
     course = np.floor(h / ruin.COURSE)
@@ -187,7 +194,7 @@ def paint_ruin(img, m, v, n, px, py, pz, o, W, L):
         mm = m & (RU == mat_)
         rv = sv + darker + (vn(px * 9, py * 9 + pz * 9) - 0.5) * 0.08
         img[mm] = R_STONE[np.clip((rv * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][mm]
-        mtop = mm & ~side & (vn(px * 7 + mat_, py * 7) > 0.45)
+        mtop = mm & ~side & (vn(px * 7 + mat_, py * 7) > (0.72 if mat_ == ruin.STEP else 0.5))   # steps: moss only in the cracks
         img[mtop] = R_MOSSW[np.clip(((v * 0.85) * len(R_MOSSW)).astype(int), 0, len(R_MOSSW) - 1)][mtop]
     worn = m & (RU == ruin.STEP) & ~side & (np.abs(lx - (-FI["length"] / 2 - 0.6)) < 1.0) & (np.abs(ly) < 0.5)
     img[worn] = np.minimum(img[worn] * 1.12, 1)                     # the treads worn pale in their middle
@@ -227,7 +234,7 @@ CANDLE_TREE = None
 def place_candle(w):
     global CANDLE_TREE
     door = np.array([C[0], C[1] + FI["length"] / 2 + 1.0])
-    best = min(w.trees, key=lambda t: np.hypot(t[0] - door[0], t[1] - door[1]))
+    best = w.trees[-1]                                                  # the tenth trunk set by the door
     ang = np.arctan2(ws.FOCUS[1] + 6 - best[1], ws.FOCUS[0] + 6 - best[0])   # on the side toward the viewer
     CANDLE_TREE = (best[0] + np.cos(ang) * best[3], best[1] + np.sin(ang) * best[3], 1.55)
 
@@ -265,6 +272,16 @@ def living_ruin(img, w, W, px, py, pz, L, T):
         put(gx, gy, base + z + 0.11, (1.0, 0.86, 0.52))
         put(gx, gy, base + z + 0.16 + fl * 0.04, (1.0, 0.72, 0.3))
         put(gx + 0.02 * np.sin(T * 6.28 * 5), gy, base + z + 0.22 + fl * 0.05, (0.9, 0.42, 0.15), 0.7)
+        # its light on the bark round it: a warm halo, stepped and dithered, breathing with the flame
+        csx, csy = ws.to_px((gx, gy, base + z + 0.12))
+        for dy_ in range(-7, 8):
+            for dx_ in range(-6, 7):
+                d_ = np.hypot(dx_, dy_ * 0.9)
+                ix, iy = int(round(csx)) + dx_, int(round(csy)) + dy_
+                if 1.5 < d_ < 7 and 0 <= iy < GH and 0 <= ix < GW and dep_px[iy, ix] <= gx + gy + 0.6:
+                    k_ = (1 - d_ / 7) ** 1.6 * (0.8 + 0.2 * fl)
+                    if k_ > 0.12 + ((ix * 3 + iy * 5) % 4) * 0.06:
+                        img[iy, ix] = np.minimum(img[iy, ix] * (1 + k_ * 0.9) + np.array([0.09, 0.05, 0.0]) * k_, 1)
     # the three caps: white along the walls outside (sound ground), blue in a ring over the crypt, red in the altar
     rr = np.random.default_rng(31)
     hx, hy = FI["length"] / 2, FI["width"] / 2
@@ -300,6 +317,8 @@ def living_ruin(img, w, W, px, py, pz, L, T):
 
 
 ws.paint_bark = pale_bark
+ws.GROUND_LIFE_OK = lambda x, y: bool(footprint_dist(np.array(x), np.array(y)) > 2.4)   # the bare ring stays bare
+ws.RIM = (1.12, (0.01, 0.015, 0.035))                                # a soft, cool moon edge on the pale trunks
 ws.WOOD_HOOKS += [clear_plan, place_candle]
 ws.BUILD_HOOKS += [stamp, candle_light, keep_world]
 ws.PAINTERS["ruin"] = paint_ruin

@@ -17,7 +17,7 @@ FLOOR, BLOCK, PIER, STEP, ALTAR, RUBBLE, FLAG = 1, 2, 3, 4, 5, 6, 7
 COURSE = 0.45                                                         # a course of stone, yards
 
 
-def chapel(seed=1, length=15.0, width=9.0, thick=1.1):
+def chapel(seed=1, length=15.0, width=9.0, thick=1.1, full=(6.5, 8.5, 7.5, 9.0)):
     rr = np.random.default_rng(seed)
     F = Field(max(length, width) / 2 + 2.5, res=0.04)
     X, Y = F.X, F.Y
@@ -32,7 +32,7 @@ def chapel(seed=1, length=15.0, width=9.0, thick=1.1):
     M = np.where(inside, FLAG, 0)
     # the walls: north, south, east (with the altar inside it), west (the door); each broken down course by course
     walls = [(-hx, -hy, hx, -hy), (-hx, hy, hx, hy), (hx, -hy, hx, hy), (-hx, -hy, -hx, hy)]
-    full = [6.5, 8.5, 7.5, 9.0]                                       # what each still stands to at its best (yd): an
+    full = list(full)                                                 # what each still stands to at its best (yd): an
                                                                       # ancient church of the old road, true scale
     wid = np.full(X.shape, -1)
     U = np.zeros(X.shape)
@@ -89,8 +89,8 @@ def chapel(seed=1, length=15.0, width=9.0, thick=1.1):
     # fallen stones: the arch's voussoirs on the threshold, blocks fallen outward from the breaks, half in the litter
     blocks = []
     for k in range(int(rr.integers(22, 30))):
-        if k < 5:
-            cx, cy = -hx - rr.uniform(1.0, 2.4), rr.uniform(-1.6, 1.6)
+        if k < 5:                                                     # the arch's stones, fallen to either side of the
+            cx, cy = -hx - rr.uniform(0.9, 2.6), rr.choice([-1, 1]) * rr.uniform(1.1, 2.4)   # door; its way kept clear
         else:
             side = rr.choice([-1, 1])
             cx, cy = rr.uniform(-hx, hx), side * (hy + rr.uniform(0.9, 3.2))

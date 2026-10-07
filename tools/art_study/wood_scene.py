@@ -54,6 +54,8 @@ BUILD_HOOKS = []         # f(W, w): stamp more into the built world
 PAINTERS = {}            # kind -> f(img, m, v, n, px, py, pz, o, W, L): paint an object kind of another scene
 LIGHTS = []              # (x, y, z, reach): more warm lights (a candle), cast like the lantern
 LIVING = []              # f(img, w, W, px, py, pz, L, T): more living layers, drawn last
+GROUND_LIFE_OK = None    # f(x, y) -> bool: where grass may grow (a ruin keeps its bare ring and its stone clear)
+RIM = (1.35, (0.025, 0.025, 0.03))   # the moonlit rim on objects: strength and cool lift
 
 
 def build(w):
@@ -507,7 +509,7 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
         mk = tg == k
         edge = mk & ~np.roll(mk, 1, axis=1) & (np.roll(dep, 1, axis=1) < dep - 0.3)
         rim = edge
-        img[rim] = np.minimum(img[rim] * 1.35 + np.array([0.025, 0.025, 0.03]), 1)
+        img[rim] = np.minimum(img[rim] * RIM[0] + np.array(RIM[1]), 1)
     return np.clip(img, 0, 1)
 
 
@@ -648,6 +650,8 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     pts.sort(key=lambda q: q[0] + q[1])
     for (x, y) in pts:
         if look(W, W["tag"], np.array(x), np.array(y)) != 0 or abs(x - FOCUS[0]) > 9 or abs(y - FOCUS[1]) > 9:
+            continue
+        if GROUND_LIFE_OK is not None and not GROUND_LIFE_OK(x, y):
             continue
         k, (i, j) = light_at(x, y)
         sx, sy = to_px((x, y, gh(x, y)))
