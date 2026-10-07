@@ -42,6 +42,14 @@ and again whenever the reminder fires, the work in progress is checked against e
 these unique objects, we can reuse them ... Each one unique ... I've decided it's a masterpiece. You can lock in
 everything you made which means that they always need to be perfect. All this will become assets for the game."
 
+0. **This covers everything in a scene, not only objects** (Derek: "not ... just bark or trees but ... all objects,
+   stone, environmental conditions, lighting, animation, movement, ecosystem rules. Everything"): objects and
+   materials (stone, masonry, wood, bark, plants, fungi, litter, water, earth); environmental conditions (mist, damp,
+   the night air, weather, the hour); lighting (the moon and its shadows, moonbeams and rays by the hour, lantern and
+   candle and their flicker, canopy flecks, rims, temperature); animation and movement (wind and gusts, grass, flames,
+   drifting mist, spores and leaves, breathing glows); ecosystem rules (what grows where and why, spacing, corridors,
+   clearings, roots, decay). Each is a reusable system made to perfection in its own graded passes; when a scene is
+   called a masterpiece all of it locks, and from then on it can only stay or improve, in one shared place.
 1. A scene is a commission for unique objects, not a picture. Every object in it (each wall, pier, stone, tree, candle,
    cap, tuft) is built as a reusable game asset in `tools/landkit/` (sprite, normal map, collision, combat data);
    nothing is painted for the scene alone.
