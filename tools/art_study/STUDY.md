@@ -526,3 +526,66 @@ Wood `main_0`, the floor of a dying wood. Four wrong turns before it read:
   than a tile (wet/dry, red/brown, green in the damp); bare earth as its own class in eroded patches whose edge is
   broken leaf by leaf; sticks, stones, grass clumps as crafted scatter sprites (the zone's scatter layer), never baked
   into a tile. Tiles are saved lossless (lossy WebP smeared the pixels).
+
+## Round 13: the old-growth forest as an ecosystem (2026-10-06; Derek: "study old growth forest pictures and
+ecosystems, in fact you need to understand ecosystem completely to build one. I want you to really elevate your work")
+My wood floors failed because I painted a surface. A forest floor is not a surface: it is the record of everything
+above it and everything that has died on it. Each thing on it is there BECAUSE of something else.
+
+### The engine: trees live a very long time, then die, and their dying makes everything
+- **Ages, all at once.** Old growth holds every age together: giants of 250-1,000 years (trunks a yard or two
+  across, bark deeply fissured, crowns broken and rebuilt), middle-aged trees waiting under them, saplings waiting
+  under those, seedlings on the logs. Multiple canopy layers, never one even roof.
+- **Gaps.** A giant dies (wind, disease, its own weight) and falls, opening a gap. Light reaches the floor only
+  there: under a closed canopy the floor gets under 5% of daylight, and most of that comes as brief **sunflecks**
+  that move as the leaves move. A gap is a bright room in a dark hall; everything that needs light crowds into it
+  (grasses, brambles, a thicket of saplings racing upward). Gaps are the forest's heartbeat: they open, fill and close
+  over decades, so a wood is a patchwork of gaps at every age.
+- **Dead wood is half the forest.** In Bialowieza almost half of all the wood is dead, ten times a managed forest's.
+  Snags (standing dead trees, broken-topped, barkless, riddled with holes, bracket fungi in tiers) stand among the
+  living; logs lie everywhere in every stage of decay.
+- **The five decay classes of a log** (Maser): 1, freshly fallen: bark tight, round, held off the ground on its
+  branches, twigs still on it; 2, bark loosening, sagging, twigs gone; 3, bark sloughing off in plates, the wood still
+  hard, the log settling into the ground, moss starting; 4, soft and blocky, sunk, split into cubes, moss-covered, roots
+  growing into it, most alive of all (it holds the most life); 5, a long soft ridge of brown crumb under moss, its
+  shape only a hump in the floor. A floor shows them all at once, oldest underneath.
+- **Nurse logs.** Seedlings can't win in the litter (smothered, out-competed), so they grow along the tops of logs, in
+  a straight line. When the log has gone, the trees stand in a ROW on stilted roots over the empty space where it lay:
+  you can read a log that vanished a century ago from a line of trees.
+- **Pit and mound.** An uprooted tree tears up its root plate: a vertical disc of roots and soil, a man's height or
+  more, standing on edge at the log's foot, and a pit where it stood. Over 5-10 years the roots decay, the soil falls
+  from the plate into a mound beside the pit. The whole floor of an old forest is hummocky with old pits and mounds,
+  centuries of them. Pits: cold, wet, deep in leaves, often holding water (vernal pools); mounds: dry, bare mineral
+  soil, the most light, moss and lichen and seedlings on them, free of the smothering leaves.
+
+### The floor itself, in layers
+- **Litter (Oi):** this year's leaves, whole, loose, on top. **Fermentation (Oe):** older leaves, broken, matted,
+  dark, still recognisable. **Humus (Oa):** black, greasy, structureless. Under deciduous trees the litter is a few
+  centimetres; it drifts (against logs, roots and the windward side of every obstacle, into pits) and thins on mounds
+  and on the lee. Nothing lies evenly.
+- **Ground layer:** mosses, lichens, club mosses: on logs, stumps, stones, root flares, mounds, the shaded foot of
+  trees; thickest where it is wet and still. Moss is a map of moisture.
+- **Herb layer:** ferns (the damp, the pits, the seeps, the shade), shade plants in carpets that spread slowly (the
+  ancient-woodland flowers: wood anemone, bluebell, dog's mercury, wood sorrel: a carpet means centuries unbroken);
+  grasses only where light allows (gaps, edges).
+- **Shrub and sapling layer:** hazel, hawthorn, young hornbeam in the subcanopy; thickest in and round gaps.
+- **Water:** seeps at the foot of slopes (dense green round them even in shade), vernal pools in pits and hollows, alder
+  carr where the ground stays wet: black water, alder on root-islands, sedge tussocks.
+
+### Fungi are the forest's other half
+They decay the wood (white and brown decay), feed the trees through their nets in the soil, fruit on logs of class 3-4,
+on stumps, on snags (brackets in tiers), in rings in the litter. In a world with no animals (Godmarrow's rule) the
+fungi are the only decomposers there are: Godmarrow's woods are fungal kingdoms, the dead never cleared, only
+softened.
+
+### What this means for building Godmarrow's wood
+1. **Start from the canopy, not the floor.** Place the trees first (ages mixed: giants, middle, young, snags, stumps),
+   then the dead ones lying where they fell, then compute LIGHT (gaps bright, under giants dark, sunflecks/moonflecks)
+   and WET (pits, hollows, seeps, the foot of slopes). The floor is then derived: litter depth, moss, ferns, grass,
+   saplings, mushrooms, pools all FOLLOW those maps, so they sit where they would.
+2. **Every fallen tree is a set:** the log (in its decay class), its root plate on edge, its pit (wet, leafy) and its
+   mound (bare, mossy), its broken crown of branches, a gap overhead (bright, crowded with saplings) if it is recent.
+3. **Nothing even.** Litter drifts against things, moss grows on things, ferns gather in the damp; the bare places are
+   the mounds and the trodden. Density follows the maps.
+4. **Repetition dies by itself** when the floor is the consequence of a placed history rather than a texture.
+5. **The ground tile is only the base:** humus and the litter's tone and form. Everything with a SHAPE is placed.

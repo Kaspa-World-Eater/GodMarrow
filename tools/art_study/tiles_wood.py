@@ -75,10 +75,10 @@ def scatter(n, seed, rng=None):
 
 SOIL = ramp("#0b090c", "#141013", "#1d1617", "#271d1b", "#33261f")
 HUMUS = ramp("#140d0d", "#1e1412", "#2a1b16", "#37241b", "#452e21", "#553826")   # the dark between, one step under the leaves
-LITTER = [ramp("#1a1010", "#2d1a14", "#45281a", "#5e3820", "#784a28", "#93602f"),     # rust-brown
-          ramp("#17120e", "#2a2016", "#40301c", "#574224", "#6f552c", "#886a36"),     # dull ochre-brown
-          ramp("#121310", "#1e2116", "#2c311b", "#3c4220", "#4e5427", "#62652e"),     # olive, the last green ones
-          ramp("#140f10", "#221a19", "#332623", "#45342d", "#584238", "#6c5244")]     # grey-brown, old and dry
+LITTER = [ramp("#130d16", "#22141c", "#3a1f1f", "#573020", "#774524", "#97602c", "#b47e3a", "#c99a50"),   # rust
+          ramp("#110f17", "#1f1a1f", "#332a25", "#4b3d2a", "#655231", "#80693b", "#9b8247", "#b29a5a"),   # brown
+          ramp("#0e1014", "#191d1a", "#262d1d", "#363f22", "#4a5228", "#5f6530", "#767a3a", "#8c8e48"),   # olive
+          ramp("#121018", "#201b22", "#30282b", "#433833", "#574a40", "#6c5c4e", "#82705e", "#98856e")]   # old grey
 MOSS = ramp("#0c140f", "#142116", "#1e311b", "#2b4321", "#3b5527")
 TWIG = ramp("#120d0e", "#251c1a", "#3e3029", "#5c4a3c")
 EARTH = ramp("#16121a", "#211b20", "#2d2427", "#3a2f2e", "#483a35", "#58473f", "#6a5649")   # cooler, greyer than the leaves
@@ -117,21 +117,25 @@ def main_0(seed=0):
     nf = np.dstack([-gxf[1:-1, 1:-1], -gyf[1:-1, 1:-1] * 2.0, np.ones_like(hgt)])
     nf /= np.linalg.norm(nf, axis=2, keepdims=True)
     lit = np.clip((nf * LIGHT).sum(2), 0, 1)
-    form = lit - 0.62 + (hgt / 7.0) * 0.2
+    form = (lit - 0.62) * 0.45 + (hgt / 7.0) * 0.32                      # read by height more than slope (a high moon)
     # four clean tone groups across the form (dither only where one meets the next)
-    tone = np.clip(np.round((0.5 + form * 1.6) * 4 + (BAY - 0.5) * 0.35), 0, 4).astype(int)    # 0..4
-    base_i = np.array([1, 2, 2, 3, 4])[tone]                              # its index on a litter ramp
+    lf1, lf2, lid = pworley(XX, YY, 900, seed + 31)                     # the old leaves underneath, a cell each
+    leafjit = (_P[(lid * 31 + seed) % 4096] - 0.5) * 0.5                # each old leaf a little lighter or darker
+    tone = np.clip(np.round((0.5 + form * 1.6) * 4 + leafjit + (BAY - 0.5) * 0.2), 0, 4).astype(int)   # 0..4
+    base_i = np.array([1, 2, 3, 3, 4])[tone]                              # its index on a litter ramp
     # the ground's colour: a smooth blend between rust and brown (never hard regions), a touch of olive in the damp
     famf = pfbm(XX, YY, 2, seed + 17)
     wr = np.clip((famf - 0.35) / 0.3, 0, 1)
     wr = np.round(wr * 2 + (BAY - 0.5) * 0.3) / 2
     img = LITTER[0][base_i] * (1 - wr[..., None]) + LITTER[1][base_i] * wr[..., None]
-    # a dry brush along the contours (mostly level on the 2:1 ground)
-    brush = pnoise(XX, YY, 20, 80, seed + 18)
-    img = img * (1 + ((brush > 0.72) * 0.06 - (brush < 0.2) * 0.06))[..., None]
+    # the old leaves' edges: a dark seam where one meets the next, its upper-left rim a touch lit
+    seam = (lf2 - lf1) < 0.6
+    img[seam] = img[seam] * 0.8
+    rimo = ((lf2 - lf1) > 0.6) & ((lf2 - lf1) < 1.3) & (tone >= 2) & (_P[(lid * 17) % 4096] > 0.5)
+    img[rimo] = np.minimum(img[rimo] * 1.08, 1)
     # the hollows: humus showing, a clean dark shape
-    hollow = (hgt < -1.9) & (pnoise(XX, YY, 40, 20, seed + 19) > 0.35)
-    img[hollow] = HUMUS[np.clip(base_i[hollow], 0, len(HUMUS) - 1)]
+    hollow = (hgt < -2.4) & (pnoise(XX, YY, 40, 20, seed + 19) > 0.5)
+    img[hollow] = HUMUS[np.clip(base_i[hollow] + 1, 0, len(HUMUS) - 1)]
     # ---- 2. the leaves, drawn one by one, spaced so each reads; dense and crisp on the lit slopes, sparse in shade
     taken = np.zeros((TH, TW), bool)
     placed = 0
@@ -140,7 +144,8 @@ def main_0(seed=0):
         g = tone[y, x]
         if rr.random() > [0.04, 0.08, 0.18, 0.34, 0.42][g]:
             continue
-        st = LEAVES[rr.integers(0, len(LEAVES))]
+        wts = np.array([1, 1, 1, 0.7, 0.8, 0.6, 0.6, 0.7, 1.6, 1.4, 0.08, 1.2])          # oak and folded leaves most; a skeleton rarely
+        st = LEAVES[rr.choice(len(LEAVES), p=wts / wts.sum())]
         if rr.random() < 0.5:
             st = [row[::-1].replace("H", "h").replace("D", "H").replace("h", "D") for row in st]   # mirrored: light still from the left
             st = [row.replace("H", "L") for row in st]
@@ -163,7 +168,11 @@ def main_0(seed=0):
                     if not taken[py, px]:
                         img[py, px] = img[py, px] * 0.72
                     continue
-                off = {"H": 2, "L": 1, "B": 0, "D": -1}[ch]
+                if ch == "V":
+                    img[py, px] = LITTER[3][int(np.clip(base_i[py, px] + 1, 0, 7))]   # a skeleton's veins, grey
+                    taken[py, px] = True
+                    continue
+                off = {"H": 2, "L": 1, "B": 0, "D": -1, "P": 3, "V": 1}[ch]
                 if soft:
                     off = min(off, 0) if off > 0 else off
                 img[py, px] = rp[int(np.clip(base_i[py, px] + off, 0, len(rp) - 1))]

@@ -56,3 +56,26 @@ every time, not only on the pieces that get a second pass.
 
 - `shaders/lake.gdshader`: the first piece in this standard (see its header comment).
 - `--lakefx` (core/test_hooks.gd): the test scene.
+
+## The checklist (Derek, 2026-10-06: "are you applying the techniques you've learned and documented?")
+Every piece is checked against every line, in writing, before it is shown. A piece that fails a line is not shown.
+1. **Brief:** written first, from the lore and from the real thing (anatomy, ecology, geology), every detail with its
+   reason. Built from the cause, not the surface (a forest floor follows its canopy and its dead).
+2. **Scale:** true size from the code's projection (a yard is 36x18; ~19-22 px per yard of height); the hero beside
+   it for scale.
+3. **Form:** a height field / 3D model, ray-cast, lit through normals. No flat sprites standing in for form.
+4. **Light:** the cold key (moon) AND the warm local light (lantern, fire), each casting real shadows; temperature in
+   steps; sunflecks / moonflecks where a canopy is.
+5. **Values:** big shapes in clean tone groups first (3-5); texture subordinate (small amplitude) and following the
+   form; contrast saved for form and focus; neighbours close in value.
+6. **Ramps:** hue-shifted (darks violet-blue, lights warm), 6-8 tones per material.
+7. **Paint:** broad tones, dry-brush strokes along the form, pigment pooled at wet edges, lit lips, a world-fixed
+   paper tooth, dither only at tone boundaries.
+8. **Contact:** AO where things meet, grass and litter over the feet of things, lit rims against what is behind.
+9. **Detail where it counts:** drawn shapes (hand-made stamps / designed forms) on the lit side and the silhouette;
+   the shade flat; open ground quiet.
+10. **Life:** something moves in the one wind (Gust); light breathes; nothing pasted.
+11. **Seen as the player sees it:** the game's camera, zoom and lighting; tiled and composed if it is a tile, with no
+    visible repeat.
+12. **Skeptic round:** compared side by side with the best pieces (the Seer's Bowl title, the ruins, the dune); the
+    worst difference fixed first; repeat until none is obvious.
