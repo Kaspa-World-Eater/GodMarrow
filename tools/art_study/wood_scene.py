@@ -32,6 +32,9 @@ R_WOOD = ramp("#1a1210", "#33221a", "#523826", "#735135", "#946c48", "#b48c62") 
 R_MOSS = ramp("#0b1210", "#132017", "#1d301b", "#2a4320", "#3b5726", "#516d2e", "#6a8538")
 R_SOIL = ramp("#120d10", "#1f1716", "#2f221d", "#413026", "#55402f", "#6b523b")          # torn-up earth
 R_ROOT = ramp("#1a1210", "#33251c", "#54402c", "#76603f")
+FUNG_TOP = ramp("#2a1a12", "#4a2e1c", "#6c4a2c", "#8c6640")
+FUNG_PORE = hexc("#b0a07e")
+FUNG_RIM = hexc("#d8ccb0")
 R_SKY = ramp("#0a0d16", "#111725", "#1a2234", "#263046")
 MOON_C = np.array([0.6, 0.68, 0.88])
 LAMP_C = np.array([1.0, 0.7, 0.38])
@@ -286,7 +289,7 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
     img[gl] = (eco * k_light)[gl]
     mossm = gl & (mat == 1)
     cush = (vn(px * 9, py * 9) - 0.5) * 0.12
-    img[mossm] = R_MOSS[np.clip(((v + cush) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 1)][mossm]
+    img[mossm] = R_MOSS[np.clip(((v * 0.8 + cush) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 2)][mossm]   # deep olive at night, as on the rocks
     lowr = mossm & ~np.roll(mossm, -1, axis=0) & ~np.roll(mossm, -1, axis=1)
     img[lowr] *= 0.8
     upl = mossm & ~np.roll(mossm, 1, axis=0) & ~np.roll(mossm, 1, axis=1)
@@ -304,9 +307,14 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
             continue
         if o["kind"] in ("giant", "middle", "young"):
             ang = np.arctan2(py - o["c"][1], px - o["c"][0])
-            furrow = (np.sin(ang * (16 if o["kind"] == "giant" else 9) + vn(pz * 0.7, ang * 2) * 2.0) > 0.5)    # deep fissures up the bark
-            ridge = (np.sin(ang * (16 if o["kind"] == "giant" else 9) + vn(pz * 0.7, ang * 2) * 2.0) < -0.6)
-            bv = v - furrow * 0.2 + ridge * 0.08 + (vn(ang * 6, pz * 4) - 0.5) * 0.06
+            nc = 18 if o["kind"] == "giant" else 10
+            cu = ang * nc / (2 * np.pi) + vn(pz * 0.6, ang * 3) * 0.8           # around the trunk, wandering
+            row = np.floor(pz / 0.45 + np.floor(cu) * 0.37)                      # the ridges break into staggered blocks
+            fu = cu - np.floor(cu)
+            fz = (pz / 0.45 + np.floor(cu) * 0.37) - row
+            furrow = (np.abs(fu - 0.5) > 0.38) | (fz < 0.08)                     # the fissures between the blocks
+            ridge_top = (fz > 0.08) & (fz < 0.22) & ~furrow                      # each block's upper edge catches the light
+            bv = v - furrow * 0.24 + ridge_top * 0.07 + (vn(ang * 6, pz * 4) - 0.5) * 0.05
             img[m] = R_BARK[np.clip((bv * len(R_BARK)).astype(int), 0, len(R_BARK) - 1)][m]
             low = m & (pz < 0.6 + (vn(ang * 3, pz) - 0.5) * 0.5) & (vn(ang * 5, pz * 3) > 0.4)   # moss on the foot
             img[low] = R_MOSS[np.clip((v[low] * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 1)]
@@ -317,6 +325,8 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
             dv = v + 0.04 - crack * 0.2
             img[m] = R_DEAD[np.clip((dv * len(R_DEAD)).astype(int), 0, len(R_DEAD) - 1)][m]
             img[m & holes] = hexc("#0a0809")
+            barkl = m & (pz < 1.4 + vn(ang * 3, 1) * 1.2) & (vn(ang * 5, pz * 1.5) > 0.5)
+            img[barkl] = R_BARK[np.clip(((v[barkl] * 0.85) * len(R_BARK)).astype(int), 0, len(R_BARK) - 1)]
         elif o["kind"] == "stump":
             topm = m & ~side
             sidem = m & side
@@ -337,12 +347,25 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
                 img[m] = R_BARK[np.clip((bv * len(R_BARK)).astype(int), 0, len(R_BARK) - 1)][m]
                 bare_w = m & loose
                 img[bare_w] = R_WOOD[np.clip(((v[bare_w] - 0.05) * len(R_WOOD)).astype(int), 0, len(R_WOOD) - 1)]
-            elif cls == 3:
-                img[m] = R_DEAD[np.clip((v * len(R_DEAD)).astype(int), 0, len(R_DEAD) - 1)][m]
-                mm = m & (n[..., 2] > 0.6) & (vn(px * 3, py * 3) > 0.45)
-                img[mm] = R_MOSS[np.clip((v[mm] * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 1)]
             else:
-                img[m] = R_MOSS[np.clip(((v + (vn(px * 5, py * 5) - 0.5) * 0.12) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 1)][m]
+                lat3 = (px - o["a"][0]) * -o["d"][1] + (py - o["a"][1]) * o["d"][0]
+                around = np.arcsin(np.clip(lat3 / o["r"], -1, 1))
+                if cls == 3:
+                    # bark sloughing in plates off grey wood split along its grain; moss starting in strips on top
+                    split = np.sin(around * 16 + vn(rel_a * 1.2, around * 2) * 3) > 0.7
+                    wood = v - split * 0.18 + (vn(rel_a * 4, around * 8) - 0.5) * 0.06
+                    img[m] = R_DEAD[np.clip((wood * len(R_DEAD)).astype(int), 0, len(R_DEAD) - 1)][m]
+                    plates = m & (vn(rel_a * 1.6 + 7, around * 2.2) > 0.6)
+                    img[plates] = R_BARK[np.clip(((v[plates] * 0.8) * len(R_BARK)).astype(int), 0, len(R_BARK) - 1)]
+                    pe = plates & ~np.roll(plates, -1, axis=0)
+                    img[pe] *= 0.65                                                 # each plate's lifted edge, its shadow
+                    strip = m & (np.abs(around) < 0.5) & (vn(rel_a * 0.7, around * 5) > 0.42)
+                    img[strip] = R_MOSS[np.clip(((v[strip] * 0.9 + (vn(rel_a * 9, around * 9)[strip] - 0.5) * 0.1) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 1)]
+                else:
+                    # soft and sunk under moss; blocky cubical breaks show the pale brown wood beneath
+                    img[m] = R_MOSS[np.clip(((v * 0.95 + (vn(rel_a * 6, around * 6) - 0.5) * 0.12) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 1)][m]
+                    cube = m & ((np.sin(rel_a * 9) > 0.92) | (np.sin(around * 7) > 0.94)) & (vn(rel_a * 2, around * 2) > 0.55)
+                    img[cube] = R_WOOD[np.clip(((v[cube] * 0.7) * len(R_WOOD)).astype(int), 0, len(R_WOOD) - 1)]
         elif o["kind"] == "rock":
             rm = look(W, W["RM"], px, py)
             rpz = pz - o["base"]
@@ -524,6 +547,39 @@ def living(img, w, W, px, py, pz, L):
             sd = rr.choice([-1, 1])
             for d in range(3):
                 put(cx + sd * (d + 1), cy - d * 0.5, np.array([0.3, 0.42, 0.18]) * k * (1.2 if sd < 0 else 0.85), x + y)
+    # bracket fungi in tiers up the snags, on the side the camera sees: a snag's signature
+    for k, o in W["obj"].items():
+        if o["kind"] != "snag":
+            continue
+        cx_, cy_ = o["c"]
+        rr2 = np.random.default_rng(int(cx_ * 10))
+        for tier in range(rr2.integers(3, 6)):
+            az = rr2.uniform(1.0, 2.2)                                         # on the moon side the camera sees
+            zt = rr2.uniform(1.0, 4.5)
+            p0 = np.array([cx_ + np.cos(az) * o["r"], cy_ + np.sin(az) * o["r"], gh(cx_ + o["r"] * 2.5, cy_ + o["r"] * 2.5) + zt])   # from the ground beside it, not its own top
+            sx, sy = to_px(p0)
+            k_, _ = light_at(cx_ + np.cos(az) * (o["r"] + 0.3), cy_ + np.sin(az) * (o["r"] + 0.3))
+            for sh_i in range(rr2.integers(2, 4)):
+                w_ = rr2.uniform(6.5, 10.0) - sh_i * 1.6                   # half-width of the shelf, px
+                cxs, cys = sx - w_ * 0.45, sy + sh_i * 5.5                  # it juts out toward the moon side
+                depth_k = p0[0] + p0[1] + 0.3
+                for dy in range(-int(w_ * 0.5) - 1, 4):
+                    for dx in range(-int(w_) - 1, int(w_) + 2):
+                        u, v_ = dx / w_, dy / (w_ * 0.42)
+                        r2 = u * u + v_ * v_
+                        if dy <= 0 and r2 <= 1:                              # the top: a half-disc, banded with growth
+                            band = int(np.hypot(dx, dy * 2.2) / 1.6) % 2
+                            lit_ = np.clip(0.55 - u * 0.25 - v_ * 0.3, 0, 0.99)
+                            col = FUNG_TOP[int(lit_ * 4)] * (0.85 if band else 1.0)
+                            if r2 > 0.7:
+                                col = FUNG_RIM * (1.0 if u < 0.3 else 0.8)       # the pale growing margin
+                            put(cxs + dx, cys + dy, np.minimum(col * k_ * 1.5, 1), depth_k)
+                        elif dy in (1,) and abs(u) <= 1:                       # the pale pores beneath
+                            put(cxs + dx, cys + dy, FUNG_PORE * k_ * 0.75, depth_k)
+                        elif dy in (2, 3) and abs(u) <= 0.9:                   # its shadow on the wood
+                            i_, j_ = int(cys + dy), int(cxs + dx)
+                            if 0 <= i_ < GH and 0 <= j_ < GW:
+                                img[i_, j_] *= 0.6
     # mushrooms on the stump's foot and on the old logs
     for (x, y) in w.shrooms:
         if abs(x - FOCUS[0]) > 9 or abs(y - FOCUS[1]) > 9:

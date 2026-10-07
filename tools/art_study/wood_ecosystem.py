@@ -156,6 +156,7 @@ class Wood:
         self.fern = (self.wet > 0.62) & (self.light < 0.6) & (fbm(self.X * 0.35 + 5, self.Y * 0.35) > 0.5) & ~self.logmask & ~self.pool
         self.grass = (self.light > 0.5) & (fbm(self.X * 0.4 + 9, self.Y * 0.4) > 0.4) & ~self.logmask
         self.bare = (H - nd.gaussian_filter(H, 15) > 0.18) & (self.litter < 0.5)
+        self.bare &= ~self.moss                                         # moss lies in patches over the mound, not round it
         self.sapl = [(x, y) for x, y in zip(rr.uniform(gx - gr, gx + gr, 40), rr.uniform(gy - gr, gy + gr, 40))
                      if np.hypot(x - gx, y - gy) < gr * 0.9]
         self.shrooms = []
