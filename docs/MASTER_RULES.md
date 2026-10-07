@@ -60,6 +60,11 @@ everything you made which means that they always need to be perfect. All this wi
    Any later change must keep or raise their quality, never lower it. Shared parts (the bark, the stone) live in one
    place (`tools/landkit/bark.py`, ...) so an improvement reaches every use.
 5. Until Derek says so, a scene and its objects are still in work.
+6. **A scene builds the game's tiles too** (Derek, 2026-10-07: "build scenes, which also means building the reusable
+   tiles for the game"). Every ground surface in a scene is a real game tile: seamless 320x160 in the game's format
+   (tools/art_study/tiles_*.py), painted to the standard, with enough variants that no repeat shows and the
+   transitions to the ground round it, exported into that land's ground set (tools/landkit/build_set.py) and laid by
+   the scene from those same tiles, never painted straight into the picture.
 
 ## 3. The painting rules (from `docs/PAINTED_STANDARD.md`)
 
