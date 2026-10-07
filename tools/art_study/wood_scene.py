@@ -726,7 +726,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
         return fbm(px * 0.35 - TT * 1.6, py * 0.35 + TT * 1.6) * 0.65 + fbm(px * 0.9 - TT * 2.4, py * 0.9 + TT * 2.4) * 0.35
     mist = drift(field, T)
     dens = np.clip((mist - 0.5) * 3.0 + wetv * 0.4 - 0.15, 0, 1) * low
-    a_ = np.where(dens > 0.55, 0.3, np.where(dens > 0.25, 0.16, 0.0)) * (bay_l > 0.2)
+    a_ = np.where(dens > 0.55, 0.18, np.where(dens > 0.25, 0.096, 0.0)) * (bay_l > 0.2)    # 40% lighter (Derek)
     img = img * (1 - a_[..., None]) + np.array([0.42, 0.46, 0.55]) * (0.35 + L["moon"][..., None] * 0.6 + L["lamp"][..., None] * np.array([1.2, 0.9, 0.5])) * a_[..., None]
     # spores turning slowly in the lantern's light, each catching it a moment and gone
     lamp = (HERO[0] + 0.25, HERO[1] - 0.25)
