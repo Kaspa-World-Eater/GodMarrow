@@ -347,3 +347,4 @@ Worst first: the pool, the floating vein, the light.
 101. The rib and its skull hung lower across the posts (~3 yd), within the fires' light.
    Graded (101): the rib reads now as a bone bar lashed across the grille, the skull under it, warm along its underside.
    Derek: "yeah the arch should be higher above the door". 102. The rib and skull back up high above the door (~4.7 yd), the doorway's glow raised to rim them.
+   Derek: "move it higher". 103. The arch and skull a yard higher (~5.7 yd), the glow raised with them.
