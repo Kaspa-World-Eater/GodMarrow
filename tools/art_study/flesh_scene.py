@@ -821,7 +821,19 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     # the vein (landkit vessel.py): a true tube, threading in and out of the ground, its pulse running to the gate
     if "vein3" not in W:
         W["vein3"] = vessel.path(VP[::2], gh, seed=5, humps=2.5, depth=0.6, lift=0.42, r0=0.3)
-    vessel.draw(img, zb, dep, ws.to_px, W["vein3"], 0.3, T, lts, ws.SUN, seed=5, ground=gh)
+    vessel.draw(img, zb, dep, ws.to_px, W["vein3"], 0.3, T, lts, ws.SUN, seed=5, ground=gh, organic=True)
+    vr = np.random.default_rng(55)                                         # smaller veins forking off it, diving back under the stones
+    V3 = W["vein3"]
+    for j0 in vr.choice(np.arange(10, len(V3) - 10), size=6, replace=False):
+        p0 = V3[j0]
+        tang = V3[min(j0 + 1, len(V3) - 1)][:2] - V3[max(j0 - 1, 0)][:2]
+        tang = tang / (np.linalg.norm(tang) + 1e-9)
+        side = np.array([-tang[1], tang[0]]) * vr.choice([-1, 1])
+        bp = []
+        for t_ in np.linspace(0, 1, 22):
+            q = p0[:2] + (side * 0.9 + tang * vr.uniform(-0.4, 0.4)) * t_ * vr.uniform(0.9, 1.6) + side * np.sin(t_ * 5) * 0.1
+            bp.append((q[0], q[1], gh(q[0], q[1]) + 0.12 * (1 - t_) - 0.18 * t_ * t_))
+        vessel.draw(img, zb, dep, ws.to_px, np.array(bp), 0.12, T, lts, ws.SUN, seed=int(j0), ground=gh, taper=True, organic=True)
     # capillaries: fine dark threads branching off the vein into the ground, pulsing faintly with it
     cr = np.random.default_rng(55)
     for i in range(0, len(VP), 9):

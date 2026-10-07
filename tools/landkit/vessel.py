@@ -38,7 +38,7 @@ def path(pts2d, ground, seed=1, humps=3.5, depth=0.35, lift=0.3, r0=0.24):
     return np.column_stack([P, z])
 
 
-def draw(img, zb, dep_scene, to_px, P, r0, T, lights, moon, seed=1, tol=0.06, ground=None, ramp_=None, taper=False):
+def draw(img, zb, dep_scene, to_px, P, r0, T, lights, moon, seed=1, tol=0.06, ground=None, ramp_=None, taper=False, organic=False):
     R_ = R_VEIN if ramp_ is None else ramp_
     GH, GW = img.shape[:2]
     n = len(P)
@@ -50,6 +50,10 @@ def draw(img, zb, dep_scene, to_px, P, r0, T, lights, moon, seed=1, tol=0.06, gr
         valve = np.exp(-(((s % 2.6) - 1.3) / 0.18) ** 2) * 0.1              # its valves, a faint swelling, far apart
         pulse = np.exp(-((((s * 0.5 - T * 2) % 1.0) - 0.5) / 0.07) ** 2)
         r = r0 * (1 + valve + 0.4 * pulse) * (0.9 + 0.2 * vn(s * 0.8 + seed, 1))
+        if organic:                                                        # not a tube (Derek): it swells and pinches, knots, and lies
+            r = r * (0.6 + 0.75 * vn(s * 0.9 + seed * 3, 2.0))                # flattened, half sunk in what it lies on
+            r = r * (1 + 0.55 * np.exp(-((((s * 0.37 + seed) % 1.0) - 0.5) / 0.06) ** 2))   # a knot, a varix
+            z = z - r * 0.35
         if taper:
             r = r * (1 - 0.75 * i / max(n - 1, 1))                              # thinning to its creeping tip
         sx, sy = to_px((x, y, z))
@@ -77,6 +81,9 @@ def draw(img, zb, dep_scene, to_px, P, r0, T, lights, moon, seed=1, tol=0.06, gr
                 right = np.array([0.7071, -0.7071, 0.0])
                 up = np.cross(VIEW, right)
                 N = right * u_ - up * v_ + VIEW * k
+                if organic:                                                # lumped, fibrous skin: the normal broken up
+                    N = N + np.array([vn(s * 5 + u_ * 2, v_ * 2 + seed) - 0.5, vn(s * 5 + 7, u_ * 3 + v_) - 0.5, 0.0]) * 0.7
+                    N[2] = N[2] * 0.75                                     # flattened: wider than it stands tall
                 N = N / np.linalg.norm(N)
                 Pp = np.array([x, y, z]) + N * r
                 d = Pp[0] + Pp[1]
@@ -97,6 +104,9 @@ def draw(img, zb, dep_scene, to_px, P, r0, T, lights, moon, seed=1, tol=0.06, gr
                 stri = 0.06 * np.sin(ang * 9 + s * 0.6 + vn(s * 3 + seed, ang) * 2)
                 idx = int(np.clip((val + stri) * len(R_), 0, len(R_) - 1))
                 col = R_[idx].copy()
+                if organic:                                                # mottled along its length: bruise and old blood
+                    mot = vn(s * 1.7 + seed, ang * 0.5)
+                    col = col * (0.75 + mot * 0.45) * np.array([1.0 + (mot - 0.5) * 0.3, 0.9, 1.0 - (mot - 0.5) * 0.2])
                 col = col + np.array([0.25, 0.02, 0.04]) * pulse * (0.4 + k * 0.6)   # the pulse: a dull red flush
                 col = col * (1 + warm * 1.3) + spec * np.array([0.7, 0.66, 0.75])
                 if ground is not None:                                        # the skin closes over it near the ground
