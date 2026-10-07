@@ -767,8 +767,8 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     wis = 0.5 * (1 - np.cos(2 * np.pi * np.clip((T - 0.15) / 0.55, 0, 1)))    # fades in and out
     if wis > 0.02:
         u = np.clip((T - 0.15) / 0.55, 0, 1)
-        wx = FOCUS[0] - 3.2 + u * 2.4 + np.sin(u * 9) * 0.3
-        wy = FOCUS[1] - 1.0 + np.sin(u * 5 + 1) * 0.6
+        wx = FOCUS[0] - 3.6 + u * 2.0 + np.sin(u * 9) * 0.3          # low over the damp hollows, left of the log
+        wy = FOCUS[1] + 2.6 + np.sin(u * 5 + 1) * 0.6
         wz = gh(wx, wy) + 0.55 + np.sin(u * 13) * 0.12
         cx_, cy_ = to_px((wx, wy, wz))
         gx_, gy_ = to_px((wx, wy, gh(wx, wy)))
