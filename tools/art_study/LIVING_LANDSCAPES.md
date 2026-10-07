@@ -120,6 +120,7 @@ pieces.
 | Ground tiles in the game's format, with the anti-repetition tricks | `tiles_wood.py`; C. Now a quiet base (the fresh fall moved to placed scatter); repaint still due |
 | Crafted pieces: grass clumps (sway frames), leaf and twig stamps | first versions (`scatter_wood.py`, `litter_stamps.py`) |
 | The object library (`tools/landkit/`): every object a reusable generator exporting sprite, normal map, height, moon shadow, footprint (Derek: "every rock every grass like everything") | `kit.py` (camera, cast, light, export) and `rock.py` (erratic, slab, stone, cluster); rocks stamped into the scene from the same generator |
+| Collision for every object, as the game's posts (circles a body slides round, `world/zone.gd`): trunk feet; rocks' own posts; logs of class 1-3 as rows (4-5 stepped over); the root plate a thin wall you walk behind; grass, ferns and leaves walked through | `wood_collision.py` (proved: an A* path walks round the log and behind the root plate); landkit objects export their `posts` |
 | The history simulation (centuries of birth, growth, death, decay) | not started |
 | Export to Godot (classes, scatter, props, light map) | not started |
 | Other lands' studies and rules | not started |

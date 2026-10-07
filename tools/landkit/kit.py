@@ -158,6 +158,29 @@ def rim(img, mask, C, k=1.35):
     return img
 
 
+def posts_from(F, min_h=0.25, r_max=0.6):
+    """cover what stands high enough to stop a body (above min_h yards) with circles, as world/zone.gd's posts:
+    greedy, largest first, so a boulder is one post and a slab or a cluster a few"""
+    solid = F.H > min_h
+    posts = []
+    if not solid.any():
+        return posts
+    dist = nd.distance_transform_edt(solid) * F.res
+    left = solid.copy()
+    for _ in range(12):
+        if not left.any():
+            break
+        d = np.where(left, dist, 0)
+        j, i = np.unravel_index(np.argmax(d), d.shape)
+        r = float(min(d[j, i], r_max))
+        if r < 0.08 or (posts and r < posts[0][2] * 0.45) or len(posts) >= 4:
+            break                                                        # no slivers: a body should not snag on nothing
+        cx, cy = float(F.X[j, i]), float(F.Y[j, i])
+        posts.append([round(cx, 3), round(cy, 3), round(r, 3)])
+        left &= np.hypot(F.X - cx, F.Y - cy) > r * 1.15
+    return posts
+
+
 def export(name, out_dir, img, mask, n, C, F, meta):
     """write the object's five files"""
     os.makedirs(out_dir, exist_ok=True)
@@ -207,6 +230,8 @@ def export(name, out_dir, img, mask, n, C, F, meta):
             contour.append([round(np.cos(a) * r, 3), round(np.sin(a) * r, 3)])
     meta = dict(meta)
     meta.update(foot=[float(fx - x0), float(fy - y0)], size=[int(x1 - x0), int(y1 - y0)], footprint=contour)
+    if "posts" not in meta:
+        meta["posts"] = posts_from(F)
     with open(os.path.join(out_dir, name + ".json"), "w") as f:
         json.dump(meta, f, indent=1)
     return crop(rgba), crop(nimg)

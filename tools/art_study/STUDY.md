@@ -642,3 +642,16 @@ softened.
   - **Fungi** cluster where the decay is (logs of class 3-4, the stump, the snag's foot): in a world with no animals
     they are the only decomposers, so they belong everywhere the dead lie.
   - **Moon rims** are one continuous line down each object's moon-side edge; tinted rims broke into cyan dashes.
+- **Collision** (Derek: "the base of every tree should have collisions ... walk around it ... we should be able to walk
+  behind" the root plate). In the game's own form: posts, circles that a body slides round and the path-finder weighs
+  (`world/zone.gd`).
+  - **A trunk:** one post at its foot, sized to the trunk and flare, never the crown.
+  - **A rock:** the posts its landkit object exports, filled greedily without slivers; stones under a quarter-yard
+    are stepped over.
+  - **A log:** a row of posts. Classes 1-3 block; the sunk soft 4-5 are stepped over.
+  - **The root plate:** a thin wall across its width only, so a body walks round its ends and behind it (where the
+    see-through system thins it).
+  - **Grass, ferns, leaves:** none.
+
+  Proved by A*: a path from the hero round the log and behind the plate (`wood_collision.py`). A bug on the way: the
+  heap held cost + guess, and treating that as the cost so far rejected every node after the first.
