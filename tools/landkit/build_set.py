@@ -15,9 +15,38 @@ import deadwood             # noqa: E402
 import rock                 # noqa: E402
 import tree                 # noqa: E402
 import flora                # noqa: E402
+import giant                # noqa: E402
 from kit import export      # noqa: E402
 
 ROOT = os.path.join(HERE, "..", "..")
+
+
+def canopy_shade(out, name, seed):
+    """the crown overhead, felt on the floor: a dappled pool of shade about eleven yards across, lobed like the crown
+    above it, with moonflecks through it; alpha in three steps, the 4x4 dither only where one step meets the next"""
+    import numpy as np
+    from PIL import Image
+    from kit import KX, KY, vn, B4
+    R = 5.5
+    W, H = int(R * 2 * KX * 2) + 8, int(R * 2 * KY * 2) + 8
+    yy, xx = np.mgrid[0:H, 0:W].astype(float)
+    cx, cy = W / 2, H / 2
+    u, v = (xx - cx) / (R * 2 * KX), (yy - cy) / (R * 2 * KY)       # world-ish, the iso ellipse made round
+    gx, gy = (u + v), (v - u)                                       # back to ground yards / R
+    ang = np.arctan2(gy, gx)
+    lobe = 0.82 + 0.12 * np.sin(ang * 5 + seed) + 0.08 * np.sin(ang * 9 + seed * 2) + (vn(gx * 3 + seed, gy * 3) - 0.5) * 0.2
+    d = np.hypot(gx, gy) * 1.4
+    body = np.clip((lobe - d) / 0.25, 0, 1)
+    clumps = vn(gx * 5 + seed * 3, gy * 5) * 0.6 + vn(gx * 11, gy * 11 + seed) * 0.4
+    fleck = (clumps > 0.68) & (vn(gx * 17 + 5, gy * 17) > 0.45)       # where the leaves part
+    a = body * (0.55 + (clumps - 0.5) * 0.3)
+    a = np.where(fleck, a * 0.15, a)
+    bay = B4[yy.astype(int) % 4, xx.astype(int) % 4]
+    q = np.clip(np.floor(a / 0.18 + bay * 0.9), 0, 3) * 0.18           # three steps of shade, dithered where they meet
+    rgba = np.dstack([np.full(q.shape, 0.03), np.full(q.shape, 0.03), np.full(q.shape, 0.06), q])
+    Image.fromarray((rgba * 255).astype(np.uint8), "RGBA").save(os.path.join(out, name + ".webp"), lossless=True)
+    json.dump(dict(kind="shade/canopy", foot=[cx, cy], size=[W, H], posts=[], cover=0.0),
+              open(os.path.join(out, name + ".json"), "w"), indent=1)
 
 
 def old_growth(out):
@@ -34,6 +63,16 @@ def old_growth(out):
         tree.save(name, out, img, trunk, crown, nm, meta)
         add("tree_dying" if thin >= 0.3 else "tree_" + age, name)
         print("tree", name, flush=True)
+    # the towering trees of the Hollow Wood (giant.py): six, so no two alike stand near each other
+    for sd in range(1, 7):
+        F, info = giant.make(sd)
+        img, mask, n, C, meta = giant.render(F, info)
+        export("towering_%d" % sd, out, img, mask, n, C, F, meta, shadow=False)
+        add("tree_towering", "towering_%d" % sd)
+        print("towering", sd, flush=True)
+    for sd in range(1, 4):
+        canopy_shade(out, "canopy_shade_%d" % sd, sd)
+        add("canopy_shade", "canopy_shade_%d" % sd)
     for cls in (1, 2, 3, 4, 5):
         for s in (1, 2, 3):
             F, info = logs.make(cls, s * 10 + cls)

@@ -449,6 +449,8 @@ func _sprites() -> void:
 	var order: Array = d.get("sprites", []).duplicate()
 	if Sfx.cm:
 		order.sort_custom(func(a, b): return _prop_rank(str(a.get("key", ""))) < _prop_rank(str(b.get("key", ""))))
+	if lk != "":
+		Landkit.begin(self, lk)
 	for s in order:
 		if lk != "" and str(s.get("set", "")) != "landmark" and Landkit.take(self, lk, s):
 			continue

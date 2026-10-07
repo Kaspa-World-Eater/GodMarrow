@@ -180,7 +180,101 @@ static func place(zone, s: String, name: String, tp: Vector2, dep: float, flip: 
 		zone._cm_taken.append([tp, float(meta.get("radius_yd", 0.5)) * (1.4 if axis == "" else 1.0)])
 	return holders
 
-## the zone's sprite placed from the set; true when it was ours to place (even if there was no room for it)
+## The wood's layout (Derek 2026-10-07: "the random generation is clustering trees and other objects too much ...
+## too many of the same objects ... the small trees cover a lot of the screen ... your seed generation needs to build
+## open corridors and spaces"). The generator's spots are only offers: a piece stands there only if it keeps its
+## kind's distance from its own kind, leaves the ways open (roads, gates, the arrival, lanterns), and is not in one
+## of the wood's clearings; small trees are mostly gone and the rest dead; no variant twice within sight of itself.
+const SPACING := {"tree": 5.5, "snag": 7.0, "stump": 4.0, "log": 6.5, "rock": 3.0}
+const OPEN_KEYS := ["road", "flags"]
+static var _placed := {}             # family -> [[tp, name], ...]
+static var _guards: Array = []       # [point, radius]: the ways kept open
+
+static func begin(zone, _s: String) -> void:
+	_placed.clear()
+	_guards.clear()
+	var ar = zone.d.get("arrive", {})
+	if ar is Dictionary:
+		for k in ar:
+			var e = ar[k]
+			if e is Dictionary and e.has("x"):
+				_guards.append([Vector2(e["x"], e["y"]), 4.5])
+			elif e is Array and e.size() >= 2:
+				_guards.append([Vector2(e[0], e[1]), 4.5])
+	for c in zone.d.get("connections", []):
+		if c is Dictionary and c.has("x"):
+			_guards.append([Vector2(c["x"], c["y"]), 4.5])
+	for L in zone.lanterns:
+		_guards.append([Vector2(L["x"], L["y"]), 4.0])
+
+static func _family(role: String) -> String:
+	if role.begins_with("tree"):
+		return "tree"
+	if role.begins_with("log"):
+		return "log"
+	if role.begins_with("rock"):
+		return "rock"
+	return role
+
+static func _open_way(zone, tp: Vector2, r: float) -> bool:
+	for g in _guards:
+		if tp.distance_to(g[0]) < float(g[1]):
+			return true
+	if zone.ground_cls == null:
+		return false
+	var n := int(ceil(r))
+	for yy in range(-n, n + 1):
+		for xx in range(-n, n + 1):
+			var c := Vector2i(int(tp.x) + xx, int(tp.y) + yy)
+			if Vector2(xx, yy).length() > r or c.x < 0 or c.y < 0 or c.x >= zone.w or c.y >= zone.h:
+				continue
+			var cls := int(zone.ground_cls[c.y * zone.w + c.x])
+			if str(zone.ground_keys.get(str(cls), "")) in OPEN_KEYS:
+				return true
+	return false
+
+static func _h2(a: int, b: int) -> float:
+	return float(absi(hash(Vector2i(a * 7919, b * 104729))) % 1000) / 1000.0
+
+## the wood's clearings: broad, soft-edged gaps in the canopy (value noise on a 12-yard lattice)
+static func _clearing(tp: Vector2) -> bool:
+	var q := tp / 12.0
+	var i := Vector2i(int(floor(q.x)), int(floor(q.y)))
+	var f := q - Vector2(i)
+	var u := f * f * (Vector2(3, 3) - f * 2.0)
+	var v := lerpf(lerpf(_h2(i.x, i.y), _h2(i.x + 1, i.y), u.x), lerpf(_h2(i.x, i.y + 1), _h2(i.x + 1, i.y + 1), u.x), u.y)
+	return v > 0.66
+
+static func _room_for(fam: String, tp: Vector2) -> bool:
+	var dmin: float = SPACING.get(fam, 0.0)
+	for e in _placed.get(fam, []):
+		if tp.distance_to(e[0]) < dmin:
+			return false
+	return true
+
+## a variant not standing within sight of itself
+static func pick_fresh(s: String, role: String, tp: Vector2, fam: String) -> String:
+	var names: Array = index(s).get("roles", {}).get(role, [])
+	if names.is_empty():
+		return ""
+	var start := absi(int(tp.x * 7919.0) * 31 + int(tp.y * 104729.0) * 17) % names.size()
+	for k in names.size():
+		var nm: String = names[(start + k) % names.size()]
+		var near := false
+		for e in _placed.get(fam, []):
+			if e[1] == nm and tp.distance_to(e[0]) < 14.0:
+				near = true
+				break
+		if not near:
+			return nm
+	return names[start]
+
+static func _mark(fam: String, tp: Vector2, name: String) -> void:
+	if not _placed.has(fam):
+		_placed[fam] = []
+	_placed[fam].append([tp, name])
+
+## the zone's sprite placed from the set; true when it was ours to place (even when the rules leave it out)
 static func take(zone, s: String, spr: Dictionary) -> bool:
 	var role := role_of(str(spr.get("key", "")))
 	if role == "":
@@ -190,33 +284,50 @@ static func take(zone, s: String, spr: Dictionary) -> bool:
 	var tp := Vector2(x, y)
 	var dep := float(spr.get("d", x + y))
 	var flip := bool(spr.get("flip", false))
-	# the generator stood a solid tile under every prop; the piece's own posts are its base now (none when it found
-	# no room: then there is nothing there to walk into)
+	# the generator stood a solid tile under every prop; the piece's own posts are its base now (none when it is left
+	# out: then there is nothing there to walk into)
 	var tl = spr.get("tile", [int(floor(x)), int(floor(y))])
 	zone.free_tile(Vector2i(int(tl[0]), int(tl[1])))
+	# the forest towers: every living tree is a towering one; small trees are mostly gone, the rest dead stumps
+	var hsh := absi(int(x * 13.0 + y * 7.0))
+	if role == "tree_sapling":
+		if hsh % 5 != 0:
+			return true
+		role = "stump"
+	elif role.begins_with("tree_") and not index(s).get("roles", {}).get("tree_towering", []).is_empty():
+		role = "tree_towering"
+	var fam := _family(role)
+	if fam != "rock" and _open_way(zone, tp, 2.5):
+		return true
+	if fam in ["tree", "snag"] and _clearing(tp):
+		return true
+	if not _room_for(fam, tp):
+		return true
 	if role == "log":
 		# the fresh falls of the big trees still hold their root plates up at the butt
 		var cls := 1 + absi(int(x * 13.0 + y * 7.0)) % 5
-		var name := pick(s, "log_c%d" % cls, x, y)
+		var name := pick_fresh(s, "log_c%d" % cls, tp, "log")
 		var held := place(zone, s, name, tp, dep, flip)
 		if held.is_empty():
 			return true
+		_mark("log", tp, name)
 		var L := float(index(s)["pieces"][name].get("length_yd", 4.0))
 		if cls <= 2 and absi(int(x * 3.0 + y * 5.0)) % 2 == 0:
 			var bp := tp + (Vector2(0, -L * 0.5 - 0.3) if flip else Vector2(-L * 0.5 - 0.3, 0))
 			place(zone, s, pick(s, "rootplate", x, y), bp, bp.x + bp.y, flip, false)
 		_life_round(zone, s, tp, L, flip, cls)
 		return true
-	if role == "snag" and absi(int(x * 11.0 + y * 3.0)) % 2 == 0:
-		role = "tree_dying"           # half the dead are still dying: a thinning crown, not yet a bare pole
-	var name := pick(s, role, x, y)
+	var name := pick_fresh(s, role, tp, fam)
 	if name == "":
 		return true
 	var held := place(zone, s, name, tp, dep, flip)
 	if not held.is_empty():
+		_mark(fam, tp, name)
+		if role == "tree_towering":
+			_canopy_shade(zone, s, tp)
 		if role == "stump":
 			_life_round(zone, s, tp, 0.0, flip, 4)
-		elif role in ["tree_giant", "tree_middle"]:
+		elif role in ["tree_giant", "tree_middle", "tree_towering"]:
 			_life_round(zone, s, tp, 0.0, flip, 0)
 	return true
 
@@ -263,6 +374,27 @@ class Stuck extends Node2D:
 		var o := Vector2(0, -h) - dir * 4.0
 		draw_line(o - dir * 16.0, o + dir * 4.0, Color(0.62, 0.55, 0.44), 3.0)
 		draw_line(o - dir * 16.0, o - dir * 12.0 + dir.orthogonal() * 4.0, Color(0.75, 0.72, 0.66), 2.0)
+
+## the crown overhead, felt on the floor: a broad dappled shade round the foot of a towering tree, thrown a little
+## away from the moon, with flecks where the leaves part
+static func _canopy_shade(zone, s: String, tp: Vector2) -> void:
+	var names: Array = index(s).get("roles", {}).get("canopy_shade", [])
+	if names.is_empty():
+		return
+	var nm: String = names[absi(int(tp.x * 31.0 + tp.y * 17.0)) % names.size()]
+	var meta: Dictionary = index(s)["pieces"].get(nm, {})
+	var sh := Sprite2D.new()
+	sh.texture = tex("res://art/landkit/%s/%s.webp" % [s, nm])
+	if sh.texture == null:
+		return
+	sh.centered = false
+	sh.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	sh.scale = Vector2.ONE * Iso.WPX
+	sh.offset = -Vector2(meta["foot"][0], meta["foot"][1])
+	sh.flip_h = absi(int(tp.x + tp.y)) % 2 == 0
+	sh.position = Iso.to_screen(tp + Vector2(1.2, -0.4))
+	sh.z_index = -92
+	zone.add_child(sh)
 
 ## the floor life a fallen log, a stump or a great foot makes round itself
 static func _life_round(zone, s: String, tp: Vector2, L: float, flip: bool, cls: int) -> void:

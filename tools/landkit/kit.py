@@ -181,7 +181,7 @@ def posts_from(F, min_h=0.25, r_max=0.6):
     return posts
 
 
-def export(name, out_dir, img, mask, n, C, F, meta):
+def export(name, out_dir, img, mask, n, C, F, meta, shadow=True):
     """write the object's five files"""
     os.makedirs(out_dir, exist_ok=True)
     rgba = np.dstack([np.clip(img, 0, 1), mask.astype(float)])
@@ -201,9 +201,10 @@ def export(name, out_dir, img, mask, n, C, F, meta):
     hz = np.clip(C["pz"] / max(meta.get("height", 1.0), 1e-3), 0, 1)
     Image.fromarray((crop(np.dstack([hz, hz, hz, mask.astype(float)])) * 255).astype(np.uint8), "RGBA").save(os.path.join(out_dir, name + "_h.webp"), lossless=True)
     # the moon's shadow on the ground: the field's footprint swept away from the moon by its height
+    want_shadow = shadow
     shadow = np.zeros(mask.shape)
     fx, fy = C["foot"]
-    for (yy, xx) in zip(*np.nonzero(F.H > -5)):
+    for (yy, xx) in zip(*np.nonzero((F.H > -5) & want_shadow)):
         if (yy + xx) % 2:
             continue
         hgt = F.H[yy, xx]

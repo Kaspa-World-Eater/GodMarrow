@@ -25,7 +25,7 @@ func _init(m: Node, c: Camera2D) -> void:
 
 ## the frame's distance (Derek 2026-10-05: "the world feels too small"): a step back, so more of the land is seen round
 ## the figure, as D2's frame holds it
-const BASE := 0.88
+const BASE := 1.06              # Diablo 2's proportion: the pilgrim about an eighth of the screen's height (Derek 2026-10-07)
 
 ## a new zone: from a gate we open looking into the land; from the lantern (or the first waking) we sink down onto you
 func arrive(zone, hero, from: String) -> void:
