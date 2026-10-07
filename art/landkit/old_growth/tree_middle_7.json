@@ -1,0 +1,33 @@
+{
+ "kind": "tree/middle",
+ "age": "middle",
+ "seed": 7,
+ "turn": 2.2,
+ "thin": 0.35,
+ "foot": [
+  262.0,
+  366.5210555966487
+ ],
+ "size": [
+  524,
+  449
+ ],
+ "height": 10.552719013477878,
+ "crown_base": 6.324475692622276,
+ "sway": 1.6,
+ "posts": [
+  [
+   0.0,
+   0.0,
+   0.594
+  ]
+ ],
+ "cover": 10.552719013477878,
+ "material": "wood_living",
+ "hp": null,
+ "lightning_rod": false,
+ "layers": [
+  "trunk",
+  "crown"
+ ]
+}

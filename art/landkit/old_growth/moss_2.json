@@ -1,0 +1,12 @@
+{
+ "kind": "flora/moss",
+ "frames": 1,
+ "sway": false,
+ "foot": [
+  20,
+  18
+ ],
+ "posts": [],
+ "cover": 0.0,
+ "material": "plant"
+}

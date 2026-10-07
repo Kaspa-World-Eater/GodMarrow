@@ -1,0 +1,33 @@
+{
+ "kind": "tree/sapling",
+ "age": "sapling",
+ "seed": 9,
+ "turn": 2.0,
+ "thin": 0.0,
+ "foot": [
+  108.5,
+  170.0127288988653
+ ],
+ "size": [
+  217,
+  206
+ ],
+ "height": 3.7698353086637884,
+ "crown_base": 2.2441294293822702,
+ "sway": 1.6,
+ "posts": [
+  [
+   0.0,
+   0.0,
+   0.2
+  ]
+ ],
+ "cover": 3.7698353086637884,
+ "material": "wood_living",
+ "hp": null,
+ "lightning_rod": false,
+ "layers": [
+  "trunk",
+  "crown"
+ ]
+}

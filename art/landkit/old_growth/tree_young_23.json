@@ -1,0 +1,33 @@
+{
+ "kind": "tree/young",
+ "age": "young",
+ "seed": 23,
+ "turn": 0.6,
+ "thin": 0.0,
+ "foot": [
+  147.0,
+  222.3753791179074
+ ],
+ "size": [
+  294,
+  270
+ ],
+ "height": 5.585132755078365,
+ "crown_base": 3.4731283725807427,
+ "sway": 1.6,
+ "posts": [
+  [
+   0.0,
+   0.0,
+   0.344
+  ]
+ ],
+ "cover": 5.585132755078365,
+ "material": "wood_living",
+ "hp": 40,
+ "lightning_rod": false,
+ "layers": [
+  "trunk",
+  "crown"
+ ]
+}

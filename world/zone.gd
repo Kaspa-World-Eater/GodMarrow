@@ -227,9 +227,14 @@ func _nearest_open(c: Vector2i) -> Vector2i:
 	return c
 
 # ------------------------------------------------------------------ the ground
+var lk := ""                   # the landkit set standing in this zone's land (world/landkit.gd), "" for none
+
 func _ground() -> void:
 	var land: String = d.get("land", "moor")
 	var set := Assets.ground(land)
+	lk = Landkit.set_for(land)
+	if lk != "":
+		set = Landkit.ground(lk, set)
 	var classes := rle(d["ground"]["classes"], w * h)
 	var tex_keys: Dictionary = d["ground"]["texKeys"]
 	ground_cls = classes
@@ -259,7 +264,7 @@ func _ground() -> void:
 		for vi in 2:
 			var p: String = arr[min(vi, arr.size() - 1)]
 			if not cache.has(p):
-				var img: Image = Assets.tex(p).get_image()
+				var img: Image = (Landkit.tex(p) if p.begins_with("res://") else Assets.tex(p)).get_image()
 				img.convert(Image.FORMAT_RGBA8)
 				if img.get_width() != 320 or img.get_height() != 160:
 					img.resize(320, 160, Image.INTERPOLATE_NEAREST)
@@ -411,6 +416,8 @@ func _sprites() -> void:
 	if Sfx.cm:
 		order.sort_custom(func(a, b): return _prop_rank(str(a.get("key", ""))) < _prop_rank(str(b.get("key", ""))))
 	for s in order:
+		if lk != "" and str(s.get("set", "")) != "landmark" and Landkit.take(self, lk, s):
+			continue
 		var tex: Texture2D = null
 		var ox := 0.0
 		var oy := 0.0

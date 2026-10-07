@@ -1,0 +1,12 @@
+{
+ "kind": "flora/fern",
+ "frames": 3,
+ "sway": true,
+ "foot": [
+  36,
+  42
+ ],
+ "posts": [],
+ "cover": 0.0,
+ "material": "plant"
+}

@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 from tree_anatomy import Tree, KX, KY, KZ, VIEW            # noqa: E402
 from tree_foliage import clumps_of, render                 # noqa: E402
 
-AGES = {"young": 0.55, "middle": 0.95, "giant": 1.55}
+AGES = {"sapling": 0.32, "young": 0.55, "middle": 0.95, "giant": 1.55}
 
 
 def grow(age, seed, turn, thin=0.0):

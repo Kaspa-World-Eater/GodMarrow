@@ -59,6 +59,8 @@ static func run(g) -> void:
 	if a.has("wisps") and g.hero.skills.has_method("spawn_wisp"):
 		for i in int(a["wisps"]):
 			g.hero.skills.spawn_wisp()
+	if a.has("near"):
+		_near(g, String(a["near"]))      # --near=log|rootplate|stump|snag|tree|rock: stand beside the nearest landkit piece
 	if a.get("show", "") == "collision":
 		_show_collision(g)
 	if a.has("shot"):
@@ -135,6 +137,48 @@ static func run(g) -> void:
 			Bus.panel_requested.emit(a["panel"], "Maren the Gravekeeper" if a["panel"] == "vendor" else "Brannoc of the Nail")
 
 ## what blocks: a node in the zone's ground layer, redrawn as the camera moves
+## --near=KIND [--near_n=N] [--near_off=X,Y]: the pilgrim stands beside the Nth nearest landkit piece of that kind
+## (world/landkit.gd), for a look at it in the game
+static func _near(g, kind: String) -> void:
+	var hero = g.hero
+	var found: Array = []
+	for c in g.zone.sorted.get_children():
+		if c.has_meta("landkit") and String(c.get_meta("landkit")).begins_with(kind):
+			found.append(c)
+	if found.is_empty():
+		print("NEAR none ", kind)
+		return
+	found.sort_custom(func(p, q): return p.position.distance_to(hero.position) < q.position.distance_to(hero.position))
+	var c: Node2D = found[mini(int(g.args.get("near_n", "0")), found.size() - 1)]
+	var off := Vector2(1.5, 2.5)
+	if g.args.has("near_off"):
+		var v := String(g.args["near_off"]).split(",")
+		off = Vector2(float(v[0]), float(v[1]))
+	# the holder sits at (screen x, depth * HY); its tile from the screen x and the depth
+	var dep: float = c.position.y / Iso.HY
+	var dx: float = c.position.x / Iso.HX
+	var tp := Vector2((dep + dx) * 0.5, (dep - dx) * 0.5) + off
+	var free := tp
+	for ring in range(0, 12):                  # the nearest open ground (not water, not inside a post)
+		var got := false
+		for k in maxi(1, ring * 8):
+			var q := tp + Vector2.from_angle(TAU * k / maxf(1.0, ring * 8.0)) * ring * 0.5
+			if g.zone.room_at(q, 0.35):
+				free = q
+				got = true
+				break
+		if got:
+			break
+	tp = free
+	hero.tp = tp
+	hero.target = null
+	hero.walking = false
+	hero._sync()
+	g.eye.cut(hero)
+	g.cam.position = g.eye.update(0.016, hero, null, g.zone)
+	g.cam.reset_smoothing()
+	print("NEAR ", kind, " ", c.get_meta("landkit"), " at ", tp)
+
 static func _show_collision(g) -> void:
 	var z: Zone = g.zone
 	var n := Node2D.new()

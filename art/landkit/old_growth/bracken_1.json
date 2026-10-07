@@ -1,0 +1,12 @@
+{
+ "kind": "flora/bracken",
+ "frames": 3,
+ "sway": true,
+ "foot": [
+  42,
+  54
+ ],
+ "posts": [],
+ "cover": 0.0,
+ "material": "plant"
+}

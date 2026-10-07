@@ -1,0 +1,12 @@
+{
+ "kind": "flora/mushroom",
+ "frames": 1,
+ "sway": false,
+ "foot": [
+  15,
+  17
+ ],
+ "posts": [],
+ "cover": 0.0,
+ "material": "plant"
+}

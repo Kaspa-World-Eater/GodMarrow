@@ -1,0 +1,33 @@
+{
+ "kind": "tree/giant",
+ "age": "giant",
+ "seed": 16,
+ "turn": 2.6,
+ "thin": 0.0,
+ "foot": [
+  367.0,
+  554.7282552818439
+ ],
+ "size": [
+  734,
+  669
+ ],
+ "height": 17.698405688940355,
+ "crown_base": 11.02837099158139,
+ "sway": 1.2,
+ "posts": [
+  [
+   0.0,
+   0.0,
+   0.969
+  ]
+ ],
+ "cover": 17.698405688940355,
+ "material": "wood_living",
+ "hp": null,
+ "lightning_rod": true,
+ "layers": [
+  "trunk",
+  "crown"
+ ]
+}

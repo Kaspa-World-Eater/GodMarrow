@@ -109,8 +109,10 @@ def stump(seed):
     X, Y = F.X, F.Y
     d = np.hypot(X, Y)
     ang = np.arctan2(Y, X)
-    butt = (np.cos(ang * 5 + seed + np.sin(ang * 3) * 0.4) * 0.5 + 0.5) ** 7
-    flare = r * 1.25 + butt * r * 1.3
+    lobe = np.floor(((ang + seed + np.pi) % (2 * np.pi)) / (2 * np.pi) * 5)
+    reach = 0.45 + 0.55 * ((lobe * 0.618 + seed * 0.31) % 1.0)          # each root its own length
+    butt = (np.cos(ang * 5 + seed + np.sin(ang * 3) * 0.4) * 0.5 + 0.5) ** 5 * reach
+    flare = r * 1.15 + butt * r * 1.0
     z = np.where(d <= r, hgt + (fbm(X * 4, Y * 4) - 0.5) * 0.2 * hgt - np.clip(1 - d / (r * 0.55), 0, 1) * 0.2,
                  np.clip((flare - d) / np.maximum(flare - r, 1e-3), 0, 1) ** 2.2 * (0.5 + butt * 0.8))
     # the broken top: jagged splinters on one side where it snapped
