@@ -232,6 +232,14 @@ def paint_ruin(img, m, v, n, px, py, pz, o, W, L):
     alb = T_[gy_s.astype(int) % T_.shape[0], gx_s.astype(int) % T_.shape[1]]
     lightk = np.clip(0.5 + v * 1.05, 0.35, 1.45)
     img[flag] = np.clip(alb[flag] * lightk[flag][:, None], 0, 1)
+    # desolation: centuries of leaves no one has swept, drifted grey against the inside of the walls and the piers' feet
+    hxi, hyi = FI["length"] / 2 - FI["thick"] / 2, FI["width"] / 2 - FI["thick"] / 2
+    dwall = np.minimum(hxi - np.abs(lx), hyi - np.abs(ly))
+    for (cx_, cy_, r_, t_) in FI["piers"]:
+        dwall = np.minimum(dwall, np.maximum(np.maximum(np.abs(lx - cx_), np.abs(ly - cy_)) - r_ - 0.24, 0) * 1.6)
+    drift = flag & (vn(lx * 7 + 3, ly * 7) > 0.42 + np.clip(dwall, 0, 2) * 0.55) & (vn(lx * 2.2, ly * 2.2) > 0.3)
+    DEADL = ws.ramp("#1e1a1c", "#2f2828", "#433835", "#574941", "#6b5a4c")
+    img[drift] = DEADL[np.clip(((v[drift] * 0.8 + (vn(lx * 19, ly * 19)[drift] - 0.5) * 0.2) * len(DEADL)).astype(int), 0, len(DEADL) - 1)]
     # ---- steps, altar, fallen stones
     for mat_, darker in ((ruin.STEP, -0.02), (ruin.ALTAR, 0.0), (ruin.RUBBLE, -0.04)):
         mm = m & (RU == mat_)
@@ -365,7 +373,19 @@ ws.RIM = (1.12, (0.01, 0.015, 0.035))                                # a soft, c
 ws.WOOD_HOOKS += [clear_plan, place_candle]
 ws.BUILD_HOOKS += [stamp, candle_light, keep_world]
 ws.PAINTERS["ruin"] = paint_ruin
+def desolation(img, w, W, px, py, pz, L, T):
+    """the forlorn of a place abandoned for centuries: colour drained toward a cold grey everywhere the warm lights
+    do not reach, the night a step deeper; the lantern's and the candle's warmth left untouched"""
+    lum = img @ np.array([0.3, 0.55, 0.15])
+    k = np.clip(1 - L["lamp"] / 0.35, 0, 1)[..., None]              # 1 where no warm light reaches
+    grey = lum[..., None] * np.array([0.92, 0.96, 1.08])
+    out = img * (1 - 0.32 * k) + grey * 0.32 * k
+    out = out * (1 - 0.1 * k)
+    return np.clip(out, 0, 1)
+
+
 ws.LIVING.append(living_ruin)
+ws.LIVING.append(desolation)
 
 if __name__ == "__main__":
     o = sys.argv[1] if len(sys.argv) > 1 else "ruin_scene.png"

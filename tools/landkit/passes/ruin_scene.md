@@ -92,3 +92,12 @@ Next when Derek says go (worst first): 1) the floor's checkerboard (closer tones
 6) run it animated.
 Section 8 (to return to): metal and armour, the environment agenda, repainting the effects, the effects still to
 build, melee.
+   Derek: "I agree, it also needs the forlorn looks of desolation, and maybe an ancient rusted away relic. And the rock
+   is a reused asset." (Taken as go for the plan: floor, doorway, the relic, a unique piece for the boulder, beams.)
+16. Floor: flag tones and temperatures between neighbours halved (a floor, not a board). Desolation: grey leaves no
+    one has swept, drifted against the inside of the walls and the piers' feet; a desolation grade (colour drained
+    toward cold grey wherever the warm lights do not reach, the night a step deeper; lantern and candle untouched).
+   Graded: desolation reads (cold grey drained colour, unswept leaves at the piers and walls); the floor a floor.
+   Derek: "sap in the world will look like dark blood" (MASTER_RULES section 5).
+17. Shared bark: every limb scar weeps one to three runs of dark-blood sap down the pale skin, glossy red-black and
+    beaded on the moon side where fresh, crusting brown and thinning as it dries (game trees and scenes alike).

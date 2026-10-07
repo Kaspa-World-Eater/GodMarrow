@@ -39,7 +39,7 @@ def church_flags(seed=0):
     ju = (fu < 0.085) & ~(pair & ~first)
     jv = fv < 0.085
     joint = ju | jv
-    tone = (_h(fid_a, fid_b, seed) - 0.5) * 0.16
+    tone = (_h(fid_a, fid_b, seed) - 0.5) * 0.08                       # neighbours close in value: a floor, not a board
     warm = _h(fid_a, fid_b, seed + 9)
     sunk = _h(fid_a, fid_b, seed + 17) > 0.88
     gone = _h(fid_a, fid_b, seed + 23) > 0.965
@@ -54,7 +54,7 @@ def church_flags(seed=0):
     vv = 0.5 + tone + form + worn + (pnoise(XX, YY, 48, 24, seed + 41) - 0.5) * 0.05 + (BAY - 0.5) * 0.06
     vv = vv - sunk * 0.12
     img = STONE[np.clip((vv * len(STONE)).astype(int), 0, len(STONE) - 1)].copy()
-    img = img * np.where((warm > 0.7)[..., None], np.array([1.05, 1.0, 0.93]), np.where((warm < 0.25)[..., None], np.array([0.94, 0.98, 1.06]), 1.0))
+    img = img * np.where((warm > 0.7)[..., None], np.array([1.025, 1.0, 0.965]), np.where((warm < 0.25)[..., None], np.array([0.97, 0.99, 1.03]), 1.0))
     # the sunk flags hold the damp: darker, colder, a wet sheen on their low side
     damp = sunk & ~joint
     img[damp] = img[damp] * np.array([0.8, 0.84, 0.92])
