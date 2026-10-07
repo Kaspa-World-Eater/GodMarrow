@@ -201,6 +201,10 @@ def lean(x, y, z, t):
     a slow sway, each tree in its own phase, much more in the gust, little at the foot and most at the crown"""
     A = 0.025 * np.sin(2 * np.pi * t * 2 + x * 0.7 + y * 0.4) + 0.09 * (gust(t) - 1.0) * (1 + 0.3 * np.sin(x * 1.3 - y))
     k = A * np.clip(z / 10.0, 0, 1.6) ** 2
+    # in whole pixels: the lean moves the wood rigidly a pixel at a time, so its bark never shimmers (on a thin trunk a
+    # sub-pixel lean resamples most of the tree each frame); the shift on screen is purely sideways, 1.414 * k * KX px
+    px_shift = np.round(1.414 * k * KX)
+    k = px_shift / (1.414 * KX)
     return k * 0.707, -k * 0.707
 
 
@@ -833,7 +837,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
         beam_k = np.maximum(beam_k, k)
         # where it lands: a pool of moonlight on the floor, stepped
         pd_ = np.hypot((xx0 - a[0]) / (half * 1.4 + 1e-3), (yy0 - a[1]) / (half * 0.7 + 1e-3))
-        pool_b = np.where(pd_ < 0.6, 0.25, np.where(pd_ < 0.9, 0.14, np.where(pd_ < 1.1, 0.06, 0.0))) * strength * breathe   # 40% fainter
+        pool_b = np.where(pd_ < 0.6, 0.42, np.where(pd_ < 0.9, 0.24, np.where(pd_ < 1.1, 0.1, 0.0))) * strength * breathe   # the beam as it was (Derek)
         img = img + np.array([0.55, 0.62, 0.75]) * pool_b[..., None] * np.clip(1 - np.abs(dep - (bx + by)) / 1.5, 0, 1)[..., None]
     img = img * (1 - beam_k[..., None] * 0.36) + np.array([0.66, 0.74, 0.88]) * beam_k[..., None] * 0.36
     # the mist where it crosses a beam: lit
