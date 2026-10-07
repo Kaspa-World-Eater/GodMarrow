@@ -141,6 +141,22 @@ messages. The lore read for it:
 23. **Variety in plants means different species and forms, not one stamp** (passes 75 and 80): one Y-shaped tuft
     repeated read as a pattern; tussocks, seed stalks, curled ferns and fallen stems, each with its own colour and
     wear, read as dead growth.
+24. **THE DEPTH EFFECT: form into the world, light from the form** (passes 89 and 90; Derek: "it's 1 dimensional,
+    there's no depth to it, no 3D", then "much better"; now MASTER_RULES section 0). What was wrong: ground.py worked
+    out each stone's height (dome, tilt, proud edge, joints) and the flesh's lumps, but used them only to shade a
+    colour; the scene's height field stayed a smooth sheet, so the floor was a painted picture lying on a plane.
+    What was done:
+    - `paving_height` and `flesh_height` return real heights; the scene's stamp adds them into the world height
+      field (0.04 yd grid) after everything else is stamped, only where nothing stands (tag 0): paving relief x1.05
+      faded in by the courtyard's soft edge, the flesh rising through its cracks (0.16 yd at a crack's heart) and
+      lumped (each lump a dome, the folds' creases sunk);
+    - the colour generators are called with `selfshade=False`, so the engine's moon and lamps light the real
+      normals and cast the real shadows: lit tops, shaded faces, stones casting on their neighbours, the flesh's
+      ridges catching the lantern;
+    - the heave placed by its cause: only near the god's own parts (the eye, the vein, the pool).
+    **What failed first:** heave from the distance to any flesh tipped every stone, because the cracks run
+    everywhere: a boulder field. Derek liked that look, though: it is LOCKED as the craggy floor
+    (`ground.craggy_height`, `CRAGGY`: relief 1.6, heave reach 1.3 yd, power 1.6) for ground torn up from below.
 13. **Reading the lore for one true detail** gave the gate its brief (the mouth's door) and the fangs their dried
     blood.
 

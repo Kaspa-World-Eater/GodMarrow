@@ -47,6 +47,25 @@ so flat.")
 5. A generator that computes a height (a stone's dome, a ripple) and then uses it only to shade a colour **breaks this
    law**. The height must reach the world, so the renderer lights it.
 
+6. **How it is done: the depth effect** (Derek, 2026-10-07: "Much better ... have the rules updated with the depth effect
+   here"; the Gate in the Flesh, passes 89 and 90):
+   - every surface generator has two outputs, a **height** (yards) and a **colour**. The height goes into the scene's
+     world height field at the world grid's resolution (0.04 yd, under a pixel), added to the ground under it, before
+     the scene is cast and lit (`ground.paving_height`, `ground.flesh_height`, `ground.craggy_height`);
+   - the colour generator is called with `selfshade=False`: it gives only the material (its bed, its wear, its stain),
+     never its own light; the engine lights it from the real normals, with the moon's and the lamps' shadows;
+   - relief is true to the thing (worn paving: domes a few cm, a stone standing a few cm proud of the next; heaved
+     ground: far more), and the heave is placed by its cause (near what pushes up, not everywhere);
+   - things standing on it (rubble, bones, plants) take their ground from the same height, so nothing floats;
+   - check it with the value-only test (point 4).
+
+## 0b. Locked techniques (keep or improve only; one shared place each)
+
+| Technique | Where it lives | Locked by Derek |
+|---|---|---|
+| **The craggy floor:** old paving heaved and tipped by something beneath, every stone a lit top and a shaded face casting on its neighbour | `tools/landkit/ground.py` `craggy_height` (`CRAGGY`) | 2026-10-07, "the craggy look looked really good, lock that tech for later areas" |
+| **The god's eye** (B+) | `tools/landkit/eye.py` | 2026-10-07, "eye looks great" |
+
 ## 2. How the work is done
 
 1. **One piece at a time.** Nothing new is started until the piece in work is finished.

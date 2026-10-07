@@ -418,3 +418,21 @@ def flesh(px, py, seed=0, moon=np.array([-0.62, 0.22, 0.75]), selfshade=True):
     col = np.where(weep[..., None], ROT * 1.4, col)
     wet = (dome > 0.82) & (lit > 0.78) & (vn(px * 3 + seed, py * 3) > 0.45)
     return np.clip(col, 0, 1), wet
+
+
+# ---------------------------------------------------------------------------------------------------- LOCKED TECHNIQUE
+# THE CRAGGY FLOOR (Derek 2026-10-07, after the Gate in the Flesh pass 89: "The craggy look looked really good. Lock that
+# tech for later areas.") Old polygon paving heaved and tipped all over by something pushing up beneath, every stone a
+# lit top and a shadowed face, casting on its neighbours: a courtyard broken into crags. LOCKED: keep or improve only.
+# Use it where the ground has been torn up from below (the god rising, a quake, roots, a collapse).
+CRAGGY = dict(relief=1.6, heave_reach=1.3, heave_pow=1.6)
+
+
+def craggy_height(px, py, seed=2, source_dist=None, path=None, relief=CRAGGY["relief"], reach=CRAGGY["heave_reach"],
+                  pw=CRAGGY["heave_pow"]):
+    """the craggy floor's real height (yards), to add into the world's height field (MASTER_RULES section 0).
+    source_dist: yards to whatever heaves it (the flesh, a fault, roots) for every point; the nearer, the more each
+    stone is lifted and tipped. With source_dist everywhere small (a network of cracks), the whole floor goes craggy."""
+    hv = np.zeros(px.shape) if source_dist is None else np.clip(1 - source_dist / reach, 0, 1) ** pw
+    h, I = _poly(px, py, seed, hv, np.zeros(px.shape) if path is None else path)
+    return h * relief, I
