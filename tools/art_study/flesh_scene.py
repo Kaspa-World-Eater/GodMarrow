@@ -35,6 +35,7 @@ import eye as eyegen                         # noqa: E402
 import fang as fanggen                       # noqa: E402
 import vessel                                # noqa: E402
 import bone as bonegen                       # noqa: E402
+import column as colgen                      # noqa: E402
 from wood_ecosystem import vn, fbm           # noqa: E402
 
 C = np.array([20.0, 19.0])
@@ -397,6 +398,15 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     lts = [((lx, ly, lz), (0.95, 0.6, 0.32), rch * 1.4) for (lx, ly, lz, rch) in ws.LIGHTS]
     for f in sorted(FG, key=lambda q: q["c"][0] + q["c"][1]):           # the fangs, ray-marched (landkit fang.py)
         fanggen.draw(img, zb, dep, ws.to_px, f, lts, ws.SUN, ambient=0.15)
+    # the colonnade and its fallen drums (landkit column.py, from chapter 2)
+    shapes = []
+    for (p, hgt, sd) in COLS:
+        g0 = float(ws.look(W, W["H"], np.array(p[0]), np.array(p[1])))
+        shapes.append(colgen.shaft((p[0], p[1], g0 + 0.45), 0.5, max(hgt - 0.45, 0.3), seed=sd))
+    for i, (p, a, L_) in enumerate(DRUMS):
+        g0 = float(ws.look(W, W["H"], np.array(p[0]), np.array(p[1])))
+        shapes.append(colgen.drum((p[0], p[1], g0 + 0.32), (np.cos(a), np.sin(a)), 0.5, L_, seed=90 + i))
+    colgen.draw(img, zb, dep, ws.to_px, sorted(shapes, key=lambda o: (o.get("b", o.get("c"))[0] + o.get("b", o.get("c"))[1])), lts, ws.SUN)
     gh = lambda x, y: float(ws.look(W, W["H"], np.array(x), np.array(y)))
     on_flesh = ws.look(W, W["putrid"], px, py) > 0
     # the flesh breathes: a slow swell of light and dark rolling across it

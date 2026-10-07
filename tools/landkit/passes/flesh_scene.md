@@ -202,3 +202,7 @@ Worst first: the pool, the floating vein, the light.
    Graded (58): the flesh in every joint across the yard (its reach too far) and the joints too wide: cobbles, not Pompeii.
 59. The heave only near the flesh; the joints hairline elsewhere, pale ash in them.
    Graded (59): reads as real lava paving: tight pillowed basalt, hairline pale joints, the flesh coming up through the joints only near its edge, the way polished. Next: stone sizes too even; the pillars and drums (chapter 2).
+60. The colonnade rebuilt from chapter 2 (landkit column.py, ray-marched): Doric shafts of 20 flutes, arrises worn soft, drums shifted off true, hairline drum joints, the top broken on a rough tilted plane and paler; rain exposure bleaching up-facing faces, black crust in the sheltered flute bottoms, streaks down from the break, pale ash packed in the low flutes, a damp salt band with pits at the foot, rust from a dowel joint; the fallen drums half sunk with their anathyrosis faces (smooth band, rough centre, square socket).
+   Graded (60): true columns at last; but the shade side flat blue with the flutes lost, the bleaching wrapping the tops like a sock.
+61. Sky light and the ground's warmth in the shade, the flute bottoms shut in more, bleaching only on faces that truly look up.
+   Graded (61): true old columns, the fallen drums' faces read; the moon-turned-away faces still flat and dark. Next in the stone: the drums in a domino fall line, the rubble ridge; then the teeth from chapter 3.

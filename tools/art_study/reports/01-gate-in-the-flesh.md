@@ -98,6 +98,13 @@ messages. The lore read for it:
     as real paving at the first render, which no amount of tweaking the invented flags had achieved. The flesh only
     in the joints near its edge (Angkor's roots); its reach at first was too far and its joints too wide, giving
     cobbles rather than Pompeii.
+15. **Columns from chapter 2** (passes 60 and 61, landkit column.py): ray-marched Doric shafts (20 flutes, worn
+    arrises, drums shifted off true, hairline joints, a rough pale break) with every mark placed by its cause (rain
+    bleaching only on faces that truly look up, black crust in sheltered flute bottoms, streaks below the break, pale
+    ash packed in the low flutes, a damp salt band at the foot, rust from a dowel joint), and fallen drums showing
+    their anathyrosis faces. They read as old columns at once. **What failed first:** an exposure mask that leaned on
+    occlusion bleached the whole top like a sock, and the shaded side had no sky or bounce light, so the flutes
+    vanished into flat blue.
 13. **Reading the lore for one true detail** gave the gate its brief (the mouth's door) and the fangs their dried
     blood.
 
