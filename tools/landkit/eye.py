@@ -1,4 +1,6 @@
-"""The god's eye (landkit). Derek 2026-10-07: "the eye should be 3 dimensional and slowly blink a pus filled blink";
+"""The god's eye (landkit). APPROVED by Derek 2026-10-07 ("Eye looks great, document it"): the full record is
+in tools/landkit/passes/organic_notes.md; changes must keep or raise it.
+ Derek 2026-10-07: "the eye should be 3 dimensional and slowly blink a pus filled blink";
 "elliptical and seen slightly from the side, looking up, so we can see the vitreous fluid transparency"; "more
 bulbous"; the eye at D-: "needs a ton more work".
 

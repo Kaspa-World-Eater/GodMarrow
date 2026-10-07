@@ -156,3 +156,6 @@ Worst first: the pool, the floating vein, the light.
 49. The fangs' flesh edge set by world position (not the angle round the fang), so no two fangs or sides match;
     it frays upward in patches; darker, the ground's own flesh, bruised in places.
    Graded (49): fixed: each fang's flesh its own, uneven, frayed, dark. Next worst: the doors and the bone arch.
+   Derek: "The ground teeth and tiles need more work. Eye looks great, document it"; "yes" (the ground rule);
+   "the bone sucks too, I agree". The eye documented in full (organic_notes.md) and marked approved; MASTER_RULES
+   2b.6 rewritten: ground is a world-position generator, every piece unique, no fixed tiles.
