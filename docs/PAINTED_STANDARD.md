@@ -43,6 +43,13 @@ individually crafted." No mock-ups shown as results; no primitive stand-ins (con
 crowns); every element (each tree, window, stone, tuft) designed as its own thing; everything in this standard applied
 every time, not only on the pieces that get a second pass.
 
+## One at a time, ten passes (Derek, 2026-10-07)
+
+"I don't want to see shit rushed: 1 at a time, painted and refined 10x." One piece is in work at a time. It gets at
+least ten painting-and-refining passes before it is shown or placed in the game, and each pass is numbered, graded in
+writing against the checklist below, and fixes the worst failure the last grade found. No other piece starts until
+this one has had its ten. Placement and generation code may be finished alongside, but no new art is begun.
+
 ## The order of work
 
 1. Finish the current agenda in this standard (environment: snow, grass, ruins, stone; cloth; pulsing flesh; armour
