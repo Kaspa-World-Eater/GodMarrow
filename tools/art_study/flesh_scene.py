@@ -96,13 +96,14 @@ for _side, _hs in ((-1, (4.6, 2.2, 5.4, 1.4)), (1, (5.0, 3.6, 0.9, 0.6))):
 _FALL = (AX * 0.9 + PERP * 0.35) / np.linalg.norm(AX * 0.9 + PERP * 0.35)       # the quake threw it this way
 _FALL_A = float(np.arctan2(_FALL[1], _FALL[0]))
 _STUMP = C + AX * 7.4 + PERP * 5.8
+COLS = []                                    # Derek: "pull the pillars out" (kept as the landkit asset gore_pillar.py)
 DRUMS = [(_STUMP + _FALL * (1.25 + k * 0.82) + PERP * (0.08 * (-1) ** k), _FALL_A + (0.22, -0.15, 0.3)[k], 0.72) for k in range(3)] \
     + [(C + AX * 6.2 - PERP * 7.4, 2.6, 1.0)]
 CAPITAL = _STUMP + _FALL * 4.3                                              # landed furthest, upside down
 # the collapsed wall on the left (chapter 2, Rievaulx and every fallen wall): a ragged stump of dressed courses, its
 # small core rubble heaped in a ridge at its foot, its big dressed blocks thrown further out, all half buried in ash
 WALL_P = -8.7
-YARD = (7.4, 1.0, 14.5)                       # half-width across, and its extent along the axis
+YARD = (9.6, -0.4, 15.5)                       # half-width across, and its extent along the axis
 VEIN = [EYE[0] + AX * 1.5 - PERP * 1.6, POOL[0] - AX * 1.6, C + AX * 3.6 - PERP * 1.2, C + AX * 3.0 - PERP * 2.4]
 R_STONE = ws.ramp("#131218", "#211f28", "#312e37", "#443f46", "#5a5455", "#726a66", "#8d8379")
 R_BONE = ws.ramp("#1a1715", "#2c2724", "#433d38", "#5c554d", "#78706a", "#958b80", "#b2a798", "#cbc1b0")
@@ -274,7 +275,8 @@ def stamp(W, w):
         import wood_ecosystem as we_
         ri = np.clip(np.round(W["Y"] / we_.RES - 0.5).astype(int), 0, cave.shape[0] - 1)
         ci = np.clip(np.round(W["X"] / we_.RES - 0.5).astype(int), 0, cave.shape[1] - 1)
-        m = cave[ri, ci] & (W["tag"] == 0)
+        u_r, r_r = gate_q(X, Y)
+        m = (cave[ri, ci] | ((r_r > 0.35) & (np.abs(u_r) > GATE_W / 2 + 0.2))) & (W["tag"] == 0)   # the walls, and the old rock behind the gate
         W["tag"] = np.where(m, 868, W["tag"])
         W["obj"][868] = dict(kind="rubble", fam=0, base=0.0, wall=False, big=True)
     for i, (p, a, L_) in enumerate(DRUMS):
@@ -312,15 +314,29 @@ def stamp(W, w):
     W["H"] = H
     W["Hrest"] = H
     W["HT"] = np.full_like(H, -50.0)
-    spread = np.zeros(X.shape)
+    # the god's flesh comes up only THROUGH THE CRACKS (Derek: "everything looks ancient except this weird biological stuff
+    # coming through the cracks in the floor"): a network of great fractures across the old floor, hairline far off,
+    # opening into wounds where they reach the eye, the fangs' roots, the pool and the vein
+    import ground as _g
+    wx_ = X + (fbm(X * 0.35 + 3, Y * 0.35) - 0.5) * 1.6
+    wy_ = Y + (fbm(X * 0.35, Y * 0.35 + 7) - 0.5) * 1.6
+    c1, c2, _, _, _ = _g.cells(wx_, wy_, 2.8, 91, 1.0)
+    crack = (c2 - c1) * 0.5                                                 # yards to the nearest great fracture
+    near = np.zeros(X.shape)
     for (p, h, rr_, s) in FANGS:
-        spread = np.maximum(spread, 1 - np.hypot(X - p[0], Y - p[1]) / (rr_ + 2.4))
-    for (p, rad_) in ((EYE[0], 4.4), (POOL[0], 2.8), (GATE + AX * 0.6, 4.2)):
-        spread = np.maximum(spread, 1 - np.hypot(X - p[0], Y - p[1]) / rad_)
+        near = np.maximum(near, 1 - np.hypot(X - p[0], Y - p[1]) / (rr_ + 1.6))
+    for (p, rad_) in ((EYE[0], 3.6), (POOL[0], 2.2)):
+        near = np.maximum(near, 1 - np.hypot(X - p[0], Y - p[1]) / rad_)
     for q in VP[::6]:
-        spread = np.maximum(spread, 1 - np.hypot(X - q[0], Y - q[1]) / 1.4)
-    spread = np.maximum(spread, np.clip(r, 0, 1) * 0.8)                   # the swell itself: flesh
-    spread = spread + (fbm(X * 0.8, Y * 0.8) - 0.5) * 0.5
+        near = np.maximum(near, 1 - np.hypot(X - q[0], Y - q[1]) / 0.9)
+    near = np.clip(near, 0, 1)
+    width = 0.07 + near ** 1.5 * 1.4 + (vn(X * 1.5, Y * 1.5) - 0.5) * 0.06    # a hairline far off, a wound near the god's parts
+    spread = 1 - crack / np.maximum(width, 0.02)
+    spread = np.maximum(spread, (near - 0.55) * 2.2)                       # round the eye and the fangs' roots, open flesh
+    sheet = (fbm(X * 0.22 + 11, Y * 0.22) - 0.56) * 6 - crack * 0.9          # and sheets of it, welled up out of the bigger
+    spread = np.maximum(spread, sheet)                                      # fractures and spilled over the stones (Derek: "we can have both")
+    spread = np.where(r > 0.3, np.minimum(spread, -1.0), spread)            # behind the gate: the old rock, not flesh
+    spread = spread + (vn(X * 3, Y * 3) - 0.5) * 0.15
     W["putrid"] = spread > 0.15
     W["fdist"] = nd.distance_transform_edt(~W["putrid"]) * ws.RES        # yards to the nearest flesh
     W["thread"] = (spread > -0.08) & (spread <= 0.15)                       # a narrow band where it creeps into the ash
@@ -337,7 +353,7 @@ def stamp(W, w):
     SICK.clear()
     W["tendrils"] = []
     climbers = [(p, hgt, sd, W["obj"][790 + i]["base"], 0.6) for i, (p, hgt, sd) in enumerate(COLS)]
-    climbers += [(GATE + PERP * sg * POST_U - AX * 0.0, 3.4, 300 + (sg > 0), gbase - 0.3, 1.25) for sg in (-1, 1)]
+    # (no tendrils on the gate posts: everything ancient but what comes up through the floor's cracks)
     for (p, hgt, sd, g, prad) in climbers:
         if hgt < 1.0:
             continue
@@ -404,11 +420,14 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     fcol, fh, fj = groundgen.paving_poly(px, py, seed=2, heave=heave, path=way, moon=ws.SUN)
     pcol0, _ = groundgen.flesh(px, py, seed=1, moon=ws.SUN)
     fcol = np.where((fj & (heave > 0.3 + (vn(px * 2, py * 2) - 0.5) * 0.3))[..., None], pcol0 * 0.8, fcol)   # flesh in the joints
-    drift = fbm(px * 0.45, py * 0.45) > 0.67 - np.clip(np.abs(qp) - 4.5, 0, 3) * 0.08  # ash drifted over the flags
-    lay = yard & ~drift
-    alb = np.where(lay[..., None], fcol, alb)
-    edge_ = yard & drift & (fbm(px * 0.45, py * 0.45) < 0.69 - np.clip(np.abs(qp) - 4.5, 0, 3) * 0.08)
-    alb = np.where(edge_[..., None], alb * 0.6 + fcol * 0.4, alb)              # the stones showing through thin ash
+    # the paving runs out under the ash gradually (chapter 2: ash fills the lows first): thick ash, then thin ash with the
+    # stones' tops showing, the joints still full, then the bare paving; no hard edge (Derek: "nothing blends smoothly")
+    soft = np.clip((YARD[0] + (vn(qa * 0.5, 3) - 0.5) * 1.6 - np.abs(qp)) / 1.8, 0, 1) * np.clip((qa - YARD[1]) / 1.2, 0, 1) * np.clip((YARD[2] - qa) / 1.2, 0, 1)
+    cover = np.clip(1 - soft * 1.35 + (fbm(px * 0.45, py * 0.45) - 0.55) * 1.3, 0, 1)
+    cover = cover * cover * (3 - 2 * cover)
+    cov = np.where(fj, np.clip(cover * 2.2, 0, 1), np.clip((cover - 0.15) * 1.4, 0, 1))   # the joints fill first
+    alb = alb * cov[..., None] + fcol * (1 - cov[..., None])
+    yard = soft > 0
     pm = ws.look(W, W["putrid"], px, py) > 0
     pcol, pwet = groundgen.flesh(px, py, seed=1, moon=ws.SUN)
     alb = np.where(pm[..., None], pcol, alb)
@@ -657,11 +676,10 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     for k_, (pa_, pp_) in enumerate(((6.6, -6.6), (11.2, 5.4))):               # dried thorn bushes by the fallen drums
         q = C + AX * pa_ + PERP * pp_
         deadplants.thorn(img, zb, dep, ws.to_px, (q[0], q[1], gh_(q[0], q[1])), 0.9 + k_ * 0.3, 600 + k_, plight)
-    cp, chg, csd = COLS[2]                                                 # a dead vine up the front pillar on the left
-    g0 = W["obj"][792]["base"]
-    vp = [(cp[0] + np.cos(0.4 + z * 2.1) * 0.56, cp[1] + np.sin(0.4 + z * 2.1) * 0.56, g0 + 0.45 + z) for z in np.linspace(0, chg - 0.8, 70)]
-    deadplants.vine(img, zb, dep, ws.to_px, vp, 700, plight)
-    print('dead plants: tufts', put) if os.environ.get('PLDBG') else None
+    for cp, chg, csd in COLS[2:3]:                                         # a dead vine up the front pillar on the left
+        g0 = W["obj"][792]["base"]
+        vp = [(cp[0] + np.cos(0.4 + z * 2.1) * 0.56, cp[1] + np.sin(0.4 + z * 2.1) * 0.56, g0 + 0.45 + z) for z in np.linspace(0, chg - 0.8, 70)]
+        deadplants.vine(img, zb, dep, ws.to_px, vp, 700, plight)
     for k_, fp in enumerate(FIRES):                                       # the banked fires: coals under a crust of ash, a thread of smoke
         g0 = gh(fp[0], fp[1]) if False else W["gbase"]
         rr = np.random.default_rng(900 + k_)
