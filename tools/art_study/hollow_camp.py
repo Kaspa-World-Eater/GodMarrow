@@ -163,6 +163,20 @@ def paint_hut(img, m, v, n, px, py, pz, o, W, L):
     fib = (vn(U * 12 + sid, h * 1.4) - 0.5) * 0.06
     sl_v = sv + (sj - 0.5) * 0.14 + fib - (sfr < 0.1) * 0.2 + (sfr > 0.88) * 0.06
     img[slab] = R_SLAB[np.clip((sl_v * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)][slab]
+    # weathering: each slab sags and leans a little (its gap widening toward the top), a few slabs fallen out showing the
+    # dark inside, rot creeping up from the foot (darker, wetter), moss climbing in tongues from the footing, grey lichen
+    # on the moon-lit slabs, the lowest slabs bleached where rain splashes up
+    lean_gap = (sfr < 0.1 + np.clip((h - 0.45) / 1.3, 0, 1) * 0.08 * (sj > 0.5))
+    img[slab & lean_gap] = img[slab & lean_gap] * 0.55
+    gone = slab & ((np.sin(sid * 5.3 + k * 1.9) * 4375.5) % 1.0 > 0.9) & (h > 0.6)
+    img[gone] = np.array([0.035, 0.03, 0.035]) + np.clip(L["lamp"], 0, 0.5)[..., None][gone] * np.array([0.12, 0.06, 0.02])
+    rot = slab & (h < 0.45 + 0.5 * vn(U * 3 + k, 1)) & ~gone
+    img[rot] = img[rot] * np.array([0.78, 0.76, 0.74])
+    tongue = 0.45 + vn(U * 2.4 + k * 3, 2) ** 2 * 1.1
+    mclimb = slab & (h < tongue) & (vn(U * 9 + k, h * 4) > 0.42) & ~gone
+    img[mclimb] = R_MOSSC[np.clip(((v * 0.75 + (vn(U * 20, h * 20) - 0.5) * 0.1) * len(R_MOSSC)).astype(int), 0, len(R_MOSSC) - 1)][mclimb]
+    lich_s = slab & (vn(U * 7 + 11, h * 5) > 0.82) & (v > 0.3) & ~gone & ~mclimb
+    img[lich_s] = img[lich_s] * 0.6 + np.array([0.42, 0.45, 0.38]) * 0.4
     foot = wall & side & (h < 0.45)
     st_i = np.floor(U / 0.3 + np.floor(h / 0.15) * 0.5)
     st_v = sv + ((np.sin(st_i * 7.7 + np.floor(h / 0.15) * 3.3) * 4375.5) % 1.0 - 0.5) * 0.14

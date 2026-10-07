@@ -85,3 +85,16 @@ Worst failure: the ribs (the god's presence carries the scene). Waiting for Dere
 15. The ribs: the ground heaves round each base (torn earth in a ring, clods); at the base the bone stained dark by
     the earth, roots gripping it, the god's hide in tatters on one side; bone that reads as bone (flatter in section,
     pores, long cracks with the grain, flaking); the snapped tip showing the honeycomb of marrow.
+
+## Rules check after pass 15
+Lore: Cap Hollow's four families (four huts), the hunter's sticks and the dead turning to the ring, the Flat Days'
+white caps, the Ribcage Bough, the hide and veins, weeping and diseased vein-trees.
+1 Brief PASS. 2 Scale PASS. 3 Form PARTIAL (huts boxy). 4 Light PARTIAL (fire leads; ribs cast no shadow). 5 Values
+PARTIAL (hut walls flat grey planes). 6 Ramps PASS. 7 Paint PARTIAL. 8 Contact PARTIAL (rib bases abrupt). 9 Detail
+PARTIAL (trees' disease out of view; foreground empty). 10 Life NOT CHECKED. 11 As played PARTIAL. 12 Skeptic: story
+strong, surfaces weaker than the church's stone.
+2b: tiles not built; objects not exported.
+Worst: the huts' walls (Derek: "the huts need a lot of work"). Derek asked for x10 refinement: continuing.
+16. Hut walls weathered: slabs leaning (gaps widening upward), a few fallen out to the dark inside, rot creeping up
+    from the foot, moss climbing in tongues from the footing, grey lichen on the moonlit slabs.
+   Graded: the moonlit hut (right) reads weathered (moss tongues, rot, lichen, a slab gone); the shaded hut (left) still a dark striped plane (its face away from moon and fire).
