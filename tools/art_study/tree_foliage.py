@@ -85,8 +85,10 @@ def _hash(a, b, s):
     return (h & 0xFFFF) / 65535.0
 
 
-def render(tree, clumps, mode, W, H, ox, oy, ground=None):
-    """ground: optional (points, normals) per pixel from a shaped floor (forest_floor.cast); flat otherwise"""
+def render(tree, clumps, mode, W, H, ox, oy, ground=None, leaf=None):
+    """ground: optional (points, normals) per pixel from a shaped floor (forest_floor.cast); flat otherwise.
+    leaf: another leaf ramp (tools/landkit/tree.py gives the game's darker one)"""
+    LF = LEAF if leaf is None else leaf
     SY, SX = np.mgrid[0:H, 0:W].astype(float)
     if ground is None:
         gx = ((SY - oy) / KY + (SX - ox) / KX) / 2
@@ -272,13 +274,14 @@ def render(tree, clumps, mode, W, H, ox, oy, ground=None):
     tex = np.where(gap, -1, np.where(leaf_lit, 1, np.where(leaf_dark, -1, 0)))
     tex = np.where(grp >= 2, tex, np.where(grp == 1, np.where(gap & (vn(SX * 0.3, SY * 0.3) > 0.5), -1, 0), 0))
     li = np.clip(base + tex, 0, len(LEAF) - 1)
-    img[lm] = LEAF[li[lm]]
+    li = np.clip(li, 0, len(LF) - 1)
+    img[lm] = LF[li[lm]]
     # the outer rim of the lit clumps catches the light (leaves edge-on to the sun), the shade side stays flat
     rimk = lm & (edge01 > 0.82) & (grp >= 2) & (ndl > 0.55)
-    img[rimk] = LEAF[np.clip(li[rimk] + 1, 0, len(LEAF) - 1)]
+    img[rimk] = LF[np.clip(li[rimk] + 1, 0, len(LF) - 1)]
     below_open = (np.roll(kind, -2, axis=0) != 2) | (np.roll(kind, -3, axis=0) != 2)
     bounce = lm & (grp <= 1) & below_open & (nrm[..., 2] < 0.1)   # only the mass's lower silhouette
-    img[bounce] = LEAF[np.clip(li[bounce] + 1, 0, len(LEAF) - 1)] * np.array([1.08, 1.02, 0.9])
+    img[bounce] = LF[np.clip(li[bounce] + 1, 0, len(LF) - 1)] * np.array([1.08, 1.02, 0.9])
     # the light's temperature in steps
     warm = lm & (grp == 3)
     img[warm] = img[warm] * np.array([1.06, 1.02, 0.9])

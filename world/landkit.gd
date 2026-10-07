@@ -207,6 +207,8 @@ static func take(zone, s: String, spr: Dictionary) -> bool:
 			place(zone, s, pick(s, "rootplate", x, y), bp, bp.x + bp.y, flip, false)
 		_life_round(zone, s, tp, L, flip, cls)
 		return true
+	if role == "snag" and absi(int(x * 11.0 + y * 3.0)) % 2 == 0:
+		role = "tree_dying"           # half the dead are still dying: a thinning crown, not yet a bare pole
 	var name := pick(s, role, x, y)
 	if name == "":
 		return true
