@@ -23,6 +23,30 @@ and again whenever the reminder fires, the work in progress is checked against e
 | The best pieces, side by side | The Seer's Bowl title (`tools/title_study/`), the ruins (`painted_scene.py`), the dune, the old-growth judge scene (`wood_scene.py`) |
 | The piece's own pass log (`tools/landkit/passes/`) | Where the work stands and what the last grade said |
 
+## 0. FORM IS LAW (Derek, 2026-10-07)
+
+"Add the form rule to the rules. It's important because it gives depth and realness, not flat painted bullshit."
+(After the Gate in the Flesh's floor: "it's 1 dimensional, there's no depth to it, no 3D, which is why everything looks
+so flat.")
+
+1. **Nothing is painted flat.** Everything that has height in the real world is built as real geometry:
+   - each paving stone's dome, tilt and proud edge, and the joint between stones;
+   - cracks;
+   - the flesh's lumps and folds;
+   - rubble, bones, roots, bark, ripples, drifts.
+   It goes either into the scene's height field at fine resolution or into a ray-cast form. Colour is never allowed
+   to stand in for height.
+2. **The light comes from the form.** The moon and every lamp light the geometry through its real normals. It casts
+   real shadows onto its neighbours, hides what is behind it, and catches light on its edges. A stone shades the joint
+   beside it because it stands above it, not because the joint was painted dark.
+3. **Texture only for what is smaller than a pixel.** Grain, pores and fine speckle may be colour. Anything a pixel
+   or larger must be shape.
+4. **The test, every pass:** take the colour away (render the value only, one material, one grey). The piece must
+   still read as solid, deep and lit, stone as stone, flesh as flesh. If it goes flat without its colour, it is flat
+   painted, and it fails.
+5. A generator that computes a height (a stone's dome, a ripple) and then uses it only to shade a colour **breaks this
+   law**. The height must reach the world, so the renderer lights it.
+
 ## 2. How the work is done
 
 1. **One piece at a time.** Nothing new is started until the piece in work is finished.
@@ -120,7 +144,8 @@ are lit by the scene and light it.
 1. **Brief:** from the lore and the real thing, every detail with its reason.
 2. **Scale:** true size from the game's projection (a yard is a 36x18 tile, about 21 px of height per yard), with the
    hero beside it.
-3. **Form:** ray-cast, lit through normals; no flat stand-ins.
+3. **Form (section 0, the law):** every feature with height is real geometry (height field or ray-cast) lit through its
+   normals, casting and catching shadow; the value-only test passes (no colour, still solid and deep). No flat stand-ins.
 4. **Light:** the moon and a warm local light, both casting shadows; flecks where a canopy is.
 5. **Values:** big shapes in three to five clean tone groups first; texture subordinate and following the form.
 6. **Ramps:** hue-shifted, six to eight tones per material.

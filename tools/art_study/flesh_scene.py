@@ -80,7 +80,7 @@ GATE_W, PYLON_R, PYLON_H = 5.0, 1.0, 4.6
 POST_U, POST_HU, POST_HR, POST_H = 3.4, 0.9, 0.8, 8.5     # the megalith posts
 # the teeth: one row across the back, the gate built into it; its posts are the two greatest fangs
 FANGS = [(GATE + AX * 0.15 + PERP * o, h, r, 60 + i) for i, (o, h, r) in enumerate(
-    [(-9.8, 4.6, 1.0), (-7.5, 5.8, 1.2), (-5.6, 7.2, 1.35), (5.6, 7.0, 1.35), (7.5, 6.0, 1.2), (9.8, 4.4, 1.0)])]
+    [])]                                         # Derek: "remove all the teeth" (fang.py kept as an asset)
 TF = [toothgen.tooth("fang", s, height=h, R=r, half=2.6) for (_, h, r, s) in FANGS]   # (their gum collars)
 FG = []                                      # the fangs themselves (landkit fang.py), made in stamp()
 PORE = (C + AX * 9.6 + PERP * 4.6, 1.7)
@@ -100,6 +100,7 @@ _STUMP = C + AX * 7.4 + PERP * 5.8
 COLS = []                                    # Derek: "pull the pillars out" (kept as the landkit asset gore_pillar.py)
 DRUMS = [(_STUMP + _FALL * (1.25 + k * 0.82) + PERP * (0.08 * (-1) ** k), _FALL_A + (0.22, -0.15, 0.3)[k], 0.72) for k in range(3)] \
     + [(C + AX * 6.2 - PERP * 7.4, 2.6, 1.0)]
+DRUMS = []                                   # Derek: "remove the drums too" (and their capital); column.py kept as an asset
 CAPITAL = _STUMP + _FALL * 4.3                                              # landed furthest, upside down
 # the collapsed wall on the left (chapter 2, Rievaulx and every fallen wall): a ragged stump of dressed courses, its
 # small core rubble heaped in a ridge at its foot, its big dressed blocks thrown further out, all half buried in ash
@@ -171,14 +172,14 @@ def shape_plan(w):
     H = np.maximum(H, wall + cols_)
     w.cave = wall > 0.4
     # two great stalagmites in the near corners: dark shapes framing the shot
-    for (pa, pp, hh, rr0, sd) in ((14.9, -9.0, 4.6, 0.95, 3), (15.5, 8.9, 5.4, 1.05, 4)):
+    for (pa, pp, hh, rr0, sd) in ():                                      # Derek: the rock pillars removed
         p0 = C + AX * pa + PERP * pp
         d = np.hypot(X - p0[0], Y - p0[1]) * (1 + (fbm(X * 1.2 + sd, Y * 1.2) - 0.5) * 0.5)
         stal = hh * np.clip(1 - d / rr0, 0, 1) ** 0.55
         H = np.maximum(H, stal)
         w.cave = w.cave | (stal > 0.3)
     w.H = H
-    w.wet = np.clip(1 - np.abs(r - 0.5) / 3.0, 0, 1) * 0.6               # mist lying at the swell's foot
+    w.wet = np.zeros_like(H)                                             # Derek: "remove the cloud stuff"
 
 
 def to_fang(k, x, y):
@@ -224,7 +225,7 @@ def stamp(W, w):
     qp_ = (X - C[0]) * PERP[0] + (Y - C[1]) * PERP[1]
     rr = np.random.default_rng(77)
     # the stump: coursed dressed blocks 0.45 high, 0.9 long; its top stepped and ragged, block by block
-    on_wall = (np.abs(qp_ - WALL_P) < 0.45) & (qa_ > 1.5) & (qa_ < 10.5)
+    on_wall = np.zeros(X.shape, bool)                                     # Derek: the broken stump removed (its rubble stays)
     blk = np.floor((qa_ - 1.5) / 0.9).astype(int)
     course_h = np.array([rr.integers(1, 5) for _ in range(12)]) * 0.45 + 0.1
     wtop = np.where(on_wall, course_h[np.clip(blk, 0, 11)] + gat(C + AX * 6 + PERP * WALL_P) - 0.2, -9.0)
@@ -234,11 +235,16 @@ def stamp(W, w):
     W["obj"][870] = dict(kind="rubble", fam=1, base=0.0, wall=True)
     # the rubble: the near ridge of small core stones, then the big dressed blocks thrown out
     k_ = 0
-    for j in range(150):
-        big = j < 22
-        a_ = rr.uniform(2.0, 10.0)
-        off = rr.uniform(0.55, 1.4) if not big else rr.uniform(1.3, 2.4)        # small ones near, big ones far
-        p = C + AX * a_ + PERP * (WALL_P + off)
+    for j in range(240):
+        big = j < 22 or (j >= 150 and j < 166)
+        if j < 150:
+            a_ = rr.uniform(2.0, 10.0)
+            off = rr.uniform(0.55, 1.4) if not big else rr.uniform(1.3, 2.4)    # small ones near, big ones far
+            p = C + AX * a_ + PERP * (WALL_P + off)
+        else:                                                              # and along the vein, where it broke the floor up
+            q = VP[int(rr.integers(0, len(VP)))]
+            ang = rr.uniform(0, 6.283)
+            p = q + np.array([np.cos(ang), np.sin(ang)]) * rr.uniform(0.45, 1.5)
         if big:
             hx, hy, hz = rr.uniform(0.35, 0.5), rr.uniform(0.2, 0.26), rr.uniform(0.18, 0.24)
         else:
@@ -266,7 +272,7 @@ def stamp(W, w):
     g = gat(CAPITAL)
     ech = np.where(d < 0.62, g + 0.15 + np.sqrt(np.clip(0.62 ** 2 - d ** 2, 0, None)) * 0.55, -9.0)
     aba = np.where(np.maximum(np.abs(lx), np.abs(ly)) < 0.72, g + 0.15 + 0.3 * np.clip((0.72 - np.maximum(np.abs(lx), np.abs(ly))) / 0.05, 0, 1), -9.0)
-    cap = np.maximum(ech, np.where(d < 0.62, -9.0, aba))
+    cap = np.full(X.shape, -9.0)                                          # the capital removed with the drums (Derek)
     m = cap > H
     H = np.where(m, cap, H)
     W["tag"] = np.where(m, 869, W["tag"])
@@ -688,7 +694,7 @@ def living_flesh(img, w, W, px, py, pz, L, T):
               (EYE[0] - AX * 2.4 - PERP * 1.9, 1.2, 12, 9, False),     # by the eye, the flesh taking them
               (C + AX * 5.2 + PERP * (WALL_P + 1.5), 2.0, 13, 5, False),   # among the rubble
               (np.array(ws.HERO) + AX * 1.1 - PERP * 1.5, 0.7, 14, 8, False),   # in the lantern's pool, on the stones
-              (FANGS[2][0] + AX * 1.9 + PERP * 0.4, 2.6, 15, 4, True)]     # by the great fang: the sandal, the blood
+              (GATE + PERP * -5.6 + AX * 2.1, 2.6, 15, 4, True)]       # where the great fang stood: the sandal, the blood
     for (o_, yaw, sd, n_, snd) in groups:
         parts = remains.scatter(sd, n_, 0.75, sandal=snd)
         remains.draw_parts(img, dep, ws.to_px, o_, yaw, gh_, parts, plight, bone_c=bone_c, zb=zb)
@@ -1023,7 +1029,7 @@ def beam(img, w, W, px, py, pz, L, T):
         acc += shaft(x, y, z) * (z < ZC) * (0.75 + 0.5 * vn(x * 0.7 + T * 0.6, z * 0.7 - y * 0.3))   # the air uneven, drifting
     acc = acc * 0.42
     fall = np.clip(1 - pz / ZC, 0.5, 1)
-    img = img + (acc * 0.03 * fall)[..., None] * np.array([0.55, 0.62, 0.78])
+    # (no glow of the beam in the air: Derek, "remove the cloud stuff"; only the motes drift in it)
     rr = np.random.default_rng(31)
     dep = px + py
     for i in range(170):
@@ -1050,7 +1056,7 @@ def atmosphere(img, w, W, px, py, pz, L, T):
     gentle grade so every material sits in one palette (Derek: "nothing really blends smoothly")"""
     dep = px + py
     dn = (dep - dep.min()) / max(np.ptp(dep), 1e-6)
-    a = 0.42 * (1 - dn) ** 1.6
+    a = 0.0 * (1 - dn) ** 1.6                                              # no haze (Derek): only the one grade
     haze = np.array([0.055, 0.04, 0.05])
     img = img * (1 - a[..., None]) + haze * a[..., None]
     lum = img.mean(2, keepdims=True)
