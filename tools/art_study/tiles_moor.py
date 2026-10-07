@@ -60,17 +60,17 @@ def ash_0(seed=0):
     def dab(x, y, pts, col):
         for (dx, dy, k) in pts:
             img[(y + dy) % TH, (x + dx) % TW] = col[k]
-    for _ in range(26):                                              # bone chips: a lit top, a dark under-edge
+    for _ in range(12):                                              # bone chips: a lit top, a dark under-edge
         x, y = int(rr.integers(0, TW)), int(rr.integers(0, TH))
         L = int(rr.integers(1, 4))
         for i in range(L):
             img[y % TH, (x + i) % TW] = BONE[2 if i == 0 else 1]
         img[(y + 1) % TH, x % TW] = img[(y + 1) % TH, x % TW] * 0.6
-    for _ in range(18):                                              # black glass: a bead, its glint, a dark pool round it
+    for _ in range(7):                                               # black glass: a bead, its glint, a dark pool round it
         x, y = int(rr.integers(0, TW)), int(rr.integers(0, TH))
         dab(x, y, [(0, 0, 0), (1, 0, 0), (0, 1, 1), (1, 1, 0)], GLASS)
         img[y % TH, x % TW] = np.array([0.55, 0.58, 0.66])            # the moon in it
-    for _ in range(40):                                              # cinders
+    for _ in range(18):                                              # cinders
         x, y = int(rr.integers(0, TW)), int(rr.integers(0, TH))
         img[y % TH, x % TW] = img[y % TH, x % TW] * 0.5
     for _ in range(9):                                               # dead straw, lying with the wind
@@ -109,10 +109,59 @@ def hide_0(seed=0):
     return np.clip(img, 0, 1), base
 
 
+PUTRID = ramp("#120a0e", "#21111a", "#33182a", "#4a2333", "#5f3138", "#74443d", "#8a5a45")      # flesh going bad
+NECRO = ramp("#0b0809", "#181012", "#26181a")                                                     # the dead black of it
+SICK = ramp("#2a2a14", "#43401c", "#5f5a28", "#7c7634")                                           # the yellow-green of the going
+MOULD = np.array([0.6, 0.64, 0.56])
+
+
+def putrid_0(seed=0):
+    """flesh gone putrid, spreading over the Moor like a disease of the skin: mottled bruise-purple and liver-red,
+    sickly yellow-green where it is going, black where it has died; blisters lit on their tops, some burst; mould
+    blooming in pale fuzzy rosettes; pale fungal threads branching through it"""
+    rr = np.random.default_rng(seed + 1000)
+    mot = pnoise(XX, YY, 12, 6, seed + 1) * 0.5 + pnoise(XX, YY, 26, 13, seed + 2) * 0.3 + pnoise(XX, YY, 50, 25, seed + 3) * 0.2
+    v = 0.25 + mot * 0.6 + (BAY - 0.5) * 0.05
+    v = np.round(v * 6) / 6
+    img = PUTRID[np.clip((v * len(PUTRID)).astype(int), 0, len(PUTRID) - 1)].copy()
+    going = (pnoise(XX, YY, 10, 5, seed + 4) + (BAY - 0.5) * 0.12) > 0.62
+    img[going] = img[going] * 0.4 + SICK[np.clip((v[going] * len(SICK)).astype(int), 0, len(SICK) - 1)] * 0.6
+    dead = (pnoise(XX, YY, 14, 7, seed + 5) + (BAY - 0.5) * 0.12) > 0.7
+    img[dead] = NECRO[np.clip((v[dead] * 3).astype(int), 0, 2)]
+    for _ in range(45):                                             # blisters
+        x, y = int(rr.integers(0, TW)), int(rr.integers(0, TH))
+        r = int(rr.integers(1, 4))
+        burst = rr.random() < 0.3
+        for dy in range(-r, r + 1):
+            for dx in range(-r * 2, r * 2 + 1):
+                q = (dx / (1.4 * r)) ** 2 + (dy / r) ** 2
+                if q <= 1:
+                    py, px = (y + dy) % TH, (x + dx) % TW
+                    if burst and q < 0.4:
+                        img[py, px] = NECRO[0]
+                    else:
+                        img[py, px] = np.minimum(img[py, px] * (1.25 if dy < 0 else 0.75), 1)
+    for _ in range(30):                                             # mould rosettes
+        x, y = int(rr.integers(0, TW)), int(rr.integers(0, TH))
+        r = rr.uniform(2, 5)
+        for dy in range(-4, 5):
+            for dx in range(-7, 8):
+                d = np.hypot(dx / 1.6, dy)
+                if d < r / 2 and rr.random() < (0.85 - d / r):              # fuzz, densest at the heart
+                    img[(y + dy) % TH, (x + dx) % TW] = img[(y + dy) % TH, (x + dx) % TW] * 0.4 + MOULD * 0.6
+    for _ in range(16):                                             # fungal threads
+        x, y, a = rr.uniform(0, TW), rr.uniform(0, TH), rr.uniform(0, 2 * np.pi)
+        for i in range(int(rr.integers(20, 50))):
+            a += rr.normal(0, 0.35)
+            x, y = x + np.cos(a), y + np.sin(a) * 0.5
+            img[int(y) % TH, int(x) % TW] = img[int(y) % TH, int(x) % TW] * 0.35 + np.array([0.7, 0.68, 0.6]) * 0.65
+    return np.clip(img, 0, 1), mot
+
+
 if __name__ == "__main__":
     out = sys.argv[1] if len(sys.argv) > 1 else "."
     os.makedirs(out, exist_ok=True)
-    for name, fn in (("ash", ash_0), ("hide", hide_0)):
+    for name, fn in (("ash", ash_0), ("hide", hide_0), ("putrid", putrid_0)):
         t, _ = fn(0)
         save(t, os.path.join(out, "%s_0.webp" % name))
         preview(t, os.path.join(out, "%s_0_tiled.png" % name))

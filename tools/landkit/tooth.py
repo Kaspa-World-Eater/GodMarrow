@@ -20,15 +20,15 @@ R_GUM = ramp("#140809", "#240d10", "#3a1418", "#521d21", "#6b2a2b", "#843a37")
 R_DENT = ramp("#3a3026", "#5a4a38", "#7a654b")
 
 
-def tooth(kind="fang", seed=1, height=None):
+def tooth(kind="fang", seed=1, height=None, R=None, half=1.9):
     rr = np.random.default_rng(seed)
-    F = Field(1.9, res=0.025)
+    F = Field(half, res=0.025)
     X, Y = F.X, F.Y
     d = np.hypot(X, Y)
     ang = np.arctan2(Y, X)
     if kind == "fang":
         h0 = height or rr.uniform(3.0, 4.5)
-        R = rr.uniform(0.75, 1.0)
+        R = R or rr.uniform(0.75, 1.0)
         lean = (rr.uniform(-1, 1) * 0.35, rr.uniform(-1, 1) * 0.35)
         # a cone with a bulging flank, its tip snapped or worn
         prof = np.clip(1 - d / R, 0, 1)
