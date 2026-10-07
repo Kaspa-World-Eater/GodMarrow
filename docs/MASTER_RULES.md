@@ -15,7 +15,7 @@ and again whenever the reminder fires, the work in progress is checked against e
 | `docs/wiki/01-rules-and-decisions.md` | The game's laws (words, light, lore, no animals) |
 | `docs/wiki/06-art-direction.md` | The standard, the hero family, lighting and cinematography, the world's surface |
 | `docs/wiki/07-art-pipelines.md` | How art is made here, and the rejected approaches never to repeat |
-| **`tools/art_study/chapters/`** (index: `chapters/README.md`) | The art library (Derek, 2026-10-07): one chapter per study of the real world (detail and nuance; ruins, ash, rock and scree; teeth, sinew and muscle; more to come), each with procedural recipes. Read every chapter that touches the piece before starting it, and check it against them |
+| **`tools/art_study/chapters/`** (index: `chapters/README.md`) and **`tools/art_study/reports/`** (one report per piece: what worked, what failed, why) | The art library (Derek, 2026-10-07): one chapter per study of the real world (detail and nuance; ruins, ash, rock and scree; teeth, sinew and muscle; more to come), each with procedural recipes. Read every chapter that touches the piece before starting it, and check it against them |
 | `tools/art_study/STUDY.md` | Every study round and its lessons: weight, silhouettes, plate not tubes, anatomy, depth, the desert, trees, tiles, the old growth |
 | `tools/art_study/STUDY.md` (effects library sections) | The effects method and Derek's list of effects |
 | `tools/art_study/LIVING_LANDSCAPES.md` | How a landscape grows from a seed: causes first, maps from them, the floor last |
@@ -70,6 +70,27 @@ everything you made which means that they always need to be perfect. All this wi
    transitions between surfaces read from the same maps, painted to the standard, never a fixed tile with variants
    and never painted straight into a picture. The old fixed tiles (`tools/art_study/tiles_*.py`) are retired for
    new scenes.
+
+## 2c. Study first, then report what was learned (Derek, 2026-10-07)
+
+"Study famous ruins and ashen grounds and the forms of different types of rocks and scree"; "study teeth and sinew
+and muscle"; "make chapters in the art repository"; "write an extensive report on what you learn from your studies
+for this particular piece and any piece going forward, and techniques. You applied things that failed and things
+that worked."
+
+1. **Study the real thing first.** Before a piece is built, the real things in it are studied from real sources
+   (photographs, geology, anatomy, archaeology, craft) and written as a chapter in `tools/art_study/chapters/`, or
+   an existing chapter is read. A piece is built from the chapters' recipes: form from causes, colour from the same
+   causes, texture last.
+2. **An extensive report for every piece.** Each piece (scene or object) has its own report in
+   `tools/art_study/reports/<piece>.md`, kept as the work goes and finished when Derek passes it. It holds:
+   - what the studies taught that mattered for this piece, chapter by chapter;
+   - **every technique tried**, with **what worked** and **what failed**, why it failed (the cause, not only the
+     symptom), and how it was fixed, with Derek's words and grades;
+   - the bugs and traps (in code and in method) so they are never repeated;
+   - what carries to every later piece: the lessons, and the reusable landkit parts.
+   The report is not the pass log: the log records each pass, the report draws the lessons out of it.
+3. **Read the reports before a new piece**, with the chapters, so failed techniques are not tried again.
 
 ## 3. The painting rules (from `docs/PAINTED_STANDARD.md`)
 
