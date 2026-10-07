@@ -250,8 +250,8 @@ def stamp(W, w):
         box = np.maximum(np.abs(lx) - hx, np.abs(ly) - hy)
         if not (box < 0.05).any():
             continue
-        rnd = 0.04 if big else 0.06
-        prof = np.clip(-box / rnd, 0, 1) ** 0.5
+        rnd = 0.012 if big else 0.04                                         # dressed blocks keep a crisp arris
+        prof = np.clip(-box / rnd, 0, 1) ** (0.3 if big else 0.5)
         g = gat(p) - hz * rr.uniform(0.25, 0.6)                                # sunk in the ash
         top = g + hz * 2 * prof + (vn(X * 8 + j, Y * 8) - 0.5) * (0.02 if big else 0.05)
         m = (box < 0) & (top > H)
@@ -987,6 +987,10 @@ def paint_rubble(img, m, v, n, px, py, pz, o, W, L):
     lt = L["moon"] * (0.35 + np.clip(n[..., 2], 0, 1) * 0.3) + L["lamp"] * 0.7      # the cavern's own light, nothing else
     sv = np.clip(0.06 + lt * 0.8 + hh - 0.04 + (v - 0.5) * 0.12, 0, 0.99)
     img[m] = R[np.clip((sv * len(R)).astype(int), 0, len(R) - 1)][m]
+    sd_ = m & L["side"]
+    img[sd_] = img[sd_] * 0.62                                            # the faces darker than the tops: they read as blocks
+    lip = m & ~L["side"] & (n[..., 2] < 0.97) & (n[..., 2] > 0.6)
+    img[lip] = np.minimum(img[lip] * 1.35 + 0.02, 1)                       # the lit arris
     top = m & (n[..., 2] > 0.85) & (vn(px * 7, py * 7) > 0.45)
     img[top] = img[top] * 0.45 + np.array([0.36, 0.35, 0.34]) * 0.55 * np.clip(v[top] + 0.35, 0, 1)[:, None]   # ash on the tops
     lich = m & (vn(px * 13 + 3, py * 13 + pz * 13) > 0.83)

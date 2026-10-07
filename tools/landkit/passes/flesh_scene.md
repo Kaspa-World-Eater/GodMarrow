@@ -300,3 +300,6 @@ Worst first: the pool, the floating vein, the light.
    RULES CHECK (reminder, 84): rules and lore re-read. Worst for blending: the rubble, capital, wall stump and cave rock lit as under open sky (pale grey, pasted); the fangs' gum skirts bright flat red.
 85. The rubble and cave rock lit only by the cavern's light (the moon's shaft, the lamps); the fangs' gum the floor's own dark flesh, the collar dimmer.
    Graded (85): the rubble and rock sit in the dark now, the fangs' gums the floor's flesh; the flesh at the gate posts' feet still bright paint-red in the fires' light: darkened to the floor's.
+   RULES CHECK (reminder, 86): rules and lore re-read. Worst: the rubble reads as lumps.
+87. Dressed blocks keep a crisp arris; their faces darker than their tops, a lit lip where they meet: blocks, not lumps.
+   Graded (87): the wall stump shows its courses, the heap reads as stone blocks with faces; it lies in a dark corner (fitting).
