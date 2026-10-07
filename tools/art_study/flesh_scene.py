@@ -34,6 +34,7 @@ import ground as groundgen                   # noqa: E402
 import eye as eyegen                         # noqa: E402
 import fang as fanggen                       # noqa: E402
 import vessel                                # noqa: E402
+import bone as bonegen                       # noqa: E402
 from wood_ecosystem import vn, fbm           # noqa: E402
 
 C = np.array([20.0, 19.0])
@@ -397,52 +398,15 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     wave = np.sin(T * 2 * np.pi - (px * 0.6 + py * 0.4)) * 0.5 + 0.5
     br = on_flesh & (W["tag"][0, 0] == W["tag"][0, 0]) & (ws.look(W, W["tag"], px, py) == 0)
     img[br] = img[br] * (0.88 + 0.18 * wave[br])[:, None]
-    # the gate's arch: a bone spanning the pylons' tops, sagging, cracked; a skull set at its keystone
+    # the gate's arch (landkit bone.py): a great rib of the god laid from fang to fang over the doors, its heads bound
+    # to the teeth with old sinew; a skull hung at its keystone, looking out over the courtyard
     gb = W["gbase"]
-    cu0, cu1 = -2.4, 2.4                                                  # from fang to fang
-    for i in range(160):
-        s = i / 159
-        uu = cu0 + (cu1 - cu0) * s
-        zz = gb + PYLON_H + np.sin(s * np.pi) * 1.1 - 0.15
-        p = GATE + PERP * uu - AX * 0.1
-        r = 0.55 * (1 - 0.25 * np.sin(s * np.pi))
-        sx, sy = ws.to_px((p[0], p[1], zz))
-        rx, ry = r * 18, r * 14
-        for yy in range(int(sy - ry - 1), int(sy + ry + 2)):
-            for xx in range(int(sx - rx - 1), int(sx + rx + 2)):
-                if not (0 <= yy < GH and 0 <= xx < GW):
-                    continue
-                u_, v_ = (xx + 0.5 - sx) / rx, (yy + 0.5 - sy) / ry
-                q2 = u_ * u_ + v_ * v_
-                if q2 > 1:
-                    continue
-                d = p[0] + p[1] + np.sqrt(1 - q2) * r
-                if d < dep[yy, xx] - 0.2 or d <= zb[yy, xx]:
-                    continue
-                zb[yy, xx] = d
-                lm = max(0.0, -u_ * 0.5 - v_ * 0.6 + np.sqrt(1 - q2) * 0.55)
-                val = 0.2 + lm * 0.55 + (vn(s * 50, u_ * 3) - 0.5) * 0.06 - (abs(np.sin(s * 30)) < 0.05) * 0.15
-                img[yy, xx] = R_BONE[int(np.clip(val * len(R_BONE), 0, len(R_BONE) - 1))]
-    # the keystone skull: a dome, two black sockets, the nasal hole, a row of teeth
-    kp = GATE - AX * 0.05
-    sx, sy = ws.to_px((kp[0], kp[1], gb + PYLON_H + 1.1 + 0.2))
-    for yy in range(int(sy - 11), int(sy + 9)):
-        for xx in range(int(sx - 10), int(sx + 11)):
-            if not (0 <= yy < GH and 0 <= xx < GW):
-                continue
-            u_, v_ = (xx + 0.5 - sx) / 10.0, (yy + 0.5 - sy) / 10.0
-            if u_ * u_ + (v_ * 1.1) ** 2 > 1:
-                continue
-            lm = max(0.0, -u_ * 0.5 - v_ * 0.6 + 0.5)
-            col = R_BONE[int(np.clip((0.3 + lm * 0.55) * len(R_BONE), 0, len(R_BONE) - 1))]
-            if np.hypot(abs(u_) - 0.38, v_ - 0.05) < 0.2:
-                col = np.array([0.01, 0.0, 0.0])
-            if np.hypot(u_, v_ - 0.35) < 0.1:
-                col = np.array([0.03, 0.01, 0.01])
-            if v_ > 0.6 and abs(u_) < 0.45:
-                col = R_BONE[6] if (xx % 2) else R_BONE[2]
-            img[yy, xx] = col
-            zb[yy, xx] = 1e9
+    pa = GATE + PERP * -2.35 - AX * 0.15
+    pb = GATE + PERP * 2.35 - AX * 0.15
+    arch = bonegen.rib((pa[0], pa[1], gb + 3.95), (pb[0], pb[1], gb + 3.85), 0.85, 0.42, 0.3, seed=12)
+    kp = GATE - AX * 0.02
+    sk = bonegen.skull((kp[0], kp[1], gb + 4.55), 0.62, (AX[0] + 0.1, AX[1], -0.35), seed=4)
+    bonegen.draw(img, zb, dep, ws.to_px, [arch, sk], lts, ws.SUN)
     # pustules on the flesh: each swells, shines, bursts, heals
     rr = np.random.default_rng(71)
     ys, xs = np.nonzero(W["putrid"][::4, ::4])

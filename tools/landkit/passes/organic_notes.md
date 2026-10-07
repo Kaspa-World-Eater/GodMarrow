@@ -6,7 +6,7 @@ so every later scene can reuse the parts as they are.
 
 ## The eye (landkit `eye.py`): APPROVED
 
-Derek's grade: D- at pass 24 ("needs a ton more work"); after passes 25-39: **"Eye looks great, document it"**
+Derek's grade: D- at pass 24 ("needs a ton more work"); after passes 25-39: **"Eye looks great, document it"**, graded **B+**
 (2026-10-07). From now on it is a canonical asset: any change must keep or raise it, and every eye of the god in the
 game (weeping tree eyes, eyes in walls, the eyes that name monsters) should be built on this one, in this one place.
 

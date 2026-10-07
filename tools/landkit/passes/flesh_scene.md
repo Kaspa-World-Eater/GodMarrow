@@ -159,3 +159,12 @@ Worst first: the pool, the floating vein, the light.
    Derek: "The ground teeth and tiles need more work. Eye looks great, document it"; "yes" (the ground rule);
    "the bone sucks too, I agree". The eye documented in full (organic_notes.md) and marked approved; MASTER_RULES
    2b.6 rewritten: ground is a world-position generator, every piece unique, no fixed tiles.
+   Derek: "and the bone sucks too, I agree"; "good lore catch, feel free"; "the rock sucks too".
+   Order of work now: the bone arch, the teeth, the ground, the stone (pillars, drums, plinths, blocks), then the
+   lore's sandal and black glass.
+50. The arch a great rib (landkit bone.py), ray-marched: a flattened section, knobbed heads gripping the two fangs,
+    a slight warp; weathered as bone really goes (cracks along the grain, the shell flaking, pits, grime low,
+    spongy bone at two breaks, dried sinew binding its heads, old blood seeping); lowered into the frame above the
+    doors. A skull ray-marched at its keystone (cranium, cheekbones, jaw, deep orbits, nasal hole), looking out.
+   Derek grades the eye B+ (recorded in organic_notes.md). Graded (50): the rib read as a dark brown gable: a bug in the tube distance (the along-axis offset dropped) painted it all as end-sinew; fixed.
+   Graded (50 fixed): the rib reads as bone, bound with sinew, the skull at its keystone; but the whole gate small and polite. Derek: "The gate needs to look more brutal and imposing and ancient".
