@@ -132,3 +132,22 @@ build, melee.
    Graded: the silhouette reads (crown, shoulder, sides); sunk too deep (the flare and lip buried: a helmet), the
    scabs too big and orange.
 24. Sunk only a hand, so the flared lip shows; the bloom fewer, smaller, browner.
+
+## Rules check after pass 24 (the 15-minute reminder; every checklist line)
+Re-read MASTER_RULES (incl. 2b everything-in-a-scene, 2b.6 tiles, sap is dark blood, see-through total, true scale).
+Lore detail in the piece: the bell ("If you hear a bell in the Wood ... ours are all grown shut"), the weeping eyes on
+the god's veins, the bare ring where the Wood grew away from what hands laid, the blue caps over the hollow.
+1. Brief: PASS.  2. Scale: PASS.  3. Form: PASS (the bell upright now, its silhouette still weak).
+4. Light: PARTIAL (moonbeam faint; candle out of view).
+5. Values: PARTIAL (the floor calm now; the bell does not separate from the flags; the jambs' faces flat).
+6. Ramps: PASS (iron re-ramped near black-brown).  7. Paint: PARTIAL (walls lean on noise over stroke).
+8. Contact: PASS (stains, drifts, moss at feet, the hero on his step).
+9. Detail where it counts: PARTIAL (the bell's rings; the jambs).
+10. Life: NOT CHECKED in motion (animate() not run since pass 1).
+11. Seen as the player sees it: PARTIAL (the church floor tile not yet seen in the game).
+12. Skeptic round vs the judge scene: weaker light drama; stronger story (bell, eyes, door).
+2b: the boulder is a reused asset (must go: the fallen capital); the ruin, bell and capital not yet exported as game
+objects (sprites, collision, combat data).
+Worst failure: the bell's readability (it is the scene's focal relic). Then the boulder, the jambs, the light, motion,
+export.
+Section 8 in view: metal and armour, the environment agenda, repainting the effects, the effects still to build, melee.
