@@ -1,6 +1,6 @@
 # Art study log
 
-Subchapters: [Living landscapes from seeds](LIVING_LANDSCAPES.md): building the land from its ecosystem, and scaling it to seeded worlds.
+Subchapters: [Living landscapes from seeds](LIVING_LANDSCAPES.md): building the land from its ecosystem, and scaling it to seeded worlds. [Ecosystems and art](ecosystems/README.md): one chapter per ecosystem, with its species, rules and transitions.
 
 Derek (2026-10-06): study drawing, painting and animating; study great games (Blasphemous, Dark Souls, Elden Ring,
 Demon's Crest, Path of Exile); study how I draw now, pixel by frame; practise; apply; repeat. The bar is the Seer's
