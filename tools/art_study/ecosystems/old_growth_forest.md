@@ -162,3 +162,17 @@ map, height, moon shadow and collision posts. "Scene" means it exists only insid
 | Ground mist | scene |
 | Wisp-fire (rare) | scene |
 | Light rays by the hour (dawn, dusk, a low moon; in gaps; in mist and spores) | rule written, to build |
+
+**Light, refined (Derek: "the light rays and shadows from the canopy are too much … a cinematic beam of light, more
+defined … some mist may pass through or spores").** The canopy's sliding leaf-shadows are now only a hint. The light
+is told instead by a few defined moonbeams through the gap, at the moon's true angle:
+- a bright core and a clean edge, dithered one band wide;
+- hidden by whatever stands in front;
+- a pool of moonlight where each lands;
+- the mist lit as it crosses a beam, and spores shining while inside one.
+
+Cinematography: one or two strong statements of light, not light everywhere.
+
+**Grass that teleported:** every living layer drew from one shared random sequence. The swaying trees changed which
+pixels earlier layers rejected, which reshuffled everything after them. Each layer now has its own fixed sequence, and
+the fallen leaves draw all their randomness up front.

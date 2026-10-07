@@ -276,7 +276,7 @@ def shade(W, px, py, pz, SX, SY, t=0.0):
         s = k * 0.08
         sh |= look(W, H, sx0 + SUN[0] * s, sy0 + SUN[1] * s, -50.0) > sz0 + SUN[2] * s + 0.03
     moon = ndl * np.where(sh, 0.12, 1.0) * np.clip(moonlit, 0, 1)
-    moon = moon * np.where((leafsh > 0.56) & (canopy > 0.45), 0.45, 1.0)   # moving leaf shadows where the moon comes down
+    moon = moon * np.where((leafsh > 0.62) & (canopy > 0.45), 0.82, 1.0)   # a hint of moving leaf shadow
     # the lantern
     lamp = np.array([HERO[0] + 0.25, HERO[1] - 0.25, look(W, H, np.array(HERO[0]), np.array(HERO[1])) + 0.7])
     lx0, ly0, lz0 = px + n[..., 0] * 0.12, py + n[..., 1] * 0.12, pz + n[..., 2] * 0.12
@@ -531,15 +531,19 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     from litter_stamps import LEAVES
     litt_px = look(W, W["litt"], px, py)
     tgm0 = look(W, W["tag"], px, py)
-    for _ in range(int(GW * GH / 9)):
-        sx, sy = rr.integers(2, GW - 8), rr.integers(2, GH - 6)
+    rf_ = np.random.default_rng(101)                                      # its own sequence, the same every frame
+    NC = int(GW * GH / 9)
+    c_sx, c_sy = rf_.integers(2, GW - 8, NC), rf_.integers(2, GH - 6, NC)
+    c_r, c_st, c_fam = rf_.random(NC), rf_.integers(0, len(LEAVES) - 1, NC), rf_.random(NC)
+    for q in range(NC):
+        sx, sy = int(c_sx[q]), int(c_sy[q])
         if tgm0[sy, sx] != 0:
             continue
         dl = litt_px[sy, sx]
-        if rr.random() > np.clip((dl - 0.7) * 1.6, 0.03, 0.85):
+        if c_r[q] > np.clip((dl - 0.7) * 1.6, 0.03, 0.85):
             continue
-        st = LEAVES[rr.integers(0, len(LEAVES) - 1)]
-        fam = 0 if rr.random() < 0.55 else 1
+        st = LEAVES[int(c_st[q])]
+        fam = 0 if c_fam[q] < 0.55 else 1
         k = 0.3 + L["moon"][sy, sx] * 0.9 + L["lamp"][sy, sx] * 1.6
         rp = tw.LITTER[fam]
         for j, row in enumerate(st):
@@ -552,6 +556,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
                     continue
                 off = {"H": 2, "L": 1, "B": 0, "D": -1, "P": 3, "V": 1}[ch]
                 img[yy_, xx_] = rp[int(np.clip(3 + off, 0, 7))] * k
+    rr = np.random.default_rng(202)                                       # the ferns' own sequence
     # ferns: in the damp, in clumps of fronds arching out
     fernpts = []
     for _ in range(4000):
@@ -606,6 +611,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
                     img[yy_, xx_] = spr[j, i, :3] * k
                     LDEP[yy_, xx_] = max(LDEP[yy_, xx_], depth)
     tgm = look(W, W["tag"], px, py) != 0                                # never drawn over a trunk, a log, the plate
+    rr = np.random.default_rng(303)                                       # the grass's own sequence
     # grass and saplings in the gap: crowding its brightest heart, thinning to its edge, in tufts
     gx, gy, gr = w.gap
     clumps = [grass_clump(s) for s in range(6)]
@@ -623,6 +629,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
         wave = np.sin(2 * np.pi * T * 2 - (x - y) * 0.9) * gust(T)      # a wave rolling across with the wind
         fr_ = 0 if wave < -0.3 else (2 if wave > 0.3 else 1)
         paste_d(clumps[rr.integers(0, 6)][fr_], sx, sy, min(k, 1.3), x + y)
+    rr = np.random.default_rng(404)                                       # the saplings' own sequence
     for (x, y) in w.sapl:
         if abs(x - FOCUS[0]) > 9 or abs(y - FOCUS[1]) > 9 or look(W, W["tag"], np.array(x), np.array(y)) != 0:
             continue
@@ -673,6 +680,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
                             i_, j_ = int(cys + dy), int(cxs + dx)
                             if 0 <= i_ < GH and 0 <= j_ < GW:
                                 img[i_, j_] *= 0.6
+    rr = np.random.default_rng(505)                                       # the fungi's own sequence
     # fungi in clusters: on the old logs, round the stump and the snag's foot (the only decomposers there are)
     spots = list(w.shrooms)
     for k_o, o_ in W["obj"].items():
@@ -797,6 +805,48 @@ def living(img, w, W, px, py, pz, L, t=0.0):
             mx, my = cx_ - tq * 14 + np.sin(tq * 8 + q) * 2, cy_ - 3 - tq * 6
             if 0 <= int(my) < GH and 0 <= int(mx) < GW and tq < 0.8:
                 img[int(my), int(mx)] = img[int(my), int(mx)] * 0.4 + np.array([0.5, 0.95, 0.85]) * 0.6 * wis * (1 - tq)
+    # ---- moonbeams: cinematic shafts slanting down through the canopy gap at the moon's angle, a bright core and a
+    # defined edge; hidden by whatever stands in front of them; mist and spores lit as they pass through
+    gx_, gy_, gr_ = w.gap
+    yy0, xx0 = np.mgrid[0:GH, 0:GW].astype(float)
+    beam_k = np.zeros((GH, GW))
+    for (bx, by, wdt, strength) in [(gx_ - 2.4, gy_ - 1.2, 0.95, 1.0), (gx_ - 0.2, gy_ + 0.6, 0.5, 0.7)]:
+        g0 = np.array([bx, by, gh(bx, by)])
+        top = g0 + SUN * 22.0                                            # back up the light toward the moon
+        a = np.array(to_px(g0))
+        b = np.array(to_px(top))
+        ab = b - a
+        L2 = (ab ** 2).sum()
+        tpar = np.clip(((xx0 - a[0]) * ab[0] + (yy0 - a[1]) * ab[1]) / L2, 0, 1)
+        dx, dy = xx0 - (a[0] + ab[0] * tpar), yy0 - (a[1] + ab[1] * tpar)
+        perp = np.hypot(dx, dy)
+        half = wdt * KX * (1.0 + 0.25 * (1 - tpar))                         # a little wider where it lands
+        breathe = 0.85 + 0.15 * np.sin(2 * np.pi * T + bx)
+        core = perp < half * 0.45
+        body = perp < half
+        edge = (perp < half * 1.25) & (bay_l > 0.5)                        # a dithered soft lip, one band wide
+        k = np.where(core, 1.0, np.where(body, 0.62, np.where(edge, 0.3, 0.0))) * strength * breathe
+        k *= np.clip(tpar * 6, 0, 1) * np.clip((1 - tpar) * 3, 0, 1) + (tpar < 0.03) * 0.0
+        beam_depth = (bx + by) - tpar * 22.0 * (SUN[0] + SUN[1])             # how far along the beam each pixel lies
+        k = np.where(dep > beam_depth + 0.6, 0.0, k)                        # anything nearer than the beam is not lit by it
+        beam_k = np.maximum(beam_k, k)
+        # where it lands: a pool of moonlight on the floor, stepped
+        pd_ = np.hypot((xx0 - a[0]) / (half * 1.4 + 1e-3), (yy0 - a[1]) / (half * 0.7 + 1e-3))
+        pool_b = np.where(pd_ < 0.6, 0.42, np.where(pd_ < 0.9, 0.24, np.where(pd_ < 1.1, 0.1, 0.0))) * strength * breathe
+        img = img + np.array([0.55, 0.62, 0.75]) * pool_b[..., None] * np.clip(1 - np.abs(dep - (bx + by)) / 1.5, 0, 1)[..., None]
+    img = img * (1 - beam_k[..., None] * 0.36) + np.array([0.66, 0.74, 0.88]) * beam_k[..., None] * 0.36
+    # the mist where it crosses a beam: lit
+    lit_mist = (a_ > 0) & (beam_k > 0.2)
+    img[lit_mist] = np.minimum(img[lit_mist] + np.array([0.12, 0.14, 0.17]) * beam_k[lit_mist][:, None], 1)
+    # spores drifting through the beams, each a point of light while it is inside one
+    rs = np.random.default_rng(606)
+    for q in range(70):
+        u = (T * rs.integers(1, 3) + rs.uniform(0, 1)) % 1.0
+        sx0, sy0 = rs.uniform(0, GW), rs.uniform(0, GH)
+        mx, my = (sx0 + u * 18 + np.sin(u * 6.28 + q) * 3) % GW, (sy0 - u * 10) % GH
+        i_, j_ = int(my), int(mx)
+        if beam_k[i_, j_] > 0.3:
+            img[i_, j_] = np.minimum(img[i_, j_] * 0.4 + np.array([0.85, 0.9, 1.0]) * 0.7 * beam_k[i_, j_], 1)
     # spores turning slowly in the lantern's light, each catching it a moment and gone
     lamp = (HERO[0] + 0.25, HERO[1] - 0.25)
     for q in range(16):
