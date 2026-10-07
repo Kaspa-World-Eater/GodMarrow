@@ -33,6 +33,10 @@ BLOOD_OLD = np.array([0.12, 0.06, 0.04])
 BAYER = np.array([[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]]) / 16.0 - 0.47
 
 
+def h1_(seed):
+    return np.random.default_rng(seed + 991).random()
+
+
 def make(centre, base, height, R, seed, ax, perp):
     rr = np.random.default_rng(seed)
     return dict(c=np.array(centre, float), base=float(base), h=float(height), R=float(R), seed=int(seed),
@@ -63,7 +67,8 @@ def _frame(u, w, z, f):
 
 def _radius(t, th, f):
     r = f["R"] * np.clip(1 - t ** 1.7, 0, 1) ** 0.95 * (1 + 0.08 * np.exp(-((t - 0.12) / 0.12) ** 2))
-    r = r * (1 + 0.035 * np.cos(5 * th + f["twist"]))                   # the long ridges
+    a_ = np.abs(th)
+    r = r * (1 + 0.07 * np.exp(-(th / 0.32) ** 2) - 0.035 * np.exp(-((a_ - 0.62) / 0.16) ** 2))   # the labial ridge, its grooves
     r = r * (1 + 0.07 * np.exp(-((((th - np.pi) + np.pi) % (2 * np.pi) - np.pi) / 0.22) ** 2) * (1 - t))   # the keel
     return r
 
@@ -83,6 +88,9 @@ def sdf(p, f):
         d = np.maximum(d, -scoop)
     else:
         d = np.maximum(d, z - f["h"])
+        nf = np.array([-0.45, 0.12, 0.88])
+        nf = nf / np.linalg.norm(nf)
+        d = np.maximum(d, (du * nf[0] + dw * nf[1] + (z - f["h"] * 0.9) * nf[2]))   # the worn facet
     chip = np.sqrt(((th - np.pi + np.pi) % (2 * np.pi) - np.pi) ** 2 * 4 + ((z % 1.3) - 0.65) ** 2 * 6) - 0.25
     d = np.maximum(d, -(chip * f["R"] * 0.4 + 0.02 * (vn(z * 3 + f["seed"], 1) < 0.6)))
     return np.maximum(d, -z - 0.5)
@@ -160,22 +168,43 @@ def draw(img, zb, dep_scene, to_px, f, lights, moon, ambient=0.16, tol=0.7):
         warm += (np.clip((N * ul).sum(-1), 0, 1) * att)[..., None] * np.array(lc) * 0.9
         hv = (ul + VIEW) / np.linalg.norm(ul + VIEW, axis=-1, keepdims=True)
         spec += np.clip((N * hv).sum(-1), 0, 1) ** 30 * att * 0.22
+    wl = warm.mean(-1)
+    val = val + np.clip(wl, 0, 0.5) * 0.55                               # light adds; then it tints
     bounce = refl * 0.35 + np.exp(-z / 0.6) * 0.06                       # the flesh's red light from below, in the shade
     ao = 1 - np.exp(-np.maximum(z, 0) / 0.45) * 0.45
     val = val * ao
     # the enamel: snapped to its ramp, the ordered dither only where tones meet
     bay = BAYER[ys % 4, xs % 4]
-    peri = np.sin(z * 30 + vn(th * 2, z) * 2) * 0.014 * lit              # growth lines ringing it, faint, in the light
-    grooves = np.cos(5 * th + f["twist"])
-    v2 = val + peri - (grooves < -0.55) * 0.05
+    cej = 0.35 + 0.3 * np.abs(np.sin(th))                                # the neck line: up on the sides, down front and back
+    lum = np.clip(ndl + wl, 0, 1)
+    rake = np.clip(4 * lum * (1 - lum), 0, 1)                             # raking light: where the light just grazes
+    peri = np.sin((z - cej) * 24 + vn(th * 2, z) * 1.5) * 0.05 * rake * np.clip(1 - tt * 1.3, 0, 1)
+    grooves = -np.exp(-((np.abs(th) - 0.62) / 0.16) ** 2) * 2               # the grooves by the ridge
+    v2 = val + peri - (grooves < -0.55) * 0.04
     q = v2 * len(R_ENAMEL)
     near_edge = np.abs(q - np.round(q)) < 0.035                            # dither only right at a tone's border
     idx = np.clip(np.where(near_edge, q + bay * 0.7, q), 0, len(R_ENAMEL) - 1).astype(int)
     col = R_ENAMEL[idx]
-    age = np.clip(1 - tt * 1.6, 0, 1)                                     # yellowing toward the root
-    col = col * (1 - age[..., None] * np.array([0.0, 0.06, 0.2]))
-    thin = np.clip((tt - 0.62) / 0.3, 0, 1)                               # the glassy tip: light comes through it
-    col = col * (1 - thin[..., None] * 0.25) + np.array([0.5, 0.46, 0.38]) * (thin * (0.15 + sk * 0.85))[..., None] * 0.3
+    g_ = np.clip((tt - 0.12) / 0.7, 0, 1)
+    g_ = g_ * g_ * (3 - 2 * g_)
+    tint = np.array([1.05, 0.95, 0.76]) * (1 - g_[..., None]) + np.array([0.86, 0.93, 1.06]) * g_[..., None]
+    col = col * tint                                                      # dentin through thin enamel at the neck; glassy enamel at the tip
+    thin = np.clip((tt - 0.6) / 0.32, 0, 1)
+    back = np.zeros(SX.shape)                                             # light from behind passing through the thin tip
+    for (lp, lc, reach) in lights:
+        v_ = np.array(lp) - P
+        dist = np.linalg.norm(v_, axis=-1)
+        back += np.clip(-(N * (v_ / dist[..., None])).sum(-1), 0, 1) / (1 + (dist / reach) ** 2)
+    back += np.clip(-(N * moon).sum(-1), 0, 1) * sk
+    col = col + np.array([0.42, 0.48, 0.55])[None, None, :] * (thin * np.clip(back, 0, 1) * 0.45)[..., None]
+    scratch = (np.abs(np.sin(th * 70 + vn(z * 0.4, th * 3) * 3)) > 0.975) & (tt < 0.6) & (vn(th * 9, z * 0.3) > 0.5)
+    col = np.where(scratch[..., None], col * 1.08 + 0.01, col)              # scored as it pushed up through the ground
+    if f['snap'] >= 1:                                                    # the worn facet: polished, a brown dentin cup in it
+        nf = np.array([-0.45, 0.12, 0.88]) / np.linalg.norm([-0.45, 0.12, 0.88])
+        fac = (np.abs(du * nf[0] + dw * nf[1] + (z - f['h'] * 0.9) * nf[2]) < 0.012) & (tt > 0.75)
+        cup = fac & (np.hypot(du + 0.0, dw) < _radius(tt, th, f) * 0.45)
+        col = np.where(fac[..., None], col * 1.12 + 0.02, col)
+        col = np.where(cup[..., None], np.array([0.42, 0.3, 0.16]) * (0.4 + val[..., None] * 0.9), col)
     craze = (np.abs(vn(th * 4 + seed, z * 0.35) - 0.5) < 0.007) & (tt < 0.8) & (vn(th * 2, z * 0.2 + 5) > 0.45)   # few, long
     if f['split']:
         sa = (((th - f['split_a'] - np.sin(z * 1.3) * 0.15) + np.pi) % (2 * np.pi)) - np.pi
@@ -185,11 +214,16 @@ def draw(img, zb, dep_scene, to_px, f, lights, moon, ambient=0.16, tol=0.7):
     stain = ((grooves < -0.7) | keel) & (vn(th * 2 + seed, z * 0.8) > 0.35) & (tt < 0.55)
     col = np.where(stain[..., None], col * np.array([0.82, 0.7, 0.52]), col)
     tart = (z < 0.2 + vn(th * 4 + seed, 1) * 0.3) & (vn(th * 9 + seed, z * 4) > 0.4)   # patchy, not a band
-    col = np.where(tart[..., None], TARTAR * (0.6 + val[..., None] * 0.6) * (0.85 + (vn(th * 30, z * 30)[..., None] - 0.5) * 0.4), col)
+    col = np.where(tart[..., None], np.array([0.62, 0.58, 0.44]) * (0.35 + val[..., None] * 0.9) * (0.85 + (vn(th * 30, z * 30)[..., None] - 0.5) * 0.4), col)
     # the snapped tip: the break, rough, the dentin showing, darker in its pits
     brk = (f["snap"] < 1) & (z > f["h"] * f["snap"] - f["R"] * 0.8) & ((N[..., 2] > 0.45) | (sdf(P - N * 0.05, f) > -0.01))
-    di = np.clip((val * 0.9 + (vn(du * 20, dw * 20) - 0.5) * 0.3) * len(R_DENTIN), 0, len(R_DENTIN) - 1).astype(int)
-    col = np.where(brk[..., None], R_DENTIN[di], col)
+    rr_ = np.hypot(du, dw / 0.84) / np.maximum(_radius(tt, th, f), 1e-3)
+    ring = 0.88 + 0.12 * np.sin(rr_ * 30 + vn(th * 2, rr_ * 3) * 2)
+    di = np.clip((val * 0.9 * ring + (vn(du * 20, dw * 20) - 0.5) * 0.12) * len(R_DENTIN), 0, len(R_DENTIN) - 1).astype(int)
+    dent = R_DENTIN[di] * 0.65 + np.array([0.5, 0.33, 0.4]) * 0.35 * (0.4 + val[..., None])   # the god's blood soaked in
+    dent = np.where((rr_ > 0.86)[..., None], np.array([0.62, 0.66, 0.7]) * (0.35 + val[..., None] * 0.9), dent)   # the enamel rim
+    dent = np.where((rr_ < 0.2)[..., None], np.array([0.05, 0.02, 0.025]), dent)                                  # the pulp canal
+    col = np.where(brk[..., None], dent, col)
     # the blood: smeared on the lower third, running down in threads that end in beads
     smear = (z < f["h"] * (0.08 + vn(th * 2.5 + seed, 2) * 0.16)) & (vn(th * 5 + seed, z * 2) > 0.55) & ~tart
     blood = smear.copy()
@@ -207,18 +241,21 @@ def draw(img, zb, dep_scene, to_px, f, lights, moon, ambient=0.16, tol=0.7):
     bl = np.where(old[..., None], BLOOD_OLD, BLOOD_FRESH) * (0.6 + val[..., None] * 0.6)
     col = np.where(blood[..., None], bl, col)
     wx, wy = P[..., 0], P[..., 1]
-    climb_h = 0.2 + vn(wx * 1.3 + seed, wy * 1.3) * 0.7 + np.clip(vn(wx * 2.1 + 40, wy * 2.1) - 0.62, 0, 1) * 3.0
-    fray = (vn(wx * 7 + seed, z * 5 + wy * 7) - 0.5) * 0.45
+    climb_h = 0.25 + 0.3 * np.abs(np.sin(th)) + vn(wx * 1.3 + seed, wy * 1.3) * 0.45 + np.clip(vn(wx * 2.1 + 40, wy * 2.1) - 0.66, 0, 1) * 2.0   # the gum's scallop
+    fray = (vn(wx * 7 + seed, z * 5 + wy * 7) - 0.5) * 0.08
     climb = z < climb_h + fray
     lump = vn(th * 14 + seed, z * 9)
     fl = np.array([0.24, 0.07, 0.09]) * (0.5 + val[..., None] * 0.8) * (0.8 + lump[..., None] * 0.4)
     fl = np.where((vn(wx * 4, wy * 4 + z) > 0.62)[..., None], fl * np.array([0.8, 0.9, 1.25]), fl)   # bruised in patches
     col = np.where(climb[..., None], fl, col)
-    lipf = ~climb & (z < climb_h + fray + 0.05)
-    col = np.where(lipf[..., None], col * 0.45, col)                       # its shadow on the enamel just above
+    edge_ = climb & (z > climb_h + fray - 0.07)
+    col = np.where(edge_[..., None], np.array([0.6, 0.18, 0.26]) * (0.45 + val[..., None] * 0.9), col)   # the collar, swollen, inflamed
+    recede = h1_(seed) > 0.5
+    lipf = ~climb & (z < climb_h + fray + (0.13 if recede else 0.04))
+    col = np.where(lipf[..., None], np.array([0.09, 0.1, 0.07]) * (0.6 + val[..., None]) if recede else col * 0.5, col)   # the black band where it drew back
     blood = blood & ~climb
-    gloss = np.where(blood, 1.6, np.where(brk | tart, 0.15, np.where(climb, 0.8, 1.0)))
-    col = col * (1 + bounce[..., None] * np.array([1.4, 0.3, 0.3])) + warm * col * np.where(blood, 0.5, 1.4)[..., None]
+    gloss = np.where(blood, 1.6, np.where(brk | tart, 0.15, np.where(edge_, 1.8, np.where(climb, 0.8, 1.0))))
+    col = col * (1 + bounce[..., None] * np.array([1.4, 0.3, 0.3])) * (1 + (warm - wl[..., None]) * 0.7)
     col = col + (spec * gloss)[..., None] * np.array([0.9, 0.92, 1.0])
     rim = (np.clip(1 - (N * VIEW).sum(-1), 0, 1) ** 3) * (N[..., 0] < 0) * sk   # a lit rim on the moon's side, against the dark
     col = col + rim[..., None] * np.array([0.12, 0.13, 0.16])

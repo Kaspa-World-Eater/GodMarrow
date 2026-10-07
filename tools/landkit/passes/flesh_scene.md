@@ -250,3 +250,15 @@ Worst first: the pool, the floating vein, the light.
 69. Banked offering-fires at the posts' feet: coals glowing through a crust of ash, a thread of smoke leaning in the draught, their low warm light thrown up the posts onto the kneelers; the rib rounder (no plank), bowed more.
    Bug (69): in gate.py the lights only multiplied the stone's colour, so black basalt stayed black however lit. Fixed: light adds to the value before the ramp, then tints.
    Graded (69): the posts read as carved black stone in the fires' low light, the kneelers' file shows across the band; the grille reads as forged iron (bars, rails, rust). The sagging leaf's rust a little too orange; the kneelers could be crisper.
+   Derek: "Continue". The teeth next ("still look lacking"), from chapter 3.
+70. The fangs from chapter 3: a rounded labial ridge with a groove each side and the keel behind (no even ridges);
+    the tooth's gradient, saturated dentin-yellow at the gum to cool translucent blue-grey at the tip, the tip glowing
+    when lit from behind; perikymata following the scalloped neck line, only in raking light; abrasion scratches up
+    the face; the whole fangs worn to a polished facet with a brown dentin cup; the broken ones showing a glassy
+    enamel rim, ringed dentin stained pink-violet by the god's blood, the dark pulp canal; tartar chalky cream ledges;
+    the gum an inflamed glossy knife-edge collar, a black band where it drew back; light adds, then tints.
+   Graded (70): the gradient and form there, but the fangs blazing orange-yellow, as if on fire: the added light (pustules, fires) too strong, the warm tint and the dentin colour stacked on it.
+71. The added light halved and capped, the warm tint softer, the dentin less saturated.
+   Graded (71): the gradient reads (warm dentin at the base to cool blue-grey up the fang), round, the front ridge lit; but the gum collar a jagged magenta sawtooth.
+72. The gum's edge a smooth scallop following the neck line (up on the sides, down front and back), barely frayed; the collar a thin glossy band.
+   Graded (72): the gum reads: a smooth scalloped collar, a thin glossy inflamed line dipping front and back, the dark band where it drew back; the fangs warm dentin at the gum to cool enamel up the shaft. Still to judge in better light: the perikymata, the facet's cup, the break's rings (most fangs stand in the dark).
