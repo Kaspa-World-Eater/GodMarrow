@@ -98,3 +98,6 @@ Worst: the huts' walls (Derek: "the huts need a lot of work"). Derek asked for x
 16. Hut walls weathered: slabs leaning (gaps widening upward), a few fallen out to the dark inside, rot creeping up
     from the foot, moss climbing in tongues from the footing, grey lichen on the moonlit slabs.
    Graded: the moonlit hut (right) reads weathered (moss tongues, rot, lichen, a slab gone); the shaded hut (left) still a dark striped plane (its face away from moon and fire).
+17. Shaded walls keep the sky's cold fill and the fire's light off the yard (slabs readable a step darker, not a black
+    plane); a dying diseased giant brought into view at the yard's front left.
+   Graded: the shaded hut readable; the giant at front left shows a jaundiced weeping eye bleeding sap down the pale bark. It now hides most of the left hut, and the eye's yellow ring is loud at this size (next: tone the ring, move the giant a yard out).

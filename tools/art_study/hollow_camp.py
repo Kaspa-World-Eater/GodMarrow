@@ -82,6 +82,8 @@ def shape_plan(w):
     for (al, ac, r_) in [(-3.0, -1, 0.95), (2.5, -1, 0.8), (-6.5, 1, 1.0), (1.2, 1, 0.85), (-11.0, 0, 1.05), (-9.5, -0.45, 0.8), (-10.0, 0.5, 0.9)]:
         p_ = C + AX * al + PERP * (ac * (FLOOR_W + 1.1) if abs(ac) == 1 else ac * FLOOR_W)
         w.trees.append((float(p_[0]), float(p_[1]), "giant", r_, 8.0))
+    # a dying giant at the yard's front left, in view: its weeping eyes and cankers close to the pilgrim
+    w.trees.append((27.141, 19.364, "giant", 0.9, 8.0))
     near = np.clip(1 - np.hypot(w.X - C[0], w.Y - C[1]) / 9.0, 0, 1)
     w.light = w.light * (1 - near) + 0.4 * near
     w.gap = (C[0] - 1.5, C[1] - 2.0, 4.0)
@@ -146,7 +148,9 @@ def paint_hut(img, m, v, n, px, py, pz, o, W, L):
         U = np.where(miss, F.at(F.U, ix, iy, 0.0), U)
     h = pz - o["base"]
     side = L["side"]
-    sv = np.clip(v * 0.95 + 0.04, 0, 0.8)
+    # a wall turned from moon and fire still takes the sky's cold fill and the fire's light thrown off the yard:
+    # it keeps its slabs readable, a step darker, not a black plane
+    sv = np.clip(v * 0.8 + 0.15, 0, 0.8)
     # walls: bark slabs stacked in rows, each slab its own length and grey; the stone footing below
     wall = m & (M == hutgen.WALL)
     row = np.floor(h / 0.28)
