@@ -178,6 +178,10 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ambient=0.15, tol=0.5)
             dist = np.linalg.norm(v_, axis=-1)
             att = 1 / (1 + (dist / reach) ** 2)
             warm += (np.clip((N * (v_ / dist[:, None])).sum(-1), 0, 1) * att)[:, None] * np.array(lc) * 0.8
+            edge_ = np.clip(1 - N @ VIEW, 0, 1) ** 2.5                          # a rim where the light is behind it
+            behind = np.clip(-((v_ / dist[:, None]) @ VIEW), 0, 1)
+            rimw = edge_ * np.clip((N * (v_ / dist[:, None])).sum(-1), 0, 1) * att * (0.4 + behind)
+            warm += rimw[:, None] * np.array(lc) * 1.6
         # cavities darken (orbits, nose, the underside): ambient occlusion from the distance a little way out
         occ = np.clip(sdf(Pv + N * 0.12, o) / 0.12, 0, 1)
         wl = warm.mean(1)

@@ -450,6 +450,7 @@ def stamp(W, w):
                 SICK.append((q + out * (0.08 + pr * 0.55), pr, rr.uniform(0, 6.28)))
     ws.LIGHTS.append((GATE[0] - AX[0] * 0.6, GATE[1] - AX[1] * 0.6, gbase + 1.2, 3.2))   # the glow from within the gate
     ws.LIGHTS.append((GATE[0] - AX[0] * 2.2, GATE[1] - AX[1] * 2.2, gbase + 2.4, 4.5))   # and deeper in: it backlights the grille
+    ws.LIGHTS.append((GATE[0] - AX[0] * 1.6, GATE[1] - AX[1] * 1.6, gbase + 4.6, 2.6))   # its glow filling the doorway's height: it rims the rib
     # the banked offering-fires at the posts' feet (the lore: "Bank it, Tam. Ash over the coals ... we keep the fire
     # low on the Cheek"): their low light thrown up the posts' faces onto the kneelers
     for sg in (-1, 1):
