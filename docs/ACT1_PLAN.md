@@ -127,3 +127,37 @@ draining it). The browser removed nothing; these sharpen it. **You choose; I bui
 1. Which frictions (step 6, 1 to 8)?
 2. Step 3 is the biggest piece (about 3,000 lines of the browser's generator code). Do it third, as listed, or first?
 3. Anything you've seen in play that's broken and not on this page?
+
+## The new art and the seeded maps (2026-10-07, after the Gate in the Flesh)
+
+Derek asked how the seed-generated maps will work with the new assets, and how big Act I is.
+
+**Act I's size** (from `data/zones/`):
+- 25 zones, monster levels 1 to 17;
+- 15 outdoor zones and the Moor town: about 331,000 square yards (one tile is one yard; the Moor alone is
+  164 x 164);
+- 9 dungeons: about 108,000;
+- about 440,000 square yards in all (~0.37 km²).
+
+**Maps today:** each zone was exported from the browser's generators at 20 seeds (1001-1020). A new game's seed
+picks one per zone (`core/game.gd seed_for`). Step 3 above (porting the generators so any seed makes a fresh map)
+is not done.
+
+**How the new assets fit:**
+1. **The ground generators** (`landkit/ground.py`: paving, ash, flesh, the locked craggy floor) paint every spot from
+   its world position, so they cannot be stored as images per zone. A Moor layout alone would be tens of megapixels
+   at 36x18 px a yard, times seeds and zones. The plan is to port them to a Godot ground shader, as the blood already
+   is (`shaders/blood_pool.gdshader`): colour and normal from world position, unique without end, no storage, lit by
+   the game's lights (the form law holds in the game).
+2. **Objects** (the eye, veins, bones, dead plants, rubble, the gore pillars, fangs, columns, the old-growth set) are
+   baked once into sprites with normal maps, shadows and collision, in many seeded variants. The zone generator's
+   placement spots decide where they stand, under `world/landkit.gd`'s spacing and open-path rules (the lore's 2-6
+   pieces of the god per outdoor zone).
+3. **Set pieces** (the Gate in the Flesh: the entrance to the underground, opened after the gatekeeper fight) are
+   hand-built rooms the generator drops into the map, as Diablo II drops fixed pieces into random levels.
+
+**Not built yet:** the ground shader port, the sprite baking for the new objects, the generator port.
+
+**What is in the game so far:** the old-growth wood set (trees at four ages, logs, root plates, stumps, snags,
+stones, ferns, litter, the path). When the generator laid it out, stumps grouped up and too many small trees crowded
+the screen. The fix starts with another unique old-growth scene (Derek, 2026-10-07).
