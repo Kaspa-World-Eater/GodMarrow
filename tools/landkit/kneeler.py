@@ -61,11 +61,11 @@ def paint_kneeler(img, m, v, n, lx, ly, lz, M, info, side):
     z = lz / s
     st = m & (M == STONE)
     # robe folds: long soft grooves down the torso and the lap, the carving softened by weather
-    fold = np.abs(np.sin(ly / s * 9 + vn(ly, z * 0.5) * 2)) < 0.12
-    folds = st & side & fold & (z > 0.8) & (z < 3.4)
+    foldk = 0.9 + 0.1 * np.sin(ly / s * 8 + vn(ly, z * 0.5) * 2)        # soft shaded folds, not cut slits
+    folds = st & side & (z > 0.8) & (z < 3.4)
     sv = v * 0.95 + 0.05 + (vn(lx * 7, ly * 7 + z * 7) - 0.5) * 0.05
     img[st] = R_KSTONE[np.clip((sv[st] * len(R_KSTONE)).astype(int), 0, len(R_KSTONE) - 1)]
-    img[folds] = img[folds] * 0.72
+    img[folds] = img[folds] * foldk[folds][:, None]
     crack = st & (np.abs(np.sin(lx * 3 + z * 5 + vn(ly * 2, z) * 4)) < 0.035) & (vn(lx * 2 + 3, z) > 0.55)
     img[crack] = img[crack] * 0.5
     lit = np.clip(n[..., 0] * -0.62 + n[..., 1] * 0.22, 0, 1)

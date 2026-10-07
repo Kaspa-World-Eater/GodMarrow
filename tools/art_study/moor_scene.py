@@ -132,6 +132,11 @@ def stamp(W, w):
         e = ((X - c[0]) / ra) ** 2 + ((Y - c[1]) / rb) ** 2 + (vn(X * 4, Y * 4) - 0.5) * 0.7
         glass |= e < 1
     W["hide"], W["glass"] = hide & (W["tag"] == 0), glass & (W["tag"] == 0)
+    # the hide swells a little out of the ash (the flesh under it), so the moon models it: a soft dome per patch
+    from scipy import ndimage as nd_
+    dome = nd_.gaussian_filter(W["hide"].astype(float), 6) * 0.28
+    W["H"] = np.where(W["tag"] == 0, W["H"] + dome, W["H"])
+    W["Hrest"] = W["H"]
     d = np.hypot(X - C[0], Y - C[1])
     dirn = ((X - C[0]) * AX[0] + (Y - C[1]) * AX[1]) / np.maximum(d, 1e-3)
     W["gum"] = (np.abs(d - RING_R) < 1.15 + (vn(X * 1.2, Y * 1.2) - 0.5) * 0.4) & (W["tag"] == 0) & (dirn < 0.8)   # the way in: no gum
@@ -180,13 +185,17 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
         wig = np.sin(t * 11 + sd) * 0.35 + np.sin(t * 27 + sd * 2) * 0.1
         dd = (px - qx - perp[0] * wig) * perp[0] + (py - qy - perp[1] * wig) * perp[1]
         dist_c = np.hypot(px - C[0], py - C[1])
-        w_ = 0.16 * (1 - t * 0.5)
-        cord = (np.abs(dd) < w_) & (dist_c > RING_R + 0.6) & (vn(t * 9 + sd, 1) > 0.25)      # it dives under the ash in places
-        top = cord & (dd < -w_ * 0.3)
-        alb = np.where(cord[..., None], np.array([0.2, 0.11, 0.16]), alb)
-        alb = np.where(top[..., None], np.array([0.38, 0.24, 0.3]), alb)
-        sh_ = (np.abs(dd - w_ * 1.3) < w_ * 0.4) & (dist_c > RING_R + 0.6)
-        alb = np.where(sh_[..., None], alb * 0.55, alb)
+        w_ = 0.1 * (1 - t * 0.4)
+        under = vn(t * 9 + sd, 1) < 0.28                                 # it dives under the ash in places
+        for (bo, bw) in ((0.0, 1.0), (0.35, 0.6), (-0.4, 0.5)):           # the vein and two branches off it
+            ddb = dd - bo * np.clip((t - (0.35 + bo * 0.3)) * 2.5, 0, 1) * (1 if bo else 0)
+            wb = w_ * bw
+            cord = (np.abs(ddb) < wb) & (dist_c > RING_R + 0.6) & ~under & ((bo == 0) | (t > 0.3 + abs(bo) * 0.3))
+            alb = np.where(cord[..., None], np.array([0.13, 0.06, 0.11]), alb)            # dark, swollen, purple-black
+            top = cord & (ddb < -wb * 0.2)
+            alb = np.where(top[..., None], np.array([0.24, 0.13, 0.2]), alb)              # its back, lit
+            sh_ = (np.abs(ddb - wb * 1.4) < wb * 0.5) & (dist_c > RING_R + 0.6) & ~under
+            alb = np.where(sh_[..., None], alb * 0.5, alb)                                 # its shadow on the ash
     out = img.copy()
     out[gl] = np.clip(alb * k, 0, 1)[gl]
     # the eye in the ash: lids of hide, a jaundiced white threaded red, a dark wet iris, the pupil, the moon in it
@@ -251,8 +260,16 @@ R_FIELD = ws.ramp("#131218", "#221f27", "#343038", "#48434a", "#5f5958", "#78706
 
 
 def paint_lstone(img, m, v, n, px, py, pz, o, W, L):
+    """the lantern's stone: worn, its faces cut with the tenders' notches, a notch for every time it brought her home"""
     sv = np.clip(v * 0.9 + 0.06 + (vn(px * 20, py * 20 + pz * 20) - 0.5) * 0.06, 0, 0.85)
     img[m] = R_FIELD[np.clip((sv * len(R_FIELD)).astype(int), 0, len(R_FIELD) - 1)][m]
+    side = L["side"]
+    h = pz - o["base"]
+    u = (px - LANTERN[0]) - (py - LANTERN[1])
+    notch = m & side & (np.abs(((u * 11) % 1.0) - 0.5) < 0.12) & (h > 0.15) & (h < 0.7) & (((u * 11) // 1) % 5 != 4)
+    img[notch] = img[notch] * 0.5
+    tally = m & side & (np.abs(((u * 11) % 1.0) - 0.5) < 0.5) & (((u * 11) // 1) % 5 == 4) & (np.abs(h - 0.42) < 0.04)
+    img[tally] = img[tally] * 0.5                                        # every fifth struck through, as tallies are
     return img
 
 
@@ -267,13 +284,35 @@ def living_moor(img, w, W, px, py, pz, L, T):
             img[iy, ix] = img[iy, ix] * (1 - a) + np.array(col) * a
     breath = 0.5 + 0.5 * np.sin(T * 6.28)                              # slower than you
     g = W["obj"][760]["base"] + 0.85
-    for dz in np.arange(0.0, 0.42, 0.04):                               # the lantern: iron frame, glass, the flame
-        for dl in (-0.12, 0.12):
-            put(LANTERN[0] + dl * 0.7, LANTERN[1] - dl * 0.7, g + dz, (0.08, 0.07, 0.07))
-    for dz in np.arange(0.05, 0.36, 0.04):
-        for dl in (-0.06, 0.0, 0.06):
-            put(LANTERN[0] + dl * 0.7, LANTERN[1] - dl * 0.7, g + dz, (1.0, 0.72, 0.34), 0.5 + 0.4 * breath)
-    put(LANTERN[0], LANTERN[1], g + 0.46, (0.12, 0.1, 0.1))
+    sx0, sy0 = ws.to_px((LANTERN[0], LANTERN[1], g))
+    ix0, iy0 = int(round(sx0)), int(round(sy0))
+    # the Sighing Lantern drawn as a pixel artist draws it: a base plate, four iron posts, glass panes lit from within
+    # (breathing), a peaked cap, a ring to carry it by
+    glow = np.array([1.0, 0.72, 0.34]) * (0.6 + 0.4 * breath)
+    for yy in range(0, 9):
+        for xx in range(-3, 4):
+            px_, py_ = ix0 + xx, iy0 - 1 - yy
+            if not (0 <= py_ < GH and 0 <= px_ < GW):
+                continue
+            if yy == 0:
+                img[py_, px_] = (0.09, 0.08, 0.08)                         # the base plate
+            elif abs(xx) == 3 or xx == 0 and yy % 4 == 0:
+                img[py_, px_] = (0.11, 0.09, 0.09) if xx != -3 else (0.2, 0.17, 0.15)   # the posts, lit on the left
+            elif yy < 8:
+                img[py_, px_] = np.minimum(glow * (1.1 if abs(xx) < 2 and 2 < yy < 6 else 0.8), 1)
+    for k_, xx in enumerate(range(-2, 3)):                              # the peaked cap
+        if 0 <= iy0 - 10 - (2 - abs(xx)) < GH:
+            img[iy0 - 10 - (2 - abs(xx)), ix0 + xx] = (0.1, 0.09, 0.09)
+    for (xx, yy) in ((-1, 14), (0, 15), (1, 14), (-1, 13), (1, 13)):     # the ring
+        if 0 <= iy0 - yy < GH:
+            img[iy0 - yy, ix0 + xx] = (0.13, 0.11, 0.1)
+    for dy_ in range(-14, 6):                                            # its breathing light on the air, stepped
+        for dx_ in range(-12, 13):
+            d_ = np.hypot(dx_, dy_ * 1.2)
+            jx, jy = ix0 + dx_, iy0 - 5 + dy_
+            if 4 < d_ < 12 and 0 <= jy < GH and 0 <= jx < GW and (jx + jy) % 2 == 0:
+                kk = (1 - d_ / 12) * (0.5 + 0.5 * breath) * 0.25
+                img[jy, jx] = np.minimum(img[jy, jx] + np.array([0.25, 0.15, 0.05]) * kk, 1)
     # the pit breathes: ash lifting on the out-breath, a low haze over its heart
     rr = np.random.default_rng(11)
     for q in range(60):

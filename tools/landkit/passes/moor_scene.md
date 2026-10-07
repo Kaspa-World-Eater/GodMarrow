@@ -21,3 +21,10 @@ Tile passes: ash_0 1 (seam: ripples not periodic; too banded), 2 (whole-period r
    Graded: the Kneeler stood off the frame (only a slab showed).
 7. The Kneeler brought into view beside the ring, kneeling toward the pit; the Sighing Lantern to the left to balance.
    Graded: the Kneeler stands at the ring's right, a hooded robed stone figure facing the pit; its robe folds render as dark slits like windows; the fallen head unclear. Still open: hide flat pink; veins read as paths; the eye too clean; the lantern a box; the molars' gum-line stain streaks read as grilles.
+
+## Rules check after pass 7: brief/scale/form PASS; light PARTIAL (lantern a box); values PARTIAL (hide flat); paint PARTIAL; life not checked; tiles: ash, hide built (not yet exported). Worst: the hide.
+8. The hide swells out of the ash as soft domes the moon models; the hide tile darker grey-mauve with long coarse hairs in tufts, pale tips.
+   Graded: the hide reads as flesh (dark skin swelling from the ash, hairs).
+9. The veins narrower, dark purple-black and swollen, lit on their backs with a shadow on the ash, branching, diving under the ash in places.
+   Graded: the veins swollen dark cords branching in.
+10. The Sighing Lantern drawn as a lantern (base plate, iron posts lit on the left, glass panes breathing, peaked cap, ring) with its breathing light on the air; its stone cut with the tenders' notches in tallies of five; the Kneeler's robe folds soft shaded bands, not cut slits.

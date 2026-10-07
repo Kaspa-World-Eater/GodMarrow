@@ -23,7 +23,7 @@ ASH = ramp("#16141a", "#221f25", "#2f2b30", "#3e393b", "#4f4947", "#625a55", "#7
 WARM = np.array([0.55, 0.28, 0.2])                     # the flesh's warmth under the ash
 BONE = ramp("#4a4440", "#77706a", "#a39a8e", "#c2b8a8")
 GLASS = ramp("#060508", "#0d0b10", "#1a1820")
-HIDE = ramp("#1a1418", "#2a2126", "#3b2f33", "#4e4044", "#635257", "#7a6669")
+HIDE = ramp("#140f13", "#21181d", "#2f2328", "#3e3035", "#4e3e42", "#5f4c4f")   # grey-mauve skin, dark under the moon
 STRAW = ramp("#2e2618", "#4a3d24", "#6b5a34")
 
 
@@ -97,11 +97,12 @@ def hide_0(seed=0):
         img[y, x] = img[y, x] * 0.5
         img[(y - 1) % TH, x] = np.minimum(img[(y - 1) % TH, x] * 1.1, 1)
     # coarse hairs lying flat with the wind: dark strokes from a pore
-    for _ in range(70):
+    for _ in range(150):                                             # coarse hairs: long, in tufts, lying with the wind
         x, y = int(rr.integers(0, TW)), int(rr.integers(0, TH))
-        L = int(rr.integers(3, 7))
-        for i in range(L):
-            img[(y + i // 3) % TH, (x + i) % TW] = HIDE[0] if i < L - 1 else HIDE[1]
+        for t in range(int(rr.integers(1, 4))):
+            L = int(rr.integers(5, 10))
+            for i in range(L):
+                img[(y + t + i // 3) % TH, (x + i) % TW] = HIDE[0] if i < L - 2 else np.array([0.42, 0.38, 0.36])   # pale tips
     # ash dusted into every hollow
     dust = (base < 0.45) & (pnoise(XX, YY, 20, 10, seed + 4) > 0.5)
     img[dust] = img[dust] * 0.5 + ASH[5] * 0.5
