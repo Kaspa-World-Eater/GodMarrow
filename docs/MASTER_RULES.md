@@ -128,6 +128,9 @@ are lit by the scene and light it.
   hero beside it before painting.
 - **See-through is total.** Any object standing between the camera and the pilgrim vanishes completely while it
   hides them, for every object, small ones too (Derek, 2026-10-07).
+- **Sap is dark blood, everywhere in the world** (Derek, 2026-10-07). Wherever a tree weeps (a wound, a limb scar, a
+  cut, a crack, a tapped trunk) it runs and dries like dark blood: deep red-black, glossy where fresh, crusted brown
+  where old. The lore agrees ("it ran red down the blade and warm over my wrists"; the hunter's "sour red sap").
 - **Collision at every base.** Walk around trunks, stones and logs; walk behind a root plate.
 - **Objects in combat.** Every object has a cover height, a material and hp. Shots stop in what is taller than their
   flight. Fire takes dry wood and runs over the litter, and wet wood smoulders. Ice glazes and slows, lightning seeks
