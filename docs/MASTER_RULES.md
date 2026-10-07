@@ -6,6 +6,23 @@ documents and techniques, and effects and ecosystems."
 This is the one list. A 15-minute reminder points at it while work is under way. Before any piece of art is begun,
 and again whenever the reminder fires, the work in progress is checked against every line here, in writing.
 
+## The gate: the rules check before any new area or piece (Derek, 2026-10-07)
+
+"That's why the ping is important before any new area is crafted." (After the Blind Face was begun without reading
+the old-growth chapter, the ecosystem rules, the art chapters or the depth law, and built from reused pieces.)
+
+The 15-minute reminder only fires when the session is idle, so it cannot be trusted to catch the start of work.
+Before the first line of code or the first render of any new area, scene or object:
+1. Run the rules check myself, in writing, at the top of the piece's pass log (`tools/landkit/passes/<piece>.md`),
+   headed "Rules check, before pass 1".
+2. It lists every document in section 1 read for this piece (the area's lore, the ecosystem chapter, the art
+   chapters, the reports, LIVING_LANDSCAPES), with the one line from each that shapes the piece.
+3. It confirms, line by line: every object and ground surface is a new design for this place (2b.3), nothing
+   borrowed from another scene; everything with height is built under FORM IS LAW and the depth effect (section 0);
+   placement follows the ecosystem's causes (section 5).
+4. Then the brief, then show Derek the brief and wait for his go.
+No check written, no work begun.
+
 ## 1. Read first (before any new piece, and again at each reminder)
 
 | Read | For |

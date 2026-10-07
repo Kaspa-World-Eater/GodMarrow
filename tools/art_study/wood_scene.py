@@ -59,6 +59,8 @@ RIM = (1.35, (0.025, 0.025, 0.03))   # the moonlit rim on objects: strength and 
 FOREST_LIFE = True       # the wood's own living layers (the leaf fall, falling and skittering leaves, the wisp-fire)
 NORMAL_BLUR = 1.0        # cells of blur on the height before its normals (a scene with small stones wants little: blur pillows)
 MOONLIT = None           # f(px, py, pz, t) -> 0..1: a scene's own reach of the moon (a cavern's shaft)
+GRASS = True             # the old scene's grass tufts in the gap (a scene with its own floor turns them off)
+FERNS = True             # the old scene's ferns in the damp
 GROUND = None            # f(img, W, px, py, pz, SX, SY, L, v, gl) -> img: another land's ground tiles over the wood's
 
 
@@ -603,6 +605,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
             fernpts.append((y, x))
         if len(fernpts) >= 40:
             break
+    fernpts = fernpts if FERNS else []
     fernpts.sort(key=lambda q: q[0] + q[1])
     for (yy, xx) in fernpts:
         if abs(xx - FOCUS[0]) > 9 or abs(yy - FOCUS[1]) > 9:
@@ -656,6 +659,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     for (cx, cy) in centres:
         for _ in range(rr.integers(3, 9)):
             pts.append((cx + rr.normal(0, 0.6), cy + rr.normal(0, 0.45)))
+    pts = pts if GRASS else []
     pts.sort(key=lambda q: q[0] + q[1])
     for (x, y) in pts:
         if look(W, W["tag"], np.array(x), np.array(y)) != 0 or abs(x - FOCUS[0]) > 9 or abs(y - FOCUS[1]) > 9:
