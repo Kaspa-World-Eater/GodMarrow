@@ -87,3 +87,24 @@ the wind; the bands breathe as the canopy moves; they're never a glow laid over 
 | Deserts | Through dust in the rib-shade. |
 | Ruins | Through the broken roofs and windows. |
 | Highlands | Through blown snow. |
+
+### Objects in combat (Derek: "the objects should also interact with missile attacks and spells in realistic ways,
+which will improve the strategy aspect of gameplay")
+The land is terrain to fight in, not scenery. Every landkit object exports, besides its collision posts:
+- **`cover`:** how high it blocks missiles, in yards.
+  - A trunk, a snag or the root plate blocks every shot (cover to full height).
+  - A fresh log blocks low shots and lets high arcs pass; a sunk soft log, almost nothing.
+  - A boulder blocks to its height.
+  - Grass and ferns block nothing, but hide what lies prone in them.
+- **`material`:** wood (living, dead-dry, dead-wet), stone, bone, moss, water, flesh. What a spell does follows from it:
+  - **Fire** ignites dry dead wood, litter and grass, and spreads by the fire-spread plan (fuel, moisture, the wind).
+    Living wet wood smoulders and resists; moss and water stop it. A snag burns like a torch and falls.
+  - **Ice and frost** glaze stone and wood (slick ground, slowing); they freeze pools to walk on.
+  - **Lightning** seeks the tallest thing near its path: a giant tree takes the strike and may split.
+  - **Bone and stone** shatter piercing shots and throw splinters; wood takes arrows and holds them.
+  - **Force** (knockback, the Colossus's landing) breaks rotten wood (log classes 4-5, snags), never stone.
+  - **Water** douses fire and conducts lightning along it.
+- **`hp`** for what can be destroyed: snags, rotten logs, saplings, a root plate's crumbling face.
+
+Strategy follows: fight from behind a trunk, burn the dry deadfall the enemy stands in, draw lightning into a tall tree
+beside a pack, freeze the pool to cross it.
