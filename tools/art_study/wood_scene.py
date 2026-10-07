@@ -268,7 +268,7 @@ def shade(W, px, py, pz, SX, SY, t=0.0):
     ox_, oy_ = np.cos(t * 6.283) * 0.9, np.sin(t * 6.283) * 0.6           # the canopy swaying overhead, a loop
     flk = (vn(px * 1.3 + ox_, py * 1.3 + oy_) > 0.7)
     leafsh = vn(px * 0.55 + ox_ * 0.7, py * 0.55 + oy_ * 0.7) * 0.6 + vn(px * 1.4 + ox_, py * 1.4 + oy_) * 0.4
-    moonlit = np.clip(0.42 + canopy * 0.75, 0, 1) + flk * 0.4 * (canopy < 0.6)        # forms must still read under the leaves
+    moonlit = np.clip(0.42 + canopy * 0.75, 0, 1) + flk * 0.24 * (canopy < 0.6)       # forms must still read under the leaves (flecks 40% fainter)
     ndl = np.clip((n * SUN).sum(2), 0, 1)
     sx0, sy0, sz0 = px + n[..., 0] * 0.12, py + n[..., 1] * 0.12, pz + n[..., 2] * 0.12
     sh = np.zeros_like(px, bool)
@@ -276,7 +276,7 @@ def shade(W, px, py, pz, SX, SY, t=0.0):
         s = k * 0.08
         sh |= look(W, H, sx0 + SUN[0] * s, sy0 + SUN[1] * s, -50.0) > sz0 + SUN[2] * s + 0.03
     moon = ndl * np.where(sh, 0.12, 1.0) * np.clip(moonlit, 0, 1)
-    moon = moon * np.where((leafsh > 0.62) & (canopy > 0.45), 0.82, 1.0)   # a hint of moving leaf shadow
+    moon = moon * np.where((leafsh > 0.62) & (canopy > 0.45), 0.89, 1.0)   # a hint of moving leaf shadow (40% fainter)
     # the lantern
     lamp = np.array([HERO[0] + 0.25, HERO[1] - 0.25, look(W, H, np.array(HERO[0]), np.array(HERO[1])) + 0.7])
     lx0, ly0, lz0 = px + n[..., 0] * 0.12, py + n[..., 1] * 0.12, pz + n[..., 2] * 0.12
@@ -657,7 +657,8 @@ def living(img, w, W, px, py, pz, L, t=0.0):
             az = rr2.uniform(1.0, 2.2)                                         # on the moon side the camera sees
             zt = rr2.uniform(1.0, 4.5)
             p0 = np.array([cx_ + np.cos(az) * o["r"], cy_ + np.sin(az) * o["r"], gh(cx_ + o["r"] * 2.5, cy_ + o["r"] * 2.5) + zt])   # from the ground beside it, not its own top
-            sx, sy = to_px(p0)
+            lx_, ly_ = lean(np.array(p0[0]), np.array(p0[1]), np.array(zt), T)   # the snag leans; so do its brackets
+            sx, sy = to_px((p0[0] + float(lx_), p0[1] + float(ly_), p0[2]))
             k_, _ = light_at(cx_ + np.cos(az) * (o["r"] + 0.3), cy_ + np.sin(az) * (o["r"] + 0.3))
             for sh_i in range(rr2.integers(2, 4)):
                 w_ = rr2.uniform(6.5, 10.0) - sh_i * 1.6                   # half-width of the shelf, px
@@ -832,7 +833,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
         beam_k = np.maximum(beam_k, k)
         # where it lands: a pool of moonlight on the floor, stepped
         pd_ = np.hypot((xx0 - a[0]) / (half * 1.4 + 1e-3), (yy0 - a[1]) / (half * 0.7 + 1e-3))
-        pool_b = np.where(pd_ < 0.6, 0.42, np.where(pd_ < 0.9, 0.24, np.where(pd_ < 1.1, 0.1, 0.0))) * strength * breathe
+        pool_b = np.where(pd_ < 0.6, 0.25, np.where(pd_ < 0.9, 0.14, np.where(pd_ < 1.1, 0.06, 0.0))) * strength * breathe   # 40% fainter
         img = img + np.array([0.55, 0.62, 0.75]) * pool_b[..., None] * np.clip(1 - np.abs(dep - (bx + by)) / 1.5, 0, 1)[..., None]
     img = img * (1 - beam_k[..., None] * 0.36) + np.array([0.66, 0.74, 0.88]) * beam_k[..., None] * 0.36
     # the mist where it crosses a beam: lit
