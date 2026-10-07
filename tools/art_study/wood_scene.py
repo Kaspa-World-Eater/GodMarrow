@@ -65,7 +65,9 @@ def build(w):
     tag = np.zeros(X.shape, int)                                         # 0 ground; 100+i trunks; 200+i logs; 300 plate
     obj = {}
     # logs, by decay class: how high they ride, how they look
-    for li, (ax, ay, bx, by, r, cls, plate) in enumerate(w.logs):
+    order_ = sorted(range(len(w.logs)), key=lambda i: -w.logs[i][5])     # the oldest first: the newest fell on top of them
+    for li in order_:
+        (ax, ay, bx, by, r, cls, plate) = w.logs[li]
         dx, dy = bx - ax, by - ay
         L2 = dx * dx + dy * dy
         t = np.clip(((X - ax) * dx + (Y - ay) * dy) / L2, 0, 1)
@@ -289,7 +291,7 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
     img[gl] = (eco * k_light)[gl]
     mossm = gl & (mat == 1)
     cush = (vn(px * 9, py * 9) - 0.5) * 0.12
-    img[mossm] = R_MOSS[np.clip(((v * 0.8 + cush) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 2)][mossm]   # deep olive at night, as on the rocks
+    img[mossm] = R_MOSS[np.clip(((v * 0.62 + cush) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 2)][mossm]   # deep olive at night, as on the rocks
     lowr = mossm & ~np.roll(mossm, -1, axis=0) & ~np.roll(mossm, -1, axis=1)
     img[lowr] *= 0.8
     upl = mossm & ~np.roll(mossm, 1, axis=0) & ~np.roll(mossm, 1, axis=1)
@@ -598,6 +600,55 @@ def living(img, w, W, px, py, pz, L):
     return np.clip(img, 0, 1)
 
 
+def the_ossuarch(big, W, px, py, anim="idle/front_l/0"):
+    """the game's own Ossuarch (art/sprites/ossuarch_hd), drawn as the game draws a hero: at screen resolution, the
+    sheet scaled by Iso.FIG (0.78), his foot on his tile; hidden wherever something nearer the camera stands"""
+    import json
+    root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "art", "sprites")
+    meta = json.load(open(os.path.join(root, "ossuarch_hd.json")))
+    sheet = Image.open(os.path.join(root, "ossuarch_hd.png")).convert("RGBA")
+    _, x, y, w, h, dx, dy = meta["idx"][anim]
+    fr = sheet.crop((x, y, x + w, y + h))
+    nsheet = Image.open(os.path.join(root, "ossuarch_hd_n.png")).convert("RGBA")
+    nfr = nsheet.crop((x, y, x + w, y + h))
+    k = 0.78
+    fr = fr.resize((max(1, int(w * k)), max(1, int(h * k))), Image.NEAREST)
+    nfr = nfr.resize(fr.size, Image.NEAREST)
+    ox = GW / 2 - (FOCUS[0] - FOCUS[1]) * KX
+    oy = GH / 2 - (FOCUS[0] + FOCUS[1]) * KY
+    hz = float(look(W, W["H"], np.array(HERO[0]), np.array(HERO[1])))
+    fx = ((HERO[0] - HERO[1]) * KX + ox) * 4
+    fy = ((HERO[0] + HERO[1]) * KY + oy - hz * KZ) * 4
+    X0, Y0 = int(fx + dx * k), int(fy + dy * k)
+    a = np.array(fr).astype(float) / 255
+    # lit as shaders/hero_lit.gdshader lights him: the lantern at his side, the cold sky rim, the night's ambient
+    nn = np.array(nfr).astype(float) / 255
+    nv = nn[..., :3] * 2 - 1
+    nv[..., 1] = -nv[..., 1]
+    nv /= np.linalg.norm(nv, axis=2, keepdims=True) + 1e-9
+    lamp_dir = np.array([0.55, 0.15, 0.8])
+    lamp_dir /= np.linalg.norm(lamp_dir)
+    lam = np.clip((nv * lamp_dir).sum(2), 0, 1)
+    sky = np.clip((nv * (np.array([-0.6, -0.7, 0.4]) / np.linalg.norm([-0.6, -0.7, 0.4]))).sum(2), 0, 1)
+    lit = 0.55 * np.array([0.78, 0.82, 0.95]) + (0.3 + 0.6 * lam)[..., None] * np.array([1.0, 0.82, 0.6]) * 0.75
+    a[..., :3] = a[..., :3] * lit + np.array([0.5, 0.6, 0.85]) * (sky ** 4)[..., None] * 0.12
+    dep = (px + py)
+    nearer = np.kron(dep > HERO[0] + HERO[1] + 0.35, np.ones((4, 4))).astype(bool)
+    B = np.array(big).astype(float) / 255
+    hh, ww = a.shape[:2]
+    for j in range(hh):
+        yy = Y0 + j
+        if not (0 <= yy < B.shape[0]):
+            continue
+        for i in range(ww):
+            xx = X0 + i
+            if not (0 <= xx < B.shape[1]) or a[j, i, 3] < 0.5 or nearer[yy, xx]:
+                continue
+            B[yy, xx, :3] = a[j, i, :3]
+    # his shadow, cast by the lantern he carries low at his side, and the moon's, falling to the lower right
+    return Image.fromarray((np.clip(B, 0, 1) * 255).astype(np.uint8))
+
+
 def hero_at(img, W, px, py):
     ox = GW / 2 - (FOCUS[0] - FOCUS[1]) * KX
     oy = GH / 2 - (FOCUS[0] + FOCUS[1]) * KY
@@ -625,8 +676,9 @@ def main(out):
     globals()["w"] = w
     img = paint(W, px, py, pz, SX, SY, L)
     img = living(img, globals()["w"], W, px, py, pz, L)
-    img = hero_at(img, W, px, py)
-    Image.fromarray((img * 255).astype(np.uint8)).resize((GW * 4, GH * 4), Image.NEAREST).save(out)
+    big = Image.fromarray((img * 255).astype(np.uint8)).resize((GW * 4, GH * 4), Image.NEAREST)
+    big = the_ossuarch(big, W, px, py)
+    big.save(out)
     print("saved", out)
 
 
