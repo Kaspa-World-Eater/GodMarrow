@@ -10,6 +10,7 @@ and again whenever the reminder fires, the work in progress is checked against e
 
 | Read | For |
 |---|---|
+| **The lore of the area in work**, for inspiration: `docs/wiki/02-world-and-lore.md`, `docs/wiki/12-lore-notes.md`, `docs/wiki/mythology/` (the making and the fall, the faiths, the Pale Order, the callings, legends of the first lands), the codex voices (`docs/wiki/11-codex-voices.md`, `11a`, `12b`), the zone's own name, line and landmarks in `data/zones/`, and Derek's Lore Bible and Second Mouth docs | What this place was, who walked it, what the god's body is here, and the story details worth carving into it. A piece grows from its place's lore before its looks; find one true detail to put in |
 | `docs/PAINTED_STANDARD.md` | The 14 painting rules, the masterwork rule, one-at-a-time-ten-passes, the 12-point checklist |
 | `docs/wiki/01-rules-and-decisions.md` | The game's laws (words, light, lore, no animals) |
 | `docs/wiki/06-art-direction.md` | The standard, the hero family, lighting and cinematography, the world's surface |
@@ -29,7 +30,7 @@ and again whenever the reminder fires, the work in progress is checked against e
    The log lives in `tools/landkit/passes/<piece>.md`.
 3. **Masterwork, never a factory.** Nothing skipped, nothing rushed. No mock-up is shown as a result, and no primitive
    stands in for a real form (no cones for trees, tubes for limbs or trunks, blobs for crowns).
-4. **The brief comes first.** It is written from the lore and from the real thing (botany, anatomy, geology, ecology),
+4. **The brief comes first, from the area's lore.** The lore of the place in work is read for inspiration before every new piece (section 1), and the brief is written from it and from the real thing (botany, anatomy, geology, ecology),
    with every detail given its reason, and built from the cause rather than the surface.
 5. **Show the honest grade.** Say what still fails. A piece that fails a checklist line is not shown as finished.
 6. **Code may run alongside.** Placement, generation and engine work may be finished while a piece is in work, but no
