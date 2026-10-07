@@ -630,3 +630,15 @@ softened.
 - **The hero belongs in the judgement.** The real Ossuarch (HD sheet) is drawn at screen resolution at the game's
   scale and lit through his own normal map, as the game lights him. A silhouette hides whether the world and the hero
   belong together.
+- **Refinement passes 1-3** (Derek: "the bark on the trees looks pretty bad ... needs two or three more refinement passes
+  minimum"):
+  - **Bark** is painted the way the big study trees had it: long fissure cells running with the wood, twisting, with
+    fine furrows and lit ridges, plates at a larger scale, moss climbing the north side, lichen only on dry standing
+    wood, damp streaks. A geometric block pattern read as tiles stacked up a column.
+  - **Root flares** sweep up concave out of narrow uneven buttress ridges; a straight cone reads as a stone pyramid.
+  - **The night air:** cool dark between the viewer and the far things, stepped and dithered, starting behind the
+    focal point so the centrepiece keeps its contrast.
+  - **Ferns** come from the scene's own wet and light maps, not only the coarse plan.
+  - **Fungi** cluster where the decay is (logs of class 3-4, the stump, the snag's foot): in a world with no animals
+    they are the only decomposers, so they belong everywhere the dead lie.
+  - **Moon rims** are one continuous line down each object's moon-side edge; tinted rims broke into cyan dashes.

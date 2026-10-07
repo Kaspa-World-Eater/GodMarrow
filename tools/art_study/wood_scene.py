@@ -106,10 +106,10 @@ def build(w):
             zc = float(H[int((ay - y0) / RES), int((ax - x0) / RES)]) if False else 0.0
             obj[300] = dict(kind="plate", a=np.array([ax, ay]), u=np.array([ux, uy]), r=r, ride=ride)
             # the broken branch stubs along the log: a class-2 giant has lost its twigs but not its limbs' stumps
-            for t0 in np.linspace(0.25, 0.85, 6):
+            for t0 in (0.32, 0.55, 0.78):
                 bx, by = ax + dx * t0, ay + dy * t0
                 side_ = 1 if int(t0 * 10) % 2 else -1
-                sl = r * (1 - t0 * 0.35) * 0.32
+                sl = r * (1 - t0 * 0.35) * 0.2
                 rl = r * (1 - t0 * 0.35)
                 g0 = H[int(np.clip((by - y0) / RES, 0, n - 1)), int(np.clip((bx - x0) / RES, 0, n - 1))]
                 for k in range(14):
@@ -118,7 +118,7 @@ def build(w):
                     sx_ = bx + (-uy) * side_ * off
                     sy_ = by + ux * side_ * off
                     d_ = np.hypot(X - sx_, Y - sy_)
-                    zz = g0 + rl * ride + np.sqrt(max(rl ** 2 - off ** 2, 0)) + f * 0.5
+                    zz = g0 + rl * ride + np.sqrt(max(rl ** 2 - off ** 2, 0)) + f * 0.35
                     mm_ = (d_ < sl) & (zz + np.sqrt(np.clip(sl ** 2 - d_ ** 2, 0, None)) > H)
                     H = np.where(mm_, zz + np.sqrt(np.clip(sl ** 2 - d_ ** 2, 0, None)), H)
                     tag[mm_] = 200 + li
@@ -344,9 +344,13 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
             img = paint_bark(img, m, v, n, px, py, pz, o)
         elif o["kind"] == "snag":
             ang = np.arctan2(py - o["c"][1], px - o["c"][0])
-            crack = np.sin(ang * 11 + vn(pz * 0.5, ang) * 3) > 0.75                 # long cracks up the grey wood
+            arc = ang * o["r"]
+            grain = vn(arc * 14.0 + pz * 0.2, pz * 0.9)                         # weathered silver grain, long
+            fine = vn(arc * 40.0, pz * 2.4)
+            crack = (grain < 0.25) | (fine < 0.12)
+            ridge = (grain > 0.7)
             holes = (vn(ang * 4, pz * 2.5) > 0.86)
-            dv = v + 0.04 - crack * 0.2
+            dv = v + 0.04 - crack * 0.2 + ridge * 0.08 + (vn(arc * 3, pz * 0.6) - 0.5) * 0.08
             img[m] = R_DEAD[np.clip((dv * len(R_DEAD)).astype(int), 0, len(R_DEAD) - 1)][m]
             img[m & holes] = hexc("#0a0809")
             barkl = m & (pz < 1.4 + vn(ang * 3, 1) * 1.2) & (vn(ang * 5, pz * 1.5) > 0.5)
@@ -433,7 +437,7 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
             stones = m & (vn(px * 11, pz * 11) > 0.85)
             img[stones] = tw.PEBBLE[np.clip(((v[stones] + 0.1) * len(tw.PEBBLE)).astype(int), 0, len(tw.PEBBLE) - 1)]
     # ---- the night air: the further from the viewer, the more cool dark air between (stepped, dithered)
-    far = np.clip(((HERO[0] + HERO[1]) + 4.0 - (px + py)) / 10.0, 0, 0.5)
+    far = np.clip(((HERO[0] + HERO[1]) - 2.5 - (px + py)) / 10.0, 0, 0.45)   # the air begins behind the gap's heart
     far = np.round((far + (bay - 0.5) * 0.08) * 8) / 8
     img = img * (1 - far[..., None]) + np.array([0.06, 0.075, 0.11]) * far[..., None]
     # ---- the light's temperature, stepped
@@ -449,8 +453,8 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
             continue
         mk = tg == k
         edge = mk & ~np.roll(mk, 1, axis=1) & (np.roll(dep, 1, axis=1) < dep - 0.3)
-        rim = edge & ((lit_side > 0.15) | (L["moon"] > 0.25))
-        img[rim] = np.minimum(img[rim] * 1.45 + np.array([0.03, 0.035, 0.05]), 1)
+        rim = edge
+        img[rim] = np.minimum(img[rim] * 1.35 + np.array([0.025, 0.025, 0.03]), 1)
     return np.clip(img, 0, 1)
 
 
@@ -621,13 +625,23 @@ def living(img, w, W, px, py, pz, L, t=0.0):
                             i_, j_ = int(cys + dy), int(cxs + dx)
                             if 0 <= i_ < GH and 0 <= j_ < GW:
                                 img[i_, j_] *= 0.6
-    # mushrooms on the stump's foot and on the old logs
-    for (x, y) in w.shrooms:
+    # fungi in clusters: on the old logs, round the stump and the snag's foot (the only decomposers there are)
+    spots = list(w.shrooms)
+    for k_o, o_ in W["obj"].items():
+        if o_["kind"] in ("stump", "snag"):
+            for q in range(5):
+                a_ = rr.uniform(-0.6, 2.2)
+                spots.append((o_["c"][0] + np.cos(a_) * (o_["r"] + 0.25), o_["c"][1] + np.sin(a_) * (o_["r"] + 0.25)))
+        if o_["kind"] == "log" and o_["cls"] in (3, 4):
+            for q in range(10):
+                t_ = rr.uniform(0.1, 0.9)
+                spots.append((o_["a"][0] + o_["d"][0] * t_ * 8 + -o_["d"][1] * o_["r"] * 1.1, o_["a"][1] + o_["d"][1] * t_ * 8 + o_["d"][0] * o_["r"] * 1.1))
+    for (x, y) in spots:
         if abs(x - FOCUS[0]) > 9 or abs(y - FOCUS[1]) > 9:
             continue
         k, _ = light_at(x, y)
         sx, sy = to_px((x, y, gh(x, y)))
-        for n_ in range(rr.integers(1, 4)):
+        for n_ in range(rr.integers(2, 6)):
             ox_, oy_ = sx + rr.integers(-3, 4), sy + rr.integers(-1, 2)
             size = rr.choice([1, 2])
             for j in range(size + 1):
