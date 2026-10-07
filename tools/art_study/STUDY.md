@@ -1,5 +1,7 @@
 # Art study log
 
+Subchapters: [Living landscapes from seeds](LIVING_LANDSCAPES.md): building the land from its ecosystem, and scaling it to seeded worlds.
+
 Derek (2026-10-06): study drawing, painting and animating; study great games (Blasphemous, Dark Souls, Elden Ring,
 Demon's Crest, Path of Exile); study how I draw now, pixel by frame; practise; apply; repeat. The bar is the Seer's
 Bowl title (tools/title_study/, its method in the memory note "godmarrow-title-method").
