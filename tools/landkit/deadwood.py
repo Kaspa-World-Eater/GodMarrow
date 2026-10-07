@@ -48,20 +48,20 @@ def root_plate(seed):
     R = rr.uniform(1.4, 1.9)
     F = Field(R + 0.5, res=0.025)
     X, Y = F.X, F.Y
-    thick = 0.22 + (fbm(X * 2, Y * 2) - 0.5) * 0.1
-    disc = (np.abs(X) < thick) & (np.abs(Y) < R + 0.35)
-    spikes = np.clip(np.sin(Y * 23 + fbm(Y * 3, 1) * 6) * 1.6 - 0.6, 0, 1) * 0.55
-    clods = (fbm(Y * 4, 7) - 0.5) * 0.45
-    top = 1.1 + np.sqrt(np.clip(R ** 2 - Y ** 2, 0, None)) * 0.85 + clods + spikes
+    # thicker at the hub where the root collar is, thin at the rim; the crown a ragged line of clods, not steps
+    thick = 0.16 + 0.22 * np.clip(1 - np.abs(Y) / R, 0, 1) + (fbm(X * 2, Y * 2) - 0.5) * 0.06
+    disc = (np.abs(X) < thick) & (np.abs(Y) < R + 0.2)
+    clods = (fbm(Y * 2.2 + seed, 7) - 0.5) * 0.5 + (fbm(Y * 6 + seed, 3) - 0.5) * 0.16
+    top = 1.05 + np.sqrt(np.clip(R ** 2 - Y ** 2, 0, None)) * 0.85 + clods
     m = disc & (top > 0.3)
     F.H = np.where(m, top, F.H)
     F.M[m] = 1
-    zc = 1.0
-    return F, dict(R=R, zc=zc, seed=seed)
+    return F, dict(R=R, zc=1.0, seed=seed)
 
 
 def paint_plate(F, info):
-    top = 1.1 + info["R"] * 0.85 + 1.0
+    R, zc = info["R"], info["zc"]
+    top = 1.05 + R * 0.85 + 1.0
     C = cast(F, top)
     n, side = normals(F, C, exag=1.0)
     sh = moon_shadow(F, C, n)
@@ -70,33 +70,94 @@ def paint_plate(F, info):
     mask = C["got"] & (C["pz"] > -0.05)
     bay = B4[C["SY"].astype(int) % 4, C["SX"].astype(int) % 4]
     py, pz = C["py"], C["pz"]
-    dz = pz - info["zc"]
+    face = mask & side & (np.abs(n[..., 0]) > 0.6)                      # the torn face, where the roots are
+    crown_top = mask & ~side                                             # its top edge: the forest floor torn up with it
+    dz = pz - zc
     ang = np.arctan2(dz, py)
     rad = np.hypot(py, dz)
-    roots = np.zeros(mask.shape, bool)
-    lit_edge = np.zeros(mask.shape, bool)
     rr = np.random.default_rng(info["seed"])
+    # ---- the soil packed between the roots: dark, clotted, stones held in it, fine root hairs through it
+    img = paint(SOIL, v * 0.8 + (vn(py * 9, pz * 9) - 0.5) * 0.16, mask, bay)
+    clot = face & (vn(py * 5 + 3, pz * 5) > 0.62)
+    img[clot] = img[clot] * 1.12
+    stones = face & (vn(py * 11, pz * 11) > 0.86)
+    img[stones] = paint(PEB, v + 0.12 + (vn(py * 40, pz * 40) - 0.5) * 0.1, stones)[stones]
+    # ---- the roots, painted round (a height field cannot carry relief on a face): each a body with its back lit
+    #      toward the moon, its belly dark, and a shadow cast on the soil beside it; they branch as they go out
+    L2 = np.array([-0.45, 0.89])                                         # the light across the face: up, a little to -y
+    roots = []
     for k in range(13):
-        a0 = -np.pi * 0.05 + k * (np.pi * 1.1 / 12) + rr.normal(0, 0.06)
-        wob = np.sin(rad * 3 + k) * 0.08
-        dd = (((ang - a0 - wob + np.pi) % (2 * np.pi)) - np.pi)
-        dist = np.abs(dd) * rad
-        wid = np.clip(0.16 - rad * 0.06, 0.04, 0.16) * rr.uniform(0.7, 1.2)
-        rk = mask & (dist < wid) & (rad > 0.3)
-        roots |= rk
-        lit_edge |= rk & (dist > wid * 0.5) & (dd > 0)
-    soil = mask & ~roots
-    img = paint(SOIL, v * 0.75 - 0.05 + (vn(py * 12, pz * 12) - 0.5) * 0.12, soil, bay)
-    img[roots] = paint(ROOT, v * 0.9 + (vn(rad * 6, ang * 3) - 0.5) * 0.1, roots, bay)[roots]
-    img[lit_edge] = np.minimum(img[lit_edge] * 1.3, 1)
-    stones = soil & (vn(py * 11, pz * 11) > 0.85)
-    img[stones] = paint(PEB, v + 0.1, stones)[stones]
-    # the butt where the log was: a dark round heart at the hub, its torn wood pale round it
-    hub = mask & (rad < 0.42)
-    img[hub] = paint(WOOD, v * 0.8 - (rad < 0.25) * 0.25, hub)[hub]
+        a0 = -np.pi * 0.06 + k * (np.pi * 1.12 / 12) + rr.normal(0, 0.06)
+        w0 = rr.uniform(0.11, 0.17)
+        roots.append((a0, 0.3, R * rr.uniform(0.85, 1.05), w0, k))
+        if rr.random() < 0.6:                                            # a branch from its middle
+            roots.append((a0 + rr.choice([-1, 1]) * rr.uniform(0.18, 0.32), R * rr.uniform(0.35, 0.55), R * rr.uniform(0.8, 1.0), w0 * 0.55, k + 50))
+    for k in range(6):                                                   # the lower roots, down into the clotted earth
+        a0 = (-rr.uniform(0.15, 0.75)) if k % 2 else (np.pi + rr.uniform(0.15, 0.75))
+        roots.append((a0, 0.3, rr.uniform(0.55, 0.95), rr.uniform(0.07, 0.11), k + 90))
+    body = np.zeros(mask.shape, bool)
+    tone = np.zeros(mask.shape)
+    shade = np.zeros(mask.shape, bool)
+    for (a0, r0_, r1_, w0, kk) in roots:
+        wob = np.sin(rad * 2.6 + kk) * 0.07
+        dd = ((ang - a0 - wob + np.pi) % (2 * np.pi)) - np.pi
+        across = dd * rad                                                # signed distance from its centreline (yd)
+        t = np.clip((rad - r0_) / max(r1_ - r0_, 1e-3), 0, 1)
+        wid = w0 * (1 - t * 0.65)
+        on = face & (np.abs(across) < wid) & (rad > r0_) & (rad < r1_)
+        nperp = np.stack([-np.sin(a0), np.cos(a0)])                       # the root's own sideways, in the face
+        side_lit = (nperp[0] * L2[0] + nperp[1] * L2[1]) * np.sign(across)
+        u_ = np.abs(across) / np.maximum(wid, 1e-3)
+        tv = 0.55 + side_lit * u_ * 0.45 - u_ ** 3 * 0.15 - (0.06 if kk >= 90 else 0.0)   # the lower ones half in earth
+        body |= on
+        tone = np.where(on, tv, tone)
+        # its shadow on the soil: just past its dark side
+        sh_ = face & ~on & (np.abs(across) < wid + 0.06) & (rad > r0_) & (rad < r1_) & (side_lit < 0)
+        shade |= sh_
+    img[shade & ~body] = img[shade & ~body] * 0.55
+    ri = np.clip(((v * 0.35 + tone * 0.75) * len(ROOT)).astype(int), 0, len(ROOT) - 1)
+    img[body] = ROOT[ri[body]]
+    # ---- the root collar at the hub: the trunk's foot still on it, bark flaring out into the great roots
+    hub = face & (rad < 0.42)
+    hv = v * 0.8 + 0.08 * np.cos(ang * 7) - (rad < 0.2) * 0.1
+    img[hub] = bark_paint(hv, rad * 3, ang * 0.4, hub, bay, n, 1.0)[hub]
+    # ---- the crown: the floor's mat torn up with it, moss and litter overhanging the soil
+    mat = crown_top | (face & (pz > (1.05 + np.sqrt(np.clip(R ** 2 - py ** 2, 0, None)) * 0.85) - 0.22))
+    img[mat] = paint(MOSS, v * 0.9 + (vn(py * 14, pz * 14) - 0.5) * 0.15, mat, bay)[mat]
+    lit_ = mat & (vn(py * 10 + 4, pz * 10) > 0.72)
+    img[lit_] = paint(ramp("#2a1712", "#45281a", "#5e3820", "#784a28"), v * 0.9, lit_)[lit_]
+    lip = face & ~mat & np.roll(mat, 1, axis=0)                           # the dark lip under the overhang
+    img[lip] = img[lip] * 0.5
     img = rim(img, mask, C, 1.2)
-    posts = [[0.0, round(y, 3), 0.22] for y in np.linspace(-info["R"], info["R"], 9)]
-    meta = dict(kind="deadwood/root_plate", height=float(top - 1.0), radius_yd=float(info["R"]), sway=0.0, posts=posts,
+    # ---- drawn out past the silhouette: root ends snapped at the rim, some drooping; root hairs hanging below
+    fx, fy = C["foot"]
+    Hh, Ww = mask.shape
+    for k in range(18):
+        a0 = rr.uniform(-0.15, np.pi + 0.15)
+        r_ = R * rr.uniform(0.9, 1.08)
+        y0, z0 = np.cos(a0) * r_, zc + np.sin(a0) * r_
+        sx, sy = (0 - y0) * KX + fx, (0 + y0) * KY - z0 * KZ + fy
+        Ln = rr.uniform(3, 10)
+        droop = rr.uniform(0.0, 0.9) if a0 > 0.3 and a0 < np.pi - 0.3 else rr.uniform(0.3, 1.2)
+        dxs, dys = -np.cos(a0) * KX / 18.0, -np.sin(a0) * 1.0
+        for i in range(int(Ln)):
+            f = i / max(Ln - 1, 1)
+            xx = int(round(sx + dxs * i))
+            yy = int(round(sy + dys * i + droop * i * f * 0.6))
+            if 0 <= yy < Hh and 0 <= xx < Ww:
+                img[yy, xx] = ROOT[2 if (i < Ln * 0.5 and dys < 0) else 1] if f < 0.85 else ROOT[0]
+                mask[yy, xx] = True
+    under = face & ~np.roll(face, -1, axis=0) & (pz > 0.25)
+    ys, xs = np.nonzero(under)
+    for (y, x) in zip(ys, xs):
+        if rr.random() > 0.12:
+            continue
+        for j in range(1, int(rr.integers(2, 7))):
+            if y + j < Hh and not mask[y + j, x]:
+                img[y + j, x] = ROOT[0] * 0.8
+                mask[y + j, x] = True
+    posts = [[0.0, round(y, 3), 0.22] for y in np.linspace(-R, R, 9)]
+    meta = dict(kind="deadwood/root_plate", height=float(top - 1.0), radius_yd=float(R), sway=0.0, posts=posts,
                 cover=float(top - 1.0), material="earth_roots", hp=80)
     return img, mask, n, C, meta
 

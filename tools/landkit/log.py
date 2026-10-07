@@ -44,9 +44,15 @@ def make(cls, seed, length=None, radius=None):
     inside = (u >= 0) & (u <= 1)
     ride = RIDE[cls]
     if cls == 5:
-        top = np.sqrt(np.clip(1 - (d / (r * 1.4)) ** 2, 0, 1)) * r * 0.45 * (fbm(X * 1.2, Y) * 0.4 + 0.8)
-        top = top + (fbm(X * 7, Y * 7) - 0.5) * 0.05                        # moss lumps
-        m = inside & (d < r * 1.4)
+        # a low mound that wanders: wider and higher here, slumped there; its ends dissolve into the floor
+        wv = 1 + 0.22 * np.sin(u * 7.3 + seed) + (fbm(X * 0.9 + seed, Y * 0.2 + 3) - 0.5) * 0.5
+        hv = 0.75 + 0.3 * np.sin(u * 4.1 + seed * 2) + (fbm(X * 1.3, Y * 0.3 + 9) - 0.5) * 0.4
+        endf = np.clip(np.minimum(u, 1 - u) / 0.14, 0, 1) ** 0.6
+        W5 = np.maximum(r * 1.5 * wv * (0.55 + 0.45 * endf), 1e-3)
+        prof = np.clip(1 - (d / W5) ** 2, 0, 1)
+        top = prof ** 0.8 * r * 0.5 * hv * endf
+        top = top + (vn(X * 9 + seed, Y * 9) - 0.5) * 0.045 * prof              # moss cushions
+        m = (u > -0.02) & (u < 1.02) & (top > 0.012)
     else:
         top = r * ride + np.sqrt(np.clip(r ** 2 - d ** 2, 0, None))
         if cls == 4:
@@ -55,11 +61,13 @@ def make(cls, seed, length=None, radius=None):
         m = inside & (d < r)
     # the broken butt end: jagged, splinters standing out of the break
     jag = (vn(Y * 14 + seed, 3) - 0.5) * 0.35 + (np.sin(Y * 40) > 0.6) * 0.12
-    m &= u > 0.0 + np.clip(jag, -0.02, 0.4) * (0.6 / L)
+    if cls < 5:
+        m &= u > 0.0 + np.clip(jag, -0.02, 0.4) * (0.6 / L)
     # the far end: snapped too, a little less
-    m &= u < 1.0 - np.clip((vn(Y * 11 - seed, 7) - 0.5) * 0.25, -0.02, 0.3) * (0.6 / L)
+    if cls < 5:
+        m &= u < 1.0 - np.clip((vn(Y * 11 - seed, 7) - 0.5) * 0.25, -0.02, 0.3) * (0.6 / L)
     F.H = np.where(m, top, F.H)
-    end_zone = m & ((u < 0.6 / L * 0.5 + 0.02) | (u > 1 - 0.6 / L * 0.5 - 0.02))
+    end_zone = m & ((u < 0.6 / L * 0.5 + 0.02) | (u > 1 - 0.6 / L * 0.5 - 0.02)) & (cls < 5)
     # broken limb stubs on the fresher logs: rising out of the top within its width (a height field cannot overhang)
     if cls <= 2:
         for t0 in rr.uniform(0.2, 0.85, 3 if cls == 1 else 2):
@@ -136,9 +144,22 @@ def render(F, info):
     mm = mask & (M == MOSSM)
     img[mm] = paint(MOSS, v * 0.9 + (vn(along * 6, around * 6) - 0.5) * 0.12, mm, bay)[mm]
     if cls == 5:
-        leaves = mm & (vn(px * 9, py * 9) > 0.78)                            # the litter lying on it
-        img[leaves] = paint(ramp("#2a1712", "#45281a", "#5e3820", "#784a28"), v * 0.85, leaves)[leaves]
-        caps = mm & (vn(px * 23 + 7, py * 23) > 0.9) & (pz > 0.1)           # small pale caps
+        hmax = max(float(pz[mm].max()) if mm.any() else 0.1, 0.05)
+        cush = vn(px * 9 + info["bend_seed"], py * 9)
+        seam = mm & (cush < 0.3)                                              # the dark between the cushions
+        img[seam] = img[seam] * 0.72
+        crest = mm & (cush > 0.68) & (v > 0.55)                               # each cushion's lit crown
+        img[crest] = np.minimum(img[crest] * 1.12, 1)
+        # where the moss has torn: the punky red-brown wood of the log itself, crumbling
+        punk = mm & (vn(px * 1.6 + 11, py * 1.6) > 0.8) & (pz > hmax * 0.35)
+        PUNK = ramp("#1d0e0a", "#341a10", "#4f2817", "#6c3a20", "#87502c")
+        img[punk] = paint(PUNK, v * 0.85 + (vn(px * 30, py * 30) - 0.5) * 0.18, punk)[punk]
+        # the litter: lying on it here and there, banked thick against its flanks
+        low = 1 - np.clip(pz / hmax, 0, 1)
+        leaves = mm & ~punk & (vn(px * 9 + 3, py * 9) > 0.9 - low ** 1.5 * 0.55)
+        LIT = ramp("#2a1712", "#45281a", "#5e3820", "#784a28", "#95602f")
+        img[leaves] = paint(LIT, v * 0.85 + (vn(px * 21, py * 21) - 0.5) * 0.2, leaves)[leaves]
+        caps = mm & (vn(px * 23 + 7, py * 23) > 0.955) & (pz > hmax * 0.4)   # small pale caps, few
         img[caps] = paint(ramp("#5e5146", "#9a8a72", "#c8b998"), v * 1.1, caps)[caps]
     if cls == 4:
         cu, cv = along * 3.2, arc * 4.0                                     # blocks about a third of a yard
