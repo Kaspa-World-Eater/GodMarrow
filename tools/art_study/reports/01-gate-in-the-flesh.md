@@ -121,6 +121,26 @@ messages. The lore read for it:
     the value first, then tints.
 19. **Stamped height and ray-cast pieces must agree on the ground** (bug of pass 64): read an object's ground before
     it is stamped, or its ray-cast twin stands on top of itself.
+20. **Cohesion comes from one rule for the whole place** (passes 78 to 84; Derek: "nothing really blends smoothly,
+    it all looks patchy and jumbled"; "everything looks ancient except this weird biological stuff coming through the
+    cracks in the floor"). Every object had been made well on its own and dropped in, each in its own light and
+    colour, and the result was a collage. What pulled it together:
+    - one idea governing every surface (ancient stone everywhere; the god only where it breaks up from below,
+      through the fractures and the joints, wells into sheets, and makes wounds at its own parts);
+    - one light for all (the open-sky terms removed from the pillars once the scene became a cavern);
+    - one air (a haze deepening with distance and one colour grade);
+    - gradual edges (the paving running out under ash in stages, the joints filling first; the flesh feathering
+      over the stones).
+    **What failed:** pieces made in one lighting world (open sky) and left there after the world changed (a cavern).
+    When the scene's premise changes, every piece must be re-lit for it.
+21. **Things removed are kept** (Derek: "pull the pillars out ... turn them into assets"): the gore pillar is now its
+    own landkit asset with a preview; nothing made is thrown away.
+22. **True-scale small things need contrast, not size** (pass 84): a human skull at game scale is about 4 pixels.
+    On busy flesh it vanished; on calm stone in the lantern's light it reads. Place the small story pieces on quiet
+    ground in light.
+23. **Variety in plants means different species and forms, not one stamp** (passes 75 and 80): one Y-shaped tuft
+    repeated read as a pattern; tussocks, seed stalks, curled ferns and fallen stems, each with its own colour and
+    wear, read as dead growth.
 13. **Reading the lore for one true detail** gave the gate its brief (the mouth's door) and the fangs their dried
     blood.
 
