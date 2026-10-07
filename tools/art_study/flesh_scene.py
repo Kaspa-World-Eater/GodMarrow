@@ -160,7 +160,12 @@ def shape_plan(w):
     out_ = np.clip(d - EYE[1] * 1.15, 0, None)
     folds = 0.16 * np.sin(out_ * 5.5 - 0.6 + np.sin(ang * 3 + d) * 0.6) * np.exp(-out_ / 1.8)   # concentric folds
     wrink = 0.05 * np.sin(ang * 14 + d * 2) * np.exp(-out_ / 1.0) * (out_ > 0)                  # radial wrinkles
-    H = H + 0.85 * np.exp(-((d - EYE[1] * 1.0) / 0.5) ** 2) + folds + wrink - np.clip(1 - d / (EYE[1] * 1.1), 0, 1) * 0.35
+    # thick rolls of flesh wrapped round its foot, stacked outward and falling away, lumped, the near side highest, so
+    # the eye rises out of the ground rather than sitting on it (Derek: "blend the eyelid flesh down and have folds")
+    near_side = 0.75 + 0.45 * np.clip(((X - EYE[0][0]) * AX[0] + (Y - EYE[0][1]) * AX[1]) / (EYE[1] * 1.5), -1, 1)
+    lump_ = 0.75 + 0.5 * vn(ang * 2.5 + d * 0.8, d * 1.3)
+    rolls = sum(hk * np.exp(-((d - EYE[1] * rk) / wk) ** 2) for (rk, hk, wk) in ((1.12, 1.05, 0.32), (1.45, 0.7, 0.3), (1.8, 0.4, 0.3)))
+    H = H + rolls * near_side * lump_ + folds + wrink - np.clip(1 - d / (EYE[1] * 1.0), 0, 1) * 0.35
     e = ((X - POOL[0][0]) / POOL[1]) ** 2 + ((Y - POOL[0][1]) / POOL[2]) ** 2
     lvl = float(H[np.unravel_index(np.argmin(e), e.shape)]) - 0.12
     m_ = np.clip((1.35 - e) / 0.5, 0, 1)
@@ -302,6 +307,15 @@ def stamp(W, w):
         H = np.where(m & (hc > 0.6), np.maximum(col_h, H * 0.4), H)
         W["tag"] = np.where(m, 868, W["tag"])
         W["obj"][868] = dict(kind="rubble", fam=0, base=0.0, wall=False, big=True)
+        # fissures low in the walls where the god's heat still glows (the lore: "the ash is warm because the flesh beneath
+        # is still cooling"): each a dim amber light grazing across the columns beside it, black within a few yards
+        FISSURES.clear()
+        for (fa, fp) in ((3.2, -10.6), (7.8, -11.0), (2.6, 10.4), (8.6, 10.9), (-1.2, -6.4), (-1.0, 6.6)):
+            q = C + AX * fa + PERP * fp
+            zq = float(H[int(np.clip((q[1] - W["y0"]) / ws.RES, 0, H.shape[0] - 1)), int(np.clip((q[0] - W["x0"]) / ws.RES, 0, H.shape[1] - 1))])
+            q = q - PERP * np.sign(fp) * 0.5
+            FISSURES.append((q, min(zq, 1.4)))
+            ws.LIGHTS.append((q[0], q[1], min(zq, 1.4) * 0.6 + 0.5, 3.6))
     for i, (p, a, L_) in enumerate(DRUMS):
         dirv = np.array([np.cos(a), np.sin(a)])
         along = (X - p[0]) * dirv[0] + (Y - p[1]) * dirv[1]
@@ -447,6 +461,7 @@ def stamp(W, w):
 _TILES = {}
 SICK = []                                    # the pustules' sickly lights: (position xyz, radius, phase)
 FIRES = []                                   # the banked offering-fires at the posts' feet
+FISSURES = []                                # the walls' fissures where the god's heat still glows
 SICKC = np.array([0.72, 0.8, 0.22])
 ws_T = [0.0]                                 # the loop's time, for the ground's own motion
 
@@ -707,6 +722,15 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     for (tp, tr, tsd) in W["tendrils"]:                                  # the gore tendrils: raw flesh, wet, pulsing
         vessel.draw(img, zb, dep, ws.to_px, tp, tr, T, lts, ws.SUN, seed=tsd, tol=0.35, ramp_=R_GORE, taper=True)
     pustules(img, zb, dep, T)
+    for (q, zq) in FISSURES:                                              # the fissures themselves: a crack of dull ember light
+        for j in range(18):
+            zz = 0.2 + j * zq * 0.05
+            x, y = q[0] + np.sin(j * 0.9) * 0.05, q[1] + np.cos(j * 1.3) * 0.05
+            sx, sy = ws.to_px((x, y, zz))
+            ix, iy = int(round(sx)), int(round(sy))
+            if 0 <= iy < GH and 0 <= ix < GW:
+                br = 0.6 + 0.4 * np.sin(T * 6.283 + j * 0.3 + q[0])
+                img[iy, ix] = np.clip(np.array([0.55, 0.24, 0.07]) * br + img[iy, ix] * 0.3, 0, 1)
     # the dead plant life (Derek): it grew only where the moon came down, in the joints, and died (landkit deadplants.py)
     gh_ = lambda x, y: float(ws.look(W, W["H"], np.array(x), np.array(y)))
     lamp = np.array([ws.HERO[0] + 0.25, ws.HERO[1] - 0.25, gh_(ws.HERO[0], ws.HERO[1]) + 0.7])
@@ -1048,8 +1072,8 @@ def paint_drum(img, m, v, n, px, py, pz, o, W, L):
 
 ws.PAINTERS["column"] = paint_column
 ws.PAINTERS["drum"] = paint_drum
-R_RUBBLE = [ws.ramp("#0e0d12", "#1a181e", "#27242a", "#36323a", "#47424a", "#5a5459"),          # basalt
-            ws.ramp("#17151d", "#26232c", "#3a3539", "#524b4a", "#6d655d", "#8a8073"),          # pale limestone
+R_RUBBLE = [ws.ramp("#100d0c", "#1c1714", "#2a231f", "#3a312b", "#4c4038", "#5f5046"),          # basalt: the floor's own warm stone (Derek: same materials)
+            ws.ramp("#16120f", "#25201b", "#3a332c", "#524840", "#6d6254", "#8a7d6a"),          # pale limestone, warm like the floor
             ws.ramp("#130b0c", "#231314", "#341d1b", "#4a2a24", "#5f3a2f", "#764b3a")]          # red tuff
 
 

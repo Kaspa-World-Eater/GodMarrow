@@ -143,7 +143,7 @@ def draw(img, zb, dep_scene, to_px, centre, R, gaze, blink, lights, moon, seed=1
     Nl = Nl / np.linalg.norm(Nl, axis=-1, keepdims=True)
     lit_l, spec_l = shade(Nl, P_lid, 18, 0.35)
     tone = 0.88 + (vn(la * 9 + seed, lb * 9) - 0.5) * 0.35
-    skin = np.array([0.5, 0.25, 0.24]) * tone[..., None]
+    skin = np.array([0.4, 0.15, 0.16]) * tone[..., None]                 # the floor's own flesh (it rises out of it)
     skin = skin * (1 - np.clip(-fold_h, 0, 1)[..., None] * 0.45)          # the folds' valleys dark
     skin = skin + np.array([0.12, 0.0, 0.02]) * roll[..., None]           # raw and red toward the margin
     vein_l = (np.abs(vn(la * 7 + 50, lb * 7) - 0.5) < 0.03) & (edge_d < 0.6)
@@ -161,7 +161,8 @@ def draw(img, zb, dep_scene, to_px, centre, R, gaze, blink, lights, moon, seed=1
     skin = np.where(car[..., None], np.array([0.6, 0.28, 0.3]), skin)          # the caruncle, wet pink
     sss = np.array([0.1, 0.02, 0.02])                                   # light through thin skin: a red warmth
     low = np.clip(1 - (P_lid[..., 2] - c[2] + R * 0.2) / (R * 0.75), 0, 1)   # the foot of the lid, into the socket
-    lidc = (skin * lit_l + sss + spec_l * (0.6 + pus[..., None] * 1.6)) * (1 - low[..., None] * 0.6)   # pus glossy
+    lidc = (skin * lit_l + sss + spec_l * (0.6 + pus[..., None] * 1.6))
+    lidc = lidc * (1 - low[..., None] * 0.55) + np.array([0.13, 0.04, 0.05]) * low[..., None] * 0.55   # its foot fades into the ground's flesh
     col = np.where(lid_hit[..., None], lidc, col)
     # ---- the ball: the yellowed white, the vessels, the lids' shadow, wet
     Pb = O + D * t_ball[..., None]
