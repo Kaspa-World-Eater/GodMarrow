@@ -265,7 +265,7 @@ def rib_list():
     for side_ in (-1, 1):
         for j in range(5):
             along = -6.0 + j * 3.1 + rr.uniform(-0.4, 0.4)
-            base = C + PERP * side_ * (FLOOR_W + 1.2 + rr.uniform(0, 0.5)) + AX * along   # from the banks' brows
+            base = C + PERP * side_ * (FLOOR_W - 0.2 + rr.uniform(0, 0.5)) + AX * along   # from the banks' feet, in view
             out.append((side_, j, base, rr.uniform(9.5, 13.5), rr.uniform(3.5, 6.0), rr.uniform(0.62, 0.95), rr.uniform(0.55, 0.75)))
     return out
 
