@@ -219,7 +219,7 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ambient=0.1, tol=0.6):
             lich = (N[:, 2] < 0.5) & (lc > 0.86) & (vn(u * 2 + 9, z * 2) > 0.55) & (z > 1.0)   # small rosettes, few
             col = np.where(lich[:, None], col * 0.5 + LICHEN * 0.5 * (0.5 + val[:, None]), col)
             climb = z < 0.5 + vn(u * 2 + seed, r * 2) * 0.9
-            col = np.where(climb[:, None], FLESH * (0.6 + val[:, None] * 1.4) * (0.8 + vn(u * 9, z * 9)[:, None] * 0.4), col)
+            col = np.where(climb[:, None], FLESH * (0.35 + val[:, None] * 0.8) * (0.8 + vn(u * 9, z * 9)[:, None] * 0.4), col)   # as dark as the floor's flesh
             if o["hinge_u"] is not None:                                                  # rust running down below each hinge pin
                 for zp in (0.8, 5.6):
                     run = (np.abs(u - o["hinge_u"]) < 0.12 + (zp - z) * 0.03) & (z < zp) & (z > zp - 1.6 - vn(u * 5, zp) * 1.2) & (r < 0.1)

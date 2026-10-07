@@ -245,11 +245,11 @@ def draw(img, zb, dep_scene, to_px, f, lights, moon, ambient=0.16, tol=0.7):
     fray = (vn(wx * 7 + seed, z * 5 + wy * 7) - 0.5) * 0.08
     climb = z < climb_h + fray
     lump = vn(th * 14 + seed, z * 9)
-    fl = np.array([0.24, 0.07, 0.09]) * (0.5 + val[..., None] * 0.8) * (0.8 + lump[..., None] * 0.4)
+    fl = np.array([0.2, 0.065, 0.08]) * (0.35 + val[..., None] * 0.7) * (0.8 + lump[..., None] * 0.4)   # the floor's own flesh, as dark
     fl = np.where((vn(wx * 4, wy * 4 + z) > 0.62)[..., None], fl * np.array([0.8, 0.9, 1.25]), fl)   # bruised in patches
     col = np.where(climb[..., None], fl, col)
     edge_ = climb & (z > climb_h + fray - 0.07)
-    col = np.where(edge_[..., None], np.array([0.6, 0.18, 0.26]) * (0.45 + val[..., None] * 0.9), col)   # the collar, swollen, inflamed
+    col = np.where(edge_[..., None], np.array([0.46, 0.15, 0.21]) * (0.3 + val[..., None] * 0.8), col)   # the collar, swollen, inflamed
     recede = h1_(seed) > 0.5
     lipf = ~climb & (z < climb_h + fray + (0.13 if recede else 0.04))
     col = np.where(lipf[..., None], np.array([0.09, 0.1, 0.07]) * (0.6 + val[..., None]) if recede else col * 0.5, col)   # the black band where it drew back

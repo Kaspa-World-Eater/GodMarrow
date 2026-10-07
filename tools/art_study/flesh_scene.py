@@ -984,7 +984,8 @@ R_RUBBLE = [ws.ramp("#0e0d12", "#1a181e", "#27242a", "#36323a", "#47424a", "#5a5
 def paint_rubble(img, m, v, n, px, py, pz, o, W, L):
     R = R_RUBBLE[o["fam"]]
     hh = vn(px * 3 + o["fam"] * 7, py * 3) * 0.12
-    sv = np.clip(v * 0.95 + hh - 0.04 + L["lamp"] * 0.5, 0, 0.99)
+    lt = L["moon"] * (0.35 + np.clip(n[..., 2], 0, 1) * 0.3) + L["lamp"] * 0.7      # the cavern's own light, nothing else
+    sv = np.clip(0.06 + lt * 0.8 + hh - 0.04 + (v - 0.5) * 0.12, 0, 0.99)
     img[m] = R[np.clip((sv * len(R)).astype(int), 0, len(R) - 1)][m]
     top = m & (n[..., 2] > 0.85) & (vn(px * 7, py * 7) > 0.45)
     img[top] = img[top] * 0.45 + np.array([0.36, 0.35, 0.34]) * 0.55 * np.clip(v[top] + 0.35, 0, 1)[:, None]   # ash on the tops
