@@ -66,3 +66,29 @@ Brief in ruin_scene.py's header, from the Hollow Wood's lore (the hunter's accou
 15. A body stands on one whole level surface (engine rule settle_hero): if the footprint straddles an edge he takes
     the nearest level spot within half a yard; he stands at its median height; only that surface is kept from
     hiding him.
+
+## Rules check after pass 15 (2026-10-07, the 15-minute reminder; every checklist line)
+Lore detail in the piece: yes (the Wood grows away from what hands laid: the bare ring; the blue caps over the hollow;
+the tenth trunk's candle; the pale vein-trees).
+1. Brief: PASS (written from the hunter's account and real church building).
+2. Scale: PASS (15 x 9 yd church, walls 1.1 yd, piers 0.5 yd, the Ossuarch 2 yd at the door).
+3. Form: PASS (all ray-cast height fields; piers with plinth, moulding, sheared tops).
+4. Light: PARTIAL. Moon and lantern cast shadows; the candle casts but has slipped out of frame; the moonbeam is
+   faint, not cinematic.
+5. Values: FAIL (worst). The nave floor's flags jump too far in tone between neighbours: a checkerboard. The doorway
+   is lantern-lit camouflage, not clean tone groups.
+6. Ramps: PASS (stone, moss, ivy, pale bark, vein: hue-shifted, 6-8 tones).
+7. Paint: PARTIAL. Joints pooled, lit lips on cracks, but wall faces still lean on noise texture over stroke.
+8. Contact: PASS (moss at the feet of walls and piers, the bare ring, AO, the hero on his step).
+9. Detail where it counts: PARTIAL. Piers and lit wall faces detailed; the door, jambs and fallen arch are thin.
+10. Life: NOT CHECKED in motion since pass 1 (animate() not run with the ruin; candle flicker, caps breathing, mist).
+11. Seen as the player sees it: PARTIAL. Study camera, Ossuarch for scale; the church tile not yet seen in the game.
+12. Skeptic round: against the old-growth judge scene, this one is flatter in light (no strong beams) and busier in
+    the floor.
+Section 2b: the new pieces are still scene-local in places (the church walls, piers and altar are one generator,
+ruin.py, but not yet exported as separate landkit objects with sprites, collision and combat data).
+Next when Derek says go (worst first): 1) the floor's checkerboard (closer tones), 2) the doorway and its fallen arch,
+3) the moonbeam and candle in frame, 4) the ruin's pieces exported as game objects, 5) the church tile seen in game,
+6) run it animated.
+Section 8 (to return to): metal and armour, the environment agenda, repainting the effects, the effects still to
+build, melee.
