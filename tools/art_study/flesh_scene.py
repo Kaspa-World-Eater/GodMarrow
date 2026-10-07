@@ -818,9 +818,9 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     gb = W["gbase"]
     pa = GATE + PERP * -(POST_U + 0.3) + AX * (POST_HR + 0.35)
     pb = GATE + PERP * (POST_U + 0.3) + AX * (POST_HR + 0.35)
-    arch = bonegen.rib((pa[0], pa[1], gb + 4.6), (pb[0], pb[1], gb + 4.45), 0.85, 0.32, 0.36, seed=12)
+    arch = bonegen.rib((pa[0], pa[1], gb + 3.15), (pb[0], pb[1], gb + 3.0), 0.6, 0.32, 0.36, seed=12)   # hung within the fires' light (pass 101)
     kp = GATE + AX * (POST_HR + 0.45)
-    sk = bonegen.skull((kp[0], kp[1], gb + 4.45), 0.62, (AX[0] + 0.1, AX[1], -0.35), seed=4)
+    sk = bonegen.skull((kp[0], kp[1], gb + 3.05), 0.62, (AX[0] + 0.1, AX[1], -0.35), seed=4)
     bonegen.draw(img, zb, dep, ws.to_px, [arch, sk], lts, ws.SUN)
     # pustules on the flesh: each swells, shines, bursts, heals
     rr = np.random.default_rng(71)
