@@ -192,3 +192,13 @@ Worst first: the pool, the floating vein, the light.
 56. The flags laid on the world's own axes (diamonds in this camera: a floor); near the flesh the stones heave,
     tip and crack, and the flesh comes up through their joints first.
 57. The paving rebuilt as real form (STUDY chapter 1): each slab its own height (settle, tip, proud edges), arrises round on the path and sharp off it, dished by wear with water lying, spalls, offset cracks; lit through its own normals; colour from the same causes (bed, path, tooling, grime, lichen, wet). Better, still far from real. Derek ordered real-world studies first (chapters 02, 03).
+   RULES CHECK (reminder, 57): MASTER_RULES (now with 2c: study first, a report per piece) and the Moor's lore
+   re-read; chapters 1-3 read. Checklist: 3 Form: the paving height-first now, stone pillars and doors still not;
+   5 Values: the yard pale and busy against the dark Moor; 7 Paint: joints all one width and colour; 8 Contact: the
+   flesh meets the paving in a cut-out. Worst (Derek: "the stones and tiles look awful"): the paving. Applying
+   chapter 2: Pompeii's pillowed basalt polygons, pale ash in the joints, a polished processional way, the flesh
+   through the joints first (Angkor).
+58. The courtyard paving rebuilt from chapter 2 (Pompeii): dark basalt polygons, pillowed, arrises round, hairline joints of pale ash, the processional way polished pale and bluer catching the moon, a warm weathered rind off the way, vesicles, rare lichen; the flesh lifting and tipping the stones near it. Reads as real paving at last.
+   Graded (58): the flesh in every joint across the yard (its reach too far) and the joints too wide: cobbles, not Pompeii.
+59. The heave only near the flesh; the joints hairline elsewhere, pale ash in them.
+   Graded (59): reads as real lava paving: tight pillowed basalt, hairline pale joints, the flesh coming up through the joints only near its edge, the way polished. Next: stone sizes too even; the pillars and drums (chapter 2).

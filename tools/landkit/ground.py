@@ -258,6 +258,72 @@ def flags(qa, qp, px, py, seed=0, heave=None, moon=np.array([-0.62, 0.22, 0.75])
     return np.clip(col, 0, 1), h, I["joint"] & ~I["gone"]
 
 
+BASALT = np.array([0.24, 0.24, 0.255])          # Vesuvian lava, fresh (#3c3d3f-#55534f)
+BASALT_POL = np.array([0.4, 0.41, 0.44])        # polished by feet, bluer (#6a6c70)
+BASALT_RIND = np.array([0.3, 0.26, 0.22])       # the old weathered rind, warm
+FINES = np.array([0.5, 0.49, 0.47])             # pale ash fines packed in the joints
+
+
+def _poly(px, py, seed, heave, path):
+    """the polygon paving's height (chapter 2, Pompeii): irregular 4-7 sided stones 0.45-1 yd, fitted tight, each
+    pillowed by wear with its arrises rounded, settled its own way, tipped and lifted by the flesh pushing under"""
+    wx = px + (vn(px * 0.9 + seed, py * 0.9) - 0.5) * 0.35                # warped so no lattice shows
+    wy = py + (vn(px * 0.9, py * 0.9 + seed + 4) - 0.5) * 0.35
+    f1, f2, cid, cx, cy = cells(wx, wy, 0.78, seed + 61, 1.0)
+    ed = (f2 - f1) * 0.5                                                   # yards to the stone's edge
+    gap = 0.008 + h1(cid, 3, seed) * 0.01 + heave * 0.06
+    rr_ = 0.05 + path * 0.05                                              # rounder on the processional way
+    pillow = np.clip((ed - gap) / rr_, 0, 1)
+    pillow = pillow * pillow * (3 - 2 * pillow)
+    h = pillow * (0.035 + path * 0.015)
+    settle = (h1(cid, 4, seed) - 0.5) * 0.04 + heave * h1(cid, 5, seed) * 0.18
+    ta = (h1(cid, 6, seed) - 0.5) * 0.04 + np.sign(h1(cid, 6, seed) - 0.5) * heave * 0.22
+    tb = (h1(cid, 7, seed) - 0.5) * 0.04 + np.sign(h1(cid, 7, seed) - 0.5) * heave * 0.22
+    h = h + settle + ta * (wx - cx) + tb * (wy - cy)
+    joint = ed < gap
+    h = np.where(joint, -0.05, h)
+    return h, dict(ed=ed, gap=gap, cid=cid, joint=joint, settle=settle, f1=f1)
+
+
+def paving_poly(px, py, seed=0, heave=None, path=None, moon=np.array([-0.62, 0.22, 0.75])):
+    """dark basalt polygon paving, built from chapter 2: pillowed stones, hairline joints packed with pale ash, the old
+    processional way polished paler and bluer and catching the moon, the weathered rind warm on stones off the way,
+    sparse vesicle pits, rare lichen on the high dry stones; where the flesh heaves under, the stones lift and tip
+    and the joints open. Lit through its own normals. Returns colour, height, joints."""
+    hv = np.zeros(px.shape) if heave is None else heave
+    pth = np.zeros(px.shape) if path is None else path
+    e = 0.025
+    h, I = _poly(px, py, seed, hv, pth)
+    hx, _ = _poly(px + e, py, seed, hv, pth)
+    hy, _ = _poly(px, py + e, seed, hv, pth)
+    n = np.dstack([-(hx - h) / e, -(hy - h) / e, np.ones(h.shape)])
+    n = n / np.linalg.norm(n, axis=2, keepdims=True)
+    ndl = np.clip((n * moon).sum(2), 0, 1)
+    shade = np.clip((0.25 + ndl) / (0.25 + max(float(moon[2]), 0.1)), 0.3, 1.8)
+    cid = I["cid"]
+    tone = 0.85 + h1(cid, 8, seed) * 0.3
+    col = BASALT * tone[..., None]
+    rind = (1 - pth) * np.clip(1 - I["ed"] / 0.12, 0, 1) * 0.6 + (1 - pth) * 0.25
+    col = _mix(col, BASALT_RIND * tone[..., None], np.clip(rind * (h1(cid, 9, seed) > 0.3), 0, 1))
+    col = _mix(col, BASALT_POL, np.clip(pth * (0.5 + 0.5 * np.clip(I["ed"] / 0.2, 0, 1)), 0, 1))   # polished most in the middle
+    ves = (vn(px * 40 + seed, py * 40) > 0.83) & (pth < 0.6)
+    col = np.where(ves[..., None], col * 0.7, col)                       # vesicles, gas holes in the lava
+    lc = cells(px, py, 0.3, seed + 70, 1.0)
+    lich = (pth < 0.1) & (I["settle"] > 0.0) & (h1(cid, 10, seed) > 0.75) & (lc[0] < 0.035 + h1(lc[2], 1, seed) * 0.05) & (h1(lc[2], 2, seed) > 0.6)
+    col = np.where(lich[..., None], _mix(col, np.array([0.46, 0.47, 0.42]), np.full(px.shape, 0.7)), col)
+    grain = (vn(px * 24 + seed, py * 24) - 0.5) * 0.06 * (1 - pth)
+    col = col * (1 + grain[..., None]) * shade[..., None]
+    hm = moon + np.array([0.62, 0.62, 0.48])
+    hm = hm / np.linalg.norm(hm)
+    spec = np.clip((n * hm).sum(2), 0, 1) ** 40
+    col = col + (spec * (0.04 + pth * 0.3))[..., None] * np.array([0.75, 0.8, 0.95])   # the polish catching the moon
+    a_ = ash(px, py, seed + 3)
+    deep = np.clip(1 - I["ed"] / np.maximum(I["gap"], 1e-3), 0, 1)
+    jc = _mix(FINES * (0.8 + vn(px * 9, py * 9)[..., None] * 0.3), a_ * 0.5, deep * 0.4 + hv * 0.6)   # pale fines, darker where opened
+    col = np.where(I["joint"][..., None], jc, col)
+    return np.clip(col, 0, 1), h, I["joint"]
+
+
 SKIN = np.array([0.36, 0.12, 0.14])
 RAW = np.array([0.5, 0.2, 0.22])
 BRUISE = np.array([0.22, 0.09, 0.17])

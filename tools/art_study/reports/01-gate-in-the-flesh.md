@@ -91,6 +91,13 @@ messages. The lore read for it:
 12. **Height-first paving** (pass 57): each slab settled and tipped, the proud edge against its neighbour, arrises
     round on the path and sharp off it, wear dishes, spalls and offset cracks, lit through its own normals. It is
     clearly better, though not yet good.
+14. **Building the paving from a real ruin (chapter 2, Pompeii), not from imagination** (passes 58 and 59): dark
+    basalt polygons from warped Voronoi cells, each stone pillowed (a smoothstep dome rising from its joint) with
+    rounded arrises, hairline joints packed with pale ash, the processional way polished paler and bluer with a moon
+    sheen, a warm rind off the way. Lit through its own normals, the near rim lit and the far lip shadowed. It read
+    as real paving at the first render, which no amount of tweaking the invented flags had achieved. The flesh only
+    in the joints near its edge (Angkor's roots); its reach at first was too far and its joints too wide, giving
+    cobbles rather than Pompeii.
 13. **Reading the lore for one true detail** gave the gate its brief (the mouth's door) and the fangs their dried
     blood.
 

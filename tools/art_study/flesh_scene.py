@@ -237,10 +237,11 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     qp = (px - C[0]) * PERP[0] + (py - C[1]) * PERP[1]
     yard = (np.abs(qp) < YARD[0] + (vn(qa * 0.5, 3) - 0.5) * 1.6) & (qa > YARD[1]) & (qa < YARD[2])
     fd = ws.look(W, W["fdist"], px, py)
-    heave = np.clip(1 - fd / 2.2, 0, 1) ** 1.5                            # the flesh pushing up under the stones
-    fcol, fh, fj = groundgen.flags(px - C[0] + 0.37, py - C[1] + 0.81, px, py, seed=2, heave=heave, moon=ws.SUN)
+    heave = np.clip(1 - fd / 1.3, 0, 1) ** 1.6                            # the flesh pushing up under the stones, near it
+    way = np.clip(1 - (np.abs(qp) - 1.2 - (vn(qa * 0.4, 5) - 0.5) * 0.8) / 1.2, 0, 1) * (qa > YARD[1] - 1)   # the old processional way to the gate
+    fcol, fh, fj = groundgen.paving_poly(px, py, seed=2, heave=heave, path=way, moon=ws.SUN)
     pcol0, _ = groundgen.flesh(px, py, seed=1, moon=ws.SUN)
-    fcol = np.where((fj & (heave > 0.12 + (vn(px * 2, py * 2) - 0.5) * 0.3))[..., None], pcol0 * 0.8, fcol)   # flesh in the joints
+    fcol = np.where((fj & (heave > 0.3 + (vn(px * 2, py * 2) - 0.5) * 0.3))[..., None], pcol0 * 0.8, fcol)   # flesh in the joints
     drift = fbm(px * 0.45, py * 0.45) > 0.67 - np.clip(np.abs(qp) - 4.5, 0, 3) * 0.08  # ash drifted over the flags
     lay = yard & ~drift
     alb = np.where(lay[..., None], fcol, alb)
