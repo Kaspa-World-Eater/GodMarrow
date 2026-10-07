@@ -101,3 +101,6 @@ Worst: the huts' walls (Derek: "the huts need a lot of work"). Derek asked for x
 17. Shaded walls keep the sky's cold fill and the fire's light off the yard (slabs readable a step darker, not a black
     plane); a dying diseased giant brought into view at the yard's front left.
    Graded: the shaded hut readable; the giant at front left shows a jaundiced weeping eye bleeding sap down the pale bark. It now hides most of the left hut, and the eye's yellow ring is loud at this size (next: tone the ring, move the giant a yard out).
+18. The giant a yard and a half out (the left hut back in view); the eye's jaundiced white sallow, not lit yellow
+    (shared bark: the church's weeping eyes calm the same way, an improvement in the one place).
+   Graded: the left hut back in view; the giant at the frame's left with two weeping eyes and cankers bleeding; the eyes still read yellow-orange in the firelight (the fire's warm tint on top of the sallow white), acceptable as 'yellowing gross eye'.

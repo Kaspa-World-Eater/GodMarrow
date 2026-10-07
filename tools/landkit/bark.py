@@ -16,7 +16,7 @@ from kit import ramp, vn
 R_BARK = ramp("#16131a", "#28232a", "#3d3639", "#554c4b", "#6f655f", "#8b7f75", "#a89a8c", "#c2b5a3")   # pale vein-wood
 R_VEIN = ramp("#1d1218", "#33202a", "#4d3036", "#694643", "#86604f")                          # the vein: bruised, warm
 SAP = ramp("#120406", "#24070b", "#3a0b10", "#541318", "#6e1c1e")                             # sap: dark blood, fresh
-EYE_Y = ramp("#2a2410", "#4a3f18", "#6e5d22", "#93802e", "#b3a04a", "#c9b96a")                 # the white, jaundiced
+EYE_Y = ramp("#241f12", "#3b3319", "#554a22", "#6e622c", "#877938", "#9c8e48")                 # the white, jaundiced: sallow, not lit yellow
 EYE_I = ramp("#140f10", "#241a1a", "#352626", "#463434")                                     # a rheumy iris
 SAP_OLD = ramp("#140b0a", "#21110e", "#311a14", "#40241a")                                     # crusted as it dries
 

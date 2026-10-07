@@ -83,7 +83,7 @@ def shape_plan(w):
         p_ = C + AX * al + PERP * (ac * (FLOOR_W + 1.1) if abs(ac) == 1 else ac * FLOOR_W)
         w.trees.append((float(p_[0]), float(p_[1]), "giant", r_, 8.0))
     # a dying giant at the yard's front left, in view: its weeping eyes and cankers close to the pilgrim
-    w.trees.append((27.141, 19.364, "giant", 0.9, 8.0))
+    w.trees.append((26.293, 21.061, "giant", 0.9, 8.0))
     near = np.clip(1 - np.hypot(w.X - C[0], w.Y - C[1]) / 9.0, 0, 1)
     w.light = w.light * (1 - near) + 0.4 * near
     w.gap = (C[0] - 1.5, C[1] - 2.0, 4.0)
