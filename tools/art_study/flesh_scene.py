@@ -36,12 +36,40 @@ import fang as fanggen                       # noqa: E402
 import vessel                                # noqa: E402
 import bone as bonegen                       # noqa: E402
 import column as colgen                      # noqa: E402
+import kit                                   # noqa: E402
+
+# THE CAVERN. The courtyard lies in a cavern under the Moor (the lore: "the god held a room open inside itself, wide as
+# the Moor ... and in the room knelt our grandmothers' grandmothers"). The roof is far overhead and out of sight; one
+# ragged hole in it lets the moon down as a single shaft, the key light, falling between the pilgrim and the eye. All
+# else is lit by what burns or festers down here: the lantern, the gate's ember glow, the pustules' sickly yellow.
+ZC = 13.0                                    # the roof's height over the floor
+ws.SUN = np.array([-0.36, 0.13, 0.92])
+ws.SUN = ws.SUN / np.linalg.norm(ws.SUN)     # a high moon over the hole, still from the upper left (rule 11)
+_SXY = ws.SUN[:2] / ws.SUN[2]
+SHAFT_AT = None                              # set below once C is known: where the shaft's centre falls on the floor
 from wood_ecosystem import vn, fbm           # noqa: E402
 
 C = np.array([20.0, 19.0])
 AX = np.array([1.0, 1.0]) / np.sqrt(2)       # toward the viewer (down the screen)
 PERP = np.array([1.0, -1.0]) / np.sqrt(2)    # across (screen right)
 ws.FOCUS = C + AX * 2.6
+SHAFT_AT = C + AX * 8.4 + PERP * 2.2
+HOLE = SHAFT_AT + _SXY * (ZC - 0.6)          # the hole in the roof, up the moon's direction from the floor
+HOLE_R = 3.3
+
+
+def shaft(x, y, z):
+    """0..1: how much of the moon reaches a point, through the ragged hole far overhead"""
+    qx = x + _SXY[0] * (ZC - z) - HOLE[0]
+    qy = y + _SXY[1] * (ZC - z) - HOLE[1]
+    a = np.arctan2(qy, qx)
+    r = HOLE_R * (1 + (vn(np.cos(a) * 2 + 3, np.sin(a) * 2) - 0.5) * 0.5)
+    d = np.hypot(qx, qy)
+    return np.clip((r - d) / 0.6, 0, 1) * (z < ZC)
+
+
+ws.MOONLIT = lambda px, py, pz, t: shaft(px, py, pz)
+kit.SKY = lambda P: shaft(P[..., 0], P[..., 1], P[..., 2])
 ws.HERO = C + AX * 8.2 - PERP * 0.8
 
 GATE = C + AX * 0.9                          # the doorway's centre at the swell's foot
@@ -121,6 +149,21 @@ def shape_plan(w):
     lvl = float(H[np.unravel_index(np.argmin(e), e.shape)]) - 0.12
     m_ = np.clip((1.35 - e) / 0.5, 0, 1)
     H = H * (1 - m_) + np.minimum(H, lvl) * m_                           # the pool's hollow: its surface level
+    # the cavern's walls: columnar basalt rising out of sight round the courtyard, the god's flesh in their seams
+    qa_ = (X - C[0]) * AX[0] + (Y - C[1]) * AX[1]
+    qp_ = (X - C[0]) * PERP[0] + (Y - C[1]) * PERP[1]
+    wall_d = np.abs(qp_) - (10.5 + (fbm(qa_ * 0.25, 7) - 0.5) * 3.0 + np.clip(qa_ - 9, 0, None) * 0.25)
+    wall = np.clip(wall_d / 1.6, 0, 1) ** 0.7 * (12 + fbm(X * 0.5, Y * 0.5) * 3)
+    cols_ = (vn(X * 1.4 + 5, Y * 1.4) > 0.5) * 0.25 * (wall > 0.5)            # columnar jointing: faceted steps
+    H = np.maximum(H, wall + cols_)
+    w.cave = wall > 0.4
+    # two great stalagmites in the near corners: dark shapes framing the shot
+    for (pa, pp, hh, rr0, sd) in ((14.2, -8.2, 7.5, 1.5, 3), (15.0, 7.6, 9.0, 1.8, 4), (12.8, -10.6, 4.0, 1.1, 5)):
+        p0 = C + AX * pa + PERP * pp
+        d = np.hypot(X - p0[0], Y - p0[1]) * (1 + (fbm(X * 1.2 + sd, Y * 1.2) - 0.5) * 0.5)
+        stal = hh * np.clip(1 - d / rr0, 0, 1) ** 0.55
+        H = np.maximum(H, stal)
+        w.cave = w.cave | (stal > 0.3)
     w.H = H
     w.wet = np.clip(1 - np.abs(r - 0.5) / 3.0, 0, 1) * 0.6               # mist lying at the swell's foot
 
@@ -232,7 +275,7 @@ ws_T = [0.0]                                 # the loop's time, for the ground's
 
 
 def ground(img, W, px, py, pz, SX, SY, L, v, gl):
-    k = (0.3 + L["moon"][..., None] * 0.85 * np.array([0.86, 0.9, 1.05]) + L["lamp"][..., None] * 1.5 * np.array([1.15, 0.85, 0.55])) * (1 - L["ao"][..., None] * 0.35)
+    k = (0.09 + L["moon"][..., None] * 1.35 * np.array([0.86, 0.9, 1.05]) + L["lamp"][..., None] * 1.5 * np.array([1.15, 0.85, 0.55])) * (1 - L["ao"][..., None] * 0.35)
     alb = groundgen.ash(px, py, seed=4)
     qa = (px - C[0]) * AX[0] + (py - C[1]) * AX[1]
     qp = (px - C[0]) * PERP[0] + (py - C[1]) * PERP[1]
@@ -400,11 +443,11 @@ def living_flesh(img, w, W, px, py, pz, L, T):
         fanggen.draw(img, zb, dep, ws.to_px, f, lts, ws.SUN, ambient=0.15)
     # the colonnade and its fallen drums (landkit column.py, from chapter 2)
     shapes = []
-    for (p, hgt, sd) in COLS:
-        g0 = float(ws.look(W, W["H"], np.array(p[0]), np.array(p[1])))
+    for i, (p, hgt, sd) in enumerate(COLS):
+        g0 = W["obj"][790 + i]["base"]                                   # the ground under it, before it was stamped
         shapes.append(colgen.shaft((p[0], p[1], g0 + 0.45), 0.5, max(hgt - 0.45, 0.3), seed=sd))
     for i, (p, a, L_) in enumerate(DRUMS):
-        g0 = float(ws.look(W, W["H"], np.array(p[0]), np.array(p[1])))
+        g0 = W["obj"][810 + i]["base"]
         shapes.append(colgen.drum((p[0], p[1], g0 + 0.32), (np.cos(a), np.sin(a)), 0.5, L_, seed=90 + i))
     colgen.draw(img, zb, dep, ws.to_px, sorted(shapes, key=lambda o: (o.get("b", o.get("c"))[0] + o.get("b", o.get("c"))[1])), lts, ws.SUN)
     gh = lambda x, y: float(ws.look(W, W["H"], np.array(x), np.array(y)))
@@ -665,6 +708,45 @@ ws.GROUND = ground
 ws.FOREST_LIFE = False
 ws.LIVING.append(mycelium)
 ws.LIVING.append(living_flesh)
+
+VIEW = np.array([1.0, 1.0, 2 * 9 / 21])
+VIEW = VIEW / np.linalg.norm(VIEW)
+
+
+def beam(img, w, W, px, py, pz, L, T):
+    """the moon's shaft made visible: the air in it lit (summed along each pixel's line of sight from the surface up to
+    the roof), and motes of ash and dust drifting down through it, glinting as they turn"""
+    GH, GW = img.shape[:2]
+    acc = np.zeros(px.shape)
+    for k in range(60):
+        s = 0.25 + k * 0.42
+        x, y, z = px + VIEW[0] * s, py + VIEW[1] * s, pz + VIEW[2] * s
+        acc += shaft(x, y, z) * (z < ZC) * (0.75 + 0.5 * vn(x * 0.7 + T * 0.6, z * 0.7 - y * 0.3))   # the air uneven, drifting
+    acc = acc * 0.42
+    fall = np.clip(1 - pz / ZC, 0.5, 1)
+    img = img + (acc * 0.03 * fall)[..., None] * np.array([0.55, 0.62, 0.78])
+    rr = np.random.default_rng(31)
+    dep = px + py
+    for i in range(170):
+        z0 = rr.uniform(0.2, ZC - 0.5)
+        z = (z0 - T * rr.uniform(0.6, 1.6) * 1.0) % (ZC - 0.3) + 0.2                  # drifting down, a loop
+        a, r = rr.uniform(0, 6.283), np.sqrt(rr.uniform(0, 1)) * HOLE_R * 0.95
+        x = HOLE[0] - _SXY[0] * (ZC - z) + np.cos(a) * r + np.sin(T * 6.283 + i) * 0.08
+        y = HOLE[1] - _SXY[1] * (ZC - z) + np.sin(a) * r
+        sx, sy = ws.to_px((x, y, z))
+        ix, iy = int(round(sx)), int(round(sy))
+        if not (0 <= iy < GH and 0 <= ix < GW) or dep[iy, ix] > x + y + 0.2:
+            continue
+        glint = 0.5 + 0.5 * np.sin(T * 6.283 * rr.uniform(2, 5) + i)
+        big = rr.random() < 0.15                                             # flakes of ash among the dust
+        c = (np.array([0.7, 0.72, 0.78]) if big else np.array([0.8, 0.84, 0.95])) * (0.12 + glint * 0.3) * shaft(x, y, z)
+        img[iy, ix] = np.minimum(img[iy, ix] + c, 1)
+        if big and ix + 1 < GW:
+            img[iy, ix + 1] = np.minimum(img[iy, ix + 1] + c * 0.5, 1)
+    return np.clip(img, 0, 1)
+
+
+ws.LIVING.append(beam)
 
 
 def still(o, T0=0.0):

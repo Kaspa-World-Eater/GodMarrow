@@ -27,6 +27,10 @@ messages. The lore read for it:
 - "The gate needs to look more brutal and imposing and ancient"; "the gate should have extruded iron bars".
 - "The ground looks pretty bad still"; "the stones and tiles just look awful, you really need to spend a lot of time
   on that".
+- After pass 61: **"A+ on the gore"** (the flesh, the vein, the eye's pus and the pool, the fangs' blood). "The teeth
+  still look lacking. And the ruins need more going on. The stone tiles look too similar. Throw a little dead plant
+  life into the scene. And some gore tendrils running up the pillars with pustules emitting a sickly yellow light.
+  And let's turn this into a cavern. The cinematography is lacking."
 - "Review what it means to detail and nuance things, make it like the real world." This led to the studies
   (chapters 1 to 3).
 

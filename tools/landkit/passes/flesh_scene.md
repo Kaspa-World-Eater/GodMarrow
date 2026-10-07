@@ -206,3 +206,25 @@ Worst first: the pool, the floating vein, the light.
    Graded (60): true columns at last; but the shade side flat blue with the flutes lost, the bleaching wrapping the tops like a sock.
 61. Sky light and the ground's warmth in the shade, the flute bottoms shut in more, bleaching only on faces that truly look up.
    Graded (61): true old columns, the fallen drums' faces read; the moon-turned-away faces still flat and dark. Next in the stone: the drums in a domino fall line, the rubble ridge; then the teeth from chapter 3.
+
+   Derek (after 61): "A+ on the gore. The teeth still look lacking. And the ruins need more going on. The stone tiles
+   look too similar. Throw a little dead plant life into the scene. And some gore tendrils running up the pillars with
+   pustules emitting a sickly yellow light. And let's turn this into a cavern. The cinematography is lacking."
+   Lore for the cavern: "The god held a room open inside itself, wide as the Moor and wider ... and in the room knelt
+   our grandmothers' grandmothers"; the courtyard lies in that room under the Moor.
+62. A CAVERN: the roof far overhead, one ragged hole letting the moon down as a single shaft (the scene's own
+    moonlight hook in the engine; kit.SKY so every ray-cast piece is lit only where the shaft reaches); the ground's
+    ambient low (darkness off the light); walls of columnar basalt rising out of sight round the courtyard; two
+    great stalagmites and a lesser one framing the near corners.
+   Graded (62): the mood at once (darkness, the fangs and columns caught in light, the lantern's pool); but no shaft
+   on the floor: with the low moon the hole sat over the side wall, which shadowed everything; the stalagmites flat
+   black cones.
+63. A high moon (still from the upper left) so the hole stands over the courtyard; the beam made visible in the
+    air (summed along each line of sight, uneven, drifting) with 420 motes of dust and ash drifting down through it.
+   Graded (63): the beam and dust there, but the dust a starfield, the beam faint, the shaft's pool on dark flesh
+   unseen; and the fangs and columns still glowing as under an open sky: the moon's highlight, rim and the fangs' tip
+   glow were not gated by the shaft.
+64. The moon's highlight, rim and tip glow gated by the shaft in every piece; the shaft turned onto the eye (the
+    star), the pilgrim at the edge of its light, wider and brighter; the beam fuller; the dust a few soft motes.
+   Bug (64): the columns' and drums' ground was read at their centres AFTER they were stamped into the height field, so each shaft began on top of its own column and the drums floated; the old flat paint showed beneath. Fixed: the ground saved at stamping.
+   Graded (64): a scene at last: the eye glistening in the moon's shaft, the pilgrim at the edge of its light, the beam with dust, darkness round, the stalagmites framing. (The fangs measured dark, 0.1-0.2: the preview misled.) Next: the gore tendrils up the pillars with pustules giving a sickly yellow light; the stalagmites need form.

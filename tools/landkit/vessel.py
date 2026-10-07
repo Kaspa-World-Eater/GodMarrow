@@ -11,7 +11,7 @@ the flesh is darkened round it.
   draw(img, zb, dep_scene, to_px, P, r0, T, lights, moon, seed)
 """
 import numpy as np
-from kit import vn, ramp
+from kit import vn, ramp, skylit
 
 KX, KY, KZ = 18.0, 9.0, 21.0
 VIEW = np.array([1.0, 1.0, 2 * KY / KZ])
@@ -80,10 +80,10 @@ def draw(img, zb, dep_scene, to_px, P, r0, T, lights, moon, seed=1, tol=0.06, gr
                 if d < dep_scene[yy, xx] - tol or d <= zb[yy, xx]:
                     continue
                 zb[yy, xx] = d
-                ndl = max(0.0, float(N @ moon))
+                ndl = max(0.0, float(N @ moon)) * float(skylit(Pp[None])[0])
                 val = 0.14 + ndl * 0.55
                 warm = np.zeros(3)
-                spec = (max(0.0, float(N @ ((moon + VIEW) / np.linalg.norm(moon + VIEW))))) ** 40 * 0.5
+                spec = (max(0.0, float(N @ ((moon + VIEW) / np.linalg.norm(moon + VIEW))))) ** 40 * 0.5 * float(skylit(Pp[None])[0])
                 for (lp, lc, reach) in lights:
                     v = np.array(lp) - Pp
                     dist = np.linalg.norm(v)

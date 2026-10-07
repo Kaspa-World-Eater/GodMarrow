@@ -11,7 +11,7 @@ broken the spongy bone shows, dark and honeycombed; dried sinew still binding it
 seeped from its ends. The moon lights its top, the warm lights its flank; a lit rim where it turns from the light.
 """
 import numpy as np
-from kit import vn, ramp
+from kit import vn, ramp, skylit
 
 KX, KY, KZ = 18.0, 9.0, 21.0
 VIEW = np.array([1.0, 1.0, 2 * KY / KZ])
@@ -163,11 +163,12 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ambient=0.15, tol=0.5)
             _, x, y, z = _skull(Pv, o)
             u1, u2 = x * 9 + z * 3, y * 9
             ends = np.ones(len(Pv))
-        ndl = np.clip(N @ moon, 0, 1)
+        ndl = np.clip(N @ moon, 0, 1) * skylit(Pv)
         val = ambient + ndl * 0.6
         warm = np.zeros((len(Pv), 3))
         hm = (moon + VIEW) / np.linalg.norm(moon + VIEW)
-        spec = np.clip(N @ hm, 0, 1) ** 24 * 0.12
+        sk = skylit(Pv)
+        spec = np.clip(N @ hm, 0, 1) ** 24 * 0.12 * sk
         for (lp, lc, reach) in lights:
             v_ = np.array(lp) - Pv
             dist = np.linalg.norm(v_, axis=-1)
@@ -199,7 +200,7 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ambient=0.15, tol=0.5)
             seep = (ends < 0.2) & (vn(th * 4 + 9, s * 30) > 0.58) & ~sin_ & (N[:, 2] < 0.4)
             col = np.where(seep[:, None], col * np.array([0.6, 0.35, 0.3]), col)
         col = col * (1 + warm * 1.3) + spec[:, None]
-        rim = (np.clip(1 - N @ VIEW, 0, 1) ** 3) * (N[:, 0] < 0)
+        rim = (np.clip(1 - N @ VIEW, 0, 1) ** 3) * (N[:, 0] < 0) * sk
         col = col + rim[:, None] * np.array([0.1, 0.11, 0.13])
         img[yx] = np.clip(col, 0, 1)
         zb[yx] = depth[vis]

@@ -57,6 +57,7 @@ LIVING = []              # f(img, w, W, px, py, pz, L, T): more living layers, d
 GROUND_LIFE_OK = None    # f(x, y) -> bool: where grass may grow (a ruin keeps its bare ring and its stone clear)
 RIM = (1.35, (0.025, 0.025, 0.03))   # the moonlit rim on objects: strength and cool lift
 FOREST_LIFE = True       # the wood's own living layers (the leaf fall, falling and skittering leaves, the wisp-fire)
+MOONLIT = None           # f(px, py, pz, t) -> 0..1: a scene's own reach of the moon (a cavern's shaft)
 GROUND = None            # f(img, W, px, py, pz, SX, SY, L, v, gl) -> img: another land's ground tiles over the wood's
 
 
@@ -285,6 +286,8 @@ def shade(W, px, py, pz, SX, SY, t=0.0):
     flk = (vn(px * 1.3 + ox_, py * 1.3 + oy_) > 0.7)
     leafsh = vn(px * 0.55 + ox_ * 0.7, py * 0.55 + oy_ * 0.7) * 0.6 + vn(px * 1.4 + ox_, py * 1.4 + oy_) * 0.4
     moonlit = np.clip(0.42 + canopy * 0.75, 0, 1) + flk * 0.24 * (canopy < 0.6)       # forms must still read under the leaves (flecks 40% fainter)
+    if MOONLIT is not None:
+        moonlit = MOONLIT(px, py, pz, t)
     ndl = np.clip((n * SUN).sum(2), 0, 1)
     sx0, sy0, sz0 = px + n[..., 0] * 0.12, py + n[..., 1] * 0.12, pz + n[..., 2] * 0.12
     sh = np.zeros_like(px, bool)

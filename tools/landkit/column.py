@@ -21,7 +21,7 @@ THE SURFACE, placed by cause (chapter 2's cause masks):
 Pale limestone, lit cool by the moon and warm by the lantern; shadows blue-violet, never black.
 """
 import numpy as np
-from kit import vn, ramp
+from kit import vn, ramp, skylit
 
 KX, KY, KZ = 18.0, 9.0, 21.0
 VIEW = np.array([1.0, 1.0, 2 * KY / KZ])
@@ -158,7 +158,7 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ground=None, ambient=0
         N = np.stack([sdf(Pv + np.array(dv), o) - sdf(Pv - np.array(dv), o) for dv in ([e, 0, 0], [0, e, 0], [0, 0, e])], -1)
         N /= np.linalg.norm(N, axis=-1, keepdims=True) + 1e-9
         seed = o["seed"]
-        ndl = np.clip(N @ moon, 0, 1)
+        ndl = np.clip(N @ moon, 0, 1) * skylit(Pv)
         lit = np.clip((ndl - 0.03) / 0.25, 0, 1)
         val = ambient + lit * 0.4 + ndl * 0.25
         occ = np.clip(sdf(Pv + N * 0.06, o) / 0.06, 0, 1)                  # flute bottoms and joints a little shut in
@@ -209,9 +209,10 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ground=None, ambient=0
             band = face & (rr_ >= 0.8)
             col = np.where(band[:, None], col * 1.1, col)                   # the smooth contact band
         col = col * (1 + warm * 1.2) + (refl[:, None] * np.array([0.5, 0.2, 0.18]))   # the flesh's warmth below
-        spec = np.clip(N @ hm, 0, 1) ** 20 * 0.05
+        sk = skylit(Pv)
+        spec = np.clip(N @ hm, 0, 1) ** 20 * 0.05 * sk
         col = col + spec[:, None]
-        rim = (np.clip(1 - N @ VIEW, 0, 1) ** 3) * (N[:, 0] < 0)
+        rim = (np.clip(1 - N @ VIEW, 0, 1) ** 3) * (N[:, 0] < 0) * sk
         col = col + rim[:, None] * np.array([0.08, 0.09, 0.11])
         img[yx] = np.clip(col, 0, 1)
         zb[yx] = depth[vis]

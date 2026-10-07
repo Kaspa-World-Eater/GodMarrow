@@ -19,7 +19,7 @@ A real 3D eye, ray-cast per pixel along the game's own view (orthographic, the i
      lights: [(position xyz, colour rgb, reach yd)]; returns img; writes zb (larger = nearer the viewer)
 """
 import numpy as np
-from kit import vn
+from kit import vn, skylit
 
 KX, KY, KZ = 18.0, 9.0, 21.0
 VIEW = np.array([1.0, 1.0, 2 * KY / KZ])
@@ -109,10 +109,10 @@ def draw(img, zb, dep_scene, to_px, centre, R, gaze, blink, lights, moon, seed=1
     visible = (lid_hit | eye_hit) & (depth >= dep_scene[ys, xs] - 0.4) & (depth > zb[ys, xs])
     # ---- lighting helper
     def shade(N, P_, spec_pow=0.0, spec_k=0.0):
-        L_ = np.clip((N * moon).sum(-1), 0, 1)[..., None] * np.array([0.62, 0.68, 0.82])
+        L_ = (np.clip((N * moon).sum(-1), 0, 1) * skylit(P_))[..., None] * np.array([0.62, 0.68, 0.82])
         H_v = moon + VIEW
         H_v = H_v / np.linalg.norm(H_v)
-        S_ = np.clip((N * H_v).sum(-1), 0, 1) ** spec_pow * spec_k if spec_k else 0.0
+        S_ = np.clip((N * H_v).sum(-1), 0, 1) ** spec_pow * spec_k * skylit(P_) if spec_k else 0.0
         out = np.full(N.shape, ambient) + L_
         spec = np.zeros(N.shape)
         if spec_k:

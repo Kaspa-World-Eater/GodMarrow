@@ -19,7 +19,7 @@ A true form, ray-marched along the game's camera (as eye.py), never a painted co
   f = make(centre_xy, base_z, height, R, seed, ax, perp)  (ax: the unit ground direction toward the viewer)
 """
 import numpy as np
-from kit import vn, ramp
+from kit import vn, ramp, skylit
 
 KX, KY, KZ = 18.0, 9.0, 21.0
 VIEW = np.array([1.0, 1.0, 2 * KY / KZ])
@@ -142,7 +142,7 @@ def draw(img, zb, dep_scene, to_px, f, lights, moon, ambient=0.16, tol=0.7):
     tt, du, dw, th = _frame(u, w, z, f)
     seed = f["seed"]
     # light: the moon (cool), each warm light, a little ambient; a warm bounce from the flesh below
-    ndl = np.clip((N * moon).sum(-1), 0, 1)
+    ndl = np.clip((N * moon).sum(-1), 0, 1) * skylit(P)
     lit = np.clip((ndl - 0.04) / 0.22, 0, 1)                            # a clean turn from light to shade
     val = ambient + lit * 0.42 + ndl * 0.22
     refl = np.clip(-N[..., 2] * 0.5 + 0.5, 0, 1) * (1 - lit) * np.clip(1 - z / (f['h'] * 0.8), 0, 1)
@@ -150,7 +150,8 @@ def draw(img, zb, dep_scene, to_px, f, lights, moon, ambient=0.16, tol=0.7):
     warm = np.zeros(SX.shape + (3,))
     spec = np.zeros(SX.shape)
     Hm = (moon + VIEW) / np.linalg.norm(moon + VIEW)
-    spec += np.clip((N * Hm).sum(-1), 0, 1) ** 70 * 0.9
+    sk = skylit(P)
+    spec += np.clip((N * Hm).sum(-1), 0, 1) ** 70 * 0.9 * sk
     for (lp, lc, reach) in lights:
         v_ = np.array(lp) - P
         dist = np.linalg.norm(v_, axis=-1)
@@ -174,7 +175,7 @@ def draw(img, zb, dep_scene, to_px, f, lights, moon, ambient=0.16, tol=0.7):
     age = np.clip(1 - tt * 1.6, 0, 1)                                     # yellowing toward the root
     col = col * (1 - age[..., None] * np.array([0.0, 0.06, 0.2]))
     thin = np.clip((tt - 0.62) / 0.3, 0, 1)                               # the glassy tip: light comes through it
-    col = col * (1 - thin[..., None] * 0.25) + np.array([0.5, 0.46, 0.38]) * thin[..., None] * 0.3
+    col = col * (1 - thin[..., None] * 0.25) + np.array([0.5, 0.46, 0.38]) * (thin * (0.15 + sk * 0.85))[..., None] * 0.3
     craze = (np.abs(vn(th * 4 + seed, z * 0.35) - 0.5) < 0.007) & (tt < 0.8) & (vn(th * 2, z * 0.2 + 5) > 0.45)   # few, long
     if f['split']:
         sa = (((th - f['split_a'] - np.sin(z * 1.3) * 0.15) + np.pi) % (2 * np.pi)) - np.pi
@@ -219,7 +220,7 @@ def draw(img, zb, dep_scene, to_px, f, lights, moon, ambient=0.16, tol=0.7):
     gloss = np.where(blood, 1.6, np.where(brk | tart, 0.15, np.where(climb, 0.8, 1.0)))
     col = col * (1 + bounce[..., None] * np.array([1.4, 0.3, 0.3])) + warm * col * np.where(blood, 0.5, 1.4)[..., None]
     col = col + (spec * gloss)[..., None] * np.array([0.9, 0.92, 1.0])
-    rim = (np.clip(1 - (N * VIEW).sum(-1), 0, 1) ** 3) * (N[..., 0] < 0)  # a lit rim on the moon's side, against the dark
+    rim = (np.clip(1 - (N * VIEW).sum(-1), 0, 1) ** 3) * (N[..., 0] < 0) * sk   # a lit rim on the moon's side, against the dark
     col = col + rim[..., None] * np.array([0.12, 0.13, 0.16])
     col = np.clip(col, 0, 1)
     img[ys[vis], xs[vis]] = col[vis]

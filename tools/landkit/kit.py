@@ -21,6 +21,13 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage as nd
 
+SKY = None                     # f(P (...,3)) -> 0..1: where the sky's light reaches (a cavern's shaft); None: open sky
+
+
+def skylit(P):
+    P = np.asarray(P, float)
+    return np.ones(P.shape[:-1]) if SKY is None else SKY(P)
+
 KX, KY, KZ = 18.0, 9.0, 21.0                  # world px per yard: x, y (a 36x18 tile) and height (core/iso.gd)
 MOON = np.array([-0.62, 0.22, 0.75])          # from the screen's upper left: world -x, a little +y (rule 11)
 MOON = MOON / np.linalg.norm(MOON)
