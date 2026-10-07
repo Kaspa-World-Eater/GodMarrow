@@ -104,3 +104,7 @@ Worst: the huts' walls (Derek: "the huts need a lot of work"). Derek asked for x
 18. The giant a yard and a half out (the left hut back in view); the eye's jaundiced white sallow, not lit yellow
     (shared bark: the church's weeping eyes calm the same way, an improvement in the one place).
    Graded: the left hut back in view; the giant at the frame's left with two weeping eyes and cankers bleeding; the eyes still read yellow-orange in the firelight (the fire's warm tint on top of the sallow white), acceptable as 'yellowing gross eye'.
+19. The rib bases: earth still clinging to the bone (clods and crumbs, thick at the foot, ragged above), the earth's
+    stain reaching higher; the foreground: troops of white caps in the litter below the yard (the hunter: they hold a
+    little light like a coal under ash, and mean the ground is sound), breathing faintly.
+   Graded: white caps scattered in troops across the foreground, faint coal-glow; the rib bases sit behind the bank trees at the frame's edges, so the clinging earth barely shows in this frame.

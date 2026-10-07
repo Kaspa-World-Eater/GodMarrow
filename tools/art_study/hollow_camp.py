@@ -314,7 +314,7 @@ def ribs(img, w, W, px, py, pz, L, T):
                 continue
             d_rib = p[0] + p[1]
             tip = i >= steps - 4
-            low = np.clip(1 - (p[2] - bz) / 1.6, 0, 1)                    # how near the earth it burst from
+            low = np.clip(1 - (p[2] - bz) / 2.4, 0, 1) ** 1.3             # how near the earth it burst from
             for yy in range(max(y0, 0), min(y1, GH)):
                 for xx in range(max(x0, 0), min(x1, GW)):
                     u, v_ = (xx + 0.5 - sx) / rx, (yy + 0.5 - sy) / ry
@@ -342,6 +342,9 @@ def ribs(img, w, W, px, py, pz, L, T):
                         col = R_BONE[2] * (0.6 if cell else 1.1)
                     if low > 0:                                           # stained by the earth it burst from
                         col = col * (1 - low * 0.55) + np.array([0.12, 0.08, 0.05]) * low * 0.55
+                        # the earth not yet fallen off it: clods and crumbs clinging, thickest at the foot, ragged above
+                        if vn(u * 6 + j, p[2] * 9) > 0.35 + (p[2] - bz - 0.5) * 0.8:
+                            col = np.array([0.1, 0.07, 0.05]) * (0.7 + lm * 0.8) * (0.85 + vn(u * 20, p[2] * 20) * 0.3)
                         if abs(np.sin(u * 2.5 + p[2] * 7 + j)) < 0.12 and p[2] - bz < 1.4:   # roots gripping it
                             col = np.array([0.16, 0.11, 0.08]) * (0.6 + lm)
                     if 0.12 < (p[2] - bz) < 2.6 and u * tatter_side > 0.15 and vn(s_ * 40 + j, u * 6) > 0.45:
@@ -505,6 +508,38 @@ def draw_offerings(img, w, W, px, py, pz, L, T):
 
 
 ws.BUILD_HOOKS.append(stamp_stones)
+
+
+def white_caps(img, w, W, px, py, pz, L, T):
+    """the hunter: "the white caps hold a little light, the way a coal holds it under ash, and they mean the ground is
+    sound": troops of them in the litter below the yard, each a pale crown on a short stem, breathing faintly"""
+    GH, GW = img.shape[:2]
+    dep = px + py
+    rr = np.random.default_rng(23)
+    breathe = 0.85 + 0.15 * np.sin(T * 6.28)
+    for troop in range(6):
+        cx, cy = C + AX * rr.uniform(5.5, 9.0) + PERP * rr.uniform(-5.0, 5.0)
+        for q in range(int(rr.integers(5, 11))):
+            x, y = cx + rr.normal(0, 0.35), cy + rr.normal(0, 0.25)
+            g = float(ws.look(W, W["H"], np.array(x), np.array(y)))
+            size = int(rr.integers(1, 3))
+            sx, sy = ws.to_px((x, y, g))
+            ix, iy = int(round(sx)), int(round(sy))
+            if not (2 <= iy < GH - 2 and 2 <= ix < GW - 2) or dep[iy, ix] > x + y + 0.3:
+                continue
+            img[iy, ix] = np.array([0.5, 0.48, 0.42])                     # the stem
+            for dx_ in range(-size + 1, size):
+                img[iy - 1, ix + dx_] = np.array([0.82, 0.83, 0.78]) * breathe   # the crown
+            img[iy - 1, ix - size + 1] = np.array([0.95, 0.96, 0.92]) * breathe
+            img[iy + 1, ix + 1] = img[iy + 1, ix + 1] * 0.55
+            for dx_, dy_ in ((-2, -1), (2, -1), (0, -2), (-1, 0), (1, 0)):   # the little light it holds
+                jx, jy = ix + dx_, iy + dy_
+                if (jx + jy) % 2 == 0:
+                    img[jy, jx] = np.minimum(img[jy, jx] + np.array([0.05, 0.06, 0.06]) * breathe, 1)
+    return img
+
+
+ws.LIVING.append(white_caps)
 
 # the god under the valley: where the banks have slumped its hide shows through the soil (more god peeking through)
 R_HIDE = ws.ramp("#1c1418", "#2e2226", "#463538", "#5f4a4a", "#7a615c", "#94796f", "#ab9084")
