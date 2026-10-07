@@ -269,3 +269,8 @@ Worst first: the pool, the floating vein, the light.
    Graded (73): the stones vary (paler slabs, repair cobbles, cracks), but the pustules' light tints the whole yard olive-green, flattening it.
 74. The pustules' light on the ground halved: a local glow, not a wash.
    Graded (74): the yard reads as varied old basalt paving again, the sick light local; the whole shot holds (the gate backlit at the back, pustules on the pillars, the eye in the shaft).
+75. Dead plant life (Derek; landkit deadplants.py): it grew only where the moon came down, in the joints, and died:
+    46 tufts of dead grass round the shaft's footprint (straw blades bent and some snapped, pale where the moon or the
+    lamp catch them, dark beyond); two dried thorn bushes by the fallen drums (forking twigs, thorns); a dead vine up
+    the front pillar, its leaves curled brown. Each a true thin 3D stroke, depth-tested.
+   Graded (75): the dead grass tufts read in the joints round the shaft and in the lantern's pool (first: none placed, the shaft falls on flesh; and all of it near-black off the light); the thorn bushes and the vine too dark to read where they stand. Next: let the thorns and vine catch a light; then more going on in the ruins.

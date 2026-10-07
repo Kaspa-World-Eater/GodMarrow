@@ -37,6 +37,7 @@ import vessel                                # noqa: E402
 import bone as bonegen                       # noqa: E402
 import column as colgen                      # noqa: E402
 import gate as gategen                       # noqa: E402
+import deadplants                            # noqa: E402
 import kit                                   # noqa: E402
 
 # THE CAVERN. The courtyard lies in a cavern under the Moor (the lore: "the god held a room open inside itself, wide as
@@ -556,6 +557,39 @@ def living_flesh(img, w, W, px, py, pz, L, T):
     for (tp, tr, tsd) in W["tendrils"]:                                  # the gore tendrils: raw flesh, wet, pulsing
         vessel.draw(img, zb, dep, ws.to_px, tp, tr, T, lts, ws.SUN, seed=tsd, tol=0.35, ramp_=R_GORE, taper=True)
     pustules(img, zb, dep, T)
+    # the dead plant life (Derek): it grew only where the moon came down, in the joints, and died (landkit deadplants.py)
+    gh_ = lambda x, y: float(ws.look(W, W["H"], np.array(x), np.array(y)))
+    lamp = np.array([ws.HERO[0] + 0.25, ws.HERO[1] - 0.25, gh_(ws.HERO[0], ws.HERO[1]) + 0.7])
+
+    def plight(P):
+        lv = shaft(P[0], P[1], P[2]) * 0.9
+        dl = np.linalg.norm(P - lamp)
+        lv += 0.6 / (1 + (dl / 2.4) ** 2)
+        for fp in FIRES:
+            lv += 0.5 / (1 + (np.hypot(P[0] - fp[0], P[1] - fp[1]) / 1.6) ** 2)
+        return min(lv, 1.2)
+    pr_ = np.random.default_rng(404)
+    put = 0
+    for _ in range(400):
+        if put >= 60:
+            break
+        a, rd = pr_.uniform(0, 6.283), np.sqrt(pr_.uniform(0, 1)) * 5.5
+        cx_ = SHAFT_AT if pr_.random() < 0.5 else np.array(ws.HERO)        # round the shaft's edge and in the lantern's pool
+        x, y = cx_[0] + np.cos(a) * rd, cx_[1] + np.sin(a) * rd
+        if ws.look(W, W["putrid"], np.array(x), np.array(y)) > 0 or ws.look(W, W["tag"], np.array(x), np.array(y)) != 0:
+            continue                                                       # not on the flesh, not on a stone object
+        if np.hypot(x - ws.HERO[0], y - ws.HERO[1]) < 0.5:
+            continue
+        put += 1
+        deadplants.grass(img, zb, dep, ws.to_px, (x, y, gh_(x, y)), int(pr_.integers(4, 9)), pr_.uniform(0.25, 0.5), 500 + put, plight)
+    for k_, (pa_, pp_) in enumerate(((6.6, -6.6), (11.2, 5.4))):               # dried thorn bushes by the fallen drums
+        q = C + AX * pa_ + PERP * pp_
+        deadplants.thorn(img, zb, dep, ws.to_px, (q[0], q[1], gh_(q[0], q[1])), 0.9 + k_ * 0.3, 600 + k_, plight)
+    cp, chg, csd = COLS[2]                                                 # a dead vine up the front pillar on the left
+    g0 = W["obj"][792]["base"]
+    vp = [(cp[0] + np.cos(0.4 + z * 2.1) * 0.56, cp[1] + np.sin(0.4 + z * 2.1) * 0.56, g0 + 0.45 + z) for z in np.linspace(0, chg - 0.8, 70)]
+    deadplants.vine(img, zb, dep, ws.to_px, vp, 700, plight)
+    print('dead plants: tufts', put) if os.environ.get('PLDBG') else None
     for k_, fp in enumerate(FIRES):                                       # the banked fires: coals under a crust of ash, a thread of smoke
         g0 = gh(fp[0], fp[1]) if False else W["gbase"]
         rr = np.random.default_rng(900 + k_)
