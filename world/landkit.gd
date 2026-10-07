@@ -172,8 +172,7 @@ static func place(zone, s: String, name: String, tp: Vector2, dep: float, flip: 
 		zone.add_post(q, float(p[2]))
 		if cov > 0.0:
 			zone.add_cover(q, float(p[2]), cov, str(meta.get("material", "")), holders[0])
-	var big := float(meta.get("height", 0.0)) > 2.5
-	if big and zone.see != null:
+	if zone.see != null:                # every object vanishes while it stands between the eye and the pilgrim
 		for h in holders:
 			zone.see.props.append([h, h])
 	if posts.size() > 0:

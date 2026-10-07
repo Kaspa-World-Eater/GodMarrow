@@ -477,7 +477,7 @@ func _sprites() -> void:
 					continue
 				if foot_r > 0.45:
 					_cm_taken.append([tp, foot_r])
-					see.props.append([null, cn])
+				see.props.append([null, cn])     # every prop goes see-through, small ones too
 				var ch := Node2D.new()
 				var ca := Iso.to_screen(Vector2(s["x"], s["y"]))
 				var cd: float = float(s.get("d", float(s["x"]) + float(s["y"])))

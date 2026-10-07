@@ -36,6 +36,23 @@ and again whenever the reminder fires, the work in progress is checked against e
 6. **Code may run alongside.** Placement, generation and engine work may be finished while a piece is in work, but no
    second piece of art is begun.
 
+## 2b. Scenes make the game's assets; masterpieces are locked (Derek, 2026-10-07)
+
+"Every time I ask you to create a scene, every object must be made to perfection because when you're done creating
+these unique objects, we can reuse them ... Each one unique ... I've decided it's a masterpiece. You can lock in
+everything you made which means that they always need to be perfect. All this will become assets for the game."
+
+1. A scene is a commission for unique objects, not a picture. Every object in it (each wall, pier, stone, tree, candle,
+   cap, tuft) is built as a reusable game asset in `tools/landkit/` (sprite, normal map, collision, combat data);
+   nothing is painted for the scene alone.
+2. Every object is made to perfection the first time, with its own ten graded passes. None is background and none is
+   a stand-in to fix later.
+3. Every scene is unique, and its objects are new designs; many scenes build a library of one-of-a-kind pieces.
+4. When Derek calls a scene a masterpiece, its objects are locked: they are canonical game assets, used as they are.
+   Any later change must keep or raise their quality, never lower it. Shared parts (the bark, the stone) live in one
+   place (`tools/landkit/bark.py`, ...) so an improvement reaches every use.
+5. Until Derek says so, a scene and its objects are still in work.
+
 ## 3. The painting rules (from `docs/PAINTED_STANDARD.md`)
 
 1. Broad flat tones from a short ramp: large shapes of one tone, not speckle.
@@ -92,6 +109,12 @@ are lit by the scene and light it.
 - **Layouts breathe.** Spacing rules, so nothing clumps; open corridors and clearings built by the generator; enough
   variants that no repeat is visible.
 - **Light rays by the hour:** a low sun or moon, an opening, and something in the air to catch it.
+- **Built things at true scale, sized from real buildings.** A man is 2 yards. An ancient stone church of the old
+  road is about 15 x 9 yards, its walls a yard thick and 6 to 9 yards high, its piers half a yard round; a course
+  of stone about 0.4 yd, a block about 0.9 yd long; a door about 1.5 yd wide. Check every built piece against the
+  hero beside it before painting.
+- **See-through is total.** Any object standing between the camera and the pilgrim vanishes completely while it
+  hides them, for every object, small ones too (Derek, 2026-10-07).
 - **Collision at every base.** Walk around trunks, stones and logs; walk behind a root plate.
 - **Objects in combat.** Every object has a cover height, a material and hp. Shots stop in what is taller than their
   flight. Fire takes dry wood and runs over the litter, and wet wood smoulders. Ice glazes and slows, lightning seeks

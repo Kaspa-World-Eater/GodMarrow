@@ -48,6 +48,14 @@ _CACHE = {}
 _LIVE = {}                                                                 # the living layers' depths, for the hero
 
 
+# hooks for other scenes built on this engine (ruin_scene.py); this scene sets none of them
+WOOD_HOOKS = []          # f(w): change the plan before the world is built (clear ground, open the canopy)
+BUILD_HOOKS = []         # f(W, w): stamp more into the built world
+PAINTERS = {}            # kind -> f(img, m, v, n, px, py, pz, o, W, L): paint an object kind of another scene
+LIGHTS = []              # (x, y, z, reach): more warm lights (a candle), cast like the lantern
+LIVING = []              # f(img, w, W, px, py, pz, L, T): more living layers, drawn last
+
+
 def build(w):
     """the fine grid over the view: height, material, a tag per object, and per-object data"""
     x0, y0 = FOCUS - 15.0
@@ -293,6 +301,17 @@ def shade(W, px, py, pz, SX, SY, t=0.0):
         lsh |= look(W, H, lx0 + (lamp[0] - lx0) * f, ly0 + (lamp[1] - ly0) * f, -50.0) > lz0 + (lamp[2] - lz0) * f + 0.03
     breath = 1 + 0.09 * np.sin(t * 6.28 * 2) + 0.05 * np.sin(t * 6.28 * 5 + 1) + 0.04 * np.sin(t * 6.28 * 11)
     lampk = np.clip((n * lu).sum(2), 0, 1) ** 0.7 / (1 + (ld / (2.6 * breath)) ** 2) * np.where(lsh, 0.1, 1.0)
+    for (cx_, cy_, cz_, reach_) in LIGHTS:                                # more warm lights, cast as the lantern is
+        lp = np.array([cx_, cy_, cz_])
+        lv2 = np.dstack([lp[0] - px, lp[1] - py, lp[2] - pz])
+        ld2 = np.linalg.norm(lv2, axis=2)
+        lu2 = lv2 / ld2[..., None]
+        lsh2 = np.zeros_like(px, bool)
+        for k in range(1, 24):
+            f = k / 24
+            lsh2 |= look(W, H, lx0 + (lp[0] - lx0) * f, ly0 + (lp[1] - ly0) * f, -50.0) > lz0 + (lp[2] - lz0) * f + 0.03
+        flick = 1 + 0.12 * np.sin(t * 6.28 * 3 + cx_) + 0.06 * np.sin(t * 6.28 * 7)
+        lampk = lampk + np.clip((n * lu2).sum(2), 0, 1) ** 0.7 / (1 + (ld2 / (reach_ * flick)) ** 2) * np.where(lsh2, 0.08, 1.0)
     ao = np.clip((nd.gaussian_filter(H, 8) - H) * 2.5, 0, 1)
     ao_px = look(W, ao, px, py) * (~side)
     return dict(n=n, side=side, tg=tg, moon=moon, lamp=lampk, ao=ao_px, ndl=ndl, sh=sh, canopy=canopy)
@@ -439,6 +458,8 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
             img[li] = rockgen.LICHEN[np.clip(((v * 0.9 + 0.15) * 4).astype(int), 0, 3)][li]
             lo = m & (rm == rockgen.LICH_O)
             img[lo] = rockgen.RUST[np.clip(((v * 0.8 + 0.1) * 3).astype(int), 0, 2)][lo]
+        elif o["kind"] in PAINTERS:
+            img = PAINTERS[o["kind"]](img, m, v, n, px, py, pz, o, W, L)
         elif o["kind"] == "plate":
             # the root plate seen behind the log's butt: thick roots radiating from the butt like spokes, snapped at the
             # rim; dark packed earth between them; stones held in the roots; clods still clinging
@@ -862,6 +883,8 @@ def living(img, w, W, px, py, pz, L, t=0.0):
         sx_, sy_ = to_px((ax_ + np.sin(u * 6.28 + ph * 9) * 0.25, ay_, zz))
         if 0 <= int(sy_) < GH and 0 <= int(sx_) < GW and np.sin(u * 3.14) > 0.25:
             img[int(sy_), int(sx_)] = np.minimum(img[int(sy_), int(sx_)] * 0.3 + np.array([1.0, 0.82, 0.5]) * 0.75, 1)
+    for f in LIVING:
+        img = f(img, w, W, px, py, pz, L, T)
     return np.clip(img, 0, 1)
 
 
@@ -945,7 +968,11 @@ def hero_at(img, W, px, py):
 
 def animate(out, n=24):
     w = Wood()
+    for f in WOOD_HOOKS:
+        f(w)
     W = build(w)
+    for f in BUILD_HOOKS:
+        f(W, w)
     px, py, pz, SX, SY = cast(W)
     globals()["w"] = w
     frames = []
@@ -964,7 +991,11 @@ def animate(out, n=24):
 
 def main(out):
     w = Wood()
+    for f in WOOD_HOOKS:
+        f(w)
     W = build(w)
+    for f in BUILD_HOOKS:
+        f(W, w)
     px, py, pz, SX, SY = cast(W)
     L = shade(W, px, py, pz, SX, SY)
     globals()["w"] = w

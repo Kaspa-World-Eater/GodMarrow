@@ -15,7 +15,7 @@ uniform float sway = 0.0;           // how far a top bends, in the sprite's own 
 uniform bool canopy = false;
 uniform float cut_in = 420.0;
 uniform float cut_out = 720.0;
-uniform float ghost = 0.14;
+uniform float ghost = 0.0;          // nothing left of a crown over the pilgrim
 varying vec2 world;
 
 void vertex() {

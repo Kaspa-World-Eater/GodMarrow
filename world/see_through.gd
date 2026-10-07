@@ -24,7 +24,7 @@ func _process(dt: float) -> void:
 		if holder.global_position.y > hp.y + 4.0 and absf(holder.global_position.x - hp.x) < 900.0:
 			var r: Rect2 = cn.spr.get_global_transform() * cn.spr.get_rect()
 			if r.intersects(body):
-				want = 0.38
+				want = 0.0          # gone while it hides the pilgrim (Derek 2026-10-07: "total invisible", every object)
 		var a: float = _fade.get(holder, 1.0)
 		if absf(a - want) > 0.005:
 			a = move_toward(a, want, dt * 2.5)

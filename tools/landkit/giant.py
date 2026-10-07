@@ -23,6 +23,7 @@ The bole, as the study trees had it (tools/art_study/wood_scene.py, the bark Der
 """
 import sys
 import numpy as np
+import bark
 from kit import Field, cast, normals, moon_shadow, ao, light, paint, rim, export, ramp, vn, fbm, B4, MOON
 
 R_BARK = ramp("#16131a", "#28232a", "#3d3639", "#554c4b", "#6f655f", "#8b7f75", "#a89a8c", "#c2b5a3")   # pale vein-wood
@@ -107,32 +108,11 @@ def render(F, info):
     arc = ang * info["r"]
     along = pz
     img = np.zeros(mask.shape + (3,))
-    grain = vn(arc * 15.0 + along * 0.35, along * 1.6)
-    fine = vn(arc * 34.0 + along * 0.5, along * 3.6)
-    furrow = (grain < 0.32) | ((fine < 0.22) & (grain < 0.45))
-    ridge = (grain > 0.68) & (fine > 0.45)
-    plates = (vn(arc * 2.6 + 5, along * 0.9) - 0.5) * 0.12
-    streak = (vn(arc * 7.0, along * 0.25 + 3) > 0.78) * -0.07
-    skin = (vn(arc * 3.0, along * 0.5) - 0.5) * 0.06 + (vn(arc * 20, along * 6) - 0.5) * 0.03
-    bv = v + skin + streak * 0.6 - (furrow & (grain < 0.2)) * 0.05
     wood = mask
-    img[wood] = R_BARK[np.clip((bv * len(R_BARK)).astype(int), 0, len(R_BARK) - 1)][wood]
-    # the veins: raised cords rising from the roots and branching as they climb; dark and warm in the cord, lit along
-    # the edge toward the moon, a thin shadow on the far side
-    vd, vside = veins(info, arc, along)
-    cord = wood & bole & (vd < 1.0)
-    vt = np.clip(v * 0.75 + (vside * (ndl > 0)) * 0.25, 0, 0.99)
-    img[cord] = R_VEIN[np.clip((vt[cord] * len(R_VEIN)).astype(int), 0, len(R_VEIN) - 1)]
-    vlit = cord & (vside < -0.3) & (ndl > 0.1)
-    img[vlit] = np.minimum(R_BARK[np.clip((v[vlit] * len(R_BARK)).astype(int) + 1, 0, len(R_BARK) - 1)] * 1.05, 1)
-    vsh = wood & bole & (vd >= 1.0) & (vd < 1.7) & (vside > 0)
-    img[vsh] = img[vsh] * 0.8
-    away = np.clip(-(n[..., 0] * MOON[0] + n[..., 1] * MOON[1]), 0, 1)     # the side turned from the moon
-    damp = wood & (along < 0.35 + away * 0.5 + (vn(arc * 5, 1) - 0.5) * 0.3)
-    img[damp] = img[damp] * np.array([0.78, 0.78, 0.82])                   # the wet of the ground drawn up into it
+    img, cord = bark.paint(img, wood, bole, v, n, arc, along, info["r"], info["seed"], MOON)
+    fine = vn(arc * 34.0 + along * 0.5, along * 3.6)
     mossy = wood & (M == 2) & ~side & (vn(px * 5, py * 5) > 0.86) & (pz < 0.12)   # a trace of moss low in the creases
     img[mossy] = R_MOSS[np.clip(((v[mossy] * 0.45 + (fine[mossy] - 0.5) * 0.1) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 4)]
-    lit_side = np.clip(n[..., 0] * MOON[0] + n[..., 1] * MOON[1], 0, 1)
     rootm = wood & (M == 2)
     low = np.clip(1 - pz / 0.17, 0, 1)
     img[rootm] = img[rootm] * (1 - low[rootm] * 0.35)[:, None]             # darker as it goes under
@@ -140,27 +120,6 @@ def render(F, info):
     reach_ = np.hypot(px, py) / (info["r"] * 1.3 + 2.8)
     over = rootm & (vn(px * 9 + 2, py * 9) > 0.78 - low * 0.35 - np.clip(reach_ - 0.5, 0, 1) * 0.5)
     img[over] = LITTER[np.clip((v[over] * 0.9 * len(LITTER)).astype(int), 0, len(LITTER) - 1)]
-    lich = wood & ~mossy & ~cord & (lit_side > 0.2) & (vn(arc * 4 + 9, along * 2.5) > 0.83) & (pz < 12)
-    img[lich] = img[lich] * np.array([0.92, 1.0, 0.92])                   # faint grey-green lichen on the pale skin
-    # the scars where limbs fell, as beech carries them: a dark oval with a raised lip lit on its upper side, and the
-    # chevron "brow" above it; on the god's veins they look back like eyes
-    rs = np.random.default_rng(info["seed"] + 13)
-    circ = 2 * np.pi * info["r"]
-    for k in range(int(rs.integers(2, 5))):
-        a_s, z_s = rs.uniform(-0.6, 0.9) * info["r"], rs.uniform(4.5, 15.0)    # mostly on the side we see
-        w_s = rs.uniform(0.2, 0.3)
-        da = ((arc - a_s + circ / 2) % circ) - circ / 2
-        dz = along - z_s
-        e = (da / w_s) ** 2 + (dz / (w_s * 0.55)) ** 2
-        hole = bole & (e < 1.0)
-        lip = bole & (e >= 1.0) & (e < 2.0)
-        img[lip] = np.minimum(img[lip] * np.where(dz[lip] > 0, 1.28, 0.7)[:, None], 1)
-        img[hole] = R_BARK[1] * np.where(e[hole] < 0.45, 0.55, 0.9)[:, None]
-        brow = bole & (np.abs(da) < w_s * 1.7) & (np.abs(dz - (w_s * 0.85 + np.abs(da) * 0.4)) < 0.05)
-        img[brow] = img[brow] * 0.72
-    # the skin's stretch: faint wrinkles across it, closest at the foot and round the scars
-    wrin = bole & (np.sin(along * 38 + vn(arc * 2, along * 0.6) * 9) > 0.93) & (vn(arc * 3, along * 0.8) > 0.45 + np.clip(along / 12, 0, 0.4))
-    img[wrin] = img[wrin] * 0.86
     # heart-rot: a hollow opened at the foot, black inside, its lip lit and the wood round it softened
     if info["cav"]:
         da = np.abs(((ang - info["cav_ang"] + np.pi) % (2 * np.pi)) - np.pi)
