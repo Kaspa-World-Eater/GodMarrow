@@ -12,7 +12,8 @@ import wood_scene as ws                      # noqa: E402
 import bark                                  # noqa: E402
 
 _WORLD = {}
-DYING_IN_FIVE = (0, 2)                       # two in five of the Wood's trees are dying, and weep
+DYING_IN_FIVE = (0, 2)                       # two in five of the Wood's trees are dying, and weep (a scene may set more)
+DISEASE = (0.0, 0.0)                         # disease on the dying, on the rest (a scene sets it; 0 keeps a scene as it was)
 
 
 def pale_bark(img, m, v, n, px, py, pz, o, along=None, arc=None, lichen=True):
@@ -29,8 +30,9 @@ def pale_bark(img, m, v, n, px, py, pz, o, along=None, arc=None, lichen=True):
     vb = np.clip(form * (0.55 + v * 0.75), 0, 0.99)                     # the pale form, under the scene's own light
     vb = vb * (1 - np.clip((along - 5.0) / 14.0, 0, 0.32))                # climbing into the canopy's shade
     dying = 1.0 if seed % 5 in DYING_IN_FIVE else 0.0
+    disease = DISEASE[0] if dying else DISEASE[1]
     img, _ = bark.paint(img, m, bole, vb, n, arc, along, max(o["r"], 0.25), seed, ws.SUN,
-                        scar_band=(1.8, 7.0) if dying else (2.5, 11.0), top=18.0, dying=dying)
+                        scar_band=(1.8, 7.0) if dying else (2.5, 11.0), top=18.0, dying=dying, disease=disease)
     return img
 
 

@@ -61,7 +61,7 @@ def veins(r, seed, arc, along, top=24.0):
 
 
 def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0, scar_band=(4.5, 15.0), px_per_yd=18.0,
-          dying=0.0):
+          dying=0.0, disease=0.0):
     """the pale vein-bark onto img where `wood` (the bole: `bole`, its round side above the flare); v the light"""
     ndl = n[..., 0] * moon[0] + n[..., 1] * moon[1]
     grain = vn(arc * 15.0 + along * 0.35, along * 1.6)
@@ -148,6 +148,41 @@ def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0
                 img[fresh] = SAP[np.clip(((v[fresh] * 0.7 + 0.1) * len(SAP)).astype(int), 0, len(SAP) - 1)]
                 bead = fresh & (ndl > 0.25) & (np.abs(((arc - a_r - wig + circ / 2) % circ) - circ / 2) > wr * 0.35) & ((((arc - a_r - wig + circ / 2) % circ) - circ / 2) * np.sign(ndl) < 0)
                 img[bead] = np.minimum(img[bead] * 1.9 + np.array([0.08, 0.02, 0.02]), 1)
+    # DISEASE (Derek 2026-10-07: "add ... some disease to the trees"): on the god's veins, what is under the skin is meat
+    if disease > 0:
+        rd = np.random.default_rng(seed + 211)
+        circ = 2 * np.pi * r
+        # cankers: sunken dark lesions with swollen, cracked callus rims, bleeding black-red down the skin
+        for q in range(int(1 + disease * 4)):
+            a_c, z_c = rd.uniform(-0.7, 1.0) * r, rd.uniform(0.6, 6.0)
+            w_c, h_c = rd.uniform(0.18, 0.32) * min(1.0, r / 0.5), rd.uniform(0.3, 0.6)
+            da = ((arc - a_c + circ / 2) % circ) - circ / 2
+            ec = (da / w_c) ** 2 + ((along - z_c) / h_c) ** 2 + (vn(arc * 8 + q, along * 8) - 0.5) * 0.4
+            core = wood & bole & (ec < 0.7) & (facing > 0.2)
+            rimc = wood & bole & (ec >= 0.7) & (ec < 1.25) & (facing > 0.2)
+            img[core] = SAP[np.clip(((v[core] * 0.5 + 0.05) * len(SAP)).astype(int), 0, len(SAP) - 1)] * 0.8
+            img[rimc] = np.minimum(img[rimc] * np.where((along[rimc] - z_c) > 0, 1.22, 0.8)[:, None] + np.array([0.03, 0.01, 0.0]), 1)
+            crack = rimc & (np.abs(np.sin(np.arctan2(along - z_c, da) * 9)) < 0.15)
+            img[crack] = img[crack] * 0.5
+            ooze = wood & bole & (facing > 0.2) & (np.abs(da - np.sin(along * 2) * 0.02) < 0.03 * min(1.0, r / 0.5)) & (along < z_c - h_c * 0.6) & (along > z_c - h_c - rd.uniform(0.4, 1.4))
+            img[ooze] = SAP_OLD[np.clip(((v[ooze] * 0.6 + 0.1) * len(SAP_OLD)).astype(int), 0, len(SAP_OLD) - 1)]
+        # galls: lumpy swellings, lit on their upper side, dark crease round their foot
+        for q in range(int(disease * 4)):
+            a_g, z_g = rd.uniform(-0.6, 1.0) * r, rd.uniform(1.0, 9.0)
+            r_g = rd.uniform(0.1, 0.2) * min(1.0, r / 0.5)
+            da = ((arc - a_g + circ / 2) % circ) - circ / 2
+            eg = np.hypot(da, (along - z_g) * 1.2) / r_g + (vn(arc * 12 + q, along * 12) - 0.5) * 0.3
+            gall = wood & bole & (eg < 1.0) & (facing > 0.1)
+            up = np.clip((along - z_g) / r_g, -1, 1)
+            img[gall] = np.minimum(img[gall] * (1.0 + up[gall, None] * 0.25) * np.array([1.0, 0.96, 0.92]), 1)
+            gring = wood & bole & (eg >= 1.0) & (eg < 1.25) & (facing > 0.1)
+            img[gring] = img[gring] * 0.6
+        # peeling: flaps of bark lifted off the raw dark flesh beneath
+        peel = wood & bole & (facing > 0.15) & (vn(arc * 2.5 + seed, along * 0.8) > 0.86 - disease * 0.08) & (along < 10)
+        RAW = np.array([0.24, 0.11, 0.1])
+        img[peel] = RAW * np.clip(v[peel] * 1.2 + 0.25, 0.3, 1.0)[:, None]
+        flap = wood & bole & (facing > 0.15) & (vn(arc * 2.5 + seed, along * 0.8) > 0.83 - disease * 0.08) & ~peel & (along < 10)
+        img[flap] = np.minimum(img[flap] * 1.25, 1)
     # the skin's stretch: faint wrinkles across it, closest at the foot
     wrin = bole & (np.sin(along * 38 + vn(arc * 2, along * 0.6) * 9) > 0.93) & (vn(arc * 3, along * 0.8) > 0.45 + np.clip(along / 12, 0, 0.4))
     img[wrin] = img[wrin] * 0.86

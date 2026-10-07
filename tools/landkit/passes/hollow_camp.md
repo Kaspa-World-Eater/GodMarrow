@@ -57,3 +57,31 @@ lantern-lit hut face washed flat; roofs camo). 6 Ramps PASS. 7 Paint PARTIAL. 8 
 church has the stronger stone; this one the stronger story.
 2b: tiles not yet built (trodden ash; hide through soil); objects not exported to the game.
 Worst failure: the ribs (the god's presence carries the scene). Waiting for Derek's go.
+   Derek: "The huts need a lot of work and why would a fire be between [huts], they should be around it. Add an eye or
+   two and some disease to the trees. Base of ribs looks bad. Everything needs more detail and refinement x10."
+11. Layout: four families, four huts in a ring round the fire-yard (13 yd floor), every door turned to the fire, the
+    front left open for the pilgrim; stones re-placed round the yard.
+   Graded: reads as a hamlet now (four huts round the fire-yard, the dead round the fire, the ribs framing). FAIL: the
+   huts are blocky masses, roofs striped camo; trees out of frame.
+12. Roofs: shingle courses that read (each lip's dark line on the course below, the top catching light, staggered
+    shingles), the ridge log, moss in clumps on the shaded slope (dark edge, lit crown), the cave-in with rafters
+    snapped short across the dark.
+   Graded: roofs read (courses on the lit slope, moss heavy on the shaded). FAIL: a flat green slab in the doorway
+   (no floor inside: the forest floor showed through); no openings in the walls.
+   Derek: "huts should be open too, with doors and broken windows."
+13. Inside: a packed-earth floor in its own dark (the fire's glow reaching in a little). Doors broken, each its own
+    way (hanging ajar from its last hinge, fallen across the threshold, leaning in its frame), of bark planks.
+    Windows in the end walls and the back: a dark opening under its frame, the split shutter hanging askew, a rusted
+    nail.
+   Graded: the huts open (a broken window with its split shutter, a door fallen across a threshold); walls still
+   monotone grey sheds; almost no trees in frame (the wider floor pushed the Wood out of view); trees need eyes and
+   disease (Derek).
+14. The Wood in frame: giants on the banks' lower slopes and at the valley's far end. Disease in the shared bark
+    (bark.py, a scene sets its level; 0 keeps older scenes as they were): cankers (sunken lesions, swollen cracked
+    callus rims, bleeding black-red), galls (lumpy swellings), peeling flaps off raw flesh-dark wood. Three in five
+    of this valley's trees dying and weeping.
+   Graded: the Wood in frame but its trunks at the edges behind ribs and huts (disease barely reads here: a giant
+   brought forward later, on its own pass). Derek's explicit note: the rib bases look bad.
+15. The ribs: the ground heaves round each base (torn earth in a ring, clods); at the base the bone stained dark by
+    the earth, roots gripping it, the god's hide in tatters on one side; bone that reads as bone (flatter in section,
+    pores, long cracks with the grain, flaking); the snapped tip showing the honeycomb of marrow.

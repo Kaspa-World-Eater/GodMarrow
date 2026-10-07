@@ -12,7 +12,7 @@ True scale: about 4 x 3 yd, the walls 1.7 yd, the ridge 2.6 yd; a man stoops at 
 import numpy as np
 from kit import Field, vn, fbm
 
-FOOT, WALL, POST, ROOF, HOLE, SHINGLE, SILL = 1, 2, 3, 4, 5, 6, 7
+FOOT, WALL, POST, ROOF, HOLE, SHINGLE, SILL, RAFTER, RIDGE, FLOORI, DOOR = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 
 
 def hut(seed=1, length=4.0, width=3.0, wall_h=1.7, ridge=2.6):
@@ -22,6 +22,10 @@ def hut(seed=1, length=4.0, width=3.0, wall_h=1.7, ridge=2.6):
     hx, hy, th = length / 2, width / 2, 0.22
     H = np.full(X.shape, -9.0)
     M = np.zeros(X.shape, int)
+    # the floor inside: packed earth, in its own dark
+    flr = (np.abs(X) < hx) & (np.abs(Y) < hy)
+    H = np.where(flr, 0.03, H)
+    M = np.where(flr, FLOORI, M)
     W = np.full(X.shape, -1)
     U = np.zeros(X.shape)
     # the walls: a stone footing to 0.45, bark slabs above; each wall its own sag; the door's gap in the front (+y)
@@ -60,9 +64,23 @@ def hut(seed=1, length=4.0, width=3.0, wall_h=1.7, ridge=2.6):
     roof_m = inside & ~hole & (roof > 0.3)
     H = np.where(roof_m, np.maximum(H, roof), H)
     M = np.where(roof_m & (roof >= H - 1e-6), ROOF, M)
+    # the ridge log along the top
+    rlog = inside & ~hole & (np.abs(Y) < 0.1) & (np.abs(X) < hx + 0.3)
+    rz = ridge + 0.06 - sag ** 1.4 * (ridge + 0.4)
+    H = np.where(rlog & (rz > H), rz, H)
+    M = np.where(rlog & (rz >= H - 1e-6), RIDGE, M)
+    # the rafters across the hole: poles snapped short at different lengths, sagging toward the break
+    roof0 = wall_h + (hy + 0.3 - np.abs(Y)) * ((ridge - wall_h) / (hy + 0.3))
+    for j, rx_ in enumerate(np.arange(cave_x + 0.25, hx, 0.55)):
+        reach = rr.uniform(0.25, 0.85) * (hy + 0.3)
+        side_ = rr.choice([-1, 1])
+        pole = (np.abs(X - rx_) < 0.05) & (side_ * Y > hy + 0.3 - reach) & (side_ * Y < hy + 0.3) & hole
+        pz_ = roof0 - np.clip((hy + 0.3 - side_ * Y) / reach, 0, 1) ** 2 * 0.5
+        H = np.where(pole, np.maximum(H, pz_), H)
+        M = np.where(pole, RAFTER, M)
     # inside the hole: the dark floor, the fallen shingles heaped in it
     H = np.where(hole, np.maximum(np.where(H > -1, H, -9), 0.05 + (vn(X * 6, Y * 6) > 0.6) * 0.15), H)
-    M = np.where(hole & (M != WALL) & (M != POST), HOLE, M)
+    M = np.where(hole & (M != WALL) & (M != POST) & (M != RAFTER), HOLE, M)
     # shingles slid off the caved end, lying on the ground beside it
     for k in range(int(rr.integers(10, 16))):
         sx, sy = hx + rr.uniform(0.1, 1.1), rr.uniform(-hy - 0.4, hy + 0.4)
@@ -72,5 +90,28 @@ def hut(seed=1, length=4.0, width=3.0, wall_h=1.7, ridge=2.6):
         m = (np.abs(lx) < 0.22) & (np.abs(ly) < 0.12) & (H < 0.06)
         H = np.where(m, 0.04 + rr.uniform(0, 0.03), H)
         M = np.where(m, SHINGLE, M)
+    # the door: broken, each its own way (hanging ajar from its last hinge, fallen across the threshold, leaning in its
+    # frame); a plank slab of bark the height of a stooping man
+    kind = ["ajar", "fallen", "leaning"][seed % 3]
+    hx_d = -hx + door_u                                               # the doorway's middle on the front wall (y = +hy)
+    if kind == "ajar":
+        a = rr.uniform(0.7, 1.1)
+        hpx, hpy = hx_d - 0.42, hy
+        t = (X - hpx) * np.cos(a) + (Y - hpy) * np.sin(a)
+        nrm = -(X - hpx) * np.sin(a) + (Y - hpy) * np.cos(a)
+        dm = (t > 0) & (t < 0.82) & (np.abs(nrm) < 0.04)
+        H = np.where(dm, np.maximum(H, 1.55), H)
+        M = np.where(dm, DOOR, M)
+    elif kind == "fallen":
+        dm = (np.abs(X - hx_d) < 0.42) & (Y > hy + 0.12) & (Y < hy + 1.7)
+        H = np.where(dm & (H < 0.07), 0.07, H)
+        M = np.where(dm, DOOR, M)
+    else:
+        dm = (np.abs(X - hx_d - 0.15) < 0.36) & (np.abs(Y - hy + 0.15) < 0.05)
+        H = np.where(dm, np.maximum(H, 1.3), H)
+        M = np.where(dm, DOOR, M)
+    # the windows: one in each end wall and one in the back, broken (painted on the wall's face: a dark opening, its frame,
+    # its split shutter; a height field cannot hollow a wall under its lintel)
+    windows = [(0, length * rr.uniform(0.35, 0.65)), (1, width * 0.5), (3, width * 0.5)]
     F.H, F.M, F.W, F.U = H, M, W, U
-    return F, dict(seed=seed, length=length, width=width, wall_h=wall_h, ridge=ridge, door_u=door_u, cave_x=cave_x)
+    return F, dict(windows=windows, door=kind, seed=seed, length=length, width=width, wall_h=wall_h, ridge=ridge, door_u=door_u, cave_x=cave_x)

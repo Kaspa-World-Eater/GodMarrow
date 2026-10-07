@@ -34,8 +34,8 @@ import wood_pale                             # noqa: E402  the Hollow Wood's tre
 C = np.array([27.0, 13.0])                   # the camp's heart (the bin) in the wood's plan
 AX = np.array([1.0, 1.0]) / np.sqrt(2)       # the valley runs toward the viewer (down the screen)
 PERP = np.array([1.0, -1.0]) / np.sqrt(2)    # across it (left-right on the screen)
-FLOOR_W, BANK_H, BANK_RUN = 3.8, 6.0, 4.0           # the floor holds the camp; the banks climb six yards inside the frame
-ws.FOCUS = C + AX * 0.6
+FLOOR_W, BANK_H, BANK_RUN = 7.4, 6.0, 4.0           # the floor holds the hamlet's ring; the banks climb six yards beyond it
+ws.FOCUS = C + AX * 0.2
 ws.HERO = C + AX * 2.4 - PERP * 0.9
 
 R_BONE = ws.ramp("#1a1715", "#2c2724", "#433d38", "#5c554d", "#78706a", "#958b80", "#b2a798", "#cbc1b0")
@@ -44,7 +44,9 @@ R_SHING = ws.ramp("#141114", "#211c1f", "#30292a", "#433a37", "#584c45")
 R_FIELD = ws.ramp("#131218", "#221f27", "#343038", "#48434a", "#5f5958", "#787068")
 R_MOSSC = ws.ramp("#0a110f", "#111c15", "#18281a", "#20341e", "#2c4423", "#3b5529")
 
-HUTS = [(C - AX * 0.9 - PERP * 2.4, 0.79, 11), (C + AX * 0.5 + PERP * 2.5, 0.79 + 3.1416, 23)]   # flanking the fire at the foot of each bank
+# four families, four huts in a ring round the fire-yard, every door turned to the fire; the front left open
+_HUT_AT = [(C - AX * 4.6 - PERP * 2.7, 11), (C - AX * 4.6 + PERP * 2.7, 23), (C - PERP * 5.1 + AX * 0.9, 37), (C + PERP * 5.1 + AX * 0.9, 41)]
+HUTS = [(p_, float(np.arctan2(-(C - p_)[0], (C - p_)[1])), sd) for (p_, sd) in _HUT_AT]   # turn: the door (+y) faces C
 HF = [hutgen.hut(s) for (_, _, s) in HUTS]
 # the dead round the fire, every one with its head toward the ring in the east (world +x, a little -y: "the ring in the
 # east"), each at its own age, each with the hunter's stick at its head
@@ -76,6 +78,10 @@ def shape_plan(w):
     w.trees = [t for t in w.trees if keep(t[0], t[1])]
     w.logs = [lg for lg in w.logs if all(keep(lg[0] + (lg[2] - lg[0]) * f, lg[1] + (lg[3] - lg[1]) * f) for f in np.linspace(0, 1, 20))]
     w.rocks = [r for r in w.rocks if keep(r[1], r[2])]
+    # the Wood in frame: giants on the banks' lower slopes and at the valley's far end, towering over the hamlet
+    for (al, ac, r_) in [(-3.0, -1, 0.95), (2.5, -1, 0.8), (-6.5, 1, 1.0), (1.2, 1, 0.85), (-11.0, 0, 1.05), (-9.5, -0.45, 0.8), (-10.0, 0.5, 0.9)]:
+        p_ = C + AX * al + PERP * (ac * (FLOOR_W + 1.1) if abs(ac) == 1 else ac * FLOOR_W)
+        w.trees.append((float(p_[0]), float(p_[1]), "giant", r_, 8.0))
     near = np.clip(1 - np.hypot(w.X - C[0], w.Y - C[1]) / 9.0, 0, 1)
     w.light = w.light * (1 - near) + 0.4 * near
     w.gap = (C[0] - 1.5, C[1] - 2.0, 4.0)
@@ -162,23 +168,51 @@ def paint_hut(img, m, v, n, px, py, pz, o, W, L):
     st_v = sv + ((np.sin(st_i * 7.7 + np.floor(h / 0.15) * 3.3) * 4375.5) % 1.0 - 0.5) * 0.14
     fj = (((U / 0.3 + np.floor(h / 0.15) * 0.5) % 1.0) < 0.12) | ((h / 0.15) % 1.0 < 0.18)
     img[foot] = R_FIELD[np.clip(((st_v - fj * 0.2) * len(R_FIELD)).astype(int), 0, len(R_FIELD) - 1)][foot]
+    # the broken windows: a dark opening under its frame, a split shutter plank hanging askew across the dark
+    for (wk, wu) in info["windows"]:
+        win = wall & side & (F.at(F.W, lx, ly, -1) == wk) & (np.abs(U - wu) < 0.3) & (h > 0.75) & (h < 1.3)
+        frame = wall & side & (F.at(F.W, lx, ly, -1) == wk) & (np.abs(U - wu) < 0.37) & (h > 0.68) & (h < 1.38) & ~win
+        img[frame] = R_SLAB[np.clip(((sv + 0.05) * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)][frame]
+        dark = np.array([0.03, 0.025, 0.03]) + np.clip(L["lamp"], 0, 0.6)[..., None] * np.array([0.12, 0.06, 0.02])
+        img[win] = dark[win]
+        plank = win & (np.abs((U - wu) * 1.0 - (h - 1.02) * 0.9 + (k % 2) * 0.1) < 0.06)   # the shutter, split and askew
+        img[plank] = R_SLAB[np.clip(((sv - 0.02) * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)][plank]
+        nail = plank & (np.abs(U - wu + 0.2) < 0.03)
+        img[nail] = relic.RUST[3]
     wtop = wall & ~side
     img[wtop] = R_MOSSC[np.clip(((v * 0.85) * len(R_MOSSC)).astype(int), 0, len(R_MOSSC) - 1)][wtop]
     post = m & (M == hutgen.POST)
     img[post] = R_SLAB[np.clip(((sv - 0.06) * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)][post]
     # roof: bark shingles in courses down the slope, mossed, weighted with stones
     roof = m & (M == hutgen.ROOF)
-    course = np.floor((info["width"] / 2 + 0.3 - np.abs(ly)) / 0.22)
-    sh_i = np.floor(lx / 0.32 + (course % 2) * 0.5)
+    # shingle courses down the slope: each course's lip casting a dark line on the one below, its top catching light
+    slope = (info["width"] / 2 + 0.3 - np.abs(ly)) / 0.3
+    course = np.floor(slope)
+    cf = slope - course
+    sh_i = np.floor(lx / 0.36 + (course % 2) * 0.5 + np.sin(course * 2.1) * 0.2)
     sh_j = (np.sin(sh_i * 9.1 + course * 3.7 + k) * 4375.5) % 1.0
-    lip = ((info["width"] / 2 + 0.3 - np.abs(ly)) / 0.22 - course) < 0.2
-    rv = sv + (sh_j - 0.5) * 0.1 - lip * 0.14
+    shut = ((lx / 0.36 + (course % 2) * 0.5 + np.sin(course * 2.1) * 0.2) - sh_i) < 0.08
+    rv = sv + (sh_j - 0.5) * 0.06 + (cf > 0.78) * 0.07 - (cf < 0.22) * 0.18 - shut * 0.06
     img[roof] = R_SHING[np.clip((rv * len(R_SHING)).astype(int), 0, len(R_SHING) - 1)][roof]
-    rmoss = roof & (vn(lx * 3 + k, ly * 3) > 0.55)
-    img[rmoss] = R_MOSSC[np.clip(((v * 0.8 + (vn(lx * 15, ly * 15) - 0.5) * 0.1) * len(R_MOSSC)).astype(int), 0, len(R_MOSSC) - 1)][rmoss]
+    # moss in clumps on the shaded slope (the side away from the moon), each clump a dark edge and a lit crown
+    shade_side = (ly * np.sin(HUTS[k][1] + 0.6)) > 0
+    clump = vn(lx * 2.2 + k * 3, ly * 2.2)
+    rmoss = roof & (clump > np.where(shade_side, 0.5, 0.72))
+    mv = v * 0.8 + (clump - 0.6) * 0.5 + (vn(lx * 15, ly * 15) - 0.5) * 0.08
+    img[rmoss] = R_MOSSC[np.clip((mv * len(R_MOSSC)).astype(int), 0, len(R_MOSSC) - 1)][rmoss]
+    medge = roof & (clump > np.where(shade_side, 0.46, 0.68)) & ~rmoss
+    img[medge] = img[medge] * 0.7
+    ridge_ = m & (M == hutgen.RIDGE)
+    img[ridge_] = R_SLAB[np.clip(((sv - 0.08 + (vn(lx * 20, 1) - 0.5) * 0.08) * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)][ridge_]
+    raft = m & (M == hutgen.RAFTER)
+    img[raft] = R_SLAB[np.clip(((sv - 0.1) * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)][raft]
     # the cave-in: the dark inside
-    hole = m & (M == hutgen.HOLE)
-    img[hole] = np.array([0.03, 0.025, 0.03]) + (vn(lx * 8, ly * 8) > 0.6)[hole][:, None] * np.array([0.06, 0.05, 0.05]) if False else img[hole] * 0 + np.array([0.035, 0.03, 0.035])
+    flr = m & ((M == hutgen.FLOORI) | (M == hutgen.HOLE))
+    img[flr] = (np.array([0.035, 0.03, 0.035]) + np.clip(L["lamp"], 0, 0.5)[..., None] * np.array([0.14, 0.07, 0.03]))[flr]
+    door = m & (M == hutgen.DOOR)
+    pl = np.floor(lx * 6 + ly * 6)                                   # its planks
+    dv = sv - 0.02 + ((np.sin(pl * 7.1 + k) * 4375.5) % 1.0 - 0.5) * 0.1 - (((lx * 6 + ly * 6) - pl) < 0.15) * 0.12
+    img[door] = R_SLAB[np.clip((dv * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)][door]
     sg = m & (M == hutgen.SHINGLE)
     img[sg] = R_SHING[np.clip(((sv - 0.04) * len(R_SHING)).astype(int), 0, len(R_SHING) - 1)][sg]
     sill = m & (M == hutgen.SILL)
@@ -206,62 +240,98 @@ def paint_bin(img, m, v, n, px, py, pz, o, W, L):
     return img
 
 
-def ribs(img, w, W, px, py, pz, L, T):
-    """the Ribcage Bough: the god's ribs standing up out of the banks and arching in over the hollow. Drawn as curved
-    bone, depth-tested against the world (a height field cannot hold an arch), lit by the moon and the fire"""
-    GH, GW = img.shape[:2]
-    dep_scene = px + py
-    zb = np.full((GH, GW), -1e9)
+def rib_list():
+    """the Ribcage Bough's ribs, the same every time: [(side, j, base xy, height, reach, broken, r0)]"""
     rr = np.random.default_rng(77)
-    fire = np.array(ws.to_px((C[0], C[1], 1.4)))
-    moon_s = np.array([-0.62, -0.55, 0.56])
-    moon_s /= np.linalg.norm(moon_s)
+    out = []
     for side_ in (-1, 1):
         for j in range(5):
             along = -6.0 + j * 3.1 + rr.uniform(-0.4, 0.4)
             base = C + PERP * side_ * (FLOOR_W + 1.2 + rr.uniform(0, 0.5)) + AX * along   # from the banks' brows
-            bz = float(ws.look(W, W["H"], np.array(base[0]), np.array(base[1]))) - 0.4
-            height = rr.uniform(9.5, 13.5)
-            reach = rr.uniform(3.5, 6.0)
-            broken = rr.uniform(0.62, 0.95)                               # where it snapped: the arch never closes
-            r0 = rr.uniform(0.55, 0.75)
-            steps = 260
-            for i in range(steps):
-                s = i / (steps - 1) * broken
-                p = np.array([base[0], base[1], bz]) + np.array([0, 0, 1.0]) * height * np.sin(s * np.pi / 2) \
-                    + np.r_[PERP * -side_ * reach * (1 - np.cos(s * np.pi / 2)) ** 1.1, 0]
-                r = r0 * (1 - s * 0.35)
-                sx, sy = ws.to_px(p)
-                rx, ry = r * 18.0, r * 15.0
-                x0, x1 = int(sx - rx - 1), int(sx + rx + 2)
-                y0, y1 = int(sy - ry - 1), int(sy + ry + 2)
-                if x1 < 0 or y1 < 0 or x0 >= GW or y0 >= GH:
-                    continue
-                d_rib = p[0] + p[1]
-                for yy in range(max(y0, 0), min(y1, GH)):
-                    for xx in range(max(x0, 0), min(x1, GW)):
-                        u, v_ = (xx + 0.5 - sx) / rx, (yy + 0.5 - sy) / ry
-                        q = u * u + v_ * v_
-                        if q > 1:
-                            continue
-                        nz = np.sqrt(1 - q)
-                        front = d_rib + nz * r * 1.2
-                        if front < dep_scene[yy, xx] - 0.2 or front <= zb[yy, xx]:
-                            continue
-                        zb[yy, xx] = front
-                        nn = np.array([u, v_, nz])
-                        lm = max(0.0, float(nn @ moon_s))
-                        fd = np.array([fire[0] - xx, fire[1] - yy, 30.0])
-                        dist = np.linalg.norm(fd[:2])
-                        lf = max(0.0, float(nn @ (fd / np.linalg.norm(fd)))) / (1 + (dist / 120.0) ** 2)
-                        grain = (vn(s * 60 + j * 7, u * 3) - 0.5) * 0.06
-                        crack = (vn(s * 25 + side_ * 5 + j, u * 6) > 0.86) * -0.12
-                        val = 0.22 + lm * 0.5 + grain + crack - (1 - nz) * 0.08
-                        col = R_BONE[int(np.clip(val * len(R_BONE), 0, len(R_BONE) - 1))]
-                        col = col * (1 + lf * np.array([1.2, 0.75, 0.4]))
-                        if v_ < -0.2 and vn(s * 30 + j, u * 4 + side_) > 0.55 and s < 0.7:
-                            col = R_MOSSC[int(np.clip((0.3 + lm * 0.5) * len(R_MOSSC), 0, len(R_MOSSC) - 1))]
-                        img[yy, xx] = np.clip(col, 0, 1)
+            out.append((side_, j, base, rr.uniform(9.5, 13.5), rr.uniform(3.5, 6.0), rr.uniform(0.62, 0.95), rr.uniform(0.55, 0.75)))
+    return out
+
+
+RIBS = rib_list()
+
+
+def stamp_rib_bases(W, w):
+    """where a rib bursts out of the bank the ground heaves up round it: torn earth heaped in a ring, clods thrown"""
+    X, Y = W["X"], W["Y"]
+    for (side_, j, base, height, reach, broken, r0) in RIBS:
+        d = np.hypot(X - base[0], Y - base[1])
+        heave = 0.55 * np.exp(-((d - r0 * 0.9) / 0.7) ** 2) * (d > r0 * 0.6) + (vn(X * 5 + j, Y * 5) > 0.7) * (d < r0 * 2.2) * 0.1
+        m = (heave > 0.02) & (W["tag"] == 0)
+        W["H"] = np.where(m, W["H"] + heave, W["H"])
+        W["Hrest"] = np.where(m & (W["HT"] < -40), W["H"], W["Hrest"])
+        W["mat"] = np.where(m & (heave > 0.08), 2, W["mat"])          # torn earth
+
+
+def ribs(img, w, W, px, py, pz, L, T):
+    """the Ribcage Bough: the god's ribs standing up out of the banks and arching in over the hollow. Drawn as curved
+    bone, depth-tested against the world (a height field cannot hold an arch), lit by the moon and the fire. Bone that
+    reads as bone: flattened in section, pores and long cracks with its grain, flaking; at its base stained dark by the
+    earth it burst from, roots gripping it, tatters of the god's hide still clinging; its snapped tip showing the
+    honeycomb of marrow inside"""
+    GH, GW = img.shape[:2]
+    dep_scene = px + py
+    zb = np.full((GH, GW), -1e9)
+    fire = np.array(ws.to_px((C[0], C[1], 1.4)))
+    moon_s = np.array([-0.62, -0.55, 0.56])
+    moon_s /= np.linalg.norm(moon_s)
+    for (side_, j, base, height, reach, broken, r0) in RIBS:
+        bz = float(ws.look(W, W["H"], np.array(base[0]), np.array(base[1]))) - 0.5
+        steps = 300
+        tatter_side = 1 if j % 2 else -1
+        for i in range(steps):
+            s_ = i / (steps - 1) * broken
+            p = np.array([base[0], base[1], bz]) + np.array([0, 0, 1.0]) * height * np.sin(s_ * np.pi / 2) \
+                + np.r_[PERP * -side_ * reach * (1 - np.cos(s_ * np.pi / 2)) ** 1.1, 0]
+            r = r0 * (1 - s_ * 0.35)
+            sx, sy = ws.to_px(p)
+            rx, ry = r * 18.0, r * 12.5                                   # a rib is flatter than it is wide
+            x0, x1 = int(sx - rx - 1), int(sx + rx + 2)
+            y0, y1 = int(sy - ry - 1), int(sy + ry + 2)
+            if x1 < 0 or y1 < 0 or x0 >= GW or y0 >= GH:
+                continue
+            d_rib = p[0] + p[1]
+            tip = i >= steps - 4
+            low = np.clip(1 - (p[2] - bz) / 1.6, 0, 1)                    # how near the earth it burst from
+            for yy in range(max(y0, 0), min(y1, GH)):
+                for xx in range(max(x0, 0), min(x1, GW)):
+                    u, v_ = (xx + 0.5 - sx) / rx, (yy + 0.5 - sy) / ry
+                    q = u * u + v_ * v_
+                    if q > 1:
+                        continue
+                    nz = np.sqrt(1 - q)
+                    front = d_rib + nz * r * 1.2
+                    if front < dep_scene[yy, xx] - 0.2 or front <= zb[yy, xx]:
+                        continue
+                    zb[yy, xx] = front
+                    nn = np.array([u, v_, nz])
+                    lm = max(0.0, float(nn @ moon_s))
+                    fd = np.array([fire[0] - xx, fire[1] - yy, 30.0])
+                    dist = np.linalg.norm(fd[:2])
+                    lf = max(0.0, float(nn @ (fd / np.linalg.norm(fd)))) / (1 + (dist / 120.0) ** 2)
+                    grain = (vn(s_ * 60 + j * 7, u * 3) - 0.5) * 0.05
+                    crack = (np.abs(np.sin(u * 3.2 + vn(s_ * 6 + j, 1) * 4)) < 0.05) * -0.14    # long cracks with the grain
+                    pore = (vn(s_ * 140 + j, u * 18) > 0.84) * -0.07
+                    flake = (vn(s_ * 30 + side_ * 3 + j, u * 5) > 0.82) * 0.06
+                    val = 0.22 + lm * 0.5 + grain + crack + pore + flake - (1 - nz) * 0.08
+                    col = R_BONE[int(np.clip(val * len(R_BONE), 0, len(R_BONE) - 1))]
+                    if tip and nz > 0.35:                                 # the break: the honeycomb of marrow
+                        cell = vn(u * 9 + j, v_ * 9) > 0.55
+                        col = R_BONE[2] * (0.6 if cell else 1.1)
+                    if low > 0:                                           # stained by the earth it burst from
+                        col = col * (1 - low * 0.55) + np.array([0.12, 0.08, 0.05]) * low * 0.55
+                        if abs(np.sin(u * 2.5 + p[2] * 7 + j)) < 0.12 and p[2] - bz < 1.4:   # roots gripping it
+                            col = np.array([0.16, 0.11, 0.08]) * (0.6 + lm)
+                    if 0.12 < (p[2] - bz) < 2.6 and u * tatter_side > 0.15 and vn(s_ * 40 + j, u * 6) > 0.45:
+                        col = R_HIDE[int(np.clip((0.25 + lm * 0.5) * len(R_HIDE), 0, len(R_HIDE) - 1))]   # the hide's tatters
+                    elif v_ < -0.2 and vn(s_ * 30 + j, u * 4 + side_) > 0.6 and s_ < 0.7:
+                        col = R_MOSSC[int(np.clip((0.3 + lm * 0.5) * len(R_MOSSC), 0, len(R_MOSSC) - 1))]
+                    col = col * (1 + lf * np.array([1.2, 0.75, 0.4]))
+                    img[yy, xx] = np.clip(col, 0, 1)
     return img
 
 
@@ -298,8 +368,10 @@ def keep_world(W, w):
 
 
 wood_pale.install()
+wood_pale.DYING_IN_FIVE = (0, 1, 2)          # this valley's trees: three in five dying, weeping
+wood_pale.DISEASE = (1.0, 0.45)              # cankers, galls, peeling: worst on the dying
 ws.WOOD_HOOKS += [shape_plan]
-ws.BUILD_HOOKS += [stamp]
+ws.BUILD_HOOKS += [stamp, stamp_rib_bases]
 ws.PAINTERS["hut"] = paint_hut
 ws.PAINTERS["bin"] = paint_bin
 
@@ -368,7 +440,7 @@ ws.LIVING.append(draw_dead)
 
 # the offerings: "the pickers put white caps on every flat stone" (the Flat Days); flat stones round the camp, each with
 # its shrivelled caps still glowing faintly white; and cloth strips tied round a tenth trunk, the bark growing over them
-STONES = [(C + AX * 3.6 + PERP * 1.9, 0.42, 41), (C - AX * 3.3 + PERP * 1.2, 0.36, 42), (C + AX * 0.8 - PERP * 2.9, 0.4, 43)]
+STONES = [(C + AX * 3.4 + PERP * 2.6, 0.42, 41), (C - AX * 2.0 - PERP * 3.2, 0.36, 42), (C + AX * 2.0 - PERP * 3.0, 0.4, 43)]
 
 
 def stamp_stones(W, w):
