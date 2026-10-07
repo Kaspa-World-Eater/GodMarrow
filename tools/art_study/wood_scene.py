@@ -56,6 +56,8 @@ LIGHTS = []              # (x, y, z, reach): more warm lights (a candle), cast l
 LIVING = []              # f(img, w, W, px, py, pz, L, T): more living layers, drawn last
 GROUND_LIFE_OK = None    # f(x, y) -> bool: where grass may grow (a ruin keeps its bare ring and its stone clear)
 RIM = (1.35, (0.025, 0.025, 0.03))   # the moonlit rim on objects: strength and cool lift
+FOREST_LIFE = True       # the wood's own living layers (the leaf fall, falling and skittering leaves, the wisp-fire)
+GROUND = None            # f(img, W, px, py, pz, SX, SY, L, v, gl) -> img: another land's ground tiles over the wood's
 
 
 def build(w):
@@ -382,6 +384,8 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
     img[lowr] *= 0.8
     upl = mossm & ~np.roll(mossm, 1, axis=0) & ~np.roll(mossm, 1, axis=1)
     img[upl] = np.minimum(img[upl] * 1.2, 1)
+    if GROUND is not None:
+        img = GROUND(img, W, px, py, pz, SX, SY, L, v, gl)
     if water.any():
         img[water] = R_SKY[np.clip(((0.4 + (vn(px * 0.6, py * 0.6) - 0.5) * 0.4) * 4).astype(int), 0, 3)][water]
         glint = water & (vn(px * 2 - t, py * 8) > 0.74) & (L["canopy"] > 0.4)
@@ -560,7 +564,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     litt_px = look(W, W["litt"], px, py)
     tgm0 = look(W, W["tag"], px, py)
     rf_ = np.random.default_rng(101)                                      # its own sequence, the same every frame
-    NC = int(GW * GH / 9)
+    NC = int(GW * GH / 9) if FOREST_LIFE else 0
     c_sx, c_sy = rf_.integers(2, GW - 8, NC), rf_.integers(2, GH - 6, NC)
     c_r, c_st, c_fam = rf_.random(NC), rf_.integers(0, len(LEAVES) - 1, NC), rf_.random(NC)
     for q in range(NC):
@@ -740,7 +744,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     # leaves drifting down out of the canopy, swaying side to side; their shadows close on them as they come down
     from litter_stamps import LEAVES
     rf = np.random.default_rng(91)
-    for q in range(22):
+    for q in range(22 if FOREST_LIFE else 0):
         lx, ly = FOCUS[0] + rf.uniform(-7, 7), FOCUS[1] + rf.uniform(-7, 7)
         ph = rf.uniform(0, 1)
         u = (T + ph) % 1.0
@@ -763,7 +767,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
                     img[yy_, xx_] = rp[int(np.clip(4 + {"H": 2, "L": 1, "B": 0, "D": -1, "P": 3, "V": 1}[ch], 0, 7))] * min(k_, 1.4)
     g_now = gust(T)
     rb = np.random.default_rng(57)
-    for q in range(26):
+    for q in range(26 if FOREST_LIFE else 0):
         bx, by = FOCUS[0] + rb.uniform(-8, 8), FOCUS[1] + rb.uniform(-8, 8)
         run = (T * 3.0 + rb.uniform(0, 1)) % 1.0                         # each leaf's skitter across the floor
         k_lift = np.clip((g_now - 1.3) / 1.0, 0, 1)
@@ -804,7 +808,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     img[spot] = np.clip(img[spot] * 0.4 + np.array([0.28, 0.62, 0.52])[None, :] * breath_f[:, None] * 0.6, 0, 1)
     # a wisp-fire: a small cold flame drifting low over the damp ground, there for part of the loop, then gone
     wis = 0.5 * (1 - np.cos(2 * np.pi * np.clip((T - 0.15) / 0.55, 0, 1)))    # fades in and out
-    if wis > 0.02:
+    if wis > 0.02 and FOREST_LIFE:
         u = np.clip((T - 0.15) / 0.55, 0, 1)
         wx = FOCUS[0] - 3.6 + u * 2.0 + np.sin(u * 9) * 0.3          # low over the damp hollows, left of the log
         wy = FOCUS[1] + 2.6 + np.sin(u * 5 + 1) * 0.6
