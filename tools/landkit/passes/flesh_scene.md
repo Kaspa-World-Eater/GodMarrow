@@ -151,3 +151,8 @@ Worst first: the pool, the floating vein, the light.
     11 MASTER_RULES 2b.6 (tiles 320x160 with variants) conflicts with Derek's newer "every piece unique": ground.py
       generates per world position; asked Derek to confirm the rule change before rewriting 2b.6.
     12 Skeptic, worst first: the fang skirts, then the doors and arch, then the columns.
+   RULES CHECK (reminder): re-read MASTER_RULES and the Moor's lore (the hermit's tooth-ring; black glass from blood
+   in ash). Checklist as at 48; the worst failure is 7/8, the fangs' flesh an even red sawtooth skirt.
+49. The fangs' flesh edge set by world position (not the angle round the fang), so no two fangs or sides match;
+    it frays upward in patches; darker, the ground's own flesh, bruised in places.
+   Graded (49): fixed: each fang's flesh its own, uneven, frayed, dark. Next worst: the doors and the bone arch.

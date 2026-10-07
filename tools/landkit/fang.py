@@ -186,12 +186,15 @@ def draw(img, zb, dep_scene, to_px, f, lights, moon, ambient=0.16, tol=0.7):
         blood |= run | bead
     bl = np.where(old[..., None], BLOOD_OLD, BLOOD_FRESH) * (0.6 + val[..., None] * 0.6)
     col = np.where(blood[..., None], bl, col)
-    climb_h = 0.3 + vn(th * 3 + seed, 5) * 0.5 + vn(th * 11 + seed, 7) * 0.25 + np.clip(vn(th * 6 + 40, 2) - 0.7, 0, 1) * 2.4
-    climb = z < climb_h
+    wx, wy = P[..., 0], P[..., 1]
+    climb_h = 0.2 + vn(wx * 1.3 + seed, wy * 1.3) * 0.7 + np.clip(vn(wx * 2.1 + 40, wy * 2.1) - 0.62, 0, 1) * 3.0
+    fray = (vn(wx * 7 + seed, z * 5 + wy * 7) - 0.5) * 0.45
+    climb = z < climb_h + fray
     lump = vn(th * 14 + seed, z * 9)
-    fl = np.array([0.3, 0.1, 0.12]) * (0.55 + val[..., None] * 0.9) * (0.8 + lump[..., None] * 0.45)
+    fl = np.array([0.24, 0.07, 0.09]) * (0.5 + val[..., None] * 0.8) * (0.8 + lump[..., None] * 0.4)
+    fl = np.where((vn(wx * 4, wy * 4 + z) > 0.62)[..., None], fl * np.array([0.8, 0.9, 1.25]), fl)   # bruised in patches
     col = np.where(climb[..., None], fl, col)
-    lipf = (z >= climb_h) & (z < climb_h + 0.06)
+    lipf = ~climb & (z < climb_h + fray + 0.05)
     col = np.where(lipf[..., None], col * 0.45, col)                       # its shadow on the enamel just above
     blood = blood & ~climb
     gloss = np.where(blood, 1.6, np.where(brk | tart, 0.15, np.where(climb, 0.8, 1.0)))
