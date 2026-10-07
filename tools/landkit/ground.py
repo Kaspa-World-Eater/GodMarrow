@@ -270,6 +270,10 @@ def _poly(px, py, seed, heave, path):
     wx = px + (vn(px * 0.9 + seed, py * 0.9) - 0.5) * 0.35                # warped so no lattice shows
     wy = py + (vn(px * 0.9, py * 0.9 + seed + 4) - 0.5) * 0.35
     f1, f2, cid, cx, cy = cells(wx, wy, 0.78, seed + 61, 1.0)
+    repair = fbm(px * 0.35 + seed + 20, py * 0.35) > 0.62                  # an old repair: small cobbles
+    g1, g2, gid, gx, gy = cells(wx, wy, 0.36, seed + 62, 1.0)
+    f1, f2, cx, cy = np.where(repair, g1, f1), np.where(repair, g2, f2), np.where(repair, gx, cx), np.where(repair, gy, cy)
+    cid = np.where(repair, gid + 7919, cid)
     ed = (f2 - f1) * 0.5                                                   # yards to the stone's edge
     gap = 0.008 + h1(cid, 3, seed) * 0.01 + heave * 0.06
     rr_ = 0.05 + path * 0.05                                              # rounder on the processional way
@@ -280,9 +284,20 @@ def _poly(px, py, seed, heave, path):
     ta = (h1(cid, 6, seed) - 0.5) * 0.04 + np.sign(h1(cid, 6, seed) - 0.5) * heave * 0.22
     tb = (h1(cid, 7, seed) - 0.5) * 0.04 + np.sign(h1(cid, 7, seed) - 0.5) * heave * 0.22
     h = h + settle + ta * (wx - cx) + tb * (wy - cy)
+    fate = h1(cid, 20, seed)
+    sunk = (fate > 0.86) & (fate < 0.93)
+    gone = fate >= 0.955
+    h = h - sunk * 0.05
+    ck = (fate < 0.14) | (heave > 0.3) & (fate < 0.4)                      # cracked across, the far piece dropped
+    ca = h1(cid, 21, seed) * 3.14
+    cd = (wx - cx) * np.cos(ca) + (wy - cy) * np.sin(ca) + (vn(wx * 5 + seed, wy * 5) - 0.5) * 0.08
+    crack = ck & (np.abs(cd) < 0.014)
+    h = h - np.where(ck & (cd > 0), 0.018, 0) - np.where(crack, 0.03, 0)
     joint = ed < gap
     h = np.where(joint, -0.05, h)
-    return h, dict(ed=ed, gap=gap, cid=cid, joint=joint, settle=settle, f1=f1)
+    h = np.where(gone, -0.06 + (vn(px * 3, py * 3) - 0.5) * 0.02, h)
+    return h, dict(ed=ed, gap=gap, cid=cid, joint=joint, settle=settle, f1=f1, gone=gone, sunk=sunk, crack=crack,
+                   cx=cx, cy=cy, wx=wx, wy=wy)
 
 
 def paving_poly(px, py, seed=0, heave=None, path=None, moon=np.array([-0.62, 0.22, 0.75])):
@@ -301,8 +316,19 @@ def paving_poly(px, py, seed=0, heave=None, path=None, moon=np.array([-0.62, 0.2
     ndl = np.clip((n * moon).sum(2), 0, 1)
     shade = np.clip((0.25 + ndl) / (0.25 + max(float(moon[2]), 0.1)), 0.3, 1.8)
     cid = I["cid"]
-    tone = 0.85 + h1(cid, 8, seed) * 0.3
-    col = BASALT * tone[..., None]
+    tone = 0.8 + h1(cid, 8, seed) * 0.38
+    kind = h1(cid, 22, seed)
+    fam = np.where((kind < 0.7)[..., None], BASALT,
+                   np.where((kind < 0.86)[..., None], np.array([0.5, 0.47, 0.42]),        # pale limestone, robbed from older work
+                            np.where((kind < 0.95)[..., None], np.array([0.4, 0.26, 0.21]),   # red tuff
+                                     np.array([0.55, 0.52, 0.46]))))                         # a re-used carved slab
+    col = fam * tone[..., None]
+    lime = (kind >= 0.7) & (kind < 0.86)
+    col = np.where((lime & (vn(px * 9 + seed, py * 9) > 0.7))[..., None], col * 0.82, col)   # the limestone pitted, sugared
+    carved = kind >= 0.95
+    lx_, ly_ = I["wx"] - I["cx"], I["wy"] - I["cy"]
+    inc = carved & ((np.abs(np.sin(lx_ * 22 + ly_ * 4)) < 0.16) | (np.abs(np.hypot(lx_, ly_) - 0.18) < 0.02)) & (vn(lx_ * 5, ly_ * 5) > 0.35)
+    col = np.where(inc[..., None], col * 0.55, col)                       # worn lines of an old carving, half gone
     rind = (1 - pth) * np.clip(1 - I["ed"] / 0.12, 0, 1) * 0.6 + (1 - pth) * 0.25
     col = _mix(col, BASALT_RIND * tone[..., None], np.clip(rind * (h1(cid, 9, seed) > 0.3), 0, 1))
     col = _mix(col, BASALT_POL, np.clip(pth * (0.5 + 0.5 * np.clip(I["ed"] / 0.2, 0, 1)), 0, 1))   # polished most in the middle
@@ -321,6 +347,9 @@ def paving_poly(px, py, seed=0, heave=None, path=None, moon=np.array([-0.62, 0.2
     deep = np.clip(1 - I["ed"] / np.maximum(I["gap"], 1e-3), 0, 1)
     jc = _mix(FINES * (0.8 + vn(px * 9, py * 9)[..., None] * 0.3), a_ * 0.5, deep * 0.4 + hv * 0.6)   # pale fines, darker where opened
     col = np.where(I["joint"][..., None], jc, col)
+    col = np.where(I["crack"][..., None], col * 0.35, col)
+    col = np.where(I["sunk"][..., None], _mix(col, a_, np.clip(vn(px * 3, py * 3) * 1.3 - 0.3, 0, 1)), col)   # ash drifted over it
+    col = np.where(I["gone"][..., None], a_ * 0.75, col)                  # a stone gone: an ash-filled pit
     return np.clip(col, 0, 1), h, I["joint"]
 
 

@@ -262,3 +262,10 @@ Worst first: the pool, the floating vein, the light.
    Graded (71): the gradient reads (warm dentin at the base to cool blue-grey up the fang), round, the front ridge lit; but the gum collar a jagged magenta sawtooth.
 72. The gum's edge a smooth scallop following the neck line (up on the sides, down front and back), barely frayed; the collar a thin glossy band.
    Graded (72): the gum reads: a smooth scalloped collar, a thin glossy inflamed line dipping front and back, the dark band where it drew back; the fangs warm dentin at the gum to cool enamel up the shaft. Still to judge in better light: the perikymata, the facet's cup, the break's rings (most fangs stand in the dark).
+73. No two stones alike (Derek: "the stone tiles look too similar"): big slabs with patches of small repair cobbles;
+    mostly basalt, with pale pitted limestone slabs robbed from older work, red tuff, and a few re-used carved slabs
+    with worn lines; each stone its own fate (cracked across with the far piece dropped, sunk under drifted ash, or
+    gone to an ash-filled pit).
+   Graded (73): the stones vary (paler slabs, repair cobbles, cracks), but the pustules' light tints the whole yard olive-green, flattening it.
+74. The pustules' light on the ground halved: a local glow, not a wash.
+   Graded (74): the yard reads as varied old basalt paving again, the sick light local; the whole shot holds (the gate backlit at the back, pustules on the pillars, the eye in the shaft).

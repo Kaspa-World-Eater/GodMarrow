@@ -325,7 +325,7 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     for (q, pr, ph) in SICK:
         d2 = (px - q[0]) ** 2 + (py - q[1]) ** 2 + (pz - q[2]) ** 2
         sick += 1 / (1 + d2 / (0.55 + pr * 2.5) ** 2) * (0.25 + pr * 1.5)   # a small sickly pool round each
-    k = (np.clip(sick, 0, 1.2)[..., None] * 0.4 * SICKC + 0.09 + L["moon"][..., None] * 1.35 * np.array([0.86, 0.9, 1.05]) + L["lamp"][..., None] * 1.5 * np.array([1.15, 0.85, 0.55])) * (1 - L["ao"][..., None] * 0.35)
+    k = (np.clip(sick, 0, 1.0)[..., None] * 0.2 * SICKC + 0.09 + L["moon"][..., None] * 1.35 * np.array([0.86, 0.9, 1.05]) + L["lamp"][..., None] * 1.5 * np.array([1.15, 0.85, 0.55])) * (1 - L["ao"][..., None] * 0.35)
     alb = groundgen.ash(px, py, seed=4)
     qa = (px - C[0]) * AX[0] + (py - C[1]) * AX[1]
     qp = (px - C[0]) * PERP[0] + (py - C[1]) * PERP[1]
