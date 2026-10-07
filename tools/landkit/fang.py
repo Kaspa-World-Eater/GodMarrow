@@ -38,7 +38,9 @@ def make(centre, base, height, R, seed, ax, perp):
     return dict(c=np.array(centre, float), base=float(base), h=float(height), R=float(R), seed=int(seed),
                 ax=np.array(ax, float), perp=np.array(perp, float),
                 bend=rr.uniform(0.18, 0.3), lean=rr.choice([-1, 1]) * rr.uniform(0.08, 0.18),
-                snap=rr.uniform(0.78, 0.93) if rr.random() < 0.8 else 1.0, twist=rr.uniform(0, 6.28),
+                snap=rr.uniform(0.74, 0.92) if rr.random() < 0.7 else 1.0, twist=rr.uniform(0, 6.28),
+                tilt=(rr.uniform(-0.6, 0.6), rr.uniform(-0.6, 0.6)), spall=rr.uniform(0, 6.28),
+                split=rr.random() < 0.4, split_a=rr.uniform(-2.5, 2.5),
                 runs=[(rr.uniform(-np.pi, np.pi), rr.uniform(0.14, 0.4), rr.uniform(0.012, 0.03)) for _ in range(6)])
 
 
@@ -71,8 +73,18 @@ def sdf(p, f):
     t, du, dw, th = _frame(u, w, z, f)
     r = _radius(t, th, f)
     d = (np.hypot(du, dw / 0.84) - r) * 0.72
-    top = f["h"] * f["snap"] + (vn(du * 6 + f["seed"], dw * 6) - 0.5) * 0.18 * (f["snap"] < 1)
-    d = np.maximum(d, z - np.where(f["snap"] < 1, top, f["h"]))
+    if f["snap"] < 1:                                                    # the break: tilted, jagged, a spall out of one side
+        top = f["h"] * f["snap"] + du * f["tilt"][0] + dw * f["tilt"][1] + (vn(du * 2.5 + f["seed"], dw * 2.5) - 0.5) * 0.55 \
+            + (vn(du * 9, dw * 9) - 0.5) * 0.12
+        d = np.maximum(d, z - top)
+        sp = np.array([np.cos(f["spall"]), np.sin(f["spall"])]) * f["R"] * 0.4
+        zs = f["h"] * f["snap"] - f["R"] * 0.35
+        scoop = np.sqrt((du - sp[0]) ** 2 + (dw - sp[1]) ** 2 + ((z - zs) * 0.7) ** 2) - f["R"] * 0.42
+        d = np.maximum(d, -scoop)
+    else:
+        d = np.maximum(d, z - f["h"])
+    chip = np.sqrt(((th - np.pi + np.pi) % (2 * np.pi) - np.pi) ** 2 * 4 + ((z % 1.3) - 0.65) ** 2 * 6) - 0.25
+    d = np.maximum(d, -(chip * f["R"] * 0.4 + 0.02 * (vn(z * 3 + f["seed"], 1) < 0.6)))
     return np.maximum(d, -z - 0.5)
 
 
@@ -131,7 +143,10 @@ def draw(img, zb, dep_scene, to_px, f, lights, moon, ambient=0.16, tol=0.7):
     seed = f["seed"]
     # light: the moon (cool), each warm light, a little ambient; a warm bounce from the flesh below
     ndl = np.clip((N * moon).sum(-1), 0, 1)
-    val = ambient + ndl * 0.62
+    lit = np.clip((ndl - 0.04) / 0.22, 0, 1)                            # a clean turn from light to shade
+    val = ambient + lit * 0.42 + ndl * 0.22
+    refl = np.clip(-N[..., 2] * 0.5 + 0.5, 0, 1) * (1 - lit) * np.clip(1 - z / (f['h'] * 0.8), 0, 1)
+    val = val + refl * 0.1                                               # the flesh's light thrown up into the shade
     warm = np.zeros(SX.shape + (3,))
     spec = np.zeros(SX.shape)
     Hm = (moon + VIEW) / np.linalg.norm(moon + VIEW)
@@ -144,30 +159,34 @@ def draw(img, zb, dep_scene, to_px, f, lights, moon, ambient=0.16, tol=0.7):
         warm += (np.clip((N * ul).sum(-1), 0, 1) * att)[..., None] * np.array(lc) * 0.9
         hv = (ul + VIEW) / np.linalg.norm(ul + VIEW, axis=-1, keepdims=True)
         spec += np.clip((N * hv).sum(-1), 0, 1) ** 30 * att * 0.22
-    bounce = np.clip(-N[..., 2], 0, 1) * 0.12 + np.exp(-z / 0.6) * 0.06   # the flesh's red light from below
+    bounce = refl * 0.35 + np.exp(-z / 0.6) * 0.06                       # the flesh's red light from below, in the shade
     ao = 1 - np.exp(-np.maximum(z, 0) / 0.45) * 0.45
     val = val * ao
     # the enamel: snapped to its ramp, the ordered dither only where tones meet
     bay = BAYER[ys % 4, xs % 4]
-    peri = np.sin(z * 34 + vn(th * 2, z) * 2) * 0.025 * (ndl > 0.2)       # growth lines ringing it, seen in the light
+    peri = np.sin(z * 30 + vn(th * 2, z) * 2) * 0.014 * lit              # growth lines ringing it, faint, in the light
     grooves = np.cos(5 * th + f["twist"])
     v2 = val + peri - (grooves < -0.55) * 0.05
     q = v2 * len(R_ENAMEL)
-    near_edge = np.abs(q - np.round(q)) < 0.07                             # dither only at a tone's border
+    near_edge = np.abs(q - np.round(q)) < 0.035                            # dither only right at a tone's border
     idx = np.clip(np.where(near_edge, q + bay * 0.7, q), 0, len(R_ENAMEL) - 1).astype(int)
     col = R_ENAMEL[idx]
     age = np.clip(1 - tt * 1.6, 0, 1)                                     # yellowing toward the root
     col = col * (1 - age[..., None] * np.array([0.0, 0.06, 0.2]))
     thin = np.clip((tt - 0.62) / 0.3, 0, 1)                               # the glassy tip: light comes through it
     col = col * (1 - thin[..., None] * 0.25) + np.array([0.5, 0.46, 0.38]) * thin[..., None] * 0.3
-    craze = (np.abs(vn(th * 7 + seed, z * 0.7) - 0.5) < 0.012) & (tt < 0.85)
+    craze = (np.abs(vn(th * 4 + seed, z * 0.35) - 0.5) < 0.007) & (tt < 0.8) & (vn(th * 2, z * 0.2 + 5) > 0.45)   # few, long
+    if f['split']:
+        sa = (((th - f['split_a'] - np.sin(z * 1.3) * 0.15) + np.pi) % (2 * np.pi)) - np.pi
+        craze = craze | (np.abs(sa) * _radius(tt, th, f) < 0.035)                 # split the whole length
     col = np.where(craze[..., None], col * 0.72, col)
-    stain = (grooves < -0.55) & (vn(th * 3 + seed, z * 1.5) > 0.42) & (tt < 0.6)
+    keel = np.abs(((th - np.pi + np.pi) % (2 * np.pi)) - np.pi) < 0.25
+    stain = ((grooves < -0.7) | keel) & (vn(th * 2 + seed, z * 0.8) > 0.35) & (tt < 0.55)
     col = np.where(stain[..., None], col * np.array([0.82, 0.7, 0.52]), col)
     tart = (z < 0.2 + vn(th * 4 + seed, 1) * 0.3) & (vn(th * 9 + seed, z * 4) > 0.4)   # patchy, not a band
     col = np.where(tart[..., None], TARTAR * (0.6 + val[..., None] * 0.6) * (0.85 + (vn(th * 30, z * 30)[..., None] - 0.5) * 0.4), col)
     # the snapped tip: the break, rough, the dentin showing, darker in its pits
-    brk = (f["snap"] < 1) & (z > f["h"] * f["snap"] - 0.22) & (N[..., 2] > 0.55)
+    brk = (f["snap"] < 1) & (z > f["h"] * f["snap"] - f["R"] * 0.8) & ((N[..., 2] > 0.45) | (sdf(P - N * 0.05, f) > -0.01))
     di = np.clip((val * 0.9 + (vn(du * 20, dw * 20) - 0.5) * 0.3) * len(R_DENTIN), 0, len(R_DENTIN) - 1).astype(int)
     col = np.where(brk[..., None], R_DENTIN[di], col)
     # the blood: smeared on the lower third, running down in threads that end in beads

@@ -168,3 +168,12 @@ Worst first: the pool, the floating vein, the light.
     doors. A skull ray-marched at its keystone (cranium, cheekbones, jaw, deep orbits, nasal hole), looking out.
    Derek grades the eye B+ (recorded in organic_notes.md). Graded (50): the rib read as a dark brown gable: a bug in the tube distance (the along-axis offset dropped) painted it all as end-sinew; fixed.
    Graded (50 fixed): the rib reads as bone, bound with sinew, the skull at its keystone; but the whole gate small and polite. Derek: "The gate needs to look more brutal and imposing and ancient".
+   RULES CHECK (reminder, 50): MASTER_RULES and the Moor's lore re-read (the mouth "a door, warm and wet, that opened
+   and shut"; the pilgrims "walked out on the breath and fell down on the cheek" -> the gate's brief, awaiting
+   Derek's go). Checklist: 3 Form: eye, fangs, vein, arch true 3D; stone and doors not. 5 Values: fangs lack clear
+   tone groups (speckled light side, flat grey shade). 7 Paint: fang enamel noisy. Worst now by Derek's order: teeth.
+51. The fangs: each its own fate (a tilted jagged break with a spall scooped from one side, or split the whole
+    length, or whole), chips bitten from the keel; clean tone groups (light, half, core shadow, the flesh's warm
+    light thrown up into the shade); growth lines only in the light; stain only down grooves and keel.
+52. The fangs quieter: crazing few and long, growth lines faint, the dither only right at tone borders; broad tones carry the form.
+   Graded (51-52): the fangs read as painted ivory: broad light, a firm turn, warm reflected light in the shade, each broken its own way. Still to do: their shade side a little flat; snapped caps could be rougher.
