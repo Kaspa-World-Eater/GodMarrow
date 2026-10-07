@@ -616,3 +616,17 @@ softened.
   rise out of the log's own top within its width; anything that truly overhangs needs a different representation.
 - **The root plate is read by its spokes:** thick roots radiating from the log's butt, snapped at the rim, earth
   packed between. A flat disc of noise reads as a tombstone.
+- **Motion pass.** The scene is cast once, then lit and painted per frame:
+  - moonflecks drift with the canopy;
+  - the lantern breathes;
+  - the grass sways in a wave rolling with the wind;
+  - leaves tumble down out of the canopy, their shadows closing on them as they land;
+  - spores turn in the lantern's light;
+  - the Ossuarch breathes in his idle.
+
+  Two more forgotten-lesson bugs on the way:
+  - an old class-5 hump laid over the newer giant (logs must be laid oldest first);
+  - brackets placed from the snag's own seven-yard top instead of the ground beside it.
+- **The hero belongs in the judgement.** The real Ossuarch (HD sheet) is drawn at screen resolution at the game's
+  scale and lit through his own normal map, as the game lights him. A silhouette hides whether the world and the hero
+  belong together.

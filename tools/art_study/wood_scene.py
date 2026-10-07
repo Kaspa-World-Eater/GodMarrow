@@ -44,6 +44,9 @@ DEPTH_V = np.array([1.0, 1.0, 2 * KY / KZ])
 DEPTH_V = DEPTH_V / np.linalg.norm(DEPTH_V)
 
 
+_CACHE = {}
+
+
 def build(w):
     """the fine grid over the view: height, material, a tag per object, and per-object data"""
     x0, y0 = FOCUS - 15.0
@@ -273,9 +276,11 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
     v = 0.16 + L["moon"] * 0.7 + skyfill + bounce + L["lamp"] * 1.1 - L["ao"] * 0.25 + (bay - 0.5) * 0.05
     img = np.zeros((GH, GW, 3))
     # ---- the ground: the wood's tiles (litter), moss, bare earth, water
-    mains = [tw.main_0(seed=k * 101)[0] for k in range(4)]
-    dirt, _ = tw.dirt_0()
-    floor = tw.compose(mains, dirt, GW=GW, GH=GH)
+    if "floor" not in _CACHE:                                          # the tiles are painted once
+        mains = [tw.main_0(seed=k * 101)[0] for k in range(4)]
+        _CACHE["dirt"], _ = tw.dirt_0()
+        _CACHE["floor"] = tw.compose(mains, _CACHE["dirt"], GW=GW, GH=GH)
+    floor, dirt = _CACHE["floor"], _CACHE["dirt"]
     gl = (tg == 0) & ~water
     k_light = (0.25 + L["moon"][..., None] * 0.9 * MOON_C + L["lamp"][..., None] * 1.5 * LAMP_C) * (1 - L["ao"][..., None] * 0.35)
     # the litter's depth on the tile: deep and fresh (warmer, lighter, the new leaves on top), thin (the dark humus showing)
@@ -432,7 +437,7 @@ def to_px(p3):
     return (p3[0] - p3[1]) * KX + ox, (p3[0] + p3[1]) * KY + oy - p3[2] * KZ
 
 
-def living(img, w, W, px, py, pz, L):
+def living(img, w, W, px, py, pz, L, t=0.0):
     """drawn piece by piece; each lit by the light where it stands, hidden by what is nearer the camera"""
     from forest_floor import FROND, CAP
     from scatter_wood import grass_clump, paste
@@ -532,7 +537,9 @@ def living(img, w, W, px, py, pz, L):
             continue
         k, (i, j) = light_at(x, y)
         sx, sy = to_px((x, y, gh(x, y)))
-        paste_d(clumps[rr.integers(0, 6)][1], sx, sy, min(k, 1.3), x + y)
+        wave = np.sin(2 * np.pi * t * 2 - (x - y) * 0.9)                # a wave rolling across with the wind
+        fr_ = 0 if wave < -0.35 else (2 if wave > 0.35 else 1)
+        paste_d(clumps[rr.integers(0, 6)][fr_], sx, sy, min(k, 1.3), x + y)
     for (x, y) in w.sapl:
         if abs(x - FOCUS[0]) > 9 or abs(y - FOCUS[1]) > 9 or look(W, W["tag"], np.array(x), np.array(y)) != 0:
             continue
@@ -597,6 +604,40 @@ def living(img, w, W, px, py, pz, L):
                 put(ox_ + dx, oy_ - size - 1, CAP[0] * k, x + y)
                 put(ox_ + dx, oy_ - size - 2, CAP[3] * k, x + y)
             put(ox_ - 1, oy_ - size - 2, np.minimum(CAP[4] * k, 1), x + y)
+    # leaves drifting down out of the canopy, swaying side to side; their shadows close on them as they come down
+    from litter_stamps import LEAVES
+    rf = np.random.default_rng(91)
+    for q in range(8):
+        lx, ly = FOCUS[0] + rf.uniform(-5, 5), FOCUS[1] + rf.uniform(-5, 5)
+        ph = rf.uniform(0, 1)
+        u = (t + ph) % 1.0
+        z = (1 - u) * 6.0
+        sw = np.sin(u * 14 + ph * 7) * 0.35
+        g = gh(lx, ly)
+        sx_, sy_ = to_px((lx + sw, ly - sw, g))
+        if 0 <= int(sy_) < GH and 0 <= int(sx_) < GW:
+            img[int(sy_), int(sx_)] *= 0.55 + 0.4 * (z / 6)
+        lsx, lsy = to_px((lx + sw, ly - sw, g + z))
+        k_, _ = light_at(lx, ly)
+        st = LEAVES[(q + int(u * 16)) % len(LEAVES)]                       # tumbling: a different face each step
+        rp = tw.LITTER[q % 2]
+        for j, row in enumerate(st):
+            for i, ch in enumerate(row):
+                if ch in ".S":
+                    continue
+                yy_, xx_ = int(lsy) + j - 2, int(lsx) + i - 3
+                if 0 <= yy_ < GH and 0 <= xx_ < GW:
+                    img[yy_, xx_] = rp[int(np.clip(4 + {"H": 2, "L": 1, "B": 0, "D": -1, "P": 3, "V": 1}[ch], 0, 7))] * min(k_, 1.4)
+    # spores turning slowly in the lantern's light, each catching it a moment and gone
+    lamp = (HERO[0] + 0.25, HERO[1] - 0.25)
+    for q in range(16):
+        ph = rf.uniform(0, 1)
+        u = (t * rf.uniform(0.5, 1.2) + ph) % 1.0
+        ax_, ay_ = lamp[0] + rf.uniform(-1.2, 1.2), lamp[1] + rf.uniform(-1.2, 1.2)
+        zz = gh(*lamp) + 0.3 + u * 1.8
+        sx_, sy_ = to_px((ax_ + np.sin(u * 6.28 + ph * 9) * 0.25, ay_, zz))
+        if 0 <= int(sy_) < GH and 0 <= int(sx_) < GW and np.sin(u * 3.14) > 0.25:
+            img[int(sy_), int(sx_)] = np.minimum(img[int(sy_), int(sx_)] * 0.3 + np.array([1.0, 0.82, 0.5]) * 0.75, 1)
     return np.clip(img, 0, 1)
 
 
@@ -668,6 +709,24 @@ def hero_at(img, W, px, py):
     return img
 
 
+def animate(out, n=24):
+    w = Wood()
+    W = build(w)
+    px, py, pz, SX, SY = cast(W)
+    globals()["w"] = w
+    frames = []
+    for i in range(n):
+        t = i / n
+        L = shade(W, px, py, pz, SX, SY, t)
+        img = paint(W, px, py, pz, SX, SY, L, t)
+        img = living(img, w, W, px, py, pz, L, t)
+        big = Image.fromarray((img * 255).astype(np.uint8)).resize((GW * 4, GH * 4), Image.NEAREST)
+        frames.append(the_ossuarch(big, W, px, py, "idle/front_l/%d" % (i % 8)))
+    frames[0].save(out, save_all=True, append_images=frames[1:], duration=110, loop=0, lossless=True)
+    frames[0].save(out.replace(".webp", ".png"))
+    print("saved", out)
+
+
 def main(out):
     w = Wood()
     W = build(w)
@@ -683,4 +742,5 @@ def main(out):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else "wood_scene.png")
+    o = sys.argv[1] if len(sys.argv) > 1 else "wood_scene.png"
+    animate(o) if o.endswith(".webp") else main(o)
