@@ -110,3 +110,4 @@ Worst: the huts' walls (Derek: "the huts need a lot of work"). Derek asked for x
    Graded: white caps scattered in troops across the foreground, faint coal-glow; the rib bases sit behind the bank trees at the frame's edges, so the clinging earth barely shows in this frame.
 20. The ribs rooted at the banks' feet (1.4 yd in), so where bone bursts from the heaved earth is in view.
    Graded: the ribs now rise from the banks' feet in view, two great arcs framing the hamlet; their feet still end behind the near trees and foreground at the frame's bottom edges, so the heaved earth shows only partly. Ten refinement passes since Derek's x10 note done; remaining list in the next rules check.
+   Derek's grade: C+.
