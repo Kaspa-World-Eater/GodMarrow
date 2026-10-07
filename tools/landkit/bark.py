@@ -16,6 +16,8 @@ from kit import ramp, vn
 R_BARK = ramp("#16131a", "#28232a", "#3d3639", "#554c4b", "#6f655f", "#8b7f75", "#a89a8c", "#c2b5a3")   # pale vein-wood
 R_VEIN = ramp("#1d1218", "#33202a", "#4d3036", "#694643", "#86604f")                          # the vein: bruised, warm
 SAP = ramp("#120406", "#24070b", "#3a0b10", "#541318", "#6e1c1e")                             # sap: dark blood, fresh
+EYE_Y = ramp("#2a2410", "#4a3f18", "#6e5d22", "#93802e", "#b3a04a", "#c9b96a")                 # the white, jaundiced
+EYE_I = ramp("#140f10", "#241a1a", "#352626", "#463434")                                     # a rheumy iris
 SAP_OLD = ramp("#140b0a", "#21110e", "#311a14", "#40241a")                                     # crusted as it dries
 
 
@@ -58,7 +60,8 @@ def veins(r, seed, arc, along, top=24.0):
     return D[zi, ai], S[zi, ai]
 
 
-def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0, scar_band=(4.5, 15.0), px_per_yd=18.0):
+def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0, scar_band=(4.5, 15.0), px_per_yd=18.0,
+          dying=0.0):
     """the pale vein-bark onto img where `wood` (the bole: `bole`, its round side above the flare); v the light"""
     ndl = n[..., 0] * moon[0] + n[..., 1] * moon[1]
     grain = vn(arc * 15.0 + along * 0.35, along * 1.6)
@@ -93,9 +96,11 @@ def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0
     if scars:
         rs = np.random.default_rng(seed + 13)
         circ = 2 * np.pi * r
-        for k in range(int(rs.integers(2, 5))):
+        n_sc = int(rs.integers(2, 5)) + int(round(dying * 3))
+        for k in range(n_sc):
             a_s, z_s = rs.uniform(-0.6, 0.9) * r, rs.uniform(*scar_band)
-            w_s = rs.uniform(0.2, 0.3) * min(1.0, r / 0.6)
+            weeping = dying > 0 and k < 1 + int(dying * 3)                # the dying tree's scars open into eyes
+            w_s = rs.uniform(0.2, 0.3) * min(1.0, r / 0.6) * (2.4 if weeping else 1.0)   # an eye big enough to be one
             da = ((arc - a_s + circ / 2) % circ) - circ / 2
             dz = along - z_s
             e = (da / w_s) ** 2 + (dz / (w_s * 0.55)) ** 2
@@ -103,16 +108,39 @@ def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0
             lip = bole & (e >= 1.0) & (e < 2.0)
             img[lip] = np.minimum(img[lip] * np.where(dz[lip] > 0, 1.28, 0.7)[:, None], 1)
             img[hole] = R_BARK[1] * np.where(e[hole] < 0.45, 0.55, 0.9)[:, None]
+            if weeping:
+                # THE WEEPING EYE (Derek: "a yellowing gross eye weeping, leaking blood sap"): the scar opened into an
+                # eye under swollen lids of bark; the white gone jaundiced yellow, threaded with bloodshot veins; a
+                # rheumy iris filmed milky at its ring; a wet glint on the moon side; the lower lid raw and red
+                ex, ey = da / w_s, dz / (w_s * 0.55)
+                er = np.hypot(ex, ey)
+                lids = bole & (er >= 0.82) & (er < 1.35)
+                img[lids] = img[lids] * np.where(ey[lids] > 0, 1.12, 0.62)[:, None]      # puffed upper lid, dark crease below
+                white = bole & (er < 0.82)
+                yv = np.clip(v * 0.75 + 0.18 - np.clip(-ey, 0, 1) * 0.1, 0, 0.99)
+                img[white] = EYE_Y[np.clip((yv[white] * len(EYE_Y)).astype(int), 0, len(EYE_Y) - 1)]
+                vein_e = white & (np.abs(np.sin(np.arctan2(ey, ex) * 7 + er * 4)) < 0.16) & (er > 0.4)
+                img[vein_e] = img[vein_e] * 0.45 + np.array([0.55, 0.1, 0.08]) * 0.55
+                iris = bole & (np.hypot(ex - 0.06, ey + 0.05) < 0.42)
+                img[iris] = EYE_I[np.clip((v[iris] * 0.8 * len(EYE_I)).astype(int), 0, len(EYE_I) - 1)]
+                film = iris & (np.hypot(ex - 0.06, ey + 0.05) > 0.3)
+                img[film] = img[film] * 0.55 + np.array([0.62, 0.62, 0.58]) * 0.45   # the rheum, milky
+                pupil = bole & (np.hypot(ex - 0.06, ey + 0.05) < 0.16)
+                img[pupil] = np.array([0.03, 0.02, 0.02])
+                glint = bole & (np.hypot(ex + 0.18, ey - 0.2) < 0.12) & (ndl > 0)
+                img[glint] = np.array([0.92, 0.9, 0.82])
+                raw = bole & (ey < -0.6) & (er >= 0.7) & (er < 1.0)
+                img[raw] = SAP[3]
             brow = bole & (np.abs(da) < w_s * 1.7) & (np.abs(dz - (w_s * 0.85 + np.abs(da) * 0.4)) < 0.05)
             img[brow] = img[brow] * 0.72
             # the scar weeps: sap is dark blood in this world (Derek 2026-10-07), runs from the scar's lower lip down
             # the skin, glossy red-black where fresh, a lit bead on the moon side, crusting brown as it dries and thins
-            for q in range(int(rs.integers(1, 4))):
+            for q in range(int(rs.integers(1, 4)) + (2 if weeping else 0)):
                 a_r = a_s + rs.uniform(-0.6, 0.6) * w_s
-                L_r = rs.uniform(0.4, 2.6)
+                L_r = rs.uniform(0.4, 2.6) * (1.8 if weeping else 1.0)
                 z0 = z_s - w_s * 0.45
                 f_ = np.clip((z0 - along) / L_r, 0, 1)                   # 0 at the scar .. 1 at the run's end
-                wig = np.sin(along * 7 + q * 2.3) * 0.02 + np.sin(along * 2.1 + a_r) * 0.015
+                wig = np.sin(along * 2.2 + q * 2.3) * 0.025 + np.sin(along * 0.9 + a_r) * 0.02   # a slow wander, not a ladder
                 wr = (0.045 - f_ * 0.03) * min(1.0, r / 0.6)
                 run = wood & bole & (along < z0) & (along > z0 - L_r) & (np.abs(((arc - a_r - wig + circ / 2) % circ) - circ / 2) < wr) & (facing > 0.2)
                 fresh = run & (f_ < 0.45)

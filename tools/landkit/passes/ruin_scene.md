@@ -101,3 +101,34 @@ build, melee.
    Derek: "sap in the world will look like dark blood" (MASTER_RULES section 5).
 17. Shared bark: every limb scar weeps one to three runs of dark-blood sap down the pale skin, glossy red-black and
     beaded on the moon side where fresh, crusting brown and thinning as it dries (game trees and scenes alike).
+   Graded: an eye weeping blood down the pale vein-tree; uncanny, right for the Wood.
+18. The doorway: jambs stand (dressed stones, taller and cleaner than the walls), a worn sill stone across the door,
+    the arch's stones as true wedges with a carved moulding band, the keystone with an incised eye (the old faith's
+    hint, echoing the vein-trees' eyes).
+   Graded: the jambs frame the Ossuarch at the door (a gateway); their faces still too clean for their age.
+   Derek: "I like the idea of some more dying trees having weeping eyes. Brings the dead god more into it." (next)
+19. The relic: the fallen iron bell (tools/landkit/relic.py, one painter for game and scene), on its side half sunk
+    in the nave floor, mouth a dark hollow, rusted almost away (scabs, pits), the crack from the lip, the inscription
+    band worn smooth, the loop broken to a stub, the clapper apart, its rust bled into the flags.
+   Graded: the bell reads as a dark rust blob half hidden behind a pier (too dark, wrongly placed).
+   Derek: "a yellowing gross eye weeping, leaking blood sap" on more dying trees.
+20. Shared bark: a dying level; a dying tree's scars open into weeping eyes (swollen bark lids, jaundiced white with
+    bloodshot veins, rheumy milky iris, wet glint, raw red lower lid, long fresh runs of blood sap); two in five of the
+    scene's trees dying, their eyes lower on the bole. The bell moved into the open nave and lit truer.
+   Graded: weeping eyes on the dying trees, the dead god in the Wood; but the eye ~6 px (reads as a sore), the runs
+   step like a ladder; the bell visible but half behind the right jamb and mouth-on (a dark dome).
+21. Weeping eyes 2.4x (an eye big enough to be one); runs wander slowly; the bell turned three-quarters, clear of
+    the jamb.
+   (The bell solved into place from the frame: on the nave axis inside the door, where the pilgrim looks.)
+   Graded: the eye reads as an eye; the bell visible but reads as a barrel or pumpkin (no waist, no flare) and too
+   evenly orange.
+22. The bell's true form (a slim waist flaring hard to a thick lip, the shoulder stepping in to the head) and iron
+    (near black-brown, orange only in bloomed scabs).
+   Graded: at its true size (~22 px) a bell on its side does not read; the mouth dominates, the lantern pushes orange.
+23. The bell rebuilt upright, resting mouth-down where it fell (fallen bells come to rest so), half sunk in the broken
+    floor, tilted where one side of the lip bit deeper: crown with the loop's stub, shoulder, slim waist, flare, thick
+    lip, a raised sound-bow; near-black iron, orange only where it bloomed, the worn inscription band, the crack from
+    the lip; the clapper rolled away.
+   Graded: the silhouette reads (crown, shoulder, sides); sunk too deep (the flare and lip buried: a helmet), the
+   scabs too big and orange.
+24. Sunk only a hand, so the flared lip shows; the bloom fewer, smaller, browner.

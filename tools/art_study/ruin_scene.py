@@ -26,6 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 import wood_scene as ws                      # noqa: E402
 import ruin                                  # noqa: E402
 import bark                                  # noqa: E402
+import relic                                 # noqa: E402
 from wood_ecosystem import vn, fbm           # noqa: E402
 
 C = np.array([15.0, 13.0])                   # the church's centre in the wood's plan
@@ -42,6 +43,17 @@ R_VEIN = ws.ramp("#1d1218", "#33202a", "#4d3036", "#694643")
 # the walls toward the camera broken low, the far ones standing high: the eye looks in (walls: 0 and 2 far, 1 and 3,
 # the door's, near)
 FR, FI = ruin.chapel(SEED, full=(9.0, 2.6, 8.0, 3.6))
+# the fallen bell, in the nave (in the church's own frame: lx along the nave, ly across), its mouth toward the door
+BF, BI = relic.bell(SEED)
+BELL_AT, BELL_ROT = np.array([-4.8, 0.0]), 1.9       # on the nave axis inside the door, where he looks (solved from the frame)
+
+
+def to_bell(x, y):
+    """world -> the bell's own frame"""
+    lx, ly = to_local(x, y)
+    dx, dy = lx - BELL_AT[0], ly - BELL_AT[1]
+    c, s_ = np.cos(BELL_ROT), np.sin(BELL_ROT)
+    return dx * c + dy * s_, -dx * s_ + dy * c
 
 
 def to_local(x, y):
@@ -103,6 +115,16 @@ def stamp(W, w):
     W["tag"] = np.where(m, 600, W["tag"])
     W["RU"] = np.where(m, fm, 0)
     W["obj"][600] = dict(kind="ruin", base=base)
+    # the bell, sunk in the floor of the nave
+    bx, by = to_bell(X, Y)
+    inb = (np.abs(bx) < BF.half) & (np.abs(by) < BF.half)
+    bh = np.where(inb, BF.at(BF.H, bx, by), -9.0)
+    floor_z = base + 0.12
+    mb = (bh > 0.0) & (floor_z + bh > W["H"])
+    W["H"] = np.where(mb, floor_z + bh, W["H"])
+    W["Hrest"] = np.where(mb, floor_z + bh, W["Hrest"])
+    W["tag"] = np.where(mb, 610, W["tag"])
+    W["obj"][610] = dict(kind="bell", base=floor_z)
     fd = footprint_dist(X, Y)
     ring = (fd > 0) & (fd < 1.6 + (fbm(X * 1.5, Y * 1.5) - 0.5) * 0.8) & (W["tag"] == 0)
     W["mat"] = np.where(ring, 2, W["mat"])                            # bare earth: the roots turned aside
@@ -232,6 +254,8 @@ def paint_ruin(img, m, v, n, px, py, pz, o, W, L):
     alb = T_[gy_s.astype(int) % T_.shape[0], gx_s.astype(int) % T_.shape[1]]
     lightk = np.clip(0.5 + v * 1.05, 0.35, 1.45)
     img[flag] = np.clip(alb[flag] * lightk[flag][:, None], 0, 1)
+    bxs, bys = to_bell(px, py)
+    img = relic.stain(img, flag, bxs, bys, BI)                         # the bell's rust bled into the flags
     # desolation: centuries of leaves no one has swept, drifted grey against the inside of the walls and the piers' feet
     hxi, hyi = FI["length"] / 2 - FI["thick"] / 2, FI["width"] / 2 - FI["thick"] / 2
     dwall = np.minimum(hxi - np.abs(lx), hyi - np.abs(ly))
@@ -240,6 +264,33 @@ def paint_ruin(img, m, v, n, px, py, pz, o, W, L):
     drift = flag & (vn(lx * 7 + 3, ly * 7) > 0.42 + np.clip(dwall, 0, 2) * 0.55) & (vn(lx * 2.2, ly * 2.2) > 0.3)
     DEADL = ws.ramp("#1e1a1c", "#2f2828", "#433835", "#574941", "#6b5a4c")
     img[drift] = DEADL[np.clip(((v[drift] * 0.8 + (vn(lx * 19, ly * 19)[drift] - 0.5) * 0.2) * len(DEADL)).astype(int), 0, len(DEADL) - 1)]
+    # ---- the door's jambs: dressed stones, taller and cleaner than the walls' rubble, a chamfer down their edge
+    jm_ = m & (RU == ruin.JAMB)
+    course_j = np.floor(h / ruin.COURSE)
+    jv_ = sv + (stone_value(0, course_j, 3, 13) - 0.5) * 0.06 + (vn(U * 10, h * 10) - 0.5) * 0.03
+    img[jm_] = R_STONE[np.clip((jv_ * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][jm_]
+    jj = jm_ & side & ((h / ruin.COURSE - course_j) < 0.07)
+    img[jj] = R_STONE[np.clip(((sv - 0.15) * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][jj]
+    jt = jm_ & ~side & (vn(px * 8, py * 8) > 0.5)
+    img[jt] = R_MOSSW[np.clip(((v * 0.85) * len(R_MOSSW)).astype(int), 0, len(R_MOSSW) - 1)][jt]
+    # ---- the fallen voussoirs: dressed wedges, a carved moulding band along one face; the keystone's incised eye
+    for mat_ in (ruin.VOUSS, ruin.KEY):
+        vm = m & (RU == mat_)
+        vv_ = sv + 0.02 + (vn(px * 10, py * 10 + pz * 10) - 0.5) * 0.05
+        img[vm] = R_STONE[np.clip((vv_ * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][vm]
+        band = vm & side & (np.abs((pz - o["base"]) - 0.24) < 0.03)
+        img[band] = R_STONE[np.clip(((sv - 0.12) * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][band]
+        bandl = vm & side & (np.abs((pz - o["base"]) - 0.29) < 0.02)
+        img[bandl] = np.minimum(img[bandl] * 1.15, 1)
+        vmoss = vm & ~side & (vn(px * 9 + 4, py * 9) > 0.62)
+        img[vmoss] = R_MOSSW[np.clip(((v * 0.85) * len(R_MOSSW)).astype(int), 0, len(R_MOSSW) - 1)][vmoss]
+    km = m & (RU == ruin.KEY) & ~side
+    if km.any():
+        kx, ky = px[km].mean(), py[km].mean()
+        ex, ey = (px - kx) / 0.17, (py - ky) / 0.09
+        eye = km & (np.abs(ex ** 2 + ey ** 2 - 1) < 0.35)                 # the almond of the eye, cut in
+        pupil = km & (ex ** 2 + ey ** 2 < 0.18)
+        img[eye | pupil] = R_STONE[np.clip(((sv - 0.2) * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][eye | pupil]
     # ---- steps, altar, fallen stones
     for mat_, darker in ((ruin.STEP, -0.02), (ruin.ALTAR, 0.0), (ruin.RUBBLE, -0.04)):
         mm = m & (RU == mat_)
@@ -266,8 +317,9 @@ def pale_bark(img, m, v, n, px, py, pz, o, along=None, arc=None, lichen=True):
     form = bark.form_value(n, ws.SUN)
     vb = np.clip(form * (0.55 + v * 0.75), 0, 0.99)                     # the pale form, under this scene's own light
     vb = vb * (1 - np.clip((along - 5.0) / 14.0, 0, 0.32))                # climbing into the canopy's shade
+    dying = 1.0 if seed % 5 in (0, 2) else 0.0                          # two in five of the Wood's trees are dying, and weep
     img, _ = bark.paint(img, m, bole, vb, n, arc, along, max(o["r"], 0.25), seed, ws.SUN,
-                        scar_band=(2.5, 11.0), top=18.0)
+                        scar_band=(1.8, 7.0) if dying else (2.5, 11.0), top=18.0, dying=dying)
     return img
 
 
@@ -373,6 +425,15 @@ ws.RIM = (1.12, (0.01, 0.015, 0.035))                                # a soft, c
 ws.WOOD_HOOKS += [clear_plan, place_candle]
 ws.BUILD_HOOKS += [stamp, candle_light, keep_world]
 ws.PAINTERS["ruin"] = paint_ruin
+
+
+def paint_bell(img, m, v, n, px, py, pz, o, W, L):
+    bx, by = to_bell(px, py)
+    M = BF.at(BF.M, bx, by, 0)
+    return relic.paint_bell(img, m, v, n, bx, by, pz - o["base"], M, BI, L["side"])
+
+
+ws.PAINTERS["bell"] = paint_bell
 def desolation(img, w, W, px, py, pz, L, T):
     """the forlorn of a place abandoned for centuries: colour drained toward a cold grey everywhere the warm lights
     do not reach, the night a step deeper; the lantern's and the candle's warmth left untouched"""

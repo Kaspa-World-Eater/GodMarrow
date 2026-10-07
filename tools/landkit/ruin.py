@@ -13,7 +13,7 @@ the stone can be laid in real courses (the painter works in the wall's own coord
 import numpy as np
 from kit import Field, vn, fbm
 
-FLOOR, BLOCK, PIER, STEP, ALTAR, RUBBLE, FLAG = 1, 2, 3, 4, 5, 6, 7
+FLOOR, BLOCK, PIER, STEP, ALTAR, RUBBLE, FLAG, JAMB, VOUSS, KEY = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 COURSE = 0.45                                                         # a course of stone, yards
 
 
@@ -50,8 +50,11 @@ def chapel(seed=1, length=15.0, width=9.0, thick=1.1, full=(6.5, 8.5, 7.5, 9.0))
         bi = np.floor(u / 0.9 + (np.floor(prof / COURSE) % 2) * 0.5)
         loose = np.floor(vn(bi * 0.53 + k * 3.1, 1) ** 1.5 * 3.6)              # each block of the top gone or not, 0-3 courses
         prof = prof - loose * COURSE * (vn(bi * 1.7 + k, 2) > 0.35)
-        if k == 3:                                                    # the west door: its arch fell
+        jamb = np.zeros(X.shape, bool)
+        if k == 3:                                                    # the west door: its arch fell, its jambs stand
             door = np.abs(u - L / 2) < 0.8                            # a door 1.6 yd wide
+            jamb = (np.abs(u - L / 2) >= 0.8) & (np.abs(u - L / 2) < 1.35)
+            prof = np.where(jamb, np.maximum(prof, 3.15 + (u > L / 2) * 0.45), prof)   # dressed stones, broken unevenly
             prof = np.where(door, 0.0, prof)
         if k == 1:                                                    # a window broken through the south wall
             win = (np.abs(u - L * 0.62) < 0.75) & (prof > 3.6)
@@ -59,9 +62,13 @@ def chapel(seed=1, length=15.0, width=9.0, thick=1.1, full=(6.5, 8.5, 7.5, 9.0))
         h = np.where(m, np.maximum(prof, 0.0), -9.0)
         upd = m & (h > H)
         H = np.where(upd, h, H)
-        M = np.where(upd, BLOCK, M)
+        M = np.where(upd, np.where(jamb, JAMB, BLOCK), M)
         wid = np.where(upd, k, wid)
         U = np.where(upd, u, U)
+    # the sill: one long threshold stone across the door, worn hollow by centuries of feet
+    sill = (np.abs(Y) < 0.8) & (np.abs(X + hx) < thick / 2)
+    H = np.where(sill, np.maximum(H, 0.2 - np.clip(1 - np.abs(Y) / 0.55, 0, 1) * 0.05), H)
+    M = np.where(sill, STEP, M)
     # the door's threshold: two worn steps up into the nave, and the arch's stones lying where they fell
     for s_ in range(2):
         st = (np.abs(Y) < 1.1) & (X < -hx - thick / 2 + 0.05 - s_ * 0.45) & (X > -hx - thick / 2 - 0.45 - s_ * 0.45)
@@ -99,6 +106,18 @@ def chapel(seed=1, length=15.0, width=9.0, thick=1.1, full=(6.5, 8.5, 7.5, 9.0))
     for k in range(int(rr.integers(22, 30))):
         if k < 5:                                                     # the arch's stones, fallen to either side of the
             cx, cy = -hx - rr.uniform(0.9, 2.6), rr.choice([-1, 1]) * rr.uniform(1.1, 2.4)   # door; its way kept clear
+            a = rr.uniform(0, np.pi)
+            sx, sy = rr.uniform(0.6, 0.8), rr.uniform(0.42, 0.5)
+            lx = (X - cx) * np.cos(a) + (Y - cy) * np.sin(a)
+            ly = -(X - cx) * np.sin(a) + (Y - cy) * np.cos(a)
+            # a voussoir: a wedge, wider at its back (the arch's outside) than its face (the soffit)
+            taper = 0.72 + 0.28 * (ly / sy + 0.5)
+            m = (np.abs(lx) < sx / 2 * taper) & (np.abs(ly) < sy / 2)
+            top = 0.42 - (np.abs(lx) > sx / 2 * taper - 0.05) * 0.04
+            H = np.where(m, np.maximum(H, top), H)
+            M = np.where(m, KEY if k == 0 else VOUSS, M)
+            blocks.append((cx, cy, a, sx, sy))
+            continue
         else:
             side = rr.choice([-1, 1])
             cx, cy = rr.uniform(-hx, hx), side * (hy + rr.uniform(0.9, 3.2))
