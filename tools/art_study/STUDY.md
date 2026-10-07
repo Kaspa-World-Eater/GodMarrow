@@ -608,3 +608,11 @@ softened.
   With the bright leaves baked into the tile, depth could never show.
 - **Show what the ecology made.** The windward drift of litter was on the log's far side; the scene's wind was turned
   so the story faces the camera.
+- **Objects, not paintings** (Derek: "every rock every grass like everything"; "the scene ... fully finished. That will
+  be the judge"). Every object is a landkit generator (`tools/landkit/`). It exports what the game's lighting reads
+  (normal map for `cm_prop_lit.gdshader`, footprint for the light map's occluders, a baked moon shadow), and the
+  scene stamps the very same object into its world, so what is judged in the scene is what goes into the game.
+- **A height field cannot overhang.** A branch held out in the air becomes a column down to the ground. Stubs must
+  rise out of the log's own top within its width; anything that truly overhangs needs a different representation.
+- **The root plate is read by its spokes:** thick roots radiating from the log's butt, snapped at the rim, earth
+  packed between. A flat disc of noise reads as a tombstone.

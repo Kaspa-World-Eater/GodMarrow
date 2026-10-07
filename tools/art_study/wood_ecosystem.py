@@ -89,6 +89,19 @@ class Wood:
         self.pm = [(rr.uniform(2, N - 2), rr.uniform(2, N - 2), rr.uniform(0, 2 * np.pi), rr.uniform(0.8, 1.6)) for _ in range(14)]
         lx0, ly0 = self.logs[0][:2]
         self.pm.append((lx0 - np.cos(ang) * 0.9, ly0 - np.sin(ang) * 0.9, ang + np.pi, 2.0))   # the fresh one's pit
+        # rocks: an erratic carried here by the ice an age ago stands at the gap's edge; stones heaved up on old
+        # mounds; clusters by the old logs; a slab
+        self.rocks = []
+        gx_, gy_, gr_ = self.gap
+        cand = [("erratic", gx_ - gr_ * 0.75, gy_ - gr_ * 0.2), ("erratic", 27.0, 18.5)]
+        for (x, y, a, r) in self.pm[:8]:
+            cand.append(("stone", x + np.cos(a) * r * 0.7, y + np.sin(a) * r * 0.7))
+        for (x0, y0, x1, y1, r, cls, plate) in self.logs[2:]:
+            cand.append(("cluster", (x0 + x1) / 2 + 0.9, (y0 + y1) / 2 - 0.6))
+        cand.append(("slab", 21.5, 21.0))
+        for k, (kind, x, y) in enumerate(cand):
+            if not on_log(x, y, 1.3) and all(np.hypot(x - t[0], y - t[1]) > t[3] + 1.4 for t in self.trees):
+                self.rocks.append((kind, x, y, 100 + k))
         # ---- 3. the ground's height: gentle, then pits and mounds
         H = (fbm(self.X * 0.06, self.Y * 0.06) - 0.5) * 1.2
         for (x, y, a, r) in self.pm:

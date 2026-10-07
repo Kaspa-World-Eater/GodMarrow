@@ -15,6 +15,9 @@ from PIL import Image
 from scipy import ndimage as nd
 from wood_ecosystem import Wood, fbm, vn
 import tiles_wood as tw
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "landkit"))   # the reusable objects
+import rock as rockgen
 
 KX, KY, KZ = 18.0, 9.0, 21.0                  # world px per tile (x, y) and per yard of height (the game's camera)
 GW, GH = 480, 270                             # the game's view in world px (1920x1080 at 4)
@@ -92,7 +95,41 @@ def build(w):
             m2 = disc & (ptop > H)
             H = np.where(m2, ptop, H)
             tag[m2] = 300
-            obj[300] = dict(kind="plate", a=np.array([ax, ay]), u=np.array([ux, uy]))
+            zc = float(H[int((ay - y0) / RES), int((ax - x0) / RES)]) if False else 0.0
+            obj[300] = dict(kind="plate", a=np.array([ax, ay]), u=np.array([ux, uy]), r=r, ride=ride)
+            # the broken branch stubs along the log: a class-2 giant has lost its twigs but not its limbs' stumps
+            for t0 in np.linspace(0.25, 0.85, 6):
+                bx, by = ax + dx * t0, ay + dy * t0
+                side_ = 1 if int(t0 * 10) % 2 else -1
+                sl = r * (1 - t0 * 0.35) * 0.32
+                rl = r * (1 - t0 * 0.35)
+                g0 = H[int(np.clip((by - y0) / RES, 0, n - 1)), int(np.clip((bx - x0) / RES, 0, n - 1))]
+                for k in range(14):
+                    f = k / 13
+                    off = rl * 0.25 + f * rl * 0.45                               # rising out of the log's top, within its width
+                    sx_ = bx + (-uy) * side_ * off
+                    sy_ = by + ux * side_ * off
+                    d_ = np.hypot(X - sx_, Y - sy_)
+                    zz = g0 + rl * ride + np.sqrt(max(rl ** 2 - off ** 2, 0)) + f * 0.5
+                    mm_ = (d_ < sl) & (zz + np.sqrt(np.clip(sl ** 2 - d_ ** 2, 0, None)) > H)
+                    H = np.where(mm_, zz + np.sqrt(np.clip(sl ** 2 - d_ ** 2, 0, None)), H)
+                    tag[mm_] = 200 + li
+    # rocks: each the landkit object itself (tools/landkit/rock.py), stamped into the world where the ecosystem put it
+    RM = np.zeros(X.shape, int)
+    for ri, (kind, rx, ry, seed) in enumerate(w.rocks):
+        if abs(rx - FOCUS[0]) > 13 or abs(ry - FOCUS[1]) > 13:
+            continue
+        img_, mask_, n_, C_, F, meta = rockgen.make(kind, seed)
+        lx, ly = X - rx, Y - ry
+        inside = (np.abs(lx) < F.half) & (np.abs(ly) < F.half)
+        fh = np.where(inside, F.at(F.H, lx, ly), -9.0)
+        fm = np.where(inside, F.at(F.M, lx, ly, 0), 0)
+        base = map_coordinates(H, ((ry - y0) / RES - 0.5, (rx - x0) / RES - 0.5), order=1) if False else H[int((ry - y0) / RES), int((rx - x0) / RES)]
+        m = fh > 0.0
+        H = np.where(m, np.maximum(H, base + fh), H)
+        tag[m] = 400 + ri
+        RM[m] = fm[m]
+        obj[400 + ri] = dict(kind="rock", rp=rockgen.SANDST if kind == "slab" else rockgen.GRANITE, base=base)
     # trunks, snags, stumps: columns with flared feet and buttress ridges
     for ti, (tx, ty, kind, r, cr) in enumerate(w.trees):
         if abs(tx - FOCUS[0]) > 13 or abs(ty - FOCUS[1]) > 13:
@@ -128,7 +165,7 @@ def build(w):
     litt = litt - np.clip(rel, 0, None) * 1.5 + np.clip(-rel, 0, None) * 1.2
     bare = (rel > 0.12) & (tag == 0) & (litt < 0.45)
     mat[bare & (mat != 1)] = 2
-    return dict(X=X, Y=Y, H=H, mat=mat, tag=tag, obj=obj, water=water, light=light, wet=wet, x0=x0, y0=y0, n=n, litt=litt)
+    return dict(X=X, Y=Y, H=H, mat=mat, tag=tag, obj=obj, water=water, light=light, wet=wet, x0=x0, y0=y0, n=n, litt=litt, RM=RM)
 
 
 def look(W, A, x, y, outside=None):
@@ -306,11 +343,49 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
                 img[mm] = R_MOSS[np.clip((v[mm] * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 1)]
             else:
                 img[m] = R_MOSS[np.clip(((v + (vn(px * 5, py * 5) - 0.5) * 0.12) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 1)][m]
+        elif o["kind"] == "rock":
+            rm = look(W, W["RM"], px, py)
+            rpz = pz - o["base"]
+            fleck = (vn(px * 60, py * 60 + pz * 60) > 0.86) * 0.06 - (vn(px * 55 + 9, py * 55) > 0.88) * 0.06
+            stain = (fbm(px * 2 + pz * 0.5, py * 2) - 0.5) * 0.1
+            wetl = np.clip(1 - rpz / 0.09, 0, 1) * 0.12
+            st = m & ((rm == rockgen.STONE) | (rm == 0))
+            img[st] = o["rp"][np.clip(((v + fleck + stain - wetl) * len(o["rp"])).astype(int), 0, len(o["rp"]) - 1)][st]
+            cr = m & (rm == rockgen.CRACK)
+            img[cr] = o["rp"][0]
+            ms = m & (rm == rockgen.MOSSM)
+            img[ms] = rockgen.MOSS[np.clip(((v * 0.9 + (vn(px * 30, py * 30) - 0.5) * 0.14) * len(rockgen.MOSS)).astype(int), 0, len(rockgen.MOSS) - 1)][ms]
+            li = m & (rm == rockgen.LICH)
+            img[li] = rockgen.LICHEN[np.clip(((v * 0.9 + 0.15) * 4).astype(int), 0, 3)][li]
+            lo = m & (rm == rockgen.LICH_O)
+            img[lo] = rockgen.RUST[np.clip(((v * 0.8 + 0.1) * 3).astype(int), 0, 2)][lo]
         elif o["kind"] == "plate":
-            # torn earth on its face, roots snapped off and hanging, a thin crust of moss on its top edge
-            img[m] = R_SOIL[np.clip((v * len(R_SOIL)).astype(int), 0, len(R_SOIL) - 1)][m]
-            rootl = m & (vn(px * 7 + pz * 3, pz * 9) > 0.66)
-            img[rootl] = R_ROOT[np.clip(((v[rootl] + 0.1) * len(R_ROOT)).astype(int), 0, len(R_ROOT) - 1)]
+            # the root plate seen behind the log's butt: thick roots radiating from the butt like spokes, snapped at the
+            # rim; dark packed earth between them; stones held in the roots; clods still clinging
+            lat = (px - o["a"][0]) * -o["u"][1] + (py - o["a"][1]) * o["u"][0]
+            base_z = look(W, W["H"], np.array(o["a"][0] - o["u"][0] * 1.0), np.array(o["a"][1] - o["u"][1] * 1.0))
+            zc = base_z + o["r"] * o["ride"] + 0.15
+            dz = pz - zc
+            ang = np.arctan2(dz, lat)
+            rad = np.hypot(lat, dz)
+            roots = np.zeros_like(px, bool)
+            edge_lit = np.zeros_like(px, bool)
+            rrs = np.random.default_rng(3)
+            for k in range(13):
+                a0 = -np.pi * 0.05 + k * (np.pi * 1.1 / 12) + rrs.normal(0, 0.06)
+                wob = np.sin(rad * 3 + k) * 0.08
+                dist = np.abs(((ang - a0 - wob + np.pi) % (2 * np.pi)) - np.pi) * rad
+                wid = np.clip(0.16 - rad * 0.06, 0.04, 0.16) * rrs.uniform(0.7, 1.2)
+                r_k = m & (dist < wid) & (rad > 0.3)
+                roots |= r_k
+                edge_lit |= m & (dist < wid) & (dist > wid * 0.55) & (((ang - a0 - wob + np.pi) % (2 * np.pi)) - np.pi > 0)
+            soil = m & ~roots
+            sv = v * 0.75 - 0.05 + (vn(px * 12, pz * 12) - 0.5) * 0.12
+            img[soil] = R_SOIL[np.clip((sv * len(R_SOIL)).astype(int), 0, len(R_SOIL) - 1)][soil]
+            rv = v * 0.9 + (vn(rad * 6, ang * 3) - 0.5) * 0.1
+            img[roots] = R_ROOT[np.clip((rv * len(R_ROOT)).astype(int), 0, len(R_ROOT) - 1)][roots]
+            el = roots & edge_lit
+            img[el] = np.minimum(img[el] * 1.3, 1)
             stones = m & (vn(px * 11, pz * 11) > 0.85)
             img[stones] = tw.PEBBLE[np.clip(((v[stones] + 0.1) * len(tw.PEBBLE)).astype(int), 0, len(tw.PEBBLE) - 1)]
     # ---- the light's temperature, stepped
