@@ -30,6 +30,8 @@ import wood_scene as ws                      # noqa: E402
 import tiles_moor                            # noqa: E402
 import tooth as toothgen                     # noqa: E402
 import fungus                                # noqa: E402
+import ground as groundgen                   # noqa: E402
+import eye as eyegen                         # noqa: E402
 from wood_ecosystem import vn, fbm           # noqa: E402
 
 C = np.array([20.0, 19.0])
@@ -46,8 +48,8 @@ FANGS = [(GATE + AX * 0.15 + PERP * o, h, r, 60 + i) for i, (o, h, r) in enumera
 TF = [toothgen.tooth("fang", s, height=h, R=r, half=2.6) for (_, h, r, s) in FANGS]
 PORE = (C + AX * 9.6 + PERP * 4.6, 1.7)
 RUIN = []                                    # the cyst and its ruin: saved for later (Derek)
-EYE = (C + AX * 8.4 + PERP * 4.4, 1.7)               # where the cyst was, looking up at the sky
-POOL = (C + AX * 10.4 + PERP * 2.6, 1.6, 1.0)
+EYE = (C + AX * 8.6 + PERP * 3.4, 1.7)               # where the cyst was, looking up at the sky
+POOL = (C + AX * 11.4 + PERP * 0.9, 1.6, 1.0)
 SHROOMS = []                                 # the shaggy manes: kept in fungus.py, to refine as an asset later (Derek)
 # the forgotten courtyard: a colonnade of fluted pillars marching to the gate, two rows; broken at every height, the ones
 # by the eye snapped low where it broke through the floor; drums fallen across the flags
@@ -57,7 +59,7 @@ for _side, _hs in ((-1, (4.6, 2.2, 5.4, 1.4)), (1, (5.0, 3.6, 0.9, 0.6))):
         COLS.append((C + AX * _a + PERP * _side * 5.8, _hs[_j], 40 + _j + (_side > 0) * 10))
 DRUMS = [(C + AX * 8.9 + PERP * 7.1, 0.5, 1.1), (C + AX * 11.6 + PERP * 6.4, 1.9, 0.9), (C + AX * 6.2 - PERP * 7.4, 2.6, 1.0)]
 YARD = (7.4, 1.0, 14.5)                       # half-width across, and its extent along the axis
-VEIN = [EYE[0] + AX * 1.5 - PERP * 1.6, POOL[0] - AX * 1.6, C + AX * 2.6 - PERP * 1.2, GATE + AX * 1.2]
+VEIN = [EYE[0] + AX * 1.5 - PERP * 1.6, POOL[0] - AX * 1.6, C + AX * 3.6 - PERP * 1.2, C + AX * 3.0 - PERP * 2.4]
 R_STONE = ws.ramp("#131218", "#211f28", "#312e37", "#443f46", "#5a5455", "#726a66", "#8d8379")
 R_BONE = ws.ramp("#1a1715", "#2c2724", "#433d38", "#5c554d", "#78706a", "#958b80", "#b2a798", "#cbc1b0")
 R_IRON = ws.ramp("#0b0a0c", "#151316", "#211d20", "#2e2829", "#3d3433")
@@ -109,9 +111,11 @@ def shape_plan(w):
     out_ = np.clip(d - EYE[1] * 1.15, 0, None)
     folds = 0.16 * np.sin(out_ * 5.5 - 0.6 + np.sin(ang * 3 + d) * 0.6) * np.exp(-out_ / 1.8)   # concentric folds
     wrink = 0.05 * np.sin(ang * 14 + d * 2) * np.exp(-out_ / 1.0) * (out_ > 0)                  # radial wrinkles
-    H = H + 0.55 * np.exp(-((d - EYE[1] * 1.25) / 0.45) ** 2) + folds + wrink - np.clip(1 - d / (EYE[1] * 1.1), 0, 1) * 0.35
+    H = H + 0.85 * np.exp(-((d - EYE[1] * 1.0) / 0.5) ** 2) + folds + wrink - np.clip(1 - d / (EYE[1] * 1.1), 0, 1) * 0.35
     e = ((X - POOL[0][0]) / POOL[1]) ** 2 + ((Y - POOL[0][1]) / POOL[2]) ** 2
-    H = H - np.clip(1 - e, 0, 1) * 0.35                                 # the pool's hollow
+    lvl = float(H[np.unravel_index(np.argmin(e), e.shape)]) - 0.12
+    m_ = np.clip((1.35 - e) / 0.5, 0, 1)
+    H = H * (1 - m_) + np.minimum(H, lvl) * m_                           # the pool's hollow: its surface level
     w.H = H
     w.wet = np.clip(1 - np.abs(r - 0.5) / 3.0, 0, 1) * 0.6               # mist lying at the swell's foot
 
@@ -205,7 +209,9 @@ def stamp(W, w):
     W["pore"] = np.full(X.shape, 99.0)
     W["doorway"] = (np.abs(u) < GATE_W / 2) & (r > -0.2)
     W["gate_r"] = r
+    W["gate_u"] = u
     W["gbase"] = gbase
+    ws.LIGHTS.append((GATE[0] - AX[0] * 0.6, GATE[1] - AX[1] * 0.6, gbase + 1.2, 3.2))   # the glow from within the gate
 
 
 _TILES = {}
@@ -213,26 +219,21 @@ ws_T = [0.0]                                 # the loop's time, for the ground's
 
 
 def ground(img, W, px, py, pz, SX, SY, L, v, gl):
-    if "ash" not in _TILES:
-        _TILES["ash"] = tiles_moor.ash_0(0)[0]
-        _TILES["putrid"] = tiles_moor.putrid_0(0)[0]
-    gx = ((px - py) * ws.KX).astype(int)
-    gy = ((px + py) * ws.KY).astype(int)
-    ash, pu = _TILES["ash"], _TILES["putrid"]
     k = (0.3 + L["moon"][..., None] * 0.85 * np.array([0.86, 0.9, 1.05]) + L["lamp"][..., None] * 1.5 * np.array([1.15, 0.85, 0.55])) * (1 - L["ao"][..., None] * 0.35)
-    alb = ash[gy % ash.shape[0], gx % ash.shape[1]]
-    alb = alb * 0.55 + ash.reshape(-1, 3).mean(0) * 0.45                    # quiet: open ground stays quiet
-    if "flags" not in _TILES:
-        import tiles_ruin
-        _TILES["flags"] = tiles_ruin.church_flags(seed=0)[0]
-    fl = _TILES["flags"]
+    alb = groundgen.ash(px, py, seed=4)
     qa = (px - C[0]) * AX[0] + (py - C[1]) * AX[1]
     qp = (px - C[0]) * PERP[0] + (py - C[1]) * PERP[1]
-    yard = (np.abs(qp) < YARD[0]) & (qa > YARD[1]) & (qa < YARD[2])
-    drift = vn(px * 0.7, py * 0.7) > 0.62 + np.clip(np.abs(qp) - 5.5, 0, 2) * -0.2   # ash drifted over the flags
-    alb = np.where((yard & ~drift)[..., None], fl[gy % fl.shape[0], gx % fl.shape[1]] * 0.9, alb)
+    yard = (np.abs(qp) < YARD[0] + (vn(qa * 0.5, 3) - 0.5) * 1.6) & (qa > YARD[1]) & (qa < YARD[2])
+    fcol, fh = groundgen.flags(qa, qp, px, py, seed=2)
+    drift = fbm(px * 0.45, py * 0.45) > 0.6 - np.clip(np.abs(qp) - 4.5, 0, 3) * 0.08   # ash drifted over the flags
+    lay = yard & ~drift
+    k = np.where(lay[..., None], k * (1 + fh[..., None] * 2.5), k)
+    alb = np.where(lay[..., None], fcol, alb)
+    edge_ = yard & drift & (fbm(px * 0.45, py * 0.45) < 0.66 - np.clip(np.abs(qp) - 4.5, 0, 3) * 0.08)
+    alb = np.where(edge_[..., None], alb * 0.6 + fcol * 0.4, alb)              # the stones showing through thin ash
     pm = ws.look(W, W["putrid"], px, py) > 0
-    alb = np.where(pm[..., None], pu[gy % pu.shape[0], gx % pu.shape[1]], alb)
+    pcol, pwet = groundgen.flesh(px, py, seed=1, moon=ws.SUN)
+    alb = np.where(pm[..., None], pcol, alb)
     # the fungal threads: sparse wandering lines (contours of a slow noise), only in the band where the flesh creeps
     # (the mycelium is drawn as living strands, threading in and out of the ground: see mycelium())
     d = ws.look(W, W["pore"], px, py)
@@ -252,22 +253,33 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     gr = ws.look(W, W["gate_r"], px, py)
     dark = np.clip((gr + 0.3) / 1.6, 0, 1)
     out = np.where(dw[..., None], out * (1 - dark[..., None]) + np.array([0.01, 0.0, 0.01]) * dark[..., None], out)
+    # within the doorway, far in: a deep red breathing glow (something waits there)
+    deep = dw & (gr > 0.6)
+    br_ = 0.75 + 0.25 * np.sin(ws_T[0] * 6.28)
+    glow_ = np.clip(1 - np.abs(gr - 1.6) / 1.4, 0, 1) * (1 - np.clip(np.abs(ws.look(W, W["gate_u"], px, py)) / (GATE_W / 2), 0, 1) ** 2)
+    out = np.where(deep[..., None], out + np.array([0.32, 0.04, 0.03]) * (glow_ * br_)[..., None], out)
+    wet_ = gl & pm & pwet
+    out[wet_] = np.minimum(out[wet_] * 1.45 + np.array([0.05, 0.04, 0.05]), 1)   # the swollen tops wet and shining
     sheen = gl & rim & (L["moon"] > 0.55) & (vn(px * 12, py * 12) > 0.66)
     out[sheen] = np.minimum(out[sheen] * 1.6 + 0.06, 1)
     pl = gl & (ws.look(W, W["pool"], px, py) > 0)
-    marb = np.sin((px - POOL[0][0]) * 3.0 + vn(px * 1.5, py * 1.5) * 6 + np.sin(py * 2.2) * 2)
+    marb = np.sin((px - POOL[0][0]) * 7.0 + vn(px * 3.5, py * 3.5) * 7 + np.sin(py * 5.1) * 2)
     mix = np.clip(marb * 0.5 + 0.5, 0, 1) ** 1.5
-    col = np.array([0.66, 0.58, 0.28]) * mix[..., None] + np.array([0.24, 0.03, 0.04]) * (1 - mix[..., None])
+    mix = np.clip(mix - 0.55, 0, 1) * 1.6                                  # mostly blood, pus in thin streaks
+    col = np.array([0.34, 0.3, 0.15]) * mix[..., None] + np.array([0.17, 0.02, 0.03]) * (1 - mix[..., None])
     out[pl] = np.clip(col * (0.45 + L["moon"][..., None] * 0.4 + L["lamp"][..., None] * 0.8), 0, 1)[pl]
     gloss = pl & (vn(px * 6 + 3, py * 6) > 0.74)
     out[gloss] = np.minimum(out[gloss] * 1.5 + 0.08, 1)
     crust = gl & ~pl & nd.binary_dilation(pl, iterations=2)                 # the dried crust round it, yellow-brown
-    out[crust] = np.clip(np.array([0.36, 0.28, 0.12]) * (0.5 + L["moon"][crust][:, None] * 0.6), 0, 1)
+    crust = crust & (vn(px * 4, py * 4) > 0.45)
+    out[crust] = out[crust] * 0.55 + np.array([0.12, 0.05, 0.04]) * 0.45   # a patchy dark crust, soaked into the flesh
     dr = np.hypot((px - POOL[0][0]) / POOL[1], (py - POOL[0][1]) / POOL[2])
     ring = pl & (np.abs(np.sin(dr * 14 - ws_T[0] * 6.28 * 2)) < 0.08) & (dr < 0.8)
     out[ring] = np.minimum(out[ring] * 1.25, 1)                              # rings spreading where the drops fall
-    edge = pl & ~nd.binary_erosion(pl, iterations=2)
-    out[edge] = out[edge] * 0.5
+    edge = pl & ~nd.binary_erosion(pl, iterations=1)
+    out[edge] = out[edge] * 0.7
+    far = edge & (np.roll(pl, 2, axis=0) == False)                        # the meniscus catching light on the far edge
+    out[far] = np.minimum(out[far] * 1.5 + 0.04, 1)
     return out
 
 
@@ -294,6 +306,12 @@ def paint_tooth(img, m, v, n, px, py, pz, o, W, L):
     v2 = np.where(m, vs * 0.55 + (0.12 + moon_an * 0.62) * 0.45, v)
     img = toothgen.paint_tooth(img, m, v2, nw, lx, ly, pz - o["base"], M, info, L["side"])
     h = pz - o["base"]
+    gl_ = m & L["side"] & (v2 > 0.5) & (np.abs(np.sin(np.arctan2(ly, lx) - 2.5)) < 0.07) & (h > info["height"] * 0.3)
+    img[gl_] = np.minimum(img[gl_] * 1.3 + 0.05, 1)                        # the gloss line down the enamel
+    craze = m & L["side"] & (np.abs(np.sin(np.arctan2(ly, lx) * 11 + h * 1.3 + vn(lx, ly) * 2)) < 0.03)
+    img[craze] = img[craze] * 0.75                                          # long craze-lines in the enamel
+    collar = m & (h < 0.95) & (h > 0.55)
+    img[collar] = img[collar] * 0.3 + np.array([0.42, 0.13, 0.15]) * 0.7 * np.clip(v2[collar] + 0.3, 0, 1)[:, None]   # the gum's collar
     climb = m & (h < 0.6 + vn(lx * 3, ly * 3) * 0.8)                  # the flesh climbing its foot
     img[climb] = tiles_moor.PUTRID[np.clip(((v2 * 0.8) * 7).astype(int), 0, 6)][climb]
     run = m & L["side"] & (np.abs(np.sin(np.arctan2(ly, lx) * 5 + 1.3)) < 0.06) & (h < info["height"] * 0.45)
@@ -480,87 +498,62 @@ def living_flesh(img, w, W, px, py, pz, L, T):
                 col = np.array([0.12, 0.03, 0.07]) + np.array([0.22, 0.05, 0.08]) * lm + np.array([0.3, 0.03, 0.04]) * pulse * 0.8
                 if v_ < -0.55 and u_ < 0:
                     col = col + 0.12
-                img[yy, xx] = np.clip(col * (0.6 + L["lamp"][yy, xx] * 1.2 + L["moon"][yy, xx] * 0.4), 0, 1)
-    # the eye, three-dimensional, bulging from its socket; its slow pus-filled blink
+                img[yy, xx] = np.clip(col * (0.5 + L["lamp"][yy, xx] * 1.0 + L["moon"][yy, xx] * 0.35), 0, 1)
+                if v_ > 0.7 and yy + 2 < GH and zb[yy + 2, xx] < d - 0.3:
+                    img[yy + 2, xx] = img[yy + 2, xx] * 0.55                   # its shadow on the ground beside it
+    # capillaries: fine dark threads branching off the vein into the ground, pulsing faintly with it
+    cr = np.random.default_rng(55)
+    for i in range(0, len(VP), 9):
+        x, y = VP[i]
+        a = cr.uniform(0, 2 * np.pi)
+        pulse = np.exp(-((((i / len(VP)) * 6 - T * 2) % 1.0 - 0.5) / 0.08) ** 2)
+        for j in range(int(cr.integers(6, 20))):
+            a += cr.normal(0, 0.4)
+            x, y = x + np.cos(a) * 0.06, y + np.sin(a) * 0.06
+            sx, sy = ws.to_px((x, y, gh(x, y)))
+            ix, iy = int(round(sx)), int(round(sy))
+            if 0 <= iy < GH and 0 <= ix < GW and dep[iy, ix] <= x + y + 0.3 and zb[iy, ix] < -1e8:
+                img[iy, ix] = img[iy, ix] * 0.45 + np.array([0.2, 0.04, 0.07]) * (0.55 + pulse * 0.6)
+    # the eye (landkit eye.py): a true ball, ray-cast along the camera; it bulges up out of its socket, gazing at the sky
+    # and a little toward us, so the iris is seen through the cornea's clear dome from the side
     ec, er_ = EYE
     g = gh(ec[0], ec[1])
-    sx0, sy0 = ws.to_px((ec[0], ec[1], g + er_ * 0.95))            # it swells up out of its socket
-    R = er_ * 18.0
+    Ry = er_ * 0.95
+    centre = (ec[0], ec[1], g + Ry * 0.12)
     blink = np.clip(1 - np.abs((T - 0.62) / 0.13), 0, 1) ** 0.8
-    # the eye is an almond lying in its folds, seen a little from the side, gazing up at the sky: the iris sits high on
-    # the ball, foreshortened to an ellipse; over it the cornea bulges, clear as glass, so the iris is seen through the
-    # fluid (a band of refraction at its edge, the wet gloss on its dome, the sky's cold light caught in it)
-    for yy in range(int(sy0 - R - 2), int(sy0 + R + 2)):
-        for xx in range(int(sx0 - R - 2), int(sx0 + R + 2)):
-            if not (0 <= yy < GH and 0 <= xx < GW):
+    gz = np.array([AX[0] * 0.25 + PERP[0] * 0.3, AX[1] * 0.25 + PERP[1] * 0.3, 1.0])
+    lts = [((lx, ly, lz), (0.95, 0.6, 0.32), rch * 1.4) for (lx, ly, lz, rch) in ws.LIGHTS]
+    eyegen.draw(img, zb, dep, ws.to_px, centre, Ry, gz, blink, lts, ws.SUN, seed=3, ambient=0.16, aperture=(0.84, 0.4))
+    sx0, sy0 = ws.to_px(centre)
+    R = Ry * 18.0 * 0.62
+    # the pus runs: out of the lower lid's margin, down the socket's folds over their own surface, into the pool
+    toward = POOL[0] - ec
+    toward = toward / np.linalg.norm(toward)
+    side = np.array([-toward[1], toward[0]])
+    for dq in range(4):
+        start = ec + toward * Ry * 1.05 + side * (dq - 1.5) * 0.35
+        end = POOL[0] - toward * 0.5 + side * (dq - 1.5) * 0.25
+        ph = (T * 1.2 + dq * 0.29) % 1.0
+        n_ = 60
+        for j in range(n_):
+            f = j / (n_ - 1)
+            q = start + (end - start) * f + side * np.sin(f * 7 + dq) * 0.12
+            z = gh(q[0], q[1]) + 0.03
+            sx, sy = ws.to_px((q[0], q[1], z))
+            ix, iy = int(round(sx)), int(round(sy))
+            if not (0 <= iy < GH and 0 <= ix < GW) or dep[iy, ix] > q[0] + q[1] + 0.25 or zb[iy, ix] > q[0] + q[1] + 0.25:
                 continue
-            u_, v_ = (xx + 0.5 - sx0) / R, (yy + 0.5 - sy0) / (R * 0.82)
-            almond = 0.74 * max(0.0, 1 - u_ * u_) ** 0.5                    # the lids' opening, stretched over the bulge
-            q2 = u_ * u_ + (v_ / 1.0) ** 2
-            if q2 > 1.15 or abs(u_) > 1:
-                continue
-            nz = np.sqrt(max(0.0, 1 - min(q2, 1)))
-            upper = -almond + blink * almond * 2.05                        # the upper lid comes down over it all in the blink
-            lower = almond
-            if v_ < upper:                                                 # the upper lid: heavy hide, its folds above
-                dl = upper - v_
-                fold = abs(np.sin(dl * 11 + u_ * 1.5)) < 0.2
-                col = np.array([0.32, 0.17, 0.18]) * (0.45 + nz * 0.6 + np.clip(0.25 - dl, 0, 0.25)) * (0.7 if fold else 1.0)
-                if v_ > upper - 0.1:
-                    col = np.array([0.66, 0.58, 0.28]) * (0.8 + nz * 0.3)   # pus crusted on its margin
-                    if (xx * 7 + yy * 3) % 5 == 0:
-                        col = np.array([0.08, 0.05, 0.05])                  # coarse hairs along the margin
-            elif v_ > lower:                                               # the lower lid: swollen, raw
-                col = np.array([0.45, 0.14, 0.15]) * (0.5 + nz * 0.6)
-                if v_ < lower + 0.08:
-                    col = np.array([0.72, 0.62, 0.3])                       # pus welling along it
-            else:
-                ic = np.array([0.05, -0.3])                                # the iris high on the ball (it looks up)
-                du, dv = (u_ - ic[0]) / 0.42, (v_ - ic[1]) / 0.24          # foreshortened: an ellipse
-                ir = np.hypot(du, dv)
-                lm = max(0.0, -u_ * 0.55 - v_ * 0.55 + nz * 0.8) ** 1.3          # a ball: strong round falloff
-                if ir < 0.33:
-                    col = np.array([0.01, 0.01, 0.015])                    # the pupil
-                elif ir < 1.0:
-                    ang_ = np.arctan2(dv, du)
-                    stri = 0.85 + 0.25 * (abs(np.sin(ang_ * 18 + ir * 3)) > 0.6)   # the iris's fibres, radiating
-                    col = np.array([0.32, 0.22, 0.09]) * (0.55 + lm * 0.55) * stri
-                    if ir > 0.85:
-                        col = col * 0.6                                     # its dark limbal ring
-                else:
-                    yel = np.clip((abs(u_) + abs(v_)) / 1.2, 0, 1)
-                    lm = lm * (0.55 + 0.45 * np.clip((v_ - upper) / 0.35, 0, 1))      # the lid's shadow on the ball
-                    col = (np.array([0.8, 0.76, 0.64]) * (1 - yel) + np.array([0.6, 0.5, 0.22]) * yel) * (0.35 + lm * 0.75)
-                    ang2 = np.arctan2(v_ - ic[1], u_ - ic[0])
-                    if ir > 1.3 and abs(np.sin(ang2 * 6 + np.sin(ir * 3) * 1.5)) < 0.09:
-                        col = col * 0.45 + np.array([0.55, 0.05, 0.05]) * 0.55   # bloodshot threads
-                # the cornea: a clear dome over the iris; through it the iris (above), at its edge the refraction band,
-                # on it the gloss and the sky
-                if ir < 1.18:
-                    edge = np.clip((ir - 0.95) / 0.23, 0, 1)
-                    col = col * (1 - 0.35 * edge) + np.array([0.55, 0.6, 0.68]) * 0.35 * edge   # the fresnel rim, cold sky
-                    if 0.98 < ir < 1.08:
-                        col = col * 0.7                                     # the refraction line where dome meets white
-                    if np.hypot(du + 0.35, dv + 0.45) < 0.22:
-                        col = np.array([0.95, 0.96, 0.98])                  # the gloss on the dome
-                    elif np.hypot(du - 0.4, dv - 0.35) < 0.12:
-                        col = col * 0.6 + np.array([0.7, 0.75, 0.8]) * 0.4   # a second, faint reflection
-            if upper < v_ < lower and lower - v_ < 0.07:
-                col = col * 0.7 + np.array([0.8, 0.78, 0.7]) * 0.3            # the wet line along the lower lid
-            img[yy, xx] = np.clip(col * (0.7 + L["lamp"][yy, xx] * 0.9), 0, 1)
-    for dq in range(3):                                                  # the pus dripping into the pool
-        u0 = -0.3 + dq * 0.3
-        ph = (T * 1.5 + dq * 0.37) % 1.0
-        x0, y0 = int(sx0 + u0 * R), int(sy0 + R * 0.75)
-        tx, ty = ws.to_px((POOL[0][0] - 0.4 + dq * 0.3, POOL[0][1] - 0.3, gh(POOL[0][0], POOL[0][1])))
-        for j in range(int(ph * 14)):
-            f = j / 14
-            jx, jy = int(x0 + (tx - x0) * f), int(y0 + (ty - y0) * f)
-            if 0 <= jy < GH and 0 <= jx < GW:
-                img[jy, jx] = np.array([0.6, 0.53, 0.26]) * (0.8 + 0.2 * (j % 2))
-        jx, jy = int(x0 + (tx - x0) * ph), int(y0 + (ty - y0) * ph) + 1
-        if 0 <= jy < GH and 0 <= jx < GW:
-            img[jy, jx] = np.array([0.82, 0.74, 0.4])
+            fresh = f < ph                                                   # wet behind the drop, a dull trail ahead
+            if fresh:
+                img[iy, ix] = img[iy, ix] * 0.3 + np.array([0.5, 0.44, 0.2]) * 0.7 * (0.75 + L["moon"][iy, ix] * 0.5)
+            elif j % 3 == 0:
+                img[iy, ix] = img[iy, ix] * 0.7 + np.array([0.3, 0.26, 0.12]) * 0.3
+        q = start + (end - start) * ph + side * np.sin(ph * 7 + dq) * 0.12
+        sx, sy = ws.to_px((q[0], q[1], gh(q[0], q[1]) + 0.06))
+        ix, iy = int(round(sx)), int(round(sy))
+        if 1 <= iy < GH - 1 and 1 <= ix < GW - 1:
+            img[iy, ix - 1:ix + 1] = np.array([0.62, 0.56, 0.28])          # the drop itself, swelling as it goes
+            img[iy - 1, ix - 1] = np.array([0.9, 0.86, 0.62])
     for q in range(10):                                                  # the pool's bubbles
         ph = (T * 2 + rr.uniform(0, 1)) % 1.0
         a, rd = rr.uniform(0, 2 * np.pi), rr.uniform(0, 0.8)
@@ -679,17 +672,30 @@ def paint_column(img, m, v, n, px, py, pz, o, W, L):
     img[pl] = R_STONE[np.clip(((v * 0.85 + 0.04) * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][pl]
     ashy = m & ~side & (vn(px * 6, py * 6) > 0.4)
     img[ashy] = img[ashy] * 0.5 + np.array([0.34, 0.32, 0.31]) * 0.5
-    flesh = m & (h < 0.5 + vn(ang * 3 + o["h"], 1) * 0.9)
-    img[flesh] = img[flesh] * 0.3 + np.array([0.3, 0.12, 0.15]) * 0.7 * np.clip(v[flesh] + 0.35, 0, 1)[:, None]
+    reach = 0.3 + vn(ang * 3 + o["h"], 1) * 0.9
+    flesh = m & (h < reach) & (vn(px * 5 + o["h"], py * 5 + h * 3) > 0.35)
+    img[flesh] = img[flesh] * 0.35 + np.array([0.3, 0.12, 0.15]) * 0.65 * np.clip(v[flesh] + 0.35, 0, 1)[:, None]
+    lip = m & (np.abs(h - reach) < 0.05)
+    img[lip] = img[lip] * 0.6                                             # its creeping edge
     return img
 
 
 def paint_drum(img, m, v, n, px, py, pz, o, W, L):
+    """a fallen drum of a pillar: round across its length (the moon on its upper flank), its flutes running along it,
+    its broken end pale and rough, ash in its grooves, half sunk in the drift"""
     dirv = np.array([np.cos(o["a"]), np.sin(o["a"])])
+    along = (px - o["c"][0]) * dirv[0] + (py - o["c"][1]) * dirv[1]
     acr = -(px - o["c"][0]) * dirv[1] + (py - o["c"][1]) * dirv[0]
-    flute = np.cos(np.arcsin(np.clip(acr / 0.5, -1, 1)) * 10) > 0.45
-    sv = np.clip(v * 0.9 + 0.05 - flute * 0.08, 0, 0.85)
+    th = np.arcsin(np.clip(acr / 0.5, -1, 1))
+    zz = np.cos(th)
+    nrm = np.dstack([-dirv[1] * np.sin(th), dirv[0] * np.sin(th), zz])
+    ndl = np.clip((nrm * ws.SUN).sum(2), 0, 1)
+    flute = np.cos(th * 10) > 0.5
+    sv = 0.16 + ndl * 0.55 - flute * 0.09 + (v - 0.4) * 0.2
     img[m] = R_STONE[np.clip((sv * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][m]
+    end = m & L["side"] & (np.abs(np.abs(along) - (np.abs(along).max() if m.any() else 0)) < 0.06)
+    groove = m & flute & (vn(along * 6, th * 3) > 0.5)
+    img[groove] = img[groove] * 0.6 + np.array([0.3, 0.29, 0.28]) * 0.4
     return img
 
 

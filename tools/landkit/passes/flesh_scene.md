@@ -48,3 +48,66 @@ Tile putrid_0: 1 camo (big hard patches, slot blisters, cross mould); 2 finer mo
 15. A colonnade of fluted pillars on plinths, two rows to the gate, broken at every height, those by the eye snapped low.
 16. Fallen drums lying across the flags.
    Graded (13-16): it reads as an important forgotten courtyard now: flags under ash and flesh, a colonnade of broken pillars, the gate in its row of teeth, the bulbous eye. FAIL: the drums read as boxes; the pool a gold bowl (the crust too yellow, the hollow too deep); a red arc of vein floats left of centre; the plinths stained flat red.
+17. The fallen drums round: a cylinder's light across them, flutes along them, ash in the grooves.
+18. The pool shallow and level, its crust thin and dark.
+19. The vein seated: dimmer skin, its shadow on the ground, fine capillaries branching off it pulsing faintly.
+20. The flesh on the plinths patchy with a creeping edge.
+
+## Rules check after pass 20 (re-read MASTER_RULES 2b and the checklist)
+Lore: the Moor as the god's cheek; Derek's design. Light PARTIAL: only the lantern; no warm/coloured local light casting
+(the gate's deep glow will be it). 2b.1 FAIL: the eye, pillars, drums and gate are painted in the scene file, not landkit
+assets yet (to move in later passes). Tiles PASS (ash, putrid, flags). Life NOT CHECKED (animate before the end).
+Worst first: the pool, the floating vein, the light.
+   Graded (17-20): drums rounder, plinths patchy; the pool still a gold dish; the vein's last arc floats on the swell.
+21. The pool mostly blood, the pus in dull sour streaks.
+22. The vein ends diving into the floor before the swell.
+23. The gate's deep glow: something breathing red far in the doorway, a warm-red light on the doorway's edges and the
+    ground before it.
+24. The fangs' enamel: a gloss line, long craze-lines, the gum's swollen collar at each foot.
+   Derek: "Eye is rated at d- needs a ton more work"; "tiles look terrible and reused, rule was every piece unique
+   and a work of art".
+25. No stamped tiles: the ground is painted where it lies (landkit ground.py): ash with drifts, crusted cracked
+    plates, cinders and bone grit; flagstones laid course by course, every stone its own size, tone, tilt, chips,
+    cracks, sunk or gone; the flesh in swollen lumps, deep creases, two nets of veins, bruise and rot, wet tops.
+26. The eye rebuilt as a true ball (landkit eye.py), ray-cast along the camera: the white yellowing to its rim,
+    branching vessels, the lids as shells over it with an almond opening that closes in the blink.
+27. The cornea a clear dome: each ray refracted through it to find the iris (fibres, crypts, collarette, limbal
+    ring, pupil); fresnel sky at its rim; sharp highlights of the moon and the warm lights.
+28. The lids: folded skin, the margin crusted with pus, coarse hairs, the wet meniscus, the caruncle.
+   Graded (25-28): the eye a ball at last, the cornea clear, but it stares at us, the lids a black band; the ash
+   cracks a hex lattice; the flags a brick wall; the pool lay on the socket's folds and read as a gold bell.
+29. The pool moved off the socket and its hollow levelled.
+30. The eye gazes up and a little aside; its pupil smaller. The lids made flesh: folds running along them, the
+    margin rolled and raw, veins, a red warmth of light through thin skin, a dull sheen, longer coarse lashes.
+    The ash cracks wander (warped cells, broken lines); the flags lie in wandering hand-laid courses, bigger, their
+    tones wider apart, their joints thinner and ash-packed, their edges ragged.
+   Graded (29-30): lids flesh at last, the pool level; but the ball sits on the ground like a helmet, the flesh
+   near it a pink glitter, the pool's marbling one big gold sign.
+   Derek: "Getting better but this whole scene will need a lot of work, and make notes on the final product with the
+   organic parts when I pass it" -> passes/organic_notes.md, kept as I go.
+31. The eye sunk into its socket, the socket's ring raised round it; the lids' foot darkened into the flesh.
+32. The flesh calmer: larger lumps, few pores, finer veins, the wet sheen only on the tops that face the light.
+33. The pool finely marbled, mostly blood, the pus in thin streaks.
+   Graded (31-33): the eye in its socket now, the flesh calmer; but a plinth's ghost lies over the eye, it shrank,
+   the far lid unseen so the ball's top is bare; the pus reads as gold leaf.
+34. The eye moved clear of the plinth and made larger; the lids thicker, standing proud of the ball, the far lid
+    rising over the eye's top; the opening narrower; the cornea's dome forward to clear them.
+35. The pus dull and sour in thinner streaks.
+   Graded (34-35): the eye reads at last, an eye in thick folded lids; the white a cold grey; the pus a thin line;
+   the drips straight lines through the air.
+36. The white sallow and sick: warmer, blotched, yellowing to the lids, twice the vessels, a flush round each.
+37. Pus welling in glossy beads along the lower margin, crusted thick in the corners.
+38. The pus runs over the folds' own surface from the lower lid down into the pool, a wet trail behind each drop.
+   Graded (36-38): the white sallow, pus runs reading down the folds into the pool; the pool's hard rim a rug.
+39. The pool's edge soaked into the flesh: the crust patchy, the rim soft, a meniscus catching light on its far edge.
+40. RULES CHECK (written, every 5 passes), against MASTER_RULES section 4:
+    1 Brief: the eye's brief met at last (3D, bulbous, elliptical opening, from the side, looking up, fluid seen through,
+      pus blink and runs into the pool, in folds). 2 Scale: eye about 3 yd across beside the Ossuarch, true.
+    3 Form: the eye is ray-cast now; the ground lit per pixel. FAILS: the fangs are still flat banded cones, the vein a
+      flat pink pipe, the iron doors flat panels, the columns smooth and blue-grey.
+    4 Light: moon plus the gate's glow and lamp; the eye takes both in its cornea. 5 Values: the flesh field too busy at
+      mid-distance; the back swell needs a quieter tone group.
+    7 Paint: ground now unique everywhere (no tile, rule 11 met by having no tile at all).
+    8 Contact: the lids' foot into the socket; still weak where columns meet flags.
+    10 Life: blink, runs, pool rings, breathing wave, vein pulse: not yet checked animated.
+    11 Seen as the player: Ossuarch for scale, game camera. 12 Skeptic: worst difference now the fangs, then the vein.
