@@ -140,6 +140,8 @@ def build(w):
         RM[m] = fm[m]
         obj[400 + ri] = dict(kind="rock", rp=rockgen.SANDST if kind == "slab" else rockgen.GRANITE, base=base)
     # trunks, snags, stumps: columns with flared feet and buttress ridges
+    H_ground = H.copy()
+    sway_m = np.zeros(X.shape, bool)
     for ti, (tx, ty, kind, r, cr) in enumerate(w.trees):
         if abs(tx - FOCUS[0]) > 13 or abs(ty - FOCUS[1]) > 13:
             continue
@@ -160,6 +162,8 @@ def build(w):
         m = foot & (top > H)
         H = np.where(m, top, H)
         tag[m] = 100 + ti
+        if kind in ("giant", "middle", "young", "snag"):
+            sway_m |= m
         obj[100 + ti] = dict(kind=kind, c=np.array([tx, ty]), r=r)
     # the litter, as the ecology lays it: banked into a drift against the windward side of every log (a real ridge,
     # a hand high, that catches the moon), deep and fresh in the pits, thin over the mounds
@@ -174,7 +178,10 @@ def build(w):
     litt = litt - np.clip(rel, 0, None) * 1.5 + np.clip(-rel, 0, None) * 1.2
     bare = (rel > 0.12) & (tag == 0) & (litt < 0.45)
     mat[bare & (mat != 1)] = 2
-    return dict(X=X, Y=Y, H=H, mat=mat, tag=tag, obj=obj, water=water, light=light, wet=wet, x0=x0, y0=y0, n=n, litt=litt, RM=RM)
+    HT = np.where(sway_m, H, -50.0)                                        # the standing trees alone
+    Hrest = np.where(sway_m, H_ground, H)                                   # everything else
+    return dict(X=X, Y=Y, H=H, mat=mat, tag=tag, obj=obj, water=water, light=light, wet=wet, x0=x0, y0=y0, n=n, litt=litt, RM=RM,
+                HT=HT, Hrest=Hrest)
 
 
 def look(W, A, x, y, outside=None):
@@ -189,8 +196,16 @@ def look(W, A, x, y, outside=None):
     return v
 
 
-def cast(W):
-    """every screen pixel down into the world: the point it meets"""
+def lean(x, y, z, t):
+    """how far a standing tree has leaned at height z (yards), toward the wind (the screen's right: world +x, -y):
+    a slow sway, each tree in its own phase, much more in the gust, little at the foot and most at the crown"""
+    A = 0.025 * np.sin(2 * np.pi * t * 2 + x * 0.7 + y * 0.4) + 0.09 * (gust(t) - 1.0) * (1 + 0.3 * np.sin(x * 1.3 - y))
+    k = A * np.clip(z / 10.0, 0, 1.6) ** 2
+    return k * 0.707, -k * 0.707
+
+
+def cast(W, t=None):
+    """every screen pixel down into the world: the point it meets (t: the trees lean with the wind at that time)"""
     SY, SX = np.mgrid[0:GH, 0:GW].astype(float)
     ox = GW / 2 - (FOCUS[0] - FOCUS[1]) * KX
     oy = GH / 2 - (FOCUS[0] + FOCUS[1]) * KY
@@ -203,9 +218,18 @@ def cast(W):
         u = (SX - ox) / KX
         v = (SY - oy + z * KZ) / KY
         x, y = (u + v) / 2, (v - u) / 2
-        hit = ~got & (look(W, W["H"], x, y, -50.0) >= z)
-        px[hit], py[hit], pz[hit] = x[hit], y[hit], z
-        got |= hit
+        if t is None:
+            hit = ~got & (look(W, W["H"], x, y, -50.0) >= z)
+            px[hit], py[hit], pz[hit] = x[hit], y[hit], z
+            got |= hit
+            continue
+        lx, ly = lean(x, y, z, t)
+        tx_, ty_ = x - lx, y - ly
+        hit_t = ~got & (look(W, W["HT"], tx_, ty_, -50.0) >= z)
+        hit_r = ~got & ~hit_t & (look(W, W["Hrest"], x, y, -50.0) >= z)
+        px[hit_t], py[hit_t], pz[hit_t] = tx_[hit_t], ty_[hit_t], z
+        px[hit_r], py[hit_r], pz[hit_r] = x[hit_r], y[hit_r], z
+        got |= hit_t | hit_r
     return px, py, pz, SX, SY
 
 
@@ -728,6 +752,51 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     dens = np.clip((mist - 0.5) * 3.0 + wetv * 0.4 - 0.15, 0, 1) * low
     a_ = np.where(dens > 0.55, 0.18, np.where(dens > 0.25, 0.096, 0.0)) * (bay_l > 0.2)    # 40% lighter (Derek)
     img = img * (1 - a_[..., None]) + np.array([0.42, 0.46, 0.55]) * (0.35 + L["moon"][..., None] * 0.6 + L["lamp"][..., None] * np.array([1.2, 0.9, 0.5])) * a_[..., None]
+    # foxfire: the fungi in the softest dead wood (class 4-5 logs, the stump's crumbled heart) glow a faint cold
+    # blue-green in the dark, breathing slowly; only in shade, never where moon or lantern light is on it
+    tgx = look(W, W["tag"], px, py)
+    soft = np.zeros_like(tgx, bool)
+    for k_o, o_ in W["obj"].items():
+        if (o_["kind"] == "log" and o_["cls"] >= 4) or o_["kind"] == "stump":
+            soft |= tgx == k_o
+    dark = (L["moon"] < 0.25) & (L["lamp"] < 0.08)
+    spot = soft & dark & (vn(px * 9, py * 9 + pz * 9) > 0.72) & (vn(px * 2.5, py * 2.5) > 0.45)
+    breath_f = 0.7 + 0.3 * np.sin(2 * np.pi * T + px[spot] * 0.5)
+    img[spot] = np.clip(img[spot] * 0.4 + np.array([0.28, 0.62, 0.52])[None, :] * breath_f[:, None] * 0.6, 0, 1)
+    # a wisp-fire: a small cold flame drifting low over the damp ground, there for part of the loop, then gone
+    wis = 0.5 * (1 - np.cos(2 * np.pi * np.clip((T - 0.15) / 0.55, 0, 1)))    # fades in and out
+    if wis > 0.02:
+        u = np.clip((T - 0.15) / 0.55, 0, 1)
+        wx = FOCUS[0] - 3.2 + u * 2.4 + np.sin(u * 9) * 0.3
+        wy = FOCUS[1] - 1.0 + np.sin(u * 5 + 1) * 0.6
+        wz = gh(wx, wy) + 0.55 + np.sin(u * 13) * 0.12
+        cx_, cy_ = to_px((wx, wy, wz))
+        gx_, gy_ = to_px((wx, wy, gh(wx, wy)))
+        yy0, xx0 = np.mgrid[0:GH, 0:GW]
+        # its cold light on the ground beneath, stepped
+        dg = np.hypot((xx0 - gx_) / 26.0, (yy0 - gy_) / 13.0)
+        pool_k = np.where(dg < 0.45, 0.22, np.where(dg < 0.8, 0.11, np.where(dg < 1.0, 0.05, 0))) * wis
+        pool_k = np.where(dep <= wx + wy + 0.5, pool_k, 0)
+        img = img + np.array([0.25, 0.55, 0.6]) * pool_k[..., None]
+        # the flame: a teardrop of cold fire, a white heart, a stepped halo, motes trailing behind on the wind
+        for dyy in range(-7, 4):
+            for dxx in range(-4, 5):
+                rr_ = np.hypot(dxx / (2.4 if dyy < 0 else 2.8), dyy / (5.5 if dyy < 0 else 2.6))
+                i_, j_ = int(cy_) + dyy, int(cx_) + dxx
+                if not (0 <= i_ < GH and 0 <= j_ < GW) or dep[i_, j_] > wx + wy + 0.4:
+                    continue
+                flick = 0.15 * np.sin(T * 40 + dyy)
+                if rr_ < 0.45 + flick * 0.3:
+                    img[i_, j_] = img[i_, j_] * (1 - wis) + np.array([0.86, 1.0, 0.95]) * wis
+                elif rr_ < 0.85 + flick:
+                    img[i_, j_] = img[i_, j_] * (1 - 0.8 * wis) + np.array([0.35, 0.85, 0.78]) * 0.8 * wis
+                elif rr_ < 1.5:
+                    img[i_, j_] = img[i_, j_] * (1 - 0.25 * wis) + np.array([0.2, 0.5, 0.5]) * 0.25 * wis
+        for q in range(6):
+            tq = ((T * 3 + q / 6) % 1.0)
+            mx, my = cx_ - tq * 14 + np.sin(tq * 8 + q) * 2, cy_ - 3 - tq * 6
+            if 0 <= int(my) < GH and 0 <= int(mx) < GW and tq < 0.8:
+                img[int(my), int(mx)] = img[int(my), int(mx)] * 0.4 + np.array([0.5, 0.95, 0.85]) * 0.6 * wis * (1 - tq)
     # spores turning slowly in the lantern's light, each catching it a moment and gone
     lamp = (HERO[0] + 0.25, HERO[1] - 0.25)
     for q in range(16):
@@ -827,6 +896,7 @@ def animate(out, n=24):
     frames = []
     for i in range(n):
         t = i / n
+        px, py, pz, SX, SY = cast(W, t)                                     # the trees lean with the wind
         L = shade(W, px, py, pz, SX, SY, t)
         img = paint(W, px, py, pz, SX, SY, L, t)
         img = living(img, w, W, px, py, pz, L, t)

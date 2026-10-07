@@ -96,3 +96,69 @@ stumps and on snags.
 **Two bugs on the way.** The fern loop reused the time variable's name, which froze every layer drawn after it. Then
 the hero was drawn over the grass in front of his feet; the living layers now keep their depth so what grows nearer
 the camera covers him, and a contact shadow grounds him.
+
+## The full inventory (what the old growth needs to be generated anywhere)
+Every item is a landkit generator (`tools/landkit/`): a crafted object with parameters, exporting a sprite, normal
+map, height, moon shadow and collision posts. "Scene" means it exists only inside `wood_scene.py` so far.
+
+### Ground tiles (the quiet base, the game's 320x160 format)
+| Tile | Status |
+|---|---|
+| Leaf litter, four variants | graded C; repaint due |
+| Bare mineral soil (fresh mounds, root plates' pits) | `dirt_0`, first version |
+| Humus, dark and wet (pit floors, under logs) | to do |
+| Moss carpet (the wet hollows, round the pools) | to do |
+| Pit mud and pool margin | to do |
+| Trodden path (the pilgrims' and the game's roads through the wood) | to do |
+| Root mat (the Root Deep, roots over the surface, marrow-dark) | to do |
+
+### Trees (by species, age, health; each sways with the wind)
+| Object | Status |
+|---|---|
+| Great broadleaf: sapling, young, middle, mature, ancient | studies exist (`tree_anatomy`, `tree_foliage`) |
+| Health: blighted crown, stag-headed, dying, dead | study exists (`blighted_tree`) |
+| Understorey tree (hornbeam-like) | to do |
+| Holly-like evergreen shrub | to do |
+
+### The dead
+| Object | Status |
+|---|---|
+| Snag: barked, barkless, broken-topped, with bracket tiers | scene |
+| Stump: cut, snapped, hollow, crumbled heart (foxfire) | scene |
+| Log: decay classes 1-5, girths and lengths, broken branch stubs | scene |
+| Root plate with its pit and mound | scene |
+| Fallen crown debris (broken limbs in the gap) | to do |
+| Nurse log with its row of seedlings | to do |
+| Stilted tree (where a nurse log was) | to do |
+
+### The floor's life
+| Object | Status |
+|---|---|
+| Grass clump (three sway frames) | done (`scatter_wood.py`) |
+| Fern clump (sways) | scene |
+| Bracken drift | to do |
+| Bramble | to do |
+| Moss cushion | to do |
+| Mushroom clusters (several kinds) | scene |
+| Bracket fungus tiers | scene |
+| Foxfire patch | scene |
+| Leaf and twig stamps, the fresh fall | done (`litter_stamps.py`) |
+| Fallen sticks and branches | to do |
+
+### Stone and water
+| Object | Status |
+|---|---|
+| Erratic, slab, stone, cluster | done (`landkit/rock.py`) |
+| Pool in an old pit | scene (water) |
+| Seep | to do |
+
+### Living layers and light
+| Effect | Status |
+|---|---|
+| Wind: the base breeze plus gusts every 9-22 s (the game's `core/gust.gd`) | scene |
+| Tree sway (more at the crown, more in the gust, each tree its own phase) | scene |
+| Grass, fern and sapling sway; leaves skittering at gusts | scene |
+| Falling leaves, spores in light, leaf shadows sliding, moonflecks | scene |
+| Ground mist | scene |
+| Wisp-fire (rare) | scene |
+| Light rays by the hour (dawn, dusk, a low moon; in gaps; in mist and spores) | rule written, to build |
