@@ -346,3 +346,4 @@ Worst first: the pool, the floating vein, the light.
    Derek: "you decide, update the artifact". Decided: the rib hung lower, within the offering-fires' light (the moon's shaft stays the eye's); the art grid stays 4 screen pixels a pixel (the whole game is built on it; the low-pixel look was flat paint and dithered air, both fixed).
 101. The rib and its skull hung lower across the posts (~3 yd), within the fires' light.
    Graded (101): the rib reads now as a bone bar lashed across the grille, the skull under it, warm along its underside.
+   Derek: "yeah the arch should be higher above the door". 102. The rib and skull back up high above the door (~4.7 yd), the doorway's glow raised to rim them.
