@@ -2,7 +2,8 @@
 Nobody hunts. The pickers put white caps on every flat stone"; and "the white caps hold a little light, the way a coal
 holds it under ash, and they mean the ground is sound."
 
-THE STONE (chapter 4, chapter 2): a sandstone slab split on its bedding, sunk into the peat:
+THE STONE (chapter 4, chapter 2): a slab split on its bedding, sunk into the peat, in this Wood's own dark damp
+stone (STONE, not the borrowed sandstone):
 - its top a plane at its own tilt (never a dome), with a bevel at the arris;
 - one to three planar chips at its edges and corners, paler where fresh;
 - its sides showing the bedding as bands;

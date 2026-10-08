@@ -32,6 +32,7 @@ No check written, no work begun.
 | `docs/wiki/01-rules-and-decisions.md` | The game's laws (words, light, lore, no animals) |
 | `docs/wiki/06-art-direction.md` | The standard, the hero family, lighting and cinematography, the world's surface |
 | `docs/wiki/07-art-pipelines.md` | How art is made here, and the rejected approaches never to repeat |
+| **`tools/art_study/library/`** (index: `library/README.md`) | THE TECHNIQUE LIBRARY (Derek, 2026-10-07): methods, environments, objects; how each thing is made, what worked, what failed, the rulings and grades, the code. Read the pages for the piece first; it says which older notes are superseded |
 | **`tools/art_study/chapters/`** (index: `chapters/README.md`) and **`tools/art_study/reports/`** (one report per piece: what worked, what failed, why) | The art library (Derek, 2026-10-07): one chapter per study of the real world (detail and nuance; ruins, ash, rock and scree; teeth, sinew and muscle; more to come), each with procedural recipes. Read every chapter that touches the piece before starting it, and check it against them |
 | `tools/art_study/STUDY.md` | Every study round and its lessons: weight, silhouettes, plate not tubes, anatomy, depth, the desert, trees, tiles, the old growth |
 | `tools/art_study/STUDY.md` (effects library sections) | The effects method and Derek's list of effects |

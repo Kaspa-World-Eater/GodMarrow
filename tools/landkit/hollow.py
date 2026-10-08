@@ -13,6 +13,9 @@ shows wherever the ray meets that plane, and this draws only the lips, the cavit
       half-height of the opening; D: how deep; kind: "mouth" (wide, the lower lip sagging, a wet gleam deep in the
       throat) or "niche" (tall, with a floor); candles: [(across, height, radius)] on the niche's floor (yards);
       lights: [(xyz, rgb, reach)]; returns (img, flames) with flames [(xyz, brightness)] for the scene's own lights
+      kind "altar" (the Vigil): a lancet arch (straight jambs, arcs of 2.5 W), the cavity following it back, a stone
+      slab with a rune-spiral, candles as (across, height, radius, depth, base), sap drips from the roof, mounds and
+      stalagmites of set wax, a ring of runes cut round the arch (rune_mask)
 """
 import numpy as np
 from kit import vn, ramp, hexc

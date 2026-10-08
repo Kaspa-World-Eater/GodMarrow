@@ -8,7 +8,7 @@ So they are placed by cause, not scattered:
 - WHITE on sound, dry ground: the hummocks, well away from the blood;
 - BLUE over hollow ground: round the feet of the hollowed trees (the altar, the alcoves);
 - RED where the god bleeds beneath: at the blood's margins.
-Clusters of three to seven, each cap a small dome two pixels across with a darker gill-rim. The white and the blue
+Clusters of five to nine, each cap a small dome two pixels across with a darker gill-rim. The white and the blue
 hold a little light and lay it on the ground round them; the red only smoulder in their own flesh (no red light:
 MASTER_RULES 6).
 

@@ -1,4 +1,6 @@
-# The Blind Face (tools/art_study/blind_face.py), the Hollow Wood
+# The Vigil (tools/art_study/vigil.py), the Hollow Wood
+
+(Begun as "the Blind Face"; the face was scrapped and the glade became the Vigil, a ritual site.)
 
 Derek (2026-10-07): "so far all we really have is old growth right. i know when you generated the map there were
 stumps all grouped up and a lot of small trees and it looked bad. so first, lets just get another unique old growth

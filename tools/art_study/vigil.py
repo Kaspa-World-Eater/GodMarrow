@@ -1,4 +1,6 @@
-"""The Blind Face, in the Hollow Wood (Derek 2026-10-07: "lets just get another unique old growth scene made"; after the
+"""The Vigil, a ritual glade in the Hollow Wood (it began as "the Blind Face"; Derek scrapped the face: "no face,
+scratch it from the lore too", and named nothing, "You decide": the Vigil, for its candles kept burning since the rite).
+Earlier: the Blind Face, in the Hollow Wood (Derek 2026-10-07: "lets just get another unique old growth scene made"; after the
 generator's wood looked bad: "stumps all grouped up and a lot of small trees"). Built on the wood's engine
 (wood_scene.py) through its hooks, under MASTER_RULES (section 0, FORM IS LAW; the forest feel: towering trees with
 their tops out of frame, open corridors, small trees mostly dead, no clumps).
@@ -15,7 +17,7 @@ THE BRIEF, from the Hollow Wood's lore (docs/wiki/02-world-and-lore.md, 11-codex
 - "Flat Days in the Hollow Wood: when the ash lies still, nobody hunts, white caps are laid on every flat stone."
 - Night: the moon through the canopy's gaps; the pilgrim's lantern.
 
-  python tools/art_study/blind_face.py OUT.png [T] | OUT.webp
+  python tools/art_study/vigil.py OUT.png [T] | OUT.webp
 """
 import os
 import sys
@@ -158,7 +160,7 @@ def fen_paint(img, W, px, py, pz, SX, SY, L, v, gl):
 WISPS = []
 
 
-RAIN = "rain" in sys.argv[2:]                                                      # python blind_face.py OUT.webp rain
+RAIN = "rain" in sys.argv[2:]                                                      # python vigil.py OUT.webp rain
 RAIN_STATE = {}
 
 
@@ -198,7 +200,7 @@ def wet_world(img, w, W, px, py, pz, L, T):
     """the rain's work on the world: wet ground and stump darker, catching the lights in dabs; stemflow down the
     trunks (the face and the eyes too); the hollows, drawn after, stay dry"""
     tg = L["tg"]
-    ground_m = (tg == 0) | ((tg >= 670) & (tg < 680)) | (tg == 645) | ((tg >= 690) & (tg < 700))
+    ground_m = (tg == 0) | ((tg >= 670) & (tg < 680)) | (tg == 645) | ((tg >= 690) & (tg < 900))                  # every stone of the spiral
     bark_m = (tg >= 600) & (tg < 600 + len(VT))
     cx = np.array([v[0] for v in VT])
     cy = np.array([v[1] for v in VT])
@@ -743,10 +745,10 @@ def export_manifest(W, w):
     objs.append(dict(kind="altar_candles", material="wax_fire", note="fire source; the wax burns and runs; dry inside the hollow"))
     objs.append(dict(kind="blood_pools", material="blood", note="slows like water; douses fire; carries lightning; rings where struck"))
     objs.append(dict(kind="tendrils", material="flesh", hp=60, note="burn; cut by edges"))
-    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "landkit", "sets", "ritual_glade.json")
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "landkit", "sets", "vigil.json")
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w") as fh:
-        json.dump(dict(scene="ritual_glade", objects=objs), fh, indent=1, default=float)
+        json.dump(dict(scene="vigil", objects=objs), fh, indent=1, default=float)
 
 
 def tree_eyes(img, w, W, px, py, pz, L, T):
