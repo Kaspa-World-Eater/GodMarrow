@@ -53,11 +53,14 @@ def _frame(X, Y, line):
     return s.reshape(X.shape), v.reshape(X.shape), curv[i].reshape(X.shape), d.reshape(X.shape)
 
 
+ENDS = 3.2           # yd over which a free end dives under the bog
 WHOLE_LINE = False   # the vertebra table over the whole line, not the frame's stretch of it (worldgen/bog_bake.py)
 NECK = 0.0           # yd at the line's END over which the Back tapers to a neck (a skull's chamber sets it)
 
 
-def stamp(X, Y, H, line, level=0.0, seed=7):
+def stamp(X, Y, H, line, level=0.0, seed=7, sink_ends=(False, False)):
+    """sink_ends: (start, end): a free end of the Back (at a map's edge, a dead end) goes down under the bog over its
+    last ENDS yards, as a serpent's body dives, instead of stopping in a cut (worldgen/bog_bake.py decides which)"""
     H = H.copy()
     s, v, curv, dist = _frame(X, Y, np.asarray(line, float))
     near = dist < W_W + 3.2
@@ -69,6 +72,14 @@ def stamp(X, Y, H, line, level=0.0, seed=7):
     from scipy import ndimage as _nd0
     ground = _nd0.gaussian_filter(H, 12)
     base = np.maximum(base, ground - 0.12)
+    if sink_ends[0] or sink_ends[1]:
+        s_len = float(np.hypot(*np.diff(np.asarray(line, float), axis=0).T).sum())
+        dive = np.zeros(s.shape)
+        if sink_ends[0]:
+            dive = np.maximum(dive, np.clip(1 - s / ENDS, 0, 1))
+        if sink_ends[1]:
+            dive = np.maximum(dive, np.clip(1 - (s_len - s) / ENDS, 0, 1))
+        base = base - dive ** 1.4 * 0.95                                   # under the water (or the mud) by its tip
     # THE BODY'S SIZE along the Back (Derek 2026-10-08: "changes in width of the path for different areas"): a serpent's
     # vertebrae grow from the tail to the middle of the body and shrink again; here the Back swells and pinches along
     # its length, so the walk narrows to a hard file in places and opens to room for a fight in others

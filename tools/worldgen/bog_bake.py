@@ -4,6 +4,7 @@ art/zones/sunken_bog_s<SEED>/ for world/bog_ground.gd:
 
   c<A>_<B>.webp     the ground: every pixel of the render at the engine's scale (the game draws it at 4, nearest);
                     alpha 255 land, 254 open water (the game moves it), 0 past the zone's edge
+  c<A>_<B>_n.webp   its normal map (the game's lantern lights the form through it)
   c<A>_<B>_up.webp  what stands up off the ground (the hut, the stones, the racks, the drowned trunks, the reeds, the
                     loose bone): its pixels cut into bands by their depth in the world, stacked into one atlas, so each
                     band sorts with the hero and the creatures (the ground image keeps them too, under it all)
@@ -37,6 +38,7 @@ MX, MY = 80, 48                              # its margin each side in the frame
 GW, GH = CW + 2 * MX, CH + 2 * MY
 OFF = np.array([200.0, 200.0])               # the zone in the engine's world (as worldgen/bog_preview.py)
 HZ0, HK = -0.5, 0.01                         # the height map's byte: z = v * HK + HZ0 yards
+PAD = 4                                      # texels each side of a tall band, for a plant's tip bending in the wind
 BAND = 0.5                                   # yards of depth (x + y) per sorted band of the tall layer
 OUT_ROOT = os.path.join(ROOT, "art", "zones")
 # the pieces that stand up off what is walked (their part codes in bog_scene's W["bog_st"]): the bog structures' stump,
@@ -94,6 +96,7 @@ def _setup(Z, joins, focus):
     ribs = [(i, w_) for i, w_ in walks if w_["kind"] == "rib"]
     bs.LINES = [w_["pts"] + OFF for _, w_ in backs]
     bs.LINE_SEEDS = [i for i, _ in backs]
+    bs.LINE_ENDS = [free_ends(Z, i) for i, _ in backs]
     jl = [(1000 + k, np.array(j_)) for k, j_ in enumerate(joins) if inside(j_[0], 4) or inside(j_[1], 4)]
     bs.CAUSEWAYS[:] = [w_["pts"] + OFF for _, w_ in cws] + [np.linspace(j_[0], j_[1], 40) + OFF for _, j_ in jl]
     bs.CAUSEWAY_SEEDS = [i for i, _ in cws] + [k for k, _ in jl]
@@ -102,6 +105,7 @@ def _setup(Z, joins, focus):
     if not bs.LINES:                     # no walk near: one far out of the world, never the last frame's (a worker
         bs.LINES = [np.linspace([-900.0, -900.0], [-880.0, -900.0], 40)]   # paints many chunks; a stale LINE is a ghost)
         bs.LINE_SEEDS = [999]
+        bs.LINE_ENDS = [(False, False)]
     bs.LINE = bs.LINES[0]
     mods, stamps, paints, living, fx = [], [], [], [], []
     for n in Z["nodes"]:
@@ -170,6 +174,26 @@ def _setup(Z, joins, focus):
     return bs, ws
 
 
+_FREE = {}
+
+
+def free_ends(Z, i):
+    """which ends of walk i are free (nothing goes on from them: a map's edge, a dead end): those dive under the bog.
+    An end on a chamber's shelf, or at another walk, joins something and stays up"""
+    key = (id(Z), i)
+    if key not in _FREE:
+        pts = np.asarray(Z["walks"][i]["pts"], float)
+        others = [np.asarray(w_["pts"], float) for j, w_ in enumerate(Z["walks"]) if j != i]
+        out = []
+        for e in (pts[0], pts[-1]):
+            on_node = any(n["kind"] != "exit" and np.hypot(*(np.asarray(n["p"]) - e)) < n.get("r", 3.0) + 0.5
+                          for n in Z["nodes"])
+            on_walk = any(np.hypot(*(o - e).T).min() < 1.6 for o in others)
+            out.append(not (on_node or on_walk))
+        _FREE[key] = tuple(out)
+    return _FREE[key]
+
+
 _SHELF = {}
 
 
@@ -209,6 +233,18 @@ def fx_of(Z):
     return out
 
 
+def screen_nmap(n):
+    """the game's screen-space normal of a world normal (as landkit/bake.py and kit.export): what the game's lantern
+    lights the ground through (shaders/baked_ground.gdshader), so it rakes the bone as the pilgrim walks"""
+    VIEW = np.array([1.0, 1.0, 2 * KY / KZ])
+    VIEW = VIEW / np.linalg.norm(VIEW)
+    sr = (n[..., 0] - n[..., 1]) / np.sqrt(2)
+    su = n[..., 2] * 0.85 - (n[..., 0] + n[..., 1]) / np.sqrt(2) * 0.5
+    sz = (n * VIEW).sum(2)
+    nm = np.dstack([sr, su, sz])
+    return nm / (np.linalg.norm(nm, axis=2, keepdims=True) + 1e-9)
+
+
 def chunk(seed, a, b, x0, y0, Z, joins, out_dir, w, h):
     """paint one chunk and write its ground and its sorted tall layer"""
     import bog_plants
@@ -221,6 +257,8 @@ def chunk(seed, a, b, x0, y0, Z, joins, out_dir, w, h):
     bs, ws = _setup(Z, joins, (fx, fy))
     # what every stroke drew, and how deep in the world: the tall layer sorts by it
     SD = np.full((GH, GW), -1e9)
+    SW = np.zeros((GH, GW), bool)                                            # drawn by the plants: they bend in the wind
+    state = {"sway": False, "pre": None}
     put0, draw0 = bog_plants._put, bonegen.draw
 
     def put(img, zb, dep, ix, iy, d, col, tol=0.3):
@@ -228,14 +266,27 @@ def chunk(seed, a, b, x0, y0, Z, joins, out_dir, w, h):
         put0(img, zb, dep, ix, iy, d, col, tol)
         if before is not None and zb[iy, ix] != before and zb.shape == SD.shape:
             SD[iy, ix] = max(SD[iy, ix], zb[iy, ix])
+            SW[iy, ix] = state["sway"]
 
     def draw(img, zb, dep_scene, to_px, shapes, *ar, **kw):
         before = zb.copy()
         r = draw0(img, zb, dep_scene, to_px, shapes, *ar, **kw)
         ch = zb != before
         SD[ch] = np.maximum(SD[ch], zb[ch])
+        SW[ch] = False
         return r
     bog_plants._put, bonegen.draw = put, draw
+
+    def before_plants(img, *ar, **kw):                                      # the ground as it lies under the plants
+        state["pre"] = img.copy()
+        state["sway"] = True
+        return img
+
+    def after_plants(img, *ar, **kw):
+        state["sway"] = False
+        return img
+    i_ = ws.LIVING.index(bs.plants)
+    ws.LIVING[i_:i_ + 1] = [before_plants, bs.plants, after_plants]
     try:
         wd = ws.Wood()
         for f in ws.WOOD_HOOKS:
@@ -267,36 +318,56 @@ def chunk(seed, a, b, x0, y0, Z, joins, out_dir, w, h):
     outside = (zx < -2.5) | (zy < -2.5) | (zx > w + 2.5) | (zy > h + 2.5)
     sl = (slice(MY, MY + CH), slice(MX, MX + CW))
     rgb = np.clip(img[sl], 0, 1)
+    # under a plant the ground keeps what lies beneath it: the plant itself is in the sorted layer, bending in the wind,
+    # and must leave no still copy of itself behind
+    pre = state["pre"] if state["pre"] is not None else img
+    ground_rgb = np.where(SW[sl][..., None], np.clip(pre[sl], 0, 1), rgb)
     alpha = np.where(outside[sl], 0, np.where(water[sl], 254, 255)).astype(np.uint8)
     name = "c%d_%d" % (a, b)
     os.makedirs(out_dir, exist_ok=True)
-    Image.fromarray(np.dstack([(rgb * 255).astype(np.uint8), alpha]), "RGBA").save(
+    Image.fromarray(np.dstack([(ground_rgb * 255).astype(np.uint8), alpha]), "RGBA").save(
         os.path.join(out_dir, name + ".webp"), lossless=True, method=6)
+    # its form for the game's lantern: the surface's normal (open water lies flat; a stroke takes the ground's)
+    nmw = np.where(water[..., None], np.array([0.0, 0.0, 1.0]), L["n"])
+    nrgb = (screen_nmap(nmw)[sl] * 0.5 + 0.5)
+    Image.fromarray((np.clip(nrgb, 0, 1) * 255).astype(np.uint8), "RGB").save(
+        os.path.join(out_dir, name + "_n.webp"), lossless=True, method=6)
     # the tall layer: one band per half yard of depth, each cropped to its own box, stacked
     up = upper[sl] & ~outside[sl]
+    swc = SW[sl]
     dep = sortk[sl]
     bands = []
     if up.any():
         kb = np.floor(dep / BAND).astype(int)
-        parts, hy = [], 0
+        parts, nparts, hy = [], [], 0
         for kk in np.unique(kb[up]):
             m = up & (kb == kk)
             ys, xs = np.nonzero(m)
             if len(ys) < 3:
                 continue
             r0, r1, c0, c1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
-            tile = np.zeros((r1 - r0, CW, 4), np.uint8)
-            tile[:, c0:c1, :3] = (rgb[r0:r1, c0:c1] * 255).astype(np.uint8)
-            tile[:, c0:c1, 3] = m[r0:r1, c0:c1] * 255
-            parts.append(tile[:, c0:c1])
-            bands.append(dict(d=round((kk + 0.5) * BAND, 2), x=int(c0), y=int(r0), w=int(c1 - c0), h=int(r1 - r0), ay=int(hy)))
+            P = PAD                                                          # room each side for a tip bending out
+            tile = np.zeros((r1 - r0, c1 - c0 + 2 * P, 4), np.uint8)
+            tile[:, P:P + c1 - c0, :3] = (rgb[r0:r1, c0:c1] * 255).astype(np.uint8)
+            tile[:, P:P + c1 - c0, 3] = m[r0:r1, c0:c1] * 255
+            parts.append(tile)
+            # the normal map; its alpha marks a plant's pixels (200: it bends in the wind) from the rest (255: still)
+            nt = np.zeros((r1 - r0, c1 - c0 + 2 * P, 4), np.uint8)
+            nt[:, P:P + c1 - c0, :3] = (np.clip(nrgb[r0:r1, c0:c1], 0, 1) * 255).astype(np.uint8)
+            nt[:, P:P + c1 - c0, 3] = np.where(m[r0:r1, c0:c1], np.where(swc[r0:r1, c0:c1], 200, 255), 0)
+            nparts.append(nt)
+            bands.append(dict(d=round((kk + 0.5) * BAND, 2), x=int(c0) - P, y=int(r0), w=int(c1 - c0) + 2 * P,
+                              h=int(r1 - r0), ay=int(hy), sway=bool(swc[r0:r1, c0:c1][m[r0:r1, c0:c1]].any())))
             hy += r1 - r0
         if parts:
             wmax = max(p_.shape[1] for p_ in parts)
             atlas = np.zeros((hy, wmax, 4), np.uint8)
-            for p_, bd in zip(parts, bands):
+            natlas = np.zeros((hy, wmax, 4), np.uint8)
+            for p_, q_, bd in zip(parts, nparts, bands):
                 atlas[bd["ay"]:bd["ay"] + bd["h"], :bd["w"]] = p_
+                natlas[bd["ay"]:bd["ay"] + bd["h"], :bd["w"]] = q_
             Image.fromarray(atlas, "RGBA").save(os.path.join(out_dir, name + "_up.webp"), lossless=True, method=6)
+            Image.fromarray(natlas, "RGBA").save(os.path.join(out_dir, name + "_up_n.webp"), lossless=True, method=6)
     # the floor's height on the half-yard lattice, where this chunk shows it
     gx, gy = np.meshgrid(np.arange(0, 2 * w + 1), np.arange(0, 2 * h + 1))
     zx_, zy_ = gx * 0.5, gy * 0.5
@@ -309,7 +380,8 @@ def chunk(seed, a, b, x0, y0, Z, joins, out_dir, w, h):
     hh_ = ws.look(W, W["H"], zx_[mine] + OFF[0], zy_[mine] + OFF[1])
     bl_ = np.isin(st_, TALL) & (hh_ > bs.LEVEL + 0.25)
     wt_ = ws.look(W, W["bog_water"], zx_[mine] + OFF[0], zy_[mine] + OFF[1]).astype(bool)   # painted as open water
-    return dict(a=a, b=b, file=name + ".webp", up=(name + "_up.webp") if bands else "", bands=bands,
+    return dict(a=a, b=b, file=name + ".webp", normal=name + "_n.webp", up=(name + "_up.webp") if bands else "",
+                up_n=(name + "_up_n.webp") if bands else "", bands=bands,
                 pos=[SCALE * (x0 + a * CW) - SCALE / 2.0, SCALE * (y0 + b * CH) - SCALE / 2.0],
                 _h=(gx[mine].astype(np.int16), gy[mine].astype(np.int16), hz_.astype(np.float32), bl_, wt_))
 

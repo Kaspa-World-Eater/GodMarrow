@@ -46,6 +46,7 @@ RIBWALKS = []                                # the great ribs walked as bridges 
 # the game's bake (worldgen/bog_bake.py) paints a whole zone in chunks, so nothing may hang on the frame:
 FRAME_SHELF = True     # the study frame's marsh shelf rising toward its back (off: the land is only what the map says)
 LINE_SEEDS = None      # each walk's own seed (its index in the whole maze), not its place in this window's list
+LINE_ENDS = None       # per walk: (start, end) free ends that dive under the bog (serpent_spine.stamp sink_ends)
 CAUSEWAY_SEEDS = None
 RIB_SEEDS = None
 PLACE_CELL = None      # yards: plants and loose bone placed per world cell, each cell its own seed (no seam between chunks)
@@ -109,7 +110,8 @@ def stamp(W, w):
     if LINES:                                                                # a maze window: several walks of the Back
         H, part, info = bed.copy(), np.zeros(X.shape, int), None
         for li, ln in enumerate(LINES):
-            H2, p2, inf2 = serpent_spine.stamp(X, Y, H, ln, LEVEL, seed=5 + (LINE_SEEDS[li] if LINE_SEEDS else li))
+            H2, p2, inf2 = serpent_spine.stamp(X, Y, H, ln, LEVEL, seed=5 + (LINE_SEEDS[li] if LINE_SEEDS else li),
+                                               sink_ends=LINE_ENDS[li] if LINE_ENDS else (False, False))
             take = p2 > 0
             H = np.where(take | (H2 > H), H2, H)
             part = np.where(take, p2, part)

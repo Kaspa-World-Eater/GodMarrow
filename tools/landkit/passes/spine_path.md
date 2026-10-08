@@ -642,3 +642,17 @@ The in-game bog (seed 9101) against the checklist:
 - Every chunk and every tall-layer band now carries its normal map.
 - `shaders/baked_ground.gdshader` lights the painted form with the same lantern the props use: the lit side warms and brightens, the far side falls into its own shade, so it rakes across the vertebrae as the pilgrim walks.
 - Next: life (the reeds in the wind, the wisp-fires).
+
+## Rules check, 2026-10-08 (later; waiting on Derek)
+
+MASTER_RULES is unchanged since the last full read (8ca48f1, which made 8.6 moot). The bog's two failures from the last check are still open, and their fixes are written but not yet baked:
+- **Light:** each chunk and band gets its normal map, and the lantern rakes through it.
+- **Life:** the plants bend in the one wind, and the Back's free ends dive under the bog.
+
+The bake is held until Derek is not playing, because it slowed his game to 6 frames a second. No art was begun. Derek interrupted the moor's bare-camp work, so that waits for his word.
+
+**The bake with the rules check's two fixes, and the cut end** (2026-10-08):
+- **Light:** every chunk and every tall band carries its normal map, and the pilgrim's lantern rakes the painted form through it.
+- **Life:** the plants' pixels are marked in the band's normal alpha and bend in the one wind, more toward their tips. The ground under them was baked without them, so no still copy is left behind.
+- **The cut end:** where the Back stopped at the arrival in a flat cut, like a sawn log, a free end (a map's edge, a dead end) now dives under the bog over its last 3.2 yd (`serpent_spine` `sink_ends`; `bog_bake.free_ends`). An end at a chamber or another walk stays up.
+- **Checks:** every place is reachable; 98% of walkable tiles show ground and 99% of water shows water. In game it runs at 60 frames a second.
