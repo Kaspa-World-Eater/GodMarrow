@@ -348,3 +348,7 @@ Worst first: the pool, the floating vein, the light.
    Graded (101): the rib reads now as a bone bar lashed across the grille, the skull under it, warm along its underside.
    Derek: "yeah the arch should be higher above the door". 102. The rib and skull back up high above the door (~4.7 yd), the doorway's glow raised to rim them.
    Derek: "move it higher". 103. The arch and skull a yard higher (~5.7 yd), the glow raised with them.
+
+## Rework (2026-10-07, stage 1 of docs/REWORK_AND_SEEDS_PLAN.md)
+- `NORMAL_BLUR` 0.35 to 0 (chapter 4: never blurred). Checked side by side: the locked craggy floor keeps its look,
+  its stone edges a little crisper. The paving already used faceted planes. **Graded:** unchanged, the debt paid.

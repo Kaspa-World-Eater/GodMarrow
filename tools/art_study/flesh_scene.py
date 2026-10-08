@@ -73,7 +73,7 @@ def shaft(x, y, z):
 
 
 ws.MOONLIT = lambda px, py, pz, t: shaft(px, py, pz)
-ws.NORMAL_BLUR = 0.35                        # chapter 4: never blur small stones' normals (it pillows them)
+ws.NORMAL_BLUR = 0.0                         # chapter 4: never blur small stones' normals (it pillows them)
 kit.SKY = lambda P: shaft(P[..., 0], P[..., 1], P[..., 2])
 ws.HERO = C + AX * 8.2 - PERP * 0.8
 
