@@ -414,3 +414,90 @@ instead of the black water, let's make it dark blood with the occasional wisp of
   - **dry inside:** the hollows (mouth, niche) are drawn after the wetting, so they stay dry.
   **Graded (still):** C+. Water runs down the Blind Face's brow, the drops show in the lantern's pool and the gap,
   the ground is darker with wet.
+
+## Piece 8: the flat stones with the white caps (Flat Day)
+**Rules check, before pass 1:**
+- **Lore** (`12b-codex-interviews.md`, `11-codex-voices.md`):
+  - the hunter: "The holy days are the Flat Days, if they come, when the ash at the ring lies still and the Wood
+    leans east. Nobody hunts. The pickers put white caps on every flat stone. We sit in the doorways and wait for the
+    lift";
+  - a Wood voice: "The white caps hold a little light, the way a coal holds it under ash, and they mean the ground
+    is sound. The blue ones grow over something hollow. Step round them. The red ones grow where the god is still
+    bleeding underneath";
+  - the Coldhearth voice disagrees ("the grey is good in broth, the other two you leave"). Voices disagree; good.
+- **One true detail:** the caps are an offering, laid by hand, so they're placed as hands place things: a ring, a
+  row, evenly. Never scattered. Each glows a little, like a banked coal.
+- **Real thing (chapter 4, chapter 2):**
+  - sandstone slabs split on their bedding;
+  - the top a tilted plane, never a dome;
+  - one to three planar chips, paler where fresh;
+  - a bevel at the arris;
+  - the bedding showing as bands on the sides;
+  - sunk into the peat;
+  - lichen rosettes sized by age on the dry top;
+  - moss at the wet foot on the side away from the moon.
+- **Form:** height in the world (the depth effect), so the stones cast and catch light; nothing painted on.
+- **New design:** `landkit/flat_stone.py`, this Wood's stones. Only the shared sandstone ramp from rock.py is reused.
+- **Placement by cause:** flat stones on sound, dry ground (no pools within reach), in the glade where pickers walk.
+- **Weather:** they get wet in the rain like everything else.
+- **Fungi to follow (piece 9):** red caps round the blood, blue over hollow ground, white on sound ground.
+
+**Passes (flat stones):**
+1. Three sandstone slabs (tilted tops, bevels, chips, bedding, lichen, moss at the foot); the caps laid by hand: a ring
+   of six to eight on the bigger stones, a row on the small one, each a pale dome glowing a little. Pools kept off
+   the stones. **Graded C-:** the slabs read as flat stones sunk in the carr; the caps read as small pale lights laid
+   in a ring and a row (an offering, not a scatter). The near slab is a little bright and plain-topped.
+
+**Derek on the Blind Face (pass 2): "The face needs a ton of work. Looks like the chad face."** He is right. It was
+built as a sculpted human face, all of it a failure:
+- symmetric smooth bulges;
+- a hard horizontal bar of a brow and a square chin;
+- graphic raking light.
+A face grown in a tree is the opposite. Study first (chapter 7).
+
+## The face scrapped; the altar (Derek, 2026-10-07)
+- **Derek:** "Make it look like a withered, wretched moaning face ... Better yet, no face, scratch it from the lore too.
+  Create an altar inside of a large hollow, many dripping red wax candles, wax pour out and into the blood, and the
+  first hint of the blood tendrils creeping up the tree and a tiny amount on the others."
+- **Done:**
+  - the Blind Face is removed from the scene, from the wiki's landmarks (`02-world-and-lore.md`) and from the Hollow
+    Wood's voice lines (`art/ui/voice.json`). `bark_face.py` is kept: removed things are kept. Chapter 7 (faces in
+    trees, the study that followed "the chad face") stays as a study.
+  - the scene file keeps its name for now; it needs a new one.
+- **The lore Derek gave the place:** long ago the rituals to bring the god back up out of the earth were held here. The
+  candles burn on and never go out, because their wax is the trees' red sap. Sap or blood? Nobody knows. What was the
+  ritual, and did it fail, or succeed long ago, so that these tendrils are all that's left, a husk? Nobody knows.
+  - Shown, never told:
+    - the sap drips from the hollow's roof and sets into wax as it falls (the candles never burn down);
+    - the tendrils are some fresh and wet, some dried to husks (growing, or the remains of what came?).
+- **Built** (landkit `hollow.py` kind "altar"; `candle.py`; the scene):
+  - a hero-sized hollow in the giant at the glade's back (Derek: "hero size"), 2.6 yd to its apex, 1.3 wide, the sill
+    a step up, deep;
+  - a pointed arch (Derek: "not round ... an arch at the top, pointed"): straight jambs and a lancet of 2.5 W arcs;
+    the cavity follows the arch straight back;
+  - a stone slab set inside, a spiral of runes cut in its top (Derek: "a spiral made of runes with a little bit of
+    blood and bone stuck to it"), old blood dried in the grooves, flecks of bone stuck to it;
+  - red candles arranged as a rite arranges them, then centuries of it (Derek: "ritualistic", then "randomize the
+    arrangement a little more"): a broken ring round the spiral, tall at the back, uneven, gaps, stubs melted low; a
+    jittered row before the slab; a few on the lip, their wax running down the bark below each (Derek: "a few burning
+    on the lip ... with the wax dripping down the sides");
+  - the red wax pouring out over the sill in curtains down the bark, into a pool of blood at the tree's foot, where it
+    sets in skins and lumps;
+  - a couple of candles on the ground outside, sparingly (Derek), each a small light;
+  - above the arch, two eyes shut (Derek: "just the eyelids facing shut, made of wood ... eyes that have closed, with
+    bloody wax tears dripping from them"): almond lids of wood met in a sagging seam, a crease above, a shallow socket,
+    the inner corners lower, red wax tears running from them toward the arch (bark_face's grown relief, drawn only
+    where it rises, so no patch);
+  - blood tendrils (the shared `vessel.py`): six on the altar tree, routed round the arch, never across its mouth; one
+    each on four other trees, a hint;
+  - the wisp-fire removed from the blood (Derek: "I don't think it's necessary"); `wisp_fire.py` kept.
+- **Bugs:**
+  - the stump's roots overwrote the resting ground at a tree's centre, so the altar was placed 18 yards up its
+    trunk. The roots now never write over a standing trunk, and hollows and eyes take their tree's ground from the
+    warp's record;
+  - the opening stayed round because the round cavity cut the hole, not the arch;
+  - the candlelight was counted twice (a flat orange inside);
+  - the tendrils crossed the opening.
+- **Graded** (pass 7 of the altar): C+. A dark hero-sized lancet arch at the glade's back, crowded with red candles
+  round the rune slab, closed wooden eyes above weeping wax, wax curtains into the blood, tendrils creeping up either
+  side.

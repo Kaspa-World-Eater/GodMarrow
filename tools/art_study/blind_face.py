@@ -32,6 +32,10 @@ import fen_ground                            # noqa: E402
 import wisp_fire                             # noqa: E402
 import bark_face                             # noqa: E402
 import rain as raingen                       # noqa: E402
+import flat_stone                            # noqa: E402
+import vessel                                # noqa: E402
+import candle                                # noqa: E402
+from kit import ramp as kramp                # noqa: E402
 from scipy import ndimage as nd              # noqa: E402
 import bone as bonegen                       # noqa: E402
 import bark                                  # noqa: E402
@@ -89,6 +93,14 @@ def fen_floor(W, w):
     keep = W["tag"] == 0
     dH, water, level, tus = fen_ground.height(W["X"], W["Y"], seed=9, keep=keep)
     water &= np.hypot(W["X"] - ws.HERO[0], W["Y"] - ws.HERO[1]) > 1.2               # the pilgrim stands on firm ground
+    x0_, y0_, r0_, h0_, sd0_ = VT[ALTAR_TREE]                                          # blood gathers at the altar's foot
+    fd_ = np.array([1.0, 1.0]) / np.sqrt(2) * 0.78 + AX * 0.22
+    fd_ = fd_ / np.linalg.norm(fd_)
+    q_ = np.array([x0_, y0_]) + fd_ * (r0_ * 1.9 + 0.7)
+    water |= (np.hypot(W["X"] - q_[0], W["Y"] - q_[1]) < 0.85 + (fbm(W["X"] * 1.5, W["Y"] * 1.5) - 0.5) * 0.5) & keep
+    for (a, p, sz, yw, sd) in STONES:                                                 # flat stones lie on sound ground
+        q = C + AX * a + PERP * p
+        water &= np.hypot(W["X"] - q[0], W["Y"] - q[1]) > sz * 0.8 + 0.5
     H = W["H"] + dH
     lab, n = nd.label(water)
     if n:
@@ -163,7 +175,7 @@ def wet_world(img, w, W, px, py, pz, L, T):
     """the rain's work on the world: wet ground and stump darker, catching the lights in dabs; stemflow down the
     trunks (the face and the eyes too); the hollows, drawn after, stay dry"""
     tg = L["tg"]
-    ground_m = (tg == 0) | ((tg >= 670) & (tg < 680)) | (tg == 645)
+    ground_m = (tg == 0) | ((tg >= 670) & (tg < 680)) | (tg == 645) | ((tg >= 690) & (tg < 700))
     bark_m = (tg >= 600) & (tg < 600 + len(VT))
     cx = np.array([v[0] for v in VT])
     cy = np.array([v[1] for v in VT])
@@ -179,6 +191,35 @@ def draw_wisps(img, w, W, px, py, pz, L, T):
     """the wisp-fire on the blood (landkit wisp_fire.py): drawn last, it is light"""
     pool = lambda xs, ys: (ws.look(W, W["fen_water"], px[ys, xs], py[ys, xs]) > 0) & (L["tg"][ys, xs] == 0)
     return wisp_fire.draw(img, ws.to_px, px + py, WISPS, T, pool=pool)
+
+
+STONES = ((-0.5, 1.0, 1.1, 0.4, 501), (2.9, -3.7, 0.8, -0.7, 502), (-2.4, 2.6, 1.0, 1.2, 503))   # (along, across, size, yaw, seed)
+STONE_INFO = []
+
+
+def stamp_stones(W, w):
+    """the flat stones (landkit flat_stone.py), each with the pickers' caps laid on it"""
+    STONE_INFO.clear()
+    for k, (a, p, sz, yw, sd) in enumerate(STONES):
+        q = C + AX * a + PERP * p
+        H, part, info = flat_stone.stamp(W["X"], W["Y"], W["H"], q, size=sz, yaw=yw, seed=sd)
+        W["H"] = H
+        W["Hrest"] = np.where(part > 0, H, W["Hrest"])
+        for pt in (1, 2, 3):
+            W["tag"] = np.where(part == pt, 690 + k * 3 + pt - 1, W["tag"])
+            W["obj"][690 + k * 3 + pt - 1] = dict(kind="flatstone", part=pt, info=info, c=info["c"], r=sz * 0.5)
+        info["caps"] = flat_stone.caps(info, seed=sd + 7)
+        STONE_INFO.append(info)
+
+
+def paint_stone(img, m, v, n, px, py, pz, o, W, L):
+    return flat_stone.paint(img, m, v, n, px, py, pz, o["part"], o["info"], L["side"], ws.SUN)
+
+
+def draw_stone_caps(img, w, W, px, py, pz, L, T):
+    for info in STONE_INFO:
+        img = flat_stone.draw_caps(img, ws.to_px, px + py, info["caps"], T)
+    return img
 
 
 VT = []
@@ -207,7 +248,7 @@ def stamp_stump(W, w):
     H, part, info = vein_stump.stamp(W["X"], W["Y"], W["H"], STUMP, R=0.8, fall=FALL, seed=211, north=NORTH, others=VT,
                                      cut=0.58)
     W["H"] = H
-    W["Hrest"] = np.where(part != 0, H, W["Hrest"])
+    W["Hrest"] = np.where((part != 0) & (W["HT"] < -40), H, W["Hrest"])             # never over a standing trunk (its ground stays)
     W["tag"] = np.where(part == -1, 645, W["tag"])
     W["obj"][645] = dict(kind="veinroot", c=np.array(STUMP), r=0.16)
     for k in range(1, 6):
@@ -237,7 +278,7 @@ def place_eyes(W, w):
     EYES.clear()
     x, y, r, h, sd = VT[EYE_TREE]
     c = np.array([x, y])
-    g0 = float(ws.look(W, W["Hrest"], np.array(x), np.array(y)))
+    g0 = float(ws.TRUNK_WARP.t[EYE_TREE]["g0"])
     for (off, zh, R, ph) in ((-0.62, 2.4, 0.36, 0.08), (0.58, 4.5, 0.3, 0.58)):
         ang = np.pi / 4 + off - ws.TRUNK_WARP._at(ws.TRUNK_WARP.t[EYE_TREE], g0 + zh)[3]   # toward the camera, turned aside (undoing the twist)
         u = np.array([np.cos(ang), np.sin(ang)])
@@ -253,6 +294,37 @@ def place_eyes(W, w):
         EYES.append(dict(c=c, ang=ang, u=uw, P=np.array([wx_, wy_]), z=g0 + zh, zr=zh, R=R, ph=ph, g0=g0, r=r, yaw0=ang + tw))
 
 
+ALTAR_TREE = 0                                                                     # the altar, in the giant at the glade's back
+
+
+ALTAR_SILL = (-0.42, -0.2, 0.05, 0.31, 0.47)                                       # candles burning on the lip, wax down the bark below
+
+
+def _altar_candles(seed=33):
+    """arranged as a rite arranges them, and then centuries of it (Derek: "ritualistic", then "randomize the
+    arrangement a little more"): a broken ring round the rune-spiral, uneven, gaps where some have gone, stubs melted low;
+    a jittered row before the slab; a few on the lip, their wax running down the bark"""
+    rr = np.random.default_rng(seed)
+    out = []
+    n = 13
+    for k in range(n):                                                              # the ring on the slab, broken
+        if rr.random() < 0.18:
+            continue
+        a = 2 * np.pi * k / n + rr.normal(0, 0.12)
+        back = (1 - np.sin(a)) / 2
+        hgt = (0.06 + 0.22 * back) * rr.uniform(0.55, 1.25)
+        if rr.random() < 0.2:
+            hgt = rr.uniform(0.02, 0.04)                                            # a stub, melted to the slab
+        out.append((0.34 * np.cos(a) * rr.uniform(0.88, 1.1), hgt, rr.uniform(0.02, 0.034), -0.62 + 0.2 * np.sin(a) * rr.uniform(0.85, 1.1), 0.22))
+    for k in range(7):                                                              # the row before the slab, jittered
+        out.append((-0.45 + k * 0.15 + rr.normal(0, 0.03), rr.choice([0.06, 0.1, 0.16, 0.22, 0.27]) * rr.uniform(0.8, 1.15),
+                    rr.uniform(0.024, 0.034), -0.12 + rr.normal(0, 0.04), 0.0))
+    for ce in ALTAR_SILL:                                                           # on the lip
+        out.append((ce + rr.normal(0, 0.02), rr.uniform(0.07, 0.17), rr.uniform(0.024, 0.032), 0.04, 0.03))
+    return tuple(out)
+
+
+ALTAR_CANDLES = _altar_candles()
 MOUTH_TREE = 4                                                                     # the mouth: the great trunk at the glade's right edge, facing in
 NICHE_TREE = 5                                                                     # the Niche Candle: the great tree in front, by the path
 HOLLOWS = []
@@ -275,10 +347,11 @@ def place_hollows(W, w):
     for (ti, kind, zh, Wd, Hd, Dd, cand) in (
             (MOUTH_TREE, "mouth", 1.9, 0.6, 0.27, 0.7, ()),
             (NICHE_TREE, "niche", 1.25, 0.3, 0.42, 0.55, ((-0.15, 0.13, 0.028), (-0.05, 0.22, 0.034), (0.05, 0.1, 0.026),
-                                                         (0.15, 0.17, 0.03), (0.0, 0.06, 0.03)))):
+                                                         (0.15, 0.17, 0.03), (0.0, 0.06, 0.03))),
+            (ALTAR_TREE, "altar", 1.25, 0.66, 1.15, 1.25, ALTAR_CANDLES)):   # hero size (Derek): 2.3 yd tall, 1.3 wide, the sill a step up
         x, y, r, h, sd = VT[ti]
         c = np.array([x, y])
-        g0 = float(ws.look(W, W["Hrest"], np.array(x), np.array(y)))
+        g0 = float(ws.TRUNK_WARP.t[ti]["g0"])
         to_glade = (C - c) / np.linalg.norm(C - c)
         fd = view * (0.97 if kind == "mouth" else 0.78) + to_glade * (0.03 if kind == "mouth" else 0.22)   # it faces us (the mouth full on), leaning into the glade
         tw0 = ws.TRUNK_WARP._at(ws.TRUNK_WARP.t[ti], g0 + zh)[3]                  # the trunk's twist there: face the world way
@@ -292,6 +365,21 @@ def place_hollows(W, w):
         if kind == "niche":                                                         # the glow spilling out over the bark and the floor
             q = P + u * 0.3
             ws.LIGHTS.append((q[0], q[1], g0 + zh - 0.1, 1.6))
+        if kind == "altar":                                                         # many candles: a stronger glow, out over the blood
+            q = P + u * 0.4
+            ws.LIGHTS.append((q[0], q[1], g0 + zh, 2.6))
+            HOLLOWS[-1].update(ac=np.arctan2(fd[1], fd[0]) - tw0, g0=g0, ti=ti, sill=g0 + zh - Hd * 0.62)
+            GROUND_CANDLES.clear()                                                  # a couple outside, on firm ground by the blood
+            pp = np.array([-u[1], u[0]])
+            for (fw, side, hgt, sd_) in ((1.5, -1.0, 0.14, 61), (1.15, 0.85, 0.09, 62), (2.2, 0.35, 0.05, 63)):
+                q = P + u * fw + pp * side
+                for _try in range(8):
+                    if ws.look(W, W["fen_water"], np.array(q[0]), np.array(q[1])) == 0:
+                        break
+                    q = q + pp * side * 0.25
+                gq = float(ws.look(W, W["H"], np.array(q[0]), np.array(q[1])))
+                GROUND_CANDLES.append(((q[0], q[1], gq), hgt, sd_))
+                ws.LIGHTS.append((q[0], q[1], gq + hgt + 0.08, 0.6))
 
 
 def draw_hollows(img, w, W, px, py, pz, L, T):
@@ -331,7 +419,7 @@ def draw_bones(img, w, W, px, py, pz, L, T):
     return img
 
 
-FACE_AT = (62.0, 2.0)                                                              # the face: its facing (degrees, world) and centre height
+FACE_AT = (60.0, 2.1)                                                              # the face: its facing (degrees, world) and centre height
 
 
 def draw_face(img, w, W, px, py, pz, L, T):
@@ -351,6 +439,174 @@ def draw_face(img, w, W, px, py, pz, L, T):
     ml = float(np.clip(0.42 + ws.look(W, W["light"], np.array(fp[0]), np.array(fp[1])) * 0.75, 0, 1))
     zb = np.full((GH, GW), -1e9)
     return bark_face.draw(img, zb, px + py, ws.to_px, canon, (x, y, r, sd, g0), a0c, zc, T, [], ws.SUN, moonlit=ml, seed=5)
+
+
+R_WAXRED = kramp("#1c0507", "#36090d", "#560f14", "#78181c", "#9a2426", "#b83a36")
+R_TENDRIL = kramp("#120305", "#24060a", "#3a0a10", "#521016", "#6c1a1e", "#86262a")
+R_HUSK = kramp("#0c0908", "#171110", "#231916", "#30221d", "#3e2c24", "#4c362b")        # dried to a husk
+
+
+def _altar():
+    return next(h for h in HOLLOWS if h["kind"] == "altar")
+
+
+def wax_pour(img, w, W, px, py, pz, L, T):
+    """the red wax poured out of the altar hollow over the sill, down the bark in curtains, and into the blood at the
+    foot, where it sets in skins and lumps on the blood"""
+    al = _altar()
+    tg = L["tg"]
+    x, y, r, h, sd = VT[ALTAR_TREE]
+    m = (tg == 600 + ALTAR_TREE) & (pz < al["sill"] + 0.02)
+    lit = np.clip(0.12 + L["moon"] * 0.45 + L["lamp"] * 0.9, 0, 1)
+    if m.any():
+        ang = np.arctan2(py - y, px - x)
+        da = (((ang - al["ac"]) + np.pi) % (2 * np.pi) - np.pi) * r
+        rr = np.random.default_rng(44)
+        for k in range(9 + len(ALTAR_SILL)):
+            c0 = rr.uniform(-0.5, 0.5) if k < 9 else ALTAR_SILL[k - 9]                   # and one below each candle on the lip
+            L_ = rr.uniform(0.4, 1.4) if k % 3 else 2.0                                  # some reach the ground
+            wig = np.sin(pz * 5 + k) * 0.02
+            wd = rr.uniform(0.03, 0.07) * (0.6 + 0.4 * np.clip((pz - (al["sill"] - L_)) / L_, 0, 1))
+            run = m & (np.abs(da - c0 - wig) < wd) & (pz > al["sill"] - L_)
+            v = np.clip(lit * 0.55 + 0.04, 0, 0.99)                                       # dark red wax, lit only where the light is
+            img[run] = R_WAXRED[(v[run] * len(R_WAXRED)).astype(int)]
+            gl = run & (np.abs(da - c0 - wig) < wd * 0.3) & (lit > 0.4)                # the gloss on the wax
+            img[gl] = np.minimum(img[gl] * 1.5 + 0.05, 1)
+    # where it meets the blood: set wax, skins and lumps floating at the foot
+    P0 = al["C"][:2]
+    near = (tg == 0) & (np.hypot(px - P0[0], py - P0[1]) < 1.6) & (ws.look(W, W["fen_water"], px, py) > 0)
+    skin = near & (vn(px * 8, py * 8) > 0.58)
+    lump = near & (vn(px * 23 + 5, py * 23) > 0.78)
+    v = np.clip(lit * 0.8, 0, 0.99)
+    img[skin] = R_WAXRED[np.clip((v[skin] * 0.8 * len(R_WAXRED)).astype(int), 0, len(R_WAXRED) - 1)]
+    img[lump] = R_WAXRED[np.clip(((v[lump] + 0.2) * len(R_WAXRED)).astype(int), 0, len(R_WAXRED) - 1)]
+    return img
+
+
+def _tendril_paths(T, W):
+    """blood tendrils out of the pools and up the bark: several on the altar tree, a hint on others. Some fresh and
+    wet, some dried to husks: growing, or all that is left of something that already came? Nobody knows"""
+    paths = []
+    spec = [(ALTAR_TREE, k) for k in range(6)] + [(1, 0), (2, 0), (3, 0), (5, 0)]
+    for (ti, k) in spec:
+        x, y, r, h, sd = VT[ti]
+        Tt = ws.TRUNK_WARP.t[ti]
+        g0 = Tt["g0"]
+        rr = np.random.default_rng(700 + ti * 13 + k)
+        ridges = vein_tree._ridges(np.random.default_rng(sd))
+        if ti == ALTAR_TREE:                                                              # round the arch, never across its mouth
+            al_ = _altar()
+            base_ang = al_["ac"] + (1 if k % 2 else -1) * ((al_["W"] + 0.18) / r + rr.uniform(0.0, 0.35))
+        else:
+            base_ang = np.pi / 4 - ws.TRUNK_WARP._at(Tt, g0 + 0.5)[3] + rr.uniform(-0.6, 0.6)
+        top = rr.uniform(1.0, 2.6) if ti == ALTAR_TREE else rr.uniform(0.35, 0.7)
+        pts = []
+        ang = base_ang
+        for j in range(26):
+            f = j / 25
+            z = g0 + 0.05 + f * top
+            ang += (np.sin(f * 7 + k) * 0.03 + rr.normal(0, 0.02)) * (0.4 if ti == ALTAR_TREE else 1.0)
+            lob = vein_tree._lobe(np.array([ang]), ridges)[0]
+            rs = r * (1 + lob - 0.06) - vein_tree._channels(np.array([ang]), sd, r)[0] + 0.03
+            cx_, cy_ = x + np.cos(ang) * rs, y + np.sin(ang) * rs
+            wx, wy, _ = ws.TRUNK_WARP.from_canon(ti, cx_, cy_, z)
+            lx, ly = ws.lean(np.array(wx), np.array(wy), np.array(z), T)
+            pts.append((wx + float(lx), wy + float(ly), z))
+        a0 = np.array(pts[0][:2])
+        twg = ws.TRUNK_WARP._at(Tt, g0)[3]
+        out = np.array([np.cos(base_ang + twg), np.sin(base_ang + twg)])
+        ground = []
+        for j in range(10, 0, -1):                                                       # its root, back across the ground to the blood
+            q = a0 + out * j * 0.08
+            ground.append((q[0], q[1], float(ws.look(W, W["H"], np.array(q[0]), np.array(q[1]))) + 0.02))
+        husk = rr.random() < 0.45
+        paths.append((np.array(ground + pts), 0.035 if ti == ALTAR_TREE else 0.025, 800 + ti * 7 + k, husk))
+    return paths
+
+
+def blood_tendrils(img, w, W, px, py, pz, L, T):
+    """thin tendrils of the god's blood creeping up the bark (landkit vessel.py, the shared organic tube)"""
+    GH, GW = img.shape[:2]
+    zb = np.full((GH, GW), -1e9)
+    dep = px + py
+    hero = np.array(ws.HERO, float)
+    gh = float(ws.look(W, W["H"], np.array(hero[0]), np.array(hero[1])))
+    lts = [((hero[0] + 0.25, hero[1] - 0.25, gh + 0.7), (0.95, 0.6, 0.32), 2.6 * 1.4)]
+    lts += [((lx, ly, lz), (0.95, 0.6, 0.32), rch * 1.4) for (lx, ly, lz, rch) in ws.LIGHTS]
+    for (P, r0, sd, husk) in _tendril_paths(T, W):
+        vessel.draw(img, zb, dep, ws.to_px, P, r0 * (0.8 if husk else 1.0), (0.0 if husk else T), lts, ws.SUN, seed=sd, tol=0.35,
+                    ramp_=R_HUSK if husk else R_TENDRIL, taper=True)
+    return img
+
+
+def closed_lids(u, w):
+    """two eyes shut, above the arch (Derek: "two closed eyes, so it's just the eyelids facing shut, made of wood, but
+    the impression that they could definitely be eyes that have closed"): each a swelling almond of wood, its lids met
+    in a seam that sags at the middle, a crease of fold above it, a shallow socket round it. Grown, not carved
+    (chapter 7): the bark runs on round them, the inner corners a little lower (sorrow)"""
+    f = np.zeros(u.shape)
+    eyes = np.zeros(u.shape, bool)
+    seam = np.zeros(u.shape, bool)
+    smooth = np.zeros(u.shape, bool)
+    for sg in (-1, 1):
+        uu = (u - sg * 0.5) / 0.36
+        ww = (w + 0.12 * (1 - sg * uu) * 0.5) / 0.46                           # the inner corner lower
+        sh = 1 - 0.45 * uu ** 2                                                 # almond: narrow at the corners
+        e = uu ** 2 + (ww / np.clip(sh, 0.2, 1)) ** 2
+        f = f + 0.075 * np.sqrt(np.clip(1 - e, 0, 1))                          # the shut lid, swelling
+        f = f - 0.035 * np.exp(-((np.sqrt(e) - 1.18) / 0.2) ** 2)             # the socket round it
+        cr = (np.abs(ww - 0.72 * (1 - 0.55 * uu ** 2)) < 0.07) & (np.abs(uu) < 0.85)   # the crease of the fold above
+        f = f - 0.02 * cr
+        sm = (np.abs(ww + 0.18 * (1 - uu ** 2)) < 0.07) & (e < 1.0)            # where the lids met: the seam, sagging
+        seam |= sm | cr
+        eyes |= e < 1.0
+        smooth |= e < 1.05
+    edge = np.clip((1 - np.maximum(np.abs(u), np.abs(w))) * 4, 0, 1)
+    return f * edge, eyes, np.zeros(u.shape, bool), np.zeros(u.shape, bool), smooth, seam
+
+
+def wax_tears(col, u, w, vb, T):
+    """the tears: bloody wax from each inner corner, run down over the bark toward the arch"""
+    for sg in (-1, 1):
+        u0 = sg * 0.5 - sg * 0.3
+        for k, (off, L_) in enumerate(((0.0, 0.85), (sg * 0.05, 0.55))):
+            du = u - u0 - off - np.sin(w * 8 + k + sg) * 0.02
+            f_ = np.clip((-0.15 - w) / L_, 0, 1)
+            tear = (np.abs(du) < 0.035 - f_ * 0.012) & (w < -0.15) & (w > -0.15 - L_)
+            v_ = np.clip(vb * 0.9 + 0.05, 0, 0.99)
+            col = np.where(tear[..., None], R_WAXRED[(v_ * len(R_WAXRED)).astype(int)], col)
+            bead = tear & (f_ > 0.9)
+            col = np.where(bead[..., None], R_WAXRED[np.clip(((v_ + 0.25) * len(R_WAXRED)).astype(int), 0, len(R_WAXRED) - 1)], col)
+    return col
+
+
+def draw_lids(img, w, W, px, py, pz, L, T):
+    """the closed eyes above the altar arch (landkit bark_face.py, the grown relief, with its own shape)"""
+    GH, GW = img.shape[:2]
+    al = _altar()
+    x, y, r, h, sd = VT[ALTAR_TREE]
+    g0 = float(ws.TRUNK_WARP.t[ALTAR_TREE]["g0"])
+    zc = g0 + 3.05
+
+    def canon(X, Y, Z):
+        lx, ly = ws.lean(X, Y, Z, T)
+        return ws.TRUNK_WARP.to_canon_one(ALTAR_TREE, X - lx, Y - ly, Z)
+
+    zb = np.full((GH, GW), -1e9)
+    hero = np.array(ws.HERO, float)
+    lts = [((lx, ly, lz), (0.95, 0.6, 0.32), rch * 1.4) for (lx, ly, lz, rch) in ws.LIGHTS]
+    return bark_face.draw(img, zb, px + py, ws.to_px, canon, (x, y, r, sd, g0), al["ac"], zc, T, lts, ws.SUN, moonlit=0.6,
+                          seed=9, relief_fn=closed_lids, hu=0.9, hw=0.45, extra=wax_tears)
+
+
+def ground_candles(img, w, W, px, py, pz, L, T):
+    """a couple of candles on the ground outside the hollow, sparingly (landkit candle.py)"""
+    for (pos, hgt, sd) in GROUND_CANDLES:
+        img = candle.draw(img, ws.to_px, px + py, pos, hgt, T, sd)
+    return img
+
+
+GROUND_CANDLES = []
 
 
 def tree_eyes(img, w, W, px, py, pz, L, T):
@@ -426,16 +682,21 @@ ws.LIVING.append(draw_bones)
 ws.LIVING.append(stump_blood)
 ws.LIVING.append(tree_eyes)
 ws.LIVING.append(draw_hollows)
-ws.LIVING.append(draw_face)
+ws.LIVING.append(wax_pour)
+ws.LIVING.append(draw_lids)
+ws.LIVING.append(blood_tendrils)
 ws.LIVING.append(grim)
-ws.LIVING.append(draw_wisps)
+ws.LIVING.append(draw_stone_caps)
+ws.LIVING.append(ground_candles)
+# ws.LIVING.append(draw_wisps)                                                     # Derek: "remove the wisp fire from the blood" (wisp_fire.py kept)
 if RAIN:
     ws.gust = gentle_gust
     ws.LIVING.insert(ws.LIVING.index(draw_hollows), wet_world)
     ws.LIVING.append(draw_rain)
-ws.BUILD_HOOKS[0:0] = [fen_floor, stamp_vein_trees, stamp_stump, place_eyes, place_hollows]   # in this order: floor, trees, stump, then what grows on the trees
+ws.BUILD_HOOKS[0:0] = [fen_floor, stamp_vein_trees, stamp_stump, stamp_stones, place_eyes, place_hollows]   # in this order: floor, trees, stump, then what grows on the trees
 ws.GROUND = fen_paint
 ws.PAINTERS["vstump"] = paint_stump
+ws.PAINTERS["flatstone"] = paint_stone
 ws.PAINTERS["veintree"] = paint_vein
 ws.PAINTERS["veinroot"] = paint_vein
 

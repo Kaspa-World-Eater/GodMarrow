@@ -23,6 +23,8 @@ VIEW = VIEW / np.linalg.norm(VIEW)
 R_LIP = ramp("#17141a", "#28222a", "#3c3438", "#544a4a", "#6e625d", "#8a7c72", "#a69686")     # woundwood: smooth new bark
 R_ROT = ramp("#070404", "#120a08", "#1e120c", "#2c1a10", "#3c2414", "#4e301a")                # punky heart rot
 R_WAX = ramp("#2a241c", "#4a4032", "#6e604a", "#968466", "#bba684", "#d8c6a2")
+R_REDWAX = ramp("#1c0507", "#36090d", "#560f14", "#78181c", "#9a2426", "#b83a36")     # red altar wax
+R_SLAB = ramp("#120f10", "#1e191a", "#2c2526", "#3c3233", "#4e4241", "#62534f")      # the altar's stone
 THROAT = hexc("#3a0a0c")
 FLAME = (np.array([1.0, 0.93, 0.66]), np.array([1.0, 0.66, 0.24]), np.array([0.8, 0.3, 0.08]))
 
@@ -41,22 +43,47 @@ def _sdf(Q, W, H, D, kind, candles):
     if kind == "mouth":
         Hm = Hm * (1 - 0.18 * (xe / W) ** 2 * (xz > 0))                           # the upper lip's corners drawn down
     rho = np.sqrt((xe / W) ** 2 + (xz / Hm) ** 2)
+    if kind == "altar":                                                            # a pointed arch (Derek): straight jambs, an equilateral arch
+        Ht = 2.0 * W                                                                 # a lancet: arcs of 2.5 W, the apex sharp
+        hw = np.where(xz < 0, W, np.sqrt(np.clip((2.5 * W) ** 2 - xz ** 2, 0, None)) - 1.5 * W)
+        rho = np.maximum(np.abs(xe) / np.clip(hw, 1e-3, None), -xz / (H * 0.7))
+        rho = np.where(xz > Ht, 9.0, rho)
+        Hm = np.where(xz < 0, H * 0.7, Ht)
     rl = min(W, H) * (0.34 if kind == "mouth" else 0.22)                             # the rolled woundwood, thick on the mouth
     dcurve = (rho - 1.0) * np.minimum(W, Hm)
     ring = np.sqrt(dcurve ** 2 + (xu - rl * 0.25) ** 2) - rl
     cd = D * 0.5
-    k = np.sqrt(((xu + cd) / D) ** 2 + (xe / (W * 1.15)) ** 2 + (xz / (Hm * 1.15)) ** 2)
+    kv = 1.6 if kind == "altar" else 1.15                                          # the altar's arch, not the bowl, shapes its top
+    k = np.sqrt(((xu + cd) / D) ** 2 + (xe / (W * (1.4 if kind == "altar" else 1.15))) ** 2 + (xz / (Hm * kv)) ** 2)
     cav = (k - 1.0) * min(D, W, H)
+    if kind == "altar":                                                            # the cavity follows the arch straight back
+        cav = np.maximum(cav, (rho - 1.0) * min(W, H) * 0.9)
     outer = np.minimum(xu, ring)
     solid = np.maximum(outer, -cav)
     part = np.where(-cav > outer, 2, np.where(ring < xu, 1, 0))
-    if kind == "niche":
+    if kind in ("niche", "altar"):
         fl = np.maximum(xz + H * 0.62, xu)                                         # a flat floor inside, the sill
         part = np.where(fl < solid, 3, part)
         solid = np.minimum(solid, fl)
-        for (ce, ch, cr) in candles:
-            dz_ = xz - (-H * 0.62 + ch / 2)
-            dc = np.maximum(np.hypot(xu + D * 0.42, xe - ce) - cr, np.abs(dz_) - ch / 2)
+        if kind == "altar":                                                        # the altar: a stone slab set in the hollow
+            sb = np.maximum(np.maximum(np.abs(xu + D * 0.5) - D * 0.28, np.abs(xe) - W * 0.62), np.abs(xz + H * 0.62 - 0.11) - 0.11)
+            part = np.where(sb < solid, 5, part)
+            solid = np.minimum(solid, sb)
+            for k in range(4):                                                     # the sap seeping from the roof, setting as it falls
+                de = (k - 1.5) * W * 0.36 + 0.04 * np.sin(k * 2.1)
+                L_ = 0.08 + 0.05 * ((k * 37) % 5)
+                top_ = (np.sqrt(max((2.5 * W) ** 2 - (abs(de) + 1.5 * W) ** 2, 0.0)) * 0.95) if kind == "altar" else H * 0.95
+                tz = np.clip((top_ - xz) / L_, 0, 1)
+                dd = np.hypot(xu + D * (0.3 + 0.12 * (k % 2)), xe - de) - 0.016 * (1 - tz) - 0.003
+                dr = np.maximum(dd, np.maximum(xz - top_ - 0.3, top_ - L_ - xz))
+                part = np.where(dr < solid, 6, part)
+                solid = np.minimum(solid, dr)
+        for c_ in candles:
+            ce, ch, cr = c_[:3]
+            cu = c_[3] if len(c_) > 3 else -D * 0.42
+            cb = c_[4] if len(c_) > 4 else 0.0                                     # its base above the floor
+            dz_ = xz - (-H * 0.62 + cb + ch / 2)
+            dc = np.maximum(np.hypot(xu - cu, xe - ce) - cr, np.abs(dz_) - ch / 2)
             part = np.where(dc < solid, 4, part)
             solid = np.minimum(solid, dc)
     return solid, part
@@ -144,15 +171,22 @@ def draw(img, zb, dep_scene, to_px, C, u, W, H, D, T, lights, moon, kind="mouth"
         k_ = np.clip((N * lv).sum(-1) / (ld + 1e-6), 0, 1) / (1 + (ld / reach) ** 2) * (1 - inside * 0.85)
         warm += k_[..., None] * np.array(lc)
     flames = []
-    if kind == "niche":
-        for i, (ce, ch, cr) in enumerate(candles):
+    if kind in ("niche", "altar"):
+        for i, c_ in enumerate(candles):
+            ce, ch, cr = c_[:3]
+            cu = c_[3] if len(c_) > 3 else -D * 0.42
+            cb = c_[4] if len(c_) > 4 else 0.0
             fl = 1 + 0.18 * np.sin(T * 6.283 * 3 + i * 1.7) + 0.08 * np.sin(T * 6.283 * 7 + i)
-            fp = C + u3 * (-D * 0.42) + e1 * ce + ez * (-H * 0.62 + ch + 0.05)
+            fp = C + u3 * cu + e1 * ce + ez * (-H * 0.62 + cb + ch + 0.05)
+            if axis is not None:                                                    # on a wrapped hollow: round the trunk
+                ang_ = a0 + ce / r0
+                rad_ = r0 + cu
+                fp = np.array([ax_[0] + np.cos(ang_) * rad_, ax_[1] + np.sin(ang_) * rad_, fp[2]])
             flames.append((fp, fl))
             lv = fp - P
             ld = np.linalg.norm(lv, axis=-1)
             k_ = np.clip((N * lv).sum(-1) / (ld + 1e-6), 0, 1) ** 0.8 / (1 + (ld / (0.35 * fl)) ** 2)
-            warm += k_[..., None] * np.array([1.0, 0.62, 0.26]) * 0.9
+            warm += k_[..., None] * np.array([1.0, 0.62, 0.26]) * (0.9 if kind == "niche" else 0.2)
     v = ambient * (1 - inside * 0.7) + lit
     vw = v[..., None] * np.array([0.62, 0.68, 0.82]) + warm
     lum = np.clip(vw.mean(-1), 0, 0.99)
@@ -163,7 +197,8 @@ def draw(img, zb, dep_scene, to_px, C, u, W, H, D, T, lights, moon, kind="mouth"
     ndl = np.clip((N * moon).sum(-1), 0, 1)
     lipv = np.clip(0.2 + ndl * moonlit * 0.75 + warm.mean(-1) * 1.1 + folds + (vn(ang * 6, seed) - 0.5) * 0.05, 0, 0.99)   # pale like the bark it grew from
     col = np.where((part == 1)[..., None], R_LIP[(lipv * len(R_LIP)).astype(int)], col)
-    rotv = np.clip(lum * 1.1 + (1 - inside) ** 2 * 0.28 + (vn(Q[..., 1] * 20 + seed, Q[..., 2] * 20) - 0.5) * 0.08, 0, 0.99)   # lit at the rim, dark deeper in
+    base_v = np.clip(v.mean(-1) if v.ndim == 3 else v, 0, 1)
+    rotv = np.clip(base_v * 1.1 + (1 - inside) ** 2 * 0.28 + (vn(Q[..., 1] * 20 + seed, Q[..., 2] * 20) - 0.5) * 0.08, 0, 0.99)   # lit at the rim, dark deeper in (the warm light tints it after)
     rot = R_ROT[(rotv * len(R_ROT)).astype(int)]
     if kind == "mouth":                                                            # deep in the throat, something wet and red
         throat = np.clip((inside - 0.55) * 2.5, 0, 1)[..., None]
@@ -173,14 +208,40 @@ def draw(img, zb, dep_scene, to_px, C, u, W, H, D, T, lights, moon, kind="mouth"
     else:                                                                           # soot on the niche's roof over the flames
         soot = np.clip((Q[..., 2] - H * 0.2) / (H * 0.6), 0, 1) * (np.abs(Q[..., 1]) < W * 0.6)
         rot = rot * (1 - soot[..., None] * 0.6)
-    col = np.where((part == 2)[..., None], np.minimum(rot * 1.0 + warm * 0.25, 1), col)
+    wt = warm / (1 + warm.mean(-1, keepdims=True))                                   # many flames: rolled off, never a flat glow
+    col = np.where((part == 2)[..., None], np.minimum(rot + rot * wt * 2.2 + wt * 0.08, 1), col)   # the rot tinted near each flame
     flv = np.clip(lum * 1.05, 0, 0.99)
     col = np.where((part == 3)[..., None], R_ROT[(flv * len(R_ROT)).astype(int)] * 1.1, col)
     waxv = np.clip(lum * 1.2 + 0.05, 0, 0.99)
-    col = np.where((part == 4)[..., None], R_WAX[(waxv * len(R_WAX)).astype(int)], col)
-    if kind == "niche":                                                             # the wax run over the sill
-        run = (part == 1) & (Q[..., 2] < -H * 0.6) & (np.abs(np.sin(Q[..., 1] * 31 + seed)) > 0.82)
-        col = np.where(run[..., None], R_WAX[np.clip((waxv * 0.85 * len(R_WAX)).astype(int), 0, len(R_WAX) - 1)], col)
+    WR = R_REDWAX if kind == "altar" else R_WAX
+    drip = (part == 4) & (np.abs(np.sin(np.arctan2(Q[..., 1], Q[..., 0]) * 7 + seed)) > 0.8)   # drips down each candle
+    col = np.where((part == 4)[..., None], WR[(waxv * len(WR)).astype(int)], col)
+    col = np.where(drip[..., None], WR[np.clip(((waxv + 0.15) * len(WR)).astype(int), 0, len(WR) - 1)], col)
+    if kind == "altar":                                                             # the slab, and the wax pooled over it
+        sl_ = R_SLAB[np.clip((lum * 1.1 * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)]
+        pooled = (Q[..., 2] < -H * 0.62 + 0.19) & (vn(Q[..., 1] * 18 + seed, Q[..., 0] * 18) > 0.5)   # wax run down the slab's face
+        col = np.where((part == 5)[..., None], np.where(pooled[..., None], WR[np.clip((waxv * 0.9 * len(WR)).astype(int), 0, len(WR) - 1)], sl_), col)
+        # THE RUNE SPIRAL cut into the slab's top: a spiral of runes, blood dried in its grooves, bone stuck to it
+        su, se = (Q[..., 0] + D * 0.5) / 0.55, Q[..., 1] / W
+        rs_ = np.hypot(se, su * 1.6)
+        ths = np.arctan2(su * 1.6, se)
+        arm = ((rs_ / 0.11) - ths / (2 * np.pi)) % 1.0
+        on_top = (part == 5) & (Q[..., 2] > -H * 0.62 + 0.19)
+        groove = on_top & (rs_ < 0.5) & (np.abs(arm - 0.5) > 0.36) & (np.sin(ths * 11 + rs_ * 20) > -0.55)   # broken into runes
+        tick = on_top & (rs_ < 0.5) & (np.abs(arm - 0.5) > 0.2) & (np.abs(np.sin(ths * 11 + rs_ * 20)) < 0.12)
+        mark = groove | tick
+        bloodc = np.array([0.2, 0.02, 0.03]) * np.clip(lum * 2 + 0.3, 0.3, 1.2)[..., None]
+        col = np.where(mark[..., None], bloodc, col)
+        bone = on_top & (rs_ < 0.55) & (vn(Q[..., 1] * 60 + seed, Q[..., 0] * 60) > 0.86)
+        col = np.where(bone[..., None], np.array([0.72, 0.67, 0.56]) * np.clip(lum * 1.4 + 0.25, 0.3, 1)[..., None], col)
+        wet_ = on_top & (rs_ < 0.6) & (vn(Q[..., 1] * 25, Q[..., 0] * 25 + 3) > 0.7) & ~mark
+        col = np.where(wet_[..., None], col * 0.6 + np.array([0.18, 0.02, 0.03]), col)
+        col = np.where((part == 6)[..., None], WR[np.clip(((waxv + 0.1) * len(WR)).astype(int), 0, len(WR) - 1)], col)
+        floorwax = (part == 3) & (vn(Q[..., 1] * 12, Q[..., 0] * 12 + seed) > 0.4)
+        col = np.where(floorwax[..., None], WR[np.clip((waxv * 0.85 * len(WR)).astype(int), 0, len(WR) - 1)], col)
+    if kind in ("niche", "altar"):                                                  # the wax run over the sill
+        run = (part == 1) & (Q[..., 2] < -H * 0.6) & (np.abs(np.sin(Q[..., 1] * 31 + seed)) > (0.5 if kind == "altar" else 0.82))
+        col = np.where(run[..., None], WR[np.clip((waxv * 0.85 * len(WR)).astype(int), 0, len(WR) - 1)], col)
     sub = img[ys, xs]
     sub[draw_m] = np.clip(col[draw_m], 0, 1)
     img[ys, xs] = sub

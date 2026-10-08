@@ -94,7 +94,7 @@
 
 - **The catacombs:** upper, the pilgrim ossuary with bone laid as sermons; lower, the patterns forget themselves, and at the bottom there is something warm.
 
-- **The Hollow Wood** is the god's veins stood up as pale trees; luminous fungi in three colours; every tenth trunk holds something the god was carrying. Landmarks: the Ribcage Bough, the Blind Face, the Niche Candle, the Sword-in-Root.
+- **The Hollow Wood** is the god's veins stood up as pale trees; luminous fungi in three colours; every tenth trunk holds something the god was carrying. Landmarks: the Ribcage Bough, the Niche Candle, the Sword-in-Root.
 
 - **The Root Deep** (Ne-no-kuni) is the country under the Hide, and it breathes; the oni's road down.
 
