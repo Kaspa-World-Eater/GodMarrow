@@ -37,3 +37,18 @@ Derek (2026-10-07): "continue with the plan: rework and improve old scenes" (doc
 - **The canopy shadows:** a check.
 - **Weather in the world:** as an option, from the Vigil's rain and fog.
 - The **loop**, checked.
+
+## Rules check, 2026-10-08: the floor brought back to life (commit 75df7b4)
+
+Derek: "you lost the life, the ground is 35% too barren". `litter_ground.py` was rebuilt and checked against the originals, side by side.
+
+| # | Line | Status |
+|---|---|---|
+| 3 | Form | Pass: every leaf and twig is a raised plate in the world height, lit through its own normal. |
+| 5 | Values | Drifts against humus patches a yard or two across. The species lean by patch, so there are no camouflage blotches. |
+| 6 | Ramps | Five leaf ramps of seven tones each. The bright kinds are pulled toward dun at night. |
+| 7 | Paint | First try was confetti (2-3 px leaves at random). Leaves are now about 5 px, each a small step of its own. |
+| 8 | Contact | Worn ground (the yard, the ways) stays near bare. Leaves drift against things. |
+| 12 | Skeptic round | Against the "before" frames: at least as alive, with more depth. |
+
+**Worst remaining failure: the Jaw's ash.** It is colour with its own shading baked in (`ground.ash` self-shades), which breaks the form law, and it is bare. The fix belongs to the moor in the Act I ground set (`passes/act1_ground.md`), which is awaiting Derek's three decisions. **Also waiting:** his go on the spine path (`passes/spine_path.md`).
