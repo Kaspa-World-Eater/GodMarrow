@@ -282,3 +282,10 @@ MASTER_RULES is unchanged.
 - **Rim:** foramina pits, flaked shell and grain running round the orbit.
 - **The eye under the water:** a pale clouded iris, a black pupil and a dull rim, dimmed and wobbled by the water, findable now ("a pool that looks back like an eye").
 - **Socket: B.** The iris is a little too clean an ellipse; its threads don't show at this size.
+
+**Raw nature, pass 6:**
+- Tall stems are kept off the Back (none within 4.8 yd), so the walk stays legible.
+- Reed now only fringes the shallow margins (0.03 to 0.22 yd of water), never mid-pool, in fewer, thinner beds.
+- The tipped snag is moved into the open water.
+
+The chamber now reads open: the pool, the shelf beyond and the tendril post all show. **Nature: B.** Derek's bar is now A (2026-10-08: "once you've moved to what you would consider an A ... the old growth forest areas" next).

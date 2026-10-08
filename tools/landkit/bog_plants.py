@@ -60,7 +60,7 @@ def _stroke(img, zb, dep, to_px, a, b, c0, c1, lv, water, level, n=None):
 
 def reed(img, zb, dep, to_px, root, h, seed, lv, water, level):
     rr = np.random.default_rng(seed)
-    for i in range(int(rr.integers(3, 8))):
+    for i in range(int(rr.integers(2, 6))):
         b0 = np.array(root, float) + np.array([rr.normal(0, 0.12), rr.normal(0, 0.12), 0])
         L = h * rr.uniform(0.6, 1.0)
         dead = rr.random() < 0.55
@@ -225,7 +225,7 @@ def place(rng, depth_at, part_at, cover_at, box, n_try=9000):
         x, y = rng.uniform(x0, x1), rng.uniform(y0, y1)
         d, p, cv = depth_at(x, y), part_at(x, y), cover_at(x, y)
         r = rng.random()
-        if p == 0 and 0.05 < d < 0.4 and _bed(x, y) > 0.68 and r < 0.08:
+        if p == 0 and 0.03 < d < 0.22 and _bed(x, y) > 0.7 and r < 0.06:       # reed fringes the margins, never mid-pool
             out.append(("reed", x, y, float(rng.uniform(1.5, 2.6))))
         elif p == 0 and d <= 0.0 and _bed(x + 80, y) > 0.48 and r < 0.07:       # sedge in clumps, the peat open between
             out.append(("sedge", x, y, float(rng.uniform(0.4, 0.9))))

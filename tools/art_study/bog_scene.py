@@ -345,6 +345,9 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     rk = np.random.default_rng(77)
     items = [it for it in items if not (it[0] in ("reed", "bulrush") and it[1] + it[2] > hd + 1.5
                                         and rk.random() < np.clip((it[1] + it[2] - hd - 1.5) / 3.0, 0, 0.92))]
+    # the walk stays legible: no tall stems within a few yards of the Back (they stand off it, in the open water)
+    items = [it for it in items if not (it[0] in ("reed", "bulrush")
+                                        and float(ws.look(W, W["bog_v"], np.array(it[1]), np.array(it[2]))) < 4.8)]
     for q, (p_, r, h, sd) in enumerate(DROWNED_TREES):                     # a few dead limbs left on each drowned tree
         rl = np.random.default_rng(sd)
         for j in range(int(rl.integers(1, 4))):

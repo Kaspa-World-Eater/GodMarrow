@@ -88,7 +88,7 @@ def scene_nature():
     bs.GIANT_RIBS = []
     post = C + AX * 1.6 + PERP * 1.6
     bs.STRUCTS[:] = [("stump", *(C - AX * 6.0 + PERP * 5.0), 0.55, 81),
-                     ("snag", *(C + AX * 5.5 + PERP * 3.5), 2.6, 6.5, 0.34, 82),
+                     ("snag", *(C + AX * 2.5 + PERP * 6.5), np.arctan2(PERP[1], PERP[0]) + 0.5, 6.5, 0.36, 82),
                      ("post", post[0], post[1], 0.22, 1.8, 83)]
     bs.EXTRA_LIVING[:] = [tendrils_round_post(post[0], post[1], 1.8, 84)]
     ws.HERO = bs.LINE[len(bs.LINE) // 2] + AX * 0.2                  # on the Back
