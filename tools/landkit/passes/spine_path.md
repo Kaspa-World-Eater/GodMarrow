@@ -516,3 +516,17 @@ Passes:
   - 22 per frame, gathered round the worms' rings, never on a walk or in the water;
   - worn pale (`R_CROWN`), drawn with the bone tool's new `plain` finish (form and light only; its weathering broke into speckle at this size).
 - **The wisps, toned down** to Derek's note: three, not five; no flame, only a small soft core and a faint halo. Each wakes, drifts slowly over the water leaving a thin ghost-trail of fading dots, then rises and thins away. A faint pool on the water under it, and a dim reflection.
+
+## The pit of offering (Derek's landmark, 2026-10-08), `bog_chambers.py pit`
+
+A round platform of coursed stone, 16 yd across:
+- four rings stepping down to a stone throat that drops into the dark;
+- five gutters cut across the rings into the pit's lip, old blood stained in them and down the inner rings;
+- an altar slab at the lip where the first gutter runs in;
+- seven broken standing stones round the rim;
+- the god's tendrils climbing up out of the throat over the inner rings;
+- the Back coiled round it, nearly closed.
+
+Passes:
+1. It read new: a clean concrete pool on a drum.
+2. Lowered and settled: its far side drowned (sunk stones become water, mirrored); ragged rim; more blocks gone; moss over the outer rings; standing stones snapped jagged; heavier tendrils. **B-.** The moss blotches read as camouflage, and the flooded side blurs the pit's edge.

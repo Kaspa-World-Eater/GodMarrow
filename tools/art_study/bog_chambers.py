@@ -817,6 +817,176 @@ def scene_worms():
     ws.HERO = mid + AX * 0.2
 
 
+# ---------------------------------------------------------------- the pit of offering (a landmark)
+def sacrifice_pit(cx, cy, R0=8.0, seed=61, tilt_dir=0.6):
+    """THE PIT OF OFFERING (Derek 2026-10-08: "a large stone platform partially sunk and ringed by a coil of the serpent
+    bone ... concentric circles around a deep pit of stone going down into the abyss ... gore and tendrils creeping up
+    the side ... ruins that suggest this was a place of sacrifice"). A round platform of coursed stone, stepped down in
+    four rings toward a pit that drops into the dark; the whole of it has settled, tilted, its far side sunk under the
+    black water. Gutters cut across the rings run inward to the pit's lip; an altar slab stands at the lip where the
+    gutters meet; broken standing stones ring the outer rim. Height in the world throughout (FORM IS LAW).
+      part: 80 tier stone, 81 joint, 82 the abyss, 83 gutter, 84 altar, 85 standing stone, 86 the pit's inner wall"""
+    rr = np.random.default_rng(seed)
+    td = np.array([np.cos(tilt_dir), np.sin(tilt_dir)])
+    tiers = [(R0, 0.45), (R0 * 0.8, 0.25), (R0 * 0.62, 0.06), (R0 * 0.46, -0.12)]
+    pit_r = R0 * 0.32
+    gut_a = rr.uniform(0, 2 * np.pi) + np.arange(5) * 2 * np.pi / 5 + rr.normal(0, 0.12, 5)
+    alt_a = gut_a[0]
+
+    def st(X, Y, H, W):
+        part = np.zeros(X.shape, int)
+        dx, dy = X - cx, Y - cy
+        r = np.hypot(dx, dy)
+        th = np.arctan2(dy, dx)
+        on = r < R0 * (1 - 0.06 * (vn(np.arctan2(Y - cy, X - cx) * 5 + seed, 1.0) > 0.55))   # its rim broken, ragged
+        if not on.any():
+            return H, part
+        sink = ((dx * td[0] + dy * td[1]) / R0) * 0.7 - 0.05               # settled: one side down under the water
+        z = np.full(X.shape, -9.0)
+        tier_i = np.full(X.shape, -1)
+        for k, (tr, th_) in enumerate(tiers):
+            m = (r < tr)
+            z = np.where(m, th_, z)
+            tier_i = np.where(m, k, tier_i)
+        # the blocks of each ring: coursed, each its own small tilt, a few gone; joints between them
+        ring_w = np.array([t[0] for t in tiers] + [pit_r])
+        k_ = np.clip(tier_i, 0, 3)
+        outer, inner = ring_w[k_], ring_w[k_ + 1]
+        n_blk = np.maximum((2 * np.pi * (outer + inner) / 2 / 1.0).astype(int), 6)
+        bi = np.floor((th + np.pi) / (2 * np.pi) * n_blk)
+        bf = (th + np.pi) / (2 * np.pi) * n_blk - bi
+        hs = lambda a_, b_, c_: (np.sin(a_ * 12.9 + b_ * 78.2 + c_ * 3.7) * 4375.5) % 1.0
+        z = z + (hs(bi, k_, 1) - 0.5) * 0.06 + (hs(bi, k_, 2) - 0.5) * 0.05 * (r - inner) / np.maximum(outer - inner, 0.1)
+        gone = hs(bi, k_, 3) < 0.14
+        z = z - gone * 0.3
+        joint = (bf < 0.05) | (np.abs(r - inner) < 0.06) | (np.abs(r - outer) < 0.06)
+        z = z - joint * 0.05
+        # the gutters, cut across the rings toward the pit
+        gut = np.zeros(X.shape, bool)
+        for ga in gut_a:
+            dd = np.abs(np.sin(th - ga)) * r
+            gut |= (dd < 0.16) & (np.cos(th - ga) > 0) & (r > pit_r) & (r < R0 * 0.85)
+        z = z - gut * 0.09
+        z = z + sink + LEVEL
+        # the pit: a stone throat dropping into the dark, its wall coursed
+        pit = r < pit_r
+        wall = (r >= pit_r * 0.88) & (r < pit_r)
+        zp = LEVEL - 7.0 + 6.5 * np.clip((r - pit_r * 0.4) / (pit_r * 0.6), 0, 1) ** 6
+        z = np.where(pit, zp + sink, z)
+        H2 = np.where(on & (z > H - 0.4) | pit, z, H)
+        part[on] = 80
+        part[on & joint] = 81
+        part[on & gut] = 83
+        part[pit] = 82
+        part[pit & (zp > LEVEL - 2.5)] = 86
+        # the altar slab at the lip where the first gutter runs in
+        ax_, ay_ = cx + np.cos(alt_a) * (pit_r + 0.9), cy + np.sin(alt_a) * (pit_r + 0.9)
+        au = (X - ax_) * np.cos(alt_a) + (Y - ay_) * np.sin(alt_a)
+        av = -(X - ax_) * np.sin(alt_a) + (Y - ay_) * np.cos(alt_a)
+        alt = (np.abs(au) < 0.5) & (np.abs(av) < 0.95)
+        az = LEVEL + tiers[3][1] + 0.55 + sink - (np.abs(av) > 0.85) * 0.06
+        H2 = np.where(alt, np.maximum(H2, az), H2)
+        part[alt] = 84
+        # broken standing stones round the outer rim, leaning, some snapped low
+        for k in range(7):
+            a_ = 2 * np.pi * k / 7 + rr.uniform(-0.2, 0.2)
+            sx_, sy_ = cx + np.cos(a_) * (R0 - 0.7), cy + np.sin(a_) * (R0 - 0.7)
+            hgt = rr.uniform(0.6, 2.8) if rr.random() > 0.3 else rr.uniform(0.25, 0.5)
+            d_ = np.hypot(X - sx_, Y - sy_)
+            sm = d_ < 0.42 + (vn(np.arctan2(Y - sy_, X - sx_) * 2 + k, 1.0) - 0.5) * 0.12
+            sz_ = LEVEL + tiers[0][1] + hgt + ((sx_ - cx) * td[0] + (sy_ - cy) * td[1]) / R0 * 0.7 - d_ * 0.6
+            sz_ = sz_ - np.clip(vn(X * 6 + k, Y * 6) - 0.35, 0, 1) * 0.6 * (hgt > 0.5)   # snapped: a jagged top
+            H2 = np.where(sm, np.maximum(H2, sz_), H2)
+            part[sm] = 85
+        W["pit"] = dict(c=(cx, cy), R0=R0, pit_r=pit_r, gut=gut_a, alt=alt_a, td=td)
+        return H2, part
+    return st
+
+
+def pit_paint(col, W, px, py, pz, L, vv, gl, st):
+    if "pit" not in W:
+        return col
+    m = (st >= 80) & (st <= 86)
+    if not m.any():
+        return col
+    P = W["pit"]
+    dx, dy = px - P["c"][0], py - P["c"][1]
+    r = np.hypot(dx, dy)
+    th = np.arctan2(dy, dx)
+    wetz = pz - LEVEL
+    bid = np.floor((th + np.pi) * 9) + np.floor(r * 1.4) * 31
+    bv = ((np.sin(bid * 12.9) * 4375.5) % 1.0 - 0.5) * 0.14
+    stone = bs._r(bs.R_STONE, vv * 0.92 + bv + (vn(px * 4, py * 4) - 0.5) * 0.06)
+    stone = np.where((wetz < 0.12)[..., None], bs._r(bs.R_ALGAE, vv * 0.95), stone)
+    mossy = (vn(px * 1.6 + 3, py * 1.6) > 0.6) & (r > P["R0"] * 0.55)       # moss creeping in over the outer rings
+    stone = np.where(mossy[..., None], bs._r(bs.R_MOSS, vv * 0.9 + (vn(px * 11, py * 11) - 0.5) * 0.1), stone)
+    # the old blood: stained into the gutters and down the inner rings toward the pit, thickest at the lip
+    near_pit = np.clip(1 - (r - P["pit_r"]) / (P["R0"] * 0.45), 0, 1)
+    gut_k = np.zeros(r.shape)
+    for ga in P["gut"]:
+        gut_k = np.maximum(gut_k, np.clip(1 - np.abs(np.sin(th - ga)) * r / 0.5, 0, 1) * (np.cos(th - ga) > 0))
+    gore = np.clip(near_pit * 0.8 + gut_k * 0.9 + (vn(px * 2.5, py * 2.5) - 0.5) * 0.5 - 0.35, 0, 1)
+    blood = np.array([0.15, 0.03, 0.035]) * (0.4 + vv[..., None])
+    stone = np.where((gore > 0.25)[..., None], stone * (1 - gore[..., None] * 0.7) + blood * gore[..., None], stone)
+    col = np.where(((st == 80) | (st == 85))[..., None], stone, col)
+    col = np.where((st == 81)[..., None], stone * 0.55, col)
+    col = np.where((st == 83)[..., None], np.array([0.09, 0.02, 0.025]) * (0.5 + vv[..., None]), col)     # the gutters
+    alt = bs._r(bs.R_STONE, vv * 0.98 + 0.06) * (1 - (gore[..., None] > 0.1) * 0.3)
+    col = np.where((st == 84)[..., None], alt, col)
+    # the pit's wall, coursed, going down into the dark; the abyss itself black
+    depth_k = np.clip((pz - (LEVEL - 2.5)) / 2.8, 0, 1)
+    wallc = bs._r(bs.R_STONE, vv * 0.7) * depth_k[..., None] * (1 - (np.abs(np.sin(pz * 9)) < 0.15)[..., None] * 0.4)
+    col = np.where((st == 86)[..., None], wallc, col)
+    col = np.where((st == 82)[..., None], np.array([0.006, 0.005, 0.007]), col)
+    return col
+
+
+def pit_tendrils(img, w, W, px, py, pz, L, T=0.0):
+    """the god's tendrils creeping up out of the pit: over its lip, across the inner rings, a few reaching the altar"""
+    if "pit" not in W:
+        return img
+    P = W["pit"]
+    GH, GW = img.shape[:2]
+    zb = np.full((GH, GW), -1e9)
+    dep = px + py
+    hero = np.array(ws.HERO, float)
+    g = float(ws.look(W, W["H"], np.array(hero[0]), np.array(hero[1])))
+    lts = [((hero[0] + 0.25, hero[1] - 0.25, g + 0.7), (0.95, 0.6, 0.32), 2.6 * 1.4)]
+    rr = np.random.default_rng(71)
+    for k in range(9):
+        a0 = rr.uniform(0, 2 * np.pi)
+        ln = rr.uniform(2.0, P["R0"] * 0.55)
+        n = 50
+        t = np.linspace(0, 1, n)
+        rad = P["pit_r"] * 0.85 + t * ln
+        ang = a0 + np.sin(t * 6 + k) * 0.18 + t * rr.uniform(-0.3, 0.3)
+        xs = P["c"][0] + np.cos(ang) * rad
+        ys = P["c"][1] + np.sin(ang) * rad
+        zs = np.array([float(ws.look(W, W["H"], np.array(x), np.array(y))) for x, y in zip(xs, ys)]) + 0.04
+        zs[: 6] = np.minimum(zs[: 6], zs[6] - np.linspace(1.2, 0.0, 6))         # rising up out of the throat
+        Pp = np.stack([xs, ys, zs], 1)
+        vessel.draw(img, zb, dep, ws.to_px, Pp, rr.uniform(0.09, 0.15), T, lts, ws.SUN, seed=300 + k, tol=0.4, taper=True)
+    return img
+
+
+def scene_pit():
+    set_origin(9)
+    pc = C - AX * 3.0
+    a = np.linspace(0.3, 0.3 + 2 * np.pi * 0.88, 1400)                     # the coil of the Back round it, nearly closed
+    rad = 10.3 - np.linspace(0, 0.9, len(a))
+    bs.LINE = np.stack([pc[0] + np.cos(a) * rad, pc[1] + np.sin(a) * rad], 1)
+    bs.BED_MODS[:] = []
+    bs.DROWNED_TREES = [(C + AX * 7.0 + PERP * 9.5, 0.4, 6.0, 79)]
+    bs.DROWNED_WALLS, bs.GIANT_RIBS = [], []
+    bs.STRUCTS[:] = []
+    bs.CAUSEWAYS[:], bs.RIBWALKS[:] = [], []
+    bs.EXTRA_STAMPS[:] = [sacrifice_pit(pc[0], pc[1], seed=61 + VARIANT, tilt_dir=0.6 + VARIANT)]
+    bs.EXTRA_PAINT[:] = [pit_paint]
+    bs.EXTRA_LIVING[:] = [pit_tendrils]
+    ws.FOCUS = pc + AX * 1.0
+    ws.HERO = pc + AX * 5.6 - PERP * 2.0
+
+
 def scene_ribwalk():
     """a branch along a great rib: the Back passes, and from its flank a fallen rib runs out over the water, curving, a
     single-file bridge of bone"""
@@ -845,7 +1015,7 @@ def scene_ribwalk():
     ws.HERO = rl[120] + AX * 0.05                                      # out on the rib
 
 
-SCENES = dict(worms=scene_worms, ribwalk=scene_ribwalk, causeway=scene_causeway, nature=scene_nature, hut=scene_hut, socket=scene_socket, skull=scene_skull, ruins=scene_ruins)
+SCENES = dict(pit=scene_pit, worms=scene_worms, ribwalk=scene_ribwalk, causeway=scene_causeway, nature=scene_nature, hut=scene_hut, socket=scene_socket, skull=scene_skull, ruins=scene_ruins)
 
 if __name__ == "__main__":
     if ":" in sys.argv[1]:                                               # NAME:VARIANT, e.g. skull:2

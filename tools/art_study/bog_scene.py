@@ -150,6 +150,8 @@ def stamp(W, w):
     W["bog_st"] = spart
     W["bog_dr"] = dpart
     water = (H < LEVEL) & (part == 0) & (dpart == 0) & (spart == 0)
+    drowned_stone = (H < LEVEL) & np.isin(spart, (80, 81, 83, 85))          # a sunk platform's stones go under the water
+    water = water | drowned_stone
     W["H"] = np.where(water, LEVEL, H)
     W["Hrest"] = W["H"].copy()
     W["HT"] = np.full(H.shape, -50.0)
