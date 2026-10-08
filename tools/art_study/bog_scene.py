@@ -458,7 +458,8 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     return img
 
 
-WISPS = [(2.0, 1.6, 0.0, 11), (-5.5, 3.0, 0.36, 12), (6.5, -4.0, 0.7, 13)]   # fewer (Derek: "tone down the wisp fire")
+WISPS = [(3.0, 3.5, 0.15, 11), (-3.0, 5.5, 0.5, 12), (6.0, -1.5, 0.82, 13)]   # fewer (Derek: "tone down the wisp fire"),
+                                                                             # over the open water before the Back
 GHOST = np.array([0.66, 0.74, 0.86])
 
 
@@ -513,14 +514,14 @@ def wisps(img, w, W, px, py, pz, L, T=0.4):
                 break
             gx, gy, gz = where(a, p, ph, sd, fk)
             gsx, gsy = ws.to_px((gx, gy, gz))
-            dot(gsx, gsy, 1.2, 0.16 * env * (1 - k / 7.0), GHOST)
+            dot(gsx, gsy, 1.4, 0.24 * env * (1 - k / 7.0), GHOST)
         # the faint pale pool it lays on the water, and its reflection, dimmer
         _, wl = ws.to_px((x, y, LEVEL))
         dot(sx, wl, 5.0 * thin, 0.07 * env, GHOST, water)
         dot(sx, 2 * wl - sy, 1.6 * thin, 0.22 * env, GHOST * 0.8, water)
         # the light itself: a small soft core and a faint halo, no flame
-        dot(sx, sy, 3.2 * thin, 0.18 * env, GHOST)
-        dot(sx, sy, 1.3 * thin, 0.65 * env, np.array([0.86, 0.9, 0.98]))
+        dot(sx, sy, 4.0 * thin, 0.24 * env, GHOST)
+        dot(sx, sy, 1.8 * thin, 0.8 * env, np.array([0.86, 0.9, 0.98]))
     return img
 
 
