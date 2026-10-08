@@ -991,12 +991,18 @@ def pit_paint(col, W, px, py, pz, L, vv, gl, st):
     col = np.where((st == 84)[..., None], alt, col)
     # the glow from below: out of sight, pulsing slowly, lighting the throat's wall and the lip from beneath
     pulse = 0.7 + 0.3 * np.sin(2 * np.pi * T * 2) * (0.6 + 0.4 * np.sin(2 * np.pi * T * 3 + 1))
-    depth_k = np.clip((pz - (LEVEL - 2.5)) / 2.8, 0, 1)
-    wallc = obs * 0.6 * (1 - (np.abs(np.sin(pz * 9)) < 0.15)[..., None] * 0.4)
-    glow_w = np.clip(1 - depth_k, 0, 1) ** 0.7 * pulse                     # stronger the deeper the wall goes
+    # the throat's wall coloured by its angle round the pit, never by the depth each pixel's ray happens to reach
+    # (a steep wall seen from above lands each column at a very different depth: coloured by depth it streaked into
+    # flames). One steady red light from below, warmer on the far wall that faces us, its stone courses faint
+    face = np.clip(0.55 - 0.45 * np.cos(th - np.arctan2(-1.0, -1.0)), 0, 1)   # the far side of the throat faces the camera
+    wallc = obs * 0.45 * (1 + (vn(th * 6, 2.0) - 0.5) * 0.2)[..., None]
+    glow_w = (0.45 + 0.4 * face + (vn(th * 3 + 1, 3.0) - 0.5) * 0.15) * pulse
     wallc = wallc * (1 - glow_w[..., None] * 0.5) + np.array([0.55, 0.06, 0.04]) * glow_w[..., None] * 0.75
-    col = np.where((st == 86)[..., None], wallc, col)
-    col = np.where((st == 82)[..., None], np.array([0.09, 0.008, 0.006]) * (0.6 + 0.6 * pulse), col)   # the deep: red-black
+    throat = (st == 86) | (st == 82) | (np.isin(st, (80, 81, 83)) & (r < P["pit_r"] * 1.14) & (pz < LEVEL + 0.25))
+                                                                           # the wall, the deep and the lip's riser: one light
+    deep = np.clip(1 - (r / max(P["pit_r"], 0.1)) ** 2, 0, 1)                # darkest straight down the middle
+    wallc = wallc * (1 - deep[..., None] * 0.6) + np.array([0.06, 0.005, 0.004]) * deep[..., None]
+    col = np.where(throat[..., None], wallc, col)
     lip = (r < P["pit_r"] * 1.5) & ((st == 80) | (st == 83) | (st == 81))
     lk = np.clip(1 - (r - P["pit_r"]) / (P["pit_r"] * 0.5), 0, 1) * pulse
     col = np.where(lip[..., None], col + np.array([0.18, 0.02, 0.01]) * lk[..., None], col)
