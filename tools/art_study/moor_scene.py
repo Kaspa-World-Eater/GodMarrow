@@ -27,6 +27,9 @@ import wood_scene as ws                      # noqa: E402
 import tiles_moor                            # noqa: E402
 import tooth as toothgen                     # noqa: E402
 import kneeler as kneelgen                   # noqa: E402
+import fang as fanggen                       # noqa: E402
+import eye as eyegen                         # noqa: E402
+import ground as groundgen                   # noqa: E402
 from wood_ecosystem import vn, fbm           # noqa: E402
 
 C = np.array([20.0, 19.0])                   # the pit's heart
@@ -81,6 +84,9 @@ def shape_plan(w):
     w.wet = np.clip(pit * 0.8, 0, 1)                                     # the pit's mist
 
 
+FG = []                                                                # the teeth as ray-cast fangs (landkit fang.py)
+
+
 def to_tooth(k, x, y):
     c = TEETH[k][0]
     a = TEETH[k][2] * 0.7
@@ -91,12 +97,21 @@ def to_tooth(k, x, y):
 def stamp(W, w):
     X, Y = W["X"], W["Y"]
     H = W["H"].copy()
+    FG.clear()
     for k, (F, info) in enumerate(TF):
         lx, ly = to_tooth(k, X, Y)
         inside = (np.abs(lx) < F.half) & (np.abs(ly) < F.half)
-        fh = np.where(inside, F.at(F.H, lx, ly), -9.0)
+        gum = np.where(inside & (F.at(F.M, lx, ly, 0) == toothgen.GUM), F.at(F.H, lx, ly), -9.0)
         c = TEETH[k][0]
         base = float(W["H"][int((c[1] - W["y0"]) / ws.RES), int((c[0] - W["x0"]) / ws.RES)]) - 0.25
+        molar = TEETH[k][1] == "molar"                                   # (reworked 2026-10-07: the ray-cast fang, as the Gate's)
+        f = fanggen.make(c, base, info["height"] * (0.82 if molar else 1.0), info["R"] * (1.15 if molar else 1.0),
+                         TEETH[k][2], AX, PERP)
+        FG.append(f)
+        near = np.hypot(X - c[0], Y - c[1]) < f["R"] * 1.3 + f["h"] * 0.25
+        en = np.full(X.shape, -9.0)
+        en[near] = fanggen.heightfield(X[near][None, :], Y[near][None, :], f)[0] - base
+        fh = np.maximum(gum, en)
         m = (fh > 0.0) & (base + fh > H)
         H = np.where(m, base + fh, H)
         W["tag"] = np.where(m, 700 + k, W["tag"])
@@ -131,6 +146,17 @@ def stamp(W, w):
     for (c, ra, rb) in GLASS:
         e = ((X - c[0]) / ra) ** 2 + ((Y - c[1]) / rb) ** 2 + (vn(X * 4, Y * 4) - 0.5) * 0.7
         glass |= e < 1
+    # the eye's socket (reworked: it rises out of a bowl in the ash ringed by a swollen lip of hide, as the Gate's eye
+    # rises from its folds; "a pool that looks back like an eye")
+    ec, ea, eb = EYE
+    de = np.hypot(X - ec[0], Y - ec[1])
+    Ry_ = min(ea, eb) * 0.95
+    lip = np.exp(-((de - Ry_ * 1.12) / 0.32) ** 2) * (0.42 + (vn(X * 3, Y * 3) - 0.5) * 0.12)
+    bowl = -np.clip(1 - de / (Ry_ * 1.05), 0, 1) ** 0.7 * 0.35
+    sock = (de < Ry_ * 1.7) & (W["tag"] == 0)
+    W["H"] = np.where(sock, W["H"] + lip + bowl, W["H"])
+    H = np.where(sock, H + lip + bowl, H)
+    hide |= sock & (de > Ry_ * 0.85)
     W["hide"], W["glass"] = hide & (W["tag"] == 0), glass & (W["tag"] == 0)
     # the hide swells a little out of the ash (the flesh under it), so the moon models it: a soft dome per patch
     from scipy import ndimage as nd_
@@ -155,7 +181,7 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     gy = ((px + py) * ws.KY).astype(int)
     ash, hide = _TILES["ash"], _TILES["hide"]
     k = (0.3 + L["moon"][..., None] * 0.85 * np.array([0.86, 0.9, 1.05]) + L["lamp"][..., None] * 1.5 * np.array([1.15, 0.85, 0.55])) * (1 - L["ao"][..., None] * 0.35)
-    alb = ash[gy % ash.shape[0], gx % ash.shape[1]]
+    alb = groundgen.ash(px, py, seed=3)                                  # (reworked: the world-position ash, not the retired tile)
     hm = ws.look(W, W["hide"], px, py) > 0
     alb = np.where(hm[..., None], hide[gy % hide.shape[0], gx % hide.shape[1]], alb)
     # the pit: the ash darker and warmer toward its heart (the flesh below still cooling)
@@ -198,25 +224,7 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
             alb = np.where(sh_[..., None], alb * 0.5, alb)                                 # its shadow on the ash
     out = img.copy()
     out[gl] = np.clip(alb * k, 0, 1)[gl]
-    # the eye in the ash: lids of hide, a jaundiced white threaded red, a dark wet iris, the pupil, the moon in it
-    ec, ea, eb = EYE
-    ex = ((px - ec[0]) * PERP[0] + (py - ec[1]) * PERP[1]) / ea
-    ey = ((px - ec[0]) * AX[0] + (py - ec[1]) * AX[1]) / eb
-    er = np.hypot(ex, ey)
-    lid = gl & (er >= 1.0) & (er < 1.4)
-    white = gl & (er < 1.0)
-    iris = gl & (np.hypot(ex * 1.0, ey * 1.0) < 0.5)
-    pupil = gl & (np.hypot(ex, ey) < 0.22)
-    out[lid] = np.clip(tiles_moor.HIDE[3] * k[lid] * np.where(ey[lid] < 0, 1.15, 0.6)[:, None], 0, 1)
-    out[white] = np.clip(np.array([0.62, 0.56, 0.36]) * k[white] * (0.75 + (1 - er[white]) * 0.3)[:, None], 0, 1)
-    vein_e = white & (np.abs(np.sin(np.arctan2(ey, ex) * 8 + er * 5)) < 0.13) & (er > 0.55)
-    out[vein_e] = out[vein_e] * 0.5 + np.array([0.45, 0.07, 0.06]) * 0.5
-    out[iris] = np.clip(np.array([0.16, 0.13, 0.08]) * k[iris] * 1.2, 0, 1)
-    out[pupil] = np.array([0.01, 0.01, 0.015])
-    glint = gl & (np.hypot(ex + 0.18, ey + 0.22) < 0.1)
-    out[glint] = np.array([0.8, 0.82, 0.86])
-    crease = gl & (np.abs(er - 1.0) < 0.06)
-    out[crease] = out[crease] * 0.4
+    # (the eye in the ash is no longer painted flat here: it is the approved 3D eye, drawn in the living layer)
     wetg = gl & gmask & ~ashed & (L["moon"] > 0.5) & (vn(px * 15, py * 15) > 0.78)
     out[wetg] = np.minimum(out[wetg] * 1.5 + 0.05, 1)
     gm = gl & (ws.look(W, W["glass"], px, py) > 0)
@@ -270,6 +278,29 @@ def paint_lstone(img, m, v, n, px, py, pz, o, W, L):
     img[notch] = img[notch] * 0.5
     tally = m & side & (np.abs(((u * 11) % 1.0) - 0.5) < 0.5) & (((u * 11) // 1) % 5 == 4) & (np.abs(h - 0.42) < 0.04)
     img[tally] = img[tally] * 0.5                                        # every fifth struck through, as tallies are
+    return img
+
+
+def jaw_forms(img, w, W, px, py, pz, L, T):
+    """the teeth as true ray-cast fangs and the eye in the ash as the approved 3D eye (landkit fang.py, eye.py)"""
+    GH, GW = img.shape[:2]
+    dep = px + py
+    zb = np.full((GH, GW), -1e9)
+    g = W["obj"][760]["base"] + 0.85
+    hero = np.array(ws.HERO, float)
+    hg = float(ws.look(W, W["H"], np.array(hero[0]), np.array(hero[1])))
+    breath = 0.5 + 0.5 * np.sin(T * 6.28)
+    lts = [((LANTERN[0], LANTERN[1], g + 0.4), (0.95, 0.62, 0.3), 2.8 * (0.8 + 0.2 * breath)),
+           ((hero[0] + 0.25, hero[1] - 0.25, hg + 0.7), (0.95, 0.6, 0.32), 2.6 * 1.4)]
+    for f in sorted(FG, key=lambda q: q["c"][0] + q["c"][1]):
+        fanggen.draw(img, zb, dep, ws.to_px, f, lts, ws.SUN, ambient=0.15)
+    ec, ea, eb = EYE                                                       # "a pool that looks back like an eye"
+    ge = float(ws.look(W, W["H"], np.array(ec[0]), np.array(ec[1])))
+    Ry = min(ea, eb) * 0.95
+    centre = (ec[0], ec[1], ge + Ry * 0.05)                                # rising from the floor of its bowl of hide, looking up over the lip
+    blink = np.clip(1 - np.abs((T - 0.4) / 0.13), 0, 1) ** 0.8
+    gz = np.array([AX[0] * 0.3 - PERP[0] * 0.2, AX[1] * 0.3 - PERP[1] * 0.2, 1.0])
+    eyegen.draw(img, zb, dep, ws.to_px, centre, Ry, gz, blink, lts, ws.SUN, seed=7, ambient=0.16, aperture=(0.84, 0.4))
     return img
 
 
@@ -345,6 +376,7 @@ def paint_kneel(img, m, v, n, px, py, pz, o, W, L):
 ws.PAINTERS["kneeler"] = paint_kneel
 ws.GROUND = ground
 ws.FOREST_LIFE = False                       # no Wood on the Moor: no leaf fall
+ws.LIVING.append(jaw_forms)
 ws.LIVING.append(living_moor)
 
 if __name__ == "__main__":

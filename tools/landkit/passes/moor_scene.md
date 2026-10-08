@@ -28,3 +28,15 @@ Tile passes: ash_0 1 (seam: ripples not periodic; too banded), 2 (whole-period r
 9. The veins narrower, dark purple-black and swollen, lit on their backs with a shadow on the ash, branching, diving under the ash in places.
    Graded: the veins swollen dark cords branching in.
 10. The Sighing Lantern drawn as a lantern (base plate, iron posts lit on the left, glass panes breathing, peaked cap, ring) with its breathing light on the air; its stone cut with the tenders' notches in tallies of five; the Kneeler's robe folds soft shaded bands, not cut slits.
+
+## Rework (2026-10-07, stage 1 of docs/REWORK_AND_SEEDS_PLAN.md)
+- **The teeth:** now the ray-cast `fang.py` (the Gate's tooth), true forms with snapped tips, dentin and blood. The
+  old `tooth.py` supplies only the gum at their feet. Molars are shorter, broader fangs (the first try, at 0.62 of the
+  height, read as cracked eggshells).
+- **The ash:** from the world-position generator `ground.ash`, not the retired tile. The hide patches still use
+  their tile, a debt.
+- **The eye in the ash:** the flat painted ellipse removed. The approved `eye.py` now rises from a bowl in the ash
+  ringed by a swollen lip of hide ("a pool that looks back like an eye"). Failed first: set on the ash it read as a
+  ball; sunk too deep, it vanished.
+- **Graded:** C+ (no grade from Derek before). The ring reads as a jaw of real teeth; the eye looks up out of the
+  ground.
