@@ -7,4 +7,4 @@ pieces. Read them, with the chapters (`../chapters/`), before starting a new pie
 | Report | Piece | Status |
 |---|---|---|
 | [01 The Gate in the Flesh](01-gate-in-the-flesh.md) | `flesh_scene.py`, Ashen Moor | in work |
-- [05, the pit of offering](05-pit-of-offering.md): the Sunken Bog's landmark; Derek: "exceptional". The landmark method: shape, story by cause, a material made for the place, one hidden-source light, age and setting.
+| [05 The pit of offering](05-pit-of-offering.md) | `bog_chambers.py`, Sunken Bog | Derek: "exceptional"; the landmark method |
