@@ -70,7 +70,7 @@ R_STONE = ramp("#0e100f", "#1a1d1a", "#292d28", "#3a3f38", "#4c5249", "#5f655a",
 DROWNED_TREES = [(C + AX * 5.5 - PERP * 7.0, 0.42, 6.5, 41), (C + AX * 3.2 + PERP * 7.6, 0.45, 7.0, 43),
                  (C - AX * 3.2 + PERP * 4.5, 0.34, 5.2, 44)]
 DROWNED_WALLS = [(C + AX * 4.6 + PERP * 4.8, 0.6, 4.2, 2.3, 51), (C - AX * 2.6 - PERP * 6.2, 2.0, 3.2, 1.5, 52)]
-GREY = ramp("#111111", "#222222", "#333333", "#444444", "#555555", "#666666", "#777777", "#888888", "#999999", "#aaaaaa")
+GREY = ramp("#0d0d0d", "#191919", "#262626", "#343434", "#434343", "#535353", "#646464", "#767676")   # the scene's own range
 
 
 def plan(w):
@@ -161,6 +161,8 @@ def stamp(W, w):
 
 
 def _r(rp, t):
+    if VALUE_ONLY:                                                           # rule 0.4: one material, one grey, everywhere
+        rp = GREY
     return rp[np.clip((t * len(rp)).astype(int), 0, len(rp) - 1)]
 
 
@@ -173,7 +175,7 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     vv = np.clip(v, 0, 0.99)
     col = np.zeros(img.shape)
     if VALUE_ONLY:                                                           # rule 0.4: one grey material, the form alone
-        col = _r(GREY, vv * 0.9)
+        col = _r(GREY, vv * 0.95)
         col[water] = _r(GREY, vv[water] * 0.3)
         img[gl] = col[gl]
         return img
@@ -361,7 +363,8 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     sp2 = edge & (vn(px * 31, py * 31) > 0.7)                                 # loose fronds at a mat's edge
     img[sp2] = bog_plants.WEED * 0.7
     # floating sphagnum rafts in the shallows: dulled red and green, ragged, distinct from the duckweed
-    raft = water & (dd < 0.35) & ~(ws.look(W, W["no_weed"], px, py) if "no_weed" in W else False) & ((vn(px * 0.7 + 21, py * 0.7) * 0.7 + vn(px * 6, py * 6) * 0.3) > 0.72) & ~mat
+    noweed = ws.look(W, W["no_weed"], px, py) if "no_weed" in W else np.zeros(water.shape, bool)
+    raft = water & (dd < 0.35) & ~noweed & ((vn(px * 0.7 + 21, py * 0.7) * 0.7 + vn(px * 6, py * 6) * 0.3) > 0.72) & ~mat
     rc = np.where((vn(px * 9, py * 9) > 0.5)[..., None], np.array([0.2, 0.13, 0.1]), np.array([0.15, 0.18, 0.09]))
     img[raft] = rc[raft] * (0.55 + L["moon"][raft, None] * 0.5)
     rng = np.random.default_rng(31)
@@ -552,7 +555,16 @@ def struct_living(img, w, W, px, py, pz, L, T=0.0):
     return img
 
 
-ws.LIVING[:] = [mirror, giant_rib_mirror, plants, giant_ribs, struct_living, bog_fog, wisps]
+def value_only(img, w, W, px, py, pz, L, T=0.0):
+    """the value test's last step: whatever still carries a colour (the floating weed, the pads, the bone's own ramp,
+    the wisp-fire) goes to the one grey, so the test shows the form and nothing else"""
+    if not VALUE_ONLY:
+        return img
+    g = img.mean(2, keepdims=True)
+    return np.repeat(g, 3, axis=2)
+
+
+ws.LIVING[:] = [mirror, giant_rib_mirror, plants, giant_ribs, struct_living, bog_fog, wisps, value_only]
 ws.GROUND = ground
 
 
@@ -578,6 +590,7 @@ ws.RIM_EXTRA = tuple(range(800, 810))
 if __name__ == "__main__":
     if len(sys.argv) > 2 and sys.argv[2] == "value":
         VALUE_ONLY = True
+        bog_plants.GREY = True
     out_ = sys.argv[1] if len(sys.argv) > 1 else "bog_scene.png"
     if out_.endswith(".webp"):
         ws.animate(out_, int(sys.argv[2]) if len(sys.argv) > 2 else 12)

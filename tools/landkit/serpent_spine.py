@@ -145,19 +145,20 @@ def stamp(X, Y, H, line, level=0.0, seed=7):
         arc = 0.4 * np.sin(f_ * np.pi * 0.65) - f_ ** 1.6 * 0.75          # up off the Back, then down into the water
         r_on = show & (side == sgn) & (out > -0.2) & (out < reach) & (np.abs(ur * L_V) < thick)
         zr = np.where(r_on, base + 0.2 + arc + np.sqrt(np.clip(1 - (ur * L_V / thick) ** 2, 0, 1)) * thick, zr)
-    # the overgrowth: mud fills the lows first, moss and sedge root in it, so bone shows only on its crowns
-    smooth = base + 0.36 - 0.14 * np.clip(av / W_W, 0, 1)                 # a soft fill over the roof
-    grow = (fbm(X * 0.7 + seed, Y * 0.7) - 0.5) * 0.42 + (vn(X * 3.1, Y * 3.1 + seed) - 0.5) * 0.12
-    # how buried the Back is changes along it: stretches scoured bare where the water runs over it at flood (whole
-    # vertebrae show, roofs, wings and joints), stretches sunk under the growth with only the crowns through
-    # (bared and buried in turn along the Back, a stretch every dozen yards or so, never the same length twice)
+    # THE OVERGROWTH DRAPES THE BONE (Derek graded the value test D: the cover read as lumpy cottage cheese, a noise of
+    # bubbles that ignored the vertebrae beneath). Peat and moss lie over the Back like a blanket: they follow the
+    # bone's own form smoothed a little, thickest in the joints and the lows (the burial rule), thin on the ridges,
+    # so the vertebrae's rhythm reads through the cover, and the bone breaks through only where it stands highest.
+    # How buried changes along the Back: stretches scoured bare where floodwater runs over it, stretches deep in growth
+    from scipy import ndimage as _nd1
+    zb_on = np.where(near & (av < wing + 0.2), zb, base + 0.1)
+    drape = _nd1.gaussian_filter(zb_on, 3.5)                              # the bone's form, softened (about 0.14 yd)
     expose = np.clip(0.45 + 0.85 * np.sin(s * 2 * np.pi / 13.0 + seed + (fbm(s * 0.05, 7.0 + seed) - 0.5) * 3.0)
                      + (fbm(s * 0.08 + seed * 2, 4.0) - 0.5) * 0.8, 0, 1)
-    cover = smooth + 0.1 + grow - expose * 0.34                          # overgrown, but not everywhere
-    # moss cushions (Derek: "the green spots look flat and blobby"): domes of real height a hand to a foot across,
-    # so the engine lights each one; their colour follows their form in the painter, not a painted patch
-    cush = np.clip((vn(X * 5.0 + seed, Y * 5.0) - 0.42) * 2.4, 0, 1) ** 0.6 * 0.07 + (vn(X * 14, Y * 14 + seed) - 0.5) * 0.02
-    cover = cover + cush
+    thick = (1 - expose) * (0.09 + 0.07 * fbm(X * 0.35 + seed, Y * 0.35)) + joint * 0.12 + np.clip(drape - zb, 0, 0.2)
+    # moss cushions (Derek: "the green spots look flat and blobby"): low domes on the blanket, a hand to a foot across
+    cush = np.clip((vn(X * 5.0 + seed, Y * 5.0) - 0.42) * 2.4, 0, 1) ** 0.6 * 0.05
+    cover = drape + thick * 0.8 + cush * (1 - expose)
     # "where the mud clutches and lets go" (the lore): bootholes down the trodden middle, half closed, holding water
     step = 0.42
     fi = np.floor(s / step)
@@ -165,10 +166,10 @@ def stamp(X, Y, H, line, level=0.0, seed=7):
     boot = (np.hypot((s - (fi + 0.5) * step) * 0.9, v - vf) < 0.075) & (_h(fi, 22, seed) < 0.6) & (av < 0.7)
     cover = cover - boot * 0.07
     # where it is bared, the growth only lies in the joints and along the wings' lips: the vertebrae show whole
-    cover = np.where(expose > 0.35, np.minimum(cover, zb - 0.03 + joint * 0.3 + (1 - lip) * 0.3 + bite * 0.3), cover)
+    cover = np.where(expose > 0.55, np.minimum(cover, zb - 0.03 + joint * 0.3 + (1 - lip) * 0.3 + bite * 0.3), cover)
     # the flank: the mud and growth run on past the wing's edge and slope down into the water, a bank, not a wall
     past = np.clip((av - wing) / (0.9 + 0.5 * vn(s * 0.5 + seed, 3.0)), 0, 1)
-    cover = cover - past ** 1.4 * 0.9
+    cover = np.where(av > wing, base + 0.16 * (1 - expose) + 0.1, cover) - past ** 1.4 * 0.75   # the bank, smooth
     flank = near & (av < wing + 1.4)
     cover = np.where(flank, cover, -9.0)
     Hb = np.where(on_back, np.maximum(zb, cover), np.where(flank, cover, -9.0))

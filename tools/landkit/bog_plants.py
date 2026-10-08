@@ -30,12 +30,17 @@ WEED = np.array([0.15, 0.19, 0.08])          # duckweed at night: olive, not law
 WIND = np.array([0.32, -0.12])
 
 
+GREY = False         # the value-only test: every stroke one grey
+
+
 def _put(img, zb, dep, ix, iy, d, col, tol=0.3):
     GH, GW = img.shape[:2]
     if not (0 <= iy < GH and 0 <= ix < GW):
         return
     if d < dep[iy, ix] - tol or d < zb[iy, ix] - 0.05:
         return
+    if GREY:
+        col = np.full(3, float(np.mean(col)) * 1.15)
     img[iy, ix] = np.clip(col, 0, 1)
     zb[iy, ix] = max(zb[iy, ix], d)
 

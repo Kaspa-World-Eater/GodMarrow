@@ -369,3 +369,28 @@ MASTER_RULES is unchanged. The eye under the water is no longer a clean ellipse:
 ## Rules check, 2026-10-08: the skull's orbits
 
 MASTER_RULES is unchanged. Deep, still water in the skull's orbits now takes no drift (`W["no_weed"]`): no duckweed and no sphagnum rafts. The orbits read as two dark pools holding the rims' reflection, eyes full of water. **Skull: B+.**
+
+## DEREK'S GRADES from the review page (2026-10-08, given against version 6-7)
+
+| Piece | Grade |
+|---|---|
+| walk | A- |
+| nature | A- |
+| ruins | A- |
+| socket | A- |
+| hut | B+ |
+| maze | B+ |
+| **skull** | **C+** |
+| **value-only test** | **D** |
+
+No notes. **Worst first: the value test (the form itself), then the skull.**
+
+## Derek's D on the value test: fixed (2026-10-08)
+
+- **The cause:** the overgrowth was a noise of bubbles (a soft hump plus fbm lumps plus cushions) that ignored the bone beneath; in grey it read as lumpy snow, the vertebrae lost under it.
+- **The overgrowth now drapes the bone.** It is the bone's own form smoothed a little (about 0.14 yd), plus a blanket thickest in the joints and lows and thin on the ridges, so the vertebrae's rhythm reads through the cover and the bone breaks through only where it stands highest. Below the wings, the bank is smooth.
+- **The test is now honest:**
+  - every ramp goes to one grey (`_r` under `VALUE_ONLY`), in the scene's own range;
+  - every plant stroke is grey (`bog_plants.GREY`);
+  - a last layer greys whatever is left (the weed, the pads, the bone tool's ramp, the wisps).
+- **Result:** in one grey the Back reads as a solid chain of vertebrae with its ribs from end to end, and the trunks, the arch and the walls hold their form. In colour, the spine reads as a chain of moss-backed vertebrae with mud in the joints. **Value test: B+.**
