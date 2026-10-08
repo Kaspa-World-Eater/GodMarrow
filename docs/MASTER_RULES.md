@@ -229,6 +229,18 @@ are lit by the scene and light it.
 
 ## 6. Effects
 
+- **Weather happens IN the world, not ON it** (Derek, 2026-10-07). Weather is never a layer over the picture.
+  Every drop, flake or gust falls somewhere and does something there, by material:
+  - **Rain:** wets what it falls on. Surfaces darken and catch the lights in broken wet dabs. Water runs down trunks
+    along their channels (stemflow), drips from lips and ledges, rings on still liquid, and splashes on ground,
+    stone and bone.
+  - **Canopy shelters:** fine rain in the open, sparse heavy drips under the trees; hollows, niches and roofs stay
+    dry.
+  - **Light:** rain is seen only where light catches it.
+  - **Wind:** moves what it touches (grass, leaves, flames, mist) and slants what falls.
+  - **Snow:** settles on the tops of things.
+  - **Fog:** lies in the lows.
+
 - One method under them all: a value field (warped noise) snapped to a short ramp with the ordered dither, in whole
   world pixels, lit by the scene and lighting it. The liquid fire and the heat shimmer are the bar for detail.
 - Restrained and purposeful, in the manner of Diablo II Resurrected. No glow for its own sake, nothing pasted over the

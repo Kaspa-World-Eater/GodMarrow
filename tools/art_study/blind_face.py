@@ -133,15 +133,17 @@ def gentle_gust(T):
     return 1.0 + 0.45 * np.exp(-(d / 0.14) ** 2)
 
 
+def _openness(W):
+    return lambda x, y: float(np.clip((ws.look(W, W["light"], np.array(x), np.array(y)) - 0.3) / 0.35, 0, 1))
+
+
 def draw_rain(img, w, W, px, py, pz, L, T):
-    """a very light rain at night (landkit rain.py): seen only where the lantern, the moon's gap or the candles light it"""
+    """a very light rain at night (landkit rain.py), IN the world (Derek: "weather happens in the world, not on the
+    world"): fine in the open, drips under the giants, each drop landing as a ring on the blood or a crown elsewhere;
+    seen only where the lantern, the moon's gap or the candles light it"""
     gh = lambda x, y: float(ws.look(W, W["H"], np.array(x), np.array(y)))
     if not RAIN_STATE:
-        RAIN_STATE["st"] = raingen.drops(91, C, n=520, span=10.0, top=7.0)
-        rr = np.random.default_rng(92)
-        cells = np.argwhere(W["fen_water"])
-        pick = cells[rr.choice(len(cells), size=min(48, len(cells)), replace=False)] if len(cells) else []
-        RAIN_STATE["rings"] = [(W["X"][i, j], W["Y"][i, j], W["H"][i, j], rr.uniform(0, 1)) for (i, j) in pick]
+        RAIN_STATE["st"] = raingen.drops(91, C, n=620, span=10.0, top=7.0, openness=_openness(W))
     hero = np.array(ws.HERO, float)
     lamp = np.array([hero[0] + 0.25, hero[1] - 0.25, gh(*hero) + 0.7])
 
@@ -153,10 +155,24 @@ def draw_rain(img, w, W, px, py, pz, L, T):
         lv += np.clip(can - 0.45, 0, 1) * 0.6                                         # the moon, where the canopy opens
         return min(lv, 1.0)
 
+    on_pool = lambda x, y: bool(ws.look(W, W["fen_water"], np.array(x), np.array(y)) > 0)
+    return raingen.draw(img, ws.to_px, px + py, RAIN_STATE["st"], T, light, wind=(0.3, -0.3), ground=gh, on_pool=on_pool)
+
+
+def wet_world(img, w, W, px, py, pz, L, T):
+    """the rain's work on the world: wet ground and stump darker, catching the lights in dabs; stemflow down the
+    trunks (the face and the eyes too); the hollows, drawn after, stay dry"""
     tg = L["tg"]
-    on_pool = lambda sx, sy: bool(ws.look(W, W["fen_water"], np.array(px[sy, sx]), np.array(py[sy, sx])) > 0) and tg[sy, sx] == 0
-    return raingen.draw(img, ws.to_px, px + py, RAIN_STATE["st"], T, light, wind=(0.3, -0.3), ground=gh, on_pool=on_pool,
-                        rings=RAIN_STATE["rings"])
+    ground_m = (tg == 0) | ((tg >= 670) & (tg < 680)) | (tg == 645)
+    bark_m = (tg >= 600) & (tg < 600 + len(VT))
+    cx = np.array([v[0] for v in VT])
+    cy = np.array([v[1] for v in VT])
+    rr_ = np.array([v[2] for v in VT])
+
+    def trunk_c(X, Y):
+        k = np.clip(tg - 600, 0, len(VT) - 1)
+        return np.arctan2(Y - cy[k], X - cx[k]), rr_[k]
+    return raingen.wet(img, L, px, py, pz, T, ground_m, bark_m, trunk_c)
 
 
 def draw_wisps(img, w, W, px, py, pz, L, T):
@@ -415,6 +431,7 @@ ws.LIVING.append(grim)
 ws.LIVING.append(draw_wisps)
 if RAIN:
     ws.gust = gentle_gust
+    ws.LIVING.insert(ws.LIVING.index(draw_hollows), wet_world)
     ws.LIVING.append(draw_rain)
 ws.BUILD_HOOKS[0:0] = [fen_floor, stamp_vein_trees, stamp_stump, place_eyes, place_hollows]   # in this order: floor, trees, stump, then what grows on the trees
 ws.GROUND = fen_paint

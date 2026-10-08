@@ -403,3 +403,14 @@ instead of the black water, let's make it dark blood with the occasional wisp of
   - Run: `python blind_face.py OUT.webp rain`.
 - **Graded (still):** C. The streaks show faintly in the lantern's pool and the gap, so the rain reads very light,
   as asked. Brightened a little for motion.
+- **Derek: "weather happens in the world, not on the world."** Now MASTER_RULES 6, and remembered.
+  The rain rebuilt:
+  - **canopy shelter:** the open gap gets the fine rain; under the giants only sparse, heavier drips;
+  - **every drop lands somewhere and acts there:** a ring on the blood, a crown of beads on ground, stump or bone
+    (only where lit), hidden when it lands behind something;
+  - **`rain.wet`:** the rained-on world a little darker, flat wet ground and tops catching the lantern warm and the
+    moon cool in broken dabs, stemflow films down the trunks' channels with beads trickling down where lit (the face
+    and the eyes wet too);
+  - **dry inside:** the hollows (mouth, niche) are drawn after the wetting, so they stay dry.
+  **Graded (still):** C+. Water runs down the Blind Face's brow, the drops show in the lantern's pool and the gap,
+  the ground is darker with wet.
