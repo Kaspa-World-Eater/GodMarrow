@@ -58,7 +58,9 @@ GROUND_LIFE_OK = None    # f(x, y) -> bool: where grass may grow (a ruin keeps i
 RIM_EXTRA = ()          # more tags to rim (a scene's own objects above 400, e.g. its trunks)
 RIM = (1.35, (0.025, 0.025, 0.03))   # the moonlit rim on objects: strength and cool lift
 FOREST_LIFE = True       # the wood's own living layers (the leaf fall, falling and skittering leaves, the wisp-fire)
-LITTER_GEN = True        # the floor from landkit/litter_ground.py (world position, quiet), not the retired tiles
+LITTER_GEN = True        # the floor from landkit/litter_ground.py (world position, every leaf its own), not the retired tiles
+LEAF_FALL = True         # the fresh fall of drawn leaves over it: its own switch, so a scene that turns FOREST_LIFE off
+                         # keeps its leaves (Derek 2026-10-08: "you lost the life ... lack of litter")
 AUTO_WARP = True         # the engine's own trees warped and channelled (chapter 6): no tube (Derek: "no tree is a perfect tube")
 TRUNK_WARP = None        # an object with to_canon(x, y, z) and normal_back(n, px, py, pz, tag): trunks that taper, swell, wander and twist
 NOW = 0.0                # the frame being painted (set by paint)
@@ -216,6 +218,10 @@ def build(w):
     litt = litt - np.clip(rel, 0, None) * 1.5 + np.clip(-rel, 0, None) * 1.2
     bare = (rel > 0.12) & (tag == 0) & (litt < 0.45)
     mat[bare & (mat != 1)] = 2
+    if LITTER_GEN:                                                     # every leaf and twig a little plate of real height
+        import litter_ground
+        open_ = (tag == 0) & ~water
+        H = np.where(open_, H + litter_ground.relief(X, Y, litt), H)
     HT = np.where(sway_m, H, -50.0)                                        # the standing trees alone
     Hrest = np.where(sway_m, H_ground, H)                                   # everything else
     return dict(X=X, Y=Y, H=H, mat=mat, tag=tag, obj=obj, water=water, light=light, wet=wet, x0=x0, y0=y0, n=n, litt=litt, RM=RM,
@@ -418,7 +424,8 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
         img = litter_ground.paint(img, gl, v, px, py, litt, mat, L["lamp"])
     mossm = gl & (mat == 1)
     cush = (vn(px * 9, py * 9) - 0.5) * 0.12
-    img[mossm] = R_MOSS[np.clip(((v * 0.62 + cush) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 2)][mossm]   # deep olive at night, as on the rocks
+    if not LITTER_GEN:                                                 # the generator paints its own green moss
+        img[mossm] = R_MOSS[np.clip(((v * 0.62 + cush) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 2)][mossm]
     lowr = mossm & ~np.roll(mossm, -1, axis=0) & ~np.roll(mossm, -1, axis=1)
     img[lowr] *= 0.8
     upl = mossm & ~np.roll(mossm, 1, axis=0) & ~np.roll(mossm, 1, axis=1)
@@ -603,7 +610,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     litt_px = look(W, W["litt"], px, py)
     tgm0 = look(W, W["tag"], px, py)
     rf_ = np.random.default_rng(101)                                      # its own sequence, the same every frame
-    NC = int(GW * GH / 18) if FOREST_LIFE else 0                          # half as many as before: the ground stays quiet
+    NC = int(GW * GH / 9) if (FOREST_LIFE or LEAF_FALL) else 0            # the full fall (the halving made it barren)
     c_sx, c_sy = rf_.integers(2, GW - 8, NC), rf_.integers(2, GH - 6, NC)
     c_r, c_st, c_fam = rf_.random(NC), rf_.integers(0, len(LEAVES) - 1, NC), rf_.random(NC)
     for q in range(NC):
