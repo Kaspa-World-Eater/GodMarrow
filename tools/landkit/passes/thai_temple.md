@@ -78,3 +78,34 @@ Derek, 2026-10-08:
 Both are seen with the Ossuarch beside them, on a review page, for Derek's grade. Then the winner gets its ten graded passes.
 
 Waiting for Derek's go on this brief.
+
+## Go (Derek, 2026-10-08: "do it"). The 3D road built, passes 1 to 4
+
+**The pipeline** (`tools/landkit3d/`):
+- `blend_scene.py` builds a scene in Blender from code, in the game's own coordinates.
+  - It flips the game's mirrored axes once, and fits the camera's height ratio (0.952) to the game's 21 px a yard.
+  - An orthographic camera at the game's exact pixel scale renders only data: normal, world position, material, ambient occlusion, and the moon as lambert with shadow.
+- `parts3d.py` holds the reusable parts: boxes, slabs, bent tubes, spheres, and displaced relief.
+- `temple3d.py` is the temple.
+- `paint3d.py` paints the data with our ramps and dither, by material and by cause, with lit edges where the form turns and a world-fixed tooth.
+- The whole temple renders in 8 seconds.
+
+**The passes** (the worst failure first, each time):
+1. **The massing.** The tiers, eaves, gable trim, stair, sema stones, guardian, root, spirit house, siege debris and tile heap all read. The paint failed: camouflage blotches, too bright, too green, the hero placed inside the hall.
+2. **Stucco loss by cause:** rising damp low, the drip line high, small and ragged; overcast light, darker. The Ossuarch now stands on the platform.
+3. **The roof as stepped tile courses**, real geometry lapped course over course, so the light catches every course. Moss on the steep roof only in patches.
+4. **Sword ferns as 3D clumps** along the drip line; the old repair tiles in patches; lit and dark lips where the form turns; the tooth. **Grade: B-.**
+
+**Version A** is the same scene reduced to a height field (`--heightfield`: rays straight down, the top surface every 0.05 yd), painted the same way. It is a solid block:
+- the eaves fill to the ground;
+- the walls and columns vanish;
+- the gable becomes a wall;
+- the ferns become lumps.
+
+**Grade: D.** That is the honest limit of one height per spot. The real engine's special cases would do better, but every overhang would need its own.
+
+**On the review page** (https://claude.ai/artifact/T28WGqopEAxcLm6v68hBer), for Derek's grade on the method. **Still failing on B:**
+- the blotchy floor;
+- the black gable;
+- no giant trees, drizzle or wet sheen yet;
+- the guardian and the candle still need their own passes.
