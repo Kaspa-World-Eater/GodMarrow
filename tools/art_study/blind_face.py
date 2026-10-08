@@ -90,6 +90,8 @@ def plan(w):
 def fen_floor(W, w):
     """the floor gone a little fen (Derek): peat, tussocks and hummocks as real height, still water levelled in the
     hollows (landkit fen_ground.py); everything after stands on it"""
+    global STONES
+    STONES = _spiral_stones()                                                          # laid long ago in a spiral round the glade
     keep = W["tag"] == 0
     dH, water, level, tus = fen_ground.height(W["X"], W["Y"], seed=9, keep=keep)
     water &= np.hypot(W["X"] - ws.HERO[0], W["Y"] - ws.HERO[1]) > 1.2               # the pilgrim stands on firm ground
@@ -193,7 +195,35 @@ def draw_wisps(img, w, W, px, py, pz, L, T):
     return wisp_fire.draw(img, ws.to_px, px + py, WISPS, T, pool=pool)
 
 
-STONES = ((-0.5, 1.0, 1.1, 0.4, 501), (2.9, -3.7, 0.8, -0.7, 502), (-2.4, 2.6, 1.0, 1.2, 503))   # (along, across, size, yaw, seed)
+def _spiral_stones(seed=505):
+    """the small stones, laid long ago in a spiral round the glade (Derek: "the vague impression is of them once being
+    arranged in a spiral, long ago"): along an opening spiral, a yard or so apart; since then pushed, tipped, sunk,
+    some gone; so the spiral is only felt. Never on a trunk, the stump, the pilgrim or a beast's bones"""
+    rr = np.random.default_rng(seed)
+    out = []
+    avoid = [(STUMP, 1.4), (np.array(ws.HERO), 1.0)] + [(C + AX * a_ + PERP * p_, 1.1) for (a_, p_, ag, sz) in BONES]
+    th = 0.6
+    k = 0
+    while th < 4.4 * np.pi / 2 * 1.7:
+        r_ = 0.9 + 0.62 * th
+        th += 0.75 / max(r_, 0.9)                                                    # three quarters of a yard between them
+        if rr.random() < 0.16:
+            continue                                                                  # gone
+        q = C + AX * (np.cos(th) * r_) * 0.85 + PERP * (np.sin(th) * r_)
+        q = q + rr.normal(0, 0.12, 2)                                                 # pushed
+        if any(np.hypot(*(q - np.asarray(o)[:2])) < d_ for o, d_ in avoid):
+            continue
+        if any(np.hypot(q[0] - x, q[1] - y) < r * 2.4 for (x, y, r, h_, s_) in VT):
+            continue
+        a_ = float((q - C) @ AX)
+        p_ = float((q - C) @ PERP)
+        sz = rr.uniform(0.3, 0.46) if k % 5 else rr.uniform(0.82, 0.92)              # small; every fifth a flat one for the caps
+        out.append((a_, p_, sz, th + rr.normal(0, 0.5), 600 + k))
+        k += 1
+    return tuple(out)
+
+
+STONES = ()
 STONE_INFO = []
 
 
@@ -208,7 +238,7 @@ def stamp_stones(W, w):
         for pt in (1, 2, 3):
             W["tag"] = np.where(part == pt, 690 + k * 3 + pt - 1, W["tag"])
             W["obj"][690 + k * 3 + pt - 1] = dict(kind="flatstone", part=pt, info=info, c=info["c"], r=sz * 0.5)
-        info["caps"] = flat_stone.caps(info, seed=sd + 7)
+        info["caps"] = flat_stone.caps(info, seed=sd + 7) if sz > 0.8 else []        # the pickers cap the big ones
         STONE_INFO.append(info)
 
 
@@ -345,7 +375,7 @@ def place_hollows(W, w):
     HOLLOWS.clear()
     view = np.array([1.0, 1.0]) / np.sqrt(2)
     for (ti, kind, zh, Wd, Hd, Dd, cand) in (
-            (MOUTH_TREE, "mouth", 1.9, 0.6, 0.27, 0.7, ()),
+            (MOUTH_TREE, "niche", 1.55, 0.2, 0.3, 0.42, ((-0.09, 0.1, 0.024), (0.02, 0.17, 0.028), (0.1, 0.07, 0.022))),   # was the mouth: now a small candle alcove (Derek)
             (NICHE_TREE, "niche", 1.25, 0.3, 0.42, 0.55, ((-0.15, 0.13, 0.028), (-0.05, 0.22, 0.034), (0.05, 0.1, 0.026),
                                                          (0.15, 0.17, 0.03), (0.0, 0.06, 0.03))),
             (ALTAR_TREE, "altar", 1.25, 0.66, 1.15, 1.25, ALTAR_CANDLES)):   # hero size (Derek): 2.3 yd tall, 1.3 wide, the sill a step up
@@ -520,7 +550,7 @@ def _tendril_paths(T, W):
             q = a0 + out * j * 0.08
             ground.append((q[0], q[1], float(ws.look(W, W["H"], np.array(q[0]), np.array(q[1]))) + 0.02))
         husk = rr.random() < 0.45
-        paths.append((np.array(ground + pts), 0.035 if ti == ALTAR_TREE else 0.025, 800 + ti * 7 + k, husk))
+        paths.append((np.array(ground + pts), (0.035 if ti == ALTAR_TREE else 0.025) * 1.35, 800 + ti * 7 + k, husk))   # Derek: 35% bigger
     return paths
 
 
@@ -683,7 +713,7 @@ ws.LIVING.append(stump_blood)
 ws.LIVING.append(tree_eyes)
 ws.LIVING.append(draw_hollows)
 ws.LIVING.append(wax_pour)
-ws.LIVING.append(draw_lids)
+# ws.LIVING.append(draw_lids)                                                      # Derek: "hate the eyes" (the ring of runes instead; kept)
 ws.LIVING.append(blood_tendrils)
 ws.LIVING.append(grim)
 ws.LIVING.append(draw_stone_caps)

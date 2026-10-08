@@ -35,6 +35,30 @@ def _frame(u):
     return u3, e1
 
 
+def rune_mask(xe, xz, rho, W, H):
+    """a band of runes round the arch (Derek: "carve a ring of dark runes into the flesh of the tree around the
+    hollow"): a hand's width outside the lips, following the arch exactly (the jambs, then the two lancet arcs meeting
+    over the point), down both sides to the sill. Each glyph is strokes cut in the old way, standing across the band:
+    a stem, a branch, a cross-stroke, a chevron; chosen glyph by glyph, no two neighbours alike"""
+    ax_ = np.abs(xe)
+    dist = np.where(xz < 0, ax_ - W, np.hypot(ax_ + 1.5 * W, xz) - 2.5 * W)       # how far outside the opening
+    n = (dist - 0.32) / 0.12                                                       # across the band: -1 .. 1 (5 px tall: a rune must be pixels)
+    t = np.where(xz < 0, xz, np.arctan2(xz, ax_ + 1.5 * W) * 2.5 * W)              # along the band, yards, up each side
+    cw = 0.22                                                                      # a glyph, about 4 px wide
+    cell = np.floor(t / cw) + (xe < 0) * 1000
+    a = (t / cw - np.floor(t / cw)) - 0.5                                          # along the glyph: -0.5 .. 0.5
+    h = (np.sin(cell * 12.9898) * 43758.5453) % 1.0
+    h2 = (np.sin(cell * 78.233 + 1.3) * 12543.211) % 1.0
+    lw = 0.2                                                                       # a stroke, a whole pixel
+    stem = np.abs(a - (h - 0.5) * 0.25) < lw
+    br = np.where(h2 < 0.25, np.abs(a - 0.5 * (n - 0.1)) < lw,
+         np.where(h2 < 0.5, (np.abs(a + 0.5 * (n - 0.2)) < lw) & (n > -0.3),
+         np.where(h2 < 0.75, np.abs(n - (h - 0.5) * 0.9) < lw * 2.0,
+                  (np.abs(np.abs(a) - 0.45 * np.abs(n)) < lw) & (n > 0))))
+    gap = np.abs(a) > 0.4                                                          # space between glyphs
+    return (np.abs(n) < 0.95) & (stem | br) & ~gap & (xz > -H * 0.66)
+
+
 def _sdf(Q, W, H, D, kind, candles):
     """Q (..., 3) in the hollow's frame: (out of the bark, across, up). Returns (distance, part):
     part 1 lip, 2 cavity wall, 3 floor, 4 candle, 0 the bark plane"""
@@ -59,8 +83,12 @@ def _sdf(Q, W, H, D, kind, candles):
     if kind == "altar":                                                            # the cavity follows the arch straight back
         cav = np.maximum(cav, (rho - 1.0) * min(W, H) * 0.9)
     outer = np.minimum(xu, ring)
+    rune = np.zeros(xu.shape, bool)
+    if kind == "altar":
+        rune = rune_mask(xe, xz, rho, W, H)                                        # a ring of runes cut round the arch
+        outer = np.where(rune & (ring >= xu), np.minimum(xu + 0.05, ring), outer)        # the cut: the bark taken away 5 cm deep
     solid = np.maximum(outer, -cav)
-    part = np.where(-cav > outer, 2, np.where(ring < xu, 1, 0))
+    part = np.where(-cav > outer, 2, np.where(ring < xu, 1, np.where(rune & (xu < 0.002), 7, 0)))
     if kind in ("niche", "altar"):
         fl = np.maximum(xz + H * 0.62, xu)                                         # a flat floor inside, the sill
         part = np.where(fl < solid, 3, part)
@@ -242,6 +270,10 @@ def draw(img, zb, dep_scene, to_px, C, u, W, H, D, T, lights, moon, kind="mouth"
     if kind in ("niche", "altar"):                                                  # the wax run over the sill
         run = (part == 1) & (Q[..., 2] < -H * 0.6) & (np.abs(np.sin(Q[..., 1] * 31 + seed)) > (0.5 if kind == "altar" else 0.82))
         col = np.where(run[..., None], WR[np.clip((waxv * 0.85 * len(WR)).astype(int), 0, len(WR) - 1)], col)
+    if kind == "altar":                                                             # the runes: cut dark into the flesh of the tree
+        cutv = np.clip(lum * 0.5 + 0.05, 0, 0.99)
+        flesh = np.array([0.13, 0.025, 0.03]) * (0.4 + cutv[..., None] * 1.2)            # dark: the raw flesh of the vein in the cut
+        col = np.where((part == 7)[..., None], flesh, col)
     sub = img[ys, xs]
     sub[draw_m] = np.clip(col[draw_m], 0, 1)
     img[ys, xs] = sub

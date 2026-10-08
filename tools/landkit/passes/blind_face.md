@@ -501,3 +501,24 @@ A face grown in a tree is the opposite. Study first (chapter 7).
 - **Graded** (pass 7 of the altar): C+. A dark hero-sized lancet arch at the glade's back, crowded with red candles
   round the rune slab, closed wooden eyes above weeping wax, wax curtains into the blood, tendrils creeping up either
   side.
+
+## Runes for the eyes, an alcove for the mouth, the spiral of stones (Derek, 2026-10-07)
+- "hate the eyes, instead carve a ring of dark runes into the flesh of the tree around the hollow": the eyes are off
+  (`draw_lids` kept). `hollow.rune_mask`:
+  - a band a hand's width outside the lips, following the arch exactly (jambs, then the two lancet arcs over the
+    point), down to the sill;
+  - glyphs of strokes (stem, branch, cross-stroke, chevron) standing across the band, no two neighbours alike;
+  - cut 5 cm into the bark, the raw dark flesh showing in the cuts.
+  - **Failed first:** the carving was written backwards (the bark left solid in the cut); then the band ran a yard out
+    round the trunk's curve; then the strokes were a third of a pixel. A rune at this scale must be a glyph of about
+    4 x 5 px with whole-pixel strokes.
+- "change that other tree with the weird mouth hole into a small candle alcove": the mouth is now a niche with three
+  candles.
+- "increase the tendrils in size by 35%": done.
+- "bugs are fine" (Derek, on the banned animal words): insects are allowed in the world.
+- "arrange the small stones so the vague impression is of them once being arranged in a spiral, long ago":
+  - small sunk stones along an opening spiral round the glade, three quarters of a yard apart;
+  - pushed, tipped, some gone;
+  - every fifth a larger flat one that the pickers still cap;
+  - never on a trunk, the stump, the pilgrim or the bones.
+**Graded:** C+. The runes ring the arch, the spiral is felt rather than seen, the alcove glows.

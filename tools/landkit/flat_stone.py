@@ -52,7 +52,7 @@ def stamp(X, Y, H, c, size=1.0, yaw=0.0, seed=1):
         s = u * nx / 1.0 + v * ny - dist
         inside &= s < 0
         edge = np.minimum(edge, -s)
-    th = rr.uniform(0.12, 0.2) * size                                    # how far it stands out of the peat
+    th = rr.uniform(0.07, 0.14) * size                                   # how far it stands out of the peat (old: sunk deep)
     tilt = rr.uniform(-0.12, 0.12, 2)                                    # 3 to 7 degrees, its own way
     top = g0 + th + tilt[0] * u + tilt[1] * v
     top = top - np.clip(1 - edge / 0.045, 0, 1) * 0.03                   # the bevel at the arris
