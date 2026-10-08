@@ -391,62 +391,109 @@ def socket_eye(img, w, W, px, py, pz, L, T=0.0):
     return img
 
 
-def serpent_skull(cx, cy, ang, length=9.0, width=5.6, height=0.55, seed=11):
-    """THE TOP OF THE SERPENT'S SKULL breaking the marsh: a long, flattish braincase, the Back running into its rear;
-    a crest along its middle; the two great orbits forward at its sides, full of black water, brow ridges over them;
-    the snout tapering to its nostril pits; sutures zigzagging across the plates; the jaws long sunk in the peat"""
+def serpent_skull(cx, cy, ang, length=7.2, width=5.6, height=0.55, seed=11):
+    """THE SERPENT'S SKULL breaking the marsh (Derek graded the first C+: it read as a mound). A serpent's skull from
+    above is not a dome: it is a long NARROW BRAINCASE with a ridge down its middle; two great ORBITS at its sides,
+    walled by the brow bones (prefrontal, postorbital); a short rounded SNOUT with the nostril pits; and, apart from
+    it, the JAWS: long thin rods (maxillae with their rows of curved teeth, mandibles below) hinged at the back on the
+    QUADRATES, which stand back from the braincase's rear corners. In a dead serpent the jaws fall open and splay. Here
+    the braincase, brows and snout are height in the world; the jaws and quadrates are true bone rods (landkit
+    bone.py), drawn and mirrored by serpent_jaws()."""
     ca, sa = np.cos(ang), np.sin(ang)
 
     def st(X, Y, H, W):
         part = np.zeros(X.shape, int)
         u = ((X - cx) * ca + (Y - cy) * sa) / (length / 2)                   # -1 rear .. +1 snout
         v = (-(X - cx) * sa + (Y - cy) * ca) / (width / 2)
-        # its outline from above: widest behind the eyes (the jaws' hinges), tapering to a rounded snout (a spade)
-        w = np.interp(u, [-1.0, -0.75, -0.35, 0.2, 0.6, 0.9, 1.0], [0.55, 0.95, 1.0, 0.78, 0.55, 0.36, 0.0])
-        q = v / np.maximum(w, 0.05)
-        inside = (np.abs(q) < 1) & (u > -1) & (u < 1)
-        z = LEVEL - 0.25 + height * np.sqrt(np.clip(1 - q ** 2, 0, 1)) * np.clip(1.15 - np.abs(u) ** 2.5, 0, 1)
-        z = z + np.exp(-(q / 0.1) ** 2) * np.clip(0.5 - u, 0, 1.2) * 0.22       # the crest along the braincase
-        # the great eye hollows: forward, at the sides, inside the outline; deep, holding water; a brow ridge over each
+        # the braincase: long and narrow, widest a little behind the orbits, its ridge down the middle
+        bw = np.interp(u, [-1.0, -0.8, -0.4, -0.05, 0.25, 0.55, 0.85, 1.0], [0.0, 0.34, 0.44, 0.36, 0.4, 0.33, 0.2, 0.0])
+        q = v / np.maximum(bw, 0.02)
+        inside = (np.abs(q) < 1) & (bw > 0.01)
+        z = LEVEL - 0.15 + height * np.sqrt(np.clip(1 - q ** 2, 0, 1)) * (0.7 + 0.3 * np.clip(-u, 0, 1))
+        z = z + np.exp(-(q / 0.12) ** 2) * np.clip(-u + 0.2, 0, 1) * 0.18      # the parietal ridge
+        # the brow bones: a bar from the braincase out over each orbit, the orbit open beneath it, full of water
+        orb = np.zeros(X.shape, bool)
+        brow = np.zeros(X.shape)
         for sg in (-1, 1):
-            d = np.hypot((u - 0.25) / 0.28, (q - sg * 0.52) / 0.4)          # big orbits: both seen over the low dome
-            z = np.where(d < 1, np.minimum(z, LEVEL - 0.25 - (1 - d) * 0.45), z)
-            W["no_weed"] = W.get("no_weed", np.zeros(X.shape, bool)) | (d < 1.05)   # deep, still: no drift lies in it
-            brow = np.clip(1 - np.abs(d - 1.12) / 0.16, 0, 1) * 0.42         # a raised rim right round each orbit
-            z = z + brow * (d >= 1)
-            nd_ = np.hypot((u - 0.86) / 0.05, (q - sg * 0.35) / 0.16)       # the nostril pits at the snout
-            z = np.where(nd_ < 1, z - 0.3, z)
-        z = z + np.clip(u - 0.7, 0, None) * 0.5                               # the snout lifts a little at its tip
-        sut = ((np.abs(np.sin(u * 7 + np.sin(q * 9) * 0.5)) < 0.05) | (np.abs(q - np.sin(u * 14) * 0.04) < 0.03)) & inside
-        z = z - sut * 0.04 + (vn(X * 18 + seed, Y * 18) - 0.5) * 0.015
-        m = inside & (z > H) & (z > LEVEL)                               # below the water line the hollows hold water
-        H2 = np.where(inside & (z <= LEVEL), np.minimum(H, LEVEL - 0.3), np.where(m, z, H))
+            d = np.hypot((u + 0.02) / 0.25, (v - sg * 0.64) / 0.32)            # great orbits, mid-length: the skull's read
+            orb |= d < 1
+            ring = np.clip(1 - np.abs(d - 1.05) / 0.2, 0, 1) * (np.abs(v) < 0.98)
+            brow = np.maximum(brow, ring * (0.7 + 0.3 * (u > 0.12)))
+            nd_ = np.hypot((u - 0.88) / 0.05, (v - sg * 0.09) / 0.05)          # the nostril pits at the snout
+            z = np.where(nd_ < 1, z - 0.2, z)
+        zb = LEVEL - 0.1 + brow * 0.75
+        z = np.where(brow > 0.05, np.maximum(np.where(inside, z, -9), zb), z)
+        inside = inside | (brow > 0.05)
+        sut = ((np.abs(np.sin(u * 7 + np.sin(v * 9) * 0.5)) < 0.05) | (np.abs(v) < 0.015)) & inside
+        z = z - sut * 0.03
+        m = inside & ~orb & (z > H) & (z > LEVEL)
+        H2 = np.where(orb, np.minimum(H, LEVEL - 0.35), np.where(m, z, H))
         part[m] = 52
         part[m & sut] = 53
-        # the teeth: a row along the jaw's edge at the water line, small, curved back, many (a serpent's are)
-        edge_d = (np.abs(q) - 1.0) * np.maximum(w, 0.05) * width / 2          # yd outside the outline
-        tid = np.floor((u + 1) * length / 2 / 0.28)
-        tph = ((u + 1) * length / 2 / 0.28) - tid
-        tooth = (edge_d > -0.05) & (edge_d < 0.22) & (np.abs(tph - 0.5) < 0.3 * (1 - edge_d / 0.22)) & (u > -0.35) & (u < 0.95)
-        tz = LEVEL + 0.08 + 0.18 * (1 - edge_d / 0.22) * ((np.sin(tid * 12.9) * 4375.5) % 1.0 > 0.25)
-        mt = tooth & (tz > H2)
-        H2 = np.where(mt, tz, H2)
-        part[mt] = 52
-        # the quadrates: the jaws' hinge bones standing back from the rear corners like horns
-        for sg in (-1, 1):
-            qu, qv = -0.82, sg * 0.88
-            qx = cx + (qu * length / 2) * ca - (qv * width / 2) * sa
-            qy = cy + (qu * length / 2) * sa + (qv * width / 2) * ca
-            dirx, diry = -ca * 0.8 - sa * sg * 0.6, -sa * 0.8 + ca * sg * 0.6
-            a_ = (X - qx) * dirx + (Y - qy) * diry
-            b_ = -(X - qx) * diry + (Y - qy) * dirx
-            rod = (a_ > 0) & (a_ < 1.7) & (np.abs(b_) < 0.2 * (1 - a_ / 2.4))
-            rz = LEVEL + 0.55 - a_ * 0.22 + np.sqrt(np.clip(1 - (b_ / 0.2) ** 2, 0, 1)) * 0.12
-            mr = rod & (rz > H2)
-            H2 = np.where(mr, rz, H2)
-            part[mr] = 52
+        W["no_weed"] = W.get("no_weed", np.zeros(X.shape, bool)) | orb   # deep, still: no drift lies in the orbits
+        W["skull"] = dict(cx=cx, cy=cy, ang=ang, length=length, width=width, seed=seed)
         return H2, part
     return st
+
+
+def serpent_jaws(img, w, W, px, py, pz, L, T=0.0):
+    """the skull's jaws and quadrates as true bone rods: the quadrates standing back from the braincase's rear corners,
+    the jaws hinged on them, fallen open and splayed, half in the water, a row of small curved teeth along each; each
+    shown again in the black mirror"""
+    if "skull" not in W:
+        return img
+    import bone as bonegen
+    k = W["skull"]
+    ca, sa = np.cos(k["ang"]), np.sin(k["ang"])
+    hl, hw = k["length"] / 2, k["width"] / 2
+    to_w = lambda u, v, z: (k["cx"] + u * hl * ca - v * hw * sa, k["cy"] + u * hl * sa + v * hw * ca, z)
+    rr = np.random.default_rng(k["seed"])
+    shapes = []
+    for sg in (-1, 1):
+        q0 = to_w(-0.78, sg * 0.24, LEVEL + 0.35)                         # the quadrate: from the braincase's corner
+        q1 = to_w(-1.0, sg * 0.72, LEVEL + 0.2)                           # back and out to the jaw's hinge
+        shapes.append(bonegen.rib(q0, q1, 0.12, 0.09, 0.12, seed=k["seed"] + 3 + sg))
+        splay = rr.uniform(0.15, 0.3)
+        j1 = to_w(0.95, sg * (0.82 + splay), LEVEL + 0.1)                  # the jaw: hinge to tip, fallen open, splayed
+        shapes.append(bonegen.rib(q1, j1, 0.35, 0.15, 0.19, seed=k["seed"] + 7 + sg))
+    GH, GW = img.shape[:2]
+    dep = px + py
+    hero = np.array(ws.HERO, float)
+    g = float(ws.look(W, W["H"], np.array(hero[0]), np.array(hero[1])))
+    lts = [((hero[0] + 0.25, hero[1] - 0.25, g + 0.7), (0.95, 0.6, 0.32), 2.6 * 1.4)]
+    keep = (bonegen.R_BONE, bonegen.SINEW, bonegen.SPONGE)
+    bonegen.R_BONE, bonegen.SINEW, bonegen.SPONGE = bs.R_CROWN, np.array([0.1, 0.09, 0.07]), np.array([0.08, 0.07, 0.06])
+    water = ws.look(W, W["bog_water"], px, py) & (L["tg"] == 0)
+    mir = []
+    for o in shapes:
+        m_ = dict(o)
+        m_["pts"] = o["pts"].copy()
+        m_["pts"][:, 2] = 2 * LEVEL - m_["pts"][:, 2]
+        mir.append(m_)
+    tmp = np.zeros_like(img)
+    hit = np.full((GH, GW), -1e9)
+    bonegen.draw(tmp, hit, np.full((GH, GW), -1e9), ws.to_px, mir, lts, ws.SUN, ambient=0.12)
+    mm = water & (hit > -1e8)
+    img[mm] = np.clip(img[mm] * 0.35 + tmp[mm] * np.array([0.42, 0.46, 0.55]), 0, 1)
+    zb = np.full((GH, GW), -1e9)
+    shapes.sort(key=lambda o: -(o["pts"][:, 0] + o["pts"][:, 1]).mean())
+    bonegen.draw(img, zb, dep, ws.to_px, shapes, lts, ws.SUN, ambient=0.32)     # the jaws catch the sky: pale rods
+    bonegen.R_BONE, bonegen.SINEW, bonegen.SPONGE = keep
+    # the teeth: small, curved back, along each jaw where it rides above the water
+    for o in shapes[-4:]:
+        pts = o["pts"]
+        if len(pts) < 10 or np.linalg.norm(pts[-1] - pts[0]) < 3.0:
+            continue
+        for t_ in np.linspace(0.25, 0.92, 9):
+            i = int(t_ * (len(pts) - 1))
+            p = pts[i]
+            if p[2] < LEVEL + 0.02:
+                continue
+            a = p + np.array([0, 0, 0.12])
+            b = a + np.array([0, 0, 0.26]) + (pts[min(i + 2, len(pts) - 1)] - pts[max(i - 2, 0)]) * -0.2
+            import bog_plants
+            bog_plants._stroke(img, zb, dep, ws.to_px, a, b, bs.R_CROWN[4], bs.R_CROWN[6], 0.8, water, LEVEL, n=4)
+    return img
 
 
 def skull_paint(col, W, px, py, pz, L, vv, gl, st):
@@ -581,7 +628,7 @@ def scene_skull():
     bs.STRUCTS[:] = [("snag", *(C + AX * 5.0 - PERP * 6.5), 0.4, 5.5, 0.3, 93)]
     bs.EXTRA_STAMPS[:] = [serpent_skull(sk[0], sk[1], ang, seed=11 + VARIANT)]
     bs.EXTRA_PAINT[:] = [skull_paint]
-    bs.EXTRA_LIVING[:] = []
+    bs.EXTRA_LIVING[:] = [serpent_jaws]
     ws.HERO = rear - np.array([np.cos(ang), np.sin(ang)]) * 1.6 + AX * 0.2   # on the Back, at the skull's rear
 
 

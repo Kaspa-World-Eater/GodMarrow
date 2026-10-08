@@ -394,3 +394,19 @@ No notes. **Worst first: the value test (the form itself), then the skull.**
   - every plant stroke is grey (`bog_plants.GREY`);
   - a last layer greys whatever is left (the weed, the pads, the bone tool's ramp, the wisps).
 - **Result:** in one grey the Back reads as a solid chain of vertebrae with its ribs from end to end, and the trunks, the arch and the walls hold their form. In colour, the spine reads as a chain of moss-backed vertebrae with mud in the joints. **Value test: B+.**
+
+## Derek's C+ on the skull: rebuilt (2026-10-08)
+
+The skull is rebuilt as a serpent's from above, not a mound:
+- a long, narrow braincase with the parietal ridge down its middle;
+- two great orbits at mid-length, each walled by a high brow ring and full of still black water;
+- a short rounded snout with nostril pits; sutures.
+- **The jaws** are true bone rods (`serpent_jaws`, landkit bone.py): the quadrates stand back from the braincase's rear corners, and the jaws hinge on them, fallen open and splayed, half in the water, each with a row of small curved teeth, all mirrored. Jaws lit by the sky (ambient 0.32) so they read as pale rods.
+
+Passes:
+1. Too narrow: read as a log with dark sticks.
+2. Wider; great orbits; jaws raised.
+3. Shorter, with the orbits at mid-length.
+4. The jaws lit.
+
+**Skull: B-.** It now reads as a skull with two orbits and splayed jaws. The Back running into its rear still lengthens it toward a log, and the jaws are thin at this distance.
