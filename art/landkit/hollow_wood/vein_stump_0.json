@@ -1,0 +1,35 @@
+{
+ "kind": "vein_stump",
+ "height": 0.9,
+ "foot": [
+  50.5,
+  12.1
+ ],
+ "size": [
+  80,
+  41
+ ],
+ "posts": [
+  [
+   0.0,
+   0.0,
+   0.919
+  ]
+ ],
+ "cover": 0.596,
+ "material": "wood_dead_wet",
+ "hp": 300,
+ "spec": {
+  "kind": "vein_stump",
+  "girth": 0.8351390936029466,
+  "fall": [
+   -0.1973298213727714,
+   0.980337157103101
+  ],
+  "seed": 1500,
+  "cut": 0.5962089198217535,
+  "height": 0.9,
+  "span": 2.6
+ },
+ "baked": "landkit/bake.py through the scene engine (wood_scene.py)"
+}

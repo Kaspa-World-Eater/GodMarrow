@@ -50,7 +50,7 @@ def _channels(theta, sd, R):
     return out * R
 
 
-def stamp(X, Y, H, trees, north, seed=1, only=None):
+def stamp(X, Y, H, trees, north, seed=1, only=None, root_reach=9.0):
     tags = np.zeros(X.shape, int)
     H = H.copy()
     north = np.asarray(north, float) / np.linalg.norm(north)
@@ -95,10 +95,10 @@ def stamp(X, Y, H, trees, north, seed=1, only=None):
                     continue
                 v = np.array([fx, fy]) - p
                 dist = np.linalg.norm(v)
-                if v @ north > 0.5 * dist and dist < best and dist < 9.0:
+                if v @ north > 0.5 * dist and dist < best and dist < root_reach:
                     best, tgt = dist, np.array([fx, fy])
             rad = R * rr.uniform(0.16, 0.24)
-            L = (best if tgt is not None else rr.uniform(3.0, 5.5))
+            L = (best if tgt is not None else rr.uniform(3.0, 5.5) * min(1.0, root_reach / 9.0))
             steps = int(L / 0.12)
             for k in range(steps):
                 f = k / max(steps - 1, 1)
@@ -123,6 +123,26 @@ def stamp(X, Y, H, trees, north, seed=1, only=None):
                 H[box] = hb
                 tags[box] = tb
     return H, tags
+
+
+def broken_top(X, Y, tx, ty, R, sd):
+    """a snapped trunk's top, in yd above the break (chapter 6: a dead stem breaks, it is not sawn): the hinge side
+    stands tall where the fibres held as it fell, splinters stand up round the rim like teeth, the heart is rotted
+    down into a hollow. Without this a broken top reads as a flat-cut pillar at the game's size"""
+    rb = np.random.default_rng(sd + 900)
+    d = np.hypot(X - tx, Y - ty) / max(R, 1e-3)
+    th = np.arctan2(Y - ty, X - tx)
+    hinge = rb.uniform(0, 2 * np.pi)
+    dh = ((th - hinge + np.pi) % (2 * np.pi)) - np.pi
+    z = np.clip(np.cos(dh), 0, 1) ** 1.5 * R * rb.uniform(1.6, 2.8) * np.clip(d, 0.3, 1)   # the hinge, torn upward
+    for k in range(int(rb.integers(4, 8))):                                # the splinters, sharp and uneven
+        a = rb.uniform(0, 2 * np.pi)
+        w = rb.uniform(0.12, 0.3)
+        da = np.abs(((th - a + np.pi) % (2 * np.pi)) - np.pi)
+        tip = np.clip(1 - da / w, 0, 1) ** 1.3 * np.clip((d - 0.45) / 0.5, 0, 1)
+        z = np.maximum(z, tip * R * rb.uniform(0.8, 2.6))
+    z = z - np.clip(1 - d / 0.55, 0, 1) * R * 0.6                           # the rotted heart
+    return z + (vn(X * 9 + sd, Y * 9) - 0.5) * R * 0.25
 
 
 class Warp:

@@ -1,0 +1,30 @@
+{
+ "kind": "vein_tree",
+ "height": 13.5999830074903,
+ "foot": [
+  32.5,
+  258.6
+ ],
+ "size": [
+  111,
+  290
+ ],
+ "posts": [
+  [
+   0.0,
+   0.0,
+   0.783
+  ]
+ ],
+ "cover": 13.6,
+ "material": "wood_living",
+ "hp": null,
+ "spec": {
+  "kind": "vein_tree",
+  "girth": 0.6805939467851934,
+  "height": 13.5999830074903,
+  "seed": 1104,
+  "span": 3.2
+ },
+ "baked": "landkit/bake.py through the scene engine (wood_scene.py)"
+}

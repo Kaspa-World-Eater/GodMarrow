@@ -1,0 +1,31 @@
+{
+ "kind": "vein_snag",
+ "height": 6.176205652546749,
+ "foot": [
+  19.0,
+  95.1
+ ],
+ "size": [
+  76,
+  115
+ ],
+ "posts": [
+  [
+   0.0,
+   0.0,
+   0.298
+  ]
+ ],
+ "cover": 3.862,
+ "material": "wood_dead",
+ "hp": 400,
+ "spec": {
+  "kind": "vein_snag",
+  "girth": 0.2589736167584503,
+  "height": 6.176205652546749,
+  "seed": 1401,
+  "span": 1.6,
+  "broken": 0.6253809265069835
+ },
+ "baked": "landkit/bake.py through the scene engine (wood_scene.py)"
+}

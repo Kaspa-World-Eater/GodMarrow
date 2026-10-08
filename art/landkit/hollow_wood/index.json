@@ -1,0 +1,1166 @@
+{
+ "set": "hollow_wood",
+ "roles": {
+  "tree_giant": [
+   "vein_giant_0",
+   "vein_giant_1",
+   "vein_giant_2",
+   "vein_giant_3",
+   "vein_giant_4",
+   "vein_giant_5",
+   "vein_giant_6",
+   "vein_giant_7",
+   "vein_giant_8",
+   "vein_giant_9"
+  ],
+  "tree_middle": [
+   "vein_middle_0",
+   "vein_middle_1",
+   "vein_middle_2",
+   "vein_middle_3",
+   "vein_middle_4",
+   "vein_middle_5",
+   "vein_middle_6",
+   "vein_middle_7"
+  ],
+  "tree_dying": [
+   "vein_dying_0",
+   "vein_dying_1",
+   "vein_dying_2",
+   "vein_dying_3"
+  ],
+  "snag": [
+   "vein_snag_0",
+   "vein_snag_1",
+   "vein_snag_2",
+   "vein_snag_3",
+   "vein_snag_4",
+   "vein_snag_5"
+  ],
+  "tree_young": [
+   "vein_pole_0",
+   "vein_pole_1",
+   "vein_pole_2",
+   "vein_pole_3",
+   "vein_pole_4",
+   "vein_pole_5"
+  ],
+  "stump": [
+   "vein_stump_0",
+   "vein_stump_1",
+   "vein_stump_2",
+   "vein_stump_3",
+   "vein_stump_4",
+   "vein_stump_5"
+  ],
+  "rock": [
+   "flat_stone_0",
+   "flat_stone_1",
+   "flat_stone_2",
+   "flat_stone_3",
+   "flat_stone_4",
+   "flat_stone_5",
+   "flat_stone_6",
+   "flat_stone_7",
+   "flat_stone_8",
+   "flat_stone_9"
+  ]
+ },
+ "pieces": {
+  "vein_giant_0": {
+   "kind": "vein_tree",
+   "foot": [
+    94.5,
+    322.5
+   ],
+   "size": [
+    191,
+    485
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.232
+    ]
+   ],
+   "cover": 17.1,
+   "material": "wood_living",
+   "hp": null,
+   "height": 17.099782914287886
+  },
+  "vein_giant_1": {
+   "kind": "vein_tree",
+   "foot": [
+    95.5,
+    312.0
+   ],
+   "size": [
+    192,
+    471
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.365
+    ]
+   ],
+   "cover": 16.426,
+   "material": "wood_living",
+   "hp": null,
+   "height": 16.42625131777012
+  },
+  "vein_giant_2": {
+   "kind": "vein_tree",
+   "foot": [
+    95.5,
+    328.5
+   ],
+   "size": [
+    192,
+    493
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.313
+    ]
+   ],
+   "cover": 17.476,
+   "material": "wood_living",
+   "hp": null,
+   "height": 17.476295614633163
+  },
+  "vein_giant_3": {
+   "kind": "vein_tree",
+   "foot": [
+    95.5,
+    304.4
+   ],
+   "size": [
+    192,
+    461
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.566
+    ]
+   ],
+   "cover": 15.943,
+   "material": "wood_living",
+   "hp": null,
+   "height": 15.943382979557622
+  },
+  "vein_giant_4": {
+   "kind": "vein_tree",
+   "foot": [
+    95.5,
+    309.0
+   ],
+   "size": [
+    192,
+    467
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.45
+    ]
+   ],
+   "cover": 16.246,
+   "material": "wood_living",
+   "hp": null,
+   "height": 16.245756918388924
+  },
+  "vein_giant_5": {
+   "kind": "vein_tree",
+   "foot": [
+    90.5,
+    333.7
+   ],
+   "size": [
+    187,
+    500
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.595
+    ]
+   ],
+   "cover": 17.8,
+   "material": "wood_living",
+   "hp": null,
+   "height": 17.799625401343196
+  },
+  "vein_giant_6": {
+   "kind": "vein_tree",
+   "foot": [
+    95.5,
+    327.0
+   ],
+   "size": [
+    192,
+    491
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.443
+    ]
+   ],
+   "cover": 17.382,
+   "material": "wood_living",
+   "hp": null,
+   "height": 17.381830242697717
+  },
+  "vein_giant_7": {
+   "kind": "vein_tree",
+   "foot": [
+    91.5,
+    329.9
+   ],
+   "size": [
+    188,
+    495
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.387
+    ]
+   ],
+   "cover": 17.565,
+   "material": "wood_living",
+   "hp": null,
+   "height": 17.564738145938925
+  },
+  "vein_giant_8": {
+   "kind": "vein_tree",
+   "foot": [
+    95.5,
+    310.5
+   ],
+   "size": [
+    192,
+    469
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.356
+    ]
+   ],
+   "cover": 16.347,
+   "material": "wood_living",
+   "hp": null,
+   "height": 16.347031133284403
+  },
+  "vein_giant_9": {
+   "kind": "vein_tree",
+   "foot": [
+    95.5,
+    306.1
+   ],
+   "size": [
+    192,
+    463
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.278
+    ]
+   ],
+   "cover": 16.066,
+   "material": "wood_living",
+   "hp": null,
+   "height": 16.065832642108507
+  },
+  "vein_middle_0": {
+   "kind": "vein_tree",
+   "foot": [
+    39.5,
+    262.5
+   ],
+   "size": [
+    118,
+    294
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.814
+    ]
+   ],
+   "cover": 13.862,
+   "material": "wood_living",
+   "hp": null,
+   "height": 13.861824121368862
+  },
+  "vein_middle_1": {
+   "kind": "vein_tree",
+   "foot": [
+    41.5,
+    249.6
+   ],
+   "size": [
+    120,
+    280
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.861
+    ]
+   ],
+   "cover": 13.026,
+   "material": "wood_living",
+   "hp": null,
+   "height": 13.025680964733613
+  },
+  "vein_middle_2": {
+   "kind": "vein_tree",
+   "foot": [
+    51.5,
+    260.3
+   ],
+   "size": [
+    130,
+    291
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.787
+    ]
+   ],
+   "cover": 13.73,
+   "material": "wood_living",
+   "hp": null,
+   "height": 13.730361602264782
+  },
+  "vein_middle_3": {
+   "kind": "vein_tree",
+   "foot": [
+    31.5,
+    267.7
+   ],
+   "size": [
+    110,
+    297
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.7
+    ]
+   ],
+   "cover": 14.19,
+   "material": "wood_living",
+   "hp": null,
+   "height": 14.189731742012105
+  },
+  "vein_middle_4": {
+   "kind": "vein_tree",
+   "foot": [
+    32.5,
+    258.6
+   ],
+   "size": [
+    111,
+    290
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.783
+    ]
+   ],
+   "cover": 13.6,
+   "material": "wood_living",
+   "hp": null,
+   "height": 13.5999830074903
+  },
+  "vein_middle_5": {
+   "kind": "vein_tree",
+   "foot": [
+    50.5,
+    276.7
+   ],
+   "size": [
+    129,
+    306
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.705
+    ]
+   ],
+   "cover": 14.749,
+   "material": "wood_living",
+   "hp": null,
+   "height": 14.74924811438436
+  },
+  "vein_middle_6": {
+   "kind": "vein_tree",
+   "foot": [
+    54.5,
+    268.3
+   ],
+   "size": [
+    133,
+    301
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.908
+    ]
+   ],
+   "cover": 14.213,
+   "material": "wood_living",
+   "hp": null,
+   "height": 14.213419353369957
+  },
+  "vein_middle_7": {
+   "kind": "vein_tree",
+   "foot": [
+    42.5,
+    278.9
+   ],
+   "size": [
+    121,
+    310
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.752
+    ]
+   ],
+   "cover": 14.894,
+   "material": "wood_living",
+   "hp": null,
+   "height": 14.893639581959297
+  },
+  "vein_dying_0": {
+   "kind": "vein_tree",
+   "foot": [
+    92.0,
+    301.5
+   ],
+   "size": [
+    185,
+    456
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.287
+    ]
+   ],
+   "cover": 15.866,
+   "material": "wood_living",
+   "hp": null,
+   "height": 15.865525479239905
+  },
+  "vein_dying_1": {
+   "kind": "vein_tree",
+   "foot": [
+    81.0,
+    297.8
+   ],
+   "size": [
+    174,
+    335
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.403
+    ]
+   ],
+   "cover": 15.639,
+   "material": "wood_living",
+   "hp": null,
+   "height": 15.638683607803724
+  },
+  "vein_dying_2": {
+   "kind": "vein_tree",
+   "foot": [
+    92.0,
+    297.8
+   ],
+   "size": [
+    185,
+    344
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.333
+    ]
+   ],
+   "cover": 15.628,
+   "material": "wood_living",
+   "hp": null,
+   "height": 15.62764065452474
+  },
+  "vein_dying_3": {
+   "kind": "vein_tree",
+   "foot": [
+    92.0,
+    309.8
+   ],
+   "size": [
+    185,
+    467
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.183
+    ]
+   ],
+   "cover": 16.402,
+   "material": "wood_living",
+   "hp": null,
+   "height": 16.40168177900171
+  },
+  "vein_snag_0": {
+   "kind": "vein_snag",
+   "foot": [
+    20.0,
+    143.1
+   ],
+   "size": [
+    95,
+    170
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.56
+    ]
+   ],
+   "cover": 5.788,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 10.465551614924404
+  },
+  "vein_snag_1": {
+   "kind": "vein_snag",
+   "foot": [
+    16.0,
+    151.9
+   ],
+   "size": [
+    91,
+    178
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.533
+    ]
+   ],
+   "cover": 6.317,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 11.656203291792224
+  },
+  "vein_snag_2": {
+   "kind": "vein_snag",
+   "foot": [
+    50.0,
+    151.0
+   ],
+   "size": [
+    125,
+    182
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.831
+    ]
+   ],
+   "cover": 4.901,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 9.86072158398415
+  },
+  "vein_snag_3": {
+   "kind": "vein_snag",
+   "foot": [
+    38.0,
+    159.5
+   ],
+   "size": [
+    113,
+    189
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.744
+    ]
+   ],
+   "cover": 6.07,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 10.349854562030849
+  },
+  "vein_snag_4": {
+   "kind": "vein_snag",
+   "foot": [
+    26.0,
+    124.2
+   ],
+   "size": [
+    101,
+    152
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.801
+    ]
+   ],
+   "cover": 3.535,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 10.08135321496233
+  },
+  "vein_snag_5": {
+   "kind": "vein_snag",
+   "foot": [
+    68.0,
+    148.3
+   ],
+   "size": [
+    143,
+    181
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.95
+    ]
+   ],
+   "cover": 4.92,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 10.596921105721677
+  },
+  "vein_pole_0": {
+   "kind": "vein_snag",
+   "foot": [
+    9.0,
+    116.7
+   ],
+   "size": [
+    66,
+    135
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.241
+    ]
+   ],
+   "cover": 5.129,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 6.280337800483855
+  },
+  "vein_pole_1": {
+   "kind": "vein_snag",
+   "foot": [
+    19.0,
+    95.1
+   ],
+   "size": [
+    76,
+    115
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.298
+    ]
+   ],
+   "cover": 3.862,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 6.176205652546749
+  },
+  "vein_pole_2": {
+   "kind": "vein_snag",
+   "foot": [
+    15.0,
+    108.2
+   ],
+   "size": [
+    72,
+    127
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.268
+    ]
+   ],
+   "cover": 4.849,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 6.942714393653648
+  },
+  "vein_pole_3": {
+   "kind": "vein_snag",
+   "foot": [
+    12.0,
+    151.9
+   ],
+   "size": [
+    69,
+    170
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.232
+    ]
+   ],
+   "cover": 6.953,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 8.322636472892626
+  },
+  "vein_pole_4": {
+   "kind": "vein_snag",
+   "foot": [
+    17.0,
+    96.5
+   ],
+   "size": [
+    74,
+    116
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.286
+    ]
+   ],
+   "cover": 4.372,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 7.862806395600149
+  },
+  "vein_pole_5": {
+   "kind": "vein_snag",
+   "foot": [
+    18.0,
+    84.6
+   ],
+   "size": [
+    75,
+    104
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.293
+    ]
+   ],
+   "cover": 3.668,
+   "material": "wood_dead",
+   "hp": 400,
+   "height": 6.070897286015328
+  },
+  "vein_stump_0": {
+   "kind": "vein_stump",
+   "foot": [
+    50.5,
+    12.1
+   ],
+   "size": [
+    80,
+    41
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.919
+    ]
+   ],
+   "cover": 0.596,
+   "material": "wood_dead_wet",
+   "hp": 300,
+   "height": 0.9
+  },
+  "vein_stump_1": {
+   "kind": "vein_stump",
+   "foot": [
+    24.5,
+    7.8
+   ],
+   "size": [
+    56,
+    36
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.665
+    ]
+   ],
+   "cover": 0.631,
+   "material": "wood_dead_wet",
+   "hp": 300,
+   "height": 0.9
+  },
+  "vein_stump_2": {
+   "kind": "vein_stump",
+   "foot": [
+    22.5,
+    12.3
+   ],
+   "size": [
+    60,
+    41
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.892
+    ]
+   ],
+   "cover": 0.619,
+   "material": "wood_dead_wet",
+   "hp": 300,
+   "height": 0.9
+  },
+  "vein_stump_3": {
+   "kind": "vein_stump",
+   "foot": [
+    31.5,
+    24.1
+   ],
+   "size": [
+    83,
+    50
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     1.014
+    ]
+   ],
+   "cover": 0.506,
+   "material": "wood_dead_wet",
+   "hp": 300,
+   "height": 0.9
+  },
+  "vein_stump_4": {
+   "kind": "vein_stump",
+   "foot": [
+    50.5,
+    16.3
+   ],
+   "size": [
+    85,
+    46
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.963
+    ]
+   ],
+   "cover": 0.642,
+   "material": "wood_dead_wet",
+   "hp": 300,
+   "height": 0.9
+  },
+  "vein_stump_5": {
+   "kind": "vein_stump",
+   "foot": [
+    22.5,
+    18.4
+   ],
+   "size": [
+    69,
+    47
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.87
+    ]
+   ],
+   "cover": 0.725,
+   "material": "wood_dead_wet",
+   "hp": 300,
+   "height": 0.9
+  },
+  "flat_stone_0": {
+   "kind": "flat_stone",
+   "foot": [
+    8.5,
+    2.0
+   ],
+   "size": [
+    26,
+    9
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.292
+    ]
+   ],
+   "cover": 0.078,
+   "material": "stone",
+   "hp": null,
+   "height": 0.3
+  },
+  "flat_stone_1": {
+   "kind": "flat_stone",
+   "foot": [
+    10.5,
+    7.1
+   ],
+   "size": [
+    33,
+    37
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.514
+    ]
+   ],
+   "cover": 0.137,
+   "material": "stone",
+   "hp": null,
+   "height": 0.3222222222222222
+  },
+  "flat_stone_2": {
+   "kind": "flat_stone",
+   "foot": [
+    10.5,
+    4.0
+   ],
+   "size": [
+    22,
+    14
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.438
+    ]
+   ],
+   "cover": 0.117,
+   "material": "stone",
+   "hp": null,
+   "height": 0.34444444444444444
+  },
+  "flat_stone_3": {
+   "kind": "flat_stone",
+   "foot": [
+    12.5,
+    5.1
+   ],
+   "size": [
+    25,
+    16
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.496
+    ]
+   ],
+   "cover": 0.132,
+   "material": "stone",
+   "hp": null,
+   "height": 0.3666666666666667
+  },
+  "flat_stone_4": {
+   "kind": "flat_stone",
+   "foot": [
+    11.5,
+    4.9
+   ],
+   "size": [
+    24,
+    13
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.435
+    ]
+   ],
+   "cover": 0.116,
+   "material": "stone",
+   "hp": null,
+   "height": 0.3888888888888889
+  },
+  "flat_stone_5": {
+   "kind": "flat_stone",
+   "foot": [
+    10.5,
+    16.9
+   ],
+   "size": [
+    28,
+    25
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.443
+    ]
+   ],
+   "cover": 0.118,
+   "material": "stone",
+   "hp": null,
+   "height": 0.4111111111111111
+  },
+  "flat_stone_6": {
+   "kind": "flat_stone",
+   "foot": [
+    9.5,
+    7.5
+   ],
+   "size": [
+    23,
+    17
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.453
+    ]
+   ],
+   "cover": 0.121,
+   "material": "stone",
+   "hp": null,
+   "height": 0.43333333333333335
+  },
+  "flat_stone_7": {
+   "kind": "flat_stone",
+   "foot": [
+    10.5,
+    4.5
+   ],
+   "size": [
+    26,
+    15
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.458
+    ]
+   ],
+   "cover": 0.122,
+   "material": "stone",
+   "hp": null,
+   "height": 0.45555555555555555
+  },
+  "flat_stone_8": {
+   "kind": "flat_stone",
+   "foot": [
+    6.5,
+    14.9
+   ],
+   "size": [
+    42,
+    28
+   ],
+   "posts": [
+    [
+     0.0,
+     0.0,
+     0.31
+    ]
+   ],
+   "cover": 0.083,
+   "material": "stone",
+   "hp": null,
+   "height": 0.47777777777777775
+  },
+  "flat_stone_9": {
+   "kind": "flat_stone",
+   "foot": [
+    23.5,
+    2.8
+   ],
+   "size": [
+    31,
+    8
+   ],
+   "posts": [],
+   "cover": 0.063,
+   "material": "stone",
+   "hp": null,
+   "height": 0.5
+  }
+ },
+ "ground": "litter_ground (landkit), to become a Godot shader"
+}

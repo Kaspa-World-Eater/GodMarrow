@@ -1,0 +1,31 @@
+{
+ "kind": "flat_stone",
+ "height": 0.4111111111111111,
+ "foot": [
+  10.5,
+  16.9
+ ],
+ "size": [
+  28,
+  25
+ ],
+ "posts": [
+  [
+   0.0,
+   0.0,
+   0.443
+  ]
+ ],
+ "cover": 0.118,
+ "material": "stone",
+ "hp": null,
+ "spec": {
+  "kind": "flat_stone",
+  "size": 0.9840956830086272,
+  "yaw": 1.0090003637240552,
+  "seed": 1605,
+  "height": 0.4111111111111111,
+  "span": 2.6
+ },
+ "baked": "landkit/bake.py through the scene engine (wood_scene.py)"
+}

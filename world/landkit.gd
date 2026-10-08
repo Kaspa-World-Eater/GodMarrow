@@ -275,7 +275,10 @@ static func _mark(fam: String, tp: Vector2, name: String) -> void:
 
 ## the zone's sprite placed from the set; true when it was ours to place (even when the rules leave it out)
 static func take(zone, s: String, spr: Dictionary) -> bool:
-	var role := role_of(str(spr.get("key", "")))
+	var key0 := str(spr.get("key", ""))
+	if key0.begins_with("lk:"):
+		return take_named(zone, str(spr.get("set", s)), key0.substr(3), spr)
+	var role := role_of(key0)
 	if role == "":
 		return false
 	var x := float(spr["x"])
@@ -441,3 +444,25 @@ static func _life_round(zone, s: String, tp: Vector2, L: float, flip: bool, cls:
 		h.add_child(sp)
 		h.set_meta("item", "flora")
 		zone.sorted.add_child(h)
+
+## a piece the forest generator chose by name (tools/worldgen/forest.py: "lk:<piece>"): it already decided the place,
+## the spacing, the open ways and the variant (none the same within a screen), so it stands as it is, solid at its posts
+static func take_named(zone, s: String, name: String, spr: Dictionary) -> bool:
+	var x := float(spr["x"])
+	var y := float(spr["y"])
+	var tp := Vector2(x, y)
+	var tl = spr.get("tile", [int(floor(x)), int(floor(y))])
+	zone.free_tile(Vector2i(int(tl[0]), int(tl[1])))
+	var held := place(zone, s, name, tp, float(spr.get("d", x + y)), bool(spr.get("flip", false)), false)
+	if held.is_empty():
+		return true
+	var role := ""
+	var roles: Dictionary = index(s).get("roles", {})
+	for r in roles:
+		if name in roles[r]:
+			role = r
+			break
+	_mark(_family(role), tp, name)
+	if role in ["tree_giant", "tree_dying"]:
+		_canopy_shade(zone, "old_growth", tp)
+	return true
