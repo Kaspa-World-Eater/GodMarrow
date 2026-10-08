@@ -100,6 +100,7 @@ func _ready() -> void:
 	if ResourceLoader.exists("res://ui/hud.gd") and not OS.has_environment("GM_NOHUD"):
 		hud = load("res://ui/hud.gd").new()
 		add_child(hud)
+	add_child(load("res://world/sleepers.gd").new(self))   # far creatures frozen until the pilgrim comes near (D2's rule)
 	await enter(args.get("zone", "moor"), "")
 	await TestHooks.run(self)   # test and capture hooks (core/test_hooks.gd); nothing without their args
 

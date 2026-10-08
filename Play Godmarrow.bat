@@ -25,4 +25,5 @@ if not defined GODOT (
 )
 if not defined GODOT (echo Godot still not found. & pause & exit /b 1)
 echo Starting Godmarrow with "%GODOT%"
-start "" "%GODOT%" --path "%CD%"
+rem anything given to this file goes to the game (a shortcut can start in a zone: --zone=sunken_bog)
+if "%~1"=="" (start "" "%GODOT%" --path "%CD%") else (start "" "%GODOT%" --path "%CD%" -- %*)

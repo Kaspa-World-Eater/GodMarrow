@@ -29,6 +29,15 @@ static func run(g) -> void:
 		await _menutest(g, a)
 	if a.has("demo"):
 		_demo(g)
+	if a.has("off"):    # perf: switch whole systems off (--off=dark,atmos,sky,far,hud,sound) to see what each costs
+		for n in String(a["off"]).split(","):
+			var o = g.get(n.strip_edges())
+			if o is Node:
+				o.process_mode = Node.PROCESS_MODE_DISABLED
+				if "visible" in o:
+					o.visible = false
+	if a.has("perf"):   # perf: every second, where the frame goes
+		_perf(g)
 	if a.has("panel"):
 		await g.get_tree().create_timer(1.0).timeout
 	if a.has("hide"):
@@ -857,3 +866,17 @@ static func _snowfx(g) -> void:
 		var m = Brain.spawn(g.zone, "hollow", c + o, 6, "normal", "snow", 1e6)
 		if m:
 			m.dmg = Vector2.ZERO
+
+
+## every second: the frame rate, the time the scripts and physics took, what was drawn, and how much stands in the world
+static func _perf(g) -> void:
+	while is_instance_valid(g):
+		await g.get_tree().create_timer(1.0).timeout
+		print("PERF fps %d proc %.1f ms phys %.1f ms draws %d items %d nodes %d mons %d" % [
+			Performance.get_monitor(Performance.TIME_FPS),
+			Performance.get_monitor(Performance.TIME_PROCESS) * 1000.0,
+			Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0,
+			Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),
+			Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME),
+			Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
+			g.get_tree().get_nodes_in_group("monsters").size()])

@@ -56,6 +56,9 @@ static func build(z) -> bool:
 	var sc: float = float(idx.get("scale", 4))
 	var mat := ShaderMaterial.new()
 	mat.shader = load("res://shaders/baked_ground.gdshader")
+	var bmat := ShaderMaterial.new()                 # the tall bands: their plants bend in the wind
+	bmat.shader = mat.shader
+	bmat.set_shader_parameter("band", true)
 	var ground := Node2D.new()
 	ground.name = "BakedGround"
 	ground.z_index = -90
@@ -85,7 +88,9 @@ static func build(z) -> bool:
 			s2.texture = at
 			s2.region_enabled = true
 			s2.region_rect = Rect2(0, b["ay"], b["w"], b["h"])
-			s2.material = mat
+			s2.material = bmat
+			# the band's foot (its atlas row) rides in the modulate, for the shader's bend (the colour itself is unused)
+			s2.self_modulate = Color((float(b["ay"]) + float(b["h"])) / 16384.0, 1.0 if str(c.get("up_n", "")) != "" else 0.0, 1.0, 1.0)
 			s2.centered = false
 			s2.scale = Vector2(sc, sc)
 			s2.position = Vector2(top.x, float(b["d"]) * Iso.HY)
