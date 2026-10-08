@@ -168,3 +168,17 @@ MASTER_RULES is unchanged. **The lore's true detail for this piece:** "where the
 - **P13:** the bog's structures: the rotting stump on its root mound, the tipped snag with its root plate and hanging vines, tussock-sedge columns.
 - **P14:** the god's tendrils round a drowned post, with a pale pustule.
 - **Then:** the value-only test; Derek's grade; variations of every piece; the maggot-lair layout in the generator.
+
+| Pass | What changed | Grade and worst failure |
+|---|---|---|
+| 12 | Bulrush, horsetail, cotton grass, bogbean, sphagnum rafts; bared stretches clamped below the bone | The noise never bared this stretch. |
+| 12b-c | Bared and buried stretches alternate along the Back; algae only in a thin band at the water line | Whole vertebrae show: roofs, wings, joints, stumps. |
+| 13 | Great single ribs out of the water (`bone.py`, ray-marched), mirrored (Derek asked for them) | One read as a rusty post; one crossed the walk. |
+| 14 | THE BONE'S OWN FORM (Derek: "the texture of the bone ... the depths and curves of it"): a saddle between ridge and keel, keels, raised rims at the joints, nutrient pits, weathered pitting, grain cracks; the colour follows the form (stain in the hollows, pale crowns, flaked shell). Ribs arched. | The ribs read as rusted iron (the bone tool's sinew and blood colours). |
+| 15 | Bog bone for the ribs; the arch moved off the walk; dark peat, not moss, on bared stretches | The ribs were too dark. |
+| 16-18 | Balance (Derek: "the area will feel open while the path is constrictive ... not too many random objects"): three drowned trunks, one giant rib in view; the Back keeps its ribs (Derek corrected me: he meant the stray ones); the pads lie under the rib arch | **B**, awaiting Derek's grade. Derek: "It's looking much better now". |
+
+**Next, toward a whole zone ("a zone sized map ... loop and curve throughout it like a maze while the player looks for exits"):**
+1. The bog's structures: the rotting stump on its mound, the tipped snag with vines, the tendrils with a pale pustule. Each rare.
+2. Variants of every piece for the generator.
+3. The zone generator: the Back coiled through the Sunken Bog as a maze, with tight walks between larger marsh shelves (the maggot lair's rhythm) and exits to find.

@@ -22,6 +22,7 @@ import wisp_fire                             # noqa: E402
 import drowned                               # noqa: E402
 import vein_tree                             # noqa: E402
 import fog as foggen                         # noqa: E402
+import bone as bonegen                       # noqa: E402
 from scipy.spatial import cKDTree            # noqa: E402
 from kit import ramp, vn, fbm                # noqa: E402
 
@@ -46,7 +47,7 @@ LINE = C[None] + (PERP[None] * (_t * 17.0)[:, None]
 # materials (hue-shifted: violet darks, warm lights)
 R_BONE = ramp("#0c0a0a", "#171210", "#241b15", "#33271c", "#433424", "#55432f", "#69553c", "#7e6a4d")   # bog-stained bone, tea-dark
 R_CROWN = ramp("#161413", "#27221e", "#3a332b", "#4f463a", "#665b4b", "#7e725e", "#968a72")              # the worn crowns, grey-ivory under the stain
-R_ALGAE = ramp("#070a08", "#0e140f", "#162016", "#1f2c1b", "#2a3a21", "#364a27")                         # algae below the tide line
+R_ALGAE = ramp("#070908", "#0d110d", "#141a13", "#1c2418", "#252e1e", "#2f3824")                         # algae at the water line, dull
 R_MOSS = ramp("#0b0d08", "#13170d", "#1d2212", "#272d17", "#31381c", "#3c4321", "#474e27")   # brown-olive bog moss (the fen lesson: not green)
 R_MUD = ramp("#0b0807", "#140f0c", "#1f1712", "#2a2018", "#36291f", "#433327")
 R_PEAT = ramp("#0b0908", "#15100d", "#201913", "#2c2219", "#392d21", "#46382a")
@@ -54,9 +55,10 @@ R_SEDGE = ramp("#0e0f08", "#1a1b0d", "#282911", "#383816", "#4a481c", "#5d5823",
 R_WATER = ramp("#020304", "#040507", "#06080a", "#090c0f", "#0d1115")   # peat-black (Derek: "darker")
 R_DEAD = ramp("#0f0e0e", "#1b1918", "#292624", "#393431", "#4a443e", "#5c554d", "#6f675d", "#82796d")   # drowned wood, grey, wet-dark
 R_STONE = ramp("#0e100f", "#1a1d1a", "#292d28", "#3a3f38", "#4c5249", "#5f655a", "#72786b")             # the village's stone, slimed
-DROWNED_TREES = [(C + AX * 5.5 - PERP * 7.0, 0.42, 6.5, 41), (C + AX * 7.2 - PERP * 4.2, 0.28, 4.2, 42),
-                 (C + AX * 3.2 + PERP * 7.6, 0.45, 7.0, 43), (C - AX * 3.2 + PERP * 4.5, 0.34, 5.2, 44),
-                 (C + AX * 8.8 + PERP * 2.6, 0.24, 3.6, 45)]
+# balance (Derek: "the area will feel open while the path is constrictive ... not too many random objects poking out
+# everywhere"): a few things stand in the water, each with room round it to be seen and mirrored
+DROWNED_TREES = [(C + AX * 5.5 - PERP * 7.0, 0.42, 6.5, 41), (C + AX * 3.2 + PERP * 7.6, 0.45, 7.0, 43),
+                 (C - AX * 3.2 + PERP * 4.5, 0.34, 5.2, 44)]
 DROWNED_WALLS = [(C + AX * 4.6 + PERP * 4.8, 0.6, 4.2, 2.3, 51), (C - AX * 2.6 - PERP * 6.2, 2.0, 3.2, 1.5, 52)]
 GREY = ramp("#111111", "#222222", "#333333", "#444444", "#555555", "#666666", "#777777", "#888888", "#999999", "#aaaaaa")
 
@@ -120,6 +122,8 @@ def stamp(W, w):
     W["bog_cush"] = info["cush"]
     W["bog_boot"] = info["boot"]
     W["bog_stain"] = info["stain"]
+    W["bog_cav"] = info["cav"]
+    W["bog_expose"] = info["expose"]
 
 
 def _r(rp, t):
@@ -143,11 +147,20 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     peat = _r(R_PEAT, vv * 0.9)
     sedge = _r(R_SEDGE, vv * 0.95 + (vn(px * 6, py * 6) - 0.5) * 0.1)
     col = np.where(((tus > 0.15) & (part == 0))[..., None], sedge, peat)
-    tide = wet < 0.16                                                        # below the old water line: algae on the bone
+    tide = wet < 0.05 + (vn(px * 3, py * 3) - 0.5) * 0.06                    # a thin band at the water line: algae on the bone
     stain = ws.look(W, W["bog_stain"], px, py)                              # every vertebra its own stain and wear
-    bone = _r(R_BONE, vv * 0.92 + (vn(px * 4, py * 4) - 0.5) * 0.08 + (stain - 0.5) * 0.16)
-    crn = _r(R_CROWN, vv * 0.92)
-    bcol = np.where((crown > 0.6)[..., None], crn, bone)
+    cav = ws.look(W, W["bog_cav"], px, py)
+    # the bone's colour follows its form: the peat's tea-black stain settles in every hollow, joint and pit; the
+    # crowns, keels and rims are worn paler by feet and weather; between, a mottle of old stain in broad patches
+    hollow_k = np.clip(-cav / 0.05, 0, 1)
+    crest_k = np.clip(cav / 0.04, 0, 1)
+    mott = (vn(px * 2.3 + 5, py * 2.3) - 0.5) * 0.14 + (vn(px * 9, py * 9) - 0.5) * 0.05
+    tb = vv * 0.9 + mott + (stain - 0.5) * 0.16 - hollow_k * 0.22
+    bone = _r(R_BONE, tb)
+    crn = _r(R_CROWN, vv * 0.92 + mott * 0.6)
+    bcol = np.where(((crown > 0.6) | (crest_k > 0.6))[..., None], crn, bone)
+    flake = (vn(px * 13 + 2, py * 13) > 0.74) & (crest_k > 0.2)            # flakes of the outer shell gone: paler, a dark edge
+    bcol[flake] = np.minimum(bcol[flake] * 1.12 + 0.02, 1)
     bcol = np.where(tide[..., None], _r(R_ALGAE, vv * 0.95), bcol)
     dr = ws.look(W, W["bog_dr"], px, py)
     wetz = pz - LEVEL
@@ -167,6 +180,8 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     blend = np.clip((cush - 0.012) / 0.03, 0, 1)
     edge_n = vn(px * 19, py * 19) - 0.5                                      # ragged edges, never a blob's outline
     cov = np.where((blend + edge_n * 0.5 > 0.5)[..., None], mc, pc)
+    bared = ws.look(W, W["bog_expose"], px, py) > 0.35                       # on a bared stretch the growth is only dark
+    cov = np.where(bared[..., None], _r(R_MUD, vv * 0.85 + edge_n * 0.12), cov)   # peat packed in the joints, not moss
     col = np.where(mossy[..., None], cov, col)
     boot = ws.look(W, W["bog_boot"], px, py) & mossy | ws.look(W, W["bog_boot"], px, py) & (part == 3)
     col[boot] = _r(R_WATER, 0.3 + L["moon"][boot] * 0.3)                     # bootholes the mud let go of, holding black water
@@ -239,6 +254,10 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     img[mat & ~speck] = img[mat & ~speck] * 0.55 + bog_plants.WEED * 0.3
     sp2 = edge & (vn(px * 31, py * 31) > 0.7)                                 # loose fronds at a mat's edge
     img[sp2] = bog_plants.WEED * 0.7
+    # floating sphagnum rafts in the shallows: dulled red and green, ragged, distinct from the duckweed
+    raft = water & (dd < 0.35) & ((vn(px * 0.7 + 21, py * 0.7) * 0.7 + vn(px * 6, py * 6) * 0.3) > 0.72) & ~mat
+    rc = np.where((vn(px * 9, py * 9) > 0.5)[..., None], np.array([0.2, 0.13, 0.1]), np.array([0.15, 0.18, 0.09]))
+    img[raft] = rc[raft] * (0.55 + L["moon"][raft, None] * 0.5)
     rng = np.random.default_rng(31)
     fx, fy = ws.FOCUS
     box = (fx - 13, fy - 13, fx + 13, fy + 13)
@@ -275,6 +294,14 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
             bog_plants.reed(img, zb, dep, ws.to_px, (x, y, max(g, LEVEL)), h, 900 + k, lv, water, LEVEL)
         elif kind == "sedge":
             bog_plants.sedge(img, zb, dep, ws.to_px, (x, y, g), h, 900 + k, lv, water, LEVEL)
+        elif kind == "bulrush":
+            bog_plants.bulrush(img, zb, dep, ws.to_px, (x, y, max(g, LEVEL)), h, 900 + k, lv, water, LEVEL)
+        elif kind == "horsetail":
+            bog_plants.horsetail(img, zb, dep, ws.to_px, (x, y, max(g, LEVEL)), h, 900 + k, lv, water, LEVEL)
+        elif kind == "cotton":
+            bog_plants.cotton(img, zb, dep, ws.to_px, (x, y, g), h, 900 + k, lv, water, LEVEL)
+        elif kind == "bogbean":
+            bog_plants.bogbean(img, ws.to_px, (x, y, LEVEL), 900 + k, lv, water)
         else:
             bog_plants.pad(img, ws.to_px, (x, y, LEVEL), h, 900 + k, lv, water)
     return img
@@ -315,6 +342,71 @@ def wisps(img, w, W, px, py, pz, L, T=0.4):
     return img
 
 
+# great single ribs standing out of the water (Derek 2026-10-08: "some large single ribs poking out of the water
+# occasionally"): the serpent's ribs that broke from the Back and sank, one end down in the peat, the other curving up
+# out of the water and snapped; true bone (landkit bone.py, ray-marched, so the arch has air under it) and mirrored
+GIANT_RIBS = [(C - AX * 1.0 + PERP * 10.5, 2.5, 6.0, 0.0, 62)]               # (where, its heading, its span, a snapped
+                                                                             # end's height: 0 = both ends down, an arch)
+
+
+def _ribs(level_mirror=None):
+    out = []
+    for (p_, ang, ln, ht, sd) in GIANT_RIBS:
+        a = np.array([p_[0], p_[1], LEVEL - 0.45])
+        b = a + np.array([np.cos(ang) * ln, np.sin(ang) * ln, ht + (0.0 if ht == 0 else 0.45)])
+        rise = ln * 0.55 if ht == 0 else 0.9 + ht * 0.3                     # an arch climbs well clear of the water
+        r = bonegen.rib(tuple(a), tuple(b), rise, 0.24, 0.32, seed=sd)
+        if level_mirror is not None:
+            r["pts"] = r["pts"].copy()
+            r["pts"][:, 2] = 2 * level_mirror - r["pts"][:, 2]
+        out.append(r)
+    return out
+
+
+def giant_rib_mirror(img, w, W, px, py, pz, L, T=0.0):
+    """the ribs in the black mirror, laid into the water before anything floats on it"""
+    GH, GW = img.shape[:2]
+    dep = px + py
+    hero = np.array(ws.HERO, float)
+    g = float(ws.look(W, W["H"], np.array(hero[0]), np.array(hero[1])))
+    lts = [((hero[0] + 0.25, hero[1] - 0.25, g + 0.7), (0.95, 0.6, 0.32), 2.6 * 1.4)]
+    water = ws.look(W, W["bog_water"], px, py) & (L["tg"] == 0)
+    # the mirror first: the ribs turned over the water line, drawn apart and laid into the water darker and cooler
+    # bog bone, not the Moor's: tea-stained and slimed, no dried sinew or old blood at its heads (the peat took them)
+    keep = (bonegen.R_BONE, bonegen.SINEW)
+    bonegen.R_BONE, bonegen.SINEW = R_CROWN, np.array([0.1, 0.09, 0.07])
+    keep_sp = bonegen.SPONGE
+    bonegen.SPONGE = np.array([0.08, 0.07, 0.06])
+    tmp = np.zeros_like(img)
+    hit = np.full((GH, GW), -1e9)
+    bonegen.draw(tmp, hit, np.full((GH, GW), -1e9), ws.to_px, _ribs(LEVEL), lts, ws.SUN, ambient=0.12)
+    m = water & (hit > -1e8)
+    img[m] = np.clip(img[m] * 0.35 + tmp[m] * np.array([0.42, 0.46, 0.55]), 0, 1)
+    bonegen.R_BONE, bonegen.SINEW = keep
+    bonegen.SPONGE = keep_sp
+    return img
+
+
+def giant_ribs(img, w, W, px, py, pz, L, T=0.0):
+    """the ribs themselves, drawn after the pads and weed that float on the water, so the bone stands over them"""
+    GH, GW = img.shape[:2]
+    dep = px + py
+    hero = np.array(ws.HERO, float)
+    g = float(ws.look(W, W["H"], np.array(hero[0]), np.array(hero[1])))
+    lts = [((hero[0] + 0.25, hero[1] - 0.25, g + 0.7), (0.95, 0.6, 0.32), 2.6 * 1.4)]
+    keep = (bonegen.R_BONE, bonegen.SINEW)
+    bonegen.R_BONE, bonegen.SINEW = R_CROWN, np.array([0.1, 0.09, 0.07])
+    keep_sp = bonegen.SPONGE
+    bonegen.SPONGE = np.array([0.08, 0.07, 0.06])
+    zb = np.full((GH, GW), -1e9)
+    shapes = _ribs()
+    shapes.sort(key=lambda o: -(o["pts"][:, 0] + o["pts"][:, 1]).mean())
+    bonegen.draw(img, zb, dep, ws.to_px, shapes, lts, ws.SUN, ambient=0.12)
+    bonegen.R_BONE, bonegen.SINEW = keep
+    bonegen.SPONGE = keep_sp
+    return img
+
+
 def bog_fog(img, w, W, px, py, pz, L, T=0.0):
     """a light fog, mostly see-through, lying over the water (Derek: "a light, mostly translucent fog over the water";
     MASTER_RULES 6: fog lies in the lows), drifting slowly in the one wind, thinning up the Back and gone on its crown"""
@@ -323,7 +415,7 @@ def bog_fog(img, w, W, px, py, pz, L, T=0.0):
     return foggen.draw(img, px, py, pz, low, T, L["moon"], np.zeros(px.shape), thick=1.5)
 
 
-ws.LIVING[:] = [mirror, plants, bog_fog, wisps]
+ws.LIVING[:] = [mirror, giant_rib_mirror, plants, giant_ribs, bog_fog, wisps]
 ws.GROUND = ground
 
 

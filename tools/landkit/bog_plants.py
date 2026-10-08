@@ -101,6 +101,83 @@ def sedge(img, zb, dep, to_px, root, h, seed, lv, water, level):
             prev = P
 
 
+BLADE = np.array([0.24, 0.27, 0.13])         # bulrush blades, dull
+SPIKE = np.array([0.2, 0.12, 0.07])          # the bulrush spike, brown velvet
+TAIL = np.array([0.22, 0.3, 0.14])           # horsetail green
+COTTON = np.array([0.82, 0.82, 0.78])        # cotton grass heads, the brightest small thing in a bog at night
+BEAN = np.array([0.2, 0.28, 0.13])
+
+
+def bulrush(img, zb, dep, to_px, root, h, seed, lv, water, level):
+    """a bulrush clump: flat blades fanning from the water, and a few stems each with its dark brown spike"""
+    rr = np.random.default_rng(seed)
+    r0 = np.array(root, float)
+    for i in range(int(rr.integers(5, 11))):
+        a = rr.uniform(0, 2 * np.pi)
+        L = h * rr.uniform(0.6, 1.0)
+        b0 = r0 + np.array([rr.normal(0, 0.06), rr.normal(0, 0.06), 0])
+        mid = b0 + np.array([np.cos(a) * 0.06 * L, np.sin(a) * 0.06 * L, L * 0.6])
+        tip = b0 + np.array([np.cos(a) * 0.3 * L + WIND[0] * 0.1, np.sin(a) * 0.3 * L, L * 0.85])
+        _stroke(img, zb, dep, to_px, b0, mid, REED_R, BLADE, lv, water, level)
+        _stroke(img, zb, dep, to_px, mid, tip, BLADE, BLADE * 1.1, lv, water, level)
+    for i in range(int(rr.integers(1, 4))):
+        b0 = r0 + np.array([rr.normal(0, 0.05), rr.normal(0, 0.05), 0])
+        L = h * rr.uniform(0.9, 1.15)
+        lean = WIND * 0.06 + rr.normal(0, 0.02, 2)
+        top = b0 + np.array([lean[0] * L, lean[1] * L, L])
+        _stroke(img, zb, dep, to_px, b0, top, REED_R, BLADE, lv, water, level)
+        s0 = b0 + (top - b0) * 0.72
+        s1 = b0 + (top - b0) * 0.9
+        for dx in (0.0, 0.02):
+            _stroke(img, zb, dep, to_px, s0 + np.array([dx, -dx, 0]), s1 + np.array([dx, -dx, 0]), SPIKE, SPIKE * 1.2, lv, water, level)
+
+
+def horsetail(img, zb, dep, to_px, root, h, seed, lv, water, level):
+    """a stand of horsetail: thin straight jointed stems, dark rings at their joints"""
+    rr = np.random.default_rng(seed)
+    for i in range(int(rr.integers(8, 18))):
+        b0 = np.array(root, float) + np.array([rr.normal(0, 0.18), rr.normal(0, 0.18), 0])
+        L = h * rr.uniform(0.5, 1.0)
+        n = int(L / 0.09) + 1
+        prev = b0
+        for j in range(1, n + 1):
+            P = b0 + np.array([WIND[0] * 0.04 * j / n, WIND[1] * 0.04 * j / n, L * j / n])
+            c = TAIL * (0.7 if j % 2 else 1.0)
+            _stroke(img, zb, dep, to_px, prev, P, c, c, lv, water, level, n=3)
+            prev = P
+
+
+def cotton(img, zb, dep, to_px, root, h, seed, lv, water, level):
+    """cotton grass on a hummock: a tuft of fine blades and a few white heads nodding on their stalks"""
+    rr = np.random.default_rng(seed)
+    sedge(img, zb, dep, to_px, root, h * 0.6, seed, lv * 0.9, water, level)
+    head = COTTON * (0.55 + 0.45 * min(lv, 1.0)) / max(lv, 0.3)
+    for i in range(int(rr.integers(2, 7))):
+        b0 = np.array(root, float) + np.array([rr.normal(0, 0.08), rr.normal(0, 0.08), 0])
+        L = h * rr.uniform(0.8, 1.2)
+        top = b0 + np.array([WIND[0] * 0.15 * L + rr.normal(0, 0.04), WIND[1] * 0.15 * L, L])
+        _stroke(img, zb, dep, to_px, b0, top, SEDGE * 0.6, SEDGE, lv, water, level)
+        for dz in (0.0, 0.025, -0.02):
+            q = top + np.array([0.0, 0.0, dz])
+            _stroke(img, zb, dep, to_px, q, q + np.array([0.02, 0.0, 0.0]), head, head, lv, water, level, n=2)
+
+
+def bogbean(img, to_px, c, seed, lv, water):
+    """bogbean at the water's edge: three-part leaves held just above the water, in a little colony"""
+    rr = np.random.default_rng(seed)
+    GH, GW = img.shape[:2]
+    for i in range(int(rr.integers(3, 9))):
+        x, y = c[0] + rr.normal(0, 0.25), c[1] + rr.normal(0, 0.25)
+        sx, sy = to_px((x, y, c[2] + 0.06))
+        a = rr.uniform(0, 2 * np.pi)
+        for j in range(3):
+            aa = a + j * 2.094
+            for t in (0.6, 1.2, 1.8):
+                ix, iy = int(round(sx + np.cos(aa) * t)), int(round(sy + np.sin(aa) * t * 0.5))
+                if 0 <= iy < GH and 0 <= ix < GW:
+                    img[iy, ix] = np.clip(BEAN * (lv + (0.15 if t < 1 else 0)), 0, 1)
+
+
 def pad(img, to_px, c, r, seed, lv, water):
     """a lily pad lying on the water: a flat disc with its notch; lit rim on the moon's side; a flower now and then"""
     rr = np.random.default_rng(seed)
@@ -156,6 +233,14 @@ def place(rng, depth_at, part_at, cover_at, box, n_try=9000):
             out.append(("reed", x, y, float(rng.uniform(1.2, 2.0))))
         elif p == 2 and cv > 0.2 and r < 0.09:                            # sedge tufts in the Back's growth, off the walked middle
             out.append(("sedge", x, y, float(rng.uniform(0.35, 0.7))))
+        elif p == 0 and 0.02 < d < 0.3 and _bed(x + 40, y) > 0.6 and r < 0.06:   # bulrush in the shallows, its own beds
+            out.append(("bulrush", x, y, float(rng.uniform(1.1, 1.8))))
+        elif p == 0 and 0.0 < d < 0.18 and _bed(x - 30, y + 7) > 0.66 and r < 0.06:  # horsetail stands at the margins
+            out.append(("horsetail", x, y, float(rng.uniform(0.4, 0.8))))
+        elif p == 0 and d <= -0.05 and r < 0.06:                              # cotton grass on the hummocks
+            out.append(("cotton", x, y, float(rng.uniform(0.35, 0.6))))
+        elif p == 0 and 0.05 < d < 0.4 and r < 0.025:                         # bogbean at the edges of the open water
+            out.append(("bogbean", x, y, 0.0))
         elif p == 0 and 0.3 < d < 1.2 and _colony(x, y) > 0.6 and r < 0.12:      # pads grow in colonies
             out.append(("pad", x, y, float(rng.uniform(0.08, 0.32) * (0.7 + _colony(x, y) * 0.5))))
     return out

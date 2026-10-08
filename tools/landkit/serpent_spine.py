@@ -108,13 +108,30 @@ def stamp(X, Y, H, line, level=0.0, seed=7):
     bite = (_h(k, 19, seed) < 0.18) & (np.hypot((u - bite_u) * Lk, v - bite_v) < 0.35 * sz + (vn(u * 9, v * 9) - 0.5) * 0.15)
     # the vertebra's own tilt and settling (each lies a little its own way)
     tilt = (_h(k, 4, seed) - 0.5) * 0.22 * v / (W_W * sz) + (_h(k, 5, seed) - 0.5) * 0.16 * sz   # each settled its own way
-    zb = base + roof + hump + stump + tilt - crack * 0.05 - bite * 0.3
+    # THE BONE'S OWN FORM (Derek 2026-10-08: "the texture of the bone more too, and the depths and curves of it"):
+    # - a saddle: the roof dips between the ridge and the wing's keel, then rises to it (the arch is not a flat plate);
+    # - the keel along each wing (the zygapophyseal ridge), proud and rounded;
+    # - raised rims round each joint, the articular faces standing up before the groove;
+    # - nutrient foramina: small deep pits, two to four to a vertebra;
+    # - the surface itself: fine pitting of weathered bone, and cracks along its grain (running with the body)
+    ws_ = np.clip(av / np.maximum(wing, 0.3), 0, 1)
+    saddle = -0.07 * np.sin(np.clip((ws_ - 0.18) / 0.5, 0, 1) * np.pi) * sz
+    keel = 0.06 * np.exp(-((ws_ - 0.72) / 0.07) ** 2) * sz * (1 - snap * 0.6)
+    rim = 0.05 * np.exp(-((jd - 0.1 * sz) / 0.05) ** 2) * sz * (ws_ < 0.95)
+    fx_u, fx_v = 0.3 + 0.4 * _h(k, 24, seed), (_h(k, 25, seed) - 0.5) * 1.2 * sz
+    fx2_u, fx2_v = 0.25 + 0.5 * _h(k, 26, seed), -fx_v * 0.8
+    foram = (np.hypot((u - fx_u) * Lk, v - fx_v) < 0.05) | (np.hypot((u - fx2_u) * Lk, v - fx2_v) < 0.04)
+    pit = (vn(X * 26 + seed, Y * 26) - 0.5) * 0.014 + (vn(X * 61, Y * 61 + seed) - 0.5) * 0.006
+    grain = np.abs(np.sin(v * 31.0 / sz + vn(s * 1.3, v * 2.0) * 4.0)) < 0.06
+    grain = grain & (vn(s * 0.9 + k, v * 3.0) > 0.55)
+    zb = (base + roof + hump + stump + tilt + saddle + keel + rim + pit
+          - crack * 0.05 - bite * 0.3 - foram * 0.09 - grain * 0.018)
     on_back = near & (av < wing + 0.05)
     # the ribs: one pair per vertebra, most sunk or broken; some arch out of the water
     zr = np.full(X.shape, -9.0)
     side = np.sign(v)
     for sgn in (-1.0, 1.0):
-        show = _h(k, 6 + (sgn > 0), seed) < 0.42
+        show = _h(k, 6 + (sgn > 0), seed) < 0.42                          # the Back keeps its ribs (Derek: "don't remove the path ribs")
         reach = (1.2 + 2.0 * _h(k, 8 + (sgn > 0), seed)) * sz             # broken short, or long
         out = (v * sgn - wing * 0.85)
         ur = (u - (0.62 + 0.12 * out / 3.0)) * sz                         # ribs sweep back as they go out
@@ -128,7 +145,9 @@ def stamp(X, Y, H, line, level=0.0, seed=7):
     grow = (fbm(X * 0.7 + seed, Y * 0.7) - 0.5) * 0.42 + (vn(X * 3.1, Y * 3.1 + seed) - 0.5) * 0.12
     # how buried the Back is changes along it: stretches scoured bare where the water runs over it at flood (whole
     # vertebrae show, roofs, wings and joints), stretches sunk under the growth with only the crowns through
-    expose = np.clip((fbm(s * 0.06 + seed * 2, 4.0) - 0.42) * 3.0, 0, 1)
+    # (bared and buried in turn along the Back, a stretch every dozen yards or so, never the same length twice)
+    expose = np.clip(0.45 + 0.85 * np.sin(s * 2 * np.pi / 13.0 + seed + (fbm(s * 0.05, 7.0 + seed) - 0.5) * 3.0)
+                     + (fbm(s * 0.08 + seed * 2, 4.0) - 0.5) * 0.8, 0, 1)
     cover = smooth + 0.1 + grow - expose * 0.34                          # overgrown, but not everywhere
     # moss cushions (Derek: "the green spots look flat and blobby"): domes of real height a hand to a foot across,
     # so the engine lights each one; their colour follows their form in the painter, not a painted patch
@@ -140,6 +159,8 @@ def stamp(X, Y, H, line, level=0.0, seed=7):
     vf = np.where(fi % 2 == 0, 0.15, -0.15) + (_h(fi, 21, seed) - 0.5) * 0.1
     boot = (np.hypot((s - (fi + 0.5) * step) * 0.9, v - vf) < 0.075) & (_h(fi, 22, seed) < 0.6) & (av < 0.7)
     cover = cover - boot * 0.07
+    # where it is bared, the growth only lies in the joints and along the wings' lips: the vertebrae show whole
+    cover = np.where(expose > 0.35, np.minimum(cover, zb - 0.03 + joint * 0.3 + (1 - lip) * 0.3 + bite * 0.3), cover)
     # the flank: the mud and growth run on past the wing's edge and slope down into the water, a bank, not a wall
     past = np.clip((av - wing) / (0.9 + 0.5 * vn(s * 0.5 + seed, 3.0)), 0, 1)
     cover = cover - past ** 1.4 * 0.9
@@ -157,6 +178,9 @@ def stamp(X, Y, H, line, level=0.0, seed=7):
     Hn = np.maximum(np.maximum(H, Hb), zr)
     Hn = np.where(near, Hn, H)
     crown = np.clip((zb - cover) / 0.2, 0, 1)
-    info = dict(s=s, v=v, k=k, u=u, wet=Hn - level, crown=crown, on_back=on_back, cush=cush, boot=boot & (part >= 2),
+    from scipy import ndimage as _nd
+    cav = Hn - _nd.gaussian_filter(Hn, 5)                                 # the bone's hollows (-) and crowns (+), for its stain
+    info = dict(s=s, v=v, k=k, u=u, wet=Hn - level, crown=crown, on_back=on_back, cush=cush, boot=boot & (part >= 2), cav=cav,
+                expose=expose,
                 stain=_h(k, 23, seed), sz=sz, wing=wing)
     return Hn, part, info
