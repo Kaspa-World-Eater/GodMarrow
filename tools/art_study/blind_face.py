@@ -31,6 +31,7 @@ import beast_bones                           # noqa: E402
 import fen_ground                            # noqa: E402
 import wisp_fire                             # noqa: E402
 import bark_face                             # noqa: E402
+import rain as raingen                       # noqa: E402
 from scipy import ndimage as nd              # noqa: E402
 import bone as bonegen                       # noqa: E402
 import bark                                  # noqa: E402
@@ -120,6 +121,42 @@ def fen_paint(img, W, px, py, pz, SX, SY, L, v, gl):
 
 
 WISPS = []
+
+
+RAIN = "rain" in sys.argv[2:]                                                      # python blind_face.py OUT.webp rain
+RAIN_STATE = {}
+
+
+def gentle_gust(T):
+    """a gentle breeze (Derek: "a gentle breeze blowing"): a soft steady breath and a mild swell once a loop"""
+    d = min(abs(T - 0.6), 1 - abs(T - 0.6))
+    return 1.0 + 0.45 * np.exp(-(d / 0.14) ** 2)
+
+
+def draw_rain(img, w, W, px, py, pz, L, T):
+    """a very light rain at night (landkit rain.py): seen only where the lantern, the moon's gap or the candles light it"""
+    gh = lambda x, y: float(ws.look(W, W["H"], np.array(x), np.array(y)))
+    if not RAIN_STATE:
+        RAIN_STATE["st"] = raingen.drops(91, C, n=520, span=10.0, top=7.0)
+        rr = np.random.default_rng(92)
+        cells = np.argwhere(W["fen_water"])
+        pick = cells[rr.choice(len(cells), size=min(48, len(cells)), replace=False)] if len(cells) else []
+        RAIN_STATE["rings"] = [(W["X"][i, j], W["Y"][i, j], W["H"][i, j], rr.uniform(0, 1)) for (i, j) in pick]
+    hero = np.array(ws.HERO, float)
+    lamp = np.array([hero[0] + 0.25, hero[1] - 0.25, gh(*hero) + 0.7])
+
+    def light(x, y, z):
+        lv = 1.0 / (1 + (np.linalg.norm(np.array([x, y, z]) - lamp) / 2.2) ** 2)
+        for (lx, ly, lz, rch) in ws.LIGHTS:
+            lv += 0.7 / (1 + (np.linalg.norm(np.array([x, y, z]) - np.array([lx, ly, lz])) / rch) ** 2)
+        can = float(ws.look(W, W["light"], np.array(x), np.array(y)))
+        lv += np.clip(can - 0.45, 0, 1) * 0.6                                         # the moon, where the canopy opens
+        return min(lv, 1.0)
+
+    tg = L["tg"]
+    on_pool = lambda sx, sy: bool(ws.look(W, W["fen_water"], np.array(px[sy, sx]), np.array(py[sy, sx])) > 0) and tg[sy, sx] == 0
+    return raingen.draw(img, ws.to_px, px + py, RAIN_STATE["st"], T, light, wind=(0.3, -0.3), ground=gh, on_pool=on_pool,
+                        rings=RAIN_STATE["rings"])
 
 
 def draw_wisps(img, w, W, px, py, pz, L, T):
@@ -376,6 +413,9 @@ ws.LIVING.append(draw_hollows)
 ws.LIVING.append(draw_face)
 ws.LIVING.append(grim)
 ws.LIVING.append(draw_wisps)
+if RAIN:
+    ws.gust = gentle_gust
+    ws.LIVING.append(draw_rain)
 ws.BUILD_HOOKS[0:0] = [fen_floor, stamp_vein_trees, stamp_stump, place_eyes, place_hollows]   # in this order: floor, trees, stump, then what grows on the trees
 ws.GROUND = fen_paint
 ws.PAINTERS["vstump"] = paint_stump

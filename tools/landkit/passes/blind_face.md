@@ -386,3 +386,20 @@ instead of the black water, let's make it dark blood with the occasional wisp of
 2. Turned toward us (62 degrees), larger (2.1 x 2.7 yd), relief 1.5 times bolder. **Graded C+:** the scene's
    landmark reads at a glance: a vast eyeless face in the bark at the glade's back, brooding over the clearing, the
    moon raking across its brow.
+
+## Night, a gentle breeze, a very light rain (Derek, 2026-10-07: "an animated image of this scene at night with a gentle breeze blowing and a very light rain")
+**Rules check:**
+- **MASTER_RULES 8.4** lists rain rings among the effects still to build; 2b.0 says weather is an asset like any
+  other; section 6 gives the effects method (whole pixels, a short ramp, lit by the scene, no glow for its own sake).
+- **The real thing:** light rain at night is nearly invisible. A drop shows only where light catches it, as a short
+  slanting streak (its fall in the eye's moment): in a lantern's pool, a moonlit gap, near a candle. Drops slant with
+  the wind. On still liquid each drop rings (flattened by the view); on ground, a flick.
+- **Built:**
+  - `landkit/rain.py`: fixed drops in a volume, each falling three times a loop (seamless), slanting with the
+    breeze; lit by the lantern, the niche's candles and the moon where the canopy opens; dark air shows nothing;
+    every drop hidden by whatever stands nearer; rings opening and fading on the blood pools, the far rim catching
+    the light;
+  - the breeze made gentle for this render (`gentle_gust`: a soft breath, a mild swell instead of the full gust).
+  - Run: `python blind_face.py OUT.webp rain`.
+- **Graded (still):** C. The streaks show faintly in the lantern's pool and the gap, so the rain reads very light,
+  as asked. Brightened a little for motion.
