@@ -23,6 +23,14 @@ import drowned                               # noqa: E402
 import vein_tree                             # noqa: E402
 import fog as foggen                         # noqa: E402
 import bone as bonegen                       # noqa: E402
+import bog_structures                        # noqa: E402
+
+# hooks for the chamber scenes (art_study/bog_chambers.py): the bog's own scenes are this one with these filled
+BED_MODS = []          # f(X, Y, bed) -> bed: the ground the chamber shapes (a shelf, a socket, a skull) before the Back
+STRUCTS = []           # landkit bog_structures items: ("stump", ...), ("snag", ...), ("post", ...)
+EXTRA_STAMPS = []      # f(X, Y, H, W) -> (H, part): more pieces (the hut, the ruins), part codes 40-79 painted by EXTRA_PAINT
+EXTRA_PAINT = []       # f(img, W, px, py, pz, L, v, gl, part) -> img: their paint
+EXTRA_LIVING = []      # more living layers (vines, tendrils, a pustule, the hut's fire)
 from scipy.spatial import cKDTree            # noqa: E402
 from kit import ramp, vn, fbm                # noqa: E402
 
@@ -81,6 +89,8 @@ def stamp(W, w):
     dH, _, _, tus = fen_ground.height(X, Y, seed=11)
     shelf = np.clip(((X - C[0]) * -AX[0] + (Y - C[1]) * -AX[1] - 4.0) / 4.0, 0, 1)   # rising toward the back of the frame
     bed = LEVEL - 0.42 + dH * 1.3 + shelf * 0.5 + (fbm(X * 0.12, Y * 0.12) - 0.5) * 0.4
+    for f_ in BED_MODS:
+        bed = f_(X, Y, bed)
     H, part, info = serpent_spine.stamp(X, Y, bed, LINE, LEVEL, seed=5)
     DT = [(p_[0], p_[1], r, h, sd) for (p_, r, h, sd) in DROWNED_TREES]
     # the ruins keep off the Back (Derek: "those stone walls will just block the path completely"): a wall that would
@@ -104,8 +114,15 @@ def stamp(W, w):
     for i, (x_, y_, r_, h_, sd_) in enumerate(DT):
         W["obj"][800 + i] = dict(kind="drowned", c=np.array([x_, y_]), r=r_, dying=0.0)
     part = np.where(dpart > 0, 0, part)
+    H, spart = bog_structures.stamp(X, Y, H, STRUCTS, LEVEL)
+    for f_ in EXTRA_STAMPS:
+        H, ep = f_(X, Y, H, W)
+        spart = np.where(ep > 0, ep, spart)
+    part = np.where((spart > 0) & (spart != 32), 0, part)
+    dpart = np.where(spart > 0, 0, dpart)
+    W["bog_st"] = spart
     W["bog_dr"] = dpart
-    water = (H < LEVEL) & (part == 0) & (dpart == 0)
+    water = (H < LEVEL) & (part == 0) & (dpart == 0) & (spart == 0)
     W["H"] = np.where(water, LEVEL, H)
     W["Hrest"] = W["H"].copy()
     W["HT"] = np.full(H.shape, -50.0)
@@ -147,6 +164,17 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     peat = _r(R_PEAT, vv * 0.9)
     sedge = _r(R_SEDGE, vv * 0.95 + (vn(px * 6, py * 6) - 0.5) * 0.1)
     col = np.where(((tus > 0.15) & (part == 0))[..., None], sedge, peat)
+    # open ground by the water table (chapter 8: hummock and hollow): black wet peat in the hollows, a sphagnum lawn of
+    # dulled reds and greens between, brown moss and old heather on the hummock tops
+    hgt_w = pz - LEVEL
+    lawn = (hgt_w > 0.04) & (hgt_w < 0.2) & (part == 0) & (tus <= 0.15)
+    sph = np.where((vn(px * 3.1 + 7, py * 3.1) > 0.5)[..., None], np.array([0.17, 0.11, 0.09]), np.array([0.13, 0.16, 0.08]))
+    sph = sph * (0.45 + vv[..., None] * 0.9) * (1 + (vn(px * 17, py * 17)[..., None] - 0.5) * 0.3)
+    col = np.where(lawn[..., None], sph, col)
+    topm = (hgt_w >= 0.2) & (part == 0) & (tus <= 0.15)
+    col = np.where(topm[..., None], _r(R_MOSS, vv * 0.85 + (vn(px * 9, py * 9) - 0.5) * 0.12) * np.array([1.05, 0.95, 0.85]), col)
+    wetp = (hgt_w <= 0.04) & (part == 0)
+    col = np.where(wetp[..., None], _r(R_PEAT, vv * 0.6), col)
     tide = wet < 0.05 + (vn(px * 3, py * 3) - 0.5) * 0.06                    # a thin band at the water line: algae on the bone
     stain = ws.look(W, W["bog_stain"], px, py)                              # every vertebra its own stain and wear
     cav = ws.look(W, W["bog_cav"], px, py)
@@ -187,6 +215,26 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     col[boot] = _r(R_WATER, 0.3 + L["moon"][boot] * 0.3)                     # bootholes the mud let go of, holding black water
     col = np.where((part == 3)[..., None], _r(R_MUD, vv * 0.9), col)
     col = np.where((dr == 10)[..., None], dead, col)
+    st = ws.look(W, W["bog_st"], px, py)
+    if (st > 0).any():
+        streak2 = (vn(px * 9 + py * 3, wetz * 1.4) - 0.5) * 0.16
+        wood = _r(R_DEAD, vv * 0.88 + streak2)
+        wood = np.where((wetz < 0.25)[..., None], _r(R_ALGAE, vv * 0.95), wood)
+        mossy_top = (vn(px * 7, py * 7) > 0.5) & (wetz > 0.25)
+        logc = np.where(mossy_top[..., None], _r(R_MOSS, vv * 0.9), wood)
+        mound = np.where((vn(px * 6 + 3, py * 6) > 0.45)[..., None], _r(R_MOSS, vv * 0.9 + (vn(px * 15, py * 15) - 0.5) * 0.1),
+                         _r(R_PEAT, vv * 0.9))
+        dirt = _r(R_MUD, vv * 0.9 + (vn(px * 12, py * 12) - 0.5) * 0.14)
+        rootl = np.abs(np.sin(px * 23 + np.sin(py * 9) * 2 + wetz * 6)) < 0.18      # roots strung through the plate's dirt
+        plate = np.where(rootl[..., None], _r(R_DEAD, vv * 0.8), dirt)
+        col = np.where((st == 30)[..., None], wood, col)
+        col = np.where((st == 31)[..., None], _r(R_MUD, vv * 0.5), col)
+        col = np.where((st == 32)[..., None], mound, col)
+        col = np.where((st == 33)[..., None], logc, col)
+        col = np.where((st == 34)[..., None], plate, col)
+        col = np.where((st == 35)[..., None], _r(R_DEAD, vv * 0.85 + streak2), col)
+        for f_ in EXTRA_PAINT:
+            col = f_(col, W, px, py, pz, L, vv, gl, st)
     col = np.where(((dr == 11) | (dr == 12))[..., None], stone, col)
     # the black water: still and level; what lies over it comes in mirror() once everything is painted
     wcol = _r(R_WATER, 0.2 + (vn(px * 0.25, py * 0.25) - 0.5) * 0.16)
@@ -284,7 +332,11 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     fx, fy = ws.FOCUS
     box = (fx - 13, fy - 13, fx + 13, fy + 13)
     da = lambda x, y: float(ws.look(W, W["bog_depth"], np.array(x), np.array(y)))
-    pa = lambda x, y: int(ws.look(W, W["bog_part"], np.array(x), np.array(y)))
+    def pa(x, y):
+        stv = int(ws.look(W, W["bog_st"], np.array(x), np.array(y)))
+        if stv > 0 and stv != 32:
+            return 9                                                         # nothing grows on the wood, the hut, the bone
+        return int(ws.look(W, W["bog_part"], np.array(x), np.array(y)))
     ca = lambda x, y: float(ws.look(W, W["bog_v"], np.array(x), np.array(y))) / 3.0
     items = bog_plants.place(rng, da, pa, ca, box)
     for q, (p_, r, h, sd) in enumerate(DROWNED_TREES):                     # a few dead limbs left on each drowned tree
@@ -437,7 +489,25 @@ def bog_fog(img, w, W, px, py, pz, L, T=0.0):
     return foggen.draw(img, px, py, pz, low, T, L["moon"], np.zeros(px.shape), thick=1.5)
 
 
-ws.LIVING[:] = [mirror, giant_rib_mirror, plants, giant_ribs, bog_fog, wisps]
+def struct_living(img, w, W, px, py, pz, L, T=0.0):
+    """the snags' limbs and hanging vines (mirrored), and whatever the chamber adds"""
+    water = ws.look(W, W["bog_water"], px, py) & (L["tg"] == 0)
+    zb = np.full(img.shape[:2], -1e9)
+    dep = px + py
+    for (a, b, kind) in bog_structures.snag_strokes(STRUCTS, LEVEL):
+        gx_, gy_ = ws.to_px(tuple(a))
+        i_, j_ = int(np.clip(gy_, 0, ws.GH - 1)), int(np.clip(gx_, 0, ws.GW - 1))
+        lv_ = 0.35 + float(L["moon"][i_, j_]) * 0.5
+        if kind == "limb":
+            bog_plants._stroke(img, zb, dep, ws.to_px, a, b, R_DEAD[3], R_DEAD[5], lv_, water, LEVEL)
+        else:
+            bog_plants._stroke(img, zb, dep, ws.to_px, a, b, np.array([0.12, 0.16, 0.08]), np.array([0.18, 0.24, 0.1]), lv_, water, LEVEL)
+    for f_ in EXTRA_LIVING:
+        img = f_(img, w, W, px, py, pz, L, T)
+    return img
+
+
+ws.LIVING[:] = [mirror, giant_rib_mirror, plants, giant_ribs, struct_living, bog_fog, wisps]
 ws.GROUND = ground
 
 

@@ -201,3 +201,13 @@ MASTER_RULES is unchanged. **The lore's true detail for this piece:** "where the
 5. **The serpent's skull:** the top of the skull breaking the marsh, its brow ridges and eye sockets, the Back running into it.
 
 All are at the scene's standard and each gets its passes. **The path twists and turns:** the Back coils, doubles back and makes tight bends.
+
+## The chambers: pass log
+
+**Raw nature** (`bog_chambers.py nature`):
+
+| Pass | What changed | Grade |
+|---|---|---|
+| 1 | A marsh shelf (`shelf()`), the rotting stump on its mound, the tipped snag, the tendril post with its pustule (landkit `bog_structures.py`), the Back twisting in two bends | Plants too dense and even on the shelf; the hero stood in the water; tendrils too small. |
+| 2 | Plants clustered; hero on the Back; tendrils enlarged | Shelf barren and flat: the lift had erased the hummocks. |
+| 3-4 | The shelf lifted as a whole, keeping its own hummock and hollow, so pools stay in the hollows. Open ground coloured by the water table: black wet peat, a dulled red-green sphagnum lawn, brown moss on the tops. | **C+.** A reed wall on the left; the shelf murky. |

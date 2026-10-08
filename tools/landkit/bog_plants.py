@@ -227,7 +227,7 @@ def place(rng, depth_at, part_at, cover_at, box, n_try=9000):
         r = rng.random()
         if p == 0 and 0.05 < d < 0.4 and _bed(x, y) > 0.62 and r < 0.1:
             out.append(("reed", x, y, float(rng.uniform(1.5, 2.6))))
-        elif p == 0 and d <= 0.0 and r < 0.18:
+        elif p == 0 and d <= 0.0 and _bed(x + 80, y) > 0.48 and r < 0.07:       # sedge in clumps, the peat open between
             out.append(("sedge", x, y, float(rng.uniform(0.4, 0.9))))
         elif p == 3 and cv > 0.6 and r < 0.012:
             out.append(("reed", x, y, float(rng.uniform(1.2, 2.0))))
@@ -237,7 +237,7 @@ def place(rng, depth_at, part_at, cover_at, box, n_try=9000):
             out.append(("bulrush", x, y, float(rng.uniform(1.1, 1.8))))
         elif p == 0 and 0.0 < d < 0.18 and _bed(x - 30, y + 7) > 0.66 and r < 0.06:  # horsetail stands at the margins
             out.append(("horsetail", x, y, float(rng.uniform(0.4, 0.8))))
-        elif p == 0 and d <= -0.05 and r < 0.06:                              # cotton grass on the hummocks
+        elif p == 0 and d <= -0.05 and _bed(x + 61, y - 9) > 0.55 and r < 0.09:   # cotton grass, in drifts on the hummocks
             out.append(("cotton", x, y, float(rng.uniform(0.35, 0.6))))
         elif p == 0 and 0.05 < d < 0.4 and r < 0.025:                         # bogbean at the edges of the open water
             out.append(("bogbean", x, y, 0.0))
