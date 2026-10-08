@@ -530,3 +530,13 @@ A round platform of coursed stone, 16 yd across:
 Passes:
 1. It read new: a clean concrete pool on a drum.
 2. Lowered and settled: its far side drowned (sunk stones become water, mirrored); ragged rim; more blocks gone; moss over the outer rings; standing stones snapped jagged; heavier tendrils. **B-.** The moss blotches read as camouflage, and the flooded side blurs the pit's edge.
+
+## Islands off the walks (Derek: "board walks ... shooting off to islands of ruined huts or swampy pits")
+
+`bog_chambers.py island`: the Back passes, and off its flank the bog folk's causeway winds out across the water to a hump of peat with a RUINED HUT (`straw_hut(..., ruined=True)`). The thatch is caved through to the dark inside on the side the camera sees, the wall broken low there, the thatch rotten in patches; its old fire ring cold; a stump on the island.
+
+Passes:
+1. The cave-in faced away and did not read.
+2. Turned to face the camera and made larger. **B-.**
+
+Next: the swampy pit island; islands in the maze generator; and the pit of offering's moss, flooded edge and outer wall.

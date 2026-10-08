@@ -133,7 +133,7 @@ def scene_nature():
 R_THATCH = None
 
 
-def straw_hut(hx, hy, R=1.8, wall_h=1.05, pitch=0.95, pit_at=None, seed=5):
+def straw_hut(hx, hy, R=1.8, wall_h=1.05, pitch=0.95, pit_at=None, seed=5, ruined=False):
     """a bog folk's hut on its hump (they who walk the Long Back): round, its low wall of wattle daubed with peat-mud,
     its roof a cone of reed thatch laid in courses, ragged at the eave, a smoke hole at its peak; before its door a pit
     ringed with stones where wisp-fire burns cold. Height in the world; the door is drawn on the wall's face (part 41)"""
@@ -152,6 +152,13 @@ def straw_hut(hx, hy, R=1.8, wall_h=1.05, pitch=0.95, pit_at=None, seed=5):
         roof = roof + (vn(th * 30 + course * 3, d * 6) - 0.5) * 0.04
         hole = d < 0.16
         roof = np.where(hole, base + wall_h + R * pitch - 0.35, roof)
+        if ruined:                                                          # fallen in: the thatch caved through to the
+            cav_a = np.pi / 4 + ((seed % 3) - 1) * 0.5                      # dark inside, the wall broken low on the side we see
+            cav = np.hypot(X - hx - np.cos(cav_a) * R * 0.25, Y - hy - np.sin(cav_a) * R * 0.25) < R * (0.7 + 0.15 * vn(th * 4, 2.0))
+            roof = np.where(cav, base + 0.15 + (vn(X * 7, Y * 7) - 0.5) * 0.2, roof)
+            torn = np.abs(((th - cav_a + np.pi) % (2 * np.pi)) - np.pi) < 0.7
+            roof = np.where(torn & (d > R * 0.75), np.minimum(roof, base + wall_h * 0.45 + (vn(th * 9, 1.0) - 0.5) * 0.3), roof)
+            W["hut_cav"] = (hx + np.cos(cav_a) * R * 0.25, hy + np.sin(cav_a) * R * 0.25, R * 0.75)
         H2 = np.where(wall & (roof > H), roof, H)
         part[wall] = 40
         # the wall's face shows below the eave: the band of the cone within a hand of its rim is the thatch fringe,
@@ -219,7 +226,7 @@ def straw_hut(hx, hy, R=1.8, wall_h=1.05, pitch=0.95, pit_at=None, seed=5):
         dz = base + 0.06 - np.clip(1 - np.hypot((X - dpt[0]) / 0.3, (Y - dpt[1]) / 0.22), 0, 1) * 0.04
         H2 = np.where(ds, dz, H2)
         part[ds] = 47
-        W["hut"] = dict(c=(hx, hy), R=R, base=base, wall_h=wall_h, door=door_a)
+        W["hut"] = dict(c=(hx, hy), R=R, base=base, wall_h=wall_h, door=door_a, ruined=ruined)
         return H2, part
     return st
 
@@ -258,6 +265,12 @@ def hut_paint(col, W, px, py, pz, L, vv, gl, st):
     col = np.where((st == 44)[..., None], turf, col)
     plank = np.array([0.2, 0.17, 0.13]) * (0.35 + vv[..., None] * 0.8) * (1 - (np.abs(np.sin((px + py) * 18)) < 0.15)[..., None] * 0.35)
     col = np.where((st == 45)[..., None], plank, col)
+    if h.get("ruined") and "hut_cav" in W:
+        cx_, cy_, cr_ = W["hut_cav"]
+        inside = is_hut & (np.hypot(px - cx_, py - cy_) < cr_) & (hz < h["wall_h"] * 0.6)
+        col = np.where(inside[..., None], np.array([0.03, 0.025, 0.02]) + vv[..., None] * 0.04, col)
+        rot = is_hut & (vn(px * 9, py * 9) > 0.62)
+        col = np.where(rot[..., None], col * np.array([0.8, 0.75, 0.7]), col)
     trod = np.array([0.15, 0.11, 0.08]) * (0.45 + vv[..., None] * 0.9) * (1 + (vn(px * 9, py * 9)[..., None] - 0.5) * 0.2)
     col = np.where((st == 46)[..., None], trod, col)
     dstone = np.array([0.27, 0.27, 0.25]) * (0.4 + vv[..., None] * 0.9)
@@ -1015,7 +1028,38 @@ def scene_ribwalk():
     ws.HERO = rl[120] + AX * 0.05                                      # out on the rib
 
 
-SCENES = dict(pit=scene_pit, worms=scene_worms, ribwalk=scene_ribwalk, causeway=scene_causeway, nature=scene_nature, hut=scene_hut, socket=scene_socket, skull=scene_skull, ruins=scene_ruins)
+def scene_island():
+    """an island off the walks (Derek: "board walks ... shooting off to islands of ruined huts or swampy pits"): the
+    Back passes; off its flank the bog folk's causeway runs out across the water to a hump of peat with a ruined hut"""
+    set_origin(10)
+    bs.LINE = twisting_line(18 + VARIANT, bends=vb(((-0.4, 2.4, 4.0), (0.45, -2.0, 5.0))))
+    mid = bs.LINE[len(bs.LINE) // 2]
+    k_ = len(bs.LINE) // 2
+    tg = bs.LINE[k_ + 5] - bs.LINE[k_ - 5]
+    tg = tg / np.linalg.norm(tg)
+    away = np.array([-tg[1], tg[0]])
+    if away @ AX > 0:
+        away = -away                                                       # out into the water behind the Back
+    isl = mid + away * 11.0 + tg * 2.5
+    t = np.linspace(0, 1, 500)
+    start = mid + away * 2.2
+    end = isl - away * 2.6
+    side = np.array([-away[1], away[0]])
+    cl = start[None] + (end - start)[None] * t[:, None] + side[None] * (np.sin(t * np.pi * 2 + VARIANT) * 1.2)[:, None]
+    bs.CAUSEWAYS[:] = [cl]
+    bs.RIBWALKS[:] = []
+    bs.BED_MODS[:] = [shelf(isl[0], isl[1], 3.6, rise=0.2, seed=41)]
+    bs.DROWNED_TREES = [(C + AX * 6.0 - PERP * 8.0, 0.36, 5.0, 81)]
+    bs.DROWNED_WALLS, bs.GIANT_RIBS = [], []
+    bs.STRUCTS[:] = [("stump", *(isl + side * 2.4), 0.4, 99)]
+    bs.EXTRA_STAMPS[:] = [straw_hut(isl[0], isl[1], R=1.6, pit_at=isl - away * 2.0, seed=7 + VARIANT, ruined=True)]
+    bs.EXTRA_PAINT[:] = [hut_paint]
+    bs.EXTRA_LIVING[:] = []
+    ws.FOCUS = (mid + isl) / 2
+    ws.HERO = cl[300] + AX * 0.05
+
+
+SCENES = dict(island=scene_island, pit=scene_pit, worms=scene_worms, ribwalk=scene_ribwalk, causeway=scene_causeway, nature=scene_nature, hut=scene_hut, socket=scene_socket, skull=scene_skull, ruins=scene_ruins)
 
 if __name__ == "__main__":
     if ":" in sys.argv[1]:                                               # NAME:VARIANT, e.g. skull:2
