@@ -739,6 +739,84 @@ def scene_causeway():
     ws.HERO = cl[90] + AX * 0.1                                        # on the boards
 
 
+# ---------------------------------------------------------------- the Vein-Worms' ground
+def worm_ground(cx, cy, seed=29, n_rings=4, spread=2.6):
+    """THE VEIN-WORMS' GROUND (the hunter: "The Vein-Worms you know by the ground. A ring of red bubbles, soft as a
+    kettle ... They will rise under soft ground and never under a road"). A shelf of soft peat churned dark and wet,
+    and on it rings of glossy dark red bubbles, each ring a worm about to rise, some swelling, some already burst into
+    a ragged crater; the peat round each ring sunk a little and slick. No red light: the bubbles only catch the moon."""
+    rr = np.random.default_rng(seed)
+    rings = []
+    for k in range(n_rings):
+        ang, dist = rr.uniform(0, 2 * np.pi), rr.uniform(0.6, spread)
+        rings.append((cx + np.cos(ang) * dist, cy + np.sin(ang) * dist, rr.uniform(0.6, 1.1), int(rr.integers(11, 19)),
+                      rr.uniform(0, 1)))
+
+    def st(X, Y, H, W):
+        part = np.zeros(X.shape, int)
+        d0 = np.hypot(X - cx, Y - cy)
+        churn = (d0 < spread + 2.0) & (H > LEVEL - 0.05)
+        H2 = np.where(churn, H - 0.04 + (vn(X * 3.5 + seed, Y * 3.5) - 0.5) * 0.08, H)
+        part[churn] = 70
+        bub = []
+        for (rx, ry, R, nb, ph) in rings:
+            d = np.hypot(X - rx, Y - ry)
+            sink = churn & (d < R + 0.35)
+            H2 = np.where(sink, H2 - 0.06 * np.clip(1 - d / (R + 0.35), 0, 1), H2)
+            part[sink & (part == 70)] = 71
+            for b in range(nb):
+                a = 2 * np.pi * b / nb + rr.uniform(-0.12, 0.12)
+                bx, by = rx + np.cos(a) * R, ry + np.sin(a) * R
+                br = rr.uniform(0.06, 0.11)
+                burst = rr.random() < 0.18
+                bub.append((bx, by, br, burst, rr.uniform(0, 1)))
+                db = np.hypot(X - bx, Y - by)
+                if burst:                                                     # a crater, its lip torn
+                    m = db < br * 1.4
+                    H2 = np.where(m, H2 - 0.05 * np.clip(1 - db / (br * 1.4), 0, 1) + (db > br) * 0.03, H2)
+                    part[m] = 73
+                else:
+                    m = db < br
+                    H2 = np.where(m, np.maximum(H2, H2 + np.sqrt(np.clip(br ** 2 - db ** 2, 0, None)) * 0.7), H2)
+                    part[m] = 72
+        W["worm"] = dict(bub=bub)
+        return H2, part
+    return st
+
+
+def worm_paint(col, W, px, py, pz, L, vv, gl, st):
+    m = (st >= 70) & (st <= 73)
+    if not m.any():
+        return col
+    peat = bs._r(bs.R_MUD, vv * 0.75 + (vn(px * 6, py * 6) - 0.5) * 0.12)
+    slick = bs._r(bs.R_MUD, vv * 0.55) + np.array([0.02, 0.0, 0.0])
+    blood = np.array([0.18, 0.03, 0.04]) * (0.35 + vv[..., None] * 0.95)      # black-red, held dark (the fen lesson)
+    hi = (L["moon"] > 0.5) & (vn(px * 30, py * 30) > 0.55)                  # a wet glint of moon on a bubble's crown
+    bubc = np.where(hi[..., None], np.array([0.3, 0.14, 0.15]), blood)
+    crater = np.array([0.1, 0.02, 0.02]) * (0.4 + vv[..., None])
+    col = np.where((st == 70)[..., None], peat, col)
+    col = np.where((st == 71)[..., None], slick, col)
+    col = np.where((st == 72)[..., None], bubc, col)
+    col = np.where((st == 73)[..., None], crater, col)
+    return col
+
+
+def scene_worms():
+    set_origin(8)
+    bs.LINE = twisting_line(16 + VARIANT, bends=vb(((-0.45, 3.0, 4.5), (0.35, -2.6, 5.0))))
+    mid = bs.LINE[np.argmin(np.hypot(*(bs.LINE - C).T))]
+    wc = mid - AX * 6.0 + PERP * 0.5                                    # the soft ground lies off the Back: never under a road
+    bs.BED_MODS[:] = [shelf(*wc, 7.0, rise=0.12, seed=23)]
+    bs.DROWNED_TREES = [(C + AX * 6.0 - PERP * 7.0, 0.36, 5.0, 78)]
+    bs.DROWNED_WALLS, bs.GIANT_RIBS = [], []
+    bs.STRUCTS[:] = [("stump", *(wc - PERP * 4.5), 0.45, 97)]
+    bs.CAUSEWAYS[:], bs.RIBWALKS[:] = [], []
+    bs.EXTRA_STAMPS[:] = [worm_ground(wc[0], wc[1], seed=29 + VARIANT)]
+    bs.EXTRA_PAINT[:] = [worm_paint]
+    bs.EXTRA_LIVING[:] = []
+    ws.HERO = mid + AX * 0.2
+
+
 def scene_ribwalk():
     """a branch along a great rib: the Back passes, and from its flank a fallen rib runs out over the water, curving, a
     single-file bridge of bone"""
@@ -767,7 +845,7 @@ def scene_ribwalk():
     ws.HERO = rl[120] + AX * 0.05                                      # out on the rib
 
 
-SCENES = dict(ribwalk=scene_ribwalk, causeway=scene_causeway, nature=scene_nature, hut=scene_hut, socket=scene_socket, skull=scene_skull, ruins=scene_ruins)
+SCENES = dict(worms=scene_worms, ribwalk=scene_ribwalk, causeway=scene_causeway, nature=scene_nature, hut=scene_hut, socket=scene_socket, skull=scene_skull, ruins=scene_ruins)
 
 if __name__ == "__main__":
     if ":" in sys.argv[1]:                                               # NAME:VARIANT, e.g. skull:2

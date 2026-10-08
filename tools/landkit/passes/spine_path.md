@@ -489,3 +489,21 @@ Passes:
 3. Square off the Back's flank, toward the open water. **Rib walk: B+.**
 
 In the maze, 35% of the dead ends are causeways, 35% rib walks and the rest the Back.
+
+## The Vein-Worms' ground (a new chamber kind, from the hunter's lore)
+
+"The Vein-Worms you know by the ground. A ring of red bubbles, soft as a kettle ... never under a road."
+- Soft peat churned dark and wet, off the Back (never under a road).
+- Four rings of glossy black-red bubbles, some burst into ragged craters, the peat sunk and slick round each ring; no red light.
+
+Passes:
+1. Berry-red and too large; on the walk.
+2. Too faint.
+3. Mid-size, held dark, moon glints on the crowns. **B.**
+
+## DEREK'S THIRD REVIEW (2026-10-08)
+
+- **Done:** hut, nature, rib walk ("Love it"), ruins, skull, socket; value A- ("Passes").
+- **Walk, A-:** "Tone down the wisp fire and they should have a ghostly drift before going away."
+- **Causeway:** "more of those to add paths shooting off to islands of ruined huts or swampy pits".
+- **Maze, B+, a landmark:** "a large stone platform partially sunk and ringed by a coil of the serpent bone ... concentric circles around a deep pit of stone going down into the abyss ... gore and tendrils creeping up the side ... ruins that suggest this was a place of sacrifice."
