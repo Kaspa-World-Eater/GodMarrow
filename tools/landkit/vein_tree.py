@@ -35,6 +35,21 @@ def _lobe(theta, ridges):
     return out
 
 
+def _channels(theta, sd, R):
+    """the bark's furrows (chapter 6): 9 to 16 narrow channels round the trunk, each its own depth and width, braided:
+    a few run in pairs that meet (the cross ridges come from the twist carrying them past each other)"""
+    rc = np.random.default_rng(sd + 500)
+    n = int(rc.integers(9, 17))
+    out = np.zeros(theta.shape)
+    for k in range(n):
+        a = rc.uniform(0, 2 * np.pi)
+        w = rc.uniform(0.035, 0.08)
+        dep = rc.uniform(0.04, 0.09)
+        d = ((theta - a + np.pi) % (2 * np.pi)) - np.pi
+        out = np.maximum(out, dep * np.exp(-(d / w) ** 2))
+    return out * R
+
+
 def stamp(X, Y, H, trees, north, seed=1, only=None):
     tags = np.zeros(X.shape, int)
     H = H.copy()
@@ -52,7 +67,7 @@ def stamp(X, Y, H, trees, north, seed=1, only=None):
         d = np.hypot(Xn - tx, Yn - ty)
         th = np.arctan2(Yn - ty, Xn - tx)
         lob = _lobe(th, ridges)
-        r_t = R * (1 + lob - 0.06)                                          # the fluted bole: ridges proud, grooves between
+        r_t = R * (1 + lob - 0.06) - _channels(th, sd, R)                   # the fluted bole: ridges proud, grooves between, the bark's channels cut in
         flare = R * (1.15 + lob * 6.0)                                      # the buttresses run out along the ridges
         g0 = H[near]
         z = np.where(d <= r_t, hgt, np.clip((flare - d) / np.maximum(flare - r_t, 1e-3), 0, 1) ** 2.4 * (0.4 + lob * 3.2))
@@ -108,3 +123,68 @@ def stamp(X, Y, H, trees, north, seed=1, only=None):
                 H[box] = hb
                 tags[box] = tb
     return H, tags
+
+
+class Warp:
+    """each vein-tree as a warped column (chapter 6, Derek: "no tree is a perfect tube ... they taper, they twist"):
+    the trunk's canonical column (its lobed, channelled section, stamped by stamp()) is warped by height into the world:
+    - TAPER and SWELL: a butt swell at the foot, a slow taper, slow swellings round old collars, each tree its own;
+    - a WANDERING AXIS: a lean and a slow sweep;
+    - TWIST: the section turns with height (spiral grain, more on the bigger trees), so the channels wind round it.
+    For the engine's TRUNK_WARP hook: to_canon maps a world point to the column, normal_back turns a normal back out."""
+
+    def __init__(self, trees, grounds, tag0=600):
+        self.t = []
+        for i, ((x, y, R, hgt, sd), g0) in enumerate(zip(trees, grounds)):
+            rr = np.random.default_rng(sd + 900)
+            sign = 1.0 if rr.random() < 0.6 else -1.0
+            self.t.append(dict(
+                c=np.array([x, y], float), R=R, g0=g0, tag=tag0 + i,
+                tw=sign * rr.uniform(0.05, 0.11) * (0.6 + R * 0.4), twp=rr.uniform(0, 6.3),
+                lean=rr.uniform(0.008, 0.022), la=rr.uniform(0, 6.3),
+                sw=rr.uniform(0.12, 0.3), swl=rr.uniform(8, 14), swp=rr.uniform(0, 6.3),
+                s1=rr.uniform(0.02, 0.045), l1=rr.uniform(3, 6), p1=rr.uniform(0, 6.3),
+                s2=rr.uniform(0.01, 0.03), l2=rr.uniform(1.5, 3), p2=rr.uniform(0, 6.3)))
+
+    def _at(self, T, z):
+        z = np.maximum(z - T["g0"], 0.0)
+        s = (1 + 0.16 * np.exp(-z / 1.1)) * (1 - 0.008 * z) * (1 + T["s1"] * np.sin(2 * np.pi * z / T["l1"] + T["p1"])
+                                                                + T["s2"] * np.sin(2 * np.pi * z / T["l2"] + T["p2"]))
+        wa = T["lean"] * z
+        sw = T["sw"] * np.sin(2 * np.pi * z / T["swl"] + T["swp"]) * np.clip(z / 3.0, 0, 1)
+        wx = np.cos(T["la"]) * wa - np.sin(T["la"]) * sw
+        wy = np.sin(T["la"]) * wa + np.cos(T["la"]) * sw
+        tw = T["tw"] * z + 0.12 * np.sin(z / 5.0 + T["twp"])
+        return s, wx, wy, tw
+
+    def to_canon(self, x, y, z):
+        x2, y2 = x.copy(), y.copy()
+        for T in self.t:
+            s, wx, wy, tw = self._at(T, z)
+            dx, dy = x - T["c"][0] - wx, y - T["c"][1] - wy
+            near = dx * dx + dy * dy < (T["R"] * 4.0) ** 2
+            if not near.any():
+                continue
+            c_, s_ = np.cos(-tw), np.sin(-tw)
+            x2 = np.where(near, T["c"][0] + (dx * c_ - dy * s_) / s, x2)
+            y2 = np.where(near, T["c"][1] + (dx * s_ + dy * c_) / s, y2)
+        return x2, y2
+
+    def from_canon(self, i, x, y, z):
+        T = self.t[i]
+        s, wx, wy, tw = self._at(T, z)
+        dx, dy = (x - T["c"][0]) * s, (y - T["c"][1]) * s
+        c_, s_ = np.cos(tw), np.sin(tw)
+        return T["c"][0] + wx + dx * c_ - dy * s_, T["c"][1] + wy + dx * s_ + dy * c_, tw
+
+    def normal_back(self, n, px, py, pz, tag):
+        for T in self.t:
+            m = tag == T["tag"]
+            if not m.any():
+                continue
+            _, _, _, tw = self._at(T, pz)
+            c_, s_ = np.cos(tw), np.sin(tw)
+            nx = n[..., 0] * c_ - n[..., 1] * s_
+            ny = n[..., 0] * s_ + n[..., 1] * c_
+            n = np.where(m[..., None], np.dstack([nx, ny, n[..., 2]]), n)
+        return n

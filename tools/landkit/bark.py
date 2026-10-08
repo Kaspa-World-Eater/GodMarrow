@@ -61,8 +61,12 @@ def veins(r, seed, arc, along, top=24.0):
 
 
 def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0, scar_band=(4.5, 15.0), px_per_yd=18.0,
-          dying=0.0, disease=0.0):
-    """the pale vein-bark onto img where `wood` (the bole: `bole`, its round side above the flare); v the light"""
+          dying=0.0, disease=0.0, eyes=None):
+    """the pale vein-bark onto img where `wood` (the bole: `bole`, its round side above the flare); v the light.
+    eyes: a list; when given, a weeping scar is painted as its socket only (the swollen bark lids, the dark hollow) and
+    its place is appended (dict a=arc, z=along, w=half-width, k) so the scene ray-casts the god's 3D eye there
+    (landkit eye.py: a true ball that blinks; Derek 2026-10-07: "that same three-dimensional blinking quality ... true
+    for basically any organic stuff")"""
     ndl = n[..., 0] * moon[0] + n[..., 1] * moon[1]
     grain = vn(arc * 15.0 + along * 0.35, along * 1.6)
     fine = vn(arc * 34.0 + along * 0.5, along * 3.6)
@@ -97,10 +101,21 @@ def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0
         rs = np.random.default_rng(seed + 13)
         circ = 2 * np.pi * r
         n_sc = int(rs.integers(2, 5)) + int(round(dying * 3))
+        placed = []
         for k in range(n_sc):
-            a_s, z_s = rs.uniform(-0.6, 0.9) * r, rs.uniform(*scar_band)
             weeping = dying > 0 and k < 1 + int(dying * 3)                # the dying tree's scars open into eyes
-            w_s = rs.uniform(0.2, 0.3) * min(1.0, r / 0.6) * (2.4 if weeping else 1.0)   # an eye big enough to be one
+            # no two scars overlap (Derek: the eyes "overlap and they shouldn't"): each keeps clear of the others by
+            # its lids, brow and the runs beneath it, or it is not placed
+            for _try in range(24):
+                a_s, z_s = rs.uniform(-0.6, 0.9) * r, rs.uniform(*scar_band)
+                w_s = rs.uniform(0.2, 0.3) * min(1.0, r / 0.6) * (2.4 if weeping else 1.0)   # an eye big enough to be one
+                clear = all((((a_s - pa + circ / 2) % circ - circ / 2) / ((w_s + pw) * 1.9)) ** 2 +
+                            ((z_s - pz_) / ((w_s + pw) * 1.5)) ** 2 > 1.0 for (pa, pz_, pw) in placed)
+                if clear:
+                    break
+            if not clear:
+                continue
+            placed.append((a_s, z_s, w_s))
             da = ((arc - a_s + circ / 2) % circ) - circ / 2
             dz = along - z_s
             e = (da / w_s) ** 2 + (dz / (w_s * 0.55)) ** 2
@@ -108,7 +123,15 @@ def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0
             lip = bole & (e >= 1.0) & (e < 2.0)
             img[lip] = np.minimum(img[lip] * np.where(dz[lip] > 0, 1.28, 0.7)[:, None], 1)
             img[hole] = R_BARK[1] * np.where(e[hole] < 0.45, 0.55, 0.9)[:, None]
-            if weeping:
+            if weeping and eyes is not None:
+                # the socket for the 3D eye: swollen bark lids round a dark hollow; the eye itself is ray-cast by the scene
+                ex, ey = da / w_s, dz / (w_s * 0.55)
+                er = np.hypot(ex, ey)
+                lids = bole & (er >= 0.82) & (er < 1.35)
+                img[lids] = img[lids] * np.where(ey[lids] > 0, 1.12, 0.62)[:, None]
+                img[bole & (er < 0.82)] = R_BARK[0]
+                eyes.append(dict(a=a_s, z=z_s, w=w_s, k=k, mask=bole & (er < 1.0)))   # the socket's own pixels
+            elif weeping:
                 # THE WEEPING EYE (Derek: "a yellowing gross eye weeping, leaking blood sap"): the scar opened into an
                 # eye under swollen lids of bark; the white gone jaundiced yellow, threaded with bloodshot veins; a
                 # rheumy iris filmed milky at its ring; a wet glint on the moon side; the lower lid raw and red

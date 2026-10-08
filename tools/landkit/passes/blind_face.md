@@ -159,3 +159,116 @@ THE BLIND FACE, a giant grown a vast face in its bark, no eyes, the bark healed 
     (the bores, the standing wedge) are about 2 px at true scale, so the stump reads as "a stump with blood" and not
     yet as a vein cut open. Next: the bores as a ring of dark mouths a pixel larger, with a lit wet lip; the pool
     soaked into the litter, not a dithered block. **Graded C overall.** Shown to Derek for his grade.
+
+**Rules check (reminder, after pass 10, waiting for Derek's grade):**
+1. **Brief:** yes. The woodcutter's eleventh trunk that "ran red down the blade" is the piece's one true detail.
+2. **Scale:** knee height (0.58 yd) beside the 2-yard hero.
+3. **Form:** passes. Every facet, check, crest, bore, wedge and chip is height; the value-only test reads solid.
+4. **Light:** moon and lantern, both casting.
+5. **Values:** three planes on the top, a dark flank.
+6. **Ramps:** grey, sap, bark and iron are hue-shifted, but only 6 to 8 tones.
+7. **Paint:** the pool is a dithered block. It fails "pooled wet edges".
+8. **Contact:** litter banked over the foot.
+9. **Detail where it counts:** **fails.** The bores, which carry the story, are about 2 px.
+10. **Life:** the loop is stable.
+11. **Seen as the player sees it:** yes, the game camera with the Ossuarch.
+12. **Skeptic round:** done (pass 10).
+
+**Worst failure first: line 9.**
+11. The bores widened (2 to 3 px), each with its wall rolled out into a lip (height) lit dark red where wet, brown
+    where dry. The blood soaks in at its edges (alpha by depth) instead of sitting as a block. **Graded C+:** the
+    wet bores read as red mouths on the cut.
+    **Derek: "Looks good."** The same diligence for every next piece. Also: the eyes on the trees overlap, and they
+    should not; they should have the big eye's three-dimensional blinking quality, "true for basically any organic
+    stuff".
+
+## Piece 2: the eye tree (Derek, 2026-10-07)
+
+"Put an eyeball on at least one of the trees ... weeping bloody sap"; "if you're going to put eyeballs on a tree they
+need to be spaced out pretty well. So like maybe two eyeballs oriented differently on the tree, bulbous, slowly slowly
+blinking or looking around and/or both"; earlier: the bark's eyes "overlap and they shouldn't ... that same
+three-dimensional blinking quality ... true for basically any organic stuff."
+
+**Rules check, before pass 1:**
+- **Read:**
+  - the lore ("every tenth trunk holds something the god was carrying"; the trunks are its veins);
+  - the eye's record (`organic_notes.md`, `eye.py`, approved B+);
+  - chapter 3 §4 (veins, pustules);
+  - bark.py (sap is dark blood);
+  - report 1 (sink a thing into its ground: "a thing set on the ground read as a helmet").
+- **New design:** the approved eye (a shared organic part, kept in one place), placed by this scene's own design on
+  one vein-tree. The shared bark's random weeping sockets are off in this scene, so nothing overlaps. The shared
+  bark itself now refuses overlapping scars (`bark.py`), and its weeping sockets carry the 3D eye in every
+  wood-engine scene (`wood_pale.tree_eyes`).
+- **Form:** each eye a ray-cast ball with lid shells and cornea, sunk into the trunk so only its bulge stands out.
+- **Life:** each blinks slowly at its own time, and its gaze wanders.
+- **Brief:**
+  - one vein-tree at the glade's right;
+  - two eyes, low (3.4 yd) turned left and high (6.3 yd) turned right;
+  - 0.3 to 0.36 yd radius (bulbous on a 2-yard trunk);
+  - bloody sap weeping from each lower lid down the bark, fresh near the eye and crusting lower;
+  - a stain soaked into the bark round each socket.
+
+**Passes:**
+1. Two eyes on the vein-tree at the glade's right: low (2.4 yd, R 0.36) turned left, high (4.5 yd, R 0.3) turned
+   right (6.3 yd was out of frame). Each blinks once a loop at its own time, its gaze wandering across and up and down.
+   Four sap runs from each lower lid, and a stain round each socket. **Graded D+:** they read as dark red domes. The
+   lid shell stood proud like a cap, the aperture was too narrow to show the white, and the canopy's dark plus the
+   grim grade crushed them.
+2. Sunk to 0.72 R (the lids grow out of the bark, only the bulge stands out); aperture (1.0, 0.7); ambient 0.24.
+   **Graded C:** they read as eyes, iris and jaundiced white between fleshy lids, weeping down the bark.
+
+## Piece 3: the mouth hollow, and piece 4: the Niche Candle (Derek, 2026-10-07)
+
+"On a different tree, create a mouth that looks like a hollow. And then I want some candles inside the hollow of
+another tree with depth so you can see it glowing."
+
+**Rules check, before pass 1:**
+- **Read:**
+  - the lore: the Wood's landmarks include the Niche Candle (so the candle hollow is that landmark) and the Blind
+    Face (the face tree stays for later);
+  - the old-growth chapter: snags holed, crumbled hearts, foxfire in the softest dead wood;
+  - chapter 5: heart rot hollows a trunk and woundwood rolls round every wound;
+  - report 1: form first, the eye's ray-casting method, and "light must ADD".
+- **Real thing:** a tree hollow begins where a limb tore off and heart rot got in. The tree grows **woundwood**
+  round the opening: smooth rolled lips of new bark, folding in over the edge, which is what makes hollows look like
+  mouths. Inside is soft punky brown rot, darker with depth. Candles in a niche leave wax runs over the sill and soot
+  on the roof above the flames.
+- **New design:** `landkit/hollow.py`, a ray-marched cavity (a height field can't carve sideways into a trunk).
+  It's one shared piece for every hollow: the mouth (wide, its lower lip sagging, the throat dark, a wet red gleam
+  deep at the back, the god subtle) and the niche (tall, a floor, candles with wax runs, the flames lighting the
+  inside and spilling out).
+- **Form:** the lips are a rolled tube (real geometry), the cavity a real ellipsoid with depth, the candles real
+  cylinders. All lit through their normals.
+- **Light:** the moon dims with depth into the cavity; the candles are point lights inside, and one light just
+  outside the mouth of the niche warms the bark and the floor (the engine's `LIGHTS`, cast with shadows).
+- **Life:** the flames flicker, and the glow breathes with them.
+
+**Passes (mouth and niche, landkit hollow.py):**
+1. First build. **Graded D:**
+   - the mouth sat behind the left foreground trunk and was hidden;
+   - the niche was small but glowing.
+2. The mouth moved to the great trunk at the right edge; the niche bigger (five candles), its spill light 1.6 yd.
+   **Graded D:** the niche faced away from the camera, and the mouth was seen edge-on.
+3. Both face the camera, leaning a little into the glade. **Graded C-:**
+   - the niche reads: an orange glow deep in the trunk, the candles, the woundwood rim;
+   - the mouth reads as a knothole: dark lips, black inside.
+4. The mouth wider, its lower lip sagging (1.45), the woundwood thicker and pale like the bark (lit by the moon), the
+   rot lit at the rim and dark deeper in, a red gleam in the throat. **Graded C:** a mouth, but it ran off the
+   trunk's edge (a flat face on a round trunk).
+5. The hollow's frame wraps round the trunk's cylinder (`axis`, `rc`).
+
+## Derek: "no tree is a perfect tube" (2026-10-07). Chapter 6, old-growth trunks
+Studied: Douglas fir (bark up to a foot thick, deep furrows between great ridges joined by cross ridges), taper and
+butt swell, spiral grain (it grows with size; in the genes and driven by the wind), fluting in redcedar and spruce.
+Built:
+- `vein_tree.Warp`: each trunk a column warped by height (butt swell, a slow taper, swellings, a wandering axis
+  with lean and sweep, a twist of 3 to 8 degrees a yard, each tree its own);
+- 9 to 16 bark channels cut into the column, which the twist winds round the trunk;
+- the engine's new `TRUNK_WARP` hook (cast and normals);
+- the eyes and hollows carried out through the warp, their facing chosen in the world.
+**Graded C+:** every trunk swells at the foot, wavers along its outline, sweeps off true and carries its channels
+up. No tube left.
+6. The hollows: the cavity's visibility tested where the ray enters the opening, not at the rot behind the bark.
+   **Graded C:** the niche glows deep in its trunk, warm light spilling down the bark; the mouth is a wide dark
+   mouth, still somewhat side-on.

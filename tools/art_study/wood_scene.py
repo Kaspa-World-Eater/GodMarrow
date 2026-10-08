@@ -57,6 +57,7 @@ LIVING = []              # f(img, w, W, px, py, pz, L, T): more living layers, d
 GROUND_LIFE_OK = None    # f(x, y) -> bool: where grass may grow (a ruin keeps its bare ring and its stone clear)
 RIM = (1.35, (0.025, 0.025, 0.03))   # the moonlit rim on objects: strength and cool lift
 FOREST_LIFE = True       # the wood's own living layers (the leaf fall, falling and skittering leaves, the wisp-fire)
+TRUNK_WARP = None        # an object with to_canon(x, y, z) and normal_back(n, px, py, pz, tag): trunks that taper, swell, wander and twist
 NORMAL_BLUR = 1.0        # cells of blur on the height before its normals (a scene with small stones wants little: blur pillows)
 MOONLIT = None           # f(px, py, pz, t) -> 0..1: a scene's own reach of the moon (a cavern's shaft)
 GRASS = True             # the old scene's grass tufts in the gap (a scene with its own floor turns them off)
@@ -227,6 +228,8 @@ def lean(x, y, z, t):
 def cast(W, t=None):
     """every screen pixel down into the world: the point it meets (t: the trees lean with the wind at that time)"""
     SY, SX = np.mgrid[0:GH, 0:GW].astype(float)
+    if t is None and TRUNK_WARP is not None:
+        t = 0.0                                                            # warped trunks need the trees' own pass
     ox = GW / 2 - (FOCUS[0] - FOCUS[1]) * KX
     oy = GH / 2 - (FOCUS[0] + FOCUS[1]) * KY
     px = np.zeros((GH, GW))
@@ -245,6 +248,8 @@ def cast(W, t=None):
             continue
         lx, ly = lean(x, y, z, t)
         tx_, ty_ = x - lx, y - ly
+        if TRUNK_WARP is not None:
+            tx_, ty_ = TRUNK_WARP.to_canon(tx_, ty_, z)
         hit_t = ~got & (look(W, W["HT"], tx_, ty_, -50.0) >= z)
         hit_r = ~got & ~hit_t & (look(W, W["Hrest"], x, y, -50.0) >= z)
         px[hit_t], py[hit_t], pz[hit_t] = tx_[hit_t], ty_[hit_t], z
@@ -266,6 +271,8 @@ def shade(W, px, py, pz, SX, SY, t=0.0):
     hz = np.hypot(nx, ny) + 1e-6
     n_side = np.dstack([nx / hz, ny / hz, np.zeros_like(px)])
     n = np.where(side[..., None], n_side, n_top)
+    if TRUNK_WARP is not None:
+        n = TRUNK_WARP.normal_back(n, px, py, pz, tg)
     # true round normals on trunks and logs
     for k, o in W["obj"].items():
         m = tg == k

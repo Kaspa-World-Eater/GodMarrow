@@ -25,10 +25,13 @@ import wood_scene as ws                      # noqa: E402
 import wood_pale                             # noqa: E402
 import vein_tree                             # noqa: E402
 import vein_stump                            # noqa: E402
+import eye as eyegen                         # noqa: E402
+import hollow                                # noqa: E402
+import bark                                  # noqa: E402
 from wood_ecosystem import vn, fbm           # noqa: E402
 
 wood_pale.install()
-wood_pale.DYING_IN_FIVE = (0,)               # the god shows subtly here: one tree in five weeps, not two (Derek: "subtly")
+wood_pale.DYING_IN_FIVE = ()                 # no random weeping sockets here: this glade's eyes are designed (the eye tree below)
 wood_pale.DISEASE = (0.7, 0.45)              # older: canker, galls, lichen thick on the old
 C = np.array([20.0, 20.0])                   # the glade's heart
 AX = np.array([1.0, 1.0]) / np.sqrt(2)       # toward the viewer (down the screen)
@@ -76,6 +79,8 @@ NORTH = -AX                                                                     
 
 
 def stamp_vein_trees(W, w):
+    grounds = [float(ws.look(W, W["Hrest"], np.array(x), np.array(y))) for (x, y, r, h, sd) in VT]
+    ws.TRUNK_WARP = vein_tree.Warp(VT, grounds)                                    # no tube: taper, swell, wander, twist (chapter 6)
     H, tags = vein_tree.stamp(W["X"], W["Y"], W["H"], VT, NORTH, seed=7)
     W["H"] = H
     W["Hrest"] = np.where(tags < 0, H, W["Hrest"])                                 # the roots are ground; the trunks stand on it (the bark measures up from it)
@@ -83,7 +88,7 @@ def stamp_vein_trees(W, w):
     for i, (x, y, r, h, sd) in enumerate(VT):
         W["tag"] = np.where(tags == 1 + i, 600 + i, W["tag"])
         W["tag"] = np.where(tags == -(1 + i), 640 + i, W["tag"])
-        W["obj"][600 + i] = dict(kind="veintree", c=np.array([x, y]), r=r)
+        W["obj"][600 + i] = dict(kind="veintree", c=np.array([x, y]), r=r, vt=i)
         W["obj"][640 + i] = dict(kind="veinroot", c=np.array([x, y]), r=r * 0.2)
 
 
@@ -115,8 +120,145 @@ def stump_blood(img, w, W, px, py, pz, L, T):
     return vein_stump.paint_blood(img, px, py, B, D, lit, T)
 
 
+EYE_TREE = 2                                                                       # which vein-tree watches (the glade's right)
+EYES = []
+
+
+def place_eyes(W, w):
+    """the eye tree (Derek: "two eyeballs oriented differently on the tree, bulbous, slowly blinking or looking
+    around"): two of the god's eyes grown into one trunk, well apart, each sunk into the bark it pushed through"""
+    EYES.clear()
+    x, y, r, h, sd = VT[EYE_TREE]
+    c = np.array([x, y])
+    g0 = float(ws.look(W, W["Hrest"], np.array(x), np.array(y)))
+    for (off, zh, R, ph) in ((-0.62, 2.4, 0.36, 0.08), (0.58, 4.5, 0.3, 0.58)):
+        ang = np.pi / 4 + off - ws.TRUNK_WARP._at(ws.TRUNK_WARP.t[EYE_TREE], g0 + zh)[3]   # toward the camera, turned aside (undoing the twist)
+        u = np.array([np.cos(ang), np.sin(ang)])
+        ts = r
+        for t_ in np.arange(r * 0.4, r * 3.0, 0.02):                                 # the fluted bark's surface on that line
+            q = c + u * t_
+            if float(ws.look(W, W["HT"], np.array(q[0]), np.array(q[1]), -50.0)) < g0 + zh:
+                ts = t_
+                break
+        Pc = c + u * ts
+        wx_, wy_, tw = ws.TRUNK_WARP.from_canon(EYE_TREE, Pc[0], Pc[1], g0 + zh)
+        uw = np.array([np.cos(ang + tw), np.sin(ang + tw)])
+        EYES.append(dict(c=c, ang=ang, u=uw, P=np.array([wx_, wy_]), z=g0 + zh, zr=zh, R=R, ph=ph, g0=g0, r=r, yaw0=ang + tw))
+
+
+MOUTH_TREE = 4                                                                     # the mouth: the great trunk at the glade's right edge, facing in
+NICHE_TREE = 5                                                                     # the Niche Candle: the great tree in front, by the path
+HOLLOWS = []
+
+
+def _surface(W, c, r, ang, z):
+    u = np.array([np.cos(ang), np.sin(ang)])
+    for t_ in np.arange(r * 0.4, r * 3.0, 0.02):
+        q = c + u * t_
+        if float(ws.look(W, W["HT"], np.array(q[0]), np.array(q[1]), -50.0)) < z:
+            return c + u * t_, u
+    return c + u * r, u
+
+
+def place_hollows(W, w):
+    """the mouth (Derek: "a mouth that looks like a hollow") and the Niche Candle (the lore's landmark; Derek: "candles
+    inside the hollow of another tree with depth so you can see it glowing"), landkit hollow.py"""
+    HOLLOWS.clear()
+    view = np.array([1.0, 1.0]) / np.sqrt(2)
+    for (ti, kind, zh, Wd, Hd, Dd, cand) in (
+            (MOUTH_TREE, "mouth", 1.9, 0.6, 0.27, 0.7, ()),
+            (NICHE_TREE, "niche", 1.25, 0.3, 0.42, 0.55, ((-0.15, 0.13, 0.028), (-0.05, 0.22, 0.034), (0.05, 0.1, 0.026),
+                                                         (0.15, 0.17, 0.03), (0.0, 0.06, 0.03)))):
+        x, y, r, h, sd = VT[ti]
+        c = np.array([x, y])
+        g0 = float(ws.look(W, W["Hrest"], np.array(x), np.array(y)))
+        to_glade = (C - c) / np.linalg.norm(C - c)
+        fd = view * 0.78 + to_glade * 0.22                                        # it faces us, leaning a little into the glade
+        tw0 = ws.TRUNK_WARP._at(ws.TRUNK_WARP.t[ti], g0 + zh)[3]                  # the trunk's twist there: face the world way
+        P, u = _surface(W, c, r, np.arctan2(fd[1], fd[0]) - tw0, g0 + zh)
+        px_, py_, tw = ws.TRUNK_WARP.from_canon(ti, P[0], P[1], g0 + zh)              # out through the trunk's warp
+        ax_, ay_, _ = ws.TRUNK_WARP.from_canon(ti, c[0], c[1], g0 + zh)
+        u = np.array([u[0] * np.cos(tw) - u[1] * np.sin(tw), u[0] * np.sin(tw) + u[1] * np.cos(tw)])
+        P = np.array([px_, py_])
+        HOLLOWS.append(dict(kind=kind, C=np.array([P[0], P[1], g0 + zh]), u=u, W=Wd, H=Hd, D=Dd, candles=cand, zr=zh,
+                            axis=np.array([ax_, ay_])))
+        if kind == "niche":                                                         # the glow spilling out over the bark and the floor
+            q = P + u * 0.3
+            ws.LIGHTS.append((q[0], q[1], g0 + zh - 0.1, 1.6))
+
+
+def draw_hollows(img, w, W, px, py, pz, L, T):
+    GH, GW = img.shape[:2]
+    dep = px + py
+    zb = np.full((GH, GW), -1e9)
+    hero = np.array(ws.HERO, float)
+    hg = float(ws.look(W, W["H"], np.array(hero[0]), np.array(hero[1])))
+    lts = [((hero[0] + 0.25, hero[1] - 0.25, hg + 0.7), (0.95, 0.6, 0.32), 2.6 * 1.4)]
+    for k, hl in enumerate(HOLLOWS):
+        lx_, ly_ = ws.lean(np.array(hl["C"][0]), np.array(hl["C"][1]), np.array(hl["zr"]), T)
+        sh = np.array([float(lx_), float(ly_), 0.0])
+        C = hl["C"] + sh
+        img, _ = hollow.draw(img, zb, dep, ws.to_px, C, hl["u"], hl["W"], hl["H"], hl["D"], T, lts, ws.SUN, kind=hl["kind"],
+                             candles=hl["candles"], seed=61 + k, ambient=0.1, moonlit=0.5, axis=hl["axis"] + sh[:2])
+    return img
+
+
+def tree_eyes(img, w, W, px, py, pz, L, T):
+    GH, GW = img.shape[:2]
+    dep = px + py
+    zb = np.full((GH, GW), -1e9)
+    hero = np.array(ws.HERO, float)
+    hg = float(ws.look(W, W["H"], np.array(hero[0]), np.array(hero[1])))
+    lts = [((hero[0] + 0.25, hero[1] - 0.25, hg + 0.7), (0.95, 0.6, 0.32), 2.6 * 1.4)]
+    view = np.array([1.0, 1.0, 0.0]) / np.sqrt(2)
+    for k, e in enumerate(EYES):
+        p = e["P"] - e["u"] * e["R"] * 0.72                                          # sunk deep: the lids grow out of the bark, only the bulge stands out
+        lx_, ly_ = ws.lean(np.array(p[0]), np.array(p[1]), np.array(e["zr"]), T)
+        centre = (p[0] + float(lx_), p[1] + float(ly_), e["z"])
+        # it looks around, slowly: the gaze wanders across and up and down, each eye on its own time
+        yaw = e["yaw0"] + 0.5 * np.sin(2 * np.pi * (T + e["ph"])) - 0.25 * np.sign(e["ang"] - np.pi / 4)
+        pitch = 0.1 + 0.22 * np.sin(2 * np.pi * (T + e["ph"] * 1.7) + 1.3)
+        gz = np.array([np.cos(yaw), np.sin(yaw), pitch]) + view * 0.35
+        tb = ((T + e["ph"]) % 1.0) - 0.8                                             # one slow blink a loop, at its own time
+        blink = np.clip(1 - abs(tb) / 0.11, 0, 1) ** 0.7
+        eyegen.draw(img, zb, dep, ws.to_px, centre, e["R"], gz, blink, lts, ws.SUN, seed=41 + k, ambient=0.24,
+                    aperture=(1.0, 0.7))
+    return img
+
+
+def eye_sap(img, m, v, n, px, py, pz, o):
+    """the bloody sap weeping from each eye's lower lid down the bark: glossy red-black near it, crusting brown lower;
+    a stain soaked into the bark round the socket"""
+    for k, e in enumerate(EYES):
+        c, r = e["c"], e["r"]
+        ang = np.arctan2(py - c[1], px - c[0])
+        da = (((ang - e["ang"]) + np.pi) % (2 * np.pi) - np.pi) * r
+        dz = pz - e["z"]
+        ell = (da / (e["R"] * 1.7)) ** 2 + (dz / (e["R"] * 1.5)) ** 2
+        halo = m & (ell < 1.0)
+        img[halo] = img[halo] * (0.55 + 0.45 * ell[halo])[:, None] * np.array([1.0, 0.82, 0.8])
+        rs = np.random.default_rng(71 + k)
+        for q in range(4):
+            a_r = rs.uniform(-0.55, 0.55) * e["R"]
+            L_r = rs.uniform(1.0, 3.2)
+            z0 = e["z"] - e["R"] * 0.75
+            f_ = np.clip((z0 - pz) / L_r, 0, 1)
+            wig = np.sin(pz * 2.0 + q * 2.1) * 0.03 + np.sin(pz * 0.8 + k) * 0.025
+            wr = 0.055 - f_ * 0.035
+            run = m & (pz < z0) & (pz > z0 - L_r) & (np.abs(da - a_r - wig) < wr)
+            fresh = run & (f_ < 0.5)
+            img[run] = bark.SAP_OLD[np.clip(((v[run] * 0.6 + 0.15) * len(bark.SAP_OLD)).astype(int), 0, len(bark.SAP_OLD) - 1)]
+            img[fresh] = bark.SAP[np.clip(((v[fresh] * 0.75 + 0.12) * len(bark.SAP)).astype(int), 0, len(bark.SAP) - 1)]
+            bead = fresh & (np.abs(da - a_r - wig) < wr * 0.35) & (v > 0.35)
+            img[bead] = np.minimum(img[bead] * 1.8 + np.array([0.08, 0.02, 0.02]), 1)
+    return img
+
+
 def paint_vein(img, m, v, n, px, py, pz, o, W, L):
-    return wood_pale.pale_bark(img, m, v, n, px, py, pz, o)
+    img = wood_pale.pale_bark(img, m, v, n, px, py, pz, o)
+    if o.get("vt") == EYE_TREE:
+        img = eye_sap(img, m, v, n, px, py, pz, o)
+    return img
 
 
 def grim(img, w, W, px, py, pz, L, T):
@@ -131,9 +273,13 @@ def grim(img, w, W, px, py, pz, L, T):
 
 ws.WOOD_HOOKS.append(plan)
 ws.LIVING.append(stump_blood)
+ws.LIVING.append(tree_eyes)
+ws.LIVING.append(draw_hollows)
 ws.LIVING.append(grim)
 ws.BUILD_HOOKS.insert(0, stamp_vein_trees)
 ws.BUILD_HOOKS.insert(1, stamp_stump)
+ws.BUILD_HOOKS.insert(2, place_eyes)
+ws.BUILD_HOOKS.insert(3, place_hollows)
 ws.PAINTERS["vstump"] = paint_stump
 ws.PAINTERS["veintree"] = paint_vein
 ws.PAINTERS["veinroot"] = paint_vein

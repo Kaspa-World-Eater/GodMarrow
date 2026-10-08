@@ -31,6 +31,8 @@ LICHEN = hexc("#8a9184")
 LITTER = ramp("#100c0a", "#1e1612", "#2e2119", "#402e20", "#553d29")
 BORE = hexc("#0d0405")
 WETBORE = hexc("#2c0508")
+WETLIP = hexc("#5a1a16")
+DRYLIP = hexc("#3a2620")
 STAIN = hexc("#3b1712")
 HA = 0.15                                    # the hinge's place along the fall (in radii from the heart)
 
@@ -136,10 +138,11 @@ def stamp(X, Y, H, c, R=0.8, fall=(-1.0, 0.0), seed=111, north=(-0.7, -0.7), oth
         ang = ridges[0][k]
         r_at = R * (1 + ridges[2][k] - 0.06) * 0.9
         lx, ly = cx + np.cos(ang) * r_at, cy + np.sin(ang) * r_at
-        lr = 0.07 + ridges[2][k] * 0.12
+        lr = 0.09 + ridges[2][k] * 0.14
         lumens.append([lx, ly, lr, ((lx - cx) * f[0] + (ly - cy) * f[1]) / R])
-        hole = np.hypot(Xs - lx, Ys - ly) < lr
-        zc = np.where(hole, zc - 0.07, zc)
+        dl_ = np.hypot(Xs - lx, Ys - ly)
+        zc = np.where(dl_ < lr, zc - 0.09, zc)                                # the open bore
+        zc = zc + np.clip(1 - np.abs(dl_ - lr * 1.15) / (lr * 0.35), 0, 1) * 0.03   # its wall, rolled out a little: a lip
     wet_rank = sorted(range(len(lumens)), key=lambda i: -lumens[i][3])[:2]   # the two lowest, toward the notch, still weep
     lumens = [(l[0], l[1], l[2], i in wet_rank) for i, l in enumerate(lumens)]
     face = d <= rt
@@ -280,6 +283,8 @@ def paint(img, m, v, n, px, py, pz, part, info, moon):
             dl = np.hypot(px - lx, py - ly)
             soak = np.clip(1 - (dl - lr) / (0.22 if wet else 0.12), 0, 1) ** 1.5 * (0.75 if wet else 0.45)
             col = col * (1 - soak[..., None]) + STAIN * np.clip(v * 1.6, 0.3, 1)[..., None] * soak[..., None]
+            lip = (dl >= lr) & (dl < lr * 1.5)
+            col = np.where(lip[..., None], (WETLIP if wet else DRYLIP) * np.clip(v * 1.5, 0.3, 1.1)[..., None], col)
             col = np.where((dl < lr)[..., None], WETBORE if wet else BORE, col)
             if wet:                                                     # the welling surface catches the light
                 gl = (dl < lr * 0.8) & (vn(px * 40, py * 40) > 0.72) & (v > 0.3)
@@ -330,5 +335,6 @@ def paint_blood(img, px, py, B, DRY, light, T=0.0, look=None):
     sy, sx = np.mgrid[0:GH, 0:GW]
     lt = np.clip(light[m], 0, 0.55)                                       # blood is dark: lit only so far (no ketchup)
     col = blood.shade(np.clip(B[m], 0, 1) * 0.62, px[m], py[m], sx[m], sy[m], T, DRY[m], light_side=lt, light=lt)
-    img[m] = col
+    a = np.clip(B[m] * 1.8, 0, 1)[:, None]                                 # thin at the edge, soaked into what it ran on
+    img[m] = img[m] * (1 - a) + col * a
     return img
