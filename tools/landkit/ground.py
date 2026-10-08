@@ -451,3 +451,45 @@ def craggy_height(px, py, seed=2, source_dist=None, path=None, relief=CRAGGY["re
     hv = np.zeros(px.shape) if source_dist is None else np.clip(1 - source_dist / reach, 0, 1) ** pw
     h, I = _poly(px, py, seed, hv, np.zeros(px.shape) if path is None else path)
     return h * relief, I
+
+
+def flags_height(u, v, seed=0, course=0.55, path=None):
+    """a floor of dressed flags laid in courses (a church nave, a hall), by chapter 4: each flag a flat plane at its own
+    tilt (2 to 6 degrees) and settle, a bevel at its arris, one to three planar chips at its edges, joints between; some
+    sunk, some cracked across with the far piece dropped, a few gone to earth. u runs along the courses, v across them
+    (yards, in the floor's own frame). Returns (height in yards, info) for the world's height field (MASTER_RULES 0)."""
+    pth = np.zeros(u.shape) if path is None else path
+    row = np.floor(v / course).astype(np.int64)
+    off = h1(row, 1, seed) * 0.9                                            # each course offset its own way
+    L = 0.65 + h1(row, 2, seed) * 0.45                                      # and its own flag length
+    col = np.floor((u + off) / L).astype(np.int64)
+    cid = row * 7919 + col
+    lu = (u + off) - (col + 0.5) * L                                        # within the flag: along, across
+    lv = v - (row + 0.5) * course
+    ed = np.minimum(L / 2 - np.abs(lu), course / 2 - np.abs(lv))            # yards to its edge
+    gap = 0.012 + h1(cid, 3, seed) * 0.01
+    settle = (h1(cid, 4, seed) - 0.5) * 0.035 - pth * 0.015                  # dished a little along the trodden way
+    ta = (h1(cid, 6, seed) - 0.5) * 0.12
+    tb = (h1(cid, 7, seed) - 0.5) * 0.12
+    top = settle + ta * lu + tb * lv
+    h = top - np.clip(1 - (ed - gap) / 0.045, 0, 1) * 0.022                 # the bevel
+    for k in range(3):                                                      # planar chips at its edges and corners
+        on = h1(cid, 50 + k, seed) > 0.5
+        a = h1(cid, 53 + k, seed) * 6.283
+        proj = lu * np.cos(a) + lv * np.sin(a)
+        r0 = 0.14 + h1(cid, 56 + k, seed) * 0.12
+        sl_ = 0.3 + h1(cid, 59 + k, seed) * 0.4
+        h = np.where(on, np.minimum(h, top - np.clip(proj - r0, 0, None) * sl_), h)
+    fate = h1(cid, 20, seed)
+    sunk = (fate > 0.84) & (fate < 0.92)
+    gone = fate >= 0.955
+    h = h - sunk * 0.045
+    ck = fate < 0.12
+    ca = h1(cid, 21, seed) * 3.14
+    cd = lu * np.cos(ca) + lv * np.sin(ca) + (vn(u * 5 + seed, v * 5) - 0.5) * 0.06
+    crack = ck & (np.abs(cd) < 0.013)
+    h = h - np.where(ck & (cd > 0), 0.016, 0) - np.where(crack, 0.03, 0)
+    joint = ed < gap
+    h = np.where(joint, -0.045, h)
+    h = np.where(gone, -0.055 + (vn(u * 3, v * 3) - 0.5) * 0.02, h)
+    return h, dict(cid=cid, joint=joint, gone=gone, sunk=sunk, crack=crack, ed=ed, lu=lu, lv=lv)

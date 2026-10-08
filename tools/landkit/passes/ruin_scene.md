@@ -151,3 +151,15 @@ objects (sprites, collision, combat data).
 Worst failure: the bell's readability (it is the scene's focal relic). Then the boulder, the jambs, the light, motion,
 export.
 Section 8 in view: metal and armour, the environment agenda, repainting the effects, the effects still to build, melee.
+
+## Rework (2026-10-07, stage 1 of docs/REWORK_AND_SEEDS_PLAN.md)
+- **From the engine:** the pale trunks warped and channelled; normals unblurred; the forest floor round the chapel
+  from `litter_ground.py`.
+- **The nave floor:** the retired tile (`tiles_ruin.church_flags`, a flat picture) replaced by real stones, the new
+  shared `ground.flags_height`, by chapter 4:
+  - coursed flags, each course offset and its own flag length;
+  - each flag a plane at its own tilt and settle, with a bevel and planar chips;
+  - some sunk, some cracked across with the far piece dropped, a few gone to earth;
+  - joints between, packed with leaf-mould and moss creeping out of them.
+  - All of it height in the world, so the moon and the candle light each flag through its real normal.
+- **Graded:** C+ (it was C). The floor reads as old laid stone, not a texture. Its worst failure stands: the bell.

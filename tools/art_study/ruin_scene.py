@@ -115,6 +115,14 @@ def stamp(W, w):
     W["tag"] = np.where(m, 600, W["tag"])
     W["RU"] = np.where(m, fm, 0)
     W["obj"][600] = dict(kind="ruin", base=base)
+    # the nave floor as real stones (reworked 2026-10-07: chapter 4, the depth effect), not the retired tile:
+    # coursed flags, each a tilted plane with a bevel and chips, some sunk, cracked or gone; into the world's height
+    import ground
+    flag = m & (W["RU"] == ruin.FLAG)
+    fh_, FI_ = ground.flags_height(lx, ly, seed=11)
+    W["H"] = np.where(flag, W["H"] + fh_, W["H"])
+    W["Hrest"] = np.where(flag, W["Hrest"] + fh_, W["Hrest"])
+    W["FLAGI"] = FI_
     # the bell, sunk in the floor of the nave
     bx, by = to_bell(X, Y)
     inb = (np.abs(bx) < BF.half) & (np.abs(by) < BF.half)
@@ -245,15 +253,21 @@ def paint_ruin(img, m, v, n, px, py, pz, o, W, L):
     # ---- the nave floor: the game's own church-floor tile (tiles_ruin.church_flags), laid where the world puts it
     # (its screen position on the ground plane) and lit by this scene's moon, lantern and candle
     flag = m & (RU == ruin.FLAG)
-    if "flags" not in _TILES:
-        import tiles_ruin
-        _TILES["flags"] = tiles_ruin.church_flags(seed=0)[0]
-    T_ = _TILES["flags"]
-    gx_s = ((px - py) * ws.KX) % T_.shape[1]
-    gy_s = ((px + py) * ws.KY) % T_.shape[0]
-    alb = T_[gy_s.astype(int) % T_.shape[0], gx_s.astype(int) % T_.shape[1]]
-    lightk = np.clip(0.5 + v * 1.05, 0.35, 1.45)
-    img[flag] = np.clip(alb[flag] * lightk[flag][:, None], 0, 1)
+    # the flags: each its own stone (its own shade of the one sandstone), lit by the real normals of its tilted plane;
+    # dark joints packed with old leaf-mould, moss creeping from them, chips paler, the gone ones earth
+    FI_ = W["FLAGI"]
+    cid = ws.look(W, FI_["cid"], px, py)
+    jnt = ws.look(W, FI_["joint"], px, py) > 0
+    gon = ws.look(W, FI_["gone"], px, py) > 0
+    tint = (np.sin(cid * 12.9898) * 43758.5453) % 1.0
+    fv = np.clip(v * 0.82 + (tint - 0.5) * 0.08 + (vn(px * 4, py * 4) - 0.5) * 0.03, 0, 0.99)
+    img[flag] = R_STONE[np.clip((fv * len(R_STONE)).astype(int), 0, len(R_STONE) - 1)][flag]
+    jm = flag & jnt
+    img[jm] = R_MOSSW[np.clip((v[jm] * 0.55 * len(R_MOSSW)).astype(int), 0, len(R_MOSSW) - 1)] * 0.7
+    creep = flag & ~jnt & (ws.look(W, FI_["ed"], px, py) < 0.05) & (vn(px * 11, py * 11) > 0.55)
+    img[creep] = R_MOSSW[np.clip((v[creep] * 0.75 * len(R_MOSSW)).astype(int), 0, len(R_MOSSW) - 1)]
+    gm = flag & gon
+    img[gm] = img[gm] * 0.45 + np.array([0.06, 0.045, 0.035])
     bxs, bys = to_bell(px, py)
     img = relic.stain(img, flag, bxs, bys, BI)                         # the bell's rust bled into the flags
     # desolation: centuries of leaves no one has swept, drifted grey against the inside of the walls and the piers' feet
