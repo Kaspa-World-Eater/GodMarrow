@@ -339,6 +339,12 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
         return int(ws.look(W, W["bog_part"], np.array(x), np.array(y)))
     ca = lambda x, y: float(ws.look(W, W["bog_v"], np.array(x), np.array(y))) / 3.0
     items = bog_plants.place(rng, da, pa, ca, box)
+    # the near water stays open (MASTER_RULES 5: nothing tall and leafy crowds the screen; the game ghosts what stands
+    # before the pilgrim, but the frame should not be a wall of stems): tall plants thin out toward the camera
+    hd = ws.HERO[0] + ws.HERO[1]
+    rk = np.random.default_rng(77)
+    items = [it for it in items if not (it[0] in ("reed", "bulrush") and it[1] + it[2] > hd + 1.5
+                                        and rk.random() < np.clip((it[1] + it[2] - hd - 1.5) / 3.0, 0, 0.92))]
     for q, (p_, r, h, sd) in enumerate(DROWNED_TREES):                     # a few dead limbs left on each drowned tree
         rl = np.random.default_rng(sd)
         for j in range(int(rl.integers(1, 4))):

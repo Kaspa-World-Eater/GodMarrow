@@ -19,6 +19,15 @@ from kit import vn, fbm                      # noqa: E402
 C, AX, PERP, LEVEL = bs.C, bs.AX, bs.PERP, bs.LEVEL
 
 
+def set_origin(k):
+    """each chamber its own place in the world (its own seeds for every bed of plants, every hummock and pool),
+    so no two chambers share a foreground"""
+    global C
+    C = np.array([20.0 + 37.0 * k, 20.0 + 13.0 * k])
+    bs.C = C
+    ws.FOCUS = C.copy()
+
+
 def twisting_line(seed, span=17.0, bends=((0.0, 3.4, 3.0),), n=1400):
     """the Back's line for a frame: in from one side, twisting (a few bends of its own sharpness), out the other.
     bends: (where along -1..1, how far it swings in yd, how tight)"""
@@ -71,6 +80,7 @@ def tendrils_round_post(px_, py_, h, seed):
 
 
 def scene_nature():
+    set_origin(1)
     bs.LINE = twisting_line(2, bends=((-0.35, 3.6, 4.0), (0.3, -3.2, 5.0)))
     bs.BED_MODS[:] = [shelf(*(C - AX * 4.5 + PERP * 2.0), 7.5)]
     bs.DROWNED_TREES = [(C + AX * 6.0 - PERP * 8.0, 0.4, 6.0, 71)]
@@ -178,6 +188,7 @@ def pit_fire(px_, py_):
 
 
 def scene_hut():
+    set_origin(2)
     bs.LINE = twisting_line(4, bends=((-0.5, -3.0, 4.5), (0.15, 3.6, 3.5), (0.65, -2.0, 6.0)))
     hc = C - AX * 4.2 - PERP * 1.0
     pit = hc + AX * 2.6 + PERP * 0.6
@@ -387,6 +398,7 @@ def ruins_paint(col, W, px, py, pz, L, vv, gl, st):
 
 
 def scene_socket():
+    set_origin(3)
     bs.LINE = twisting_line(6, bends=((-0.45, 3.4, 5.0), (0.35, -3.0, 4.0)))
     sc = C - AX * 4.8 + PERP * 1.0
     bs.BED_MODS[:] = [shelf(*(sc), 8.0, rise=0.14, seed=13)]
@@ -400,6 +412,7 @@ def scene_socket():
 
 
 def scene_skull():
+    set_origin(4)
     sk = C - AX * 3.5 + PERP * 0.5
     ang = np.arctan2(PERP[1], PERP[0])
     rear = sk - np.array([np.cos(ang), np.sin(ang)]) * 4.6
@@ -414,10 +427,11 @@ def scene_skull():
     bs.EXTRA_STAMPS[:] = [serpent_skull(sk[0], sk[1], ang)]
     bs.EXTRA_PAINT[:] = [skull_paint]
     bs.EXTRA_LIVING[:] = []
-    ws.HERO = bs.LINE[int(len(bs.LINE) * 0.7)] + AX * 0.2
+    ws.HERO = rear - np.array([np.cos(ang), np.sin(ang)]) * 1.6 + AX * 0.2   # on the Back, at the skull's rear
 
 
 def scene_ruins():
+    set_origin(5)
     bs.LINE = twisting_line(8, bends=((-0.4, -3.2, 4.0), (0.4, 2.8, 5.0)))
     rc = C - AX * 5.0 - PERP * 0.5
     bs.BED_MODS[:] = [shelf(*(rc + AX * 1.0), 7.5, rise=0.2, seed=19)]

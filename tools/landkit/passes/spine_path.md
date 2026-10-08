@@ -230,3 +230,10 @@ All are at the scene's standard and each gets its passes. **The path twists and 
 - Pass 2: coursed blocks each their own grey, moss on the tops, the floor laid into the shelf, the jambs lowered, the hero on the floor. **B-.** The floor flags don't read yet.
 
 **Across the chambers:** they share the bog scene's foreground plants and the drowned tree on the right. Each needs its own seeds and its own foreground.
+
+**All chambers, pass 4 (2026-10-08):**
+- Each chamber now has its own place in the world (`set_origin`), so its own beds of plants, hummocks and pools; none share a foreground.
+- Tall plants thin toward the camera (MASTER_RULES 5: nothing tall crowds the screen).
+- The skull's hero stands on the Back at the skull's rear.
+
+Grades: nature **B-**, hut **B-**, socket **B-**, skull **B-**, ruins **B-**, the main walk **B**.
