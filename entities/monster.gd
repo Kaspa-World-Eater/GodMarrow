@@ -173,6 +173,7 @@ func _numbers() -> void:
 	var ek := ease_k(level)
 	hp_max = maxf(1.0, roundf(hp_max * ek))
 	dmg *= ek * (0.85 if level > 5 else 1.0)   # their blows a little lighter than their life
+	dmg *= DMG_K
 	hp = hp_max
 	radius = float(info.get("r", kd.get("radius", 0.3)))
 	var rr = kd.get("resists_at_spawn")
@@ -210,6 +211,9 @@ func _shadow() -> void:
 		zone.shadow_layer.add_child(SilShadow.new(spr, self, false))
 
 # ------------------------------------------------------------------ numbers the brain and skills use
+## their blows on this difficulty (Derek 2026-10-08: "I can't get anywhere without immediately dying")
+const DMG_K := 0.6
+
 func roll_damage() -> float:
 	Combat.striker = self   # the blow about to land knows whose it is (the deeds: Thirsting, Nail-Fisted)
 	Combat.striker_frame = Engine.get_physics_frames()
@@ -223,7 +227,7 @@ func hour_mult() -> float:
 	if not (h is Dictionary):
 		return 1.0
 	var v = h.get(Game.hour_name(), 1.0)
-	return float(v) if (v is float or v is int) else 1.0
+	return minf(float(v), 1.15) if (v is float or v is int) else 1.0   # the night makes them bolder, never twice as deadly
 
 func walks_now() -> bool:
 	var hh = kd.get("hours")

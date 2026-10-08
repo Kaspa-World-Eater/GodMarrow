@@ -105,6 +105,36 @@ func _ready() -> void:
 	await TestHooks.run(self)   # test and capture hooks (core/test_hooks.gd); nothing without their args
 
 
+## fewer strong ones (Derek 2026-10-08: "magic+ monsters are too often"): only one champion pack in three stays a
+## champion pack (the rest are ordinary creatures of their kind), and a zone keeps one named unique, the first
+func _tame(m: Dictionary, seen: Dictionary) -> Dictionary:
+	var rank := str(m.get("rank", "normal"))
+	var pack := str(m.get("pack", ""))
+	var keep := true
+	# never far above the pilgrim (Derek 2026-10-08: "I can't get anywhere without immediately dying"; with the Moor wiped
+	# to a bare camp, every road out of it leads to creatures of level 5 to 17): at most two levels over them
+	var cap := (hero.st.level + 2) if hero and hero.st else 99
+	if int(m.get("level", 1)) > cap:
+		var o2 := m.duplicate()
+		o2["level"] = cap
+		o2.erase("hp")                  # its life from its new level's row
+		m = o2
+	if rank == "champion":
+		keep = absi(pack.hash()) % 3 == 0
+	elif rank == "unique":
+		keep = not seen.has("unique") or seen["unique"] == pack
+		if keep:
+			seen["unique"] = pack
+	if keep:
+		return m
+	var o := m.duplicate()
+	o["rank"] = "normal"
+	o["mods"] = []
+	o.erase("hp")                       # its life from the ordinary row, not the champion's
+	if rank == "unique":
+		o.erase("name")
+	return o
+
 func enter(zid: String, from: String) -> void:
 	travelling = true
 	if from != "" and from != "__lantern":
@@ -155,11 +185,13 @@ func enter(zid: String, from: String) -> void:
 		_title_open()
 	elif reading_open and fresh_pilgrim:
 		_reading_open()
-	for m in zone.d.get("monsters", []):
+	var tamed := {}
+	for m0 in zone.d.get("monsters", []):
 		# the safe circle of a town holds no creatures
 		var sc = zone.markers.get("safeCircle")
-		if sc is Dictionary and Vector2(m["x"], m["y"]).distance_to(Vector2(sc["x"], sc["y"])) < float(sc["r"]):
+		if sc is Dictionary and Vector2(m0["x"], m0["y"]).distance_to(Vector2(sc["x"], sc["y"])) < float(sc["r"]):
 			continue
+		var m: Dictionary = _tame(m0, tamed)
 		var mon := Monster.new()
 		zone.sorted.add_child(mon)
 		mon.setup(zone, m)
