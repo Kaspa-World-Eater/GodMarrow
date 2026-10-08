@@ -394,14 +394,21 @@ def ruins(cx, cy, ang, seed=21):
         u = (X - cx) * ca + (Y - cy) * sa
         v = -(X - cx) * sa + (Y - cy) * ca
         # the floor: flags, each its own tilt, the joints dark, sinking toward one side
-        fl = (u > -2.3) & (u < 2.2) & (v > 0.5) & (v < 4.6)
+        W["ruin_c"] = (cx, cy)
+        # the floor lies before the house corner, toward the viewer (it was laid behind its walls, unseen)
+        fa = (X - cx) * AX[0] + (Y - cy) * AX[1]
+        fp = (X - cx) * PERP[0] + (Y - cy) * PERP[1]
+        fl = (fa > 0.6) & (fa < 4.2 + (vn(fp * 0.8, 2.0) - 0.5) * 1.6) & (np.abs(fp) < 3.4 + (vn(fa * 0.8, 5.0) - 0.5) * 1.4)
+        edge_r = np.clip(np.minimum(fa - 0.6, 3.4 - np.abs(fp)) / 1.2, 0, 1)      # at its margins the flags go under the peat
+        u, v = fp + 10, fa + 10                                             # the flags' own courses run with the view
         fi, fj = np.floor(u / 0.8), np.floor(v / 0.6 + (np.floor(u / 0.8) % 2) * 0.5)
         hs = lambda a, b, k: (np.sin(a * 12.9 + b * 78.2 + k * 3.7) * 4375.5) % 1.0
         tilt = (hs(fi, fj, 1) - 0.5) * 0.14 * ((u / 0.8 - fi) - 0.5) + (hs(fi, fj, 2) - 0.5) * 0.14 * ((v / 0.6 - fj) - 0.5)
-        fz = LEVEL + 0.18 - v * 0.035 + tilt - (hs(fi, fj, 3) < 0.15) * 0.25
+        fz = LEVEL + 0.24 - fa * 0.03 + tilt - (hs(fi, fj, 3) < 0.12) * 0.2    # sinking toward the water, a few flags gone
         joint = (((u / 0.8) % 1.0) < 0.06) | ((((v / 0.6) + (fi % 2) * 0.5) % 1.0) < 0.07)
         fz = fz - joint * 0.04
-        mf = fl & (part == 0)                                              # the floor is laid into the shelf
+        gone = hs(fi, fj, 7) > 0.25 + edge_r * 0.75
+        mf = fl & (part == 0) & ~gone                                      # the floor is laid into the shelf, its edge ragged
         H2 = np.where(mf, fz, H2)
         part = np.where(mf, 54, part)
         part = np.where(mf & joint, 56, part)
@@ -413,6 +420,27 @@ def ruins(cx, cy, ang, seed=21):
             jm = jm & (jz > H2)
             H2 = np.where(jm, jz, H2)
             part = np.where(jm, 55, part)
+        # the lintel, fallen across the threshold before the jambs, and a spill of rubble
+        lx, ly = cx + ca * 0.0 - sa * 5.6, cy + sa * 0.0 + ca * 5.6
+        la = (X - lx) * np.cos(ang + 0.25) + (Y - ly) * np.sin(ang + 0.25)
+        lb = -(X - lx) * np.sin(ang + 0.25) + (Y - ly) * np.cos(ang + 0.25)
+        ml = (np.abs(la) < 1.1) & (np.abs(lb) < 0.25)
+        lz = LEVEL + 0.42 + la * 0.06
+        ml = ml & (lz > H2)
+        H2 = np.where(ml, lz, H2)
+        part = np.where(ml, 55, part)
+        rr_ = np.random.default_rng(seed + 5)
+        for k in range(9):
+            rx_, ry_ = cx + rr_.normal(0, 1.4) + AX[0] * 1.2, cy + rr_.normal(0, 1.4) + AX[1] * 1.2
+            a_ = rr_.uniform(0, np.pi)
+            ru = (X - rx_) * np.cos(a_) + (Y - ry_) * np.sin(a_)
+            rv = -(X - rx_) * np.sin(a_) + (Y - ry_) * np.cos(a_)
+            sz = rr_.uniform(0.2, 0.42)
+            mr = (np.abs(ru) < sz) & (np.abs(rv) < sz * 0.6)
+            rz = LEVEL + 0.2 + rr_.uniform(0.05, 0.3) + ru * 0.1
+            mr = mr & (rz > H2)
+            H2 = np.where(mr, rz, H2)
+            part = np.where(mr, 55, part)
         return H2, part
     return st
 
@@ -430,8 +458,15 @@ def ruins_paint(col, W, px, py, pz, L, vv, gl, st):
         top = (st == 55) & (vn(px * 5 + 2, py * 5) > 0.45) & (wetz > 0.6)
         stone = np.where(top[..., None], bs._r(bs.R_MOSS, vv * 0.85), stone)
         stone = np.where((wetz < 0.3)[..., None], bs._r(bs.R_ALGAE, vv * 0.95), stone)
-        moss = (vn(px * 6, py * 6) > 0.6) & (st == 54)
+        moss = (vn(px * 2.2, py * 2.2) > 0.62) & (st == 54)                  # moss creeping over the flags from the peat, in broad tongues
         stone = np.where(moss[..., None], bs._r(bs.R_MOSS, vv * 0.9), stone)
+        fpa = (px - W["ruin_c"][0]) * PERP[0] + (py - W["ruin_c"][1]) * PERP[1] + 10
+        faa = (px - W["ruin_c"][0]) * AX[0] + (py - W["ruin_c"][1]) * AX[1] + 10
+        fid = np.floor(fpa / 0.8) * 13 + np.floor(faa / 0.6 + (np.floor(fpa / 0.8) % 2) * 0.5)
+        fv = ((np.sin(fid * 12.9) * 4375.5) % 1.0 - 0.5) * 0.22                 # every flag its own grey, worn paler
+        flag = bs._r(bs.R_STONE, vv * 0.92 + fv) * np.array([1.04, 1.0, 0.96])
+        flag = np.where(moss[..., None], bs._r(bs.R_MOSS, vv * 0.9), flag)
+        stone = np.where((st == 54)[..., None], flag, stone)
         stone = np.where((st == 56)[..., None], bs._r(bs.R_MUD, vv * 0.6), stone)
         col = np.where(m[..., None], stone, col)
     return col

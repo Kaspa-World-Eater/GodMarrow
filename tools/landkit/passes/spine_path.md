@@ -268,3 +268,10 @@ MASTER_RULES is unchanged. **Fixed the worst B-, the skull:**
 - the bone above the water worn pale.
 
 It now reads as a serpent's skull from above: two orbits holding water, a row of teeth, the jaw hinges standing back like horns, the snout and the sutures. **Skull: B.** Duckweed fills the orbits; black water there would read stronger.
+
+## Rules check, 2026-10-08 (third ping): the ruins' floor
+
+MASTER_RULES is unchanged.
+- **Found:** the flagged floor had been laid behind the walls, out of view.
+- **Fixed:** it now lies before the house corner, toward the viewer, sinking toward the water. Each flag has its own worn grey, moss creeps over them in broad tongues, and at the margins the flags go under the peat. A fallen lintel lies across the threshold, with a spill of rubble.
+- **Ruins: B.** The flags are a little large for the walls' scale.
