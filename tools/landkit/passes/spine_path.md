@@ -618,3 +618,27 @@ Seeds 1 to 3: 15 to 16 places each, including the pit and four islands; 7 to 9 c
 6. **The vertebrae:** they were counted from the frame's stretch of the walk, so joints moved between chunks. Now they're counted from each walk's own start (`serpent_spine.WHOLE_LINE`).
 
 After these, six seams on and off the Back match the centred frame to within 7 pixels in 5,120.
+
+## Rules check, 2026-10-08 (the Sunken Bog in the game)
+
+I re-read MASTER_RULES in full, with the bog's lore: the Long Back's wrong names, and "where the mud clutches and lets go". Section 8 is in view; its item 6 (the Cursemark props' shader) is moot now that Cursemark is dropped.
+
+The in-game bog (seed 9101) against the checklist:
+
+| Line | Verdict |
+|---|---|
+| 1. Brief | Passes. From the lore and Derek's own words; the half-remembered names stand. |
+| 2. Scale | Passes. The game's own projection: a yard is 72 px at zoom 1.06, the hero beside the vertebrae. |
+| 3. Form | Passes in the bake: all real height, and the value test is graded A-. |
+| **4. Light** | **Fails in the game.** The bake's moon lights the form through its normals, but the game's lantern laid a flat pool on the baked ground. It never raked the bone (section 0.2). |
+| 5–7. Values, ramps, paint | As graded on the review page. |
+| 8. Contact | Passes. |
+| 9. Detail | Passes. |
+| **10. Life** | **Fails in the game.** The water moves, but the baked reeds and sedge stand still in the wind. The wisp-fires over the water are not in the game yet. |
+| 11. Seen as the player sees it | Passes. Captured in game with the Ossuarch, with no visible repeat. |
+| 12. Skeptic | The in-game frames are darker and softer than the review stills, because of the game's night layer. To compare side by side next. |
+
+**Worst failure first: the lantern.**
+- Every chunk and every tall-layer band now carries its normal map.
+- `shaders/baked_ground.gdshader` lights the painted form with the same lantern the props use: the lit side warms and brightens, the far side falls into its own shade, so it rakes across the vertebrae as the pilgrim walks.
+- Next: life (the reeds in the wind, the wisp-fires).

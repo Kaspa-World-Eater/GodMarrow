@@ -273,7 +273,8 @@ metal etc." These come back once the forest's current piece has had its ten pass
    shadows, sand, and every order's skill-tree types.
 5. **Melee:** the styles and the special melee skills, done once the Ossuarch's skills are finalised. The Ossuarch is
    finished before any other class.
-6. **Cursemark props' shader:** Derek to decide whether to fix its colour squaring.
+6. ~~**Cursemark props' shader:** Derek to decide whether to fix its colour squaring.~~ Moot: Cursemark was dropped
+   from the game (Derek, 2026-10-08, "Drop it").
 7. **Rework every older tree with the warped column** (Derek, 2026-10-07: "we're going to have to go back and edit
    our old assets with this new information"): the judge scene, Cap Hollow, `tree.py` and `giant.py`. See chapter 6,
    section 4.

@@ -1,11 +1,17 @@
-// A baked land's ground (world/baked_ground.gd, painted by tools/worldgen/bog_bake.py): the picture as painted, at
-// 4 screen px a texel. Its alpha says what each texel is: 255 land, 254 open water, 0 past the zone's edge. The water
+// A baked land's ground and its sorted tall bands (world/baked_ground.gd, painted by tools/worldgen/bog_bake.py): the
+// picture as painted, at 4 screen px a texel. Its alpha says what each texel is: 255 land, 254 open water, 0 past the zone's edge. The water
 // moves as the tile ground's water moves (shaders/ground_iso.gdshader): its rows slide a little against each other in
 // a slow swell, harder in the gust, so the mirror in it trembles; now and then a cold glint, a texel at a time.
 shader_type canvas_item;
 
 uniform float wind = 0.5;
 uniform float gain = 1.0;
+// the pilgrim's lantern, as every prop reads it (core/main.gd sets these each frame; shaders/landkit_lit.gdshader):
+// it lights the painted form through its own normal map, so the light rakes across the bone, the boards and the
+// stones as the pilgrim walks, and the far side of every vertebra falls into its own shade (MASTER_RULES 0.2)
+global uniform vec2 lamp_world;
+global uniform float lamp_reach;
+global uniform float lamp_night;
 
 varying vec2 wpos;
 
@@ -31,6 +37,17 @@ void fragment() {
 		float g2 = hash(W + floor(TIME * 3.0));
 		if (g > 0.8 && g2 > 0.95) c.rgb = mix(c.rgb, vec3(0.55, 0.62, 0.72), 0.35);
 		c.rgb *= 0.95 + 0.05 * sin(TIME * 1.3 + W.x * 0.08 + W.y * 0.13);
+	}
+	vec3 n = texture(NORMAL_TEXTURE, UV).rgb;
+	if (length(n) > 0.05 && lamp_reach > 1.0) {
+		n = n * 2.0 - 1.0;
+		n.y = -n.y;
+		n = normalize(n);
+		vec2 dv = lamp_world - wpos;
+		float dist = length(dv * vec2(1.0, 2.0));
+		float k = clamp(1.2 - dist / lamp_reach, 0.0, 1.0) * (0.4 + 0.6 * lamp_night);
+		float lam = max(0.0, dot(n, normalize(vec3(dv, 140.0))));
+		c.rgb *= mix(1.0, 0.74 + 0.5 * lam, k) * mix(vec3(1.0), vec3(1.0, 0.86, 0.68), k * lam * 0.4);
 	}
 	COLOR = vec4(c.rgb * gain, 1.0);
 }

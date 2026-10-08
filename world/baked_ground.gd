@@ -18,6 +18,17 @@ static func _tex(path: String) -> Texture2D:
 	var img := Image.load_from_file(ProjectSettings.globalize_path(path))
 	return ImageTexture.create_from_image(img) if img else null
 
+## its picture with its normal map, so the pilgrim's lantern lights the painted form (shaders/baked_ground.gdshader)
+static func _lit(d: String, file: String, normal: String) -> Texture2D:
+	var t := _tex(d + "/" + file)
+	if t == null or normal == "" or not FileAccess.file_exists(d + "/" + normal):
+		return t
+	var ct := CanvasTexture.new()
+	ct.diffuse_texture = t
+	ct.normal_texture = _tex(d + "/" + normal)
+	ct.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	return ct
+
 ## lay the baked land into zone z; false when it has none (the tile ground stands alone)
 static func build(z) -> bool:
 	Iso.clear_lift()
@@ -52,7 +63,7 @@ static func build(z) -> bool:
 	var bands := 0
 	for c in idx["chunks"]:
 		var pos := Vector2(c["pos"][0], c["pos"][1])
-		var t := _tex(d + "/" + str(c["file"]))
+		var t := _lit(d, str(c["file"]), str(c.get("normal", "")))
 		if t:
 			var s := Sprite2D.new()
 			s.texture = t
@@ -64,17 +75,17 @@ static func build(z) -> bool:
 			ground.add_child(s)
 		if str(c.get("up", "")) == "":
 			continue
-		var at := _tex(d + "/" + str(c["up"]))
+		var at := _lit(d, str(c["up"]), str(c.get("up_n", "")))
 		if at == null:
 			continue
 		for b in c["bands"]:
 			# each band sorts where a body of the same depth on the same floor would (bog_bake.py: depth less lift)
-			var a := AtlasTexture.new()
-			a.atlas = at
-			a.region = Rect2(0, b["ay"], b["w"], b["h"])
 			var top := pos + Vector2(b["x"], b["y"]) * sc
 			var s2 := Sprite2D.new()
-			s2.texture = a
+			s2.texture = at
+			s2.region_enabled = true
+			s2.region_rect = Rect2(0, b["ay"], b["w"], b["h"])
+			s2.material = mat
 			s2.centered = false
 			s2.scale = Vector2(sc, sc)
 			s2.position = Vector2(top.x, float(b["d"]) * Iso.HY)
