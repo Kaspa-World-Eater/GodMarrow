@@ -365,3 +365,7 @@ MASTER_RULES is unchanged.
 ## Rules check, 2026-10-08: the socket's eye
 
 MASTER_RULES is unchanged. The eye under the water is no longer a clean ellipse: a ragged, uneven iris, its pupil a little out of round, all wobbled by the water. It reads as something looking up through murk. **Socket: B+.**
+
+## Rules check, 2026-10-08: the skull's orbits
+
+MASTER_RULES is unchanged. Deep, still water in the skull's orbits now takes no drift (`W["no_weed"]`): no duckweed and no sphagnum rafts. The orbits read as two dark pools holding the rims' reflection, eyes full of water. **Skull: B+.**

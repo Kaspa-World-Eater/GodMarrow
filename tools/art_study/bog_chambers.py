@@ -411,6 +411,7 @@ def serpent_skull(cx, cy, ang, length=9.0, width=5.6, height=0.55, seed=11):
         for sg in (-1, 1):
             d = np.hypot((u - 0.25) / 0.28, (q - sg * 0.52) / 0.4)          # big orbits: both seen over the low dome
             z = np.where(d < 1, np.minimum(z, LEVEL - 0.25 - (1 - d) * 0.45), z)
+            W["no_weed"] = W.get("no_weed", np.zeros(X.shape, bool)) | (d < 1.05)   # deep, still: no drift lies in it
             brow = np.clip(1 - np.abs(d - 1.12) / 0.16, 0, 1) * 0.42         # a raised rim right round each orbit
             z = z + brow * (d >= 1)
             nd_ = np.hypot((u - 0.86) / 0.05, (q - sg * 0.35) / 0.16)       # the nostril pits at the snout

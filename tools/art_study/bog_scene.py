@@ -351,6 +351,9 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     lee = np.clip(1 - (vb - 2.0) / 2.5, 0, 1) + np.clip(0.5 - dd, 0, 1) * 0.6
     drift = vn(px * 0.45 + py * 0.9 + 3, py * 0.45 - px * 0.2) * 0.55 + vn(px * 3, py * 3) * 0.25 + lee * 0.4   # drifted, combed by the wind
     mat = water & (drift > 0.82)
+    if "no_weed" in W:                                                       # the orbits of the skull: black, unbroken
+        nw = ws.look(W, W["no_weed"], px, py)
+        mat &= ~nw
     edge = water & (drift > 0.76) & ~mat
     speck = vn(px * 23, py * 23) > 0.45
     img[mat & speck] = bog_plants.WEED * (0.55 + L["moon"][mat & speck, None] * 0.5)
@@ -358,7 +361,7 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     sp2 = edge & (vn(px * 31, py * 31) > 0.7)                                 # loose fronds at a mat's edge
     img[sp2] = bog_plants.WEED * 0.7
     # floating sphagnum rafts in the shallows: dulled red and green, ragged, distinct from the duckweed
-    raft = water & (dd < 0.35) & ((vn(px * 0.7 + 21, py * 0.7) * 0.7 + vn(px * 6, py * 6) * 0.3) > 0.72) & ~mat
+    raft = water & (dd < 0.35) & ~(ws.look(W, W["no_weed"], px, py) if "no_weed" in W else False) & ((vn(px * 0.7 + 21, py * 0.7) * 0.7 + vn(px * 6, py * 6) * 0.3) > 0.72) & ~mat
     rc = np.where((vn(px * 9, py * 9) > 0.5)[..., None], np.array([0.2, 0.13, 0.1]), np.array([0.15, 0.18, 0.09]))
     img[raft] = rc[raft] * (0.55 + L["moon"][raft, None] * 0.5)
     rng = np.random.default_rng(31)
