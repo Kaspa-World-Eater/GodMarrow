@@ -308,3 +308,19 @@ MASTER_RULES is unchanged. **Added:**
 - a flat doorstone worn hollow in its middle.
 
 **Result:** the way reads as a darker brown band; the doorstone sits under the fire's pale light and is hard to tell apart. **Hut: B.**
+
+## Rules check, 2026-10-08: variants (Derek: "create variations so we can create a real reusable map")
+
+MASTER_RULES is unchanged. Every chamber now takes a variant (`bog_chambers.py NAME:V`) with its own place in the world and its own layout:
+- the Back's bends are flipped and rescaled;
+- the set piece is moved, resized and turned (the socket's radii and angle, the skull's heading, the ruins' angle, the hut's size);
+- its own seeds.
+
+Six rendered: skull 1 and 2, socket 1, hut 1, ruins 1, nature 1. All read as distinct places.
+
+**Faults found:**
+- socket 1's rim is mostly broken away (the gaps landed on the brow);
+- ruins 1 is cluttered where the walls meet the Back;
+- nature 1's shelf is far off.
+
+The variant system: **B.**

@@ -19,13 +19,32 @@ from kit import vn, fbm                      # noqa: E402
 C, AX, PERP, LEVEL = bs.C, bs.AX, bs.PERP, bs.LEVEL
 
 
+VARIANT = 0          # which version of a chamber (Derek: "create variations so we can create a real reusable map")
+J = np.random.default_rng(0)
+
+
 def set_origin(k):
     """each chamber its own place in the world (its own seeds for every bed of plants, every hummock and pool),
-    so no two chambers share a foreground"""
-    global C
-    C = np.array([20.0 + 37.0 * k, 20.0 + 13.0 * k])
+    so no two chambers share a foreground; each VARIANT its own place again, and its own layout from J"""
+    global C, J
+    kk = k + 10 * VARIANT
+    J = np.random.default_rng(VARIANT * 97 + k)
+    C = np.array([20.0 + 37.0 * kk, 20.0 + 13.0 * kk])
     bs.C = C
     ws.FOCUS = C.copy()
+
+
+def vb(bb):
+    """a variant's bends: each one's swing flipped or not and rescaled, its sharpness its own"""
+    if VARIANT == 0:
+        return bb
+    return tuple((at + J.uniform(-0.12, 0.12), amp * J.choice([-1, 1]) * J.uniform(0.75, 1.25), tight * J.uniform(0.7, 1.4))
+                 for (at, amp, tight) in bb)
+
+
+def jit(p, r=1.2):
+    """a variant's set piece moved a little from where variant 0 has it"""
+    return p if VARIANT == 0 else p + J.normal(0, r, 2)
 
 
 def twisting_line(seed, span=17.0, bends=((0.0, 3.4, 3.0),), n=1400):
@@ -81,12 +100,12 @@ def tendrils_round_post(px_, py_, h, seed):
 
 def scene_nature():
     set_origin(1)
-    bs.LINE = twisting_line(2, bends=((-0.35, 3.6, 4.0), (0.3, -3.2, 5.0)))
+    bs.LINE = twisting_line(2 + VARIANT, bends=vb(((-0.35, 3.6, 4.0), (0.3, -3.2, 5.0))))
     bs.BED_MODS[:] = [shelf(*(C - AX * 4.5 + PERP * 2.0), 7.5)]
     bs.DROWNED_TREES = [(C + AX * 6.0 - PERP * 8.0, 0.4, 6.0, 71)]
     bs.DROWNED_WALLS = []
     bs.GIANT_RIBS = []
-    post = C + AX * 1.6 + PERP * 1.6
+    post = jit(C + AX * 1.6 + PERP * 1.6)
     bs.STRUCTS[:] = [("stump", *(C - AX * 6.0 + PERP * 5.0), 0.55, 81),
                      ("snag", *(C + AX * 2.5 + PERP * 6.5), np.arctan2(PERP[1], PERP[0]) + 0.5, 6.5, 0.36, 82),
                      ("post", post[0], post[1], 0.22, 1.8, 83)]
@@ -253,15 +272,15 @@ def pit_fire(px_, py_):
 
 def scene_hut():
     set_origin(2)
-    bs.LINE = twisting_line(4, bends=((-0.5, -3.0, 4.5), (0.15, 3.6, 3.5), (0.65, -2.0, 6.0)))
-    hc = C - AX * 4.2 - PERP * 1.0
+    bs.LINE = twisting_line(4 + VARIANT, bends=vb(((-0.5, -3.0, 4.5), (0.15, 3.6, 3.5), (0.65, -2.0, 6.0))))
+    hc = jit(C - AX * 4.2 - PERP * 1.0)
     pit = hc + AX * 2.6 + PERP * 0.6
     bs.BED_MODS[:] = [shelf(*(hc + AX * 0.8), 6.5, rise=0.22, seed=9)]
     bs.DROWNED_TREES = [(C + AX * 6.5 + PERP * 7.0, 0.38, 5.5, 72)]
     bs.DROWNED_WALLS = []
     bs.GIANT_RIBS = []
     bs.STRUCTS[:] = [("stump", *(hc - PERP * 4.2 + AX * 1.0), 0.45, 91)]
-    bs.EXTRA_STAMPS[:] = [straw_hut(hc[0], hc[1], pit_at=pit)]
+    bs.EXTRA_STAMPS[:] = [straw_hut(hc[0], hc[1], R=1.8 * (1 if VARIANT == 0 else J.uniform(0.8, 1.2)), pit_at=pit, seed=5 + VARIANT)]
     bs.EXTRA_PAINT[:] = [hut_paint]
     bs.EXTRA_LIVING[:] = [pit_fire(pit[0], pit[1])]
     ws.HERO = pit + AX * 0.9 + PERP * 2.2                              # beside the pit, not over it
@@ -518,13 +537,13 @@ def ruins_paint(col, W, px, py, pz, L, vv, gl, st):
 
 def scene_socket():
     set_origin(3)
-    bs.LINE = twisting_line(6, bends=((-0.45, 3.4, 5.0), (0.35, -3.0, 4.0)))
-    sc = C - AX * 4.8 + PERP * 1.0
+    bs.LINE = twisting_line(6 + VARIANT, bends=vb(((-0.45, 3.4, 5.0), (0.35, -3.0, 4.0))))
+    sc = jit(C - AX * 4.8 + PERP * 1.0)
     bs.BED_MODS[:] = [shelf(*(sc), 8.0, rise=0.14, seed=13)]
     bs.DROWNED_TREES = [(C + AX * 5.5 - PERP * 7.5, 0.36, 5.0, 73)]
     bs.DROWNED_WALLS, bs.GIANT_RIBS = [], []
     bs.STRUCTS[:] = []
-    bs.EXTRA_STAMPS[:] = [eye_socket(sc[0], sc[1])]
+    bs.EXTRA_STAMPS[:] = [eye_socket(sc[0], sc[1], *((4.2, 3.2, 0.4) if VARIANT == 0 else (J.uniform(3.4, 5.0), J.uniform(2.6, 3.6), J.uniform(-0.6, 1.2))), seed=7 + VARIANT)]
     bs.EXTRA_PAINT[:] = [socket_paint]
     bs.EXTRA_LIVING[:] = [socket_eye]
     ws.HERO = bs.LINE[len(bs.LINE) // 2] + AX * 0.2
@@ -532,8 +551,8 @@ def scene_socket():
 
 def scene_skull():
     set_origin(4)
-    sk = C - AX * 3.5 + PERP * 0.5
-    ang = np.arctan2(PERP[1], PERP[0])
+    sk = jit(C - AX * 3.5 + PERP * 0.5, 0.8)
+    ang = np.arctan2(PERP[1], PERP[0]) + (0 if VARIANT == 0 else J.uniform(-0.5, 0.5))
     rear = sk - np.array([np.cos(ang), np.sin(ang)]) * 4.6
     t = np.linspace(0, 1, 900)
     # the Back comes in twisting and runs into the skull's rear
@@ -543,7 +562,7 @@ def scene_skull():
     bs.DROWNED_TREES = [(C + AX * 6.0 + PERP * 7.0, 0.4, 6.0, 74)]
     bs.DROWNED_WALLS, bs.GIANT_RIBS = [], []
     bs.STRUCTS[:] = [("snag", *(C + AX * 5.0 - PERP * 6.5), 0.4, 5.5, 0.3, 93)]
-    bs.EXTRA_STAMPS[:] = [serpent_skull(sk[0], sk[1], ang)]
+    bs.EXTRA_STAMPS[:] = [serpent_skull(sk[0], sk[1], ang, seed=11 + VARIANT)]
     bs.EXTRA_PAINT[:] = [skull_paint]
     bs.EXTRA_LIVING[:] = []
     ws.HERO = rear - np.array([np.cos(ang), np.sin(ang)]) * 1.6 + AX * 0.2   # on the Back, at the skull's rear
@@ -551,14 +570,14 @@ def scene_skull():
 
 def scene_ruins():
     set_origin(5)
-    bs.LINE = twisting_line(8, bends=((-0.4, -3.2, 4.0), (0.4, 2.8, 5.0)))
-    rc = C - AX * 5.0 - PERP * 0.5
+    bs.LINE = twisting_line(8 + VARIANT, bends=vb(((-0.4, -3.2, 4.0), (0.4, 2.8, 5.0))))
+    rc = jit(C - AX * 5.0 - PERP * 0.5)
     bs.BED_MODS[:] = [shelf(*(rc + AX * 1.0), 7.5, rise=0.2, seed=19)]
     bs.DROWNED_TREES = [(C + AX * 6.0 + PERP * 7.5, 0.4, 6.0, 75)]
     bs.DROWNED_WALLS, bs.GIANT_RIBS = [], []
     post = rc + AX * 3.6 + PERP * 3.0
     bs.STRUCTS[:] = [("post", post[0], post[1], 0.22, 1.8, 95)]
-    bs.EXTRA_STAMPS[:] = [ruins(rc[0], rc[1], 0.75)]
+    bs.EXTRA_STAMPS[:] = [ruins(rc[0], rc[1], 0.75 if VARIANT == 0 else J.uniform(0.3, 1.2), seed=21 + VARIANT)]
     bs.EXTRA_PAINT[:] = [ruins_paint]
     bs.EXTRA_LIVING[:] = [tendrils_round_post(post[0], post[1], 1.8, 96)]
     ws.HERO = rc + AX * 1.5 + PERP * 2.0                               # on the old floor, between the walls
@@ -567,6 +586,8 @@ def scene_ruins():
 SCENES = dict(nature=scene_nature, hut=scene_hut, socket=scene_socket, skull=scene_skull, ruins=scene_ruins)
 
 if __name__ == "__main__":
+    if ":" in sys.argv[1]:                                               # NAME:VARIANT, e.g. skull:2
+        sys.argv[1], VARIANT = sys.argv[1].split(":")[0], int(sys.argv[1].split(":")[1])
     SCENES[sys.argv[1]]()
     if len(sys.argv) > 3 and sys.argv[3] == "value":
         bs.VALUE_ONLY = True
