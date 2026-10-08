@@ -70,3 +70,34 @@ through the swamp again. Ruins and drowned trees will also stick out of the wate
 5. The drowned trees and ruins.
 
 Each takes graded passes in the game's camera with the Ossuarch.
+
+## Derek's answers, 2026-10-08 (the go)
+
+"It is a giant demon snake god long dead. Serpent, or come up with obscure names that are half remembered by the
+people and all wrong. Bog works for me. I like how the ruined sunken temple water looks, so let's aim for that, lots of
+plant life. The vertebrae sometimes poking through."
+
+- **What it is:** a long-dead demon serpent god. It is a god, so the no-animals law does not bar it (Derek's ruling).
+- **The names the people half remember**, all wrong, in-world voices only (for the codex later, never explained):
+  - **the Long Back** (the bog folk, who walk it and think the Tithed laid it as a causeway);
+  - **Saint Uss's Causeway** (the pilgrims, after a saint nobody can find in any calendar; the name is what is left of the true one, worn down like a step);
+  - **Old Coil** (what children call the bends);
+  - **the Stair of the Drowned King** (the boatmen, who say a king walked down it into the water and is still walking).
+  - The true name is never given.
+- **Where:** the Sunken Bog.
+- **The look:** the Famine's bog (`painted_swamp_god.py`, workbench `famine.png`):
+  - black mirror water with the reflected ray marched up through the field;
+  - duckweed in drifts breaking the reflection;
+  - lily pads with a notch and a lit rim, and a pale flower now and then;
+  - mist on the water;
+  - **lots of plant life**.
+- **The path is mostly overgrown:** mud, algae, reed, moss and sedge over the Back. **The vertebrae poke through sometimes**: a worn crown here, a broken spine there, a rib arching out of the water.
+
+**Revised order:**
+1. The vertebra, as a piece.
+2. The path generator, mostly overgrown with vertebrae breaking through.
+3. The water, on the Famine's method.
+4. The plants: duckweed, pads, reed, sedge, moss.
+5. The wisp-fire.
+6. The marsh.
+7. The drowned trees and ruins.
