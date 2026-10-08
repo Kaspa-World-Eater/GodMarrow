@@ -196,6 +196,7 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
 
 
 SKY = np.array([0.06, 0.075, 0.1])          # the night sky in the water where nothing stands over it
+R_SKYW = ramp("#040608", "#080d10", "#0e161a", "#172227", "#243238", "#35464d")   # the sky as the water shows it (the Famine's ramp, darker)
 
 
 def mirror(img, w, W, px, py, pz, L, T=0.0):
@@ -219,20 +220,41 @@ def mirror(img, w, W, px, py, pz, L, T=0.0):
         new = (~hit) & (h >= z)
         hx[new], hy[new], hz[new] = x[new], y[new], z[new]
         hit |= new
+    # THE FUSION (Derek 2026-10-08: "a fusion of its water and this one", the Famine's water, painted_swamp_god.py, with
+    # this bog's true reflection march):
+    # - from the Famine: the reflection strong (0.68 of what stands over it, the rest a dark teal), WOBBLED sideways by
+    #   the slow ripples a pixel or two as they pass (its life); the sky where nothing stands, dark, broken by sparse
+    #   horizontal streaks of the night sky's light (its shimmer); a dark lip where the water meets bank or bone;
+    # - from this bog: the reflection is marched through the world's true height, so the trunks, the bone, the ribs
+    #   and the drowned walls all stand in it; and the gas breaking out of the peat, its rings spreading slow
+    a2 = 2 * np.pi * T
+    ripple = ((vn(x0 * 3 + np.cos(a2) * 0.7, y0 * 9 + np.sin(a2) * 0.7) - 0.5) * 2.0
+              + np.sin((x0 + y0) * 14 - a2 * 2) * 0.6)
     sx, sy = ws.to_px((hx, hy, hz))
-    sx = np.clip(np.round(sx).astype(int), 0, img.shape[1] - 1)
+    sx = np.clip(np.round(sx + ripple * 1.2).astype(int), 0, img.shape[1] - 1)
     sy = np.clip(np.round(sy).astype(int), 0, img.shape[0] - 1)
-    # the night sky where nothing stands over the water: moonlit cloud drifting, seen far off along the reflected ray
-    cl = vn((x0 - 6) * 0.09 + T * 0.4, (y0 - 6) * 0.09) * 0.7 + vn(x0 * 0.3 - T, y0 * 0.3) * 0.3
-    sky = SKY[None] + np.clip(cl - 0.45, 0, 1)[:, None] * np.array([0.11, 0.12, 0.14])
-    refl = np.where(hit[:, None], img[sy, sx], sky)
-    base = img[wy_, wx_]
-    # the wind's ruffles (cat's paws) crossing the open water: where one passes, the mirror breaks into the sky's grey
-    ruff = vn((x0 + y0) * 0.22 - T * 2.0, (x0 - y0) * 0.5 + T * 0.7) * 0.7 + vn(x0 * 1.3 - T * 3, y0 * 1.3) * 0.3
-    rk = np.clip((ruff - 0.62) * 4, 0, 1)
-    rk = rk * (((np.arange(len(x0)) * 7) % 3) > 0)                          # broken into dabs, never a smear
-    refl = refl * (1 - rk[:, None] * 0.6) + sky * rk[:, None] * 0.5
-    out = base * 0.35 + refl * np.array([0.38, 0.42, 0.5])                    # darker and cooler than what it shows
+    s1 = vn(x0 * 1.2 + np.sin(a2) * 0.3, y0 * 6 + T * 0.2) > 0.84            # the sky's light, in horizontal streaks
+    s2 = vn(x0 * 1.6 + 5 - np.cos(a2) * 0.3, y0 * 10) > 0.94
+    sky_v = 0.1 + s1 * 0.16 + s2 * 0.22 + (vn((x0 - 6) * 0.09 + T * 0.4, (y0 - 6) * 0.09) - 0.5) * 0.06
+    sky = R_SKYW[np.clip((sky_v * len(R_SKYW)).astype(int), 0, len(R_SKYW) - 1)] * np.array([0.9, 1.0, 1.15])
+    refl = img[sy, sx]
+    out = np.where(hit[:, None], refl * 0.68 + np.array([0.024, 0.063, 0.059]) * 0.32 * 0.6, sky)
+    # the gas: here and there a bubble breaks and its ring spreads, slow, then gone
+    cell = 2.3
+    gi, gj = np.floor(x0 / cell), np.floor(y0 / cell)
+    hs = lambda a, b, k: (np.sin(a * 12.99 + b * 78.23 + k * 37.7) * 43758.55) % 1.0
+    bx = (gi + 0.2 + 0.6 * hs(gi, gj, 1)) * cell
+    by = (gj + 0.2 + 0.6 * hs(gi, gj, 2)) * cell
+    live = hs(gi, gj, 3) < 0.4
+    ph = (T + hs(gi, gj, 4)) % 1.0
+    rr_ = np.hypot(x0 - bx, (y0 - by)) - ph * 0.9
+    ring = live & (np.abs(rr_) < 0.035) & (ph < 0.85)
+    out = np.where(ring[:, None], out + np.array([0.06, 0.07, 0.08]) * (1 - ph)[:, None], out)
+    pop = live & (np.hypot(x0 - bx, y0 - by) < 0.05) & (ph < 0.08)
+    out = np.where(pop[:, None], np.array([0.2, 0.22, 0.24]), out)
+    # the dark lip where the water meets the bank or the bone (the Famine's: the line that seats a thing in water)
+    lip = (~np.roll(water, -1, 0)) | (~np.roll(water, 1, 1))
+    out = np.where(lip[wy_, wx_][:, None], out * 0.55, out)
     img[wy_, wx_] = np.clip(out, 0, 1)
     return img
 
@@ -441,4 +463,8 @@ ws.RIM_EXTRA = tuple(range(800, 810))
 if __name__ == "__main__":
     if len(sys.argv) > 2 and sys.argv[2] == "value":
         VALUE_ONLY = True
-    ws.main(sys.argv[1] if len(sys.argv) > 1 else "bog_scene.png")
+    out_ = sys.argv[1] if len(sys.argv) > 1 else "bog_scene.png"
+    if out_.endswith(".webp"):
+        ws.animate(out_, int(sys.argv[2]) if len(sys.argv) > 2 else 12)
+    else:
+        ws.main(out_)

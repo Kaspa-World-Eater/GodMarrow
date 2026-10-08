@@ -182,3 +182,22 @@ MASTER_RULES is unchanged. **The lore's true detail for this piece:** "where the
 1. The bog's structures: the rotting stump on its mound, the tipped snag with vines, the tendrils with a pale pustule. Each rare.
 2. Variants of every piece for the generator.
 3. The zone generator: the Back coiled through the Sunken Bog as a maze, with tight walks between larger marsh shelves (the maggot lair's rhythm) and exits to find.
+
+## The value-only test (rule 0.4), 2026-10-08
+
+`bog_scene.py OUT.png value`, with the ground and the Back in one grey. **Passes:** the Back reads as solid and deep with its colour gone: the lumpy overgrowth, the wings and keels, the stumps, the ribs, the bitten chunks, the banked flanks into the water, all lit by their real form. The drowned trees, plants and giant ribs keep their own painters in this test, so it covers the ground and the Back only.
+
+**Derek, next:** "make the water have more shimmer and movements like a bog". Pass 19 gives the water slow moving ripples with the moon's shimmer broken into dabs, bubble rings rising out of the peat, and the iron film's oily sheen on the stillest water, shown as an animated loop.
+
+## Derek, 2026-10-08: the open marsh chambers, and the water's model
+
+"I want some large open marsh areas where the player can walk around a bit and choose different paths. These can be just raw nature in the big, some can be ancient ruins, maybe a straw hut with a wisp fire in a pit, a giant eye socket and the top of a snake skull. Stuff like that. All at the same level as this one. Make sure the path can twist and turn too." And: "Remove the iron film, just study the ruin scene in the swamp, that water looked good" (the Famine, `painted_swamp_god.py`).
+
+**The chambers, the maggot lair's larger areas between the tight walks.** Each is a set piece the generator places where the Back's coils come near each other, so the player chooses which way to go on:
+1. **Raw nature:** a broad marsh shelf of hummocks, sedge, cotton grass and pools, open to wander.
+2. **Ancient ruins:** the drowned village's outskirts, walls and a fallen arch, the floor sunk in the peat.
+3. **The straw hut:** a reed-thatched hut on a hump, wisp-fire burning cold in a pit before its door (the bog folk who walk the Long Back).
+4. **The giant eye socket:** a vast socket in the peat, the god's or the serpent's, its bowl filled with black water.
+5. **The serpent's skull:** the top of the skull breaking the marsh, its brow ridges and eye sockets, the Back running into it.
+
+All are at the scene's standard and each gets its passes. **The path twists and turns:** the Back coils, doubles back and makes tight bends.
