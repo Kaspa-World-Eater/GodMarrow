@@ -259,3 +259,12 @@ MASTER_RULES is unchanged.
 - **Result:** the eave and smoke hole read; the turf stack reads as a dark mound; the punt is lost in the dark at this framing. **Hut: B-, nearing B.**
 
 **Next fix:** the skull's form (the worst B-).
+
+## Rules check, 2026-10-08 (second ping): the skull
+
+MASTER_RULES is unchanged. **Fixed the worst B-, the skull:**
+- a lower dome, so both orbits show over it;
+- bigger orbits, each with a raised rim right round it;
+- the bone above the water worn pale.
+
+It now reads as a serpent's skull from above: two orbits holding water, a row of teeth, the jaw hinges standing back like horns, the snout and the sutures. **Skull: B.** Duckweed fills the orbits; black water there would read stronger.

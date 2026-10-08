@@ -312,7 +312,7 @@ def socket_eye(img, w, W, px, py, pz, L, T=0.0):
     return img
 
 
-def serpent_skull(cx, cy, ang, length=9.0, width=5.2, height=0.75, seed=11):
+def serpent_skull(cx, cy, ang, length=9.0, width=5.6, height=0.55, seed=11):
     """THE TOP OF THE SERPENT'S SKULL breaking the marsh: a long, flattish braincase, the Back running into its rear;
     a crest along its middle; the two great orbits forward at its sides, full of black water, brow ridges over them;
     the snout tapering to its nostril pits; sutures zigzagging across the plates; the jaws long sunk in the peat"""
@@ -330,9 +330,9 @@ def serpent_skull(cx, cy, ang, length=9.0, width=5.2, height=0.75, seed=11):
         z = z + np.exp(-(q / 0.1) ** 2) * np.clip(0.5 - u, 0, 1.2) * 0.22       # the crest along the braincase
         # the great eye hollows: forward, at the sides, inside the outline; deep, holding water; a brow ridge over each
         for sg in (-1, 1):
-            d = np.hypot((u - 0.28) / 0.24, (q - sg * 0.56) / 0.36)
+            d = np.hypot((u - 0.25) / 0.28, (q - sg * 0.52) / 0.4)          # big orbits: both seen over the low dome
             z = np.where(d < 1, np.minimum(z, LEVEL - 0.25 - (1 - d) * 0.45), z)
-            brow = np.clip(1 - np.abs(d - 1.15) / 0.18, 0, 1) * (q * sg < 0.58 + 0.25) * 0.28
+            brow = np.clip(1 - np.abs(d - 1.12) / 0.16, 0, 1) * 0.42         # a raised rim right round each orbit
             z = z + brow * (d >= 1)
             nd_ = np.hypot((u - 0.86) / 0.05, (q - sg * 0.35) / 0.16)       # the nostril pits at the snout
             z = np.where(nd_ < 1, z - 0.3, z)
@@ -372,8 +372,8 @@ def serpent_skull(cx, cy, ang, length=9.0, width=5.2, height=0.75, seed=11):
 def skull_paint(col, W, px, py, pz, L, vv, gl, st):
     m = (st == 52) | (st == 53)
     if m.any():
-        crest = (pz - LEVEL) > 0.3
-        bc = _bone_col(vv * 1.05, px, py, crest)
+        crest = (pz - LEVEL) > 0.12                                           # out of the water the skull is worn pale
+        bc = _bone_col(vv * 1.08, px, py, crest)
         bc = np.where((st == 53)[..., None], bc * 0.55, bc)
         bc = np.where(((pz - LEVEL) < 0.12)[..., None], bs._r(bs.R_ALGAE, vv * 0.95), bc)
         col = np.where(m[..., None], bc, col)
