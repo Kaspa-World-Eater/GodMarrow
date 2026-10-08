@@ -53,6 +53,9 @@ def _frame(X, Y, line):
     return s.reshape(X.shape), v.reshape(X.shape), curv[i].reshape(X.shape), d.reshape(X.shape)
 
 
+NECK = 0.0           # yd at the line's END over which the Back tapers to a neck (a skull's chamber sets it)
+
+
 def stamp(X, Y, H, line, level=0.0, seed=7):
     H = H.copy()
     s, v, curv, dist = _frame(X, Y, np.asarray(line, float))
@@ -71,6 +74,9 @@ def stamp(X, Y, H, line, level=0.0, seed=7):
     s_tab = np.linspace(s[near].min() - 1, s[near].max() + 1, 3000) if near.any() else np.linspace(0, 1, 10)
     sz_tab = np.clip(0.55 + (fbm(s_tab * 0.028 + seed, 1.3) - 0.3) * 1.4, 0.52, 1.32)
     ph_tab = np.concatenate([[0.0], np.cumsum(np.diff(s_tab) / (L_V * sz_tab[1:]))])
+    if NECK > 0:                                                           # toward the head the vertebrae shrink: the neck
+        s_end = float(np.hypot(*np.diff(np.asarray(line, float), axis=0).T).sum())
+        sz_tab = sz_tab * np.clip(0.45 + 0.55 * (s_end - s_tab) / NECK, 0.45, 1.0)
     sz = np.interp(s, s_tab, sz_tab)
     # the vertebra and where in it: the joints are chevrons pointing forward (each laps over the next)
     sw = s - 0.16 * av / (W_W * sz) * L_V * sz                           # the arrowhead: joints swept back from the midline

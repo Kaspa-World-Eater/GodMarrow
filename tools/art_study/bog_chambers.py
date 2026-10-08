@@ -417,8 +417,13 @@ def serpent_skull(cx, cy, ang, length=7.2, width=5.6, height=0.55, seed=11):
         for sg in (-1, 1):
             d = np.hypot((u + 0.02) / 0.25, (v - sg * 0.64) / 0.32)            # great orbits, mid-length: the skull's read
             orb |= d < 1
-            ring = np.clip(1 - np.abs(d - 1.05) / 0.2, 0, 1) * (np.abs(v) < 0.98)
-            brow = np.maximum(brow, ring * (0.7 + 0.3 * (u > 0.12)))
+            # the brow: steep into the orbit, sloping away outside it (bone, not a tub), its inner side joined to the
+            # braincase by a bridge of bone, its outer rim lower, worn
+            inner = np.clip((d - 0.95) / 0.12, 0, 1)
+            outer = np.clip(1 - (d - 1.1) / (0.55 + 0.35 * (v * sg < 0.62)), 0, 1) ** 1.3
+            ring = np.where(d < 1.1, inner, outer) * (d >= 0.95)
+            tilt = np.clip(0.6 + 0.4 * (0.62 - np.abs(v)) / 0.62, 0.35, 1)  # higher toward the braincase
+            brow = np.maximum(brow, ring * tilt * (0.75 + 0.25 * (u > 0.0)))
             nd_ = np.hypot((u - 0.88) / 0.05, (v - sg * 0.09) / 0.05)          # the nostril pits at the snout
             z = np.where(nd_ < 1, z - 0.2, z)
         zb = LEVEL - 0.1 + brow * 0.75
@@ -620,7 +625,8 @@ def scene_skull():
     rear = sk - np.array([np.cos(ang), np.sin(ang)]) * 4.6
     t = np.linspace(0, 1, 900)
     # the Back comes in twisting and runs into the skull's rear
-    pts = rear[None] - np.array([np.cos(ang), np.sin(ang)])[None] * (t * 16)[:, None] + AX[None] * (np.sin(t * 5.0) * 3.0 * t)[:, None]
+    neck_end = rear - np.array([np.cos(ang), np.sin(ang)]) * 1.4            # the neck stops short: a gap where the head came away
+    pts = neck_end[None] - np.array([np.cos(ang), np.sin(ang)])[None] * (t * 16)[:, None] + AX[None] * (np.sin(t * 5.0) * 3.0 * t)[:, None]
     bs.LINE = pts[::-1]
     bs.BED_MODS[:] = [shelf(*(sk + AX * 1.0), 7.0, rise=0.1, seed=17)]
     bs.DROWNED_TREES = [(C + AX * 6.0 + PERP * 7.0, 0.4, 6.0, 74)]
@@ -629,6 +635,8 @@ def scene_skull():
     bs.EXTRA_STAMPS[:] = [serpent_skull(sk[0], sk[1], ang, seed=11 + VARIANT)]
     bs.EXTRA_PAINT[:] = [skull_paint]
     bs.EXTRA_LIVING[:] = [serpent_jaws]
+    import serpent_spine
+    serpent_spine.NECK = 7.0
     ws.HERO = rear - np.array([np.cos(ang), np.sin(ang)]) * 1.6 + AX * 0.2   # on the Back, at the skull's rear
 
 

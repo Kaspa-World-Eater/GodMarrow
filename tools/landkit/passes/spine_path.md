@@ -410,3 +410,11 @@ Passes:
 4. The jaws lit.
 
 **Skull: B-.** It now reads as a skull with two orbits and splayed jaws. The Back running into its rear still lengthens it toward a log, and the jaws are thin at this distance.
+
+## Rules check, 2026-10-08: the skull, pass 5-6
+
+MASTER_RULES is unchanged; no new grades from Derek.
+- **The neck:** the Back tapers over its last 7 yd (`serpent_spine.NECK`) and stops 1.4 yd short of the skull, a gap where the head came away, so the skull stands as its own thing and not the end of a log.
+- **The brows:** steep into each orbit, sloping away outside it, highest toward the braincase and joined to it by a bridge of bone (no longer tubs).
+
+**Result:** the skull reads from above as a braincase between two great water-filled orbits, its jaws splayed on either side with their teeth. **Skull: B.** Still too symmetric and clean-edged, a little machined.
