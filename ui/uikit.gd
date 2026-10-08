@@ -50,9 +50,9 @@ static func font(kind: String) -> Font:
 		_fonts[kind] = f2
 		return f2
 	var cmf: String = {"pixel": "lookout_7", "book": "barlow_17", "italic": "barlow_17", "sc": "gothic_12", "small": "barlow_11"}.get(kind, "barlow_17")
-	if FileAccess.file_exists("res://cursemark/fonts/%s.fnt" % cmf):
+	if FileAccess.file_exists(load("res://core/cm_data.gd").root() + "fonts/%s.fnt" % cmf):
 		var bf := FontFile.new()
-		if bf.load_bitmap_font(ProjectSettings.globalize_path("res://cursemark/fonts/%s.fnt" % cmf)) == OK:
+		if bf.load_bitmap_font(ProjectSettings.globalize_path(load("res://core/cm_data.gd").root() + "fonts/%s.fnt" % cmf)) == OK:
 			bf.fixed_size_scale_mode = TextServer.FIXED_SIZE_SCALE_INTEGER_ONLY
 			bf.antialiasing = TextServer.FONT_ANTIALIASING_NONE
 			bf.subpixel_positioning = TextServer.SUBPIXEL_POSITIONING_DISABLED
@@ -246,7 +246,7 @@ static func page(ci: CanvasItem, x: float, y: float, w: int, h: int, tint: Color
 
 # ------------------------------------------------------------------ (Cursemark assets) its own window pieces
 static func cm() -> bool:
-	return FileAccess.file_exists("res://cursemark/raw/data.cdb")
+	return FileAccess.file_exists(load("res://core/cm_data.gd").root() + "raw/data.cdb")
 
 ## a Cursemark UI piece stretched over r with its corners kept (m: the corner, in art px), at 3 screen px an art px
 static func nine(ci: CanvasItem, name: String, r: Rect2, m: int, mod := Color.WHITE) -> void:

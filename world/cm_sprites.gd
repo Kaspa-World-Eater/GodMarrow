@@ -4,7 +4,7 @@ extends RefCounted
 ## them as Cursemark's LitSurface does; the glow atlases drawn over them additively (engine/light/Emissive).
 ## Frames are centred on their position, as Cursemark draws them; a Cursemark pixel is 4 Godot units.
 
-const RAW := "res://cursemark/raw/sprites/"
+static var RAW: String = load("res://core/cm_data.gd").root() + "raw/sprites/"
 const U := 4.0
 const CHAR_ATLASES := ["Characters_Blighted", "Characters_Bound", "Characters_Corrupted", "Characters_Crusader",
 	"Characters_Cultist", "Characters_Forsaken", "Characters_Fungal", "Characters_Other", "Characters_Starspawn"]

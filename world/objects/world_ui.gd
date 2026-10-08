@@ -75,7 +75,7 @@ static func font(path: String) -> Font:
 		return _fonts[path]
 	# (Cursemark assets): its faces (ui/uikit.gd font): small capitals in the gothic pixel face, the rest in Barlow
 	var U = load("res://ui/uikit.gd")
-	if FileAccess.file_exists("res://cursemark/fonts/barlow_17.fnt"):
+	if FileAccess.file_exists(load("res://core/cm_data.gd").root() + "fonts/barlow_17.fnt"):
 		# names and banners in Cursemark's gothic; what is spoken and written in our own IM Fell (as the title and the
 		# tooltips), so the words of the world read as one hand
 		var cf: Font = U.font("sc") if path == F_CAPS else U.font("own_italic" if path == F_ITALIC else "own_book")

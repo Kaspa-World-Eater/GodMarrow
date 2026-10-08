@@ -35,7 +35,7 @@ static func frames_of(anim: String) -> Array:
 	var CmS = load("res://world/cm_sprites.gd")
 	var book := "Effects_" + anim.split("/")[0].capitalize() if anim.contains("/") else "Effects"
 	var A: Dictionary = CmS.atlas(book)
-	var G: Dictionary = CmS.atlas(book + "_glow") if FileAccess.file_exists("res://cursemark/raw/sprites/" + book + "_glow.atlas") else {}
+	var G: Dictionary = CmS.atlas(book + "_glow") if FileAccess.file_exists(load("res://core/cm_data.gd").root() + "raw/sprites/" + book + "_glow.atlas") else {}
 	return [A.get(anim, []), G.get(anim, [])]
 
 static func play(parent: Node, anim: String, at: Vector2, o := {}) -> Node2D:

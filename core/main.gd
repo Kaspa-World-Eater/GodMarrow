@@ -76,7 +76,7 @@ func _ready() -> void:
 	sound = Soundscape.new(self)
 	add_child(sound)
 	# (Cursemark assets): when Cursemark's files are here (cursemark/, local only), its sound and music are the game's
-	Sfx.cm = FileAccess.file_exists("res://cursemark/raw/data.cdb")
+	Sfx.cm = FileAccess.file_exists(load("res://core/cm_data.gd").root() + "raw/data.cdb")
 	if Sfx.cm:
 		cm_audio = load("res://world/cm_audio.gd").new(self)
 		add_child(cm_audio)

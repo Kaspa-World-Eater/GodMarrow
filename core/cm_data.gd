@@ -3,9 +3,14 @@ extends RefCounted
 
 static var _sheets := {}
 
+## Cursemark is dropped (Derek 2026-10-08, "Drop it"): the game runs on its own monsters, sounds and fonts, exactly as
+## on a machine without Cursemark's files (they stay on this PC, gitignored, untouched). --cm=1 brings them back here.
+static func root() -> String:
+	return "res://cursemark/" if "--cm=1" in OS.get_cmdline_user_args() else "res://_cursemark_dropped/"
+
 static func sheet(name: String) -> Dictionary:
 	if _sheets.is_empty():
-		var j = JSON.parse_string(text("res://cursemark/raw/data.cdb"))
+		var j = JSON.parse_string(text(load("res://core/cm_data.gd").root() + "raw/data.cdb"))
 		if j is Dictionary:
 			for s in j["sheets"]:
 				var by := {}

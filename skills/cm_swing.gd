@@ -35,7 +35,7 @@ var fx_glow: Sprite2D
 
 static func melee_row(id: String) -> Dictionary:
 	if _rows.is_empty():
-		var text: String = load("res://core/cm_data.gd").text("res://cursemark/raw/data.cdb")
+		var text: String = load("res://core/cm_data.gd").text(load("res://core/cm_data.gd").root() + "raw/data.cdb")
 		var j = JSON.parse_string(text)
 		if j is Dictionary:
 			for s in j["sheets"]:
@@ -87,7 +87,7 @@ func _fx_setup() -> void:
 	fx.scale = Vector2(U, U)
 	fx.visible = false
 	add_child(fx)
-	var G: Dictionary = CmS.atlas(book + "_glow") if FileAccess.file_exists("res://cursemark/raw/sprites/" + book + "_glow.atlas") else {}
+	var G: Dictionary = CmS.atlas(book + "_glow") if FileAccess.file_exists(load("res://core/cm_data.gd").root() + "raw/sprites/" + book + "_glow.atlas") else {}
 	if G.has(anim):
 		fx_glow = Sprite2D.new()
 		fx_glow.region_enabled = true

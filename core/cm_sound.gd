@@ -2,7 +2,7 @@ extends RefCounted
 ## Cursemark's sounds by id (cursemark_raw/sounds/**/<id>.json: one or more .ogg files, a volume), played once at a
 ## random pick (the Cursemark fork).
 
-const RAW := "res://cursemark/raw/"
+static var RAW: String = load("res://core/cm_data.gd").root() + "raw/"
 static var _defs := {}
 static var _streams := {}
 

@@ -3,7 +3,7 @@ extends Node
 ## music_active, ambient): the place's track (its intro once, then its loop), the fight's track while something hunts
 ## the pilgrim near, a boss's own track while a boss is up, and the ambient bed under it all. Tracks cross-fade.
 
-const RAW := "res://cursemark/raw/"
+static var RAW: String = load("res://core/cm_data.gd").root() + "raw/"
 const CmData := preload("res://core/cm_data.gd")
 
 var main

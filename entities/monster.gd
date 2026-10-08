@@ -80,7 +80,7 @@ func setup(z: Zone, m: Dictionary) -> void:
 			sk = kind + "@" + rank
 	# (Cursemark assets): the creature in Cursemark's body (Derek 2026-10-05: "take assets from this game and put them
 	# into godmarrow"), its own kind's brain and numbers kept
-	if CM_BODY.has(kind) and FileAccess.file_exists("res://cursemark/raw/data.cdb"):
+	if CM_BODY.has(kind) and FileAccess.file_exists(load("res://core/cm_data.gd").root() + "raw/data.cdb"):
 		sk = "cm:" + str(CM_BODY[kind])
 	spr = AnimSprite.new(Data.sprite_set(sk))
 	add_child(spr)
