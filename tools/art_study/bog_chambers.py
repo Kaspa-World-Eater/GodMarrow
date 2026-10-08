@@ -166,6 +166,24 @@ def straw_hut(hx, hy, R=1.8, wall_h=1.05, pitch=0.95, pit_at=None, seed=5):
         mb = hull & (bz > H2 - 0.15)
         H2 = np.where(mb, bz, H2)
         part[mb] = 45
+        # the way they walk: from the door past the fire pit down to the punt, trodden into the peat, a hand lower,
+        # bare of moss; and the doorstone, a flat slab worn hollow in its middle by generations of feet
+        dpt = np.array([hx + np.cos(door_a) * (R + 0.35), hy + np.sin(door_a) * (R + 0.35)])
+        way_pts = [dpt, np.array([px_, py_]) + np.array([np.cos(door_a + 1.4), np.sin(door_a + 1.4)]) * 0.95, np.array([bx, by])]
+        tw_ = np.zeros(X.shape, bool)
+        for a_, b_ in zip(way_pts[:-1], way_pts[1:]):
+            dv = b_ - a_
+            L_ = np.hypot(*dv)
+            t_ = np.clip(((X - a_[0]) * dv[0] + (Y - a_[1]) * dv[1]) / (L_ * L_), 0, 1)
+            dd_ = np.hypot(X - a_[0] - dv[0] * t_, Y - a_[1] - dv[1] * t_)
+            tw_ |= dd_ < 0.42 + (vn(X * 3, Y * 3) - 0.5) * 0.18
+        tw_ &= (part == 0)
+        H2 = np.where(tw_, H2 - 0.04, H2)
+        part[tw_] = 46
+        ds = np.hypot((X - dpt[0]) / 0.55, (Y - dpt[1]) / 0.4) < 1
+        dz = base + 0.06 - np.clip(1 - np.hypot((X - dpt[0]) / 0.3, (Y - dpt[1]) / 0.22), 0, 1) * 0.04
+        H2 = np.where(ds, dz, H2)
+        part[ds] = 47
         W["hut"] = dict(c=(hx, hy), R=R, base=base, wall_h=wall_h, door=door_a)
         return H2, part
     return st
@@ -205,6 +223,10 @@ def hut_paint(col, W, px, py, pz, L, vv, gl, st):
     col = np.where((st == 44)[..., None], turf, col)
     plank = np.array([0.2, 0.17, 0.13]) * (0.35 + vv[..., None] * 0.8) * (1 - (np.abs(np.sin((px + py) * 18)) < 0.15)[..., None] * 0.35)
     col = np.where((st == 45)[..., None], plank, col)
+    trod = np.array([0.15, 0.11, 0.08]) * (0.45 + vv[..., None] * 0.9) * (1 + (vn(px * 9, py * 9)[..., None] - 0.5) * 0.2)
+    col = np.where((st == 46)[..., None], trod, col)
+    dstone = np.array([0.27, 0.27, 0.25]) * (0.4 + vv[..., None] * 0.9)
+    col = np.where((st == 47)[..., None], dstone, col)
     stone = np.array([0.22, 0.23, 0.22]) * (0.35 + vv[..., None] * 0.85) * (1 + (vn(px * 9, py * 9)[..., None] - 0.5) * 0.3)
     col = np.where((st == 42)[..., None], stone, col)
     col = np.where((st == 43)[..., None], np.array([0.05, 0.05, 0.05]) + vv[..., None] * 0.03, col)

@@ -300,3 +300,11 @@ MASTER_RULES is unchanged.
 - **Before:** the bog lay in the same even moonlight everywhere.
 - **Now:** high thin cloud drifts across the moon (the `MOONLIT` hook), so broad pools of moonlight move over the water and the Back and the rest lies a step darker. The pools are stepped, with the dither only at their edges. The wet crowns of the bone catch the moon in broken pale dabs where it is open.
 - **Result:** the frame has a lit half and a dark half that move with the loop. **Walk: B, toward B+.**
+
+## Rules check, 2026-10-08: detail where the eye goes (the hut)
+
+MASTER_RULES is unchanged. **Added:**
+- the way the bog folk walk, trodden into the peat a hand lower and bare of moss, from the door past the fire pit down to the punt;
+- a flat doorstone worn hollow in its middle.
+
+**Result:** the way reads as a darker brown band; the doorstone sits under the fire's pale light and is hard to tell apart. **Hut: B.**
