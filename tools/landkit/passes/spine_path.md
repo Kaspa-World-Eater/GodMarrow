@@ -418,3 +418,11 @@ MASTER_RULES is unchanged; no new grades from Derek.
 - **The brows:** steep into each orbit, sloping away outside it, highest toward the braincase and joined to it by a bridge of bone (no longer tubs).
 
 **Result:** the skull reads from above as a braincase between two great water-filled orbits, its jaws splayed on either side with their teeth. **Skull: B.** Still too symmetric and clean-edged, a little machined.
+
+## Rules check, 2026-10-08: the skull's age
+
+MASTER_RULES is unchanged.
+- The machined symmetry is broken: a ragged, chipped outline; one brow broken away over a third of its ring; the skull settled into the peat, a little sunk on one side; moss only on its lowest, wettest edge.
+- **The overreach and the fix:** the first try (tilt 0.16, moss below 0.35 yd) camouflaged the skull in moss blotches and lost its read. Pulled back to a tilt of 0.07 and moss below 0.2 yd.
+
+**Skull: B+.** It reads as an old skull lying in the bog; the front orbit's broken brow faces the camera, so that orbit reads a little less.

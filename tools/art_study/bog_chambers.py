@@ -407,6 +407,7 @@ def serpent_skull(cx, cy, ang, length=7.2, width=5.6, height=0.55, seed=11):
         v = (-(X - cx) * sa + (Y - cy) * ca) / (width / 2)
         # the braincase: long and narrow, widest a little behind the orbits, its ridge down the middle
         bw = np.interp(u, [-1.0, -0.8, -0.4, -0.05, 0.25, 0.55, 0.85, 1.0], [0.0, 0.34, 0.44, 0.36, 0.4, 0.33, 0.2, 0.0])
+        bw = bw * (1 + (vn(u * 9 + seed, np.sign(v) * 3) - 0.5) * 0.28)      # a ragged outline: chipped, worn, not cut
         q = v / np.maximum(bw, 0.02)
         inside = (np.abs(q) < 1) & (bw > 0.01)
         z = LEVEL - 0.15 + height * np.sqrt(np.clip(1 - q ** 2, 0, 1)) * (0.7 + 0.3 * np.clip(-u, 0, 1))
@@ -422,6 +423,9 @@ def serpent_skull(cx, cy, ang, length=7.2, width=5.6, height=0.55, seed=11):
             inner = np.clip((d - 0.95) / 0.12, 0, 1)
             outer = np.clip(1 - (d - 1.1) / (0.55 + 0.35 * (v * sg < 0.62)), 0, 1) ** 1.3
             ring = np.where(d < 1.1, inner, outer) * (d >= 0.95)
+            if sg == (1 if seed % 2 else -1):                                  # one brow broken away over a third of its ring
+                oa = np.arctan2((v - sg * 0.56) / 0.36, (u + 0.02) / 0.25)
+                ring = ring * (np.abs(((oa - 0.9 * sg + np.pi) % (2 * np.pi)) - np.pi) > 1.0 + (vn(oa * 4, 1.0) - 0.5) * 0.4)
             tilt = np.clip(0.6 + 0.4 * (0.62 - np.abs(v)) / 0.62, 0.35, 1)  # higher toward the braincase
             brow = np.maximum(brow, ring * tilt * (0.75 + 0.25 * (u > 0.0)))
             nd_ = np.hypot((u - 0.88) / 0.05, (v - sg * 0.09) / 0.05)          # the nostril pits at the snout
@@ -429,6 +433,7 @@ def serpent_skull(cx, cy, ang, length=7.2, width=5.6, height=0.55, seed=11):
         zb = LEVEL - 0.1 + brow * 0.75
         z = np.where(brow > 0.05, np.maximum(np.where(inside, z, -9), zb), z)
         inside = inside | (brow > 0.05)
+        z = z + v * 0.07 + u * 0.03                                            # settled into the peat, a little sunk on one side
         sut = ((np.abs(np.sin(u * 7 + np.sin(v * 9) * 0.5)) < 0.05) | (np.abs(v) < 0.015)) & inside
         z = z - sut * 0.03
         m = inside & ~orb & (z > H) & (z > LEVEL)
@@ -508,6 +513,8 @@ def skull_paint(col, W, px, py, pz, L, vv, gl, st):
         bc = _bone_col(vv * 1.08, px, py, crest)
         bc = np.where((st == 53)[..., None], bc * 0.55, bc)
         bc = np.where(((pz - LEVEL) < 0.12)[..., None], bs._r(bs.R_ALGAE, vv * 0.95), bc)
+        mossy = ((pz - LEVEL) < 0.2) & (vn(px * 3.3, py * 3.3) > 0.6)          # moss only on its lowest, wettest edge
+        bc = np.where(mossy[..., None], bs._r(bs.R_MOSS, vv * 0.9 + (vn(px * 13, py * 13) - 0.5) * 0.1), bc)
         col = np.where(m[..., None], bc, col)
     return col
 
