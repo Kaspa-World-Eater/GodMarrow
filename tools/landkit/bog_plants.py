@@ -26,7 +26,7 @@ SEDGE_D = np.array([0.42, 0.37, 0.22])
 PAD = np.array([0.16, 0.22, 0.1])
 PAD_RIM = np.array([0.3, 0.38, 0.18])
 FLOWER = np.array([0.78, 0.76, 0.7])
-WEED = np.array([0.2, 0.27, 0.1])
+WEED = np.array([0.15, 0.19, 0.08])          # duckweed at night: olive, not lawn-green
 WIND = np.array([0.32, -0.12])
 
 
@@ -134,6 +134,11 @@ def _bed(x, y):
     return vn(x * 0.22 + 5.0, y * 0.22) * 0.7 + vn(x * 0.7, y * 0.7 + 2.0) * 0.3
 
 
+def _colony(x, y):
+    from kit import vn
+    return vn(x * 0.35 + 17.0, y * 0.35) * 0.75 + vn(x * 1.1, y * 1.1 + 9.0) * 0.25
+
+
 def place(rng, depth_at, part_at, cover_at, box, n_try=9000):
     """by the water table: reed in beds in the shallows, sedge on the hummocks and the Back's growth, pads on still
     open water, never on the walked crown"""
@@ -151,6 +156,6 @@ def place(rng, depth_at, part_at, cover_at, box, n_try=9000):
             out.append(("reed", x, y, float(rng.uniform(1.2, 2.0))))
         elif p == 2 and cv < 0.35 and r < 0.05:
             out.append(("sedge", x, y, float(rng.uniform(0.35, 0.7))))
-        elif p == 0 and 0.3 < d < 1.2 and r < 0.035:
-            out.append(("pad", x, y, float(rng.uniform(0.12, 0.3))))
+        elif p == 0 and 0.3 < d < 1.2 and _colony(x, y) > 0.6 and r < 0.12:      # pads grow in colonies
+            out.append(("pad", x, y, float(rng.uniform(0.08, 0.32) * (0.7 + _colony(x, y) * 0.5))))
     return out

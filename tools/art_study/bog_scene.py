@@ -18,6 +18,7 @@ import wood_scene as ws                      # noqa: E402
 import serpent_spine                         # noqa: E402
 import fen_ground                            # noqa: E402
 import bog_plants                            # noqa: E402
+import wisp_fire                             # noqa: E402
 from kit import ramp, vn, fbm                # noqa: E402
 
 C = np.array([20.0, 20.0])
@@ -174,10 +175,14 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     vb = ws.look(W, W["bog_v"], px, py)
     dd = ws.look(W, W["bog_depth"], px, py)
     lee = np.clip(1 - (vb - 2.0) / 2.5, 0, 1) + np.clip(0.5 - dd, 0, 1) * 0.6
-    mat = water & ((vn(px * 0.9 + 3, py * 0.9) * 0.6 + vn(px * 4, py * 4) * 0.4 + lee * 0.35) > 0.78)
-    speck = vn(px * 23, py * 23) > 0.42
-    img[mat & speck] = bog_plants.WEED * (0.6 + L["moon"][mat & speck, None] * 0.6)
-    img[mat & ~speck] = img[mat & ~speck] * 0.6 + bog_plants.WEED * 0.25
+    drift = vn(px * 0.45 + py * 0.9 + 3, py * 0.45 - px * 0.2) * 0.55 + vn(px * 3, py * 3) * 0.25 + lee * 0.4   # drifted, combed by the wind
+    mat = water & (drift > 0.82)
+    edge = water & (drift > 0.76) & ~mat
+    speck = vn(px * 23, py * 23) > 0.45
+    img[mat & speck] = bog_plants.WEED * (0.55 + L["moon"][mat & speck, None] * 0.5)
+    img[mat & ~speck] = img[mat & ~speck] * 0.55 + bog_plants.WEED * 0.3
+    sp2 = edge & (vn(px * 31, py * 31) > 0.7)                                 # loose fronds at a mat's edge
+    img[sp2] = bog_plants.WEED * 0.7
     rng = np.random.default_rng(31)
     fx, fy = ws.FOCUS
     box = (fx - 13, fy - 13, fx + 13, fy + 13)
@@ -202,7 +207,42 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     return img
 
 
-ws.LIVING[:] = [mirror, plants]
+WISPS = [(2.0, 1.6, 0.0, 11), (-5.5, 3.0, 0.21, 12), (6.5, -4.0, 0.43, 13), (-2.0, -6.5, 0.67, 14), (9.0, 3.5, 0.82, 15)]
+wisp_fire.LIFE = 0.7
+
+
+def wisps(img, w, W, px, py, pz, L, T=0.4):
+    """the wisp-fire: small cold flames drifting low over the black water in wandering paths, gathering and parting,
+    each lighting the water under it and shown again, upside down and dimmer, in the mirror"""
+    water = ws.look(W, W["bog_water"], px, py) & (L["tg"] == 0)
+    dep = px + py
+    GH, GW = img.shape[:2]
+    for (a, p, ph, sd) in WISPS:
+        th = 2 * np.pi * (T + ph)
+        x = ws.FOCUS[0] + a + np.sin(th + sd) * 1.6 + np.sin(th * 2 + sd * 3) * 0.5     # a wandering loop
+        y = ws.FOCUS[1] + p + np.cos(th * 1 + sd * 2) * 1.2
+        if float(ws.look(W, W["bog_water"], np.array(x), np.array(y))) < 0.5:
+            continue                                                         # only over the water
+        z = LEVEL + 0.5 + 0.25 * np.sin(th * 3 + sd)
+        tmp = np.zeros_like(img)
+        tmp = wisp_fire.draw(tmp, ws.to_px, np.full(dep.shape, -1e9), [(x, y, z, -T + 0.35, sd)], T,
+                             pool=lambda xs, ys: water[np.clip(ys, 0, GH - 1), np.clip(xs, 0, GW - 1)])
+        lit = tmp.sum(2) > 0.02
+        sx, sy = ws.to_px((x, y, z))
+        if (x + y) < dep[int(np.clip(sy, 0, GH - 1)), int(np.clip(sx, 0, GW - 1))] - 0.6:
+            continue
+        img[lit] = np.maximum(img[lit], tmp[lit])
+        _, wl = ws.to_px((x, y, LEVEL))                                      # the mirror: the flame turned over the water line
+        rr_, cc_ = np.nonzero(lit & (np.arange(GH)[:, None] < wl))
+        mr = np.round(2 * wl - rr_).astype(int)
+        ok = (mr >= 0) & (mr < GH)
+        rr_, cc_, mr = rr_[ok], cc_[ok], mr[ok]
+        ok = water[mr, cc_]
+        img[mr[ok], cc_[ok]] = np.clip(img[mr[ok], cc_[ok]] * 0.5 + tmp[rr_[ok], cc_[ok]] * 0.45, 0, 1)
+    return img
+
+
+ws.LIVING[:] = [mirror, plants, wisps]
 ws.GROUND = ground
 
 if __name__ == "__main__":

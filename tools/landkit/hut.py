@@ -40,8 +40,8 @@ def hut(seed=1, length=4.0, width=3.0, wall_h=1.7, ridge=2.6):
         sid = np.floor(u / 0.42 + np.sin(u * 1.7 + k) * 0.25)
         top = wall_h - (fbm(u * 0.8 + k * 5, 2) - 0.5) * 0.35 - np.clip(np.sin(u / L * np.pi) * 0.12, 0, 1) \
             + ((np.sin(sid * 7.3 + k) * 4375.5) % 1.0 - 0.5) * 0.22        # each upright slab its own ragged top
-        if k == 2:
-            top = np.where(np.abs(u - door_u) < 0.42, 0.0, top)          # the doorway: the door gone
+        # the doorway stays a wall in the height field: the eave hides any gap from the camera, so the opening is
+        # drawn on the wall's face like the windows (Derek 2026-10-08: the houses "lack doors and windows, except one")
         upd = m & (top > H)
         H = np.where(upd, top, H)
         M = np.where(upd, np.where(top < 0.05, SILL, WALL), M)
@@ -93,25 +93,33 @@ def hut(seed=1, length=4.0, width=3.0, wall_h=1.7, ridge=2.6):
     # the door: broken, each its own way (hanging ajar from its last hinge, fallen across the threshold, leaning in its
     # frame); a plank slab of bark the height of a stooping man
     kind = ["ajar", "fallen", "leaning"][seed % 3]
-    hx_d = -hx + door_u                                               # the doorway's middle on the front wall (y = +hy)
-    if kind == "ajar":
+    # the door is in the GABLE END (+x), as such huts have it: from the game's camera a long wall hides under its own
+    # roof slope, so a door there is never seen (Derek 2026-10-08: the houses "lack doors and windows, except one")
+    door_y = rr.uniform(-0.2, 0.2) * width
+    door_geom = (hx, door_y - 0.42, 0.0)                               # (hinge x, hinge y, swing): along it run the planks
+    if kind == "ajar":                                                # hanging from its last hinge, swung out
         a = rr.uniform(0.7, 1.1)
-        hpx, hpy = hx_d - 0.42, hy
-        t = (X - hpx) * np.cos(a) + (Y - hpy) * np.sin(a)
-        nrm = -(X - hpx) * np.sin(a) + (Y - hpy) * np.cos(a)
+        hpx, hpy = hx, door_y - 0.42
+        door_geom = (hpx, hpy, a)
+        t = (X - hpx) * np.sin(a) + (Y - hpy) * np.cos(a)
+        nrm = (X - hpx) * np.cos(a) - (Y - hpy) * np.sin(a)
         dm = (t > 0) & (t < 0.82) & (np.abs(nrm) < 0.04)
         H = np.where(dm, np.maximum(H, 1.55), H)
         M = np.where(dm, DOOR, M)
-    elif kind == "fallen":
-        dm = (np.abs(X - hx_d) < 0.42) & (Y > hy + 0.12) & (Y < hy + 1.7)
+    elif kind == "fallen":                                            # fallen flat across the threshold
+        dm = (np.abs(Y - door_y) < 0.42) & (X > hx + 0.12) & (X < hx + 1.7)
         H = np.where(dm & (H < 0.07), 0.07, H)
         M = np.where(dm, DOOR, M)
-    else:
-        dm = (np.abs(X - hx_d - 0.15) < 0.36) & (np.abs(Y - hy + 0.15) < 0.05)
+    else:                                                             # leaning in its frame
+        dm = (np.abs(Y - door_y - 0.15) < 0.36) & (np.abs(X - hx + 0.15) < 0.05)
         H = np.where(dm, np.maximum(H, 1.3), H)
         M = np.where(dm, DOOR, M)
-    # the windows: one in each end wall and one in the back, broken (painted on the wall's face: a dark opening, its frame,
-    # its split shutter; a height field cannot hollow a wall under its lintel)
-    windows = [(0, length * rr.uniform(0.35, 0.65)), (1, width * 0.5), (3, width * 0.5)]
+    # the windows, broken (painted on the wall's face: a dark opening, its frame, its split shutter; a height field
+    # cannot hollow a wall under its lintel): one in each long wall close by the door's gable (from the camera a long
+    # wall shows only its last yard before that corner; the rest hides under its own roof), one further back on each,
+    # and one in the back gable
+    windows = [(0, length - rr.uniform(0.6, 0.75)), (2, rr.uniform(0.6, 0.75)),
+               (0, length * rr.uniform(0.3, 0.45)), (2, length * rr.uniform(0.55, 0.7)), (3, width * 0.5)]
     F.H, F.M, F.W, F.U = H, M, W, U
-    return F, dict(windows=windows, door=kind, seed=seed, length=length, width=width, wall_h=wall_h, ridge=ridge, door_u=door_u, cave_x=cave_x)
+    return F, dict(windows=windows, door=kind, seed=seed, length=length, width=width, wall_h=wall_h, ridge=ridge, door_wall=1,
+                   door_u=door_y + hy, door_geom=door_geom, cave_x=cave_x)

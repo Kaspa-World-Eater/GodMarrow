@@ -46,7 +46,7 @@ R_MOSSC = ws.ramp("#0a110f", "#111c15", "#18281a", "#20341e", "#2c4423", "#3b552
 
 # four families, four huts in a ring round the fire-yard, every door turned to the fire; the front left open
 _HUT_AT = [(C - AX * 4.6 - PERP * 2.7, 11), (C - AX * 4.6 + PERP * 2.7, 23), (C - PERP * 5.1 + AX * 0.9, 37), (C + PERP * 5.1 + AX * 0.9, 41)]
-HUTS = [(p_, float(np.arctan2(-(C - p_)[0], (C - p_)[1])), sd) for (p_, sd) in _HUT_AT]   # turn: the door (+y) faces C
+HUTS = [(p_, float(np.arctan2((C - p_)[1], (C - p_)[0])), sd) for (p_, sd) in _HUT_AT]    # turn: the door's gable (+x) faces C
 HF = [hutgen.hut(s) for (_, _, s) in HUTS]
 # the dead round the fire, every one with its head toward the ring in the east (world +x, a little -y: "the ring in the
 # east"), each at its own age, each with the hunter's stick at its head
@@ -137,6 +137,7 @@ def paint_hut(img, m, v, n, px, py, pz, o, W, L):
     lx, ly = to_hut(k, px, py)
     M = F.at(F.M, lx, ly, 0)
     U = F.at(F.U, lx, ly, 0.0)
+    WID = F.at(F.W, lx, ly, -1)
     # a ray that strikes a thin wall's face lands a hair outside the wall's own cells: look a little way in along the
     # surface normal for the material it belongs to (else those pixels stay unpainted, black, in an aliased grid)
     for step in (0.04, 0.08, 0.12):
@@ -146,6 +147,8 @@ def paint_hut(img, m, v, n, px, py, pz, o, W, L):
         ix, iy = to_hut(k, px - n[..., 0] * step, py - n[..., 1] * step)
         M = np.where(miss, F.at(F.M, ix, iy, 0), M)
         U = np.where(miss, F.at(F.U, ix, iy, 0.0), U)
+        WID = np.where(miss, F.at(F.W, ix, iy, -1), WID)                # which wall, found the same way (else the
+                                                                        # windows and door missed most faces)
     h = pz - o["base"]
     side = L["side"]
     # a wall turned from moon and fire still takes the sky's cold fill and the fire's light thrown off the yard:
@@ -186,10 +189,21 @@ def paint_hut(img, m, v, n, px, py, pz, o, W, L):
     st_v = sv + ((np.sin(st_i * 7.7 + np.floor(h / 0.15) * 3.3) * 4375.5) % 1.0 - 0.5) * 0.14
     fj = (((U / 0.3 + np.floor(h / 0.15) * 0.5) % 1.0) < 0.12) | ((h / 0.15) % 1.0 < 0.18)
     img[foot] = R_FIELD[np.clip(((st_v - fj * 0.2) * len(R_FIELD)).astype(int), 0, len(R_FIELD) - 1)][foot]
+    # the doorway: a dark opening the height of a stooping man under its lintel, framed by two posts; the door itself
+    # (ajar, fallen or leaning) stands in the world as real height
+    on2 = wall & side & (WID == info["door_wall"])
+    du = info["door_u"]
+    dw = on2 & (np.abs(U - du) < 0.36) & (h < 1.42)
+    dfr = on2 & (np.abs(U - du) < 0.46) & (h < 1.55) & ~dw
+    img[dfr] = R_SLAB[np.clip(((sv + 0.08) * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)][dfr]
+    ddark = np.array([0.025, 0.02, 0.025]) + np.clip(L["lamp"], 0, 0.6)[..., None] * np.array([0.1, 0.05, 0.015])
+    img[dw] = ddark[dw]
+    sillp = dw & (h < 0.06)
+    img[sillp] = R_SLAB[np.clip(((sv - 0.05) * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)][sillp]   # the worn threshold
     # the broken windows: a dark opening under its frame, a split shutter plank hanging askew across the dark
     for (wk, wu) in info["windows"]:
-        win = wall & side & (F.at(F.W, lx, ly, -1) == wk) & (np.abs(U - wu) < 0.3) & (h > 0.75) & (h < 1.3)
-        frame = wall & side & (F.at(F.W, lx, ly, -1) == wk) & (np.abs(U - wu) < 0.37) & (h > 0.68) & (h < 1.38) & ~win
+        win = wall & side & (WID == wk) & (np.abs(U - wu) < 0.3) & (h > 0.75) & (h < 1.3)
+        frame = wall & side & (WID == wk) & (np.abs(U - wu) < 0.37) & (h > 0.68) & (h < 1.38) & ~win
         img[frame] = R_SLAB[np.clip(((sv + 0.05) * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)][frame]
         dark = np.array([0.03, 0.025, 0.03]) + np.clip(L["lamp"], 0, 0.6)[..., None] * np.array([0.12, 0.06, 0.02])
         img[win] = dark[win]
@@ -228,9 +242,15 @@ def paint_hut(img, m, v, n, px, py, pz, o, W, L):
     flr = m & ((M == hutgen.FLOORI) | (M == hutgen.HOLE))
     img[flr] = (np.array([0.035, 0.03, 0.035]) + np.clip(L["lamp"], 0, 0.5)[..., None] * np.array([0.14, 0.07, 0.03]))[flr]
     door = m & (M == hutgen.DOOR)
-    pl = np.floor(lx * 6 + ly * 6)                                   # its planks
-    dv = sv - 0.02 + ((np.sin(pl * 7.1 + k) * 4375.5) % 1.0 - 0.5) * 0.1 - (((lx * 6 + ly * 6) - pl) < 0.15) * 0.12
+    gx, gy, ga = info["door_geom"]                                   # its planks run up it, across its width from the hinge
+    tw_ = (lx - gx) * np.sin(ga) + (ly - gy) * np.cos(ga) if ga else (ly - gy)
+    pq = tw_ / 0.17
+    pl = np.floor(pq)
+    bat = (np.abs(h - 0.35) < 0.07) | (np.abs(h - 1.15) < 0.07)       # two battens nailed across
+    dv = sv - 0.06 + ((np.sin(pl * 7.1 + k) * 4375.5) % 1.0 - 0.5) * 0.12 - ((pq - pl) < 0.16) * 0.14 + bat * 0.06
     img[door] = R_SLAB[np.clip((dv * len(R_SLAB)).astype(int), 0, len(R_SLAB) - 1)][door]
+    hinge = door & bat & (np.abs(tw_) < 0.12)
+    img[hinge] = relic.RUST[2]
     sg = m & (M == hutgen.SHINGLE)
     img[sg] = R_SHING[np.clip(((sv - 0.04) * len(R_SHING)).astype(int), 0, len(R_SHING) - 1)][sg]
     sill = m & (M == hutgen.SILL)
