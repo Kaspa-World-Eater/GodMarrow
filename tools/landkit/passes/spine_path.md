@@ -507,3 +507,12 @@ Passes:
 - **Walk, A-:** "Tone down the wisp fire and they should have a ghostly drift before going away."
 - **Causeway:** "more of those to add paths shooting off to islands of ruined huts or swampy pits".
 - **Maze, B+, a landmark:** "a large stone platform partially sunk and ringed by a coil of the serpent bone ... concentric circles around a deep pit of stone going down into the abyss ... gore and tendrils creeping up the side ... ruins that suggest this was a place of sacrifice."
+
+## Derek: "the open mud should have more vegetation and skeleton pieces in it" (2026-10-08)
+
+- **Vegetation:** the dry ground takes denser sedge clumps (bed threshold 0.38, rate 0.13), low dead tufts scattered between them, and more cotton grass; the Vein-Worms' churned peat lets a few dead tufts survive.
+- **Bone litter** (`bog_scene.bone_litter`): small pieces of the serpent half sunk in the peat of the shelves and banks:
+  - lengths of broken rib, splinters in twos and threes, a loose vertebra's knob;
+  - 22 per frame, gathered round the worms' rings, never on a walk or in the water;
+  - worn pale (`R_CROWN`), drawn with the bone tool's new `plain` finish (form and light only; its weathering broke into speckle at this size).
+- **The wisps, toned down** to Derek's note: three, not five; no flame, only a small soft core and a faint halo. Each wakes, drifts slowly over the water leaving a thin ghost-trail of fading dots, then rises and thins away. A faint pool on the water under it, and a dim reflection.

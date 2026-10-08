@@ -117,7 +117,9 @@ def _bounds(o, to_px):
     return int(min(xs) - pad), int(max(xs) + pad), int(min(ys) - pad), int(max(ys) + pad)
 
 
-def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ambient=0.15, tol=0.5):
+def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ambient=0.15, tol=0.5, plain=False):
+    """plain: small pieces seen far off take only their form and light, no cracks, flakes, pits or ends (at a few
+    pixels across that weathering breaks into speckle; form law 0.3: under a pixel it is colour, and here, nothing)"""
     GH, GW = img.shape[:2]
     ox, oy = to_px((0.0, 0.0, 0.0))
     for o in shapes:
@@ -191,6 +193,11 @@ def draw(img, zb, dep_scene, to_px, shapes, lights, moon, ambient=0.15, tol=0.5)
         q = val * len(R_BONE)
         q = np.where(np.abs(q - np.round(q)) < 0.08, q + bay * 0.7, q)
         col = R_BONE[np.clip(q, 0, len(R_BONE) - 1).astype(int)]
+        if plain:
+            col = col * (1 + (warm - wl[:, None]) * 0.8) + spec[:, None]
+            img[yx] = np.clip(col, 0, 1)
+            zb[yx] = depth[vis]
+            continue
         # weathering: cracks along the grain, the shell flaking from them, pits, grime in the low places
         crack = np.abs(vn(u2 * 3 + seed, u1 * 0.15) - 0.5) < 0.018
         flake = (np.abs(vn(u2 * 3 + seed, u1 * 0.15) - 0.5) < 0.06) & (vn(u1 * 0.5, u2 * 4) > 0.62)

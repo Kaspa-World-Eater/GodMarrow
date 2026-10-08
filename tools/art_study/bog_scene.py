@@ -398,6 +398,8 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     da = lambda x, y: float(ws.look(W, W["bog_depth"], np.array(x), np.array(y)))
     def pa(x, y):
         stv = int(ws.look(W, W["bog_st"], np.array(x), np.array(y)))
+        if stv in (70, 71):
+            return 0 if rng.random() < 0.35 else 9                           # the churned peat: a few dead tufts survive
         if stv > 0 and stv != 32:
             return 9                                                         # nothing grows on the wood, the hut, the bone
         return int(ws.look(W, W["bog_part"], np.array(x), np.array(y)))
@@ -454,38 +456,69 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     return img
 
 
-WISPS = [(2.0, 1.6, 0.0, 11), (-5.5, 3.0, 0.21, 12), (6.5, -4.0, 0.43, 13), (-2.0, -6.5, 0.67, 14), (9.0, 3.5, 0.82, 15)]
-wisp_fire.LIFE = 0.7
+WISPS = [(2.0, 1.6, 0.0, 11), (-5.5, 3.0, 0.36, 12), (6.5, -4.0, 0.7, 13)]   # fewer (Derek: "tone down the wisp fire")
+GHOST = np.array([0.66, 0.74, 0.86])
 
 
 def wisps(img, w, W, px, py, pz, L, T=0.4):
-    """the wisp-fire: small cold flames drifting low over the black water in wandering paths, gathering and parting,
-    each lighting the water under it and shown again, upside down and dimmer, in the mirror"""
+    """the wisp-fire, toned down (Derek 2026-10-08: "tone down the wisp fire and they should have a ghostly drift before
+    going away"): each is a small pale cold light low over the black water, no flame, only a soft core and a faint halo.
+    It wakes, drifts slowly along the water leaving a thin ghost of itself behind, and as it goes it rises, thins and
+    is gone; it lays a faint pale pool on the water under it and shows again, dimmer, in the mirror. Stepped alphas,
+    dithered only at the edges (the effects method)."""
     water = ws.look(W, W["bog_water"], px, py) & (L["tg"] == 0)
     dep = px + py
     GH, GW = img.shape[:2]
+    bay = ws.tw.B4[(np.arange(GH)[:, None] % 4), (np.arange(GW)[None, :] % 4)]
+    LIFE = 0.8                                                               # alive for this share of the loop
+
+    def where(a, p, ph, sd, f):
+        """the wisp at the share f of its life: drifting along, wandering, rising as it fades"""
+        drift = np.array([np.cos(sd * 1.7), np.sin(sd * 1.7)]) * 2.4 * f
+        wob = np.array([np.sin(f * 9 + sd) * 0.25, np.cos(f * 7 + sd * 2) * 0.2])
+        x, y = ws.FOCUS[0] + a + drift[0] + wob[0], ws.FOCUS[1] + p + drift[1] + wob[1]
+        z = LEVEL + 0.35 + 0.08 * np.sin(f * 11 + sd) + np.clip((f - 0.6) / 0.4, 0, 1) ** 1.6 * 1.3
+        return x, y, z
+
+    def dot(cx, cy, r, alpha, col, mask=None):
+        x0, x1 = int(max(cx - r - 1, 0)), int(min(cx + r + 2, GW))
+        y0, y1 = int(max(cy - r - 1, 0)), int(min(cy + r + 2, GH))
+        if x0 >= x1 or y0 >= y1:
+            return
+        ys, xs = np.mgrid[y0:y1, x0:x1]
+        d = np.hypot(xs - cx, (ys - cy) * 1.2) / max(r, 0.5)
+        a = np.where(d < 0.45, alpha, np.where(d < 1.0, alpha * 0.45 * (bay[ys, xs] > 0.45), 0.0))
+        if mask is not None:
+            a = a * mask[ys, xs]
+        img[ys, xs] = img[ys, xs] * (1 - a[..., None]) + col * a[..., None]
+
     for (a, p, ph, sd) in WISPS:
-        th = 2 * np.pi * (T + ph)
-        x = ws.FOCUS[0] + a + np.sin(th + sd) * 1.6 + np.sin(th * 2 + sd * 3) * 0.5     # a wandering loop
-        y = ws.FOCUS[1] + p + np.cos(th * 1 + sd * 2) * 1.2
-        if float(ws.look(W, W["bog_water"], np.array(x), np.array(y))) < 0.5:
-            continue                                                         # only over the water
-        z = LEVEL + 0.5 + 0.25 * np.sin(th * 3 + sd)
-        tmp = np.zeros_like(img)
-        tmp = wisp_fire.draw(tmp, ws.to_px, np.full(dep.shape, -1e9), [(x, y, z, -T + 0.35, sd)], T,
-                             pool=lambda xs, ys: water[np.clip(ys, 0, GH - 1), np.clip(xs, 0, GW - 1)])
-        lit = tmp.sum(2) > 0.02
-        sx, sy = ws.to_px((x, y, z))
-        if (x + y) < dep[int(np.clip(sy, 0, GH - 1)), int(np.clip(sx, 0, GW - 1))] - 0.6:
+        f = ((T + ph) % 1.0) / LIFE
+        if f >= 1.0:
             continue
-        img[lit] = np.maximum(img[lit], tmp[lit])
-        _, wl = ws.to_px((x, y, LEVEL))                                      # the mirror: the flame turned over the water line
-        rr_, cc_ = np.nonzero(lit & (np.arange(GH)[:, None] < wl))
-        mr = np.round(2 * wl - rr_).astype(int)
-        ok = (mr >= 0) & (mr < GH)
-        rr_, cc_, mr = rr_[ok], cc_[ok], mr[ok]
-        ok = water[mr, cc_]
-        img[mr[ok], cc_[ok]] = np.clip(img[mr[ok], cc_[ok]] * 0.5 + tmp[rr_[ok], cc_[ok]] * 0.45, 0, 1)
+        env = np.clip(f / 0.15, 0, 1) * np.clip((1 - f) / 0.4, 0, 1)            # wakes quickly, fades slowly
+        x, y, z = where(a, p, ph, sd, f)
+        if float(ws.look(W, W["bog_water"], np.array(x), np.array(y))) < 0.5 and f < 0.6:
+            continue                                                         # it keeps over the water
+        sx, sy = ws.to_px((x, y, z))
+        if not (0 <= sx < GW and 0 <= sy < GH) or (x + y) < dep[int(sy), int(sx)] - 0.6:
+            continue
+        thin = 1 - 0.6 * np.clip((f - 0.6) / 0.4, 0, 1)                        # it thins as it rises away
+        # the ghost it leaves behind: a few faint dots along the way it came, fainter the further back
+        for k in range(1, 7):
+            fk = f - k * 0.025
+            if fk <= 0:
+                break
+            gx, gy, gz = where(a, p, ph, sd, fk)
+            gsx, gsy = ws.to_px((gx, gy, gz))
+            dot(gsx, gsy, 1.2, 0.16 * env * (1 - k / 7.0), GHOST)
+        # the faint pale pool it lays on the water, and its reflection, dimmer
+        _, wl = ws.to_px((x, y, LEVEL))
+        dot(sx, wl, 5.0 * thin, 0.07 * env, GHOST, water)
+        dot(sx, 2 * wl - sy, 1.6 * thin, 0.22 * env, GHOST * 0.8, water)
+        # the light itself: a small soft core and a faint halo, no flame
+        dot(sx, sy, 3.2 * thin, 0.18 * env, GHOST)
+        dot(sx, sy, 1.3 * thin, 0.65 * env, np.array([0.86, 0.9, 0.98]))
     return img
 
 
@@ -589,7 +622,67 @@ def value_only(img, w, W, px, py, pz, L, T=0.0):
     return np.repeat(g, 3, axis=2)
 
 
-ws.LIVING[:] = [mirror, giant_rib_mirror, plants, giant_ribs, struct_living, bog_fog, wisps, value_only]
+def bone_litter(img, w, W, px, py, pz, L, T=0.0):
+    """the serpent everywhere in the mud (Derek 2026-10-08: "the open mud should have more vegetation and skeleton
+    pieces in it"): small pieces of the god's bone half sunk in the peat of the shelves and banks: lengths of broken rib,
+    splinters, a loose vertebra's knob; bog-stained, their tops worn paler; sparse, never on a walk, never in the water;
+    true bone (landkit bone.py), lying as things lie, each its own way"""
+    rng = np.random.default_rng(int(ws.FOCUS[0] * 7 + ws.FOCUS[1] * 3) % 9973)
+    fx, fy = ws.FOCUS
+    shapes = []
+    tries = 0
+    worm = W.get("worm")
+    while len(shapes) < 22 and tries < 5000:
+        tries += 1
+        if worm and rng.random() < 0.4:                                      # where the worms took things under: more bone
+            b_ = worm["bub"][int(rng.integers(0, len(worm["bub"])))]
+            x, y = b_[0] + rng.normal(0, 1.2), b_[1] + rng.normal(0, 1.2)
+        else:
+            x, y = fx + rng.uniform(-12, 12), fy + rng.uniform(-12, 12)
+        if bool(ws.look(W, W["bog_water"], np.array(x), np.array(y))):
+            continue
+        pt = int(ws.look(W, W["bog_part"], np.array(x), np.array(y)))
+        stv = int(ws.look(W, W["bog_st"], np.array(x), np.array(y)))
+        if pt == 1 or pt == 4 or (stv > 0 and stv not in (32, 70, 71)):
+            continue                                                         # not on the bone of the walk, not on a piece
+        if pt == 0 and float(ws.look(W, W["bog_v"], np.array(x), np.array(y))) < 3.0:
+            continue
+        g = float(ws.look(W, W["H"], np.array(x), np.array(y)))
+        ang = rng.uniform(0, 2 * np.pi)
+        kind = rng.random()
+        if kind < 0.55:                                                      # a broken length of rib, bowed, half sunk
+            ln = rng.uniform(0.7, 1.6)
+            a = (x, y, g - 0.05)
+            b = (x + np.cos(ang) * ln, y + np.sin(ang) * ln, g - 0.12)
+            shapes.append(bonegen.rib(a, b, rng.uniform(0.08, 0.2), 0.09, 0.12, seed=int(rng.integers(1, 9999))))
+        elif kind < 0.85:                                                    # splinters, a few together
+            for q in range(int(rng.integers(2, 4))):
+                a2 = ang + rng.normal(0, 0.8)
+                ln = rng.uniform(0.25, 0.55)
+                ox, oy = rng.normal(0, 0.25, 2)
+                a = (x + ox, y + oy, g - 0.03)
+                b = (x + ox + np.cos(a2) * ln, y + oy + np.sin(a2) * ln, g - 0.06)
+                shapes.append(bonegen.rib(a, b, 0.03, 0.05, 0.065, seed=int(rng.integers(1, 9999))))
+        else:                                                                # a loose vertebra's knob, sunk to its middle
+            shapes.append(bonegen.rib((x, y, g - 0.18), (x + np.cos(ang) * 0.35, y + np.sin(ang) * 0.35, g - 0.2),
+                                      0.05, 0.22, 0.24, seed=int(rng.integers(1, 9999))))
+    if not shapes:
+        return img
+    GH, GW = img.shape[:2]
+    dep = px + py
+    hero = np.array(ws.HERO, float)
+    gh = float(ws.look(W, W["H"], np.array(hero[0]), np.array(hero[1])))
+    lts = [((hero[0] + 0.25, hero[1] - 0.25, gh + 0.7), (0.95, 0.6, 0.32), 2.6 * 1.4)]
+    keep = (bonegen.R_BONE, bonegen.SINEW, bonegen.SPONGE)
+    bonegen.R_BONE, bonegen.SINEW, bonegen.SPONGE = R_CROWN, np.array([0.08, 0.07, 0.06]), np.array([0.07, 0.06, 0.05])
+    zb = np.full((GH, GW), -1e9)                                             # worn pale where it lies above the peat
+    shapes.sort(key=lambda o: -(o["pts"][:, 0] + o["pts"][:, 1]).mean())
+    bonegen.draw(img, zb, dep, ws.to_px, shapes, lts, ws.SUN, ambient=0.22, plain=True)
+    bonegen.R_BONE, bonegen.SINEW, bonegen.SPONGE = keep
+    return img
+
+
+ws.LIVING[:] = [mirror, giant_rib_mirror, plants, bone_litter, giant_ribs, struct_living, bog_fog, wisps, value_only]
 ws.GROUND = ground
 
 
