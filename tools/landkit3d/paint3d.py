@@ -35,6 +35,7 @@ R = {
     "iron": ramp("#0e0f13", "#1a1b20", "#27282c", "#36363a", "#47464a"),
     "bone": ramp("#2e2a28", "#4a443d", "#6a6155", "#8b7f6e", "#ab9e88", "#c7bba2", "#ddd3bb"),
     "moss": ramp("#0e1710", "#152515", "#1e351b", "#284722", "#355a2a", "#456e33", "#58833e"),
+    "leaf": ramp("#22120d", "#3a1d10", "#552a14", "#723c1b", "#8d5226", "#a46a34"),
     "algae": ramp("#121a17", "#1b2a22", "#26392b", "#304634", "#3c553e"),
 }
 MAT = {1: "ground", 2: "stucco", 3: "brick", 4: "stone", 5: "lacquer", 6: "gold", 7: "tile", 8: "wood", 9: "root",
@@ -107,14 +108,18 @@ def paint(d):
             kept = (ao[m] < 0.78) | (noise[m] > 0.62)
             col = np.where(kept[:, None], tone(R["gold"], t * 1.05, dith[m]), tone(R["lacquer"], t, dith[m]))
         elif name == "ground":
-            # the rainforest floor: a moss carpet in broad tones; the needle-litter of the spruce in drifts where the
-            # moss thins; dark worn earth only where feet went (the way to the stair)
-            drift = fbm(X[m] * 0.7 + 11, Y[m] * 0.7)
-            needles = (drift < 0.45) & (vn(X[m] * 9, Y[m] * 9) > 0.35)
-            worn = (np.abs(Y[m]) < 1.6) & (X[m] > 9.5) & (X[m] < 16)
-            col = tone(R["ground"], t * (0.9 + 0.2 * drift), dith[m])
-            col = np.where(needles[:, None], tone(R["soil"], t * 1.05, dith[m]), col)
-            col = np.where(worn[:, None], tone(R["soil"], t * 0.8, dith[m]), col)
+            # the rainforest floor (Derek's standing ruling: the ground stays alive, never flat brown or blotched):
+            # a carpet of cushion moss, every clump its own two tones, a bright lip on its lit side; the leaf-fall
+            # of the maples in drifts (landkit litter_ground: every leaf its own, placed by world position) where the
+            # moss thins; dark worn earth only on the way feet went (to the stair)
+            c1 = vn(X[m] * 6.0, Y[m] * 6.0)
+            c2 = vn(X[m] * 15.0 + 3, Y[m] * 15.0)
+            clump = c1 * 0.6 + c2 * 0.4
+            col = tone(R["moss"], t * (0.48 + 0.6 * clump), dith[m])
+            lip = (c2 > 0.72) & (vn(X[m] * 15.0 + 3.4, Y[m] * 15.0 - 0.3) < c2)    # the clump's lit edge, toward the key
+            col = np.where(lip[:, None], tone(R["moss"], t * 1.15, dith[m]), col)
+            worn = (np.abs(Y[m] + 0.2 * np.sin(X[m] * 0.7)) < 1.1) & (X[m] > 10.0)
+            col = np.where(worn[:, None], tone(R["soil"], t * (0.75 + 0.3 * c2), dith[m]), col)
         elif name in R:
             col = tone(R[name], t, dith[m])
         else:
@@ -125,6 +130,23 @@ def paint(d):
             mossy = (up[m] > (0.6 if name == "tile" else 0.62)) & (fbm(X[m] * 1.3 + 7, Y[m] * 1.3 + Z[m]) > (0.6 if name == "tile" else 0.46))
             col = np.where(mossy[:, None], tone(R["moss"], t, dith[m]), col)
         img[m] = col
+    # the leaf-fall over the moss (Derek liked the Hollow Wood's floor: every leaf its own): the maples' leaves, each a
+    # few pixels placed by world position, thick in the drifts and thinning out into the moss with no edge at all
+    gm = (mat == 1)
+    litt = np.clip(fbm(X * 0.32 + 5, Y * 0.32 - 2) * 1.5 - 0.35, 0, 1)
+    cs = 0.17
+    ix, iy = np.floor(X / cs), np.floor(Y / cs)
+    hh = np.sin(ix * 12.9898 + iy * 78.233) * 43758.5453
+    hh = hh - np.floor(hh)
+    ox = (np.sin(ix * 39.3 + iy * 11.1) * 9341.7) % 1.0
+    oy = (np.sin(ix * 7.7 + iy * 51.9) * 4517.3) % 1.0
+    inleaf = np.hypot(X / cs - ix - 0.25 - ox * 0.5, (Y / cs - iy - 0.25 - oy * 0.5) * 1.6) < 0.32
+    leaf = gm & inleaf & (hh < 0.06 + 0.55 * litt)
+    if leaf.any():
+        kind = (hh[leaf] * 997) % 1.0
+        rl = np.where((kind < 0.6)[:, None], tone(R["leaf"], v[leaf] * (0.85 + 0.3 * kind), dith[leaf]),
+                      tone(R["soil"], v[leaf] * 1.1, dith[leaf]))
+        img[leaf] = rl
     # the form's own edges: where the surface turns, the lip toward the light catches it and the far lip goes dark
     # (rule 3, the lit lip; from the real normals, nothing painted on)
     nd_ = np.zeros((gh, gw))

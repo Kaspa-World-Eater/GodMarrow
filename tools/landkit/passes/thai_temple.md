@@ -109,3 +109,8 @@ Waiting for Derek's go on this brief.
 - the black gable;
 - no giant trees, drizzle or wet sheen yet;
 - the guardian and the candle still need their own passes.
+
+**Rules check, then pass 5: the forest floor**, the worst failure, against Derek's standing ruling that the ground stays alive.
+- The first try used the Hollow Wood's litter generator. It lays its own humus base wherever it runs, so the drifts became hard brown pools: blotches again, only bigger.
+- The fix: a cushion-moss carpet, each clump in two tones with a lit lip, with the maples' leaves placed one by one by world position. They are thick in the drifts and thin out with no edge. The worn way to the stair is earth.
+- **Grade: B-** (it holds). **Next worst:** the floor is too even (broad tone shapes and real hummocks), then the black gable.
