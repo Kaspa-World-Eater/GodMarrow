@@ -19,6 +19,8 @@ import serpent_spine                         # noqa: E402
 import fen_ground                            # noqa: E402
 import bog_plants                            # noqa: E402
 import wisp_fire                             # noqa: E402
+import drowned                               # noqa: E402
+import vein_tree                             # noqa: E402
 from kit import ramp, vn, fbm                # noqa: E402
 
 C = np.array([20.0, 20.0])
@@ -48,6 +50,12 @@ R_MUD = ramp("#0b0807", "#140f0c", "#1f1712", "#2a2018", "#36291f", "#433327")
 R_PEAT = ramp("#0b0908", "#15100d", "#201913", "#2c2219", "#392d21", "#46382a")
 R_SEDGE = ramp("#0e0f08", "#1a1b0d", "#282911", "#383816", "#4a481c", "#5d5823", "#716a2c")
 R_WATER = ramp("#040507", "#07090c", "#0b0e12", "#101419", "#161b21")
+R_DEAD = ramp("#0f0e0e", "#1b1918", "#292624", "#393431", "#4a443e", "#5c554d", "#6f675d", "#82796d")   # drowned wood, grey, wet-dark
+R_STONE = ramp("#0e100f", "#1a1d1a", "#292d28", "#3a3f38", "#4c5249", "#5f655a", "#72786b")             # the village's stone, slimed
+DROWNED_TREES = [(C + AX * 5.5 - PERP * 7.0, 0.42, 6.5, 41), (C + AX * 7.2 - PERP * 4.2, 0.28, 4.2, 42),
+                 (C + AX * 3.2 + PERP * 7.6, 0.45, 7.0, 43), (C - AX * 3.2 + PERP * 4.5, 0.34, 5.2, 44),
+                 (C + AX * 8.8 + PERP * 2.6, 0.24, 3.6, 45)]
+DROWNED_WALLS = [(C + AX * 4.6 + PERP * 4.8, 0.6, 4.2, 2.3, 51), (C - AX * 2.6 - PERP * 6.2, 2.0, 3.2, 1.5, 52)]
 GREY = ramp("#111111", "#222222", "#333333", "#444444", "#555555", "#666666", "#777777", "#888888", "#999999", "#aaaaaa")
 
 
@@ -70,11 +78,19 @@ def stamp(W, w):
     shelf = np.clip(((X - C[0]) * -AX[0] + (Y - C[1]) * -AX[1] - 4.0) / 4.0, 0, 1)   # rising toward the back of the frame
     bed = LEVEL - 0.42 + dH * 1.3 + shelf * 0.5 + (fbm(X * 0.12, Y * 0.12) - 0.5) * 0.4
     H, part, info = serpent_spine.stamp(X, Y, bed, LINE, LEVEL, seed=5)
-    water = (H < LEVEL) & (part == 0)
+    DT = [(p_[0], p_[1], r, h, sd) for (p_, r, h, sd) in DROWNED_TREES]
+    H, dpart, tid = drowned.stamp(X, Y, H, DT, [(p_[0], p_[1], a, ln, h, sd) for (p_, a, ln, h, sd) in DROWNED_WALLS], LEVEL)
+    # no tree is a perfect tube (Derek): each drowned trunk is the warped column (taper, swell, sway, twist)
+    ws.TRUNK_WARP = vein_tree.Warp(DT, [LEVEL - 0.2] * len(DT), tag0=800)
+    for i, (x_, y_, r_, h_, sd_) in enumerate(DT):
+        W["obj"][800 + i] = dict(kind="drowned", c=np.array([x_, y_]), r=r_, dying=0.0)
+    part = np.where(dpart > 0, 0, part)
+    W["bog_dr"] = dpart
+    water = (H < LEVEL) & (part == 0) & (dpart == 0)
     W["H"] = np.where(water, LEVEL, H)
     W["Hrest"] = W["H"].copy()
     W["HT"] = np.full(H.shape, -50.0)
-    W["tag"] = np.zeros(H.shape, int)
+    W["tag"] = np.where(tid >= 0, 800 + tid, 0)
     W["water"] = np.zeros(H.shape, bool)                                    # the engine's own water off: this bog paints its own
     W["bog_part"] = part
     W["bog_water"] = water
@@ -112,6 +128,15 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     crn = _r(R_CROWN, vv * 0.92)
     bcol = np.where((crown > 0.6)[..., None], crn, bone)
     bcol = np.where(tide[..., None], _r(R_ALGAE, vv * 0.95), bcol)
+    dr = ws.look(W, W["bog_dr"], px, py)
+    wetz = pz - LEVEL
+    streak = (vn(px * 7 + py * 7, wetz * 0.9) - 0.5) * 0.18                   # long checks running up the dead wood
+    dead = _r(R_DEAD, vv * 0.9 + streak)
+    dead = np.where((wetz < 0.32)[..., None], _r(R_ALGAE, vv * 0.95), dead)
+    stone = _r(R_STONE, vv * 0.92 + (vn(px * 5, py * 5) - 0.5) * 0.1)
+    joint = ((wetz % 0.4) < 0.035) | ((vn(px * 2.2 + py * 2.2, np.floor(wetz / 0.4) * 3.1) * 9) % 1.0 < 0.06)
+    stone = np.where(joint[..., None], stone * 0.55, stone)
+    stone = np.where((wetz < 0.36)[..., None], _r(R_ALGAE, vv * 0.95), stone)
     isb = (part == 1) | (part == 4)
     col = np.where(isb[..., None], bcol, col)
     mossy = part == 2
@@ -122,6 +147,8 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     cov = np.where((patch > 0.62)[..., None], sc, np.where((patch < 0.32)[..., None], uc, mc))
     col = np.where(mossy[..., None], cov, col)
     col = np.where((part == 3)[..., None], _r(R_MUD, vv * 0.9), col)
+    col = np.where((dr == 10)[..., None], dead, col)
+    col = np.where(((dr == 11) | (dr == 12))[..., None], stone, col)
     # the black water: still and level; what lies over it comes in mirror() once everything is painted
     wcol = _r(R_WATER, 0.2 + (vn(px * 0.25, py * 0.25) - 0.5) * 0.16)
     col = np.where(water[..., None], wcol, col)
@@ -190,10 +217,27 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
     pa = lambda x, y: int(ws.look(W, W["bog_part"], np.array(x), np.array(y)))
     ca = lambda x, y: float(ws.look(W, W["bog_v"], np.array(x), np.array(y))) / 3.0
     items = bog_plants.place(rng, da, pa, ca, box)
-    items.sort(key=lambda it: it[1] + it[2])
+    for q, (p_, r, h, sd) in enumerate(DROWNED_TREES):                     # a few dead limbs left on each drowned tree
+        rl = np.random.default_rng(sd)
+        for j in range(int(rl.integers(1, 4))):
+            z0 = LEVEL + h * rl.uniform(0.45, 0.8)
+            a = rl.uniform(0, 2 * np.pi)
+            ln = rl.uniform(0.6, 1.6)
+            b0 = np.array([p_[0] + np.cos(a) * r * 0.8, p_[1] + np.sin(a) * r * 0.8, z0])
+            b1 = b0 + np.array([np.cos(a) * ln, np.sin(a) * ln, rl.uniform(-0.2, 0.7) * ln])
+            gx_, gy_ = ws.to_px(tuple(b0))
+            i_, j_ = int(np.clip(gy_, 0, ws.GH - 1)), int(np.clip(gx_, 0, ws.GW - 1))
+            lv_ = 0.35 + float(L["moon"][i_, j_]) * 0.5
+            items.append(("limb", (b0, b1), 0, lv_))
+    items.sort(key=lambda it: (it[1][0][0] + it[1][0][1]) if it[0] == "limb" else it[1] + it[2])
     zb = np.full(img.shape[:2], -1e9)
     dep = px + py
     for k, (kind, x, y, h) in enumerate(items):
+        if kind == "limb":
+            b0, b1 = x
+            bog_plants._stroke(img, zb, dep, ws.to_px, b0, b1, R_DEAD[4], R_DEAD[5], h, water, LEVEL)
+            bog_plants._stroke(img, zb, dep, ws.to_px, b0 + np.array([0, 0, 0.03]), b1 + np.array([0, 0, 0.02]), R_DEAD[5], R_DEAD[6], h, water, LEVEL)
+            continue
         g = float(ws.look(W, W["H"], np.array(x), np.array(y)))
         sx, sy = ws.to_px((x, y, g))
         i, j = int(np.clip(sy, 0, ws.GH - 1)), int(np.clip(sx, 0, ws.GW - 1))
@@ -244,6 +288,26 @@ def wisps(img, w, W, px, py, pz, L, T=0.4):
 
 ws.LIVING[:] = [mirror, plants, wisps]
 ws.GROUND = ground
+
+
+def paint_drowned(img, m, v, n, px, py, pz, o, W, L):
+    """the drowned wood: grey, the bark long gone, long checks running up it, a green-black slime band from the water"""
+    vv = np.clip(v, 0, 0.99)
+    wetz = pz - LEVEL
+    ang = np.arctan2(py - o["c"][1], px - o["c"][0])
+    check = np.abs(np.sin(ang * 7 + o["r"] * 31 + vn(wetz * 0.7, ang) * 2)) < 0.12              # deep checks along the grain
+    t = vv * 0.9 + (vn(ang * 3 + o["r"] * 9, wetz * 0.8) - 0.5) * 0.14 - check * 0.18
+    col = _r(R_DEAD, t)
+    bark = vn(ang * 2.2, wetz * 0.5 + o["r"] * 7) > 0.68                   # a few plates of old bark still holding, darker
+    col[bark] = _r(R_DEAD, t * 0.7)[bark]
+    slime = wetz < 0.32 + (vn(ang * 4, 1.0) - 0.5) * 0.1
+    col[slime] = _r(R_ALGAE, vv * 0.95)[slime]
+    img[m] = col[m]
+    return img
+
+
+ws.PAINTERS["drowned"] = paint_drowned
+ws.RIM_EXTRA = tuple(range(800, 810))
 
 if __name__ == "__main__":
     if len(sys.argv) > 2 and sys.argv[2] == "value":

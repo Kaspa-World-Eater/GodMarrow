@@ -121,3 +121,27 @@ plant life. The vertebrae sometimes poking through."
 - the value-only test;
 - the generator from a seed;
 - the animated loop (wisps wandering, rings on the water, the reeds in the wind).
+
+## Rules check, before pass 8 (2026-10-08)
+
+MASTER_RULES is unchanged. **The lore's true detail for this piece:** "where the mud clutches and lets go". The Back's trodden mud keeps bootholes, half-closed, filling with black water.
+
+| # | Line | Status |
+|---|---|---|
+| 1 | Brief | From Derek's words and the Fen's legends. The serpent's names are written. |
+| 2 | Scale | Pass: vertebrae 1.9 yd, the path 3 to 5 yd, the Ossuarch for scale. |
+| 3 | Form | The Back, ribs, bed and hummocks are height; plants are true strokes. The value-only test is still to run. |
+| 4 | Light | Moon and lantern, plus the wisp-fire's cold light. |
+| 5 | Values | Three groups read: the black water, the Back, the far marsh. |
+| 6 | Ramps | Hue-shifted: bone, crown, algae, moss, mud, peat, sedge, water. |
+| 7 | Paint | Broad tones. The duckweed is too faint. |
+| 8 | Contact | Banked flanks; ribs dip under; reeds root in the shallows. |
+| 9 | Detail where it counts | Stumps and crowns on the Back. Few details on the water. |
+| 10 | Life | Still frames only; the loop is to come. |
+| 11 | Seen as the player sees it | The game's camera, with the Ossuarch. |
+| 12 | Skeptic round | Against the Famine: **its mirror sings because tall things stand over it. Ours has none. Worst failure, fixed first: the drowned trees and ruins.** |
+
+| Pass | What changed | Grade and worst failure |
+|---|---|---|
+| 8 | Drowned trees and the village's walls standing out of the water (landkit `drowned.py`); dead limbs as mirrored strokes | The mirror sings at last: trunks and walls run down into the black water. **The trunks read as smooth pale pillars** (no tree is a perfect tube). |
+| 9 | Each drowned trunk is a warped column (`vein_tree.Warp`) with its own painter: grey wet wood, deep checks along the grain, a few old bark plates, the slime band | **B.** The trunks are still a little even in girth; the duckweed is faint; no bootholes yet ("the mud clutches"). |
