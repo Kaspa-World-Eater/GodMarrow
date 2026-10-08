@@ -101,3 +101,23 @@ plant life. The vertebrae sometimes poking through."
 5. The wisp-fire.
 6. The marsh.
 7. The drowned trees and ruins.
+
+## Passes 1 to 7 (2026-10-08), `art_study/bog_scene.py`
+
+| Pass | What changed | Grade and worst failure |
+|---|---|---|
+| 1 | The Back as height: chevron joints, stumps, ribs; black water | **D+.** Bone bare and pale, a high wall; ribs read as planks; choppy water. |
+| 2 | Lower; overgrown; ribs taper into the water | **C-.** The cover read as a bright green lawn; the flanks were sheer. |
+| 3 | Banked flanks; brown-olive moss, sedge and mud in patches; tea-dark bone | **C.** The water still dashed. |
+| 4 | The mirror: reflected rays marched up the world height | Honest but faint: a Back half a yard high reflects only at its foot. The mirror needs tall things. |
+| 5 | Reeds, sedge and pads, each drawn with its mirror image | **D.** A wall of reeds (rule 5: nothing leafy crowds the screen). |
+| 6 | Reeds gathered into beds | **C+.** Duckweed bright and blotchy; pads evenly spread. |
+| 7 | Wisp-fire drifting, each mirrored; pad colonies; duckweed muted and drifted | **B-.** Duckweed now too faint. |
+
+**Next:**
+- the drowned trees and ruins standing out of the water (tall things for the mirror);
+- duckweed back up a step;
+- the open marsh and the branching ribs and causeways;
+- the value-only test;
+- the generator from a seed;
+- the animated loop (wisps wandering, rings on the water, the reeds in the wind).
