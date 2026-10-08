@@ -199,8 +199,10 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     joint = ((wetz % 0.4) < 0.035) | ((vn(px * 2.2 + py * 2.2, np.floor(wetz / 0.4) * 3.1) * 9) % 1.0 < 0.06)
     stone = np.where(joint[..., None], stone * 0.55, stone)
     stone = np.where((wetz < 0.36)[..., None], _r(R_ALGAE, vv * 0.95), stone)
+    wetglint = (((part == 1) & (crown > 0.4)) | (part == 4)) & (L["moon"] > 0.62) & (vn(px * 21, py * 7) > 0.68)
     isb = (part == 1) | (part == 4)
     col = np.where(isb[..., None], bcol, col)
+    col = np.where(wetglint[..., None], np.minimum(col * 1.25 + 0.05, 1), col)
     mossy = part == 2
     cush = ws.look(W, W["bog_cush"], px, py)                                 # the colour follows the form: moss on the cushions'
     mc = _r(R_MOSS, vv * 0.92 + (vn(px * 11, py * 11) - 0.5) * 0.1)          # domes, wet peat and mud in the lows between
@@ -307,6 +309,20 @@ def mirror(img, w, W, px, py, pz, L, T=0.0):
     return img
 
 
+def moonlit(px, py, pz, t):
+    """light tells the story (MASTER_RULES 3.10): no canopy over the bog, but high thin cloud drifting across the moon,
+    so broad pools of moonlight move over the water and the Back and the rest lies a step darker. Stepped, never a
+    smooth gradient, with the 4x4 dither only at the pools' edges"""
+    a = 2 * np.pi * t
+    c = fbm(px * 0.045 + np.cos(a) * 0.35 + 3.0, py * 0.045 + np.sin(a) * 0.35) * 0.75 + vn(px * 0.13 - t, py * 0.13) * 0.25
+    k = np.clip((c - 0.42) * 3.2, 0, 1)
+    gh, gw = px.shape
+    bay = ws.tw.B4[(np.arange(gh)[:, None] % 4), (np.arange(gw)[None, :] % 4)]
+    k = np.where((k > 0.15) & (k < 0.85), (k > bay).astype(float), np.round(k))
+    return 0.62 + 0.42 * k
+
+
+ws.MOONLIT = moonlit
 ws.WOOD_HOOKS[:] = [plan]
 ws.BUILD_HOOKS[:] = [stamp]
 def plants(img, w, W, px, py, pz, L, T=0.0):

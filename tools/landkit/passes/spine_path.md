@@ -293,3 +293,10 @@ The chamber now reads open: the pool, the shelf beyond and the tendril post all 
 **The hut, pass 4:** the turf is stacked as turf is stacked to dry (a low stepped ridge of cut bricks with dark joints, by the door wall, in view); the punt is drawn up at the shelf's edge in view. **Hut: B.**
 
 **All pieces now B or better:** walk B, nature B, hut B, socket B, skull B, ruins B, maze B. The bar is A.
+
+## Rules check, 2026-10-08: light (checklist line 4, the weakest)
+
+MASTER_RULES is unchanged.
+- **Before:** the bog lay in the same even moonlight everywhere.
+- **Now:** high thin cloud drifts across the moon (the `MOONLIT` hook), so broad pools of moonlight move over the water and the Back and the rest lies a step darker. The pools are stepped, with the dither only at their edges. The wet crowns of the bone catch the moon in broken pale dabs where it is open.
+- **Result:** the frame has a lit half and a dark half that move with the loop. **Walk: B, toward B+.**
