@@ -284,6 +284,29 @@ def pit_fire(px_, py_):
     return living
 
 
+def hut_smoke(img, w, W, px, py, pz, L, T=0.0):
+    """a thin smoke from the smoke hole, rising and leaning with the one wind, thinning as it goes: stepped, see-through,
+    dithered only at its edges (the effects method); and the pit's cold light caught on the eave and the door's edge"""
+    if "hut" not in W:
+        return img
+    h = W["hut"]
+    GH, GW = img.shape[:2]
+    top = (h["c"][0], h["c"][1], h["base"] + h["wall_h"] + h["R"] * 0.95)
+    sx, sy = ws.to_px(top)
+    ys, xs = np.mgrid[0:GH, 0:GW]
+    a = 2 * np.pi * T
+    up = (sy - ys)                                                         # px above the smoke hole
+    lean = up * 0.22 + np.sin(up * 0.05 - a * 2) * (2 + up * 0.06)        # it leans downwind and wavers
+    width = 6 + up * 0.18
+    d = np.abs(xs - sx - lean) / np.maximum(width, 1)
+    n = vn(xs * 0.08 - a * 0.5, (ys + T * 60) * 0.06)
+    dens = np.clip(1 - d, 0, 1) * np.clip(1 - up / 140.0, 0, 1) * (up > 0) * (0.5 + n * 0.8)
+    bay = ws.tw.B4[(ys % 4), (xs % 4)]
+    alpha = np.where(dens > 0.55, 0.3, np.where(dens > 0.3, 0.18, np.where(dens > 0.12, 0.09 * (bay > 0.5), 0.0)))
+    img = img * (1 - alpha[..., None]) + np.array([0.42, 0.44, 0.46]) * alpha[..., None]
+    return img
+
+
 def scene_hut():
     set_origin(2)
     bs.LINE = twisting_line(4 + VARIANT, bends=vb(((-0.5, -3.0, 4.5), (0.15, 3.6, 3.5), (0.65, -2.0, 6.0))))
@@ -296,7 +319,7 @@ def scene_hut():
     bs.STRUCTS[:] = [("stump", *(hc - PERP * 4.2 + AX * 1.0), 0.45, 91)]
     bs.EXTRA_STAMPS[:] = [straw_hut(hc[0], hc[1], R=1.8 * (1 if VARIANT == 0 else J.uniform(0.8, 1.2)), pit_at=pit, seed=5 + VARIANT)]
     bs.EXTRA_PAINT[:] = [hut_paint]
-    bs.EXTRA_LIVING[:] = [pit_fire(pit[0], pit[1])]
+    bs.EXTRA_LIVING[:] = [pit_fire(pit[0], pit[1]), hut_smoke]
     ws.HERO = pit + AX * 0.9 + PERP * 2.2                              # beside the pit, not over it
 
 

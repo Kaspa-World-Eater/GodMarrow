@@ -426,3 +426,9 @@ MASTER_RULES is unchanged.
 - **The overreach and the fix:** the first try (tilt 0.16, moss below 0.35 yd) camouflaged the skull in moss blotches and lost its read. Pulled back to a tilt of 0.07 and moss below 0.2 yd.
 
 **Skull: B+.** It reads as an old skull lying in the bog; the front orbit's broken brow faces the camera, so that orbit reads a little less.
+
+## Rules check, 2026-10-08: the hut's life (line 10)
+
+MASTER_RULES is unchanged; no new grades.
+- **Added:** a thin smoke from the smoke hole, rising and leaning with the one wind, thinning as it goes; stepped, see-through, dithered only at its edges (the effects method).
+- **Result:** it reads as a pale wisp off the peak in the still frame and will move in the loop. A little faint against the moss. **Hut: B+.**
