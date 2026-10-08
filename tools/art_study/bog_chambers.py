@@ -134,7 +134,36 @@ def straw_hut(hx, hy, R=1.8, wall_h=1.05, pitch=0.95, pit_at=None, seed=5):
         hollow = dp <= 0.45
         H2 = np.where(hollow, np.minimum(H2, LEVEL + 0.05), H2)
         part[hollow] = 43
-        W["hut"] = dict(c=(hx, hy), R=R, base=base, wall_h=wall_h, door=np.arctan2(py_ - hy, px_ - hx))
+        # the eave: the thatch overhangs the wall, ragged, a little drooping
+        eave = (d >= R + rag) & (d < R + 0.28 + rag * 1.5)
+        ez = base + wall_h - (d - R) * 0.6 + (vn(th * 40, 3.0) - 0.5) * 0.06
+        me = eave & (ez > H2)
+        H2 = np.where(me, ez, H2)
+        part[me] = 40
+        door_a = np.arctan2(py_ - hy, px_ - hx)
+        # what the bog folk keep (the real bog: turf is cut and stacked to dry by the door; a flat punt for the water)
+        sa_ = door_a + 1.3
+        tx, ty = hx + np.cos(sa_) * (R + 1.1), hy + np.sin(sa_) * (R + 1.1)
+        u = (X - tx) * np.cos(sa_ + 1.57) + (Y - ty) * np.sin(sa_ + 1.57)
+        v = -(X - tx) * np.sin(sa_ + 1.57) + (Y - ty) * np.cos(sa_ + 1.57)
+        stack = (np.abs(u) < 0.7) & (np.abs(v) < 0.35)
+        brick = np.floor(u / 0.24) + np.floor(v / 0.16) * 7
+        sz_ = base + 0.55 - np.abs(u) * 0.25 + ((np.sin(brick * 12.9) * 4375.5) % 1.0) * 0.06
+        gapb = (((u / 0.24) % 1.0) < 0.12) | (((v / 0.16) % 1.0) < 0.15)
+        ms = stack & (sz_ > H2)
+        H2 = np.where(ms, sz_ - gapb * 0.05, H2)
+        part[ms] = 44
+        pa_ = door_a - 1.6                                                  # the punt, drawn up at the shelf's edge
+        bx, by = hx + np.cos(pa_) * (R + 3.4), hy + np.sin(pa_) * (R + 3.4)
+        bu = (X - bx) * np.cos(pa_) + (Y - by) * np.sin(pa_)
+        bv = -(X - bx) * np.sin(pa_) + (Y - by) * np.cos(pa_)
+        hull = (np.abs(bu) < 1.5) & (np.abs(bv) < 0.42 * np.clip(1.4 - np.abs(bu) / 1.5, 0, 1))
+        gun = hull & (np.abs(bv) > 0.42 * np.clip(1.4 - np.abs(bu) / 1.5, 0, 1) - 0.07)
+        bz = LEVEL + np.where(gun, 0.28, 0.08) - bu * 0.05
+        mb = hull & (bz > H2 - 0.15)
+        H2 = np.where(mb, bz, H2)
+        part[mb] = 45
+        W["hut"] = dict(c=(hx, hy), R=R, base=base, wall_h=wall_h, door=door_a)
         return H2, part
     return st
 
@@ -163,6 +192,14 @@ def hut_paint(col, W, px, py, pz, L, vv, gl, st):
     dframe = side & (da >= 0.28) & (da < 0.36)
     col = np.where(door[..., None], np.array([0.02, 0.018, 0.02]) + vv[..., None] * 0.02, col)
     col = np.where(dframe[..., None], np.array([0.16, 0.13, 0.1]) * (0.5 + vv[..., None]), col)
+    hole = is_hut & (d < 0.2) & (hz > h["wall_h"])                         # the smoke hole, dark, soot round it
+    col = np.where(hole[..., None], np.array([0.02, 0.02, 0.02]), col)
+    soot = is_hut & (d >= 0.2) & (d < 0.45) & (hz > h["wall_h"])
+    col = np.where(soot[..., None], col * 0.55, col)
+    turf = np.array([0.16, 0.11, 0.08]) * (0.35 + vv[..., None] * 0.8) * (1 + (vn(px * 21, py * 21)[..., None] - 0.5) * 0.3)
+    col = np.where((st == 44)[..., None], turf, col)
+    plank = np.array([0.2, 0.17, 0.13]) * (0.35 + vv[..., None] * 0.8) * (1 - (np.abs(np.sin((px + py) * 18)) < 0.15)[..., None] * 0.35)
+    col = np.where((st == 45)[..., None], plank, col)
     stone = np.array([0.22, 0.23, 0.22]) * (0.35 + vv[..., None] * 0.85) * (1 + (vn(px * 9, py * 9)[..., None] - 0.5) * 0.3)
     col = np.where((st == 42)[..., None], stone, col)
     col = np.where((st == 43)[..., None], np.array([0.05, 0.05, 0.05]) + vv[..., None] * 0.03, col)

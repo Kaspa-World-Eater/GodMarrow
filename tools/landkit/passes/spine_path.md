@@ -249,3 +249,13 @@ Grades: nature **B-**, hut **B-**, socket **B-**, skull **B-**, ruins **B-**, th
 - 28 sparse props in the water, near the walks.
 - Seeds 1 to 3: about 500 to 600 yd of Back; 19% of the zone walkable.
 - **B** as a plan. It is not yet in the game format.
+
+## Rules check, 2026-10-08 (the improvement on this ping)
+
+MASTER_RULES is unchanged.
+- **Worst gap fixable now:** the straw hut showed no one living there.
+- **The true detail (real bog life):** cut turf stacked to dry by the door, and a flat punt drawn up at the water.
+- **Added:** a ragged thatch eave overhanging the wall, a dark smoke hole with soot round it, the turf stack (bricks with dark joints) and the punt.
+- **Result:** the eave and smoke hole read; the turf stack reads as a dark mound; the punt is lost in the dark at this framing. **Hut: B-, nearing B.**
+
+**Next fix:** the skull's form (the worst B-).
