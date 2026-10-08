@@ -377,15 +377,16 @@ def socket_eye(img, w, W, px, py, pz, L, T=0.0):
     wob = (vn(px * 3 + T * 2, py * 9) - 0.5) * 0.08                          # seen through moving water
     # the eye under the water: a pale clouded iris with fine radial threads, a black pupil, a dull rim round it;
     # dimmed and wobbled by the water over it, but there to be found ("a pool that looks back like an eye")
-    rw = r + wob
     ang_ = np.arctan2(v, u)
+    rw = r + wob + (vn(ang_ * 2.2 + 4, 1.0) - 0.5) * 0.22 + (vn(ang_ * 7, r * 3) - 0.5) * 0.08   # no clean ellipse: a
+                                                                          # ragged, uneven iris, its pupil drawn a little out of round
     iris = water & (rw > 0.3) & (rw < 0.82)
     thread = np.abs(np.sin(ang_ * 26 + rw * 6)) < 0.25
     ic = np.array([0.2, 0.21, 0.16]) * (0.75 + 0.25 * thread[..., None]) * (1.15 - rw[..., None] * 0.5) * br
     img[iris] = img[iris] * 0.45 + ic[iris]
     ring = water & (np.abs(rw - 0.86) < 0.06)
     img[ring] = img[ring] * 0.6
-    pup = water & (rw <= 0.3)
+    pup = water & (np.hypot(u * 0.8, v * 1.25) + wob <= 0.3)
     img[pup] = img[pup] * 0.35
     return img
 

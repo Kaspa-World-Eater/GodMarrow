@@ -361,3 +361,7 @@ MASTER_RULES is unchanged.
 - **Cause:** the bone's finest pitting was height at under a pixel, so it speckled the light (form law 0.3: under a pixel it is colour).
 - **Fix:** pitting a hand across stays form; the finer is now colour in the mottle.
 - **Result:** the vertebrae read cleaner in both the walk and the maze window, the stain and the pale crowns broad and calm. **Walk: B+.**
+
+## Rules check, 2026-10-08: the socket's eye
+
+MASTER_RULES is unchanged. The eye under the water is no longer a clean ellipse: a ragged, uneven iris, its pupil a little out of round, all wobbled by the water. It reads as something looking up through murk. **Socket: B+.**
