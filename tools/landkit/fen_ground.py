@@ -13,7 +13,7 @@ from kit import vn, fbm, ramp
 import blood
 
 R_PEAT = ramp("#0b0908", "#140f0c", "#1d1611", "#281e17", "#34271d", "#433226")
-R_LEAF = ramp("#120c09", "#1f140e", "#2e1d13", "#3e2817", "#50341d", "#634024")     # matted wet leaves
+R_LEAF = ramp("#110c0a", "#1c140f", "#291c14", "#372519", "#462f1f", "#563a25")     # matted wet leaves: near the peat in hue (a quiet ground)
 R_SPHAG = ramp("#121209", "#1c1c10", "#272615", "#33311b", "#403c21", "#4f4828")    # moss on the hummocks: brown mosses, ochre, dulled by night
 R_STRAW = ramp("#1c1812", "#2d271c", "#403727", "#564a33", "#6d5e41", "#857350")    # dead sedge
 R_WATER = ramp("#05070a", "#0a0e13", "#10161c", "#182029", "#222c37")
@@ -72,7 +72,7 @@ def paint(img, m, v, px, py, water, tus, T=0.0, moon=None, depth=None, sx=None, 
     leaf = R_LEAF[np.clip((vv * len(R_LEAF)).astype(int), 0, len(R_LEAF) - 1)]
     sph = R_SPHAG[np.clip((vv * len(R_SPHAG)).astype(int), 0, len(R_SPHAG) - 1)]
     straw = R_STRAW[np.clip((vv * 1.05 * len(R_STRAW)).astype(int), 0, len(R_STRAW) - 1)]
-    lv = vn(px * 7.0, py * 7.0) * 0.6 + vn(px * 19, py * 19) * 0.4        # leaves matted in patches, broken small
+    lv = vn(px * 2.6, py * 2.6) * 0.8 + vn(px * 8, py * 8) * 0.2          # leaves matted in broad patches (the ground stays quiet)
     sv = fbm(px * 2.2 + 3, py * 2.2)                                      # moss on the higher, drier places
     col = np.where((lv > 0.45)[..., None], leaf, peat)
     edge_n = (vn(px * 6 + 11, py * 6) - 0.5) * 0.12                         # ragged cushion edges, not blobs
@@ -81,7 +81,7 @@ def paint(img, m, v, px, py, water, tus, T=0.0, moon=None, depth=None, sx=None, 
     col = np.where(((tus > 0.25) & strand)[..., None], straw, col)
     col = np.where(((tus > 0.25) & ~strand)[..., None], straw * 0.55, col)
     if path is not None:                                                    # a way trodden for generations, overgrown now
-        trod = R_PEAT[np.clip(((vv * 1.05 + 0.08) * len(R_PEAT)).astype(int), 0, len(R_PEAT) - 1)]
+        trod = R_PEAT[np.clip(((vv * 1.1 + 0.16) * len(R_PEAT)).astype(int), 0, len(R_PEAT) - 1)] * np.array([1.06, 1.03, 1.0])   # packed, paler, a little warmer
         grown = vn(px * 5 + 2, py * 5) > 0.35 + path * 0.45                 # moss creeping back in from its edges
         col = np.where(((path > 0.35) & ~grown)[..., None], trod, col)
     if depth is not None:

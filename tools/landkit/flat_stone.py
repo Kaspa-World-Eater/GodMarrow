@@ -20,7 +20,9 @@ with a darker gill-rim, glowing a little, like a banked coal.
 """
 import numpy as np
 from kit import vn, ramp
-from rock import SANDST, MOSS, LICHEN
+from rock import MOSS, LICHEN
+
+STONE = ramp("#110f11", "#1b1819", "#272221", "#342d2a", "#423933", "#52473e", "#635649", "#756653")   # this Wood's stone: old, damp, weathered dark
 
 CAP_TOP = np.array([0.86, 0.87, 0.8])
 CAP_RIM = np.array([0.42, 0.43, 0.38])
@@ -82,12 +84,12 @@ def paint(img, m, v, n, px, py, pz, part, info, side, moon):
     if not m.any():
         return img
     rr_ = vn(px * 3 + info["seed"], py * 3)
-    sv = np.clip(v * 0.85 + (rr_ - 0.5) * 0.06, 0, 0.99)
-    col = SANDST[(sv * len(SANDST)).astype(int)]
+    sv = np.clip(v * 0.72 + (rr_ - 0.5) * 0.06, 0, 0.99)
+    col = STONE[(sv * len(STONE)).astype(int)]
     bed = (np.sin((pz - info["g0"]) * 90 + vn(px * 2, py * 2) * 2) > 0.55) & side       # bedding bands down its sides
     col = np.where(bed[..., None], col * 0.8, col)
     if part == 3:                                                                      # a chip: fresh stone, paler
-        col = SANDST[np.clip(((sv + 0.12) * len(SANDST)).astype(int), 0, len(SANDST) - 1)]
+        col = STONE[np.clip(((sv + 0.12) * len(STONE)).astype(int), 0, len(STONE) - 1)]
     away = np.clip(-(n[..., 0] * moon[0] + n[..., 1] * moon[1]), 0, 1)
     mossy = side & (pz - info["g0"] < 0.05 + away * 0.06) & (vn(px * 12, py * 12) > 0.4)
     col = np.where(mossy[..., None], MOSS[np.clip((v * 0.7 * len(MOSS)).astype(int), 0, len(MOSS) - 1)], col)

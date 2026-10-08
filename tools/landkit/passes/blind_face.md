@@ -554,3 +554,36 @@ A face grown in a tree is the opposite. Study first (chapter 7).
   - the lights on the ground are small and placed by their causes;
   - the fog lies low.
   Still to do: the passes owed on every piece; the floor's fine speckle is still busy at the edges.
+
+## Finishing the glade (Derek, 2026-10-07: "do the upgrades, then rewrite the guide"; chose "finish this glade")
+**This round:**
+- **The floor's speckle calmed:** matted leaves in broad patches, their ramp brought near the peat's hue. The ground is
+  quiet, the eye rests on it, and the bones and stones read against it.
+- **This Wood's own stone:** `flat_stone.STONE`, dark, damp, weathered grey-brown, in place of the borrowed sandstone
+  ramp. The stones no longer shine cream in the lantern; they sit in the ground.
+- **The worn way** brought back after the calming hid it: packed peat, paler, a little warmer.
+- **Workbench:** the ritual glade's night-rain loop replaces the Blind Face section.
+
+**Every piece at the close of this round** (passes so far, grade). Each was graded in writing as it went.
+
+| Piece | Passes | Grade |
+|---|---|---|
+| The woodcutter's stump | 11 | B- (Derek: "looks good") |
+| The vein-trees, warped (taper, twist, channels) | 6 | B (Derek: "great job on the turning trees") |
+| The eye tree | 3 | C+ |
+| The altar hollow (arch, runes, slab, candles, drips, wax, soot) | 12 | B- |
+| The candle alcoves | 6 | B- (Derek: "really like the candles in the tree") |
+| Wax pour and the blood at the foot | 3 | C+ |
+| Blood tendrils | 3 | C+ |
+| The flat stones and the spiral | 5 | C+ |
+| The pickers' caps | 2 | C+ |
+| The three lights | 4 | C+ |
+| Beast bones | 3 | C |
+| Fen floor and the worn way | 6 | B- |
+| Blood pools | 3 | C+ |
+| Ground fog | 2 | C+ |
+| Rain in the world | 3 | B- |
+| Ground candles | 1 | C |
+
+**Still short of ten passes:** the eye tree, the bones, the tendrils, the caps, the fog, the ground candles. They come
+back the next time the glade is opened. None is a stand-in: each is its own designed piece.
