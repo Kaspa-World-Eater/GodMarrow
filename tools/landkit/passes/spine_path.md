@@ -145,3 +145,26 @@ MASTER_RULES is unchanged. **The lore's true detail for this piece:** "where the
 |---|---|---|
 | 8 | Drowned trees and the village's walls standing out of the water (landkit `drowned.py`); dead limbs as mirrored strokes | The mirror sings at last: trunks and walls run down into the black water. **The trunks read as smooth pale pillars** (no tree is a perfect tube). |
 | 9 | Each drowned trunk is a warped column (`vein_tree.Warp`) with its own painter: grey wet wood, deep checks along the grain, a few old bark plates, the slime band | **B.** The trunks are still a little even in girth; the duckweed is faint; no bootholes yet ("the mud clutches"). |
+
+**Derek's grade on pass 9 (2026-10-08): C-.** "We need variety in the bone, changes in width of the path for different areas, the green spots look flat and blobby, those stone walls will just block the path completely. The water needs to have some movement to it and be darker, a light, mostly translucent fog over the water."
+
+## Pass 10 and 11, and Derek's new direction (2026-10-08)
+
+**Pass 10:**
+- body size along the Back (the path pinches and widens);
+- each vertebra with its own sink, tilt, snapped wing, cracks, bitten chunks, stain and stump (gone, low, tall, split);
+- moss cushions of real height, coloured by their form;
+- bootholes holding black water;
+- walls pushed off the walk;
+- darker water with wind ruffles;
+- fog.
+
+**Result:** the walls are clear and the blobs gone, but the bone is buried. **Pass 11:** burial varies along the Back, but the cover still rides over the roofs.
+
+**Derek, mid-pass:** the layout is like D2's maggot lair, tight fighting broken by larger areas; more and different plants in the water. Bog structures: a rotting stump on its dirt mound, a snag tipped into the water with vines, tendrils round something with a pale pustule. Variations after grading. Chapter 8 now has sections 5 and 6 on these.
+
+**The plan:**
+- **P12:** the bared stretches clamp the cover below the bone, so whole vertebrae show. New water plants: bulrush, horsetail, cotton grass, bogbean, floating sphagnum mats.
+- **P13:** the bog's structures: the rotting stump on its root mound, the tipped snag with its root plate and hanging vines, tussock-sedge columns.
+- **P14:** the god's tendrils round a drowned post, with a pale pustule.
+- **Then:** the value-only test; Derek's grade; variations of every piece; the maggot-lair layout in the generator.

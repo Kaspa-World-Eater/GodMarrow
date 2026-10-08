@@ -154,7 +154,7 @@ def place(rng, depth_at, part_at, cover_at, box, n_try=9000):
             out.append(("sedge", x, y, float(rng.uniform(0.4, 0.9))))
         elif p == 3 and cv > 0.6 and r < 0.012:
             out.append(("reed", x, y, float(rng.uniform(1.2, 2.0))))
-        elif p == 2 and cv < 0.35 and r < 0.05:
+        elif p == 2 and cv > 0.2 and r < 0.09:                            # sedge tufts in the Back's growth, off the walked middle
             out.append(("sedge", x, y, float(rng.uniform(0.35, 0.7))))
         elif p == 0 and 0.3 < d < 1.2 and _colony(x, y) > 0.6 and r < 0.12:      # pads grow in colonies
             out.append(("pad", x, y, float(rng.uniform(0.08, 0.32) * (0.7 + _colony(x, y) * 0.5))))

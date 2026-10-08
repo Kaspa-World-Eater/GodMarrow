@@ -62,3 +62,37 @@ Sources: descriptions of fossil snake vertebrae (Palaeo-Electronica's systematic
   are cold: blue-white to pale green.
 - In the world they light only a little round themselves (the water under them, a reed, the bone) and show again in the
   mirror. A few at a time, never a swarm.
+
+## 5. What stands in a bog, a fen and a swamp (Derek 2026-10-08: "study swamps and bogs and fens for structures that appear in them")
+
+Sources: wetland microtopography studies (hummock and hollow; the tropical peat swamp surveys; Copernicus HESS 2019,
+Biogeosciences 2020), the Irish Peatland Conservation Council's bog plant notes, Saul Lake bog notes, and the
+woodland and carr chapters already in this library.
+- **Hummock and hollow** is the bog's whole grammar. The hollows are flat, wet and often flooded; the hummocks rise a
+  hand to a yard out of them. Plants take the slightly higher ground first, build peat there and raise it further,
+  so the hummocks are where life is thickest. The hollows are open water or bare black peat.
+- **Tussock sedge** (*Carex paniculata*) builds columns: a stool of dead leaf bases and roots up to a yard high and
+  half a yard across, its living blades fountaining off the top. In flooded carr they stand in the water like posts.
+- **Alder stools and root islands:** carr trees grow on raised pedestals of their own roots. When the tree dies and
+  rots, the stump stands on a mound of root, peat and dirt above the water, moss and ferns on it, its heart rotted
+  into a hollow.
+- **Windthrow in wet ground:** shallow-rooted trees on saturated peat go over easily and lie in the water. The root
+  plate is torn up on its edge, with dirt held in it; its pit fills with water. The trunk lies along the water,
+  half sunk and moss-backed, the snags of its limbs up. Vines and creepers hang off it into the water.
+- **Floating mats** (schwingmoor): sphagnum and sedge knit a raft over open water that quakes underfoot. Its edge
+  is ragged and overhangs the black water.
+- **Peat hags:** where water cuts the peat, banks stand as dark cut faces with an overhanging lip of moss, the cut
+  peat black and layered.
+
+**The plants, each to its own band of the water table:**
+- open water: lily pads, pondweed, duckweed, bogbean (three-part leaves held just above the water);
+- the shallows: reed, bulrush (cattail: a dark brown spike on a stem among flat blades), horsetail (jointed green
+  stems in stands);
+- the hummocks: tussock sedge, cotton grass (white tufts that catch any light at night, the bog's brightest small
+  thing), heather where it is driest, sphagnum carpets in reds and greens dulled by night.
+
+## 6. The god in it (the Hide)
+
+The tendrils are the god's veins come up out of the bog (the Vigil's blood tendrils, `vessel.py`). Here they are
+rare: a few wrapped round a drowned post or stump, and in their grip, a pale pustule of the god's flesh, barely
+glowing. Restrained: it never casts red light, only a faint pale bloom on the water under it.
