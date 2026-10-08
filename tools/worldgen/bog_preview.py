@@ -27,7 +27,9 @@ def render(seed, cx, cy, out):
     bs.C = c
     ws.FOCUS = c.copy()
     near = lambda p, r: np.hypot(*(np.array(p) + OFF - c)) < r
-    bs.LINES = [w["pts"] + OFF for w in Z["walks"] if any(near(p, 22) for p in w["pts"][::6])]
+    here = [w for w in Z["walks"] if any(near(p, 22) for p in w["pts"][::6])]
+    bs.LINES = [w["pts"] + OFF for w in here if w["kind"] == "back"]
+    bs.CAUSEWAYS[:] = [w["pts"] + OFF for w in here if w["kind"] == "causeway"]
     bs.LINE = bs.LINES[0] if bs.LINES else bs.LINE
     mods, stamps, paints, living = [], [], [], []
     for n in Z["nodes"]:

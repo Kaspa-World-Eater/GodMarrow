@@ -719,7 +719,27 @@ def scene_ruins():
     ws.HERO = rc + AX * 1.5 + PERP * 2.0                               # on the old floor, between the walls
 
 
-SCENES = dict(nature=scene_nature, hut=scene_hut, socket=scene_socket, skull=scene_skull, ruins=scene_ruins)
+def scene_causeway():
+    """a branch: the Back passes, and off it the bog folk's board causeway runs away across the water, twisting"""
+    set_origin(6)
+    bs.LINE = twisting_line(12 + VARIANT, bends=vb(((-0.4, 2.6, 4.0), (0.5, -2.2, 5.0))))
+    mid = bs.LINE[len(bs.LINE) // 2]
+    t = np.linspace(0, 1, 600)
+    away = -AX * 0.75 + PERP * 0.66
+    away = away / np.linalg.norm(away)
+    side = np.array([-away[1], away[0]])
+    start = mid + away * 2.4                                           # from the Back's flank, not across it
+    cl = start[None] + away[None] * (t * 14.0)[:, None] + side[None] * (np.sin(t * 6.0 + VARIANT) * 1.6 * t)[:, None]
+    bs.CAUSEWAYS[:] = [cl]
+    bs.BED_MODS[:] = []
+    bs.DROWNED_TREES = [(C - AX * 2.0 + PERP * 7.5, 0.36, 5.0, 76)]
+    bs.DROWNED_WALLS, bs.GIANT_RIBS = [], []
+    bs.STRUCTS[:] = []
+    bs.EXTRA_STAMPS[:], bs.EXTRA_PAINT[:], bs.EXTRA_LIVING[:] = [], [], []
+    ws.HERO = cl[90] + AX * 0.1                                        # on the boards
+
+
+SCENES = dict(causeway=scene_causeway, nature=scene_nature, hut=scene_hut, socket=scene_socket, skull=scene_skull, ruins=scene_ruins)
 
 if __name__ == "__main__":
     if ":" in sys.argv[1]:                                               # NAME:VARIANT, e.g. skull:2

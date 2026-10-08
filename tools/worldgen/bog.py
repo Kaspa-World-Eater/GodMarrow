@@ -126,9 +126,15 @@ def generate(seed):
             edges.append((i, j))
             loops += 1
     walks = []
-    for (i, j) in edges:
+    n_tree = N - 1
+    for ei, (i, j) in enumerate(edges):
         pts, wd = walk(rng, nodes[i]["p"], nodes[j]["p"], nodes[i]["r"], nodes[j]["r"])
-        walks.append(dict(a=i, b=j, pts=pts, width=wd, spur=False))
+        # the loops are the bog folk's board causeways, laid later between places the Back already joined (a second
+        # kind of way: narrow, single file, its own look); the Back is the tree that joins everything
+        kind = "causeway" if ei >= n_tree else "back"
+        if kind == "causeway":
+            wd = np.full(len(wd), 1.6)
+        walks.append(dict(a=i, b=j, pts=pts, width=wd, spur=False, kind=kind))
     # dead-end spurs: the maze's false leads, the Back broken off in the water
     for i in range(N):
         if nodes[i]["kind"] == "exit" or rng.random() > 0.45:
@@ -138,7 +144,9 @@ def generate(seed):
         if not (6 < end[0] < W_ZONE - 6 and 6 < end[1] < H_ZONE - 6):
             continue
         pts, wd = walk(rng, nodes[i]["p"], end, nodes[i]["r"], 0.0)
-        walks.append(dict(a=i, b=-1, pts=pts, width=wd * np.linspace(1, 0.6, len(wd)), spur=True))
+        kind = "causeway" if rng.random() < 0.4 else "back"               # some false leads are boards going nowhere
+        wd = np.full(len(wd), 1.6) if kind == "causeway" else wd * np.linspace(1, 0.6, len(wd))
+        walks.append(dict(a=i, b=-1, pts=pts, width=wd, spur=True, kind=kind))
     # the land: a grid at 0.5 yd; the Back and the shelves; the rest water
     res = 0.5
     gw, gh = int(W_ZONE / res), int(H_ZONE / res)
@@ -154,7 +162,7 @@ def generate(seed):
     for wk in walks:
         for p, w_ in zip(wk["pts"][::2], wk["width"][::2]):
             m = np.hypot(xx - p[0], yy - p[1]) < w_ / 2
-            land[m] = 2
+            land[m] = 3 if wk["kind"] == "causeway" else 2
     # the balance: few things in the water, each with room round it
     from scipy import ndimage as nd
     water = land == 0
@@ -178,13 +186,14 @@ def generate(seed):
 
 def numbers(Z):
     land, res = Z["land"], Z["res"]
-    back = (land == 2).sum() * res * res
+    back = ((land == 2) | (land == 3)).sum() * res * res
     shelf = (land == 1).sum() * res * res
     total = land.size * res * res
     length = sum(np.hypot(*np.diff(w["pts"], axis=0).T).sum() for w in Z["walks"])
     widths = np.concatenate([w["width"] for w in Z["walks"]])
     return dict(chambers=sum(1 for n in Z["nodes"] if n["kind"] != "exit"), kinds=[n["kind"] for n in Z["nodes"]],
-                walks=len([w for w in Z["walks"] if not w["spur"]]), loops=Z["loops"], spurs=len([w for w in Z["walks"] if w["spur"]]),
+                walks=len([w for w in Z["walks"] if not w["spur"]]),
+                causeways=len([w for w in Z["walks"] if w["kind"] == "causeway"]), loops=Z["loops"], spurs=len([w for w in Z["walks"] if w["spur"]]),
                 back_length_yd=round(float(length)), tight_share=round(float((widths < 3.8).mean()), 2),
                 walkable_share=round(float((back + shelf) / total), 3), props=len(Z["props"]))
 
@@ -197,6 +206,7 @@ def draw_map(Z, out):
     col[land == 0] = (10, 13, 17)
     col[land == 1] = (58, 54, 36)
     col[land == 2] = (150, 136, 108)
+    col[land == 3] = (110, 82, 52)
     im = Image.fromarray(col).resize((land.shape[1] * S // 1, land.shape[0] * S // 1), Image.NEAREST)
     d = ImageDraw.Draw(im)
     k = S / Z["res"]
@@ -221,7 +231,7 @@ if __name__ == "__main__":
     draw_map(Z, os.path.join(out, "bog_s%d_map.png" % seed))
     plan = dict(seed=seed, numbers=nums,
                 nodes=[dict(kind=n["kind"], x=round(float(n["p"][0]), 2), y=round(float(n["p"][1]), 2), r=round(float(n["r"]), 2)) for n in Z["nodes"]],
-                walks=[dict(a=w["a"], b=w["b"], spur=w["spur"], pts=np.round(w["pts"][::4], 2).tolist(), width=np.round(w["width"][::4], 2).tolist()) for w in Z["walks"]],
+                walks=[dict(a=w["a"], b=w["b"], spur=w["spur"], kind=w["kind"], pts=np.round(w["pts"][::4], 2).tolist(), width=np.round(w["width"][::4], 2).tolist()) for w in Z["walks"]],
                 props=[dict(kind=p["kind"], x=round(float(p["p"][0]), 2), y=round(float(p["p"][1]), 2)) for p in Z["props"]])
     with open(os.path.join(out, "bog_s%d.json" % seed), "w") as fh:
         json.dump(plan, fh)

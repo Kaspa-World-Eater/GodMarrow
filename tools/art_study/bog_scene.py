@@ -24,6 +24,7 @@ import vein_tree                             # noqa: E402
 import fog as foggen                         # noqa: E402
 import bone as bonegen                       # noqa: E402
 import bog_structures                        # noqa: E402
+import bog_causeway                          # noqa: E402
 
 # hooks for the chamber scenes (art_study/bog_chambers.py): the bog's own scenes are this one with these filled
 BED_MODS = []          # f(X, Y, bed) -> bed: the ground the chamber shapes (a shelf, a socket, a skull) before the Back
@@ -40,6 +41,7 @@ PERP = np.array([1.0, -1.0]) / np.sqrt(2)    # across (screen right)
 LEVEL = 0.0                                  # the bog's water table
 VALUE_ONLY = False
 LINES = []                                   # several walks (a maze window, worldgen/bog.py); LINE alone otherwise
+CAUSEWAYS = []                               # the bog folk's board causeways: lines (landkit bog_causeway.py)
 
 ws.FOCUS = C.copy()
 for _f in ("FOREST_LIFE", "MIST", "BEAMS", "GRASS", "FERNS", "LITTER_GEN", "LEAF_FALL"):
@@ -64,6 +66,7 @@ R_PEAT = ramp("#0b0908", "#15100d", "#201913", "#2c2219", "#392d21", "#46382a")
 R_SEDGE = ramp("#0e0f08", "#1a1b0d", "#282911", "#383816", "#4a481c", "#5d5823", "#716a2c")
 R_WATER = ramp("#020304", "#040507", "#06080a", "#090c0f", "#0d1115")   # peat-black (Derek: "darker")
 R_DEAD = ramp("#0f0e0e", "#1b1918", "#292624", "#393431", "#4a443e", "#5c554d", "#6f675d", "#82796d")   # drowned wood, grey, wet-dark
+R_PLANK = ramp("#100c09", "#1d1610", "#2b2117", "#3a2d1f", "#4a3a29", "#5a4834", "#6b5740")   # old oak boards, bog-darkened
 R_STONE = ramp("#0e100f", "#1a1d1a", "#292d28", "#3a3f38", "#4c5249", "#5f655a", "#72786b")             # the village's stone, slimed
 # balance (Derek: "the area will feel open while the path is constrictive ... not too many random objects poking out
 # everywhere"): a few things stand in the water, each with room round it to be seen and mirrored
@@ -132,6 +135,9 @@ def stamp(W, w):
         W["obj"][800 + i] = dict(kind="drowned", c=np.array([x_, y_]), r=r_, dying=0.0)
     part = np.where(dpart > 0, 0, part)
     H, spart = bog_structures.stamp(X, Y, H, STRUCTS, LEVEL)
+    for ci, cl in enumerate(CAUSEWAYS):
+        H, cp = bog_causeway.stamp(X, Y, H, cl, LEVEL, seed=31 + ci)
+        spart = np.where(cp > 0, cp, spart)
     for f_ in EXTRA_STAMPS:
         H, ep = f_(X, Y, H, W)
         spart = np.where(ep > 0, ep, spart)
@@ -254,6 +260,15 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
         col = np.where((st == 33)[..., None], logc, col)
         col = np.where((st == 34)[..., None], plate, col)
         col = np.where((st == 35)[..., None], _r(R_DEAD, vv * 0.85 + streak2), col)
+        # the causeway: old split planks, each its own grey-brown, darker at its worn edges, slimed low; stakes; brush
+        pid = np.floor((px * 0.71 + py * 0.71) / 0.25)
+        pv = ((np.sin(pid * 12.9) * 4375.5) % 1.0 - 0.5) * 0.18
+        grain = (vn(px * 2 + pid, py * 40) - 0.5) * 0.08
+        plank = _r(R_PLANK, vv * 0.92 + pv + grain)
+        plank = np.where((wetz < 0.025)[..., None], _r(R_ALGAE, vv * 0.95), plank)   # slime only where it touches water
+        col = np.where((st == 60)[..., None], plank, col)
+        col = np.where((st == 61)[..., None], _r(R_DEAD, vv * 0.75), col)
+        col = np.where((st == 62)[..., None], _r(R_MUD, vv * 0.8 + 0.08), col)
         for f_ in EXTRA_PAINT:
             col = f_(col, W, px, py, pz, L, vv, gl, st)
     col = np.where(((dr == 11) | (dr == 12))[..., None], stone, col)

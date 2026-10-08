@@ -459,3 +459,19 @@ Awaiting Derek's grade.
 **Derek, mid-pass: "The eye sockets still don't make sense, just remove them"; "Make the skull platform wider".** Done: the skull is now a broad hump of crown, 8 x 8 yd, with its seams and no sockets, a platform to stand on in the marsh.
 
 **The hut's trellis (Derek's note):** two forked posts of grey drowned wood either side of the fire pit, a crossbar in their forks, bundles of reed and root hung to dry, and a blackened pot on a hook over the cold fire; true strokes, mirrored. The first pass lit the posts too pale (they read as metal); the wood is now darker.
+
+## Rules check, 2026-10-08: the second kind of path (the bog folk's causeway)
+
+MASTER_RULES is unchanged. Landkit `bog_causeway.py`: a plank trackway as real bog trackways were built:
+- split planks laid ACROSS the way, each its own width, reach, tilt and sag;
+- some lost (black water between), some split, one end sunk;
+- stakes driven beside it every 1.6 yd, alternating sides, some snapped short; brushwood under the planks' ends;
+- 1.6 yd wide, single file; slimed only where it touches water.
+
+`bog_chambers.py causeway` shows a branch leaving the Back's flank across the water.
+
+Passes:
+1. Planks read green (algae band too high), stray stakes far off the way, and the boards began on top of the Back.
+2. All three fixed. **Causeway: B+.**
+
+**The maze** (`worldgen/bog.py`): the Back is now the spanning tree that joins everything; the loops are causeways laid later between places the Back already joined, and about 40% of the dead ends are boards going nowhere. Seeds 1 to 3: 4 to 5 causeways each, and about 60% of the walking is tight. The preview stamps both kinds.
