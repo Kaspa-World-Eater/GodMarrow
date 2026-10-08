@@ -275,3 +275,10 @@ MASTER_RULES is unchanged.
 - **Found:** the flagged floor had been laid behind the walls, out of view.
 - **Fixed:** it now lies before the house corner, toward the viewer, sinking toward the water. Each flag has its own worn grey, moss creeps over them in broad tongues, and at the margins the flags go under the peat. A fallen lintel lies across the threshold, with a spill of rubble.
 - **Ruins: B.** The flags are a little large for the walls' scale.
+
+## Rules check, 2026-10-08 (fourth ping): the socket
+
+MASTER_RULES is unchanged.
+- **Rim:** foramina pits, flaked shell and grain running round the orbit.
+- **The eye under the water:** a pale clouded iris, a black pupil and a dull rim, dimmed and wobbled by the water, findable now ("a pool that looks back like an eye").
+- **Socket: B.** The iris is a little too clean an ellipse; its threads don't show at this size.

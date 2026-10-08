@@ -270,7 +270,16 @@ def eye_socket(cx, cy, rx=4.2, ry=3.2, ang=0.4, seed=7):
             notch |= np.abs(((th - g_ + np.pi) % (2 * np.pi)) - np.pi) < 0.12 + 0.05 * vn(r * 9, g_)
         rim = rim_h * np.sqrt(prof) + (1 - np.sqrt(prof)) * H
         crack = np.abs(np.sin(th * 23 + vn(th * 3, r * 4) * 3)) < 0.06
-        rim = rim - crack * 0.06 + (vn(X * 14 + seed, Y * 14) - 0.5) * 0.04 + (vn(X * 40, Y * 40) - 0.5) * 0.015
+        # bone at its own scale: nutrient pits (foramina) in the rim, the outer shell flaked away in patches, the
+        # grain running round the orbit
+        hs_ = lambda a, b, k: (np.sin(a * 12.9 + b * 78.2 + k * 3.7) * 4375.5) % 1.0
+        ci, cj = np.floor(X / 0.6), np.floor(Y / 0.6)
+        fx_, fy_ = (ci + 0.2 + 0.6 * hs_(ci, cj, 1)) * 0.6, (cj + 0.2 + 0.6 * hs_(ci, cj, 2)) * 0.6
+        foram = (np.hypot(X - fx_, Y - fy_) < 0.06) & (hs_(ci, cj, 3) < 0.35)
+        flake = vn(X * 3.1 + seed, Y * 3.1) > 0.66
+        grain = np.abs(np.sin(th * 60 + vn(th * 9, r * 9) * 2)) < 0.1
+        rim = (rim - crack * 0.06 - foram * 0.08 - flake * 0.035 - grain * 0.012
+               + (vn(X * 14 + seed, Y * 14) - 0.5) * 0.04 + (vn(X * 40, Y * 40) - 0.5) * 0.015)
         m = (prof > 0) & ~notch & (rim > H)
         H2 = np.where(m, rim, H)
         part[m] = 50
@@ -305,10 +314,18 @@ def socket_eye(img, w, W, px, py, pz, L, T=0.0):
     water = ws.look(W, W["bog_water"], px, py) & (L["tg"] == 0)
     br = 0.8 + 0.2 * np.sin(2 * np.pi * T)
     wob = (vn(px * 3 + T * 2, py * 9) - 0.5) * 0.08                          # seen through moving water
-    ring = water & (np.abs(r + wob - 0.75) < 0.1) & (vn(np.arctan2(v, u) * 5 + 3, r * 4) > 0.42)   # broken, barely there
-    pup = water & (r + wob < 0.3)
-    img[ring] = img[ring] * 0.65 + np.array([0.18, 0.19, 0.15]) * br
-    img[pup] = img[pup] * 0.7
+    # the eye under the water: a pale clouded iris with fine radial threads, a black pupil, a dull rim round it;
+    # dimmed and wobbled by the water over it, but there to be found ("a pool that looks back like an eye")
+    rw = r + wob
+    ang_ = np.arctan2(v, u)
+    iris = water & (rw > 0.3) & (rw < 0.82)
+    thread = np.abs(np.sin(ang_ * 26 + rw * 6)) < 0.25
+    ic = np.array([0.2, 0.21, 0.16]) * (0.75 + 0.25 * thread[..., None]) * (1.15 - rw[..., None] * 0.5) * br
+    img[iris] = img[iris] * 0.45 + ic[iris]
+    ring = water & (np.abs(rw - 0.86) < 0.06)
+    img[ring] = img[ring] * 0.6
+    pup = water & (rw <= 0.3)
+    img[pup] = img[pup] * 0.35
     return img
 
 
