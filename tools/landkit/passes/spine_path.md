@@ -555,3 +555,11 @@ Next: the swampy pit island; islands in the maze generator; and the pit of offer
 - **The glow** (Derek's ruling over "no red light"): red from out of sight below, pulsing, lighting the throat's wall the deeper it goes, warming the lip; a faint red haze above the throat.
 
 Pass 3's glints scattered as white speckle and hid the runes; calmed. **Pit: B.** The throat's coursed wall reads a little like flames.
+
+**The swampy-pit island** (`bog_chambers.py island:1`, odd variants): from the Bog's lore, "where the mud clutches and lets go".
+- A hump of sedge round a bowl of black glossy mud, slack, a little below its rim, with long slick streaks of moon and slow gas rings.
+- Half swallowed in it: a cart wheel on its edge, a pilgrim's staff leaning out, a rib cage arching up, a skull's crown.
+
+Passes:
+1. Dark wood lost on dark mud; the mud read grey like a puddle.
+2. Weathered pale wood, a bigger wheel, black mud with a sheen. **B-.** The wheel is thin at this distance.

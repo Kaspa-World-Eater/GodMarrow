@@ -1137,6 +1137,99 @@ def scene_ribwalk():
     ws.HERO = rl[120] + AX * 0.05                                      # out on the rib
 
 
+def mire_pit(cx, cy, R=2.2, seed=13):
+    """THE SUCKING MIRE (the Sunken Bog's lore: "where the mud clutches and lets go"; Derek: "islands of ruined huts or
+    swampy pits"): a hump of sedge round a bowl of black mud, glossy and slack, a little below the rim; in it the
+    things it has taken lie half swallowed (a cart wheel on its edge, a pilgrim's staff, bones), and gas rises through
+    it in slow rings. Height in the world; the mud's surface paint is its own (part 90), the rim 91"""
+    def st(X, Y, H, W):
+        part = np.zeros(X.shape, int)
+        d = np.hypot(X - cx, Y - cy)
+        th = np.arctan2(Y - cy, X - cx)
+        rag = (vn(th * 3 + seed, 1.0) - 0.5) * 0.5
+        bowl = d < R + rag
+        rim = (d >= R + rag) & (d < R + rag + 0.6)
+        H2 = np.where(rim, np.maximum(H, LEVEL + 0.18 + (vn(X * 5, Y * 5) - 0.5) * 0.1), H)
+        H2 = np.where(bowl, LEVEL - 0.08 + (vn(X * 1.5 + seed, Y * 1.5) - 0.5) * 0.03, H2)   # slack, nearly flat
+        part[bowl] = 90
+        part[rim] = 91
+        W["mire"] = dict(c=(cx, cy), R=R, seed=seed)
+        return H2, part
+    return st
+
+
+def mire_paint(col, W, px, py, pz, L, vv, gl, st):
+    if "mire" not in W:
+        return col
+    m = st == 90
+    if not m.any():
+        return col
+    Mi = W["mire"]
+    T = W.get("T", 0.0)
+    # black glossy mud: a dull sheen where the moon lies along it, slow gas rings opening and fading
+    mud = np.array([0.015, 0.012, 0.01]) + vv[..., None] * np.array([0.02, 0.016, 0.014])   # black, glossy
+    sheen = (vn(px * 1.2 - T, py * 4) > 0.6) & (vn(px * 9, py * 3) > 0.35)    # long slick streaks of moon along it
+    mud = np.where(sheen[..., None], mud + np.array([0.11, 0.11, 0.12]), mud)
+    rings = np.zeros(px.shape, bool)
+    rr = np.random.default_rng(Mi["seed"])
+    for k in range(5):
+        a_, d_ = rr.uniform(0, 2 * np.pi), rr.uniform(0, Mi["R"] * 0.75)
+        bx, by = Mi["c"][0] + np.cos(a_) * d_, Mi["c"][1] + np.sin(a_) * d_
+        ph = (T + rr.uniform(0, 1)) % 1.0
+        rings |= np.abs(np.hypot(px - bx, py - by) - ph * 0.7) < 0.03 * (1 - ph) + 0.005
+    mud = np.where(rings[..., None], mud + np.array([0.05, 0.05, 0.05]), mud)
+    col = np.where(m[..., None], mud, col)
+    col = np.where((st == 91)[..., None], bs._r(bs.R_MUD, vv * 0.6), col)
+    return col
+
+
+def mire_things(img, w, W, px, py, pz, L, T=0.0):
+    """what the mire has half swallowed: a cart wheel on its edge, a pilgrim's staff leaning, bones; each sunk to its
+    middle, drawn as true strokes and bone (they stand above a surface that does not mirror)"""
+    import bog_plants
+    import bone as bonegen
+    W["T"] = T
+    if "mire" not in W:
+        return img
+    Mi = W["mire"]
+    cx, cy = Mi["c"]
+    zb = np.full(img.shape[:2], -1e9)
+    dep = px + py
+    none = np.zeros(img.shape[:2], bool)
+    WOOD, WOOD_L = bs.R_DEAD[4], bs.R_DEAD[6]                             # weathered grey, paler than the mud
+    # the cart wheel, standing on edge, its lower half under: rim, hub, spokes
+    wc = np.array([cx + 0.5, cy - 0.6, LEVEL - 0.1])
+    ax_ = np.array([np.cos(0.6), np.sin(0.6), 0.0])
+    up = np.array([0.0, 0.0, 1.0])
+    rad = 0.85
+    pts = [wc + (ax_ * np.cos(a) + up * np.sin(a)) * rad for a in np.linspace(-0.3, np.pi + 0.3, 24)]
+    for p0, p1 in zip(pts[:-1], pts[1:]):
+        for off in (0.0, 0.03):
+            bog_plants._stroke(img, zb, dep, ws.to_px, p0 + up * off, p1 + up * off, WOOD, WOOD_L, 0.7, none, None, n=4)
+    for a in np.linspace(0.2, np.pi - 0.2, 5):
+        bog_plants._stroke(img, zb, dep, ws.to_px, wc + up * 0.02, wc + (ax_ * np.cos(a) + up * np.sin(a)) * rad, WOOD, WOOD_L, 0.65, none, None)
+    # a pilgrim's staff, leaning out of it
+    s0 = np.array([cx - 0.9, cy + 0.2, LEVEL - 0.1])
+    bog_plants._stroke(img, zb, dep, ws.to_px, s0, s0 + np.array([0.35, -0.2, 1.4]), WOOD, WOOD_L, 0.7, none, None)
+    bog_plants._stroke(img, zb, dep, ws.to_px, s0 + np.array([0.35, -0.2, 1.4]), s0 + np.array([0.48, -0.25, 1.38]), WOOD, WOOD_L, 0.7, none, None)
+    # bones: a rib cage's few ribs arching out of the mud, a skull's crown
+    shapes = []
+    for k in range(4):
+        a = (cx - 0.2 + k * 0.28, cy + 0.9, LEVEL - 0.1)
+        b = (cx - 0.2 + k * 0.28 + 0.15, cy + 0.9 - 0.7, LEVEL - 0.1)
+        shapes.append(bonegen.rib(a, b, 0.35, 0.035, 0.045, seed=200 + k))
+    shapes.append(bonegen.skull((cx + 1.1, cy + 0.7, LEVEL - 0.02), 0.22, (0.7, 0.7, 0.5), seed=7))
+    hero = np.array(ws.HERO, float)
+    g = float(ws.look(W, W["H"], np.array(hero[0]), np.array(hero[1])))
+    lts = [((hero[0] + 0.25, hero[1] - 0.25, g + 0.7), (0.95, 0.6, 0.32), 2.6 * 1.4)]
+    keep = (bonegen.R_BONE, bonegen.SINEW, bonegen.SPONGE)
+    bonegen.R_BONE, bonegen.SINEW, bonegen.SPONGE = bs.R_CROWN, np.array([0.08, 0.07, 0.06]), np.array([0.07, 0.06, 0.05])
+    shapes.sort(key=lambda o: -((o["pts"][:, 0] + o["pts"][:, 1]).mean() if o["kind"] == "tube" else o["c"][0] + o["c"][1]))
+    bonegen.draw(img, zb, dep, ws.to_px, shapes, lts, ws.SUN, ambient=0.24, plain=True)
+    bonegen.R_BONE, bonegen.SINEW, bonegen.SPONGE = keep
+    return img
+
+
 def scene_island():
     """an island off the walks (Derek: "board walks ... shooting off to islands of ruined huts or swampy pits"): the
     Back passes; off its flank the bog folk's causeway runs out across the water to a hump of peat with a ruined hut"""
@@ -1161,9 +1254,14 @@ def scene_island():
     bs.DROWNED_TREES = [(C + AX * 6.0 - PERP * 8.0, 0.36, 5.0, 81)]
     bs.DROWNED_WALLS, bs.GIANT_RIBS = [], []
     bs.STRUCTS[:] = [("stump", *(isl + side * 2.4), 0.4, 99)]
-    bs.EXTRA_STAMPS[:] = [straw_hut(isl[0], isl[1], R=1.6, pit_at=isl - away * 2.0, seed=7 + VARIANT, ruined=True)]
-    bs.EXTRA_PAINT[:] = [hut_paint]
-    bs.EXTRA_LIVING[:] = []
+    if VARIANT % 2 == 1:                                                   # the swampy pit's island
+        bs.EXTRA_STAMPS[:] = [mire_pit(isl[0], isl[1], seed=13 + VARIANT)]
+        bs.EXTRA_PAINT[:] = [mire_paint]
+        bs.EXTRA_LIVING[:] = [mire_things]
+    else:                                                                  # the ruined hut's
+        bs.EXTRA_STAMPS[:] = [straw_hut(isl[0], isl[1], R=1.6, pit_at=isl - away * 2.0, seed=7 + VARIANT, ruined=True)]
+        bs.EXTRA_PAINT[:] = [hut_paint]
+        bs.EXTRA_LIVING[:] = []
     ws.FOCUS = (mid + isl) / 2
     ws.HERO = cl[300] + AX * 0.05
 
