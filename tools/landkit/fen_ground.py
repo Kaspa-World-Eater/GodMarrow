@@ -10,6 +10,7 @@ world; the water is levelled at its own table; colour is only the material.
 import numpy as np
 from scipy import ndimage as nd
 from kit import vn, fbm, ramp
+import blood
 
 R_PEAT = ramp("#0b0908", "#140f0c", "#1d1611", "#281e17", "#34271d", "#433226")
 R_LEAF = ramp("#120c09", "#1f140e", "#2e1d13", "#3e2817", "#50341d", "#634024")     # matted wet leaves
@@ -58,8 +59,12 @@ def height(X, Y, seed=5, keep=None):
     return dH, water, level, ttag * (0.3 + wetness * 0.7)
 
 
-def paint(img, m, v, px, py, water, tus, T=0.0, moon=None):
-    """m: the ground pixels; v: the scene's light there; water: the water mask there; tus: tussock-ness there"""
+def paint(img, m, v, px, py, water, tus, T=0.0, moon=None, depth=None, sx=None, sy=None, lamp=None):
+    """m: the ground pixels; v: the scene's light there; water: the pool mask there; tus: tussock-ness there.
+    depth (0 at a pool's edge .. 1 deep), sx, sy (art pixels): the pools are BLOOD (Derek: "I want the puddles here
+    to be blood ... dark blood"), the game's blood effect (blood.py) laid to the lake test's rules (shaders/lake.gdshader):
+    the pigment pooled dark at the wet edge then a lit lip, the light broken into dabs, clots drifting, a skin that
+    wrinkles slowly, a duller, heavier gloss"""
     if not m.any():
         return img
     vv = np.clip(v, 0, 0.99)
@@ -75,13 +80,28 @@ def paint(img, m, v, px, py, water, tus, T=0.0, moon=None):
     strand = np.abs(np.sin(px * 41 + py * 17 + vn(px * 3, py * 3) * 6)) > 0.35
     col = np.where(((tus > 0.25) & strand)[..., None], straw, col)
     col = np.where(((tus > 0.25) & ~strand)[..., None], straw * 0.55, col)
-    # the water: black, still, the sky in it dark, the moon's light laid on it in a broken streak
-    wv = np.clip(0.25 + (vn(px * 0.8 + T * 0.05, py * 0.8) - 0.5) * 0.3, 0, 0.99)
-    wat = R_WATER[(wv * len(R_WATER)).astype(int)]
-    if moon is not None:
-        glint = (moon > 0.55) & (vn(px * 2.2 - T * 0.3, py * 2.2) > 0.66) & (vn(px * 11, py * 11) > 0.45)   # a broken sheen
-        wat = np.where(glint[..., None], np.array([0.42, 0.46, 0.55]) * np.clip(moon, 0, 1)[..., None], wat)
+    if depth is not None:
+        lt = np.clip(v * 0.5, 0.04, 0.38)                                  # dark blood: lit only so far (Derek: "dark blood")
+        side_ = np.clip((lamp if lamp is not None else v) * 1.5, 0, 1)
+        wat = blood.shade(np.clip(depth, 0, 1) * 0.5, px, py, sx, sy, T, 0.0, light_side=side_ * 0.7, light=lt)
+        wet_edge = depth < 0.12                                             # the pigment pooled dark at the wet edge
+        wat = np.where(wet_edge[..., None], blood.C0 * 0.9, wat)
+        clot = (fbm(px * 4.0 + T * 0.05, py * 4.0 - T * 0.03) > 0.68) & (depth > 0.25)    # clots drifting
+        wat = np.where(clot[..., None], blood.C0 * 1.2 + np.array([0.02, 0.0, 0.0]), wat)
+        skin = (np.abs(np.sin(px * 13 + py * 7 + fbm(px * 2, py * 2 + T * 0.02) * 9)) < 0.1) & (depth > 0.2)
+        wat = np.where(skin[..., None], wat * 0.8, wat)                      # the skin, wrinkling slowly
+        if moon is not None:                                                 # the moon in it: broken dabs, dull and heavy
+            dab = (moon > 0.5) & (vn(px * 2.2 - T * 0.1, py * 2.2) > 0.68) & (vn(px * 11, py * 11) > 0.5) & ~clot
+            wat = np.where(dab[..., None], np.array([0.42, 0.2, 0.2]) * np.clip(moon, 0, 1)[..., None] + blood.C1 * 0.5, wat)
+    else:
+        # the water: black, still, the sky in it dark, the moon's light laid on it in a broken streak
+        wv = np.clip(0.25 + (vn(px * 0.8 + T * 0.05, py * 0.8) - 0.5) * 0.3, 0, 0.99)
+        wat = R_WATER[(wv * len(R_WATER)).astype(int)]
+        if moon is not None:
+            glint = (moon > 0.55) & (vn(px * 2.2 - T * 0.3, py * 2.2) > 0.66) & (vn(px * 11, py * 11) > 0.45)   # a broken sheen
+            wat = np.where(glint[..., None], np.array([0.42, 0.46, 0.55]) * np.clip(moon, 0, 1)[..., None], wat)
     col = np.where(water[..., None], wat, col)
-    col = np.where((~water & nd.binary_dilation(water, iterations=1))[..., None], col * 0.55, col)
+    lip = ~water & nd.binary_dilation(water, iterations=1)               # the wet lip round it, stained
+    col = np.where(lip[..., None], col * 0.5 + (blood.C1 * 0.4 if depth is not None else 0), col)
     img[m] = col[m]
     return img

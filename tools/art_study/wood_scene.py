@@ -58,6 +58,7 @@ GROUND_LIFE_OK = None    # f(x, y) -> bool: where grass may grow (a ruin keeps i
 RIM = (1.35, (0.025, 0.025, 0.03))   # the moonlit rim on objects: strength and cool lift
 FOREST_LIFE = True       # the wood's own living layers (the leaf fall, falling and skittering leaves, the wisp-fire)
 TRUNK_WARP = None        # an object with to_canon(x, y, z) and normal_back(n, px, py, pz, tag): trunks that taper, swell, wander and twist
+NOW = 0.0                # the frame being painted (set by paint)
 NORMAL_BLUR = 1.0        # cells of blur on the height before its normals (a scene with small stones wants little: blur pillows)
 MOONLIT = None           # f(px, py, pz, t) -> 0..1: a scene's own reach of the moon (a cavern's shaft)
 GRASS = True             # the old scene's grass tufts in the gap (a scene with its own floor turns them off)
@@ -363,6 +364,8 @@ def paint_bark(img, m, v, n, px, py, pz, o, along=None, arc=None, lichen=True):
 
 
 def paint(W, px, py, pz, SX, SY, L, t=0.0):
+    global NOW
+    NOW = t                                                             # the frame's time, for a scene's GROUND
     tg, side, n = L["tg"], L["side"], L["n"]
     mat = look(W, W["mat"], px, py)
     water = look(W, W["water"], px, py) & (tg == 0)

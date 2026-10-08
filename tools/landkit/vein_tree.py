@@ -170,6 +170,14 @@ class Warp:
             y2 = np.where(near, T["c"][1] + (dx * s_ + dy * c_) / s, y2)
         return x2, y2
 
+    def to_canon_one(self, i, x, y, z):
+        """one tree's warp undone (x, y, z may be arrays)"""
+        T = self.t[i]
+        s, wx, wy, tw = self._at(T, z)
+        dx, dy = x - T["c"][0] - wx, y - T["c"][1] - wy
+        c_, s_ = np.cos(-tw), np.sin(-tw)
+        return T["c"][0] + (dx * c_ - dy * s_) / s, T["c"][1] + (dx * s_ + dy * c_) / s
+
     def from_canon(self, i, x, y, z):
         T = self.t[i]
         s, wx, wy, tw = self._at(T, z)

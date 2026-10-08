@@ -81,3 +81,35 @@ Sources: [Characteristics of old-growth Douglas firs](https://scmbc.org/characte
 [Flute (glossary)](https://mgnv.org/glossary-flute/);
 [Western redcedar (Virginia Tech dendrology)](https://dendro.cnre.vt.edu/DENDROLOGY/carddetail.cfm?ID=260);
 [Stem characteristics of western redcedar](https://agris.fao.org/search/en/records/65df435c0f3e94b9e5d6c7c2).
+
+## 4. How it was done, and what it gave (Derek, 2026-10-07: "great job on the turning trees. More realistic and not just tubes")
+**The technique: the warped column.**
+- `tools/landkit/vein_tree.py` stamps each trunk once, as a straight canonical column, into the world's height
+  (`HT`). Its section is lobed by the vein-ridges (`_ridges`/`_lobe`) and cut by 9 to 16 bark channels
+  (`_channels`).
+- `vein_tree.Warp` gives each tree its own height functions:
+  - a radius scale `s(z)`: butt swell, about 1 percent taper a yard, two slow swellings;
+  - an axis offset (lean plus a slow sweep);
+  - a twist angle (3 to 8 degrees a yard, more on the bigger trees, each tree its own direction).
+- The engine (`wood_scene.py`) has a `TRUNK_WARP` hook:
+  - in `cast`, every ray point tested against a trunk is first sent through the wind's lean, then `to_canon`
+    (un-offset, un-twist, un-scale), and looked up in the straight column;
+  - in `shade`, each trunk pixel's normal is turned back out by the twist at its height (`normal_back`).
+- So the trunk is real geometry in every direction: the outline wavers as channels pass the edge, the moon lights the
+  channels' walls and they cast their own shadow, and the bark's painted fissures (drawn in the canonical frame)
+  wind with the twist for free.
+
+**Rules learned on the way:**
+- **Anything placed on a warped trunk must be carried out through the warp** (`Warp.from_canon`). The eyes and the
+  hollows are found on the canonical column, then moved and turned by the twist at their height.
+- **Choose a facing in the world, then undo the twist** for the canonical angle. Otherwise the twist turns a mouth
+  edge-on.
+- **A height field can only hold a downward-closed solid.** A section that changes with height can't be stamped; it
+  must be a warp of a column.
+- **Stills need the trees' own pass:** `cast` with no time skips the trunk lookup, so the hook forces `t = 0`.
+- **Build-hook order matters:** insert the scene's hooks as one ordered list (floor, trees, stump, then what grows on
+  the trees). Inserting one at a time at index 0 shifted the rest.
+
+**To carry back** (Derek: "we're going to have to go back and edit our old assets with this"): every earlier tree,
+meaning the old-growth judge scene, Cap Hollow and the landkit `tree.py`/`giant.py` trunks, gets the warp and the
+channels.

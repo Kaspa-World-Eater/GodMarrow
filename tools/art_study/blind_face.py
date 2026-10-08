@@ -29,6 +29,8 @@ import eye as eyegen                         # noqa: E402
 import hollow                                # noqa: E402
 import beast_bones                           # noqa: E402
 import fen_ground                            # noqa: E402
+import wisp_fire                             # noqa: E402
+import bark_face                             # noqa: E402
 from scipy import ndimage as nd              # noqa: E402
 import bone as bonegen                       # noqa: E402
 import bark                                  # noqa: E402
@@ -76,6 +78,8 @@ def plan(w):
     d = np.hypot(w.X - C[0], w.Y - C[1])
     w.light = np.maximum(w.light * 0.7, np.clip(1 - d / 6.0, 0, 1) * 0.55)          # the glade a little open to the moon
     w.gap = (C[0], C[1], 5.0)
+    fr = FACE_TREE + AX * 1.4                                                          # the Blind Face's crown died back: the moon comes down on it
+    w.light = np.maximum(w.light, np.clip(1 - np.hypot(w.X - fr[0], w.Y - fr[1]) / 2.6, 0, 1) * 0.7)
 
 
 def fen_floor(W, w):
@@ -96,12 +100,32 @@ def fen_floor(W, w):
     W["Hrest"] = np.where(keep, H, W["Hrest"])
     W["fen_water"] = lab > 0
     W["fen_tus"] = tus
+    W["fen_depth"] = np.clip(nd.distance_transform_edt(lab > 0) * float(W["X"][0, 1] - W["X"][0, 0]) / 0.3, 0, 1)
+    # the wisp-fires: a few points over the blood, each flaring at its own time
+    WISPS.clear()
+    rr = np.random.default_rng(77)
+    deep = np.argwhere(W["fen_depth"] > 0.6)
+    near = deep[np.hypot(W["X"][deep[:, 0], deep[:, 1]] - C[0], W["Y"][deep[:, 0], deep[:, 1]] - C[1]) < 9]
+    if len(near):
+        for k, idx in enumerate(rr.choice(len(near), size=min(7, len(near)), replace=False)):
+            i, j = near[idx]
+            WISPS.append((W["X"][i, j], W["Y"][i, j], H[i, j], k / 7.0 + rr.uniform(0, 0.08), 13 + k))
 
 
 def fen_paint(img, W, px, py, pz, SX, SY, L, v, gl):
     wat = ws.look(W, W["fen_water"], px, py) > 0
     tus = ws.look(W, W["fen_tus"], px, py)
-    return fen_ground.paint(img, gl, v, px, py, wat, tus, moon=L["moon"])
+    dep_ = ws.look(W, W["fen_depth"], px, py)
+    return fen_ground.paint(img, gl, v, px, py, wat, tus, T=ws.NOW, moon=L["moon"], depth=dep_, sx=SX, sy=SY, lamp=L["lamp"])
+
+
+WISPS = []
+
+
+def draw_wisps(img, w, W, px, py, pz, L, T):
+    """the wisp-fire on the blood (landkit wisp_fire.py): drawn last, it is light"""
+    pool = lambda xs, ys: (ws.look(W, W["fen_water"], px[ys, xs], py[ys, xs]) > 0) & (L["tg"][ys, xs] == 0)
+    return wisp_fire.draw(img, ws.to_px, px + py, WISPS, T, pool=pool)
 
 
 VT = []
@@ -203,7 +227,7 @@ def place_hollows(W, w):
         c = np.array([x, y])
         g0 = float(ws.look(W, W["Hrest"], np.array(x), np.array(y)))
         to_glade = (C - c) / np.linalg.norm(C - c)
-        fd = view * 0.78 + to_glade * 0.22                                        # it faces us, leaning a little into the glade
+        fd = view * (0.97 if kind == "mouth" else 0.78) + to_glade * (0.03 if kind == "mouth" else 0.22)   # it faces us (the mouth full on), leaning into the glade
         tw0 = ws.TRUNK_WARP._at(ws.TRUNK_WARP.t[ti], g0 + zh)[3]                  # the trunk's twist there: face the world way
         P, u = _surface(W, c, r, np.arctan2(fd[1], fd[0]) - tw0, g0 + zh)
         px_, py_, tw = ws.TRUNK_WARP.from_canon(ti, P[0], P[1], g0 + zh)              # out through the trunk's warp
@@ -252,6 +276,28 @@ def draw_bones(img, w, W, px, py, pz, L, T):
     shapes.sort(key=lambda o: -((o["pts"][:, 0] + o["pts"][:, 1]).mean() if o["kind"] == "tube" else o["c"][0] + o["c"][1]))
     bonegen.draw(img, zb, dep, ws.to_px, shapes, lts, ws.SUN, ambient=0.14)
     return img
+
+
+FACE_AT = (62.0, 2.0)                                                              # the face: its facing (degrees, world) and centre height
+
+
+def draw_face(img, w, W, px, py, pz, L, T):
+    """the Blind Face itself (landkit bark_face.py): grown in the bark of the giant at the glade's back"""
+    GH, GW = img.shape[:2]
+    x, y, r, h, sd = VT[0]
+    g0 = float(ws.TRUNK_WARP.t[0]["g0"])
+    zc = g0 + FACE_AT[1]
+    a0 = np.radians(FACE_AT[0])
+    a0c = a0 - ws.TRUNK_WARP._at(ws.TRUNK_WARP.t[0], zc)[3]
+
+    def canon(X, Y, Z):
+        lx, ly = ws.lean(X, Y, Z, T)
+        return ws.TRUNK_WARP.to_canon_one(0, X - lx, Y - ly, Z)
+
+    fp = np.array([x, y]) + np.array([np.cos(a0), np.sin(a0)]) * r * 1.5
+    ml = float(np.clip(0.42 + ws.look(W, W["light"], np.array(fp[0]), np.array(fp[1])) * 0.75, 0, 1))
+    zb = np.full((GH, GW), -1e9)
+    return bark_face.draw(img, zb, px + py, ws.to_px, canon, (x, y, r, sd, g0), a0c, zc, T, [], ws.SUN, moonlit=ml, seed=5)
 
 
 def tree_eyes(img, w, W, px, py, pz, L, T):
@@ -327,7 +373,9 @@ ws.LIVING.append(draw_bones)
 ws.LIVING.append(stump_blood)
 ws.LIVING.append(tree_eyes)
 ws.LIVING.append(draw_hollows)
+ws.LIVING.append(draw_face)
 ws.LIVING.append(grim)
+ws.LIVING.append(draw_wisps)
 ws.BUILD_HOOKS[0:0] = [fen_floor, stamp_vein_trees, stamp_stump, place_eyes, place_hollows]   # in this order: floor, trees, stump, then what grows on the trees
 ws.GROUND = fen_paint
 ws.PAINTERS["vstump"] = paint_stump

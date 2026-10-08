@@ -309,3 +309,80 @@ up. No tube left.
 2. Brown mosses dulled by night with ragged cushion edges; leaves matted in broken small patches; the sheen broken;
    firm ground round the pilgrim. **Graded C:** dark wet carr under the giants, still black pools catching the moon.
    The engine's falling leaves and moonflecks still play over it.
+
+**Rules check (reminder, the whole scene after pieces 1 to 6):**
+1. **Brief:** each piece carries a lore detail:
+   - the eleventh trunk;
+   - the Niche Candle;
+   - the hunter's dead lying head to the north;
+   - trunks as the god's veins.
+   The Blind Face itself, the scene's own landmark, is not built yet.
+2. **Scale:** the 2-yard hero beside the stump, the bones and the trunks.
+3. **Form:** trunks, stump, eyes, hollows, bones and fen relief are all geometry. The engine's falling leaves and
+   moonflecks are still the old scene's living layers (2b: animation is an asset too). To be made this scene's own.
+4. **Light:** moon, lantern, the niche's candles.
+5. **Values:** the dark giants frame the moonlit glade.
+6. **Ramps:** hue-shifted.
+7. **Paint:** the water's sheen is good; the moss edges are ragged.
+8. **Contact:** the bones sunk, the stump banked.
+9. **Detail where it counts:** **fails.** The mouth is side-on, and the near bones are lost.
+10. **Life:** blinks, gaze, flames. Not checked as a loop since the floor changed.
+11. **Seen as the player sees it:** yes.
+12. **Skeptic round:** against the Gate (B+ eye). The mouth is the weakest organic piece.
+
+**Ten passes:** no piece has had ten except the stump. They continue.
+
+**Worst first:** the mouth faces us.
+
+## Piece 7: the Blind Face (the scene's landmark)
+**Rules check, before pass 1:**
+- **Lore:** the Hollow Wood's landmarks are "the Ribcage Bough, the Blind Face, the Niche Candle, the
+  Sword-in-Root". The brief from the scene's start: one giant has grown, over centuries, a vast face in its bark
+  (brow, cheekbones, a mouth half open) and no eyes, the bark healed smooth where they should be.
+- **Real thing (chapter 5, chapter 6):**
+  - bark grows round anything it is pushed over: stretched smooth and pale over a bulge (as over a burl or a healed
+    wound), fissured deep in the hollows between;
+  - woundwood lips round any opening.
+  So the face is grown, not carved: the fissures flow round its features.
+- **Form:** relief on the warped trunk, ray-marched in the trunk's own canonical frame (through `vein_tree.Warp`),
+  so it sits exactly on the bark. Brow, cheekbones, nose ridge, chin and lips are proud; the healed eye-hollows are
+  shallow; the mouth is a real cavity.
+- **Light:** raking. It faces a little toward the moon's side (world +y, screen lower left) so the moon slides
+  across the relief. The canopy above the face tree is broken (a stag-headed giant whose crown died back), so
+  moonlight reaches it.
+- **The god, subtle:** under the healed eyes, the faint blue-grey of veins beneath the bark (chapter 3 §4), and a
+  wet dark gleam deep in the mouth.
+- **Scale:** chin at 0.9 yd, brow at 3.1 yd: a face taller than the pilgrim, within frame on the far tree.
+
+## The pools become blood, with wisp-fire (Derek, 2026-10-07)
+"Your water could definitely use a lot of work ... I want the puddles here to be blood ... I like the depth, but
+instead of the black water, let's make it dark blood with the occasional wisp of white fire flaring up."
+- **Read:** the lake test (`shaders/lake.gdshader`, the painted standard's origin):
+  - the pigment pooled dark at the wet edge;
+  - light broken into brush dabs;
+  - for blood: clots drifting, a skin that wrinkles slowly, a duller, heavier gloss.
+  Also the game's blood (`blood.py`, `shaders/blood_pool.gdshader`) and MASTER_RULES 6 (no red light).
+- **Built:**
+  - `fen_ground.paint` lays the pools in the shared blood effect: depth from each pool's distance to its rim, a
+    dark wet edge, drifting clots, a slow wrinkling skin, the moon in it as broken dull dabs, and the shore's lip
+    stained;
+  - `landkit/wisp_fire.py` (new effect): a cold teardrop flame, white core and pale blue-white body, torn at the
+    tip, dithered only at its border; it flares, burns about a third of the loop, and dies. It throws a faint cold
+    glow on the blood and a broken reflection. Seven of them over the deepest blood, each at its own time.
+- **Graded:**
+  1. **D+:** blood too bright and red near the lantern (the "ketchup" failure).
+  2. Held dark (light capped at 0.38, depth at half). **C:** dark blood, clots and dull moon dabs. The wisps read
+     as wisp-fire, one or two burning at a time across the loop.
+
+**Passes (the Blind Face, landkit bark_face.py):**
+1. Relief on the giant at the back, ray-marched in its canonical frame:
+   - a frowning brow, healed eye-hollows, cheekbones, a nose ridge, a mouth half open (a real cavity) with heavier
+     lower lip, a chin;
+   - the trunk's channels stretched smooth across the face, fissures only in the hollows;
+   - blue-grey veins under the healed eyes;
+   - self-shadowing under the moon;
+   - the canopy above opened (the crown died back).
+   **Graded D+:** a face, but in profile on the trunk's edge, too small and too dark to read.
+2. Turned toward us (62 degrees), larger (2.1 x 2.7 yd), relief 1.5 times bolder. **Graded C+:** the scene's
+   landmark reads at a glance: a vast eyeless face in the bark at the glade's back, brooding over the clearing, the
+   moon raking across its brow.
