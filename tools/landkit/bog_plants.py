@@ -225,7 +225,7 @@ def place(rng, depth_at, part_at, cover_at, box, n_try=9000):
         x, y = rng.uniform(x0, x1), rng.uniform(y0, y1)
         d, p, cv = depth_at(x, y), part_at(x, y), cover_at(x, y)
         r = rng.random()
-        if p == 0 and 0.05 < d < 0.4 and _bed(x, y) > 0.62 and r < 0.1:
+        if p == 0 and 0.05 < d < 0.4 and _bed(x, y) > 0.68 and r < 0.08:
             out.append(("reed", x, y, float(rng.uniform(1.5, 2.6))))
         elif p == 0 and d <= 0.0 and _bed(x + 80, y) > 0.48 and r < 0.07:       # sedge in clumps, the peat open between
             out.append(("sedge", x, y, float(rng.uniform(0.4, 0.9))))

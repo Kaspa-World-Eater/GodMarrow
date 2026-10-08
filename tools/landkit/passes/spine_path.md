@@ -211,3 +211,22 @@ All are at the scene's standard and each gets its passes. **The path twists and 
 | 1 | A marsh shelf (`shelf()`), the rotting stump on its mound, the tipped snag, the tendril post with its pustule (landkit `bog_structures.py`), the Back twisting in two bends | Plants too dense and even on the shelf; the hero stood in the water; tendrils too small. |
 | 2 | Plants clustered; hero on the Back; tendrils enlarged | Shelf barren and flat: the lift had erased the hummocks. |
 | 3-4 | The shelf lifted as a whole, keeping its own hummock and hollow, so pools stay in the hollows. Open ground coloured by the water table: black wet peat, a dulled red-green sphagnum lawn, brown moss on the tops. | **C+.** A reed wall on the left; the shelf murky. |
+
+**The straw hut** (`bog_chambers.py hut`):
+- Pass 1: a round reed-thatched hut in courses (moss in patches), a daubed wall with its door, a ring-stone pit with cold wisp-fire (`straw_hut`, `pit_fire`). The hero stood over the pit; the foreground was a reed wall.
+- Pass 2: hero beside the pit; reed beds thinner; the fire lights its ring. **B-.**
+
+**The giant eye socket** (`socket`):
+- Pass 1: a bone rim thick at the brow and broken in places, a bowl of black water, a pale ring deep in it ("a pool that looks back"). The ring was too crisp.
+- Pass 2: ring broken and faint; rim given cracks and pitting.
+- Pass 3: rim slimed low. **B-.** The ring is now nearly invisible: find the middle.
+
+**The serpent's skull** (`skull`):
+- Pass 1 read as a pill; pass 2 as a shoe.
+- Pass 3: a spade outline from above (broad behind the eyes, tapering to the snout), a crest, great eye hollows holding water, brow ridges, nostril pits, sutures, a row of teeth at the water line, the quadrates standing back like horns. **C+.**
+
+**The ruins** (`ruins`):
+- Pass 1: grey boxes; the hero stood on a jamb.
+- Pass 2: coursed blocks each their own grey, moss on the tops, the floor laid into the shelf, the jambs lowered, the hero on the floor. **B-.** The floor flags don't read yet.
+
+**Across the chambers:** they share the bog scene's foreground plants and the drowned tree on the right. Each needs its own seeds and its own foreground.
