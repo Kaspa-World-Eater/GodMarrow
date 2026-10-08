@@ -58,9 +58,11 @@ GROUND_LIFE_OK = None    # f(x, y) -> bool: where grass may grow (a ruin keeps i
 RIM_EXTRA = ()          # more tags to rim (a scene's own objects above 400, e.g. its trunks)
 RIM = (1.35, (0.025, 0.025, 0.03))   # the moonlit rim on objects: strength and cool lift
 FOREST_LIFE = True       # the wood's own living layers (the leaf fall, falling and skittering leaves, the wisp-fire)
+LITTER_GEN = True        # the floor from landkit/litter_ground.py (world position, quiet), not the retired tiles
+AUTO_WARP = True         # the engine's own trees warped and channelled (chapter 6): no tube (Derek: "no tree is a perfect tube")
 TRUNK_WARP = None        # an object with to_canon(x, y, z) and normal_back(n, px, py, pz, tag): trunks that taper, swell, wander and twist
 NOW = 0.0                # the frame being painted (set by paint)
-NORMAL_BLUR = 1.0        # cells of blur on the height before its normals (a scene with small stones wants little: blur pillows)
+NORMAL_BLUR = 0.0        # cells of blur on the height before its normals (a scene with small stones wants little: blur pillows)
 MOONLIT = None           # f(px, py, pz, t) -> 0..1: a scene's own reach of the moon (a cavern's shaft)
 MIST = True              # the old scene's ground mist (a scene with its own air turns it off)
 BEAMS = True             # the old scene's moonbeams through the gap
@@ -174,7 +176,12 @@ def build(w):
         hgt = {"giant": 16.0, "middle": 14.0, "young": 12.0, "snag": 7.0, "stump": 0.8}[kind]
         foot = d < flare
         # the flare: wide at the ground, reaching the trunk's own radius a yard up
-        z_at = np.where(d <= r, hgt, np.clip((flare - d) / np.maximum(flare - r, 1e-3), 0, 1) ** 2.2 * (0.6 + butt * 0.9))   # a concave sweep up out of the roots
+        if AUTO_WARP and kind != "stump":                                  # the bark's channels, cut into the column (chapter 6)
+            import vein_tree as _vt
+            r_ch = r - _vt._channels(ang, 300 + ti, r)
+        else:
+            r_ch = r
+        z_at = np.where(d <= r_ch, hgt, np.clip((flare - d) / np.maximum(flare - r, 1e-3), 0, 1) ** 2.2 * (0.6 + butt * 0.9))   # a concave sweep up out of the roots
         if kind == "stump":
             z_at = np.where(d <= r, 0.8 + (fbm(X * 4, Y * 4) - 0.5) * 0.15 - np.clip(1 - d / (r * 0.6), 0, 1) * 0.25, z_at)
         if kind == "snag":
@@ -186,6 +193,16 @@ def build(w):
         if kind in ("giant", "middle", "young", "snag"):
             sway_m |= m
         obj[100 + ti] = dict(kind=kind, c=np.array([tx, ty]), r=r)
+    global TRUNK_WARP
+    if AUTO_WARP:                                                          # each tree its own taper, swell, wander and twist
+        import vein_tree as _vt
+        trs, gr = [], []
+        for ti, (tx, ty, kind, r, cr) in enumerate(w.trees):
+            trs.append((tx, ty, r, 1.0, 300 + ti))
+            ii = int(np.clip((ty - y0) / RES, 0, n - 1))
+            jj = int(np.clip((tx - x0) / RES, 0, n - 1))
+            gr.append(float(H_ground[ii, jj]))
+        TRUNK_WARP = _vt.Warp(trs, gr, tag0=100) if trs else None
     # the litter, as the ecology lays it: banked into a drift against the windward side of every log (a real ridge,
     # a hand high, that catches the moon), deep and fresh in the pits, thin over the mounds
     from wood_ecosystem import WIND
@@ -282,7 +299,7 @@ def shade(W, px, py, pz, SX, SY, t=0.0):
         m = tg == k
         if not m.any():
             continue
-        if o["kind"] in ("giant", "middle", "young", "snag", "stump"):
+        if o["kind"] in ("giant", "middle", "young", "snag", "stump") and not (AUTO_WARP and o["kind"] != "stump"):
             d = np.dstack([px - o["c"][0], py - o["c"][1], np.zeros_like(px)])
             d /= np.linalg.norm(d, axis=2, keepdims=True) + 1e-9
             n = np.where((m & side)[..., None], d, n)
@@ -396,6 +413,9 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
     dy_ = (SY % tw.TH).astype(int)
     eco[barem] = dirt[dy_[barem], dx_[barem]] * 1.1
     img[gl] = (eco * k_light)[gl]
+    if LITTER_GEN:                                                     # the retired tiles replaced: the floor from its own generator
+        import litter_ground
+        img = litter_ground.paint(img, gl, v, px, py, litt, mat, L["lamp"])
     mossm = gl & (mat == 1)
     cush = (vn(px * 9, py * 9) - 0.5) * 0.12
     img[mossm] = R_MOSS[np.clip(((v * 0.62 + cush) * len(R_MOSS)).astype(int), 0, len(R_MOSS) - 2)][mossm]   # deep olive at night, as on the rocks
@@ -583,7 +603,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     litt_px = look(W, W["litt"], px, py)
     tgm0 = look(W, W["tag"], px, py)
     rf_ = np.random.default_rng(101)                                      # its own sequence, the same every frame
-    NC = int(GW * GH / 9) if FOREST_LIFE else 0
+    NC = int(GW * GH / 18) if FOREST_LIFE else 0                          # half as many as before: the ground stays quiet
     c_sx, c_sy = rf_.integers(2, GW - 8, NC), rf_.integers(2, GH - 6, NC)
     c_r, c_st, c_fam = rf_.random(NC), rf_.integers(0, len(LEAVES) - 1, NC), rf_.random(NC)
     for q in range(NC):
@@ -1070,6 +1090,27 @@ def main(out):
     print("saved", out)
 
 
+def judge_plan(w):
+    """the judge scene's own composition, reworked (2026-10-07, after the Vigil): small trees are mostly dead (the
+    forest feel: "we should stick with larger trees or small ones should be mostly dead"), so the young away from the
+    gap's light stand dead, broken, and only those in its light live; the fallen giant lies across the view, as it
+    reads from above, not end-on as a pillar"""
+    gx, gy, gr = w.gap
+    t = []
+    for (x, y, kind, r, cr) in w.trees:
+        if kind == "young" and np.hypot(x - gx, y - gy) > gr * 0.55:
+            t.append((x, y, "snag", max(r, 0.16), cr))                   # died in the shade, its top broken off
+        else:
+            t.append((x, y, kind, r, cr))
+    w.trees = t
+    if w.logs:
+        (ax, ay, bx, by, r, cls, plate) = w.logs[0]
+        dx, dy = bx - ax, by - ay
+        c45, s45 = np.cos(np.pi / 4), np.sin(np.pi / 4)
+        w.logs[0] = (ax, ay, ax + dx * c45 - dy * s45, ay + dx * s45 + dy * c45, r, cls, plate)   # turned an eighth: its length and its plate's face both read
+
+
 if __name__ == "__main__":
+    WOOD_HOOKS.insert(0, judge_plan)
     o = sys.argv[1] if len(sys.argv) > 1 else "wood_scene.png"
     animate(o) if o.endswith(".webp") else main(o)
