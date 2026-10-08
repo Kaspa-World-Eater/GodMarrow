@@ -61,6 +61,10 @@ def stamp(X, Y, H, line, level=0.0, seed=7):
     # where the Back rises and sinks along its length (it goes under the marsh and comes up again)
     rise = (fbm(s * 0.045 + seed, 0.5) - 0.5) * 0.9 - 0.12                # low: the water laps at the wings
     base = level + rise
+    # where it crosses raised ground (a chamber's shelf), the Back rides on it instead of sinking under it
+    from scipy import ndimage as _nd0
+    ground = _nd0.gaussian_filter(H, 12)
+    base = np.maximum(base, ground - 0.12)
     # THE BODY'S SIZE along the Back (Derek 2026-10-08: "changes in width of the path for different areas"): a serpent's
     # vertebrae grow from the tail to the middle of the body and shrink again; here the Back swells and pinches along
     # its length, so the walk narrows to a hard file in places and opens to room for a fight in others

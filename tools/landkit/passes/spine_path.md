@@ -345,3 +345,12 @@ MASTER_RULES is unchanged.
 - The far walks read as pale dithered bars.
 - The hut is huge against this framing.
 - Next: the walk stays bared across a shelf, then check the far walks' scale and haze.
+
+## Rules check, 2026-10-08: the maze window, pass 2
+
+MASTER_RULES is unchanged.
+- **The Back rides on raised ground:** where a walk crosses a chamber's shelf, its base follows the ground beneath (smoothed) instead of sinking under it. The walks show their bone across the junction.
+- **The night air is a scene's own** (`wood_scene.AIR`): the bog's thins slower and never veils the far bone.
+- **The cloud-shadow dither:** its band had been so wide it checkered the whole frame; it is now a thin seam at the pools' edges.
+
+**Maze window: B-.** The hut is oversized for the junction; the bone's weathering mottle is a little busy at this distance.

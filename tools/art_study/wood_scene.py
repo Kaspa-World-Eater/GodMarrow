@@ -59,6 +59,7 @@ RIM_EXTRA = ()          # more tags to rim (a scene's own objects above 400, e.g
 RIM = (1.35, (0.025, 0.025, 0.03))   # the moonlit rim on objects: strength and cool lift
 FOREST_LIFE = True       # the wood's own living layers (the leaf fall, falling and skittering leaves, the wisp-fire)
 LITTER_GEN = True        # the floor from landkit/litter_ground.py (world position, every leaf its own), not the retired tiles
+AIR = (10.0, 0.45)       # the night air between us and the far ground: (yards to its full depth, its most); a scene sets its own
 LEAF_FALL = True         # the fresh fall of drawn leaves over it: its own switch, so a scene that turns FOREST_LIFE off
                          # keeps its leaves (Derek 2026-10-08: "you lost the life ... lack of litter")
 AUTO_WARP = True         # the engine's own trees warped and channelled (chapter 6): no tube (Derek: "no tree is a perfect tube")
@@ -542,7 +543,7 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
             stones = m & (vn(px * 11, pz * 11) > 0.85)
             img[stones] = tw.PEBBLE[np.clip(((v[stones] + 0.1) * len(tw.PEBBLE)).astype(int), 0, len(tw.PEBBLE) - 1)]
     # ---- the night air: the further from the viewer, the more cool dark air between (stepped, dithered)
-    far = np.clip(((HERO[0] + HERO[1]) - 2.5 - (px + py)) / 10.0, 0, 0.45)   # the air begins behind the gap's heart
+    far = np.clip(((HERO[0] + HERO[1]) - 2.5 - (px + py)) / AIR[0], 0, AIR[1])   # the air begins behind the gap's heart
     far = np.round((far + (bay - 0.5) * 0.08) * 8) / 8
     img = img * (1 - far[..., None]) + np.array([0.06, 0.075, 0.11]) * far[..., None]
     # ---- the light's temperature, stepped

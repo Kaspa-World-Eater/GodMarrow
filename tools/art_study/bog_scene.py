@@ -45,6 +45,7 @@ ws.FOCUS = C.copy()
 for _f in ("FOREST_LIFE", "MIST", "BEAMS", "GRASS", "FERNS", "LITTER_GEN", "LEAF_FALL"):
     setattr(ws, _f, False)
 ws.NORMAL_BLUR = 0.0
+ws.AIR = (16.0, 0.22)                        # open bog: the air thins slower and never veils the far bone
 ws.AUTO_WARP = False
 ws.HERO = C + AX * 1.2 - PERP * 0.3
 
@@ -331,10 +332,10 @@ def moonlit(px, py, pz, t):
     smooth gradient, with the 4x4 dither only at the pools' edges"""
     a = 2 * np.pi * t
     c = fbm(px * 0.045 + np.cos(a) * 0.35 + 3.0, py * 0.045 + np.sin(a) * 0.35) * 0.75 + vn(px * 0.13 - t, py * 0.13) * 0.25
-    k = np.clip((c - 0.42) * 3.2, 0, 1)
+    k = np.clip((c - 0.42) * 9.0 + 0.5, 0, 1)                                 # a steep edge: the dither stays a thin seam
     gh, gw = px.shape
     bay = ws.tw.B4[(np.arange(gh)[:, None] % 4), (np.arange(gw)[None, :] % 4)]
-    k = np.where((k > 0.15) & (k < 0.85), (k > bay).astype(float), np.round(k))
+    k = np.where((k > 0.3) & (k < 0.7), (k > bay).astype(float), np.round(k))
     return 0.62 + 0.42 * k
 
 
