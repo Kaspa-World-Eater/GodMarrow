@@ -324,3 +324,11 @@ Six rendered: skull 1 and 2, socket 1, hut 1, ruins 1, nature 1. All read as dis
 - nature 1's shelf is far off.
 
 The variant system: **B.**
+
+## Rules check, 2026-10-08: the variant faults
+
+MASTER_RULES is unchanged.
+- **The socket's rim** now always stands out of the ground round it; it had sunk under the shelf's hummocks. Socket 1 now shows a whole broken ring with its brow.
+- **The ruins** are pushed out across the water until clear of the walk (`clear_of_back`, 7 yd). Ruins 1 now stands apart, with the Back behind it.
+
+**Variants: B+** (nature 1's shelf is still far off).

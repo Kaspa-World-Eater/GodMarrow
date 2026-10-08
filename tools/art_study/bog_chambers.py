@@ -42,6 +42,20 @@ def vb(bb):
                  for (at, amp, tight) in bb)
 
 
+def clear_of_back(p, d):
+    """a set piece moved out across the water until it stands clear of the walk (the ruins never block it)"""
+    from scipy.spatial import cKDTree
+    kd = cKDTree(bs.LINE)
+    p = np.array(p, float)
+    for _ in range(60):
+        dd, i = kd.query(p)
+        if dd >= d:
+            break
+        away = p - bs.LINE[i]
+        p = p + away / (np.linalg.norm(away) + 1e-6) * 0.4
+    return p
+
+
 def jit(p, r=1.2):
     """a variant's set piece moved a little from where variant 0 has it"""
     return p if VARIANT == 0 else p + J.normal(0, r, 2)
@@ -314,6 +328,7 @@ def eye_socket(cx, cy, rx=4.2, ry=3.2, ang=0.4, seed=7):
         notch = np.zeros(th.shape, bool)
         for g_ in gapc:
             notch |= np.abs(((th - g_ + np.pi) % (2 * np.pi)) - np.pi) < 0.12 + 0.05 * vn(r * 9, g_)
+        rim_h = np.maximum(rim_h, H + 0.3 + 0.9 * brow)                     # the rim always stands out of the ground round it
         rim = rim_h * np.sqrt(prof) + (1 - np.sqrt(prof)) * H
         crack = np.abs(np.sin(th * 23 + vn(th * 3, r * 4) * 3)) < 0.06
         # bone at its own scale: nutrient pits (foramina) in the rim, the outer shell flaked away in patches, the
@@ -571,7 +586,7 @@ def scene_skull():
 def scene_ruins():
     set_origin(5)
     bs.LINE = twisting_line(8 + VARIANT, bends=vb(((-0.4, -3.2, 4.0), (0.4, 2.8, 5.0))))
-    rc = jit(C - AX * 5.0 - PERP * 0.5)
+    rc = clear_of_back(jit(C - AX * 5.0 - PERP * 0.5), 7.0)
     bs.BED_MODS[:] = [shelf(*(rc + AX * 1.0), 7.5, rise=0.2, seed=19)]
     bs.DROWNED_TREES = [(C + AX * 6.0 + PERP * 7.5, 0.4, 6.0, 75)]
     bs.DROWNED_WALLS, bs.GIANT_RIBS = [], []
