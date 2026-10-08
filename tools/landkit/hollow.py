@@ -97,6 +97,21 @@ def _sdf(Q, W, H, D, kind, candles):
             sb = np.maximum(np.maximum(np.abs(xu + D * 0.5) - D * 0.28, np.abs(xe) - W * 0.62), np.abs(xz + H * 0.62 - 0.11) - 0.11)
             part = np.where(sb < solid, 5, part)
             solid = np.minimum(solid, sb)
+            zf = -H * 0.62                                                         # CENTURIES OF WAX: mounds where it ran and set
+            for k, (mu, me, rx, rz) in enumerate(((-0.12, -0.42, 0.13, 0.07), (-0.1, 0.4, 0.15, 0.08), (-0.2, -0.05, 0.12, 0.05),
+                                                  (-0.3, 0.55, 0.1, 0.1), (-0.32, -0.56, 0.11, 0.09), (-0.06, 0.12, 0.09, 0.04))):
+                km = np.sqrt(((xu - mu) / rx) ** 2 + ((xe - me) / rx) ** 2 + ((xz - zf) / rz) ** 2)
+                dm = (km - 1.0) * min(rx, rz)
+                part = np.where(dm < solid, 8, part)
+                solid = np.minimum(solid, dm)
+            for k in range(4):                                                     # stalagmites of wax where the drips fall
+                de = (k - 1.5) * W * 0.36 + 0.04 * np.sin(k * 2.1)
+                du = -D * (0.3 + 0.12 * (k % 2))
+                hg = 0.1 + 0.05 * (k % 3)
+                tz = np.clip((xz - zf) / hg, 0, 1)
+                dd = np.maximum(np.hypot(xu - du, xe - de) - 0.035 * (1 - tz) - 0.004, np.maximum(zf - 0.02 - xz, xz - zf - hg))
+                part = np.where(dd < solid, 8, part)
+                solid = np.minimum(solid, dd)
             for k in range(4):                                                     # the sap seeping from the roof, setting as it falls
                 de = (k - 1.5) * W * 0.36 + 0.04 * np.sin(k * 2.1)
                 L_ = 0.08 + 0.05 * ((k * 37) % 5)
@@ -265,6 +280,8 @@ def draw(img, zb, dep_scene, to_px, C, u, W, H, D, T, lights, moon, kind="mouth"
         wet_ = on_top & (rs_ < 0.6) & (vn(Q[..., 1] * 25, Q[..., 0] * 25 + 3) > 0.7) & ~mark
         col = np.where(wet_[..., None], col * 0.6 + np.array([0.18, 0.02, 0.03]), col)
         col = np.where((part == 6)[..., None], WR[np.clip(((waxv + 0.1) * len(WR)).astype(int), 0, len(WR) - 1)], col)
+        wv8 = np.clip(waxv * 0.95 + (vn(Q[..., 1] * 30, Q[..., 2] * 30 + Q[..., 0] * 10) - 0.5) * 0.12, 0, 0.99)   # set wax, layer on layer
+        col = np.where((part == 8)[..., None], WR[(wv8 * len(WR)).astype(int)], col)
         floorwax = (part == 3) & (vn(Q[..., 1] * 12, Q[..., 0] * 12 + seed) > 0.4)
         col = np.where(floorwax[..., None], WR[np.clip((waxv * 0.85 * len(WR)).astype(int), 0, len(WR) - 1)], col)
     if kind in ("niche", "altar"):                                                  # the wax run over the sill

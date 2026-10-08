@@ -522,3 +522,35 @@ A face grown in a tree is the opposite. Study first (chapter 7).
   - every fifth a larger flat one that the pickers still cap;
   - never on a trunk, the stump, the pilgrim or the bones.
 **Graded:** C+. The runes ring the arch, the spiral is felt rather than seen, the alcove glows.
+
+## The critique, acted on (Derek, 2026-10-07: "i agree with the critique, except lets not worry about dead trees for this area, because its a ritualistic place, so magic or something. do the rest")
+- **No dead wood here**, by Derek's ruling. A ritual place, kept clean by whatever was done here.
+- **The reused floor layers removed:** the old scene's fallen leaves, falling leaves and wisp (`FOREST_LIFE` off), and
+  its ground mist and moonbeams (new engine switches `MIST`, `BEAMS`, default on for other scenes).
+- **Its own air:** `landkit/fog.py`, ground fog lying in the carr's lows and over the blood (MASTER_RULES 6: fog lies
+  in the lows). It thins up the trunks, drifts with the wind in a seamless loop, in stepped see-through layers lit by
+  the moon and warm near the candles.
+- **Centuries of burning** (`hollow.py` altar):
+  - mounds of set wax on the floor where it ran;
+  - stalagmites of wax under the roof's drips;
+  - soot blackening the hollow's roof, and a plume of soot climbing the bark over the arch, narrowing upward.
+- **The altar's light spread:** its light sits out over the ground before it (reach 3.6 yd), and the warm lights now
+  tint the fen ground they reach (the GROUND painter had no warm hue). The first try tinted the whole floor orange;
+  now only the ground near the flames.
+- **The three lights on the ground** (`landkit/wood_lights.py`, from the lore), by cause:
+  - red caps at the blood's margins (where the god bleeds beneath), smouldering in their own flesh and casting no
+    light (no red light);
+  - blue round the feet of the hollowed trees (over something hollow);
+  - white on dry sound ground away from the blood and the path, each holding a little light.
+  - **Failed first:** placed over the whole 30-yard world grid, so most fell off-screen. They are now chosen only where
+    the eye can find them.
+- **The worn way:** a path trodden for generations from the glade's front to the altar's blood. Trodden flat (no
+  tussock stands on it), pools kept off it, paler peat, the moss creeping back in from its edges.
+- **Objects in combat:** `landkit/sets/ritual_glade.json` is written on every build. For each object: cover,
+  material, hp and collision posts (trunks, stump, stones, bones, candles as a fire source, blood pools, tendrils).
+- **Graded:** B-. The glade is calm, dark and readable:
+  - the altar is the one strong statement of light;
+  - the worn way leads the eye to it;
+  - the lights on the ground are small and placed by their causes;
+  - the fog lies low.
+  Still to do: the passes owed on every piece; the floor's fine speckle is still busy at the edges.

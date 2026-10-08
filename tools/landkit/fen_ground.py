@@ -59,7 +59,7 @@ def height(X, Y, seed=5, keep=None):
     return dH, water, level, ttag * (0.3 + wetness * 0.7)
 
 
-def paint(img, m, v, px, py, water, tus, T=0.0, moon=None, depth=None, sx=None, sy=None, lamp=None):
+def paint(img, m, v, px, py, water, tus, T=0.0, moon=None, depth=None, sx=None, sy=None, lamp=None, path=None):
     """m: the ground pixels; v: the scene's light there; water: the pool mask there; tus: tussock-ness there.
     depth (0 at a pool's edge .. 1 deep), sx, sy (art pixels): the pools are BLOOD (Derek: "I want the puddles here
     to be blood ... dark blood"), the game's blood effect (blood.py) laid to the lake test's rules (shaders/lake.gdshader):
@@ -80,6 +80,10 @@ def paint(img, m, v, px, py, water, tus, T=0.0, moon=None, depth=None, sx=None, 
     strand = np.abs(np.sin(px * 41 + py * 17 + vn(px * 3, py * 3) * 6)) > 0.35
     col = np.where(((tus > 0.25) & strand)[..., None], straw, col)
     col = np.where(((tus > 0.25) & ~strand)[..., None], straw * 0.55, col)
+    if path is not None:                                                    # a way trodden for generations, overgrown now
+        trod = R_PEAT[np.clip(((vv * 1.05 + 0.08) * len(R_PEAT)).astype(int), 0, len(R_PEAT) - 1)]
+        grown = vn(px * 5 + 2, py * 5) > 0.35 + path * 0.45                 # moss creeping back in from its edges
+        col = np.where(((path > 0.35) & ~grown)[..., None], trod, col)
     if depth is not None:
         lt = np.clip(v * 0.5, 0.04, 0.38)                                  # dark blood: lit only so far (Derek: "dark blood")
         side_ = np.clip((lamp if lamp is not None else v) * 1.5, 0, 1)

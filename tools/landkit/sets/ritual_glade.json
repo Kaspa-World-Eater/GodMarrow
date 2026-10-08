@@ -1,0 +1,485 @@
+{
+ "scene": "ritual_glade",
+ "objects": [
+  {
+   "kind": "vein_tree",
+   "x": 16.74730880654188,
+   "y": 15.898780669118025,
+   "posts": [
+    [
+     16.74730880654188,
+     15.898780669118025,
+     1.4300000000000002
+    ]
+   ],
+   "cover": 17.0,
+   "material": "wood_living_wet",
+   "hp": null,
+   "hollow": "altar"
+  },
+  {
+   "kind": "vein_tree",
+   "x": 13.494617613083765,
+   "y": 22.26274169979695,
+   "posts": [
+    [
+     13.494617613083765,
+     22.26274169979695,
+     1.1
+    ]
+   ],
+   "cover": 16.0,
+   "material": "wood_living_wet",
+   "hp": null,
+   "hollow": null
+  },
+  {
+   "kind": "vein_tree",
+   "x": 23.46482322781408,
+   "y": 14.413856428626273,
+   "posts": [
+    [
+     23.46482322781408,
+     14.413856428626273,
+     1.1550000000000002
+    ]
+   ],
+   "cover": 16.0,
+   "material": "wood_living_wet",
+   "hp": null,
+   "hollow": null
+  },
+  {
+   "kind": "vein_tree",
+   "x": 16.323044737829953,
+   "y": 28.20243866176395,
+   "posts": [
+    [
+     16.323044737829953,
+     28.20243866176395,
+     0.9900000000000001
+    ]
+   ],
+   "cover": 16.0,
+   "material": "wood_living_wet",
+   "hp": null,
+   "hollow": null
+  },
+  {
+   "kind": "vein_tree",
+   "x": 29.192388155425117,
+   "y": 17.030151519016503,
+   "posts": [
+    [
+     29.192388155425117,
+     17.030151519016503,
+     1.045
+    ]
+   ],
+   "cover": 16.0,
+   "material": "wood_living_wet",
+   "hp": null,
+   "hollow": "candle_niche"
+  },
+  {
+   "kind": "vein_tree",
+   "x": 21.55563491861041,
+   "y": 31.17228714274745,
+   "posts": [
+    [
+     21.55563491861041,
+     31.17228714274745,
+     1.2100000000000002
+    ]
+   ],
+   "cover": 16.0,
+   "material": "wood_living_wet",
+   "hp": null,
+   "hollow": "candle_niche"
+  },
+  {
+   "kind": "vein_tree",
+   "x": 11.161165235168157,
+   "y": 15.403805922287441,
+   "posts": [
+    [
+     11.161165235168157,
+     15.403805922287441,
+     0.6050000000000001
+    ]
+   ],
+   "cover": 13.0,
+   "material": "wood_living_wet",
+   "hp": null,
+   "hollow": null
+  },
+  {
+   "kind": "vein_tree",
+   "x": 16.60588745030457,
+   "y": 10.666190488337573,
+   "posts": [
+    [
+     16.60588745030457,
+     10.666190488337573,
+     0.66
+    ]
+   ],
+   "cover": 13.0,
+   "material": "wood_living_wet",
+   "hp": null,
+   "hollow": null
+  },
+  {
+   "kind": "vein_stump",
+   "x": 22.545584412271573,
+   "y": 20.28284271247462,
+   "posts": [
+    [
+     22.545584412271573,
+     20.28284271247462,
+     0.85
+    ]
+   ],
+   "cover": 0.6,
+   "material": "wood_dead_wet",
+   "hp": 300,
+   "note": "its bores bleed; force breaks its splinters"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 20.969027732410982,
+   "y": 19.50017552474093,
+   "posts": [
+    [
+     20.969027732410982,
+     19.50017552474093,
+     0.41396493917285115
+    ]
+   ],
+   "cover": 0.11039065044609364,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 21.157363606076352,
+   "y": 18.691638629536342,
+   "posts": [],
+   "cover": 0.051474054494278776,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 20.560775683280003,
+   "y": 18.487233945114834,
+   "posts": [],
+   "cover": 0.040464314798939166,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 20.110441555101197,
+   "y": 18.027453110297465,
+   "posts": [],
+   "cover": 0.04308531852645765,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 17.306740096300647,
+   "y": 19.854662797677324,
+   "posts": [],
+   "cover": 0.05034270049274763,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 16.775830861141124,
+   "y": 20.50123212752817,
+   "posts": [
+    [
+     16.775830861141124,
+     20.50123212752817,
+     0.4024612066383577
+    ]
+   ],
+   "cover": 0.10732298843689538,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 17.0822808016485,
+   "y": 22.31508542460209,
+   "posts": [],
+   "cover": 0.05276181767007578,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 17.536870017739044,
+   "y": 22.924998264330764,
+   "posts": [],
+   "cover": 0.04304663890485607,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 18.363155118644194,
+   "y": 23.46738242678125,
+   "posts": [],
+   "cover": 0.050927522497042674,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 19.48299181629822,
+   "y": 23.787647268422308,
+   "posts": [],
+   "cover": 0.04426620875222409,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 19.868029852912187,
+   "y": 23.780051919290585,
+   "posts": [
+    [
+     19.868029852912187,
+     23.780051919290585,
+     0.4050746147762002
+    ]
+   ],
+   "cover": 0.10801989727365338,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 24.25428989684468,
+   "y": 21.288378508154675,
+   "posts": [],
+   "cover": 0.03898965576657558,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 24.33383855121604,
+   "y": 20.625472451159986,
+   "posts": [],
+   "cover": 0.044972202219567464,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 24.68471864263226,
+   "y": 19.80377509773709,
+   "posts": [],
+   "cover": 0.03890424931727028,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 24.95851866826389,
+   "y": 18.639213338587897,
+   "posts": [],
+   "cover": 0.04664292787941973,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 24.64783192840456,
+   "y": 17.95534667577834,
+   "posts": [
+    [
+     24.64783192840456,
+     17.95534667577834,
+     0.3780238465333047
+    ]
+   ],
+   "cover": 0.10080635907554791,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 24.866789104079945,
+   "y": 17.213457500558174,
+   "posts": [],
+   "cover": 0.0480903103872474,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 24.7282934004003,
+   "y": 16.725016707652426,
+   "posts": [],
+   "cover": 0.04592776193491642,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 20.740531471474526,
+   "y": 14.33966513075721,
+   "posts": [],
+   "cover": 0.041581727290346863,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 20.224786863396723,
+   "y": 14.197785007437327,
+   "posts": [],
+   "cover": 0.05372327456629733,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 14.007227280700006,
+   "y": 18.703646842686528,
+   "posts": [
+    [
+     14.007227280700006,
+     18.703646842686528,
+     0.38137762757254046
+    ]
+   ],
+   "cover": 0.10170070068601078,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 13.649896125916513,
+   "y": 19.461359425146348,
+   "posts": [],
+   "cover": 0.047512705078573074,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 14.243689630035428,
+   "y": 25.22618707730979,
+   "posts": [],
+   "cover": 0.05174974392146987,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 14.825803722991688,
+   "y": 25.72573013435713,
+   "posts": [],
+   "cover": 0.043459633515619205,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "flat_stone",
+   "x": 19.717341686117102,
+   "y": 27.849617841290097,
+   "posts": [],
+   "cover": 0.04834596704097469,
+   "material": "stone",
+   "hp": null,
+   "note": "shatters piercing shots"
+  },
+  {
+   "kind": "beast_bones",
+   "x": 19.010050506338832,
+   "y": 22.121320343559642,
+   "posts": [],
+   "cover": 0.1,
+   "material": "bone",
+   "hp": 40,
+   "note": "walked through; force scatters them"
+  },
+  {
+   "kind": "beast_bones",
+   "x": 19.010050506338832,
+   "y": 18.444365081389595,
+   "posts": [],
+   "cover": 0.1,
+   "material": "bone",
+   "hp": 40,
+   "note": "walked through; force scatters them"
+  },
+  {
+   "kind": "beast_bones",
+   "x": 23.7476659402887,
+   "y": 22.899137802864846,
+   "posts": [],
+   "cover": 0.1,
+   "material": "bone",
+   "hp": 40,
+   "note": "walked through; force scatters them"
+  },
+  {
+   "kind": "beast_bones",
+   "x": 16.181623381592644,
+   "y": 22.9698484809835,
+   "posts": [],
+   "cover": 0.1,
+   "material": "bone",
+   "hp": 40,
+   "note": "walked through; force scatters them"
+  },
+  {
+   "kind": "altar_candles",
+   "material": "wax_fire",
+   "note": "fire source; the wax burns and runs; dry inside the hollow"
+  },
+  {
+   "kind": "blood_pools",
+   "material": "blood",
+   "note": "slows like water; douses fire; carries lightning; rings where struck"
+  },
+  {
+   "kind": "tendrils",
+   "material": "flesh",
+   "hp": 60,
+   "note": "burn; cut by edges"
+  }
+ ]
+}

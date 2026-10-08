@@ -35,6 +35,9 @@ import rain as raingen                       # noqa: E402
 import flat_stone                            # noqa: E402
 import vessel                                # noqa: E402
 import candle                                # noqa: E402
+import wood_lights                           # noqa: E402
+import fog as foggen                         # noqa: E402
+import json                                  # noqa: E402
 from kit import ramp as kramp                # noqa: E402
 from scipy import ndimage as nd              # noqa: E402
 import bone as bonegen                       # noqa: E402
@@ -51,6 +54,9 @@ FACE_TREE = C - AX * 5.2 + PERP * 0.6        # the Blind Face, at the glade's ba
 STUMP = C + AX * 2.0 + PERP * 1.6            # the woodcutter's eleventh trunk, in the glade's moon, near the lantern
 FALL = AX * 0.6 - PERP * 0.8                 # it was felled toward the open glade: the notch and the chips this side
 ws.FOCUS = C - AX * 0.4
+ws.FOREST_LIFE = False                       # the old scene's fallen leaves, falling leaves and wisp: reused, off
+ws.MIST = False                              # its mist and moonbeams too: this glade has its own air
+ws.BEAMS = False
 ws.GRASS = False                             # the old scene's grass, ferns and mushrooms are reused: off until this floor's own
 ws.FERNS = False
 ws.NORMAL_BLUR = 0.6                         # facets and splinters keep their edges (chapter 4: never blur normals into pillows)
@@ -100,6 +106,17 @@ def fen_floor(W, w):
     fd_ = fd_ / np.linalg.norm(fd_)
     q_ = np.array([x0_, y0_]) + fd_ * (r0_ * 1.9 + 0.7)
     water |= (np.hypot(W["X"] - q_[0], W["Y"] - q_[1]) < 0.85 + (fbm(W["X"] * 1.5, W["Y"] * 1.5) - 0.5) * 0.5) & keep
+    pts = [C + AX * 6.8 - PERP * 1.0, C + AX * 4.4 - PERP * 0.5, C + AX * 2.0 + PERP * 0.2, C - AX * 0.6 + PERP * 0.4, q_]
+    dpath = np.full(W["X"].shape, 9.0)
+    for a_, b_ in zip(pts[:-1], pts[1:]):                                              # THE WORN WAY to the altar, generations of feet
+        ab = b_ - a_
+        t_ = np.clip(((W["X"] - a_[0]) * ab[0] + (W["Y"] - a_[1]) * ab[1]) / (ab @ ab), 0, 1)
+        dpath = np.minimum(dpath, np.hypot(W["X"] - a_[0] - ab[0] * t_, W["Y"] - a_[1] - ab[1] * t_))
+    wpath = 0.42 + (fbm(W["X"] * 1.2 + 3, W["Y"] * 1.2) - 0.5) * 0.3
+    path = np.clip(1 - dpath / wpath, 0, 1) * keep
+    dH = dH * (1 - path * 0.85)                                                        # trodden flat: no tussock stands on it
+    water &= ~((path > 0.2) & (np.hypot(W["X"] - q_[0], W["Y"] - q_[1]) > 1.2))
+    W["fen_path"] = path
     for (a, p, sz, yw, sd) in STONES:                                                 # flat stones lie on sound ground
         q = C + AX * a + PERP * p
         water &= np.hypot(W["X"] - q[0], W["Y"] - q[1]) > sz * 0.8 + 0.5
@@ -131,7 +148,11 @@ def fen_paint(img, W, px, py, pz, SX, SY, L, v, gl):
     wat = ws.look(W, W["fen_water"], px, py) > 0
     tus = ws.look(W, W["fen_tus"], px, py)
     dep_ = ws.look(W, W["fen_depth"], px, py)
-    return fen_ground.paint(img, gl, v, px, py, wat, tus, T=ws.NOW, moon=L["moon"], depth=dep_, sx=SX, sy=SY, lamp=L["lamp"])
+    pth = ws.look(W, W["fen_path"], px, py)
+    img = fen_ground.paint(img, gl, v, px, py, wat, tus, T=ws.NOW, moon=L["moon"], depth=dep_, sx=SX, sy=SY, lamp=L["lamp"], path=pth)
+    warm = np.clip(L["lamp"] - 0.12, 0, 1.2)[..., None] * np.array([0.55, 0.24, 0.02])   # the warm lights tint only the ground near them
+    img[gl] = np.clip(img[gl] * (1 + warm[gl] * 0.7), 0, 1)
+    return img
 
 
 WISPS = []
@@ -396,8 +417,8 @@ def place_hollows(W, w):
             q = P + u * 0.3
             ws.LIGHTS.append((q[0], q[1], g0 + zh - 0.1, 1.6))
         if kind == "altar":                                                         # many candles: a stronger glow, out over the blood
-            q = P + u * 0.4
-            ws.LIGHTS.append((q[0], q[1], g0 + zh, 2.6))
+            q = P + u * 0.9
+            ws.LIGHTS.append((q[0], q[1], g0 + 0.9, 3.6))                            # out over the ground before it, the bones, the blood
             HOLLOWS[-1].update(ac=np.arctan2(fd[1], fd[0]) - tw0, g0=g0, ti=ti, sill=g0 + zh - Hd * 0.62)
             GROUND_CANDLES.clear()                                                  # a couple outside, on firm ground by the blood
             pp = np.array([-u[1], u[0]])
@@ -502,6 +523,17 @@ def wax_pour(img, w, W, px, py, pz, L, T):
             img[run] = R_WAXRED[(v[run] * len(R_WAXRED)).astype(int)]
             gl = run & (np.abs(da - c0 - wig) < wd * 0.3) & (lit > 0.4)                # the gloss on the wax
             img[gl] = np.minimum(img[gl] * 1.5 + 0.05, 1)
+    # SOOT: centuries of flames have blackened the bark above the arch, a plume narrowing upward
+    ms = (tg == 600 + ALTAR_TREE)
+    if ms.any():
+        ang = np.arctan2(py - y, px - x)
+        da = (((ang - al["ac"]) + np.pi) % (2 * np.pi) - np.pi) * r
+        apex = al["sill"] + al["H"] * 0.62 + 2.0 * al["W"]
+        hz = pz - (apex - 0.9)
+        wdt = np.clip(0.55 - hz * 0.22, 0.12, 0.55) * (1 + (vn(px * 3, pz * 2) - 0.5) * 0.4)
+        soot = ms & (hz > 0) & (hz < 2.2) & (np.abs(da) < wdt)
+        k_ = np.clip(1 - np.abs(da) / wdt, 0, 1) * np.clip(1 - hz / 2.2, 0, 1)
+        img[soot] = img[soot] * (1 - 0.6 * k_[soot])[:, None]
     # where it meets the blood: set wax, skins and lumps floating at the foot
     P0 = al["C"][:2]
     near = (tg == 0) & (np.hypot(px - P0[0], py - P0[1]) < 1.6) & (ws.look(W, W["fen_water"], px, py) > 0)
@@ -639,6 +671,84 @@ def ground_candles(img, w, W, px, py, pz, L, T):
 GROUND_CANDLES = []
 
 
+THREE_LIGHTS = []
+
+
+def place_lights(W, w):
+    """the three lights on the ground, by cause (landkit wood_lights.py): red at the blood's margins, blue round the
+    hollowed trees, white on the sound hummocks"""
+    THREE_LIGHTS.clear()
+    rr = np.random.default_rng(171)
+    gh = lambda x, y: float(ws.look(W, W["H"], np.array(x), np.array(y)))
+    water = W["fen_water"]
+    edge = nd.binary_dilation(water, iterations=6) & ~nd.binary_dilation(water, iterations=2) & (W["tag"] == 0)
+    seeds = []
+    sxg, syg = ws.to_px((W["X"], W["Y"], W["H"]))
+    inview = (sxg > 12) & (sxg < ws.GW - 12) & (syg > 30) & (syg < ws.GH - 12)    # where the eye can find them
+    edge &= inview
+    ij = np.argwhere(edge)
+    for idx in rr.choice(len(ij), size=min(9, len(ij)), replace=False):
+        i, j = ij[idx]
+        seeds.append((W["X"][i, j], W["Y"][i, j], "red"))
+    for ti in (ALTAR_TREE, NICHE_TREE, MOUTH_TREE):                                       # over something hollow
+        x, y, r, h, sd = VT[ti]
+        for k in range(2 if ti == ALTAR_TREE else 1):
+            a = rr.uniform(0, 2 * np.pi)
+            q = np.array([x, y]) + np.array([np.cos(a), np.sin(a)]) * (r * 1.9 + rr.uniform(0.2, 0.7))
+            qs = ws.to_px((q[0], q[1], 0.0))
+            if ws.look(W, W["tag"], np.array(q[0]), np.array(q[1])) == 0 and ws.look(W, water, np.array(q[0]), np.array(q[1])) == 0 and 0 < qs[0] < ws.GW:
+                seeds.append((q[0], q[1], "blue"))
+    tus = W["fen_tus"]
+    far = ~nd.binary_dilation(water, iterations=15) & (W["fen_path"] < 0.2) & (W["tag"] == 0) & inview   # sound ground: dry, untrodden
+    ij = np.argwhere(far)
+    for idx in rr.choice(len(ij), size=min(8, len(ij)), replace=False):
+        i, j = ij[idx]
+        seeds.append((W["X"][i, j], W["Y"][i, j], "white"))
+    THREE_LIGHTS.extend(wood_lights.place(rr, seeds, gh))
+
+
+def draw_three_lights(img, w, W, px, py, pz, L, T):
+    return wood_lights.draw(img, ws.to_px, px + py, THREE_LIGHTS, T)
+
+
+def ground_fog(img, w, W, px, py, pz, L, T):
+    """this glade's own air (landkit fog.py): fog lying in the carr's lows and over the blood, lit by the moon and the
+    candles"""
+    Hr = W["Hrest"]
+    lowness = ws.look(W, np.clip((nd.gaussian_filter(Hr, 25) - Hr) * 8 + 0.3, 0, 1), px, py)
+    pool = ws.look(W, nd.gaussian_filter(W["fen_water"].astype(float), 12), px, py)
+    gnd = ws.look(W, Hr, px, py)
+    above = np.clip(1 - (pz - gnd) / 0.8, 0, 1)                                       # it lies low: thinning up the trunks
+    low = np.clip(lowness * 0.6 + pool * 1.2, 0, 1) * above
+    warm = np.clip(L["lamp"], 0, 1)
+    return foggen.draw(img, px, py, pz, low, T, L["moon"], warm * 0.5, thick=1.5)
+
+
+def export_manifest(W, w):
+    """what the game needs of every object here (MASTER_RULES 5, objects in combat): cover, material, hp, posts"""
+    objs = []
+    for i, (x, y, r, h, sd) in enumerate(VT):
+        objs.append(dict(kind="vein_tree", x=x, y=y, posts=[[x, y, r * 1.1]], cover=h, material="wood_living_wet", hp=None,
+                         hollow={0: "altar", NICHE_TREE: "candle_niche", MOUTH_TREE: "candle_niche"}.get(i)))
+    objs.append(dict(kind="vein_stump", x=STUMP[0], y=STUMP[1], posts=[[STUMP[0], STUMP[1], 0.85]], cover=0.6,
+                     material="wood_dead_wet", hp=300, note="its bores bleed; force breaks its splinters"))
+    for (a, p, sz, yw, sd) in STONES:
+        q = C + AX * a + PERP * p
+        objs.append(dict(kind="flat_stone", x=q[0], y=q[1], posts=[[q[0], q[1], sz * 0.45]] if sz > 0.6 else [],
+                         cover=0.12 * sz, material="stone", hp=None, note="shatters piercing shots"))
+    for (a, p, age, size) in BONES:
+        q = C + AX * a + PERP * p
+        objs.append(dict(kind="beast_bones", x=q[0], y=q[1], posts=[], cover=0.1, material="bone", hp=40,
+                         note="walked through; force scatters them"))
+    objs.append(dict(kind="altar_candles", material="wax_fire", note="fire source; the wax burns and runs; dry inside the hollow"))
+    objs.append(dict(kind="blood_pools", material="blood", note="slows like water; douses fire; carries lightning; rings where struck"))
+    objs.append(dict(kind="tendrils", material="flesh", hp=60, note="burn; cut by edges"))
+    out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "landkit", "sets", "ritual_glade.json")
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    with open(out, "w") as fh:
+        json.dump(dict(scene="ritual_glade", objects=objs), fh, indent=1, default=float)
+
+
 def tree_eyes(img, w, W, px, py, pz, L, T):
     GH, GW = img.shape[:2]
     dep = px + py
@@ -715,15 +825,17 @@ ws.LIVING.append(draw_hollows)
 ws.LIVING.append(wax_pour)
 # ws.LIVING.append(draw_lids)                                                      # Derek: "hate the eyes" (the ring of runes instead; kept)
 ws.LIVING.append(blood_tendrils)
+ws.LIVING.append(ground_fog)
 ws.LIVING.append(grim)
 ws.LIVING.append(draw_stone_caps)
 ws.LIVING.append(ground_candles)
+ws.LIVING.append(draw_three_lights)
 # ws.LIVING.append(draw_wisps)                                                     # Derek: "remove the wisp fire from the blood" (wisp_fire.py kept)
 if RAIN:
     ws.gust = gentle_gust
     ws.LIVING.insert(ws.LIVING.index(draw_hollows), wet_world)
     ws.LIVING.append(draw_rain)
-ws.BUILD_HOOKS[0:0] = [fen_floor, stamp_vein_trees, stamp_stump, stamp_stones, place_eyes, place_hollows]   # in this order: floor, trees, stump, then what grows on the trees
+ws.BUILD_HOOKS[0:0] = [fen_floor, stamp_vein_trees, stamp_stump, stamp_stones, place_eyes, place_hollows, place_lights, export_manifest]   # in this order: floor, trees, stump, then what grows on the trees
 ws.GROUND = fen_paint
 ws.PAINTERS["vstump"] = paint_stump
 ws.PAINTERS["flatstone"] = paint_stone

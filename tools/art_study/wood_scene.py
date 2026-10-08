@@ -61,6 +61,8 @@ TRUNK_WARP = None        # an object with to_canon(x, y, z) and normal_back(n, p
 NOW = 0.0                # the frame being painted (set by paint)
 NORMAL_BLUR = 1.0        # cells of blur on the height before its normals (a scene with small stones wants little: blur pillows)
 MOONLIT = None           # f(px, py, pz, t) -> 0..1: a scene's own reach of the moon (a cavern's shaft)
+MIST = True              # the old scene's ground mist (a scene with its own air turns it off)
+BEAMS = True             # the old scene's moonbeams through the gap
 GRASS = True             # the old scene's grass tufts in the gap (a scene with its own floor turns them off)
 FERNS = True             # the old scene's ferns in the damp
 GROUND = None            # f(img, W, px, py, pz, SX, SY, L, v, gl) -> img: another land's ground tiles over the wood's
@@ -810,7 +812,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     def field(TT):
         return fbm(px * 0.35 - TT * 1.6, py * 0.35 + TT * 1.6) * 0.65 + fbm(px * 0.9 - TT * 2.4, py * 0.9 + TT * 2.4) * 0.35
     mist = drift(field, T)
-    dens = np.clip((mist - 0.5) * 3.0 + wetv * 0.4 - 0.15, 0, 1) * low
+    dens = np.clip((mist - 0.5) * 3.0 + wetv * 0.4 - 0.15, 0, 1) * low * (1.0 if MIST else 0.0)
     a_ = np.where(dens > 0.55, 0.18, np.where(dens > 0.25, 0.096, 0.0)) * (bay_l > 0.2)    # 40% lighter (Derek)
     img = img * (1 - a_[..., None]) + np.array([0.42, 0.46, 0.55]) * (0.35 + L["moon"][..., None] * 0.6 + L["lamp"][..., None] * np.array([1.2, 0.9, 0.5])) * a_[..., None]
     # foxfire: the fungi in the softest dead wood (class 4-5 logs, the stump's crumbled heart) glow a faint cold
@@ -863,7 +865,7 @@ def living(img, w, W, px, py, pz, L, t=0.0):
     gx_, gy_, gr_ = w.gap
     yy0, xx0 = np.mgrid[0:GH, 0:GW].astype(float)
     beam_k = np.zeros((GH, GW))
-    for (bx, by, wdt, strength) in [(gx_ - 2.4, gy_ - 1.2, 0.95, 1.0), (gx_ - 0.2, gy_ + 0.6, 0.5, 0.7)]:
+    for (bx, by, wdt, strength) in ([(gx_ - 2.4, gy_ - 1.2, 0.95, 1.0), (gx_ - 0.2, gy_ + 0.6, 0.5, 0.7)] if BEAMS else []):
         g0 = np.array([bx, by, gh(bx, by)])
         top = g0 + SUN * 22.0                                            # back up the light toward the moon
         a = np.array(to_px(g0))
