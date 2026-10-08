@@ -143,18 +143,21 @@ def straw_hut(hx, hy, R=1.8, wall_h=1.05, pitch=0.95, pit_at=None, seed=5):
         door_a = np.arctan2(py_ - hy, px_ - hx)
         # what the bog folk keep (the real bog: turf is cut and stacked to dry by the door; a flat punt for the water)
         sa_ = door_a + 1.3
-        tx, ty = hx + np.cos(sa_) * (R + 1.1), hy + np.sin(sa_) * (R + 1.1)
+        txy = np.array([hx, hy]) + AX * (R + 0.4) + PERP * (R + 0.6)        # by the wall, the door side, in view
+        tx, ty = txy[0], txy[1]
         u = (X - tx) * np.cos(sa_ + 1.57) + (Y - ty) * np.sin(sa_ + 1.57)
         v = -(X - tx) * np.sin(sa_ + 1.57) + (Y - ty) * np.cos(sa_ + 1.57)
         stack = (np.abs(u) < 0.7) & (np.abs(v) < 0.35)
         brick = np.floor(u / 0.24) + np.floor(v / 0.16) * 7
-        sz_ = base + 0.55 - np.abs(u) * 0.25 + ((np.sin(brick * 12.9) * 4375.5) % 1.0) * 0.06
+        # stacked as turf is stacked to dry: a low ridge, the bricks leaned in against each other, stepping down
+        sz_ = base + 0.5 - np.floor(np.abs(v) / 0.12) * 0.1 - np.abs(u) * 0.12 + ((np.sin(brick * 12.9) * 4375.5) % 1.0) * 0.06
         gapb = (((u / 0.24) % 1.0) < 0.12) | (((v / 0.16) % 1.0) < 0.15)
         ms = stack & (sz_ > H2)
         H2 = np.where(ms, sz_ - gapb * 0.05, H2)
         part[ms] = 44
-        pa_ = door_a - 1.6                                                  # the punt, drawn up at the shelf's edge
-        bx, by = hx + np.cos(pa_) * (R + 3.4), hy + np.sin(pa_) * (R + 3.4)
+        pa_ = np.arctan2(PERP[1], PERP[0]) + 0.3                            # the punt, drawn up at the shelf's edge, in view
+        bxy = np.array([hx, hy]) + AX * 4.6 - PERP * 2.8
+        bx, by = bxy[0], bxy[1]
         bu = (X - bx) * np.cos(pa_) + (Y - by) * np.sin(pa_)
         bv = -(X - bx) * np.sin(pa_) + (Y - by) * np.cos(pa_)
         hull = (np.abs(bu) < 1.5) & (np.abs(bv) < 0.42 * np.clip(1.4 - np.abs(bu) / 1.5, 0, 1))
@@ -196,7 +199,9 @@ def hut_paint(col, W, px, py, pz, L, vv, gl, st):
     col = np.where(hole[..., None], np.array([0.02, 0.02, 0.02]), col)
     soot = is_hut & (d >= 0.2) & (d < 0.45) & (hz > h["wall_h"])
     col = np.where(soot[..., None], col * 0.55, col)
-    turf = np.array([0.16, 0.11, 0.08]) * (0.35 + vv[..., None] * 0.8) * (1 + (vn(px * 21, py * 21)[..., None] - 0.5) * 0.3)
+    tj = (np.abs(np.sin((px - py) * 13)) < 0.18) | (np.abs(np.sin(pz * 19)) < 0.2)   # the cut bricks' joints
+    turf = np.array([0.24, 0.16, 0.11]) * (0.4 + vv[..., None] * 0.9) * (1 + (vn(px * 21, py * 21)[..., None] - 0.5) * 0.25)
+    turf = np.where(tj[..., None], turf * 0.5, turf)
     col = np.where((st == 44)[..., None], turf, col)
     plank = np.array([0.2, 0.17, 0.13]) * (0.35 + vv[..., None] * 0.8) * (1 - (np.abs(np.sin((px + py) * 18)) < 0.15)[..., None] * 0.35)
     col = np.where((st == 45)[..., None], plank, col)

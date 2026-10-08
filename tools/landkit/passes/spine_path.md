@@ -289,3 +289,7 @@ MASTER_RULES is unchanged.
 - The tipped snag is moved into the open water.
 
 The chamber now reads open: the pool, the shelf beyond and the tendril post all show. **Nature: B.** Derek's bar is now A (2026-10-08: "once you've moved to what you would consider an A ... the old growth forest areas" next).
+
+**The hut, pass 4:** the turf is stacked as turf is stacked to dry (a low stepped ridge of cut bricks with dark joints, by the door wall, in view); the punt is drawn up at the shelf's edge in view. **Hut: B.**
+
+**All pieces now B or better:** walk B, nature B, hut B, socket B, skull B, ruins B, maze B. The bar is A.
