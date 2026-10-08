@@ -199,7 +199,7 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
     # crowns, keels and rims are worn paler by feet and weather; between, a mottle of old stain in broad patches
     hollow_k = np.clip(-cav / 0.05, 0, 1)
     crest_k = np.clip(cav / 0.04, 0, 1)
-    mott = (vn(px * 2.3 + 5, py * 2.3) - 0.5) * 0.14 + (vn(px * 9, py * 9) - 0.5) * 0.05
+    mott = (vn(px * 2.3 + 5, py * 2.3) - 0.5) * 0.14 + (vn(px * 26, py * 26) - 0.5) * 0.04     # the fine pitting, as colour
     tb = vv * 0.9 + mott + (stain - 0.5) * 0.16 - hollow_k * 0.22
     bone = _r(R_BONE, tb)
     crn = _r(R_CROWN, vv * 0.92 + mott * 0.6)

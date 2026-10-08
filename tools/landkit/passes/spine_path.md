@@ -354,3 +354,10 @@ MASTER_RULES is unchanged.
 - **The cloud-shadow dither:** its band had been so wide it checkered the whole frame; it is now a thin seam at the pools' edges.
 
 **Maze window: B-.** The hut is oversized for the junction; the bone's weathering mottle is a little busy at this distance.
+
+## Rules check, 2026-10-08: the bone's speckle
+
+MASTER_RULES is unchanged.
+- **Cause:** the bone's finest pitting was height at under a pixel, so it speckled the light (form law 0.3: under a pixel it is colour).
+- **Fix:** pitting a hand across stays form; the finer is now colour in the mottle.
+- **Result:** the vertebrae read cleaner in both the walk and the maze window, the stain and the pale crowns broad and calm. **Walk: B+.**

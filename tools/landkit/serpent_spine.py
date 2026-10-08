@@ -125,7 +125,8 @@ def stamp(X, Y, H, line, level=0.0, seed=7):
     fx_u, fx_v = 0.3 + 0.4 * _h(k, 24, seed), (_h(k, 25, seed) - 0.5) * 1.2 * sz
     fx2_u, fx2_v = 0.25 + 0.5 * _h(k, 26, seed), -fx_v * 0.8
     foram = (np.hypot((u - fx_u) * Lk, v - fx_v) < 0.05) | (np.hypot((u - fx2_u) * Lk, v - fx2_v) < 0.04)
-    pit = (vn(X * 26 + seed, Y * 26) - 0.5) * 0.014 + (vn(X * 61, Y * 61 + seed) - 0.5) * 0.006
+    pit = (vn(X * 9 + seed, Y * 9) - 0.5) * 0.02                          # pitting a hand across is form; the finer is colour
+                                                                          # (form law 0.3: under a pixel it speckles the light)
     grain = np.abs(np.sin(v * 31.0 / sz + vn(s * 1.3, v * 2.0) * 4.0)) < 0.06
     grain = grain & (vn(s * 0.9 + k, v * 3.0) > 0.55)
     zb = (base + roof + hump + stump + tilt + saddle + keel + rim + pit
