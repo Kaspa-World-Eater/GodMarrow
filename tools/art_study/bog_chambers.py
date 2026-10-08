@@ -115,7 +115,9 @@ def tendrils_round_post(px_, py_, h, seed):
 def scene_nature():
     set_origin(1)
     bs.LINE = twisting_line(2 + VARIANT, bends=vb(((-0.35, 3.6, 4.0), (0.3, -3.2, 5.0))))
-    bs.BED_MODS[:] = [shelf(*(C - AX * 4.5 + PERP * 2.0), 7.5)]
+    # the shelf is anchored to this variant's own walk: just behind the Back where it passes the middle of the frame
+    mid = bs.LINE[np.argmin(np.hypot(*(bs.LINE - C).T))]
+    bs.BED_MODS[:] = [shelf(*(mid - AX * 4.0 + PERP * 1.5), 7.5)]
     bs.DROWNED_TREES = [(C + AX * 6.0 - PERP * 8.0, 0.4, 6.0, 71)]
     bs.DROWNED_WALLS = []
     bs.GIANT_RIBS = []

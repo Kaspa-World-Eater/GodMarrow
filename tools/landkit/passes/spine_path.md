@@ -432,3 +432,7 @@ MASTER_RULES is unchanged.
 MASTER_RULES is unchanged; no new grades.
 - **Added:** a thin smoke from the smoke hole, rising and leaning with the one wind, thinning as it goes; stepped, see-through, dithered only at its edges (the effects method).
 - **Result:** it reads as a pale wisp off the peak in the still frame and will move in the loop. A little faint against the moss. **Hut: B+.**
+
+## Rules check, 2026-10-08: the nature shelf anchored
+
+MASTER_RULES is unchanged; no new grades. The nature chamber's marsh shelf is now anchored to its own variant's walk (just behind the Back where it passes the frame's middle), not to a fixed point, so every variant's open ground sits beside the walk, where the player can step off it. Variants 0 and 1 both checked. **Variants: B+, all three faults fixed.**
