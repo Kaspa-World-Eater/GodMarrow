@@ -455,3 +455,7 @@ Passes:
 3. The crown kept smooth (ragged only at its waterline).
 
 Awaiting Derek's grade.
+
+**Derek, mid-pass: "The eye sockets still don't make sense, just remove them"; "Make the skull platform wider".** Done: the skull is now a broad hump of crown, 8 x 8 yd, with its seams and no sockets, a platform to stand on in the marsh.
+
+**The hut's trellis (Derek's note):** two forked posts of grey drowned wood either side of the fire pit, a crossbar in their forks, bundles of reed and root hung to dry, and a blackened pot on a hook over the cold fire; true strokes, mirrored. The first pass lit the posts too pale (they read as metal); the wood is now darker.

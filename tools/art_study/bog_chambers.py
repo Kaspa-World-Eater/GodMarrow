@@ -286,6 +286,59 @@ def pit_fire(px_, py_):
     return living
 
 
+def fire_trellis(px_, py_):
+    """the trellis over the fire pit (Derek: "add a trellis with fire"): two forked posts of grey drowned wood either
+    side of the pit, a crossbar laid in their forks, and from it bundles of reed and root hung to dry over the cold
+    fire, and a blackened pot on a hook; true thin strokes in the world, each lit pale on its fire side, mirrored where
+    water is under it"""
+    import bog_plants
+
+    def living(img, w, W, px, py, pz, L, T=0.0):
+        water = ws.look(W, W["bog_water"], px, py) & (L["tg"] == 0)
+        zb = np.full(img.shape[:2], -1e9)
+        dep = px + py
+        g = float(ws.look(W, W["H"], np.array(px_), np.array(py_)))
+        g = max(g, LEVEL + 0.05)
+        WOOD, WOOD_L = bs.R_DEAD[3], bs.R_DEAD[5]
+        P3 = np.array([bs.PERP[0], bs.PERP[1], 0.0])
+        A3 = np.array([bs.AX[0], bs.AX[1], 0.0])
+        FIRE = np.array([0.55, 0.62, 0.72])
+        ends = []
+        for sg in (-1, 1):
+            b0 = np.array([px_ + bs.PERP[0] * sg * 0.85, py_ + bs.PERP[1] * sg * 0.85, g])
+            top = b0 + np.array([0.0, 0.0, 1.35])
+            for off in (0.0, 0.025):                                       # a post two strokes thick
+                bog_plants._stroke(img, zb, dep, ws.to_px, b0 + np.array([off, -off, 0]), top + np.array([off, -off, 0]),
+                                   WOOD, WOOD_L * 0.75 + FIRE * 0.1, 0.5, water, LEVEL)
+            for fk in (-1, 1):                                             # the fork
+                bog_plants._stroke(img, zb, dep, ws.to_px, top, top + A3 * fk * 0.12 + np.array([0, 0, 0.2]),
+                                   WOOD, WOOD_L, 0.5, water, LEVEL, n=5)
+            ends.append(top + np.array([0, 0, 0.08]))
+        for off in (0.0, 0.025):                                           # the crossbar
+            bog_plants._stroke(img, zb, dep, ws.to_px, ends[0] + np.array([0, 0, off]), ends[1] + np.array([0, 0, off]),
+                               WOOD, WOOD_L * 0.8 + FIRE * 0.12, 0.55, water, LEVEL)
+        rr = np.random.default_rng(int(px_ * 13) % 997)
+        for k, f in enumerate(np.linspace(0.18, 0.82, 5)):                 # what hangs from it
+            hp = ends[0] + (ends[1] - ends[0]) * (f + rr.uniform(-0.04, 0.04))
+            if k == 2:                                                     # the pot on its hook, over the fire's middle
+                bog_plants._stroke(img, zb, dep, ws.to_px, hp, hp - np.array([0, 0, 0.45]), np.array([0.12, 0.1, 0.09]),
+                                   np.array([0.12, 0.1, 0.09]), 0.8, water, LEVEL, n=6)
+                c = hp - np.array([0, 0, 0.62])
+                for dz in np.linspace(-0.12, 0.12, 7):
+                    wdt = 0.16 * np.sqrt(max(1 - (dz / 0.13) ** 2, 0.05))
+                    bog_plants._stroke(img, zb, dep, ws.to_px, c + np.array([0, 0, dz]) - P3 * wdt, c + np.array([0, 0, dz]) + P3 * wdt,
+                                       np.array([0.07, 0.07, 0.07]), np.array([0.2, 0.22, 0.25]), 0.9, water, LEVEL, n=6)
+                continue
+            ln = rr.uniform(0.25, 0.45)
+            col = np.array([0.36, 0.31, 0.2]) if k % 2 else np.array([0.24, 0.17, 0.12])   # reed bundles, root bundles
+            for t_ in range(5):
+                o_ = (t_ - 2) * 0.018
+                bog_plants._stroke(img, zb, dep, ws.to_px, hp + P3 * o_, hp + P3 * (o_ * 1.8) - np.array([0, 0, ln * rr.uniform(0.85, 1.0)]),
+                                   col * 0.8, col, 0.8, water, LEVEL, n=6)
+        return img
+    return living
+
+
 def hut_smoke(img, w, W, px, py, pz, L, T=0.0):
     """a thin smoke from the smoke hole, rising and leaning with the one wind, thinning as it goes: stepped, see-through,
     dithered only at its edges (the effects method); and the pit's cold light caught on the eave and the door's edge"""
@@ -321,7 +374,7 @@ def scene_hut():
     bs.STRUCTS[:] = [("stump", *(hc - PERP * 4.2 + AX * 1.0), 0.45, 91)]
     bs.EXTRA_STAMPS[:] = [straw_hut(hc[0], hc[1], R=1.8 * (1 if VARIANT == 0 else J.uniform(0.8, 1.2)), pit_at=pit, seed=5 + VARIANT)]
     bs.EXTRA_PAINT[:] = [hut_paint]
-    bs.EXTRA_LIVING[:] = [pit_fire(pit[0], pit[1]), hut_smoke]
+    bs.EXTRA_LIVING[:] = [fire_trellis(pit[0], pit[1]), pit_fire(pit[0], pit[1]), hut_smoke]
     ws.HERO = pit + AX * 0.9 + PERP * 2.2                              # beside the pit, not over it
 
 
@@ -416,7 +469,7 @@ def socket_eye(img, w, W, px, py, pz, L, T=0.0):
     return img
 
 
-def serpent_skull(cx, cy, ang, length=7.0, width=5.4, height=1.4, seed=11):
+def serpent_skull(cx, cy, ang, length=8.0, width=8.0, height=1.2, seed=11):
     """THE SERPENT'S SKULL, all but buried (Derek, second review: "The skull should be hump and the top of the eye
     sockets showing"). The bog has swallowed it: only the crown of the cranium breaks the marsh, a broad smooth hump of
     bone, and in front of it the brows, the arched tops of the two great eye sockets, stand just out of the peat with
@@ -438,20 +491,7 @@ def serpent_skull(cx, cy, ang, length=7.0, width=5.4, height=1.4, seed=11):
         # the sutures: zigzag seams where the skull's plates meet, one across the crown, one down its middle behind it
         zz = lambda t: (np.abs(((t * 9.0) % 2.0) - 1.0) - 0.5) * 0.05
         sut = (np.abs(u + 0.12 - zz(v)) < 0.022) | ((np.abs(v - zz(u)) < 0.02) & (u < -0.12))
-        # the eye sockets: in front of the hump, at its sides, full of water; their tops (the brows) arch out of the peat
-        orb = np.zeros(X.shape, bool)
-        brow = np.full(X.shape, -9.0)
-        for sg in (-1, 1):
-            ou, ov = 0.38, sg * 0.46                                         # set into the hump's front corners
-            d = np.hypot((u - ou) / 0.26, (v - ov) / 0.3)
-            oa = np.arctan2((v - ov) / 0.3, (u - ou) / 0.26)                  # 0 toward the front, pi toward the rear
-            orb |= d < 0.92
-            # the brow: the socket's upper rim, an arch of bone over its rear and inner side, highest at the back
-            back = np.clip(-np.cos(oa) * 0.7 + 0.3 - 0.4 * np.sin(oa) * sg, 0, 1)
-            rim = np.clip(1 - np.abs(d - 1.06) / 0.17, 0, 1) ** 0.7
-            bz = LEVEL - 0.05 + rim * back * 0.6 + (vn(oa * 5 + sg, 3.0) - 0.5) * 0.05
-            brow = np.where(rim > 0, np.maximum(brow, bz), brow)
-        z = np.maximum(z, brow)
+        orb = np.zeros(X.shape, bool)                                     # no sockets (Derek: "just remove them")
         z = z - sut * 0.025 + (vn(X * 9 + seed, Y * 9) - 0.5) * 0.02
         m = (z > H) & (z > LEVEL) & ~orb
         H2 = np.where(orb, np.minimum(H, LEVEL - 0.4), np.where(m, z, H))
