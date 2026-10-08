@@ -108,7 +108,28 @@ def gable_trim(tag, x, half, eave_z, ridge_z, snapped=False, front=True):
     """the gable's face and its serpent: the gilded na ban, the lamyong bargeboards with their bai raka teeth, the
     hang hong heads curling up at the eaves, and the chofa at the peak"""
     dx = 0.1 if front else -0.1
-    P.poly(tag + "_naban", [(x - dx, -half * 0.8, eave_z), (x - dx, half * 0.8, eave_z), (x - dx, 0.0, ridge_z - 0.2)], [(0, 1, 2)], "gold", 0.08)
+    # the na ban: a weathered board face, carved in relief (chapter 09: carved and gilded): a raised border inside its
+    # edges, a medallion at its heart and kanok flame scrolls round it; the gilt survives only in the carving's hollows
+    P.poly(tag + "_naban", [(x - dx, -half * 0.8, eave_z), (x - dx, half * 0.8, eave_z), (x - dx, 0.0, ridge_z - 0.2)], [(0, 1, 2)], "wood", 0.08)
+    sx = 1 if front else -1
+    xr = x - dx + sx * 0.06                                       # proud of the face
+    cz = eave_z + (ridge_z - eave_z) * 0.36
+    hb = half * 0.8 - 0.25
+    P.tube(tag + "_border", [(xr, -hb, eave_z + 0.18), (xr, 0.0, ridge_z - 0.55), (xr, hb, eave_z + 0.18), (xr, -hb, eave_z + 0.18)],
+           [0.06, 0.06, 0.06, 0.06], "gold", 5)
+    P.sphere(tag + "_medal", (xr, 0.0, cz), 0.55, "gold", scale=(0.25, 1.0, 1.0))
+    P.sphere(tag + "_medal_in", (xr + sx * 0.05, 0.0, cz), 0.3, "wood", scale=(0.3, 1.0, 1.0))
+    rnd = random.Random(hash(tag) % 1000)
+    for k in range(12):
+        a = math.pi * (0.06 + 0.88 * k / 11)                        # fanned round the medallion, upward
+        r0, r1 = 0.65, 0.65 + rnd.uniform(0.7, 1.3)
+        pts = []
+        for j in range(6):
+            f = j / 5
+            r = r0 + (r1 - r0) * f
+            aa = a + 0.5 * f * (1 if k % 2 else -1)                  # each flame curling its own way
+            pts.append((xr, math.cos(aa) * r * 1.4, cz + math.sin(aa) * r * 0.9))
+        P.tube("%s_kanok%d" % (tag, k), pts, [0.07, 0.07, 0.06, 0.05, 0.035, 0.01], "gold", 5)
     for s in (-1, 1):
         a = (x, s * half, eave_z + 0.1)
         b = (x, 0.0, ridge_z + 0.15)

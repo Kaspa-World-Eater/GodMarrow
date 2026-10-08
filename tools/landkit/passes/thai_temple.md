@@ -114,3 +114,8 @@ Waiting for Derek's go on this brief.
 - The first try used the Hollow Wood's litter generator. It lays its own humus base wherever it runs, so the drifts became hard brown pools: blotches again, only bigger.
 - The fix: a cushion-moss carpet, each clump in two tones with a lit lip, with the maples' leaves placed one by one by world position. They are thick in the drifts and thin out with no edge. The worn way to the stair is earth.
 - **Grade: B-** (it holds). **Next worst:** the floor is too even (broad tone shapes and real hummocks), then the black gable.
+
+**Rules check (2nd in a row without Derek's reply), then pass 6: the gable.**
+- It was a flat triangle with gold kept only in recesses, and it had none, so it read as a black hole.
+- It is now carved relief, real geometry: a raised border, a medallion and twelve kanok flame scrolls fanned round it, on weathered dark wood. The gilt shows on the carving.
+- **Grade: B-, nearly B.** **Next worst:** the floor's evenness (hummocks, broad shapes), then the giant trees and the drizzle.
