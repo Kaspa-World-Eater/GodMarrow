@@ -39,6 +39,7 @@ AX = np.array([1.0, 1.0]) / np.sqrt(2)       # toward the viewer (down the scree
 PERP = np.array([1.0, -1.0]) / np.sqrt(2)    # across (screen right)
 LEVEL = 0.0                                  # the bog's water table
 VALUE_ONLY = False
+LINES = []                                   # several walks (a maze window, worldgen/bog.py); LINE alone otherwise
 
 ws.FOCUS = C.copy()
 for _f in ("FOREST_LIFE", "MIST", "BEAMS", "GRASS", "FERNS", "LITTER_GEN", "LEAF_FALL"):
@@ -91,7 +92,22 @@ def stamp(W, w):
     bed = LEVEL - 0.42 + dH * 1.3 + shelf * 0.5 + (fbm(X * 0.12, Y * 0.12) - 0.5) * 0.4
     for f_ in BED_MODS:
         bed = f_(X, Y, bed)
-    H, part, info = serpent_spine.stamp(X, Y, bed, LINE, LEVEL, seed=5)
+    if LINES:                                                                # a maze window: several walks of the Back
+        H, part, info = bed.copy(), np.zeros(X.shape, int), None
+        for li, ln in enumerate(LINES):
+            H2, p2, inf2 = serpent_spine.stamp(X, Y, H, ln, LEVEL, seed=5 + li)
+            take = p2 > 0
+            H = np.where(take | (H2 > H), H2, H)
+            part = np.where(take, p2, part)
+            if info is None:
+                info = inf2
+            else:
+                for k_ in ("crown", "wet", "cush", "cav", "stain", "expose"):
+                    info[k_] = np.where(take, inf2[k_], info[k_])
+                info["boot"] = np.where(take, inf2["boot"], info["boot"])
+                info["v"] = np.where(np.abs(inf2["v"]) < np.abs(info["v"]), inf2["v"], info["v"])
+    else:
+        H, part, info = serpent_spine.stamp(X, Y, bed, LINE, LEVEL, seed=5)
     DT = [(p_[0], p_[1], r, h, sd) for (p_, r, h, sd) in DROWNED_TREES]
     # the ruins keep off the Back (Derek: "those stone walls will just block the path completely"): a wall that would
     # touch the walk is moved out across the water until it stands clear of it

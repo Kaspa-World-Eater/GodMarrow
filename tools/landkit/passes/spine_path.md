@@ -332,3 +332,16 @@ MASTER_RULES is unchanged.
 - **The ruins** are pushed out across the water until clear of the walk (`clear_of_back`, 7 yd). Ruins 1 now stands apart, with the Back behind it.
 
 **Variants: B+** (nature 1's shelf is still far off).
+
+## Rules check, 2026-10-08: the maze seen from inside (`tools/worldgen/bog_preview.py`)
+
+MASTER_RULES is unchanged.
+- The bog scene now stamps several walks of the Back at once (`bog_scene.LINES`).
+- The preview renders any window of a generated zone: its walks, chamber shelves and set pieces, and its sparse props, at the game's camera.
+- Seed 1 at the hut junction (62.8, 72) renders end to end. Three walks meet at the hut's shelf, the fire pit burns, and reeds stand at the margins.
+
+**Maze window pass 1: C+.**
+- Where a walk crosses a chamber shelf the shelf buries the Back, so the walks lose their bone.
+- The far walks read as pale dithered bars.
+- The hut is huge against this framing.
+- Next: the walk stays bared across a shelf, then check the far walks' scale and haze.
