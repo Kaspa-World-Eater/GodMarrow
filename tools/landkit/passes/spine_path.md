@@ -563,3 +563,14 @@ Pass 3's glints scattered as white speckle and hid the runes; calmed. **Pit: B.*
 Passes:
 1. Dark wood lost on dark mud; the mud read grey like a puddle.
 2. Weathered pale wood, a bigger wheel, black mud with a sheen. **B-.** The wheel is thin at this distance.
+
+## The maze places the landmark and the islands (Derek: "Go for it", 2026-10-08)
+
+`worldgen/bog.py`:
+- **The pit of offering** goes in the largest open water (the point farthest from any land, at least 11 yd clear), ringed by a coil of the Back (nearly closed, 10.3 yd round), the coil's open end joined to the nearest walk by a walk of the Back.
+- **Three to five islands** go out in the water (5.5 to 14 yd from land, clear of every chamber), each reached by its own board causeway from the nearest walk; ruined huts and sucking mires in turn.
+- **The Vein-Worms' ground** joins the chamber kinds (at most two a zone).
+
+Seeds 1 to 3: 15 to 16 places each, including the pit and four islands; 7 to 9 causeways.
+
+`bog_preview.py` stamps every kind. Seed 2's window at its pit (145, 60) renders the coil, a causeway and the obsidian platform with its glow, all from the generator. **Maze: B+.**

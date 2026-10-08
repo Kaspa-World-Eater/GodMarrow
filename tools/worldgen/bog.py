@@ -23,7 +23,7 @@ import json
 import numpy as np
 
 W_ZONE, H_ZONE = 164, 152
-KINDS = [("nature", 0.4), ("ruins", 0.22), ("hut", 0.18), ("socket", 0.2)]
+KINDS = [("nature", 0.34), ("ruins", 0.2), ("hut", 0.16), ("socket", 0.16), ("worms", 0.14)]
 
 
 def blue_noise(rng, n, spacing, w, h, margin, avoid=()):
@@ -78,7 +78,7 @@ def generate(seed):
         if i == far:
             kinds.append("skull")
         else:
-            cap = dict(hut=2, socket=2, ruins=3)                            # the set pieces stay rare in a zone
+            cap = dict(hut=2, socket=2, ruins=3, worms=2)                   # the set pieces stay rare in a zone
             r = rng.random()
             acc = 0
             pick = "nature"
@@ -148,24 +148,103 @@ def generate(seed):
         kind = "causeway" if r_ < 0.35 else ("rib" if r_ < 0.7 else "back")   # rib running out over the water, or the Back
         wd = np.full(len(wd), 1.6 if kind == "causeway" else 1.3) if kind != "back" else wd * np.linspace(1, 0.6, len(wd))
         walks.append(dict(a=i, b=-1, pts=pts, width=wd, spur=True, kind=kind))
-    # the land: a grid at 0.5 yd; the Back and the shelves; the rest water
     res = 0.5
     gw, gh = int(W_ZONE / res), int(H_ZONE / res)
     yy, xx = np.mgrid[0:gh, 0:gw] * res
-    land = np.zeros((gh, gw), np.uint8)                                     # 0 water, 1 shelf, 2 back
-    for nd_ in nodes:
-        if nd_["kind"] == "exit":
-            continue
-        c, r = nd_["p"], nd_["r"]
-        ang = np.arctan2(yy - c[1], xx - c[0])
-        rr = r * (1 + 0.18 * np.sin(ang * 3 + c[0]) + 0.1 * np.sin(ang * 5 + c[1]))
-        land[np.hypot(xx - c[0], yy - c[1]) < rr] = 1
-    for wk in walks:
-        for p, w_ in zip(wk["pts"][::2], wk["width"][::2]):
-            m = np.hypot(xx - p[0], yy - p[1]) < w_ / 2
-            land[m] = {"causeway": 3, "rib": 4}.get(wk["kind"], 2)
-    # the balance: few things in the water, each with room round it
     from scipy import ndimage as nd
+
+    def raster():
+        """the land: a grid at 0.5 yd; the Back and the shelves; the rest water"""
+        land = np.zeros((gh, gw), np.uint8)                                 # 0 water, 1 shelf, 2 back, 3 boards, 4 rib
+        for nd_ in nodes:
+            if nd_["kind"] == "exit":
+                continue
+            c, r = nd_["p"], nd_["r"]
+            ang = np.arctan2(yy - c[1], xx - c[0])
+            rr = r * (1 + 0.18 * np.sin(ang * 3 + c[0]) + 0.1 * np.sin(ang * 5 + c[1]))
+            land[np.hypot(xx - c[0], yy - c[1]) < rr] = 1
+        for wk in walks:
+            for p, w_ in zip(wk["pts"][::2], wk["width"][::2]):
+                m = np.hypot(xx - p[0], yy - p[1]) < w_ / 2
+                land[m] = {"causeway": 3, "rib": 4}.get(wk["kind"], 2)
+        return land
+
+    def board(a, b, rng_):
+        """a causeway from a to b, twisting a little, 1.6 yd"""
+        d_ = b - a
+        L_ = np.hypot(*d_)
+        n_ = np.array([-d_[1], d_[0]]) / max(L_, 1e-6)
+        t_ = np.linspace(0, 1, max(int(L_ / 0.5), 8))
+        off = np.sin(t_ * np.pi * rng_.uniform(1, 2.5) + rng_.uniform(0, 6)) * rng_.uniform(0.8, 2.2) * np.sin(np.pi * t_)
+        pts_ = a[None] + d_[None] * t_[:, None] + n_[None] * off[:, None]
+        return pts_, np.full(len(t_), 1.6)
+
+    # THE PIT OF OFFERING (Derek): in the largest open water, the landmark ringed by a coil of the Back, joined to the maze
+    land = raster()
+    water = land == 0
+    dist = nd.distance_transform_edt(water) * res
+    margin = (xx > 16) & (xx < W_ZONE - 16) & (yy > 16) & (yy < H_ZONE - 16)
+    dd = np.where(margin, dist, 0)
+    k_ = int(np.argmax(dd))
+    pit = None
+    if dd.flat[k_] >= 11.0:
+        pc = np.array([xx.flat[k_], yy.flat[k_]])
+        a0 = rng.uniform(0, 2 * np.pi)
+        a = np.linspace(a0, a0 + 2 * np.pi * 0.88, 700)
+        rad = 10.3 - np.linspace(0, 0.9, len(a))
+        coil = np.stack([pc[0] + np.cos(a) * rad, pc[1] + np.sin(a) * rad], 1)
+        walks.append(dict(a=-2, b=-2, pts=coil, width=np.full(len(coil), 3.6), spur=False, kind="back"))
+        # the coil joins the maze: a walk of the Back from the coil's open end to the nearest walk or chamber
+        tail = coil[-1]
+        best = None
+        for wk in walks[:-1]:
+            if wk["kind"] != "back":
+                continue
+            dd_ = np.hypot(*(wk["pts"] - tail).T)
+            q = int(np.argmin(dd_))
+            if best is None or dd_[q] < best[0]:
+                best = (dd_[q], wk["pts"][q])
+        if best is not None:
+            pts_, wd_ = walk(rng, tail, best[1], 0.0, 0.0)
+            walks.append(dict(a=-2, b=-1, pts=pts_, width=wd_, spur=False, kind="back"))
+        nodes.append(dict(p=pc, kind="pit", r=8.4))
+        pit = pc
+    # ISLANDS (Derek: "board walks ... shooting off to islands of ruined huts or swampy pits"): a few humps out in the
+    # water off the walks, each reached by its own board causeway; ruined huts and sucking mires in turn
+    land = raster()
+    water = land == 0
+    dist = nd.distance_transform_edt(water) * res
+    n_isl = int(rng.integers(3, 6))
+    isl_k = 0
+    for _ in range(600):
+        if isl_k >= n_isl:
+            break
+        p_ = np.array([rng.uniform(10, W_ZONE - 10), rng.uniform(10, H_ZONE - 10)])
+        gi, gj = int(p_[1] / res), int(p_[0] / res)
+        if not water[gi, gj] or dist[gi, gj] < 5.5 or dist[gi, gj] > 14:
+            continue
+        if any(np.hypot(*(p_ - n["p"])) < n["r"] + 9 for n in nodes):
+            continue
+        best = None                                                         # the nearest walk, where the boards leave it
+        for wk in walks:
+            if wk["kind"] == "rib":
+                continue
+            dd_ = np.hypot(*(wk["pts"] - p_).T)
+            q = int(np.argmin(dd_))
+            if best is None or dd_[q] < best[0]:
+                best = (dd_[q], wk["pts"][q])
+        if best is None or best[0] > 18:
+            continue
+        kind = "island_hut" if isl_k % 2 == 0 else "island_mire"
+        r_isl = rng.uniform(2.8, 3.6)
+        start = best[1]
+        end = p_ - (p_ - start) / np.linalg.norm(p_ - start) * (r_isl * 0.8)
+        pts_, wd_ = board(start, end, rng)
+        walks.append(dict(a=-3, b=len(nodes), pts=pts_, width=wd_, spur=True, kind="causeway"))
+        nodes.append(dict(p=p_, kind=kind, r=r_isl))
+        isl_k += 1
+    land = raster()
+    # the balance: few things in the water, each with room round it
     water = land == 0
     dist = nd.distance_transform_edt(water) * res
     props = []
@@ -213,7 +292,8 @@ def draw_map(Z, out):
     im = Image.fromarray(col).resize((land.shape[1] * S // 1, land.shape[0] * S // 1), Image.NEAREST)
     d = ImageDraw.Draw(im)
     k = S / Z["res"]
-    cc = dict(nature=(110, 140, 70), ruins=(150, 160, 150), hut=(190, 150, 80), socket=(200, 200, 190), skull=(230, 220, 190), exit=(220, 80, 60))
+    cc = dict(nature=(110, 140, 70), ruins=(150, 160, 150), hut=(190, 150, 80), socket=(200, 200, 190), skull=(230, 220, 190),
+              exit=(220, 80, 60), pit=(200, 40, 40), island_hut=(190, 150, 80), island_mire=(120, 100, 80), worms=(170, 60, 60))
     for n in Z["nodes"]:
         x, y = n["p"] * k
         d.ellipse((x - 9, y - 9, x + 9, y + 9), outline=cc[n["kind"]], width=3)

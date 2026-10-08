@@ -37,7 +37,8 @@ def render(seed, cx, cy, out):
         if n["kind"] == "exit" or not near(n["p"], 24):
             continue
         p = n["p"] + OFF
-        mods.append(bc.shelf(p[0], p[1], n["r"], rise=0.16, seed=int(p[0]) % 97))
+        if n["kind"] != "pit":                                          # the pit stands in open water, no shelf
+            mods.append(bc.shelf(p[0], p[1], n["r"], rise=0.16, seed=int(p[0]) % 97))
         if n["kind"] == "hut":
             pit = p + bs.AX * 2.6 + bs.PERP * 0.6
             stamps.append(bc.straw_hut(p[0], p[1], pit_at=pit))
@@ -53,6 +54,20 @@ def render(seed, cx, cy, out):
         elif n["kind"] == "ruins":
             stamps.append(bc.ruins(p[0], p[1], 0.75))
             paints.append(bc.ruins_paint)
+        elif n["kind"] == "worms":
+            stamps.append(bc.worm_ground(p[0], p[1], seed=int(p[0]) % 97))
+            paints.append(bc.worm_paint)
+        elif n["kind"] == "pit":
+            stamps.append(bc.sacrifice_pit(p[0], p[1], seed=int(p[1]) % 97))
+            paints.append(bc.pit_paint)
+            living += [bc.pit_tendrils, bc.pit_racks]
+        elif n["kind"] == "island_hut":
+            stamps.append(bc.straw_hut(p[0], p[1], R=1.6, pit_at=p + bs.AX * 1.8, seed=int(p[0]) % 7 + 7, ruined=True))
+            paints.append(bc.hut_paint)
+        elif n["kind"] == "island_mire":
+            stamps.append(bc.mire_pit(p[0], p[1], seed=int(p[1]) % 97))
+            paints.append(bc.mire_paint)
+            living.append(bc.mire_things)
     bs.BED_MODS[:] = mods
     bs.EXTRA_STAMPS[:] = stamps
     bs.EXTRA_PAINT[:] = paints
