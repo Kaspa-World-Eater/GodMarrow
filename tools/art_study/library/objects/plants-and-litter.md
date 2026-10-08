@@ -78,7 +78,7 @@ scene's tufts in the gap), `FERNS` (its ferns in the damp), `FOREST_LIFE` (falle
 - **Form first, leaves drawn:** STUDY round 12's litter read once the drifts' light and shade were a smooth value and the
   leaves only nudged it (±0.04), and once leaves were drawn stamps with spacing.
 - **Neighbours close in value:** humus one step under the leaves; contrast saved for form and focus.
-- **Calming the floor** (the glade's last round): matted leaves in broad patches near the peat's hue; "no green on the
+- ~~**Calming the floor**~~ **OVERTURNED by Derek, 2026-10-08** ("you lost the life, the ground is 35% too barren now, looks more flat because of the vast swathes of brown, lack of litter"). Never calm a floor into broad brown patches; `litter_ground.py` now builds every leaf and twig as real height, leaves leaning by species in patches, drifts and humus a yard or two across, worn ground near bare, green moss back. The old note, kept as history: (the glade's last round): matted leaves in broad patches near the peat's hue; "no green on the
   floor" for the grim old wood.
 
 ## What failed, and why (traps)
