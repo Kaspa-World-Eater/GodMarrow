@@ -237,3 +237,15 @@ All are at the scene's standard and each gets its passes. **The path twists and 
 - The skull's hero stands on the Back at the skull's rear.
 
 Grades: nature **B-**, hut **B-**, socket **B-**, skull **B-**, ruins **B-**, the main walk **B**.
+
+**Pass 5, skull and socket:**
+- **Skull:** the orbits and nostril pits now hold water (they had been painted as bone below the water line); paler crowns. **B-.**
+- **Socket:** the brow is thick and high, the rim broken right through in three places, its height uneven (no longer a tyre); the ring is a little clearer. **B-.**
+
+**The zone maze** (`tools/worldgen/bog.py`):
+- 8 to 12 chambers by blue noise; the skull once, at the farthest point from the arrival; huts and sockets at most two each.
+- A spanning tree plus 3 loops plus 4 or 5 dead-end spurs, with no crossings.
+- Each walk twists (now and then a hairpin), pinching and swelling between 3 and 5 yd; about half of it is tight.
+- 28 sparse props in the water, near the walks.
+- Seeds 1 to 3: about 500 to 600 yd of Back; 19% of the zone walkable.
+- **B** as a plan. It is not yet in the game format.

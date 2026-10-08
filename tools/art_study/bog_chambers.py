@@ -223,15 +223,18 @@ def eye_socket(cx, cy, rx=4.2, ry=3.2, ang=0.4, seed=7):
         v = (-(X - cx) * sa + (Y - cy) * ca) / ry
         r = np.hypot(u, v) + (fbm(X * 0.8 + seed, Y * 0.8) - 0.5) * 0.08
         th = np.arctan2(v, u)
-        brow = np.clip(np.cos(th - 1.9), 0, 1)                             # the brow: the rim's thick high side
-        rim_w = 0.12 + 0.1 * brow
-        rim_h = LEVEL + 0.45 + 0.9 * brow + (vn(th * 5 + seed, 1.0) - 0.5) * 0.25
+        brow = np.clip(np.cos(th - 1.9), 0, 1) ** 1.5                      # the brow: the rim's thick high side
+        rim_w = 0.08 + 0.16 * brow + (vn(th * 4 + seed, 2.0) - 0.5) * 0.05
+        rim_h = LEVEL + 0.25 + 1.4 * brow + (vn(th * 5 + seed, 1.0) - 0.5) * 0.4
         prof = np.clip(1 - ((r - 1.0) / rim_w) ** 2, 0, 1)
-        notch = (vn(th * 3.3 + seed, 4.0) > 0.7)                            # broken out of the rim in places
+        gapc = [0.4 + seed * 0.1, 3.6 + seed * 0.05, 5.1]                    # broken right through in three places
+        notch = np.zeros(th.shape, bool)
+        for g_ in gapc:
+            notch |= np.abs(((th - g_ + np.pi) % (2 * np.pi)) - np.pi) < 0.12 + 0.05 * vn(r * 9, g_)
         rim = rim_h * np.sqrt(prof) + (1 - np.sqrt(prof)) * H
         crack = np.abs(np.sin(th * 23 + vn(th * 3, r * 4) * 3)) < 0.06
         rim = rim - crack * 0.06 + (vn(X * 14 + seed, Y * 14) - 0.5) * 0.04 + (vn(X * 40, Y * 40) - 0.5) * 0.015
-        m = (prof > 0) & ~(notch & (prof < 0.85)) & (rim > H)
+        m = (prof > 0) & ~notch & (rim > H)
         H2 = np.where(m, rim, H)
         part[m] = 50
         bowl = r < 1.0 - rim_w * 0.6
@@ -267,7 +270,7 @@ def socket_eye(img, w, W, px, py, pz, L, T=0.0):
     wob = (vn(px * 3 + T * 2, py * 9) - 0.5) * 0.08                          # seen through moving water
     ring = water & (np.abs(r + wob - 0.75) < 0.1) & (vn(np.arctan2(v, u) * 5 + 3, r * 4) > 0.42)   # broken, barely there
     pup = water & (r + wob < 0.3)
-    img[ring] = img[ring] * 0.75 + np.array([0.13, 0.14, 0.11]) * br
+    img[ring] = img[ring] * 0.65 + np.array([0.18, 0.19, 0.15]) * br
     img[pup] = img[pup] * 0.7
     return img
 
@@ -299,8 +302,8 @@ def serpent_skull(cx, cy, ang, length=9.0, width=5.2, height=0.75, seed=11):
         z = z + np.clip(u - 0.7, 0, None) * 0.5                               # the snout lifts a little at its tip
         sut = ((np.abs(np.sin(u * 7 + np.sin(q * 9) * 0.5)) < 0.05) | (np.abs(q - np.sin(u * 14) * 0.04) < 0.03)) & inside
         z = z - sut * 0.04 + (vn(X * 18 + seed, Y * 18) - 0.5) * 0.015
-        m = inside & (z > H)
-        H2 = np.where(m, z, H)
+        m = inside & (z > H) & (z > LEVEL)                               # below the water line the hollows hold water
+        H2 = np.where(inside & (z <= LEVEL), np.minimum(H, LEVEL - 0.3), np.where(m, z, H))
         part[m] = 52
         part[m & sut] = 53
         # the teeth: a row along the jaw's edge at the water line, small, curved back, many (a serpent's are)
@@ -332,8 +335,8 @@ def serpent_skull(cx, cy, ang, length=9.0, width=5.2, height=0.75, seed=11):
 def skull_paint(col, W, px, py, pz, L, vv, gl, st):
     m = (st == 52) | (st == 53)
     if m.any():
-        crest = (pz - LEVEL) > 0.45
-        bc = _bone_col(vv, px, py, crest)
+        crest = (pz - LEVEL) > 0.3
+        bc = _bone_col(vv * 1.05, px, py, crest)
         bc = np.where((st == 53)[..., None], bc * 0.55, bc)
         bc = np.where(((pz - LEVEL) < 0.12)[..., None], bs._r(bs.R_ALGAE, vv * 0.95), bc)
         col = np.where(m[..., None], bc, col)
