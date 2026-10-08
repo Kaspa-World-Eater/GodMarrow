@@ -540,3 +540,18 @@ Passes:
 2. Turned to face the camera and made larger. **B-.**
 
 Next: the swampy pit island; islands in the maze generator; and the pit of offering's moss, flooded edge and outer wall.
+
+## Derek on the pit of offering: C- (2026-10-08)
+
+"Refine the textures and depths of the stone. Add some objects like forgotten broken metal racks, runes carved into the stone. Make the stone obsidian. Have a pulsating red glow emanating from the hole out of sight. Blood stains like a thousand people were sacrificed here once and their blood channeled gutters into the hole to feed the god."
+
+**Derek's ruling over MASTER_RULES 6 ("no red light"):** this landmark's pit glows red, pulsing, from out of sight below. Recorded as his ruling for the pit; the rest of the bog keeps the rule.
+
+**The pit, passes 3 to 5, to Derek's C- notes:**
+- **Obsidian:** near black with a violet-green depth; rare broken glints where a face turns fully to the moon; the stone breaks in shells (conchoidal scars of real height, rippled); block edges chipped sharp.
+- **Runes:** a band of glyphs cut round the outer edge of each ring (two or three strokes each, every one its own), filled with dried blood that catches the light.
+- **The blood of a thousand:** crusted black-red over the inner rings, thick in every gutter, run down the risers and the outer wall in tongues, fresher in places.
+- **Racks:** four broken iron racks on the outer ring, rusted, one toppled across the stone, chains hanging.
+- **The glow** (Derek's ruling over "no red light"): red from out of sight below, pulsing, lighting the throat's wall the deeper it goes, warming the lip; a faint red haze above the throat.
+
+Pass 3's glints scattered as white speckle and hid the runes; calmed. **Pit: B.** The throat's coursed wall reads a little like flames.

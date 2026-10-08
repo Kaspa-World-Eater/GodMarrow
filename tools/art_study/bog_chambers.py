@@ -874,6 +874,28 @@ def sacrifice_pit(cx, cy, R0=8.0, seed=61, tilt_dir=0.6):
         z = z - gone * 0.3
         joint = (bf < 0.05) | (np.abs(r - inner) < 0.06) | (np.abs(r - outer) < 0.06)
         z = z - joint * 0.05
+        # obsidian breaks in shells: each block's face carries a conchoidal scar or two, rippled rings round a strike
+        sc_u = (hs(bi, k_, 4) - 0.5) * 0.6 + 0.5
+        sc_r = inner + (outer - inner) * (0.3 + 0.4 * hs(bi, k_, 5))
+        sc_d = np.hypot((bf - sc_u) * 2 * np.pi * r / np.maximum(n_blk, 1), r - sc_r)
+        shell = (hs(bi, k_, 6) < 0.55) & (sc_d < 0.45)
+        z = z - shell * (0.06 * (1 - sc_d / 0.45) + 0.012 * np.sin(sc_d * 38))
+        chip = (vn(X * 11 + seed, Y * 11) > 0.72) & ((bf < 0.14) | (bf > 0.86))   # sharp chips off the block edges
+        z = z - chip * 0.05
+        # the runes: a band of glyphs cut round the outer edge of each ring, every glyph its own two or three strokes
+        rb0, rb1 = outer - 0.8, outer - 0.2
+        band = (r > rb0) & (r < rb1) & (tier_i >= 0)
+        cw = 0.5
+        ga = (th + np.pi) * r / cw
+        gi_ = np.floor(ga)
+        a_l = ga - gi_
+        b_l = (r - rb0) / (rb1 - rb0)
+        g1, g2, g3 = hs(gi_, k_, 7), hs(gi_, k_, 8), hs(gi_, k_, 9)
+        strokes = ((np.abs(a_l - 0.5) < 0.09) & (g1 < 0.6)) | ((np.abs(b_l - 0.5) < 0.1) & (g2 < 0.5)) \
+            | ((np.abs(a_l - b_l) < 0.1) & (g3 < 0.35)) | ((np.abs(a_l + b_l - 1) < 0.1) & (g3 > 0.65)) \
+            | ((np.abs(np.hypot(a_l - 0.5, b_l - 0.5) - 0.3) < 0.08) & (g2 > 0.8))
+        rune = band & strokes & (a_l > 0.12) & (a_l < 0.88) & (b_l > 0.08) & (b_l < 0.92)
+        z = z - rune * 0.05
         # the gutters, cut across the rings toward the pit
         gut = np.zeros(X.shape, bool)
         for ga in gut_a:
@@ -912,46 +934,133 @@ def sacrifice_pit(cx, cy, R0=8.0, seed=61, tilt_dir=0.6):
             H2 = np.where(sm, np.maximum(H2, sz_), H2)
             part[sm] = 85
         W["pit"] = dict(c=(cx, cy), R0=R0, pit_r=pit_r, gut=gut_a, alt=alt_a, td=td)
+        W["pit_rune"] = rune & on
+        W["pit_shell"] = shell & on
         return H2, part
     return st
 
 
+R_OBS = None
+
+
 def pit_paint(col, W, px, py, pz, L, vv, gl, st):
+    """OBSIDIAN (Derek: "make the stone obsidian"; chapter 2: black volcanic glass, conchoidal fractures, razor edges,
+    glints): near black with a violet-green depth, its faces dark until they turn to the moon and flash in sharp broken
+    glints; THE BLOOD OF A THOUSAND (Derek: "blood stains like a thousand people were sacrificed here once and their
+    blood channeled gutters into the hole to feed the god"): crusted black-red over the inner rings, thick in every
+    gutter, run down every riser into the throat, filling the runes; THE GLOW (Derek's ruling): a red light from out of
+    sight below, pulsing, lighting the throat's wall and the lip from beneath"""
     if "pit" not in W:
         return col
     m = (st >= 80) & (st <= 86)
     if not m.any():
         return col
     P = W["pit"]
+    T = W.get("T", 0.0)
     dx, dy = px - P["c"][0], py - P["c"][1]
     r = np.hypot(dx, dy)
     th = np.arctan2(dy, dx)
     wetz = pz - LEVEL
-    bid = np.floor((th + np.pi) * 9) + np.floor(r * 1.4) * 31
-    bv = ((np.sin(bid * 12.9) * 4375.5) % 1.0 - 0.5) * 0.14
-    stone = bs._r(bs.R_STONE, vv * 0.92 + bv + (vn(px * 4, py * 4) - 0.5) * 0.06)
-    stone = np.where((wetz < 0.12)[..., None], bs._r(bs.R_ALGAE, vv * 0.95), stone)
-    mossy = (vn(px * 1.6 + 3, py * 1.6) > 0.6) & (r > P["R0"] * 0.55)       # moss creeping in over the outer rings
-    stone = np.where(mossy[..., None], bs._r(bs.R_MOSS, vv * 0.9 + (vn(px * 11, py * 11) - 0.5) * 0.1), stone)
-    # the old blood: stained into the gutters and down the inner rings toward the pit, thickest at the lip
-    near_pit = np.clip(1 - (r - P["pit_r"]) / (P["R0"] * 0.45), 0, 1)
+    # obsidian: a short dark ramp, violet-green in its depth; the moon catches the faces turned to it in glints
+    obs = np.array([0.035, 0.03, 0.045])[None, None] + vv[..., None] * np.array([0.11, 0.115, 0.14])
+    tint = (vn(px * 0.8 + 3, py * 0.8) - 0.5)[..., None] * np.array([-0.01, 0.015, 0.012])
+    obs = obs + tint
+    glint = (L["moon"] > 0.9) & (vn(px * 7, py * 3) > 0.8)                 # rare, broken dabs of moon on glass
+    obs = np.where(glint[..., None], obs * 0.5 + np.array([0.42, 0.44, 0.52]) * 0.5, obs)
+    shell = ws.look(W, W["pit_shell"], px, py)
+    obs = np.where((shell & (L["moon"] > 0.7))[..., None], obs * 1.2 + 0.015, obs)   # the shell ripples catch light
+    obs = np.where((wetz < 0.1)[..., None], obs * 0.7 + bs._r(bs.R_ALGAE, vv * 0.9) * 0.3, obs)
+    # the blood of a thousand: soaked into the inner rings, crusted thick in the gutters, run down into the throat
+    near_pit = np.clip(1 - (r - P["pit_r"]) / (P["R0"] * 0.7), 0, 1)
     gut_k = np.zeros(r.shape)
     for ga in P["gut"]:
-        gut_k = np.maximum(gut_k, np.clip(1 - np.abs(np.sin(th - ga)) * r / 0.5, 0, 1) * (np.cos(th - ga) > 0))
-    gore = np.clip(near_pit * 0.8 + gut_k * 0.9 + (vn(px * 2.5, py * 2.5) - 0.5) * 0.5 - 0.35, 0, 1)
-    blood = np.array([0.15, 0.03, 0.035]) * (0.4 + vv[..., None])
-    stone = np.where((gore > 0.25)[..., None], stone * (1 - gore[..., None] * 0.7) + blood * gore[..., None], stone)
+        gut_k = np.maximum(gut_k, np.clip(1 - np.abs(np.sin(th - ga)) * r / 0.9, 0, 1) * (np.cos(th - ga) > 0))
+    flow = (vn(th * 14 + 5, r * 0.6) - 0.5) * 0.8 + (vn(px * 3, py * 3) - 0.5) * 0.4   # runs down the risers in tongues
+    soak = np.clip(near_pit * 1.1 + gut_k * 1.2 + flow - 0.3, 0, 1)
+    crust = np.array([0.11, 0.02, 0.025]) * (0.45 + vv[..., None] * 0.9)
+    fresh = (vn(px * 6, py * 6) > 0.7) & (soak > 0.6)
+    crust = np.where(fresh[..., None], np.array([0.2, 0.03, 0.035]) * (0.5 + vv[..., None]), crust)
+    stone = np.where((soak > 0.15)[..., None], obs * (1 - soak[..., None] * 0.85) + crust * soak[..., None], obs)
+    rune = ws.look(W, W["pit_rune"], px, py)
+    stone = np.where(rune[..., None], np.array([0.26, 0.05, 0.05]) * (0.55 + vv[..., None] * 0.8), stone)   # runes, filled with
+                                                                             # dried blood that catches the light
     col = np.where(((st == 80) | (st == 85))[..., None], stone, col)
-    col = np.where((st == 81)[..., None], stone * 0.55, col)
-    col = np.where((st == 83)[..., None], np.array([0.09, 0.02, 0.025]) * (0.5 + vv[..., None]), col)     # the gutters
-    alt = bs._r(bs.R_STONE, vv * 0.98 + 0.06) * (1 - (gore[..., None] > 0.1) * 0.3)
+    col = np.where((st == 81)[..., None], stone * 0.5, col)
+    col = np.where((st == 83)[..., None], np.array([0.08, 0.012, 0.016]) * (0.6 + vv[..., None]), col)   # gutters full
+    alt = obs * 0.6 + crust * 0.6
     col = np.where((st == 84)[..., None], alt, col)
-    # the pit's wall, coursed, going down into the dark; the abyss itself black
+    # the glow from below: out of sight, pulsing slowly, lighting the throat's wall and the lip from beneath
+    pulse = 0.7 + 0.3 * np.sin(2 * np.pi * T * 2) * (0.6 + 0.4 * np.sin(2 * np.pi * T * 3 + 1))
     depth_k = np.clip((pz - (LEVEL - 2.5)) / 2.8, 0, 1)
-    wallc = bs._r(bs.R_STONE, vv * 0.7) * depth_k[..., None] * (1 - (np.abs(np.sin(pz * 9)) < 0.15)[..., None] * 0.4)
+    wallc = obs * 0.6 * (1 - (np.abs(np.sin(pz * 9)) < 0.15)[..., None] * 0.4)
+    glow_w = np.clip(1 - depth_k, 0, 1) ** 0.7 * pulse                     # stronger the deeper the wall goes
+    wallc = wallc * (1 - glow_w[..., None] * 0.5) + np.array([0.55, 0.06, 0.04]) * glow_w[..., None] * 0.75
     col = np.where((st == 86)[..., None], wallc, col)
-    col = np.where((st == 82)[..., None], np.array([0.006, 0.005, 0.007]), col)
+    col = np.where((st == 82)[..., None], np.array([0.09, 0.008, 0.006]) * (0.6 + 0.6 * pulse), col)   # the deep: red-black
+    lip = (r < P["pit_r"] * 1.5) & ((st == 80) | (st == 83) | (st == 81))
+    lk = np.clip(1 - (r - P["pit_r"]) / (P["pit_r"] * 0.5), 0, 1) * pulse
+    col = np.where(lip[..., None], col + np.array([0.18, 0.02, 0.01]) * lk[..., None], col)
     return col
+
+
+def pit_racks(img, w, W, px, py, pz, L, T=0.0):
+    """forgotten broken metal racks (Derek): iron frames on the outer ring where the offered were held, rusted, two
+    uprights and their bars, most broken, one toppled across the stone, chains hanging; and the red glow's haze rising
+    out of the throat, faint, pulsing (Derek's ruling)"""
+    import bog_plants
+    W["T"] = T
+    if "pit" not in W:
+        return img
+    P = W["pit"]
+    water = ws.look(W, W["bog_water"], px, py) & (L["tg"] == 0)
+    zb = np.full(img.shape[:2], -1e9)
+    dep = px + py
+    RUST, RUST_L = np.array([0.16, 0.08, 0.05]), np.array([0.32, 0.16, 0.08])
+    rr = np.random.default_rng(91)
+    for k in range(4):
+        a_ = P["alt"] + 0.9 + k * 1.3 + rr.uniform(-0.2, 0.2)
+        rr_r = P["R0"] * (0.7 + 0.12 * rr.random())
+        c = np.array([P["c"][0] + np.cos(a_) * rr_r, P["c"][1] + np.sin(a_) * rr_r])
+        g = float(ws.look(W, W["H"], np.array(c[0]), np.array(c[1])))
+        tang = np.array([-np.sin(a_), np.cos(a_), 0.0])
+        toppled = k == 2
+        hgt = rr.uniform(1.4, 2.1)
+        lean = np.array([np.cos(a_), np.sin(a_), 0.0]) * rr.uniform(-0.3, 0.3)
+        tops = []
+        for sg in (-1, 1):
+            b0 = np.array([c[0], c[1], g]) + tang * 0.55 * sg
+            if toppled:                                                     # fallen flat across the stone
+                b1 = b0 + np.array([np.cos(a_), np.sin(a_), 0.0]) * hgt + np.array([0, 0, 0.05])
+            else:
+                broken = rr.random() < 0.4
+                b1 = b0 + np.array([0, 0, hgt * (0.45 if broken else 1.0)]) + lean
+            for off in (0.0, 0.03):
+                bog_plants._stroke(img, zb, dep, ws.to_px, b0 + np.array([off, -off, 0]), b1 + np.array([off, -off, 0]),
+                                   RUST, RUST_L, 0.7, water, LEVEL)
+            tops.append(b1)
+        for f in (0.35, 0.92):                                              # the bars across, one gone
+            if rr.random() < 0.75:
+                p0 = np.array([c[0], c[1], g]) - tang * 0.55
+                q0 = np.array([c[0], c[1], g]) + tang * 0.55
+                pa = p0 + (tops[0] - p0) * f
+                qa = q0 + (tops[1] - q0) * f
+                bog_plants._stroke(img, zb, dep, ws.to_px, pa, qa, RUST, RUST_L, 0.7, water, LEVEL)
+                if not toppled and rr.random() < 0.6:                        # a chain hanging from it
+                    h0 = pa + (qa - pa) * rr.uniform(0.3, 0.7)
+                    for q in range(int(rr.integers(5, 9))):
+                        lnk = h0 - np.array([0, 0, 0.09 * q])
+                        bog_plants._stroke(img, zb, dep, ws.to_px, lnk, lnk - np.array([0.02, 0, 0.06]),
+                                           RUST * 0.8, RUST_L * 0.8, 0.6, water, LEVEL, n=3)
+    # the haze of the glow above the throat: faint, stepped, pulsing; dithered at its edges
+    GH, GW = img.shape[:2]
+    pulse = 0.7 + 0.3 * np.sin(2 * np.pi * T * 2)
+    cx, cy = ws.to_px((P["c"][0], P["c"][1], LEVEL + 0.4))
+    ys, xs = np.mgrid[0:GH, 0:GW]
+    d = np.hypot((xs - cx) / (P["pit_r"] * 18 * 1.6), (ys - cy) / (P["pit_r"] * 9 * 1.8))
+    bay = ws.tw.B4[(ys % 4), (xs % 4)]
+    a = np.where(d < 0.6, 0.1, np.where(d < 1.0, 0.05 * (bay > 0.5), 0.0)) * pulse
+    img = img * (1 - a[..., None]) + np.array([0.5, 0.05, 0.03]) * a[..., None]
+    return img
 
 
 def pit_tendrils(img, w, W, px, py, pz, L, T=0.0):
@@ -995,7 +1104,7 @@ def scene_pit():
     bs.CAUSEWAYS[:], bs.RIBWALKS[:] = [], []
     bs.EXTRA_STAMPS[:] = [sacrifice_pit(pc[0], pc[1], seed=61 + VARIANT, tilt_dir=0.6 + VARIANT)]
     bs.EXTRA_PAINT[:] = [pit_paint]
-    bs.EXTRA_LIVING[:] = [pit_tendrils]
+    bs.EXTRA_LIVING[:] = [pit_tendrils, pit_racks]
     ws.FOCUS = pc + AX * 1.0
     ws.HERO = pc + AX * 5.6 - PERP * 2.0
 
