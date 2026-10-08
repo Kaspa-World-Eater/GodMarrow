@@ -55,6 +55,7 @@ PAINTERS = {}            # kind -> f(img, m, v, n, px, py, pz, o, W, L): paint a
 LIGHTS = []              # (x, y, z, reach): more warm lights (a candle), cast like the lantern
 LIVING = []              # f(img, w, W, px, py, pz, L, T): more living layers, drawn last
 GROUND_LIFE_OK = None    # f(x, y) -> bool: where grass may grow (a ruin keeps its bare ring and its stone clear)
+RIM_EXTRA = ()          # more tags to rim (a scene's own objects above 400, e.g. its trunks)
 RIM = (1.35, (0.025, 0.025, 0.03))   # the moonlit rim on objects: strength and cool lift
 FOREST_LIFE = True       # the wood's own living layers (the leaf fall, falling and skittering leaves, the wisp-fire)
 TRUNK_WARP = None        # an object with to_canon(x, y, z) and normal_back(n, px, py, pz, tag): trunks that taper, swell, wander and twist
@@ -526,7 +527,7 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
     dep = px + py
     lit_side = np.clip(n[..., 0] * SUN[0] + n[..., 1] * SUN[1], 0, 1)
     for k in np.unique(tg):
-        if k == 0 or k >= 400:
+        if k == 0 or (k >= 400 and k not in RIM_EXTRA):
             continue
         mk = tg == k
         edge = mk & ~np.roll(mk, 1, axis=1) & (np.roll(dep, 1, axis=1) < dep - 0.3)

@@ -87,7 +87,8 @@ Older notes disagree with these. The older notes are history; these stand:
 ## Debts found while writing the library (to fix)
 - ~~Several animated terms grew with time instead of cycling~~ (fixed 2026-10-07: each now moves on a small circle
   or a whole number of cycles a loop, so the loop has no seam).
-- The engine's moon rim skips tags of 400 and above, so the Vigil's vein-trees get none.
+- ~~The engine's moon rim skipped tags of 400 and above~~ (fixed 2026-10-07: `wood_scene.RIM_EXTRA` names a scene's own
+  tags to rim; the Vigil's trunks take it).
 - `NORMAL_BLUR` is still above 0 in the engine default (1.0), the Vigil (0.6) and the Gate (0.35).
 - No value-only render switch exists yet for the form test.
 - MASTER_RULES 0.1 and 0.6 still say "domes" for paving; chapter 4's planes supersede them.

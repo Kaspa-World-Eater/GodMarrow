@@ -841,6 +841,7 @@ ws.BUILD_HOOKS[0:0] = [fen_floor, stamp_vein_trees, stamp_stump, stamp_stones, p
 ws.GROUND = fen_paint
 ws.PAINTERS["vstump"] = paint_stump
 ws.PAINTERS["flatstone"] = paint_stone
+ws.RIM_EXTRA = tuple(range(600, 608))                                               # the vein-trees take the moon rim too (wood_pale's soft cool edge)
 ws.PAINTERS["veintree"] = paint_vein
 ws.PAINTERS["veinroot"] = paint_vein
 
