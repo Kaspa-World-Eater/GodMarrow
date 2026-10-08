@@ -1264,10 +1264,10 @@ func _slash_pt(sl: Dictionary, a: float, k: float) -> Vector2:
 		# the overhead: phi runs from over the shoulder (behind, high) to down into the ground ahead
 		var phi := lerpf(1.9, -0.35, a)
 		var R: float = sl["R"] * k
-		var h := Iso.to_screen(sl["dir"] * R * cos(phi)) - Iso.to_screen(Vector2.ZERO)
+		var h := Iso.vec(sl["dir"] * R * cos(phi)) - Iso.vec(Vector2.ZERO)
 		return sl["c"] + h + Vector2(0, -sin(phi) * R * Iso.HX * 0.75 + 44.0 * (1.0 - clampf(sin(phi) + 0.6, 0.0, 1.0)) * 0.0)
 	var ang := lerpf(sl["a0"], sl["a1"], a)
-	return sl["c"] + Iso.to_screen(Vector2(cos(ang), sin(ang)) * sl["R"] * k) - Iso.to_screen(Vector2.ZERO)
+	return sl["c"] + Iso.vec(Vector2(cos(ang), sin(ang)) * sl["R"] * k) - Iso.vec(Vector2.ZERO)
 
 func _tick_slash(dt: float) -> void:
 	for sl in slashes:

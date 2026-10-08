@@ -118,7 +118,7 @@ func _draw() -> void:
 	# Bone Lances: a long straight spear of packed bone (splinters and the Storm's shards are slivers)
 	for sp in book.spears:
 		var c := S(sp["tp"], 8.0)
-		var u: Vector2 = Iso.to_screen(sp["v"].normalized()).normalized()
+		var u: Vector2 = Iso.vec(sp["v"].normalized()).normalized()
 		if sp["small"]:
 			sliver(c - u * 9.0, c + u * 9.0, BONE_M)
 		elif SPEAR_TEX != null:
@@ -133,7 +133,7 @@ func _draw() -> void:
 		var prev: float = 0.0 if tier == 0 else book.LANCE_T[tier - 1]
 		var grow := 1.0 if tier >= 3 else clampf((ch["t"] - prev) / maxf(0.01, nxt - prev), 0.0, 1.0)
 		var dir: Vector2 = ch["at"] - hero.tp
-		var u2: Vector2 = Iso.to_screen(dir.normalized() if dir.length() > 0.05 else Vector2(1, 1).normalized()).normalized()
+		var u2: Vector2 = Iso.vec(dir.normalized() if dir.length() > 0.05 else Vector2(1, 1).normalized()).normalized()
 		var side := Vector2(-u2.y, u2.x) * (1.0 if u2.x >= 0.0 else -1.0)
 		var rise := clampf(ch["t"] / 0.2, 0.0, 1.0)
 		if SPEAR_TEX != null:
@@ -247,7 +247,7 @@ func _spear_trail(dt: float) -> void:
 	for sp in book.spears:
 		if sp["small"]:
 			continue
-		var u: Vector2 = Iso.to_screen(sp["v"].normalized()).normalized()
+		var u: Vector2 = Iso.vec(sp["v"].normalized()).normalized()
 		if ring_t <= 0.0:
 			rings.append({"c": S(sp["tp"], 8.0), "u": u, "t": 0.0, "tier": int(sp.get("tier", 0))})
 		if k < spear_lights.size():
@@ -316,7 +316,7 @@ func _draw_spears() -> void:
 	for h in book.spear_hits:
 		var q2: float = h["t"] / 0.3
 		var hc := S(h["at"], 10.0)
-		var u3: Vector2 = Iso.to_screen(h["v"].normalized()).normalized()
+		var u3: Vector2 = Iso.vec(h["v"].normalized()).normalized()
 		var r2 := 4.0 + 16.0 * q2
 		var ring2 := PackedVector2Array()
 		for a_i in 19:
@@ -332,7 +332,7 @@ func _draw_spears() -> void:
 		if sp["small"]:
 			continue
 		var c := S(sp["tp"], 8.0)
-		var u: Vector2 = Iso.to_screen(sp["v"].normalized()).normalized()
+		var u: Vector2 = Iso.vec(sp["v"].normalized()).normalized()
 		spear(c, u, int(sp.get("tier", 0)), 1.0, true)
 	if not book.charging.is_empty():
 		var ch: Dictionary = book.charging
@@ -341,7 +341,7 @@ func _draw_spears() -> void:
 		var prev: float = 0.0 if tier == 0 else book.LANCE_T[tier - 1]
 		var grow := 1.0 if tier >= 3 else clampf((ch["t"] - prev) / maxf(0.01, nxt - prev), 0.0, 1.0)
 		var dir: Vector2 = ch["at"] - hero.tp
-		var u2: Vector2 = Iso.to_screen(dir.normalized() if dir.length() > 0.05 else Vector2(1, 1).normalized()).normalized()
+		var u2: Vector2 = Iso.vec(dir.normalized() if dir.length() > 0.05 else Vector2(1, 1).normalized()).normalized()
 		var side := Vector2(-u2.y, u2.x) * (1.0 if u2.x >= 0.0 else -1.0)
 		var rise := clampf(ch["t"] / 0.2, 0.0, 1.0)
 		spear(S(hero.tp, 4.0 + 10.0 * rise) + side * 16.0, u2, tier, 0.55 + 0.45 * grow, false)
@@ -480,7 +480,7 @@ func _draw_blade(hero) -> void:
 		var prev: float = 0.0 if tier == 0 else book.BLADE_T[tier - 1]
 		var grow := 1.0 if tier >= 2 else clampf((ch["t"] - prev) / maxf(0.01, nxt - prev), 0.0, 1.0)
 		var dir: Vector2 = ch["at"] - hero.tp
-		var u: Vector2 = Iso.to_screen(dir.normalized() if dir.length() > 0.05 else Vector2(1, 1).normalized()).normalized()
+		var u: Vector2 = Iso.vec(dir.normalized() if dir.length() > 0.05 else Vector2(1, 1).normalized()).normalized()
 		var hand := S(hero.tp, 14.0) + u * 22.0
 		var length := (26.0 + 16.0 * tier + 14.0 * grow * (1.0 if tier < 2 else 0.0)) * (1.0 + 0.04 * tier)
 		_blade_shape(hand, u, length, 4.0 + tier * 1.5, float(tier))
@@ -496,12 +496,12 @@ func _draw_blade(hero) -> void:
 		var k: float = 1.0 - f["t"] / 0.5
 		match f["kind"]:
 			"thrust":
-				var u1: Vector2 = Iso.to_screen(f["dir"]).normalized()
+				var u1: Vector2 = Iso.vec(f["dir"]).normalized()
 				var a1 := S(f["tp"], 12.0)
 				_px_line(self, a1, a1 + u1 * f["reach"] * 70.0, Color(BONE, 0.8 * k))
 			"cleave":
 				var c2 := S(f["tp"], 10.0)
-				var base_a: float = Iso.to_screen(f["dir"]).angle()
+				var base_a: float = Iso.vec(f["dir"]).angle()
 				for i in 13:
 					var ang := base_a - 1.2 + i * 0.2
 					var r: float = f["reach"] * 62.0 + 10.0
@@ -509,9 +509,9 @@ func _draw_blade(hero) -> void:
 					sliver(c2 + d * r * (0.55 + 0.25 * (1.0 - k)), c2 + d * r, Color(BONE_M, k))
 			"split", "split_flash":
 				if f["kind"] == "split":
-					var u3: Vector2 = Iso.to_screen(f["dir"]).normalized()
+					var u3: Vector2 = Iso.vec(f["dir"]).normalized()
 					var p0 := S(f["tp"])
-					var L3: float = f["len"] * Iso.to_screen(f["dir"]).length()
+					var L3: float = f["len"] * Iso.vec(f["dir"]).length()
 					var n3 := Vector2(-u3.y, u3.x)
 					var last := p0
 					for i in range(1, 13):

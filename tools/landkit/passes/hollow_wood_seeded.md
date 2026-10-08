@@ -56,3 +56,7 @@ Everything here comes from the Wood's own lore. There is no green on the floor (
 4. **The carried things:** a trunk grown round a bell (lip only), a skull (wood in at the eyes), a candle (bark drawn back from the flame), ribs with a pilgrim's badge, a lantern (flame turned to the road). Each is a vein-tree variant with its own ten passes. They're placed by the tenth-trunk rule.
 5. **Fallen veins:** the lore says the trees are never cut and heal by morning, so a fallen vein doesn't rot like wood. It withers to a husk: a collapsed pale skin over fibre, sinking into the litter, in stages of drying, not decay classes. They're rare, and they give cover.
 6. **The floor itself:** the litter generator as a Godot ground shader painted from world position, so no two yards are alike (2b.6).
+
+## Rules check, 2026-10-08 (second reminder)
+
+MASTER_RULES is unchanged since the last full read. The work in progress is waiting at the gate for Derek's go on the floor-life brief. No art has been begun. The code that may run alongside (the tenth trunk) is done and committed (a06c292). Worst failure, still the bare floor; it needs his go.

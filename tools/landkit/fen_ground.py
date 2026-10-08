@@ -19,21 +19,40 @@ R_STRAW = ramp("#1c1812", "#2d271c", "#403727", "#564a33", "#6d5e41", "#857350")
 R_WATER = ramp("#05070a", "#0a0e13", "#10161c", "#182029", "#222c37")
 
 
+CELL = None    # yards: tussocks placed per world cell, each its own seed (a zone painted in chunks: no seam between them)
+
+
+def _spots(X, Y, seed, n_per):
+    """(k, cx, cy, rng) for every tussock over the grid: one draw for the frame, or per world cell"""
+    x0, x1, y0, y1 = X.min(), X.max(), Y.min(), Y.max()
+    if not CELL:
+        rr = np.random.default_rng(seed)
+        for k in range(int((x1 - x0) * (y1 - y0) * n_per)):
+            yield k, rr.uniform(x0, x1), rr.uniform(y0, y1), rr
+        return
+    cs = float(CELL)
+    for gx in range(int(np.floor(x0 / cs)) - 1, int(np.ceil(x1 / cs)) + 1):
+        for gy in range(int(np.floor(y0 / cs)) - 1, int(np.ceil(y1 / cs)) + 1):
+            rr = np.random.default_rng((gx * 7919 + gy * 104729 + seed * 31) % (2 ** 32))
+            for q in range(int(round(cs * cs * n_per))):
+                cx, cy = gx * cs + rr.uniform(0, cs), gy * cs + rr.uniform(0, cs)
+                yield gx * 7 + gy * 131 + q, cx, cy, rr
+
+
 def _tussocks(X, Y, seed, n_per=0.22):
     """sedge tussocks: domed mounds 0.25 to 0.4 yd across, standing 0.12 to 0.28 yd, spaced as plants space"""
-    rr = np.random.default_rng(seed)
-    x0, x1, y0, y1 = X.min(), X.max(), Y.min(), Y.max()
-    n = int((x1 - x0) * (y1 - y0) * n_per)
+    x0, y0 = X.min(), Y.min()
     out = np.zeros(X.shape)
     tag = np.zeros(X.shape)
     RES = float(X[0, 1] - X[0, 0])
-    for k in range(n):
-        cx, cy = rr.uniform(x0, x1), rr.uniform(y0, y1)
+    for k, cx, cy, rr in _spots(X, Y, seed, n_per):
         r = rr.uniform(0.13, 0.22)
         h = rr.uniform(0.12, 0.28)
         i0, j0 = int((cy - y0) / RES), int((cx - x0) / RES)
         w = int(r * 1.6 / RES) + 2
-        sl = (slice(max(i0 - w, 0), i0 + w), slice(max(j0 - w, 0), j0 + w))
+        sl = (slice(max(i0 - w, 0), max(i0 + w, 0)), slice(max(j0 - w, 0), max(j0 + w, 0)))
+        if X[sl].size == 0:
+            continue
         d = np.hypot(X[sl] - cx, Y[sl] - cy)
         ang = np.arctan2(Y[sl] - cy, X[sl] - cx)
         rr_ = r * (1 + 0.18 * np.sin(ang * 5 + k))                       # tufted, never a perfect dome

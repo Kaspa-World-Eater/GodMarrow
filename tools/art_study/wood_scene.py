@@ -66,6 +66,7 @@ AUTO_WARP = True         # the engine's own trees warped and channelled (chapter
 TRUNK_WARP = None        # an object with to_canon(x, y, z) and normal_back(n, px, py, pz, tag): trunks that taper, swell, wander and twist
 NOW = 0.0                # the frame being painted (set by paint)
 NORMAL_BLUR = 0.0        # cells of blur on the height before its normals (a scene with small stones wants little: blur pillows)
+SNAP_GRID = False        # the fine grid on world multiples of RES (worldgen/bog_bake.py: chunks of one zone)
 MOONLIT = None           # f(px, py, pz, t) -> 0..1: a scene's own reach of the moon (a cavern's shaft)
 MIST = True              # the old scene's ground mist (a scene with its own air turns it off)
 BEAMS = True             # the old scene's moonbeams through the gap
@@ -77,6 +78,8 @@ GROUND = None            # f(img, W, px, py, pz, SX, SY, L, v, gl) -> img: anoth
 def build(w):
     """the fine grid over the view: height, material, a tag per object, and per-object data"""
     x0, y0 = FOCUS - 15.0
+    if SNAP_GRID:                                                       # a zone painted in chunks: every chunk's cells on
+        x0, y0 = np.floor(x0 / RES) * RES, np.floor(y0 / RES) * RES     # the one world lattice (no seam from sampling)
     n = int(30.0 / RES)
     ii = (np.arange(n) + 0.5) * RES
     X, Y = np.meshgrid(x0 + ii, y0 + ii)

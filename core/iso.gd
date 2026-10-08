@@ -13,13 +13,57 @@ const HY := 9.0 * WPX       # 36
 ## its keeps read larger round them. One number for all of them: the hero, the creatures, the folk, the summoned.
 const FIG := 0.78
 
+## the floor's height where a baked land has one (world/baked_ground.gd: the Sunken Bog's Back stands up out of the
+## water, its skull and its pit higher still): whatever stands at a point is drawn lifted onto it, KZ (21) world px a
+## yard. Empty everywhere else, so every other zone is flat as before.
+static var lift_z := PackedFloat32Array()
+static var lift_w := 0
+static var lift_h := 0
+static var lift_res := 0.5
+static var lift_px := 84.0
+
+static func set_lift(z: PackedFloat32Array, w: int, h: int, res: float, px: float) -> void:
+	lift_z = z
+	lift_w = w
+	lift_h = h
+	lift_res = res
+	lift_px = px
+
+static func clear_lift() -> void:
+	lift_z = PackedFloat32Array()
+	lift_w = 0
+	lift_h = 0
+
+## screen px a thing at t is lifted by (its floor's height, smooth between the lattice's points)
+static func lift(t: Vector2) -> float:
+	if lift_w == 0:
+		return 0.0
+	var fx := clampf(t.x / lift_res, 0.0, float(lift_w - 1) - 0.001)
+	var fy := clampf(t.y / lift_res, 0.0, float(lift_h - 1) - 0.001)
+	var ix := int(fx)
+	var iy := int(fy)
+	var ax := fx - ix
+	var ay := fy - iy
+	var i := iy * lift_w + ix
+	var z := lerpf(lerpf(lift_z[i], lift_z[i + 1], ax), lerpf(lift_z[i + lift_w], lift_z[i + lift_w + 1], ax), ay)
+	return z * lift_px
+
 static func to_screen(t: Vector2) -> Vector2:
-	return Vector2((t.x - t.y) * HX, (t.x + t.y) * HY)
+	return Vector2((t.x - t.y) * HX, (t.x + t.y) * HY - lift(t))
+
+## a direction or an offset on the ground (no place, so never lifted)
+static func vec(v: Vector2) -> Vector2:
+	return Vector2((v.x - v.y) * HX, (v.x + v.y) * HY)
 
 static func to_tile(s: Vector2) -> Vector2:
 	var u := s.x / HX
 	var v := s.y / HY
-	return Vector2((u + v) * 0.5, (v - u) * 0.5)
+	var t := Vector2((u + v) * 0.5, (v - u) * 0.5)
+	if lift_w > 0:                 # a point seen on lifted ground lies further south: walk back down to it
+		for i in 4:
+			v = (s.y + lift(t)) / HY
+			t = Vector2((u + v) * 0.5, (v - u) * 0.5)
+	return t
 
 ## depth for y-sorting: the web sorts by x + y; screen y is proportional to it
 static func depth(t: Vector2) -> float:

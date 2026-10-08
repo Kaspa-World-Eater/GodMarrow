@@ -27,6 +27,7 @@ sys.path.insert(0, HERE)
 import bog                                   # noqa: E402
 
 TEMPLATE = os.path.join(ROOT, "data", "zones", "sunken_bog_s1001.json.gz")
+BAKED = os.path.join(ROOT, "art", "zones")                                   # bog_bake.py's output, per seed
 SOLID = {2, 3, 4, 5, 7, 8, 9, 10, 15}
 
 
@@ -84,12 +85,34 @@ def export(seed, out_dir=None):
         grid[d < 8.0] = 14
         gcls[d < 8.0] = 6
         grid[d < 8.0 * 0.32] = 3
+    # what stands on the land (bog_bake.py's block map, when the seed is baked): the hut, the ruins' walls, the pit's
+    # stones and altar, stumps and posts are solid where they stand; a tile goes when its middle is under one, or
+    # three of its corners
+    bp = os.path.join(BAKED, "sunken_bog_s%d" % seed, "block.png")
+    if os.path.exists(bp):
+        from PIL import Image
+        A = np.array(Image.open(bp))
+
+        def under(B):
+            mid = B[1:2 * H:2, 1:2 * W:2]
+            corners = B[0:2 * H:2, 0:2 * W:2].astype(int) + B[0:2 * H:2, 2::2] + B[2::2, 0:2 * W:2] + B[2::2, 2::2]
+            return mid, corners
+        mid, corners = under(A > 200)
+        stand = (mid | (corners >= 3)) & ~np.isin(grid, list(SOLID))
+        grid[stand] = 2
+        # and where the painted world is open water (an eye socket's pool, the pit's drowned side, the Back's crown
+        # narrower than the plan's band), no one walks: the tile is water when its middle and three corners are
+        mid, corners = under((A > 100) & (A < 200))
+        wet = mid & (corners >= 3) & ~np.isin(grid, list(SOLID))
+        grid[wet] = 4
+        gcls[wet] = 7
     rng = np.random.default_rng(seed * 31 + 7)
     # EVERY PIECE OF LAND JOINED (the check found pieces cut off at the yard grid): tiny fragments go back under the
     # water; anything bigger is joined to the land the start stands on by a short board causeway, straight to the
     # nearest reached tile; repeated until one land remains
     from scipy import ndimage as nd
     e0 = exits[0]["p"]
+    Z["joins"] = []                                                           # (from, to) in yards: the bake lays boards there
     for _ in range(40):
         walk = ~np.isin(grid, list(SOLID))
         lab, nl = nd.label(walk)                                             # 4-connected: the strict reading
@@ -114,6 +137,7 @@ def export(seed, out_dir=None):
             i, j = np.unravel_index(np.argmin(dmat), dmat.shape)
             a_, b_ = sub[i], mpts[::max(1, len(mpts) // 4000)][j]
             n_ = int(max(abs(a_ - b_).max(), 1)) * 2
+            Z["joins"].append(((a_[1] + 1.0, a_[0] + 1.0), (b_[1] + 1.0, b_[0] + 1.0)))
             for t in np.linspace(0, 1, n_ + 1):
                 yx = np.round(a_ + (b_ - a_) * t).astype(int)
                 for dy in (0, 1):
@@ -185,6 +209,16 @@ def export(seed, out_dir=None):
             objects.append(dict(type="shrine", x=p[0], y=p[1], used=False, kind=["stone", "wisp", "arcana"][len(mk["shrines"]) % 3],
                                 i=len(objects), solid=False, sprites=[]))
             mk["shrines"].append(len(objects) - 1)
+    # the living lights the bake leaves to the game (worldgen/bog_bake.py fx_of): the cold wisp-fire in each hut's pit,
+    # pale and small; the pit's throat, its red glow from below (Derek's ruling: red light at the pit only)
+    AX_ = np.array([1.0, 1.0]) / np.sqrt(2)
+    PERP_ = np.array([1.0, -1.0]) / np.sqrt(2)
+    for n in Z["nodes"]:
+        if n["kind"] == "hut":
+            q = np.array(n["p"], float) + AX_ * 2.6 + PERP_ * 0.6
+            lights.append(dict(type="raw", x=round(float(q[0]), 2), y=round(float(q[1]), 2), radiusPx=70, rgb="150,185,235"))
+        elif n["kind"] == "pit":
+            lights.append(dict(type="raw", x=round(float(n["p"][0]), 2), y=round(float(n["p"][1]), 2), radiusPx=150, rgb="190,40,28"))
     N["objects"], N["connections"], N["arrive"], N["markers"], N["lights"] = objects, conns, arrive, mk, lights
     # monsters: the template's packs moved onto this map, at the chambers and along the walks (none near the start)
     spots = [n["p"] for n in Z["nodes"] if n["kind"] not in ("exit",)]

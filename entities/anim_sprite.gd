@@ -70,7 +70,7 @@ func apply() -> void:
 
 ## the eight octants in screen space to (view, face), following meta.view_map (heroes) or facing8 (monsters)
 static func hero_view(dir: Vector2, last_face: int, s8: SpriteSet = null) -> Array:
-	var s := Iso.to_screen(dir)
+	var s := Iso.vec(dir)
 	if s.length() < 0.001:
 		return ["", last_face]
 	var a := rad_to_deg(atan2(s.y, s.x))
@@ -86,7 +86,7 @@ static func hero_view(dir: Vector2, last_face: int, s8: SpriteSet = null) -> Arr
 	return [v[0], last_face if v[1] == 0 else v[1]]
 
 static func mon_view(dir: Vector2, last_face: int) -> Array:
-	var s := Iso.to_screen(dir)
+	var s := Iso.vec(dir)
 	if s.length() < 0.001:
 		return ["", last_face]
 	var a := rad_to_deg(atan2(s.y, s.x))

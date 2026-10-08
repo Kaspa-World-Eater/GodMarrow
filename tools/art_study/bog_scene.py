@@ -43,6 +43,13 @@ VALUE_ONLY = False
 LINES = []                                   # several walks (a maze window, worldgen/bog.py); LINE alone otherwise
 CAUSEWAYS = []                               # the bog folk's board causeways: lines (landkit bog_causeway.py)
 RIBWALKS = []                                # the great ribs walked as bridges of bone: lines (bog_causeway.rib_walk)
+# the game's bake (worldgen/bog_bake.py) paints a whole zone in chunks, so nothing may hang on the frame:
+FRAME_SHELF = True     # the study frame's marsh shelf rising toward its back (off: the land is only what the map says)
+LINE_SEEDS = None      # each walk's own seed (its index in the whole maze), not its place in this window's list
+CAUSEWAY_SEEDS = None
+RIB_SEEDS = None
+PLACE_CELL = None      # yards: plants and loose bone placed per world cell, each cell its own seed (no seam between chunks)
+THIN_NEAR = True       # thin the tall stems toward the camera (a framed still; the game's ground keeps them all)
 
 ws.FOCUS = C.copy()
 for _f in ("FOREST_LIFE", "MIST", "BEAMS", "GRASS", "FERNS", "LITTER_GEN", "LEAF_FALL"):
@@ -94,13 +101,15 @@ def stamp(W, w):
     # the far side where the Back goes through open ground
     dH, _, _, tus = fen_ground.height(X, Y, seed=11)
     shelf = np.clip(((X - C[0]) * -AX[0] + (Y - C[1]) * -AX[1] - 4.0) / 4.0, 0, 1)   # rising toward the back of the frame
+    if not FRAME_SHELF:
+        shelf = shelf * 0.0
     bed = LEVEL - 0.42 + dH * 1.3 + shelf * 0.5 + (fbm(X * 0.12, Y * 0.12) - 0.5) * 0.4
     for f_ in BED_MODS:
         bed = f_(X, Y, bed)
     if LINES:                                                                # a maze window: several walks of the Back
         H, part, info = bed.copy(), np.zeros(X.shape, int), None
         for li, ln in enumerate(LINES):
-            H2, p2, inf2 = serpent_spine.stamp(X, Y, H, ln, LEVEL, seed=5 + li)
+            H2, p2, inf2 = serpent_spine.stamp(X, Y, H, ln, LEVEL, seed=5 + (LINE_SEEDS[li] if LINE_SEEDS else li))
             take = p2 > 0
             H = np.where(take | (H2 > H), H2, H)
             part = np.where(take, p2, part)
@@ -137,10 +146,10 @@ def stamp(W, w):
     part = np.where(dpart > 0, 0, part)
     H, spart = bog_structures.stamp(X, Y, H, STRUCTS, LEVEL)
     for ci, cl in enumerate(CAUSEWAYS):
-        H, cp = bog_causeway.stamp(X, Y, H, cl, LEVEL, seed=31 + ci)
+        H, cp = bog_causeway.stamp(X, Y, H, cl, LEVEL, seed=31 + (CAUSEWAY_SEEDS[ci] if CAUSEWAY_SEEDS else ci))
         spart = np.where(cp > 0, cp, spart)
     for ri, rl in enumerate(RIBWALKS):
-        H, rp = bog_causeway.rib_walk(X, Y, H, rl, LEVEL, seed=41 + ri)
+        H, rp = bog_causeway.rib_walk(X, Y, H, rl, LEVEL, seed=41 + (RIB_SEEDS[ri] if RIB_SEEDS else ri))
         spart = np.where(rp > 0, rp, spart)
     for f_ in EXTRA_STAMPS:
         H, ep = f_(X, Y, H, W)
@@ -165,6 +174,11 @@ def stamp(W, w):
     W["bog_tus"] = tus
     W["bog_bed"] = bed
     W["bog_v"] = np.abs(info["v"])
+    if PLACE_CELL and LINES:
+        # the zone's bake: the true distance to the nearest walk. The offset across a walk runs on past its end along
+        # its tangent, where the next chunk, without that walk in reach, would not see it (a seam in the duckweed)
+        d_, _ = cKDTree(np.concatenate(LINES)).query(np.stack([X.ravel(), Y.ravel()], 1))
+        W["bog_v"] = d_.reshape(X.shape)
     W["bog_cush"] = info["cush"]
     W["bog_boot"] = info["boot"]
     W["bog_stain"] = info["stain"]
@@ -371,6 +385,12 @@ def moonlit(px, py, pz, t):
 ws.MOONLIT = moonlit
 ws.WOOD_HOOKS[:] = [plan]
 ws.BUILD_HOOKS[:] = [stamp]
+def _ps(x, y, k):
+    """a plant's own seed: by where it stands when the zone is painted in chunks (the same reed on both sides of a
+    chunk's edge), by its place in the list in a single frame (as the graded stills were painted)"""
+    return int(abs(x * 7919.0 + y * 104729.0)) % 99991 + 900 if PLACE_CELL else 900 + k
+
+
 def plants(img, w, W, px, py, pz, L, T=0.0):
     """lots of plant life, each placed by the water table, drawn far to near, each mirrored in the black water"""
     water = ws.look(W, W["bog_water"], px, py) & (L["tg"] == 0)
@@ -406,13 +426,22 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
             return 9                                                         # nothing grows on the wood, the hut, the bone
         return int(ws.look(W, W["bog_part"], np.array(x), np.array(y)))
     ca = lambda x, y: float(ws.look(W, W["bog_v"], np.array(x), np.array(y))) / 3.0
-    items = bog_plants.place(rng, da, pa, ca, box)
+    if PLACE_CELL:                                                           # the zone's bake: per world cell, its own seed
+        items, cs = [], float(PLACE_CELL)
+        for gx in range(int(np.floor(box[0] / cs)), int(np.ceil(box[2] / cs))):
+            for gy in range(int(np.floor(box[1] / cs)), int(np.ceil(box[3] / cs))):
+                rng = np.random.default_rng((gx * 7919 + gy * 104729 + 31) % (2 ** 32))   # pa() draws on this one too
+                items += bog_plants.place(rng, da, pa, ca, (gx * cs, gy * cs, gx * cs + cs, gy * cs + cs),
+                                          n_try=int(round(9000 * cs * cs / 676.0)))
+    else:
+        items = bog_plants.place(rng, da, pa, ca, box)
     # the near water stays open (MASTER_RULES 5: nothing tall and leafy crowds the screen; the game ghosts what stands
     # before the pilgrim, but the frame should not be a wall of stems): tall plants thin out toward the camera
     hd = ws.HERO[0] + ws.HERO[1]
     rk = np.random.default_rng(77)
-    items = [it for it in items if not (it[0] in ("reed", "bulrush") and it[1] + it[2] > hd + 1.5
-                                        and rk.random() < np.clip((it[1] + it[2] - hd - 1.5) / 3.0, 0, 0.92))]
+    if THIN_NEAR:
+        items = [it for it in items if not (it[0] in ("reed", "bulrush") and it[1] + it[2] > hd + 1.5
+                                            and rk.random() < np.clip((it[1] + it[2] - hd - 1.5) / 3.0, 0, 0.92))]
     # the walk stays legible: no tall stems within a few yards of the Back (they stand off it, in the open water)
     items = [it for it in items if not (it[0] in ("reed", "bulrush")
                                         and float(ws.look(W, W["bog_v"], np.array(it[1]), np.array(it[2]))) < 4.8)]
@@ -442,19 +471,19 @@ def plants(img, w, W, px, py, pz, L, T=0.0):
         i, j = int(np.clip(sy, 0, ws.GH - 1)), int(np.clip(sx, 0, ws.GW - 1))
         lv = 0.32 + float(L["moon"][i, j]) * 0.55 + float(L["lamp"][i, j]) * 0.9
         if kind == "reed":
-            bog_plants.reed(img, zb, dep, ws.to_px, (x, y, max(g, LEVEL)), h, 900 + k, lv, water, LEVEL)
+            bog_plants.reed(img, zb, dep, ws.to_px, (x, y, max(g, LEVEL)), h, _ps(x, y, k), lv, water, LEVEL)
         elif kind == "sedge":
-            bog_plants.sedge(img, zb, dep, ws.to_px, (x, y, g), h, 900 + k, lv, water, LEVEL)
+            bog_plants.sedge(img, zb, dep, ws.to_px, (x, y, g), h, _ps(x, y, k), lv, water, LEVEL)
         elif kind == "bulrush":
-            bog_plants.bulrush(img, zb, dep, ws.to_px, (x, y, max(g, LEVEL)), h, 900 + k, lv, water, LEVEL)
+            bog_plants.bulrush(img, zb, dep, ws.to_px, (x, y, max(g, LEVEL)), h, _ps(x, y, k), lv, water, LEVEL)
         elif kind == "horsetail":
-            bog_plants.horsetail(img, zb, dep, ws.to_px, (x, y, max(g, LEVEL)), h, 900 + k, lv, water, LEVEL)
+            bog_plants.horsetail(img, zb, dep, ws.to_px, (x, y, max(g, LEVEL)), h, _ps(x, y, k), lv, water, LEVEL)
         elif kind == "cotton":
-            bog_plants.cotton(img, zb, dep, ws.to_px, (x, y, g), h, 900 + k, lv, water, LEVEL)
+            bog_plants.cotton(img, zb, dep, ws.to_px, (x, y, g), h, _ps(x, y, k), lv, water, LEVEL)
         elif kind == "bogbean":
-            bog_plants.bogbean(img, ws.to_px, (x, y, LEVEL), 900 + k, lv, water)
+            bog_plants.bogbean(img, ws.to_px, (x, y, LEVEL), _ps(x, y, k), lv, water)
         else:
-            bog_plants.pad(img, ws.to_px, (x, y, LEVEL), h, 900 + k, lv, water)
+            bog_plants.pad(img, ws.to_px, (x, y, LEVEL), h, _ps(x, y, k), lv, water)
     return img
 
 
@@ -630,18 +659,42 @@ def bone_litter(img, w, W, px, py, pz, L, T=0.0):
     pieces in it"): small pieces of the god's bone half sunk in the peat of the shelves and banks: lengths of broken rib,
     splinters, a loose vertebra's knob; bog-stained, their tops worn paler; sparse, never on a walk, never in the water;
     true bone (landkit bone.py), lying as things lie, each its own way"""
-    rng = np.random.default_rng(int(ws.FOCUS[0] * 7 + ws.FOCUS[1] * 3) % 9973)
     fx, fy = ws.FOCUS
+    worm = W.get("worm")
+    if PLACE_CELL:                                                           # the zone's bake: each world cell its own few
+        cs = float(PLACE_CELL)
+        cells = [(gx, gy) for gx in range(int(np.floor((fx - 12) / cs)), int(np.ceil((fx + 12) / cs)))
+                 for gy in range(int(np.floor((fy - 12) / cs)), int(np.ceil((fy + 12) / cs)))]
+    else:
+        cells = [None]
+    shapes = []
+    for cell in cells:
+        if cell is None:
+            rng = np.random.default_rng(int(ws.FOCUS[0] * 7 + ws.FOCUS[1] * 3) % 9973)
+            want, box, bub = 22, (fx - 12, fy - 12, fx + 12, fy + 12), (worm["bub"] if worm else [])
+        else:
+            rng = np.random.default_rng((cell[0] * 6151 + cell[1] * 93911 + 57) % (2 ** 32))
+            box = (cell[0] * cs, cell[1] * cs, cell[0] * cs + cs, cell[1] * cs + cs)
+            want = int(rng.poisson(22 * cs * cs / 576.0))
+            bub = [b_ for b_ in (worm["bub"] if worm else []) if box[0] <= b_[0] < box[2] and box[1] <= b_[1] < box[3]]
+        shapes += _bone_cell(W, rng, want, box, bub)
+    if not shapes:
+        return img
+    _draw_bones(img, W, px, py, shapes)
+    return img
+
+
+def _bone_cell(W, rng, want, box, bub):
     shapes = []
     tries = 0
-    worm = W.get("worm")
-    while len(shapes) < 22 and tries < 5000:
+    start = len(shapes)
+    while len(shapes) - start < want and tries < 5000:
         tries += 1
-        if worm and rng.random() < 0.4:                                      # where the worms took things under: more bone
-            b_ = worm["bub"][int(rng.integers(0, len(worm["bub"])))]
+        if bub and rng.random() < 0.4:                                       # where the worms took things under: more bone
+            b_ = bub[int(rng.integers(0, len(bub)))]
             x, y = b_[0] + rng.normal(0, 1.2), b_[1] + rng.normal(0, 1.2)
         else:
-            x, y = fx + rng.uniform(-12, 12), fy + rng.uniform(-12, 12)
+            x, y = rng.uniform(box[0], box[2]), rng.uniform(box[1], box[3])
         if bool(ws.look(W, W["bog_water"], np.array(x), np.array(y))):
             continue
         pt = int(ws.look(W, W["bog_part"], np.array(x), np.array(y)))
@@ -669,8 +722,10 @@ def bone_litter(img, w, W, px, py, pz, L, T=0.0):
         else:                                                                # a loose vertebra's knob, sunk to its middle
             shapes.append(bonegen.rib((x, y, g - 0.18), (x + np.cos(ang) * 0.35, y + np.sin(ang) * 0.35, g - 0.2),
                                       0.05, 0.22, 0.24, seed=int(rng.integers(1, 9999))))
-    if not shapes:
-        return img
+    return shapes
+
+
+def _draw_bones(img, W, px, py, shapes):
     GH, GW = img.shape[:2]
     dep = px + py
     hero = np.array(ws.HERO, float)
@@ -682,10 +737,11 @@ def bone_litter(img, w, W, px, py, pz, L, T=0.0):
     shapes.sort(key=lambda o: -(o["pts"][:, 0] + o["pts"][:, 1]).mean())
     bonegen.draw(img, zb, dep, ws.to_px, shapes, lts, ws.SUN, ambient=0.22, plain=True)
     bonegen.R_BONE, bonegen.SINEW, bonegen.SPONGE = keep
-    return img
 
 
-ws.LIVING[:] = [mirror, giant_rib_mirror, plants, bone_litter, giant_ribs, struct_living, bog_fog, wisps, value_only]
+# no fog over the water (Derek 2026-10-08: "its ugly, so just that shit" -- taken out of the bog entirely; bog_fog stays
+# below only as a record of what was tried)
+ws.LIVING[:] = [mirror, giant_rib_mirror, plants, bone_litter, giant_ribs, struct_living, wisps, value_only]
 ws.GROUND = ground
 
 

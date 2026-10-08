@@ -94,6 +94,7 @@ func load_zone(zid: String, zseed: int) -> void:
 	sorted = Node2D.new()
 	sorted.y_sort_enabled = true
 	add_child(sorted)
+	baked = load("res://world/baked_ground.gd").build(self)   # a land painted whole: its ground, its sorted bands, its lift
 	_ground()
 	_scatter()
 	_walls()
@@ -262,6 +263,7 @@ func _nearest_open(c: Vector2i) -> Vector2i:
 
 # ------------------------------------------------------------------ the ground
 var lk := ""                   # the landkit set standing in this zone's land (world/landkit.gd), "" for none
+var baked := false             # a land painted whole (world/baked_ground.gd): its own ground over the tiles
 
 func _ground() -> void:
 	var land: String = d.get("land", "moor")

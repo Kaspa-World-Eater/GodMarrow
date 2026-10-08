@@ -180,8 +180,8 @@ func _draw() -> void:
 			var k := clampf(t / life, 0.0, 1.0)
 			for i in 40:
 				var ang := i / 40.0 * TAU
-				var q := Iso.to_screen(Vector2(cos(ang), sin(ang)) * R)
+				var q := Iso.vec(Vector2(cos(ang), sin(ang)) * R)
 				draw_rect(Rect2(Vector2(floorf(q.x / P) * P, floorf(q.y / P) * P), Vector2(P, P)), Color(0.62, 0.58, 0.5, 0.55))
-				var q2 := Iso.to_screen(Vector2(cos(ang), sin(ang)) * R * (1.0 - k) + Vector2.ZERO)
+				var q2 := Iso.vec(Vector2(cos(ang), sin(ang)) * R * (1.0 - k) + Vector2.ZERO)
 				if i % 2 == 0:
 					draw_rect(Rect2(Vector2(floorf(q2.x / P) * P, floorf(q2.y / P) * P), Vector2(P, P)), Color(0.55, 0.5, 0.44, 0.45))

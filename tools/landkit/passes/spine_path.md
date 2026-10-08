@@ -574,3 +574,47 @@ Passes:
 Seeds 1 to 3: 15 to 16 places each, including the pit and four islands; 7 to 9 causeways.
 
 `bog_preview.py` stamps every kind. Seed 2's window at its pit (145, 60) renders the coil, a causeway and the obsidian platform with its glow, all from the generator. **Maze: B+.**
+
+## Into the game: proved walkable, then baked (Derek: "Finish it. Create game assets. Run some automated map generation that proves that it's all walkable and workable", 2026-10-08)
+
+**The proof** (`worldgen/bog_export.py`, `worldgen/bog_check.py`):
+- Each seed is exported to the game's zone format: water solid; the Back, shelves, boards and ribs walkable; the pit's throat solid; portals, lanterns, waystone, island chests and shrines on the walk; the template's packs moved onto it. Stray land is drowned or joined to the main walk by boards.
+- The check walks each export the way the game walks: 8 neighbours, with no squeezing between two solid corners (AStarGrid2D's only-if-no-obstacles rule). From the arrival it must reach every chamber, the pit, every island, both exits, every object and every monster.
+- **100 seeds out of 100 pass.** The game's own `zone_export/check.py` finds no problems either.
+- In the demo, the hero pathed across the bog and fought. When killed with no lantern lit, the hero went back to the moor, which is why the monster count jumped.
+
+**The bake** (`worldgen/bog_bake.py` → `art/zones/sunken_bog_s<SEED>/`, `world/baked_ground.gd`, `shaders/baked_ground.gdshader`):
+- The whole zone is painted through the bog scene's engine at the game's camera (one yard = 72 screen px at zoom 1.06, so the engine's 18 px a yard is drawn at 4x).
+- It is cut into 200 chunks of 320x176. Each chunk is the centre of a larger frame, so no blur or reflection is cut off.
+- **No seams:** nothing hangs on the frame any more.
+  - Plants and loose bone are placed per world cell, each cell with its own seed.
+  - Every walk keeps its own seed.
+  - The study frame's shelf is off.
+  - Walks within 8 yd of the frame are counted (the duckweed reads the distance to the Back).
+- **Alpha says what a texel is:** 255 ground, 254 water (the game slides its rows and glints it), 0 past the edge.
+- **The tall layer:** the hut, walls, standing stones, altar, stumps, posts, drowned trunks, and everything drawn as a stroke (reeds, racks, ribs, limbs, loose bone). These are cut into half-yard depth bands and sorted with the bodies, so the hero walks behind the hut.
+- **Height:** the floor's height on a half-yard lattice. `core/iso.gd` lifts every place onto it (`to_screen`, `to_tile`), so a body stands on the Back's crown, not a yard south of it. Bands sort by depth less lift, the same key the bodies sort by. Pure directions use the new flat `Iso.vec`.
+- **The walk follows the paint:**
+  - The bake writes a block map (standing pieces are solid) and a water map (where it painted open water, nobody walks).
+  - The map's shelves raise the peat exactly where the plan says shelf.
+  - If blocking cuts a shelf, the exporter's boards are baked too: the chunks they touch are rebaked.
+- **Lights left to the game:** a cold light at each hut's wisp-fire pit, and the pit's red throat.
+- **Size:** about 3.6 MB a seed, 30 minutes on 7 processes.
+
+**The visual check** (`worldgen/bog_seen.py`) looks up every tile in the painted ground where the game draws it.
+- First bake: 25% of walkable tiles showed water, because the chamber shelves had drowned once the study frame's shelf was off. Fixed with the map's shelves.
+- Second bake: 95% walk and 99% water. The misses were:
+  - the eye socket's pool;
+  - the Back's crown, narrower than the plan's band;
+  - a duckweed seam at chunk edges.
+  Fixed with the water map and the wider walk reach.
+
+**The seams, found and closed.** The test renders a third frame centred on a seam and compares it with the edge rows of the two chunks either side. Each fault is behind a switch only the bake turns on, so the graded stills are painted exactly as before. In the order found:
+1. **Sedge tussocks:** they were scattered over the frame's box in one draw. Now they're placed per 4-yd world cell (`fen_ground.CELL`).
+2. **Plant shapes:** each was seeded by its index in the frame's list. Now the seed comes from where the plant stands (`bog_scene._ps`).
+3. **A frame with no walk in reach:** it re-stamped the last walk its worker had painted (a ghost of the Back). It now gets one far out of the world.
+4. **The lee of the Back:** the offset across a walk runs on past its end along its tangent. In the bake it is the true distance to the nearest walk.
+5. **The grid's phase:** each frame laid its 0.04-yd cells from its own focus, so the rough bone sampled differently. Now every chunk's cells are on one world lattice (`wood_scene.SNAP_GRID`).
+6. **The vertebrae:** they were counted from the frame's stretch of the walk, so joints moved between chunks. Now they're counted from each walk's own start (`serpent_spine.WHOLE_LINE`).
+
+After these, six seams on and off the Back match the centred frame to within 7 pixels in 5,120.

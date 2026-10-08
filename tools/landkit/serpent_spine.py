@@ -53,6 +53,7 @@ def _frame(X, Y, line):
     return s.reshape(X.shape), v.reshape(X.shape), curv[i].reshape(X.shape), d.reshape(X.shape)
 
 
+WHOLE_LINE = False   # the vertebra table over the whole line, not the frame's stretch of it (worldgen/bog_bake.py)
 NECK = 0.0           # yd at the line's END over which the Back tapers to a neck (a skull's chamber sets it)
 
 
@@ -71,7 +72,11 @@ def stamp(X, Y, H, line, level=0.0, seed=7):
     # THE BODY'S SIZE along the Back (Derek 2026-10-08: "changes in width of the path for different areas"): a serpent's
     # vertebrae grow from the tail to the middle of the body and shrink again; here the Back swells and pinches along
     # its length, so the walk narrows to a hard file in places and opens to room for a fight in others
-    s_tab = np.linspace(s[near].min() - 1, s[near].max() + 1, 3000) if near.any() else np.linspace(0, 1, 10)
+    if WHOLE_LINE:                    # a zone painted in chunks: count the vertebrae from the line's own start, so each
+        s_len = float(np.hypot(*np.diff(np.asarray(line, float), axis=0).T).sum())   # chunk numbers them alike
+        s_tab = np.linspace(-3.0, s_len + 3.0, max(int((s_len + 6.0) * 12), 10))
+    else:
+        s_tab = np.linspace(s[near].min() - 1, s[near].max() + 1, 3000) if near.any() else np.linspace(0, 1, 10)
     sz_tab = np.clip(0.55 + (fbm(s_tab * 0.028 + seed, 1.3) - 0.3) * 1.4, 0.52, 1.32)
     ph_tab = np.concatenate([[0.0], np.cumsum(np.diff(s_tab) / (L_V * sz_tab[1:]))])
     if NECK > 0:                                                           # toward the head the vertebrae shrink: the neck

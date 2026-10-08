@@ -130,7 +130,7 @@ func _air() -> void:
 	# knives and needles
 	for kn in b.knives:
 		var p3 = S(kn["tp"], 10)
-		var v: Vector2 = Iso.to_screen(kn["v"]).normalized()
+		var v: Vector2 = Iso.vec(kn["v"]).normalized()
 		draw_line(p3 - v * 8.0, p3 + v * 8.0, BONE, 2.0)
 		draw_line(p3 + v * 4.0, p3 + v * 8.0, VIOLET, 2.0)
 	# traps in flight
