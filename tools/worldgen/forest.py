@@ -224,6 +224,53 @@ def free_forest_tiles(Z):
     return Z
 
 
+CARRIED = ("bell", "skull", "candle", "ribs", "lantern")
+
+
+def tenth_trunks(way, pts, chosen, rng, reach=4.0):
+    """the hunters' count (the Hollow Wood's lore: "Count the trunks as you walk, because every tenth one has grown round
+    something"): the trunks a walker passes, counted in the order the way reaches them from the zone's first point,
+    and every tenth grown round a thing the god was carrying. Returns {index in chosen: what it holds}"""
+    from scipy import ndimage as nd
+    h, w = way.shape
+    if not way.any() or not pts:
+        return {}
+    y0, x0 = int(np.clip(round(pts[0][1]), 0, h - 1)), int(np.clip(round(pts[0][0]), 0, w - 1))
+    if not way[y0, x0]:                                                  # start at the way cell nearest the first point
+        yy, xx = np.nonzero(way)
+        k = int(np.argmin((yy - y0) ** 2 + (xx - x0) ** 2))
+        y0, x0 = int(yy[k]), int(xx[k])
+    along = np.full((h, w), np.inf)                                      # walked distance along the ways
+    along[y0, x0] = 0
+    q = [(0.0, y0, x0)]
+    while q:
+        d, y, x = heapq.heappop(q)
+        if d > along[y, x]:
+            continue
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
+            yy, xx = y + dy, x + dx
+            if 0 <= yy < h and 0 <= xx < w and way[yy, xx]:
+                nd_ = d + (1.414 if dx and dy else 1.0)
+                if nd_ < along[yy, xx]:
+                    along[yy, xx] = nd_
+                    heapq.heappush(q, (nd_, yy, xx))
+    dist, (iy, ix) = nd.distance_transform_edt(~np.isfinite(along), return_indices=True)
+    passed = []
+    for i, (kind, name, x, y) in enumerate(chosen):
+        if kind not in ("giant", "middle"):                              # the trunks a walker counts (the dying already hold eyes)
+            continue
+        cy, cx = int(np.clip(y, 0, h - 1)), int(np.clip(x, 0, w - 1))
+        if dist[cy, cx] <= reach:
+            passed.append((float(along[iy[cy, cx], ix[cy, cx]]), i))
+    passed.sort()
+    out = {}
+    start = int(rng.integers(0, 10))                                     # where the count began is the hunters' own
+    for n, (_, i) in enumerate(passed):
+        if (n + start) % 10 == 9:
+            out[i] = CARRIED[int(rng.integers(0, len(CARRIED)))]
+    return out
+
+
 def generate(zone, seed, template_seed=1001):
     Z = free_forest_tiles(load(zone, template_seed))
     rng = np.random.default_rng(seed * 7919 + 13)
@@ -271,15 +318,20 @@ def generate(zone, seed, template_seed=1001):
     chosen = assign_variants(items, roles, rng)
     # the new forest, in the game's sprite form; everything else of the zone kept
     keep = [s for s in Z["sprites"] if not str(s.get("key", "")).startswith(FOREST_KEYS)]
+    carried = tenth_trunks(way, pts, chosen, rng)
     new = []
-    for (kind, name, x, y) in chosen:
-        new.append(dict(key="lk:" + name, set=SET, x=round(x, 3), y=round(y, 3), flip=bool(rng.random() < 0.5),
-                        scale=1, d=round(x + y, 3), src="world", item=kind, tile=[int(x), int(y)]))
+    for i, (kind, name, x, y) in enumerate(chosen):
+        sp = dict(key="lk:" + name, set=SET, x=round(x, 3), y=round(y, 3), flip=bool(rng.random() < 0.5),
+                  scale=1, d=round(x + y, 3), src="world", item=kind, tile=[int(x), int(y)])
+        if i in carried:
+            sp["carried"] = carried[i]                                   # the piece to come (passes/hollow_wood_seeded.md, brief 4)
+        new.append(sp)
     Z2 = dict(Z)
     Z2["sprites"] = keep + new
     Z2["seed"] = seed
     Z2["generator"] = "tools/worldgen/forest.py (ours, from the ecosystem rules)"
-    return Z, Z2, dict(walk=walk, way=way, clear=clr, free=free, placed=placed, chosen=chosen, w=w, h=h, grid=grid)
+    return Z, Z2, dict(walk=walk, way=way, clear=clr, free=free, placed=placed, chosen=chosen, w=w, h=h, grid=grid,
+                       carried=carried)
 
 
 def numbers(info):
@@ -355,6 +407,10 @@ def draw_map(info, Z_old, out_png, title=""):
         for (x, y) in L:
             r = max(RADIUS[k] * S, 1.5)
             d.ellipse((x * S - r, y * S - r, x * S + r, y * S + r), fill=col[k])
+    for i, what in info.get("carried", {}).items():                    # the tenth trunks, ringed in gold
+        kind, name, x, y = info["chosen"][i]
+        r = RADIUS[kind] * S + 3
+        d.ellipse((x * S - r, y * S - r, x * S + r, y * S + r), outline=(230, 190, 70), width=2)
     old = base()
     d2 = ImageDraw.Draw(old)
     for s in Z_old["sprites"]:
