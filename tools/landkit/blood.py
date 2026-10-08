@@ -28,7 +28,7 @@ def shade(depth, px, py, sx, sy, T=0.0, dry=0.0, light_side=None, light=None):
     """depth 0 (edge) .. 1 (heart); sx, sy the art-pixel coordinates (for the dither); dry 0..1 (per pixel or one);
     light_side: 0..1 how much this pixel's edge faces the lantern; light: 0..1 how lit it is (the scene's light)"""
     d = B4[(sy.astype(int)) % 4, (sx.astype(int)) % 4]
-    churn = fbm(px * 2.0 + T * 0.15, py * 2.0 - T * 0.1)
+    churn = fbm(px * 2.0 + np.cos(2 * np.pi * T) * 0.3, py * 2.0 + np.sin(2 * np.pi * T) * 0.3)   # it churns round and back: a seamless loop
     v = depth * 0.7 + churn * 0.35
     dry = np.broadcast_to(np.asarray(dry, float), depth.shape)
     lv = v * 3.6 + d * 0.8 - dry * 1.4
@@ -38,7 +38,7 @@ def shade(depth, px, py, sx, sy, T=0.0, dry=0.0, light_side=None, light=None):
     if light_side is not None:
         rim = (depth < 0.12) & (light_side * wet > 0.45 + d * 0.3)
         cc = np.where(rim[..., None], WET, cc)
-    glint = (fbm(px * 5 + T * 0.4, py * 5) > 0.78) & (wet > 0.5) & (depth > 0.3)
+    glint = (fbm(px * 5 + np.cos(2 * np.pi * T) * 0.5, py * 5 + np.sin(2 * np.pi * T) * 0.5) > 0.78) & (wet > 0.5) & (depth > 0.3)
     cc = np.where(glint[..., None], WET, cc)
     crack = (dry > 0.5) & (depth < 0.1) & (d < dry - 0.4)                  # a dried edge cracks
     cc = np.where(crack[..., None], cc * 0.55, cc)

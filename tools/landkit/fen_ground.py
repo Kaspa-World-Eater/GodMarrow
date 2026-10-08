@@ -90,16 +90,16 @@ def paint(img, m, v, px, py, water, tus, T=0.0, moon=None, depth=None, sx=None, 
         wat = blood.shade(np.clip(depth, 0, 1) * 0.5, px, py, sx, sy, T, 0.0, light_side=side_ * 0.7, light=lt)
         wet_edge = depth < 0.12                                             # the pigment pooled dark at the wet edge
         wat = np.where(wet_edge[..., None], blood.C0 * 0.9, wat)
-        clot = (fbm(px * 4.0 + T * 0.05, py * 4.0 - T * 0.03) > 0.68) & (depth > 0.25)    # clots drifting
+        clot = (fbm(px * 4.0 + np.cos(2 * np.pi * T) * 0.12, py * 4.0 + np.sin(2 * np.pi * T) * 0.12) > 0.68) & (depth > 0.25)    # clots drifting, round and back
         wat = np.where(clot[..., None], blood.C0 * 1.2 + np.array([0.02, 0.0, 0.0]), wat)
-        skin = (np.abs(np.sin(px * 13 + py * 7 + fbm(px * 2, py * 2 + T * 0.02) * 9)) < 0.1) & (depth > 0.2)
+        skin = (np.abs(np.sin(px * 13 + py * 7 + fbm(px * 2, py * 2 + np.sin(2 * np.pi * T) * 0.04) * 9)) < 0.1) & (depth > 0.2)
         wat = np.where(skin[..., None], wat * 0.8, wat)                      # the skin, wrinkling slowly
         if moon is not None:                                                 # the moon in it: broken dabs, dull and heavy
-            dab = (moon > 0.5) & (vn(px * 2.2 - T * 0.1, py * 2.2) > 0.68) & (vn(px * 11, py * 11) > 0.5) & ~clot
+            dab = (moon > 0.5) & (vn(px * 2.2 - np.sin(2 * np.pi * T) * 0.2, py * 2.2) > 0.68) & (vn(px * 11, py * 11) > 0.5) & ~clot
             wat = np.where(dab[..., None], np.array([0.42, 0.2, 0.2]) * np.clip(moon, 0, 1)[..., None] + blood.C1 * 0.5, wat)
     else:
         # the water: black, still, the sky in it dark, the moon's light laid on it in a broken streak
-        wv = np.clip(0.25 + (vn(px * 0.8 + T * 0.05, py * 0.8) - 0.5) * 0.3, 0, 0.99)
+        wv = np.clip(0.25 + (vn(px * 0.8 + np.sin(2 * np.pi * T) * 0.1, py * 0.8) - 0.5) * 0.3, 0, 0.99)
         wat = R_WATER[(wv * len(R_WATER)).astype(int)]
         if moon is not None:
             glint = (moon > 0.55) & (vn(px * 2.2 - T * 0.3, py * 2.2) > 0.66) & (vn(px * 11, py * 11) > 0.45)   # a broken sheen

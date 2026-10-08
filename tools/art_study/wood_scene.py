@@ -406,7 +406,7 @@ def paint(W, px, py, pz, SX, SY, L, t=0.0):
         img = GROUND(img, W, px, py, pz, SX, SY, L, v, gl)
     if water.any():
         img[water] = R_SKY[np.clip(((0.4 + (vn(px * 0.6, py * 0.6) - 0.5) * 0.4) * 4).astype(int), 0, 3)][water]
-        glint = water & (vn(px * 2 - t, py * 8) > 0.74) & (L["canopy"] > 0.4)
+        glint = water & (vn(px * 2 - np.sin(2 * np.pi * t) * 1.0, py * 8) > 0.74) & (L["canopy"] > 0.4)
         img[glint] = img[glint] * 0.4 + np.array([0.6, 0.66, 0.78]) * 0.6
         shore = water & ~nd.binary_erosion(water, iterations=2)
         img[shore] *= 0.6

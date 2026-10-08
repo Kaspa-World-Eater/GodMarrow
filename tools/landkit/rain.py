@@ -115,6 +115,6 @@ def wet(img, L, px, py, pz, T, ground_m, bark_m, trunk_c, dry_m=None, amount=1.0
         film = bark_m & (vn(arc * 16.0, pz * 0.4) > 0.7)                   # water films running down the channels
         lit = np.clip(moon * 0.6 + lamp, 0, 1)
         out[film] = np.clip(out[film] * 0.85 + np.array([0.12, 0.13, 0.16]) * lit[film][:, None] * amount, 0, 1)
-        bead = film & (((pz * 0.9 + T * FALLS * 0.6 + vn(arc * 7, 1.0) * 3.0) % 1.0) < 0.07) & (lit > 0.2)
+        bead = film & (((pz * 0.9 + T * 2 + vn(arc * 7, 1.0) * 3.0) % 1.0) < 0.07) & (lit > 0.2)
         out[bead] = np.clip(out[bead] + np.array([0.4, 0.43, 0.5]) * lit[bead][:, None] * 0.6, 0, 1)
     return out

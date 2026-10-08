@@ -85,9 +85,8 @@ Older notes disagree with these. The older notes are history; these stand:
   stays open to that test).
 
 ## Debts found while writing the library (to fix)
-- Several animated terms grow with time instead of cycling, so a loop can show a seam: `blood.shade` churn and
-  glints, `fen_ground` clots, skin and dabs, the gleams in `hollow.py` and `bark_face.py`, the stemflow beads in
-  `rain.wet`, `wisp_fire`, the water glint in `wood_scene`.
+- ~~Several animated terms grew with time instead of cycling~~ (fixed 2026-10-07: each now moves on a small circle
+  or a whole number of cycles a loop, so the loop has no seam).
 - The engine's moon rim skips tags of 400 and above, so the Vigil's vein-trees get none.
 - `NORMAL_BLUR` is still above 0 in the engine default (1.0), the Vigil (0.6) and the Gate (0.35).
 - No value-only render switch exists yet for the form test.

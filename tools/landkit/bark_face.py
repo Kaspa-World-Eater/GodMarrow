@@ -170,7 +170,7 @@ def draw(img, zb, dep_scene, to_px, canon, tree, a0c, zc, T, lights, moon, moonl
     col = np.where(drool[..., None], bark.SAP[np.clip(((v * 0.7 + 0.1) * len(bark.SAP)).astype(int), 0, len(bark.SAP) - 1)], col)
     # the mouth: rot dark with depth; far in, something wet
     rot = R_ROT[np.clip(((v * 0.8 + (1 - deep) * 0.2) * len(R_ROT)).astype(int), 0, len(R_ROT) - 1)]
-    gleam = mouth & (deep > 0.6) & (vn(u * 30 + T * 0.4, w * 30) > 0.78)
+    gleam = mouth & (deep > 0.6) & (vn(u * 30 + np.sin(2 * np.pi * T) * 0.4, w * 30) > 0.78)
     rot = np.where(gleam[..., None], np.array([0.36, 0.09, 0.09]), rot)
     col = np.where(mouth[..., None] & (f < -0.03)[..., None], rot, col)
     grown = (np.abs(f) > 0.003) | seam                                                   # only where it rises or sinks: no patch

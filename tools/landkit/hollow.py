@@ -249,7 +249,7 @@ def draw(img, zb, dep_scene, to_px, C, u, W, H, D, T, lights, moon, kind="mouth"
     if kind == "mouth":                                                            # deep in the throat, something wet and red
         throat = np.clip((inside - 0.55) * 2.5, 0, 1)[..., None]
         rot = rot * (1 - throat * 0.6) + THROAT * np.clip(lum * 2.2 + 0.15, 0, 1)[..., None] * throat * 0.6
-        gleam = (inside > 0.6) & (vn(Q[..., 1] * 40, Q[..., 2] * 40 + T * 0.6) > 0.8) & (lum > 0.04)
+        gleam = (inside > 0.6) & (vn(Q[..., 1] * 40, Q[..., 2] * 40 + np.sin(2 * np.pi * T) * 0.6) > 0.8) & (lum > 0.04)
         rot = np.where(gleam[..., None], np.array([0.5, 0.16, 0.14]), rot)
     else:                                                                           # soot on the niche's roof over the flames
         soot = np.clip((Q[..., 2] - H * 0.2) / (H * 0.6), 0, 1) * (np.abs(Q[..., 1]) < W * 0.6)
