@@ -272,3 +272,40 @@ up. No tube left.
 6. The hollows: the cavity's visibility tested where the ray enters the opening, not at the rot behind the bark.
    **Graded C:** the niche glows deep in its trunk, warm light spilling down the bark; the mouth is a wide dark
    mouth, still somewhat side-on.
+
+## Piece 5: the bones (landkit beast_bones.py)
+**Rules check:**
+- **Lore:** the game has no animals, and the lore never names these. The Burnt Heath's "great horned carcasses lie
+  in a ring facing the same way". The Hollow Wood's hunter: the dead turn their heads "toward the ring ... the ground
+  takes them the way a sleeper pulls the blanket up". So each lies skull to the north, truer and sunk deeper the
+  older it is, and the small bones go first.
+- **Form:** ray-cast true forms on the shared bone (bone.py's tube and skull, its weathered surface): skull, muzzle,
+  horns, a vertebra chain, collapsed ribs, long bones.
+
+**Passes:**
+1. Four beasts round the glade (ages 0.15 to 0.9). **Graded D+:** the horns spread like arms, so they read as tiny
+   human skeletons; the near set was lost in the busy litter.
+2. A beast's long muzzle; horns thicker. **Graded D+:** the horns hung down like arms.
+3. Horns spread wide to either side, tips curling forward and up (the classic horned skull); the skull bigger.
+   **Graded C-:** a horned beast's skeleton, read at a glance in the moon. The near set waits for a quieter floor.
+
+## Piece 6: the floor, "a little fen-like" (Derek)
+**Rules check:**
+- **The old-growth chapter:** wood going into fen becomes **alder carr**; the ground goes wet and the trees thin onto
+  root-islands. Pits fill with water, moss maps the wet and the still. The ecosystem README's wetlands chapter
+  covers fen and carr.
+- **Real fen and carr:** peat, black and wet; sedge **tussocks** standing as mounds; **sphagnum and brown mosses** on
+  the hummocks; still black water in every hollow, lying level; leaves matted dark into the wet.
+- **Depth law (0.6):** the hummocks and tussocks are height in the world (0.04 yd grid). The water is levelled flat
+  at its own table. The colour is given only as material (`selfshade` off). Everything standing on it (the stump,
+  the bones) takes its ground from the same height.
+- **New design:** `landkit/fen_ground.py`, a world-position generator, so no two yards are alike. It replaces the
+  engine's reused litter tiles in this scene.
+
+**Passes (fen floor):**
+1. Peat, matted leaves, sphagnum, tussocks (height), pools levelled at each one's own rim, the moon on the water.
+   **Graded D+:** reads as fen, but the moss is too green and blotchy (camouflage), the moon's sheen draws as scratch
+   lines, and a pool lies under the pilgrim's feet.
+2. Brown mosses dulled by night with ragged cushion edges; leaves matted in broken small patches; the sheen broken;
+   firm ground round the pilgrim. **Graded C:** dark wet carr under the giants, still black pools catching the moon.
+   The engine's falling leaves and moonflecks still play over it.

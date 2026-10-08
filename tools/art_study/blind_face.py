@@ -27,6 +27,10 @@ import vein_tree                             # noqa: E402
 import vein_stump                            # noqa: E402
 import eye as eyegen                         # noqa: E402
 import hollow                                # noqa: E402
+import beast_bones                           # noqa: E402
+import fen_ground                            # noqa: E402
+from scipy import ndimage as nd              # noqa: E402
+import bone as bonegen                       # noqa: E402
 import bark                                  # noqa: E402
 from wood_ecosystem import vn, fbm           # noqa: E402
 
@@ -72,6 +76,32 @@ def plan(w):
     d = np.hypot(w.X - C[0], w.Y - C[1])
     w.light = np.maximum(w.light * 0.7, np.clip(1 - d / 6.0, 0, 1) * 0.55)          # the glade a little open to the moon
     w.gap = (C[0], C[1], 5.0)
+
+
+def fen_floor(W, w):
+    """the floor gone a little fen (Derek): peat, tussocks and hummocks as real height, still water levelled in the
+    hollows (landkit fen_ground.py); everything after stands on it"""
+    keep = W["tag"] == 0
+    dH, water, level, tus = fen_ground.height(W["X"], W["Y"], seed=9, keep=keep)
+    water &= np.hypot(W["X"] - ws.HERO[0], W["Y"] - ws.HERO[1]) > 1.2               # the pilgrim stands on firm ground
+    H = W["H"] + dH
+    lab, n = nd.label(water)
+    if n:
+        ring = nd.grey_dilation(lab, size=3) * (lab == 0)
+        lev = np.array(nd.minimum(H, labels=ring, index=np.arange(1, n + 1)))
+        pool_top = np.array(nd.maximum(H, labels=lab, index=np.arange(1, n + 1)))
+        lev = np.minimum(lev - 0.01, pool_top)
+        H = np.where(lab > 0, lev[np.maximum(lab - 1, 0)], H)                    # each pool lies level at its own rim
+    W["H"] = H
+    W["Hrest"] = np.where(keep, H, W["Hrest"])
+    W["fen_water"] = lab > 0
+    W["fen_tus"] = tus
+
+
+def fen_paint(img, W, px, py, pz, SX, SY, L, v, gl):
+    wat = ws.look(W, W["fen_water"], px, py) > 0
+    tus = ws.look(W, W["fen_tus"], px, py)
+    return fen_ground.paint(img, gl, v, px, py, wat, tus, moon=L["moon"])
 
 
 VT = []
@@ -203,6 +233,27 @@ def draw_hollows(img, w, W, px, py, pz, L, T):
     return img
 
 
+BONES = ((0.8, -2.2, 0.4, 1.0), (-1.8, 0.4, 0.9, 1.15), (4.7, 0.6, 0.15, 0.9), (-0.6, -4.8, 0.7, 1.0))   # (along, across, age, size)
+
+
+def draw_bones(img, w, W, px, py, pz, L, T):
+    """the Wood's dead (landkit beast_bones.py): horned beasts, heads to the north, the older sunk deeper"""
+    GH, GW = img.shape[:2]
+    dep = px + py
+    zb = np.full((GH, GW), -1e9)
+    gh = lambda x, y: float(ws.look(W, W["H"], np.array(x), np.array(y)))
+    hero = np.array(ws.HERO, float)
+    lts = [((hero[0] + 0.25, hero[1] - 0.25, gh(*hero) + 0.7), (0.95, 0.6, 0.32), 2.6 * 1.4)]
+    lts += [((lx, ly, lz), (0.95, 0.6, 0.32), rch * 1.4) for (lx, ly, lz, rch) in ws.LIGHTS]
+    shapes = []
+    for k, (a, p, age, size) in enumerate(BONES):
+        q = C + AX * a + PERP * p
+        shapes += beast_bones.beast(q, NORTH, gh, age=age, size=size, seed=300 + k * 50)
+    shapes.sort(key=lambda o: -((o["pts"][:, 0] + o["pts"][:, 1]).mean() if o["kind"] == "tube" else o["c"][0] + o["c"][1]))
+    bonegen.draw(img, zb, dep, ws.to_px, shapes, lts, ws.SUN, ambient=0.14)
+    return img
+
+
 def tree_eyes(img, w, W, px, py, pz, L, T):
     GH, GW = img.shape[:2]
     dep = px + py
@@ -272,14 +323,13 @@ def grim(img, w, W, px, py, pz, L, T):
 
 
 ws.WOOD_HOOKS.append(plan)
+ws.LIVING.append(draw_bones)
 ws.LIVING.append(stump_blood)
 ws.LIVING.append(tree_eyes)
 ws.LIVING.append(draw_hollows)
 ws.LIVING.append(grim)
-ws.BUILD_HOOKS.insert(0, stamp_vein_trees)
-ws.BUILD_HOOKS.insert(1, stamp_stump)
-ws.BUILD_HOOKS.insert(2, place_eyes)
-ws.BUILD_HOOKS.insert(3, place_hollows)
+ws.BUILD_HOOKS[0:0] = [fen_floor, stamp_vein_trees, stamp_stump, place_eyes, place_hollows]   # in this order: floor, trees, stump, then what grows on the trees
+ws.GROUND = fen_paint
 ws.PAINTERS["vstump"] = paint_stump
 ws.PAINTERS["veintree"] = paint_vein
 ws.PAINTERS["veinroot"] = paint_vein
