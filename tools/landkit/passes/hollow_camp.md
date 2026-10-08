@@ -111,3 +111,16 @@ Worst: the huts' walls (Derek: "the huts need a lot of work"). Derek asked for x
 20. The ribs rooted at the banks' feet (1.4 yd in), so where bone bursts from the heaved earth is in view.
    Graded: the ribs now rise from the banks' feet in view, two great arcs framing the hamlet; their feet still end behind the near trees and foreground at the frame's bottom edges, so the heaved earth shows only partly. Ten refinement passes since Derek's x10 note done; remaining list in the next rules check.
    Derek's grade: C+.
+
+## Rework (2026-10-07, stage 1 of docs/REWORK_AND_SEEDS_PLAN.md)
+- **From the engine:**
+  - its trunks warped and channelled (`AUTO_WARP`);
+  - normals unblurred;
+  - its floor from `litter_ground.py` instead of the retired tiles.
+- **The shared bark** (`bark.py`), found by this rework:
+  - a socket whose 3D eye is not drawn (turned from the camera) showed as a black hole; now it is a healed scar, a
+    little darker;
+  - a dying tree carried four weeping eyes stacked up its trunk; now two at most (Derek: "maybe two eyeballs ...
+    spaced out pretty well"), kept well apart.
+- **Graded:** C+ (it was C+). The eyes read as two per tree, apart; the floor is quieter. Its own debts stand: more of
+  the god, the confetti of fallen leaves near the fire.

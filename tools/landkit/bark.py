@@ -103,14 +103,14 @@ def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0
         n_sc = int(rs.integers(2, 5)) + int(round(dying * 3))
         placed = []
         for k in range(n_sc):
-            weeping = dying > 0 and k < 1 + int(dying * 3)                # the dying tree's scars open into eyes
+            weeping = dying > 0 and k < 1 + int(dying * 1)                # the dying tree's scars open into eyes: two at most (Derek: "maybe two eyeballs ... spaced out pretty well")
             # no two scars overlap (Derek: the eyes "overlap and they shouldn't"): each keeps clear of the others by
             # its lids, brow and the runs beneath it, or it is not placed
             for _try in range(24):
                 a_s, z_s = rs.uniform(-0.6, 0.9) * r, rs.uniform(*scar_band)
                 w_s = rs.uniform(0.2, 0.3) * min(1.0, r / 0.6) * (2.4 if weeping else 1.0)   # an eye big enough to be one
                 clear = all((((a_s - pa + circ / 2) % circ - circ / 2) / ((w_s + pw) * 1.9)) ** 2 +
-                            ((z_s - pz_) / ((w_s + pw) * 1.5)) ** 2 > 1.0 for (pa, pz_, pw) in placed)
+                            ((z_s - pz_) / ((w_s + pw) * 2.6)) ** 2 > 1.0 for (pa, pz_, pw) in placed)   # well apart
                 if clear:
                     break
             if not clear:
@@ -129,7 +129,8 @@ def paint(img, wood, bole, v, n, arc, along, r, seed, moon, scars=True, top=24.0
                 er = np.hypot(ex, ey)
                 lids = bole & (er >= 0.82) & (er < 1.35)
                 img[lids] = img[lids] * np.where(ey[lids] > 0, 1.12, 0.62)[:, None]
-                img[bole & (er < 0.82)] = R_BARK[0]
+                sk = bole & (er < 0.82)                                           # the socket: dark bark, healed over where no eye shows
+                img[sk] = img[sk] * 0.8                                           # healed over: only a little darker where no eye shows
                 eyes.append(dict(a=a_s, z=z_s, w=w_s, k=k, mask=bole & (er < 1.0)))   # the socket's own pixels
             elif weeping:
                 # THE WEEPING EYE (Derek: "a yellowing gross eye weeping, leaking blood sap"): the scar opened into an
