@@ -475,3 +475,17 @@ Passes:
 2. All three fixed. **Causeway: B+.**
 
 **The maze** (`worldgen/bog.py`): the Back is now the spanning tree that joins everything; the loops are causeways laid later between places the Back already joined, and about 40% of the dead ends are boards going nowhere. Seeds 1 to 3: 4 to 5 causeways each, and about 60% of the walking is tight. The preview stamps both kinds.
+
+## Rules check, 2026-10-08: the third kind of path (the rib walk)
+
+MASTER_RULES is unchanged. `bog_causeway.rib_walk`: one of the serpent's great ribs fallen and lying along the bog, a yard and a quarter across, a single-file bridge of bone:
+- the rib's own flattened-oval section, its walked crown worn flat and dished;
+- its knobbed head at the Back's flank, tapering away;
+- high by the Back, sinking toward its tip; slanted cracks across it, bitten chunks, grain along it; slimed where the water reaches.
+
+Passes:
+1. It ran up out of frame and read as a log.
+2. It ran along the Back (the wrong axis).
+3. Square off the Back's flank, toward the open water. **Rib walk: B+.**
+
+In the maze, 35% of the dead ends are causeways, 35% rib walks and the rest the Back.

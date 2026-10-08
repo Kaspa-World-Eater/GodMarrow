@@ -30,6 +30,7 @@ def render(seed, cx, cy, out):
     here = [w for w in Z["walks"] if any(near(p, 22) for p in w["pts"][::6])]
     bs.LINES = [w["pts"] + OFF for w in here if w["kind"] == "back"]
     bs.CAUSEWAYS[:] = [w["pts"] + OFF for w in here if w["kind"] == "causeway"]
+    bs.RIBWALKS[:] = [w["pts"] + OFF for w in here if w["kind"] == "rib"]
     bs.LINE = bs.LINES[0] if bs.LINES else bs.LINE
     mods, stamps, paints, living = [], [], [], []
     for n in Z["nodes"]:

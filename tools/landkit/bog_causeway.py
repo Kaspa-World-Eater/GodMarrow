@@ -70,3 +70,43 @@ def stamp(X, Y, H, line, level=0.0, seed=3, half=0.8):
     H = np.where(ms, level + tall - dd * 0.6, H)
     part[ms] = 61
     return H, part
+
+
+def rib_walk(X, Y, H, line, level=0.0, seed=5, half=0.62):
+    """A RIB WALK (the brief: "branches leave it as the long ribs"): one of the serpent's great ribs fallen and lying
+    along the bog, broad enough to walk, a yard and a quarter across: a single-file bridge of bone over the black water.
+    Its section is the rib's own (a flattened oval, broad on top, the walked crown worn flat); along its length it
+    curves (the rib's own bow), rises out of the water near its knobbed head where it left the Back and sinks toward its
+    far end; cracked across, a chunk gone here and there; the grain running its length.
+      returns (H, part): part 64 the rib's bone, 65 its broken ends' spongy bone"""
+    line = np.asarray(line, float)
+    seg = np.diff(line, axis=0)
+    sl = np.hypot(seg[:, 0], seg[:, 1])
+    s_at = np.concatenate([[0.0], np.cumsum(sl)])
+    L = s_at[-1]
+    tree = cKDTree(line)
+    d, i = tree.query(np.stack([X.ravel(), Y.ravel()], 1))
+    i = np.clip(i, 0, len(line) - 2)
+    t = seg[i] / sl[i, None]
+    rel = np.stack([X.ravel(), Y.ravel()], 1) - line[i]
+    s = (s_at[i] + (rel * t).sum(1)).reshape(X.shape)
+    v = (-rel[:, 0] * t[:, 1] + rel[:, 1] * t[:, 0]).reshape(X.shape)
+    d = d.reshape(X.shape)
+    H = H.copy()
+    part = np.zeros(X.shape, int)
+    f = np.clip(s / max(L, 1e-3), 0, 1)
+    w = half * (1.0 + 0.45 * np.exp(-(s / 0.9) ** 2)) * (1 - 0.25 * f)    # the knobbed head, tapering away
+    on = (d < w + 0.02) & (s > -0.3) & (s < L)
+    q = np.clip(np.abs(v) / np.maximum(w, 0.05), 0, 1)
+    sect = np.sqrt(np.clip(1 - q ** 2.6, 0, 1))                            # broad on top, rounding to its sides
+    top = level + 0.42 * (1 - f) ** 0.8 + 0.06 - 0.12 * f                  # high by the Back, sinking to its tip
+    crack = (_h(np.floor(s / 1.1), 1, seed) < 0.6) & (np.abs((s % 1.1) - 0.55 - v * 0.3) < 0.045)   # cracks across, slanted
+    bite = (_h(np.floor(s / 2.2), 2, seed) < 0.25) & (np.hypot((s % 2.2) - 1.1, v - np.sign(_h(np.floor(s / 2.2), 3, seed) - 0.5) * w * 0.8) < 0.3)
+    grain = np.abs(np.sin(v * 40 + vn(s * 0.8, v * 2) * 3)) < 0.08
+    worn = (vn(s * 1.1 + seed, v * 3) - 0.5) * 0.06                       # the walked crown unevenly worn, dished
+    z = top - (1 - sect) * 0.32 - crack * 0.08 - bite * 0.25 - grain * 0.015 + worn + (vn(X * 9 + seed, Y * 9) - 0.5) * 0.02
+    m = on & (z > H)
+    H = np.where(m, z, H)
+    part[m] = 64
+    part[m & (bite | ((L - s) < 0.25))] = 65
+    return H, part

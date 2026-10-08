@@ -42,6 +42,7 @@ LEVEL = 0.0                                  # the bog's water table
 VALUE_ONLY = False
 LINES = []                                   # several walks (a maze window, worldgen/bog.py); LINE alone otherwise
 CAUSEWAYS = []                               # the bog folk's board causeways: lines (landkit bog_causeway.py)
+RIBWALKS = []                                # the great ribs walked as bridges of bone: lines (bog_causeway.rib_walk)
 
 ws.FOCUS = C.copy()
 for _f in ("FOREST_LIFE", "MIST", "BEAMS", "GRASS", "FERNS", "LITTER_GEN", "LEAF_FALL"):
@@ -138,6 +139,9 @@ def stamp(W, w):
     for ci, cl in enumerate(CAUSEWAYS):
         H, cp = bog_causeway.stamp(X, Y, H, cl, LEVEL, seed=31 + ci)
         spart = np.where(cp > 0, cp, spart)
+    for ri, rl in enumerate(RIBWALKS):
+        H, rp = bog_causeway.rib_walk(X, Y, H, rl, LEVEL, seed=41 + ri)
+        spart = np.where(rp > 0, rp, spart)
     for f_ in EXTRA_STAMPS:
         H, ep = f_(X, Y, H, W)
         spart = np.where(ep > 0, ep, spart)
@@ -269,6 +273,12 @@ def ground(img, W, px, py, pz, SX, SY, L, v, gl):
         col = np.where((st == 60)[..., None], plank, col)
         col = np.where((st == 61)[..., None], _r(R_DEAD, vv * 0.75), col)
         col = np.where((st == 62)[..., None], _r(R_MUD, vv * 0.8 + 0.08), col)
+        # the rib walk: the Back's own bone, its walked crown worn pale, slimed where the water reaches it
+        rmot = (vn(px * 2.3 + 5, py * 2.3) - 0.5) * 0.14 + (vn(px * 26, py * 26) - 0.5) * 0.04
+        rib = np.where((wetz > 0.22)[..., None], _r(R_CROWN, vv * 0.92 + rmot), _r(R_BONE, vv * 0.9 + rmot))
+        rib = np.where((wetz < 0.06)[..., None], _r(R_ALGAE, vv * 0.95), rib)
+        col = np.where((st == 64)[..., None], rib, col)
+        col = np.where((st == 65)[..., None], _r(R_MUD, vv * 0.6), col)
         for f_ in EXTRA_PAINT:
             col = f_(col, W, px, py, pz, L, vv, gl, st)
     col = np.where(((dr == 11) | (dr == 12))[..., None], stone, col)

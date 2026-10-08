@@ -739,7 +739,35 @@ def scene_causeway():
     ws.HERO = cl[90] + AX * 0.1                                        # on the boards
 
 
-SCENES = dict(causeway=scene_causeway, nature=scene_nature, hut=scene_hut, socket=scene_socket, skull=scene_skull, ruins=scene_ruins)
+def scene_ribwalk():
+    """a branch along a great rib: the Back passes, and from its flank a fallen rib runs out over the water, curving, a
+    single-file bridge of bone"""
+    set_origin(7)
+    bs.LINE = twisting_line(14 + VARIANT, bends=vb(((-0.4, -2.4, 4.0), (0.45, 2.0, 5.0))))
+    mid = bs.LINE[len(bs.LINE) // 2]
+    t = np.linspace(0, 1, 500)
+    k_ = len(bs.LINE) // 2
+    tg = bs.LINE[k_ + 5] - bs.LINE[k_ - 5]
+    tg = tg / np.linalg.norm(tg)
+    away = np.array([-tg[1], tg[0]])                                       # square off the Back's flank
+    if away @ AX < 0:
+        away = -away                                                       # into the open water before us
+    away = away * 0.85 + tg * 0.3
+    away = away / np.linalg.norm(away)
+    side = np.array([-away[1], away[0]])
+    start = mid + away * 2.0
+    rl = start[None] + away[None] * (t * 12.0)[:, None] + side[None] * ((t ** 1.4) * 4.5)[:, None]   # the rib's own bow
+    bs.RIBWALKS[:] = [rl]
+    bs.CAUSEWAYS[:] = []
+    bs.BED_MODS[:] = []
+    bs.DROWNED_TREES = [(C + AX * 5.0 + PERP * 7.0, 0.36, 5.0, 77)]
+    bs.DROWNED_WALLS, bs.GIANT_RIBS = [], []
+    bs.STRUCTS[:] = []
+    bs.EXTRA_STAMPS[:], bs.EXTRA_PAINT[:], bs.EXTRA_LIVING[:] = [], [], []
+    ws.HERO = rl[120] + AX * 0.05                                      # out on the rib
+
+
+SCENES = dict(ribwalk=scene_ribwalk, causeway=scene_causeway, nature=scene_nature, hut=scene_hut, socket=scene_socket, skull=scene_skull, ruins=scene_ruins)
 
 if __name__ == "__main__":
     if ":" in sys.argv[1]:                                               # NAME:VARIANT, e.g. skull:2

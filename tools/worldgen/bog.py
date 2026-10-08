@@ -144,8 +144,9 @@ def generate(seed):
         if not (6 < end[0] < W_ZONE - 6 and 6 < end[1] < H_ZONE - 6):
             continue
         pts, wd = walk(rng, nodes[i]["p"], end, nodes[i]["r"], 0.0)
-        kind = "causeway" if rng.random() < 0.4 else "back"               # some false leads are boards going nowhere
-        wd = np.full(len(wd), 1.6) if kind == "causeway" else wd * np.linspace(1, 0.6, len(wd))
+        r_ = rng.random()                                                  # the false leads: boards going nowhere, a great
+        kind = "causeway" if r_ < 0.35 else ("rib" if r_ < 0.7 else "back")   # rib running out over the water, or the Back
+        wd = np.full(len(wd), 1.6 if kind == "causeway" else 1.3) if kind != "back" else wd * np.linspace(1, 0.6, len(wd))
         walks.append(dict(a=i, b=-1, pts=pts, width=wd, spur=True, kind=kind))
     # the land: a grid at 0.5 yd; the Back and the shelves; the rest water
     res = 0.5
@@ -162,7 +163,7 @@ def generate(seed):
     for wk in walks:
         for p, w_ in zip(wk["pts"][::2], wk["width"][::2]):
             m = np.hypot(xx - p[0], yy - p[1]) < w_ / 2
-            land[m] = 3 if wk["kind"] == "causeway" else 2
+            land[m] = {"causeway": 3, "rib": 4}.get(wk["kind"], 2)
     # the balance: few things in the water, each with room round it
     from scipy import ndimage as nd
     water = land == 0
@@ -186,14 +187,15 @@ def generate(seed):
 
 def numbers(Z):
     land, res = Z["land"], Z["res"]
-    back = ((land == 2) | (land == 3)).sum() * res * res
+    back = (land >= 2).sum() * res * res
     shelf = (land == 1).sum() * res * res
     total = land.size * res * res
     length = sum(np.hypot(*np.diff(w["pts"], axis=0).T).sum() for w in Z["walks"])
     widths = np.concatenate([w["width"] for w in Z["walks"]])
     return dict(chambers=sum(1 for n in Z["nodes"] if n["kind"] != "exit"), kinds=[n["kind"] for n in Z["nodes"]],
                 walks=len([w for w in Z["walks"] if not w["spur"]]),
-                causeways=len([w for w in Z["walks"] if w["kind"] == "causeway"]), loops=Z["loops"], spurs=len([w for w in Z["walks"] if w["spur"]]),
+                causeways=len([w for w in Z["walks"] if w["kind"] == "causeway"]),
+                ribs=len([w for w in Z["walks"] if w["kind"] == "rib"]), loops=Z["loops"], spurs=len([w for w in Z["walks"] if w["spur"]]),
                 back_length_yd=round(float(length)), tight_share=round(float((widths < 3.8).mean()), 2),
                 walkable_share=round(float((back + shelf) / total), 3), props=len(Z["props"]))
 
@@ -207,6 +209,7 @@ def draw_map(Z, out):
     col[land == 1] = (58, 54, 36)
     col[land == 2] = (150, 136, 108)
     col[land == 3] = (110, 82, 52)
+    col[land == 4] = (205, 196, 170)
     im = Image.fromarray(col).resize((land.shape[1] * S // 1, land.shape[0] * S // 1), Image.NEAREST)
     d = ImageDraw.Draw(im)
     k = S / Z["res"]
