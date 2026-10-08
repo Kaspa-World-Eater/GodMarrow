@@ -436,3 +436,22 @@ MASTER_RULES is unchanged; no new grades.
 ## Rules check, 2026-10-08: the nature shelf anchored
 
 MASTER_RULES is unchanged; no new grades. The nature chamber's marsh shelf is now anchored to its own variant's walk (just behind the Back where it passes the frame's middle), not to a fixed point, so every variant's open ground sits beside the walk, where the player can step off it. Variants 0 and 1 both checked. **Variants: B+, all three faults fixed.**
+
+## DEREK'S SECOND REVIEW (2026-10-08, notes)
+
+- **hut, B+:** "But could use some work, add a trellis with fire".
+- **skull, C+:** "The skull should be hump and the top of the eye sockets showing." So: almost all of it buried, a hump of cranium and the brows over the orbits breaking the marsh. The jaws, the snout and the separate parts go under.
+- **value, D, "Why does it look grey, F currently":** the grey frame is rule 0.4's colour-off check, not a look. The page will show it beside the colour frame, labelled as a check, so it isn't read as the scene.
+- Unchanged: walk A-, nature A-, ruins A-, socket A-, maze B+.
+
+**The skull, rebuilt to Derek's note ("hump and the top of the eye sockets showing"):**
+- the crown of the cranium is a broad, smooth hump of worn bone, sinking forward toward the buried snout, with zigzag sutures (one across the crown, one down its middle behind it);
+- set into the hump's front corners, the arched brows (the tops of the two great eye sockets) break the peat with black water in the sockets below;
+- the jaws and snout are gone under the bog.
+
+Passes:
+1. Brows detached; the sutures fanned like a shell.
+2. Sockets set into the hump; true zigzag seams.
+3. The crown kept smooth (ragged only at its waterline).
+
+Awaiting Derek's grade.
