@@ -408,11 +408,12 @@ def sea_paint(m, t, X, Y, Z, n, soft, dith, Fm):
         _, crest = Fm.water(s_, t_)
         # on the curl: clinging at the lip's leading edge and on the slumped sections, in runs down the face
         # along the lip's top a thin broken line, then strands clinging down the face
-        foam = (z > 0.7) & (np.abs(n[m][:, 2] - 0.55) < 0.25) & (vn(t_ * 2.6, 1.0) > 0.38)
+        foam = (z > 0.7) & (np.abs(n[m][:, 2] - 0.55) < 0.25) & (vn(t_ * 7.0, z * 9.0) + vn(t_ * 1.3, 2.0) * 0.4 > 0.62)
         foam |= (z > 0.25) & (z < 0.7) & (n[m][:, 2] < 0.3) & (np.abs(vn(t_ * 4.0 + 4, z * 1.5) - 0.5) < 0.04)
         # behind the break, the spent foam lies in strands dragged along the shore, thinning toward the beach
         spent = np.clip((s_ - 66.5) / 6.0, 0, 1) * (s_ < 73.5)
-        foam |= (z < 0.15) & (np.abs(vn(t_ * 0.35 + 9, s_ * 1.6) - 0.5) < 0.05 * spent) & (vn(t_ * 2.0, s_ * 2.0) > 0.35)
+        # dry-brush streaks dragged along the shore (the lake's method), broken where the brush lifts
+        foam |= (z < 0.15) & (vn(t_ * 0.22 + 9, s_ * 3.4) > 0.86 - spent * 0.12) & (vn(t_ * 3.0, s_ * 3.0) > 0.3)
         col = np.where(foam[:, None], np.array([0.27, 0.15, 0.14]) * (0.75 + light[:, None]), col)
     # the shallows over the sand: the sand's red-black shows up through the blood, more the shallower, in dithered
     # steps (never contour lines); at its very edge a thin dark wet line, the pigment pooled

@@ -110,3 +110,22 @@ Checked against pass 1:
 - the spent strands curl too neatly;
 - the swells beyond the break are bands, not yet heavy shapes;
 - the breaker doesn't move (that comes with the game's animation pass: "fold late and fall slowly").
+
+## Rules check (2nd since Derek's last word), then pass 3: the sea's foam and swells
+
+**Worst failure:** the sea's paint:
+- the lip's foam broke into blocks;
+- the spent strands curled like ornament;
+- the swells beyond were even bands.
+
+**Fixes:**
+- A second swell set crosses at an angle, shorter, so the sea is heavy and irregular.
+- The lip's foam is a fine broken line, from two noises at the scale of a hand.
+- The spent foam lies in dry-brush streaks dragged along the shore and broken where the brush lifts (the lake
+  effect's method, from the library's water page).
+
+**Grade: the sea B-, the piece B-. Still short:**
+- a few rows of dither in the near swells;
+- the far sea needs its own darker distance under cloud shadow (the area page: "near black ... under cloud shadow");
+- the corpses read as bodies only up close;
+- the breaker doesn't move yet (that comes in the game).

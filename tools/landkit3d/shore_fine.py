@@ -82,6 +82,9 @@ def water(s, t):
     a = 0.5 * F3.smooth(WATERLINE + 2.5, WATERLINE + 9.0, s)        # the shallows lie slack: a clean waterline
     ph = 2 * math.pi * (s + 0.4 * np.sin(t / 7.0) + 0.6 * F3.vnoise(t * 0.08, 2.0)) / 9.0
     swell = a * ((0.5 + 0.5 * np.sin(ph)) ** 2.2 - 0.3)
+    # a second set crossing at an angle, shorter: the sea heavy and irregular, never even bands
+    ph2 = 2 * math.pi * (s * math.cos(0.45) + t * math.sin(0.45)) / 5.5
+    swell = swell + a * 0.35 * ((0.5 + 0.5 * np.sin(ph2 + 1.3)) ** 2 - 0.3)
     bs = 73.8 + 0.8 * np.sin(t / 5.0)                              # the breaker line, out past the swash
     d = s - bs
     crest = 0.35 * np.where(d < 0, np.exp(-(d / 0.9) ** 2), np.exp(-(d / 1.8) ** 2))   # the curl itself is 3D
