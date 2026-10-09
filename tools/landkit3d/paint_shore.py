@@ -124,9 +124,16 @@ def paint(d, t, hero=None):
         fine = np.clip((BF.BERM_S - 0.6 - sm) / 3.0, 0, 1)
         grain = vn(X[m] * 41.0, Y[m] * 41.0)
         vd = tm * 0.52 + 0.06 * fine + np.where(grain > 0.78, 0.07, 0.0) - np.where(grain < 0.16, 0.04, 0.0)
+        # laid in dry-brush strokes along the ripple crests (the painted standard, rule 4): a stretched noise, long
+        # along the shore and thin across it, a step lighter where the brush catches the tops, a step darker in the
+        # hollows, only where the light grazes
+        stroke = vn(tm_t * 0.9 + fbm(sm * 0.3, tm_t * 0.3) * 1.5, sm * 9.0)
+        lit = np.clip((tm - 0.35) * 3.0, 0, 1)
+        vd = vd + np.where(stroke > 0.7, 0.07, np.where(stroke < 0.22, -0.05, 0.0)) * lit
         cd = tone(R_SAND, np.clip(vd, 0, 0.99), dith[m], band=0.08)
         # wet matte: the darkest value in the frame, the grain gone
         vw = tm * 0.55 + (vn(X[m] * 5, Y[m] * 5) - 0.5) * 0.05
+        vw = vw + np.where(vn(tm_t * 0.7 + 3, sm * 7.0) > 0.74, 0.05, 0.0) * np.clip((tm - 0.3) * 3.0, 0, 1)
         cw = tone(R_WET, np.clip(vw, 0, 0.99), dith[m], band=0.06)
         col = np.where(dry[:, None], cd, cw)
         # the stain (chapter 13, section 6): below the high-tide line the Red has filmed the sand; wet it is maroon, dried
@@ -287,12 +294,16 @@ def paint(d, t, hero=None):
         rb = np.where(hit, 0.12, rb)
         # the body: oxblood, darker in the hollows and the trough, under the lip darkest
         body = 0.05 + 0.05 * T[m]
+        hb_s = BF.heart(t)
         v = body * (1 - F) + F * rb * 2.0
         # the swash sheet thinning over the sand: its last feathered edge shows the sand through, a maroon stain
         thin = np.clip(depth / 0.05, 0, 1)
         v = v * (0.75 + 0.25 * thin)
         # a breath of the wind's small ripples on the surface (no drawn lines: the swell's own normals carry the form)
         v = v + (vn(s[m] * 3.0 + tt[m] * 0.4, tt[m] * 6.0) - 0.5) * 0.02
+        # faint strokes along the swell's run, the brush dragged with the flow; heavier where the glaze lies
+        runs = vn(s[m] * 0.8 + fbm(tt[m] * 0.25, s[m] * 0.25) * 1.2, tt[m] * 6.0 - hb_s * 2.0)
+        v = v + np.where(runs > 0.74, 0.025, np.where(runs < 0.2, -0.015, 0.0)) * (0.4 + 6.0 * F)
         col = tone(R_SEA, np.clip(v * 1.9, 0, 0.99), dith[m], band=0.05)
         # the skin (blood is thick: Derek): a dull film over the heavy surface, wrinkled into slow folds where the beat
         # has pushed it together (near the shore and behind the bore), smooth and lacquered where it lies still

@@ -434,3 +434,22 @@ The loop was repainted from pass 10's passes (the forms did not change).
 
 **Grade: B-.** **Still short:** the drowned's legs read as stubs, the sand and the sea want dry-brush strokes, and the
 dry backshore is lighter than the sea (rule 22).
+
+## Rules check, after pass 11, and pass 12 (2026-10-09): the strokes
+
+**Rules check:** the rules, the painted standard and the area page unchanged; no grade from Derek on pass 10 or 11
+yet. **Worst failure: line 7, the paint:** no dry-brush strokes on the sand or the sea (painted standard, rule 4:
+"Long dry-brush strokes: noise stretched along one axis ... Not round blobs, not cells").
+
+**Pass 12** (paint only):
+- the dry sand laid in strokes along the ripple crests: a stretched noise long along the shore and thin across it, a
+  step lighter where the brush catches the grain tops and a step darker in the hollows, only where the light grazes;
+- fainter strokes along the shore on the wet matte band;
+- faint strokes along the swell's run on the sea, heavier where the sky's glaze lies.
+
+**One bug:** the sea's strokes first used the sand's coordinates (a leftover variable) and crashed; fixed.
+
+**cine_check (exterior):** 4 of 7, unchanged.
+
+**Grade: B-.** **Still short:** the drowned's legs read as stubs, and the dry backshore is lighter than the sea (rule
+22).
