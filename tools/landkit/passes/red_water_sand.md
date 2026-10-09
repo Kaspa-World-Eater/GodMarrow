@@ -311,3 +311,42 @@ bone jam; whose bones is never said). `beach3d.bones_jam` replaces the logs:
 
 **Grade: C.** The bones read as bones and the trail reads. **Still short:** the swell's front is one big smooth dark
 mass, the roll is hard to read, the froth is blotchy, the tall column is plain, and the dead are hard to read.
+
+## Rules check, after pass 6 (2026-10-09, the reminder)
+
+`MASTER_RULES` unchanged since my last full reading (last edited this morning). Read again: the area page (the Red Water,
+the wrack now a bone jam, "the washed-up dead along the strand"), the review page's notes.
+
+**Derek's new note on pass 5:** "Don't forget the bodies in the water." Pass 4 had the dead floating in the shallows;
+the rebuild dropped them. **This is the worst failure,** and line 1 of the checklist (the brief from the lore: "whatever
+goes into the Red comes back"; the dead the sleeper's breath carries back to the shore).
+
+The other lines stand as logged after pass 5 and 6: form passes the value test; the prints read; the paint is weak
+(no dry-brush strokes); the dead on the sand are hard to read; the swell's front is one smooth dark mass; cine_check 4
+of 7.
+
+**Fix first:** the dead in the Red, as real forms riding the surface: face down with only the back and shoulders out,
+one face up, one half sunk with a cloak spread round it, one tumbling in the swash; each bobbing on the heave and
+swaying on the beat, the blood running off their backs.
+
+## Pass 7 (2026-10-09): the bodies in the water
+
+Derek: "Don't forget the bodies in the water." `beach3d.drowned`: five of the dead riding the Red as real forms on
+its surface (`beach_floor.sea_z`), rebuilt every frame so they rise and fall on the heave and drift a little shoreward
+on each surge of the beat, then back:
+- face down, the back and the shoulder blades standing out of the blood, the head's crown with the hair spread on
+  the surface, the arms flung out or hanging down into the red, the legs trailing under;
+- one face up, pale;
+- two in sodden cloaks clinging to the back, their ragged edges sinking under the surface so the Red cuts their
+  outline;
+- one rolled in the bore's froth; one at the swash's edge with the tongue running round it.
+- **Painted** soaked in the Red: skin blotched dark red, cloth near black, a wet glaze where the sky catches the tops.
+
+**The first try failed:** sunk too deep, the bodies were pale blobs, and the cloaks were flat square sheets reading as
+tiles. Raised, given shoulder blades and flung arms at the surface, with the cloaks' edges sinking, they read as the
+drowned.
+
+**cine_check (exterior):** 4 of 7, unchanged.
+
+**Grade: C.** **Still short:** the swell's front is one smooth dark mass, the roll is hard to read, the froth is
+blotchy, the tall column is plain, and the drowned's legs read as stubs.

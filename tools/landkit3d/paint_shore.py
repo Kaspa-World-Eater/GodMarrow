@@ -247,6 +247,14 @@ def paint(d, t, hero=None):
             col = tone(R["stone"], tm, dith[m])
         if name == "blood":
             col = tone(R["blood"], np.clip(tm * 0.2, 0, 0.99), dith[m])
+        if name in ("corpse", "cloth") and True:
+            # the drowned: out in the Red, soaked and stained with it; cloth goes near black, skin blotched dark red,
+            # a wet glaze on the tops where the grey sky catches it
+            insea = s[m] > BF.WATER - 1.0
+            stain = np.where(insea, 0.6 if name == "cloth" else 0.5, 0.0)[:, None]
+            col = col * (1 - stain) + np.array([0.09, 0.02, 0.025]) * (0.5 + tm[:, None]) * stain
+            glaze = insea & (up[m] > 0.85) & (key[m] > 0.55) & (vn(X[m] * 9, Y[m] * 9) > 0.55)
+            col = np.where(glaze[:, None], col * 0.6 + np.array([0.3, 0.2, 0.21]) * 0.5, col)
         if name in ("corpse", "cloth", "bone"):
             # the dead and their rags: wet where the Red still reaches them, stained below the high-tide line
             wb = s[m] > ht[m]
