@@ -43,24 +43,27 @@ anything long feared or long prayed to, and hardens there into **marrow**.
 
 The Terrors walked. Every great fear had grown a body, and every body ruled the people whose fear had made it.
 
-- **The Unhewn,** from outside the world, who ate the shape of things, until the god raised its herald, the one dragon,
-  and drove them out. The herald stayed, remade the world and came to believe it had made it: the Shaper, later the
-  Starved Crown.
+- **The Unhewn,** three fingers of something from beyond the outside, reaching in, which ate the shape of things
+  without ever knowing the world was there. The herald, a great dead thing of bone with fire in its ribs, fought them;
+  they never noticed. One lay down and is the bleeding mountains above the Red; the other two went. The herald fell
+  into a crater, was worshipped there, and ate its worshippers and then itself: the Starved Crown.
 - **The Famines:** god-corpses the height of hills that kept walking, eating the land bare, into which whole kingdoms
-  climbed to live; among them Vesk, the city whose walls stood up, now an iron behemoth.
-- **The tower** filled with one thing full of eyes, which drinks dreams.
-- **The reaper** asleep in a cavern floored with an age's dead.
+  climbed to live. One still walks, with Dhum's lamps lit in its side.
+- **The Needle,** a spike of iron in a forest, full of a slow digesting liquid, bones and great eyes, which drinks
+  dreams.
+- **The reaper,** grown from the fear that the dead would never lie down: it reaped them, then the living, carried an
+  age's dead down a pit and lay on them to count.
 - **The shell** far out under the Red, whose sleeper's breath is the tide.
-- **The serpent of the wet country,** a naga coiled round the whole wet country with its tail in its mouth, fed in blood.
+- **The serpent of the wet country,** dead before anyone counted: its rot is the wet country, its stone spine the road.
 
 The peoples of the age:
-- the Lifted of Ithmar, the height of the world, who burned the world's marrow to hang their cities in the sky, and
-  fell in the Marrow War; their sovereigns are the Thrones Below, their drained people the Emptied;
-- the Sky-Climbers, who built a stair to climb out of the sky;
+- the cities in the sky, whose builders nobody knows: one great city, Qhaloth, burned the world's marrow and then the
+  marrow of its lesser cities' people to climb, cut them loose (Ghenn and Sorrath fell, their people hollow: the
+  Emptied), and rose until it stopped, and is the dark moon, dead, rusting, ruled by one lich;
 - the Unison, a single mind in many bodies, in the mire;
 - the Hallowed, who live as long as a people keeps their name in its prayers;
-- the Lanternless, eaters of souls at the edge of the light;
-- the Angled, inside the thing, whose halls have too many corners.
+- the Xyrr, inside the thing, whose halls have too many corners;
+- in the Deep, Vesk, the iron city that sank and was held up by its people, fused into its legs.
 
 Rule by terror was the order of things. A city that trembles is a city that feeds its god. And every power anyone
 had was marrow dug out of the ground, which was the god's own life.
@@ -75,15 +78,15 @@ else: processions of penance, and the iron maidens standing in rows in the waste
 something more, a saint or a Want or a god for a winter. The cities emptied. Knowledge died with the hands that held it.
 
 Some powers did not die. They slept, or went under, or kept walking because nobody told them to stop. The Starved Crown
-ate its worshippers and then itself to stay awake. One Famine still walks, and Vesk. The serpent of the wet country was
-still being fed in blood when the god died, and long after, and then ate itself.
+ate its worshippers and then itself to stay awake. One Famine still walks, and Vesk walks in the Deep. The pit at the
+dead serpent's throat was still being fed in blood when the god died, and long after.
 
 ## The Held Space
 
 All that time, inside the thing beneath, there was a space held open, and in it there was no night. Light lay evenly
 over everything and came from nowhere. In it:
 - the Choir sang the thing what it was, in turns, so that the note was never dropped;
-- the Angled cut halls with too many corners and sigils that hurt the eyes;
+- the Xyrr cut halls with too many corners and sigils that hurt the eyes;
 - high in the dark, a court of white faces judged every thought.
 
 At the very last, a congregation knelt there and sang. They are the ancestors of every person now alive on the Hide.

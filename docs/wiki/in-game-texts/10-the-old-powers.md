@@ -42,23 +42,24 @@ those.
 *A warning the grandmothers of the white country give to children who go out after dark. A reader of the Citadel
 set it down, and wrote under it what the Citadel thinks.*
 
-There was only ever one dragon. Anyone who tells you there were many has been listening to songs.
+There was only ever one of it. Anyone who tells you there were many has been listening to songs.
 
-It was dead before it was ever alive. When the things with no shape came into the world and began to eat it, the
-mountains and the rivers and the faces off people's heads, the god under us made itself a hand out of its own dead to
-push them out again: bones the length of a valley, and fire in the cage of the ribs. It was not afraid of them,
-because it had nothing left to lose. It drove them out the way they had come in, every one, and then the god went
-still again and left it here alone.
+It was dead before it was ever alive. When the three things with no shape put themselves into the world, feeling for
+something, and the mountains and the rivers and the faces off people's heads came away wherever they felt, the god
+under us made itself a hand out of its own dead: bones the length of a valley, wings of bone that held no air and flew
+anyway, and fire in the cage of the ribs. It was not afraid of them, because it had nothing left to lose. It fought
+them longer than anyone has counted, and they never once turned round. They did not know it was there. They did not
+know we were.
 
-So it mended what they had eaten. It raised the mountains again where mountains had been, and cut the rivers back
-into their beds with its claws, and that is why the rivers of the north run straight as a cut. The people who lived
-in what it made called it the Shaper, and it listened to them so long that it believed them. It forgot whose hand it
-had been.
+One of them lay down at last, by the red sea, and did not get up. The other two went away. And it fell, because it had
+broken itself on them too many times, and it struck the ground so hard it made a cup a day's walk across, and lay in the
+bottom of it, burning low.
 
-When its worshippers grew few, it ate them, and when there were none left it began on itself, a little at a time, to
-stay awake. It sits on a broken throne in a citadel it has eaten from the inside, wearing an iron crown it forged when
-it still had subjects to forge for. It is very thin now. It wants nothing in the world so much as to be believed in
-again.
+The people who found it there knelt. They built a city round it, ring on ring up the sides of the cup, and worshipped it
+for saving the world, and it lay and listened to them, and it woke. When its worshippers grew few, it ate them, and
+when there were none left it began on itself, a little at a time, to stay awake. It sits on a broken throne at the
+bottom of the cup, in the city it has eaten from the inside, wearing an iron crown they forged for it when it still had
+subjects. It is very thin now. It wants nothing in the world so much as to be believed in again.
 
 So when you go out at night, do not be afraid of the dark. That is how it finds you.
 
@@ -84,20 +85,22 @@ At dusk, a long way up its side, there was a light. Our guide said it was Dhum t
 walked up into it, and that the lamps of Dhum are still lit inside it after all these years. He said nobody knows who
 lights them.
 
-## The tower that drinks
+## The Needle
 
-*A letter from a town in the sight of the tower. It was carried out by a pedlar, who said it was the only letter
+*A letter from a village in the sight of the Needle. It was carried out by a pedlar, who said it was the only letter
 anybody there had written in a year.*
 
-We can see it from every window. It is a tower, and it is full to the top of something that moves. It is all one
-thing, and it is full of eyes, and every eye is someone's. On a clear day you can see the eyes turn to look at the
-town, all together.
-
-It is awake. It has always been awake.
+We can see it from every window, over the trees. It is iron, and it goes up until the grey takes it, and it has no
+door. Old Haddo climbed it once when he was young, as far as the crack where the rust has eaten through, and looked in.
+He said it is full to the top of something like the water in a blister, and that there are bones in it all the way
+down, going soft, and eyes. He said the eyes were bigger than he was, and that they turned to look at him. He came
+down and told us, and the next winter he got up in his sleep and walked into the trees, and we have not seen him
+since. We can all remember his dreams now. They are mostly about the sea.
 
 Nobody here has dreamed for as long as I have been alive. We lie down and close our eyes and open them again in the
-morning, and nothing has happened in between. The old people say it was not always so. They say the tower drinks the
-dreams of any town in its sight, and that a town in its sight has no dreams of its own.
+morning, and nothing has happened in between. The old people say it was not always so. They say the Needle drinks the
+dreams of any village in its sight, and that a village in its sight has no dreams of its own. We tie our sleepers by
+the ankle.
 
 I do not know what a dream is. I am writing to ask whether anyone where you are still has them, and what they are
 like.
@@ -107,7 +110,7 @@ like.
 *A note found in the margin of the Citadel's oldest book of drawings, beside a drawing of a cavern. The hand is a
 scholar's of the Pale Order.*
 
-The book calls it the Reaper Below. It is a skeleton too great to measure, the drawing says, lying in a cavern
+The book calls it Oss-Karrhath, and the lowlands call it the Gleaner. It is a skeleton too great to measure, the drawing says, lying in a cavern
 floored with the dead of a whole age, and its right arm ends in a scythe grown out of its own bone. The book says it
 may be asleep.
 
@@ -118,40 +121,24 @@ I will say only that I have seen this shape twice.
 
 ## Vesk
 
-*Told by iron-gleaners, who cross the empty country a long way behind Vesk and pick up what it leaves.*
+*Scratched into the wall of a pithead hut in the iron hills, by a miner who did not come up from his next shift. The
+miner who found it copied it out and sent it to the Citadel.*
 
-The readers will tell you Vesk is one of the Famines, a god that outlived its people and kept on walking. We say it
-was a city, and it still is.
+The readers will tell you Vesk is one of the Famines, walking on the edge of the sky. It is not. Vesk is under us.
 
-The people of Vesk worshipped their walls. A wall keeps you alive, and a people that lives behind a wall long enough
-begins to pray to it, and a thing prayed to long enough stands up. One night the walls of Vesk stood up and walked,
-and the city went with them, because the city was inside them. Its people were turned to iron where they stood, in
-the streets and doorways and at their windows, and they went too.
+It was a city once, up here, where the pithead is. When the ground went soft in the old time it went soft under Vesk
+first, because Vesk had dug it hollow, and one night the whole city started going down. And the people would not let
+it. They went down under their houses, every one of them, the children too, and put their shoulders to it and held it
+up. The iron came up into them out of the dark. Their blood stopped in them and went hard, and they went to iron where
+they stood, and grew together, shoulder to shoulder and hip to hip, and they did not let go. Vesk stood up on them. On
+their legs. Then it walked, down, into the Deep, where the iron is, and it walks there still.
 
-It is all iron now, walls and towers and streets and people grown together into one body a league long, and it walks
-still, a grey line moving on the edge of the sky. It eats as it goes. It eats the iron out of the ground, and the
-soil behind it goes grey and dead and will not hold a post.
+There are prints in the ore at the bottom of the new shaft. Round. Hundreds. Going on under the rock.
 
-Where it has stopped to rest, it leaves a square of flattened ground with the marks of streets in it, and sometimes,
-in the middle, an iron child nobody could carry, left behind. We do not take those. Some of us have lain near one at
-night and heard it tapping, very slowly, as if it were trying to walk after the rest.
+I have had my ear to the ore. You can hear it walking. Under the walking you can hear them. They are not screaming.
+They are only holding, the way you hold your breath.
 
-## The Lanternless
-
-*From a letter of the tender of the lantern round, written to a new tender. It is the part of the letter
-the new tender underlined.*
-
-There are things on the roads at night that eat souls. They are older than the faiths, the old tenders said, and in
-the old age they were rivals of the gods themselves, and fed where the gods fed. The readers call them the
-Lanternless. They come near lanterns, because a lantern has a soul in it, and they wait at the edge of the light.
-They do not step into it. They wait for it to gutter.
-
-You will know when one is near. The flame leans away from it. It draws down small and blue and leans against the far
-side of the glass, as far from the dark as it can get.
-
-When that happens, do not open the glass to trim the wick. Do not look into the dark to see what it is. Walk on,
-steady, the way you would walk past a stranger in a doorway, and talk to the lantern. Tell it where you are going. It
-helps them to know someone means to bring them there.
+I am going down again tomorrow. I want to hear whether they say anything.
 
 ## The Hallowed
 
@@ -167,17 +154,22 @@ The readers call them the Hallowed, after the prayers: hallowed be the name.
 
 If you ever come among people whose prayers all end with a name you do not know, keep walking.
 
-## The Thrones Below
+## The Man in the Rust
 
 *Written on the wall of the Citadel's prison by a reader kept there. Under it, another hand has written: "He was
 right."*
 
-Belief makes more than gods. Kings were believed in, and abbots, and matrons of great houses, and most of all the
-sovereigns of the cities that once hung in the sky, believed in so hard and so long by every frightened people under
-them that they stopped being people. When their cities came down, they did not die with them, because they were too
-believed-in to lie down. They sit where they fell, crowned, in the broken hearts of the cities, still holding court,
-still sending for marrow that does not come. The faiths call them liches. The Citadel calls them the Thrones Below.
-There are more of them than the Citadel admits.
+Belief makes more than gods. Kings were believed in, and abbots, and matrons of great houses, and more than any of them,
+whoever ruled the great city in the sky, believed in so hard and so long by every frightened people under it that it
+stopped being a person, if it ever was one. When the great city cut its chains and went up, its ruler went up with it.
+The Citadel teaches that the city got out of the world. It did not. Look at the dark moon on a clear night. Look at its
+edges. That is the city, and it is not small; it is only far away, and it is brown because it is rust.
+
+It is dead up there, all of it, and the dead walk its streets as if they still had somewhere to be. And on the highest
+throne there is one thing that does not walk, because it is sitting, and it gives the order to rise. Every day. To a
+city that cannot rise any further. It has been giving it for longer than we have been counting years, and it has not
+once been obeyed, and it has not once stopped. The shore folk call it the Man in the Rust. The Citadel calls it the
+Regent and will not discuss it, and that is why I am here.
 
 ## The Uninvited
 

@@ -58,8 +58,8 @@ inward, all pointing to a ring of standing teeth. The mothers they carried inste
 god's ribs, because the mothers had carried the children out, and wanted to go back in.
 
 **The hunting.** The old powers that had outlived the Wasting still walked, and the new people were small and warm
-and full of belief. Things waited at the edge of every lantern's light. The Lanternless came to the lanterns,
-because a lantern has a soul in it. Whole companies went down roads and did not come to the end of them.
+and full of belief. Things waited at the edge of every lantern's light, because a lantern has
+a soul in it. Whole companies went down roads and did not come to the end of them.
 
 **The first cup, about 80.** At a great wound in the ground that did not close, people began to pour a measured cup of
 their own blood once a year, and to say words over it as it poured. The processions of the Bleeding Maiden count their

@@ -37,112 +37,204 @@ worse than the Terrors, because a Terror at least wanted to be feared, and these
 
 *Behind the myth.* This law is the deep lore showing at the surface (`00-the-deep-lore.md`): everything here is told,
 and what is told enough stands up. Marrow is belief settled into bone, and the world's own marrow is what kept the god
-alive. Every power that has been taken out of the ground since, by the Terrors, the Lifted, the faiths and the
+alive. Every power that has been taken out of the ground since, by the Terrors, the cities in the sky, the faiths and the
 pilgrim's own hands, has been taken from the god. Nobody in the world has put this together. The game never says it.
 It lets the player notice that every source of power in the world is a wound in it.
 
 ## The Unhewn, and the herald
 
-In the Uncounted, before the Terrors were many, something came into the world from outside it.
+In the Uncounted, before the Terrors were many, something reached into the world.
 
-The peoples who saw it had no word for it, because it had no shape to name. The later peoples call them **the
-Unhewn**, the things that were never cut into any form, and they say there were three great ones and that the rest
-were only their shadows. The first was the One That Unfolds: wherever it lay down, the ground opened like a flower,
-layer under layer, and kept opening. The second was the One That Eats the Edges: it ate the edges of things, so that
-a mountain it had passed no longer ended anywhere, and a man it had touched could not tell where his hand stopped.
-The third was the One That Is Seen Sideways, and nobody who looked at it straight ever described it, because nobody
-who looked at it straight said anything again.
+Nobody knows from where. The scholars who have tried to say it say "from outside", and then, because outside is only
+the dark between the stars and the dark between the stars is still the world's, they say "from outside the outside",
+and stop. The grandmothers of the white country say: from behind. Three things came in. The later peoples call them
+**the Unhewn**, the things that were never cut into any shape, and the oldest tellings say they were never three things
+at all, but three fingers of one hand, put in through the skin of the world the way a hand is put into a sack, feeling
+for something at the bottom.
 
-They did not hate the world and they did not want it. They ate its shape. Where they passed, rivers stood up out of
-their beds and wandered off, forests grew downward into the ground, and a people woke one morning with their faces
-on the backs of their heads and did not remember that it had ever been otherwise. Whole countries were unmade, and
-the Unhewn's spawn came after them, smaller things, many-limbed and angled wrong, picking over what was left.
+The first was the One That Unfolds: wherever it lay, the ground opened like a flower, layer under layer, and kept
+opening. The second was the One That Eats the Edges: a mountain it had passed no longer ended anywhere, and a man it
+touched could not tell where his hand stopped. The third was the One That Is Seen Sideways, and nobody who looked at it
+straight ever described it, because nobody who looked at it straight said anything again.
 
-The thing beneath had not been seen to move in all the Uncounted. It moved then. It raised a herald out of its own
-dead: a thing of bone the length of a valley, with fire in the cage of its ribs, dead already when it was made, and
-fearless because it had nothing left to lose. The peoples called it the dragon, though there was never another. It
-was the god's right hand in the world. It went against the Unhewn with fire and with weight, and it drove them back
-out through the wound they had come in by, one after another, the third last. Then the thing beneath closed the wound,
-and went still again, and the herald was left in the world alone.
+They brought nothing with them: no servants, no spawn, no host. They needed none. They did not hate the world and they
+did not want it. Whatever they were feeling for, the world was only in the way of it, as the cloth of the sack is in
+the way of the hand. Where they moved, rivers stood up out of their beds and wandered off, forests grew downward into
+the ground, and a people woke one morning with their faces on the backs of their heads and did not remember that it had
+ever been otherwise. Nobody has ever said what they wanted. Nobody has ever been sure they knew the world was there.
 
-What the Unhewn had eaten did not grow back. So the herald set about remaking it. It raised mountains where mountains
-had been eaten, and cut the rivers back into their beds with its claws, and laid down plains of fire-glass, and the
-peoples who lived in its new shapes came to call it **the Shaper**. In time it came to believe what they said: that the
-world was its work, and that it had made it. It forgot the god whose hand it had been. It took worship as its due,
-and when the worship thinned, as all worship thinned in the Wasting, it ate its worshippers to stay awake, and then
-began on itself.
+Then the herald came against them.
 
-It sits now on a broken throne in a citadel it has eaten from the inside, wearing an iron crown it forged when it
-still had subjects to forge for. It is very thin. It wants nothing in the world so much as to be believed again. It is
-called **the Starved Crown**. The grandmothers of the white country tell their children: when you go out at night, do
-not be afraid of the dark. That is how it finds you.
+What it was, the tellings agree on only as far as its bones. It was dead already when it first rose: a thing of bone
+the length of a valley, with a neck like a long stair and a skull like a gate, and wings of bare bone that held no air
+and flew anyway, and in the cage of its ribs, where a heart would be, a fire that burned with nothing to burn. The white
+country says the god raised it out of its own dead to be its hand in the world. The shore folk say it came up out of
+the Red. The Citadel of the Shattered Femur says nothing raised it, that it came the way a fever comes. Everybody agrees
+that it was not afraid, because it had nothing left to be afraid for.
 
-*Behind the myth.* The Starved Crown is the one dragon, the dracolich, the god's herald (Derek's ruling), and it became
-the world's demiurge: a maker that believes it made what it only mended. Some of the world's shape is truly its work;
-the white country's ridges, the glass plains and the straight rivers of the north are its cuts. Whether the Unhewn
-are gone or only shut out, nobody knows. Whether the wound is still closed, now the god is dead, nobody knows either.
+It fought the Unhewn for longer than anyone has counted, and the fire of its ribs burned whole countries to glass. And
+the strangest thing told of that war, told by everyone, is that the Unhewn never fought back. They did not turn. They
+did not seem to know. The herald tore at them, and burned them, and broke its bones on them, and they went on feeling
+through the world for whatever they were feeling for, as if nothing were happening at all. Whoever has watched a dog
+worry at the wheel of a moving cart has seen the herald's war, the white country says, except that the cart went over
+the dog again and again, and the dog got up.
+
+In the end one of the three was killed, if it can be said to have been killed. The One That Unfolds lay down at the edge
+of the Red Water and did not get up again, and its body is the mountains there. That is why those mountains are made the
+way they are, fold under fold, black and broken into columns, and why they bleed. Red runs out of their high clefts in
+falls and rivers, down through the folds and out across the flats into the sea, and it has never stopped. The shore
+folk call those mountains the Fallen One and tell them another way (`02-the-creation-myths.md`), and nobody on the shore
+has ever told them they were wrong.
+
+The other two went. Whether they were driven out, or simply finished feeling for what they had come for, nobody knows.
+Whether they found it, nobody knows. The hand drew back out of the sack, and the hole it had come in by closed, or
+seemed to.
+
+The herald fell. It had been broken against them too many times, and somewhere in the white country it came down out of
+the sky and struck the ground so hard that it made a crater a day's walk across, and lay at the bottom of it, burning
+low. The peoples who came after found it there: a valley of bone in a cup of glass, with a fire still in its ribs. They
+knelt. They built a city round it, ring on ring up the crater's sides, and called it **Uth-Kharesh**, and worshipped the
+thing at the bottom as the thing that had saved the world. And it lay there and was worshipped, and it woke.
+
+It woke hungry. A thing that is dead already does not need to eat, but a thing that is believed in needs to be believed
+in, and the worship of Uth-Kharesh was the first it had ever had, and it found it could not do without. When the worship
+thinned, as all worship thinned in the Wasting, it ate the worshippers, a few at first, and then the rest, and when
+there were none left it began on itself. It sits now at the bottom of the crater on a broken throne, in the city it has
+eaten from the inside, wearing an iron crown it had them forge for it when it still had subjects. It is very thin. It
+wants nothing in the world so much as to be believed in again. The white country calls it **the Starved Crown**, and
+the oldest texts **Morrh-Ythraal**, and the grandmothers there tell their children: when you go out at night, do not
+be afraid of the dark. That is how it finds you.
+
+*Behind the myth.* The herald is the one dracolich (Derek's ruling), but the world's voice never calls it a dragon: it
+is the herald, the Starved Crown, the bone-winged thing, the fire in the ribs. The Unhewn are three fingers of something
+beyond even the dark between the stars, alien past understanding. They had no followers and fought nobody; what they
+wanted is never told. The One That Unfolds is the bleeding mountains above the Red Water (the blood rivers and their
+estuaries, `areas/the-red-shore.md`); the shore folk's Fallen One is the same mountains told another way, and both
+stand. Whether the other two will reach in again, now that the god whose herald fought them is dead, nobody knows.
 
 ## The Famines
 
-Some Terrors grew so vast that their bodies outlasted their lives. These were **the Famines**, and they are named for
-what they left behind: wherever one walked, the harvest failed behind it for a generation, the wells went dry and the
-marrow was gone out of the ground, because a god that has outlived its people goes on eating anyway, and eats what is
-under its feet. They were god-corpses the height of hills, and they kept walking after whatever moved them was gone.
+Some Terrors grew so vast that their bodies outlasted their lives. These were **the Famines**, whom the oldest texts
+call **the Gorrhaun**, and they are named for what they left behind: wherever one walked, the harvest failed behind it
+for a generation, the wells went dry and the marrow was gone out of the ground, because a god that has outlived its
+people goes on eating anyway, and eats what is under its feet. They were god-corpses the height of hills, and they kept
+walking after whatever moved them was gone.
 
 Whole kingdoms worshipped them by climbing the long ramps of their bodies and going inside, and lived there, in the
-warm, in the dark, in the god, for generations, and were not seen again outside. Most of the Famines have fallen and
-lie where they fell, and grass grows on them, and the peoples who live round them call them hills. One still walks. It
-takes an afternoon to cross the edge of the sky, and where it has trodden the ground keeps a pulse you can feel in your
-feet. High on its side, at dusk, there are lights: the lamps of Dhum the Swallowed, the last city that climbed up into
-it, still lit after all these years. Nobody knows who lights them.
+warm, in the dark, in the god, for generations, and were not seen again outside. Most of the Famines have fallen and lie
+where they fell, and grass grows on them, and the peoples who live round them call them hills.
 
-The strangest of the Famines was not born a god. There was a city called **Vesk** that worshipped its walls. A wall keeps
-a people alive, and a people that lives behind its wall long enough begins to pray to it, and a thing prayed to long
-enough stands up. One night the walls of Vesk stood up and walked, and the city went with them, because the city was
-inside them. Its people turned to iron where they stood, in the streets and doorways and at the windows, and went too.
-Vesk is iron now, all of it, a behemoth of iron a league long, walls and towers and streets and people grown together
-into one body, and it walks still, a grey line moving on the far edge of the world, eating the iron out of the ground
-as it goes. Where it has stopped to rest it leaves a square of flattened ground with the marks of streets in it, and
-sometimes an iron child in the middle, too heavy to carry, left behind.
+One still walks. It takes an afternoon to cross the edge of the sky, and where it has trodden the ground keeps a pulse
+you can feel in your feet. High on its side, at dusk, there are lights: the lamps of **Dhum the Swallowed**, the last
+city that climbed up into it, and the last city under the sky that still walks. The lamps are lit every evening, after
+all these years. Nobody knows who lights them.
 
 *Behind the myth.* Kingdoms climbed into the Famines and lived inside them for generations without seeing out. The
 congregation knelt inside the thing beneath, in a warm dark they could never see the edges of, and came out through
 its mouth. The rhyme is meant to be heard. Whether the world itself is the last and greatest of the Famines, a god that
 outlived its believers and lay down, and whether the Tithed are only the last kingdom that climbed up into one, no myth
-says outright. The player is meant to come to suspect it.
+says outright. The player is meant to come to suspect it. Dhum is the one walking city under the sky; Vesk, the iron
+city, walks below, in the Deep (`04-the-held-space.md`), and is no Famine, whatever the readers say.
 
-## The tower that drinks
+## The Needle
 
-There is a tower full to the top of one thing that moves, and the thing is full of eyes, and every eye is someone's.
+In a forest that no road goes to, there is a spike of iron standing up out of the trees.
 
-It was made by a fear: the fear of being watched in sleep, which every people has and which one people had so badly,
-for so long, that it grew. It began as one eye in the dark of a bedroom wall. It grew a socket, and a wall to keep the
-socket in, and a stair to climb to the next wall. Now it is a tower higher than any made by hands, and nobody has
-found a door into it, and it is awake. It has always been awake.
+It is higher than the trees by many times their height: straight, black, narrowing to a point that is lost in the grey.
+It has no door, no window and no seam. Rust runs down it in long red streaks like the tracks of tears. The woodcutters
+who live nearest it, as near as anybody lives, call it **the Needle**, and say it is a spike broken off the inside of an
+iron maiden the size of a mountain, standing point up where it fell, and that one day whoever owns the maiden will come
+back for it. The lowlands call it **the Sleepless**. The Citadel's oldest book calls it **Vhul-Oghra**, and says nothing
+else. Nobody knows who made it, or whether anybody did, or how long it has stood. The trees round its foot are older
+than any other trees in that forest, and all of them lean away from it.
 
-It drinks dreams. A town in its sight dreams no dreams of its own: the tower drinks them, and the people lie down and
-close their eyes and open them in the morning with nothing between. At first they do not mind. Then they find they have
-stopped having ideas, because an idea is only a dream that came in the daytime, and the tower drinks those too. Then
-they stop being able to picture the faces of their dead. The last thing to go is the ability to imagine tomorrow, and a
-people that cannot imagine tomorrow sits down where it is and waits. There are towns like that still, in its sight,
-sitting.
+It is not hollow. The few who have climbed it as far as the crack, high up, where the rust has eaten through, and put an
+eye to the crack, say that it is full to the top of one thing: a liquid, clear and faintly yellow and very slow, like the
+water in a blister, and that the liquid is working. Everything in it is coming apart. Bones hang in it at every height,
+whole skeletons and pieces of skeletons, turning slowly, going soft at the edges like bread in broth, more of them the
+lower you look, and at the bottom they lie packed like the sediment in a jar. And among the bones there are eyes: great
+eyes, wider than a man is tall, white and veined, with no faces round them and nothing behind them, drifting in the
+liquid. They are alive. When somebody looks in at the crack, they turn to the crack. Whatever is in the Needle is
+digesting, and the eyes are what it cannot digest, or will not.
 
-Every eye in the tower is the eye of someone whose dreams it drank to the bottom. They look out of its stones in every
-direction, and they blink, and some of them weep. Travellers who have passed near it at night say that for a while
-afterward they dream other people's dreams, as if the tower had spilled.
+It drinks dreams. A village in its sight dreams no dreams of its own: the people lie down and close their eyes and open
+them in the morning with nothing between. At first they do not mind. Then they find that they have stopped having ideas,
+because an idea is only a dream that came in the daytime, and the Needle drinks those too. Then they cannot picture the
+faces of their dead. The last thing to go is the ability to imagine tomorrow, and a people that cannot imagine tomorrow
+sits down where it is and waits. There are villages like that still, in its sight, sitting.
 
-*Behind the myth.* Dreams are what gods are made of (`00-the-deep-lore.md`). Every dream the tower drinks is a god
-that will not be born. The scholars of the Last Breath have noticed that no new god has stood up anywhere in their
-count of years; none of them has looked toward the tower. What it is filling itself up to become, nobody knows.
+And it calls. One night a sleeper gets up out of bed without waking and walks out into the forest, toward the Needle,
+and does not come back, and in the morning the others find that they can remember the sleeper's dreams, every one, as if
+they had been handed round. The woodcutters bar their doors from the outside at night and tie their sleepers by the
+ankle. How a sleeper gets into the Needle, when it has no door, nobody has seen. Travellers who pass near it at night
+say that for a while afterward they dream other people's dreams, as if the Needle had spilled.
+
+*Behind the myth.* Dreams are what gods are made of (`00-the-deep-lore.md`). Every dream the Needle drinks is a god that
+will not be born. The scholars of the Last Breath have noticed that no new god has stood up anywhere in their count of
+years; none of them has looked toward the forest. The liquid is a gut's, and the Needle is digesting; what it is
+digesting toward, and what the eyes are kept for, is never told. Its likeness to the spikes of the iron maidens of the
+Wasting is meant: nobody in the world knows whether the maidens were made in its image or it in theirs.
 
 ## The reaper below
 
-In a cavern floored with the dead of a whole age lies a skeleton too great to measure, whose right arm ends in a scythe
-grown out of its own bone. It may be asleep. Nobody living has seen the cavern; a drawing of it is the oldest thing
-anyone keeps.
+In the Uncounted, the dead did not lie down unless they were told to.
 
-*Behind the myth.* Every bone-house of the Ossa is cut in the shape of the reaper's cavern. The builders who cut them
-copied it, or remembered it, or were told to. The Pale Order does not know this, or will not.
+They got up. A man died in the evening, and in the morning he was standing at the foot of his bed, and he did not know
+what he wanted, and he followed the living about the house and out to the fields, wanting. The dead of every people
+walked behind the living in long patient crowds, and there were more of them every year, because nobody had ever told
+any of them to lie down. They filled the fields and the roads. They stood round the houses in the dark, close to the
+walls, and the living could not sleep for the sound of them breathing, which they did not need to do and did anyway.
+Every people of that age feared one thing above every other: that the dead would never lie down. And a fear held long
+enough, by enough people, grows a body.
+
+It came up out of the ground in a field of the standing dead: a skeleton the height of a hill, all bone, no flesh ever
+on it, and its right arm did not end in a hand. The bone of the forearm ran on past where the wrist should be, and
+curved, and thinned to an edge, one long blade of its own bone. It walked into the standing dead and it reaped them. It
+swung its arm low through them, the way a man swings through barley, and they fell where it cut them, and lay down, and
+stayed down. The living stood at the edge of the field and watched it and wept, because it was the first mercy that
+anybody had ever had.
+
+It walked the world for an age, reaping. Wherever the dead stood, it came. The peoples sang it in, and laid flowers in
+its prints, and gave it a hundred names. The one the Citadel keeps, from under the oldest drawing, is
+**Oss-Karrhath**. The lowlands call it **the Gleaner**. Children call it Old Scythe and do not say it after dark.
+
+But a Terror eats what made it, and what made the Gleaner was the fear of death. When it had reaped the standing dead of
+the whole world, and none were left standing, it was hungry still, and the fear was still there, in the living, where it
+had always been. So it went where the fear was. It reaped the sick first, in their beds, because they were the most
+afraid. Then the old. Then anyone who saw it coming, and everyone saw it coming, because it was the height of a hill.
+Whole peoples went down in one swing. The flowers stopped.
+
+It did not leave what it reaped lying. The dead it cut had to be laid somewhere, and it gathered them up in armfuls and
+carried them down: into a crack in the ground in a country nobody remembers the name of, and down the crack into the
+dark, and laid them there, layer on layer. The cave it found there grew into a cavern, and the cavern into a hall,
+floored ten bodies deep with the dead of a whole age, and walled with them, and roofed. And when there were no more
+peoples near enough to reap, it went down after its last armful, and lay down on its harvest, and began to count.
+
+It is counting still. The oldest drawing anyone keeps shows it lying on its side on the dead, with its scythe arm drawn
+up under it and its skull turned to the bodies and its other hand on them, one finger out, as a man counts sheep in a
+fold. Under the drawing there is a line in a script nobody reads except the Citadel's oldest reader, who says it says:
+*When the count is done.* Nobody knows what happens then. Some say it will stand up and come up and reap again. Some say
+it will lie still forever, finished, and the dead everywhere will lie down and never get up again for anyone. Every
+death adds one to the count, so the count is never done.
+
+The mouth of the crack is a pit, round, a stone's throw across, in a country nobody farms. It has no bottom anyone has
+heard: a stone dropped into it is never heard to land. People have brought their dead to its edge and tipped them in,
+to save the Gleaner the walk, since before there were graves; it is the oldest burial there is. On the longest nights,
+those who live nearest say, a sound comes up out of the pit, slow and even, like a whetstone drawn along a blade.
+
+The Pale Order counts the dead. It is the first thing a brother learns and the last thing he does, and every bone-house
+of the Ossa is cut in the shape of the Gleaner's hall: the same long hall floored with the dead, the same niche at the
+far end where something lies on its side. The Order says it counts the dead so that none of them is ever lost. A heresy
+inside the Order says it counts them so that the Gleaner never has to wake and count them itself. And under the heresy
+there is a whisper, which no brother has ever written down, that says the Order counts *for* it, and that on the day the
+Order's count and the Gleaner's agree, it will get up.
+
+*Behind the myth.* A Terror made of the fear that the dead would never lie down: the first of the Terrors and the
+greatest to outlive its use, and death as that age knew it. Since the god died the dead get up again (the Red gives them
+back, the hollow walk), and nobody knows whether the Gleaner's count has stopped, or whether it is only very far behind.
+The Xyrr cut the lowest halls under the bone-houses in the same shape (`04-the-held-space.md`): they copied it, or
+remembered it, or were told to. The Pale Order's counting and the Ossuarch's numerology rhyme with it; whether the Order
+counts for it or against it is never said.
 
 ## The shell beneath
 
@@ -171,29 +263,38 @@ Some say that when the sleeper wakes it will not need to breathe the Red in and 
 and it stays unknown. Its breath and the dying heart are rival tellings of the same tide; both stand. The dead the Red
 gives back to the black sand are, read this way, its dreams washing up.
 
-## The serpent that ate itself
+## The serpent of the wet country
 
-In the low wet country lay a god with a serpent's coil, longer than a day's walk, so long that it lay right round the
-whole wet country in a ring, with its tail in its own mouth. Above the coil, where the ring closed, it had a crowned
-head and arms, many of them, and a face that was almost a person's, and the wet country inside the ring was its. The
-peoples there walked on its back from one dry place to another, because the back was the only dry road. It let them,
-because they fed it. Where its head bent down over its own tail there was a pit of black stone with gutters cut to it,
-and once a year the throats of the chosen were opened over the gutters, and the blood ran down into the dark, and the
-serpent drank. In return the water stayed in its place, and the road on its back stayed above it.
+Before the Terrors, before the Unhewn, before anyone counted anything, something long died in the low country.
 
-Between the feedings it held its tail in its mouth and did not bite down. That was the bargain it kept with itself.
+Nobody knows what it was. It was long past reckoning, longer than a day's walk: a serpent's length, with a crowned head
+on it and arms, many of them, folded under. That much the bones say. Whether it was a god, or a beast, or the Terror of
+a people so old that nothing else of them is left, nobody knows, and the bones do not say. It died, and it lay where it
+died, along the low country in a long slack coil, and it did what dead things do. It rotted.
 
-The boatmen of the later age remember a king of that country who heard the serpent calling him from under the water.
-He put on his crown and walked out along its back with his whole court behind him ringing bells, and where its back
-went down under the water, he walked down into the water as if it were a stair, and his court went down after him,
-ringing. The boatmen say he is still walking down, and that on still nights you can hear the bells.
+It rotted for an age. Its flesh went down into the ground and the ground went soft. Its bile ran out of it, green-black
+and bitter, and pooled in the low places and never drained, and its guts slid out and swelled and burst and spread over
+everything, and that is the wet country: a whole country of its insides. The water of the Sunken Bog is its bile still.
+That is why it is that colour, and why nothing drinks from it, and why the reeds that grow in it are bitter to the
+root. The mounds in the mire are its guts gone to peat, and the gas that comes up through the water in slow bubbles and
+burns blue on still nights is the last of its rotting.
 
-The serpent was still being fed when the thing beneath died, and long after (`05-the-last-breath.md`). When the feeding
-stopped, at last, it was hungry, and it had only one thing in reach. It bit down. It swallowed its own tail, and then
-more of itself, a coil at a time over a hundred years, and the ring of it closed tighter and tighter round the wet
-country, drawing the drowned land in, until it had swallowed so much of itself that it could swallow no more, and it
-choked, with itself in its throat. Its spine is the road through the Sunken Bog now, half sunk, and the pit of offering
-is at its throat, and still glows red from down there, out of sight.
+Its bones did not rot. The bile soaked into them as they lay, and the bog, and the age, and they went to stone: a spine
+of grey stone, each knuckle of it as big as a house, running in a long curve right through the wet country, the only dry
+ground in it. So the peoples who came walked on it. It is the road. It has always been the road. Every people that has
+lived in the wet country has used it to get from one dry place to the next, and most of them never knew it was a spine,
+and walked to market along the top of it and set their carts down on its knuckles.
+
+Some knew. Where the spine rises at its far end toward the skull, which is under the mire, a people long gone cut a pit
+of black stone at the throat, with gutters to it, and fed the dead thing. Once a year they opened the throats of the
+chosen over the gutters, and the blood ran down into the dark, because they believed it was only sleeping, and that if
+it were fed it would keep the water in its place. The pit still glows red from down there, out of sight. Nobody feeds it
+now. The shore folk say their grandmothers' grandmothers did.
+
+The boatmen remember a king of that country who heard the serpent calling him from under the water. He put on his crown
+and walked out along the spine with his whole court behind him ringing bells, and where the spine goes down under the
+water he walked down into the water as if it were a stair, and his court went after him, ringing. The boatmen say he is
+still walking down, and that on still nights you can hear the bells.
 
 Its true name is lost. Everyone who has walked its back calls it something else:
 - **the Long Back** (the bog folk, who think their own people laid it as a road);
@@ -202,58 +303,70 @@ Its true name is lost. Everyone who has walked its back calls it something else:
 - **the Stair of the Drowned King** (boatmen);
 - **the Long One** (the shore folk, who fed it once).
 
-*Behind the myth.* A demon serpent god, long dead (Derek), a naga that was its own ouroboros. It held its own tail as
-its bargain with hunger, and when the feeding stopped it ate itself and choked. Its spine is the Sunken Bog's road, and
-its pit of offering still glows red at the throat, from out of sight below. What the red is, nobody knows. Whether it
-was the serpent that was fed there, or something under it, is told both ways.
+*Behind the myth.* A demon serpent god, long dead (Derek): a corpse and nothing more, and that is the horror of it. The
+whole wet country is its rot, and its spine is the Sunken Bog's road, half sunk, its vertebrae poking up through the
+water. What it was is never told. The pit of offering at its throat was cut long after it died, by a people who thought
+it slept; what glows red down there, and whether anything ever answered them, is never told either.
 
 ## The peoples of the age
 
 They are gone, or nearly, and they left ruins in every act.
 
-**The Lifted of Ithmar** were the greatest people the world has seen, and the last thing they knew how to do was fall.
-They learned the Art of Marrow before anyone else and further than anyone since: they drew the marrow out of the deep
-bone of the world through shafts a mile down, and refined it, and burned it, and with it they did what only gods had
-done. They lifted their cities off the ground and hung them in the sky, so that the Terrors below could not reach them.
-They walled out the dreams of the peoples underneath, so that no Terror would ever be born in Ithmar again. They made
-lamps that never went out, and doors that opened onto other doors far away, and men and women who did not age. For a
-thousand years, or ten, their thrones hung over the world, and the peoples under them looked up and called that light
-in the sky Ithmar, and feared it as they feared the Terrors, which is to say they believed in it.
+**The cities in the sky.** Once there were cities in the sky. Nobody knows who built them. Nobody knows what the people
+of them were, or whether they were people at all: no body has ever been dug out of their ruins that was not hollow.
+What is known is this. There was one great city, and it hung in the air over the world, and under it, on chains, hung
+lesser cities, two or three of them, each of which would have been the greatest in the world if the great one had not
+been over it. The peoples under them lived their whole lives looking up at the undersides of cities. The oldest texts
+give the great city a name that no throat can quite say, which the Citadel writes **Qhaloth** and admits is a guess.
+The lowland grandmothers called it **the Lid**. The shore folk had no name for it; they did not look up.
 
-That was the beginning of their end. A people that is believed in long enough begins to grow, and the sovereigns of
-the Lifted felt it, and wanted more. Each of them wanted to be a god, and saw no reason to share. They drank more
-marrow than a body can hold, and drew it up from deeper than any shaft had gone, out of the bones of the thing beneath
-itself, and they went to war with one another for the deepest shafts. The scholars call it **the Marrow War**. Nobody
-knows how long it lasted. It was fought in the sky, with weapons nobody can describe, and when it ended the shafts
-were dry, the marrow under half the world was gone, and the cities had nothing left to hold them up. They fell. Some
-fell in a night and some over a hundred years, and the peoples underneath watched the lights come down. The ash of
-their falling is under the lowland grass, and in some places it is the lowland itself.
+What held the cities up was marrow. Their builders, whoever they were, drew it out of the deep bone of the world through
+shafts a mile down, and burned it, and the burning held the cities in the air, the way the heat over a fire holds up a
+cinder. And hanging was not enough for them. The words cut on the undersides of the fallen cities, where only someone
+looking up from below would read them, say one thing in a hundred ways: *higher*. They meant to go up through the sky
+and out of the world altogether, to wherever the light comes from, and they would stop for nothing.
 
-Of the sovereigns, a few were too believed-in to die. They are the liches, the **Thrones Below**: crowned dead who sit
-in the cities' broken hearts where they came down, still holding court, still sending for marrow that does not come.
-The common people of the Lifted, drained by the sovereigns' wars to the last of the marrow in their own bones, did not
-die either. They went hollow. They are **the Emptied**: very tall, very thin, courteous. They knock at a door after
-midnight, softly, three times, and ask whether there is marrow in the house, and thank you when you say there is not,
-and do not go away.
+When the marrow under the world began to give out, they did not stop. They took it from the lesser cities instead: out
+of the stone first, and out of the lamps, and then out of the people, out of their bones, drawn up the chains to the
+great city to be burned. A little, and then more, until there was nothing left in the bones of anyone below, and that
+was not dying; they went hollow. Then the great city cut its chains.
 
-**The Sky-Climbers** of the heights believed the sky was an open mouth and that the whole world was inside it. A
-people that knows it is inside a mouth does not stay. They built a stair up into the cloud and climbed it, all of them,
-carrying their children, leaving nothing behind for the mouth to close on. The town at its foot was left with every
-door open. None of them came down. Some say they were climbing toward the last of Ithmar, still hanging up there;
-some say they were climbing away from it.
+The lesser cities fell. **Ghenn** came down on the lowlands in one night, and its ash lies under the lowland grass for a
+hundred leagues, and its lamps, which never went out, still glow faintly up through the grass on dark nights.
+**Sorrath** fell slowly, over a hundred years, tilting and shedding towers, and broke at last on the white ridges, and
+lies there upside down, so that the words cut on its underside face the sky. If there were others, they fell too far
+away for anyone to find. Their people came down with them, and climbed out of the wreck, and went walking, hollow.
+
+The great city went up. It rose through the grey and was never seen to come down, and the peoples under it said it had
+got out. It had not. It is still there. It is the dark moon (`02-the-creation-myths.md`): not small, only very far off, a
+city the size of a country hanging past the cloud where it stopped rising when the burning ran out, too high now ever to
+fall. It is brown because it is rust. On the clearest nights, those who have looked at it longest say it has edges, and
+turns, and that there are lights on it, moving. Nobody living has been there. The grandmothers say that its streets are
+walked by the pale ghosts of whoever built it, still going about their business as if the city were still rising, and
+that on its highest throne sits one dead thing that still gives the order to rise, every day, to a city that cannot
+obey. The shore folk call that one **the Man in the Rust**. The Citadel calls it **the Regent**, and does not like to
+talk about it.
+
+**The Emptied**, whom the oldest texts call **the Ghauul**, are what came down out of the lesser cities: very tall, very
+thin, courteous, hollow to the bone. They remember being full. They knock at a door after midnight, softly, three times,
+and ask whether there is marrow in the house, and thank you when you say there is not, and do not go away. The common
+roads call them the Marrow-Eaters, and say they crack the bones of sleepers.
 
 **The Unison** were one mind in many bodies, in the mire that is now Shog-Mire. They built the stepped tower and the
 causeway that runs to it, and nobody has lived in either since. They thought one thought at a time, all of them
 together, and it took them a generation to think it. A clay tablet of theirs tells their beginning and then ends in a
-row of marks nobody can read, repeated to the edge of the clay. It is thought to be the last thought they had, and
-that they are still thinking it, somewhere, all of them, very slowly.
+row of marks nobody can read, repeated to the edge of the clay. It is thought to be the last thought they had, and that
+they are still thinking it, somewhere, all of them, very slowly.
 
 **The Hallowed** drink the belief that blood carries, a little from many, over many years, and do not age. Iron, fire
 and water do not kill them; only being forgotten does. One lives among a people, never two, and that people keeps its
 name in every prayer without once saying whose it is. Hallowed be the name.
 
-**The Lanternless** were rivals of the Terrors, eaters of souls. They are still on the roads at night, at the edge of
-every lantern's light, because a lantern has a soul in it. They do not step into the light. They wait for it to gutter.
+*Behind the myth.* Who built the cities in the sky is never told, and nobody in the world knows. Their story is hubris
+and marrow: they drank their own lesser cities hollow to climb, and climbed to nowhere. The dark moon is Qhaloth, dead
+and rusting, walked by ghosts, with the one lich of that age on its throne; the sky myths half know it
+(`02-the-creation-myths.md`). Ghenn's lamps under the lowland grass and Sorrath's upturned underside on the white
+ridges could be places the pilgrim stands.
 
 ## Outside of everything
 
@@ -274,8 +387,8 @@ they were always there. The scholars call them **the Uninvited**.
 
 ## The Wasting
 
-It ended the way it had to. The marrow was gone out of half the world, burned in the sky by the Lifted and dug out by
-everyone else, and the ground the Terrors walked on had nothing left in it to give. The peoples who fed the Terrors died
+It ended the way it had to. The marrow was gone out of half the world, burned in the sky by the cities there and dug out
+by everyone else, and the ground the Terrors walked on had nothing left in it to give. The peoples who fed the Terrors died
 of the waste, or stopped believing, or were eaten by what they believed in, and the Terrors began to waste away. The
 later peoples call this age **the Wasting**.
 

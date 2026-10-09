@@ -154,6 +154,30 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09 (evening), the old age's second lore pass (Derek's notes on the Myths and Lands page):**
+  - **Names:** "the builders, the hinge, the lifted" are "boring"; old powers get Lovecraftian names and each people
+    its own telling of them. The builders are **the Xyrr** (the Stair-Cutters, the Corner Men); the Lifted and Ithmar
+    are gone for **the cities in the sky** (Qhaloth, with Ghenn and Sorrath).
+  - **Away from the Netherese story:** one great sky city and two lesser ones, builders unknown, perhaps not people;
+    hubris and marrow: it drank the lesser cities' people hollow (the Emptied) to climb, cut them loose, and rose until
+    it stopped. **It is the dark moon:** vast, far off, brown with rust, dead, walked by ghosts, one lich on its throne
+    (the Regent, the Man in the Rust). No Marrow War, no Thrones Below, no hundreds of cities.
+  - **Cut:** the Sky-Climbers and the Lanternless.
+  - **The herald is never called a dragon** in the world: a great undead beast of bone with fire in its ribs. No
+    demiurge or Shaper. The three Unhewn have no followers; they are fingers of something beyond the void, and never
+    knew they were fought. One died and is the bleeding mountains above the Red (the blood rivers); the herald fell
+    into a crater, was worshipped, woke, ate its city and itself (Uth-Kharesh, the Starved Crown).
+  - **Vesk** belongs to the Deep, not the Famines: a city that sank, held up by its people fused to iron into a mass
+    of legs, walking the Deep. Dhum's Famine stays the one walking city under the sky (Derek: "we don't want two
+    walking cities").
+  - **The serpent** is simply a long-dead creature: its body calcified into the road, its bile and guts the swamp. No
+    ouroboros, no bargain.
+  - **The tower that drinks** is **the Needle**: an iron spike in a forest like a maiden's spike, full of digesting
+    liquid, bones and giant eyes; the dreaming kept; unknowable.
+  - **The reaper** gets a full myth: grown from the fear that the dead would never lie down, it reaped them, then the
+    living, carried an age's dead down a pit and counts them; the Pale Order counts with it.
+  - **The sky myth** is kept as written (Derek: "Great job ... the sun is actually a hole with light bleeding through
+    ... the sky is cloudy like a dead eye").
 - **2026-10-09, the map policy (Derek: "Yes"):** fixed set pieces (the opening, the towns, landmarks, boss arenas) and
   seeded wild lands from a graded pool: many seeds per zone generated and proved walkable, the best 3 to 5 graded and
   baked, one picked per new game. The bluffs past the cove are to be the first seeded zone. (MASTER_RULES 5.)

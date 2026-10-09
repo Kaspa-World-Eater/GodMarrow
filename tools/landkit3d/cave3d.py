@@ -907,8 +907,9 @@ def throne():
     relief("orcus", (fx, fy, cz), (nx, ny), H, "orcus", 4242, "basalt", 0.55, back=0.75, nu=64, nv=76)
     # the fires the little faces' mirrors will hold: the braziers, the throne's candles, the heap's candles
     # on the seat's arms' ends and on the top step's front corners
-    THRONE_C = [(fx + nx * d + sx * a, fy + ny * d + sy * a, top + b) for a, d, b in ((-3.0, 1.0, 0.14), (3.0, 1.0, 0.14), (-3.6, 0.6, 0.14), (3.6, 0.6, 0.14),
-                                                                                    (-1.3, 2.0, -0.14), (1.3, 2.0, -0.14))]
+    # (the two candles on the stairs below the top step are gone: Derek, 2026-10-09, "I meant to remove the two on the
+    # stairs"; the four on the top step stay)
+    THRONE_C = [(fx + nx * d + sx * a, fy + ny * d + sy * a, top + b) for a, d, b in ((-3.0, 1.0, 0.14), (3.0, 1.0, 0.14), (-3.6, 0.6, 0.14), (3.6, 0.6, 0.14))]
     BRAZ = [(fx + nx * 3.4 + sx * side * 4.8, fy + ny * 3.4 + sy * side * 4.8, f + 1.55) for side in (-1, 1)]
     # (Derek: "You can have one large face with a mirror in its mouth": the small faces that covered it are gone)
     # its key light: an iron fire-basket hanging on chains out of the dark, high and to one side, raking across the
@@ -927,8 +928,10 @@ def throne():
     P.sphere("cresset_coals", (cbx, cby, cbz - 0.1), 0.3, "ash", scale=(1, 1, 0.5))
     flame("cresset", cbx, cby, cbz - 0.05, 0.28, 175.0)
     # two sconces high on its flanks, raking across the little faces so each holds its own shadows (rule 19)
-    # (the two sconces high on its flanks are gone: Derek, 2026-10-09, "the main face remove two of the torches on the
-    # top of the stairs"; the cresset and the candles light it)
+    # two sconces high on its flanks, raking across the face so it holds its own shadows (rule 19)
+    for side in (-1, 1):
+        wx_, wy_ = fx + sx * side * 5.7 + nx * 0.6, fy + sy * side * 5.7 + ny * 0.6
+        torch("ftorch%d" % side, wx_, wy_, cz + 0.9, -sx * side * 0.6 + nx * 0.8, -sy * side * 0.6 + ny * 0.8, 70.0)
     # the throne is gone; the mouth at the top of the throne's stairs is a great dark mirror, the way out (Derek: "Give
     # the room no exit. There will be a large mirror the player looks in in a large face, it reflects nothing but
     # darkness"; "The mirror is the way out, they will walk into it and disappear"; "The large mirror will be at the top

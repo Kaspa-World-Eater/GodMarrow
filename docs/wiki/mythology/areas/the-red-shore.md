@@ -464,7 +464,9 @@ and pipe the shore folk played on the wall.
 **Derek's ideas for later (2026-10-09):** "I like the idea of the coast culture believing that the mountains are a
 great dead beast of behemoth of a thing, and from its wounds the red flows. So we can have like a lot of waterfalls or
 something. I mean blood rivers that flow into estuaries."
-- **The shore folk's telling:** the mountains inland are the body of a great dead behemoth, and the Red runs out of its
+- **The bible's telling** (`../03-the-age-of-terrors.md`, 2026-10-09): the mountains inland are the body of the One That
+  Unfolds, the Unhewn the herald killed; the shore folk call them the Fallen One. **The shore folk's telling:** the
+  mountains inland are the body of a great dead behemoth, and the Red runs out of its
   wounds, down the land, to the sea (a rival or a deepening of the Fallen One's wound in its side).
 - **For the land:** blood falls down the bluffs and the cliffs; blood rivers cutting the terrace and fanning out into
   estuaries across the black sand; where they meet the Red, the slow mixing of the two.

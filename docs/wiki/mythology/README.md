@@ -23,8 +23,8 @@ leaves), written in the world's own voices. Those live in `../in-game-texts/` an
 | `00-the-deep-lore.md` | **the truth beneath everything, for us only:** the world as narrative, gods as dreams believed real, everything reflecting everything, mantles, the Silence, the pilgrim |
 | `01-the-ages.md` | **the timeline:** the ages from the Silence to the year 1114, and the dated events of the last thousand years |
 | `02-the-creation-myths.md` | **every people's creation myth,** in full |
-| `03-the-age-of-terrors.md` | the world before the god died: the Terrors, the Unhewn and the herald, the Famines, the Lifted of Ithmar and the Marrow War, the peoples of that age, and the Wasting that ended it |
-| `04-the-held-space.md` | inside the living god: the Choir, the builders, the court of white faces, the congregation; and every telling of how the god died |
+| `03-the-age-of-terrors.md` | the world before the god died: the Terrors, the Unhewn and the herald, the Famines, the Needle, the reaper, the dead serpent, the cities in the sky and the dark moon, the peoples of that age, and the Wasting that ended it |
+| `04-the-held-space.md` | inside the living god: the Choir, the Xyrr, the court of white faces, the congregation; and every telling of how the god died |
 | `05-the-last-breath.md` | the thousand years since, era by era: the coming out, the founding of the faiths, the serpent's death, the great events, to now |
 | `06-the-ends-of-the-world.md` | **every people's end of the world** |
 | `07-who-is-who.md` | the powers, the faiths and the peoples: what each holds holy, how it keeps its dead, its rites, its quarrels |

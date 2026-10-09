@@ -33,11 +33,12 @@ thing's last breath to finish going out, so that there will be a rest again, and
 line. They do not say what the next line is. They are practising it. Of the congregation that knelt near them at the
 last, they say only that it *answered badly, with names*.
 
-## The builders
+## The Xyrr
 
-There were builders in the Held Space before anyone else. They had no name anyone could say. They signed their work
-with a sigil instead, and the scholars, who cannot copy the sigil, call them **the Angled**, after the one thing about
-them everybody who has stood in their halls agrees on: there are too many angles.
+There were cutters in the Held Space before anyone else. They had no name anyone could say. They signed their work
+with a sigil instead, and the scholars, who cannot copy the sigil, call them **the Xyrr**, after the sound the first
+copyist made trying to read it aloud. Everybody who has stood in their halls agrees on one thing about them: there are
+too many angles.
 
 Their halls have more corners than a room can have. Walk the edge of one and count the corners, and the count comes out
 different every time, and higher. Their stairs have risers that come only to the knee and treads that slope very
@@ -45,7 +46,7 @@ slightly, so that whoever climbs them leans, and arrives leaning. Their niches a
 and their doors are set a little off true, so that a door seen straight on looks open and seen from the side looks
 shut. Lines that should meet do not; lines that should not, do. People who sleep in their halls wake with nosebleeds.
 
-They cut signs everywhere, and the signs hurt. A sigil of the Angled is all angles, more than its lines can hold,
+They cut signs everywhere, and the signs hurt. A sigil of the Xyrr is all angles, more than its lines can hold,
 and it cannot be looked at for long: the eye slides off it, comes back, slides off again, and behind the eyes
 something aches. Copyists who have tried to draw one have gone blind in the eye they used, and one copyist who
 finished a drawing was found sitting in front of it, still looking, a day later, and did not get up. Some of their
@@ -61,12 +62,12 @@ What they looked like, nobody alive has seen. Their bones turn up in the deepest
 joints in a finger than a person has in an arm, and they never go brittle.
 
 The rings with teeth that stand all over the Hide (the waystones: eight hooked stones round a pit of breathing ash, that
-take a walker apart and put them back together at another ring) carry the Angled's sigil on their inner faces, where
+take a walker apart and put them back together at another ring) carry the Xyrr's sigil on their inner faces, where
 only someone standing in the pit would see it: *WE CUT THEM FACING IN, SO THE MOUTH IS KEPT BY WHAT IT HOLDS.* Others
 claim them too.
 
-*Behind the myth.* The Angled were not people and never pretended to be. When the Pale Order came to the white ridges,
-the Angled walled themselves into their own halls. The Order's bone-houses are their upper floors, and the Order hides
+*Behind the myth.* The Xyrr were not people and never pretended to be. When the Pale Order came to the white ridges,
+the Xyrr walled themselves into their own halls. The Order's bone-houses are their upper floors, and the Order hides
 the older halls beneath. It is whispered that the rings are coming nearer to each other, and that someone is still
 cutting them.
 
@@ -137,11 +138,35 @@ that every so often it moves.
 
 It answers iron. Strike iron on iron anywhere on the Hide and the Deep hears, and something far down strikes back.
 
+There is a city in the Deep, and it walks.
+
+**Vesk** stood once on the surface, in the iron hills of the north, over the deepest of the iron. Its people dug the
+iron and lived by it, and bled the first ore of every shaft as everyone does, and dug deeper. In the Wasting, when the
+marrow had gone out of the ground everywhere and the ground everywhere began to sink, the ground under Vesk sank faster
+than anywhere, because it had been dug hollow; and one night the whole city began to go down, walls and towers and
+streets and every house and everyone in them, down into the dark toward the iron.
+
+The people of Vesk would not let it fall. They went down into the cellars and the workings under their houses, every one
+of them, the old and the children too, and set their shoulders under the city and held it up. And the Deep came up to
+meet them. Its iron rose into them through the soles of their feet. Their blood stood still in them, and grew heavy, and
+hardened, as the Deep's own blood had hardened, and they went to iron where they stood, holding, and grew together at
+the shoulder and the hip into one mass under the streets: a mass of legs, more legs than anyone has counted, iron and
+blood-dark and jointed every way. They did not let go, and they did not fall. Vesk stood up on its people, and walked.
+
+It walks still, down there. It went down into the Deep on its legs and never came up, and it walks the iron country
+under everything, carrying its empty streets on its back through the dark, and the iron things of the Deep step aside
+for it. The miners call those things **the Answerers**, for the way they strike back, and say that Vesk is the greatest
+of them, or their mother, or the god they work for. In the deepest shafts there are sometimes prints in the ore, round
+and deep and close together, hundreds in a line, going on under the rock. Some miners say that if you lie with your
+ear to the ore you can hear it walking, very far off, and under the walking, very faintly, the people of Vesk, still
+holding.
+
 And it asks, very politely, for infants, where the folded thing lies nearest the top. The golems do not know how to
 make a mind. The thing inside the shell will need one. They say soon.
 
 *Behind the myth.* What hatches when the shell is hard, if anything does, is unknown, and kept so. The iron of the Hide
-is the god's stale blood (the iron maidens, Vesk, the red heart of old iron, `03-the-age-of-terrors.md`). The deep lore
+is the god's stale blood (the iron maidens, the red heart of old iron, `03-the-age-of-terrors.md`); Vesk is the Deep's one walking city, and the
+only city that walks anywhere but Dhum, which walks in a Famine under the sky. The deep lore
 offers a rhyme: the cycle turns (`00-the-deep-lore.md`), and something is always being got ready for the next telling.
 
 ## The congregation
@@ -155,7 +180,7 @@ there will be fire in the morning. It lies, they say, nearest the top in a newbo
 closed.
 
 Where the congregation came from is told two ways:
-- they were always there, inside, as the Angled and the Choir were;
+- they were always there, inside, as the Xyrr and the Choir were;
 - they walked in from the wasting world outside, through the thing's mouth, with their tools on their backs, to
   mend what the marrow-diggers had taken and to kneel at the work (`03-the-age-of-terrors.md`).
 
@@ -178,7 +203,7 @@ The thing stopped. Every people tells it, and none was there to see. All the tel
 - **On the roads it is told** that the faithful divided it: that its worshippers took knives to it, dying or sleeping,
   and shared out its bone and soul and flesh among them, and that the Tithe-Hands that run on their fingers are its
   right hand, taken off at the wrist. The grandmothers will not have this told at their fires.
-- **The Angled's carvings** say that she listened toward something, or too far, and while she listened she forgot to
+- **The Xyrr's carvings** say that she listened toward something, or too far, and while she listened she forgot to
   close her hand.
 - **The Keeper of the Spiral Hollow** says a speaking came in with no mouth behind it and said her names one at a time.
 - **The Slayers** say nothing of a death. They say something was opened, and they came in where it was open.
@@ -205,7 +230,7 @@ The common count begins here, at year 0, and every age since is the Age of the L
 ## What became of them
 
 - **The Choir** sings under the crypts, waiting for the rest.
-- **The Angled** sleep walled into their halls beneath the Ossa, and their carvings wait for someone to take the
+- **The Xyrr** sleep walled into their halls beneath the Ossa, and their carvings wait for someone to take the
   empty seat.
 - **The court's faces** fly at dusk on borrowed wings.
 - **The Keeper** waits for the Holder to hear again.

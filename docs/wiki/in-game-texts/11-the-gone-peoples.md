@@ -28,7 +28,7 @@ They speak of us, once. The congregation that knelt in the god, they sing, answe
 Now they are waiting. The god's out-breath is still going out, and when it has finished, there will be a rest, and
 they mean to come in on the next line. They do not say what the next line is. I think they are practising it.
 
-## The Angled
+## The Xyrr
 
 *Copied by a scholar of the Undercount from the plain script in the lowest halls under a bone-house of the Pale Order,
 and sent in secret to the Citadel. The Order does not know the copy exists.*
@@ -41,8 +41,9 @@ a nosebleed.
 Count the corners of a hall down there and the count comes out different every time, and higher. The ones who cut the
 halls left no name for themselves, only a sign at the head of every stair, all angles, more angles than its lines can
 hold. I have not tried to copy it. The brother who went down with me the first time did, and he went blind in the eye
-he drew it with. The Citadel calls them the Angled, because that is the one thing about them that everyone who has
-stood in their halls agrees on.
+he drew it with. Before he went blind he tried to read it aloud, and the sound he made is the name the Citadel has
+written for them ever since: the Xyrr. The brothers call them the Stair-Cutters, and do not call them anything at all
+if they can help it.
 
 Beside the signs there is a plainer script of straight cuts, and that I could read, in four years. They say they were
 cut from the first of the room, and began cutting at once. They say, over the niches, *Lie down facing the stair.
@@ -77,30 +78,29 @@ faces on them are the faces of the court.
 The tenders say the faces still judge. If one of them hangs in the air and looks at you for a long time before it
 comes, it has found you wanting, and you should not be there when it decides what to do about it.
 
-## The Lifted
+## The undersides
 
-*Cut on the underside of a fallen city, where only someone looking up from below was ever meant to read it. A reader of
-the Citadel copied it lying on his back in a trench the lamp-diggers had cut under the stone, and wrote his own notes
-after it.*
+*Cut on the underside of Sorrath, the city that broke on the white ridges, where only someone looking up from below was
+ever meant to read it. A reader of the Citadel copied it lying on his back in a trench the diggers had cut under the
+stone, and wrote his own notes after it.*
 
 In the beginning the world was heavy, and everything in it was held down. The rivers were held in their beds, and the
 people were held to the ground, and the gods were held to the people who feared them. Then the first of us opened a
 bone and found the weight inside it, and drank it, and was light.
 
-*We were the first thing in the world that did not fall.*
+*We were the first thing in the world that did not fall. Higher. Higher. Higher.*
 
-*The reader's notes:* The Citadel calls them the Lifted, and their country Ithmar, which is what the peoples under
-them called the light in the sky. They drew the marrow up from a mile down and burned it, and hung their cities in
-the air where nothing could reach them, and lived there longer than anyone has counted since. The city I copied this
-from lies upside down in the ash, and the words face the sky. The ones who cut them never thought anyone would read
-them from above.
+*The reader's notes:* The last word goes on to the edge of the stone. The Citadel calls the great city Qhaloth, which is
+its best guess at a mark no throat can say, and the two that fell Ghenn and Sorrath. Who built them it does not say,
+because it does not know. They drew the marrow up from a mile down and burned it to hang their cities in the air, and
+when it gave out under the world they drew it out of the lesser cities instead, out of the stone and then out of the
+people, up the chains to the great one, until the great one cut the chains and went on up alone. The city I copied
+this from lies upside down on the ridge, and the words face the sky. The ones who cut them never thought anyone would
+read them from above.
 
-How the cities came down, the Citadel argues every winter. Most of the readers say the sovereigns made war on each
-other for the last of the marrow, and drew it up from deeper than any shaft had gone, until the shafts ran dry and
-there was nothing left to hold the cities up. They call it the Marrow War. The diggers who go under the grass for the
-lamps that still burn there say the cities did not fall but were pulled, by something below that had been looking up
-at them all that time. I asked the oldest digger what had pulled them. She said it was whatever had been holding the
-rivers in their beds.
+The diggers who go under the lowland grass for Ghenn's lamps do not hold with any of that. They say the cities did not
+fall but were pulled, by something below that had been looking up at them all that time. I asked the oldest digger
+what had pulled them. She said it was whatever had been holding the rivers in their beds.
 
 ## The Unison
 
@@ -120,21 +120,6 @@ not say what came after, and it does not tell their end. It ends with a line of 
 repeated many times to the edge of the clay. The Citadel holds that it is the last thought they had, and that they
 are still thinking it, somewhere, all of them, very slowly.
 
-## The Sky-Climbers
-
-*A rubbing taken from a stone at the foot of the stair nobody climbs, in the Heights. The stone is cut in a script
-nobody now reads; this is the reading the Citadel accepts, though it argues about it.*
-
-The sky is a mouth, open. We are inside it. Everything is inside it.
-
-A people that knows it is inside a mouth does not stay. We have built the stair, and we will climb out by it, all of
-us, and carry the children, and leave nothing behind for the mouth to close on.
-
-That is all the stone says. The stair goes up into the cloud, and no one living has seen the top of it. The people who
-lived at its foot climbed, all of them, and their houses were left with the doors open. None of them came down. The
-readers call them the Sky-Climbers. Some say they were climbing toward the last of the cities that hung in the sky,
-still up there in the cloud; some say they were climbing away from it.
-
 ## The tall ones at the door
 
 *What one of the Emptied said of its own people, through a closed door, to a reader of the Citadel who did not open
@@ -146,8 +131,8 @@ thanked me, and then it did not go away. It stood outside the door, and after a 
 lonely.
 
 It said its people had lived high up once, in the light, where nothing could reach them, and that it had been a long
-way down. It said their lords had drunk from them, a little and then more, to fight their wars, until there was
-nothing left in their bones at all. It said that was not dying. It said it remembered being full, and that it would
+way down. It said the city over them had drunk from them, a little and then more, up the chains, to go higher,
+until there was nothing left in their bones at all, and then had let them go. It said that was not dying. It said it remembered being full, and that it would
 like to remember it better.
 
 The common roads call them Marrow-Eaters, and say they crack the bones of the sleeping to suck out what is inside. I

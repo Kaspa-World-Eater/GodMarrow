@@ -778,7 +778,9 @@ and keep a small pool filling. A source that falls in a hole (the great face's a
 every crease (the sockets, the lids, the lips, the nostrils) holding its own dark through its occlusion. There are no
 hard lit lips; Derek rejected those as the "orange squish line".
 
-**The great face's two flank sconces are removed:** the cresset and the top step's candles light it.
+**The great face's torches:** Derek then made it clear: "I meant to remove the two on the stairs." The two flank
+sconces are back, and the two candles on the stair are gone; the cresset and the sconces light the face. Checked in
+`cv18_face`: a sconce on each side of the archway, and no flame left on the steps.
 
 **The flames:** at the old 4 px grid a candle's flame was a few texels, so its shape could not read. The cave is now
 rendered on the 2 x 2 grid (painted standard 7), where each flame has four times the texels.

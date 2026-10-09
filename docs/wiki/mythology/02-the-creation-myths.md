@@ -256,41 +256,43 @@ and never comes back.
 ## The older voices
 
 The peoples who were here before the Tithed left little but stone, ash and a few words. These are their beginnings, as
-far as anyone has made them out.
+far as anyone has made them out, and what the peoples after them made of them.
 
-**The Lifted of Ithmar** left the most and are understood the least. They were the height of the world: a people that
-learned to draw the marrow out of the deep bone of the world and burn it, and with it hung their cities in the sky,
-and lived above the Terrors for longer than anyone has counted since (`03-the-age-of-terrors.md`). Their beginning is
-known from the inscriptions on the undersides of their fallen cities, cut where only someone looking up from below
-would read them, and it is a boast. In the beginning, it says, there was a heavy world, and everything in it was held
-down: the rivers held in their beds, the people held to the ground, the gods held to the people who feared them. Then
-the first of the Lifted opened a bone and found the weight inside it, and drank it, and was light. *We were the first
-thing in the world that did not fall.* Everything after that, in their telling, was going up. The scholars who read the
-inscriptions note that the cities they are cut on are lying in the ash, upside down, and that the people who carved
-them never imagined anyone would read them from above.
+**The cities in the sky** left the most and are understood the least (`03-the-age-of-terrors.md`). Their beginning is
+known from the words cut on the undersides of their fallen cities, where only someone looking up from below would read
+them, and it is a boast. In the beginning, it says, there was a heavy world, and everything in it was held down: the
+rivers held in their beds, the people held to the ground, the gods held to the people who feared them. Then the first
+of us opened a bone and found the weight inside it, and drank it, and was light. *We were the first thing in the world
+that did not fall.* Everything after that, in their telling, was going up, and every line of it ends on the same word,
+*higher*. The scholars who read it note that the cities it is cut on are lying in the ash, upside down, and that whoever
+carved it never imagined anyone would read it from above.
 
-What the Lifted knew is mostly lost, and what is left is told as if it were magic, because nobody now can tell it
-apart from magic. They made doors that opened onto other doors a hundred leagues off. They made lamps that have not
-gone out in all the years since, and some of those lamps still burn in the ash where the cities came down, under the
-grass, so that on a dark night parts of the lowlands glow faintly from beneath. They wrote with light. They spoke to
-each other across the whole sky. Their sovereigns drank so much marrow that they stopped being people and started being
-believed in, and in the end they made war on one another for the last of it, the war the scholars call the Marrow War,
-and the sky burned for a generation, and the cities fell. Of the greatest people the world has seen, there is now
-nothing but myth and ash and the Thrones Below, the crowned dead still sitting in the cities' broken hearts, still
-sending for marrow.
+What they could do is told as if it were magic, because nobody now can tell it apart from magic. They made doors that
+opened onto other doors a hundred leagues off. They made lamps that have never gone out, and some of those lamps still
+burn in the ash where Ghenn came down, under the grass, so that on a dark night parts of the lowlands glow faintly from
+beneath. They wrote with light. Who they were, the peoples after them have never agreed:
+- **the lowland grandmothers** say they were the god's own thoughts, which got out through the top of its head while it
+  slept and could never get back in, and went up looking for somewhere else to be thought;
+- **the Pale Order** says there were never any people in the cities at all, only the lamps, and that the lamps built
+  the cities to hang themselves in;
+- **the diggers** who go under the lowland grass for the lamps say they were people like us, and that we will be them
+  again, and that is why they dig;
+- **the shore folk** say nothing about them, and do not look at the dark moon.
 
 **The Choir**, behind the ribs: *We were the part of the god that told it what it was.* Their beginning was the first
 note, and they were eleven hundred and one voices singing it in turns so that it was never dropped.
 
-**The builders**, whom the scholars call **the Angled**, left no word for their beginning, only a sign: a sigil cut at
-the head of every stair they made, all angles, more angles than its lines can hold, that hurts the eyes to look at
-and cannot be copied by any hand that has tried. Those who look at it long enough say it is a picture of the moment
-they began, seen from every side at once, and that it is not finished.
+**The Xyrr**, the cutters of the halls inside the thing, left no word for their beginning, only a sign: a sigil cut at
+the head of every stair they made, all angles, more angles than its lines can hold, which hurts the eyes to look at and
+cannot be copied by any hand that has tried. Their name is not theirs. It is the sound the first copyist made when he
+tried to read the sigil aloud, before the blood came out of his nose, and the Citadel has written it down that way ever
+since. The Pale Order, which sleeps on top of their halls, calls them **the Stair-Cutters**; the white country's
+children call them **the Corner Men**; the old miners call them **the Leaners**, because their stairs make whoever climbs
+them lean. Those who have looked at the sigil long enough say it is a picture of the moment they began, seen from every
+side at once, and that it is not finished.
 
 **The Unison**, the single mind that lived in many bodies in the mire: the whole of the beginning was one thought, a
 long one, and they were inside it, thinking it together, and it was the only time they were warm all through.
-
-**The Sky-Climbers** of the heights: the sky is a mouth, open, and everything is inside it.
 
 **The Emptied**, the hollow folk of the fallen cities: they say nothing of a beginning. They remember being full.
 
@@ -343,12 +345,15 @@ older, and does not agree with it.
 **The processions of the Bleeding Maiden** say the sun is not an eye or a hand but a wound in the sky, and the light is
 what bleeds through it from the other side.
 
-**The Lifted** left their own telling, cut in the undersides of their fallen cities. *We made the second moon*, it
+**The cities in the sky** left their own telling, cut in the undersides of the ones that fell. *We made the second moon*, it
 says. *We lifted a city so high it would never come down.* The scholars who read it have looked a long time at the dark
 moon through the gaps in the cloud. It is not round. It has edges, and it turns, slowly, and on the clearest nights
 there are, some of them swear, lights on it.
 
 *Behind the myth.* What the sun and the moons are, nobody knows, and it stays unknown. The pale moon is the night's key
 light in every scene (the moonlight the pilgrim walks by). The dark moon is rarely seen, and its crossings are an
-omen in every faith. Whether it is Ithmar's last throne, a coin, an eye or a lamp is never said; every telling stands.
+omen in every faith. In the world, whether it is a coin, an eye, a lamp or a city is never settled, and every telling stands; the makers
+know it is Qhaloth, the great city in the sky, dead and rusting where it stopped rising (`03-the-age-of-terrors.md`).
+The sun stays unknown in the world; the makers lean on the Maiden's telling, a hole in the sky with the light of
+somewhere else bleeding through it, under a grey lid clouded like a dead man's eye.
 The grey sky is the Last Breath's, and the deep lore rhymes it: the god's breath is still leaving the world.

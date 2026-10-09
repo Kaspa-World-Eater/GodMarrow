@@ -24,7 +24,12 @@ ruling in `../01-rules-and-decisions.md` always wins. Section 8 lists what the 2
   - salt is gone from the myths and, by Derek's word the same day, from the zones too (worn tools at the sills and
     shelves, potash at the Ash Shore, lime in the Smugglers' Hold); "Marrow-Eaters" survives as the roads' folk name
     for the Emptied, so the game's boss still fits.
-
+- **By Derek's second notes of 2026-10-09** (the decision log has them): the Lifted, Ithmar, the Marrow War and the
+  Thrones Below are gone for **the cities in the sky** (Qhaloth, the dark moon, and the fallen Ghenn and Sorrath) and
+  its one lich, **the Regent**; the Sky-Climbers and the Lanternless are cut; the Angled are **the Xyrr**; the herald
+  is never a dragon, no Shaper; Vesk walks in the Deep, not among the Famines; the serpent is a plain corpse (no
+  ouroboros); the tower that drinks is **the Needle**. Old digest names brought back: Gorrhaun (the Famines),
+  Vhul-Oghra (the Needle), Oss-Karrhath (the reaper), Morrh-Ythraal (the Starved Crown), Ghauul (the Emptied).
 The digest keeps the old words as a record of its sources. The bible is `00-the-deep-lore.md` to `07-who-is-who.md`.
 
 ## 0. Sources, precedence and shorthand
