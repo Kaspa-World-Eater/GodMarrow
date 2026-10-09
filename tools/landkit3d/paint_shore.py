@@ -179,12 +179,24 @@ def paint(d, t, hero=None):
         wall = np.abs(up[m]) < 0.4
         along = np.where(np.abs(n[m][:, 0]) > np.abs(n[m][:, 1]), Y[m], X[m])
         tb = tm * (0.62 + 0.4 * oh[m]) + (oh2[m] - 0.5) * 0.04
-        tb = tb + (vn(along * 5.0 + oh[m] * 13, Z[m] * 0.5) - 0.5) * 0.12 * wall
+        tb = tb + (vn(along * 5.0 + oh[m] * 13, Z[m] * 0.5) - 0.5) * 0.2 * wall
+        # each drum read by its joint: the gap between drums holds the dark
+        tb = np.where(wall & (ao[m] < 0.55), tb * 0.55, tb)
+        # long dark runs down the faces where the weather has wept from every joint
+        weep = wall & (vn(along * 9.0 + oh[m] * 17, Z[m] * 0.18) > 0.72) & (vn(along * 3, Z[m] * 2) > 0.3)
+        tb = np.where(weep, tb * 0.72, tb)
         # wet and red-black below the splash line, where the Red reaches them
         splash = (Z[m] < 1.4 + 0.5 * vn(along * 0.8, 2.0)) & (s[m] > 60.0)
         tb = np.where(splash, tb * 0.6, tb)
         col = tone(R["basalt"], np.clip(tb * 0.72, 0, 0.99), dith[m], band=0.1)
         col = np.where(splash[:, None], col * 0.75 + np.array([0.05, 0.008, 0.01]), col)
+        # the tide marks (the area page: "tide marks of dried red film"): wavering bands of dried blood crust round the
+        # columns at the heights past tides reached, brown-black, each one broken
+        for lvl, wd in ((0.55, 0.06), (0.95, 0.08), (1.45, 0.06), (2.05, 0.05)):
+            zl = lvl + 0.12 * (vn(along * 1.3 + lvl * 7, 1.0) - 0.5)
+            band = wall & (np.abs(Z[m] - zl) < wd) & (vn(along * 6 + lvl * 3, Z[m] * 4) > 0.35) & (s[m] > 58.0)
+            # dried crust is matte and browner, a step lighter than the wet black rock round it
+            col = np.where(band[:, None], col * 0.35 + np.array([0.2, 0.1, 0.085]) * (0.5 + tm[:, None]), col)
         # grey-green lichen crusts on the dry high ledges facing up
         lich = (up[m] > 0.55) & (Z[m] > 3.0) & (vn(X[m] * 9, Y[m] * 9) > 0.8)
         col = np.where(lich[:, None], col * 0.4 + np.array([0.2, 0.23, 0.2]) * (0.4 + tm[:, None]) * 0.8, col)

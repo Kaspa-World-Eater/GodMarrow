@@ -414,3 +414,23 @@ lace two flat tones with holes punched in it, reading as paint.
 **Grade: B-.** This is the tenth pass. **Still short of finished:** the tall column at the right is plain, the
 drowned's legs read as stubs, the sand and the sea want dry-brush strokes, and the near-dark/far-light rule fails
 because the dry backshore is lighter than the sea.
+
+## Rules check, after pass 10, and pass 11 (2026-10-09): the column
+
+**Rules check:** the rules and the area page unchanged; no grade from Derek on pass 10 yet. **Worst failure:** the tall
+basalt column at the right, a large plain slab beside the pilgrim (line 9, detail where it counts).
+
+**Pass 11** (paint only, `paint_shore`'s basalt):
+- the joints between the drums hold the dark, so each column reads as stacked drums;
+- long dark runs weep down the faces from the joints;
+- the strokes along each column are stronger;
+- **the tide marks** (the area page's "tide marks of dried red film"): wavering, broken bands of dried blood crust round
+  the columns at four heights where past tides reached. First painted darker than the wet rock and invisible; dried
+  crust is matte and browner, a step lighter than wet black basalt, and reads at that value.
+
+The loop was repainted from pass 10's passes (the forms did not change).
+
+**cine_check (exterior):** 4 of 7, unchanged.
+
+**Grade: B-.** **Still short:** the drowned's legs read as stubs, the sand and the sea want dry-brush strokes, and the
+dry backshore is lighter than the sea (rule 22).
