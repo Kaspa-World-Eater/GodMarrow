@@ -56,3 +56,22 @@ hexagonal tiling extruded to heights by cause.
 **Derek: "Those rocks look like fucking ass ... I would give those an f currently along with everything."** The
 rebuild after that note gives the columns structure and rhythm. They are still too clean and regular, read as gray
 plastic, and the talus is a row of tidy hexagonal stubs. **Grade: D+.** Paused here by Derek's word.
+
+## 2026-10-09: rebuilt on the cave's basalt (report 07)
+
+Derek: "Looks good go on" (after the cave), and the cliffs' D+ note: "too clean and regular ... the talus is a row of
+tidy hexagonal stubs".
+
+**`cliff3d.cliffs_v2`:**
+- Columns of every girth from one power diagram in the shore's coordinates, thicker in the high wall.
+- Each a rough drum stack: long drums in the colonnade, worn corners, lost flakes.
+- The high wall breaks into the entablature's thin, crooked columns.
+- Stumps at the foot broken at every height.
+- A real talus of breakdown chunks on the sand.
+- Only the columns within reach of the face are built.
+
+**Seen at the old framing:** the form is right: girths vary, drums read, tops broken, breakdown on the sand. The paint
+is still the old exterior painter's even sky light, so the black rock reads as clean grey plastic.
+
+**Next:** an overcast exterior painter in the cave painter's manner (light by cause, stone tone by its own light, strokes,
+stains, quiet darks), built with the beach rebuild after the ocean study.

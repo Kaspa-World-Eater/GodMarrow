@@ -174,7 +174,7 @@ def build(root, material):
     RW.corpses()
     RW.things()
     RW.floating()
-    cliffs()
+    cliffs_v2()
 
 
 # ---- columns that are not uniform (Derek, 2026-10-09: "The basalt is too uniform"; chapter 12, section 5) ----
@@ -374,3 +374,76 @@ def chunk(name, c, size, mat, seed=0, flat=0.6, tilt=0.6):
         x, y = x * math.cos(az) - y * math.sin(az), x * math.sin(az) + y * math.cos(az)
         out.append((c[0] + x, c[1] + y, c[2] + z + h * 0.3))
     return P.poly(name, out, f, mat)
+
+
+def cliffs_v2():
+    """the black cliffs remade with the cave's basalt (report 07; Derek graded the hex cliffs D+: "too clean and
+    regular ... the talus is a row of tidy hexagonal stubs"): columns of every girth from one power diagram in the
+    shore's own coordinates, rough drums worn and flaked, the wall breaking at its foot into stumps of every height, a
+    real talus of fallen drums and breakdown on the sand, columns cut down by the sea where they stand in the surf"""
+    def radius(s_, t_):
+        x, y = S.xy(s_, t_)
+        d = face_dist(x, y)
+        thick = 0.5 + 0.5 * math.sin(s_ * 0.21 + 1.3) * math.cos(t_ * 0.17)
+        r = 0.32 + 0.55 * thick ** 1.3 + (_h(int(s_ * 3), int(t_ * 3), 31) - 0.5) * 0.12
+        return r * (1.15 if d > 2.0 else 1.0)                     # the high wall's colonnade thicker
+    def keep(s_, t_):
+        x, y = S.xy(s_, t_)
+        d = face_dist(x, y)
+        return -0.5 < d < 7.0
+    pts = seeds(28.0, 84.0, -12.0, 30.0, radius, keep, seed=21)
+    made = 0
+    rnd = random.Random(5)
+    for k, (cs_, ct_), r, poly in cells(pts):
+        cx_, cy_ = S.xy(cs_, ct_)
+        kk = _h(k, 7, 5)
+        hgt = column_height(cs_, ct_, kk, cx_, cy_)
+        if hgt <= 0.0:
+            continue
+        xy = [S.xy(a, b) for a, b in poly]
+        g = float(SF.height(np.array([cx_]), np.array([cy_]))[0])
+        d = face_dist(cx_, cy_)
+        lean = ((_h(k, 1, 21) - 0.5) * 0.025, (_h(k, 2, 22) - 0.5) * 0.025)
+        age = 0.45 + 0.45 * _h(k, 3, 7)
+        cup = 0.06 if (hgt < 3.0 and _h(k, 4, 6) < 0.5) else 0.0
+        broken = 0.0 if (cup or hgt > 15) else (_h(k, 5, 24) * 0.8 if _h(k, 6, 25) < 0.75 else 0.0)
+        if hgt > 15 and _h(k, 8, 26) < 0.1:
+            hgt = 3.0 + _h(k, 9, 27) * 8.0                             # a column fallen out of the wall: a recess
+            broken = 0.7
+        z0 = min(g, 0.0) - 1.5
+        z1 = max(g, 0.0) + hgt
+        if z1 - z0 > 9.0:
+            # the high wall: the colonnade below, the entablature's thin crooked columns above it
+            split = z0 + 6.0 + _h(k, 10, 28) * 4.0
+            rough_prism("cw%d" % k, xy, z0, split, "basalt", k, 0.0, 0.0, lean, age, drum=(1.4, 3.4))
+            r2 = random.Random(k)
+            subs = [xy]
+            for _ in range(2):
+                nxt = []
+                for p in subs:
+                    cxp = sum(q[0] for q in p) / len(p)
+                    cyp = sum(q[1] for q in p) / len(p)
+                    a = r2.uniform(0, math.pi)
+                    for sgn in (1, -1):
+                        h_ = _clip(p, cxp, cyp, sgn * math.cos(a), sgn * math.sin(a))
+                        if len(h_) >= 3:
+                            nxt.append(h_)
+                subs = nxt
+            for q, sub in enumerate(subs):
+                rough_prism("ce%d_%d" % (k, q), sub, split, z1 - r2.uniform(0, 2.5), "basalt", k * 7 + q, 0.0, 0.0,
+                            ((r2.random() - 0.5) * 0.06, (r2.random() - 0.5) * 0.06), 0.4, drum=(0.4, 0.9))
+        else:
+            rough_prism("cs%d" % k, xy, z0, z1, "basalt", k, cup, broken, lean, age, drum=(0.5, 1.6))
+        made += 1
+        if cup and cs_ > 55:
+            z = z1 - 0.05
+            P.poly("cuppool%d" % k, [(x, y, z) for x, y in xy][::-1], [tuple(range(len(xy)))], "blood")
+        # breakdown at the foot of the high wall: fallen drums and broken blocks on the sand
+        if 0.0 < d < 2.5 and rnd.random() < 0.5:
+            for q in range(rnd.randint(1, 3)):
+                fx_, fy_ = cx_ + rnd.uniform(-1.5, 1.5), cy_ + rnd.uniform(0.6, 3.0)
+                if face_dist(fx_, fy_) > -0.2:
+                    continue
+                gg = float(SF.height(np.array([fx_]), np.array([fy_]))[0])
+                chunk("cb%d_%d" % (k, q), (fx_, fy_, gg), rnd.uniform(0.18, 0.55), "basalt", k * 3 + q)
+    return made
