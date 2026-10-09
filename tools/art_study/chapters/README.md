@@ -21,5 +21,6 @@ before starting it (MASTER_RULES section 1). `../STUDY.md` keeps the older round
 | [11 Northwest Coast forms](11-northwest-coast-forms.md) | Cedar and the adze's mark, the plank house, posts and carved human faces, formline (ovoid, U, split U), canoes, bentwood boxes, woven cedar bark; forms only, the fusion with the Thai | The shore folk's huts, posts, palisade, canoes, boxes and mats |
 
 | [12 Cinematography, atmosphere and wonder](12-cinematography-atmosphere-wonder.md) | Deakins, *The Descent*, INSIDE, Piranesi; Burke's sublime (darkness, obscurity, vastness, infinity); Ice Age carvings made to move in firelight; rock-cut temples kept dark; ancient dark mirrors; Conan's tomb; columnar basalt that is not uniform; twelve rules with recipes for a fixed camera | Every piece (MASTER_RULES 0c); caves, temples, any interior; the opening cave |
+| [13 Tide, surf, foam and black sand](13-tide-surf-black-sand.md) | One heavy break close in (the Iribarren number), breaks peeling along the crest, ballistic lobed swash, foam as a life cycle and lace as holes, black sand by its state (measured albedos at Vík), cusps, berm and wrack, Fresnel at our camera, a sea of blood reasoned from blood's optics, Homer, Courbet, Sea of Thieves | The Red Water shore and any coast |
 
 **Both studies for the Red Shore are written** (2026-10-09).
