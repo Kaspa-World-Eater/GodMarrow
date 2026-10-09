@@ -350,3 +350,23 @@ drowned.
 
 **Grade: C.** **Still short:** the swell's front is one smooth dark mass, the roll is hard to read, the froth is
 blotchy, the tall column is plain, and the drowned's legs read as stubs.
+
+## Rules check, after pass 7, and pass 8 (2026-10-09): the swell's face
+
+**Rules check:** `MASTER_RULES` and `CINEMATOGRAPHY.md` unchanged since my last full reading; no new notes on the
+review page. Line by line as after pass 7, except line 1, which now passes (the drowned are in the water). **Worst
+failure: the skeptic round's,** the swell's front as one big smooth dark mass with nothing for the eye.
+
+**Pass 8:**
+- **Form:** the crest is never even along the shore now (`beach_floor.crest`): it humps and sags, up to a third
+  higher or lower, and stands forward or back, so the face breaks into broad facets that take the grey sky each its
+  own way, and the lit band along the crest wanders.
+- **Paint:** on the steep face the blood's skin is stretched as the wave climbs: long slow streaks running down the
+  slope, a dull grey-pink sheen on the stretched lines and dark creases between, torn so no streak runs the whole face.
+  The first try ran them too regular and read as a curtain of vertical bars; thinned and broken, they read as thick
+  blood pulling.
+
+**cine_check (exterior):** 4 of 7, unchanged.
+
+**Grade: C+.** The face has structure and the viscosity shows on it. **Still short:** the roll is hard to read at this
+angle, the froth is blotchy, the tall column at the right is plain, and the drowned's legs read as stubs.

@@ -289,6 +289,15 @@ def paint(d, t, hero=None):
         wr = np.abs(_frac(vn(sm_ * 1.6 + hb * 0.3, tt[m] * 0.7) * 6.0 + fbm(X[m] * 1.5, Y[m] * 1.5) * 1.5) - 0.5) < 0.05
         crease = wr & (push > 0.45) & (vn(X[m] * 5, Y[m] * 5) > 0.35)
         col = np.where(crease[:, None], col * 0.72, col)
+        # on the steep face the skin is stretched as the wave climbs: pulled into long slow streaks running down the
+        # slope, a dull grey-pink sheen on the stretched lines, dark creases between, strongest where the face is steepest
+        steep = np.clip((1.0 - n[m][:, 2]) * 3.0, 0, 1)
+        flow = vn(tt[m] * 4.5 + fbm(sm_ * 0.4, tt[m] * 0.4) * 2.0, sm_ * 0.45 - hb * 0.6)
+        broken = vn(X[m] * 2.2 + 7, Y[m] * 2.2 + Z[m] * 3) > 0.5          # the skin tears: no streak runs the whole face
+        sheen_s = (flow > 0.8) & (steep > 0.4) & broken
+        crease_s = (flow < 0.12) & (steep > 0.4) & ~broken
+        col = np.where(sheen_s[:, None], col * 0.75 + np.array([0.2, 0.12, 0.12]) * 0.55, col)
+        col = np.where(crease_s[:, None], col * 0.78, col)
         clot = (vn(X[m] * 1.7 + 40, Y[m] * 1.7) > 0.8) & (vn(X[m] * 6.0, Y[m] * 6.0) > 0.45) & (sm_ < BF.WATER + 6)
         col = np.where(clot[:, None], col * 0.8 + np.array([0.025, 0.012, 0.01]), col)
         edge = depth < 0.02

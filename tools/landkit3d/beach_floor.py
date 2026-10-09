@@ -235,7 +235,11 @@ def crest(ph, t):
     """the unbroken crest's place (s) and height (yards) at phase ph < 0.38"""
     sb = break_s(t)
     sc = np.where(ph < 0.3, sb + (0.3 - ph) * 40.0, sb - (ph - 0.3) * 8.0)
-    H = (0.45 + 1.15 * np.clip(ph / 0.3, 0, 1) ** 2) * group()
+    # the crest is never even along the shore: it humps and sags, and stands a little forward or back, so the face is
+    # broken into broad facets that each take the grey sky their own way
+    t = np.asarray(t, float)
+    sc = sc + 1.1 * (_vn1(t * 0.17, 73.0) - 0.5) + 0.4 * (_vn1(t * 0.6, 79.0) - 0.5)
+    H = (0.45 + 1.15 * np.clip(ph / 0.3, 0, 1) ** 2) * group() * (0.78 + 0.38 * _vn1(t * 0.21, 71.0))
     return sc, H
 
 
