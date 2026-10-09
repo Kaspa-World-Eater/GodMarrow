@@ -152,7 +152,7 @@ Worst failure: the bell's readability (it is the scene's focal relic). Then the 
 export.
 Section 8 in view: metal and armour, the environment agenda, repainting the effects, the effects still to build, melee.
 
-## Rework (2026-10-07, stage 1 of docs/REWORK_AND_SEEDS_PLAN.md)
+## Rework (2026-10-07, stage 1 of docs/archive/REWORK_AND_SEEDS_PLAN.md)
 - **From the engine:** the pale trunks warped and channelled; normals unblurred; the forest floor round the chapel
   from `litter_ground.py`.
 - **The nave floor:** the retired tile (`tiles_ruin.church_flags`, a flat picture) replaced by real stones, the new

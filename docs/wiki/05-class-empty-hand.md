@@ -18,13 +18,13 @@
 
 ---
 
-## 1. The order at a glance
+## 1. The monastery at a glance
 
-- **The Order of the Gilded Peak, the Kinrei-shū**, "the Gold Bell". Their monastery stood on a mountain of the god's knee-bone, high above the lowlands.
+- **The Gilded Peak, the Kinrei-shū**, "the Gold Bell". Their monastery stood on a mountain of the god's knee-bone, high above the lowlands.
 
 - **They serve Ur-Nihl, the Silence:** the thing that unsaid the god. It has no name, only negations.
 
-- Most people say **the Hush**, and the Reading says **the Void That Emanates**. Only the Peak's monks and the mad say "Ur-Nihl" plainly.
+- Most people say **the Silence**, or leave a pause where the name would go; the Peak's monks called it **That Which Cannot Be Held**, and the Reading says **the Void That Emanates**. Only the Peak's monks and the mad say "Ur-Nihl" plainly.
 
 - **What the lowlands saw:** gaunt, gentle monks who chanted night and day to hold the miasma off the slopes, and came down to beg.
 
@@ -55,7 +55,7 @@ The Peak taught that **the Silence has two hands, and both are empty.**
 **Begging Bowl of the Peak**
 
 > *A plain wooden bowl, worn black at the lip.*
-> *The monks of the Gilded Peak never begged for food. They held out the bowl and asked, "Put a name in it."*
+> *The monks of the Gilded Peak never begged for anything. They held out the bowl and asked, "Put a name in it."*
 > *The lowlanders learned to whisper into it the names they wanted gone: a grief, a debt, a man. The monks carried the names up the mountain, and the lowlands forgot them. Gratefully, mostly.*
 
 **Gilded Leaf**
@@ -106,14 +106,14 @@ The Peak taught that **the Silence has two hands, and both are empty.**
 - The gold was never wealth. **It was Radiance made solid**, a way to erase a face without destroying it.
 - **The inner sanctum** was lined with gilded saints, and they wept.
 
-**The begging.** Monks went down to the lowlands with bowls. They never asked for food. They asked for names: the sorrows, shames and dead the lowlanders wanted gone.
+**The begging.** Monks went down to the lowlands with bowls. They never asked for alms. They asked for names: the sorrows, shames and dead the lowlanders wanted gone.
 - The names were carried up the mountain and given to the Silence, and the lowlands forgot.
-- It was the Peak's mercy, and the reason the lowlands fed the monks anyway, and feared them.
+- It was the Peak's mercy, and the reason the lowlands gave the monks alms anyway, and feared them.
 
 **The Destroyer's stone.** The Peak was cut from the god's knee-bone, and its oldest masters knew how to make the mountain move: bars, grips, pagodas and a weeping stone guardian at the gate. This is the third tree, paid in the body's own poise.
 
 **The fall.** The **Pale Order**, the Ossuarch's order, learned that the Peak had been gilding its dead and giving them to the Silence, leaving no bone.
-- To the Order that was the worst waste in the world. Its dead came up the Peak's stair to take the bones before the Hush could (see `claude/godmarrow-class-ossuarch.md`).
+- To the Order that was the worst waste in the world. Its dead came up the Peak's stair to take the bones before the Silence could (see `claude/godmarrow-class-ossuarch.md`).
 - The monks were too light to fight and too gentle to try, so each was cut down and raised before he hit the ground.
 - **What happened next is not agreed.** By morning the courtyard was black glass. The dead were gone, and the doors of the inner sanctum were open.
 
@@ -130,17 +130,15 @@ The Peak taught that **the Silence has two hands, and both are empty.**
 
 ## 6. The man
 
-*The lore is about the order. About him, there is very little.*
-- **What is seen:** a barefoot beggar-monk with a wooden bowl, a vermilion shawl and a lantern that burns black. He comes to villages at dusk and asks for a name.
-- **What is known:** things he strikes leave smooth black glass, a little dust, or nothing, never a corpse. That is the Silence's signature.
-- **What is said:**
-  - He is one of the Peak's monks, one who was down in the lowlands with his bowl the night the Peak fell.
-  - He is the one who opened the sanctum doors.
-  - When the Order's knights came back to the Peak to count, there was a gilded saint missing from the sanctum.
-  - There is no gold on him. There never was. He is a beggar, and that is all.
-- **What he says about it:** "Put a name in the bowl."
-- **For us:** he may be a monk, a saint with the gold worn off, or older than the Peak. He may be immortal. Leave every door open.
-- **Other names:** **the Smiling Oblivion**, **Hōkai-bō** ("the Monk of the Broken Realm", an old pilgrim name for any monk of the Peak), and **the Palm** in the flesh-houses, where they spit when they say it.
+*The lore is about the monastery. About him, there is very little.*
+
+He is a barefoot beggar-monk with a wooden bowl, a vermilion shawl and a lantern that burns black. He comes to villages at dusk and asks for a name. Things he strikes leave smooth black glass, a little dust, or nothing, never a corpse; that is the Silence's signature.
+
+The stories about him do not agree. Some say he is one of the Peak's monks, one who was down in the lowlands with his bowl the night the Peak fell. Some say he is the one who opened the sanctum doors, and that when the Order's knights came back to the Peak to count, there was a gilded saint missing from the sanctum. Others say there is no gold on him and there never was: he is a beggar, and that is all. Asked about any of it, he says only, "Put a name in the bowl."
+
+He is called **the Smiling Oblivion**, and **Hōkai-bō** ("the Monk of the Broken Realm", an old pilgrim name for any monk of the Peak). In the Bleeding Maiden's processions he is **the Palm**, and they spit when they say it.
+
+**For us:** he may be a monk, a saint with the gold worn off, or older than the Peak. He may be immortal. Leave every door open.
 
 ## 7. How he plays (and why)
 
@@ -236,7 +234,7 @@ His three-blow string, the held heavy and the roll are the model for every order
 **The Black-Flame Road: the channels of the Empty Hand.**
 - Major Arcana sit over the lower dantian.
 - Minor roads run along the two midlines, the meridians and the spring in the sole.
-- **Notables:** the Hundred Meetings, the Sea of Breath, Lantern in the Fist, the Empty Laugh, the Bubbling Spring, the Barefoot Gate, Three Miles More.
+- **Notables:** the Hundred Meetings, the Sea of Breath, Lantern in the Fist, the Empty Laugh, the Bubbling Spring, the Barefoot Gate, Three Leagues More.
 
 ## 9. Look (the character as he is)
 
@@ -258,11 +256,11 @@ His three-blow string, the held heavy and the roll are the model for every order
 
 - **Moves:** idle, walk and a three-blow chain; cast, flurry, sky fist, sky, clap, hungry palm, pinch; heavy, leap, dodge, hit and death.
 
-## 10. The order's enemies
+## 10. The monastery's enemies
 
 - **The Pale Order** (the Ossuarch's order): the bloodiest feud. The Order's dead took the Peak, and something on the Peak took them back. The Peak leaves glass where the Order wants bone.
 
-- **The flesh-houses:** the Peak starved the flesh; the flesh-houses feast. They hate the Silence more than they hated the Peak.
+- **The Bleeding Maiden's processions:** the Peak starved the flesh; the processions fill it. They hate the Silence more than they hated the Peak.
 
 - **The Hollow Mystic's lodges:** to them the Silence is a weave with no pattern left, and they bar their doors to anyone who speaks its name.
 

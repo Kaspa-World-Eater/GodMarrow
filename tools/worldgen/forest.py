@@ -1,4 +1,4 @@
-"""Act I's forests from seed, our own way (docs/REWORK_AND_SEEDS_PLAN.md, stage 3; Derek 2026-10-07: "dialing in asset
+"""Act I's forests from seed, our own way (docs/archive/REWORK_AND_SEEDS_PLAN.md, stage 3; Derek 2026-10-07: "dialing in asset
 placement and creating the code that does it perfectly from seed is very important").
 
 Not a port of the browser's generator (its saplings came in clumps and the game turned one in five into a stump: the

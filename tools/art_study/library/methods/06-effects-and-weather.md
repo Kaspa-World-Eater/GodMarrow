@@ -68,7 +68,8 @@ beneath; seven over the deepest blood, one or two burning at a time. The game ca
   wetting and stay dry;
 - **seamless**: each drop falls `FALLS = 3` times a loop from a fixed phase; the wind slants every drop the same way.
 
-**Fog lies in the lows** (`tools/landkit/fog.py`; `vigil.py:ground_fog`): density from two fbm layers sliding
+**Retired 2026-10-08 (no fog or mist layers; Derek on the bog's fog: "its ugly"):** the fog below is kept for the
+record only. **Fog lies in the lows** (`tools/landkit/fog.py`; `vigil.py:ground_fog`): density from two fbm layers sliding
 round a loop, times `low` (how far the resting ground lies below its blur, plus the blurred pools), times `above`
 (thinning up to 0.8 yd above the ground, so it never climbs the trunks); three alpha steps (0.05, 0.11, 0.2),
 dithered only at the thin edge; coloured by the moon and warm near the lantern and candles.

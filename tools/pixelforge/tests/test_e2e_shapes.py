@@ -1,6 +1,6 @@
 """End to end: a sentence becomes a shape file, frames in the game's layout and the game's atlas, headlessly.
 
-This is the sequence docs/GUIDE_SESSION.md gives a new session: draft -> validate -> still -> preview -> render -> export.
+This is the sequence tools/pixelforge/docs/GUIDE_SESSION.md gives a new session: draft -> validate -> still -> preview -> render -> export.
 """
 import json
 from pathlib import Path

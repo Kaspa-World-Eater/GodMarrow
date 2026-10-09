@@ -3,7 +3,7 @@
 *2026-10-05. Written before drawing, by the Ossuarch's process. Sources:*
 - *Derek's three sheets in this folder (the best is `sheet_58e07eae_3.png`);*
 - *`docs/wiki/05-class-shrine-keeper.md`;*
-- *the mythology page `docs/wiki/mythology/04-the-other-callings.md` (the Myriad);*
+- *the mythology page `docs/wiki/mythology/06-the-myriad.md` (the Myriad; the older page is in `docs/archive/mythology_2026-10-05/`);*
 - *Derek's lore bible rulings: callings are never particular characters; gate, paper figure and the Horned replace the old Japanese words; no animals; no fox.*
 
 ## Who wears this

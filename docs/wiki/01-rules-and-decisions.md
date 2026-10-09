@@ -1,113 +1,233 @@
-<!-- Start · updated 2026-09-30 · 3568 words · source page #rules -->
-# 01 · The user's rules and the decision log
+# 01 · Derek's rules and the decision log
 
-*These are law. Each came from the user. When a rule changes, edit it here and add a dated line to the log at the bottom.*
+*These are law. Each came from Derek. When a rule changes, edit it here and add a dated line to the log at the bottom.
+Rewritten 2026-10-08: the rulings of 2026-10-02 to 2026-10-08 are in, the 2026-10-01 notes that sat under "Words" are
+moved into the log, and what has been superseded is marked. The art laws in full are `docs/MASTER_RULES.md`.*
 
 ## How to work (process)
 
-- **Small, reviewable steps.** A playable demo for every step change. Never a massive change made without the user's insight.
-
-- **One piece at a time**, approved before the next. The user was upset when many agents ran at once and changed too much.
-
-- **Status reports.** Prompt, clear updates; no long silent stretches. Keep the workshop board current with snapshots.
-
-- **Say the plan first** for big changes, and wait for a go.
-
-- **Midjourney prompts:** one full prompt per view, never one prompt plus view notes.
-
+- **Say the plan first** for big changes, and wait for a go. Small, reviewable steps; a playable game after each.
+- **One piece at a time,** approved before the next. Every art piece gets ten graded passes, an honest grade, and
+  Derek's grade on the area's review page (`docs/MASTER_RULES.md` section 2).
+- **Status reports:** prompt, plain, honest; no long silent stretches.
 - **Check facts before stating them.** Never guess how something was made.
-
-- **PixelLab:** Claude drives it so the user doesn't have to be present. The token lives only in `~/.pixellab/token`; never print it or put it in files. Never delete the user's PixelLab characters; the user does that.
+- **Midjourney is for reference only:**
+  - prompts in Derek's own way: short plain sentences, one full prompt per view;
+  - his profile `anngqkz`, stylize 350 to 750, weird 130 to 550;
+  - never change his settings.
+- **Never port the old browser code one to one** (Derek, 2026-10-05: "the one-to-one porting has been a disaster").
+  Take the idea, design our own version, and say what's new about it.
+- **Secrets:** the PixelLab token lives only in `~/.pixellab/token`, the Hugging Face token only in
+  `~/.huggingface/token`. Never print them or put them in files; never read `_secrets`; never type passwords. Never
+  delete Derek's PixelLab characters; deletions and downloads on his PC need his yes, and go to the Recycle Bin.
 
 ## Gameplay law
 
-- **No cooldowns anywhere.** Power is gated by cost (life, resource, poise, minions), never timers, and no durations that read like cooldowns.
+**Power and cost:**
+- **No cooldowns anywhere.** Power is gated by cost (life, resource, poise, minions), never timers, and no durations
+  that read like cooldowns.
+- **Melee costs poise, never mana,** for every calling.
+- **Poise break:** a short stagger, a burst refill to half, then normal regen; no rolling until poise is full.
+- **No teleport skills** for any calling.
 
-- **Melee costs poise, never mana**, for every order.
+**Melee** is charged in the manner of Secret of Mana (2026-10-05):
+- hold to charge through up to three tiers, each a different strike (a fourth from some uniques);
+- it is optional by a setting, and with it off, holding strikes on and the string climbs the tiers;
+- skills are charged, plain or held;
+- stances (weaker auras, upkept in poise), rites borne by a minion, and one kept curse at a time.
 
-- **Boss fights are Diablo-style, never Dark Souls-style:** never lock the player in a small room. You can run, kite and leave as much as you need (v75).
+**Fights:**
+- **Boss fights are Diablo-style, never Dark Souls-style:** never lock the player in a small room. Bosses left behind
+  never heal.
+- **Every danger is plainly seen** (2026-09-30): no deaths to things you could not see. Tells and hazards draw
+  unshaded so the dark never hides them. The death screen names the killer.
+- **Monster marks are Diablo II's kind only.** Champion packs and uniques are rare (one champion pack in three of
+  those the maps place, one named unique a zone, 2026-10-08).
+- **Monsters are known by their eyes in the dark;** the eyeless are the jump scares. Each kind behaves differently;
+  creatures loiter like D2's imps and are bold.
 
-- **Every danger is plainly seen** (2026-09-30): no Diablo IV-style deaths to things you could not see — ground effects lost in clutter or the dark, detonations after a death with no tell, blows from off screen. Ground hazards, bursts and fires are fine when highly visible (Ash-Trailing's smouldering ash, the Bursting deed, the Pyre-Saint's eruption and fires). Tells and hazards draw unshaded so the dark never hides them.
+**Difficulty:**
+- like Diablo II: Normal, Nightmare, Hell, each a little darker;
+- in Normal, creatures are never more than two levels above the pilgrim;
+- the night makes them at most 15% bolder (2026-10-08).
 
-- **Monster marks are Diablo II's kind only** (2026-09-30): no Diablo III / IV affixes (beams, orbiting fire, burning trails and the like).
+**Loot, stash, souls:**
+- **Loot is scarce,** as in Diablo II. Gold is the currency and drops silently.
+- **Souls are imbued in the lantern;** no gems. Small materials stack in a materials tab; one big main stash.
 
-- **Lantern perks are benign:** slow, fear, regeneration, radius. **Never damage.**
+**The lantern and companions:**
+- **The lantern** is carried by a bearer, each calling's own small companion (the Ossuarch's is the Candle-Hand). Its
+  perks are benign: slow, fear, regeneration, radius, never damage.
+- **Companions have real roles** (Lantern-Bearer, Porter, Reader, Warden, Mender): one at a time, hired at camp; they
+  level and wear gear, can fall, and take orders.
 
-- **Loot is scarce**, as in Diablo 2: you should see items, but never a flood of magic and rares.
+**Death:** like Diablo II and Dark Souls together. Something is dropped where you fell, and you walk back for it.
 
-- **Gold is the currency** (the user prefers it to PoE-style currency-as-crafting).
+**The world:**
+- **Openness:** zones are open and spacious; paths may be constrictive where a land calls for it (the Sunken Bog's
+  maze).
+- **Maps are random from seeds;** towns and set pieces are hand-laid.
 
-- **Openness:** zones are open and spacious like D2's Act 1 and Act 5; few narrow corridors. Trees were thinned on purpose. "Some channeling things" are fine: a few loose tree lines and ruins per zone (v89).
-
-- **Maps are random** per new game and Continue; towns and quest vaults are hand-laid.
-
-- **Packs are 15% smaller** (not smaller monsters).
-
-- **Poise break:** a short stun, a burst refill to half, then normal regen; **no rolling until poise is full**.
-
-- **Monsters loiter like D2's imps** and should be bold, not cowardly (v76; +20% bolder in v79).
-
-- **No strobing light.** Flames swell and gutter slowly; no fast flicker (v79).
-
-- **Skill trees:** three per order, D2 layout, rows at levels 1/6/12/18/24/30; no capstones; a few clear synergies; every order has a viable melee and caster style; no weak level-1 minions without a point; no level-1 skill that needs a later one.
-
-- **The Reading:** every percent effect is ±1% at most; flat values small.
-
+**Skills and the Reading:**
+- **Skill trees:** three per calling, D2 layout, rows at levels 1, 6, 12, 18, 24, 30; Masteries at 30; the trees
+  intersect like D2's.
+- **The Reading:** every percent effect ±1% at most.
 - **Major Arcana** never give +skill levels and never add waits.
+- **Progression is built:** the skill trees and the Arcana board. Don't redesign them.
+
+**No tutorials, ever, from any character.** People talk about their lives, not about buttons or menus.
 
 ## Art and presentation law
 
-- **No red lighting.** Ignore Midjourney's red key light; it's the tool's habit.
+The full art law is `docs/MASTER_RULES.md`; the look is `06-art-direction.md`. The core:
+- **No red light,** except the pit of offering's throat in the Sunken Bog (Derek's ruling for that landmark).
+- **Restrained effects** in the manner of Diablo II Resurrected:
+  - no glow for its own sake, though glow is fine on magic, lanterns and wisps;
+  - no swing arcs or comet trails;
+  - nothing pasted over the screen;
+  - no fog or mist layers.
+- **The painted standard** for everything, and **FORM IS LAW:** real form under the paint, never flat. Never a
+  *cheap* 3D look; the 3D road's form is always painted.
+- **True scale:** the pilgrim small in a big world; forest crowns out of frame.
+- **Gritty and dark, never unplayable.** The lantern is the key light, a pool that pushes the dark back. The night's
+  floor is 0.52 (2026-10-08). Each difficulty is a little darker.
+- **The hero casts a real shadow.**
+- **No corny markers** (no "!" over NPCs).
+- **Use Derek's own art directly where it exists.** Never reduce his colours.
+- **Realistic proportions** (7.5 to 8 heads), muted hue-shifted palettes, one bold mass per figure.
+- **No animals, no animal motifs.** Every creature is a piece of the god. Three exceptions:
+  - insects are allowed (2026-10-07);
+  - the crows on the moor were allowed (2026-10-01);
+  - the Sunken Bog's long-dead serpent god may be called a serpent (2026-10-08).
+- **The god's body shows through the world,** more the deeper you go; in the first area only a hint (2026-10-08).
+- **Sap is dark blood.**
+- **The Hemomancer (Red Penitent)** reads dark brown, a Black man drawn with dignity: penitent, not tribal, not a
+  mummy, no head cage.
 
-- **The Hemomancer's skin reads dark brown.** He is a Black man, drawn with dignity. Penitent, not tribal, not a mummy; no head cage.
+## Words and lore
 
-- **No glows or effects on attacks and casts.** Ground it in realism.
+**The Silence is never "the Hush"** (2026-10-08: "it's so corny"). In the world it is That Which Cannot Be Named,
+That Which Cannot Be Held, the Unmaking, or nothing at all: a pause in speech, a gap in writing.
 
-- **Heroes' hands stay free** (weapons are separate layers, coming later).
+**Banned words:** never use cooldown, dps, proc, aggro, loot, buff, nerf, stun, lightning (as a word), mana (except in
+code), chain lightning, rot, cell, virus, DNA, organism or biology. The world speaks in flesh, bone, breath, blood,
+marrow.
 
-- **No corny markers** (no "!" over things). The player learns from visual cues.
+**Real-world words:** copper not pennies, lands not country, leagues not miles, the fast-day (there is no Friday).
 
-- **Gritty and dark.** The light comes from the **lantern, not the hero**: a pool on the ground that pushes the dark back, deepening outward like a cave, never pitch black; easier to see by day. "Useful in the game but not intrusive." A faint ring at the pool's edge is fine.
+**Names:**
+- the Bleeding Maiden, never "Weeping";
+- the Ossuarch's order is the Pale Order;
+- the Shrine Keeper's stacks are Omens; the Word skill's sigil stays a sigil; the runeword-style words are sigils;
+- "Minor Arcana", not nodes or knots;
+- the Empty Hand's name is "The Empty Hand".
 
-- **The hero casts a real shadow**; no dark blob under the feet. Wisps cast light but no shadow.
+**Lore rulings** (2026-10-04 and 2026-10-05):
+- no "house" or "brotherhood" for faiths; each faith has its own word;
+- there is only one cult, the Second Mouth;
+- never "the five" as a title;
+- the classes are callings, never written as characters;
+- "Polished Heart" is retired (hearts belong to the Bleeding Maiden); "Wet Nurse" is retired; the Laden Board is
+  scrapped;
+- no food, tables or kitchen framing (esoteric, occult);
+- the faiths are called by their goddess (the Bleeding Maiden, the Veiled Crone); the breath faith is the Myriad,
+  commonly the Shrine Keepers;
+- the Silence is the space between words, holding all meaning;
+- **contradictions are canon** (rival tellings);
+- **the Tithe has two meanings** (to be tithed is to be hollowed out; the people are also the tithe);
+- dragons were one power among many in the age before; the dracolich is the last.
 
-- **Never 3D-looking.** Flat, decided value shapes; no gradients, tubes or balloons. (The user rejected "old school 3D" three times.)
-
-- **Use the user's own art directly** where it exists. Never sacrifice detail.
-
-- **Grimdark knight standard:** realistic proportions (7.5–8 heads), harsh light, muddy desaturated palette, worn and tattered; one bold saturated mass per figure.
-
-- **Atmosphere** is subtle, rare and comes from the world (no screen-overlay flecks).
-
-- **No animals, no animal motifs** (no foxes, fur, birds). Every creature is a piece of the god.
-
-- **No yin-yang** (non-duality is implied only).
-
-- **The world has organic hints** in Act I (the god's body showing through), and a quiet dead-cow homage (never overt).
-
-## Words
-
-- **No science words in the world's voice:** never "cell", "virus", "DNA", "organism", "biology" and the like. The world speaks in flesh, bone, breath, blood, marrow.
-
-- **The Ossuarch's order is the Pale Order.** Locked. (It was briefly "the Chapter of the Frame".)
-
-- **Never used in the game:** cooldown, dps, proc, aggro, loot, buff, nerf, stun, lightning (as a word), mana (except as code), chain lightning.
-
-- **2026-10-01 (Derek): PixelForge is the game's forge, for this game and the next.** All art tooling goes through it (`tools/pixelforge`), stays in theme (near-black, bone, iron, dull teal; amber only for lanterns and the Empty Hand's sand; blood dark; glow only on magic, lanterns, wisps), and ships with its Godot add-on so another project can use it unchanged.
-- **2026-10-01 (Derek): the Hollow Mystic's carve is the reference fit.** Derek judged the form-fitted carve "much better" (cloak pulled to 0.8 of the side sweep, rounded cross-sections, no protrusions). Every character carve uses these defaults (`depth_scale` 0.8, `fit` 2.6) unless a sheet needs otherwise.
-- **2026-10-01 (Derek): every hero carries a lantern.** The lanterns are painted as objects (one per order, in `docs/ART_ORDER.md`) and built through the Forge like any prop.
-- **2026-10-01 (Derek): the Shrine Keeper's stacks are Omens**, not Sigils ("let's use omens over sigils"). The Word skill's drawn *sigil* stays a sigil; the Ossuarch's *count sigils* stay.
-- **2026-10-01 (Derek): crows are allowed.** The "no animals" rule does not cover the crows in the moor (and the audit's "crows" rows are closed).
-- **2026-10-01 (Derek): the wraith test skin is the Hollow Mystic.** `art/sprites/wraith.*` (made by the Forge) is his look; `--skin=wraith` on the Hollow Mystic is the look test.
-- **"Rot" is never used** for miasma, the Shrine Keeper or anything else.
-
-- The Hemomancer's goddess is the **Bleeding** Maiden, never "Weeping".
-
-- "Minor Arcana", not "nodes" or "knots".
+**How lore is written:**
+- **Only in-world voices,** never an all-knowing narrator. Writers believe they live in the world; they can be wrong
+  and disagree.
+- **Readable** (2026-10-05, 2026-10-08): plain stories and discussion, with a little jargon at most. No Q&A, no "What
+  is said / What is known" blocks, no aphorism stacks.
+- **Myths are told as texts found on scrolls, in tombs, or passed down** by priests and families.
+- **The gods are unknowable** (2026-10-08): Lovecraftian, alien entities. Every name and face a faith gives them (the
+  Bearing Mother, the Veiled Crone, the Bleeding Maiden, the small gods) is an aspect people define so they can try to
+  understand. It is never what the thing is.
+- **A world of unknowns** (2026-10-08). The player makes the connections ("not Baldur's Gate"). No little towns or
+  villages that are not in the game; regions like the Ossa are fine.
+- **The bible and the in-game texts are different things** (2026-10-08). `mythology/` is the makers' bible: myths told as
+  myths, with depth of time. `in-game-texts/` holds what players find, in the world's own voices.
+- **World-building only** (2026-10-08): "we're not writing story or quests or anything. We're just building the world." Lore is never a quest hook, a boss hook or a story beat.
 
 ## Decision log (newest first)
 
-- **2026-10-01, the look going forward (Derek, confirmed):** Diablo II sprites lit by a real 3D lantern. The game stays 2D pixel sprites made by the Forge (pre-rendered from carved models), standing as upright cards in the real-3D scene of `tests/scene3d` (orthographic 30° camera, real lantern light with stepped falloff, real shadows; normal + depth maps per frame from the Forge make the cards light like bodies). Not full 3D models in-game. The browser build's look and behaviour remain the reference for the port; its lighting is rebuilt on the 3D scene with the browser as the target.
+- **2026-10-08, the deep lore** (Derek; for us, never stated in the game):
+  - "everything in this world is simply narrative. Even the gods aren't real. They're simply dreams. Manifesting because they think they're real. People think they're real ... Thoughts and words can manifest and gain power in this world and that's why they say the god has a thousand faces and 1,000 hands."
+  - "everything is everything, reflecting off one another and people still think what they [are] seeing but it's really them projecting themselves and recognizing that and providing identity to those things."
+  - **Mantles:** "things just fulfill roles. Killing one just leaves another to take [the] mantle. And there are an infinite number of mantles that have always existed even if they're merely born that day. They have always existed and they've never existed."
+  - **The hero, a direction and not a story:** "I like the idea of the hero really being a world killer, slaying the thoughts and dreams, but with no real purpose. No meaning."
+  - **The Silence's names:** "I don't like the word hush, it's so corny." Better: "that which cannot be named, that which cannot be held, simply saying nothing, the unmaking, kind of like a fusion of nihilism and daoism."
+  - **Story notes, a direction not a story:** "perhaps the hero doesn't have a backstory. Maybe they always were around. Maybe they're just a dream that manifested, maybe they just popped out of the digestion warp point thing [the waystones] ... They don't really know ... at the end the cosmic joke is that the world has gone through many world endings, it's a cycle. You're not a hero. You're a world ender, brought back into being like Kali, to renew things, to take up the mantle of the evil bad guys at the [end] and become merely the next one in the next cycle like it's always been."
+  - **The tarot:** "a unifying theme across all people at all times is the use of the tarot, and its myriad of cards. No one even knows all the cards or the formations that they can take when drawn."
+  - **The Reading:** "Weaving in the hero myth to the tarot building at the beginning of the game would be cool too. More archetypal so that the narrator is kind of mocking you because it's like they're in on it. They know what's happening as you pick each aspect each tarot each archetype to build your character." The idea "you don't draw the cards the deck draws you", but never that exact line.
+  - All of it is written up in `mythology/00-the-deep-lore.md`.
+- **2026-10-08, the bible and the mythos:**
+  - "I want mythologies. I want creation myths. Not always done the same journal format. Consider this a Bible for us, the creators of the world to reference. The in-game writing is more for finding shit in the game for the players." The lore had lost "the depth of time" and was told "from the perspective of the [Ossuarch] or other characters".
+  - "I want it lovecraftian, the gods being unknowable alien-like entities defined [by] mythos. [People] merely define aspects so they can try to understand it."
+  - "I don't want to talk anymore about little villages and shit because they don't exist yet" ("ossa is fine").
+  - "This is the world of unknowns where the player simply has to make connections themselves. Not baldur's gate."
+  - So `mythology/` is now the makers' bible, the found texts are in `in-game-texts/`, and no lore names small towns or villages that are not in the game.
+- **2026-10-08, the start on the Red Water:** "Let's make the starting area also on the edge of the ocean. Of course they don't know it's the ocean, but it's also completely made of blood. When they go down to the black sands all they see is the red blood going forever. Come up with a myth for that."
+  - Much of the area is black sand and coast, then it "works its way inward through the environment following the natural landscape ecosystem trends".
+  - The culture: "combine some native American elements with the thai theme and some sort of new fusion all wrapped in a real dark souls like atmosphere". This overturns "all Thai" of the same morning.
+  - "We're not writing story or quests or anything. We're just building the world."
+  - Written up in `mythology/08-the-shore-folk.md` (the myth of the Red Water) and `mythology/areas/the-red-shore.md`.
+- **2026-10-08, the lore:** rewrite the lore as readable myths (a creation myth, myths and the end of the world for each faith and people), told as texts found on scrolls, in tombs, or passed down, with only a little jargon; and area lore for every Act I zone, as inspiration for building each one; and the inconsistencies fixed. In `mythology/`.
+- **2026-10-08, the first area:** the Ashen Moor is wiped to a bare camp ("we can nuke the entire first area anyways, its fucking trash"; "wipe it, keep a bare camp ... make it very basic so we can finish the bog"). The new first area is a destroyed village of the forest folk, deep in overcast old-growth rainforest (the Olympic rain forest): round hide huts, a palisade collapsed after years of siege by "creatures from the outside world. the beasts and the undead", a central fire pit burning the dead, a destroyed Thai temple shrine, a dark-Souls Thai theme, darker; **all Thai, no Native American elements** *(overturned the same day: a Thai and Native American fusion, and the start moved to the edge of the Red Water)*; **safe**; its only soul is "the wandering merchant who seems kinda insane and mocking at your ignorance", looting it; the god only as a hint there.
+- **2026-10-08, the music:** the old score is deleted. The new main music is "a more middle eastern diablo 2 sound ... dark and maybe a slight tone of traditional thai kick boxing music".
+- **2026-10-08, the 3D road:** after the temple trial (the same temple as real 3D and as a height field): "absolutely fucking crushed with the 3d, beautiful the painting and details have a long ways to go but this is the way." Built things and anything that overhangs are made as 3D forms in Blender, painted our way.
+- **2026-10-08, Cursemark dropped:** "Drop it." The game uses its own monsters, sounds and fonts; Cursemark's files went to the Recycle Bin. The game was pushed to GitHub `main` so the laptop updates.
+- **2026-10-08, playable again:** "the game is unplayably dark at night currently, magic+ monsters are too often and i cant get anywhere with out immediatley dyin." The night's floor 0.52 (was 0.72); monster blows x0.6; the night at most +15%; one champion pack in three; one named unique a zone; no creature more than two levels above the pilgrim. Far creatures sleep (Diablo II's rule) for the lag.
+- **2026-10-08, the browser retired for good:** "we dont use the browser anymore, so we will need to launch every one into the game when we decide act 1 is complete."
+- **2026-10-08, the Sunken Bog:**
+  - The Long Back is the spine of a long-dead demon serpent god, its names half-remembered and all wrong ("serpent" allowed).
+  - The black mirror water, mostly overgrown bone, vertebrae breaking through, lots of plants.
+  - A maze like Diablo II's maggot lair, with open marsh chambers.
+  - The pit of offering is "exceptional"; red light allowed at its throat only.
+  - The fog over the water is removed ("its ugly").
+- **2026-10-08, the ground stays alive:** the reworked floors were "35% too barren"; calm floors are overturned; the old road tile is scrapped.
+- **2026-10-08, review pages:** every area gets its own review page with grades and notes ("let's make that the standard"); on every rules-check ping, improve something too.
+- **2026-10-07, the art laws:**
+  - MASTER_RULES, read before every piece with the area's lore first, and the gate (the rules check before any new piece);
+  - FORM IS LAW and the depth effect, with the craggy floor and the god's eye locked;
+  - scenes make the game's assets, masterpieces lock, and every ground is unique;
+  - study chapters and a report per piece;
+  - one at a time, ten passes;
+  - weather in the world, not on it;
+  - more of the god in every place; sap is dark blood;
+  - insects are allowed;
+  - the forest felt from under it (towering trees, crowns out of frame, no clumps, small trees mostly dead, Diablo II's camera);
+  - test captures with the Ossuarch only;
+  - the art library; tones by size; the Vigil named; the reminder's pause rule.
+- **2026-10-06, the painted standard** (the lake) for everything:
+  - the masterwork rule;
+  - true scale ("everything needs to be large");
+  - every rock, tree and tuft a reusable object;
+  - objects interact with missiles and spells by material;
+  - lands grow from their ecosystems;
+  - study and practise art, and repaint every frame;
+  - balance slightly easier, with difficulties and gear doing the rest.
+- **2026-10-05, Act I first:** finish and polish Act I before anything new. The same day:
+  - never port one to one;
+  - the Seer's Bowl title is the standard ("a slight 3D look is okay if it's done correctly");
+  - the Diablo II lessons (monster design first, friction is the reward, items that matter, readability over realism);
+  - the combat and stash rulings (above);
+  - the design rulings: difficulties darker, no teleport, progression is built, souls not gems, death drop, companions, no tutorials, the lantern bearer;
+  - characters are hand-drawn shape models ("The hand drawn is just way better"; AI 3D rejected), with the browser's sculpted Tithe-Hand as the minimum standard;
+  - the Ossuarch first (a Custodes-like pointed helm, a pale green plume, black iron and bone, numerology);
+  - lore: contradictions are canon, the Tithe has two meanings, and the myths are told as plain stories.
+- **2026-10-04, the lore bible rulings** (above, under Words and lore).
+- **2026-10-01 (Derek): PixelForge is the game's forge.** *Since narrowed:* PixelForge makes the characters (shape sprites); the world is made on the landkit, the 3D road and the land bakes (page 07).
+- **2026-10-01 (Derek): the Hollow Mystic's carve is the reference fit.** *Superseded* by the hand-drawn shape road (2026-10-05).
+- **2026-10-01 (Derek): every hero carries a lantern,** painted as objects. *Superseded* by the lantern bearer (2026-10-05).
+- **2026-10-01 (Derek): the Shrine Keeper's stacks are Omens,** not Sigils.
+- **2026-10-01 (Derek): crows are allowed** on the moor; the no-animals rule does not cover them. *(The old Godot page of 2026-09-30 said the crow props became offerings; this later ruling stands.)*
+- **2026-10-01 (Derek): the wraith test skin is the Hollow Mystic.** *Superseded* by the PixelForge build `mystic_hd`.
+
+- **2026-10-01, the look going forward (Derek, confirmed)** *(superseded 2026-10-06 to 2026-10-08: the painted standard, the baked lands lit through normal maps, the 3D road; the browser is retired)*: Diablo II sprites lit by a real 3D lantern. The game stays 2D pixel sprites made by the Forge (pre-rendered from carved models), standing as upright cards in the real-3D scene of `tests/scene3d` (orthographic 30° camera, real lantern light with stepped falloff, real shadows; normal + depth maps per frame from the Forge make the cards light like bodies). Not full 3D models in-game. The browser build's look and behaviour remain the reference for the port; its lighting is rebuilt on the 3D scene with the browser as the target.
 - **2026-10-01, glows:** glows are fine on magic, lanterns and wisps. The rule is against a Diablo III look with glow on everything; attacks and plain melee stay unlit, the dark stays blue-teal, no red light. (Derek, to the PixelForge session.)
 - **2026-10-01, PixelForge merged:** the asset forge lives at `tools/pixelforge/` in this repo. It replaces Marrowpress for anything that needs side or back views. The wiki is copied into `docs/wiki/`.
 
@@ -117,7 +237,7 @@
 
 - **2026-09-29, the Unfallen:** the Pale Order believes the stars are pieces of the god's bones that have not yet fallen to rest. **Bone Rain** asks them to come down early.
 
-- **2026-09-29, the Pale Order counts:** numerology joins the Order's theme. Numbers outlast names (the Hush unsays names), every bone gets its number in the Great Count, and counts are reduced to roots. Nine is the Mother's root ("nine keeps itself"). A man is two hundred and six bones, and the fewer is the holier. The Last Number closes the Count and lets her rest. The Count rises (implied only). See the Ossuarch page, §3.
+- **2026-09-29, the Pale Order counts:** numerology joins the Order's theme. Numbers outlast names (the Silence unsays names), every bone gets its number in the Great Count, and counts are reduced to roots. Nine is the Mother's root ("nine keeps itself"). A man is two hundred and six bones, and the fewer is the holier. The Last Number closes the Count and lets her rest. The Count rises (implied only). See the Ossuarch page, §3.
 
 - **2026-09-29, the Codex is mostly voices:** the main body of the Codex is in-world writing by many characters (sages, clerics, beggars, pilgrims, penitents, ancient things from before the Last Breath). Each chapter is a collection of works on its subject; found fragments are one part.
 

@@ -160,14 +160,14 @@ pixelforge godot-addon <godot project>                                          
 
 ```
 pixelforge prompt --world object|building|tree|ground|effect|ui|icons|portrait --describe "..." --sref <hero sheet url>   # style-locked world prompts
-pixelforge artlist -o docs/ART_ORDER.md --sref <hero sheet url>                   # the Act I art order with every prompt
+pixelforge artlist -o docs/archive/ART_ORDER.md --sref <hero sheet url>                   # the Act I art order with every prompt
 pixelforge object <sheet.png> <name> -o art/objects --height 1.2 [--views 3] [--top plan.png] [--canopy] [--game-objects objects.json]   # painted sheet -> carved, painted, filmed, pixelated prop; --top carves the footprint and paints the top; --canopy for trees
 ```
 
 **The world is painted, then built: objects are shape files too.** `prompt --world` writes Midjourney prompts with
 one fixed style block (measured from the Hollow Mystic painting) and `--sref` to the hero sheet; an object is then a
 solid `.shapes.json` without bones (`shapes object`, `shapes still --game-objects`), the chest under
-`assets/shapes/objects/` is the example. `docs/ART_ORDER.md` in the game lists Act I's assets in the order to paint
+`assets/shapes/objects/` is the example. `docs/archive/ART_ORDER.md` in the game lists Act I's assets in the order to paint
 them. The kit props and 3D ground (`prop3d`, `tiles3d`, the fetched CC0 kits) are retired: the game does not place them.
 
 **The quality bar: Diablo II Resurrected / Path of Exile, not clip art.** Flat painted stand-ins
@@ -251,7 +251,7 @@ art that reads like hand-made work, and the rig (`pixelforge/shape_rig.py`) play
 (24 clips exported to `assets/animations/joints.json.gz` at 24 fps), so the result is real frames per clip per
 direction with no painting, no Blender and no Mixamo. This is the character road of the Forge from now on; the
 painting road stays for reference and for props. The procedure for a fresh session, with the places of every
-reference, is the game repository's `docs/GUIDE_SESSION.md`; this section is the format reference. The worked
+reference, is the game repository's `tools/pixelforge/docs/GUIDE_SESSION.md`; this section is the format reference. The worked
 example is the necromancer of the reference page (`docs/refs/necromancer_shape_sprite.html` in the game repository):
 its flat file `assets/shapes/necromancer.shapes.json` re-renders the page's PNG with 99.8% of the figure's pixels
 identical, and its solid file `assets/shapes/necromancer_3d.shapes.json` is the page's 3D model (61 shapes) seen

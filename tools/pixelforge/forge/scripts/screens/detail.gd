@@ -1,5 +1,5 @@
 extends "res://scripts/screen.gd"
-## Detail: the bench where the painted detail that rides a part is made (docs/FORGE_FROM_THE_GAME.md 3.1). Pick a
+## Detail: the bench where the painted detail that rides a part is made (tools/pixelforge/docs/FROM_THE_GAME.md 3.1). Pick a
 ## part, see its texture unwrapped at pixel scale on the left of the picture window (u round the part with the front
 ## in the middle, v down it), paint on it with the pencil or a brush in the material's ramp shades (each shade is a
 ## step offset, never a new colour), and watch the turning figure on the right redraw with it. Every stroke writes

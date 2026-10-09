@@ -64,7 +64,7 @@ def add_parser(sub) -> None:
     common(x)
     x = ds.add_parser("measure", help="numbers on imported sets: figure heights, frames a clip, speeds, directions, palette use, outline, shadow")
     x.add_argument("frames", nargs="+", help="frames folders written by `d2 import` (or a folder holding several)")
-    x.add_argument("--md", default=None, help="write the report as Markdown here (docs/track_notes/d2_measure.md in the repository)")
+    x.add_argument("--md", default=None, help="write the report as Markdown here (tools/pixelforge/docs/track_notes/d2_measure.md in the repository)")
     x.add_argument("--write-preset", default=None, metavar="NAME", help="lay the measured figure height, clip frames and fps over this look preset (assets/styles/overrides.json)")
     common(x)
     x = ds.add_parser("export-mod", help="our frames as a Diablo 2 mod: DCC + COF per mode, AnimData.d2, the mod folder, read back whole")

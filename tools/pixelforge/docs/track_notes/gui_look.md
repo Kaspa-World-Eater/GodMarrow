@@ -53,7 +53,7 @@ Keep the look and feel: full screen, integer-scaled pixel rendering, the 1-bit d
 dungeon-synth music and bell/thud sounds, pixel cursor, gamepad and keyboard, transitions. Inside that skin the
 Forge is a straightforward professional tool: Home with the nine things it makes as tiles; each one opens a
 workbench with tabs; every workbench is picker / live preview / knobs / bottom bar (Keep, Reset, Start over,
-Undo); Advanced is a fold, not a mode; text is adult and precise (docs/track_notes/tone.md). A person clicks
+Undo); Advanced is a fold, not a mode; text is adult and precise (tools/pixelforge/docs/track_notes/tone.md). A person clicks
 through it; an AI drives the same functions by CLI and MCP and never needs the window.
 
 ## Correction (2026-10-02): not 1-bit
@@ -132,13 +132,13 @@ in Settings; silent when reduced motion or mute is set.
   the idea was ace." Keep the cards (the Arcana: upright / reversed) as a mechanic and a motif; redo their layout:
   a clean fanned or ruled row in the text box area, large enough to read, one card per selector step, the selected
   card lifts one pixel with the blip, art on the cards drawn through the Forge's icon road in the game's palette.
-  Mock it up first (docs/PLAN.md: mock first).
+  Mock it up first (tools/pixelforge/docs/PLAN.md: mock first).
 
 ## From the mockup round 3 (2026-10-02)
 Transitions are quick: the pixel dissolve is 4 steps each way at 24 fps (about a third of a second in all).
 Selecting plays a quick falling "shrink" blip and the selector flashes white-to-gold for three frames. The Forge's
 music plays in the app from the first interaction (a toggle in the title bar, volume in Settings): the dungeon-synth
-family (docs/track_notes/gui_look.md, music reference), rendered by music.py; the mockup carries a procedural
+family (tools/pixelforge/docs/track_notes/gui_look.md, music reference), rendered by music.py; the mockup carries a procedural
 in-browser stand-in (detuned pads in C# minor over a drone, breathing lowpass, sparse pentatonic bell sparkles
 through a long reverb) that states the intent.
 

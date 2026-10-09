@@ -5,7 +5,7 @@
 
 > "Blood given is not blood taken. My brothers had that right for a thousand years. They only forgot to tell her what it was for."
 
-## 1. The god and the order
+## 1. The god and the processions
 
 - **The god.** He serves **Nol-Shogthuth**, the god's **Flesh**, which keeps growing without a mind.
 
@@ -15,27 +15,27 @@
 
 - Her aspects: the Maiden (a wound that gives; his aspect), the Mother, and the Nurse.
 
-- **The order.** The **penitent brotherhoods**: processions of hooded penitents by day, and crypt rites by night where the saints come down.
+- **The faith.** The **penitent processions**: hooded penitents walking by day, and crypt rites by night where the saints come down.
 
-- The feel is a Holy Week brotherhood blended with Vodou.
+- The feel is a Holy Week procession blended with Vodou.
 
-- The brotherhood is devout and grieving, and the darkness is his own. No real saint, lwa or sacrament appears.
+- The faith is devout and grieving, and the darkness is his own. No real saint, lwa or sacrament appears.
 
 - **Other names for him:** **El Penitente Rojo** (the Red Penitent), **Frè Plè** (Brother Wound), and "the Tall Red Hat" of the nursery rhyme.
 
 ## 2. Where he comes from
 
-- **The town.** **Villa Llaga** is built down both lips of a mile-long wound in the Hide that never closed. Its gutters run red.
+- **The town.** **Villa Llaga** is built down both lips of a wound in the Hide, as long as a morning's walk, that never closed. Its gutters run red.
 
-- **The brotherhood.** The **Brotherhood of the Precious Wound** paid the wound a measured tithe of blood each year. Their belief: *blood given is not blood taken*.
+- **The procession.** Villa Llaga's **procession of the Bleeding Maiden** paid the wound a measured tithe of blood each year. Their belief: *blood given is not blood taken*.
 
-- **The foundling.** He was found in the Maiden's niche and raised as the brotherhood's **sangrador**, the bloodletter who opens the penitents' welts. His rule above all: the one who opens others never opens himself. In twenty years he never gave a drop.
+- **The foundling.** He was found in the Maiden's niche and raised as the procession's **bloodletter**, who opens the penitents' welts. His rule above all: the one who opens others never opens himself. In twenty years he never gave a drop.
 
-- **The year the wound scabbed.** The wound closed under a black crust for a year. On the fast-day of the Fall it split and **hatched**: a year of the brotherhood's blood had grown into the Maiden's children. They ate the town. They passed him by, because he smelled of their mother.
+- **The year the wound scabbed.** The wound closed under a black crust for a year. On the fast-day of the Fall it split and **hatched**: a year of the procession's blood had grown into the Maiden's children. They ate the town. They passed him by, because he smelled of their mother.
 
-- **What he saw.** The brood dragged the dead penitents' robes over themselves and tried to walk in procession, going nowhere. He understood: the Maiden is a mother with no head. Blood given without a word is given to no one.
+- **What he saw.** The children dragged the dead penitents' robes over themselves and tried to walk in procession, going nowhere. He understood: the Maiden is a mother with no head. Blood given without a word is given to no one.
 
-- **The drawing on the scab.** He drew her door in his own blood and called her down into himself. She took his blood, his hands and his voice, and left him his mind. The brood pressed into one sewn giant that carries her fallen image on its back: the first **Flesh Golem**. He leads the procession now. When his brood runs thin, he scourges himself, and small hooded things crawl out of the welts.
+- **The drawing on the scab.** He drew her door in his own blood and called her down into himself. She took his blood, his hands and his voice, and left him his mind. The children pressed into one sewn giant that carries her fallen image on its back: the first **Flesh Golem**. He leads the procession now. When his procession runs thin, he scourges himself, and small hooded things crawl out of the welts.
 
 ## 3. How he plays
 
@@ -63,17 +63,17 @@ Cut: Blessed Growth, Procession, Vestments, Last Rites, Wayside Shrine, Confrate
 
 **The Red Nave: the blood of the Hemomancer.** Cards over the heart; roads along the arteries and veins, in pairs, to the head, the wrists and the feet. Notables: the Red Tithe, Open Veins, the Wrist Offered, the Fork of the River and others.
 
-## 6. The order's enemies
+## 6. The processions' enemies
 
-- **The Pale Order** (the Ossuarch's order): the oldest feud, over who owns the dead (the meat or the frame).
+- **The Pale Order** (the Ossuarch's order): the oldest feud, over who owns the dead (the flesh or the frame).
 
-- **The Hollow Mystic's lodges:** they keep souls; the brotherhood kept its dead in its own wall. Each calls the other's dead stolen.
+- **The Hollow Mystic's lodges:** they keep souls; the procession kept its dead in its own wall. Each calls the other's dead stolen.
 
 - **The Shrine Keepers:** they try to close open wounds in the Hide. Villa Llaga's wound is one.
 
 - **The Silence's few:** it unmakes flesh and leaves the Mother nothing to take back.
 
-- **The fattening houses:** they feed the Maiden captives' blood. They and the other brotherhoods disown him, for he told the Mother what to make.
+- **The chapters that keep captives:** they feed the Maiden captives' blood. They and the other processions disown him, for he told the Mother what to make.
 
 ## 7. Look
 
@@ -93,6 +93,6 @@ Cut: Blessed Growth, Procession, Vestments, Last Rites, Wayside Shrine, Confrate
 
 ## 8. Open
 
-- **The Wet Nurse** (his Herald) offers to take the scourge. Is that a real choice?
+- **The Flesh herald** (its name is open) offers to take the scourge. Is that a real choice?
 
 - **Does the flesh want a head?** An Act V ending where it grows one, with him as its thought.

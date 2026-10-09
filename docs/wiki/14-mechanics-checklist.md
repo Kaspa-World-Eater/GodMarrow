@@ -74,7 +74,7 @@ These are law. Every system below must respect them. Where the code still breaks
 
 - **The class name shows "The Monk".** `zz_mech_balance.js` sets `CLASS_NAME.monk = 'The Monk'` after `e_ui.js` set "The Empty Hand", so the character page and the pause menu say "The Monk". Use **The Empty Hand**. `zz_mech_balance.js` `e_ui.js` **[Act I]**
 
-- **Shrine Keeper tab names:** at run time they are Miasma · **Trap** · **Sigil** (`zz_mech_balance.js`), while the wiki says Distortion · Death and the HUD says Omens. Skill text says "Sigil" and the HUD says "OMENS". Pick one word (the wiki's backlog prefers Omen). Bird-named skills (Crow's Heel, Raven Flurry, "a raven moving between carcasses") break the no-animals rule. `zz_mech_balance.js` `m_mias.js` **[Act I]**
+- **Shrine Keeper tab names:** at run time they are Miasma · **Trap** · **Sigil** (`zz_mech_balance.js`), while the wiki says Distortion · Death and the HUD says Omens. Skill text says "Sigil" and the HUD says "OMENS". Pick one word (the wiki's backlog prefers Omen). The bird-named skills are renamed in the game (Hanged Man's Heel, Black-Rag Flurry), but its text still has "a raven moving between carcasses" and the perk Murder of Crows, which break the no-animals rule. `zz_mech_balance.js` `m_mias.js` **[Act I]**
 
 - **Stale text:** the Reading's god faces still say "+1 to Iron / Anima / Logos skills" (the Mystic's trees are Mirror · Soul · Thread). Tooltips still say "Weight" for the Empty Hand, which has no Weight since v0.54. `qa_fate22.js` `zw_monk.js` **[Act I]**
 
@@ -238,7 +238,7 @@ These are law. Every system below must respect them. Where the code still breaks
 
 - **Marks on the player (Act V natives):** bleed (dps × 3 s), daze 1.4 s, corrosion 4 s (physical hurts more), void-cut (the top 4% of life, up to 25%, hollowed for 4 s), hush (Essence drained near Silence-Keepers), bile and acid pools. `zz_act5.js` **[later]**
 
-- **Fetish-priest venom** (Act III): a landed blow poisons for 3 s. **Leech larvae** spill out of Brood-Swollen Husks. `zz_act3.js` **[later]**
+- **Fetish-priest venom** (Act III): a landed blow poisons for 3 s. **Clot-Spawn** spill out of Brood-Swollen Husks. `zz_act3.js` **[later]**
 
 - **Stagger on monsters** (section 6), **ossify** (30% slower, +20% damage taken, 8 s), **crush** (+25% taken, 5 s), **grave root** (1 s root). `zc_combat22.js` `c_game.js` **[Act I]**
 
@@ -264,7 +264,7 @@ These are law. Every system below must respect them. Where the code still breaks
 
 - **Light radius:** `heroLightR` = 7 yd outdoors + 1.5 at night, 7.5 underground; ×0.45 near a Silent One (they swallow light). Lantern perk Bright (`lrad`) widens it (`__lampK` = 1.5 + lrad/100 × 0.5). `zd_world22.js` `zz_zw_lantern63.js` **[Act I]**
 
-- **Light is gameplay:** creatures are seen by light (visibility = clamp(light × 1.2 + 0.05, 0.16, 1); emissive Pyre-Saints and hurt creatures always show). Gasps recoil from light and take ×1.5 lit. Moth-Saints are drawn to light. Silent Ones darken everything within 5 yd. `lightLevel()` sums ambient, the hero's lamp (blocked by walls), world lanterns (9 yd), props, fires and altars. `zd_world22.js` `zc_combat22.js` **[Act I]**
+- **Light is gameplay:** creatures are seen by light (visibility = clamp(light × 1.2 + 0.05, 0.16, 1); emissive Pyre-Saints and hurt creatures always show). Gasps recoil from light and take ×1.5 lit. Wick-Saints are drawn to light. Silent Ones darken everything within 5 yd. `lightLevel()` sums ambient, the hero's lamp (blocked by walls), world lanterns (9 yd), props, fires and altars. `zd_world22.js` `zc_combat22.js` **[Act I]**
 
 - **Occlusion (v84):** walls, cliffs and palisades (whole tiles), tree trunks, rocks and pillars (round bases), statues, gibbets, tents and shrines throw shadows away from the lantern; inside them the dark stays. The four nearest world flames (one in lighter mode) are occluded the same way. `zz_zx_dark64.js` **[Act I]**
 
@@ -536,7 +536,7 @@ The shared rules for all five orders are in section 9 (trees and points). The co
 
 - **`bwave` Tide of the Maiden** (row 4, level 18, cast; cost Vitae 33.6→48.7 (L10) + life share (see Vitae); needs Burst Vessel): A wave of blood rolls out from you, sweeping enemies back before it and leaving them bleeding. It grows taller for every bleeding enemy it swallows. Numbers: L1: 18 damage · 2.6 yd wide · sweeps enemies back / L10: 67 damage · 3.9 yd wide · sweeps enemies back / L20: 122 damage · 3.9 yd wide · sweeps enemies back. Perks (at skill level): L5 Riptide: The wave is half again as wide. L10 +55 Essence Drown: What the wave carries is stunned when it lets go. Synergies (per hard point): Sin Purge +4%, Burst Vessel +3%. `o_skills14.js` `zz_hero_hemomancer.js` `p_ui14.js` **[later]**
 
-- **`spool` The Leeches** (row 4, level 18, passive; cost none; needs Grasping Veins): Fat leeches live in your sleeves. Whenever you wound an enemy one may drop out and crawl to the wound, latch on and drink its fill, then crawl back up your arm and feed you what it drank as life and Vitae. Levels: more leeches out at once, more drink, faster crawling. Numbers: L1: 33% per wound (half per bleed tick) · up to 2 out at once · drink 4/s, crawl home full at 12 · 4.7 yd/s · life 12 · you get 80% as life and 40% as Vitae / L10: 46% per wound (half per bleed tick) · up to 3 out at once · drink 22/s, crawl home full at 79 · 5.8 yd/s · life 23 · you get 80% as life and 40% as Vitae / L20: 61% per wound (half per bleed tick) · up to 5 out at once · drink 39/s, crawl home full at 166 · 7.0 yd/s · life 35 · you get 80% as life and 40% as Vitae. Perks (at skill level): L5 Fat Leeches: Leeches drink half again as fast. L10 +55 Vitality Leech Mother: Two more leeches out at once. Synergies (per hard point): Covenant of Blood +3%, Hemorrhage +2.5%. `zy_flesh.js` `h_blood.js` `zz_hero_hemomancer.js` **[later]**
+- **`spool` The Suckling Clots** (row 4, level 18, passive; cost none; needs Grasping Veins): Fat leeches live in your sleeves. Whenever you wound an enemy one may drop out and crawl to the wound, latch on and drink its fill, then crawl back up your arm and feed you what it drank as life and Vitae. Levels: more leeches out at once, more drink, faster crawling. Numbers: L1: 33% per wound (half per bleed tick) · up to 2 out at once · drink 4/s, crawl home full at 12 · 4.7 yd/s · life 12 · you get 80% as life and 40% as Vitae / L10: 46% per wound (half per bleed tick) · up to 3 out at once · drink 22/s, crawl home full at 79 · 5.8 yd/s · life 23 · you get 80% as life and 40% as Vitae / L20: 61% per wound (half per bleed tick) · up to 5 out at once · drink 39/s, crawl home full at 166 · 7.0 yd/s · life 35 · you get 80% as life and 40% as Vitae. Perks (at skill level): L5 Fat Leeches: Leeches drink half again as fast. L10 +55 Vitality Leech Mother: Two more leeches out at once. Synergies (per hard point): Covenant of Blood +3%, Hemorrhage +2.5%. `zy_flesh.js` `h_blood.js` `zz_hero_hemomancer.js` **[later]**
 
 - **`pact` Covenant of Blood** (row 5, level 24, cast; cost 12% of current life; needs Red Fervour): Open your veins for your children: lose 12% of your current life, and every minion is mended 40% and strikes 30% harder for 8 s. Numbers: L1: Costs 12% of your life · minions mend 40%, +30% damage for 8 s / L10: Costs 12% of your life · minions mend 40%, +30% damage for 12 s / L20: Costs 12% of your life · minions mend 40%, +30% damage for 12 s. Perks (at skill level): L5 Binding Oath: The pact lasts 4 s longer. L10 +55 Vitality Shared Veins: While the pact lasts, a fifth of the damage you take is spread among your minions. `zz_hero_hemomancer.js` `o_skills14.js` `p_ui14.js` **[later]**
 
@@ -628,23 +628,23 @@ The shared rules for all five orders are in section 9 (trees and points). The co
 
 #### Sigil tree (tab 2)
 
-- **`rarc` Rending Arc** (row 1, level 1, cast; cost poise 5): A wide, sweeping claw cut in a half-circle before you, tearing everything in reach. Each enemy caught beyond the first adds 10% to the blow. Catching three or more gives a Sigil. Numbers: L1: 7 to each in a half-circle · +10% per extra enemy / L10: 11 to each in a half-circle · +10% per extra enemy / L20: 14 to each in a half-circle · +10% per extra enemy. Perks (at skill level): L5 Crossing Arcs: A second arc tears back across the first. L10 +50 Constitution Wide Sweep: The arc reaches 0.6 yd farther. Synergies (per hard point): Grave Strike +3%, Raven Flurry +2.5%. `m_mias.js` `o_skills14.js` `c_game.js` **[Act I]**
+- **`rarc` Rending Arc** (row 1, level 1, cast; cost poise 5): A wide, sweeping claw cut in a half-circle before you, tearing everything in reach. Each enemy caught beyond the first adds 10% to the blow. Catching three or more gives a Sigil. Numbers: L1: 7 to each in a half-circle · +10% per extra enemy / L10: 11 to each in a half-circle · +10% per extra enemy / L20: 14 to each in a half-circle · +10% per extra enemy. Perks (at skill level): L5 Crossing Arcs: A second arc tears back across the first. L10 +50 Constitution Wide Sweep: The arc reaches 0.6 yd farther. Synergies (per hard point): Grave Strike +3%, Black-Rag Flurry +2.5%. `m_mias.js` `o_skills14.js` `c_game.js` **[Act I]**
 
 - **`gstrike` Grave Strike** (row 1, level 1, cast; cost poise 6): A heavy claw blow that marks you with a Sigil of death. Sigils circle you as pale skulls: each one makes you strike harder and faster. They stack up to three and fade after a while. Finishers (Reap, Execute) spend them. Numbers: L1: 10 damage · +1 Omen · each Omen +6% damage, +5% speed / L10: 15 damage · +1 Omen · each Omen +6% damage, +5% speed / L20: 20 damage · +1 Omen · each Omen +6% damage, +5% speed. Perks (at skill level): L5 Soul Rend: Strikes mend 2% of your life for each Sigil you hold. L10 +50 Constitution Grave Combo: Every third Grave Strike hits twice. Synergies (per hard point): Rending Arc +3%, Execute +2.5%. `m_mias.js` `o_skills14.js` `c_game.js` **[Act I]**
 
 - **`thrust` Impaling Thrust** (row 1, level 1, cast; cost poise 6): Drive both claws forward in a straight, piercing thrust that runs through every enemy in a 3 yd line. Gives a Sigil if it pierces anything. Numbers: L1: 9 to each in a 3 yd line / L10: 13 to each in a 4 yd line / L20: 18 to each in a 4 yd line. Perks (at skill level): L5 Long Reach: The thrust reaches a yard farther. L10 +50 Constitution Pinned: The first enemy it runs through is pinned in place for a second. Synergies (per hard point): Death's Step +3%, Grave Strike +2.5%. `m_mias.js` `zz_hero_miasmancer.js` `o_skills14.js` **[Act I]**
 
-- **`talon` Crow's Heel** (row 2, level 6, cast; cost poise 7; needs Rending Arc): A spinning flurry of three kicks into the enemy nearest the cursor, the last one throwing it back. Gives a Sigil. Numbers: L1: 3 kicks · 4 each · +1 Omen / L10: 4 kicks · 6 each · +1 Omen / L20: 4 kicks · 9 each · +1 Omen. Perks (at skill level): L5 Fourth Kick: One more kick. L10 +50 Constitution Crushing Heel: The last kick stuns for a second. Synergies (per hard point): Rending Arc +3%, Death's Step +2.5%. `m_mias.js` `o_skills14.js` `n_mias_ui.js` **[Act I]**
+- **`talon` Hanged Man's Heel** (row 2, level 6, cast; cost poise 7; needs Rending Arc): A spinning flurry of three kicks into the enemy nearest the cursor, the last one throwing it back. Gives a Sigil. Numbers: L1: 3 kicks · 4 each · +1 Omen / L10: 4 kicks · 6 each · +1 Omen / L20: 4 kicks · 9 each · +1 Omen. Perks (at skill level): L5 Fourth Kick: One more kick. L10 +50 Constitution Crushing Heel: The last kick stuns for a second. Synergies (per hard point): Rending Arc +3%, Death's Step +2.5%. `m_mias.js` `o_skills14.js` `n_mias_ui.js` **[Act I]**
 
 - **`dstep` Death's Step** (row 2, level 6, cast; cost poise 10; needs Impaling Thrust): Rush to the cursor through your enemies, cutting each one you pass. Gives a Sigil if you cut anything. Numbers: L1: 7 to each · 5 yd / L10: 10 to each · 8 yd / L20: 13 to each · 8 yd. Perks (at skill level): L5 Long Stride: You rush up to 8 yd. L10 +50 Constitution Sigil Trail: An Sigil for every enemy you cut. Synergies (per hard point): Impaling Thrust +4%. `m_mias.js` `o_skills14.js` `n_mias_ui.js` **[Act I]**
 
-- **`reap` Reap** (row 3, level 12, cast; cost poise 8; needs Crow's Heel): Finisher: a sweeping claw cut all around you that spends every Sigil. Each Sigil widens it and adds damage; with three it throws enemies back. Numbers: L1: 9 · +70% and +0.3 yd per Omen / L10: 13 · +70% and +0.3 yd per Omen / L20: 17 · +70% and +0.3 yd per Omen. Perks (at skill level): L5 Wide Harvest: Reap reaches 30% farther. L8 Mourning Knell: Kills made by a finisher ring a funeral knell: enemies around you flee in terror for 2 s. L12 Harvest Feast: Mend 3% of your life for each Sigil spent. L16 +50 Essence Dread: Terrified enemies take 20% more damage. Synergies (per hard point): Execute +3%, Grave Strike +2.5%. `m_mias.js` `o_skills14.js` `n_mias_ui.js` **[Act I]**
+- **`reap` Reap** (row 3, level 12, cast; cost poise 8; needs Hanged Man's Heel): Finisher: a sweeping claw cut all around you that spends every Sigil. Each Sigil widens it and adds damage; with three it throws enemies back. Numbers: L1: 9 · +70% and +0.3 yd per Omen / L10: 13 · +70% and +0.3 yd per Omen / L20: 17 · +70% and +0.3 yd per Omen. Perks (at skill level): L5 Wide Harvest: Reap reaches 30% farther. L8 Mourning Knell: Kills made by a finisher ring a funeral knell: enemies around you flee in terror for 2 s. L12 Harvest Feast: Mend 3% of your life for each Sigil spent. L16 +50 Essence Dread: Terrified enemies take 20% more damage. Synergies (per hard point): Execute +3%, Grave Strike +2.5%. `m_mias.js` `o_skills14.js` `n_mias_ui.js` **[Act I]**
 
-- **`flurry` Raven Flurry** (row 3, level 12, cast; cost poise 7; needs Grave Strike): Hold: a fast chain of claw strikes at the enemy nearest the cursor. Each strike leaps to another enemy within reach if there is one, like a raven moving between carcasses. Every fourth strike gives a Sigil. Numbers: L1: 4 strikes · 4 each · hops between enemies in reach / L10: 6 strikes · 6 each · hops between enemies in reach / L20: 6 strikes · 8 each · hops between enemies in reach. Perks (at skill level): L5 Murder of Crows: Two more strikes in each chain. L10 +55 Constitution Carrion Sigil: Every third strike gives a Sigil instead. Synergies (per hard point): Rending Arc +3%, Crow's Heel +3%. `m_mias.js` `zw_monk_ui.js` `o_skills14.js` **[Act I]**
+- **`flurry` Black-Rag Flurry** (row 3, level 12, cast; cost poise 7; needs Grave Strike): Hold: a fast chain of claw strikes at the enemy nearest the cursor. Each strike leaps to another enemy within reach if there is one, like a raven moving between carcasses. Every fourth strike gives a Sigil. Numbers: L1: 4 strikes · 4 each · hops between enemies in reach / L10: 6 strikes · 6 each · hops between enemies in reach / L20: 6 strikes · 8 each · hops between enemies in reach. Perks (at skill level): L5 Murder of Crows: Two more strikes in each chain. L10 +55 Constitution Carrion Sigil: Every third strike gives a Sigil instead. Synergies (per hard point): Rending Arc +3%, Hanged Man's Heel +3%. `m_mias.js` `zw_monk_ui.js` `o_skills14.js` **[Act I]**
 
 - **`dhead` Death's Head** (row 3, level 12, passive; cost none; needs Death's Step): You find the seam under the skin, where a stroke goes through to the marrow. Now and then your blows and strikes land as clean, killing cuts. Numbers: L1: 5% critical chance / L10: 18% critical chance / L20: 33% critical chance. Perks (at skill level): L5 Deathblow: Critical hits strike for triple instead. L10 +55 Constitution Death Sign: Critical hits give a Sigil. `m_mias.js` `n_mias_ui.js` **[Act I]**
 
-- **`execute` Execute** (row 4, level 18, cast; cost poise 8; needs Raven Flurry): Finisher: strike the enemy nearest the cursor, spending every Sigil. Below 10% life (+8% per Sigil) it dies outright; bosses take triple damage instead. Numbers: L1: 12 · +90% per Omen · kills below 10% +8% per Omen / L10: 16 · +90% per Omen · kills below 10% +8% per Omen / L20: 21 · +90% per Omen · kills below 10% +8% per Omen. Perks (at skill level): L5 Clean Kill: Execute costs no stamina. L10 +60 Constitution Headsman: It kills outright below 15% life (+8% per Sigil). Synergies (per hard point): Reap +3%, Grave Strike +2.5%. `m_mias.js` `o_skills14.js` `n_mias_ui.js` **[later]**
+- **`execute` Execute** (row 4, level 18, cast; cost poise 8; needs Black-Rag Flurry): Finisher: strike the enemy nearest the cursor, spending every Sigil. Below 10% life (+8% per Sigil) it dies outright; bosses take triple damage instead. Numbers: L1: 12 · +90% per Omen · kills below 10% +8% per Omen / L10: 16 · +90% per Omen · kills below 10% +8% per Omen / L20: 21 · +90% per Omen · kills below 10% +8% per Omen. Perks (at skill level): L5 Clean Kill: Execute costs no stamina. L10 +60 Constitution Headsman: It kills outright below 15% life (+8% per Sigil). Synergies (per hard point): Reap +3%, Grave Strike +2.5%. `m_mias.js` `o_skills14.js` `n_mias_ui.js` **[later]**
 
 - **`deathm` Sigil Mastery** (row 6, level 30, passive; cost none): Death sits closer to your hands. Every claw stroke and every strike falls heavier than the last. Numbers: L1: +6% melee · 3 Omens · claws: +25% strikes, +15% speed / L10: +60% melee · 3 Omens · claws: +25% strikes, +15% speed / L20: +120% melee · 3 Omens · claws: +25% strikes, +15% speed. Perks (at skill level): L5 Swift Death: You strike 10% faster. L8 Last Breath: Once a minute, a killing blow leaves you at 1 life instead, unseen and untouchable for 2 s. L12 Second Wind: Last Breath also mends 30% of your life. L16 +65 Constitution Fourth Sigil: You can hold a fourth Sigil. `m_mias.js` `n_mias_ui.js` **[later]**
 
@@ -837,7 +837,7 @@ Bone throwing is removed. `q_fate.js` `qa_fate22.js` `zz_fate_tune.js` `zz_art_r
 
 - **Bases** (`BASES`), each with slot, grid size, damage or armour range, item level and optional order lock:
 
-- Weapons: Bone Wand 2–5 (a ranged bolt, 6.5 yd), Ritual Knife 3–7 (L3), Grave Staff 5–10 (L6); Vharn Claws 3–6 and Raven Talons 6–11 (L6; Shrine Keeper only); Fist Wraps 3–6, Sutra-Bound Wraps 6–11 (L8), Gravedigger's Spade 5–11 (L4) and Ringed Staff 6–12 (L6) (the Empty Hand only).
+- Weapons: Bone Wand 2–5 (a ranged bolt, 6.5 yd), Ritual Knife 3–7 (L3), Grave Staff 5–10 (L6); Vharn Claws 3–6 and Grave-Hooks 6–11 (L6; Shrine Keeper only); Fist Wraps 3–6, Sutra-Bound Wraps 6–11 (L8), Gravedigger's Spade 5–11 (L4) and Ringed Staff 6–12 (L6) (the Empty Hand only).
 
 - Off-hand: Skull Relic (armour 2–5).
 
@@ -891,7 +891,7 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **Ranks:** champion ×2.5 life, ×1.4 damage, ×3 XP, ×1.1 speed. Unique ×4 life, ×1.7 damage, ×5 XP, a generated name (for example "Grimmaw the Hungry"), with minions (×1.3 life). One or two modifiers: Extra Fast (×1.4 speed), Extra Strong (×1.5 damage), Stone Skin (+80 armour). Per pack: unique 4% and champion 6% at mlvl ≤3, else 8% and 12%. `c_game.js` `b_core.js` **[Act I]**
 
-- **The hour changes creatures outdoors** (a day is 600 s: day 55%, dusk 11%, night 24%, dawn 10%). Dusk ×1.12 speed for everything, night ×1.05, dawn ×0.95; per-kind damage multipliers by hour (listed per creature). Gasps, Mire Gasps and Moth-Saints only walk in their hours and lie hidden otherwise. `zv_time24.js` `zd_world22.js` **[Act I]**
+- **The hour changes creatures outdoors** (a day is 600 s: day 55%, dusk 11%, night 24%, dawn 10%). Dusk ×1.12 speed for everything, night ×1.05, dawn ×0.95; per-kind damage multipliers by hour (listed per creature). Gasps, Mire Gasps and Wick-Saints only walk in their hours and lie hidden otherwise. `zv_time24.js` `zd_world22.js` **[Act I]**
 
 ### 15.2 Behaviour layers (all creatures)
 
@@ -933,15 +933,15 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **Bellwether** (`bell`): a hulk with its head sealed in a bell. At 2.8–9 yd with a clear line it tolls twice (0.9 s) then charges at 8.5 yd/s: ×1.6 damage, empties your poise and throws you; a wall stops it dead, dazed 2.2 s. Armour 20. Tell: two tolls. Counter: stand before a wall, sidestep. base hp 70, dmg 9–15, speed 1.3 yd/s, xp 45, armour 20, AI `charger`, wind-up 0.7 s, poise ×1.1. Hours: dusk ×1.45, dawn ×1.45. Zones: moor, fen, drowned_village, sunken_bog, well_shaft, broken_bridge, a4_bellhollow, root_deep. `zc_combat22.js` **[Act I]**
 
-- **Vein-Worm** (`worm`): a severed artery. Burrows (untargetable, no damage) under soft ground, bursts up under you after 0.75 s (×1.4 in 0.95 yd), lashes, and dives again after 2.8 s. Cannot dig through stone: on roads and flagstones it circles at 3 yd. Tell: soil ripples (no surfacing marker since v0.55). Counter: stand on stone or roads. base hp 22, dmg 4–8, speed 3 yd/s, xp 18, AI `burrow`, wind-up 0.35 s, poise ×0.5. Hours: night ×1.25. Zones: moor, barrow, sighing_ridge, ash_shore, burnt_heath, fern_gully, pilgrim_road, wolf_den_chapel, smugglers_hold, fallen_watchtower, hollow_wood. `zc_combat22.js` **[Act I]**
+- **Vein-Borer** (`worm`): a severed artery. Burrows (untargetable, no damage) under soft ground, bursts up under you after 0.75 s (×1.4 in 0.95 yd), lashes, and dives again after 2.8 s. Cannot dig through stone: on roads and flagstones it circles at 3 yd. Tell: soil ripples (no surfacing marker since v0.55). Counter: stand on stone or roads. base hp 22, dmg 4–8, speed 3 yd/s, xp 18, AI `burrow`, wind-up 0.35 s, poise ×0.5. Hours: night ×1.25. Zones: moor, barrow, sighing_ridge, ash_shore, burnt_heath, fern_gully, pilgrim_road, wolf_den_chapel, smugglers_hold, fallen_watchtower, hollow_wood. `zc_combat22.js` **[Act I]**
 
-- **Moth-Saint** (`moth`): a porcelain face on a moth's body. Hovers in a 4.2 yd circle out of reach (takes 35% high up), drawn to light, folds its wings (0.45 s) and swoops through you in an arc (takes 130% low). Walks only at dusk and night. Tell: wings fold back. Counter: strike during the swoop. base hp 14, dmg 4–7, speed 2.6 yd/s, xp 17, AI `flyer`, wind-up 0.45 s, poise ×0.3. Hours: walks only dusk/night, dusk ×1.5, night ×1.2. Zones: moor, fen, barrow, sighing_ridge, ash_shore, burnt_heath, fern_gully, drowned_village, sunken_bog, wolf_den_chapel, smugglers_hold, bogwitch_shack … `zc_combat22.js` **[Act I]**
+- **Wick-Saint** (`moth`): a porcelain face on a moth's body. Hovers in a 4.2 yd circle out of reach (takes 35% high up), drawn to light, folds its wings (0.45 s) and swoops through you in an arc (takes 130% low). Walks only at dusk and night. Tell: wings fold back. Counter: strike during the swoop. base hp 14, dmg 4–7, speed 2.6 yd/s, xp 17, AI `flyer`, wind-up 0.45 s, poise ×0.3. Hours: walks only dusk/night, dusk ×1.5, night ×1.2. Zones: moor, fen, barrow, sighing_ridge, ash_shore, burnt_heath, fern_gully, drowned_village, sunken_bog, wolf_den_chapel, smugglers_hold, bogwitch_shack … `zc_combat22.js` **[Act I]**
 
 - **The Carrion Warden** (`boss`): Act I zone boss of the Hollow Crypt (quest a1_warden). Boss chassis: slam (0.9 s wind, 2.1 yd, ×1.3 magic) and charge (0.7 s wind, 10 yd/s); at half life calls 4 dead (Warden and Husk) and speeds up ×1.25. base hp 300, dmg 14–22, speed 2.1 yd/s, xp 900, AI `boss`. Zones: crypt. `d_play.js` **[Act I]**
 
 - **Drowned Husk** (`drowned`): fen Husk (same surge AI), tougher. base hp 26, dmg 4–8, speed 1.7 yd/s, xp 16, AI `husk`, wind-up 0.55 s, poise ×0.5. Hours: night ×1.3, dusk ×1.3. Zones: fen, drowned_village, sunken_bog, well_shaft, bogwitch_shack, a3_flats. `c_game.js` **[Act I]**
 
-- **Mire Vein-Worm** (`leech`): fen burrower (same AI). base hp 24, dmg 4–8, speed 3.2 yd/s, xp 18, AI `burrow`, wind-up 0.35 s, poise ×0.5. Hours: night ×1.25, dusk ×1.2. Zones: fen, drowned_village, sunken_bog, well_shaft, a3_delta, a3_sumps. `c_game.js` **[Act I]**
+- **Mire Vein-Borer** (`leech`): fen burrower (same AI). base hp 24, dmg 4–8, speed 3.2 yd/s, xp 18, AI `burrow`, wind-up 0.35 s, poise ×0.5. Hours: night ×1.25, dusk ×1.2. Zones: fen, drowned_village, sunken_bog, well_shaft, a3_delta, a3_sumps. `c_game.js` **[Act I]**
 
 - **Mire Gasp** (`bogwitch`): fen Gasp (ghost AI; walks dusk to dawn). base hp 20, dmg 6–10, speed 1.5 yd/s, xp 22, AI `ghost`, wind-up 0.8 s, poise ×0.3. Hours: walks only dusk/night/dawn, night ×1.3, dusk ×1.4. Zones: fen, cata1, cata2, drowned_village, sunken_bog, a3_amber. `c_game.js` **[Act I]**
 
@@ -953,9 +953,9 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **Kneeler** (`kneeler`): a pilgrim still on its knees, on kneeling-boards, a candle on its skull. Husk AI but slow (1.05 yd/s), long wind-up (0.75 s) and recovery (1.2 s), high poise (1.0). Tell: rears back, scourge up behind the flame. Counter: hit it while it rears, or step past. base hp 30, dmg 5–10, speed 1.05 yd/s, xp 19, AI `husk`, wind-up 0.75 s, poise ×1. Zones: moor, crypt, sighing_ridge, ash_shore, fallen_monastery, plague_hospice. `zz_mon_kneeler.js` **[Act I]**
 
-- **Moth-Saint of the Canopy** (`moth_saint`): taller Moth-Saint that dives out of the canopy (flyer). base hp 20, dmg 5–9, speed 2.8 yd/s, xp 28, AI `flyer`, wind-up 0.5 s, poise ×0.35. Zones: moor, fen, barrow, burnt_heath, fern_gully, pilgrim_road, drowned_village, wolf_den_chapel, well_shaft, smugglers_hold, tree_hollow, fallen_watchtower … `zz_monsters_new.js` **[Act I]**
+- **Wick-Saint of the Canopy** (`moth_saint`): taller Wick-Saint that dives out of the canopy (flyer). base hp 20, dmg 5–9, speed 2.8 yd/s, xp 28, AI `flyer`, wind-up 0.5 s, poise ×0.35. Zones: moor, fen, barrow, burnt_heath, fern_gully, pilgrim_road, drowned_village, wolf_den_chapel, well_shaft, smugglers_hold, tree_hollow, fallen_watchtower … `zz_monsters_new.js` **[Act I]**
 
-- **Elder Vein-Worm** (`veinworm_elder`): larger burrower that surfaces deeper. base hp 44, dmg 7–12, speed 3.2 yd/s, xp 60, AI `burrow`, wind-up 0.4 s, poise ×0.7. Zones: moor, root_deep. `zz_monsters_new.js` **[Act I]**
+- **Elder Vein-Borer** (`veinworm_elder`): larger burrower that surfaces deeper. base hp 44, dmg 7–12, speed 3.2 yd/s, xp 60, AI `burrow`, wind-up 0.4 s, poise ×0.7. Zones: moor, root_deep. `zz_monsters_new.js` **[Act I]**
 
 - **Stalker Crone** (`stalker_crone`): stalker AI: skulks in your rear cone and springs in a straight dash for a heavy strike when your front turns away; seen, she circles wide. base hp 22, dmg 6–10, speed 2.6 yd/s, xp 34, AI `stalker`, wind-up 0.3 s, poise ×0.45. Zones: barrow, fern_gully, pilgrim_road, wolf_den_chapel, smugglers_hold. `zz_monsters_new.js` **[Act I]**
 
@@ -971,11 +971,11 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **The Marrow Pontiff** (`hbone`): Herald of Bone (altar speaker Old Upright): walls you in with a ring of 7 bone walls (5 s) every 7 s; at half life calls 3 Wardens once; shield AI; enrages ×1.3 below half. base hp 260, dmg 12–20, speed 1.7 yd/s, xp 700, armour 40, AI `herald`, wind-up 0.7 s, poise ×1.2. `zd_world22.js` **[Act I]**
 
-- **The Wet Nurse** (`hflesh`): Herald of Flesh (the Red Mother): births 2 Husks every 6 s (max 6), spews a 5-orb bile fan at 2–6 yd every 3.5 s. base hp 320, dmg 10–17, speed 1.1 yd/s, xp 700, AI `herald`, wind-up 0.8 s, poise ×1.4. `zd_world22.js` **[Act I]**
+- **The Flesh herald** (its name is open; `hflesh`): Herald of Flesh (the Red Mother): births 2 Husks every 6 s (max 6), spews a 5-orb bile fan at 2–6 yd every 3.5 s. base hp 320, dmg 10–17, speed 1.1 yd/s, xp 700, AI `herald`, wind-up 0.8 s, poise ×1.4. `zd_world22.js` **[Act I]**
 
 - **The Long Exhale** (`hbreath`): Herald of Breath (the Last Breath): drifts like a Gasp; every 5 s within 6 yd breathes you away (with damage) or pulls you in. base hp 200, dmg 12–19, speed 1.9 yd/s, xp 700, AI `herald`, wind-up 0.8 s, poise ×0.8. `zd_world22.js` **[Act I]**
 
-- **A Silent One** (`hhollow`): Herald of the Silence (the Hush): no light near it; steps out of the dark behind you every 4.5 s. base hp 230, dmg 14–22, speed 2.3 yd/s, xp 700, AI `herald`, wind-up 0.5 s, poise ×0.9. `zd_world22.js` **[Act I]**
+- **A Silent One** (`hhollow`): Herald of the Silence: no light near it; steps out of the dark behind you every 4.5 s. base hp 230, dmg 14–22, speed 2.3 yd/s, xp 700, AI `herald`, wind-up 0.5 s, poise ×0.9. `zd_world22.js` **[Act I]**
 
 ### 15.5 Acts II–V bestiary
 
@@ -989,11 +989,11 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **Chalk Wraith** (`chalk_wraith`): ghost AI; rides the chalk storm (+45% speed, nearly unseen). base hp 26, dmg 7–12, speed 1.6 yd/s, xp 32, AI `ghost`, wind-up 0.85 s, poise ×0.3. Zones: a2_avenue, a2_chapter, a2_stormflat, a2_tomb, a2_banners, a2_oasis, a2_marrow. `zz_act2.js` **[later]**
 
-- **Grit-Moth** (`dune_kite`): kiter AI. base hp 20, dmg 5–9, speed 2 yd/s, xp 26, AI `kiter`, wind-up 0.6 s, poise ×0.35. Zones: a2_dunes, a2_avenue, a2_ribvalley, a2_stormflat, a2_oasis. `zz_act2.js` **[later]**
+- **Grit-Wick** (`dune_kite`): kiter AI. base hp 20, dmg 5–9, speed 2 yd/s, xp 26, AI `kiter`, wind-up 0.6 s, poise ×0.35. Zones: a2_dunes, a2_avenue, a2_ribvalley, a2_stormflat, a2_oasis. `zz_act2.js` **[later]**
 
-- **Brood-Swollen Husk** (`a3_broodhusk`): husk AI; bursts into 3 Leech-Larvae on death. base hp 34, dmg 5–9, speed 1.6 yd/s, xp 22, AI `husk`, wind-up 0.55 s, poise ×0.6. Zones: a3_flats, a3_mangroves, a3_fetish, a3_delta, a3_amber, a3_broodbanks, a3_causeway, a3_sumps, a3_egggal, a3_ziggurat, a3_lair. `zz_act3.js` **[later]**
+- **Brood-Swollen Husk** (`a3_broodhusk`): husk AI; bursts into 3 Clot-Spawn on death. base hp 34, dmg 5–9, speed 1.6 yd/s, xp 22, AI `husk`, wind-up 0.55 s, poise ×0.6. Zones: a3_flats, a3_mangroves, a3_fetish, a3_delta, a3_amber, a3_broodbanks, a3_causeway, a3_sumps, a3_egggal, a3_ziggurat, a3_lair. `zz_act3.js` **[later]**
 
-- **Leech-Larva** (`a3_larva`): tiny flanker (7 hp), no loot. base hp 7, dmg 2–4, speed 3.6 yd/s, xp 3, AI `flank`, wind-up 0.22 s, poise ×0.2. `zz_act3.js` **[later]**
+- **Clot-Spawn** (`a3_larva`): tiny flanker (7 hp), no loot. base hp 7, dmg 2–4, speed 3.6 yd/s, xp 3, AI `flank`, wind-up 0.22 s, poise ×0.2. `zz_act3.js` **[later]**
 
 - **Masked Fetish-Priest** (`a3_fetishpriest`): flanker; its blows leave venom for 3 s. base hp 22, dmg 5–8, speed 3.3 yd/s, xp 24, AI `flank`, wind-up 0.28 s, poise ×0.4. Zones: a3_flats, a3_mangroves, a3_fetish, a3_delta, a3_broodbanks, a3_causeway, a3_egggal, a3_ziggurat. `zz_act3.js` **[later]**
 
@@ -1011,7 +1011,7 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **Rime-Wraith** (`a4_rimewraith`): ghost AI. base hp 24, dmg 7–12, speed 1.6 yd/s, xp 30, AI `ghost`, wind-up 0.85 s, poise ×0.3. Zones: a4_foothills, a4_glasspass, a4_spires, a4_cloudshelf, a4_windscour, a4_stair, a4_breathcaves, a4_bellhollow, a4_monastery. `zz_act4.js` **[later]**
 
-- **Prayer-Flag Moth** (`a4_flagmoth`): flyer AI. base hp 18, dmg 5–9, speed 2.9 yd/s, xp 22, AI `flyer`, wind-up 0.42 s, poise ×0.3. Zones: a4_foothills, a4_glasspass, a4_flags, a4_spires, a4_cloudshelf, a4_windscour, a4_stair. `zz_act4.js` **[later]**
+- **Prayer-Flag Wick** (`a4_flagmoth`): flyer AI. base hp 18, dmg 5–9, speed 2.9 yd/s, xp 22, AI `flyer`, wind-up 0.42 s, poise ×0.3. Zones: a4_foothills, a4_glasspass, a4_flags, a4_spires, a4_cloudshelf, a4_windscour, a4_stair. `zz_act4.js` **[later]**
 
 - **Tethered Pilgrim** (`a4_tetherpilgrim`): flanker AI. base hp 26, dmg 5–9, speed 3.3 yd/s, xp 24, AI `flank`, wind-up 0.26 s, poise ×0.4. Zones: a4_foothills, a4_glasspass, a4_flags, a4_spires, a4_windscour, a4_stair, a4_breathcaves. `zz_act4.js` **[later]**
 
@@ -1031,7 +1031,7 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **Synapse-Walker** (`a5_synapse`): stalker; blows daze. base hp 34, dmg 9–15, speed 2.8 yd/s, xp 55, AI `stalker`, wind-up 0.3 s, poise ×0.45. Zones: a5_shaft, a5_cerebrum. `zz_act5.js` **[later]**
 
-- **Stomach-Parasite Worm** (`a5_parasite`): burrower; leaves acid pools where it surfaces. base hp 40, dmg 8–13, speed 3 yd/s, xp 50, AI `burrow`, wind-up 0.4 s, poise ×0.6. Zones: a5_crucible. `zz_act5.js` **[later]**
+- **Stomach-Tether** (`a5_parasite`): burrower; leaves acid pools where it surfaces. base hp 40, dmg 8–13, speed 3 yd/s, xp 50, AI `burrow`, wind-up 0.4 s, poise ×0.6. Zones: a5_crucible. `zz_act5.js` **[later]**
 
 - **Corrosion-Stalker** (`a5_corroder`): duelist; corrosion (physical hurts more for 4 s). base hp 60, dmg 10–16, speed 2.1 yd/s, xp 62, armour 35, AI `duelist`, wind-up 0.45 s, poise ×0.8. Zones: a5_crucible. `zz_act5.js` **[later]**
 
@@ -1045,7 +1045,7 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **Calcified Knight** (`qa_calcknight`): Calcified Knight (Saint Calcifer's add). base hp 60, dmg 9–14, speed 1.6 yd/s, xp 60, armour 40, AI `shield`, wind-up 0.6 s, poise ×0.9. `zz_quests.js` **[later]**
 
-- **Brood-Leech** (`qa_broodling`): Brood-Leech (Brood-Mother's add). base hp 24, dmg 7–11, speed 3 yd/s, xp 20, AI `burrow`, wind-up 0.4 s, poise ×0.5. `zz_quests.js` **[later]**
+- **Brood-Mouth** (`qa_broodling`): Brood-Mouth (Brood-Mother's add). base hp 24, dmg 7–11, speed 3 yd/s, xp 20, AI `burrow`, wind-up 0.4 s, poise ×0.5. `zz_quests.js` **[later]**
 
 - **Chime-Golem of the Upper Bell** (`qa_chimegolem`): Chime-Golem of the Upper Bell (Chime-Abbot's champion adds). base hp 150, dmg 13–21, speed 1.3 yd/s, xp 200, armour 80, AI `shield`, wind-up 0.8 s, poise ×1.2. `zz_quests.js` **[later]**
 
@@ -1119,75 +1119,75 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 ### 18.2 Act I zones (measured at seed 12345)
 
-- **Ashen Moor** (`moor`, 164x164, theme moor): mlvl 2–6; about 538 creatures at generation (mostly Husk, Tithe-Hand, Moth-Saint, Weeper, Gasp, Gravebloat); 2 lanterns, 1 vendor, 7 chests, 2 shrine refill, 1 shrine echo, 2 shrine stone, 2 statues; links to crypt, fen, barrow, sighing_ridge, hollow_wood. The start: Maren's camp (palisade; vendor Maren, then the quest NPCs, stash and waystone), a radial crossroads plain. The dead herd lies on the Burnt Heath, not here. `b_core.js` `zz_openness.js` **[Act I]**
+- **Ashen Moor** (`moor`, 164x164, theme moor): mlvl 2–6; about 538 creatures at generation (mostly Husk, Tithe-Hand, Wick-Saint, Weeper, Gasp, Gravebloat); 2 lanterns, 1 vendor, 7 chests, 2 shrine refill, 1 shrine echo, 2 shrine stone, 2 statues; links to crypt, fen, barrow, sighing_ridge, hollow_wood. The start: Maren's camp (palisade; vendor Maren, then the quest NPCs, stash and waystone), a radial crossroads plain. The dead herd lies on the Burnt Heath, not here. `b_core.js` `zz_openness.js` **[Act I]**
 
 - **Hollow Crypt** (`crypt`, 109x109, theme crypt): mlvl 9–12; about 85 creatures at generation (mostly Husk, Gravebloat, Ossuary Warden, Chorister, Gasp, Kneeler); 1 lantern, 2 chest; links to moor, fallen_monastery, hollow_wood. Rooms and halls; the Carrion Warden's boss room. `b_core.js` `zz_openness.js` **[Act I]**
 
-- **Drowned Fen** (`fen`, 160x160, theme fen): mlvl 10–15; about 490 creatures at generation (mostly Drowned Husk, Moth-Saint, Bloatling, Mire Vein-Worm, Weeper, Gravebloat); 2 lanterns, 6 chests, 1 shrine wisp, 2 shrine stone, 1 shrine refill, 2 statues; links to moor, cata1, drowned_village, root_deep, pilgrim_road. Braided delta; shallows and mud; two guardian packs at treasure sites (+5 attribute points, +1 Arcana when both fall); the Well-Shrine lore site. `b_core.js` `zz_openness.js` **[Act I]**
+- **Drowned Fen** (`fen`, 160x160, theme fen): mlvl 10–15; about 490 creatures at generation (mostly Drowned Husk, Wick-Saint, Bloatling, Mire Vein-Borer, Weeper, Gravebloat); 2 lanterns, 6 chests, 1 shrine wisp, 2 shrine stone, 1 shrine refill, 2 statues; links to moor, cata1, drowned_village, root_deep, pilgrim_road. Braided delta; shallows and mud; two guardian packs at treasure sites (+5 attribute points, +1 Arcana when both fall); the Well-Shrine lore site. `b_core.js` `zz_openness.js` **[Act I]**
 
-- **Old Barrow** (`barrow`, 87x87, theme barrow): mlvl 7–10; about 96 creatures at generation (mostly Husk, Moth-Saint, Tithe-Hand, Weeper, Vein-Worm, Bloatling); 1 lantern, 4 chest; links to moor, fallen_watchtower. The Barrow lord pack (+1 skill point, +1 Arcana when cleared). `b_core.js` `zz_openness.js` **[Act I]**
+- **Old Barrow** (`barrow`, 87x87, theme barrow): mlvl 7–10; about 96 creatures at generation (mostly Husk, Wick-Saint, Tithe-Hand, Weeper, Vein-Borer, Bloatling); 1 lantern, 4 chest; links to moor, fallen_watchtower. The Barrow lord pack (+1 skill point, +1 Arcana when cleared). `b_core.js` `zz_openness.js` **[Act I]**
 
 - **Bone Catacombs I** (`cata1`, 117x117, theme bone): mlvl 14–16; about 148 creatures at generation (mostly Ossuary Weeper, Husk, Marrow Duelist, Gravebloat, Ossuary Warden, Mire Gasp); 1 lantern, 4 chests, 1 altar; links to fen, cata2, plague_hospice, root_deep. The Reader's Bay (quest relic). `b_core.js` `zz_openness.js` **[Act I]**
 
 - **Bone Catacombs II** (`cata2`, 113x113, theme bone): mlvl 15–18; about 112 creatures at generation (mostly Marrow Duelist, Gravebloat, Ossuary Weeper, Husk, Mire Gasp); 1 lantern, 1 chest; links to cata1, smugglers_hold. Act I lair: the Ossuary Matron; her death opens the road to Act II. `b_core.js` `zz_openness.js` **[Act I]**
 
-- **Sighing Ridge** (`sighing_ridge`, 172x124, theme moor): mlvl 2–4; about 72 creatures at generation (mostly Husk, Tithe-Hand, Moth-Saint, Kneeler, Bloatling, Weeper); 4 lanterns, 5 chests, 2 shrine echo, 1 shrine refill, 3 statues, 1 altar; links to moor, burnt_heath, wolf_den_chapel. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **Sighing Ridge** (`sighing_ridge`, 172x124, theme moor): mlvl 2–4; about 72 creatures at generation (mostly Husk, Tithe-Hand, Wick-Saint, Kneeler, Bloatling, Weeper); 4 lanterns, 5 chests, 2 shrine echo, 1 shrine refill, 3 statues, 1 altar; links to moor, burnt_heath, wolf_den_chapel. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **Ash Shore** (`ash_shore`, 152x152, theme moor): mlvl 3–5; about 97 creatures at generation (mostly Husk, Tithe-Hand, Kneeler, Weeper, Vein-Worm, Moth-Saint); 4 lanterns, 5 chests, 1 shrine stone, 2 shrine refill, 3 statues, 1 altar; links to burnt_heath. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **Ash Shore** (`ash_shore`, 152x152, theme moor): mlvl 3–5; about 97 creatures at generation (mostly Husk, Tithe-Hand, Kneeler, Weeper, Vein-Borer, Wick-Saint); 4 lanterns, 5 chests, 1 shrine stone, 2 shrine refill, 3 statues, 1 altar; links to burnt_heath. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **Burnt Heath** (`burnt_heath`, 152x152, theme moor): mlvl 4–6; about 117 creatures at generation (mostly Husk, Weeper, Moth-Saint, Bloatling, Moth-Saint of the Canopy, Vein-Worm); 4 lanterns, 5 chests, 1 shrine wisp, 2 shrine echo, 3 statues, 1 altar; links to sighing_ridge, ash_shore, fern_gully. The dead herd (cow-level homage): seven horned carcasses in a ring in the far corner, one line on first visit. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **Burnt Heath** (`burnt_heath`, 152x152, theme moor): mlvl 4–6; about 117 creatures at generation (mostly Husk, Weeper, Wick-Saint, Bloatling, Wick-Saint of the Canopy, Vein-Borer); 4 lanterns, 5 chests, 1 shrine wisp, 2 shrine echo, 3 statues, 1 altar; links to sighing_ridge, ash_shore, fern_gully. The dead herd (cow-level homage): seven horned carcasses in a ring in the far corner, one line on first visit. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **Fern Gully** (`fern_gully`, 132x172, theme hollow_wood): mlvl 3–6; about 85 creatures at generation (mostly Weeper, Vein-Worm, Tithe-Hand, Husk, Moth-Saint, Pyre-Saint); 4 lanterns, 3 chests, 1 shrine wisp, 2 shrine echo; links to burnt_heath, hunter_cache. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **Fern Gully** (`fern_gully`, 132x172, theme hollow_wood): mlvl 3–6; about 85 creatures at generation (mostly Weeper, Vein-Borer, Tithe-Hand, Husk, Wick-Saint, Pyre-Saint); 4 lanterns, 3 chests, 1 shrine wisp, 2 shrine echo; links to burnt_heath, hunter_cache. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **Pilgrim Road** (`pilgrim_road`, 184x128, theme moor): mlvl 6–8; about 148 creatures at generation (mostly Husk, Weeper, Tithe-Hand, Stalker Crone, Gasp, Moth-Saint of the Canopy); 5 lanterns, 5 chests, 1 shrine stone, 1 shrine echo, 1 shrine wisp, 2 statues; links to hollow_wood, fen, tree_hollow. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **Pilgrim Road** (`pilgrim_road`, 184x128, theme moor): mlvl 6–8; about 148 creatures at generation (mostly Husk, Weeper, Tithe-Hand, Stalker Crone, Gasp, Wick-Saint of the Canopy); 5 lanterns, 5 chests, 1 shrine stone, 1 shrine echo, 1 shrine wisp, 2 statues; links to hollow_wood, fen, tree_hollow. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **Drowned Village** (`drowned_village`, 152x144, theme fen): mlvl 6–9; about 156 creatures at generation (mostly Drowned Husk, Moth-Saint, Moth-Saint of the Canopy, Gravebloat, Weeper, Bellwether); 5 lanterns, 5 chests, 1 shrine echo, 1 shrine refill, 1 shrine wisp, 2 statues; links to fen, sunken_bog, well_shaft. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **Drowned Village** (`drowned_village`, 152x144, theme fen): mlvl 6–9; about 156 creatures at generation (mostly Drowned Husk, Wick-Saint, Wick-Saint of the Canopy, Gravebloat, Weeper, Bellwether); 5 lanterns, 5 chests, 1 shrine echo, 1 shrine refill, 1 shrine wisp, 2 statues; links to fen, sunken_bog, well_shaft. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **Sunken Bog** (`sunken_bog`, 164x152, theme fen): mlvl 9–11; about 139 creatures at generation (mostly Drowned Husk, Mire Vein-Worm, Pyre-Saint, Bloatling, Mire Gasp, Moth-Saint); 5 lanterns, 5 chests, 1 shrine refill, 2 shrine echo, 1 statue; links to drowned_village, bogwitch_shack. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **Sunken Bog** (`sunken_bog`, 164x152, theme fen): mlvl 9–11; about 139 creatures at generation (mostly Drowned Husk, Mire Vein-Borer, Pyre-Saint, Bloatling, Mire Gasp, Wick-Saint); 5 lanterns, 5 chests, 1 shrine refill, 2 shrine echo, 1 statue; links to drowned_village, bogwitch_shack. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
 - **Fallen Monastery** (`fallen_monastery`, 120x120, theme crypt): mlvl 7–9; about 163 creatures at generation (mostly Husk, Chorister, Ossuary Warden, Gasp, Gravebloat, Kneeler); 3 lanterns, 4 chests, 1 altar; links to crypt, bogwitch_shack. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **Wolf-Den Chapel** (`wolf_den_chapel`, 104x104, theme crypt): mlvl 4–8; about 103 creatures at generation (mostly Husk, Tithe-Hand, Moth-Saint, Weeper, Moth-Saint of the Canopy, Bloatling); 3 lanterns, 4 chest; links to sighing_ridge. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **The Gnawed Chapel** (`wolf_den_chapel`, 104x104, theme crypt): mlvl 4–8; about 103 creatures at generation (mostly Husk, Tithe-Hand, Wick-Saint, Weeper, Wick-Saint of the Canopy, Bloatling); 3 lanterns, 4 chest; links to sighing_ridge. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
 - **Plague Hospice** (`plague_hospice`, 120x120, theme crypt): mlvl 9–12; about 118 creatures at generation (mostly Husk, Ossuary Warden, Weeper, Chorister, Gasp, Gravebloat); 3 lanterns, 4 chest; links to cata1. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **The Well-Shaft** (`well_shaft`, 105x105, theme crypt): mlvl 10–13; about 110 creatures at generation (mostly Drowned Husk, Bloatling, Bellwether, Mire Vein-Worm, Moth-Saint of the Canopy, Pyre-Saint); 3 lanterns, 3 chest; links to drowned_village. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **The Well-Shaft** (`well_shaft`, 105x105, theme crypt): mlvl 10–13; about 110 creatures at generation (mostly Drowned Husk, Bloatling, Bellwether, Mire Vein-Borer, Wick-Saint of the Canopy, Pyre-Saint); 3 lanterns, 3 chest; links to drowned_village. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **Smugglers' Hold** (`smugglers_hold`, 107x107, theme barrow): mlvl 5–9; about 113 creatures at generation (mostly Tithe-Hand, Husk, Bloatling, Vein-Worm, Moth-Saint, Gasp); 3 lanterns, 4 chest; links to cata2. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **Smugglers' Hold** (`smugglers_hold`, 107x107, theme barrow): mlvl 5–9; about 113 creatures at generation (mostly Tithe-Hand, Husk, Bloatling, Vein-Borer, Wick-Saint, Gasp); 3 lanterns, 4 chest; links to cata2. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **Bog-Witch's Shack** (`bogwitch_shack`, 104x104, theme fen): mlvl 7–10; about 53 creatures at generation (mostly Drowned Husk, Pyre-Saint, Moth-Saint, Gravebloat, Weeper); 1 lantern, 3 chests, 1 shrine stone, 1 statue, 1 altar; links to sunken_bog, fallen_monastery. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **Bog-Witch's Shack** (`bogwitch_shack`, 104x104, theme fen): mlvl 7–10; about 53 creatures at generation (mostly Drowned Husk, Pyre-Saint, Wick-Saint, Gravebloat, Weeper); 1 lantern, 3 chests, 1 shrine stone, 1 statue, 1 altar; links to sunken_bog, fallen_monastery. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **The Tree-Hollow** (`tree_hollow`, 104x104, theme hollow_wood): mlvl 6–7; about 54 creatures at generation (mostly Husk, Gasp, Tithe-Hand, Weeper, Moth-Saint, Moth-Saint of the Canopy); 1 lantern, 2 chests, 1 shrine echo; links to pilgrim_road. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **The Tree-Hollow** (`tree_hollow`, 104x104, theme hollow_wood): mlvl 6–7; about 54 creatures at generation (mostly Husk, Gasp, Tithe-Hand, Weeper, Wick-Saint, Wick-Saint of the Canopy); 1 lantern, 2 chests, 1 shrine echo; links to pilgrim_road. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
 - **Hunter's Cache** (`hunter_cache`, 104x104, theme moor): mlvl 4–5; about 76 creatures at generation (mostly Husk, Tithe-Hand, Bloatling, Weeper); 1 lantern, 4 chests, 1 shrine stone, 1 statue; links to fern_gully. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **Fallen Watchtower** (`fallen_watchtower`, 124x124, theme moor): mlvl 6–9; about 94 creatures at generation (mostly Husk, Weeper, Moth-Saint of the Canopy, Moth-Saint, Bloatling, Vein-Worm); 2 lanterns, 5 chests, 1 shrine refill, 1 shrine echo, 5 statues, 1 altar; links to barrow. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **Fallen Watchtower** (`fallen_watchtower`, 124x124, theme moor): mlvl 6–9; about 94 creatures at generation (mostly Husk, Weeper, Wick-Saint of the Canopy, Wick-Saint, Bloatling, Vein-Borer); 2 lanterns, 5 chests, 1 shrine refill, 1 shrine echo, 5 statues, 1 altar; links to barrow. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **The Broken Bridge** (`broken_bridge`, 152x132, theme moor): mlvl 10–13; about 92 creatures at generation (mostly Tithe-Hand, Moth-Saint of the Canopy, Husk, Pyre-Saint, Bellwether, Gasp); 2 lanterns, 5 chests, 1 shrine stone, 1 shrine wisp, 3 statues, 1 altar; links to root_deep. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
+- **The Broken Bridge** (`broken_bridge`, 152x132, theme moor): mlvl 10–13; about 92 creatures at generation (mostly Tithe-Hand, Wick-Saint of the Canopy, Husk, Pyre-Saint, Bellwether, Gasp); 2 lanterns, 5 chests, 1 shrine stone, 1 shrine wisp, 3 statues, 1 altar; links to root_deep. `zz_act1_expand.js` `zz_openness.js` **[Act I]**
 
-- **Hollow Wood** (`hollow_wood`, 152x152, theme hollow_wood): mlvl 5–8; about 204 creatures at generation (mostly Husk, Vein-Worm, Tithe-Hand, Bloatling, Weeper, Moth-Saint of the Canopy); 2 lanterns, 4 chests, 3 shrine wisp, 1 altar; links to moor, crypt, pilgrim_road. `zz_world_expand.js` `zz_openness.js` **[Act I]**
+- **Hollow Wood** (`hollow_wood`, 152x152, theme hollow_wood): mlvl 5–8; about 204 creatures at generation (mostly Husk, Vein-Borer, Tithe-Hand, Bloatling, Weeper, Wick-Saint of the Canopy); 2 lanterns, 4 chests, 3 shrine wisp, 1 altar; links to moor, crypt, pilgrim_road. `zz_world_expand.js` `zz_openness.js` **[Act I]**
 
-- **Root Deep** (`root_deep`, 164x164, theme root_deep): mlvl 13–16; about 253 creatures at generation (mostly Husk, Tithe-Hand, Weeper, Gravebloat, Moth-Saint of the Canopy, Pyre-Saint); 3 lanterns, 6 chests, 1 shrine echo, 1 shrine wisp, 1 shrine stone; links to fen, cata1, broken_bridge. `zz_world_expand.js` `zz_openness.js` **[Act I]**
+- **Root Deep** (`root_deep`, 164x164, theme root_deep): mlvl 13–16; about 253 creatures at generation (mostly Husk, Tithe-Hand, Weeper, Gravebloat, Wick-Saint of the Canopy, Pyre-Saint); 3 lanterns, 6 chests, 1 shrine echo, 1 shrine wisp, 1 shrine stone; links to fen, cata1, broken_bridge. `zz_world_expand.js` `zz_openness.js` **[Act I]**
 
 ### 18.3 Acts II–V zones
 
 - **Citadel of the Shattered Femur** (`a2_town`, 124x96, theme ossa_town town): no monsters; about 0 creatures at generation; 1 lantern; links to a2_dunes. `zz_act2.js` **[later]**
 
-- **The Bleached Dunes** (`a2_dunes`, 170x150, theme ossa): mlvl 18–19; about 152 creatures at generation (mostly Chalk-Wyrm, Grit-Moth, Marrow-Ghoul, Calcified Knight, Ossuary Weeper); 4 lanterns, 4 chests, 2 shrine refill, 1 shrine wisp, 1 altar; links to a2_town, a2_avenue. `zz_act2.js` **[later]**
+- **The Bleached Dunes** (`a2_dunes`, 170x150, theme ossa): mlvl 18–19; about 152 creatures at generation (mostly Chalk-Wyrm, Grit-Wick, Marrow-Ghoul, Calcified Knight, Ossuary Weeper); 4 lanterns, 4 chests, 2 shrine refill, 1 shrine wisp, 1 altar; links to a2_town, a2_avenue. `zz_act2.js` **[later]**
 
-- **Reliquary Avenue** (`a2_avenue`, 180x120, theme ossa): mlvl 19–20; about 157 creatures at generation (mostly Grit-Moth, Calcified Knight, Ossuary Weeper, Oath-Fused Blade, Chalk Wraith, Chalk-Wyrm); 3 lanterns, 4 chests, 2 shrine wisp, 1 shrine stone; links to a2_dunes, a2_ribvalley, a2_chapter. `zz_act2.js` **[later]**
+- **Reliquary Avenue** (`a2_avenue`, 180x120, theme ossa): mlvl 19–20; about 157 creatures at generation (mostly Grit-Wick, Calcified Knight, Ossuary Weeper, Oath-Fused Blade, Chalk Wraith, Chalk-Wyrm); 3 lanterns, 4 chests, 2 shrine wisp, 1 shrine stone; links to a2_dunes, a2_ribvalley, a2_chapter. `zz_act2.js` **[later]**
 
 - **The Buried Chapter-House** (`a2_chapter`, 104x104, theme ossa_chapter): mlvl 19–21; about 78 creatures at generation (mostly Calcified Knight, Chalk Wraith, Marrow Duelist, Ossuary Weeper, Oath-Fused Blade); 2 lanterns, 3 chest; links to a2_avenue. `zz_act2.js` **[later]**
 
-- **The Valley of Standing Ribs** (`a2_ribvalley`, 170x160, theme ossa): mlvl 20–21; about 137 creatures at generation (mostly Chalk-Wyrm, Grit-Moth, Ossuary Weeper, Marrow-Ghoul, Calcified Knight, Oath-Fused Blade); 3 lanterns, 4 chests, 3 shrine stone; links to a2_avenue, a2_stormflat. `zz_act2.js` **[later]**
+- **The Valley of Standing Ribs** (`a2_ribvalley`, 170x160, theme ossa): mlvl 20–21; about 137 creatures at generation (mostly Chalk-Wyrm, Grit-Wick, Ossuary Weeper, Marrow-Ghoul, Calcified Knight, Oath-Fused Blade); 3 lanterns, 4 chests, 3 shrine stone; links to a2_avenue, a2_stormflat. `zz_act2.js` **[later]**
 
-- **The Chalk Flats** (`a2_stormflat`, 180x170, theme ossa): mlvl 21–22; about 126 creatures at generation (mostly Chalk Wraith, Grit-Moth, Chalk-Wyrm, Marrow-Ghoul); 4 lanterns, 4 chests, 2 shrine refill, 1 shrine wisp; links to a2_ribvalley, a2_banners, a2_tomb. Chalk storms (about every minute, 20 breaths): the lamp shrinks, arrows drift, Chalk Wraiths speed up. `zz_act2.js` **[later]**
+- **The Chalk Flats** (`a2_stormflat`, 180x170, theme ossa): mlvl 21–22; about 126 creatures at generation (mostly Chalk Wraith, Grit-Wick, Chalk-Wyrm, Marrow-Ghoul); 4 lanterns, 4 chests, 2 shrine refill, 1 shrine wisp; links to a2_ribvalley, a2_banners, a2_tomb. Chalk storms (about every minute, 20 breaths): the lamp shrinks, arrows drift, Chalk Wraiths speed up. `zz_act2.js` **[later]**
 
 - **The Sand-Choked Tomb** (`a2_tomb`, 100x100, theme ossa_tomb): mlvl 21–23; about 44 creatures at generation (mostly Chalk Wraith, Calcified Knight, Chalk-Wyrm, Marrow-Ghoul); 2 lanterns, 3 chests, 1 altar; links to a2_stormflat. `zz_act2.js` **[later]**
 
 - **The Field of Fallen Standards** (`a2_banners`, 170x150, theme ossa): mlvl 22–23; about 179 creatures at generation (mostly Ossuary Weeper, Calcified Knight, Oath-Fused Blade, Marrow-Ghoul, Chalk Wraith); 3 lanterns, 4 chests, 1 shrine echo, 2 shrine refill, 1 altar; links to a2_stormflat, a2_oasis. `zz_act2.js` **[later]**
 
-- **The Dry Oasis** (`a2_oasis`, 160x160, theme ossa): mlvl 22–23; about 140 creatures at generation (mostly Chalk-Wyrm, Grit-Moth, Oath-Fused Blade, Chalk Wraith, Marrow-Ghoul); 3 lanterns, 4 chests, 1 shrine refill, 1 shrine stone, 1 shrine wisp, 1 altar; links to a2_banners, a2_marrow. `zz_act2.js` **[later]**
+- **The Dry Oasis** (`a2_oasis`, 160x160, theme ossa): mlvl 22–23; about 140 creatures at generation (mostly Chalk-Wyrm, Grit-Wick, Oath-Fused Blade, Chalk Wraith, Marrow-Ghoul); 3 lanterns, 4 chests, 1 shrine refill, 1 shrine stone, 1 shrine wisp, 1 altar; links to a2_banners, a2_marrow. `zz_act2.js` **[later]**
 
 - **The Marrow Cavity** (`a2_marrow`, 112x112, theme ossa_marrow): mlvl 23–24; about 58 creatures at generation (mostly Chalk Wraith, Marrow-Ghoul, Marrow Duelist, Calcified Knight, Oath-Fused Blade); 2 lanterns, 1 chest, 1 altar; links to a2_oasis, a2_lair. `zz_act2.js` **[later]**
 
@@ -1197,11 +1197,11 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **The Heartbeat Flats** (`a3_flats`, 160x150, theme shogmire): mlvl 24–25; about 255 creatures at generation (mostly Brood-Swollen Husk, Drowned Husk, Bloatling, Mud-Leaper, Masked Fetish-Priest); 3 lanterns, 1 statue, 7 chests, 2 shrine refill, 1 shrine wisp; links to a3_town, a3_mangroves. Heartbeat mud: every 1.7 s the mud clutches, slowing walkers a further 40% for the beat. `zz_act3.js` **[later]**
 
-- **The Weeping Mangroves** (`a3_mangroves`, 150x150, theme shogmire): mlvl 25–26; about 154 creatures at generation (mostly Brood-Swollen Husk, Moth-Saint of the Canopy, Amber-Weeping Gasp, Masked Fetish-Priest, Mud-Leaper, Mangrove Stalker); 3 lanterns, 1 statue, 6 chests, 2 shrine wisp, 1 shrine refill; links to a3_flats, a3_delta, a3_fetish. `zz_act3.js` **[later]**
+- **The Weeping Mangroves** (`a3_mangroves`, 150x150, theme shogmire): mlvl 25–26; about 154 creatures at generation (mostly Brood-Swollen Husk, Wick-Saint of the Canopy, Amber-Weeping Gasp, Masked Fetish-Priest, Mud-Leaper, Mangrove Stalker); 3 lanterns, 1 statue, 6 chests, 2 shrine wisp, 1 shrine refill; links to a3_flats, a3_delta, a3_fetish. `zz_act3.js` **[later]**
 
 - **The Fetish-Tree Groves** (`a3_fetish`, 140x140, theme shogmire): mlvl 26–27; about 143 creatures at generation (mostly Masked Fetish-Priest, Brood-Swollen Husk, Amber-Weeping Gasp, Mangrove Stalker); 3 lanterns, 5 chests, 2 shrine stone, 1 shrine refill; links to a3_mangroves, a3_sumps. `zz_act3.js` **[later]**
 
-- **The Blood Delta** (`a3_delta`, 170x140, theme shogmire): mlvl 26–28; about 188 creatures at generation (mostly Brood-Swollen Husk, Mud-Leaper, Masked Fetish-Priest, Amber-Weeping Gasp, Mire Vein-Worm); 3 lanterns, 7 chests, 1 shrine stone, 1 shrine wisp, 1 shrine echo, 1 altar; links to a3_mangroves, a3_amber. `zz_act3.js` **[later]**
+- **The Blood Delta** (`a3_delta`, 170x140, theme shogmire): mlvl 26–28; about 188 creatures at generation (mostly Brood-Swollen Husk, Mud-Leaper, Masked Fetish-Priest, Amber-Weeping Gasp, Mire Vein-Borer); 3 lanterns, 7 chests, 1 shrine stone, 1 shrine wisp, 1 shrine echo, 1 altar; links to a3_mangroves, a3_amber. `zz_act3.js` **[later]**
 
 - **The Amber-Grease Mire** (`a3_amber`, 140x140, theme shogmire): mlvl 27–28; about 169 creatures at generation (mostly Brood-Swollen Husk, Mire Gasp, Amber-Weeping Gasp, Mud-Leaper, Mangrove Stalker); 3 lanterns, 6 chests, 2 shrine wisp, 1 shrine refill; links to a3_delta, a3_broodbanks. `zz_act3.js` **[later]**
 
@@ -1209,7 +1209,7 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **Causeway of the First Brood** (`a3_causeway`, 150x150, theme shogmire): mlvl 29–30; about 162 creatures at generation (mostly Brood-Swollen Husk, Masked Fetish-Priest, Amber-Weeping Gasp, Mangrove Stalker, Brood-Sow, Mud-Leaper); 3 lanterns, 6 chests, 1 shrine echo, 2 shrine refill; links to a3_broodbanks, a3_ziggurat. `zz_act3.js` **[later]**
 
-- **The Leech-Sumps** (`a3_sumps`, 110x110, theme shogmire_deep): mlvl 26–29; about 118 creatures at generation (mostly Brood-Swollen Husk, Mire Vein-Worm, Amber-Weeping Gasp, Mud-Leaper); 2 lanterns, 5 chests, 1 altar; links to a3_fetish. `zz_act3.js` **[later]**
+- **The Leech-Sumps** (`a3_sumps`, 110x110, theme shogmire_deep): mlvl 26–29; about 118 creatures at generation (mostly Brood-Swollen Husk, Mire Vein-Borer, Amber-Weeping Gasp, Mud-Leaper); 2 lanterns, 5 chests, 1 altar; links to a3_fetish. `zz_act3.js` **[later]**
 
 - **The Egg-Galleries** (`a3_egggal`, 110x100, theme shogmire_deep): mlvl 28–30; about 94 creatures at generation (mostly Brood-Swollen Husk, Masked Fetish-Priest, Amber-Weeping Gasp, Brood-Sow); 2 lanterns, 4 chest; links to a3_broodbanks. `zz_act3.js` **[later]**
 
@@ -1219,19 +1219,19 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **Bellrest Hearth** (`a4_town`, 86x80, theme anvhar town): no monsters; about 0 creatures at generation; 1 lantern; links to a4_foothills. `zz_act4.js` **[later]**
 
-- **The Chime-Foothills** (`a4_foothills`, 160x150, theme anvhar): mlvl 30–31; about 177 creatures at generation (mostly Tethered Pilgrim, Prayer-Flag Moth, Anima-Bound Monk, Rime-Wraith, Basalt Borer); 3 lanterns, 7 chests, 2 shrine wisp, 1 shrine refill; links to a4_town, a4_glasspass. Chime-winds (all outdoor Act IV zones): every 10–16 s a 2.4 s gust drains poise, never below 35%; lanterns and Lantern-Spires shelter you. `zz_act4.js` **[later]**
+- **The Chime-Foothills** (`a4_foothills`, 160x150, theme anvhar): mlvl 30–31; about 177 creatures at generation (mostly Tethered Pilgrim, Prayer-Flag Wick, Anima-Bound Monk, Rime-Wraith, Basalt Borer); 3 lanterns, 7 chests, 2 shrine wisp, 1 shrine refill; links to a4_town, a4_glasspass. Chime-winds (all outdoor Act IV zones): every 10–16 s a 2.4 s gust drains poise, never below 35%; lanterns and Lantern-Spires shelter you. `zz_act4.js` **[later]**
 
-- **The Glass Pass** (`a4_glasspass`, 150x150, theme anvhar): mlvl 30–31; about 120 creatures at generation (mostly Prayer-Flag Moth, Tethered Pilgrim, Basalt Borer, Rime-Wraith, Anima-Bound Monk); 2 lanterns, 6 chests, 1 shrine echo, 1 shrine stone, 1 shrine refill; links to a4_foothills, a4_breathcaves, a4_flags. `zz_act4.js` **[later]**
+- **The Glass Pass** (`a4_glasspass`, 150x150, theme anvhar): mlvl 30–31; about 120 creatures at generation (mostly Prayer-Flag Wick, Tethered Pilgrim, Basalt Borer, Rime-Wraith, Anima-Bound Monk); 2 lanterns, 6 chests, 1 shrine echo, 1 shrine stone, 1 shrine refill; links to a4_foothills, a4_breathcaves, a4_flags. `zz_act4.js` **[later]**
 
-- **The Prayer-Flag Terraces** (`a4_flags`, 150x150, theme anvhar): mlvl 31–32; about 155 creatures at generation (mostly Tethered Pilgrim, Prayer-Flag Moth, Anima-Bound Monk, Chime-Golem); 3 lanterns, 1 statue, 7 chests, 1 shrine echo, 2 shrine stone, 1 altar; links to a4_glasspass, a4_spires. `zz_act4.js` **[later]**
+- **The Prayer-Flag Terraces** (`a4_flags`, 150x150, theme anvhar): mlvl 31–32; about 155 creatures at generation (mostly Tethered Pilgrim, Prayer-Flag Wick, Anima-Bound Monk, Chime-Golem); 3 lanterns, 1 statue, 7 chests, 1 shrine echo, 2 shrine stone, 1 altar; links to a4_glasspass, a4_spires. `zz_act4.js` **[later]**
 
-- **Field of Lantern-Spires** (`a4_spires`, 160x160, theme anvhar): mlvl 31–32; about 181 creatures at generation (mostly Prayer-Flag Moth, Chime-Golem, Tethered Pilgrim, Basalt Borer, Rime-Wraith, Anima-Bound Monk); 3 lanterns, 1 statue, 8 chests, 1 shrine wisp, 2 shrine refill; links to a4_flags, a4_cloudshelf. `zz_act4.js` **[later]**
+- **Field of Lantern-Spires** (`a4_spires`, 160x160, theme anvhar): mlvl 31–32; about 181 creatures at generation (mostly Prayer-Flag Wick, Chime-Golem, Tethered Pilgrim, Basalt Borer, Rime-Wraith, Anima-Bound Monk); 3 lanterns, 1 statue, 8 chests, 1 shrine wisp, 2 shrine refill; links to a4_flags, a4_cloudshelf. `zz_act4.js` **[later]**
 
-- **The Cloud-Shelf** (`a4_cloudshelf`, 170x150, theme anvhar): mlvl 32–33; about 157 creatures at generation (mostly Prayer-Flag Moth, Rime-Wraith, Chime-Golem, Anima-Bound Monk, Basalt Borer); 3 lanterns, 1 statue, 6 chests, 1 shrine echo, 2 shrine refill; links to a4_spires, a4_bellhollow, a4_windscour. `zz_act4.js` **[later]**
+- **The Cloud-Shelf** (`a4_cloudshelf`, 170x150, theme anvhar): mlvl 32–33; about 157 creatures at generation (mostly Prayer-Flag Wick, Rime-Wraith, Chime-Golem, Anima-Bound Monk, Basalt Borer); 3 lanterns, 1 statue, 6 chests, 1 shrine echo, 2 shrine refill; links to a4_spires, a4_bellhollow, a4_windscour. `zz_act4.js` **[later]**
 
-- **The Wind-Scoured Ridges** (`a4_windscour`, 150x150, theme anvhar): mlvl 32–33; about 172 creatures at generation (mostly Tethered Pilgrim, Prayer-Flag Moth, Anima-Bound Monk, Basalt Borer, Rime-Wraith, Chime-Golem); 3 lanterns, 7 chests, 2 shrine refill, 1 shrine wisp; links to a4_cloudshelf, a4_stair. `zz_act4.js` **[later]**
+- **The Wind-Scoured Ridges** (`a4_windscour`, 150x150, theme anvhar): mlvl 32–33; about 172 creatures at generation (mostly Tethered Pilgrim, Prayer-Flag Wick, Anima-Bound Monk, Basalt Borer, Rime-Wraith, Chime-Golem); 3 lanterns, 7 chests, 2 shrine refill, 1 shrine wisp; links to a4_cloudshelf, a4_stair. `zz_act4.js` **[later]**
 
-- **Stair of the Sky-Climbers** (`a4_stair`, 140x160, theme anvhar): mlvl 33–34; about 224 creatures at generation (mostly Prayer-Flag Moth, Anima-Bound Monk, Tethered Pilgrim, Rime-Wraith, Chime-Golem); 4 lanterns, 8 chests, 1 shrine wisp, 1 shrine refill, 1 shrine stone; links to a4_windscour, a4_monastery. `zz_act4.js` **[later]**
+- **Stair of the Sky-Climbers** (`a4_stair`, 140x160, theme anvhar): mlvl 33–34; about 224 creatures at generation (mostly Prayer-Flag Wick, Anima-Bound Monk, Tethered Pilgrim, Rime-Wraith, Chime-Golem); 4 lanterns, 8 chests, 1 shrine wisp, 1 shrine refill, 1 shrine stone; links to a4_windscour, a4_monastery. `zz_act4.js` **[later]**
 
 - **The Breath-Caves** (`a4_breathcaves`, 110x110, theme anvhar_deep): mlvl 31–33; about 79 creatures at generation (mostly Tethered Pilgrim, Basalt Borer, Rime-Wraith, Chorister); 2 lanterns, 5 chests, 1 altar; links to a4_glasspass. `zz_act4.js` **[later]**
 
@@ -1253,7 +1253,7 @@ Bases drop at item level + 1 or lower. `c_game.js` `zw_monk.js` **[Act I]**
 
 - **The Shaft of Fading Echoes** (`a5_shaft`, 164x164, theme a5_shaft): mlvl 37–38; about 76 creatures at generation (mostly Synapse-Walker, Hemorrhagic Leaper, Neural Wraith); 2 lanterns, 2 shrine echo, 5 chests, 1 shrine wisp, 1 altar; links to a5_valves, a5_crucible. Void spanned by 5-tile nerve-strand bridges (the void is solid). `zz_act5.js` **[later]**
 
-- **The Digesting Crucible** (`a5_crucible`, 164x152, theme a5_crucible): mlvl 38–39; about 123 creatures at generation (mostly Stomach-Parasite Worm, Corrosion-Stalker, Tumor-Swell Monstrosity); 2 lanterns, 7 chests, 1 shrine stone, 1 shrine echo, 1 shrine wisp; links to a5_shaft, a5_cerebrum. Acid basins and bile shallows burn the feet. `zz_act5.js` **[later]**
+- **The Digesting Crucible** (`a5_crucible`, 164x152, theme a5_crucible): mlvl 38–39; about 123 creatures at generation (mostly Stomach-Tether, Corrosion-Stalker, Tumor-Swell Monstrosity); 2 lanterns, 7 chests, 1 shrine stone, 1 shrine echo, 1 shrine wisp; links to a5_shaft, a5_cerebrum. Acid basins and bile shallows burn the feet. `zz_act5.js` **[later]**
 
 - **The Cerebrum Labyrinth** (`a5_cerebrum`, 208x208, theme a5_cerebrum): mlvl 39–40; about 156 creatures at generation (mostly Alien Sentinel, Thought-Form, Synapse-Walker, Neural Wraith); 2 lanterns, 7 chests, 2 shrine wisp, 1 shrine echo; links to a5_crucible, a5_lair. A brain-coral labyrinth (wave-field walls, 7-tile doors, no maze pinches). `zz_act5.js` **[later]**
 
@@ -1425,9 +1425,9 @@ Zones resolve by id, or by keyword for acts II–V. `zz_quests.js` **[Act I]**
 
 - **The Codex of the Hide:** opened from the title menu. A book bound in old pitted bronze: vellum pages foxed at the edges, iron-gall ink, bronze rubrics, drop capitals, corner guards with rivets, stacked page edges, a gutter, a ribbon, illuminated initials, a cup stain and a torn corner. `zz_zz_tome94.js` **[Act I]**
 
-- **Layout:** the left leaf is the index (chapters in Roman numerals, the Hush's eye sigil); the right leaf is the chapter. Arrow keys and PageUp/PageDown turn chapters; Escape closes. On a phone the close button sits in the index leaf's corner. `zz_zz_tome94.js` **[Act I]**
+- **Layout:** the left leaf is the index (chapters in Roman numerals, the Silence's eye sigil); the right leaf is the chapter. Arrow keys and PageUp/PageDown turn chapters; Escape closes. On a phone the close button sits in the index leaf's corner. `zz_zz_tome94.js` **[Act I]**
 
-- **Content:** nine chapters of in-world works (66 voices): The Reliquary; The Roads and the Stones; The Pale Order; The Gilded Peak; The Polished Heart; The Precious Wound; The House of Eight Million; Before the Last Breath; The Feuds. Each is a preface by the Sage (the Mysterious Stranger), the works, then Relics and Rites. It opens with the Sage's letter (dated 1114 of the Last Breath). Generated from `lore/chapters.py` + `lore/voices/*.md` by `lore/gen.py` into `zz_zz_tome94_text.js`. `zz_zz_tome94_text.js` `lore/gen.py` **[Act I]**
+- **Content:** nine chapters of in-world works (66 voices): The Reliquary; The Roads and the Stones; The Pale Order; The Gilded Peak; The Veiled Crone; The Bleeding Maiden; The Myriad; Before the Last Breath; The Feuds. Each is a preface by the Sage (the Mysterious Stranger), the works, then Relics and Rites. It opens with the Sage's letter (dated 1114 of the Last Breath). Generated from `lore/chapters.py` + `lore/voices/*.md` by `lore/gen.py` into `zz_zz_tome94_text.js`. `zz_zz_tome94_text.js` `lore/gen.py` **[Act I]**
 
 - **Unlock by discovery (for release):** all chapters are open during development; later chapters, paragraphs and relic entries unlock as the player finds them (meeting an order, picking up a relic, reading an inscription, entering a land), and unfound entries show as blank or scratched-out pages. `wiki/09` **[later]**
 

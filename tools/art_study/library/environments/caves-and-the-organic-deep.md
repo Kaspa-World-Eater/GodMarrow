@@ -75,7 +75,7 @@ later". Its course:
   high over the door ("move it higher").
 
 Derek's purpose for it: "This area can be an entrance to an underground area later after we fight the gatekeeper." In
-the seeded maps it is a set piece dropped in whole, as Diablo II drops fixed rooms (`docs/ACT1_PLAN.md`).
+the seeded maps it is a set piece dropped in whole, as Diablo II drops fixed rooms (`docs/archive/ACT1_PLAN.md`).
 
 ## What worked
 - Ray-casting organic forms along the game's camera (the eye from D- to B+ only as a true ball); refraction through

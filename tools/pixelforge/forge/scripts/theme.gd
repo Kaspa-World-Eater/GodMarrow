@@ -1,5 +1,5 @@
 extends RefCounted
-## scripts/theme.gd: the Forge's palette and faces (docs/track_notes/gui_look.md, docs/mockups/forge_app_v8.html).
+## scripts/theme.gd: the Forge's palette and faces (tools/pixelforge/docs/track_notes/gui_look.md, docs/mockups/forge_app_v8.html).
 ## Near-black, bone, iron and a dull ember gold for pointers and values; the blackletter banner face, the pixel text
 ## face for everything else. Every colour here is one of the mockup's. Fonts load straight from the files, no import.
 

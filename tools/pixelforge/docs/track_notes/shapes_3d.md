@@ -35,7 +35,7 @@ Why this is the refinement PixelForge needs:
 5. Authoring stays "the AI writes a file": the primitive list with materials is what the page's author wrote; the
    page proves an AI writes it in minutes. A painting is the reference for proportions, materials and colours.
 
-Changes to the shape-sprite track (docs/track_notes/shape_sprites.md) before it resumes:
+Changes to the shape-sprite track (tools/pixelforge/docs/track_notes/shape_sprites.md) before it resumes:
 - `shapes.py` renders 3D primitives (SDF) to a voxel shell and then to pixels with the recipe above; the 2D
   polygon renderer from the first page stays as the fast path for flat things (icons, effects, props without
   depth) and shares the shading rules.

@@ -112,7 +112,7 @@ Worst: the huts' walls (Derek: "the huts need a lot of work"). Derek asked for x
    Graded: the ribs now rise from the banks' feet in view, two great arcs framing the hamlet; their feet still end behind the near trees and foreground at the frame's bottom edges, so the heaved earth shows only partly. Ten refinement passes since Derek's x10 note done; remaining list in the next rules check.
    Derek's grade: C+.
 
-## Rework (2026-10-07, stage 1 of docs/REWORK_AND_SEEDS_PLAN.md)
+## Rework (2026-10-07, stage 1 of docs/archive/REWORK_AND_SEEDS_PLAN.md)
 - **From the engine:**
   - its trunks warped and channelled (`AUTO_WARP`);
   - normals unblurred;

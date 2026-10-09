@@ -5,7 +5,7 @@
 
 > "Every soul is a thread. I only hold the end of it up to the light, so it can see where it goes."
 
-## 1. The god and the order
+## 1. The god and the circle
 
 - **The god.** He serves **Yh'Anuul**, the god's **Soul**: the threads of fate the dead god wove, and still weaves.
 
@@ -13,21 +13,21 @@
 
 - Her aspects are the Spinner, the Weaver, the Unraveller and **the Hollow**, the empty space inside the weave where the pattern shows through.
 
-- **The order.** The Hollow Mystics serve the Hollow. They read the threads there with mirrors and bend them. Some of the other orders call that heresy.
+- **The circle.** The Hollow Mystics serve the Hollow. They read the threads there with mirrors and bend them. Some of the other faiths call that heresy.
 
-- **The feel.** Sufi in rhythm and imagery: lodges and circles, remembrance, the heart polished like a mirror, turning. No drums, no fur, no breath-rites (breath belongs to the Myriad).
+- **The feel.** Sufi in rhythm and imagery: lodges and circles, remembrance, polished mirrors, turning. No drums, no fur, no breath-rites (breath belongs to the Myriad).
 
 - **Other names for him:** **the Glass Man** (villagers turn their mirrors to the wall when he passes); **the Hundred-Faced** (anyone who looks at his coat sees their own face many times over); **Needle-Brother** (among mourners who pay him to sew their dead a little longer into the world).
 
 ## 2. Where he comes from
 
-- **The lodge.** The **House of the Polished Heart** stood where the Veiled Crone's threads surface in the Hide. Its people sat in circles and repeated the Crone's names until remembrance and the self were one thing. They taught that each Tithed life is a thread; at death it is drawn back through the Hollow, the eye of the loom, and woven again. Their work was polishing mirrors so the pattern could be read and a dying thread could find its way.
+- **The lodge.** The **Veiled Crone's lodge** stood where her threads surface in the Hide. Its people sat in circles and repeated the Crone's names until remembrance and the self were one thing. They taught that each Tithed life is a thread; at death it is drawn back through the Hollow, the eye of the loom, and woven again. Their work was polishing mirrors so the pattern could be read and a dying thread could find its way.
 
-- **The Polisher.** A foundling set to that work: twenty years with felt and ash, one of the Crone's names to every stroke. Above all he polished **the Pir's Coat**, sewn by every Pir with more iron and small round mirrors until only she could bear its weight.
+- **The Polisher.** A foundling set to that work: twenty years with felt and ash, one of the Crone's names to every stroke. Above all he polished **the eldest's coat**, sewn by every eldest of the circle with more iron and small round mirrors until only she could bear its weight.
 
-- **The Unravelling.** One winter the threads of a whole valley came loose at once. The Pir put on the coat and looked into the Hollow for forty nights. On the last night she said: *"There is no loom. It goes on and on, and it never finishes."* Then her own thread ran out of her hands.
+- **The Unravelling.** One winter the threads of a whole valley came loose at once. The eldest put on the coat and looked into the Hollow for forty nights. On the last night she said: *"There is no loom. It goes on and on, and it never finishes."* Then her own thread ran out of her hands.
 
-- **The mirrors uncovered.** The loose dead came home, wandering, asking which way. By custom every mirror in a house of death is covered; he pulled the cloth off the coat's mirrors instead. Each dead face met its own and stopped. **A soul cannot pass its own reflection.** The weave never finishes, and the order had been sending the dead into nothing. So he kept them. The choir of wisps that circles him is that valley's dead, each trailing its thread.
+- **The mirrors uncovered.** The loose dead came home, wandering, asking which way. By custom every mirror in a house of death is covered; he pulled the cloth off the coat's mirrors instead. Each dead face met its own and stopped. **A soul cannot pass its own reflection.** The weave never finishes, and the circle had been sending the dead into nothing. So he kept them. The choir of wisps that circles him is that valley's dead, each trailing its thread.
 
 - **The iron stood up.** He could not carry the coat and the dead together. He hung it on its post and asked the choir into the iron. The coat stood up as a knight twice his height, a lamp burning where the heart-mirror had been: the **Iron Golem**, which never dies for good, because the glass keeps count.
 
@@ -59,11 +59,11 @@ Rows open at levels 1, 6, 12, 18, 24 and 30. No cooldowns anywhere.
 
 **The Hall of Mirrors: the nerves and threads of the Hollow Mystic.** Cards in the head; roads along the spinal cord, the nerves of the arms and legs, the optic road, and threads rising above the crown (the Warp, the Weft, the Loose Ends). See `claude/godmarrow-body-board.md`.
 
-## 6. The order's enemies
+## 6. The circle's enemies
 
 - **The Pale Order** (the Ossuarch's order) wants every bone kept and standing. He keeps the soul and leaves the bone, and they call that waste.
 
-- **The flesh-houses** feed the dead back to the Wheel, where no thread is ever read again.
+- **The Bleeding Maiden's processions** feed the dead back to the Wheel, where no thread is ever read again.
 
 - **The Shrine Keepers** say his mirrors are cages, and a breath held forever.
 

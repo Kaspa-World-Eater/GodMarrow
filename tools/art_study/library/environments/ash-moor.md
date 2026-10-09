@@ -36,7 +36,7 @@ has blown thin, veins running in toward what they feed, black glass where blood 
 banked along the wind, ripples only on soft drift, crusted plates in patches on warped cells so no lattice shows,
 cinders and rare bone grit). The older seamless tiles in `art_study/tiles_moor.py` (`ash_0`, `hide_0`) are the retired
 tile road (MASTER_RULES 2b.6). For Godot, the plan is a ground shader painting from world position
-(`docs/ACT1_PLAN.md`, "The new art and the seeded maps").
+(`docs/archive/ACT1_PLAN.md`, "The new art and the seeded maps").
 
 **Objects and methods:**
 - The teeth of the Jaw (`landkit/tooth.py`, fang or molar in its gum) and the Gate's fangs (`fang.py`):

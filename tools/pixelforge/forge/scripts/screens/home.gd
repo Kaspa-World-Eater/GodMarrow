@@ -255,7 +255,7 @@ static func _prompt_screen(r: Dictionary, a: Dictionary) -> String:
 			return "effects"
 	return "characters"
 
-# ------------------------------------------------------------------ the Detail bench and Build (docs/FORGE_FROM_THE_GAME.md 3.1, 3.4)
+# ------------------------------------------------------------------ the Detail bench and Build (tools/pixelforge/docs/FROM_THE_GAME.md 3.1, 3.4)
 func _last_character() -> Dictionary:
 	var lc = app.cfg.get("last_character", {})
 	return lc if lc is Dictionary else {}

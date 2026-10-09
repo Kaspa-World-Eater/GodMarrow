@@ -1,7 +1,7 @@
 <!-- Orders · updated 2026-09-30 · 4746 words · source page #ossuarch -->
 # The Ossuarch
 
-*Class doc. Code id `ossumancer`. Lore rewritten 2026-09-29, fourth pass; skill trees redone 2026-09-30 (Ossuary · Bone · the Count). The class is still out of commission in the game (not yet ported to Godot).*
+*Class doc. Code id `ossumancer`. Lore rewritten 2026-09-29, fourth pass; skill trees redone 2026-09-30 (Ossuary · Bone · the Count). In the game the Ossuarch walks (2026-10-08): the Ossuary and Carapace trees are built, and the Count tree has 2 of its 12 skills, the Bone Blade and Tally (`04-systems-and-combat.md`).*
 
 **The user's direction, as it stands:**
 - **The order:**
@@ -61,7 +61,7 @@
 
 **Niche-Tally**
 
-> *A strip of bone cut with notches: the count of one wall in the Ossuary of Nine Stairs, taken each year at the Feast of the Laying.*
+> *A strip of bone cut with notches: the count of one wall in the Ossuary of Nine Stairs, taken each year on the Day of the Count.*
 > *The count is never lower than the year before. It is often higher than the dead that were brought.*
 > *The brothers call the difference "the Mother's gift" and do not write it down.*
 
@@ -107,7 +107,7 @@
 **Ossuarch's words** (his rare lines)
 
 > *"Look up. That is everyone we ever finished."*
-> *"The Hush takes. We give back. The difference is the whole of the Rule."*
+> *"The Unmaking takes. We give back. The difference is the whole of the Rule."*
 > *"I do not raise them. I ask. They were always going to stand."*
 
 ---
@@ -124,7 +124,7 @@
 
 **The reverence of bone.** A brother's life is spent in the company of bones, and all of it is devotion.
 - **The Laying:** every bone brought into an ossuary is washed, anointed with marrow, and set in a niche by a brother who says its name, or, if it has none, the name of the bone ("the long bone of the left arm, from the lowlands"). Nothing is laid anonymously.
-- **The Count:** once a year, at the Feast of the Laying, every wall is counted. It is the Order's great rite, and its most carefully kept record.
+- **The Count:** once a year, on the Day of the Count, every wall is counted. It is the Order's great rite, and its most carefully kept record.
 - **Handling:** a bone is always held in two hands. A dropped bone is a sin, and a broken bone a mourning.
 
 **The marrow** is the Order's second office, and its wealth.
@@ -147,7 +147,7 @@
 
 **The knighthood.** The Order is monastic, but it is not gentle.
 - **What they go down for:** its brothers are knights in plate of carved bone who go down into the lowlands to bring home the bones that lie out of place.
-- **The feuds:** they come from this. The flesh-houses want the meat, the lodges want the souls left in peace, and the Shrine Keepers want the dead given to the water. The Order carries the bones home anyway, politely, with an escort of the standing dead, and does not negotiate.
+- **The feuds:** they come from this. The Bleeding Maiden's processions want the flesh, the lodges want the souls left in peace, and the Shrine Keepers want the dead given to the water. The Order carries the bones home anyway, politely, with an escort of the standing dead, and does not negotiate.
 
 **Their manner:** stoic, grim, beyond hurry, beyond thanks.
 - **"Rest":** they never say it of anything that is not yet dust.
@@ -158,7 +158,7 @@
 - **Chant:** one line, sung low, falling a step on every stress, like a man breathing out under a load. A second voice would be a second will.
 
 **The Count (the Order's numerology, 2026-09-29).** The Pale Order counts, and its counting is a faith.
-- **Numbers outlast names.** The Hush unsays names, and the Order believes it cannot unsay a number. So every bone laid is given two things: its spoken name, and its number in the Great Count. In the Order's books a brother is written by his number.
+- **Numbers outlast names.** The Silence unsays names, and the Order believes it cannot unsay a number. So every bone laid is given two things: its spoken name, and its number in the Great Count. In the Order's books a brother is written by his number.
 - **Roots.** Every count is reduced to its root by adding its figures until one figure is left (2,061 → 9).
   - **Nine is the Mother's root, because nine keeps itself:** any count taken nine times comes back to nine. So there are nine great ossuaries and nine stairs, the Ninth Stair holds the Count, and prayers are said in nines.
   - A count whose root is not nine is an **open count**, unfinished. Talliers carry open counts in their heads until they close.
@@ -194,23 +194,19 @@
 
 - **What the Rule really is.** The Order says it helps the Mother bear the world. On the Ninth Stair the teaching is quieter:
    - **Keep her where she is.** Hold her in her halls. Let finish, with honour and a rite, as much of her as will finish.
-   - **The Hush would end her all at once,** and the Hide with her. The Order will not allow that, and cannot allow the other thing either. So it keeps the count, and sweeps, and sings, and does not say the word.
+   - **The Silence would end her all at once,** and the Hide with her. The Order will not allow that, and cannot allow the other thing either. So it keeps the count, and sweeps, and sings, and does not say the word.
 
 *The designer's truth, for us only:* **the Bone is growing.** Slowly, without a plan, it encroaches and calcifies. The Order reveres it and is containing it, and both are true. Never state this in the game; let the count, the stairs, the weights and the sky say it.
 
 ## 5. The man
 
 *We don't need to know much about him, and neither does the player.*
-- **What is seen:** a colossal figure in carved bone plate, who comes down out of the Ossa range with an escort of the standing dead and goes wherever bones lie out of place.
-- **What is known:** he calls himself an Ossuarch. No ossuary will open its gate to him.
-- **What is said:**
-  - His ossuary went quiet, and he is the last who came out of it.
-  - He was sent down to carry home every bone in the lowlands before the Hush can take them.
-  - He read the weights on the Ninth Stair and walked out.
-  - His plate has more bone on it every year than the year before, and the Order has noticed.
-  - He was never a brother at all, but something from the oldest niches, wearing a brother's armour.
-- **What he says about it:** nothing.
-- **Other names:** **Grandfather Dust** in the lowland villages, where children are told he will sweep them up; **the Ungated**, in the Order.
+
+He is a colossal figure in carved bone plate. He comes down out of the Ossa range with an escort of the standing dead and goes wherever bones lie out of place. He calls himself an Ossuarch, and no ossuary will open its gate to him.
+
+The stories about him do not agree. Some say his ossuary went quiet and he is the last who came out of it. Some say he was sent down to carry home every bone in the lowlands before the Unmaking can take them, and some that he read the weights on the Ninth Stair and walked out. Others say his plate has more bone on it every year than the year before, and that the Order has noticed, or that he was never a brother at all, but something from the oldest niches, wearing a brother's armour. He says nothing about any of it.
+
+In the lowland villages he is **Grandfather Dust**, and children are told he will sweep them up. In the Order he is **the Ungated**.
 
 ## 6. How he plays (the lore behind the mechanics)
 
@@ -273,15 +269,15 @@
 
 ## 8. The order's enemies
 
-- **The Hush and its servants:** the enemy the Rule exists for. The Order hates the Silence the way a mason hates frost, because it takes with no rite at all.
+- **The Silence and its servants:** the enemy the Rule exists for. The Order hates the Silence the way a mason hates frost, because it takes with no rite at all.
 
-- **The Order of the Gilded Peak** (the Empty Hand's order): the Peak gilded its dead and gave them to the Hush, and left no bone.
+- **The Gilded Peak** (the Empty Hand's monastery): the Peak gilded its dead and gave them to the Silence, and left no bone.
 
-- To the Order that was the worst sacrilege in the world. So its standing dead went up the Peak's stair to carry the monks' bones home before the Hush could.
+- To the Order that was the worst sacrilege in the world. So its standing dead went up the Peak's stair to carry the monks' bones home before the Silence could.
 
 - What happened in the Peak's courtyard afterwards, the Order does not discuss (see `claude/godmarrow-class-kusho.md`).
 
-- **The flesh-houses of the Red Mother** (the Hemomancer's brotherhoods): two mothers and one dead world between them. They have fought for centuries over the dead, the houses claiming the meat and the Order the frame.
+- **The processions of the Red Mother** (the Hemomancer's faith): two mothers and one dead world between them. They have fought for centuries over the dead, the processions claiming the flesh and the Order the frame.
 
 - **The Hollow Mystic's lodges:** they keep souls and let bone lie. The Order calls it neglect, and the lodges call the standing dead a desecration.
 

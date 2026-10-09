@@ -8,7 +8,7 @@
 
 > "Give it to me. All of it. I have room."
 
-## 1. The god and the order
+## 1. The god and the shrines
 
 - **The god: the Myriad.** She serves **Breath**: the god's last breath, and the small spirits of every stone, river and bell that ride it.
 
@@ -22,9 +22,9 @@
 
 - It is never called "rot".
 
-- **The order: the House of Eight Million**, Shinto purifiers.
+- **The faith: the Myriad**, Shinto purifiers.
 
-- A **katashiro** is the paper doll that takes a person's impurity in the old rite. The House's purifiers make themselves into that doll.
+- A **katashiro** is the paper doll that takes a person's impurity in the old rite. The Myriad's purifiers make themselves into that doll.
 
 - They breathe the distortion out of the world, hold it in their own lungs, and breathe it back out at whoever made it.
 
@@ -58,7 +58,7 @@
 
 - The knights of the Pale Order had dredged the Fen's drowned dead and stood them up down there, and the raised bone came up bent.
 
-- Seven purifiers went down. The older six ran out of room and walked off into the water as **oni**, carrying what they had taken.
+- Seven purifiers went down. The older six ran out of room and walked off into the water as **the Horned**, carrying what they had taken.
 
 - At the spring, Akane breathed in a century of distortion at once.
 
@@ -74,9 +74,9 @@
 
 - Shiori walks the Hide in faded vermilion and white, a fan in her hand and a cloud at her back.
 
-- She keeps the shrines the House forgot, and turns their guardian stones back from the wall.
+- She keeps the shrines her faith forgot, and turns their guardian stones back from the wall.
 
-- She is running out of room. Every katashiro ends as an oni.
+- She is running out of room. Every katashiro ends as one of the Horned.
 
 ## 3. How she plays
 
@@ -108,23 +108,23 @@
 
 **Distortion** (tab 1): Needle Sentry · Blur · Miasma Wake · Haze · Sighing Bladder · Mirage · Siren Lure · Warped Miasma (passive) · The Mirror-Sister (passive) · The Unseen (passive)
 
-**Death** (tab 2): Rending Arc · Grave Strike · Impaling Thrust · Crow's Heel · Death's Step · Reap · Raven Flurry (hold) · Death's Head (passive) · Execute · Sigil Mastery (passive)
+**Death** (tab 2): Rending Arc · Grave Strike · Impaling Thrust · Hanged Man's Heel · Death's Step · Reap · Black-Rag Flurry (hold) · Death's Head (passive) · Execute · Sigil Mastery (passive)
 
-**Text to tidy:** some descriptions still say "Sigil" where the HUD says Omen; Crow's Heel and Raven Flurry carry bird names in a world with no animals.
+**Text to tidy:** some descriptions still say "Sigil" where the HUD says Omen, and a few still name Crow's Heel and Raven Flurry, which are now Hanged Man's Heel and Black-Rag Flurry.
 
 ## 5. Her body board
 
 **The Well-Shrine: the breath of the Shrine Keeper.** Cards over the lungs; roads along the windpipe, breath leaving the mouth, and two winds curling round the body. Notables: the Held Breath, the Fan Unfolded, Salt on the Threshold, Grandmother Wind, the Undertow, the Mouth of the Well.
 
-## 6. The order's enemies
+## 6. The Myriad's enemies
 
-- **The Pale Order** (the Ossuarch's order): the oldest feud. The House lets the dead go into the water; the Order's knights dredge the bones back up to stand.
+- **The Pale Order** (the Ossuarch's order): the oldest feud. The Myriad lets the dead go into the water; the Order's knights dredge the bones back up to stand.
 
-- **The flesh-houses of the Maiden:** mindless flesh warps essence faster than anything. They are her worst enemy and, grimly, her best supplier.
+- **The processions of the Maiden:** mindless flesh warps essence faster than anything. They are her worst enemy and, grimly, her best supplier.
 
-- **The Hollow Mystic's lodges:** uneasy cousins. They hold souls in mirrors, and to the House that is a breath held forever.
+- **The Hollow Mystic's lodges:** uneasy cousins. They hold souls in mirrors, and to the Myriad that is a breath held forever.
 
-- **The servants of the Silence:** the enemy the House fears most. Where they pass there is nothing left to breathe in. Distortion can be carried. Nothing cannot.
+- **The servants of the Silence:** the enemy the Myriad fears most. Where they pass there is nothing left to breathe in. Distortion can be carried. Nothing cannot.
 
 ## 7. Look
 

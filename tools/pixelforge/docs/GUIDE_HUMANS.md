@@ -441,7 +441,7 @@ longer"). To look: `pixelforge shapes preview FILE --clip walk
 turntable FILE -o turn.gif` a spin. To put one in the game: `pixelforge project build <character> -p <project
 folder>` does the whole road (import, every clip in eight directions with the painted detail and the light, the
 game's atlas, `skins.json`, the height check); the steps on their own are **import-shapes**, **render-shapes** and
-**export-game** (the step-by-step list for an assistant is `docs/GUIDE_SESSION.md` in the game repository).
+**export-game** (the step-by-step list for an assistant is `tools/pixelforge/docs/GUIDE_SESSION.md` in the game repository).
 
 ## Detail: the painted detail that rides the parts
 

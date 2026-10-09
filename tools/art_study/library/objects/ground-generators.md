@@ -57,7 +57,7 @@ a 320 x 160 iso diamond (about 9 yd across) under a plain moon, no scene; surfac
 neighbouring tiles cut from one stretch of ground, each different, meeting without a seam. Preview
 `landkit/previews/tiles_sheet.png`.
 
-**For the game** (`docs/ACT1_PLAN.md`): the generators cannot be stored as images per zone (a Moor alone would be tens of
+**For the game** (`docs/archive/ACT1_PLAN.md`): the generators cannot be stored as images per zone (a Moor alone would be tens of
 megapixels at 36 x 18 px a yard, times seeds and zones). The plan is to **port them to a Godot ground shader**, as the
 blood already is (`shaders/blood_pool.gdshader`): colour and normal from world position, unique without end, no storage,
 lit by the game's lights so the form law holds in the game. Not built yet.

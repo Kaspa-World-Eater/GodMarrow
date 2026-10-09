@@ -1,5 +1,5 @@
 """The baker (landkit): every piece rendered through the same scene engine as the scenes (tools/art_study/wood_scene.py),
-alone on bare ground under the moon, and cut out in the game's form (docs/REWORK_AND_SEEDS_PLAN.md, stage 2). So the
+alone on bare ground under the moon, and cut out in the game's form (docs/archive/REWORK_AND_SEEDS_PLAN.md, stage 2). So the
 assets carry every technique the scenes have: the warped, channelled trunks, the form law, the real normals, the moon's
 shadows. Written for the game as world/landkit.gd reads a set:
 

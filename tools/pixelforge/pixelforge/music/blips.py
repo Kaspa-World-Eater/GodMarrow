@@ -1,4 +1,4 @@
-"""The Forge app's interface sounds, in the family's voice (docs/track_notes/gui_look.md, "Motion and sound
+"""The Forge app's interface sounds, in the family's voice (tools/pixelforge/docs/track_notes/gui_look.md, "Motion and sound
 discipline"): a square-wave cursor blip (higher for right and down, lower for left and up), a two-note confirm (a
 single short bell click: never a sweep, never a laser), an iron scrape for a lever, a ratchet
 tick for a wheel, a chain's clunk, a low thud for back, a soft bell for a finished job, a dull knock for a stopped

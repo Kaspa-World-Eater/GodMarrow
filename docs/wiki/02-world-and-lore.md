@@ -1,158 +1,240 @@
-<!-- World · updated 2026-09-29 · 2351 words · source page #world -->
-# 02 · The world and its lore
+# 02 · The world
 
-*God names follow `claude/godmarrow-naming-codex.md`. Every in-game line lives in `src/zz_voice.js` (readable copy: `claude/godmarrow-voice-lines.md`).*
+*Rewritten 2026-10-08. This page is the world as design: what the pilgrim walks through, what the creatures are, how
+the world shows itself in play. The myths, told in the world's own voices, are in `mythology/`; every Act I place has
+its page in `mythology/areas/`; everything decided about the lore, with its sources, is in `mythology/backstage.md`.
+Derek's newest dated ruling in `01-rules-and-decisions.md` wins over all of it.*
 
 > Everything that lives here grew out of a dead god. Nothing was born; everything was shed.
 
-## 1. Cosmology
+## 1. The world in brief
 
-- **The Silence came first** (Ur-Nihl, the Hush): not darkness, but the absence of anything that could be named.
+**The corpse.** The world is the corpse of a dead god, which scholars call the Reliquary.
+- Nobody knows whose corpse it is, or how the god died. Every people tells it differently, and all the tellings are
+  canon as beliefs.
+- What every faith agrees on: the ground is warm, the dead do not stay down, and things still come up out of the body.
 
-- **The god** of three natures, **Soul, Bone and Flesh**, held a space open inside the Silence. The Silence **unsaid** it, one name at a time, until it forgot how to be three-in-one and died.
+**Where the acts lie on it:**
+- **Act I** is the Hide, the skin. It begins at the edge of the world, on black sand by the Red Water, a sea of blood
+  nobody there knows is a sea.
+- **Acts II to IV** are the bones, the flesh and the heights.
+- **Act V** goes down inside the body.
+- **The god shows more the deeper you go.** In the first lands, the world looks almost ordinary.
 
-- **Its corpse is the world: the Reliquary.** Its true name is lost; "Triune", "the Three-in-One" and "the God Beneath" are only descriptions.
+**The Age of the Last Breath.** It is the year 1114 of the common count.
+- Most history is lost; knowledge is the rarest thing there is.
+- The people, the Tithed, live in toil, keeping what is left of the world going.
+- The god's last breath is still leaving the corpse, and people live in that breath.
 
-- **The godmarrow:** what still lives in the corpse's bones, in everything that walks. Every order draws on it differently.
+**The people.** The Tithed descend from the congregation that knelt inside the god when it died.
+- They are the only things in the world not made of the god, so the god's pieces want them back: some to take inside,
+  some to wear.
+- **The double Tithe:** to be tithed is also to be hollowed out. Both meanings stand (Derek, 2026-10-05).
 
-- **Breath:** the god's last breath and the small spirits of every stone, river and bell that ride it are **the Myriad**.
+**No animals.** Every creature is a piece of the god that forgot it was part of something: a thought that grew teeth,
+a prayer that grew skin. Allowed exceptions:
+- insects;
+- the moor's crows;
+- the Sunken Bog's long-dead serpent god.
 
-- **Miasma** is breath gone wrong, essence twisted out of true. **Never called rot.**
+**Every lantern burns a soul,** one that chose to be kept rather than go down with the last breath:
+- it chooses whom it follows;
+- when you fall, it carries you back to the lantern-stones, and keeps a little of you each time.
 
-- **No animals.** Every creature is a piece of the god that forgot it was part of something: a cell that grew legs, a thought that grew teeth, a prayer that grew skin. The deeper you go, the older and stranger.
+## 2. The powers and the faiths
 
-- **The Tithed** (people) descend from the congregation inside the god, at worship, when it died. They are the only things not made of the god; its pieces want to **eat** them or **become** them.
+| Power | Old name | What it is now | Faith (its word) | Calling | Herald | Altar name |
+|---|---|---|---|---|---|---|
+| Bone | Oss-Vharoth | the skeleton that refuses to lie down; the Bearing Mother | the Pale Order (order) | the Ossuarch | the Marrow Pontiff | Old Upright |
+| Soul | Yh'Anuul | the threads of fate, still weaving with no pattern | the Veiled Crone (circle) | the Hollow Mystic | none yet | (open) |
+| Flesh | Nol-Shogthuth | the flesh that keeps growing without a mind | the Bleeding Maiden (procession) | the Red Penitent | **open** (see below) | the Red Mother |
+| Breath | none; asking is an insult | the last breath, and the small gods riding it out | the Myriad, the Shrine Keepers (shrine) | the Shrine Keeper | the Long Exhale | the Last Breath |
+| the Silence | Ur-Nihl (taboo) | the space between words, holding all meaning | the Gilded Peak, fallen in 1098 (monastery) | the Empty Hand | a Silent One | That Which Cannot Be Named |
 
-- **Corpses:** anything made of the god leaves a corpse, because the god is still dying. The Silence's servants leave nothing.
+**The faiths' words are proposed, not confirmed** (order, monastery, circle, procession, shrine). There is one cult, the
+Second Mouth, hidden in the processions.
 
-- **The Pale Order (Bone):** an ancient order, as old as the world or so it claims, that keeps the ossuaries of the Ossa range, built over ruins older than itself. It reveres bone and calls the Bone **the Bearing Mother**. It tends the bones and the marrow, and its dead stand vigil in their niches. Bone gone to dust is sacred, the only thing in a dying world that has finished, and it is given to the wind in sky funerals. The Order hides something. See `claude/godmarrow-class-ossuarch.md`.
+**The Flesh herald's name is open.** The game still shows "the Wet Nurse", which Derek retired. "The Weeping Gash"
+was proposed, but the Maiden's faith is never "Weeping".
 
-- **Each hero stands alone.** Their orders feud (see each class page).
+**Heralds** wake at rare god altars, and only they grant Major Arcana. An altar shows its speaker's name, never the
+true name.
 
-| Power | True name | What it is now | Order |
-|---|---|---|---|
-| Soul | Yh'Anuul | the threads of fate the god wove and still weaves | Hollow Mystic |
-| Bone | Oss-Vharoth | the skeleton that refuses to lie down | Ossuarch |
-| Flesh | Nol-Shogthuth | the flesh that keeps growing without a mind | Hemomancer |
-| Breath | none (the Myriad) | the last breath and the small spirits riding it | Shrine Keeper |
-| the Silence | Ur-Nihl (taboo) | what killed the god, leaking in through its wounds | The Empty Hand |
+**The callings are callings,** never particular people: the player decides who they are.
 
-## 2. The lanterns: the Wickbound (v74)
+## 3. The world in play
 
-- **No lantern in the Godmarrow burns oil.** Each is lit with a soul that chose to be kept rather than go down into the Last Breath: a pilgrim who fell on the road, a mother from the crypt niches, someone nobody remembers. The soul is the flame.
+**Light.**
+- Light is sacred and practical; the dark is the danger.
+- The lantern is the key light: a pool that pushes the dark back.
+- Creatures are known by their eyes in the dark, and the eyeless are the jump scares.
+- Wick-Saints and Gasps react to light; Silent Ones eat it.
+- Day and night matter: the night makes creatures at most 15% bolder, and its darkness bottoms out at 0.52.
 
-- It **chooses whom it follows** and goes where they go, a little behind, a little to one side, the way a dog walks with you at night. It can't be struck or commanded.
+**The lantern.**
+- **In the game now:** it floats at head height and follows the hero (Derek, 2026-10-01), drifting behind on the
+  walk and coming to the side when the hero stops. Its flame struggles near death and gutters when something great
+  wakes.
+- **Derek's ruling (2026-10-05):** a bearer will carry it, each calling's own small companion (the Ossuarch's is the
+  Candle-Hand). Its perks are benign: slow, fear, regeneration, radius, never damage. Not built yet.
 
-- When you fall, it **carries your anima back** to the lantern-stones and **keeps a little of you** each time; that is what it burns. (Existing return line: *"The lantern gives you back. It keeps a little, as it always does."* Lantern inscription: *"Dust on the glass. Wipe it. It is someone."*)
+**Poise** is the Tithed body refusing to fall. Monsters have poise too.
 
-- **In play:** the lantern floats at shoulder height beside the hero; its light makes the pool on the ground; its flame struggles when you're near death and gutters when something great wakes. See `04-systems-and-combat.md` §Light.
+**Materials matter in a fight.** Every object has a cover height, a material and hit points:
+- shots stop in what is taller than their flight;
+- fire takes dry wood, water douses it;
+- bone and stone shatter shots;
+- stone stops burrowers, and doorways stop giants.
 
-## 3. Mechanics that express the world
+**Weather acts on the world by material,** never as a layer over it.
 
-- **Poise** is the Tithed body refusing to fall. Monsters have poise too (Path of Exile 2 rules).
+**The dead and the lost.** Death is like Diablo II and Dark Souls together: something is dropped where you fell, and
+you walk back for it.
 
-- **Light** is sacred and practical: the dark is the danger; creatures' eyes catch your lantern; Gasps and Moth-Saints react to light, Silent Ones eat it; day and night matter (the Empty Hand is bound to them).
+## 4. Openness
 
-- **Water** douses fire. **Stone** stops burrowers. **Doorways** stop giants.
+**Derek's rule:** "We want all the open spaces and not overcrowding or too many narrow spaces. Act 5 and Act 1 [of
+Diablo 2] are really good examples."
+- **Outdoor zones** are big and open. Woods clear into meadows. Props are sparse, and there are long corridors between
+  giant trunks.
+- **Dungeons** have wide halls and boss rooms that are never sealed.
+- **Paths may be tight where a land calls for it:** the Sunken Bog's maze, like Diablo II's maggot lair, is tight
+  single-file walking broken by open chambers.
 
-## 4. The openness rule
+The old browser build's numbers (outdoor zones 120 to 180 tiles a side, 52 to 82% open, halls 5 to 7 wide, boss
+arenas at least 16 by 16) are a reference for intent, never a port.
 
-> "We want all the open spaces and not overcrowding or too many narrow spaces. Act 5 and Act 1 [of Diablo 2] are really good examples."
-> - **Outdoors:** 120–180 tiles a side, 52–82% open ground, roads 5–6 wide, groves that clear into meadows, sparse props (trees deliberately halved; `z.__treesHalved`).
-> - **Dungeons:** rooms 13–21 tiles, halls 5 wide (7 in catacombs and monasteries), boss arenas ≥16×16 and **never sealed**.
-> - **Some channeling (v89):** 2–4 loose tree lines or broken colonnades per open zone, sometimes paired into lanes, always with gaps and open ends (`zz_zz_world89.js`).
-> - **Toolkit:** `zz_openness.js` (`buildOpen`, `wideDungeon`, `spreadPacks`); narrowest point on any route to a portal ≥5 tiles.
+## 5. The acts
 
-## 5. The acts (first playthrough ends around level 36–40)
-
-| Act | Region | Monster levels | Town | Act boss |
+| Act | Region | Creature levels | Town | The act's end |
 |---|---|---|---|---|
-| I | **The Hide**: Ashen Moor, Hollow Wood, Drowned Fen, barrows, crypts, catacombs (25 zones) | 1–17 | Maren's camp on the Moor | the Ossuary Matron (in `cata2`); the Carrion Warden guards the crypt |
-| II | **The Bleached Barrens of Ossa** | 18–24 | Citadel of the Shattered Femur (`a2_town`) | Saint Calcifer, in the Empty Socket |
-| III | **The Parasitic Fen of Shog-Mire** | 24–30 | Kettlewick Stilts (`a3_town`) | the Brood-Mother, in the Blood-Basin |
-| IV | **The Frigid Heights of An-Vhar** | 30–34 | Bellrest Hearth (`a4_town`) | the Chime-Abbot, Summit of the Unrung Bell |
-| V | **The Descent** into the body | 34–40 | The Last Vigil (`a5_town`) | the Thought of the Slayer, Alien Temple of the Slayers |
-| side | **The Scar of Ur-Nihl** and the Silent Monolith | 36–40 | none | none |
+| I | **The Hide** (25 zones, plus the new start) | 1–17 | the shore folk's fallen village on the Red Shore, with only the merchant (to build); the Ashen Moor's bare camp stands in | the Ossuary Matron, in the lower catacombs; the Carrion Warden keeps the Hollow Crypt |
+| II | **The Bleached Barrens of Ossa** | 18–24 | the Citadel of the Shattered Femur | Saint Calcifer, in the Empty Socket |
+| III | **Shog-Mire** | 24–30 | the Kettlewick Stilts | the Brood-Mother, in the Blood-Basin |
+| IV | **The Heights of An-Vhar** | 30–34 | Bellrest Hearth | the Chime-Abbot, at the summit of the Unrung Bell |
+| V | **The Descent** into the body | 34–40 | the Last Vigil | the Thought of the Slayer, in the Slayers' temple |
+| beyond | **The Scar of Ur-Nihl** and the Silent Monolith | 36–40 | none | none |
 
-**Zones**
-- **Act I:** Moor, crypt, fen, barrow, two catacombs; Sighing Ridge, Ash Shore, Burnt Heath, Fern Gully, Pilgrim Road, Drowned Village, Sunken Bog; Fallen Monastery, Wolf-Den Chapel, Plague Hospice, Well-Shaft, Smugglers' Hold, Bog-Witch's Shack; Tree-Hollow, Hunter's Cache, Fallen Watchtower, Broken Bridge; Hollow Wood, Root Deep.
-- **Act II:** Bleached Dunes, Reliquary Avenue, Buried Chapter-House, Valley of Standing Ribs, Chalk Flats, Sand-Choked Tomb, Field of Fallen Standards, Dry Oasis, Marrow Cavity, Empty Socket.
-- **Act III:** Heartbeat Flats, Weeping Mangroves, Fetish-Tree Groves, Blood Delta, Amber-Grease Mire, Brood-Banks, Causeway of the First Brood, Leech-Sumps, Egg-Galleries, Ziggurat of the First Brood, Blood-Basin. *Heartbeat mud:* every 1.7 s it clutches, slowing you a further 40%.
-- **Act IV:** Chime-Foothills, Glass Pass, Prayer-Flag Terraces, Field of Lantern-Spires, Cloud-Shelf, Wind-Scoured Ridges, Stair of the Sky-Climbers, Breath-Caves, Bell-Hollow, Sky-Climber's Monastery. *Chime-winds* drain poise, never below 35%; lanterns and spires give shelter.
-- **Act V:** Grand Calcified Highway, Siphon Vaults, Sanguine Cavity, Valve Gates, Shaft of Fading Echoes, Digesting Crucible, Cerebrum Labyrinth, Alien Temple of the Slayers.
-- **Ids:** Act N zones are `aN_*`, town `aN_town`, lair `aN_lair`.
+**The first playthrough** ends around level 36 to 40. Killing an act's last creature opens the way to the next act's
+town. Derek's order (2026-10-05) stands: finish and polish Act I before anything new.
 
-## 6. Act I details worth remembering
+## 6. Act I's lands
 
-- **The Ashen Moor** is the god's cheek, where it struck first. The ash is warm because the flesh beneath is still cooling; black glass forms where a Husk's blood ran into the ash. Landmarks: the Sighing Lantern, the Widow's Stumps, the Broken Kneeler, the Ashwake milestones.
+Every zone has its page in `mythology/areas/` (start at its `README.md`): what is told of it, and a brief for
+building it.
 
-- **The Rib Crypts** are dug between the god's ribs; the flagstones lift as something below breathes. Landmarks: the Empty Reliquary of Sister Un, the Weeping Rib, the Counting Wall, the Long Candle.
+**The start: the Red Shore** (new, 2026-10-08):
+- black sand at the edge of the Red Water;
+- then inland through a real coast's bands to the old growth, where the shore folk's village stands, fallen after
+  seven winters' siege;
+- the culture is a Thai and Northwest Coast fusion, in a Dark Souls mood;
+- it is safe, with one mad merchant.
 
-- **The Barrows** hold the Tithed's own dead, who rise wrong; every barrow-lid is dished inward. Landmarks: the Turned Mound, Widow's Lane, the Grieving Stone, the Empty Ninth.
+**The dry side:**
+- the Ashen Moor (the god's cheek; a bare camp now);
+- the Sighing Ridge, the Ash Shore, the Burnt Heath;
+- Fern Gully, the Hunter's Cache;
+- the Gnawed Chapel.
 
-- **The Drowned Fen** is the god's lymph: clear water that does not wet. The Well-Shrine stands here; below it, Minasoko-dō, the Drowned Nave. Landmarks: the Kneeling Arch, the Reed That Points Home, the Iron Hook.
+**The dead:**
+- the Old Barrow, the Fallen Watchtower;
+- the Hollow Crypt (the Rib Crypts), the Fallen Monastery;
+- the Bone Catacombs, upper and lower;
+- the Plague Hospice, the Smugglers' Hold.
 
-- **The catacombs:** upper, the pilgrim ossuary with bone laid as sermons; lower, the patterns forget themselves, and at the bottom there is something warm.
+**The wet country:**
+- the Drowned Fen (the god's lymph, the Well-Shrine);
+- the Drowned Village, the Well-Shaft;
+- **the Sunken Bog** (built: the Long Back, a dead serpent god's spine);
+- the Bog-Witch's Shack.
 
-- **The Hollow Wood** is the god's veins stood up as pale trees; luminous fungi in three colours; every tenth trunk holds something the god was carrying. Landmarks: the Ribcage Bough, the Niche Candle, the Sword-in-Root.
+**The wood and the deep:**
+- the Hollow Wood (the god's veins stood up as pale trees);
+- the Pilgrim Road, the Tree-Hollow;
+- the Root Deep (the country under the Hide; it breathes);
+- the Broken Bridge.
 
-- **The Root Deep** (Ne-no-kuni) is the country under the Hide, and it breathes; the oni's road down.
+**The Hide showing through:** in each outdoor zone, a few rare, unexplained pieces of the body:
+- a rib arching from the turf;
+- a vein breaching the soil;
+- a patch of skin with pores and coarse hairs;
+- a pool that looks back like an eye.
 
-- **The Hide showing through (v66):** 2–6 rare, unexplained organic pieces per Act I outdoor zone: a rib arching from the turf, a vein breaching soil, a patch of skin with pores and coarse hairs, a pool that looks back like an eye.
+There are fewer near the start and more deeper in.
 
-- **The dead herd (a quiet cow-level homage):** on the Burnt Heath, the corner farthest from the road, seven great horned carcasses lie in a ring facing the same way, with skull heaps. First visit: *"The herd lay down here, facing the same way. The ground between them was opened once, and closed."* (Its king, the Hollow King, is parked; see backlog.)
+## 7. Towns and their people
 
-- **Pilgrims' camps** (a tent and a banked fire, ~60% of open zones), **wayside saint/angel statues** by roads, **gibbet cages** at the edges.
+**Towns are safe.** Each has buying and selling, the shared stash, a waystone and the Stranger, and most have a
+healer, a smith and someone with work.
 
-## 7. Towns, errands and the road
+| Act | People |
+|---|---|
+| I | **the merchant** (the new start: a little mad, mocking the pilgrim's ignorance, picking the village clean). The old camp's people, Maren (vendor), Sister Ysolde (healer), Brannoc of the Nail (smith) and Warden-Crone Esk, are parked: whether they return is Derek's |
+| II | Qasim the Dust-Factor; Mother Oss-Ana; Ibbat the Knuckle-Smith; the Last Reliquarist |
+| III | Lugh the Eel-Monger; Asheth the Leech-Wife; Old Tamb; Priestess Ninsun |
+| IV | Dorje the Salt-Trader; Sister Palden; Chime-Wright Ulan; Brother Tenzar |
+| V | the Tallow-Merchant; the Nurse Without a Face; Ferrous; the Hollow Seer |
 
-- **Towns are safe.** Each has a vendor, healer, smith, quest-giver, the Stranger, the Reliquary Chest (shared 48-slot stash) and a waypoint.
+**To fix when those acts are made** (flagged for Derek):
+- **Act III's "Eel-Monger" and "Leech-Wife"** break the animal-word law.
+- **Act IV's names** (Dorje, Palden, Ulan, Tenzar) are Tibetan, which is ruled out for the Peak and the Order; whether
+  the Heights keep them is open.
 
-| Act | Vendor | Healer | Smith | Quest-giver |
+**No tutorials, ever, from anyone.** People talk about their own lives.
+
+## 8. Act I's creatures
+
+Nothing flashes. Each creature has a tell and a counter, and its behaviour is its own (the game's AI kind is in
+brackets).
+
+| Creature | What it is | How it fights | Tell | Counter |
 |---|---|---|---|---|
-| I | Maren | Sister Ysolde | Brannoc of the Nail | Warden-Crone Esk |
-| II | Qasim the Dust-Factor | Mother Oss-Ana | Ibbat the Knuckle-Smith | The Last Reliquarist |
-| III | Lugh the Eel-Monger | Asheth the Leech-Wife | Old Tamb | Priestess Ninsun |
-| IV | Dorje the Salt-Trader | Sister Palden | Chime-Wright Ulan | Brother Tenzar |
-| V | The Tallow-Merchant | The Nurse Without a Face | Ferrous | The Hollow Seer |
+| Husk; Drowned Husk | a pilgrim who drank from the wound; one the water kept | waits until three gather, then surges (husk) | head snaps up, arms spread | pull a few at a time; fight in a doorway |
+| Tithe-Hand | a severed hand of the god, running on its fingers | packs circle and dart in from behind; the hurt flee (flank) | fingers tense and spread | back to a wall |
+| Weeper; Ossuary Weeper | a faceless mourner whose tears harden into bone needles | keeps its distance behind cover (kiter) | tilts its head back | break the line of sight; corner it |
+| Gasp; Mire Gasp | a stray scrap of breath, a veil of mouths | drifts through walls, recoils from light (ghost) | breathes in, the veil billows | fight near lanterns and fire |
+| Chorister | one of the singers, still singing | drifts and sings (ghost) | the note rises | silence it fast |
+| Pyre-Saint | a martyr whose faith still burns | leaves burning footprints, erupts (pyre) | flames roar white | water douses it; or range |
+| Bellwether | a hulk with its head sealed in a bell | tolls, then charges; a wall stops it cold (charger) | two tolls | stand before a wall and sidestep |
+| Vein-Borer; Mire and Elder Vein-Borer | a severed artery, still pumping | burrows and erupts under you (burrow) | a ring of dark bubbles | stand on stone or a road |
+| Wick-Saint; Wick-Saint of the Canopy | a white face of the old court, worn by a moth | swoops in an arc and climbs away (flyer) | wings fold back | strike during the swoop |
+| Gravebloat; Bloatling | a walking stomach | shuffles close and bursts (bomber) | swells, gurgles | range, or let it burst in a crowd |
+| Ossuary Warden | a bone knight with a skull tower-shield | blocks everything from the front (shield) | the shield lowers | flank it, or break its poise |
+| the Trunk-Thing | a great hulk of the Moor and the Root Deep (not yet described in the lore) | a wall that walks (shield) | | flank it |
+| Marrow Duelist | a skeleton fencer | parries flurries, ripostes (duelist) | the blade tip rises | slow heavy blows; spells |
+| Kneeler | a penitent still on its knees, one of those who never came out | comes on its knees with the packs (husk) | the head lifts | as for Husks |
+| Stalker Crone | an old woman in the tall grass | stalks, unseen until close (stalker) | the grass parts | keep your lantern high and turn |
+| the Carrion Warden | the crypt's keeper, who forgot what he guarded | the Hollow Crypt's master (boss) | | |
+| the Ossuary Matron | she counts the dead she stands up | Act I's last (boss) | | |
 
-- **Errands** (J opens the journal): about 5–6 per act: kill, relic, shrine (hold through two waves), captive, seal (three seals open a vault), zone boss, act boss. Rewards: skill/stat points, resistances, gold, uniques, Arcana.
+**Ideas not yet built:**
+- the Long Sister, a shroud-weaver who wrapped herself;
+- the Ash-Choir, three tiny singers who never finished the note;
+- the Splint;
+- the Weeping Post;
+- the Miscount, two skeletons sharing one set of bones;
+- the Un-Bell;
+- the Root-Bride;
+- the Sub-Deacon, a four-armed censer priest;
+- the Late Sister, always three paces behind you.
 
-- **The road:** killing an act boss opens a gate to the next act's town. The Thought of the Slayer's death plays the Stranger's line and the credits, then opens the Scar.
-
-- **Heralds** wake at rare god altars and alone grant Major Arcana: the Marrow Pontiff (Bone), the Wet Nurse (Flesh), the Long Exhale (Breath), a Silent One (the Silence). Altars show a speaker's name (Old Upright, the Red Mother, the Last Breath, the Hush), never the true name.
-
-## 8. Act I bestiary: every creature is a lesson
-
-Nothing flashes. Each creature has a **tell** and a **counter**.
-
-| Creature | What it is | Behaviour | Tell | Counter |
-|---|---|---|---|---|
-| Husk | a pilgrim who drank from the wound | waits until three gather, then surges | head snaps up, arms spread | pull a few; fight in a doorway |
-| Tithe-Hand | a severed hand of the god on its fingers | packs circle and dart in from behind | fingers tense and spread | back to a wall |
-| Weeper | faceless mourner, tears harden into bone needles | keeps distance behind ruins | tilts head back | break line of sight, corner it |
-| Gasp | a stray scrap of breath, a veil of mouths | drifts through walls, recoils from light | inhales, veil billows | fight near lanterns and fire |
-| Pyre-Saint | a martyr whose faith still burns | burning footprints, erupts | flames roar white | douse in water, or range |
-| Bellwether | a hulk with its head sealed in a bell | tolls, then charges; a wall stuns it | two tolls | stand before a wall, sidestep |
-| Vein-Worm | a severed artery, still pumping | burrows, erupts under you | ring of blood-bubbles | stand on stone or roads |
-| Moth-Saint | a porcelain saint's face on a moth's body | swoops in an arc, climbs away | wings fold back | strike during the swoop |
-| Ossuary Warden | bone knight with a skull tower-shield | blocks everything from the front | shield lowers | flank, or break its poise |
-| Marrow Duelist | skeleton fencer | parries flurries, ripostes | blade tip rises | slow heavy hits, spells |
-| Gravebloat | a walking stomach | shuffles close and bursts | swells, gurgles | range, or let it burst in a crowd |
-| the Kneeler | a penitent still on its knees | (in game since v0.53, Moor and crypt packs) |  |  |
-
-**Ideas not yet built:** the Long Sister (a shroud-weaver who wrapped herself), the Ash-Choir (three tiny singers who never finished the note), the Splint, the Weeping Post, the Miscount (two skeletons sharing one set of bones), the Un-Bell, the Root-Bride, the Sub-Deacon (four-armed censer priest), the Late Sister (always three paces behind you).
-
-## 9. Voice
+## 9. Voice in the game
 
 - **Tone:** elegiac. Second person present for the player; third person for the world.
-
-- **Entry line:** first visit to a zone, ≤14 words. **Whispers:** every 60–120 s of exploring, ≤18 words, never in fights. Landmarks, lantern names and inscriptions surface when you pass or touch them. Death and return lines. One lore line on rare and unique tooltips.
-
-- **The Mysterious Stranger** (the Reading and every town) speaks in half-lines and ellipses and calls each god by a different name every time.
-
-- Banned words: see `01-rules-and-decisions.md`. `window.__voice.audit()` checks the limits in game.
+- **Where the lines live:** `art/ui/zone_lines.json` (first-visit lines) and `art/ui/voice.json` (whispers,
+  landmarks, deaths and returns). Some of them are older than the word laws, and they are fixed as each zone is
+  remade.
+- **The limits:**
+  - **Entry line:** on the first visit to a zone, 14 words at most.
+  - **Whispers:** every 60 to 120 seconds of exploring, 18 words at most, never in a fight.
+  - **Landmarks, lantern names and inscriptions** surface when you pass or touch them.
+  - **Item text:** one lore line on rare and unique items.
+- **The Mysterious Stranger** reads the tarot at the start and appears in every town. He speaks in half-lines and
+  calls each god by a different name every time.
+- **Banned words and the world's own words:** `01-rules-and-decisions.md`.
 
 ## 10. Mood board (not canon)
 
-Another AI's ten realm concepts feed props and atmosphere, never names (the Frigid Heights and Bleached Barrens were used; the Marrow Catacombs, Sanguine Cavity, Shaft of Echoes, Digesting Crucible and Cerebrum Labyrinth are in Act V). The user: *"just flavor material, not so much lore."*
+Another AI's ten realm concepts fed props and atmosphere, never names: the Frigid Heights and the Bleached Barrens
+were used, and the Marrow Catacombs, Sanguine Cavity, Shaft of Echoes, Digesting Crucible and Cerebrum Labyrinth are
+in Act V. Derek: "just flavor material, not so much lore."

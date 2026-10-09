@@ -66,7 +66,7 @@ what he wants or drops a picture, and Claude does the rest through the Forge.
   exists); no node canvas. Before building a step, check the free-tool table in the guides and tell the owner when a
   tool exists.
 - **Mock-ups and new directions** unless the owner asks. Build the list above; report with pictures; merge.
-- **The game and the lore.** Other sessions own them: `docs/GAME_HANDOFF.md`, `docs/codex/LORE_REWRITE_GUIDE.md`.
+- **The game and the lore.** Other sessions own them: `docs/archive/GAME_HANDOFF.md`, `docs/codex/LORE_REWRITE_GUIDE.md`.
   The Diablo 2 bridge (`pixelforge/d2/`) exists and is merged; use only if the owner asks.
 
 ## 4. How to work

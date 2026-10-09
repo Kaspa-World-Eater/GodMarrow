@@ -65,7 +65,7 @@ vocabulary does not cover; the guide's worked example (the necromancer, flat and
   export. The game's camera for objects is 30 degrees (`view.elevation`).
 - The ground lock works on the screen (the lowest foot pixel on one row); the canvas widens per clip for a death that
   lies down, so the frame editor should expect frames of one square side per set, not the file's size.
-- The step-by-step procedure for a session (and for the app's help page) is `docs/GUIDE_SESSION.md`.
+- The step-by-step procedure for a session (and for the app's help page) is `tools/pixelforge/docs/GUIDE_SESSION.md`.
 
 ## Knobs added in the second review round (2026-10-02)
 

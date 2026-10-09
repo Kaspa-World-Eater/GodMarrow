@@ -1,4 +1,4 @@
-"""The detail layer that rides the parts (docs/FORGE_FROM_THE_GAME.md 3.1), the light and ink of the godmarrow look
+"""The detail layer that rides the parts (tools/pixelforge/docs/FROM_THE_GAME.md 3.1), the light and ink of the godmarrow look
 (3.2), blood runs (3.3) and the one build command (3.4): the palette never grows, the detail turns with the part, a
 style with the look off renders the old picture bit for bit."""
 import hashlib

@@ -2,7 +2,7 @@ extends Node2D
 ## The Mystic's transient things, drawn from the skill book's lists every frame. Two of these live in a zone: one on
 ## the floor layer (cracked glass, sigils, the storm's eye, the procession's worn ring, pale ground fires) and one
 ## above the world (threads, needles, sparks, souls, darts, shards, glass, the golem's thrown shield and its beam).
-## Everything is thin and pale: no glow, no comet tails, no swing arcs (rules in PORTING.md; zz_zz_mystic90.js and
+## Everything is thin and pale: no glow, no comet tails, no swing arcs (rules in docs/wiki/01-rules-and-decisions.md; zz_zz_mystic90.js and
 ## zz_zz_thread93.js drawing: "thin, pale, no glow").
 
 var book

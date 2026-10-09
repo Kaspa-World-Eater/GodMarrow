@@ -19,7 +19,7 @@ The scholars who have handled these leaves call them a codex. I call the book th
 
 There are nine chapters. I did not choose nine. I spread the leaves on the floor of a barn at Ashwake one winter, and by morning they lay in nine heaps, and I have been in the Ossa long enough not to quarrel with a count like that.
 
-Every chapter opens with pages of mine, about the land it concerns and the people I found there. The works come after, in the order they reached me: letters, sermons, tallies, a catechism, a wall, a song. Most I paid for, in bread or salt or oil. Some I copied at night in houses where I was a guest. Two came out of dead hands, and I asked first. I have changed nothing. Where a writer is wrong, the mistake is still there. Where a copyist left a gap, so have I.
+Every chapter opens with pages of mine, about the land it concerns and the people I found there. The works come after, in the order they reached me: letters, sermons, tallies, a catechism, a wall, a song. Most I paid for, in copper or salt or oil. Some I copied at night in houses where I was a guest. Two came out of dead hands, and I asked first. I have changed nothing. Where a writer is wrong, the mistake is still there. Where a copyist left a gap, so have I.
 
 Each chapter closes with the things I carry out of that land. They are in the bag by my feet tonight. What I believe of each, I say. You may believe less.
 
@@ -64,13 +64,13 @@ What I can add is small. In my first year on the Cheek I met a salt-boiler who h
 
 After the Edgeless came the god, and it held a space open. The scholars call that the Age of the Held Space, and I have no better name. Soul, Bone and Flesh were in it at once. Others lived inside it, and near the end a congregation knelt within it. I have been down to where some of those others worked. The ceilings are low and the steps are high, and nobody I have taken there wanted to stay.
 
-The Quiet wore at it. It went as a word goes when a child says it over and over at the table, until it is only noise, and at last the god could not hold itself together and died. That was one thousand one hundred and nine years before I cut my first pen for this book, on a night with no wind anywhere. I have heard it given as a year less. The ones who say so are all short by the same winter, which tells me they had it from one another.
+The Quiet wore at it. It went as a word goes when a child says it over and over at the hearth, until it is only noise, and at last the god could not hold itself together and died. That was one thousand one hundred and nine years before I cut my first pen for this book, on a night with no wind anywhere. I have heard it given as a year less. The ones who say so are all short by the same winter, which tells me they had it from one another.
 
 ### What you are standing on
 
 The body is the world. Every order on the Hide starts from that and then quarrels. The skin is the Hide, where the towns are. The long white ridges in the far lands are its bones. What runs in the rivers is what still runs in it. The scholars at Ashwake call the whole corpse the Reliquary, as though it were a box someone had set down with care. I use their word. I have not found a gentler.
 
-The life left in the bones they call the godmarrow. I have seen it drawn up a well in the Ossa, warm and slow. I have seen it on a woodcutter's blade after he opened a pale trunk he should have left. Every house on the Hide has its own use for the stuff and its own word for the other houses' uses. You will hear those words in the ninth chapter.
+The life left in the bones they call the godmarrow. I have seen it drawn up a well in the Ossa, warm and slow. I have seen it on a woodcutter's blade after he opened a pale trunk he should have left. Every faith on the Hide has its own use for the stuff and its own word for the other faiths' uses. You will hear those words in the ninth chapter.
 
 ### Of us, and of the rest
 
@@ -86,9 +86,9 @@ When a thing made of the god dies, something stays: a bone, a husk, a smear, a s
 
 ### Of the breath
 
-The last breath is still going out of the god. On the Moor after dark you feel it as a steady pull at your back, always toward the same quarter. Every small god rides it: the one in the milestone, the one in the ford, the one in the bell. There are eight million of them by the House's count, and the House gave up counting long ago. Together they are the Myriad.
+The last breath is still going out of the god. On the Moor after dark you feel it as a steady pull at your back, always toward the same quarter. Every small god rides it: the one in the milestone, the one in the ford, the one in the bell. There are eight million of them by the Shrine Keepers' count, and the Shrine Keepers gave up counting long ago. Together they are the Myriad.
 
-Where the breath snags, it thickens and goes wrong. That is miasma. I once drank from a well in the Barrow lands that had it, before I knew. The water was like a copper held too long under the tongue. For three nights I dreamed of a room with a green door that was not any room of mine, and on the fourth morning a child in the next village told me the same dream over her porridge.
+Where the breath snags, it thickens and goes wrong. That is miasma. I once drank from a well in the Barrow lands that had it, before I knew. The water was like a copper held too long under the tongue. For three nights I dreamed of a room with a green door that was not any room of mine, and on the fourth morning a child in the next village told me the same dream on her doorstep.
 
 ### Of the lamps
 
@@ -118,11 +118,11 @@ Past the crypts lie the Barrows, where the Tithed bury their own, and every lid 
 
 On the Burnt Heath, in the corner the road bends away from, seven great carcasses lie in a ring. My lantern halted at the edge of them and would come no further. I went in without it. What I found I keep.
 
-Then off the Hide. The Bleached Barrens of Ossa, chalk and ribs standing in rows, and a citadel cut into a broken thighbone. South and down, Shog-Mire and its stilt-towns, where you learn to step between the beats of the mud or you stop learning. Up, higher than anywhere, the Heights of An-Vhar, where the frost lives, where a man hears his own blood in his ears all day and the cold gets into his lamp. And last the Descent, the road that goes in. Every road on the Hide tilts toward it a little. Set a full bowl on any table and watch which rim the water favours. The Vigil went down it with a lamp each and stayed down. I sat at its gate a season. I have been through the gate. That is all I will write of it here.
+Then off the Hide. The Bleached Barrens of Ossa, chalk and ribs standing in rows, and a citadel cut into a broken thighbone. South and down, Shog-Mire and its stilt-towns, where you learn to step between the beats of the mud or you stop learning. Up, higher than anywhere, the Heights of An-Vhar, where the frost lives, where a man hears his own blood in his ears all day and the cold gets into his lamp. And last the Descent, the road that goes in. Every road on the Hide tilts toward it a little. Set a full bowl on any flat stone and watch which rim the water favours. The Vigil went down it with a lamp each and stayed down. I sat at its gate a season. I have been through the gate. That is all I will write of it here.
 
 ### The rings with teeth
 
-On the Moor, in the Barrens, out on the flats of the Mire, you will come on a ring of broken stones like fangs round a pit of ash that rises and falls. Pilgrims walk down into them and come up at other rings. The next chapter belongs to them, and to the people who walk in. I will set down one thing here. I stood at a ring in the Barrens one night and watched a man go in. I was at the Ashwake fire the next morning when he came in asking for bread, and the Barrens are forty days from Ashwake. He asked me how I came to be at both. I gave him the answer he gave me.
+On the Moor, in the Barrens, out on the flats of the Mire, you will come on a ring of broken stones like fangs round a pit of ash that rises and falls. Pilgrims walk down into them and come up at other rings. The next chapter belongs to them, and to the people who walk in. I will set down one thing here. I stood at a ring in the Barrens one night and watched a man go in. I was at the Ashwake fire the next morning when he came in hungry, and the Barrens are forty days from Ashwake. He asked me how I came to be at both. I gave him the answer he gave me.
 
 ### How these ten came to me
 
@@ -183,7 +183,7 @@ I asked a boy of about twelve once, on the road below Ashwake, and he thought ab
 
 ### The milestones
 
-Every order on the Hide will tell you it cut the Pilgrim Road. It was there before any of them. I have walked it through the Hollow Wood and seen the pale roots turn aside at its edge, as a hand turns aside from a hot pot. The milestones came later. They were set in one autumn of the two hundred and sixth year after the god's death, by people who found the road already lying there and wanted it numbered. The figures go down as you walk out from Ashwake. None of the orders will tell you what they count toward. I spent one night beside the stone that says one. The ground past it looked like the ground before it. It was warmer.
+Every faith on the Hide will tell you it cut the Pilgrim Road. It was there before any of them. I have walked it through the Hollow Wood and seen the pale roots turn aside at its edge, as a hand turns aside from a hot coal. The milestones came later. They were set in one autumn of the two hundred and sixth year after the god's death, by people who found the road already lying there and wanted it numbered. The figures go down as you walk out from Ashwake. None of the faiths will tell you what they count toward. I spent one night beside the stone that says one. The ground past it looked like the ground before it. It was warmer.
 
 The first milestone I ever leaned on was the ninth out of Ashwake. It came to my hip then. There is a beggar against it now who says it has grown past his shoulder in his time. I have no quarrel with him. I have stopped leaning on it too.
 
@@ -197,9 +197,9 @@ Some sit down by the stone and do not rise, and in a winter or two there is a ne
 
 ### Of the rings, briefly
 
-Older than the roads and older than the lamps are the rings of stones with teeth. A measurer in this chapter gives their shape with a cord, and a walker gives their manners, and neither needs me. What the orders do about them is keep away.
+Older than the roads and older than the lamps are the rings of stones with teeth. A measurer in this chapter gives their shape with a cord, and a walker gives their manners, and neither needs me. What the faiths do about them is keep away.
 
-I once watched one of the Order's knights lead his standing dead a long way off the white road to pass a ring out on the chalk, and his dead went round it wider than he did, without being asked. At the Fen stair I asked a Fan-Bearer what the stones were. She took out a square of paper and folded a doll while I waited, put it away in her sleeve, and spoke to me about the damp. The Brotherhood will not let its hooded ones stand in sight of one. The lodge would not read a thread past the place where it went into a ring. Only the pilgrims go near. They leave something at the lip when they go in: a button, a curl of hair, a child's milk tooth. By morning the lip is bare.
+I once watched one of the Order's knights lead his standing dead a long way off the white road to pass a ring out on the chalk, and his dead went round it wider than he did, without being asked. At the Fen stair I asked a Fan-Bearer what the stones were. She took out a square of paper and folded a doll while I waited, put it away in her sleeve, and spoke to me about the damp. The processions will not let their hooded ones stand in sight of one. The lodge would not read a thread past the place where it went into a ring. Only the pilgrims go near. They leave something at the lip when they go in: a button, a curl of hair, a child's milk tooth. By morning the lip is bare.
 
 Nobody I have met has seen one raised. Fires ask me whether I have, and I say no, and it is true. I have seen one stoop a little lower over a man going down, the way a woman stoops over a cradle to see if the child is breathing.
 
@@ -209,7 +209,7 @@ Three people in these pages tell you what happens in the pit, and they tell it w
 
 I went in first at the Barrow ring, long ago, with an iron ring on my finger because no one had told me to take it off. I remember that it did not hurt where the walkers say it hurts, and that it hurt somewhere they do not mention, behind the breastbone, like a word you were about to say and lost. In the dark there were others going the same way. It was warm as a crowded room is warm when everyone in it is on their knees. I have been in one room like that before. I was very small then.
 
-I rose on the Kettlewick Flats, a long walk from the Barrows by any road, with the mud keeping its beat under the crust and a woman at the lip holding out a candle. The iron ring had gone to my other hand. I was hungrier than I have ever been, and bread did nothing for it, and I keep to myself what did.
+I rose on the Kettlewick Flats, a long walk from the Barrows by any road, with the mud keeping its beat under the crust and a woman at the lip holding out a candle. The iron ring had gone to my other hand. I was hungrier than I have ever been, and nothing at any hearth eased it, and I keep to myself what did.
 
 I have gone in since, more often than I will number. My scars stay where they were. The walkers who watch me come up tell me that is uncommon, and then their eyes go down to my feet, and stay there a while.
 
@@ -251,7 +251,7 @@ I have wiped a hand on the stain at a plinth, as the walkers do. I have not wipe
 
 ### Ash from the Pit
 
-Grey ash in a twist of cloth, faintly warm, faintly moving. I scraped it from the crust of the Moor ring with a spoon, and left the spoon at the lip.
+Grey ash in a twist of cloth, faintly warm, faintly moving. I scraped it from the crust of the Moor ring with a copper, and left the copper at the lip.
 
 Poured onto a flat stone it gathers itself into a shallow dish, and lifts, and settles. The walkers say never take it far from its ring and do not say why. I carried it to An-Vhar and back, and for a long while nothing came of that. Then one night on the Heights I woke to find it lifting each time I breathed in.
 
@@ -283,7 +283,7 @@ note: Cut into a milestone of the Pilgrim Road a day's walk out from the Ashwake
 ## The Pale Order
 
 subtitle: of the servants of the Bone, with whom I counted nine winters
-epigraph: They wrote me into their book before I had finished my bread.
+epigraph: They wrote me into their book before I had warmed my hands.
 
 ## Preface
 
@@ -291,15 +291,15 @@ Wash your hands before this chapter, and dry them one finger at a time. The brot
 
 ### How they got the name
 
-The lowlands named them, not the other way about. I first heard the name at a bridge under the mountains, from a headman who had come out with bread and salt to meet seven knights, and I understood it once they had gone past me. Their plate was grey to the joints with a dust so fine it lay in the carving like frost in a footprint, and not one of them had brushed it off. That is the first reason. For the second, look up. Over the Ossa the sky has a pallor no other sky has, like cloth scrubbed too many times on the same stone. The third reason is said after dark, and I will come to it.
+The lowlands named them, not the other way about. I first heard the name at a bridge under the mountains, from a headman who had come out with salt and a lamp to meet seven knights, and I understood it once they had gone past me. Their plate was grey to the joints with a dust so fine it lay in the carving like frost in a footprint, and not one of them had brushed it off. That is the first reason. For the second, look up. Over the Ossa the sky has a pallor no other sky has, like cloth scrubbed too many times on the same stone. The third reason is said after dark, and I will come to it.
 
 Among themselves they use an older word, Kostyak. A brother told it me at the gate of Nine Stairs while he dried my feet, counting the toes aloud as he went. He said it means the bones of a body, and also the few who keep a thing upright when the rest has sagged: the posts of a barn, the three old women every village has, the knots in a net.
 
 ### Nine winters
 
-I came up behind the tithe in the nine hundred and eighty-first year after the god's death, nine days after the first frost. The brothers took the date for a good sign and explained why, and I let them. I stayed nine winters. I held a lamp at the Feast in each of them. I turned a windlass, stirred the vat, swept, and lay on the roof under the cords. The book had me by a number within the hour, and in nine winters no brother asked me for the other thing.
+I came up behind the tithe in the nine hundred and eighty-first year after the god's death, nine days after the first frost. The brothers took the date for a good sign and explained why, and I let them. I stayed nine winters. I held a lamp on the Day of the Count in each of them. I turned a windlass, stirred the vat, swept, and lay on the roof under the cords. The book had me by a number within the hour, and in nine winters no brother asked me for the other thing.
 
-It is a kind house. I want that plain before anything else is said. They fed me when I came up thin. They nursed a brother of theirs through two winters of the coughing sickness and never once let him lie alone in the dark. They are courteous to the lowlands and patient with them, and they come for their dead.
+It is a kind house. I want that plain before anything else is said. They tended me when I came up thin. They nursed a brother of theirs through two winters of the coughing sickness and never once let him lie alone in the dark. They are courteous to the lowlands and patient with them, and they come for their dead.
 
 ### Under the stairs
 
@@ -323,7 +323,7 @@ At first light the sweepers carry the dust of their brothers up to the highest l
 
 I will not teach you the Count. The tallier does that, below, and the novices' catechism does, and a boy from Cold Adit learns it in his letters to his mother, and between them you will have more of it than a lowlander should carry. I learned it on the stair from the same man who wrote the tallier's leaves, and I count by it still, wanted or not. I cannot see three candles on a table now without adding them.
 
-What I can give you is what I did with it. At my first Feast they told my bones on a cord, as they do for any guest who allows it. The tallier reached the end, smiled at me, and wrote the figure. I have let nobody tell them since. I held the lamp at nine Feasts while the talliers read the walls, and I never once saw a wall come out lower than the year before. The brothers have words for that. I said the words with them. I say them still, some nights, over things that are not bones.
+What I can give you is what I did with it. At my first Day of the Count they told my bones on a cord, as they do for any guest who allows it. The tallier reached the end, smiled at me, and wrote the figure. I have let nobody tell them since. I held the lamp at nine Days of the Count while the talliers read the walls, and I never once saw a wall come out lower than the year before. The brothers have words for that. I said the words with them. I say them still, some nights, over things that are not bones.
 
 ### The roof
 
@@ -365,7 +365,7 @@ I have used it twice, both times on my own hands. In all the years I have carrie
 
 ### Niche-Tally
 
-A strip of bone cut with notches: the count of the fourth wall at Nine Stairs, taken at one Feast. It is the tally the old sweeper's letter was folded into.
+A strip of bone cut with notches: the count of the fourth wall at Nine Stairs, taken on one Day of the Count. It is the tally the old sweeper's letter was folded into.
 
 The count of the brothers' own dead is cut along the top. What the Order calls the Mother's share is cut in a row of its own beneath. I have run my thumb along the lower row in the dark. It is the longer of the two.
 
@@ -417,23 +417,23 @@ Hold one hand out in front of you, palm up. Open it wide, then close it, slowly,
 
 ### Going up
 
-The Peak is the god's knee, broken up through the Hide when the body came down, and the monks cut their stair into the bone of it. I first climbed it in the summer of the one thousand and seventy-first year, while the Peak was whole and rang at noon. A brother met me at the landing where pilgrims who would go no higher left their bread. He did not ask my business. He only fell in behind me, a little lower on the stair than I was, and climbed the rest of the way there. I did not understand until I stumbled, near the top, and found him already braced to take my weight.
+The Peak is the god's knee, broken up through the Hide when the body came down, and the monks cut their stair into the bone of it. I first climbed it in the summer of the one thousand and seventy-first year, while the Peak was whole and rang at noon. A brother met me at the landing where pilgrims who would go no higher left their offerings. He did not ask my business. He only fell in behind me, a little lower on the stair than I was, and climbed the rest of the way there. I did not understand until I stumbled, near the top, and found him already braced to take my weight.
 
-From the courtyard the miasma lay in the valleys like milk left standing in a pan, and the lowland towns under it showed only as lamps.
+From the courtyard the miasma lay in the valleys like lime-water left standing in a basin, and the lowland towns under it showed only as lamps.
 
 They called themselves the Kinrei-shū, the Gold Bell. A monk owned a bowl, a robe, and later a lantern, and nothing else. I sat one evening in their hall among them while they chanted. How the chant goes is not mine to give; a woman who sang it four winters tells you below, and so does the man who taught it. I will tell you that in the third of the long quiet places, the brother beside me pressed his shoulder hard against mine, and kept it there, the way you steady a man at the lip of a drop, and that I did not know until then that I had been leaning.
 
 ### The bell at noon
 
-At noon they struck the big bell that hangs over the courtyard. I stood a few paces from it. The beam went in, and I felt the blow in my teeth and heard nothing, and every monk round me let out his breath at once, content. Two days later I was in a market in the valley when the noon stroke came down the mountain, and it rang so long the bread-sellers stopped calling to let it end.
+At noon they struck the big bell that hangs over the courtyard. I stood a few paces from it. The beam went in, and I felt the blow in my teeth and heard nothing, and every monk round me let out his breath at once, content. Two days later I was in a market in the valley when the noon stroke came down the mountain, and it rang so long the lamp-sellers stopped calling to let it end.
 
 A bell-caster tells you in this chapter what his wife heard. I stood in that market. She heard right.
 
 ### What they waited for
 
-Going down at dusk I found an old monk sitting on a landing with an empty bowl across his knees, and I asked him to whom they prayed. He said the fifth name, the one I wrote once in the first chapter. He said it as a man speaks of a guest expected for supper, who is late, and will come. I have not heard it said so gently anywhere else.
+Going down at dusk I found an old monk sitting on a landing with an empty bowl across his knees, and I asked him to whom they prayed. He said the fifth name, the one I wrote once in the first chapter. He said it as a man speaks of a guest expected at nightfall, who is late, and will come. I have not heard it said so gently anywhere else.
 
-Every other house on the Hide bars its door against the Unsaying. The Peak laid a place for it. I have stood nearer the Long Silence than those monks ever meant to stand, and I cannot call it what they called it. And still, every argument I have made against them since, I can hear the old man on the landing answering, in one breath, without raising his eyes from the bowl.
+Every other faith on the Hide bars its door against the Unsaying. The Peak laid a place for it. I have stood nearer the Long Silence than those monks ever meant to stand, and I cannot call it what they called it. And still, every argument I have made against them since, I can hear the old man on the landing answering, in one breath, without raising his eyes from the bowl.
 
 ### Of the gold, and the saints
 
@@ -443,7 +443,7 @@ I have my own belief about the saints. I keep it in the bag with the gold. The g
 
 ### Of the bowls
 
-They came down to the valleys at dusk in fours, barefoot, with small bells at their belts, and asked for one thing. The lowlanders gave it, and forgot, and fed the monks bread for the forgetting. Where the gifts went, the Peak did not ask, or asked and got an open hand for answer. The bread-woman, the magistrate and the abbot each tell you a piece of what came of it. None of them has the whole. I have not either, and I have walked further along it than they did.
+They came down to the valleys at dusk in fours, barefoot, with small bells at their belts, and asked for one thing. The lowlanders gave it, and forgot, and gave the monks alms for the forgetting. Where the gifts went, the Peak did not ask, or asked and got an open hand for answer. The potter, the magistrate and the abbot each tell you a piece of what came of it. None of them has the whole. I have not either, and I have walked further along it than they did.
 
 A monk of the Peak carried his teacher in his lantern, and the teacher burned his own name for fuel, slowly, down to nothing. I once walked a day behind a brother carrying his teacher down to the valley. He set his feet on each riser as though the stair were ice over a deep pool, and at the bottom he sat down on the last step and held the lantern in his lap until it was dark.
 
@@ -491,7 +491,7 @@ At its middle is a pinhole fine as a hair. I laid it over the back of my hand on
 
 A lamp of the Peak, the gold on its case worn through at the handle. The flame is black, and still I can see the road by it. A brother of the Peak who had been in the valleys on the tenth night handed it to me at the foot of the old water-cut in the thaw, and asked me to hold it while he went up to open the doors. I held it. He did not come down.
 
-He told me whose name it burns. I have never said that name within its hearing. Once at a fire I said another, a woman's, and the flame drew in toward me like a hungry man leaning toward a pot. It is very small now. I carry it carefully, as he did.
+He told me whose name it burns. I have never said that name within its hearing. Once at a fire I said another, a woman's, and the flame drew in toward me like a cold man leaning toward a fire. It is very small now. I carry it carefully, as he did.
 
 ### Tongueless Bell
 
@@ -526,7 +526,7 @@ note: Scratched on the right-hand leaf of the sanctum door after the fall, shall
 
 ---
 
-## The Polished Heart
+## The Veiled Crone
 
 subtitle: of the lodge at the head of the cold lakes, and the winter its dead came home
 epigraph: Every soul is a thread. I only hold the end of it up to the light, so it can see where it goes.
@@ -561,7 +561,7 @@ The mirror-maker gives you the trade from the grinding side. He was honest. He s
 
 It came when the ice first held at the ford, in 1106 by the Ashwake reckoning, three nights past the new moon. I was on the hill above the lodge when the runners came up from the Reach. I had come to buy felt. I stayed forty nights.
 
-What the Pir did in those nights you have twice over below: from the man who kept the ring round her, and from her own leaves. I leave them to each other. I will only say that on the last night I was near enough to hear the ring stop, all at once, as a mill stops when the race is shut, and that the quiet afterwards was the quiet of a room where somebody has just understood something.
+What the eldest did in those nights you have twice over below: from the man who kept the ring round her, and from her own leaves. I leave them to each other. I will only say that on the last night I was near enough to hear the ring stop, all at once, as a mill stops when the race is shut, and that the quiet afterwards was the quiet of a room where somebody has just understood something.
 
 The dead came home that night. I saw them come. There was no walking in it. The lane held frost and ash, and then it held them. They went to the doors. The valley sent them up to the lodge, and walked behind them. I did not walk behind. I stood on the hill, where I could see the whole yard, and so I saw the felt come off the coat, and heard the dead draw breath at the glass as a congregation draws breath before it sings.
 
@@ -601,9 +601,9 @@ A steel needle as long as a forearm, threaded with something pale that is nearly
 
 The thread has never run short, and nobody has wound more onto it. At night, if I lie close to the bag, I hear it hum, faintly, as a string hums in a wind that is not blowing.
 
-### Pir's Mirror
+### Eldest's Mirror
 
-One of the small hollowed rounds from the Pir's coat, rimmed in black iron, with a thumb-print pressed into the wax on its back. It fell from the coat's shoulder on the first night the iron stood up, and the Polisher let me keep it.
+One of the small hollowed rounds from the eldest's coat, rimmed in black iron, with a thumb-print pressed into the wax on its back. It fell from the coat's shoulder on the first night the iron stood up, and the Polisher let me keep it.
 
 Look into it and you see your face, then a face behind yours, then another behind that. The last face in every round of that coat is turned away. When I count, I begin at the second.
 
@@ -613,15 +613,15 @@ A pad of grey felt worn through in the middle, stiff with ash and a little blood
 
 It is worn in the shape of a hand, and the hand is smaller than the Polisher's is now. The circle-keeper knew at once whose it was. I offered it to him. He would not touch it.
 
-### Heel of a Loaf
+### Stub of a Candle
 
-The heel of a small dark loaf, hard as a whetstone, with a thumb pressed deep into the crumb. It has been in my bag a long time.
+The stub of a small dark candle, hard as a whetstone, with a thumb pressed deep into the wax. It has been in my bag a long time.
 
-In that valley a woman presses her thumb into bread she hands to someone she fears for. I have not eaten it. Some mornings it is warm on the thumbed side. The apprentice's leaf tells as much as I will about how it came to me.
+In that valley a woman presses her thumb into a candle she hands to someone she fears for. I have not burned it. Some mornings it is warm on the thumbed side. The apprentice's leaf tells as much as I will about how it came to me.
 
 ---
 
-## The Precious Wound
+## The Bleeding Maiden
 
 subtitle: of the Flesh, and the town that paid her by the cup
 epigraph: Blood given is a word said to someone. My brothers said it for a thousand years, and forgot to say to whom.
@@ -632,7 +632,7 @@ If you have a cut on you anywhere, bind it before you begin. Use clean cloth. Wh
 
 ### The woman on the step
 
-The penitent who taught me the Flesh's names at Villa Llaga was the one who had been away. I met her in the spring after the Fall. She was sitting on the lip with her tin cup in her lap, the way a woman sits on her own doorstep shelling beans, and she sang the names through for me so that I would have them in the right order. I will not write them in that order. She wrote them herself, below, and she has more right.
+The penitent who taught me the Flesh's names at Villa Llaga was the one who had been away. I met her in the spring after the Fall. She was sitting on the lip with her tin cup in her lap, the way a woman sits on her own doorstep winding thread, and she sang the names through for me so that I would have them in the right order. I will not write them in that order. She wrote them herself, below, and she has more right.
 
 She sang the lowland name faster than the others, as if it shamed her. The true one she sang last, low, with her arms held out over the dark water in the wound, and the drops went off her elbows on the second part of it. I have not heard it sung since, and I do not want to.
 
@@ -650,9 +650,9 @@ That night I went down into the crypt with them, two by two, and a saint who had
 
 ### The man at the back
 
-I watched the sangrador that day. He walked last, as he always did. While the brothers poured he did not once look at the wound. He watched their hands, the way a clerk watches coin going across a table, and his lips moved, and I think he was keeping the tally in his head as well as on the stick.
+I watched the bloodletter that day. He walked last, as he always did. While the brothers poured he did not once look at the wound. He watched their hands, the way a clerk watches coin going across a table, and his lips moved, and I think he was keeping the tally in his head as well as on the stick.
 
-The brotherhood had found him as an infant at the feet of the faceless image over the crypt stair, and raised him, and kept him the one man in the town she never tasted. The carver who made that image tells you what went into it. The carver was not let watch. I was not in the room either. I have my suspicion. It is in the bag.
+The brothers had found him as an infant at the feet of the faceless image over the crypt stair, and raised him, and kept him the one man in the town she never tasted. The carver who made that image tells you what went into it. The carver was not let watch. I was not in the room either. I have my suspicion. It is in the bag.
 
 ### The crust, and the night
 
@@ -660,7 +660,7 @@ Then the wound closed over for a year, and in that year the brothers poured onto
 
 I was on the upper lip on the night it opened. What came up out of it is not mine to tell; four people in this chapter have told you, and the one who told it lying in a drain has told it best. I will tell you that what came up went past me in a doorway. They filled the door, low down, and swayed at me a little, and went on down the street. I have thought about why for a long time. I have not written down what I thought.
 
-Afterwards the sangrador opened his own arm for the first time in his life, on the crust, and drew a door in his blood, and called her down into himself. I have seen the shape of that door since, drawn on a wall in a cellar under An-Vhar, by a hand that was not his. I will not draw it for you.
+Afterwards the bloodletter opened his own arm for the first time in his life, on the crust, and drew a door in his blood, and called her down into himself. I have seen the shape of that door since, drawn on a wall in a cellar under An-Vhar, by a hand that was not his. I will not draw it for you.
 
 Everyone who tells what happened next says that she took his blood and his hands and his voice and left him his mind. I have said it too. Some nights I wonder whose mind it is now, and which of the two of them is keeping it.
 
@@ -672,7 +672,7 @@ I have lain in a ditch while the procession went past on the road above me. I wi
 
 ### Paid for, found, and carried
 
-Seven works follow, and not one was written by somebody who hoped to be read. I bought some, found some, and was handed the rest by people glad to be rid of them. The Brotherhood would not thank me for any of them, and one of them I have kept a line back from.
+Seven works follow, and not one was written by somebody who hoped to be read. I bought some, found some, and was handed the rest by people glad to be rid of them. The processions would not thank me for any of them, and one of them I have kept a line back from.
 
 If you bled at all while you were reading, you know now what to say over it.
 
@@ -717,7 +717,7 @@ note: Chalked on the inside of the crypt door at Villa Llaga many times over, on
 
 ---
 
-## The House of Eight Million
+## The Myriad
 
 subtitle: of the paper dolls, and the one who came up
 epigraph: Give it to me. All of it. I have room.
@@ -730,13 +730,13 @@ Empty your chest before you read this. Push the air out until nothing more will 
 
 The first chapter told you the god is still breathing its last across the Hide. It did not tell you the breath is crowded.
 
-I learned its names as you learn the names of people in a crowd, one face at a time, from whoever stood nearest. The reed-cutters of the Fen say the Eight Million. Up at the salt pans they say the Long Exhale, and let their own air out through the teeth after they say it. A widow at Bellrest called it the Sigh Under the Door and laid a rolled cloth along her sill while she talked. The grandmothers of the Moor say Grandmother Wind, as though it were one more of them, sitting a little apart from the fire. The House says the Small Gods, when it says anything.
+I learned its names as you learn the names of people in a crowd, one face at a time, from whoever stood nearest. The reed-cutters of the Fen say the Eight Million. Up at the salt pans they say the Long Exhale, and let their own air out through the teeth after they say it. A widow at Bellrest called it the Sigh Under the Door and laid a rolled cloth along her sill while she talked. The grandmothers of the Moor say Grandmother Wind, as though it were one more of them, sitting a little apart from the fire. The Shrine Keepers say the Small Gods, when they say anything.
 
 When I was young, younger than anyone living would credit, I asked the Myriad its true name. I asked the ford-bell at the salt crossing, because it was said to answer. It has not rung in my hearing since. It rings once I am past, far enough off; I feel it on the road, behind the breastbone, as you feel a door shut somewhere else in a house.
 
 ### The doll that stood straight
 
-Wherever the wind snags on something, the House has been there before you: a gate of two posts and a lintel at the crossing, a stone at the spring, a strip of white paper knotted to the bell. They kept the forgotten shrines too, when they had the hands for it. Lately they have not had the hands.
+Wherever the wind snags on something, the Shrine Keepers have been there before you: a gate of two posts and a lintel at the crossing, a stone at the spring, a strip of white paper knotted to the bell. They kept the forgotten shrines too, when they had the hands for it. Lately they have not had the hands.
 
 I let one of them sit with me once, knee to knee, at a little roadside shrine in the Fen reaches. She was grey at the temples and in no hurry. The elder in this chapter tells a novice what is meant to happen with the doll, and I will leave it to her. I will tell you what happened with mine. It did not move. The purifier watched it a long while. Then she folded its arms shut, carefully, laid it in the brazier, and turned her face from the smoke, and would not take my salt when I offered it.
 
@@ -744,7 +744,7 @@ I have thought since about what she saw in the paper that made her do it. I have
 
 ### What they cannot carry
 
-The House fears one thing more than its own ending. Where the servants of the Quiet have gone by, there is nothing left in the air to take in. A purifier can hold a wrong breath until it bends her. She cannot hold an absence. One summer a village at the edge of the Fen went wrong all at once, past what the purifiers could take in, and the Mouth That Eats Its Own Echo came through it. I stood beside a Fan-Bearer at the end of its lane that morning, and watched her raise the fan, and lower it, and raise it, like someone trying a key in a door that has no lock.
+The Shrine Keepers fear one thing more than their own ending. Where the servants of the Quiet have gone by, there is nothing left in the air to take in. A purifier can hold a wrong breath until it bends her. She cannot hold an absence. One summer a village at the edge of the Fen went wrong all at once, past what the purifiers could take in, and the Mouth That Eats Its Own Echo came through it. I stood beside a Fan-Bearer at the end of its lane that morning, and watched her raise the fan, and lower it, and raise it, like someone trying a key in a door that has no lock.
 
 ### Of the Nave
 
@@ -754,15 +754,15 @@ I stopped where the hand shakes. Anyone would.
 
 ### On the bank
 
-I have seen an oni three times, and each time on a bank at night, and each time it kept out of my lamplight. The third time I set the lamp down on the reeds and walked away from it into the dark, to see what the thing would do. It came a little nearer the lamp, and stood looking at it with its hands shut against its chest, the way a cold man stands near a fire in a house where he has not been asked in. I went back for the lamp before dawn. The reeds round it were pressed flat in a ring, as though something heavy had sat by it most of the night and then thought better of it.
+I have seen one of the Horned three times, and each time on a bank at night, and each time it kept out of my lamplight. The third time I set the lamp down on the reeds and walked away from it into the dark, to see what the thing would do. It came a little nearer the lamp, and stood looking at it with its hands shut against its chest, the way a cold man stands near a fire in a house where he has not been asked in. I went back for the lamp before dawn. The reeds round it were pressed flat in a ring, as though something heavy had sat by it most of the night and then thought better of it.
 
 The reed-camp women hum at their folding where there used to be words. I sat a whole evening on the mats once and never heard the words. I heard the place where they went, which is louder.
 
-I have been down the Nave stair since. The House gives a number for its steps. I made it more. I will not write my number, and I will not write which way the pews face now.
+I have been down the Nave stair since. The keepers give a number for its steps. I made it more. I will not write my number, and I will not write which way the pews face now.
 
 ### At a crossing on the Barrow road
 
-I met the one who came up in the thaw of the year 1103, at a crossing where the lowlands had forgotten what the stone was for. Faded red and white, a wide hat, down on both knees in the mud. She set her palms to the guardian stone and put it right, and breathed on it, and the air at the crossing eased the way a kitchen eases when a quarrel is over. By morning it had moved a finger's width again. She knew it would. She went on to the next.
+I met the one who came up in the thaw of the year 1103, at a crossing where the lowlands had forgotten what the stone was for. Faded red and white, a wide hat, down on both knees in the mud. She set her palms to the guardian stone and put it right, and breathed on it, and the air at the crossing eased the way a room eases when a quarrel is over. By morning it had moved a finger's width again. She knew it would. She went on to the next.
 
 I counted her breathing while she worked, as the reed-cutter's wife counts in this chapter; she taught me the trick, years before she wrote it down. Twenty of mine went by, and one of hers.
 
@@ -772,23 +772,23 @@ The one in the haze beside her held the fan while she knelt. I bowed to it. I di
 
 ### What the water let me keep
 
-Eight works follow. The House would have kept at least one of them out of this book if I had let it, and I did not. Water gives things back dry. These came back to me the same, and I have put nothing of mine on them but a few lines at the top.
+Eight works follow. The keepers would have kept at least one of them out of this book if I had let it, and I did not. Water gives things back dry. These came back to me the same, and I have put nothing of mine on them but a few lines at the top.
 
 Now breathe out. You have been holding it.
 
 ## Relics
 
-intro: What the House gave me, and what it did not. Carry them lightly; each is heavier than it looks.
+intro: What the keepers gave me, and what they did not. Carry them lightly; each is heavier than it looks.
 
 ### Paper Doll
 
-A doll of pressed reed paper, arms out, of the kind the House leaves on doorsteps in the lowland camps. I found it on the step of a hut where I sheltered, the week the Fen came clear again. I stopped. No one came at dusk.
+A doll of pressed reed paper, arms out, of the kind the keepers leave on doorsteps in the lowland camps. I found it on the step of a hut where I sheltered, the week the Fen came clear again. I stopped. No one came at dusk.
 
 I unfolded it once, at the shoulder only. The inside of the paper was grey, as though something had been breathed into it and kept. I folded it back along its own creases and have not opened it since.
 
 ### Guardian Stone, Turned
 
-A shrine stone the size of a loaf, worn smooth on one face, from a crossing on the Barrow road where there is no shrine any more. I carried it off because nobody else would put it right.
+A shrine stone the size of a skull, worn smooth on one face, from a crossing on the Barrow road where there is no shrine any more. I carried it off because nobody else would put it right.
 
 Each night I set it by the fire facing me. Most mornings it faces the dark. I have laid my ear to the smooth face. I turned it back quickly, and I have not laid my ear there again.
 
@@ -859,7 +859,7 @@ I wrote three more pages here. I have cut them out, and the stubs are in the bin
 
 I said I would come last to the room where the oldest age was not empty.
 
-It is the room at Greywell where the lodge used to read. I went there the summer after the page in this chapter was found. The flags along the east wall stay dry in every season, while the rest of the floor sweats. I sat on the floor in the middle of the room, because I would not take any of the chairs, and I kept my back to the east wall. After a while the only thing in the room I could hear was a cloth-covered glass lying on one of the chairs. Keeper Aubren of the Polished Heart teaches that before the Weaver held the room open, the whole world was like that east wall. I believe him. I believe that what stood there was there before the holding, and that the Held Space was held open round it, and that when the holding ended it had only to wait where it stood.
+It is the room at Greywell where the lodge used to read. I went there the summer after the page in this chapter was found. The flags along the east wall stay dry in every season, while the rest of the floor sweats. I sat on the floor in the middle of the room, because I would not take any of the chairs, and I kept my back to the east wall. After a while the only thing in the room I could hear was a cloth-covered glass lying on one of the chairs. Keeper Aubren of the Veiled Crone teaches that before the Weaver held the room open, the whole world was like that east wall. I believe him. I believe that what stood there was there before the holding, and that the Held Space was held open round it, and that when the holding ended it had only to wait where it stood.
 
 That is as much of the oldest age as I will write. It is more than I meant to.
 
@@ -912,26 +912,26 @@ note: The highest ring of the builders' pillar, above the reach of the scholar's
 
 ## The Feuds
 
-subtitle: of the five houses, and what each keeps of the others
-epigraph: Five houses pay me to watch the other four. Nobody pays me to watch the stone.
+subtitle: of the five faiths, and what each keeps of the others
+epigraph: Five faiths pay me to watch the other four. Nobody pays me to watch the stone.
 
 ## Preface
 
-Five houses draw on one dead god. Each calls its own use of the body holy and the others' uses theft, and each has told me so across its own fire, in a low voice. The Hide is wide. The dead on it are counted, and there are only so many.
+Five faiths draw on one dead god. Each calls its own use of the body holy and the others' uses theft, and each has told me so across its own fire, in a low voice. The Hide is wide. The dead on it are counted, and there are only so many.
 
-I have sat at all their fires. The Bone's brothers broke bread with me and entered me in their book. The Brotherhood stood me on their scale going in and coming out, and frowned at both weights. The House pinned a paper doll to my coat, and the woman who pinned it came back in the night and took it off again. The lodge turned its glasses to the wall when I came in, politely, the way you cover a dish. On the Peak they once put the bowl into my hands and asked me for nothing, which is the most frightening courtesy on the Hide.
+I have sat at all their fires. The Bone's brothers kept vigil with me and entered me in their book. The processions stood me on their scale going in and coming out, and frowned at both weights. The Shrine Keepers pinned a paper doll to my coat, and the woman who pinned it came back in the night and took it off again. The lodge turned its glasses to the wall when I came in, politely, the way you cover a cough. On the Peak they once put the bowl into my hands and asked me for nothing, which is the most frightening courtesy on the Hide.
 
-Each house told me the sins of the other four. None told me its own. That is how I came to know all five, and why not one of them trusts me.
+Each faith told me the sins of the other four. None told me its own. That is how I came to know all five, and why not one of them trusts me.
 
 ### The first quarrel I saw
 
 It was in a ditch on the Barrow road, over a carter who had died of the cold with his lamp still in his fist. A knight came up the road from the east and a penitent from the west, and they reached him in the same breath. I watched from the hedge. The knight carried a cleaver, short and broad and made for one work. The penitent carried nothing. His arms were already open to the elbow.
 
-That is the oldest quarrel on the Hide, older than any book that records it: two mothers and one corpse of a world between them. Old Upright wants the frame back, bone by bone into the niche. The Generous One wants the meat back while it is warm. For centuries the two houses have parted the dead between them, and they have never once agreed where the one ends and the other begins.
+That is the oldest quarrel on the Hide, older than any book that records it: two mothers and one corpse of a world between them. Old Upright wants the frame back, bone by bone into the niche. The Generous One wants the flesh back while it is warm. For centuries the two faiths have parted the dead between them, and they have never once agreed where the one ends and the other begins.
 
-The knight did the parting. He was quick, and not unkind. The penitent sang while he worked, and between the goddess's names he sang the knight's. I asked him afterwards why. He said the brotherhood carries every knight's name in its litanies, so that she will know whom to feed first when the time comes. He meant it as a kindness. The knight heard it as a threat. I believe them both.
+The knight did the parting. He was quick, and not unkind. The penitent sang while he worked, and between the goddess's names he sang the knight's. I asked him afterwards why. He said the processions carry every knight's name in their litanies, so that she will know whom to feed first when the time comes. He meant it as a kindness. The knight heard it as a threat. I believe them both.
 
-The penitent left a loaf of the brotherhood's sweet bread on the milestone. The knight ate it walking, and said his grace over it in nines. They all do. Neither house will speak of it.
+The penitent left a candle of the processions' sweet tallow on the milestone. The knight took it walking, and said his blessing over it in nines. They all do. Neither faith will speak of it.
 
 ### Of the glass on the knee
 
@@ -941,35 +941,35 @@ The fourth chapter tells you where I was on the night the Order's dead went up t
 
 ### The water, and the step
 
-The House gives its dead to the Fen. The Order's knights come down out of the white lands with hooks and chain and dredge them up again, and stand what they bring up. The House has never forgiven it. The knights say nothing.
+The Shrine Keepers give their dead to the Fen. The Order's knights come down out of the white lands with hooks and chain and dredge them up again, and stand what they bring up. The Shrine Keepers have never forgiven it. The knights say nothing.
 
-Once, at the thaw, I saw a knight lay a purse on the step of the Well-Shrine, counted so that its root came right, and turn away. A purifier came down the step behind him and pinned a paper doll between his shoulder-blades. He let her. The House calls the purse pilgrims' alms. Neither house writes it down. They curse each other in the lanes and pay each other on the step, and to my mind it is the most honest dealing on the Hide.
+Once, at the thaw, I saw a knight lay a purse on the step of the Well-Shrine, counted so that its root came right, and turn away. A purifier came down the step behind him and pinned a paper doll between his shoulder-blades. He let her. The Shrine Keepers call the purse pilgrims' alms. Neither faith writes it down. They curse each other in the lanes and pay each other on the step, and to my mind it is the most honest dealing on the Hide.
 
 ### Two cousins and a brother
 
-At Tarn Hollow a reader of the lodge told me the standing dead are a desecration: a frame with no thread in it, walking, the way a loom goes on knocking after the Weaver has left the room. In the Barrens a brother of the Ossa told me the lodge's is the worse sin, that it leaves its bones in the heather like the end of a meal nobody cleared. Neglect, he called it, in the same voice the reader had used for his word. The two have never met.
+At Tarn Hollow a reader of the lodge told me the standing dead are a desecration: a frame with no thread in it, walking, the way a loom goes on knocking after the Weaver has left the room. In the Barrens a brother of the Ossa told me the lodge's is the worse sin, that it leaves its bones in the heather like a floor nobody swept. Neglect, he called it, in the same voice the reader had used for his word. The two have never met.
 
-The House and the lodge are cousins, which is harder. Each keeps something of the dead that the knight and the penitent leave behind. The lodge holds souls in its mirrors. To the House that is a breath held for ever, and the House knows what holding does. I once saw a purifier and a reader share a fire on the salt road. When the reader uncovered his hand-glass to see by, she opened her fan and shut it again. Among the House that means: I will take that in later, alone. She did not sleep. Neither did he.
+The Shrine Keepers and the lodge are cousins, which is harder. Each keeps something of the dead that the knight and the penitent leave behind. The lodge holds souls in its mirrors. To the Shrine Keepers that is a breath held for ever, and they know what holding does. I once saw a purifier and a reader share a fire on the salt road. When the reader uncovered his hand-glass to see by, she opened her fan and shut it again. Among the Shrine Keepers that means: I will take that in later, alone. She did not sleep. Neither did he.
 
 ### The fourth morning
 
-Once a year they all stand in one place. On the fourth morning after the day of the Long Field they come to Kerrow Cross and set their tables round the truce-stone. The Order sells salt and buys cloth. The Brotherhood sells bread and weighs children for a coin. The House sells clean water in clay flasks. The lodge reads threads for nothing. The Peak's table stands empty, with a bowl on it.
+Once a year they all stand in one place. On the fourth morning after the day of the Long Field they come to Kerrow Cross and set their tables round the truce-stone. The Order sells salt and buys cloth. The processions sell sweet tallow and weigh children for a coin. The Shrine Keepers sell clean water in clay flasks. The lodge reads threads for nothing. The Peak's table stands empty, with a bowl on it.
 
-In the ditch below the stone the hired blades stand shoulder to shoulder, the same forty every house hires, and every house pays them extra to stand there together. They call it keeping the peace. The ditch-keepers take coin from each house to watch the other four, and more, when a clause is broken, to say the stone broke it first. The children on the scales look at the knights and whisper the name of the one the Order will not let in.
+In the ditch below the stone the hired blades stand shoulder to shoulder, the same forty every faith hires, and every faith pays them extra to stand there together. They call it keeping the peace. The ditch-keepers take coin from each faith to watch the other four, and more, when a clause is broken, to say the stone broke it first. The children on the scales look at the knights and whisper the name of the one the Order will not let in.
 
 I go most years, and I sit for the lodge. The last reader who took my wrist held it a long while. Then he let it go and called the next one.
 
 ### Of the one they all fear
 
-There is one quarrel all five share. Where the servants of the Unnaming pass, nothing is left to stand up, or feed, or hold in a glass, or give to the water. Every house fears that above the other four.
+There is one quarrel all five share. Where the servants of the Unnaming pass, nothing is left to stand up, or feed, or hold in a glass, or give to the water. Every faith fears that above the other four.
 
-And every house has been glad of it once. You have met, in the seventh chapter, the purifier at the end of a lane out on the Fen's edge-ground. The village behind her had gone wrong past all mending; the wells there tasted like a mouthful of old coins, and the Order would not touch its bones. When the Unnaming's servant had gone through, there was nothing wrong in the village, and nothing else in it at all. She bowed to the empty lane before she left it. The other glad nights are in no house's book, and they are not in mine.
+And every faith has been glad of it once. You have met, in the seventh chapter, the purifier at the end of a lane out on the Fen's edge-ground. The village behind her had gone wrong past all mending; the wells there tasted like a mouthful of old coins, and the Order would not touch its bones. When the Unnaming's servant had gone through, there was nothing wrong in the village, and nothing else in it at all. She bowed to the empty lane before she left it. The other glad nights are in no faith's book, and they are not in mine.
 
-The houses count five at every quarrel. The ditch-keepers at Kerrow have a song about the Long Field with a verse for a sixth watcher, and they will only hum that verse. I have heard it once with the words. I will leave it hummed.
+The faiths count five at every quarrel. The ditch-keepers at Kerrow have a song about the Long Field with a verse for a sixth watcher, and they will only hum that verse. I have heard it once with the words. I will leave it hummed.
 
 ### Three, and the one I did not buy
 
-Three works follow: a judge's roll, a hired blade's talk, and a wanderer's gloss on a stone. All three were written by people every house has paid and none has kept. They are the nearest thing to honest witnesses I found. Even they were paid.
+Three works follow: a judge's roll, a hired blade's talk, and a wanderer's gloss on a stone. All three were written by people every faith has paid and none has kept. They are the nearest thing to honest witnesses I found. Even they were paid.
 
 The one I did not buy is the ditch-keepers' song. It was offered. The price was that I sing it back.
 
@@ -977,11 +977,11 @@ Everyone in this book has told you who the others are. Nobody has told you who t
 
 ## Relics
 
-intro: Picked up in the ditches between the houses. Not one of them came to me freely.
+intro: Picked up in the ditches between the faiths. Not one of them came to me freely.
 
 ### Rubbing of the Truce-Stone
 
-Charcoal on waxed cloth, taken from the stone at Kerrow Cross on a fair morning, with five houses at my back and none of them watching me. The clauses and their marks are on it, most scratched through or stopped with pitch, and under them the last clause, in a hand no carver living can make.
+Charcoal on waxed cloth, taken from the stone at Kerrow Cross on a fair morning, with five faiths at my back and none of them watching me. The clauses and their marks are on it, most scratched through or stopped with pitch, and under them the last clause, in a hand no carver living can make.
 
 Nine years on I took a second rubbing and laid it over the first. The letters are the same size. The stone between them is wider. The last clause's mark came up darker on the cloth than anything else, though I rubbed it lightest. Fold it face in.
 

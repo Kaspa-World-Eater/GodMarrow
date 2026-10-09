@@ -1,6 +1,6 @@
 # The old-growth judge scene (tools/art_study/wood_scene.py), reworked
 
-Derek (2026-10-07): "continue with the plan: rework and improve old scenes" (docs/REWORK_AND_SEEDS_PLAN.md, stage 1).
+Derek (2026-10-07): "continue with the plan: rework and improve old scenes" (docs/archive/REWORK_AND_SEEDS_PLAN.md, stage 1).
 
 **Rules check, before the rework:**
 - **Read:**

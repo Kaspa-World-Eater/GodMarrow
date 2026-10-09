@@ -155,12 +155,12 @@ The game needs the 20 Act I creature kinds, 4 Heralds, 2 bosses, and the camp's 
 
 They need real art through the same road (shape model + detail layer). Today most are the browser's old sprites, and
 the camp's folk are blank figures with black faces. This is the art half of finishing Act I
-(`docs/ACT1_PLAN.md`, step 7). Each needs idle, walk, attack, hit and death in 8 directions; the game's monster
+(`docs/archive/ACT1_PLAN.md`, step 7). Each needs idle, walk, attack, hit and death in 8 directions; the game's monster
 loader reads the same atlas format as the heroes.
 
 ### 3.6 Effects, only when a skill asks
 
-When the combat-feel work wires effects into skills (`docs/GAME_HANDOFF.md`), the game will ask for specific
+When the combat-feel work wires effects into skills (`docs/archive/GAME_HANDOFF.md`), the game will ask for specific
 effects by name. Until then `art/fx` stays unused.
 
 ## 4. Rules the game holds the Forge to
@@ -188,4 +188,4 @@ show the painting, the flat model, the detail and the light side by side. The ga
 - The paint-over scripts and before/after pictures: `tools/paintover/`,
   `docs/concepts/hemomancer/shapes/paintover_*.png`.
 - His masked render (the input to the detail script): Derek's PC, `PixelForge Projects/godmarrow/characters/hemomancer_paint`.
-- The Act I plan: `docs/ACT1_PLAN.md`; the game's state: `docs/HANDOFF.md` section 8.
+- The Act I plan: `docs/archive/ACT1_PLAN.md`; the game's state: `docs/HANDOFF.md` section 8.

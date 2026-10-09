@@ -29,7 +29,7 @@ Tile passes: ash_0 1 (seam: ripples not periodic; too banded), 2 (whole-period r
    Graded: the veins swollen dark cords branching in.
 10. The Sighing Lantern drawn as a lantern (base plate, iron posts lit on the left, glass panes breathing, peaked cap, ring) with its breathing light on the air; its stone cut with the tenders' notches in tallies of five; the Kneeler's robe folds soft shaded bands, not cut slits.
 
-## Rework (2026-10-07, stage 1 of docs/REWORK_AND_SEEDS_PLAN.md)
+## Rework (2026-10-07, stage 1 of docs/archive/REWORK_AND_SEEDS_PLAN.md)
 - **The teeth:** now the ray-cast `fang.py` (the Gate's tooth), true forms with snapped tips, dentin and blood. The
   old `tooth.py` supplies only the gum at their feet. Molars are shorter, broader fangs (the first try, at 0.62 of the
   height, read as cracked eggshells).

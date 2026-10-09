@@ -27,14 +27,17 @@ section 1).
 | [The warped column](methods/03-warped-column.md) | Trunks that taper, swell, wander and twist |
 | [Light](methods/04-light.md) | Moon, lantern, candles; light adds; one strong statement; no red light |
 | [Values, ramps, dither](methods/05-values-ramps-dither.md) | Tones by size, quiet ground, small things by contrast |
-| [Effects and weather](methods/06-effects-and-weather.md) | Blood, fire and wax, rain in the world, fog in the lows |
+| [Effects and weather](methods/06-effects-and-weather.md) | Blood, fire and wax, rain in the world (its "fog in the lows" is retired: no fog layers) |
 | [Living layers](methods/07-living-layers.md) | The seamless loop, blinks, flicker, sway |
 | [The scene engine](methods/08-scene-engine.md) | `wood_scene.py` as a framework: hooks, order, switches, traps |
+| [The 3D road](methods/09-the-3d-road.md) | Built things and overhangs as real 3D forms in Blender, painted by our painter; what the temple trial taught |
+| [Baking a land](methods/10-baking-a-land.md) | A whole zone painted for the game in chunks: the proof, seams, height, bands, wind, cost |
 
 ## Environments: one page per land
 [Old-growth wood](environments/old-growth-wood.md) ·
 [The ritual glade](environments/the-vigil.md) ·
 [Fen and carr](environments/fen-and-carr.md) ·
+[The Sunken Bog](environments/sunken-bog.md) ·
 [The Ashen Moor](environments/ash-moor.md) ·
 [Ruins and stone](environments/ruins-and-stone.md) ·
 [Caves and the organic deep](environments/caves-and-the-organic-deep.md) ·
@@ -71,6 +74,13 @@ Older notes disagree with these. The older notes are history; these stand:
 - **"Never 3D-looking"** (wiki 01, 06) means never a cheap 3D look. Real form, ray-cast and painted, is the law.
 - **Weather happens in the world, not on it** (Derek, 2026-10-07).
 - **Insects are allowed** in the world; the no-animals law does not cover them (Derek, 2026-10-07: "bugs are fine").
+- **No fog or mist layers** (Derek, 2026-10-08, on the bog's fog: "its ugly"). Method 06's fog in the lows and every
+  scene's fog are retired.
+- **Built things and overhangs are made on the 3D road** (Derek, 2026-10-08: "this is the way"). The height engine
+  stays for ground and one-surface things (method 09).
+- **The first area is the Red Shore,** with a Thai and Northwest Coast fusion (Derek, 2026-10-08). Chapter 09 (Thai
+  temples) stands. The coast and the Northwest Coast forms need chapters of their own before building
+  (`docs/wiki/mythology/areas/the-red-shore.md`).
 
 ## Decided (Derek, 2026-10-07: "You decide. We can also be flexible")
 - **Tones per material, by size:** big forms 6 to 8 tones, small things (a 10 px stone) 3 to 4, always hue-shifted,
@@ -91,6 +101,6 @@ Older notes disagree with these. The older notes are history; these stand:
   tags to rim; the Vigil's trunks take it).
 - `NORMAL_BLUR` is still above 0 in the engine default (1.0), the Vigil (0.6) and the Gate (0.35).
 - No value-only render switch exists yet for the form test.
-- MASTER_RULES 0.1 and 0.6 still say "domes" for paving; chapter 4's planes supersede them.
+- ~~MASTER_RULES 0.1 and 0.6 still said "domes" for paving~~ (fixed 2026-10-08: they say planes).
 - Retired fixed tiles still ship through `build_set.py` (`tiles_wood`, `church_flags`).
 - `bone.SINEW` is brown; chapter 3 says dried sinew is translucent amber.

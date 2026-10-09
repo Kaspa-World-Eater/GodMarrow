@@ -1,6 +1,6 @@
 extends "res://scripts/screen.gd"
 ## Tiles and ground: a painted ground texture into iso diamonds with variants and transition tiles
-## (`pixelforge tiles`, docs/track_notes/tile_rack.md). Tabs: Source · Edges · Variants · Export. The picture window
+## (`pixelforge tiles`, tools/pixelforge/docs/track_notes/tile_rack.md). Tabs: Source · Edges · Variants · Export. The picture window
 ## lays the variants as a small iso patch so repetition shows, with the transition tiles in a row under it.
 
 func build() -> void:

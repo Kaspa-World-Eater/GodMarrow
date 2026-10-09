@@ -9,7 +9,7 @@ Derek, 2026-10-08:
 ## Rules check, before pass 1
 
 **Read for this piece:**
-- **The lore** (`docs/wiki/02-world-and-lore.md`, `mythology/05-legends-of-the-first-lands.md`): Act I is the Hide, the dead god's skin. North of the old Moor, the Hollow Wood is "the god's veins stood up out of the ground and become a forest"; the trunks are "pale and warm a hand's depth in ... a slow beat in it". **The one true detail:** a pale root of that kind, warm and slowly beating, has grown round the temple guardian's head, the god's only hint in this area (Derek: a hint here, stronger deeper in).
+- **The lore** (`docs/wiki/02-world-and-lore.md`, `mythology/05-legends-of-the-first-lands.md` (now in `docs/archive/mythology_2026-10-05/`)): Act I is the Hide, the dead god's skin. North of the old Moor, the Hollow Wood is "the god's veins stood up out of the ground and become a forest"; the trunks are "pale and warm a hand's depth in ... a slow beat in it". **The one true detail:** a pale root of that kind, warm and slowly beating, has grown round the temple guardian's head, the god's only hint in this area (Derek: a hint here, stronger deeper in).
 - **Derek's brief for the area** (memory `godmarrow-first-area-vision`):
   - a village besieged for years by the beasts and the undead, and fallen;
   - all Thai; safe; one insane, mocking looter-merchant;

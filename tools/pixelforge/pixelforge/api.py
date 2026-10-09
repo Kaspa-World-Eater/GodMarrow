@@ -1046,7 +1046,7 @@ def which_python() -> str:
 
 
 # ------------------------------------------------------------- one command from a shape file to the game
-# the game's fixed animation set for a hero (docs/FORGE_FROM_THE_GAME.md section 4): Forge clip -> frames rendered
+# the game's fixed animation set for a hero (tools/pixelforge/docs/FROM_THE_GAME.md section 4): Forge clip -> frames rendered
 BUILD_CLIPS = {"idle": 8, "walk": 8, "attack": 8, "punch": 8, "cast": 8, "hit": 6, "death": 8, "roll": 8}
 # the game anim each clip becomes (godmarrow_export.HERO_ANIMS): idle walk atk atk2 cast hit death dodge
 

@@ -1,4 +1,4 @@
-# The Hollow Wood from a seed (stages 2 and 3 of docs/REWORK_AND_SEEDS_PLAN.md)
+# The Hollow Wood from a seed (stages 2 and 3 of docs/archive/REWORK_AND_SEEDS_PLAN.md)
 
 The baker (`tools/landkit/bake.py`), the set (`art/landkit/hollow_wood/`, 50 pieces), the generator
 (`tools/worldgen/forest.py`) and the game hook (`world/landkit.gd` `take_named`). Commit 00d846a; workbench v42.

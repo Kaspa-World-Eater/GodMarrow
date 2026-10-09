@@ -44,7 +44,7 @@ var _queued: Callable           # a request made while a job ran; it runs when t
 var _request_gen := 0           # the debounce: a request that a newer one followed within its delay never runs
 var _ticket := 0                # the newest request's number; a result that comes back for an older one is stale
 
-## the retired roads (docs/FORGE_FROM_THE_GAME.md section 2; pixelforge/old_roads.py): the automatic drafting of a character
+## the retired roads (tools/pixelforge/docs/FROM_THE_GAME.md section 2; pixelforge/old_roads.py): the automatic drafting of a character
 ## from a picture or a sentence. Their choices and hints stay off every bench unless the environment sets
 ## PIXELFORGE_OLD_ROADS=1, the same flag the command line honours.
 const RETIRED_CHOICES := ["Choose a picture", "Start from a picture", "Measure again", "Sample materials again"]

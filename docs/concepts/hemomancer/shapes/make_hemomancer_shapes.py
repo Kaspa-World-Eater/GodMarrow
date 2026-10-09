@@ -22,7 +22,7 @@ rnd = random.Random(7)
 M = {
     "darkskin": {"ramp": ["#0d0907", "#1a120e", "#291d17", "#3a2a22", "#4e3a30", "#654c41"]},
     "locs":     {"ramp": ["#050506", "#0c0c0f", "#151519", "#1f1f25", "#2b2b33"], "texture": "weave", "texture_strength": 0.3},
-    # blood runs (docs/FORGE_FROM_THE_GAME.md 3.3): the cloth, the planks and the wraps bleed in drips from the seeds the
+    # blood runs (tools/pixelforge/docs/FROM_THE_GAME.md 3.3): the cloth, the planks and the wraps bleed in drips from the seeds the
     # detail layer paints (and from the top of a part without seeds), never in random specks
     "mantle":   {"ramp": ["#180a0c", "#2b1115", "#421b20", "#5a262c", "#72353c", "#8a4a52"], "texture": "weave", "texture_strength": 0.4,
                  "runs": {"colour_from": "blood", "density": 0.35, "length": [2, 6]}},

@@ -1,4 +1,4 @@
-"""The detail layer: painted textures that ride the parts (``docs/FORGE_FROM_THE_GAME.md`` 3.1).
+"""The detail layer: painted textures that ride the parts (``tools/pixelforge/docs/FROM_THE_GAME.md`` 3.1).
 
 A part's texture is a small grid of ramp-step offsets in the part's own surface coordinates (u around the shape's
 long axis, the front at the middle; v along it from the top), read by the renderer per pixel in every frame and

@@ -12,7 +12,7 @@ The rule: The lodge turns, reads the thread, and keeps the dead it is given.
 ### The Anchorite of Glass
 *Stands still, and lets the mirrors walk.*
 
-> **Anchorhold.** An anchorhold of polished iron, one pace square, its inside a single mirror. The anchorites of the Polished Heart were walled into these and fed through a slot. They did not starve. When the lodge fell, one was found open from the inside, empty, and still polished.
+> **Anchorhold.** An anchorhold of polished iron, one pace square, its inside a single mirror. The anchorites of the Veiled Crone were walled into these and tended through a slot. They did not starve. When the lodge fell, one was found open from the inside, empty, and still polished.
 
 - Rule broken: The lodge turns. He stops turning.
 - Plays: A fortress caster. While he stands his ground, his Standing Mirrors never fade, and every spell he casts is cast again from each mirror with a clear line to its target. A step shatters the farthest mirror. Positioning is the whole game: he walks to the right place, raises his glass, and holds it.
@@ -36,7 +36,7 @@ The rule: The lodge turns, reads the thread, and keeps the dead it is given.
 ### The Unwoven
 *Walks where the pattern shows through.*
 
-> **Page Cut from the Pir's Book.** Hold a lamp to him and look in the mirror behind him. The room is there, and the lamp. The Pir wrote that the Hollow is the space inside the weave where the pattern shows. She did not write that anyone could stand in it. That page was cut from her book.
+> **Page Cut from the Eldest's Book.** Hold a lamp to him and look in the mirror behind him. The room is there, and the lamp. The eldest wrote that the Hollow is the space inside the weave where the pattern shows. She did not write that anyone could stand in it. That page was cut from her book.
 
 - Rule broken: A soul cannot pass its own reflection. He has none.
 - Plays: A close-range skirmisher who passes through what he fights. Wraith Form becomes his stance. Every creature he walks through is threaded and gives up Essence to him, and the choir follows in his wake and dives into whatever he threaded. He weaves back and forth through a pack like a shuttle through a loom. Standing still is how he dies.
@@ -94,7 +94,7 @@ The rule: The penitent walks in procession, strikes in penance, and gives his bl
 ### The Nazareno
 *Walks the fourteen stations, and cannot stop.*
 
-> **Nazareno's Hood.** The Nazarenos carried the cross all fourteen stations in one night, and were not allowed to set it down between them. The brotherhood kept a list of those who finished. It is a short list. The last name on it is not written in ink.
+> **Nazareno's Hood.** The Nazarenos carried the cross all fourteen stations in one night, and were not allowed to set it down between them. The procession kept a list of those who finished. It is a short list. The last name on it is not written in ink.
 
 - Rule broken: The procession walks together. He walks alone, and does not stop.
 - Plays: A momentum brawler. Via Crucis becomes the build. Every kill moves him one station along, and each station changes his blows. If he lingers, the road goes cold and he falls back a station. At the fourteenth, his next blow lays down everything near him, and the road begins again.
@@ -118,7 +118,7 @@ The rule: The penitent walks in procession, strikes in penance, and gives his bl
 ### The Closed
 *Shuts the iron, and lets them tire.*
 
-> **Iron Maiden's Hinge.** A cabinet of iron in the shape of a woman, spikes on the inside of the doors. The brotherhood used it once a year, for one night, and the brother inside was always the one who had asked. They say it was never locked from the outside.
+> **Iron Maiden's Hinge.** A cabinet of iron in the shape of a woman, spikes on the inside of the doors. The procession used it once a year, for one night, and the brother inside was always the one who had asked. They say it was never locked from the outside.
 
 - Rule broken: The penitent strikes in penance. He does not strike at all.
 - Plays: A counter-fighter who wins by being struck. He moves between two states. Open, he casts blood. Closed, he walks slowly inside the iron, turns blows back, and every blow he takes draws blood from the striker into pools at his feet. Open the doors when the pools are deep and let it all out at once.
@@ -147,10 +147,10 @@ The rule: The purifier breathes in, breathes out, and is folded like paper for o
 ### The Unfolded
 *She ran out of room, and kept walking.*
 
-> **A Broken Fan-Rib.** Every katashiro ends as an oni. The House says it plainly and early, so that no novice is surprised. It does not say what the oni do after. The Fen's boatmen do: they keep the shrines. Badly, and with great care.
+> **A Broken Fan-Rib.** Every katashiro ends as one of the Horned. The Myriad says it plainly and early, so that no novice is surprised. It does not say what the Horned do after. The Fen's boatmen do: they keep the shrines. Badly, and with great care.
 
-- Rule broken: The doll takes the harm and is burned. She kept it, and became the oni.
-- Plays: A shifting brawler. She lets Miasma fill her instead of her cloud, and she grows with it, taking on the oni's frame: poise instead of evasion, and an iron club in place of the fan. At her largest she cannot breathe in at all. She must give it all back to become small and quick again, then start to fill once more.
+- Rule broken: The doll takes the harm and is burned. She kept it, and became one of the Horned.
+- Plays: A shifting brawler. She lets Miasma fill her instead of her cloud, and she grows with it, taking on the frame of the Horned: poise instead of evasion, and an iron club in place of the fan. At her largest she cannot breathe in at all. She must give it all back to become small and quick again, then start to fill once more.
 - Loop: let it in → grow heavy → brawl with the club → full: cannot inhale → give it back in one blast → small and quick again
 - Skills: **Let It In**: Miasma fills her instead of the air. Each thing she sickens makes her larger. · **The Iron Club**: Her heavy blow while large. A kanabō of the Fen's shrines, slow and crushing. · **Give It Back**: All of it at once, in one burst around her. She is small, quick and hard to hit again.
 - Gains: Two bodies in one build; Great poise while large; Huge burst on the way down. Gives up: No evasion while large; Cannot inhale when full; Clumsy against ranged foes.
@@ -169,7 +169,7 @@ The rule: The purifier breathes in, breathes out, and is folded like paper for o
 - Reach/Motion/Retinue/Risk: 4/4/3/2. Cousin: the Amazon's Decoy with PoE curses on it.
 
 ## The Empty Hand
-Ur-Nihl, the Hush · draws on the hourglass · trees: Radiance, Absence, Destroyer
+Ur-Nihl, the Silence · draws on the hourglass · trees: Radiance, Absence, Destroyer
 
 The rule: The monk carries nothing, keeps nothing, and pays the Silence in sand.
 

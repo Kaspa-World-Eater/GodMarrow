@@ -1,4 +1,4 @@
-"""The retired roads (docs/FORGE_FROM_THE_GAME.md section 2): the cutout road, the kit props and 3D ground, the automatic
+"""The retired roads (tools/pixelforge/docs/FROM_THE_GAME.md section 2): the cutout road, the kit props and 3D ground, the automatic
 drafts and the old music generator answer with one line unless PIXELFORGE_OLD_ROADS=1; the game's cues still render,
 from the song library; the Forge app shows no button for them."""
 import json

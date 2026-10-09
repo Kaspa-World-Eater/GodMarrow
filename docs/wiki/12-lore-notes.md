@@ -1,13 +1,13 @@
 <!-- World · updated 2026-09-29 · 8150 words · source page #lore-notes -->
 # 12 · Lore notes from the interviews
 
-Nine agents sat down with the Codex characters, in character, and asked each the same questions: who they are, where they live, what they believe, their days and feasts, their fears, what they think of the other orders and the waystones, and one small true thing. The full interviews are in `wiki/12b-codex-interviews.md`. Below are the notes each interviewer took. **Nothing here is canon until adopted**; mark bullets adopted or rejected in `01-rules-and-decisions.md`.
+Nine agents sat down with the Codex characters, in character, and asked each the same questions: who they are, where they live, what they believe, their days and holy days, their fears, what they think of the other faiths and the waystones, and one small true thing. The full interviews are in `wiki/12b-codex-interviews.md`. Below are the notes each interviewer took. **Nothing here is canon until adopted**; mark bullets adopted or rejected in `01-rules-and-decisions.md`.
 
 ## I. The Reliquary
 
 #### Places
 
-- The Copyists' Mile: four copyists keep tables along the Ashwake milestones; Aumery's stone room is built against the ninth milestone, a stone's throw from the lantern-stones and the tender's hut.
+- The Copyists' Row: four copyists keep tables along the Ashwake milestones; Aumery's stone room is built against the ninth milestone, a stone's throw from the lantern-stones and the tender's hut.
 
 - The Dry Ford on the Barrows road: a riverbed whose small god "rode off on the breath" one spring, taking the water. The quietest place on the Hide; the preacher's glass-smooth mark lies in it.
 
@@ -23,13 +23,13 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - The Drying: carters throw a cup of water into the Dry Ford for its departed river god.
 
-- The Feast of Wicks: pilgrims tie a cloth strip on a lantern's hook for each soul lost on the road; the hooks hang "like washing".
+- The Day of Wicks: pilgrims tie a cloth strip on a lantern's hook for each soul lost on the road; the hooks hang "like washing".
 
 - The Hearth-Naming: a weaned child's hidden name is said aloud once at the hearth; the midwife "listens for it to land".
 
-- Pacing Day (thaw): the surveyor paces Maren's fire to the Sighing Lantern with the camp counting aloud; 1,140 is cause to feast.
+- Pacing Day (thaw): the surveyor paces Maren's fire to the Sighing Lantern with the camp counting aloud; 1,140 is cause to rejoice.
 
-- Spoon Day (Coldhearth): a child's first spoon is carved and the lane watches it eat; the dead are buried with their spoon.
+- Candle Day (Coldhearth): a child's first candle is dipped and the lane watches it burn; the dead are buried with their candle.
 
 - Last Stubble (Barrens road): children lie in the harvest stubble singing the Unfallen while fathers wait at the edge with sacks.
 
@@ -53,7 +53,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - The Pale Order says stars fall and are fetched; the sky-reader says his "nail-heads" go out without falling. A brother asked him not to tell the next brother.
 
-- The tender says feast-day flames are no warmer; the lantern-soul says she is right about the warmth and wrong about the cause.
+- The tender says holy-day flames are no warmer; the lantern-soul says she is right about the warmth and wrong about the cause.
 
 - The preacher says "nothing kind wants you whole" of the waystones; the woodcutter would step in now because nothing wants him whole.
 
@@ -79,9 +79,9 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Places
 
-- **The Aveth Lantern:** the Sighing Lantern at the Ashwake crossroad has a name scratched small at the foot of its glass: "Aveth. She was kind about the road." (Ninth-Mile)
+- **The Aveth Lantern:** the Sighing Lantern at the Ashwake crossroad has a name scratched small at the foot of its glass: "Aveth. She was kind about the road." (Ninth-Stone)
 
-- **Cinderholt**, a forge village near Ashwake; Wenna's home. Its Hearth-Night loaf is a local rite.
+- **Cinderholt**, a forge village near Ashwake; Wenna's home. Its Hearth-Night candle is a local rite.
 
 - **Cap Hollow**, a hamlet of four fungus-picking families in the Hollow Wood, next to the hunter's hollow under the Ribcage Bough.
 
@@ -99,7 +99,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **Flat Days** in the Hollow Wood: when the ash lies still, nobody hunts, white caps are laid on every flat stone.
 
-- **Turning Morning** (midsummer, Burnt Heath): sleepers lie feet toward the herd's corner; those whose feet turn back toward the road by dawn will walk on.
+- **Turning Morning** (midsummer, Burnt Heath): sleepers lie feet toward the seven's corner; those whose feet turn back toward the road by dawn will walk on.
 
 - **Knot Night** (Kettlewick): the whole town ties a knot on every lamp at once, is counted back in and sung up the ladders.
 
@@ -113,15 +113,15 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - Crossers come up with clean white teeth, sometimes with sharper back teeth; old walkers "grin rich".
 
-- Villa Llaga brothers pay in **blood-pennies**, dried red clots that go soft in the palm; nobody on the road will take them.
+- Villa Llaga brothers pay in **blood-coppers**, dried red clots that go soft in the palm; nobody on the road will take them.
 
 - Barrens pilgrims avoid the word eleven and say "the one after".
 
 #### Things they disagree about
 
-- Whether the waystones are a mouth (Ninth-Mile), the road's own hearths (Old Thirty), the only honest thing on the road (the measurer), or friendly teeth (Wenna).
+- Whether the waystones are a mouth (Ninth-Stone), the road's own hearths (Old Thirty), the only honest thing on the road (the measurer), or friendly teeth (Wenna).
 
-- Whether the dead go down (Wenna, the digger), stay and set the table (Dry Nan), or go into fire and lantern (Aud).
+- Whether the dead go down (Wenna, the digger), stay and bank the hearth (Dry Nan), or go into fire and lantern (Aud).
 
 - Old Thirty claims walkers who never come up are "kept whole"; she admits she said it to make a girl brave.
 
@@ -129,7 +129,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Threads worth pulling
 
-- **The rings are coming nearer:** Ninth-Mile's ninety paces are now eighty-nine (compare the measurer's shrinking distance to the fallen stone).
+- **The rings are coming nearer:** Ninth-Stone's ninety paces are now eighty-nine (compare the measurer's shrinking distance to the fallen stone).
 
 - **Eight hidden bands** under the turf at every stone, tight and old; the visible bands are the new ones (the measurer).
 
@@ -137,7 +137,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The roads were never laid**, and run ring to ring "where the god was going to be touched" (the hunter's grandfather).
 
-- **The seat under the herd** is carved of plinth-stone and has seven empty places at its feet (Garrow, via Aud); the knight's herd count ends in an extra figure.
+- **The seat under the seven** is carved of plinth-stone and has seven empty places at its feet (Garrow, via Aud); the knight's count of the seven ends in an extra figure.
 
 - **The word over the tooth** in Kettlewick comes unbidden into the mouth of whoever gives a tooth back; the place risen pilgrims name sounds like "the space behind the teeth" (Mother Brisk).
 
@@ -155,7 +155,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The tallier's desk** sits beside the scale at the Weighing under the Eighth Stair; the tallier sleeps behind it and never leaves the book alone.
 
-- **The roof-house:** a stone hut on the ossuary's lip under the 81-square frame; bread and broth are hauled up on a cord. The **Wall of the Come Down** is cold enough to find in the dark.
+- **The roof-house:** a stone hut on the ossuary's lip under the 81-square frame; what they need is hauled up on a cord. The **Wall of the Come Down** is cold enough to find in the dark.
 
 - **The Wardens' Wall:** laid wardens, whose names are said once by their successor and never again.
 
@@ -163,13 +163,13 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Beliefs and rites
 
-- **Splice Day** (eve of the Feast): nine fathoms of tarred rope let down the wells; every well brother lays a hand on the splice. "The one day the rope goes down on purpose."
+- **Splice Day** (eve of the Day of the Count): nine fathoms of tarred rope let down the wells; every well brother lays a hand on the splice. "The one day the rope goes down on purpose."
 
 - **The Night of the Come Down** (midwinter): the whole ossuary lies on its back along the lip in rows, nine prayers per falling line.
 
-- **Bridge Bread** (Cold Adit, the ninth day after first frost): round loaves scored in nines, salted, set on the bridge parapet for the knights.
+- **Bridge Salt** (Cold Adit, the ninth day after first frost): salt and a lit lamp set on the bridge parapet for the knights.
 
-- **The Third Asking:** the knights' rite for ground that will not give up its bone. Seen, never described; "we moved camp a mile after."
+- **The Third Asking:** the knights' rite for ground that will not give up its bone. Seen, never described; "we moved camp a third of a league after."
 
 - **Chrism ink:** the Order writes numbers in soot-ink set with chrism, because on the oldest leaves the soot names went blank and the chrism numbers stayed. The Order found this in older pages and forgot it had copied it.
 
@@ -179,7 +179,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **Novice lore:** tell your cord slowly, with the first knot held in your teeth, or the cord seems to go on.
 
-- **Jaws:** every morning some laid brother's jaw has dropped open; sweepers push it shut with one finger and say "hush, brother," a very old bad joke.
+- **Jaws:** every morning some laid brother's jaw has dropped open; sweepers push it shut with one finger and say "quiet, brother," a very old bad joke.
 
 - **Chrism by the cradle:** Cold Adit mothers set a pot of chrism by the cradle for warmth. Those children are heavy-boned, walk late, and never break anything when they fall.
 
@@ -191,7 +191,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The Pogost:** to the village it is smoke, "the brothers going home"; to the Order it is dust.
 
-- **When the Ungated came:** the Warden says after the Feast; the sweepers, the talliers and the second hand all say before.
+- **When the Ungated came:** the Warden says after the Day of the Count; the sweepers, the talliers and the second hand all say before.
 
 - **What the stars are:** the Order says the Mother's bones, the lodges souls, the Shrine Keepers spirits of the breath.
 
@@ -213,7 +213,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The Tithed woman's memory:** a warm, wide floor sloping toward the middle, the congregation kneeling all one way. It matches the old halls beneath the ossuaries. *(the Tithed woman)*
 
-- **Radko's hand** carries the gauntlet's ridge. He expects to miss his fifth Feast; the letter he owes Vasko is the one that lay unread. *(knight, novice)*
+- **Radko's hand** carries the gauntlet's ridge. He expects to miss his fifth Day of the Count; the letter he owes Vasko is the one that lay unread. *(knight, novice)*
 
 - **Benn's collar** closed to five holes overnight, sewn round with grey Order thread in a hand better than his. *(the tithed son)*
 
@@ -223,21 +223,21 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Places
 
-- **Lower Stair** is the lowland parish town under the Peak: the Well of Two Steps, the lamp-seller's shop and the bread-woman's corner facing each other across the lane, the assize house over an empty lock-up, the washing-house behind the churchyard.
+- **Lower Stair** is the lowland parish town under the Peak: the Well of Two Steps, the lamp-seller's shop and the potter's corner facing each other across the lane, the assize house over an empty lock-up, the washing-house behind the churchyard.
 
 - **The beating-house** stood at the foot of the sanctum stair, and the bell-caster's pit and furnace at the foot of the mountain stair, where the clay is grey. The Peak's lay craftsmen now mend pots all over the valleys.
 
-- **The old water-cut** is a steep meltwater channel down the mountain, the novices' quick way down. Every thaw it washes the order's shaved hair into the reeds at the bottom.
+- **The old water-cut** is a steep meltwater channel down the mountain, the novices' quick way down. Every thaw it washes the monks' shaved hair into the reeds at the bottom.
 
 - **The east stone:** the abbot gave the bowls' names to the open hand at noon, over the lip of the east stone.
 
-- **A waystone camp below the Knee** has craftsmen, a rope-seller and pilgrims' broth. Tapped, the fang-stones ring like a cracked bell that "keeps talking after".
+- **A waystone camp below the Knee** has craftsmen, a rope-seller and pilgrims' fires. Tapped, the fang-stones ring like a cracked bell that "keeps talking after".
 
 #### Beliefs and rites
 
 - **The Noon of No Shadow** (midsummer) was the Peak's holiest day. The saints were re-laid the night before, and the monks sat open-eyed in the white fire of the sanctum.
 
-- **Bowl Eve**, the lowland rite: the first dusk after the thaw, a loaf is set on every step of the lane. By morning the loaves are gone and nobody took them. It still happens with no monks.
+- **Bowl Eve**, the lowland rite: the first dusk after the thaw, a candle is set on every step of the lane. By morning the candles are gone and nobody took them. It still happens with no monks.
 
 - **The Shut Night** (the longest dark) is when the lowlands light every lamp they own. **The Ringing of the Great Bell** was the Peak's midwinter rite, after a month in which no lesser bell was rung.
 
@@ -259,9 +259,9 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The Hand Book:** every lowland court secretly keeps a record with no names, only descriptions. "The only book that still works."
 
-- **Novice dress:** a grey smock with no belt, worn until the order is sure of you.
+- **Novice dress:** a grey smock with no belt, worn until the monastery is sure of you.
 
-- **Lay names:** "the Weight" was the Peak's kind name for a lay man, because he ate. The Pale Order says **"an early morning"** when a brother finishes telling his cord one knot short.
+- **Lay names:** "the Weight" was the Peak's kind name for a lay man, because he did not fast. The Pale Order says **"an early morning"** when a brother finishes telling his cord one knot short.
 
 - **Gold keeps the last hand:** breathe on leaf and the whorl of the thumb that laid it shows.
 
@@ -273,7 +273,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **Who opened the sanctum doors.** The abbot ordered the first brother up to open them. The washer swears nobody went up past her.
 
-- **Kept or let go.** The lamp-seller and the bread-woman want the lantern. The goldbeater wants the river. The bell-caster wants "one stroke". The washer wants her name given away first.
+- **Kept or let go.** The lamp-seller and the potter want the lantern. The goldbeater wants the river. The bell-caster wants "one stroke". The washer wants her name given away first.
 
 - **The stair count.** The knight-scribe's counts agree up and down. The lamp-seller's count going down "moves".
 
@@ -289,17 +289,17 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The shared breath at the pour** (bell-caster): the tongueless bell's syllable is "the breath you take for a word you never say".
 
-- **The third cup** (bread-woman): each morning it is cold and short by the width of a lip.
+- **The third cup** (potter): each morning it is cold and short by the width of a lip.
 
 - **The teacher's thumbprint** (lamp-seller): it is smaller than her own, though her teacher was a big man.
 
 - **The abbot's words to the washer** ("Keep that for me", "Someone always comes up first"), and the part of the water-cut where she was not alone.
 
-## V. The Polished Heart
+## V. The Veiled Crone
 
 #### Places
 
-- **The ring-yard** of the empty lodge: forty-two worn stones (forty-one sitters and the Pir's patch), the keeper's stone, the Felt-Loft over the lower door, the Coat-Post, the sewing-room behind it, and the **Hollow-stone** where the year's cloth was laid.
+- **The ring-yard** of the empty lodge: forty-two worn stones (forty-one sitters and the eldest's patch), the keeper's stone, the Felt-Loft over the lower door, the Coat-Post, the sewing-room behind it, and the **Hollow-stone** where the year's cloth was laid.
 
 - **Greenkiln**, the furnace-town on the furnace road that supplies the valley's green glass, packed in bracken.
 
@@ -311,11 +311,11 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Beliefs and rites
 
-- **The Folding**: midwinter. Each house knits one row per death into a single grey valley cloth; on the longest night the Pir folded it in nine and laid it on the Hollow-stone. The last cloth, with Oswy's row as its final row, was never folded and is missing.
+- **The Folding**: midwinter. Each house knits one row per death into a single grey valley cloth; on the longest night the eldest folded it in nine and laid it on the Hollow-stone. The last cloth, with Oswy's row as its final row, was never folded and is missing.
 
 - **The Casting-On**: spring. Every infant's thread was cast on glass needles, an arm's length long, and hung in the Felt-Loft.
 
-- **The Relining**: spring and autumn, the Coat taken off its post and laid on the seamstress's table; the Pir thumbed the wax of every re-sewn glass.
+- **The Relining**: spring and autumn, the Coat taken off its post and laid on the seamstress's table; the eldest thumbed the wax of every re-sewn glass.
 
 - The Hollow's name is said with the mouth shut, a hum. (The widow's Oswy was stitched at the throat "where he used to hum.")
 
@@ -323,15 +323,15 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - Readers **warm the glass** with the heel of the hand before turning it; cold glass shows a thread too long.
 
-- Every Pir sewed a keepsake into the Coat's lining for the next.
+- Every eldest sewed a keepsake into the Coat's lining for the next.
 
 #### Daily life (food, dress, work, sayings)
 
 - Valley food: flax-bread, flax-seed porridge and cakes, root broth and pottage, barley, turnips, onions, cap-fungus, shelf-fungus done in god-fat.
 
-- The **thumb-loaf**: bread with a thumb pressed in the middle, given to someone leaving whom you want kept; the Pir's thumb in the mirror-wax is the same mark.
+- The **thumb-candle**: a candle with a thumb pressed in the middle, given to someone leaving whom you want kept; the eldest's thumb in the mirror-wax is the same mark.
 
-- The **ring-loaf** of forty-one twists baked on Folding night; nobody eats the middle.
+- The **ring-cord** of forty-one twists, plied on Folding night; nobody cuts the middle.
 
 - The lodge's felt was beaten from **Lower Reach flax-tow**; the lodge's knitting needles were glass.
 
@@ -343,21 +343,21 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Things they disagree about
 
-- Whether the Needle-Brother stole the dead or saved them splits families: the flax-beater chalks his window, his daughter keeps a mirror at her door, and they no longer eat together.
+- Whether the Needle-Brother stole the dead or saved them splits families: the flax-beater chalks his window, his daughter keeps a mirror at her door, and they no longer sit together.
 
-- Whether the Pir came back from a waystone "smaller" (her own word) or "lighter" (the Mender's).
+- Whether the eldest came back from a waystone "smaller" (her own word) or "lighter" (the Mender's).
 
 - Whether the Hollow Mystic's wisps look into the coat's mirrors from recognition (the widow) or like a child at a bright thing (her sister).
 
-- The other orders: the Eight Million want the valley's glass open "so the dead can breathe out"; the Pale Order took only the oldest, faceless barrow-bones, "closer to the count."
+- The other faiths: the Eight Million want the valley's glass open "so the dead can breathe out"; the Pale Order took only the oldest, faceless barrow-bones, "closer to the count."
 
 - Ysolt says she believes the Crone is gentle with the still; her apprentice says she said the opposite last week.
 
 #### Threads worth pulling
 
-- **The forty-second face / mouth**: the keeper counts forty-two in the ring by candlelight and forty-one by breath (keeper; echoes the Pir's pages).
+- **The forty-second face / mouth**: the keeper counts forty-two in the ring by candlelight and forty-one by breath (keeper; echoes the eldest's pages).
 
-- **The un-ordered glass** on the Coat's left sleeve, the one that reflects nothing: it arrived with no slate, the Pir had it sewn on anyway (the Mender). Tie to the grey-hood man and the servants of the Silence.
+- **The un-ordered glass** on the Coat's left sleeve, the one that reflects nothing: it arrived with no slate, the eldest had it sewn on anyway (the Mender). Tie to the grey-hood man and the servants of the Silence.
 
 - **The grey-hood man**: casts a shadow at noon, shows nothing in glass, says of the grinder's last round, "It will be" (the grinder).
 
@@ -365,7 +365,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The Lower Reach tow**: every covering-cloth in the lodge was made from the Reach's flax, and the Reach came loose all at once (keeper, who asks the copyist to "take them apart again").
 
-- **The lining held more keepsakes than there were Pirs**, and the Pirs' names on the lodge wall will not come to the right count (the Mender). A quiet hint of counts that rise.
+- **The lining held more keepsakes than there were wearers of the coat**, and the wearers' names on the lodge wall will not come to the right count (the Mender). A quiet hint of counts that rise.
 
 - **Lantern-stone ash as rouge**: every mirror on the Coat was polished with Wickbound ash (the grinder).
 
@@ -373,7 +373,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **Waystones clean the hands**: the grinder came out of a stone ring with all his grit gone; the widow's cousin came back unable to bear glass.
 
-## VI. The Precious Wound
+## VI. The Bleeding Maiden
 
 #### Places
 
@@ -383,7 +383,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The cup-beater's yard** in the chapter yard, beside the carver's shop at the top of the upper lip, where the wind comes over from the Hollow Wood.
 
-- **The House of the Laden Board,** north of the Moor: a long, low, turf-roofed house built over a seam of god-fat, with the pens under a warm floor.
+- **The Laden Board,** north of the Moor: a long, low, turf-roofed house built over a seam of god-fat, with the pens under a warm floor.
 
 - **Kettlewick stilt-houses:** reed walls, split-pole floors you can see the mud through, and hammocks so the beat cannot climb the stilts into a sleeper.
 
@@ -391,15 +391,15 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Beliefs and rites
 
-- **The three faces in order:** the Maiden opens, the Mother makes, the Nurse feeds.
+- **The three faces in order:** the Maiden opens, the Mother makes, the Nurse tends.
 
-- **The Brotherhood's teaching:** blood given with the Words carries the giver's name, and comes back as a saint coming down the stair.
+- **The processions' teaching:** blood given with the Words carries the giver's name, and comes back as a saint coming down the stair.
 
-- **Counted down:** when the stair counts differ and the Elder rules a brother out, he lives on as a dead brother. His robe goes on a wall peg, his food is left at the door, and he keeps a quiet office such as the chained book.
+- **Counted down:** when the stair counts differ and the Elder rules a brother out, he lives on as a dead brother. His robe goes on a wall peg, his share is left at the door, and he keeps a quiet office such as the chained book.
 
 - **Brothers never use waystones:** coming apart in the pit spills blood before the Day of the Measure with no Words over it. A stone with two doors also breaks the ninth clause.
 
-- **The Raising:** the Friday a new image goes up; the carver walks behind it with his tools wrapped, in case it chips.
+- **The Raising:** the fast-day a new image goes up; the carver walks behind it with his tools wrapped, in case it chips.
 
 - **Carver's rule:** a saint's eyes are cut last, at night, with the carver's own eyes shut, or the saint will not stay in the figure.
 
@@ -443,7 +443,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Threads worth pulling
 
-- **The fourth clause:** the Elders kept it in their mouths and all of them lisped, and the leech-wives speak it into every pour. The last Elder spoke clearly on the eve of his final Measure (Gaudel, Asheth).
+- **The fourth clause:** the Elders kept it in their mouths and all of them lisped, and the bleed-wives speak it into every pour. The last Elder spoke clearly on the eve of his final Measure (Gaudel, Asheth).
 
 - **Something answered the keeper by name from the crypt stair,** and he broke a clause by not answering (Gaudel).
 
@@ -455,7 +455,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The licked cups:** licking was forbidden, and the marks were many small tongues (Tobal).
 
-- **The given in the fattening houses hum the Villa Llaga processional,** and the Mother under the floor swallows in time (Brunel).
+- **The given in the Laden Board's pens hum the Villa Llaga processional,** and the Mother under the floor swallows in time (Brunel).
 
 - **Children know the rhyme's last verse,** but nobody taught it and the older ones never sang it (Nela).
 
@@ -467,13 +467,13 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **Asheth's forty little mouths vanished from a lidded jar** the night the hoods passed (Asheth).
 
-## VII. The House of Eight Million
+## VII. The Myriad
 
 #### Places
 
 - **The gate-house at the torii:** the book-keeper sleeps there, nearest the guardian stone, so the stone is the first thing she sees; the day-book sits in a reed case under a reed awning (Mio).
 
-- **The salt-house at the torii:** a barred door where the oni can be spoken with on still nights; the House forbids it (Kasane interview).
+- **The salt-house at the torii:** a barred door where the Horned can be spoken with on still nights; the Well-Shrine forbids it (Kasane interview).
 
 - **The Salt Ford:** the ropeless bell hangs on a post "that was a reed that stood up and would not lie down"; salt crusts the stones where the water leaves it; carters sleep on the far bank.
 
@@ -487,7 +487,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **Folded names:** a purifier is renamed at her folding; the birth-name goes into a doll that is burned. Jinpei was written "Sen" in the Register, which reconciles Tae's husband with the Register's list of the seven.
 
-- **The Dusk of the Empty Bowl (Thaw the fourth):** since the Cutting-Away ended, one bowl of salt and one of rice on the step, and nobody eats.
+- **The Dusk of the Empty Bowl (Thaw the fourth):** since the Cutting-Away ended, one bowl of salt and one of water on the step, and nobody touches them.
 
 - **Stone-Turning:** the last week of Frost, every boat in the camps goes out with two strong men to turn the causeway guardian stones back to the road.
 
@@ -513,7 +513,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **Heights moss-cloth** is spun from the stone-moss of the Prayer-Flag Terraces. Barley, salt-bread and frozen white fungus from the Breath-Caves.
 
-- **Warm backs:** men who hold breath for the House stay warm all winter, and their wives sleep against them. "The only good thing."
+- **Warm backs:** men who hold breath for the Myriad stay warm all winter, and their wives sleep against them. "The only good thing."
 
 - **Sayings:** "Pay at the Hook." "A boat has no side." "Everyone wants to know" (Slow Ren). Children at the Hearth mimic Ren's through-the-teeth breathing.
 
@@ -523,9 +523,9 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **What the Nave's roof does:** Tokuji can no longer say which of his three notches came first, and secretly slides his cord mark back.
 
-- **Where the dead go:** out on the breath (House), down to the pews to wait for the bell (the boatmen's mothers), crooked or never (the Ford-Bell, of the Pale Order's dead), or down the warm road (Tae).
+- **Where the dead go:** out on the breath (the Myriad), down to the pews to wait for the bell (the boatmen's mothers), crooked or never (the Ford-Bell, of the Pale Order's dead), or down the warm road (Tae).
 
-- **Whether the guardian stones grieve or listen:** Fusa has come round to "listen"; the Ford-Bell says listen; the House still teaches grief.
+- **Whether the guardian stones grieve or listen:** Fusa has come round to "listen"; the Ford-Bell says listen; the Myriad still teaches grief.
 
 - **Ren says he heard nothing from Ivo,** then says he heard "Lighter" twice.
 
@@ -571,9 +571,9 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Beliefs and rites
 
-- In the Held Space there was no night; light lay evenly with no source; it "smelled of being held." The Choir ate the note, the builders ate the dust of cutting, the Keeper stood in the songs.
+- In the Held Space there was no night; light lay evenly with no source; it "smelled of being held." The Choir lived on the note, the builders lived on the dust of cutting, the Keeper stood in the songs.
 
-- The Choir breathed in turns so the god's note was always held; the Hush entered in the one rest when all drew breath together ("the first silence," remembered as their holiest, "sharpest" day).
+- The Choir breathed in turns so the god's note was always held; the Silence entered in the one rest when all drew breath together ("the first silence," remembered as their holiest, "sharpest" day).
 
 - The builders call themselves the hinge, belonging to neither bone; the warm ones went to them "when a door stuck." They keep as holy the day they were cut "from the first of the room," a line that also reads "taken out of the outside."
 
@@ -585,7 +585,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Daily life (food, dress, work, sayings)
 
-- Rib Crypt sextons stir a curl of grey fat from the foot of the Long Candle into the new-year broth, not knowing why; the Choir says the congregation ate from the soft walls of the god, and the god liked them quiet while they ate.
+- Rib Crypt sextons stir a curl of grey fat from the foot of the Long Candle into the new-year lamp-oil, not knowing why; the Choir says the congregation took from the soft walls of the god, and the god liked them quiet while they took.
 
 - Moor miners believe the Deep answers only Dunne Hask's pick; in truth it answers any iron, because iron comes from the god's blood seams.
 
@@ -613,7 +613,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **A fourth breath** at Greywell, drawn in and never let out: the Silent One's, or the god's in-breath returning? (Silent One.)
 
-- **The Gilded Peak's name survives** the Silent One's page; the Polished Heart's own name whitens. (Silent One.)
+- **The Gilded Peak's name survives** the Silent One's page; the circle's own name whitens. (Silent One.)
 
 - **Something the god was the first to do**, which the novice heard in the corner and will not finish saying. (Silent One.)
 
@@ -625,9 +625,9 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **Four Wents**: crossing of the Barrow road and the salt road; the reeve's hall sits on the salt-road side. A **soft place** in the middle of the crossing, warm, frost will not lie on it; measured each assize-month with a forearm-knotted cord: four knots the first year, eleven now.
 
-- **Sallow Lip**: a daughter-house of the Brotherhood of the Precious Wound (the Chapter of the Open Side), three days east of Four Wents on the salt road; its walls are its bricked-in dead, a cup in the plaster at each mouth; warm all winter without a fire; holds the great scale.
+- **Sallow Lip**: a daughter chapter of the Bleeding Maiden (the Chapter of the Open Side), three days east of Four Wents on the salt road; its walls are its bricked-in dead, a cup in the plaster at each mouth; warm all winter without a fire; holds the great scale.
 
-- **Tarn Hollow**: a round lodge of the Polished Heart on a round water west of the Barrow country; readers sit in a ring facing inward; a lowest room under the tarn keeps something in glass.
+- **Tarn Hollow**: a round lodge of the Veiled Crone on a round water west of the Barrow country; readers sit in a ring facing inward; a lowest room under the tarn keeps something in glass.
 
 - **The Chapter-House of the Kostyak**, on the fourth stair of the Ossa: sleeping-rooms a man's length and a hand more, bone-shelf beds.
 
@@ -635,23 +635,23 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The keepers' row at Kerrow Cross**: five turf houses, one keeper per road-ditch, the office passed mother to daughter.
 
-- **The moor-road tavern**: where the forty or so sellswords who serve all five houses drink.
+- **The moor-road tavern**: where the forty or so sellswords who serve all five faiths drink.
 
 #### Beliefs and rites
 
 - **Dust Night** (lowland): at the dark of the year every house sweeps inward, door to hearth, and leaves the door open until the fire dies so Grandfather Dust can take what he is owed.
 
-- **The Feast of the Laying** (Pale Order): the year's bones go up the nine stairs; the Count is read aloud from the Ninth Stair, which took seven days when the knight was a novice and takes nine now.
+- **The Day of the Count** (Pale Order): the year's bones go up the nine stairs; the Count is read aloud from the Ninth Stair, which took seven days when the knight was a novice and takes nine now.
 
-- Pale Order novices lay their birth-name in a niche with their first teeth so the Hush has nothing to unsay.
+- Pale Order novices lay their birth-name in a niche with their first teeth so the Silence has nothing to unsay.
 
-- **The Night of the Weighing** (Precious Wound): each brother stands on the great scale and gives back in blood a cup for every stone gained; older brothers sometimes owe more than they have.
+- **The Night of the Weighing** (the Bleeding Maiden): each brother stands on the great scale and gives back in blood a cup for every stone gained; older brothers sometimes owe more than they have.
 
-- **The Small Cutting** (House of Eight Million) replaced the Great Cutting-Away: breath into paper boats, burned on a dry bank, silence until the ash is cold.
+- **The Small Cutting** (the Myriad) replaced the Great Cutting-Away: breath into paper boats, burned on a dry bank, silence until the ash is cold.
 
-- **The Night of Forty** (Polished Heart): every lodge mirror uncovered for the space of one name said slowly.
+- **The Night of Forty** (the Veiled Crone): every lodge mirror uncovered for the space of one name said slowly.
 
-- A House purifier's fan opened and closed means: "I will breathe that in later, alone."
+- A purifier's fan opened and closed means: "I will breathe that in later, alone."
 
 - A paper doll turns face down when what it holds is heavier than the paper.
 
@@ -659,27 +659,27 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - Lowland food: salt-bread, root pottage, white caps from barrow-lids (the young no longer eat them).
 
-- The Wound's **sweet bread** is made with the Maiden's pale fat from the wound-lips and never goes stale; lowland mothers put a loaf under the cradle; Pale Order brothers eat it on the road and say grace in nines over it.
+- The processions' **sweet tallow** is made from the Maiden's pale fat from the wound-lips and never goes hard; lowland mothers put a candle of it under the cradle; Pale Order brothers burn it on the road and say a blessing in nines over it.
 
-- The Polished Heart buys warm polishing-ash off the Ashen Moor from the carters of Four Wents and pays in threads read, so those carters know when they will die, and are too calm to bargain.
+- The lodges buy warm polishing-ash off the Ashen Moor from the carters of Four Wents and pay in threads read, so those carters know when they will die, and are too calm to bargain.
 
-- **The Share Fair** at Kerrow Cross on the fourth morning after the Long Field's day: Order sells salt and buys cloth; Wound sells bread and weighs children for a coin; House sells clean water in clay flasks; lodge reads for free; the Peak's table stands empty with a bowl on it.
+- **The Share Fair** at Kerrow Cross on the fourth morning after the Long Field's day: Order sells salt and buys cloth; the processions sell sweet tallow and weigh children for a coin; the Shrine Keepers sell clean water in clay flasks; lodge reads for free; the Peak's table stands empty with a bowl on it.
 
-- **The ferry**: the Order leaves a purse counted to nine on the Well-Shrine step each spring; the House pins a paper doll on each dredger. The House calls it pilgrims' alms. Neither book records it.
+- **The ferry**: the Order leaves a purse counted to nine on the Well-Shrine step each spring; the Shrine Keepers pin a paper doll on each dredger. The Shrine Keepers call it pilgrims' alms. Neither book records it.
 
-- The houses hire the same forty sellswords, who stand in the ditch together when houses clash; the houses pay extra for this and call it keeping the peace.
+- The faiths hire the same forty sellswords, who stand in the ditch together when faiths clash; the faiths pay extra for this and call it keeping the peace.
 
-- Ditch-keepers are paid by each house to watch the other four, and paid again after a broken clause to say the stone did it first.
+- Ditch-keepers are paid by each faith to watch the other four, and paid again after a broken clause to say the stone did it first.
 
-- Sayings: "Hunger is honest" (Wound). "Letters wear. Figures do not." (Order). Lowland children: a reader's mirror shows who will bury you.
+- Sayings: "Hunger is honest" (the processions). "Letters wear. Figures do not." (Order). Lowland children: a reader's mirror shows who will bury you.
 
 #### Things they disagree about
 
-- Whether the House takes Order coin: the knight says it does (the ferry); the purifier denies it, then lets her fan admit it.
+- Whether the Shrine Keepers take Order coin: the knight says it does (the ferry); the purifier denies it, then lets her fan admit it.
 
 - What the barrow-lids do: the brother says the lowland barrows are mouths that eat the dead slowly and graceless; the reeve refuses to say.
 
-- Who took Villa Llaga's tithe-cup: the daughter-houses set it at the closed gate each year; "someone in our robes" takes it.
+- Who took Villa Llaga's tithe-cup: the daughter chapters set it at the closed gate each year; "someone in our robes" takes it.
 
 - Who kept watch over the Long Field dead: five books, five answers; the Peak's book unseen; the ditch-keepers hum a verse about a sixth watcher.
 

@@ -1,6 +1,6 @@
 """The retired roads and the one flag that reopens them.
 
-The game's note (``docs/FORGE_FROM_THE_GAME.md`` section 2) asked for the roads that lead to a blob to go out of the
+The game's note (``tools/pixelforge/docs/FROM_THE_GAME.md`` section 2) asked for the roads that lead to a blob to go out of the
 way of a person or a session: the old cutout road (``hero``: cutouts, Blender, Mixamo, renders), the kit props and
 3D ground (``prop3d``, ``tiles3d``), the automatic drafting of a character (``shapes draft``, ``character
 from-picture`` and the describe line's shape drafts) and the old music generator (the web score's port, ``music

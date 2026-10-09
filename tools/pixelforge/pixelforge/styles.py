@@ -47,7 +47,7 @@ class Style:
     outline_diagonal: bool = False
     edge: str = "crisp"               # soft | crisp | hard (see EDGES)
     clean: int = 0                    # passes of a 3x3 majority filter on the palette indices: specks join the colour area round them
-    # --- light and ink (the solid shape renderer; docs/FORGE_FROM_THE_GAME.md 3.2). Off = the plain render, bit for bit.
+    # --- light and ink (the solid shape renderer; tools/pixelforge/docs/FROM_THE_GAME.md 3.2). Off = the plain render, bit for bit.
     form_light: bool = False          # a ramp step up toward each piece's upper-left, down toward its lower-right
     creases: bool = False             # one step darker where a nearer piece overlaps this one
     ink: bool = False                 # the near side of a deep overlap inked with the outline colour
