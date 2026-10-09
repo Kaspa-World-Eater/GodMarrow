@@ -717,3 +717,33 @@ value, so the frame reads as dark plus mid.
 **Rules check paused** (2026-10-09): the third reminder in a row with no word from Derek, so the reminder is off by his
 pause rule until he next writes. **Next when work resumes:** the hall's light mass composed whole (fewer weeping streaks
 across the great face's lit planes, the chains off its centre), and the onyx's border made to read as ornate.
+
+## Derek, 2026-10-09: "Make the mouth more like an archway and less like an o on the exit"
+
+**Pass 10, the archway:**
+- The great face's mouth is now an archway: flat at the top step, straight sides, a round arch overhead, with a raised
+  moulding round it, cut in the face's own surface.
+- The face grew from 8 to 10 yd, so the arch (about 3.7 by 3 yd) walks through under the nose.
+- The onyx fills the arch just behind the lips. Its carved border (two mouldings, the marked band between them, bosses)
+  follows the arch and stands just proud of the lips, so it reads.
+- The candles stepped clear of the border; the wall, the sconces and the fire-basket moved out for the bigger face.
+
+**Rules check** resumed (Derek wrote).
+
+**Derek, the same hour:** "Carve runes into the stairs. Overall I like it. Be sure to write about how you massively
+improved the stone look. Then move on to what's next when you are ready."
+- The builders' marks are now cut along every cut riser of the cave's stairs, facing whoever climbs (the rough stumps
+  below stay unmarked: the raw before the made).
+- The stone's remaking is written up as report 07 (`tools/art_study/reports/07-opening-cave.md`) and indexed in the
+  library.
+
+**Pass 10 results:**
+- The archway reads: flat at the step, straight sides, a round head.
+- Its carved border shows clearly, with its bosses.
+- The great face over it reads strongly: brows, deep sockets, the nose bridge running down to the arch's crown.
+
+**Next:** the Red Water and the black sand. Its study comes first (Derek's D: "need a study in the tide, oceans,
+water, black sand").
+- `cine_check`: the hall 9 of 9 (the squint recovered with the archway), the stairs 9 of 9.
+- The runes on the cave stairs' cut risers are cut, but in the stairs frame those steps sit up in the dark and the marks
+  are too small to show there. They read best at the throne steps in the hall.

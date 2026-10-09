@@ -233,10 +233,10 @@ def serene_depth(X, Y, kind, seed):
             f += 0.02 * g(X, Y + 0.42, 0.18, 0.08)
         f -= 0.015 * g(X, Y + 0.54, 0.12, 0.05)                              # under the lower lip
     else:
-        mo = (X / 0.42) ** 2 + ((Y + 0.45) / 0.38) ** 2
-        if mo < 1.0:
-            f -= 0.55 * math.sqrt(1.0 - mo)
-        f += 0.05 * math.exp(-((math.sqrt(mo) - 1.0) / 0.06) ** 2)
+        ai = arch_inside(X, Y)                                            # the archway (Derek: "more like an archway")
+        if ai > 0:
+            f -= 0.55 * min(1.0, ai / 0.03)
+        f += 0.05 * math.exp(-(ai / 0.04) ** 2)                            # its moulding
     f += 0.05 * g(X, Y + 0.66, 0.15, 0.09)                                   # the chin
     inside_ = min(1.0, max(0.0, (1.0 - e2) / 0.15))
     d = head + f * inside_ * (1.0 if kind == "orcus" else 1.7)          # cut deep enough to read in the dark
@@ -597,6 +597,9 @@ def stairs_cut():
         for q in range(3):
             px = rnd.uniform(x0 + 0.2, x1 - 0.2)
             P.sphere("sdust%d_%d" % (i, q), (px, yb + 0.12, top), rnd.uniform(0.18, 0.4), "ash", scale=(1.6, 0.6, 0.18))
+        # the builders' marks cut along the riser, facing whoever climbs (Derek: "Carve runes into the stairs")
+        rh = FLOOR_HALL / STEPS
+        carve_marks("smark%d" % i, (x0 + 0.3, ya + 0.004, top - rh + 0.09), (1.0, 0.0), None, (0.0, 1.0), (x1 - x0) - 0.6, 0.16, 200 + i)
 
 
 def hall_floor():
@@ -660,7 +663,7 @@ def hall_walls():
         tb = th0 + (th1 - th0) * (k + 1) / n
         tm = (ta + tb) / 2
         mx, my = _hall_pt(tm, 0.995)
-        if math.hypot(mx - fx, my - fy) < 4.6:
+        if math.hypot(mx - fx, my - fy) < 5.6:
             continue                                                # the colossal face is cut here
         a_in, b_in = _hall_pt(ta, 1.0), _hall_pt(tb, 1.0)
         a_out, b_out = _hall_pt(ta, 1.12), _hall_pt(tb, 1.12)
@@ -806,7 +809,7 @@ def throne():
     fx, fy, nx, ny = _face_span()
     sx, sy = -ny, nx
     f = FLOOR_HALL
-    H = 8.0
+    H = 10.0                                                       # grown, so the archway walks through under the nose
     # the dais, five steps of dressed stone, each worn hollow where the feet went
     for k in range(5):
         dep = 6.2 - k * 1.05
@@ -822,18 +825,18 @@ def throne():
     top = f + 1.4
     WORN.append((fx + nx * 7.5, fy + ny * 7.5, fx + nx * 0.2, fy + ny * 0.2, 1.3))       # up the throne's stairs to the mouth
     # the colossal face: its lower lip at the dais top, so the mouth is the throne room
-    cz = top + 0.83 * 0.5 * H - 0.12                               # the maw's lower lip at the top step
+    cz = top - ARCH_BOT * 0.5 * H - 0.1                            # the archway's sill at the top step
     CUTS.append((fx, fy, nx, ny, 0.55 * H, f - 2.0, cz + 0.6 * H))
     relief("orcus", (fx, fy, cz), (nx, ny), H, "orcus", 4242, "basalt", 0.55, back=0.75, nu=64, nv=76)
     # the fires the little faces' mirrors will hold: the braziers, the throne's candles, the heap's candles
     # on the seat's arms' ends and on the top step's front corners
-    THRONE_C = [(fx + nx * d + sx * a, fy + ny * d + sy * a, top + b) for a, d, b in ((-2.35, 1.0, 0.14), (2.35, 1.0, 0.14), (-2.9, 0.6, 0.14), (2.9, 0.6, 0.14),
+    THRONE_C = [(fx + nx * d + sx * a, fy + ny * d + sy * a, top + b) for a, d, b in ((-3.0, 1.0, 0.14), (3.0, 1.0, 0.14), (-3.6, 0.6, 0.14), (3.6, 0.6, 0.14),
                                                                                     (-1.3, 2.0, -0.14), (1.3, 2.0, -0.14))]
     BRAZ = [(fx + nx * 3.4 + sx * side * 4.8, fy + ny * 3.4 + sy * side * 4.8, f + 1.55) for side in (-1, 1)]
     # (Derek: "You can have one large face with a mirror in its mouth": the small faces that covered it are gone)
     # its key light: an iron fire-basket hanging on chains out of the dark, high and to one side, raking across the
     # whole face so every little face holds its own shadows (rule 19; Derek: "the faces are still to hard to see")
-    cbx, cby, cbz = fx + nx * 3.2 - sx * 3.6, fy + ny * 3.2 - sy * 3.6, cz + 1.6
+    cbx, cby, cbz = fx + nx * 3.4 - sx * 4.4, fy + ny * 3.4 - sy * 4.4, cz + 1.6
     for i in range(10):
         a_ = 2 * math.pi * i / 10
         P.tube("cresset_bar%d" % i, [(cbx + math.cos(a_) * 0.22, cby + math.sin(a_) * 0.22, cbz - 0.35), (cbx + math.cos(a_) * 0.42, cby + math.sin(a_) * 0.42, cbz + 0.15)],
@@ -848,7 +851,7 @@ def throne():
     flame("cresset", cbx, cby, cbz - 0.05, 0.28, 175.0)
     # two sconces high on its flanks, raking across the little faces so each holds its own shadows (rule 19)
     for side in (-1, 1):
-        wx_, wy_ = fx + sx * side * 4.7 + nx * 0.6, fy + sy * side * 4.7 + ny * 0.6
+        wx_, wy_ = fx + sx * side * 5.7 + nx * 0.6, fy + sy * side * 5.7 + ny * 0.6
         torch("ftorch%d" % side, wx_, wy_, cz + 0.9, -sx * side * 0.6 + nx * 0.8, -sy * side * 0.6 + ny * 0.8, 70.0)
     # the throne is gone; the mouth at the top of the throne's stairs is a great dark mirror, the way out (Derek: "Give
     # the room no exit. There will be a large mirror the player looks in in a large face, it reflects nothing but
@@ -857,14 +860,12 @@ def throne():
     # step either side, where any mirror would hold their flames: black framed by light, the hall's one subject
     mx, my = fx - nx * 0.6, fy - ny * 0.6
     P.box("mouthfloor", (mx - 1.8, my - 1.8, f), (mx + 1.8, my + 1.8, top), "dressed", rot_z=math.atan2(ny, nx))
-    mc = (fx + nx * 1.45, fy + ny * 1.45, cz - 0.45 * 0.5 * H)        # at the lips' plane, so its border is seen
-    nv_ = 48
-    verts = [mc]
-    for i in range(nv_):
-        a_ = 2 * math.pi * i / nv_
-        verts.append((mc[0] + sx * math.cos(a_) * 1.78, mc[1] + sy * math.cos(a_) * 1.78, mc[2] + math.sin(a_) * 1.46))
-    P.poly("voidmirror", verts, [(0, 1 + i, 1 + (i + 1) % nv_) for i in range(nv_)], "voidmirror")
-    onyx_frame(mc, (sx, sy), (nx, ny), 1.78, 1.46)
+    # the onyx fills the archway just behind the lips; its border stands just proud of them
+    fc = (fx, fy, cz)
+    outline = arch_path(fc, (sx, sy), (nx, ny), H, 0.0, 1.7)
+    P.poly("voidmirror", outline, [tuple(range(len(outline)))], "voidmirror")
+    onyx_arch_frame(fc, (sx, sy), (nx, ny), H, 1.78)
+    mc = (fx + nx * 1.7, fy + ny * 1.7, cz + (ARCH_BOT + ARCH_SPRING) * 0.25 * H)
     for k, (cx_, cy_, cz_) in enumerate(THRONE_C):
         P.cylinder("tcandle%d" % k, (cx_, cy_, cz_ - 0.12), 0.06, 0.14, "bone", sides=6)
         flame("tcandle%d" % k, cx_, cy_, cz_ + 0.02, 0.08, 72.0)
@@ -1315,6 +1316,85 @@ def onyx_frame(mc, s_, n_, rx, rz, seed=77):
     # bosses on the outer ring
     for i in range(12):
         P.sphere("onyx_boss%d" % i, at(2 * math.pi * (i + 0.5) / 12, 0.62, 0.16), 0.13, "carved", scale=(1, 1, 1))
+
+
+# the way out: an archway through the great face (Derek: "Make the mouth more like an archway and less like an o"),
+# in the face's own coordinates (X across, Y up): flat at the step, straight sides, a round arch overhead
+ARCH_HW, ARCH_BOT, ARCH_SPRING, ARCH_RISE = 0.34, -0.83, -0.42, 0.18
+
+
+def arch_inside(X, Y):
+    """how far inside the archway a point is (in the face's units; negative outside)"""
+    side = ARCH_HW - abs(X)
+    bot = Y - ARCH_BOT
+    if Y <= ARCH_SPRING:
+        return min(side, bot)
+    e = (X / ARCH_HW) ** 2 + ((Y - ARCH_SPRING) / ARCH_RISE) ** 2
+    return min((1.0 - math.sqrt(e)) * ARCH_RISE, bot)
+
+
+def arch_path(c, s_, n_, H, off, out, n=64):
+    """the archway's outline in the world, grown outward by off (yards), set out from the face's plane by out: from the
+    left foot up, over the arch, down to the right foot"""
+    sx, sy = s_
+    nx, ny = n_
+    hw = ARCH_HW * 0.55 * H + off
+    zb = c[2] + ARCH_BOT * 0.5 * H
+    zs = c[2] + ARCH_SPRING * 0.5 * H
+    rise = ARCH_RISE * 0.5 * H + off
+    pts = []
+    k_side = n // 4
+    for i in range(k_side):
+        pts.append((-hw, zb + (zs - zb) * i / k_side))
+    for i in range(n - 2 * k_side + 1):
+        a = math.pi - math.pi * i / (n - 2 * k_side)
+        pts.append((math.cos(a) * hw, zs + math.sin(a) * rise))
+    for i in range(1, k_side + 1):
+        pts.append((hw, zs - (zs - zb) * i / k_side))
+    return [(c[0] + sx * u + nx * out, c[1] + sy * u + ny * out, z) for u, z in pts]
+
+
+def onyx_arch_frame(c, s_, n_, H, out, seed=77):
+    """the onyx's border, following the archway (Derek: "an ornate carved runic stone border"): two raised mouldings of
+    smooth carved stone, a flat band between them with the builders' marks cut along it, bosses on the outer moulding;
+    standing just proud of the lips, so the black reads against lit stone"""
+    inner = arch_path(c, s_, n_, H, 0.1, out + 0.08)
+    outer = arch_path(c, s_, n_, H, 0.66, out + 0.06)
+    P.tube("onyx_ring_in", inner, [0.14] * len(inner), "carved", 8)
+    P.tube("onyx_ring_out", outer, [0.11] * len(outer), "carved", 8)
+    a_ = arch_path(c, s_, n_, H, 0.18, out + 0.03)
+    b_ = arch_path(c, s_, n_, H, 0.6, out + 0.03)
+    verts = []
+    for p, q in zip(a_, b_):
+        verts += [p, q]
+    faces = [(2 * i, 2 * i + 2, 2 * i + 3, 2 * i + 1) for i in range(len(a_) - 1)]
+    P.poly("onyx_band", verts, faces, "carved", 0.12)
+    # the marks along the band, each upright to the band's run
+    mid = arch_path(c, s_, n_, H, 0.39, out + 0.1, n=120)
+    rnd = random.Random(seed)
+    nx, ny = n_
+    k = 0
+    i = 2
+    while i < len(mid) - 2:
+        p0, p1 = mid[i - 1], mid[i + 1]
+        tan = (p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2])
+        tl = math.sqrt(sum(t * t for t in tan)) + 1e-9
+        tan = tuple(t / tl for t in tan)
+        # the band's across: the cross of the tangent with the face's normal
+        up = (tan[1] * 0.0 - tan[2] * ny, tan[2] * nx - tan[0] * 0.0, tan[0] * ny - tan[1] * nx)
+        ul = math.sqrt(sum(t * t for t in up)) + 1e-9
+        up = tuple(t / ul for t in up)
+        glyph = SCRIPT[rnd.randrange(len(SCRIPT))]
+        w, h = 0.17, 0.26
+        for q, (u0, v0, u1, v1) in enumerate(glyph):
+            a = tuple(mid[i][j] + tan[j] * (u0 - 0.5) * w + up[j] * (v0 - 0.5) * h for j in range(3))
+            b = tuple(mid[i][j] + tan[j] * (u1 - 0.5) * w + up[j] * (v1 - 0.5) * h for j in range(3))
+            P.tube("onyx_mark%d_%d" % (k, q), [a, b], [0.024, 0.024], "lacquer", 4)
+        k += 1
+        i += 5
+    bosses = arch_path(c, s_, n_, H, 0.66, out + 0.16, n=24)
+    for j, p in enumerate(bosses[1:-1:2]):
+        P.sphere("onyx_boss%d" % j, p, 0.14, "carved")
 
 
 FACE_TURN = (0.74, 0.67)               # the stair faces turned on the wall to look down the stairs at whoever climbs

@@ -32,6 +32,7 @@ section 1).
 | [The scene engine](methods/08-scene-engine.md) | `wood_scene.py` as a framework: hooks, order, switches, traps |
 | [The 3D road](methods/09-the-3d-road.md) | Built things and overhangs as real 3D forms in Blender, painted by our painter; what the temple trial taught |
 | [Baking a land](methods/10-baking-a-land.md) | A whole zone painted for the game in chunks: the proof, seams, height, bands, wind, cost |
+| [Stone and dark interiors](../reports/07-opening-cave.md) | Basalt of every girth (`cliff3d.seeds`, `cells`, `rough_prism`, `chunk`); the cave painter (`paint_cave.py`: the lamps as the light, log curve, light zones, black as a note, quiet darks, fire with embers and shimmer); stone carved smooth against rough walls; faces in the rock (`serene_depth`); `cine_check.py` |
 
 ## Environments: one page per land
 [Old-growth wood](environments/old-growth-wood.md) ·
