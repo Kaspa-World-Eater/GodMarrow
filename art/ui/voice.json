@@ -11,7 +11,7 @@
    ]
   },
   "crypt": {
-   "e": "Dur-nang, the inside grave. The walls are ribs, dry as old ivory.",
+   "e": "Dur-nang, the inside grave. The walls are ribs, dry as an old tooth.",
    "w": [
     "The flagstones lift under your boots, slow and even. Something below is sleeping.",
     "Every niche held a mother's bones once. The Great Standing emptied them.",
@@ -136,7 +136,7 @@
   "wolf_den_chapel": {
    "e": "A chapel the hungry took. They left the pews and ate the rest.",
    "w": [
-    "The old kill-floor, dark with a century of meals. Bone-scraps in the altar rail.",
+    "The old kill-floor, dark with a century of feeding. Bone-scraps in the altar rail.",
     "Something howled here at the moment the god died. The walls still hold the note.",
     "A pew split by a body thrown hard. The hungry were not the first to fight here.",
     "The hymn-board still lists the last hymns. The numbers match nothing now."
@@ -191,7 +191,7 @@
    "e": "A hunter's cache in the heather. He meant to come back for it.",
    "w": [
     "Snares still set, rusted shut around nothing. What he hunted, he did not catch.",
-    "Dried meat on the rack, black as tar. Whose meat, the cache does not say.",
+    "Dried flesh on the rack, black as tar. Whose flesh, the cache does not say.",
     "A bow unstrung and leaning, the way a man leaves one when he means to return.",
     "His boots are here. So are his tracks, leading away barefoot."
    ]
@@ -230,7 +230,7 @@
     "Your echo comes back before you speak. Do not answer it.",
     "Drink from the Reversed Spring and it takes a memory. It does not say which.",
     "A second heartbeat under your own, slower. Stand still and they begin to match.",
-    "The oni walk down this road with their sacks. Nothing walks up it."
+    "The Horned walk down this road with their sacks. Nothing walks up it."
    ]
   },
   "a2_town": {
@@ -246,7 +246,7 @@
    "e": "White dunes of powdered bone, under a sun that does not blink.",
    "w": [
     "The sand is holy bone, ground fine. Every step you take is on someone.",
-    "A caravan lies where the dune took it: salt, oxen, drivers, one white shape.",
+    "A caravan lies where the dune took it: salt, yokes, drivers, one white shape.",
     "The Keel of Saint Ivel juts from the sand. He sailed the dunes, they say, and sank.",
     "Your edge dulls a little in the dust. Bone wears down iron, given time.",
     "A rib-arch on the horizon, like a wrecked hull. It is the Bearing Mother's."
@@ -298,7 +298,7 @@
    ]
   },
   "a2_banners": {
-   "e": "Banners of holy wars no one won. The cloth rotted; the gold thread stands.",
+   "e": "Banners of holy wars no one won. The cloth decayed; the gold thread stands.",
    "w": [
     "The Standard of Nine Wars went out to nine wars. It never came back from the tenth.",
     "The shield-wall held. The men behind it did not. The shields stand in a line, alone.",
@@ -320,7 +320,7 @@
    "w": [
     "The Marrow-Ghouls gnaw the petrified marrow. Their teeth are worn to the gums.",
     "The walls sweat tallow. The Citadel's candles came from here, once.",
-    "A shore of marrow-butter, soft underfoot. Things sleep under the skin of it.",
+    "A shore of marrow-grease, soft underfoot. Things sleep under the skin of it.",
     "Oss-Vharoth made her children from this. Some of it is still trying."
    ]
   },
@@ -368,12 +368,12 @@
    ]
   },
   "a3_fetish": {
-   "e": "Grass masks in the branches, feather charms, dripping egg sacs. Someone keeps these.",
+   "e": "Grass masks in the branches, bone charms, dripping sacs. Someone keeps these.",
    "w": [
     "The masks all face inward, toward the ring. Whatever they watch has not left.",
-    "Egg sacs hang like fruit. Do not shake the branches. They are ripe.",
-    "The Sac-Mother's hollow is warm, and smells of milk and iron.",
-    "The priests carve their masks from bird-bone. There are no birds. Think on that."
+    "The sacs hang low and heavy. Do not shake the branches. They are ripe.",
+    "The Sac-Mother's hollow is warm, and smells of skin and iron.",
+    "The priests carve their masks from hollow bone. Nothing on the Hide grows bone that light. Think on that."
    ]
   },
   "a3_delta": {
@@ -381,12 +381,12 @@
    "w": [
     "The kettle-priests boiled the delta for tallow until the delta boiled them.",
     "At the braided ford the blood is shin-deep and warm as a hand.",
-    "Leeches the size of dogs sleep in the shallows, fat and content. Walk softly.",
+    "Clots as long as a man's arm sleep in the shallows, fat and content. Walk softly.",
     "Every channel runs to the sea, and on the beat the sea runs back up them."
    ]
   },
   "a3_amber": {
-   "e": "The mire has curdled. Grease the colour of old honey, holding things fast.",
+   "e": "The mire has curdled. Grease the colour of old resin, holding things fast.",
    "w": [
     "Flies in the grease, and moths, and a man, all held mid-motion.",
     "A tree wept here so long it drowned in its own grease.",
@@ -395,12 +395,12 @@
    ]
   },
   "a3_broodbanks": {
-   "e": "Egg-banks along a broad red river. Something here is always hatching.",
+   "e": "Banks of sacs along a broad red river. Something here is always hatching.",
    "w": [
-    "The sac-weir holds the eggs back from the current. It has begun to fail.",
+    "The sac-weir holds the unborn back from the current. It has begun to fail.",
     "Larvae swim in the hatching shallows, all facing upstream, toward the Ziggurat.",
     "The brood-sows wallow in the warm. They do not mind you. Yet.",
-    "A husk floats past, belly swollen. It is not dead. It is carrying leeches."
+    "A husk floats past, belly swollen. It is not dead. It is carrying clot-spawn."
    ]
   },
   "a3_causeway": {
@@ -413,19 +413,19 @@
    ]
   },
   "a3_sumps": {
-   "e": "Pits where the brood-priests bred their leeches. The leeches bred themselves after.",
+   "e": "Pits where the brood-priests bred their clots. The clots bred themselves after.",
    "w": [
-    "In the Suckling Pool a leech the size of a cart sleeps, still attached to something.",
+    "In the Suckling Pool a clot the size of a cart sleeps, still attached to something.",
     "The sumps drain toward the Maiden. Everything here drains toward her.",
     "Priests lay in these pits to be bled holy. Their outlines are still in the mud.",
     "A drip. A drip. A drip. Each one warm."
    ]
   },
   "a3_egggal": {
-   "e": "Racks of eggs in warm galleries, tended by no one, hatching anyway.",
+   "e": "Racks of sacs in warm galleries, tended by no one, hatching anyway.",
    "w": [
     "The warm racks hum. Put your ear close and you can hear them growing.",
-    "Each egg holds a face against its shell. No two the same face.",
+    "Each sac holds a face against its skin. No two the same face.",
     "A keeper's stool by the racks, and a keeper's shape on it, gone to shell.",
     "The first brood was laid here. The galleries still keep its heat."
    ]
@@ -514,7 +514,7 @@
     "Where the wind turns, it turns hard and takes what is loose. Hold on to your name.",
     "The wind carved the Cut Stone a grain a year, into a woman at prayer.",
     "Tether-pilgrims roped themselves to the ridges and let the wind take them, slowly.",
-    "This wind is the Crone's last breath, still leaving. It will take a long time."
+    "This wind is the god's last breath, still going out. It will take a long time."
    ]
   },
   "a4_stair": {
@@ -557,7 +557,7 @@
    "e": "The summit. A great bell, never rung, and an Abbot keeping it silent.",
    "w": [
     "The Unrung Bell was cast to sound the god's last breath. They never let it.",
-    "Ring it, and the Crone finishes breathing out. The Abbot has waited to be sure.",
+    "Ring it, and the god finishes breathing out. The Abbot has waited to be sure.",
     "The last lantern on the mountain. After this the way is only down, into her."
    ]
   },
@@ -682,7 +682,7 @@
   "2": [
    "Bone-dust in your teeth. It is someone. It was always someone.",
    "The sun does not blink. Neither do the dead out here.",
-   "A hymn in a language the orders forgot drifts over the dunes."
+   "A hymn in a language the faiths forgot drifts over the dunes."
   ],
   "3": [
    "The mud keeps time. You are keeping it too, now.",
@@ -690,7 +690,7 @@
    "Something hatches, far off, and begins to cry."
   ],
   "4": [
-   "The air is thin. Every breath you take is one the Crone let go.",
+   "The air is thin. Every breath you take is one the god let go.",
    "A bell rings once, somewhere below. No one strikes it.",
    "Frost forms on your lashes in the shape of words."
   ],

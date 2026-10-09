@@ -58,8 +58,20 @@ var dots: Array = []       # [{dps, t, elem, tick}]
 var hit_flash := 0.0
 var corpse_t := 0.0
 
+## the old exports' unique names were built from parts that include words the world never uses ("Rot" is banned;
+## "Hush" Derek dropped on 2026-10-08): they read as Gall- and Still- instead
+const NAME_FIX := {"Rot": "Gall", "Hush": "Still"}
+
+static func clean_name(n: String) -> String:
+	for k in NAME_FIX:
+		if n.begins_with(k):
+			return NAME_FIX[k] + n.substr(k.length())
+	return n
+
 func setup(z: Zone, m: Dictionary) -> void:
 	zone = z
+	if m.has("name"):
+		m["name"] = clean_name(str(m["name"]))
 	info = m
 	kind = m["kind"]
 	ai = m.get("ai", "husk")

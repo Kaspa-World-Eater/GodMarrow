@@ -75,6 +75,9 @@ func _on_herald(_m, _god: String) -> void:
 	pass
 
 # ------------------------------------------------------------------ building
+## old lantern names in the zone exports that break the word laws (no "rot", no kitchen words, 2026-10-08)
+const LANTERN_RENAME := {"The Rotted Loom": "The Weaver's Lamp", "The Salt Cellar": "The Salt Store"}
+
 func _build(o: Dictionary) -> void:
 	var i := int(o.get("i", -1))
 	var tp := Vector2(o["x"], o["y"])
@@ -82,7 +85,8 @@ func _build(o: Dictionary) -> void:
 	var mem := Q.obj(zone.id, i)
 	match ty:
 		"lantern":
-			_add("lantern", o, _holder(i), o.get("name", "Lantern"))
+			var ln := str(o.get("name", "Lantern"))
+			_add("lantern", o, _holder(i), LANTERN_RENAME.get(ln, ln))
 		"vendor":
 			var n := NPC.new()
 			n.setup("vendor", tp)

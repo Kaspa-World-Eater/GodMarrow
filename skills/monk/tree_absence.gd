@@ -64,7 +64,7 @@ func _cast_clap() -> bool:
 		if m.brain and m.brain.state in ["wind", "charge", "chargeWind"]:
 			broke += 1
 			m.brain.state = "chase"
-			say_at(m.tp, "hushed", Color8(184, 168, 216))
+			say_at(m.tp, "stilled", Color8(184, 168, 216))
 		stun(m, st)
 		hurt(m, dmg, "kclap")
 	claps.append({"tp": hero.tp, "t": 0.0, "dur": 0.45, "R": R})

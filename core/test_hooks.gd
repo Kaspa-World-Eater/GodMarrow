@@ -38,6 +38,8 @@ static func run(g) -> void:
 					o.visible = false
 	if a.has("perf"):   # perf: every second, where the frame goes
 		_perf(g)
+	if a.has("ranks"):   # tests: how many of each rank the zone holds, and the uniques by name (core/main.gd _tame)
+		_ranks(g)
 	if a.has("panel"):
 		await g.get_tree().create_timer(1.0).timeout
 	if a.has("hide"):
@@ -880,3 +882,14 @@ static func _perf(g) -> void:
 			Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME),
 			Performance.get_monitor(Performance.OBJECT_NODE_COUNT),
 			g.get_tree().get_nodes_in_group("monsters").size()])
+
+
+static func _ranks(g) -> void:
+	var count := {}
+	var named := []
+	for m in g.zone.sorted.get_children():
+		if m is Monster:
+			count[m.rank] = int(count.get(m.rank, 0)) + 1
+			if m.rank == "unique":
+				named.append("%s [%s]" % [str(m.info.get("name", "")), m.pack])
+	print("RANKS ", g.zone.id, " ", count, " uniques: ", named)

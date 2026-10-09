@@ -252,10 +252,10 @@
    "Mire",
    "Ash",
    "Grim",
-   "Rot",
+   "Gall",
    "Pale",
    "Bitter",
-   "Hush",
+   "Still",
    "Dusk"
   ],
   "B": [
@@ -404668,7 +404668,7 @@
     "type": "qb_abbot",
     "act": 4,
     "life_scale": 2.2,
-    "intro": "The Chime-Abbot: \"Hush. The choir is about to begin.\"",
+    "intro": "The Chime-Abbot: \"Quiet. The choir is about to begin.\"",
     "stages": [
      {
       "at_life_frac": 0.66,

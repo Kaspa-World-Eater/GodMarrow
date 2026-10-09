@@ -182,7 +182,7 @@ const GODS := {
 	"bone": {"name": "Old Upright", "herald": "The Marrow Pontiff", "rgb": Color8(232, 226, 208), "mon": "hbone"},
 	"flesh": {"name": "the Red Mother", "herald": "The Wet Nurse", "rgb": Color8(196, 150, 150), "mon": "hflesh"},
 	"breath": {"name": "the Last Breath", "herald": "The Long Exhale", "rgb": Color8(180, 225, 255), "mon": "hbreath"},
-	"hollow": {"name": "the Hush", "herald": "A Silent One", "rgb": Color8(150, 110, 200), "mon": "hhollow"},
+	"hollow": {"name": "That Which Cannot Be Named", "herald": "A Silent One", "rgb": Color8(150, 110, 200), "mon": "hhollow"},
 }
 const SHRINE_NAMES := {"echo": "Shrine of Echoes", "wisp": "Shrine of the Wisp", "stone": "Shrine of Stone", "refill": "Refilling Shrine", "arcana": "A Hidden Shrine"}
 

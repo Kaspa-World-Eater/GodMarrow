@@ -106,7 +106,8 @@ func _ready() -> void:
 
 
 ## fewer strong ones (Derek 2026-10-08: "magic+ monsters are too often"): only one champion pack in three stays a
-## champion pack (the rest are ordinary creatures of their kind), and a zone keeps one named unique, the first
+## champion pack (the rest are ordinary creatures of their kind), and a zone keeps one named unique: a vow's target if
+## the zone has one (its pack is "q<vow id>", and the vow needs it unique), else the first
 func _tame(m: Dictionary, seen: Dictionary) -> Dictionary:
 	var rank := str(m.get("rank", "normal"))
 	var pack := str(m.get("pack", ""))
@@ -122,7 +123,7 @@ func _tame(m: Dictionary, seen: Dictionary) -> Dictionary:
 	if rank == "champion":
 		keep = absi(pack.hash()) % 3 == 0
 	elif rank == "unique":
-		keep = not seen.has("unique") or seen["unique"] == pack
+		keep = pack.begins_with("q") or not seen.has("unique") or seen["unique"] == pack
 		if keep:
 			seen["unique"] = pack
 	if keep:
@@ -186,6 +187,9 @@ func enter(zid: String, from: String) -> void:
 	elif reading_open and fresh_pilgrim:
 		_reading_open()
 	var tamed := {}
+	for m0 in zone.d.get("monsters", []):
+		if str(m0.get("rank", "")) == "unique" and str(m0.get("pack", "")).begins_with("q"):
+			tamed["unique"] = str(m0["pack"])   # the vow's target is the zone's one unique
 	for m0 in zone.d.get("monsters", []):
 		# the safe circle of a town holds no creatures
 		var sc = zone.markers.get("safeCircle")

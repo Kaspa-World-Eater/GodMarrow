@@ -17,7 +17,7 @@ const GODS := {
 	"bone": {"name": "Old Upright", "herald": "The Marrow Pontiff", "mon": "hbone"},
 	"flesh": {"name": "the Red Mother", "herald": "The Wet Nurse", "mon": "hflesh"},
 	"breath": {"name": "the Last Breath", "herald": "The Long Exhale", "mon": "hbreath"},
-	"hollow": {"name": "the Hush", "herald": "A Silent One", "mon": "hhollow"},
+	"hollow": {"name": "That Which Cannot Be Named", "herald": "A Silent One", "mon": "hhollow"},
 }
 static var gods_done := {}     # god -> true once its Herald is unmade (one per god per playthrough)
 
