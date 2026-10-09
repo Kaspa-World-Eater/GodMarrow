@@ -154,6 +154,18 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09, the bible's old age rewritten from Derek's lore notes** (the Myths and Lands page): the gods of fear are
+  the Terrors ("the loud gods is a bad name"); the Starving is the Wasting, and starved gods break into Wants, not
+  demons; the marrow is the world's own life, and taking it kills the world; no dragons but the one dracolich, the
+  god's herald, who cast out the Eldrazi-like Unhewn and became the Shaper (the demiurge), later the Starved Crown;
+  Vesk is an iron behemoth among the Famines; the shell beneath is a Cthulhu-like sleeper whose breath is the tide;
+  the serpent is a naga ouroboros that ate itself and choked; the Lifted of Ithmar, a high civilization of marrow-magic
+  fallen in the Marrow War, lead a renamed set of peoples; the Wasting holds penance, the iron maidens and apotheosis;
+  the Tithed toil, and salt is gone from the myths. The folded thing is the god's mind, the Held Space a labyrinth of
+  its folds where thoughts are real, and the Hide is both the skin and where the people hid. The builders are the
+  Angled (alien, too many angles, sigils that hurt the eyes); the Deep is iron grown from stale blood, where iron
+  golems harden the core like an eggshell; the Keeper of the Spiral Hollow keeps the god's hearing. New: the myth of
+  the sun and the moons (Derek: "we need a myth of the sun and the moons that fit our lore").
 - **2026-10-09, the drift logs are bones (Derek):** "Turn the logs into bones." The jam at the back of the Red Shore's
   beach is giant bones the Red has thrown up, not trees: long bones with their knuckled ends, ribs (some arching out of
   the sand), vertebrae, piled crosswise as drift logs pile. Whose bones is never said.

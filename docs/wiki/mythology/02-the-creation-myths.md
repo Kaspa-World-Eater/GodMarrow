@@ -18,48 +18,66 @@ Children in the lowlands count it on their fingers:
 ## The Tithed: the Kneeling
 
 *What they look at:* not the world but the inside of something. The common people's beginning is their own: kneeling
-in a place they could never see the edges of.
+at work in a place they could never see the edges of.
 
-In the beginning that the Tithed remember, they were already on their knees. They knelt inside something warm, in a
-light that came from nowhere and lay over everything evenly, and they sang, because singing was what one did there.
-How long they knelt, nobody can say. Nothing in that place was ever counted, and there was no night to count by.
+In the beginning that the Tithed remember, they were already on their knees, and they were working. They knelt inside
+something warm, in a light that came from nowhere and lay over everything evenly, and they worked, and as they worked
+they sang, because singing was what one did there and because a song keeps the hands moving. How long they knelt,
+nobody can say. Nothing in that place was ever counted, and there was no night to count by.
+
+The place was a maze. Its walls were soft and grey and folded on themselves, fold behind fold, and its ways turned back
+and doubled and ran on, so that a woman could walk all day and come round to where she started without once turning a
+corner. It was warm, and it hummed. And in that place, the grandmothers say, what you thought was so. A thing thought
+hard enough walked out from behind the next fold and stood there. A fear came down the passage toward you with its own
+feet. A good dream could be met in the turning and walked with a while. The people learned to think carefully, and to
+work instead of thinking, because work is the one thing a thought cannot get into. That is why the Tithed still say,
+when a child is idle, *keep your hands busy, or your head will fill.*
+
+What they worked at, nobody now agrees. Some say they scrubbed the walls of the maze, because things grew on them.
+Some say they carried something down the passages, a load each, hand to hand, deeper and deeper in, and put it back
+where it had been taken from. Some say the work was the singing, and that the song held the walls up. Every telling
+agrees that the work was owed. The Tithed were paying for something. They still are; it is in their name.
 
 The thing they knelt inside was three things at once, the grandmothers say: a soul to weave its fates on, a bone to
 hold it up, and flesh to fill it out, the way a knot is three turns and still one thing. That is how the grandmothers
-make it small enough to say. Pressed, they admit that nobody ever saw it, any more than a seed sees the fruit it lies
-in.
+make it small enough to say. Pressed, they admit that nobody ever saw it, any more than a thought sees the head it is
+thought in.
 
 They were not the first ones there. There were singers somewhere behind the walls who never showed themselves. There
-were builders with long hands, cutting stairs too low for any foot and niches too long for any body. High in the dark
-sat a court of white faces that watched every thought. None of these cared for the people much. The people sang
-anyway.
+were builders whose halls had too many corners, cutting signs that hurt to look at. High in the dark sat a court of
+white faces that watched every thought, and in that place a thought was a thing that could be judged. None of these
+cared for the people much. The people worked anyway.
 
-Near the end, the thing set something down among them, small and folded, the way a woman banks a coal in ash so there
-will be fire in the morning. Nobody saw it set down. Mothers still say it lies nearest the top in a newborn, where the
-skull has not yet closed, and they hold a newborn's head in the hand for that reason.
+Near the end, the thing set something down among them, small and grey and folded, folded the way the walls of the maze
+were folded, the way a woman banks a coal in ash so there will be fire in the morning. Nobody saw it set down. Mothers
+still say it lies nearest the top in a newborn, where the skull has not yet closed, and they hold a newborn's head in
+the hand for that reason, and do not let it think too hard too young.
 
-Then it came. Here the grandmothers say nothing for the space of a breath, because what came has no name that
-may be said: That Which Cannot Be Named, the lowlands call it when they must. It pressed in from outside, the way cold presses at a tent, and began to take the thing's names.
-It took the little ones first: the name of the smallest finger, the name of one eyelash, the name of the hour before
-morning. The people sang louder. It took more. And one night, though there was no night there, the thing forgot how
-to be three, and the warmth went out of the walls, and the light went with it.
+Then it came. Here the grandmothers say nothing for the space of a breath, because what came has no name that may be
+said: That Which Cannot Be Named, the lowlands call it when they must. It pressed in from outside, the way cold presses
+at a tent, and began to take the thing's names. It took the little ones first: the name of the smallest finger, the
+name of one eyelash, the name of the hour before morning. The people sang louder and worked harder. It took more. And
+one night, though there was no night there, the thing forgot how to be three, and the warmth went out of the walls, and
+the light went with it, and every thought that had ever walked in the maze lay down where it stood.
 
 In the dark the people took hold of each other's belts, so that nobody would be lost, and walked. They walked through
 soft places, and hard places, and places that pulsed underfoot, toward a door that was warm and wet and opened and
 shut. They went out through it on the thing's last breath, into a grey light, and fell on ash, and kissed the ash
 because it was ground.
 
+They called the land they came out onto **the Hide**. It is the skin of the thing, the grandmothers say, and anyone can
+feel that it is warm. And it is where the people hid, afterward, from what had come in and from what would come up,
+on the outside of the body they had worked in, under a grey sky, keeping their heads down. Both meanings are meant.
+
 The children always ask whether everybody came out. "All of them," the grandmothers say, the first time they tell it.
 "Most of them," the second time.
 
-Where were they before they went in to kneel? They do not know. But they had salt with them, and the thing they knelt
-in never had any of its own.
-
-*Behind the myth.* "Three natures" is the Tithed's own way of making the thing small enough to say. The folded thing
-is real, and it does lie nearest the top in infants; the Deep under the Hide asks for them. The salt came from
-somewhere outside. One telling (`03-the-age-of-terrors.md`) has the congregation walk in through the mouth from the
-starving world to kneel where it was still warm. What took the names, and whether the thing is truly dead, is unknown,
-even to us.
+*Behind the myth.* The maze of folds was the thing's mind, and the Held Space was inside its skull (`04-the-held-space.md`):
+the congregation came out through its mouth onto the ash of its cheek. In that place thoughts and dreams were real,
+because a mind is where they are. The folded thing set down among the people is a seed of that mind, and it does lie
+nearest the top in infants; the Deep under the Hide asks for them. One telling (`03-the-age-of-terrors.md`) has the
+congregation walk in from the wasting world as toilers, to mend what the marrow-diggers had taken; the work they
+remember is that. What took the names, and whether the thing is truly dead, is unknown, even to us.
 
 ## The Pale Order: the Falling
 
@@ -237,26 +255,100 @@ and never comes back.
 
 ## The older voices
 
-The peoples who were here before the Tithed left little but stone and a few words. These are their beginnings, as far
-as anyone has made them out.
+The peoples who were here before the Tithed left little but stone, ash and a few words. These are their beginnings, as
+far as anyone has made them out.
+
+**The Lifted of Ithmar** left the most and are understood the least. They were the height of the world: a people that
+learned to draw the marrow out of the deep bone of the world and burn it, and with it hung their cities in the sky,
+and lived above the Terrors for longer than anyone has counted since (`03-the-age-of-terrors.md`). Their beginning is
+known from the inscriptions on the undersides of their fallen cities, cut where only someone looking up from below
+would read them, and it is a boast. In the beginning, it says, there was a heavy world, and everything in it was held
+down: the rivers held in their beds, the people held to the ground, the gods held to the people who feared them. Then
+the first of the Lifted opened a bone and found the weight inside it, and drank it, and was light. *We were the first
+thing in the world that did not fall.* Everything after that, in their telling, was going up. The scholars who read the
+inscriptions note that the cities they are cut on are lying in the ash, upside down, and that the people who carved
+them never imagined anyone would read them from above.
+
+What the Lifted knew is mostly lost, and what is left is told as if it were magic, because nobody now can tell it
+apart from magic. They made doors that opened onto other doors a hundred leagues off. They made lamps that have not
+gone out in all the years since, and some of those lamps still burn in the ash where the cities came down, under the
+grass, so that on a dark night parts of the lowlands glow faintly from beneath. They wrote with light. They spoke to
+each other across the whole sky. Their sovereigns drank so much marrow that they stopped being people and started being
+believed in, and in the end they made war on one another for the last of it, the war the scholars call the Marrow War,
+and the sky burned for a generation, and the cities fell. Of the greatest people the world has seen, there is now
+nothing but myth and ash and the Thrones Below, the crowned dead still sitting in the cities' broken hearts, still
+sending for marrow.
 
 **The Choir**, behind the ribs: *We were the part of the god that told it what it was.* Their beginning was the first
 note, and they were eleven hundred and one voices singing it in turns so that it was never dropped.
 
-**The builders**, who called themselves the hinge: *We were cut from the first of the room, and began cutting at
-once.* They never cut a name for the thing they lived inside. They cut around it, and every ring they carved has a gap
-the width of a thumb.
+**The builders**, whom the scholars call **the Angled**, left no word for their beginning, only a sign: a sigil cut at
+the head of every stair they made, all angles, more angles than its lines can hold, that hurts the eyes to look at
+and cannot be copied by any hand that has tried. Those who look at it long enough say it is a picture of the moment
+they began, seen from every side at once, and that it is not finished.
 
-**The One Swallow**, the single mind that lived in many bodies in the mire: the whole of the beginning was one swallow,
-a throat going down, and they were inside it, going down together, and it was the only time they were warm all
-through.
+**The Unison**, the single mind that lived in many bodies in the mire: the whole of the beginning was one thought, a
+long one, and they were inside it, thinking it together, and it was the only time they were warm all through.
 
-**The climbers** of the heights: the sky is a mouth, open, and everything is inside it.
+**The Sky-Climbers** of the heights: the sky is a mouth, open, and everything is inside it.
 
-**The tall hollow ones**, made of wanting: they were the wanting of something that wanted nothing. Once they stood a
-long while in a warm room where nothing wanted, and were at rest, and they have been looking for that room since.
+**The Emptied**, the hollow folk of the fallen cities: they say nothing of a beginning. They remember being full.
 
 **The Slayers**, who came from outside: *Something was opened, and we came in where it was open. There was never a
 beginning. There was only a way in.*
 
-**The Deep**, under the skin of the world, courteous: *Before the skin was laid over, I was the floor.*
+**The Deep**, under the skin of the world, in the iron dark: *The blood stood still, and grew heavy, and the weight of
+everything lay on it, and it hardened, and we woke in it.*
+
+## The sky: the sun and the moons
+
+Over the Hide the sky is grey. It has been grey for as long as anyone has counted years, by day a low pale lid of cloud
+with the sun behind it as a white smear that gives light and no warmth, and at night a darker lid with the moons
+behind it. On some nights the cloud thins and the moons stand out clear, and on very few days the sun does, and the
+people go out of their houses to look. Every people of the Hide has a telling of what is up there. Here are the ones
+told most.
+
+**The grandmothers of the lowlands** say that when the god died, somebody laid coins on its eyes, so that it would not
+see what came after. Those are the two moons. One is silver, and that is the pale moon, the great one, whose light the
+night roads are walked by. The other was tarnished before it was laid, and that is the dark moon, small and red-brown
+and dull, which is hard to see except when it crosses the face of the pale one and bites a piece out of it. And the
+sun, the grandmothers say, is the third eye, the one in the brow, which would not close. There was no third coin for
+it. It stares down at the world through the grey, clouded white as a dead man's eye is clouded, and that is why the
+day gives no warmth: it is a dead eye looking.
+
+**The shore folk** say there were three moons once, and one of them fell. It fell out of the sky and lay down, and the
+land is its body, and the Red Water is its blood (see above). The two left in the sky go round and round looking for it.
+On the nights when they come close together, nose to nose over the sea, they are looking hardest, and the Red rises
+higher up the black sand than on any other night, reaching for them. The shore folk do not go down to the water on
+those nights.
+
+**The grey itself**, everyone agrees, is newer than the sun. The common count says the sky went grey in the year of
+the coming out. The Myriad say the grey is the god's last breath: it breathed out as it died and the breath is still
+going out, rising off the whole Hide and hanging between the world and the sun, and the sky will not clear until the
+breath has all gone. The circles of the Veiled Crone say the grey is her veil, drawn over the whole sky, and that the
+two moons are her eyes behind it, one open and one shut, and that when the dark moon crosses the pale one she is
+blinking.
+
+**The Gilded Peak** taught that the sun is the open hand of the Silence, Radiance, which shows everything and so takes
+everything away, and that the dark moon is the closed hand, Absence. The pale moon between them is the world, being
+weighed. The monks watched the dark moon's crossings and wrote down how much of the pale one it covered, every time,
+for nine hundred years, and the numbers were getting larger.
+
+**The Pale Order** says that when the Mother fell, the first brothers needed light to lay her bones by, and they lit
+two lamps and hung them where nothing could put them out. The pale moon is the lamp they lit first. The dark moon is
+the second, which has been guttering since the first night. The brothers count the moons' turns as they count
+everything, and in the deepest books the count of the dark moon's turns is written in a different hand from the rest,
+older, and does not agree with it.
+
+**The processions of the Bleeding Maiden** say the sun is not an eye or a hand but a wound in the sky, and the light is
+what bleeds through it from the other side.
+
+**The Lifted** left their own telling, cut in the undersides of their fallen cities. *We made the second moon*, it
+says. *We lifted a city so high it would never come down.* The scholars who read it have looked a long time at the dark
+moon through the gaps in the cloud. It is not round. It has edges, and it turns, slowly, and on the clearest nights
+there are, some of them swear, lights on it.
+
+*Behind the myth.* What the sun and the moons are, nobody knows, and it stays unknown. The pale moon is the night's key
+light in every scene (the moonlight the pilgrim walks by). The dark moon is rarely seen, and its crossings are an
+omen in every faith. Whether it is Ithmar's last throne, a coin, an eye or a lamp is never said; every telling stands.
+The grey sky is the Last Breath's, and the deep lore rhymes it: the god's breath is still leaving the world.

@@ -8,6 +8,20 @@ ruling in `../01-rules-and-decisions.md` always wins. Section 8 lists what the 2
 - the small towns and villages it names (Ashwake, Villa Llaga, Greywell, Kerrow Cross and the rest): the lore names
   no little towns that are not in the game;
 - "the Hush": the Silence is That Which Cannot Be Named, That Which Cannot Be Held, the Unmaking, or a pause.
+- **By Derek's lore notes of 2026-10-09** (the rewrite of `02`, `03`, `04`; the decision log has the full ruling):
+  - "the loud gods" are **the Terrors**; "the Starving" is **the Wasting**; "demons" are **Wants**;
+  - the dragons are gone but the one dracolich, the god's herald, the Shaper, the Starved Crown; the Unhewn replace
+    them as the great threat from outside;
+  - "the walls that stood up" are folded into the Famines as Vesk, the iron behemoth;
+  - the peoples are renamed: the One Swallow is **the Unison**, the tall hollow ones / Marrow-Eaters are **the
+    Emptied** (drained people of Ithmar), the lords are **the Thrones Below**, the Unforgotten are **the Hallowed**,
+    the mouths at the wick are **the Lanternless**; the climbers stay **the Sky-Climbers**; **the Lifted of Ithmar**
+    are new;
+  - the builders, "the hinge" and "the Lintel-Folk" are **the Angled**;
+  - the Visitors are **the Uninvited**; the Tallyman and the Ferryman are retired for **the Unborn** and **the
+    Drowned Twin**;
+  - the Deep is no longer "the floor": it is the iron country of stale blood;
+  - salt is gone from the myths (not yet from the zones' folk practice; open for Derek).
 
 The digest keeps the old words as a record of its sources. The bible is `00-the-deep-lore.md` to `07-who-is-who.md`.
 

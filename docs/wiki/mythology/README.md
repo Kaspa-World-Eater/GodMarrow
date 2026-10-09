@@ -23,7 +23,7 @@ leaves), written in the world's own voices. Those live in `../in-game-texts/` an
 | `00-the-deep-lore.md` | **the truth beneath everything, for us only:** the world as narrative, gods as dreams believed real, everything reflecting everything, mantles, the Silence, the pilgrim |
 | `01-the-ages.md` | **the timeline:** the ages from the Silence to the year 1114, and the dated events of the last thousand years |
 | `02-the-creation-myths.md` | **every people's creation myth,** in full |
-| `03-the-age-of-terrors.md` | the world before the god died: the loud gods, the dragons, the god-corpses that walk, the peoples of that age, and the Starving that ended it |
+| `03-the-age-of-terrors.md` | the world before the god died: the Terrors, the Unhewn and the herald, the Famines, the Lifted of Ithmar and the Marrow War, the peoples of that age, and the Wasting that ended it |
 | `04-the-held-space.md` | inside the living god: the Choir, the builders, the court of white faces, the congregation; and every telling of how the god died |
 | `05-the-last-breath.md` | the thousand years since, era by era: the coming out, the founding of the faiths, the serpent's death, the great events, to now |
 | `06-the-ends-of-the-world.md` | **every people's end of the world** |
@@ -66,8 +66,16 @@ leaves), written in the world's own voices. Those live in `../in-game-texts/` an
 
 ## Still open for Derek
 
-- **The ages' names.** These pages use the Lore Bible's first set: the Uncounted, the Age of Terrors, the Starving,
-  the Age of the Last Breath.
+- **The ages' names.** These pages use the Lore Bible's first set, with Derek's change of 2026-10-09: the Uncounted,
+  the Age of Terrors, the Wasting (was the Starving), the Age of the Last Breath.
+- **From Derek's notes of 2026-10-09** (the rewrite of `02`, `03` and `04`):
+  - salt is gone from the myths (the congregation no longer carries it in, and the first night's line is of worn
+    tools). The zones still use salt as a folk ward (sills, barrows, the Ash Shore's salt-boilers, the Smugglers'
+    Hold). Keep it there as everyday practice, or take it out of the world too?
+  - the in-game texts that retell the old age (`../in-game-texts/10-the-old-powers.md`, `11-the-gone-peoples.md`)
+    still use the old names and need rewriting to match;
+  - the game's own data still names a boss "The Marrow-Eater" (`data/progression.json`); the bible no longer has a
+    people of that name (the Emptied took its place).
 - **The Flesh herald's name.** The game still shows the retired "Wet Nurse"; Soul has no herald.
 - **The faiths' own words:** order, monastery, circle, procession, shrine.
 - **The start's names:** the village, the merchant, and the sea's common name.

@@ -15,8 +15,8 @@ before. This page tells only this turn.
 |---|---|---|---|
 | **The Silence** | before anything; around everything still | the space between words, holding every meaning there could ever be | `02`, `04` |
 | **The Uncounted** | long, unnumbered | the thing beneath: something vast lies across the dark, and the first peoples live on it without knowing what it is | `02`, `03` |
-| **The Age of Terrors** | long, unnumbered | the loud gods: fear and worship grow bodies, and the bodies rule; dragons, walking walls, god-corpses that walk, the serpent of the wet country | `03` |
-| **The Starving** | shorter, unnumbered | the gods starve as their peoples die or forget; starved gods break into demons; the cities empty | `03` |
+| **The Age of Terrors** | long, unnumbered | the Terrors: fear and worship grow bodies, and the bodies rule; the Unhewn from outside, cast out by the god's herald; the Famines; the Lifted of Ithmar and the Marrow War; the serpent of the wet country | `03` |
+| **The Wasting** | shorter, unnumbered | the marrow is gone out of half the world; the Terrors waste away and break into Wants; penance, the iron maidens, apotheosis; the cities empty | `03` |
 | **The Held Space** | alongside the three ages above | inside the thing beneath, a space held open and lit from nowhere: the Choir, the builders, the court of white faces, and at the last the congregation | `04` |
 | **The Death** | year 0 | the thing beneath stops; the congregation walks out of its mouth onto the ash | `04` |
 | **The Age of the Last Breath** | years 0 to 1114 | the world as a corpse that has not finished dying; its last breath still going out; the faiths, the lanterns, the long dark | `05` |
@@ -41,49 +41,54 @@ anything long feared or long prayed to, and hardens there into **marrow**.
 
 ## The Age of Terrors
 
-The loud gods walked. Every great fear had grown a body, and every body ruled the people whose fear had made it.
+The Terrors walked. Every great fear had grown a body, and every body ruled the people whose fear had made it.
 
-- **The dragons,** born of the terror of a world without walls. They were one power among many, perhaps the greatest,
-  perhaps only the ones that lasted longest.
-- **The Famines:** god-corpses the height of hills that kept walking, into which whole kingdoms climbed to worship.
-- **The tower** filled with one thing full of eyes.
-- **The cities** that worshipped their walls until the walls stood up.
+- **The Unhewn,** from outside the world, who ate the shape of things, until the god raised its herald, the one dragon,
+  and drove them out. The herald stayed, remade the world and came to believe it had made it: the Shaper, later the
+  Starved Crown.
+- **The Famines:** god-corpses the height of hills that kept walking, eating the land bare, into which whole kingdoms
+  climbed to live; among them Vesk, the city whose walls stood up, now an iron behemoth.
+- **The tower** filled with one thing full of eyes, which drinks dreams.
 - **The reaper** asleep in a cavern floored with an age's dead.
-- **The shell** under a delta, filtering blood.
-- **The serpent of the wet country,** fed in blood.
-- **The lords:** kings, abbots and matrons believed into small godhood.
+- **The shell** far out under the Red, whose sleeper's breath is the tide.
+- **The serpent of the wet country,** a naga coiled round the whole wet country with its tail in its mouth, fed in blood.
 
-The peoples of the age left ruins and little else:
-- the climbers, who built a stair to climb out of the sky;
-- the One Swallow, a single mind in many bodies, in the mire;
-- the tall hollow ones made of wanting;
-- the builders whose halls fit no human body.
+The peoples of the age:
+- the Lifted of Ithmar, the height of the world, who burned the world's marrow to hang their cities in the sky, and
+  fell in the Marrow War; their sovereigns are the Thrones Below, their drained people the Emptied;
+- the Sky-Climbers, who built a stair to climb out of the sky;
+- the Unison, a single mind in many bodies, in the mire;
+- the Hallowed, who live as long as a people keeps their name in its prayers;
+- the Lanternless, eaters of souls at the edge of the light;
+- the Angled, inside the thing, whose halls have too many corners.
 
-Rule by terror was the order of things. A city that trembles is a city that feeds its god.
+Rule by terror was the order of things. A city that trembles is a city that feeds its god. And every power anyone
+had was marrow dug out of the ground, which was the god's own life.
 
-## The Starving
+## The Wasting
 
-It ended the way it had to. The peoples who fed the loud gods died, or stopped believing, or were eaten by what they
-believed in. The gods starved. **A god that starves to the end breaks apart into lesser things**, as a dead thing breaks
-in the heat into flies, and those lesser things are the demons: hungry for what their god was fed and unable to get it,
-so they bargain, because a bargain is the nearest thing to a prayer they can get. The cities emptied. Knowledge died
-with the hands that held it.
+It ended the way it had to. The marrow was gone out of half the world, and the peoples who fed the Terrors died of the
+waste, or stopped believing, or were eaten by what they believed in. The Terrors wasted away. **A god that wastes to
+its end breaks apart into lesser things**, each carrying one of its hungers: these are the Wants, and they bargain,
+because a bargain is the nearest thing to a prayer they can get. The peoples fed their gods pain when they had nothing
+else: processions of penance, and the iron maidens standing in rows in the wastes. Some penitents were believed into
+something more, a saint or a Want or a god for a winter. The cities emptied. Knowledge died with the hands that held it.
 
-Some powers did not die. They slept, or went under, or kept walking because nobody told them to stop. The last dragon
-ate its worshippers and then itself to stay awake. One Famine still walks. The serpent of the wet country was still
-being fed in blood when the god died, and long after.
+Some powers did not die. They slept, or went under, or kept walking because nobody told them to stop. The Starved Crown
+ate its worshippers and then itself to stay awake. One Famine still walks, and Vesk. The serpent of the wet country was
+still being fed in blood when the god died, and long after, and then ate itself.
 
 ## The Held Space
 
 All that time, inside the thing beneath, there was a space held open, and in it there was no night. Light lay evenly
 over everything and came from nowhere. In it:
 - the Choir sang the thing what it was, in turns, so that the note was never dropped;
-- the builders cut stairs and long niches, in proportions no human body fits;
+- the Angled cut halls with too many corners and sigils that hurt the eyes;
 - high in the dark, a court of white faces judged every thought.
 
 At the very last, a congregation knelt there and sang. They are the ancestors of every person now alive on the Hide.
-Whether they had always been inside, or walked in from the starving world through its mouth carrying their salt, is
-told both ways. Whether the Held Space was the thing's life, a dream it had, or a story told by things that need one,
+Whether they had always been inside, or walked in from the wasting world through its mouth as toilers, to mend what
+the marrow-diggers had taken, is told both ways. Whether the Held Space was the thing's life, a dream it had, or a story told by things that need one,
 no voice agrees.
 
 ## The Death, year 0
@@ -106,7 +111,7 @@ one shape. Derek may move any of them.
 
 | Year | What happened | Told in |
 |---|---|---|
-| 0 | The god dies. The congregation walks out of the mouth onto the ash. The first night; the salt line across the door. | `04`, `05` |
+| 0 | The god dies. The congregation walks out of the mouth onto the ash. The first night; the line of tools across the door. The sky goes grey. | `04`, `05` |
 | 0–1 | The first soul is kept in a lantern. | `05` |
 | 1 | The heath below the cheek burns for a year, and nobody lit it. | `05` |
 | 0 onward | The brothers who will be the Pale Order begin laying the bones, and the Count begins. They say they stood beside her as she fell. | `05` |

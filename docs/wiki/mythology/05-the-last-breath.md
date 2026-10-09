@@ -15,10 +15,11 @@ Ashen Moor, and kissed the ash because it was ground. The light was grey and cam
 way ever since, the same length every day to the width of a thread.
 
 **The first night.** The things that come up out of the god came to them on the first night, and stood round them in
-the dark, and breathed. The people had nothing but the salt they had carried out. They laid it in a line across the
-mouth of their shelter and in a ring round the first child born in the open, and the things stood outside the line all
-night and did not cross it. Ever since, the Tithed put salt on every sill and round every cradle, and hang a lantern at
-the cradle's head. The things that come up are made of the god. The people are the only things that are not, and the
+the dark, and breathed. The people had nothing but the tools they had carried in to work with and carried out again.
+They laid them in a line across the mouth of their shelter and in a ring round the first child born in the open, and
+the things stood outside the line all night and did not cross it, because the tools were worn with the people's work,
+and nothing of the god had ever worked. Ever since, the Tithed lay a worn tool across every sill and round every
+cradle, and hang a lantern at the cradle's head. The things that come up are made of the god. The people are the only things that are not, and the
 things want them back: some to take inside, some to put on like a coat and kneel and be them. They do not hate the
 people. They are homesick.
 
@@ -56,8 +57,8 @@ barrows, nine to a ring and nine of a family to each, face down, and said no nam
 inward, all pointing to a ring of standing teeth. The mothers they carried instead into the crypts dug between the
 god's ribs, because the mothers had carried the children out, and wanted to go back in.
 
-**The hunting.** The old powers that had outlived the Starving still walked, and the new people were small and warm
-and full of belief. Things waited at the edge of every lantern's light. The mouths at the wick came to the lanterns,
+**The hunting.** The old powers that had outlived the Wasting still walked, and the new people were small and warm
+and full of belief. Things waited at the edge of every lantern's light. The Lanternless came to the lanterns,
 because a lantern has a soul in it. Whole companies went down roads and did not come to the end of them.
 
 **The first cup, about 80.** At a great wound in the ground that did not close, people began to pour a measured cup of

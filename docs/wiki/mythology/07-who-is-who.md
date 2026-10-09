@@ -73,7 +73,7 @@ Every herald is a mantle (`00-the-deep-lore.md`): whoever wears it now. They wak
 ## The peoples
 
 **The Tithed** are everyone: the children of the congregation that knelt inside the god.
-- **Their ways:** salt on the sill and round the cradle; belts knotted at the back; true names kept behind the teeth; no
+- **Their ways:** a worn tool across the sill and round the cradle; belts knotted at the back; true names kept behind the teeth; no
   singing on the open ash at night.
 - **Their nights:** Kneel-Night, once a year; Low Day at the barrows.
 - **Their end:** "somebody always sits up". They have no end of their own.
