@@ -55,6 +55,8 @@ R = {
     # the black sand by the dune's method: eight tones, the darks leaning violet-blue, the lights warm (rule 9)
     "black_sand": ramp("#0d0b13", "#16131c", "#211c24", "#2c252b", "#383032", "#463b3a", "#564942", "#68584d", "#7a6858"),
     "sand_wet": ramp("#0d0708", "#170b0c", "#221012", "#2d1617", "#3a1d1d", "#482525"),
+    # iron gone to rust: dark scale, orange where it flakes
+    "rust": ramp("#0f0b0b", "#1d1310", "#2f1c14", "#45261a", "#5c321f", "#764226", "#8d5530"),
     "kelp": ramp("#120708", "#1f0d0b", "#2e150f", "#3e1f14", "#4f2a19"),
     # the drowned dead: bloated skin gone grey-violet and green, the dark marbling of the veins under it
     "corpse": ramp("#1d1a1e", "#302a30", "#463e43", "#5e5459", "#776b6c", "#928580", "#ab9d92", "#c2b5a6"),
@@ -66,7 +68,8 @@ R = {
 }
 MAT = {1: "ground", 2: "stucco", 3: "brick", 4: "stone", 5: "lacquer", 6: "gold", 7: "tile", 8: "wood", 9: "root",
        10: "iron", 11: "bone", 12: "moss", 13: "cloth", 14: "straw", 15: "water", 16: "boxpaint", 17: "blood",
-       18: "hide", 19: "cedar", 20: "basalt", 21: "ash", 22: "kelp", 23: "corpse"}
+       18: "hide", 19: "cedar", 20: "basalt", 21: "ash", 22: "kelp", 23: "corpse",
+       24: "pool", 25: "rust", 26: "cutrock"}
 
 
 def tone(rmp, t, dith, band=0.2):
@@ -161,6 +164,33 @@ def paint(d):
         elif name == "lacquer":
             col = lacquer_paint(m, t, along, Z, W, dith)
             col = keeper_account(col, m, t, X, Y, Z, n, dith)
+        elif name == "pool":
+            # the blood in the basin (the game's own blood, blood.py): level, its depth from its edge on the screen,
+            # held dark, clots and a skin, the pigment pooled at the wet edge; lit only by what lights it
+            import blood as BL
+            full = np.zeros(m.shape, bool)
+            full[m] = True
+            dep = np.clip(nd.distance_transform_edt(full)[m] / 18.0, 0, 1)
+            sy_, sx_ = np.nonzero(m)
+            # held dark (the library's trap: ketchup): the clot and the dark red only, a lit dab where the light lies
+            lvp = dep * 0.6 + (fbm(X[m] * 1.2, Y[m] * 1.2) - 0.5) * 0.5 + dith[m] * 0.2
+            col = np.where((lvp > 0.55)[:, None], BL.C1, BL.C0)
+            dabp = (vn(X[m] * 2.5 + 3, Y[m] * 6.0) > 0.78) & (dep > 0.25)
+            col = np.where(dabp[:, None], BL.C1 * 1.4 + np.array([0.04, 0.04, 0.06]), col)
+            clot = vn(X[m] * 1.6 + 40, Y[m] * 1.6) > 0.7
+            col = np.where(clot[:, None], BL.C0 * 0.7, col)
+        elif name == "cutrock":
+            # the rock cut away for the camera: solid and near black, only its rim faintly lit so the room's edge reads
+            col = tone(R["basalt"], np.full(int(m.sum()), 0.04), dith[m])
+            rimc = np.zeros(m.shape, bool)
+            rimc[m] = True
+            rim = rimc & ~nd.binary_erosion(rimc, iterations=1)
+            col = np.where(rim[m][:, None], tone(R["basalt"], np.full(int(m.sum()), 0.2), dith[m]), col)
+        elif name == "rust":
+            # rusted iron: dark scale with flakes of orange where it has opened, the edges a step lighter
+            col = tone(R["rust"], t * 1.3, dith[m])
+            flake = vn(X[m] * 14.0 + Z[m] * 9.0, Y[m] * 14.0 - Z[m] * 9.0) > 0.62
+            col = np.where(flake[:, None], tone(R["rust"], t * 1.3 + 0.25, dith[m]), col)
         elif name == "basalt":
             # columnar basalt: near black, each column its own small step of tone (the cooling made each its own), lit
             # where the key catches a face; below the splash line wet and red-black; grey-green lichen on the dry high
@@ -183,10 +213,12 @@ def paint(d):
             arris = ar & ~np.roll(ar, 1, axis=1) & np.roll(mat == 20, 1, axis=1)
             col = np.where(arris[m][:, None], tone(R["basalt"], tb + 0.22, dith[m]), col)
             s_b = -(X[m] + Y[m]) / np.sqrt(2)
-            splash = Z[m] < 0.6 + 1.6 * np.clip((s_b - 60.0) / 6.0, 0, 1) + 0.3 * vn(X[m] * 2.0, Y[m] * 2.0)
+            splash = (Z[m] < 0.6 + 1.6 * np.clip((s_b - 60.0) / 6.0, 0, 1) + 0.3 * vn(X[m] * 2.0, Y[m] * 2.0)) & ("sand" in FM)
             col = np.where(splash[:, None], tone(R["blood"], tb * 0.9, dith[m]) * 0.6 + tone(R["basalt"], tb * 0.8, dith[m]) * 0.4, col)
             # lichen in small pale crusts, grey-green and a few rust-orange, on the dry upper faces
             lich = (Z[m] > 2.0) & (vn(X[m] * 7.0 + Z[m] * 3.0, Y[m] * 7.0 - Z[m] * 3.0) > 0.78) & (vn(X[m] * 23.0, Z[m] * 23.0) > 0.5)
+            if "skyview" in d:
+                lich &= d["skyview"][m] > 0.3                           # nothing grows in the dark of a cave
             orange = vn(X[m] * 2.0 + 5, Y[m] * 2.0) > 0.7
             lc = np.where(orange[:, None], np.array([0.42, 0.26, 0.14]), np.array([0.40, 0.42, 0.36]))
             col = np.where(lich[:, None], col * 0.4 + lc * 0.6 * (0.55 + tb[:, None]), col)
@@ -247,6 +279,8 @@ def paint(d):
             col = np.where(mossy[:, None], tone(R["moss"], t, dith[m]), col)
         img[m] = col
     img = paint_floor(img, d, v, FM, dith)
+    global LAMP_REF
+    LAMP_REF = float(d["lamp_ref"]) if "lamp_ref" in d else 0.09
     # the form's own edges: where the surface turns, the lip toward the light catches it and the far lip goes dark
     # (rule 3, the lit lip; from the real normals, nothing painted on)
     nd_ = np.zeros((gh, gw))
@@ -260,9 +294,14 @@ def paint(d):
     # candle's light from blend_scene.lamp_pass, through the real forms with its true shadows, laid in four steps with
     # the dither only where one step meets the next
     if "lamp" in d and d["lamp"].max() > 0:
-        Lw = np.clip(d["lamp"] / 0.09, 0, 1.6)
+        Lr = d["lamp"]
+        if Lr.ndim == 2:                                             # an old pass: one warm candle
+            Lr = Lr[..., None] * np.array([1.0, 0.55, 0.2])
+        lum = Lr.max(axis=2)
+        hue = Lr / (lum[..., None] + 1e-6)                           # each lamp's own colour (the wisp-fire's blue)
+        Lw = np.clip(lum / LAMP_REF, 0, 1.6)
         Lq = np.clip(np.floor(Lw * 3 + dith - 0.35), 0, 4) / 3
-        img = img * (1 + Lq[..., None] * np.array([0.85, 0.42, 0.06])) + Lq[..., None] * np.array([0.07, 0.03, 0.0])
+        img = img * (1 + Lq[..., None] * hue * 0.85) + Lq[..., None] * hue * 0.07
     # the paper's tooth, fixed to the world (rule 6): a breath of grain in every tone
     tooth = (vn(X * 31 + Z * 17, Y * 31 - Z * 17) - 0.5) * 0.06
     img = np.clip(img * (1 + tooth[..., None]), 0, 1)
@@ -270,6 +309,7 @@ def paint(d):
 
 
 LV = 1.3            # the litter painter's light is the wood scene's, a step brighter than this overcast's
+LAMP_REF = 0.09     # the lamp pass's value at full step (a scene may lower it: the cave's fires are its only light)
 
 
 def _frac(a):

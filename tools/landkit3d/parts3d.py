@@ -12,7 +12,7 @@ MAT = None
 MATS = {"ground": 1, "stucco": 2, "brick": 3, "stone": 4, "lacquer": 5, "gold": 6, "tile": 7, "wood": 8, "root": 9,
         "iron": 10, "bone": 11, "moss": 12, "cloth": 13, "straw": 14, "water": 15,
         "boxpaint": 16, "blood": 17, "hide": 18, "cedar": 19, "basalt": 20, "ash": 21, "kelp": 22,
-        "corpse": 23}
+        "corpse": 23, "pool": 24, "rust": 25, "cutrock": 26}
 
 
 def init(root, material):

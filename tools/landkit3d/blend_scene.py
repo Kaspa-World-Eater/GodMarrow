@@ -108,7 +108,7 @@ def material(name, index):
     return m
 
 
-def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0):
+def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0, lamp_ref=0.09):
     """render, then read every pass back as numpy and save them (game coordinates) to out_dir/passes.npz"""
     sc = bpy.context.scene
     sc.use_nodes = True
@@ -145,7 +145,7 @@ def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0):
     np.savez_compressed(os.path.join(out_dir, "passes.npz"), normal=n, pos=pos, ao=P["AO"][..., 0],
                         mat=np.round(P["IndexMA"][..., 0]).astype(np.int16), moon=P["DiffDir"][..., 0],
                         alpha=P["Alpha"][..., 0], shelter=sky["shelter"], skyview=sky["skyview"], lamp=lamp,
-                        floor=np.array(floor), zoom=np.array(zoom), time=np.array(float(os.environ.get("GM_T", "0"))),
+                        floor=np.array(floor), zoom=np.array(zoom), lamp_ref=np.array(lamp_ref), time=np.array(float(os.environ.get("GM_T", "0"))),
                         gw=gw, gh=gh)
 
 
@@ -155,14 +155,16 @@ def lamp_pass(out_dir, outs, lamps):
     (x, y, z, watts) in game coordinates. Zero when there are none"""
     sc = bpy.context.scene
     if not lamps:
-        return np.zeros((sc.render.resolution_y, sc.render.resolution_x), np.float32)
+        return np.zeros((sc.render.resolution_y, sc.render.resolution_x, 3), np.float32)
     moon = bpy.data.objects["moon"]
     e0 = moon.data.energy
     moon.data.energy = 0.0
     made = []
-    for k, (x, y, z, w) in enumerate(lamps):
+    for k, lp in enumerate(lamps):
+        x, y, z, w = lp[:4]
         ld = bpy.data.lights.new("lamp%d" % k, "POINT")
         ld.energy = w
+        ld.color = lp[4] if len(lp) > 4 else (1.0, 0.55, 0.2)       # a lamp's own colour (a candle's warm by default)
         ld.shadow_soft_size = 0.03
         o = bpy.data.objects.new("lamp%d" % k, ld)
         sc.collection.objects.link(o)
@@ -173,7 +175,7 @@ def lamp_pass(out_dir, outs, lamps):
     bpy.ops.render.render(write_still=False)
     f = [x for x in os.listdir(os.path.join(out_dir, "_p")) if x.startswith("DiffDirlamp_")]
     img = bpy.data.images.load(os.path.join(out_dir, "_p", sorted(f)[-1]))
-    out = np.array(img.pixels[:], dtype=np.float32).reshape(img.size[1], img.size[0], 4)[::-1][..., 0]
+    out = np.array(img.pixels[:], dtype=np.float32).reshape(img.size[1], img.size[0], 4)[::-1][..., :3]
     for o in made:
         bpy.data.objects.remove(o, do_unlink=True)
     moon.data.energy = e0
@@ -263,5 +265,6 @@ if __name__ == "__main__":
     setup_camera(focus, gw, gh, zoom)
     setup_sun()
     setup_render()
-    render_passes(out_dir, getattr(mod, "LAMPS", ()), getattr(mod, "FLOOR_MODULE", "floor3d"), zoom)
+    render_passes(out_dir, getattr(mod, "LAMPS", ()), getattr(mod, "FLOOR_MODULE", "floor3d"), zoom,
+                  getattr(mod, "LAMP_REF", 0.09))
     print("passes saved", out_dir)
