@@ -453,3 +453,10 @@ yet. **Worst failure: line 7, the paint:** no dry-brush strokes on the sand or t
 
 **Grade: B-.** **Still short:** the drowned's legs read as stubs, and the dry backshore is lighter than the sea (rule
 22).
+
+## Paused (2026-10-09), waiting for Derek's grade
+
+Third rules-check reminder in a row with no reply from Derek, and the piece now waits on his grade of passes 10 to 12
+(keep refining, or move to the next piece of the Red Shore). By the pause rule the reminder job is deleted; it is to be
+recreated with the same prompt (`scratchpad/rules_check_cron.txt`) when he next writes. Rules unchanged; no new notes
+on the review page.
