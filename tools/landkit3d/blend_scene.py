@@ -40,11 +40,11 @@ def game_root():
     return root
 
 
-def setup_camera(focus, gw=GW, gh=GH):
+def setup_camera(focus, gw=GW, gh=GH, zoom=1.0):
     sc = bpy.context.scene
     cam_d = bpy.data.cameras.new("cam")
     cam_d.type = "ORTHO"
-    cam_d.ortho_scale = max(gw, gh) / K
+    cam_d.ortho_scale = max(gw, gh) / K / zoom          # zoom < 1: an overview, more yards a pixel
     cam_d.sensor_fit = "AUTO"
     cam = bpy.data.objects.new("cam", cam_d)
     sc.collection.objects.link(cam)
@@ -108,7 +108,7 @@ def material(name, index):
     return m
 
 
-def render_passes(out_dir, lamps=()):
+def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0):
     """render, then read every pass back as numpy and save them (game coordinates) to out_dir/passes.npz"""
     sc = bpy.context.scene
     sc.use_nodes = True
@@ -145,7 +145,7 @@ def render_passes(out_dir, lamps=()):
     np.savez_compressed(os.path.join(out_dir, "passes.npz"), normal=n, pos=pos, ao=P["AO"][..., 0],
                         mat=np.round(P["IndexMA"][..., 0]).astype(np.int16), moon=P["DiffDir"][..., 0],
                         alpha=P["Alpha"][..., 0], shelter=sky["shelter"], skyview=sky["skyview"], lamp=lamp,
-                        gw=gw, gh=gh)
+                        floor=np.array(floor), zoom=np.array(zoom), gw=gw, gh=gh)
 
 
 def lamp_pass(out_dir, outs, lamps):
@@ -250,7 +250,8 @@ if __name__ == "__main__":
     argv = sys.argv[sys.argv.index("--") + 1:]
     scene, out_dir = argv[0], argv[1]
     focus = (float(argv[2]), float(argv[3])) if len(argv) > 3 else (0.0, 0.0)
-    gw, gh = (int(argv[4]), int(argv[5])) if len(argv) > 5 else (GW, GH)
+    gw, gh = (int(argv[4]), int(argv[5])) if len(argv) > 5 and not argv[4].startswith("--") else (GW, GH)
+    zoom = float(argv[argv.index("--zoom") + 1]) if "--zoom" in argv else 1.0
     os.makedirs(out_dir, exist_ok=True)
     clear()
     root = game_root()
@@ -258,8 +259,8 @@ if __name__ == "__main__":
     mod.build(root, material)
     if "--heightfield" in argv:
         to_heightfield(root, focus)
-    setup_camera(focus, gw, gh)
+    setup_camera(focus, gw, gh, zoom)
     setup_sun()
     setup_render()
-    render_passes(out_dir, getattr(mod, "LAMPS", ()))
+    render_passes(out_dir, getattr(mod, "LAMPS", ()), getattr(mod, "FLOOR_MODULE", "floor3d"), zoom)
     print("passes saved", out_dir)

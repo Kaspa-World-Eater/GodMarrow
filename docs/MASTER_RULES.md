@@ -68,6 +68,10 @@ No check written, no work begun.
      hanging moss): the form is real 3D geometry at true size in Blender. Its normals, positions, occlusion and the
      moon's shadow are what the painter paints from (`tools/landkit3d`). The temple trial proved it: as a height
      field, the eaves fill solid to the ground.
+   - **Terrain is 3D where it stands up** (Derek, 2026-10-09: "you can't expect an area to not have a sheer Rocks"):
+     cliffs, bluffs, sheer rock, mountains and anything that overhangs are built on the 3D road. Ground that is only a
+     surface keeps its height by cause in one shared function, meshed in Blender and read by the painter
+     (`tools/landkit3d/floor3d.py`), so the floor and the forms on it are one world.
    - **Never blur normals** into pillows.
 
 ## 0b. Locked techniques (keep or improve only; one shared place each)
@@ -261,11 +265,11 @@ etc." In order of his latest word (2026-10-08: "finish the bog first, and then w
 1. **The first area, the Red Shore** (Derek, 2026-10-08; its lore and brief in
    `docs/wiki/mythology/areas/the-red-shore.md`, the memory `godmarrow-first-area-vision`), built on the 3D road. In
    this order:
-   - the study chapters first:
+   - the study chapters first (**done** 2026-10-09: chapters 10 and 11):
      - the Olympic coast (black sand, sea stacks, drift logs, the spruce fringe, bluffs, river mouths);
      - Northwest Coast forms (plank, post, canoe, woven bark), taken as forms only: no animal crests, no real nation's
        crests, stories or ceremonies;
-   - the temple to an A (the painter's weaknesses first, then the fusion details);
+   - the temple to an A (**done** 2026-10-09: Derek's A, with its inside);
    - the Red Water and the black sand (blood that is red by colour, never by glow);
    - the drift logs and sea stacks;
    - the giant trees and the wind-bent fringe;
@@ -287,5 +291,6 @@ etc." In order of his latest word (2026-10-08: "finish the bog first, and then w
 9. **Melee:** the styles and the special melee skills, once the Ossuarch's skills are final. The Ossuarch is finished
    before any other calling.
 10. **Older trees with the warped column,** and the Hollow Wood's trees' white stripes; some trees mostly straight.
-11. **Old scenes and lands rebuilt by the bog's method,** zone by zone through Act I, with the area lore as the
-    brief.
+11. **Old scenes and lands rebuilt on the 3D road** (Derek, 2026-10-09: "It's going to be awesome when we go back and
+    redesign all those other areas"), zone by zone through Act I, with the area lore as the brief. The Sunken Bog's
+    serpent way first ("we'll probably have to redo snake way area").

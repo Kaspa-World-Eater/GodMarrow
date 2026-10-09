@@ -17,10 +17,7 @@ before starting it (MASTER_RULES section 1). `../STUDY.md` keeps the older round
 | [07 Faces in trees](07-faces-in-trees.md) | Pareidolia, Rackham's trees, the Green Man; a face built from tree parts (scars, woundwood, ridges, hollows), long, asymmetric, read by its darks | Any organic face in wood or stone (the Blind Face itself was struck, 2026-10-07) |
 | [08 The serpent's spine and black bog water](08-serpent-spine-and-bog-water.md) | A serpent's vertebrae and ribs from fossils and Titanoboa (many, alike, overlapping, changing slowly); black bog water: still, mirror-dark, duckweed and lilies; how bogs, fens and swamps hold their structures | The Sunken Bog's Back, its water and plants |
 | [09 Thai temples and spirit houses](09-thai-temples-and-spirit-houses.md) | A wat's buildings and its roof (tiers, chofa, bai raka, hang hong, naga stairs, sema stones); materials; how temples fall apart in a wet forest (stucco, brick, rotting roofs, roots, lacquer); spirit houses | The first area's destroyed temple shrine, its spirit houses, any Thai building |
+| [10 The Olympic coast](10-the-olympic-coast.md) | The coast's bands from the surf inland: the foreshore and the black sand by wetness, the cobble berm, the drift logs at the storm line, sea stacks and arches, the sheared spruce fringe and eroding bluffs, river mouths, the way into the rainforest; for the Red Shore, the fringe leaning to sea | The Red Shore's beach, logs, stacks, fringe and bluffs |
+| [11 Northwest Coast forms](11-northwest-coast-forms.md) | Cedar and the adze's mark, the plank house, posts and carved human faces, formline (ovoid, U, split U), canoes, bentwood boxes, woven cedar bark; forms only, the fusion with the Thai | The shore folk's huts, posts, palisade, canoes, boxes and mats |
 
-**Still to write, before the Red Shore is built** (Derek, 2026-10-08):
-- **10, the Olympic coast:** black sand beaches, sea stacks and arches, drift logs at the storm line, dune grass, the
-  wind-sheared spruce fringe, eroding bluffs, river mouths, and how the coast gives way to rainforest.
-- **11, Northwest Coast forms:** cedar plank houses and posts, carved face-posts, canoes, woven cedar bark, bentwood
-  boxes, ovoid and U-form carving. Taken as forms only: human faces, never animal crests, and no real nation's crests,
-  stories or ceremonies.
+**Both studies for the Red Shore are written** (2026-10-09).

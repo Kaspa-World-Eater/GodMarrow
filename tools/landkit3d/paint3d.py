@@ -42,12 +42,25 @@ R = {
     "algae": ramp("#121a17", "#1b2a22", "#26392b", "#304634", "#3c553e"),
     # the bentwood boxes' paint: red ochre gone brown, the formline's black, over cedar
     "ochre": ramp("#1a0d0c", "#2e1410", "#481d14", "#622819", "#7a3620", "#8f4729"),
+    # the Red Water: blood under a grey sky, red by its own colour and never by glow
+    "blood": ramp("#0c0405", "#1a0708", "#2a0b0b", "#3c100e", "#4f1712", "#621f16", "#74291b"),
+    # pale hairless hides, from the things killed at the wall
+    "hide": ramp("#2a2420", "#433a33", "#5e534a", "#7a6d61", "#968878", "#b0a290", "#c8baa6"),
+    # cedar weathered silver, and the bleached drift logs
+    "cedar": ramp("#1c1c1e", "#2e2e30", "#434242", "#5a5856", "#72706b", "#8b8882", "#a5a199"),
+    "basalt": ramp("#0b0b0e", "#16161a", "#222226", "#2f2f33", "#3e3e42", "#4f4f52", "#626266"),
+    "ash": ramp("#2a2826", "#45413d", "#625d57", "#807a72", "#9d978e", "#b8b2a8"),
+    # the black sand: dry above the tide, and wet, where the Red has just left it
+    "sand_dry": ramp("#141315", "#1e1c1e", "#292627", "#353131", "#423d3b", "#504a46", "#5f5853"),
+    "sand_wet": ramp("#0d0708", "#170b0c", "#221012", "#2d1617", "#3a1d1d", "#482525"),
+    "dunegrass": ramp("#1a1d12", "#2a2e19", "#3d4122", "#52552c", "#686a37", "#7f7e44"),
     "straw": ramp("#1a1612", "#2b251c", "#40372a", "#574b39", "#6f6049", "#88775b", "#a08f6e"),
     # rain standing in the pits, tea-dark with the leaves' tannin: the dark of the crowns in it, a little grey sky
     "water": ramp("#06080a", "#0c1012", "#12191a", "#1b2423", "#26302e", "#333e3b", "#45504b"),
 }
 MAT = {1: "ground", 2: "stucco", 3: "brick", 4: "stone", 5: "lacquer", 6: "gold", 7: "tile", 8: "wood", 9: "root",
-       10: "iron", 11: "bone", 12: "moss", 13: "cloth", 14: "straw", 15: "water", 16: "boxpaint"}
+       10: "iron", 11: "bone", 12: "moss", 13: "cloth", 14: "straw", 15: "water", 16: "boxpaint", 17: "blood",
+       18: "hide", 19: "cedar", 20: "basalt", 21: "ash"}
 
 
 def tone(rmp, t, dith, band=0.2):
@@ -79,7 +92,8 @@ def paint(d):
     v = (0.05 + sky * 0.3 * occ + soft * 0.28 * (0.45 + 0.55 * occ) + mn * 0.1) * 0.86   # a deep wood: dim even by day
     # the floor's causes at every pixel's world position (floor3d): the same floor the 3D build stood on. The canopy is
     # the broad shape of the light: the giants stand back from the kept ground, so the sky reaches it; under them, dim
-    FM = F.maps(X, Y)
+    Fm = __import__(str(d["floor"])) if "floor" in d else F           # the scene's own floor module
+    FM = Fm.maps(X, Y)
     v = v * FM["open"]
     # the enclosure (blend_scene.sky_passes: occlusion out to 12 yd): what sees little of the sky goes dark, inside the
     # hall under its roof, deep in the porch, in a recess; a wall in the open (half its view is ground) is untouched
@@ -466,6 +480,19 @@ def paint_floor(img, d, v, FM, dith):
             cur = img[rb]
             cur[on] = col[on]
             img[rb] = cur
+    # the black sand, by its wetness (chapter 10): dry grey-black above the tide, red-black and glossy where the Red
+    # has just left it, the tide lines of dried red film; the backshore's dune grass in clumps
+    if "sand" in FM:
+        sd = gm & (FM["sand"] > 0.5) & ~((mat == 15))
+        wetp = sd & (FM["wet"] > dith * 0.9 + 0.05)
+        dry = sd & ~wetp
+        img[dry] = tone(R["sand_dry"], v[dry] * 1.05 + (vn(X[dry] * 6.0, Y[dry] * 6.0) - 0.5) * 0.05, dith[dry])
+        sheen = np.clip(0.9 - FM["wet"] * 0.3, 0, 1)
+        img[wetp] = tone(R["sand_wet"], v[wetp] * sheen[wetp] * 1.15, dith[wetp])
+        wr = sd & (FM["wrack"] > 0.5) & (vn(X * 3.0, Y * 3.0) > 0.35)
+        img[wr] = tone(R["blood"], v[wr] * 0.9, dith[wr])
+        gr = gm & (FM["grass"] > 0.5) & (vn(X * 2.2 + 4, Y * 2.2) + vn(X * 7, Y * 7) * 0.4 > 0.72)
+        img[gr] = tone(R["dunegrass"], v[gr] * 1.1 + (vn(X[gr] * 9, Y[gr] * 9) - 0.5) * 0.15, dith[gr])
     # the stair has not been swept (05-the-last-breath): the leaves lie where they fell, drifted into the back of every
     # tread and against the walls of the walk, where the wind cannot reach (the dark of the occlusion is that shelter)
     flat = ((mat == 2) | (mat == 3) | (mat == 4)) & (up > 0.85)

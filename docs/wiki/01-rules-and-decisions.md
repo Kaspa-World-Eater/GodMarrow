@@ -154,6 +154,17 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09, the temple passed and the 3D road goes everywhere:**
+  - The temple trial: "I gave the temple an A, so it's good enough"; of its inside: "Great job on the inside. The new
+    technique really is paid off. It's going to be awesome when we go back and redesign all those other areas."
+  - **Terrain goes 3D too:** "the terrain should be somewhat 3D also especially in the mountains, cuz really you can't
+    expect an area to not have a sheer Rocks and stuff." Sheer rock, cliffs, overhangs and bluffs are built on the 3D
+    road; plain ground keeps its height by cause (the `floor3d` way: a height function meshed in Blender and read by
+    the painter).
+  - **The village is coastal:** "We'll make the village pretty coastal. The Olympic peninsula will be how we model it
+    in and the Olympic rainforest."
+  - **The Sunken Bog's serpent way will be redone on the 3D road** ("we'll probably have to redo snake way area"), and
+    the older areas redesigned the same way in their turn.
 - **2026-10-08, the deep lore** (Derek; for us, never stated in the game):
   - "everything in this world is simply narrative. Even the gods aren't real. They're simply dreams. Manifesting because they think they're real. People think they're real ... Thoughts and words can manifest and gain power in this world and that's why they say the god has a thousand faces and 1,000 hands."
   - "everything is everything, reflecting off one another and people still think what they [are] seeing but it's really them projecting themselves and recognizing that and providing identity to those things."
