@@ -696,3 +696,20 @@ Also the pool faces' fires: close, above and to one side, grazing (115 W).
 all three.
 **Correction:** `cine_check` after 9b: the stairs 9 of 9 and the pool 9 of 9, but the hall 8 of 9. Rule 6, the squint,
 finds 2 masses: the locally calibrated light flattened the hall's broad value structure. To fix next.
+
+## Rules check (2nd since pass 9)
+
+**Read:** `MASTER_RULES` and `CINEMATOGRAPHY.md` (rule 1, the subject brightest; rule 6, the squint).
+
+**Worst failure:** the hall's squint finds 2 masses (rule 6). Since 9b the maw's frame of lit stone sits at the walls'
+value, so the frame reads as dark plus mid.
+
+**Fix (9c):** the candles framing the maw from 52 to 72 W, so the subject is again its own light mass round the black.
+
+**9c result:**
+- Brighter maw candles (72 W) and, as a trial, gentler form contrast did not lift the hall's squint off 2 masses. The
+  gentle form softened the faces, so it was put back (the candles stay).
+- The bins show the middle-light mass is not missing but broken up (7% of the frame, in fragments). Its large lit area
+  is cut by the black maw, the hanging chains and the dark mineral weeping.
+- **Next for the hall:** compose the light mass whole. Fewer weeping streaks across the great face's lit planes, the
+  chains moved off its centre, so the lit stone round the maw reads as one shape.

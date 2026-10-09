@@ -867,7 +867,7 @@ def throne():
     onyx_frame(mc, (sx, sy), (nx, ny), 1.78, 1.46)
     for k, (cx_, cy_, cz_) in enumerate(THRONE_C):
         P.cylinder("tcandle%d" % k, (cx_, cy_, cz_ - 0.12), 0.06, 0.14, "bone", sides=6)
-        flame("tcandle%d" % k, cx_, cy_, cz_ + 0.02, 0.08, 52.0)
+        flame("tcandle%d" % k, cx_, cy_, cz_ + 0.02, 0.08, 72.0)
     mx, my = mc[0], mc[1]
     # chains hanging out of the dark into the mouth
     for k, (a, b) in enumerate(((-0.9, 0.4), (0.7, -0.2), (1.3, 0.9))):
