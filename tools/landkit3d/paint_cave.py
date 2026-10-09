@@ -133,7 +133,7 @@ def paint(d, t=0.0):
     # the faint fringe of a pool stays continuous (a carving's turn must still read there), the bands crisp above it
     T = np.maximum(Fz, Fn * 0.75) * shade + amb
     # the shadow is not black but the weak light of everything lit nearby (Gurney); the contacts stay darkest
-    T = T + 0.06 * np.clip(ao, 0, 1) ** 2
+    T = T + 0.075 * np.clip(ao, 0, 1) ** 2
     # quiet darks: the dither only where there is light to step (rule 7)
     dith = np.where(T < 0.16, 0.5, dith)
     oh = _hash(obj.astype(np.float64))                                # each object (each column, each flag) its own
@@ -306,6 +306,10 @@ def paint(d, t=0.0):
     img = mirrors(img, d, proj, fk)
     img = pool_gloss(img, d, proj, fk, t)
     img = fires(img, d, proj, fk, t)
+    # black is a note, not a fill (rule 4): the darkenings above never take a surface below its ramp's darkest swatch,
+    # except in the contacts (the darkest note) and the onyx mirror (black by its nature)
+    floor_ = (alpha > 0.5) & (ao > 0.32) & (mat != 31)
+    img = np.where(floor_[..., None], np.maximum(img, np.array([0.047, 0.045, 0.058])), img)
     tooth = (vn(X * 31 + Z * 17, Y * 31 - Z * 17) - 0.5) * 0.05 * np.clip(T * 3, 0, 1)
     img = np.clip(img * (1 + tooth[..., None]), 0, 1)
     return img, alpha

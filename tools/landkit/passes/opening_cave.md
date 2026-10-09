@@ -583,3 +583,27 @@ central large mouth will have the only black onyx mirror."
 **Grade:**
 - Hall B+, stairs B, pool B-.
 - **Still short:** the heaps sit dim, and the pool masks want a closer look.
+
+## Rules check (1st since pass 8)
+
+**Read:** `MASTER_RULES`, `CINEMATOGRAPHY.md` and the area's opening (the pool beat: "a visceral pool of blood"; the
+mirror the way out).
+
+**Checklist:** lines 1 to 11 pass at pass 8 (the heaps sit dim, a line 9 note). **Line 13 fails worst, in the pool
+frame:**
+- the black note covers 10.2% (rule 4);
+- the squint test finds one mass (rule 6).
+
+The frame's lower half is near-black stumps far from any fire, and the shadow there touches black.
+
+**Fix (8b):**
+- Frame the pool by its subject: the lit wall of masks and the pool fill the frame, the dark foreground kept to a band
+  (rule 21: the near plane darkest, but a band, not half the frame).
+- The shadow's bounce raised a breath (0.06 to 0.075), so the dark sits a step above black (Gurney; rule 3).
+
+**8b results:**
+- The pool is framed by its subject: the lit wall of masks, each with its fire and its blood, above the pool.
+- The weeping, the dark lips and the light's tint had pushed shadowed stone below its ramp's darkest swatch, so stone
+  now never goes below that swatch, except in the contacts and the onyx mirror.
+- `cine_check` measured a deep red as black (luminance). Black is now measured as every channel near zero.
+- All three frames pass 9 of 9.

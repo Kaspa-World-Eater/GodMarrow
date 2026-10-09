@@ -56,7 +56,7 @@ def check(path, interior=True):
         rule(2, "low key: bottom third of value >= 60%", "%.0f%%" % (low * 100), low >= 0.6)
         rule(2, "pools of light <= 30%", "%.0f%%" % (pools * 100), pools <= 0.3)
     # 4: the black note
-    black = (L < 0.035).mean()
+    black = (im.max(2) < 0.045).mean()                         # black is every channel near zero (a deep red is not black)
     rule(4, "black note <= 5% (black is a note, not a fill)", "%.1f%%" % (black * 100), black <= 0.05,
          "too much pure black: shadows should sit a step or two above it" if black > 0.05 else "")
     # 5: one large simple dark mass
