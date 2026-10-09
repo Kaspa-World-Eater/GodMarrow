@@ -41,6 +41,7 @@ R_FOAM = P3.ramp("#2e1216", "#4a2026", "#6a3239", "#8a4a50", "#a7676b", "#c08b8b
 R_SAND = R["black_sand"]
 R_WET = P3.ramp("#060507", "#0a080b", "#0f0c10", "#151116", "#1c171c")
 R_PEB = P3.ramp("#08080a", "#101013", "#19191d", "#232328", "#2e2e34", "#3b3b42", "#4a4a52")
+R_BONE_OLD = P3.ramp("#161214", "#251e1e", "#362c29", "#4b3e37", "#635347", "#7d6b5a", "#98856f", "#b3a086")
 R_DRIFT = P3.ramp("#1b1a1c", "#2a2829", "#3b3837", "#4e4a47", "#625d58", "#77716a", "#8d867d", "#a29b90")
 
 
@@ -145,10 +146,16 @@ def paint(d, t, hero=None):
                   & (vn(X[m] * 23 + k, Y[m] * 23) > 0.62) & (sm < fr[m] - 0.15))
             ck = np.array([0.16, 0.1, 0.1]) if k < 2 else np.array([0.1, 0.075, 0.07])
             col = np.where(on[:, None], col * 0.4 + ck * (0.5 + tm[:, None]) * 0.9, col)
-        # the prints hold a little of the red
-        import shore_fine as SF
-        dep, inprint = SF._prints(sm, tm_t)
-        col = np.where((dep > 0.012)[:, None], col * 0.55 + np.array([0.075, 0.016, 0.02]) * (0.5 + tm[:, None]), col)
+        # the prints (the one true detail): each hollow holds the blood that came up out of the Red with the feet,
+        # dark and glossy, the sky caught on its far lip; the squeezed ridge round it a breath lighter where the key finds it
+        _, dep = BF.prints(sm, tm_t)
+        blood = dep > 0.014
+        bcol = np.array([0.1, 0.022, 0.026]) * (0.55 + 0.6 * tm[:, None])
+        col = np.where(blood[:, None], bcol, col)
+        far = blood & (n[m][:, 2] < 0.93) & ((n[m] * VIEW).sum(1) < 0.45)
+        col = np.where(far[:, None], np.array([0.3, 0.17, 0.18]) * (0.6 + 0.5 * tm[:, None]), col)
+        lip = (~blood) & (dep <= 0) & (BF.trail_dist(sm, tm_t) < 0.3) & (key[m] > 0.62)
+        col = np.where(lip[:, None], col * 1.15 + 0.01, col)
         img[m] = col
 
     # ---- the stones the sea sorted ----
@@ -183,12 +190,18 @@ def paint(d, t, hero=None):
         col = np.where(lich[:, None], col * 0.4 + np.array([0.2, 0.23, 0.2]) * (0.4 + tm[:, None]) * 0.8, col)
         img[m] = col
 
-    # ---- the drift logs: silvered, checked along the grain, spume caught on their seaward sides ----
-    m = mat == 19
-    if m.any():
+    # ---- the bone jam (Derek: "Turn the logs into bones"), and any drift wood: old and weathered, split along the
+    # grain, pitted, spume caught on the seaward sides; the near plane, so dark but for the tops the sky finds ----
+    big_bone = (mat == 11) & (obj > 0)
+    if big_bone.any():
+        sizes = np.bincount(obj[big_bone].ravel())
+        big_bone &= sizes[np.clip(obj, 0, len(sizes) - 1)] > 25          # the jam's bones, not the dead's small ones
+    for m, rmp in ((mat == 19, R_DRIFT), (big_bone, R_BONE_OLD)):
+        if not m.any():
+            continue
         tm = T[m]
-        # each log's own axis (its pixels' long direction on the ground), so the grain runs along it: the silvered
-        # wood split in long checks, ridged, a breath lighter on the ridges; darker toward the butt where it lay wet
+        # each piece's own axis (its pixels' long direction on the ground), so the grain runs along it: split in long
+        # checks, ridged, a breath lighter on the ridges
         along = np.zeros(int(m.sum()))
         across = np.zeros(int(m.sum()))
         om = obj[m]
@@ -205,10 +218,14 @@ def paint(d, t, hero=None):
             along[k_] = (px - cx_) * ax[0] + (py - cy_) * ax[1]
             across[k_] = -(px - cx_) * ax[1] + (py - cy_) * ax[0]
         ridge = vn(across * 26.0 + Z[m] * 26.0 + oh[m] * 40, along * 0.6)
-        v = tm * (0.42 + 0.18 * oh[m]) * (0.55 + 0.45 * np.clip(up[m], 0, 1)) + (ridge - 0.5) * 0.1
+        lift = 0.68 if rmp is R_BONE_OLD else 0.42                      # bone reads as bone: an old ivory-grey
+        v = tm * (lift + 0.18 * oh[m]) * (0.55 + 0.45 * np.clip(up[m], 0, 1)) + (ridge - 0.5) * 0.1
         check = (np.abs(ridge - 0.5) < 0.04) & (vn(along * 1.5 + oh[m] * 9, across * 4) > 0.45)
         v = np.where(check, v - 0.18, v)
-        col = tone(R_DRIFT, np.clip(v, 0, 0.99), dith[m], band=0.06)
+        if rmp is R_BONE_OLD:
+            pit = (vn(X[m] * 19 + Z[m] * 11, Y[m] * 19 - Z[m] * 7) > 0.78) & (tm > 0.2)
+            v = np.where(pit, v - 0.1, v)
+        col = tone(rmp, np.clip(v, 0, 0.99), dith[m], band=0.06)
         seaward = n[m][:, 0] * (-1 / math.sqrt(2)) + n[m][:, 1] * (-1 / math.sqrt(2))       # toward +s
         spume = (seaward > 0.35) & (vn(X[m] * 6 + 3, Y[m] * 6 + Z[m] * 6) > 0.6) & (s[m] > 47.5)
         col = np.where(spume[:, None], tone(R_FOAM, np.clip(0.25 + tm * 0.45, 0, 0.99), dith[m]), col)
@@ -219,6 +236,8 @@ def paint(d, t, hero=None):
         if name in ("ground", "stone", "basalt", "cedar", "pool", "mirror", "foam"):
             continue
         m = mat == k
+        if name == "bone":
+            m = m & ~big_bone
         if not m.any():
             continue
         tm = T[m]

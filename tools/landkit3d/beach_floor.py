@@ -95,9 +95,80 @@ def height_st(s, t):
     r = SF.ripple_phase(s, t) % 1.0
     patch = np.clip((_vn1(s * 0.3 + t * 0.21, 51.0) - 0.35) * 4.0, 0, 1) * np.clip((BERM_S - 1.0 - se) / 1.5, 0, 1)
     z = z + (SF.ripple_profile(r) - 0.5) * 0.07 * patch
-    # the footprints coming up out of the Red (the area page), each a shallow hollow
-    dep, _ = SF._prints(s, t)
-    return z - dep
+    # the footprints coming up out of the Red (the area page: the one true detail)
+    dz, _ = prints(s, t)
+    return z + dz
+
+
+# the trail of bare prints coming up out of the Red, ahead of the pilgrim's own (the area page), wandering a little
+TRAIL = [(65.5, 3.5), (61.0, 2.4), (57.0, 1.0), (53.5, -0.6), (50.5, -2.4)]
+STRIDE = 0.72
+
+
+def _foot_list():
+    out = []
+    k = 0
+    for (s0, t0), (s1, t1) in zip(TRAIL[:-1], TRAIL[1:]):
+        ln = math.hypot(s1 - s0, t1 - t0)
+        ds, dt = (s1 - s0) / ln, (t1 - t0) / ln
+        for i in range(int(ln / STRIDE)):
+            side = 1 if k % 2 else -1
+            k += 1
+            cs = s0 + ds * (i + 0.5) * STRIDE - dt * side * 0.11
+            ct = t0 + dt * (i + 0.5) * STRIDE + ds * side * 0.11
+            out.append((cs, ct, ds, dt, side, k))
+    return out
+
+
+FEET = _foot_list()
+
+
+def trail_dist(s, t):
+    """how far from the trail's line (yards)"""
+    s = np.asarray(s, float)
+    t = np.asarray(t, float)
+    best = np.full(np.shape(s), 99.0)
+    for (s0, t0), (s1, t1) in zip(TRAIL[:-1], TRAIL[1:]):
+        ds, dt = s1 - s0, t1 - t0
+        ll = ds * ds + dt * dt
+        u = np.clip(((s - s0) * ds + (t - t0) * dt) / ll, 0, 1)
+        best = np.minimum(best, np.hypot(s - s0 - ds * u, t - t0 - dt * u))
+    return best
+
+
+def prints(s, t):
+    """each bare foot pressed into the sand as real form: the heel deepest, the ball, five toes, the arch's shallow link
+    on the outer side, and a low ridge of sand squeezed up round it. Returns (the height change, how deep the hollow is)"""
+    s = np.asarray(s, float)
+    t = np.asarray(t, float)
+    dz = np.zeros(np.shape(s))
+    dep = np.zeros(np.shape(s))
+    near = trail_dist(s, t) < 0.5
+    if not near.any():
+        return dz, dep
+    for (cs, ct, ds, dt, side, k) in FEET:
+        u = (s - cs) * ds + (t - ct) * dt                    # along the foot, toward the toes
+        v = (-(s - cs) * dt + (t - ct) * ds) * side          # across, the big toe on the inside
+        box = (np.abs(u) < 0.22) & (np.abs(v) < 0.12) & near
+        if not box.any():
+            continue
+        uu, vv = u[box], v[box]
+        d = np.zeros(uu.shape)
+        for cu, cv, ru, rv, dd in ((-0.085, 0.0, 0.058, 0.044, 0.05), (0.045, 0.006, 0.05, 0.048, 0.042),
+                                   (-0.015, -0.022, 0.06, 0.024, 0.02)):
+            q = ((uu - cu) / ru) ** 2 + ((vv - cv) / rv) ** 2
+            d = np.maximum(d, dd * np.clip(1 - q, 0, 1) ** 0.5)
+        for j, (tu, tv, tr) in enumerate(((0.112, 0.032, 0.019), (0.118, 0.008, 0.014), (0.113, -0.012, 0.013),
+                                          (0.104, -0.03, 0.012), (0.09, -0.045, 0.011))):
+            q = ((uu - tu) ** 2 + (vv - tv) ** 2) / tr ** 2
+            d = np.maximum(d, 0.028 * np.clip(1 - q, 0, 1) ** 0.5)
+        qf = (uu / 0.16) ** 2 + (vv / 0.072) ** 2
+        rim = 0.013 * np.exp(-((np.sqrt(qf) - 1.12) / 0.13) ** 2) * (d <= 0)
+        # the older prints (further from the water) a little softened by the wind
+        soft = 1.0 if cs > 57.0 else 0.75
+        dz[box] = np.minimum(dz[box], -d * soft) + rim * soft
+        dep[box] = np.maximum(dep[box], d * soft)
+    return dz, dep
 
 
 def height(x, y):

@@ -258,3 +258,56 @@ dry backshore at the bottom is lighter than the sea at the top; rule 27 fails be
 - the froth reads blotchy;
 - the cliffs' tall foreground column is plain;
 - the corpses are hard to read.
+
+## Rules check, after pass 5 (2026-10-09, the reminder)
+
+Re-read `MASTER_RULES` in full, the area page (the Red Water's "thick and slow", "the tide is its heartbeat", the
+footprints coming up out of the water), chapter 13 with its new section 6b, and the review page's notes (no new grade
+on pass 5 yet; the last notes are the D grades on pass 4 and the cave's pass 1).
+
+**The checklist, line by line:**
+1. **Brief, the one true detail: FAILS.** The footprints coming up out of the Red do not read at all: 0.035 yd deep on a
+   0.06 yd mesh is less than a pixel of form, and the red in them is a few stray dots.
+2. **Scale:** passes; the Ossuarch at true size at the water's edge.
+3. **Form:** passes the value-only test: in grey the swell, the coat, the berm, the logs and the columns read as solid
+   and lit.
+4. **Light:** the overcast sky by facing and occlusion, with a soft key. There is no warm local light on the open beach,
+   and none belongs there by the lore.
+5. **Values:** five masses (measured).
+6. **Ramps:** hue-shifted throughout; the sea's darks desaturated as the area page asks.
+7. **Paint: weak.** No dry-brush strokes on the sand or the sea yet; tooth only.
+8. **Contact:** occlusion under the logs and the dead; the pebbles sit in the sand.
+9. **Detail where it counts: weak.** The dead are hard to read.
+10. **Life:** passes; everything moves on the heartbeat clock.
+11. **Seen as the player sees it:** the game's camera and zoom; not in the game yet.
+12. **Skeptic round:** beside the pit of offering and the cave's hall, the worst difference is the one big smooth dark
+    swell face, with nothing on it for the eye.
+13. **Cinematography:** 4 of 7 measured (rules 1, 22 and 27 fail, as logged in pass 5).
+
+**Worst failure first: line 1, the footprints.** They become real form: each a bare foot (heel, ball, five toes, the
+arch's shallow link) 0.05 yd deep, with a ridge of squeezed sand round it, on a fine 0.015 yd mesh along the trail, and
+painted holding the blood with a lit far lip.
+
+## Pass 6 (2026-10-09): the prints, and the logs become bones
+
+**The prints (the rules check's worst failure):** each bare foot is now real form on its own fine mesh (0.015 yd) along
+the trail: a heel 0.05 yd deep, the ball, five toes, the arch's shallow link on the outer side, and a low ridge of
+squeezed sand round it, the older prints softened by the wind. Each holds the blood with a pale lip on its far edge.
+At true scale a foot is a few pixels, so they read as a trail of small dark-red marks coming up out of the Red, which
+is what the lore asks.
+
+**Derek: "Turn the logs into bones."** Recorded in the decision log and the area page (the wrack's drift logs are now a
+bone jam; whose bones is never said). `beach3d.bones_jam` replaces the logs:
+- long bones, 5 to 10 yd: a waisted shaft flaring to its ends, a ball head on a short neck at one end, two knuckles at
+  the other, piled crosswise as drift logs pile;
+- one side of a ribcage half buried, four broad flat ribs arching out of the sand, and more strewn;
+- vertebrae the size of casks, tipped over, with the arch, the spine and the side processes;
+- the wrack's wood splinters are bone shards now.
+- **Painted** (`paint_shore`): an old ivory-grey ramp of its own, grain split along each bone's own axis, pits, spume
+  on the seaward sides. The first try was so dark it read as branches, and the first ribs read as wire hoops; they are
+  lighter now, and broad, two strands across the blade.
+
+**cine_check (exterior):** 4 of 7, unchanged (rules 1, 22, 27 fail as before).
+
+**Grade: C.** The bones read as bones and the trail reads. **Still short:** the swell's front is one big smooth dark
+mass, the roll is hard to read, the froth is blotchy, the tall column is plain, and the dead are hard to read.

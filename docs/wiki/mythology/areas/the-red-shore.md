@@ -269,8 +269,9 @@ of the real world.
    - Arches and rock benches.
    - On the headland, memorial poles of stacked human faces looking out to sea, each capped with a little tiered
      roof.
-4. **The wrack and the drift logs.** At the storm line, whole trees thrown up and bleached silver, piled crosswise,
-   roots and all, taller than the pilgrim. One or two of the "logs" are ribs.
+4. **The wrack and the bone jam.** At the storm line, where a coast would pile drift logs, the Red has thrown up giant
+   bones (Derek, 2026-10-09: "Turn the logs into bones"): long bones with knuckled ends, ribs, some arching out of the
+   sand, and vertebrae, piled crosswise, old and pitted, taller than the pilgrim. Whose bones is never said.
 5. **The backshore.** Dune grass, beach pea and salal, cut by small clear streams.
 6. **The spruce fringe and the bluffs.**
    - Sitka spruce sheared by the wind, flagged and **leaning out toward the Red**, their seaward sides dead and grey.
@@ -402,7 +403,8 @@ of the real world.
 - the pale root, warm and slowly beating, grown round the head of the stone guardian at the temple door;
 - the temple stair warm under the hand;
 - the ground under the pit's ash too warm for the fire alone;
-- on the shore, a rib among the drift logs, and a low pulse in the wet sand at the water's edge.
+- on the shore, the giant bones the Red throws up where drift logs should lie, and a low pulse in the wet sand at the
+  water's edge.
 
 Nothing more; the god shows more the deeper you go.
 

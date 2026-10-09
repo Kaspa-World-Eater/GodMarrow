@@ -67,7 +67,13 @@ def st_grid(name, s0, s1, t0, t1, res, zfun, mat, keep=None):
 # ---- the ground and the water ----
 
 def ground():
-    st_grid("sand", 43.0, 74.0, T0, T1, 0.06, BF.height_st, "ground")
+    # the sand; along the trail of prints a finer mesh, so each bare foot is real form (heel, ball, toes, the ridge)
+    st_grid("sand", 43.0, 74.0, T0, T1, 0.06, BF.height_st, "ground", lambda s, t, z: BF.trail_dist(s, t) > 0.3)
+    s_lo = min(p[0] for p in BF.TRAIL) - 0.5
+    s_hi = max(p[0] for p in BF.TRAIL) + 0.5
+    t_lo = min(p[1] for p in BF.TRAIL) - 0.5
+    t_hi = max(p[1] for p in BF.TRAIL) + 0.5
+    st_grid("sand_prints", s_lo, s_hi, t_lo, t_hi, 0.015, BF.height_st, "ground", lambda s, t, z: BF.trail_dist(s, t) < 0.36)
 
 
 def sea():
@@ -265,10 +271,10 @@ def wrack():
         pts = [(x + math.cos(a) * ln * u + math.sin(u * 5 + i) * 0.07, y + math.sin(a) * ln * u, z + 0.022) for u in (0, 0.33, 0.66, 1.0)]
         P.tube("kelp%d" % i, pts, [0.028, 0.032, 0.026, 0.012], "kelp" if not storm else "straw", 5)
         if rnd.random() < 0.25:
-            # a splinter of wood
+            # a splinter of bone
             b = rnd.uniform(0, math.pi)
             l2 = rnd.uniform(0.2, 0.6)
-            P.tube("spl%d" % i, [(x, y, z + 0.02), (x + math.cos(b) * l2, y + math.sin(b) * l2, z + 0.02)], [0.025, 0.012], "cedar", 5)
+            P.tube("spl%d" % i, [(x, y, z + 0.02), (x + math.cos(b) * l2, y + math.sin(b) * l2, z + 0.02)], [0.025, 0.012], "bone", 5)
     for i in range(14):
         t_ = rnd.uniform(T0, T1)
         s_ = float(BF.high_tide(np.array([t_]))[0]) + rnd.gauss(0, 0.4)
@@ -283,50 +289,119 @@ def wrack():
         P.sphere("lknob%d_b" % i, p1, 0.03, "bone", scale=(1, 1, 0.7))
 
 
-def logs():
-    """the drift-log jam (chapter 13, section 4; Rialto, Ruby): giant trees the storms threw up past the berm, stripped
-    and silvered, jammed and piled on each other along the back of the beach, some with their root wads"""
+def bones_jam():
+    """the bone jam (Derek, 2026-10-09: "Turn the logs into bones"): where a coast piles its drift logs, the Red has
+    thrown up giant bones and the storms have jammed them at the back of the beach, piled crosswise as logs pile: long
+    bones with a ball head on a neck at one end and two knuckles at the other, ribs (some arching out of the sand, both
+    ends buried), vertebrae tipped on their sides. Old, pitted and split along the grain (paint_shore). Whose they are is
+    never said"""
     rnd = random.Random(53)
     laid = []
-    for i in range(15):
-        t_c = rnd.uniform(T0 - 3, T1 + 2)
-        s_c = rnd.uniform(44.0, 49.5) if i < 13 else rnd.uniform(50.0, 52.5)
-        r0 = rnd.uniform(0.24, 0.5)
-        ln = rnd.uniform(6.0, 13.0)
-        yaw = rnd.gauss(0, 0.32)
-        ns = 9
+
+    def gz_on(x, y, r):
+        z = _gz(x, y) + r * 0.7
+        for (lx, ly, lz, lr) in laid:
+            dd = math.hypot(lx - x, ly - y)
+            if dd < lr + r * 0.9:
+                z = max(z, lz + (lr + r) * 0.8 * math.sqrt(max(0.0, 1 - (dd / (lr + r)) ** 2)) + 0.02)
+        return z
+
+    def long_bone(i, s_c, t_c, ln, r0, yaw):
+        ns = 11
         pts, radii = [], []
-        bend = rnd.uniform(-0.25, 0.25)
+        bend = rnd.uniform(-0.15, 0.15)
         for k in range(ns):
             u = k / (ns - 1) - 0.5
             s_ = s_c + u * ln * math.sin(yaw) + bend * (1 - 4 * u * u)
             t_ = t_c + u * ln * math.cos(yaw)
             x, y = S.xy(s_, t_)
-            r = r0 * (1.0 - 0.35 * (u + 0.5)) * (1 + 0.05 * math.sin(k * 2.3 + i))
-            z = _gz(x, y) + r * 0.75
-            for (lx, ly, lz, lr) in laid:
-                dd = math.hypot(lx - x, ly - y)
-                if dd < lr + r * 0.9:
-                    z = max(z, lz + (lr + r) * 0.8 * math.sqrt(max(0.0, 1 - (dd / (lr + r)) ** 2)) + 0.02)
-            pts.append((x, y, z))
+            # the shaft waisted in its middle, flaring toward both ends
+            r = r0 * (0.82 + 0.75 * (2 * abs(u)) ** 3)
+            pts.append((x, y, 0.0))
             radii.append(r)
-        o = P.tube("log%d" % i, pts, radii, "cedar", 14)
-        for (x, y, z), r in zip(pts, radii):
-            laid.append((x, y, z, r))
-        if rnd.random() < 0.4:
-            # a root wad at the butt: the stubs of the roots spread round it, broken
-            bx, by, bz = pts[0]
-            dx, dy = pts[0][0] - pts[1][0], pts[0][1] - pts[1][1]
-            dl = math.hypot(dx, dy) + 1e-9
-            dx, dy = dx / dl, dy / dl
-            for q in range(rnd.randint(6, 10)):
-                a = rnd.uniform(0, 2 * math.pi)
-                ex, ey = -dy * math.cos(a), dx * math.cos(a)
-                ez = math.sin(a)
-                rl = rnd.uniform(0.8, 2.0) * r0 * 2
-                tip = (bx + (ex * 0.8 + dx * 0.4) * rl, by + (ey * 0.8 + dy * 0.4) * rl, max(bz + ez * rl * 0.8, _gz(bx, by) + 0.05))
-                mid = ((bx + tip[0]) / 2 + rnd.uniform(-0.1, 0.1), (by + tip[1]) / 2, (bz + tip[2]) / 2 + 0.1)
-                P.tube("root%d_%d" % (i, q), [(bx, by, bz), mid, tip], [r0 * 0.35, r0 * 0.2, 0.03], "cedar", 7)
+        zs = [gz_on(p[0], p[1], r) for p, r in zip(pts, radii)]
+        zs = [min(z, zs[0] + 0.8) for z in zs]
+        pts = [(p[0], p[1], z) for p, z in zip(pts, zs)]
+        P.tube("bone%d" % i, pts, radii, "bone", 12)
+        # one end: a ball head on a short neck, turned off the axis; the other: two knuckles side by side
+        (x0, y0, z0), (x1, y1, z1) = pts[0], pts[1]
+        dx, dy = x0 - x1, y0 - y1
+        dl = math.hypot(dx, dy) + 1e-9
+        dx, dy = dx / dl, dy / dl
+        nx, ny = -dy, dx
+        hx, hy = x0 + dx * r0 * 1.2 + nx * r0 * 1.1, y0 + dy * r0 * 1.2 + ny * r0 * 1.1
+        P.tube("bneck%d" % i, [(x0, y0, z0), (hx, hy, z0 + r0 * 0.3)], [radii[0] * 0.8, r0 * 0.75], "bone", 10)
+        P.sphere("bhead%d" % i, (hx + nx * r0 * 0.4, hy + ny * r0 * 0.4, z0 + r0 * 0.35), r0 * 1.35, "bone", scale=(1, 1, 0.95))
+        (x0, y0, z0), (x1, y1, z1) = pts[-1], pts[-2]
+        dx, dy = x0 - x1, y0 - y1
+        dl = math.hypot(dx, dy) + 1e-9
+        dx, dy = dx / dl, dy / dl
+        nx, ny = -dy, dx
+        for sgn in (-1, 1):
+            P.sphere("bknuck%d_%d" % (i, sgn), (x0 + dx * r0 * 0.6 + nx * sgn * r0 * 0.75, y0 + dy * r0 * 0.6 + ny * sgn * r0 * 0.75,
+                                                  z0 - r0 * 0.1), r0 * 1.05, "bone", scale=(1.25, 0.95, 0.9))
+        for p, r in zip(pts, radii):
+            laid.append((p[0], p[1], p[2], r))
+
+    def rib(i, s0, t0, span, yaw, h, lean, r0):
+        """a rib arching out of the sand, both ends buried, leaning; flattened as a rib is (two tubes side by side)"""
+        pts, radii = [], []
+        for k in range(15):
+            u = k / 14.0
+            s_ = s0 + (u - 0.5) * span * math.sin(yaw)
+            t_ = t0 + (u - 0.5) * span * math.cos(yaw)
+            arch = math.sin(math.pi * u) ** 0.85
+            s_ += math.cos(yaw) * h * arch * math.sin(lean)
+            t_ -= math.sin(yaw) * h * arch * math.sin(lean)
+            x, y = S.xy(s_, t_)
+            pts.append((x, y, _gz(x, y) - 0.2 + h * arch * math.cos(lean)))
+            radii.append(r0 * (1.0 - 0.4 * u))
+        # a rib is broad and flat: a second strand beside the first, across the arch, makes the blade
+        side = []
+        for k, (x, y, z) in enumerate(pts):
+            ox, oy = S.xy(s0 + math.cos(yaw) * r0 * 1.1, t0 - math.sin(yaw) * r0 * 1.1)
+            bx, by = S.xy(s0, t0)
+            side.append((x + ox - bx, y + oy - by, z - r0 * 0.15))
+        P.tube("rib%d" % i, pts, radii, "bone", 9)
+        P.tube("ribb%d" % i, side, [r * 0.9 for r in radii], "bone", 9)
+
+    def vertebra(i, s_, t_, r):
+        """a vertebra the size of a cask, tipped over: its body, the arch, the long spine and the two side processes"""
+        x, y = S.xy(s_, t_)
+        z = _gz(x, y)
+        a = rnd.uniform(0, 6.28)
+        ca, sa = math.cos(a), math.sin(a)
+        tip = rnd.uniform(0.9, 1.4)                           # lying on its side
+        ax = (ca * math.cos(tip), sa * math.cos(tip), math.sin(tip))
+        c = (x, y, z + r * 0.75)
+        P.tube("vbody%d" % i, [(c[0] - ax[0] * r * 0.4, c[1] - ax[1] * r * 0.4, c[2] - ax[2] * r * 0.4),
+                               (c[0] + ax[0] * r * 0.4, c[1] + ax[1] * r * 0.4, c[2] + ax[2] * r * 0.4)],
+               [r, r * 0.95], "bone", 14)
+        ox, oy = -sa, ca                                     # the arch and the spine leave the body sideways
+        P.tube("vspine%d" % i, [(c[0] + ox * r * 0.8, c[1] + oy * r * 0.8, c[2] + 0.1),
+                                (c[0] + ox * r * 2.2, c[1] + oy * r * 2.2, z + r * 0.25)], [r * 0.32, r * 0.14], "bone", 8)
+        for sgn in (-1, 1):
+            P.tube("vside%d_%d" % (i, sgn), [(c[0] + ox * r * 0.7, c[1] + oy * r * 0.7, c[2]),
+                                             (c[0] + ox * r * 0.9 + ca * sgn * r * 1.4, c[1] + oy * r * 0.9 + sa * sgn * r * 1.4,
+                                              c[2] + sgn * 0.05)], [r * 0.22, r * 0.12], "bone", 7)
+        laid.append((x, y, z + r * 0.75, r))
+
+    n = 0
+    for i in range(12):
+        t_c = rnd.uniform(T0 - 3, T1 + 2)
+        s_c = rnd.uniform(44.0, 49.5) if i < 10 else rnd.uniform(50.0, 52.0)
+        long_bone(n, s_c, t_c, rnd.uniform(5.0, 10.0), rnd.uniform(0.2, 0.34), rnd.gauss(0, 0.35))
+        n += 1
+    # a run of ribs arching out of the sand where one side of a ribcage lies buried, and others strewn
+    s0, t0 = 51.2, -10.5
+    for k in range(4):
+        rib(k, s0 - k * 0.25, t0 + k * 1.25, rnd.uniform(3.2, 4.2), 0.25 + rnd.uniform(-0.08, 0.08), rnd.uniform(1.3, 2.1),
+            rnd.uniform(0.25, 0.5), rnd.uniform(0.2, 0.26))
+    for k in range(4, 8):
+        rib(k, rnd.uniform(45.0, 50.5), rnd.uniform(T0, T1), rnd.uniform(2.5, 4.0), rnd.uniform(-0.6, 0.6),
+            rnd.uniform(0.4, 0.9), rnd.uniform(0.9, 1.3), rnd.uniform(0.17, 0.22))
+    for k in range(6):
+        vertebra(k, rnd.uniform(45.5, 52.5), rnd.uniform(T0, T1), rnd.uniform(0.5, 0.75))
 
 
 def dead():
@@ -360,6 +435,6 @@ def build(root, material):
     bore()
     pebbles()
     wrack()
-    logs()
+    bones_jam()
     dead()
     cliffs()

@@ -154,6 +154,9 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09, the drift logs are bones (Derek):** "Turn the logs into bones." The jam at the back of the Red Shore's
+  beach is giant bones the Red has thrown up, not trees: long bones with their knuckled ends, ribs (some arching out of
+  the sand), vertebrae, piled crosswise as drift logs pile. Whose bones is never said.
 - **2026-10-09, the Red Water moves on a dying heartbeat (Derek):** "Make sure the tide moves rather slow as it's based
   on dying heart beats not normal speeds and blood is thick and viscous." The sea's motion is timed to a slow, failing
   pulse (a surge, a weaker second surge, a long stillness), never an ocean's speed. Blood's viscosity governs its form:
