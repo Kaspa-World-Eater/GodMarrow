@@ -713,3 +713,7 @@ value, so the frame reads as dark plus mid.
   is cut by the black maw, the hanging chains and the dark mineral weeping.
 - **Next for the hall:** compose the light mass whole. Fewer weeping streaks across the great face's lit planes, the
   chains moved off its centre, so the lit stone round the maw reads as one shape.
+
+**Rules check paused** (2026-10-09): the third reminder in a row with no word from Derek, so the reminder is off by his
+pause rule until he next writes. **Next when work resumes:** the hall's light mass composed whole (fewer weeping streaks
+across the great face's lit planes, the chains off its centre), and the onyx's border made to read as ornate.
