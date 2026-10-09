@@ -140,9 +140,36 @@ def render_passes(out_dir):
     pos = P["Position"][..., :3].copy()
     pos[..., 1] = -pos[..., 1]
     pos[..., 2] = pos[..., 2] / ZSQ
+    sky = sky_passes(out_dir, outs)
     np.savez_compressed(os.path.join(out_dir, "passes.npz"), normal=n, pos=pos, ao=P["AO"][..., 0],
                         mat=np.round(P["IndexMA"][..., 0]).astype(np.int16), moon=P["DiffDir"][..., 0],
-                        alpha=P["Alpha"][..., 0], gw=gw, gh=gh)
+                        alpha=P["Alpha"][..., 0], shelter=sky["shelter"], skyview=sky["skyview"], gw=gw, gh=gh)
+
+
+def sky_passes(out_dir, outs):
+    """a second look, at the sky (MASTER_RULES 6: weather happens in the world, by what it reaches). A sun straight
+    down shows what the rain falls on: shelter is 1 where an eave, a roof or a crown keeps it off. The occlusion out to
+    12 yd shows how much of the overcast each surface sees (skyview): low inside the hall, under the porch, deep in a
+    recess, where the 3 yd contact occlusion can't tell. The camera and the forms are the same, so the pixels match"""
+    sc = bpy.context.scene
+    moon = bpy.data.objects["moon"]
+    rot = moon.rotation_euler.copy()
+    moon.rotation_euler = (0.0, 0.0, 0.0)                     # a sun with no turn points straight down
+    dist = sc.world.light_settings.distance
+    sc.world.light_settings.distance = 12.0
+    for key, fo in outs.items():
+        fo.file_slots[0].path = key + "sky_"
+    bpy.ops.render.render(write_still=False)
+    got = {}
+    for key in ("DiffDir", "AO"):
+        f = [x for x in os.listdir(os.path.join(out_dir, "_p")) if x.startswith(key + "sky_")]
+        img = bpy.data.images.load(os.path.join(out_dir, "_p", sorted(f)[-1]))
+        got[key] = np.array(img.pixels[:], dtype=np.float32).reshape(img.size[1], img.size[0], 4)[::-1][..., 0]
+    moon.rotation_euler = rot
+    sc.world.light_settings.distance = dist
+    for key, fo in outs.items():
+        fo.file_slots[0].path = key + "_"
+    return dict(shelter=(got["DiffDir"] < 0.02).astype(np.float32), skyview=got["AO"])
 
 
 def to_heightfield(root, focus, half=17.0, res=0.05):

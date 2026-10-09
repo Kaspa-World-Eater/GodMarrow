@@ -48,14 +48,15 @@ MAT = {1: "ground", 2: "stucco", 3: "brick", 4: "stone", 5: "lacquer", 6: "gold"
        10: "iron", 11: "bone", 12: "moss", 13: "cloth", 14: "straw", 15: "water"}
 
 
-def tone(rmp, t, dith):
-    """t (0..1) to the ramp, with the 4x4 dither only at the step between two tones"""
+def tone(rmp, t, dith, band=0.2):
+    """t (0..1) to the ramp, with the 4x4 dither only at the step between two tones (within band of the midpoint; a
+    big flat surface takes a narrow band, so it lies in flat tones and never stipples)"""
     n = len(rmp)
     f = np.clip(t, 0, 0.999) * n
     i = np.floor(f).astype(int)
     frac = f - i
     i2 = np.where(frac > dith, i + 1, i)
-    i2 = np.where((frac > 0.3) & (frac < 0.7), i2, np.round(f - 0.5 + 0.5).astype(int))
+    i2 = np.where((frac > 0.5 - band) & (frac < 0.5 + band), i2, np.round(f - 0.5 + 0.5).astype(int))
     return rmp[np.clip(i2, 0, n - 1)]
 
 
@@ -78,29 +79,60 @@ def paint(d):
     # the broad shape of the light: the giants stand back from the kept ground, so the sky reaches it; under them, dim
     FM = F.maps(X, Y)
     v = v * FM["open"]
+    # the enclosure (blend_scene.sky_passes: occlusion out to 12 yd): what sees little of the sky goes dark, inside the
+    # hall under its roof, deep in the porch, in a recess; a wall in the open (half its view is ground) is untouched
+    if "skyview" in d:
+        v = v * np.clip(d["skyview"] / 0.42, 0.25, 1.0) ** 0.75
     # what each surface is, by cause
     wall = np.abs(up) < 0.35                                    # standing faces
     along = np.where(np.abs(n[..., 0]) > np.abs(n[..., 1]), Y, X)   # a wall's own horizontal coordinate
     noise = fbm(X * 0.9 + Y * 0.3, Y * 0.9 + Z * 0.7)
     fine = vn(X * 7 + Z * 5, Y * 7 - Z * 5)
     img = np.zeros((gh, gw, 3))
+    exposed = 1.0 - d.get("shelter", np.zeros((gh, gw)))       # what the rain reaches (blend_scene.shelter_pass)
+    W = wall_maps(n, pos, mat, along, wall)
     for k, name in MAT.items():
         m = mat == k
         if not m.any():
             continue
         t = v[m] + (fine[m] - 0.5) * 0.08
         if name == "stucco":
-            # stucco fails by cause: the rising damp eats the wall's foot, the drip off the eaves its head, the corners
-            # first; elsewhere it holds, in islands the size of a hand to a man (not camouflage: small, ragged, few)
-            low = np.clip(1.0 - (Z[m] - 1.0) / 1.6, 0, 1)
-            lose = fbm(along[m] * 2.6 + Z[m] * 0.4, Z[m] * 2.6 + 3.0) + low * 0.32
-            lost = lose > 0.66
-            col = np.where(lost[:, None], tone(R["brick"], t * 0.85, dith[m]), tone(R["stucco"], t, dith[m]))
-            # the wet: algae only low on the shade side; thin black streaks down from the eaves and the sills
-            shade = wall[m] & (mn[m] < 0.05) & (low > 0.4) & (vn(along[m] * 3.0, Z[m] * 3.0) > 0.5)
-            col = np.where(shade[:, None], tone(R["algae"], t * 0.85, dith[m]), col)
-            streak = wall[m] & (vn(along[m] * 13.0, Z[m] * 0.25) > 0.7) & ~lost
-            col = np.where(streak[:, None], col * 0.7, col)
+            # whitewashed lime over brick (the area's brief): it holds the light a step above stone at the same light,
+            # so the walls are the piece's big light shape. Where it has failed, by cause (wall_maps), the brick shows
+            # the walk and the treads are trodden plaster, never whitewashed: grey with grime, worn through to the
+            # brick along the keepers' track from the stair to the door
+            # (the wall's lime lies in flat tones shaped only by its stains: no fine grain, a narrow dither band)
+            ts = np.where(wall[m], v[m] * (1.55 + W["stain"][m]), t)
+            lost = W["lost"][m]
+            col = np.where(lost[:, None], brick_tone(along[m], Z[m], t * 0.9, dith[m]),
+                           tone(R["stucco"], ts, dith[m], band=np.where(wall[m], 0.06, 0.2)))
+            flat_ = ~wall[m]
+            col = np.where(flat_[:, None], tone(R["stone"], t * 0.8 + (fine[m] - 0.5) * 0.06, dith[m]), col)
+            track = flat_ & (np.abs(Y[m]) < 0.8 + 0.25 * vn(X[m] * 2.0, 4.0)) & (X[m] > 4.4) & (X[m] < 7.7) & (vn(X[m] * 5.0, Y[m] * 5.0) > 0.42)
+            col = np.where(track[:, None], brick_tone(X[m], Y[m] * 0.31, t * 0.8, dith[m]), col)
+            # the salt the damp leaves where it dries out, a pale tide just above its line
+            col = np.where(W["salt"][m][:, None], tone(R["stucco"], ts * 1.18 + 0.04, dith[m]), col)
+            # run-off from the sills: grey-black streaks hanging below each window, down to the damp
+            col = np.where(W["streak"][m][:, None], tone(R["stucco"], ts * 0.62, dith[m]), col)
+            # the algae: a film on the damp, thickest at the foot and on the faces the light never reaches, dithered
+            # where it thins (never blotches)
+            a = W["damp"][m] ** 0.8 * np.where(soft[m] < 0.3, 1.0, 0.45)
+            alg = wall[m] & (a > 0.3 + dith[m] * 0.55)
+            col = np.where(alg[:, None], tone(R["algae"], t * 0.95, dith[m]), col)
+            # the edges of what stays are rounded and grey-black with lichen (chapter 09), a band a pixel or two wide
+            col = np.where(W["lichen"][m][:, None], tone(R["stucco"], ts * 0.62, dith[m]), col)
+            # the cracks the walls settled along, from the windows' corners
+            col = np.where(W["crack"][m][:, None], tone(R["stucco"], ts * 0.45, dith[m]), col)
+            # the plaster stands proud of the brick: a loss's top edge throws a thin shadow on the brick below it, and
+            # its bottom edge, the plaster's broken top, catches the sky (rule 3, the lit lip)
+            col = np.where(W["shadow"][m][:, None], col * 0.68, col)
+            col = np.where(W["lip"][m][:, None], tone(R["stucco"], ts * 1.25 + 0.05, dith[m]), col)
+        elif name == "brick":
+            col = brick_tone(along[m], Z[m], t * 0.95, dith[m])
+            a = W["damp"][m] ** 0.8 * np.where(soft[m] < 0.3, 1.0, 0.45)
+            col = np.where((wall[m] & (a > 0.3 + dith[m] * 0.55))[:, None], tone(R["algae"], t * 0.95, dith[m]), col)
+        elif name == "lacquer":
+            col = lacquer_paint(m, t, along, Z, W, dith)
         elif name == "tile":
             # every tile its own: a course every quarter yard down the slope, a row every third of a yard across; each
             # tile a little lighter or darker, a few gone (the dark beneath), the rust tiles of an older repair in runs
@@ -125,8 +157,13 @@ def paint(d):
             col = tone(R["stone"], t, dith[m])
         # moss on whatever faces the sky and holds the wet: stone, stucco, brick, tile, wood
         if name in ("stucco", "brick", "stone", "tile", "wood"):
-            # (a steep roof sheds its water and holds moss only in patches; flat tops hold it everywhere the wet stays)
-            mossy = (up[m] > (0.6 if name == "tile" else 0.62)) & (fbm(X[m] * 1.3 + 7, Y[m] * 1.3 + Z[m]) > (0.6 if name == "tile" else 0.46))
+            # (a steep roof sheds its water and holds moss only in patches; flat tops hold it where the rain reaches
+            # them, thickest where the water stands, at the foot of what rises from them; under the eaves, none)
+            if name == "tile":
+                mossy = (up[m] > 0.6) & (fbm(X[m] * 1.3 + 7, Y[m] * 1.3 + Z[m]) > 0.6)
+            else:
+                stand = np.clip((0.97 - ao[m]) / 0.3, 0, 1)
+                mossy = (up[m] > 0.62) & (exposed[m] > 0.5) & (fbm(X[m] * 1.3 + 7, Y[m] * 1.3 + Z[m]) + stand * 0.35 > 0.5)
             col = np.where(mossy[:, None], tone(R["moss"], t, dith[m]), col)
         img[m] = col
     img = paint_floor(img, d, v, FM, dith)
@@ -146,6 +183,122 @@ def paint(d):
 
 
 LV = 1.3            # the litter painter's light is the wood scene's, a step brighter than this overcast's
+
+
+def _frac(a):
+    return a - np.floor(a)
+
+
+def brick_tone(along, Z, t, dith):
+    """brick by the course (a course 0.075 yd, a brick 0.24 yd, every other course set over by half): each brick its own
+    small step of tone, a few burnt dark, a few gone to the hollow behind them"""
+    row = np.floor(Z / 0.075)
+    cb = np.floor(along / 0.24 + 0.5 * (row % 2))
+    h = _frac(np.sin(row * 12.9898 + cb * 78.233) * 43758.5453)
+    tt = t + (h - 0.5) * 0.16
+    tt = np.where(h > 0.94, tt * 0.5, tt)
+    return tone(R["brick"], tt, dith)
+
+
+def wall_maps(n, pos, mat, along, wall):
+    """how the whitewashed stucco has failed, by cause (chapter 09: it drops in sheets, baring the brick in irregular
+    continents, the edges of what stays rounded): the rising damp at every wall's foot, its line wandering slowly along
+    the wall, a pale tide of salt just above it where the damp dries out; the exposed edges first (a wall's corners, the
+    door's jambs, the window reveals, where the form turns); tongues under the sills where the run-off goes, with its
+    grey streaks. Elsewhere the lime holds. Never a threshold on noise at the scale of yards (the camouflage trap)"""
+    gh, gw = mat.shape
+    X, Y, Z = pos[..., 0], pos[..., 1], pos[..., 2]
+    st = (mat == 2) & wall
+    base = np.where(Z > 0.98, 1.0, -0.1)                # the platform's walk, or the ground at the platform's own faces
+    rel = Z - base
+    hd = 0.55 + 0.6 * fbm(along * 0.45 + 3.0, 1.7 + base * 5.0)          # the damp's line
+    rag = (vn(along * 3.3, Z * 3.3) - 0.5) * 0.24 + (vn(along * 9.0 + 2, Z * 9.0) - 0.5) * 0.09
+    damp = np.clip(1.0 - rel / (hd + 0.25), 0, 1) * (np.abs(n[..., 2]) < 0.35)
+    lost = st & (rel < hd + rag) & ~(fbm(along * 2.2 + 5, Z * 2.2) > 0.75)   # a few islands of plaster still hold
+    salt = st & ~lost & (rel >= hd + rag) & (rel < hd + rag + 0.07 + 0.06 * vn(along * 5.0, 2.0))
+    # the exposed edges: where the form turns from column to column (a vertical edge in the world), within a ragged reach
+    turn = np.zeros((gh, gw))
+    turn[:, :-1] += np.linalg.norm(n[:, 1:] - n[:, :-1], axis=2)
+    turn[:, 1:] += np.linalg.norm(n[:, 1:] - n[:, :-1], axis=2)
+    far = nd.distance_transform_edt(turn < 0.9)                     # a corner, a jamb, a reveal; never a column's roundness
+    reach = 1.5 + 3.5 * fbm(along * 1.6, Z * 1.6 + 9.0) * (0.5 + 0.7 * damp)
+    lost |= st & (far < reach) & (vn(along * 4.0 + 1, Z * 4.0) > 0.38)
+    # under each window: how many rows below a shutter (the run-off from its sill goes straight down the wall)
+    lac = mat == 5
+    below = np.zeros((gh, gw))
+    since = np.full(gw, 999.0)
+    for r in range(gh):
+        since = np.where(lac[r], 0.0, since + 1.0)
+        below[r] = since
+    under = st & (below > 0) & (below < 60)
+    lost |= under & (below < 3 + 9 * vn(along * 6.0, 3.0)) & (vn(along * 8.0 + 4, Z * 2.0) > 0.42)
+    streak = under & ~lost & (vn(along * 14.0, Z * 0.3) > 0.56) & (below < 10 + 30 * vn(along * 3.0, 7.0))
+    # the cracks the walls settled along: from each window's lower corners down and outward, wandering; beside each,
+    # the plaster bellied and dropped a sheet (the irregular continents), on the side away from the window
+    crack = np.zeros((gh, gw), bool)
+    lab, nlab = nd.label(lac & wall)
+    for k in range(1, nlab + 1):
+        q = lab == k
+        if q.sum() < 30:
+            continue
+        a0, a1, z0 = along[q].min(), along[q].max(), Z[q].min()
+        rnd = np.random.default_rng(k * 7 + 3)
+        for side, ax in ((-1, a0), (1, a1)):
+            if rnd.random() < 0.35:
+                continue                                              # not every corner cracked
+            ln = rnd.uniform(0.7, 1.5)
+            slope = rnd.uniform(0.9, 1.6)                             # yards down per yard out
+            s_out = side * (along - ax)                               # out from the window's side
+            dz = z0 - Z                                               # down from its sill
+            onwall = st & (s_out > -0.05) & (dz > -0.05) & (dz < ln)
+            wob = (vn(dz * 9.0 + k, 3.0 + side) - 0.5) * 0.08
+            dist = np.abs(s_out * slope - dz + wob) / np.hypot(slope, 1.0)
+            crack |= onwall & (dist < 0.022)
+            sheet = onwall & (s_out * slope - dz + wob > 0) & (dist < 0.12 + 0.18 * vn(dz * 4.0, along * 4.0 + k)) & (dz < ln * 0.8)
+            lost |= sheet
+    crack &= ~lost
+    # the lime's own stains: soft vertical runs, a step lighter or darker in long shapes (never blotches)
+    stain = (fbm(along * 0.9 + 2.0, Z * 0.22) - 0.5) * 0.22
+    # the edges of what stays: a band of grey-black lichen a pixel or two wide round every loss
+    keep = st & ~lost
+    lichen = keep & (nd.distance_transform_edt(~lost) < 1.6 + vn(along * 6.0, Z * 6.0))
+    # the plaster's broken edges (screen rows run down the wall): shadow on the brick under a top edge, lit lip on top
+    same = (n * np.roll(n, 1, 0)).sum(2) > 0.95
+    shadow = lost & np.roll(keep, 1, 0) & same
+    lip = keep & np.roll(lost, 1, 0) & same
+    lichen &= ~lip
+    return dict(lost=lost, salt=salt, damp=damp, streak=streak, shadow=shadow, lip=lip, crack=crack, stain=stain,
+                lichen=lichen)
+
+
+def lacquer_paint(m, t, along, Z, W, dith):
+    """black lacquer over teak (the shutters, the door): crazed and flaking in islands to the grey wood, more toward
+    the foot where the wet reaches; the gilt pattern (gold leaf on black) kept only in an inset border and a lozenge,
+    in the upper part where the eaves keep the weather off. Each panel's own bounds come from its pixels"""
+    lab, nlab = nd.label(m)
+    u = np.zeros(m.shape)
+    w = np.zeros(m.shape)
+    ua = np.zeros(m.shape)
+    wa = np.zeros(m.shape)
+    for k in range(1, nlab + 1):
+        q = lab == k
+        a0, a1 = along[q].min(), along[q].max()
+        z0, z1 = Z[q].min(), Z[q].max()
+        u[q] = (along[q] - a0) / max(a1 - a0, 1e-3)
+        w[q] = (Z[q] - z0) / max(z1 - z0, 1e-3)
+        ua[q], wa[q] = a1 - a0, z1 - z0
+    u, w, ua, wa = u[m], w[m], ua[m], wa[m]
+    a, z = along[m], Z[m]
+    col = tone(R["lacquer"], t, dith[m])
+    flaked = fbm(a * 3.0 + 11.0, z * 3.0) + (1.0 - w) * 0.28 > 0.7
+    col = np.where(flaked[:, None], tone(R["wood"], t * 0.95, dith[m]), col)
+    inset = np.minimum(np.minimum(u, 1 - u) * ua, np.minimum(w, 1 - w) * wa)
+    border = (inset > 0.05) & (inset < 0.095)
+    loz = np.abs(u - 0.5) * 2 / 0.75 + np.abs(w - 0.62) * 2 / 0.32
+    lozenge = (loz > 0.8) & (loz < 1.0)
+    gilt = (border | lozenge) & ~flaked & (w > 0.3) & (vn(a * 7.0 + 3, z * 7.0) > 0.35)
+    col = np.where(gilt[:, None], tone(R["gold"], t * 0.9, dith[m]), col)
+    return col
 
 
 def _leaves_on(img, m, v, X, Y, dens, lt, seed):

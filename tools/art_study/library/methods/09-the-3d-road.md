@@ -60,11 +60,21 @@ trees with branches, hanging moss.
    with leaves lying over the rims, thins cushion by cushion and never ends in an edge.
 10. **Everything on the ground takes its foot from the ground's height** (`floor3d.height`), and whatever stands is set
     into the floor. Without that, tiles floated and the stair's serpents hung in the air.
+11. **A second look at the sky** (`blend_scene.sky_passes`, about 2 seconds): a sun straight down gives shelter (what
+    the rain reaches), and occlusion out to 12 yd gives skyview (how much of the overcast a surface sees). The weather's
+    work goes only where the rain falls, and enclosed places go dark (the hall's inside, the porch's depth). A ray per
+    pixel from Python did the same in 65 seconds.
+12. **Walls fail by cause** (pass 8: rising damp with its salt tide, exposed edges first, run-off under the sills,
+    settlement cracks from the windows' corners with the sheet beside each dropped). Each loss is real at its edges:
+    a lit lip on the plaster's broken top, a thin shadow under its lower edge, grey-black lichen round what stays.
+13. **The material's own lightness.** Lime holds the light, so the whitewash takes a step above stone at the same
+    light; without it the walls sank to the floor's value. A big flat surface lies in flat tones with a narrow dither
+    band (`tone(band=...)`). Otherwise its light sits between two tones and the whole plane stipples.
 
 ## Still to learn
 
 From the trial's open list:
-- the stucco walls' losses, which still read as camouflage in colour and in value;
+- the roof: its repair tiles and missing tiles are a checker of square patches, a pixel grid;
 - the stair's readability (the treads and risers are lost under brick, moss and leaves);
 - the giant trees round the temple;
 - drizzle and wet sheen, by material;

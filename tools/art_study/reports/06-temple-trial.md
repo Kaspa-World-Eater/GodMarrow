@@ -3,7 +3,7 @@
 **The piece:** the Red Shore's destroyed temple hall, the first piece built on the 3D road. The code is in
 `tools/landkit3d/` (`temple3d.py`, `floor3d.py`, `parts3d.py`, `paint3d.py`); the pass log is
 `tools/landkit/passes/thai_temple.md`; the review page is https://claude.ai/artifact/T28WGqopEAxcLm6v68hBer. Status: in
-work, pass 7, **B-** (the floor B+). Derek has not graded it yet.
+work, pass 8, **B** (the floor and the walls B+). Derek has not graded it yet.
 
 ## What the studies taught
 
@@ -38,6 +38,12 @@ work, pass 7, **B-** (the floor B+). Derek has not graded it yet.
 - **Water levelled below its rim,** with the far bank's dark mirrored along the far edge.
 - **The occlusion pass as a map of shelter:** where the wind can't reach, the leaves pile up, as in the unswept
   stair's corners.
+- **The walls by cause** (pass 8): rising damp with its salt tide, exposed edges first, run-off under the sills,
+  settlement cracks with the sheet beside each dropped. Lit lips, shadow and lichen at every loss's edge.
+- **A sky render:** shelter (a sun straight down) and skyview (occlusion out to 12 yd), so moss, wet and the dark of
+  enclosed places go where they belong.
+- **The material's own lightness:** whitewash a step above stone at the same light. Big flat surfaces get a narrow
+  dither band, so they lie in flat tones.
 
 ## Techniques: what failed, and why
 
@@ -53,6 +59,11 @@ work, pass 7, **B-** (the floor B+). Derek has not graded it yet.
   overcast in pass 7.
 - **Sine lobes for a natural outline** came out as a symbol (a heart, a bat).
 - **Things placed at fixed heights:** tiles floated, and the stair's serpents hung in the air.
+- **One albedo for every material:** the whitewash sank to the floor's value, and the walls stopped being the light
+  shape.
+- **The edge rule on round things:** a column's roundness counted as a corner, and the columns striped like candy
+  canes. Only sharp turns count.
+- **A walk painted like a wall:** near-white plaster under brown leaves read as dirt on snow.
 
 ## Traps
 

@@ -210,3 +210,70 @@ The temple's walls still break into blotches, in value as well as colour.
 1. the stucco walls, whose losses still read as camouflage in colour and in value;
 2. the stair's readability;
 3. then the giant trees and the drizzle.
+
+## Rules check, 2026-10-08 (2nd since Derek's last word), then pass 8: the walls
+
+**Read:**
+- `MASTER_RULES` (unchanged since pass 7's check).
+- The area page's temple ("whitewashed brick under stucco"; the keeper's account; "the boards from the back of the
+  temple" went into the palisade).
+- Chapter 09: stucco "cracks, bellies and drops in sheets, baring the red brick beneath in irregular continents. The
+  edges of what stays are rounded and grey-black with lichen"; moss on the tops of things, algae on the shaded sides,
+  streaks down from every lip.
+
+**Pass 7 against the checklist:**
+
+| Line | Pass 7 |
+|---|---|
+| 1. Brief | Passes (the unswept stair) |
+| 2. Scale | Passes |
+| 3. Form | Passes (the floor's real height; the serpents on their cheek walls) |
+| 4. Light | The warm candle is still missing |
+| 5. Values | **Fails on the walls.** The whitewashed walls are no lighter than the floor, and they break into blotches, so the biggest light shape in the piece doesn't read |
+| 6. Ramps | Passes |
+| 7. Paint | **Fails on the walls.** Their losses are decided by a noise threshold at the scale of yards (the camouflage trap of passes 1 and 7); the dark streaks are noise; the shutters are flat black slabs. The roof's checker of repair tiles still fails |
+| 8. Contact | Passes on the floor; the walls' feet don't show the damp |
+| 9. Detail | The stair's readability is still short |
+| 10. Life | Not yet (in the game) |
+| 11. As the player sees it | Passes for the trial |
+| 12. Skeptic round | Beside the ruins scene, whose walls read as stone first and damage second, these read as damage first |
+
+**The worst failure:** the walls (values and paint).
+
+**Pass 8: the walls, by cause** (`paint3d.wall_maps`, `brick_tone`, `lacquer_paint`).
+- **The whitewash leads the values.** Lime holds the light, so the walls take a step above stone at the same light:
+  they are now the piece's big light shape, ahead of the roof. They lie in flat tones shaped only by long vertical
+  stains, with no fine grain and a narrow dither band (`tone(band=...)`). The first try stippled the whole plane,
+  because a flat wall's light sat between two ramp tones.
+- **The losses by cause** (chapter 09):
+  - **Rising damp** at every wall's foot. Its line wanders slowly along the wall and is ragged at a hand's scale. A
+    few islands of plaster still hold inside it. A pale salt tide sits just above it, where the damp dries out.
+  - **The exposed edges first:** corners, jambs and window reveals, where the form turns sharply. A column's roundness
+    doesn't count; the first try striped the columns like candy canes.
+  - **Run-off under each sill:** a tongue of loss and grey streaks hanging below the shutters.
+  - **Settlement cracks** from some windows' lower corners, wandering down and outward, with the sheet beside each one
+    dropped. These are the irregular continents.
+- **Each loss is real at its edges.** The plaster's broken top edge catches the sky as a lit lip, and its lower edge
+  throws a thin shadow on the brick. Grey-black lichen rims everything that stays.
+- **The brick by the course:** every brick its own small step of tone, a few burnt dark, a few gone to the hollow
+  behind them.
+- **Algae** is a film on the damp, thickest at the foot and on the faces the light never reaches, dithered where it
+  thins.
+- **The shutters and door** are black lacquer over teak, flaking in islands to the grey wood (more toward the foot).
+  The gilt survives only in an inset border and a lozenge, in the upper part the eaves protect.
+- **The walk and the treads** are trodden plaster, grey with grime, never whitewashed. The first try was near-white,
+  and its leaves read as dirt on snow. The keepers' track from the stair to the door is worn through to the brick.
+- **Two new data passes** from Blender (`blend_scene.sky_passes`), a second render with the same camera and about 2
+  seconds:
+  - **shelter**, from a sun straight down: what the rain reaches. Moss on tops now grows only where the rain falls.
+    The walk under the eaves is dry, with leaves blown in.
+  - **skyview**, the occlusion out to 12 yd: how much of the overcast each surface sees. The hall's inside through the
+    broken roof and the depth of the porch go dark. A first version cast a ray per pixel from Python and took 65
+    seconds; the render does it in 2.
+
+**Value-only:** the walls' whitewash leads the roof, the walk sits between them and the floor, and the floor is darkest.
+The groups read.
+
+**Grade:** the walls B+; the piece **B** (up from B-). **Next worst:** the roof. Its rust-repair tiles and missing tiles
+are a checker of square patches that reads as a pixel grid, and it is the biggest shape in the frame. Then the stair,
+the giant trees and the drizzle.
