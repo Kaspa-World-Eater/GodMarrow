@@ -52,6 +52,8 @@ R = {
     "ash": ramp("#2a2826", "#45413d", "#625d57", "#807a72", "#9d978e", "#b8b2a8"),
     # the black sand: dry above the tide, and wet, where the Red has just left it
     "sand_dry": ramp("#141315", "#1e1c1e", "#292627", "#353131", "#423d3b", "#504a46", "#5f5853"),
+    # the black sand by the dune's method: eight tones, the darks leaning violet-blue, the lights warm (rule 9)
+    "black_sand": ramp("#0d0b13", "#16131c", "#211c24", "#2c252b", "#383032", "#463b3a", "#564942", "#68584d", "#7a6858"),
     "sand_wet": ramp("#0d0708", "#170b0c", "#221012", "#2d1617", "#3a1d1d", "#482525"),
     "kelp": ramp("#120708", "#1f0d0b", "#2e150f", "#3e1f14", "#4f2a19"),
     # the drowned dead: bloated skin gone grey-violet and green, the dark marbling of the veins under it
@@ -160,6 +162,8 @@ def paint(d):
             col = lacquer_paint(m, t, along, Z, W, dith)
             col = keeper_account(col, m, t, X, Y, Z, n, dith)
         elif name == "blood":
+            global Fm_ground_mask
+            Fm_ground_mask = mat == 1
             col = sea_paint(m, t, X, Y, Z, n, soft, dith, Fm)
         elif name == "corpse":
             # the drowned: grey-violet and green, the veins' dark marbling showing through, the skin's tight lit tops;
@@ -372,6 +376,9 @@ def wall_maps(n, pos, mat, along, wall):
                 lichen=lichen)
 
 
+Fm_ground_mask = None
+
+
 def sea_paint(m, t, X, Y, Z, n, soft, dith, Fm):
     """the Red Water with the game's own blood (landkit blood.py, the shader's twin: one blood everywhere, held dark,
     never glowing) at its true depth over the sand, and the lake's ways (library: water): the light broken into dull
@@ -383,15 +390,27 @@ def sea_paint(m, t, X, Y, Z, n, soft, dith, Fm):
     s_, t_ = (-(x + y) / np.sqrt(2), (x - y) / np.sqrt(2))
     # the blood ramp (blood.py's C0..C3: clot, dark red, the body, a lit red) picked by the real light on the swells,
     # held dark (the library's trap: ketchup); the blood effect's churn only as small clots, stretched along the swell
-    churn = fbm(t_ * 0.6 + 2.0, s_ * 2.4)
-    # the swells by their real slopes: their backs, turned from us, take the grey sky; their faces toward us are the
-    # blood's own dark body (the slope along the shore's normal, pushed so a swell reads as a band of tones)
     n_s = -(n[m][:, 0] + n[m][:, 1]) / np.sqrt(2)
-    lv = np.clip(t, 0, 0.6) * 2.0 + n_s * 5.5 + (churn - 0.5) * 0.45
+    depth = np.clip((z - g) / 1.2, 0, 1)
+    T_ = float(d["time"]) if "time" in d else 0.0
+    stroke = vn(t_ * 0.07 + 3.0 + T_ * 2.0, s_ * 0.9)                    # dragged along the shore, as the lake's ax.x
+    stroke2 = vn(t_ * 0.25 + 7.0 - T_ * 3.0, s_ * 1.8)
+    grain = vn(x * 0.7 + 71.0, y * 0.7) * 0.7 + vn(x * 2.0, y * 2.0) * 0.3
+    vsea = 0.1 + depth * 0.2 + (stroke - 0.5) * 0.18 + (stroke2 - 0.5) * 0.05 + (grain - 0.5) * 0.04 - 0.04
+    vsea = vsea + n_s * 1.6 + (np.clip(t, 0, 0.6) - 0.35) * 0.4       # the swells' real slopes and light
+    # the light broken into dabs: a sheen band toward the sky side (further out, higher on the screen), dabbed
+    sheen = np.clip((s_ - 69.0) / 14.0 + (stroke - 0.5) * 0.6, 0, 1) * 0.55
+    dabs = vn(t_ * 0.6 + 13.0, s_ * 5.0) > 0.58
+    vsea = vsea + sheen * dabs * 0.3
+    # clots drifting, and a skin that wrinkles slowly
+    clot = vn(x * 0.9 + 40.0, y * 0.9) > 0.76
+    vsea = np.where(clot, np.minimum(vsea, 0.12 + (grain - 0.5) * 0.05), vsea)
+    # (no sine wrinkles: they drew curls)
+    BR = np.array([BL.C0, (BL.C0 + BL.C1) / 2, BL.C1, (BL.C1 + BL.C2) / 2, BL.C2, BL.C2 * 0.85 + np.array([0.08, 0.05, 0.06])])
+    lv = np.clip(vsea, 0, 0.99) * len(BR)
     fr_ = lv - np.floor(lv)
-    lv = np.where(np.abs(fr_ - 0.5) < 0.12, lv + (dith[m] - 0.5) * 0.24, lv)          # dither only at a tone's edge
-    col = np.where((lv > 1.75)[:, None], BL.C2, np.where((lv > 0.95)[:, None], BL.C1, BL.C0))
-    col = col * (0.75 + np.clip(t, 0, 0.6)[:, None] * 0.6)
+    lv = np.where(np.abs(fr_ - 0.5) < 0.1, lv + (dith[m] - 0.5) * 0.2, lv)
+    col = BR[np.clip(lv.astype(int), 0, len(BR) - 1)]
     light = np.clip(t * 1.25, 0, 0.55)
     # the light in dabs: where the surface turns from us the grey sky lies on it, dragged along the swells' line, few
     V = np.array([0.612, 0.612, 0.5])
@@ -413,7 +432,7 @@ def sea_paint(m, t, X, Y, Z, n, soft, dith, Fm):
         # behind the break, the spent foam lies in strands dragged along the shore, thinning toward the beach
         spent = np.clip((s_ - 66.5) / 6.0, 0, 1) * (s_ < 73.5)
         # dry-brush streaks dragged along the shore (the lake's method), broken where the brush lifts
-        foam |= (z < 0.15) & (vn(t_ * 0.22 + 9, s_ * 3.4) > 0.86 - spent * 0.12) & (vn(t_ * 3.0, s_ * 3.0) > 0.3)
+        foam |= (z < 0.15) & (vn(t_ * 0.16 + 9 + T_ * 1.5, s_ * 2.6) > 0.9 - spent * 0.08) & (vn(t_ * 2.0, s_ * 2.0) > 0.4)
         col = np.where(foam[:, None], np.array([0.27, 0.15, 0.14]) * (0.75 + light[:, None]), col)
     # the shallows over the sand: the sand's red-black shows up through the blood, more the shallower, in dithered
     # steps (never contour lines); at its very edge a thin dark wet line, the pigment pooled
@@ -422,7 +441,56 @@ def sea_paint(m, t, X, Y, Z, n, soft, dith, Fm):
     col = np.where(thru[:, None], tone(R["sand_wet"], t * 0.85, dith[m]) * 0.55 + BL.C1 * 0.45, col)
     edge = (z - g) < 0.012
     col = np.where(edge[:, None], BL.C0 * 1.1, col)
+    # the lace: only along the film's running edge, where it meets the sand (found on the screen), broken
+    full = np.zeros(m.shape, bool)
+    full[m] = (z - g) < 0.05
+    sandpx = Fm_ground_mask if Fm_ground_mask is not None else np.zeros(m.shape, bool)
+    edge_full = full & nd.binary_dilation(sandpx, iterations=2)
+    lace = edge_full[m] & (vn(t_ * 2.5 + 5, s_ * 5.0) > 0.38)
+    col = np.where(lace[:, None], np.array([0.40, 0.26, 0.26]) * (0.8 + light[:, None] * 0.6), col)
     return col
+
+
+def black_sand(img, dry, damp, d, v, FM, soft_, X, Y):
+    """the dry and damp black sand by the dune's method (painted_dune.py, Derek's approved sand): the light from the
+    real ripples pushed bold, dry-brush strokes along the crests, broad washes laid wet, a paper tooth fixed to the
+    world, tone edges broken by the brush; pigment pooled where a wash turns to shade; the lit tones a step warmer and
+    the shade a step cooler; grit pooled dark in each trough, a lit lip along each crest; rare flecks of bone"""
+    s_, t_ = (-(X + Y) / np.sqrt(2), (X - Y) / np.sqrt(2))
+    a, c = s_, t_                                                     # the wind goes out to sea: across the crests is s
+    lit = soft_
+    if "ripple" in FM:
+        # each ripple's own light, as the dune's low sun gave it: the steep lee face toward the key lit, the long stoss
+        # darkening into the trough (the overcast alone is too soft to carve them)
+        r = FM["ripple"]
+        lr = np.where(r > 0.72, 0.9, 0.22 + 0.4 * (r / 0.72))
+        lit = lit * (1 - FM["rippled"]) + lr * FM["rippled"]
+    sky = d["normal"][..., 2] * 0.12
+    stroke = (vn(c * 0.8 + 11, a * 4.0) - 0.5) * 0.06
+    wash = (fbm(X * 0.17 + 20, Y * 0.17 + 4) - 0.5) * 0.14
+    tooth = (vn(X * 1.4, Y * 1.4) - 0.5) * 0.05 + (vn(X * 4.5 + 5, Y * 4.5) - 0.5) * 0.025
+    jitter = (vn(c * 1.6 + 3, a * 9.0) - 0.5) * 0.07
+    vv = 0.14 + lit * 0.62 + sky + stroke + wash + tooth + jitter
+    vv = np.where(damp, vv * 0.72, vv)
+    RB = R["black_sand"]
+    idx = np.clip((vv * len(RB)).astype(int), 0, len(RB) - 1)
+    rgb = RB[idx]
+    sw = 0.06 + lit * 0.62 + sky + wash
+    pool = (sw > 0.42) & (sw < 0.47)
+    rgb[pool] = RB[np.clip(idx[pool] - 1, 0, len(RB) - 1)]
+    rgb = np.where((lit > 0.5)[..., None], rgb * np.array([1.03, 1.0, 0.95]), rgb * np.array([0.97, 0.985, 1.04]))
+    if "ripple" in FM:
+        r = FM["ripple"]
+        on = FM["rippled"] > 0.35
+        trough = on & (r < 0.1)
+        rgb[trough] = RB[np.clip(idx[trough] - 2, 0, len(RB) - 1)]
+        lip = on & (r > 0.58) & (r < 0.72) & (lit > 0.35)
+        rgb[lip] = RB[np.clip(idx[lip] + 1, 0, len(RB) - 1)]
+    fl = (vn(X * 5.1, Y * 5.1) > 0.94) & (vn(X * 31.0, Y * 31.0) > 0.78)
+    rgb[fl] = R["bone"][5]
+    m = dry | damp
+    img[m] = rgb[m]
+    return img
 
 
 def keeper_account(col, m, t, X, Y, Z, n, dith):
@@ -560,21 +628,28 @@ def paint_floor(img, d, v, FM, dith):
         damp = sd & ~wetp & (FM["wet"] + rag > 0.32)
         dry = sd & ~wetp & ~damp
         # the ripples read by their lit windward slopes and shaded lee faces: the real normal pushed a step
-        img[dry] = tone(R["sand_dry"], v[dry] * 1.05 + (soft_[dry] - 0.45) * 0.45, dith[dry], band=0.1)
-        img[damp] = tone(R["sand_dry"], v[damp] * 0.72, dith[damp], band=0.1)
+        img = black_sand(img, dry, damp, d, v, FM, soft_, X, Y)
         img[wetp] = tone(R["sand_wet"], v[wetp] * 1.05, dith[wetp], band=0.1)
         # the wet sand gives back the grey sky in dabs where it slopes from us, never a smooth sheen
         Vv = np.array([0.612, 0.612, 0.5])
         fres = (1 - np.clip((d["normal"] * Vv).sum(2), 0, 1)) ** 2
-        sh = wetp & (vn(X * 2.6 + 5, Y * 7.0) > 0.8 - fres * 0.3) & (vn(X * 9.0, Y * 9.0) > 0.45)
-        img[sh] = tone(R["sand_wet"], v[sh] * 1.5, dith[sh], band=0.1)
+        s_w, t_w = (-(X + Y) / np.sqrt(2), (X - Y) / np.sqrt(2))
+        # the wet sand is a mirror for the grey sky: strongest where it is wettest (nearest the water), laid in long
+        # dry-brush strokes along the shore, broken where the sand is drying (the lake's sheen, on sand)
+        wetness = np.clip(FM["wet"] + rag * 0.5, 0, 1)
+        strokes = vn(t_w * 0.12 + 2, s_w * 2.2)
+        mir = wetp & (strokes * 0.6 + wetness * 0.7 > 0.72)
+        sky_c = np.array([0.36, 0.30, 0.32])
+        img[mir] = img[mir] * 0.4 + sky_c * 0.6 * (0.75 + v[mir][:, None] * 0.6)
+        deep_m = wetp & (strokes * 0.6 + wetness * 0.7 > 0.95)
+        img[deep_m] = sky_c * (0.95 + v[deep_m][:, None] * 0.4)
         if "print" in FM:
             pr = sd & (FM["print"] > 0.5) & (FM["wet"] + rag > 0.32)
             import blood as BL
             img[pr] = BL.C2 * (0.7 + np.clip(v[pr], 0, 0.5)[:, None])     # each print holds a little of the red
         # the dead bleed into the sand round them: a stain that runs out past each body (the library: a pool hidden
         # under a body must run out past it), lobed, dark at its heart
-        dead = (mat == 23) | ((mat == 11) & (FM["sand"] > 0.5))
+        dead = mat == 23                                              # the bodies bleed; loose bones are long dry
         if dead.any():
             import blood as BL
             dd_ = nd.distance_transform_edt(~dead)

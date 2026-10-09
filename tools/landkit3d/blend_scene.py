@@ -145,7 +145,8 @@ def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0):
     np.savez_compressed(os.path.join(out_dir, "passes.npz"), normal=n, pos=pos, ao=P["AO"][..., 0],
                         mat=np.round(P["IndexMA"][..., 0]).astype(np.int16), moon=P["DiffDir"][..., 0],
                         alpha=P["Alpha"][..., 0], shelter=sky["shelter"], skyview=sky["skyview"], lamp=lamp,
-                        floor=np.array(floor), zoom=np.array(zoom), gw=gw, gh=gh)
+                        floor=np.array(floor), zoom=np.array(zoom), time=np.array(float(os.environ.get("GM_T", "0"))),
+                        gw=gw, gh=gh)
 
 
 def lamp_pass(out_dir, outs, lamps):

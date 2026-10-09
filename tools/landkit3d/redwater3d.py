@@ -66,7 +66,8 @@ def breaker():
     rows = []
     for t_ in ts:
         bs = 73.8 + 0.8 * math.sin(t_ / 5.0)
-        k = 0.5 + 0.5 * math.sin(t_ / 3.3 + 1.0) * math.cos(t_ / 7.1)
+        # the curl peels along the shore over the loop: it folds late and falls slowly
+        k = 0.5 + 0.5 * math.sin(t_ / 3.3 + 1.0 - 2 * math.pi * SF.TIME) * math.cos(t_ / 7.1)
         prof = curl_profile(max(0.0, min(1.0, k)))
         row = []
         for ds, dz in prof:
@@ -203,6 +204,84 @@ def corpses():
         corpse(k, s0, t0, yaw, rot, sink, flung)
 
 
+def things():
+    """what the Red gives back and the sea sorts (chapter 10: everything on a beach is sorted by the waves' energy):
+    black basalt cobbles in a band at the old high water and strewn below it, each a tilted stone with its own shape
+    (chapter 04: never domes); the bones of the dead, broken and scattered, a jaw, a long bone, vertebrae; and the
+    pilgrims' things: a lantern on its side, a bowl, a sandal, a coil of rope, beads come off their string"""
+    rnd = random.Random(17)
+    for i in range(140):
+        band = rnd.random() < 0.6
+        s_ = (S.FORE_S - 1.4 + rnd.gauss(0, 0.5)) if band else rnd.uniform(52.5, 64.0)
+        t_ = rnd.uniform(-12.5, 12.5)
+        x, y = S.xy(s_, t_)
+        r = rnd.uniform(0.05, 0.16) * (1.3 if band else 0.8)
+        o = P.sphere("cobble%d" % i, (x, y, _gz(x, y) + r * 0.25), r, "basalt",
+                     scale=(1.0, rnd.uniform(0.6, 0.9), rnd.uniform(0.35, 0.55)))
+        o.rotation_euler = (rnd.uniform(-0.25, 0.25), rnd.uniform(-0.25, 0.25), rnd.uniform(0, 3.14))
+    for i in range(26):
+        s_, t_ = rnd.uniform(50.0, 64.5), rnd.uniform(-12.5, 12.5)
+        x, y = S.xy(s_, t_)
+        z = _gz(x, y)
+        a = rnd.uniform(0, math.pi)
+        kind = rnd.random()
+        if kind < 0.45:                                             # a long bone, its knuckled ends
+            ln = rnd.uniform(0.25, 0.45)
+            p0 = (x - math.cos(a) * ln / 2, y - math.sin(a) * ln / 2, z + 0.02)
+            p1 = (x + math.cos(a) * ln / 2, y + math.sin(a) * ln / 2, z + 0.02)
+            P.tube("lbone%d" % i, [p0, p1], [0.022, 0.02], "bone", 6)
+            P.sphere("lknob%d_a" % i, p0, 0.035, "bone", scale=(1, 1, 0.7))
+            P.sphere("lknob%d_b" % i, p1, 0.03, "bone", scale=(1, 1, 0.7))
+        elif kind < 0.75:                                           # vertebrae, a few in a broken run
+            for k in range(rnd.randint(2, 5)):
+                P.sphere("vert%d_%d" % (i, k), (x + math.cos(a) * k * 0.07, y + math.sin(a) * k * 0.07, z + 0.02), 0.03, "bone",
+                         scale=(0.8, 1.3, 0.7))
+        else:                                                       # a jaw, half sunk
+            P.tube("jaw%d" % i, [(x - 0.08, y, z + 0.01), (x, y + 0.07, z + 0.03), (x + 0.08, y, z + 0.01)], [0.018, 0.022, 0.018], "bone", 5)
+    # the pilgrims' things
+    lx, ly = S.xy(55.5, -1.6)
+    o = P.cylinder("lantern", (lx, ly, _gz(lx, ly) + 0.08), 0.08, 0.22, "iron", sides=8)
+    o.rotation_euler = (1.45, 0.0, 0.6)
+    bx, by = S.xy(57.4, 3.6)
+    P.sphere("bowl", (bx, by, _gz(bx, by) + 0.02), 0.1, "wood", scale=(1.0, 1.0, 0.45))
+    sx_, sy_ = S.xy(53.2, 7.1)
+    P.sphere("sandal", (sx_, sy_, _gz(sx_, sy_) + 0.01), 0.13, "cloth", scale=(1.0, 0.42, 0.12))
+    cx, cy = S.xy(51.8, -3.0)
+    pts = [(cx + 0.18 * math.cos(u) * (1 - u / 20), cy + 0.18 * math.sin(u) * (1 - u / 20), _gz(cx, cy) + 0.02 + u * 0.002) for u in np.linspace(0, 14, 40)]
+    P.tube("rope", pts, [0.016] * len(pts), "straw", 5)
+    for k in range(9):
+        a = k * 0.7
+        px, py = S.xy(56.2 + math.cos(a) * 0.3 + k * 0.05, -0.4 + math.sin(a) * 0.25)
+        P.sphere("bead%d" % k, (px, py, _gz(px, py) + 0.015), 0.018, "gold")
+
+
+def floating():
+    """the dead the Red has not yet given back: one face down in the shallows, rising and falling, and a cloak
+    spread on the water beside it; rafts of dark foam drifting"""
+    for k, (s0, t0, yaw) in enumerate(((68.2, -5.0, 0.9), (70.1, 6.3, -0.4))):
+        def at(u, w, z):
+            x, y = _body_xy(s0, t0, yaw, u, w)
+            return (x, y, float(SF.water(np.array([s0 + u * math.cos(yaw)]), np.array([t0 + u * math.sin(yaw)]))[0][0]) + z)
+        d0, d1 = S.xy(s0 + math.cos(yaw), t0 + math.sin(yaw)), S.xy(s0, t0)
+        ang = math.atan2(d0[1] - d1[1], d0[0] - d1[0])
+        o = P.sphere("float%d_torso" % k, at(0, 0, 0.04), 1.0, "corpse", scale=(0.42, 0.28, 0.12))
+        o.rotation_euler = (0, 0, ang)
+        P.sphere("float%d_head" % k, at(0.62, 0.0, 0.0), 0.12, "corpse", scale=(1.1, 0.9, 0.6))
+        for side in (-1, 1):
+            P.tube("float%d_arm%d" % (k, side), [at(0.3, side * 0.26, 0.02), at(0.55, side * 0.5, -0.01), at(0.7, side * 0.62, -0.03)],
+                   [0.06, 0.055, 0.045], "corpse", 6)
+            P.tube("float%d_leg%d" % (k, side), [at(-0.5, side * 0.12, 0.0), at(-1.0, side * 0.2, -0.03), at(-1.35, side * 0.24, -0.05)],
+                   [0.075, 0.06, 0.05], "corpse", 6)
+        verts = []
+        for j in range(5):
+            for i in range(7):
+                u, w = -0.6 + i * 0.22, -0.55 + j * 0.27
+                x, y = _body_xy(s0, t0, yaw, u, w)
+                verts.append((x, y, at(u, w, 0.0)[2] + 0.015 + 0.08 * max(0.0, 1 - (u / 0.6) ** 2 - (w / 0.35) ** 2)))
+        faces = [(j * 7 + i, j * 7 + i + 1, (j + 1) * 7 + i + 1, (j + 1) * 7 + i) for j in range(4) for i in range(6) if (i + j + k) % 4]
+        P.poly("float%d_cloak" % k, verts, faces, "cloth")
+
+
 def build(root, material):
     P.init(root, material)
     ground()
@@ -210,3 +289,5 @@ def build(root, material):
     breaker()
     wrack()
     corpses()
+    things()
+    floating()

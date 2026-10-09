@@ -129,3 +129,34 @@ Checked against pass 1:
 - the far sea needs its own darker distance under cloud shadow (the area page: "near black ... under cloud shadow");
 - the corpses read as bodies only up close;
 - the breaker doesn't move yet (that comes in the game).
+
+## Pass 4 (Derek: "It all looks very plain. There's no details. The sand doesn't even look as good as your desert sand, the water looks very plain"; "Those curvy lines look ridiculous"; "the artifact has an animated image too")
+
+**Rebuilt on the best work we have:**
+- **The black sand** on the dune's method (`painted_dune.py`): bold ripples, each lit from its own profile (the
+  overcast alone is too soft to carve them); dry-brush strokes along the crests; washes; tooth; grit pooled in the
+  troughs and a lit lip on each crest; a hue-shifted eight-tone ramp, warm in the light and violet in the shade.
+- **The sea** on the painted lake's method (`shaders/lake.gdshader`, kind 1): dragged strokes, a paper grain, the
+  sheen in dabs toward the sky side, and clots drifting.
+- **The wet sand mirrors the grey sky,** strongest where it is wettest, in strokes along the shore. This is the
+  beach's own read, and it gives the scene its value bands: dark sea, pale glossy strand, dry sand.
+- **Details:**
+  - 140 black cobbles, in a band and strewn;
+  - scattered bones (long bones, vertebrae, jaws);
+  - the pilgrims' things: a lantern, a bowl, a sandal, a coil of rope, beads;
+  - two dead floating face down in the shallows, with a cloak spread on the water.
+- **The waterline** is irregular and runs up and back, with a thin broken lace of foam at its edge.
+
+**Removed** (Derek: "ridiculous"): every sine-drawn line, meaning the rills, the repeated swash ridges, the ripples'
+forced forks that bent them into chevrons, and the sea's wrinkle curls. Loose bones no longer leave blood stains.
+
+**The loop:** an eight-frame animation (`GM_T`, the scene's time 0 to 1). The swells roll in one wavelength a loop,
+the breaker's curl peels along the shore, the swash runs up and draws back, and the foam drifts. It is on the page
+beside the still.
+
+**Grade: C+, better but not there.** **Still short:**
+- the mirror is too even;
+- the frame has nothing standing in it to give structure: no cliff, stack or drift log;
+- the far sea is still noisy.
+
+**Next, by Derek's word:** the beach runs long side to side, closed at both ends by large black cliffs.

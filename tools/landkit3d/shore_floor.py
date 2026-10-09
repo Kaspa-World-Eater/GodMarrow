@@ -68,11 +68,10 @@ def maps(x, y):
     h = profile(s)
     # the sand's own shapes: beach cusps in the swash, a cobble berm at the old high water, rills down the foreshore
     swash = _smooth(FORE_S, FORE_S + 3.0, s) * (1 - _smooth(SEA_S - 2.0, SEA_S + 0.5, s))
-    h = h + swash * 0.14 * np.sin(t / 2.0) * np.sin(t / 3.1 + 1.0)
+    h = h + swash * 0.06 * (F3.fbm(t * 0.12, s * 0.05, 44.0) - 0.5)        # cusps only as a faint unevenness
     berm = np.exp(-((s - (FORE_S - 1.0)) / 0.9) ** 2) * (0.4 + 0.3 * F3.vnoise(t * 0.3, 3.0))
     h = h + berm
-    rill = swash * (np.abs(np.sin(t * 2.1 + np.sin(s * 0.8))) < 0.08) * 0.03
-    h = h - rill
+    # (no drawn rills: real wet sand is smooth; Derek: "those curvy lines look ridiculous")
     # inland: the old growth's floor, gentled on the kept ground of the village
     vs, vt, vr = VILLAGE
     dv = np.hypot(s - vs, t - vt)

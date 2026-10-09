@@ -15,11 +15,14 @@ import floor3d as F3
 TRAIL = [(65.5, 3.5), (61.0, 2.4), (57.0, 1.0), (53.5, -0.6), (50.5, -2.4)]
 STEP = 0.72                                        # a stride
 WATERLINE = 66.0                                   # where the sand meets the red at this tide
+import os
+TIME = float(os.environ.get("GM_T", "0"))           # the loop's time 0..1 (the animation frames)
+SWASH_RUN = 1.2 * math.sin(2 * math.pi * TIME)       # the swash runs up and draws back once a loop
 
 
 def swash_limit(t):
     """how far up the beach the swash runs, in lobes set by the cusps"""
-    return 62.6 + 0.9 * np.cos(2 * math.pi * t / 9.0) + 0.3 * np.sin(t / 2.3)
+    return 62.6 + (F3.fbm(t * 0.21 + 3.0, 1.0 + TIME * 0.0, 45.0) - 0.5) * 2.6 - SWASH_RUN
 
 
 def _prints(s, t):
@@ -47,15 +50,34 @@ def _prints(s, t):
     return dep, mask
 
 
+LAM = 0.62                                         # a ripple's spacing on the dry black sand, in yards
+_dr = np.random.default_rng(12)
+DISLOC = [(_dr.uniform(44, 60), _dr.uniform(-12, 12), 1 if k % 2 else -1) for k in range(14)]
+
+
+def ripple_phase(s, t):
+    """as the dune's (painted_dune.ripple_phase): the one wind goes out to sea, so the crests run along the shore; they
+    wander on a slow warp and fork where the phase tears round a dislocation, two crests running into one"""
+    # (no forced forks: their pinwheels bent the crests into chevrons; the slow warp alone makes them wander)
+    return s / LAM + (F3.fbm(s * 0.16, t * 0.12, 41.0) - 0.5) * 2.2 + (F3.vnoise(t * 0.5 + 4, s * 0.2, 42.0) - 0.5) * 0.8
+
+
+def ripple_profile(r):
+    """the stoss rises gently over 72% of a wavelength (from the land, where the wind comes from), the lee drops"""
+    return np.where(r < 0.72, r / 0.72, (1 - r) / 0.28)
+
+
+def rippled(s, t):
+    """the ripples fade on the smooth brows and where the sand is damp (patches, not everywhere)"""
+    dry = 1.0 - F3.smooth(S.FORE_S - 3.0, S.FORE_S - 0.5, s)
+    return dry * (s > S.BACK_S) * F3.smooth(0.38, 0.55, F3.fbm(s * 0.3 + 7, t * 0.3, 43.0))
+
+
 def detail(s, t):
-    dry = 1.0 - F3.smooth(S.FORE_S - 1.5, S.FORE_S + 1.0, s)
-    dry = dry * (s > S.BACK_S)
-    ph = s / 0.34 + 0.7 * np.sin(t * 0.7) + 2.0 * F3.vnoise(t * 0.25, s * 0.25)
-    f = ph - np.floor(ph)
-    saw = np.where(f < 0.7, f / 0.7, (1 - f) / 0.3)                 # gentle windward slope, steep lee face seaward
-    rip = (saw - 0.5) * 0.065 * dry * (0.5 + 0.5 * F3.vnoise(s * 0.6, t * 0.6))
+    r = ripple_phase(s, t) % 1.0
+    rip = (ripple_profile(r) - 0.5) * 0.085 * rippled(s, t)
     lim = swash_limit(t)
-    ridge = 0.012 * np.exp(-((s - lim) / 0.05) ** 2) * (s > S.FORE_S)
+    ridge = 0.0 * lim                                             # no drawn swash lines
     dep, mask = _prints(s, t)
     return rip + ridge - dep, mask
 
@@ -67,6 +89,8 @@ def maps(x, y):
     M["h"] = M["h"] + dh
     M["print"] = prints.astype(float)
     M["swash"] = ((s > swash_limit(t)) & (s < WATERLINE + 2.0)).astype(float)
+    M["ripple"] = ripple_phase(s, t) % 1.0
+    M["rippled"] = rippled(s, t)
     return M
 
 
@@ -80,10 +104,10 @@ def water(s, t):
     x, y = S.xy(s, t)
     g = height(x, y)
     a = 0.5 * F3.smooth(WATERLINE + 2.5, WATERLINE + 9.0, s)        # the shallows lie slack: a clean waterline
-    ph = 2 * math.pi * (s + 0.4 * np.sin(t / 7.0) + 0.6 * F3.vnoise(t * 0.08, 2.0)) / 9.0
+    ph = 2 * math.pi * ((s + 0.4 * np.sin(t / 7.0) + 0.6 * F3.vnoise(t * 0.08, 2.0)) / 9.0 + TIME)   # one swell a loop
     swell = a * ((0.5 + 0.5 * np.sin(ph)) ** 2.2 - 0.3)
     # a second set crossing at an angle, shorter: the sea heavy and irregular, never even bands
-    ph2 = 2 * math.pi * (s * math.cos(0.45) + t * math.sin(0.45)) / 5.5
+    ph2 = 2 * math.pi * ((s * math.cos(0.45) + t * math.sin(0.45)) / 5.5 + TIME * 2)
     swell = swell + a * 0.35 * ((0.5 + 0.5 * np.sin(ph2 + 1.3)) ** 2 - 0.3)
     bs = 73.8 + 0.8 * np.sin(t / 5.0)                              # the breaker line, out past the swash
     d = s - bs
