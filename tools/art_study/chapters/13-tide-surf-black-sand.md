@@ -112,6 +112,24 @@ the camera 30 degrees down.
   longer-lived: heavy pink lace, crusted swash lines, spume caught on the logs.
 - **The stain tells the tide:** maroon film drying to brown-black crust below the high-tide line, clean charcoal above.
 
+## 6b. Derek's ruling: a dying heartbeat, and blood's viscosity (2026-10-09)
+
+"Make sure the tide moves rather slow as it's based on dying heart beats not normal speeds and blood is think and
+viscous." This overrules the ocean's speeds above wherever they conflict.
+
+- **The timing is a failing pulse,** never an ocean's period: a surge (the beat), a weaker second surge close behind,
+  then a long stillness while everything drains. The beats are slow and uneven. Everything moves on them: the swell
+  heaves, the roll folds, the swash runs up, all in the surges, crawling between.
+- **Viscosity damps the short waves first.** A thick liquid has no chop and no spray: the surface is smooth, heavy and
+  lacquered, the long heave alone carrying the form, with a skin that wrinkles and folds slowly where it is pushed.
+- **The breaker sags rather than plunges.** The front steepens, bulges and rolls over on itself like a heavy fold of
+  syrup or paint, its nose rounded and thick, closing on a small dark crease; it collapses into a heaving ridge, not a
+  burst of white.
+- **The swash is a gravity current of a thick liquid:** a slow tongue with a blunt, raised, rounded front (a real step,
+  taller than water's), running up less far, slowing early; the backwash slower still. It leaves a thick glossy coat on
+  the sand that drains back in slow sheets, a red lacquer mirroring the grey sky.
+- **The foam is froth that holds:** slow, thick, clinging, tearing only slowly into lace.
+
 ## 7. How the masters did it
 
 - **Homer:** foam by removal and touches (scraped, sanded, "staccato marks"), opaque white only where thickest. Broken

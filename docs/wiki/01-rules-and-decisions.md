@@ -154,6 +154,12 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09, the Red Water moves on a dying heartbeat (Derek):** "Make sure the tide moves rather slow as it's based
+  on dying heart beats not normal speeds and blood is thick and viscous." The sea's motion is timed to a slow, failing
+  pulse (a surge, a weaker second surge, a long stillness), never an ocean's speed. Blood's viscosity governs its form:
+  the short chop is damped away (a smooth, heavy, lacquered surface with a skin), the breaker sags and rolls over
+  rather than throwing a lip, the swash is a slow tongue with a blunt raised front, and what it leaves is a thick
+  coat that drains slowly. Study chapter 13's ocean physics hold only where viscosity does not overrule them.
 - **2026-10-09, the opening cave's fires (Derek):** "Change the wisp fire into normal orange fires." Also: "All that
   debris on the throne stairs needs to move and the faces are still to hard to see"; and for the pool: "I liked the blood
   pool better without the wall in it, have define plain faces on the chamber walls, with mouths opens while blood oozes

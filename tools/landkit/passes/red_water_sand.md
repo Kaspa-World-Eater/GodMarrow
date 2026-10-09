@@ -164,3 +164,97 @@ beside the still.
 **Derek's grade, D:** "Doesn't look real enough, need a study in the tide, oceans, water, black sand, the details are
 lacking. It's very plain." **Next for this piece, when the ocean resumes:** a study chapter on real oceans, surf, tides
 and black sand beaches, then the piece rebuilt from it.
+
+## Rules check, before the rebuild (2026-10-09)
+
+Derek graded pass 4 D: "Doesn't look real enough, need a study in the tide, oceans, water, black sand, the details are
+lacking. It's very plain." He paused the ocean for the cave, then after it: "Looks good go on."
+
+**Read:**
+- `MASTER_RULES` (form law; 0c cinematography; no fog; no red light, so the blood is red by colour).
+- `CINEMATOGRAPHY.md`.
+- **Study chapter 13** (tide, surf, foam, black sand) and its research.
+- Report 07 (the cave's stone and painter).
+- The area page: "a sea of blood ... black sands"; the pilgrim comes out of the black cliffs onto "the beach of the
+  dead"; the footprints coming up out of the water.
+
+**The one true detail:** the footprints coming up out of the Red, ahead of the pilgrim's own.
+
+**Confirmed:**
+- Everything with height is real form: the profile, cusps, pebbles, the swell, the breaker and its lip, the bore, the
+  swash front, kelp, logs, the dead, the cliffs.
+- Only the sub-pixel is painted: the swash sheet, lace, grain, swash marks.
+
+## The brief (pass 5, the rebuild)
+
+1. **The profile:**
+   - a submerged step;
+   - a steep 1:8 face;
+   - a berm crest casting shadow;
+   - the backshore;
+   - the log jam;
+   - the cliff foot.
+2. **Beach cusps** about 15 yd apart: horns of pebbles, drier and lighter; bays wetter and glossy, holding foam.
+3. **One heavy shore-break, peeling along its crest,** part unbroken, part curling (a real lip with its shadow), part
+   white (the bore as lumpy geometry). Behind it, only one or two long swells.
+4. **The swash:** a lobed front (a real step), the sheet painted, backwash rills.
+5. **The sand by its state:**
+   - the glossy film band, mirroring the cliffs, the dead and the pilgrim through the reflection pass, with the grey
+     sky where nothing is hit;
+   - the wet matte band, the darkest value;
+   - the drying band, mottled;
+   - the dry charcoal, grain-lit.
+6. **The blood:**
+   - an oxblood body;
+   - a Fresnel sheen on the slopes facing away;
+   - pink stage-A foam, and lace as holes;
+   - a maroon stain drying to brown crust below the high-tide line;
+   - spume caught on the logs.
+7. **The shore's painter** in the cave painter's manner: overcast light, quiet darks, `cine_check`.
+8. **The black cliffs** (`cliffs_v2`) closing the frame.
+
+## Pass 5 (2026-10-09): rebuilt from chapter 13, then on Derek's heartbeat ruling
+
+**Built** (`tools/landkit3d/beach_floor.py`, `beach3d.py`, `paint_shore.py`), every height real form:
+- **The profile by cause:** a submerged step with a yard's drop and a steep shelf beyond, the 1:8 face, a berm 0.48 yd
+  tall at the high water, a backshore rising gently with wind ripples in patches; cusps about 15 yd apart (horns pushed
+  seaward and higher, bays drawn in with a worn runnel); the footprints coming up out of the Red.
+- **What the waves sorted:** about 4,000 pebbles (one mesh) and cobbles on the horns, along the berm and at the cliff
+  foot, fewer under the seepage film.
+- **One wave's life at every place along the shore,** peeling from the headland: the swell shoaling, the roll, the bore
+  of foam lumps, the swash with a real raised front, the backwash drawn down past the still line. The film the
+  backwash leaves is a mirror mesh, so the reflection pass finds the cliffs and the dead in it.
+- **The wrack:** a broken high-tide line of kelp, splinters and bones, an older storm line dried grey; a drift-log jam
+  at the back of the beach, some with root wads; five of the dead; the pilgrim's lost staff and lantern.
+- **The black cliffs** (`cliffs_v2`) stand on the new beach, closing the right of the frame.
+- **The shore's painter:** overcast light (the sky pass by facing, a soft blurred key, the contacts darkest); the sea
+  by Fresnel on an oxblood body, the reflection pass darkening the glaze where it sees the cliffs; foam stage A lit as
+  form, stage B as lace by holes from a cellular noise, aging; the sand by its state band (glossy coat, wet matte,
+  drying mottle, dry charcoal with grain), the stain below the high-tide line, swash residue in broken specks, the
+  prints holding the red; the pilgrim's reflection in the film when he stands on it.
+
+**Derek, mid-pass:** "Make sure the tide moves rather slow as it's based on dying heart beats not normal speeds and
+blood is think and viscous." Recorded in the decision log, the area page, chapter 13 (new section 6b) and memory. I had
+built a water ocean's physics (a fast plunging lip, chop), against the area page's own "thick and slow".
+- **The heartbeat clock** (`beach_floor.heart`): one loop is one beat. The sea's time runs in a surge, a weaker second
+  surge close behind, then crawls through a long stillness. Everything (the swell, the roll, the bore, the swash) moves
+  on that clock.
+- **Viscosity:** the short chop is gone (only long, low, slow undulations remain); the front never sharpens to an
+  edge; the lip is a heavy rounded roll sagging over onto a dark crease, not a thrown curl; the foam is heaped flat
+  froth, no spray; the swash is a slow tongue with a blunt nose a hand high, reaching 3 to 4 yd, its backwash slower;
+  the coat it leaves lingers and is red lacquer, not clear water; the painted surface carries a skin creased where the
+  beat pushes it, and clots.
+- **Fixed in the painting rounds:** the sea flat maroon (now Fresnel on near-black, the troughs desaturated as the area
+  page asks); the wet band a "river of blood" (the stain cut to a trace); the swash marks drawn as parallel lines (the
+  "curvy lines" Derek rejected: now broken specks); the lace too white (capped); the basalt's camouflage lichen; the
+  logs as pale pipes (each log's own grain from its pixels' long axis, and darkened as the near plane).
+
+**cine_check (exterior):** 4 of 7. Rules 4, 5, 6, 7 pass. Rule 1 fails on the scattered foam; rule 22 fails because the
+dry backshore at the bottom is lighter than the sea at the top; rule 27 fails because the sea is red by its own colour.
+
+**Grade: C.** The form is right by cause and the motion now has the heartbeat. **Still short:**
+- the swell's front face is one big smooth dark mass across the upper left;
+- the roll is hard to read at this angle;
+- the froth reads blotchy;
+- the cliffs' tall foreground column is plain;
+- the corpses are hard to read.

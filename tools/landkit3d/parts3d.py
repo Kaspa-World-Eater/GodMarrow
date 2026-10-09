@@ -14,7 +14,7 @@ MATS = {"ground": 1, "stucco": 2, "brick": 3, "stone": 4, "lacquer": 5, "gold": 
         "iron": 10, "bone": 11, "moss": 12, "cloth": 13, "straw": 14, "water": 15,
         "boxpaint": 16, "blood": 17, "hide": 18, "cedar": 19, "basalt": 20, "ash": 21, "kelp": 22,
         "corpse": 23, "pool": 24, "rust": 25, "cutrock": 26,
-        "dressed": 27, "mirror": 28, "flame": 29, "carved": 30, "voidmirror": 31}
+        "dressed": 27, "mirror": 28, "flame": 29, "carved": 30, "voidmirror": 31, "foam": 32}
 
 
 def init(root, material):

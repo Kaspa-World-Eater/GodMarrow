@@ -249,6 +249,9 @@ of the real world.
      wet crimson where the light lies on a swell. Nothing glows; the no-red-light law holds (the red is the water's
      own colour, and nothing lights it).
    - **Movement:** thick and slow. Long swells, heavy breakers that fold late and fall slowly, dark foam that clings.
+     It moves on a dying heartbeat (Derek, 2026-10-09): a surge, a weaker second surge, then a long stillness, slower
+     than any sea. The blood is thick and viscous: no chop, no spray, a skin on the surface, a sagging roll instead of
+     a curl, the swash a slow blunt tongue that leaves a coat draining back.
    - **The tide,** its pulse, twice a day. At low water it bares rock benches with pools of clotted red and
      red-brown kelp lying in wracks.
    - **Where streams cross the sand,** clear water fans into the red in streaks.
