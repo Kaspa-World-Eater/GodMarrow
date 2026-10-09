@@ -219,6 +219,22 @@ def paint(d, t=0.0):
         hot = np.clip((light[m] - 1.6) * 0.25, 0, 0.45)[:, None]
         col = col * (1 - hot) + (WISP_C * 0.75 * hm + 0.05) * hot
         img[m] = col
+    # the weeping (rule 37, ancient): water has seeped from every socket and crevice of the carved and the raw rock for
+    # longer than anyone remembers, and run down the face below it, leaving long dark mineral tears, a pale crust at
+    # their lips where a fire finds them
+    stone = ((mat == 20) | (mat == 27)) & wall
+    crev = stone & (ao < 0.42)
+    run = np.zeros((gh, gw))
+    acc = crev.astype(float)
+    colv = vn(np.arange(gw)[None, :] * 0.35 + 0.0 * np.arange(gh)[:, None], np.zeros((gh, gw)) + 3.0)
+    for k in range(1, 22):
+        acc = np.roll(acc, 1, axis=0) * (0.9 + 0.08 * colv)
+        acc[0, :] = 0
+        run = np.maximum(run, acc)
+    weep = stone & ~crev & (run > 0.45) & (vn(X * 3.0 + Y * 3.0, Z * 0.15) > 0.35)
+    img = np.where(weep[..., None], img * 0.62, img)
+    lipm = weep & ~np.roll(weep, 1, axis=1) & (T > 0.2)
+    img = np.where(lipm[..., None], np.clip(img * 1.0 + np.array([0.05, 0.06, 0.06]) * T[..., None], 0, 1), img)
     # the form's edges where a fire grazes them: the lip toward the light a step up (texture only where light grazes)
     ndf = np.zeros((gh, gw))
     ndf[:-1, :] += np.linalg.norm(n[1:, :] - n[:-1, :], axis=2)

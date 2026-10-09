@@ -373,3 +373,61 @@ surface.
 **`cine_check`:**
 - The stairs pass 9 of 9, the pool 9 of 9, the hall 8 of 9 (rule 22: the face's crown is dark on purpose).
 - Rule 1 now ignores specks under 3 px, since an ember is fire too.
+
+## Rules check (1st since Derek's B)
+
+**Read:**
+- `MASTER_RULES` and `CINEMATOGRAPHY.md`.
+- The area page: the faces are "blunt, distinct, worn; some without eyes, some without mouths, some only half cut", and
+  the Stranger says "Everyone sees faces but there's no faces here".
+
+**The checklist:**
+- Lines 1 to 8, 10, 11 and 13 pass, as at pass 6.
+- **Line 9 (detail where it counts) fails worst,** in Derek's words: "The faces needs work".
+  - Every face is the same template at different scales: one egg, one set of features. Not distinct.
+  - They are too clean for their age: no cracks, no broken pieces, no weeping from the sockets.
+  - Nothing about them is wrong in the way the brief asks ("they look weird").
+  - The stair faces are small at the game's zoom.
+
+**Pass 7, the faces:**
+- Each face its own design from its seed: the head's width and length, how high the brow sits, how far apart the eyes
+  are, the length of the nose, the width of the mouth.
+- Some are wrong:
+  - a third socket in the brow;
+  - one eye too low;
+  - sockets of different sizes;
+  - a mouth stitched shut in vertical cuts;
+  - a second, smaller face carved inside the mouth.
+- Age:
+  - cracks running across, as real grooves;
+  - a piece of jaw or brow broken away to the rough;
+  - the mineral weeping dark from every socket and crevice down the wall (the painter: tears of mineral, ancient and
+    forlorn).
+- The stair faces taller: 3.2 to 3.6 yd against the pilgrim's 2.
+
+**Pass 7, the faces** (`cave3d.face_params`, `face_depth`; `paint_cave` weeping):
+- **Each face its own design from its seed:** the head's width and length, how high the brow sits, how far apart the
+  eyes are, the length of the nose, the width and height of the mouth, one brow lifted.
+- **About half are wrong, one wrong thing each:**
+  - a third socket in the brow;
+  - one eye fallen lower;
+  - one socket far larger;
+  - the mouth stitched shut in cuts;
+  - a small face looking out of the mouth.
+- **Age:**
+  - one to three cracks right across each, cut as ragged grooves;
+  - more than half have a piece of jaw or brow broken away to the rough;
+  - the colossal face is cracked from crown to cheek.
+- **The weeping:** water has seeped from every socket and crevice for longer than anyone remembers, and the painter
+  runs dark mineral tears down the wall below each (a pale crust at the lip where a fire finds them). It shows most on
+  the colossal face, which weeps from its sockets.
+- **The stair faces are taller,** 3.2 to 3.6 yd against the pilgrim's 2. Each torch moved to its face's middle height
+  and burns brighter (125 W), so its light rakes the whole face, not just the brow.
+
+**`cine_check`:** the stairs 9 of 9; the hall 8 of 9 (rule 22, the crown dark on purpose).
+
+**Grade:**
+- The faces C+ to B-. The great eyeless face on the stairs reads from across the frame, brow, sockets, nose and broken
+  jaw; the colossal face weeps.
+- **Still short:** the half-cut face sits low and dark at the stairs' foot. The faces' cut stone is lit evenly within
+  each band and wants more chisel in the light.

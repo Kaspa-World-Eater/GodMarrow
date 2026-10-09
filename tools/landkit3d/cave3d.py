@@ -102,88 +102,146 @@ def _g(dx, dy, sx, sy):
     return math.exp(-((dx / sx) ** 2 + (dy / sy) ** 2))
 
 
-def face_depth(X, Y, kind, wear, seed, pits):
+def face_params(kind, seed):
+    """each face its own design (Derek: "The faces needs work"; the brief: "blunt, distinct, worn"): the head's width
+    and length, the brow's height, the eyes' spacing, the nose's length, the mouth's width; and for some, what is
+    wrong with it (Derek: "they look weird")"""
+    r = random.Random(seed * 7919 + 17)
+    p = dict(hw=r.uniform(0.56, 0.74), hl=r.uniform(0.92, 1.04), brow=r.uniform(0.2, 0.3), eye=r.uniform(0.23, 0.33),
+             eyey=r.uniform(0.04, 0.12), nose=r.uniform(0.75, 1.15), mouthw=r.uniform(0.2, 0.32), mouthy=r.uniform(-0.48, -0.38),
+             chin=r.uniform(0.04, 0.09), lift=r.uniform(-0.15, 0.25), third=False, low=0.0, sock2=1.0, stitched=False,
+             inner=False, crack=[], broken=None)
+    if kind == "orcus":
+        p.update(hw=0.64, hl=1.0, brow=0.25, eye=0.28, eyey=0.08, nose=1.0, mouthw=0.27, mouthy=-0.43, chin=0.07, lift=0.0)
+        p["crack"] = [(-0.3, 0.95, 0.1, -0.2), (0.45, 0.6, 0.62, -0.1)]
+        return p
+    wrong = r.random()
+    if wrong < 0.2:
+        p["third"] = True                                       # a third socket in the brow
+    elif wrong < 0.35:
+        p["low"] = r.uniform(0.08, 0.14)                        # one eye fallen lower than the other
+    elif wrong < 0.5:
+        p["sock2"] = r.uniform(1.5, 1.9)                        # one socket far larger
+    elif wrong < 0.62 and kind not in ("mouthless",):
+        p["stitched"] = True                                    # the mouth sewn shut in cuts
+    elif wrong < 0.72:
+        p["inner"] = True                                       # a second small face in the mouth
+    for _ in range(r.randint(1, 3)):                            # cracks right across, as the rock split
+        x0, y0 = r.uniform(-0.7, 0.7), r.uniform(0.6, 1.1)
+        p["crack"].append((x0, y0, x0 + r.uniform(-0.5, 0.5), r.uniform(-1.0, 0.0)))
+    if r.random() < 0.55:                                       # a piece broken away to the rough
+        p["broken"] = (r.choice((-1, 1)) * r.uniform(0.25, 0.55), r.choice((r.uniform(-0.85, -0.55), r.uniform(0.55, 0.9))),
+                       r.uniform(0.22, 0.38))
+    return p
+
+
+def _seg_dist(X, Y, x0, y0, x1, y1):
+    dx, dy = x1 - x0, y1 - y0
+    t = max(0.0, min(1.0, ((X - x0) * dx + (Y - y0) * dy) / (dx * dx + dy * dy + 1e-9)))
+    return math.hypot(X - x0 - dx * t, Y - y0 - dy * t)
+
+
+def face_depth(X, Y, kind, wear, seed, pits, p=None):
     """the relief's height (in the face's own height H) at X across (-1..1) and Y up (-1.15..1.15). Carved to be read
-    from far off in the dark, as the Bayon's faces at Angkor and the moai are: big simple planes, a brow that is a
-    shelf, sockets cut deep under it to hold black, a long nose, the cheek falling away under the bone, a mouth or
-    none (Derek: "Maybe they don't have a mouth or eyes or they look weird"); worn by the years only on the surface,
-    never in the planes; "half" left unfinished where the builders stopped; "effaced" chiselled off by someone;
-    "orcus" the colossal face whose mouth is a room (Bomarzo)"""
+    from far off in the dark, as the Bayon's faces at Angkor and the moai are: big simple planes, brows arched over each
+    eye with the ridge between rising into the nose, sockets cut deep enough to hold black, the cheek falling away under
+    the bone, a mouth or none; each face its own (face_params); worn, cracked and broken by the years; "half" left
+    unfinished where the builders stopped; "effaced" chiselled off by someone; "orcus" the colossal face whose mouth is
+    a room (Bomarzo)"""
+    if p is None:
+        p = face_params(kind, seed)
     ax = abs(X)
-    e = (X / 0.64) ** 2 + (Y / 1.0) ** 2
-    # the head: a flat front falling steeply at its sides (a plateau, so the features sit on a plane)
+    e = (X / p["hw"]) ** 2 + (Y / p["hl"]) ** 2
     head = 0.17 * max(0.0, 1.0 - e) ** 0.3
     f = 0.0
-    # the brow: two arches, one over each eye, projecting, their undersides cut back; the ridge between the eyes rising
-    # to meet the nose, so each socket holds its own shape of black (one straight shelf read as a band)
+    ex, ey = p["eye"], p["eyey"]
     for sx in (-1, 1):
-        u = (X - sx * 0.28) / 0.24
+        u = (X - sx * ex) / (0.24 * ex / 0.28)
         if abs(u) < 1.0:
-            yb = 0.24 + 0.07 * (1 - u * u)
+            yb = p["brow"] + 0.07 * (1 - u * u) + (p["lift"] * 0.08 * sx * u if kind != "orcus" else 0.0)
             f += 0.1 * (1 - u ** 6) * math.exp(-((Y - yb - 0.03) / 0.06) ** 2) * (1.0 if Y > yb - 0.04 else 0.4)
-    f += 0.09 * math.exp(-((X / 0.07) ** 2 + ((Y - 0.2) / 0.11) ** 2))              # the ridge between the eyes
-    f += 0.03 * math.exp(-((X / 0.3) ** 2 + ((Y - 0.55) / 0.2) ** 2))               # the forehead's swell
-    # the sockets: deep hollows under the shelf
+    f += 0.09 * math.exp(-((X / 0.07) ** 2 + ((Y - p["brow"] + 0.05) / 0.11) ** 2))
+    f += 0.03 * math.exp(-((X / 0.3) ** 2 + ((Y - 0.55) / 0.2) ** 2))
     sock = {"eyeless": -0.2, "orcus": -0.26, "full": -0.13, "half": -0.13, "blind": -0.07, "closed": -0.09,
             "mouthless": -0.15, "effaced": -0.06}[kind]
     for sx in (-1, 1):
-        dx, dy = X - sx * 0.27, Y - 0.08
-        f += sock * math.exp(-((dx / 0.15) ** 4 + (dy / 0.1) ** 4))
+        k2 = p["sock2"] if sx > 0 else 1.0
+        eyy = ey - (p["low"] if sx < 0 else 0.0)
+        dx, dy = X - sx * ex, Y - eyy
+        f += sock * math.exp(-((dx / (0.15 * k2)) ** 4 + (dy / (0.1 * k2)) ** 4))
         if kind in ("full", "half", "mouthless"):
-            f += 0.1 * math.exp(-((dx / 0.075) ** 2 + (dy / 0.055) ** 2))              # the orb, no pupil
+            f += 0.1 * math.exp(-((dx / 0.075) ** 2 + (dy / 0.055) ** 2))
         if kind == "closed":
-            # the lid: a heavy curve over the orb, its slit a dark line (the Bayon's sleep)
             f += 0.09 * math.exp(-((dx / 0.12) ** 2 + ((dy + 0.005) / 0.05) ** 2))
             if abs(dx) < 0.12:
-                f -= 0.05 * math.exp(-((dy + 0.03 - 0.25 * dx * dx / 0.0144 * 0.04) / 0.012) ** 2)
-    # the nose: long, from the brow to above the mouth, broadening, its tip proud
-    if -0.3 < Y < 0.3:
-        u = (0.3 - Y) / 0.6
+                f -= 0.05 * math.exp(-((dy + 0.03 - 0.04 * dx * dx / 0.0144) / 0.012) ** 2)
+    if p["third"]:
+        f += sock * 0.9 * math.exp(-((X / 0.1) ** 4 + ((Y - p["brow"] - 0.2) / 0.08) ** 4))
+    # the nose
+    nl = p["nose"]
+    ytop, ybot = p["brow"] + 0.02, p["brow"] + 0.02 - 0.58 * nl
+    if ybot < Y < ytop:
+        u = (ytop - Y) / (ytop - ybot)
         w = 0.045 + 0.075 * u
-        f += (0.07 + 0.13 * u) * max(0.0, 1 - (ax / w) ** 2) * min(1.0, (Y + 0.3) / 0.05)
-    f += 0.06 * math.exp(-((X / 0.12) ** 2 + ((Y + 0.27) / 0.05) ** 2))                 # the wings of the nose
-    # the cheekbone, and the cheek falling away under it
+        f += (0.07 + 0.13 * u) * max(0.0, 1 - (ax / w) ** 2) * min(1.0, (Y - ybot) / 0.05)
+    f += 0.06 * math.exp(-((X / 0.12) ** 2 + ((Y - ybot - 0.03) / 0.05) ** 2))
+    f -= 0.035 * (math.exp(-(((X - 0.075) / 0.03) ** 2 + ((Y - ybot) / 0.025) ** 2)) + math.exp(-(((X + 0.075) / 0.03) ** 2 + ((Y - ybot) / 0.025) ** 2)))
     for sx in (-1, 1):
-        f += 0.05 * math.exp(-(((X - sx * 0.4) / 0.12) ** 2 + ((Y + 0.0) / 0.09) ** 2))
-        f -= 0.05 * math.exp(-(((X - sx * 0.32) / 0.12) ** 2 + ((Y + 0.28) / 0.12) ** 2))
-    # the mouth: full lips, the slit between them cut deep, its corners lifted (the Bayon's smile)
+        f += 0.05 * math.exp(-(((X - sx * (ex + 0.12)) / 0.12) ** 2 + ((Y + 0.0) / 0.09) ** 2))
+        f -= 0.05 * math.exp(-(((X - sx * (ex + 0.04)) / 0.12) ** 2 + ((Y + 0.28) / 0.12) ** 2))
+    my, mw = p["mouthy"], p["mouthw"]
     if kind in ("full", "eyeless", "half", "blind", "closed"):
-        lip = max(0.0, 1 - (X / 0.25) ** 2)
-        yc = -0.44 + 0.12 * X * X / 0.0625 * 0.25
+        lip = max(0.0, 1 - (X / mw) ** 2)
+        yc = my + 0.03 * X * X / (mw * mw)
         f += 0.06 * lip * math.exp(-((Y - yc - 0.035) / 0.04) ** 2)
         f += 0.07 * lip * math.exp(-((Y - yc + 0.045) / 0.045) ** 2)
         f -= 0.09 * lip * math.exp(-((Y - yc) / 0.016) ** 2)
+        if p["stitched"] and abs(Y - yc) < 0.07 and ax < mw * 0.9:
+            if abs(((X / mw) * 4.5) % 1.0 - 0.5) < 0.12:
+                f -= 0.05                                                   # the stitches, cut across the lips
+        if p["inner"]:
+            f -= 0.08 * math.exp(-((X / (mw * 0.8)) ** 2 + ((Y - yc) / 0.09) ** 2))
+            for sx in (-1, 1):                                              # a small face looking out of the mouth
+                f -= 0.03 * math.exp(-(((X - sx * 0.06) / 0.025) ** 2 + ((Y - yc - 0.02) / 0.02) ** 2))
     if kind == "mouthless":
-        f += 0.02 * math.exp(-((X / 0.25) ** 2 + ((Y + 0.45) / 0.12) ** 2))             # smooth stone where it should be
+        f += 0.02 * math.exp(-((X / 0.25) ** 2 + ((Y - my) / 0.12) ** 2))
     if kind == "orcus":
         mo = (X / 0.42) ** 2 + ((Y + 0.36) / 0.28) ** 2
         if mo < 1.0:
-            f -= 0.48 * math.sqrt(1.0 - mo)                                             # the mouth: a room in the rock
-        f += 0.06 * math.exp(-((math.sqrt(mo) - 1.0) / 0.06) ** 2)                      # the lips' rim
-    # the chin, and the jaw's line
-    f += 0.07 * math.exp(-((X / 0.2) ** 2 + ((Y + 0.72) / 0.1) ** 2))
+            f -= 0.48 * math.sqrt(1.0 - mo)
+        f += 0.06 * math.exp(-((math.sqrt(mo) - 1.0) / 0.06) ** 2)
+    f += p["chin"] * math.exp(-((X / 0.2) ** 2 + ((Y + 0.72 * p["hl"]) / 0.1) ** 2))
     keep = 1.0 - 0.25 * wear
     if kind == "effaced":
-        keep = 0.15                                                                     # cut away, on purpose
+        keep = 0.15
     inside_ = min(1.0, max(0.0, (1.12 - e) / 0.2))
     d = head + f * keep * inside_
     for (px, py, pr, pd) in pits:
         d -= pd * 0.5 * math.exp(-(((X - px) / pr) ** 2 + ((Y - py) / pr) ** 2))
+    # cracks right across: real grooves, ragged
+    for (x0, y0, x1, y1) in p["crack"]:
+        cd = _seg_dist(X + (_vn(Y * 9, X * 3, seed + 21) - 0.5) * 0.06, Y, x0, y0, x1, y1)
+        d -= 0.045 * math.exp(-(cd / 0.012) ** 2) * inside_
+    # a piece broken away to the rough
+    if p["broken"]:
+        bx, by, br = p["broken"]
+        q = math.hypot((X - bx) / br, (Y - by) / (br * 0.8)) + (_vn(X * 6, Y * 6, seed + 31) - 0.5) * 0.5
+        if q < 1.0:
+            rough = 0.04 + (_vn(X * 14, Y * 14, seed + 32) - 0.5) * 0.05
+            d = min(d, rough) if q < 0.85 else d * 0.5 + min(d, rough) * 0.5
     if kind == "effaced":
-        d -= 0.03 * max(0.0, _vn(X * 9, Y * 9, seed) - 0.5) * 2 * inside_                 # the chisel's bites
+        d -= 0.03 * max(0.0, _vn(X * 9, Y * 9, seed) - 0.5) * 2 * inside_
     if kind == "half":
-        s = min(1.0, max(0.0, (X - 0.05) / 0.12))                                       # the builders stopped here
-        # the unfinished half in rough-hewn planes, as a quarry face is left
+        s = min(1.0, max(0.0, (X - 0.05) / 0.12))
         Xw = X + (_vn(X * 2.5, Y * 2.5, seed + 11) - 0.5) * 0.35
         Yw = Y + (_vn(X * 2.5 + 9, Y * 2.5, seed + 12) - 0.5) * 0.35
-        bx, by = math.floor(Xw * 5 + 0.5 * math.floor(Yw * 3.3)), math.floor(Yw * 3.3)
-        hv = math.sin(bx * 12.9898 + by * 78.233 + seed) * 43758.5453
+        bx_, by_ = math.floor(Xw * 5 + 0.5 * math.floor(Yw * 3.3)), math.floor(Yw * 3.3)
+        hv = math.sin(bx_ * 12.9898 + by_ * 78.233 + seed) * 43758.5453
         hv -= math.floor(hv)
-        rough = 0.12 + (hv - 0.5) * 0.06 + (Xw - bx / 5.0) * (0.1 * (hv - 0.3))
+        rough = 0.12 + (hv - 0.5) * 0.06 + (Xw - bx_ / 5.0) * (0.1 * (hv - 0.3))
         d = d * (1 - s) + rough * s
-    # the rock round it: rough, the face rising out of it as Lascaux's beasts rise out of their bulges
     surround = 0.02 + (_vn(X * 4, Y * 4, seed + 7) - 0.5) * 0.06 + (_vn(X * 11, Y * 11, seed + 8) - 0.5) * 0.02
-    edge = max(0.0, max(abs(X) - 0.78, abs(Y) - 0.95) / 0.2)            # toward the panel's bounds it sinks back
+    edge = max(0.0, max(abs(X) - 0.78, abs(Y) - 0.95) / 0.2)
     surround -= 0.2 * min(1.0, edge) ** 1.5
     d = max(d, surround * (1.0 - inside_ * 0.7))
     d += (_vn(X * 13, Y * 13, seed + 1) - 0.5) * (0.004 + 0.008 * wear)
@@ -198,12 +256,13 @@ def relief(name, c, nrm, H, kind, seed=0, mat="basalt", wear=0.5, wscale=0.55, b
     rnd = random.Random(seed)
     pits = [(rnd.uniform(-0.9, 0.9), rnd.uniform(-1.0, 1.0), rnd.uniform(0.02, 0.06), rnd.uniform(0.01, 0.04))
             for _ in range(int(8 + 14 * wear))]
+    prm = face_params(kind, seed)
     verts = []
     for j in range(nv + 1):
         Y = -1.15 + 2.3 * j / nv
         for i in range(nu + 1):
             X = -1.0 + 2.0 * i / nu
-            d = face_depth(X, Y, kind, wear, seed, pits)
+            d = face_depth(X, Y, kind, wear, seed, pits, prm)
             # the rim slopes back into the rock, so the carving rises out of a bulge of the living rock (as Lascaux's
             # beasts rise out of the wall's own swell) and never stands in a box
             b = min(1.0, max(0.0, max((abs(X) - 0.7) / 0.3, (abs(Y) - 0.98) / 0.17)))
@@ -888,7 +947,7 @@ def niche(k, x, y, z, nx, ny):
 
 
 FACE_TURN = (0.74, 0.67)               # the stair faces turned on the wall to look down the stairs at whoever climbs
-STAIR_FACES = ((-8.5, "half", 2.3), (-12.6, "eyeless", 2.5), (-17.2, "closed", 2.6))   # y, kind, height (yards)
+STAIR_FACES = ((-8.2, "half", 3.2), (-12.9, "eyeless", 3.4), (-17.9, "closed", 3.6))   # y, kind, height (yards)
 
 
 def build(root, material):
@@ -928,7 +987,7 @@ def build(root, material):
         ty = y - 0.62 * H - 0.25
         f = floor_at(STAIR[0] + 0.4, ty) or 0.0
         fz = (floor_at(STAIR[0] + 0.4, y) or 0.0) + 0.35 + 0.575 * H
-        torch("torch%d" % (i + 1), wx + 0.15, ty, fz + 0.15 * H, 1.0, 0.0, 85.0)
+        torch("torch%d" % (i + 1), wx + 0.15, ty, fz - 0.05 * H, 1.0, 0.0, 125.0)
     f = floor_at(STAIR[0] + 0.4, -15.2) or 0.0
     skeleton(wx + 0.3, -15.2, f + 1.5, 1.0, 0.0)
     stairs_cut()
