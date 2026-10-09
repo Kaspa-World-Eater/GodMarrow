@@ -670,3 +670,27 @@ against the dark walls, and their features are cut 1.7 times deeper.
 - **The stairs:** the upper face reads in its light from above: sockets, nose, the mouth pulled down.
 - **The pool:** the three faces (now 3 yd) still do not read; the lit wall shows pale blobs. They are next.
 - Torches at 65%, shimmer and embers, the marks on the risers, gritty steps worn in the centre: all in.
+
+## Rules check (1st since pass 9)
+
+**Read:**
+- `MASTER_RULES` and `CINEMATOGRAPHY.md` (rule 19, grazing light; rule 18, flatten the lights only within two steps).
+- The area's pool beat.
+
+**Worst failure, line 9 (detail where it counts):** the pool's three faces read as pale blobs. Their geometry reads
+lit from above (the normal pass). But each fire hangs 1.5 yd off its face, so the face washes into the top band, where
+the form's turn is lost. **Fix (9b):** the fire higher and further out, weaker, so the face lies in the middle bands
+and its sockets, nose and lips keep their shadow.
+
+**9b, what was really wrong with the pool faces (two causes, both in the light, not the carving):**
+1. Near a fire the painter laid a flat pale wash over everything bright ("the stone goes pale by the flame"), erasing a
+   face's shading. Now the wash comes only right beside a flame and follows the form.
+2. The form inside each band was the light over a falloff estimated from the lamps alone, scaled once for the whole
+   frame. Beside close fires the estimate ran low and the form saturated on most of each face. Now the falloff is
+   calibrated locally to the light that truly arrives (wide blur). Tried and set aside: the form taken as the light
+   over its own blur, which flattened the great face's large shapes.
+
+Also the pool faces' fires: close, above and to one side, grazing (115 W).
+
+**Results:** the pool's faces now show brows and sockets, still faint; the hall's great face reads; `cine_check` 9 of 9 on
+all three.

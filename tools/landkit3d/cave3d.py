@@ -1226,7 +1226,7 @@ def ooze_faces():
                      0.05 + 0.02 * q, "blood", scale=(1.0, 1.0, 1.5))
         # a fire on the wall beside it, raking across the face and catching the wet of the blood
         tx_, ty_ = -uy, ux
-        torch("oztorch%d" % k, x + ux * 0.3 + tx_ * 0.45 * H, y + uy * 0.3 + ty_ * 0.45 * H, cz + 0.6 * H, ux, uy, 75.0)   # above and to one side
+        torch("oztorch%d" % k, x + ux * 0.55 + tx_ * 0.5 * H, y + uy * 0.55 + ty_ * 0.5 * H, cz + 0.62 * H, ux, uy, 115.0)   # close, above, to one side: grazing
         # where it strikes the pool
         SPOUTS.append((BASIN[0] - ux * (BASIN[2] + 0.4), BASIN[1] - uy * (BASIN[2] + 0.4), -0.12))
 

@@ -128,9 +128,16 @@ def paint(d, t=0.0):
     # the light zones defined (Derek: "more defines light zones"; rule 10): the falloff stepped into bands, each wider
     # than the one inside it (equal steps in the log of the light), the edge between two a narrow dither; the form's
     # own turn to the fire and its shadows kept whole inside each band
-    Fn = np.clip(np.log1p(F * EXPO) / np.log1p(LMAX * EXPO), 0, 1) ** 1.15
+    # the zones from the light itself, blurred (the pool of light), the form as the light over that blur (the local
+    # turn of every surface to its fire): near any fire, at any distance, the form survives inside its band (an estimate
+    # of the falloff from the lamps alone saturated the faces flat beside close fires)
+    # the falloff from the lamps (it keeps the big shapes: a great face's sockets are not mistaken for the pool's
+    # edge), calibrated locally to the light that truly arrives, so beside a close fire it does not saturate the form
+    c_loc = (nd.gaussian_filter(light, 16.0) + 0.02) / (nd.gaussian_filter(F, 16.0) + 0.02)
+    Fl = F * c_loc
+    Fn = np.clip(np.log1p(Fl * EXPO) / np.log1p(LMAX * EXPO), 0, 1) ** 1.15
     Fz = np.floor(Fn * ZONES + (dith - 0.5) * 0.08 + 0.5) / ZONES
-    shade = np.clip(light / (F + 1e-6), 0, 1.25) ** 1.05
+    shade = np.clip(light / (Fl + 1e-3), 0, 1.6) ** 1.05
     # the faint fringe of a pool stays continuous (a carving's turn must still read there), the bands crisp above it
     T = np.maximum(Fz, Fn * 0.75) * shade + amb
     # the shadow is not black but the weak light of everything lit nearby (Gurney); the contacts stay darkest
@@ -288,8 +295,10 @@ def paint(d, t=0.0):
         hm = hue[m] / (hue[m].max(axis=1, keepdims=True) + 1e-9)
         col = col * (1 - s) + col * hm * 1.25 * s
         # right by the fire the stone goes pale with it
-        hot = np.clip((light[m] - 1.6) * 0.25, 0, 0.45)[:, None]
-        col = col * (1 - hot) + (WISP_C * 0.75 * hm + 0.05) * hot
+        # (only right beside a flame, and following the form, so a carving's shadows stay dark: the flat wash it was
+        # erased the faces in the pool chamber)
+        hot = (np.clip((light[m] - 6.0) * 0.06, 0, 0.3) * np.clip(tm * 1.4, 0, 1))[:, None]
+        col = col * (1 - hot) + (WISP_C * 0.75 * hm + 0.05) * hot * np.clip(tm * 1.3, 0, 1)[:, None]
         img[m] = col
     # the weeping (rule 37, ancient): water has seeped from every socket and crevice of the carved and the raw rock for
     # longer than anyone remembers, and run down the face below it, leaving long dark mineral tears, a pale crust at
