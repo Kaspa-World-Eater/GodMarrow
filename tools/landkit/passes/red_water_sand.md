@@ -370,3 +370,27 @@ failure: the skeptic round's,** the swell's front as one big smooth dark mass wi
 
 **Grade: C+.** The face has structure and the viscosity shows on it. **Still short:** the roll is hard to read at this
 angle, the froth is blotchy, the tall column at the right is plain, and the drowned's legs read as stubs.
+
+## Rules check, after pass 8, and pass 9 (2026-10-09): the roll
+
+**Rules check:** the rules, the cinematography chapter and the area page unchanged; no new notes on the review page.
+Derek's last word was to keep doing what I think best, so the work goes on (the pause rule is for waiting). **Worst
+failure: the roll is hard to read** (line 12, the skeptic round).
+
+**Tried and failed:** a sky that is brighter overhead than at the horizon (about three to one), each facet mirroring
+the part of the sky its reflected ray points at, to light the roll's top. At our camera height a facet tilted away
+from us reflects the horizon or below, not the zenith, so the sheen fell everywhere and the crest's lit band went
+out. Reverted. **Lesson:** under this camera, the high-Fresnel facets see the dim horizon; a sky gradient only
+flattens the sea.
+
+**The real fault was form:** where the roll gives way to the bore, `sea_z` cut the rest of the hump off at one phase,
+so the wave ended along the shore in a sheer vertical wall. Now the roll sinks into the bore over a long stretch of
+the crest (a smooth fall from phase 0.34 to 0.48), the lace of froth spreading over its collapsing back. The wave reads
+as one heavy mass sweeping diagonally from the open beach down into the froth against the headland, its lit crest
+leading the eye to the pilgrim.
+
+**cine_check (exterior):** 4 of 7, unchanged.
+
+**Grade: B-.** The frame composes, the motion has the heartbeat, the dead are in it. **Still short:** the froth is
+blotchy where it is thickest, the tall column at the right is plain, the drowned's legs read as stubs, and the sand and
+the sea want dry-brush strokes.

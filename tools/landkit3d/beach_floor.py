@@ -289,11 +289,13 @@ def sea_z(s, t, time=None):
     g = height_st(s, t)
     z = np.zeros_like(s)
     sc, H = crest(np.minimum(ph, 0.38), t)
-    unb = ph < 0.38
+    unb = ph < 0.5
     wf = np.clip(2.8 - 2.0 * np.clip(ph / 0.3, 0, 1), 0.85, 2.8)          # thick: it never sharpens to an edge
     ds = s - sc
     hump = H * np.exp(-(ds / np.where(ds < 0, wf, 4.0)) ** 2)
-    hump = hump * (1 - np.clip((ph - 0.36) / 0.025, 0, 1) * 0.7)          # it collapses as the lip lands
+    # thick blood: the roll sinks into the bore along a stretch of the crest, never a sheer step
+    kc = np.clip((ph - 0.34) / 0.14, 0, 1)
+    hump = hump * (1 - kc * kc * (3 - 2 * kc))
     trough = 0.2 * H * np.exp(-((s - (sc - wf * 1.9)) / 1.3) ** 2)
     z = z + np.where(unb, hump - trough, 0.0)
     # the bore: a front of broken water and foam, its height falling off behind it
