@@ -109,6 +109,10 @@ def paint(d):
                            tone(R["stucco"], ts, dith[m], band=np.where(wall[m], 0.06, 0.2)))
             flat_ = ~wall[m]
             col = np.where(flat_[:, None], tone(R["stone"], t * 0.8 + (fine[m] - 0.5) * 0.06, dith[m]), col)
+            # the stair's treads: swept every morning for centuries, worn smooth and pale, each nosing rounded and lit;
+            # so the stair reads as light treads over the dark of its risers
+            tread = flat_ & (X[m] > 7.55) & (X[m] < 9.65) & (np.abs(Y[m]) < 1.25)
+            col = np.where(tread[:, None], tone(R["stone"], t * 1.05, dith[m], band=0.08), col)
             track = flat_ & (np.abs(Y[m]) < 0.8 + 0.25 * vn(X[m] * 2.0, 4.0)) & (X[m] > 4.4) & (X[m] < 7.7) & (vn(X[m] * 5.0, Y[m] * 5.0) > 0.42)
             col = np.where(track[:, None], brick_tone(X[m], Y[m] * 0.31, t * 0.8, dith[m]), col)
             # the salt the damp leaves where it dries out, a pale tide just above its line
@@ -161,6 +165,9 @@ def paint(d):
             else:
                 stand = np.clip((0.97 - ao[m]) / 0.3, 0, 1)
                 mossy = (up[m] > 0.62) & (exposed[m] > 0.5) & (fbm(X[m] * 1.3 + 7, Y[m] * 1.3 + Z[m]) + stand * 0.35 > 0.5)
+                # the swept stair has had a season or two to green: moss only in the back corner of each tread
+                on_stair = (X[m] > 7.55) & (X[m] < 9.65) & (np.abs(Y[m]) < 1.25)
+                mossy &= ~on_stair | (stand > 0.75)
             col = np.where(mossy[:, None], tone(R["moss"], t, dith[m]), col)
         img[m] = col
     img = paint_floor(img, d, v, FM, dith)

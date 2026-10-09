@@ -311,3 +311,36 @@ how far down its slope it lies.
 - the missing tiles are still plain dark slots.
 
 **Next worst:** the stair's readability. Then the giant trees and the drizzle, the guardian and the candle.
+
+## Rules check, 2026-10-09 (1st since Derek's last word), then pass 10: the stair
+
+**Pass 9 against the checklist:**
+- Lines 1, 2, 3, 5, 6 and 11 pass.
+- **Detail (9) fails on the stair:**
+  - its treads were green with moss, though the keepers swept it every morning until they died;
+  - treads and risers sat at one value, so the steps didn't read;
+  - the serpent rails were plain pipes, where the lore has "its heads rearing at the foot";
+  - the front boundary stone stood in the middle of the stair (a placement bug: it was put on the axis).
+- **Light (4):** the candle. **Life (10):** in the game.
+- **Skeptic round (12):** beside the pit of offering's carved approach, the stair is the weakest thing at the hero's
+  feet.
+
+**Pass 10:**
+- **The treads** are swept stone, worn pale and smooth, lying in flat tones over the dark of the damp risers, so the
+  stair reads as light treads over dark. The unswept leaves lie on them. Moss grows only in each tread's back corner,
+  after a season or two.
+- **The serpents:** a crest of low blade fins runs down each back. At the foot the neck rises into five heads fanned
+  from a hood, the middle one highest. The broken side's hood lies in the mud with three heads still on it and one
+  jaw snapped beside.
+- **The front boundary stone** stands to the side of the worn way.
+- **The floor mesh** is widened, so a view centred on the stair has ground to its edge. The first close view showed a
+  black void.
+- **A close view of the stair** (focus 9, 0) with the Ossuarch at its foot now sits on the review page beside the
+  trial's frame. The rearing heads stand just outside the trial's frame.
+
+**Grade:** the stair B, the piece **B**. **Still short:**
+- at this size the five heads read as a grey knot, not a fan;
+- they need the hood's glass mosaic glints and gilt in the recesses (the brief) to read as ornament.
+
+**Ten passes done.** The piece is not shown as finished: the candle (the warm light, line 4), the giant trees, the
+drizzle and the guardian still fail.

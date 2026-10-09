@@ -195,17 +195,41 @@ def stair():
         P.poly("cheek%d" % s, verts, faces, "stucco")
         body = [(7.5, s * 1.45, FLOOR + 0.35), (8.6, s * 1.45, 0.75), (9.7, s * 1.45, 0.4), (10.2, s * 1.45, 0.55)]
         P.tube("naga%d" % s, body, [0.17, 0.17, 0.17, 0.16], "stucco", 8)
+        # the crest down its back: low blade fins, every hand's width, leaning back up the stair
+        for k in range(1, 14):
+            f = k / 14
+            seg = min(int(f * 3), 2)
+            u = f * 3 - seg
+            a, b = body[seg], body[seg + 1]
+            px, pz = a[0] + (b[0] - a[0]) * u, a[2] + (b[2] - a[2]) * u
+            P.tube("naga_fin%d_%d" % (s, k), [(px, s * 1.45, pz + 0.14), (px - 0.1, s * 1.45, pz + 0.3)], [0.05, 0.005], "stucco", 4)
         if s < 0:
-            P.tube("naga_head%d" % s, [(10.2, s * 1.45, 0.55), (10.35, s * 1.45, 1.0), (10.3, s * 1.45, 1.35)], [0.17, 0.2, 0.12], "stucco", 8)
-            P.sphere("naga_hood%d" % s, (10.25, s * 1.45, 1.3), 0.42, "stucco", scale=(0.35, 1.0, 0.85))
+            # the heads rearing at the foot (05-the-last-breath: "its heads rearing at the foot"): a neck rising, then
+            # five heads fanned from it, the middle one highest, each with its open jaw toward whoever climbs
+            P.tube("naga_head%d" % s, [(10.2, s * 1.45, 0.55), (10.35, s * 1.45, 1.0), (10.3, s * 1.45, 1.3)], [0.17, 0.2, 0.17], "stucco", 8)
+            for j in range(5):
+                a = (j - 2) * 0.42
+                tip = (10.3 + 0.18, s * 1.45 + math.sin(a) * 0.55, 1.3 + math.cos(a) * 0.55)
+                mid = (10.33, s * 1.45 + math.sin(a) * 0.3, 1.3 + math.cos(a) * 0.32)
+                P.tube("naga_neck%d_%d" % (s, j), [(10.3, s * 1.45, 1.3), mid, tip], [0.13, 0.1, 0.09], "stucco", 7)
+                P.sphere("naga_jaw%d_%d" % (s, j), (tip[0] + 0.08, tip[1], tip[2] - 0.02), 0.11, "stucco", scale=(1.5, 0.8, 0.7))
+            P.sphere("naga_hood%d" % s, (10.27, s * 1.45, 1.42), 0.5, "stucco", scale=(0.22, 1.0, 0.9))
         else:
-            # broken off: the head lies in the mud beside the stair
-            P.sphere("naga_hood%d" % s, (10.9, s * 2.2, gz(10.9, s * 2.2) + 0.08), 0.42, "stucco", scale=(0.9, 0.35, 0.8))
+            # broken off: the hood lies in the mud beside the stair, three heads still on it, one snapped beside
+            hx, hy = 10.9, s * 2.2
+            g = gz(hx, hy)
+            P.sphere("naga_hood%d" % s, (hx, hy, g + 0.08), 0.5, "stucco", scale=(0.9, 0.22, 1.0))
+            for j in range(3):
+                a = (j - 1) * 0.5
+                P.tube("naga_neck%d_%d" % (s, j), [(hx, hy, g + 0.1), (hx + math.sin(a) * 0.5, hy + 0.15, g + 0.12 + math.cos(a) * 0.45)],
+                       [0.12, 0.09], "stucco", 7)
+            P.sphere("naga_jaw%d_x" % s, (hx + 0.7, hy + 0.5, gz(hx + 0.7, hy + 0.5) + 0.05), 0.12, "stucco", scale=(1.5, 0.8, 0.7))
 
 
 def sema():
     rnd = random.Random(9)
-    pts = [(-8.6, -5.6), (0.0, -5.8), (8.6, -5.6), (8.8, 0.0), (8.6, 5.6), (0.0, 5.8), (-8.6, 5.6), (-8.8, 0.0)]
+    # (the front stone stands to the side of the worn way, never on the stair)
+    pts = [(-8.6, -5.6), (0.0, -5.8), (8.6, -5.6), (11.9, -1.7), (8.6, 5.6), (0.0, 5.8), (-8.6, 5.6), (-8.8, 0.0)]
     toppled = {2, 5, 6}
     for i, (x, y) in enumerate(pts):
         g = gz(x, y)
@@ -286,8 +310,8 @@ def ground():
     """the forest floor as real height (floor3d: every hummock, pit, bank and rut by its cause), a tenth of a yard a
     cell; the rain standing in the deep pits as level water"""
     res = 0.1
-    xs = np.arange(-21.0, 15.5, res)
-    ys = np.arange(-19.5, 17.0, res)
+    xs = np.arange(-21.0, 22.0, res)                           # wide enough for a view centred on the stair too
+    ys = np.arange(-19.5, 19.0, res)
     X, Y = np.meshgrid(xs, ys)
     P.grid("ground", xs, ys, F.height(X, Y), "ground")
     for i, (cx, cy, r, lvl) in enumerate(F.pools(xs[0], xs[-1], ys[0], ys[-1])):
