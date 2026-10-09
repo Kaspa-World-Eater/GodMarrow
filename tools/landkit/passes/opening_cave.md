@@ -694,3 +694,5 @@ Also the pool faces' fires: close, above and to one side, grazing (115 W).
 
 **Results:** the pool's faces now show brows and sockets, still faint; the hall's great face reads; `cine_check` 9 of 9 on
 all three.
+**Correction:** `cine_check` after 9b: the stairs 9 of 9 and the pool 9 of 9, but the hall 8 of 9. Rule 6, the squint,
+finds 2 masses: the locally calibrated light flattened the hall's broad value structure. To fix next.
