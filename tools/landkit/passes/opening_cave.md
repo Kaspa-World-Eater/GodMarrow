@@ -308,3 +308,22 @@ His notes on the cave:
   back across the heap, so the helms, skulls and shield rims catch it at the foot and the swords rise into the dark.
 
 **Grade:** the hall stays B-. The heap now reads as things left behind. **Still short:** the heap's middle is dark.
+
+## Rules check (2nd since pass 5)
+
+**Read:** `MASTER_RULES` and `CINEMATOGRAPHY.md`. The checklist stands as at the 1st check, with the heap now passing
+line 9.
+
+**Worst failure now, line 7 (paint and form):** the colossal face, the hall's subject, had a brow that read as one
+black band. A single straight shelf threw one continuous shadow over both sockets.
+
+**Pass 5c:**
+- The brow is recarved as two arches, one over each eye, as carved brows are (the Bayon's included).
+- The ridge between the eyes rises to meet the nose, with a swell to the forehead.
+- Each socket now holds its own shape of black.
+- Every face shares `face_depth`, so the stair faces gained it too.
+
+**Results:**
+- `cine_check`: the stairs pass 9 of 9, the hall 8 of 9 (its crown dark on purpose).
+- At the game's scale: the colossal face reads as a face from across the hall; the upper stair face reads brow,
+  socket, nose and mouth in its torch's raking light.

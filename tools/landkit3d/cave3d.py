@@ -114,10 +114,15 @@ def face_depth(X, Y, kind, wear, seed, pits):
     # the head: a flat front falling steeply at its sides (a plateau, so the features sit on a plane)
     head = 0.17 * max(0.0, 1.0 - e) ** 0.3
     f = 0.0
-    # the brow: a shelf across the face, projecting, its underside cut back
-    shelf = max(0.0, 1 - (ax / 0.56) ** 6)
-    if 0.17 < Y < 0.42:
-        f += 0.1 * shelf * min(1.0, (Y - 0.17) / 0.04) * min(1.0, (0.42 - Y) / 0.12)
+    # the brow: two arches, one over each eye, projecting, their undersides cut back; the ridge between the eyes rising
+    # to meet the nose, so each socket holds its own shape of black (one straight shelf read as a band)
+    for sx in (-1, 1):
+        u = (X - sx * 0.28) / 0.24
+        if abs(u) < 1.0:
+            yb = 0.24 + 0.07 * (1 - u * u)
+            f += 0.1 * (1 - u ** 6) * math.exp(-((Y - yb - 0.03) / 0.06) ** 2) * (1.0 if Y > yb - 0.04 else 0.4)
+    f += 0.09 * math.exp(-((X / 0.07) ** 2 + ((Y - 0.2) / 0.11) ** 2))              # the ridge between the eyes
+    f += 0.03 * math.exp(-((X / 0.3) ** 2 + ((Y - 0.55) / 0.2) ** 2))               # the forehead's swell
     # the sockets: deep hollows under the shelf
     sock = {"eyeless": -0.2, "orcus": -0.26, "full": -0.13, "half": -0.13, "blind": -0.07, "closed": -0.09,
             "mouthless": -0.15, "effaced": -0.06}[kind]
