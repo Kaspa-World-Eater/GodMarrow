@@ -154,6 +154,18 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09, the game's opening (Derek's idea, under discussion):**
+  - You rise out of a pool of blood in the dark lower chamber of a black basalt temple cut into the bluff, looking like
+    one of the corpses, a dark silhouette ("not ... wake up in the water ... that's a total rip off").
+  - Blue wisp-fire burns in rusted iron holders. Faces are carved on the walls and in the cliffs: not detailed, each
+    distinct, some without eyes or mouths.
+  - In the hall, "the mysterious stranger" (name to come) stands beside an empty throne. This is Conan's tomb of the
+    dead king, with weapons and walls. The empty throne stands for the hero, the Silence as king, and the throne
+    waiting for the new god.
+  - The Stranger: "What do you see, faces? Everyone sees faces, but there's no faces here" (projection). He offers to
+    read your fate with the tarot, and the drawing is the character creation.
+  - Then a door of white light, and out onto the beach full of corpses.
+  - The beach runs long side to side, closed by large black cliffs so it can't be explored forever.
 - **2026-10-09, the temple passed and the 3D road goes everywhere:**
   - The temple trial: "I gave the temple an A, so it's good enough"; of its inside: "Great job on the inside. The new
     technique really is paid off. It's going to be awesome when we go back and redesign all those other areas."
