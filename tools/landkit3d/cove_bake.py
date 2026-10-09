@@ -35,9 +35,10 @@ import beach_floor as BF                                                  # noqa
 BLENDER = r"C:/Program Files/Blender Foundation/Blender 4.5/blender.exe"
 ZONE, SEED = "red_shore", 9201
 KX, KY, KZ = 18.0, 9.0, 21.0                                              # engine px a yard; the game is 4 times this
-SCALE = 4
-CW, CH = 320, 176                                                         # a chunk (bog_bake.py)
-TA = 4                                                                    # chunks along each side of a rendered tile
+RES = 2                                                                   # texels an engine px (the 2 x 2 art grid,
+SCALE = 4 // RES                                                          # painted standard 7): the game draws a texel at 2
+CW, CH = 320, 176                                                         # a chunk, engine px (bog_bake.py)
+TA = 2                                                                    # chunks along each side of a rendered tile
 MX, MY = 96, 64                                                           # a tile's margin each side
 O = -108.0                                                                # the zone's (0, 0) corner in the world (yards)
 W = H = 145                                                               # the zone, tiles (yards)
@@ -73,12 +74,12 @@ def tiles_for(keep, x0, y0, work):
     for a, b in keep:
         groups.setdefault((a // TA, b // TA), []).append((a, b))
     out = []
-    gw, gh = TA * CW + 2 * MX, TA * CH + 2 * MY
+    gw, gh = RES * (TA * CW + 2 * MX), RES * (TA * CH + 2 * MY)
     for (ga, gb), chs in sorted(groups.items()):
         A0, B0 = ga * TA, gb * TA
         sx0, sy0 = x0 + A0 * CW - MX, y0 + B0 * CH - MY
-        d1 = (sx0 + (gw - 1) / 2.0) / KX                                  # fx - fy
-        d2 = (sy0 + (gh - 1) / 2.0) / KY + 2 * O                          # fx + fy
+        d1 = (sx0 + (gw - 1) / (2.0 * RES)) / KX                          # fx - fy (a texel's centre at sx0 + i / RES)
+        d2 = (sy0 + (gh - 1) / (2.0 * RES)) / KY + 2 * O                  # fx + fy
         out.append(dict(out=os.path.join(work, "t%d_%d" % (ga, gb)), focus=[(d1 + d2) / 2.0, (d2 - d1) / 2.0], w=gw, h=gh,
                         A0=A0, B0=B0, sx0=sx0, sy0=sy0, chunks=chs))
     return out
@@ -86,7 +87,7 @@ def tiles_for(keep, x0, y0, work):
 
 def render(tiles, work):
     js = os.path.join(work, "tiles.json")
-    json.dump([dict(out=t["out"], focus=t["focus"], w=t["w"], h=t["h"]) for t in tiles], open(js, "w"))
+    json.dump([dict(out=t["out"], focus=t["focus"], w=t["w"], h=t["h"], zoom=RES) for t in tiles], open(js, "w"))
     env = dict(os.environ, GM_CALM="1", GM_T=os.environ["GM_T"], GM_OBST=os.path.join(work, "obst.json"))
     t0 = time.time()
     p = subprocess.run([BLENDER, "--background", "--python", os.path.join(HERE, "blend_tiles.py"), "--", "beach3d", js],
@@ -104,7 +105,7 @@ def check_align(d, t):
     x, y, z = pos[jj, ii, 0], pos[jj, ii, 1], pos[jj, ii, 2]
     sx = (x - y) * KX
     sy = (x + y - 2 * O) * KY - z * KZ
-    return float(np.median(sx - (t["sx0"] + ii))), float(np.median(sy - (t["sy0"] + jj)))
+    return float(np.median(sx - (t["sx0"] + ii / RES))), float(np.median(sy - (t["sy0"] + jj / RES)))
 
 
 def screen_nmap(n):
@@ -132,8 +133,8 @@ def cut_chunks(t, d, img):
     nrgb = np.clip(screen_nmap(np.where(water[..., None], np.array([0.0, 0.0, 1.0]), n)) * 0.5 + 0.5, 0, 1)
     rows = []
     for a, b in t["chunks"]:
-        iy0, ix0 = MY + (b - t["B0"]) * CH, MX + (a - t["A0"]) * CW
-        sl = (slice(iy0, iy0 + CH), slice(ix0, ix0 + CW))
+        iy0, ix0 = RES * (MY + (b - t["B0"]) * CH), RES * (MX + (a - t["A0"]) * CW)
+        sl = (slice(iy0, iy0 + RES * CH), slice(ix0, ix0 + RES * CW))
         rgb = np.clip(img[sl], 0, 1)
         alpha = np.where(outside[sl], 0, np.where(water[sl], 254, 255)).astype(np.uint8)
         name = "c%d_%d" % (a, b)
@@ -174,7 +175,7 @@ def cut_chunks(t, d, img):
                 Image.fromarray(natlas, "RGBA").save(os.path.join(OUT, name + "_up_n.webp"), lossless=True, method=6)
         rows.append(dict(a=a, b=b, file=name + ".webp", normal=name + "_n.webp", up=(name + "_up.webp") if bands else "",
                          up_n=(name + "_up_n.webp") if bands else "", bands=bands,
-                         pos=[SCALE * (t["x0"] + a * CW) - SCALE / 2.0, SCALE * (t["y0"] + b * CH) - SCALE / 2.0]))
+                         pos=[4 * (t["x0"] + a * CW) - SCALE / 2.0, 4 * (t["y0"] + b * CH) - SCALE / 2.0]))
     return rows
 
 
@@ -229,9 +230,9 @@ def main():
         Image.fromarray(bl, "L").save(os.path.join(OUT, "block.png"))
         json.dump(obst, open(os.path.join(OUT, "obstacles.json"), "w"))
         rows.sort(key=lambda r: (r["b"], r["a"]))
-        idx = dict(zone=ZONE, seed=SEED, w=W, h=H, scale=SCALE, chunk=[CW, CH], origin=[x0, y0], band=BAND, chunks=rows,
+        idx = dict(zone=ZONE, seed=SEED, w=W, h=H, scale=SCALE, res=RES, chunk=[CW, CH], origin=[x0, y0], band=BAND, chunks=rows,
                    fx=[], water="red", world_origin=[O, O],
-                   height=dict(file="height.png", res=0.5, z0=HZ0, k=HK, lift=KZ * SCALE),
+                   height=dict(file="height.png", res=0.5, z0=HZ0, k=HK, lift=KZ * 4),       # Godot units a yard of height
                    baked="tools/landkit3d/cove_bake.py through beach3d.py and paint_shore.py")
         with open(os.path.join(OUT, "index.json"), "w", newline="\n") as fh:
             json.dump(idx, fh, indent=0)

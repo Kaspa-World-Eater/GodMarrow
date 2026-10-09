@@ -27,9 +27,9 @@ if __name__ == "__main__":
     for k, tl in enumerate(tiles):
         for o in [o for o in bpy.data.objects if o.type == "CAMERA"]:
             bpy.data.objects.remove(o, do_unlink=True)
-        BS.setup_camera(tuple(tl["focus"]), int(tl["w"]), int(tl["h"]), 1.0)
+        BS.setup_camera(tuple(tl["focus"]), int(tl["w"]), int(tl["h"]), float(tl.get("zoom", 1.0)))
         os.makedirs(tl["out"], exist_ok=True)
-        BS.render_passes(tl["out"], getattr(mod, "LAMPS", ()), getattr(mod, "FLOOR_MODULE", "floor3d"), 1.0,
+        BS.render_passes(tl["out"], getattr(mod, "LAMPS", ()), getattr(mod, "FLOOR_MODULE", "floor3d"), float(tl.get("zoom", 1.0)),
                          getattr(mod, "LAMP_REF", 0.09), getattr(mod, "AMBIENT", 1.0), getattr(mod, "SPOUTS", ()),
                          getattr(mod, "WORN", ()))
         print("tile %d/%d saved %s" % (k + 1, len(tiles), tl["out"]), flush=True)

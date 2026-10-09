@@ -78,12 +78,29 @@ def cells(u, v, size, seed):
     return best
 
 
+KEY = np.array([-0.62, 0.22, 0.75]) / np.linalg.norm([-0.62, 0.22, 0.75])   # the overcast's bright side (blend_scene.SUN)
+
+
+def form_tones(n, ao, cast):
+    """the five tones of a rounded form (MASTER_RULES 0.5c; Derek: the bones "looking very flat"): the light side
+    turned to the bright cloud, the halftone, the core shadow where the form turns away (the darkest of the form itself),
+    the reflected light where its underside takes the sand's bounce, and the cast shadow it throws (the moon pass). The
+    overcast alone is too soft to turn a bone; this is the turn, as a value offset (about -0.3 to +0.3)"""
+    lam = (n * KEY).sum(-1)
+    light_ = np.clip(lam, 0, 1) ** 0.8 * 0.3
+    core = np.exp(-((lam + 0.08) / 0.16) ** 2) * 0.24                        # the band where the form turns from the light
+    under = np.clip(-n[..., 2], 0, 1) + np.clip(-lam - 0.25, 0, 1)
+    refl = np.clip(under, 0, 1) * 0.1                                         # the sand's bounce into the underside
+    contact = (1.0 - np.clip(ao, 0, 1)) ** 1.5 * 0.3                          # the occlusion where it meets the sand
+    return light_ - core + refl - contact - (1.0 - cast) * 0.1
+
+
 def light(d):
     """the overcast at every pixel: (the light 0..1, the soft key alone)"""
     n, ao = d["normal"], d["ao"]
     sky = np.clip(d["skyview"], 0, 1)
     dome = sky * (0.55 + 0.45 * np.clip(n[..., 2], -0.2, 1))
-    key = nd.gaussian_filter(d["moon"].astype(np.float64), 1.2)
+    key = nd.gaussian_filter(d["moon"].astype(np.float64), 1.2 * float(d.get("zoom", 1.0)))
     T = 0.6 * dome + 0.38 * key + 0.04
     T = T * (0.55 + 0.45 * np.clip(ao, 0, 1) ** 1.4)
     return np.clip(T, 0, 1), key
@@ -238,7 +255,7 @@ def paint(d, t, hero=None):
     run = np.zeros((gh, gw))
     acc = crev.astype(float)
     colv = vn(np.arange(gw)[None, :] * 0.35 + 0.0 * np.arange(gh)[:, None], np.zeros((gh, gw)) + 3.0)
-    for k_ in range(1, 22):
+    for k_ in range(1, int(22 * float(d.get("zoom", 1.0)))):              # the run's length in world terms
         acc = np.roll(acc, 1, axis=0) * (0.9 + 0.08 * colv)
         acc[0, :] = 0
         run = np.maximum(run, acc)
@@ -275,8 +292,10 @@ def paint(d, t, hero=None):
             along[k_] = (px - cx_) * ax[0] + (py - cy_) * ax[1]
             across[k_] = -(px - cx_) * ax[1] + (py - cy_) * ax[0]
         ridge = vn(across * 26.0 + Z[m] * 26.0 + oh[m] * 40, along * 0.6)
-        lift = 0.68 if rmp is R_BONE_OLD else 0.42                      # bone reads as bone: an old ivory-grey
-        v = tm * (lift + 0.18 * oh[m]) * (0.55 + 0.45 * np.clip(up[m], 0, 1)) + (ridge - 0.5) * 0.1
+        lift = 0.58 if rmp is R_BONE_OLD else 0.42                      # bone reads as bone: an old ivory-grey
+        # turned as a volume: the five tones of form, so each bone is a round shaft with a lit side, a core shadow
+        # and the sand's bounce under it, never a flat strip
+        v = tm * (lift + 0.18 * oh[m]) + form_tones(n[m], ao[m], np.clip(d["moon"][m], 0, 1)) + (ridge - 0.5) * 0.08
         check = (np.abs(ridge - 0.5) < 0.04) & (vn(along * 1.5 + oh[m] * 9, across * 4) > 0.45)
         v = np.where(check, v - 0.18, v)
         if rmp is R_BONE_OLD:
@@ -298,8 +317,12 @@ def paint(d, t, hero=None):
         if not m.any():
             continue
         tm = T[m]
+        rounded = name in ("corpse", "cloth", "bone", "wood", "iron", "rust", "kelp", "straw")
         if name in R:
-            col = tone(R[name], np.clip(tm * (0.85 + 0.25 * oh[m]), 0, 0.99), dith[m])
+            v_ = tm * (0.85 + 0.25 * oh[m]) * (0.8 if rounded else 1.0)
+            if rounded:
+                v_ = v_ + form_tones(n[m], ao[m], np.clip(d["moon"][m], 0, 1)) * 0.9
+            col = tone(R[name], np.clip(v_, 0, 0.99), dith[m])
         else:
             col = tone(R["stone"], tm, dith[m])
         if name == "blood":
@@ -462,7 +485,7 @@ def gloss(img, d, proj, T, dith):
     ed = np.zeros(mm.shape)
     ed[mm] = 1
     dist = nd.distance_transform_edt(ed)[jj, ii]
-    patchy = (dist < 3) & (vn(pos[jj, ii, 0] * 7, pos[jj, ii, 1] * 7) > 0.5)
+    patchy = (dist < 3 * float(d.get("zoom", 1.0))) & (vn(pos[jj, ii, 0] * 7, pos[jj, ii, 1] * 7) > 0.5)
     col = np.where(patchy[:, None], img[jj, ii] * 0.5 + col * 0.5, col)
     out[jj, ii] = col
     return out
