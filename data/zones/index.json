@@ -1555,6 +1555,31 @@
     "root_deep_s1019.json.gz",
     "root_deep_s1020.json.gz"
    ]
+  },
+  "red_shore": {
+   "id": "red_shore",
+   "name": "The Red Shore",
+   "act": 1,
+   "kind": "outdoor",
+   "outdoor": true,
+   "theme": "moor",
+   "land": "moor",
+   "wallTheme": "moor",
+   "w": 145,
+   "h": 145,
+   "mlvl": [
+    1,
+    3
+   ],
+   "links": [
+    "moor"
+   ],
+   "seeds": [
+    9201
+   ],
+   "files": [
+    "red_shore_s9201.json.gz"
+   ]
   }
  },
  "missingArt": {

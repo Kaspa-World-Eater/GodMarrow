@@ -10,6 +10,8 @@ and the black cliffs (cliff3d.cliffs_v2) closing the beach on the right. Only wh
 
   blender --background --python blend_scene.py -- beach3d OUT -48.44 -42.78 480 340     (GM_T sets the wave's time)
 """
+import os
+import json
 import math
 import random
 import types
@@ -25,7 +27,9 @@ FLOOR_MODULE = "beach_floor"
 LAMPS = []
 SAMPLES = 48
 FOCUS_ST = (64.5, -4.0)                      # the frame's centre on the shore (s, t)
-T0, T1 = -16.0, 11.0                         # the stretch of shore built (along t)
+T0, T1 = -50.0, 50.0                         # the stretch of shore built (along t): the whole cove (beach_floor.COVE_T)
+CALM = os.environ.get("GM_CALM", "0") == "1"  # the game's bake: no breaking wave frozen in the ground (the game moves the Red)
+OBSTACLES = []                                # (s, t, r): what stands on the walkable sand, for the zone's grid (cove_export)
 
 
 def _gz(x, y):
@@ -68,7 +72,8 @@ def st_grid(name, s0, s1, t0, t1, res, zfun, mat, keep=None):
 
 def ground():
     # the sand; along the trail of prints a finer mesh, so each bare foot is real form (heel, ball, toes, the ridge)
-    st_grid("sand", 43.0, 74.0, T0, T1, 0.06, BF.height_st, "ground", lambda s, t, z: BF.trail_dist(s, t) > 0.3)
+    st_grid("sand", 49.9, 74.0, T0, T1, 0.07, BF.height_st, "ground", lambda s, t, z: BF.trail_dist(s, t) > 0.3)
+    st_grid("sand_back", -12.0, 50.0, T0 - 6.0, T1 + 6.0, 0.12, BF.height_st, "ground")
     s_lo = min(p[0] for p in BF.TRAIL) - 0.5
     s_hi = max(p[0] for p in BF.TRAIL) + 0.5
     t_lo = min(p[1] for p in BF.TRAIL) - 0.5
@@ -83,8 +88,12 @@ def sea():
         return BF.sea_z(s, t)[0]
     def keep(s, t, z):
         return z > BF.height_st(s, t) + 0.003
-    st_grid("red_shallows", 57.0, 72.6, T0, T1, 0.06, zf, "pool", keep)
-    st_grid("red_sea", 72.0, 96.0, T0, T1, 0.12, zf, "pool", keep)
+    st_grid("red_shallows", 57.0, 72.6, T0 - 6.0, T1 + 6.0, 0.07, zf, "pool", keep)
+    st_grid("red_sea", 72.0, 100.0, T0 - 6.0, T1 + 6.0, 0.14, zf, "pool", keep)
+    # the Red on out to the zone's edge, and round the headlands' outer sides
+    st_grid("red_far", 99.6, 165.0, -80.0, 80.0, 0.4, zf, "pool")
+    st_grid("red_wings_l", 40.0, 100.0, -80.0, T0 - 5.6, 0.3, zf, "pool", keep)
+    st_grid("red_wings_r", 40.0, 100.0, T1 + 5.6, 80.0, 0.3, zf, "pool", keep)
 
 
 def film():
@@ -213,8 +222,10 @@ def pebbles():
     rnd = random.Random(29)
     verts, faces = [], []
     n = 0
-    for _ in range(26000):
+    for _ in range(int(26000 * (T1 - T0) / 27.0)):
         s_, t_ = rnd.uniform(52.0, 66.3), rnd.uniform(T0, T1)
+        if float(BF.cove_d(np.array([s_]), np.array([t_]))[0]) > -0.6:
+            continue
         c = float(BF.cusp(np.array([t_]))[0])
         x, y = S.xy(s_, t_)
         foot = C.face_dist(x, y)
@@ -238,8 +249,10 @@ def pebbles():
         n += 1
     o = P.poly("pebbles", verts, faces, "stone")
     o.data.polygons.foreach_set("use_smooth", [True] * len(faces))
-    for i in range(420):
+    for i in range(int(420 * (T1 - T0) / 27.0)):
         s_, t_ = rnd.uniform(53.0, 66.0), rnd.uniform(T0, T1)
+        if float(BF.cove_d(np.array([s_]), np.array([t_]))[0]) > -0.6:
+            continue
         c = float(BF.cusp(np.array([t_]))[0])
         x, y = S.xy(s_, t_)
         foot = C.face_dist(x, y)
@@ -248,6 +261,8 @@ def pebbles():
         if rnd.random() > 0.05 + 0.5 * horn + 0.5 * berm + (0.8 if -3.0 < foot < 0.3 else 0.0):
             continue
         r = rnd.uniform(0.08, 0.2)
+        if r > 0.15:
+            OBSTACLES.append((s_, t_, r))
         P.sphere("cobble%d" % i, (x, y, _gz(x, y) + r * 0.22), r, "stone",
                  scale=(1.0, rnd.uniform(0.65, 0.9), rnd.uniform(0.4, 0.6)),
                  rot=(rnd.uniform(-0.2, 0.2), rnd.uniform(-0.2, 0.2), rnd.uniform(0, 6.28)))
@@ -258,9 +273,11 @@ def wrack():
     """the wrack (chapter 13, section 4): a broken line of kelp and splinters at the last high tide, a few of the dead's
     bones in it; an older, higher, sparser storm line, dried to grey, against the logs"""
     rnd = random.Random(41)
-    for i in range(170):
-        storm = i >= 120
+    for i in range(600):
+        storm = i >= 430
         t_ = rnd.uniform(T0, T1)
+        if abs(t_) > float(BF.side_t(np.array([55.0]))[0]) - 1.5:
+            continue
         line = (BF.BERM_S - 4.3 + 0.8 * math.sin(t_ * 0.21)) if storm else float(BF.high_tide(np.array([t_]))[0])
         if not storm and BF._vn1(np.array([t_ * 0.35]), 71.0)[0] < 0.35:
             continue                                                   # the line is broken: gaps where it is bare
@@ -276,8 +293,8 @@ def wrack():
             b = rnd.uniform(0, math.pi)
             l2 = rnd.uniform(0.2, 0.6)
             P.tube("spl%d" % i, [(x, y, z + 0.02), (x + math.cos(b) * l2, y + math.sin(b) * l2, z + 0.02)], [0.025, 0.012], "bone", 5)
-    for i in range(14):
-        t_ = rnd.uniform(T0, T1)
+    for i in range(40):
+        t_ = rnd.uniform(T0 + 8, T1 - 8)
         s_ = float(BF.high_tide(np.array([t_]))[0]) + rnd.gauss(0, 0.4)
         x, y = S.xy(s_, t_)
         z = _gz(x, y)
@@ -320,8 +337,27 @@ def bones_jam():
             r = r0 * (0.82 + 0.75 * (2 * abs(u)) ** 3)
             pts.append((x, y, 0.0))
             radii.append(r)
-        zs = [gz_on(p[0], p[1], r) for p, r in zip(pts, radii)]
-        zs = [min(z, zs[0] + 0.8) for z in zs]
+        # a bone is rigid (Derek: some "doing an accordion thing ... doesn't make any sense"): it lies as one straight
+        # piece on what is under it, resting on the two supports that bracket its middle (the ground, or a bone it
+        # crosses): the edge of the upper hull of what it must clear that spans its centre
+        need = [gz_on(p[0], p[1], r) for p, r in zip(pts, radii)]
+        us = [k / (ns - 1) for k in range(ns)]
+        hull = []
+        for k in range(ns):
+            while len(hull) >= 2:
+                (u1, z1), (u2, z2) = hull[-2], hull[-1]
+                if (z2 - z1) * (us[k] - u1) <= (need[k] - z1) * (u2 - u1):
+                    hull.pop()
+                else:
+                    break
+            hull.append((us[k], need[k]))
+        ua, za, ub, zb = hull[0][0], hull[0][1], hull[-1][0], hull[-1][1]
+        for (u1, z1), (u2, z2) in zip(hull[:-1], hull[1:]):
+            if u1 <= 0.5 <= u2:
+                ua, za, ub, zb = u1, z1, u2, z2
+                break
+        slope = (zb - za) / max(ub - ua, 1e-6)
+        zs = [za + slope * (u - ua) for u in us]                            # a hull edge's line clears every point
         pts = [(p[0], p[1], z) for p, z in zip(pts, zs)]
         P.tube("bone%d" % i, pts, radii, "bone", 12)
         # one end: a ball head on a short neck, turned off the axis; the other: two knuckles side by side
@@ -388,21 +424,31 @@ def bones_jam():
         laid.append((x, y, z + r * 0.75, r))
 
     n = 0
-    for i in range(12):
-        t_c = rnd.uniform(T0 - 3, T1 + 2)
-        s_c = rnd.uniform(44.0, 49.5) if i < 10 else rnd.uniform(50.0, 52.0)
-        long_bone(n, s_c, t_c, rnd.uniform(5.0, 10.0), rnd.uniform(0.2, 0.34), rnd.gauss(0, 0.35))
+    for i in range(40):
+        t_c = rnd.uniform(T0 + 6, T1 - 6)
+        s_c = rnd.uniform(44.0, 49.5) if i < 32 else rnd.uniform(50.0, 52.0)
+        if float(BF.cove_d(np.array([s_c]), np.array([t_c]))[0]) > -6.0:
+            continue
+        ln_ = rnd.uniform(5.0, 10.0)
+        r_ = rnd.uniform(0.2, 0.34)
+        yaw_ = rnd.gauss(0, 0.35)
+        long_bone(n, s_c, t_c, ln_, r_, yaw_)
+        for u in np.linspace(-0.5, 0.5, max(2, int(ln_ / 1.2))):
+            OBSTACLES.append((s_c + u * ln_ * math.sin(yaw_), t_c + u * ln_ * math.cos(yaw_), r_ * 1.3 + 0.1))
         n += 1
     # a run of ribs arching out of the sand where one side of a ribcage lies buried, and others strewn
     s0, t0 = 51.2, -10.5
     for k in range(4):
+        OBSTACLES.append((s0 - k * 0.25, t0 + k * 1.25, 0.4))
         rib(k, s0 - k * 0.25, t0 + k * 1.25, rnd.uniform(3.2, 4.2), 0.25 + rnd.uniform(-0.08, 0.08), rnd.uniform(1.3, 2.1),
             rnd.uniform(0.25, 0.5), rnd.uniform(0.2, 0.26))
-    for k in range(4, 8):
-        rib(k, rnd.uniform(45.0, 50.5), rnd.uniform(T0, T1), rnd.uniform(2.5, 4.0), rnd.uniform(-0.6, 0.6),
+    for k in range(4, 14):
+        rib(k, rnd.uniform(45.0, 50.5), rnd.uniform(T0 + 8, T1 - 8), rnd.uniform(2.5, 4.0), rnd.uniform(-0.6, 0.6),
             rnd.uniform(0.4, 0.9), rnd.uniform(0.9, 1.3), rnd.uniform(0.17, 0.22))
-    for k in range(6):
-        vertebra(k, rnd.uniform(45.5, 52.5), rnd.uniform(T0, T1), rnd.uniform(0.5, 0.75))
+    for k in range(14):
+        vs, vt = rnd.uniform(45.5, 52.5), rnd.uniform(T0 + 8, T1 - 8)
+        vertebra(k, vs, vt, rnd.uniform(0.5, 0.75))
+        OBSTACLES.append((vs, vt, 0.9))
 
 
 def dead():
@@ -414,6 +460,7 @@ def dead():
             (63.4, -9.4, 0.5, 0, 0.05, True), (61.2, 1.6, -1.9, 1, 0.06, False), (57.6, -12.2, 2.6, 0, 0.04, True),
             (54.8, 3.4, 1.2, 2, 0.04, False), (52.6, -6.8, -0.4, 1, 0.04, True))):
         RW.corpse(k, s0, t0, yaw, rot, sink, flung)
+        OBSTACLES.append((s0, t0, 0.7))
     # a pilgrim's staff and lantern lost at the high-tide line
     p0, p1 = S.xy(57.2, -1.8), S.xy(57.9, -0.2)
     P.tube("staff", [(p0[0], p0[1], _gz(*p0) + 0.04), (p1[0], p1[1], _gz(*p1) + 0.04)], [0.035, 0.03], "wood", 6)
@@ -431,7 +478,9 @@ def drowned():
     for k, (s0, t0, yaw, up, sink, cloak, roll) in enumerate((
             (68.2, -7.6, 0.6, False, 0.0, True, 0.0), (71.6, -11.2, -0.9, True, 0.03, False, 0.0),
             (73.6, -2.2, 1.9, False, 0.05, False, 0.0), (67.3, 2.6, -2.2, False, 0.0, False, 0.9),
-            (65.7, -10.4, 2.8, False, 0.0, True, 0.0))):
+            (65.7, -10.4, 2.8, False, 0.0, True, 0.0), (69.4, -27.5, 1.1, False, 0.02, False, 0.0),
+            (67.0, 19.5, -0.4, True, 0.03, True, 0.0), (72.8, 30.5, 2.2, False, 0.05, False, 0.0),
+            (70.2, 11.0, -1.6, False, 0.02, False, 0.0))):
         ph = 0.37 * k
         s0 = s0 - 0.35 * math.sin(2 * math.pi * (hb + ph))
         yaw = yaw + 0.12 * math.sin(2 * math.pi * (hb * 2 + ph))
@@ -489,21 +538,353 @@ def drowned():
             P.poly(tag + "_cloak", verts, faces, "cloth")
 
 
-def cliffs():
-    C.SF = types.SimpleNamespace(height=BF.height)        # the columns stand on the new beach
-    return C.cliffs_v2()
+def cove_column_height(s_, t_, d, k):
+    """the cove's basalt by cause and by the camera: the headlands at the sides stand 20 to 28 yd (their tops out of
+    frame); where they run out into the Red the sea has cut them to stumps and single columns; the back wall and its
+    rounded corners stand between the camera and the sand, so (as Diablo II cuts its near walls) they are shown cut
+    down: a rim of broken stumps 2 to 5 yd tall, stepping up inland like a pavement of column tops; round the cleft the
+    stumps stand above its ramp so it reads as a cut climbing into the bluffs"""
+    if d < -0.3:
+        return 0.0
+    wall = 22.0 + 6.0 * C._h(int(s_ * 3), int(t_ * 3), 9)
+    stair = 0.5 + max(d, 0.0) * 5.0 + k * 1.5
+    h = min(wall, stair)
+    near = (s_ < BF.COVE_MID + 4.0) and (abs(t_) < float(BF.side_t(np.array([s_]))[0]) + 2.5)
+    if near:
+        cap = 2.2 + max(d, 0.0) * 0.45 + k * 1.2
+        if abs(t_ - float(BF.cleft_t(np.array([s_]))[0])) < BF.CLEFT_W + 4.0 and s_ < float(BF.back_s(np.array([t_]))[0]) + 3.0:
+            ramp = float(BF.height_st(np.array([s_]), np.array([float(BF.cleft_t(np.array([s_]))[0])]))[0])
+            cap = max(cap, ramp + 3.0 + k * 1.2)
+            h = max(min(h, cap), ramp + 2.0 - max(float(BF.height_st(np.array([s_]), np.array([t_]))[0]), 0.0))
+        h = min(h, cap)
+    sea = s_ - 64.0
+    if sea > 0:
+        h = min(h, max(0.4, 6.0 - sea * 0.45 + k * 2.0))
+        if C._h(int(s_ * 5), int(t_ * 5), 11) < 0.1 * min(sea, 6):
+            h = 0.0
+    return h
+
+
+def cove_cliffs():
+    """the cove's basalt (report 07's columns): every girth from one power diagram over the cliff band round the cove,
+    rough drums worn and flaked, the high headlands with the entablature's thin crooked columns above the colonnade,
+    breakdown on the sand at their feet"""
+    C.SF = types.SimpleNamespace(height=BF.height)
+
+    def radius(s_, t_):
+        thick = 0.5 + 0.5 * math.sin(s_ * 0.21 + 1.3) * math.cos(t_ * 0.17)
+        return 0.34 + 0.55 * thick ** 1.3 + (C._h(int(s_ * 3), int(t_ * 3), 31) - 0.5) * 0.12
+
+    def keep(s_, t_):
+        d = float(BF.cove_d(np.array([s_]), np.array([t_]))[0])
+        return -0.3 < d < 7.0 and s_ < 88.0
+
+    pts = C.seeds(2.0, 90.0, T0 - 8.0, T1 + 8.0, radius, keep, seed=23)
+    rnd = random.Random(7)
+    made = 0
+    for k, (cs_, ct_), r, poly in C.cells(pts):
+        # basalt is five and six sided and near round in plan: a sliver cell (seen from above it reads as a wedge, Derek:
+        # "the triangle shaped wedges are bad") is left out, a crevice between its neighbours
+        pa = np.array(poly)
+        ev = np.linalg.eigvalsh(np.cov((pa - pa.mean(0)).T))
+        if len(poly) < 4 or ev[1] > 3.2 * max(ev[0], 1e-6):
+            continue
+        d = float(BF.cove_d(np.array([cs_]), np.array([ct_]))[0])
+        kk = C._h(k, 7, 5)
+        hgt = cove_column_height(cs_, ct_, d, kk)
+        if hgt <= 0.0:
+            continue
+        cx_, cy_ = S.xy(cs_, ct_)
+        xy = [S.xy(a, b) for a, b in poly]
+        g = _gz(cx_, cy_)
+        lean = ((C._h(k, 1, 21) - 0.5) * 0.025, (C._h(k, 2, 22) - 0.5) * 0.025)
+        age = 0.45 + 0.45 * C._h(k, 3, 7)
+        cup = 0.06 if (hgt < 3.0 and C._h(k, 4, 6) < 0.5) else 0.0
+        broken = 0.0 if (cup or hgt > 15) else (C._h(k, 5, 24) * 0.8 if C._h(k, 6, 25) < 0.75 else 0.0)
+        z0 = min(g, 0.0) - 1.5
+        z1 = max(g, 0.0) + hgt
+        if z1 - z0 > 9.0 and hgt > 12.0:                                # only the high headlands' upper tier splits
+            split = z0 + 6.0 + C._h(k, 10, 28) * 4.0
+            C.rough_prism("cw%d" % k, xy, z0, split, "basalt", k, 0.0, 0.0, lean, age, drum=(1.4, 3.4))
+            r2 = random.Random(k)
+            subs = [xy]
+            for _ in range(2):
+                nxt = []
+                for p in subs:
+                    cxp = sum(q[0] for q in p) / len(p)
+                    cyp = sum(q[1] for q in p) / len(p)
+                    a = r2.uniform(0, math.pi)
+                    for sgn in (1, -1):
+                        h_ = C._clip(p, cxp, cyp, sgn * math.cos(a), sgn * math.sin(a))
+                        if len(h_) >= 3:
+                            nxt.append(h_)
+                subs = nxt
+            for q, sub in enumerate(subs):
+                C.rough_prism("ce%d_%d" % (k, q), sub, split, z1 - r2.uniform(0, 2.5), "basalt", k * 7 + q, 0.0, 0.0,
+                              ((r2.random() - 0.5) * 0.06, (r2.random() - 0.5) * 0.06), 0.4, drum=(0.4, 0.9))
+        else:
+            C.rough_prism("cs%d" % k, xy, z0, z1, "basalt", k, cup, broken, lean, age, drum=(0.5, 1.6))
+        made += 1
+        OBSTACLES.append((cs_, ct_, r + 0.15))
+        # breakdown on the sand at the foot of the cliff
+        if -0.3 < d < 1.2 and rnd.random() < 0.35 and cs_ < 66.0:
+            for q in range(rnd.randint(1, 3)):
+                ds_, dt_ = rnd.uniform(0.8, 3.0), rnd.uniform(-1.5, 1.5)
+                # step out of the rock toward the open sand (down the field of cove_d)
+                e = 0.5
+                gs = float(BF.cove_d(np.array([cs_ + e]), np.array([ct_]))[0] - BF.cove_d(np.array([cs_ - e]), np.array([ct_]))[0])
+                gt = float(BF.cove_d(np.array([cs_]), np.array([ct_ + e]))[0] - BF.cove_d(np.array([cs_]), np.array([ct_ - e]))[0])
+                gl = math.hypot(gs, gt) + 1e-9
+                fs_, ft_ = cs_ - gs / gl * ds_ - gt / gl * dt_, ct_ - gt / gl * ds_ + gs / gl * dt_
+                if float(BF.cove_d(np.array([fs_]), np.array([ft_]))[0]) > -0.4:
+                    continue
+                fx_, fy_ = S.xy(fs_, ft_)
+                size = rnd.uniform(0.18, 0.55)
+                C.chunk("cb%d_%d" % (k, q), (fx_, fy_, _gz(fx_, fy_)), size, "basalt", k * 3 + q)
+                OBSTACLES.append((fs_, ft_, size + 0.1))
+    return made
+
+
+def sea_columns():
+    """lone basalt columns standing in the Red (Derek: "Add random columns of basalt in the water sparsely"): where the
+    headlands once ran further out, single columns and little clusters the sea has cut free, each its own height,
+    their feet in the surf, the blood standing in their cupped tops"""
+    rnd = random.Random(61)
+    placed = 0
+    tries = 0
+    spots = []
+    while placed < 9 and tries < 400:
+        tries += 1
+        s_, t_ = rnd.uniform(69.0, 86.0), rnd.uniform(T0 + 4.0, T1 - 4.0)
+        if any(math.hypot(s_ - a, t_ - b) < 9.0 for a, b in spots):
+            continue
+        spots.append((s_, t_))
+        n = 1 if rnd.random() < 0.6 else rnd.randint(2, 4)
+        for q in range(n):
+            a = rnd.uniform(0, 6.28)
+            cs_, ct_ = s_ + (math.cos(a) * 0.9 if q else 0.0), t_ + (math.sin(a) * 0.9 if q else 0.0)
+            sides = rnd.randint(5, 7)
+            r = rnd.uniform(0.45, 0.8)
+            pts = []
+            for i in range(sides):
+                aa = 2 * math.pi * i / sides + rnd.uniform(-0.25, 0.25)
+                rr = r * rnd.uniform(0.82, 1.08)
+                pts.append(S.xy(cs_ + math.cos(aa) * rr, ct_ + math.sin(aa) * rr))
+            g = _gst(cs_, ct_)
+            hgt = rnd.uniform(1.5, 6.5) * (1.0 if q == 0 else 0.6)
+            cup = 0.07 if rnd.random() < 0.5 else 0.0
+            o = C.rough_prism("seacol%d_%d" % (placed, q), pts, g - 1.0, max(g, 0.0) + hgt, "basalt", placed * 13 + q, cup,
+                              0.0 if cup else rnd.uniform(0.0, 0.6), ((rnd.random() - 0.5) * 0.04, (rnd.random() - 0.5) * 0.04),
+                              rnd.uniform(0.6, 0.9), drum=(0.5, 1.4))
+            if cup:
+                xy = pts
+                P.poly("seacup%d_%d" % (placed, q), [(x, y, max(g, 0.0) + hgt - 0.08) for x, y in xy][::-1], [tuple(range(len(xy)))], "blood")
+        placed += 1
+    return placed
+
+
+def _drum_poly(cs_, ct_, r, sides, rnd):
+    pts = []
+    for i in range(sides):
+        a = 2 * math.pi * i / sides + rnd.uniform(-0.25, 0.25)
+        rr = r * rnd.uniform(0.85, 1.08)
+        pts.append(S.xy(cs_ + math.cos(a) * rr, ct_ + math.sin(a) * rr))
+    return pts
+
+
+def shrine():
+    """an old crumbled basalt shrine (Derek: "an old crumbled basalt shrine ... sparsely to give it more identity"): a
+    spirit house of the shore folk, raised above the storm line where they could reach it dry, on a stump of three column
+    drums; its little house of slabs on corner posts, the roof's back slab fallen in and the front one slid off onto the
+    sand; a face worn smooth in the niche, looking at the sea; a ring of low standing drums round it, half of them
+    toppled; and across its step a line of worn tools, the old ward (a tool worn with work is the one thing of the god's
+    world nothing that comes up will cross)"""
+    s0, t0 = 37.5, 7.5
+    rnd = random.Random(101)
+    g = _gst(s0, t0)
+    # the pedestal: three drums of one old column
+    C.rough_prism("shrine_stump", _drum_poly(s0, t0, 0.62, 6, rnd), g - 0.4, g + 1.25, "basalt", 3, 0.0, 0.0, (0.0, 0.0), 0.85,
+                  drum=(0.38, 0.5))
+    OBSTACLES.append((s0, t0, 0.9))
+    top = g + 1.25
+    # the house: a floor slab, four corner posts, the back roof slab fallen in across the floor
+    corners = [(-0.42, -0.36), (0.42, -0.36), (0.42, 0.36), (-0.42, 0.36)]
+    fl = [S.xy(s0 + a, t0 + b) for a, b in [(-0.55, -0.48), (0.55, -0.48), (0.55, 0.48), (-0.55, 0.48)]]
+    P.poly("shrine_floor", [(x, y, top + 0.08) for x, y in fl], [(0, 1, 2, 3)], "basalt", thick=0.1)
+    for k, (a, b) in enumerate(corners):
+        h_ = 0.55 if k != 2 else 0.22                                        # one post broken off short
+        C.rough_prism("shrine_post%d" % k, _drum_poly(s0 + a, t0 + b, 0.08, 5, rnd), top + 0.08, top + 0.08 + h_, "basalt",
+                      k, 0.0, 0.08 if k == 2 else 0.0, (0.0, 0.0), 0.7, drum=(0.2, 0.3))
+    ra = [S.xy(s0 - 0.5, t0 - 0.5), S.xy(s0 + 0.45, t0 - 0.5), S.xy(s0 + 0.45, t0 + 0.5), S.xy(s0 - 0.5, t0 + 0.5)]
+    P.poly("shrine_roof_fallen", [(ra[0][0], ra[0][1], top + 0.55), (ra[1][0], ra[1][1], top + 0.22), (ra[2][0], ra[2][1], top + 0.16),
+                                  (ra[3][0], ra[3][1], top + 0.52)], [(0, 1, 2, 3)], "basalt", thick=0.07)
+    # the front roof slab slid off onto the sand, broken in two
+    for q, (ds, dt) in enumerate(((1.25, -0.2), (1.55, 0.45))):
+        x, y = S.xy(s0 + ds, t0 + dt)
+        gz = _gz(x, y)
+        C.chunk("shrine_slab%d" % q, (x, y, gz), 0.32, "basalt", 40 + q, flat=0.18, tilt=0.35)
+    # the face in the niche, worn smooth, turned to the sea
+    fx_, fy_ = S.xy(s0 + 0.2, t0)
+    P.sphere("shrine_face", (fx_, fy_, top + 0.32), 0.17, "carved", scale=(0.55, 1.0, 1.25))
+    nx, ny = S.xy(s0 + 0.36, t0)
+    P.sphere("shrine_face_nose", (nx, ny, top + 0.3), 0.04, "carved", scale=(1.2, 0.7, 1.3))
+    # the ring of low standing drums, half toppled
+    for k in range(7):
+        a = 2 * math.pi * k / 7 + 0.3
+        ss, tt = s0 + math.cos(a) * 2.6, t0 + math.sin(a) * 2.6
+        x, y = S.xy(ss, tt)
+        if k % 2 == 0:
+            C.rough_prism("shrine_ring%d" % k, _drum_poly(ss, tt, 0.28, 5, rnd), _gz(x, y) - 0.2, _gz(x, y) + rnd.uniform(0.45, 0.75),
+                          "basalt", 60 + k, 0.0, rnd.uniform(0, 0.2), (0.0, 0.0), 0.8, drum=(0.3, 0.45))
+            OBSTACLES.append((ss, tt, 0.4))
+        else:
+            C.chunk("shrine_ring%d" % k, (x, y, _gz(x, y)), 0.3, "basalt", 60 + k, flat=0.7, tilt=1.2)
+            OBSTACLES.append((ss, tt, 0.35))
+    # the worn tools across the step, seaward: a mattock, an adze, a hoe, a spade, their handles grey, the iron rusted
+    for q in range(4):
+        ss, tt = s0 + 1.0, t0 - 0.75 + q * 0.5
+        x0_, y0_ = S.xy(ss - 0.25, tt + rnd.uniform(-0.05, 0.05))
+        x1_, y1_ = S.xy(ss + 0.35, tt + rnd.uniform(-0.05, 0.05))
+        z_ = _gz(x0_, y0_) + 0.03
+        P.tube("shrine_tool%d" % q, [(x0_, y0_, z_), (x1_, y1_, z_)], [0.022, 0.02], "wood", 6)
+        P.box("shrine_toolhead%d" % q, (x1_ - 0.05, y1_ - 0.08, z_ - 0.02), (x1_ + 0.05, y1_ + 0.08, z_ + 0.03), "rust",
+              rot_z=rnd.uniform(-0.3, 0.3))
+
+
+def canoes():
+    """the shore folk's old canoes (the area page: "upturned, grey and split, from when the dead were given to the Red"):
+    long dugouts turned keel up above the tide line, gone silver, split along their grain, a plank sprung, the tall prow
+    of one carved as the serpent's head"""
+    for k, (s0, t0, yaw, ln) in enumerate(((50.5, -18.0, 0.18, 6.8), (49.2, 23.5, -0.12, 5.9))):
+        nu, nv = 18, 9
+        verts, faces = [], []
+        for i in range(nu):
+            u = i / (nu - 1) - 0.5
+            taper = math.sqrt(max(0.0, 1.0 - (2 * u) ** 2)) ** 0.7
+            rise = 0.35 * (2 * abs(u)) ** 4                                   # the ends sweep up into prows
+            for j in range(nv):
+                a = math.pi * j / (nv - 1)
+                w = -math.cos(a) * 0.48 * taper
+                hgt = math.sin(a) * 0.42 * (0.35 + 0.65 * taper)
+                ss = s0 + u * ln * math.sin(yaw) + w * math.cos(yaw)
+                tt = t0 + u * ln * math.cos(yaw) - w * math.sin(yaw)
+                x, y = S.xy(ss, tt)
+                verts.append((x, y, _gst(s0, t0) + hgt + rise - 0.06))
+        for i in range(nu - 1):
+            for j in range(nv - 1):
+                if k == 0 and i in (9, 10) and j in (3, 4):
+                    continue                                                  # a sprung plank: a hole in the hull
+                faces.append((i * nv + j, i * nv + j + 1, (i + 1) * nv + j + 1, (i + 1) * nv + j))
+        o = P.poly("canoe%d" % k, verts, faces, "cedar")
+        m = o.modifiers.new("solid", "SOLIDIFY")
+        m.thickness = 0.05
+        OBSTACLES.append((s0, t0, ln * 0.35))
+        OBSTACLES.append((s0 + ln * 0.3 * math.sin(yaw), t0 + ln * 0.3 * math.cos(yaw), 0.6))
+        OBSTACLES.append((s0 - ln * 0.3 * math.sin(yaw), t0 - ln * 0.3 * math.cos(yaw), 0.6))
+        if k == 0:
+            # the prow carved as the serpent's head, raised, its jaw open
+            ps, pt = s0 + 0.5 * ln * math.sin(yaw), t0 + 0.5 * ln * math.cos(yaw)
+            x, y = S.xy(ps, pt)
+            z = _gst(s0, t0) + 0.7
+            P.tube("canoe_prow", [(x, y, z - 0.35), (x, y, z), S.xy(ps + 0.1 * math.sin(yaw), pt + 0.25 * math.cos(yaw)) + (z + 0.2,)],
+                   [0.12, 0.1, 0.08], "cedar", 7)
+            hx, hy = S.xy(ps + 0.15 * math.sin(yaw), pt + 0.42 * math.cos(yaw))
+            P.sphere("canoe_prow_head", (hx, hy, z + 0.24), 0.14, "cedar", scale=(1.5, 0.8, 0.8))
+
+
+def cairns():
+    """pilgrims' cairns of column drums stacked on the backshore, each a few drums smaller as they go up, one fallen"""
+    rnd = random.Random(113)
+    spots = [(33.0, -10.0), (41.5, 21.0), (30.5, 28.5), (45.0, -31.0), (35.5, -2.5)]
+    for k, (s0, t0) in enumerate(spots):
+        x, y = S.xy(s0, t0)
+        z = _gz(x, y) - 0.1
+        n = rnd.randint(3, 5)
+        r = rnd.uniform(0.32, 0.42)
+        if k == 3:
+            for q in range(n):                                                # fallen: its drums strewn
+                fx_, fy_ = S.xy(s0 + rnd.uniform(-0.9, 0.9), t0 + rnd.uniform(-0.9, 0.9))
+                C.chunk("cairn%d_%d" % (k, q), (fx_, fy_, _gz(fx_, fy_)), r * (1 - q * 0.12), "basalt", 80 + q, flat=0.5)
+            OBSTACLES.append((s0, t0, 0.8))
+            continue
+        for q in range(n):
+            rr = r * (1 - q * 0.14)
+            hq = rnd.uniform(0.22, 0.32)
+            ds, dt = rnd.uniform(-0.04, 0.04), rnd.uniform(-0.04, 0.04)
+            C.rough_prism("cairn%d_%d" % (k, q), _drum_poly(s0 + ds, t0 + dt, rr, rnd.randint(5, 7), rnd), z, z + hq, "basalt",
+                          90 + k * 7 + q, 0.0, 0.0, (0.0, 0.0), 0.8, drum=(hq + 1, hq + 2))
+            z += hq + 0.01
+        OBSTACLES.append((s0, t0, r + 0.15))
+
+
+def memorial_pole():
+    """a memorial pole of stacked faces (the area page: "on the headland, memorial poles of stacked human faces looking
+    out to sea, each capped with a little tiered roof"): a grey cedar pole at the foot of the left headland, faces
+    one above another turned to the Red, the lowest worn almost away, a little tiered roof at its top, leaning"""
+    s0, t0 = 57.5, -34.5
+    x, y = S.xy(s0, t0)
+    z0 = _gz(x, y) - 0.3
+    hgt = 6.0
+    lean = S.xy(s0 + 0.25, t0 + 0.1)
+    pts = [(x + (lean[0] - x) * u, y + (lean[1] - y) * u, z0 + hgt * u) for u in np.linspace(0, 1, 7)]
+    P.tube("pole", pts, [0.33, 0.31, 0.3, 0.29, 0.28, 0.27, 0.26], "cedar", 12)
+    OBSTACLES.append((s0, t0, 0.55))
+    # the faces: a brow, two sockets left hollow by the carving, a nose, a mouth, every metre or so up the pole
+    for k in range(5):
+        u = 0.12 + k * 0.17
+        cx, cy, cz = (x + (lean[0] - x) * u, y + (lean[1] - y) * u, z0 + hgt * u)
+        fs, ft = S.st(np.array(cx), np.array(cy))
+        fx_, fy_ = S.xy(float(fs) + 0.28, float(ft))
+        wear = 0.5 if k == 0 else 1.0
+        P.sphere("pole_brow%d" % k, (fx_, fy_, cz + 0.22), 0.1 * wear, "cedar", scale=(0.6, 2.4, 0.6))
+        P.sphere("pole_nose%d" % k, (fx_, fy_, cz + 0.02), 0.07 * wear, "cedar", scale=(1.0, 0.7, 1.6))
+        mx, my = S.xy(float(fs) + 0.26, float(ft))
+        P.sphere("pole_mouth%d" % k, (mx, my, cz - 0.2), 0.06 * wear, "cedar", scale=(0.7, 2.0, 0.6))
+    # the little tiered roof
+    tx, ty, tz = pts[-1]
+    for q, (r, dz) in enumerate(((0.55, 0.0), (0.38, 0.22), (0.22, 0.4))):
+        P.sphere("pole_roof%d" % q, (tx, ty, tz + dz + 0.1), r, "cedar", scale=(1.0, 1.0, 0.28))
+
+
+def more_dead():
+    """the washed-up dead along the whole strand (the area page): on the face, in the wet band, at the high-tide line in
+    the wrack, against the bone jam; sparse, each as the water left it"""
+    RW._gz = _gz
+    rnd = random.Random(127)
+    k = 10
+    for _ in range(9):
+        t_ = rnd.uniform(T0 + 6, T1 - 6)
+        if -14 < t_ < 6:
+            continue                                                          # the review frame's own dead are there
+        s_ = rnd.choice((rnd.uniform(60.0, 64.5), rnd.uniform(56.5, 58.5), rnd.uniform(51.0, 54.0)))
+        if float(BF.cove_d(np.array([s_]), np.array([t_]))[0]) > -2.0:
+            continue
+        RW.corpse(k, s_, t_, rnd.uniform(-3.1, 3.1), rnd.randint(0, 2), rnd.uniform(0.03, 0.06), rnd.random() < 0.5)
+        OBSTACLES.append((s_, t_, 0.7))
+        k += 1
 
 
 def build(root, material):
     P.init(root, material)
+    del OBSTACLES[:]
     ground()
     sea()
     film()
-    lip()
-    bore()
+    if not CALM:
+        lip()
+        bore()
     pebbles()
     wrack()
     bones_jam()
     dead()
+    more_dead()
     drowned()
-    cliffs()
+    shrine()
+    canoes()
+    cairns()
+    memorial_pole()
+    cove_cliffs()
+    sea_columns()
+    if os.environ.get("GM_OBST"):
+        with open(os.environ["GM_OBST"], "w") as fh:
+            json.dump([[round(a, 2), round(b, 2), round(c, 2)] for a, b, c in OBSTACLES], fh)

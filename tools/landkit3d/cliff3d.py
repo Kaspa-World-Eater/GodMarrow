@@ -320,8 +320,12 @@ def rough_prism(name, pts, z0, z1, mat, seed=0, cup=0.0, broken=0.0, lean=(0.0, 
                 xr, yr = (x * ct - y * st_) * s, (x * st_ + y * ct) * s
                 zz_ = zz
                 if top and h == 2 and broken > 0:
-                    u = (xr * math.cos(tw * 31) + yr * math.sin(tw * 31)) / 0.6
-                    zz_ = max(zz_ - broken * (0.5 + 0.5 * max(-1.0, min(1.0, u))), z + 0.1)
+                    # broken where a drum parted at its cross-joint (Derek: no slanted wedges, "doesn't make any
+                    # sense"): the top stays level, its rim chipped back and a corner or two knocked off
+                    xr, yr = xr * (1.0 - 0.08 * broken), yr * (1.0 - 0.08 * broken)
+                    if corner and rnd.random() < 0.3 + 0.3 * broken:
+                        s2 = 1.0 - rnd.uniform(0.06, 0.14)                 # a corner knocked off: chipped back level,
+                        xr, yr = xr * s2, yr * s2                           # never dropped (a dropped corner tilts the top)
                 if h == 2 and not top:
                     zz_ -= rnd.uniform(0.0, 0.03)                           # the joint opens unevenly
                 if h == 1:
@@ -339,7 +343,9 @@ def rough_prism(name, pts, z0, z1, mat, seed=0, cup=0.0, broken=0.0, lean=(0.0, 
         # the drum's top: a ball, a socket, or the column's own top
         ci = len(verts)
         if top:
-            dzc = -cup if cup > 0 else rnd.uniform(-0.02, 0.03)
+            # the column's own top: a joint face, gently domed or cupped (ball and socket), cupped deeper to hold blood
+            dzc = -cup if cup > 0 else rnd.uniform(-0.006, 0.01)          # near flat: a top facet-fanned to a raised
+                                                                          # centre shades as a pyramid of wedges
         else:
             dzc = rnd.choice((-1, 1)) * rnd.uniform(0.02, 0.06)
         tz = sum(v[2] for v in rings[2]) / m
@@ -354,25 +360,29 @@ def rough_prism(name, pts, z0, z1, mat, seed=0, cup=0.0, broken=0.0, lean=(0.0, 
 
 
 def chunk(name, c, size, mat, seed=0, flat=0.6, tilt=0.6):
-    """a broken piece of rock (breakdown, rubble, gravel): a short rough drum of a random 4 to 7 sided section, tipped
-    over at a random angle, sunk a little into what it lies on"""
+    """a fallen piece of basalt as the real ones fall (Derek: no wedges): a whole drum, five to seven sided, parted from
+    its column at the joints, lying on its side or standing as it landed, settled into what it lies on; a thin slab
+    (flat < 0.3) lies flat. Never tipped at a random slant"""
     rnd = random.Random((zlib.crc32(name.encode()) & 0xFFFFF) + seed)
-    k = rnd.randint(4, 7)
+    k = rnd.randint(5, 7)
     pts = []
     for i in range(k):
-        a = 2 * math.pi * i / k + rnd.uniform(-0.3, 0.3)
-        r = size * rnd.uniform(0.7, 1.1)
+        a = 2 * math.pi * i / k + rnd.uniform(-0.2, 0.2)
+        r = size * rnd.uniform(0.85, 1.05)
         pts.append((math.cos(a) * r, math.sin(a) * r))
-    h = size * rnd.uniform(0.5, 1.2) * flat * 2
+    slab = flat < 0.3
+    h = size * (rnd.uniform(0.3, 0.5) if slab else rnd.uniform(1.1, 2.0))
     v, f = rough_prism(name, pts, 0.0, h, mat, seed, age=0.8, drum=(h + 1, h + 2), build=False)
-    ax, ay, az = rnd.uniform(-tilt, tilt), rnd.uniform(-tilt, tilt), rnd.uniform(0, 6.28)
+    lying = (not slab) and rnd.random() < 0.6
+    ax = (math.pi / 2 + rnd.uniform(-0.06, 0.06)) if lying else rnd.uniform(-0.05, 0.05)
+    az = rnd.uniform(0, 6.28)
     out = []
     for (x, y, z) in v:
         z -= h * 0.5
         y, z = y * math.cos(ax) - z * math.sin(ax), y * math.sin(ax) + z * math.cos(ax)
-        x, z = x * math.cos(ay) + z * math.sin(ay), -x * math.sin(ay) + z * math.cos(ay)
         x, y = x * math.cos(az) - y * math.sin(az), x * math.sin(az) + y * math.cos(az)
-        out.append((c[0] + x, c[1] + y, c[2] + z + h * 0.3))
+        rest = size * 0.92 if lying else h * 0.5
+        out.append((c[0] + x, c[1] + y, c[2] + z + rest - 0.06))
     return P.poly(name, out, f, mat)
 
 

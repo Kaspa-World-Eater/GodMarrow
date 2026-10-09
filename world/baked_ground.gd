@@ -56,6 +56,7 @@ static func build(z) -> bool:
 	var sc: float = float(idx.get("scale", 4))
 	var mat := ShaderMaterial.new()
 	mat.shader = load("res://shaders/baked_ground.gdshader")
+	mat.set_shader_parameter("red", str(idx.get("water", "")) == "red")   # the Red Water moves on its own beat
 	var bmat := ShaderMaterial.new()                 # the tall bands: their plants bend in the wind
 	bmat.shader = mat.shader
 	bmat.set_shader_parameter("band", true)

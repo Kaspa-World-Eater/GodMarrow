@@ -460,3 +460,124 @@ Third rules-check reminder in a row with no reply from Derek, and the piece now 
 (keep refining, or move to the next piece of the Red Shore). By the pause rule the reminder job is deleted; it is to be
 recreated with the same prompt (`scratchpad/rules_check_cron.txt`) when he next writes. Rules unchanged; no new notes
 on the review page.
+
+## Rules check, before the cove (2026-10-09)
+
+Derek, after pass 12: "Do another refinement pass on the beach and make sure it's at least 4 screens long and leads to
+more bluffs and forces the player inland. You can add and old crumbled basalt shrine and other such things sparsely
+to give it more identity. And the sand should extend inland for 2 screen before hitting cliffs that stop the player
+like it's a big cove. Do another refinement pass, and make sure it's all walkable and ship it to game assets. Add
+random columns of basalt in the water sparsely." The reminder job is recreated (he wrote).
+
+**Read:** `MASTER_RULES` (the gate; 2b: the scene builds the game's tiles too; 5: placement by cause, layouts breathe,
+collision at every base, objects in combat, the D2 camera); the area page (the bands from the water inland; the upturned
+canoes above the tide line; sea stacks; the memorial poles of stacked faces on the headland; the spirit houses of the
+shore folk's Thai side; the bluffs eroding, the river mouths; "the pilgrim small on a black beach"); chapter 13 and its
+section 6b; report 07 (basalt) and report 08 (this piece).
+
+**Confirmed:**
+- Everything with height stays real form: the cove's cliffs (`cliff3d` basalt), the shrine, the cairns, the canoes, the
+  columns in the sea.
+- Every object is a new design for this place (a crumbled basalt spirit house, not the temple's; canoes as the area
+  page gives them).
+- Placement by cause: the cliffs where the coast's basalt stands; columns in the sea where the Red has cut the
+  headlands down; the shrine above the storm line where the folk could reach it dry; the bone jam at the storm line.
+
+**The brief (the cove):**
+1. **The size, true to the game's screen** (480 x 270 art px; a screen is about 19 yd along the shore and 21 yd of
+   depth): the beach runs **four screens along the shore** (about 76 yd), and the black sand runs **two screens inland**
+   from the water (about 42 yd) to a back wall of basalt cliffs. The cliffs curve round at both ends into headlands
+   running out into the Red: **a closed cove**.
+2. **The one way on:** a cleft in the back wall, near one end, where the cliffs have broken: a talus ramp climbing
+   between walls up into **the bluffs**, the only exit, forcing the player inland toward the old growth and the village.
+3. **The sand by its bands,** as built: the swash and the coat, the wet band, the berm, the backshore rising to the cliff
+   foot, wind-rippled, with a talus of fallen drums and breakdown at the cliffs' feet.
+4. **Sparse identity:**
+   - **an old crumbled basalt shrine:** a spirit house of the shore folk raised on a stump of column above the storm
+     line, its little roof of slabs fallen in, drums toppled round it, worn tools laid in a line across its step (the
+     new lore's ward);
+   - **upturned canoes**, grey and split, above the tide line (the area page);
+   - **cairns** of stacked drums;
+   - **a memorial pole** of stacked faces on one headland, looking out to sea;
+   - the bone jam at the storm line, kept.
+5. **Lone basalt columns standing in the Red,** sparse, where the headlands have been cut down.
+6. **All walkable:** the sand from the swash to the cliff foot and up the cleft; collision at every base (columns,
+   shrine, canoes, the jam's bones, cairns, the cliffs); the water and the cliffs closed.
+7. **Shipped to the game** as a baked zone on the pipeline the game already uses (being mapped), with its walk mask and
+   collision, captured in the game with the Ossuarch.
+
+## Pass 13 (2026-10-09): the cove, and the road into the game
+
+**The cove** (`beach_floor`: `back_s`, `side_t`, `cove_d`, `cleft_t`, `in_cleft`, `cove_ground`): the beach runs about
+100 yd along the shore between two headlands, the back wall about 42 yd (two screens) inland of the water, its corners
+rounded into the headlands. One cleft through the back wall near the left end, its floor a gentle ramp between stumps,
+is the only way on.
+
+**The camera ruled the back wall:** the game's camera looks out to sea, so the back wall stands between it and the sand.
+At true height (20 yd and more) it would hide half a screen of beach. As Diablo II cuts its near walls, the back wall
+and its corners are a rim of broken stumps 2 to 5 yd tall, stepping up inland like a pavement of column tops. Round the
+cleft, the stumps stand above its ramp so it reads as a cut. The headlands at the sides stand full height (20 to 28
+yd); what they hide is only more headland and sea. Past the rim the ground is painted near dark: ground no one walks
+and the camera cannot honestly see.
+
+**New, sparse** (`beach3d`):
+- **the shrine:** a crumbled basalt spirit house on a stump of three drums, its back roof slab fallen in and its front
+  slab slid off broken onto the sand, a face worn smooth in the niche looking at the sea, a ring of low drums half
+  toppled, and a line of worn tools across its step (the new lore's ward);
+- **two upturned canoes,** grey and split, one with a sprung plank, one with its prow carved as the serpent's head;
+- **five cairns** of stacked drums, one fallen;
+- **a memorial pole** of stacked faces at the foot of the left headland, looking out to sea, the lowest face worn
+  almost away, a little tiered roof on top;
+- **nine lone basalt columns and clusters in the Red,** some cupped and holding blood;
+- **the dead, the wrack and the bone jam** across the whole cove; more of the drowned.
+
+**Into the game** (there was no road from the 3D road into the game before):
+- **`blend_tiles.py`** builds a scene once in Blender and renders many frames.
+- **`cove_bake.py`:**
+  - lays the bog's chunk grid over a 145 x 145 yd zone;
+  - renders tiles of 4 x 4 chunks, each camera placed so every pixel's centre falls on an engine pixel (checked from
+    the position pass: 0.00 px off);
+  - paints them with `paint_shore`;
+  - cuts each chunk's ground (the Red at alpha 254), normals and tall bands sorted by depth less lift;
+  - writes the half-yard height and block lattices and the index (with `"water": "red"`).
+- **The Red is baked between beats** (`GM_CALM`): no breaking wave frozen into the ground.
+- **`cove_export.py`:** the zone file. The sand is walkable, the Red and the cliffs solid, and every piece on the sand
+  solid by its reach. The way on is a portal at the cleft's top (the moor's camp stands in for the bluffs until they
+  are built). The start is under the right headland, with a lantern and a waystone. It proves every walkable tile and
+  the portal are reached from the start.
+- **The shader:** the Red has its own water branch (`shaders/baked_ground.gdshader`, `red`): no glint, the slide only
+  in the beat's two surges, the surface darkening a breath with each.
+
+**Derek's notes during the pass:**
+- "The triangle shaped wedges are bad ... looks lazy." Basalt breaks along its cross-joints, so `cliff3d.rough_prism`'s
+  "broken" tops now stay level (chipped back, never slanted). `chunk` lays whole drums on their side or standing. The
+  column tops are near flat (a top fanned to a raised centre shaded as a pyramid of wedges). Sliver cells are left
+  out, and only the high headlands split into the entablature's thin columns.
+- "They need that raw gritty rough texture that you did inside of the cave." The cave's stone is in `paint_shore`'s
+  basalt: per-column tone, strokes, grit specks and pits, rust runs, pale mineral in the crevices, and the weeping
+  tears. The grit's pale specks are held back in daylight; at full strength they read as snow.
+- "There's some that are like doing an accordion thing." Each long bone's points were lifted one by one where it crossed
+  another, so it kinked. Bones are rigid now, lying straight on the two supports that bracket their middle (the upper
+  hull of what they must clear).
+- "The wave should be coming in not from the side." The break no longer peels sideways (`PEEL` 400 yd: a long stretch of
+  crest breaks almost at once). In the game, the Red's shader heaves it shoreward on each surge, and swell bands travel
+  in from the open Red.
+- "The shadows being cast from objects look pretty bad but we can handle the fine detail later." These are the paint's
+  key-light shadows baked into the ground (long dark streaks behind the bones and the dead). Logged for the
+  fine-detail pass.
+- Recorded in the area page: Derek's mountains-as-a-dead-behemoth and blood rivers into estuaries, for later.
+
+**In the game** (`--zone=red_shore`, the Ossuarch):
+- **The bake:** 174 chunks, 1912 sorted bands, 8.5 MB, every tile aligned to 0.00 px.
+- **Walkable:** 2553 tiles, every one reached from the start, and the cleft's portal reached.
+- **Collision:** checked (`--show=collision`): the jam, the dead, the shrine and the waystone stand solid.
+- **The light:** the zone's own: a pale cool day over the paint's overcast (the bog's ambience was a heavy veil), and
+  the moor's blue night.
+- **Performance:** 60 fps, 17 ms a frame, about 300 draws.
+- **The smoke test:** every order, champions, sigils, panels and the title: 0 errors.
+
+**Still to do:**
+- the shadows (fine detail);
+- the pixel scale question (Derek: "why does it look so pixely?");
+- the Red's true heartbeat loop in the game;
+- the bluffs zone the cleft leads to.

@@ -9,6 +9,10 @@ shader_type canvas_item;
 uniform float wind = 0.5;
 uniform float gain = 1.0;
 uniform bool band = false;          // a tall band (sorted with the bodies), not a ground chunk
+// the Red Water (tools/landkit3d/cove_bake.py, index "water": "red"): blood, thick and slow, on a dying heartbeat
+// (Derek, 2026-10-09): no glint (nothing glints on it), the slide only in the beat's two surges, a long stillness
+// between, the surface darkening a breath as each surge passes
+uniform bool red = false;
 // the pilgrim's lantern, as every prop reads it (core/main.gd sets these each frame; shaders/landkit_lit.gdshader):
 // it lights the painted form through its own normal map, so the light rakes across the bone, the boards and the
 // stones as the pilgrim walks, and the far side of every vertebra falls into its own shade (MASTER_RULES 0.2)
@@ -59,7 +63,23 @@ void fragment() {
 		if (c.a < 0.5) discard;
 	} else {
 		if (c.a < 0.5) discard;
-		if (c.a < 0.998) {
+		if (c.a < 0.998 && red) {
+			vec2 W = floor(wpos / 4.0);
+			float ph = fract(TIME / 3.6);                   // one beat: a surge, a weaker surge, then the stillness
+			float d1 = ph - 0.06;
+			float d2 = ph - 0.27;
+			float pulse = exp(-d1 * d1 / 0.002) + 0.5 * exp(-d2 * d2 / 0.0012);
+			// the swell comes IN, toward the beach (down the screen; Derek: "The wave should be coming in not from the
+			// side"): on each surge the whole Red heaves a few texels shoreward and slides back in the stillness
+			float heave = smoothstep(0.02, 0.12, ph) * (1.0 - smoothstep(0.3, 0.95, ph)) + 0.5 * smoothstep(0.24, 0.31, ph) * (1.0 - smoothstep(0.31, 0.9, ph));
+			float dy = floor(heave * 3.0 + 0.5 * sin(W.x * 0.05 + W.y * 0.02));
+			vec4 c2 = texture(TEXTURE, uv - vec2(0.0, dy * TEXTURE_PIXEL_SIZE.y));
+			if (c2.a > 0.5 && c2.a < 0.998) c = c2;
+			// long swell bands travelling in from the open Red, a band a beat, moving only in the surges
+			float hc = floor(TIME / 3.6) + 0.3 * ph + 0.5 * smoothstep(0.02, 0.12, ph) + 0.2 * smoothstep(0.24, 0.31, ph);
+			float swb = sin(W.y * 0.21 + W.x * 0.025 + 0.6 * sin(W.x * 0.011) - hc * 6.2832);
+			c.rgb *= 0.97 - 0.05 * pulse + 0.045 * swb;
+		} else if (c.a < 0.998) {
 			vec2 W = floor(wpos / 4.0);                     // the painted texel
 			float sw = sin(TIME * 0.9 + W.y * 0.21 + W.x * 0.05) + 0.6 * sin(TIME * 1.7 - W.y * 0.37);
 			float dx = floor(sw * (0.6 + wind * 0.9));

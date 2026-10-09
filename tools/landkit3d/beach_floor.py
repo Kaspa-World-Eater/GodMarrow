@@ -18,6 +18,7 @@ import shore_floor as S
 import shore_fine as SF
 
 TIME = float(os.environ.get("GM_T", "0"))         # the loop's time 0..1
+CALM = os.environ.get("GM_CALM", "0") == "1"       # the game's bake: the Red between beats (the game moves it itself)
 WATER = 66.0                                       # the still-water line (s)
 STEP_S = 69.6                                      # the submerged step where the break is
 BERM_S = 57.2                                      # the berm crest at the high water
@@ -97,7 +98,8 @@ def height_st(s, t):
     z = z + (SF.ripple_profile(r) - 0.5) * 0.07 * patch
     # the footprints coming up out of the Red (the area page: the one true detail)
     dz, _ = prints(s, t)
-    return z + dz
+    # the cove's edges: the talus apron at the cliffs' feet, the cleft's ramp
+    return cove_ground(s, t, z + dz)
 
 
 # the trail of bare prints coming up out of the Red, ahead of the pilgrim's own (the area page), wandering a little
@@ -182,7 +184,10 @@ def height(x, y):
 # unbroken to the left, curling in the middle, a bore of foam to the right. phase(t) is where this place is in the life
 # of the wave: 0 the swell far out, 0.30 the lip thrown, 0.36 the impact, the bore running in to the water's edge by
 # 0.47, then the swash up the face and the long backwash, until the next swell.
-PEEL = 30.0                                        # yards along the shore the break peels in one wave period
+# the swell comes IN, toward the beach (Derek: "The wave should be coming in not from the side"): a long stretch of crest
+# breaks almost at once, only an irregular wobble along it (the break a little earlier off the cusps' horns and the
+# headland), never a peel running sideways across the screen
+PEEL = 400.0                                       # yards along the shore the break would peel in one period (barely)
 BREAK_S = 70.8                                     # where the crest throws its lip (just seaward of the step)
 
 
@@ -217,7 +222,7 @@ def beat(time=None):
 
 def phase(t, time=None):
     t = np.asarray(t, float)
-    return (heart(time) + t / PEEL + 0.05 * (_vn1(t * 0.15, 41.0) - 0.5)) % 1.0
+    return (heart(time) + t / PEEL + 0.07 * (_vn1(t * 0.12, 41.0) - 0.5) + 0.03 * (_vn1(t * 0.5, 43.0) - 0.5)) % 1.0
 
 
 def group(time=None):
@@ -297,13 +302,13 @@ def sea_z(s, t, time=None):
     kc = np.clip((ph - 0.34) / 0.14, 0, 1)
     hump = hump * (1 - kc * kc * (3 - 2 * kc))
     trough = 0.2 * H * np.exp(-((s - (sc - wf * 1.9)) / 1.3) ** 2)
-    z = z + np.where(unb, hump - trough, 0.0)
+    z = z + np.where(unb & (not CALM), hump - trough, 0.0)
     # the bore: a front of broken water and foam, its height falling off behind it
     bf, hb = bore_front(ph, t)
     inb = (ph >= 0.34) & (ph < 0.6)
     k = np.clip((s - bf) / 0.3 + 1.0, 0, 1)
     bore = hb * (k * k * (3 - 2 * k)) * np.exp(-np.maximum(s - bf, 0) / 2.4) * np.clip(1 - (ph - 0.47) / 0.13, 0, 1)
-    z = z + np.where(inb, bore, 0.0)
+    z = z + np.where(inb & (not CALM), bore, 0.0)
     # the chop on the open water; the bore's back churned in lumps (the foam itself is form: beach3d.bore)
     open_ = np.clip((s - WATER + 0.3) / 1.5, 0, 1)
     churn = np.where(inb, 0.06 * (_vn2(s * 1.2, t * 1.2 - heart(time) * 3, 13.0) - 0.4)
@@ -311,6 +316,9 @@ def sea_z(s, t, time=None):
     z = z + (chop(s, t, TIME if time is None else time) + churn) * open_
     # the swash sheet over the face, up to its front; a lip at the front while it runs up, thinning on the backwash
     fr, top, ps, rising = swash_front(t, time)
+    if CALM:                                                    # between beats: the coat lying halfway up, draining
+        fr = WATER - 0.45 * (WATER - top)
+        rising = np.zeros_like(fr, bool)
     # a thick liquid's front is blunt and raised: the tongue stands a hand high at its nose and rolls forward on it
     film = np.where(rising, 0.05 + 0.06 * np.exp(-((s - fr - 0.28) / 0.32) ** 2),
                     0.03 + 0.02 * np.clip((s - fr) / 2.0, 0, 1) + 0.025 * np.exp(-((s - fr - 0.2) / 0.25) ** 2))
@@ -329,3 +337,67 @@ def foam_age(s, t, time=None):
     pb = np.where(s > WATER, 0.36 + np.clip((sb - 1.2 - s) / (sb - 1.2 - WATER), 0, 1) * 0.11,
                   0.47 + 0.24 * np.arcsin(np.clip((WATER - s) / 4.0, 0, 1)) / (np.pi / 2))
     return (ph - pb) % 1.0
+
+
+# ---- the cove (Derek, 2026-10-09): four screens along the shore, two screens of sand inland to a back wall of basalt
+# cliffs that curves round at both ends into headlands running out into the Red; one cleft in the back wall is the only
+# way on, up into the bluffs ----
+COVE_T = 39.0                                      # the headlands' inner faces stand about this far along the shore
+COVE_MID = 50.0                                    # where the back wall's curve meets the straight headlands (s)
+CLEFT_T = -24.0                                    # the cleft through the back wall (t at the wall)
+CLEFT_W = 2.8                                      # its half width at the floor (yards)
+
+
+def back_s(t):
+    """the back wall's foot (s): two screens inland of the water, wandering in bays and buttresses"""
+    t = np.asarray(t, float)
+    return 24.0 + 2.0 * np.sin(t * 0.11 + 0.7) + 1.4 * (_vn1(t * 0.3, 91.0) - 0.5)
+
+
+def side_t(s):
+    """the headlands' inner faces (|t|), wandering as they run out into the Red"""
+    s = np.asarray(s, float)
+    return COVE_T + 2.5 * np.sin(s * 0.17 + 0.4) + 1.2 * (_vn1(s * 0.4, 93.0) - 0.5)
+
+
+def cleft_t(s):
+    """the cleft's line: it leaves the back wall and climbs inland, bending a little"""
+    s = np.asarray(s, float)
+    return CLEFT_T + 0.18 * (24.0 - s) + 1.2 * np.sin((24.0 - s) * 0.2)
+
+
+def cove_d(s, t):
+    """how far into the cliff mass (yards): negative on the open sand and the sea inside the cove, positive in the rock.
+    The back wall's corners are rounded into the headlands (a superellipse), the cleft cut through the back wall"""
+    s = np.asarray(s, float)
+    t = np.asarray(t, float)
+    sb = back_s(t)
+    tw = side_t(s)
+    a = np.abs(t) / tw
+    b = np.maximum(COVE_MID - s, 0.0) / np.maximum(COVE_MID - sb, 1.0)
+    g = (a ** 6 + b ** 6) ** (1.0 / 6.0)
+    d = (g - 1.0) * np.where(s < COVE_MID, 16.0, tw * 0.6)
+    # the cleft: a slot through the back wall and on inland, its floor a talus ramp up into the bluffs
+    inl = (s < sb + 3.0) & (s > sb - 10.0)
+    dc = np.abs(t - cleft_t(s)) - (CLEFT_W + 0.6 * np.clip((sb + 3.0 - s) / 6.0, 0, 1) - 0.6)
+    return np.where(inl, np.minimum(d, dc), d)
+
+
+def in_cleft(s, t):
+    s = np.asarray(s, float)
+    t = np.asarray(t, float)
+    sb = back_s(t)
+    return (s < sb + 1.0) & (s > sb - 10.0) & (np.abs(t - cleft_t(s)) < CLEFT_W + 1.0)
+
+
+def cove_ground(s, t, z):
+    """the ground's rise at the cove's edges: a talus apron of breakdown at the cliffs' feet, and the cleft's floor
+    climbing inland as a walkable ramp (about 1 in 3, the steepest a pilgrim takes without hands)"""
+    s = np.asarray(s, float)
+    t = np.asarray(t, float)
+    d = cove_d(s, t)
+    k = np.clip(1.0 + d / 5.0, 0, 1)
+    z = z + 1.3 * k * k
+    sb = back_s(t)
+    ramp = np.clip((sb + 1.0 - s) / 6.0, 0, 1.6) + 2.6
+    return np.where(in_cleft(s, t) & (s < sb + 1.0), np.maximum(z, ramp), z)

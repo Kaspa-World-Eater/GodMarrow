@@ -153,6 +153,10 @@ def paint(d, t, hero=None):
                   & (vn(X[m] * 23 + k, Y[m] * 23) > 0.62) & (sm < fr[m] - 0.15))
             ck = np.array([0.16, 0.1, 0.1]) if k < 2 else np.array([0.1, 0.075, 0.07])
             col = np.where(on[:, None], col * 0.4 + ck * (0.5 + tm[:, None]) * 0.9, col)
+        # beyond the cove's back rim: ground no one walks and the camera cannot honestly see (as Diablo II leaves what
+        # lies past its walls): near dark, a breath of the sand's own grain
+        beyond = (BF.cove_d(sm, tm_t) > 2.5) & (sm < BF.COVE_MID)
+        col = np.where(beyond[:, None], tone(R_WET, np.clip(0.12 + tm * 0.12 + (grain - 0.5) * 0.06, 0, 0.99), dith[m], band=0.04), col)
         # the prints (the one true detail): each hollow holds the blood that came up out of the Red with the feet,
         # dark and glossy, the sky caught on its far lip; the squeezed ridge round it a breath lighter where the key finds it
         _, dep = BF.prints(sm, tm_t)
@@ -185,8 +189,21 @@ def paint(d, t, hero=None):
         tm = T[m]
         wall = np.abs(up[m]) < 0.4
         along = np.where(np.abs(n[m][:, 0]) > np.abs(n[m][:, 1]), Y[m], X[m])
-        tb = tm * (0.62 + 0.4 * oh[m]) + (oh2[m] - 0.5) * 0.04
-        tb = tb + (vn(along * 5.0 + oh[m] * 13, Z[m] * 0.5) - 0.5) * 0.2 * wall
+        # the cave's raw stone (Derek: "that raw gritty rough texture that you did inside of the cave"; paint_cave's
+        # basalt): each column its own step of value; laid in strokes along the column on its faces and across its top
+        tb = tm * (0.6 + 0.42 * oh[m]) + (oh2[m] - 0.5) * 0.05
+        st_w = vn(along * 5.0 + oh[m] * 13, Z[m] * 0.5) - 0.5
+        st_t = vn((X[m] + Y[m]) * 3.0 + oh[m] * 7, (X[m] - Y[m]) * 0.8) - 0.5
+        lit_ = np.clip(tm * 2.0, 0, 1)
+        tb = tb + np.where(wall, st_w, st_t) * 0.22 * lit_
+        # grit: the rough grain of the rock, pale specks where a crystal catches the light, dark pits between
+        grit = vn(X[m] * 37 + Z[m] * 13, Y[m] * 37 - Z[m] * 11)
+        tb = np.where((grit > 0.76) & (tm > 0.3), tb + 0.045, tb)       # the pale specks held back in daylight (they
+        tb = np.where((grit < 0.22) & (tm > 0.08), tb - 0.09, tb)        # read as snow), the dark grain kept
+        grit2 = vn(X[m] * 71 + 3, Y[m] * 71 + Z[m] * 71)
+        tb = np.where((grit2 > 0.8) & (tm > 0.1), tb - 0.07, tb)
+        pit = vn(X[m] * 9 + 5, Y[m] * 9 + Z[m] * 9) > 0.8
+        tb = np.where(pit, tb - 0.08, tb)
         # each drum read by its joint: the gap between drums holds the dark
         tb = np.where(wall & (ao[m] < 0.55), tb * 0.55, tb)
         # long dark runs down the faces where the weather has wept from every joint
@@ -195,8 +212,13 @@ def paint(d, t, hero=None):
         # wet and red-black below the splash line, where the Red reaches them
         splash = (Z[m] < 1.4 + 0.5 * vn(along * 0.8, 2.0)) & (s[m] > 60.0)
         tb = np.where(splash, tb * 0.6, tb)
-        col = tone(R["basalt"], np.clip(tb * 0.72, 0, 0.99), dith[m], band=0.1)
+        col = tone(R["basalt"], np.clip(tb * 0.78, 0, 0.99), dith[m], band=0.1)
         col = np.where(splash[:, None], col * 0.75 + np.array([0.05, 0.008, 0.01]), col)
+        # rust weeping down from the joints in long thin runs; pale mineral in the crevices where the light finds it
+        rust = wall & (vn(along * 7.0 + oh[m] * 31, Z[m] * 0.3) > 0.74) & (oh2[m] > 0.35) & (tm > 0.18) & ~splash
+        col = np.where(rust[:, None], col * 0.55 + tone(R["rust"], np.clip(tb * 1.1, 0, 0.99), dith[m]) * 0.45, col)
+        zeo = (ao[m] < 0.55) & (vn(X[m] * 19 + Z[m] * 7, Y[m] * 19 - Z[m] * 7) > 0.8) & (tm > 0.12)
+        col = np.where(zeo[:, None], col * 0.4 + np.array([0.52, 0.55, 0.56]) * (0.35 + tm[:, None]) * 0.6, col)
         # the tide marks (the area page: "tide marks of dried red film"): wavering bands of dried blood crust round the
         # columns at the heights past tides reached, brown-black, each one broken
         for lvl, wd in ((0.55, 0.06), (0.95, 0.08), (1.45, 0.06), (2.05, 0.05)):
@@ -208,6 +230,22 @@ def paint(d, t, hero=None):
         lich = (up[m] > 0.55) & (Z[m] > 3.0) & (vn(X[m] * 9, Y[m] * 9) > 0.8)
         col = np.where(lich[:, None], col * 0.4 + np.array([0.2, 0.23, 0.2]) * (0.4 + tm[:, None]) * 0.8, col)
         img[m] = col
+
+    # the weeping (the cave's, paint_cave): water has seeped from every crevice of the columns for longer than anyone
+    # remembers and run down the faces below, leaving long dark mineral tears, a pale crust at their lips
+    stone = (mat == 20) & (np.abs(up) < 0.4)
+    crev = stone & (ao < 0.42)
+    run = np.zeros((gh, gw))
+    acc = crev.astype(float)
+    colv = vn(np.arange(gw)[None, :] * 0.35 + 0.0 * np.arange(gh)[:, None], np.zeros((gh, gw)) + 3.0)
+    for k_ in range(1, 22):
+        acc = np.roll(acc, 1, axis=0) * (0.9 + 0.08 * colv)
+        acc[0, :] = 0
+        run = np.maximum(run, acc)
+    weep_c = stone & ~crev & (run > 0.45) & (vn(X * 3.0 + Y * 3.0, Z * 0.15) > 0.35)
+    img = np.where(weep_c[..., None], img * 0.62, img)
+    lipm = weep_c & ~np.roll(weep_c, 1, axis=1) & (T > 0.2)
+    img = np.where(lipm[..., None], np.clip(img + np.array([0.05, 0.06, 0.06]) * T[..., None], 0, 1), img)
 
     # ---- the bone jam (Derek: "Turn the logs into bones"), and any drift wood: old and weathered, split along the
     # grain, pitted, spume caught on the seaward sides; the near plane, so dark but for the tops the sky finds ----
