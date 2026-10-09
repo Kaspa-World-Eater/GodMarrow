@@ -154,7 +154,13 @@ marrow.
 
 ## Decision log (newest first)
 
-- **2026-10-09, the game's opening (Derek's idea, under discussion):**
+- **2026-10-09, the opening, settled (Derek's answers):** the Stranger is not the village's merchant; the weapons are
+  heaped before the throne "just like the movie"; no enemies until the beach. The pilgrim rises from a visceral pool,
+  climbs stairs past faces and blue wisp-fire torches, and a weapon falls from a skeleton on the wall (the starting
+  weapon, settled later). It is all a cave, and leaving it the pilgrim comes out of the black cliffs onto the beach.
+  Presentation only, no quest. The dialogue "needs to be well thought out. With hints of insanity and mocking and very
+  dark." Written into `mythology/areas/the-red-shore.md`, "The opening".
+- **2026-10-09, the game's opening (Derek's idea, first telling):**
   - You rise out of a pool of blood in the dark lower chamber of a black basalt temple cut into the bluff, looking like
     one of the corpses, a dark silhouette ("not ... wake up in the water ... that's a total rip off").
   - Blue wisp-fire burns in rusted iron holders. Faces are carved on the walls and in the cliffs: not detailed, each

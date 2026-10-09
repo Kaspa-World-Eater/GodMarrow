@@ -146,6 +146,88 @@ trying to get back in ever since.
 
 The mapmaker painted it to the edge of the sheet and then over the edge, as if he could not find where to stop.
 
+## The opening: the cave under the black cliffs
+
+*Derek, 2026-10-09: presentation, not a quest. The pilgrim does not wash up; it rises. The cave is cut into the black
+basalt cliffs that close the beach, and leaving it, the pilgrim comes out of the cliffs onto the beach of the dead.*
+
+**The beats:**
+1. **The pool.** Black, then a breath. A dark silhouette drags itself up out of a visceral pool of blood in a low
+   basalt cave: the Red, come in under the cliffs. The pilgrim looks exactly like the corpses on the beach, and stands.
+   The only light is blue wisp-fire in rusted iron holders, which rims the shape in cold blue (the blood never glows).
+2. **The stairs.** Steps cut up through the rock. On the walls, faces: blunt, distinct, worn; some without eyes, some
+   without mouths, some only half cut. On the way up, a skeleton fixed to the wall lets its weapon fall: the starting
+   weapon (its kind by class, to be settled later). There are no enemies until the beach.
+3. **The hall.** The Conan tomb, emptied. A throne of black basalt on a dais, with no one in it; the rusted weapons and
+   armour of everyone who came up before heaped before it. Faces all round the walls. The Stranger sits on the dais
+   step beside the throne, never on it.
+4. **The Reading.** He reads the pilgrim's fate with the tarot; the drawing is the character creation (the nine draws,
+   `00-the-deep-lore.md`).
+5. **The door.** A doorway of white light, which is only the grey day after the dark, but it burns. The pilgrim comes
+   out of the black cliffs onto the beach full of corpses.
+
+**What the empty throne is:** the Silence's only true image (a king no one can name or hold, so an empty seat); a seat
+waiting for the next god; and, at the turn of the cycle, the pilgrim's own. The Stranger never chooses between them.
+
+**The Stranger** (a name to come; not the village's merchant). Old, thin, ash-pale, wrapped in a pilgrim's cloak gone
+to threads. He has laid this reading for every one who came up the stairs, and it has worn him through. He counts
+things, laughs a moment too long, speaks to the empty throne as if it had said something, and mocks the pilgrim
+gently, because he knows how it ends. Every line is short. He never explains.
+
+**His lines** (in-game writing; drafts to be graded):
+
+*As the pilgrim comes up into the hall:*
+- "Ah. Up you come. Up they always come, steaming."
+- "You're dripping on the floor. Not my floor. His." *(He tips his head at the empty throne.)* "He doesn't mind. He
+  doesn't mind anything."
+
+*If the pilgrim stops at the faces:*
+- "You're looking at the faces. Everyone looks at the faces."
+- "Four hundred and nine. I counted them, the first winter. The second winter I counted again and there were none.
+  Only stone. Only you, looking." *(He laughs, and goes on laughing after it stops being a laugh.)*
+- "Which one's looking back? That one? ...Yes. They all pick that one."
+
+*If the pilgrim looks at the throne:*
+- "Don't sit in it. Don't stand where it can see you." *(Quietly, to the throne:)* "No. Not this one. Not yet."
+- "Empty? Of course it's empty. Nobody sits there. Nobody has always sat there."
+- "One day someone will want it. They all want it, at the end. I keep the cushion warm."
+
+*If the pilgrim looks at the heap of weapons:*
+- "Gifts. Everyone who came up the stairs left something at His feet. Most left what they were holding."
+- "One left her teeth. I didn't ask."
+
+*When the skeleton's weapon falls, on the stairs below (his voice carries up):*
+- "Take it. He won't miss it. He's been holding it out for a hundred years. His arm must be numb."
+
+*The offer:*
+- "Sit. On the floor, with me. Kings stand, and you're not one. Not yet."
+- "You came up out of the Red with no name in your mouth. Shall I find you one?"
+- "Your fortune, little wet thing. Your fate. Your sentence. It's all the same card."
+
+*As he shuffles:*
+- "Listen. They're whispering. They decided before you were warm. They just like to be asked."
+
+*The nine draws, a line for each (others to be written so they never repeat in one reading):*
+1. **A god:** "Whose are you? Pick a god. Any god. They're all the same god, wearing a different mouth." *After:*
+   "That one. He'll be so pleased. He won't remember you."
+2. **A face:** "Now a face. You'll need one. Yours is still in the pool." *After:* "It suits you. Wear it carefully.
+   The last one wore it thin."
+3. **The card:** upright: "Upright. How hopeful. How early." Reversed: "Reversed. You never could hold that one the
+   right way up."
+4. **A fear:** "What frightens you? Don't say. It's on the card already. It's been on the card for years."
+5. **A seeking:** "And what are you looking for? ...It's looking for you too. It's much better at it."
+6. **A road:** "Your road. There's only the one road. But it's polite to pretend."
+7. **A question:** "Ask it. Quietly." *(He listens to nothing for too long.)* "No. I won't tell you that. You'd laugh.
+   I laughed."
+8. **A price:** "And the price. You'll pay it. Everyone pays it. Some of them pay it coming and going."
+9. **The reading:** "There. That's you." *(He looks at the cards a long time.)* "Isn't it horrible? A moment ago you
+   were nothing, and it was so quiet."
+
+*At the door:*
+- "The light will hurt. It's only the day."
+- "Out there everything will tell you who you are. The sand's full of the ones who listened."
+- *(As the pilgrim goes, not looking up:)* "You'll come back down. They always come back down. I'll keep your place."
+
 ## For building it
 
 **From the water inland.** The area follows a real temperate rainforest coast (the Olympic coast, its Rialto, Ruby
