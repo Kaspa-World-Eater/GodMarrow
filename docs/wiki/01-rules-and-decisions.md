@@ -154,6 +154,9 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09, the map policy (Derek: "Yes"):** fixed set pieces (the opening, the towns, landmarks, boss arenas) and
+  seeded wild lands from a graded pool: many seeds per zone generated and proved walkable, the best 3 to 5 graded and
+  baked, one picked per new game. The bluffs past the cove are to be the first seeded zone. (MASTER_RULES 5.)
 - **2026-10-09, the 2 x 2 art grid, and ground with depth (Derek):** after the cove's side by side at the game's size,
   "2x2": bakes are painted at twice the engine's scale and drawn at 2 x 2 screen pixels a texel (painted standard 7).
   And of the cove's sand: "just so flat. Shouldn't it have depth profiles to give it more shape and real worldness?

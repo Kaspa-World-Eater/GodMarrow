@@ -271,6 +271,16 @@ means that they always need to be perfect. All this will become assets for the g
 
 ## 5. The world: scale, objects, ecosystems
 
+- **The map policy: fixed set pieces, seeded wild lands from a graded pool** (Derek, 2026-10-09: "Yes"). As Diablo II
+  does it:
+  - **fixed and hand-made, the same every run:** the opening (the cave, the onyx mirror, the cove), the towns,
+    landmarks and boss arenas, where the lore and the cinematography are authored;
+  - **seeded:** the wild lands between, each a generator by cause (as the bog and the cove are) that takes a seed and
+    grows the land by its rules, with the fixed landmarks placed into it;
+  - **a curated pool, never live generation:** many seeds per zone are generated, each proved walkable by the zone's
+    own check, and graded by Derek and Claude; the best 3 to 5 are baked (about 35 minutes and 9 to 35 MB each) and
+    each new game picks one per zone. Every map the player sees has been seen and passed.
+
 - **True scale, and large.** The pilgrim is small inside a big world; a person is about 2 yards. Plants are a
   population of species, shapes and ages; built things have one fixed true size each, sized from real buildings.
   Check every piece against the Ossuarch beside it before painting.
