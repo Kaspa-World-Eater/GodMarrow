@@ -36,6 +36,8 @@ STEPS = 17
 DOOR = (5.9, -38.1)
 AMBIENT = 0.05                           # nothing reaches in here: the fires make all the light (chapter 12, rule 2)
 CARVE_H = 4.2                            # how high the builders dressed the hall's walls before they stopped
+WORN = []                                # where countless feet have climbed: (x0, y0, x1, y1, half-width), for the painter
+SERENE = True                            # every face carved to Derek's reference (2026-10-09)
 MASKS = True                             # every face but the great one is a smooth mask (Derek, 2026-10-09)
 FACE_TH = math.radians(222.0)            # where the colossal face is cut in the hall's back wall
 
@@ -123,7 +125,7 @@ def face_params(kind, seed):
         p["crack"] = [(0.2, 1.0, 0.45, 0.2)]
         return p
     if kind == "orcus":
-        p.update(hw=0.64, hl=1.0, brow=0.25, eye=0.28, eyey=0.08, nose=1.0, mouthw=0.27, mouthy=-0.43, chin=0.07, lift=0.0)
+        p.update(hw=0.64, hl=1.0, brow=0.28, eye=0.28, eyey=0.12, nose=0.55, mouthw=0.27, mouthy=-0.45, chin=0.0, lift=0.0)
         p["crack"] = []                                             # one smooth great face
         return p
     # every face but the great one is a mask in the wall's own stone (Derek: "just the features like porcelain mas[ks]
@@ -154,6 +156,97 @@ def _seg_dist(X, Y, x0, y0, x1, y1):
     dx, dy = x1 - x0, y1 - y0
     t = max(0.0, min(1.0, ((X - x0) * dx + (Y - y0) * dy) / (dx * dx + dy * dy + 1e-9)))
     return math.hypot(X - x0 - dx * t, Y - y0 - dy * t)
+
+
+def serene_depth(X, Y, kind, seed):
+    """a face carved as Derek's reference is (2026-10-09, "Here is a good carved face example"): naturalistic, serene,
+    rising out of the rough rock with no outline: the head a true rounded mass tapering to the jaw, its edge broken into
+    the rock; soft sockets; heavy closed lids, each a convex form with a dark crease beneath; the nose rising out of the
+    brow to a rounded tip, its nostrils in shadow; full lips slightly parted on a dark line; a firm chin. Kinds: closed
+    (lids, the default), eyeless (sockets empty), full (open eyes), plain (the mouth open), mouthless, orcus (the maw)"""
+    def g(dx, dy, sx, sy):
+        return math.exp(-((dx / sx) ** 2 + (dy / sy) ** 2))
+    ax = abs(X)
+    # the head: wide at the cheekbones, tapering to the jaw and chin; rounded, so the light turns over it
+    hw = 0.6 * (1.0 - 0.42 * max(0.0, -Y - 0.15) ** 1.2) * (1.0 - 0.12 * max(0.0, Y - 0.55))
+    e = (X / max(hw, 0.12)) ** 2 + (Y / 1.0) ** 2
+    rag = (_vn(X * 3.0, Y * 3.0, seed + 41) - 0.5) * 0.35 + (_vn(X * 9.0, Y * 9.0, seed + 42) - 0.5) * 0.12
+    wr = min(1.0, 0.3 + max(0.0, min(1.0, (Y - 0.3) / 0.35)) + max(0.0, min(1.0, (ax - 0.3) / 0.25)))
+    e2 = e + rag * wr                                                       # the brow and sides break into the rock
+    head = 0.21 * max(0.0, 1.0 - e2) ** 0.5
+    f = 0.0
+    eyx, eyy = 0.25, 0.1
+    # brow: soft arcs; the sockets: broad shallow hollows
+    for sx in (-1, 1):
+        # the brow slanting up to the middle (grief lifts the inner ends and draws them together)
+        u_ = (X - sx * eyx) / 0.2
+        f += 0.03 * g(X - sx * eyx * 0.9, Y - (0.25 - 0.06 * u_ * sx), 0.17, 0.08)
+        f -= 0.075 * g(X - sx * eyx, Y - eyy, 0.16, 0.11)
+        if kind in ("eyeless", "orcus"):
+            f -= 0.11 * g(X - sx * eyx, Y - eyy, 0.11, 0.08)                  # empty, holding black
+        elif kind == "full":
+            f += 0.07 * g(X - sx * eyx, Y - eyy, 0.09, 0.055)                 # the open eye, a smooth orb
+            f += 0.03 * g(X - sx * eyx, Y - eyy - 0.05, 0.11, 0.025)          # its upper lid
+        else:
+            # the closed lid: a heavy convex form, its lower edge a sharp dark crease, curving down at the outer corner
+            u = (X - sx * eyx) / 0.13
+            if abs(u) < 1.2:
+                yc = eyy - 0.015 - 0.02 * u * u - 0.035 * max(0.0, u * sx)       # sagging at the outer corner
+                f += 0.075 * g(X - sx * eyx, Y - eyy - 0.01, 0.13, 0.06)
+                f -= 0.045 * math.exp(-((Y - yc + 0.045) / 0.012) ** 2) * max(0.0, 1 - (u / 1.1) ** 2)
+                f -= 0.015 * math.exp(-((Y - yc - 0.065) / 0.018) ** 2) * max(0.0, 1 - (u / 1.0) ** 2)   # the upper crease
+    if kind != "orcus" or True:
+        f += 0.03 * g(X, Y - 0.29, 0.08, 0.06)                              # the knot between the brows
+        for sx in (-1, 1):
+            f -= 0.018 * g(X - sx * 0.04, Y - 0.27, 0.012, 0.06)            # the creases between them
+        for yy_ in (0.42, 0.5):
+            f -= 0.014 * math.exp(-((Y - yy_ - 0.04 * (X / 0.2) ** 2) / 0.014) ** 2) * max(0.0, 1 - (X / 0.22) ** 2)
+    # the nose: the bridge rising out of the brow, broadening, to a rounded tip; the wings; the nostrils in shadow
+    if -0.24 < Y < 0.2:
+        u = (0.2 - Y) / 0.44
+        w = 0.05 + 0.05 * u
+        f += (0.03 + 0.11 * u) * math.exp(-(X / w) ** 2)
+    f += 0.05 * g(X, Y + 0.21, 0.07, 0.06)
+    for sx in (-1, 1):
+        f += 0.035 * g(X - sx * 0.075, Y + 0.24, 0.045, 0.04)
+        f -= 0.05 * g(X - sx * 0.045, Y + 0.275, 0.025, 0.018)
+    f -= 0.03 * g(X, Y + 0.3, 0.12, 0.03)                                    # the shadow under the nose
+    f -= 0.018 * g(X, Y + 0.33, 0.02, 0.04)                                  # the philtrum
+    # cheeks full, the fold from the nose to the mouth soft
+    for sx in (-1, 1):
+        f += 0.04 * g(X - sx * 0.33, Y + 0.08, 0.13, 0.12)
+        f -= 0.02 * g(X - sx * 0.3, Y + 0.3, 0.1, 0.1)                      # hollow under the bone
+        f -= 0.012 * g(X - sx * 0.16, Y + 0.33, 0.03, 0.09)
+    # the mouth
+    if kind != "orcus":
+        mw = 0.2
+        lip = max(0.0, 1 - (X / mw) ** 2)
+        if kind != "mouthless":
+            dn = 0.07 * (X / mw) ** 2                                                     # the corners pulled down
+            f += 0.03 * lip * g(0, Y + 0.38 + dn + 0.012 * math.exp(-(X / 0.04) ** 2), 1, 0.035)
+            f += 0.045 * lip * g(0, Y + 0.465 + dn * 0.6, 1, 0.045)
+            f -= 0.05 * lip * math.exp(-((Y + 0.42 + dn * 0.8) / 0.02) ** 2)              # parted on a moan
+            f -= 0.05 * max(0.0, 1 - (X / (mw * 0.55)) ** 2 - ((Y + 0.42) / 0.035) ** 2)  # the dark of the open mouth
+            if kind == "plain":
+                f -= 0.12 * max(0.0, 1 - (X / (mw * 0.75)) ** 2 - ((Y + 0.415) / 0.05) ** 2)   # open
+        else:
+            f += 0.02 * g(X, Y + 0.42, 0.18, 0.08)
+        f -= 0.015 * g(X, Y + 0.54, 0.12, 0.05)                              # under the lower lip
+    else:
+        mo = (X / 0.42) ** 2 + ((Y + 0.45) / 0.38) ** 2
+        if mo < 1.0:
+            f -= 0.55 * math.sqrt(1.0 - mo)
+        f += 0.05 * math.exp(-((math.sqrt(mo) - 1.0) / 0.06) ** 2)
+    f += 0.05 * g(X, Y + 0.66, 0.15, 0.09)                                   # the chin
+    inside_ = min(1.0, max(0.0, (1.0 - e2) / 0.15))
+    d = head + f * inside_ * (1.0 if kind == "orcus" else 1.7)          # cut deep enough to read in the dark
+    # the rock round it, rough and broken (the face rises out of it with no outline)
+    rock = 0.03 + (_vn(X * 4, Y * 4, seed + 7) - 0.5) * 0.08 + (_vn(X * 13, Y * 13, seed + 8) - 0.5) * 0.03
+    edge = max(0.0, max(abs(X) - 0.78, abs(Y) - 0.95) / 0.2)
+    rock -= 0.2 * min(1.0, edge) ** 1.5
+    k = 0.03                                                                # a smooth maximum: no outline
+    hgap = max(k - abs(d - rock), 0.0) / k
+    return max(d, rock) + hgap * hgap * k * 0.25
 
 
 def face_depth(X, Y, kind, wear, seed, pits, p=None):
@@ -234,9 +327,9 @@ def face_depth(X, Y, kind, wear, seed, pits, p=None):
             f -= 0.22 * min(1.0, (1.0 - mo) * 4)                       # the round mouth, cut back to hold the mirror
         f += 0.07 * math.exp(-((math.sqrt(mo) - 1.0) / 0.06) ** 2)
     if kind == "orcus":
-        mo = (X / 0.42) ** 2 + ((Y + 0.36) / 0.28) ** 2
-        if mo < 1.0:
-            f -= 0.48 * math.sqrt(1.0 - mo)
+        mo = (X / 0.42) ** 2 + ((Y + 0.45) / 0.38) ** 2              # a maw (Derek: "Make the mouth taller ... like we
+        if mo < 1.0:                                                    # are being eaten")
+            f -= 0.55 * math.sqrt(1.0 - mo)
         f += 0.06 * math.exp(-((math.sqrt(mo) - 1.0) / 0.06) ** 2)
     f += p["chin"] * math.exp(-((X / 0.2) ** 2 + ((Y + 0.72 * p["hl"]) / 0.1) ** 2))
     keep = 1.0 - 0.25 * wear
@@ -292,7 +385,7 @@ def relief(name, c, nrm, H, kind, seed=0, mat="basalt", wear=0.5, wscale=0.55, b
         Y = -1.15 + 2.3 * j / nv
         for i in range(nu + 1):
             X = -1.0 + 2.0 * i / nu
-            d = face_depth(X, Y, kind, wear, seed, pits, prm)
+            d = serene_depth(X, Y, "closed" if kind in ("half", "blind", "mirrormouth") else kind, seed) if SERENE else face_depth(X, Y, kind, wear, seed, pits, prm)
             # the rim slopes back into the rock, so the carving rises out of a bulge of the living rock (as Lascaux's
             # beasts rise out of the wall's own swell) and never stands in a box
             b = min(1.0, max(0.0, max((abs(X) - 0.7) / 0.3, (abs(Y) - 0.98) / 0.17)))
@@ -665,7 +758,7 @@ def flame(name, x, y, z, size, w):
 def torch(name, x, y, z, nx, ny, w=60.0):
     """a wisp-fire torch: a rusted iron bracket out of the wall, a cup, the cold flame"""
     sconce(name, x, y, z, nx, ny)
-    flame(name, x + nx * 0.5, y + ny * 0.5, z + 0.1, 0.09, w)
+    flame(name, x + nx * 0.5, y + ny * 0.5, z + 0.1, 0.09, w * 0.65)        # (Derek: "Dim the torches by 35%")
 
 
 def skeleton(x, y, z, nx, ny):
@@ -724,9 +817,12 @@ def throne():
         verts = [(x, y, f - 0.5) for x, y in corners] + [(x, y, z1) for x, y in corners]
         faces = [(0, 1, 2, 3)[::-1], (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
         P.displace(P.outward(P.poly("dais%d" % k, verts, faces, "dressed")), 0.03, 0.1, 4)
+        fr = (cx + nx * (dep / 2 + 0.035) - sx * (wid / 2 - 0.5), cy + ny * (dep / 2 + 0.035) - sy * (wid / 2 - 0.5), f + 0.28 * k + 0.06)
+        carve_marks("mark%d" % k, fr, (sx, sy), None, (nx, ny), wid - 1.0, 0.17, 90 + k)
     top = f + 1.4
+    WORN.append((fx + nx * 7.5, fy + ny * 7.5, fx + nx * 0.2, fy + ny * 0.2, 1.3))       # up the throne's stairs to the mouth
     # the colossal face: its lower lip at the dais top, so the mouth is the throne room
-    cz = top + 0.36 * 0.5 * H + 0.28 * 0.5 * H - 0.25
+    cz = top + 0.83 * 0.5 * H - 0.12                               # the maw's lower lip at the top step
     CUTS.append((fx, fy, nx, ny, 0.55 * H, f - 2.0, cz + 0.6 * H))
     relief("orcus", (fx, fy, cz), (nx, ny), H, "orcus", 4242, "basalt", 0.55, back=0.75, nu=64, nv=76)
     # the fires the little faces' mirrors will hold: the braziers, the throne's candles, the heap's candles
@@ -761,13 +857,14 @@ def throne():
     # step either side, where any mirror would hold their flames: black framed by light, the hall's one subject
     mx, my = fx - nx * 0.6, fy - ny * 0.6
     P.box("mouthfloor", (mx - 1.8, my - 1.8, f), (mx + 1.8, my + 1.8, top), "dressed", rot_z=math.atan2(ny, nx))
-    mc = (fx + nx * 0.7, fy + ny * 0.7, cz - 0.36 * 0.5 * H)
+    mc = (fx + nx * 1.45, fy + ny * 1.45, cz - 0.45 * 0.5 * H)        # at the lips' plane, so its border is seen
     nv_ = 48
     verts = [mc]
     for i in range(nv_):
         a_ = 2 * math.pi * i / nv_
-        verts.append((mc[0] + sx * math.cos(a_) * 1.9, mc[1] + sy * math.cos(a_) * 1.9, mc[2] + math.sin(a_) * 1.15))
+        verts.append((mc[0] + sx * math.cos(a_) * 1.78, mc[1] + sy * math.cos(a_) * 1.78, mc[2] + math.sin(a_) * 1.46))
     P.poly("voidmirror", verts, [(0, 1 + i, 1 + (i + 1) % nv_) for i in range(nv_)], "voidmirror")
+    onyx_frame(mc, (sx, sy), (nx, ny), 1.78, 1.46)
     for k, (cx_, cy_, cz_) in enumerate(THRONE_C):
         P.cylinder("tcandle%d" % k, (cx_, cy_, cz_ - 0.12), 0.06, 0.14, "bone", sides=6)
         flame("tcandle%d" % k, cx_, cy_, cz_ + 0.02, 0.08, 52.0)
@@ -1112,7 +1209,7 @@ def ooze_faces():
     each mouth down the chin and the wall and away along a worn channel into the pool (Derek: "have define plain faces
     on the chamber walls, with mouths opens while blood oozes from their mouths in the pool")"""
     for k, (x, y, nx, ny, ux, uy, ln) in enumerate(OOZE_FACES):
-        H = 2.3 + 0.2 * (k % 2)
+        H = 3.0 + 0.2 * (k % 2)
         f = floor_at(x + ux * 1.2, y + uy * 1.2) or 0.05
         cz = f + 0.35 + 0.575 * H
         CUTS.append((x, y, nx, ny, 0.62 * H, -2.0, cz + 0.6 * H))
@@ -1129,9 +1226,95 @@ def ooze_faces():
                      0.05 + 0.02 * q, "blood", scale=(1.0, 1.0, 1.5))
         # a fire on the wall beside it, raking across the face and catching the wet of the blood
         tx_, ty_ = -uy, ux
-        torch("oztorch%d" % k, x + tx_ * 0.7 * H + ux * 0.15, y + ty_ * 0.7 * H + uy * 0.15, cz + 0.1, ux * 0.8 - tx_ * 0.6, uy * 0.8 - ty_ * 0.6, 60.0)
+        torch("oztorch%d" % k, x + ux * 0.3 + tx_ * 0.45 * H, y + uy * 0.3 + ty_ * 0.45 * H, cz + 0.6 * H, ux, uy, 75.0)   # above and to one side
         # where it strikes the pool
         SPOUTS.append((BASIN[0] - ux * (BASIN[2] + 0.4), BASIN[1] - uy * (BASIN[2] + 0.4), -0.12))
+
+
+# the builders' script: each mark a few straight strokes in a unit box (x across 0..1, y up 0..1), cut into the stone
+SCRIPT = [
+    [(0.5, 0.0, 0.5, 1.0), (0.5, 0.65, 0.15, 0.95), (0.5, 0.65, 0.85, 0.95)],
+    [(0.2, 0.0, 0.2, 1.0), (0.2, 1.0, 0.8, 0.7), (0.8, 0.7, 0.2, 0.4)],
+    [(0.15, 0.0, 0.5, 1.0), (0.5, 1.0, 0.85, 0.0), (0.3, 0.45, 0.7, 0.45)],
+    [(0.5, 0.0, 0.5, 1.0), (0.15, 0.3, 0.85, 0.7)],
+    [(0.2, 0.0, 0.2, 1.0), (0.8, 0.0, 0.8, 1.0), (0.2, 0.5, 0.8, 0.5)],
+    [(0.5, 0.0, 0.5, 0.6), (0.5, 0.6, 0.15, 1.0), (0.5, 0.6, 0.85, 1.0)],
+    [(0.2, 1.0, 0.8, 0.0), (0.2, 0.0, 0.8, 1.0)],
+    [(0.3, 0.0, 0.3, 1.0), (0.3, 1.0, 0.75, 0.75), (0.3, 0.5, 0.75, 0.25)],
+    [(0.15, 0.2, 0.5, 1.0), (0.5, 1.0, 0.85, 0.2), (0.15, 0.2, 0.85, 0.2)],
+    [(0.5, 0.0, 0.5, 1.0), (0.2, 0.8, 0.8, 0.8), (0.2, 0.2, 0.8, 0.2)],
+]
+
+
+def carve_marks(name, origin, along, up, normal, length, height, seed):
+    """a line of marks cut into a stone face (Derek: "Add carved runes into the steps"): the builders' script, no one
+    living can read it; each stroke a narrow groove, dark in the stone (narrower than a world pixel, so its dark is
+    painted, as the form law allows)"""
+    rnd = random.Random(seed)
+    ox, oy, oz = origin
+    ax, ay = along
+    nx, ny = normal
+    w = height * 0.62
+    gap = height * 0.32
+    n = int((length + gap) / (w + gap))
+    x0 = (length - n * (w + gap) + gap) / 2.0
+    for i in range(n):
+        glyph = SCRIPT[rnd.randrange(len(SCRIPT))]
+        bx = x0 + i * (w + gap)
+        for k, (u0, v0, u1, v1) in enumerate(glyph):
+            p0 = (ox + ax * (bx + u0 * w) + nx * 0.004, oy + ay * (bx + u0 * w) + ny * 0.004, oz + v0 * height)
+            p1 = (ox + ax * (bx + u1 * w) + nx * 0.004, oy + ay * (bx + u1 * w) + ny * 0.004, oz + v1 * height)
+            P.tube("%s_%d_%d" % (name, i, k), [p0, p1], [0.018, 0.018], "lacquer", 4)
+
+
+def onyx_frame(mc, s_, n_, rx, rz, seed=77):
+    """the onyx mirror's border (Derek: "The mirror in the large mouth is not able to be seen, give it an ornate carved
+    runic stone border"): two raised rings of smooth carved stone, between them a flat band with the builders' marks
+    cut round it, bosses on the outer ring; lit by the candles, it makes the black of the mirror read (dark on light)"""
+    sx, sy = s_
+    nx, ny = n_
+    def at(a, r_add, out, rr=1.0):
+        return (mc[0] + sx * math.cos(a) * (rx + r_add) * rr + nx * out, mc[1] + sy * math.cos(a) * (rx + r_add) * rr + ny * out,
+                mc[2] + math.sin(a) * (rz + r_add) * rr)
+    n = 72
+    P.tube("onyx_ring_in", [at(2 * math.pi * i / n, 0.1, 0.08) for i in range(n + 1)], [0.13] * (n + 1), "carved", 8)
+    P.tube("onyx_ring_out", [at(2 * math.pi * i / n, 0.62, 0.06) for i in range(n + 1)], [0.1] * (n + 1), "carved", 8)
+    # the band between: a flat ring of stone the marks are cut in
+    verts, faces = [], []
+    for i in range(n):
+        a = 2 * math.pi * i / n
+        verts.append(at(a, 0.16, 0.03))
+        verts.append(at(a, 0.56, 0.03))
+    for i in range(n):
+        a0, b0 = 2 * i, 2 * i + 1
+        a1, b1 = 2 * ((i + 1) % n), 2 * ((i + 1) % n) + 1
+        faces.append((a0, a1, b1, b0))
+    P.poly("onyx_band", verts, faces, "carved", 0.12)
+    # the marks round the band, each standing on the band, its up turned outward from the mirror
+    rnd = random.Random(seed)
+    k = 0
+    a = 0.0
+    while a < 2 * math.pi - 0.05:
+        ca, sa = math.cos(a), math.sin(a)
+        # the band's centre line here, its outward (radial) and along (tangent) directions in the wall's plane
+        cx_, cy_, cz_ = at(a, 0.36, 0.06)
+        rad = (sx * ca * (rx + 0.36), sy * ca * (rx + 0.36), sa * (rz + 0.36))
+        rl = math.sqrt(rad[0] ** 2 + rad[1] ** 2 + rad[2] ** 2)
+        rad = (rad[0] / rl, rad[1] / rl, rad[2] / rl)
+        tan = (-sx * sa * (rx + 0.36), -sy * sa * (rx + 0.36), ca * (rz + 0.36))
+        tl = math.sqrt(tan[0] ** 2 + tan[1] ** 2 + tan[2] ** 2)
+        tan = (tan[0] / tl, tan[1] / tl, tan[2] / tl)
+        glyph = SCRIPT[rnd.randrange(len(SCRIPT))]
+        w, h = 0.16, 0.24
+        for q, (u0, v0, u1, v1) in enumerate(glyph):
+            p0 = tuple(c + tan[i] * (u0 - 0.5) * w + rad[i] * (v0 - 0.5) * h + (nx, ny, 0.0)[i] * 0.07 for i, c in enumerate((cx_, cy_, cz_)))
+            p1 = tuple(c + tan[i] * (u1 - 0.5) * w + rad[i] * (v1 - 0.5) * h + (nx, ny, 0.0)[i] * 0.07 for i, c in enumerate((cx_, cy_, cz_)))
+            P.tube("onyx_mark%d_%d" % (k, q), [p0, p1], [0.022, 0.022], "lacquer", 4)
+        k += 1
+        a += 0.27 / ((rx + rz) / 2 + 0.36) * 1.6
+    # bosses on the outer ring
+    for i in range(12):
+        P.sphere("onyx_boss%d" % i, at(2 * math.pi * (i + 0.5) / 12, 0.62, 0.16), 0.13, "carved", scale=(1, 1, 1))
 
 
 FACE_TURN = (0.74, 0.67)               # the stair faces turned on the wall to look down the stairs at whoever climbs
@@ -1364,6 +1547,7 @@ STAIR_FACES = ((-8.2, "closed", 3.2), (-12.9, "eyeless", 3.4), (-17.9, "plain", 
 
 def build(root, material):
     P.init(root, material)
+    WORN.append((-2.4, -5.0, -2.4, -20.5, 1.0))                                     # up the cave's stairs
     # the great faces of the stairs first: the wall's columns are cut back where they stand
     wx = STAIR[0] - 0.05
     for i, (y, kind, H) in enumerate(STAIR_FACES):
@@ -1398,10 +1582,8 @@ def build(root, material):
     f = floor_at(STAIR[0] + 0.4, -6.4) or 0.0
     torch("torch0", wx + 0.15, -6.0, f + 2.2, 1.0, 0.0, 120.0)
     for i, (y, kind, H) in enumerate(STAIR_FACES):
-        ty = y - 0.62 * H - 0.25
-        f = floor_at(STAIR[0] + 0.4, ty) or 0.0
         fz = (floor_at(STAIR[0] + 0.4, y) or 0.0) + 0.35 + 0.575 * H
-        torch("torch%d" % (i + 1), wx + 0.15, ty, fz - 0.05 * H, 1.0, 0.0, 125.0)
+        torch("torch%d" % (i + 1), wx + 0.35, y + 0.3, fz + 0.64 * H, FACE_TURN[0], FACE_TURN[1], 140.0)   # above its head
     f = floor_at(STAIR[0] + 0.4, -15.2) or 0.0
     skeleton(wx + 0.3, -15.2, f + 1.5, 1.0, 0.0)
     stairs_cut()

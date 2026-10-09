@@ -607,3 +607,66 @@ The frame's lower half is near-black stumps far from any fire, and the shadow th
   now never goes below that swatch, except in the contacts and the onyx mirror.
 - `cine_check` measured a deep red as black (luminance). Black is now measured as every channel near zero.
 - All three frames pass 9 of 9.
+
+## Derek, 2026-10-09 (after 8b)
+
+"Make the mouth taller s[o] we can walk through it like we are being eaten. The faces have a weird orange squish line,
+make them smooth like they were hand carved to a smooth finish, to offer contrast to the rough walls. Dim the t[orch]es
+by 35% and add the embers and heat shimmer our fire effects have. Add carved runes into the steps"
+
+**Pass 9:**
+- **The maw:** the great face's nose is shortened and its mouth made a maw about three yards tall, its lower lip at the
+  top step. The onyx fills it, and the pilgrim walks in as if being eaten.
+- **Smooth faces:** the orange line was the hard lit lip painted on every turn of a carving, with the chisel strokes.
+  Both are gone. The carvings are one even stone with a soft polish that takes a highlight of the fire, against the
+  rough walls.
+- **The torches** burn at 65%.
+- **Shimmer:** above and round every fire the scene bends a little in whole pixels and the air warms a breath (the
+  game's own method, `radiant_blaze.gdshader`).
+- **Embers:** more of them, some streaking.
+- **The marks:** the builders' script, ten marks of straight strokes, cut in a line along the riser of every throne
+  step. No one living can read it. (Derek said "runes"; the game's word for item runes is "sigil", so these are the
+  builders' marks.)
+
+**Derek, the same hour:** "The mirror in the large mouth is not able to be seen, give it an ornate carved runic stone
+border."
+- The onyx gets a border: two raised rings of smooth carved stone, a flat band between them with the builders' marks cut
+  round it, and twelve bosses on the outer ring.
+- The step candles light it, so the black reads against lit stone (dark on light, the Windmill relation).
+
+**Derek, the same hour:** "Don't make the steps reflective, give them a bit more grit. But worn smooth in the center
+where countless have walked up."
+- The dressed floor's polish glints are gone.
+- More grit and pits are painted on all dressed stone.
+- The scene records each path as a worn line (up the throne's stairs to the mouth; up the cave's stairs), and the
+  painter thins the grit along them and lays the stone a breath paler there. Matte, worn smooth, never reflective.
+
+**Derek, the same hour:** "Here is a good carved face example" (a reference: a serene stone face rising out of rough rock,
+heavy closed lids, a rounded nose, full parted lips, no outline, raked from above); then "Make the face expression more
+one of despair."
+- Every face is now carved by a new model to his reference (`cave3d.serene_depth`):
+  - a rounded head tapering to the jaw, rising out of the rock with no outline (its edge broken by noise, joined to the
+    rock by a smooth maximum);
+  - soft sockets and heavy closed lids, each with a dark crease;
+  - a nose rising to a rounded tip with shadowed nostrils;
+  - full lips and a firm chin.
+- **Despair:**
+  - the inner brows raised and drawn together;
+  - a knot and creases between them, furrows across the middle of the brow;
+  - lids sagging at the outer corners;
+  - the mouth's corners pulled down, the lips parted on a moan;
+  - cheeks hollow under the bone.
+- The kinds stay: closed lids, empty sockets, open eyes, the mouth open (the pool's), the maw.
+
+**The faces were lost in the paint, not the geometry.** Shaded from above in the normal pass they read, despair and all.
+Their fires beside them at mid-height flooded them near front-on. Every face's fire now hangs above its head (the
+reference is lit from above), so the light falls down the face, shadowing the sockets, under the nose and under the
+lip. The painter keeps a little more of the form's turn inside each band. The carved faces paint in a paler, warm ramp
+against the dark walls, and their features are cut 1.7 times deeper.
+
+**Pass 9 results (honest):**
+- **The hall:** the maw is tall, a black gate at the top of the clear stairs, with candles either side. The onyx and its
+  border were moved forward to the lips' plane, but the border still reads only faintly, not yet ornate.
+- **The stairs:** the upper face reads in its light from above: sockets, nose, the mouth pulled down.
+- **The pool:** the three faces (now 3 yd) still do not read; the lit wall shows pale blobs. They are next.
+- Torches at 65%, shimmer and embers, the marks on the risers, gritty steps worn in the centre: all in.

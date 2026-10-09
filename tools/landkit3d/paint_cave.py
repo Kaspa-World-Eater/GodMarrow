@@ -30,6 +30,7 @@ FL = [np.array(c) / 255.0 for c in ((255, 250, 222), (255, 222, 132), (250, 164,
 LMAX = 30.0                                            # the light that is the ramp's top
 ZONES = 6                                              # the bands of a pool of light
 EXPO = 0.2                                             # the fires' reach: pools of light, black between (rule 2)
+R_CARVED = P3.ramp("#120f0f", "#211c1a", "#332b27", "#473c35", "#5d4f45", "#756455", "#8e7b68", "#a8937d")
 R_DUST = P3.ramp("#0e0d10", "#1b191b", "#2a2726", "#3b3734", "#4d4842", "#615a52")
 R_OBS = P3.ramp("#030305", "#07070b", "#0c0d13", "#13151d", "#1c2029")
 
@@ -129,7 +130,7 @@ def paint(d, t=0.0):
     # own turn to the fire and its shadows kept whole inside each band
     Fn = np.clip(np.log1p(F * EXPO) / np.log1p(LMAX * EXPO), 0, 1) ** 1.15
     Fz = np.floor(Fn * ZONES + (dith - 0.5) * 0.08 + 0.5) / ZONES
-    shade = np.clip(light / (F + 1e-6), 0, 1.25) ** 0.8
+    shade = np.clip(light / (F + 1e-6), 0, 1.25) ** 1.05
     # the faint fringe of a pool stays continuous (a carving's turn must still read there), the bands crisp above it
     T = np.maximum(Fz, Fn * 0.75) * shade + amb
     # the shadow is not black but the weak light of everything lit nearby (Gurney); the contacts stay darkest
@@ -156,7 +157,7 @@ def paint(d, t=0.0):
             st_w = vn(along[m] * 5.0 + oh[m] * 13, Z[m] * 0.5) - 0.5
             st_t = vn((X[m] + Y[m]) * 3.0 + oh[m] * 7, (X[m] - Y[m]) * 0.8) - 0.5
             tb = tb + np.where(wall[m], st_w, st_t) * 0.16 * np.clip(tm * 2, 0, 1)
-            if name == "carved":
+            if name == "carved" and False:
                 # the chisel: short parallel strokes in the stone's own plane, turning with the surface (each plane
                 # worked from its own side), seen only where the light rakes them
                 nxm, nym, nzm = n[m][:, 0], n[m][:, 1], n[m][:, 2]
@@ -168,15 +169,38 @@ def paint(d, t=0.0):
                 bite = (vn(X[m] * 23 + Z[m] * 11, Y[m] * 23 - Z[m] * 7) > 0.83) & (tm > 0.25)
                 tb = np.where(bite, tb + 0.08, tb)                     # a fresh bite, paler, where the iron struck
             if name == "dressed":
+                # gritty (Derek: "give them a bit more grit"), but worn smooth where countless feet have climbed
+                wf = np.zeros(int(m.sum()))
+                for (x0, y0, x1, y1, hw) in (d["worn"] if "worn" in d else []):
+                    dx, dy = x1 - x0, y1 - y0
+                    ll = dx * dx + dy * dy + 1e-9
+                    tt = np.clip(((X[m] - x0) * dx + (Y[m] - y0) * dy) / ll, 0, 1)
+                    dd_ = np.hypot(X[m] - x0 - dx * tt, Y[m] - y0 - dy * tt)
+                    wf = np.maximum(wf, np.exp(-(dd_ / hw) ** 2) * (up[m] > 0.6))
+                gk = 1.0 - wf * 0.85
                 grit = vn(X[m] * 37 + Z[m] * 13, Y[m] * 37 - Z[m] * 11)
-                tb = np.where((grit > 0.8) & (tm > 0.15), tb + 0.07, tb)
-                tb = np.where((grit < 0.16) & (tm > 0.1), tb - 0.08, tb)
-                pit = vn(X[m] * 9 + 5, Y[m] * 9 + Z[m] * 9) > 0.84
-                tb = np.where(pit, tb - 0.06, tb)
+                tb = np.where((grit > 0.74) & (tm > 0.12), tb + 0.09 * gk, tb)
+                tb = np.where((grit < 0.22) & (tm > 0.08), tb - 0.1 * gk, tb)
+                grit2 = vn(X[m] * 71 + 3, Y[m] * 71 + Z[m] * 71)
+                tb = np.where((grit2 > 0.8) & (tm > 0.1), tb - 0.06 * gk, tb)
+                pit = vn(X[m] * 9 + 5, Y[m] * 9 + Z[m] * 9) > 0.8
+                tb = np.where(pit, tb - 0.07 * gk, tb)
+                tb = tb + wf * 0.05 * np.clip(tm * 3, 0, 1)             # the worn way a breath paler, matte
+            if name == "carved":
+                # finished smooth by hand (Derek: "make them smooth like they were hand carved to a smooth finish, to offer
+                # contrast to the rough walls"): one even stone, no per-block steps, no strokes, a soft polish
+                tb = tm * 1.02
             if name == "dressed":
                 tooled = wall[m] & (np.abs(_frac(Z[m] * 8.0 + vn(X[m] * 3, Y[m] * 3) * 0.6) - 0.5) < 0.09)
                 tb = np.where(tooled, tb - 0.05 * np.clip(tm * 3, 0, 1), tb) * 1.08
-            col = tone(R["basalt"], tb * 1.05, dith[m], band=0.1)
+            if name == "carved":
+                # the faces are a paler, warmer stone than the rough dark walls, finished smooth (Derek's reference: the
+                # carved face light against the dark broken rock round it; his "contrast to the rough walls")
+                col = tone(R_CARVED, np.clip(tb * 1.15, 0, 0.999), dith[m], band=0.04)
+            else:
+                col = tone(R["basalt"], tb * 1.05, dith[m], band=0.1)
+            if name == "carved":
+                wet[m] = True                                             # the polish takes a highlight of the fire
             # rust weeping down from the joints, in long thin runs
             rust = wall[m] & (vn(along[m] * 7.0 + oh[m] * 31, Z[m] * 0.3) > 0.74) & (oh2[m] > 0.35) & (tm > 0.18)
             col = np.where(rust[:, None], col * 0.55 + tone(R["rust"], tb * 1.2, dith[m]) * 0.45, col)
@@ -186,7 +210,7 @@ def paint(d, t=0.0):
             # wet near the blood: darker and holding glints
             wz = (pool_d[m] < 5.2) & (Z[m] < 1.0)
             col = np.where(wz[:, None], col * 0.82, col)
-            wet[m] = wz | ((name == "dressed") & (up[m] > 0.8) & (vn(X[m] * 0.6, Y[m] * 0.6) > 0.55))
+            wet[m] = wz                                                  # the steps are not reflective (Derek)
         elif name == "cutrock":
             col = tone(R["basalt"], 0.02 + oh[m] * 0.07 + tm * 0.3, dith[m], band=0.05)
             rimc = np.zeros(m.shape, bool)
@@ -287,16 +311,13 @@ def paint(d, t=0.0):
     ndf = np.zeros((gh, gw))
     ndf[:-1, :] += np.linalg.norm(n[1:, :] - n[:-1, :], axis=2)
     ndf[:, :-1] += np.linalg.norm(n[:, 1:] - n[:, :-1], axis=2)
-    edge = (ndf > 0.55) & (mat != 24) & (mat != 26) & (mat != 28)
+    edge = (ndf > 0.55) & (mat != 24) & (mat != 26) & (mat != 28) & (mat != 30)
     up_lip = np.zeros((gh, gw), bool)
     up_lip[1:, :] = T[1:, :] > T[:-1, :] + 0.05
     img = np.where((edge & (T > 0.12))[..., None], np.clip(img * 1.25 + 0.015, 0, 1), img)
     # the carvings defined: their lit lips a step brighter, the far lip of every turn a step darker
     cv_ = (mat == 30)
-    lit_lip = cv_ & (ndf > 0.35) & (T > 0.15)
-    img = np.where(lit_lip[..., None], np.clip(img * 1.35 + 0.02, 0, 1), img)
-    dark_lip = cv_ & (ndf > 0.35) & (T <= 0.15)
-    img = np.where(dark_lip[..., None], img * 0.55, img)
+    # (the hard lit and dark lips on the carvings are gone: Derek saw "a weird orange squish line"; the faces are smooth)
     # glints
     g = spec_glints(d, light, wet)
     img = np.where(g[..., None], np.clip(img * 0.4 + WISP_C * 0.85 * hue / (hue.max(2, keepdims=True) + 1e-9), 0, 1), img)
@@ -490,8 +511,21 @@ def fires(img, d, proj, fk, t):
             layer = np.where(sel[..., None], cols[lv], layer)
         layer = np.where((core & vis)[..., None], FL[0], layer)
         out[sub] = layer
-        # embers: cold sparks flicking up from the fire, twinkling, dying within a yard
-        n_e = 14 if brazier else 7
+        # the heat shimmer (the game's fire method, radiant_blaze.gdshader): above and round the fire the scene behind
+        # bends a little, in whole pixels, and the air glows a breath warm
+        sy0, sy1 = int(min(gh, max(0, sy - hpx * 3.2))), int(min(gh, max(0, sy - hpx * 0.75)))
+        sx0, sx1 = int(max(0, sx - wpx * 1.3)), int(min(gw, sx + wpx * 1.3))
+        if sy1 > sy0 and sx1 > sx0:
+            for yy_ in range(sy0, sy1):
+                hgt = (sy - yy_) / (hpx * 3.2)
+                amp = (1.0 - hgt) * 1.6
+                sh = int(round(math.sin(yy_ * 0.7 + t * 2 * math.pi * 3 + ph * 6) * amp))
+                if sh:
+                    row = out[yy_, sx0:sx1].copy()
+                    out[yy_, sx0:sx1] = np.roll(row, sh, axis=0)
+                out[yy_, sx0:sx1] = np.clip(out[yy_, sx0:sx1] + np.array([0.025, 0.012, 0.0]) * (1 - hgt), 0, 1)
+        # embers: sparks flicking up from the fire, twinkling, dying within a yard or so
+        n_e = 22 if brazier else 11
         for k in range(n_e):
             o1 = float(_hash(np.float64(i * 31 + k), 9.0))
             o2 = float(_hash(np.float64(i * 31 + k), 11.0))
@@ -507,6 +541,8 @@ def fires(img, d, proj, fk, t):
             if (pe * 9.0 + o1 * 5) % 1.0 < 0.22:
                 continue                                                  # it winks out a moment
             out[my, mx] = FL[0] if pe < 0.25 else (FL[1] if pe < 0.55 else FL[3])
+            if k % 3 == 0 and pe < 0.5 and my + 1 < gh:
+                out[my + 1, mx] = FL[2]                                   # a streak: the spark moving fast
     return out
 
 
