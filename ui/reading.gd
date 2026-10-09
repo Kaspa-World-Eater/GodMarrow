@@ -24,17 +24,21 @@ const CH := 252.0
 const STEPS := ["star", "face", "card", "fear", "seek", "road", "ask", "sac", "end"]
 ## what he asks at each step (one of these, each time)
 const PROMPT := {
-	"face": ["Your god you chose at the other fire. But a god wears more than one face, and one of them has been wearing you. Which?",
-		"Three faces on the one god. Look at them. One of them looked back. Which?"],
-	"card": ["Four of the old cards. I will not tell you what is on them. Take one, and we will see which way up you are.",
-		"The deck is older than the Hide. Older than me, nearly. Draw. Do not turn it; I will."],
-	"fear": ["What do you fear? Say it plainly. Down there it will be asked less kindly.",
-		"Everyone brings a fear to my fire. Put yours on the cloth where I can see it."],
-	"seek": ["And what do you go down for?", "Nobody goes down for nothing. What is it for you?"],
-	"road": ["Which road brought you to my fire?", "You came a long way to sit on this stone. Which way?"],
-	"sac": ["A reading is not free. Something stays here with me. What will it be?",
-		"And now the price. Not copper. Something of you. Choose, before I do."],
+	"face": ["Gods keep a few faces for the ones who come asking. Three on the cloth. One of them has been wearing you since before you climbed out. Which?",
+		"Faces. Take the one that looks least surprised to see you."],
+	"card": ["Now one from the deck. Don't turn it. I turn it. If it comes up the wrong way, that's not my fault. That's yours.",
+		"Draw. Gently. They bruise."],
+	"fear": ["What frightens you? Quickly, before you think of something brave.",
+		"Put your fear on the cloth. It's safer there than in you. For a minute."],
+	"seek": ["And what do you go out there for? Everyone says something. It's never true. Say something anyway.",
+		"What do you want? ...No. Under that."],
+	"road": ["You remember a road. You never walked it. Pick one, and it will have been yours.",
+		"Which road brought you? Don't look so lost. Choose, and it brought you."],
+	"sac": ["Now the price. Not coin; you haven't any, and I've no pockets. Something of you stays on this step.",
+		"Something stays with me. Look at the heap. They all leave something."],
 }
+## the end: what he says over the finished spread (docs/wiki/mythology/areas/the-red-shore.md, his lines)
+const END_SAY := "There. That's you. Isn't it horrible? A moment ago you were nothing, and it was so quiet."
 const STEP_NAME := {"star": "The God", "face": "The Face", "card": "The Card", "fear": "The Fear", "seek": "The Seeking",
 	"road": "The Road", "ask": "The Question", "sac": "The Price", "end": "The Reading"}
 ## how a fate's sum reads, in the order it is shown
@@ -153,7 +157,7 @@ func _enter(i: int) -> void:
 			var pool: Array = fit if not fit.is_empty() and randf() < 0.75 else any
 			prophecy = String(pool[randi() % pool.size()]) if not pool.is_empty() else ""
 			_sum()
-			prompt = "That is as much of you as I can see. Go on, then. The dark is expecting you."
+			prompt = END_SAY
 	if PROMPT.has(s):
 		var pv: Array = PROMPT[s]
 		prompt = aside + String(pv[randi() % pv.size()])

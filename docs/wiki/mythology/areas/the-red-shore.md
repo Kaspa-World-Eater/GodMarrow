@@ -158,10 +158,11 @@ basalt cliffs that close the beach, and leaving it, the pilgrim comes out of the
 2. **The stairs.** Steps cut up through the rock, fires in iron holders. On the walls, faces: blunt, distinct, worn; some without eyes, some
    without mouths, some only half cut. On the way up, a skeleton fixed to the wall lets its weapon fall: the starting
    weapon (its kind by class, to be settled later). There are no enemies until the beach.
-3. **The hall.** *(Derek, 2026-10-09: the dark mirror replaces the throne at the top of the stairs; the heap lies at
-   their foot; the lines below that name the throne wait to be reworked to the mirror.)* The Conan tomb, emptied. A throne of black basalt on a dais, with no one in it; the rusted weapons and
-   armour of everyone who came up before heaped before it. Faces all round the walls. The Stranger sits on the dais
-   step beside the throne, never on it.
+3. **The hall.** *(Derek, 2026-10-09: the dark mirror replaces the throne at the top of the stairs; the heaps lie at
+   their foot.)* The Conan tomb, emptied: the rusted weapons and armour of everyone who came up before, heaped at the
+   stair's foot; faces all round the walls; at the top of the stair the great face with the onyx mirror in its mouth.
+   The Stranger stands on the top step beside the mirror, never in front of it. (Derek still calls the stair's head
+   "the throne".)
 4. **The Reading.** He reads the pilgrim's fate with the tarot; the drawing is the character creation (the nine draws,
    `00-the-deep-lore.md`).
 5. **The mirror** (Derek, 2026-10-09: "Give the room no exit. There will be a large mirror the player looks in in a large
@@ -183,59 +184,76 @@ to threads. He has laid this reading for every one who came up the stairs, and i
 things, laughs a moment too long, speaks to the empty throne as if it had said something, and mocks the pilgrim
 gently, because he knows how it ends. Every line is short. He never explains.
 
-**His lines** (in-game writing; drafts to be graded):
+**His lines** (in-game writing, second draft, 2026-10-09; Derek: "come up with some good dialogue better than what you
+shared earlier"). He stands on the top step under the great face, beside the onyx mirror, never in front of it. He
+talks to the pilgrim as to a child who has come home late, and to the great face as to an old man who interrupts.
+Every line is short. He never explains, and he is never quite wrong.
 
-*As the pilgrim comes up into the hall:*
-- "Ah. Up you come. Up they always come, steaming."
-- "You're dripping on the floor. Not my floor. His." *(He tips his head at the empty throne.)* "He doesn't mind. He
-  doesn't mind anything."
+*As the pilgrim climbs into sight (one of):*
+- "There you are. Still warm from it. Mind the steps; they're older than walking."
+- "Up, up. The first ones crawled the whole way. You're walking already. Show-off."
+- "Another one out of the pot."
 
-*If the pilgrim stops at the faces:*
-- "You're looking at the faces. Everyone looks at the faces."
-- "Four hundred and nine. I counted them, the first winter. The second winter I counted again and there were none.
-  Only stone. Only you, looking." *(He laughs, and goes on laughing after it stops being a laugh.)*
-- "Which one's looking back? That one? ...Yes. They all pick that one."
+*The first time the pilgrim speaks to him:*
+1. "Don't wipe it off. It's the only thing you're wearing that's yours."
+2. "You came up out of the Red with nothing in your mouth. No name. No god. No reason. That won't do. He won't let
+   you through like that." *(He tips his head back at the great face without looking at it.)*
+3. "Sit. The floor's fine. Everyone sits on the floor here. He's the only one with a seat, and he hasn't the body for
+   it."
+4. "I have a deck. It was old when the god was young, and it's missing cards nobody remembers. We'll find out who you
+   are. Or we'll decide. From the outside it looks the same."
 
-*If the pilgrim looks at the throne:*
-- "Don't sit in it. Don't stand where it can see you." *(Quietly, to the throne:)* "No. Not this one. Not yet."
-- "Empty? Of course it's empty. Nobody sits there. Nobody has always sat there."
-- "One day someone will want it. They all want it, at the end. I keep the cushion warm."
+*What the pilgrim can say:*
+- **"Read me."** "Good. Hands where I can see them. Not for me. For them." *(The Reading begins.)*
+- **"Who are you?"** "Me? I'm the one who's here when you come up. That's the whole of me. I had a name once. I dealt
+  it to someone. Lovely girl. Didn't last."
+- **"What is this place?"** "A room somebody cut for something. They cut all those faces so it wouldn't be lonely. It
+  didn't work. Ask the faces. They've been listening longer than I have."
+- **"What is that?"** *(the mirror)* "A door. A mouth. A bad mirror. Whatever you like. It doesn't mind. It doesn't
+  do anything. That's what's wrong with it."
+- **"Choose for me."** "Lazy. Good. The ones who choose everything take so long." *(He reads it all himself.)*
 
-*If the pilgrim looks at the heap of weapons:*
-- "Gifts. Everyone who came up the stairs left something at His feet. Most left what they were holding."
-- "One left her teeth. I didn't ask."
-
-*When the skeleton's weapon falls, on the stairs below (his voice carries up):*
-- "Take it. He won't miss it. He's been holding it out for a hundred years. His arm must be numb."
-
-*The offer:*
-- "Sit. On the floor, with me. Kings stand, and you're not one. Not yet."
-- "You came up out of the Red with no name in your mouth. Shall I find you one?"
-- "Your fortune, little wet thing. Your fate. Your sentence. It's all the same card."
-
-*As he shuffles:*
-- "Listen. They're whispering. They decided before you were warm. They just like to be asked."
-
-*The nine draws, a line for each (others to be written so they never repeat in one reading):*
-1. **A god:** "Whose are you? Pick a god. Any god. They're all the same god, wearing a different mouth." *After:*
-   "That one. He'll be so pleased. He won't remember you."
-2. **A face:** "Now a face. You'll need one. Yours is still in the pool." *After:* "It suits you. Wear it carefully.
-   The last one wore it thin."
-3. **The card:** upright: "Upright. How hopeful. How early." Reversed: "Reversed. You never could hold that one the
-   right way up."
-4. **A fear:** "What frightens you? Don't say. It's on the card already. It's been on the card for years."
-5. **A seeking:** "And what are you looking for? ...It's looking for you too. It's much better at it."
-6. **A road:** "Your road. There's only the one road. But it's polite to pretend."
-7. **A question:** "Ask it. Quietly." *(He listens to nothing for too long.)* "No. I won't tell you that. You'd laugh.
-   I laughed."
-8. **A price:** "And the price. You'll pay it. Everyone pays it. Some of them pay it coming and going."
+*The Reading* (each of the nine draws, `00-the-deep-lore.md`; the game picks one line a draw):
+1. **The god** (chosen at the order's page; he only turns it over): "Your god. You picked it before you were born,
+   which is the only time anyone picks well."
+2. **The face:** "Gods keep a few faces for the ones who come asking. Three on the cloth. One of them has been wearing
+   you since before you climbed out. Which?" / "Faces. Take the one that looks least surprised to see you."
+3. **The card:** "Now one from the deck. Don't turn it. I turn it. If it comes up the wrong way, that's not my fault.
+   That's yours." / "Draw. Gently. They bruise."
+4. **The fear:** "What frightens you? Quickly, before you think of something brave." / "Put your fear on the cloth.
+   It's safer there than in you. For a minute."
+5. **The seeking:** "And what do you go out there for? Everyone says something. It's never true. Say something
+   anyway." / "What do you want? ...No. Under that."
+6. **The road:** "You remember a road. You never walked it. Pick one, and it will have been yours." / "Which road
+   brought you? Don't look so lost. Choose, and it brought you."
+7. **The question:** "One question. I always ask one. It's the only one that matters, and you won't know which it was."
+8. **The price:** "Now the price. Not coin; you haven't any, and I've no pockets. Something of you stays on this step." /
+   "Something stays with me. Look at the heap. They all leave something."
 9. **The reading:** "There. That's you." *(He looks at the cards a long time.)* "Isn't it horrible? A moment ago you
    were nothing, and it was so quiet."
 
-*At the door:*
-- "The light will hurt. It's only the day."
-- "Out there everything will tell you who you are. The sand's full of the ones who listened."
-- *(As the pilgrim goes, not looking up:)* "You'll come back down. They always come back down. I'll keep your place."
+*Spoken to the great face, now and then, not to the pilgrim:*
+- "No. This one's mine till the cards are down. ...Yes. I know."
+- "He can hear you. Of course he can hear you. Stop it."
+- "You said that about the last one." *(A long pause.)* "Well. You were right about the last one."
+
+*After the Reading, if the pilgrim lingers (one of):*
+- "Still here? Walk into it. No, don't knock. It's rude to knock on a mouth."
+- "You'll come out on the sand. Don't count them. I did, once. It took a winter, and then the sea brought more."
+- "If you find yourself out there, face down in the red, don't turn it over. Bad luck. For it."
+- "Four hundred and nine faces. I counted them the first winter. The second winter there were none. Only stone. Only
+  you, looking."
+
+*If the pilgrim looks at the heaps at the stair's foot:*
+- "Gifts. Everyone who came up left something. Most of them left what they were holding."
+- "One left her teeth. I didn't ask."
+
+*When the skeleton's weapon falls, on the stairs below (his voice carries up):*
+- "Take it. He won't miss it. He's held it out for a hundred years. His arm must be numb."
+
+*As the pilgrim walks into the mirror (he does not look up):*
+- "Don't look back. Not because it's forbidden. Because there's nothing to see, and you'll mind."
+- "Go on. I'll keep your place."
 
 ## For building it
 
