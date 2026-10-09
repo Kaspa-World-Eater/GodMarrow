@@ -581,3 +581,36 @@ and the camera cannot honestly see.
 - the pixel scale question (Derek: "why does it look so pixely?");
 - the Red's true heartbeat loop in the game;
 - the bluffs zone the cleft leads to.
+
+## Rules check, after the cove shipped (2026-10-09)
+
+`MASTER_RULES`, the painted standard and the cinematography chapter are unchanged since my last reading. Read again: the
+area page (the bands; the Red's heartbeat and viscosity; Derek's blood rivers for later).
+
+**The checklist, in the game:**
+1. **Brief:** passes; the footprints, the dead in the Red, the bone jam, the shrine with its line of worn tools.
+2. **Scale:** passes; the Ossuarch at the game's own scale.
+3. **Form:** passes; all of it is 3D form, baked.
+4. **Light:** the zone's ambience fixed; the paint's baked shadows are poor (Derek: later).
+5. **Values:** the cove reads; the bone jam is the brightest thing on the sand.
+6. **Ramps:** pass.
+7. **Paint:** strokes, grit and stone are in. The open question is the **pixel scale** (Derek: "why does it look so
+   pixely?"):
+   - the 4 px art grid (rule 7);
+   - a camera zoom of 1.06, so art pixels land on 4.24 screen pixels, unevenly;
+   - the pilgrim drawn far finer than the ground.
+8. **Contact:** passes.
+9. **Detail where it counts:** the shrine, the canoes and the cairns are small at this scale.
+10. **Life:** the Red heaves on the heartbeat in the game (the shader's approximation).
+11. **Seen as the player sees it:** done, in the game.
+12. **Skeptic round:** the pixel scale and the baked shadows are the largest differences from the best pieces.
+13. **Cinematography:** not re-measured in the game.
+
+**Worst failure I can act on without Derek's choice:** the pixel scale. He has to choose, so I give him the evidence:
+the same view at the current 4 px grid and at a 2 px grid, side by side, at the game's screen size.
+
+**The pixel A/B** (on the review page, item `pixel_ab`): the cove's start rendered twice at the game's 1920 x 1080 with
+the Ossuarch at true size, the ground on the 4 px grid (as baked) and on a 2 px grid (`blend_scene --zoom 2`, the same
+painter). At 2 px the bones show their grain, cracks and knuckles, the dead have shape, the strokes are fine, and the
+ground's detail matches the pilgrim's sprite. My recommendation: the 2 px grid (it amends painted standard rule 7). It
+waits for Derek's choice.
