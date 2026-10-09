@@ -161,6 +161,35 @@ def paint(d):
         elif name == "lacquer":
             col = lacquer_paint(m, t, along, Z, W, dith)
             col = keeper_account(col, m, t, X, Y, Z, n, dith)
+        elif name == "basalt":
+            # columnar basalt: near black, each column its own small step of tone (the cooling made each its own), lit
+            # where the key catches a face; below the splash line wet and red-black; grey-green lichen on the dry high
+            # faces that look up; the joints' gaps dark
+            cid = np.floor(X[m] * 1.6) * 7.0 + np.floor(Y[m] * 1.6) * 13.0
+            hv = _frac(np.sin(cid * 12.9898) * 43758.5453)
+            # the faces in strong planes by their turn to the light (the face toward the viewer's left catches the
+            # sky, the one toward the right is in the cliff's own shade, the tops take the most), each column a step
+            # of its own
+            nx_, ny_ = n[m][:, 0], n[m][:, 1]
+            plane = np.where(up[m] > 0.6, 0.62, np.where(ny_ > np.abs(nx_) * 0.6, 0.42, 0.2))
+            tb = plane * (0.75 + 0.5 * np.clip(t, 0, 0.6)) + (hv - 0.5) * 0.1
+            # rain has run down every face from the joints and tops, in dark vertical streaks
+            streak = (up[m] < 0.4) & (vn(X[m] * 9.0 + Y[m] * 9.0, Z[m] * 0.35) > 0.66)
+            tb = np.where(streak, tb - 0.09, tb)
+            col = tone(R["basalt"], tb, dith[m], band=0.08)
+            # the arris toward the viewer catches the light: a thin lit line down each column's front corner
+            ar = np.zeros(m.shape, bool)
+            ar[m] = (up[m] < 0.4) & (ny_ > 0.2)
+            arris = ar & ~np.roll(ar, 1, axis=1) & np.roll(mat == 20, 1, axis=1)
+            col = np.where(arris[m][:, None], tone(R["basalt"], tb + 0.22, dith[m]), col)
+            s_b = -(X[m] + Y[m]) / np.sqrt(2)
+            splash = Z[m] < 0.6 + 1.6 * np.clip((s_b - 60.0) / 6.0, 0, 1) + 0.3 * vn(X[m] * 2.0, Y[m] * 2.0)
+            col = np.where(splash[:, None], tone(R["blood"], tb * 0.9, dith[m]) * 0.6 + tone(R["basalt"], tb * 0.8, dith[m]) * 0.4, col)
+            # lichen in small pale crusts, grey-green and a few rust-orange, on the dry upper faces
+            lich = (Z[m] > 2.0) & (vn(X[m] * 7.0 + Z[m] * 3.0, Y[m] * 7.0 - Z[m] * 3.0) > 0.78) & (vn(X[m] * 23.0, Z[m] * 23.0) > 0.5)
+            orange = vn(X[m] * 2.0 + 5, Y[m] * 2.0) > 0.7
+            lc = np.where(orange[:, None], np.array([0.42, 0.26, 0.14]), np.array([0.40, 0.42, 0.36]))
+            col = np.where(lich[:, None], col * 0.4 + lc * 0.6 * (0.55 + tb[:, None]), col)
         elif name == "blood":
             global Fm_ground_mask
             Fm_ground_mask = mat == 1
