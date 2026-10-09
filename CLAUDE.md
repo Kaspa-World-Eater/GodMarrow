@@ -14,6 +14,8 @@ our own version.
   - `docs/MASTER_RULES.md`: its gate comes first, a written rules check before any new piece;
   - the area's lore in `docs/wiki/mythology/areas/`;
   - `docs/PAINTED_STANDARD.md`;
+  - `docs/CINEMATOGRAPHY.md`: depth, light and atmosphere, the rules every frame is measured by
+    (`tools/landkit3d/cine_check.py`);
   - the art library in `tools/art_study/library/`, with its chapters and reports.
 - **Lore:**
   - `docs/wiki/mythology/README.md`: the makers' bible, and how it is written;

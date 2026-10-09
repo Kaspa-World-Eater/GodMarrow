@@ -35,8 +35,10 @@ No check written, no work begun.
 | **The area's review page and its notes** | Derek's grades and words on every piece so far (read them with ArtifactData) |
 | `docs/wiki/06-art-direction.md` | The look: camera and scale, light and the dark, each land's look, figures |
 | `docs/PAINTED_STANDARD.md` | How every pixel gets its colour |
+| **`docs/CINEMATOGRAPHY.md`** | How light composes every frame: depth, atmosphere, wonder; run `cine_check.py` on every render |
 | `docs/wiki/07-art-pipelines.md` | Which road makes the piece (the 3D road, the height engine, a baked land, a set, a character) and what was rejected |
 | **`tools/art_study/library/`** (index: `library/README.md`) | THE TECHNIQUE LIBRARY: methods, environments, objects; how each thing is made, what worked, what failed, the code. Read the pages for the piece first |
+| **Chapter 12, cinematography** (`tools/art_study/chapters/12-cinematography-atmosphere-wonder.md`) | Every piece: how light composes the frame, why darkness makes wonder (section 0c) |
 | **`tools/art_study/chapters/`** and **`tools/art_study/reports/`** | Studies of the real world with recipes (one per subject), and one report per finished piece. Read every chapter and report that touches the piece |
 | `tools/art_study/LIVING_LANDSCAPES.md`, `tools/art_study/ecosystems/` | How a land grows from a seed (causes first); each ecosystem's species, life and transitions |
 | `docs/wiki/01-rules-and-decisions.md` | The game's laws (words, light, lore, no animals) and the dated decision log |
@@ -73,6 +75,46 @@ No check written, no work begun.
      surface keeps its height by cause in one shared function, meshed in Blender and read by the painter
      (`tools/landkit3d/floor3d.py`), so the floor and the forms on it are one world.
    - **Never blur normals** into pillows.
+
+## 0c. CINEMATOGRAPHY: light composes every frame (Derek, 2026-10-09)
+
+"There's no cinematography. No. Ambiance. It doesn't inspire wonder." "Study cinematography again ... Add it to the
+rules why it's important."
+
+**Why it matters:**
+- The player feels a frame before they see it. Light decides what that feeling is: where the eye goes first, what is
+  hidden, how big, how old and how alone a place is.
+- A scene with perfect form and material is still dead when light falls evenly on everything (the opening cave, pass 4:
+  every column the same, nothing leading the eye, nothing withheld, no visible source).
+- Wonder is not detail. It is scale shown against something small, the unknown kept in the dark, and one thing lit so
+  the mind fills in the rest (Burke's sublime).
+- **Our camera is fixed** (Diablo II's iso, one zoom), so the set and the light must do all the composing a
+  cinematographer does with the camera. Every room is designed as a sequence of frames the player walks through.
+
+**Its own chapter: `docs/CINEMATOGRAPHY.md`** (Derek: "applied to the rules with its own very specific chapter"): why it
+matters, how a room is made before any form is built (image words, a value thumbnail, lights on the floor plan, the
+reveal), and 39 rules each testable on a still frame. The measurable ones are checked on every render by
+`tools/landkit3d/cine_check.py`, and its report goes in the pass log. The study is chapter 12; the full research with
+every quote is `tools/art_study/private/cinematography_research.md`. The rules in brief:
+1. **One subject per frame, and it is the brightest thing.** Light it first; every other light is weaker by at least
+   half.
+2. **Pools of light with black between.** Lights die within a few yards. Indoors and underground there is no fill and
+   almost no ambient (about 0.08); a chain of pools leads the walk.
+3. **Every source is seen:** the flame, its holder, its glow on the wall behind it.
+4. **Texture only where light grazes.** Roughness shows on the lit side of a pool and vanishes in the black, so it must
+   be real form.
+5. **Silhouette and rim:** what stands before a light is a dark shape with a lit edge; near-black foreground mass
+   frames the frame.
+6. **Depth by value, never by fog:** near silhouette, lit middle, far black, and a far light that says the space goes
+   on.
+7. **Withhold:** the roof unseen, columns rising past the light, stairs and heaps running into the dark, half a face
+   lit.
+8. **Scale against the small:** the pilgrim and human things beside every big form.
+9. **Each room has its colour of light,** and the colour changes as the walk goes deeper.
+10. **The light moves slowly:** flames swell and gutter, shadows breathe on carvings so they seem to move; never strobe.
+11. **The reveal is designed:** narrow to wide, dark to the subject lit.
+12. **Mood by what lies where:** forlorn is what the absent left; ancient is wear and unfinished work; mystical is light
+    with an uncanny source.
 
 ## 0b. Locked techniques (keep or improve only; one shared place each)
 
@@ -190,6 +232,19 @@ means that they always need to be perfect. All this will become assets for the g
 11. **Seen as the player sees it:** the game's camera, zoom and lighting, with the Ossuarch for scale. For anything
     going into the game, a capture in the game itself; no visible repeat.
 12. **Skeptic round:** side by side with the best pieces; the worst difference fixed first.
+13. **Cinematography (section 0c, `docs/CINEMATOGRAPHY.md`; `cine_check.py`'s report pasted in the log):**
+    - one subject, brightest;
+    - pools with black between;
+    - every source seen;
+    - texture only where light grazes;
+    - silhouettes and rims;
+    - depth by value;
+    - something withheld;
+    - scale against the small;
+    - the room's colour of light;
+    - slow moving light;
+    - the reveal designed;
+    - the mood (forlorn, ancient, mystical) told by what lies where.
 
 ## 5. The world: scale, objects, ecosystems
 

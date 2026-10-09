@@ -163,3 +163,109 @@ and need their own pass (deeper carving, bigger, lit from the side by the torche
 **Rules check paused** (2026-10-09): the third reminder with no word from Derek, so the reminder is off by his pause
 rule until he next writes. **Next when work resumes:** the faces' own pass (deeper carving, bigger, lit from the side),
 then the hall at the game's scale.
+
+## Derek, 2026-10-09 (after pass 4)
+
+His notes on the cave:
+- "The cave looks too blocks not enough painted look, lacks fine details is too brightly lit. The floor and walls aren't
+  rough enough, I don't see the faces, it doesn't give mystical ancient and forlorn vibes."
+- "There's no cinematography. No. Ambiance. It doesn't inspire wonder."
+- "The basalt is too uniform."
+- "Study cinematography again ... Add it to the rules why it's important."
+- "Depth and lighting in atmosphere and cinematog[raphy are] very incredibly important for everything we do."
+- "The throne sucks too. Add some mirrors as well."
+- "The wisp light flame should be white blue. Flickering ethereal."
+
+## The study first
+
+- **Chapter 12** (cinematography, atmosphere, wonder) and a deeper second round of research
+  (`tools/art_study/private/cinematography_research.md`).
+- **Bound as its own rules chapter,** `docs/CINEMATOGRAPHY.md`: 39 rules, `MASTER_RULES` 0c, checklist line 13.
+- **`tools/landkit3d/cine_check.py`** measures the testable rules on every render.
+- **Its verdict on pass 4's stairs:** the brightness spread over 152 places, the even, sourceless light Derek saw.
+
+## Pass 5: the cave remade by chapter 12
+
+**The light** (`tools/landkit3d/paint_cave.py`, the cave's own painter):
+- The light is the lamps. Tone comes from the light that truly reaches each surface, on a logarithmic curve, so a
+  carving's turn to or from a fire stays readable beside the flame.
+- Pools of light with black between them. The shadow sits a step above black (Gurney), the contacts darkest.
+- Dither and paper tooth fade with the light (quiet darks). The render runs at 128 samples, with the light's hue
+  smoothed (no red specks).
+- **Every source is seen:** the wisp flames are painted at their lamps:
+  - white heart, pale cyan, cold blue body, the edge half there;
+  - each on its own breath, swaying, tongues tearing off;
+  - an aura only on the stone near it, and cold motes rising and dying within a yard.
+
+  A brazier burns as a bowl of tongues.
+- Glints toward the fires on the wet stone near the pool and on the worn floor.
+
+**The basalt, not uniform** (`cliff3d.seeds`, `cells`, `rough_prism`, `chunk`):
+- Every column is a cell of a power diagram of every girth, thick in the colonnade and thin where the rock cooled fast.
+- Drums of uneven height with cupped or domed joints. Faces spalled and bellied, arrises worn round and chipped, flakes
+  gone.
+- The tall walls break at four or five yards into the entablature's thin crooked columns, rising out of the light.
+- At the walls' feet: breakdown, fallen drums lying among the stumps, and grit.
+- Each column has its own value step by the object pass (`blend_scene` now writes object ids), laid in vertical strokes,
+  with rust running from the joints and pale zeolite in the crevices.
+
+**The faces** (`cave3d.relief`, `face_depth`):
+- Recarved to be read from far off in the dark, as the Bayon's faces at Angkor and the moai are: a brow that is a
+  shelf, sockets cut deep enough to hold black, a long nose, the cheek falling away under the bone, a Bayon smile or no
+  mouth.
+- Kinds:
+  - the half face, left unfinished in hewn planes;
+  - the eyeless;
+  - the sleeping Bayon face;
+  - the blind;
+  - the effaced, chiselled off by someone.
+- **The stair faces,** each 2.3 to 2.6 yd (taller than the pilgrim):
+  - turned on the wall to look down the stairs at whoever climbs, since square to the wall they were seen in profile;
+  - each rising out of a bulge of the living rock, its rim sloping back so it never stands in a box;
+  - each raked by its own wisp-fire from its up-stair side at the brow's height.
+
+**The throne** (Derek: "The throne sucks too"):
+- Bomarzo's Orcus is the real thing: the giant face in the Sacro Bosco whose open mouth holds a seat. The empty throne
+  sits in the mouth of a face eight yards tall, cut into the raw columns at the head of the nave. Whoever sits on it
+  sits in the god's mouth.
+- A dais of five worn steps; the seat too big for a man; an iron circlet left on it.
+- Chains hang out of the dark into the mouth.
+- Two braziers burn low beside the dais, the hall's brightest fires, lighting the face from below (sinister, saint11).
+  Its crown fades into the unseen roof (withhold).
+- The heap of everything left by the ones before spills down the steps: swords driven in, helms, shields, skulls,
+  spears leaning, rotted cloth.
+- The Stranger's wax and cards on the step.
+
+**The mirrors:**
+- Four dark mirrors of obsidian in rings of dressed stone, human teeth set round them, two at each side of the hall.
+- A wisp candle stands before each, placed on the camera's reflected ray, so the mirror holds a second flame.
+- `blend_scene.mirror_pass` renders what each mirror sees: every surface gives off its own position as light and the
+  mirror is perfect gloss. The painter finds that point in the frame.
+- The pilgrim has no reflection. This is deliberate, and Derek can overrule it.
+
+**Also:**
+- The hall's flags made great, some cracked through or missing, dust drifted where no foot goes.
+- The stair treads cupped, their nosings worn, dust against the risers.
+- Two dim torches only at the hall's ends, so its edges are found, not lit.
+
+**Bugs fixed:**
+- `P.sphere` objects turned with `rotation_euler` swung round the world's origin, flinging shields 19 yd up; spheres now
+  take `rot`, turned about their own centre.
+- Python's `hash()` on strings differs every run, so the columns changed between renders; it is now `zlib.crc32`.
+
+**`cine_check`:**
+- The hall passes 8 of 9. Rule 22 fails on the measure: the face's crown is kept dark on purpose, so the top band is
+  dark.
+- The stairs pass 9 of 9.
+
+**Grade:**
+- The hall is B-: a real composition. The face reads as a face from across the hall; the throne in its mouth is the
+  subject; the pillars frame it in silhouette; the mirrors catch the fires.
+- The stairs are C+.
+- The pool chamber is C.
+
+**Still short:**
+- The heap reads as a murky mass, not a heap of things.
+- The colossal face's planes are still crude (its brow reads as a band), and the stair faces are small at this zoom.
+- The pool's surface is blotchy.
+- The flags and the cut-rock mass in the foreground are plain.

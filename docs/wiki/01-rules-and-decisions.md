@@ -154,6 +154,20 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09, cinematography is a rule (Derek, on the cave):**
+  - His words: "too blocks not enough painted look, lacks fine details is too brightly lit ... I don't see the faces,
+    it doesn't give mystical ancient and forlorn vibes"; "There's no cinematography. No. Ambiance. It doesn't inspire
+    wonder"; "The basalt is too uniform"; "The throne sucks too. Add some mirrors as well."
+  - The study is chapter 12 of the art library.
+  - The rules and why they matter are in `MASTER_RULES` section 0c, with a checklist line (13):
+    - one subject, brightest;
+    - pools of light with black between;
+    - every source seen;
+    - texture only where light grazes;
+    - depth by value;
+    - withhold;
+    - the reveal designed.
+  - Mirrors join the cave as ancient dark mirrors, obsidian and bronze, that throw back only the flames.
 - **2026-10-09, Derek's grades on the Red Shore page:**
   - The cave, D: "Make it bigger, more defined, darker, glowing red near the pool, way way way more detail. The only
     light after the pool comes from the wisp fire torches." The red glow at the pool is an exception to the no-red-light

@@ -4,6 +4,7 @@ radius per point (horns, serpents, roots, rods), and spheres. Materials by name 
 import bpy
 import bmesh
 import math
+import zlib
 from mathutils import Vector, Matrix
 
 ROOT = None
@@ -13,7 +14,7 @@ MATS = {"ground": 1, "stucco": 2, "brick": 3, "stone": 4, "lacquer": 5, "gold": 
         "iron": 10, "bone": 11, "moss": 12, "cloth": 13, "straw": 14, "water": 15,
         "boxpaint": 16, "blood": 17, "hide": 18, "cedar": 19, "basalt": 20, "ash": 21, "kelp": 22,
         "corpse": 23, "pool": 24, "rust": 25, "cutrock": 26,
-        "dressed": 27}
+        "dressed": 27, "mirror": 28, "flame": 29}
 
 
 def init(root, material):
@@ -25,7 +26,14 @@ def _link(name, mesh, mat):
     o = bpy.data.objects.new(name, mesh)
     bpy.context.scene.collection.objects.link(o)
     o.parent = ROOT
-    mesh.materials.append(MAT(mat, MATS[mat]))
+    o.pass_index = zlib.crc32(name.encode()) % 32000 + 1          # each object its own id (the object pass: every
+    mesh.materials.append(MAT(mat, MATS[mat]))                   # column its own tone, every block its own stain)
+    if mat == "flame":
+        # a flame is light, not stone: unseen by the camera (its look is painted, an effect), casting nothing, but
+        # seen in a mirror, so the dark mirrors hold the fires
+        o.visible_camera = False
+        o.visible_shadow = False
+        o.visible_diffuse = False
     return o
 
 
@@ -109,11 +117,15 @@ def tube(name, pts, radii, mat, sides=8, cap=True):
     return o
 
 
-def sphere(name, c, r, mat, scale=(1, 1, 1)):
+def sphere(name, c, r, mat, scale=(1, 1, 1), rot=None):
+    """a sphere squashed by scale, turned by rot (x, y, z radians) about its own centre, at c"""
     me = bpy.data.meshes.new(name)
     bm = bmesh.new()
     bmesh.ops.create_uvsphere(bm, u_segments=14, v_segments=9, radius=1.0)
     bmesh.ops.scale(bm, vec=Vector(scale) * r, verts=bm.verts)
+    if rot:
+        from mathutils import Euler
+        bmesh.ops.rotate(bm, cent=Vector((0, 0, 0)), matrix=Euler(rot).to_matrix(), verts=bm.verts)
     bmesh.ops.translate(bm, vec=Vector(c), verts=bm.verts)
     bm.to_mesh(me)
     bm.free()
@@ -136,4 +148,14 @@ def displace(o, strength=0.05, size=0.4, subdiv=2):
     d.texture = t
     d.strength = strength
     d.texture_coords = "GLOBAL"
+    return o
+
+
+def outward(o):
+    """turn every face of a closed mesh outward (a mesh built from points can come out inside-out)"""
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(o.data)
+    bm.free()
     return o

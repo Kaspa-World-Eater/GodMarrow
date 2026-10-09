@@ -56,6 +56,8 @@ how the art is made is page 07. This page is the look itself and the reasons for
   - Restraint: take light away rather than add it.
   - The brightest spot leads the eye.
   - Moving light makes a frame alive, but there is no strobing: flames swell and gutter slowly.
+  - The full rules and their reasons: `docs/MASTER_RULES.md` section 0c and chapter 12 of the art library (Derek,
+    2026-10-09: "There's no cinematography. No. Ambiance. It doesn't inspire wonder").
 - **The first area is almost always overcast:** flat grey-green light, wet surfaces, soft shadows.
 
 ## 4. Paint (the painted standard, in short)

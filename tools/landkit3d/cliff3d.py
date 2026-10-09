@@ -8,6 +8,7 @@ by its cause: the wall standing tall inland of the beach's end, broken down towa
 standing in the surf where the sea has cut it. Every column is crossed by joints (a real gap a few hundredths wide)
 every yard or so; its top flat or gently cupped (the cupped ones at the foot hold the blood)."""
 import math
+import zlib
 import random
 import numpy as np
 import parts3d as P
@@ -76,7 +77,7 @@ def prism(name, pts, z0, z1, mat, cup=0.0, lean=(0.0, 0.0), broken=0.0, proud=(0
     back. Its top flat, gently cupped, or broken off at a slant (broken > 0 is the slant's drop, in yards)"""
     n = len(pts)
     verts, faces = [], []
-    rnd = random.Random(hash(name) % 100000)
+    rnd = random.Random(zlib.crc32(name.encode()) % 100000)
     cx0 = sum(p[0] for p in pts) / n + proud[0]
     cy0 = sum(p[1] for p in pts) / n + proud[1]
     rel = [(x - (cx0 - proud[0]), y - (cy0 - proud[1])) for x, y in pts]
@@ -174,3 +175,202 @@ def build(root, material):
     RW.things()
     RW.floating()
     cliffs()
+
+
+# ---- columns that are not uniform (Derek, 2026-10-09: "The basalt is too uniform"; chapter 12, section 5) ----
+
+def seeds(x0, x1, y0, y1, radius, keep, seed=7):
+    """column centres by dart throwing, each with its own radius from radius(x, y) (the cooling decided each column's
+    girth: thick in the colonnade, thin where it cooled fast), packed so no two overlap; keep(x, y) says where columns
+    are wanted at all"""
+    rnd = random.Random(seed)
+    cell = 0.25
+    grid = {}
+    pts = []
+    tries = int((x1 - x0) * (y1 - y0) * 22)
+    reach = int(math.ceil(2.4 / cell))
+    for _ in range(tries):
+        x, y = rnd.uniform(x0, x1), rnd.uniform(y0, y1)
+        if not keep(x, y):
+            continue
+        r = radius(x, y)
+        gi, gj = int(math.floor(x / cell)), int(math.floor(y / cell))
+        ok = True
+        for i in range(gi - reach, gi + reach + 1):
+            for j in range(gj - reach, gj + reach + 1):
+                for (px, py, pr) in grid.get((i, j), ()):
+                    if (px - x) ** 2 + (py - y) ** 2 < (0.86 * (r + pr)) ** 2:
+                        ok = False
+                        break
+                if not ok:
+                    break
+            if not ok:
+                break
+        if ok:
+            grid.setdefault((gi, gj), []).append((x, y, r))
+            pts.append((x, y, r))
+    return pts
+
+
+def _clip(poly, mx, my, dx, dy):
+    """keep the side of the line through (mx, my), normal (dx, dy), that the seed is on"""
+    res = []
+    n = len(poly)
+    for i in range(n):
+        a, b = poly[i], poly[(i + 1) % n]
+        da = (a[0] - mx) * dx + (a[1] - my) * dy
+        db = (b[0] - mx) * dx + (b[1] - my) * dy
+        if da <= 0:
+            res.append(a)
+        if (da <= 0) != (db <= 0):
+            t = da / (da - db)
+            res.append((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t))
+    return res
+
+
+def cells(pts, gap=0.03):
+    """each seed's cell of the power diagram (a Voronoi weighted by each column's own girth): the polygons pack tight
+    with every size of column, 4 to 8 sided as the real ones; each shrunk by a joint's gap"""
+    grid = {}
+    for k, (x, y, r) in enumerate(pts):
+        grid.setdefault((int(math.floor(x)), int(math.floor(y))), []).append(k)
+    out = []
+    for k, (x, y, r) in enumerate(pts):
+        poly = [(x - 2.5, y - 2.5), (x + 2.5, y - 2.5), (x + 2.5, y + 2.5), (x - 2.5, y + 2.5)]
+        gi, gj = int(math.floor(x)), int(math.floor(y))
+        for i in range(gi - 3, gi + 4):
+            for j in range(gj - 3, gj + 4):
+                for q in grid.get((i, j), ()):
+                    if q == k or not poly:
+                        continue
+                    qx, qy, qr = pts[q]
+                    dx, dy = qx - x, qy - y
+                    d2 = dx * dx + dy * dy
+                    if d2 > 9.0:
+                        continue
+                    # the power bisector: |p - a|^2 - ra^2 = |p - b|^2 - rb^2
+                    c = (d2 + r * r - qr * qr) / (2.0 * d2)
+                    poly = _clip(poly, x + dx * c, y + dy * c, dx, dy)
+        if len(poly) < 3:
+            continue
+        cx = sum(p[0] for p in poly) / len(poly)
+        cy = sum(p[1] for p in poly) / len(poly)
+        sh = []
+        for (px, py) in poly:
+            dx, dy = px - cx, py - cy
+            L = math.hypot(dx, dy) + 1e-9
+            sh.append((px - dx / L * gap, py - dy / L * gap))
+        merged = []
+        for p in sh:
+            if not merged or math.hypot(p[0] - merged[-1][0], p[1] - merged[-1][1]) > 0.09:
+                merged.append(p)
+        if len(merged) > 3 and math.hypot(merged[0][0] - merged[-1][0], merged[0][1] - merged[-1][1]) < 0.09:
+            merged.pop()
+        if len(merged) >= 3:
+            out.append((k, (cx, cy), r, merged))
+    return out
+
+
+def rough_prism(name, pts, z0, z1, mat, seed=0, cup=0.0, broken=0.0, lean=(0.0, 0.0), age=0.5, drum=(0.45, 1.3),
+                build=True):
+    """a basalt column as the real ones are (chapter 12 section 5; Fingal's Cave, the Causeway): drums of uneven height,
+    each joint a real gap, the drum tops domed or cupped (ball and socket); every face spalled and a little bellied or
+    hollow; the arrises rounded and chipped by age (age 0 fresh, 1 worn smooth); a big flake gone here and there. Its top
+    flat, cupped or broken off at a slant. Returns the mesh object (or the raw verts and faces with build=False)"""
+    rnd = random.Random((zlib.crc32(name.encode()) & 0xFFFFF) + seed * 7919)
+    n = len(pts)
+    cx0 = sum(p[0] for p in pts) / n
+    cy0 = sum(p[1] for p in pts) / n
+    # every edge split near its middle, so a face can belly or hollow and lose a flake
+    ring0 = []
+    for k in range(n):
+        a, b = pts[k], pts[(k + 1) % n]
+        ring0.append((a[0] - cx0, a[1] - cy0, 1))                 # 1: a corner (an arris)
+        f = rnd.uniform(0.38, 0.62)
+        ring0.append((a[0] + (b[0] - a[0]) * f - cx0, a[1] + (b[1] - a[1]) * f - cy0, 0))
+    m = len(ring0)
+    verts, faces = [], []
+    z = z0
+    while z < z1 - 0.05:
+        zt = min(z1, z + rnd.uniform(*drum))
+        if z1 - zt < 0.25:
+            zt = z1
+        top = zt >= z1 - 1e-6
+        sh = rnd.uniform(0.93, 0.995)
+        ox, oy = rnd.uniform(-0.025, 0.025) + lean[0] * z, rnd.uniform(-0.025, 0.025) + lean[1] * z
+        tw = rnd.uniform(-0.04, 0.04)
+        ct, st_ = math.cos(tw), math.sin(tw)
+        flake = rnd.randrange(m) if rnd.random() < 0.35 else -9     # a flake gone from this drum's face
+        mid = z + 0.02 + (zt - z) * rnd.uniform(0.35, 0.65)
+        rings = []
+        for h, zz in enumerate((z + 0.02, mid, zt - 0.02)):
+            ring = []
+            for k, (x, y, corner) in enumerate(ring0):
+                L = math.hypot(x, y) + 1e-9
+                inset = rnd.uniform(0.0, 0.025)                          # spall
+                if corner:
+                    inset += (0.02 + 0.06 * age) * (1.6 if h != 1 else 1.0) * rnd.uniform(0.6, 1.3)   # the arris worn
+                    if rnd.random() < 0.15:
+                        inset += rnd.uniform(0.05, 0.12)                    # a corner knocked off
+                elif h == 1:
+                    inset += rnd.uniform(-0.03, 0.035)                      # the face bellied or hollow
+                if abs(k - flake) <= 1 and h >= 1:
+                    inset += rnd.uniform(0.06, 0.13)
+                s = max(0.4, (L * sh - inset) / L)
+                xr, yr = (x * ct - y * st_) * s, (x * st_ + y * ct) * s
+                zz_ = zz
+                if top and h == 2 and broken > 0:
+                    u = (xr * math.cos(tw * 31) + yr * math.sin(tw * 31)) / 0.6
+                    zz_ = max(zz_ - broken * (0.5 + 0.5 * max(-1.0, min(1.0, u))), z + 0.1)
+                if h == 2 and not top:
+                    zz_ -= rnd.uniform(0.0, 0.03)                           # the joint opens unevenly
+                if h == 1:
+                    zz_ += rnd.uniform(-0.012, 0.012)
+                ring.append((cx0 + xr + ox, cy0 + yr + oy, zz_))
+            rings.append(ring)
+        base = len(verts)
+        for ring in rings:
+            verts.extend(ring)
+        for h in range(2):
+            for k in range(m):
+                a, b = base + h * m + k, base + h * m + (k + 1) % m
+                faces.append((a, b, b + m, a + m))
+        faces.append(tuple(range(base, base + m))[::-1])
+        # the drum's top: a ball, a socket, or the column's own top
+        ci = len(verts)
+        if top:
+            dzc = -cup if cup > 0 else rnd.uniform(-0.02, 0.03)
+        else:
+            dzc = rnd.choice((-1, 1)) * rnd.uniform(0.02, 0.06)
+        tz = sum(v[2] for v in rings[2]) / m
+        verts.append((cx0 + ox, cy0 + oy, tz + dzc))
+        for k in range(m):
+            a, b = base + 2 * m + k, base + 2 * m + (k + 1) % m
+            faces.append((a, b, ci))
+        z = zt
+    if not build:
+        return verts, faces
+    return P.poly(name, verts, faces, mat)
+
+
+def chunk(name, c, size, mat, seed=0, flat=0.6, tilt=0.6):
+    """a broken piece of rock (breakdown, rubble, gravel): a short rough drum of a random 4 to 7 sided section, tipped
+    over at a random angle, sunk a little into what it lies on"""
+    rnd = random.Random((zlib.crc32(name.encode()) & 0xFFFFF) + seed)
+    k = rnd.randint(4, 7)
+    pts = []
+    for i in range(k):
+        a = 2 * math.pi * i / k + rnd.uniform(-0.3, 0.3)
+        r = size * rnd.uniform(0.7, 1.1)
+        pts.append((math.cos(a) * r, math.sin(a) * r))
+    h = size * rnd.uniform(0.5, 1.2) * flat * 2
+    v, f = rough_prism(name, pts, 0.0, h, mat, seed, age=0.8, drum=(h + 1, h + 2), build=False)
+    ax, ay, az = rnd.uniform(-tilt, tilt), rnd.uniform(-tilt, tilt), rnd.uniform(0, 6.28)
+    out = []
+    for (x, y, z) in v:
+        z -= h * 0.5
+        y, z = y * math.cos(ax) - z * math.sin(ax), y * math.sin(ax) + z * math.cos(ax)
+        x, z = x * math.cos(ay) + z * math.sin(ay), -x * math.sin(ay) + z * math.cos(ay)
+        x, y = x * math.cos(az) - y * math.sin(az), x * math.sin(az) + y * math.cos(az)
+        out.append((c[0] + x, c[1] + y, c[2] + z + h * 0.3))
+    return P.poly(name, out, f, mat)

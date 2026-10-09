@@ -91,6 +91,7 @@ def setup_render(samples=24):
     vl.use_pass_ambient_occlusion = True
     vl.use_pass_material_index = True
     vl.use_pass_diffuse_direct = True
+    vl.use_pass_object_index = True
     sc.cycles.ao_bounces_render = 0
     bpy.context.scene.world.light_settings.distance = 3.0   # AO reach: 3 yd
 
@@ -117,7 +118,7 @@ def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0, lamp_ref=0.09, a
         nt.nodes.remove(n)
     rl = nt.nodes.new("CompositorNodeRLayers")
     outs = {}
-    for key in ("Normal", "Position", "AO", "IndexMA", "DiffDir", "Alpha"):
+    for key in ("Normal", "Position", "AO", "IndexMA", "DiffDir", "Alpha", "IndexOB"):
         fo = nt.nodes.new("CompositorNodeOutputFile")
         fo.base_path = os.path.join(out_dir, "_p")
         fo.format.file_format = "OPEN_EXR"
@@ -142,9 +143,12 @@ def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0, lamp_ref=0.09, a
     pos[..., 2] = pos[..., 2] / ZSQ
     sky = sky_passes(out_dir, outs)
     lamp = lamp_pass(out_dir, outs, lamps)
+    refl = mirror_pass(out_dir, rl, nt)
     np.savez_compressed(os.path.join(out_dir, "passes.npz"), normal=n, pos=pos, ao=P["AO"][..., 0],
                         mat=np.round(P["IndexMA"][..., 0]).astype(np.int16), moon=P["DiffDir"][..., 0],
                         alpha=P["Alpha"][..., 0], shelter=sky["shelter"], skyview=sky["skyview"], lamp=lamp,
+                        obj=np.round(P["IndexOB"][..., 0]).astype(np.int32), refl=refl,
+                        lamps=np.array([list(lp[:4]) + list(lp[4] if len(lp) > 4 else (1.0, 0.55, 0.2)) for lp in lamps], np.float32).reshape(-1, 7),
                         floor=np.array(floor), zoom=np.array(zoom), lamp_ref=np.array(lamp_ref), ambient=np.array(ambient), time=np.array(float(os.environ.get("GM_T", "0"))),
                         gw=gw, gh=gh)
 
@@ -182,6 +186,70 @@ def lamp_pass(out_dir, outs, lamps):
     for key, fo in outs.items():
         fo.file_slots[0].path = key + "_"
     return out
+
+
+def mirror_pass(out_dir, rl, nt):
+    """what each mirror sees (the opening cave's dark mirrors): every surface made to give off its own world position
+    as light, the mirrors made perfect glossy, so a camera ray that strikes a mirror comes back holding the position of
+    whatever the mirror shows (a flame, the floor before it, the far wall). The painter looks that point up in its own
+    painted frame. Zero where there is no mirror or the mirror sees nothing; empty if the scene has no mirror"""
+    sc = bpy.context.scene
+    gw, gh = sc.render.resolution_x, sc.render.resolution_y
+    if "mirror" not in bpy.data.materials:
+        return np.zeros((gh, gw, 3), np.float32)
+    saved = {}
+    for m in bpy.data.materials:
+        if not m.use_nodes:
+            continue
+        t = m.node_tree
+        out = [n for n in t.nodes if n.type == "OUTPUT_MATERIAL"][0]
+        saved[m.name] = out.inputs["Surface"].links[0].from_socket if out.inputs["Surface"].links else None
+        if m.name == "mirror":
+            g = t.nodes.new("ShaderNodeBsdfGlossy")
+            g.inputs["Roughness"].default_value = 0.0
+            g.inputs["Color"].default_value = (1.0, 1.0, 1.0, 1.0)
+            t.links.new(g.outputs[0], out.inputs["Surface"])
+        else:
+            geo = t.nodes.new("ShaderNodeNewGeometry")
+            add = t.nodes.new("ShaderNodeVectorMath")
+            add.operation = "ADD"
+            add.inputs[1].default_value = (100.0, 100.0, 100.0)
+            em = t.nodes.new("ShaderNodeEmission")
+            em.inputs["Strength"].default_value = 1.0
+            t.links.new(geo.outputs["Position"], add.inputs[0])
+            t.links.new(add.outputs[0], em.inputs["Color"])
+            t.links.new(em.outputs[0], out.inputs["Surface"])
+    moon = bpy.data.objects["moon"]
+    e0 = moon.data.energy
+    moon.data.energy = 0.0
+    smp = sc.cycles.samples
+    sc.cycles.samples = 1
+    sc.cycles.max_bounces = 4
+    sc.cycles.glossy_bounces = 2
+    fo = nt.nodes.new("CompositorNodeOutputFile")
+    fo.base_path = os.path.join(out_dir, "_p")
+    fo.format.file_format = "OPEN_EXR"
+    fo.format.color_depth = "32"
+    fo.file_slots[0].path = "Mirror_"
+    nt.links.new(rl.outputs["Image"], fo.inputs[0])
+    bpy.ops.render.render(write_still=False)
+    f = [x for x in os.listdir(os.path.join(out_dir, "_p")) if x.startswith("Mirror_")]
+    img = bpy.data.images.load(os.path.join(out_dir, "_p", sorted(f)[-1]))
+    a = np.array(img.pixels[:], dtype=np.float32).reshape(img.size[1], img.size[0], 4)[::-1][..., :3]
+    nt.nodes.remove(fo)
+    sc.cycles.samples = smp
+    moon.data.energy = e0
+    for m in bpy.data.materials:
+        if m.name in saved and saved[m.name] is not None:
+            out = [n for n in m.node_tree.nodes if n.type == "OUTPUT_MATERIAL"][0]
+            m.node_tree.links.new(saved[m.name], out.inputs["Surface"])
+    # back to game coordinates (as the position pass); zero stays zero (nothing seen)
+    hit = a.sum(axis=2) > 1.0
+    pos = a - 100.0
+    pos[..., 1] = -pos[..., 1]
+    pos[..., 2] = pos[..., 2] / ZSQ
+    pos[~hit] = 0.0
+    return np.concatenate([pos, hit[..., None].astype(np.float32)], axis=2)
 
 
 def sky_passes(out_dir, outs):
@@ -264,7 +332,7 @@ if __name__ == "__main__":
         to_heightfield(root, focus)
     setup_camera(focus, gw, gh, zoom)
     setup_sun()
-    setup_render()
+    setup_render(getattr(mod, "SAMPLES", 24))
     render_passes(out_dir, getattr(mod, "LAMPS", ()), getattr(mod, "FLOOR_MODULE", "floor3d"), zoom,
                   getattr(mod, "LAMP_REF", 0.09), getattr(mod, "AMBIENT", 1.0))
     print("passes saved", out_dir)

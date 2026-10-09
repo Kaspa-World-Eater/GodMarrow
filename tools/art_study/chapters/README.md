@@ -20,4 +20,6 @@ before starting it (MASTER_RULES section 1). `../STUDY.md` keeps the older round
 | [10 The Olympic coast](10-the-olympic-coast.md) | The coast's bands from the surf inland: the foreshore and the black sand by wetness, the cobble berm, the drift logs at the storm line, sea stacks and arches, the sheared spruce fringe and eroding bluffs, river mouths, the way into the rainforest; for the Red Shore, the fringe leaning to sea | The Red Shore's beach, logs, stacks, fringe and bluffs |
 | [11 Northwest Coast forms](11-northwest-coast-forms.md) | Cedar and the adze's mark, the plank house, posts and carved human faces, formline (ovoid, U, split U), canoes, bentwood boxes, woven cedar bark; forms only, the fusion with the Thai | The shore folk's huts, posts, palisade, canoes, boxes and mats |
 
+| [12 Cinematography, atmosphere and wonder](12-cinematography-atmosphere-wonder.md) | Deakins, *The Descent*, INSIDE, Piranesi; Burke's sublime (darkness, obscurity, vastness, infinity); Ice Age carvings made to move in firelight; rock-cut temples kept dark; ancient dark mirrors; Conan's tomb; columnar basalt that is not uniform; twelve rules with recipes for a fixed camera | Every piece (MASTER_RULES 0c); caves, temples, any interior; the opening cave |
+
 **Both studies for the Red Shore are written** (2026-10-09).
