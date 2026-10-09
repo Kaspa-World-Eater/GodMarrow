@@ -176,14 +176,14 @@ def paint(d):
             dep = np.clip(nd.distance_transform_edt(full)[m] / 18.0, 0, 1)
             sy_, sx_ = np.nonzero(m)
             # held dark (the library's trap: ketchup): the clot and the dark red only, a lit dab where the light lies
-            lvp = dep * 0.6 + (fbm(X[m] * 1.2, Y[m] * 1.2) - 0.5) * 0.5 + dith[m] * 0.2
-            col = np.where((lvp > 0.55)[:, None], BL.C1, BL.C0)
+            # it glows from its depths: the heart a step lighter, the shallows dark, the edge darkest
+            lvp = dep * 1.1 + (fbm(X[m] * 0.8, Y[m] * 0.8) - 0.5) * 0.08 + (dith[m] - 0.5) * 0.1
+            col = np.where((lvp > 0.75)[:, None], BL.C2 * 0.8, np.where((lvp > 0.38)[:, None], BL.C1, BL.C0))
             dabp = (vn(X[m] * 2.5 + 3, Y[m] * 6.0) > 0.78) & (dep > 0.25)
             col = np.where(dabp[:, None], BL.C1 * 1.4 + np.array([0.04, 0.04, 0.06]), col)
-            clot = vn(X[m] * 1.6 + 40, Y[m] * 1.6) > 0.7
+            clot = (vn(X[m] * 4.0 + 40, Y[m] * 4.0) > 0.8) & (vn(X[m] * 11.0, Y[m] * 11.0) > 0.4)
             col = np.where(clot[:, None], BL.C0 * 0.7, col)
-            # the blood throws the glow; its own surface stays dark, the light only in its heavy dabs (never lava)
-            col = col * 0.55
+            col = col * 0.8
         elif name == "dressed":
             # basalt cut and dressed by hands long gone: the same black stone, its faces flat and tooled (the chisel's
             # fine parallel strokes), its arrises softened by age, damp dark at the foot, pale mineral weeping from the
@@ -192,7 +192,7 @@ def paint(d):
             hb = _frac(np.sin(bid * 12.9898) * 43758.5453)
             nx_, ny_ = n[m][:, 0], n[m][:, 1]
             plane = np.where(up[m] > 0.6, 0.58, np.where(ny_ > np.abs(nx_) * 0.6, 0.44, 0.24))
-            tb = plane * (0.8 + 0.5 * np.clip(t, 0, 0.6)) + (hb - 0.5) * 0.08
+            tb = plane * (0.2 + 1.7 * np.clip(t, 0, 0.5)) + (hb - 0.5) * 0.08 * np.clip(t * 3, 0, 1)
             tooled = (up[m] < 0.4) & (np.abs(_frac(Z[m] * 9.0 + vn(X[m] * 3, Y[m] * 3) * 0.6) - 0.5) < 0.1)
             tb = np.where(tooled, tb - 0.04, tb)
             col = tone(R["basalt"], tb, dith[m], band=0.08)
@@ -221,7 +221,9 @@ def paint(d):
             # of its own
             nx_, ny_ = n[m][:, 0], n[m][:, 1]
             plane = np.where(up[m] > 0.6, 0.62, np.where(ny_ > np.abs(nx_) * 0.6, 0.42, 0.2))
-            tb = plane * (0.75 + 0.5 * np.clip(t, 0, 0.6)) + (hv - 0.5) * 0.1
+            # the planes scaled by the light actually there: in a dark place the stone goes dark, and only the lamps
+            # carve it (the first version kept every top mid-grey in the cave's dark)
+            tb = plane * (0.2 + 1.7 * np.clip(t, 0, 0.5)) + (hv - 0.5) * 0.1 * np.clip(t * 3, 0, 1)
             # rain has run down every face from the joints and tops, in dark vertical streaks
             streak = (up[m] < 0.4) & (vn(X[m] * 9.0 + Y[m] * 9.0, Z[m] * 0.35) > 0.66)
             tb = np.where(streak, tb - 0.09, tb)

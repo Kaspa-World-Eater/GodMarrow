@@ -124,3 +124,24 @@ only light after the pool comes from the wisp fire torches."
 - the detail is too small and dark to tell.
 
 **Next:** one room at a time at the game's scale, the pool chamber first.
+
+## Rules check (1st since Derek's notes), then pass 3: the pool chamber at the game's scale
+
+**Worst failure, line 5 (values):** the stumps were lit flat. The basalt paint set each face's tone by its direction
+alone and never dimmed it by the light actually there, so in the cave's dark every top came out mid-grey.
+
+**Fixes:**
+- **The stone's planes are scaled by the light that reaches them** (basalt and dressed alike), so the dark is real and
+  only the lamps carve the stone.
+- **The pool glows from its depths:** its tone follows the depth from its edge in smooth bands, with small clots, never
+  blotches.
+- **Three red lamps just above the blood,** so the glow rakes across every stump face that looks into the pool and
+  fades fast, lighting the raw columns behind a dull red.
+
+**Grade: the pool chamber C+.** The mood is there: a black chamber, a pool lit from beneath with islands of stumps and
+bones in it, red light raking the stone. **Still short:**
+- the dead at the edge don't read as bodies;
+- the floor beyond the glow is an even dark;
+- the surface could show a slow skin.
+
+**Next:** the stairs and the hall at the game's scale.

@@ -491,8 +491,10 @@ def build(root, material):
     pool()
     pool_dead()
     # the pool's own red glow, low over the blood (the one red light allowed); past it, only the wisp-fires
-    LAMPS.append((BASIN[0], BASIN[1], 0.2, 70.0, RED))                # the glow stays near the pool
-    LAMPS.append((BASIN[0] - 1.4, BASIN[1] + 0.8, 0.15, 25.0, RED))
+    # the glow from just above the blood, so it rakes across every stump face that looks into the pool and fades fast
+    LAMPS.append((BASIN[0], BASIN[1], 0.0, 140.0, RED))
+    LAMPS.append((BASIN[0] - 1.5, BASIN[1] + 0.9, -0.02, 60.0, RED))
+    LAMPS.append((BASIN[0] + 1.2, BASIN[1] - 1.1, -0.02, 60.0, RED))
     pool_bodies()
     # one wisp-fire at the stairs' foot, then up the carved wall, then round the hall
     torch("torch0", STAIR[0] - 0.05, -6.6, 2.0, 1.0, 0.0, 70.0)
