@@ -747,3 +747,49 @@ water, black sand").
 - `cine_check`: the hall 9 of 9 (the squint recovered with the archway), the stairs 9 of 9.
 - The runes on the cave stairs' cut risers are cut, but in the stairs frame those steps sit up in the dark and the marks
   are too small to show there. They read best at the throne steps in the hall.
+
+## Pass 11 (2026-10-09): depth, blood from every face, the 2 x 2 grid
+
+**Derek's notes:**
+- (On the cove) "We need to set these as the rules ... Which means you need to go back and fix the starting area too."
+- "I'd like the faces to be a little bit more defined as well and all of them having blood running out of their nose and
+  mouth. And then the main face remove two of the torches on the top of the stairs. And also I don't know if it's just
+  the pictures but the flames look not great."
+
+**The bare-floor test** (MASTER_RULES 0.5b, value only, the floors alone):
+- **The pool chamber passes:** a pavement of column stumps at many heights.
+- **The stairs pass:** cut steps.
+- **The throne hall fails:** its flags lay within a finger of dead level, a sheet with joints drawn on it, and the worn
+  way existed only in the paint.
+
+**Fixed** (`cave3d.hall_relief`, read by the flags and by everything standing on them):
+- long low swells of heave under the floor, plus a finer one;
+- a shallow trough worn along the way from the stairs' head to the great face's mouth (real form now);
+- each flag's corners at the floor's own height there, one in twenty tipped where a corner sank;
+- dust banked against the walls and the pillars as real drifts, thick at the wall and thinning across the flags.
+
+In the value-only render the hall's floor now shows its shape.
+
+**Every face bleeds** (`cave3d.bleed`, called by every `relief`): from both nostrils and both corners of the mouth,
+runs of blood follow the carved surface down over the lips and the chin, gathering as they go, drip off the slab's foot
+and keep a small pool filling. A source that falls in a hole (the great face's archway) is skipped.
+
+**The faces more defined** (`paint_cave`, the carved stone): a steeper turn from the lit planes into the shade, and
+every crease (the sockets, the lids, the lips, the nostrils) holding its own dark through its occlusion. There are no
+hard lit lips; Derek rejected those as the "orange squish line".
+
+**The great face's two flank sconces are removed:** the cresset and the top step's candles light it.
+
+**The flames:** at the old 4 px grid a candle's flame was a few texels, so its shape could not read. The cave is now
+rendered on the 2 x 2 grid (painted standard 7), where each flame has four times the texels.
+
+**Then, from the renders on the 2 x 2 grid:**
+- **The faces' real fault was the mesh:** about 36 by 44 vertices over a three-yard face, so a lid or a nostril was three
+  or four vertices and rendered as smeared triangles whatever the light did. `relief` now scales the mesh to the face,
+  about 28 vertices a yard across and 34 up. The features are deeper too (2.4 times the old depth, the head a fifth
+  fuller). The lids with their creases, the noses and the downturned mouths now read on the stair faces.
+- **The carved stone's tone** rolls off in the highlights (a tanh curve), so a face beside its fire keeps turning. A
+  steeper curve blew the faces out to one orange mass.
+- **The blood runs** are twice as thick, painted as wet blood with a glint where the fire catches them.
+- **The flames:** a small hot seat and four separate tongues (seven in a brazier), narrower, taller and swaying more,
+  with dark between them. They had merged into one soft teardrop.

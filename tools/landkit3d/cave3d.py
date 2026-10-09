@@ -64,8 +64,19 @@ def floor_at(x, y, k=0.5):
         step = math.floor(u * STEPS) / STEPS
         return step * FLOOR_HALL + (k - 0.5) * 0.16
     if _ell(x, y, HALL) < 1.0:
-        return FLOOR_HALL + (k - 0.5) * 0.12
+        return FLOOR_HALL + hall_relief(x, y) + (k - 0.5) * 0.04
     return None
+
+
+def hall_relief(x, y):
+    """the hall floor's depth (MASTER_RULES 0.5b; Derek: the starting area's floors too): the flags heaved and sunk
+    by the ground beneath in long low swells, and worn into a shallow trough along the way countless feet took from the
+    stairs' head to the great face's mouth (the worn way, as real form, not only painted)"""
+    heave = 0.11 * (_vn(x * 0.22, y * 0.22, 7) - 0.5) + 0.05 * (_vn(x * 0.6, y * 0.6, 9) - 0.5)
+    fx_, fy_ = _face_span()[:2]
+    d = _seg_dist(x, y, -2.4, -20.6, fx_, fy_)
+    trough = 0.085 * math.exp(-(d / 1.35) ** 2)
+    return heave - trough
 
 
 def inside(x, y):
@@ -239,7 +250,9 @@ def serene_depth(X, Y, kind, seed):
         f += 0.05 * math.exp(-(ai / 0.04) ** 2)                            # its moulding
     f += 0.05 * g(X, Y + 0.66, 0.15, 0.09)                                   # the chin
     inside_ = min(1.0, max(0.0, (1.0 - e2) / 0.15))
-    d = head + f * inside_ * (1.0 if kind == "orcus" else 1.7)          # cut deep enough to read in the dark
+    # cut deep enough to read in the dark and from the side (Derek, 2026-10-09: "a little bit more defined"): the
+    # sockets, the nose and the lips throw real shadows in the torchlight
+    d = head * 1.2 + f * inside_ * (1.0 if kind == "orcus" else 2.4)
     # the rock round it, rough and broken (the face rises out of it with no outline)
     rock = 0.03 + (_vn(X * 4, Y * 4, seed + 7) - 0.5) * 0.08 + (_vn(X * 13, Y * 13, seed + 8) - 0.5) * 0.03
     edge = max(0.0, max(abs(X) - 0.78, abs(Y) - 0.95) / 0.2)
@@ -380,6 +393,9 @@ def relief(name, c, nrm, H, kind, seed=0, mat="basalt", wear=0.5, wscale=0.55, b
     pits = [(rnd.uniform(-0.9, 0.9), rnd.uniform(-1.0, 1.0), rnd.uniform(0.02, 0.06), rnd.uniform(0.01, 0.04))
             for _ in range(int(8 + 14 * wear))]
     prm = face_params(kind, seed)
+    # fine enough for the features to be form (a lid or a nostril was three or four vertices and rendered as smeared
+    # triangles: Derek, "a little bit more defined"): about 28 vertices a yard across, 34 up
+    nu, nv = max(nu, int(H * 28)), max(nv, int(H * 34))
     verts = []
     for j in range(nv + 1):
         Y = -1.15 + 2.3 * j / nv
@@ -410,7 +426,58 @@ def relief(name, c, nrm, H, kind, seed=0, mat="basalt", wear=0.5, wscale=0.55, b
     for k in range(L):
         faces.append((border[k], border[(k + 1) % L], b0 + (k + 1) % L, b0 + k))
     faces.append(tuple(b0 + k for k in range(L))[::-1])
-    return P.outward(P.poly(name, verts, faces, "carved" if mat in ("basalt", "dressed") else mat))
+    o = P.outward(P.poly(name, verts, faces, "carved" if mat in ("basalt", "dressed") else mat))
+    bleed(name, c, nrm, H, kind, seed, wscale)
+    return o
+
+
+def bleed(name, c, nrm, H, kind, seed=0, wscale=0.55):
+    """every face bleeds (Derek, 2026-10-09: "all of them having blood running out of their nose and mouth"): from
+    both nostrils and both corners of the mouth, thin runs of blood following the carved surface straight down over
+    the lips and the chin, thickening where they gather, dripping off the slab's foot into a small dark pool. A source
+    that falls in a hole (the great face's archway) does not run"""
+    nx, ny = nrm
+    tx, ty = -ny, nx
+    rnd = random.Random(seed * 13 + 5)
+    k_ = "closed" if kind in ("half", "blind", "mirrormouth") else kind
+
+    def depth(X, Y):
+        return serene_depth(X, Y, k_, seed) if SERENE else 0.0
+
+    def world(X, Y, lift):
+        u, v = X * wscale * H, Y * 0.5 * H
+        d = depth(X, Y) * H + lift
+        return (c[0] + tx * u + nx * d, c[1] + ty * u + ny * d, c[2] + v)
+
+    srcs = [(-0.045, -0.29, 0.6), (0.045, -0.29, 0.6)]
+    if kind not in ("mouthless", "orcus"):
+        srcs += [(-0.19, -0.45, 1.0), (0.19, -0.45, 1.0)]
+    elif kind == "orcus":
+        srcs += [(-0.36, -0.4, 1.0), (0.36, -0.4, 1.0)]
+    r0 = 0.022 * H                                                        # thick enough to read on the firelit stone
+    for q, (X0, Y0, w) in enumerate(srcs):
+        if depth(X0, Y0) < -0.12:
+            continue
+        pts, rads = [], []
+        X, Y = X0 + rnd.uniform(-0.01, 0.01), Y0
+        while Y > -1.12:
+            pts.append(world(X, Y, 0.012 * H))
+            gather = 1.0 + 0.6 * max(0.0, (Y0 - Y) / 0.8)
+            rads.append(r0 * w * gather * (0.85 + 0.3 * _vn(X * 20, Y * 20, seed + q)))
+            Y -= 0.035
+            X += 0.006 * math.sin(Y * 23.0 + q * 2.1 + seed) + (rnd.random() - 0.5) * 0.004
+            if abs(X) > 0.8:
+                break
+        if len(pts) > 2:
+            P.tube("%s_blood%d" % (name, q), pts, rads, "blood", 6)
+            # the drip off the slab's foot and the pool it keeps filling
+            bx, by, bz = pts[-1]
+            fz = c[2] - 0.575 * H - 0.35
+            if bz - fz > 0.05:
+                P.tube("%s_drip%d" % (name, q), [(bx, by, bz), (bx + nx * 0.05, by + ny * 0.05, fz + 0.02)],
+                       [rads[-1] * 0.7, rads[-1] * 0.5], "blood", 5)
+            P.sphere("%s_bpool%d" % (name, q), (bx + nx * 0.25, by + ny * 0.25, fz + 0.01), 0.18 + 0.05 * H ** 0.5, "blood",
+                     scale=(1.4, 1.0, 0.08), rot=(0.0, 0.0, rnd.uniform(0, 6.28)))
 
 
 # ---- the columns ----
@@ -630,18 +697,28 @@ def hall_floor():
                 tw = rnd.uniform(-0.05, 0.05)
                 u2 = (ux * math.cos(tw) - uy * math.sin(tw), ux * math.sin(tw) + uy * math.cos(tw))
                 a2 = (-u2[1], u2[0])
-                z = FLOOR_HALL + rnd.uniform(-0.035, 0.02)
-                tz = [rnd.uniform(-0.035, 0.035) for _ in range(4)]
                 corners = [(px + u2[0] * su + a2[0] * sa * hw, py + u2[1] * su + a2[1] * sa * hw)
                            for su, sa in ((la, -1), (lb, -1), (lb, 1), (la, 1))]
+                # each flag follows the floor's heave and the worn way under it (its corners each at the floor's own
+                # height there), a finger of its own on top; one in twenty tipped where the ground gave under a corner
+                z = FLOOR_HALL + hall_relief(px, py) + rnd.uniform(-0.02, 0.015)
+                tz = [hall_relief(cx_, cy_) - hall_relief(px, py) + rnd.uniform(-0.025, 0.025) for cx_, cy_ in corners]
+                if rnd.random() < 0.05:
+                    tz[rnd.randrange(4)] += rnd.uniform(0.08, 0.14)
                 verts = [(x, y, z - 0.4) for x, y in corners] + [(x, y, z + tz[t]) for t, (x, y) in enumerate(corners)]
                 faces = [(0, 1, 2, 3)[::-1], (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
                 P.displace(P.outward(P.poly("flag%d_%d_%d" % (i, j, q), verts, faces, "dressed")), 0.028, 0.08, 3)
-    # dust drifted against the walls and round the pillars' feet
-    for k in range(60):
-        th = rnd.uniform(math.radians(140), math.radians(310))
-        x, y = _hall_pt(th, rnd.uniform(0.86, 0.95))
-        P.sphere("hdust%d" % k, (x, y, FLOOR_HALL - 0.02), rnd.uniform(0.4, 0.9), "ash", scale=(1.3, 1.0, 0.16))
+    # dust drifted against the walls and round the pillars' feet: real banks, thick at the wall and thinning out
+    # across the flags, tongues of it where the draughts carried it (the drift scale, MASTER_RULES 0.5b)
+    for k in range(150):
+        th = rnd.uniform(math.radians(130), math.radians(320))
+        rr = rnd.uniform(0.84, 0.95)
+        x, y = _hall_pt(th, rr)
+        big = (0.95 - rr) < 0.04
+        r_ = rnd.uniform(0.6, 1.3) if big else rnd.uniform(0.3, 0.7)
+        P.sphere("hdust%d" % k, (x, y, FLOOR_HALL + hall_relief(x, y) - 0.03), r_, "ash",
+                 scale=(rnd.uniform(1.2, 2.0), 1.0, rnd.uniform(0.14, 0.26) if big else rnd.uniform(0.08, 0.14)),
+                 rot=(0.0, 0.0, th + math.pi / 2 + rnd.uniform(-0.3, 0.3)))
 
 
 def _face_span():
@@ -850,9 +927,8 @@ def throne():
     P.sphere("cresset_coals", (cbx, cby, cbz - 0.1), 0.3, "ash", scale=(1, 1, 0.5))
     flame("cresset", cbx, cby, cbz - 0.05, 0.28, 175.0)
     # two sconces high on its flanks, raking across the little faces so each holds its own shadows (rule 19)
-    for side in (-1, 1):
-        wx_, wy_ = fx + sx * side * 5.7 + nx * 0.6, fy + sy * side * 5.7 + ny * 0.6
-        torch("ftorch%d" % side, wx_, wy_, cz + 0.9, -sx * side * 0.6 + nx * 0.8, -sy * side * 0.6 + ny * 0.8, 70.0)
+    # (the two sconces high on its flanks are gone: Derek, 2026-10-09, "the main face remove two of the torches on the
+    # top of the stairs"; the cresset and the candles light it)
     # the throne is gone; the mouth at the top of the throne's stairs is a great dark mirror, the way out (Derek: "Give
     # the room no exit. There will be a large mirror the player looks in in a large face, it reflects nothing but
     # darkness"; "The mirror is the way out, they will walk into it and disappear"; "The large mirror will be at the top

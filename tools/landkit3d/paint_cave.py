@@ -195,8 +195,13 @@ def paint(d, t=0.0):
                 tb = tb + wf * 0.05 * np.clip(tm * 3, 0, 1)             # the worn way a breath paler, matte
             if name == "carved":
                 # finished smooth by hand (Derek: "make them smooth like they were hand carved to a smooth finish, to offer
-                # contrast to the rough walls"): one even stone, no per-block steps, no strokes, a soft polish
-                tb = tm * 1.02
+                # contrast to the rough walls"): one even stone, no per-block steps, no strokes, a soft polish. Defined
+                # (Derek, 2026-10-09: "the faces to be a little bit more defined"): a steeper turn from the lit planes to
+                # the shade, and every crease (the sockets, the lids, the lips, the nostrils) holding its own dark
+                # a curve that rolls off in the highlights, so a face beside its fire keeps its brow, nose and lips
+                # turning instead of washing out to the ramp's top (the steeper curve blew them to one orange mass)
+                tb = 0.92 * np.tanh(np.clip(tm, 0, 3) * 1.15)
+                tb = tb * (0.6 + 0.4 * np.clip(ao[m], 0, 1) ** 1.6)
             if name == "dressed":
                 tooled = wall[m] & (np.abs(_frac(Z[m] * 8.0 + vn(X[m] * 3, Y[m] * 3) * 0.6) - 0.5) < 0.09)
                 tb = np.where(tooled, tb - 0.05 * np.clip(tm * 3, 0, 1), tb) * 1.08
@@ -259,6 +264,10 @@ def paint(d, t=0.0):
             flow = vn(X[m] * 9.0 + Y[m] * 9.0, Z[m] * 3.0 + t * 8.0)
             tb = tm * 0.9 + np.where(up[m] > 0.6, -0.05, (flow - 0.5) * 0.25 * np.clip(tm * 3, 0, 1))
             col = tone(R["blood"], np.clip(tb, 0, 1) * 1.2, dith[m], band=0.1)
+            # wet blood on lit stone: dark red-black, and a sharp glint where the fire catches the run's crown (Derek:
+            # the faces' blood must read against the firelit carving)
+            crown = (np.abs(n[m][:, 2]) < 0.5) & (tm > 0.5) & (vn(X[m] * 31 + Z[m] * 23, Y[m] * 31) > 0.6)
+            col = np.where(crown[:, None], np.array([0.62, 0.2, 0.14]), col)
             wet[m] = True
             img[m] = col
             continue
@@ -492,18 +501,20 @@ def fires(img, d, proj, fk, t):
         vis = depth[sub] > ldepth - 0.25
         heat = np.zeros(X_.shape)                                        # 0 none, then rising: tip, body, inner, heart
         # the base: holds its volume, its shape breathing
-        bw = wpx * (0.85 + 0.12 * math.sin(2 * math.pi * (3 * t + ph)))
-        bh = hpx * 0.42
+        bw = wpx * (0.6 + 0.08 * math.sin(2 * math.pi * (3 * t + ph)))          # a small hot seat; the tongues carry the shape
+        bh = hpx * 0.3
         q, m = _tongue_mask(X_, Y_, sx, sy - bh * 0.45, bw, bh, i, t)
         heat = np.where(m, np.maximum(heat, np.where(q < 0.45, 4, np.where(q < 0.75, 3, 2))), heat)
         # the tongues: born at the base, rising, narrowing, tearing off
-        n_t = 6 if brazier else 3
+        n_t = 7 if brazier else 4
         for k in range(n_t):
             p = (t * (2 + (k % 2)) + k / n_t + ph) % 1.0
-            sway = math.sin(2 * math.pi * (p * 0.9 + ph + k * 0.31)) * wpx * 0.28 * p
-            off = ((k + 0.5) / n_t - 0.5) * wpx * (0.9 if brazier else 0.45)
-            tw = bw * (0.75 - 0.55 * p) * (0.8 if brazier else 1.0)
-            th = hpx * (0.55 + 0.25 * (1 - p))
+            sway = math.sin(2 * math.pi * (p * 0.9 + ph + k * 0.31)) * wpx * 0.42 * p
+            off = ((k + 0.5) / n_t - 0.5) * wpx * (1.1 if brazier else 0.75)
+            # separate tongues licking up with dark between them, taller, narrowing to points (Derek: "the flames look
+            # not great": they had merged into one soft teardrop)
+            tw = bw * (0.46 - 0.32 * p) * (0.8 if brazier else 1.0)
+            th = hpx * (0.75 + 0.35 * (1 - p))
             tcy = sy - bh * 0.3 - p * hpx * 0.95 - th * 0.35
             q, m = _tongue_mask(X_, Y_, sx + off + sway, tcy, tw, th, i * 13 + k, t)
             hot = np.where(p < 0.35, np.where(q < 0.4, 4, np.where(q < 0.7, 3, 2)),
