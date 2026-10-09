@@ -344,3 +344,37 @@ how far down its slope it lies.
 
 **Ten passes done.** The piece is not shown as finished: the candle (the warm light, line 4), the giant trees, the
 drizzle and the guardian still fail.
+
+## Derek's grade, 2026-10-09: A ("I gave the temple an A, so it's good enough"; A- on the review page). Passed.
+
+## Pass 11: the warm light, then the inside (Derek: "Create an inside for the temple")
+
+**Rules check (2nd since Derek's last word):** line 4 (light) was the worst failure, because the brief's one warm light
+was missing: "a square of black stone at the centre of the floor, polished by knees, with one candle burning before it
+that no one living could have lit. It is a hidden source, seen only by its light on the floor and the door's edge."
+
+- **The lamp pass** (`blend_scene.lamp_pass`): the scene's `LAMPS` as real point lights through the real forms, with the
+  moon off, so the warm light reaches only what it can see and every edge casts its true shadow. The painter lays it in
+  four temperature steps with the dither only where one step meets the next (rule 10). From outside it gives exactly the
+  lore's picture: the candle's light only on the floor seen through the fallen roof, and along the open door's edge. The
+  first try registered the lamp on a second copy of the runner module and came out black; the scene now declares its
+  own `LAMPS`.
+- **The inside** (`temple3d.interior`), everything from the lore:
+  - the black stone, with two hollows worn before it;
+  - the candle on its mound of runs, its flame never drawn;
+  - two rows of columns with lotus capitals and a gilt ring;
+  - the ashes of the dead in bentwood boxes painted red ochre, with black ovoids and a gilt line (`box_paint`, forms
+    only), on shelves in the niches between the windows;
+  - the back screen stripped for the palisade, its frame standing with three boards left;
+  - where the roof fell, tiles, a rafter, a fern in the wet and moss hanging from the bare rafters;
+  - the keeper's account knifed into the inside of the door, low down, its lines crowding (`keeper_account`).
+- **The inside view** (`--inside`), as the game's see-through rule will show it: the roof and the near walls (with their
+  niches) are hidden from the camera only, so they still keep out the sky and the rain and the hall is lit as a roofed
+  hall. The near walls' feet stay as low stubs.
+- **Inside, the wind hardly reaches:** leaves lie only by the door and under the gap. The first paint strewed the hall
+  floor like the open walk.
+
+**Grade:** the inside B. **Still short:**
+- the black stone could stand out more from the floor;
+- the door's carving faces away from this camera;
+- the candle's flame is a small effect for the game.

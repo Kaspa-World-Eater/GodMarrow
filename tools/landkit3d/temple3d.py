@@ -8,6 +8,7 @@ the rafters standing bare over empty air (the overhang a height field cannot mak
 """
 import math
 import random
+import sys
 import numpy as np
 import parts3d as P
 import floor3d as F
@@ -16,6 +17,12 @@ L0, L1 = -6.0, 4.5          # the hall's walls along x
 HW = 3.2                    # half its width
 WALL_T = 0.5
 FLOOR = 1.0                 # the platform's top
+LAMPS = []                  # the warm local lights, for blend_scene.lamp_pass: (x, y, z, watts)
+# the view from inside (blend_scene ... -- temple3d OUT FX FY W H --inside): as in the game, where the see-through rule
+# takes away whatever hides the pilgrim, the roof and the near walls are hidden from the camera, but they still keep
+# the sky and the rain off, so the hall's light is the light of a roofed hall
+INSIDE = "--inside" in sys.argv
+HIDE = ("main_", "porch_", "brk", "wall_right", "front_", "lintel", "shelf1_", "abox1_", "alid1_", "nichepost1_")
 FOOT = -0.5                 # how deep everything standing on the ground is set into it (the floor is not flat)
 
 
@@ -320,6 +327,98 @@ def ground():
         P.poly("pool%d" % i, verts, [tuple(range(n))], "water")
 
 
+IN_X0, IN_X1, IN_Y = L0 + WALL_T, L1 - WALL_T, HW - WALL_T     # the hall's inside: x -5.5 to 4.0, y +-2.7
+
+
+def interior():
+    """inside the hall (the area's brief, the keeper's account): a square of black stone at the centre of the floor,
+    polished by knees, and before it, toward the door, one candle that no one living could have lit, on a mound of its
+    own runs (its flame is never drawn: only its light, blend_scene.lamp_pass). Two rows of columns carry the roof. The
+    ashes of the dead lie in painted bentwood boxes stacked on shelves in the wall's niches. The carved screen at the
+    back was stripped for the palisade ("then the boards from the back of the temple"): its frame stands, three boards
+    left. Where the roof fell, the rain comes in: tiles and a rafter on the floor, a fern in the wet, moss hanging from
+    the bare rafters"""
+    cx = (L0 + L1) / 2
+    P.box("black_stone", (cx - 0.6, -0.6, FLOOR - 0.02), (cx + 0.6, 0.6, FLOOR + 0.1), "iron")
+    for k, dy in enumerate((-0.32, 0.32)):
+        # where they knelt: two hollows worn into the floor's plaster before the stone, toward the candle
+        P.sphere("knee_wear%d" % k, (cx + 0.95, dy, FLOOR - 0.012), 0.2, "iron", scale=(1.3, 0.8, 0.08))
+    kx = cx + 1.45
+    P.sphere("wax_mound", (kx, 0.0, FLOOR), 0.2, "bone", scale=(1.0, 1.0, 0.4))
+    P.cylinder("candle", (kx, 0.0, FLOOR + 0.05), 0.04, 0.17, "bone")
+    LAMPS.append((kx, 0.0, FLOOR + 0.3, 60.0))
+    # the columns: two rows, octagonal shafts on square bases, lotus capitals under the roof's beams
+    for y in (-1.75, 1.75):
+        for x in (-4.5, -2.4, 0.9, 3.0):
+            tag = "icol%d_%d" % (int(x * 10), int(y * 10))
+            P.box(tag + "_base", (x - 0.3, y - 0.3, FLOOR), (x + 0.3, y + 0.3, FLOOR + 0.3), "stucco")
+            P.cylinder(tag, (x, y, FLOOR + 0.3), 0.19, 4.6, "stucco", sides=8)
+            # the lotus capital: petals flaring in two rows, a gilt ring where the shaft meets it
+            P.tube(tag + "_cap", [(x, y, FLOOR + 4.7), (x, y, FLOOR + 4.85), (x, y, FLOOR + 5.0), (x, y, FLOOR + 5.15)],
+                   [0.19, 0.27, 0.36, 0.3], "stucco", 8)
+            P.tube(tag + "_ring", [(x, y, FLOOR + 4.66), (x, y, FLOOR + 4.74)], [0.22, 0.22], "gold", 8)
+    # the shelves in the niches, between the windows, on both long walls, each holding the boxes of the dead
+    rnd = random.Random(31)
+    for s_ in (-1, 1):
+        yw = s_ * IN_Y
+        for x in (-5.0, -3.3, -1.1, 1.1, 3.3):
+            for lvl, z in enumerate((FLOOR + 0.35, FLOOR + 1.2, FLOOR + 2.05)):
+                P.box("shelf%d_%d_%d" % (s_, int(x * 10), lvl), (x - 0.5, yw - s_ * 0.42, z - 0.05), (x + 0.5, yw, z), "wood")
+                n = rnd.choice((0, 1, 2, 2, 3))
+                for b in range(n):
+                    bx = x - 0.32 + b * 0.32 + rnd.uniform(-0.03, 0.03)
+                    h = rnd.uniform(0.24, 0.34)
+                    tilt = rnd.uniform(-0.06, 0.06)
+                    P.box("abox%d_%d_%d_%d" % (s_, int(x * 10), lvl, b), (bx - 0.13, yw - s_ * 0.36, z), (bx + 0.13, yw - s_ * 0.06, z + h),
+                          "boxpaint", rot_z=tilt)
+                    P.box("alid%d_%d_%d_%d" % (s_, int(x * 10), lvl, b), (bx - 0.15, yw - s_ * 0.38, z + h), (bx + 0.15, yw - s_ * 0.04, z + h + 0.04),
+                          "lacquer", rot_z=tilt)
+            # the uprights of the niche
+            for dx in (-0.52, 0.52):
+                P.box("nichepost%d_%d_%d" % (s_, int(x * 10), int(dx * 10)), (x + dx - 0.04, yw - s_ * 0.44, FLOOR), (x + dx + 0.04, yw, FLOOR + 2.3), "wood")
+    # the back screen, stripped: its posts and rails stand against the back wall, three carved boards left of many
+    bx = IN_X0 + 0.12
+    for y in (-2.4, -1.2, 0.0, 1.2, 2.4):
+        P.box("scr_post%d" % int(y * 10), (bx, y - 0.07, FLOOR), (bx + 0.12, y + 0.07, FLOOR + 3.6), "wood")
+    for z in (FLOOR + 0.4, FLOOR + 1.9, FLOOR + 3.4):
+        P.box("scr_rail%d" % int(z * 10), (bx, -2.45, z - 0.06), (bx + 0.1, 2.45, z + 0.06), "wood")
+    for k, (y0, y1, tilt) in enumerate(((-2.35, -1.25, 0.0), (0.05, 1.15, 0.0), (1.25, 2.35, -0.35))):
+        P.box("scr_board%d" % k, (bx + 0.12, y0, FLOOR + 0.45), (bx + 0.18, y1, FLOOR + 1.85), "boxpaint",
+              tilt=("X", tilt, (bx, y1, FLOOR + 1.85)) if tilt else None)
+    # where the roof fell (x -3.4 to 1.6 over the near half): tiles and a rafter on the floor, a fern in the wet
+    for i in range(26):
+        x, y = rnd.uniform(-3.3, 1.5), rnd.uniform(0.2, 2.6)
+        w = rnd.uniform(0.1, 0.2)
+        P.box("in_shard%d" % i, (x - w, y - 0.09, FLOOR), (x + w, y + 0.09, FLOOR + 0.04), "tile", rot_z=rnd.uniform(0, math.pi),
+              tilt=("X", rnd.uniform(-0.2, 0.2), (x, y, FLOOR)))
+    P.tube("in_rafter", [(-2.9, 2.5, FLOOR + 0.07), (-1.0, 0.9, FLOOR + 0.55), (0.4, -0.3, FLOOR + 1.6)], [0.07, 0.07, 0.07], "wood", 6)
+    for f in range(9):
+        a = rnd.uniform(0, 2 * math.pi)
+        ln = rnd.uniform(0.5, 0.8)
+        x0, y0 = -1.9, 1.9
+        P.tube("in_fern%d" % f, [(x0 + math.cos(a) * ln * u, y0 + math.sin(a) * ln * u, FLOOR + 0.02 + 0.45 * math.sin(u * 2.7))
+                                  for u in (0, 0.25, 0.5, 0.75, 1.0)], [0.05, 0.06, 0.05, 0.035, 0.01], "moss", 4)
+    # moss hanging from the bare rafters in the wet, strands of a hand to an arm's length
+    for i in range(30):
+        x = rnd.uniform(-3.3, 1.5)
+        yy = rnd.uniform(0.1, 1.2)
+        ztop = RIDGE_Z - 0.2 - (RIDGE_Z - 7.0) * yy / 1.4
+        ln = rnd.uniform(0.3, 1.2)
+        P.tube("in_moss%d" % i, [(x, yy, ztop), (x + 0.03, yy + 0.02, ztop - ln * 0.5), (x - 0.02, yy, ztop - ln)], [0.035, 0.03, 0.01], "moss", 4)
+
+
+def hide_near():
+    """the inside view: the roof and the near walls hidden from the camera only (they still shade and shelter); the near
+    walls' feet kept as low stubs so the hall's footprint reads"""
+    import bpy
+    for o in bpy.data.objects:
+        if o.type == "MESH" and o.name.startswith(HIDE):
+            o.visible_camera = False
+    P.box("stub_right", (L0, HW - WALL_T, FLOOR), (L1, HW, FLOOR + 0.4), "stucco")
+    P.box("stub_front_l", (L1 - WALL_T, -HW, FLOOR), (L1, -0.9, FLOOR + 0.4), "stucco")
+    P.box("stub_front_r", (L1 - WALL_T, 0.9, FLOOR), (L1, HW, FLOOR + 0.4), "stucco")
+
+
 def broom():
     """the keepers' broom, a bundle of coconut-leaf ribs bound to a bamboo handle, that swept the stair every morning
     (the founder's rule, 05-the-last-breath). It slid off the bottom step where it was dropped and lies across the way"""
@@ -353,6 +452,7 @@ def build(root, material):
     siege()
     tile_heap()
     broom()
+    interior()
 
 
 def ferns():
@@ -396,3 +496,5 @@ _build0 = build
 def build(root, material):
     _build0(root, material)
     ferns()
+    if INSIDE:
+        hide_near()

@@ -40,12 +40,14 @@ R = {
     "moss": ramp("#0e1710", "#152515", "#1e351b", "#284722", "#355a2a", "#456e33", "#58833e"),
     "leaf": ramp("#22120d", "#3a1d10", "#552a14", "#723c1b", "#8d5226", "#a46a34"),
     "algae": ramp("#121a17", "#1b2a22", "#26392b", "#304634", "#3c553e"),
+    # the bentwood boxes' paint: red ochre gone brown, the formline's black, over cedar
+    "ochre": ramp("#1a0d0c", "#2e1410", "#481d14", "#622819", "#7a3620", "#8f4729"),
     "straw": ramp("#1a1612", "#2b251c", "#40372a", "#574b39", "#6f6049", "#88775b", "#a08f6e"),
     # rain standing in the pits, tea-dark with the leaves' tannin: the dark of the crowns in it, a little grey sky
     "water": ramp("#06080a", "#0c1012", "#12191a", "#1b2423", "#26302e", "#333e3b", "#45504b"),
 }
 MAT = {1: "ground", 2: "stucco", 3: "brick", 4: "stone", 5: "lacquer", 6: "gold", 7: "tile", 8: "wood", 9: "root",
-       10: "iron", 11: "bone", 12: "moss", 13: "cloth", 14: "straw", 15: "water"}
+       10: "iron", 11: "bone", 12: "moss", 13: "cloth", 14: "straw", 15: "water", 16: "boxpaint"}
 
 
 def tone(rmp, t, dith, band=0.2):
@@ -138,6 +140,16 @@ def paint(d):
             col = np.where((wall[m] & (a > 0.3 + dith[m] * 0.55))[:, None], tone(R["algae"], t * 0.95, dith[m]), col)
         elif name == "lacquer":
             col = lacquer_paint(m, t, along, Z, W, dith)
+            col = keeper_account(col, m, t, X, Y, Z, n, dith)
+        elif name == "boxpaint":
+            col = box_paint(m, t, along, Z, dith)
+        elif name == "iron":
+            # the black stone, polished by knees: dark, and where it faces up a sheen that gives back the light
+            col = tone(R["iron"], t, dith[m])
+            # where knees and hands have worn it, it gives back the candle in long soft streaks
+            lamp = d["lamp"][m] / 0.09 if "lamp" in d else np.zeros(int(m.sum()))
+            sheen = (up[m] > 0.9) & (vn(X[m] * 1.5, Y[m] * 5.0) + np.clip(lamp, 0, 1) * 0.12 > 0.7)
+            col = np.where(sheen[:, None], tone(R["stone"], t * 0.9 + np.clip(lamp, 0, 1) * 0.15, dith[m]), col)
         elif name == "tile":
             # every tile its own: a course every quarter yard down the slope, a row every third of a yard across; each
             # tile a little lighter or darker, a few gone (the dark beneath), the rust tiles of an older repair in runs
@@ -180,6 +192,13 @@ def paint(d):
     lit = np.clip((n * KEY).sum(2), 0, 1)
     img = np.where((edge & (lit > 0.35))[..., None], np.clip(img * 1.22 + 0.02, 0, 1), img)
     img = np.where((edge & (lit < 0.1))[..., None], img * 0.78, img)
+    # the warm local light (rule 10: a cool key and a warm local light, temperature tinting the tone in steps): the
+    # candle's light from blend_scene.lamp_pass, through the real forms with its true shadows, laid in four steps with
+    # the dither only where one step meets the next
+    if "lamp" in d and d["lamp"].max() > 0:
+        Lw = np.clip(d["lamp"] / 0.09, 0, 1.6)
+        Lq = np.clip(np.floor(Lw * 3 + dith - 0.35), 0, 4) / 3
+        img = img * (1 + Lq[..., None] * np.array([0.85, 0.42, 0.06])) + Lq[..., None] * np.array([0.07, 0.03, 0.0])
     # the paper's tooth, fixed to the world (rule 6): a breath of grain in every tone
     tooth = (vn(X * 31 + Z * 17, Y * 31 - Z * 17) - 0.5) * 0.06
     img = np.clip(img * (1 + tooth[..., None]), 0, 1)
@@ -322,6 +341,39 @@ def wall_maps(n, pos, mat, along, wall):
                 lichen=lichen)
 
 
+def keeper_account(col, m, t, X, Y, Z, n, dith):
+    """the keeper's account (the area's in-game text), cut with a knife into the inside of the door, low down, as if by
+    someone sitting with their back to it, the lines crowding as they go: pale cuts through the lacquer to the wood"""
+    x, y, z = X[m], Y[m], Z[m]
+    door = (x > 4.2) & (x < 5.3) & (np.abs(y) < 1.4) & (z > 1.15) & (z < 2.1)
+    rowh = 0.07 - (z - 1.15) * 0.02                               # the lines crowd as they go down
+    line = np.abs(_frac((2.1 - z) / np.maximum(rowh, 0.03)) - 0.5) < 0.18
+    cut = door & line & (vn(x * 40.0 + y * 40.0, z * 3.0) > 0.38)
+    return np.where(cut[:, None], tone(R["wood"], t * 1.25, dith[m]), col)
+
+
+def box_paint(m, t, along, Z, dith):
+    """the bentwood boxes of the dead, and the screen's boards: red ochre on cedar, the formline in black (an inset band
+    and an ovoid with its dark eye, forms only), a gilt line kept where nothing rubbed it"""
+    lab, nlab = nd.label(m)
+    u = np.zeros(m.shape)
+    w = np.zeros(m.shape)
+    for k in range(1, nlab + 1):
+        q = lab == k
+        a0, a1 = along[q].min(), along[q].max()
+        z0, z1 = Z[q].min(), Z[q].max()
+        u[q] = (along[q] - a0) / max(a1 - a0, 1e-3)
+        w[q] = (Z[q] - z0) / max(z1 - z0, 1e-3)
+    u, w = u[m], w[m]
+    col = tone(R["ochre"], t * 1.45, dith[m])
+    band = (np.minimum(np.minimum(u, 1 - u), np.minimum(w, 1 - w)) < 0.07)
+    ov = ((u - 0.5) / 0.3) ** 2 + ((w - 0.52) / 0.24) ** 2
+    black = band | ((ov > 0.72) & (ov < 1.0)) | (ov < 0.12)
+    col = np.where(black[:, None], tone(R["lacquer"], t, dith[m]), col)
+    gilt = (np.abs(ov - 0.42) < 0.08) & (vn(along[m] * 9.0, Z[m] * 9.0) > 0.4)
+    return np.where(gilt[:, None], tone(R["gold"], t * 0.9, dith[m]), col)
+
+
 def lacquer_paint(m, t, along, Z, W, dith):
     """black lacquer over teak (the shutters, the door): crazed and flaking in islands to the grey wood, more toward
     the foot where the wet reaches; the gilt pattern (gold leaf on black) kept only in an inset border and a lozenge,
@@ -421,6 +473,10 @@ def paint_floor(img, d, v, FM, dith):
         corner = np.clip((0.97 - ao) / 0.35, 0, 1) ** 1.2
         stair = (X > 7.5) & (X < 10.6) & (np.abs(Y) < 1.7)
         dens = np.clip(0.05 + 0.8 * corner + 0.25 * stair, 0, 0.95)
+        # inside the hall the wind hardly reaches: leaves only by the door and under the fallen roof
+        if "skyview" in d:
+            inside = (d["skyview"] < 0.3) & (d.get("shelter", np.zeros_like(ao)) > 0.5) & (X < 4.0)
+            dens = np.where(inside, dens * 0.12, dens)
         img = _leaves_on(img, flat, v, X, Y, dens[flat], np.full(int(flat.sum()), 0.4), 31)
     # leaves lodge only where a steep glazed roof can hold them: the lowest courses, against the eave's lip
     tm = mat == 7

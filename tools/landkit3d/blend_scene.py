@@ -108,7 +108,7 @@ def material(name, index):
     return m
 
 
-def render_passes(out_dir):
+def render_passes(out_dir, lamps=()):
     """render, then read every pass back as numpy and save them (game coordinates) to out_dir/passes.npz"""
     sc = bpy.context.scene
     sc.use_nodes = True
@@ -141,9 +141,44 @@ def render_passes(out_dir):
     pos[..., 1] = -pos[..., 1]
     pos[..., 2] = pos[..., 2] / ZSQ
     sky = sky_passes(out_dir, outs)
+    lamp = lamp_pass(out_dir, outs, lamps)
     np.savez_compressed(os.path.join(out_dir, "passes.npz"), normal=n, pos=pos, ao=P["AO"][..., 0],
                         mat=np.round(P["IndexMA"][..., 0]).astype(np.int16), moon=P["DiffDir"][..., 0],
-                        alpha=P["Alpha"][..., 0], shelter=sky["shelter"], skyview=sky["skyview"], gw=gw, gh=gh)
+                        alpha=P["Alpha"][..., 0], shelter=sky["shelter"], skyview=sky["skyview"], lamp=lamp,
+                        gw=gw, gh=gh)
+
+
+def lamp_pass(out_dir, outs, lamps):
+    """the warm local light (rule 10): the scene's lamps alone, the moon off, as real point lights through the real
+    forms, so the light reaches only what it can see and every edge casts its true shadow. lamps: the scene module's LAMPS,
+    (x, y, z, watts) in game coordinates. Zero when there are none"""
+    sc = bpy.context.scene
+    if not lamps:
+        return np.zeros((sc.render.resolution_y, sc.render.resolution_x), np.float32)
+    moon = bpy.data.objects["moon"]
+    e0 = moon.data.energy
+    moon.data.energy = 0.0
+    made = []
+    for k, (x, y, z, w) in enumerate(lamps):
+        ld = bpy.data.lights.new("lamp%d" % k, "POINT")
+        ld.energy = w
+        ld.shadow_soft_size = 0.03
+        o = bpy.data.objects.new("lamp%d" % k, ld)
+        sc.collection.objects.link(o)
+        o.location = (x, -y, z * ZSQ)
+        made.append(o)
+    for key, fo in outs.items():
+        fo.file_slots[0].path = key + "lamp_"
+    bpy.ops.render.render(write_still=False)
+    f = [x for x in os.listdir(os.path.join(out_dir, "_p")) if x.startswith("DiffDirlamp_")]
+    img = bpy.data.images.load(os.path.join(out_dir, "_p", sorted(f)[-1]))
+    out = np.array(img.pixels[:], dtype=np.float32).reshape(img.size[1], img.size[0], 4)[::-1][..., 0]
+    for o in made:
+        bpy.data.objects.remove(o, do_unlink=True)
+    moon.data.energy = e0
+    for key, fo in outs.items():
+        fo.file_slots[0].path = key + "_"
+    return out
 
 
 def sky_passes(out_dir, outs):
@@ -226,5 +261,5 @@ if __name__ == "__main__":
     setup_camera(focus, gw, gh)
     setup_sun()
     setup_render()
-    render_passes(out_dir)
+    render_passes(out_dir, getattr(mod, "LAMPS", ()))
     print("passes saved", out_dir)
