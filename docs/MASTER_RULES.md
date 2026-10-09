@@ -60,6 +60,27 @@ No check written, no work begun.
    solid, deep and lit. If it goes flat, it fails.
 5. **A generator that computes a height and then uses it only to shade a colour breaks this law.** The height must
    reach the world.
+5b. **Ground is never flat: it has a depth profile at every scale** (Derek, 2026-10-09, of the cove's sand: "just so
+   flat. Shouldn't it have depth profiles to give it more shape and real worldness?"). Every ground (sand, ash, soil,
+   moss, floors of stone) carries its relief by cause, at three scales at once:
+   - **the landform** (yards to tens of yards): dunes and swales, berms, terraces, hollows, the rise to a cliff's foot,
+     the worn way;
+   - **the drift** (a yard or two): what the wind, the water and the feet piled and scoured: drifts banked against what
+     stands, scour hollows on the windward side and sand tails on the lee, hummocks, ruts, runnels, tide lines;
+   - **the grain** (inches): ripples, prints, pebbles, cracks.
+   A ground that reads as a sheet with marks painted on it fails. **The test:** the value-only render of the bare
+   ground (nothing standing on it) must still show its shape.
+5c. **Everything rounded reads as a volume: the five tones of form** (Derek, 2026-10-09: the bones "looking very flat
+   too ... if the rules don't have anything about making things a little more 3D then we need those added"). Being
+   real 3D is not enough when the light is soft (the overcast, a far lamp): the paint must turn every rounded form
+   with
+   - the light side, toward the area's key (the moon, the bright side of the cloud, the fire);
+   - the halftone;
+   - **the core shadow**, a darker band where the form turns from the light, the darkest of the form itself;
+   - **the reflected light**, the ground's bounce lifting its underside a step;
+   - **the cast shadow and the contact**, darkest where it meets what it lies on.
+   A shaft, a body, a rock or a log painted one value across fails, however true its geometry.
+   (`tools/landkit3d/paint_shore.py form_tones` is the method.)
 6. **How it is done, by road:**
    - **The height engine** (ground, terrain, water, the bog): every surface generator has two outputs, a height
      (yards) and a colour. The height goes into the world height field at the grid's resolution (0.04 yd) before the
@@ -201,7 +222,7 @@ means that they always need to be perfect. All this will become assets for the g
 4. Surfaces are laid in long dry-brush strokes along the form, the wind or the flow.
 5. Highlights are a loaded brush dragged across, never square dabs.
 6. A paper tooth under everything, fixed to the world and not to the screen.
-7. Whole world pixels (the 4 px art grid).
+7. Whole world pixels: **the 2 x 2 art grid** (Derek, 2026-10-09: "2x2"; was the 4 px grid).
 8. Still alive: everything moves a little in the one wind (`core/gust.gd`); glows breathe.
 9. Hue-shift every ramp: darks lean violet-blue, lights lean warm.
 10. Light tells the story: a cool key (the moon) and a warm local light (lantern, fire), each casting real shadows,
@@ -218,7 +239,9 @@ means that they always need to be perfect. All this will become assets for the g
 2. **Scale:** true size from the game's projection (a yard is 18 × 9 art px on the ground and 21 px of height), with
    the Ossuarch beside it.
 3. **Form (section 0, the law):** every feature with height is real form (height field or 3D), lit through its
-   normals, casting and catching shadow. The value-only test passes. No flat stand-ins.
+   normals, casting and catching shadow. The value-only test passes. No flat stand-ins. **The ground has its depth
+   profile at all three scales (0.5b), and the bare ground passes the value-only test on its own. Every rounded
+   thing is turned with the five tones of form (0.5c).**
 4. **Light:** the area's light:
    - the moon, or the overcast sky in the first area;
    - a warm local light, with both casting shadows;

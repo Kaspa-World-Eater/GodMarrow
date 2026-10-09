@@ -45,8 +45,18 @@ with what the bog, the pit and the 3D temple taught.*
   position.
 
 **7. Whole world pixels.**
-- The art grid is 4 screen pixels; the paint is in the pixel art, not instead of it.
-- Bakes render at the engine's scale (18 × 9 px a yard), and the game draws them at 4× with nearest filtering.
+- **The art grid is 2 x 2 screen pixels** (Derek, 2026-10-09: "2x2", after the cove's side by side at the game's
+  size: on the old 4 px grid the ground went soft and blocky beside the pilgrim's finer sprite). The paint is in the
+  pixel art, not instead of it.
+- Bakes render at twice the engine's scale (36 × 18 px a yard, 42 of height), and the game draws them at 2× with
+  nearest filtering (a baked land's `index.json`: `"scale": 2`). Lands baked before (the Sunken Bog) stay on the 4 px
+  grid until they are rebaked.
+
+**7b. Turn every form.**
+- Every rounded thing is painted with the five tones of form: the light side, the halftone, the core shadow, the
+  reflected light and the cast shadow with its contact (MASTER_RULES 0.5c). Soft light is no excuse for a flat shaft.
+- The method: `paint_shore.form_tones`, a value offset from the surface's turn to the key and its occlusion, laid over
+  the material's own tone.
 
 **8. Still alive.**
 - Everything moves a little in the one wind (`core/gust.gd`, `Game.wind`, the shader global `world_wind`): grass,

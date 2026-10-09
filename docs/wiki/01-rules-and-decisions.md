@@ -154,6 +154,14 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09, the 2 x 2 art grid, and ground with depth (Derek):** after the cove's side by side at the game's size,
+  "2x2": bakes are painted at twice the engine's scale and drawn at 2 x 2 screen pixels a texel (painted standard 7).
+  And of the cove's sand: "just so flat. Shouldn't it have depth profiles to give it more shape and real worldness?
+  We need to set these as the rules": MASTER_RULES 0.5b, every ground's relief by cause at three scales (the landform,
+  the drift, the grain), the bare ground passing the value-only test on its own. "Which means you need to go back and
+  fix the starting area too": the opening cave's floors get the same.
+  Then: "The bones have the same issue of looking very flat too ... if the rules don't have anything about making
+  things a little more 3D then we need those added": MASTER_RULES 0.5c, the five tones of form on every rounded thing.
 - **2026-10-09, the bible's old age rewritten from Derek's lore notes** (the Myths and Lands page): the gods of fear are
   the Terrors ("the loud gods is a bad name"); the Starving is the Wasting, and starved gods break into Wants, not
   demons; the marrow is the world's own life, and taking it kills the world; no dragons but the one dracolich, the
