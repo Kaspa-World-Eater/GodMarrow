@@ -53,6 +53,10 @@ R = {
     # the black sand: dry above the tide, and wet, where the Red has just left it
     "sand_dry": ramp("#141315", "#1e1c1e", "#292627", "#353131", "#423d3b", "#504a46", "#5f5853"),
     "sand_wet": ramp("#0d0708", "#170b0c", "#221012", "#2d1617", "#3a1d1d", "#482525"),
+    "kelp": ramp("#120708", "#1f0d0b", "#2e150f", "#3e1f14", "#4f2a19"),
+    # the drowned dead: bloated skin gone grey-violet and green, the dark marbling of the veins under it
+    "corpse": ramp("#1d1a1e", "#302a30", "#463e43", "#5e5459", "#776b6c", "#928580", "#ab9d92", "#c2b5a6"),
+    "cloth": ramp("#100e0e", "#1a1717", "#252020", "#312a28", "#3d3431", "#4a3f3a"),
     "dunegrass": ramp("#1a1d12", "#2a2e19", "#3d4122", "#52552c", "#686a37", "#7f7e44"),
     "straw": ramp("#1a1612", "#2b251c", "#40372a", "#574b39", "#6f6049", "#88775b", "#a08f6e"),
     # rain standing in the pits, tea-dark with the leaves' tannin: the dark of the crowns in it, a little grey sky
@@ -60,7 +64,7 @@ R = {
 }
 MAT = {1: "ground", 2: "stucco", 3: "brick", 4: "stone", 5: "lacquer", 6: "gold", 7: "tile", 8: "wood", 9: "root",
        10: "iron", 11: "bone", 12: "moss", 13: "cloth", 14: "straw", 15: "water", 16: "boxpaint", 17: "blood",
-       18: "hide", 19: "cedar", 20: "basalt", 21: "ash"}
+       18: "hide", 19: "cedar", 20: "basalt", 21: "ash", 22: "kelp", 23: "corpse"}
 
 
 def tone(rmp, t, dith, band=0.2):
@@ -155,6 +159,17 @@ def paint(d):
         elif name == "lacquer":
             col = lacquer_paint(m, t, along, Z, W, dith)
             col = keeper_account(col, m, t, X, Y, Z, n, dith)
+        elif name == "blood":
+            col = sea_paint(m, t, X, Y, Z, n, soft, dith, Fm)
+        elif name == "corpse":
+            # the drowned: grey-violet and green, the veins' dark marbling showing through, the skin's tight lit tops;
+            # where they lie in the sand the Red has soaked up into them
+            col = tone(R["corpse"], t * 1.45, dith[m])
+            marb = np.abs(vn(X[m] * 9.0 + Y[m] * 3.0, Z[m] * 9.0 + Y[m] * 6.0) - 0.5) < 0.035
+            col = np.where(marb[:, None], tone(R["corpse"], t * 0.55, dith[m]), col)
+            gnd = Fm.height(X[m], Y[m])
+            soak = (Z[m] - gnd) < 0.05 + 0.04 * vn(X[m] * 6.0, Y[m] * 6.0)
+            col = np.where(soak[:, None], tone(R["blood"], t * 0.9, dith[m]), col)
         elif name == "boxpaint":
             col = box_paint(m, t, along, Z, dith)
         elif name == "iron":
@@ -194,6 +209,8 @@ def paint(d):
                 # the swept stair has had a season or two to green: moss only in the back corner of each tread
                 on_stair = (X[m] > 7.55) & (X[m] < 9.65) & (np.abs(Y[m]) < 1.25)
                 mossy &= ~on_stair | (stand > 0.75)
+                if "sand" in FM:
+                    mossy &= FM["sand"][m] < 0.5                    # nothing greens on the salt sand
             col = np.where(mossy[:, None], tone(R["moss"], t, dith[m]), col)
         img[m] = col
     img = paint_floor(img, d, v, FM, dith)
@@ -355,6 +372,46 @@ def wall_maps(n, pos, mat, along, wall):
                 lichen=lichen)
 
 
+def sea_paint(m, t, X, Y, Z, n, soft, dith, Fm):
+    """the Red Water with the game's own blood (landkit blood.py, the shader's twin: one blood everywhere, held dark,
+    never glowing) at its true depth over the sand, and the lake's ways (library: water): the light broken into dull
+    dabs dragged along the swells, never a smooth sheen; dark foam clinging on the breakers' crests in dabs and
+    strands; the swash a thin film the sand shows through, its edge pooled dark"""
+    import blood as BL
+    x, y, z = X[m], Y[m], Z[m]
+    g = Fm.height(x, y)
+    s_, t_ = (-(x + y) / np.sqrt(2), (x - y) / np.sqrt(2))
+    # the blood ramp (blood.py's C0..C3: clot, dark red, the body, a lit red) picked by the real light on the swells,
+    # held dark (the library's trap: ketchup); the blood effect's churn only as small clots, stretched along the swell
+    churn = fbm(t_ * 0.6 + 2.0, s_ * 2.4)
+    # the swells by their real slopes: their backs, turned from us, take the grey sky; their faces toward us are the
+    # blood's own dark body (the slope along the shore's normal, pushed so a swell reads as a band of tones)
+    n_s = -(n[m][:, 0] + n[m][:, 1]) / np.sqrt(2)
+    lv = np.clip(t, 0, 0.6) * 2.0 + n_s * 5.5 + (churn - 0.5) * 0.45 + dith[m] * 0.3
+    col = np.where((lv > 1.75)[:, None], BL.C2, np.where((lv > 0.95)[:, None], BL.C1, BL.C0))
+    col = col * (0.75 + np.clip(t, 0, 0.6)[:, None] * 0.6)
+    light = np.clip(t * 1.25, 0, 0.55)
+    # the light in dabs: where the surface turns from us the grey sky lies on it, dragged along the swells' line, few
+    V = np.array([0.612, 0.612, 0.5])
+    fres = (1 - np.clip((n[m] * V).sum(1), 0, 1)) ** 2
+    dab = (fres > 0.3) & (vn(t_ * 0.3 + 3.0, s_ * 3.5) > 0.74 - fres * 0.25)
+    col = np.where(dab[:, None], BL.C2 * 0.95 + np.array([0.05, 0.04, 0.05]), col)
+    # foam: dark, it clings on the breakers' crests in thin strands and lies in strands behind them, never pale blobs
+    if hasattr(Fm, "water"):
+        _, crest = Fm.water(s_, t_)
+        foam = (crest > 0.25) & (np.abs(vn(t_ * 0.9, s_ * 3.0) - 0.5) < 0.06 + crest * 0.05)
+        foam |= (crest > 0.05) & (np.abs(vn(t_ * 0.5 + 9, s_ * 2.0) - 0.5) < 0.025)
+        col = np.where(foam[:, None], np.array([0.22, 0.11, 0.11]) * (0.7 + light[:, None]), col)
+    # the shallows over the sand: the sand's red-black shows up through the blood, more the shallower, in dithered
+    # steps (never contour lines); at its very edge a thin dark wet line, the pigment pooled
+    sh = np.clip(1.0 - (z - g) / 0.35, 0, 1)
+    thru = sh > 0.25 + dith[m] * 0.5
+    col = np.where(thru[:, None], tone(R["sand_wet"], t * 0.85, dith[m]) * 0.55 + BL.C1 * 0.45, col)
+    edge = (z - g) < 0.012
+    col = np.where(edge[:, None], BL.C0 * 1.1, col)
+    return col
+
+
 def keeper_account(col, m, t, X, Y, Z, n, dith):
     """the keeper's account (the area's in-game text), cut with a knife into the inside of the door, low down, as if by
     someone sitting with their back to it, the lines crowding as they go: pale cuts through the lacquer to the wood"""
@@ -440,6 +497,7 @@ def paint_floor(img, d, v, FM, dith):
     n, pos, mat, ao = d["normal"], d["pos"], d["mat"], d["ao"]
     X, Y = pos[..., 0], pos[..., 1]
     up = n[..., 2]
+    soft_ = np.clip((n * KEY).sum(2), 0, 1)
     gm = mat == 1
     if gm.any():
         litt = np.clip(FM["litter"] * 1.5 + 0.1, 0, 1.25)
@@ -484,13 +542,36 @@ def paint_floor(img, d, v, FM, dith):
     # has just left it, the tide lines of dried red film; the backshore's dune grass in clumps
     if "sand" in FM:
         sd = gm & (FM["sand"] > 0.5) & ~((mat == 15))
-        wetp = sd & (FM["wet"] > dith * 0.9 + 0.05)
-        dry = sd & ~wetp
-        img[dry] = tone(R["sand_dry"], v[dry] * 1.05 + (vn(X[dry] * 6.0, Y[dry] * 6.0) - 0.5) * 0.05, dith[dry])
-        sheen = np.clip(0.9 - FM["wet"] * 0.3, 0, 1)
-        img[wetp] = tone(R["sand_wet"], v[wetp] * sheen[wetp] * 1.15, dith[wetp])
-        wr = sd & (FM["wrack"] > 0.5) & (vn(X * 3.0, Y * 3.0) > 0.35)
-        img[wr] = tone(R["blood"], v[wr] * 0.9, dith[wr])
+        rag = (fbm(X * 0.9 + 3, Y * 0.9) - 0.5) * 0.5 + (vn(X * 4.0, Y * 4.0) - 0.5) * 0.15
+        wetp = sd & (FM["wet"] + rag > 0.62)
+        damp = sd & ~wetp & (FM["wet"] + rag > 0.32)
+        dry = sd & ~wetp & ~damp
+        # the ripples read by their lit windward slopes and shaded lee faces: the real normal pushed a step
+        img[dry] = tone(R["sand_dry"], v[dry] * 1.05 + (soft_[dry] - 0.45) * 0.45, dith[dry], band=0.1)
+        img[damp] = tone(R["sand_dry"], v[damp] * 0.72, dith[damp], band=0.1)
+        img[wetp] = tone(R["sand_wet"], v[wetp] * 1.05, dith[wetp], band=0.1)
+        # the wet sand gives back the grey sky in dabs where it slopes from us, never a smooth sheen
+        Vv = np.array([0.612, 0.612, 0.5])
+        fres = (1 - np.clip((d["normal"] * Vv).sum(2), 0, 1)) ** 2
+        sh = wetp & (vn(X * 2.6 + 5, Y * 7.0) > 0.8 - fres * 0.3) & (vn(X * 9.0, Y * 9.0) > 0.45)
+        img[sh] = tone(R["sand_wet"], v[sh] * 1.5, dith[sh], band=0.1)
+        if "print" in FM:
+            pr = sd & (FM["print"] > 0.5) & (FM["wet"] + rag > 0.32)
+            import blood as BL
+            img[pr] = BL.C2 * (0.7 + np.clip(v[pr], 0, 0.5)[:, None])     # each print holds a little of the red
+        # the dead bleed into the sand round them: a stain that runs out past each body (the library: a pool hidden
+        # under a body must run out past it), lobed, dark at its heart
+        dead = (mat == 23) | ((mat == 11) & (FM["sand"] > 0.5))
+        if dead.any():
+            import blood as BL
+            dd_ = nd.distance_transform_edt(~dead)
+            reach = 5.0 + 6.0 * fbm(X * 2.2, Y * 2.2) + 4.0 * np.clip((fbm(X * 6, Y * 6) - 0.45) * 2, 0, None) ** 2
+            stain = sd & (dd_ < reach)
+            deep = stain & (dd_ < reach * 0.45)
+            img[stain] = img[stain] * 0.55 + BL.C0 * 0.45                   # soaked dark, never a red rim
+            img[deep] = BL.C0 * 1.15 + BL.C1 * 0.25
+        wr = sd & (FM["wrack"] > 0.5) & (vn(X * 3.0, Y * 3.0) > 0.7) & (vn(X * 11.0, Y * 11.0) > 0.5)
+        img[wr] = tone(R["kelp"], v[wr] * 0.9, dith[wr])
         gr = gm & (FM["grass"] > 0.5) & (vn(X * 2.2 + 4, Y * 2.2) + vn(X * 7, Y * 7) * 0.4 > 0.72)
         img[gr] = tone(R["dunegrass"], v[gr] * 1.1 + (vn(X[gr] * 9, Y[gr] * 9) - 0.5) * 0.15, dith[gr])
     # the stair has not been swept (05-the-last-breath): the leaves lie where they fell, drifted into the back of every
