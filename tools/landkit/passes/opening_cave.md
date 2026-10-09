@@ -431,3 +431,25 @@ surface.
   jaw; the colossal face weeps.
 - **Still short:** the half-cut face sits low and dark at the stairs' foot. The faces' cut stone is lit evenly within
   each band and wants more chisel in the light.
+
+## Rules check (2nd since Derek's B), then pass 7b
+
+**Read:** `MASTER_RULES`, `CINEMATOGRAPHY.md` and the area's opening. The checklist stands as at pass 7. Worst first:
+
+1. **Line 9:** the half-cut face at the stairs' foot sits low and dark. Its fire is too far and too weak (80 W, 1.8 yd
+   off).
+2. **Line 7, paint:** the carved stone is lit evenly within each band, with no hand in it. Rule 37 (ancient) and the
+   real thing: carved basalt keeps the chisel's marks, fine parallel strokes changing direction from plane to plane,
+   seen only where the light rakes them.
+
+**Pass 7b:**
+- The carvings take their own material, `carved` (30). The painter lays the chisel on it: short parallel strokes in the
+  face's own plane, the direction turning with the surface. They are smaller than a pixel in depth, so painted, as the
+  form law allows, and only in the light (rule 7: quiet darks).
+- The foot torch comes closer to the half-cut face and burns brighter.
+
+**Results:**
+- The chisel shows in the lit stone of every carving; the upper stair face reads brow, socket, nose and mouth with the
+  hand in it.
+- The half-cut face is lit but remains the weakest.
+- `cine_check`: the stairs 9 of 9, the hall 8 of 9.

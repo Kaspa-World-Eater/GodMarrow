@@ -147,7 +147,7 @@ def paint(d, t=0.0):
         if not m.any():
             continue
         tm = T[m]
-        if name in ("basalt", "dressed"):
+        if name in ("basalt", "dressed", "carved"):
             # each column its own step of value and its own lean of hue (the cooling made each its own); laid in
             # strokes along the column on the faces, across the tops; a stain by cause (rust running from the joints,
             # pale zeolite in the crevices); the fresh-cut dressed stone a breath lighter and tooled
@@ -155,6 +155,17 @@ def paint(d, t=0.0):
             st_w = vn(along[m] * 5.0 + oh[m] * 13, Z[m] * 0.5) - 0.5
             st_t = vn((X[m] + Y[m]) * 3.0 + oh[m] * 7, (X[m] - Y[m]) * 0.8) - 0.5
             tb = tb + np.where(wall[m], st_w, st_t) * 0.16 * np.clip(tm * 2, 0, 1)
+            if name == "carved":
+                # the chisel: short parallel strokes in the stone's own plane, turning with the surface (each plane
+                # worked from its own side), seen only where the light rakes them
+                nxm, nym, nzm = n[m][:, 0], n[m][:, 1], n[m][:, 2]
+                ang = np.arctan2(nym, nxm) * 2.0 + nzm * 3.0
+                cu = X[m] * np.cos(ang) + Y[m] * np.sin(ang) + Z[m] * 0.7
+                cv = -X[m] * np.sin(ang) + Y[m] * np.cos(ang) + Z[m] * 0.4
+                strokes = (np.abs(_frac(cu * 11.0 + vn(cv * 2.0, cu * 0.5) * 0.8) - 0.5) < 0.16) & (vn(cv * 6.0 + 3, cu * 6.0) > 0.4)
+                tb = np.where(strokes & (tm > 0.2), tb - 0.07, tb)
+                bite = (vn(X[m] * 23 + Z[m] * 11, Y[m] * 23 - Z[m] * 7) > 0.83) & (tm > 0.25)
+                tb = np.where(bite, tb + 0.08, tb)                     # a fresh bite, paler, where the iron struck
             if name == "dressed":
                 tooled = wall[m] & (np.abs(_frac(Z[m] * 8.0 + vn(X[m] * 3, Y[m] * 3) * 0.6) - 0.5) < 0.09)
                 tb = np.where(tooled, tb - 0.05 * np.clip(tm * 3, 0, 1), tb) * 1.08
@@ -222,7 +233,7 @@ def paint(d, t=0.0):
     # the weeping (rule 37, ancient): water has seeped from every socket and crevice of the carved and the raw rock for
     # longer than anyone remembers, and run down the face below it, leaving long dark mineral tears, a pale crust at
     # their lips where a fire finds them
-    stone = ((mat == 20) | (mat == 27)) & wall
+    stone = ((mat == 20) | (mat == 27) | (mat == 30)) & wall
     crev = stone & (ao < 0.42)
     run = np.zeros((gh, gw))
     acc = crev.astype(float)

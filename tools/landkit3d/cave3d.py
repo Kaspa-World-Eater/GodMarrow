@@ -287,7 +287,7 @@ def relief(name, c, nrm, H, kind, seed=0, mat="basalt", wear=0.5, wscale=0.55, b
     for k in range(L):
         faces.append((border[k], border[(k + 1) % L], b0 + (k + 1) % L, b0 + k))
     faces.append(tuple(b0 + k for k in range(L))[::-1])
-    return P.outward(P.poly(name, verts, faces, mat))
+    return P.outward(P.poly(name, verts, faces, "carved" if mat in ("basalt", "dressed") else mat))
 
 
 # ---- the columns ----
@@ -982,7 +982,7 @@ def build(root, material):
     # each face raked by its own fire from its up-stair side, at the brow's height: the nose throws its shadow over the
     # cheek, a socket half black (chapter 12: carved to be seen in moving light)
     f = floor_at(STAIR[0] + 0.4, -6.4) or 0.0
-    torch("torch0", wx + 0.15, -6.4, f + 2.0, 1.0, 0.0, 80.0)
+    torch("torch0", wx + 0.15, -6.0, f + 2.2, 1.0, 0.0, 120.0)
     for i, (y, kind, H) in enumerate(STAIR_FACES):
         ty = y - 0.62 * H - 0.25
         f = floor_at(STAIR[0] + 0.4, ty) or 0.0
