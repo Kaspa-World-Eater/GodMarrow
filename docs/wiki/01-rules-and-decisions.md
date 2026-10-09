@@ -154,6 +154,8 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09, the cave's pass 5, Derek's grade B:** "The faces needs work but it's a B, good job on the lighting, but
+  make the flames more flames like with embers, and flickering, little darker, more defines light zones."
 - **2026-10-09, cinematography is a rule (Derek, on the cave):**
   - His words: "too blocks not enough painted look, lacks fine details is too brightly lit ... I don't see the faces,
     it doesn't give mystical ancient and forlorn vibes"; "There's no cinematography. No. Ambiance. It doesn't inspire

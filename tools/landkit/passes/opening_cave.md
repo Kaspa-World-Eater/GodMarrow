@@ -327,3 +327,49 @@ black band. A single straight shelf threw one continuous shadow over both socket
 - `cine_check`: the stairs pass 9 of 9, the hall 8 of 9 (its crown dark on purpose).
 - At the game's scale: the colossal face reads as a face from across the hall; the upper stair face reads brow,
   socket, nose and mouth in its torch's raking light.
+
+## Derek, 2026-10-09: B
+
+"The faces needs work but it's a B, good job on the lighting, but make the flames more flames like with embers, and
+flickering, little darker, more defines light zones"
+
+**Next (pass 6):**
+- **The flames** become real fire, per saint11's fire tutorial:
+  - a bright base that holds its volume, with tongues born at the base, rising, narrowing to points and tearing off;
+  - ragged edges that change every frame;
+  - embers: cold sparks flicking up and dying.
+- **The light** flickers more, without strobing.
+- **A step darker.**
+- **Light zones defined:** each pool stepped in bands by its falloff (rule 10: at least three bands, each wider than
+  the one inside it), the form's shading kept within each band.
+- **Later:** the faces.
+
+## Pass 6 (Derek's B, his notes)
+
+**The flames** (`paint_cave.fires`, saint11's fire tutorial):
+- A bright base that holds its volume.
+- Tongues (three to a torch, six to a brazier) born at the base, rising, narrowing to points and tearing off, their
+  edges ragged by a noise that moves with time.
+- White heart, pale cyan, cold blue; the dying tips violet-blue and half there.
+- Embers flick up, wink and die within about a yard.
+- The light's own flicker is stronger (integer frequencies so the loop closes; never a strobe).
+- The loops have 12 frames at 90 ms.
+
+**A step darker:** `EXPO` from 0.30 to 0.25; the shadow's bounce from 0.09 to 0.06.
+
+**The light zones defined:**
+- The light is split into its falloff (from the lamps' positions and power, matched to the pass) and the form's own
+  shading (the pass over the falloff: shadows and turn to the fire).
+- The falloff is stepped into six bands, equal steps in the log, so each band is wider than the one inside it
+  (rule 10), with a narrow dither at each seam.
+- The form keeps its shading inside each band.
+- The faint fringe stays continuous (at most a quarter dimmer). The first try stepped it to black and the colossal face
+  vanished.
+- A wide dither seam brought the stipple back over whole walls, so it is held to a thin line.
+
+**Grade:** B. **Still short:** the faces (Derek: "The faces needs work"), then the heap's middle and the pool's
+surface.
+
+**`cine_check`:**
+- The stairs pass 9 of 9, the pool 9 of 9, the hall 8 of 9 (rule 22: the face's crown is dark on purpose).
+- Rule 1 now ignores specks under 3 px, since an ember is fire too.

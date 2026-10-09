@@ -46,6 +46,7 @@ def check(path, interior=True):
     top = L >= thr
     lab, k = nd.label(nd.binary_dilation(top, iterations=2))
     sizes = nd.sum(top, lab, range(1, k + 1)) if k else np.array([0])
+    k = int((sizes >= 3).sum())                                 # an ember is fire too: specks under 3 px don't count
     rule(1, "brightest pixels in a few small places (sources)", "%d places, largest %d px" % (k, int(sizes.max())),
          k <= 24 and sizes.max() < n * 0.004)
     # 2: low key

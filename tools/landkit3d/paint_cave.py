@@ -27,7 +27,8 @@ WISP_C = np.array([0.62, 0.80, 1.0])
 # the wisp-fire's own colours, hot to cool: white heart, pale cyan, the cold blue body, its dying edge
 FL = [np.array(c) / 255.0 for c in ((246, 251, 255), (204, 236, 255), (140, 200, 255), (84, 148, 245), (46, 88, 200))]
 LMAX = 30.0                                            # the light that is the ramp's top
-EXPO = 0.3                                             # the fires' reach: pools of light, black between (rule 2)
+ZONES = 6                                              # the bands of a pool of light
+EXPO = 0.25                                            # the fires' reach: pools of light, black between (rule 2)
 R_DUST = P3.ramp("#0e0d10", "#1b191b", "#2a2726", "#3b3734", "#4d4842", "#615a52")
 R_OBS = P3.ramp("#030305", "#07070b", "#0c0d13", "#13151d", "#1c2029")
 
@@ -61,8 +62,8 @@ def flicker(lamps, t):
         if L[4] > 0.9 and L[5] < 0.3:                                   # the pool's red
             out.append(1.0 + 0.06 * math.sin(2 * math.pi * (t + ph)))
         else:
-            out.append(1.0 + 0.11 * math.sin(2 * math.pi * (2 * t + ph)) + 0.06 * math.sin(2 * math.pi * (5 * t + 2 * ph))
-                       + 0.04 * math.sin(2 * math.pi * (9 * t + 3 * ph)))
+            out.append(1.0 + 0.15 * math.sin(2 * math.pi * (2 * t + ph)) + 0.09 * math.sin(2 * math.pi * (5 * t + 2 * ph))
+                       + 0.06 * math.sin(2 * math.pi * (9 * t + 3 * ph)))
     return np.array(out)
 
 
@@ -81,13 +82,18 @@ def light_field(d, t):
         wsum += w
         fsum += w * fk[i]
     mult = fsum / (wsum + 1e-9)
+    F = fsum / float(d["lamp_ref"])                                      # the falloff, shadows and form aside
     # the render's grain smoothed out of the light (its hue above all: a stray red sample is a red speck)
     L = np.stack([nd.median_filter(L[..., c], size=3) for c in range(3)], axis=2)
     lum = L.max(axis=2)
     Ls = np.stack([nd.gaussian_filter(L[..., c], 2.0) for c in range(3)], axis=2)
     hue = Ls / (Ls.max(axis=2, keepdims=True) + 1e-9)
     ref = float(d["lamp_ref"])
-    return lum / ref * mult, hue, fk
+    light = lum / ref * mult
+    lit = light > 0.05
+    c = float(np.median(light[lit] / (F[lit] + 1e-9))) if lit.any() else 1.0
+    F = F * c
+    return light, hue, fk, F
 
 
 def spec_glints(d, light, wet):
@@ -113,13 +119,20 @@ def paint(d, t=0.0):
     X, Y, Z = pos[..., 0], pos[..., 1], pos[..., 2]
     up = n[..., 2]
     dith = B4[np.arange(gh)[:, None] % 4, np.arange(gw)[None, :] % 4]
-    light, hue, fk = light_field(d, t)
+    light, hue, fk, F = light_field(d, t)
     amb = float(d["ambient"]) * 0.5 * ao ** 2
     # the light's tone: falls off fast and saturates near the fire (the stone a step from the flame is its lightest)
     # logarithmic, as the eye sees: the turn of a carving toward or from a fire stays readable right beside the flame
-    T = np.clip(np.log1p(light * EXPO) / np.log1p(LMAX * EXPO), 0, 1) ** 1.15 + amb
+    # the light zones defined (Derek: "more defines light zones"; rule 10): the falloff stepped into bands, each wider
+    # than the one inside it (equal steps in the log of the light), the edge between two a narrow dither; the form's
+    # own turn to the fire and its shadows kept whole inside each band
+    Fn = np.clip(np.log1p(F * EXPO) / np.log1p(LMAX * EXPO), 0, 1) ** 1.15
+    Fz = np.floor(Fn * ZONES + (dith - 0.5) * 0.08 + 0.5) / ZONES
+    shade = np.clip(light / (F + 1e-6), 0, 1.25) ** 0.8
+    # the faint fringe of a pool stays continuous (a carving's turn must still read there), the bands crisp above it
+    T = np.maximum(Fz, Fn * 0.75) * shade + amb
     # the shadow is not black but the weak light of everything lit nearby (Gurney); the contacts stay darkest
-    T = T + 0.09 * np.clip(ao, 0, 1) ** 2
+    T = T + 0.06 * np.clip(ao, 0, 1) ** 2
     # quiet darks: the dither only where there is light to step (rule 7)
     dith = np.where(T < 0.16, 0.5, dith)
     oh = _hash(obj.astype(np.float64))                                # each object (each column, each flag) its own
@@ -276,10 +289,24 @@ def tongues(w):
     return [(0.0, 1.0)] if w < 150 else [(-1.1, 0.7), (-0.45, 0.95), (0.25, 1.0), (0.9, 0.75), (1.5, 0.55)]
 
 
+def _tongue_mask(xx, yy, cx, cy, w, h, seed, t):
+    """one tongue of fire: a teardrop pointing up, narrower above its middle, its edge ragged by a noise that moves
+    with time (a flame's edge is never the same twice)"""
+    du = (xx - cx) / (w * 0.5 + 1e-6)
+    dv = (cy - yy) / (h * 0.5 + 1e-6)                                    # up is positive
+    narrow = np.where(dv > 0, 1.0 - np.clip(dv, 0, 1) * 0.75, 1.0)
+    q = np.sqrt((du / np.maximum(narrow, 0.08)) ** 2 + dv ** 2)
+    rag = (vn(xx * 0.55 + seed * 7.1, yy * 0.4 + t * 9.0 + seed) - 0.5) * 0.55
+    return q, q < 1.0 + rag
+
+
 def fires(img, d, proj, fk, t):
-    """each wisp-fire seen (rule 3): a flame painted at its lamp, white at the heart and cold blue at the edge,
-    swaying and flickering on its own breath, its tongues tearing off; a small aura on the stone close behind it; cold
-    motes rising and dying within a yard. Hidden by whatever stands nearer the camera"""
+    """each wisp-fire seen (rule 3), painted as fire is (saint11: "each fire wave starts brighter and on the bottom";
+    "the wave top fades in a pointy shape"; "I divide the flame in base and particles ... the base change the shape
+    but keeps volume"; "ember flicks and moves slightly"): a bright base that holds its volume; tongues born at the
+    base, rising, narrowing to points and tearing off, their edges ragged and never the same twice; white at the heart,
+    pale cyan, cold blue, the tips dying violet-blue; embers flicking up and dying within a yard; an aura on the stone
+    close behind. Hidden by whatever stands nearer the camera"""
     gh, gw = img.shape[:2]
     pos = d["pos"]
     depth = (pos * CAM).sum(2)
@@ -295,61 +322,75 @@ def fires(img, d, proj, fk, t):
         base = lp[:3] - np.array([0, 0, size * 0.55])
         sx, sy = proj(base)
         sx, sy = float(sx[0]), float(sy[0])
-        if not (-30 < sx < gw + 30 and -30 < sy < gh + 30):
+        if not (-40 < sx < gw + 40 and -40 < sy < gh + 40):
             continue
         ph = float(_hash(np.float64(i), 5.0))
-        hpx = size * 2.4 * 21.0 * zoom * (0.9 + 0.12 * math.sin(2 * math.pi * (3 * t + ph)) + 0.06 * math.sin(2 * math.pi * (7 * t + ph * 2)))
-        wpx = max(2.2, size * 1.3 * 25.0 * zoom)
+        brazier = lp[3] >= 150
+        hpx = size * 2.4 * 21.0 * zoom * (0.92 + 0.1 * fk[i])
+        wpx = max(2.4, size * 1.3 * 25.0 * zoom) * (1.6 if brazier else 1.0)
         ldepth = float((lp[:3] * CAM).sum())
         # the aura on the stone near it (only on what is truly near the fire), stepped
-        r0 = wpx * (2.2 if lp[3] < 150 else 3.4)
-        y0, y1 = int(max(0, sy - hpx - r0 * 2)), int(min(gh, sy + r0 * 2))
-        x0, x1 = int(max(0, sx - r0 * 2.5)), int(min(gw, sx + r0 * 2.5))
+        r0 = wpx * (2.0 if not brazier else 2.4)
+        y0, y1 = int(max(0, sy - hpx * 3.2 - r0)), int(min(gh, sy + r0 * 1.6))
+        x0, x1 = int(max(0, sx - r0 * 2.4)), int(min(gw, sx + r0 * 2.4))
         if y1 <= y0 or x1 <= x0:
             continue
         sub = (slice(y0, y1), slice(x0, x1))
+        X_, Y_ = xx[sub].astype(float), yy[sub].astype(float)
         cy = sy - hpx * 0.4
-        rr = np.hypot(xx[sub] - sx, (yy[sub] - cy) * 1.15)
+        rr = np.hypot(X_ - sx, (Y_ - cy) * 1.15)
         near = np.linalg.norm(pos[sub] - lp[:3], axis=2) < 1.6
         a = np.exp(-(rr / r0) ** 2) * fk[i]
         aq = np.floor(a * 3 + dith[sub] * 0.5) / 3
-        out[sub] = np.where((near & (aq > 0))[..., None], np.clip(out[sub] + WISP_C * 0.16 * aq[..., None], 0, 1), out[sub])
-        # the air's own glow round the flame (the ethereal: the fire hangs in a breath of its own light)
-        a2 = np.exp(-(rr / (wpx * 1.4)) ** 2)
-        a2q = (a2 > 0.35 + dith[sub] * 0.3) & (depth[sub] > ldepth - 0.2)
-        out[sub] = np.where(a2q[..., None], np.clip(out[sub] * 0.7 + FL[3] * 0.45, 0, 1), out[sub])
-        # the flame (a brazier's many tongues, each on its own breath)
+        out[sub] = np.where((near & (aq > 0))[..., None], np.clip(out[sub] + WISP_C * 0.14 * aq[..., None], 0, 1), out[sub])
         vis = depth[sub] > ldepth - 0.25
-        for q_, (ox, hs) in enumerate(tongues(lp[3])):
-            ph2 = ph + q_ * 0.37
-            hq = hpx * hs * (0.85 + 0.2 * math.sin(2 * math.pi * (3 * t + ph2)))
-            v = (sy - yy[sub]) / hq                                      # 0 at its foot, 1 at its tip
-            sway = (0.55 * math.sin(2 * math.pi * (2 * t + ph2)) + 0.3 * math.sin(2 * math.pi * (5 * t + ph2 * 3))) * wpx * 0.35
-            u = (xx[sub] - sx - ox * wpx - sway * np.clip(v, 0, 1) ** 1.5) / wpx
-            width = np.where((v > 0) & (v < 1), np.sin(np.pi * np.clip(v, 0, 1) ** 0.65) * (1 - np.clip(v, 0, 1)) ** 0.25 * 0.55, 0)
-            q = np.abs(u) / (width + 1e-6)
-            inside = (q < 1.0) & (width > 0.02)
-            c = np.where((q < 0.3)[..., None] & (v < 0.55)[..., None], FL[0],
-                         np.where((q < 0.55)[..., None], FL[1], np.where((q < 0.8)[..., None], FL[2], FL[3])))
-            edge = (q > 0.8) & (dith[sub] > 0.5)                         # the edge half there: ethereal
-            draw = inside & vis
-            out[sub] = np.where((draw & ~edge)[..., None], c, np.where((draw & edge)[..., None], out[sub] * 0.4 + FL[3] * 0.6, out[sub]))
-        # a tongue torn off above the tip, now and then
-        tv = (2 * t + ph) % 1.0
-        if tv < 0.5:
-            ty_ = sy - hpx * (1.05 + tv * 0.9)
-            tx_ = sx + sway * 1.3
-            tr = np.hypot((xx[sub] - tx_) / (wpx * 0.22), (yy[sub] - ty_) / (wpx * 0.45))
-            tk = (tr < 1.0) & vis
-            out[sub] = np.where(tk[..., None], FL[2] * (1 - tv) + out[sub] * tv, out[sub])
-        # cold motes rising, dying within a yard
-        for k in range(4):
-            mp = float(_hash(np.float64(i * 7 + k), 9.0))
-            life = (t * (1 + k % 2) + mp) % 1.0
-            mx = int(round(sx + math.sin(2 * math.pi * (life * 1.5 + mp)) * wpx * 0.9 + (mp - 0.5) * wpx))
-            my = int(round(sy - hpx - life * 21.0 * zoom * 1.1))
-            if 0 <= mx < gw and 0 <= my < gh and life < 0.85 and depth[my, mx] > ldepth - 0.25:
-                out[my, mx] = FL[1] if life < 0.4 else FL[3]
+        heat = np.zeros(X_.shape)                                        # 0 none, then rising: tip, body, inner, heart
+        # the base: holds its volume, its shape breathing
+        bw = wpx * (0.85 + 0.12 * math.sin(2 * math.pi * (3 * t + ph)))
+        bh = hpx * 0.42
+        q, m = _tongue_mask(X_, Y_, sx, sy - bh * 0.45, bw, bh, i, t)
+        heat = np.where(m, np.maximum(heat, np.where(q < 0.45, 4, np.where(q < 0.75, 3, 2))), heat)
+        # the tongues: born at the base, rising, narrowing, tearing off
+        n_t = 6 if brazier else 3
+        for k in range(n_t):
+            p = (t * (2 + (k % 2)) + k / n_t + ph) % 1.0
+            sway = math.sin(2 * math.pi * (p * 0.9 + ph + k * 0.31)) * wpx * 0.28 * p
+            off = ((k + 0.5) / n_t - 0.5) * wpx * (0.9 if brazier else 0.45)
+            tw = bw * (0.75 - 0.55 * p) * (0.8 if brazier else 1.0)
+            th = hpx * (0.55 + 0.25 * (1 - p))
+            tcy = sy - bh * 0.3 - p * hpx * 0.95 - th * 0.35
+            q, m = _tongue_mask(X_, Y_, sx + off + sway, tcy, tw, th, i * 13 + k, t)
+            hot = np.where(p < 0.35, np.where(q < 0.4, 4, np.where(q < 0.7, 3, 2)),
+                           np.where(p < 0.7, np.where(q < 0.5, 3, 2), 1))
+            heat = np.where(m, np.maximum(heat, hot), heat)
+        cols = [None, FL[4], FL[3], FL[2], FL[1]]
+        core = (heat >= 4) & (np.hypot(X_ - sx, (Y_ - (sy - bh * 0.4)) * 0.8) < bw * 0.22)
+        draw = (heat > 0) & vis
+        layer = out[sub].copy()
+        for lv in (1, 2, 3, 4):
+            sel = draw & (heat == lv)
+            if lv == 1:
+                sel &= dith[sub] > 0.35                                  # the dying tips half there: ethereal
+            layer = np.where(sel[..., None], cols[lv], layer)
+        layer = np.where((core & vis)[..., None], FL[0], layer)
+        out[sub] = layer
+        # embers: cold sparks flicking up from the fire, twinkling, dying within a yard
+        n_e = 14 if brazier else 7
+        for k in range(n_e):
+            o1 = float(_hash(np.float64(i * 31 + k), 9.0))
+            o2 = float(_hash(np.float64(i * 31 + k), 11.0))
+            o3 = float(_hash(np.float64(i * 31 + k), 13.0))
+            pe = (t * (1 + (k % 3 == 0)) + o1) % 1.0
+            if pe > 0.9:
+                continue
+            ex = sx + (o2 - 0.5) * wpx * 1.1 + (o3 - 0.5) * wpx * 2.2 * pe + math.sin(2 * math.pi * (pe * 2.5 + o3)) * 1.6
+            ey = sy - hpx * 0.6 - pe * 21.0 * zoom * (1.0 + 0.6 * o2)
+            mx, my = int(round(ex)), int(round(ey))
+            if not (0 <= mx < gw and 0 <= my < gh) or depth[my, mx] <= ldepth - 0.25:
+                continue
+            if (pe * 9.0 + o1 * 5) % 1.0 < 0.22:
+                continue                                                  # it winks out a moment
+            out[my, mx] = FL[0] if pe < 0.25 else (FL[1] if pe < 0.55 else FL[3])
     return out
 
 
@@ -372,7 +413,7 @@ def main():
             big = P3.place_hero(big, d, hero, focus, gw, gh)
         ims.append(Image.fromarray((np.clip(big, 0, 1) * 255).astype(np.uint8)))
     if out.endswith(".webp") and frames > 1:
-        ims[0].save(out, save_all=True, append_images=ims[1:], duration=140, loop=0, lossless=True)
+        ims[0].save(out, save_all=True, append_images=ims[1:], duration=90, loop=0, lossless=True)
     else:
         ims[0].save(out)
     print("saved", out)
