@@ -159,3 +159,7 @@ columns stand a little inside it, so the faces, torches and skeleton were buried
 **Grade: the stairs C.** The rough stumps at the foot turn into cut steps as they climb into the wisp-light: the raw
 becoming the made, readable in one climb. **Still short:** the faces are too shallow and small to catch the light,
 and need their own pass (deeper carving, bigger, lit from the side by the torches).
+
+**Rules check paused** (2026-10-09): the third reminder with no word from Derek, so the reminder is off by his pause
+rule until he next writes. **Next when work resumes:** the faces' own pass (deeper carving, bigger, lit from the side),
+then the hall at the game's scale.
