@@ -154,17 +154,22 @@ basalt cliffs that close the beach, and leaving it, the pilgrim comes out of the
 **The beats:**
 1. **The pool.** Black, then a breath. A dark silhouette drags itself up out of a visceral pool of blood in a low
    basalt cave: the Red, come in under the cliffs. The pilgrim looks exactly like the corpses on the beach, and stands.
-   The only light is blue wisp-fire in rusted iron holders, which rims the shape in cold blue (the blood never glows).
-2. **The stairs.** Steps cut up through the rock. On the walls, faces: blunt, distinct, worn; some without eyes, some
+   The only light is fire in iron holders (Derek, 2026-10-09: ordinary orange fire, no longer blue wisp-fire).
+2. **The stairs.** Steps cut up through the rock, fires in iron holders. On the walls, faces: blunt, distinct, worn; some without eyes, some
    without mouths, some only half cut. On the way up, a skeleton fixed to the wall lets its weapon fall: the starting
    weapon (its kind by class, to be settled later). There are no enemies until the beach.
-3. **The hall.** The Conan tomb, emptied. A throne of black basalt on a dais, with no one in it; the rusted weapons and
+3. **The hall.** *(Derek, 2026-10-09: the dark mirror replaces the throne at the top of the stairs; the heap lies at
+   their foot; the lines below that name the throne wait to be reworked to the mirror.)* The Conan tomb, emptied. A throne of black basalt on a dais, with no one in it; the rusted weapons and
    armour of everyone who came up before heaped before it. Faces all round the walls. The Stranger sits on the dais
    step beside the throne, never on it.
 4. **The Reading.** He reads the pilgrim's fate with the tarot; the drawing is the character creation (the nine draws,
    `00-the-deep-lore.md`).
-5. **The door.** A doorway of white light, which is only the grey day after the dark, but it burns. The pilgrim comes
-   out of the black cliffs onto the beach full of corpses.
+5. **The mirror** (Derek, 2026-10-09: "Give the room no exit. There will be a large mirror the player looks in in a large
+   face, it reflects nothing but darkness"). The hall has no door. In its wall a great face rises from the floor to its
+   chin, and its open mouth holds a great dark mirror at a standing pilgrim's height. Every other mirror in the hall
+   holds the fires; this one holds nothing, and no pilgrim. **The mirror is the way out** (Derek: "they will walk into it
+   and disappear"; "The large mirror will be at the top of the throne stairs"): the pilgrim climbs the throne's steps,
+   walks into the darkness of the mirror and is gone, and comes out of the black cliffs onto the beach full of corpses.
 
 **From the raw to the made** (Derek): the cave begins as rough natural basalt and becomes more carved as the pilgrim
 climbs, until the hall is plainly a forgotten temple cut into the living rock. Nobody can say who cut it; it is older

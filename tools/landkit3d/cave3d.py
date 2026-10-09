@@ -23,18 +23,20 @@ LAMPS = []
 MIRRORS = []
 LAMP_REF = 0.05
 SAMPLES = 128                            # the fires' light must be clean: noise in it becomes noise of hue
-WISP = (0.62, 0.80, 1.0)                 # the wisp-fire: white-blue (Derek: "The wisp light flame should be white blue")
+WISP = (1.0, 0.55, 0.22)                 # the fires: ordinary orange fire (Derek, 2026-10-09: "Change the wisp fire into
+                                         # normal orange fires"; it was white-blue wisp-fire before)
 RED = (1.0, 0.12, 0.06)                  # the pool's glow (Derek: "glowing red near the pool"; the one red light allowed)
 
 POOL = (0.0, 0.0, 9.5, 7.4)              # the pool chamber: centre x, y and radii (yards)
 STAIR = (-4.6, -0.2, -5.8, -19.5)        # the stairs: x from, x to, y from (bottom), y to (top)
 HALL = (-1.9, -31.5, 11.0, 9.5)          # the hall, up and to the right, so the stair's carved wall never hides it
-BASIN = (1.0, 0.7, 2.4)                  # the pool itself: centre and the radius of its deep heart
+BASIN = (-1.6, -1.4, 2.4)                  # the pool itself: centre and the radius of its deep heart
 FLOOR_HALL = 6.0
 STEPS = 17
 DOOR = (5.9, -38.1)
 AMBIENT = 0.05                           # nothing reaches in here: the fires make all the light (chapter 12, rule 2)
 CARVE_H = 4.2                            # how high the builders dressed the hall's walls before they stopped
+MASKS = True                             # every face but the great one is a smooth mask (Derek, 2026-10-09)
 FACE_TH = math.radians(222.0)            # where the colossal face is cut in the hall's back wall
 
 
@@ -47,6 +49,8 @@ def floor_at(x, y, k=0.5):
     """the floor's height where a column stump stands, or None where the rock is solid (a wall)"""
     if _ell(x, y, POOL) < 1.0:
         db = math.hypot(x - BASIN[0], y - BASIN[1])
+        if db >= BASIN[2] and _in_runnel(x, y):
+            return -0.34 + k * 0.1                                  # the worn channel, under the blood
         if db < BASIN[2]:
             return -0.75 + (0.5 if k > 0.85 else 0.0)              # under the blood, a stump or two rising as islands
         if db < BASIN[2] + 1.3:
@@ -111,9 +115,20 @@ def face_params(kind, seed):
              eyey=r.uniform(0.04, 0.12), nose=r.uniform(0.75, 1.15), mouthw=r.uniform(0.2, 0.32), mouthy=r.uniform(-0.48, -0.38),
              chin=r.uniform(0.04, 0.09), lift=r.uniform(-0.15, 0.25), third=False, low=0.0, sock2=1.0, stitched=False,
              inner=False, crack=[], broken=None)
+    if kind == "plain":
+        p.update(hw=0.62, hl=1.0, brow=0.26, eye=0.27, eyey=0.09, nose=0.95, mouthw=0.24, mouthy=-0.42, chin=0.07, lift=0.0)
+        return p
+    if kind == "mirrormouth":
+        p.update(hw=0.62, hl=1.0, brow=0.27, eye=0.27, eyey=0.1, nose=0.85, mouthw=0.3, mouthy=-0.36, chin=0.06, lift=0.0)
+        p["crack"] = [(0.2, 1.0, 0.45, 0.2)]
+        return p
     if kind == "orcus":
         p.update(hw=0.64, hl=1.0, brow=0.25, eye=0.28, eyey=0.08, nose=1.0, mouthw=0.27, mouthy=-0.43, chin=0.07, lift=0.0)
-        p["crack"] = [(-0.3, 0.95, 0.1, -0.2), (0.45, 0.6, 0.62, -0.1)]
+        p["crack"] = []                                             # one smooth great face
+        return p
+    # every face but the great one is a mask in the wall's own stone (Derek: "just the features like porcelain mas[ks]
+    # but made of the wall ... Nothing in their mouths"): smooth, nothing wrong, no cracks, no broken pieces
+    if MASKS:
         return p
     wrong = r.random()
     if wrong < 0.2:
@@ -159,10 +174,10 @@ def face_depth(X, Y, kind, wear, seed, pits, p=None):
         u = (X - sx * ex) / (0.24 * ex / 0.28)
         if abs(u) < 1.0:
             yb = p["brow"] + 0.07 * (1 - u * u) + (p["lift"] * 0.08 * sx * u if kind != "orcus" else 0.0)
-            f += 0.1 * (1 - u ** 6) * math.exp(-((Y - yb - 0.03) / 0.06) ** 2) * (1.0 if Y > yb - 0.04 else 0.4)
+            f += 0.13 * (1 - u ** 6) * math.exp(-((Y - yb - 0.03) / 0.045) ** 2) * (1.0 if Y > yb - 0.03 else 0.25)
     f += 0.09 * math.exp(-((X / 0.07) ** 2 + ((Y - p["brow"] + 0.05) / 0.11) ** 2))
     f += 0.03 * math.exp(-((X / 0.3) ** 2 + ((Y - 0.55) / 0.2) ** 2))
-    sock = {"eyeless": -0.2, "orcus": -0.26, "full": -0.13, "half": -0.13, "blind": -0.07, "closed": -0.09,
+    sock = {"plain": -0.15, "eyeless": -0.24, "orcus": -0.28, "mirrormouth": -0.22, "full": -0.13, "half": -0.13, "blind": -0.07, "closed": -0.09,
             "mouthless": -0.15, "effaced": -0.06}[kind]
     for sx in (-1, 1):
         k2 = p["sock2"] if sx > 0 else 1.0
@@ -183,19 +198,19 @@ def face_depth(X, Y, kind, wear, seed, pits, p=None):
     if ybot < Y < ytop:
         u = (ytop - Y) / (ytop - ybot)
         w = 0.045 + 0.075 * u
-        f += (0.07 + 0.13 * u) * max(0.0, 1 - (ax / w) ** 2) * min(1.0, (Y - ybot) / 0.05)
+        f += (0.08 + 0.18 * u) * max(0.0, 1 - (ax / w) ** 4) * min(1.0, (Y - ybot) / 0.03)
     f += 0.06 * math.exp(-((X / 0.12) ** 2 + ((Y - ybot - 0.03) / 0.05) ** 2))
     f -= 0.035 * (math.exp(-(((X - 0.075) / 0.03) ** 2 + ((Y - ybot) / 0.025) ** 2)) + math.exp(-(((X + 0.075) / 0.03) ** 2 + ((Y - ybot) / 0.025) ** 2)))
     for sx in (-1, 1):
         f += 0.05 * math.exp(-(((X - sx * (ex + 0.12)) / 0.12) ** 2 + ((Y + 0.0) / 0.09) ** 2))
-        f -= 0.05 * math.exp(-(((X - sx * (ex + 0.04)) / 0.12) ** 2 + ((Y + 0.28) / 0.12) ** 2))
+        f -= 0.075 * math.exp(-(((X - sx * (ex + 0.04)) / 0.11) ** 2 + ((Y + 0.28) / 0.11) ** 2))
     my, mw = p["mouthy"], p["mouthw"]
     if kind in ("full", "eyeless", "half", "blind", "closed"):
         lip = max(0.0, 1 - (X / mw) ** 2)
         yc = my + 0.03 * X * X / (mw * mw)
         f += 0.06 * lip * math.exp(-((Y - yc - 0.035) / 0.04) ** 2)
         f += 0.07 * lip * math.exp(-((Y - yc + 0.045) / 0.045) ** 2)
-        f -= 0.09 * lip * math.exp(-((Y - yc) / 0.016) ** 2)
+        f -= 0.13 * lip * math.exp(-((Y - yc) / 0.014) ** 2)
         if p["stitched"] and abs(Y - yc) < 0.07 and ax < mw * 0.9:
             if abs(((X / mw) * 4.5) % 1.0 - 0.5) < 0.12:
                 f -= 0.05                                                   # the stitches, cut across the lips
@@ -205,6 +220,19 @@ def face_depth(X, Y, kind, wear, seed, pits, p=None):
                 f -= 0.03 * math.exp(-(((X - sx * 0.06) / 0.025) ** 2 + ((Y - yc - 0.02) / 0.02) ** 2))
     if kind == "mouthless":
         f += 0.02 * math.exp(-((X / 0.25) ** 2 + ((Y - my) / 0.12) ** 2))
+    if kind == "plain":
+        lip = max(0.0, 1 - (X / mw) ** 2)
+        f += 0.06 * lip * math.exp(-((Y - my - 0.07) / 0.04) ** 2)
+        f += 0.07 * lip * math.exp(-((Y - my + 0.08) / 0.045) ** 2)
+        mo = (X / (mw * 0.8)) ** 2 + ((Y - my) / 0.075) ** 2
+        if mo < 1.0:
+            f -= 0.2 * math.sqrt(1.0 - mo)                               # the mouth open, a dark hollow
+        f += 0.1 * math.exp(-((X / 0.06) ** 2 + ((Y - 0.12) / 0.08) ** 2)) * 0.0
+    if kind == "mirrormouth":
+        mo = (X / 0.33) ** 2 + ((Y + 0.36) / 0.33) ** 2
+        if mo < 1.0:
+            f -= 0.22 * min(1.0, (1.0 - mo) * 4)                       # the round mouth, cut back to hold the mirror
+        f += 0.07 * math.exp(-((math.sqrt(mo) - 1.0) / 0.06) ** 2)
     if kind == "orcus":
         mo = (X / 0.42) ** 2 + ((Y + 0.36) / 0.28) ** 2
         if mo < 1.0:
@@ -216,8 +244,9 @@ def face_depth(X, Y, kind, wear, seed, pits, p=None):
         keep = 0.15
     inside_ = min(1.0, max(0.0, (1.12 - e) / 0.2))
     d = head + f * keep * inside_
-    for (px, py, pr, pd) in pits:
-        d -= pd * 0.5 * math.exp(-(((X - px) / pr) ** 2 + ((Y - py) / pr) ** 2))
+    if not MASKS:
+        for (px, py, pr, pd) in pits:
+            d -= pd * 0.5 * math.exp(-(((X - px) / pr) ** 2 + ((Y - py) / pr) ** 2))
     # cracks right across: real grooves, ragged
     for (x0, y0, x1, y1) in p["crack"]:
         cd = _seg_dist(X + (_vn(Y * 9, X * 3, seed + 21) - 0.5) * 0.06, Y, x0, y0, x1, y1)
@@ -244,7 +273,8 @@ def face_depth(X, Y, kind, wear, seed, pits, p=None):
     edge = max(0.0, max(abs(X) - 0.78, abs(Y) - 0.95) / 0.2)
     surround -= 0.2 * min(1.0, edge) ** 1.5
     d = max(d, surround * (1.0 - inside_ * 0.7))
-    d += (_vn(X * 13, Y * 13, seed + 1) - 0.5) * (0.004 + 0.008 * wear)
+    if not MASKS:
+        d += (_vn(X * 13, Y * 13, seed + 1) - 0.5) * (0.002 + 0.004 * wear)
     return d
 
 
@@ -468,7 +498,7 @@ def stairs_cut():
             continue
         top = FLOOR_HALL * i / STEPS
         for k, (a, b, dz) in enumerate(((x0, x0 + 0.9, 0.0), (x0 + 0.9, x1 - 0.9, -0.06), (x1 - 0.9, x1, 0.0))):
-            P.box("step%d_%d" % (i, k), (a, yb, -2.0), (b, ya - 0.06, top + dz), "dressed")
+            P.displace(P.box("step%d_%d" % (i, k), (a, yb, -2.0), (b, ya - 0.06, top + dz), "dressed"), 0.025, 0.09, 3)
             P.box("nose%d_%d" % (i, k), (a, ya - 0.08, -2.0), (b, ya, top + dz - 0.05), "dressed")   # the worn nosing
         # dust against the riser
         for q in range(3):
@@ -510,7 +540,7 @@ def hall_floor():
                            for su, sa in ((la, -1), (lb, -1), (lb, 1), (la, 1))]
                 verts = [(x, y, z - 0.4) for x, y in corners] + [(x, y, z + tz[t]) for t, (x, y) in enumerate(corners)]
                 faces = [(0, 1, 2, 3)[::-1], (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
-                P.outward(P.poly("flag%d_%d_%d" % (i, j, q), verts, faces, "dressed"))
+                P.displace(P.outward(P.poly("flag%d_%d_%d" % (i, j, q), verts, faces, "dressed")), 0.028, 0.08, 3)
     # dust drifted against the walls and round the pillars' feet
     for k in range(60):
         th = rnd.uniform(math.radians(140), math.radians(310))
@@ -530,7 +560,7 @@ def hall_walls():
     breaks through it all"""
     th0, th1 = math.radians(150), math.radians(300)
     n = 40
-    kinds = ["blind", "eyeless", "closed", "mouthless", "full", "half", "eyeless", "blind", "closed", "mouthless"]
+    kinds = ["closed", "eyeless", "plain", "blind", "closed", "mouthless", "plain", "eyeless", "closed", "blind"]
     fx, fy, fnx, fny = _face_span()
     for k in range(n):
         ta = th0 + (th1 - th0) * k / n
@@ -545,7 +575,7 @@ def hall_walls():
         verts = [(a_in[0], a_in[1], z0), (b_in[0], b_in[1], z0), (b_out[0], b_out[1], z0), (a_out[0], a_out[1], z0),
                  (a_in[0], a_in[1], z1), (b_in[0], b_in[1], z1), (b_out[0], b_out[1], z1), (a_out[0], a_out[1], z1)]
         faces = [(0, 1, 2, 3)[::-1], (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
-        P.outward(P.poly("cwall%d" % k, verts, faces, "dressed"))
+        P.displace(P.outward(P.poly("cwall%d" % k, verts, faces, "dressed")), 0.06, 0.14, 5)
         nx, ny = HALL[0] - mx, HALL[1] - my
         nl = math.hypot(nx, ny)
         nx, ny = nx / nl, ny / nl
@@ -569,7 +599,7 @@ def hall_walls():
         P.tube("cornice_end", seg, [0.14] * len(seg), "dressed", 6)
 
 
-MIRROR_SEGS = (5, 8, 28, 32)            # the hall wall's segments that hold the dark mirrors (two each side of the face)
+MIRROR_SEGS = ()                            # the hall wall's segments that hold the dark mirrors (two each side of the face)
 
 
 def mirror(name, c, nrm, r, seed):
@@ -634,10 +664,8 @@ def flame(name, x, y, z, size, w):
 
 def torch(name, x, y, z, nx, ny, w=60.0):
     """a wisp-fire torch: a rusted iron bracket out of the wall, a cup, the cold flame"""
-    P.tube(name + "_arm", [(x, y, z - 0.25), (x + nx * 0.25, y + ny * 0.25, z - 0.1), (x + nx * 0.32, y + ny * 0.32, z)], [0.03, 0.03, 0.03], "rust", 5)
-    P.sphere(name + "_cup", (x + nx * 0.34, y + ny * 0.34, z + 0.03), 0.09, "rust", scale=(1, 1, 0.6))
-    P.tube(name + "_ring", [(x - ny * 0.08, y + nx * 0.08, z - 0.3), (x + ny * 0.08, y - nx * 0.08, z - 0.3)], [0.03, 0.03], "rust", 5)
-    flame(name, x + nx * 0.34, y + ny * 0.34, z + 0.08, 0.09, w)
+    sconce(name, x, y, z, nx, ny)
+    flame(name, x + nx * 0.5, y + ny * 0.5, z + 0.1, 0.09, w)
 
 
 def skeleton(x, y, z, nx, ny):
@@ -695,28 +723,58 @@ def throne():
         corners = [(cx + nx * a * dep / 2 + sx * b * wid / 2, cy + ny * a * dep / 2 + sy * b * wid / 2) for a, b in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
         verts = [(x, y, f - 0.5) for x, y in corners] + [(x, y, z1) for x, y in corners]
         faces = [(0, 1, 2, 3)[::-1], (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
-        P.outward(P.poly("dais%d" % k, verts, faces, "dressed"))
+        P.displace(P.outward(P.poly("dais%d" % k, verts, faces, "dressed")), 0.03, 0.1, 4)
     top = f + 1.4
     # the colossal face: its lower lip at the dais top, so the mouth is the throne room
     cz = top + 0.36 * 0.5 * H + 0.28 * 0.5 * H - 0.25
     CUTS.append((fx, fy, nx, ny, 0.55 * H, f - 2.0, cz + 0.6 * H))
     relief("orcus", (fx, fy, cz), (nx, ny), H, "orcus", 4242, "basalt", 0.55, back=0.75, nu=64, nv=76)
-    # the seat inside the mouth, too big for a man, and the floor of the mouth carried in from the dais
-    mx, my = fx - nx * 1.1, fy - ny * 1.1
+    # the fires the little faces' mirrors will hold: the braziers, the throne's candles, the heap's candles
+    # on the seat's arms' ends and on the top step's front corners
+    THRONE_C = [(fx + nx * d + sx * a, fy + ny * d + sy * a, top + b) for a, d, b in ((-2.35, 1.0, 0.14), (2.35, 1.0, 0.14), (-2.9, 0.6, 0.14), (2.9, 0.6, 0.14),
+                                                                                    (-1.3, 2.0, -0.14), (1.3, 2.0, -0.14))]
+    BRAZ = [(fx + nx * 3.4 + sx * side * 4.8, fy + ny * 3.4 + sy * side * 4.8, f + 1.55) for side in (-1, 1)]
+    # (Derek: "You can have one large face with a mirror in its mouth": the small faces that covered it are gone)
+    # its key light: an iron fire-basket hanging on chains out of the dark, high and to one side, raking across the
+    # whole face so every little face holds its own shadows (rule 19; Derek: "the faces are still to hard to see")
+    cbx, cby, cbz = fx + nx * 3.2 - sx * 3.6, fy + ny * 3.2 - sy * 3.6, cz + 1.6
+    for i in range(10):
+        a_ = 2 * math.pi * i / 10
+        P.tube("cresset_bar%d" % i, [(cbx + math.cos(a_) * 0.22, cby + math.sin(a_) * 0.22, cbz - 0.35), (cbx + math.cos(a_) * 0.42, cby + math.sin(a_) * 0.42, cbz + 0.15)],
+               [0.03, 0.025], "iron", 4)
+    for zz, rr in ((cbz - 0.35, 0.22), (cbz + 0.15, 0.42)):
+        P.tube("cresset_ring%d" % int(rr * 100), [(cbx + math.cos(2 * math.pi * q / 20) * rr, cby + math.sin(2 * math.pi * q / 20) * rr, zz) for q in range(21)],
+               [0.03] * 21, "iron", 4)
+    for i in range(3):
+        a_ = 2 * math.pi * i / 3
+        chains(cbx + math.cos(a_) * 0.4, cby + math.sin(a_) * 0.4, cbz + 9.0, 760 + i, floor=cbz + 0.15)
+    P.sphere("cresset_coals", (cbx, cby, cbz - 0.1), 0.3, "ash", scale=(1, 1, 0.5))
+    flame("cresset", cbx, cby, cbz - 0.05, 0.28, 175.0)
+    # two sconces high on its flanks, raking across the little faces so each holds its own shadows (rule 19)
+    for side in (-1, 1):
+        wx_, wy_ = fx + sx * side * 4.7 + nx * 0.6, fy + sy * side * 4.7 + ny * 0.6
+        torch("ftorch%d" % side, wx_, wy_, cz + 0.9, -sx * side * 0.6 + nx * 0.8, -sy * side * 0.6 + ny * 0.8, 70.0)
+    # the throne is gone; the mouth at the top of the throne's stairs is a great dark mirror, the way out (Derek: "Give
+    # the room no exit. There will be a large mirror the player looks in in a large face, it reflects nothing but
+    # darkness"; "The mirror is the way out, they will walk into it and disappear"; "The large mirror will be at the top
+    # of the throne stairs"; the mirror replaces the throne). Its lips frame it; the Stranger's candles burn on the top
+    # step either side, where any mirror would hold their flames: black framed by light, the hall's one subject
+    mx, my = fx - nx * 0.6, fy - ny * 0.6
     P.box("mouthfloor", (mx - 1.8, my - 1.8, f), (mx + 1.8, my + 1.8, top), "dressed", rot_z=math.atan2(ny, nx))
-    P.box("seat", (mx - 0.75, my - 1.3, top), (mx + 0.75, my + 1.3, top + 1.05), "dressed", rot_z=math.atan2(ny, nx))
-    P.box("seatback", (mx - 1.45, my - 1.3, top), (mx - 0.85, my + 1.3, top + 2.4), "dressed", rot_z=math.atan2(ny, nx))
-    # the circlet left on the seat: a ring of rusted iron with seven points
-    cxr, cyr, czr = mx + nx * 0.2, my + ny * 0.2, top + 1.08
-    ring = [(cxr + math.cos(2 * math.pi * i / 24) * 0.24, cyr + math.sin(2 * math.pi * i / 24) * 0.24, czr) for i in range(25)]
-    P.tube("circlet", ring, [0.03] * 25, "rust", 5)
-    for i in range(7):
-        a = 2 * math.pi * i / 7
-        P.tube("circ_pt%d" % i, [(cxr + math.cos(a) * 0.24, cyr + math.sin(a) * 0.24, czr), (cxr + math.cos(a) * 0.26, cyr + math.sin(a) * 0.26, czr + 0.14)],
-               [0.022, 0.004], "rust", 4)
+    mc = (fx + nx * 0.7, fy + ny * 0.7, cz - 0.36 * 0.5 * H)
+    nv_ = 48
+    verts = [mc]
+    for i in range(nv_):
+        a_ = 2 * math.pi * i / nv_
+        verts.append((mc[0] + sx * math.cos(a_) * 1.9, mc[1] + sy * math.cos(a_) * 1.9, mc[2] + math.sin(a_) * 1.15))
+    P.poly("voidmirror", verts, [(0, 1 + i, 1 + (i + 1) % nv_) for i in range(nv_)], "voidmirror")
+    for k, (cx_, cy_, cz_) in enumerate(THRONE_C):
+        P.cylinder("tcandle%d" % k, (cx_, cy_, cz_ - 0.12), 0.06, 0.14, "bone", sides=6)
+        flame("tcandle%d" % k, cx_, cy_, cz_ + 0.02, 0.08, 52.0)
+    mx, my = mc[0], mc[1]
     # chains hanging out of the dark into the mouth
     for k, (a, b) in enumerate(((-0.9, 0.4), (0.7, -0.2), (1.3, 0.9))):
-        chains(mx + sx * a + nx * b, my + sy * a + ny * b, top + 9.0, 700 + k, floor=top + (1.05 if abs(a) < 1.0 else 0.0))
+        chains(fx + sx * a * 1.6 + nx * 1.6, fy + sy * a * 1.6 + ny * 1.6, top + 9.0, 700 + k, floor=top)
     # the braziers: wisp-fire in iron bowls on tall tripods at the dais' foot, lighting the face from below
     for k, side in enumerate((-1, 1)):
         bx, by = fx + nx * 3.4 + sx * side * 4.8, fy + ny * 3.4 + sy * side * 4.8
@@ -726,26 +784,31 @@ def throne():
                    [0.035, 0.028], "rust", 5)
         P.sphere("tbz%d_bowl" % k, (bx, by, f + 1.1), 0.46, "rust", scale=(1.0, 1.0, 0.42))
         P.sphere("tbz%d_ash" % k, (bx, by, f + 1.21), 0.38, "ash", scale=(1.0, 1.0, 0.2))
-        flame("tbz%d" % k, bx, by, f + 1.25, 0.3, 170.0)
-    # the heap, spilling down the steps: a mound of rotted mail and scale, everything else on it and round it
-    hx, hy = fx + nx * 5.4, fy + ny * 5.4
-    P.sphere("heapmound", (hx, hy, f - 0.35), 2.3, "ash", scale=(1.35, 1.0, 0.34))
+        flame("tbz%d" % k, bx, by, f + 1.25, 0.3, 140.0)
+    # the heap, in two heaps either side of the stairs' foot (Derek: "All that debris on the throne stairs needs to
+    # move"): the stairs climb clear to the mirror; mounds of rotted mail and scale, everything else on them and round
+    HEAPS = [(fx + nx * 5.6 + sx * side * 6.3, fy + ny * 5.6 + sy * side * 6.3) for side in (-1, 1)]
+    for q, (hx_, hy_) in enumerate(HEAPS):
+        P.sphere("heapmound%d" % q, (hx_, hy_, f - 0.35), 2.0, "ash", scale=(1.2, 1.0, 0.36))
+    hx, hy = HEAPS[0]
     rnd = random.Random(9)
     ca, sa_ = math.cos(math.atan2(ny, nx)), math.sin(math.atan2(ny, nx))
     def mound_z(x, y):
-        dx, dy = x - hx, y - hy
-        u = (dx * ca + dy * sa_) / (2.3 * 1.35)
-        v = (-dx * sa_ + dy * ca) / 2.3
-        q = 1 - u * u - v * v
-        dais = 0.0
-        along = (x - fx) * nx + (y - fy) * ny
-        if along < 5.6:
-            dais = 0.28 * min(5, int((5.6 - along) / 1.05) + 1)
-        return f + max(dais, -0.35 + 0.34 * 2.3 * math.sqrt(max(0.0, q)))
+        best = f
+        for (hx_, hy_) in HEAPS:
+            dx, dy = x - hx_, y - hy_
+            u = (dx * ca + dy * sa_) / (2.0 * 1.2)
+            v = (-dx * sa_ + dy * ca) / 2.0
+            q = 1 - u * u - v * v
+            best = max(best, f - 0.35 + 0.36 * 2.0 * math.sqrt(max(0.0, q)))
+        return best
     for i in range(460):
-        r = rnd.uniform(0, 1) ** 0.6 * 3.0
+        hx_, hy_ = HEAPS[i % 2]
+        r = rnd.uniform(0, 1) ** 0.6 * 2.6
         a = rnd.uniform(0, 2 * math.pi)
-        x, y = hx + math.cos(a) * r * 1.2, hy + math.sin(a) * r
+        x, y = hx_ + math.cos(a) * r * 1.15, hy_ + math.sin(a) * r
+        if abs((x - fx) * sx + (y - fy) * sy) < 4.6:
+            continue                                               # nothing on the stairs
         z = mound_z(x, y)
         kind = rnd.random()
         b = rnd.uniform(0, math.pi)
@@ -804,10 +867,10 @@ def throne():
     # three of his candles still burn, low at the heap's front: their light rakes across the blades, the helms' rims
     # and the skulls toward whoever comes up, so the heap reads as the things of the ones before (the area's one true
     # detail), not a mound
-    for i, (a, b) in enumerate(((1.7, 7.5), (2.5, 6.6), (-1.9, 7.6))):
+    for i, (a, b) in enumerate(((5.6, 7.9), (-5.6, 7.9), (7.4, 7.2))):
         cx_, cy_ = fx + nx * b + sx * a, fy + ny * b + sy * a
         P.sphere("swax%d" % i, (cx_, cy_, f + 0.04), 0.12, "bone", scale=(1.0, 1.0, 0.8))
-        flame("scandle%d" % i, cx_, cy_, f + 0.16, 0.08, 46.0)
+        flame("scandle%d" % i, cx_, cy_, f + 0.16, 0.08, 30.0)
 
 
 def cards(x, y, z, ang):
@@ -829,7 +892,7 @@ def pillars():
         for i, du in enumerate((-3.6, 0.8, 5.0)):
             px = cx + ux * du + ax * row * 5.6
             py = cy + uy * du + ay * row * 5.6
-            P.box("pillar%d_%d" % (row, i), (px - 0.42, py - 0.42, FLOOR_HALL), (px + 0.42, py + 0.42, FLOOR_HALL + 12.0), "dressed", rot_z=math.radians(45))
+            P.displace(P.box("pillar%d_%d" % (row, i), (px - 0.42, py - 0.42, FLOOR_HALL), (px + 0.42, py + 0.42, FLOOR_HALL + 12.0), "dressed", rot_z=math.radians(45)), 0.05, 0.14, 5)
             P.box("pbase%d_%d" % (row, i), (px - 0.56, py - 0.56, FLOOR_HALL), (px + 0.56, py + 0.56, FLOOR_HALL + 0.4), "dressed", rot_z=math.radians(45))
             P.box("pcap%d_%d" % (row, i), (px - 0.52, py - 0.52, FLOOR_HALL + 4.6), (px + 0.52, py + 0.52, FLOOR_HALL + 4.95), "dressed", rot_z=math.radians(45))
             if (i + row) % 2 == 0:
@@ -863,6 +926,14 @@ def pool():
     rr = BASIN[2] + 1.6
     pts = [(BASIN[0] + math.cos(2 * math.pi * k / n) * rr, BASIN[1] + math.sin(2 * math.pi * k / n) * rr, -0.12) for k in range(n)]
     P.poly("pool", pts, [tuple(range(n))], "pool")
+    # and the blood standing in the runnels from the faces (Derek liked the pool contained: blood only in the pool and
+    # its runnels, never the whole floor)
+    for q, (fx_, fy_, nx_, ny_, ux, uy, ln) in enumerate(OOZE_FACES):
+        tx, ty = -uy, ux
+        a0, a1 = 0.3, ln - BASIN[2] + 0.5
+        quad = [(fx_ + ux * a0 + tx * 0.55, fy_ + uy * a0 + ty * 0.55, -0.12), (fx_ + ux * a1 + tx * 0.6, fy_ + uy * a1 + ty * 0.6, -0.12),
+                (fx_ + ux * a1 - tx * 0.6, fy_ + uy * a1 - ty * 0.6, -0.12), (fx_ + ux * a0 - tx * 0.55, fy_ + uy * a0 - ty * 0.55, -0.12)]
+        P.poly("runnel%d" % q, quad, [(0, 1, 2, 3)], "pool")
 
 
 def pool_bodies():
@@ -946,8 +1017,349 @@ def niche(k, x, y, z, nx, ny):
     P.sphere("nskull%d" % k, (x + nx * 0.22, y + ny * 0.22, z + 0.12), 0.11, "bone", scale=(1.0, 1.0, 1.1))
 
 
+SPOUTS = []                              # where the blood from the faces' mouths strikes the pool (x, y, z)
+
+
+def spouting_faces():
+    """three raw pillars at the pool's back edge, each with a crude face cut into it, the first carving in the cave
+    (the raw becoming the made), and from each mouth a thick rope of blood pouring down into the pool (Derek: "faces on
+    the wall having blood pour from their mouths into the pool"; the mascarons of old fountains)"""
+    bx, by, br = BASIN
+    for k, ang in enumerate((200.0, 228.0, 256.0)):
+        a = math.radians(ang)
+        px, py = bx + math.cos(a) * (br + 0.9), by + math.sin(a) * (br + 0.9)
+        nx, ny = bx - px, by - py
+        nl = math.hypot(nx, ny)
+        nx, ny = nx / nl, ny / nl
+        rnd = random.Random(140 + k)
+        poly = [(px + math.cos(2 * math.pi * i / 6 + rnd.uniform(-0.2, 0.2)) * 0.78, py + math.sin(2 * math.pi * i / 6 + rnd.uniform(-0.2, 0.2)) * 0.78)
+                for i in range(6)]
+        top = rnd.uniform(4.2, 5.4)
+        C.rough_prism("spillar%d" % k, poly, -1.6, top, "basalt", 300 + k, 0.0, 0.25 * rnd.random(), (0.0, 0.0), 0.7, drum=(0.8, 2.0))
+        H = 1.75 + 0.2 * rnd.random()
+        cz = 2.45 + 0.3 * rnd.random()
+        fc = (px + nx * 0.58, py + ny * 0.58, cz)
+        relief("spface%d" % k, fc, (nx, ny), H, "eyeless", 700 + k, "carved", 0.85, back=0.55, nu=22, nv=26)
+        p2 = face_params("eyeless", 700 + k)
+        mz = cz + p2["mouthy"] * 0.5 * H
+        m0 = (fc[0] + nx * (0.16 * H + 0.04), fc[1] + ny * (0.16 * H + 0.04), mz)
+        # the rope of blood: thick from the mouth, arcing out and down, thinning, into the pool; two strands beside it
+        for q, (off, rad, reach) in enumerate(((0.0, 0.085, 0.55), (0.06, 0.035, 0.45), (-0.05, 0.03, 0.5))):
+            tx_, ty_ = -ny * off, nx * off
+            pts, radii = [], []
+            for i in range(9):
+                s_ = i / 8.0
+                out_ = reach * (1 - (1 - s_) ** 2)                      # it leaves the lip and falls
+                pts.append((m0[0] + nx * out_ + tx_, m0[1] + ny * out_ + ty_, m0[2] - (m0[2] + 0.12) * s_ ** 1.6))
+                radii.append(rad * (1.0 - 0.35 * s_) + (0.02 if i == 0 else 0.0))
+            P.tube("spout%d_%d" % (k, q), pts, radii, "blood", 7)
+        # the chin and the pillar's foot run with it
+        P.tube("spchin%d" % k, [(m0[0] - nx * 0.02, m0[1] - ny * 0.02, mz - 0.05), (fc[0] + nx * 0.2, fc[1] + ny * 0.2, cz - 0.45 * H),
+                                (px + nx * 0.8, py + ny * 0.8, 0.4), (px + nx * 0.85, py + ny * 0.85, -0.1)], [0.05, 0.06, 0.07, 0.09], "blood", 6)
+        SPOUTS.append((m0[0] + nx * 0.55, m0[1] + ny * 0.55, -0.12))
+        if k != 1:
+            # a wisp-fire on the pillar's outer side, raking across its face
+            side = -1 if k == 0 else 1
+            sxp, syp = -ny * side, nx * side
+            torch("sptorch%d" % k, px + sxp * 1.3 + nx * 0.5, py + syp * 1.3 + ny * 0.5, cz - 0.25, -sxp * 0.5 + nx * 0.85, -syp * 0.5 + ny * 0.85, 60.0)
+
+
+def clots():
+    """what floats on the blood: clots in dark lumps, gathered toward the edge and round where the streams strike"""
+    rnd = random.Random(73)
+    bx, by, br = BASIN
+    for i in range(38):
+        a = rnd.uniform(0, 2 * math.pi)
+        r = br * math.sqrt(rnd.random()) * 1.15
+        x, y = bx + math.cos(a) * r, by + math.sin(a) * r
+        P.sphere("clot%d" % i, (x, y, -0.13), rnd.uniform(0.06, 0.2), "blood", scale=(1.0, rnd.uniform(0.6, 1.0), 0.3), rot=(0, 0, rnd.uniform(0, 3)))
+
+
+OOZE_TH = (196.0, 214.0, 232.0)          # where the plain faces are cut in the pool chamber's back wall
+
+
+def _ooze_faces():
+    """the plain faces of the pool chamber's back wall: where each stands, its normal (toward the pool and the eye), the
+    line its blood runs along to the pool"""
+    out = []
+    for th in OOZE_TH:
+        a = math.radians(th)
+        x, y = POOL[0] + POOL[2] * 0.95 * math.cos(a), POOL[1] + POOL[3] * 0.95 * math.sin(a)
+        ix, iy = BASIN[0] - x, BASIN[1] - y
+        il = math.hypot(ix, iy)
+        nx, ny = ix / il + 0.55, iy / il + 0.55
+        nl = math.hypot(nx, ny)
+        out.append((x, y, nx / nl, ny / nl, ix / il, iy / il, il))
+    return out
+
+
+OOZE_FACES = _ooze_faces()
+
+
+def _in_runnel(x, y):
+    """on the channel the blood has worn from a face's foot to the pool"""
+    for (fx, fy, nx, ny, ux, uy, ln) in OOZE_FACES:
+        t = (x - fx) * ux + (y - fy) * uy
+        if 0.4 < t < ln:
+            w = abs(-(x - fx) * uy + (y - fy) * ux)
+            if w < 0.45 + 0.15 * math.sin(t * 2.3):
+                return True
+    return False
+
+
+def ooze_faces():
+    """plain faces cut into the raw columns of the pool chamber's back wall, defined, mouths open, blood oozing from
+    each mouth down the chin and the wall and away along a worn channel into the pool (Derek: "have define plain faces
+    on the chamber walls, with mouths opens while blood oozes from their mouths in the pool")"""
+    for k, (x, y, nx, ny, ux, uy, ln) in enumerate(OOZE_FACES):
+        H = 2.3 + 0.2 * (k % 2)
+        f = floor_at(x + ux * 1.2, y + uy * 1.2) or 0.05
+        cz = f + 0.35 + 0.575 * H
+        CUTS.append((x, y, nx, ny, 0.62 * H, -2.0, cz + 0.6 * H))
+        relief("ozface%d" % k, (x, y, cz), (nx, ny), H, "plain", 610 + k, "carved", 0.3, back=0.9, nu=30, nv=36)
+        p2 = face_params("plain", 610 + k)
+        mz = cz + p2["mouthy"] * 0.5 * H
+        m0 = (x + nx * (0.16 * H), y + ny * (0.16 * H), mz)
+        # the tongue of blood: thick at the lip, sagging down the chin, down the wall, pooling at the foot
+        pts = [m0, (m0[0] + nx * 0.12, m0[1] + ny * 0.12, mz - 0.18), (x + nx * 0.36, y + ny * 0.36, cz - 0.5 * H),
+               (x + nx * 0.3, y + ny * 0.3, f + 0.5), (x + nx * 0.55, y + ny * 0.55, f + 0.05)]
+        P.tube("ooze%d" % k, pts, [0.11, 0.13, 0.1, 0.12, 0.16], "blood", 8)
+        for q in range(3):                                               # drips gathering on the chin
+            P.sphere("oozedrip%d_%d" % (k, q), (m0[0] + nx * 0.16 + (q - 1) * -ny * 0.12, m0[1] + ny * 0.16 + (q - 1) * nx * 0.12, mz - 0.3 - 0.12 * q),
+                     0.05 + 0.02 * q, "blood", scale=(1.0, 1.0, 1.5))
+        # a fire on the wall beside it, raking across the face and catching the wet of the blood
+        tx_, ty_ = -uy, ux
+        torch("oztorch%d" % k, x + tx_ * 0.7 * H + ux * 0.15, y + ty_ * 0.7 * H + uy * 0.15, cz + 0.1, ux * 0.8 - tx_ * 0.6, uy * 0.8 - ty_ * 0.6, 60.0)
+        # where it strikes the pool
+        SPOUTS.append((BASIN[0] - ux * (BASIN[2] + 0.4), BASIN[1] - uy * (BASIN[2] + 0.4), -0.12))
+
+
 FACE_TURN = (0.74, 0.67)               # the stair faces turned on the wall to look down the stairs at whoever climbs
-STAIR_FACES = ((-8.2, "half", 3.2), (-12.9, "eyeless", 3.4), (-17.9, "closed", 3.6))   # y, kind, height (yards)
+def mirror_disc(name, c, nrm3, r, ring_mat="iron"):
+    """a small dark mirror of polished obsidian at c, its face turned to nrm3 (any direction), a thin rim round it"""
+    nx, ny, nz = nrm3
+    L = math.sqrt(nx * nx + ny * ny + nz * nz)
+    nx, ny, nz = nx / L, ny / L, nz / L
+    # two axes across the disc
+    ax = (-ny, nx, 0.0) if abs(nz) < 0.9 else (1.0, 0.0, 0.0)
+    la = math.sqrt(ax[0] ** 2 + ax[1] ** 2 + ax[2] ** 2)
+    ax = (ax[0] / la, ax[1] / la, ax[2] / la)
+    bx = (ny * ax[2] - nz * ax[1], nz * ax[0] - nx * ax[2], nx * ax[1] - ny * ax[0])
+    n = 16
+    verts = [(c[0], c[1], c[2])]
+    for i in range(n):
+        a = 2 * math.pi * i / n
+        verts.append((c[0] + (ax[0] * math.cos(a) + bx[0] * math.sin(a)) * r, c[1] + (ax[1] * math.cos(a) + bx[1] * math.sin(a)) * r,
+                      c[2] + (ax[2] * math.cos(a) + bx[2] * math.sin(a)) * r))
+    P.poly(name, verts, [(0, 1 + i, 1 + (i + 1) % n) for i in range(n)], "mirror")
+    MIRRORS.append((c[0], c[1], c[2], nx, ny, nz, r))
+    ring = [(c[0] + (ax[0] * math.cos(2 * math.pi * i / 20) + bx[0] * math.sin(2 * math.pi * i / 20)) * (r + 0.02) - nx * 0.01,
+             c[1] + (ax[1] * math.cos(2 * math.pi * i / 20) + bx[1] * math.sin(2 * math.pi * i / 20)) * (r + 0.02) - ny * 0.01,
+             c[2] + (ax[2] * math.cos(2 * math.pi * i / 20) + bx[2] * math.sin(2 * math.pi * i / 20)) * (r + 0.02) - nz * 0.01) for i in range(21)]
+    P.tube(name + "_rim", ring, [0.025] * 21, ring_mat, 5)
+
+
+def toward(c, target):
+    """the normal a mirror at c must have for whoever looks down the camera's way to see target in it (the law of
+    reflection: halfway between the way back to the eye and the way to the thing)"""
+    vx, vy, vz = -CAM[0], -CAM[1], -CAM[2]
+    lv = math.sqrt(vx * vx + vy * vy + vz * vz)
+    lx, ly, lz = target[0] - c[0], target[1] - c[1], target[2] - c[2]
+    ll = math.sqrt(lx * lx + ly * ly + lz * lz)
+    return (vx / lv + lx / ll, vy / lv + ly / ll, vz / lv + lz / ll)
+
+
+def face_of_faces(c, nrm, H, seed, targets):
+    """the colossal face made of little faces (Derek: "The big face need to be a bunch of little faces ... the mirror
+    can be in the mouths"): its form stays (the arched brows, the sockets, the nose, the mouth that holds the throne),
+    its surface covered in small faces, each its own, turned with the big face's surface; the sockets and the mouth
+    left empty and black. Each little face's mouth is a dark mirror, turned so it holds one of the fires: the great
+    face glitters with fires that are not there"""
+    nx, ny = nrm
+    tx, ty = -ny, nx
+    prm = face_params("orcus", seed)
+    rnd = random.Random(seed)
+    pits = [(rnd.uniform(-0.9, 0.9), rnd.uniform(-1.0, 1.0), rnd.uniform(0.02, 0.06), rnd.uniform(0.01, 0.04))
+            for _ in range(int(8 + 14 * 0.55))]
+    def depth(X, Y):
+        return face_depth(X, Y, "orcus", 0.55, seed, pits, prm)
+    r2 = random.Random(seed + 1)
+    kinds = ["closed", "blind", "eyeless", "full", "closed", "mouthless", "half", "closed"]
+    k = 0
+    j = 0
+    Y = 0.98
+    while Y > -0.95:
+        X = -0.58 + (0.17 if j % 2 else 0.0)
+        while X < 0.66:
+            Xj, Yj = X + r2.uniform(-0.03, 0.03), Y + r2.uniform(-0.03, 0.03)
+            e = (Xj / prm["hw"]) ** 2 + (Yj / prm["hl"]) ** 2
+            X += 0.34
+            if e > 0.93:
+                continue
+            head = 0.17 * max(0.0, 1.0 - e) ** 0.3
+            d = depth(Xj, Yj)
+            mo = (Xj / 0.42) ** 2 + ((Yj + 0.36) / 0.28) ** 2
+            if d < head - 0.05 or mo < 1.15:
+                continue                                          # the sockets, the mouth, a crack: left empty
+            h = 0.01
+            dX = (depth(Xj + h, Yj) - depth(Xj - h, Yj)) / (2 * h) * H / (0.55 * H)
+            lnx, lny = nx - tx * dX * 0.8, ny - ty * dX * 0.8
+            ln = math.hypot(lnx, lny)
+            lnx, lny = lnx / ln, lny / ln
+            px = c[0] + tx * Xj * 0.55 * H + nx * d * H
+            py = c[1] + ty * Xj * 0.55 * H + ny * d * H
+            pz = c[2] + Yj * 0.5 * H
+            hs = r2.uniform(1.6, 2.1)
+            kind = kinds[k % len(kinds)]
+            sd = seed * 100 + k
+            relief("ff%d" % k, (px + lnx * 0.02, py + lny * 0.02, pz), (lnx, lny), hs, kind, sd, "carved", 0.7,
+                   back=0.5, nu=20, nv=24)
+            # its mouth a dark mirror, turned to hold one of the fires
+            if kind != "mouthless":
+                p2 = face_params(kind, sd)
+                mz = pz + p2["mouthy"] * 0.5 * hs
+                mc = (px + lnx * (0.15 * hs + 0.04), py + lny * (0.15 * hs + 0.04), mz)
+                tgt = targets[r2.randrange(len(targets))]
+                mirror_disc("ffm%d" % k, mc, toward(mc, tgt), 0.075 * hs / 0.8)
+            k += 1
+        Y -= 0.36
+        j += 1
+
+
+def sconce(name, x, y, z, nx, ny):
+    """a wrought-iron holder for a wisp-fire on the wall (Derek: "The torches on the walls need iron holders"): a plate
+    nailed to the rock, an arm curling out and up, a basket of bars round the fire, a drip ring under it"""
+    tx, ty = -ny, nx
+    P.box(name + "_plate", (x - 0.05, y - 0.16, z - 0.55), (x + 0.05, y + 0.16, z + 0.05), "iron", rot_z=math.atan2(ny, nx))
+    for i, h in enumerate((-0.45, -0.05)):
+        P.sphere("%s_nail%d" % (name, i), (x + nx * 0.06, y + ny * 0.06, z + h), 0.03, "iron")
+    P.tube(name + "_arm", [(x + nx * 0.05, y + ny * 0.05, z - 0.38), (x + nx * 0.3, y + ny * 0.3, z - 0.3),
+                          (x + nx * 0.45, y + ny * 0.45, z - 0.12), (x + nx * 0.48, y + ny * 0.48, z + 0.02)], [0.035, 0.032, 0.03, 0.03], "iron", 6)
+    P.tube(name + "_curl", [(x + nx * 0.3, y + ny * 0.3, z - 0.3), (x + nx * 0.22, y + ny * 0.22, z - 0.45), (x + nx * 0.3, y + ny * 0.3, z - 0.52),
+                           (x + nx * 0.36, y + ny * 0.36, z - 0.45)], [0.02, 0.02, 0.018, 0.016], "iron", 5)
+    bx, by = x + nx * 0.5, y + ny * 0.5
+    for zz, rr in ((z + 0.02, 0.09), (z + 0.3, 0.15)):
+        ring = [(bx + math.cos(2 * math.pi * i / 16) * rr, by + math.sin(2 * math.pi * i / 16) * rr, zz) for i in range(17)]
+        P.tube("%s_ring%d" % (name, int(rr * 100)), ring, [0.018] * 17, "iron", 4)
+    for i in range(6):
+        a = 2 * math.pi * i / 6
+        P.tube("%s_bar%d" % (name, i), [(bx + math.cos(a) * 0.09, by + math.sin(a) * 0.09, z + 0.02), (bx + math.cos(a) * 0.15, by + math.sin(a) * 0.15, z + 0.3),
+                                       (bx + math.cos(a) * 0.17, by + math.sin(a) * 0.17, z + 0.38)], [0.014, 0.013, 0.008], "iron", 4)
+    P.sphere(name + "_pan", (bx, by, z + 0.05), 0.09, "rust", scale=(1, 1, 0.4))
+
+
+def relics():
+    """iron left lying where it fell, through the hall, up the stairs and round the pool (Derek: "more iron relics
+    laying around"): swords, broken blades, helms, shields, chains, manacles, spearheads on broken shafts, iron
+    candlesticks standing and fallen, a cage, a lantern; nothing is placed, everything dropped"""
+    rnd = random.Random(61)
+    fx, fy, fnx, fny = _face_span()
+    spots = []
+    for _ in range(4000):
+        if len(spots) >= 150:
+            break
+        zone = rnd.random()
+        if zone < 0.62:
+            th = rnd.uniform(0, 2 * math.pi)
+            rr = math.sqrt(rnd.random()) * 0.92
+            x, y = HALL[0] + HALL[2] * rr * math.cos(th), HALL[1] + HALL[3] * rr * math.sin(th)
+            al = (x - fx) * fnx + (y - fy) * fny
+            ac = abs(-(x - fx) * fny + (y - fy) * fnx)
+            if al < 9.0 and ac < 8.6:
+                continue                                        # the stairs climb clear; the heaps have their own
+        elif zone < 0.82:
+            x, y = rnd.uniform(STAIR[0] + 0.2, STAIR[1] - 0.2), rnd.uniform(STAIR[3], STAIR[2])
+        else:
+            th = rnd.uniform(0, 2 * math.pi)
+            rr = rnd.uniform(0.55, 0.9)
+            x, y = POOL[0] + POOL[2] * rr * math.cos(th), POOL[1] + POOL[3] * rr * math.sin(th)
+        f = floor_at(x, y)
+        if f is None:
+            continue
+        spots.append((x, y, f))
+    for i, (x, y, f) in enumerate(spots):
+        kind = rnd.random()
+        b = rnd.uniform(0, math.pi)
+        cb, sb = math.cos(b), math.sin(b)
+        z = f + 0.03
+        if kind < 0.2:                                           # a sword, whole or broken
+            ln = rnd.uniform(0.45, 1.0)
+            P.tube("rl_sw%d" % i, [(x, y, z), (x + cb * ln, y + sb * ln, z + 0.01)], [0.035, 0.008 if ln > 0.7 else 0.03], "iron", 4)
+            P.tube("rl_gd%d" % i, [(x - sb * 0.13, y + cb * 0.13, z + 0.02), (x + sb * 0.13, y - cb * 0.13, z + 0.02)], [0.02, 0.02], "rust", 4)
+            P.tube("rl_gp%d" % i, [(x, y, z + 0.02), (x - cb * 0.2, y - sb * 0.2, z + 0.02)], [0.022, 0.02], "rust", 4)
+        elif kind < 0.33:                                        # a helm on its side
+            P.sphere("rl_hm%d" % i, (x, y, z + 0.1), 0.15, "iron", scale=(1.0, 0.9, 0.85), rot=(1.2, 0, b))
+        elif kind < 0.43:                                        # a shield, face down or up
+            P.sphere("rl_sh%d" % i, (x, y, z + 0.04), 0.36, "rust", scale=(1.0, 1.0, 0.09), rot=(rnd.uniform(-0.15, 0.15), 0, b))
+            P.sphere("rl_sb%d" % i, (x, y, z + 0.08), 0.08, "iron", scale=(1.0, 1.0, 0.5))
+        elif kind < 0.56:                                        # a length of chain lying in a curve
+            n = rnd.randint(6, 14)
+            for q in range(n):
+                a = b + q * 0.18 * rnd.choice((-1, 1)) * 0.5
+                P.sphere("rl_ch%d_%d" % (i, q), (x + math.cos(a) * q * 0.1, y + math.sin(a) * q * 0.1, z + 0.02), 0.05, "rust",
+                         scale=(1.0 if q % 2 else 0.4, 0.4 if q % 2 else 1.0, 0.35))
+        elif kind < 0.64:                                        # manacles, a pair joined by links
+            for s_ in (-1, 1):
+                ring = [(x + s_ * 0.12 + math.cos(2 * math.pi * q / 12) * 0.07, y + math.sin(2 * math.pi * q / 12) * 0.07, z + 0.02) for q in range(13)]
+                P.tube("rl_mn%d_%d" % (i, s_), ring, [0.016] * 13, "iron", 4)
+            P.tube("rl_ml%d" % i, [(x - 0.05, y, z + 0.02), (x + 0.05, y, z + 0.02)], [0.012, 0.012], "iron", 4)
+        elif kind < 0.74:                                        # a spearhead on a broken shaft
+            ln = rnd.uniform(0.5, 1.4)
+            P.tube("rl_sp%d" % i, [(x, y, z), (x + cb * ln, y + sb * ln, z + 0.02)], [0.025, 0.022], "wood", 4)
+            P.tube("rl_sph%d" % i, [(x + cb * ln, y + sb * ln, z + 0.02), (x + cb * (ln + 0.3), y + sb * (ln + 0.3), z + 0.02)], [0.04, 0.004], "iron", 4)
+        elif kind < 0.88:                                        # an iron candlestick, standing or fallen, wax on it
+            if rnd.random() < 0.5:
+                P.tube("rl_cs%d" % i, [(x, y, f), (x, y, f + 0.7)], [0.06, 0.025], "iron", 6)
+                P.sphere("rl_cc%d" % i, (x, y, f + 0.72), 0.08, "iron", scale=(1, 1, 0.4))
+                P.tube("rl_cw%d" % i, [(x, y, f + 0.74), (x, y, f + 0.82)], [0.03, 0.025], "bone", 5)
+            else:
+                P.tube("rl_cs%d" % i, [(x, y, z + 0.05), (x + cb * 0.7, y + sb * 0.7, z + 0.03)], [0.06, 0.025], "iron", 6)
+        elif kind < 0.94:                                        # a hanging cage, fallen, its bars bent
+            for q in range(8):
+                a = 2 * math.pi * q / 8
+                P.tube("rl_cg%d_%d" % (i, q), [(x + math.cos(a) * 0.35, y + math.sin(a) * 0.35, f), (x + math.cos(a) * 0.3, y + math.sin(a) * 0.3, f + 0.9 + rnd.uniform(-0.1, 0.1)),
+                                               (x, y, f + 1.15)], [0.02, 0.02, 0.02], "iron", 4)
+            ring = [(x + math.cos(2 * math.pi * q / 16) * 0.35, y + math.sin(2 * math.pi * q / 16) * 0.35, f + 0.02) for q in range(17)]
+            P.tube("rl_cgr%d" % i, ring, [0.025] * 17, "rust", 4)
+        else:                                                    # a lantern, its glass long gone
+            P.box("rl_ln%d" % i, (x - 0.1, y - 0.1, f), (x + 0.1, y + 0.1, f + 0.28), "iron", rot_z=b)
+            P.tube("rl_lh%d" % i, [(x - 0.07, y, f + 0.28), (x, y, f + 0.4), (x + 0.07, y, f + 0.28)], [0.012, 0.012, 0.012], "iron", 4)
+
+
+def void_mirror_face():
+    """the hall has no door (Derek: "Give the room no exit. There will be a large mirror the player looks in in a large
+    face, it reflects nothing but darkness"): a great face rising out of the floor to its chin, its open mouth a great
+    dark mirror at a standing pilgrim's height. Two wisp candles stand before it where any mirror would show them; it
+    shows nothing, and no pilgrim"""
+    x, y, nx, ny = hall_spot(VOID_TH, 0.93)
+    H = 6.0
+    f = FLOOR_HALL
+    cz = f + 1.75 + 0.36 * 0.5 * H
+    CUTS.append((x, y, nx, ny, 0.55 * H, f - 2.0, cz + 0.6 * H))
+    relief("voidface", (x, y, cz), (nx, ny), H, "mirrormouth", 5151, "carved", 0.5, back=0.7, nu=48, nv=56)
+    mc = (x + nx * 0.25, y + ny * 0.25, cz - 0.36 * 0.5 * H)
+    tx, ty = -ny, nx
+    n = 40
+    r = 1.05
+    verts = [(mc[0], mc[1], mc[2])]
+    for i in range(n):
+        a = 2 * math.pi * i / n
+        verts.append((mc[0] + tx * math.cos(a) * r, mc[1] + ty * math.cos(a) * r, mc[2] + math.sin(a) * r * 0.92))
+    P.poly("voidmirror", verts, [(0, 1 + i, 1 + (i + 1) % n) for i in range(n)], "voidmirror")
+    ring = [(mc[0] + tx * math.cos(2 * math.pi * i / 48) * (r + 0.06) + nx * 0.03, mc[1] + ty * math.cos(2 * math.pi * i / 48) * (r + 0.06) + ny * 0.03,
+             mc[2] + math.sin(2 * math.pi * i / 48) * (r + 0.06) * 0.92) for i in range(49)]
+    P.tube("voidring", ring, [0.07] * 49, "iron", 6)
+    # two wisp candles on iron stands before it, where any mirror would hold them
+    for side in (-1, 1):
+        sx_, sy_ = mc[0] + nx * 1.6 + tx * side * 1.1, mc[1] + ny * 1.6 + ty * side * 1.1
+        P.tube("vstand%d" % side, [(sx_, sy_, f), (sx_, sy_, f + 1.15)], [0.06, 0.03], "iron", 6)
+        P.sphere("vpan%d" % side, (sx_, sy_, f + 1.17), 0.09, "iron", scale=(1, 1, 0.4))
+        P.cylinder("vwax%d" % side, (sx_, sy_, f + 1.18), 0.05, 0.12, "bone", sides=6)
+        flame("vcandle%d" % side, sx_, sy_, f + 1.32, 0.08, 34.0)
+
+
+VOID_TH = math.radians(264.0)          # where the void mirror's face is cut in the hall's back wall
+STAIR_FACES = ((-8.2, "closed", 3.2), (-12.9, "eyeless", 3.4), (-17.9, "plain", 3.6))   # y, kind, height (yards)
 
 
 def build(root, material):
@@ -967,12 +1379,14 @@ def build(root, material):
     pool()
     pool_dead()
     pool_bodies()
+    ooze_faces()
+    clots()
     # the pool's own red glow, low over the blood (the one red light allowed); past it, only the wisp-fires
     # low in the basin, so the stumps round it take the glow and the walls beyond stay the wisp-fire's (Derek: "The
     # only light after the pool comes from the wisp fire torches")
-    LAMPS.append((BASIN[0], BASIN[1], -0.06, 220.0, RED))
-    LAMPS.append((BASIN[0] - 1.5, BASIN[1] + 0.9, -0.08, 100.0, RED))
-    LAMPS.append((BASIN[0] + 1.2, BASIN[1] - 1.1, -0.08, 100.0, RED))
+    LAMPS.append((BASIN[0], BASIN[1], -0.06, 85.0, RED))
+    LAMPS.append((BASIN[0] - 1.5, BASIN[1] + 0.9, -0.08, 38.0, RED))
+    LAMPS.append((BASIN[0] + 1.2, BASIN[1] - 1.1, -0.08, 38.0, RED))
     # the stair faces, each raked by a wisp-fire beside it (chapter 12: carved to move in firelight)
     for i, (y, kind, H) in enumerate(STAIR_FACES):
         f = floor_at(STAIR[0] + 0.4, y) or 0.0
@@ -999,13 +1413,13 @@ def build(root, material):
     for k in MIRROR_SEGS:
         tm = th0 + (th1 - th0) * (k + 0.5) / 40
         x, y, nx, ny = hall_spot(tm, 0.99)
-        c = (x + nx * 0.05, y + ny * 0.05, FLOOR_HALL + 2.2)
-        mirror("mirror%d" % k, c, (nx, ny), 0.72, k)
-        candle_before("mcandle%d" % k, c, (nx, ny), FLOOR_HALL, 20.0)
+        c = (x + nx * 0.05, y + ny * 0.05, FLOOR_HALL + 2.5)
+        mirror("mirror%d" % k, c, (nx, ny), 1.0, k)
+        candle_before("mcandle%d" % k, c, (nx, ny), FLOOR_HALL, 16.0)
     # two dim torches far round the hall, so its edges are found, not lit
     for i, th in enumerate((math.radians(160), math.radians(290))):
         x, y, nx, ny = hall_spot(th, 0.975)
-        torch("htorch%d" % i, x, y, FLOOR_HALL + 2.2, nx, ny, 40.0)
+        torch("htorch%d" % i, x, y, FLOOR_HALL + 2.2, nx, ny, 28.0)
     for k, th in enumerate([math.radians(155 + 9 * q) for q in range(16)]):
         x, y, nx, ny = hall_spot(th, 0.985)
         if math.hypot(x - fx, y - fy) < 4.8:
@@ -1014,5 +1428,5 @@ def build(root, material):
             rags(400 + k, x, y, FLOOR_HALL + CARVE_H - 0.2, nx, ny)
         if k % 5 == 3:
             niche(500 + k, x + nx * 0.02, y + ny * 0.02, FLOOR_HALL + 1.0, nx, ny)
-    door_frame()
     throne()
+    relics()

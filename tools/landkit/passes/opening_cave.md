@@ -453,3 +453,133 @@ surface.
   hand in it.
 - The half-cut face is lit but remains the weakest.
 - `cine_check`: the stairs 9 of 9, the hall 8 of 9.
+
+## Derek, 2026-10-09 (after pass 7b)
+
+"The torches on the walls need iron holders. The bug [big] face need to be a bunch of little faces, dim it down some
+more, with a emphasis of light on the throne, make the floor and walls that are carved more raw and gritty. The throne
+itself is so hard to see I couldn't see it at all"
+
+**Pass 8, worst first:**
+1. **The throne, unseen** (rule 1: the subject must be the brightest lit surface).
+   - The seat sat back inside the mouth's hollow, hidden behind the lower lip at the camera's angle.
+   - It comes forward onto the top step, a great seat with a tall back and arms, silhouetted against the black of the
+     open mouth (light on dark).
+   - Four of the Stranger's wisp candles on its arms and step make it the brightest lit thing in the hall; every other
+     fire is turned down.
+2. **The big face as many little faces:** the colossal face's form stays (brows, sockets, nose, the mouth that holds the
+   throne), but its surface is covered in small faces, each its own, turned with the big face's surface. Its sockets
+   and mouth stay empty and black.
+3. **Dimmer overall.**
+4. **The carved stone raw and gritty:**
+   - the flags, walls, pillars, steps and dais roughened as true geometry (subdivided and displaced);
+   - grit, pits and pale fresh bites painted in their light.
+5. **Iron holders:** each wall torch in a wrought-iron sconce (a wall plate, a curled arm, a basket of bars round the
+   fire), big enough to read as a dark shape against its own light.
+
+## Derek, 2026-10-09: the pool
+
+"Reduce the blood glow and make the blood more realistic and gross with faces on the wall having blood pour from their
+mouths into the pool"
+
+**The real thing:** the mascarons of old fountains, stone faces spouting from their mouths.
+
+**The plan (pass 8, the pool):**
+- **The faces:** the chamber's back walls stand about nine yards from the blood, too far to pour into. So three raw
+  basalt pillars rise at the pool's back edge, each with a crude face cut into it, the first carving in the cave (the
+  raw becoming the made). From each mouth a thick rope of blood pours straight down into the pool.
+- **The glow cut well down.**
+- **The blood:**
+  - near-black red;
+  - a congealed skin wrinkling at its edges;
+  - clots floating as real lumps;
+  - pink froth and spreading rings where the streams strike;
+  - the surface glossy, holding the wisp-fires in it, as blood does in the dark (the mirror pass now treats the pool as
+    gloss).
+
+## Derek, 2026-10-09: no exit
+
+"Give the room no exit. There will be a large mirror the player looks in in a large face, it reflects nothing but
+darkness."
+
+**Built (pass 8):**
+- The door and its frame are gone; the hall is closed.
+- On the hall's back wall to the right of the throne, facing the camera, a great face rises out of the floor to its
+  chin.
+- Its open mouth, at standing height, holds a great dark mirror. The material is new (`voidmirror`, 31), and the
+  reflection pass never touches it: the painter lays it the deepest black, with a faint cold rim and a slow breath in
+  the black.
+- Two wisp candles stand before it, exactly where any mirror would show their flames. Every other mirror in the hall
+  holds its fires; this one holds none, and no pilgrim.
+- The right-hand wall mirrors moved further round to make room.
+
+**Left to Derek:** how the pilgrim leaves the hall. The mirror is not assumed to be the way out.
+
+**Derek, the same hour:** "The mirror is the way out, they will walk into it and disappear." "The large mirror will be
+at the top of the throne stairs." So the void mirror moves to the top of the dais.
+
+**Derek's choice:** "Mirror replaces it" (the throne).
+- The colossal face's open mouth at the top of the dais is the great dark mirror, about 3.7 by 2.2 yd, framed by the
+  lips.
+- No seat. The heap stays at the stairs' foot.
+- The Stranger's candles burn on the top step either side of it.
+- The separate void-mirror face was removed.
+- The area page marks the throne's lines for rework.
+
+## Derek, 2026-10-09: the pool again
+
+"I liked the blood pool better without the wall in it, have define plain faces on the chamber walls, with mouths opens
+while blood oozes from their mouths in the poo[l]."
+
+**The rebuild:**
+- The pillars are gone.
+- The pool moves nearer the back wall.
+- Three plain, defined faces are cut into the raw columns there: taller than the pilgrim, turned to the camera, no cracks
+  and nothing wrong with them, mouths open.
+- Blood oozes from each mouth as a thick tongue down the chin and the wall, and runs to the pool along a channel worn low
+  through the stumps.
+- The blood stands level in every low place on the floor, so the runnels and the pool are one.
+
+## Derek, 2026-10-09: one face, one mirror; the rest masks
+
+"You can have one large face with a mirror in its mouth. The other faces on the walls Should be kind of just like
+almost like just the features like porcelain Mass [masks] but made of the wall obviously. Nothing in their mouths. The
+central large mouth will have the only black onyx mirror."
+
+**Changes:**
+- The great face at the top of the stairs is one face, without the small faces on it.
+- Its mouth holds the only mirror in the cave: black onyx, reflecting nothing.
+- The four wall mirrors, their candles and the little mouth-mirrors are gone.
+- Every other face is a mask in the wall's own stone: just the features, smooth as porcelain, with no cracks, broken
+  pieces, pits or wrong things, and nothing in the mouths. The blood still oozes from the pool chamber's faces.
+- The mirror pass still runs for the pool's gloss.
+
+## Pass 8, results
+
+**Changes, all to Derek's notes:**
+- **Fire:** orange, with iron sconces.
+- **The hall:**
+  - no exit;
+  - the onyx mirror in the great face's mouth at the top of the cleared stairs, the only mirror;
+  - the heaps either side of the stairs' foot;
+  - an iron fire-basket hung on chains, raking the great face;
+  - the throne gone.
+- **The masks:** every other face is a smooth stone mask.
+- **The stone:** gritty dressed stone (displaced geometry and painted grit).
+- **Relics:** iron relics scattered through the cave.
+- **The pool:**
+  - contained again, nearer the back wall;
+  - its glow cut well down;
+  - near-black blood with a congealed skin, clots and gloss;
+  - three plain masks oozing blood along runnels into it, each with its fire.
+
+**At the game's scale:**
+- The great face reads from across the hall: brows, sockets, nose, and the black mouth framed by candles.
+- The stair masks read.
+- The pool's masks read in a row on the lit wall.
+
+**`cine_check`:** the hall passes 9 of 9; the stairs 8 of 9 (black note 6.2%); the pool as reported.
+
+**Grade:**
+- Hall B+, stairs B, pool B-.
+- **Still short:** the heaps sit dim, and the pool masks want a closer look.

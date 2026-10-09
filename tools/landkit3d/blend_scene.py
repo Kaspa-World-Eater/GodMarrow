@@ -109,7 +109,7 @@ def material(name, index):
     return m
 
 
-def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0, lamp_ref=0.09, ambient=1.0):
+def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0, lamp_ref=0.09, ambient=1.0, spouts=()):
     """render, then read every pass back as numpy and save them (game coordinates) to out_dir/passes.npz"""
     sc = bpy.context.scene
     sc.use_nodes = True
@@ -148,6 +148,7 @@ def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0, lamp_ref=0.09, a
                         mat=np.round(P["IndexMA"][..., 0]).astype(np.int16), moon=P["DiffDir"][..., 0],
                         alpha=P["Alpha"][..., 0], shelter=sky["shelter"], skyview=sky["skyview"], lamp=lamp,
                         obj=np.round(P["IndexOB"][..., 0]).astype(np.int32), refl=refl,
+                        spouts=np.array(list(spouts), np.float32).reshape(-1, 3),
                         lamps=np.array([list(lp[:4]) + list(lp[4] if len(lp) > 4 else (1.0, 0.55, 0.2)) for lp in lamps], np.float32).reshape(-1, 7),
                         floor=np.array(floor), zoom=np.array(zoom), lamp_ref=np.array(lamp_ref), ambient=np.array(ambient), time=np.array(float(os.environ.get("GM_T", "0"))),
                         gw=gw, gh=gh)
@@ -195,7 +196,7 @@ def mirror_pass(out_dir, rl, nt):
     painted frame. Zero where there is no mirror or the mirror sees nothing; empty if the scene has no mirror"""
     sc = bpy.context.scene
     gw, gh = sc.render.resolution_x, sc.render.resolution_y
-    if "mirror" not in bpy.data.materials:
+    if "mirror" not in bpy.data.materials and "pool" not in bpy.data.materials:
         return np.zeros((gh, gw, 3), np.float32)
     saved = {}
     for m in bpy.data.materials:
@@ -204,7 +205,7 @@ def mirror_pass(out_dir, rl, nt):
         t = m.node_tree
         out = [n for n in t.nodes if n.type == "OUTPUT_MATERIAL"][0]
         saved[m.name] = out.inputs["Surface"].links[0].from_socket if out.inputs["Surface"].links else None
-        if m.name == "mirror":
+        if m.name in ("mirror", "pool"):                         # the blood's surface is glossy too
             g = t.nodes.new("ShaderNodeBsdfGlossy")
             g.inputs["Roughness"].default_value = 0.0
             g.inputs["Color"].default_value = (1.0, 1.0, 1.0, 1.0)
@@ -334,5 +335,5 @@ if __name__ == "__main__":
     setup_sun()
     setup_render(getattr(mod, "SAMPLES", 24))
     render_passes(out_dir, getattr(mod, "LAMPS", ()), getattr(mod, "FLOOR_MODULE", "floor3d"), zoom,
-                  getattr(mod, "LAMP_REF", 0.09), getattr(mod, "AMBIENT", 1.0))
+                  getattr(mod, "LAMP_REF", 0.09), getattr(mod, "AMBIENT", 1.0), getattr(mod, "SPOUTS", ()))
     print("passes saved", out_dir)

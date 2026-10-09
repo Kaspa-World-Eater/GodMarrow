@@ -23,12 +23,13 @@ from scipy import ndimage as nd                       # noqa: E402
 
 CAM = np.array([-0.612, -0.612, -0.5])                 # the camera's look (game coordinates)
 VIEW = -CAM / np.linalg.norm(CAM)
-WISP_C = np.array([0.62, 0.80, 1.0])
-# the wisp-fire's own colours, hot to cool: white heart, pale cyan, the cold blue body, its dying edge
-FL = [np.array(c) / 255.0 for c in ((246, 251, 255), (204, 236, 255), (140, 200, 255), (84, 148, 245), (46, 88, 200))]
+WISP_C = np.array([1.0, 0.62, 0.3])
+# the fire's own colours, hot to cool: the white-yellow heart, yellow, orange, the dark orange of the dying tips (never
+# red: MASTER_RULES 6)
+FL = [np.array(c) / 255.0 for c in ((255, 250, 222), (255, 222, 132), (250, 164, 62), (222, 104, 32), (150, 58, 22))]
 LMAX = 30.0                                            # the light that is the ramp's top
 ZONES = 6                                              # the bands of a pool of light
-EXPO = 0.25                                            # the fires' reach: pools of light, black between (rule 2)
+EXPO = 0.2                                             # the fires' reach: pools of light, black between (rule 2)
 R_DUST = P3.ramp("#0e0d10", "#1b191b", "#2a2726", "#3b3734", "#4d4842", "#615a52")
 R_OBS = P3.ramp("#030305", "#07070b", "#0c0d13", "#13151d", "#1c2029")
 
@@ -163,9 +164,15 @@ def paint(d, t=0.0):
                 cu = X[m] * np.cos(ang) + Y[m] * np.sin(ang) + Z[m] * 0.7
                 cv = -X[m] * np.sin(ang) + Y[m] * np.cos(ang) + Z[m] * 0.4
                 strokes = (np.abs(_frac(cu * 11.0 + vn(cv * 2.0, cu * 0.5) * 0.8) - 0.5) < 0.16) & (vn(cv * 6.0 + 3, cu * 6.0) > 0.4)
-                tb = np.where(strokes & (tm > 0.2), tb - 0.07, tb)
+                tb = np.where(strokes & (tm > 0.2), tb - 0.035, tb)
                 bite = (vn(X[m] * 23 + Z[m] * 11, Y[m] * 23 - Z[m] * 7) > 0.83) & (tm > 0.25)
                 tb = np.where(bite, tb + 0.08, tb)                     # a fresh bite, paler, where the iron struck
+            if name == "dressed":
+                grit = vn(X[m] * 37 + Z[m] * 13, Y[m] * 37 - Z[m] * 11)
+                tb = np.where((grit > 0.8) & (tm > 0.15), tb + 0.07, tb)
+                tb = np.where((grit < 0.16) & (tm > 0.1), tb - 0.08, tb)
+                pit = vn(X[m] * 9 + 5, Y[m] * 9 + Z[m] * 9) > 0.84
+                tb = np.where(pit, tb - 0.06, tb)
             if name == "dressed":
                 tooled = wall[m] & (np.abs(_frac(Z[m] * 8.0 + vn(X[m] * 3, Y[m] * 3) * 0.6) - 0.5) < 0.09)
                 tb = np.where(tooled, tb - 0.05 * np.clip(tm * 3, 0, 1), tb) * 1.08
@@ -193,13 +200,43 @@ def paint(d, t=0.0):
             dep = np.clip(nd.distance_transform_edt(full)[m] / 18.0, 0, 1)
             breathe = fk[[i for i, lp in enumerate(d["lamps"]) if lp[4] > 0.9 and lp[5] < 0.3]].mean() if len(d["lamps"]) else 1.0
             lvp = dep * 1.1 * breathe + (fbm(X[m] * 0.8, Y[m] * 0.8) - 0.5) * 0.08 + (dith[m] - 0.5) * 0.1
-            # it glows from its depths, the room's one subject (rule 1): the heart a hot red, held short of ketchup
-            col = np.where((lvp > 0.95)[:, None], BL.C3 * 0.9, np.where((lvp > 0.62)[:, None], BL.C2, np.where((lvp > 0.3)[:, None], BL.C1 * 1.15, BL.C0)))
+            # its glow cut well down (Derek: "Reduce the blood glow"): near black, only a dull red heart
+            col = np.where((lvp > 0.9)[:, None], BL.C2 * 0.62, np.where((lvp > 0.5)[:, None], BL.C1 * 0.8, BL.C0 * 0.85))
+            # the congealed skin at its edge, wrinkling, browner, where it has stood and thickened
+            skin_e = dep < 0.22
+            wr = np.abs(_frac(vn(X[m] * 2.5, Y[m] * 2.5) * 7.0 + fbm(X[m] * 4, Y[m] * 4) * 2.0) - 0.5) < 0.07
+            col = np.where((skin_e & wr)[:, None], BL.C0 * 0.45, np.where(skin_e[:, None], col * 0.75 + np.array([0.07, 0.025, 0.02]) * 0.25, col))
+            # where the streams strike: rings spreading, and a pink froth heaving
+            for (spx, spy, spz) in (d["spouts"] if "spouts" in d else []):
+                dsp = np.hypot(X[m] - spx, Y[m] - spy)
+                for rk in range(3):
+                    rr_ = ((t * 2 + rk / 3.0) % 1.0) * 1.3
+                    ring = (np.abs(dsp - rr_) < 0.035 + 0.02 * rr_) & (vn(X[m] * 9, Y[m] * 9) > 0.3)
+                    col = np.where(ring[:, None], col * 0.5 + BL.C2 * 0.6 * (1.2 - rr_ * 0.6), col)
+                froth = (dsp < 0.42) & (vn(X[m] * 14 + t * 3, Y[m] * 14 - t * 2) > 0.5 - 0.25 * (1 - dsp / 0.42))
+                col = np.where(froth[:, None], np.array([0.42, 0.17, 0.19]) * (0.6 + 0.4 * vn(X[m] * 30, Y[m] * 30))[:, None], col)
             # a slow skin drifting on the blood
             skin = vn(X[m] * 2.2 + t * 0.6, Y[m] * 5.0 - t * 0.3) > 0.74
-            col = np.where(skin[:, None], BL.C1 * 1.35 + np.array([0.03, 0.03, 0.05]), col)
+            col = np.where(skin[:, None], BL.C1 * 0.9 + np.array([0.02, 0.015, 0.02]), col)
             clot = (vn(X[m] * 4.0 + 40, Y[m] * 4.0) > 0.8) & (vn(X[m] * 11.0, Y[m] * 11.0) > 0.4)
             col = np.where(clot[:, None], BL.C0 * 0.7, col)
+            img[m] = col
+            continue
+        elif name == "blood":
+            # blood pouring and lying in clots: dark, wet, the flow running down it in lighter strands that move;
+            # the clots' tops a skin with a dull sheen
+            flow = vn(X[m] * 9.0 + Y[m] * 9.0, Z[m] * 3.0 + t * 8.0)
+            tb = tm * 0.9 + np.where(up[m] > 0.6, -0.05, (flow - 0.5) * 0.25 * np.clip(tm * 3, 0, 1))
+            col = tone(R["blood"], np.clip(tb, 0, 1) * 1.2, dith[m], band=0.1)
+            wet[m] = True
+            img[m] = col
+            continue
+        elif name == "voidmirror":
+            # it reflects nothing but darkness: the deepest black there is in the frame, a faint cold rim at its edge
+            full = np.zeros(m.shape, bool)
+            full[m] = True
+            edge_v = full & ~nd.binary_erosion(full, iterations=2)
+            col = np.where(edge_v[m][:, None], np.array([0.05, 0.06, 0.09]) + tm[:, None] * 0.08, np.array([0.006, 0.006, 0.01]))
             img[m] = col
             continue
         elif name == "mirror":
@@ -233,7 +270,7 @@ def paint(d, t=0.0):
     # the weeping (rule 37, ancient): water has seeped from every socket and crevice of the carved and the raw rock for
     # longer than anyone remembers, and run down the face below it, leaving long dark mineral tears, a pale crust at
     # their lips where a fire finds them
-    stone = ((mat == 20) | (mat == 27) | (mat == 30)) & wall
+    stone = ((mat == 20) | (mat == 27)) & wall
     crev = stone & (ao < 0.42)
     run = np.zeros((gh, gw))
     acc = crev.astype(float)
@@ -254,6 +291,12 @@ def paint(d, t=0.0):
     up_lip = np.zeros((gh, gw), bool)
     up_lip[1:, :] = T[1:, :] > T[:-1, :] + 0.05
     img = np.where((edge & (T > 0.12))[..., None], np.clip(img * 1.25 + 0.015, 0, 1), img)
+    # the carvings defined: their lit lips a step brighter, the far lip of every turn a step darker
+    cv_ = (mat == 30)
+    lit_lip = cv_ & (ndf > 0.35) & (T > 0.15)
+    img = np.where(lit_lip[..., None], np.clip(img * 1.35 + 0.02, 0, 1), img)
+    dark_lip = cv_ & (ndf > 0.35) & (T <= 0.15)
+    img = np.where(dark_lip[..., None], img * 0.55, img)
     # glints
     g = spec_glints(d, light, wet)
     img = np.where(g[..., None], np.clip(img * 0.4 + WISP_C * 0.85 * hue / (hue.max(2, keepdims=True) + 1e-9), 0, 1), img)
@@ -261,6 +304,7 @@ def paint(d, t=0.0):
     img = np.where((alpha > 0.5)[..., None], img, tone(R["basalt"], np.full((gh, gw), 0.1), np.full((gh, gw), 0.5)))
     proj = projector(d)
     img = mirrors(img, d, proj, fk)
+    img = pool_gloss(img, d, proj, fk, t)
     img = fires(img, d, proj, fk, t)
     tooth = (vn(X * 31 + Z * 17, Y * 31 - Z * 17) - 0.5) * 0.05 * np.clip(T * 3, 0, 1)
     img = np.clip(img * (1 + tooth[..., None]), 0, 1)
@@ -299,11 +343,47 @@ def mirrors(img, d, proj, fk):
         k = hit & (dd < size * 1.6)
         if k.any():
             q = dd[k] / (size * 1.6)
-            c = np.where((q < 0.35)[:, None], FL[1], np.where((q < 0.65)[:, None], FL[2], FL[3]))
-            col[k] = c * 0.8 * fk[i]
+            c = np.where((q < 0.3)[:, None], FL[0], np.where((q < 0.6)[:, None], FL[1], FL[2]))
+            col[k] = np.clip(c * 0.95 * fk[i], 0, 1)
     # the obsidian's own: a breath of sheen at the rim toward the light
     base = img[jj, ii]
     out[jj, ii] = np.clip(col + base * 0.5, 0, 1)
+    return out
+
+
+def pool_gloss(img, d, proj, fk, t):
+    """the blood's surface is glossy (blood in the dark holds every light): what the reflection pass found in it, the
+    wisp-fires broken by the slow skin and dimmed through the red, the lit stone faint; a trembling where the streams
+    strike"""
+    if "refl" not in d or d["refl"].shape[-1] < 4:
+        return img
+    mm = d["mat"] == 24
+    if not mm.any():
+        return img
+    out = img.copy()
+    pos, refl = d["pos"], d["refl"]
+    gh, gw = mm.shape
+    jj, ii = np.nonzero(mm)
+    hit = refl[jj, ii, 3] > 0.5
+    P_ = refl[jj, ii, :3]
+    X, Y = pos[jj, ii, 0], pos[jj, ii, 1]
+    # the skin breaks the reflection up; the trembling where the streams strike shifts it
+    keep = vn(X * 3.0 + t * 0.5, Y * 6.0) < 0.62
+    sx, sy = proj(P_)
+    sxi = np.clip(sx.astype(int), 0, gw - 1)
+    syi = np.clip(sy.astype(int), 0, gh - 1)
+    seen = hit & keep & (sx >= 0) & (sx < gw) & (sy >= 0) & (sy < gh) & (np.linalg.norm(pos[syi, sxi] - P_, axis=1) < 0.4)
+    add = np.where(seen[:, None], img[syi, sxi] * np.array([0.22, 0.1, 0.11]), 0.0)
+    for i, lp in enumerate(d["lamps"]):
+        if lp[4] > 0.9 and lp[5] < 0.3:
+            continue
+        size = flame_size(lp[3])
+        dd = np.linalg.norm(P_ - lp[:3], axis=1)
+        k = hit & keep & (dd < size * 0.55)
+        if k.any():
+            # a highlight on a dark liquid keeps the light's own colour: a small white-blue glint
+            add[k] = FL[1] * 0.6 * fk[i]
+    out[jj, ii] = np.clip(img[jj, ii] + add, 0, 1)
     return out
 
 
@@ -356,6 +436,11 @@ def fires(img, d, proj, fk, t):
         hpx = size * 2.4 * 21.0 * zoom * (0.92 + 0.1 * fk[i])
         wpx = max(2.4, size * 1.3 * 25.0 * zoom) * (1.6 if brazier else 1.0)
         ldepth = float((lp[:3] * CAM).sum())
+        # a fire hidden from the eye shows no aura either (it lights the stone, which the lamp pass already does)
+        lx, ly = proj(lp[:3])
+        lxi, lyi = int(np.clip(lx[0], 0, gw - 1)), int(np.clip(ly[0], 0, gh - 1))
+        if depth[lyi, lxi] < ldepth - 0.3:
+            continue
         # the aura on the stone near it (only on what is truly near the fire), stepped
         r0 = wpx * (2.0 if not brazier else 2.4)
         y0, y1 = int(max(0, sy - hpx * 3.2 - r0)), int(min(gh, sy + r0 * 1.6))

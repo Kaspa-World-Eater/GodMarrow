@@ -69,7 +69,7 @@ R = {
 MAT = {1: "ground", 2: "stucco", 3: "brick", 4: "stone", 5: "lacquer", 6: "gold", 7: "tile", 8: "wood", 9: "root",
        10: "iron", 11: "bone", 12: "moss", 13: "cloth", 14: "straw", 15: "water", 16: "boxpaint", 17: "blood",
        18: "hide", 19: "cedar", 20: "basalt", 21: "ash", 22: "kelp", 23: "corpse",
-       24: "pool", 25: "rust", 26: "cutrock", 27: "dressed", 28: "mirror", 29: "flame", 30: "carved"}
+       24: "pool", 25: "rust", 26: "cutrock", 27: "dressed", 28: "mirror", 29: "flame", 30: "carved", 31: "voidmirror"}
 
 
 def tone(rmp, t, dith, band=0.2):

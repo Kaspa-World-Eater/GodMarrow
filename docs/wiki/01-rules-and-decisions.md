@@ -154,6 +154,19 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09, the opening cave's fires (Derek):** "Change the wisp fire into normal orange fires." Also: "All that
+  debris on the throne stairs needs to move and the faces are still to hard to see"; and for the pool: "I liked the blood
+  pool better without the wall in it, have define plain faces on the chamber walls, with mouths opens while blood oozes
+  from their mouths in the pool." The mirror replaces the throne (his choice).
+- **2026-10-09, the opening hall has no exit (Derek):** "Give the room no exit. There will be a large mirror the player
+  looks in in a large face, it reflects nothing but darkness." The door of white light is gone. "The mirror is the way
+  out, they will walk into it and disappear." "The large mirror will be at the top of the throne stairs."
+- **2026-10-09, the pool (Derek):** "Reduce the blood glow and make the blood more realistic and gross with faces on the
+  wall having blood pour from their mouths into the pool." Also: "more iron relics laying around and the mirrors more
+  obvious so we can see many reflections, the mirror can be in the mouths."
+- **2026-10-09, the cave after pass 7 (Derek):** "The torches on the walls need iron holders. The big face need to be a
+  bunch of little faces, dim it down some more, with a emphasis of light on the throne, make the floor and walls that
+  are carved more raw and gritty. The throne itself is so hard to see I couldn't see it at all."
 - **2026-10-09, the cave's pass 5, Derek's grade B:** "The faces needs work but it's a B, good job on the lighting, but
   make the flames more flames like with embers, and flickering, little darker, more defines light zones."
 - **2026-10-09, cinematography is a rule (Derek, on the cave):**

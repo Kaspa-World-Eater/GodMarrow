@@ -82,7 +82,12 @@ starting thresholds, to be tuned by Derek's grades.
     smooth airbrush gradients. The base is bright and holds its volume, the tip is pointed, and tongues tear off (saint11:
     "the bright colors come from bottom"; "the wave top fades in a pointy shape").
 12. **No deep dark within a pilgrim's height of a visible flame,** except contact shadows (Gurney's candlelight corona).
-13. **The wisp-fire is white-blue, flickering and ethereal** (Derek, 2026-10-09).
+13. **Fire is ordinary orange fire** (Derek, 2026-10-09: "Change the wisp fire into normal orange fires"; before that
+    "white blue. Flickering ethereal").
+    - Its heart is white-yellow, then yellow and orange, the dying tips dark orange, never red.
+    - The light it throws is warm; the shadows keep the ramps' violet-blue (warm key, cool shadow, rule 26).
+    - It flickers on its own breath, never strobing, its tongues tearing off, embers rising.
+    - (The earlier white-blue wisp-fire rule:)
     - Its core is white, its body pale cyan to cold blue, its edge half there (dithered).
     - Its aura lies only on what is near it.
     - It swells and gutters on its own breath, never strobing.
