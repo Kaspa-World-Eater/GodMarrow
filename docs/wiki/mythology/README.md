@@ -68,14 +68,15 @@ leaves), written in the world's own voices. Those live in `../in-game-texts/` an
 
 - **The ages' names.** These pages use the Lore Bible's first set, with Derek's change of 2026-10-09: the Uncounted,
   the Age of Terrors, the Wasting (was the Starving), the Age of the Last Breath.
-- **From Derek's notes of 2026-10-09** (the rewrite of `02`, `03` and `04`):
-  - salt is gone from the myths (the congregation no longer carries it in, and the first night's line is of worn
-    tools). The zones still use salt as a folk ward (sills, barrows, the Ash Shore's salt-boilers, the Smugglers'
-    Hold). Keep it there as everyday practice, or take it out of the world too?
+- **Settled from Derek's notes of 2026-10-09** (the rewrite of `02`, `03` and `04`):
+  - the retired folk ward and trade are gone from the zones too, not only the myths: the Tithed lay worn tools (and,
+    here and there, hearth-ash or old nails) where the zones had it; the Ash Shore's boilers boil the grey-soaked ash
+    for potash; the Smugglers' Hold packs its bone in lime. The game's own Codex (`data/codex.json`) and the Shrine
+    Keeper's passive "Salt on the Threshold" (`data/board.json`, `data/progression.json`) still have the old word;
   - the in-game texts that retell the old age (`../in-game-texts/10-the-old-powers.md`, `11-the-gone-peoples.md`)
-    still use the old names and need rewriting to match;
-  - the game's own data still names a boss "The Marrow-Eater" (`data/progression.json`); the bible no longer has a
-    people of that name (the Emptied took its place).
+    are rewritten to the new names;
+  - the game's boss "The Marrow-Eater" (`data/progression.json`) stays: "Marrow-Eaters" is what the common roads call
+    the Emptied.
 - **The Flesh herald's name.** The game still shows the retired "Wet Nurse"; Soul has no herald.
 - **The faiths' own words:** order, monastery, circle, procession, shrine.
 - **The start's names:** the village, the merchant, and the sea's common name.

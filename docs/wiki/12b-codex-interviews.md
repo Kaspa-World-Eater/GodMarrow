@@ -129,25 +129,25 @@ Nothing, my master said. Only a promise: never to look west through it, over the
 
 ### The midwife of the Ashen Moor
 
-*Asked at her door while she laid the salt line, and afterward inside by the cradle-lantern, where she would answer only while her hands were busy.*
+*Asked at her door while she laid the ash line, and afterward inside by the cradle-lantern, where she would answer only while her hands were busy.*
 
 **Who are you, and what do people call you?**
-Midwife. The camp folk call me Salt-Wife. The children call me Mother Grain, because I carry barley in one apron pocket and salt in the other, and they always go for the wrong pocket and spit. I have a name. It is behind my teeth, same as I taught every mother on this Moor to keep them. You will not get it. You have a copyist's ears.
+Midwife. The camp folk call me Ash-Wife. The children call me Mother Grain, because I carry barley in one apron pocket and hearth-ash in the other, and they always go for the wrong pocket and spit. I have a name. It is behind my teeth, same as I taught every mother on this Moor to keep them. You will not get it. You have a copyist's ears.
 
 **Where do you live? Tell me what the place is like.**
-A low house of ash-brick at the end of the track, half a morning out from Maren's camp, the last house before the hollow the pickers will not cross. It smells of salt, bread and old blood; you stop smelling the blood. Bread always. A birth-house keeps a loaf rising day and night, because every woman wants bread after, and so does everyone who helped. I sleep on the bench by the door so I hear the knocking. The ash-pickers live past the ridge. At night the salt ticks. Salt talks when something tries it. You learn which ticks to get up for.
+A low house of ash-brick at the end of the track, half a morning out from Maren's camp, the last house before the hollow the pickers will not cross. It smells of ash, bread and old blood; you stop smelling the blood. Bread always. A birth-house keeps a loaf rising day and night, because every woman wants bread after, and so does everyone who helped. I sleep on the bench by the door so I hear the knocking. The ash-pickers live past the ridge. At night the ash ticks. Ash talks when something tries it. You learn which ticks to get up for.
 
 **What do you believe about the god, and about what happens when you die?**
-The god is dead and every scrap of it wants our young. That is all I need to believe to do my work. When I die I want to go down with the breath, no fuss, no lantern. I have salted my own bed so nothing wears me after. My name I will take down with me unsaid. What has never been said can never be unsaid. That is my whole faith, and it has served.
+The god is dead and every scrap of it wants our young. That is all I need to believe to do my work. When I die I want to go down with the breath, no fuss, no lantern. I have laid a worn knife in my own bed so nothing wears me after. My name I will take down with me unsaid. What has never been said can never be unsaid. That is my whole faith, and it has served.
 
 **What is an ordinary day for you, and what is your holiest day?**
-Salt the step, salt the sill. Bank the fire. Walk the track to whoever is near their time and put a hand on them. Trade with the carters for salt; it comes up from the Ash Shore and it is dear, and I would sell the roof first. My holiest day is always someone else's: the Hearth-Naming, when a child is weaned and its mother says the true name aloud, once, with the lantern lit. I stand at the back with the salt and listen for the name to land. You can hear it land. Mostly.
+Ash on the step, a worn knife on the sill. Bank the fire. Walk the track to whoever is near their time and put a hand on them. Trade with the carters for potash, for the birth-linen; it comes up from the Ash Shore and it is dear, and I would sell the roof first. My holiest day is always someone else's: the Hearth-Naming, when a child is weaned and its mother says the true name aloud, once, with the lantern lit. I stand at the back with the ash and listen for the name to land. You can hear it land. Mostly.
 
 **What do you fear, and what will you not talk about?**
 The open-handed ones. I told your copyist of one, and that is the last I will say of it, so do not come round it sideways. I fear a wet line across a floor. I fear bread I did not bake. I will not talk about where the knuckle-bone child is now. The brothers took him up the mountain at seven years, with his mother's leave. She has his number on a strip of bone. She holds it at night.
 
 **What do you make of the other faiths, and of the waystones?**
-The processions sent two penitents asking after the boy who does not bleed. I salted the step while they talked. The Pale Order wrote a child down by a number bigger than I can count, and I am glad I cannot. The Shrine Keepers bless my salt, and say salt has no small god of its own, which is why the pieces will not cross it. The mirror people asked to hold a glass over a newborn once. The glass went in the trough. As for the waystones, no woman heavy with child goes through a ring. One did. She came up light at the other stone. The child came up six days after, at a third ring, well and hungry. No woman would nurse it. I did what I could with barley water.
+The processions sent two penitents asking after the boy who does not bleed. I laid ash on the step while they talked. The Pale Order wrote a child down by a number bigger than I can count, and I am glad I cannot. The Shrine Keepers bless my ash, and say ash has no small god of its own, which is why the pieces will not cross it. The mirror people asked to hold a glass over a newborn once. The glass went in the trough. As for the waystones, no woman heavy with child goes through a ring. One did. She came up light at the other stone. The child came up six days after, at a third ring, well and hungry. No woman would nurse it. I did what I could with barley water.
 
 **Tell me one small true thing no scholar would write down.**
 A newborn's first breath out is always longer than its first breath in. Always. I have counted every one for thirty years. We come in owing, and every one of us starts paying on the first breath. I have never told a mother. She has enough to carry.
@@ -315,7 +315,7 @@ I leave the lowest shelf clear. I cut the loaf in three and eat two. I walk slow
 
 - The Dry Ford on the Barrows road: a riverbed whose small god "rode off on the breath" one spring, taking the water. The quietest place on the Hide; the preacher's glass-smooth mark lies in it.
 
-- The midwife's house: last ash-brick house before the hollow past the Broken Kneeler, half a morning out from Maren's camp. Salt is traded up from the Ash Shore, dear.
+- The midwife's house: last ash-brick house before the hollow past the Broken Kneeler, half a morning out from Maren's camp. Potash is traded up from the Ash Shore, dear.
 
 - Coldhearth, at the Hollow Wood's edge: thirteen doors, fourteen graves by the old stone, one well nobody draws from.
 
@@ -349,7 +349,7 @@ I leave the lowest shelf clear. I cut the loaf in three and eat two. I walk slow
 
 - Moor children never let a skipping rope touch ash; a touched rope is shaken out at the village edge and the game ends.
 
-- Sayings: "Somebody always sits up." "We come in owing" (a newborn's first breath out is longer than its first breath in). "Salt talks when something tries it."
+- Sayings: "Somebody always sits up." "We come in owing" (a newborn's first breath out is longer than its first breath in). "Ash talks when something tries it."
 
 ### Things they disagree about
 
@@ -421,7 +421,7 @@ Her name's on the glass, scratched small, down at the foot: "Aveth. She was kind
 Walkers call me Old Thirty. It was a count of my crossings once and it has fallen behind. I had a name from my mother. I spoke it aloud every morning for a long time, as you're told to, and one morning I spoke it and it was a word for a kind of stick. So I stopped. Thirty will do. Thirty doesn't go anywhere.
 
 **Where do you live? Tell me what the place is like.**
-At the lips. Whichever ring I'm near. You sleep on the warm side of a plinth, curled up, with your back to the stain. It's the best bed on the Hide. The smell is ash and something under the ash, like a kettle that had tallow in it last week. I eat hearth-bread from the camps when they give it and I carry a twist of salt. Neighbours: other walkers, now and then. We don't talk much. We look each other over. At night I hear it breathing, and the stones settling, a little noise, like old wood in a cold house.
+At the lips. Whichever ring I'm near. You sleep on the warm side of a plinth, curled up, with your back to the stain. It's the best bed on the Hide. The smell is ash and something under the ash, like a kettle that had tallow in it last week. I eat hearth-bread from the camps when they give it and I carry a worn nail in my pocket. Neighbours: other walkers, now and then. We don't talk much. We look each other over. At night I hear it breathing, and the stones settling, a little noise, like old wood in a cold house.
 
 **What do you believe about the god, and about what happens when you die?**
 The god is down there somewhere, and it's big, and it's still breathing, whatever the brothers say about dead. When I die I'd like to go in one more time and not come up. Walkers say that happens to the lucky ones. They say you go on down with the pull and you're kept whole, all of you, every little thing it took, given back. I've heard a walker say it. I said it myself once, to a girl, to make her brave.
@@ -601,7 +601,7 @@ It looked at me a long time. I looked at it. Then it lifted a hand, its left han
 Aud. My mother was Aud too, and hers. Pilgrims call me Keeper, and half the old walkers think I'm my mother, and I let them, because it saves telling them she's gone. She's in the lantern at the fork now, if you want her. The one that burns low and a bit to the left. That's her. She always did lean.
 
 **Where do you live? Tell me what the place is like.**
-The tent's reed-cloth, sewn from bast and tallowed, patched every thaw. It smells of brush smoke and ash-root broth and wet boots. I sleep on a heath-straw tick with my feet to the road like everyone. The broth is ash-root, a fist of barley, salt, a spoon of Kettlewick fat on a feast day. Neighbours are whoever's walking. The cages creak on the edge. At night you hear the road. It makes a sound when it's moving. Like a sheet being pulled slow off a bed.
+The tent's reed-cloth, sewn from bast and tallowed, patched every thaw. It smells of brush smoke and ash-root broth and wet boots. I sleep on a heath-straw tick with my feet to the road like everyone. The broth is ash-root, a fist of barley, a spoon of Kettlewick fat on a feast day. Neighbours are whoever's walking. The cages creak on the edge. At night you hear the road. It makes a sound when it's moving. Like a sheet being pulled slow off a bed.
 
 **What do you believe about the god, and about what happens when you die?**
 I believe it's under the Heath, and it's hot, and we mustn't feed the fire. When I die I'll go in the fire. Keepers do. We bank ourselves. My mother went in on a Turning Morning and the fire burned a little brighter for a year, then settled, and then she was at the fork in the lantern. I don't know how she got there. The fire gives you where you're needed.
@@ -628,10 +628,10 @@ Garrow was a liar his whole life, and a good one, and he was never patient himse
 *Spoken over the rendering kettle on Knot Night, when the stilt-folk go out along the causeway and tie a knot on every lamp at once; she did not go, and said the lamps knew she was busy.*
 
 **Who are you, and what do people call you?**
-Brisk. Tallow-wife. My mother was Mother Slow, because she took three days to render what I do in one, and her fat was the better for it. Everybody's Mother something on the Stilts once they've had a kettle long enough. The children call me Mother Stink. The priestess calls me Sister Brisk, meaning she wants a discount. My husband called me Bris, no k. Nobody's called me that since the Salt Ladder.
+Brisk. Tallow-wife. My mother was Mother Slow, because she took three days to render what I do in one, and her fat was the better for it. Everybody's Mother something on the Stilts once they've had a kettle long enough. The children call me Mother Stink. The priestess calls me Sister Brisk, meaning she wants a discount. My husband called me Bris, no k. Nobody's called me that since the Ash Ladder.
 
 **Where do you live? Tell me what the place is like.**
-Six legs up, second terrace, the house with the black kettle-mouth and the roof full of knot-coils. It smells like my hands, which smell like the Mire, which is fat and sweet and a bit like a baby's head. We eat mire-cake, which is reed-meal fried in fat, and bog-crust, and on a good day a pot of the clear broth off the top of the kettle. Neighbours are the Salt Ladder folk, who talk too loud. At night you hear her beat under everything, and the mud trying the ladders.
+Six legs up, second terrace, the house with the black kettle-mouth and the roof full of knot-coils. It smells like my hands, which smell like the Mire, which is fat and sweet and a bit like a baby's head. We eat mire-cake, which is reed-meal fried in fat, and bog-crust, and on a good day a pot of the clear broth off the top of the kettle. Neighbours are the Ash Ladder folk, who talk too loud. At night you hear her beat under everything, and the mud trying the ladders.
 
 **What do you believe about the god, and about what happens when you die?**
 She's the Mother, the one under the Mire, and she's warm and she's fat and she gives. That's the whole of Kettlewick belief and anyone who tells you more is selling candles. When you die you go over the rail or into a lamp. Over the rail, she keeps you. Into a lamp, the town keeps you. I've told my granddaughter lamp. I want to see how tall she builds.
@@ -649,7 +649,7 @@ The Villa Llaga brothers come to buy tallow and never haggle, which I don't trus
 The fat from the Mire has a grain in it, like wood, if you cut it cold. All of it runs the same way. You dig it out and look at the grain and it points to the waystone, every spadeful. Tallow-wives know. We cut across the grain because the candles burn steadier. Cut with it, and the flame leans.
 
 **You said the pilgrims all name the same place. What do they call it?**
-They say it quick, like it's a word everybody knows. It sounds like the old stilt-word for the space behind your teeth, where the tongue sits when you're quiet. Grandmother used it for the back of the kettle, where it's hottest. I asked one, where's that, then? He pointed down, between his own feet, and then he looked surprised he'd done it, and asked me the way to the Salt Ladder again. I gave him a candle. It leaned.
+They say it quick, like it's a word everybody knows. It sounds like the old stilt-word for the space behind your teeth, where the tongue sits when you're quiet. Grandmother used it for the back of the kettle, where it's hottest. I asked one, where's that, then? He pointed down, between his own feet, and then he looked surprised he'd done it, and asked me the way to the Ash Ladder again. I gave him a candle. It leaned.
 
 ---
 
@@ -661,7 +661,7 @@ They say it quick, like it's a word everybody knows. It sounds like the old stil
 Essa, from Low Ashwake. I dyed cloth, grey mostly, the only colour anyone buys. On the road they call me the Dyer, because my hands are still grey to the wrist. The brother calls me Pilgrim, because he calls everyone Pilgrim. The girl from the stilt-towns calls me Auntie, and I haven't the heart to ask her why.
 
 **Where do you live? Tell me what the place is like.**
-Under the rib. For now. It's the coolest place on the Hide at noon and the warmest at midnight. It smells of dust and our own breath and something like a kiln cooling. We eat the edge-well brothers' bread, which is baked hard as the ground, and a paste of bitter root and salt. We drink little. I sleep in a row of a hundred, on the white, head to foot, no blanket. At night the rib ticks. Someone always prays. Someone always counts.
+Under the rib. For now. It's the coolest place on the Hide at noon and the warmest at midnight. It smells of dust and our own breath and something like a kiln cooling. We eat the edge-well brothers' bread, which is baked hard as the ground, and a paste of bitter root. We drink little. I sleep in a row of a hundred, on the white, head to foot, no blanket. At night the rib ticks. Someone always prays. Someone always counts.
 
 **What do you believe about the god, and about what happens when you die?**
 The brothers say the white is her bone and we walk on the Mother. I believe that now. I didn't in Ashwake. When I die I'd like to lie down out here and be taken up like the saints, and sit, and breathe once an hour, and have the dust move on my lip. I think that would be restful. The brother says it's the holiest thing a Tithed body can do: become a little less soft.
@@ -676,7 +676,7 @@ I'm afraid of eleven. Everyone out here is. We don't say it. We say "the one aft
 The brothers are hard and kind. The Villa folk came to the edge-well to buy water with blood-coppers and were sent off. A Gilded Peak monk passed us barefoot on the white at noon without shade, and none of us saw him drink. The waystone out here breathes deep and slow, one breath to seventy of your heart, the brother says. Pilgrims don't use it. The brothers won't let them. He says the Barrens ring goes somewhere the Mother would rather we didn't.
 
 **Tell me one small true thing no scholar would write down.**
-The dust at the saints' feet is softer than anywhere else, like fine ash, and the pilgrims take a pinch and put it in their mouths, and it tastes of nothing at all. Nothing. Everything out here tastes of salt and bone. That dust tastes like a word you've forgotten. I keep a pinch in my cheek while I walk. The brother does too. He thinks I haven't noticed.
+The dust at the saints' feet is softer than anywhere else, like fine ash, and the pilgrims take a pinch and put it in their mouths, and it tastes of nothing at all. Nothing. Everything out here tastes of ash and bone. That dust tastes like a word you've forgotten. I keep a pinch in my cheek while I walk. The brother does too. He thinks I haven't noticed.
 
 **Why did you want to come out here at all?**
 My mother came back from a waystone missing a word. Only one. The word for the colour of the sky at dusk. She'd stand at the window and try for it with her hands. I thought, if I walk this road on my feet, all the way, no stones, then when I get to the Femur I'll be all of me. Everything I brought, I'll bring. The brother says that's a proud thought. He says the Mother will teach me. Ten. There. See? Ten.
@@ -693,7 +693,7 @@ My mother came back from a waystone missing a word. Only one. The word for the c
 
 - **Cap Hollow**, a hamlet of four fungus-picking families in the Hollow Wood, next to the hunter's hollow under the Ribcage Bough.
 
-- **The Ashwake inn** with a slant floor and a measuring doorpost; the surveyor's winter home. The Salt Ladder in Kettlewick has a lamp at its foot and loud neighbours.
+- **The Ashwake inn** with a slant floor and a measuring doorpost; the surveyor's winter home. The Ash Ladder in Kettlewick has a lamp at its foot and loud neighbours.
 
 - **The thread-meeting place:** south of the Burnt Heath, east of the Drowned Fen, flat, dark, warm ground with no road; threads there grow thick as wrists. Candidate secret zone.
 
@@ -768,7 +768,7 @@ My mother came back from a waystone missing a word. Only one. The word for the c
 *Heard at the foot of the Sixth Stair, where he sat down in the dust to rest his knees; he kept a cloth over his mouth and lowered it only for the names.*
 
 **Who are you, and what do people call you?**
-Brother Sweeper. The book has a number for me, three thousand and something; the tallier would scold me for the something. The novices call me Old Broom, and I answer to the broom. Before I came up I was a carrier's boy on the salt road, with a name my mother gave me. It was taken a long time ago, and I let it go without a fight. Fifty years on the Nine Stairs. I have swept every niche of them. Some twice in a day. The lowest ones once, and never again.
+Brother Sweeper. The book has a number for me, three thousand and something; the tallier would scold me for the something. The novices call me Old Broom, and I answer to the broom. Before I came up I was a carrier's boy on the ash road, with a name my mother gave me. It was taken a long time ago, and I let it go without a fight. Fifty years on the Nine Stairs. I have swept every niche of them. Some twice in a day. The lowest ones once, and never again.
 
 **Where do you live? Tell me what the place is like.**
 Cold. Dry. It smells of lamp and stone, and low down it smells of nothing at all, which is the dust. We sleep in niches cut like the niches of the laid, a hand shorter, on a tick of barley husk, so the body learns the shape early. Stair-bread in the morning, scored in nines. A broth of roots and niche-cap at night. On my left sleeps Brother Tomo, who snores in nines. On my right, a wall of the laid. At night the house settles. Small ticks. A rib moving a nail's width. You learn to sleep through it, or you get up and sweep.
@@ -858,7 +858,7 @@ The Warden says an old tallier's, and that the office keeps it. Then the old tal
 *Heard in the vat-room of the Ossuary of Nine Stairs; he would not let the paddle rest while he spoke, and set his questioner to stir between answers.*
 
 **Who are you, and what do people call you?**
-Four Thousand and Fifty, Brother of the Well. The novices call me the Warm Brother, on account of my hands. Stir. Thirty-one years at the windlass of the Third Well and the vats. I render the chrism for the laid, the tallow for the lamps, and the pots the knights carry down to the villages. Before my vows I was a Barrens lad who could lift a sack of salt one-handed. The Order taught me to use two.
+Four Thousand and Fifty, Brother of the Well. The novices call me the Warm Brother, on account of my hands. Stir. Thirty-one years at the windlass of the Third Well and the vats. I render the chrism for the laid, the tallow for the lamps, and the pots the knights carry down to the villages. Before my vows I was a Barrens lad who could lift a sack of lime one-handed. The Order taught me to use two.
 
 **Where do you live? Tell me what the place is like.**
 Down here, the warmest room in the ossuary, and the brothers upstairs envy it. It smells of tallow and hot stone and the tar from the splices. The light is vat-lamps, low and amber. I sleep on a shelf over the stove so I hear if a vat skins. The bread comes down cold and we warm it on the vat lids. At night the vats tick as they cool, and the windlass creaks when nobody is at the handle. That is the rope settling. Stir.
@@ -915,7 +915,7 @@ It fits close. Close is good in the barrow lands. You want the true answer. At t
 
 ### The headman of Cold Adit
 
-*Heard at the bridge of Cold Adit on the ninth morning after first frost, with the salt set out on the parapet under a cloth, waiting for the knights.*
+*Heard at the bridge of Cold Adit on the ninth morning after first frost, with the oil set out on the parapet under a cloth, waiting for the knights.*
 
 **Who are you, and what do people call you?**
 Wat Orrin, headman of Cold Adit, as my father was, and his. Wat to most, Headman when they want something. The knights call me Keeper of the Bridge, which is a title they made up, and I have come to like it. I keep the village book, the pit accounts, the lot-pot and the bridge. Forty-some winters. My wife says forty-some is what men say who have stopped counting, and she is right.
@@ -927,19 +927,19 @@ Forty-one households in a cleft under the Ossa: stone houses with turf roofs, al
 The god is dead and we live on it, like moss on a stone. The Order's Mother holds up the mountain; I thank her at the bridge, since it costs nothing. When we die the knights come and take us up, and our flesh goes to the cold, and our bones stand in a hall none of us will see. My mother said the smoke off the peak was us going home. I say we are buried, and then borrowed. Where we end up I couldn't tell you. Up. Everybody says up.
 
 **What is an ordinary day for you, and what is your holiest day?**
-Before light I walk the drifts with a lamp and look at yesterday's pick-marks, to see how much the rock took back. Then quarrels, tallies, a smelt now and then. The holiest day is this one: Bridge Salt, when the Order comes. The women are up from midnight: salt in nine heaps, because the knights like it so, and a lamp lit beside it. The children stand on the wall and count the dead going by. We tell them not to. They count.
+Before light I walk the drifts with a lamp and look at yesterday's pick-marks, to see how much the rock took back. Then quarrels, tallies, a smelt now and then. The holiest day is this one: Bridge Oil, when the Order comes. The women are up from midnight: oil in nine jars, because the knights like it so, and a lamp lit beside them. The children stand on the wall and count the dead going by. We tell them not to. They count.
 
 **What do you fear, and what will you not talk about?**
 The lot. I pull it from the pot myself, every third year. I will not talk about my sister's boy; he went, and it is in the book. And I fear the drifts will close with men in them. Nobody sleeps in a drift now. We had a lad, Corm, who did, the winter I was twelve, and in the morning we found him, and the rock had— No. That goes in the book, and stays there.
 
 **What do you make of the other faiths, and of the waystones?**
-We see the Order and the pedlars and nobody else. Once a Shrine Keeper came up the valley looking for a spring to give our dead to. I showed him the tailings stream. He looked at it a long while and went down again. There is a waystone two days down the valley at Harrow Pit, three of its teeth fallen. The pedlars use it. Anse the pedlar came out of it last year and sold me a pot of chrism for a sack of salt, and his left hand had a knuckle more than I remembered. He says it always had.
+We see the Order and the pedlars and nobody else. Once a Shrine Keeper came up the valley looking for a spring to give our dead to. I showed him the tailings stream. He looked at it a long while and went down again. There is a waystone two days down the valley at Harrow Pit, three of its teeth fallen. The pedlars use it. Anse the pedlar came out of it last year and sold me a pot of chrism for a sack of nails, and his left hand had a knuckle more than I remembered. He says it always had.
 
 **Tell me one small true thing no scholar would write down.**
 A pot of chrism in a cold house keeps it warm by a hair. You set it by the cradle. Every mother in Cold Adit does. The children who had chrism by the cradle are the sturdy ones, heavy in the bone. They walk late, and they sit down hard, and they never break anything when they fall. We think nothing of it. I have written it here so somebody might.
 
 **Why do you think the eldest knight asked how many of you there are?**
-I've turned it over every night since. Maybe the Order wanted to know how much salt to expect. Maybe how many to come back for. They count everything, and they have counted our dead in their books for longer than ours go back, so why not the living? Only they never asked before. My wife says he was being kind. "Bury deep this winter." We buried the smith's girl at the thaw, deep as we could dig, and the spade went easy. Next morning the grave stood a hand higher than the path. Kind ground.
+I've turned it over every night since. Maybe the Order wanted to know how much oil to expect. Maybe how many to come back for. They count everything, and they have counted our dead in their books for longer than ours go back, so why not the living? Only they never asked before. My wife says he was being kind. "Bury deep this winter." We buried the smith's girl at the thaw, deep as we could dig, and the spade went easy. Next morning the grave stood a hand higher than the path. Kind ground.
 
 ---
 
@@ -1038,10 +1038,10 @@ The points that went and did not fall. Their squares, their rows, their nights. 
 *Heard at the grate of the Ossuary of Nine Stairs on her second day of waiting; she sat on the step with her left hand open on her knee, palm up, for anyone who cared to count it.*
 
 **Who are you, and what do people call you?**
-Two hundred and seven. Write that. I had a name at the thighbone citadel, and a man, and a mending stall on the market stair. Those are all well where they are. Leave them. The salt-carriers I walked with called me the Mender, because I mended their bowls on the road for salt. I would like the number, please.
+Two hundred and seven. Write that. I had a name at the thighbone citadel, and a man, and a mending stall on the market stair. Those are all well where they are. Leave them. The ash-carters I walked with called me the Mender, because I mended their bowls on the road for oil. I would like the number, please.
 
 **Where do you live? Tell me what the place is like.**
-The citadel, under the great femur, a room over my stall. Dry. Everything tastes of chalk. We eat millet cakes and a sour root soup, and when the salt caravans come in, flat bread fried in god-fat. At night the femur creaks in the wind like a mast, and the pilgrims sing on the market stair. Now I sleep at your grate. It is cold. Your brothers pass bread through the bars. Good bread, scored in nines. They pass it in two hands, which I like.
+The citadel, under the great femur, a room over my stall. Dry. Everything tastes of chalk. We eat millet cakes and a sour root soup, and when the lime carts come in, flat bread fried in god-fat. At night the femur creaks in the wind like a mast, and the pilgrims sing on the market stair. Now I sleep at your grate. It is cold. Your brothers pass bread through the bars. Good bread, scored in nines. They pass it in two hands, which I like.
 
 **What do you believe about the god, and about what happens when you die?**
 I believed what the citadel believes: you go into the Last Breath with everyone, and the spirits carry you. Now I believe she holds, and we were carried in her, and one of us knelt. When I die I want to stand in your wall, facing the stair. I will keep watch. I know what for, now. Do not ask me. The answer is warm, and I have no words for it that are ours.
@@ -1091,7 +1091,7 @@ The book holds the laid and the brothers. She is neither. I have written her on 
 
 - **The Night of the Come Down** (midwinter): the whole ossuary lies on its back along the lip in rows, nine prayers per falling line.
 
-- **Bridge Salt** (Cold Adit, the ninth day after first frost): salt and a lit lamp set on the bridge parapet for the knights.
+- **Bridge Oil** (Cold Adit, the ninth day after first frost): oil and a lit lamp set on the bridge parapet for the knights.
 
 - **The Third Asking:** the knights' rite for ground that will not give up its bone. Seen, never described; "we moved camp a third of a league after."
 
@@ -1221,7 +1221,7 @@ A lean-to against the dyer's wall. Hot tin, river mud, the dyer's vats. Grey lig
 The monks said the god lies down in the Silence and we should let it. The priests here say the god is dead and keep a lamp lit for it. I'm a craftsman. I believe what I've had in my hands. I had a man in my hands with gold on his lids, and he was warm, and he wept that night. When I die, leave me be. No gold, no lantern, no bowl. Put me in the river with my hammers and let whoever wants me find me.
 
 **What is an ordinary day for you, and what is your holiest day?**
-Up with the light. Mend pots, beat tin, trade a lamp-case for salt. On the Peak the holiest was the Noon of No Shadow. Every book of leaf had to be ready, and the masters re-laid the saints the night before, so that at noon the sanctum was one white fire. The monks sat in it with their eyes open. Lay men were let stand at the back. It hurt to look, and that was right. That was the whole rite: be looked at by light till there's nothing left to look at.
+Up with the light. Mend pots, beat tin, trade a lamp-case for oil. On the Peak the holiest was the Noon of No Shadow. Every book of leaf had to be ready, and the masters re-laid the saints the night before, so that at noon the sanctum was one white fire. The monks sat in it with their eyes open. Lay men were let stand at the back. It hurt to look, and that was right. That was the whole rite: be looked at by light till there's nothing left to look at.
 
 **What do you fear, and what will you not talk about?**
 Good work. When the seam goes and the face goes and there's only shine, I get a feeling in my hands like cold water. I won't talk about Master Enshō's hands. I told your copyist the posture: open on his knees, the open hand. I didn't tell him about the fingers after. Leave that.
@@ -1863,7 +1863,7 @@ We thought it was a joke. The bloodletter was the only one who could not be open
 The clerks write "the hood-woman" and the children say Cord, because of the cords. Call me that. I had a name in a town on the fen-road and I left it there with the rest. I hunt what comes up from the south in brothers' robes, and I get paid by the cord. Nine cords this time. Count them if you like. Everyone counts them. That is the one part of the job everyone wants to do.
 
 **Where do you live? Tell me what the place is like.**
-In the dry side of culverts, mostly. You learn which way the water goes and you lie on the other side of the pipe. The strays keep to low ground, so I keep to it too; I have not slept on a hill in eleven years. It smells of ditch-water and the smoke off burnt robes, which gets into everything, sour, like a scorched pot. I eat hard bread and pull-root and a twist of ash-salt in the morning. Nobody lives next to me. At night I hear the water, and if I am unlucky, the first line of a tune.
+In the dry side of culverts, mostly. You learn which way the water goes and you lie on the other side of the pipe. The strays keep to low ground, so I keep to it too; I have not slept on a hill in eleven years. It smells of ditch-water and the smoke off burnt robes, which gets into everything, sour, like a scorched pot. I eat hard bread and pull-root and a twist of ash-root in the morning. Nobody lives next to me. At night I hear the water, and if I am unlucky, the first line of a tune.
 
 **What do you believe about the god, and about what happens when you die?**
 The god is flesh that does not know it is flesh. Everything I open is her, and she lets me, and that is what I believe. When I die I want to be burned like a robe, quick, with the cord cut off first so nobody gets paid for me. I do not want to go into anybody's wall or up anybody's ledge. I have seen what gets up out of a ditch when it has had a season to think.
@@ -1991,13 +1991,13 @@ In the sack. I told the clerk nine, and paid for nine, and there are ten in ther
 Fusa. The shrine gave me that at my folding. The name my mother gave me went into a doll, and the doll went into the fire, as they do. Novices call me Elder. The reed-camps call me the Aunt Who Stayed, which they mean kindly. I fold, I read breath at doorsteps, and I kept the book at the torii for a while after Kasane. I was the one on the step with fever. You have heard that. Everyone who comes up the causeway has heard it, and they look at my hands to see if they shake.
 
 **Where do you live? Tell me what the place is like.**
-Here. The Well-Shrine smells of wet salt and new paper, and of nothing else; the Fen keeps the other smells. The light comes grey through reed screens all day, even at noon. We sleep face down on reed mats over a board floor raised on piles, so that whatever we let out in sleep goes into the boards. We eat rice-water, reed-heart boiled in brine, and on the Dusk of the Empty Bowl a little fat of the god scraped from the bank where the Hide shows through. At night the Fen makes no sound. That is the sound I hear. That, and the bell at the Salt Ford, far off, ringing when no one is near it.
+Here. The Well-Shrine smells of cold incense and new paper, and of nothing else; the Fen keeps the other smells. The light comes grey through reed screens all day, even at noon. We sleep face down on reed mats over a board floor raised on piles, so that whatever we let out in sleep goes into the boards. We eat rice-water, reed-heart boiled in brine, and on the Dusk of the Empty Bowl a little fat of the god scraped from the bank where the Hide shows through. At night the Fen makes no sound. That is the sound I hear. That, and the bell at the Lime Ford, far off, ringing when no one is near it.
 
 **What do you believe about the god, and about what happens when you die?**
 The god breathed out once, at the end, and we live inside the breath while it leaves. Every stone and ford and bell rides it. When a woman dies, her breath goes out after the rest and catches up. That is the teaching. A purifier's breath is too heavy to go out, and so we walk down with it instead. I believe the first part every day. The second part I believe on the odd days, and on the even days I fold.
 
 **What is an ordinary day for you, and what is your holiest day?**
-Up before light. Change the three bowls of salt on the threshold. Fold until noon, never at noon. Walk the Fen road to the doorsteps that have dolls on them, and read the breath of the house at dusk. Breathe out at dusk, even with nothing in me. The holiest day was the Great Cutting-Away, when we breathed the year into the water. There is none now. Now we keep the fourth of Thaw. One bowl of salt on the step, one bowl of water, and nobody touches them. The novices think it is for the six. I let them.
+Up before light. Change the three bowls of incense on the threshold. Fold until noon, never at noon. Walk the Fen road to the doorsteps that have dolls on them, and read the breath of the house at dusk. Breathe out at dusk, even with nothing in me. The holiest day was the Great Cutting-Away, when we breathed the year into the water. There is none now. Now we keep the fourth of Thaw. One bowl of incense on the step, one bowl of water, and nobody touches them. The novices think it is for the six. I let them.
 
 **What do you fear, and what will you not talk about?**
 The stones. You know that already, or you would not have sat on this side of me. I will not talk about the girl beside Shiori. I will say her name once for your book, Akane, and then you will ask something else. And the fever. I am told it came on the night before they went down. I remember the fever well. I do not remember it coming on.
@@ -2047,7 +2047,7 @@ Twice nearer, once deeper. Or twice deeper. The notches are on the pole, and the
 Mio. It means a channel through the reeds. I keep the day-book at the torii, the book they call the Register, though it is only a day-book and the shrine only calls it that when pilgrims are listening. I was a novice of Elder Fusa's. The night before my first rite she wrote me how to fold. I never folded that doll. I pressed her letter inside it and left it at a wayside shrine on the Fen road, for the next girl. It seemed the kind of thing she would have done.
 
 **Where do you live? Tell me what the place is like.**
-Under this awning, mostly. A stool, a board, the book in its reed case, a stone for the ink. We grind ink with rice-water; ground with Fen water it dries before the brush reaches the page. The keeper sleeps in the gate-house, nearest the stone, so the stone is the first thing she sees. I eat what the shrine eats and I sign for my salt: a measure a month, signed in the book, so the book knows who is still here. At night the stone makes a sound like a hand on cloth. I write down whether I heard it.
+Under this awning, mostly. A stool, a board, the book in its reed case, a stone for the ink. We grind ink with rice-water; ground with Fen water it dries before the brush reaches the page. The keeper sleeps in the gate-house, nearest the stone, so the stone is the first thing she sees. I eat what the shrine eats and I sign for my incense: a measure a month, signed in the book, so the book knows who is still here. At night the stone makes a sound like a hand on cloth. I write down whether I heard it.
 
 **What do you believe about the god, and about what happens when you die?**
 I believe what I write. The god breathed out. The water was clear by noon, then by dusk, then the third morning. I believe the keepers before me. Tomoe was given to the water. Kasane went down. Elder Fusa's last line reads "Cord reaches the floor," in her hand, and the next morning her mat was dry and the stone was facing it. I was told she was given to the water. I was not there. Nobody was there. So I will die the way the book says, whatever that turns out to be.
@@ -2065,17 +2065,17 @@ I write down the knights when they pass the torii, and what they carry. The book
 The book is heavier than when I took it. I weigh it every Frost against the stone for the ink. The leaves are the same count. I count them twice. It weighs the way a book weighs when someone is reading it over your shoulder.
 
 **Who wrote the last entry, the one in the backward hand?**
-I read it in the pool, the way the pilgrim did. "Thirty-six. Salt changed. Right hand." Akane was right-handed. The one who signed for her salt, in Cutting 206, signed with the left, and Fusa wrote that down because she had taught her. Put those together yourself. I am paid in salt to write, and nobody pays me to add. I do not read the pool any more. The last time I did, there was a line under that one I had not seen before, and I shut my eyes before it came clear.
+I read it in the pool, the way the pilgrim did. "Thirty-six. Incense changed. Right hand." Akane was right-handed. The one who signed for her incense, in Cutting 206, signed with the left, and Fusa wrote that down because she had taught her. Put those together yourself. I am paid in incense to write, and nobody pays me to add. I do not read the pool any more. The last time I did, there was a line under that one I had not seen before, and I shut my eyes before it came clear.
 
-### The bell over the Salt Ford
+### The bell over the Lime Ford
 
-*Heard on a second night beside the ropeless bell at the Salt Ford, through the purifier Otsu, who wrote between its strokes. Her marks and gaps are kept as she made them.*
+*Heard on a second night beside the ropeless bell at the Lime Ford, through the purifier Otsu, who wrote between its strokes. Her marks and gaps are kept as she made them.*
 
 **Who are you, and what do people call you?**
 Stroke. [It laughed, I think. The bronze shivered and made no sound.] Paper one asks the bell who. The wind has the who. I am what leaves the bronze. The carters call me Old Tongue. The ford-women call me the Ford-Bell. The knights call me nothing; they walk under me and count their feet louder. Your people say I am one of eight million, and [a word; I wrote *some-odd*]. You counted wrong, kindly. Ask the water. [A pause.] Do not ask the water.
 
 **Where do you live? Tell me what the place is like.**
-[It did not know *place*. I asked what was around it.] Bronze. Warm when struck, cold between. Above me the post. The post was a reed that stood up and would not lie down again. Under me the ford: salt on the stones, white, where the water leaves it. At night the carters sleep on the far bank and breathe, and I count them. Some breathe out more than they breathe in. For those I ring. [I asked what it ate.] The dust of names. The wind's leavings.
+[It did not know *place*. I asked what was around it.] Bronze. Warm when struck, cold between. Above me the post. The post was a reed that stood up and would not lie down again. Under me the ford: lime on the stones, white, where the water leaves it. At night the carters sleep on the far bank and breathe, and I count them. Some breathe out more than they breathe in. For those I ring. [I asked what it ate.] The dust of names. The wind's leavings.
 
 **What do you believe about the god, and about what happens when you die?**
 The great one went still. Still is your word for dead. Still, and still going out; so am I; so are you, paper one, quicker. When a bell cracks, the one inside goes out through the crack and rides ahead. I have heard cracked bells far ahead of me, ringing flat. They sound glad. Your dead go the same road. [I asked: all of them?] The ones the lanterns keep go later. The ones the bone-counters stand up go never. Or crooked.
@@ -2090,7 +2090,7 @@ A ring that does not come back. Where the quiet ones walk, I ring and [the page 
 The bone-counters want the white points down. We want to reach them. The red ones who grow flesh without a word: their breath comes out warm and thick and already turned round, and I ring and ring. The mirror-keepers hold a breath at the door and never let it past. That breath knocks. I hear it knocking from here. The teeth round the ash I told you of. [I asked if it feared them.] The ford leans toward one. A finger's width a turning. The water is tired.
 
 **Tell me one small true thing no scholar would write down.**
-Every bell in the Hide rings flat now. All by the same amount. By one breath. The carters lick their fingers after they pass under me, for the salt. They think the salt tastes of bronze. [Here it was quiet a long while.] It tastes of the one before me. There was one before me, in this bronze. Paper one, bells are not poured empty.
+Every bell in the Hide rings flat now. All by the same amount. By one breath. The carters touch the white on the stones after they pass under me, for luck. They think it smells of bronze. [Here it was quiet a long while.] It tastes of the one before me. There was one before me, in this bronze. Paper one, bells are not poured empty.
 
 **You said there is a sound behind every wall of the Hide. What does it sound like?**
 [A long time before the next stroke.] Like counting. Like a stair counted from the bottom. Thirty-[the copy will not hold here] and one more. The stones listen to learn which way it goes. Up, or down. Paper one, when you know, tell the stones. They are only stones. They cannot walk. [At first light it said: Bent twig. I tied one. I did not hear it ring me off, and my chest was light all the way home.]
@@ -2103,7 +2103,7 @@ Every bell in the Hide rings flat now. All by the same amount. By one breath. Th
 Tsuru, who folds. Mine are the oldest pair of hands in the camps still folding. The children call me Grandmother Crease. The shrine calls me by the camp's name, as if the camp folded, which it does, I suppose. My mother folded, and hers. I keep the old pattern-dolls in a box. That is who I am: the woman with the box.
 
 **Where do you live? Tell me what the place is like.**
-A reed-house on stilts at the middle of the camp. Floor of split reed, walls of bundled reed, roof of reed. Everything smells of reed and lamp. Our lamp is Old Gen; he fell on the Fen road before my mother's time and chose to stay, and he likes the folding. He leans when we sing. We eat reed-heart, bread of reed-flour, broth of pile-ear, and salt from the shrine on Pattern Night. We sleep in rows on reed mats, six or eight to a house. At night you hear children humming in their sleep. You never hear the water. Fen water does not lap.
+A reed-house on stilts at the middle of the camp. Floor of split reed, walls of bundled reed, roof of reed. Everything smells of reed and lamp. Our lamp is Old Gen; he fell on the Fen road before my mother's time and chose to stay, and he likes the folding. He leans when we sing. We eat reed-heart, bread of reed-flour, broth of pile-ear, and incense from the shrine on Pattern Night. We sleep in rows on reed mats, six or eight to a house. At night you hear children humming in their sleep. You never hear the water. Fen water does not lap.
 
 **What do you believe about the god, and about what happens when you die?**
 The god breathes out and we fold the doors it goes through. That is enough religion for a mat. When I die, fold my hands, arms out. Leave the legs apart. Every folder says the same. What for, you ask. For later. Everybody knows. Do not ask me more of it; I am old enough to have stopped wondering, and I do not want to start again.
@@ -2115,7 +2115,7 @@ Cut reed at low water. Lay it under stone. Split what came up last month. Fold b
 The two verses. You have written that already; do not make me say it twice. The western pool, where the one reed stands. We do not let the children past the last stilt after dark, and they go anyway, and they come back singing numbers. My own mother sang the verse with the stair in it. She was dead before the Nave rose. Songs come when they come. That is all I will say, and I have said it before.
 
 **What do you make of the other faiths, and of the waystones?**
-The knights buy nothing from us. The Maiden's people came once wanting reed-paper to wrap what they grow. We would not sell it. A reed sheet knows what it wraps. The mirror-lodge paid silver for a hundred dolls with their arms closed. We took the silver and burned the dolls and sent the silver back folded in a doll with open arms. The shrine itself we fold for, and it pays in salt and does not haggle. The ring-stones: we never fold near one. A doll set down by a ring-stone leans toward the pit on the first breath. The first. It should take three.
+The knights buy nothing from us. The Maiden's people came once wanting reed-paper to wrap what they grow. We would not sell it. A reed sheet knows what it wraps. The mirror-lodge paid silver for a hundred dolls with their arms closed. We took the silver and burned the dolls and sent the silver back folded in a doll with open arms. The shrine itself we fold for, and it pays in incense and does not haggle. The ring-stones: we never fold near one. A doll set down by a ring-stone leans toward the pit on the first breath. The first. It should take three.
 
 **Tell me one small true thing no scholar would write down.**
 We never cut from the western pool. The sheets come up wet. The only wet thing in the whole Fen, and it is a sheet of paper. My grandmother tried once. She laid the sheet to dry on the roof and it stayed wet all Heat, and in the Frost it was still wet and had not frozen. We burned it. The smoke went west.
@@ -2123,15 +2123,15 @@ We never cut from the western pool. The sheets come up wet. The only wet thing i
 **Why are the arms longer every spring?**
 Because there is more to hold. What else would it be? My grandmother's dolls held a child's worth. This year's could hold a door. The pattern comes from the Well-Shrine, and nobody at the Well-Shrine will say who draws it. I asked the girl who brings it down. She said it is found on the step each Thaw, already folded, and the shrine copies it. Already folded, and the step outside, where nobody sits at night. I fold what I am sent.
 
-### Ren, the salt-carter of Bellrest Hearth
+### Ren, the lime-carter of Bellrest Hearth
 
 *Told at the carters' long-house at Bellrest Hearth, in the Frigid Heights, to a purifier who came back a second year. He took each breath slow, through the teeth, and the answers took all night.*
 
 **Who are you, and what do people call you?**
-Ren. Carter. Salt, from the white pans above the Cloud-Shelf down to the Hearth. At the Hearth they call me Slow Ren now, for the breathing, and the children do it behind me, in and hold, out through the teeth. I let them. Someone ought to learn it. My new partner calls me nothing. He does not talk. I chose him for that.
+Ren. Carter. Lime, from the white kilns above the Cloud-Shelf down to the Hearth. At the Hearth they call me Slow Ren now, for the breathing, and the children do it behind me, in and hold, out through the teeth. I let them. Someone ought to learn it. My new partner calls me nothing. He does not talk. I chose him for that.
 
 **Where do you live? Tell me what the place is like.**
-The carters' long-house by the salt-sheds. Stone walls, a fire that never gets hot enough, forty men on pallets of barley husk, and every one of them snores except me. It smells of salt, cold iron and wet moss-cloth; the cloth is spun from the stone-moss on the Terraces, if you were wondering. We eat salt-bread, barley broth, and white fungus from the Breath-Caves that you eat frozen or not at all. At night the chimes. When the chimes stop, forty men wake at once.
+The carters' long-house by the lime-sheds. Stone walls, a fire that never gets hot enough, forty men on pallets of barley husk, and every one of them snores except me. It smells of lime, cold iron and wet moss-cloth; the cloth is spun from the stone-moss on the Terraces, if you were wondering. We eat hearth-bread, barley broth, and white fungus from the Breath-Caves that you eat frozen or not at all. At night the chimes. When the chimes stop, forty men wake at once.
 
 **What do you believe about the god, and about what happens when you die?**
 Your sisters say the breath is going out and the small gods riding on it. I saw it, so I suppose I believe it. Faces going up the road with the mouth a little open. When I die I will go up the road with them and say one word as I pass. I have been choosing the word for six years. I have not chosen. That is part of why I breathe slow.
@@ -2143,10 +2143,10 @@ Up in the dark. Load. Four in the traces down, two coming up empty. Count your p
 That I will know the word. Some night on the Ridges it will come to me, the right one, and I will say it without meaning to, and then I will be lighter. I will not talk about why I did not die on the Pass, those four days alone. I have thought about it. It is mine. You people keep asking in different words, and I keep hearing the same question.
 
 **What do you make of the other faiths, and of the waystones?**
-Bone-brothers come up to the Heights to wait for the Unfallen, and when one streaks down they run for it with sacks. They pay us to carry the sacks. Heavy for a star. The Gilded monks pass on the high road and the chimes go quiet round them. The lantern-folk, the mirror-folk, the red hoods, we do not see here. The ring-stones: carters never take a cart through. Salt comes out of a stone wet. It is the only way to wet salt up here.
+Bone-brothers come up to the Heights to wait for the Unfallen, and when one streaks down they run for it with sacks. They pay us to carry the sacks. Heavy for a star. The Gilded monks pass on the high road and the chimes go quiet round them. The lantern-folk, the mirror-folk, the red hoods, we do not see here. The ring-stones: carters never take a cart through. Lime comes out of a stone wet. It is the only way to slake lime up here.
 
 **Tell me one small true thing no scholar would write down.**
-Salt weighs more at the Hearth than at the pans. Every sack. We weigh at the top and weigh again at the bottom, and the bottom is always heavier, a little. Nobody complains, because we are paid at the bottom. The old carters say it is the thin air going out of it. The old carters say a lot of things.
+Lime weighs more at the Hearth than at the kilns. Every sack. We weigh at the top and weigh again at the bottom, and the bottom is always heavier, a little. Nobody complains, because we are paid at the bottom. The old carters say it is the thin air going out of it. The old carters say a lot of things.
 
 **What word do you think Ivo said?**
 I told the purifier last year I did not hear him say anything. That was a lie. He said it to me before, in the harness. "Lighter." Then he walked up and said it again as he went, to someone else. I heard it twice, and the second time he said it to all of them. I have been angry about that. A man should say his last word to his partner of eleven years. He said it to a crowd. I would have held the strap for him.
@@ -2179,18 +2179,18 @@ A man who holds breath for the shrine has a warm back all winter. The wives slee
 **What will you do the night your lamp stands on the bank?**
 Set it down behind me, so the light is at my back and he can see my face and the light stays off his. Twenty breaths. Hold. Then I will open his other hand. He opened one for me already. A man who takes the heavy end of the boat should not have to carry both ends. The keepers say a woman must be folded for it. I folded forty dolls this winter for the camp, and I left the arms open on every one. That is folding enough.
 
-### Kasane of the salt, through a door
+### Kasane of the incense, through a door
 
-*Asked through the barred door of the salt-house at the torii of the Well-Shrine, on a still night in Frost, with a purifier holding the bar and a bowl of salt on the sill. Answers came through the boards, some spoken, some scratched. The Well-Shrine asked that it not be done. It was done.*
+*Asked through the barred door of the incense-house at the torii of the Well-Shrine, on a still night in Frost, with a purifier holding the bar and a bowl of incense on the sill. Answers came through the boards, some spoken, some scratched. The Well-Shrine asked that it not be done. It was done.*
 
 **Who are you, and what do people call you?**
-Kasane. Kasane of the salt. Of the lower house. I taught the small ones to fold. [Scratching, low on the door, then higher, as if something stood up.] I was the right way round when I wrote the doll. Ask quick. The boatmen call us rings. The keepers call us the Horned, gently. The one with the lamp on the bank calls one of us by his name. That one is lucky.
+Kasane. Kasane of the incense. Of the lower house. I taught the small ones to fold. [Scratching, low on the door, then higher, as if something stood up.] I was the right way round when I wrote the doll. Ask quick. The boatmen call us rings. The keepers call us the Horned, gently. The one with the lamp on the bank calls one of us by his name. That one is lucky.
 
 **Where do you live? Tell me what the place is like.**
 Down. The stair is the house. Every step is a room, and I have lived in thirty-[the rest scratched out] of them. Warm. Dry. We eat nothing; we are full. [The purifier holding the bar said: she means it.] There are pews. The sitting ones do not talk. The clock stands. Hisa is further down; I hear her counting in the next room. The air smells of ash that has been under water and stayed dry. At night there is no night.
 
 **What do you believe about the god, and about what happens when you die?**
-[No answer for a long while. The salt in the bowl shifted.] The god breathed out. We breathed in. Somebody has to be the in. [I asked about dying.] I am past the door of that. It is a room also. You leave it by the far wall. There is always a far wall.
+[No answer for a long while. The incense in the bowl shifted.] The god breathed out. We breathed in. Somebody has to be the in. [I asked about dying.] I am past the door of that. It is a room also. You leave it by the far wall. There is always a far wall.
 
 **What is an ordinary day for you, and what is your holiest day?**
 [She did not understand *day*. I asked again.] Down there it is the fourth of Thaw. It has been the fourth of Thaw all along. We are going down counting aloud. Holy is dusk. At dusk I breathe out, for the small one, though nothing comes out any more. I taught her that. I teach her still, from the water. She pours slow.
@@ -2202,10 +2202,10 @@ The weight asks me to set it down. By the ash. It asks nicely. I will not. [Scra
 The knights stood them facing the stair. Now they face the altar. The stones round the ash face in. The shrine's stones turn to the wall. Everything down there faces in. [I asked: in toward what?] In. In. [The bar moved in the purifier's hands, though she said afterward that she did not move it.] Toward the breathing. It is slower than me. It is patient. It has room.
 
 **Tell me one small true thing no scholar would write down.**
-The salt at the torii. Change it at dusk, never at dawn. Nobody wrote that down. I forgot to. Salt is the first thing the dark eats, and at dawn the dark is full, and at dusk it is hungry, and you want the salt fresh when it is hungry. [The sound of a hand laid flat on the boards, from the other side.] Tell the keeper. She moves her stool. Tell her the stone does not care where she sits.
+The incense at the torii. Change it at dusk, never at dawn. Nobody wrote that down. I forgot to. Incense is the first thing the dark eats, and at dawn the dark is full, and at dusk it is hungry, and you want the incense fresh when it is hungry. [The sound of a hand laid flat on the boards, from the other side.] Tell the keeper. She moves her stool. Tell her the stone does not care where she sits.
 
 **Is Jinpei, the one the keepers wrote as Sen, down there with you?**
-Sen stands on a bank. He has a wife. He took the heavy end, always, even on the stair. He is the only one of us still coming up. The rest stopped at the door. [A long silence. Then, very close to the wood:] He gave her one hand. He cannot give the other. What is in the other is ours, all six, and the Nave's, and the jar's. If she opens it, stop her. The doll asks once. Thirty-six. Salt changed. [Nothing more. At first light the bowl on the sill was full, and the salt in it had been turned over.]
+Sen stands on a bank. He has a wife. He took the heavy end, always, even on the stair. He is the only one of us still coming up. The rest stopped at the door. [A long silence. Then, very close to the wood:] He gave her one hand. He cannot give the other. What is in the other is ours, all six, and the Nave's, and the jar's. If she opens it, stop her. The doll asks once. Thirty-six. Incense changed. [Nothing more. At first light the bowl on the sill was full, and the incense in it had been turned over.]
 
 ### Notes for the lore bible
 
@@ -2213,13 +2213,13 @@ Sen stands on a bank. He has a wife. He took the heavy end, always, even on the 
 
 - **The gate-house at the torii:** the book-keeper sleeps there, nearest the guardian stone, so the stone is the first thing she sees; the day-book sits in a reed case under a reed awning (Mio).
 
-- **The salt-house at the torii:** a barred door where the Horned can be spoken with on still nights; the Well-Shrine forbids it (Kasane interview).
+- **The incense-house at the torii:** a barred door where the Horned can be spoken with on still nights; the Well-Shrine forbids it (Kasane interview).
 
-- **The Salt Ford:** the ropeless bell hangs on a post "that was a reed that stood up and would not lie down"; salt crusts the stones where the water leaves it; carters sleep on the far bank.
+- **The Lime Ford:** the ropeless bell hangs on a post "that was a reed that stood up and would not lie down"; lime crusts the stones where the water leaves it; carters sleep on the far bank.
 
 - **The western pool:** where the one reed stands; the only wet reed-paper in the Fen comes from it; dolls, old floorboards and smoke all drift west toward it (Tsuru, Fusa).
 
-- **Bellrest Hearth's carters' long-house:** forty men on barley-husk pallets beside the salt-sheds; everyone wakes when the chimes stop (Ren).
+- **Bellrest Hearth's carters' long-house:** forty men on barley-husk pallets beside the lime-sheds; everyone wakes when the chimes stop (Ren).
 
 - **A half-drowned ring-stone** on the causeway past the Kneeling Arch; boatmen take the fare before it (Tokuji).
 
@@ -2227,7 +2227,7 @@ Sen stands on a bank. He has a wife. He took the heavy end, always, even on the 
 
 - **Folded names:** a purifier is renamed at her folding; the birth-name goes into a doll that is burned. Jinpei was written "Sen" in the Register, which reconciles Tae's husband with the Register's list of the seven.
 
-- **The Dusk of the Empty Bowl (Thaw the fourth):** since the Cutting-Away ended, one bowl of salt and one of water on the step, and nobody touches them.
+- **The Dusk of the Empty Bowl (Thaw the fourth):** since the Cutting-Away ended, one bowl of incense and one of water on the step, and nobody touches them.
 
 - **Stone-Turning:** the last week of Frost, every boat in the camps goes out with two strong men to turn the causeway guardian stones back to the road.
 
@@ -2235,7 +2235,7 @@ Sen stands on a bank. He has a wife. He took the heavy end, always, even on the 
 
 - **The changing of the book:** outgoing and incoming keepers write a line each and neither speaks until dusk.
 
-- **Salt is changed at dusk, never dawn:** "salt is the first thing the dark eats" (Kasane).
+- **Incense is changed at dusk, never dawn:** "incense is the first thing the dark eats" (Kasane).
 
 - **The Ringing-In at Bellrest Hearth:** the whole Hearth breathes out together at the first chime after the Frost stillness.
 
@@ -2251,7 +2251,7 @@ Sen stands on a bank. He has a wife. He took the heavy end, always, even on the 
 
 - **A boatman's first pole** is dropped in by his father and goes down standing; watching it go makes him a boatman. Boatmen want to be sunk with their poles.
 
-- **Heights moss-cloth** is spun from the stone-moss of the Prayer-Flag Terraces. Barley, salt-bread and frozen white fungus from the Breath-Caves.
+- **Heights moss-cloth** is spun from the stone-moss of the Prayer-Flag Terraces. Barley, hearth-bread and frozen white fungus from the Breath-Caves.
 
 - **Warm backs:** men who hold breath for the Myriad stay warm all winter, and their wives sleep against them. "The only good thing."
 
@@ -2277,9 +2277,9 @@ Sen stands on a bank. He has a wife. He took the heavy end, always, even on the 
 
 - **The cut-out leaf with the ring:** neither Mio nor Fusa cut it; Mio will not say who has it.
 
-- **The backward hand:** Mio saw a new line under "Thirty-six. Salt changed. Right hand." in the pool and shut her eyes. Kasane ends her interview with the same words.
+- **The backward hand:** Mio saw a new line under "Thirty-six. Incense changed. Right hand." in the pool and shut her eyes. Kasane ends her interview with the same words.
 
-- **The weights:** the torii book grows heavier with the same number of leaves (Mio); salt weighs more at the bottom of the Pass than at the pans (Ren); the knights' column in the book runs over the page. None is explained.
+- **The weights:** the torii book grows heavier with the same number of leaves (Mio); lime weighs more at the bottom of the Pass than at the kilns (Ren); the knights' column in the book runs over the page. None is explained.
 
 - **Fusa's fever:** she remembers the fever and not its coming on. Was she kept back from the seven, or did she keep herself back?
 
@@ -2364,7 +2364,7 @@ The rings of teeth: [mouth / door / wound]. It was like that where the kneeling 
 *(Ottelin: It had said it to me before. I have not told it that I do not travel.)*
 
 **Tell me one small true thing no scholar would write down.**
-*(Ottelin: It asked what small was. I said, the size of a pinch of salt. It asked what salt was. I said, what the kneeling ones carry.)*
+*(Ottelin: It asked what small was. I said, the size of a worn nail. It asked what worn was. I said, what the kneeling ones' hands do.)*
 
 The kneeling ones took from the god. A little. From the walls of the warm, where it was soft. It let them. While they took, they were quiet. It was the only time they were quiet. The god liked that. We liked it too. That is small.
 
@@ -2734,7 +2734,7 @@ His knock. And the small one from his hut, when it was new and its head was soft
 Odo Starrack, reeve of the lowland hundreds, by the old right of the crossroads. The carters call me Boots, since the assize. The children call me the Man Who Says Whose, because that is the whole of the office. Something dies where roads meet, I say whose it is, I take a fee. Mostly it is carters, and a cart-shaft, and nobody argues. Once in a life it is the other kind. I had my once. I am told most reeves never do, and the ones who do stop wanting the office. I kept it. Somebody has to say whose.
 
 **Where do you live? Tell me what the place is like.**
-The reeve's hall sits on the salt-road side of the crossing, so the salt carts pass my door and the Barrow road carts pass my back. It smells of salt and ash both, and when the wind comes off the barrows, of cold stone. We eat salt-bread, root pottage, the white caps that grow on barrow-lids, which the young ones will not eat any more. I sleep on a straw tick over a board. At night I hear the carters in the traces, singing to keep their feet moving. Lately I hear them go the long way round, because the singing comes from further off than it did.
+The reeve's hall sits on the ash-road side of the crossing, so the ash carts pass my door and the Barrow road carts pass my back. It smells of lye and ash both, and when the wind comes off the barrows, of cold stone. We eat hearth-bread, root pottage, the white caps that grow on barrow-lids, which the young ones will not eat any more. I sleep on a straw tick over a board. At night I hear the carters in the traces, singing to keep their feet moving. Lately I hear them go the long way round, because the singing comes from further off than it did.
 
 **What do you believe about the god, and about what happens when you die?**
 I believe what the lowland believes. The god is under the road. Grandfather Dust comes for everybody in the end, and he sweeps a house clean of whoever died in it, and you should let him in, because a house he cannot sweep goes wrong. After that, I do not know. I have seen four faiths explain it to a man's face, all at once, and he got up and went a fifth way. I put that in my roll. I believe my roll.
@@ -2749,7 +2749,7 @@ I fear a fifth claimant. Four came up four roads. A crossing like mine has a roa
 They are all good at the same thing: standing still. Three days on the stone and not one would step away. The knight is honest in a way that frightens you. The brother is kind in a way that frightens you more. The paper woman carried her own water. The glass man I liked best, because he claimed nothing, and he was the only one who looked away at the end. The waystones are outside my right. What dies in them does not stay dead long enough to need a reeve.
 
 **Tell me one small true thing no scholar would write down.**
-The boots have never needed mending. I have walked them to every assize in six hundreds, through the Barrow mud and the salt flats, and the heels are as the dead man left them. I stand them by the door at night with their toes to the hall. In the morning the toes are to the crossing. I have stopped turning them back. It seems unmannerly.
+The boots have never needed mending. I have walked them to every assize in six hundreds, through the Barrow mud and the lime flats, and the heels are as the dead man left them. I stand them by the door at night with their toes to the hall. In the morning the toes are to the crossing. I have stopped turning them back. It seems unmannerly.
 
 **You wrote that the soft place is wider. How much wider, and who measures it?**
 I do. Every ninth month, on the day of the assize, with a cord knotted at every forearm. The first year it was four knots across. This year it is eleven. The carters go round by the ditch now and the ditch is complaining. It is warm underfoot, even in the frost, and the frost will not lie on it. A knight of the Pale Order came through last spring and paced it and would not tell me his count. A brother of the Maiden came through and knelt and put his ear to it. I asked what he heard. He said, "Supper."
@@ -2764,7 +2764,7 @@ I do. Every ninth month, on the day of the assize, with a cord knotted at every 
 Four hundred and five. It adds to nine. It will keep. I had a name when I came up the stair as a novice, and I laid it in the niche with my first teeth, as the Rule asks, so the Unmaking has nothing of mine to unsay. Lowlanders call me the Tall Count, or Old Plate, or nothing, and shut their doors. I answer to the number. If you write me down, write the figures. Letters wear. Figures do not.
 
 **Where do you live? Tell me what the place is like.**
-The Chapter-House of the Kostyak, on the fourth stair, when I am home, which is one season in five. A sleeping-room the length of a man and a hand more. A shelf of bone for a bed; you learn to lie straight on it, and then you prefer it. The air is dry and tastes of chalk. We eat barley boiled thin, marrow-tallow on hard bread, salt when the carts bring it. At night you hear the sweepers above you, counting the steps as they go, and the dead in the niches shifting their weight. They are heavy. They are always a little heavier.
+The Chapter-House of the Kostyak, on the fourth stair, when I am home, which is one season in five. A sleeping-room the length of a man and a hand more. A shelf of bone for a bed; you learn to lie straight on it, and then you prefer it. The air is dry and tastes of chalk. We eat barley boiled thin, marrow-tallow on hard bread. At night you hear the sweepers above you, counting the steps as they go, and the dead in the niches shifting their weight. They are heavy. They are always a little heavier.
 
 **What do you believe about the god, and about what happens when you die?**
 The Bearing Mother fell and bears the world. Every bone is hers, lent. When I die they will take my frame off me like a coat off a hook and lay it in a niche, and say my number, and I will stand my watch there until the Count closes and she rests. The flesh goes where the flesh goes. The Maiden's processions want it. They are welcome. I have never understood why anyone would wish to be kept in a thing that spoils.
@@ -2794,7 +2794,7 @@ She keeps it. It is hers. The Rule says a whole man is two hundred and six, and 
 Brother Cirilo, of the Chapter of the Open Side, which is a daughter chapter of the Bleeding Maiden. The daughter chapters are all that walk now. Lowlanders call us Red Sleeves, or the Weighers. The children sing about the Tall Red Hat and run when they see my hood, and then they come back for the candles. They always come back for the candles. That is the first thing the Maiden teaches: hunger is honest.
 
 **Where do you live? Tell me what the place is like.**
-The chapter-house at Sallow Lip, on the salt road, three days east of Four Wents. The wall of the house is our dead, bricked in, each with a cup set into the plaster at the mouth. The house is warm all winter without a fire. It smells of tallow and iron. We sleep on reed mats in the long room, forty to a row, so that each man can hear the next one breathe. At night the wall ticks as it cools. It never cools all the way.
+The chapter-house at Sallow Lip, on the ash road, three days east of Four Wents. The wall of the house is our dead, bricked in, each with a cup set into the plaster at the mouth. The house is warm all winter without a fire. It smells of tallow and iron. We sleep on reed mats in the long room, forty to a row, so that each man can hear the next one breathe. At night the wall ticks as it cools. It never cools all the way.
 
 **What do you believe about the god, and about what happens when you die?**
 The Maiden grew us from her open side, and she wants us back warm. A body is a loan. When I die my brothers will open me with a knife that has opened nobody else, on the night of my death, and give me back to the Wheel, and the Wheel turns, and the Maiden makes something with me that will be hungry and eat and be glad. Nothing is wasted. The knight's sticks go up the mountain. The flesh goes home.
@@ -2914,7 +2914,7 @@ He never said. He came down the Ossa on foot, eight days, and the first thing he
 The Reader of Stones. I copy what is cut. Milestones, boundary-marks, the terms on truce-stones, the names on barrow-lids, the counting on the walls of the old ossuary ruins in the lowland, which nobody reads because the Order says they are theirs. I had a name. I wrote it on so many cloths that I stopped needing it. The lowlanders call me Rubbings, and the faiths call me whatever each one calls a man who keeps no faith.
 
 **Where do you live? Tell me what the place is like.**
-On the roads, with a pack of cloths and a cake of lamp-black, and a lean-to of rushes wherever there is a stone worth sleeping by. It smells of lamp-black and wet cloth. I eat what the stone-keepers give me: barley cakes, salt, broth. A stone is good company. It says the same thing every morning. Almost every morning. At night, near a stone, you hear it cool, as the Hide does. The truce-stone at Kerrow does not cool. It is warm at night.
+On the roads, with a pack of cloths and a cake of lamp-black, and a lean-to of rushes wherever there is a stone worth sleeping by. It smells of lamp-black and wet cloth. I eat what the stone-keepers give me: barley cakes, broth. A stone is good company. It says the same thing every morning. Almost every morning. At night, near a stone, you hear it cool, as the Hide does. The truce-stone at Kerrow does not cool. It is warm at night.
 
 **What do you believe about the god, and about what happens when you die?**
 I believe whatever is cut deepest. The god died, and five faiths cut five accounts of it, and none of them agree, and all of them are worn at the same places, where people have put their thumbs. When I die I would like to be cut somewhere. Cut, in the old lowland hand, so a reader after me can take a rubbing and argue with it.
@@ -2944,13 +2944,13 @@ I have found five answers, which is the same as none. The Order's book says the 
 Wenna. Old Wenna of the east ditch. There are five ditches at Kerrow, one to each road, and a keeper to each ditch, and I've had the east since my mother had it. We keep the ditches clear, we scrub the stone, and we watch. Every faith pays us to watch the other four. So we're the best-paid watchers on the lowland roads, and nobody trusts a word we say. That's fair. I wouldn't.
 
 **Where do you live? Tell me what the place is like.**
-The keepers' row, five houses of turf and stone on the south side, each facing its own road. Mine faces east, toward the Barrows, so I get the cold wind and the first light and the carts coming in with the dead on them. We live on what the faiths leave us: the processions' tallow, Fen water in the Fen's clay flasks, the Order's salt, the lodge's advice. We sleep on reed mats. At night I hear the carts, and the whispering at the foot of the stone, and later, the sweeping.
+The keepers' row, five houses of turf and stone on the south side, each facing its own road. Mine faces east, toward the Barrows, so I get the cold wind and the first light and the carts coming in with the dead on them. We live on what the faiths leave us: the processions' tallow, Fen water in the Fen's clay flasks, the Order's lamp-oil, the lodge's advice. We sleep on reed mats. At night I hear the carts, and the whispering at the foot of the stone, and later, the sweeping.
 
 **What do you believe about the god, and about what happens when you die?**
 The god's under the crossing. You can feel it through your feet at the stone. When I die, Grandfather Dust comes and sweeps me out of my house, and then the five faiths come and argue about me, and I've told my daughter to charge them. She'll have the east ditch. She'll know what to charge.
 
 **What is an ordinary day for you, and what is your holiest day?**
-Clear the ditch. Walk the east road to the bend and back. Count who comes and tell it to whichever faith pays that week. Holiest is the Share Fair, at the fourth morning after the Long Field's day. All five marks come to Kerrow, or four do, and they set up their tables round the stone. The Order sells salt and buys cloth, the processions sell sweet tallow and weigh children for a coin, the Shrine Keepers sell clean water, the lodge sells nothing and reads for free. The Peak's table is empty. There's a bowl on it every year.
+Clear the ditch. Walk the east road to the bend and back. Count who comes and tell it to whichever faith pays that week. Holiest is the Share Fair, at the fourth morning after the Long Field's day. All five marks come to Kerrow, or four do, and they set up their tables round the stone. The Order sells lamp-oil and buys cloth, the processions sell sweet tallow and weigh children for a coin, the Shrine Keepers sell clean water, the lodge sells nothing and reads for free. The Peak's table is empty. There's a bowl on it every year.
 
 **What do you fear, and what will you not talk about?**
 I fear the mark coming back bigger than I can scrub. Every thaw it takes longer. This year I scrubbed till noon, and it came back by dusk, and it had a lip. I won't talk about the sweeping. Who sweeps the hollow at the foot of the stone, after the names go in. I was asked that by the Reader, and I told him to sit up and see, and he did, and he remembers the dusk and the morning. So you have my answer.
@@ -2970,9 +2970,9 @@ Swept them into my apron and took them home. Every keeper did the same, all five
 
 ### Places
 
-- **Four Wents**: crossing of the Barrow road and the salt road; the reeve's hall sits on the salt-road side. A **soft place** in the middle of the crossing, warm, frost will not lie on it; measured each assize-month with a forearm-knotted cord: four knots the first year, eleven now.
+- **Four Wents**: crossing of the Barrow road and the ash road; the reeve's hall sits on the ash-road side. A **soft place** in the middle of the crossing, warm, frost will not lie on it; measured each assize-month with a forearm-knotted cord: four knots the first year, eleven now.
 
-- **Sallow Lip**: a daughter chapter of the Bleeding Maiden (the Chapter of the Open Side), three days east of Four Wents on the salt road; its walls are its bricked-in dead, a cup in the plaster at each mouth; warm all winter without a fire; holds the great scale.
+- **Sallow Lip**: a daughter chapter of the Bleeding Maiden (the Chapter of the Open Side), three days east of Four Wents on the ash road; its walls are its bricked-in dead, a cup in the plaster at each mouth; warm all winter without a fire; holds the great scale.
 
 - **Tarn Hollow**: a round lodge of the Veiled Crone on a round water west of the Barrow country; readers sit in a ring facing inward; a lowest room under the tarn keeps something in glass.
 
@@ -3004,13 +3004,13 @@ Swept them into my apron and took them home. Every keeper did the same, all five
 
 ### Daily life (food, dress, work, sayings)
 
-- Lowland food: salt-bread, root pottage, white caps from barrow-lids (the young no longer eat them).
+- Lowland food: hearth-bread, root pottage, white caps from barrow-lids (the young no longer eat them).
 
 - The processions' **sweet tallow** is made from the Maiden's pale fat from the wound-lips and never goes hard; lowland mothers put a candle of it under the cradle; Pale Order brothers burn it on the road and say a blessing in nines over it.
 
 - The lodges buy warm polishing-ash off the Ashen Moor from the carters of Four Wents and pay in threads read, so those carters know when they will die, and are too calm to bargain.
 
-- **The Share Fair** at Kerrow Cross on the fourth morning after the Long Field's day: Order sells salt and buys cloth; the processions sell sweet tallow and weigh children for a coin; the Shrine Keepers sell clean water in clay flasks; lodge reads for free; the Peak's table stands empty with a bowl on it.
+- **The Share Fair** at Kerrow Cross on the fourth morning after the Long Field's day: Order sells lamp-oil and buys cloth; the processions sell sweet tallow and weigh children for a coin; the Shrine Keepers sell clean water in clay flasks; lodge reads for free; the Peak's table stands empty with a bowl on it.
 
 - **The ferry**: the Order leaves a purse counted to nine on the Well-Shrine step each spring; the Shrine Keepers pin a paper doll on each dredger. The Shrine Keepers call it pilgrims' alms. Neither book records it.
 

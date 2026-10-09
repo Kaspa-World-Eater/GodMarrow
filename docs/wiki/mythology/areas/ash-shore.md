@@ -14,11 +14,11 @@ under ash the way coals go grey when a fire is banked. Nobody on the shore knows
 the grey wets the warm ash of the strand, the ash hardens into black glass, as it does on the Moor where a Husk bleeds.
 
 The shore is the end of a pilgrim road. Its own Broken Kneeler, a halved prayer-bench, stands by the water, and the
-Kneelers who came the last league on their knees face the sea along the strand. Salt-boilers work above the tide. It is
+Kneelers who came the last league on their knees face the sea along the strand. Ash-boilers work above the tide. It is
 the Hide's edge, where the skin stops, and it should feel like the end of the world gone quiet: flat, pale, listening.
 
 **The one image:** a flat grey sea heaving without breaking, a strand of black glass where it meets the ash, a row of
-kneeling figures facing it, and the salt-boilers' smoke laid flat over the water by the wind.
+kneeling figures facing it, and the ash-boilers' smoke laid flat over the water by the wind.
 
 ## Found in the world
 
@@ -26,7 +26,7 @@ kneeling figures facing it, and the salt-boilers' smoke laid flat over the water
 
 ### The grey
 
-*Told by a salt-boiler of the Ash Shore to a carter who had come down for salt and asked why nobody ever put a boat on
+*Told by an ash-boiler of the Ash Shore to a carter who had come down for potash and asked why nobody ever put a boat on
 the water. The carter's daughter, who was with him, wrote it down on the walk home.*
 
 Nobody puts a boat on the grey because nobody knows where a boat would go. My grandfather said that as if it were a
@@ -44,8 +44,9 @@ the Kneeler call it the god's eye, filmed over and still looking up, and they wo
 have to work beside it.
 
 We dig the ash at the tide line where the grey has soaked it, wash it in the pits, and boil the wash in the pans, and
-the pans give salt. Good salt; the Moor puts it on its doorsteps and its sills. My father said that settles it. The god
-never had any salt of its own, everybody knows that, so whatever is under the ash is water, whatever the old women say.
+the pans give potash. Good potash, white as a tooth; the Moor washes its grave-cloth in the lye of it. My father said
+that settles it. Boil blood and you get black scab, everybody knows that, and our pans come up white, so whatever is
+under the ash is water, whatever the old women say.
 
 My aunt said otherwise. A trader came along the coast once, in her girlhood, from far along, where he said the sea is
 red. The people there live up in the trees, he said, and burn their dead, and give the water nothing, because whatever
@@ -63,7 +64,7 @@ stone. The old women stopped that in the year the grey came up the strand higher
 there a day and a night before it went back. Since then we carry our dead up to the Heath fire, and the keeper lays them
 by the saint.
 
-I boil salt. I don't throw stones.
+I boil ash. I don't throw stones.
 
 ### The last league
 
@@ -98,16 +99,16 @@ strand where they knelt.
 
 **The land, from the Heath down.** A real coast after an ashfall, and a sea under a raft of pumice: Iceland's
 grey-black south-coast sands, and the pumice raft of 2021 from Fukutoku-Okanoba, which choked Okinawa's harbours until
-the sea looked like land. The salt-works follow the medieval salt-makers of the Frisian coast, who burned sea-soaked
-peat and washed its ash into brine.
+the sea looked like land. The ash-works follow the old potash-makers of the northern forests, who leached wood ash in
+vats and boiled the lye down in iron pots to a white crust.
 1. **The heath's edge** thins into dunes of drifted ash held by lyme grass and sea holly, every tuft trailing a tail of
    ash toward the sea.
-2. **The salt-works:** boiling-houses of stone and turf with wide iron pans, clay-lined brine pits, raked ash beds above
+2. **The ash-works:** boiling-houses of stone and turf with wide iron pans, clay-lined lye pits, raked ash beds above
    the tide, and mounds of spent ash taller than a house. One or two are still worked.
 3. **The glass strand** at the tide line, and **the grey sea.**
 
 **The floor stays alive:** ash in a dozen greys, rippled across the wind; glass chips, black and brown-green at their
-thin edges; rills where rain runs to the sea; dune grass; dried plates of the skin cracked into polygons; white salt
+thin edges; rills where rain runs to the sea; dune grass; dried plates of the skin cracked into polygons; white potash
 crust at the pits; pilgrims' dropped things.
 
 **The grey sea** (built as the Red Water is, `the-red-shore.md`):
@@ -118,22 +119,22 @@ crust at the pits; pilgrims' dropped things.
 - **The skin:** ash fine as flour, cracked in great plates like old paint. Where anything breaks it (a stone, a
   creature, a pilgrim who falls) the dark beneath shows for a breath, deep red-brown and glossy, and the grey closes
   over without a ring.
-- **Stranded plates** at the tide lines, grey on top, dark red-brown and tacky beneath, which the salt-boilers turn
+- **Stranded plates** at the tide lines, grey on top, dark red-brown and tacky beneath, which the ash-boilers turn
   face down: the only place what lies under the grey can be seen. Keep them small.
 - **Never walkable:** the zone's edge.
 
 **Landmarks, by the pit method.**
 - **The Shore's Broken Kneeler** (the altar). A kneeling-bench of grey stone about seven yards long, broken in the
   middle, its halves leaning apart toward the water like a door opened onto the sea; the strand between them glassed in
-  a fan; knee-hollows worn into each step; salt, cloth strips and glass heaped on the landward ends. Its hidden light: a
-  lantern behind the landward half, out of sight, so its light reaches the step first. Older than the Tithed.
+  a fan; knee-hollows worn into each step; worn tools, cloth strips and glass heaped on the landward ends. Its hidden
+  light: a lantern behind the landward half, out of sight, so its light reaches the step first. Older than the Tithed.
 - **The glass strand:** black glass 3 to 10 yards wide, in low ridges, one for each high tide, like the rings of a
   felled tree; and rows of glass running straight down to the water, a stride apart, where the Husks knelt.
 - **The boiling-houses:** pans scaled grey-white, one with a dark ring in its bottom that no scraping takes out; the
   worked house's hearth seen first as warm light under its own smoke.
 - **The three statues:** wayside figures along the last league, each turned to face the water.
 
-**Light and weather.** Overcast; the shore pale, the brightest values the glass and the salt crust. The wind always
+**Light and weather.** Overcast; the shore pale, the brightest values the glass and the potash crust. The wind always
 blows out to sea: smoke lies flat over the water, and ash lifts off the dunes in low skeins and settles on the grey.
 Rain darkens the ash and beads on the glass; the sea's skin takes it without a mark. No fog, and no red light: what
 shows when the skin breaks is a colour, never a glow. The lantern is the key light.
@@ -149,7 +150,7 @@ undersides; the glass; the warm ash.
 - **Vein-Borers** come up through soft ash, never through the glass strand, which is the safe road.
 - **Wick-Saints** gather at dusk over the boiling-house fires; **Weepers** keep behind the mounds and walls.
 - **In a fight:** mounds and walls are cover; the glass strand is safe from Borers but bright, so Weepers find you on
-  it; brine pits douse fire; dune grass burns, ash does not; the pilgrim cannot go into the sea.
+  it; lye pits douse fire; dune grass burns, ash does not; the pilgrim cannot go into the sea.
 
 **Sound.** No surf: a long soft hiss as the skin slides up over the glass and drags back; glass ticking underfoot; the
 wind going out over the water; a pan seething; the Kneelers' scourges. No shore life at all.
@@ -158,10 +159,10 @@ wind going out over the water; a pan seething; the Kneelers' scourges. No shore 
 generator's shared landmarks.
 
 **Open questions for Derek.**
-- **The proposal itself.** If the grey is the Red Water's blood under ash, the shore's salt comes out of the god's
-  blood, against the Tithed belief that the god never had any salt of its own. The salt-boilers argue it both ways,
-  unreconciled. Does that contradiction stand?
-- **The dead.** The salt-boilers once gave their dead to the grey, and at the Red Shore the dead of "somewhere far along
+- **The proposal itself.** If the grey is the Red Water's blood under ash, the shore's white potash is boiled out of
+  the god's blood, against the boilers' own proof that boiled blood gives black, not white. The ash-boilers argue it
+  both ways, unreconciled. Does that contradiction stand?
+- **The dead.** The ash-boilers once gave their dead to the grey, and at the Red Shore the dead of "somewhere far along
   the water" came up in pilgrims' cloaks. They may be the same dead, if the coasts are to be tied that far.
 - **The two Broken Kneelers** (the Moor's a kneeling figure, the Shore's a halved bench): we keep both, each claiming
   to be the true one.

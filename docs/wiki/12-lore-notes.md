@@ -11,7 +11,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - The Dry Ford on the Barrows road: a riverbed whose small god "rode off on the breath" one spring, taking the water. The quietest place on the Hide; the preacher's glass-smooth mark lies in it.
 
-- The midwife's house: last ash-brick house before the hollow past the Broken Kneeler, half a morning out from Maren's camp. Salt is traded up from the Ash Shore, dear.
+- The midwife's house: last ash-brick house before the hollow past the Broken Kneeler, half a morning out from Maren's camp. Potash is traded up from the Ash Shore, dear.
 
 - Coldhearth, at the Hollow Wood's edge: thirteen doors, fourteen graves by the old stone, one well nobody draws from.
 
@@ -45,7 +45,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - Moor children never let a skipping rope touch ash; a touched rope is shaken out at the village edge and the game ends.
 
-- Sayings: "Somebody always sits up." "We come in owing" (a newborn's first breath out is longer than its first breath in). "Salt talks when something tries it."
+- Sayings: "Somebody always sits up." "We come in owing" (a newborn's first breath out is longer than its first breath in). "Ash talks when something tries it."
 
 #### Things they disagree about
 
@@ -85,7 +85,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **Cap Hollow**, a hamlet of four fungus-picking families in the Hollow Wood, next to the hunter's hollow under the Ribcage Bough.
 
-- **The Ashwake inn** with a slant floor and a measuring doorpost; the surveyor's winter home. The Salt Ladder in Kettlewick has a lamp at its foot and loud neighbours.
+- **The Ashwake inn** with a slant floor and a measuring doorpost; the surveyor's winter home. The Ash Ladder in Kettlewick has a lamp at its foot and loud neighbours.
 
 - **The thread-meeting place:** south of the Burnt Heath, east of the Drowned Fen, flat, dark, warm ground with no road; threads there grow thick as wrists. Candidate secret zone.
 
@@ -167,7 +167,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The Night of the Come Down** (midwinter): the whole ossuary lies on its back along the lip in rows, nine prayers per falling line.
 
-- **Bridge Salt** (Cold Adit, the ninth day after first frost): salt and a lit lamp set on the bridge parapet for the knights.
+- **Bridge Oil** (Cold Adit, the ninth day after first frost): oil and a lit lamp set on the bridge parapet for the knights.
 
 - **The Third Asking:** the knights' rite for ground that will not give up its bone. Seen, never described; "we moved camp a third of a league after."
 
@@ -473,13 +473,13 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The gate-house at the torii:** the book-keeper sleeps there, nearest the guardian stone, so the stone is the first thing she sees; the day-book sits in a reed case under a reed awning (Mio).
 
-- **The salt-house at the torii:** a barred door where the Horned can be spoken with on still nights; the Well-Shrine forbids it (Kasane interview).
+- **The incense-house at the torii:** a barred door where the Horned can be spoken with on still nights; the Well-Shrine forbids it (Kasane interview).
 
-- **The Salt Ford:** the ropeless bell hangs on a post "that was a reed that stood up and would not lie down"; salt crusts the stones where the water leaves it; carters sleep on the far bank.
+- **The Lime Ford:** the ropeless bell hangs on a post "that was a reed that stood up and would not lie down"; lime crusts the stones where the water leaves it; carters sleep on the far bank.
 
 - **The western pool:** where the one reed stands; the only wet reed-paper in the Fen comes from it; dolls, old floorboards and smoke all drift west toward it (Tsuru, Fusa).
 
-- **Bellrest Hearth's carters' long-house:** forty men on barley-husk pallets beside the salt-sheds; everyone wakes when the chimes stop (Ren).
+- **Bellrest Hearth's carters' long-house:** forty men on barley-husk pallets beside the lime-sheds; everyone wakes when the chimes stop (Ren).
 
 - **A half-drowned ring-stone** on the causeway past the Kneeling Arch; boatmen take the fare before it (Tokuji).
 
@@ -487,7 +487,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **Folded names:** a purifier is renamed at her folding; the birth-name goes into a doll that is burned. Jinpei was written "Sen" in the Register, which reconciles Tae's husband with the Register's list of the seven.
 
-- **The Dusk of the Empty Bowl (Thaw the fourth):** since the Cutting-Away ended, one bowl of salt and one of water on the step, and nobody touches them.
+- **The Dusk of the Empty Bowl (Thaw the fourth):** since the Cutting-Away ended, one bowl of incense and one of water on the step, and nobody touches them.
 
 - **Stone-Turning:** the last week of Frost, every boat in the camps goes out with two strong men to turn the causeway guardian stones back to the road.
 
@@ -495,7 +495,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The changing of the book:** outgoing and incoming keepers write a line each and neither speaks until dusk.
 
-- **Salt is changed at dusk, never dawn:** "salt is the first thing the dark eats" (Kasane).
+- **Incense is changed at dusk, never dawn:** "incense is the first thing the dark eats" (Kasane).
 
 - **The Ringing-In at Bellrest Hearth:** the whole Hearth breathes out together at the first chime after the Frost stillness.
 
@@ -511,7 +511,7 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **A boatman's first pole** is dropped in by his father and goes down standing; watching it go makes him a boatman. Boatmen want to be sunk with their poles.
 
-- **Heights moss-cloth** is spun from the stone-moss of the Prayer-Flag Terraces. Barley, salt-bread and frozen white fungus from the Breath-Caves.
+- **Heights moss-cloth** is spun from the stone-moss of the Prayer-Flag Terraces. Barley, hearth-bread and frozen white fungus from the Breath-Caves.
 
 - **Warm backs:** men who hold breath for the Myriad stay warm all winter, and their wives sleep against them. "The only good thing."
 
@@ -537,9 +537,9 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 - **The cut-out leaf with the ring:** neither Mio nor Fusa cut it; Mio will not say who has it.
 
-- **The backward hand:** Mio saw a new line under "Thirty-six. Salt changed. Right hand." in the pool and shut her eyes. Kasane ends her interview with the same words.
+- **The backward hand:** Mio saw a new line under "Thirty-six. Incense changed. Right hand." in the pool and shut her eyes. Kasane ends her interview with the same words.
 
-- **The weights:** the torii book grows heavier with the same number of leaves (Mio); salt weighs more at the bottom of the Pass than at the pans (Ren); the knights' column in the book runs over the page. None is explained.
+- **The weights:** the torii book grows heavier with the same number of leaves (Mio); lime weighs more at the bottom of the Pass than at the kilns (Ren); the knights' column in the book runs over the page. None is explained.
 
 - **Fusa's fever:** she remembers the fever and not its coming on. Was she kept back from the seven, or did she keep herself back?
 
@@ -623,9 +623,9 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Places
 
-- **Four Wents**: crossing of the Barrow road and the salt road; the reeve's hall sits on the salt-road side. A **soft place** in the middle of the crossing, warm, frost will not lie on it; measured each assize-month with a forearm-knotted cord: four knots the first year, eleven now.
+- **Four Wents**: crossing of the Barrow road and the ash road; the reeve's hall sits on the ash-road side. A **soft place** in the middle of the crossing, warm, frost will not lie on it; measured each assize-month with a forearm-knotted cord: four knots the first year, eleven now.
 
-- **Sallow Lip**: a daughter chapter of the Bleeding Maiden (the Chapter of the Open Side), three days east of Four Wents on the salt road; its walls are its bricked-in dead, a cup in the plaster at each mouth; warm all winter without a fire; holds the great scale.
+- **Sallow Lip**: a daughter chapter of the Bleeding Maiden (the Chapter of the Open Side), three days east of Four Wents on the ash road; its walls are its bricked-in dead, a cup in the plaster at each mouth; warm all winter without a fire; holds the great scale.
 
 - **Tarn Hollow**: a round lodge of the Veiled Crone on a round water west of the Barrow country; readers sit in a ring facing inward; a lowest room under the tarn keeps something in glass.
 
@@ -657,13 +657,13 @@ Nine agents sat down with the Codex characters, in character, and asked each the
 
 #### Daily life (food, dress, work, sayings)
 
-- Lowland food: salt-bread, root pottage, white caps from barrow-lids (the young no longer eat them).
+- Lowland food: hearth-bread, root pottage, white caps from barrow-lids (the young no longer eat them).
 
 - The processions' **sweet tallow** is made from the Maiden's pale fat from the wound-lips and never goes hard; lowland mothers put a candle of it under the cradle; Pale Order brothers burn it on the road and say a blessing in nines over it.
 
 - The lodges buy warm polishing-ash off the Ashen Moor from the carters of Four Wents and pay in threads read, so those carters know when they will die, and are too calm to bargain.
 
-- **The Share Fair** at Kerrow Cross on the fourth morning after the Long Field's day: Order sells salt and buys cloth; the processions sell sweet tallow and weigh children for a coin; the Shrine Keepers sell clean water in clay flasks; lodge reads for free; the Peak's table stands empty with a bowl on it.
+- **The Share Fair** at Kerrow Cross on the fourth morning after the Long Field's day: Order sells lamp-oil and buys cloth; the processions sell sweet tallow and weigh children for a coin; the Shrine Keepers sell clean water in clay flasks; lodge reads for free; the Peak's table stands empty with a bowl on it.
 
 - **The ferry**: the Order leaves a purse counted to nine on the Well-Shrine step each spring; the Shrine Keepers pin a paper doll on each dredger. The Shrine Keepers call it pilgrims' alms. Neither book records it.
 

@@ -21,7 +21,9 @@ ruling in `../01-rules-and-decisions.md` always wins. Section 8 lists what the 2
   - the Visitors are **the Uninvited**; the Tallyman and the Ferryman are retired for **the Unborn** and **the
     Drowned Twin**;
   - the Deep is no longer "the floor": it is the iron country of stale blood;
-  - salt is gone from the myths (not yet from the zones' folk practice; open for Derek).
+  - salt is gone from the myths and, by Derek's word the same day, from the zones too (worn tools at the sills and
+    shelves, potash at the Ash Shore, lime in the Smugglers' Hold); "Marrow-Eaters" survives as the roads' folk name
+    for the Emptied, so the game's boss still fits.
 
 The digest keeps the old words as a record of its sources. The bible is `00-the-deep-lore.md` to `07-who-is-who.md`.
 

@@ -151,8 +151,7 @@ and stains down the walls. The wind runs along the rift. No fog over the water.
 fingers ticking on stone; the Bellwethers' tolls echoing from wall to wall; the waiting dead silent; at the cold hearth,
 nothing.
 
-**Keep out.** Fog over the water; red water or red light (the vein runs clear); a ferry or a ferryman (the Ferryman
-belongs to another river, `../../in-game-texts/10-the-old-powers.md`); any way across; a fire in Garrow's hearth.
+**Keep out.** Fog over the water; red water or red light (the vein runs clear); a ferry or a ferryman; any way across; a fire in Garrow's hearth.
 
 **Open questions.**
 - **Where it lies:** the proposal here is a rift where the road comes up out of the Deep into the open air; the game

@@ -30,7 +30,7 @@ it that has never been put out, and crows stepping across ground too warm to sta
 ### What the ash-pickers know
 
 *Told by an ash-picker to a copyist who wanted to know where the black edge on his knife had come from. He wrote it on
-the back of a bill for salt, and kept the bill.*
+the back of a bill for lamp-oil, and kept the bill.*
 
 You want to know about the glass. Everyone who buys a knife wants to know about the glass, and nobody who picks it
 wants to say, so I'll tell you once and you can stop asking the others.
@@ -61,11 +61,11 @@ hangs over our door now. In winter it is the warmest thing in the house, and nob
 
 ### The Kneeler that kneels
 
-*Said by an old woman of the Moor camps to a copyist at the ninth milestone of the old road, as her answer to a
-salt-boiler who had told her that the true Broken Kneeler stood on his shore. The copyist kept his copy; whether the
+*Said by an old woman of the Moor camps to a copyist at the ninth milestone of the old road, as her answer to an
+ash-boiler who had told her that the true Broken Kneeler stood on his shore. The copyist kept his copy; whether the
 answer ever went down to the shore, he does not say.*
 
-Write this down, and give it to the next carter going down to the grey water, and let him read it to that salt-boiler
+Write this down, and give it to the next carter going down to the grey water, and let him read it to that ash-boiler
 with the whole strand listening. The Broken Kneeler is ours. It kneels on the rise above the hollow, a robed figure of
 stone that is taller kneeling than two men standing, with its hands held to its breast, facing down into the hollow
 toward the ring of teeth. Its knees have sunk into the ash to the shin. One arm is gone at the elbow. Its head is off at
@@ -78,7 +78,7 @@ was a piece of the sky, and the year I was married two of them dug a pit behind 
 more ash, warmer the deeper they went, and filled the pit in again quickly. The children say nothing fell at all: the
 stone man was praying so hard that his head came off, and that is why you must never pray where a Kneeler can hear you.
 
-Now the salt-boiler says the true one is down on his shore, and that ours is a statue someone carved and someone else
+Now the ash-boiler says the true one is down on his shore, and that ours is a statue someone carved and someone else
 broke. I have never been to his shore, but I know what his Kneeler is from those who have. It is a bench, a long stone
 bench of the kind you kneel on in a chapel, broken in two in the middle. Tell him this from me. His is a thing you kneel
 on. Ours is a thing that kneels. Let him explain to his pilgrims which of the two is the Kneeler.

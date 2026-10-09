@@ -28,14 +28,14 @@ He read it back to her the same night, and she made him strike out one word, whi
 You can't dig on the Ridge. A spade goes down a hand and strikes stone, and the wind takes whatever earth you turn. So
 we never had barrows like the lowland folk. When one of ours died, we carried them down the stair into the chapel under
 the crest, and the men cut a place in the wall long enough to lie in. We laid the dead one in it with their belt knotted
-at the back and a line of salt along the lip, and the plasterer closed it up flush with the wall. When the plaster was
-dry, the nearest kin painted the face on it, and the name under the face. My mother painted my father. She was no
+at the back and a line of hearth-ash along the lip, and the plasterer closed it up flush with the wall. When the plaster
+was dry, the nearest kin painted the face on it, and the name under the face. My mother painted my father. She was no
 painter, and he looked surprised for forty years.
 
 We closed them up flush because of the knights. Every spring the knights of the Pale Order came down the Ridge road in
 their carved plate and asked us for our bones. A bone out of its place, they said, is a wound in the world. We told them
 we had no dead. A people with no dead, one of them said to my grandmother, is a people that lies. She agreed with him
-and gave him salt, and he went away with his chests empty, and the chapel walls looked like walls.
+and mended a strap of his plate, and he went away with his chests empty, and the chapel walls looked like walls.
 
 Up on the crest you never say a name aloud, because the wind takes it, but the wind can't reach under the rock. So on
 the fast-day we went down and sang, and after the singing the eldest of us read the names off the plaster, every one, so
@@ -99,8 +99,8 @@ There was nothing to carry home.
   the plasterer's room; the lowest room, with the ring.
 - **The floor is never bare:** seal plaster in shards and dust fanned outward from every niche; grit blown down the
   stair in tongues, with dry grass and heather twigs drifted at its foot; candle stubs, wax runs and dried flower stems;
-  salt crusted along the niche lips; knotted belts where the dead lay; gnawed cloth; moth scales like grey dust. No bone
-  anywhere.
+  hearth-ash dark along the niche lips; knotted belts where the dead lay; gnawed cloth; moth scales like grey dust. No
+  bone anywhere.
 
 **Landmarks.**
 - **The galleries of the dead** (the zone's signature):

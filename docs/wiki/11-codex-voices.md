@@ -186,13 +186,13 @@ Whoever reads the sky after me: keep the thread tied. Write what you see. Keep t
 
 ## What the Cradle Keeps
 
-*Set down from the words of a midwife of the Ashen Moor, spoken to a copyist of the Codex while she salted a doorstep. He wrote it on the back of a birth-tally she let him keep.*
+*Set down from the words of a midwife of the Ashen Moor, spoken to a copyist of the Codex while she laid ash along a doorstep. He wrote it on the back of a birth-tally she let him keep.*
 
-Hold that bowl steady. No, the coarse salt. The fine blows off.
+Hold that bowl steady. No, the cold ash, from the hearth. The fine blows off.
 
 You want the customs. Nobody wants the third hour, with their arms red to the elbow. Write them, then.
 
-Salt on the doorstep, salt on the sill, a line of it round the bed. That one is for the child. The ash here is warm, and warm ash draws things up out of the ground. They come to a birth. They always have. A new one of us is the rarest thing on the Hide, a thing made of something other than the god, and every scrap of the god that ever grew a wish wants it. Some want to eat it. Most want to be it. You wake at dawn to a child that feeds well and never cries and looks at the lantern too long, and you do not know which you have. So: salt. The pieces will not cross it. The old women say the congregation carried salt in with them, and the god never had any of its own.
+Ash on the doorstep, ash on the sill, a line of it round the bed. That one is for the child. The ash here is warm, and warm ash draws things up out of the ground. They come to a birth. They always have. A new one of us is the rarest thing on the Hide, a thing made of something other than the god, and every scrap of the god that ever grew a wish wants it. Some want to eat it. Most want to be it. You wake at dawn to a child that feeds well and never cries and looks at the lantern too long, and you do not know which you have. So: cold ash, from a hearth that has been kept. The pieces will not cross it. The old women would have a worn tool across the door instead, because the congregation carried their tools in with them and the god never worked a day. I do both.
 
 The lantern by the cradle is for the child too. Set it at the head, on the left, and never let it gutter the first year. Whoever burns in it chose to stay, and a soul that chose to stay has no love for anything that wants in. I have seen the flame lie down flat toward the window as if someone had knocked on the glass, and the mother asleep through all of it.
 
@@ -202,7 +202,7 @@ You asked what they are born holding.
 
 Most come with empty fists, as they should. Some come holding. I have opened little fingers on a knot of pale thread, on a pinch of dry ash, on a milk-tooth that was nobody's. Once a knuckle-bone, clean and old, and the child had all its own. The brothers of the Pale Order came down for that one within the month. They wrote the bone in their book and wrote the child too, by a number, and would not tell the mother why the number was so large.
 
-I keep what I can. I bury the rest under the doorstep, in salt.
+I keep what I can. I bury the rest under the doorstep, in ash.
 
 One I will not speak of. It was born with its hand open. Wide open, and quiet, and it stayed so. The lantern went out that night and no one had touched it.
 
@@ -210,7 +210,7 @@ Thicker by the hinge.
 
 The Tall Woman. I call her that because I will not call her by the name on her altar.
 
-A girl at the edge of the moor, first child, lying wrong. The bleeding would not stop. I had my hand in the wound to the wrist and it ran past my wrist. The salt at the door was whole, and the lantern stood straight, and she came in anyway. There was a line of wet across the floor behind her and the salt dissolved under it like frost on a palm.
+A girl at the edge of the moor, first child, lying wrong. The bleeding would not stop. I had my hand in the wound to the wrist and it ran past my wrist. The ash at the door was unbroken, and the lantern stood straight, and she came in anyway. There was a line of wet across the floor behind her and the ash went dark under it like frost on a palm.
 
 Tall. Taller than the door, and she did not stoop. Her front was soaked dark. The room smelled of copper and of warm skin. She knelt, and the floor gave a little under her knee, as ash does.
 
@@ -747,7 +747,7 @@ The tallow. Everyone asks what it's rendered from, as though there were anything
 
 We grease the stilts, the ladders, the rails, the lamp-posts. Candles for indoors. Never a drop for the lamps. The lamps burn who they burn.
 
-Which is why the knots. Every lamp in Kettlewick hangs from a cord, and every time you pass one after dark you tie a knot in it. That's how the one inside knows the town is still standing. Most of ours are stilt-folk who went over the rail and chose to stay. When a cord is all knots we hang a new one and coil the old in the rafters. My roof sags with them. My husband's lamp hangs at the foot of the Salt Ladder. I've tied more knots on him dead than I ever untied his boots living.
+Which is why the knots. Every lamp in Kettlewick hangs from a cord, and every time you pass one after dark you tie a knot in it. That's how the one inside knows the town is still standing. Most of ours are stilt-folk who went over the rail and chose to stay. When a cord is all knots we hang a new one and coil the old in the rafters. My roof sags with them. My husband's lamp hangs at the foot of the Ash Ladder. I've tied more knots on him dead than I ever untied his boots living.
 
 Now the stilts. You'll have seen how tall we stand.
 
@@ -1059,7 +1059,7 @@ Radko, knight of the Kostyak, at the Shallows
 
 *From the village book of Cold Adit, an iron-working hamlet under the Ossa range, in the hand of its headman Wat Orrin. A pedlar had the pages from the headman's widow in exchange for a pot of chrism, and carried them down to the lowlands.*
 
-The Order came on the ninth day after first frost, as it has come in every year this book holds. Seven knights in their white plate, and the standing dead behind them on the road, forty or more. You do not count those to their faces. I met them at the bridge with salt and a lamp, as my father did, and his.
+The Order came on the ninth day after first frost, as it has come in every year this book holds. Seven knights in their white plate, and the standing dead behind them on the road, forty or more. You do not count those to their faces. I met them at the bridge with oil and a lamp, as my father did, and his.
 
 What they took. Eleven bones from the Low Field, where the thaw heaved the ground and set them out in the furrows like stones. Nobody here knew whose. Then our own. They say a bone in soft earth lies out of its place, and in time they come for every grave we dig. We give them. Old Mag's man went up this year. She stood in her door and said his name after them the whole length of the road, and the last knight lifted his hand to her. They are courteous. I set that down. They are always courteous.
 
@@ -1077,9 +1077,9 @@ The notch. My father cut a mark on the doorpost where the high peak stood from o
 
 The sky. It hangs lower over the peaks each year, and paler. When the wind comes off the Ossa the linen on the lines takes a grey that will not beat out. The children write their names in the dust on the sills. I told them to stop. I could not have said why.
 
-Last. This year, for the first time in the book, the eldest knight asked how many of us there are. Men, women, children, and the old. He wrote it in a book of his own. Then he took my hand in both of his, the way they hold a bone, and thanked us for the salt. At the bridge he turned back and said, "Bury deep this winter." I asked him why. He said the ground here is kind, and went on up.
+Last. This year, for the first time in the book, the eldest knight asked how many of us there are. Men, women, children, and the old. He wrote it in a book of his own. Then he took my hand in both of his, the way they hold a bone, and thanked us for the oil. At the bridge he turned back and said, "Bury deep this winter." I asked him why. He said the ground here is kind, and went on up.
 
-Forty-one households. The salt was clean. Bear what is given. I have cut it over the door.
+Forty-one households. The oil was clean. Bear what is given. I have cut it over the door.
 
 ## Letters Up the Ossa
 
@@ -1256,7 +1256,7 @@ Below the fingers, where a face would sit, there was a bowl of bone, worn hollow
 
 It stopped at the lip. Most of it stayed down. I know that, because the well kept breathing around it, warm, and slow, and a long way down.
 
-The brothers call it the Marrow Pontiff. The salt-carriers call it the Herald of Bone, and walk wide of the knuckles. It was older than the altar. Older than the letters under the letters.
+The brothers call it the Marrow Pontiff. The ash-carters call it the Herald of Bone, and walk wide of the knuckles. It was older than the altar. Older than the letters under the letters.
 
 It spoke out of the bowl, and out of the stair, and out of my knees. Slow, the way your talliers read off a wall. The words were ours, set in an order nobody sets them.
 
@@ -1638,7 +1638,7 @@ I had felt on the little mirror, on the water pail, on the window, because a win
 
 The Needle-Brother came at dusk. You know him by the sound first. Small glass knocking on small glass, all down his coat, like a cupboard of cups when a cart goes by. Then the lights. Then him, long and grey in the doorway, with his lantern hanging in the air at his shoulder and no hand holding it.
 
-I paid him the salt and the good knife. He asked for nothing. He took them.
+I paid him the oil and the good knife. He asked for nothing. He took them.
 
 He looked at the covered mirrors before he looked at Oswy, one and then the next, the way a man counts doors. Then he sat on the floor by the bed, as the lodge folk sat in their circles, and said a name I did not know, and another, very low, over and over, until I lost the count.
 
@@ -2128,7 +2128,7 @@ The ones that go wrong are the ones that stray long. Out past a season, a stray 
 
 The giant. Yes. Everyone asks that second.
 
-I have seen it from the ridge above the salt-ditch. Taller than your granary. Sewn. The seams run in tithe-cord, knotted every hand-span, and every knot is a hood it swallowed. Something rides on its back, bound face-down with rope, painted, with the paint worn off the knees. A saint's image, a Maiden off some altar. When it walks the image nods.
+I have seen it from the ridge above the lime-ditch. Taller than your granary. Sewn. The seams run in tithe-cord, knotted every hand-span, and every knot is a hood it swallowed. Something rides on its back, bound face-down with rope, painted, with the paint worn off the knees. A saint's image, a Maiden off some altar. When it walks the image nods.
 
 It walks behind him. When he stops, it stops. The strays come to it from three valleys and go into it. I have seen them walk up into the seams.
 
@@ -2236,7 +2236,7 @@ There. The torii. Step out on the left, and do not look at the stone until you a
 
 *(Here the hand changes. Firmer, smaller.)*
 
-**Cutting 198. Heat, the second.** Tomoe given to the water. Her cord reached the floor. I keep the book now. Kasane, of the salt.
+**Cutting 198. Heat, the second.** Tomoe given to the water. Her cord reached the floor. I keep the book now. Kasane, of the incense.
 
 **Cutting 198. The Great Cutting-Away.** The year breathed into the Fen. Water clear.
 
@@ -2250,7 +2250,7 @@ There. The torii. Step out on the left, and do not look at the stone until you a
 
 *(One leaf cut out here. The stub shows the edge of a drawing: a ring.)*
 
-**Cutting 204. Thaw, the first.** Novice Nae drew a bucket. Her face in it reversed. Drew again. Reversed again, and looked right. Bucket poured on the salt. Salt changed.
+**Cutting 204. Thaw, the first.** Novice Nae drew a bucket. Her face in it reversed. Drew again. Reversed again, and looked right. Bucket poured on the incense. Incense changed.
 
 **Cutting 204. Thaw, the second.** Every bucket.
 
@@ -2272,19 +2272,19 @@ Akane's mat empty this morning. Akane was not sent. Akane is not written above.
 
 **Cutting 204. Thaw, the sixth.** Water clear. Reeds upright. Stone at the torii facing the road. No hand.
 
-Akane laid on the step. Dry, though she came out of the water. The one sat by her while the salt was changed twice. What was done with Akane is not written here.
+Akane laid on the step. Dry, though she came out of the water. The one sat by her while the incense was changed twice. What was done with Akane is not written here.
 
 **Cutting 204. Thaw, the ninth.** No Cutting-Away this year.
 
 **Cutting 206.** No Cutting-Away. Where does the year go now. It goes into us.
 
-**Cutting 206. Heat, the fourth.** The one signed for her salt ration. Left hand. She was taught right. I taught her.
+**Cutting 206. Heat, the fourth.** The one signed for her incense ration. Left hand. She was taught right. I taught her.
 
 **Cutting 207. Frost, the second.** Knights of the Pale Order at the Iron Hook. Paid the boatman. Went down with hooks and chain. Came up by dark with the drowned of the Fen. Four hundred and some were given to the water, in all the years of the book. I counted what they carried past the torii. I stopped at five hundred.
 
 **Cutting 207. Frost, the third.** Boatman counts six rings of breath past the Reed That Points Home. He asked me to write seven. Written.
 
-**Cutting 208. Thaw, the first.** The one left at dusk with her fan. Tied a bent twig on the post. Salt ration not taken. There was someone beside her in the haze. I did not look long.
+**Cutting 208. Thaw, the first.** The one left at dusk with her fan. Tied a bent twig on the post. Incense ration not taken. There was someone beside her in the haze. I did not look long.
 
 *(Many leaves blank. Then the same hand, older.)*
 
@@ -2296,11 +2296,11 @@ Akane laid on the step. Dry, though she came out of the water. The one sat by he
 
 *(The last entry is in a hand the copyist did not know. The strokes run backward and he read them in the well.)*
 
-**Cutting 204. Thaw, the fourth.** Thirty-six. Salt changed. Right hand.
+**Cutting 204. Thaw, the fourth.** Thirty-six. Incense changed. Right hand.
 
 ## What the Ford-Bell Said
 
-*Set down by a purifier of the Myriad, who sat one whole night beside the bell that hangs over the Salt Ford and wrote between its strokes. The bell has no rope. The copyist of the Codex left her gaps and her marks as she made them.*
+*Set down by a purifier of the Myriad, who sat one whole night beside the bell that hangs over the Lime Ford and wrote between its strokes. The bell has no rope. The copyist of the Codex left her gaps and her marks as she made them.*
 
 [It began at dusk. The wind moved the bell once. After that it moved by itself, or the words came when it was still. I could never tell which.]
 
@@ -2419,11 +2419,11 @@ On the road north I found I had folded the last leaf of my debt-roll into a doll
 
 ## Four in the Traces
 
-*Told by a salt-carter of the Heights to a purifier of the Myriad, who had come up to Bellrest Hearth to read the breath of travellers. The purifier set it down that night, and left the carter a paper doll, unused.*
+*Told by a lime-carter of the Heights to a purifier of the Myriad, who had come up to Bellrest Hearth to read the breath of travellers. The purifier set it down that night, and left the carter a paper doll, unused.*
 
 You want to know why I breathe like this. Everyone at the Hearth wants to know. Sit, then. It takes me a while.
 
-We pulled salt. One cart, from the white pans above the Cloud-Shelf, down through the Glass Pass to the Hearth. Four in the traces going down, because salt is heavy and the road is steep, and a cart that gets away from you goes over the edge and takes the traces with it. Coming up empty we were two, me and Ivo. Ivo and I pulled together eleven years. I knew his breathing better than my own. On the climb you breathe together or you fall out of step, and the strap cuts you.
+We pulled lime. One cart, from the white kilns above the Cloud-Shelf, down through the Glass Pass to the Hearth. Four in the traces going down, because lime is heavy and the road is steep, and a cart that gets away from you goes over the edge and takes the traces with it. Coming up empty we were two, me and Ivo. Ivo and I pulled together eleven years. I knew his breathing better than my own. On the climb you breathe together or you fall out of step, and the strap cuts you.
 
 Up there the air is thin. Hear it from me: you breathe and nothing comes. You breathe again and a little comes. The lanterns on the spires burn tall and still, like flames painted on a wall, and the frost on the glass is a hand, every time, the fingers spread. The old carters say never wipe the hand off. We never did.
 
@@ -2431,9 +2431,9 @@ The morning it came we were on the Wind-Scoured Ridges, past the last spire. The
 
 Then it came up the road from below. Wind comes down off the peaks; this came up from the Hide, slow, the width of the road and taller than the spire, and it was faces. Grey faces, thin as breath on cold glass, pressed close as a crowd at a well. Old men. Children. Faces with too many eyes, or none, and faces so plain they could have been anyone from my village. All of them with the mouth a little open, the way a mouth sits when the last of the air goes out.
 
-The cold came with it, past any cold I know. My lashes froze together. The salt dust on my sleeves went hard as sand.
+The cold came with it, past any cold I know. My lashes froze together. The lime dust on my sleeves went hard as sand.
 
-The faces spoke. Each one said a single word as it passed, and then it was gone behind us, up toward the top, and the next came. I heard *mother*. I heard *enough*. I heard a name I think was a place. I heard a word I have never heard again and could not say for you if you paid me in white salt. Most said only the sound a man makes at the end of a long day's pull, when he sets the traces down. *Hahh.* Like that. Hundreds of them. Thousands. I did not count. I am no bone-brother.
+The faces spoke. Each one said a single word as it passed, and then it was gone behind us, up toward the top, and the next came. I heard *mother*. I heard *enough*. I heard a name I think was a place. I heard a word I have never heard again and could not say for you if you paid me in white lime. Most said only the sound a man makes at the end of a long day's pull, when he sets the traces down. *Hahh.* Like that. Hundreds of them. Thousands. I did not count. I am no bone-brother.
 
 Ivo stopped pulling. I felt it in the harness before I saw it. He said, It's lighter. I said the cart is full, what is lighter. He said, Everything. Listen to them, Ren. Nobody in there is carrying anything.
 
@@ -2441,7 +2441,7 @@ Then he slipped the traces. Eleven years, and I watched him lift the strap over 
 
 When it had gone past, the lantern stood straight. His footprints went twelve steps into the frost and stopped. His coat lay on the road, folded. Ivo never folded anything in his life.
 
-I brought the salt down alone. Four days. I should have died on the Pass. I did not, and I have thought a long time about why.
+I brought the lime down alone. Four days. I should have died on the Pass. I did not, and I have thought a long time about why.
 
 The next year, crossing up with a new partner who does not talk, I saw it again, far off along the Cloud-Shelf, going up. And I knew one face near the front, with its mouth a little open. He said nothing. He had already said it.
 
@@ -2457,7 +2457,7 @@ You want to know about the Horned. Sit on that side, where the lamp can see your
 
 His name was Jinpei, and he was the loudest man in the reed-camps. He sang cutting reeds and he sang poling home, badly, and when he slept the thatch shook. My mother said that one would never need a doll on his step; he breathed everything out as fast as it came in. She was wrong about that.
 
-The shrine took him the year we married. They came up from the Well-Shrine with a fan and said he had room in him. They said it as a gift, and he took it as one. After that he went down to the torii every dusk and came home at dark smelling of salt and paper, and he stopped singing.
+The shrine took him the year we married. They came up from the Well-Shrine with a fan and said he had room in him. They said it as a gift, and he took it as one. After that he went down to the torii every dusk and came home at dark smelling of incense and paper, and he stopped singing.
 
 I learned to count him. Every keeper's wife learns. You lie in the dark with your hand flat on his back and count his breaths against your own. The first spring he breathed four to my five. Then three. By the tenth spring I would count twenty of mine and wait, and wait, and he would draw one breath so long I could have filled a bowl in it. His back stayed warm under my hand, like a hearthstone after the fire has gone out. His jaw came long. His old hat stopped fitting. I plaited him a new one and said nothing, and so did he, and that was the worst thing we did to each other.
 
@@ -2495,7 +2495,7 @@ Tell them that at the torii. Tell them the doll asks once. So do I.
 
 I fold this from the last paper in my sleeve. The Fen gives back dry whatever it gives back, so this may reach the reeds.
 
-I was Kasane of the lower house. I kept the salt at the torii and taught the small ones to fold. I set it down now, while it is still the right way round.
+I was Kasane of the lower house. I kept the incense at the torii and taught the small ones to fold. I set it down now, while it is still the right way round.
 
 We went down seven. The stair into the Nave has thirty-three steps. We counted them going down, all of us aloud, as the rite asks. At the bottom Hisa counted again and said thirty-four, and we laughed at her, there, in that place. I am glad we laughed.
 
@@ -2507,7 +2507,7 @@ At the Kneeling Arch the six of us stood in the shallows with our hands full. Th
 
 **Back of the doll**
 
-Shiori. You were the small one who carried the salt bowl in both hands and spilled it every time. Hear me.
+Shiori. You were the small one who carried the incense bowl in both hands and spilled it every time. Hear me.
 
 Keep a little room. Breathe out at every dusk, even when there is nothing to breathe out. A full jar pours slow. I have watched you from the water and you pour slow.
 
@@ -2525,7 +2525,7 @@ I am the last at the stair.
 
 **Round the edge, smaller, the point pressed deeper**
 
-My name was. Kasane. Kasane of the salt. The paper is small and the hand is large now. It wants out and I hold it, where would it go, it would go to you. We are room. The room is warm below. Thirty-six. The stair counts itself. The doll asks once, so stop, stop at the doll, you that finds it. Fold the corners tight. Turn the stone. Right hand. Right hand. We are the right way round again, nearly. Almost.
+My name was. Kasane. Kasane of the incense. The paper is small and the hand is large now. It wants out and I hold it, where would it go, it would go to you. We are room. The room is warm below. Thirty-six. The stair counts itself. The doll asks once, so stop, stop at the doll, you that finds it. Fold the corners tight. Turn the stone. Right hand. Right hand. We are the right way round again, nearly. Almost.
 
 ---
 
@@ -2817,7 +2817,7 @@ I will set my name at the foot, so it is written once. [     ]. [ �
 
 *The record of a reeve of the lowland hundreds, entered in his roll of assizes. The roll was sold for its vellum after his death; the Codex copy was taken from a binder's scraps, and the last leaf was stitched in upside down.*
 
-Assize held at Four Wents, where the Barrow road crosses the salt road, in the ninth month, by the old right of the crossroads: what dies where roads meet, the reeve shall say whose it is.
+Assize held at Four Wents, where the Barrow road crosses the ash road, in the ninth month, by the old right of the crossroads: what dies where roads meet, the reeve shall say whose it is.
 
 **The dead.** A man of the Tithed, of middle years, found at first light on the crossing stone, lying straight. No mark upon him but a cut on the left palm, old and clean. Boots good. Purse empty. Nobody knew his face.
 

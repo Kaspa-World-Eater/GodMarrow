@@ -120,8 +120,8 @@ the bell. It did not seem mine to turn them from it.
   the slope, facing the Barrows, each holding a sooted hollow at its chest. The wind has worn their faces blank; ash
   drifts against their backs and tails away in front. One has fallen on its face and been left there.
 - **The two shrines:** a cup-stone and two posts and a lintel, both guardian stones facing the Buried Bell.
-- **The altar:** the game places one. Make it the squat block below the tower door, its top crusted white where the
-  barrow families laid salt for the watchman each dusk.
+- **The altar:** the game places one. Make it the squat block below the tower door, its top rusted with worn tools where
+  the barrow families laid one for the watchman each dusk.
 
 **Light and weather.**
 - Overcast by day, moonlit by night. The lantern is the key light; the game's two lanterns stand on the road up the rise

@@ -172,7 +172,7 @@ healer, a smith and someone with work.
 | I | **the merchant** (the new start: a little mad, mocking the pilgrim's ignorance, picking the village clean). The old camp's people, Maren (vendor), Sister Ysolde (healer), Brannoc of the Nail (smith) and Warden-Crone Esk, are parked: whether they return is Derek's |
 | II | Qasim the Dust-Factor; Mother Oss-Ana; Ibbat the Knuckle-Smith; the Last Reliquarist |
 | III | Lugh the Eel-Monger; Asheth the Leech-Wife; Old Tamb; Priestess Ninsun |
-| IV | Dorje the Salt-Trader; Sister Palden; Chime-Wright Ulan; Brother Tenzar |
+| IV | Dorje the Incense-Trader; Sister Palden; Chime-Wright Ulan; Brother Tenzar |
 | V | the Tallow-Merchant; the Nurse Without a Face; Ferrous; the Hollow Seer |
 
 **To fix when those acts are made** (flagged for Derek):

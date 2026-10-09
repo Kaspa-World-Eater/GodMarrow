@@ -96,8 +96,8 @@ know what we are counting. I know he is still keeping them. I think it is the on
   2.2 yards long.
 - **The floor is never bare:** flagstones laid between the ribs, lifting and settling on a slow breath as real height
   (the ground log's one true detail), grey grease and dust in their joints; a walked line polished down each gallery;
-  salt at every niche lip; grave-cloth rags; wax runs and stubs; chalk dust under the Counting Wall; ash blown in at the
-  mouth.
+  old nails from worn tools laid along every niche lip; grave-cloth rags; wax runs and stubs; chalk dust under the
+  Counting Wall; ash blown in at the mouth.
 
 **Landmarks.**
 - **The Long Candle** (the threshold of the first gallery):

@@ -19,7 +19,7 @@ The scholars who have handled these leaves call them a codex. I call the book th
 
 There are nine chapters. I did not choose nine. I spread the leaves on the floor of a barn at Ashwake one winter, and by morning they lay in nine heaps, and I have been in the Ossa long enough not to quarrel with a count like that.
 
-Every chapter opens with pages of mine, about the land it concerns and the people I found there. The works come after, in the order they reached me: letters, sermons, tallies, a catechism, a wall, a song. Most I paid for, in copper or salt or oil. Some I copied at night in houses where I was a guest. Two came out of dead hands, and I asked first. I have changed nothing. Where a writer is wrong, the mistake is still there. Where a copyist left a gap, so have I.
+Every chapter opens with pages of mine, about the land it concerns and the people I found there. The works come after, in the order they reached me: letters, sermons, tallies, a catechism, a wall, a song. Most I paid for, in copper or nails or oil. Some I copied at night in houses where I was a guest. Two came out of dead hands, and I asked first. I have changed nothing. Where a writer is wrong, the mistake is still there. Where a copyist left a gap, so have I.
 
 Each chapter closes with the things I carry out of that land. They are in the bag by my feet tonight. What I believe of each, I say. You may believe less.
 
@@ -58,7 +58,7 @@ First find the floor with your palm. Wherever you are, the Hide is under it some
 
 Every fire I have sat at begins its telling in the same place, and I have heard it at more fires than I could count on my hands and feet several times over. First there was the Edgeless, and nothing in it had a name, and a thing without a name cannot stand. A copyist at Ashwake spent his life on that part. A grandmother on the Moor gives it in a breath. Both are in this chapter, and I will not tell it better than they do.
 
-What I can add is small. In my first year on the Cheek I met a salt-boiler who had been born deaf, and I asked him with my hands what came before the god. He put both his palms over my mouth and held them there a while. Then he took them away and nodded, as though I had understood. I think I had.
+What I can add is small. In my first year on the Cheek I met a ash-boiler who had been born deaf, and I asked him with my hands what came before the god. He put both his palms over my mouth and held them there a while. Then he took them away and nodded, as though I had understood. I think I had.
 
 ### The long age, and its end
 
@@ -78,7 +78,7 @@ You are almost certainly one of the Tithed. The Tithed are the children of that 
 
 Everything else here was the god first. The creeping things in the Barrows, the hands that walk, the veils of mouths on the Moor wind: each is a scrap of the corpse that got up and went about on its own. I have been followed by them. They do not hate you. That would be simpler. I have watched one stand a whole night outside a pilgrims' tent, near enough to lean on the canvas, and in the morning it had gone and the canvas was warm on that side.
 
-A midwife on the Moor let me across her salt once, and watched my feet the whole way. I have been let across a great deal of salt since. Every hand that poured it has done the same. I do not blame them.
+A midwife on the Moor let me across her ash once, and watched my feet the whole way. I have been let across a great deal of ash since. Every hand that poured it has done the same. I do not blame them.
 
 ### What the Quiet leaves
 
@@ -126,7 +126,7 @@ On the Moor, in the Barrens, out on the flats of the Mire, you will come on a ri
 
 ### How these ten came to me
 
-Ten works follow, and at the head of each I have written how I came by it. Some I paid for in salt. One I took down lying awake in a tent, and one with a lamp held to my ear, and I own to both. Not every writer here is right, and where one is wrong I have said so at the top of the page and nowhere else.
+Ten works follow, and at the head of each I have written how I came by it. Some I paid for in nails. One I took down lying awake in a tent, and one with a lamp held to my ear, and I own to both. Not every writer here is right, and where one is wrong I have said so at the top of the page and nowhere else.
 
 Now take your hand off the floor. You know whose it was.
 
@@ -160,7 +160,7 @@ I know what stood on it. Twice I have tried to put it back, and twice the lines 
 
 ### A Knuckle-Bone from a Cradle
 
-A small knuckle-bone, clean and old, the colour of a tooth. The midwife in these pages gave it to me. She had buried it under her doorstep in salt, as she does with such things, and three springs running it came up through the salt and lay on the step in the morning.
+A small knuckle-bone, clean and old, the colour of a tooth. The midwife in these pages gave it to me. She had buried it under her doorstep in ash, as she does with such things, and three springs running it came up through the ash and lay on the step in the morning.
 
 The child who was born holding it lives on the Moor still. The Pale Order sent down for him and wrote him into their book by a number. I asked the tallier the number and he told me, and I have not reduced it, because I do not want to know its root. Each spring I set the bone on the tithe-scale at Ashwake. I stopped keeping the weights some years ago.
 
@@ -291,7 +291,7 @@ Wash your hands before this chapter, and dry them one finger at a time. The brot
 
 ### How they got the name
 
-The lowlands named them, not the other way about. I first heard the name at a bridge under the mountains, from a headman who had come out with salt and a lamp to meet seven knights, and I understood it once they had gone past me. Their plate was grey to the joints with a dust so fine it lay in the carving like frost in a footprint, and not one of them had brushed it off. That is the first reason. For the second, look up. Over the Ossa the sky has a pallor no other sky has, like cloth scrubbed too many times on the same stone. The third reason is said after dark, and I will come to it.
+The lowlands named them, not the other way about. I first heard the name at a bridge under the mountains, from a headman who had come out with oil and a lamp to meet seven knights, and I understood it once they had gone past me. Their plate was grey to the joints with a dust so fine it lay in the carving like frost in a footprint, and not one of them had brushed it off. That is the first reason. For the second, look up. Over the Ossa the sky has a pallor no other sky has, like cloth scrubbed too many times on the same stone. The third reason is said after dark, and I will come to it.
 
 Among themselves they use an older word, Kostyak. A brother told it me at the gate of Nine Stairs while he dried my feet, counting the toes aloud as he went. He said it means the bones of a body, and also the few who keep a thing upright when the rest has sagged: the posts of a barn, the three old women every village has, the knots in a net.
 
@@ -730,15 +730,15 @@ Empty your chest before you read this. Push the air out until nothing more will 
 
 The first chapter told you the god is still breathing its last across the Hide. It did not tell you the breath is crowded.
 
-I learned its names as you learn the names of people in a crowd, one face at a time, from whoever stood nearest. The reed-cutters of the Fen say the Eight Million. Up at the salt pans they say the Long Exhale, and let their own air out through the teeth after they say it. A widow at Bellrest called it the Sigh Under the Door and laid a rolled cloth along her sill while she talked. The grandmothers of the Moor say Grandmother Wind, as though it were one more of them, sitting a little apart from the fire. The Shrine Keepers say the Small Gods, when they say anything.
+I learned its names as you learn the names of people in a crowd, one face at a time, from whoever stood nearest. The reed-cutters of the Fen say the Eight Million. Up at the lime-kilns they say the Long Exhale, and let their own air out through the teeth after they say it. A widow at Bellrest called it the Sigh Under the Door and laid a rolled cloth along her sill while she talked. The grandmothers of the Moor say Grandmother Wind, as though it were one more of them, sitting a little apart from the fire. The Shrine Keepers say the Small Gods, when they say anything.
 
-When I was young, younger than anyone living would credit, I asked the Myriad its true name. I asked the ford-bell at the salt crossing, because it was said to answer. It has not rung in my hearing since. It rings once I am past, far enough off; I feel it on the road, behind the breastbone, as you feel a door shut somewhere else in a house.
+When I was young, younger than anyone living would credit, I asked the Myriad its true name. I asked the ford-bell at the lime crossing, because it was said to answer. It has not rung in my hearing since. It rings once I am past, far enough off; I feel it on the road, behind the breastbone, as you feel a door shut somewhere else in a house.
 
 ### The doll that stood straight
 
 Wherever the wind snags on something, the Shrine Keepers have been there before you: a gate of two posts and a lintel at the crossing, a stone at the spring, a strip of white paper knotted to the bell. They kept the forgotten shrines too, when they had the hands for it. Lately they have not had the hands.
 
-I let one of them sit with me once, knee to knee, at a little roadside shrine in the Fen reaches. She was grey at the temples and in no hurry. The elder in this chapter tells a novice what is meant to happen with the doll, and I will leave it to her. I will tell you what happened with mine. It did not move. The purifier watched it a long while. Then she folded its arms shut, carefully, laid it in the brazier, and turned her face from the smoke, and would not take my salt when I offered it.
+I let one of them sit with me once, knee to knee, at a little roadside shrine in the Fen reaches. She was grey at the temples and in no hurry. The elder in this chapter tells a novice what is meant to happen with the doll, and I will leave it to her. I will tell you what happened with mine. It did not move. The purifier watched it a long while. Then she folded its arms shut, carefully, laid it in the brazier, and turned her face from the smoke, and would not take my oil when I offered it.
 
 I have thought since about what she saw in the paper that made her do it. I have decided she saw nothing, and that nothing was what she did not like.
 
@@ -829,7 +829,7 @@ In the first chapter I wrote that in the oldest age nobody was there. I wrote it
 
 I also wrote that the congregation knelt inside the god near the end. Near the end is the important part. The Tithed remember the kneeling and nothing earlier. A grandmother keeps three notes. On Kneel-Night the camps on the Cheek kneel from dark to grey round a banked fire, and nobody can tell you why the fire must be banked. That is everything the congregation kept, and they came late.
 
-I knelt with them one Kneel-Night, at a camp below the Jaw, between a salt-boiler's widow and a boy who kept falling asleep against my arm. Near the grey hour the widow leaned across and asked me, quite kindly, whether I would like to be the one to bank the fire, since I knew how. I had not touched the fire. I had not said I knew anything. I banked it. My hands did it the old way, the ash drawn over from the far side first, and three of the old women stopped their kneeling to watch, and none of them would speak to me in the morning.
+I knelt with them one Kneel-Night, at a camp below the Jaw, between a ash-boiler's widow and a boy who kept falling asleep against my arm. Near the grey hour the widow leaned across and asked me, quite kindly, whether I would like to be the one to bank the fire, since I knew how. I had not touched the fire. I had not said I knew anything. I banked it. My hands did it the old way, the ash drawn over from the far side first, and three of the old women stopped their kneeling to watch, and none of them would speak to me in the morning.
 
 Others had been in the Held Space a long while before them, and those others had work.
 
@@ -949,11 +949,11 @@ Once, at the thaw, I saw a knight lay a purse on the step of the Well-Shrine, co
 
 At Tarn Hollow a reader of the lodge told me the standing dead are a desecration: a frame with no thread in it, walking, the way a loom goes on knocking after the Weaver has left the room. In the Barrens a brother of the Ossa told me the lodge's is the worse sin, that it leaves its bones in the heather like a floor nobody swept. Neglect, he called it, in the same voice the reader had used for his word. The two have never met.
 
-The Shrine Keepers and the lodge are cousins, which is harder. Each keeps something of the dead that the knight and the penitent leave behind. The lodge holds souls in its mirrors. To the Shrine Keepers that is a breath held for ever, and they know what holding does. I once saw a purifier and a reader share a fire on the salt road. When the reader uncovered his hand-glass to see by, she opened her fan and shut it again. Among the Shrine Keepers that means: I will take that in later, alone. She did not sleep. Neither did he.
+The Shrine Keepers and the lodge are cousins, which is harder. Each keeps something of the dead that the knight and the penitent leave behind. The lodge holds souls in its mirrors. To the Shrine Keepers that is a breath held for ever, and they know what holding does. I once saw a purifier and a reader share a fire on the ash road. When the reader uncovered his hand-glass to see by, she opened her fan and shut it again. Among the Shrine Keepers that means: I will take that in later, alone. She did not sleep. Neither did he.
 
 ### The fourth morning
 
-Once a year they all stand in one place. On the fourth morning after the day of the Long Field they come to Kerrow Cross and set their tables round the truce-stone. The Order sells salt and buys cloth. The processions sell sweet tallow and weigh children for a coin. The Shrine Keepers sell clean water in clay flasks. The lodge reads threads for nothing. The Peak's table stands empty, with a bowl on it.
+Once a year they all stand in one place. On the fourth morning after the day of the Long Field they come to Kerrow Cross and set their tables round the truce-stone. The Order sells lamp-oil and buys cloth. The processions sell sweet tallow and weigh children for a coin. The Shrine Keepers sell clean water in clay flasks. The lodge reads threads for nothing. The Peak's table stands empty, with a bowl on it.
 
 In the ditch below the stone the hired blades stand shoulder to shoulder, the same forty every faith hires, and every faith pays them extra to stand there together. They call it keeping the peace. The ditch-keepers take coin from each faith to watch the other four, and more, when a clause is broken, to say the stone broke it first. The children on the scales look at the knights and whisper the name of the one the Order will not let in.
 

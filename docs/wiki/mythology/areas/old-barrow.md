@@ -12,12 +12,12 @@ same way: east, toward the Barrow ring, a ring of tooth-stones beyond the Lane. 
 their chambers have run together under the turf, and the zone is the inside of them: passages and chambers of grey slab
 and chalk under roofs that sag into the room like a cheek sucked hollow.
 
-It is the Tithed's own place of the dead, kept by frightened rules: salt along every shelf, no name said over a grave,
-the risen put back face down with a flat stone on the neck. It should feel like grief held very still. The god is in the
-ground's breath, which went out once, the diggers say, and never came back in.
+It is the Tithed's own place of the dead, kept by frightened rules: a worn tool along every shelf, no name said over a
+grave, the risen put back face down with a flat stone on the neck. It should feel like grief held very still. The god is
+in the ground's breath, which went out once, the diggers say, and never came back in.
 
 **The one image:** a chamber's roof sagging down to a ragged hole of grey sky, rain falling through it in a thread, and
-the dead on their shelves under lines of salt.
+the dead on their shelves behind lines of worn tools.
 
 ## Found in the world
 
@@ -63,9 +63,9 @@ Every lid in the Barrows points east, to the ring of teeth. Stand at the foot of
 and all the hollows lean the one way, like grass in a wind. All but my mother's.
 
 She should have gone inside, under the Moor, with the mothers before her, but that was shut long before her time, so she
-went into our family's barrow at the foot of the Lane. We laid her face up, with the salt along her and her belt knotted
-at the back. Nine days after, my brother went out at first grey and found her standing at the foot of the Lane, facing
-up it. She was clean, cleaner than when we laid her, cleaner than she had been in her life.
+went into our family's barrow at the foot of the Lane. We laid her face up, with her worn awl along her and her belt
+knotted at the back. Nine days after, my brother went out at first grey and found her standing at the foot of the Lane,
+facing up it. She was clean, cleaner than when we laid her, cleaner than she had been in her life.
 
 The digger came with his spade and the flat stone, and he and my brother led her back and laid her face down, and put
 the stone on her neck, and said no name. That is how it is done. She came up again at midsummer and got as far as the
@@ -93,13 +93,14 @@ only place in the Barrows that faces the right way.
   in; here every one has, and they all lean one way.
 - **What was made:** passages walled with upright slabs of grey sarsen-like stone, chalk rubble between, roofed with
   capstones; round chambers roofed by corbelling, each course of slabs stepping in until one stone closes the top;
-  shelves of slab round each chamber, three high, three dead to a shelf; a stone basin in each side chamber for salt.
+  shelves of slab round each chamber, three high, three dead to a shelf; a stone basin in each side chamber for
+  hearth-ash.
 - **True scale:** passages 1.2 to 1.6 yards wide and 2 high, so the pilgrim stoops under some capstones; chambers 5 to 7
   yards across, their roofs 4 to 5 yards up before they sagged.
 - **The floor is never bare:** chalk rubble and grave-earth in many tones, white through grey to brown; turf clods
-  fallen through the lids; roots; salt crusted along every shelf lip; Low Day's candle stubs and soot at every chamber's
-  foot; the diggers' sacks of leftover grave-earth, which stays warm, stacked in the passages; knotted belts, a child's
-  shoe, small carved things laid with the dead.
+  fallen through the lids; roots; worn tools rusted along every shelf lip; Low Day's candle stubs and soot at every
+  chamber's foot; the diggers' sacks of leftover grave-earth, which stays warm, stacked in the passages; knotted belts,
+  a child's shoe, small carved things laid with the dead.
 
 **Landmarks.**
 - **The broken dishes** (the zone's signature):

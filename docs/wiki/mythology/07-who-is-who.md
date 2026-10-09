@@ -87,7 +87,7 @@ Every herald is a mantle (`00-the-deep-lore.md`): whoever wears it now. They wak
 
 **Those who work the lands** (each lives in its zone, and none has a town):
 - the bog folk, who walk the Long Back and say their own people laid it;
-- the salt-boilers of the Ash Shore;
+- the ash-boilers of the Ash Shore, who boil the grey-soaked ash for potash;
 - the lantern folk of the Sighing Ridge, who stand still when the wind stops;
 - the boatmen of the Drowned Fen;
 - the hunters, who take hide, bone and tallow from what comes up out of the god;

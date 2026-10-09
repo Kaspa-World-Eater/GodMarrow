@@ -7,7 +7,7 @@ the crypts, and from what outsiders saw.*
 ## The wound
 
 *The opening of the Rule, read aloud at the front of every procession on the Day of the Measure. Copied from the
-chained book of a chapter on the salt road.*
+chained book of a chapter on the ash road.*
 
 In the beginning there was a wound. It was a wound in nothing, for there was nothing yet to be wounded. It opened,
 and it did not close.
@@ -75,7 +75,7 @@ there. Each of us has seen something. We do not compare.
 
 ## The saints on the stair
 
-*A pilgrim's account of a night spent in a chapter of the processions, written the next morning at an inn on the salt
+*A pilgrim's account of a night spent in a chapter of the processions, written the next morning at an inn on the ash
 road.*
 
 They warned me before I went down to sleep in the guest room. At night, they said, the saints come down the crypt
@@ -96,7 +96,7 @@ I left before it was light. I left a copper on the guest room's sill, I do not k
 
 ## The year the wound hatched
 
-*Told by a salt-carrier who passed many times, before and after, through a chapter of the processions built along a
+*Told by an ash-carter who passed many times, before and after, through a chapter of the processions built along a
 great wound in the ground. It was written down at its daughter chapter, which still sets out the old chapter's
 tithe-cup at its closed gate once a year.*
 

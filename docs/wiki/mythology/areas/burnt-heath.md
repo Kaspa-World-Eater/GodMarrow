@@ -23,7 +23,7 @@ point one way, and far off in the corner, seven great horned shapes lying in a r
 ### Three nights at the Heath fire
 
 *A letter from a pilgrim to her sister in the Moor camps, written at the keeper's fire on the Burnt Heath and carried
-back up the road by a carter. Her sister kept it in her salt tin.*
+back up the road by a carter. Her sister kept it in her tinder tin.*
 
 The fire is by the road, short of the fork, banked so low you cannot see it from twenty paces, with a reed tent behind
 it and the sleepers lying round it. The keeper is called Aud, as her mother was and her grandmother, and she tells her

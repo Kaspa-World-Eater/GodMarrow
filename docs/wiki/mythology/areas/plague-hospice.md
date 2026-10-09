@@ -70,7 +70,7 @@ we talked, and behind him I could see the sisters going up and down with their f
 the room with their shields.
 
 Toward the end he told me he had been dreaming of a big warm room with people kneeling in it, and that he liked it
-there. I put salt on the step every time I went, and the knight at the door never moved its foot off it.
+there. I laid a worn chisel across the step every time I went, and the knight at the door never moved its foot off it.
 
 Then one week nobody came to the grille. The cots were in their rows and the blankets were drawn up over all of them,
 and nothing moved under them, and there were no sisters, only the dead at the doors and at the end of the room, where
@@ -96,8 +96,8 @@ way down the ward, one of the blankets moves.
   rows; the shafts a yard across, going up out of sight.
 - **The floor is never bare:** straw from the cots, matted and scattered; paper figures by the hundred, folded with
   their arms open, a few with them closed; long knotted cords; basins and ewers; grey felt fallen from the covered
-  mirrors (the Veiled Crone's families covered them); salt crusted on the outer steps; grit and old ash fanned under
-  every shaft; paper-boat ash at the bank.
+  mirrors (the Veiled Crone's families covered them); worn tool-heads and nails rusted to the outer steps; grit and old
+  ash fanned under every shaft; paper-boat ash at the bank.
 
 **Landmarks.**
 - **The long ward** (the zone's signature):
@@ -111,8 +111,8 @@ way down the ward, one of the blankets moves.
     source far above. Rain comes down the same way and has soaked that bed's straw dark, a level puddle beside it.
   - *Age:* a lifetime since the last sister.
 - **The grilles:** iron grilles in the outer passage wall, looking down the wards, their bars worn bright at hand height
-  on both sides, salt crusted on the step beneath, the Ossuary Wardens at the doors beside them. A lantern in the outer
-  passage throws the bars' shadows long down the ward.
+  on both sides, a worn tool or two rusted to the step beneath, the Ossuary Wardens at the doors beside them. A lantern
+  in the outer passage throws the bars' shadows long down the ward.
 - **The burning bank:** a raised bank of dry stone in a side room under a flue, where the sisters burned the year's
   wrong breath in paper boats and kept silent until the ash was cold. Ash and half-burnt boats drift against it, and
   grey light comes down the flue onto the ash.
