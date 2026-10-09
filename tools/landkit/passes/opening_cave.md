@@ -145,3 +145,17 @@ bones in it, red light raking the stone. **Still short:**
 - the surface could show a slow skin.
 
 **Next:** the stairs and the hall at the game's scale.
+
+## Rules check (2nd since Derek's notes), then pass 4: the stairs at the game's scale
+
+**Worst failure, line 9 (detail where it counts):** the faces were built on the room's boundary line, but the wall's
+columns stand a little inside it, so the faces, torches and skeleton were buried in the rock.
+
+**Fixes:**
+- They are set on the stone's real surface.
+- The stairs' wisp-fires are stronger and the pool's red glow weaker, so past the pool the blue owns the light
+  (Derek's note).
+
+**Grade: the stairs C.** The rough stumps at the foot turn into cut steps as they climb into the wisp-light: the raw
+becoming the made, readable in one climb. **Still short:** the faces are too shallow and small to catch the light,
+and need their own pass (deeper carving, bigger, lit from the side by the torches).

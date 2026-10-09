@@ -359,7 +359,7 @@ def door():
 def wall_spot(x, y, side_x=None):
     """a point on the stairs' carved wall (the west wall, which looks toward the camera), at the floor's height there"""
     f = floor_at(STAIR[0] + 0.4, y) or 0.0
-    return STAIR[0] - 0.05, y, f
+    return STAIR[0] + 0.32, y, f                                    # the wall's columns stand a little into the room
 
 
 def hall_spot(th, r=0.985):
@@ -492,15 +492,15 @@ def build(root, material):
     pool_dead()
     # the pool's own red glow, low over the blood (the one red light allowed); past it, only the wisp-fires
     # the glow from just above the blood, so it rakes across every stump face that looks into the pool and fades fast
-    LAMPS.append((BASIN[0], BASIN[1], 0.0, 140.0, RED))
+    LAMPS.append((BASIN[0], BASIN[1], 0.0, 110.0, RED))
     LAMPS.append((BASIN[0] - 1.5, BASIN[1] + 0.9, -0.02, 60.0, RED))
     LAMPS.append((BASIN[0] + 1.2, BASIN[1] - 1.1, -0.02, 60.0, RED))
     pool_bodies()
     # one wisp-fire at the stairs' foot, then up the carved wall, then round the hall
-    torch("torch0", STAIR[0] - 0.05, -6.6, 2.0, 1.0, 0.0, 70.0)
+    torch("torch0", STAIR[0] + 0.32, -6.6, 2.0, 1.0, 0.0, 110.0)
     for i, y in enumerate((-10.2, -14.4, -18.4)):
         x, yy, f = wall_spot(0, y)
-        torch("torch%d" % (i + 1), x, yy, f + 2.1, 1.0, 0.0, 70.0)
+        torch("torch%d" % (i + 1), x, yy, f + 2.1, 1.0, 0.0, 120.0)
     for i, th in enumerate((math.radians(165), math.radians(205), math.radians(245), math.radians(285))):
         x, y, nx, ny = hall_spot(th, 0.975)
         torch("htorch%d" % i, x, y, FLOOR_HALL + 2.0, nx, ny, 80.0)
