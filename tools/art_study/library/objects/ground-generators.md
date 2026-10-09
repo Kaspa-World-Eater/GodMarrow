@@ -81,6 +81,12 @@ lit by the game's lights so the form law holds in the game. Not built yet.
 - **Quiet ground:** the glade's floor calmed (broad matted patches near the peat's hue) so bones, stones and caps read.
 - **Tussocks as height** and pools levelled at their own rims: "dark wet carr under the giants".
 - **The worn way** leading the eye to the altar; brought back after the calming hid it.
+- **The floor by cause on the 3D road** (`tools/landkit3d/floor3d.py`, the temple's pass 7). Height and cause maps
+  come from one function: old windthrows, the kept ground and its bank of sweepings, the runoff trench, the worn way, a
+  rubble bank, cushion colonies, and rain levelled in the pits below their rims. The build meshes it and the painter
+  reads it, so the paint follows the real form.
+- **`litter_ground` fed by cause:** `paint(..., drift=map)` places the drifts where the causes put them, and
+  `flecks=False` turns off its moss specks where the moss is real cushions. Its defaults are unchanged.
 
 ## What failed, and why (traps)
 - **Stamped tiles** (ash, putrid, flags): "tiles look terrible and reused". One small picture repeated.
@@ -94,6 +100,10 @@ lit by the game's lights so the form law holds in the game. Not built yet.
 - **The floor's fine speckle** busy at the edges (the glade at B-), calmed in the last round.
 - **Tiles at the wrong scale** (STUDY round 10): ripples 4 px apart broke into dashes. Read the projection first.
 - **A soft feature mask** left a field of dying half-ripples; a sharp mask gives clean patches and quiet ground.
+- **Moss by a noise threshold, again** (the temple's pass 7): big green and brown islands with hard edges. Moss goes
+  only where its real cushions are.
+- **`litter_ground`'s own noise drifts under a dim overcast** left yard-wide patches of bare humus that read as flat
+  brown, the barren floor of Derek's ruling. Pass in the drifts by cause.
 
 ## Derek's rulings and grades (verbatim)
 - 2026-10-06: "The world you craft is only as good as its foundation."
@@ -117,6 +127,7 @@ lit by the game's lights so the form law holds in the game. Not built yet.
   pretty bad still" before the depth effect, then "much better".
 - **Retired but still shipped:** `build_set.py` still puts `tiles_wood` and `tiles_ruin.church_flags` into the game's
   old-growth set, and `tile_sheet.py` renders colour with self-shading. Both belong to the retired tile road.
+- **The temple's floor** (`floor3d.py`): built on the 3D road, pass 7, the floor B+.
 - **Not built:** the Godot ground-shader port; ash as exported height; litter as height for the old growth; the moss
   carpet, humus, pit mud, root mat and trodden path of the old-growth inventory as generators.
 - **Duplicates to merge:** the old wood's tiles into a world-position litter generator; `ground.flags` into `_poly`.

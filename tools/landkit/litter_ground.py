@@ -119,9 +119,11 @@ def _drift(x, y, seed):
     return vn(x * 0.55 + seed * 0.3, y * 0.55) * 0.65 + vn(x * 1.5, y * 1.5 + seed) * 0.35
 
 
-def _visible(x, y, h1, h2, litt, seed):
+def _visible(x, y, h1, h2, litt, seed, drift=None):
     cover = np.clip((litt - 0.2) * 1.4, 0, 1)
-    dr = np.clip((_drift(x, y, seed) - 0.4) * 3.0, 0, 1) * (0.12 + cover * 0.88)    # 0 in the humus patches .. 1 in a drift;
+    if drift is None:                                                           # the generator's own drifts, by noise
+        drift = np.clip((_drift(x, y, seed) - 0.4) * 3.0, 0, 1)
+    dr = drift * (0.12 + cover * 0.88)                                          # 0 in the humus patches .. 1 in a drift;
                                                                                 # worn and thin ground (a yard, a path) stays near bare
     n1, n2 = _cov_noise(x, y, seed), _cov_noise(x + 3, y, seed)
     vis1 = (h1 > 0) & (n1 < 0.04 + cover * 0.18 + dr * 0.78)                    # a few leaves even in the humus
@@ -129,7 +131,27 @@ def _visible(x, y, h1, h2, litt, seed):
     return vis1, vis2
 
 
-def paint(img, m, v, px, py, litt, mat, lamp=None, seed=3):
+def leaf_colours(lid, dd, x, y, vv, lt):
+    """each leaf's own colour (lid: its id from _layer; dd: where on it, for the rim; vv: the light; lt: the litter's
+    depth): its tree's kind, leaning by place and never a blotch, a small step of age of its own and a darker rim; thin
+    litter holds the older, darker leaves. Shared, so leaves anywhere (a stair, a pool) are the floor's own"""
+    r1 = (lid * 2654435761 % 4294967296) / 4294967296.0
+    r2 = (lid * 40503 % 65536) / 65536.0
+    sp_ = vn(x * 0.9 + 11, y * 0.9) * 0.5 + r1 * 0.5                     # which tree's leaves lie here: a leaning, not a blotch
+    fam = np.searchsorted(FAM_P, np.clip(sp_, 0, 0.999) * FAM_P[-1])
+    fam = np.where(lt < 0.45, np.where(fam == 0, 2, fam), fam)              # thin litter: older, darker leaves
+    age = (r2 - 0.5) * 0.12                                                  # each leaf a small step of its own
+    edge = np.where(dd > 0.72, -0.08, 0.0)                                   # a darker rim round each leaf
+    t = np.clip(vv * 0.86 + age + edge, 0, 0.99)
+    out = np.zeros((len(lid), 3))
+    for f in range(len(LEAF)):
+        k = fam == f
+        if k.any():
+            out[k] = LEAF[f][np.clip((t[k] * len(LEAF[f])).astype(int), 0, len(LEAF[f]) - 1)]
+    return out
+
+
+def paint(img, m, v, px, py, litt, mat, lamp=None, seed=3, flecks=True, drift=None):
     if not m.any():
         return img
     x, y = px[m], py[m]
@@ -138,29 +160,18 @@ def paint(img, m, v, px, py, litt, mat, lamp=None, seed=3):
     cover = np.clip((lt - 0.2) * 1.4, 0, 1)
     h1, id1, d1 = _layer(x, y, CELL1, seed)
     h2, id2, d2 = _layer(x + 0.031, y - 0.017, CELL2, seed + 50)
-    vis1, vis2 = _visible(x, y, h1, h2, lt, seed)
+    # drift: the caller's own map (0..1) of where the leaves lie thick, by cause, in place of the generator's noise
+    vis1, vis2 = _visible(x, y, h1, h2, lt, seed, None if drift is None else drift[m])
     lid = np.where(vis2, id2, np.where(vis1, id1, -1))
     dd = np.where(vis2, d2, d1)
     col = R_HUMUS[np.clip((vv * 0.9 * len(R_HUMUS)).astype(int), 0, len(R_HUMUS) - 1)]
     on = lid >= 0
     if on.any():
-        r1 = (lid[on] * 2654435761 % 4294967296) / 4294967296.0
-        r2 = (lid[on] * 40503 % 65536) / 65536.0
-        sp_ = vn(x[on] * 0.9 + 11, y[on] * 0.9) * 0.5 + r1 * 0.5              # which tree's leaves lie here: a leaning, not a blotch
-        fam = np.searchsorted(FAM_P, np.clip(sp_, 0, 0.999) * FAM_P[-1])
-        fam = np.where(lt[on] < 0.45, np.where(fam == 0, 2, fam), fam)          # thin litter: older, darker leaves
-        age = (r2 - 0.5) * 0.12                                                  # each leaf a small step of its own
-        edge = np.where(dd[on] > 0.72, -0.08, 0.0)                               # a darker rim round each leaf
-        t = np.clip(vv[on] * 0.86 + age + edge, 0, 0.99)
-        out = np.zeros((on.sum(), 3))
-        for f in range(len(LEAF)):
-            k = fam == f
-            if k.any():
-                out[k] = LEAF[f][np.clip((t[k] * len(LEAF[f])).astype(int), 0, len(LEAF[f]) - 1)]
-        col[on] = out
+        col[on] = leaf_colours(lid[on], dd[on], x[on], y[on], vv[on], lt[on])
     tw = _twigs(x, y, seed) > 0                                                  # the twigs: grey-brown bark, dark ends
     col[tw] = LEAF[3][np.clip((vv[tw] * 0.85 * 7).astype(int), 0, 6)] * np.array([1.05, 0.95, 0.85])
-    flk = (~on) & (vn(x * 13 + 5, y * 13) > 0.78) & (_drift(x, y, seed) < 0.5)   # small moss cushions in the humus, not specks
+    flk = (~on) & (vn(x * 13 + 5, y * 13) > 0.78) & (_drift(x, y, seed) < 0.5) & flecks   # small moss cushions in the humus
+    # (flecks=False where the moss is already real cushions of its own, as on the 3D road's floor)
     col[flk] = R_MOSS[np.clip((vv[flk] * 0.9 * len(R_MOSS)).astype(int) + 1, 0, len(R_MOSS) - 1)]
     mt = mat[m]
     soil = R_SOIL[np.clip((vv * len(R_SOIL)).astype(int), 0, len(R_SOIL) - 1)]

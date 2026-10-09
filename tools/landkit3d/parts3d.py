@@ -10,7 +10,7 @@ ROOT = None
 MAT = None
 
 MATS = {"ground": 1, "stucco": 2, "brick": 3, "stone": 4, "lacquer": 5, "gold": 6, "tile": 7, "wood": 8, "root": 9,
-        "iron": 10, "bone": 11, "moss": 12, "cloth": 13}
+        "iron": 10, "bone": 11, "moss": 12, "cloth": 13, "straw": 14, "water": 15}
 
 
 def init(root, material):
@@ -57,6 +57,19 @@ def poly(name, verts, faces, mat, thick=0.0):
         m.thickness = thick
         m.offset = -1.0
     return o
+
+
+def grid(name, xs, ys, H, mat):
+    """a height field as a smooth mesh: H[j, i] is the height (yards) at (xs[i], ys[j]); used for ground that is only a
+    height (floor3d), where the 3D road needs it as real form under everything else"""
+    nx, ny = len(xs), len(ys)
+    verts = [(float(xs[i]), float(ys[j]), float(H[j, i])) for j in range(ny) for i in range(nx)]
+    faces = [(j * nx + i, j * nx + i + 1, (j + 1) * nx + i + 1, (j + 1) * nx + i) for j in range(ny - 1) for i in range(nx - 1)]
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(verts, [], faces)
+    me.polygons.foreach_set("use_smooth", [True] * len(faces))
+    me.update()
+    return _link(name, me, mat)
 
 
 def quad_slab(name, a, b, c, d, mat, thick=0.15):

@@ -15,6 +15,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 sys.path.insert(0, os.path.join(HERE, "..", "landkit"))
 from kit import ramp, vn, fbm, B4                     # noqa: E402
+from scipy import ndimage as nd                       # noqa: E402
+import litter_ground as LG                            # noqa: E402
+import floor3d as F                                   # noqa: E402
 
 KX, KY, KZ = 18.0, 9.0, 21.0
 KEY = np.array([-0.62, 0.22, 0.75]) / np.linalg.norm([-0.62, 0.22, 0.75])
@@ -37,9 +40,12 @@ R = {
     "moss": ramp("#0e1710", "#152515", "#1e351b", "#284722", "#355a2a", "#456e33", "#58833e"),
     "leaf": ramp("#22120d", "#3a1d10", "#552a14", "#723c1b", "#8d5226", "#a46a34"),
     "algae": ramp("#121a17", "#1b2a22", "#26392b", "#304634", "#3c553e"),
+    "straw": ramp("#1a1612", "#2b251c", "#40372a", "#574b39", "#6f6049", "#88775b", "#a08f6e"),
+    # rain standing in the pits, tea-dark with the leaves' tannin: the dark of the crowns in it, a little grey sky
+    "water": ramp("#06080a", "#0c1012", "#12191a", "#1b2423", "#26302e", "#333e3b", "#45504b"),
 }
 MAT = {1: "ground", 2: "stucco", 3: "brick", 4: "stone", 5: "lacquer", 6: "gold", 7: "tile", 8: "wood", 9: "root",
-       10: "iron", 11: "bone", 12: "moss", 13: "cloth"}
+       10: "iron", 11: "bone", 12: "moss", 13: "cloth", 14: "straw", 15: "water"}
 
 
 def tone(rmp, t, dith):
@@ -68,6 +74,10 @@ def paint(d):
     sky = 0.5 + 0.5 * up
     occ = ao ** 1.6
     v = (0.05 + sky * 0.3 * occ + soft * 0.28 * (0.45 + 0.55 * occ) + mn * 0.1) * 0.86   # a deep wood: dim even by day
+    # the floor's causes at every pixel's world position (floor3d): the same floor the 3D build stood on. The canopy is
+    # the broad shape of the light: the giants stand back from the kept ground, so the sky reaches it; under them, dim
+    FM = F.maps(X, Y)
+    v = v * FM["open"]
     # what each surface is, by cause
     wall = np.abs(up) < 0.35                                    # standing faces
     along = np.where(np.abs(n[..., 0]) > np.abs(n[..., 1]), Y, X)   # a wall's own horizontal coordinate
@@ -108,18 +118,7 @@ def paint(d):
             kept = (ao[m] < 0.78) | (noise[m] > 0.62)
             col = np.where(kept[:, None], tone(R["gold"], t * 1.05, dith[m]), tone(R["lacquer"], t, dith[m]))
         elif name == "ground":
-            # the rainforest floor (Derek's standing ruling: the ground stays alive, never flat brown or blotched):
-            # a carpet of cushion moss, every clump its own two tones, a bright lip on its lit side; the leaf-fall
-            # of the maples in drifts (landkit litter_ground: every leaf its own, placed by world position) where the
-            # moss thins; dark worn earth only on the way feet went (to the stair)
-            c1 = vn(X[m] * 6.0, Y[m] * 6.0)
-            c2 = vn(X[m] * 15.0 + 3, Y[m] * 15.0)
-            clump = c1 * 0.6 + c2 * 0.4
-            col = tone(R["moss"], t * (0.48 + 0.6 * clump), dith[m])
-            lip = (c2 > 0.72) & (vn(X[m] * 15.0 + 3.4, Y[m] * 15.0 - 0.3) < c2)    # the clump's lit edge, toward the key
-            col = np.where(lip[:, None], tone(R["moss"], t * 1.15, dith[m]), col)
-            worn = (np.abs(Y[m] + 0.2 * np.sin(X[m] * 0.7)) < 1.1) & (X[m] > 10.0)
-            col = np.where(worn[:, None], tone(R["soil"], t * (0.75 + 0.3 * c2), dith[m]), col)
+            continue                                                  # painted from its causes after the loop
         elif name in R:
             col = tone(R[name], t, dith[m])
         else:
@@ -130,23 +129,7 @@ def paint(d):
             mossy = (up[m] > (0.6 if name == "tile" else 0.62)) & (fbm(X[m] * 1.3 + 7, Y[m] * 1.3 + Z[m]) > (0.6 if name == "tile" else 0.46))
             col = np.where(mossy[:, None], tone(R["moss"], t, dith[m]), col)
         img[m] = col
-    # the leaf-fall over the moss (Derek liked the Hollow Wood's floor: every leaf its own): the maples' leaves, each a
-    # few pixels placed by world position, thick in the drifts and thinning out into the moss with no edge at all
-    gm = (mat == 1)
-    litt = np.clip(fbm(X * 0.32 + 5, Y * 0.32 - 2) * 1.5 - 0.35, 0, 1)
-    cs = 0.17
-    ix, iy = np.floor(X / cs), np.floor(Y / cs)
-    hh = np.sin(ix * 12.9898 + iy * 78.233) * 43758.5453
-    hh = hh - np.floor(hh)
-    ox = (np.sin(ix * 39.3 + iy * 11.1) * 9341.7) % 1.0
-    oy = (np.sin(ix * 7.7 + iy * 51.9) * 4517.3) % 1.0
-    inleaf = np.hypot(X / cs - ix - 0.25 - ox * 0.5, (Y / cs - iy - 0.25 - oy * 0.5) * 1.6) < 0.32
-    leaf = gm & inleaf & (hh < 0.06 + 0.55 * litt)
-    if leaf.any():
-        kind = (hh[leaf] * 997) % 1.0
-        rl = np.where((kind < 0.6)[:, None], tone(R["leaf"], v[leaf] * (0.85 + 0.3 * kind), dith[leaf]),
-                      tone(R["soil"], v[leaf] * 1.1, dith[leaf]))
-        img[leaf] = rl
+    img = paint_floor(img, d, v, FM, dith)
     # the form's own edges: where the surface turns, the lip toward the light catches it and the far lip goes dark
     # (rule 3, the lit lip; from the real normals, nothing painted on)
     nd_ = np.zeros((gh, gw))
@@ -160,6 +143,96 @@ def paint(d):
     tooth = (vn(X * 31 + Z * 17, Y * 31 - Z * 17) - 0.5) * 0.06
     img = np.clip(img * (1 + tooth[..., None]), 0, 1)
     return img, alpha
+
+
+LV = 1.3            # the litter painter's light is the wood scene's, a step brighter than this overcast's
+
+
+def _leaves_on(img, m, v, X, Y, dens, lt, seed):
+    """leaves lying on a surface (stone, water) with its own colour left between them: the floor's own leaves
+    (litter_ground), a leaf where its cell's hash falls under the density"""
+    x, y = X[m], Y[m]
+    h1, lid, dd = LG._layer(x, y, LG.CELL1, seed)
+    on = (h1 > 0) & (LG._hash(lid, 0, 21) < dens)
+    if on.any():
+        cur = img[m]
+        cur[on] = LG.leaf_colours(lid[on], dd[on], x[on], y[on], np.clip(v[m][on] * LV, 0, 0.99), lt[on])
+        img[m] = cur
+    return img
+
+
+def paint_floor(img, d, v, FM, dith):
+    """the forest floor from its causes (floor3d), with the floor's own leaves (landkit litter_ground: every leaf its
+    own, Derek's standing ruling that the ground stays alive): moss on the mounds, the cushion colonies and the kept
+    ground, with a few leaves lying on it; the leaf-fall drifted deep into the pits, the hollows and the platform's
+    trench and lying thin between; bare wet earth on the worn way; the fallen roof's shards on its bank; rain in the
+    pits; and on the stair, which has not been swept, the leaves where they fell"""
+    n, pos, mat, ao = d["normal"], d["pos"], d["mat"], d["ao"]
+    X, Y = pos[..., 0], pos[..., 1]
+    up = n[..., 2]
+    gm = mat == 1
+    if gm.any():
+        litt = np.clip(FM["litter"] * 1.5 + 0.1, 0, 1.25)
+        # the moss is its cushions (real form, floor3d), so it thins cushion by cushion and never ends in an edge; the
+        # kept ground's young carpet breaks up into cushions where the sweeping stopped. Leaves lie over every
+        # cushion's rim (the floor's own leaves, so a rim is notched leaf by leaf, never a clean oval)
+        h1, lid, _ = LG._layer(X, Y, LG.CELL1, 3)
+        over = (h1 > 0) & (LG._hash(lid, 0, 23) < 0.7)
+        mossy = (FM["cushion"] > 0.014 + 0.01 * vn(X * 3.1, Y * 3.1)) & ~(over & (FM["cushion"] < 0.045))
+        # the carpet's edge is no line: past the stones the leaves lie over it more and more, each leaf deciding
+        # for itself (its own hash against how kept the ground is), until only the cushions hold out
+        k = FM["kept"]
+        covered = (h1 > 0) & (LG._hash(lid, 0, 29) > np.clip((k - 0.4) / 0.45, 0, 0.8))   # a few autumns lie on it too
+        mossy |= (k > 0.4 + 0.12 * vn(X * 1.9 + 2, Y * 1.9)) & ~covered
+        lmat = np.where(mossy, 1, 0)
+        # bare earth where nothing lies: the worn way, the trench, and every bank too steep to hold the leaves (the
+        # windthrows' torn faces)
+        bank = (up < 0.8) & (FM["wild"] > 0.5)
+        lmat = np.where((FM["path"] > 0.45) | (FM["trench"] > 0.65) | bank, 2, lmat)
+        # where the leaves lie thick, by cause: deep in the hollows and the trench, over most of the forest's floor,
+        # thinner on the kept ground, thin on the mounds; never the generator's own noise patches of bare humus
+        drift = np.clip(0.62 + 0.5 * FM["hollow"] + 0.2 * FM["wild"] - 0.55 * FM["mound"] - 0.22 * FM["kept"]
+                        + (vn(X * 0.9 + 7, Y * 0.9) - 0.5) * 0.35, 0, 1)
+        img = LG.paint(img, gm, np.clip(v * LV, 0, 0.99), X, Y, litt, lmat, flecks=False, drift=drift)
+        # the wet darkens what it soaks: the rut down the worn way, the trench, the pits' banks
+        wet = gm & (FM["wet"] > 0.3)
+        img[wet] = img[wet] * (1 - 0.32 * np.clip(FM["wet"][wet], 0, 1))[:, None]
+        # the fallen roof's shards on its bank, each its own plate of glazed clay, green or an old rust repair
+        rb = gm & (FM["rubble"] > 0.15)
+        if rb.any():
+            x, y = X[rb], Y[rb]
+            h1, sid, sd = LG._layer(x, y, 0.13, 77)
+            dens = np.clip((FM["rubble"][rb] - 0.15) * 1.8, 0, 0.97)
+            on = (h1 > 0) & (LG._hash(sid, 0, 5) < dens)
+            r = LG._hash(sid, 0, 6)
+            tt = np.clip(v[rb] * 1.15 + (r - 0.5) * 0.14 - (sd > 0.7) * 0.1, 0, 0.99)
+            col = np.where((r < 0.2)[:, None], tone(R["tile_r"], tt, dith[rb]), tone(R["tile_g"], tt, dith[rb]))
+            cur = img[rb]
+            cur[on] = col[on]
+            img[rb] = cur
+    # the stair has not been swept (05-the-last-breath): the leaves lie where they fell, drifted into the back of every
+    # tread and against the walls of the walk, where the wind cannot reach (the dark of the occlusion is that shelter)
+    flat = ((mat == 2) | (mat == 3) | (mat == 4)) & (up > 0.85)
+    if flat.any():
+        corner = np.clip((0.97 - ao) / 0.35, 0, 1) ** 1.2
+        stair = (X > 7.5) & (X < 10.6) & (np.abs(Y) < 1.7)
+        dens = np.clip(0.05 + 0.8 * corner + 0.25 * stair, 0, 0.95)
+        img = _leaves_on(img, flat, v, X, Y, dens[flat], np.full(int(flat.sum()), 0.4), 31)
+    # rain standing in the pits: tea-dark and still, the crowns' dark in it and a little grey sky toward its far side;
+    # pigment pooled in a dark band at the wet edge, a few leaves afloat
+    wm = mat == 15
+    if wm.any():
+        # the far bank's dark is mirrored along the pool's far edge (the top, from this camera); nearer us the water
+        # gives back the higher things, the crowns' gaps and the grey sky
+        below = np.zeros(wm.shape)
+        for r in range(1, wm.shape[0]):
+            below[r] = np.where(wm[r], np.where(wm[r - 1], below[r - 1] + 1, 0), 0)
+        sky = np.clip(0.2 + 0.035 * below + 0.12 * (vn(X * 0.5 + 3, Y * 0.5) - 0.5) + 0.12 * (FM["open"] - 0.85) * 4, 0, 0.6)
+        img[wm] = tone(R["water"], sky[wm], dith[wm])
+        shore = wm & ~nd.binary_erosion(wm, iterations=1)
+        img[shore] = tone(R["water"], sky[shore] * 0.45, dith[shore])
+        img = _leaves_on(img, wm & ~shore, v, X, Y, np.full(int((wm & ~shore).sum()), 0.1), np.full(int((wm & ~shore).sum()), 0.3), 41)
+    return img
 
 
 def place_hero(big, d, hero, focus, gw, gh):

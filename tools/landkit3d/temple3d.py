@@ -8,18 +8,26 @@ the rafters standing bare over empty air (the overhang a height field cannot mak
 """
 import math
 import random
+import numpy as np
 import parts3d as P
+import floor3d as F
 
 L0, L1 = -6.0, 4.5          # the hall's walls along x
 HW = 3.2                    # half its width
 WALL_T = 0.5
 FLOOR = 1.0                 # the platform's top
+FOOT = -0.5                 # how deep everything standing on the ground is set into it (the floor is not flat)
+
+
+def gz(x, y):
+    """the floor's true height at a point (floor3d), for whatever stands or lies on it"""
+    return float(F.height(np.array([x]), np.array([y]))[0])
 EAVE_Z = 5.15
 RIDGE_Z = 9.6
 
 
 def platform():
-    P.box("plat0", (-7.6, -4.7, 0.0), (7.6, 4.7, 0.38), "stucco")
+    P.box("plat0", (-7.6, -4.7, FOOT), (7.6, 4.7, 0.38), "stucco")
     P.box("plat1", (-7.35, -4.45, 0.38), (7.35, 4.45, 0.72), "brick")
     P.box("plat2", (-7.15, -4.25, 0.72), (7.15, 4.25, FLOOR), "stucco")
 
@@ -169,9 +177,22 @@ def roofs():
 def stair():
     for i in range(4):
         z = FLOOR - (i + 1) * 0.25
-        P.box("step%d" % i, (7.6 + i * 0.5, -1.2, 0.0), (7.6 + (i + 1) * 0.5, 1.2, z + 0.25), "stucco")
-    # the naga balustrades: the serpent's body down each side, its hooded head rearing at the foot; one head broken
+        P.box("step%d" % i, (7.6 + i * 0.5, -1.2, FOOT), (7.6 + (i + 1) * 0.5, 1.2, z + 0.25), "stucco")
+    # the naga balustrades: the serpent's body down each side, lying along the stair's cheek walls, its hooded head
+    # rearing at the foot on a pedestal; one head broken
     for s in (-1, 1):
+        # the cheek wall: its top follows the serpent's body down to the pedestal at its foot
+        y0, y1 = s * 1.62, s * 1.28
+        prof = [(7.5, FLOOR + 0.2), (8.6, 0.6), (9.7, 0.25), (10.55, 0.3), (10.55, FOOT), (7.5, FOOT)]
+        n = len(prof)
+        verts = [(x, y0, z) for x, z in prof] + [(x, y1, z) for x, z in prof]
+        faces = [tuple(range(n)), tuple(range(n, 2 * n))[::-1]]
+        for k in range(n):
+            a, b = k, (k + 1) % n
+            faces.append((a, a + n, b + n, b))
+        if s < 0:                                              # mirrored, so its faces wind the other way
+            faces = [f[::-1] for f in faces]
+        P.poly("cheek%d" % s, verts, faces, "stucco")
         body = [(7.5, s * 1.45, FLOOR + 0.35), (8.6, s * 1.45, 0.75), (9.7, s * 1.45, 0.4), (10.2, s * 1.45, 0.55)]
         P.tube("naga%d" % s, body, [0.17, 0.17, 0.17, 0.16], "stucco", 8)
         if s < 0:
@@ -179,7 +200,7 @@ def stair():
             P.sphere("naga_hood%d" % s, (10.25, s * 1.45, 1.3), 0.42, "stucco", scale=(0.35, 1.0, 0.85))
         else:
             # broken off: the head lies in the mud beside the stair
-            P.sphere("naga_hood%d" % s, (10.9, s * 2.2, 0.15), 0.42, "stucco", scale=(0.9, 0.35, 0.8))
+            P.sphere("naga_hood%d" % s, (10.9, s * 2.2, gz(10.9, s * 2.2) + 0.08), 0.42, "stucco", scale=(0.9, 0.35, 0.8))
 
 
 def sema():
@@ -187,11 +208,13 @@ def sema():
     pts = [(-8.6, -5.6), (0.0, -5.8), (8.6, -5.6), (8.8, 0.0), (8.6, 5.6), (0.0, 5.8), (-8.6, 5.6), (-8.8, 0.0)]
     toppled = {2, 5, 6}
     for i, (x, y) in enumerate(pts):
-        P.box("sema_base%d" % i, (x - 0.32, y - 0.32, 0.0), (x + 0.32, y + 0.32, 0.28), "stone")
+        g = gz(x, y)
+        P.box("sema_base%d" % i, (x - 0.32, y - 0.32, g - 0.3), (x + 0.32, y + 0.32, g + 0.28), "stone")
         if i in toppled:
-            P.sphere("sema%d" % i, (x + rnd.uniform(-0.6, 0.6), y + rnd.uniform(-0.6, 0.6), 0.1), 0.5, "stone", scale=(0.55, 0.9, 0.18))
+            tx, ty = x + rnd.uniform(-0.6, 0.6), y + rnd.uniform(-0.6, 0.6)
+            P.sphere("sema%d" % i, (tx, ty, gz(tx, ty) + 0.06), 0.5, "stone", scale=(0.55, 0.9, 0.18))
         else:
-            P.sphere("sema%d" % i, (x, y, 0.75), 0.5, "stone", scale=(0.5, 0.14, 0.95))
+            P.sphere("sema%d" % i, (x, y, g + 0.75), 0.5, "stone", scale=(0.5, 0.14, 0.95))
 
 
 def guardian():
@@ -216,7 +239,7 @@ def guardian():
 
 def spirit_house():
     x, y = 11.8, 6.0
-    P.tube("sp_pillar", [(x, y, 0.0), (x + 0.12, y, 1.4)], [0.1, 0.09], "wood", 8)
+    P.tube("sp_pillar", [(x, y, gz(x, y) - 0.25), (x + 0.12, y, 1.4)], [0.1, 0.09], "wood", 8)
     P.box("sp_floor", (x - 0.45, y - 0.4, 1.4), (x + 0.65, y + 0.4, 1.5), "wood", tilt=("Y", math.radians(8), (x, y, 1.4)))
     P.box("sp_house", (x - 0.3, y - 0.28, 1.5), (x + 0.45, y + 0.28, 1.95), "stucco", tilt=("Y", math.radians(8), (x, y, 1.4)))
     for s in (-1, 1):
@@ -236,7 +259,8 @@ def siege():
     for i in range(6):
         x, y = rnd.uniform(9.5, 11.5), rnd.uniform(-2.0, 2.0)
         a = rnd.uniform(0, math.pi)
-        P.tube("bone%d" % i, [(x, y, 0.06), (x + math.cos(a) * 0.45, y + math.sin(a) * 0.45, 0.06)], [0.05, 0.04], "bone", 5)
+        x2, y2 = x + math.cos(a) * 0.45, y + math.sin(a) * 0.45
+        P.tube("bone%d" % i, [(x, y, gz(x, y) + 0.03), (x2, y2, gz(x2, y2) + 0.03)], [0.05, 0.04], "bone", 5)
 
 
 def tile_heap():
@@ -244,16 +268,51 @@ def tile_heap():
     rnd = random.Random(7)
     for i in range(70):
         x = rnd.uniform(-3.6, 1.8)
-        y = HW + rnd.uniform(0.6, 2.2)
-        z = max(0.0, 0.5 - (y - HW - 0.6) * 0.25) + rnd.uniform(0, 0.25)
+        y = 4.75 + rnd.uniform(0.0, 1.7) ** 1.3
+        z = gz(x, y) + rnd.uniform(-0.03, 0.04)
         a = rnd.uniform(0, math.pi)
         P.box("tile%d" % i, (x - 0.2, y - 0.1, z), (x + 0.2, y + 0.1, z + 0.05), "tile", rot_z=a,
-              tilt=("X", rnd.uniform(-0.6, 0.6), (x, y, z)))
+              tilt=("X", rnd.uniform(-0.5, 0.5), (x, y, z)))
+    for i in range(16):
+        # the ones that fell short broke on the platform's walk, under the gap they came from
+        x, y = rnd.uniform(-3.3, 1.5), rnd.uniform(3.35, 4.2)
+        a = rnd.uniform(0, math.pi)
+        w = rnd.uniform(0.08, 0.2)
+        P.box("shard%d" % i, (x - w, y - 0.09, FLOOR), (x + w, y + 0.09, FLOOR + 0.04), "tile", rot_z=a,
+              tilt=("X", rnd.uniform(-0.25, 0.25), (x, y, FLOOR)))
 
 
 def ground():
-    g = P.box("ground", (-30.0, -30.0, -0.3), (30.0, 30.0, 0.0), "ground")
-    P.displace(g, 0.12, 1.2, subdiv=5)
+    """the forest floor as real height (floor3d: every hummock, pit, bank and rut by its cause), a tenth of a yard a
+    cell; the rain standing in the deep pits as level water"""
+    res = 0.1
+    xs = np.arange(-21.0, 15.5, res)
+    ys = np.arange(-19.5, 17.0, res)
+    X, Y = np.meshgrid(xs, ys)
+    P.grid("ground", xs, ys, F.height(X, Y), "ground")
+    for i, (cx, cy, r, lvl) in enumerate(F.pools(xs[0], xs[-1], ys[0], ys[-1])):
+        n = 32
+        verts = [(cx + math.cos(2 * math.pi * k / n) * r, cy + math.sin(2 * math.pi * k / n) * r, lvl) for k in range(n)]
+        P.poly("pool%d" % i, verts, [tuple(range(n))], "water")
+
+
+def broom():
+    """the keepers' broom, a bundle of coconut-leaf ribs bound to a bamboo handle, that swept the stair every morning
+    (the founder's rule, 05-the-last-breath). It slid off the bottom step where it was dropped and lies across the way"""
+    a = (9.35, 0.55, 0.27)                                     # the handle's end, still on the bottom tread
+    bx, by = 10.45, -0.25
+    b = (bx, by, gz(bx, by) + 0.05)                             # the binding, on the ground
+    P.tube("broom_handle", [a, b], [0.022, 0.024], "wood", 6)
+    P.tube("broom_bind", [b, (bx + 0.1, by - 0.07, b[2])], [0.04, 0.04], "straw", 6)
+    ang = math.atan2(by - a[1], bx - a[0])
+    rnd = random.Random(5)
+    for k in range(18):
+        t = (k / 17 - 0.5) * 0.85 + rnd.uniform(-0.04, 0.04)          # the ribs fanned out as they lay
+        ln = rnd.uniform(0.5, 0.7)
+        ex, ey = bx + math.cos(ang + t) * ln, by + math.sin(ang + t) * ln
+        mx, my = bx + math.cos(ang + t * 0.6) * ln * 0.5, by + math.sin(ang + t * 0.6) * ln * 0.5
+        P.tube("broom_rib%d" % k, [(bx + 0.05, by - 0.03, b[2]), (mx, my, gz(mx, my) + 0.035), (ex, ey, gz(ex, ey) + 0.02)],
+               [0.012, 0.01, 0.006], "straw", 4)
 
 
 def build(root, material):
@@ -269,6 +328,7 @@ def build(root, material):
     spirit_house()
     siege()
     tile_heap()
+    broom()
 
 
 def ferns():
@@ -293,6 +353,7 @@ def ferns():
         spots.append((x, y))
     for k, (x, y) in enumerate(spots):
         s = rnd.uniform(0.6, 1.1)
+        g0 = gz(x, y)
         for f in range(rnd.randint(7, 11)):
             a = rnd.uniform(0, 2 * math.pi)
             ln = rnd.uniform(0.7, 1.2) * s
@@ -300,7 +361,8 @@ def ferns():
             pts = []
             for j in range(5):
                 u = j / 4
-                pts.append((x + math.cos(a) * ln * u, y + math.sin(a) * ln * u, 0.02 + rise * math.sin(u * math.pi * 0.85)))
+                px, py = x + math.cos(a) * ln * u, y + math.sin(a) * ln * u
+                pts.append((px, py, g0 + 0.02 + rise * math.sin(u * math.pi * 0.85)))
             P.tube("fern%d_%d" % (k, f), pts, [0.07 * s, 0.08 * s, 0.07 * s, 0.05 * s, 0.01], "moss", 4)
 
 

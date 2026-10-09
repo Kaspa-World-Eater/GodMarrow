@@ -45,17 +45,27 @@ trees with branches, hanging moss.
    do; painted ferns lie flat.
 5. **Lips where the form turns:** a lit lip on top edges and a dark lip under them. The data passes say exactly where
    the form turns, so the painter can lay them precisely.
-6. **The floor needs its own generator.** The Hollow Wood's litter generator laid its own humus base and made hard
-   brown pools. A cushion-moss carpet worked, each clump in two tones with a lit lip, with leaves placed one by one by
-   world position, thick in the drifts and thinning out with no edge.
+6. **The floor is a height by cause, shared by the build and the painter** (pass 7, `floor3d.py`). One function gives
+   the floor's true height and its cause maps from world position. The Blender build meshes it (0.1 yd cells), and the
+   painter reads the same maps.
+   - Pass 5's moss carpet, painted on a flat box, was colour standing in for height.
+   - The causes now make the ground: old windthrows (pit and slumped mound), the kept ground swept low with the
+     sweepings banked past its boundary stones, the runoff trench, the worn way, the rubble bank and cushion colonies.
+   - The Hollow Wood's litter generator paints the leaves, fed drifts by cause. Its own noise drifts made hard brown
+     pools in pass 5, and barren humus patches under this overcast in pass 7.
 7. **No flat faces where detail belongs.** The gable was a flat triangle and read as a black hole. Carved relief as
    real geometry fixed it (a border, a medallion, kanok flames on dark wood), with the gilt showing on the carving.
 8. **The hero stands where the eye can see him,** for scale. In pass 1 he stood inside the hall, hidden.
+9. **Moss is form.** Moss chosen by a threshold on noise is camouflage at any size. Moss bound to its real cushions,
+   with leaves lying over the rims, thins cushion by cushion and never ends in an edge.
+10. **Everything on the ground takes its foot from the ground's height** (`floor3d.height`), and whatever stands is set
+    into the floor. Without that, tiles floated and the stair's serpents hung in the air.
 
 ## Still to learn
 
 From the trial's open list:
-- the floor's evenness: broad tone shapes and real hummocks;
+- the stucco walls' losses, which still read as camouflage in colour and in value;
+- the stair's readability (the treads and risers are lost under brick, moss and leaves);
 - the giant trees round the temple;
 - drizzle and wet sheen, by material;
 - the guardian and the candle's hidden light.

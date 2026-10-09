@@ -8,3 +8,4 @@ pieces. Read them, with the chapters (`../chapters/`), before starting a new pie
 |---|---|---|
 | [01 The Gate in the Flesh](01-gate-in-the-flesh.md) | `flesh_scene.py`, Ashen Moor | in work |
 | [05 The pit of offering](05-pit-of-offering.md) | `bog_chambers.py`, Sunken Bog | Derek: "exceptional"; the landmark method |
+| [06 The temple trial](06-temple-trial.md) | `tools/landkit3d/temple3d.py`, the Red Shore | in work, pass 7, B- |

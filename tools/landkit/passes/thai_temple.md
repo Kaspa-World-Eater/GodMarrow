@@ -119,3 +119,94 @@ Waiting for Derek's go on this brief.
 - It was a flat triangle with gold kept only in recesses, and it had none, so it read as a black hole.
 - It is now carved relief, real geometry: a raised border, a medallion and twelve kanok flame scrolls fanned round it, on weathered dark wood. The gilt shows on the carving.
 - **Grade: B-, nearly B.** **Next worst:** the floor's evenness (hummocks, broad shapes), then the giant trees and the drizzle.
+
+## Rules check, 2026-10-08 (after the bible), then pass 7: the floor
+
+**Read for this pass:**
+- `docs/MASTER_RULES.md` in full.
+- The area page (`the-red-shore.md`) and the bible's Last Breath. The founder's rule was "that the stair be swept every
+  morning before anything else is done"; now "The stair has not been swept."
+- The ecosystem pages (old growth, rainforest): pit and mound; the floor in layers; litter drifting into pits and
+  thinning on mounds; rain standing in old pits; wet is everything.
+- Chapter 09: the eight boundary stones mark the sacred ground.
+- The library: the 3D road, the ground generators, plants and litter (`litter_ground`: every leaf its own).
+- Derek's ruling that the ground stays alive (2026-10-08).
+- The review page: no grades or notes yet.
+
+**Pass 6 against the checklist:**
+
+| Line | Pass 6 |
+|---|---|
+| 1. Brief | Passes, but the lore's newest true detail is missing: the stair the keepers swept every morning was as clean as the walk |
+| 2. Scale | Passes: the 13 × 8 yd hall, with the Ossuarch (2 yd) on the platform |
+| 3. Form | **Fails, the worst failure.** The floor was a 60-yard box displaced 0.12 yd over 1.9 yd cells, flat to the eye, with moss clumps and their lit lips painted on: colour standing in for height. The serpent rails floated, with nothing under them |
+| 4. Light | The overcast and the moon pass; the warm local light (the candle) is not built |
+| 5. Values | Fails: the floor was one mid-green field with even speckle and no broad groups; the walls' blotches break the biggest light shape |
+| 6. Ramps | Passes |
+| 7. Paint | Partial: the floor's speckle; the roof's checker of repair tiles |
+| 8. Contact | Partial: the stones and the stair foot stood on a flat floor with nothing drifted against them |
+| 9. Detail | Partial: the gable carries it now; the stair reads as pipes on boxes |
+| 10. Life | Fails: still, no wind (that comes in the game) |
+| 11. As the player sees it | Passes for a trial (the game's camera, scale and the Ossuarch); not yet in the game |
+| 12. Skeptic round | Beside the pit of offering, whose ground tells its story by its form, the temple's floor told nothing |
+
+**Pass 7: the floor by cause, as real height** (`tools/landkit3d/floor3d.py`, new). One function gives the floor's true
+height and its cause maps from world position. The Blender build makes the ground mesh from it (0.1 yd cells, 133,000
+vertices), and the painter reads the same maps.
+
+The causes, in the order they happened:
+- **The old growth's own floor.** Most 6.5-yard cells hold an old windthrow: a pit where the roots stood, and the root
+  plate slumped to a mound (up to 0.8 yd) on the side it fell. The older the windthrow, the lower and wider. A long roll
+  of humus lies over the buried wood.
+- **The kept ground.** Inside the boundary stones the keepers levelled and swept the earth for centuries. It lies
+  0.13 yd below the forest's humus, with the sweepings banked in a low ring just past the stones.
+- **The platform's runoff:** a shallow trench along its foot, and a lip of splashed soil.
+- **The worn way** from the stair's foot toward the shore: sunk and smoothed, with a rut down the middle.
+- **The tile bank:** the fallen roof's tiles in a rubble slope against the wet side's foot. Before, the tiles floated
+  in the air; now they lie on it, and sixteen broke on the walk under the gap.
+- **One recent windthrow** on the wet side: a ragged pit still holding rain, with its plate slumped beside it.
+- **Cushion moss in colonies:** many small cushions and a few big ones. They crowd on the mounds and in the wet, are
+  few on the kept ground, and none grow on the way.
+- **Rain stands level** in every pit deep enough to hold it, no higher than the lowest point of the pit's rim.
+
+Everything on the ground now takes its foot from the same height: the boundary stones, the spirit house, the ferns, the
+bones and the broken serpent head. The platform and the stair are set half a yard into the floor. The stair got its
+cheek walls, so the serpents lie along them instead of floating. The keepers' coconut-rib broom lies where it slid off
+the bottom step.
+
+**The paint:**
+- **The moss is its cushions.** Green shows only on the real cushions, each lit through its own normals, with leaves
+  lying over the rims. So the moss thins cushion by cushion and never ends in an edge.
+- **The leaves are the Hollow Wood's** (`litter_ground`: every leaf its own, five kinds by tree and age). Their drifts
+  are placed by cause: deep in the pits, the hollows and the trench; thin on the mounds; a few autumns' worth on the
+  kept ground.
+- **The kept ground's young moss carpet** is covered more and more past the stones, each leaf deciding for itself,
+  until only the cushions hold out.
+- **Bare wet earth** on the worn way, in the trench, and on every bank too steep to hold leaves.
+- **The water is dark with tannin.** The far bank's dark shows along the pool's far edge and the grey sky nearer; a
+  dark band marks the wet edge, and a few leaves float.
+- **The unswept stair:** leaves lie on every tread, drifted into the back corners and against the walls of the walk,
+  where the occlusion says the wind can't reach.
+- **The canopy:** the giants stand back from the kept ground, so under them the light falls off by a third. That is
+  the floor's broad light shape.
+
+**What failed on the way:**
+- **Moss chosen by a noise threshold** made big green and brown islands with hard edges. That is camouflage again,
+  pass 1's failure a size up. Fixed by tying the moss to the real cushions.
+- **The litter generator's own drifts** (its noise) left patches of bare dark humus a yard or two across. Under this
+  overcast they read as flat brown, the barren floor Derek ruled against. Fixed by passing in a drift map by cause
+  (`litter_ground.paint(drift=...)`). Its defaults are unchanged, checked pixel for pixel against the committed
+  version.
+- **Its small moss flecks** in the humus read as green specks once the cushions were real. They are off here
+  (`flecks=False`).
+- **The pit's outline from sine lobes** came out as a symbol (a heart, a bat). Replaced by noise round the rim.
+- **A rubble formula lifted every hollow** on the map to a third of its depth. It was caught because the pit's water
+  sat at -0.08 yd instead of -0.23.
+
+**The value-only test passes for the floor:** with the colour gone, the mounds, pits, pool and cushions hold as form.
+The temple's walls still break into blotches, in value as well as colour.
+
+**Grade:** the floor B+; the piece still **B-**, but its form line now passes. **Next worst:**
+1. the stucco walls, whose losses still read as camouflage in colour and in value;
+2. the stair's readability;
+3. then the giant trees and the drizzle.
