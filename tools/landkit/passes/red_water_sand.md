@@ -394,3 +394,23 @@ leading the eye to the pilgrim.
 **Grade: B-.** The frame composes, the motion has the heartbeat, the dead are in it. **Still short:** the froth is
 blotchy where it is thickest, the tall column at the right is plain, the drowned's legs read as stubs, and the sand and
 the sea want dry-brush strokes.
+
+## Rules check, after pass 9, and pass 10 (2026-10-09): the froth
+
+**Rules check:** the rules, the cinematography chapter and the area page unchanged; no new notes on the review page.
+**Worst failure: the froth was blotchy** (line 7, the paint): the heaped froth a scatter of flat pale-pink blobs, the
+lace two flat tones with holes punched in it, reading as paint.
+
+**Pass 10:**
+- **The lace has relief:** its value follows the sheet's fullness, thickest midway between the holes and thinning to
+  a dark rim round each, pocked with small pores (a second, finer cellular noise). Thick froth is salmon-maroon, pale
+  only where it is freshest and fullest.
+- **The heaped froth is one mass:** many small lumps packed with a few large (7 to 12 to a stretch of crest, most of
+  them 0.05 to 0.11 yd), lit as a mass: the tops facing the sky pale, the sides salmon, the contacts between lumps and
+  at the foot dark, pocked with bubbles.
+
+**cine_check (exterior):** 4 of 7, unchanged (rules 1, 22, 27 as logged).
+
+**Grade: B-.** This is the tenth pass. **Still short of finished:** the tall column at the right is plain, the
+drowned's legs read as stubs, the sand and the sea want dry-brush strokes, and the near-dark/far-light rule fails
+because the dry backshore is lighter than the sea.

@@ -160,12 +160,13 @@ def bore():
             bf, hb = float(bf[0]), float(hb[0])
             fresh = np.clip(1.0 - (ph - 0.36) / 0.12, 0.25, 1.0)
             rnd = random.Random(int(t_ * 100) * 7 + int(ph * 40))
-            for q in range(rnd.randint(3, 6)):
+            for q in range(rnd.randint(7, 12)):
                 ds = rnd.uniform(0.0, 1.8) ** 1.4
                 s_ = bf + ds
                 tt = t_ + rnd.uniform(-0.15, 0.15)
                 zw, g = BF.sea_z(np.array([s_]), np.array([tt]))
-                r = rnd.uniform(0.08, 0.22) * fresh * (1.0 if ds < 0.5 else 0.7)          # thick froth, heaped, no spray
+                # thick froth heaped in one rolling mass: many small lumps packed together and a few large
+                r = (rnd.uniform(0.05, 0.11) if rnd.random() < 0.75 else rnd.uniform(0.13, 0.22)) * fresh * (1.0 if ds < 0.5 else 0.7)
                 x, y = S.xy(s_, tt)
                 P.sphere("foam%d" % k, (x, y, float(zw[0]) + r * 0.05), r, "foam",
                          scale=(rnd.uniform(1.4, 2.2), rnd.uniform(0.9, 1.3), rnd.uniform(0.3, 0.5)),

@@ -309,8 +309,12 @@ def paint(d, t, hero=None):
     m = mat == 32
     if m.any():
         tm = T[m]
-        v = 0.15 + 0.7 * tm + (oh[m] - 0.5) * 0.1
-        img[m] = tone(R_FOAM, np.clip(v, 0, 0.99), dith[m], band=0.12)
+        # lit as one heaped mass: the tops that face the sky pale, the sides salmon, the contacts between the lumps and
+        # the froth's foot dark, pocked with bubbles
+        v = 0.08 + 0.5 * tm + 0.22 * np.clip(up[m], 0, 1) ** 2 - 0.25 * (1 - np.clip(ao[m], 0, 1)) + (oh[m] - 0.5) * 0.06
+        pores = vn(X[m] * 37 + Z[m] * 23, Y[m] * 37 - Z[m] * 19) > 0.78
+        v = np.where(pores, v - 0.12, v)
+        img[m] = tone(R_FOAM, np.clip(v, 0, 0.99), dith[m], band=0.06)
 
     # ---- the glossy film: a mirror of the grey sky ----
     img = gloss(img, d, proj, T, dith)
@@ -352,8 +356,13 @@ def lace(img, d, m, s, tt, X, Y, age, fr, top, ps, rising, c, T, dith, t):
     big = cells(u * 0.5 + 3, v * 0.5, 0.32, 9.0)
     open_ = 0.35 + 0.9 * a
     sheet = (holes > open_) & (big > 0.25 + 0.5 * a) & (amt > 0.18 + 0.25 * (fbm(X[m] * 0.9, Y[m] * 0.9) - 0.5))
-    lv = np.clip(0.04 + amt * 0.3 + T[m] * 0.18 - a * 0.3, 0, 0.5)
-    col = tone(R_FOAM, lv, dith[m], band=0.1)
+    # the sheet has relief: fullest midway between its holes, thinning to dark edges round each one, pocked with small
+    # bubbles; thick froth is a salmon-maroon that only goes pale where it is freshest and fullest
+    full = np.clip((holes - open_) / 0.35, 0, 1)
+    pores = cells(u * 3.1 + 5, v * 3.1, 0.3, 11.0) < 0.3
+    lv = np.clip(0.03 + amt * 0.22 + T[m] * 0.12 - a * 0.25 + full * 0.22, 0, 0.55)
+    lv = np.where(pores, lv - 0.12, lv)
+    col = tone(R_FOAM, np.clip(lv, 0, 0.55), dith[m], band=0.06)
     # the thinnest strands half there: the sheet's edges draining into the red
     rim = sheet & (holes < open_ + 0.12)
     col = np.where(rim[:, None], col * 0.45 + img[m] * 0.55, col)
