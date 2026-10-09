@@ -154,6 +154,12 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09, Derek's grades on the Red Shore page:**
+  - The cave, D: "Make it bigger, more defined, darker, glowing red near the pool, way way way more detail. The only
+    light after the pool comes from the wisp fire torches." The red glow at the pool is an exception to the no-red-light
+    law, like the bog's pit throat; beyond the pool the only light is the blue wisp-fire.
+  - The Red Water, D: "Doesn't look real enough, need a study in the tide, oceans, water, black sand, the details are
+    lacking. It's very plain." A study chapter comes before its next pass.
 - **2026-10-09, the opening, settled (Derek's answers):** the Stranger is not the village's merchant; the weapons are
   heaped before the throne "just like the movie"; no enemies until the beach. The pilgrim rises from a visceral pool,
   climbs stairs past faces and blue wisp-fire torches, and a weapon falls from a skeleton on the wall (the starting

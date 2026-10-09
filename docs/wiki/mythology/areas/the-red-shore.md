@@ -166,6 +166,10 @@ basalt cliffs that close the beach, and leaving it, the pilgrim comes out of the
 5. **The door.** A doorway of white light, which is only the grey day after the dark, but it burns. The pilgrim comes
    out of the black cliffs onto the beach full of corpses.
 
+**From the raw to the made** (Derek): the cave begins as rough natural basalt and becomes more carved as the pilgrim
+climbs, until the hall is plainly a forgotten temple cut into the living rock. Nobody can say who cut it; it is older
+than the shore folk.
+
 **What the empty throne is:** the Silence's only true image (a king no one can name or hold, so an empty seat); a seat
 waiting for the next god; and, at the turn of the cycle, the pilgrim's own. The Stranger never chooses between them.
 

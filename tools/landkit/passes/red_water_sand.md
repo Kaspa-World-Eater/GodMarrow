@@ -160,3 +160,7 @@ beside the still.
 - the far sea is still noisy.
 
 **Next, by Derek's word:** the beach runs long side to side, closed at both ends by large black cliffs.
+
+**Derek's grade, D:** "Doesn't look real enough, need a study in the tide, oceans, water, black sand, the details are
+lacking. It's very plain." **Next for this piece, when the ocean resumes:** a study chapter on real oceans, surf, tides
+and black sand beaches, then the piece rebuilt from it.

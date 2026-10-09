@@ -69,7 +69,7 @@ R = {
 MAT = {1: "ground", 2: "stucco", 3: "brick", 4: "stone", 5: "lacquer", 6: "gold", 7: "tile", 8: "wood", 9: "root",
        10: "iron", 11: "bone", 12: "moss", 13: "cloth", 14: "straw", 15: "water", 16: "boxpaint", 17: "blood",
        18: "hide", 19: "cedar", 20: "basalt", 21: "ash", 22: "kelp", 23: "corpse",
-       24: "pool", 25: "rust", 26: "cutrock"}
+       24: "pool", 25: "rust", 26: "cutrock", 27: "dressed"}
 
 
 def tone(rmp, t, dith, band=0.2):
@@ -104,6 +104,9 @@ def paint(d):
     Fm = __import__(str(d["floor"])) if "floor" in d else F           # the scene's own floor module
     FM = Fm.maps(X, Y)
     v = v * FM["open"]
+    if "ambient" in d and float(d["ambient"]) < 1.0:
+        # a dark place: the sky's fill cut down, the crevices deeper, so the scene's own lamps make its light
+        v = v * float(d["ambient"]) * (0.55 + 0.45 * ao ** 2)
     # the enclosure (blend_scene.sky_passes: occlusion out to 12 yd): what sees little of the sky goes dark, inside the
     # hall under its roof, deep in the porch, in a recess; a wall in the open (half its view is ground) is untouched
     if "skyview" in d:
@@ -179,6 +182,22 @@ def paint(d):
             col = np.where(dabp[:, None], BL.C1 * 1.4 + np.array([0.04, 0.04, 0.06]), col)
             clot = vn(X[m] * 1.6 + 40, Y[m] * 1.6) > 0.7
             col = np.where(clot[:, None], BL.C0 * 0.7, col)
+            # the blood throws the glow; its own surface stays dark, the light only in its heavy dabs (never lava)
+            col = col * 0.55
+        elif name == "dressed":
+            # basalt cut and dressed by hands long gone: the same black stone, its faces flat and tooled (the chisel's
+            # fine parallel strokes), its arrises softened by age, damp dark at the foot, pale mineral weeping from the
+            # joints in thin runs; every block its own step of tone
+            bid = np.floor(X[m] * 1.1 + 0.3) * 5.0 + np.floor(Y[m] * 1.1) * 11.0 + np.floor(Z[m] * 1.4) * 17.0
+            hb = _frac(np.sin(bid * 12.9898) * 43758.5453)
+            nx_, ny_ = n[m][:, 0], n[m][:, 1]
+            plane = np.where(up[m] > 0.6, 0.58, np.where(ny_ > np.abs(nx_) * 0.6, 0.44, 0.24))
+            tb = plane * (0.8 + 0.5 * np.clip(t, 0, 0.6)) + (hb - 0.5) * 0.08
+            tooled = (up[m] < 0.4) & (np.abs(_frac(Z[m] * 9.0 + vn(X[m] * 3, Y[m] * 3) * 0.6) - 0.5) < 0.1)
+            tb = np.where(tooled, tb - 0.04, tb)
+            col = tone(R["basalt"], tb, dith[m], band=0.08)
+            weep = (up[m] < 0.4) & (vn(X[m] * 11.0 + Y[m] * 11.0, Z[m] * 0.4) > 0.8)
+            col = np.where(weep[:, None], col * 0.6 + np.array([0.30, 0.32, 0.33]) * 0.4, col)
         elif name == "cutrock":
             # the rock cut away for the camera: solid and near black, only its rim faintly lit so the room's edge reads
             col = tone(R["basalt"], np.full(int(m.sum()), 0.04), dith[m])

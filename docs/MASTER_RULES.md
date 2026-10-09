@@ -243,7 +243,8 @@ means that they always need to be perfect. All this will become assets for the g
   - no glow for its own sake, though glow is fine on magic, lanterns and wisps;
   - nothing pasted over the screen;
   - every danger plainly seen.
-- **No red light,** except the pit of offering's throat (Derek's ruling for that landmark).
+- **No red light,** except the pit of offering's throat (Derek's ruling for that landmark) and the blood pool where the
+  pilgrim rises in the opening cave (Derek, 2026-10-09: "glowing red near the pool").
 - **Effects live in the world:** they run, pool, stain, scorch and are lit, and meet the objects by material. Size
   noise to the sprite's own texel grid. A pool must run out past the body that hides it.
 

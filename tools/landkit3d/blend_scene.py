@@ -108,7 +108,7 @@ def material(name, index):
     return m
 
 
-def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0, lamp_ref=0.09):
+def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0, lamp_ref=0.09, ambient=1.0):
     """render, then read every pass back as numpy and save them (game coordinates) to out_dir/passes.npz"""
     sc = bpy.context.scene
     sc.use_nodes = True
@@ -145,7 +145,7 @@ def render_passes(out_dir, lamps=(), floor="floor3d", zoom=1.0, lamp_ref=0.09):
     np.savez_compressed(os.path.join(out_dir, "passes.npz"), normal=n, pos=pos, ao=P["AO"][..., 0],
                         mat=np.round(P["IndexMA"][..., 0]).astype(np.int16), moon=P["DiffDir"][..., 0],
                         alpha=P["Alpha"][..., 0], shelter=sky["shelter"], skyview=sky["skyview"], lamp=lamp,
-                        floor=np.array(floor), zoom=np.array(zoom), lamp_ref=np.array(lamp_ref), time=np.array(float(os.environ.get("GM_T", "0"))),
+                        floor=np.array(floor), zoom=np.array(zoom), lamp_ref=np.array(lamp_ref), ambient=np.array(ambient), time=np.array(float(os.environ.get("GM_T", "0"))),
                         gw=gw, gh=gh)
 
 
@@ -266,5 +266,5 @@ if __name__ == "__main__":
     setup_sun()
     setup_render()
     render_passes(out_dir, getattr(mod, "LAMPS", ()), getattr(mod, "FLOOR_MODULE", "floor3d"), zoom,
-                  getattr(mod, "LAMP_REF", 0.09))
+                  getattr(mod, "LAMP_REF", 0.09), getattr(mod, "AMBIENT", 1.0))
     print("passes saved", out_dir)

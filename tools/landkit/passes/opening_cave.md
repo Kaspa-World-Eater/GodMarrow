@@ -84,3 +84,43 @@ splash stain is no longer painted on the cave's stumps.
 - there is no close view at the game's scale yet.
 
 **Next:** the pool chamber at the game's scale with the Ossuarch rising from the pool, then the stairs, then the hall.
+
+## Derek, 2026-10-09: "Have the cave started as the rough real looking ... basalt but then it becomes more carved and more. Obviously some sort of forgotten Temple shrine on the inside."
+
+**The arc from nature to the made:**
+- **The pool chamber** is raw columnar basalt, untouched (Fingal's Cave).
+- **The stairs:** the lowest steps are rough stumps; the upper steps are cut true, worn hollow in the middle. The faces
+  are half cut near the bottom and whole near the top.
+- **The hall** is a forgotten temple cut into the living rock:
+  - dressed walls to about four yards, with pilasters, a frieze of faces and a cornice, and raw columns rising above
+    the carving where the builders stopped;
+  - squared pillars rising out of frame;
+  - a floor of dressed flags;
+  - a carved frame round the door;
+  - the throne cut from one block.
+
+**Derek's grade, D:** "Make it bigger, more defined, darker, glowing red near the pool, way way way more detail. The
+only light after the pool comes from the wisp fire torches."
+
+## Pass 2 (after Derek's notes)
+
+**Changes:**
+- **Bigger:** about 1.6 times, a longer climb of seventeen steps to 6 yd.
+- **Darker:** the scene's `AMBIENT` at 0.3, and deeper crevices.
+- **The pool's red glow:** two low red lamps that stay near it. Its surface is dark (it throws the glow, it isn't
+  lava). Its shoreline is the column stumps themselves, hex by hex with islands. Three dead lie at its edge, with bones.
+- **Past the pool, only wisp-fire:** the door's white lamp is removed.
+- **Raw to made:** the cut steps above the rough ones; the hall's dressed walls (pilasters, a frieze of faces, a
+  cornice) with raw columns above them; squared pillars; irregular flags; a carved door frame.
+- **Detail:** offerings under the faces (candle stubs, teeth, coins), chains on the pillars, rags from the cornice,
+  skulls in niches, cold braziers, wax mounds at the throne's foot, and the Stranger's nine cards on the step.
+- **Three views at the game's scale** with the Ossuarch, beside the overview.
+
+**Grade: D+. Still short at the game's scale:**
+- the faces are too dim to read;
+- the hall's flags are a noisy jumble;
+- the hall view cuts off the throne and the back wall;
+- the stumps are lit too flatly;
+- the detail is too small and dark to tell.
+
+**Next:** one room at a time at the game's scale, the pool chamber first.
