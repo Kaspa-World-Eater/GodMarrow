@@ -665,7 +665,7 @@ def throne():
         flame("tbz%d" % k, bx, by, f + 1.25, 0.3, 170.0)
     # the heap, spilling down the steps: a mound of rotted mail and scale, everything else on it and round it
     hx, hy = fx + nx * 5.4, fy + ny * 5.4
-    P.sphere("heapmound", (hx, hy, f - 0.35), 2.3, "ash", scale=(1.35, 1.0, 0.4))
+    P.sphere("heapmound", (hx, hy, f - 0.35), 2.3, "ash", scale=(1.35, 1.0, 0.34))
     rnd = random.Random(9)
     ca, sa_ = math.cos(math.atan2(ny, nx)), math.sin(math.atan2(ny, nx))
     def mound_z(x, y):
@@ -677,9 +677,9 @@ def throne():
         along = (x - fx) * nx + (y - fy) * ny
         if along < 5.6:
             dais = 0.28 * min(5, int((5.6 - along) / 1.05) + 1)
-        return f + max(dais, -0.35 + 0.4 * 2.3 * math.sqrt(max(0.0, q)))
-    for i in range(240):
-        r = rnd.uniform(0, 1) ** 0.7 * 2.9
+        return f + max(dais, -0.35 + 0.34 * 2.3 * math.sqrt(max(0.0, q)))
+    for i in range(460):
+        r = rnd.uniform(0, 1) ** 0.6 * 3.0
         a = rnd.uniform(0, 2 * math.pi)
         x, y = hx + math.cos(a) * r * 1.2, hy + math.sin(a) * r
         z = mound_z(x, y)
@@ -690,25 +690,28 @@ def throne():
             lx, ly = math.cos(b) * rnd.uniform(0, 0.4), math.sin(b) * rnd.uniform(0, 0.4)
             p0 = (x, y, z - 0.25)
             p1 = (x + lx, y + ly, z + ln * 0.85)
-            P.tube("heap_us%d" % i, [p0, p1], [0.035, 0.008], "rust", 4)
+            P.tube("heap_us%d" % i, [p0, p1], [0.04, 0.008], "iron", 4)
             gx, gy, gz = x + lx * 0.6, y + ly * 0.6, z + ln * 0.55
             P.tube("heap_ug%d" % i, [(gx - math.sin(b) * 0.15, gy + math.cos(b) * 0.15, gz), (gx + math.sin(b) * 0.15, gy - math.cos(b) * 0.15, gz)], [0.02, 0.02], "rust", 4)
             P.sphere("heap_up%d" % i, (x + lx * 0.95, y + ly * 0.95, z + ln * 0.82), 0.035, "rust")
         elif kind < 0.36:                                          # a sword lying
             ln = rnd.uniform(0.7, 1.0)
             p0, p1 = (x - math.cos(b) * ln / 2, y - math.sin(b) * ln / 2, z), (x + math.cos(b) * ln / 2, y + math.sin(b) * ln / 2, z + rnd.uniform(-0.1, 0.2))
-            P.tube("heap_sw%d" % i, [p0, p1], [0.03, 0.006], "rust", 4)
+            P.tube("heap_sw%d" % i, [p0, p1], [0.035, 0.006], "iron", 4)
             P.tube("heap_gd%d" % i, [(p0[0] - math.sin(b) * 0.13, p0[1] + math.cos(b) * 0.13, p0[2]),
                                      (p0[0] + math.sin(b) * 0.13, p0[1] - math.cos(b) * 0.13, p0[2])], [0.018, 0.018], "rust", 4)
         elif kind < 0.44:                                          # a spear, leaning on the heap or the steps
             ln = rnd.uniform(1.8, 2.5)
             P.tube("heap_sp%d" % i, [(x, y, z), (x + math.cos(b) * 0.9, y + math.sin(b) * 0.9, z + ln)], [0.025, 0.02], "wood", 4)
             P.tube("heap_sph%d" % i, [(x + math.cos(b) * 0.9, y + math.sin(b) * 0.9, z + ln), (x + math.cos(b) * 1.02, y + math.sin(b) * 1.02, z + ln + 0.32)], [0.035, 0.004], "rust", 4)
-        elif kind < 0.6:                                           # a helm, with its rim
-            P.sphere("heap_hm%d" % i, (x, y, z + 0.08), 0.15, "rust", scale=(1.0, 0.9, 0.85))
-            P.sphere("heap_hr%d" % i, (x, y, z + 0.02), 0.19, "rust", scale=(1.0, 0.95, 0.15))
+        elif kind < 0.6:                                           # a helm, with its rim and a nasal
+            P.sphere("heap_hm%d" % i, (x, y, z + 0.08), 0.16, "iron" if i % 3 else "rust", scale=(1.0, 0.9, 0.85))
+            P.sphere("heap_hr%d" % i, (x, y, z + 0.02), 0.2, "rust", scale=(1.0, 0.95, 0.15))
+            P.tube("heap_hn%d" % i, [(x + math.cos(b) * 0.15, y + math.sin(b) * 0.15, z + 0.16), (x + math.cos(b) * 0.17, y + math.sin(b) * 0.17, z - 0.02)], [0.02, 0.015], "iron", 4)
         elif kind < 0.74:                                          # a shield, leaning
-            P.sphere("heap_sh%d" % i, (x, y, z + 0.25), 0.34, "rust", scale=(1.0, 0.12, 1.0), rot=(rnd.uniform(-0.6, 0.6), 0, b))
+            tilt = rnd.uniform(-0.7, 0.7)
+            P.sphere("heap_sh%d" % i, (x, y, z + 0.28), 0.4, "rust", scale=(1.0, 0.1, 1.0), rot=(tilt, 0, b))
+            P.sphere("heap_sb%d" % i, (x - math.sin(b) * 0.05, y + math.cos(b) * 0.05, z + 0.28), 0.09, "iron", scale=(1.0, 0.6, 1.0), rot=(tilt, 0, b))
         elif kind < 0.82:                                          # a skull
             P.sphere("heap_sk%d" % i, (x, y, z + 0.08), 0.1, "bone", scale=(1.1, 0.9, 0.95))
         elif kind < 0.92:                                          # long bones
@@ -716,6 +719,16 @@ def throne():
         else:                                                      # rotted cloth over the heap
             verts = [(x + math.cos(b + q * 1.57) * 0.5, y + math.sin(b + q * 1.57) * 0.4, z + rnd.uniform(-0.05, 0.08)) for q in range(4)]
             P.poly("heap_cl%d" % i, verts, [(0, 1, 2, 3)], "cloth", 0.01)
+    # the big things that say what the heap is, at a glance: a banner pole with its rag, a great axe, a hauberk
+    P.tube("heap_pole", [(hx + nx * 0.4, hy + ny * 0.4, f + 0.3), (hx - nx * 0.6 + sx * 0.5, hy - ny * 0.6 + sy * 0.5, f + 3.4)], [0.05, 0.04], "wood", 6)
+    pt = (hx - nx * 0.6 + sx * 0.5, hy - ny * 0.6 + sy * 0.5, f + 3.4)
+    P.poly("heap_banner", [pt, (pt[0] + sx * 0.9, pt[1] + sy * 0.9, pt[2] - 0.1), (pt[0] + sx * 0.8 + nx * 0.1, pt[1] + sy * 0.8 + ny * 0.1, pt[2] - 1.5),
+                           (pt[0] + sx * 0.05, pt[1] + sy * 0.05, pt[2] - 1.2)], [(0, 1, 2, 3)], "cloth", 0.01)
+    ax0 = (hx + sx * 1.2 + nx * 1.4, hy + sy * 1.2 + ny * 1.4)
+    P.tube("heap_axe", [(ax0[0], ax0[1], f + 0.1), (ax0[0] - nx * 0.3, ax0[1] - ny * 0.3, f + 1.6)], [0.04, 0.035], "wood", 5)
+    P.box("heap_axeb", (ax0[0] - 0.3, ax0[1] - 0.05, f + 1.35), (ax0[0] + 0.3, ax0[1] + 0.05, f + 1.75), "iron", rot_z=math.atan2(sy, sx))
+    P.sphere("heap_mail", (hx - sx * 1.0 + nx * 1.2, hy - sy * 1.0 + ny * 1.2, mound_z(hx - sx * 1.0 + nx * 1.2, hy - sy * 1.0 + ny * 1.2) + 0.05), 0.6,
+             "iron", scale=(1.0, 0.7, 0.18), rot=(0.2, 0, 0.6))
     # the Stranger's wax at the dais' left foot, burned down over years, and his cards on the lowest step
     rnd = random.Random(77)
     wx, wy = fx + nx * 5.2 - sx * 3.0, fy + ny * 5.2 - sy * 3.0
@@ -724,6 +737,13 @@ def throne():
         P.sphere("wax%d" % i, (wx + math.cos(a) * rnd.uniform(0, 0.7), wy + math.sin(a) * rnd.uniform(0, 0.7), f + 0.3), rnd.uniform(0.07, 0.17), "bone",
                  scale=(1.0, 1.0, 0.7))
     cards(wx + nx * 0.6 + sx * 0.8, wy + ny * 0.6 + sy * 0.8, f + 0.29, math.atan2(ny, nx))
+    # three of his candles still burn, low at the heap's front: their light rakes across the blades, the helms' rims
+    # and the skulls toward whoever comes up, so the heap reads as the things of the ones before (the area's one true
+    # detail), not a mound
+    for i, (a, b) in enumerate(((1.7, 7.5), (2.5, 6.6), (-1.9, 7.6))):
+        cx_, cy_ = fx + nx * b + sx * a, fy + ny * b + sy * a
+        P.sphere("swax%d" % i, (cx_, cy_, f + 0.04), 0.12, "bone", scale=(1.0, 1.0, 0.8))
+        flame("scandle%d" % i, cx_, cy_, f + 0.16, 0.08, 46.0)
 
 
 def cards(x, y, z, ang):

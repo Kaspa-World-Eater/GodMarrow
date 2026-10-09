@@ -182,10 +182,15 @@ def paint(d, t=0.0):
             col = tone(R_OBS, np.clip(tm * 0.6, 0, 0.99), dith[m])        # filled below from the reflection
         elif name == "ash":
             col = tone(R_DUST, tm * 0.95 + (vn(X[m] * 6, Y[m] * 6) - 0.5) * 0.08 * np.clip(tm * 3, 0, 1), dith[m], band=0.1)
-        elif name in ("rust", "iron"):
+        elif name == "rust":
             col = tone(R["rust"], tm * 1.15, dith[m])
             flake = (vn(X[m] * 14.0 + Z[m] * 9.0, Y[m] * 14.0 - Z[m] * 9.0) > 0.7) & (tm > 0.25)
             col = np.where(flake[:, None], tone(R["rust"], tm * 1.15 + 0.22, dith[m]), col)
+            wet[m] = True                                             # old metal still takes a glint of the fire
+        elif name == "iron":
+            # dark iron, the blades and helms: near black, its edges and glints catching the fires (light on dark)
+            col = tone(R["iron"], tm * 1.3, dith[m])
+            wet[m] = True
         elif name in R:
             col = tone(R[name], tm * (0.9 + 0.2 * oh[m]), dith[m])
         elif name == "boxpaint":

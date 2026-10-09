@@ -269,3 +269,42 @@ His notes on the cave:
 - The colossal face's planes are still crude (its brow reads as a band), and the stair faces are small at this zoom.
 - The pool's surface is blotchy.
 - The flags and the cut-rock mass in the foreground are plain.
+
+## Rules check (1st since pass 5), against every checklist line
+
+**Read:**
+- `MASTER_RULES` in full, including the new 0c.
+- `CINEMATOGRAPHY.md`.
+- The area page's opening. One true detail: "the rusted weapons and armour of everyone who came up before heaped
+  before it". The Stranger sits on the dais step, never on the throne.
+
+| Line | Verdict |
+|---|---|
+| 1. Brief | Passes: built from the lore, with the heap as its true detail. But the heap fails at the game's scale (line 9). |
+| 2. Scale | Passes: the pilgrim is 2 yd; the faces are 2.3 to 2.6 yd and the colossal face 8 yd; the seat is too big for a man, on purpose. |
+| 3. Form | Passes: every column, relief, flag, step and heap item is geometry, and the value-only test reads. |
+| 4. Light | Passes: the wisp-fires and the pool glow (the ruled red exception); no sky. |
+| 5. Values | Passes: `cine_check` puts each frame's squint test at 3 to 5 masses. |
+| 6. Ramps | Passes: hue-shifted. |
+| 7. Paint | Partly: the stone is laid in strokes, but the colossal face's brow reads as a flat band. |
+| 8. Contact | Passes: occlusion is dark at the feet. |
+| 9. Detail where it counts | **Fails (worst):** the heap, the room's true detail, reads as a murky brown mass; nothing in it catches the braziers' light. |
+| 10. Life | Passes: the flames flicker, the motes rise, the pool's skin drifts. |
+| 11. Seen as the player sees it | Passes: the game's camera, with the Ossuarch. |
+| 12. Skeptic round | Against the temple's inside, the cave is darker and grander but rougher in finish. |
+| 13. Cinematography | Passes: the stairs 9 of 9, the pool 9 of 9, the hall 8 of 9 (its crown dark on purpose). |
+
+**Fix first: the heap.**
+- The heap is the room's true detail, and it must read as a heap of things left by people: blades catching the
+  braziers, rims on helms and shields, dense and spilling.
+
+**The fix (pass 5b): the heap** (detail where it counts):
+- 460 things, dense and spilling low down the steps.
+- Blades and helms of dark iron (light on dark), rust for the rest; shields with bosses, helms with nasals.
+- A banner pole with its rag, a great axe and a hauberk, so the heap says what it is at a glance.
+- Old metal takes glints of the fires.
+- **The light:** the braziers stand behind the heap and backlit it into a murk. Three of the Stranger's candles still
+  burn low at its front, on both sides. He sits on the dais step and has kept them there for years. Their light rakes
+  back across the heap, so the helms, skulls and shield rims catch it at the foot and the swords rise into the dark.
+
+**Grade:** the hall stays B-. The heap now reads as things left behind. **Still short:** the heap's middle is dark.
