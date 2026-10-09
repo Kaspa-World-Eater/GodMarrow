@@ -614,3 +614,31 @@ the Ossuarch at true size, the ground on the 4 px grid (as baked) and on a 2 px 
 painter). At 2 px the bones show their grain, cracks and knuckles, the dead have shape, the strokes are fine, and the
 ground's detail matches the pilgrim's sprite. My recommendation: the 2 px grid (it amends painted standard rule 7). It
 waits for Derek's choice.
+
+## Rules check, after the 2 x 2 cove (2026-10-09)
+
+`MASTER_RULES` re-read with today's additions (0.5b depth at three scales, 0.5c the five tones of form, the 2 x 2 grid,
+the map policy in section 5).
+
+**The checklist, in the game at 2 x 2:**
+1. **Brief:** passes.
+2. **Scale:** passes.
+3. **Form:** passes; the bare sand has its landform, drift and grain; the bones and the dead are turned with the five
+   tones.
+4. **Light: FAILS:** the paint's cast shadows were the moon pass's, hard and long, fanning dark streaks from every bone
+   and body (Derek: "look pretty bad").
+5. **Values, 6. Ramps, 7. Paint, 8. Contact:** pass.
+9. **Detail:** the shrine and the cairns are small at this scale.
+10. **Life:** the shader's heave, not yet the true loop.
+11. **Seen as the player sees it:** done.
+12. **Skeptic round:** the shadows first.
+
+**Fixed** (`paint_shore.light`): the key keeps the turn of form (each surface's angle to the cloud's bright side), but
+the cast shadow is separated out of the moon pass, blurred wide (7 texels a texel of zoom) and weakened to a third. An
+overcast throws no hard shadow: what stands only softens the light behind it a little, and the contact stays dark. The
+whole cove is being repainted from its saved passes (no re-render).
+
+**In the game after the repaint** (Ossuarch, hour 0.3, 60 fps): the bake's own long dark streaks are gone, and the
+bones and the dead keep their contact shadow. The sharp dark rays still fanning from the bones near the pilgrim are
+the game's lantern, not the bake: `world/dark_layer.gd` casts the lantern's shadows from each object's occluder, with
+hard edges. Left for the fine pass Derek set aside ("we can handle the fine detail later").

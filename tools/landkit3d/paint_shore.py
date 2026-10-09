@@ -100,8 +100,16 @@ def light(d):
     n, ao = d["normal"], d["ao"]
     sky = np.clip(d["skyview"], 0, 1)
     dome = sky * (0.55 + 0.45 * np.clip(n[..., 2], -0.2, 1))
-    key = nd.gaussian_filter(d["moon"].astype(np.float64), 1.2 * float(d.get("zoom", 1.0)))
-    T = 0.6 * dome + 0.38 * key + 0.04
+    # the key: the bright side of the cloud turns every form (its angle), but an overcast casts no hard shadow: what
+    # stands only softens the light behind it a little, wide and short (Derek: "the shadows being cast from objects look
+    # pretty bad"; they were the moon pass's hard shadows, long dark streaks fanning from every bone)
+    z_ = float(d.get("zoom", 1.0))
+    lam = np.clip((n * KEY).sum(-1), 0, 1)
+    moon = d["moon"].astype(np.float64)
+    cast = np.where(lam > 0.08, np.clip(moon / (lam + 1e-3), 0, 1), 1.0)
+    cast = nd.gaussian_filter(cast, 7.0 * z_)
+    key = lam * (1.0 - 0.32 * (1.0 - cast))
+    T = 0.66 * dome + 0.32 * key + 0.04
     T = T * (0.55 + 0.45 * np.clip(ao, 0, 1) ** 1.4)
     return np.clip(T, 0, 1), key
 
