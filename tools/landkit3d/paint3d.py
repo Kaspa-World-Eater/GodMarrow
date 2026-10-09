@@ -90,6 +90,7 @@ def paint(d):
     fine = vn(X * 7 + Z * 5, Y * 7 - Z * 5)
     img = np.zeros((gh, gw, 3))
     exposed = 1.0 - d.get("shelter", np.zeros((gh, gw)))       # what the rain reaches (blend_scene.shelter_pass)
+    FALL = roof_fall(X, Z)
     W = wall_maps(n, pos, mat, along, wall)
     for k, name in MAT.items():
         m = mat == k
@@ -136,15 +137,7 @@ def paint(d):
         elif name == "tile":
             # every tile its own: a course every quarter yard down the slope, a row every third of a yard across; each
             # tile a little lighter or darker, a few gone (the dark beneath), the rust tiles of an older repair in runs
-            row = np.floor(X[m] / 0.32)
-            course = np.floor(Z[m] / 0.22)
-            h = np.sin(row * 12.9898 + course * 78.233) * 43758.5453
-            h = h - np.floor(h)
-            rust = vn(row * 0.45 + 3.0, course * 0.5) > 0.74              # an older repair, here and there, in patches
-            base = np.where(rust[:, None], tone(R["tile_r"], t + (h - 0.5) * 0.12, dith[m]),
-                            tone(R["tile_g"], t + (h - 0.5) * 0.12, dith[m]))
-            gone = (h > 0.975) & (up[m] > 0.3)
-            col = np.where(gone[:, None], tone(R["wood"], t * 0.5, dith[m]), base)
+            col = roof_paint(m, t, X, Y, Z, up, FALL, dith)
         elif name == "gold":
             # gold survives where nothing touched it (the recesses); on the exposed faces it has gone to the lacquer
             kept = (ao[m] < 0.78) | (noise[m] > 0.62)
@@ -160,7 +153,11 @@ def paint(d):
             # (a steep roof sheds its water and holds moss only in patches; flat tops hold it where the rain reaches
             # them, thickest where the water stands, at the foot of what rises from them; under the eaves, none)
             if name == "tile":
-                mossy = (up[m] > 0.6) & (fbm(X[m] * 1.3 + 7, Y[m] * 1.3 + Z[m]) > 0.6)
+                # the roof holds its moss from the eave up, where the water slows and the debris lodges, and along the
+                # runs the water takes; the steep upper courses shed it
+                fl = FALL[m]
+                mossy = (up[m] > 0.3) & (fbm(X[m] * 1.1 + 7, Z[m] * 0.7 + Y[m] * 0.3) * 0.6 + (1 - fl) ** 2 * 0.5
+                                         + roof_runs(X[m], fl) * 0.12 > 0.63)
             else:
                 stand = np.clip((0.97 - ao[m]) / 0.3, 0, 1)
                 mossy = (up[m] > 0.62) & (exposed[m] > 0.5) & (fbm(X[m] * 1.3 + 7, Y[m] * 1.3 + Z[m]) + stand * 0.35 > 0.5)
@@ -198,6 +195,53 @@ def brick_tone(along, Z, t, dith):
     tt = t + (h - 0.5) * 0.16
     tt = np.where(h > 0.94, tt * 0.5, tt)
     return tone(R["brick"], tt, dith)
+
+
+# each roof's eave and ridge (temple3d: the main tier, the porch tier, the spirit house), for how far down its slope a
+# tile lies: 0 at the eave, 1 at the ridge
+ROOFS = [(4.9, 11.0, 4.8, 8.2), (-99.0, 4.9, 5.15, 9.6), (11.0, 99.0, 1.95, 2.35)]
+
+
+def roof_fall(X, Z):
+    f = np.zeros(X.shape)
+    for x0, x1, ez, rz in ROOFS:
+        q = (X >= x0) & (X < x1)
+        f = np.where(q, np.clip((Z - ez) / (rz - ez), 0, 1), f)
+    return f
+
+
+def roof_runs(X, fall):
+    """the water's runs down a roof: a few tile columns stained from where the water gathers down to the eave"""
+    row = np.floor(X / 0.32)
+    h1 = _frac(np.sin(row * 41.3 + 7.1) * 24634.6)
+    h2 = _frac(np.sin(row * 17.9 + 2.3) * 13579.2)
+    return ((h1 < 0.16) & (fall < 0.25 + 0.7 * h2)).astype(float)
+
+
+def roof_paint(m, t, X, Y, Z, up, FALL, dith):
+    """old green glaze, every tile its own (a course every 0.22 yd down the slope, a tile every 0.32 yd across), by
+    cause: the water's runs stain whole columns of tiles from where it gathers down to the eave; the keepers' repairs
+    are runs of unglazed tiles along a course where a leak was, a few tiles long, never a block; the tiles gone are
+    near the fallen stretch and the eaves, each hole showing its batten over the dark of the hall"""
+    x, z, fl = X[m], Z[m], FALL[m]
+    row = np.floor(x / 0.32)
+    course = np.floor(z / 0.22)
+    h = _frac(np.sin(row * 12.9898 + course * 78.233) * 43758.5453)
+    tt = t * 0.92 + (h - 0.5) * 0.1
+    tt = np.where(roof_runs(x, fl) > 0, tt * 0.78, tt)
+    hc = _frac(np.sin(course * 91.7 + 3.3) * 17345.1)
+    seg = np.floor((row + hc * 9.0) / 6.0)
+    hs = _frac(np.sin(seg * 37.1 + course * 11.3) * 9123.7)
+    start = _frac(np.sin(seg * 5.3 + course * 2.9) * 4231.9) * 3.0
+    pos_ = (row + hc * 9.0) - seg * 6.0
+    rust = (hs < 0.09) & (pos_ >= start) & (pos_ < start + 2.0 + 3.0 * hs / 0.09)
+    col = np.where(rust[:, None], tone(R["tile_r"], tt, dith[m]), tone(R["tile_g"], tt, dith[m]))
+    breach = np.clip(1.0 - np.maximum(np.maximum(-4.4 - x, x - 2.6), 0) / 1.5, 0, 1) * (Y[m] > 0)
+    p_gone = 0.004 + 0.06 * breach * (1 - fl) + 0.02 * (fl < 0.12)
+    gone = (_frac(h * 77.7) < p_gone) & (up[m] > 0.3)
+    within = _frac(z / 0.22)
+    hole = np.where((within > 0.68)[:, None], tone(R["wood"], t * 0.6, dith[m]), tone(R["wood"], t * 0.22, dith[m]))
+    return np.where(gone[:, None], hole, col)
 
 
 def wall_maps(n, pos, mat, along, wall):
@@ -371,6 +415,12 @@ def paint_floor(img, d, v, FM, dith):
         stair = (X > 7.5) & (X < 10.6) & (np.abs(Y) < 1.7)
         dens = np.clip(0.05 + 0.8 * corner + 0.25 * stair, 0, 0.95)
         img = _leaves_on(img, flat, v, X, Y, dens[flat], np.full(int(flat.sum()), 0.4), 31)
+    # leaves lodge only where a steep glazed roof can hold them: the lowest courses, against the eave's lip
+    tm = mat == 7
+    if tm.any():
+        fl = roof_fall(X, pos[..., 2])
+        dens = 0.4 * np.clip(1 - fl / 0.14, 0, 1) ** 1.5
+        img = _leaves_on(img, tm, v, X, Y, dens[tm], np.full(int(tm.sum()), 0.35), 51)
     # rain standing in the pits: tea-dark and still, the crowns' dark in it and a little grey sky toward its far side;
     # pigment pooled in a dark band at the wet edge, a few leaves afloat
     wm = mat == 15

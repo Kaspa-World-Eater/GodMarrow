@@ -277,3 +277,37 @@ The groups read.
 **Grade:** the walls B+; the piece **B** (up from B-). **Next worst:** the roof. Its rust-repair tiles and missing tiles
 are a checker of square patches that reads as a pixel grid, and it is the biggest shape in the frame. Then the stair,
 the giant trees and the drizzle.
+
+**Rules check paused** (2026-10-08): the third reminder with no word from Derek, so by his pause rule the reminder is
+off until he next writes. Pass 9, the roof, is next when work resumes.
+
+## Rules check, 2026-10-09 (Derek: "Yes, continue"; the reminder restarted), then pass 9: the roof
+
+**Pass 8 against the checklist:**
+- Lines 1, 2, 3, 6 and 11 pass.
+- **Values (5) and paint (7) fail on the roof,** the biggest shape in the frame. Its rust repairs were blocks chosen by
+  low-frequency noise over the tile grid, and its missing tiles were single dark squares spread evenly: a pixel
+  checker, and the camouflage trap again at the scale of tiles.
+- **Light (4):** the candle is still missing.
+- **Detail (9):** the stair is still short.
+- **Life (10):** in the game, later.
+- **Skeptic round (12):** beside the ruins scene, its roofs read as fabric worn by weather; ours read as a grid.
+
+**Pass 9: the roof by cause** (`paint3d.roof_paint`, `roof_runs`, `roof_fall`). Every tile is its own, and each knows
+how far down its slope it lies.
+- **The water's runs:** whole columns of tiles are stained from where the water gathers down to the eave.
+- **The keepers' repairs:** runs of unglazed tiles along one course where a leak was, two to five tiles long, never a
+  block.
+- **The tiles gone** cluster round the fallen stretch and along the eaves, rare elsewhere. Each hole shows its batten
+  over the dark of the hall.
+- **The moss** grows from the eave up, where the water slows and the debris lodges, and along the runs. The steep upper
+  courses shed it.
+- **Leaves lodge only in the lowest courses,** against the eave's lip. The first try scattered them up the whole slope,
+  where a steep glaze can't hold a leaf, and they read as rust spots.
+- **The glaze sits a step darker,** so the whitewash leads.
+
+**Grade:** the roof B, the piece **B**. **Still short:**
+- the moss in the lower courses barely separates from the glaze;
+- the missing tiles are still plain dark slots.
+
+**Next worst:** the stair's readability. Then the giant trees and the drizzle, the guardian and the candle.
