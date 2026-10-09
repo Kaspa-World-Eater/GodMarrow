@@ -84,3 +84,29 @@ print holding a little of the red.
 
 **Next:** the sea as its own pass. The breaker gets real 3D form (the crest curling over, on the 3D road), the swells'
 backs carry the sky in dragged strokes, and foam lies in the troughs behind the break.
+
+## Rules check, 2026-10-09 (Derek's last word: the corpses, "reference those effects"), then pass 2: the sea
+
+Checked against pass 1:
+- Lines 2, 3, 8 and 11 pass for the beach (true scale with the Ossuarch, real ripples and prints, the dead sunk in
+  the sand, the game's camera).
+- **Lines 5, 7 and 9 fail on the sea,** the worst failure: one flat red sheet, no swell bands, a breaker that is a
+  band, foam that does not cling. The lore's line: "heavy breakers that fold late and fall slowly, dark foam that
+  clings".
+
+**Pass 2, the sea:**
+- **The breaker is real form** (`redwater3d.breaker`, `curl_profile`): a sheet swept along the shore through its
+  cross-section. The back rises slow and heavy, the lip is thrown forward over a dark hollow and curls down, and the
+  curl changes slowly along its length, sections already collapsed to a slumped wall. The height field keeps only a low
+  swell under it.
+- **Its paint:** the hollow under the lip in the blood's own shadow; the lip's face a step lighter; a thin broken line
+  of foam along the lip's top, strands clinging down the face, and the spent foam lying in strands behind the break,
+  thinning toward the beach.
+- **The swells' backs** carry the grey sky in dragged strokes along their line. The dither falls only at a tone's
+  edge; the first try showed rows of dots across the whole sea, against rule 2.
+
+**Grade: the sea C+, the piece C+.** A breaking wave reads as one, dark and heavy, from the beach. **Still short:**
+- the lip's foam breaks into blocky rectangles;
+- the spent strands curl too neatly;
+- the swells beyond the break are bands, not yet heavy shapes;
+- the breaker doesn't move (that comes with the game's animation pass: "fold late and fall slowly").

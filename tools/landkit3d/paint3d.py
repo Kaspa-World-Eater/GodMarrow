@@ -387,21 +387,33 @@ def sea_paint(m, t, X, Y, Z, n, soft, dith, Fm):
     # the swells by their real slopes: their backs, turned from us, take the grey sky; their faces toward us are the
     # blood's own dark body (the slope along the shore's normal, pushed so a swell reads as a band of tones)
     n_s = -(n[m][:, 0] + n[m][:, 1]) / np.sqrt(2)
-    lv = np.clip(t, 0, 0.6) * 2.0 + n_s * 5.5 + (churn - 0.5) * 0.45 + dith[m] * 0.3
+    lv = np.clip(t, 0, 0.6) * 2.0 + n_s * 5.5 + (churn - 0.5) * 0.45
+    fr_ = lv - np.floor(lv)
+    lv = np.where(np.abs(fr_ - 0.5) < 0.12, lv + (dith[m] - 0.5) * 0.24, lv)          # dither only at a tone's edge
     col = np.where((lv > 1.75)[:, None], BL.C2, np.where((lv > 0.95)[:, None], BL.C1, BL.C0))
     col = col * (0.75 + np.clip(t, 0, 0.6)[:, None] * 0.6)
     light = np.clip(t * 1.25, 0, 0.55)
     # the light in dabs: where the surface turns from us the grey sky lies on it, dragged along the swells' line, few
     V = np.array([0.612, 0.612, 0.5])
     fres = (1 - np.clip((n[m] * V).sum(1), 0, 1)) ** 2
-    dab = (fres > 0.3) & (vn(t_ * 0.3 + 3.0, s_ * 3.5) > 0.74 - fres * 0.25)
+    dab = (fres > 0.22) & (vn(t_ * 0.18 + 3.0, s_ * 4.0) + vn(t_ * 1.1, s_ * 6.0) * 0.25 > 0.78 - fres * 0.35)
     col = np.where(dab[:, None], BL.C2 * 0.95 + np.array([0.05, 0.04, 0.05]), col)
+    # the breaker's curl: under the lip the blood is in its own shadow (normals turned down or toward us, deep in)
+    hollow = (n[m][:, 2] < 0.2) & (z > 0.15)
+    col = np.where(hollow[:, None], BL.C0 * 0.9, col)
+    lipf = (n[m][:, 2] > -0.2) & (n[m][:, 2] < 0.55) & (z > 0.55) & (n_s < -0.15)
+    col = np.where(lipf[:, None], BL.C1 * 1.1, col)
     # foam: dark, it clings on the breakers' crests in thin strands and lies in strands behind them, never pale blobs
     if hasattr(Fm, "water"):
         _, crest = Fm.water(s_, t_)
-        foam = (crest > 0.25) & (np.abs(vn(t_ * 0.9, s_ * 3.0) - 0.5) < 0.06 + crest * 0.05)
-        foam |= (crest > 0.05) & (np.abs(vn(t_ * 0.5 + 9, s_ * 2.0) - 0.5) < 0.025)
-        col = np.where(foam[:, None], np.array([0.22, 0.11, 0.11]) * (0.7 + light[:, None]), col)
+        # on the curl: clinging at the lip's leading edge and on the slumped sections, in runs down the face
+        # along the lip's top a thin broken line, then strands clinging down the face
+        foam = (z > 0.7) & (np.abs(n[m][:, 2] - 0.55) < 0.25) & (vn(t_ * 2.6, 1.0) > 0.38)
+        foam |= (z > 0.25) & (z < 0.7) & (n[m][:, 2] < 0.3) & (np.abs(vn(t_ * 4.0 + 4, z * 1.5) - 0.5) < 0.04)
+        # behind the break, the spent foam lies in strands dragged along the shore, thinning toward the beach
+        spent = np.clip((s_ - 66.5) / 6.0, 0, 1) * (s_ < 73.5)
+        foam |= (z < 0.15) & (np.abs(vn(t_ * 0.35 + 9, s_ * 1.6) - 0.5) < 0.05 * spent) & (vn(t_ * 2.0, s_ * 2.0) > 0.35)
+        col = np.where(foam[:, None], np.array([0.27, 0.15, 0.14]) * (0.75 + light[:, None]), col)
     # the shallows over the sand: the sand's red-black shows up through the blood, more the shallower, in dithered
     # steps (never contour lines); at its very edge a thin dark wet line, the pigment pooled
     sh = np.clip(1.0 - (z - g) / 0.35, 0, 1)

@@ -49,6 +49,47 @@ def sea():
     _st_grid("red_water", 69.96, 110.0, -16.0, 16.0, 0.1, lambda s, t: SF.water(s, t)[0], "blood", keep)
 
 
+def curl_profile(k):
+    """the breaker's cross-section (ds seaward of its line, dz above the sea) at a phase k along the shore: the back
+    rising slow and heavy, the crest, the lip thrown forward over a dark hollow and curling down; where k is low the
+    lip has already fallen and the wave is a slumped wall of foam"""
+    lip = 0.35 + 0.65 * k                                             # how far the lip has thrown forward
+    h = 0.75 + 0.45 * k
+    return [(2.6, 0.0), (1.5, h * 0.3), (0.7, h * 0.7), (0.2, h * 0.96), (-0.25 * lip, h), (-0.6 * lip, h * 0.9),
+            (-0.85 * lip, h * 0.68), (-0.92 * lip, h * 0.45), (-0.8 * lip, h * 0.3), (-0.55 * lip, h * 0.33)]
+
+
+def breaker():
+    """the line of breakers folding late (the area page), as real form on the 3D road: a sheet swept along the shore
+    through its cross-section, the curl changing slowly along its length, sections already collapsed"""
+    ts = np.arange(-16.0, 16.0, 0.12)
+    rows = []
+    for t_ in ts:
+        bs = 73.8 + 0.8 * math.sin(t_ / 5.0)
+        k = 0.5 + 0.5 * math.sin(t_ / 3.3 + 1.0) * math.cos(t_ / 7.1)
+        prof = curl_profile(max(0.0, min(1.0, k)))
+        row = []
+        for ds, dz in prof:
+            x, y = S.xy(bs + ds, t_)
+            base = float(SF.water(np.array([bs + 2.6]), np.array([t_]))[0][0]) if ds > 2.5 else 0.0
+            row.append((x, y, dz + base))
+        rows.append(row)
+    n = len(rows[0])
+    verts = [p for row in rows for p in row]
+    faces = []
+    for j in range(len(rows) - 1):
+        for i in range(n - 1):
+            a = j * n + i
+            faces.append((a, a + 1, a + n + 1, a + n))
+    me = P.bpy.data.meshes.new("breaker")
+    me.from_pydata(verts, [], faces)
+    me.polygons.foreach_set("use_smooth", [True] * len(faces))
+    me.update()
+    o = P._link("breaker", me, "blood")
+    m = o.modifiers.new("solid", "SOLIDIFY")
+    m.thickness = 0.04
+
+
 def wrack():
     """the high-water line's wrack (chapter 10): kelp heaped and strewn, and what the Red gave back"""
     rnd = random.Random(4)
@@ -166,5 +207,6 @@ def build(root, material):
     P.init(root, material)
     ground()
     sea()
+    breaker()
     wrack()
     corpses()

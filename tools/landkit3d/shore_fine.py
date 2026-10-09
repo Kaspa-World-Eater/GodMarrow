@@ -84,7 +84,7 @@ def water(s, t):
     swell = a * ((0.5 + 0.5 * np.sin(ph)) ** 2.2 - 0.3)
     bs = 73.8 + 0.8 * np.sin(t / 5.0)                              # the breaker line, out past the swash
     d = s - bs
-    crest = 0.6 * np.where(d < 0, np.exp(-(d / 0.7) ** 2), np.exp(-(d / 1.8) ** 2))    # steep landward face
+    crest = 0.35 * np.where(d < 0, np.exp(-(d / 0.9) ** 2), np.exp(-(d / 1.8) ** 2))   # the curl itself is 3D
     sea = swell + crest * F3.smooth(WATERLINE + 3.5, WATERLINE + 6.0, s)
     film = g + 0.02
     up = (s > swash_limit(t)) & (g >= sea)
