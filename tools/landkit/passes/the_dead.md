@@ -172,3 +172,10 @@ The face-down dead keep their hoods shut over their heads. **Grade: B-** for the
 passes. **For Derek's grade:** the dead on the strand and in the Red (cove rebaked after pass 8; passes 9 and 10 are in
 the builder for the next bake). **Still to reach the standard:** the wet sheen and the sand packed into the cloth when
 painted; the skeleton's pelvis and hands; the dead nearer the lantern, where their form turns most.
+
+## Rules check (after pass 10)
+
+**Read:** `MASTER_RULES` (checklist 11, seen as the player sees it); the area's opening (the dead wear the pilgrim's
+shape). **Worst open line:** 11; passes 9 and 10 (the bloat, the faces) are in the builder but not yet in the game.
+**Done:** the cove rebaked from the new builder (then the cove's and the cave's exports, which put back the shore field
+and the cave's link).
