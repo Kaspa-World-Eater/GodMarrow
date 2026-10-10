@@ -6,8 +6,8 @@
    "what": "the face it wore",
    "pool": "cards",
    "ask": [
-    "Its brow. Every god keeps a drawer of faces. Pick it one.",
-    "The brow first. A face. It came up without one."
+    "Its brow. Every god keeps a drawer of faces. Three of them, blind, out of the deck. It only gets to wear one.",
+    "The brow first. A face. It came up without one. Pull three, face down, and we'll see who's in the drawer."
    ]
   },
   {
@@ -16,8 +16,8 @@
    "what": "what it is after",
    "pool": "seeks",
    "ask": [
-    "The heart. What it's after. They're all after marrow, whatever they call it.",
-    "Over the heart, now. Something wants it back. Draw what."
+    "The heart. What it's after. They're all after marrow, whatever they call it. Three, blind.",
+    "Over the heart, now. Something wants it back. Draw three, and don't look."
    ]
   },
   {
@@ -26,8 +26,8 @@
    "what": "what it holds",
    "pool": "answers",
    "ask": [
-    "Left hand. Something was in its hand when it came up out of the Red. Draw what.",
-    "The left hand. It's holding on to something. They always are."
+    "Left hand. Something was in its hand when it came up out of the Red. Three from the deck. Blind.",
+    "The left hand. It's holding on to something. They always are. Draw three, and we'll see what."
    ]
   },
   {
@@ -36,8 +36,8 @@
    "what": "what it lets go",
    "pool": "sacs",
    "ask": [
-    "Right hand. What it lets go of. Something always stays on the step with the rest.",
-    "The right hand opens. Old Scythe keeps a count; leave him something to count."
+    "Right hand. What it lets go of. Something always stays on the step with the rest. Three, face down.",
+    "The right hand opens. Old Scythe keeps a count. Pull three, and leave him something to count."
    ]
   },
   {
@@ -46,8 +46,8 @@
    "what": "what it fears",
    "pool": "fears",
    "ask": [
-    "The belly. That's where the fear sits. It'll lie about this one; the card won't.",
-    "Down in the belly. Put the fear here, little hide, where it can be counted."
+    "The belly. That's where the fear sits. It'll lie about this one. The cards won't. Three, blind.",
+    "Down in the belly. Three, little hide, face down, where the fear can be counted."
    ]
   },
   {
@@ -56,8 +56,8 @@
    "what": "the road it came by",
    "pool": "roads",
    "ask": [
-    "The feet. A road. It came up a stair out of a pool an hour ago. Give it a road anyway. A road's a kindness.",
-    "Feet. Pick it a road. It'll have walked it by mourning."
+    "The feet. A road. It came up a stair out of a pool an hour ago. Give it a road anyway. A road's a kindness. Draw three.",
+    "Feet. Three roads, face down. It'll have walked one of them by mourning."
    ]
   },
   {
@@ -66,7 +66,7 @@
    "what": "what lies beneath",
    "pool": "cards",
    "ask": [
-    "And one under it. Face down, in the Red. We don't read that one yet. ...Red. Read. Ha.",
+    "And one under it. Face down, in the Red. We haven't read that one yet. Read. Red. Always red.",
     "The last goes underneath, where the Red is. Leave it lying. It'll turn when it's ready."
    ]
   }
@@ -78,7 +78,7 @@
   "rhand": "It let go of {p}.",
   "belly": "Down in the belly, it's afraid of {p}.",
   "feet": "It came the way of {p}.",
-  "under": "And under it, in the Red, face down till now: {p}. {w} wears that one."
+  "under": "And under it, in the Red, face down till now, {p}. {w} wears that one."
  },
  "open": [
   "Here's how it lies.",
@@ -107,31 +107,31 @@
  },
  "read": {
   "brow": [
-   "On the brow: the face it shows the Hide. {g}. That's what they'll see coming. Whether it's true is another card.",
-   "So that's the face it wears: {g}. Faces are lent here. It'll give this one back, one day."
+   "On the brow, the face it shows the Hide. {G}. That's what they'll see coming. Whether it's true is another card.",
+   "So that's the face it wears. {G}. Faces are lent here. It'll give this one back, one day."
   ],
   "heart": [
-   "Over the heart, what it wants: {g}. It'll walk the whole Hide for that, and never know why.",
-   "That's what's in its heart, then: {g}. Wanting is the oldest thing on the Hide. Older than the Hide."
+   "Over the heart lies what it wants, and what it wants is {g}. It'll walk the whole Hide for that, and never know why.",
+   "That's what's in its heart, then. {G}. Wanting is the oldest thing on the Hide. Older than the Hide."
   ],
   "lhand": [
-   "In the left hand, what it holds and won't put down: {g}. It came up out of the pool already holding it.",
+   "The left hand holds what it won't put down, and that's {g}. It came up out of the pool already holding it.",
    "The left hand closes, and what's in it is {g}. It won't open, not for anything. Watch it try."
   ],
   "rhand": [
    "The right hand opens, and what it lets go is {g}. Something always stays on the step with the rest. Old Scythe counts it.",
-   "What it gives up: {g}. It won't miss it. Not yet."
+   "What it gives up is {g}. It won't miss it. Not yet."
   ],
   "belly": [
-   "Down in the belly, where the fear lives: {g}. Mind that one. Fear's the only thing here that never lies.",
-   "So that's what it's afraid of: {g}. Good. The ones afraid of nothing go first."
+   "Down in the belly, where the fear lives. {G}. Mind that one. Fear's the only thing here that never lies.",
+   "So that's what it's afraid of. {G}. Good. The ones afraid of nothing go first."
   ],
   "feet": [
-   "Under the feet, the road that brought it: {g}. Roads don't end on the Hide. They just stop.",
+   "Under the feet, the road that brought it. {G}. Roads don't end on the Hide. They just stop.",
    "It came here by {g}. It'll leave by it too. That's how roads are."
   ],
   "under": [
-   "And under it all, in the Red, face down till now: {g}. That's the one that's been doing the drawing. All along."
+   "And under it all, in the Red, face down till now. {G}. That's the one that's been doing the drawing. All along."
   ]
  },
  "deck_open": [
@@ -142,7 +142,7 @@
   "It didn't take that card. That card took it. They always do.",
   "The deck reads the hand before the hand reads the deck. It's been waiting for this hand.",
   "Hear that? A card comes off the deck the way a tooth comes out. Something's left a gap.",
-  "Don't look so pleased. Nobody chooses. The cards come up the way the dead come up: when they're ready.",
+  "Don't look so pleased. Nobody chooses. The cards come up the way the dead come up, when they're ready.",
   "There. It reached, and the deck let it. The deck doesn't let everyone.",
   "Warm where it touched. They like this one. That's never good."
  ],
@@ -172,7 +172,7 @@
   ],
   "belly": [
    "What it feared was {g}. That fear will keep it alive longer than any blade.",
-   "And under the wanting, the fear: {g}. It'll meet that one again. Fears come round."
+   "And under the wanting, the fear. {G}. It'll meet that one again. Fears come round."
   ],
   "lhand": [
    "In its left hand it carried a thing it would not put down, and the thing was {g}.",
@@ -183,7 +183,7 @@
    "And the right hand opened, and what fell out of it was {g}. The step kept that, with all the rest."
   ],
   "under": [
-   "But that was only the top of it. Under all of it, face down in the Red the whole time, lay the card that did the drawing: {p}. {W} wears that one now. One day it might be this one's turn.",
+   "But that was only the top of it. Under all of it, face down in the Red the whole time, lay the card that did the drawing, {p}. {W} wears that one now. One day it might be this one's turn.",
    "That's what lay on top. Underneath, in the Red, where nobody looks, it was {p} all along. {W} has that one now. Mantles change hands. That's what hands are for."
   ],
   "close": [
@@ -191,7 +191,12 @@
    "And that's where it begins. Go on. The sand's waiting. It always is.",
    "Isn't it horrible? A moment ago it was nothing, and it was so quiet."
   ],
-  "prophecy": "And the last thing the cards said, they said to it, not to me:"
+  "prophecy": "And the last thing the cards said, they said to it, not to me.",
+  "go": [
+   "Now up, and look into the mirror. The black one, in the face's mouth. Nothing looks back from it. Walk on into it anyway. There's no door here, and there never was. Only that.",
+   "There's the way out, in the great face's mouth. The black mirror. Go and look into it. It won't show this one. It doesn't show anyone. Step into the dark of it, and the sand's on the other side.",
+   "Go on, then. The mirror, there, in the mouth of the face. Look into it till it looks like nothing, and walk in. ...And don't look back. There's nothing to see, and it'll mind."
+  ]
  },
  "tale_order": [
   "open",
@@ -204,43 +209,43 @@
   "under"
  ],
  "on": {
-  "brow": "On the brow",
-  "heart": "Over the heart",
-  "lhand": "In the left hand",
-  "rhand": "Out of the right hand",
-  "belly": "In the belly",
-  "feet": "Under the feet"
+  "brow": "On the brow it would mean {g}.",
+  "heart": "Over the heart it would mean {g}.",
+  "lhand": "In the left hand it would mean {g}.",
+  "rhand": "What the right hand lets go would be {g}.",
+  "belly": "In the belly it would mean {g}.",
+  "feet": "Under the feet it would mean {g}."
  },
  "deal": {
   "brow": [
-   "Three faces. It can wear one. The others go back in the drawer.",
-   "Three come up for the brow. Choose. Choosing is the only freedom the deck allows, and it lies about that."
+   "Three faces, turned up. It can wear one. The others go back in the drawer.",
+   "There. Three came up for the brow. Choose. Choosing is the only freedom the deck allows, and it lies about that."
   ],
   "heart": [
-   "Three for the heart. What does it want? Go on. It's allowed to want.",
+   "Three for the heart, face up now. What does it want? Go on. It's allowed to want.",
    "The heart. Three of them, face up, and every one of them hungry."
   ],
   "lhand": [
-   "Three for the left hand. What does it hold on to? Pick, and it'll never put it down.",
-   "Left hand. Three things it might be holding. Only one fits the hand."
+   "Three it drew for the left hand. What does it hold on to? Pick, and it'll never put it down.",
+   "Left hand. Three things it might be holding, turned up. Only one fits the hand."
   ],
   "rhand": [
-   "Three for the right hand. What does it let go of? Choose what to lose. That's a kindness. Most never get to.",
-   "Right hand. Something has to fall out of it. Three come up. Pick the one it can spare."
+   "Three it drew for the right hand. What does it let go of? Choose what to lose. That's a kindness. Most never get to.",
+   "Right hand. Something has to fall out of it. Three came up. Pick the one it can spare."
   ],
   "belly": [
    "Three for the belly. Choose its fear. ...Choose carefully. It'll meet that one again.",
    "The belly. Three fears, face up. It only gets to keep one."
   ],
   "feet": [
-   "Three roads. It came by one of them. Pick which, and it'll remember the walking.",
+   "Three roads, turned up. It came by one of them. Pick which, and it'll remember the walking.",
    "The feet. Three roads lie open, and every one of them ends here."
   ]
  },
  "chose": [
-  "Chosen. Now let's see if the deck agrees.",
-  "That one. The deck had a feeling it would.",
-  "Good. The other two will remember being passed over."
+  "Chosen. The other two go back in the deck. Now let's see if the deck agrees.",
+  "That one. The deck had a feeling it would. The rest go home.",
+  "Good. The other two go back in, and they'll remember being passed over."
  ],
  "turned": [
   "...And the deck turns it over as it lands. It chose. The deck chose back.",
@@ -309,7 +314,7 @@
    "rev": "the one who keeps it under",
    "wears": "Old Scythe, in its pit",
    "say": "The Gleaner. Old Scythe himself, down in his pit under the bone. He comes up once an age to take the harvest, and he has never missed one. Not one stalk. Not one.",
-   "say_rev": "The Gleaner, reversed: the one who keeps him under. An Ossuarch with a sliver of the scythe in his plate, counting, always counting, so the old harvester stays down a little longer.",
+   "say_rev": "The Gleaner, reversed, is the one who keeps him under. An Ossuarch with a sliver of the scythe in his plate, counting, always counting, so the old harvester stays down a little longer.",
    "gist": "the end that comes for everything",
    "gist_rev": "to keep the end under, a little longer"
   },
@@ -320,7 +325,7 @@
    "rev": "the crowd that came to watch",
    "wears": "the girl in the iron",
    "say": "The Weeping Saint. She bleeds so they'll believe her, and they do; they always do. The girl in the iron wept until the weeping was the only thing left of her, and they made a faith of the tears.",
-   "say_rev": "The Saint, reversed: the crowd that came to watch her. A thousand faces and not one of them looking at her. They came for the weeping. They'd come again.",
+   "say_rev": "The Saint, reversed, is the crowd that came to watch her. A thousand faces and not one of them looking at her. They came for the weeping. They'd come again.",
    "gist": "to suffer, so as to be believed",
    "gist_rev": "to watch, and do nothing"
   },
@@ -331,7 +336,7 @@
    "rev": "the eyes in the Needle",
    "wears": "the Citadel's oldest reader",
    "say": "The Scholar's Eye. Reads, and reads, and reads, until the page starts reading back. The oldest reader in the Citadel still sits at his book. He hasn't turned a page in an age. The page turns him.",
-   "say_rev": "The Eye, turned inward: the eyes in the Needle, looking back. Once they've seen you, they don't stop. ...It looked. It shouldn't have looked.",
+   "say_rev": "The Eye, turned inward. The eyes in the Needle, looking back. Once they've seen you, they don't stop. ...It looked. It shouldn't have looked.",
    "gist": "to know, whatever knowing costs",
    "gist_rev": "the eyes that look back"
   },
@@ -353,7 +358,7 @@
    "rev": "the one that is eaten",
    "wears": "the Second Mouth",
    "say": "The Knot of Mouths. Many mouths and one hunger, eating to keep and keeping to eat. The Second Mouth preaches it. The Tallow-Mother lives it. Round and round it goes.",
-   "say_rev": "The Knot, reversed: the one that's eaten. Someone has to be the meal. Somebody always is. Better to know which one you are.",
+   "say_rev": "The Knot, reversed. The one that's eaten. Someone has to be the meal. Somebody always is. Better to know which one you are.",
    "gist": "to eat, and keep what it eats",
    "gist_rev": "to be eaten"
   },
@@ -363,8 +368,8 @@
    "one": "the one that burns down to give light",
    "rev": "the dark at the edge of the light",
    "wears": "every soul in a lantern",
-   "say": "The Wick. It burns down to give a little light, and the light is all that's left of it. Every lantern on the Hide has one inside: a soul that chose to stay and burn instead of going out with the breath.",
-   "say_rev": "The Wick, reversed: the dark just past the edge of the light. Always there. Always patient. The light only ever pushes it back a step.",
+   "say": "The Wick. It burns down to give a little light, and the light is all that's left of it. Every lantern on the Hide has one inside, a soul that chose to stay and burn instead of going out with the breath.",
+   "say_rev": "The Wick, reversed, is the dark just past the edge of the light. Always there. Always patient. The light only ever pushes it back a step.",
    "gist": "to burn itself down for a little light",
    "gist_rev": "the dark at the edge of every light"
   },
@@ -375,7 +380,7 @@
    "rev": "the one who is mourned",
    "wears": "the Grandmother of the Red",
    "say": "The Mourner. She cuts her hair for every one the Red takes, and the Red takes them all. The Grandmother of the Red has none left. She cuts it anyway. The shore folk say you can hear the scissors in the surf.",
-   "say_rev": "The Mourner, reversed: the one being mourned. ...Somebody, somewhere, cut their hair for it already. Long before it came up out of the pool.",
+   "say_rev": "The Mourner, reversed, is the one being mourned. ...Somebody, somewhere, cut their hair for it already. Long before it came up out of the pool.",
    "gist": "grief that cuts and keeps cutting",
    "gist_rev": "to be mourned, and not know it"
   },
@@ -386,7 +391,7 @@
    "rev": "the one who opens it",
    "wears": "the Ossuarch",
    "say": "The Ossuary Key. It locks the count. Nine, and nine, and nine, and every bone in its place. The Pale Order's whole faith is a key turned in a lock, and the lock is the world.",
-   "say_rev": "The Key, reversed: the one who opens it. Somebody always does. That's why there's a key. That's why there's always somebody looking for it.",
+   "say_rev": "The Key, reversed. The one who opens it. Somebody always does. That's why there's a key. That's why there's always somebody looking for it.",
    "gist": "to lock the count and keep it",
    "gist_rev": "to open what was locked"
   },
@@ -397,7 +402,7 @@
    "rev": "the house that answers",
    "wears": "the Ghauul, knocking for marrow",
    "say": "The Beggar's Cup. It knocks at the door with an empty bowl and asks, very politely, for marrow. The Ghauul ask like that. So does hunger. So does the Hide.",
-   "say_rev": "The Cup, reversed: the house that answers the door. Don't answer the door. Whatever knocks at night on the Hide, don't answer.",
+   "say_rev": "The Cup, reversed, is the house that answers the door. Don't answer the door. Whatever knocks at night on the Hide, don't answer.",
    "gist": "to ask, and keep on asking",
    "gist_rev": "to open the door to what knocks"
   },
@@ -408,7 +413,7 @@
    "rev": "the bell rung in tune",
    "wears": "the drowned king's court",
    "say": "The Drowned Bell. It rings under the water where nobody living hears it. The drowned king's court still walks down the old one's spine to the sound of it, in step, the whole way.",
-   "say_rev": "The Bell, reversed: rung in tune at last. That should frighten anybody. A drowned bell isn't meant to sound right.",
+   "say_rev": "The Bell, reversed, and rung in tune at last. That should frighten anybody. A drowned bell isn't meant to sound right.",
    "gist": "a call only the drowned can hear",
    "gist_rev": "a bell rung true, for once"
   },
@@ -419,7 +424,7 @@
    "rev": "the one who buys",
    "wears": "the merchant",
    "say": "The First Coin. Somebody sold something at the end of the world, and here's what they got for it. The merchant on the shore picks the dead clean and sells it back. Somebody's always selling.",
-   "say_rev": "The Coin, reversed: the one who buys. What did it buy? ...No. Don't tell me. I'd rather not know what it paid.",
+   "say_rev": "The Coin, reversed. The one who buys. What did it buy? ...No. Don't tell me. I'd rather not know what it paid.",
    "gist": "to sell what is left",
    "gist_rev": "to buy, and pay too much"
   },
@@ -430,7 +435,7 @@
    "rev": "the one that cracks",
    "wears": "the Deep",
    "say": "The Kiln. It hardens what's given to it. Soft goes in, and doesn't come out soft. The Deep sets the old one's blood to iron in the dark under everything, slowly, the way a kiln does.",
-   "say_rev": "The Kiln, reversed: the one that cracks in the firing. Something always cracks. Better it cracks in the fire than after.",
+   "say_rev": "The Kiln, reversed, is the one that cracks in the firing. Something always cracks. Better it cracks in the fire than after.",
    "gist": "to be hardened by what it goes through",
    "gist_rev": "to crack in the fire"
   },
@@ -441,7 +446,7 @@
    "rev": "the one who reweaves",
    "wears": "the Veiled Crone",
    "say": "The Unravelling Loom. Somebody's picking it apart, thread by thread, and humming while they do it. The Crone behind her veil pulls out what was woven wrong. It's mostly woven wrong.",
-   "say_rev": "The Loom, reversed: the one who weaves it back. Badly. Knots and lumps, threads from somebody else's life. But it holds. Mostly it holds.",
+   "say_rev": "The Loom, reversed. The one who weaves it back. Badly. Knots and lumps, threads from somebody else's life. But it holds. Mostly it holds.",
    "gist": "to be unpicked, thread by thread",
    "gist_rev": "to be stitched back together, badly"
   },
@@ -452,7 +457,7 @@
    "rev": "the one who lets it go",
    "wears": "nobody now",
    "say": "The Lantern-Wright. The one who made the lanterns, and kept what was lost inside them. The makers were hunted out. There are fewer lanterns every year, and nobody left who knows how.",
-   "say_rev": "The Wright, reversed: the one who lets it go. The light goes out the top, they say, like breath. Some of them want to go. Most of them do.",
+   "say_rev": "The Wright, reversed, is the one who lets it go. The light goes out the top, they say, like breath. Some of them want to go. Most of them do.",
    "gist": "to keep what was lost",
    "gist_rev": "to let go what it kept"
   },
@@ -463,7 +468,7 @@
    "rev": "the rest between notes",
    "wears": "the Choir, under the crypts",
    "say": "The Drowned Choir. Under the crypts they're still holding the note. They've held it so long the stone hums with it, and the water in the low places shivers when you walk by.",
-   "say_rev": "The Choir, reversed: the rest between the notes. Listen. ...There. That. That's what they're afraid of.",
+   "say_rev": "The Choir, reversed, is the rest between the notes. Listen. ...There. That. That's what they're afraid of.",
    "gist": "to hold on past all breath",
    "gist_rev": "the silence between notes"
   },
@@ -473,8 +478,8 @@
    "one": "the one who owes",
    "rev": "the one who comes to collect",
    "wears": "the Tithed, every one left",
-   "say": "The Tithe. It owes. Everyone left owes: a tenth of everything, back to whatever gave them the mourning. Nobody remembers taking the loan. Everybody pays.",
-   "say_rev": "The Tithe, reversed: the one who comes to collect. On foot, at night, very polite. Knock, knock. Not the tenth, this time. The rest.",
+   "say": "The Tithe. It owes. Everyone left owes a tenth of everything, back to whatever gave them the mourning. Nobody remembers taking the loan. Everybody pays.",
+   "say_rev": "The Tithe, reversed. The one who comes to collect. On foot, at night, very polite. Knock, knock. Not the tenth, this time. The rest.",
    "gist": "to owe, and pay",
    "gist_rev": "the one who comes to collect"
   },
@@ -485,7 +490,7 @@
    "rev": "the city that would obey if it could",
    "wears": "the Man in the Rust, on the dark moon",
    "say": "The Hollow Crown. Orders, given and given, and nobody obeying. The Man in the Rust sits up on the dark moon and still gives them. The Hide doesn't listen. It never did.",
-   "say_rev": "The Crown, reversed: the city that would obey if it could. It can't. It's empty. Not one left in it to hear the orders.",
+   "say_rev": "The Crown, reversed, is the city that would obey if it could. It can't. It's empty. Not one left in it to hear the orders.",
    "gist": "to command, and not be obeyed",
    "gist_rev": "to want to obey, and have nothing left"
   }

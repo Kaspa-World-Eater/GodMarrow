@@ -139,14 +139,14 @@ const LAYERS := {
 	"fall": [["fall_body", 0.0], ["fall_knocks", 0.12]],
 	"cast_mirror": [["glass", 0.0], ["cast_mirror_ring", 0.0]],
 }
-const SGAIN := {"step_stone": -22.0, "step_ash": -21.0, "step_leaf": -16.0, "hit": -11.0, "heavy": -8.0, "hurt": -10.0,
+const SGAIN := {"step_stone": -28.0, "step_ash": -27.0, "step_leaf": -22.0, "hit": -11.0, "heavy": -8.0, "hurt": -10.0,
 	"fall_body": -12.0, "break_iron": -12.0, "glass": -15.0, "bell_far": -20.0, "lid": -12.0, "roll": -12.0, "hinge": -8.0,
 	"coins": -8.0, "leather": -14.0, "page_open": -4.0, "page_close": -6.0, "draw_blade": 8.0, "latch": -10.0}
 
 ## sounds always made here, with or without Cursemark's
-const OURS := ["thunder"]
+const OURS := ["thunder", "shuffle"]
 
-const GAIN := {"thunder": -3.0, "break_ring": -15.0, "fall_knocks": -16.0, "cast_mirror_ring": -20.0, "step_ash": -17.0, "step_stone": -18.0, "step_leaf": -18.0, "step_wet": -14.0, "swing": -13.0, "hit": -7.0,
+const GAIN := {"thunder": -3.0, "shuffle": -2.0, "break_ring": -15.0, "fall_knocks": -16.0, "cast_mirror_ring": -20.0, "step_ash": -23.0, "step_stone": -24.0, "step_leaf": -24.0, "step_wet": -20.0, "swing": -13.0, "hit": -7.0,
 	"heavy": -5.0, "break": -9.0, "hurt": -8.0, "fall": -10.0, "roll": -12.0, "drink": -10.0, "m_wind": -12.0, "cast_mirror": -14.0, "cast_soul": -12.0, "cast_thread": -12.0, "chest": -9.0, "kindle": -9.0, "shrine": -10.0, "passage": -12.0}
 
 func _takes(name: String) -> Array:
@@ -253,6 +253,43 @@ func _make(name: String, rng: RandomNumberGenerator) -> PackedFloat32Array:
 				var crack := c * exp(-t * 18.0) * 0.8 if t < 0.4 else 0.0
 				s[i] = b * 3.2 * env + crack
 			return s
+		"shuffle":     # a riffle (the Reading's deck): the two halves let go into each other, many small papery clicks that
+			# hurry and then slow, over a whisper of card on card, then the deck squared with two light taps
+			var dur := rng.randf_range(0.66, 0.82)
+			var nn := int(dur * RATE)
+			var sh := PackedFloat32Array()
+			sh.resize(nn)
+			var wl := 0.0
+			var wh := 0.0
+			for i in nn:
+				var tt := float(i) / RATE
+				var w := rng.randf() * 2.0 - 1.0
+				wh += (w - wh) * 0.55
+				wl += (wh - wl) * 0.08
+				sh[i] = (wh - wl) * 0.07 * sin(PI * minf(1.0, tt / dur * 1.15))
+			var end_c := dur - 0.16
+			var ct := 0.03
+			while ct < end_c:
+				var u := ct / end_c
+				var k0 := int(ct * RATE)
+				var amp := rng.randf_range(0.25, 0.55) * (0.55 + 0.45 * sin(PI * u))
+				var c1 := 0.0
+				var c2 := 0.0
+				for j in int(rng.randf_range(0.003, 0.006) * RATE):
+					if k0 + j >= nn:
+						break
+					var w := rng.randf() * 2.0 - 1.0
+					c1 += (w - c1) * 0.75
+					c2 += (c1 - c2) * 0.2
+					sh[k0 + j] += (c1 - c2) * amp * exp(-float(j) / RATE * 900.0)
+				ct += 0.0075 + 0.012 * (1.0 - sin(PI * u)) + rng.randf_range(0.0, 0.004)
+			for tap: float in [end_c + 0.04, end_c + 0.11]:
+				var k1 := int(tap * RATE)
+				var knock := _mix(_thud(0.05, 300.0, 170.0, 70.0, 0.12), _noise(rng, 0.03, 0.001, 120.0, 0.35, 0.8, 0.25))
+				for j in knock.size():
+					if k1 + j < nn:
+						sh[k1 + j] += knock[j]
+			return sh
 		"step_ash":    # a soft crunch in ash and dry earth
 			return _mix(_noise(rng, 0.09, 0.004, 45.0, 0.25, 0.55, 1.2), _noise(rng, 0.05, 0.002, 70.0, 0.6, 0.9, 0.4), int(RATE * 0.02))
 		"step_stone":  # a hard heel on flags: a click and a short knock

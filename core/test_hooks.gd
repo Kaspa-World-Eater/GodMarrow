@@ -80,6 +80,8 @@ static func run(g) -> void:
 		_use(g, String(a["use"]))        # --use=stranger (a role) or a type (lantern, chest): used as a click would use it
 	if a.has("goto"):
 		_goto(g, String(a["goto"]))      # --goto=x,y (zone tiles): the pilgrim walks there, as a click on the ground would send him (--walk is the walker)
+	if a.has("esctest"):
+		_esctest(g)
 	if a.has("shot"):
 		_shot(g, a)
 	if a.has("groundfire"):
@@ -919,3 +921,23 @@ static func _ranks(g) -> void:
 			if m.rank == "unique":
 				named.append("%s [%s]" % [str(m.info.get("name", "")), m.pack])
 	print("RANKS ", g.zone.id, " ", count, " uniques: ", named)
+
+
+## --esctest: Esc as the player presses it (Derek, 2026-10-10: Esc "should also open up the menu and close windows if they
+## are open first, before the menu"): I, then Esc, then Esc, printing ESC lines with what is open after each
+static func _key(g, k: Key) -> void:
+	for down in [true, false]:
+		var e := InputEventKey.new()
+		e.keycode = k
+		e.physical_keycode = k
+		e.pressed = down
+		Input.parse_input_event(e)
+		await g.get_tree().process_frame
+		await g.get_tree().process_frame
+
+static func _esctest(g) -> void:
+	await g.get_tree().create_timer(5.0).timeout
+	var h = g.hud
+	for step in [["I", KEY_I], ["Esc", KEY_ESCAPE], ["Esc", KEY_ESCAPE], ["Esc", KEY_ESCAPE]]:
+		await _key(g, step[1])
+		print("ESC after %s: panel %s, pause %s, hud input %s" % [step[0], h.any_panel(), h.pause.visible, h.is_processing_input()])

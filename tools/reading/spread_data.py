@@ -3,8 +3,8 @@
 Derek, 2026-10-09: "come up with a way to weave a story from the card draw and how they lay/formation and let the
 player interact with them more, hide the plus minus and other stats. We want this to be blind ... The only one they'll
 know for sure is the class." So: one deck, the twenty-two mantles of the bible (mythology/07-who-is-who.md, the
-"cards" of data/reading.json); a spread laid like a body on the cloth; every card drawn blind from the fanned deck,
-landing upright or reversed, turned by the pilgrim's own hand; the Stranger speaks to each card in its place, and at
+"cards" of data/reading.json); a spread laid like a body on the cloth; for each place three cards drawn blind from
+the fanned deck and turned over, one of them chosen, landing upright or reversed; the Stranger speaks to each card in its place, and at
 the end weaves the whole spread into one telling. What each card does in each place stays hidden (ui/reading.gd takes
 it from the old pools of data/reading.json, by card and place and which way up).
 
@@ -21,25 +21,25 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 # the places of the spread, in the order they are drawn (the crown is the calling, face up from the start)
 PLACES = [
     dict(id="brow", name="The Brow", what="the face it wore", pool="cards",
-         ask=["Its brow. Every god keeps a drawer of faces. Pick it one.",
-              "The brow first. A face. It came up without one."]),
+         ask=["Its brow. Every god keeps a drawer of faces. Three of them, blind, out of the deck. It only gets to wear one.",
+              "The brow first. A face. It came up without one. Pull three, face down, and we'll see who's in the drawer."]),
     dict(id="heart", name="The Heart", what="what it is after", pool="seeks",
-         ask=["The heart. What it's after. They're all after marrow, whatever they call it.",
-              "Over the heart, now. Something wants it back. Draw what."]),
+         ask=["The heart. What it's after. They're all after marrow, whatever they call it. Three, blind.",
+              "Over the heart, now. Something wants it back. Draw three, and don't look."]),
     dict(id="lhand", name="The Left Hand", what="what it holds", pool="answers",
-         ask=["Left hand. Something was in its hand when it came up out of the Red. Draw what.",
-              "The left hand. It's holding on to something. They always are."]),
+         ask=["Left hand. Something was in its hand when it came up out of the Red. Three from the deck. Blind.",
+              "The left hand. It's holding on to something. They always are. Draw three, and we'll see what."]),
     dict(id="rhand", name="The Right Hand", what="what it lets go", pool="sacs",
-         ask=["Right hand. What it lets go of. Something always stays on the step with the rest.",
-              "The right hand opens. Old Scythe keeps a count; leave him something to count."]),
+         ask=["Right hand. What it lets go of. Something always stays on the step with the rest. Three, face down.",
+              "The right hand opens. Old Scythe keeps a count. Pull three, and leave him something to count."]),
     dict(id="belly", name="The Belly", what="what it fears", pool="fears",
-         ask=["The belly. That's where the fear sits. It'll lie about this one; the card won't.",
-              "Down in the belly. Put the fear here, little hide, where it can be counted."]),
+         ask=["The belly. That's where the fear sits. It'll lie about this one. The cards won't. Three, blind.",
+              "Down in the belly. Three, little hide, face down, where the fear can be counted."]),
     dict(id="feet", name="The Feet", what="the road it came by", pool="roads",
-         ask=["The feet. A road. It came up a stair out of a pool an hour ago. Give it a road anyway. A road's a kindness.",
-              "Feet. Pick it a road. It'll have walked it by mourning."]),
+         ask=["The feet. A road. It came up a stair out of a pool an hour ago. Give it a road anyway. A road's a kindness. Draw three.",
+              "Feet. Three roads, face down. It'll have walked one of them by mourning."]),
     dict(id="under", name="Under It, in the Red", what="what lies beneath", pool="cards",
-         ask=["And one under it. Face down, in the Red. We don't read that one yet. ...Red. Read. Ha.",
+         ask=["And one under it. Face down, in the Red. We haven't read that one yet. Read. Red. Always red.",
               "The last goes underneath, where the Red is. Leave it lying. It'll turn when it's ready."]),
 ]
 
@@ -123,7 +123,7 @@ WEAVE = {
     "rhand": "It let go of {p}.",
     "belly": "Down in the belly, it's afraid of {p}.",
     "feet": "It came the way of {p}.",
-    "under": "And under it, in the Red, face down till now: {p}. {w} wears that one.",
+    "under": "And under it, in the Red, face down till now, {p}. {w} wears that one.",
 }
 OPEN = ["Here's how it lies.", "There. Look at it lying there.", "Well. That's the hide of it. ...And what's hid in it."]
 # what the spread's shape says (the order they are tried; the first few that hold are said)
@@ -178,19 +178,19 @@ STORY = {
     "gleaner": (
         "The Gleaner. Old Scythe himself, down in his pit under the bone. He comes up once an age to take the "
         "harvest, and he has never missed one. Not one stalk. Not one.",
-        "The Gleaner, reversed: the one who keeps him under. An Ossuarch with a sliver of the scythe in his plate, "
+        "The Gleaner, reversed, is the one who keeps him under. An Ossuarch with a sliver of the scythe in his plate, "
         "counting, always counting, so the old harvester stays down a little longer.",
         "the end that comes for everything", "to keep the end under, a little longer"),
     "saint": (
         "The Weeping Saint. She bleeds so they'll believe her, and they do; they always do. The girl in the iron "
         "wept until the weeping was the only thing left of her, and they made a faith of the tears.",
-        "The Saint, reversed: the crowd that came to watch her. A thousand faces and not one of them looking at "
+        "The Saint, reversed, is the crowd that came to watch her. A thousand faces and not one of them looking at "
         "her. They came for the weeping. They'd come again.",
         "to suffer, so as to be believed", "to watch, and do nothing"),
     "scholar": (
         "The Scholar's Eye. Reads, and reads, and reads, until the page starts reading back. The oldest reader in "
         "the Citadel still sits at his book. He hasn't turned a page in an age. The page turns him.",
-        "The Eye, turned inward: the eyes in the Needle, looking back. Once they've seen you, they don't stop. "
+        "The Eye, turned inward. The eyes in the Needle, looking back. Once they've seen you, they don't stop. "
         "...It looked. It shouldn't have looked.",
         "to know, whatever knowing costs", "the eyes that look back"),
     "hanged": (
@@ -202,101 +202,101 @@ STORY = {
     "knot": (
         "The Knot of Mouths. Many mouths and one hunger, eating to keep and keeping to eat. The Second Mouth "
         "preaches it. The Tallow-Mother lives it. Round and round it goes.",
-        "The Knot, reversed: the one that's eaten. Someone has to be the meal. Somebody always is. Better to know "
+        "The Knot, reversed. The one that's eaten. Someone has to be the meal. Somebody always is. Better to know "
         "which one you are.",
         "to eat, and keep what it eats", "to be eaten"),
     "wick": (
         "The Wick. It burns down to give a little light, and the light is all that's left of it. Every lantern on "
-        "the Hide has one inside: a soul that chose to stay and burn instead of going out with the breath.",
-        "The Wick, reversed: the dark just past the edge of the light. Always there. Always patient. The light "
+        "the Hide has one inside, a soul that chose to stay and burn instead of going out with the breath.",
+        "The Wick, reversed, is the dark just past the edge of the light. Always there. Always patient. The light "
         "only ever pushes it back a step.",
         "to burn itself down for a little light", "the dark at the edge of every light"),
     "mourner": (
         "The Mourner. She cuts her hair for every one the Red takes, and the Red takes them all. The Grandmother of "
         "the Red has none left. She cuts it anyway. The shore folk say you can hear the scissors in the surf.",
-        "The Mourner, reversed: the one being mourned. ...Somebody, somewhere, cut their hair for it already. Long "
+        "The Mourner, reversed, is the one being mourned. ...Somebody, somewhere, cut their hair for it already. Long "
         "before it came up out of the pool.",
         "grief that cuts and keeps cutting", "to be mourned, and not know it"),
     "key": (
         "The Ossuary Key. It locks the count. Nine, and nine, and nine, and every bone in its place. The Pale "
         "Order's whole faith is a key turned in a lock, and the lock is the world.",
-        "The Key, reversed: the one who opens it. Somebody always does. That's why there's a key. That's why "
+        "The Key, reversed. The one who opens it. Somebody always does. That's why there's a key. That's why "
         "there's always somebody looking for it.",
         "to lock the count and keep it", "to open what was locked"),
     "cup": (
         "The Beggar's Cup. It knocks at the door with an empty bowl and asks, very politely, for marrow. The Ghauul "
         "ask like that. So does hunger. So does the Hide.",
-        "The Cup, reversed: the house that answers the door. Don't answer the door. Whatever knocks at night on the "
+        "The Cup, reversed, is the house that answers the door. Don't answer the door. Whatever knocks at night on the "
         "Hide, don't answer.",
         "to ask, and keep on asking", "to open the door to what knocks"),
     "bell": (
         "The Drowned Bell. It rings under the water where nobody living hears it. The drowned king's court still "
         "walks down the old one's spine to the sound of it, in step, the whole way.",
-        "The Bell, reversed: rung in tune at last. That should frighten anybody. A drowned bell isn't meant to "
+        "The Bell, reversed, and rung in tune at last. That should frighten anybody. A drowned bell isn't meant to "
         "sound right.",
         "a call only the drowned can hear", "a bell rung true, for once"),
     "coin": (
         "The First Coin. Somebody sold something at the end of the world, and here's what they got for it. The "
         "merchant on the shore picks the dead clean and sells it back. Somebody's always selling.",
-        "The Coin, reversed: the one who buys. What did it buy? ...No. Don't tell me. I'd rather not know what "
+        "The Coin, reversed. The one who buys. What did it buy? ...No. Don't tell me. I'd rather not know what "
         "it paid.",
         "to sell what is left", "to buy, and pay too much"),
     "kiln": (
         "The Kiln. It hardens what's given to it. Soft goes in, and doesn't come out soft. The Deep sets the old "
         "one's blood to iron in the dark under everything, slowly, the way a kiln does.",
-        "The Kiln, reversed: the one that cracks in the firing. Something always cracks. Better it cracks in the "
+        "The Kiln, reversed, is the one that cracks in the firing. Something always cracks. Better it cracks in the "
         "fire than after.",
         "to be hardened by what it goes through", "to crack in the fire"),
     "loom": (
         "The Unravelling Loom. Somebody's picking it apart, thread by thread, and humming while they do it. The "
         "Crone behind her veil pulls out what was woven wrong. It's mostly woven wrong.",
-        "The Loom, reversed: the one who weaves it back. Badly. Knots and lumps, threads from somebody else's "
+        "The Loom, reversed. The one who weaves it back. Badly. Knots and lumps, threads from somebody else's "
         "life. But it holds. Mostly it holds.",
         "to be unpicked, thread by thread", "to be stitched back together, badly"),
     "lanternwright": (
         "The Lantern-Wright. The one who made the lanterns, and kept what was lost inside them. The makers were "
         "hunted out. There are fewer lanterns every year, and nobody left who knows how.",
-        "The Wright, reversed: the one who lets it go. The light goes out the top, they say, like breath. Some of "
+        "The Wright, reversed, is the one who lets it go. The light goes out the top, they say, like breath. Some of "
         "them want to go. Most of them do.",
         "to keep what was lost", "to let go what it kept"),
     "choir": (
         "The Drowned Choir. Under the crypts they're still holding the note. They've held it so long the stone hums "
         "with it, and the water in the low places shivers when you walk by.",
-        "The Choir, reversed: the rest between the notes. Listen. ...There. That. That's what they're afraid of.",
+        "The Choir, reversed, is the rest between the notes. Listen. ...There. That. That's what they're afraid of.",
         "to hold on past all breath", "the silence between notes"),
     "tithe": (
-        "The Tithe. It owes. Everyone left owes: a tenth of everything, back to whatever gave them the mourning. "
+        "The Tithe. It owes. Everyone left owes a tenth of everything, back to whatever gave them the mourning. "
         "Nobody remembers taking the loan. Everybody pays.",
-        "The Tithe, reversed: the one who comes to collect. On foot, at night, very polite. Knock, knock. Not the "
+        "The Tithe, reversed. The one who comes to collect. On foot, at night, very polite. Knock, knock. Not the "
         "tenth, this time. The rest.",
         "to owe, and pay", "the one who comes to collect"),
     "crown": (
         "The Hollow Crown. Orders, given and given, and nobody obeying. The Man in the Rust sits up on the dark moon "
         "and still gives them. The Hide doesn't listen. It never did.",
-        "The Crown, reversed: the city that would obey if it could. It can't. It's empty. Not one left in it to "
+        "The Crown, reversed, is the city that would obey if it could. It can't. It's empty. Not one left in it to "
         "hear the orders.",
         "to command, and not be obeyed", "to want to obey, and have nothing left"),
 }
 
 # what each place makes of a card: its gist read in that place (one picked each time)
 READ = {
-    "brow": ["On the brow: the face it shows the Hide. {g}. That's what they'll see coming. Whether it's true is "
+    "brow": ["On the brow, the face it shows the Hide. {G}. That's what they'll see coming. Whether it's true is "
              "another card.",
-             "So that's the face it wears: {g}. Faces are lent here. It'll give this one back, one day."],
-    "heart": ["Over the heart, what it wants: {g}. It'll walk the whole Hide for that, and never know why.",
-              "That's what's in its heart, then: {g}. Wanting is the oldest thing on the Hide. Older than the Hide."],
-    "lhand": ["In the left hand, what it holds and won't put down: {g}. It came up out of the pool already holding "
+             "So that's the face it wears. {G}. Faces are lent here. It'll give this one back, one day."],
+    "heart": ["Over the heart lies what it wants, and what it wants is {g}. It'll walk the whole Hide for that, and never know why.",
+              "That's what's in its heart, then. {G}. Wanting is the oldest thing on the Hide. Older than the Hide."],
+    "lhand": ["The left hand holds what it won't put down, and that's {g}. It came up out of the pool already holding "
               "it.",
               "The left hand closes, and what's in it is {g}. It won't open, not for anything. Watch it try."],
     "rhand": ["The right hand opens, and what it lets go is {g}. Something always stays on the step with the rest. "
               "Old Scythe counts it.",
-              "What it gives up: {g}. It won't miss it. Not yet."],
-    "belly": ["Down in the belly, where the fear lives: {g}. Mind that one. Fear's the only thing here that never "
+              "What it gives up is {g}. It won't miss it. Not yet."],
+    "belly": ["Down in the belly, where the fear lives. {G}. Mind that one. Fear's the only thing here that never "
               "lies.",
-              "So that's what it's afraid of: {g}. Good. The ones afraid of nothing go first."],
-    "feet": ["Under the feet, the road that brought it: {g}. Roads don't end on the Hide. They just stop.",
+              "So that's what it's afraid of. {G}. Good. The ones afraid of nothing go first."],
+    "feet": ["Under the feet, the road that brought it. {G}. Roads don't end on the Hide. They just stop.",
              "It came here by {g}. It'll leave by it too. That's how roads are."],
-    "under": ["And under it all, in the Red, face down till now: {g}. That's the one that's been doing the drawing. "
+    "under": ["And under it all, in the Red, face down till now. {G}. That's the one that's been doing the drawing. "
               "All along."],
 }
 
@@ -311,7 +311,7 @@ DRAWN = [
     "It didn't take that card. That card took it. They always do.",
     "The deck reads the hand before the hand reads the deck. It's been waiting for this hand.",
     "Hear that? A card comes off the deck the way a tooth comes out. Something's left a gap.",
-    "Don't look so pleased. Nobody chooses. The cards come up the way the dead come up: when they're ready.",
+    "Don't look so pleased. Nobody chooses. The cards come up the way the dead come up, when they're ready.",
     "There. It reached, and the deck let it. The deck doesn't let everyone.",
     "Warm where it touched. They like this one. That's never good.",
 ]
@@ -337,43 +337,53 @@ TALE = {
     "heart": ["What it wanted, more than anything, was {g}. It wouldn't have said so. It didn't have to.",
               "Down where the wanting lives, it wanted {g}, and it would walk the whole Hide for it."],
     "belly": ["What it feared was {g}. That fear will keep it alive longer than any blade.",
-              "And under the wanting, the fear: {g}. It'll meet that one again. Fears come round."],
+              "And under the wanting, the fear. {G}. It'll meet that one again. Fears come round."],
     "lhand": ["In its left hand it carried a thing it would not put down, and the thing was {g}.",
               "What it held on to, with the left hand, was {g}, and nothing on the Hide would make it let go."],
     "rhand": ["With the right it let something go, and what it let go was {g}. It won't miss it until much later.",
               "And the right hand opened, and what fell out of it was {g}. The step kept that, with all the rest."],
     "under": ["But that was only the top of it. Under all of it, face down in the Red the whole time, lay the card that "
-              "did the drawing: {p}. {W} wears that one now. One day it might be this one's turn.",
+              "did the drawing, {p}. {W} wears that one now. One day it might be this one's turn.",
               "That's what lay on top. Underneath, in the Red, where nobody looks, it was {p} all along. {W} has that "
               "one now. Mantles change hands. That's what hands are for."],
     "close": ["That's the story. It isn't finished. They never are.",
               "And that's where it begins. Go on. The sand's waiting. It always is.",
               "Isn't it horrible? A moment ago it was nothing, and it was so quiet."],
-    "prophecy": "And the last thing the cards said, they said to it, not to me:",
+    "prophecy": "And the last thing the cards said, they said to it, not to me.",
+    # the very last words, after the sum (Derek, 2026-10-10: "we should also be told to look into the black mirror and
+    # walk to it not just auto move to the next area"): he sends it to the mirror in the great face's mouth
+    "go": ["Now up, and look into the mirror. The black one, in the face's mouth. Nothing looks back from it. Walk on into it anyway. There's no door here, and there never was. Only that.",
+           "There's the way out, in the great face's mouth. The black mirror. Go and look into it. It won't show this one. It doesn't show anyone. Step into the dark of it, and the sand's on the other side.",
+           "Go on, then. The mirror, there, in the mouth of the face. Look into it till it looks like nothing, and walk in. ...And don't look back. There's nothing to see, and it'll mind."],
 }
 TALE_ORDER = ["open", "feet", "brow", "heart", "belly", "lhand", "rhand", "under"]
 
 # the choice (Derek, 2026-10-10: "I want them to feel like they are given a choice"): for every place but the one
-# under the body, the deck deals three cards face up and the pilgrim chooses; the deck may still turn the chosen card
-# against it (it can land reversed). ON: how a card's meaning is named in each place, shown as the pilgrim weighs it.
-ON = {"brow": "On the brow", "heart": "Over the heart", "lhand": "In the left hand", "rhand": "Out of the right hand",
-      "belly": "In the belly", "feet": "Under the feet"}
+# under the body, the pilgrim draws three blind from the fanned deck (Derek, 2026-10-10: "pick 3 face down from every
+# draw, then they are shown face down and flipped over"); they turn themselves over (DEAL is said then) and the pilgrim
+# chooses one; the other two go back in the deck; the deck may still turn the chosen card against it (it can land
+# reversed). ON: what a card would mean in each place, said whole as the pilgrim weighs it ({g} its meaning).
+# No colons anywhere the pilgrim reads (Derek, 2026-10-10: "dont use ':' in the text"); {G} is {g} with a capital.
+ON = {"brow": "On the brow it would mean {g}.", "heart": "Over the heart it would mean {g}.",
+      "lhand": "In the left hand it would mean {g}.", "rhand": "What the right hand lets go would be {g}.",
+      "belly": "In the belly it would mean {g}.", "feet": "Under the feet it would mean {g}."}
 DEAL = {
-    "brow": ["Three faces. It can wear one. The others go back in the drawer.",
-             "Three come up for the brow. Choose. Choosing is the only freedom the deck allows, and it lies about that."],
-    "heart": ["Three for the heart. What does it want? Go on. It's allowed to want.",
+    "brow": ["Three faces, turned up. It can wear one. The others go back in the drawer.",
+             "There. Three came up for the brow. Choose. Choosing is the only freedom the deck allows, and it lies about that."],
+    "heart": ["Three for the heart, face up now. What does it want? Go on. It's allowed to want.",
               "The heart. Three of them, face up, and every one of them hungry."],
-    "lhand": ["Three for the left hand. What does it hold on to? Pick, and it'll never put it down.",
-              "Left hand. Three things it might be holding. Only one fits the hand."],
-    "rhand": ["Three for the right hand. What does it let go of? Choose what to lose. That's a kindness. Most never get to.",
-              "Right hand. Something has to fall out of it. Three come up. Pick the one it can spare."],
+    "lhand": ["Three it drew for the left hand. What does it hold on to? Pick, and it'll never put it down.",
+              "Left hand. Three things it might be holding, turned up. Only one fits the hand."],
+    "rhand": ["Three it drew for the right hand. What does it let go of? Choose what to lose. That's a kindness. Most never get to.",
+              "Right hand. Something has to fall out of it. Three came up. Pick the one it can spare."],
     "belly": ["Three for the belly. Choose its fear. ...Choose carefully. It'll meet that one again.",
               "The belly. Three fears, face up. It only gets to keep one."],
-    "feet": ["Three roads. It came by one of them. Pick which, and it'll remember the walking.",
+    "feet": ["Three roads, turned up. It came by one of them. Pick which, and it'll remember the walking.",
              "The feet. Three roads lie open, and every one of them ends here."],
 }
-CHOSE = ["Chosen. Now let's see if the deck agrees.", "That one. The deck had a feeling it would.",
-         "Good. The other two will remember being passed over."]
+CHOSE = ["Chosen. The other two go back in the deck. Now let's see if the deck agrees.",
+         "That one. The deck had a feeling it would. The rest go home.",
+         "Good. The other two go back in, and they'll remember being passed over."]
 TURNED = ["...And the deck turns it over as it lands. It chose. The deck chose back.",
           "Head down. It chose that card; the card chose to lie the other way. That's how choosing goes here."]
 
