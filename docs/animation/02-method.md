@@ -61,6 +61,18 @@ On our skeleton:
 6. **The secondary parts:** cloth, plume, chains, tassels, the lantern, driven by the joints' velocity
    (PixelForge's pixel road already does this), each with its own drag and settle by weight.
 
+**The stick pass: every layer as coloured lines before any detail** (added 2026-10-10, from a process clip Derek set:
+Catnip Studio's boss arm for DAY50, x.com/CatnipStudio_G/status/2108766714326597992, where the motion is laid down as
+stick lines in a different colour per limb and tentacle, and the detailed arm and tentacles are drawn over them after).
+- Each moving part (a limb, a tentacle, a chain, a cloak tail, a strand of the plume) is first animated as one line
+  along its bones, in its own colour, over every frame of the clip.
+- Read as lines, each part's arc, its timing and its drag behind the part before it can be seen and fixed: a
+  tentacle's base moves first and its tip some frames later, and a wrong lag shows at once. Under finished detail it
+  only reads as "something is off".
+- The detail is drawn last, onto timing that is already right, so it cannot break the motion.
+- **Tool, when animation resumes** (with the Ossuarch's rebuild): `tools/anim/contact_sheet.py` to draw every bone chain
+  of a clip as a coloured line across its frames, so a clip's stick pass can be checked at a glance.
+
 **Captured clips are a start, never the result.** A Quaternius clip gives a plausible body; it does not give our
 character's thought, weight or timing. Re-time it on the sheet, push its extremes (exaggeration), add the lead and the
 follow-through, and replace the parts that read as someone else.
