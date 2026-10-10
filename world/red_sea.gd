@@ -72,6 +72,7 @@ func _init(dir: String, sf: Dictionary, world_o: float, lift_px: float) -> void:
 	# about 25 yards of s and 44 of t at the camera's zoom; the swells lift the far side up to two yards more)
 	_add(_grid(0.0, WIN_S, RES, 0.0, WIN_T, RES), sea_sh, ftex, sf, world_o, lift_px)
 	_add(_lip(0.0, WIN_T, 0.1), lip_sh, ftex, sf, world_o, lift_px)
+	_dead(ftex, sf, world_o, lift_px)
 	pic = Sprite2D.new()
 	pic.centered = false
 	pic.scale = Vector2(AP, AP)
@@ -95,6 +96,55 @@ func _add(mesh: ArrayMesh, sh: Shader, ftex: Texture2D, sf: Dictionary, world_o:
 	mi.custom_aabb = AABB(Vector3(-1e4, -1e4, -1e4), Vector3(2e4, 2e4, 2e4))   # placed by its shader: never culled
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	vp.add_child(mi)
+
+## the dead riding the Red (tools/landkit3d/beach3d.py drowned(): where each floats and which way it lies; the bodies
+## from tools/landkit3d/drowned_glb.py), laid on the live surface by shaders/red_sea_body.gdshader
+const DEAD := [[68.2, -7.6, 0.6], [71.6, -11.2, -0.9], [73.6, -2.2, 1.9], [67.3, 2.6, -2.2], [65.7, -10.4, 2.8],
+		[69.4, -27.5, 1.1], [67.0, 19.5, -0.4], [72.8, 30.5, 2.2], [70.2, 11.0, -1.6]]
+const SKIN := {"corpse": Color(0.4, 0.33, 0.33), "cloth": Color(0.17, 0.14, 0.15), "bone": Color(0.6, 0.55, 0.46),
+		"hide": Color(0.3, 0.22, 0.2)}
+
+func _dead(ftex: Texture2D, sf: Dictionary, world_o: float, lift_px: float) -> void:
+	var path := "res://art/zones/red_shore_drowned.glb"
+	if not ResourceLoader.exists(path):
+		return
+	var root: Node3D = (load(path) as PackedScene).instantiate()
+	vp.add_child(root)
+	var body_sh: Shader = load("res://shaders/red_sea_body.gdshader")
+	for k in DEAD.size():
+		var holder := root.find_child("drowned%d" % k, true, false)
+		if holder == null:
+			continue
+		var s0: float = DEAD[k][0]
+		var t0: float = DEAD[k][1]
+		var yaw: float = DEAD[k][2]
+		# its heading in the world, as the builder turned it (beach3d.drowned: wy)
+		var d := Vector2(((t0 + sin(yaw)) - (s0 + cos(yaw)) - (t0 - s0)) / sqrt(2.0), ((-(s0 + cos(yaw)) - (t0 + sin(yaw))) - (-s0 - t0)) / sqrt(2.0))
+		var wy := atan2(d.y, d.x)
+		for mi in holder.find_children("*", "MeshInstance3D", true, false):
+			var mesh: Mesh = mi.mesh
+			for si in mesh.get_surface_count():
+				var mn := ""
+				var sm := mesh.surface_get_material(si)
+				if sm:
+					mn = sm.resource_name
+				var m := ShaderMaterial.new()
+				m.shader = body_sh
+				m.set_shader_parameter("field", ftex)
+				m.set_shader_parameter("fgeo", Vector4(float(sf["s0"]), float(sf["t0"]), float(sf["res"]), 0.0))
+				m.set_shader_parameter("fn", Vector2(float(sf["ns"]), float(sf["nt"])))
+				m.set_shader_parameter("zo", world_o)
+				m.set_shader_parameter("lift_px", lift_px)
+				m.set_shader_parameter("anchor", Vector2(s0, t0))
+				m.set_shader_parameter("wyaw", wy)
+				m.set_shader_parameter("kph", 0.37 * k)
+				m.set_shader_parameter("debug", int(OS.get_environment("GM_SEA_DEBUG")) if OS.get_environment("GM_SEA_DEBUG") != "" else 0)
+				var col: Color = SKIN.get(mn.get_slice(".", 0), SKIN["corpse"])
+				m.set_shader_parameter("base", Vector3(col.r, col.g, col.b))
+				mats.append(m)
+				mi.set_surface_override_material(si, m)
+			mi.custom_aabb = AABB(Vector3(-1e4, -1e4, -1e4), Vector3(2e4, 2e4, 2e4))
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 ## a grid on the shore: s in VERTEX.x, t in VERTEX.z
 static func _grid(sa: float, sb: float, ds: float, ta: float, tb: float, dt: float) -> ArrayMesh:
