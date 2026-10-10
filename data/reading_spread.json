@@ -1,0 +1,308 @@
+{
+ "places": [
+  {
+   "id": "brow",
+   "name": "The Brow",
+   "what": "the face it wore",
+   "pool": "cards",
+   "ask": [
+    "Its brow. Every god keeps a drawer of faces. Pick it one.",
+    "The brow first. A face. It came up without one."
+   ]
+  },
+  {
+   "id": "heart",
+   "name": "The Heart",
+   "what": "what it is after",
+   "pool": "seeks",
+   "ask": [
+    "The heart. What it's after. They're all after marrow, whatever they call it.",
+    "Over the heart, now. Something wants it back. Draw what."
+   ]
+  },
+  {
+   "id": "lhand",
+   "name": "The Left Hand",
+   "what": "what it holds",
+   "pool": "answers",
+   "ask": [
+    "Left hand. Something was in its hand when it came up out of the Red. Draw what.",
+    "The left hand. It's holding on to something. They always are."
+   ]
+  },
+  {
+   "id": "rhand",
+   "name": "The Right Hand",
+   "what": "what it lets go",
+   "pool": "sacs",
+   "ask": [
+    "Right hand. What it lets go of. Something always stays on the step with the rest.",
+    "The right hand opens. Old Scythe keeps a count; leave him something to count."
+   ]
+  },
+  {
+   "id": "belly",
+   "name": "The Belly",
+   "what": "what it fears",
+   "pool": "fears",
+   "ask": [
+    "The belly. That's where the fear sits. It'll lie about this one; the card won't.",
+    "Down in the belly. Put the fear here, little hide, where it can be counted."
+   ]
+  },
+  {
+   "id": "feet",
+   "name": "The Feet",
+   "what": "the road it came by",
+   "pool": "roads",
+   "ask": [
+    "The feet. A road. It came up a stair out of a pool an hour ago. Give it a road anyway. A road's a kindness.",
+    "Feet. Pick it a road. It'll have walked it by morning."
+   ]
+  },
+  {
+   "id": "under",
+   "name": "Under It, in the Red",
+   "what": "what lies beneath",
+   "pool": "cards",
+   "ask": [
+    "And one under it. Face down, in the Red. We don't read that one yet. ...Red. Read. Ha.",
+    "The last goes underneath, where the Red is. Leave it lying. It'll turn when it's ready."
+   ]
+  }
+ ],
+ "weave": {
+  "brow": "It wore the face of {p}.",
+  "heart": "It's after what {p} is after.",
+  "lhand": "In its left hand, {p}.",
+  "rhand": "It let go of {p}.",
+  "belly": "Down in the belly, it's afraid of {p}.",
+  "feet": "It came the way of {p}.",
+  "under": "And under it, in the Red, face down till now: {p}. {w} wears that one."
+ },
+ "open": [
+  "Here's how it lies.",
+  "There. Look at it lying there.",
+  "Well. That's the hide of it. ...And what's hid in it."
+ ],
+ "shapes": {
+  "many_rev": "Most of it lies the wrong way up. Good. So does everything here.",
+  "none_rev": "Not one card turned against it. That's never happened. ...That's never good.",
+  "heart_belly": "It's afraid of the very thing it wants. They always are.",
+  "hands": "Both hands full of the same thing. It'll drop one.",
+  "calling": "More {a} in it than it knows. It'll find out.",
+  "under_rev": "And the one underneath is lying too."
+ },
+ "close": [
+  "Isn't it horrible? A moment ago it was nothing, and it was so quiet.",
+  "Up you get, then. The mouth's that way.",
+  "Go on. The sand's waiting. It always is."
+ ],
+ "aspect_word": {
+  "bone": "bone",
+  "soul": "thread",
+  "flesh": "flesh",
+  "breath": "breath",
+  "silence": "quiet"
+ },
+ "mantles": [
+  {
+   "id": "unwritten",
+   "aspect": "silence",
+   "one": "the one who ends the turn",
+   "rev": "the one who begins the next",
+   "wears": "nobody yet",
+   "say": "Nothing on it. Good. It'll write itself in somebody else's hand.",
+   "say_rev": "Turned over and still blank. That's the worst kind of full."
+  },
+  {
+   "id": "pilgrim",
+   "aspect": "silence",
+   "one": "the one who walks and does not know why",
+   "rev": "the one who has stopped",
+   "wears": "the pilgrim",
+   "say": "The Pilgrim. Walking. Doesn't know where. Never stopped one yet.",
+   "say_rev": "Stopped. Sat down by the road. They do that, near the end. Or the start."
+  },
+  {
+   "id": "digger",
+   "aspect": "bone",
+   "one": "the one who buries",
+   "rev": "the one who digs them up",
+   "wears": "the Ossuary Matron",
+   "say": "The Hands. It's buried more than it remembers. The hands remember.",
+   "say_rev": "Digging the other way now. Up. Mind what comes up with it."
+  },
+  {
+   "id": "veil",
+   "aspect": "soul",
+   "one": "the one drawn to the light that burns it",
+   "rev": "the one already burned",
+   "wears": "the moths with the white faces",
+   "say": "The Singed Veil. Goes to every light that burns it. The moths have the right of it.",
+   "say_rev": "Already burned. Not much left to be drawn to anything."
+  },
+  {
+   "id": "swaddling",
+   "aspect": "flesh",
+   "one": "the one who is carried",
+   "rev": "the knife that cut the cloth",
+   "wears": "every child the Deep asks for",
+   "say": "The Swaddling. Carried. Somebody's always carried, on the Hide. Somebody always carries.",
+   "say_rev": "The knife that cut the cloth. Somebody had to."
+  },
+  {
+   "id": "gleaner",
+   "aspect": "bone",
+   "one": "the one who ends",
+   "rev": "the one who keeps it under",
+   "wears": "Old Scythe, in its pit",
+   "say": "The Gleaner. Old Scythe. Comes round once an age, and never misses one.",
+   "say_rev": "The one who keeps the Gleaner under. Heavy work. Counted work."
+  },
+  {
+   "id": "saint",
+   "aspect": "flesh",
+   "one": "the one who suffers to be believed",
+   "rev": "the crowd that came to watch",
+   "wears": "the girl in the iron",
+   "say": "The Weeping Saint. Suffers, so it's believed. Works every time.",
+   "say_rev": "The crowd that came to watch her. Always a crowd. Never a face in it."
+  },
+  {
+   "id": "scholar",
+   "aspect": "soul",
+   "one": "the one who reads until it is read",
+   "rev": "the eyes in the Needle",
+   "wears": "the Citadel's oldest reader",
+   "say": "The Scholar's Eye. Reads until it's read. Careful what it reads here.",
+   "say_rev": "The eyes in the Needle. Don't look back at them. ...It looked."
+  },
+  {
+   "id": "hanged",
+   "aspect": "soul",
+   "one": "the one a breath behind",
+   "rev": "the one a breath ahead",
+   "wears": "the Drowned Twin",
+   "say": "The Hanged Twin. A breath behind it, on the far side of every still water.",
+   "say_rev": "A breath ahead. That one's worse. It knows where it's going."
+  },
+  {
+   "id": "knot",
+   "aspect": "flesh",
+   "one": "the one that eats to keep",
+   "rev": "the one that is eaten",
+   "wears": "the Second Mouth",
+   "say": "The Knot of Mouths. Eats to keep. Keeps to eat. Round it goes.",
+   "say_rev": "The one that's eaten. Someone has to be the meal."
+  },
+  {
+   "id": "wick",
+   "aspect": "breath",
+   "one": "the one that burns down to give light",
+   "rev": "the dark at the edge of the light",
+   "wears": "every soul in a lantern",
+   "say": "The Wick. Burns down for a little light. Every lantern's got one in it.",
+   "say_rev": "The dark at the edge of the light. Always just there. Patient."
+  },
+  {
+   "id": "mourner",
+   "aspect": "flesh",
+   "one": "the one who cuts her hair",
+   "rev": "the one who is mourned",
+   "wears": "the Grandmother of the Red",
+   "say": "The Mourner. Cuts her hair for what the Red took. The Red's never short of hair.",
+   "say_rev": "The one who's mourned. ...Somebody cut their hair for it already."
+  },
+  {
+   "id": "key",
+   "aspect": "bone",
+   "one": "the one who locks the count",
+   "rev": "the one who opens it",
+   "wears": "the Ossuarch",
+   "say": "The Ossuary Key. Locks the count. Nine, and nine, and nine.",
+   "say_rev": "The one who opens it. Somebody always does. That's why there's a key."
+  },
+  {
+   "id": "cup",
+   "aspect": "bone",
+   "one": "the one who asks at the door",
+   "rev": "the house that answers",
+   "wears": "the Ghauul, knocking for marrow",
+   "say": "The Beggar's Cup. Knocks at the door. Asks for marrow. Asks nicely.",
+   "say_rev": "The house that answers. Don't answer."
+  },
+  {
+   "id": "bell",
+   "aspect": "breath",
+   "one": "the one who rings under the water",
+   "rev": "the bell rung in tune",
+   "wears": "the drowned king's court",
+   "say": "The Drowned Bell. Rings under the water. Only the drowned hear it, and they keep time.",
+   "say_rev": "Rung in tune at last. That should frighten anybody."
+  },
+  {
+   "id": "coin",
+   "aspect": "silence",
+   "one": "the one who sells at the end of the world",
+   "rev": "the one who buys",
+   "wears": "the merchant",
+   "say": "The First Coin. Sold at the end of the world. Somebody's always selling.",
+   "say_rev": "The one who buys. What did it buy? ...Don't tell me."
+  },
+  {
+   "id": "kiln",
+   "aspect": "flesh",
+   "one": "the one that hardens what is given to it",
+   "rev": "the one that cracks",
+   "wears": "the Deep",
+   "say": "The Kiln. Hardens what's given it. Goes in soft. Doesn't come out soft.",
+   "say_rev": "The one that cracks. Something always cracks in the firing."
+  },
+  {
+   "id": "loom",
+   "aspect": "soul",
+   "one": "the one who unpicks",
+   "rev": "the one who reweaves",
+   "wears": "the Veiled Crone",
+   "say": "The Unravelling Loom. Somebody's picking it out, thread by thread. Not me.",
+   "say_rev": "The one who weaves it back. Badly. There'll be lumps."
+  },
+  {
+   "id": "lanternwright",
+   "aspect": "breath",
+   "one": "the one who keeps what is lost",
+   "rev": "the one who lets it go",
+   "wears": "nobody now",
+   "say": "The Lantern-Wright. Keeps what's lost. Nobody makes lanterns now. Nobody.",
+   "say_rev": "Lets it go. The light goes out of the top, they say, like breath."
+  },
+  {
+   "id": "choir",
+   "aspect": "breath",
+   "one": "the one who holds the note",
+   "rev": "the rest between notes",
+   "wears": "the Choir, under the crypts",
+   "say": "The Drowned Choir. Holds the note. Been holding it a long, long while.",
+   "say_rev": "The rest between the notes. Listen. ...There. That."
+  },
+  {
+   "id": "tithe",
+   "aspect": "bone",
+   "one": "the one who owes",
+   "rev": "the one who comes to collect",
+   "wears": "the Tithed, every one left",
+   "say": "The Tithe. Owes. Everyone left owes. A tenth of the hide, every time.",
+   "say_rev": "The one who comes to collect. Knock, knock."
+  },
+  {
+   "id": "crown",
+   "aspect": "silence",
+   "one": "the one whose orders are never obeyed",
+   "rev": "the city that would obey if it could",
+   "wears": "the Man in the Rust, on the dark moon",
+   "say": "The Hollow Crown. Gives orders nobody obeys. Up on the brown moon, still giving them.",
+   "say_rev": "The city that would obey if it could. Can't. Never could."
+  }
+ ]
+}
