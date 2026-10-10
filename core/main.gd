@@ -276,18 +276,18 @@ func _reading_done(r: Dictionary) -> void:
 		await enter("red_shore", "opening_cave")
 
 ## the new pilgrim in the cave before the cards have made it (Derek, 2026-10-10): "a suggestion of a person ... gore
-## covered and thus undefined", "It can be a generic new body", "Sluggish and slow from its new birth": the same hooded,
-## gaunt body for every calling (art/sprites/hollow_hd), drawn as a shape of blood (shaders/nascent.gdshader), no
-## lantern and no light of its own, dragging itself along at under half pace (entities/hero.gd NASCENT_K)
+## covered and thus undefined", "It can be a generic new body", "Sluggish and slow from its new birth": the same body for
+## every calling, a live 3D body (entities/body3d.gd; art/characters3d/newborn, made by tools/landkit3d/newborn3d.py)
+## drawn in place of the calling's sprite, no light of its own, until the last card is drawn; the opening
+## (world/opening.gd) brings it up out of the pool first.
 func _nascent() -> void:
 	hero.nascent = true
-	hero.spr.set = Data.sprite_set("hollow_hd")
-	hero.spr.scale = Vector2.ONE * Iso.FIG
-	hero.spr_base = hero.spr.scale
-	hero.spr.play("idle", true)
-	var m := ShaderMaterial.new()
-	m.shader = load("res://shaders/nascent.gdshader")
-	hero.spr.material = m
+	hero.spr.visible = false
+	var b := Body3D.new("res://art/characters3d/newborn/newborn.glb")
+	hero.add_child(b)
+	hero.body3d = b
+	b.face_ground(Vector2(1, 1), true)
+	b.play("idle", 0.0)
 	if hero.lamp:
 		hero.lamp.enabled = false
 	if hero.lantern and is_instance_valid(hero.lantern):
@@ -296,6 +296,9 @@ func _nascent() -> void:
 	var mg = zone.get_node_or_null("WorldObjects")
 	if mg and mg.gore:
 		mg.gore.drips = 6.0                          # the blood running off it
+	if not args.has("no_opening"):
+		var op = load("res://world/opening.gd").new(self, hero, b)
+		add_child(op)
 
 func title_done() -> void:
 	title_open = false

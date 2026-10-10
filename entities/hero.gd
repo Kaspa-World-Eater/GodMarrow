@@ -21,7 +21,9 @@ var goal := Vector2.ZERO
 var walking := false
 var lantern: LanternUnit = null    # the floating lantern (the Mystic, the Penitent)
 var nascent := false              # not yet made by the cards: a shape of blood with no light (core/main.gd _nascent)
-const NASCENT_K := 0.45            # how fast it drags itself along, new-born
+var body3d: Body3D = null        # the newborn's live body (entities/body3d.gd), drawn in place of spr
+var scripted := false            # the opening (world/opening.gd) drives the body; the player has none of it
+const NASCENT_K := 0.3            # how fast it drags itself along, new-born
 var class_lamp: Node2D = null      # the lamp carried in hand (the Ossuarch, the Shrine Keeper, the Empty Hand)
 var lamp: PointLight2D
 var st: HeroStats
@@ -254,6 +256,9 @@ func _physics_process(dt: float) -> void:
 		if dead:
 			spr.step(dt)
 		return
+	if scripted:
+		_sync()
+		return
 	st.tick(dt)
 	skills.tick(dt)
 	invuln = maxf(0.0, invuln - dt)
@@ -332,11 +337,15 @@ func _physics_process(dt: float) -> void:
 	if moved:
 		spr.play("walk")
 		spr.step(dt, st.move_speed() / 3.11 * (NASCENT_K if nascent else 1.0))
+		if body3d:
+			body3d.play("walk", 0.3, st.move_speed() * NASCENT_K / Body3D.WALK_V)
 		if act == "":
 			st.poise = maxf(0.0, st.poise - 1.6 * dt)   # walking drains 1.6/s (regeneration still runs)
 	else:
 		spr.play("idle")
 		spr.step(dt)
+		if body3d:
+			body3d.play("idle", 0.45)
 	_sync()
 
 var step_acc := 0.0
@@ -369,6 +378,8 @@ func _walk(dt: float) -> bool:
 	else:
 		tp = zone.move(tp, to.normalized() * step, radius)
 	_face(to)
+	if body3d:
+		body3d.face_ground(to)
 	if path_i >= path.size():
 		walking = false
 	return true

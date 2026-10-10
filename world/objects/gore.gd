@@ -53,6 +53,21 @@ func gore(p: Vector2, n: int, up: bool) -> void:
 	if parts.size() > 700:
 		parts = parts.slice(parts.size() - 700)
 
+## a mouthful thrown out ahead (the newborn's retch, world/opening.gd): blood and dark matter from a low mouth, in a
+## narrow cone along dir, most of it landing within a yard, and a stain where it lands
+func spew(p: Vector2, dir: Vector2, n: int, mouth_z: float = 10.0) -> void:
+	var d := dir.normalized()
+	for i in n:
+		var a := d.angle() + randf_range(-0.45, 0.45)
+		var s := 0.5 + randf() * 1.6
+		var r := randf()
+		var col: Color = _pick(BLOOD) if r < 0.6 else (MEAT[2] if r < 0.85 else MEAT[0])   # dark: blood and matter, never pink
+		parts.append({"p": p, "z": mouth_z + randf() * 2.0, "v": Vector2(cos(a), sin(a)) * s,
+			"vz": 2.0 + randf() * 10.0, "t": 0.5 + randf() * 0.5, "col": col, "w": 1 + randi() % 2})
+		if r > 0.4 and chunks.size() < 80:
+			chunks.append({"p": p + Vector2(cos(a), sin(a)) * s * 0.4, "col": col, "w": 1, "life": 30.0 + randf() * 20.0})
+	stain(p + d * 0.6, 18, 0.55)
+
 func stain(p: Vector2, n: int, r: float) -> void:
 	var dots := []
 	for i in n:
