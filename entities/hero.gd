@@ -20,6 +20,8 @@ var repath := 0.0
 var goal := Vector2.ZERO
 var walking := false
 var lantern: LanternUnit = null    # the floating lantern (the Mystic, the Penitent)
+var nascent := false              # not yet made by the cards: a shape of blood with no light (core/main.gd _nascent)
+const NASCENT_K := 0.45            # how fast it drags itself along, new-born
 var class_lamp: Node2D = null      # the lamp carried in hand (the Ossuarch, the Shrine Keeper, the Empty Hand)
 var lamp: PointLight2D
 var st: HeroStats
@@ -118,6 +120,8 @@ func setup(z: Zone, c: String, at: Vector2) -> void:
 	_sync()
 
 func light_radius() -> float:
+	if nascent:
+		return 0.0                   # it carries no light: the cave's fires alone
 	# heroLightR (zd_world22.js:421, zz_zw_lantern63.js:44): wider as the day goes; the dim wick and what the lantern
 	# keeps are the lantern's mood, not its reach (zz_zz_study82.js:16-20, world/dark_layer.gd)
 	var out: bool = zone != null and zone.d.get("outdoor", false)
@@ -189,6 +193,14 @@ func monster_at_mouse() -> Monster:
 func _unhandled_input(ev: InputEvent) -> void:
 	if dead:
 		return
+	if nascent:
+		# new-born: it can only drag itself along; no casting, no blows, no roll, no draught, until the cards make it
+		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_RIGHT:
+			return
+		if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT and monster_at_mouse():
+			return
+		if ev is InputEventKey:
+			return
 	if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
 		var m := monster_at_mouse()
 		if m and skills.left != "attack":
@@ -319,7 +331,7 @@ func _physics_process(dt: float) -> void:
 	spr.face = face
 	if moved:
 		spr.play("walk")
-		spr.step(dt, st.move_speed() / 3.11)
+		spr.step(dt, st.move_speed() / 3.11 * (NASCENT_K if nascent else 1.0))
 		if act == "":
 			st.poise = maxf(0.0, st.poise - 1.6 * dt)   # walking drains 1.6/s (regeneration still runs)
 	else:
@@ -344,6 +356,8 @@ func _walk(dt: float) -> bool:
 	if skills.has_method("move_k"):
 		spd *= skills.move_k()
 	spd *= Gust.drag(to)   # a storm's gust in your face slows you (core/gust.gd)
+	if nascent:
+		spd *= NASCENT_K     # sluggish and slow from its new birth (Derek, 2026-10-10)
 	var step := spd * dt
 	step_acc += minf(step, to.length())
 	if step_acc > 0.62:

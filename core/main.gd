@@ -188,6 +188,8 @@ func enter(zid: String, from: String) -> void:
 		if args.has("hour"):
 			Game.clock = float(args["hour"]) * Game.day_len
 	hero.died.connect(_on_hero_died)
+	if zone.id == "opening_cave" and hero.st.fate_picks.is_empty():
+		_nascent()
 	if title_open:
 		_title_open()
 	elif reading_open and fresh_pilgrim and zone.id != "opening_cave":
@@ -269,6 +271,31 @@ func _reading_done(r: Dictionary) -> void:
 	hero.st.poise = hero.st.poise_max()
 	title_done()
 	save_game()
+	# the last card drawn, the pilgrim has its shape: the game goes on out on the cove, in its calling's own body
+	if zone and zone.id == "opening_cave":
+		await enter("red_shore", "opening_cave")
+
+## the new pilgrim in the cave before the cards have made it (Derek, 2026-10-10): "a suggestion of a person ... gore
+## covered and thus undefined", "It can be a generic new body", "Sluggish and slow from its new birth": the same hooded,
+## gaunt body for every calling (art/sprites/hollow_hd), drawn as a shape of blood (shaders/nascent.gdshader), no
+## lantern and no light of its own, dragging itself along at under half pace (entities/hero.gd NASCENT_K)
+func _nascent() -> void:
+	hero.nascent = true
+	hero.spr.set = Data.sprite_set("hollow_hd")
+	hero.spr.scale = Vector2.ONE * Iso.FIG
+	hero.spr_base = hero.spr.scale
+	hero.spr.play("idle", true)
+	var m := ShaderMaterial.new()
+	m.shader = load("res://shaders/nascent.gdshader")
+	hero.spr.material = m
+	if hero.lamp:
+		hero.lamp.enabled = false
+	if hero.lantern and is_instance_valid(hero.lantern):
+		hero.lantern.visible = false
+		hero.lantern.process_mode = Node.PROCESS_MODE_DISABLED
+	var mg = zone.get_node_or_null("WorldObjects")
+	if mg and mg.gore:
+		mg.gore.drips = 6.0                          # the blood running off it
 
 func title_done() -> void:
 	title_open = false
