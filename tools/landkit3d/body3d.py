@@ -169,10 +169,34 @@ def body(name, pose, state, x, y, yaw, support, seed=0, cloak=True):
         q[2] = support(q[0], q[1]) + thick.get(j, 0.05) * 0.85            # pressed a little flat where it lies
     for (a, b, t, rw, rh, _) in A:
         _clear(Wj, support, a, b, rh * 0.8)
-    objs = [_shell(name, Wj, A, rnd, 1.0)]
+    face = _face(Wj, state) if p["roll"] == 180 else []
+    objs = [_shell(name, Wj, A, rnd, 1.0, face)]
     if cloak:
-        objs.append(_cloak(name + "c", Wj, A, rnd, state))
+        objs.append(_cloak(name + "c", Wj, A, rnd, state, p["roll"] == 180))
     return objs
+
+
+def _face(Wj, state):
+    """a face turned up out of the hood (chapter 15, 6e: true form for the supine): the brow, the nose, the cheekbones,
+    the jaw dropped a little, the eyes sunk; puffed in the bloat, drawn tight in the rot"""
+    hd, nk = Vector(Wj["head"]), Vector(Wj["neck"])
+    ax = hd - nk
+    ax.z = 0
+    ax.normalize()
+    sd = Vector((-ax.y, ax.x, 0))
+    k = dict(bloat=1.3, rot=0.85).get(state, 1.0)
+    top = hd.z + 0.085 * k
+    out = []
+    def el(off_ax, off_sd, dz, rw, rh, ln):
+        q = hd + ax * off_ax + sd * off_sd
+        q.z = top + dz
+        out.append((q, rw, rh, (ax.x, ax.y), ln))
+    el(0.045, 0.0, 0.0, 0.05 * k, 0.02, 0.03)                         # the brow
+    el(0.0, 0.0, 0.02, 0.012, 0.02, 0.03)                             # the nose
+    for s_ in (-1, 1):
+        el(-0.01, s_ * 0.04, -0.005, 0.022 * k, 0.015, 0.02)          # the cheekbones
+    el(-0.07, 0.0, -0.02, 0.04 * k, 0.018, 0.035)                     # the jaw, dropped
+    return out
 
 
 def _mb(name):
@@ -208,8 +232,10 @@ def _mesh(ob, name, mat):
     return P._link(name, me, mat)
 
 
-def _shell(name, Wj, A, rnd, grow):
+def _shell(name, Wj, A, rnd, grow, extra=()):
     mb, ob = _mb(name)
+    for (q, rw, rh, along, ln) in extra:
+        _el(mb, q, rw, rh, along, ln)
     for (a, b, t, rw, rh, _) in A:
         pa, pb = Vector(Wj[a]), Vector(Wj[b])
         q = pa.lerp(pb, t)
@@ -221,7 +247,7 @@ def _shell(name, Wj, A, rnd, grow):
     return _mesh(ob, name, "corpse")
 
 
-def _cloak(name, Wj, A, rnd, state):
+def _cloak(name, Wj, A, rnd, state, face_up=False):
     """the hooded cloak, wet (chapter 15, section 4): plastered on the high forms so the body reads through it (the
     shoulder blades, the buttocks, the backs of the thighs), the hood collapsed onto the skull, a few small sharp folds
     only where it leaves the body (pooled at the waist, gathered by the rope belt), the hem spread on the ground in a few
@@ -241,7 +267,11 @@ def _cloak(name, Wj, A, rnd, state):
             q = pa.lerp(pb, t)
             seg = pb - pa
             g = 1.05 if b != "head" else 1.1                        # wet: tight on the body; the hood on the skull
-            _el(mb, q + Vector((0, 0, 0.008)), rw * g + 0.006, rh * g + 0.006, (seg.x, seg.y),
+            off = Vector((0, 0, 0.008))
+            if b == "head" and face_up:
+                # face up, the wet hood has slipped back off the face: it lies behind and under the head like a pillow
+                off = Vector((0, 0, -0.06)) - seg.normalized() * 0.05
+            _el(mb, q + off, rw * g + 0.006, rh * g + 0.006, (seg.x, seg.y),
                 (min(seg.length * 0.42, 0.3) + rw * 0.4) * g)
     ax = Vector(Wj["neck"]) - Vector(Wj["pelvis"])
     ax.z = 0

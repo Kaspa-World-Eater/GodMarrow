@@ -163,3 +163,12 @@ puffed, the cloak stretched smooth over it with no folds, the belt cutting in. *
 the bloated body reads heavy and domed beside the fresh dead. **Grade: B-** for the robed dead, C+ the bone. **Next:**
 the face for the bodies that lie face up (the supine pose shows the hood's opening, empty dark), and the dead seen near
 the lantern in the game.
+
+## Pass 10: the faces turned up
+
+**Fixed:** a body lying face up shows its face (chapter 15, 6e): the wet hood slipped back off it to lie under the head
+like a pillow, the brow, the nose, the cheekbones, the jaw dropped a little, puffed in the bloat and drawn in the rot.
+The face-down dead keep their hoods shut over their heads. **Grade: B-** for the robed dead, C+ the bone, after ten
+passes. **For Derek's grade:** the dead on the strand and in the Red (cove rebaked after pass 8; passes 9 and 10 are in
+the builder for the next bake). **Still to reach the standard:** the wet sheen and the sand packed into the cloth when
+painted; the skeleton's pelvis and hands; the dead nearer the lantern, where their form turns most.
