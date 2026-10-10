@@ -856,3 +856,20 @@ constants on the 2 x 2 grid, tested on all three rooms from their saved passes (
 `cine_check`: 9 of 9 in all three rooms, before and after. The follow-up is closed. **Open:** the shared corpse asset
 (queued above); Derek's grade of pass 11; then the cave's bake into the game.
 
+
+## Rules check (5th since pass 11): the cave in the game (2026-10-09, evening)
+
+**Read:** `MASTER_RULES` in full (now with the zoom rule, the bake and walk proofs, the animation section); the area's
+opening (`areas/the-red-shore.md`, "The pilgrim looks exactly like the corpses on the beach, and stands"); Derek's
+newest note on the review page, `cave_now`: "Bodies look bad".
+**Checked in the game itself** (captures on the review page, section "The cave, in the game"):
+- 1 brief, 2 scale: held; the pilgrim small under the faces and the great face.
+- 3 form: held, except the dead (below).
+- 4 light, 13 cinematography: pools with black between; every source seen; the cliffs on the camera's side now fall
+  to black. The pool chamber's floor reads a flat mid-grey at the game's scale, a step lighter than the stills.
+- 8 contact, 10 life: the flames breathe and smoke in the game; the braziers' smoke puffs read large.
+- 11 seen as the player sees it: done; the walk proved, 60 fps.
+- **2.3 no primitive stand-ins: FAILS.** The dead in the pool are a sphere torso with tube limbs. Derek: "Bodies look
+  bad". This is the worst failure.
+**The fix is a piece of its own** (2b, 2.3): one shared body for the cave, the beach and every later dead. Its rules
+check and brief are written at the head of `tools/landkit/passes/the_dead.md`, for Derek's go before pass 1.
