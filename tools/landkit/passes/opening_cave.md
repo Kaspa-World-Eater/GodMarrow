@@ -838,4 +838,9 @@ again, with the dull heart, the skin and the clots reading; 9 of 9.
 - **Follow-up:** `paint_cave.light_field`'s grain smoothing (2 px) and the local-contrast blur (16 px) are the same kind
   of pixel constant; scaling them by the zoom changes every room's light, so it is its own pass, checked on all three
   rooms.
+- **The dead are a piece of their own (MASTER_RULES 2b, 2.3):** the cave's `pool_bodies` and the beach's
+  `redwater3d.corpse` and `beach3d.drowned` are all built the same way, a sphere torso and straight tube limbs; the
+  beach's only read better because `paint_shore.form_tones` turns them. A body is a reusable asset: one shared
+  builder (shaped limbs with knees, elbows, hands and feet, the weight lying on what it lies on, bloat and rot as
+  states), with its own ten graded passes, then used by the beach, the cave and every later dead. Queued, not patched.
 
