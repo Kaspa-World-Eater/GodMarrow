@@ -167,7 +167,7 @@ def main():
     # a lightning storm at dawn, the black sand blowing in off the Red (Derek, 2026-10-09: first "night", then "let's
     # change the time of day to be Dawn ... You can't really enjoy the oh shit if you can't see it"; world/weather.gd,
     # world/dark_layer.gd, core/gust.gd): the wind's heading in world tiles, from the sea inland
-    N["weather"], N["wind"], N["holdPhase"] = "sandstorm", [1.0, 0.0], 0.955    # well into dawn: light enough to see it
+    N["weather"], N["wind"], N["holdPhase"] = "sandstorm", [1.0, 0.0], 0.978    # late in the dawn: light enough to see it
     N["packs"], N["monsters"] = [], []
     # the light over the cove: the paint already holds the overcast, so the day lays only a breath of cool grey over it
     # (the bog's ambience is a heavy veil for a dark marsh); the night is the moor's deep blue

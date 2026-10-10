@@ -145,3 +145,11 @@ has no dome against the cloak; none of it yet seen painted at the game's scale o
 state's pelvis, a smooth lump. **Fixed:** two flared wings, the sacrum between them, the rim of its opening, the hip
 sockets; under the fallen cloak it now reads as small bones, not a ball. **Next:** the cove rebaked with the new dead
 (checklist 11: seen as the player sees it, painted, at the game's size), then the bloat's dome.
+
+## The cove rebaked with the new dead (checklist 11)
+
+The cove baked again with the robed dead on the strand and in the Red (45 tiles aligned at 0.00 px, the empty corner
+tiles none; the walk proved, 2,553 tiles). **In the game:** a body on the strand reads as a dark cloaked shape with pale
+hands and feet, lying by its weight, small at the game's true scale. **Also:** the cove's held dawn moved later
+(0.978), because at 0.955 the frame was still too dark to see (Derek: "You can't really enjoy the oh shit if you can't
+see it"). **Next:** the bloat's dome; the dead seen nearer the lantern, where their form turns.
