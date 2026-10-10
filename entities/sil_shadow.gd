@@ -78,7 +78,8 @@ func _process(_dt: float) -> void:
 		queue_free()
 		return
 	var zone = owner_node.get("zone")
-	var gone: bool = zone == null or owner_node.get("dead") == true or owner_node.get("buried") == true or src == null or not is_instance_valid(src) or not src.visible
+	var s2 := _src_sprite()
+	var gone: bool = zone == null or owner_node.get("dead") == true or owner_node.get("buried") == true or s2 == null or not is_instance_valid(s2) or not s2.visible
 	if gone:
 		visible = false
 		return
@@ -95,6 +96,15 @@ func _process(_dt: float) -> void:
 			queue_redraw()
 
 # ------------------------------------------------------------------ the hero's silhouettes
+## what the hero's silhouette is cast from: its sprite, or the live 3D body's picture when it has one
+## (entities/body3d.gd, the newborn: its own silhouette, crawling or standing, laid on the ground)
+func _src_sprite() -> Sprite2D:
+	if is_hero and owner_node != null and is_instance_valid(owner_node):
+		var b = owner_node.get("body3d")
+		if b != null and is_instance_valid(b):
+			return b.pic
+	return src
+
 ## a world direction on screen (web px)
 static func scr(d: Vector2) -> Vector2:
 	return Vector2((d.x - d.y) * A, (d.x + d.y) * B)
@@ -113,7 +123,7 @@ func _hero(zone) -> void:
 	var want: Array = []     # [world dir, length, strength]
 	# 1. the floating lantern: a low light close by, a long shadow thrown off the far side
 	var ln = h.get("lantern")
-	if ln != null and is_instance_valid(ln):
+	if ln != null and is_instance_valid(ln) and ln.visible:      # (a hidden lantern, as the newborn's, throws nothing)
 		var d: Vector2 = h.tp - ln.tp
 		if d.length() <= 0.08:
 			var gl: Vector2 = ln.glass_screen() - h.position
@@ -131,7 +141,7 @@ func _hero(zone) -> void:
 	for e in ([] if Settings.fewer_fx else fl.slice(0, 2)):
 		want.append([h.tp - e[1]["tp"], minf(1.7, 0.55 + e[2] / e[1]["R"] * 1.3), e[0] * 0.8])
 	# 3. the sun, outdoors by day: it turns with the hour and is long at either end of the day
-	if out and dk > 0.05:
+	if out and dk > 0.05 and not zone.d.get("sunless", false):   # (the cave keeps the hours' ambient, but no sun)
 		var hh := clampf(Game.phase() / 0.55, 0.0, 1.0)
 		var ang := -2.4 + hh * 2.2
 		want.append([Vector2(cos(ang), sin(ang)), 0.85 + 0.9 * absf(hh - 0.5), 0.34 * dk])
@@ -153,19 +163,25 @@ func _cast(sp: Sprite2D, d: Vector2, len: float, al: float) -> void:
 	if bs.x < 0.0:
 		bs = -bs
 	sp.visible = true
-	sp.texture = src.texture
-	sp.offset = src.offset
-	sp.flip_h = src.flip_h
+	var s2 := _src_sprite()
+	sp.texture = s2.texture
+	sp.offset = s2.offset
+	sp.flip_h = s2.flip_h
 	sp.transform = Transform2D(bs, -av, owner_node.global_position + Vector2(0, 8))
 	var m := sp.material as ShaderMaterial
 	m.set_shader_parameter("al", al)
-	var at := src.texture as AtlasTexture
+	var at := s2.texture as AtlasTexture
 	if at and at.atlas:
 		var H := float(at.atlas.get_height())
 		var r := at.region
-		var feet := r.position.y - src.offset.y   # the feet stand at the local origin
+		var feet := r.position.y - s2.offset.y   # the feet stand at the local origin
 		m.set_shader_parameter("uv_feet", feet / H)
 		m.set_shader_parameter("uv_head", r.position.y / H)
+	elif s2.texture is ViewportTexture:
+		# a live body's picture: the feet at its foot line, the head a standing figure's height above it
+		var H2 := float(s2.texture.get_height())
+		m.set_shader_parameter("uv_feet", -s2.offset.y / H2)
+		m.set_shader_parameter("uv_head", (-s2.offset.y - 195.0) / H2)
 
 # ------------------------------------------------------------------ the creatures' wedges
 func _draw() -> void:

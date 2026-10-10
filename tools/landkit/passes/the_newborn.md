@@ -211,3 +211,23 @@ ambient drops to 0.08 (MASTER_RULES 0c).
 
 **Grade: B-** (light now passes; the next items hold it).
 **Worst open:** 1. no shadow (8); 2. the faint rings at the wrists and knees; 3. paint (7).
+
+## Rules check (after pass 4), and pass 5: its shadow
+
+**Check:** rules and lore unchanged. The worst open line was **8 (contact): no shadow**. The hero's silhouette shadow
+read the hidden sprite, so it vanished with it.
+
+**Pass 5:** `SilShadow` now casts from the live body's own picture when the hero has one (`_src_sprite()`): its
+silhouette, crawling or standing, laid flat along the ground away from the two strongest flames in reach. The feet sit
+at the picture's foot line and the fade runs over a standing figure's height. Two wrong shadows found by a debug count
+were taken out: the hidden lantern's (a hidden lantern throws nothing) and the sun's in the cave (the cave keeps the
+hours' ambient by design, so its zone now carries `sunless`; `cave_export.py`). The cave was re-exported from its bake;
+the only change in the zone is that mark. (A first re-export without the bake's work folder wrote no lights; it was
+restored from the commit before anything else ran.)
+- **A/B in the game** (the same moment with the casts on and off): the shadows are there but faint. The candles are
+  weak and several yards off and the floor is dark, so the shadow is as faint as that light makes it (0c: shadows
+  show in lit pools).
+- Smoke 12/0.
+
+**Grade: B-.** **Worst open:** 1. the faint rings at the wrists and knees; 2. paint (7): the picture is a stepped
+render; 3. the blood streaming off it is still 2D drips, not strands on the body.

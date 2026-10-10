@@ -149,6 +149,7 @@ def main():
     amb["dark"] = 0.22
     N["ambient"] = amb
     N["dark"] = 0.22
+    N["sunless"] = True                                               # no sun throws a shadow down here (entities/sil_shadow.gd)
     path = os.path.join(ROOT, "data", "zones", "opening_cave_s%d.json.gz" % CB.SEED)
     with gzip.open(path, "wt", encoding="utf-8") as fh:
         json.dump(N, fh)
