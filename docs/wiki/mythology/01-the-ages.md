@@ -16,7 +16,7 @@ before. This page tells only this turn.
 |---|---|---|
 | **The Silence** | before anything, and around everything still: the space between words, holding every meaning there could ever be | `02`, `04` |
 | **The Lying Down** | the thing beneath comes to lie across the dark, and the first peoples live on it without knowing what it is | `02`, `03` |
-| **The Age of the Ythraal** | fear and worship grow bodies, and the bodies rule; the Thrae reach in from beyond, and the god's herald goes against them; the Famines; the cities in the sky; the Needle, the reaper, the shell | `03` |
+| **The Age of the Ythraal** | fear and worship grow bodies, and the bodies rule; the Thrae reach in from beyond, and the old one's herald goes against them; the Famines; the cities in the sky; the Needle, the reaper, the shell | `03` |
 | **The Wasting** | the marrow is gone out of half the world; the Ythraal waste away and break into Wants; penance, the iron maidens, the girl who would not die in hers; the cities empty | `03` |
 | **The Held Space** | alongside the ages above, inside the thing beneath: a space held open and lit from nowhere, the Choir, the Angles, the court of white faces, the Keeper | `04` |
 | **The first morning** | the thing beneath lets go its last breath; the people wake on the ash of its hide, and nobody knows how they came there | `02`, `04` |
@@ -24,9 +24,10 @@ before. This page tells only this turn.
 
 ## The Silence
 
-Before there was anything, there was the Silence. It held every meaning there could ever be, the way the pause before a sentence holds what the sentence is for. It had no edge, and nothing in it
-could be named, so nothing in it could stand. It is still there. Every god, every age and every word in this bible
-is held inside it the way a word is held between two pauses.
+Before there was anything, there was the Silence. It held every meaning there could ever be, the way the pause before
+a sentence holds what the sentence is for. It had no edge, and nothing in it could be named, so nothing in it could
+stand. It is still there. Every power, every age and every word in this bible is held inside it the way a word is held
+between two pauses.
 
 ## The Lying Down
 
@@ -34,20 +35,22 @@ Something came to lie in the Silence. What it was, nobody knows, and we leave it
 its skin a country, its bones mountain ranges, its breath a weather. The peoples who came later called it a god because
 "god" was the largest word they had. It may never have known that anything lived on it.
 
-On it, in that unnumbered time, the first peoples lived and feared. Where they came from, nobody can say. They feared
-the dark, the open, the cold, the hunger of things larger than themselves, and they prayed, and here the oldest law of
-the world began to work: **a belief held long enough by enough people grows a body.** Fear and worship are food to a
-god; a god that nobody remembers starves. And belief does not pass through a god and away: it settles, in the bones of
-anything long feared or long prayed to, and hardens there into **marrow**.
+On it, in that unnumbered time, the first peoples lived. Where they came from, nobody can say. They hungered, grieved,
+feared, prayed and boasted, and here the oldest law of the world began to work: **a belief held long enough by enough
+people grows a body.** Whatever is held hardest feeds what it grows; a power nobody holds to any more starves. And belief
+does not pass through a power and away: it settles, in the bones of anything long held to, and hardens there into
+**marrow**.
 
 ## The Age of the Ythraal
 
-The Ythraal walked. Every great fear had grown a body, and every body ruled the people whose fear had made it.
+The Ythraal walked. Every belief held hard enough (a hunger, a grief, a pride, a fear) had grown a body, and every
+body ruled the people who had made it.
 
 - **The Thrae,** three that came in from beyond the outside, and the fourth, the hole they came through (whole,
   holy, hole), which ate the shape of things without ever knowing the world was there. The herald, a great undead beast
-  of bone and black hide, fought them; they never noticed. One lay down and is the bleeding mountains above the Red; the other two went. The herald fell
-  into a crater, was worshipped there, and ate its worshippers and then itself: the Starved Crown.
+  of bone and black hide, fought them; they never noticed. One lay down and is the bleeding mountains above the Red;
+  the other two went back into the hole. The herald fell into a crater, was worshipped there, and ate its worshippers
+  and then itself: the Starved Crown.
 - **The Famines:** god-corpses the height of hills that kept walking, eating the land bare, into which whole kingdoms
   climbed to live. One still walks, with Dhum's lamps lit in its side.
 - **The Needle,** a spike of iron in a forest, full of a slow digesting liquid, bones and great eyes, which drinks
@@ -66,21 +69,21 @@ The peoples of the age:
 - the Angles, inside the thing, whose halls have too many corners;
 - in the Deep, Vesk, the iron city that sank and was held up by its people, fused into its legs.
 
-Rule by terror was the order of things. A city that trembles is a city that feeds its god. And every power anyone
-had was marrow dug out of the ground, which was the god's own life.
+The peoples fed their powers, and the powers grew, and ruled. And every power anyone had was marrow dug out of the
+ground, which was the old one's own life.
 
 ## The Wasting
 
 It ended the way it had to. The marrow was gone out of half the world, and the peoples who fed the Ythraal died of the
-waste, or stopped believing, or were eaten by what they believed in. The Ythraal wasted away. **A god that wastes to
+waste, or stopped believing, or were eaten by what they believed in. The Ythraal wasted away. **A power that wastes to
 its end breaks apart into lesser things**, each carrying one of its hungers: these are the Wants, and they bargain,
-because a bargain is the nearest thing to a prayer they can get. The peoples fed their gods pain when they had nothing
+because a bargain is the nearest thing to a prayer they can get. The peoples fed their powers pain when they had nothing
 else: processions of penance, and the iron maidens standing in rows in the wastes. Some penitents were believed into
 something more, a saint or a Want or a god for a winter. The cities emptied. Knowledge died with the hands that held it.
 
 Some powers did not die. They slept, or went under, or kept walking because nobody told them to stop. The Starved Crown
 ate its worshippers and then itself to stay awake. One Famine still walks, and Vesk walks in the Deep. The pit at the
-dead serpent's throat was still being fed in blood when the god died, and long after.
+dead serpent's throat was still being fed in blood when the old one died, and long after.
 
 ## The Held Space
 

@@ -88,8 +88,8 @@ get in under the veil and lift it from inside. However it begins, the grey will 
 since the first morning, and whoever is left on the Hide will stand out of doors and see the sky bare: the sun for the
 hole it is, and the two moons for what they are, and the Crone looking down through all three.
 
-And she will see what she has woven, and it will be wrong. It has been wrong since the god died, the circles say,
-because the god was the loom and she has been weaving without one ever since, and the cloth has puckered and run and
+And she will see what she has woven, and it will be wrong. It has been wrong since the old one died, the circles say,
+because the old one was the loom and she has been weaving without one ever since, and the cloth has puckered and run and
 gone to knots, and every war and plague and lost child is a knot in it. She will see it all at once. And she will begin
 to unpick.
 
@@ -129,12 +129,12 @@ close the Silence too, and the processions say it carefully.
 
 ## The Myriad: the Breath Drawn In
 
-The keepers teach that the world is the dead god's out-breath, and that every breath that goes out comes back in.
+The keepers teach that the world is the dead one's out-breath, and that every breath that goes out comes back in.
 
 The one wind is still going out across the Hide, thick with the kami of everything the great one ever thought, and
 of everything everyone since has said aloud. They quarrel in it. That is the only thing keeping the world as it is:
-**discord**, belief against belief, god against god, each small one holding every other small one down. The keepers tend
-the quarrel. They whisper contradictions into their shrines so that the caught gods never settle. They breathe a lie
+**discord**, belief against belief, kami against kami, each small one holding every other small one down. The keepers tend
+the quarrel. They whisper contradictions into their shrines so that the caught kami never settle. They breathe a lie
 into a room where a truth has been told too often. They set one house's grudge loose in the next house's well. They
 are hated for it, and they would say they are hated by people who do not understand what they are holding back.
 
@@ -166,9 +166,9 @@ is closer than it was*.
 
 ## The Second Mouth: the Swallowing
 
-The cult that calls itself the Second Mouth teaches that the god had two. The first mouth breathed. It breathed in once,
-at the beginning, and everything that is was in that breath, and since the god died the first mouth has been breathing
-out: the long exhale, the one wind, the world going out of the god a little more every year. The second mouth eats.
+The cult that calls itself the Second Mouth teaches that the old one had two. The first mouth breathed. It breathed in once,
+at the beginning, and everything that is was in that breath, and since the old one died the first mouth has been breathing
+out: the long exhale, the one wind, the world going out of the old one a little more every year. The second mouth eats.
 
 The cult is the second mouth's teeth. They do not pray; they eat. At their tables, at night, they eat the flesh of the
 world: the warm earth of Shog-Mire, the meat of the things that come up, the red of the wet places, and, at the great

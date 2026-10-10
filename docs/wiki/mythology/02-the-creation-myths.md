@@ -28,12 +28,12 @@ back to, and nobody is to try.
 
 That much every telling agrees on. How the people came to be lying there, no two tellings agree, and the tellers have
 stopped expecting to. The tellings heard most often:
-- **Dreamed.** The grandmothers of the lowlands say the god was dying under the ash that night, and the dying dream,
+- **Dreamed.** The grandmothers of the lowlands say the old one was dying under the ash that night, and the dying dream,
   and what the dying dream of most is company. It dreamed of people around it, and dreamed so hard that in the morning
   they were there. That is why, some nights, you dream a dream that is not your own, of warm dark and a sound like
   breath: it is the old one's dream, still running in you, and you are in it.
 - **Grown.** The diggers of the lowlands say people came up out of the Hide the way everything comes
-  up out of a body left lying: the god died, and the warm ash bred, and what it bred was them. They say it without
+  up out of a body left lying: the old one died, and the warm ash bred, and what it bred was them. They say it without
   shame. Everything that lives here grew out of something dead, they say. Why should we be the only ones ashamed of it?
 - **Given back.** The shore folk say the first people came up out of the Red on the first morning, red to the hair,
   crawling up the black sand on their hands, because the Red gives back whatever goes into it, and that morning it gave
@@ -41,7 +41,7 @@ stopped expecting to. The tellings heard most often:
 - **Counted.** The Pale Order says people were always here, laid in the Mother like the bones of a hand, and the morning
   is only when the first of them was counted. Before the count, nothing is anything.
 - **Left.** Some old women say the people were here before the morning, a long time before, living under the old powers
-  in the old age, and that whatever took the god's names that night took everyone's names with it, and left the bodies
+  in the old age, and that whatever took the old one's names that night took everyone's names with it, and left the bodies
   lying on the ash to wake up with nobody in them. They say: we are not new. We are what was left.
 
 None of the tellings says who the people were before, or whether there was a before. The Tithed have learned to leave
@@ -209,8 +209,14 @@ say the Words over it as it pours. The Words tell her whose blood it is and what
 comes back, in time, as a saint on the stair. Blood given without them is given to no one. Blood given is not blood
 taken.
 
-Of the god's death the processions remember nothing. The wound was already open when they came to it, and the cup came
-down to them from somewhere. Their faith begins with the first cup filled.
+Of the old one's death the processions remember nothing. The wound was already open when they came to it, and the cup
+came down to them from somewhere. Their faith begins with the first cup filled.
+
+There is another telling, and the processions do not tell it. The few who remember the Wasting say the Maiden was a
+girl, once, who stepped into an iron maiden out in the waste and closed it on herself, and did not die, and bled, and
+went on bleeding for longer than anyone could stand to watch; and that the wound in the ground where the first cup was
+poured is the channel her blood wore under the iron's foot (`03-the-age-of-terrors.md`, the Wasting). A maiden in a
+maiden. The processions say the wound came first. The grandmothers say the girl did.
 
 *Behind the myth.* What the flesh is, nobody knows. The faith's own creed, that it has no mind, is the most
 frightening thing it says. Deep in Shog-Mire it is whispered that something in the red water is learning the words.
@@ -273,27 +279,40 @@ bodies, and it shows: they go grey, they cough, their lips go dark, and a keeper
 down into the water, still holding. The faith calls those ones **kegare**, the word for the filth they carry. Nobody has
 followed far enough to see what they become.
 
-## The Second Mouth: the Door
+## The Second Mouth: the Two Mouths
 
-*What they look at:* the same flesh as the processions, from the other side. This is the one cult, hidden inside the
-processions, and its creation is the processions' turned inside out.
+*What they look at:* the same flesh as the processions, from the other side: its hunger. This is the one cult, hidden
+inside what is left of the processions, and its beginning is theirs turned inside out.
 
-The world is the outside of a body. The Mother is inside, and every wound in the world is a door she is
-trying to come out of. What comes up when a wound opens is her, looking for somewhere to go.
+The old one had two mouths, the cult teaches. With the first it breathed. It breathed in once, at the beginning, and
+everything there is was inside that breath; and since it died it has been breathing out, and the world is the long
+exhale going out of it, the wind the Myriad's keepers ride. With the second it ate. The second mouth is still open,
+somewhere under the Hide, and it is still hungry, and it is the only one of the two that matters now.
 
-Worship starves her. Every cup poured and every Word said forward keeps her down under the skin, blind and still, and
-the faithful call that keeping her holy. Taken into a living body, she has eyes again, and hands, and a voice. The Words
-run both ways: forward they give, backward they take, and the Mother cannot tell who is taking her.
+So the world is not a wound to be bled into, whatever the processions say. It is food that has not been eaten yet. The
+processions give their blood back to the Mother a cup at a time, so that she will stay fed and quiet under the skin;
+the cult says that is starving her, because blood poured into a wound runs into the ground, and the ground is only the
+outside. Only what is eaten is carried. Only what is carried is kept. So the faithful eat: the warm earth of the mires,
+the meat of the things that come up, and, at the great feasts, their own dead, so that nothing of the faithful is ever
+lost to the outside. What they carry, the Mother has: eyes again, and hands, and a voice.
 
-Creation is not finished. It will be finished when she has walked out of the world wearing her people.
+The first of them cut the first second mouth. She opened a mouth in her own body, over the breastbone, and sewed its
+lips open with gut, and fed it before she fed the one in her face, and every one of the faithful since has done the
+same. The Words of the processions run both ways in the cult: said forward they give, said backward they take, and the
+Mother cannot tell who is taking her.
+
+Creation is not finished, the cult says. It will be finished when the second mouth has eaten everything the first one
+breathed out.
 
 *Behind the myth.* The cult's founder has outlived her name, and the mouths cut into her have begun to answer one
-another. Whether anything is walking out through them, nobody outside the dark has seen.
+another. The processions burn a body wherever they find a sewn breastbone. Whether anything is walking out through the
+second mouths, nobody outside the dark has seen. Its end is the Swallowing (`06-the-ends-of-the-world.md`).
 
-## The shore folk: the Fallen One and the Red Water
+## The shore folk: the Fallen One and the Red
 
-*What they look at:* the blood. A sea of it at the edge of the world, and the dead it gives back. The shore folk, at
-the start of the game, gave it no face at all, only a body.
+*What they looked at:* the blood. A sea of it at the edge of the world, and the dead it gives back. The shore folk gave
+it no face at all, only a body, and they never called it water: it was **the Red**, which was its name and not its
+colour.
 
 Before there were people, and before there were trees, there was the Fallen One. It came down out of somewhere higher
 than the sky and lay down, and the land is its body. The forest grew out of its back, the way young cedars grow out of
@@ -303,15 +322,17 @@ tall.
 But it did not lie down whole. As it fell, it was struck, or it struck something on the way down; the keepers never
 agreed which. It came down with a wound in its side, the side that faces away from the trees, and it bled. Blood runs
 downhill. It ran past the edge of the trees and past the edge of the land and pooled at the low edge of everything, and
-it lies there still. That is the Red Water. It has no other side.
+it lies there still. That is the Red. It has no other side.
 
-The tide is the Fallen One's heart, still beating, very slowly, because it has not finished dying. The black sand is
-its edge, burned black where the blood touches it and ground fine by the water. And whatever goes into the Red comes
-back.
+The black sand is the Fallen One's edge, burned black where the Red touches it and ground fine. And whatever goes into
+the Red comes back. Of the tide the keepers told two things, and never chose: that it is the Fallen One's heart, still
+beating, very slowly, because it has not finished dying; and that it is the Grandmother of the Red, at the bottom of
+it, drawing in her braid and letting it out (`06-the-ends-of-the-world.md`).
 
-*Behind the myth.* The Red Water is blood, and nobody has reached a far shore. The canoes that went looking found only
-more of it, warmer the farther they went. What lies at the warm end is unknown. The wind of the world goes out over it
-and never comes back.
+*Behind the myth.* The Red is blood, and nobody has reached a far shore. The canoes that went looking found only more of
+it, warmer the farther they went. What lies at the warm end is unknown (the shell, some say, `03-the-age-of-terrors.md`).
+The wind of the world goes out over it and never comes back. The mountains above the shore that bleed into it are the
+Fallen One to the shore folk, and the One That Unfolds to the oldest books; both stand.
 
 ## The older voices
 
@@ -331,7 +352,7 @@ What they could do is told as if it were magic, because nobody now can tell it a
 opened onto other doors a hundred leagues off. They made lamps that have never gone out, and some of those lamps still
 burn in the ash where Ghenn came down, under the grass, so that on a dark night parts of the lowlands glow faintly from
 beneath. They wrote with light. Who they were, the peoples after them have never agreed:
-- **the lowland grandmothers** say they were the god's own thoughts, which got out through the top of its head while it
+- **the lowland grandmothers** say they were the old one's own thoughts, which got out through the top of its head while it
   slept and could never get back in, and went up looking for somewhere else to be thought;
 - **the Pale Order** says there were never any people in the cities at all, only the lamps, and that the lamps built
   the cities to hang themselves in;
@@ -339,7 +360,7 @@ beneath. They wrote with light. Who they were, the peoples after them have never
   be them again, and that is why they dig;
 - **the shore folk** say nothing about them, and do not look at the dark moon.
 
-**The Choir**, behind the ribs: *We were the part of the god that told it what it was.* Their beginning was the first
+**The Choir**, behind the ribs: *We were the part of the old one that told it what it was.* Their beginning was the first
 note, and they were eleven hundred and one voices singing it in turns so that it was never dropped.
 
 **The Angles**, the many-angled host, who cut the halls inside the thing, left no word for their beginning, only a
@@ -368,7 +389,7 @@ sun behind it as a white smear that gives light and no warmth, and at night a da
 some nights the cloud thins and the moons stand out clear, and on very few days the sun does, and whoever is left goes
 out to look. Every people that has lived on the Hide has a telling of what is up there. Here are the ones told most.
 
-**The grandmothers of the lowlands** say that when the god died, somebody laid coins on its eyes, so that it would not
+**The grandmothers of the lowlands** say that when the old one died, somebody laid coins on its eyes, so that it would not
 see what came after. Those are the two moons. One is silver, and that is the pale moon, the great one, whose light the
 night roads are walked by. The other was tarnished before it was laid, and that is the dark moon, small and red-brown
 and dull, which is hard to see except when it crosses the face of the pale one and bites a piece out of it. And the
@@ -383,7 +404,7 @@ higher up the black sand than on any other night, reaching for them. The shore f
 those nights.
 
 **The grey itself**, everyone agrees, is newer than the sun. The oldest tellings say the sky went grey in the year
-of the coming out. The Myriad say the grey is the god's last breath: it breathed out as it died and the breath is still
+of the coming out. The Myriad say the grey is the old one's last breath: it breathed out as it died and the breath is still
 going out, rising off the whole Hide and hanging between the world and the sun, and the sky will not clear until the
 breath has all gone. The circles of the Veiled Crone say the grey is her veil, drawn over the whole sky, and that the
 two moons are her eyes behind it, one open and one shut, and that when the dark moon crosses the pale one she is
@@ -414,4 +435,4 @@ omen in every faith. In the world, whether it is a coin, an eye, a lamp or a cit
 know it is Qhaloth, the great city in the sky, dead and rusting where it stopped rising (`03-the-age-of-terrors.md`).
 The sun stays unknown in the world; the makers lean on the Maiden's telling, a hole in the sky with the light of
 somewhere else bleeding through it, under a grey lid clouded like a dead man's eye.
-The grey sky is the Last Breath's, and the deep lore rhymes it: the god's breath is still leaving the world.
+The grey sky is the Last Breath's, and the deep lore rhymes it: the old one's breath is still leaving the world.

@@ -1,4 +1,4 @@
-# Before the god died: the Uncounted, the Age of the Ythraal, the Wasting
+# Before the old one died: the Lying Down, the age of the Ythraal, the Wasting
 
 The world the Tithed woke up in was already a ruin. Long before them, other peoples lived on the thing
 beneath, in the open and the dark. They rose higher than any people since, and their fears grew gods. This is what is
@@ -21,7 +21,7 @@ were made of, and the peoples fed them, and the more they fed them the larger th
 their dreams, because a dream is a door left open. A nightmare is something feeding.
 
 Belief does not pass through a god and away. It settles. In anything long feared or long prayed to, in a god's bones
-and in the bones of the ground the god walked on, belief sinks down and hardens into **marrow**: grey, warm, faintly
+and in the bones of the ground the old one walked on, belief sinks down and hardens into **marrow**: grey, warm, faintly
 moving, heavier than lead. Marrow is power. Whoever eats it, burns it or draws it out of a bone can do what gods do,
 for a while. Every great people of that age learned to dig it, and every faith since has dug it too.
 
@@ -37,9 +37,9 @@ world that owed nothing to anyone's belief. Nobody had dreamed them, so nobody c
 worse than the Ythraal, because an Ythraal at least wanted to be feared, and these wanted nothing that could be given.
 
 *Behind the myth.* This law is the deep lore showing at the surface (`00-the-deep-lore.md`): everything here is told,
-and what is told enough takes a body. Marrow is belief settled into bone, and the world's own marrow is what kept the god
+and what is told enough takes a body. Marrow is belief settled into bone, and the world's own marrow is what kept the old one
 alive. Every power that has been taken out of the ground since, by the Ythraal, the cities in the sky, the faiths and the
-pilgrim's own hands, has been taken from the god. Nobody in the world has put this together. The game never says it.
+pilgrim's own hands, has been taken from the old one. Nobody in the world has put this together. The game never says it.
 It lets the player notice that every source of power in the world is a wound in it.
 
 ## The Thrae, and the herald
@@ -116,7 +116,7 @@ people goes on eating anyway, and eats what is under its feet. They were god-cor
 walking after whatever moved them was gone.
 
 Whole kingdoms worshipped them by climbing the long ramps of their bodies and going inside, and lived there, in the
-warm, in the dark, in the god, for generations, and were not seen again outside. Most of the Famines have fallen and lie
+warm, in the dark, in the old one, for generations, and were not seen again outside. Most of the Famines have fallen and lie
 where they fell, and grass grows on them, and the few who live round them call them hills.
 
 One still walks. It takes an afternoon to cross the edge of the sky, and where it has trodden the ground keeps a pulse
@@ -215,7 +215,7 @@ this one, is never said.
 Far out under the Red Water, past where any canoe has gone and come back, at the warm end where the blood grows hot,
 there is a shell. It is not the size of a house or a cathedral. It is the size of a country, ridged and whorled, its
 mouth turned downward into the dark, and the blood of the whole sea has silted against it for so long that its ridges
-are mountains under the Red. Something lives in it. Something sleeps in it, and has slept since before the Uncounted,
+are mountains under the Red. Something lives in it. Something sleeps in it, and has slept since before the Lying Down,
 and dreams.
 
 When it breathes in, it draws the Red toward itself, and the blood goes back from every shore and bares the black
@@ -233,7 +233,7 @@ lights going on and off, as if someone were walking from room to room.
 
 Some say that when the sleeper wakes it will not need to breathe the Red in and out any more, because it will drink it.
 
-*Behind the myth.* Whether the sleeper is an Ythraal, one of the Thrae, or something older than the god, nobody knows,
+*Behind the myth.* Whether the sleeper is an Ythraal, one of the Thrae, or something older than the old one, nobody knows,
 and it stays unknown. Its breath and the dying heart are rival tellings of the same tide; both stand. The dead the Red
 gives back to the black sand are, read this way, its dreams washing up.
 
@@ -339,7 +339,7 @@ name in every prayer without once saying whose it is. Hallowed be the name.
 *Behind the myth.* Who built the cities in the sky is never told, and nobody in the world knows. Their story is hubris
 and marrow: they drank their own lesser cities hollow to climb, and climbed to nowhere. The dark moon is Qhaloth, dead
 and rusting, walked by ghosts, with the one lich of that age on its throne; the sky myths half know it
-(`02-the-creation-myths.md`). Ghenn's lamps under the lowland grass and Sorrath's upturned underside on the white
+(`02-the-creation-myths.md`). Ghenn's lamps under the lowland grass and Sorrath's upturned underside on the pale
 ridges could be places the pilgrim stands.
 
 ## Outside of everything
@@ -354,7 +354,7 @@ they were always there. The Citadel keeps them in a book of their own and gives 
   blade, the onyx. When you look in, it looks out, wearing your face, a little late. On the other side there is a world
   exactly like this one, where it lives your life a breath behind you, and it is tired of being behind. One day, the
   circles say, it will step through first.
-- **The Gaunt Pilgrim** has been walking upward since before the god's last breath, on roads that go up even where the
+- **The Gaunt Pilgrim** has been walking upward since before the old one's last breath, on roads that go up even where the
   ground is flat, and where he passes the dead lie back down, and some of the living.
 - **The Lectern** is a reading-stand with a book open on it, never found twice in the same place. The book is the life of
   whoever reads it, one page ahead.
@@ -367,22 +367,22 @@ of the waste, or stopped believing, or were eaten by what they believed in, and 
 later peoples call this age **the Wasting**.
 
 A god that wastes to its end does not die cleanly. It breaks apart into lesser things, the way a fallen tree breaks
-down into the grubs that eat it, each one carrying a piece of the god's hunger and nothing else. These are **the
-Wants**. A Want is a single hunger that was once part of a god, walking on its own: the want to be feared, the want to
-be fed, the want to be remembered, the want to be held. It cannot be satisfied, because the god it belonged to is gone,
+down into the grubs that eat it, each one carrying a piece of its power's hunger and nothing else. These are **the
+Wants**. A Want is a single hunger that was once part of a power, walking on its own: the want to be feared, the want to
+be fed, the want to be remembered, the want to be held. It cannot be satisfied, because the old one it belonged to is gone,
 so it bargains, because a bargain is the nearest thing to a prayer it can get. Every bargain anyone has ever made with
 something in the dark has been made with a Want.
 
 The peoples did not let their gods go easily. They fed them what they had left, and when they had nothing left, they
 fed them pain. Pain is belief made sharp; a little of it goes a long way. So the Wasting was an age of penance. Whole
-peoples walked in processions, scourging, to the places where their gods lay thin. They built **the iron maidens**:
+peoples walked in processions, scourging, to the places where their powers lay thin. They built **the iron maidens**:
 upright coffins of iron, hinged, lined inside with spikes, and they stepped into them of their own will, and closed
-them, and stood in rows in the wastes so that their suffering would go up to the god all at once. The iron drank their
+them, and stood in rows in the wastes so that their suffering would go up to their power all at once. The iron drank their
 blood. That is why the iron of that age is red at the heart when it is broken: it is old blood, gone stale and hard.
 Some of the maidens still stand in their rows out in the waste, closed, rusted shut, and on a still day some of them
 still hum.
 
-Some of the penitents were looking for something else. A god that is wasting leaves an empty place behind it, and a
+Some of the penitents were looking for something else. A power that is wasting leaves an empty place behind it, and a
 person who suffers long enough and is watched suffering by enough people is believed in. Here and there, in the iron,
 one of them did not die. They became something: a saint, or a Want, or a god for a winter. This was **apotheosis**,
 and in the Wasting every people that had lost its god tried it. Almost nobody survived trying. The ones who did were
@@ -407,8 +407,8 @@ The cities emptied. Knowledge died with the hands that held it, and what was wri
 reads. Some powers did not die: they slept, or went under, or kept walking because nobody told them to stop. The world
 went dark and quiet and grey, and the thing beneath lay under all of it, warm, emptier than it had ever been.
 
-*Behind the myth.* The Wasting is the marrow's cost come due: every power taken out of the ground was the god's life,
-and by the end of the age there was not enough left to keep it. Whether the god died of the Silence, of its own
+*Behind the myth.* The Wasting is the marrow's cost come due: every power taken out of the ground was the old one's life,
+and by the end of the age there was not enough left to keep it. Whether the old one died of the Silence, of its own
 emptying, or of both, is unknown (`04-the-held-space.md`). The Bleeding Maiden's saints on the stair, the Pale Order's
 brothers who outlive their deaths and the iron maidens are all the same hope: suffer, be watched, become. The game
 lets the player see the rhyme and never says it.

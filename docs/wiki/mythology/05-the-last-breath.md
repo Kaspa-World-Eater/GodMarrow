@@ -1,6 +1,6 @@
 # The Age of the Last Breath
 
-From the god's death to now, longer than anyone remembers. The world is a corpse that has not finished dying. Its last
+From the old one's death to now, longer than anyone remembers. The world is a corpse that has not finished dying. Its last
 breath is still going out, and the few who are left live in that breath. Its bone still stands, its flesh still grows,
 its threads still pull, and things still come up out of it. Knowledge is the rarest thing there is. What is left of the
 faiths keeps the dark back with a soul in a jar for a lamp.
@@ -33,7 +33,7 @@ nobody lit it. Some say hot ash came over the ridge on one long breath of the wi
 heath say it came up from underneath, the heather only the wick. The Burnt Heath has never quite stopped burning since,
 and every burn on it runs one way: the way the wind goes.
 
-**The wind.** That wind is the god's last breath going out. It blows one way across the whole Hide, out past the
+**The wind.** That wind is the old one's last breath going out. It blows one way across the whole Hide, out past the
 Sighing Ridge toward the dark and out over the Red Water, and it has never once blown back. Ash that goes out on it
 never comes back.
 
@@ -53,7 +53,7 @@ world the hard way:
 So they kept their true names behind their teeth, and stopped singing at night, and buried their dead in rings of
 barrows, nine to a ring and nine of a family to each, face down, and said no names over them. The barrow lids sank
 inward, all pointing to a ring of standing teeth. The mothers they carried instead into the crypts dug between the
-god's ribs, because the crypts were warm, and the mothers had always been cold.
+old one's ribs, because the crypts were warm, and the mothers had always been cold.
 
 **The hunting.** The old powers that had outlived the Wasting still walked, and the new people were small and warm
 and full of belief. Things waited at the edge of every lantern's light, because a lantern has
@@ -104,7 +104,7 @@ summer with three still living in it, red to the shoulders, saying there was not
 the farther they went, the warmer it grew.
 
 **The Gilded Peak.** A bell-caster struck a new bell to hear its note, and in the moment after
-the note died he heard what was behind it. He put down his hammer, climbed a mountain of bone that some say is the god's
+the note died he heard what was behind it. He put down his hammer, climbed a mountain of bone that some say is the old one's
 knee, sat down at the top, and did not speak for years. The monastery of the Gilded Peak grew up around him, its
 stair gilded on every seventh step. Its monks chanted one syllable and then a silence as long, *the syllable a fence and
 the silence the field it marks*. They gilded what they honoured, so that it would be looked at and not seen. At dusk they
@@ -127,7 +127,7 @@ up. They taught that the stars are pieces of the Mother's bone not yet fallen. W
 gather bone, he set white stones in a line across the lowlands, and the line moved outward year by year; beyond it,
 things were past keeping.
 
-*Behind the myth.* The bone-houses were never cut by the Order. They are the upper floors of the builders' halls
+*Behind the myth.* The bone-houses were never cut by the Order. They are the upper floors of the Angles' halls
 (`04-the-held-space.md`), and the Order hides what lies beneath.
 
 **The bridge over the vein.** Beyond the Root Deep the Hide lies split open, and along the bottom of the rift runs a
@@ -137,9 +137,9 @@ middle of a line, and was never heard from again, and the near crew built out as
 stopped. The Broken Bridge's two halves still reach for each other. The last name cut on the near parapet is half a
 name.
 
-**The Well-Shrine.** The Myriad's purifiers set their first shrine at the Drowned Fen's one clean pool and
-began the Cutting-Away: once a year every purifier breathed the year's wrong breath into the Fen, and the Fen took it,
-and the year went with it. It took it for generations.
+**The Well-Shrine.** The Myriad's keepers set their first shrine at the Drowned Fen's one clean pool and began the
+Cutting-Away: once a year every keeper breathed out into the Fen every stolen breath she could not use, and the Fen took
+it, and the year went with it. It took it for generations.
 
 **The cards, all along.** Through all of it, every people laid cards. The brothers laid them by number, the circles
 read them like threads, the processions turned them at the cup, the shrine-keepers asked them which way the breath
@@ -161,7 +161,7 @@ in a hand no counter ever saw at work.
 
 **The grey year.** After generations of taking the world's wrong breath, the Fen gave it back. The
 clean pool went grey from the bottom up in a single night, and the grey came up out of the water and lay over the reed
-camps for days on end. Seven purifiers went down the drowned stair under the pool to find what had turned it. One counted
+camps for days on end. Seven keepers went down the drowned stair under the pool to find what had turned it. One counted
 thirty-three steps, one thirty-four, and the last one up counted thirty-six and would not say what was on the extra
 steps. Six came up horned. The seventh carried up a girl nobody had sent down, and the girl was dry. There has been no
 Cutting-Away since, only the Small Cutting, breath into paper boats burned on a dry bank. In the day-book under that
@@ -234,5 +234,6 @@ could have lit. The stair has not been swept.
 Across the Hide the lanterns are fewer every year, and so are the living. The Count rises. The rings with teeth are said
 to be coming nearer to each other, and someone is still cutting them. The wind goes out and never comes back.
 
-And somewhere a pilgrim is walking who does not know where it came from: out of a ring, out of a dream, or out of
-nothing, given a fate by a reading of the cards (`00-the-deep-lore.md`).
+And under the black cliffs, in a pool of blood, something is rising that does not know where it came from: out of the
+Red, out of a ring, out of a dream, or out of nothing. On the top step above it, a stranger is shuffling the cards
+(`00-the-deep-lore.md`).

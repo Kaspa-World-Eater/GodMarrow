@@ -60,7 +60,7 @@ grudges, lies and beliefs, carried on the breath, many and nameless (the keepers
 - **Its dead** are given to the water.
 - **Its rites:** stilling breath (taking it, from the air, the sick, the dying, the grieving who ask), holding it longer
   than anyone living, and breathing it out by the fan into a shrine, a paper figure or an enemy's face; whispering
-  quarrels into the shrines so the caught gods never agree; the Small Cutting, since the grey year.
+  quarrels into the shrines so the caught kami never agree; the Small Cutting, since the grey year.
 - **Its end of a keeper:** a keeper who holds too much grows horns and walks down into the dark, still holding; she is
   called kegare then, the word for the filth she carries.
 - **Its calling:** the Shrine Keeper.
@@ -94,7 +94,7 @@ every year):
 - a lone ash-boiler on the Ash Shore, boiling the grey-soaked ash;
 - the lantern folk of the Sighing Ridge, a handful, who stand still when the wind stops;
 - a boatman on the Drowned Fen;
-- a hunter here and there, who takes hide, bone and tallow from what comes up out of the god;
+- a hunter here and there, who takes hide, bone and tallow from what comes up out of the old one;
 - a last copyist, who keeps the register of the old road's numbered stones.
 
 **Further off, and later in the acts:**
@@ -145,7 +145,7 @@ waits for the next.
 
 ## The callings
 
-Each calling is a card too: the god's card the Stranger turns face up first, before any other is drawn, and the one
+Each calling is a card too: the old one's card the Stranger turns face up first, before any other is drawn, and the one
 card the pilgrim does not choose.
 
 | Calling | Code id | Its card | Its faith | Its aspect | Its resource |

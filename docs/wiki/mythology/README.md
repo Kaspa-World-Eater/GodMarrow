@@ -1,87 +1,75 @@
 # The Godmarrow bible
 
-*For us, the makers. Written 2026-10-08, at Derek's word: "I want mythologies. I want creation myths. Not always done
-the same journal format. Consider this a Bible for us, the creators of the world to reference. The in-game writing is
-more for finding shit in the game for the players."*
+*For us, the makers. Begun 2026-10-08 at Derek's word ("I want mythologies. I want creation myths ... Consider this a
+Bible for us, the creators of the world to reference. The in-game writing is more for finding shit in the game for the
+players"), rewritten through his notes of 2026-10-09. Derek reads it section by section on the Myths and Lands page
+(https://claude.ai/artifact/FJszffP2zc6C48vyDHH9ja) and leaves notes; act on every one.*
 
-This is the world's mythology, told as mythology. It holds:
-- how each people believes the world began;
-- the ages from the Silence to now, and the great myths of each;
-- how each people believes the world will end;
-- who keeps which faith.
+This is the world's mythology, told as mythology: how each people believes the world began, the ages and their great
+myths, how each people believes the world will end, and who keeps which faith. It is the reference behind every zone,
+creature, item and line we make. It is written for us, not for the player.
 
-It is the reference behind everything we make: every zone, creature, item and line. It is written for us, not for the
-player.
-
-**The player's lore is a separate thing:** the texts a pilgrim finds in the game (letters, carvings, sermons, day-book
-leaves), written in the world's own voices. Those live in `../in-game-texts/` and in each zone's page.
+**The player's lore is separate:** the texts a pilgrim finds in the game, in the world's own voices, live in
+`../in-game-texts/` and on each zone's page.
 
 ## The pages
 
 | Page | What it holds |
 |---|---|
-| `00-the-deep-lore.md` | **the truth beneath everything, for us only:** the world as narrative, gods as dreams believed real, everything reflecting everything, mantles, the Silence, the pilgrim |
-| `01-the-ages.md` | **the timeline:** the ages from the Silence to now, and the events of the Last Breath in order |
-| `02-the-creation-myths.md` | **every people's creation myth,** in full |
-| `03-the-age-of-terrors.md` | the world before the god died: the Ythraal, the Thrae and the herald, the Famines, the Needle, the reaper, the dead serpent, the cities in the sky and the dark moon, the peoples of that age, and the Wasting that ended it |
-| `04-the-held-space.md` | inside the living god: the Choir, the Angles, the court of white faces, the Keeper, the Deep; the first morning; and every telling of how the god died |
-| `05-the-last-breath.md` | the long age since, era by era: the coming out, the founding of the faiths, the serpent's death, the great events, to now |
-| `06-the-ends-of-the-world.md` | **every people's end of the world** |
-| `07-who-is-who.md` | the powers, the faiths and the peoples: what each holds holy, how it keeps its dead, its rites, its quarrels |
-| `areas/` | **the lands of Act I,** one page per zone: what the place is, the texts found there, and a brief for building it |
-| `backstage.md` | every decided fact with its source, the gaps and the contradictions: the detail behind these pages |
+| `00-the-deep-lore.md` | **the truth beneath everything, for us only:** everything is told, everything reflects everything, the Silence, mantles, the cards, the cycle, the pilgrim, the Reading |
+| `01-the-ages.md` | the ages in order (nothing is dated): the Silence, the Lying Down, the age of the Ythraal, the Wasting, the Held Space, the first morning, the Age of the Last Breath and its events in order |
+| `02-the-creation-myths.md` | every people's beginning: the Tithed's first morning (nobody knows where they came from), the Pale Order, the Gilded Peak, the Veiled Crone, the Bleeding Maiden, the Myriad, the Second Mouth, the shore folk, the older voices, the sky |
+| `03-the-age-of-terrors.md` | the age of the Ythraal: how they were made, the Thrae and their fourth, the herald (the Starved Crown), the Famines, the Needle, the reaper (death's Titan), the shell, the dead serpent, the cities in the sky and the dark moon, the Wasting and the girl in the iron maiden |
+| `04-the-held-space.md` | inside the old one: the Choir, the Angles, the court of white faces, the Keeper, the Deep and Vesk, every iron thing as one story; how the old one died; the first morning |
+| `05-the-last-breath.md` | the age since, era by era, to now |
+| `06-the-ends-of-the-world.md` | every people's end of the world, each read in the cards, and the signs |
+| `07-who-is-who.md` | the aspects and their masks, the faiths, the few peoples left, the mantles (one per card), the callings (each a card) |
+| `areas/` | one page per Act I zone: what the place is, the texts found there, a brief for building it |
+| `backstage.md` | not lore: the old digest of every source, with what has since been retired at its head |
 
 ## How the bible is written
 
-- **The gods are unknowable** (Derek: "I want it lovecraftian, the gods being unknowable alien-like entities"). What
-  the world is made of, and what walked on it, is vast, alien and indifferent. The peoples cannot grasp the whole, so
-  they cut it into aspects they can name (the frame, the threads, the growing, the leaving breath) and give each a face
-  they can love or fear: the Bearing Mother, the Veiled Crone, the Bleeding Maiden, the small gods. **The faces are
-  masks,** human ways of trying to understand. The bible tells the myths behind the masks, and never pretends a mask is
-  the thing.
-- **A world of unknowns** ("not Baldur's Gate"). The bible keeps to the great things: the entities, the ages, the
-  faiths, the regions. It names no little towns or villages (they don't exist; the Ossa is fine), and few people.
-  The player makes the connections.
-- **A desolate world** (Derek, 2026-10-09: "it's in fact more of a desolate wasteland and there's almost nobody
-  there"). The living are few and scattered: a lone house, a camp, a hermit, the last one left in a place. The faiths
-  are dwindling remnants. Trades, markets and busy roads stay out of the lore, but for a few lone figures. The cities
-  of the old age are ruins, and make the world emptier.
-- **Myths are told as myths.** The voice is that of a good book of world mythology, readable and in order, with
-  little jargon. The old tongue's names (Oss-Vharoth, Ur-Nihl) appear rarely. No myth is framed as a character's
-  journal.
-- **Depth of time.** Every myth belongs to an age, and `01-the-ages.md` places it. Nothing is dated; the ages and
-  their events have only an order.
-- **Rival tellings stand.** The peoples of the Hide were not there for most of what they tell, and they disagree.
-  Contradictions are canon (Derek, 2026-10-05); the bible tells each telling and never reconciles them.
-- **Behind the myth.** Where Derek has ruled a truth the world's people never learn, a short note marked *Behind the
-  myth* says it, for us. The game only ever hints at these.
-- **Unknown on purpose.** Some things are unknown even to us, and stay unknown:
-  - whose corpse the world is;
-  - how the god really died;
-  - what the Silence wants, if anything.
-- **World-building only** (Derek, 2026-10-08): "we're not writing story or quests or anything. We're just building the
-  world."
-- **The word laws hold.** They are in `../01-rules-and-decisions.md`:
-  - no animals, except insects, the moor's crows and the bog's serpent god;
-  - no food or kitchen framing;
-  - the world's own words;
-  - the retired names stay retired.
-- **Names are working names** where Derek has not chosen: the ages, the Flesh herald, the start's village.
+- **The powers are unknowable** (Derek: "lovecraftian, the gods being unknowable alien-like entities"). The peoples cut
+  what they cannot grasp into aspects they can name (the frame, the threads, the growing, the leaving breath) and give
+  each a mask: the Bearing Mother, the Veiled Crone, the Bleeding Maiden, the kami. The bible tells the myths behind the
+  masks and never pretends a mask is the thing.
+- **A world of unknowns** ("not Baldur's Gate"). The great things only: the entities, the ages, the faiths, the regions.
+  No little towns or villages, and few people. The player makes the connections.
+- **A desolate world** ("it's in fact more of a desolate wasteland and there's almost nobody there"). The living are few
+  and scattered: a lone house, a camp, a hermit, the last one left in a place. The faiths are dwindling remnants.
+  Trades, markets and busy roads stay out, but for a few lone figures. The old age's cities are ruins, and make the
+  world emptier.
+- **Myths are told as myths.** The voice of a good book of world mythology: readable, in order, little jargon, never a
+  character's journal. The old tongue's names appear rarely.
+- **Depth of time, no numbers.** Every myth belongs to an age; nothing is dated. Time is told by what happened: the
+  first morning, the grey year, the loose winter, before the Peak fell.
+- **Rival tellings stand.** Contradictions are canon (Derek, 2026-10-05): the bible tells each and never reconciles
+  them.
+- **Behind the myth.** Where Derek has ruled a truth the world never learns, a short note marked *Behind the myth* says
+  it, for us. The game only hints.
+- **Unknown on purpose:** whose corpse the world is; how the old one really died; where the people came from; what the
+  Silence wants, if anything.
+- **World-building only:** "we're not writing story or quests or anything. We're just building the world."
+
+## The word laws
+
+- **Names:** never "the [verb]-ers" or "the [past participle]" ("the Answerers, the Lifted, the Climbers": Derek hates
+  them). Names come from **wordplay** (hide and the Hide, the Red and read, angles and angels, beyond the Pale, the
+  Maiden and the iron maiden, steal, still and steel, whole, holy and hole, keep), **Lovecraftian proper names**
+  (Ythraal, Qhaloth, Ghauul, Oss-Karrhath, Vhul-Oghra, Khar-Dhuum, Thrae), or **each people's own name** for a thing.
+- **Play on words wherever it can live.** It is a theme of the game.
+- **"God" sparingly:** kami, spirits, powers, the old one beneath. The Gilded Peak has no god at all.
+- **Never "the dead stand up"** or beliefs "standing up": they take a body, take flesh, wake, rise.
+- **Not everything from fear,** and not everything one-to-one.
+- **"The Pale", never "white"** for the northern country.
+- **No animals,** except insects, the moor's crows and the bog's dead serpent; no food or kitchen framing; no salt; no
+  tools motif; never "the Hush".
+- The retired names stay retired (`backstage.md`, at its head).
 
 ## Still open for Derek
 
-- **The ages' names.** These pages use the Lore Bible's first set, with Derek's change of 2026-10-09: the Uncounted,
-  the Age of the Ythraal, the Wasting (was the Starving), the Age of the Last Breath.
-- **Settled from Derek's notes of 2026-10-09** (the rewrite of `02`, `03` and `04`):
-  - the retired folk ward and trade are gone from the zones too, not only the myths: the Tithed leave the tenth loaf on
-    the sill where the zones had it; the Ash Shore's boilers boil the grey-soaked ash for potash; the Smugglers' Hold
-    packs its bone in lime. The game's own Codex (`data/codex.json`) and the Shrine Keeper's passive "Salt on the
-    Threshold" (`data/board.json`, `data/progression.json`) still have the old word;
-  - the in-game texts that retell the old age (`../in-game-texts/10-the-old-powers.md`, `11-the-gone-peoples.md`)
-    are rewritten to the new names;
-  - the game's boss "The Marrow-Eater" (`data/progression.json`) stays: "Marrow-Eaters" is what the few on the roads
-    call the Ghauul.
-- **The Flesh herald's name.** The game still shows the retired "Wet Nurse"; Soul has no herald.
-- **The faiths' own words:** order, monastery, circle, procession, shrine.
-- **The start's names:** the village, the merchant, and the sea's common name.
-- **The proposals** in `01-the-ages.md`: orders of events the canon never fixed.
+- **The ages' names:** working names (the Lying Down, the age of the Ythraal, the Wasting, the Age of the Last Breath).
+- **The Flesh herald's name:** the game still shows the retired "Wet Nurse"; Soul has no herald.
+- **The start's names:** the village, the merchant, the sea's common name.
+- **The game's own Codex** (`data/codex.json`) still tells retired lore (the congregation, salt, dates): to be rewritten
+  to the bible.

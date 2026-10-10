@@ -1,4 +1,4 @@
-# The Held Space, and the death of the god
+# The Held Space, and the death of the old one
 
 All through the ages outside, while the Ythraal walked and wasted on its skin, the thing beneath had an inside.
 This page tells what is told of it, and of how the thing died, which is the one event every people that has lived on
@@ -19,7 +19,7 @@ peoples told the thing what it was, and while they told it, it was.
 
 ## The Choir
 
-In the long groove behind the ribs there was a Choir, and it was the part of the god that told it what it was. Its
+In the long groove behind the ribs there was a Choir, and it was the part of the old one that told it what it was. Its
 song was the thing knowing itself. They were eleven hundred and one voices, and they sang in turns, so that the note was
 always held and there was never a moment when the thing did not know what it was.
 
@@ -108,7 +108,7 @@ those ages, and whether it is still holding it at a turn of the spiral, is unkno
 ## The Deep
 
 At the bottom of everything, under the skin of the world and under the flesh and under the bone, there was the blood
-that had nowhere left to run. It had pooled there since before the Uncounted, at the low point of the thing, and stood,
+that had nowhere left to run. It had pooled there since before the Lying Down, at the low point of the thing, and stood,
 and stood. Blood that stands too long goes dark and thick and then hard. And the weight of the whole world lay on it,
 the bone and the flesh and every people and every Ythraal, pressing down from every side at once, for longer than there
 are years for, and under that weight the stale blood was forced into iron.
@@ -147,7 +147,7 @@ blood-dark and jointed every way. They did not let go, and they did not fall. Ve
 It walks still, down there. It went down into the Deep on its legs and never came up, and it walks the iron country
 under everything, carrying its empty streets on its back through the dark, and the iron things of the Deep step aside
 for it. The few who have dug that deep say that Vesk is the greatest of the Khar-Dhuum, or the first
-of them, or their mother, or the god they work for. In the deepest shafts there are sometimes prints in the ore, round
+of them, or their mother, or the old one they work for. In the deepest shafts there are sometimes prints in the ore, round
 and deep and close together, hundreds in a line, going on under the rock. Some of them say that if you lie with your
 ear to the ore you can hear it walking, very far off, and under the walking, very faintly, the people of Vesk, still
 holding.
@@ -156,14 +156,14 @@ And it asks, very politely, for infants, where the folded thing lies nearest the
 make a mind. The thing inside the shell will need one. They say soon.
 
 *Behind the myth.* What hatches when the shell is hard, if anything does, is unknown, and kept so. The iron of the Hide
-is the god's stale blood (the iron maidens, the red heart of old iron, `03-the-age-of-terrors.md`); Vesk is the Deep's one walking city, and the
+is the old one's stale blood (the iron maidens, the red heart of old iron, `03-the-age-of-terrors.md`); Vesk is the Deep's one walking city, and the
 only city that walks anywhere but Dhum, which walks in a Famine under the sky. The deep lore
 offers a rhyme: the cycle turns (`00-the-deep-lore.md`), and something is always being got ready for the next telling.
 
 **Every iron story is the same story** (Derek, 2026-10-09: "tie everything iron related together ... every story is
 the same story in a way, but completely different"). Iron is blood that was held too long, under weight, until it
 hardened; and every iron thing in the world is something held:
-- **the Deep:** the god's own blood, held still under the whole world until it set;
+- **the Deep:** the old one's own blood, held still under the whole world until it set;
 - **the iron maidens:** penitents holding still on the spikes until the iron drank them, and the girl who is holding
   still in hers yet, and bleeding (`03-the-age-of-terrors.md`);
 - **Vesk:** a people holding their city up until they hardened into its legs;
@@ -173,7 +173,7 @@ hardened; and every iron thing in the world is something held:
 - **the few who still dig iron:** who bleed the first ore of every shaft, to give back a little of what is held.
 Held is the Held Space's own word. Nobody in the world has laid these side by side. The player may.
 
-## How the god died
+## How the old one died
 
 The thing stopped. Every people tells it, and none was there to see. All the tellings stand.
 

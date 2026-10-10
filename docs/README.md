@@ -1,7 +1,7 @@
-# The map of Godmarrow's documents
+# The map of Godmarrow's documents and tools
 
-*Rewritten 2026-10-08. Every document, where it lives, and when to read it. When two documents disagree, Derek's
-newest dated ruling in `wiki/01-rules-and-decisions.md` wins; then the newer document.*
+*Rewritten 2026-10-09. Every document and tool, where it lives, and when to read it. When two documents disagree,
+Derek's newest dated ruling in `wiki/01-rules-and-decisions.md` wins; then the newer document.*
 
 ## Start here
 
@@ -11,73 +11,50 @@ newest dated ruling in `wiki/01-rules-and-decisions.md` wins; then the newer doc
 | `HANDOFF.md` | every session: the state of the game, how Derek works, the work in progress, open questions |
 | `wiki/01-rules-and-decisions.md` | before any change: Derek's laws and the dated decision log |
 
-## The work in hand
+## The rules for making things
 
 | Document | What it is |
 |---|---|
-| `MASTER_RULES.md` | **the art laws**, read before every piece: the gate (a written rules check first), form is law, landmarks, scale, objects in combat, light, weather; section 8 is the order of the work |
-| `CINEMATOGRAPHY.md` | depth, light and atmosphere: why they matter, how a room is made, 39 rules each testable on a still frame (the measurable ones checked by `tools/landkit3d/cine_check.py`) |
-| `animation/` | everything that moves: John Lasseter's principles applied to our sprites, how a clip is made (the timing sheet, layers, eight views, the pose test), every clip, the world's motion, and the animation checklist |
-| `PAINTED_STANDARD.md` | the painting manual: the rules of the painted standard, how each road paints, what failed, the ten passes |
+| `MASTER_RULES.md` | **the art laws**, read before every piece: the gate (a written rules check first), form is law (ground depth at three scales, the five tones of form), cinematography, scenes make assets, the map policy, effects; section 8 is the order of the work |
+| `PAINTED_STANDARD.md` | the painting manual: broad tones, dry-brush strokes, the 2 x 2 grid, turning every form, what failed |
+| `CINEMATOGRAPHY.md` | depth, light and atmosphere: why they matter, how a room is made, 39 rules each testable on a still frame (`tools/landkit3d/cine_check.py` measures them) |
+| `animation/` | **everything that moves:** Lasseter's principles for our sprites, how a clip is made (why first, the timing sheet, layers, eight views, the pose test), every clip, the world's motion (plants, water, fire, the Red), the checklist, and where our animations stand |
+| `../tools/landkit/passes/*.md` | one log per piece: its rules check, brief, every pass and its grade, Derek's notes (`red_water_sand.md` the cove, `opening_cave.md` the cave, `spine_path.md` the bog, `thai_temple.md` the temple) |
 | `wiki/09-backlog-and-open-questions.md` | the plan beyond the current piece, what is parked, what Derek still decides |
-| `../tools/landkit/passes/*.md` | one log per piece: its rules check, brief, every pass and its grade, Derek's notes (`spine_path.md` is the Sunken Bog; `thai_temple.md` is the first area's temple) |
+
+## The lore
+
+| Document | What it is |
+|---|---|
+| `wiki/mythology/README.md` | **the makers' bible:** how it is written, its laws, the index. Start here for any lore |
+| `wiki/mythology/00-the-deep-lore.md` | the truth beneath everything, for us only: everything is told, the Silence, mantles, the cards, the cycle, the pilgrim |
+| `wiki/mythology/01` to `07` | the ages (in order, no dates); every people's beginning; the age of the Ythraal; the Held Space and the death; the Age of the Last Breath; the ends of the world; who is who (the faiths, the peoples, the mantles as cards, the callings) |
+| `wiki/mythology/areas/` | one page per Act I zone: what is told of it, and a brief for building it. Read it before building the zone |
+| `wiki/in-game-texts/` | texts for the player to find, in the world's own voices |
+| `wiki/mythology/backstage.md` | not lore: the old digest of every source, with what has since been retired at its head |
 
 ## The design wiki (`wiki/`)
 
-`wiki/00-start-here.md` lists every page. In short:
-- **The world:**
-  - `02` is the world as design: the powers, the acts, Act I's lands, towns, creatures, voice;
-  - `mythology/` holds the myths;
-  - `11` and `12` are the Codex and the writers' notes.
-- **The game:**
-  - `04` is systems and combat;
-  - `05` is the callings;
-  - `14` is the mechanics checklist;
-  - `15` is the body board;
-  - `16` is the Errant Ways.
-- **The look and the making:**
-  - `06` is art direction;
-  - `07` is the art pipelines (the 3D road, the height engine, bakes, characters);
-  - `10` is the study of great games.
-- **The machine:**
-  - `08` is tech and build (running, testing, git, delivering to the laptop);
-  - `13` is the code's architecture.
+`wiki/00-start-here.md` lists every page.
+- **The game:** `04` systems and combat; `05-class-*` the callings; `14` the mechanics checklist; `15` the body board;
+  `16` the Errant Ways.
+- **The look and the making:** `06` art direction; `07` the art pipelines (the 3D road, bakes, characters); `10` the
+  study of great games.
+- **The machine:** `08` tech and build (running, testing, git, delivering to the laptop); `13` the code's architecture.
+- **Older lore pages** (`02`, `11`, `11a`, `12`, `12b`): written before the bible; where they disagree, the bible wins.
 
-## The lore (`wiki/mythology/`)
+## The tools (`../tools/`)
 
-| Document | What it is |
+`../tools/README.md` indexes every tool folder. The ones used most:
+
+| Folder | What it is |
 |---|---|
-| `wiki/mythology/README.md` | **the makers' bible:** what it is, how it is written, the index |
-| `wiki/mythology/00-the-deep-lore.md` | **the truth beneath everything, for us only:** everything is told, gods are dreams believed real, mantles, the cycle of world-endings, the cards, the pilgrim |
-| `wiki/mythology/01` to `07` | the ages; every people's creation myth; the Age of Terrors; the Held Space and the god's death; the thousand years of the Last Breath; every people's end of the world; who is who |
-| `wiki/in-game-texts/` | texts for the player to find, in the world's own voices |
-| `wiki/mythology/areas/` | **one page per Act I zone:** what is told of it, and a brief for building it. Read it before building the zone |
-| `wiki/mythology/backstage.md` | not lore: everything decided, with sources, gaps and contradictions |
-
-## The art library (`../tools/art_study/`)
-
-| Document | What it is |
-|---|---|
-| `library/README.md` | the library's index: `methods/` (how we make form, light, values, effects, scenes), `objects/` (bone, water, trees, stone, plants...), `environments/` (each land's recipe) |
-| `chapters/` | studies of real things (ruins, teeth and sinew, stone and caves, cut wood, old-growth trunks, faces in trees, the serpent spine and bog water, Thai temples and spirit houses) |
-| `reports/` | one report per finished piece: what worked, what failed, why. `05-pit-of-offering.md` is the landmark method |
-| `STUDY.md`, `LIVING_LANDSCAPES.md`, `ecosystems/` | the study log, building lands from their ecosystems and seeds, and one chapter per ecosystem |
-| `private/` | studies of other artists' work: private, never shipped |
-
-## PixelForge (`../tools/pixelforge/`)
-
-Characters are shape sprites, made in PixelForge.
-
-| Document | What it is |
-|---|---|
-| `docs/GUIDE_AI.md` | how an AI session drives it |
-| `docs/GUIDE_HUMANS.md` | how a person does |
-| `docs/GUIDE_SESSION.md` | how a session works |
-| `docs/DIRECTION.md` | where it is going |
-| `docs/FROM_THE_GAME.md` | what the game needs from it |
-| `docs/PLAN.md` | its plan |
-| `docs/track_notes/` | notes per track |
-| `CLAUDE.md` | its own rules |
+| `landkit3d/` | **the 3D road:** scenes built in Blender, the painters, the checks, the bakes and zone exporters (module index in its `README.md`) |
+| `landkit/` | object generators, the set baker, and every piece's pass log (`passes/`) |
+| `art_study/` | the art library: `chapters/` (studies of real things), `reports/` (one per finished piece), `library/` (methods, objects, environments), the height engine's scenes |
+| `worldgen/` | our map generators and the bog's land bake |
+| `anim/` | animation tools: `contact_sheet.py` (a clip's frames side by side, change per step, loop seams) |
+| `pixelforge/` | Derek's character tool (its own `docs/` and `CLAUDE.md`) |
 
 ## Other folders here
 
@@ -87,4 +64,4 @@ Characters are shape sprites, made in PixelForge.
 | `midjourney/` | Midjourney batches (reference only; Derek's settings are never changed) |
 | `screens/` | dated screenshots kept as records |
 | `refs/`, `mockups/` | references and mockups for the forge |
-| `archive/` | **retired documents**, kept for the record: the old hand-offs, the Act I plan of 2026-10-05, the rework-and-seeds plan, the porting notes and audits, the 3D tool brief, session notes, and the mythology of 2026-10-05 |
+| `archive/` | **retired documents**, kept for the record: old hand-offs, the old Act I plan, the porting notes, the mythology of 2026-10-05 |

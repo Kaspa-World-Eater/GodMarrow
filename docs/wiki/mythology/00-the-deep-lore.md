@@ -50,6 +50,19 @@ The world already rhymes with this, and the player can find the rhymes:
 - the court of white faces judged every thought, and its faces still fly at dusk;
 - the dead tell the merchant their names "tomorrow".
 
+## Every word is two words
+
+If what is told takes a body, then a word said two ways is two tellings at once, and what it names grows both ways. This
+is why the world is full of puns that nobody in it finds funny. The land is the Hide because it is a skin and because the
+people hid on it, and it is both. The Red is read: the shore folk read the tide, the Stranger reads the pilgrim out of
+the Red, and the cards are laid on wet sand. The Angles are heard as something else in every old song, and are both. The
+keepers steal a breath and still it, and it sets like steel. The Pale is pale, and a fence, and everything beyond it is
+uncounted. The fourth of the Thrae is the whole, the holy and the hole, one word in the oldest tongue. The Pale Order
+keeps: a keep, a count kept whole, a body kept together, a secret kept.
+
+For the makers: wherever a word can carry two tellings, let it. Wordplay is not decoration here. It is how the world is
+made, and the player may come to feel that the language itself is unstable, because it is.
+
 ## The Silence
 
 If everything is told, the Silence is the untold: the space between words, where every meaning waits, unsaid. It is
@@ -91,9 +104,10 @@ Everything fills a role, and every role is a mantle.
 - each power's herald;
 - the Starved Crown;
 - the merchant at the end of the world;
+- death itself, which Oss-Karrhath wears now (`03-the-age-of-terrors.md`);
 - the pilgrim.
 
-Kill whoever wears a mantle and another takes it up, though it was born that morning. There is no end to the mantles.
+Every card of the deck is a mantle, and every mantle a card (`07-who-is-who.md`, the mantles). Kill whoever wears a mantle and another takes it up, though it was born that morning. There is no end to the mantles.
 
 **The faiths half know it:**
 - the Pale Order writes its brothers by number and calls the Ossuarch an office of no one man;
@@ -160,6 +174,9 @@ direction he likes, and story notes toward its end:
 - **A dream:** they are a dream that manifested, a story that believed itself into a body.
 - **Out of a ring:** they rose out of a waystone, one of the rings with teeth that take a walker apart, blood first and
   bone last, and put them back together elsewhere. But this pilgrim never stepped in.
+- **Out of the Red:** the game begins with the pilgrim rising out of a pool of blood in a cave under the black cliffs,
+  the way the shore folk said the first people came up out of the Red on the first morning
+  (`areas/the-red-shore.md`, the opening).
 
 The Reading that begins the game is the Stranger giving a nameless thing a fate. It is identity given from outside,
 the way every face in this world is given.
@@ -206,17 +223,12 @@ pilgrim.
 - He never says so plainly. He speaks in half-lines, calls each god by a different name every time, and lets the
   pilgrim believe its hand is its own.
 
-**Some lines in his voice,** as examples for whoever writes the Reading (none is final, and none quotes Derek's
-phrase):
-- "Choose, then. Go on. You always choose this one."
-- "Your hand thinks it's choosing. Let it."
-- "Shuffle if you like. They remember the order."
-- "Reversed. ... You never could hold that one the right way up."
-- "There. It fits you. It fit the last one, too."
-- "What are you seeking? ... It has been looking for you much longer."
-- "Every face on this table has been worn. Some of them by you."
-- "The price? You'll pay it. You always pay it."
-- "Ah. That one. Don't look so surprised."
+**His voice** (Derek, 2026-10-09: "not talk directly at you but like through you ... like he's doing a tarot reading
+with no one else there"): he never looks up; he reads the cards to himself and to the great face, calls the pilgrim
+"it" and "this one", and lets "you" slip out now and then. He plays on words the way a man plays with a coin (hide and
+the Hide, Red and read, lie, held, count), and the lore lies under the play unsaid. His lines are in
+`areas/the-red-shore.md` (the opening), and the game's Reading speaks them (`ui/reading.gd`). The Reading now happens on
+the top step of the cave, beside the onyx mirror, when the pilgrim first speaks to him.
 
 ## How the deep lore sits under the bible
 
