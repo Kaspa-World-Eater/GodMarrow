@@ -5,6 +5,51 @@ principles: it has a weight, a material, a timing and, often, something like a t
 weather happens in the world, not on it; no fog layers; restrained effects in the manner of Diablo II Resurrected; the
 one wind (`core/gust.gd`).
 
+## Trees, plants and grass (Derek, 2026-10-09: "use some in the animation study to ... the way things animate like trees and plants")
+
+A plant is a chain of parts, and Lasseter's follow-through applies along it: the base leads and the tips follow.
+
+- **The bend travels up the plant.** The wind moves the trunk or stem first, and each part above follows a little later
+  and a little further: trunk, then boughs, then twigs, then the leaves flickering last. The motion is a wave climbing
+  the plant, not a lean. **Today:** the game's sway (`shaders/cm_sway.gdshader`) bends every height of a sprite in
+  step, scaled by its height, which reads as a rigid tilt. The fix is a phase lag that grows with height: the bend at
+  height `up` is the wind of a moment ago, `s(t - up * lag)`.
+- **Weight by material:**
+  - grass is light: it answers fast and settles fast;
+  - a dead branch is stiff: it barely answers and then shudders;
+  - a great trunk hardly moves while its crown makes slow, large moves;
+  - cloth and hanging moss lag furthest and flutter.
+
+  A plant's stiffness, lag and settle come from what it is, never one setting for all.
+- **Gusts arrive; they are not everywhere at once.** A gust is an anticipation the player can watch: the far grass
+  bends first, and the bend runs across the field toward the pilgrim in the wind's direction, then the near trees take
+  it. The wave's delay comes from position along the wind, so a field moves as one weather, not as a thousand random
+  beats.
+- **Slow in and slow out on the gust:** it builds, peaks, and dies away, and the plants overshoot a little on the way
+  back (follow-through) and settle.
+- **Moving holds in the calm:** even between gusts something moves, a single stem or a leaf turning, so the forest is
+  never frozen.
+- **No twins:** neighbours never sway in step; each keeps its own stiffness and a small offset.
+- **Secondary and subordinate:** the forest moves less than anything the player must read. When a fight starts, the
+  plants are background (the LottieFiles rule of thumb: about a tenth to a fifth of the main motion's size).
+- **Bodies push through** (the shader already does this): the push is fast, and the plant comes back slowly, overshoots
+  once, and settles.
+
+## Water
+
+Timing makes the liquid. The same ripple read fast is water; read slow and blunt, it is blood (the Red, below).
+- **Still water** (the bog, the fen, the pools after rain) is a moving hold: a slow skin of reflections breathing, and
+  small events on it. Rings spread from a drip, a rain drop or a footfall, fast at first, slowing as they widen (slow
+  out), and fading.
+- **Running water** never scrolls as one sheet. It speeds up over a lip and slows in a pool. Its surface lines bunch
+  where it turns, and it breaks white only where it strikes (follow-through at every rock).
+- **Waves** have the three parts: the swell gathering (anticipation), the break (the short action), and the swash and
+  the drain-back (follow-through and settle). Foam is the secondary action and lags the wave.
+- **Water answers the world,** by material and weight: a body falling in throws a heavy splash that rises slowly and
+  falls fast, then rings. Rain on blood barely dents it.
+- **Loops close.** Every looping water texture or wave cycle must pass the seam check: its last frame flows into its
+  first (`tools/anim/contact_sheet.py` checks sprite loops; the same test applies to a shader's period).
+
 ## Fire
 
 - **A moving hold that never repeats:** a flame's seat holds its shape while its tongues rise, narrow and tear off;

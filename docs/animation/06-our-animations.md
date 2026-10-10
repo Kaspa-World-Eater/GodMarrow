@@ -3,6 +3,11 @@
 Derek, 2026-10-09: "Do you think we can improve our animations with what you learned. Not that we're going to do it
 now, but I want a committed chapter that you can reference later."
 
+**Derek, the same day:** "Let's not do the [Ossuarch] animations cuz he's going to get it. Total rebuild." So the
+Ossuarch's current clips will not be re-timed: he is rebuilt from the ground up. The diagnosis below stays as the
+lessons his rebuild and every new character start from, and the plan's engine and tool steps (1 and 2) stand for
+everything that moves.
+
 **Yes, a great deal, and most of the gain is cheap.** Our art is ahead of our motion. The biggest faults are not in the
 drawings: they are in the timing, and timing is the one thing Lasseter says defines weight "more than any other
 principle". This page is the diagnosis of the Ossuarch, the hero every other calling will follow, measured frame by
