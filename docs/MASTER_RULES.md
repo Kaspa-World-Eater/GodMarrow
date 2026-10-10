@@ -36,6 +36,7 @@ No check written, no work begun.
 | `docs/wiki/06-art-direction.md` | The look: camera and scale, light and the dark, each land's look, figures |
 | `docs/PAINTED_STANDARD.md` | How every pixel gets its colour |
 | **`docs/CINEMATOGRAPHY.md`** | How light composes every frame: depth, atmosphere, wonder; run `cine_check.py` on every render |
+| **`docs/animation/`** (Derek, 2026-10-09) | Everything that moves: Lasseter's principles for our sprites, the timing sheet, layers down the skeleton, every clip, the world's motion, and the checklist each animation is graded on. Read before any animation, effect or loop |
 | `docs/wiki/07-art-pipelines.md` | Which road makes the piece (the 3D road, the height engine, a baked land, a set, a character) and what was rejected |
 | **`tools/art_study/library/`** (index: `library/README.md`) | THE TECHNIQUE LIBRARY: methods, environments, objects; how each thing is made, what worked, what failed, the code. Read the pages for the piece first |
 | **Chapter 12, cinematography** (`tools/art_study/chapters/12-cinematography-atmosphere-wonder.md`) | Every piece: how light composes the frame, why darkness makes wonder (section 0c) |

@@ -17,6 +17,7 @@ newest dated ruling in `wiki/01-rules-and-decisions.md` wins; then the newer doc
 |---|---|
 | `MASTER_RULES.md` | **the art laws**, read before every piece: the gate (a written rules check first), form is law, landmarks, scale, objects in combat, light, weather; section 8 is the order of the work |
 | `CINEMATOGRAPHY.md` | depth, light and atmosphere: why they matter, how a room is made, 39 rules each testable on a still frame (the measurable ones checked by `tools/landkit3d/cine_check.py`) |
+| `animation/` | everything that moves: John Lasseter's principles applied to our sprites, how a clip is made (the timing sheet, layers, eight views, the pose test), every clip, the world's motion, and the animation checklist |
 | `PAINTED_STANDARD.md` | the painting manual: the rules of the painted standard, how each road paints, what failed, the ten passes |
 | `wiki/09-backlog-and-open-questions.md` | the plan beyond the current piece, what is parked, what Derek still decides |
 | `../tools/landkit/passes/*.md` | one log per piece: its rules check, brief, every pass and its grade, Derek's notes (`spine_path.md` is the Sunken Bog; `thai_temple.md` is the first area's temple) |
