@@ -350,10 +350,22 @@ def bones(name, Wj, support, rnd, roll, cloak):
     jw = hd + ax * 0.16 + side * 0.08
     jw.z = support(jw.x, jw.y) + 0.015
     objs.append(P.tube(name + "jaw", [tuple(jw - side * 0.06), tuple(jw + ax * 0.05), tuple(jw + side * 0.06)], [0.014, 0.018, 0.014], "bone", 5))
-    # the pelvis, a bowl tipped forward
+    # the pelvis, a bowl tipped forward (chapter 15, 2e): two flared wings, the sacrum wedged between them, the rim of
+    # its opening, the hip sockets where the thighs come off
     pl = Vector(Wj["pelvis"])
-    pl.z = support(pl.x, pl.y) + 0.05
-    objs.append(P.sphere(name + "pelv", tuple(pl), 0.14, "bone", scale=(0.65, 1.2, 0.42)))
+    pl.z = support(pl.x, pl.y) + 0.04
+    for sd in (-1, 1):
+        wing = pl + side * sd * 0.085 + ax * 0.03
+        wing.z += 0.035
+        o = P.sphere(name + "ilium%d" % sd, tuple(wing), 0.075, "bone", scale=(0.85, 0.35, 1.0))
+        o.rotation_euler = (0.0, 0.0, math.atan2(ax.y, ax.x) + sd * 0.5)
+        sock = pl + side * sd * 0.09 - ax * 0.04
+        sock.z = support(sock.x, sock.y) + 0.03
+        objs.append(P.sphere(name + "sock%d" % sd, tuple(sock), 0.03, "bone", scale=(1.0, 1.0, 0.8)))
+    objs.append(P.sphere(name + "sacrum", tuple(pl + ax * 0.02 + Vector((0, 0, 0.02))), 0.05, "bone", scale=(1.4, 0.8, 0.5)))
+    rim = [tuple(pl - ax * 0.05 + side * 0.07 + Vector((0, 0, 0.03))), tuple(pl - ax * 0.09 + Vector((0, 0, 0.025))),
+           tuple(pl - ax * 0.05 - side * 0.07 + Vector((0, 0, 0.03)))]
+    objs.append(P.tube(name + "pubis", rim, [0.013, 0.015, 0.013], "bone", 5))
     if cloak:
         mb, ob = _mb(name + "c")
         for j in ("pelvis", "lumbar", "chest"):

@@ -138,3 +138,10 @@ vertebrae, the ribs arched over a cage fallen in on the spine, the skull with it
 small bones scattered, the cloak a collapsed sack under the ribs with its hood round the skull. **Grade: C+** (the
 bone); the robed bodies stay B-. **Worst now:** the pelvis a smooth lump (a bowl with its wings is wanted); the bloat
 has no dome against the cloak; none of it yet seen painted at the game's scale on the strand.
+
+## Rules check, and pass 8: the pelvis
+
+**Read:** `MASTER_RULES` checklist; chapter 15, 2e (the pelvis a bowl tipped forward). **Worst first:** the bone
+state's pelvis, a smooth lump. **Fixed:** two flared wings, the sacrum between them, the rim of its opening, the hip
+sockets; under the fallen cloak it now reads as small bones, not a ball. **Next:** the cove rebaked with the new dead
+(checklist 11: seen as the player sees it, painted, at the game's size), then the bloat's dome.
