@@ -1,7 +1,7 @@
 shader_type canvas_item;
 // Fire on the ground, as liquid (Derek 2026-10-05: "fire spreading should move like liquid"; "effects should be in the
 // world, interacting with it"). The title's method: a value field (flowing, warped noise) snapped to a short ramp with
-// the 4x4 ordered dither, in whole world pixels. The pool spreads out from where it fell with a bright licking rim and
+// the ordered (Bayer) dither, on the 2 x 2 grid. The pool spreads out from where it fell with a bright licking rim and
 // leaves a scorch behind it; tongues rise off its hottest parts and lean with the wind; it gutters as it dies.
 
 uniform float t = 0.0;          // seconds alive
@@ -43,10 +43,10 @@ float pool(vec2 d) {
 }
 
 void fragment() {
-	vec2 px = floor(UV * rect_size / 4.0) * 4.0;                  // whole world pixels
+	vec2 px = floor(UV * rect_size / 2.0) * 2.0;                  // whole art pixels: the 2 x 2 grid
 	vec2 c = vec2(rect_size.x * 0.5, flame_h + half_px.y);
 	vec2 d = px - c;
-	ivec2 g = ivec2(px / 4.0);
+	ivec2 g = ivec2(px / 2.0);
 	float dith = B4[(g.y & 3) * 4 + (g.x & 3)] / 16.0 - 0.47;
 	vec4 col = vec4(0.0);
 	float h = pool(d);

@@ -14,6 +14,7 @@ const SNAG := Color("#c9d6de")
 const BIND := Color("#d6cfbf")
 const SOUL := Color(0.9, 0.95, 0.98)
 const GLASS := Color(0.81, 0.91, 0.98)
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
 
 ## soul dust shed by the threads: motes that drift off the wire, twinkle and go out
 var dust: Array = []       # {q (screen), v, t, life, glint}
@@ -37,11 +38,12 @@ func shed(p: Vector2, n: int = 1, v: float = 12.0) -> void:
 			"life": randf_range(0.5, 1.2), "glint": randf() < 0.25})
 
 ## the soul-wire: the user's "more pizzazz" for every thread. A one-cell core of the thread's colour with a cold halo
-## either side, soul-light pulses running along it (flow > 0 runs a to b, < 0 back), a white glint with a cross where a
-## pulse peaks, optional knotted beads, a twang (a plucked tremble, decaying), and soul dust shed off it as it hangs.
+## either side (an art pixel close, a fainter one beyond), soul-light pulses running along it (flow > 0 runs a to b,
+## < 0 back), a white glint with a cross where a pulse peaks, optional knotted beads, a twang (a plucked tremble,
+## decaying), and soul dust shed off it as it hangs.
 func wire(a: Vector2, b: Vector2, s: float, col: Color, flow: float = 1.0, twang: float = 0.0, beads: int = 0) -> void:
 	var mid := (a + b) * 0.5 + Vector2(0, s)
-	var n := maxi(2, int((a.distance_to(mid) + mid.distance_to(b)) / 4.0))
+	var n := maxi(2, int((a.distance_to(mid) + mid.distance_to(b)) / AP))
 	var g := global_position
 	var t0: float = book.time if book else 0.0
 	var nrm := Vector2(-(b - a).y, (b - a).x).normalized()
@@ -52,17 +54,20 @@ func wire(a: Vector2, b: Vector2, s: float, col: Color, flow: float = 1.0, twang
 		var p := a.lerp(mid, t).lerp(mid.lerp(b, t), t)
 		if twang > 0.0:
 			p += nrm * sin(t * PI) * sin(t0 * 38.0) * twang
-		var key := Vector2i(int(floor((p.x + g.x) / 4.0)), int(floor((p.y + g.y) / 4.0)))
+		var key := Vector2i(int(floor((p.x + g.x) / AP)), int(floor((p.y + g.y) / AP)))
 		if seen.has(key):
 			continue
 		seen[key] = true
 		pts.append([p, t, i])
 	var halo := Color(lerpf(col.r, 0.55, 0.6), lerpf(col.g, 0.78, 0.6), 1.0, 0.2 * col.a)
+	var halo2 := Color(halo, halo.a * 0.5)
 	for e in pts:                                          # the halo, under everything
-		cell(e[0] + Vector2(0, -4), halo)
-		cell(e[0] + Vector2(0, 4), halo)
+		cell(e[0] + Vector2(0, -AP), halo)
+		cell(e[0] + Vector2(0, AP), halo)
+		cell(e[0] + Vector2(0, -2.0 * AP), halo2)
+		cell(e[0] + Vector2(0, 2.0 * AP), halo2)
 		# the ghost strand: a dim double of the thread, swaying off it and back, as if its spirit lags the wire
-		var gp: Vector2 = e[0] + nrm * 4.0 * (1.5 + sin(t0 * 2.3 + e[1] * 6.0) * 1.5) * sin(e[1] * PI)
+		var gp: Vector2 = e[0] + nrm * Iso.WPX * (1.5 + sin(t0 * 2.3 + e[1] * 6.0) * 1.5) * sin(e[1] * PI)
 		cell(gp, Color(0.7, 0.86, 1.0, 0.22 * col.a))
 	var step := maxi(1, n / maxi(1, beads)) if beads > 0 else 0
 	for e in pts:
@@ -76,17 +81,17 @@ func wire(a: Vector2, b: Vector2, s: float, col: Color, flow: float = 1.0, twang
 		var core := col.lerp(Color(1, 1, 1), pulse)
 		cell(p, Color(core.r, core.g, core.b, minf(1.0, col.a * sh + pulse * 0.5)))
 		if pulse > 0.75:                                   # the pulse: a little soul riding the wire, a cross of light
-			for yy in range(-2, 3):
-				for xx in range(-2, 3):
+			for yy in range(-4, 5):
+				for xx in range(-4, 5):
 					var dd := absi(xx) + absi(yy)
-					if dd > 0 and dd <= 2:
-						cell(p + Vector2(xx, yy) * 4.0, Color(0.75, 0.9, 1.0, (0.5 if dd == 1 else 0.18) * col.a))
-			cell(p, Color(1, 1, 1, col.a))
+					if dd > 0 and dd <= 4:
+						cell(p + Vector2(xx, yy) * AP, Color(0.75, 0.9, 1.0, (0.5 if dd <= 2 else 0.18) * col.a))
+			spark(p, Color(1, 1, 1, col.a))
 			if randf() < _dt * 6.0:
 				shed(p, 1, 16.0)
 		if step > 0 and e[2] % step == 0 and t > 0.05 and t < 0.95:   # a knot on the thread
-			cell(p + Vector2(-4, -4), Color(col.r * 0.6, col.g * 0.6, col.b * 0.6, col.a), 2.0, 2.0)
-			cell(p + Vector2(-4, -4), Color(1, 1, 1, col.a * 0.9))
+			blob(p + Vector2(-2.0, -2.0) * AP, Color(col.r * 0.6, col.g * 0.6, col.b * 0.6, col.a))
+			spark(p + Vector2(-2.0, -2.0) * AP, Color(1, 1, 1, col.a * 0.9))
 		if randf() < _dt * 0.35 * col.a:                    # soul dust drifting off the wire
 			shed(p)
 
@@ -103,23 +108,42 @@ func _draw_dust() -> void:
 		var u: float = d["t"] / d["life"]
 		var tw := 0.55 + 0.45 * sin(t0 * 22.0 + d["life"] * 40.0)
 		var col := Color(1, 1, 1, (1.0 - u) * tw).lerp(Color(0.6, 0.78, 1.0, 0.8 * (1.0 - u) * tw), smoothstep(0.0, 0.6, u))
-		cell(d["q"], col)
-		if d["glint"] and tw > 0.85 and u < 0.5:
-			for o in [Vector2(-4, 0), Vector2(4, 0), Vector2(0, -4), Vector2(0, 4)]:
-				cell(d["q"] + o, Color(0.75, 0.88, 1.0, 0.4 * (1.0 - u)))
+		spark(d["q"], col)
+		if d["glint"] and tw > 0.85 and u < 0.5:   # a cross of glints, fainter at the arms' ends
+			var ga := Color(0.75, 0.88, 1.0, 0.4 * (1.0 - u))
+			var gb := Color(ga, ga.a * 0.5)
+			for o in [Vector2(-1, 0), Vector2(2, 0), Vector2(0, -1), Vector2(0, 2)]:
+				cell(d["q"] + o * AP, ga)
+			for o in [Vector2(-2, 0), Vector2(3, 0), Vector2(0, -2), Vector2(0, 3)]:
+				cell(d["q"] + o * AP, gb)
 
 static func S(tp: Vector2, z: float = 0.0) -> Vector2:
-	return Iso.to_screen(tp) + Vector2(0, -z * 4.0)
+	return Iso.to_screen(tp) + Vector2(0, -z * Iso.WPX)
 
-## one cell of the art grid (1 web px = 4 px here), at a screen point
+## one cell of the art grid (an art pixel, 2 x 2 px), at a screen point; cw x ch cells
 func cell(p: Vector2, col: Color, cw: float = 1.0, ch: float = 1.0) -> void:
 	var g := global_position
-	var q := Vector2(floor((p.x + g.x) / 4.0) * 4.0, floor((p.y + g.y) / 4.0) * 4.0) - g
-	draw_rect(Rect2(q, Vector2(cw, ch) * 4.0), col)
+	var q := Vector2(floor((p.x + g.x) / AP) * AP, floor((p.y + g.y) / AP) * AP) - g
+	draw_rect(Rect2(q, Vector2(cw, ch) * AP), col)
 
-## a line one web px wide, stepped on the art grid (the web's 1 px canvas strokes)
+## a single bright mark (a mote, a glint core): a bright art pixel with its right and lower neighbours at half alpha
+func spark(p: Vector2, col: Color) -> void:
+	var h := Color(col, col.a * 0.5)
+	cell(p, col)
+	cell(p + Vector2(AP, 0), h)
+	cell(p + Vector2(0, AP), h)
+
+## a small solid mark n art pixels square with its four corners at half alpha (a knot, a barb, a spark's head)
+func blob(p: Vector2, col: Color, n: int = 4) -> void:
+	var h := Color(col, col.a * 0.5)
+	for y in n:
+		for x in n:
+			var corner := (x == 0 or x == n - 1) and (y == 0 or y == n - 1)
+			cell(p + Vector2(x, y) * AP, h if corner else col)
+
+## a line one art pixel wide, stepped on the art grid (the web's 1 px canvas strokes)
 func pix_line(a: Vector2, b: Vector2, col: Color) -> void:
-	var n := maxi(1, int(maxf(absf(b.x - a.x), absf(b.y - a.y)) / 4.0))
+	var n := maxi(1, int(maxf(absf(b.x - a.x), absf(b.y - a.y)) / AP))
 	for i in n + 1:
 		cell(a.lerp(b, i / float(n)), col)
 
@@ -127,14 +151,14 @@ func pix_line(a: Vector2, b: Vector2, col: Color) -> void:
 ## grid, with the user's ghostly shimmer: a faint brightening that runs along it (HANDOFF §5.5)
 func sag(a: Vector2, b: Vector2, s: float, col: Color, _w: float = 2.0) -> void:
 	var mid := (a + b) * 0.5 + Vector2(0, s)
-	var n := maxi(2, int((a.distance_to(mid) + mid.distance_to(b)) / 4.0))
+	var n := maxi(2, int((a.distance_to(mid) + mid.distance_to(b)) / AP))
 	var g := global_position
 	var seen := {}
 	var t0: float = book.time if book else 0.0
 	for i in n + 1:
 		var t := i / float(n)
 		var p := a.lerp(mid, t).lerp(mid.lerp(b, t), t)
-		var key := Vector2i(int(floor((p.x + g.x) / 4.0)), int(floor((p.y + g.y) / 4.0)))
+		var key := Vector2i(int(floor((p.x + g.x) / AP)), int(floor((p.y + g.y) / AP)))
 		if seen.has(key):
 			continue
 		seen[key] = true
@@ -238,14 +262,14 @@ func _air() -> void:
 			var m = e
 			if not is_instance_valid(m) or m.dead:
 				continue
-			var sg := (2.0 + k * 12.0) * 4.0
+			var sg := (2.0 + k * 12.0) * Iso.WPX
 			wire(pa, S(m.tp, 11), sg, Color(BIND.r, BIND.g, BIND.b, minf(1.0, al * 1.4)), -0.7, 3.0 * k, 4)
 			if bd["done"] and not bd.get("fx_burst", false):
 				burst(pa, S(m.tp, 11), sg)
 		if bd["done"]:
 			bd["fx_burst"] = true
 		if not bd["done"]:   # the knot on the held one
-			cell(S(A.tp, 12) + Vector2(-4, 0), Color(BIND.r, BIND.g, BIND.b, 0.7), 2.0, 2.0)
+			blob(S(A.tp, 12) + Vector2(-2.0 * AP, 0), Color(BIND.r, BIND.g, BIND.b, 0.7))
 	# Soul Leash: pale threads from the wisps to what they hold
 	for th in b.threads:
 		var m = th["m"]
@@ -255,7 +279,7 @@ func _air() -> void:
 		var f: float = minf(1.0, th["life"] / 0.3) * minf(1.0, (th["max"] - th["life"]) / 0.12 + 0.2)
 		var a := S(Vector2(s.x, s.y), s.z)
 		var e := S(m.tp, 10)
-		wire(e, a, (8.0 + 4.0 * sin(b.time * 3.0 + a.x * 0.025)) * 4.0, Color(THREAD.r, THREAD.g, THREAD.b, 0.75 * f), 1.0)
+		wire(e, a, (8.0 + 4.0 * sin(b.time * 3.0 + a.x * 0.025)) * Iso.WPX, Color(THREAD.r, THREAD.g, THREAD.b, 0.75 * f), 1.0)
 	# snags: a wisp's strike catches a thread on the foe
 	for sn in b.snags:
 		var m2 = sn["m"]
@@ -263,8 +287,8 @@ func _air() -> void:
 			continue
 		var k2: float = 1.0 - sn["t"] / sn["dur"]
 		var pe := S(m2.tp, 10)
-		wire(S(sn["tp"], 9), pe, (6.0 * k2 + 1.0) * 4.0, Color(SNAG.r, SNAG.g, SNAG.b, 0.85 * k2), 2.0, 7.0 * k2 * k2)
-		cell(pe + Vector2(-4, -4), Color(1, 1, 1, k2), 2.0, 2.0)                       # the barb
+		wire(S(sn["tp"], 9), pe, (6.0 * k2 + 1.0) * Iso.WPX, Color(SNAG.r, SNAG.g, SNAG.b, 0.85 * k2), 2.0, 7.0 * k2 * k2)
+		blob(pe - Vector2(2, 2) * AP, Color(1, 1, 1, k2))                       # the barb
 		if k2 < 0.12 and not sn.get("fx_burst", false):
 			sn["fx_burst"] = true
 			shed(pe, 8, 30.0)
@@ -276,15 +300,15 @@ func _air() -> void:
 		var nh := S(n["tp"] + n["d"] * s1, 10)
 		wire(S(n["tp"] + n["d"] * maxf(0.0, s1 - 1.6), 10), nh, 4.0, Color(0.722, 0.816, 0.871, 0.7 * (1.0 - k3 * 0.5)), 3.0)   # #b8d0de
 		pix_line(S(n["tp"] + n["d"] * s0, 10), nh, Color(0.95, 0.98, 1.0, 0.9 * (1.0 - k3 * 0.5)))
-		cell(nh + Vector2(-4, -4), Color(1, 1, 1, 0.5 * (1.0 - k3)), 2.0, 2.0)
+		blob(nh - Vector2(2, 2) * AP, Color(1, 1, 1, 0.5 * (1.0 - k3)))
 		if randf() < _dt * 25.0:
 			shed(nh, 1, 10.0)
 	# sparks: motes like the wisps themselves
 	for sp in b.sparks:
 		var tr: Array = sp.get("trail", [])
-		for i in tr.size():   # a 3-point trail, then a 2x2 spark (zz_zz_mystic90.js:158-160)
-			cell(S(tr[i], sp["z"]), Color(200 / 255.0, 228 / 255.0, 240 / 255.0, 0.15 + i * 0.12))
-		cell(S(sp["tp"], sp["z"]) + Vector2(-4, -4), Color("#e4f4fa"), 2.0, 2.0)
+		for i in tr.size():   # a 3-point trail, then the spark's head (zz_zz_mystic90.js:158-160, at the 2x2 grid)
+			spark(S(tr[i], sp["z"]), Color(200 / 255.0, 228 / 255.0, 240 / 255.0, 0.15 + i * 0.12))
+		blob(S(sp["tp"], sp["z"]) - Vector2(2, 2) * AP, Color("#e4f4fa"))
 	# seeking souls (Soul Swarm, Soul Storm, the golem's overflow, a branded death)
 	for so in b.souls:
 		mote(S(so["tp"], 9.0 + sin(so["wob"]) * 1.5), 5.0, Color(SOUL.r, SOUL.g, SOUL.b, 0.85))
@@ -312,7 +336,11 @@ func _air() -> void:
 		draw_line(p3 - dv2 * 7.0, p3 + dv2 * 3.0, GLASS, 2.0)
 	for g in b.glass:        # glass that falls and lies a moment
 		var p4 := S(g["tp"], g["z"])
-		draw_rect(Rect2(p4 - Vector2(2, 2), Vector2(4, 4) * g["s"]), Color(0.82, 0.9, 0.98, clampf(g["t"] / 0.4, 0.0, 1.0)))
+		var gc := Color(0.82, 0.9, 0.98, clampf(g["t"] / 0.4, 0.0, 1.0))
+		if g["s"] > 1.5:
+			blob(p4 - Vector2(1, 1) * AP, gc)       # the bigger chip (8 px)
+		else:
+			spark(p4 - Vector2(1, 1) * AP, gc)      # a fleck (4 px)
 	for s2 in b.spikes:      # jagged slivers bursting up from the crack
 		var k5: float = s2["t"] / s2["max"]
 		var p5 := S(s2["tp"])
@@ -370,17 +398,17 @@ func _oval(c: Vector2, rx: float, ry: float) -> PackedVector2Array:
 		pts.append(c + Vector2(cos(a) * rx, sin(a) * ry))
 	return pts
 
-## a ring on the ground one web px wide, dashed two on and four off along its length, on the art grid
+## a ring on the ground one art pixel wide, dashed (8 px on, 16 off: the web's [2,4]) along its length, on the art grid
 func pix_ring(c: Vector2, R: float, col: Color) -> void:
 	var rx := R * Iso.HX * 1.414
 	var ry := rx * 0.5
-	var n := maxi(24, int(TAU * rx / 4.0))
+	var n := maxi(24, int(TAU * rx / AP))
 	var run := 0.0
 	var last := c + Vector2(rx, 0)
 	for i in n:
 		var a := i / float(n) * TAU
 		var p := c + Vector2(cos(a) * rx, sin(a) * ry)
-		run += p.distance_to(last) / 4.0
+		run += p.distance_to(last)
 		last = p
-		if fmod(run, 6.0) < 2.0:
+		if fmod(run, 24.0) < 8.0:
 			cell(p, col)

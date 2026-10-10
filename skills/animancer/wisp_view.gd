@@ -2,13 +2,13 @@ extends Node2D
 ## A wisp of the choir (or the great wisp, or a lantern's wisp) standing in the y-sorted layer, drawn live as the web
 ## draws it (zz_zx_dark64.js:158-206, v0.66-v0.80): a soft spot of pale light, a bright 2x2 heart in a small breathing
 ## halo, trailing a thin ghostly wake (the places it has been, fading, curling up and apart like breath in cold air) and
-## shedding single motes of dust that twinkle, sink and fade. Everything is laid on the art grid (1 web px = 4 px here),
-## added to what is under it. Each wisp opens two small pools in the dark (one on the ground, one round its own body) and
+## shedding single motes of dust that twinkle, sink and fade. Positions are kept in web px (Iso.WPX screen px each) and
+## everything is laid on the art grid (the 2 x 2 grid: an art pixel is 2 x 2 px), added to what is under it. Each wisp opens two small pools in the dark (one on the ground, one round its own body) and
 ## casts no shadow.
 
 const COL := {"rev": Color8(196, 226, 240), "beam": Color8(236, 222, 190), "prism": Color8(214, 204, 236)}
-const PX := 4.0
-static var _halo := {}           # radius (web px) -> the radial gradient as a texture, one texel per web px
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
+static var _halo := {}           # radius (texels) -> the radial gradient as a texture (callers choose the px per texel)
 
 var w                            # the wisp's state (animancer base.gd Wisp): tp, z, gone, scale, alpha, wt
 var kind := "rev"
@@ -70,9 +70,9 @@ func _place() -> void:
 	var bob := sin(t * 1.3 + ph) * 1.2
 	# the ground pool breathes; the body pool sits at the wisp's height
 	lamp.set_meta("dark_r", 21.0 * (0.85 + 0.15 * sin(t * 2.3 + ph)) * w.scale)
-	lamp.position = Vector2(0, PX)
+	lamp.position = Vector2(0, Iso.WPX)
 	body.set_meta("dark_r", 12.0 * w.scale)
-	body.position = Vector2(0, -(w.z - bob) * PX)
+	body.position = Vector2(0, -(w.z - bob) * Iso.WPX)
 	modulate.a = w.alpha
 
 func _process(dt: float) -> void:
@@ -101,17 +101,29 @@ func _process(dt: float) -> void:
 ## a web-px point (relative to the wisp's foot, in web px) laid on the art grid, in this node's px
 func _grid(wx: float, wy: float) -> Vector2:
 	var g := global_position
-	var p := Vector2(round((g.x + wx * PX) / PX) * PX, round((g.y + wy * PX) / PX) * PX)
+	var p := Vector2(round((g.x + wx * Iso.WPX) / AP) * AP, round((g.y + wy * Iso.WPX) / AP) * AP)
 	return p - g
 
+## cw x ch art pixels at a web-px point
 func _cell(wx: float, wy: float, c: Color, a: float, cw := 1.0, ch := 1.0) -> void:
 	var p := _grid(wx, wy)
-	draw_rect(Rect2(p, Vector2(cw * PX, ch * PX)), Color(c.r, c.g, c.b, clampf(a, 0.0, 1.0)))
+	draw_rect(Rect2(p, Vector2(cw * AP, ch * AP)), Color(c.r, c.g, c.b, clampf(a, 0.0, 1.0)))
 
+## a single mote (one web px across): a bright art pixel, its right and lower neighbours at half alpha
+func _mote(wx: float, wy: float, c: Color, a: float) -> void:
+	var p := _grid(wx, wy)
+	var cc := Color(c.r, c.g, c.b, clampf(a, 0.0, 1.0))
+	var h := Color(cc, cc.a * 0.5)
+	draw_rect(Rect2(p, Vector2(AP, AP)), cc)
+	draw_rect(Rect2(p + Vector2(AP, 0), Vector2(AP, AP)), h)
+	draw_rect(Rect2(p + Vector2(0, AP), Vector2(AP, AP)), h)
+
+## the soft halo, r web px across its radius: a texture of two texels per web px drawn at one art pixel per texel
 func _glow(wx: float, wy: float, r: float, a: float) -> void:
 	var ri := maxi(1, int(round(r)))
 	var p := _grid(wx - ri, wy - ri)
-	draw_texture_rect(halo(ri), Rect2(p, Vector2(ri * 2, ri * 2) * PX), false, Color(col.r, col.g, col.b, a))
+	var tex := halo(ri * 2)
+	draw_texture_rect(tex, Rect2(p, tex.get_size() * AP), false, Color(col.r, col.g, col.b, a))
 
 func _draw() -> void:
 	if w == null:
@@ -119,7 +131,7 @@ func _draw() -> void:
 	var ph := _ph()
 	var bob := sin(t * 1.3 + ph) * 1.2
 	var br := 0.72 + 0.28 * sin(t * 2.3 + ph) * sin(t * 5.1 + ph * 0.7)
-	var me := Iso.to_screen(w.tp) / PX
+	var me := Iso.to_screen(w.tp) / Iso.WPX
 	var sc: float = w.scale
 	# the wake: older points rise and spread and fade
 	for q in wake:
@@ -127,19 +139,19 @@ func _draw() -> void:
 		var k := 1.0 - age / 0.9
 		if k <= 0.0:
 			continue
-		var pp: Vector2 = Iso.to_screen(q[0]) / PX - me
+		var pp: Vector2 = Iso.to_screen(q[0]) / Iso.WPX - me
 		var x := pp.x + sin(float(q[3]) + age * 4.0) * age * 3.0
 		var y := pp.y - float(q[1]) + bob - age * 6.0
-		_cell(x, y, col, 0.34 * k * k * br)
+		_mote(x, y, col, 0.34 * k * k * br)
 		if k > 0.6:
-			_cell(x + 1.0, y, col, 0.12 * k * br)
+			_mote(x + 1.0, y, col, 0.12 * k * br)
 	# the dust: single motes that twinkle and sink
 	for m in dust:
 		var a := t - float(m[3])
 		var k := 1.0 - a / float(m[4])
-		var pp: Vector2 = Iso.to_screen(m[0]) / PX - me
+		var pp: Vector2 = Iso.to_screen(m[0]) / Iso.WPX - me
 		var tw := 0.5 + 0.5 * sin(float(m[5]) * 3.0 + a * 14.0)
-		_cell(pp.x + float(m[2]) + sin(float(m[5]) + a * 2.0) * 1.2, pp.y - float(m[1]) + a * 5.0, Color.WHITE if tw > 0.85 else col, 0.55 * k * tw)
+		_mote(pp.x + float(m[2]) + sin(float(m[5]) + a * 2.0) * 1.2, pp.y - float(m[1]) + a * 5.0, Color.WHITE if tw > 0.85 else col, 0.55 * k * tw)
 	# the light itself: a wide soft halo, a slow breath, the heart
 	var sy := -float(w.z) + bob
 	var eb := 0.8 + 0.2 * sin(t * 1.1 + ph)
@@ -147,9 +159,15 @@ func _draw() -> void:
 	_glow(1.0, sy + 1.0, 10.0 * sc, 0.3 * br)
 	_glow(1.0, sy + 1.0, 5.0 * sc, 0.45 * br)
 	var hc := Color(minf(1.0, col.r + 30.0 / 255.0), minf(1.0, col.g + 25.0 / 255.0), minf(1.0, col.b + 15.0 / 255.0))
-	var hs := maxf(2.0, round(2.0 * sc))
-	_cell(0.0, sy, hc, 0.95 * br, hs, hs)
-	_cell(-1.0, sy, col, 0.35 * br, 1.0, hs)
-	_cell(hs, sy, col, 0.35 * br, 1.0, hs)
-	_cell(0.0, sy - 1.0, col, 0.35 * br, hs, 1.0)
-	_cell(0.0, sy + hs, col, 0.35 * br, hs, 1.0)
+	var hs := maxf(2.0, round(2.0 * sc))       # the heart, in web px across
+	var hn := hs * 2.0                         # ... in art pixels
+	var o := AP / Iso.WPX                      # one art pixel, in web px
+	_cell(0.0, sy, hc, 0.95 * br, hn, hn)
+	# its rim one web px deep either side: an art pixel close, a fainter one beyond
+	for ring in 2:
+		var ra := (0.35 if ring == 0 else 0.15) * br
+		var d := o * (ring + 1)
+		_cell(-d, sy, col, ra, 1.0, hn)
+		_cell(hs + d - o, sy, col, ra, 1.0, hn)
+		_cell(0.0, sy - d, col, ra, hn, 1.0)
+		_cell(0.0, sy + hs + d - o, col, ra, hn, 1.0)

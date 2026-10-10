@@ -1,10 +1,10 @@
 # Values, ramps and dither
 
-Every lit value is snapped to a short hue-shifted ramp per material, in whole world pixels, with the 4x4 ordered
-dither only where one tone meets the next. How many tones a form gets depends on its size on screen. Big shapes are
-laid in a few clean tone groups first; texture stays subordinate; open ground stays quiet so the story's small
-things can read against it. Small things read by contrast, never by being drawn larger than they are. Use this page
-whenever a ramp is chosen, a material painted or a small detail placed.
+Every lit value is snapped to a short hue-shifted ramp per material, in whole world pixels on the 2 x 2 grid, with the
+ordered (Bayer) dither only where one tone meets the next. How many tones a form gets depends on its size on screen. Big
+shapes are laid in a few clean tone groups first; texture stays subordinate; open ground stays quiet so the story's
+small things can read against it. Small things read by contrast, never by being drawn larger than they are. Use this
+page whenever a ramp is chosen, a material painted or a small detail placed.
 
 ## The rule
 - [PAINTED_STANDARD](../../../../docs/PAINTED_STANDARD.md) rules 1 (broad flat tones from a short ramp), 2 (dither
@@ -37,8 +37,10 @@ Practice now is by size: big forms 6 to 8, small stones 3 to 4. Until Derek rule
 count a piece uses and why.
 
 **Dither only at tone borders, in a narrow band.**
-- The 4x4 Bayer matrix `B4` (`kit.py`, `blood.py`, `fog.py`, `wisp_fire.py`, `candle.py`, `wood_lights.py`) indexed by
-  the screen pixel `(sy % 4, sx % 4)`.
+- The Bayer matrix `B4` (`kit.py`, `blood.py`, `fog.py`, `wisp_fire.py`, `candle.py`, `wood_lights.py`) indexed by
+  the render's own pixel `(sy % 4, sx % 4)`, which is an art pixel: one threshold per art pixel, and every art pixel
+  a 2 x 2 block of screen pixels (MASTER_RULES section 3 rule 7). The 4 x 4 is the matrix's pattern of thresholds,
+  never a pixel size; a dither cell of 4 screen px fails `tools/check_2x2.py`.
 - Narrow band: dither only where the value is within 0.035 of a step, `|q - round(q)| < 0.035` (report 1, technique
   9). Amplitude about plus or minus 0.07 of the value at most (PAINTED_STANDARD rule 2); the engine's whole-field
   `(bay - 0.5) * 0.05` and `kit.paint(..., dither=0.05)` stay under that.
@@ -57,7 +59,8 @@ count a piece uses and why.
 
 **Small things need contrast, not size** (report 1, technique 22). True scale is the law
 ([MASTER_RULES](../../../../docs/MASTER_RULES.md) section 5), so small story pieces are a few pixels:
-- a human skull is **about 4 px**; on busy flesh it vanished, on calm stone in the lantern it reads;
+- a human skull is **about 4 px** (world px, as all sizes on this page; twice that in art pixels on the 2 x 2 grid);
+  on busy flesh it vanished, on calm stone in the lantern it reads;
 - a rune is a **4 x 5 px glyph** with whole-pixel strokes (`hollow.py:rune_mask`: glyph cell 0.22 yd, band 5 px tall,
   stroke width a whole pixel, gaps between glyphs);
 - a cap of the three lights is **2 px** (`wood_lights.py`: three or four cells, top, top shaded, rim); a ground

@@ -10,7 +10,8 @@ extends Node2D
 ##   lantern gone grey-dark with a black flame and a thin violet-white edge.
 ## Its glass (glass_screen) is where world/dark_layer.gd opens the small glow round the lamp.
 
-const PX := 4.0
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
+# positions here are in the web's px (Iso.WPX screen px each: a length unit, not a cell)
 const SKULL := [
 	"iVBORw0KGgoAAAANSUhEUgAAAAsAAAARCAYAAAAL4VbbAAABIUlEQVR4nGNgwAI4OTj/YxPHqZBkDeiACZugpJgIVkNQFHNycP7n5OD8LyctDmcjyzMiK+xtzmFgYGBg6Jm8giEi0IGBgYGBoX/mGobvP74zwk1GVvjkyQsUqwM9rOB+QHEGusIHD5+h8Bk5OTj/mxtqMzx6+hKrp2Dg+as3EJPDghwZXr95w/D6zRu4WyMCHeBiFkZqiNCAWb97y2wME3dvmc3w5NkrRGhwcnD+L0wPYWBgYGCYPHsNg6iICMPrN28YfN2sGJ48e8Vw+tIdhu8/vjPCPfjg4TOGdZv2M+SmhjCwMf9nyE0NYTh38SaKLUwMDAwM3398Z1y/4xhKCMBomKkYQScmKoiVhgcdMoeTg/M/crp4/uoN3FSsAF8SBQAyEHMcaQNGtgAAAABJRU5ErkJggg==",
 	"iVBORw0KGgoAAAANSUhEUgAAAAsAAAARCAYAAAAL4VbbAAABIUlEQVR4nGNgwAI4OTj/YxPHqZBkDeiACZugpJgIVkNQFHNycP7n5OD8LyctDmcjyzMiK+xtzmFgYGBg6Jm8giEi0IGBgYGBoX/mGobvP74zwk1GVvjkyQsUqwM9rOB+QHEGusIHD5+h8Bk5OTj/mxtqMzx6+hKrp2Dg+as3EJPDghwZXr95w/D6zRu4WyMCHeBiFkZqiNCAWX/90l4ME69f2svw5NkrRGhwcnD+L0wPYWBgYGCYPHsNg6iICMPrN28YfN2sGJ48e8Vw+tIdhu8/vjPCPfjg4TOGdZv2M+SmhjCwMf9nyE0NYTh38SaKLUwMDAwM3398Z1y/4xhKCMBomKkYQScmKoiVhgcdMoeTg/M/crp4/uoN3FSsAF8SBQADO3PUtXTIwwAAAABJRU5ErkJggg==",
@@ -94,9 +95,9 @@ func glass_screen() -> Vector2:
 	if unit != null:
 		return unit.glass_screen()
 	if cls == "ossumancer":
-		return hero.position + _heart() * PX
+		return hero.position + _heart() * Iso.WPX
 	var sw := _sway()
-	return hero.position + Vector2(hero.face * 7 + sw, -14 + absf(sw) * 0.3 + 0.8) * PX
+	return hero.position + Vector2(hero.face * 7 + sw, -14 + absf(sw) * 0.3 + 0.8) * Iso.WPX
 
 func _process(dt: float) -> void:
 	if hero == null or not is_instance_valid(hero):
@@ -156,14 +157,14 @@ func _draw() -> void:
 	if unit != null:   # floating: the soul is the flame, the glass at its height
 		X = -6.0
 		Y = roundf(-float(unit.z) - 16 * 0.55)
-	draw_texture_rect(tex[0], Rect2(Vector2(X, Y) * PX + o, Vector2(12, 16) * PX), false, Color.WHITE)
+	draw_texture_rect(tex[0], Rect2(Vector2(X, Y) * Iso.WPX + o, tex[0].get_size() * AP), false, Color.WHITE)   # 24 x 32 texels, an art pixel each
 	# its glow, a faint swell (the web's LAMP_RGB; the Empty Hand's turns cold by night)
 	var rgb := Color8(255, 200, 140)
 	if cls == "monk":
 		var k := _sky()
 		rgb = Color8(255, 214, 140) if k < 0.0 or k > 0.5 else Color8(150, 130, 190)
 	var c := Vector2(X + 6, Y + 16 * 0.55)
-	draw_texture_rect(WispView.halo(6), Rect2((c - Vector2(6, 6)) * PX + o, Vector2(12, 12) * PX), false, Color(rgb.r, rgb.g, rgb.b, 0.12 + 0.03 * sin(t * 9.0)))
+	draw_texture_rect(WispView.halo(12), Rect2(((c - Vector2(6, 6)) * Iso.WPX / AP).round() * AP + o, Vector2(24, 24) * AP), false, Color(rgb.r, rgb.g, rgb.b, 0.12 + 0.03 * sin(t * 9.0)))
 
 ## where it is in the world (tiles)
 func _tp() -> Vector2:
@@ -171,21 +172,21 @@ func _tp() -> Vector2:
 
 func _draw_skull(o: Vector2) -> void:
 	var me := Iso.to_screen(_tp())
-	var s := PX / 3.0
-	var h := (_hand() * PX).round() + o
+	var s := Iso.WPX / 3.0
+	var h := (_hand() * Iso.WPX).round() + o
 	var seq := [0, 1, 2, 3, 2, 1]
 	var fi: int = seq[int(t * 2.2) % seq.size()]
 	draw_set_transform(h, a, Vector2.ONE)
 	for i in CHAIN:   # the chain: two links
-		draw_rect(Rect2(Vector2(-s, i * PX), Vector2(s * 2.0, PX * (0.67 if i % 2 else 1.0))), Color("#16131a"))
+		draw_rect(Rect2(Vector2(-s, i * 3.0 * s), Vector2(s * 2.0, s * (2.0 if i % 2 else 3.0))), Color("#16131a"))   # links on the skull's grain
 	draw_set_transform(h, a, Vector2(-1.0 if hero.face < 0 else 1.0, 1.0))
-	draw_texture_rect(tex[fi], Rect2(Vector2(-HANG_X * s, CHAIN * PX), Vector2(SK_W, SK_H) * s), false)
+	draw_texture_rect(tex[fi], Rect2(Vector2(-HANG_X * s, CHAIN * 3.0 * s), Vector2(SK_W, SK_H) * s), false)
 	draw_set_transform(o, 0.0, Vector2.ONE)
 	# the vapour: soft bone-white wisps, dense and small as they leave the skull, widening and thinning as they climb
 	for w in vap:
 		var k: float = w[7] / w[8]
 		var al := k / 0.1 if k < 0.1 else pow(1.0 - (k - 0.1) / 0.9, 1.4)
-		var p: Vector2 = Iso.to_screen(w[0]) - me + Vector2(w[1] + w[3], w[2] + w[4]) * PX
+		var p: Vector2 = Iso.to_screen(w[0]) - me + Vector2(w[1] + w[3], w[2] + w[4]) * Iso.WPX
 		_puff(p, (0.45 + k * 2.4) * w[10], Color(226 / 255.0, 220 / 255.0, 204 / 255.0, al * (0.34 - k * 0.2)))
 		if k < 0.45:
 			draw_rect(Rect2((p / s).round() * s - Vector2(s, 0), Vector2(s, s) * 2.0), Color(242 / 255.0, 238 / 255.0, 226 / 255.0, al * 0.22 * (1.0 - k / 0.45)))
@@ -194,7 +195,7 @@ func _draw_skull(o: Vector2) -> void:
 ## a soft round puff: a filled ellipse on the hero's grain (the web's canvas ellipse)
 func _puff(c: Vector2, r_web: float, col: Color) -> void:
 	var rr := maxi(1, int(round(r_web * 3.0)))
-	var s := PX / 3.0
+	var s := Iso.WPX / 3.0
 	draw_texture_rect(_disc(rr), Rect2(((c / s).round() - Vector2(rr, rr * 0.8)) * s, Vector2(rr * 2, rr * 1.6) * s), false, col)
 
 static func _disc(r: int) -> Texture2D:

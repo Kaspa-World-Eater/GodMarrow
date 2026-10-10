@@ -29,43 +29,43 @@ vec3 ramp(float v) {
 }
 
 void fragment() {
-	vec2 cell = floor(UV * rect_size / 4.0);
+	vec2 cell = floor(UV * rect_size / 2.0);                   // the 2 x 2 grid (MASTER_RULES 3.7): a blade is one art pixel wide
 	vec4 col = vec4(0.0);
 	float best = -1.0;
-	int H = int(blade_h / 4.0);
+	int H = int(blade_h / 2.0);
 	// look down the columns near this cell for a blade rooted below that reaches up to it
-	for (int k = 0; k <= 12; k++) {
+	for (int k = 0; k <= 24; k++) {
 		if (k > H) break;
-		for (int dx = -3; dx <= 3; dx++) {
+		for (int dx = -6; dx <= 6; dx++) {
 			vec2 root = cell + vec2(float(dx), float(k));
-			vec2 rq = (root * 4.0 + 2.0 - rect_size * vec2(0.5, 1.0) + vec2(0.0, half_px.y)) / half_px;
+			vec2 rq = (root * 2.0 + 1.0 - rect_size * vec2(0.5, 1.0) + vec2(0.0, half_px.y)) / half_px;
 			float re = length(rq);
 			if (re > 1.0) continue;
-			vec2 wr = root + world_ofs / 4.0;
+			vec2 wr = root + world_ofs / 2.0;
 			float hh = h21(wr);
-			float clump = vn(wr * 0.16 + seed);                        // blades gather in tufts, ground between
-			if (clump < 0.45 || hh < 0.62 - (clump - 0.45) * 0.5) continue;
+			float clump = vn(wr * 0.08 + seed);                        // blades gather in tufts, ground between
+			if (clump < 0.45 || hh < 0.81 - (clump - 0.45) * 0.25) continue;   // half the old chance: four roots per old cell, each blade half as wide
 			float hgt = float(H) * (0.4 + 0.6 * smoothstep(0.45, 0.8, clump)) * (0.75 + 0.25 * h21(wr + 7.0)) * (1.0 - re * re * 0.6);   // taller in a tuft's heart
 			float f = float(k) / max(hgt, 1.0);                       // 0 at the root .. 1 at the tip
 			if (f > 1.0) continue;
 			// the sway: a wave rolling across the patch with the wind, each blade with its own phase
-			float wave = sin(wr.x * 0.12 - t * (1.4 + wind.y) + h21(wr + 3.0) * 1.2) * (0.5 + wind.y);
-			float lean = (wind.x * (0.8 + wind.y) + wave) * 1.6 + (h21(wr + 11.0) - 0.5) * 1.5;
+			float wave = sin(wr.x * 0.06 - t * (1.4 + wind.y) + h21(wr + 3.0) * 1.2) * (0.5 + wind.y);
+			float lean = (wind.x * (0.8 + wind.y) + wave) * 3.2 + (h21(wr + 11.0) - 0.5) * 3.0;   // in cells (2 px)
 			// parting round bodies: blades near a body lean away from it
 			for (int b = 0; b < 6; b++) {
 				vec4 bd = bodies[b];
 				if (bd.w <= 0.0) continue;
-				vec2 dv = (root * 4.0 + 2.0) - bd.xy;
+				vec2 dv = (root * 2.0 + 1.0) - bd.xy;
 				dv.y *= 2.0;
 				float dd = length(dv);
 				float near = 1.0 - smoothstep(bd.z * 0.4, bd.z, dd);
-				lean += sign(dv.x) * near * 4.5 * bd.w;
+				lean += sign(dv.x) * near * 9.0 * bd.w;
 			}
 			float xoff = lean * f * f;
 			if (abs(float(dx) + xoff) > 0.5) continue;
 			float w = (1.0 - f) * 1.0;                                // taper (one cell; the taper is in the tone)
 			// tone: pooled dark at the root, rising to a lit tip; blades leaning toward the light (left) brighter
-			float broad = vn(wr * 0.05 + 40.0);                        // broad light across the patch, not per blade
+			float broad = vn(wr * 0.025 + 40.0);                        // broad light across the patch, not per blade
 			float v = 0.05 + f * 0.62 + (broad - 0.5) * 0.3 + (h21(wr + 5.0) - 0.5) * 0.06 - clamp(lean, -2.0, 2.0) * 0.05;
 			// nearer rows (lower on screen) draw over farther ones
 			float order = root.y + f * 0.01;

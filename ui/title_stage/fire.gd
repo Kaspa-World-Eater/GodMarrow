@@ -5,7 +5,8 @@ extends Node2D
 ## from it. The orders not yet painted keep their place with their tarot card stood up in the joints of the flagstones.
 ## Hover a pilgrim and they step into the light. Stage API as ui/title_stage/bowl.gd.
 
-const K := 4.0
+const K := 4.0   # a chapel px in screen px (the painting is 480 x 270 shown x4, the pilgrims brought to its grain)  # 2x2-ok: the painting's coordinate unit and texel until it is re-baked at 960 x 540, not an effect's cell
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7); every live effect here is drawn in it
 const MARROW := Color("#c9974a")
 const FIRE := Vector2(1360, 954)
 const FS := 1.7
@@ -139,47 +140,101 @@ func _process(dt: float) -> void:
 	add_fx.queue_redraw()
 
 func _snap(p: Vector2) -> Vector2:
-	return Vector2(floorf(p.x / K) * K, floorf(p.y / K) * K)
+	return (p / AP).floor() * AP
+
+## the fire is drawn FS times the size of its pieces' numbers, round FIRE, straight onto the art-pixel grid
+func _f(v: Vector2) -> Vector2:
+	return _snap(FIRE + v * FS)
+
+func _fr(v: Vector2, sz: Vector2) -> Rect2:
+	var a := _f(v)
+	return Rect2(a, (_snap(FIRE + (v + sz) * FS) - a).max(Vector2(AP, AP)))
+
+## a speck: a bright art pixel, its right and lower neighbours at half (the web's one 4-px pixel, shaped, not a block)
+func _speck(n: CanvasItem, q: Vector2, c: Color) -> void:
+	n.draw_rect(Rect2(q, Vector2(AP, AP)), c)
+	var c2 := Color(c, c.a * 0.5)
+	n.draw_rect(Rect2(q + Vector2(AP, 0), Vector2(AP, AP)), c2)
+	n.draw_rect(Rect2(q + Vector2(0, AP), Vector2(AP, AP)), c2)
 
 func _draw_fx() -> void:
 	var t: float = T.t
-	fx.draw_set_transform(FIRE * (1.0 - FS), 0.0, Vector2(FS, FS))
-	fx.draw_rect(Rect2(_snap(FIRE + Vector2(-44, -8)), Vector2(88, 12)), Color("#0f0905"))
+	# the logs: dark, each with its lit top edge (the web's one px, at the fire's size)
+	fx.draw_rect(_fr(Vector2(-44, -8), Vector2(88, 12)), Color("#0f0905"))
 	for l in [[-40, -14, 64, 8], [-20, -20, 60, 8], [-30, -4, 70, 8]]:
-		fx.draw_rect(Rect2(_snap(FIRE + Vector2(l[0], l[1])), Vector2(l[2], l[3])), Color("#1b1008"))
-		fx.draw_rect(Rect2(_snap(FIRE + Vector2(l[0], l[1])), Vector2(l[2], 4)), Color("#3d2512"))
+		fx.draw_rect(_fr(Vector2(l[0], l[1]), Vector2(l[2], l[3])), Color("#1b1008"))
+		fx.draw_rect(_fr(Vector2(l[0], l[1]), Vector2(l[2], 4)), Color("#3d2512"))
+	# the coals: a small mound of art pixels each, lit on top
 	for i in 14:
 		var g: float = T._flick(i * 1.3)
-		fx.draw_rect(Rect2(_snap(FIRE + Vector2(-36.0 + i * 6.0, -8)), Vector2(4, 4)), Color("#b83026").lerp(Color("#ecc47e"), g * 0.6))
-	var cols := 13
-	for c in cols:
-		var u := (float(c) / (cols - 1)) * 2.0 - 1.0
+		var q := _f(Vector2(-36.0 + i * 6.0, -8))
+		var cc := Color("#b83026").lerp(Color("#ecc47e"), g * 0.6)
+		fx.draw_rect(Rect2(q + Vector2(AP, 0), Vector2(2.0 * AP, AP)), cc.lerp(Color("#ecc47e"), 0.3))
+		fx.draw_rect(Rect2(q + Vector2(0, AP), Vector2(3.0 * AP, AP)), cc)
+	# the flame: one column per art pixel across (the web's 13 columns, their height and sway read between them), each
+	# climbing in art-pixel steps; runs of one colour drawn as one strip
+	var half := 38.0 * FS
+	var x := -half
+	while x < half:
+		var lx := x / FS
+		var u := clampf(lx / 34.0, -1.0, 1.0)
+		var c := (u + 1.0) * 0.5 * 12.0
 		var hgt: float = (1.0 - u * u) * (70.0 + 30.0 * T._flick(c * 2.1)) + 10.0
 		var sway := sin(t * 3.0 + c * 0.7) * 6.0 + sin(t * 7.3 + c) * 3.0
+		var top_on := fmod(t * 11.0 + roundf(c), 1.0) < 0.6
+		var run_q := Vector2.INF
+		var run_h := 0.0
+		var run_col := Color(0, 0, 0, 0)
 		var y := 0.0
-		while y < hgt:
-			var k := y / hgt
-			var col := Color("#fff2c0").lerp(Color("#ecc47e"), minf(1.0, k * 2.0)).lerp(Color("#e8704e"), clampf(k * 2.0 - 0.6, 0.0, 1.0)).lerp(Color("#84181c"), clampf(k * 2.0 - 1.3, 0.0, 1.0))
-			if absf(u) > 0.6:
-				col = col.lerp(Color("#e8704e"), 0.5)
-			if k < 0.85 or fmod(t * 11.0 + c, 1.0) < 0.6:
-				fx.draw_rect(Rect2(_snap(FIRE + Vector2(u * 34.0 + sway * k, -14.0 - y)), Vector2(K, K)), col)
-			y += K
-	fx.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		while true:
+			var q := Vector2.INF
+			var col := Color(0, 0, 0, 0)
+			if y < hgt:
+				var k := y / hgt
+				col = Color("#fff2c0").lerp(Color("#ecc47e"), minf(1.0, k * 2.0)).lerp(Color("#e8704e"), clampf(k * 2.0 - 0.6, 0.0, 1.0)).lerp(Color("#84181c"), clampf(k * 2.0 - 1.3, 0.0, 1.0))
+				if absf(u) > 0.6:
+					col = col.lerp(Color("#e8704e"), 0.5)
+				col = Color(roundf(col.r * 24.0) / 24.0, roundf(col.g * 24.0) / 24.0, roundf(col.b * 24.0) / 24.0)   # the ramp in steps, so the strips run
+				if k < 0.85 or top_on:
+					q = _f(Vector2(lx + sway * k, -14.0 - y))
+			if run_q != Vector2.INF and q != Vector2.INF and q.x == run_q.x and q.y < run_q.y and col.is_equal_approx(run_col):
+				run_h += run_q.y - q.y
+				run_q = q
+			else:
+				if run_q != Vector2.INF:
+					fx.draw_rect(Rect2(run_q, Vector2(2.0 * AP, run_h)), run_col)   # one art pixel over the next column, so a sway never opens a seam
+				run_q = q
+				run_h = AP
+				run_col = col
+			if y >= hgt:
+				break
+			y += AP / FS
+		x += AP
 	for e in embers:
 		var a: float = 1.0 - e["t"] / e["life"]
-		fx.draw_rect(Rect2(_snap(e["p"]), Vector2(K, K)), Color(1.0, 0.55 + 0.35 * a, 0.25, a))
+		_speck(fx, _snap(e["p"]), Color(1.0, 0.55 + 0.35 * a, 0.25, a))
 
 func _draw_back() -> void:
 	for i in candles.size():
 		var c: Vector2 = candles[i]
 		var g: float = T._flick(i * 1.7)
-		fx_back.draw_rect(Rect2(_snap(c + Vector2(0, -8)), Vector2(K, 8 + roundf(g) * 4)), Color("#ecc47e"))
-		fx_back.draw_rect(Rect2(_snap(c + Vector2(0, -12 - g * 4)), Vector2(K, K)), Color("#fff2c0"))
-	if drop_y >= 0.0:
-		fx_back.draw_rect(Rect2(_snap(chin + Vector2(0, drop_y)), Vector2(K, K * 2)), Color("#84181c"))
-	elif drop_t < 1.2:
-		fx_back.draw_rect(Rect2(_snap(chin), Vector2(K, K * (1.0 if drop_t > 0.5 else 2.0))), Color("#5e1016"))
+		# the candle's flame: two art pixels wide, narrowing to one at its top, and its hot tip
+		var b := _snap(c + Vector2(0, -8))
+		var bh := 8.0 + roundf(g) * 4.0
+		fx_back.draw_rect(Rect2(b + Vector2(0, AP), Vector2(2.0 * AP, bh - AP)), Color("#ecc47e"))
+		fx_back.draw_rect(Rect2(b, Vector2(AP, AP)), Color("#ecc47e"))
+		_speck(fx_back, _snap(c + Vector2(0, -12 - g * 4)), Color("#fff2c0"))
+	if drop_y >= 0.0:   # the falling drop: rounded below
+		var q := _snap(chin + Vector2(0, drop_y))
+		fx_back.draw_rect(Rect2(q, Vector2(2.0 * AP, 3.0 * AP)), Color("#84181c"))
+		fx_back.draw_rect(Rect2(q + Vector2(0, 3.0 * AP), Vector2(AP, AP)), Color("#84181c"))
+	elif drop_t < 1.2:  # the bead gathering on the chin
+		var q := _snap(chin)
+		fx_back.draw_rect(Rect2(q, Vector2(2.0 * AP, AP)), Color("#5e1016"))
+		fx_back.draw_rect(Rect2(q + Vector2(0, AP), Vector2(AP if drop_t > 0.5 else 2.0 * AP, AP)), Color("#5e1016"))
+		if drop_t <= 0.5:
+			fx_back.draw_rect(Rect2(q + Vector2(0, 2.0 * AP), Vector2(2.0 * AP, AP)), Color("#5e1016"))
+			fx_back.draw_rect(Rect2(q + Vector2(0, 3.0 * AP), Vector2(AP, AP)), Color("#5e1016"))
 
 func _draw_add() -> void:
 	var t: float = T.t

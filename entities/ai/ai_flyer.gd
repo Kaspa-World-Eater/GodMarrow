@@ -4,7 +4,7 @@ extends "res://entities/ai/brain.gd"
 ## and swoop through you in a 0.75 s arc that ends 2.2 yd past you (one blow), low enough to take 130%. They walk only
 ## in their hours (dusk and night), lying hidden otherwise. Tell: the wings fold back. zc_combat22.js AI22.flyer.
 
-const WPX := 4.0   # the web's heights are world px; ours are screen px
+const WPX := Iso.WPX   # the web's heights are world px; ours are screen px (a unit, not a drawn pixel)
 var z := 6.0
 var oa := INF
 var from_p := Vector2.ZERO

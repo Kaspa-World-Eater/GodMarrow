@@ -3,9 +3,11 @@ extends Node2D
 ## into a pit. At the bottom, under a crust of old ash, something dark and wet lies and breathes. Ancient stone with
 ## traces of biology: stains seep from the plinths, a pale fibre runs into the earth. Not a mouth. Nothing glows.
 ## A waystone that does not know you is crusted shut; one that knows you has its crust fallen in.
-## Three layers, drawn in the web's world px (x4): the dais and pit on the floor, the stones behind the hero, the stones
-## in front of the hero (so he stands inside the ring).
+## Three layers, laid out in the web's world px (x4, a unit of length): the dais and pit on the floor, the stones behind
+## the hero, the stones in front of the hero (so he stands inside the ring). Every mark sits on the 2 x 2 grid (MASTER_RULES
+## 3.7): half a web px is one art pixel (AP), and a mark one web px thick is drawn one art pixel thick.
 
+const AP := 0.5              # the art pixel in web world px: 2 screen px, the 2 x 2 grid
 const RX := 24.0
 const RY := 12.0
 const STONE := [Color8(0x12, 0x10, 0x16), Color8(0x1c, 0x19, 0x1e), Color8(0x28, 0x23, 0x28), Color8(0x35, 0x30, 0x33), Color8(0x45, 0x3e, 0x3d), Color8(0x58, 0x50, 0x49)]
@@ -31,7 +33,7 @@ class Layer extends Node2D:
 	var part := 0    # 0 floor, 1 back stones, 2 front stones
 	var off := Vector2.ZERO
 	func _draw() -> void:
-		draw_set_transform(off, 0.0, Vector2(Iso.WPX, Iso.WPX))
+		draw_set_transform(off, 0.0, Vector2(Iso.WPX, Iso.WPX))   # 2x2-ok: a unit (web px to screen); marks snap to AP
 		if part == 0:
 			ws._draw_base(self)
 		else:
@@ -90,15 +92,16 @@ static func _ell_line(c: CanvasItem, cx: float, cy: float, rx: float, ry: float,
 	for i in n + 1:
 		var a := float(i) / n * TAU
 		pts.append(Vector2(cx + cos(a) * rx, cy + sin(a) * ry))
-	c.draw_polyline(pts, col, 1.0)
+	c.draw_polyline(pts, col, AP)
 
 static func _quad(a: Vector2, ctrl: Vector2, b: Vector2, n: int, out: PackedVector2Array) -> void:
 	for i in range(1, n + 1):
 		var k := float(i) / n
 		out.append(a.lerp(ctrl, k).lerp(ctrl.lerp(b, k), k))
 
+## a block of art pixels: placed on the 2 x 2 grid; a side one web px long (the old one-pixel mark) is one art pixel
 static func _rect(c: CanvasItem, x: float, y: float, w: float, h: float, col: Color) -> void:
-	c.draw_rect(Rect2(roundf(x), roundf(y), w, h), col)
+	c.draw_rect(Rect2(snappedf(x, AP), snappedf(y, AP), AP if w == 1.0 else w, AP if h == 1.0 else h), col)
 
 # ------------------------------------------------------------------ the dais and the pit
 func _draw_base(c: CanvasItem) -> void:
@@ -129,10 +132,10 @@ func _draw_base(c: CanvasItem) -> void:
 	# thin dark veins running in from the edge
 	for i in 4:
 		var a := i * 1.7 + 0.6
-		var p0 := Vector2(roundf(cx + cos(a) * rx) + 0.5, roundf(cy + 2 + sin(a) * ry) + 0.5)
+		var p0 := Vector2(snappedf(cx + cos(a) * rx, AP) + AP * 0.5, snappedf(cy + 2 + sin(a) * ry, AP) + AP * 0.5)
 		var pts := PackedVector2Array([p0])
 		_quad(p0, Vector2(cx + cos(a + 0.6) * rx * 0.4, cy + 2 + sin(a + 0.6) * ry * 0.4), Vector2(cx + 0.5, cy + 2.5), 8, pts)
-		c.draw_polyline(pts, VEIN, 1.0)
+		c.draw_polyline(pts, VEIN, AP)
 	# one slow ridge travelling inward
 	var f := fmod(t * 0.18, 1.0)
 	var rr := 1.0 - f

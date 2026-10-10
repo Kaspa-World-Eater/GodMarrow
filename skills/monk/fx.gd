@@ -14,6 +14,7 @@ const VOID := Color8(138, 106, 200)
 const INK := Color8(20, 14, 26)
 const STONE := Color8(176, 172, 160)
 const STONE_D := Color8(96, 92, 84)
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
 
 func _process(_dt: float) -> void:
 	if book == null or (book.fx_air != self and book.fx_floor != self):
@@ -22,7 +23,26 @@ func _process(_dt: float) -> void:
 	queue_redraw()
 
 static func S(tp: Vector2, z: float = 0.0) -> Vector2:
-	return Iso.to_screen(tp) + Vector2(0, -z * 4.0)
+	return Iso.to_screen(tp) + Vector2(0, -z * Iso.WPX)
+
+## a point laid on the art grid (2 x 2 px), in this node's px
+func _snap(p: Vector2) -> Vector2:
+	var g := global_position
+	return Vector2(floorf((p.x + g.x) / AP) * AP, floorf((p.y + g.y) / AP) * AP) - g
+
+## a single bright mark (one old 4 px pixel): a bright art pixel, its right and lower neighbours at half alpha
+func spark(p: Vector2, col: Color) -> void:
+	var q := _snap(p)
+	var h := Color(col, col.a * 0.5)
+	draw_rect(Rect2(q, Vector2(AP, AP)), col)
+	draw_rect(Rect2(q + Vector2(AP, 0), Vector2(AP, AP)), h)
+	draw_rect(Rect2(q + Vector2(0, AP), Vector2(AP, AP)), h)
+
+## a mote: a bright art pixel with a half-alpha one below it (as the flames' embers)
+func ember(p: Vector2, col: Color) -> void:
+	var q := _snap(p)
+	draw_rect(Rect2(q, Vector2(AP, AP)), col)
+	draw_rect(Rect2(q + Vector2(0, AP), Vector2(AP, AP)), Color(col, col.a * 0.5))
 
 func ell(c: Vector2, R: float, col: Color, w: float = 2.0, filled: bool = false) -> void:
 	var rx = R * Iso.HX * 1.414
@@ -92,7 +112,7 @@ func _floor() -> void:
 		ell(sc, sl["R"] * 0.55, Color(PALEGOLD, 0.35 * ks), 1.0)
 		for i in 4:
 			var aa = b.time * 0.8 + i * PI / 2.0
-			draw_rect(Rect2(sc + Vector2(cos(aa) * sl["R"] * 60.0, sin(aa) * sl["R"] * 30.0) - Vector2(2, 2), Vector2(4, 4)), Color(AMBER, 0.8 * ks))
+			spark(sc + Vector2(cos(aa) * sl["R"] * 60.0, sin(aa) * sl["R"] * 30.0) - Vector2(AP, AP), Color(AMBER, 0.8 * ks))
 	# tears lying in wait
 	for t in b.tears:
 		if t["fall"] > 0.0:
@@ -144,7 +164,7 @@ func _floor() -> void:
 			for j in 4:
 				var rr: float = c["R"] * (0.35 + j * 0.2)
 				var p3 = Iso.to_screen(c["tp"] + d * rr)
-				draw_rect(Rect2(p3 - Vector2(2, 2), Vector2(4, 4)), Color(AMBER if (i + j) % 2 else PALEGOLD, 0.8 * fade))
+				spark(p3 - Vector2(AP, AP), Color(AMBER if (i + j) % 2 else PALEGOLD, 0.8 * fade))
 		var tip = Iso.to_screen(c["tp"] + Vector2(cos(a1), sin(a1)) * c["R"])
 		draw_line(cc, tip, Color(PALEGOLD, 0.6 * fade), 2.0)
 	# cracks and craters where he lands, the hand that grips from below
@@ -329,7 +349,7 @@ func _air() -> void:
 	# motes
 	for m in b.motes:
 		var k10: float = clampf(m["t"] / 0.4, 0.0, 1.0)
-		draw_rect(Rect2(S(m["tp"], m["z"]) - Vector2(1.5, 1.5), Vector2(3, 3)), Color(m["col"], k10))
+		ember(S(m["tp"], m["z"]) - Vector2(AP, AP) * 0.5, Color(m["col"], k10))
 	# the words he says, rising
 	for w in b.words:
 		var k11: float = clampf(w["t"] / 0.4, 0.0, 1.0)

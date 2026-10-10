@@ -13,7 +13,8 @@ extends Node2D
 ## drawn as bars over the vaults, the dawn rays and the canopy shafts. They were laid over the screen, not in the world.
 
 const Flame = preload("res://fx/flame.gd")
-const PX := 4.0
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
+# drifts and heights below are in the web's px (Iso.WPX screen px each: a length unit, not a cell)
 const TALL := [2, 3, 5, 7, 8, 9, 10]
 const WATER := 4
 const FLOOR := 6
@@ -82,14 +83,14 @@ func _process(dt: float) -> void:
 	# fireflies over the fen, dust under the ground
 	var want := 15 if kind == "fen" else (18 if kind == "deep" else 0)
 	while motes.size() < want:
-		motes.append({"p": Vector2(randf() * vs.x, (40.0 + randf() * (270.0 - 60.0)) * PX if kind == "fen" else randf() * vs.y), "t": 0.0,
+		motes.append({"p": Vector2(randf() * vs.x, (40.0 + randf() * (270.0 - 60.0)) * Iso.WPX if kind == "fen" else randf() * vs.y), "t": 0.0,
 			"life": (6.0 + randf() * 8.0) if kind == "fen" else 40.0, "s": randf() * 100.0, "vy": 0.0 if kind == "fen" else 1.5 + randf() * 2.5})
 	for m in motes:
 		m["t"] += dt
 		if kind == "fen":
-			m["p"] += Vector2(sin(t * 1.3 + m["s"]) * 6.0, cos(t * 1.1 + m["s"] * 2.0) * 4.0) * PX * dt
+			m["p"] += Vector2(sin(t * 1.3 + m["s"]) * 6.0, cos(t * 1.1 + m["s"] * 2.0) * 4.0) * Iso.WPX * dt
 		else:
-			m["p"] += Vector2(sin(t * 0.4 + m["s"]) * 2.0, m["vy"]) * PX * dt
+			m["p"] += Vector2(sin(t * 0.4 + m["s"]) * 2.0, m["vy"]) * Iso.WPX * dt
 		m["p"] -= dcam
 	motes = motes.filter(func(m): return m["t"] < m["life"] and Rect2(Vector2(-80, -80), vs + Vector2(160, 120)).has_point(m["p"]))
 	# day motes in the open
@@ -98,7 +99,7 @@ func _process(dt: float) -> void:
 			dmotes.append({"p": Vector2(randf() * vs.x, randf() * vs.y), "s": randf() * TAU, "t": 0.0, "life": 6.0 + randf() * 6.0})
 		for d in dmotes:
 			d["t"] += dt
-			d["p"] += Vector2(sin(t * 0.5 + d["s"]) * 4.0, 2.0 + cos(t * 0.3 + d["s"])) * PX * dt - dcam
+			d["p"] += Vector2(sin(t * 0.5 + d["s"]) * 4.0, 2.0 + cos(t * 0.3 + d["s"])) * Iso.WPX * dt - dcam
 		dmotes = dmotes.filter(func(d): return d["t"] < d["life"] and d["p"].y < vs.y + 16)
 	else:
 		dmotes.clear()
@@ -196,16 +197,16 @@ func _draw() -> void:
 	# fireflies and dust
 	for m in motes:
 		var fade := minf(1.0, minf(m["t"] / 0.6, (m["life"] - m["t"]) / 0.8))
-		var p: Vector2 = ((m["p"] as Vector2) / PX).round() * PX
+		var p: Vector2 = ((m["p"] as Vector2) / AP).round() * AP
 		if kind == "fen":
 			var b := 0.5 + 0.5 * sin(t * 3.0 + m["s"])
-			draw_rect(Rect2(p, Vector2(PX, PX)), Color(220 / 255.0, 1.0, 180 / 255.0, b * fade))
+			_mark(self, p, Color(220 / 255.0, 1.0, 180 / 255.0, b * fade))
 		else:
-			draw_rect(Rect2(p, Vector2(PX, PX)), Color(Color("#d8d0c0"), 0.3 * fade * (0.6 + 0.4 * sin(t * 2.0 + m["s"]))))
+			_mark(self, p, Color(Color("#d8d0c0"), 0.3 * fade * (0.6 + 0.4 * sin(t * 2.0 + m["s"]))))
 	# day: a few bright motes hanging in the light
 	for d in dmotes:
 		var f: float = minf(1.0, minf(d["t"] / 1.5, (d["life"] - d["t"]) / 1.5)) * dk * (0.5 + 0.5 * sin(t * 2.0 + d["s"] * 3.0))
-		draw_rect(Rect2(((d["p"] as Vector2) / PX).round() * PX, Vector2(PX, PX)), Color(232 / 255.0, 224 / 255.0, 200 / 255.0, 0.45 * f))
+		_mark(self, ((d["p"] as Vector2) / AP).round() * AP, Color(232 / 255.0, 224 / 255.0, 200 / 255.0, 0.45 * f))
 
 	# motes falling in the moonlight
 	var nk := _night()
@@ -216,8 +217,8 @@ func _draw() -> void:
 				var an := fmod(i * 2.4 + c["s"], TAU)
 				var rr := fmod(i * 0.37 + c["s"], 1.0) * R_MOON * 0.8
 				var p: Vector2 = xf * Iso.to_screen((c["tp"] as Vector2) + Vector2(cos(an), sin(an)) * rr)
-				var q := Vector2(roundf(p.x / PX + sin(t + i) * 2.0), roundf(p.y / PX - 40.0 * (1.0 - ph))) * PX
-				draw_rect(Rect2(q, Vector2(PX, PX)), Color(Color("#dde6f4"), 0.5 * sin(ph * PI) * nk))
+				var q := ((p + Vector2(sin(t + i) * 2.0, -40.0 * (1.0 - ph)) * Iso.WPX) / AP).round() * AP
+				_mark(self, q, Color(Color("#dde6f4"), 0.5 * sin(ph * PI) * nk))
 
 ## what is laid on as light: motes falling into the cracks' light, the fireflies' glow
 func _draw_add() -> void:
@@ -231,12 +232,20 @@ func _draw_add() -> void:
 		var p: Vector2 = xf * Iso.to_screen(Vector2(s[0] + 0.5, s[1] + 0.5))
 		for i in 4:
 			var k := fmod(t * 0.08 + i * 0.27 + s[0] * 0.1, 1.0)
-			var mp := (p / PX).round() + Vector2(36.0 - k * 34.0 + sin(i * 5.0) * 4.0, -146.0 + k * 140.0)
-			add.draw_rect(Rect2(mp.round() * PX, Vector2(PX, PX)), Color(Color("#eef0ff"), 0.6 * sin(k * PI)))
+			var mp := p + Vector2(36.0 - k * 34.0 + sin(i * 5.0) * 4.0, -146.0 + k * 140.0) * Iso.WPX
+			_mark(add, (mp / AP).round() * AP, Color(Color("#eef0ff"), 0.6 * sin(k * PI)))
 	if kind == "fen":
 		for m in motes:
 			var fade := minf(1.0, minf(m["t"] / 0.6, (m["life"] - m["t"]) / 0.8))
 			var b := 0.5 + 0.5 * sin(t * 3.0 + m["s"])
-			var p: Vector2 = ((m["p"] as Vector2) / PX).round() * PX
-			var g := Flame.dither_glow(4, Color8(150, 255, 110))
-			add.draw_texture_rect(g, Rect2(p - Vector2(4, 4) * PX, g.get_size() * PX), false, Color(1, 1, 1, 0.5 * b * fade * (1.2 - dk * 0.6)))
+			var p: Vector2 = ((m["p"] as Vector2) / AP).round() * AP
+			var g := Flame.dither_glow(8, Color8(150, 255, 110))   # 17 x 17 texels, an art pixel each (the old 9 at 4 px)
+			add.draw_texture_rect(g, Rect2(p - Vector2(8, 8) * AP, g.get_size() * AP), false, Color(1, 1, 1, 0.5 * b * fade * (1.2 - dk * 0.6)))
+
+## a mote: a bright art pixel, its right and lower neighbours at half (the web's one 4-px speck, shaped, not a block)
+static func _mark(cv: CanvasItem, q: Vector2, col: Color) -> void:
+	cv.draw_rect(Rect2(q, Vector2(AP, AP)), col)
+	var c2 := col
+	c2.a *= 0.5
+	cv.draw_rect(Rect2(q + Vector2(AP, 0), Vector2(AP, AP)), c2)
+	cv.draw_rect(Rect2(q + Vector2(0, AP), Vector2(AP, AP)), c2)

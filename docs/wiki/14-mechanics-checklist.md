@@ -92,7 +92,7 @@ These are law. Every system below must respect them. Where the code still breaks
 
 ## 1. Engine, scale and the frame
 
-- **Logical screen** 480×270, drawn at 4 screen px per art px on desktop (1920×1080) and 2 on phones (`RS`). World zoom `ZK` 1.0 since v0.54: the world is a third larger around the same-sized hero. Godot: viewport 1920×1080, `canvas_items` stretch, camera zoom 2 (`13-godot.md`). `b_core.js` `zz_worldscale.js` **[Act I]**
+- **Logical screen** 480×270, drawn at 4 screen px per art px on desktop (1920×1080) and 2 on phones (`RS`). World zoom `ZK` 1.0 since v0.54: the world is a third larger around the same-sized hero. Godot: viewport 1920×1080, `canvas_items` stretch, camera zoom 2 (`13-godot.md`). Never port the 4: in Godot every art pixel is a 2 x 2 block of screen pixels (MASTER_RULES section 3 rule 7). `b_core.js` `zz_worldscale.js` **[Act I]**
 
 - **Isometric grid:** a tile is 36×18 art px (`TW`, `TH`). `iso(x,y)` → screen (x−y)·TW/2, (x+y)·TH/2. Depth sort is by x+y. `b_core.js` `d_play.js` **[Act I]**
 

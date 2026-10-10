@@ -19,8 +19,8 @@ float vn(vec2 p) { vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3.0 - 2.0 
 	return mix(mix(h21(i), h21(i + vec2(1, 0)), u.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), u.x), u.y); }
 
 void fragment() {
-	vec2 px = floor(UV * rect_size / 4.0) * 4.0;
-	ivec2 g = ivec2(px / 4.0);
+	vec2 px = floor(UV * rect_size / 2.0) * 2.0;
+	ivec2 g = ivec2(px / 2.0);
 	float d = B4[(g.y & 3) * 4 + (g.x & 3)] / 16.0;
 	vec2 q = (px - rect_size * 0.5) / half_px;
 	float r = length(q);

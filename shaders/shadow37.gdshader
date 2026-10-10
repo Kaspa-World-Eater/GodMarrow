@@ -22,7 +22,7 @@ void fragment() {
 		v = COLOR.a;
 	}
 	v *= levels;
-	ivec2 c = ivec2(floor(FRAGCOORD.xy / 4.0)) & ivec2(3);
+	ivec2 c = ivec2(floor(FRAGCOORD.xy / 2.0)) & ivec2(3);   // the 2 x 2 grid (MASTER_RULES 3.7)
 	float b = (B[c.y * 4 + c.x] + 0.5) / 16.0;
 	float lv = min(2.0, floor(v) + ((fract(v) - th_off) * th_mul > b ? 1.0 : 0.0));
 	float o = lv < 0.5 ? 0.0 : (lv < 1.5 ? steps.x : steps.y);

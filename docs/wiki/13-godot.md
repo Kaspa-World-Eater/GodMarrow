@@ -17,7 +17,10 @@ run, test and ship is page 08; how art is made is page 07.*
 
 - **Positions are tiles, and a tile is a yard.** Floats: `tp: Vector2`.
 - **The projection:** `Iso.to_screen(tp) = ((x − y) × 72, (x + y) × 36)` Godot units. That is the old web build's
-  18 × 9 px tile at 4 Godot units a pixel (`Iso.WPX`). One yard of height is 21 art pixels, which is 84 Godot units.
+  18 × 9 px tile at 4 Godot units a world px (`Iso.WPX`). One yard of height is 21 world px, which is 84 Godot units.
+  `Iso.WPX` is a unit of length only (positions, heights, offsets), never the size of a drawn pixel: every art pixel
+  is a 2 x 2 block (MASTER_RULES section 3 rule 7), so a yard is 36 × 18 art pixels on the ground and 42 of height.
+  `tools/check_2x2.py` fails the smoke test on any drawing cell of 4.
 - **The camera** (`world/cam_director.gd`): zoom `BASE` 1.06, so the pilgrim stands about an eighth of the screen's
   height (Diablo II's proportion; Derek, 2026-10-07). Every body is drawn at `Iso.FIG` 0.78 against the ground, so the
   world reads large round the figures.

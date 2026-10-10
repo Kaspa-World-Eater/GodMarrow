@@ -10,8 +10,8 @@ layers. Use this page when starting a new scene or adding a piece to one, and re
 - [MASTER_RULES](../../../../docs/MASTER_RULES.md) 2b: scenes make the game's assets; every object a new design and a
   reusable landkit generator; nothing painted for the scene alone. 2b.6: the ground is a world-position generator.
 - MASTER_RULES, the gate: the rules check is written in the piece's pass log before the first line of code.
-- MASTER_RULES 5: true scale (a yard is a 36 x 18 tile, about 21 px of height), see-through, collision at every base,
-  objects in combat; checklist line 11: seen as the player sees it, with the Ossuarch for scale.
+- MASTER_RULES 5: true scale (on the 2 x 2 grid a yard is a 36 x 18 tile and 42 px of height), see-through, collision at
+  every base, objects in combat; checklist line 11: seen as the player sees it, with the Ossuarch for scale.
 
 ## How it is done
 **The pipeline** (`wood_scene.py:main` for a still, `animate` for a loop):

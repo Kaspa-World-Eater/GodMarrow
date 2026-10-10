@@ -37,11 +37,11 @@ vec3 ramp(float v, int k) {
 }
 
 void fragment() {
-	vec2 px = floor(UV * rect_size / 4.0) * 4.0;
-	ivec2 g = ivec2(px / 4.0);
+	vec2 px = floor(UV * rect_size / 2.0) * 2.0;
+	ivec2 g = ivec2(px / 2.0);
 	float d = (B4[(g.y & 3) * 4 + (g.x & 3)] + 0.5) / 16.0;
 	vec2 c = rect_size * 0.5;
-	vec2 q = (px + 2.0 - c) / half_px;
+	vec2 q = (px + 1.0 - c) / half_px;
 	float r = length(q);
 	vec2 dir = q / max(r, 0.001);
 	float edge = 0.78 + 0.3 * fbm(dir * 2.0 + seed);                     // the lobed shore
@@ -64,7 +64,7 @@ void fragment() {
 		for (int i = 0; i < 8; i++) {
 			vec4 rp = ripples[i];
 			if (rp.w <= 0.0) continue;
-			vec2 dv = (px + 2.0 - rp.xy) * vec2(1.0, 2.0);
+			vec2 dv = (px + 1.0 - rp.xy) * vec2(1.0, 2.0);
 			float rr = length(dv);
 			float rad = rp.z * (kind == 1 ? 22.0 : 46.0);
 			float band = 1.0 - smoothstep(0.0, 5.0, abs(rr - rad));

@@ -225,7 +225,9 @@ means that they always need to be perfect. All this will become assets for the g
 4. Surfaces are laid in long dry-brush strokes along the form, the wind or the flow.
 5. Highlights are a loaded brush dragged across, never square dabs.
 6. A paper tooth under everything, fixed to the world and not to the screen.
-7. Whole world pixels: **the 2 x 2 art grid** (Derek, 2026-10-09: "2x2"; was the 4 px grid).
+7. Whole world pixels: **the 2 x 2 art grid** (Derek, 2026-10-09: "2x2"; was the 4 px grid). Every art pixel is a
+   2 x 2 block of screen pixels. The grid is checked by `tools/check_2x2.py` in every smoke test, and a 4 px cell is a
+   failure (Derek, 2026-10-10: "we need to eliminate the 4x4 shit from ever happening again").
 8. Still alive: everything moves a little in the one wind (`core/gust.gd`); glows breathe.
 9. Hue-shift every ramp: darks lean violet-blue, lights lean warm.
 10. Light tells the story: a cool key (the moon) and a warm local light (lantern, fire), each casting real shadows,
@@ -243,8 +245,8 @@ means that they always need to be perfect. All this will become assets for the g
 ## 4. The checklist (every pass, every line, in writing)
 
 1. **Brief:** from the lore and the real thing, every detail with its reason, one true detail from the area's lore.
-2. **Scale:** true size from the game's projection (a yard is 18 × 9 art px on the ground and 21 px of height), with
-   the Ossuarch beside it.
+2. **Scale:** true size from the game's projection (on the 2 x 2 grid a yard is 36 × 18 art px on the ground and 42
+   of height; 18 × 9 and 21 in the engine's world px, a unit of length only), with the Ossuarch beside it.
 3. **Form (section 0, the law):** every feature with height is real form (height field or 3D), lit through its
    normals, casting and catching shadow. The value-only test passes. No flat stand-ins. **The ground has its depth
    profile at all three scales (0.5b), and the bare ground passes the value-only test on its own. Every rounded

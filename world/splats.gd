@@ -4,6 +4,7 @@ extends Node2D
 ## 45 s. Matter, never light: no glow, drawn flat on the floor under every standing thing. At most 140 at once.
 ## Lives in the zone's floor layer; Splats.at(zone) finds or makes it.
 
+const AP := 2.0              # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
 const BONY := ["archer", "ossarcher", "knight", "marrow", "calc_knight", "oath_blade"]
 var list: Array = []   # {p: tile pos, r: tiles, t, seed, col: "r" | "g" | "b"}
 
@@ -37,9 +38,9 @@ func _pool(p: Vector2, r: float, bile: bool) -> void:
 	var hw := r * Iso.HX
 	var rr := ColorRect.new()
 	rr.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	rr.size = (Vector2(hw * 2.9, hw * 1.5) / 4.0).ceil() * 4.0
+	rr.size = (Vector2(hw * 2.9, hw * 1.5) / AP).ceil() * AP
 	var q := Iso.to_screen(p)
-	rr.position = ((q - rr.size * 0.5) / 4.0).floor() * 4.0
+	rr.position = ((q - rr.size * 0.5) / AP).floor() * AP
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/blood_pool.gdshader")
 	m.set_shader_parameter("seed", randf() * 30.0)
@@ -92,13 +93,16 @@ func _process(dt: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	var W := Iso.WPX
 	for s in list:
-		var q := Iso.to_screen(s["p"]).snapped(Vector2(W, W))
+		var q := (Iso.to_screen(s["p"]) / AP).floor() * AP
 		var a := minf(1.0, float(s["t"]) / 8.0)
-		if s["col"] == "b":
-			draw_rect(Rect2(q, Vector2(2, 1) * W), Color(210 / 255.0, 200 / 255.0, 180 / 255.0, 0.8 * a))
-			draw_rect(Rect2(q + Vector2(1, 1) * W, Vector2(W, W)), Color(120 / 255.0, 112 / 255.0, 100 / 255.0, 0.8 * a))
+		if s["col"] == "b":   # a chip of bone in art pixels: a pale slanted top, its broken end in shadow
+			var pale := Color(210 / 255.0, 200 / 255.0, 180 / 255.0, 0.8 * a)
+			var shade := Color(120 / 255.0, 112 / 255.0, 100 / 255.0, 0.8 * a)
+			draw_rect(Rect2(q + Vector2(1, 0) * AP, Vector2(3, 1) * AP), pale)
+			draw_rect(Rect2(q + Vector2(0, 1) * AP, Vector2(3, 1) * AP), pale)
+			draw_rect(Rect2(q + Vector2(2, 2) * AP, Vector2(2, 1) * AP), shade)
+			draw_rect(Rect2(q + Vector2(3, 3) * AP, Vector2(1, 1) * AP), shade)
 			continue
 		if s["col"] == "s":
 			var sa := minf(1.0, float(s["t"]) / 12.0)
@@ -111,7 +115,7 @@ func _draw() -> void:
 					var ea: float = float(s["seed"]) * 3.0 + i * 2.3
 					var ep := q + Vector2(cos(ea), sin(ea) * 0.5) * sr * (0.2 + 0.15 * i)
 					if sin(Time.get_ticks_msec() * 0.006 + i * 1.7 + float(s["seed"])) > -0.3:
-						draw_rect(Rect2(ep.snapped(Vector2(W, W)), Vector2(W, W)), Color(1.0, 0.45 + 0.3 * hot, 0.15, hot))
+						Atmos.mote(self, ep, Color(1.0, 0.45 + 0.3 * hot, 0.15, hot))
 			continue
 		var c := Color8(70, 80, 30) if s["col"] == "g" else Color8(70, 8, 14)
 		c.a = 0.75 * a
@@ -126,13 +130,12 @@ func _ellipse(c: Vector2, rx: float, ry: float, col: Color) -> void:
 	var pts := PackedVector2Array()
 	for i in 14:
 		var a := TAU * i / 14.0
-		var q := (c + Vector2(cos(a) * rx, sin(a) * ry)).snapped(Vector2(Iso.WPX, Iso.WPX))
+		var q := (c + Vector2(cos(a) * rx, sin(a) * ry)).snapped(Vector2(AP, AP))
 		if pts.is_empty() or (q != pts[pts.size() - 1] and q != pts[0]):
 			pts.append(q)
 	if pts.size() < 3 or Geometry2D.triangulate_polygon(pts).is_empty():
 		# a drop too small for the pixel grid to hold its outline: a block of art pixels instead
-		var W := Iso.WPX
-		var hs := Vector2(maxf(W, snappedf(rx, W)), maxf(W, snappedf(ry, W)))
-		draw_rect(Rect2((c - hs).snapped(Vector2(W, W)), hs * 2.0), col)
+		var hs := Vector2(maxf(AP, snappedf(rx, AP)), maxf(AP, snappedf(ry, AP)))
+		draw_rect(Rect2((c - hs).snapped(Vector2(AP, AP)), hs * 2.0), col)
 		return
 	draw_colored_polygon(pts, col)

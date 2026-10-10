@@ -4,7 +4,8 @@ extends Node2D
 ## lights the ground and whatever stands near for a breath; chips thrown in arcs that land, bounce once, lie in the dirt
 ## and fade; under a heavy blow, a crack scored into the ground. All in whole world pixels, drawn on the ground.
 
-const PX := 4.0
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
+const OLDPX := 2.0 * AP   # 2x2-ok: a length unit (the web's world px, the old cell's size), never a drawn cell
 var zone
 var chips: Array = []      # {p (tile), z (px up), v (tile/s), vz, col, t, life, rest}
 var cracks: Array = []     # {pts (screen), t, life}
@@ -61,7 +62,7 @@ func blaze(p: Vector2, secs: float = 3.0, size: float = 1.0) -> void:
 	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	r.size = Vector2(200, 320) * size
 	var q := Iso.to_screen(p)
-	r.position = ((q - Vector2(r.size.x * 0.5, r.size.y - 16)) / PX).floor() * PX
+	r.position = ((q - Vector2(r.size.x * 0.5, r.size.y - 16)) / AP).floor() * AP
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/radiant_blaze.gdshader")
 	m.set_shader_parameter("seed", randf() * 40.0)
@@ -150,22 +151,25 @@ func _jag(a: Vector2, b: Vector2, step: float) -> Array:
 	pts.append(b)
 	return pts
 
+## the fern's arms are polylines (each arm, and each twig off it from where it forks), stroked one art pixel thick
 func _fern(c: Vector2) -> void:
 	var arms: Array = []
 	for i in 7:
 		var ang := randf() * TAU
 		var p := c
-		var arm: Array = []
+		var arm: Array = [p]
 		for k in int(randf_range(6, 12)):
 			ang += randf_range(-0.6, 0.6)
-			p += Vector2(cos(ang), sin(ang) * 0.5) * PX * 2.0
+			p += Vector2(cos(ang), sin(ang) * 0.5) * 2.0 * OLDPX
 			arm.append(p)
 			if randf() < 0.3:
 				var q := p
+				var twig: Array = [q]
 				var a2 := ang + randf_range(-1.2, 1.2)
 				for j in 3:
-					q += Vector2(cos(a2), sin(a2) * 0.5) * PX * 1.5
-					arm.append(q)
+					q += Vector2(cos(a2), sin(a2) * 0.5) * 1.5 * OLDPX
+					twig.append(q)
+				arms.append(twig)
 		arms.append(arm)
 	ferns.append({"c": c, "arms": arms, "t": 0.0, "life": 18.0})
 	while ferns.size() > 12:
@@ -209,16 +213,63 @@ func _draw_sky() -> void:
 		for f in bl["forks"]:
 			_px_path(f, Color(0.88, 0.94, 1.0, 0.95), 1, sky)
 
+## a stroke along pts on the 2 x 2 grid; w is its weight in old (4-px) cells: 1 is one art pixel thick (a thin line
+## stays thin), heavier strokes keep their extent at 2w - 1 art pixels, centred on the path
 func _px_path(pts: Array, col: Color, w: int, cv: CanvasItem = null) -> void:
 	if cv == null:
 		cv = self
+	var cells := 2 * w - 1
+	var off := Vector2(w - 1, w - 1) * AP
 	for i in pts.size() - 1:
 		var a: Vector2 = pts[i]
 		var b: Vector2 = pts[i + 1]
-		var n := maxi(1, int(a.distance_to(b) / PX))
+		var n := maxi(1, int(a.distance_to(b) / AP))
 		for k in n + 1:
-			var q := (a.lerp(b, float(k) / n) / PX).floor() * PX
-			cv.draw_rect(Rect2(q - Vector2(w / 2, w / 2) * PX, Vector2(w, w) * PX), col)
+			var q := (a.lerp(b, float(k) / n) / AP).floor() * AP
+			cv.draw_rect(Rect2(q - off, Vector2(cells, cells) * AP), col)
+
+## one art pixel at q
+func _ap(cv: CanvasItem, q: Vector2, col: Color) -> void:
+	cv.draw_rect(Rect2((q / AP).floor() * AP, Vector2(AP, AP)), col)
+
+## a single bright mark (what was one 4-px pixel): a bright art pixel, its right and lower neighbours at half alpha,
+## the old extent but shaped, not a square block (as world/flames.gd's embers)
+func _mote(cv: CanvasItem, q: Vector2, col: Color) -> void:
+	var c := (q / AP).floor() * AP
+	cv.draw_rect(Rect2(c, Vector2(AP, AP)), col)
+	var h := Color(col.r, col.g, col.b, col.a * 0.5)
+	cv.draw_rect(Rect2(c + Vector2(AP, 0), Vector2(AP, AP)), h)
+	cv.draw_rect(Rect2(c + Vector2(0, AP), Vector2(AP, AP)), h)
+
+## a glint: a bright art pixel and a cross of arms two art pixels long, the outer ones at half the arms' alpha
+func _glint(cv: CanvasItem, q: Vector2, core: Color, arm: Color) -> void:
+	var c := (q / AP).floor() * AP
+	var h := Color(arm.r, arm.g, arm.b, arm.a * 0.5)
+	for o in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:
+		cv.draw_rect(Rect2(c + o * AP, Vector2(AP, AP)), arm)
+		cv.draw_rect(Rect2(c + o * 2.0 * AP, Vector2(AP, AP)), h)
+	cv.draw_rect(Rect2(c, Vector2(AP, AP)), core)
+
+## what was a 3 x 3 block (or plus) of 4-px cells round the cell at q: the same 12-px extent in art pixels, 6 x 6 with
+## its corners off (a rounded square), or as a cross (rows 2, 4, 6, 6, 4, 2: an octagon, the plus rounded)
+func _spot(cv: CanvasItem, q: Vector2, col: Color, cross: bool = false) -> void:
+	var b := (q / AP).floor() * AP - Vector2(2, 2) * AP
+	if cross:
+		cv.draw_rect(Rect2(b + Vector2(2, 0) * AP, Vector2(2, 1) * AP), col)
+		cv.draw_rect(Rect2(b + Vector2(1, 1) * AP, Vector2(4, 1) * AP), col)
+		cv.draw_rect(Rect2(b + Vector2(0, 2) * AP, Vector2(6, 2) * AP), col)
+		cv.draw_rect(Rect2(b + Vector2(1, 4) * AP, Vector2(4, 1) * AP), col)
+		cv.draw_rect(Rect2(b + Vector2(2, 5) * AP, Vector2(2, 1) * AP), col)
+	else:
+		cv.draw_rect(Rect2(b + Vector2(1, 0) * AP, Vector2(4, 1) * AP), col)
+		cv.draw_rect(Rect2(b + Vector2(0, 1) * AP, Vector2(6, 4) * AP), col)
+		cv.draw_rect(Rect2(b + Vector2(1, 5) * AP, Vector2(4, 1) * AP), col)
+
+## a filled disc of radius r art pixels round the art pixel c (in cells), one colour, drawn as row spans
+func _disc(cv: CanvasItem, c: Vector2, r: int, col: Color) -> void:
+	for yy in range(-r, r + 1):
+		var xm := int(floor(sqrt(maxf(0.0, float(r * r - yy * yy)))))
+		cv.draw_rect(Rect2((c + Vector2(-xm, yy)) * AP, Vector2(2 * xm + 1, 1) * AP), col)
 
 ## frost on the ground (shaders/frost.gdshader): feathers grow out from p for a second, glitter, then melt back
 var frosts: Array = []
@@ -227,8 +278,8 @@ func frost(p: Vector2, r: float = 1.6, secs: float = 9.0) -> void:
 	var hw := r * Iso.HX
 	var n := ColorRect.new()
 	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	n.size = (Vector2(hw * 2.2, hw * 1.1) / PX).ceil() * PX
-	n.position = ((Iso.to_screen(p) - n.size * 0.5) / PX).floor() * PX
+	n.size = (Vector2(hw * 2.2, hw * 1.1) / AP).ceil() * AP
+	n.position = ((Iso.to_screen(p) - n.size * 0.5) / AP).floor() * AP
 	n.z_index = -1
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/frost.gdshader")
@@ -277,25 +328,25 @@ func _draw_spikes() -> void:
 			var w: float = sp["w"]
 			var tip := b + dirv * h
 			# fill the prism pixel by pixel: across from -w/2 to w/2 tapering to the tip
-			var n := int(h / PX)
+			var n := int(h / AP)
+			var P: Array = SPIKE_PAL[ss.get("pal", "ice")]
 			for k in n:
 				var u := float(k) / n
 				var half := w * 0.5 * (1.0 - u)
 				var cpos := b + dirv * (u * h)
-				var m := int(ceil(half / PX))
+				var m := int(ceil(half / AP))
 				for j in range(-m, m + 1):
-					var q := ((cpos + side * j * PX) / PX).floor() * PX
-					var P: Array = SPIKE_PAL[ss.get("pal", "ice")]
+					var q := ((cpos + side * j * AP) / AP).floor() * AP
 					var col: Color = P[0] if j < 0 else P[1]
 					if j == 0:
 						col = P[2]                                            # the ridge catches the light
 					elif abs(j) == m:
 						col = P[3]                                            # the dark edge
-					draw_rect(Rect2(q, Vector2(PX, PX)), col)
-			draw_rect(Rect2((tip / PX).floor() * PX, Vector2(PX, PX)), Color(1, 1, 1))
+					draw_rect(Rect2(q, Vector2(AP, AP)), col)
+			_mote(self, tip, Color(1, 1, 1))
 			if sink > 0.0:                                                 # cracks as it melts
-				var cq := ((b + dirv * h * 0.5) / PX).floor() * PX
-				draw_rect(Rect2(cq, Vector2(PX * 2, PX)), Color(0.05, 0.08, 0.16, sink))
+				var cq := ((b + dirv * h * 0.5) / AP).floor() * AP
+				draw_rect(Rect2(cq, Vector2(4 * AP, AP)), Color(0.05, 0.08, 0.16, sink))
 
 ## an acid pool (shaders/acid.gdshader): it spreads, bubbles and fumes for secs, then sinks away
 var acids: Array = []
@@ -305,9 +356,9 @@ func acid(p: Vector2, r: float = 1.3, secs: float = 8.0) -> void:
 	var fh := 60.0 + r * 30.0
 	var n := ColorRect.new()
 	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	n.size = (Vector2(hw * 2.4, hw + fh) / PX).ceil() * PX
+	n.size = (Vector2(hw * 2.4, hw + fh) / AP).ceil() * AP
 	var q := Iso.to_screen(p)
-	n.position = ((q - Vector2(n.size.x * 0.5, fh + hw * 0.5)) / PX).floor() * PX
+	n.position = ((q - Vector2(n.size.x * 0.5, fh + hw * 0.5)) / AP).floor() * AP
 	n.z_index = -1
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/acid.gdshader")
@@ -376,18 +427,18 @@ func _draw_souls(cv: CanvasItem) -> void:
 		var tr: Array = so["trail"]
 		for i in tr.size():
 			var u := float(i) / tr.size()
-			var q: Vector2 = (tr[i] / PX).floor() * PX
-			if (int(q.x / PX) + int(q.y / PX) + i) % 2 == 0 or u < 0.3:
-				cv.draw_rect(Rect2(q, Vector2(PX, PX)), Color(0.6, 0.85, 1.0, 0.7 * (1.0 - u)))
+			var q: Vector2 = (tr[i] / AP).floor() * AP
+			if (int(q.x / AP) + int(q.y / AP) + i) % 2 == 0 or u < 0.3:
+				_mote(cv, q, Color(0.6, 0.85, 1.0, 0.7 * (1.0 - u)))
 		# a soul: no face (Derek: no little skulls), a small spirit-mote like the wisps, faint, breathing
-		var c: Vector2 = (so["p"] / PX).floor() * PX
+		var c: Vector2 = (so["p"] / AP).floor() * AP
 		var br := 0.7 + 0.3 * sin(so["t"] * 7.0 + so["seed"])
-		for yy in range(-3, 4):
-			for xx in range(-3, 4):
+		for yy in range(-6, 7):
+			for xx in range(-6, 7):
 				var e := xx * xx + yy * yy
-				if e <= 9:
-					cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.55, 0.75, 1.0, (0.16 if e > 4 else 0.3) * br))
-		cv.draw_rect(Rect2(c, Vector2(PX, PX)), Color(1, 1, 1, 0.95))
+				if e <= 36:
+					cv.draw_rect(Rect2(c + Vector2(xx, yy) * AP, Vector2(AP, AP)), Color(0.55, 0.75, 1.0, (0.16 if e > 16 else 0.3) * br))
+		_mote(cv, c, Color(1, 1, 1, 0.95))
 
 # ------------------------------------------------------------------ lightning's other forms
 ## an arc leaping between two points (chain lightning), and a body crackling with charge for a while
@@ -456,9 +507,9 @@ func miasma(p: Vector2, r: float = 2.0, secs: float = 10.0, kind: String = "brea
 	var rh := (60.0 if kind == "breath" else 140.0) * (0.6 + r * 0.25)
 	var n := ColorRect.new()
 	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	n.size = (Vector2(hw * 2.3, hw + rh) / PX).ceil() * PX
+	n.size = (Vector2(hw * 2.3, hw + rh) / AP).ceil() * AP
 	var q := Iso.to_screen(p)
-	n.position = ((q - Vector2(n.size.x * 0.5, rh + hw * 0.5)) / PX).floor() * PX
+	n.position = ((q - Vector2(n.size.x * 0.5, rh + hw * 0.5)) / AP).floor() * AP
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/miasma.gdshader")
 	m.set_shader_parameter("seed", randf() * 30.0)
@@ -504,10 +555,9 @@ func _draw_breaths() -> void:
 		var tr: Array = b["trail"]
 		for i in tr.size():
 			var w := float(i) / tr.size()
-			var q: Vector2 = (tr[i] / PX).floor() * PX
 			var al := (1.0 - w) * (1.0 - u) * 0.8
 			if (i % 2 == 0) or w < 0.25:
-				_breath_cv.draw_rect(Rect2(q, Vector2(PX, PX)), Color(0.78, 0.72, 1.0, al))
+				_ap(_breath_cv, tr[i], Color(0.78, 0.72, 1.0, al))       # a thread one art pixel thick
 
 # ------------------------------------------------------------------ the burst (blood)
 ## a body bursts: a ring of gore thrown wide (heavy chunks and blood), a spray of fine droplets, a red flash, a pool
@@ -650,18 +700,18 @@ func _draw_wisps(cv: CanvasItem) -> void:
 	# the ghosts a wisp leaves where it blinked out: a pale ring opening and fading, rising a little
 	for gh in wghosts:
 		var gu: float = gh["t"] / gh["life"]
-		var gc: Vector2 = (gh["q"] / PX).floor()
-		var gr := 3 + int(gu * 4.0)
+		var gc: Vector2 = (gh["q"] / AP).floor()
+		var gr := 6 + int(gu * 8.0)                              # in art pixels (the old 3..7 cells, the same 12..28 px)
 		for k in 16:
 			var ang := k / 16.0 * TAU
 			var qq := gc + Vector2(round(cos(ang) * gr), round(sin(ang) * gr * 0.8))
-			cv.draw_rect(Rect2(qq * PX, Vector2(PX, PX)), Color(0.7, 0.85, 1.0, 0.4 * (1.0 - gu)))
-		cv.draw_rect(Rect2(gc * PX, Vector2(PX, PX)), Color(0.85, 0.94, 1.0, 0.5 * (1.0 - gu)))
+			_mote(cv, qq * AP, Color(0.7, 0.85, 1.0, 0.4 * (1.0 - gu)))
+		_mote(cv, gc * AP, Color(0.85, 0.94, 1.0, 0.5 * (1.0 - gu)))
 	# smoke: soft dithered puffs, pale blue-grey, swelling as they thin
 	for m in wsmoke:
 		var u: float = m["t"] / m["life"]
-		var R := int(m["r"] + u * 4.0)
-		var c0: Vector2 = (m["q"] / PX).floor()
+		var R := int((m["r"] + u * 4.0) * 2.0)                  # in art pixels: twice the old cells, the same extent
+		var c0: Vector2 = (m["q"] / AP).floor()
 		for yy in range(-R, R + 1):
 			for xx in range(-R, R + 1):
 				var e := float(xx * xx + yy * yy) / float(R * R)
@@ -669,26 +719,26 @@ func _draw_wisps(cv: CanvasItem) -> void:
 					continue
 				var gx := posmod(int(c0.x) + xx, 4)
 				var gy := posmod(int(c0.y) + yy, 4)
-				var th := float([0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5][gy * 4 + gx]) / 16.0
+				var th := float(B4[gy * 4 + gx]) / 16.0
 				if (1.0 - e) * (1.0 - u) * 1.4 > th:
 					var sc: Color = m.get("col", Color(0.62, 0.72, 0.9))
-					cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(sc.r, sc.g, sc.b, 0.16 * (1.0 - u) * (2.0 if m.has("col") else 1.0)))
+					cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * AP, Vector2(AP, AP)), Color(sc.r, sc.g, sc.b, 0.16 * (1.0 - u) * (2.0 if m.has("col") else 1.0)))
 	# tendrils: thin curling lines that drift back and dissolve (pixels drop out from the tip inward)
 	for tn in wtend:
 		var u: float = tn["t"] / tn["life"]
 		var L: float = tn["len"] * (0.4 + 0.6 * minf(1.0, u * 3.0))
 		var dirv: Vector2 = tn["dir"]
 		var p: Vector2 = tn["q"]
-		var steps := int(L / PX)
+		var steps := int(L / AP)                                 # art-pixel steps: half the turn per step, the same curl
 		for k in steps:
 			var f := float(k) / maxf(1.0, steps)
-			dirv = dirv.rotated(tn["curl"] * 0.08 + sin(now * 3.0 + tn["ph"] + k * 0.4) * 0.05)
-			p += dirv * PX
+			dirv = dirv.rotated(tn["curl"] * 0.04 + sin(now * 3.0 + tn["ph"] + k * 0.2) * 0.025)
+			p += dirv * AP
 			if f > 1.0 - u * 1.3:                                  # dissolving from the tip
 				continue
 			if randf() < u * 0.6:
 				continue
-			cv.draw_rect(Rect2((p / PX).floor() * PX, Vector2(PX, PX)), Color(0.7, 0.84, 1.0, 0.5 * (1.0 - f) * (1.0 - u)))
+			_ap(cv, p, Color(0.7, 0.84, 1.0, 0.5 * (1.0 - f) * (1.0 - u)))
 	for s in _phos:
 		var u: float = s["t"] / s["life"]
 		var tw := 0.5 + 0.5 * sin(now * 14.0 + s["ph"])        # scintillation: each mote twinkles on its own beat
@@ -697,12 +747,10 @@ func _draw_wisps(cv: CanvasItem) -> void:
 		var col := Color(1.0, 1.0, 1.0, (1.0 - u)).lerp(Color(0.55, 0.72, 1.0, 0.85 * (1.0 - u)), smoothstep(0.0, 0.7, u))
 		if s.get("acid", false):
 			col = Color(0.62, 0.86, 0.2, 1.0 - u)
-		var q: Vector2 = (s["q"] / PX).floor() * PX
-		cv.draw_rect(Rect2(q, Vector2(PX, PX)), col)
 		if s["glint"] and tw > 0.88 and u < 0.7:             # a cross-shaped glint at the peak of its twinkle
-			var gc := Color(1, 1, 1, 0.7 * (1.0 - u))
-			for o in [Vector2(PX, 0), Vector2(-PX, 0), Vector2(0, PX), Vector2(0, -PX)]:
-				cv.draw_rect(Rect2(q + o, Vector2(PX, PX)), gc)
+			_glint(cv, s["q"], col, Color(1, 1, 1, 0.7 * (1.0 - u)))
+		else:
+			_mote(cv, s["q"], col)
 	for w in wisps:
 		# a spirit, not a star: it phases (fades in and out, now and then almost gone), its small soft light trailing
 		# a long smoky tail that undulates behind it, thinning to nothing; faint echoes of it linger where it passed
@@ -710,7 +758,7 @@ func _draw_wisps(cv: CanvasItem) -> void:
 		var sd: float = w["seed"]
 		var phase := 0.55 + 0.45 * sin(t * 2.7 + sd) * sin(t * 1.1 + sd * 1.7)
 		phase = clampf(phase, 0.4, 1.0) * float(w.get("vis", 1.0)) * (0.55 + 0.45 * float(w.get("depth", 1.0)))
-		var orb_r := int(round(5.0 + 2.0 * float(w.get("depth", 1.0))))
+		var orb_r := int(round((5.0 + 2.0 * float(w.get("depth", 1.0))) * 2.0))   # in art pixels: the same extent
 		var tr: Array = w["trail"]
 		for i in tr.size():
 			var k := 1.0 - float(i) / tr.size()
@@ -718,22 +766,21 @@ func _draw_wisps(cv: CanvasItem) -> void:
 			if i > 0:
 				var dirv: Vector2 = (tr[i - 1] - q).normalized()
 				q += Vector2(-dirv.y, dirv.x) * sin(i * 0.55 - t * 9.0) * (1.0 + 7.0 * (1.0 - k))   # the tail undulates
-			q = (q / PX).floor() * PX
-			var wdt := int(1 + 3.0 * k * k)
+			q = (q / AP).floor() * AP
+			var wdt := 2 * int(1 + 3.0 * k * k) - 1                  # the old 2w-1 cells as 2(2w-1)-1 art pixels
 			for j in range(-wdt + 1, wdt):
-				cv.draw_rect(Rect2(q + Vector2(j * PX, 0), Vector2(PX, PX)), Color(0.62, 0.8, 1.0, 0.59 * k * phase))
+				cv.draw_rect(Rect2(q + Vector2(j * AP, 0), Vector2(AP, AP)), Color(0.62, 0.8, 1.0, 0.59 * k * phase))
 			if i % 9 == 4:                                       # an echo of it, lingering faintly
-				cv.draw_rect(Rect2(q - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(0.7, 0.85, 1.0, 0.07 * k * phase))
-		var c: Vector2 = (w["p"] / PX).floor() * PX
+				_spot(cv, q, Color(0.7, 0.85, 1.0, 0.07 * k * phase))
+		var c: Vector2 = (w["p"] / AP).floor() * AP
 		var rr2 := float(orb_r * orb_r)
 		for yy in range(-orb_r, orb_r + 1):
 			for xx in range(-orb_r, orb_r + 1):
 				var e := float(xx * xx + yy * yy)
 				if e <= rr2:
-					cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.55, 0.78, 1.0, 0.45 * pow(1.0 - e / rr2, 2.0) * phase))   # glow +40% (Derek)
-		cv.draw_rect(Rect2(c - Vector2(PX, 0), Vector2(PX * 3, PX)), Color(0.85, 0.94, 1.0, minf(1.0, 1.12 * phase)))
-		cv.draw_rect(Rect2(c - Vector2(0, PX), Vector2(PX, PX * 3)), Color(0.85, 0.94, 1.0, minf(1.0, 1.12 * phase)))
-		cv.draw_rect(Rect2(c, Vector2(PX, PX)), Color(1, 1, 1))
+					cv.draw_rect(Rect2(c + Vector2(xx, yy) * AP, Vector2(AP, AP)), Color(0.55, 0.78, 1.0, 0.45 * pow(1.0 - e / rr2, 2.0) * phase))   # glow +40% (Derek)
+		_spot(cv, c, Color(0.85, 0.94, 1.0, minf(1.0, 1.12 * phase)), true)
+		_mote(cv, c, Color(1, 1, 1))
 
 # ------------------------------------------------------------------ ice, more forms
 ## a frost nova: a ring of cold rolls outward over the ground, a white crest of crystals at its front, frost left
@@ -799,48 +846,47 @@ func _draw_ice(cv: CanvasItem) -> void:
 			continue
 		var u: float = ch["t"] / ch["life"]
 		var a: float = sin(u * PI) * 0.38
-		var c0: Vector2 = (ch["q"] / PX).floor()
-		var R := int(ch["r"] + u * 3.0)
+		var c0: Vector2 = (ch["q"] / AP).floor()
+		var R := int((ch["r"] + u * 3.0) * 2.0)                 # in art pixels: the same extent
 		for yy in range(-R / 2, R / 2 + 1):
 			for xx in range(-R, R + 1):
 				var e := pow(float(xx) / R, 2) + pow(float(yy) / (R * 0.5), 2)
 				if e > 1.0:
 					continue
-				var th := float([0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5][posmod(int(c0.y) + yy, 4) * 4 + posmod(int(c0.x) + xx, 4)]) / 16.0
+				var th := float(B4[posmod(int(c0.y) + yy, 4) * 4 + posmod(int(c0.x) + xx, 4)]) / 16.0
 				if (1.0 - e) * 1.3 > th:
-					cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.7, 0.85, 1.0, a))
+					cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * AP, Vector2(AP, AP)), Color(0.7, 0.85, 1.0, a))
 	for gl in glints:
 		var gu: float = gl["t"] / gl["life"]
-		var q: Vector2 = (gl["q"] / PX).floor() * PX
 		var gc := Color(1, 1, 1, 1.0 - gu)
-		cv.draw_rect(Rect2(q, Vector2(PX, PX)), gc)
 		if gu < 0.4:
-			for o in [Vector2(PX, 0), Vector2(-PX, 0), Vector2(0, PX), Vector2(0, -PX)]:
-				cv.draw_rect(Rect2(q + o, Vector2(PX, PX)), Color(0.7, 0.88, 1.0, 0.6 * (1.0 - gu)))
+			_glint(cv, gl["q"], gc, Color(0.7, 0.88, 1.0, 0.6 * (1.0 - gu)))
+		else:
+			_mote(cv, gl["q"], gc)
 	for nv in novas:
 		var u: float = nv["t"] / nv["secs"]
 		var r: float = nv["R"] * (1.0 - pow(1.0 - u, 2.5))
 		var n := int(12 + r / 5.0)
 		for k in n:
 			var ang := k / float(n) * TAU
-			var q: Vector2 = ((nv["c"] + Vector2(cos(ang) * r, sin(ang) * r * 0.5)) / PX).floor() * PX
+			var q: Vector2 = ((nv["c"] + Vector2(cos(ang) * r, sin(ang) * r * 0.5)) / AP).floor() * AP
 			var crest := 1.0 - u
-			cv.draw_rect(Rect2(q, Vector2(PX, PX)), Color(0.92, 0.97, 1.0, crest))
-			if k % 3 == 0:                                   # crystals jutting up at the crest
-				for h in int(2 + 3 * crest):
-					cv.draw_rect(Rect2(q - Vector2(0, (h + 1) * PX), Vector2(PX, PX)), Color(0.75, 0.9, 1.0, crest * (1.0 - h * 0.2)))
-			var q2: Vector2 = ((nv["c"] + Vector2(cos(ang) * r * 0.85, sin(ang) * r * 0.425)) / PX).floor() * PX
-			cv.draw_rect(Rect2(q2, Vector2(PX, PX)), Color(0.5, 0.72, 1.0, 0.5 * crest))
+			_mote(cv, q, Color(0.92, 0.97, 1.0, crest))
+			if k % 3 == 0:                                   # crystals jutting up at the crest: one art pixel wide
+				for h in int(2 + 3 * crest) * 2:
+					cv.draw_rect(Rect2(q - Vector2(0, (h + 1) * AP), Vector2(AP, AP)), Color(0.75, 0.9, 1.0, crest * (1.0 - floorf(h * 0.5) * 0.2)))
+			var q2: Vector2 = nv["c"] + Vector2(cos(ang) * r * 0.85, sin(ang) * r * 0.425)
+			_mote(cv, q2, Color(0.5, 0.72, 1.0, 0.5 * crest))
 	for sh in shards:
 		var d: Vector2 = (sh["v"] as Vector2).normalized()
 		var side := Vector2(-d.y, d.x)
-		for k in 9:
-			var w := 1 if k < 6 else 0
-			var q: Vector2 = sh["p"] - d * k * PX
+		for k in 18:                                         # the old 9 cells' length in art-pixel steps
+			var w := 2 if k < 12 else 0                      # the old 3 cells' width as 5 art pixels, its tail one thin
+			var q: Vector2 = sh["p"] - d * k * AP
 			for j in range(-w, w + 1):
 				var c := Color(0.92, 0.97, 1.0) if j == 0 else (Color(0.55, 0.78, 1.0) if j < 0 else Color(0.3, 0.48, 0.8))
-				cv.draw_rect(Rect2(((q + side * j * PX) / PX).floor() * PX, Vector2(PX, PX)), c)
-		cv.draw_rect(Rect2(((sh["p"] + d * PX) / PX).floor() * PX, Vector2(PX, PX)), Color(1, 1, 1))
+				_ap(cv, q + side * j * AP, c)
+		_mote(cv, sh["p"] + d * OLDPX, Color(1, 1, 1))
 
 # ------------------------------------------------------------------ lightning, more forms
 ## ball lightning: a writhing orb of charge drifting low, its surface crawling with tiny arcs, now and then lashing an
@@ -907,38 +953,35 @@ func _draw_zap(cv: CanvasItem) -> void:
 	var now := Time.get_ticks_msec() / 1000.0
 	for f in fields:
 		var fade: float = 1.0 - smoothstep(f["secs"] - 1.0, f["secs"], f["t"])
-		var fc: Vector2 = (f["c"] / PX).floor()
-		var Rg := int(f["R"] / PX)
+		var fc: Vector2 = (f["c"] / AP).floor()
+		var Rg := int(f["R"] / AP)
 		var hum := 0.75 + 0.25 * sin(now * 13.0)
 		for yy in range(-Rg / 2, Rg / 2 + 1):
-			for xx in range(-Rg, Rg + 1):
+			var xm := int(Rg * sqrt(maxf(0.0, 1.0 - pow(float(yy) / (Rg * 0.5), 2))))   # only the cells inside the ellipse
+			for xx in range(-xm, xm + 1):
 				var e := pow(float(xx) / Rg, 2) + pow(float(yy) / (Rg * 0.5), 2)
 				if e <= 1.0 and posmod(xx + yy, 2) == 0:
-					cv.draw_rect(Rect2((fc + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.45, 0.6, 1.0, 0.13 * (1.0 - e) * fade * hum))
+					cv.draw_rect(Rect2((fc + Vector2(xx, yy)) * AP, Vector2(AP, AP)), Color(0.45, 0.6, 1.0, 0.13 * (1.0 - e) * fade * hum))
 		for k in 70:                                          # static: a sparse crawl of pale points over the patch
 			var a := fmod(k * 2.39996 + now * (0.5 + k % 3), TAU)
 			var d: float = f["R"] * sqrt(fmod(k * 0.618, 1.0))
 			if sin(now * 30.0 + k * 3.1) > 0.2:
 				var q: Vector2 = f["c"] + Vector2(cos(a) * d, sin(a) * d * 0.5)
-				cv.draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), Color(0.75, 0.86, 1.0, 0.85 * fade))
+				_mote(cv, q, Color(0.75, 0.86, 1.0, 0.85 * fade))
 		for ar in f["arcs"]:
 			_px_path(ar[0], Color(0.5, 0.65, 1.0, 0.45 * fade), 2, cv)
 			_px_path(ar[0], Color(1, 1, 1, fade), 1, cv)
 	for b in balls:
-		var c: Vector2 = ((b["p"] + Vector2(randf_range(-2, 2), randf_range(-2, 2))) / PX).floor() * PX
+		var c: Vector2 = ((b["p"] + Vector2(randf_range(-2, 2), randf_range(-2, 2))) / AP).floor() * AP
 		var fl := 0.7 + 0.3 * sin(now * 40.0 + b["t"])
-		for ring in [[14, 0.06], [10, 0.12], [6, 0.28], [3, 0.75]]:
-			var R: int = ring[0]
-			for yy in range(-R, R + 1):
-				for xx in range(-R, R + 1):
-					if xx * xx + yy * yy <= R * R:
-						cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.6, 0.75, 1.0, ring[1] * fl))
+		for ring in [[28, 0.06], [20, 0.12], [12, 0.28], [6, 0.75]]:   # radii in art pixels (the old 14/10/6/3 cells)
+			_disc(cv, c / AP, ring[0], Color(0.6, 0.75, 1.0, ring[1] * fl))
 		for k in 7:                                           # its surface crawls with arcs, some reaching out
 			var a := now * (3.0 + k) + k * 1.7
-			var e1 := c + Vector2(cos(a), sin(a)) * 4.0 * PX
-			var e2 := c + Vector2(cos(a + 1.2), sin(a + 1.2)) * (7.0 + 5.0 * float(k % 3 == 0)) * PX
+			var e1 := c + Vector2(cos(a), sin(a)) * 4.0 * OLDPX
+			var e2 := c + Vector2(cos(a + 1.2), sin(a + 1.2)) * (7.0 + 5.0 * float(k % 3 == 0)) * OLDPX
 			_px_path(_jag(e1, e2, 5.0), Color(0.9, 0.95, 1.0, 0.9), 1, cv)
-		cv.draw_rect(Rect2(c - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(1, 1, 1))
+		_spot(cv, c, Color(1, 1, 1))
 		if b["lash"].size() == 2 and b["lash"][1] > 0.0:
 			_px_path(b["lash"][0], Color(0.5, 0.65, 1.0, 0.5), 3, cv)
 			_px_path(b["lash"][0], Color(1, 1, 1, 1), 1, cv)
@@ -1016,34 +1059,46 @@ func _tick_bone(dt: float) -> void:
 		cg["t"] += dt
 	cages = cages.filter(func(cg): return cg["t"] < cg["secs"])
 
-func _bone_px(cv: CanvasItem, q: Vector2, lit: bool, a: float = 1.0) -> void:
-	cv.draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), Color(0.9, 0.88, 0.82, a) if lit else Color(0.5, 0.49, 0.5, a))
+## a bone pixel: one art pixel (w art pixels wide), lit or shaded
+func _bone_px(cv: CanvasItem, q: Vector2, lit: bool, a: float = 1.0, w: int = 1) -> void:
+	cv.draw_rect(Rect2((q / AP).floor() * AP, Vector2(AP * w, AP)), Color(0.9, 0.88, 0.82, a) if lit else Color(0.5, 0.49, 0.5, a))
 
 func _draw_bone(cv: CanvasItem) -> void:
 	var now := Time.get_ticks_msec() / 1000.0
 	for gl in glows:
 		var u: float = gl["t"] / gl["secs"]
 		var fa := smoothstep(0.0, 0.15, u) * (1.0 - smoothstep(0.7, 1.0, u)) * (0.75 + 0.25 * sin(now * 4.0))
-		var c0: Vector2 = (gl["c"] / PX).floor()
-		var R := int(gl["R"] / PX)
-		for yy in range(-R, R + 1):
-			for xx in range(-R, R + 1):
-				var e := pow(float(xx) / R, 2) + pow(float(yy) / (R * 0.7), 2)
-				if e <= 1.0:
-					cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.55, 0.85, 1.0, 0.14 * (1.0 - e) * fa))
+		var c0: Vector2 = (gl["c"] / AP).floor()
+		var R := int(gl["R"] / AP)
+		var ry := int(R * 0.7)
+		for yy in range(-ry, ry + 1):
+			# runs of one shade along each row (the shade quantised finely), so the glow is a few rects, not thousands
+			var xm := int(R * sqrt(maxf(0.0, 1.0 - pow(float(yy) / (R * 0.7), 2))))
+			var x0 := -xm
+			var lv0 := -1
+			for xx in range(-xm, xm + 2):
+				var lv := -1
+				if xx <= xm:
+					var e := pow(float(xx) / R, 2) + pow(float(yy) / (R * 0.7), 2)
+					lv = int((1.0 - minf(1.0, e)) * 24.0)
+				if lv != lv0:
+					if lv0 > 0:
+						cv.draw_rect(Rect2((c0 + Vector2(x0, yy)) * AP, Vector2(xx - x0, 1) * AP), Color(0.55, 0.85, 1.0, 0.14 * (lv0 / 24.0) * fa))
+					x0 = xx
+					lv0 = lv
 	for b in bshards:
 		if b["t"] < 0.0:
 			continue
 		var dirv: Vector2 = b["ang"]
-		var L := 7 if b["stuck"] else 12
+		var L := 14 if b["stuck"] else 24                   # art-pixel steps over the old 7/12 cells' length
 		var a: float = 1.0 if not b["stuck"] else 1.0 - smoothstep(b["life"] - 0.8, b["life"], b["t"])
 		for k in L:
-			var q: Vector2 = b["q"] - dirv * k * PX * (1.0 if b["stuck"] else 1.6)
-			if b["stuck"] and k < 2:
+			var q: Vector2 = b["q"] - dirv * k * AP * (1.0 if b["stuck"] else 1.6)
+			if b["stuck"] and k < 4:
 				continue                                         # its point is in the ground
-			_bone_px(cv, q, k % 3 != 2, a)
+			_bone_px(cv, q, (k >> 1) % 3 != 2, a)
 			if not b["stuck"]:
-				cv.draw_rect(Rect2((q / PX).floor() * PX - Vector2(PX, 0), Vector2(PX * 3, PX)), Color(0.55, 0.85, 1.0, 0.12))
+				cv.draw_rect(Rect2((q / AP).floor() * AP - Vector2(2 * AP, 0), Vector2(5 * AP, AP)), Color(0.55, 0.85, 1.0, 0.12))
 	for cg in cages:
 		var u: float = cg["t"] / cg["secs"]
 		var rise := 1.0 - pow(1.0 - minf(1.0, cg["t"] / 0.35), 3.0)
@@ -1053,21 +1108,25 @@ func _draw_bone(cv: CanvasItem) -> void:
 			var ang := i / 8.0 * TAU
 			var base: Vector2 = cg["c"] + Vector2(cos(ang) * R, sin(ang) * R * 0.5)
 			var H := 90.0 * rise
-			var steps := int(H / PX)
+			var steps := int(H / AP)
 			for k in steps:
 				var f := float(k) / maxf(1.0, steps)
 				if randf() < crumble * 1.4 * (1.0 - f + 0.3):
 					continue
 				var inward: Vector2 = (cg["c"] - base) * (f * f * 0.85)          # the rib curves in over the mark
 				var q: Vector2 = base + inward + Vector2(0, -f * H)
-				_bone_px(cv, q, i % 2 == 0, 1.0)
-				_bone_px(cv, q + Vector2(PX, 0), false, 0.9)
-			var kn: Vector2 = base + Vector2(0, -2)
-			cv.draw_rect(Rect2((kn / PX).floor() * PX - Vector2(PX, 0), Vector2(PX * 3, PX * 2)), Color(0.82, 0.8, 0.74))
-		var c0: Vector2 = (cg["c"] / PX).floor()
+				_bone_px(cv, q, i % 2 == 0, 1.0, 2)                              # the rib keeps its width: 2 + 2 art px
+				_bone_px(cv, q + Vector2(2 * AP, 0), false, 0.9, 2)
+			var kn: Vector2 = (base + Vector2(0, -2)) / AP                   # the knuckle: the old 12 x 8 block, rounded
+			var kc := Color(0.82, 0.8, 0.74)
+			var k0 := kn.floor() - Vector2(2, 0)
+			cv.draw_rect(Rect2((k0 + Vector2(1, 0)) * AP, Vector2(4, 1) * AP), kc)
+			cv.draw_rect(Rect2((k0 + Vector2(0, 1)) * AP, Vector2(6, 2) * AP), kc)
+			cv.draw_rect(Rect2((k0 + Vector2(1, 3)) * AP, Vector2(4, 1) * AP), kc)
+		var c0: Vector2 = (cg["c"] / AP).floor()
 		for k in 10:                                             # ghost-light inside the cage
-			var q := c0 + Vector2(randi_range(-5, 5), randi_range(-14, 0))
-			cv.draw_rect(Rect2(q * PX, Vector2(PX, PX)), Color(0.55, 0.85, 1.0, 0.25 * (1.0 - crumble)))
+			var q := c0 + Vector2(randi_range(-10, 10), randi_range(-28, 0))
+			_mote(cv, q * AP, Color(0.55, 0.85, 1.0, 0.25 * (1.0 - crumble)))
 
 # ------------------------------------------------------------------ acid, more forms
 ## an acid glob: a swollen green drop arcing through the air, dripping as it flies; it bursts where it lands into a
@@ -1125,21 +1184,21 @@ func _draw_acid(cv: CanvasItem) -> void:
 	for gb in globs:
 		if not gb.has("p"):
 			continue
-		var c: Vector2 = (gb["p"] / PX).floor() * PX
-		for yy in range(-3, 4):
-			for xx in range(-3, 4):
+		var c: Vector2 = (gb["p"] / AP).floor() * AP
+		for yy in range(-6, 7):                                  # in art pixels: the old 3-cell radius
+			for xx in range(-6, 7):
 				var e := xx * xx + yy * yy
-				if e <= 9:
-					var col := Color(0.42, 0.66, 0.1) if e > 4 else Color(0.64, 0.86, 0.2)
-					if xx <= -1 and yy <= -1 and e <= 4:
+				if e <= 36:
+					var col := Color(0.42, 0.66, 0.1) if e > 16 else Color(0.64, 0.86, 0.2)
+					if xx <= -2 and yy <= -2 and e <= 16:
 						col = Color(0.88, 1.0, 0.55)
-					cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), col)
+					cv.draw_rect(Rect2(c + Vector2(xx, yy) * AP, Vector2(AP, AP)), col)
 	for dr in drips2:
 		if dr["t"] < 0.0:
 			continue
-		var q: Vector2 = (dr["q"] / PX).floor() * PX
-		cv.draw_rect(Rect2(q, Vector2(PX, PX * 3)), Color(0.55, 0.8, 0.15, 0.9))
-		cv.draw_rect(Rect2(q + Vector2(0, PX * 2), Vector2(PX, PX)), Color(0.85, 1.0, 0.5))
+		var q: Vector2 = (dr["q"] / AP).floor() * AP
+		cv.draw_rect(Rect2(q, Vector2(AP, 6 * AP)), Color(0.55, 0.8, 0.15, 0.9))   # a falling streak one art pixel thin
+		_mote(cv, q + Vector2(0, 4 * AP), Color(0.85, 1.0, 0.5))
 
 # ------------------------------------------------------------------ blood, more forms (the Hemomancer's)
 ## an arterial spray: a wound pumps a jet of droplets in pulses (three beats, each weaker), arcing and spattering
@@ -1204,25 +1263,26 @@ func _draw_blood(cv: CanvasItem) -> void:
 		var a: Vector2 = wh["a"]
 		var b: Vector2 = wh["b"]
 		var side: Vector2 = Vector2(-(b - a).y, (b - a).x).normalized() * wh["side"]
-		var n := 28
+		var n := 56                                            # twice the old samples at half the cell: the same lash
 		for k in int(n * reach):
 			var f := float(k) / n
 			var q := a.lerp(b, f) + side * sin(f * PI) * 50.0 * (1.0 - slack) + Vector2(0, f * f * 60.0 * slack)
 			var w := 3 if f < 0.5 else (2 if f < 0.85 else 1)
-			for j in range(-w + 1, w):
+			var wa := 2 * w - 1                                # the old 2w-1 cells as 2(2w-1)-1 art pixels
+			for j in range(-wa + 1, wa):
 				var col := Color(0.62, 0.06, 0.08) if j == 0 else Color(0.36, 0.02, 0.04)
-				if j == 0 and k % 4 == 0:
+				if j == 0 and k % 8 == 0:
 					col = Color(0.9, 0.3, 0.28)                 # wet glints along it
-				cv.draw_rect(Rect2(((q + side * j * PX) / PX).floor() * PX, Vector2(PX, PX)), col)
+				_ap(cv, q + side * j * AP, col)
 	for bo in boils:
 		for bb in bo["bub"]:
 			var bu: float = bb["t"] / bb["life"]
-			var c: Vector2 = (bb["q"] / PX).floor() * PX
-			var r := int(bb["r"] * minf(1.0, bu * 1.2))
+			var c: Vector2 = (bb["q"] / AP).floor() * AP
+			var r := int(bb["r"] * 2.0 * minf(1.0, bu * 1.2))   # in art pixels: the same extent
 			if bb.get("popped", false):
 				for k in 8:
 					var ang := k / 8.0 * TAU
-					cv.draw_rect(Rect2(c + (Vector2(cos(ang), sin(ang) * 0.6) * (r + 2) * PX / PX).floor() * PX, Vector2(PX, PX)), Color(0.85, 0.25, 0.22, 0.8))
+					_mote(cv, c + (Vector2(cos(ang), sin(ang) * 0.6) * (r + 4)).floor() * AP, Color(0.85, 0.25, 0.22, 0.8))
 				continue
 			for yy in range(-r, r + 1):
 				for xx in range(-r, r + 1):
@@ -1230,7 +1290,7 @@ func _draw_blood(cv: CanvasItem) -> void:
 						var col := Color(0.55, 0.05, 0.08)
 						if xx <= -r / 2 and yy <= -r / 2:
 							col = Color(0.95, 0.45, 0.4)               # the bubble's lit skin
-						cv.draw_rect(Rect2(c + Vector2(xx, yy) * PX, Vector2(PX, PX)), col)
+						cv.draw_rect(Rect2(c + Vector2(xx, yy) * AP, Vector2(AP, AP)), col)
 
 # ------------------------------------------------------------------ melee: slashes and echoes
 ## a slash: the blade's smear, a crescent swept round the striker on the ground's plane (so it lies in the world, an
@@ -1297,7 +1357,7 @@ func _crescent(cv: CanvasItem, sl: Dictionary, tl: float, hd: float, al: float, 
 	if hd - tl < 0.01:
 		return
 	var L: float = (_slash_pt(sl, hd, 1.0) - _slash_pt(sl, tl, 1.0)).length()
-	var n := maxi(3, int(L / PX * 1.3))
+	var n := maxi(3, int(L / AP * 1.3))
 	var W := (6.0 if sl["heavy"] else 4.0)
 	var seen := {}
 	for i in n + 1:
@@ -1306,11 +1366,11 @@ func _crescent(cv: CanvasItem, sl: Dictionary, tl: float, hd: float, al: float, 
 		var w := W * sin(PI * pow(f, 0.55)) + 0.6          # thickest just behind the head
 		var o := _slash_pt(sl, a, 1.0)
 		var inn := _slash_pt(sl, a, 0.74)
-		var band := maxf(1.0, o.distance_to(inn) / PX)      # the band's depth in cells, filled from the edge in
+		var band := maxf(1.0, o.distance_to(inn) / AP)      # the band's depth in art pixels, filled from the edge in
 		var steps := int(ceil(band * w / W))
 		for k in steps:
 			var q := o.lerp(inn, k / band)
-			var cellp := (q / PX).floor()
+			var cellp := (q / AP).floor()
 			var key := Vector2i(cellp)
 			if seen.has(key):
 				continue
@@ -1328,7 +1388,7 @@ func _crescent(cv: CanvasItem, sl: Dictionary, tl: float, hd: float, al: float, 
 			# dither the fade on the grid: a cell is drawn whole or not at all (the title's method)
 			var th: float = (B4[(posmod(int(cellp.y), 4)) * 4 + posmod(int(cellp.x), 4)] + 0.5) / 16.0
 			if aa > th * 0.9:
-				cv.draw_rect(Rect2(cellp * PX, Vector2(PX, PX)), Color(col.r, col.g, col.b, minf(1.0, 0.55 + aa * 0.45)))
+				cv.draw_rect(Rect2(cellp * AP, Vector2(AP, AP)), Color(col.r, col.g, col.b, minf(1.0, 0.55 + aa * 0.45)))
 
 func _draw_slash(cv: CanvasItem) -> void:
 	for sl in slashes:
@@ -1355,44 +1415,44 @@ func _draw_slash(cv: CanvasItem) -> void:
 		var L := (70.0 if ct["heavy"] else 48.0) * (0.5 + 0.5 * minf(1.0, u * 5.0))
 		var lines := [nrm.rotated(0.5)] if not ct["heavy"] else [nrm.rotated(0.6), nrm.rotated(-0.6)]
 		if u < 0.3:                                        # the impact star: a white diamond and four long rays
-			var sr := int((5.0 if ct["heavy"] else 3.0) * (1.0 - u / 0.3) + 1.0)
-			var c0: Vector2 = (ct["c"] / PX).floor()
+			var sr := int(((5.0 if ct["heavy"] else 3.0) * (1.0 - u / 0.3) + 1.0) * 2.0)   # in art pixels: the same extent
+			var c0: Vector2 = (ct["c"] / AP).floor()
 			for yy in range(-sr, sr + 1):
 				for xx in range(-sr, sr + 1):
 					var dd := absi(xx) + absi(yy)
 					if dd <= sr and (dd <= sr / 2 or xx == 0 or yy == 0):
-						cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(1, 1, 1) if dd <= sr / 2 else Color(0.75, 0.85, 1.0, 0.9))
+						cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * AP, Vector2(AP, AP)), Color(1, 1, 1) if dd <= sr / 2 else Color(0.75, 0.85, 1.0, 0.9))
 			for k in range(sr, sr * 3):
 				for o in [Vector2(k, 0), Vector2(-k, 0), Vector2(0, k * 0.6), Vector2(0, -k * 0.6)]:
-					cv.draw_rect(Rect2((c0 + o.floor()) * PX, Vector2(PX, PX)), Color(0.85, 0.92, 1.0, 0.7 * (1.0 - float(k) / (sr * 3))))
+					cv.draw_rect(Rect2((c0 + o.floor()) * AP, Vector2(AP, AP)), Color(0.85, 0.92, 1.0, 0.7 * (1.0 - float(k) / (sr * 3))))
 		for ln in lines:
-			var n := int(L / PX)
+			var n := int(L / AP)
 			var side := Vector2(-ln.y, ln.x)
 			for k in range(-n, n + 1):
-				var q: Vector2 = ct["c"] + ln * k * PX
+				var q: Vector2 = ct["c"] + ln * k * AP
 				var edge := absf(k) / float(n)
 				if u > 0.4 and edge > 1.0 - (u - 0.4) / 0.6:
 					continue
-				var thick := 1 if edge > 0.55 else 2           # a rent through the air, tapered at both ends
+				var thick := 1 if edge > 0.55 else 3           # a rent through the air, tapered at both ends (art pixels)
 				for j in thick:
-					cv.draw_rect(Rect2(((q + side * j * PX) / PX).floor() * PX, Vector2(PX, PX)), Color(1, 1, 1, 1.0 - u * 0.5) if (edge < 0.6 and j == 0) else Color(0.62, 0.74, 1.0, 0.85 - u * 0.6))
+					_ap(cv, q + side * j * AP, Color(1, 1, 1, 1.0 - u * 0.5) if (edge < 0.6 and j == 0) else Color(0.62, 0.74, 1.0, 0.85 - u * 0.6))
 		for k in (8 if ct["heavy"] else 5):               # speed-lines bursting from the cut along the stroke
 			var ang := d.angle() + (k - 2.0) * 0.32
 			var r0 := 10.0 + u * 70.0
-			for j in 3:
-				var q: Vector2 = ct["c"] + Vector2(cos(ang), sin(ang) * 0.7) * (r0 + j * PX)
-				cv.draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), Color(0.9, 0.95, 1.0, (1.0 - u) * 0.8))
+			for j in 6:                                    # the old 3-cell dash in art-pixel steps, one art pixel thin
+				var q: Vector2 = ct["c"] + Vector2(cos(ang), sin(ang) * 0.7) * (r0 + j * AP)
+				_ap(cv, q, Color(0.9, 0.95, 1.0, (1.0 - u) * 0.8))
 	for rg in rings:
 		var u: float = rg["t"] / rg["secs"]
 		var R: float = rg["R"] * (0.3 + 0.7 * (1.0 - pow(1.0 - u, 3.0)))
-		var n := int(R * 0.5)
+		var n := int(R)                                    # twice the old dots at half the size: the same ring
 		for k in n:
 			var ang := k / float(n) * TAU
 			var q: Vector2 = rg["c"] + Vector2(cos(ang) * R, sin(ang) * R * 0.5)
-			var cellp := (q / PX).floor()
+			var cellp := (q / AP).floor()
 			var th: float = (B4[(posmod(int(cellp.y), 4)) * 4 + posmod(int(cellp.x), 4)] + 0.5) / 16.0
 			if 1.0 - u > th:
-				cv.draw_rect(Rect2(cellp * PX, Vector2(PX, PX)), Color(0.85, 0.82, 0.74, 0.9))
+				cv.draw_rect(Rect2(cellp * AP, Vector2(AP, AP)), Color(0.85, 0.82, 0.74, 0.9))
 
 # ------------------------------------------------------------------ miasma, more forms
 ## a gyre: the breath gathering into a slow turning wheel of violet haze, wisps spiralling in toward a heart that
@@ -1466,9 +1526,11 @@ func _tick_miasma2(dt: float) -> void:
 		v["threads"] = v["threads"].filter(func(th): return th["t"] < th["life"])
 	vents = vents.filter(func(v): return v["t"] < v["secs"] or v["threads"].size() > 0)
 
-## a soft dithered puff of the breath: solid cells kept or dropped on the Bayer grid, so it reads as haze in pixels
+## a soft dithered puff of the breath: solid cells kept or dropped on the Bayer grid, so it reads as haze in pixels;
+## r is its radius in old 4-px cells (the callers' unit), drawn in art pixels at the same extent
 func _haze(cv: CanvasItem, c: Vector2, r: float, col: Color, a: float) -> void:
-	var c0 := (c / PX).floor()
+	r *= OLDPX / AP
+	var c0 := (c / AP).floor()
 	var R := int(ceil(r))
 	for yy in range(-R, R + 1):
 		for xx in range(-R, R + 1):
@@ -1478,9 +1540,9 @@ func _haze(cv: CanvasItem, c: Vector2, r: float, col: Color, a: float) -> void:
 			var q := c0 + Vector2(xx, yy)
 			var th: float = (B4[posmod(int(q.y), 4) * 4 + posmod(int(q.x), 4)] + 0.5) / 16.0
 			if a * (1.0 - e) > th:
-				cv.draw_rect(Rect2(q * PX, Vector2(PX, PX)), Color(col.r, col.g, col.b, 0.3))
+				cv.draw_rect(Rect2(q * AP, Vector2(AP, AP)), Color(col.r, col.g, col.b, 0.3))
 			elif a * (1.0 - e) > th * 0.4:
-				cv.draw_rect(Rect2(q * PX, Vector2(PX, PX)), Color(col.r, col.g, col.b, 0.1))   # the haze's thin undercoat
+				cv.draw_rect(Rect2(q * AP, Vector2(AP, AP)), Color(col.r, col.g, col.b, 0.1))   # the haze's thin undercoat
 
 func _draw_miasma2(cv: CanvasItem) -> void:
 	var now := Time.get_ticks_msec() / 1000.0
@@ -1493,17 +1555,17 @@ func _draw_miasma2(cv: CanvasItem) -> void:
 		var pulse := 0.5 + 0.5 * sin(now * 2.2)                 # the heart: the faintest glow, breathing
 		_haze(cv, g["c"], 4.0 + pulse * 1.5, Color(0.8, 0.7, 1.0), fade * (0.35 + 0.25 * pulse))
 	for bl in bladders:
-		var c: Vector2 = (bl["c"] / PX).floor()
+		var c: Vector2 = (bl["c"] / AP).floor()
 		if bl["burst"]:
-			var u: float = bl["bt"] / 0.6                      # the torn sac, collapsing
-			for xx in range(-3, 4):
+			var u: float = bl["bt"] / 0.6                      # the torn sac, collapsing (a row one art pixel thin)
+			for xx in range(-6, 8):
 				if randf() > u:
-					cv.draw_rect(Rect2((c + Vector2(xx, 0)) * PX, Vector2(PX, PX)), Color(0.24, 0.16, 0.3, 1.0 - u))
+					cv.draw_rect(Rect2((c + Vector2(xx, 0)) * AP, Vector2(AP, AP)), Color(0.24, 0.16, 0.3, 1.0 - u))
 			continue
 		var k: float = bl["t"] / bl["swell"]
 		var breath := 0.5 + 0.5 * sin(bl["t"] * (3.0 + k * 9.0))   # its breaths quicken as it nears bursting
-		var rx := 4.0 + k * 4.0 + breath * 0.9
-		var ry := 3.0 + k * 4.0 + breath * 1.0
+		var rx := (4.0 + k * 4.0 + breath * 0.9) * 2.0             # in art pixels: the same extent
+		var ry := (3.0 + k * 4.0 + breath * 1.0) * 2.0
 		for yy in range(-int(ry * 2), 1):
 			for xx in range(-int(rx) - 1, int(rx) + 2):
 				var ex := xx / rx
@@ -1516,20 +1578,20 @@ func _draw_miasma2(cv: CanvasItem) -> void:
 					col = Color(0.72, 0.6, 0.86)                      # the lit, stretched skin
 				elif e > 0.75:
 					col = Color(0.2, 0.12, 0.26)                      # its dark rim
-				var vv := absf(sin(xx * 1.7 + bl["seed"]) * 2.0 + yy * 0.6)
-				if vv < 0.3 and e < 0.8:
+				var vv := absf(sin(xx * 0.85 + bl["seed"]) * 2.0 + yy * 0.3)   # the veins' pattern at the old scale, one art pixel thin
+				if vv < 0.15 and e < 0.8:
 					col = col.lerp(Color(0.85, 0.55, 0.95), 0.4 + 0.6 * breath * k)   # veins, glowing as it strains
-				cv.draw_rect(Rect2((c + Vector2(xx, yy)) * PX, Vector2(PX, PX)), col)
+				cv.draw_rect(Rect2((c + Vector2(xx, yy)) * AP, Vector2(AP, AP)), col)
 		if k > 0.6 and randf() < 0.3:                      # it leaks a little before it goes
-			wsmoke.append({"q": bl["c"] + Vector2(randf_range(-8, 8), -ry * PX), "v": Vector2(randf_range(-5, 5), -randf_range(12, 22)),
+			wsmoke.append({"q": bl["c"] + Vector2(randf_range(-8, 8), -ry * AP), "v": Vector2(randf_range(-5, 5), -randf_range(12, 22)),
 				"t": 0.0, "life": 1.0, "r": 1.6, "ph": randf() * TAU, "col": MIASMA_COL})
 	for v in vents:
-		var c1: Vector2 = (v["c"] / PX).floor()
-		for xx in range(-4, 5):                              # the crack itself, a faint violet light down in it
-			var yy := int(round(sin(xx * 1.3) * 0.8))
-			cv.draw_rect(Rect2((c1 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.12, 0.08, 0.14))
-			if absi(xx) < 3:
-				cv.draw_rect(Rect2((c1 + Vector2(xx, yy - 1)) * PX, Vector2(PX, PX)), Color(0.7, 0.55, 1.0, 0.25 + 0.15 * sin(now * 2.0 + xx)))
+		var c1: Vector2 = (v["c"] / AP).floor()
+		for xx in range(-8, 10):                             # the crack itself, a faint violet light down in it
+			var yy := int(round(sin(xx * 0.65) * 1.6))
+			cv.draw_rect(Rect2((c1 + Vector2(xx, yy)) * AP, Vector2(AP, AP)), Color(0.12, 0.08, 0.14))
+			if xx >= -4 and xx < 6:
+				cv.draw_rect(Rect2((c1 + Vector2(xx, yy - 1)) * AP, Vector2(AP, AP)), Color(0.7, 0.55, 1.0, 0.25 + 0.15 * sin(now * 2.0 + xx * 0.5)))
 		for th in v["threads"]:
 			var u: float = th["t"] / th["life"]
 			var tr: Array = th["trail"]
@@ -1537,9 +1599,9 @@ func _draw_miasma2(cv: CanvasItem) -> void:
 				var w := float(i) / tr.size()
 				var al := (1.0 - w) * sin(PI * minf(1.0, u * 1.2)) * 0.85
 				if i % 2 == 0 or w < 0.3:
-					cv.draw_rect(Rect2((tr[i] / PX).floor() * PX, Vector2(PX, PX)), Color(MIASMA_COL.r, MIASMA_COL.g, MIASMA_COL.b, al))
+					_ap(cv, tr[i], Color(MIASMA_COL.r, MIASMA_COL.g, MIASMA_COL.b, al))
 				if w < 0.35:
-					cv.draw_rect(Rect2((tr[i] / PX).floor() * PX + Vector2(PX, 0), Vector2(PX, PX)), Color(MIASMA_COL.r, MIASMA_COL.g, MIASMA_COL.b, al * 0.35))
+					_ap(cv, tr[i] + Vector2(AP, 0), Color(MIASMA_COL.r, MIASMA_COL.g, MIASMA_COL.b, al * 0.35))
 
 # ------------------------------------------------------------------ radiance (the open hand: erasing light)
 ## the wiki (05-class-empty-hand.md): "noon with no shadow: white fire, glare, a brightness so complete it leaves
@@ -1556,9 +1618,9 @@ var leaves: Array = []     # {q, v, t, life, ph}
 func glare(p: Vector2, r: float = 1.6, secs: float = 3.0) -> void:
 	var n := ColorRect.new()
 	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	n.size = (Vector2(r * Iso.HX * 2.4, r * Iso.HX * 1.2 + 60.0) / PX).ceil() * PX
+	n.size = (Vector2(r * Iso.HX * 2.4, r * Iso.HX * 1.2 + 60.0) / AP).ceil() * AP
 	var q := Iso.to_screen(p)
-	n.position = ((q - n.size * 0.5 - Vector2(0, 20)) / PX).floor() * PX
+	n.position = ((q - n.size * 0.5 - Vector2(0, 20)) / AP).floor() * AP
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/radiance_glare.gdshader")
 	m.set_shader_parameter("seed", randf() * 40.0)
@@ -1635,11 +1697,12 @@ func _draw_radiance(cv: CanvasItem) -> void:
 		var w := 3.0 * (1.0 - smoothstep(0.3, 1.0, u)) + 0.8 * sin(ln["t"] * 60.0) * (1.0 - u)
 		var dirv := (b - a).normalized()
 		var side := Vector2(-dirv.y, dirv.x)
-		var n := int(a.distance_to(b) / PX)
+		var n := int(a.distance_to(b) / AP)
+		var ww := int(ceil(w * 2.0))                               # the half-width in art pixels (w is in old cells)
+		var fade := 1.0 - smoothstep(0.5, 1.0, u)
 		for k in n + 1:
-			var q := a + dirv * k * PX
-			var ww := int(ceil(w))
-			for j in range(-ww - 1, ww + 2):
+			var q := a + dirv * k * AP
+			for j in range(-ww - 2, ww + 3):                      # its gold skin two art pixels deep, as before
 				var aj := absi(j)
 				var col: Color
 				if aj <= ww / 2:
@@ -1648,29 +1711,39 @@ func _draw_radiance(cv: CanvasItem) -> void:
 					col = Color(1.0, 0.86, 0.5)
 				else:
 					col = Color(0.9, 0.6, 0.25, 0.6)
-				col.a *= 1.0 - smoothstep(0.5, 1.0, u)
-				cv.draw_rect(Rect2(((q + side * j * PX) / PX).floor() * PX, Vector2(PX, PX)), col)
+				col.a *= fade
+				_ap(cv, q + side * j * AP, col)
 	for h in halos:
 		var fa: float = smoothstep(0.0, 0.4, h["t"]) * (1.0 - smoothstep(h["secs"] - 0.8, h["secs"], h["t"]))
 		for i in h["n"]:
 			var ang: float = h["t"] * 1.4 + i / float(h["n"]) * TAU
 			var q: Vector2 = h["c"] + Vector2(cos(ang) * h["R"], sin(ang) * h["R"] * 0.35)
 			var turn := absf(sin(h["t"] * 5.0 + i * 1.3))             # a flake turning: broad, then edge-on
-			var c0 := (q / PX).floor() * PX
+			var c0 := (q / AP).floor() * AP
 			var front := sin(ang) > 0.0
 			var col := Color(1.0, 0.86, 0.5, fa) if turn > 0.5 else Color(0.75, 0.5, 0.2, fa)
 			if turn > 0.92:
 				col = Color(1, 1, 0.95, fa)                                # it catches the light
-			cv.draw_rect(Rect2(c0, Vector2(PX * (3.0 if turn > 0.5 else 1.0), PX * 2.0)), Color(col.r, col.g, col.b, col.a * (1.0 if front else 0.55)))
+			col.a *= 1.0 if front else 0.55
+			if turn > 0.5:                                             # broad: the old 12 x 8 flake, its corners off
+				cv.draw_rect(Rect2(c0 + Vector2(AP, 0), Vector2(4, 1) * AP), col)
+				cv.draw_rect(Rect2(c0 + Vector2(0, AP), Vector2(6, 2) * AP), col)
+				cv.draw_rect(Rect2(c0 + Vector2(AP, 3 * AP), Vector2(4, 1) * AP), col)
+			else:                                                      # edge-on: a line one art pixel thin
+				cv.draw_rect(Rect2(c0, Vector2(1, 4) * AP), col)
 	for lf2 in leaves:
 		var u: float = lf2["t"] / lf2["life"]
 		var turn := absf(sin(lf2["t"] * 6.0 + lf2["ph"]))
-		var c0: Vector2 = (lf2["q"] / PX).floor() * PX
+		var c0: Vector2 = (lf2["q"] / AP).floor() * AP
 		var al := 1.0 - smoothstep(0.7, 1.0, u)
 		var col := Color(1.0, 0.84, 0.45, al) if turn > 0.4 else Color(0.7, 0.48, 0.2, al)
 		if turn > 0.94:
 			col = Color(1, 1, 0.95, al)
-		cv.draw_rect(Rect2(c0, Vector2(PX * (2.0 if turn > 0.4 else 1.0), PX)), col)
+		if turn > 0.4:                                                 # broad: the old 8 x 4 leaf, a slanted sliver
+			cv.draw_rect(Rect2(c0, Vector2(3, 1) * AP), col)
+			cv.draw_rect(Rect2(c0 + Vector2(AP, AP), Vector2(3, 1) * AP), col)
+		else:
+			_mote(cv, c0, col)
 
 # ------------------------------------------------------------------ absence (the closed hand: erasing dark)
 ## the wiki: "Absence, the closed hand, erases with dark: the palm that swallows, the pinch, the gate that closes over
@@ -1687,9 +1760,9 @@ func hush(p: Vector2, r: float = 1.4, secs: float = 4.0) -> void:
 	_ensure_sky()
 	var n := ColorRect.new()
 	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	n.size = (Vector2(r * Iso.HX * 2.0 * 1.6, r * Iso.HX * 1.6) / PX).ceil() * PX
+	n.size = (Vector2(r * Iso.HX * 2.0 * 1.6, r * Iso.HX * 1.6) / AP).ceil() * AP
 	var q := Iso.to_screen(p)
-	n.position = ((q - n.size * 0.5) / PX).floor() * PX
+	n.position = ((q - n.size * 0.5) / AP).floor() * AP
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/absence_hush.gdshader")
 	m.set_shader_parameter("seed", randf() * 40.0)
@@ -1767,25 +1840,33 @@ func _draw_absence(cv: CanvasItem) -> void:
 			var col := Color(0.03, 0.02, 0.04, (1.0 - u) * (1.0 - i * 0.22))
 			if i == 0 and fmod(sd["t"] * 7.0 + sd["life"] * 13.0, 1.0) < 0.35:
 				col = Color(0.5, 0.44, 0.58, 1.0 - u)               # a grain catching what little light there is
-			cv.draw_rect(Rect2((tr[i] / PX).floor() * PX, Vector2(PX, PX)), col)
+			if i == 0:
+				_mote(cv, tr[i], col)                              # the grain; its trail one art pixel thin
+			else:
+				_ap(cv, tr[i], col)
 	for gt in gates:
 		var u: float = gt["t"] / gt["secs"]
 		var close := pow(minf(1.0, u / 0.7), 2.2)              # the leaves close, slow then fast
-		var W: float = gt["W"] * (1.0 - close) + 4.0
+		var W: float = gt["W"] * (1.0 - close) + AP            # shut, a line one art pixel wide
 		var H: float = gt["H"] * (1.0 - 0.3 * close)
 		var fade := 1.0 - smoothstep(0.7, 1.0, u)
-		var c0: Vector2 = (gt["c"] / PX).floor()
-		var hy := int(H / PX / 2.0)
+		var c0: Vector2 = (gt["c"] / AP).floor()
+		var hy := int(H / AP / 2.0)
+		var dark := Color(0.015, 0.01, 0.025, fade)
+		var edge := Color(0.62, 0.54, 0.78, fade)              # the leaves' edges, catching what light is left
+		var edge2 := Color(0.2, 0.16, 0.28, fade)
 		for yy in range(-hy, hy + 1):
 			var f := float(yy) / hy
-			var hw := int(W / PX / 2.0 * sqrt(maxf(0.0, 1.0 - f * f)))   # an eye shape, pointed top and bottom
-			for xx in range(-hw, hw + 1):
-				var col := Color(0.015, 0.01, 0.025, fade)
-				if absi(xx) == hw:
-					col = Color(0.62, 0.54, 0.78, fade)              # the leaves' edges, catching what light is left
-				elif absi(xx) == hw - 1:
-					col = Color(0.2, 0.16, 0.28, fade)
-				cv.draw_rect(Rect2((c0 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), col)
+			var hw := int(W / AP / 2.0 * sqrt(maxf(0.0, 1.0 - f * f)))   # an eye shape, pointed top and bottom
+			if hw >= 2:                                          # the dark between the leaves, one span per row
+				cv.draw_rect(Rect2((c0 + Vector2(-hw + 2, yy)) * AP, Vector2(2 * hw - 3, 1) * AP), dark)
+			if hw >= 1:
+				cv.draw_rect(Rect2((c0 + Vector2(-hw + 1, yy)) * AP, Vector2(AP, AP)), edge2)
+				if hw > 1:
+					cv.draw_rect(Rect2((c0 + Vector2(hw - 1, yy)) * AP, Vector2(AP, AP)), edge2)
+			cv.draw_rect(Rect2((c0 + Vector2(-hw, yy)) * AP, Vector2(AP, AP)), edge)
+			if hw > 0:
+				cv.draw_rect(Rect2((c0 + Vector2(hw, yy)) * AP, Vector2(AP, AP)), edge)
 	for pc in pinches:
 		var u: float = pc["t"] / pc["secs"]
 		var c: Vector2 = pc["c"]
@@ -1793,17 +1874,17 @@ func _draw_absence(cv: CanvasItem) -> void:
 			var r0: float = ry[1] * (1.0 - u)
 			var r1: float = maxf(0.0, r0 - 18.0)
 			var dirv := Vector2(cos(ry[0]), sin(ry[0]) * 0.6)
-			var n := int((r0 - r1) / PX)
+			var n := int((r0 - r1) / AP)
 			for k in n:
-				var q := c + dirv * (r1 + k * PX)
-				var lead := k == n - 1                                 # the outer tip of each streak is lit, the rest is dark
-				cv.draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), Color(0.6, 0.52, 0.76, 1.0 - u * 0.5) if lead else Color(0.02, 0.015, 0.03, 0.9 * (1.0 - u * 0.5)))
-		var dr := int(3.0 * sin(PI * u))
-		var c1 := (c / PX).floor()
+				var q := c + dirv * (r1 + k * AP)
+				var lead := k >= n - 2                                 # the outer tip of each streak is lit, the rest is dark
+				_ap(cv, q, Color(0.6, 0.52, 0.76, 1.0 - u * 0.5) if lead else Color(0.02, 0.015, 0.03, 0.9 * (1.0 - u * 0.5)))
+		var dr := int(6.0 * sin(PI * u))                            # in art pixels: the same extent, its rim one thin
+		var c1 := (c / AP).floor()
 		for yy in range(-dr, dr + 1):
 			for xx in range(-dr, dr + 1):
 				if xx * xx + yy * yy <= dr * dr:
-					cv.draw_rect(Rect2((c1 + Vector2(xx, yy)) * PX, Vector2(PX, PX)), Color(0.01, 0.005, 0.02) if xx * xx + yy * yy < dr * dr - 1 else Color(0.36, 0.3, 0.46))
+					cv.draw_rect(Rect2((c1 + Vector2(xx, yy)) * AP, Vector2(AP, AP)), Color(0.01, 0.005, 0.02) if xx * xx + yy * yy < (dr - 1) * (dr - 1) else Color(0.36, 0.3, 0.46))
 
 # ------------------------------------------------------------------ lakes (painted: shaders/lake.gdshader)
 ## water or blood lying in the ground, on the floor layer (under every figure, lit by the night like the ground).
@@ -1815,9 +1896,9 @@ func lake(p: Vector2, r: float = 2.0, kind: String = "water") -> Node:
 	var hw := r * Iso.HX
 	var n := ColorRect.new()
 	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	n.size = (Vector2(hw * 2.6, hw * 1.4) / PX).ceil() * PX
+	n.size = (Vector2(hw * 2.6, hw * 1.4) / AP).ceil() * AP
 	var q := Iso.to_screen(p)
-	n.position = ((q - n.size * 0.5) / PX).floor() * PX
+	n.position = ((q - n.size * 0.5) / AP).floor() * AP
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/lake.gdshader")
 	m.set_shader_parameter("seed", randf() * 40.0)
@@ -1894,9 +1975,9 @@ func meadow(p: Vector2, r: float = 2.0, kind: String = "grass", tall: float = 36
 	var hw := r * Iso.HX
 	var n := ColorRect.new()
 	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	n.size = (Vector2(hw * 2.0 + 32.0, hw + tall + 8.0) / PX).ceil() * PX
+	n.size = (Vector2(hw * 2.0 + 32.0, hw + tall + 8.0) / AP).ceil() * AP
 	var q := Iso.to_screen(p)
-	n.position = ((q - Vector2(n.size.x * 0.5, n.size.y - hw * 0.5)) / PX).floor() * PX
+	n.position = ((q - Vector2(n.size.x * 0.5, n.size.y - hw * 0.5)) / AP).floor() * AP
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/meadow.gdshader")
 	m.set_shader_parameter("seed", randf() * 40.0)
@@ -1952,9 +2033,9 @@ func snowfield(p: Vector2, r: float = 2.4) -> Node:
 	var hw := r * Iso.HX
 	var n := ColorRect.new()
 	n.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	n.size = (Vector2(hw * 2.6, hw * 1.4) / PX).ceil() * PX
+	n.size = (Vector2(hw * 2.6, hw * 1.4) / AP).ceil() * AP
 	var q := Iso.to_screen(p)
-	n.position = ((q - n.size * 0.5) / PX).floor() * PX
+	n.position = ((q - n.size * 0.5) / AP).floor() * AP
 	var m := ShaderMaterial.new()
 	m.shader = load("res://shaders/snowfield.gdshader")
 	m.set_shader_parameter("seed", randf() * 40.0)
@@ -2037,7 +2118,7 @@ func _crack(p: Vector2, away: Vector2) -> void:
 		var line: Array = [q]
 		for s in int(randf_range(4, 8)):
 			ang += randf_range(-0.5, 0.5)
-			q += Vector2(cos(ang), sin(ang) * 0.5) * PX * 2.0
+			q += Vector2(cos(ang), sin(ang) * 0.5) * 2.0 * OLDPX
 			line.append(q)
 		pts.append(line)
 	cracks.append({"pts": pts, "t": 0.0, "life": 6.0})
@@ -2175,52 +2256,60 @@ func _draw() -> void:
 		var hot := clampf(1.0 - fn["t"] / 1.5, 0.0, 1.0)
 		var col := Color(0.04, 0.04, 0.06, 0.75 * (1.0 - smoothstep(0.6, 1.0, u))).lerp(Color(0.75, 0.85, 1.0, 1.0), hot)
 		for arm in fn["arms"]:
-			for q in arm:
-				draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), col)
+			_px_path(arm, col, 1)                                  # burnt in one art pixel thin
 
 	for mo in motes:
 		var u: float = mo["t"] / mo["life"]
-		var mq: Vector2 = (mo["q"] / PX).floor() * PX
+		var mq: Vector2 = (mo["q"] / AP).floor() * AP
 		if mo["ember"]:
 			var hot := 1.0 - u
-			draw_rect(Rect2(mq, Vector2(PX, PX)), Color(1.0, 0.45 + 0.4 * hot, 0.15 + 0.3 * hot * hot, 1.0 - u * u))
+			_mote(self, mq, Color(1.0, 0.45 + 0.4 * hot, 0.15 + 0.3 * hot * hot, 1.0 - u * u))
 		elif mo["smoke"]:
-			var r := int(1 + u * 3)
+			var r := int((1 + u * 3) * 2.0)                          # in art pixels: the same extent
 			for yy in range(-r, r + 1):
 				for xx in range(-r, r + 1):
-					if xx * xx + yy * yy <= r * r and (int(mq.x / PX) + xx + int(mq.y / PX) + yy) % 2 == 0:
-						draw_rect(Rect2(mq + Vector2(xx, yy) * PX, Vector2(PX, PX)), Color(0.16, 0.15, 0.15, 0.35 * (1.0 - u)))
+					if xx * xx + yy * yy <= r * r and (int(mq.x / AP) + xx + int(mq.y / AP) + yy) % 2 == 0:
+						draw_rect(Rect2(mq + Vector2(xx, yy) * AP, Vector2(AP, AP)), Color(0.16, 0.15, 0.15, 0.35 * (1.0 - u)))
 		else:
-			draw_rect(Rect2(mq, Vector2(PX, PX)), Color(0.45, 0.43, 0.41, 0.7 * (1.0 - u)))
+			_mote(self, mq, Color(0.45, 0.43, 0.41, 0.7 * (1.0 - u)))
 	for st in stains:
 		var sa: float = 1.0 - smoothstep(0.6, 1.0, st["t"] / st["life"])
-		var sq: Vector2 = (st["q"] / PX).floor() * PX
-		draw_rect(Rect2(sq, Vector2(PX * st["w"] * 2, PX)), Color(0.22, 0.03, 0.03, 0.75 * sa))
+		var sq: Vector2 = (st["q"] / AP).floor() * AP
+		var sw: int = int(st["w"]) * 4                              # the old 8/16 x 4 stain: art pixels, its top row inset
+		var scol := Color(0.22, 0.03, 0.03, 0.75 * sa)
+		draw_rect(Rect2(sq + Vector2(AP, 0), Vector2(sw - 2, 1) * AP), scol)
+		draw_rect(Rect2(sq + Vector2(0, AP), Vector2(sw, 1) * AP), scol)
 	for k in cracks:
 		var a: float = 1.0 - smoothstep(0.6, 1.0, k["t"] / k["life"])
 		for line in k["pts"]:
-			for i in range(1, line.size()):
-				var q: Vector2 = line[i]
-				draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), Color(0.05, 0.04, 0.035, 0.7 * a))
+			if line.size() < 2:
+				continue
+			var ln: Array = line.duplicate()
+			ln[0] = (line[0] as Vector2).lerp(line[1], 0.5)          # it starts a little off the very point of the blow
+			_px_path(ln, Color(0.05, 0.04, 0.035, 0.7 * a), 1)     # scored one art pixel thin
 	for c in chips:
 		var q := Iso.to_screen(c["p"]) - Vector2(0, c["z"])
 		var a: float = 1.0 - smoothstep(0.7, 1.0, c["t"] / c["life"])
 		var col: Color = c["col"]
 		col.a = a
-		var sz := PX * (2.0 if c.get("big", false) else 1.0)
-		draw_rect(Rect2((q / PX).floor() * PX, Vector2(sz, sz)), col)
-		if c["z"] > 6.0:   # its shadow on the ground under it
+		if c.get("big", false):                                     # the old 8 x 8 chip: 4 x 4 art pixels, corners off
+			var cq := (q / AP).floor() * AP
+			draw_rect(Rect2(cq + Vector2(AP, 0), Vector2(2, 1) * AP), col)
+			draw_rect(Rect2(cq + Vector2(0, AP), Vector2(4, 2) * AP), col)
+			draw_rect(Rect2(cq + Vector2(AP, 3 * AP), Vector2(2, 1) * AP), col)
+		else:
+			_mote(self, q, col)
+		if c["z"] > 6.0:   # its shadow on the ground under it, flat
 			var sq := Iso.to_screen(c["p"])
-			draw_rect(Rect2((sq / PX).floor() * PX, Vector2(PX, PX)), Color(0, 0, 0, 0.35 * a))
+			draw_rect(Rect2((sq / AP).floor() * AP, Vector2(2, 1) * AP), Color(0, 0, 0, 0.35 * a))
 
 	for b in bursts:
 		var bc: Color = b["col"]
 		for r in b["rays"]:
 			var dv: Vector2 = Vector2(r[0].x - r[0].y, (r[0].x + r[0].y) * 0.5).normalized()   # the tile way, on screen
-			var L: float = r[1] * (0.6 + b["t"] * 8.0)
+			var L: float = r[1] * (0.6 + b["t"] * 8.0)                # in old cells (the web's world px)
 			var s0 := 1.5
-			while s0 < L:
-				var q: Vector2 = b["c"] + dv * s0 * PX
-				draw_rect(Rect2((q / PX).floor() * PX, Vector2(PX, PX)), Color(bc, 1.0 - s0 / L * 0.6))
-				s0 += 1.0
-		draw_rect(Rect2((b["c"] / PX).floor() * PX - Vector2(PX, PX), Vector2(PX * 3, PX * 3)), Color(1, 1, 0.92, 0.9))
+			while s0 < L:                                             # art-pixel steps: a streak one art pixel thin
+				_ap(self, b["c"] + dv * s0 * OLDPX, Color(bc, 1.0 - s0 / L * 0.6))
+				s0 += 0.5
+		_spot(self, b["c"], Color(1, 1, 0.92, 0.9))

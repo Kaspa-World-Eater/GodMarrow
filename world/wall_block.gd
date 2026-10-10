@@ -79,7 +79,11 @@ func _draw() -> void:
 ## hanging down. Every choice is the web's hash of the tile, so a fence looks the same each time it is built.
 const WOOD := [Color("#2d1e12"), Color("#4d341f"), Color("#6e4c2e"), Color("#946c46")]
 const WOODD := [Color("#22170e"), Color("#3a2818"), Color("#553a24"), Color("#6e4c2e")]
-const SKULL := [".1331.", "134431", "300403", "334433", ".3033."]
+# the skull and the cord in art pixels (the 2 x 2 grid, MASTER_RULES 3.7): the old 6 x 5 skull of 4-px pixels redrawn at
+# 12 x 10, the same size on screen
+const AP := 2.0
+const SKULL := ["...133331...", "..13444431..", ".1344444431.", ".3444444443.", "340044440043", "330004400033",
+	".3344004433.", "..33444433..", "..30404030..", "...333333..."]
 const SKULLC := [Color("#1e1818"), Color("#4a3f36"), Color("#76674f"), Color("#a2916f"), Color("#c4b28c")]
 
 func _stakes() -> void:
@@ -130,12 +134,12 @@ func _stakes() -> void:
 	for k in tops.size():
 		var tp: Vector2 = tops[k][0]
 		if H2.call(x * 3 + k, y * 11) < 0.12:
-			for j in 5:
-				for i in 6:
+			for j in SKULL.size():
+				for i in SKULL[0].length():
 					var ch: String = SKULL[j][i]
 					if ch != ".":
-						draw_rect(Rect2(tp + Vector2(-3 + i, -9 + j) * P, Vector2(P, P)), SKULLC[int(ch)])
+						draw_rect(Rect2(tp + Vector2(-6 + i, -18 + j) * AP, Vector2(AP, AP)), SKULLC[int(ch)])
 		elif H2.call(x + k * 7, y * 3) < 0.08:
-			for j in 7:
-				var off := 1 if j > 3 else 0
-				draw_rect(Rect2(tp + Vector2(1 + off, 3 + j) * P, Vector2(P, P)), Color("#5a4a3a") if j % 3 else Color("#3a2e24"))
+			for j in 14:   # the cord, one art pixel wide, drifting a little as it hangs
+				var off := 0 if j < 6 else (1 if j < 9 else 2)
+				draw_rect(Rect2(tp + Vector2(2 + off, 6 + j) * AP, Vector2(AP, AP)), Color("#5a4a3a") if (j >> 1) % 3 else Color("#3a2e24"))

@@ -8,7 +8,8 @@ extends Node2D
 ## The painting's left edge goes down into the dark, where the words stand.
 ## The stage API (ui/title.gd): order_at(p), label_at(i), hint(); T is the title (mode, fig_hover, order_i, t).
 
-const SK := 4.0
+const SK := 4.0   # the Stranger's sheet, shown x4  # 2x2-ok: the user's animation at its own texel (320 x 270 frames) until it is re-made at twice the grain, not an effect's cell
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7); the embers and ash are drawn in it
 const FW := 320
 const FH := 270
 const FPS := 10.0
@@ -187,8 +188,12 @@ func _draw_fx() -> void:
 	fx.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	for m in motes:
 		var a: float = clampf(1.0 - m["t"] / m["life"], 0.0, 1.0)
-		var p := Vector2(floorf(m["x"] / SK), floorf(m["y"] / SK)) * SK
-		fx.draw_rect(Rect2(p, Vector2(SK, SK)), Color(1.0, 0.6 + 0.3 * a, 0.28, a) if m["ember"] else Color(0.4, 0.4, 0.46, 0.35))
+		# a speck: a bright art pixel, its right and lower neighbours at half (shaped, not a 4 x 4 block)
+		var p := (Vector2(m["x"], m["y"]) / AP).floor() * AP
+		var col := Color(1.0, 0.6 + 0.3 * a, 0.28, a) if m["ember"] else Color(0.4, 0.4, 0.46, 0.35)
+		fx.draw_rect(Rect2(p, Vector2(AP, AP)), col)
+		fx.draw_rect(Rect2(p + Vector2(AP, 0), Vector2(AP, AP)), Color(col, col.a * 0.5))
+		fx.draw_rect(Rect2(p + Vector2(0, AP), Vector2(AP, AP)), Color(col, col.a * 0.5))
 
 ## the card he draws: up off the deck, turned over, then held out to you, larger, in the fire's light
 func _draw_drawn() -> void:

@@ -11,7 +11,8 @@ extends CanvasLayer
 ##   gusts are core/gust.gd's storm, which slows a pilgrim walking into them; the lightning is world/dark_layer.gd's.
 ## Everything takes its colour and strength from the light round it (the dark layer's light_at), never red.
 
-const WPX := 4.0
+const WPX := Iso.WPX         # screen px per web world px: a unit of length, never the drawn pixel
+const AP := 2.0              # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
 var zone: Zone
 var hero: Hero
 var dark: DarkLayer
@@ -189,7 +190,7 @@ func _process(dt: float) -> void:
 	add_canvas.queue_redraw()
 
 func _snap(p: Vector2) -> Vector2:
-	return Vector2(floorf(p.x / WPX) * WPX, floorf(p.y / WPX) * WPX)
+	return (p / AP).floor() * AP
 
 func _draw() -> void:
 	# ash: pale grey flakes, brighter where a light finds them
@@ -200,8 +201,12 @@ func _draw() -> void:
 		var g := 0.5 + 0.6 * lum
 		var c := Color(0.62 * g + col.r * 0.2 * lum, 0.6 * g + col.g * 0.2 * lum, 0.6 * g + col.b * 0.2 * lum, 0.6 + 0.3 * lum)
 		var p := _snap(f["p"])
-		canvas.draw_rect(Rect2(p, Vector2(WPX * f["s"], WPX)), c)
-	# rain: thin strokes along the fall, one pixel wide, strongest in the light
+		if f["s"] == 1:
+			Atmos.mote(canvas, p, c)
+		else:   # a bigger flake: a short slanted sliver, its lower edge at half
+			canvas.draw_rect(Rect2(p, Vector2(3.0 * AP, AP)), c)
+			canvas.draw_rect(Rect2(p + Vector2(AP, AP), Vector2(3.0 * AP, AP)), Color(c, c.a * 0.5))
+	# rain: thin strokes along the fall, one art pixel wide, strongest in the light
 	var slope := Vector2(Game.wind * 80.0 + 20.0, 260.0).normalized()
 	for d in drops:
 		var l := _light(d["p"])
@@ -211,33 +216,35 @@ func _draw() -> void:
 		var c := Color(col.r * 0.5 + 0.35, col.g * 0.5 + 0.38, col.b * 0.5 + 0.45, a)
 		var ln: float = 10.0 * WPX * d["z"]
 		var p0: Vector2 = d["p"]
-		for i in int(ln / WPX):
-			var q := _snap(p0 - slope * float(i) * WPX)
-			canvas.draw_rect(Rect2(q, Vector2(2, WPX)), c)
+		for i in int(ln / AP):
+			var q := _snap(p0 - slope * float(i) * AP)
+			canvas.draw_rect(Rect2(q, Vector2(AP, AP)), c)
 	for s in splashes:
 		var l := _light(s["p"])
 		var a: float = (0.15 + 0.5 * float(l[0])) * (1.0 - s["t"] / 0.28)
 		var p := _snap(s["p"])
 		var c := Color(0.7, 0.74, 0.82, a)
 		var k := 1 + int(s["t"] / 0.1)
-		canvas.draw_rect(Rect2(p + Vector2(-WPX * k, 0), Vector2(WPX, WPX)), c)
-		canvas.draw_rect(Rect2(p + Vector2(WPX * k, 0), Vector2(WPX, WPX)), c)
+		Atmos.mote(canvas, p + Vector2(-WPX * k, 0), c)
+		Atmos.mote(canvas, p + Vector2(WPX * k, 0), c)
 		if s["t"] < 0.1:
-			canvas.draw_rect(Rect2(p + Vector2(0, -WPX), Vector2(WPX, WPX)), c)
+			Atmos.mote(canvas, p + Vector2(0, -WPX), c)
 	# drips: a bead falling, then a small ring spreading on the floor
 	for d in drips:
 		var l := _light(d["g"])
 		var lum: float = l[0]
 		var c := Color(0.62, 0.7, 0.78, 0.2 + 0.6 * lum)
 		if not d["hit"]:
-			canvas.draw_rect(Rect2(_snap(Vector2(d["g"].x, d["y"])), Vector2(WPX, WPX * 2)), c)
+			var bq := _snap(Vector2(d["g"].x, d["y"]))   # a bead: a thin tail, a round body below it
+			canvas.draw_rect(Rect2(bq, Vector2(AP, 2.0 * AP)), Color(c, c.a * 0.5))
+			canvas.draw_rect(Rect2(bq + Vector2(0, 2.0 * AP), Vector2(2.0 * AP, 2.0 * AP)), c)
 		else:
 			var r: float = (2.0 + d["t"] * 9.0) * WPX
 			c.a *= 1.0 - d["t"] / 0.9
 			var ctr := _snap(d["g"])
-			for i in 12:
-				var ang := TAU * i / 12.0
-				canvas.draw_rect(Rect2(_snap(ctr + Vector2(cos(ang) * r, sin(ang) * r * 0.5)), Vector2(WPX, WPX)), c)
+			for i in 24:   # twice the points of the old ring, each one art pixel
+				var ang := TAU * i / 24.0
+				canvas.draw_rect(Rect2(_snap(ctr + Vector2(cos(ang) * r, sin(ang) * r * 0.5)), Vector2(AP, AP)), c)
 
 func _draw_add() -> void:
 	# the shafts: long leaning bands of warm light, dithered in steps. They are never still: the canopy they come
@@ -269,6 +276,7 @@ func _draw_add() -> void:
 			var gap := 1.0 - 0.55 * clampf(1.0 - absf(y - gap_y) / 60.0, 0.0, 1.0)
 			var x0: float = s["x"] + sway + y * lean
 			var c := Color(1.0, 0.8, 0.5, br * fade * gap)
-			add_canvas.draw_rect(Rect2(Vector2(floorf(x0 / WPX) * WPX, y), Vector2(w, WPX * 2)), c)
-			add_canvas.draw_rect(Rect2(Vector2(floorf((x0 + w * 0.2) / WPX) * WPX, y), Vector2(w * 0.6, WPX * 2)), c)
-			y += WPX * 2
+			var wq := maxf(AP, roundf(w / AP) * AP)
+			add_canvas.draw_rect(Rect2(Vector2(floorf(x0 / AP) * AP, y), Vector2(wq, AP)), c)
+			add_canvas.draw_rect(Rect2(Vector2(floorf((x0 + w * 0.2) / AP) * AP, y), Vector2(maxf(AP, roundf(w * 0.6 / AP) * AP), AP)), c)
+			y += AP   # steps of one art pixel (the 2 x 2 grid)

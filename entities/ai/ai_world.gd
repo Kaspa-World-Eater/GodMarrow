@@ -13,6 +13,7 @@ extends Node2D
 ##  - a death scatters the skittish ones nearby (zz_zz_imps67)
 
 const BONE := Color(0.847, 0.808, 0.722)
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
 const GODS := {
 	"bone": {"name": "Old Upright", "herald": "The Marrow Pontiff", "mon": "hbone"},
 	"flesh": {"name": "the Red Mother", "herald": "The Wet Nurse", "mon": "hflesh"},
@@ -359,9 +360,18 @@ static func h01(x: int, y: int, s: int) -> float:
 	hh = ((hh ^ (hh >> 13)) * 1274126177) & 0xffffffff
 	return float((hh ^ (hh >> 16)) & 0xffffffff) / 4294967295.0
 
-func _px(p: Vector2, col: Color, s: float = 4.0) -> void:
-	var q := Iso.to_screen(p)
-	draw_rect(Rect2(q.x - s * 0.5, q.y - s * 0.5, s, s), col)
+## one grain at a world point: a whole art pixel on the 2 x 2 grid, its right and lower neighbours at half (a shaped
+## mark the size of the browser's one 4-px pixel, not a square block)
+func _px(p: Vector2, col: Color) -> void:
+	_mark(Iso.to_screen(p), col)
+
+func _mark(q: Vector2, col: Color) -> void:
+	var g := ((q - Vector2(AP, AP)) / AP).round() * AP
+	draw_rect(Rect2(g, Vector2(AP, AP)), col)
+	var c2 := col
+	c2.a *= 0.5
+	draw_rect(Rect2(g + Vector2(AP, 0), Vector2(AP, AP)), c2)
+	draw_rect(Rect2(g + Vector2(0, AP), Vector2(AP, AP)), c2)
 
 func _draw() -> void:
 	for f in fires:
@@ -373,7 +383,11 @@ func _draw() -> void:
 		draw_set_transform(q, 0.0, Vector2(1.0, 0.5))
 		draw_arc(Vector2.ZERO, 8.0 + 24.0 * k, 0.0, TAU, 18, Color(0.24, 0.13, 0.1, 0.7 * a), 3.0)
 		draw_set_transform(Vector2.ZERO)
-		draw_rect(Rect2(q.x - 4, q.y - 2, 8, 4), Color(0.35, 0.24, 0.16, 0.6 * a))
+		# the stirred mud at its heart: a low mound of art pixels, four across over two
+		var g := ((q - Vector2(4, 2)) / AP).round() * AP
+		var mud := Color(0.35, 0.24, 0.16, 0.6 * a)
+		draw_rect(Rect2(g, Vector2(4.0 * AP, AP)), mud)
+		draw_rect(Rect2(g + Vector2(AP, AP), Vector2(2.0 * AP, AP)), mud)
 	for r in rings:
 		var k: float = 1.0 - r["t"] / r["T"]
 		var rad: float = lerpf(r["r0"], r["r1"], k)
@@ -412,7 +426,7 @@ func _draw_fire(f: Dictionary) -> void:
 		m.shader = load("res://shaders/ground_fire.gdshader")
 		m.set_shader_parameter("seed", float(f["s"]))
 		rr.material = m
-		rr.size = Vector2(ceilf((hw * 2.0 + 16.0) / 4.0) * 4.0, ceilf((hh * 2.0 + fh) / 4.0) * 4.0)
+		rr.size = Vector2(ceilf((hw * 2.0 + 16.0) / AP) * AP, ceilf((hh * 2.0 + fh) / AP) * AP)
 		add_child(rr)
 		# its light, pooled on the ground round it by the dark layer (and so on everything standing near)
 		var pl := PointLight2D.new()
@@ -427,7 +441,7 @@ func _draw_fire(f: Dictionary) -> void:
 		f["born"] = clock
 	var node: ColorRect = f["node"]
 	var q := Iso.to_screen(f["p"])
-	node.position = Vector2(roundf((q.x - node.size.x * 0.5) / 4.0) * 4.0, roundf((q.y - hh - fh) / 4.0) * 4.0)
+	node.position = Vector2(roundf((q.x - node.size.x * 0.5) / AP) * AP, roundf((q.y - hh - fh) / AP) * AP)
 	var mt: ShaderMaterial = node.material
 	var age: float = clock - float(f["born"])
 	mt.set_shader_parameter("t", age)
@@ -437,20 +451,6 @@ func _draw_fire(f: Dictionary) -> void:
 	mt.set_shader_parameter("flame_h", fh)
 	mt.set_shader_parameter("wind", Game.wind)
 	mt.set_shader_parameter("rect_size", node.size)
-
-func _draw_fire_old(f: Dictionary) -> void:
-	var q := Iso.to_screen(f["p"])
-	var a: float = minf(1.0, f["t"] / 0.6)
-	var R: float = f["R"]
-	draw_set_transform(q, 0.0, Vector2(1.0, 0.5))
-	draw_circle(Vector2.ZERO, R * Iso.HX, Color(0.2, 0.07, 0.03, 0.55 * a))
-	draw_set_transform(Vector2.ZERO)
-	var s: float = f["s"]
-	for i in 5:
-		var ox := sin(i * 2.3 + s) * R * 40.0
-		var hh := (10.0 + 12.0 * absf(sin(clock * 9.0 + i * 1.7 + s))) * a
-		var col := Color(0.93, 0.55, 0.22) if i % 2 else Color(0.96, 0.78, 0.4)
-		draw_rect(Rect2(q.x + ox, q.y - hh + cos(i) * 6.0, 4, hh), col)
 
 ## a slam's circle: grit lifting, thickening from the centre as the blow comes; a broken rim; cracks near the end
 func _dust_disc(c: Vector2, r: float, k: float, sd: int) -> void:
@@ -523,7 +523,7 @@ func _draw_scar(z: Dictionary) -> void:
 			var lip := BONE
 			lip.a = 0.45 * k
 			var q := Iso.to_screen(p)
-			draw_rect(Rect2(q.x - 2, q.y + 2, 4, 4), lip)
+			_mark(q + Vector2(0, 4), lip)   # the pale lip just under the crack
 			s += 0.06
 	for n in 40:
 		var ang := h01(n, 3, sd) * TAU
@@ -556,4 +556,4 @@ class BoneWall extends Node2D:
 			var x := -16.0 + i * 12.0
 			var y := -hgt + (i % 2) * 8.0
 			draw_colored_polygon(PackedVector2Array([Vector2(x, 4), Vector2(x + 8, 4), Vector2(x + 5, y), Vector2(x + 3, y)]), col)
-			draw_rect(Rect2(x + 2, y, 4, 8), Color(0.957, 0.937, 0.886))
+			draw_rect(Rect2(x + 3, floorf(y / AP) * AP, AP, 8), Color(0.957, 0.937, 0.886))   # the pale edge, one art pixel wide

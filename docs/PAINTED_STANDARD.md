@@ -20,8 +20,9 @@ with what the bog, the pit and the 3D temple taught.*
   between steps (`paint3d.tone`, `wood_scene._r`).
 
 **2. Dither lightly, and only at edges.**
-- The 4×4 ordered dither (`kit.B4`) works only where one tone meets the next (the middle of a step's band), with a
-  small amplitude. Everywhere else the tone is flat.
+- The ordered (Bayer) dither (`kit.B4`), on the 2 x 2 grid, works only where one tone meets the next (the middle of a
+  step's band), with a small amplitude. Its 4 × 4 matrix is a pattern of thresholds, never a pixel size. Everywhere
+  else the tone is flat.
 
 **3. Pigment pools at the wet edge.**
 - Where a wash ends (a lake's shore, a pool's rim, blood's edge), the colour darkens in a thin band just inside the edge,
@@ -48,9 +49,12 @@ with what the bog, the pit and the 3D temple taught.*
 - **The art grid is 2 x 2 screen pixels** (Derek, 2026-10-09: "2x2", after the cove's side by side at the game's
   size: on the old 4 px grid the ground went soft and blocky beside the pilgrim's finer sprite). The paint is in the
   pixel art, not instead of it.
+- Every art pixel is a 2 x 2 block of screen pixels. `tools/check_2x2.py` runs first in every smoke test and fails on
+  any drawing cell of 4 px (Derek, 2026-10-10: "we need to eliminate the 4x4 shit from ever happening again").
 - Bakes render at twice the engine's scale (36 × 18 px a yard, 42 of height), and the game draws them at 2× with
-  nearest filtering (a baked land's `index.json`: `"scale": 2`). Lands baked before (the Sunken Bog) stay on the 4 px
-  grid until they are rebaked.
+  nearest filtering (a baked land's `index.json`: `"scale": 2`). What was made before the ruling is still on the old
+  4 px grid and is due a rebake at 2: the Sunken Bog's bake, and the landkit's hollow wood and old growth sets (drawn
+  at 4 px a texel by `world/landkit.gd`). Nothing new is made at 4.
 - **Every size a painter measures in pixels follows the grid.** A blur radius, an edge's depth, a run's length or a
   pool's depth tuned on the old grid acts at half its size on the 2 x 2 grid, so it is scaled by the render's zoom
   (`d["zoom"]`). The cave's pool went flat bright red because one depth was not. Where scaling makes the look worse,

@@ -97,7 +97,7 @@ static func _sprite(s: String, file: String, flip: bool, sway: float, canopy := 
 	sp.texture = ct
 	sp.centered = false
 	sp.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	sp.scale = Vector2.ONE * Iso.WPX
+	sp.scale = Vector2.ONE * Iso.WPX   # 2x2-debt: the landkit sets are baked at 4 px per texel; due a rebake at 2 (tools/landkit/bake.py)
 	sp.flip_h = flip
 	sp.material = lit(flip, sway, canopy)
 	return sp
@@ -159,7 +159,7 @@ static func place(zone, s: String, name: String, tp: Vector2, dep: float, flip: 
 		sh.texture = tex(shp)
 		sh.centered = false
 		sh.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		sh.scale = Vector2.ONE * Iso.WPX
+		sh.scale = Vector2.ONE * Iso.WPX   # 2x2-debt: the landkit sets are baked at 4 px per texel; due a rebake at 2 (tools/landkit/bake.py)
 		sh.flip_h = flip
 		sh.offset = Vector2(-(size.x - foot.x) if flip else -foot.x, -foot.y)
 		sh.position = anchor
@@ -391,7 +391,7 @@ static func _canopy_shade(zone, s: String, tp: Vector2) -> void:
 		return
 	sh.centered = false
 	sh.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	sh.scale = Vector2.ONE * Iso.WPX
+	sh.scale = Vector2.ONE * Iso.WPX   # 2x2-debt: the landkit sets are baked at 4 px per texel; due a rebake at 2 (tools/landkit/bake.py)
 	sh.offset = -Vector2(meta["foot"][0], meta["foot"][1])
 	sh.flip_h = absi(int(tp.x + tp.y)) % 2 == 0
 	sh.position = Iso.to_screen(tp + Vector2(1.2, -0.4))
@@ -431,7 +431,7 @@ static func _life_round(zone, s: String, tp: Vector2, L: float, flip: bool, cls:
 			continue
 		sp.centered = false
 		sp.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		sp.scale = Vector2.ONE * Iso.WPX
+		sp.scale = Vector2.ONE * Iso.WPX   # 2x2-debt: the landkit sets are baked at 4 px per texel; due a rebake at 2 (tools/landkit/bake.py)
 		var foot := Vector2(meta["foot"][0], meta["foot"][1])
 		sp.offset = -foot
 		sp.flip_h = rng.randf() < 0.5

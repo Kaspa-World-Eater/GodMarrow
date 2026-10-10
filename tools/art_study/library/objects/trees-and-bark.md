@@ -17,9 +17,10 @@ blood. This page covers the trunk (`vein_tree.py` and its `Warp`), the shared ba
   - **spiral grain:** the twist grows with the tree's size, so the channels wind round the oldest trunks;
   - **fluting:** lobes and channels that begin, deepen and fade with height;
   - the silhouette is never a straight line, and the axis is never straight (lean, sweep, a kink at a lost leader).
-- **At game scale** (a yard is 18 px across, 21 px tall): a 2-yard trunk is about 36 px; a 10 to 15 cm furrow is 2 to
-  3 px, so the channels are real geometry with their own shadow. Taper over a screen of trunk is only 5 to 10 percent;
-  the outline's 1 to 2 px waver is what kills the tube.
+- **At game scale** (a yard is 18 world px across, 21 tall; sizes here are world px, twice that in art pixels on
+  the 2 x 2 grid): a 2-yard trunk is about 36 px; a 10 to 15 cm furrow is 2 to 3 px, so the channels are real
+  geometry with their own shadow. Taper over a screen of trunk is only 5 to 10 percent; the outline's 1 to 2 px waver
+  is what kills the tube.
 - **STUDY round 11** (tree botany): area is conserved at every fork (r² = r1² + r2²); the smaller branch leaves at 40
   to 70 degrees; each fork turns about 137 degrees round the axis; broadleaves are decurrent; a crown is three to seven
   lit masses, sky holes, detail only on the lit side and silhouette.

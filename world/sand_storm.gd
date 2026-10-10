@@ -9,7 +9,8 @@ extends Node2D
 ## Red. Made by world/weather.gd for a zone whose "weather" is "sandstorm". Kept in packed arrays: a few hundred
 ## grains, one short streak each.
 
-const WPX := 4.0
+const WPX := Iso.WPX         # screen px per web world px: a unit of length, never the drawn pixel
+const AP := 2.0              # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
 const MAXG := 420
 const SAND := Color(0.6, 0.57, 0.55)        # black sand's grain catching light (the dark makes the rest of it)
 
@@ -74,8 +75,10 @@ func _draw() -> void:
 	for i in gt.size():
 		var p := Iso.to_screen(gt[i]) - Vector2(0, gh[i] * 21.0 * WPX)
 		var n := 1.0 + floorf((1.0 + 3.0 * g) * gs[i])
-		# one streak, trailing back along the wind, on the world pixel grid
+		# one streak, trailing back along the wind, one art pixel thick on the 2 x 2 grid (its length as before)
 		var q := p - head * (n * WPX)
-		var x0 := floorf(minf(p.x, q.x) / WPX) * WPX
-		var y0 := floorf(((p.y + q.y) * 0.5) / WPX) * WPX
-		draw_rect(Rect2(x0, y0, maxf(WPX, absf(p.x - q.x)), WPX), col)
+		var x0 := floorf(minf(p.x, q.x) / AP) * AP
+		var y0 := floorf(((p.y + q.y) * 0.5) / AP) * AP
+		var ln := maxf(2.0 * AP, roundf(absf(p.x - q.x) / AP) * AP)
+		draw_rect(Rect2(x0, y0, ln, AP), col)
+		draw_rect(Rect2(x0 + AP, y0 + AP, maxf(AP, ln - 2.0 * AP), AP), Color(col, col.a * 0.5))   # its softer underside

@@ -2,7 +2,7 @@ shader_type canvas_item;
 // Blood on the ground, the liquid fire's method turned to blood (Derek 2026-10-06: "blood can borrow from it too"): it
 // runs out from where the body fell, its edge seeping forward in fingers; its surface slowly churns and takes a wet
 // gloss where the light is (a bright rim on the side toward the lantern); as it ages it darkens, goes dull and its edge
-// cracks dry. Whole world pixels, a short red ramp, the 4x4 ordered dither.
+// cracks dry. Whole world pixels, a short red ramp, the ordered (Bayer) dither, on the 2 x 2 grid.
 uniform float t = 0.0;            // seconds since it began
 uniform float spread = 1.0;       // 0..1 how far it has run
 uniform float dry = 0.0;          // 0 wet .. 1 dried
@@ -20,8 +20,8 @@ float vn(vec2 p) { vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3.0 - 2.0 
 float fbm(vec2 p) { return vn(p) * 0.55 + vn(p * 2.1 + 9.0) * 0.3 + vn(p * 4.3 + 3.0) * 0.15; }
 
 void fragment() {
-	vec2 px = floor(UV * rect_size / 4.0) * 4.0;
-	ivec2 g = ivec2(px / 4.0);
+	vec2 px = floor(UV * rect_size / 2.0) * 2.0;
+	ivec2 g = ivec2(px / 2.0);
 	float d = B4[(g.y & 3) * 4 + (g.x & 3)] / 16.0;
 	vec2 c = rect_size * 0.5;
 	vec2 q = (px - c) / half_px;

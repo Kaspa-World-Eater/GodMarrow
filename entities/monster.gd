@@ -4,6 +4,8 @@ extends Node2D
 ## makeMon, sampled per rank and level). Behaviour lives in a Brain (entities/ai/*.gd) chosen by the kind's AI.
 ## The body keeps the shared state every brain and skill reads: poise and reel, statuses, burrowing, facing.
 
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
+
 var zone: Zone
 var info: Dictionary
 var kd: Dictionary        # the kind's row in monsters.json
@@ -145,7 +147,7 @@ func _true_size() -> void:
 	if spr.set != null and str(spr.set.meta.get("source", "")) != "cursemark":
 		_fx_shader()
 	if spr.set != null and str(spr.set.meta.get("source", "")) == "cursemark":
-		spr.scale = Vector2(4, 4) * Iso.FIG   # a Cursemark pixel is 4 units: its man about our man's height
+		spr.scale = Vector2(4, 4) * Iso.FIG   # a Cursemark pixel is 4 units: its man about our man's height  # 2x2-ok: Cursemark's own art (the fork), at its own pixel
 		base_scale = spr.scale
 		cm_body = true
 		_fx_shader()
@@ -432,21 +434,30 @@ func _draw_ghost_glow() -> void:
 	var box := Rect2(spr.position + r.position * sc, r.size * sc)
 	var k: float = ossify if calc_k < 0.0 else 1.0 - calc_k
 	var pulse := 0.6 + 0.4 * sin(Time.get_ticks_msec() * 0.004 + float(get_instance_id() % 7))
-	var c := box.get_center() - Vector2(0, box.size.y * 0.12)
+	var c := ((box.get_center() - Vector2(0, box.size.y * 0.12)) / AP).floor() * AP
 	var rx := box.size.x * 0.62
 	var ry := box.size.y * 0.55
-	var n := 0
-	for yy in range(int(-ry), int(ry), 4):
-		for xx in range(int(-rx), int(rx), 4):
-			var e := pow(xx / rx, 2) + pow(yy / ry, 2)
-			if e > 1.0:
+	var step := int(AP)
+	for yy in range(int(-ry), int(ry), step):
+		# a soft halo: every art pixel, its light falling off toward the rim in four steps (pixel rings, no screen
+		# door); each row's runs of one step are drawn as one strip
+		var run_x := 0
+		var run_lv := 0.0
+		var run_n := 0
+		for xx in range(int(-rx), int(rx) + step, step):
+			var lv := 0.0
+			if xx < int(rx):
+				var e := pow(xx / rx, 2) + pow(yy / ry, 2)
+				if e <= 1.0:
+					lv = floorf((1.0 - e) * k * pulse * 4.0) / 4.0
+			if run_n > 0 and lv == run_lv:
+				run_n += 1
 				continue
-			n += 1
-			var dens := (1.0 - e) * k * pulse
-			# a soft halo: every cell, its light falling off toward the rim in four steps (pixel rings, no screen door)
-			var lv := floorf(dens * 4.0) / 4.0
-			if lv > 0.0:
-				_ghost_glow.draw_rect(Rect2(c + Vector2(xx, yy) - Vector2(2, 2), Vector2(4, 4)), Color(0.42, 0.8, 1.0, 0.08 + 0.26 * lv))
+			if run_n > 0 and run_lv > 0.0:
+				_ghost_glow.draw_rect(Rect2(c + Vector2(run_x, yy), Vector2(run_n * AP, AP)), Color(0.42, 0.8, 1.0, 0.08 + 0.26 * run_lv))
+			run_x = xx
+			run_lv = lv
+			run_n = 1
 	# soul-motes rising through the halo (Diablo II's bone spells): pale cells drifting up and winking out
 	var now := Time.get_ticks_msec() / 1000.0
 	var sd := float(get_instance_id() % 97)
@@ -454,12 +465,16 @@ func _draw_ghost_glow() -> void:
 		var ph := fmod(now * (0.35 + fmod(i * 0.137, 0.3)) + i * 0.618 + sd, 1.0)
 		var mx := (fmod(i * 0.381 + sd * 0.1, 1.0) * 2.0 - 1.0) * rx * 0.8 + sin(now * 2.0 + i) * 4.0
 		var my := ry * 0.8 - ph * ry * 1.9
-		var q := (c + Vector2(mx, my) - Vector2(2, 2)).snapped(Vector2(4, 4))
+		var q := (c + Vector2(mx, my) - Vector2(AP, AP)).snapped(Vector2(AP, AP))
 		var al := sin(PI * ph) * k
-		_ghost_glow.draw_rect(Rect2(q, Vector2(4, 4)), Color(0.85, 0.98, 1.0, 0.85 * al))
+		# the mote: a bright art pixel, its right and lower neighbours at half (a shaped mark, not a square block)
+		_ghost_glow.draw_rect(Rect2(q, Vector2(AP, AP)), Color(0.85, 0.98, 1.0, 0.85 * al))
+		_ghost_glow.draw_rect(Rect2(q + Vector2(AP, 0), Vector2(AP, AP)), Color(0.85, 0.98, 1.0, 0.42 * al))
+		_ghost_glow.draw_rect(Rect2(q + Vector2(0, AP), Vector2(AP, AP)), Color(0.85, 0.98, 1.0, 0.42 * al))
 		if al > 0.7 and i % 3 == 0:
-			for o in [Vector2(-4, 0), Vector2(4, 0), Vector2(0, -4), Vector2(0, 4)]:
-				_ghost_glow.draw_rect(Rect2(q + o, Vector2(4, 4)), Color(0.6, 0.9, 1.0, 0.35 * al))
+			# its glint: four arms one art pixel thick, two long
+			for o in [Rect2(-2.0 * AP, 0, 2.0 * AP, AP), Rect2(2.0 * AP, 0, 2.0 * AP, AP), Rect2(0, -2.0 * AP, AP, 2.0 * AP), Rect2(0, 2.0 * AP, AP, 2.0 * AP)]:
+				_ghost_glow.draw_rect(Rect2(q + o.position, o.size), Color(0.6, 0.9, 1.0, 0.35 * al))
 
 ## bone spurs through the outline: pale spikes from the body's edges, longer as the growth spreads
 func _draw_spurs() -> void:
@@ -481,17 +496,22 @@ func _draw_spurs() -> void:
 		elif side == 1:
 			base.x = box.position.x + box.size.x * 0.78
 		var ln := L * (0.6 + 0.6 * h2)
-		var steps := int(ln / 4.0)
+		# drawn in art pixels: one every AP along the spike, 12 px across at the root tapering to 4 px at the tip
+		var steps := int(ln / AP)
 		for k in steps:
-			var w := int(ceilf((1.0 - float(k) / steps) * 2.0))
-			var p := ((base + dir * k * 4.0) / 4.0).floor() * 4.0
-			for ww in range(-w + 1, w):
-				var q := p + Vector2(-dir.y, dir.x) * ww * 4.0
-				q = (q / 4.0).floor() * 4.0
-				var lit := ww <= 0
-				_spurs.draw_rect(Rect2(q - Vector2(4, 0), Vector2(12, 4)), Color(0.55, 0.85, 1.0, 0.18))     # ghost-light round it
-				_spurs.draw_rect(Rect2(q, Vector2(4, 4)), Color(0.88, 0.94, 0.96) if lit else Color(0.46, 0.52, 0.58))
-		_spurs.draw_rect(Rect2(((base + dir * ln) / 4.0).floor() * 4.0, Vector2(4, 4)), Color(1, 0.98, 0.92))
+			var hw := maxi(1, int(ceilf((1.0 - float(k) / steps) * 3.0)))   # half-width in art pixels
+			var p := ((base + dir * k * AP) / AP).floor() * AP
+			for ww in range(-hw, hw):
+				var q := p + Vector2(-dir.y, dir.x) * ww * AP
+				q = (q / AP).floor() * AP
+				var lit := ww < 0
+				_spurs.draw_rect(Rect2(q - Vector2(2.0 * AP, 0), Vector2(5.0 * AP, AP)), Color(0.55, 0.85, 1.0, 0.11))     # ghost-light round it
+				_spurs.draw_rect(Rect2(q, Vector2(AP, AP)), Color(0.88, 0.94, 0.96) if lit else Color(0.46, 0.52, 0.58))
+		# the white tip: a bright art pixel, its right and lower neighbours at half
+		var tip := ((base + dir * ln) / AP).floor() * AP
+		_spurs.draw_rect(Rect2(tip, Vector2(AP, AP)), Color(1, 0.98, 0.92))
+		_spurs.draw_rect(Rect2(tip + Vector2(AP, 0), Vector2(AP, AP)), Color(1, 0.98, 0.92, 0.5))
+		_spurs.draw_rect(Rect2(tip + Vector2(0, AP), Vector2(AP, AP)), Color(1, 0.98, 0.92, 0.5))
 
 ## burning out (shaders/burn.gdshader): a body killed by fire chars, its ember cracks glow and cool, it crumbles to ash
 ## from the top over a few seconds, smoking and shedding embers; the fire's light dims with it
@@ -779,7 +799,7 @@ func _cm_presence(dt: float) -> void:
 		spr.position = sd * off * Vector2(1.0, 0.5)
 	spr.skew = lean * signf(sd.x if absf(sd.x) > 0.2 else float(face))
 	k += -sq
-	spr.scale = Vector2(4.0 * (1.0 - (k - 1.0) * 0.5) * (1.0 + sq * 0.5), 4.0 * k) * Iso.FIG
+	spr.scale = Vector2(4.0 * (1.0 - (k - 1.0) * 0.5) * (1.0 + sq * 0.5), 4.0 * k) * Iso.FIG   # 2x2-ok: Cursemark's own art (the fork), at its own pixel
 
 func _tick_status(dt: float) -> void:
 	stun = maxf(0.0, stun - dt)

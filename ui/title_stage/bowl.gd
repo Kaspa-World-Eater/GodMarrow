@@ -6,7 +6,8 @@ extends Node2D
 ## candles gutter, embers rise, ash falls.
 ## The stage API (ui/title.gd): order_at(p), label_at(i), hint(); T is the title (mode, fig_hover, order_i, t).
 
-const K := 4.0
+const K := 4.0   # a chapel px in screen px: the captured painting is 480 x 270 shown x4  # 2x2-ok: the chapel's coordinate unit (and its painting's grain until it is re-baked at 960 x 540), not an effect's cell
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7); every live effect here is drawn in it
 const MARROW := Color("#c9974a")
 const CARDS := []   # Derek 2026-10-05: "Remove the cards. They were never a good fit."
 const SHIFT := -100.0
@@ -18,8 +19,7 @@ var fx: Node2D
 var fx_back: Node2D
 var add_fx: Node2D
 var add_big: Node2D
-var grain: Node2D
-var grain_tex: Array = []
+var grain: ColorRect           # the film grain, in art pixels (an inline shader: 960 x 540 cells over the screen)
 var lit: ColorRect              # the live-lit chapel, or null (then the captured painting stands)
 var dust: Array = []           # specks in the cold shaft, seen only where it catches them
 var _w := Vector4.ONE
@@ -113,20 +113,16 @@ func _ready() -> void:
 	add_fx.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	add_fx.draw.connect(_draw_add)
 	add_child(add_fx)
-	grain = Node2D.new()
-	grain.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	grain = ColorRect.new()
 	grain.position.x = -SHIFT * K
-	grain.draw.connect(_draw_grain)
+	grain.size = Vector2(1920, 1080)
+	grain.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var gs := Shader.new()
+	gs.code = GRAIN_SHADER
+	var gm := ShaderMaterial.new()
+	gm.shader = gs
+	grain.material = gm
 	add_child(grain)
-	for f in 4:
-		var im := Image.create(480, 270, false, Image.FORMAT_RGBA8)
-		for i in 480 * 270:
-			var r := whash(i, f * 31 + 7)
-			if r < 0.07:
-				im.set_pixel(i % 480, i / 480, Color(0, 0, 0, 70.0 / 255.0))
-			elif r > 0.988:
-				im.set_pixel(i % 480, i / 480, Color(200 / 255.0, 170 / 255.0, 140 / 255.0, 18.0 / 255.0))
-		grain_tex.append(ImageTexture.create_from_image(im))
 	_glow = _linear_glow()
 
 func _process(dt: float) -> void:
@@ -192,7 +188,7 @@ func _process(dt: float) -> void:
 	fx_back.queue_redraw()
 	add_fx.queue_redraw()
 	add_big.queue_redraw()
-	grain.queue_redraw()
+	(grain.material as ShaderMaterial).set_shader_parameter("frame", float(int(floorf(t * 14.0)) % 4))
 
 func _snap(p: Vector2) -> Vector2:
 	return Vector2(floorf(p.x / K) * K, floorf(p.y / K) * K)
@@ -299,13 +295,36 @@ func _flame(n: CanvasItem, cx: float, top: float, k: float, seed: float) -> void
 	var lean := roundf(sin(t * 5.0 + seed) * 0.8 + k * 0.4 + Gust.dir() * g * (2.2 + sin(t * 13.0 + seed) * 0.8))
 	var tall := 3.0 + (1.0 if sin(t * 11.0 + seed * 3.0) > 0.3 else 0.0) - roundf(g * 1.6)
 	var gutter := g > 0.55 and sin(t * 17.0 + seed * 5.0) > 0.4
-	var R := func(x: float, y: float, w: float, h: float, c: Color) -> void:
-		n.draw_rect(Rect2(x * K, y * K, w * K, h * K), c)
-	R.call(cx + lean, fy - tall - 1.0, 1, 2, Color("#7a2a10")); R.call(cx - 1.0, fy - 2.0, 3, 3, Color("#7a2a10"))
-	R.call(cx + lean, fy - tall, 1, tall, Color("#d0601c")); R.call(cx, fy - 2.0, 1, 3, Color("#d0601c"))
+	# drawn in art pixels (the web's flame at twice the grain): a rounded dark halo, a body that narrows to a one-pixel
+	# tip on the lean side, a pointed core, a blue root
+	var o := (Vector2(cx, fy) * K / AP).round() * AP
+	var l := lean * 2.0
+	var T2 := tall * 2.0
+	var tip := l + (1.0 if lean > 0.0 else 0.0)
+	var dark := Color("#7a2a10")
+	var body := Color("#d0601c")
+	_a(n, o, tip, -T2 - 2.0, 1, 1, dark); _a(n, o, l, -T2 - 1.0, 2, 1, dark)
+	_a(n, o, -1, -4, 4, 1, dark); _a(n, o, -2, -3, 6, 4, dark); _a(n, o, -1, 1, 4, 1, dark)
+	_a(n, o, tip, -T2, 1, 1, body); _a(n, o, l, -T2 + 1.0, 2, T2 - 1.0, body)
+	_a(n, o, 0, -4, 2, 6, body)
 	if not gutter:
-		R.call(cx, fy - 1.0, 1, 2, Color("#ffc070"))
-	R.call(cx, fy + 1.0, 1, 1, Color("#2a3080"))
+		_a(n, o, 0, -2, 1, 1, Color("#ffc070")); _a(n, o, 0, -1, 2, 3, Color("#ffc070"))
+	_a(n, o, 0, 2, 2, 1, Color("#2a3080")); _a(n, o, 0, 3, 1, 1, Color("#2a3080"))
+
+## a rect of art pixels at o (screen px), x y w h counted in art pixels
+func _a(n: CanvasItem, o: Vector2, x: float, y: float, w: float, h: float, c: Color) -> void:
+	n.draw_rect(Rect2(o + Vector2(x, y) * AP, Vector2(w, h) * AP), c)
+
+## a speck: a bright art pixel, its right and lower neighbours at half (the web's one 4-px pixel, shaped, not a block)
+func _speck(n: CanvasItem, q: Vector2, c: Color) -> void:
+	n.draw_rect(Rect2(q, Vector2(AP, AP)), c)
+	var c2 := Color(c, c.a * 0.5)
+	n.draw_rect(Rect2(q + Vector2(AP, 0), Vector2(AP, AP)), c2)
+	n.draw_rect(Rect2(q + Vector2(0, AP), Vector2(AP, AP)), c2)
+
+## a point in chapel px, on the art-pixel grid on screen
+func _at(x: float, y: float) -> Vector2:
+	return (Vector2(x, y) * K / AP).round() * AP
 
 func _draw_fx() -> void:
 	for n in cand.size():
@@ -315,18 +334,20 @@ func _draw_fx() -> void:
 func _draw_back() -> void:
 	# the drop swelling on the god's chin, then falling, and the crowns it throws up
 	var sw := clampf(1.0 - drop_t / 2.4, 0.0, 1.0)
-	if sw > 0.3:
-		fx_back.draw_rect(Rect2(Vector2(chin.x, chin.y) * K, Vector2(K, K * (2.0 if sw > 0.75 else 1.0))), Color("#5e1016"))
-		if sw > 0.75:
-			fx_back.draw_rect(Rect2(Vector2(chin.x, chin.y + 1.0) * K, Vector2(K, K)), Color("#b83026"))
+	var ch := _at(chin.x, chin.y)
+	if sw > 0.75:   # the bead, full: dark, rounded below, the light caught low on it
+		_a(fx_back, ch, 0, 0, 2, 2, Color("#5e1016"))
+		_speck(fx_back, ch + Vector2(0, 2) * AP, Color("#b83026"))
+	elif sw > 0.3:  # the bead, gathering
+		_a(fx_back, ch, 0, 0, 2, 1, Color("#5e1016")); _a(fx_back, ch, 0, 1, 1, 1, Color("#5e1016"))
 	for d in drops:
-		var x := roundf(d["x"])
-		var y := roundf(d["y"])
-		fx_back.draw_rect(Rect2(Vector2(x, y - 3.0) * K, Vector2(K, 3.0 * K)), Color("#420a10"))
-		fx_back.draw_rect(Rect2(Vector2(x, y) * K, Vector2(K, 2.0 * K)), Color("#84181c"))
-		fx_back.draw_rect(Rect2(Vector2(x, y) * K, Vector2(K, K)), Color("#e8704e"))
+		# a thin trail widening to the drop, the drop, its lit head (in art pixels, so it falls in finer steps)
+		var q := _at(d["x"], d["y"])
+		_a(fx_back, q, 0, -6, 1, 4, Color("#420a10")); _a(fx_back, q, 0, -2, 2, 2, Color("#420a10"))
+		_a(fx_back, q, 0, 0, 2, 3, Color("#84181c")); _a(fx_back, q, 0, 3, 1, 1, Color("#84181c"))
+		_speck(fx_back, q, Color("#e8704e"))
 	for sp in sparks:
-		fx_back.draw_rect(Rect2(Vector2(roundf(sp["x"]), roundf(sp["y"])) * K, Vector2(K, K)), Color("#b83026") if sp["t"] < 0.15 else Color("#5e1016"))
+		_speck(fx_back, _at(sp["x"], sp["y"]), Color("#b83026") if sp["t"] < 0.15 else Color("#5e1016"))
 
 func _draw_add_big() -> void:
 	var o := Color8(255, 120, 50)
@@ -342,20 +363,28 @@ func _draw_add() -> void:
 		var bd: float = ((dd["x"] - 312.0) - (dd["y"] - 30.0) * 0.5) / 1.118
 		var sa: float = clampf(1.0 - absf(bd) / 30.0, 0.0, 1.0) * clampf(1.15 - dd["y"] / 170.0, 0.0, 1.0)
 		if sa > 0.08:
-			var dp := Vector2(roundf(dd["x"]), roundf(dd["y"])) * K
-			add_fx.draw_rect(Rect2(dp, Vector2(K, K)), Color(0.8 * sa, 0.88 * sa, 1.0 * sa))
+			_speck(add_fx, _at(dd["x"], dd["y"]), Color(0.8 * sa, 0.88 * sa, 1.0 * sa))
 	for m in motes:
 		var a: float = maxf(0.0, 1.0 - m["t"] / m["life"]) if m["ember"] else minf(1.0, m["t"]) * 0.5
-		var p := Vector2(roundf(m["x"]), roundf(m["y"])) * K
+		var p := _at(m["x"], m["y"])
 		var col := Color(1.0 * a, (120.0 + floorf(a * 60.0)) / 255.0 * a, 50.0 / 255.0 * a) if m["ember"] else Color(160 / 255.0 * a * 0.5, 140 / 255.0 * a * 0.5, 120 / 255.0 * a * 0.5)
-		add_fx.draw_rect(Rect2(p, Vector2(K, K)), col)
+		_speck(add_fx, p, col)
 
-func _draw_grain() -> void:
-	if grain_tex.is_empty():
-		return
-	var t: float = T.t
-	var g: Texture2D = grain_tex[int(floorf(t * 14.0)) % 4]
-	grain.draw_texture_rect(g, Rect2(0, 0, 480 * K, 270 * K), false)
+## the film grain (the web's: 7% of the pixels darkened, a few warm; four frames at 14 a second), one art pixel each
+const GRAIN_SHADER := """
+shader_type canvas_item;
+uniform float frame = 0.0;
+float gh(vec2 p) {
+	vec3 q = fract(vec3(p.xyx) * 0.1031);
+	q += dot(q, q.yzx + 33.33);
+	return fract((q.x + q.y) * q.z);
+}
+void fragment() {
+	vec2 c = floor(UV * vec2(960.0, 540.0));   // the art pixel: 2 x 2 screen px over the 1920 x 1080 stage
+	float r = gh(c + vec2(frame * 97.0, frame * 61.0 + 7.0));
+	COLOR = r < 0.07 ? vec4(0.0, 0.0, 0.0, 70.0 / 255.0) : (r > 0.988 ? vec4(200.0, 170.0, 140.0, 18.0) / 255.0 : vec4(0.0));
+}
+"""
 
 ## the strip right of the chapel: its own left side, mirrored about the face (x 340)
 func _draw_mirror(n: Node2D, tex: Texture2D) -> void:

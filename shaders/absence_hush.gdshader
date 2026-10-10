@@ -16,10 +16,10 @@ float vn(vec2 p) { vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3.0 - 2.0 
 float fbm(vec2 p) { return vn(p) * 0.55 + vn(p * 2.1 + 9.0) * 0.3 + vn(p * 4.3 + 3.0) * 0.15; }
 
 void fragment() {
-	vec2 px = floor(UV * rect_size / 4.0) * 4.0;
-	ivec2 g = ivec2(px / 4.0);
+	vec2 px = floor(UV * rect_size / 2.0) * 2.0;
+	ivec2 g = ivec2(px / 2.0);
 	float d = (B4[(g.y & 3) * 4 + (g.x & 3)] + 0.5) / 16.0;
-	vec2 off = px + 2.0 - rect_size * 0.5;                 // from the heart, in screen px
+	vec2 off = px + 1.0 - rect_size * 0.5;                 // from the heart, in screen px
 	vec2 q = off / (rect_size * 0.5);
 	float e = length(q) * 1.6;                              // the hole fills the inner part; the thinning ring the rest
 	float ang = atan(q.y, q.x * 0.5);
@@ -32,7 +32,7 @@ void fragment() {
 	float rot = k * 0.5 * sin(t * 0.7);
 	vec2 ro = vec2(off.x * cos(rot) - off.y * sin(rot), off.x * sin(rot) + off.y * cos(rot));
 	vec2 suv = SCREEN_UV + (ro * (1.0 + a) - off) * SCREEN_PIXEL_SIZE;
-	suv = (floor(suv / SCREEN_PIXEL_SIZE / 4.0) * 4.0 + 2.0) * SCREEN_PIXEL_SIZE;
+	suv = (floor(suv / SCREEN_PIXEL_SIZE / 2.0) * 2.0 + 1.0) * SCREEN_PIXEL_SIZE;   // read on the 2 x 2 grid
 	vec3 sc = texture(screen_tex, suv).rgb;
 	vec3 col = sc * (1.0 - smoothstep(0.0, 0.9, k) * 0.95);
 	if (k > 0.55 + d * 0.3) col = vec3(0.02, 0.012, 0.03);                      // the heart: nothing

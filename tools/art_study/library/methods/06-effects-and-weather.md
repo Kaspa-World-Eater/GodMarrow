@@ -17,10 +17,10 @@ Use this page for every effect, every liquid and every kind of weather or air.
   rule 5 (highlights a loaded brush dragged across, never square dabs).
 
 ## How it is done
-**The effects method** (STUDY, effects library): a flowing value field (warped fbm) snapped to a short ramp through
-the 4x4 ordered dither, in whole world pixels, lit by and lighting the scene. The liquid fire (`shaders/ground_fire.gdshader`)
-and the heat shimmer are the bar for detail. Size noise to the sprite's own texel grid; hold a creature's death frame
-while an effect plays on it; a pool must run out past the body that hides it.
+**The effects method** (STUDY, effects library): a flowing value field (warped fbm) snapped to a short ramp through the
+ordered (Bayer) dither, in whole world pixels on the 2 x 2 grid, lit by and lighting the scene. The liquid fire
+(`shaders/ground_fire.gdshader`) and the heat shimmer are the bar for detail. Size noise to the sprite's own texel grid;
+hold a creature's death frame while an effect plays on it; a pool must run out past the body that hides it.
 
 **Blood** (`tools/landkit/blood.py`, the same as `shaders/blood_pool.gdshader`, one blood everywhere):
 - `edge(px, py, seed, reach)`: a lobed seep with fingers that run further;

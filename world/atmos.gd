@@ -9,7 +9,8 @@ extends CanvasLayer
 ##  4. leaves shaken loose on the moor and in the woods, tumbling on the wind;
 ## One shared gust (Game.wind) moves leaves, dust and the flames.
 
-const WPX := 4.0             # screen px per world px
+const WPX := Iso.WPX         # screen px per web world px: a unit of length, never the drawn pixel
+const AP := 2.0              # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
 var zone: Zone
 var hero: Hero
 var dark: DarkLayer
@@ -43,7 +44,7 @@ func _ready() -> void:
 	add_canvas.draw.connect(_draw_add)
 	add_child(add_canvas)
 	if _halo == null:
-		_halo = _blob(9, 9, 1.5)
+		_halo = _blob(18, 18, 1.5)     # twice the texels, drawn at AP: the 2 x 2 grid
 
 func bind(z: Zone, h: Hero, d: DarkLayer) -> void:
 	zone = z
@@ -61,7 +62,7 @@ func bind(z: Zone, h: Hero, d: DarkLayer) -> void:
 	flames.bind(z)
 	air.bind(z, d, h)
 
-## a dithered white blob, the web's mist sprite (world px)
+## a dithered white blob, the web's mist sprite (texels of AP: its noise is laid at half rate, so the shape keeps its size)
 static func _blob(w: int, h: int, soft: float) -> Texture2D:
 	var BAY := [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
@@ -72,13 +73,26 @@ static func _blob(w: int, h: int, soft: float) -> Texture2D:
 			var d := sqrt(dx * dx + dy * dy)
 			if d >= 1.0:
 				continue
-			var n := (sin(i * 0.37 + j * 0.91) + sin(i * 0.13 - j * 0.29 + 2.0)) * 0.12
+			var n := (sin(i * 0.185 + j * 0.455) + sin(i * 0.065 - j * 0.145 + 2.0)) * 0.12
 			var v := pow(1.0 - d, soft) + n
 			if v <= (BAY[((j & 3) << 2) + (i & 3)] + 0.5) / 16.0 * 0.9:
 				continue
 			img.set_pixel(i, j, Color.WHITE)
 	var tex := ImageTexture.create_from_image(img)
 	return tex
+
+## a mote on the 2 x 2 grid: a bright art pixel with its right and lower neighbours at half; the old one-pixel mote's
+## extent, shaped, not a square block (world/weather.gd and world/sand_storm.gd draw theirs with it too)
+static func mote(cv: CanvasItem, p: Vector2, c: Color) -> void:
+	var q := (p / AP).floor() * AP
+	cv.draw_rect(Rect2(q, Vector2(AP, AP)), c)
+	var h := Color(c, c.a * 0.5)
+	cv.draw_rect(Rect2(q + Vector2(AP, 0), Vector2(AP, AP)), h)
+	cv.draw_rect(Rect2(q + Vector2(0, AP), Vector2(AP, AP)), h)
+
+## a soul-light's core in art pixels: [x, y, w, h, alpha]
+const SOUL_CORE := [[1, 0, 2, 4, 0.95], [0, 1, 1, 2, 0.95], [3, 1, 1, 2, 0.95], [0, 0, 1, 1, 0.5], [3, 0, 1, 1, 0.5],
+	[0, 3, 1, 1, 0.5], [3, 3, 1, 1, 0.5], [-2, 1, 2, 2, 0.5], [4, 1, 2, 2, 0.5]]
 
 func _woody() -> bool:
 	var s: String = str(zone.d.get("theme", "")) + " " + zone.id
@@ -209,18 +223,18 @@ func _draw_all() -> void:
 				continue
 			var f3: float = minf(1.0, minf(d["t"] / 0.8, (d["life"] - d["t"]) / 1.2)) * minf(1.0, (l3 - 0.55) * 2.2) * (0.55 + 0.45 * sin(t * 3.0 + d["ph"]))
 			var c3: Color = L3[1]
-			canvas.draw_rect(Rect2(q.snapped(Vector2(WPX, WPX)), Vector2(WPX, WPX)), Color(0.78 * c3.r + 0.2, 0.77 * c3.g + 0.2, 0.73 * c3.b + 0.2, 0.55 * f3))
+			mote(canvas, q, Color(0.78 * c3.r + 0.2, 0.77 * c3.g + 0.2, 0.73 * c3.b + 0.2, 0.55 * f3))
 	# 3. soul-lights: a pale core and a breath of halo, bobbing slowly
 	for s in souls:
 		var f4 := minf(1.0, minf(s["t"] / 2.0, (s["life"] - s["t"]) / 3.0))
 		var b := 0.7 + 0.3 * sin(t * 2.1 + s["ph"])
 		var p4: Vector2 = xf * (Iso.to_screen(s["p"]) + Vector2(0, (-float(s["h"]) + sin(t * 0.9 + s["ph"]) * 2.0) * WPX))
-		p4 = p4.snapped(Vector2(WPX, WPX))
-		var hs := _halo.get_size() * WPX
-		canvas.draw_texture_rect(_halo, Rect2(p4 - hs / 2.0, hs), false, Color(0.51, 0.75, 0.69, 0.35 * f4 * b))
-		canvas.draw_rect(Rect2(p4, Vector2(2, 2) * WPX), Color(0.9, 0.96, 0.93, 0.95 * f4 * b))
-		canvas.draw_rect(Rect2(p4 + Vector2(-WPX, 0), Vector2(WPX, 2 * WPX)), Color(0.9, 0.96, 0.93, 0.5 * f4 * b))
-		canvas.draw_rect(Rect2(p4 + Vector2(2 * WPX, 0), Vector2(WPX, 2 * WPX)), Color(0.9, 0.96, 0.93, 0.5 * f4 * b))
+		p4 = (p4 / AP).floor() * AP
+		var hs := _halo.get_size() * AP
+		canvas.draw_texture_rect(_halo, Rect2(((p4 - hs / 2.0) / AP).floor() * AP, hs), false, Color(0.51, 0.75, 0.69, 0.35 * f4 * b))
+		# the core: a rounded light four art pixels across, its corners and two side lobes at half (the old 16 x 8 extent)
+		for cl in SOUL_CORE:
+			canvas.draw_rect(Rect2(p4 + Vector2(cl[0], cl[1]) * AP, Vector2(cl[2], cl[3]) * AP), Color(0.9, 0.96, 0.93, cl[4] * f4 * b))
 	# eye-shine (zz_zz_cine76.js): beyond the pool, what watches you shows as two points catching the lantern
 	var night := (1.0 - dk) if outdoor else 1.0
 	if night >= 0.35 and not hero.dead and not Sfx.cm:     # (Cursemark assets): world/cm_eyes.gd has the eyes
@@ -259,25 +273,29 @@ func _draw_all() -> void:
 			var gap := 12.0 if sz.x > 136.0 else 8.0
 			var ec := ecol
 			ec.a = ea
-			canvas.draw_rect(Rect2(Vector2(cx - gap, cy).snapped(Vector2(WPX, WPX)), Vector2(WPX, WPX)), ec)
-			canvas.draw_rect(Rect2(Vector2(cx + gap - WPX, cy).snapped(Vector2(WPX, WPX)), Vector2(WPX, WPX)), ec)
+			mote(canvas, Vector2(cx - gap, cy), ec)
+			mote(canvas, Vector2(cx + gap - 2.0 * AP, cy), ec)
 	if flames and is_instance_valid(flames):   # embers and smoke off every flame (world/flames.gd)
 		flames.draw_air(canvas, xf, _light)
 	# dusk embers: small orange motes lifting off the ash (matter, not light)
 	for e in embers:
 		var f6 := minf(1.0, minf(e["t"] / 0.5, (e["life"] - e["t"]) / 1.5))
-		canvas.draw_rect(Rect2((e["p"] as Vector2).snapped(Vector2(WPX, WPX)), Vector2(WPX, WPX)), Color(0.85, 0.46, 0.18, 0.75 * f6))
-	# 4. leaves: two-pixel flakes that flip as they tumble, lit by what they pass through
+		mote(canvas, e["p"], Color(0.85, 0.46, 0.18, 0.75 * f6))
+	# 4. leaves: small flakes on the 2 x 2 grid that flip as they tumble (a lozenge face-on, a slanted sliver edge-on), lit by
+	# what they pass through
 	var LEAF := [[Color("#6e3a1c"), Color("#9a5a2a")], [Color("#5a5a2a"), Color("#7c7a3a")], [Color("#3e2a1c"), Color("#5e4630")]]
 	for l in leaves:
-		var p5: Vector2 = (l["p"] as Vector2).snapped(Vector2(WPX, WPX))
+		var p5: Vector2 = ((l["p"] as Vector2) / AP).floor() * AP
 		var fl := sin(t * 6.0 + l["ph"]) > 0.0
 		var L5 := _light(p5)
 		var c5: Color = LEAF[l["col"]][1 if fl else 0]
 		c5.a = minf(1.0, minf(l["t"] / 0.5, (l["life"] - l["t"]) / 0.8)) * minf(1.0, 0.35 + float(L5[0]) * 0.7)
-		canvas.draw_rect(Rect2(p5, Vector2((2 if fl else 1) * WPX, WPX)), c5)
-		if not fl:
-			canvas.draw_rect(Rect2(p5 + Vector2(0, WPX), Vector2(WPX, WPX)), c5)
+		if fl:
+			canvas.draw_rect(Rect2(p5 + Vector2(AP, 0), Vector2(3.0 * AP, AP)), c5)
+			canvas.draw_rect(Rect2(p5 + Vector2(0, AP), Vector2(3.0 * AP, AP)), c5)
+		else:
+			canvas.draw_rect(Rect2(p5 + Vector2(AP, 0), Vector2(AP, 2.0 * AP)), c5)
+			canvas.draw_rect(Rect2(p5 + Vector2(0, 2.0 * AP), Vector2(AP, 2.0 * AP)), c5)
 
 
 ## the additive layer: the dawn's gold dust (light added, never a glow on an attack)
@@ -287,4 +305,4 @@ func _draw_add() -> void:
 	var dk := Game.day_k() if zone.d.get("outdoor", false) else 0.0
 	for mo in motes:
 		var f2 := minf(1.0, minf(mo["t"] / 0.8, (mo["life"] - mo["t"]) / 1.2)) * (0.6 + 0.4 * sin(t * 3.0 + mo["ph"]))
-		add_canvas.draw_rect(Rect2((mo["p"] as Vector2).snapped(Vector2(WPX, WPX)), Vector2(WPX, WPX)), Color(0.5, 0.4, 0.18, 0.7 * f2))
+		mote(add_canvas, mo["p"], Color(0.5, 0.4, 0.18, 0.7 * f2))

@@ -14,6 +14,8 @@ const VIOLET_K := Color8(74, 50, 104)
 const WARP := Color8(168, 192, 224)
 const PALE := Color8(232, 226, 208)
 const BONE := Color8(207, 198, 174)
+const BONE_D := Color8(150, 142, 122)
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7)
 
 func _process(_dt: float) -> void:
 	if book == null or (book.fx_air != self and book.fx_floor != self):
@@ -22,7 +24,35 @@ func _process(_dt: float) -> void:
 	queue_redraw()
 
 static func S(tp: Vector2, z: float = 0.0) -> Vector2:
-	return Iso.to_screen(tp) + Vector2(0, -z * 4.0)
+	return Iso.to_screen(tp) + Vector2(0, -z * Iso.WPX)
+
+## a point laid on the art grid (2 x 2 px), in this node's px
+func _snap(p: Vector2) -> Vector2:
+	var g := global_position
+	return Vector2(floorf((p.x + g.x) / AP) * AP, floorf((p.y + g.y) / AP) * AP) - g
+
+## a single bright mark (one old 4 px pixel): a bright art pixel, its right and lower neighbours at half alpha
+func spark(p: Vector2, col: Color) -> void:
+	var q := _snap(p)
+	var h := Color(col, col.a * 0.5)
+	draw_rect(Rect2(q, Vector2(AP, AP)), col)
+	draw_rect(Rect2(q + Vector2(AP, 0), Vector2(AP, AP)), h)
+	draw_rect(Rect2(q + Vector2(0, AP), Vector2(AP, AP)), h)
+
+## a mote: a bright art pixel with a half-alpha one below it (as the flames' embers)
+func ember(p: Vector2, col: Color) -> void:
+	var q := _snap(p)
+	draw_rect(Rect2(q, Vector2(AP, AP)), col)
+	draw_rect(Rect2(q + Vector2(0, AP), Vector2(AP, AP)), Color(col, col.a * 0.5))
+
+## a trap in flight: a chip of bone 8 px across on the art grid, its corners cut and its lower edge in shade
+func chip(p: Vector2, col: Color, shade: Color) -> void:
+	var q := _snap(p)
+	for y in 4:
+		for x in 4:
+			if (x == 0 or x == 3) and (y == 0 or y == 3):
+				continue
+			draw_rect(Rect2(q + Vector2(x, y) * AP, Vector2(AP, AP)), shade if y == 3 or (y == 2 and x == 3) else col)
 
 func ell(c: Vector2, R: float, col: Color, w: float = 2.0, filled: bool = false) -> void:
 	var rx = R * Iso.HX * 1.414
@@ -137,7 +167,7 @@ func _air() -> void:
 	for th in b.throws:
 		var kt = clampf(th["t"] / th["dur"], 0.0, 1.0)
 		var p4 = S((th["from"] as Vector2).lerp(th["to"], kt), 18.0 + sin(kt * PI) * 22.0)
-		draw_rect(Rect2(p4 - Vector2(4, 4), Vector2(8, 8)), BONE)
+		chip(p4 - Vector2(2, 2) * AP, BONE, BONE_D)
 	# claw marks: three thin rakes; the arc and the thrust as a single pale cut
 	for c in b.clawfx:
 		var kc = clampf(c["t"] / 0.2, 0.0, 1.0)
@@ -167,7 +197,7 @@ func _air() -> void:
 	# motes of her breath
 	for m in b.motes:
 		var km = clampf(m["t"] / 0.4, 0.0, 1.0)
-		draw_rect(Rect2(S(m["tp"], m["z"]) - Vector2(1.5, 1.5), Vector2(3, 3)), Color(m["col"], 0.8 * km))
+		ember(S(m["tp"], m["z"]) - Vector2(AP, AP) * 0.5, Color(m["col"], 0.8 * km))
 	# the haze wrapped round her (The Hanged Man reversed)
 	if b.haze_mantle > 0.0:
 		ell(S(b.hero.tp), 1.9, Color(WARP, 0.35), 2.0)

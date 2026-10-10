@@ -39,7 +39,8 @@ only the paint does.
 2. **Blender renders the passes** (`blend_scene.py` for one camera, `blend_tiles.py` for many tiles in one build):
    normal, position, occlusion, material, the moon's light and shadow, the lamps' light, sky view, reflection, object
    ids, all saved to `passes.npz` in game coordinates. The orthographic camera matches the game's projection pixel for
-   pixel (18 × 9 px a yard on the ground, 21 px a yard of height; `K = 25.46` px a yard on the screen's axes).
+   pixel at zoom 1 (18 × 9 px a yard on the ground, 21 px a yard of height; `K = 25.46` px a yard on the screen's
+   axes). Bakes render at zoom 2 (`RES = 2`: 36 × 18 px a yard, 42 of height), for the 2 x 2 grid.
 3. **A painter paints them** to the painted standard: `paint3d.py` (built things), `paint_shore.py` (sand, sea, basalt,
    bone, the dead), `paint_cave.py` (fire-lit interiors: stepped light zones, flames as tongues, carved faces, the pool).
 4. **The frame is measured:** `cine_check.py` scores the measurable cinematography rules; the value-only render proves

@@ -106,8 +106,8 @@ I am folding it in now. I have not looked.
   bone, pick marks in rows, bays off them, stairs going down in flights.
 - **The walls:** each gallery one sermon in one kind of bone (thigh-bones ends-out banded with skulls; jaws in arcs;
   the Cup Wall), a face about 2.5 yards high with loose bone heaped to the roof behind it. A skull is a fifth of a yard
-  (4 px), so skull bands and caps are real form; a thigh-bone's end is a pixel or two, so the courses between are
-  fine grain (MASTER_RULES 0.3).
+  (about 7 art pixels on the 2 x 2 grid), so skull bands and caps are real form; a thigh-bone's end is two to four
+  pixels, so the courses between are fine grain (MASTER_RULES 0.3).
 - **The floor is never bare:** bone grit and dust drifted against the walls, fallen finger-bones and teeth, runs of
   old wax, chalked marks, knotted cords, pilgrims' badges, a copper in a crack, a trodden path down each gallery.
 - **Dry under a fen:** the Fen's water does not wet, so where it seeps through the roof it creeps down the bone as a

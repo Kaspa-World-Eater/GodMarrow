@@ -62,8 +62,8 @@ burns about a third of the loop (`LIFE = 0.3`) and dies; a faint cold glow on th
 `ai_world.gd wildfire()` (a flame front over dry ground with the wind, scorch with dying embers);
 `shaders/radiant_blaze.gdshader` (white core, gold body, torn tongues, heat shimmer); `shaders/burn.gdshader` (char,
 ember cracks sized to the sprite's texel grid, crumble to ash; hold the death frame while it burns). One method: a value
-field snapped to a short ramp with the 4x4 ordered dither, lit by and lighting the scene. See [effects and
-weather](../methods/06-effects-and-weather.md) and [light](../methods/04-light.md).
+field snapped to a short ramp with the ordered (Bayer) dither on the 2 x 2 grid, lit by and lighting the scene. See
+[effects and weather](../methods/06-effects-and-weather.md) and [light](../methods/04-light.md).
 
 ## Variants and parameters
 | Piece | Where | Key parameters |

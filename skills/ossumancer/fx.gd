@@ -2,10 +2,10 @@ extends Node2D
 ## The Ossuarch's transient things, drawn from his skill book's lists every frame (skills/ossumancer/*.gd).
 ## On the floor: grit where bone tears out of the ground. Above: the Mantle (shards hanging about him in a loose,
 ## slow drift, more as it fills), shards flying in to him, Bone Lances grown dead straight, small words.
-## Bone is matter, never light: pale, flat, stepped at the pixel grain. No glow, no trails.
+## Bone is matter, never light: pale, flat, stepped at the art pixel (the 2 x 2 grid). No glow, no trails.
 
 const U := preload("res://ui/uikit.gd")
-const P := 3.0                # the pixel grain: the heroes' own (3 scene px an art pixel)
+const AP := 2.0   # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7); was a 3-px grain and 4-px cells
 var book
 var floor_mode := false
 
@@ -58,14 +58,14 @@ func _process(dt: float) -> void:
 		spear_cv.queue_redraw()
 
 static func S(tp: Vector2, z: float = 0.0) -> Vector2:
-	return Iso.to_screen(tp) + Vector2(0, -z * 4.0)
+	return Iso.to_screen(tp) + Vector2(0, -z * Iso.WPX)
 
 func px(p: Vector2, col: Color, n: float = 1.0) -> void:
-	draw_rect(Rect2(Vector2(floorf(p.x / P) * P, floorf(p.y / P) * P), Vector2(P * n, P * n)), col)
+	draw_rect(Rect2(Vector2(floorf(p.x / AP) * AP, floorf(p.y / AP) * AP), Vector2(AP * n, AP * n)), col)
 
 ## a sliver of bone from a to b in the grain: a light edge on a darker body
 func sliver(a: Vector2, b: Vector2, col: Color, w: float = 1.0) -> void:
-	var n := maxi(1, int(a.distance_to(b) / P))
+	var n := maxi(1, int(a.distance_to(b) / AP))
 	for i in n + 1:
 		var q := a.lerp(b, float(i) / n)
 		px(q, col if i < n else BONE, w)
@@ -259,19 +259,19 @@ func _spear_trail(dt: float) -> void:
 	for j in range(k, spear_lights.size()):
 		spear_lights[j].visible = false
 
-## a line and a disc in whole pixels (the world's grid), for sparks and splinters
+## a line one art pixel wide and a disc, in whole art pixels (the 2 x 2 grid), for sparks and splinters
 func _px_line(cv: CanvasItem, a: Vector2, b: Vector2, col: Color) -> void:
-	var steps := maxi(1, int(a.distance_to(b) / 4.0))
+	var steps := maxi(1, int(a.distance_to(b) / AP))
 	for j in steps + 1:
-		var q := (a.lerp(b, float(j) / steps) / 4.0).floor()
-		cv.draw_rect(Rect2(q * 4.0, Vector2(4, 4)), col)
+		var q := (a.lerp(b, float(j) / steps) / AP).floor()
+		cv.draw_rect(Rect2(q * AP, Vector2(AP, AP)), col)
 
 func _px_disc(cv: CanvasItem, c: Vector2, r: float, col: Color) -> void:
-	var n := int(ceilf(r / 4.0))
+	var n := int(ceilf(r / AP))
 	for y in range(-n, n + 1):
 		for x in range(-n, n + 1):
-			if Vector2(x, y).length() * 4.0 <= r:
-				cv.draw_rect(Rect2(((c / 4.0).floor() + Vector2(x, y)) * 4.0, Vector2(4, 4)), col)
+			if Vector2(x, y).length() * AP <= r:
+				cv.draw_rect(Rect2(((c / AP).floor() + Vector2(x, y)) * AP, Vector2(AP, AP)), col)
 
 ## a ring in whole pixels (dotted, every other point), not a smooth line over the picture
 func _px_ring(pts: PackedVector2Array, col: Color) -> void:
@@ -279,13 +279,13 @@ func _px_ring(pts: PackedVector2Array, col: Color) -> void:
 	for i in pts.size() - 1:
 		var a: Vector2 = pts[i]
 		var b: Vector2 = pts[i + 1]
-		var steps := maxi(1, int(a.distance_to(b) / 4.0))
+		var steps := maxi(1, int(a.distance_to(b) / AP))
 		for j in steps:
-			var q := (a.lerp(b, float(j) / steps) / 4.0).floor()
+			var q := (a.lerp(b, float(j) / steps) / AP).floor()
 			if seen.has(q) or int(q.x + q.y) % 2 == 1:
 				continue
 			seen[q] = true
-			spear_cv.draw_rect(Rect2(q * 4.0, Vector2(4, 4)), col)
+			spear_cv.draw_rect(Rect2(q * AP, Vector2(AP, AP)), col)
 
 func _draw_spears() -> void:
 	if floor_mode or SPEAR_TEX == null or book == null or book.zone == null or book.hero == null:
@@ -367,7 +367,7 @@ func spear(c: Vector2, u: Vector2, tier: int, k: float, flying: bool) -> void:
 	if flying:
 		var t: float = book.time
 		var n := Vector2(-u.y, u.x)
-		# the streak, in whole pixels (the title's method): a taper behind the spear thinned by the 4x4 ordered dither,
+		# the streak, in whole art pixels (the title's method): a taper behind the spear thinned by the 4x4 ordered dither,
 		# so it fades in steps as everything else does, never a smooth smear laid over the picture
 		var L := half_len * 3.0
 		var w0 := (4.0 + 1.2 * tier) * sc
@@ -379,20 +379,20 @@ func spear(c: Vector2, u: Vector2, tier: int, k: float, flying: bool) -> void:
 			var o := -wq
 			while o <= wq:
 				var pp := tail - u * L * q0 + n * o
-				var g := Vector2i(int(floorf(pp.x / 4.0)), int(floorf(pp.y / 4.0)))
+				var g := Vector2i(int(floorf(pp.x / AP)), int(floorf(pp.y / AP)))
 				var th := float(B4[(g.y & 3) * 4 + (g.x & 3)]) / 16.0
 				var edge := absf(o) / maxf(1.0, wq)
 				if dens * (1.0 - edge * 0.7) > th:
-					cv.draw_rect(Rect2(Vector2(g) * 4.0, Vector2(4, 4)), Color(STREAK, 0.85) if edge < 0.35 and q0 < 0.4 else Color(STREAK, 0.5))
-				o += 4.0
-			q0 += 4.0 / maxf(8.0, L)
+					cv.draw_rect(Rect2(Vector2(g) * AP, Vector2(AP, AP)), Color(STREAK, 0.85) if edge < 0.35 and q0 < 0.4 else Color(STREAK, 0.5))
+				o += AP
+			q0 += AP / maxf(8.0, L)
 		# its shadow on the ground below, a dithered smudge that runs with it
-		var gnd: Vector2 = c + Vector2(0, 8.0 * 4.0)
-		for sx in range(-int(half_len / 4.0), int(half_len / 4.0) + 1):
-			var sp2 := gnd + u * float(sx) * 4.0 * 0.9
-			var gg := Vector2i(int(floorf(sp2.x / 4.0)), int(floorf(sp2.y / 4.0)))
+		var gnd: Vector2 = c + Vector2(0, 8.0 * Iso.WPX)
+		for sx in range(-int(half_len / AP), int(half_len / AP) + 1):
+			var sp2 := gnd + u * float(sx) * AP * 0.9
+			var gg := Vector2i(int(floorf(sp2.x / AP)), int(floorf(sp2.y / AP)))
 			if (gg.x + gg.y) % 2 == 0:
-				cv.draw_rect(Rect2(Vector2(gg) * 4.0, Vector2(4, 4)), Color(0, 0, 0, 0.28))
+				cv.draw_rect(Rect2(Vector2(gg) * AP, Vector2(AP, AP)), Color(0, 0, 0, 0.28))
 	cv.draw_set_transform(c, 0.0, Vector2(sc, sc))
 	# bone, not paper: toned down from white so it takes the scene's light rather than glowing on top of it
 	cv.draw_texture_rect_region(SPEAR_TEX, Rect2(-float(an[0]), -float(an[1]), r[2], r[3]), Rect2(r[0], r[1], r[2], r[3]), Color(0.88, 0.85, 0.78))
@@ -404,21 +404,22 @@ func spear(c: Vector2, u: Vector2, tier: int, k: float, flying: bool) -> void:
 ## outline. From tier 1 a faint warmth of marrow about it that deepens with each tier (the user asked for this
 ## subtle glow, 2026-09-30); at tier 3 amber marrow shows through the core of the shaft.
 func lance(c: Vector2, u: Vector2, tier: int, k: float) -> void:
-	var half := int((12.0 + 4.0 * tier) * k)          # art pixels from the middle to either end
-	var head := int((6 + 2 * tier) * clampf(k, 0.6, 1.0))
+	# (sized as it was on the old 3-px grain: one and a half art pixels for each of those)
+	var half := int((18.0 + 6.0 * tier) * k)          # art pixels from the middle to either end
+	var head := int((9 + 3 * tier) * clampf(k, 0.6, 1.0))
 	var n := Vector2(-u.y, u.x)
 	if n.y > 0.0:
 		n = -n                                         # n points up the screen: the lit side
 	if tier >= 1:
 		for ring in 3:
-			var rr := (half + 5.0 - ring * 2.5) * P
-			var ww := (1.5 + tier * 1.2 - ring * 0.6) * P
+			var rr := half * AP + 15.0 - ring * 7.5     # px
+			var ww := 4.5 + tier * 3.6 - ring * 1.8     # px
 			var pts := PackedVector2Array()
 			for a_i in 20:
 				var a := a_i / 20.0 * TAU
 				pts.append(c + u * cos(a) * rr + n * sin(a) * ww)
 			draw_colored_polygon(pts, Color(1.0, 0.86, 0.62, 0.03 * tier))
-	var sw := 0 if tier < 2 else 1                     # half-width of the shaft (cells beside the core)
+	var sw := 1 if tier < 2 else 2                     # half-width of the shaft (cells beside the core)
 	var OUT := Color(0.16, 0.14, 0.12)
 	var AMBER := Color(0.86, 0.62, 0.3)
 	for i in range(-half, half + 1):
@@ -427,12 +428,12 @@ func lance(c: Vector2, u: Vector2, tier: int, k: float) -> void:
 		var barb := false
 		if from_tip < head:
 			# the head: widest at its base, straight taper to the point
-			hw = int(round((sw + 2.0) * float(from_tip) / head))
+			hw = int(round((sw + 3.0) * float(from_tip) / head))
 			barb = from_tip == head - 1
-		elif (i + half) % 5 == 0 and i > -half + 1:
+		elif (i + half) % 7 == 0 and i > -half + 1:
 			hw = sw + 1                                  # a knuckle of the spine
 		for j in range(-hw - 1, hw + 2):
-			var q := c + u * i * P + n * j * P
+			var q := c + u * i * AP + n * j * AP
 			var col := BONE_M
 			if absi(j) == hw + 1:
 				col = OUT
@@ -442,14 +443,14 @@ func lance(c: Vector2, u: Vector2, tier: int, k: float) -> void:
 				col = BONE_D
 			if tier >= 3 and from_tip >= head and j == 0:
 				col = BONE_M.lerp(AMBER, 0.55)
-			elif tier == 2 and from_tip >= head and j == 0 and (i + half) % 5 == 0:
+			elif tier == 2 and from_tip >= head and j == 0 and (i + half) % 7 == 0:
 				col = BONE_M.lerp(AMBER, 0.4)
-			draw_rect(Rect2(Vector2(floorf(q.x / P) * P, floorf(q.y / P) * P), Vector2(P, P)), col)
+			draw_rect(Rect2(Vector2(floorf(q.x / AP) * AP, floorf(q.y / AP) * AP), Vector2(AP, AP)), col)
 		if barb:   # two barbs swept back from the head's base
 			for side in [-1, 1]:
-				for b in 2:
-					var q2: Vector2 = c + u * (i - 1 - b) * P + n * side * (sw + 2 + b) * P
-					draw_rect(Rect2(Vector2(floorf(q2.x / P) * P, floorf(q2.y / P) * P), Vector2(P, P)), BONE if side > 0 else BONE_D)
+				for b in 3:
+					var q2: Vector2 = c + u * (i - 1 - b) * AP + n * side * (sw + 3 + b) * AP
+					draw_rect(Rect2(Vector2(floorf(q2.x / AP) * AP, floorf(q2.y / AP) * AP), Vector2(AP, AP)), BONE if side > 0 else BONE_D)
 
 
 ## The Bone Blade (skills/ossumancer/tree_count.gd): while he charges, bone grows out over the head of his weapon, longer

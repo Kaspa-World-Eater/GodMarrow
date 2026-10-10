@@ -25,11 +25,11 @@ vec3 ramp(float v) {
 }
 
 void fragment() {
-	vec2 px = floor(UV * rect_size / 4.0) * 4.0;
-	ivec2 g = ivec2(px / 4.0);
+	vec2 px = floor(UV * rect_size / 2.0) * 2.0;
+	ivec2 g = ivec2(px / 2.0);
 	float d = (B4[(g.y & 3) * 4 + (g.x & 3)] + 0.5) / 16.0;
 	vec2 c = rect_size * 0.5;
-	vec2 q = (px + 2.0 - c) / half_px;
+	vec2 q = (px + 1.0 - c) / half_px;
 	float r = length(q);
 	vec2 dir = q / max(r, 0.001);
 	float edge = 0.8 + 0.28 * fbm(dir * 2.0 + seed);
@@ -51,7 +51,7 @@ void fragment() {
 		for (int i = 0; i < 32; i++) {
 			vec4 pr = prints[i];
 			if (pr.w <= 0.0) continue;
-			vec2 dv = (px + 2.0 - pr.xy) * vec2(1.0, 1.7);
+			vec2 dv = (px + 1.0 - pr.xy) * vec2(1.0, 1.7);
 			float dd = length(dv);
 			float fill = smoothstep(4.0, 14.0, pr.z);                       // seconds until the wind fills it
 			if (dd < 10.0 * (1.0 - fill * 0.5)) v = mix(0.12, v, fill);

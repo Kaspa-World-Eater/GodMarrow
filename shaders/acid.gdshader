@@ -18,8 +18,8 @@ float vn(vec2 p) { vec2 i = floor(p), f = fract(p); vec2 u = f * f * (3.0 - 2.0 
 float fbm(vec2 p) { return vn(p) * 0.55 + vn(p * 2.1 + 9.0) * 0.3 + vn(p * 4.3 + 3.0) * 0.15; }
 
 void fragment() {
-	vec2 px = floor(UV * rect_size / 4.0) * 4.0;
-	ivec2 g = ivec2(px / 4.0);
+	vec2 px = floor(UV * rect_size / 2.0) * 2.0;
+	ivec2 g = ivec2(px / 2.0);
 	float d = B4[(g.y & 3) * 4 + (g.x & 3)] / 16.0;
 	vec2 c = vec2(rect_size.x * 0.5, fume_h + half_px.y);
 	vec2 q = (px - c) / half_px;

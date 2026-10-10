@@ -23,10 +23,10 @@ vec3 tone(float l) {               // the glare's four tones: burnt gold, gold, 
 }
 
 void fragment() {
-	vec2 px = floor(UV * rect_size / 4.0) * 4.0;
-	ivec2 g = ivec2(px / 4.0);
+	vec2 px = floor(UV * rect_size / 2.0) * 2.0;
+	ivec2 g = ivec2(px / 2.0);
 	float d = (B4[(g.y & 3) * 4 + (g.x & 3)] + 0.5) / 16.0;
-	vec2 q = (px + 2.0 - rect_size * 0.5) / (rect_size * 0.5);
+	vec2 q = (px + 1.0 - rect_size * 0.5) / (rect_size * 0.5);
 	float e = length(q);
 	float n = fbm(px * 0.03 + vec2(t * 0.4, 0.0));
 	float k = (1.0 - smoothstep(0.45, 1.0, e + (n - 0.5) * 0.35)) * life;

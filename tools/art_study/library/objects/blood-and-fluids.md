@@ -23,10 +23,10 @@ in `fen_ground.py` and `shaders/lake.gdshader`, sap, wax tears and pus.
 - `edge(px, py, seed, reach=0.6)`: a lobed edge `0.75 + 0.35 fbm(2.2)` plus fingers that run further,
   `clip((fbm(6) - 0.45) * 2)^2 * 0.6`;
 - `shade(depth, px, py, sx, sy, T, dry, light_side, light)`: value `depth * 0.7 + churn * 0.35` (a slow fbm churn),
-  snapped through the 4x4 ordered dither to a short ramp `C0..C3` (near-black clot `(0.09, 0.01, 0.02)`, dark red,
-  the body, a lit red `(0.6, 0.08, 0.08)`); drying pulls it darker and toward `DRIED`; a wet rim (`WET`) on the edge
-  toward the lantern; a few glints on wet depth; a dried edge cracks; lit only by what lights it
-  (`0.35 + light * 0.75`). No red light: blood never glows.
+  snapped through the ordered (Bayer) dither, on the 2 x 2 grid, to a short ramp `C0..C3` (near-black clot
+  `(0.09, 0.01, 0.02)`, dark red, the body, a lit red `(0.6, 0.08, 0.08)`); drying pulls it darker and toward `DRIED`;
+  a wet rim (`WET`) on the edge toward the lantern; a few glints on wet depth; a dried edge cracks; lit only by what
+  lights it (`0.35 + light * 0.75`). No red light: blood never glows.
 - The shader version runs it from where a body fell (`spread`, `dry`, `fade`, `light_dir`, `tint` for bile and ichor).
 
 **Blood pools of the glade** (`tools/landkit/fen_ground.py:paint`, the pools levelled at their own rims by `height`):
