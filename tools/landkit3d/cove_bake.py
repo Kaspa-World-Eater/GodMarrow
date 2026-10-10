@@ -40,8 +40,8 @@ SCALE = 4 // RES                                                          # pain
 CW, CH = 320, 176                                                         # a chunk, engine px (bog_bake.py)
 TA = 2                                                                    # chunks along each side of a rendered tile
 MX, MY = 96, 64                                                           # a tile's margin each side
-O = -108.0                                                                # the zone's (0, 0) corner in the world (yards)
-W = H = 145                                                               # the zone, tiles (yards)
+O = -114.0                                                                # the zone's (0, 0) corner in the world (yards)
+W = H = 166                                                               # the zone, tiles (yards) (was 145: the cove twice the size)
 HZ0, HK = -1.0, 0.05                                                      # the height map's byte: z = v * HK + HZ0
 BAND = 0.5
 PAD = 4

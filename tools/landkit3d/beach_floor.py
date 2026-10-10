@@ -203,7 +203,7 @@ def dune_relief(s, t):
     fore = _dune(s, fc, fh * (1 - 0.8 * blow), 9.0, 4.2)
     fore = fore - 0.6 * blow * np.exp(-((s - fc - 1.0) / 2.6) ** 2)
     # dunes and swales inland of it, each its own height and crest line, the swales between them deep enough to hide in
-    ph = (s - 26.0) / 9.0 + 0.45 * np.sin(t * 0.07 + 1.3) + 0.7 * (_vn1(t * 0.12 + s * 0.05, 67.0) - 0.5)
+    ph = (s - BACK0) / 9.0 + 0.45 * np.sin(t * 0.07 + 1.3) + 0.7 * (_vn1(t * 0.12 + s * 0.05, 67.0) - 0.5)
     fr = ph - np.floor(ph)
     low = 1.35 * (0.55 + 0.45 * _vn1(t * 0.2 + np.floor(ph) * 3.1, 69.0)) * np.where(fr < 0.68, (fr / 0.68) ** 1.5, ((1 - fr) / 0.32) ** 1.2)
     low = low * np.clip((fc - 3.0 - s) / 3.0, 0, 1)
@@ -236,7 +236,7 @@ def _drift_list():
     rnd = np.random.default_rng(1207)
     out = []
     tries = 0
-    while len(out) < 90 and tries < 4000:
+    while len(out) < 150 and tries < 6000:
         tries += 1
         band = rnd.random()
         if band < 0.4:
@@ -244,10 +244,10 @@ def _drift_list():
         elif band < 0.65:
             s_ = 41.0 + rnd.normal(0, 1.2)                      # the foredune's foot
         elif band < 0.9:
-            s_ = rnd.uniform(27.0, 39.0)                        # the swales
+            s_ = rnd.uniform(BACK0 + 3.0, 39.0)                 # the swales
         else:
             s_ = BERM_S + rnd.uniform(0.3, 2.5)                 # stranded on the berm
-        t_ = rnd.uniform(-34.0, 34.0)
+        t_ = rnd.uniform(-50.0, 50.0)
         if abs(s_ - 47.0) < 3.5 and abs(t_) < 22.0:
             continue                                            # the bone jam's hollow is its own
         if any(abs(s_ - a) < 2.5 and abs(t_ - b) < 2.5 for a, b, _ in STANDING):
@@ -265,7 +265,7 @@ def _drift_list():
     return out
 
 
-DRIFT = _drift_list()
+DRIFT = None                                       # (filled below, once the cove's shape is defined)
 
 
 def height(x, y):
@@ -437,16 +437,20 @@ def foam_age(s, t, time=None):
 # ---- the cove (Derek, 2026-10-09): four screens along the shore, two screens of sand inland to a back wall of basalt
 # cliffs that curves round at both ends into headlands running out into the Red; one cleft in the back wall is the only
 # way on, up into the bluffs ----
-COVE_T = 39.0                                      # the headlands' inner faces stand about this far along the shore
-COVE_MID = 50.0                                    # where the back wall's curve meets the straight headlands (s)
-CLEFT_T = -24.0                                    # the cleft through the back wall (t at the wall)
+COVE_T = 55.0                                      # the headlands' inner faces stand about this far along the shore
+                                                   # (2026-10-10, Derek: "make the beach twice the size so there room to
+                                                   # walk around ... fight in open spaces and draw them into bottlenecks";
+                                                   # was 39, the back wall at 24)
+BACK0 = 6.0                                        # the back wall's mean line (s)
+COVE_MID = 42.0                                    # where the back wall's curve meets the straight headlands (s)
+CLEFT_T = -32.0                                    # the cleft through the back wall (t at the wall)
 CLEFT_W = 2.8                                      # its half width at the floor (yards)
 
 
 def back_s(t):
     """the back wall's foot (s): two screens inland of the water, wandering in bays and buttresses"""
     t = np.asarray(t, float)
-    return 24.0 + 2.0 * np.sin(t * 0.11 + 0.7) + 1.4 * (_vn1(t * 0.3, 91.0) - 0.5)
+    return BACK0 + 2.0 * np.sin(t * 0.11 + 0.7) + 1.4 * (_vn1(t * 0.3, 91.0) - 0.5)
 
 
 def side_t(s):
@@ -458,7 +462,7 @@ def side_t(s):
 def cleft_t(s):
     """the cleft's line: it leaves the back wall and climbs inland, bending a little"""
     s = np.asarray(s, float)
-    return CLEFT_T + 0.18 * (24.0 - s) + 1.2 * np.sin((24.0 - s) * 0.2)
+    return CLEFT_T + 0.18 * (BACK0 - s) + 1.2 * np.sin((BACK0 - s) * 0.2)
 
 
 def cove_d(s, t):
@@ -475,7 +479,23 @@ def cove_d(s, t):
     # the cleft: a slot through the back wall and on inland, its floor a talus ramp up into the bluffs
     inl = (s < sb + 3.0) & (s > sb - 10.0)
     dc = np.abs(t - cleft_t(s)) - (CLEFT_W + 0.6 * np.clip((sb + 3.0 - s) / 6.0, 0, 1) - 0.6)
-    return np.where(inl, np.minimum(d, dc), d)
+    d = np.where(inl, np.minimum(d, dc), d)
+    # the bottlenecks (Derek: "fight in open spaces and draw them into bottlenecks"): spurs of the basalt running out
+    # from the back wall toward the sea, and stacks standing free on the backshore, so the sand is open bowls joined by
+    # gaps four or five yards wide between a spur's tip and a stack
+    for (tc, tip, w0, w1) in SPURS:
+        u = np.clip((s - (sb - 2.0)) / max(tip - (sb.mean() if np.ndim(sb) else sb) + 2.0, 1.0), 0.0, 1.0)
+        w = w0 + (w1 - w0) * u + 0.8 * (_vn1(s * 0.3 + tc, 95.0) - 0.5)
+        ctr = tc + 1.6 * np.sin(s * 0.13 + tc)
+        inside = (s < tip) & (s > sb - 3.0)
+        dsp = np.where(inside, w - np.abs(t - ctr), -99.0)
+        dtip = w1 - np.hypot(s - tip, (t - (tc + 1.6 * np.sin(tip * 0.13 + tc))))     # its tip rounded
+        d = np.maximum(d, np.maximum(dsp, dtip))
+    for (ss, tt, r) in STACKS:
+        a_ = np.arctan2(t - tt, s - ss)
+        rr = r * (1.0 + 0.18 * np.sin(3 * a_ + ss) + 0.1 * np.sin(5 * a_ + tt))
+        d = np.maximum(d, rr - np.hypot(s - ss, t - tt))
+    return d
 
 
 def gate_niches():
@@ -494,6 +514,10 @@ def gate_niches():
             z = float(height_st(np.array([s_]), np.array([tc]))[0]) + 1.15 + 0.12 * k
             out.append((s_, t_, z, side))
     return out
+
+
+SPURS = [(-8.0, 30.0, 8.0, 3.4), (21.0, 33.0, 8.5, 3.6)]   # (t of its line, s of its tip, half width at the wall, at the tip)
+STACKS = [(37.0, -7.0, 2.6), (38.5, 25.5, 2.3), (19.0, 6.0, 3.2), (24.0, 42.0, 2.4)]   # (s, t, radius)
 
 
 def in_cleft(s, t):
@@ -515,3 +539,6 @@ def cove_ground(s, t, z):
     sb = back_s(t)
     ramp = np.clip((sb + 1.0 - s) / 6.0, 0, 1.6) + 2.6
     return np.where(in_cleft(s, t) & (s < sb + 1.0), np.maximum(z, ramp), z)
+
+
+DRIFT = [d for d in _drift_list() if float(cove_d(np.array([d[0]]), np.array([d[1]]))[0]) < -1.5]

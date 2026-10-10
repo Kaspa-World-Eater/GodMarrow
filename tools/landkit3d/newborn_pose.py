@@ -25,7 +25,8 @@ CLIPS = {
     "rise": (5.6, 32, False, 0.0),
     "idle": (3.2, 8, True, 0.0),
     "walk": (1.9, 12, True, 0.53),       # feet: 0.6 m over a stance of 0.6
-    "climb": (2.1, 12, True, 0.48),      # up the stairs: a step a foot, the knee driven high
+    "climb": (2.2, 16, True, 0.0),       # up the stairs, two steps a cycle (driven by the stair, not the clock)
+    "descend": (2.0, 16, True, 0.0),     # down them
 }
 
 THIGH, SHIN = 0.40, 0.43
@@ -237,36 +238,67 @@ def walk(t):
     return p
 
 
-def climb(t):
-    """up the stairs (Derek, 2026-10-10: "the newborns legs should animate like he is walking up stairs"): the walk with
-    each foot driven high and reached onto the step above, the knee up, the trunk leaning into the stair, the arms working
-    to haul it, the hips pushing up as the planted leg straightens; the stair itself lifts the body a step at a time
-    (entities/hero.gd _stair_lift)"""
-    cyc, stride = CLIPS["climb"][0], 0.55
+# the cave's stair, true (tools/landkit3d/cave3d.py STAIR, STEPS, FLOOR_HALL): 17 steps up 6 yards over 13.7
+STAIR_TREAD = 13.7 / 17 * 0.9144          # 0.737 m
+STAIR_RISE = 6.0 / 17 * 0.9144            # 0.323 m
+
+
+def _stairs(t, up):
+    """on the stairs, each foot on a tread (Derek, 2026-10-10: "make some actual stairs and animate the legs touching
+    the stairs"): one cycle is two steps. The body's root rises along the stair's line (in place: the stair slides back
+    and down beneath it); each foot plants on a tread's middle and stays there while the body rises past it, then lifts
+    in an arc that clears the step between and lands two treads on; the hips bob on each push, the trunk leans into the
+    climb (back from the descent), the arms work. The game drives the clip by where the body is on the stair, not by the
+    clock (entities/hero.gd), so foot and tread always meet."""
+    T = STAIR_TREAD
+    R = STAIR_RISE if up else -STAIR_RISE
+    cyc = CLIPS["climb" if up else "descend"][0]
+    ph = (t / cyc) % 1.0
     p = stand_pose(t, sway=0.0)
-    w = 2.0 * math.pi * t / cyc
-    p["pitch"] = 24.0 + 4 * math.sin(2 * w)
-    p["spine"] = (10.0, 10.0, 12.0)
-    p["neck"] = 16.0 + 5 * math.sin(2 * w - 1.4)
-    p["roll"] = 3.5 * math.sin(w)
-    p["hips"] = (0.03 * math.sin(w), 0.0, 0.8 + 0.06 * max(0.0, math.cos(2 * w)))
-    for s, ph0 in (("L", 0.0), ("R", 0.5)):
-        side = 1.0 if s == "L" else -1.0
-        ph = (t / cyc + ph0) % 1.0
-        swing = 0.42
-        if ph < swing:
-            k = ease(ph / swing)
-            y = lerp(stride / 2, -stride / 2, k)
-            lift = 0.28 * math.sin(math.pi * min(1.0, k * 1.15))           # the foot raised high onto the next step
+    w = 2.0 * math.pi * ph
+    p["pitch"] = (20.0 + 4.0 * math.cos(2 * w)) if up else (2.0 + 2.0 * math.cos(2 * w))
+    p["spine"] = (10.0, 8.0, 10.0) if up else (4.0, 4.0, 8.0)
+    p["neck"] = 14.0 if up else 26.0                         # going down, the newborn watches its feet
+    p["head"] = 8.0 if up else 14.0
+    p["roll"] = 3.0 * math.sin(w)
+    zb = 2.0 * R * ph
+    yb = -2.0 * T * ph
+    p["hips"] = (0.03 * math.sin(w), 0.0, 0.82 + 0.035 * math.cos(2 * w))
+    sw = 0.42
+    for s_, o, b in (("L", 0.0, 1), ("R", 0.5, 0)):
+        side = 1.0 if s_ == "L" else -1.0
+        tau = ph + o
+        c = math.floor(tau)
+        k = tau - c
+        n1 = 2 * c + b
+        n0 = n1 - 2
+
+        def tread(n):
+            return -(n + 0.5) * T, n * R
+        if k < sw:
+            u = ease(k / sw)
+            y0, z0 = tread(n0)
+            y1, z1 = tread(n1)
+            yw = lerp(y0, y1, u)
+            arc = (abs(R) + 0.14) * math.sin(math.pi * min(1.0, k / sw)) ** 0.8
+            zw = lerp(z0, z1, ease(min(1.0, k / sw * 1.25))) + arc
+            foot_dir = (side * 0.15, -1.0, -0.15 if up else -0.6)
         else:
-            k = (ph - swing) / (1 - swing)
-            y = lerp(-stride / 2, stride / 2, k)
-            lift = 0.0
-        p["ankle." + s] = (side * 0.12, y, 0.10 + lift)
-        p["knee." + s] = (side * 0.15, -1.0, 0.6)
-        p["foot." + s] = (side * 0.2, -1.0, -0.25 if ph < swing else -0.35)
-        p["arm_swing." + s] = 22.0 * math.sin(w + (0 if s == "R" else math.pi))
+            yw, zw = tread(n1)
+            foot_dir = (side * 0.2, -1.0, -0.3)
+        p["ankle." + s_] = (side * 0.11, yw - yb, zw + 0.1 - zb)
+        p["knee." + s_] = (side * 0.15, -1.0, 0.7 if up else 0.3)
+        p["foot." + s_] = foot_dir
+        p["arm_swing." + s_] = 16.0 * math.sin(w + (0 if s_ == "R" else math.pi))
     return p
+
+
+def climb(t):
+    return _stairs(t, True)
+
+
+def descend(t):
+    return _stairs(t, False)
 
 
 def rise(t):
@@ -333,7 +365,7 @@ def rise(t):
 
 
 def pose(clip, t):
-    return {"crawl": crawl, "slip": slip, "retch": retch, "rise": rise, "idle": idle, "walk": walk, "climb": climb}[clip](t)
+    return {"crawl": crawl, "slip": slip, "retch": retch, "rise": rise, "idle": idle, "walk": walk, "climb": climb, "descend": descend}[clip](t)
 
 
 def times(clip):

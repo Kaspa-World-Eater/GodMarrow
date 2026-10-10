@@ -27,7 +27,7 @@ FLOOR_MODULE = "beach_floor"
 LAMPS = []
 SAMPLES = 48
 FOCUS_ST = (64.5, -4.0)                      # the frame's centre on the shore (s, t)
-T0, T1 = -50.0, 50.0                         # the stretch of shore built (along t): the whole cove (beach_floor.COVE_T)
+T0, T1 = -66.0, 66.0                         # the stretch of shore built (along t): the whole cove (beach_floor.COVE_T)
 CALM = os.environ.get("GM_CALM", "0") == "1"  # the game's bake: no breaking wave frozen in the ground (the game moves the Red)
 OBSTACLES = []                                # (s, t, r): what stands on the walkable sand, for the zone's grid (cove_export)
 
@@ -410,8 +410,8 @@ def cobble_patches():
     floor's pans): a fist to a head in size, rounded, sitting in the hollow"""
     rnd = random.Random(91)
     n = 0
-    for _ in range(9000):
-        s_, t_ = rnd.uniform(26.0, 55.0), rnd.uniform(T0, T1)
+    for _ in range(18000):
+        s_, t_ = rnd.uniform(BF.BACK0 + 2.0, 55.0), rnd.uniform(T0, T1)
         if float(BF.cove_d(np.array([s_]), np.array([t_]))[0]) > -1.0:
             continue
         pan = float(BF._vn2(np.array([s_ * 0.33 + 9.0]), np.array([t_ * 0.33]), 75.0)[0])
@@ -424,7 +424,7 @@ def cobble_patches():
         n += 1
         if r > 0.18:
             OBSTACLES.append((s_, t_, r))
-        if n >= 260:
+        if n >= 460:
             break
     return n
 
@@ -436,8 +436,8 @@ def dune_grass():
     rnd = random.Random(55)
     verts, faces = [], []
     n = 0
-    for _ in range(14000):
-        s_, t_ = rnd.uniform(26.0, 46.0), rnd.uniform(T0, T1)
+    for _ in range(26000):
+        s_, t_ = rnd.uniform(BF.BACK0 + 2.0, 46.0), rnd.uniform(T0, T1)
         if float(BF.cove_d(np.array([s_]), np.array([t_]))[0]) > -1.5:
             continue
         d0 = float(BF.dune_relief(np.array([s_]), np.array([t_]))[0])
@@ -456,7 +456,7 @@ def dune_grass():
             bend = (wx * rnd.uniform(0.3, 0.7), wy * rnd.uniform(0.3, 0.7))
             _blades(verts, faces, bx, by, z, ln, lean, bend, 0.012)
         n += 1
-        if n >= 420:
+        if n >= 760:
             break
     if verts:
         o = P.poly("dunegrass", verts, faces, "straw")
@@ -711,7 +711,7 @@ def cove_cliffs():
         d = float(BF.cove_d(np.array([s_]), np.array([t_]))[0])
         return -0.3 < d < 7.0 and s_ < 88.0
 
-    pts = C.seeds(2.0, 90.0, T0 - 8.0, T1 + 8.0, radius, keep, seed=23)
+    pts = C.seeds(-8.0, 90.0, T0 - 8.0, T1 + 8.0, radius, keep, seed=23)
     rnd = random.Random(7)
     made = 0
     for k, (cs_, ct_), r, poly in C.cells(pts):
