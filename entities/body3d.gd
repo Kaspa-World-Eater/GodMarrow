@@ -222,8 +222,8 @@ func enable_drips() -> void:
 	# fresh blood running off: brighter and wetter than the coat drying on the skin, so it reads against it and the
 	# candles catch a wet highlight on it
 	mat.albedo_color = Color(0.2, 0.012, 0.016)
-	mat.roughness = 0.06
-	mat.metallic_specular = 1.0
+	mat.roughness = 0.22
+	mat.metallic_specular = 0.55
 	for i in DRIP_BONES.size():
 		var e: Array = DRIP_BONES[i]
 		var att := BoneAttachment3D.new()

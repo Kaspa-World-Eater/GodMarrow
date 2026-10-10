@@ -42,6 +42,8 @@ func bind(z: Zone) -> void:
 		match L.get("type", ""):
 			"fire":
 				var at := Iso.to_screen(tp) + Vector2(float(L.get("dxPx", 0)), -float(L.get("heightPx", 0))) * PX
+				if L.has("zAbs"):   # the flame's true height in the world (cave_export), where the live flame stands
+					at = Vector2(at.x, (tp.x + tp.y) * Iso.HY - float(L["zAbs"]) * Iso.lift_px)
 				src.append({"tp": tp, "at": at, "kind": String(L.get("kind", "fire")), "seed": seed})
 			"wallCandle":
 				src.append({"tp": tp, "at": Iso.to_screen(tp) + Vector2(0, -float(L.get("heightPx", 20))) * PX, "kind": "wallc", "seed": seed})
@@ -122,8 +124,8 @@ func _draw() -> void:
 		var gk := Gust.k()
 		f *= 1.0 - 0.32 * gk * (0.5 + 0.5 * sin(t * (11.0 + 9.0 * gk) + float(s["seed"]) * 3.0))
 		var h := _halo_of(s["kind"])
-		if int(h[0]) <= 0:
-			continue
+		if int(h[0]) <= 0 or zone.has_meta("live_flames"):
+			continue        # (a zone with live flames: no halo orbs, the relit stone and the floor's pool carry the glow)
 		var g := Flame.dither_glow(int(h[0]) * 2, h[1])                   # twice the texels, half the size: the 2 x 2 grid
 		var sz := g.get_size() * AP
 		var p := ((at - sz / 2.0) / AP).round() * AP

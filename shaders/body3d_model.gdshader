@@ -43,7 +43,7 @@ void fragment() {
 	c *= 1.0 + st * stroke + th * tooth;
 	ALBEDO = mix(c, c * 0.55, wl);
 	float r = has_rough_tex ? texture(rough_tex, UV).g : rough;
-	ROUGHNESS = mix(r, 0.1, wl);
+	ROUGHNESS = mix(0.55 + 0.4 * r, 0.3, wl);       // (Derek, 2026-10-10: "a bit too shiny": the coat mostly matte, drying)
 	if (has_normal_tex) NORMAL_MAP = texture(normal_tex, UV).rgb;
-	SPECULAR = 0.4;
+	SPECULAR = 0.18;
 }

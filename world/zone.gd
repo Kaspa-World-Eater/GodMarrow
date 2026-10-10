@@ -138,6 +138,12 @@ func move(p: Vector2, v: Vector2, r: float = 0.25) -> Vector2:
 	# stairs and have to restart"). While it overlaps, a step is taken if its centre stands on open ground
 	if _blocked(p, r, p):
 		r = 0.0
+		if is_solid(p):
+			# its very centre in rock (however it got there): any step that doesn't go deeper into rock is taken,
+			# so it always walks out (Derek, 2026-10-10: "i still get stuck on the stairs")
+			var np_ := p + v
+			if not is_solid(np_) or _rock_depth(np_) <= _rock_depth(p):
+				return np_
 	var q := p
 	var nx := Vector2(p.x + v.x, p.y)
 	if not _blocked(nx, r, q):
@@ -154,6 +160,18 @@ func move(p: Vector2, v: Vector2, r: float = 0.25) -> Vector2:
 			if tv.length_squared() > 1e-8 and not _blocked(p + tv, r, p):
 				q = p + tv
 	return q
+
+## how far into rock a point is: the distance to the nearest open tile centre (0 on open ground), searched a few tiles out
+func _rock_depth(p: Vector2) -> float:
+	if not is_solid(p):
+		return 0.0
+	var best := 9.0
+	for dy in range(-3, 4):
+		for dx in range(-3, 4):
+			var c := Vector2(floor(p.x) + dx + 0.5, floor(p.y) + dy + 0.5)
+			if not is_solid(c):
+				best = minf(best, p.distance_to(c))
+	return best
 
 ## the circle's edge, eight points round it (four let a body cut a corner), and the posts
 func _blocked(p: Vector2, r: float, from: Vector2 = Vector2.INF) -> bool:
