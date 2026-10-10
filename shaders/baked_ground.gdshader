@@ -19,6 +19,12 @@ uniform bool red = false;
 // surge of the heartbeat the swash runs up the real sand as a thin film with a dull froth at its lip, then drains back,
 // leaving the sand dark and wet behind it until the next beat
 uniform bool has_shore = false;
+// a still pool of blood (the opening cave's; Derek, 2026-10-10: it "moves chunky and doesnt look like a smoothly animated
+// pool of blood", its drips' ripples "frozen"): no texel ever slides; a slow sheen drifts over the thick surface and it
+// breathes a little on the heartbeat; live rings spread where the faces' blood strikes it and wherever a body moves in it
+// (world/pool_life.gd fills `rings`: x, y in world px, age in seconds, strength)
+uniform bool pool = false;
+uniform vec4 rings[12];
 uniform sampler2D shore : filter_linear, repeat_disable;
 uniform vec2 shore_size = vec2(1.0);
 uniform float shore_span = 24.0;
@@ -106,6 +112,29 @@ void fragment() {
 					c.rgb = c.rgb * 0.78 + vec3(0.02, 0.0, 0.002);                       // the sand left wet
 				}
 			}
+		} else if (c.a < 0.998 && red && pool) {
+			vec2 W = floor(wpos / 2.0);                     // the 2 x 2 art grid
+			float ph = fract(TIME / 3.6);
+			float d1 = ph - 0.06;
+			float d2 = ph - 0.27;
+			float pulse = exp(-d1 * d1 / 0.002) + 0.5 * exp(-d2 * d2 / 0.0012);
+			// the sheen: broad, slow, drifting; the thick surface shifting under the fires, never sliding
+			float sh = vn(W * 0.045 + vec2(TIME * 0.05, TIME * 0.032)) * 0.65 + vn(W * 0.11 - vec2(TIME * 0.035, TIME * 0.06)) * 0.35;
+			c.rgb *= 0.92 + 0.13 * sh - 0.035 * pulse;
+			// the rings: each a lifted crest with a dark trough inside, spreading slowly on thick blood, fading
+			float lift_ = 0.0;
+			for (int i = 0; i < 12; i++) {
+				vec4 r = rings[i];
+				if (r.w <= 0.0) continue;
+				vec2 dv = (W * 2.0 + 1.0) - r.xy;
+				float d = length(vec2(dv.x, dv.y * 2.0));
+				float R_ = 6.0 + r.z * 46.0;
+				float fade = r.w * (1.0 - smoothstep(0.2, 1.7, r.z));
+				float x = (d - R_) / 5.0;
+				lift_ += fade * (exp(-x * x) - 0.6 * exp(-(x + 1.6) * (x + 1.6)));
+			}
+			c.rgb *= 1.0 + 0.6 * lift_;
+			c.rgb += vec3(0.1, 0.028, 0.026) * max(lift_, 0.0);   // the crest catches the fire: wet, a shade lighter
 		} else if (c.a < 0.998 && red) {
 			vec2 W = floor(wpos / 4.0);
 			float ph = fract(TIME / 3.6);                   // one beat: a surge, a weaker surge, then the stillness

@@ -22,7 +22,8 @@ func _ready() -> void:
 func _process(_dt: float) -> void:
 	var z = hud.zone if hud else null
 	var on: bool = z != null and is_instance_valid(z) and z.d.get("outdoor", false) and hud.hero != null \
-		and not hud.any_panel() and not hud.pause.visible
+		and not hud.any_panel() and not hud.pause.visible \
+		and not z.d.get("sunless", false) and not hud.hero.nascent    # no hour underground; the newborn's view is bare
 	visible = on
 	if not on:
 		return

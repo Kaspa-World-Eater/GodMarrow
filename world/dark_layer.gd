@@ -250,7 +250,9 @@ func _process(dt: float) -> void:
 		holes.append([pos, r, float(s["far"]), float(s["core"]), 0.0, float(s["w"]), s["rgb"], shadowed, 0.0, 0.0, 0.0, 0.0, 1.0])
 		# the light map: a pool on the ground cut by what the flame can see, a round light at the flame's own height
 		# (fireLight37, y_light21.js:100-107); a wall candle's glow (y_light21.js:131-136)
-		var ff: float = FlameK.smooth(st0.x * 3.1 + st0.y * 7.7)
+		# the breath's swing doubled and more (Derek, 2026-10-10: the fires had none of "the realistic fire flicker and
+		# pulsing and waving lightness, like real fire": firelight swells and gutters by a tenth and more, not by 2%)
+		var ff: float = 1.0 + (FlameK.smooth(st0.x * 3.1 + st0.y * 7.7) - 1.0) * 2.4
 		if s["kind"] == "wallc":
 			lights.append([pos + Vector2(0, -16.0 * sc), 36.0 * 4.0 * sc, minf(1.0, 0.85 * 0.5) * (1.0 if ff > 0.95 else 0.86), s["rgb"], 1, 1.0, -1])
 		elif s.has("R"):
@@ -259,7 +261,7 @@ func _process(dt: float) -> void:
 				fa = 2.3 - 0.9 * dk
 			elif outdoor:
 				fa *= 1.0 - 0.5 * dk
-			lights.append([pos, s["R"] * (0.96 + 0.04 * ff) * ISO_R * 4.0 * sc, minf(1.0, fa * ff * 0.5), s["rgb"], 2, 0.5, hi2 if shadowed > 0.0 else -1])
+			lights.append([pos, s["R"] * (0.92 + 0.08 * ff) * ISO_R * 4.0 * sc, minf(1.0, fa * ff * 0.5), s["rgb"], 2, 0.5, hi2 if shadowed > 0.0 else -1])
 			lights.append([pos + Vector2(s["dx"], -s["fh"]) * 4.0 * sc, s["R"] * ISO_R * 0.42 * 4.0 * sc, minf(1.0, fa * 0.7 * ff * 0.5), s["rgb"], 1, 1.0, -1])
 	# ---- lights other systems placed (wisps, skills, objects, fires): made into pools
 	scan_t -= dt

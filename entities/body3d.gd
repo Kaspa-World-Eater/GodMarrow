@@ -33,16 +33,28 @@ var env: Environment
 var key: DirectionalLight3D
 var rim: DirectionalLight3D
 var lamps: Array = []                    # the world's lights near the body, placed where they truly are (light_from)
-var world_lit := false                   # lit only by the world's lights (light_from), not the fixed key and rim
+var world_lit := false
+## the clips' contacts (cycle phases where a foot, or a crawling hand, lands; tools/landkit3d/newborn_pose.py): walk,
+## the left foot at 0.4 and the right at 0.9; crawl, the right hand at 0.34 and the left at 0.84
+const CONTACTS := {"walk": [0.4, 0.9], "crawl": [0.34, 0.84]}
+signal contact(clip: String)
+var _last_ph := -1.0                   # lit only by the world's lights (light_from), not the fixed key and rim
 const N_LAMPS := 4
 const YD_M := 0.9144
-var sink := 0.0 :                        # metres under the ground line (the pool's surface): hidden below it
-	set(v):
-		sink = v
-		if pivot:
-			pivot.position.y = -v
-		for m in mats:
-			m.set_shader_parameter("surface_y", 0.0 if v > 0.0005 else -100.0)
+var sink := 0.0                          # metres under the pool's surface by the script (the opening's rising)
+var wade := 0.0                          # metres under it by the pool's depth where the body stands (world/pool_life.gd)
+var _under := -1.0
+
+## how far under the surface the body is drawn: the deeper of the two; nothing below the surface is drawn
+func _apply_sink() -> void:
+	var v := maxf(sink, wade)
+	if absf(v - _under) < 0.0005:
+		return
+	_under = v
+	if pivot:
+		pivot.position.y = -v
+	for m in mats:
+		m.set_shader_parameter("surface_y", 0.0 if v > 0.0005 else -100.0)
 
 func _init(scene_path: String) -> void:
 	vp = SubViewport.new()
@@ -180,8 +192,10 @@ func _process(dt: float) -> void:
 	yaw += d * minf(1.0, TURN * dt * 0.5)
 	if pivot:
 		pivot.rotation.y = yaw
+	_apply_sink()
 	if not drips.is_empty():
 		_drip_tick()
+	_contacts()
 
 ## blood streaming off it (the newborn's pass 7; Derek: "gore and blood streaming off"): from each low point of the
 ## body (the chin, the wrists, the elbows, the knees, the chest, the belly) a strand hangs straight down whatever the
@@ -236,7 +250,7 @@ func enable_drips() -> void:
 			"phase": float((i * 13) % 10) / 10.0, "base": float(e[1])})
 
 func _drip_tick() -> void:
-	var under := sink > 0.0005
+	var under := maxf(sink, wade) > 0.25          # the strands hide only when the body is well under
 	var t := Time.get_ticks_msec() / 1000.0
 	for d in drips:
 		var st: MeshInstance3D = d["strand"]
@@ -250,7 +264,7 @@ func _drip_tick() -> void:
 		# the strand: from inside the limb down past the skin, lengthening as it fills, then letting go
 		var vis := 0.03 + 0.14 * ph * ph
 		var ln: float = float(d["base"]) + vis
-		var floor_y := -sink
+		var floor_y := -maxf(sink, wade)
 		ln = minf(ln, maxf(0.01, top.y - floor_y - 0.005))
 		st.visible = true
 		st.global_transform = Transform3D(Basis.from_scale(Vector3(1.0, ln, 1.0)), top - Vector3(0, ln / 2.0, 0))
@@ -259,6 +273,21 @@ func _drip_tick() -> void:
 		var by := top.y - ln - 0.5 * 9.8 * fall * fall * 0.35
 		bd.visible = ph < 0.45 and by > floor_y + 0.01
 		bd.global_position = Vector3(top.x, by, top.z)
+
+func _contacts() -> void:
+	if anim == null or not anim.is_playing() or not CONTACTS.has(clip) or anim.speed_scale <= 0.0:
+		_last_ph = -1.0
+		return
+	var ln := length(clip)
+	if ln <= 0.0:
+		return
+	var ph := fmod(anim.current_animation_position / ln, 1.0)
+	if _last_ph >= 0.0:
+		for c in CONTACTS[clip]:
+			var crossed: bool = (_last_ph < c and ph >= c) if ph >= _last_ph else (_last_ph < c or ph >= c)
+			if crossed:
+				contact.emit(clip)
+	_last_ph = ph
 
 ## the glb's materials remade on shaders/body3d_model.gdshader (the same baked textures, and the pool's waterline)
 func _own_surfaces(root: Node) -> void:

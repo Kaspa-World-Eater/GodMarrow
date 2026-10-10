@@ -57,6 +57,10 @@ static func build(z) -> bool:
 	var mat := ShaderMaterial.new()
 	mat.shader = load("res://shaders/baked_ground.gdshader")
 	mat.set_shader_parameter("red", str(idx.get("water", "")) == "red")   # the Red Water moves on its own beat
+	if z.d.has("pool"):
+		# a still pool, alive: its sheen and its rings (world/pool_life.gd)
+		mat.set_shader_parameter("pool", true)
+		z.add_child(load("res://world/pool_life.gd").new(mat, z.d))
 	# the shore field (tools/landkit3d/cove_export.py): the water runs in along the land's own shape, up the real sand
 	var sh: Dictionary = idx.get("shore", {})
 	if not sh.is_empty() and FileAccess.file_exists(d + "/" + str(sh["file"])):

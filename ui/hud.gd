@@ -253,7 +253,19 @@ func is_open(id: String) -> bool:
 			return pause.visible
 	return false
 
+## the newborn's view (Derek, 2026-10-10: "No HUD in the cave either"): only the world; the bar, its orbs and belt and
+## the dial gone, the spoken lines and the pause menu kept (core/main.gd, while the pilgrim is newborn)
+func set_bare(on: bool) -> void:
+	if bar:
+		bar.visible = not on
+	if dial:
+		dial.visible = not on
+
 func toggle_panel(id: String) -> void:
+	# the newborn has no calling, no gear and no skills until the cards have made it (Derek, 2026-10-10: "dont start us
+	# with a skill point or skill trees or anything"): only the map and the journal open
+	if hero != null and is_instance_valid(hero) and hero.nascent and not (id in ["map", "journal"]):
+		return
 	var was := any_panel()
 	_toggle_panel(id)
 	var now := any_panel()

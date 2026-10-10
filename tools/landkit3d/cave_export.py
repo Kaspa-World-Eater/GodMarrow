@@ -18,6 +18,7 @@ in it on trial (--cave, GM_START=cave or user://start_in_cave; core/main.gd _sta
 import os
 import sys
 import json
+import math
 import gzip
 import copy
 import glob
@@ -149,6 +150,46 @@ def main():
     amb["dark"] = 0.22
     N["ambient"] = amb
     N["dark"] = 0.22
+    # the stair's true steps (Derek, 2026-10-10: the walk up "is like a weird floating slide rather than taking steps"):
+    # the floor's lattice blends them into a ramp, so the stair's footprint and count go in for the walker to follow
+    sx0, sy0 = zone_of(CV.STAIR[0], CV.STAIR[2])
+    sx1, sy1 = zone_of(CV.STAIR[1], CV.STAIR[3])
+    N["stairs"] = [dict(x0=sx0, x1=sx1, y0=sy0, y1=sy1, steps=CV.STEPS, z0=0.0, z1=CV.FLOOR_HALL)]
+    # the pool, alive in the game (Derek, 2026-10-10: the blood "moves chunky", the drips' ripples "are frozen", "depth to
+    # the pool so we sink when we go in or out", "ripples in the blood when we step in it"): its heart and shore (the
+    # wading depth: the surface over the floor, deepest at the heart, nothing past the shore), and where the blood out of
+    # the faces' mouths strikes it (world/pool_life.gd rings the surface there, and wherever a body moves in it)
+    bcx, bcy = zone_of(CV.BASIN[0], CV.BASIN[1])
+    N["pool"] = dict(cx=bcx, cy=bcy, r_deep=CV.BASIN[2], r_shore=CV.BASIN[2] + 1.3, surface=CB.POOL_Z, floor_deep=-0.75)
+    sp = []
+    for ang in (200.0, 228.0, 256.0):                                  # the mascarons' ropes (cave3d.spouting_faces)
+        a_ = math.radians(ang)
+        sp.append(zone_of(CV.BASIN[0] + math.cos(a_) * (CV.BASIN[2] - 0.55), CV.BASIN[1] + math.sin(a_) * (CV.BASIN[2] - 0.55)))
+    for (x_, y_, nx_, ny_, ux_, uy_, ln_) in CV.OOZE_FACES:             # the plain faces' tongues (cave3d.ooze_faces)
+        sp.append(zone_of(CV.BASIN[0] - ux_ * (CV.BASIN[2] + 0.4), CV.BASIN[1] - uy_ * (CV.BASIN[2] + 0.4)))
+    N["spouts"] = [dict(x=round(a_, 2), y=round(b_, 2)) for a_, b_ in sp]
+    # candles (Derek, 2026-10-10: "add a few candles around in the cave main area and on the stairs to add a little light
+    # an ambiance"): left by those who came before, in small clusters on the chamber's floor round the pool (never in the
+    # blood) and at the stair's side ends every few steps; each a small warm light, drawn live (world/live_flames.gd)
+    rnd = np.random.default_rng(9302)
+    cands = []
+    for ang in np.linspace(0.0, 2 * math.pi, 9, endpoint=False) + rnd.uniform(-0.25, 0.25, 9):
+        rr = CV.BASIN[2] + 2.0 + rnd.uniform(0.0, 1.6)
+        cx_, cy_ = CV.BASIN[0] + math.cos(ang) * rr, CV.BASIN[1] + math.sin(ang) * rr * 0.9
+        f_ = CV.floor_at(cx_, cy_)
+        if f_ is None or CV._ell(cx_, cy_, CV.POOL) > 0.9 or abs(cx_ - (CV.STAIR[0] + CV.STAIR[1]) / 2) < 3.0 and cy_ < CV.STAIR[2] + 1.0:
+            continue
+        cands.append((cx_, cy_, f_))
+    for i in range(2, CV.STEPS - 1, 3):
+        u_ = (i + 0.5) / CV.STEPS
+        sy_ = CV.STAIR[2] - (CV.STAIR[2] - CV.STAIR[3]) * u_
+        sx_ = (CV.STAIR[0] + 0.35) if (i // 3) % 2 == 0 else (CV.STAIR[1] - 0.35)
+        cands.append((sx_, sy_, CV.floor_at(sx_, sy_) or 0.0))
+    for cx_, cy_, f_ in cands:
+        zx_, zy_ = zone_of(cx_, cy_)
+        lights.append(dict(type="fire", kind="floorcandles", x=round(zx_, 2), y=round(zy_, 2), radius=2.4, rgb="255,150,64",
+                           a=0.38, heightPx=4, dxPx=0))
+    N["lights"] = lights
     N["sunless"] = True                                               # no sun throws a shadow down here (entities/sil_shadow.gd)
     path = os.path.join(ROOT, "data", "zones", "opening_cave_s%d.json.gz" % CB.SEED)
     with gzip.open(path, "wt", encoding="utf-8") as fh:

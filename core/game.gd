@@ -7,6 +7,7 @@ var day_len := 720.0
 var clock := 0.12 * 720.0
 var zone_seeds := {}       # zone id -> exported seed chosen for this run (maps are random per new game)
 var visited := {}
+var force_title := false     # the pause menu's "To the title": the scene reloads onto the title (Derek, 2026-10-10)
 var skip_title := false      # a new pilgrim chosen on the title reloads the scene straight into play
 var force_new := false
 var slot := ""                # "" the pilgrims; "_trial" the Trial of Thirty (the web's test character), kept apart

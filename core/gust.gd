@@ -55,11 +55,11 @@ static func k() -> float:
 static func dir() -> float:
 	return _dir
 
-## a storm's push on a body walking along move (world tiles): 1 with the wind or across it, down to 0.4 straight into
+## a storm's push on a body walking along move (world tiles): 1 with the wind or across it, down to 0.7 straight into
 ## a full gust (Derek, 2026-10-09: "making walking slow down on gusts in your direction")
 static func drag(move: Vector2) -> float:
 	if not storm or move.length() < 0.0001:
 		return 1.0
 	var against := maxf(0.0, -move.normalized().dot(storm_dir))
 	var g := clampf((k() - 0.25) / 0.6, 0.0, 1.0)
-	return 1.0 - 0.6 * g * against
+	return 1.0 - 0.3 * g * against      # (Derek, 2026-10-10: the push "needs to drop by 50%"; was 0.6)

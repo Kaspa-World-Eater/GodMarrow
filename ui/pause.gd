@@ -33,7 +33,7 @@ func close() -> void:
 func _build() -> void:
 	match page:
 		"main":
-			rows = [["Resume", "resume"], ["Written." if saved else "Save the pilgrim", "save"], ["The Codex", "codex"], ["Controls", "controls"], ["Full screen: " + _on(_full()), "fullscreen"], ["Options", "options"], ["Save and quit", "quit"]]
+			rows = [["Resume", "resume"], ["Written." if saved else "Save the pilgrim", "save"], ["The Codex", "codex"], ["Controls", "controls"], ["Full screen: " + _on(_full()), "fullscreen"], ["Options", "options"], ["To the title", "title"], ["Save and quit", "quit"]]
 		"options":
 			rows = [
 				["Damage numbers: " + _on(Settings.damage_numbers), "t:damage_numbers"],
@@ -103,6 +103,14 @@ func _act(a: String, down: bool) -> void:
 		Settings.save()
 		_main_save()
 		get_tree().quit()
+	elif a == "title":
+		# back to the title screen (Derek, 2026-10-10: "we need a button on the menu that takes us back to the main
+		# screen"): the pilgrim saved, the scene reloaded onto the title
+		Settings.save()
+		_main_save()
+		get_tree().paused = false
+		Game.force_title = true
+		get_tree().reload_current_scene()
 	elif a == "fullscreen":   # the web's pause menu has it (a_head.html:281-304)
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if _full() else DisplayServer.WINDOW_MODE_FULLSCREEN)
 	elif a == "title_scene":
@@ -190,5 +198,7 @@ func _draw() -> void:
 
 func _main_save() -> void:
 	var m := get_tree().current_scene
+	if m and m.get("hero") != null and m.hero.get("nascent") == true:
+		return     # the newborn is not a pilgrim yet: nothing is written until the cards have made it
 	if m and m.has_method("save_game"):
 		m.save_game()

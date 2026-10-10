@@ -9,7 +9,7 @@ var vit := 15
 var ess := 25
 var con := 15
 var attr_points := 0
-var skill_points := 1
+var skill_points := 0
 var gold := 40
 var hp := 0.0
 var res := 0.0
@@ -70,7 +70,7 @@ func setup(c: String) -> void:
 	inv.setup_kit(kit)
 	arc = load("res://core/arcana.gd").new()
 	arc.setup(self, c)
-	skill_points = int(kit.get("skill_points", 1))
+	skill_points = 0   # (Derek, 2026-10-10: "dont start us with a skill point"; the kit's one is not given)
 	hollow_tokens = int(kit.get("hollow_tokens", 1))
 	hp = life_max()
 	res = res_max()

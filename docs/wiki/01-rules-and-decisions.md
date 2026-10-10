@@ -154,6 +154,12 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-10, characters are live 3D (Derek, testing the newborn):** "3D wins for the character model." After the
+  newborn's ten passes as the pilot (`tools/landkit/passes/the_newborn.md`), every character is a rigged 3D body
+  played live in the game (`entities/body3d.gd`), never rendered to frames; the sprite characters stay until each is
+  rebuilt this way. Earlier the same day: "Do we even need to capture frames if we have a full 3d working model?",
+  "Wouldn't animations be smoother ... Locked pov etc".
+
 - **2026-10-09 (night), the third lore pass: names, numbers and the people's origin (Derek's notes and messages):**
   - **Names:** "stop using names like 'the answers, the lifted, the climbers' ... I've given you so many interesting
     ways to name things." No more "the [verb]-ers" or "the [participle]" names. Names come from wordplay, Lovecraftian

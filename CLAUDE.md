@@ -41,15 +41,16 @@ our own version.
 - No fog or mist layers.
 - No red light, except the Sunken Bog's pit throat.
 - No animals, except insects, the moor's crows and the bog's serpent god.
-- **Characters are shape sprites in PixelForge** (`tools/pixelforge/`; run it with Python from that folder;
-  `.gdignore` keeps Godot out):
-  - `.shapes.json` solids on the standard skeleton, at the game's hero height (the `godmarrow` preset, 195 px);
-  - rendered as pixel art and moved by motion clips in 8 directions;
-  - a painting is the reference a shape file is measured against (`shapes measure`, `shapes compare`), never the
-    source;
-  - the old cutout, Blender and Mixamo road is retired.
-  
-  Its guide is `tools/pixelforge/docs/GUIDE_AI.md`.
+- **Characters are live 3D bodies** (Derek, 2026-10-10: "3D wins for the character model"):
+  - a rigged body made in Blender (`tools/landkit3d/newborn3d.py` is the first: the body, its coat, its clips keyed by
+    IK from a timing-sheet pose module), exported as a `.glb`;
+  - played in the game by `entities/body3d.gd`: its own small 3D world in a SubViewport behind a locked orthographic
+    camera at the heroes' angle and density, drawn through the painted pixel pass (`shaders/body3d.gdshader`), lit
+    by the zone's own lights, casting the silhouette shadow;
+  - never rendered to frames; it turns to any heading and its clips blend at the game's frame rate.
+
+  The older sprite characters (PixelForge shape sprites, `tools/pixelforge/`, guide `docs/GUIDE_AI.md`) stay until
+  each is rebuilt this way.
 
 **Lore:**
 - The bible is for us: myths told as myths, with depth of time. The gods are unknowable, and the faiths' gods are

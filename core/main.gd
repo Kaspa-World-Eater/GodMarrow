@@ -14,6 +14,7 @@ var hud: Node
 var dark: DarkLayer
 var atmos: Atmos
 var args := {}
+var mirror_said := 0.0        # the Stranger's word at the mirror, not repeated every frame
 var last_lantern := {}        # {zone, x, y}
 var remnant := {}             # {zone, x, y, gold}
 var travelling := false
@@ -54,7 +55,8 @@ func _ready() -> void:
 		Game.force_new = false
 	# the title: when the game is simply launched (no test arguments), or with --title
 	var plain := args.is_empty() or (args.size() == 1 and args.has("hour"))
-	title_open = (plain or args.has("title")) and not Game.skip_title
+	title_open = (plain or args.has("title") or Game.force_title) and not Game.skip_title
+	Game.force_title = false
 	Game.skip_title = false
 	reading_open = Game.read_new or args.has("reading")
 	Game.read_new = false
@@ -151,9 +153,12 @@ func enter(zid: String, from: String) -> void:
 	add_child(zone)
 	move_child(zone, 0)
 	zone.load_zone(zid, Game.seed_for(zid))
-	# a place that keeps its own hour (the cove: Derek 2026-10-09, "change the time of day to be Dawn. Maybe it's a
-	# little too dark"): held while the pilgrim is in it, let go on leaving
-	Game.hour_hold = float(zone.d.get("holdPhase", -1.0))
+	# the hour a place is first come into at (the cove: Derek 2026-10-09, "change the time of day to be Dawn"; and
+	# 2026-10-10, "time is frozen in the cove", "we enter at dawn and it begins"): out of the black mirror the pilgrim
+	# comes onto the cove at dawn, and the day runs on from there
+	Game.hour_hold = -1.0
+	if zone.d.has("holdPhase") and from == "opening_cave":
+		Game.clock = float(zone.d["holdPhase"]) * Game.day_len
 	var at: Vector2
 	if from == "__lantern" and not last_lantern.is_empty():
 		at = Vector2(last_lantern["x"], last_lantern["y"] + 1.2)
@@ -161,6 +166,11 @@ func enter(zid: String, from: String) -> void:
 		at = Vector2(zone.arrive[from]["x"], zone.arrive[from]["y"])
 	else:
 		at = Vector2(zone.markers["start"]["x"], zone.markers["start"]["y"])
+	if zone.id == "opening_cave":
+		# its fires are painted into its bake, so they stand still: each gets a live flame (world/live_flames.gd)
+		var lf = load("res://world/live_flames.gd").new()
+		zone.add_child(lf)
+		lf.bind(zone)
 	if args.has("at") and from == "":   # tests: the pilgrim stood at x,y (zone tiles), for captures
 		var p := String(args["at"]).split(",")
 		at = Vector2(float(p[0]), float(p[1]))
@@ -221,6 +231,7 @@ func enter(zid: String, from: String) -> void:
 		far.wait = 0.5
 	if hud and hud.has_method("bind"):
 		hud.bind(hero, zone)
+		hud.set_bare(hero.nascent)                       # (the newborn's bare view; the cove's pilgrim has it all)
 		# a new pilgrim opens on the skill page to spend the first point
 		if fresh_pilgrim and hero.st.skill_points > 0 and not args.has("demo") and not args.has("panel") and not args.has("shot") and not args.has("arena") and not hud.is_open("skills"):
 			hud.toggle_panel("skills")
@@ -271,9 +282,9 @@ func _reading_done(r: Dictionary) -> void:
 	hero.st.poise = hero.st.poise_max()
 	title_done()
 	save_game()
-	# the last card drawn, the pilgrim has its shape: the game goes on out on the cove, in its calling's own body
-	if zone and zone.id == "opening_cave":
-		await enter("red_shore", "opening_cave")
+	# the last card drawn, the Stranger sends it to the black mirror, and it walks there itself in the body it rose in
+	# (Derek, 2026-10-10: "we should also be told to look into the black mirror and walk to it not just auto move");
+	# through the mirror, the cove takes it in its calling's own body
 
 ## the new pilgrim in the cave before the cards have made it (Derek, 2026-10-10): "a suggestion of a person ... gore
 ## covered and thus undefined", "It can be a generic new body", "Sluggish and slow from its new birth": the same body for
@@ -283,11 +294,14 @@ func _reading_done(r: Dictionary) -> void:
 func _nascent() -> void:
 	hero.nascent = true
 	hero.spr.visible = false
+	if hud:
+		hud.set_bare(true)
 	var b := Body3D.new("res://art/characters3d/newborn/newborn.glb")
 	hero.add_child(b)
 	hero.body3d = b
 	b.face_ground(Vector2(1, 1), true)
 	b.enable_drips()
+	b.contact.connect(hero.footfall)
 	b.play("idle", 0.0)
 	if hero.lamp:
 		hero.lamp.enabled = false
@@ -306,6 +320,7 @@ func title_done() -> void:
 	if hud:
 		hud.visible = true
 		hud.set_process_input(true)
+		hud.set_bare(hero != null and hero.nascent)      # the newborn's bare view stays until the mirror
 	hero.set_process_unhandled_input(true)
 	hero.set_process_input(true)
 
@@ -390,8 +405,16 @@ func _process(_dt: float) -> void:
 	for c in zone.connections:
 		var p := Vector2(c["x"], c["y"])
 		if hero.tp.distance_to(p) < 0.8 and not hero.dead:
+			# the black mirror takes no one the Stranger has not read (Derek, 2026-10-10: "we shouldnt be able to walk
+			# out the cave without talking to the stranger first")
+			if zone.id == "opening_cave" and hero.st.fate_picks.is_empty():
+				if mirror_said <= 0.0:
+					Bus.say.emit("“Not yet,” the Stranger says from his step. “It has to be read before the dark will take it.”", 4.0)
+					mirror_said = 6.0
+				continue
 			enter(c["to"], zone.id)
 			return
+	mirror_said = maxf(0.0, mirror_said - _dt)
 	# lantern-stones: kindled by passing and set as the return point by touch (world/objects/manager.gd)
 	# the remnant: what the lantern kept waits where you fell
 	if not remnant.is_empty() and remnant["zone"] == zone.id and not hero.dead:

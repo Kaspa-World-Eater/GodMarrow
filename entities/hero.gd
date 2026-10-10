@@ -159,7 +159,32 @@ func _shadow() -> void:
 
 func _sync() -> void:
 	position = Iso.to_screen(tp)
+	var sz := _stair_lift()
+	if sz >= 0.0:
+		position.y = (tp.x + tp.y) * Iso.HY - sz
 	_lit_tick()
+
+## on a stair, the height of its true steps under the pilgrim (screen px), or -1 off every stair: each rise is taken
+## over the last quarter of its tread, a foot going up (zone data "stairs", from tools/landkit3d/cave_export.py)
+func _stair_lift() -> float:
+	if zone == null:
+		return -1.0
+	for s in zone.d.get("stairs", []):
+		var x0 := minf(float(s["x0"]), float(s["x1"]))
+		var x1 := maxf(float(s["x0"]), float(s["x1"]))
+		if tp.x < x0 or tp.x > x1:
+			continue
+		var ya := float(s["y0"])
+		var yb := float(s["y1"])
+		var u := (tp.y - ya) / (yb - ya)
+		if u < 0.0 or u > 1.0:
+			continue
+		var n := float(s["steps"])
+		var k := u * n
+		var f := k - floorf(k)
+		var zq := (floorf(k) + smoothstep(0.75, 1.0, f)) / n
+		return (float(s["z0"]) + (float(s["z1"]) - float(s["z0"])) * zq) * Iso.lift_px
+	return -1.0
 
 func mouse_tile() -> Vector2:
 	return Iso.to_tile(get_global_mouse_position())
@@ -258,6 +283,8 @@ func _physics_process(dt: float) -> void:
 		return
 	if body3d and zone:
 		body3d.light_from(zone.d.get("lights", []), tp)   # the live body lit by the world's own lights
+		var pl = load("res://world/pool_life.gd").me
+		body3d.wade = pl.depth_at(tp) if pl != null and is_instance_valid(pl) else 0.0   # sunk to its waterline
 	if scripted:
 		_sync()
 		return
@@ -339,7 +366,13 @@ func _physics_process(dt: float) -> void:
 	spr.face = face
 	if moved:
 		spr.play("walk")
+		var fi0 := spr.fi
 		spr.step(dt, st.move_speed() / 3.11 * (NASCENT_K if nascent else 1.0))
+		# a footfall on the walk's two contact frames, so the sound keeps the feet's time (Derek, 2026-10-10: the steps
+		# "sounds like the ossuarch is running really fast": they had come every 0.62 yd, whatever the legs did)
+		var nf := spr.frame_count()
+		if body3d == null and nf > 1 and spr.fi != fi0 and (spr.fi == 0 or spr.fi == nf / 2):
+			footfall("walk")
 		if body3d:
 			body3d.play("walk", 0.3, st.move_speed() * NASCENT_K / Body3D.WALK_V)
 		if act == "":
@@ -351,7 +384,6 @@ func _physics_process(dt: float) -> void:
 			body3d.play("idle", 0.45)
 	_sync()
 
-var step_acc := 0.0
 func _walk(dt: float) -> bool:
 	if not walking or path_i >= path.size():
 		walking = false
@@ -371,10 +403,6 @@ func _walk(dt: float) -> bool:
 	if nascent:
 		spd *= NASCENT_K     # sluggish and slow from its new birth (Derek, 2026-10-10)
 	var step := spd * dt
-	step_acc += minf(step, to.length())
-	if step_acc > 0.62:
-		step_acc = 0.0
-		Sfx.play("step_" + zone.surface_at(tp))
 	if to.length() <= step:
 		tp = zone.move(tp, to, radius)
 		path_i += 1
@@ -386,6 +414,22 @@ func _walk(dt: float) -> bool:
 	if path_i >= path.size():
 		walking = false
 	return true
+
+## a foot (or a hand, crawling) meets the ground: its sound, by the ground's surface
+func footfall(clip: String) -> void:
+	if zone == null:
+		return
+	# in the pool: a ring where the foot (or, crawling, the hand ahead) goes in (world/pool_life.gd)
+	var pl = load("res://world/pool_life.gd").me
+	if pl != null and is_instance_valid(pl) and pl.depth_at(tp) > 0.02:
+		var ahead := Vector2.ZERO
+		if clip == "crawl" and body3d:
+			ahead = Vector2(cos(body3d.yaw_to), sin(body3d.yaw_to)).rotated(PI / 4.0) * 0.45
+		pl.ring(tp + ahead, 0.6 if clip == "crawl" else 1.0)
+	if clip == "crawl":
+		Sfx.play("step_wet", 0.45, randf_range(0.8, 0.95))     # a hand, slapping down in the blood
+	else:
+		Sfx.play("step_" + zone.surface_at(tp), 0.85, randf_range(0.94, 1.06))
 
 func _face(dir: Vector2) -> void:
 	var r := AnimSprite.hero_view(dir, face, spr.set if spr else null)
