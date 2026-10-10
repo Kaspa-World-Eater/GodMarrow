@@ -155,14 +155,10 @@ def main():
                   arriveHereFrom=None)]
     arrive = {"hollow_wood": dict(x=arrive_up[0], y=arrive_up[1])}
     mk["start"] = dict(x=st0[0], y=st0[1])
-    lp = zone_of(47.0, 27.5)
-    objects.append(dict(type="lantern", x=lp[0], y=lp[1], idx=0, name="The Last Lantern on the Sand", vOld="The Red Shore",
-                        vInscr="A light set on the black sand where the cliffs let the living out.", i=len(objects), solid=False,
-                        sprites=[]))
-    mk["lanterns"].append(dict(idx=0, name="The Last Lantern on the Sand", x=lp[0], y=lp[1], object=len(objects) - 1))
-    # no waystone and no stash on the beach (Derek, 2026-10-09: "It will be in the first little town. Same with the
-    # waypoint"): both wait for the shore folk's dead village
-    lights = [dict(type="fire", kind="lantern", x=lp[0], y=lp[1] + 0.3, radius=8.5, rgb="255,150,72", a=1.4, heightPx=44, dxPx=13)]
+    # no lantern-stone, no waystone and no stash on the beach (Derek, 2026-10-09: "It will be in the first little town.
+    # Same with the waypoint"): all wait for the shore folk's dead village. (A lantern-stone with no sprite had stayed,
+    # and its light glowed orange round the start with no source: Derek, 2026-10-10.)
+    lights = []
     N["objects"], N["connections"], N["arrive"], N["markers"], N["lights"] = objects, conns, arrive, mk, lights
     # a lightning storm at dawn, the black sand blowing in off the Red (Derek, 2026-10-09: first "night", then "let's
     # change the time of day to be Dawn ... You can't really enjoy the oh shit if you can't see it"; world/weather.gd,
