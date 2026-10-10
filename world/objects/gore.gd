@@ -126,7 +126,9 @@ func _draw() -> void:
 			var q := Iso.to_screen(at)
 			var z: float = r["z0"] + (18.0 - r["z0"]) * e
 			draw_rect(Rect2(roundf(q.x / W) * W, roundf((q.y - z * W) / W) * W, r["w"] * W, r["w"] * W), r["col"])
-		if drips > 0.0:
+		# (a live body streams its own blood from where its body truly is, entities/body3d.gd; these drops, set at a standing
+		# figure's heights, hung in the air over the crouched newborn: Derek, 2026-10-10)
+		if drips > 0.0 and hero.get("body3d") == null:
 			var q := Iso.to_screen(hp)
 			var kk := minf(1.0, drips / 2.0)
 			var tt := Time.get_ticks_msec() / 1000.0
