@@ -23,6 +23,8 @@ var sims: Array = []            # its material
 var imps: Array = []            # [uv, strength, radius], each for one frame
 var spring_uv := Vector2(0.5, 0.5)
 var t := 0.0
+var level := 0.0                # the tide: -1 drained down, +1 welled up
+var welling := 0.0              # rising (+) or sinking (-)
 var _frames := 0
 
 func _init(m: ShaderMaterial, zd: Dictionary) -> void:
@@ -83,7 +85,7 @@ func _uv(tile: Vector2) -> Vector2:
 
 ## a push down into the surface at a tile (a step 1, a hand or a drip less)
 func ring(tile: Vector2, strength: float = 1.0) -> void:
-	imps.append([_uv(tile), 0.12 * strength, 3.5])        # a heavy step, a broad dent
+	imps.append([_uv(tile), 0.06 * strength, 3.5])        # a heavy step, a broad dent
 	while imps.size() > 8:
 		imps.pop_front()
 
@@ -102,12 +104,19 @@ func _process(dt: float) -> void:
 	t += dt
 	_frames += 1
 	var u_: Dictionary = {"t": t, "init": _frames < 4}
-	# the spring: two surges on each slow beat of the heart beneath, wandering a little about the heart
+	# the welling (Derek, 2026-10-10: "it should have an upwelling and downwelling like a real cave ocean pool"): the
+	# blood comes up from beneath and sinks back on a long slow tide, a rise of about eleven seconds and a fall, the level
+	# of the whole pool with it; the heart beneath only a faint pulse on top
+	var tide := sin(TAU * t / 22.0) + 0.25 * sin(TAU * t / 9.0 + 1.3)
+	var dtide := cos(TAU * t / 22.0) * TAU / 22.0 + 0.25 * cos(TAU * t / 9.0 + 1.3) * TAU / 9.0
+	level = tide
+	welling = dtide
 	var ph := fmod(t / 3.6, 1.0)
 	var push := exp(-pow((ph - 0.06) / 0.05, 2.0)) + 0.55 * exp(-pow((ph - 0.27) / 0.035, 2.0))
-	var wander := Vector2(sin(t * 0.13), cos(t * 0.17)) * 0.035
-	# (its mean over a beat taken away: it surges up and falls back, and the pool stays level on the whole)
-	u_["spring"] = Vector4(spring_uv.x + wander.x, spring_uv.y + wander.y, 0.03 * (push - 0.123), 0.0)
+	var wander := Vector2(sin(t * 0.07), cos(t * 0.09)) * 0.035
+	u_["spring"] = Vector4(spring_uv.x + wander.x, spring_uv.y + wander.y, 0.006 * dtide + 0.006 * (push - 0.123), 0.0)
+	mat.set_shader_parameter("pool_level", tide)
+	mat.set_shader_parameter("pool_welling", dtide)
 	var sp: Array = []
 	for i in 6:
 		if i < spouts.size():

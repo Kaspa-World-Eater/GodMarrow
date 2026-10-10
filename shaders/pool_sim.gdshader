@@ -51,18 +51,18 @@ void fragment() {
 	float hd = H(suv + vec2(0.0, sp.y * fy.y)) * step(0.5, texture(field, uv + vec2(0.0, px.y)).b);
 	// thick blood (Derek, 2026-10-10: "too fast and noisy", "needs to be thicker and sloshier"): slow waves; a strong
 	// viscosity that smooths every small ripple away within moments, so only long heavy swells travel; little loss on those
-	float c2 = 0.05;
+	float c2 = 0.025;                                // (slower still: thick blood)
 	float avg = (hl + hr + hu + hd) * 0.25;
 	float hn = (2.0 * h - hp + c2 * 4.0 * (avg - h)) * 0.994;
 	hn += 0.22 * (avg - h);                          // viscosity: the surface pulled toward its neighbours' mean
 	hn -= 0.004 * h;                                 // it settles back toward level, as a basin's blood finds it
 	// the slosh: the whole basin rocking, slowly, back and forth and round (the swell from beneath pushing it), so
 	// the blood heaps against one shore, then the other, and the stumps cut through it
-	vec2 rk = vec2(sin(t * 0.55), sin(t * 0.37 + 1.2));
-	hn += 0.0035 * dot(rk, (uv - 0.5) * vec2(2.0, 2.0));
+	vec2 rk = vec2(sin(t * 0.3), sin(t * 0.21 + 1.2));
+	hn += 0.0015 * dot(rk, (uv - 0.5) * vec2(2.0, 2.0));
 	// the spring: an upwelling at the heart, swelling on each beat
 	vec2 ds = (uv - spring.xy) * cells;
-	hn += spring.z * exp(-dot(ds, ds) / 140.0);       // a broad boil
+	hn += spring.z * exp(-dot(ds, ds) / 900.0);       // the welling: broad, from beneath the whole heart
 	// the ropes of blood striking: small falls churning the surface
 	for (int i = 0; i < 6; i++) {
 		vec4 S = spouts[i];
@@ -70,7 +70,7 @@ void fragment() {
 		vec2 d = (uv - S.xy) * cells;
 		float k = exp(-dot(d, d) / 14.0);
 		// a heavy fall, not a spray: a slow, broad churn (the rope's own beat), never noise
-		hn += k * S.z * (0.6 * sin(t * 2.3 + float(i) * 1.7) + 0.4 * sin(t * 3.7 + float(i) * 2.9)) * 0.05;
+		hn += k * S.z * (0.6 * sin(t * 1.3 + float(i) * 1.7) + 0.4 * sin(t * 2.1 + float(i) * 2.9)) * 0.03;
 	}
 	// impulses: a step or a hand going in pushes the surface down
 	for (int i = 0; i < 8; i++) {

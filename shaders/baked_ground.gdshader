@@ -35,6 +35,8 @@ uniform sampler2D pool_state : filter_nearest;   // the simulated surface (world
 uniform sampler2D pool_field : filter_linear;    // R, G its flow; B the blood mask (pool_sim.png)
 uniform vec4 pool_rect = vec4(0.0, 0.0, 1.0, 1.0);   // the simulated area, world px
 uniform vec2 pool_cells = vec2(192.0, 96.0);
+uniform float pool_level = 0.0;      // the tide: -1 drained down, +1 welled up
+uniform float pool_welling = 0.0;    // rising (+) or sinking (-)
 uniform sampler2D shore : filter_linear, repeat_disable;
 uniform vec2 shore_size = vec2(1.0);
 uniform float shore_span = 24.0;
@@ -168,6 +170,20 @@ void fragment() {
 				float a = clamp(0.55 + (-din) * 0.5, 0.55, 0.85);
 				c.rgb = mix(c.rgb, film, a);
 			}
+		} else if (c.a > 0.998 && red && pool) {
+			// the shore and the stumps: as the blood wells up it creeps up over their feet in a thin dark film and draws
+			// back as it sinks, leaving them wet (the mask's soft edge, read further out the higher the tide)
+			vec2 su0 = (wpos - pool_rect.xy) / pool_rect.zw;
+			if (su0.x > 0.0 && su0.y > 0.0 && su0.x < 1.0 && su0.y < 1.0) {
+				float m = texture(pool_field, su0).b;
+				float reach = 0.62 - 0.32 * pool_level;
+				if (m > reach) {
+					float th = clamp((m - reach) / 0.12, 0.0, 1.0);
+					c.rgb = mix(c.rgb * 0.62, vec3(0.16, 0.02, 0.03) * (0.6 + max(max(c.r, c.g), c.b) * 1.8), 0.35 + 0.5 * th);
+				} else if (m > reach - 0.1 - 0.08 * max(-pool_welling, 0.0) * 6.0) {
+					c.rgb *= 0.78;                              // wet, where the blood has just drawn back
+				}
+			}
 		} else if (c.a < 0.998 && red && pool) {
 			// the pool from its simulation (world/pool_life.gd): its height read from the wave field, so every swell from
 			// the spring, every fall of the faces' blood, every step and the wake round a wading body is a real wave,
@@ -190,8 +206,10 @@ void fragment() {
 			float T = TIME * 0.35;
 			vec2 q = wp + grad * 22.0;
 			vec2 fl = flow * vec2(1.0, 0.5) * 50.0;
-			float f1 = fract(TIME * 0.05);                   // slow: thick blood creeping, not water running
-			float f2 = fract(TIME * 0.05 + 0.5);
+			// the flow runs out from the faces and the heart as the blood wells up, and is drawn back as it sinks
+			fl *= clamp(0.35 + pool_welling * 2.5, -1.0, 1.0);
+			float f1 = fract(TIME * 0.03);                   // slow: thick blood creeping, not water running
+			float f2 = fract(TIME * 0.03 + 0.5);
 			float pa = pool_pat(q - fl * f1, T);
 			float pb = pool_pat(q - fl * f2 + 17.0, T);
 			float v = 0.22 + mix(pa, pb, abs(1.0 - 2.0 * f1));
