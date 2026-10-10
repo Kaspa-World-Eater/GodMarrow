@@ -844,3 +844,15 @@ again, with the dull heart, the skin and the clots reading; 9 of 9.
   builder (shaped limbs with knees, elbows, hands and feet, the weight lying on what it lies on, bloat and rot as
   states), with its own ten graded passes, then used by the beach, the cave and every later dead. Queued, not patched.
 
+## Rules check (4th since pass 11): the light's pixel constants
+
+**Read:** `MASTER_RULES` (unchanged). **Worked:** the follow-up from the last check, `paint_cave`'s two pixel-sized light
+constants on the 2 x 2 grid, tested on all three rooms from their saved passes (before, after, then each alone):
+- **The local-contrast blur (16 px):** scaled with the zoom, the hall's step-tops lost some orange blotching, but the
+  stairs' faces beside their fires went flatter and dimmer: against Derek's "the faces ... more defined". **Kept at
+  16 px on purpose**, with a note in the code.
+- **The light's grain smoothing (2 px):** scaled with the zoom; it changes almost nothing (mean difference 0.03 of 255),
+  kept as the right value.
+`cine_check`: 9 of 9 in all three rooms, before and after. The follow-up is closed. **Open:** the shared corpse asset
+(queued above); Derek's grade of pass 11; then the cave's bake into the game.
+

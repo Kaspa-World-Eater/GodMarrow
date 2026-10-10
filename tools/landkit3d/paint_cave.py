@@ -88,7 +88,8 @@ def light_field(d, t):
     # the render's grain smoothed out of the light (its hue above all: a stray red sample is a red speck)
     L = np.stack([nd.median_filter(L[..., c], size=3) for c in range(3)], axis=2)
     lum = L.max(axis=2)
-    Ls = np.stack([nd.gaussian_filter(L[..., c], 2.0) for c in range(3)], axis=2)
+    zm = float(d["zoom"]) if "zoom" in d else 1.0                  # pixel sizes below were set on the old 4 px grid
+    Ls = np.stack([nd.gaussian_filter(L[..., c], 2.0 * zm) for c in range(3)], axis=2)
     hue = Ls / (Ls.max(axis=2, keepdims=True) + 1e-9)
     ref = float(d["lamp_ref"])
     light = lum / ref * mult
@@ -133,6 +134,7 @@ def paint(d, t=0.0):
     # of the falloff from the lamps alone saturated the faces flat beside close fires)
     # the falloff from the lamps (it keeps the big shapes: a great face's sockets are not mistaken for the pool's
     # edge), calibrated locally to the light that truly arrives, so beside a close fire it does not saturate the form
+    # (kept at 16 px on the 2 x 2 grid on purpose: scaled with the zoom it flattened the faces beside their fires)
     c_loc = (nd.gaussian_filter(light, 16.0) + 0.02) / (nd.gaussian_filter(F, 16.0) + 0.02)
     Fl = F * c_loc
     Fn = np.clip(np.log1p(Fl * EXPO) / np.log1p(LMAX * EXPO), 0, 1) ** 1.15
