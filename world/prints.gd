@@ -8,7 +8,7 @@ extends Node2D
 static var me = null
 
 const LIFE := 30.0
-const PX := 4.0               # the game's art pixel (Iso.WPX): a print is about a third of a yard, 40 x 16 units
+const PX := 2.0               # the art pixel, the 2 x 2 grid: a print is about a third of a yard, about 40 x 16 units
 
 var prints: Array = []        # {tp, dir, side, t}
 var kicks: Array = []         # {p (screen), v, t, life}
@@ -56,20 +56,22 @@ func _draw() -> void:
 		var sd := Iso.vec(d).normalized()           # the foot's length on screen
 		var sp := Vector2(-sd.y, sd.x)              # its width
 		# the hollow: an oval of whole pixels, heel and toe, darker; its rim lit toward the upper left
-		for i in range(-4, 5):
-			for j in range(-1, 2):
-				if absi(i) == 4 and j != 0:
-					continue                                # the heel and the toe rounded
-				var o := sd * (i * PX * 1.15) + sp * (j * PX * 1.3)
+		for i in range(-9, 10):
+			for j in range(-3, 4):
+				var e := float(i * i) / 81.0 + float(j * j) / 9.0
+				if e > 1.0:
+					continue                                # an oval: the heel and the toe rounded
+				var o := sd * (i * PX * 1.1) + sp * (j * PX * 1.2)
 				var pp := ((q + o) / PX).floor() * PX
-				var heel := 1.0 if i <= -1 else 0.85
+				var heel := 1.0 if i <= -2 else 0.85
 				draw_rect(Rect2(pp, Vector2(PX, PX)), Color(0.02, 0.01, 0.02, 0.42 * fade * heel))
 		# the sand pushed up at the toe and along the far side, catching the light
-		for i in range(-2, 4):
-			var rp := ((q + sd * (i * PX * 1.15) - sp * (2 * PX * 1.3)) / PX).floor() * PX
+		for i in range(-5, 8):
+			var rp := ((q + sd * (i * PX * 1.1) - sp * (4 * PX * 1.2)) / PX).floor() * PX
 			draw_rect(Rect2(rp, Vector2(PX, PX)), Color(0.5, 0.45, 0.46, 0.18 * fade))
-		var toe := ((q + sd * (5 * PX * 1.15)) / PX).floor() * PX
-		draw_rect(Rect2(toe, Vector2(PX * 2, PX)), Color(0.5, 0.45, 0.46, 0.2 * fade))
+		for j in range(-2, 3):
+			var toe := ((q + sd * (10 * PX * 1.1) + sp * (j * PX * 1.2)) / PX).floor() * PX
+			draw_rect(Rect2(toe, Vector2(PX, PX)), Color(0.5, 0.45, 0.46, 0.2 * fade))
 	for k in kicks:
 		var a := 1.0 - float(k["t"]) / float(k["life"])
 		var pp: Vector2 = (k["p"] / PX).floor() * PX

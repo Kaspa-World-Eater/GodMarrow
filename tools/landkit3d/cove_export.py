@@ -159,6 +159,15 @@ def main():
     # Same with the waypoint"): all wait for the shore folk's dead village. (A lantern-stone with no sprite had stayed,
     # and its light glowed orange round the start with no source: Derek, 2026-10-10.)
     lights = []
+    # the candle hollows in the gateposts of the way out (BF.gate_niches; Derek, 2026-10-10): each a small warm light,
+    # set on the cleft's floor before its hollow at the hollow's height (its flames drawn live: world/live_flames.gd)
+    for (ns, nt, nz, side) in BF.gate_niches():
+        tc = float(BF.cleft_t(np.array([ns]))[0])
+        fs, ft = ns, tc + side * (BF.CLEFT_W - 0.35)
+        floor = float(BF.height_st(np.array([fs]), np.array([ft]))[0])
+        zx, zy = zone_of(fs, ft)
+        lights.append(dict(type="fire", kind="floorcandles", x=round(zx, 2), y=round(zy, 2), radius=2.6, rgb="255,150,64",
+                           a=0.42, heightPx=int(round(max(0.0, nz - floor) * 21)), dxPx=0))
     N["objects"], N["connections"], N["arrive"], N["markers"], N["lights"] = objects, conns, arrive, mk, lights
     # a lightning storm at dawn, the black sand blowing in off the Red (Derek, 2026-10-09: first "night", then "let's
     # change the time of day to be Dawn ... You can't really enjoy the oh shit if you can't see it"; world/weather.gd,

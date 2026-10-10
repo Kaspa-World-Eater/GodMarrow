@@ -14,6 +14,8 @@ var data: Dictionary
 var spouts: Array = []
 var rings: Array = []          # [world px x, y, age, strength]
 var clocks: Array = []
+var _last := Vector2.INF
+var _vel := Vector2.ZERO
 
 func _init(m: ShaderMaterial, zd: Dictionary) -> void:
 	mat = m
@@ -59,3 +61,15 @@ func _process(dt: float) -> void:
 	for i in 12:
 		arr.append(Vector4(rings[i][0], rings[i][1], rings[i][2], rings[i][3]) if i < rings.size() else Vector4(0, 0, 0, 0))
 	mat.set_shader_parameter("rings", arr)
+	mat.set_shader_parameter("pool_geo", Vector4(float(data.get("cx", 0)), float(data.get("cy", 0)), float(data.get("r_shore", 3.7)), 0.0))
+	# the body in it, for its slosh: where it stands and the way it goes (screen px a second)
+	var h = get_tree().current_scene.get("hero") if get_tree() and get_tree().current_scene else null
+	if h != null and is_instance_valid(h) and depth_at(h.tp) > 0.01:
+		var sp: Vector2 = h.position
+		var v := (sp - _last) / maxf(dt, 0.001) if _last != Vector2.INF else Vector2.ZERO
+		_vel = _vel.lerp(v, minf(1.0, dt * 6.0))
+		_last = sp
+		mat.set_shader_parameter("body", Vector4(sp.x, sp.y, _vel.x, _vel.y))
+	else:
+		_last = Vector2.INF
+		mat.set_shader_parameter("body", Vector4(-9999.0, 0.0, 0.0, 0.0))

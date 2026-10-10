@@ -133,6 +133,11 @@ func blocks_sight(t: Vector2) -> bool:
 
 ## a body of radius r moving from p by v, sliding along solid tiles (the web moves x and y separately) and round posts
 func move(p: Vector2, v: Vector2, r: float = 0.25) -> Vector2:
+	# a body already overlapping rock (it cut a corner, or stood where the walk grid changed) could never move again:
+	# every step it tried still overlapped, so every step was refused (Derek, 2026-10-10: "i get stuck at the top of the
+	# stairs and have to restart"). While it overlaps, a step is taken if its centre stands on open ground
+	if _blocked(p, r, p):
+		r = 0.0
 	var q := p
 	var nx := Vector2(p.x + v.x, p.y)
 	if not _blocked(nx, r, q):

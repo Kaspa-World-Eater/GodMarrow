@@ -25,6 +25,8 @@ uniform bool has_shore = false;
 // (world/pool_life.gd fills `rings`: x, y in world px, age in seconds, strength)
 uniform bool pool = false;
 uniform vec4 rings[12];
+uniform vec4 pool_geo = vec4(0.0, 0.0, 3.7, 0.0);   // the pool's centre (tiles) and its shore's reach (tiles)
+uniform vec4 body = vec4(-9999.0, 0.0, 0.0, 0.0);   // a body in it: world px x, y, and its way (x, y, screen px a second)
 uniform sampler2D shore : filter_linear, repeat_disable;
 uniform vec2 shore_size = vec2(1.0);
 uniform float shore_span = 24.0;
@@ -140,28 +142,64 @@ void fragment() {
 				c.rgb = mix(c.rgb, film, a);
 			}
 		} else if (c.a < 0.998 && red && pool) {
-			vec2 W = floor(wpos / 2.0);                     // the 2 x 2 art grid
-			float ph = fract(TIME / 3.6);
-			float d1 = ph - 0.06;
-			float d2 = ph - 0.27;
-			float pulse = exp(-d1 * d1 / 0.002) + 0.5 * exp(-d2 * d2 / 0.0012);
-			// the sheen: broad, slow, drifting; the thick surface shifting under the fires, never sliding
-			float sh = vn(W * 0.045 + vec2(TIME * 0.05, TIME * 0.032)) * 0.65 + vn(W * 0.11 - vec2(TIME * 0.035, TIME * 0.06)) * 0.35;
-			c.rgb *= 0.92 + 0.13 * sh - 0.035 * pulse;
-			// the rings: each a lifted crest with a dark trough inside, spreading slowly on thick blood, fading
-			float lift_ = 0.0;
+			// (2026-10-10, Derek: the pool "has no movement at all and looks like a flat red blotch", its ripples "look
+			// painted on top", "the blood should slosh and move around the body"): the blood surface of the library's
+			// lake (tools/art_study/library/objects/blood-and-fluids.md; shaders/lake.gdshader kind 1), on the 2 x 2 grid:
+			// dry-brush strokes drifting slowly (blood moves at a third of water's pace), clots drifting, a skin that
+			// wrinkles slowly, the light broken into dull heavy dabs, the pigment pooled dark toward the edge, held dark
+			// (no ketchup); lit by the baked light under it, so the fires and the red glow fall where they did; and a body
+			// in it pushes a wake: a raised ring round it, heaped ahead as it moves, the rings of its steps spreading
+			vec2 W = floor(wpos / 2.0);
+			vec2 wp = W * 2.0 + 1.0;
+			float lum = max(max(c.r, c.g), c.b);
+			vec2 tl = vec2(wpos.x / 72.0 + wpos.y / 36.0, wpos.y / 36.0 - wpos.x / 72.0) * 0.5;
+			vec2 dv0 = tl - pool_geo.xy;
+			float lobe = 0.82 + 0.3 * vn(normalize(dv0 + 1e-4) * 2.0 + 3.0);
+			float depth = clamp(1.0 - length(dv0) / (pool_geo.z * lobe), 0.0, 1.0);
+			float T = TIME * 0.35;
+			vec2 wd = normalize(vec2(1.0, 0.35));
+			vec2 ax = vec2(dot(wp, wd), dot(wp, vec2(-wd.y, wd.x)));
+			float stroke = vn(vec2(ax.x * 0.012 - T * 0.25, ax.y * 0.16));
+			float stroke2 = vn(vec2(ax.x * 0.03 + T * 0.4, ax.y * 0.3 + 5.0));
+			float v = 0.1 + depth * 0.22 + (stroke - 0.5) * 0.26 + (stroke2 - 0.5) * 0.06;
+			// the rings (world/pool_life.gd): thin, broken like a brush lifted, spreading slowly in thick blood
+			float rip = 0.0;
 			for (int i = 0; i < 12; i++) {
 				vec4 r = rings[i];
 				if (r.w <= 0.0) continue;
-				vec2 dv = (W * 2.0 + 1.0) - r.xy;
-				float d = length(vec2(dv.x, dv.y * 2.0));
-				float R_ = 6.0 + r.z * 46.0;
-				float fade = r.w * (1.0 - smoothstep(0.2, 1.7, r.z));
-				float x = (d - R_) / 5.0;
-				lift_ += fade * (exp(-x * x) - 0.6 * exp(-(x + 1.6) * (x + 1.6)));
+				vec2 dv = (wp - r.xy) * vec2(1.0, 2.0);
+				float rr = length(dv);
+				float rad = 6.0 + r.z * 40.0;
+				float bnd = 1.0 - smoothstep(0.0, 5.0, abs(rr - rad));
+				float br = step(0.35, vn(vec2(atan(dv.y, dv.x) * 4.0, r.z * 2.0)));
+				rip += bnd * br * r.w * (1.0 - smoothstep(0.4, 1.7, r.z));
 			}
-			c.rgb *= 1.0 + 0.6 * lift_;
-			c.rgb += vec3(0.1, 0.028, 0.026) * max(lift_, 0.0);   // the crest catches the fire: wet, a shade lighter
+			v += rip * 0.32;
+			// the slosh round the body: a raised lip at its waterline, heaped ahead the way it goes, a trough behind
+			if (body.x > -9000.0) {
+				vec2 bd = (wp - body.xy) * vec2(1.0, 2.0);
+				float bl = length(bd);
+				vec2 bv = body.zw;
+				float sp = clamp(length(bv) / 60.0, 0.0, 1.0);
+				float ahead = sp > 0.01 ? dot(bd / max(bl, 0.001), normalize(bv * vec2(1.0, 2.0))) : 0.0;
+				float lip = exp(-pow((bl - 26.0 - 6.0 * sin(TIME * 2.2)) / 7.0, 2.0)) * (0.5 + 0.5 * sp * (0.5 + ahead));
+				float trough = exp(-pow((bl - 40.0) / 9.0, 2.0)) * 0.6 * sp * max(0.0, -ahead);
+				v += lip * 0.22 - trough * 0.12;
+			}
+			// the light broken into dull, heavy dabs; clots drifting; the skin wrinkling
+			float dab = step(0.68, vn(vec2(ax.x * 0.035 - T * 0.5, ax.y * 0.22 + 31.0)));
+			v += dab * 0.12 * smoothstep(0.2, 0.7, lum * 3.0);
+			float clot = vn(wp * 0.035 + vec2(T * 0.05, T * 0.03) + 40.0);
+			if (clot > 0.74) v = min(v, 0.12);
+			float wr = 1.0 - abs(vn(wp * 0.06 + vec2(T * 0.04, 0.0)) * 2.0 - 1.0);
+			if (wr > 0.9) v += 0.12;
+			// toward the edge the pigment pools dark
+			v -= 0.18 * (1.0 - smoothstep(0.0, 0.18, depth));
+			float dth = (float((int(W.x) % 4) * 4 + (int(W.y) % 4)) + 0.5) / 16.0;
+			float lv = clamp(v + (dth - 0.5) * 0.07, 0.0, 1.0);
+			vec3 bc = lv > 0.62 ? vec3(0.5, 0.09, 0.09) : (lv > 0.44 ? vec3(0.34, 0.04, 0.06) : (lv > 0.26 ? vec3(0.2, 0.02, 0.04) : vec3(0.09, 0.01, 0.02)));
+			// lit by the baked light that fell here (the fires, the pool's glow), held dark
+			c.rgb = bc * clamp(0.45 + lum * 1.6, 0.4, 1.35);
 		} else if (c.a < 0.998 && red) {
 			vec2 W = floor(wpos / 4.0);
 			float ph = fract(TIME / 3.6);                   // one beat: a surge, a weaker surge, then the stillness

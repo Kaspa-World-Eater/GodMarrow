@@ -14,7 +14,6 @@ var flames: Array = []        # {node, seed}
 
 func bind(z) -> void:
 	zone = z
-	z_index = 899
 	var sh: Shader = load("res://shaders/live_flame.gdshader")
 	for L in z.d.get("lights", []):
 		if str(L.get("type", "")) != "fire":
@@ -23,30 +22,42 @@ func bind(z) -> void:
 		var hpx := float(L.get("heightPx", 0))
 		var kind := 0
 		var size := Vector2(30, 50)
+		var root := Vector2(0.5, 1.0)          # where in the rect the flame stands on its fuel
 		if str(L.get("kind", "")) == "floorcandles":
 			kind = 3                  # a cluster of wax stubs on the floor or a step, each with its flame
 			size = Vector2(30, 26)
 		elif str(L.get("kind", "")) == "brazier":
-			kind = 1
-			size = Vector2(60, 58)
+			kind = 1                  # a fire down in its bowl: the bowl's opening an ellipse, its front lip hiding the root
+			size = Vector2(100, 96)
+			root = Vector2(0.5, 0.75)
 		elif hpx < 34.0:
 			kind = 2                  # low: candles on a heap of the dead's iron, or on a step
 			size = Vector2(34, 22)
 		elif hpx > 130.0:
 			size = Vector2(30, 60)    # the hall's sconces, the highest and largest torches
 		var seed := tp.x * 3.1 + tp.y * 7.7
+		# where the fire truly is: its own height in the world when the export knows it (zAbs, yards), else its height
+		# over the floor under it; and the flame stands in the world's sorted layer by its ground point, so what walks
+		# in front of a fire hides it (Derek, 2026-10-10: the brazier "has no depth to it, looks like its pasted on top")
+		var ground := Iso.to_screen(tp)
+		var fy := ground.y - hpx * 4.0
+		if L.has("zAbs"):
+			fy = (tp.x + tp.y) * Iso.HY - float(L["zAbs"]) * Iso.lift_px
+		var holder := Node2D.new()
+		holder.position = ground
+		zone.sorted.add_child(holder)
 		var n := ColorRect.new()
 		n.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		n.size = size
-		var at := Iso.to_screen(tp) + Vector2(float(L.get("dxPx", 0)), -hpx) * 4.0
-		n.position = (at - Vector2(size.x * 0.5, size.y - 4.0)).floor()
+		n.position = (Vector2(float(L.get("dxPx", 0)) * 4.0, fy - ground.y) - Vector2(size.x * root.x, size.y * root.y - (4.0 if root.y >= 1.0 else 0.0))).floor()
 		var m := ShaderMaterial.new()
 		m.shader = sh
 		m.set_shader_parameter("seed", seed)
 		m.set_shader_parameter("kind", kind)
 		m.set_shader_parameter("rect_size", size)
 		n.material = m
-		add_child(n)
+		holder.add_child(n)
+		var at := Vector2(ground.x, fy)
 		flames.append({"node": n, "seed": seed})
 		# its sound, at the fire: a torch crackles, a brazier roars low, candles barely flutter (core/sfx.gd loop)
 		var snd := "fire_brazier" if kind == 1 else ("fire_candle" if kind >= 2 else "fire_torch")

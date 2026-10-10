@@ -526,6 +526,10 @@ def cove_column_height(s_, t_, d, k):
         if abs(t_ - float(BF.cleft_t(np.array([s_]))[0])) < BF.CLEFT_W + 4.0 and s_ < float(BF.back_s(np.array([t_]))[0]) + 3.0:
             ramp = float(BF.height_st(np.array([s_]), np.array([float(BF.cleft_t(np.array([s_]))[0])]))[0])
             cap = max(cap, ramp + 3.0 + k * 1.2)
+            # the gateposts (2026-10-10, Derek: "an exit on the beach, a gap in the basalt we can walk though"): the
+            # columns flanking the cleft stand tall over its ramp, so the way out reads as a gap through the low rim
+            if abs(t_ - float(BF.cleft_t(np.array([s_]))[0])) < BF.CLEFT_W + 1.9:
+                cap = max(cap, ramp + 5.4 + k * 1.8)
             h = max(min(h, cap), ramp + 2.0 - max(float(BF.height_st(np.array([s_]), np.array([t_]))[0]), 0.0))
         h = min(h, cap)
     sea = s_ - 64.0
@@ -591,6 +595,15 @@ def cove_cliffs():
                             nxt.append(h_)
                 subs = nxt
             for q, sub in enumerate(subs):
+                # (2026-10-10, Derek: "the bluff wall has a wedge basalt"): the random cuts through the upper tier left
+                # three-sided and sliver pieces that read as wedges; only the four-sided-and-more, near-round ones stand,
+                # the rest left as crevices
+                sa = np.array(sub)
+                if len(sub) < 4:
+                    continue
+                sev = np.linalg.eigvalsh(np.cov((sa - sa.mean(0)).T))
+                if sev[1] > 3.0 * max(sev[0], 1e-6):
+                    continue
                 C.rough_prism("ce%d_%d" % (k, q), sub, split, z1 - r2.uniform(0, 2.5), "basalt", k * 7 + q, 0.0, 0.0,
                               ((r2.random() - 0.5) * 0.06, (r2.random() - 0.5) * 0.06), 0.4, drum=(0.4, 0.9))
         else:
@@ -616,18 +629,60 @@ def cove_cliffs():
     return made
 
 
+def cleft_gate():
+    """the candle hollows in the gateposts (BF.gate_niches): a carved frame set into each face that looks into the cleft
+    (a sill, two jambs and a lintel of cut rock, a dark back), its recess left in shadow, three or four wax stubs of
+    their own heights on the sill, the wax run down over its lip. The flames are the game's (lit live, world/live_flames)"""
+    made = 0
+    for i, (s_, t_, z, side) in enumerate(BF.gate_niches()):
+        x0, y0 = S.xy(s_, t_)
+        x1, y1 = S.xy(s_, t_ - side * 0.2)                       # one step across, into the cleft
+        nx, ny = x1 - x0, y1 - y0
+        nl = math.hypot(nx, ny)
+        nx, ny = nx / nl, ny / nl                                 # out of the wall, across the cleft
+        ux, uy = -ny, nx                                          # along the wall
+        rot = math.atan2(uy, ux)
+        W, H, D = 0.62, 0.72, 0.34
+
+        def at(u, n_, zz):
+            return (x0 + ux * u + nx * n_, y0 + uy * u + ny * n_, zz)
+
+        def slab(name, u0, u1, n0, n1, z0, z1, mat):
+            v = [at(u0, n0, z0), at(u1, n0, z0), at(u1, n1, z0), at(u0, n1, z0),
+                 at(u0, n0, z1), at(u1, n0, z1), at(u1, n1, z1), at(u0, n1, z1)]
+            f = [(0, 3, 2, 1), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]
+            P.poly(name, v, f, mat)
+
+        slab("nback%d" % i, -W / 2 - 0.12, W / 2 + 0.12, -D, -D + 0.06, z - 0.1, z + H + 0.1, "cutrock")
+        slab("nsill%d" % i, -W / 2 - 0.12, W / 2 + 0.12, -D, 0.1, z - 0.12, z, "cutrock")
+        slab("nlint%d" % i, -W / 2 - 0.14, W / 2 + 0.14, -D, 0.12, z + H, z + H + 0.16, "cutrock")
+        slab("njl%d" % i, -W / 2 - 0.14, -W / 2, -D, 0.1, z, z + H, "cutrock")
+        slab("njr%d" % i, W / 2, W / 2 + 0.14, -D, 0.1, z, z + H, "cutrock")
+        rnd = random.Random(900 + i)
+        for q in range(rnd.randint(3, 4)):
+            u = -W / 2 + 0.12 + q * (W - 0.24) / 3.0 + rnd.uniform(-0.04, 0.04)
+            hgt = rnd.uniform(0.08, 0.26)
+            cx, cy, cz = at(u, -D / 2 + rnd.uniform(-0.05, 0.05), z)
+            P.cylinder("ncand%d_%d" % (i, q), (cx, cy, cz), rnd.uniform(0.03, 0.045), hgt, "bone", sides=8)
+        # the wax run over the sill's lip
+        P.tube("nwax%d" % i, [at(-0.05, 0.08, z), at(-0.04, 0.12, z - 0.05), at(-0.03, 0.12, z - 0.16)], [0.03, 0.025, 0.018], "bone", 6)
+        made += 1
+    return made
+
+
 def sea_columns():
-    """lone basalt columns standing in the Red (Derek: "Add random columns of basalt in the water sparsely"): where the
+    """lone basalt columns standing in the Red (Derek: "Add random columns of basalt in the water sparsely"; and
+    2026-10-10, "the beach can also have a few more single columns of basalt in the surf and water"): where the
     headlands once ran further out, single columns and little clusters the sea has cut free, each its own height,
-    their feet in the surf, the blood standing in their cupped tops"""
+    their feet in the surf, the blood standing in their cupped tops; a few stand in the surf itself"""
     rnd = random.Random(61)
     placed = 0
     tries = 0
     spots = []
-    while placed < 9 and tries < 400:
+    while placed < 17 and tries < 700:
         tries += 1
-        s_, t_ = rnd.uniform(69.0, 86.0), rnd.uniform(T0 + 4.0, T1 - 4.0)
-        if any(math.hypot(s_ - a, t_ - b) < 9.0 for a, b in spots):
+        s_, t_ = (rnd.uniform(64.5, 69.0) if placed % 3 == 2 else rnd.uniform(69.0, 86.0)), rnd.uniform(T0 + 4.0, T1 - 4.0)
+        if any(math.hypot(s_ - a, t_ - b) < 7.0 for a, b in spots):
             continue
         spots.append((s_, t_))
         n = 1 if rnd.random() < 0.6 else rnd.randint(2, 4)
@@ -647,6 +702,8 @@ def sea_columns():
             o = C.rough_prism("seacol%d_%d" % (placed, q), pts, g - 1.0, max(g, 0.0) + hgt, "basalt", placed * 13 + q, cup,
                               0.0 if cup else rnd.uniform(0.0, 0.6), ((rnd.random() - 0.5) * 0.04, (rnd.random() - 0.5) * 0.04),
                               rnd.uniform(0.6, 0.9), drum=(0.5, 1.4))
+            if cs_ < 70.0:
+                OBSTACLES.append((cs_, ct_, r + 0.15))                 # in the surf: walked round, never through
             if cup:
                 xy = pts
                 P.poly("seacup%d_%d" % (placed, q), [(x, y, max(g, 0.0) + hgt - 0.08) for x, y in xy][::-1], [tuple(range(len(xy)))], "blood")
@@ -856,6 +913,7 @@ def build(root, material):
     memorial_pole()
     cove_cliffs()
     sea_columns()
+    cleft_gate()
     if os.environ.get("GM_OBST"):
         with open(os.environ["GM_OBST"], "w") as fh:
             json.dump([[round(a, 2), round(b, 2), round(c, 2)] for a, b, c in OBSTACLES], fh)

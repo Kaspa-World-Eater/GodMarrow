@@ -25,8 +25,11 @@ func _init(m: Node, c: Camera2D) -> void:
 
 ## the frame's distance (Derek 2026-10-05: "the world feels too small"): a step back, so more of the land is seen round
 ## the figure, as D2's frame holds it
-const BASE := 0.86              # further out, as Path of Exile frames it (Derek 2026-10-10: "maybe we should have the camera zoomed out
+const BASE_OUT := 0.86              # further out, as Path of Exile frames it (Derek 2026-10-10: "maybe we should have the camera zoomed out
                                 # a bit more, like poe"); was 1.06, a pilgrim about an eighth of the screen (2026-10-07)
+const BASE_UNDER := 1.06        # underground, Diablo's closer frame (Derek 2026-10-10: in the cave "the screen is cut off at the
+                                # top ... maybe in the cave we have the diablo zoom level")
+var BASE := BASE_OUT
 
 ## a new zone: from a gate we open looking into the land; from the lantern (or the first waking) we sink down onto you
 func arrive(zone, hero, from: String) -> void:
@@ -34,7 +37,20 @@ func arrive(zone, hero, from: String) -> void:
 	last_pos = hero.position
 	boss_off = Vector2.ZERO
 	fall = 0.0
+	BASE = BASE_OUT          # (Derek, 2026-10-10: "i like the poe level zoom better" in the cave too)
 	cam.zoom = Vector2.ONE * BASE
+	# held inside the baked picture where a land is baked whole (core of the "cut off at the top"): never past its edge
+	if zone.has_meta("bake_rect"):
+		var br: Rect2 = zone.get_meta("bake_rect")
+		cam.limit_left = int(br.position.x)
+		cam.limit_top = int(br.position.y)
+		cam.limit_right = int(br.end.x)
+		cam.limit_bottom = int(br.end.y)
+	else:
+		cam.limit_left = -10000000
+		cam.limit_top = -10000000
+		cam.limit_right = 10000000
+		cam.limit_bottom = 10000000
 	arr_t = 0.0
 	if from == "" or from == "__lantern":
 		arr_from = Vector2(0, -150)

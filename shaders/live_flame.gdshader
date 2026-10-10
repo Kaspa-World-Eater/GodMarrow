@@ -50,6 +50,8 @@ void fragment() {
 	float t = TIME + seed * 7.3;
 	float heat = 0.0;
 	float smoke = 0.0;
+	float coal = 0.0;
+	bool cut = false;
 	vec4 wax = vec4(0.0);
 	if (kind == 3) {
 		// three stubs: wax columns two or four pixels wide, their own heights, lit on the flame's side, a teardrop on each
@@ -87,14 +89,30 @@ void fragment() {
 			heat = max(heat, (pow(b, 1.4) * 1.2 + b * 0.3) * top);
 		}
 	} else if (kind == 1) {
-		// a brazier: a bed of licks along the bowl's width, low, the middle ones tallest
-		for (int i = 0; i < 4; i++) {
-			float fi = float(i);
-			float cx = -0.6 + 0.4 * fi;
-			float hgt = 0.6 + 0.4 * (1.0 - abs(cx)) * (0.8 + 0.3 * sin(t * 0.9 + fi * 2.3 + seed));
-			heat = max(heat, tongue((x - cx) * 2.0, y, t, seed + fi * 5.1, hgt));
+		// a brazier: the fire down in its bowl (Derek, 2026-10-10: it "has no depth to it, looks like its pasted on
+		// top"; the bog ruin's fire in the eye the example). The bowl's opening is an ellipse (47 x 23 px, centred three
+		// quarters down the rect); below its front lip nothing is drawn, so the baked bowl's own wall hides the fire's
+		// root; inside the opening a bed of coals glows and stirs; the tongues rise out of it, the middle ones tallest
+		float ex = (px.x - rect_size.x * 0.5) / 47.0;
+		float ey = (px.y - rect_size.y * 0.75) / 23.0;
+		float front = sqrt(max(0.0, 1.0 - ex * ex));
+		if (ey > front || abs(ex) > 1.0) {
+			cut = true;
+		} else {
+			float yy = (rect_size.y * 0.75 - px.y) / (rect_size.y * 0.75);       // up from the opening's middle
+			for (int i = 0; i < 5; i++) {
+				float fi = float(i);
+				float cx = -0.62 + 0.31 * fi + 0.06 * sin(t * 0.7 + fi * 2.1 + seed);
+				float hgt = 0.55 + 0.45 * (1.0 - abs(cx)) * (0.8 + 0.3 * sin(t * 0.9 + fi * 2.3 + seed));
+				heat = max(heat, tongue((ex - cx) * 2.6, max(yy, 0.0) + max(-ey, 0.0) * 0.0, t, seed + fi * 5.1, hgt));
+			}
+			if (ex * ex + ey * ey < 1.0) {
+				// the coals: dark red to orange, stirring, brightest under the tongues' roots
+				float cn = vn(vec2(px.x * 0.18 + seed, px.y * 0.36 - t * 0.6)) * 0.7 + vn(vec2(px.x * 0.5, px.y * 0.9 + t * 1.7)) * 0.3;
+				coal = cn * (0.75 + 0.25 * breath) * (1.0 - 0.6 * (ex * ex));
+			}
+			smoke = smoothstep(0.62, 1.0, yy) * fbm(vec2(x * 2.0, y * 3.0 - t * 0.8)) * 0.5;
 		}
-		smoke = smoothstep(0.65, 1.0, y) * fbm(vec2(x * 2.0, y * 3.0 - t * 0.8)) * 0.5;
 	} else {
 		heat = tongue(x, y, t, seed, 1.0);
 		smoke = smoothstep(0.7, 1.0, y) * fbm(vec2(x * 2.4, y * 3.0 - t * 0.9)) * 0.45;
@@ -113,5 +131,11 @@ void fragment() {
 	else if (lv > 1.0) col = vec4(0.72, 0.22, 0.06, 0.92);               // the red edge
 	else if (smoke + d * 0.25 > 0.42) col = vec4(0.09, 0.07, 0.07, 0.55); // the tips darkening into smoke
 	if (!cold && col.a < 0.5 && wax.a > 0.5) col = wax;
+	if (col.a < 0.5 && coal > 0.0) {
+		// the bed of coals in the bowl, seen through its opening, dithered between its few tones
+		float cv = coal + (d - 0.5) * 0.18;
+		col = cv > 0.62 ? vec4(1.0, 0.62, 0.2, 1.0) : (cv > 0.42 ? vec4(0.78, 0.25, 0.07, 1.0) : vec4(0.32, 0.07, 0.04, 1.0));
+	}
+	if (cut) col = vec4(0.0);
 	COLOR = col;
 }

@@ -429,6 +429,24 @@ def cove_d(s, t):
     return np.where(inl, np.minimum(d, dc), d)
 
 
+def gate_niches():
+    """the way out (Derek, 2026-10-10: "dont forget to include an exit on the beach, a gap in the basalt we can walk
+    though. with candle hollow in the walls"): hollows cut into the gateposts' faces that look into the cleft, three a
+    side, about chest high over its ramp, each with a few wax stubs; the builder carves them (beach3d.cleft_gate), the
+    exporter lights them (cove_export: their flames drawn live in the game). Each (s, t, z, side): side is +1 or -1, the
+    wall the hollow is cut into, its face looking across the cleft"""
+    out = []
+    for side in (1.0, -1.0):
+        for k, ds in enumerate((1.6, -0.6, -2.9)):
+            sb = float(back_s(np.array([CLEFT_T]))[0])
+            s_ = sb + ds + (0.35 if side > 0 else -0.25)
+            tc = float(cleft_t(np.array([s_]))[0])
+            t_ = tc + side * (CLEFT_W + 0.05)
+            z = float(height_st(np.array([s_]), np.array([tc]))[0]) + 1.15 + 0.12 * k
+            out.append((s_, t_, z, side))
+    return out
+
+
 def in_cleft(s, t):
     s = np.asarray(s, float)
     t = np.asarray(t, float)

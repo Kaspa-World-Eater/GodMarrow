@@ -79,6 +79,7 @@ def cells(u, v, size, seed):
 
 
 KEY = np.array([-0.62, 0.22, 0.75]) / np.linalg.norm([-0.62, 0.22, 0.75])   # the overcast's bright side (blend_scene.SUN)
+RAKE = np.array([-0.88, 0.3, 0.36]) / np.linalg.norm([-0.88, 0.3, 0.36])     # the dawn's bright band, low over the upper left: rakes the sand
 
 
 def form_tones(n, ao, cast):
@@ -87,10 +88,13 @@ def form_tones(n, ao, cast):
     the reflected light where its underside takes the sand's bounce, and the cast shadow it throws (the moon pass). The
     overcast alone is too soft to turn a bone; this is the turn, as a value offset (about -0.3 to +0.3)"""
     lam = (n * KEY).sum(-1)
-    light_ = np.clip(lam, 0, 1) ** 0.8 * 0.3
-    core = np.exp(-((lam + 0.08) / 0.16) ** 2) * 0.24                        # the band where the form turns from the light
+    # (2026-10-10, Derek: "the bones look flat too"): the turn made stronger, and the dawn's low rake across it (as the
+    # sand's), so the lit side, the terminator and the bounce read as a round shaft at the game's size
+    lr = np.clip((n * RAKE).sum(-1), 0, 1)
+    light_ = np.clip(lam, 0, 1) ** 0.8 * 0.36 + 0.16 * (lr - 0.35)
+    core = np.exp(-((lam + 0.08) / 0.16) ** 2) * 0.32                        # the band where the form turns from the light
     under = np.clip(-n[..., 2], 0, 1) + np.clip(-lam - 0.25, 0, 1)
-    refl = np.clip(under, 0, 1) * 0.1                                         # the sand's bounce into the underside
+    refl = np.clip(under, 0, 1) * 0.14                                        # the sand's bounce into the underside
     contact = (1.0 - np.clip(ao, 0, 1)) ** 1.5 * 0.3                          # the occlusion where it meets the sand
     return light_ - core + refl - contact - (1.0 - cast) * 0.1
 
@@ -137,6 +141,13 @@ def paint(d, t, hero=None):
 
     # ---- the sand by its state ----
     m = mat == 1
+    # the sand's raking light (see the dry sand below): the big forms from the smoothed rake in clean groups, the
+    # ripples' fine relief on top
+    z_ = float(d.get("zoom", 1.0))
+    lr = np.clip((n * RAKE).sum(-1), 0, 1)
+    lr_big = nd.gaussian_filter(lr, 5.0 * z_)
+    groups = np.floor(lr_big * 4.0 + 0.5) / 4.0
+    RAKE_T = 0.1 + 0.3 * groups + 0.22 * np.clip(lr - lr_big, -0.3, 0.3) - np.where(lr < 0.12, 0.05, 0.0)
     if m.any():
         tm, sm, tm_t = T[m], s[m], tt[m]
         wet = sm > lim[m]
@@ -148,7 +159,14 @@ def paint(d, t, hero=None):
         # dry: charcoal lifted by its grain tops, paler where the wind sorted it finer on the backshore
         fine = np.clip((BF.BERM_S - 0.6 - sm) / 3.0, 0, 1)
         grain = vn(X[m] * 41.0, Y[m] * 41.0)
-        vd = tm * 0.52 + 0.06 * fine + np.where(grain > 0.78, 0.07, 0.0) - np.where(grain < 0.16, 0.04, 0.0)
+        # (2026-10-10, Derek: the sand "reads as a flat grey plain, not as sand, theres no curves to the ground ... the
+        # desert sand tile we made was way better"): the overcast's dome lit every slope alike, so the landforms and the
+        # ripples melted into one tone. As the dune (painted_dune.py): a low raking light, the dawn's bright band low
+        # over the screen's upper left, turns the forms; the big forms take their tone from it smoothed, stepped into a
+        # few clean groups (each lit face one tone, each shaded face another), and the ripples' own relief rides on top,
+        # subordinate, their lee faces a step darker
+        vd = tm * 0.22 + 0.06 * fine + np.where(grain > 0.78, 0.06, 0.0) - np.where(grain < 0.16, 0.035, 0.0)
+        vd = vd + RAKE_T[m]
         # laid in dry-brush strokes along the ripple crests (the painted standard, rule 4): a stretched noise, long
         # along the shore and thin across it, a step lighter where the brush catches the tops, a step darker in the
         # hollows, only where the light grazes

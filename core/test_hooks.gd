@@ -82,6 +82,10 @@ static func run(g) -> void:
 		_goto(g, String(a["goto"]))      # --goto=x,y (zone tiles): the pilgrim walks there, as a click on the ground would send him (--walk is the walker)
 	if a.has("esctest"):
 		_esctest(g)
+	if a.has("flowtest"):
+		_flowtest(g)
+	if a.has("walklog"):
+		_walklog(g)
 	if a.has("shot"):
 		_shot(g, a)
 	if a.has("groundfire"):
@@ -941,3 +945,56 @@ static func _esctest(g) -> void:
 	for step in [["I", KEY_I], ["Esc", KEY_ESCAPE], ["Esc", KEY_ESCAPE], ["Esc", KEY_ESCAPE]]:
 		await _key(g, step[1])
 		print("ESC after %s: panel %s, pause %s, hud input %s" % [step[0], h.any_panel(), h.pause.visible, h.is_processing_input()])
+
+## --flowtest (with --new and GM_READ_ACT=all): the opening end to end (Derek, 2026-10-10): the newborn rises; the
+## mirror refuses it unread; the Stranger reads it; no one moves it; it walks into the mirror and wakes on the cove in its
+## calling's body with the HUD. FLOW lines at each step.
+static func _flowtest(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	var t0 := Time.get_ticks_msec()
+	while g.hero == null or g.hero.scripted:
+		await tree.create_timer(0.5).timeout
+		if Time.get_ticks_msec() - t0 > 60000:
+			print("FLOW opening never ended")
+			return
+	print("FLOW risen: zone ", g.zone.id, " nascent ", g.hero.nascent, " bare ", not g.hud.bar.visible)
+	g.hero.tp = Vector2(6.5, 7.6)
+	g.hero.walk_to(Vector2(6.5, 5.5))
+	await tree.create_timer(4.0).timeout
+	print("FLOW unread at the mirror: zone ", g.zone.id, " (must be opening_cave)")
+	g.hero.tp = Vector2(5.5, 9.6)
+	await tree.create_timer(0.5).timeout
+	var mgr = g.zone.get_node_or_null("WorldObjects")
+	for e in mgr.things:
+		if String(e.get("o", {}).get("role", "")) == "stranger":
+			mgr._interact(e)
+			break
+	t0 = Time.get_ticks_msec()
+	while g.hero.st.fate_picks.is_empty() or g.reading_open:
+		await tree.create_timer(0.5).timeout
+		if Time.get_ticks_msec() - t0 > 90000:
+			print("FLOW the Reading never ended")
+			return
+	await tree.create_timer(1.0).timeout
+	print("FLOW read: zone ", g.zone.id, " (no auto-move: opening_cave) nascent ", g.hero.nascent, " bare ", not g.hud.bar.visible)
+	g.hero.tp = Vector2(6.5, 7.6)
+	g.hero.walk_to(Vector2(6.5, 5.5))
+	t0 = Time.get_ticks_msec()
+	while g.zone.id == "opening_cave":
+		await tree.create_timer(0.5).timeout
+		if Time.get_ticks_msec() - t0 > 20000:
+			print("FLOW the mirror never took it")
+			return
+	await tree.create_timer(2.0).timeout
+	print("FLOW through: zone ", g.zone.id, " nascent ", g.hero.nascent, " body3d ", g.hero.body3d != null, " hud bar ", g.hud.bar.visible, " phase ", snappedf(Game.phase(), 0.001))
+
+## --walklog (with --goto): the pilgrim's place, path and speed each second for twenty seconds, to see a walk that stalls
+static func _walklog(g) -> void:
+	var tree: SceneTree = g.get_tree()
+	await tree.create_timer(1.2).timeout
+	var last: Vector2 = g.hero.tp
+	for i in 20:
+		await tree.create_timer(1.0).timeout
+		var h = g.hero
+		print("WALK t%d tp %s moved %.2f walking %s path %d/%d act '%s' scripted %s" % [i, h.tp, h.tp.distance_to(last), h.walking, h.path_i, h.path.size(), h.act, h.scripted])
+		last = h.tp

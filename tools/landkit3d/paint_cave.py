@@ -359,7 +359,11 @@ def paint(d, t=0.0):
     img = mirrors(img, d, proj, fk)
     # (the blood holds no reflections: Derek, 2026-10-09, "Remove the reflections from the blood pool"; pool_gloss is kept
     # below, unused)
-    img = fires(img, d, proj, fk, t)
+    # the flames are drawn live in the game now (world/live_flames.gd; Derek, 2026-10-10: painted ones stood still beside
+    # them, "side flames that arent moving and probably shouldnt be there"); their light stays in the stone. A still
+    # render that wants them painted sets GM_PAINT_FIRES=1
+    if os.environ.get("GM_PAINT_FIRES") == "1":
+        img = fires(img, d, proj, fk, t)
     # black is a note, not a fill (rule 4): the darkenings above never take a surface below its ramp's darkest swatch,
     # except in the contacts (the darkest note) and the onyx mirror (black by its nature)
     floor_ = (alpha > 0.5) & (ao > 0.32) & (mat != 31)

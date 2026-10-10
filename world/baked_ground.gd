@@ -80,10 +80,13 @@ static func build(z) -> bool:
 	ground.z_index = -90
 	z.add_child(ground)
 	var bands := 0
+	var bounds := Rect2()
 	for c in idx["chunks"]:
 		var pos := Vector2(c["pos"][0], c["pos"][1])
 		var t := _lit(d, str(c["file"]), str(c.get("normal", "")))
 		if t:
+			var r := Rect2(pos, t.get_size() * sc)
+			bounds = r if bounds.size == Vector2.ZERO else bounds.merge(r)
 			var s := Sprite2D.new()
 			s.texture = t
 			s.centered = false
@@ -115,4 +118,7 @@ static func build(z) -> bool:
 			z.sorted.add_child(s2)
 			bands += 1
 	print("baked ground: %d chunks, %d sorted bands from %s" % [idx["chunks"].size(), bands, d])
+	# the picture's own bounds: the camera stops at them, as Diablo stops at a map's edge, so the view never runs past what
+	# was baked (Derek, 2026-10-10: in the cave "the screen is cut off at the top")
+	z.set_meta("bake_rect", bounds)
 	return true

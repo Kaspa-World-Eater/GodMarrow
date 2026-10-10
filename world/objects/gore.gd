@@ -28,7 +28,7 @@ class Stains extends Node2D:
 			var a := minf(1.0, s["life"] / 6.0) * 0.85
 			var c := Color(40 / 255.0, 6 / 255.0, 9 / 255.0, a)
 			for d in s["dots"]:
-				draw_rect(Rect2(q.x + roundf(d[0]) * Iso.WPX, q.y + roundf(d[1]) * Iso.WPX, d[2] * Iso.WPX, Iso.WPX), c)
+				draw_rect(Rect2(q.x + roundf(d[0] * 2.0) * 2.0, q.y + roundf(d[1] * 2.0) * 2.0, d[2] * 4.0, 2.0), c)   # the 2 x 2 grid
 
 func setup(zone: Zone) -> void:
 	z_index = 4
@@ -64,9 +64,12 @@ func spew(p: Vector2, dir: Vector2, n: int, mouth_z: float = 10.0) -> void:
 		var col: Color = _pick(BLOOD) if r < 0.6 else (MEAT[2] if r < 0.85 else MEAT[0])   # dark: blood and matter, never pink
 		parts.append({"p": p, "z": mouth_z + randf() * 2.0, "v": Vector2(cos(a), sin(a)) * s,
 			"vz": 2.0 + randf() * 10.0, "t": 0.5 + randf() * 0.5, "col": col, "w": 1 + randi() % 2})
-		if r > 0.4 and chunks.size() < 80:
-			chunks.append({"p": p + Vector2(cos(a), sin(a)) * s * 0.4, "col": col, "w": 1, "life": 30.0 + randf() * 20.0})
-	stain(p + d * 0.6, 18, 0.55)
+		if r > 0.7 and chunks.size() < 80:
+			chunks.append({"p": p + Vector2(cos(a), sin(a)) * s * 0.35, "col": col.darkened(0.25), "w": 1, "life": 60.0 + randf() * 40.0})
+	# a puddle on the floor, not squares in the air (Derek, 2026-10-10: "vomit still floats, its on the floor"): wide, dark,
+	# lying where it fell, kept a long while
+	stain(p + d * 0.5, 46, 0.62)
+	stains.list[-1]["life"] = 240.0
 
 func stain(p: Vector2, n: int, r: float) -> void:
 	var dots := []
@@ -106,7 +109,7 @@ func _process(dt: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	var W := Iso.WPX
+	var W := 2.0   # the 2 x 2 art grid (was Iso.WPX, 4)
 	for c in chunks:
 		var q := Iso.to_screen(c["p"])
 		var col: Color = c["col"]

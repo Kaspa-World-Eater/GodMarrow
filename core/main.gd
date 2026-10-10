@@ -179,8 +179,9 @@ func enter(zid: String, from: String) -> void:
 		var wz = load("res://world/red_wisps.gd").new()     # wisp-fire drifting out on the Red
 		zone.add_child(wz)
 		wz.bind(zone)
-	if zone.id == "opening_cave":
-		# its fires are painted into its bake, so they stand still: each gets a live flame (world/live_flames.gd)
+	if zone.id == "opening_cave" or (zone.id == "red_shore" and not zone.d.get("lights", []).is_empty()):
+		# its fires are painted into its bake (the cave's) or not painted at all (the cove's candle hollows): each gets
+		# a live flame and its sound (world/live_flames.gd)
 		var lf = load("res://world/live_flames.gd").new()
 		zone.add_child(lf)
 		lf.bind(zone)

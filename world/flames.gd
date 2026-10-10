@@ -12,6 +12,7 @@ extends Node2D
 
 const Flame = preload("res://fx/flame.gd")
 const PX := 4.0
+const AP := 2.0               # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7; Derek, 2026-10-10: "eliminate all 4x4 ... asure it 2x2")
 const EMB_COL := [Color("#fff0b8"), Color("#ffc860"), Color("#ff9038"), Color("#8a6a4a"), Color("#4a4038")]
 
 var zone: Zone
@@ -59,6 +60,8 @@ func _halo_of(kind: String) -> Array:
 			return [10, Color8(255, 130, 60), 0.38]
 		"wallc":
 			return [4, Color8(255, 190, 110), 0.14]
+		"floorcandles":
+			return [0, Color8(255, 150, 64), 0.0]     # no orb: their light lies on the ground (Derek, 2026-10-10: "the light is an orb")
 	return [16, Color8(255, 130, 60), 0.5]
 
 var _view := Rect2()          # the screen, in world px, this frame
@@ -119,9 +122,11 @@ func _draw() -> void:
 		var gk := Gust.k()
 		f *= 1.0 - 0.32 * gk * (0.5 + 0.5 * sin(t * (11.0 + 9.0 * gk) + float(s["seed"]) * 3.0))
 		var h := _halo_of(s["kind"])
-		var g := Flame.dither_glow(h[0], h[1])
-		var sz := g.get_size() * PX
-		var p := ((at - sz / 2.0) / PX).round() * PX
+		if int(h[0]) <= 0:
+			continue
+		var g := Flame.dither_glow(int(h[0]) * 2, h[1])                   # twice the texels, half the size: the 2 x 2 grid
+		var sz := g.get_size() * AP
+		var p := ((at - sz / 2.0) / AP).round() * AP
 		draw_texture_rect(g, Rect2(p, sz), false, Color(1, 1, 1, minf(1.0, h[2] * f)))
 	for ps in posts:
 		var c: Vector2 = ps + Vector2(15, -61) * PX
@@ -144,20 +149,20 @@ func draw_air(cv: CanvasItem, xf: Transform2D, light: Callable) -> void:
 			var lv: float = float(L[0])
 			s["col"] = Color(minf(1.0, (96.0 * minf(1.05, lc.r * lv * 1.6) + 22.0) / 255.0), minf(1.0, (90.0 * minf(1.0, lc.g * lv * 1.6) + 20.0) / 255.0), minf(1.0, (92.0 * minf(1.0, lc.b * lv * 1.6) + 24.0) / 255.0))
 		var col: Color = s["col"]
-		var g := Flame.dither_puff(int(round(r)), Color(0.9, 0.9, 0.9))   # grey, shaded top and bottom; tinted as drawn
-		var sz := g.get_size() * PX
-		cv.draw_texture_rect(g, Rect2(((q - sz / 2.0) / PX).round() * PX, sz), false, Color(minf(1.0, col.r / 0.9), minf(1.0, col.g / 0.9), minf(1.0, col.b / 0.9), a))
+		var g := Flame.dither_puff(int(round(r * 2.0)), Color(0.9, 0.9, 0.9))   # grey, shaded top and bottom; tinted as drawn
+		var sz := g.get_size() * AP
+		cv.draw_texture_rect(g, Rect2(((q - sz / 2.0) / AP).round() * AP, sz), false, Color(minf(1.0, col.r / 0.9), minf(1.0, col.g / 0.9), minf(1.0, col.b / 0.9), a))
 	for e in emb:
 		var k: float = e["t"] / e["life"]
 		var ci := mini(4, int(k * 5.0))
 		if sin(t * 23.0 + e["s"] * 9.0) <= -0.6:
 			continue   # the blink
-		var q: Vector2 = (xf * e["p"] / PX).floor() * PX
-		cv.draw_rect(Rect2(q, Vector2(PX, PX)), EMB_COL[ci])
+		var q: Vector2 = (xf * e["p"] / AP).floor() * AP
+		cv.draw_rect(Rect2(q, Vector2(AP, AP)), EMB_COL[ci])
 		if ci < 2:
 			var c2: Color = EMB_COL[ci]
 			c2.a = 0.5
-			cv.draw_rect(Rect2(q + Vector2(0, PX), Vector2(PX, PX)), c2)
+			cv.draw_rect(Rect2(q + Vector2(0, AP), Vector2(AP, AP)), c2)
 
 ## the lanterns lie in the water (z_props21.js:243-253): a broken column of warm light below each one, shivering with
 ## the ripples, on water and shallows only

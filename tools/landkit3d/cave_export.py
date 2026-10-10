@@ -46,6 +46,14 @@ def grid():
     yy, xx = np.mgrid[0:H, 0:W]
     lat = bl[2 * yy + 1, 2 * xx + 1]
     g = np.where(lat == 255, ROCK, WALK).astype(np.uint8)
+    # the stairs walked their whole width (Derek, 2026-10-10: the way up to the face "has no area to move in, feels like
+    # hes stuck in a tunnel"): the block map's lattice left a strip three tiles wide down the middle of a stair four and
+    # a half yards wide; every tile whose centre lies on the stair, and on its landing, is walked
+    cx_ = CB.OX + xx + 0.5
+    cy_ = CB.OY + yy + 0.5
+    x0, x1, y0, y1 = CV.STAIR
+    on_stair = (cx_ > x0 + 0.15) & (cx_ < x1 - 0.15) & (cy_ < y0 + 0.4) & (cy_ > y1 - 3.4)
+    g = np.where(on_stair, WALK, g).astype(np.uint8)
     gcls = np.where(lat == 128, 7, np.where(g == WALK, 4, 1)).astype(np.uint8)
     return g, gcls
 
@@ -140,8 +148,10 @@ def main():
         if not np.isfinite(fl):
             fl = float(CB.at(near, np.array([x]), np.array([y]))[0])
         fl = fl if np.isfinite(fl) else (CV.floor_at(x, y) or 0.0)
+        # zAbs: the flame's own height in the world (yards), so its live flame stands where the fire is even where the
+        # floor under it is the stair's and the lift's is the hall's (the great face's sconces had floated off)
         lights.append(dict(type="fire", kind="brazier" if w >= 120 else "candles", x=zx, y=zy, radius=rad, rgb=rgb, a=0.55,
-                           heightPx=int(round(max(0.0, z - fl) * 21)), dxPx=0))
+                           heightPx=int(round(max(0.0, z - fl) * 21)), dxPx=0, zAbs=round(float(z), 2)))
     N["objects"], N["connections"], N["arrive"], N["markers"], N["lights"] = objects, conns, {}, mk, lights
     N["packs"], N["monsters"] = [], []
     amb = json.load(open(os.path.join(HERE, "ambient_outdoor.json"), encoding="utf-8"))   # the hours' light (once the moor's)
@@ -185,10 +195,29 @@ def main():
         sy_ = CV.STAIR[2] - (CV.STAIR[2] - CV.STAIR[3]) * u_
         sx_ = (CV.STAIR[0] + 0.35) if (i // 3) % 2 == 0 else (CV.STAIR[1] - 0.35)
         cands.append((sx_, sy_, CV.floor_at(sx_, sy_) or 0.0))
+    # and the hall's floor before the dais (Derek, 2026-10-10: "the bottom area needs candles"): clusters left on the
+    # flags, kept off the worn way up to the face and off the dais
+    hx_, hy_, hrx, hry = CV.HALL
+    got = 0
+    for k_ in range(80):
+        if got >= 11:
+            break
+        a_ = rnd.uniform(0, 2 * math.pi)
+        rr = math.sqrt(rnd.uniform(0.08, 0.85))
+        cx_, cy_ = hx_ + math.cos(a_) * hrx * rr, hy_ + math.sin(a_) * hry * rr
+        f_ = CV.floor_at(cx_, cy_)
+        if f_ is None or f_ < CV.FLOOR_HALL - 0.5 or CV.dais_at(cx_, cy_) is not None:
+            continue
+        if abs(cx_ - hx_) < 1.6:                                       # the worn way up the middle
+            continue
+        if any(math.hypot(cx_ - a, cy_ - b) < 2.6 for a, b, _ in cands):
+            continue
+        cands.append((cx_, cy_, f_))
+        got += 1
     for cx_, cy_, f_ in cands:
         zx_, zy_ = zone_of(cx_, cy_)
-        lights.append(dict(type="fire", kind="floorcandles", x=round(zx_, 2), y=round(zy_, 2), radius=2.4, rgb="255,150,64",
-                           a=0.38, heightPx=4, dxPx=0))
+        lights.append(dict(type="fire", kind="floorcandles", x=round(zx_, 2), y=round(zy_, 2), radius=3.0, rgb="255,150,64",
+                           a=0.6, heightPx=4, dxPx=0, zAbs=round(float(f_) + 0.2, 2)))
     N["lights"] = lights
     N["sunless"] = True                                               # no sun throws a shadow down here (entities/sil_shadow.gd)
     path = os.path.join(ROOT, "data", "zones", "opening_cave_s%d.json.gz" % CB.SEED)
