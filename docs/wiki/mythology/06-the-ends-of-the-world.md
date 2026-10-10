@@ -140,7 +140,7 @@ are hated for it, and they would say they are hated by people who do not underst
 
 **The Concord.** But the miasma is thickening. Every year the breath is fouler, and the kami in it are sicker and
 quarrel less, and here and there, the keepers have seen it, they have begun to agree. Two grudges find they are the same
-grudge and run together. A whole valley's fear of the dark becomes one fear, and stands up. The keepers say the end
+grudge and run together. A whole valley's fear of the dark becomes one dread, and wakes. The keepers say the end
 comes when the agreeing spreads faster than they can sow quarrel: when, on one still day, every kami in the breath
 believes the same thing at the same moment, and they run together, all of them, into one god as large as the dead one.
 It will not be a new god. It will be the old one, made again out of its own last thoughts, and it will do what a thing
@@ -242,7 +242,7 @@ and cut it at the nape, and let it go.
 Then the tide will stop. The Red will run out once and not come in again: down past the rocks and the stacks, farther
 out than anyone has seen the sand go, and on, down the slope of the bottom of the world, until the black sand goes on
 forever under the grey. Everything the Red ever held will be lying on the bottom of it, bared: every boat and every
-body, the drowned city and its lights, and the shell. And everything the Red ever held will get up, and turn round, and
+body, the drowned city and its lights, and the shell. And everything the Red ever held will rise, and turn round, and
 walk home up the dry bottom toward the shore, all of them, all night, toward the houses they were taken from.
 
 **The holes.** And the keepers who have studied with the old men of the highest stair add the last of it, and the

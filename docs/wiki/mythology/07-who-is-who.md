@@ -114,7 +114,7 @@ card is the same mantle seen from the other side.
 | **The Gravedigger's Hands** | the one who buries | the Ossuary Matron, laying the catacombs' dead | the one who digs them up |
 | **The Singed Veil** | the one drawn to the light that burns it | the moths that wear the court's white faces | the one already burned |
 | **The Swaddling** | the one who is carried | every infant the Deep asks for | the knife that cut the cloth |
-| **The Gleaner** | the one who reaps and counts | Oss-Karrhath, on its harvest under the ground | the Pale Order, counting for it |
+| **The Gleaner** | the one who ends | Oss-Karrhath, death's Titan in its pit | the Ossuarch, who keeps it under |
 | **The Weeping Saint** | the one who suffers to be believed | the girl in the iron, who is the Bleeding Maiden | the crowd that came to watch |
 | **The Scholar's Eye** | the one who reads until it is read | the Citadel's oldest reader | the eyes in the Needle |
 | **The Hanged Twin** | the one a breath behind | the Drowned Twin, on the other side of every still surface | the one a breath ahead |
@@ -126,7 +126,7 @@ card is the same mantle seen from the other side.
 | **The Beggar's Cup** | the one who asks at the door | the Ghauul, knocking for marrow | the house that answers |
 | **The Drowned Bell** | the one who rings under the water | the drowned king's court, still walking down the spine | the bell rung in tune |
 | **The First Coin** | the one who sells at the end of the world | the merchant | the one who buys |
-| **The Kiln** | the one with a fire in its ribs | the herald, the Starved Crown, burning low in its cup | the ash it leaves |
+| **The Kiln** | the one that hardens what is given to it | the Deep, setting the old one's blood to iron under the world | the one that cracks |
 | **The Unravelling Loom** | the one who unpicks | the Veiled Crone, behind her veil | the one who reweaves |
 | **The Lantern-Wright** | the one who keeps what is lost | nobody now; the makers were hunted out, and the lanterns are fewer every year | the one who lets it go |
 | **The Drowned Choir** | the one who holds the note | the Choir, under the crypts | the rest between notes |

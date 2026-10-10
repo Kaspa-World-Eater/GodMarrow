@@ -12,9 +12,9 @@ in his first week. He did not finish his reading.*
 Forget what the faiths have told you about the beginning. Every faith begins its story with its own god, and the
 world is older than any of them.
 
-A god is a belief that grew a body. When enough people fear a thing, or pray to it, for long enough, it stands up. Fear
+A god is a belief that grew a body. When enough people fear a thing, or pray to it, for long enough, it takes a body. Fear
 grows one fastest. In that age, when there were cities, a city that was afraid of its river for a lifetime would one
-spring see the river stand up. The oldest books call the gods of that age the Ythraal. Nobody knows what the word meant;
+spring see the river rise out of its bed and walk. The oldest books call the gods of that age the Ythraal. Nobody knows what the word meant;
 everyone says it quietly. Fear is what they were made of, and fear was what they ate. A city that trembled was a city
 that fed its god, and a god nobody fears any more grows thin, and then hungry, and then comes looking. There was an age
 when they walked the world, and it is the age most of our ruins come from, and most of what we know about it is wrong.
@@ -44,16 +44,17 @@ set it down, and wrote under it what the Citadel thinks.*
 
 There was only ever one of it. Anyone who tells you there were many has been listening to songs.
 
-It was dead before it was ever alive. When the three things with no shape put themselves into the world, feeling for
-something, and the mountains and the rivers and the faces off people's heads came away wherever they felt, the god
-under us made itself a hand out of its own dead: bones the length of a valley, wings of bone that held no air and flew
-anyway, and fire in the cage of the ribs. It was not afraid of them, because it had nothing left to lose. It fought
-them longer than anyone has counted, and they never once turned round. They did not know it was there. They did not
-know we were.
+It was dead before it was ever alive. When the three things with no shape came into the world, and the mountains and
+the rivers and the faces off people's heads came away wherever they passed, the old one under us made itself a hand out
+of its own dead: a beast the length of a valley, half bone and half black hide, its wings fingers of bone with the hide
+hanging off them in rags, its jaw hanging open because what closed it had rotted away. It had no fire. It had weight, and
+rot, and it was not afraid of them, because it had nothing left to lose. It fought them longer than anyone has counted,
+and they never once turned round. They did not know it was there. They did not know we were.
 
-One of them lay down at last, by the red sea, and did not get up. The other two went away. And it fell, because it had
-broken itself on them too many times, and it struck the ground so hard it made a cup a day's walk across, and lay in the
-bottom of it, burning low.
+One of them lay down at last, by the red sea, and did not rise again. The other two went back through the hole they came
+in by. Three came in, the grandmothers say, but there were always four: the hole was the fourth. And it fell, because it
+had broken itself on them too many times, and it struck the ground so hard it made a cup a day's walk across, and lay in
+the bottom of it, still.
 
 The people who found it there knelt. They built a city round it, ring on ring up the sides of the cup, and worshipped it
 for saving the world, and it lay and listened to them, and it woke. When its worshippers grew few, it ate them, and
@@ -111,9 +112,9 @@ like.
 *A note found in the margin of the Citadel's oldest book of drawings, beside a drawing of a cavern. The hand is a
 scholar's of the Pale Order.*
 
-The book calls it Oss-Karrhath. It is a skeleton too great to measure, the drawing says, lying in a cavern
-floored with the dead of a whole age, and its right arm ends in a scythe grown out of its own bone. The book says it
-may be asleep.
+The book calls it Oss-Karrhath, and under the drawing it says only: *the end, lying down.* It is a skeleton too great
+to measure, curled on its side in a pit at the bottom of the world, and its right arm ends in a scythe grown out of its
+own bone. The book says it moves its arm once an age.
 
 I have walked the lowest halls under the fifth house of my Order, where the stair's risers come only to the knee and
 the niches are too long for any body. I have looked at this drawing for a long time.
@@ -131,7 +132,7 @@ It was a city once, up here, where the pithead is. When the ground went soft in 
 first, because Vesk had dug it hollow, and one night the whole city started going down. And the people would not let
 it. They went down under their houses, every one of them, the children too, and put their shoulders to it and held it
 up. The iron came up into them out of the dark. Their blood stopped in them and went hard, and they went to iron where
-they stood, and grew together, shoulder to shoulder and hip to hip, and they did not let go. Vesk stood up on them. On
+they stood, and grew together, shoulder to shoulder and hip to hip, and they did not let go. Vesk rose on them. On
 their legs. Then it walked, down, into the Deep, where the iron is, and it walks there still.
 
 There are prints in the ore at the bottom of the new shaft. Round. Hundreds. Going on under the rock.

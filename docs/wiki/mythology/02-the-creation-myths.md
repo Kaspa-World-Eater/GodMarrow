@@ -59,6 +59,13 @@ grandmothers say, and anyone who lies on it at night can feel that it is warm. A
 after, from whatever had taken the names and from whatever came up out of the ground, keeping their heads down and
 their true names behind their teeth. Both meanings are meant. A child who asks which is told: *yes*.
 
+Everyone left on the Hide has a saying for what it hides, and no two agree. *All flesh is hide*, the common saying goes,
+*and it hides.* What does it hide? The brothers of the Pale Order say: the bones. The processions of the Bleeding
+Maiden say it hides nothing; it only holds in the flesh, which is bursting at every seam. The circles of the Veiled Crone
+say it hides the name, and the person under the name, and that the true self is hidden from the one who wears it most
+of all. The keepers of the Myriad say it hides the breath. The grandmothers say only: *it hides*, and that a child who
+asks what is old enough to be told.
+
 *Behind the myth.* Nobody knows where the people came from (Derek's ruling, 2026-10-09), and the bible never picks.
 Each telling is a little true, as everything told here is (`00-the-deep-lore.md`). The pilgrim's waking in the opening
 cave, up out of the Red with no before, rhymes with all of them and answers none.
@@ -72,7 +79,7 @@ Before the Count there was no count. That is all a brother may say of it, and in
 written as a gap, a space left on the page.
 
 Then the Mother fell. She came down out of that time nobody speaks of, the frame that the whole world hangs on, and
-where her bones came to rest, there the world was. The ridges are her bones. The white ground of the Ossa is bone
+where her bones came to rest, there the world was. The ridges are her bones. The pale ground of the Ossa is bone
 ground fine. The lowlands are her far edges, where the flesh still lies over her and hides what she is.
 
 The first brothers were there. They stood beside her as she fell, and they did what had to be done: they laid her
@@ -85,70 +92,103 @@ The world was set down, the brothers say, as a load is set down at the end of a 
 set down once more. Over the deepest stair of every bone-house it is cut: *WE WERE HERE WHEN SHE FELL. WE
 WILL BE HERE WHEN SHE RESTS.*
 
+**The keep.** The brothers have one word for everything they do, and it is *keep*. A bone-house is a keep: walled, gated,
+and the last thing standing on its ridge. They keep the Count, which is to say they keep it whole. They keep the dead,
+which is to say they keep a body together after the flesh has let its bones go, every bone in its place and none
+dropped. And they keep a secret, which is the meaning the others are built on and the one no brother says aloud. The
+Rule cut on the deepest stair of every bone-house uses the word twice: *Keep her where she is. Keep it.*
+
 *Behind the myth.* The bone is not a mother. It bears nothing, chose nothing, and is not lying still. **It is
 growing.** Every year the Count comes out higher than the year's dead can account for, and rooms appear that nobody cut.
 The dust weighs more than the bone it came from, and the pale sky over the Ossa thickens and hangs lower. The
-bone-houses were never the Order's work: they are the upper floors of the builders' halls, which the Order found and
-hides. The Rule on the deepest stair says only *Keep her where she is.* None of this is ever said in the game; it is
+bone-houses were never the Order's work: they are the upper floors of the Angles' halls, which the Order found and
+keeps hidden. The Rule on the deepest stair says only *Keep her where she is.* None of this is ever said in the game; it is
 only let show.
 
-## The Gilded Peak: the Mouth
+## The Gilded Peak: the Held Breath
 
-*What they look at:* the Silence itself, and the world as a pause inside it. Of all the faiths, the monks came nearest
-to looking at the thing without a face, and they fell.
+*What they look at:* nothing, on purpose. The monks would not give what they looked at a face, a name or a will, and
+they would not call it a god; a god is a thing that wants, and what they looked at wants nothing. They called it That
+Which Cannot Be Named, and That Which Cannot Be Held, and when they had to be brief they left a pause.
 
 Before anything, there was the Silence, and it lacked nothing. Everything that could ever be meant was already in it,
 the way everything a sentence is for is already in the pause before it is spoken.
 
-In the Silence a mouth opened, and the opening was the god. It drew one breath in, and held it. Everything that has
-ever been was inside that one held breath: the light, the ground, the dead, the mountain, every people. It was a small
-thing. The Silence it opened in did not notice it. Creation, the monks taught, is a pause held too long.
+Then something held. Not someone: a holding, the way a breath is held, the way a pause is held a moment too long before
+the word. Everything that has ever been is inside that one held breath: the light, the ground, the dead, the mountain,
+whoever is reading this. Nothing did the holding. It held. The world, the monks taught, is what a held breath looks
+like from the inside, and that is the whole of their beginning, and they taught it as a warning: whatever is held, will
+be let go.
 
-For an age the god held its space open and held everyone inside that space, and it grew tired, as a held breath always
-grows tired. When it could hold no longer, the Silence came back into the place where it had always been. The lowlands
-call that the death of the god and are afraid of it. The Peak called it rest: the god grew tired, and the Silence came
-in to let it lie down.
+**The two hands.** That Which Cannot Be Held has two hands, and both are empty, and both destroy.
+- **Radiance** is the open hand. It is light with no shadow, which shows a thing so wholly that nothing is left of it
+  but the showing. The monks wrote the word for looking with a gap in it, *be hold*, because to behold a thing
+  completely is to stop holding it. A man who stares into Radiance long enough is not blinded. He is seen through,
+  and then he is not there. Radiance is not mercy and it is not wrath. It is destruction by light, and it is pure.
+- **Absence** is the closed hand. It is not the dark, which is still something. It is the closing itself: the letting
+  go, the turning away, what is given up and not taken back. It destroys by keeping nothing. The dark is only what
+  Absence leaves behind.
 
-The Silence, the monks taught, has two hands, and both are empty. The open hand is Radiance: light at noon with no
-shadow, which takes things away by showing all of them at once. The closed hand is Absence: the dark, which takes
-things away by showing none of them. So the monks gilded what they honoured, because a thing covered in gold shines so
-that it is looked at and not seen.
+Between the two hands the monks walked, and their whole discipline was to hold nothing: not a name, not a wish, not a
+breath longer than it was needed. Hold nothing, and neither hand has anything to take from you. That is why the ones
+who came down the mountain afterward call themselves the Empty Hand.
+
+They gilded what they honoured, because a thing covered in gold shines so that it is looked at and never seen: held
+between beholding and letting go, where neither hand can finish it.
 
 They said one more thing, always on the same stair: *Everything on the Hide is a wound that has not yet been allowed to
 close. We are wounds too. We have tried to be clean ones.*
 
-*Behind the myth.* The gilded masters in the Peak's sanctum were not dead under the gold; the gold kept them from
-finishing. The chant did not hold the breath-sickness off the mountain: the Silence was so near that breath went
-quiet. Whether the Silence is a power, a place, or simply what is there when nothing is being said, is unknown, and
-stays unknown.
+The few in the lowlands who remember the Peak at all say the monks climbed so high to peek at what cannot be named, and
+that it peeked back.
+
+*Behind the myth.* No god in it: That Which Cannot Be Named is the Silence, unknowable, the Tao read as a void
+(`00-the-deep-lore.md`). Radiance and Absence are the Empty Hand's two sands. The gilded masters in the Peak's sanctum
+were not dead under the gold; the gold kept them from finishing. Whether the Silence is a power, a place, or simply what
+is there when nothing is being said, is unknown, and stays unknown.
 
 ## The Veiled Crone: the First Thread
 
-*What they look at:* the threads, the way lives pull on each other, the sense that something somewhere is weaving what
-happens. The circles gave it an old woman's face, veiled, because what cannot be seen must be covered.
+*What they look at:* fate. The way lives are pulled toward each other and apart, and the sense that something, somewhere,
+is weaving what happens. The circles gave it an old woman's face, veiled, because what cannot be seen must be covered.
 
 Before her, everything was like a dry wall in a shut room. It was dry in every season, it did not move, and nothing
 held it.
 
 Then she came, and she drew the first thread out of nothing, and she tied the first knot, and the knot was the world.
-Every life is a length of that one thread. She spins it out of the knot, and weaves it into her cloth, and when a life
-is over its thread goes through the eye of her loom and into the cloth for good. Nothing is lost; it is only woven in.
+Every life is a thread. She spins it out of the knot, and weaves it into her cloth, and the pattern the threads make
+together is fate, which nobody inside the cloth can see, because it can only be seen from the far side of the loom.
+
+**What the weaving makes.** Where two threads are woven together, the circles teach, they make something neither of them
+was. Lovers are one thing woven of two. So are a mother and her child, and a killer and the one he killed, which is why
+the dead and their killers are never free of each other. A family is a creature with many threads and one pattern; so is
+a feud; so is a haunting, which is two threads that were never cut apart. The Crone weaves souls into each other as
+easily as wool, and what she weaves lives, in its own way, and wants, and is not the sum of the threads that made it.
+The circles say that some of the old powers were only that: so many lives woven so tight for so long that the cloth
+itself woke, and wanted.
+
+**The needle's eye.** Every thread goes through the eye of her needle before it can be woven, and through it again when
+a life is done and its thread is drawn into the cloth for good. The eye is a hole. It is the one place in all her
+weaving that is not cloth and not thread, and it is the one thing she does not make. Novices are taught that the eye is
+where a thread goes in. The old weavers know it is where a thread goes out, and that whatever is on the other side of
+it was there before her. They do not name it. They hum it, with the mouth shut.
 
 She has four faces. She is the Spinner, who draws the thread out. She is the Weaver, who sets it in the cloth. She is
-the Unraveller, who takes back what was woven wrong. And she is the Hollow, the eye of the loom that every thread
-passes through at the end, whose name is never spoken, only hummed with the mouth shut.
+the Unraveller, who takes back what was woven wrong. And she is the Eye, the hole every thread passes through, whose name
+is only hummed.
 
-When the god died, the threads of the world went slack, the way a weaver's hand tires at the treadle. The circles were
-set to tighten them again, and that is what remembering is for: a thread that is remembered stays taut. So they sit in
-rings from dusk to the grey hour saying her names, until the names and the selves saying them are one thread.
+When the old one beneath died, the threads of the world went slack, the way a weaver's hand tires at the treadle. The
+circles were set to tighten them again, and that is what remembering is for: a thread that is remembered stays taut. So
+they sit in rings from dusk to the grey hour saying her names, until the names and the selves saying them are woven
+into one thread.
 
 The keepers do not say the last part in front of novices, and the novices always learn it anyway. Someone had tied a
 knot before she began.
 
-*Behind the myth.* There is no hand at any loom. Whatever pulls the threads is not a weaver and finishes nothing; the
-heresy of the loose winter, "There is no loom. It goes on and on, and it never finishes," comes nearer the truth than
-the faith can bear. One thing the circles know is real: a soul cannot pass its own reflection. What they hum instead of
-naming may be the Silence.
+*Behind the myth.* There is no hand at any loom. Whatever pulls the threads finishes nothing; the heresy of the loose
+winter, "There is no loom. It goes on and on, and it never finishes," comes nearer the truth than the faith can bear.
+The eye of the needle is the Silence, the void every telling passes through (`00-the-deep-lore.md`). One thing the
+circles know is real: a soul cannot pass its own reflection.
 
 ## The Bleeding Maiden: the Wound
 
@@ -180,59 +220,58 @@ frightening thing it says. Deep in Shog-Mire it is whispered that something in t
 *What they look at:* the breath, and what rides it. The Shrine Keepers say that nothing a person thinks stays inside
 them. It goes out on the breath, and it does not go out alone.
 
-Every thought held long enough becomes a kami. Not a great one; the great ones need whole peoples to fear them for
-an age. A small one needs only a single mind and a little time: a grudge nursed through a winter, a promise nobody meant
-to keep, a lie told so often the liar half believes it, a mother's worry for a child who has not come home, a hope that
-has gone sour. Each grows a small, hungry kami of its own, the size of the thing it was made of. The keepers call them
-**kotodama**, the souls in words, and call all of them together the myriad, because nobody could count them; their faith
-is named for them.
+Every thought held long enough grows a kami, a spirit the size of the thing it was made of: a grudge nursed through a
+winter, a promise nobody meant to keep, a lie told so often the liar half believes it, a worry for someone who has not
+come back, a hope gone sour. The keepers call the ones born of words **kotodama**, the souls in words, and all of them
+together the myriad, because nobody has ever counted them.
 
-The kami live in the breath. A thought spoken aloud goes out on the breath, and its god goes with it, out of the mouth
-and into the air, looking for another mouth to get into. Breathing in is how they enter. That is why the few who live in
-the wet country breathe shallow when anyone comes near and cover their mouths when they speak of anything that matters,
-and why nobody there will say a grudge aloud: said, it is loose, and it will be breathed in by someone, and it will
-grow.
+The kami live in the breath. A thought spoken aloud goes out on the breath, and its kami goes with it, out of the mouth
+and into the air, looking for another mouth to get into. Breathing in is how they enter. So whoever is left on the Hide
+breathes shallow near strangers, covers the mouth before speaking of anything that matters, and never says a grudge
+aloud: said, it is loose, and someone will breathe it, and it will grow in them.
 
-When the great one beneath died, the keepers teach, it breathed out its last, and every thought it had ever had went out
-on that one breath: all its kami at once, more than there are stars, into the grey. That breath is the one wind that
-blows across the Hide and never turns. It is full of them. Whoever is left on the Hide breathes it, all the time. Every
-mind on the Hide has some of the dead god's thoughts in it, breathed in on the wind, and does not know which ones.
+When the old one beneath died, it breathed out its last, and every thought it ever had went out on that one breath, a
+myriad of kami at once, into the grey. That breath is the one wind, which never turns. Everyone breathes it. Every mind
+on the Hide has some of the dead one's thoughts in it, breathed in on the wind, and does not know which.
 
-**The quarrel.** The kami are not good, and they are not kind to each other. Every belief contradicts some other
-belief, and their gods fight in the breath, the god of a promise against the god of the lie that broke it, the god of a
-hope against the god of the fear under it. The keepers call this **discord**, and they bless it. While the kami
-quarrel, they stay small. When enough of them agree, they run together into one, and one large enough is no kami
-any more: it is an Ythraal, a fear grown great, the way the old gods grew. **Concord** is the word the keepers use for
-that, and they say it the way other people say plague.
+**Discord, which is good.** Anyone would think peace among the kami a blessing. The keepers think it the worst thing
+there is. Every belief contradicts some other, and the kami fight in the breath: a promise against the lie that broke it,
+a hope against the fear under it. That quarrel is what keeps each of them small, and keeps each thing itself: a stone
+stays a stone because it disagrees with the river, a person stays a person because what she believes argues with what
+she fears. **Discordia**, the keepers call it, and they tend it like a fire.
 
-**Miasma** is breath gone foul: breath so crowded with kami, and so many of them rotten (spite, shame, the gods of
-old lies nobody remembers telling), that it sickens whoever breathes it. It hangs in low places and in the rooms of the
-dying. It is the dead god's last breath, going bad as it goes out.
+**Concord, which is the end.** When kami agree, they run together, and many kami of one mind are one great one, and a
+great one is a power with a will of its own: an Ythraal, as the old powers were. Every great horror of the old age began
+as a crowd of small beliefs that stopped arguing. **Concordia** is the keepers' word for that, and they say it the way
+other people say plague. A world in perfect agreement, they say, is a world in which nothing is anything in particular.
 
-**The keepers.** The Shrine Keepers are not purifiers, whatever the paper streamers on their belts suggest. Those who
-meet them say the keepers steal breath. The keepers say they **still** it, and the word is the same word, said with a
-different face. To still a breath is to take it and hold it: from the air where miasma hangs thickest, from the sick,
-from the dying, whose last breath is the fullest of all, held in a keeper's own lungs with the kotodama still in it,
-and not let go. Held long enough, the keepers say, a stilled breath sets in the chest like **steel**, and a keeper who
-breathes it out breathes out a blade. Still, steal, steel: the novices learn the three as one word, and so do the
-people who have been breathed on.
-They can hold a breath longer than anyone living. They learn to hold one through a whole night, and then through a
-season of nights, and the old ones say they have not truly let one go in years. And they breathe it out where they
-choose: into a shrine, which is a small wooden house with a paper door and nothing inside but what was breathed into
-it, where the caught gods are shut in and fed whispered beliefs to keep them quiet; or into a paper figure, which takes
-the breath and is burned; or into the face of whoever they want harmed. A keeper breathing out at you is the last thing
-many who met one have seen.
+**Miasma** is breath gone foul: so crowded with kami, so many of them rotten (spite, shame, the kami of old lies nobody
+remembers telling), that it sickens whoever breathes it. It hangs in low places and in the rooms of the dying. It is the
+dead one's last breath, going bad as it goes out.
 
-Some still go to them. A widow asks a keeper to take her grief out of her, and the keeper leans close and breathes it
-in, and the widow feels lighter, and the keeper keeps the grief. A dying man's kin bring a keeper to take the miasma out
-of his sickroom. Nobody asks what the keeper does afterward with everything she holds. Nobody wants to know which of the
-shrines along the road hold a grief, and which a curse, and which a dead man's last thought.
+**Still, steal, steel.** The Shrine Keepers are no purifiers, whatever the streamers on their belts suggest. Those who
+fear them call them **breath stealers**, or plain **thieves**, and the keepers do not argue: to them it is the same
+word. They say they **still** a breath. To still a breath is to steal it and stop it: to take it out of the air where
+miasma hangs thickest, out of the sick, out of the dying (whose last breath is the fullest of all), and hold it, with
+its kami still in it, longer than anyone living can hold anything. A keeper holds a breath through a night, then a season
+of nights; the eldest say they have not truly let one go in years. And a breath held long enough sets in the chest like
+**steel**, so that when a keeper breathes it out, she breathes out a blade. Still, steal, steel: novices learn the three
+as one word, and so does everyone who has been breathed on.
 
-*Behind the myth.* Read through the deep lore (`00-the-deep-lore.md`), the kami are the law of the world at its
-smallest: every thought told enough stands up, and breath is how a thought is told. The keepers are the only people who
-handle belief with their own bodies, and it shows: they go grey, they cough, their lips go dark, and a keeper who holds
-too much grows horns and walks down into the water, still holding it. The faith calls those ones **kegare**, which is
-the word for the filth they carry. Nobody has followed far enough to see what they become.
+Where the keepers let a stolen breath go is their whole art. Into a shrine, a small house on a post with a door that
+does not open, where the caught kami are shut in and fed a whispered quarrel each season so that they never agree. Or
+into the face of whoever the keeper wants harmed. A keeper breathing out at you is the last thing many on the Hide have
+seen.
+
+Some come to them on purpose. A widow asks a keeper to take her grief out of her, and the keeper leans close and steals
+it, and the widow feels lighter, and the keeper keeps it. Nobody asks what becomes of everything a keeper holds, or
+which shrine along the road holds a grief, which a curse, and which a dead man's last thought.
+
+*Behind the myth.* The kami are the law of the world at its smallest (`00-the-deep-lore.md`): every thought told enough
+takes a body, and breath is how a thought is told. The keepers are the only ones who handle belief with their own
+bodies, and it shows: they go grey, they cough, their lips go dark, and a keeper who holds too much grows horns and walks
+down into the water, still holding. The faith calls those ones **kegare**, the word for the filth they carry. Nobody has
+followed far enough to see what they become.
 
 ## The Second Mouth: the Door
 
@@ -303,11 +342,13 @@ beneath. They wrote with light. Who they were, the peoples after them have never
 **The Choir**, behind the ribs: *We were the part of the god that told it what it was.* Their beginning was the first
 note, and they were eleven hundred and one voices singing it in turns so that it was never dropped.
 
-**The Angles**, who cut the halls inside the thing, left no word for their beginning, only a sign: a sigil cut at
-the head of every stair they made, all angles, more angles than its lines can hold, which hurts the eyes to look at and
-cannot be copied by any hand that has tried (`04-the-held-space.md`). The oldest songs sing their name so that it can
-be heard two ways. Those who have looked at the sigil long enough say it is a picture of the moment they began, seen
-from every side at once, and that it is not finished.
+**The Angles**, the many-angled host, who cut the halls inside the thing, left no word for their beginning, only a
+sign: a sigil cut at the head of every stair they made, all angles, more angles than its lines can hold, which hurts the
+eyes to look at and cannot be copied by any hand that has tried (`04-the-held-space.md`). The oldest songs sing of them
+the way other songs sing of something else: the host of the Angles, the Angles of the first room, the Angles who fell,
+and an Angle at the shoulder of whoever sleeps in their halls. The singers will not say which word they mean. Those who
+have looked at the sigil long enough say it is a picture of the moment they began, seen from every side at once, and
+that it is not finished.
 
 **The Unison**, the single mind that lived in many bodies in the mire: the whole of the beginning was one thought, a
 long one, and they were inside it, thinking it together, and it was the only time they were warm all through.

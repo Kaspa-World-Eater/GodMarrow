@@ -157,11 +157,11 @@ One day the Red will go back down the sand and not come up again. It will go dow
 stacks, farther than anyone has ever seen the sand go, and it will keep going, back up into the Fallen One's side,
 and the wound will close.
 
-Some keepers say that then the Fallen One will get up. The forest will slide off its back like rain off a roof, all
+Some keepers say that then the Fallen One will rise. The forest will slide off its back like rain off a roof, all
 the great trees at once, and the spirits will have nowhere left to live but in us. And everything the Red ever kept
 will be standing on the dry black sand, looking up.
 
-Other keepers say the Fallen One will not get up. They say the tide stopping only means it has finished dying at
+Other keepers say the Fallen One will not rise. They say the tide stopping only means it has finished dying at
 last. Then no more dead will come up out of the water, because there will be no water. The dead will lie down for
 good, and the living will have nothing left to burn. The fire will go out, and that will be the end, and it will be
 quiet.

@@ -35,7 +35,8 @@ they *answer badly, with names*.
 
 ## The Angles
 
-Before anything else stood in the Held Space, there were the Angles, and almost nothing is known about them. They left
+Before anything else stood in the Held Space, there were the Angles, the many-angled host, and almost nothing is
+known about them. They left
 halls with more corners than a room can have, so that whoever walks the edge of one and counts gets a different count
 each time, and higher. They left stairs with risers that come only to the knee, doors set a little off true, and
 niches too long for any body. People who sleep in their halls wake with nosebleeds. They signed everything with a sigil
@@ -63,7 +64,7 @@ it is whispered that the rings are coming nearer to each other, and that someone
 ## The court of white faces
 
 High in the dark of the Held Space sat a court of white faces, smooth as glazed clay, and it sat in judgment on souls.
-It watched every thought, and in that place, where a thought could stand up and walk, a thought was a thing that could
+It watched every thought, and in that place, where a thought could take a body and walk, a thought was a thing that could
 be judged. It found most of them wanting.
 
 When the thing died, the court fell. The faces came down out of the dark and lay where they fell, all across the Hide,
@@ -141,7 +142,7 @@ of them, the old and the children too, and set their shoulders under the city an
 meet them. Its iron rose into them through the soles of their feet. Their blood stood still in them, and grew heavy, and
 hardened, as the Deep's own blood had hardened, and they went to iron where they stood, holding, and grew together at
 the shoulder and the hip into one mass under the streets: a mass of legs, more legs than anyone has counted, iron and
-blood-dark and jointed every way. They did not let go, and they did not fall. Vesk stood up on its people, and walked.
+blood-dark and jointed every way. They did not let go, and they did not fall. Vesk rose on its people, and walked.
 
 It walks still, down there. It went down into the Deep on its legs and never came up, and it walks the iron country
 under everything, carrying its empty streets on its back through the dark, and the iron things of the Deep step aside

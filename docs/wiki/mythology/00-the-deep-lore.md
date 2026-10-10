@@ -6,7 +6,7 @@ feel it, and make the connections.*
 ## Everything is told
 
 In this world, what is told becomes. A thought held long enough, a word said often enough, a story repeated by enough
-mouths gains weight, and enough weight stands up and walks.
+mouths gains weight, and enough weight takes a body and a will.
 
 The gods are not real, the way a stone is real, and in the end neither is the stone. They are dreams that manifest
 because they think they are real, and because people think they are real. Each one is a story that has started to
@@ -30,7 +30,7 @@ the inside. Belief builds a god out of the telling alone, and there is nothing u
 ## Everything is everything
 
 Everything reflects everything else. What anyone sees is themselves: projected outward, recognised, and given an
-identity. Named, the reflection answers. Answered, it stands up.
+identity. Named, the reflection answers. Answered, it takes a shape.
 
 > "Everything is everything, reflecting off one another and people still think what they [are] seeing but it's really
 > them projecting themselves and recognizing that and providing identity to those things." (Derek)

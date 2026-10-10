@@ -44,16 +44,16 @@ anything long feared or long prayed to, and hardens there into **marrow**.
 
 The Ythraal walked. Every great fear had grown a body, and every body ruled the people whose fear had made it.
 
-- **The Thrae,** three fingers of something from beyond the outside, reaching in, which ate the shape of things
-  without ever knowing the world was there. The herald, a great dead thing of bone with fire in its ribs, fought them;
-  they never noticed. One lay down and is the bleeding mountains above the Red; the other two went. The herald fell
+- **The Thrae,** three that came in from beyond the outside, and the fourth, the hole they came through (whole,
+  holy, hole), which ate the shape of things without ever knowing the world was there. The herald, a great undead beast
+  of bone and black hide, fought them; they never noticed. One lay down and is the bleeding mountains above the Red; the other two went. The herald fell
   into a crater, was worshipped there, and ate its worshippers and then itself: the Starved Crown.
 - **The Famines:** god-corpses the height of hills that kept walking, eating the land bare, into which whole kingdoms
   climbed to live. One still walks, with Dhum's lamps lit in its side.
 - **The Needle,** a spike of iron in a forest, full of a slow digesting liquid, bones and great eyes, which drinks
   dreams.
-- **The reaper,** grown from the fear that the dead would never lie down: it reaped them, then the living, carried an
-  age's dead down a pit and lay on them to count.
+- **The reaper,** Oss-Karrhath, death's Titan, wearing death's mantle in a pit at the bottom of the world; its scythe
+  moves once an age.
 - **The shell** far out under the Red, whose sleeper's breath is the tide.
 - **The serpent of the wet country,** dead before anyone counted: its rot is the wet country, its stone spine the road.
 
