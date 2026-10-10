@@ -18,6 +18,7 @@ const TURN := 7.0                        # how fast it turns to its heading (rad
 ## the clips' own ground speeds in yards a second (tools/landkit3d/newborn_pose.py: a stride over its stance), so a
 ## clip is played at the rate that keeps its feet and hands planted on the moving ground
 const WALK_V := 0.58
+const CLIMB_V := 0.52
 const CRAWL_V := 0.19
 
 var vp: SubViewport
@@ -36,7 +37,7 @@ var lamps: Array = []                    # the world's lights near the body, pla
 var world_lit := false
 ## the clips' contacts (cycle phases where a foot, or a crawling hand, lands; tools/landkit3d/newborn_pose.py): walk,
 ## the left foot at 0.4 and the right at 0.9; crawl, the right hand at 0.34 and the left at 0.84
-const CONTACTS := {"walk": [0.4, 0.9], "crawl": [0.34, 0.84]}
+const CONTACTS := {"walk": [0.4, 0.9], "crawl": [0.34, 0.84], "climb": [0.42, 0.92]}
 signal contact(clip: String)
 var _last_ph := -1.0                   # lit only by the world's lights (light_from), not the fixed key and rim
 const N_LAMPS := 4
@@ -111,7 +112,7 @@ func _init(scene_path: String) -> void:
 		break
 	_own_surfaces(model)
 	if anim:
-		for a in ["crawl", "idle", "walk"]:
+		for a in ["crawl", "idle", "walk", "climb"]:
 			if anim.has_animation(a):
 				anim.get_animation(a).loop_mode = Animation.LOOP_LINEAR
 	pic = Sprite2D.new()
@@ -171,7 +172,7 @@ func light_from(lights: Array, tp: Vector2) -> void:
 			continue
 		var w := a * pow(1.0 - d / reach, 2.0)
 		var h := (Iso.lift(lt) / Iso.lift_px + float(L.get("heightPx", 0)) / 21.0) if t == "fire" else floor_yd + 0.15
-		best.append([w, lt, h, reach, a, String(L.get("rgb", "255,150,72")), t])
+		best.append([w, lt, h, reach, a, String(L.get("rgb", "255,150,72")), t, String(L.get("kind", ""))])
 	best.sort_custom(func(p, q): return p[0] > q[0])
 	for i in lamps.size():
 		var o: OmniLight3D = lamps[i]
@@ -184,7 +185,10 @@ func light_from(lights: Array, tp: Vector2) -> void:
 		o.omni_range = float(b[3]) * YD_M
 		var rgb: PackedStringArray = String(b[5]).split(",")
 		o.light_color = Color8(int(rgb[0]), int(rgb[1]), int(rgb[2]))
-		o.light_energy = (2.8 if b[6] == "fire" else 1.6) * float(b[4])
+		# a few candles on the floor warm a body a little; a torch or a brazier lights it (they had lit the newborn like
+		# lava as it climbed past the stair's candles)
+		var k_ := 0.9 if b[7] == "floorcandles" else (2.8 if b[6] == "fire" else 1.6)
+		o.light_energy = k_ * float(b[4])
 		o.visible = true
 
 func _process(dt: float) -> void:

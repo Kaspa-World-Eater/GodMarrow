@@ -23,7 +23,7 @@ var lantern: LanternUnit = null    # the floating lantern (the Mystic, the Penit
 var nascent := false              # not yet made by the cards: a shape of blood with no light (core/main.gd _nascent)
 var body3d: Body3D = null        # the newborn's live body (entities/body3d.gd), drawn in place of spr
 var scripted := false            # the opening (world/opening.gd) drives the body; the player has none of it
-const NASCENT_K := 0.3            # how fast it drags itself along, new-born
+const NASCENT_K := 0.4      # (Derek, 2026-10-10: at 0.3 the cave "feels like the path is obstructed")            # how fast it drags itself along, new-born
 var class_lamp: Node2D = null      # the lamp carried in hand (the Ossuarch, the Shrine Keeper, the Empty Hand)
 var lamp: PointLight2D
 var st: HeroStats
@@ -374,7 +374,10 @@ func _physics_process(dt: float) -> void:
 		if body3d == null and nf > 1 and spr.fi != fi0 and (spr.fi == 0 or spr.fi == nf / 2):
 			footfall("walk")
 		if body3d:
-			body3d.play("walk", 0.3, st.move_speed() * NASCENT_K / Body3D.WALK_V)
+			if _stair_lift() >= 0.0:
+				body3d.play("climb", 0.25, st.move_speed() * NASCENT_K / Body3D.CLIMB_V)   # knees up, a step at a time
+			else:
+				body3d.play("walk", 0.3, st.move_speed() * NASCENT_K / Body3D.WALK_V)
 		if act == "":
 			st.poise = maxf(0.0, st.poise - 1.6 * dt)   # walking drains 1.6/s (regeneration still runs)
 	else:

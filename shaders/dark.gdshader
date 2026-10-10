@@ -2,7 +2,7 @@
 // holes cut where light falls. In a pool's heart the painted colours show untouched; the dark rises in four gentle
 // steps to the rim (with a faint bright ring just inside it), then keeps gathering out to `far` x the radius, where it
 // settles at the open dark (never full black). Walls, trunks and stones stop the lantern's light: behind them the dark
-// stays. The darkness is quantised to 12 steps with a 4x4 Bayer dither in 4-px cells. Each pool breathes a little of
+// stays. The darkness is quantised to 12 steps with a Bayer dither in 2-px cells (the 2 x 2 grid). Each pool breathes a little of
 // its own colour over the scene (an overlay tint), so the lamp reads warm or ghostly against the cold.
 shader_type canvas_item;
 

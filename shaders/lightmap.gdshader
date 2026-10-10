@@ -1,5 +1,5 @@
 shader_type canvas_item;
-// The light map (y_light21.js L37), one texel per art pixel (a 4 px cell on screen), read by shaders/dark.gdshader.
+// The light map (y_light21.js L37), one texel per art pixel (a 2 px cell on screen: the 2 x 2 grid), read by shaders/dark.gdshader.
 // The land's ambient at half strength; the flames and the lantern laid over it (lighten keeps the hottest where pools
 // meet; small lights add); then the excess over the ambient cut into bands of 12 with a Bayer step between, capped at 160.
 uniform vec3 amb = vec3(1.0);

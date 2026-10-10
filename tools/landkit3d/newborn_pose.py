@@ -25,6 +25,7 @@ CLIPS = {
     "rise": (5.6, 32, False, 0.0),
     "idle": (3.2, 8, True, 0.0),
     "walk": (1.9, 12, True, 0.53),       # feet: 0.6 m over a stance of 0.6
+    "climb": (2.1, 12, True, 0.48),      # up the stairs: a step a foot, the knee driven high
 }
 
 THIGH, SHIN = 0.40, 0.43
@@ -236,6 +237,38 @@ def walk(t):
     return p
 
 
+def climb(t):
+    """up the stairs (Derek, 2026-10-10: "the newborns legs should animate like he is walking up stairs"): the walk with
+    each foot driven high and reached onto the step above, the knee up, the trunk leaning into the stair, the arms working
+    to haul it, the hips pushing up as the planted leg straightens; the stair itself lifts the body a step at a time
+    (entities/hero.gd _stair_lift)"""
+    cyc, stride = CLIPS["climb"][0], 0.55
+    p = stand_pose(t, sway=0.0)
+    w = 2.0 * math.pi * t / cyc
+    p["pitch"] = 24.0 + 4 * math.sin(2 * w)
+    p["spine"] = (10.0, 10.0, 12.0)
+    p["neck"] = 16.0 + 5 * math.sin(2 * w - 1.4)
+    p["roll"] = 3.5 * math.sin(w)
+    p["hips"] = (0.03 * math.sin(w), 0.0, 0.8 + 0.06 * max(0.0, math.cos(2 * w)))
+    for s, ph0 in (("L", 0.0), ("R", 0.5)):
+        side = 1.0 if s == "L" else -1.0
+        ph = (t / cyc + ph0) % 1.0
+        swing = 0.42
+        if ph < swing:
+            k = ease(ph / swing)
+            y = lerp(stride / 2, -stride / 2, k)
+            lift = 0.28 * math.sin(math.pi * min(1.0, k * 1.15))           # the foot raised high onto the next step
+        else:
+            k = (ph - swing) / (1 - swing)
+            y = lerp(-stride / 2, stride / 2, k)
+            lift = 0.0
+        p["ankle." + s] = (side * 0.12, y, 0.10 + lift)
+        p["knee." + s] = (side * 0.15, -1.0, 0.6)
+        p["foot." + s] = (side * 0.2, -1.0, -0.25 if ph < swing else -0.35)
+        p["arm_swing." + s] = 22.0 * math.sin(w + (0 if s == "R" else math.pi))
+    return p
+
+
 def rise(t):
     """it struggles to stand (Derek: "before it struggles to stand up"):
     0.0-1.1  from all fours it sits back onto its heels, the hands dragging back along the stone;
@@ -300,7 +333,7 @@ def rise(t):
 
 
 def pose(clip, t):
-    return {"crawl": crawl, "slip": slip, "retch": retch, "rise": rise, "idle": idle, "walk": walk}[clip](t)
+    return {"crawl": crawl, "slip": slip, "retch": retch, "rise": rise, "idle": idle, "walk": walk, "climb": climb}[clip](t)
 
 
 def times(clip):

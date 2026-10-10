@@ -340,7 +340,7 @@ func _process(dt: float) -> void:
 		lA.append(Vector4.ZERO)
 		lB.append(Vector4.ZERO)
 		lC.append(Vector4.ZERO)
-	var cellw := 4.0 * sc
+	var cellw := 2.0 * sc        # the 2 x 2 art grid (was 4)
 	var vsz := Vector2i(int(ceil(vis.size.x / cellw)), int(ceil(vis.size.y / cellw)))
 	if lm_vp.size != vsz:
 		lm_vp.size = vsz
@@ -368,7 +368,7 @@ func _process(dt: float) -> void:
 	mat.set_shader_parameter("dark_a", A)
 	mat.set_shader_parameter("dark_rgb", Vector3(dark_rgb.r, dark_rgb.g, dark_rgb.b))
 	mat.set_shader_parameter("tint_a", 0.2 + 0.1 * (1.0 - dk))
-	mat.set_shader_parameter("cell", 4.0 * sc)
+	mat.set_shader_parameter("cell", 2.0 * sc)        # the 2 x 2 art grid (Derek, 2026-10-10: "eliminate all 4x4 ... asure it 2x2")
 	# the grade, eased toward the night's as the day goes
 	var land := land_of(zone)
 	var g: Dictionary = GR[land]
