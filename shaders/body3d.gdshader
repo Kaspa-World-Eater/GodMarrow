@@ -13,8 +13,8 @@
 // - a tooth under everything (3.6), fixed to the body's own pixels so it rides with the body.
 shader_type canvas_item;
 
-uniform float steps = 8.0;
-uniform float band = 0.16;            // how wide the dithered band at a step's edge is (of one step)
+uniform float steps = 5.0;        // hard tone groups (the Last Faith study: flat masses, crisp edges)
+uniform float band = 0.1;            // how wide the dithered band at a step's edge is (of one step)
 uniform float stroke = 0.0;          // (pass 10: the strokes and the tooth moved onto the skin, shaders/body3d_model.gdshader)         // how much a stroke moves the value (of the whole ramp, in its square-root space)
 uniform float tooth = 0.0;
 const vec3 OUTLINE = vec3(0.031, 0.024, 0.039);
