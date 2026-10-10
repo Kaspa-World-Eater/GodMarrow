@@ -1102,7 +1102,9 @@ def pillars():
     cx, cy = HALL[0], HALL[1]
     ux, uy = -0.7071, -0.7071
     ax, ay = 0.7071, -0.7071
-    for row in (-1, 1):
+    # only the right-hand row: from the game's camera the nave runs straight up the screen, so the left row's three
+    # stood one behind another as a single dark shaft beside the heap (Derek, 2026-10-10: "remove this pillar")
+    for row in (1,):
         for i, du in enumerate((-3.6, 0.8, 5.0)):
             px = cx + ux * du + ax * row * 5.6
             py = cy + uy * du + ay * row * 5.6
