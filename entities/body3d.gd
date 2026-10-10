@@ -112,7 +112,7 @@ func _init(scene_path: String) -> void:
 		break
 	_own_surfaces(model)
 	if anim:
-		for a in ["crawl", "idle", "walk", "climb"]:
+		for a in ["crawl", "idle", "walk", "climb", "descend"]:
 			if anim.has_animation(a):
 				anim.get_animation(a).loop_mode = Animation.LOOP_LINEAR
 	pic = Sprite2D.new()
@@ -134,6 +134,16 @@ func play(c: String, blend: float = 0.25, speed: float = 1.0) -> void:
 	if c != clip:
 		clip = c
 		anim.play(c, blend)
+
+## hold a clip at a phase of its cycle (0..1): the stairs drive it by where the body stands on them, not by the clock
+func hold_at(c: String, phase: float, blend: float = 0.2) -> void:
+	if anim == null or not anim.has_animation(c):
+		return
+	if c != clip:
+		clip = c
+		anim.play(c, blend)
+	anim.speed_scale = 0.0
+	anim.seek(fposmod(phase, 1.0) * anim.get_animation(c).length, true)
 
 func length(c: String) -> float:
 	return anim.get_animation(c).length if anim and anim.has_animation(c) else 0.0

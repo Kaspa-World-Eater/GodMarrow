@@ -10,7 +10,7 @@ func _initialize() -> void:
 	b.position = Vector2(300, 400)
 	b.enable_drips()
 	await process_frame
-	var shots := [["crawl", 0.0], ["crawl", 0.9], ["slip", 0.8], ["retch", 2.1], ["rise", 1.4], ["rise", 2.9], ["rise", 3.6], ["idle", 0.0], ["walk", 0.4]]
+	var shots := [["crawl", 0.0], ["crawl", 0.9], ["slip", 0.8], ["retch", 2.1], ["rise", 1.4], ["rise", 2.9], ["rise", 3.6], ["idle", 0.0], ["walk", 0.4], ["climb", 0.0], ["climb", 0.55], ["climb", 1.1], ["climb", 1.65], ["descend", 0.5], ["descend", 1.5]]
 	var heads := {"front": Vector2(1, 0), "side": Vector2(1, -1), "down": Vector2(1, 1), "back": Vector2(0, -1)}
 	for s in shots:
 		for hn in heads:

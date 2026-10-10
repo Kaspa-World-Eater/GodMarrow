@@ -166,6 +166,23 @@ func _sync() -> void:
 
 ## on a stair, the height of its true steps under the pilgrim (screen px), or -1 off every stair: each rise is taken
 ## over the last quarter of its tread, a foot going up (zone data "stairs", from tools/landkit3d/cave_export.py)
+var _last_move := Vector2.ZERO
+
+## on a stair, how many steps up from its foot the body stands (continuous), or -1 off every stair
+func _stair_steps() -> float:
+	if zone == null:
+		return -1.0
+	for s in zone.d.get("stairs", []):
+		var x0 := minf(float(s["x0"]), float(s["x1"]))
+		var x1 := maxf(float(s["x0"]), float(s["x1"]))
+		if tp.x < x0 or tp.x > x1:
+			continue
+		var u := (tp.y - float(s["y0"])) / (float(s["y1"]) - float(s["y0"]))
+		if u < 0.0 or u > 1.0:
+			continue
+		return u * float(s["steps"])
+	return -1.0
+
 func _stair_lift() -> float:
 	if zone == null:
 		return -1.0
@@ -183,6 +200,8 @@ func _stair_lift() -> float:
 		var k := u * n
 		var f := k - floorf(k)
 		var zq := (floorf(k) + smoothstep(0.75, 1.0, f)) / n
+		if body3d:
+			zq = u          # the live body rises along the stair's line; its clip puts each foot on a tread
 		return (float(s["z0"]) + (float(s["z1"]) - float(s["z0"])) * zq) * Iso.lift_px
 	return -1.0
 
@@ -374,8 +393,11 @@ func _physics_process(dt: float) -> void:
 		if body3d == null and nf > 1 and spr.fi != fi0 and (spr.fi == 0 or spr.fi == nf / 2):
 			footfall("walk")
 		if body3d:
-			if _stair_lift() >= 0.0:
-				body3d.play("climb", 0.25, st.move_speed() * NASCENT_K / Body3D.CLIMB_V)   # knees up, a step at a time
+			var sk := _stair_steps()
+			if sk >= 0.0:
+				# on the stairs, the clip held at the phase of where the body is: each foot on a tread (Derek, 2026-10-10)
+				var going_up := _last_move.y < 0.0
+				body3d.hold_at("climb" if going_up else "descend", sk / 2.0 if going_up else -sk / 2.0 + 0.5)
 			else:
 				body3d.play("walk", 0.3, st.move_speed() * NASCENT_K / Body3D.WALK_V)
 		if act == "":
@@ -412,6 +434,7 @@ func _walk(dt: float) -> bool:
 	else:
 		tp = zone.move(tp, to.normalized() * step, radius)
 	_face(to)
+	_last_move = to
 	if body3d:
 		body3d.face_ground(to)
 	if path_i >= path.size():
