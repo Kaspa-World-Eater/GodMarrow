@@ -616,6 +616,15 @@ var ground_keys := {}
 func surface_at(t: Vector2) -> String:
 	var x := int(floor(t.x))
 	var y := int(floor(t.y))
+	# a shore (the cove, world/baked_ground.gd): sand inland of the waterline, wet at its edge (its ground classes marked
+	# it all wet, so the beach splashed underfoot and kept no prints: Derek, 2026-10-10)
+	if has_meta("shore"):
+		var sh: Dictionary = get_meta("shore")
+		var img: Image = sh["img"]
+		var u := clampf(t.x / float(sh["w"]), 0.0, 0.999)
+		var v := clampf(t.y / float(sh["h"]), 0.0, 0.999)
+		var din := (img.get_pixel(int(u * img.get_width()), int(v * img.get_height())).r - 0.5) * float(sh["span"])
+		return "ash" if din > 0.6 else "wet"
 	if ground_cls == null or x < 0 or y < 0 or x >= w or y >= h:
 		return "stone"
 	var key: String = ground_keys.get(str(ground_cls[y * w + x]), "main")

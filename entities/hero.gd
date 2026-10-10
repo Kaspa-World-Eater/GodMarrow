@@ -426,6 +426,9 @@ func footfall(clip: String) -> void:
 		if clip == "crawl" and body3d:
 			ahead = Vector2(cos(body3d.yaw_to), sin(body3d.yaw_to)).rotated(PI / 4.0) * 0.45
 		pl.ring(tp + ahead, 0.6 if clip == "crawl" else 1.0)
+	var prn = load("res://world/prints.gd").me
+	if prn != null and is_instance_valid(prn) and clip != "crawl" and zone.surface_at(tp) != "wet":
+		prn.step(tp, path[mini(path_i, path.size() - 1)] - tp if path_i < path.size() else Vector2(cos(float(face)), 0.5))
 	if clip == "crawl":
 		Sfx.play("step_wet", 0.45, randf_range(0.8, 0.95))     # a hand, slapping down in the blood
 	else:

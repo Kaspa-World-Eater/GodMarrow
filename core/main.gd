@@ -174,6 +174,8 @@ func enter(zid: String, from: String) -> void:
 		rs.volume_db = -7.0 + linear_to_db(maxf(0.0001, float(Settings.sfx_vol)))
 		zone.add_child(rs)
 		rs.play(fmod(Time.get_ticks_msec() / 1000.0, 5.2))
+		var pr = load("res://world/prints.gd").new()        # the sand answers the foot
+		zone.floor_layer.add_child(pr)
 		var wz = load("res://world/red_wisps.gd").new()     # wisp-fire drifting out on the Red
 		zone.add_child(wz)
 		wz.bind(zone)
