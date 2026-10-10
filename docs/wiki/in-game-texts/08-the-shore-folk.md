@@ -91,9 +91,9 @@ She set the rule that the stair is swept every morning, every step, before anyth
 One carved on it is kept clean and knows he is minded. The keepers swept it every morning after her, longer than
 anyone can count.
 
-Down in the low wet country, with no one to feed him, the Long One starved. A god that nobody feeds does not lie
-down quietly. It breaks apart, and what it breaks into is worse than what it was. The bog is what is left of him. His
-back is the road the last of the bog folk walk now, his bones lie everywhere in the black water, and nobody down there remembers
+Down in the low wet country, with no one to feed him, the Long One starved. A god that nobody feeds does not lie down
+quietly. It breaks apart, and what it breaks into is worse than what it was. The bog is what is left of him. His back is
+the road the last of the bog folk walk now, his bones lie everywhere in the black water, and nobody down there remembers
 his name.
 
 The last stone says: *Sweep the stair. He is not as dead as the bog folk think.*

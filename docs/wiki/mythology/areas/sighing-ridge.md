@@ -26,8 +26,8 @@ smoke off snuffed candles, and at the end of the line one small lantern breathin
 ### When the wind stops
 
 *Told by the woman who wiped the lanterns at the Ridge end of the lantern round, the last to do it, to a lone pilgrim,
-who wrote it down at the next fire. She would not give her name; she said that on the Ridge a name said aloud is a name the wind
-takes.*
+who wrote it down at the next fire. She would not give her name; she said that on the Ridge a name said aloud is a name
+the wind takes.*
 
 You've felt it at your back since the Moor. Up here you'll hear it too. That wind is the god's last breath, still going
 out of it, and it has been going out longer than anyone has counted. In my mother's life and her mother's it never once
@@ -54,10 +54,10 @@ which of the still shapes were which. When the wind came back, all of us walked 
 the others.
 
 Nobody knows who raised the columns. The grandmothers on the Moor used to say our people raised them in the first years,
-as a walk out of the wind for pilgrims, with a roof on it. The copyists say the columns were standing when the people came
-out, the way the road was lying there. The wind is wearing them down from the side it comes from, a finger's width in a
-lifetime. On the sheltered side you can still see the carving: people walking, every one of them going the way the wind
-goes.
+as a walk out of the wind for pilgrims, with a roof on it. The copyists say the columns were standing when the people
+came out, the way the road was lying there. The wind is wearing them down from the side it comes from, a finger's width
+in a lifetime. On the sheltered side you can still see the carving: people walking, every one of them going the way the
+wind goes.
 
 When you're past the last lantern, the wind will be at your back all the way down onto the Heath. Let it be. Don't turn
 round to see where it's going. It's going where everything goes.

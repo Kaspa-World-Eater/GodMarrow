@@ -56,8 +56,8 @@ behind the teeth.
 The glass lies thickest in the hollow past the Broken Kneeler, where a ring of stones like teeth stands round a pit of
 ash that lifts and settles as if something under it is breathing. No picker crosses that hollow after dark. My husband
 did, once, for a run of glass he had seen from the rise. He came back with it after dark and would not break it up,
-though it was the longest run anyone at our fire had ever seen. It had set in the ash in the shape of somebody kneeling. It
-hangs over our door now. In winter it is the warmest thing in the house, and nobody sits under it.
+though it was the longest run anyone at our fire had ever seen. It had set in the ash in the shape of somebody kneeling.
+It hangs over our door now. In winter it is the warmest thing in the house, and nobody sits under it.
 
 ### The Kneeler that kneels
 
@@ -137,8 +137,8 @@ North York Moors, buried and growing grey up through it, as the farms under Eyja
   chalked again in brown.
 
 **What travels if the Moor does not come back:** the Sighing Lantern and the Widow's Stumps to the Sighing Ridge, whose
-tellers claim both; the Broken Kneeler's rival stays on the Ash Shore (`ash-shore.md`); the camp's people go where the Red
-Shore's open question sends them.
+tellers claim both; the Broken Kneeler's rival stays on the Ash Shore (`ash-shore.md`); the camp's people go where the
+Red Shore's open question sends them.
 
 **Light, weather and the god.** Overcast. Rain darkens the ash by a third, crusts it and cuts branching rills, and
 steams in threads where it lands on the warmest ash, never in a layer. The lantern is the key light. The god shows only

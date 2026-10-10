@@ -67,10 +67,10 @@ had whispered. You would only feel lighter, and not know why.
 The monks carried the names up the mountain, and at noon the abbot gave them to the open hand. He stood on the east
 stone and tipped each bowl out over its lip, into the light, and the names went wherever names go.
 
-There was a widow near us whose husband had died in the spring, and she could not bear it. She put his name
-in the bowl. In the morning she did not know him. She did not know she had ever had a husband. But every fast-day
-for the rest of her life she walked out to the same grave in the barrow field and sat beside it until dark, and when
-anyone asked whose grave it was, she said she did not know, and that her feet knew the way.
+There was a widow near us whose husband had died in the spring, and she could not bear it. She put his name in the bowl.
+In the morning she did not know him. She did not know she had ever had a husband. But every fast-day for the rest of her
+life she walked out to the same grave in the barrow field and sat beside it until dark, and when anyone asked whose
+grave it was, she said she did not know, and that her feet knew the way.
 
 The forgetting had no edge. That is what frightened people, in the end. You could not put in only the part of a
 thing you wanted gone. And the bowls grew heavier every year, though they were always empty when the monks came down.
@@ -85,10 +85,10 @@ In the spring of the year the Peak fell, the monks began to die in their rooms a
 night, and in the morning there was nothing in the room but a little black glass and a little dust. Night after night the
 abbot counted them, until there were nine of us left who were not gilded.
 
-The gilded masters had been dying differently, if it was dying. The oldest of them were gilded while still breathing
-and set in the niches of the inner sanctum, a hundred and eight niches, the last on the left always empty and kept.
-For years before the end, dark tracks had run down from the gilded masters' eyes every night, and every morning we
-wiped them away, and the few pilgrims who climbed to them said the masters wept for the living.
+The gilded masters had been dying differently, if it was dying. The oldest of them were gilded while still breathing and
+set in the niches of the inner sanctum, a hundred and eight niches, the last on the left always empty and kept. For
+years before the end, dark tracks had run down from the gilded masters' eyes every night, and every morning we wiped
+them away, and the few pilgrims who climbed to them said the masters wept for the living.
 
 On the last evening the abbot wrote a letter and gave it to me. I was the youngest and the quickest down the old
 water-cut. He told me to take the letter down to the valley and not to look back. I did not look back.
@@ -124,8 +124,8 @@ them, a little behind, and no one has ever seen it give heat.
 
 Every faith fears them. The Pale Order says the Peak leaves glass where it should leave bone. The processions of the
 Bleeding Maiden hate the Silence more than they ever hated the Peak. The circles of the Veiled Crone bar their doors to
-anyone who speaks its name, and the Shrine Keepers who are left hunt them when they can. The Empty Hands do not seem to mind.
-They do not seem to mind anything.
+anyone who speaks its name, and the Shrine Keepers who are left hunt them when they can. The Empty Hands do not seem to
+mind. They do not seem to mind anything.
 
 ## The pause completed
 

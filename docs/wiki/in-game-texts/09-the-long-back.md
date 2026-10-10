@@ -12,10 +12,10 @@ is in each of them.*
 
 The road across the Sunken Bog has as many names as there are people who walk it, and few people walk it.
 
-The last of the bog folk, who live along it, call it the Long Back, and they will tell you their own people laid it at the start of
-things, out of the biggest stones they could find, so as to have a road that would not sink. They are proud of it,
-and they keep it. Ask them why the stones are hollow in the middle and knobbed at the sides and they will tell you
-that is how stones were made in those days.
+The last of the bog folk, who live along it, call it the Long Back, and they will tell you their own people laid it at
+the start of things, out of the biggest stones they could find, so as to have a road that would not sink. They are proud
+of it, and they keep it. Ask them why the stones are hollow in the middle and knobbed at the sides and they will tell
+you that is how stones were made in those days.
 
 Pilgrims call it Saint Uss's Causeway, after a saint who is in no calendar of any faith. The old boatman of the Fen
 calls it the Stair of the Drowned King, and the bog folk's few children call it Old Coil and dare each other to walk

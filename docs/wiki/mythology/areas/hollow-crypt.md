@@ -25,8 +25,8 @@ flagstones lifting under the pilgrim's feet.
 
 ### Why the mothers went inside
 
-*Told at a banked fire on the Moor by a grandmother to a girl about to be married, as the grandmothers there tell it. A
-copyist who sat at the same fire wrote it down from memory the next day.*
+*Told at a banked fire on the Moor by a grandmother to a girl about to be married, the last girl at that fire. A
+pilgrim who stopped there wrote it down from memory the next day.*
 
 When we came out of the god, we came out of the warm into the cold, and the mothers carried the children out. You know
 that part. What you don't know is that the mothers were the ones who wanted to go back.
@@ -55,7 +55,7 @@ will you, girl, unless somebody changes it. Don't let them tell you it is the sa
 
 ### The last sexton
 
-*Set down by a copyist from the words of the last sexton of the Hollow Crypt, an old man who would no longer go past
+*Set down by a pilgrim from the words of the last sexton of the Hollow Crypt, an old man who would no longer go past
 its threshold.*
 
 When I was a boy and my father was sexton, the Warden stood inside the first gallery, just past the Long Candle, and did

@@ -41,10 +41,10 @@ People disagree about what she did with the years. My mother said she lived on t
 long. The pilgrims say she put them into her candles.
 
 Because she made candles. The bog keeps its drowned. You will have seen them in the turf banks, if you looked: a hand in
-the cut face, a shoulder, brown and whole, generations down. Down there in the wet, where no air gets in, the fat of
-the drowned goes pale and hard, like wax. The turf-cutters called it grave-wax and would not touch it, in the days when
-there were turf-cutters. Hesk paid them to bring it to her. She rendered it in her vat and poured it, and her candles burned slow and gave a good light, and some
-of them got up and walked.
+the cut face, a shoulder, brown and whole, generations down. Down there in the wet, where no air gets in, the fat of the
+drowned goes pale and hard, like wax. The turf-cutters called it grave-wax and would not touch it, in the days when
+there were turf-cutters. Hesk paid them to bring it to her. She rendered it in her vat and poured it, and her candles
+burned slow and gave a good light, and some of them got up and walked.
 
 You will see them on the hump, the ones that burn as they go and leave their footprints smoking in the wet. The pilgrims
 call them saints, martyrs out of the burnt country who walk wherever there is something to burn. I call them Hesk's

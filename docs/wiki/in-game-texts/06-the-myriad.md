@@ -29,10 +29,11 @@ Pray, if you pray, that they never agree.
 
 *From the Well-Shrine's day-book, in the hand of an old keeper.*
 
-A shrine is a house the size of a cradle on a post, with a paper door. There is nothing in it but what a keeper
-breathed into it. When we take a breath from the sick, or the dying, or the grieving who ask us, we carry it in our
-chests as far as we can bear, and then we breathe it into a shrine and seal the door, and the kami in it are shut in. We feed them. Once a season we come back and whisper into the door something they can quarrel over, so that
-they never settle and never grow.
+A shrine is a house the size of a cradle on a post, with a paper door. There is nothing in it but what a keeper breathed
+into it. When we take a breath from the sick, or the dying, or the grieving who ask us, we carry it in our chests as far
+as we can bear, and then we breathe it into a shrine and seal the door, and the kami in it are shut in. We feed them.
+Once a season we come back and whisper into the door something they can quarrel over, so that they never settle and
+never grow.
 
 The few who pass the shrines think they are holy. Let them. They bow to them, and leave what they can spare, and do
 not open the doors, and that is all we need of them.

@@ -25,9 +25,10 @@ figure cut in it, and black glass in the paving catching the lantern.
 *The first leaf of the copyists' register of the Pilgrim Road's stones, found with the register in a dry niche of a
 lantern-stone. A few later hands have added lines below it; none has changed it.*
 
-Every faith that is left will tell you it cut this road, and every one of them is wrong. The road was here first. It goes
-through the pale wood as if the wood were not there, and the roots turn aside at its edge, as a hand turns aside from a
-hot stone. Under the dust it is hard and dark and close-fitted, and nobody has ever found the mark of a tool on it.
+Every faith that is left will tell you it cut this road, and every one of them is wrong. The road was here first. It
+goes through the pale wood as if the wood were not there, and the roots turn aside at its edge, as a hand turns aside
+from a hot stone. Under the dust it is hard and dark and close-fitted, and nobody has ever found the mark of a tool on
+it.
 
 The stones came later. They were set along it one autumn in the first years after the god died, by
 people who found the road already lying there and wanted it numbered. Who those people were, the faiths dispute as they
@@ -84,9 +85,9 @@ Your register asks for anything on the lower road that it does not hold. Here is
 make of it.
 
 We were three, walking down out of the pale wood and singing as pilgrims used to on this road by day, the long
-walking-song whose verses go round. We sang past the kneeling posts, where each of us knelt and found that our foreheads fitted the
-hollow worn in the post. We sang past the stone where they say Sister Un's reliquary rested a night on its way below,
-the one no dust will settle on. Somewhere below that, we stopped singing.
+walking-song whose verses go round. We sang past the kneeling posts, where each of us knelt and found that our foreheads
+fitted the hollow worn in the post. We sang past the stone where they say Sister Un's reliquary rested a night on its
+way below, the one no dust will settle on. Somewhere below that, we stopped singing.
 
 Nobody decided to. We were in the middle of a verse, and then we were walking without it, all three of us, and when I
 noticed I could not remember stopping. Nothing marked the place.

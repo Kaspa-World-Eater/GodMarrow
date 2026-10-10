@@ -5,11 +5,11 @@ borders: the Hollow Crypt, the Bog-Witch's Shack · in the game: the old procedu
 by the bog's method · the Pale Order: `../../in-game-texts/02-the-pale-order.md`*
 
 Below the Hollow Crypt, where the low road turns down toward the wet country, the Pale Order cut a house into the rock,
-and the lowlanders call it the monastery. The knights coming down from the white mountains each spring rested their dead
-and their chests there, and a few brothers lived in it all year, keeping the house, its count and its night office. Its
-great room was cut under a vault of living rock, and one night the vault came down on one side: half the nave is under
-rock and half under the grey sky, and the rain falls into the font. The altar faces away from the pews, toward the rock
-wall and the crypts beyond it. The brothers turned it, the lowlanders say, the night of the fall.
+and the few who still speak of it call it the monastery. The knights coming down from the white mountains each spring
+rested their dead and their chests there, and a few brothers lived in it all year, keeping the house, its count and its
+night office. Its great room was cut under a vault of living rock, and one night the vault came down on one side: half
+the nave is under rock and half under the grey sky, and the rain falls into the font. The altar faces away from the
+pews, toward the rock wall and the crypts beyond it. The brothers turned it, the tellings say, the night of the fall.
 
 It was a small house, far from the Gilded Peak, which fell elsewhere and in another year; nothing of the Peak belongs
 here. It should feel stern and broken open, a dry, sooted half beside a wet, green half. It sits over the same dark as
@@ -24,8 +24,8 @@ facing the plain back of an altar that has turned to the wall.
 
 ### The night office
 
-*Told by a woman who as a girl lived above the house and did the brothers' washing, and heard it fall. Her grandson, a
-copyist, wrote it down.*
+*Told by an old woman who as a girl lived above the house and did the brothers' washing, and heard it fall. Her
+grandson, the last left with her, wrote it down.*
 
 Every night of my girlhood the brothers sang. They sang after dark and on into the night, deep voices all together, nine
 lines and a rest, nine lines and a rest, and it came up out of the ground under our feet like a cellar full of bells.

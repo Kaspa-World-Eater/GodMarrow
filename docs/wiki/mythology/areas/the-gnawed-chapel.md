@@ -22,8 +22,9 @@ at the far end, at the lantern's edge, the backs of the last niches broken throu
 
 ### The names under the Ridge
 
-*Told by a woman of the Ridge, who came down to the lowlands in her old age, to a copyist who lodged next door to her.
-He read it back to her the same night, and she made him strike out one word, which was a name.*
+*Told by a woman of the Ridge, the last of its folk, who came down to a hut in the lowlands in her old age, to a copyist
+who sheltered a night with her. He read it back to her the same night, and she made him strike out one word, which was
+a name.*
 
 You can't dig on the Ridge. A spade goes down a hand and strikes stone, and the wind takes whatever earth you turn. So
 we never had barrows like the lowland folk. When one of ours died, we carried them down the stair into the chapel under
@@ -32,10 +33,10 @@ at the back and a line of hearth-ash along the lip, and the plasterer closed it 
 was dry, the nearest kin painted the face on it, and the name under the face. My mother painted my father. She was no
 painter, and he looked surprised ever after.
 
-We closed them up flush because of the knights. Every spring the knights of the Pale Order came down the Ridge road in
-their carved plate and asked us for our bones. A bone out of its place, they said, is a wound in the world. We told them
-we had no dead. A people with no dead, one of them said to my grandmother, is a people that lies. She agreed with him
-and mended a strap of his plate, and he went away with his chests empty, and the chapel walls looked like walls.
+We closed them up flush because of the knights. Every spring a knight or two of the Pale Order came down the Ridge road
+in their carved plate and asked us for our bones. A bone out of its place, they said, is a wound in the world. We told
+them we had no dead. A people with no dead, one of them said to my grandmother, is a people that lies. She agreed with
+him and mended a strap of his plate, and he went away with his chests empty, and the chapel walls looked like walls.
 
 Up on the crest you never say a name aloud, because the wind takes it, but the wind can't reach under the rock. So on
 the fast-day we went down and sang, and after the singing the eldest of us read the names off the plaster, every one, so
@@ -56,12 +57,12 @@ The lowlanders say our own dead did it, gnawing their way out to come home. Let 
 Something came up out of the Ridge from underneath, into the backs of our walls, and took our dead down with it. It came
 up where we were saying their names, and I have not said a name aloud since.
 
-The knights came that spring as they always did. We told them we had no dead, and for once it was true.
+A knight came that spring as one always did. We told him we had no dead, and for once it was true.
 
 ### A knight's day-book
 
 *A leaf from the day-book of a knight of the Pale Order, written the spring after the chapel was opened. It was copied
-for a lowland scholar by a brother who had been told to copy the book and not to read it.*
+by a brother of the Order who had been told to copy the book and not to read it.*
 
 The Ridge folk say again that they have no dead. This year I went down into their chapel under the crest, which I have
 passed many springs without entering, because the old woman at the stair-head would not look at me.

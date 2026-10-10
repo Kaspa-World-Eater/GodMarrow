@@ -7,8 +7,8 @@ method*
 Off the Ridge the land runs down into a wide heath burned to black wire. It burned season on season after the god died,
 and nobody lit it, and it has never quite stopped: the wind off the Ridge drives every fire across it the same way, so
 the Heath is a patchwork of burns of every age in long tongues that all point downwind, toward the sea. The few pilgrims
-who cross it keep to one road and sleep at one banked fire. In the corner the road bends away from, seven great horned carcasses lie in
-a ring, all facing the same way, and no lantern will go nearer than its edge.
+who cross it keep to one road and sleep at one banked fire. In the corner the road bends away from, seven great horned
+carcasses lie in a ring, all facing the same way, and no lantern will go nearer than its edge.
 
 The Heath is the god's skin, burned, with one old wound under the seven that closed. It should feel wide, dry, smoky
 and watched: there is always a fire somewhere on it.
@@ -61,13 +61,12 @@ Round them the skulls are heaped like stones cleared off a field, and those skul
 The ground inside the ring is darker than the Heath and flatter than ground lies, and nothing grows on it.
 
 The keeper gives four tellings of the seven. Old Garrow said they were the god's first thoughts, sent out walking to
-carry something, and that they lay down when they got where they were going. Brannoc the smith's girl said they knelt
-to something coming up. A knight of the Pale Order sat at the fire and said they lay down to hold a door shut with
-their weight, and then he went out and counted their bones twice. He wrote the first number
-in his book and would not say the second. The keeper knows it all the same: he dropped his book in the ash going out,
-and she read it before she gave it back, and the second number was the first with one more figure on the end. The
-keeper's mother had it in six words, and the few pilgrims who pass carry those away: the ground between them was opened once, and
-closed.
+carry something, and that they lay down when they got where they were going. Brannoc the smith's girl said they knelt to
+something coming up. A knight of the Pale Order sat at the fire and said they lay down to hold a door shut with their
+weight, and then he went out and counted their bones twice. He wrote the first number in his book and would not say the
+second. The keeper knows it all the same: he dropped his book in the ash going out, and she read it before she gave it
+back, and the second number was the first with one more figure on the end. The keeper's mother had it in six words, and
+the few pilgrims who pass carry those away: the ground between them was opened once, and closed.
 
 Garrow went out to the ring in the last year of his life. He left his lantern at the edge, where it stopped, and went
 in without it. He came back at grey light and said there was a seat under the ground there, grey, of the same stone as

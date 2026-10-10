@@ -82,9 +82,9 @@ and the water closed over it. That is why the halves lean apart toward the sea, 
 glass. Up on the Moor there is a stone man on a rise who kneels with his head off, and the camp up there calls him the
 Kneeler, and they are welcome to him. A kneeler is a thing you kneel at. Kneel at ours.
 
-Go the last league on your knees if you have come to do that. Some still do. Leave your boots here. They will be here when you
-come back, and if you do not come back, someone will have the use of them. Whatever you have come to ask, ask it at the
-bench. Do not ask it of the water.
+Go the last league on your knees if you have come to do that. Some still do. Leave your boots here. They will be here
+when you come back, and if you do not come back, someone will have the use of them. Whatever you have come to ask, ask
+it at the bench. Do not ask it of the water.
 
 Along the strand, facing the grey, you will pass the ones who came the last league on their knees and did not get up
 again. Some say they are pilgrims who prayed too long. The old women of the shore said they are some of those who never

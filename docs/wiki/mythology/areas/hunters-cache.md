@@ -5,15 +5,15 @@ old procedural map (`hunter_cache_s1001` to `s1020`), to be remade by the bog's 
 
 Up out of the far side of Fern Gully lies heather the fire never reached: old, deep, knee- to waist-high, grey-green and
 rolling to the sky. One family of hunters worked this ground, father to son, and the cache is where the last of them
-kept what he took: a turf-roofed hut half sunk in the heather, hides stretched on frames, tallow in crocks, bone tied in bundles, a
-bow leaning by the door. He meant to come back for it. His boots are on the step, and his footprints lead away barefoot.
+kept what he took: a turf-roofed hut half sunk in the heather, hides stretched on frames, tallow in crocks, bone tied in
+bundles, a bow leaning by the door. He meant to come back for it. His boots are on the step, and his footprints lead
+away barefoot.
 
 Nothing in this world was ever born that a hunter could take. The hunters took from what comes up out of the god: hide
 and finger-bone from the Hands, fat for tallow from the swollen ones, the bone needles the Weepers cry, and from the
 Husks only the knot of the belt. The heather here grows over soft, warm ground where things push up through the skin,
-and the hunters dug their waiting-pits at its edges. It is the Heath as it was
-before the burning, and it should feel lonely, patient and watched, the way a place feels when somebody has only just
-left it.
+and the hunters dug their waiting-pits at its edges. It is the Heath as it was before the burning, and it should feel
+lonely, patient and watched, the way a place feels when somebody has only just left it.
 
 **The one image:** a turf hut half sunk in old heather under a grey sky, hides drying on the outstretched arms of a
 stone saint, a bow leaning by the door, boots side by side on the step, and bare footprints going away into the

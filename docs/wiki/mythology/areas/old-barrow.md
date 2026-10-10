@@ -57,8 +57,8 @@ stone keeping them, and that I should not have stayed.
 
 ### The Turned Mound
 
-*Told by a woman of the last barrow families to a pilgrim at her door, and written down by him there. She would not give her
-mother's name, or her own.*
+*Told by a woman of the last barrow families to a pilgrim at her door, and written down by him there. She would not give
+her mother's name, or her own.*
 
 Every lid in the Barrows points east, to the ring of teeth. Stand at the foot of the Lane at dawn and look along them,
 and all the hollows lean the one way, like grass in a wind. All but my mother's.

@@ -61,8 +61,8 @@ you can read them only standing in the pit. It says: *WE CUT THEM FACING IN, SO 
 
 ## The court of white faces
 
-*Told by the lantern-tenders of the lowlands, who see the Wick-Saints come to their lanterns at dusk. A copyist set
-it down.*
+*Told by one of the last lantern-tenders of the lowlands, who sees the Wick-Saints come to her lanterns at dusk. A
+pilgrim who sat out a night with her set it down.*
 
 In the warm place where the Tithed knelt, before the god died, there was a court of white faces high up in the dark,
 and it sat in judgment on souls. The faces were smooth and white as glazed clay, and they watched what everyone
@@ -75,14 +75,14 @@ The moths found them. Moths go to anything pale in the dark. They found the whit
 them up, and now they wear them. At dusk they come to the lanterns on the roads, swooping in their long arcs, and the
 faces on them are the faces of the court.
 
-The tenders say the faces still judge. If one of them hangs in the air and looks at you for a long time before it
+The tender says the faces still judge. If one of them hangs in the air and looks at you for a long time before it
 comes, it has found you wanting, and you should not be there when it decides what to do about it.
 
 ## The undersides
 
 *Cut on the underside of Sorrath, the city that broke on the pale ridges, where only someone looking up from below was
-ever meant to read it. A reader of the Citadel copied it lying on his back in a trench the diggers had cut under the
-stone, and wrote his own notes after it.*
+ever meant to read it. A reader of the Citadel copied it lying on his back in a trench someone had cut under the
+stone long before, and wrote his own notes after it.*
 
 In the beginning the world was heavy, and everything in it was held down. The rivers were held in their beds, and the
 people were held to the ground, and the gods were held to the people who feared them. Then the first of us opened a
@@ -98,9 +98,9 @@ people, up the chains to the great one, until the great one cut the chains and w
 this from lies upside down on the ridge, and the words face the sky. The ones who cut them never thought anyone would
 read them from above.
 
-The diggers who go under the lowland grass for Ghenn's lamps do not hold with any of that. They say the cities did not
-fall but were pulled, by something below that had been looking up at them all that time. I asked the oldest digger
-what had pulled them. She said it was whatever had been holding the rivers in their beds.
+The one digger I met, an old woman who goes under the lowland grass alone for Ghenn's lamps, does not hold with any
+of that. She says the cities did not fall but were pulled, by something below that had been looking up at them all
+that time. I asked her what had pulled them. She said it was whatever had been holding the rivers in their beds.
 
 ## The Unison
 
@@ -135,8 +135,8 @@ way down. It said the city over them had drunk from them, a little and then more
 until there was nothing left in their bones at all, and then had let them go. It said that was not dying. It said it remembered being full, and that it would
 like to remember it better.
 
-The common roads call them Marrow-Eaters, and say they crack the bones of the sleeping to suck out what is inside. I
-had believed it. It did not sound hungry. It sounded like a guest who had been kept waiting.
+The few who still walk the roads call them Marrow-Eaters, and say they crack the bones of the sleeping to suck out what
+is inside. I had believed it. It did not sound hungry. It sounded like a guest who had been kept waiting.
 
 It said they were tall and hollow, and that it would show me if I opened the door. I did not open the door. In the
 morning there were marks on the outside of it, very high up, as if someone tall had leaned their forehead against
@@ -161,10 +161,11 @@ never once mention it. They may mean the Silence, or its opposite, or something 
 
 ## What answers iron
 
-*Told by a miner of the Pale to a copyist at the pithead, on the day he gave up the work.*
+*Told by a miner of the Pale, the last who worked that pithead, to a pilgrim who sheltered in his hut, on the day he
+gave up the work.*
 
-We bleed the first ore we bring up out of a new shaft. Everybody does. Iron is old blood, and you give a little back.
-I had done it all my life and never asked why.
+You bleed the first ore you bring up out of a new shaft. Every miner did, when there were miners. Iron is old blood,
+and you give a little back. I had done it all my life and never asked why.
 
 At the bottom of the deepest shaft I worked, the iron is warm. It is ridged and crusted like a scab, and it is warm,
 and it grows. I have seen it branch in a night like frost on a pane. If you strike iron on iron down there, something

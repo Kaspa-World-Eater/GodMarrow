@@ -33,7 +33,7 @@ and went on into country nobody up here has seen. There is a camp at the near en
 there was a ferry, and he kept its fire because somebody should. He sat by it every night and told the waiting ones the
 news from up here, whether they wanted it or not.
 
-The waiting ones I believe in, because pilgrims who have been down there say the same. They stand at the water's edge
+The waiting ones I believe in, because the few who have been down there say the same. They stand at the water's edge
 below the camp, a crowd of them, in the clothes they set out in, facing the far bank. They waited for the ferry, and the
 ferry stopped coming, and they went on waiting. Garrow said they were no trouble if you did not stand among them, and
 that they lift their heads whenever they hear a bell.
@@ -48,16 +48,16 @@ said, he raked out his fire and laid it for morning, kindling crossed on the ash
 to it when he got back. He went out to the seven, and came back to my fire, and lay down here with his feet toward the
 corner, and I let him. He never went back down.
 
-The boatmen who have been there tell it otherwise. They say the fire at the bridge went out generations before Garrow
-was born, its ash already laid for a morning that never came, and that Garrow only sat beside it and told everyone it
-was burning. Garrow would have liked that. It is a better lie than any of his.
+The boatman of the Fen, who has been there, tells it otherwise. He says the fire at the bridge went out generations
+before Garrow was born, its ash already laid for a morning that never came, and that Garrow only sat beside it and told
+everyone it was burning. Garrow would have liked that. It is a better lie than any of his.
 
 Either way the ash is still laid, and nobody has put a light to it. I would not.
 
 ### The last name
 
-*Told by an old stonecutter of the lowlands to his apprentices, on the day each of them cuts a name for the first time.
-One of them wrote it down.*
+*Told by an old stonecutter of the lowlands to his last apprentice, on the day she cut a name for the first time. She
+wrote it down.*
 
 Our people built half of that bridge. I will tell it as my master told it to me.
 
@@ -78,11 +78,11 @@ Our crew went on building alone, out as far as the stone would hold without the 
 further, and then they stopped. The last of them was cutting his name on the parapet when they stopped. He got half of
 it cut. He put down his chisel and walked back up the road, and nobody knows his name, because he never finished it.
 
-The boatmen tell it otherwise. They say the bridge stood whole for generations, and pilgrims crossed it, until one
-spring the vein came down in a single great push and took the middle out. After that there was a ferry, with a bell on a
-post at the landing to call it, and the last ferry went over at dusk full of people and never came back, and the ones
-who had missed it are standing on the bank still. And the pilgrims who knew Garrow say the half-cut name is his, begun
-the year he went up to the Heath.
+The boatman of the Fen tells it otherwise. He says the bridge stood whole for generations, and pilgrims crossed it,
+until one spring the vein came down in a single great push and took the middle out. After that there was a ferry, with a
+bell on a post at the landing to call it, and the last ferry went over at dusk full of people and never came back, and
+the ones who had missed it are standing on the bank still. And the few who knew Garrow say the half-cut name is his,
+begun the year he went up to the Heath.
 
 You will hear all of it. I believe ours, because the names are ours. Now take your chisel and cut your name, and finish
 it. That is the whole of the rule: whatever you start, cut it to the end.

@@ -8,8 +8,9 @@ that faces the road. Its inner walls are ribbed like the inside of a wrist, and 
 wall a candle burns that has not run down in living memory. Scratch the wall and a clear cold thing runs out,
 almost water. Somewhere in it the bark has closed over something, and nobody agrees what.
 
-It is a small, still side place, a dead end off the road where pilgrims have always stopped to shelter and stare: a
-chapel with no faith in it. The god shows here as a pulse. The woodcutters say this tree is the god's wrist.
+It is a small, still side place, a dead end off the road where the rare pilgrim has always stopped to shelter and stare:
+a chapel with no faith in it. The god shows here as a pulse. A woodcutter of the pale wood says this tree is the god's
+wrist.
 
 **The one image:** a pale trunk as wide as a chapel, its hollow open like a door, and deep inside, in a knot in the
 ribbed wall, one small steady flame.
@@ -20,30 +21,31 @@ ribbed wall, one small steady flame.
 
 ### Still burning
 
-*The note at the front of the copyists' book of the candle, written by a copyist when the book had to be
-rebound. Each year one copyist walks down the Pilgrim Road to the great hollow tree and writes one line in it.*
+*The note at the front of the copyists' book of the candle, written when the book had to be rebound, by the last
+copyist left to keep it. Each year whoever keeps the book walks down the Pilgrim Road to the great hollow tree and
+writes one line in it.*
 
-The book is older than its binding and older than this scriptorium, and nobody knows who began it. It has a line for
-every year, and nearly every line is the same two words: *still burning*. I tried once to count them, and gave it up. The
-first lines are in a hand none of us can read, the letters all leaning left, but we know the words by their shape,
-because they are the same shape as ours.
+The book is older than its binding and older than the house it was kept in, and nobody knows who began it. It has a
+line for every year, and nearly every line is the same two words: *still burning*. I tried once to count them, and gave
+it up. The first lines are in a hand nobody now can read, the letters all leaning left, but I know the words by their
+shape, because they are the same shape as ours.
 
 The custom is that on the first grey morning of the year a copyist walks down the road to the hollow tree, goes in,
-looks at the candle in the knot, and comes home and writes the line. It has been my turn three times. The candle is no
-bigger than your thumb. It stands in a knot at the height of a man's heart, with the wood drawn back from the flame all
-round, and its light is small and does not flicker, even when the wind is loud in the trees. Some early copyist cut a
-notch in the wood beside it at the top of the wax. The wax still stands even with the notch.
+looks at the candle in the knot, and comes home and writes the line. There used to be turns. Now there is only me. The
+candle is no bigger than your thumb. It stands in a knot at the height of a man's heart, with the wood drawn back from
+the flame all round, and its light is small and does not flicker, even when the wind is loud in the trees. Some early
+copyist cut a notch in the wood beside it at the top of the wax. The wax still stands even with the notch.
 
-Who lit it, the book does not say; its first line says only that it was burning. The pilgrims say a saint lit it on her
-way down the road and asked the tree to keep it for her until she came back up. The woodcutters say nobody lit it: the
-tree grew round it, as the trees of the pale wood grow round the things the god dropped. The shrine-folk bow to it as
-they bow to any small god, and say nothing.
+Who lit it, the book does not say; its first line says only that it was burning. Some pilgrims say a saint lit it on
+her way down the road and asked the tree to keep it for her until she came back up. The old woodcutters said nobody lit
+it: the tree grew round it, as the trees of the pale wood grow round the things the god dropped. What shrine-folk come
+this way bow to it as they bow to any small god, and say nothing.
 
 Three lines in the book are different. One, long ago, says *still burning* in a hand no copyist of that year would own
 to. In another year the copyist wrote *still burning*, and under it, *someone else was here*. And the line for the year
 the Fen went grey says only *leaning*.
 
-I will walk down again if I am asked. I would rather not be asked.
+I will walk down again next year, because there is nobody else to. I would rather not.
 
 ### The wrist
 

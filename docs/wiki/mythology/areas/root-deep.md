@@ -5,11 +5,11 @@ Drowned Fen, the upper catacombs, the Broken Bridge · in the game: the old proc
 remade by the bog's method · the Horned: `../../in-game-texts/06-the-myriad.md` · the Deep in its own words: "Words Up Through the Seam"
 in the Codex (`data/codex.json`)*
 
-Under the skin of the world lies a country. Those left in the lowlands call it the Root Deep, or only the Deep; the oldest texts give
-it another name, Ne-no-kuni, which nobody now says. It is warm and dark, and it breathes: out for a long while, then in.
-It is courteous. It answers iron. It keeps a little of everyone who goes down, and sends the rest back up in good order.
-Its halls are wider when you enter them than when you leave. The Horned, the Shrine Keepers' purifiers come to their
-end, walk down its road with their sacks, and nothing walks up.
+Under the skin of the world lies a country. Those left in the lowlands call it the Root Deep, or only the Deep; the
+oldest texts give it another name, Ne-no-kuni, which nobody now says. It is warm and dark, and it breathes: out for a
+long while, then in. It is courteous. It answers iron. It keeps a little of everyone who goes down, and sends the rest
+back up in good order. Its halls are wider when you enter them than when you leave. The Horned, the Shrine Keepers'
+purifiers come to their end, walk down its road with their sacks, and nothing walks up.
 
 Here the god shows as strongly as anywhere in the act: the roof is the underside of the Hide, hung with the Hollow
 Wood's roots like hair, and the floor is warm and folded. The feeling is courteous dread. Nothing here is cruel, and
@@ -80,8 +80,9 @@ late, as if he were always answering something. He lived a long time, and poled 
 answered things nobody else had heard. Near the end he would stop in the middle of a word, and listen, and nod, and say
 "yes," and finish the word.
 
-So the boatmen used to tell their sons: in the Deep your echo comes back before you speak, and you must never answer it. And if
-the wall thanks you for something you never did, thank it back and leave. It means no harm. It never means any harm.
+So the boatmen used to tell their sons: in the Deep your echo comes back before you speak, and you must never answer it.
+And if the wall thanks you for something you never did, thank it back and leave. It means no harm. It never means any
+harm.
 
 ## For building it
 

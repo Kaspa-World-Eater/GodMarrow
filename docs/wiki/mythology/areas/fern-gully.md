@@ -23,8 +23,8 @@ curling shut along the path behind the pilgrim like fingers closing.
 
 ### Why the fire stops at the lip
 
-*Told by a hunter's mother to the children at the hunters' fires beyond the gully, and written down long after by one
-of those children, who had gone to the copyists to learn her letters.*
+*Told by a hunter's mother to her children at their fire beyond the gully, and written down long after by one of those
+children, grown old and the last at that fire.*
 
 When the Heath burned, soon after the god died, the fire went everywhere the wind sent it. It went over the low
 ground and the high, and round the pools, and it came to the lip of the gully, all along it, the whole length, and
@@ -42,14 +42,14 @@ that is why they curl and uncurl when you pass: they are trying to remember what
 
 The stream that runs along the bottom is real water, and cold, and it comes up out of a spring at the head of the gully,
 under a slab of stone. It tastes of iron, the way your mouth does when you have bitten your tongue. The Shrine Keepers
-have set a stone at the spring with white paper tied round it, and they bow to it when they pass and never ask what it
-is called. We drink the water anyway. There is no other.
+set a stone at the spring with white paper tied round it, and now and then one of them still comes to bow to it, and
+never asks what it is called. We drink the water anyway. There is no other.
 
 Below the ford there is a ring of ferns on the floor of the gully, as round as if it had been drawn with a cord and a
 peg. The fronds all lean in toward the middle, and the middle is bare, and nothing stands in it for long. A Hand that
 runs into it closes, the way a fist closes, and stays closed. A man who steps into it finds he would like to kneel, and
 then he would like to lie down, and if somebody does not pull him out by the back of his belt, he does. My mother's
-mother said the ring is where the fold is deepest. The hunters say it is where a great Hand went down into the floor of
+mother said the ring is where the fold is deepest. The hunters said it is where a great Hand went down into the floor of
 the gully when the god fell, and closed there, and that the ring is its fingertips, and a closed hand keeps whatever is
 put in it.
 
@@ -57,8 +57,8 @@ So keep out of the ring, leave the berries at the ford alone, and when you drink
 
 ### The Berry-Warden
 
-*Told among the women of the heath's edge, and set down by a road-warden who wanted to know why they spoke aloud to
-nobody when they went down to the ford. He kept it with his notices.*
+*Told by an old woman of the heath's edge, the last who still goes down to the ford, to a pilgrim who wanted to know why
+she spoke aloud to nobody there. The pilgrim wrote it down.*
 
 Below the spring, where the gully widens and the stream runs shallow over pale stones, there is a ford, and on the far
 bank a thicket of small trees with berries as red as a cut. The berries never fall and never wither, winter or summer.
@@ -82,10 +82,10 @@ strings. She felt it come out of the thicket behind her as she turned to go. She
 with her back to it and said out loud what the second handful was for, and why. Then she walked up out of the gully
 with it behind her the whole way, near enough to touch, and at the lip it was gone. Her sickly child lived to be old.
 
-Since then the mothers say aloud, at the ford, what every handful is for. The hunters laugh at them. The hunters say
-the thing in the thicket is the same one the woodcutters see in the tall grass at the Wood's edge, and that it was never
-the Warden, and does not care about berries or reasons; it only waits for you to turn your back. The mothers say the
-hunters have never once been let off, and that this is because they never say what anything is for.
+Since then the mothers said aloud, at the ford, what every handful was for, and I still do. The hunters laughed at
+them. The hunters said the thing in the thicket is the same one that is seen in the tall grass at the Wood's edge, and
+that it was never the Warden, and does not care about berries or reasons; it only waits for you to turn your back. The
+mothers said the hunters were never once let off, and that this was because they never said what anything was for.
 
 ## For building it
 
@@ -139,7 +139,7 @@ Wick-Saint of the Canopy 1.
   safe ground.
 - **Wick-Saints** come out of the damp at dusk; **Husks** wait at the ford; the three **Pyre-Saints** come down off
   the burning Heath, and in the gully their burning hisses.
-- **The Stalker Crone,** one, at the ford: the gully's people call her the Berry-Warden.
+- **The Stalker Crone,** one, at the ford: the tellings call her the Berry-Warden.
 - **In a fight:** the walls block shots; the stream douses a Pyre-Saint; wet ferns will not burn, though the dry fronds
   on the lip will; flood logs are low cover.
 

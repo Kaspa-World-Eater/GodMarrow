@@ -20,19 +20,19 @@ the iron stops, rings of warm bone going on into the dark, with drops of water r
 
 ### The rungs
 
-*As the well-sinkers of the lowlands tell it to their apprentices before they are let down their first shaft. A
-copyist wrote it down from an old sinker who would not give his name.*
+*As the well-sinkers of the lowlands told it to their apprentices before they were let down their first shaft, when
+there were still sinkers to teach. A copyist wrote it down from the last of them, an old man who would not give his
+name.*
 
-Every one of us hears about the well in the drowned village before we go down a shaft of our own, and this is how it is
-told.
+Every one of us heard about the well in the drowned village before we went down a shaft of our own, and this is how it
+was told.
 
 The village sent for us when it was young. The master who sank its well went down an arm's length at a time, as we
-still do, and at every arm's length he set an iron rung in the lining, so that he could always climb out. At forty
-turns of rope he struck water, cold and good, and he came up, and the village paid him, and drew its water for longer
-than anybody remembers.
+did, and at every arm's length he set an iron rung in the lining, so that he could always climb out. At forty turns of
+rope he struck water, cold and good, and he came up, and the village drew its water for longer than anybody remembers.
 
-When the water came up dry and drowned them, our guild sent its oldest master down that well to see what had become of
-a shaft of ours. The well was empty; the water had all gone up out of it. He climbed down past the old iron, rung by
+When the water came up dry and drowned them, our oldest master went down that well to see what had become of a shaft of
+ours. The well was empty; the water had all gone up out of it. He climbed down past the old iron, rung by
 rung, and at the bottom, where our master had stopped, he found the shaft going on down, and the rungs going on with
 it.
 
@@ -44,18 +44,18 @@ struck him under the chin.
 
 He climbed down as far as his light lasted and never reached the end of the rungs. When he came up he would not say
 what he had heard, except that something down there was breathing, slowly, and that at dusk something rang. He never
-set another rung. He made the rule we all learn before anything else: set your own rungs, every one, and count them
+set another rung. He made the rule we all learned before anything else: set your own rungs, every one, and count them
 going down, and if there is one more when you count them coming up, leave that shaft and never go back.
 
-Some of us say the bone rungs were set by diggers older than any of ours, before there was anyone to dig for. Some
-say the shaft is the god's own throat, and the rungs are the rings in it, and our master only followed them down. A few
-of the old ones say nothing, and set their rungs closer than an arm's length, so that nothing else's will fit between
+Some of us said the bone rungs were set by diggers older than any of ours, before there was anyone to dig for. Some
+said the shaft is the god's own throat, and the rungs are the rings in it, and our master only followed them down. A few
+of the old ones said nothing, and set their rungs closer than an arm's length, so that nothing else's would fit between
 them.
 
 ### The bells at dusk
 
-*What a bog guide told the pilgrims she was taking across, while they waited at the edge of the drowned village for
-the bells to stop. One of them wrote it down.*
+*What the last bog guide told a pilgrim she was taking across, while they waited at the edge of the drowned village for
+the bells to stop. He wrote it down.*
 
 There. You hear it? Those are the village's bells, and it is dusk, so they are ringing. We wait here until they stop.
 Nobody crosses the square while they ring.
@@ -67,7 +67,7 @@ sound comes up out of the well as if the well were a throat and the bells were s
 The old woman in the reed hut says it is her sister ringing them, who stayed on the chapel roof when the water came and
 went down to their mother, and has rung for evening ever since.
 
-The boatmen say the bells got up and walked when the tower fell, the way bells have done in the barrow country, each
+The boatman says the bells got up and walked when the tower fell, the way bells have done in the barrow country, each
 with somebody's head shut up inside it, and that they went down the well because it was the only road left them.
 
 The Shrine Keepers say every bell has its small god, and a bell's god is its sound, and these are ringing down there

@@ -11,8 +11,9 @@ that a wrong breath let go in it goes down with the air, away from the next bed.
 doors, because the dead do not breathe and the sickness could not take them. The sisters kept the sick, and then the
 sickness kept the sisters. The dead are still keeping the doors.
 
-The game calls it the Plague Hospice; the few left in the lowlands call it the breath-house, and its sickness is breath gone wrong and
-nothing else. It should feel still and patient: mercy that was tried and failed, with the air itself the danger.
+The game calls it the Plague Hospice; the few left in the lowlands call it the breath-house, and its sickness is breath
+gone wrong and nothing else. It should feel still and patient: mercy that was tried and failed, with the air itself the
+danger.
 
 **The one image:** a long ward under a low vault, cots in rows with the blankets drawn up over patient shapes, shafts
 going up into the dark with nothing coming down them, and at the far end a knight of bone at the grille, still keeping

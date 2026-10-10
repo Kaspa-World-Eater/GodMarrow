@@ -22,8 +22,8 @@ and a red light pulses at the pit's throat.
 
 ### What the guides say
 
-*Told by a bog guide to the pilgrims she took across, and written down by one of them while they waited for the
-light at the edge of the Drowned Village.*
+*Told by the last bog guide to a pilgrim she took across, and written down by him while they waited for the light at
+the edge of the Drowned Village.*
 
 My mother walked the Long Back, and her mother did, and none of us has ever reached the end of it. Don't believe
 anyone who says they have.
@@ -31,8 +31,9 @@ anyone who says they have.
 It was laid by our own people at the start of things, when they first came down into the wet country and needed a
 road that would not sink. That is what we were told. They laid it out of the biggest stones they could find, round
 stones, hollow in the middle and knobbed at the sides, end to end, so close you can't get a knife between them. Then
-the bog grew over most of it. That is the Long Back. You will hear other things on the road. The pilgrims call it a
-saint's causeway, the boatmen say a king walked down it into the water, and the children call it Old Coil. Let them.
+the bog grew over most of it. That is the Long Back. You will hear other things on the road. Some pilgrims call it a
+saint's causeway, the boatman says a king walked down it into the water, and the children used to call it Old Coil. Let
+them.
 
 Walk where the stone shows, or where the moss lies thin over stone. Never walk the green. The green looks like
 ground, and it isn't. If the mud takes you to the knee, stand still. It holds on, and if you fight it, it holds
@@ -40,7 +41,7 @@ harder; if you stand still and breathe slowly, it lets go. Nobody knows why. We 
 you're afraid.
 
 The Back doesn't go anywhere you'd want. It turns back on itself, crosses itself, goes out into the open water and
-comes back. Some of the planked ways off it are ours, out to the islands. Some go nowhere, and those were ours too,
+comes back. Some of the planked ways off it were ours, out to the islands. Some go nowhere, and those were ours too,
 once: the boards are still there, and the place they went to has gone under.
 
 There is one place I won't take you. Out in the big open water, where the Back curls round on itself almost in a
@@ -50,8 +51,8 @@ there. She said that was where the road was going all along.
 
 ### The cold fire
 
-*Told among the bog folk. A purifier of the Myriad who passed through set it down in her day-book, with a note of her
-own at the end.*
+*Told by the last of the bog folk. A purifier of the Myriad who passed through set it down in her day-book, with a
+note of her own at the end.*
 
 Long ago a woman lived in the round hut on the hump, and her man went out along the Back to count its stones. The
 bog folk believed then that whoever counted the Back from one end to the other would know where the road went. He
@@ -64,7 +65,7 @@ because the fire went on without it.
 
 She died in the hut, and the fire is still there. It gives no heat; you can put your hand into it. It is pale and it
 leans, always toward the Back. Now and then a piece of it comes loose and drifts out over the water, the way a breath
-does on a cold morning, and goes out. The bog folk say the fire is her: she is still keeping it, and the pieces that
+does on a cold morning, and goes out. The bog folk said the fire is her: she is still keeping it, and the pieces that
 drift away are going to look for him.
 
 The purifier wrote under it: *I have looked at it. It is a breath that has lost its door and goes round and round in

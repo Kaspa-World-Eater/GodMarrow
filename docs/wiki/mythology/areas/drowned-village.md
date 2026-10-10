@@ -66,11 +66,11 @@ Leave the door as you found it when you go.
 
 ### The foreman's daughter
 
-*Told on the Ridge road and in the lowlands below it. A carter's wife told it this way at the Fen's edge, and a
-copyist travelling with the carts wrote it down.*
+*Told on the Ridge road, by the few who still walk it. A woman told it this way to a pilgrim she met at the Fen's edge,
+and the pilgrim wrote it down.*
 
-Everyone on the Ridge road knows the three stumps on the crest, and the foreman who died there with his daughters'
-hands in his, one in each. Something came on his caravan in the dark. The Ridge says Husks, or else the wind, which
+Anyone who has walked the Ridge road knows the three stumps on the crest, and the foreman who died there with his
+daughters' hands in his, one in each. Something came on them in the dark. The Ridge says Husks, or else the wind, which
 sounds like breathing up there and sometimes is. He did not let go of either girl, and when they were found there were
 three warm stumps on the crest where they had stood, a big one and two small ones, and they are warm still.
 
@@ -90,7 +90,7 @@ were ringing, dry as paper, in a dress of a kind nobody had sewn in living memor
 her one morning, the way you let go of a hand. All of them agree on what she asked: that nobody be told she had let go.
 So the Ridge does not tell it. There are three stumps on the crest, and the Ridge will not say which of them is empty.
 
-Some on the Ridge road tell it the other way about: that it was the other sister who let go, and Nell who held on.
+Some who walk the Ridge road tell it the other way about: that it was the other sister who let go, and Nell who held on.
 I only tell it the way it was told to me.
 
 ## For building it

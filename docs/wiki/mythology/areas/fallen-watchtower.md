@@ -5,12 +5,12 @@ procedural moor map (124 × 124), to be remade by the bog's method · the sky-re
 Codex's entry on the sky over the Hide*
 
 On a granite rise at the edge of the Ashen Moor, where the ash runs down to the barrow-field, stands the stump of a
-round stone tower. The families who bury at the Barrows built it to keep watch, because the dead there come up and walk
-home, and hung a bell in its top to wake the families when they did. Most of the tower fell, in one long tongue of stone
-down the slope. Its bell went into the ground, and it still rings under the turf when the wind is right, though nobody
-strikes it. Later two sky-readers, a master and then his pupil, roofed the stump, read the sky from it for two
-lifetimes and wrote what they saw on the inside wall, climbing with the stair. Nobody lives there now, and the writing has
-gone on climbing.
+round stone tower. The families who once buried at the Barrows built it to keep watch, because the dead there come up
+and walk home, and hung a bell in its top to wake the families when they did. Most of the tower fell, in one long tongue
+of stone down the slope. Its bell went into the ground, and it still rings under the turf when the wind is right, though
+nobody strikes it. Later two sky-readers, a master and then his pupil, roofed the stump, read the sky from it for two
+lifetimes and wrote what they saw on the inside wall, climbing with the stair. Nobody lives there now, and the writing
+has gone on climbing.
 
 It is the barrow country seen from above: open high ground over the Old Barrow, all wind and heather and ash. The god
 shows only in the warmth of the ash and in the hollow where the bell lies.
@@ -24,8 +24,8 @@ and below it the barrow-field, every hollow leaning toward the ring of teeth.
 
 ### The watch bell
 
-*Told by an old man of the families who bury at the Barrows to a pilgrim who asked why they all go quiet when the wind
-comes from the tower. The pilgrim wrote it on the back of his road-pass.*
+*Told by an old man, the last of the families who buried at the Barrows, to a pilgrim who asked why he went quiet when
+the wind came from the tower. The pilgrim wrote it on the back of his road-pass.*
 
 Before there was a tower, we took turns sitting up. Every night one of the men sat on the rise with a lantern and
 watched the Barrows, and when one of ours came up out of a lid and started home, he ran down shouting, and everybody got
@@ -38,19 +38,19 @@ The bell had words cast round its rim, as bells do. I won't say them. It is stil
 
 My grandmother saw the tower fall. She said the bell rang on its own one night for a long time, more strokes than
 anybody could count, and every family sat behind its doors and listened. In the morning the tower had fallen down the
-slope toward the Barrows like a man asleep on his feet, and there was no bell anywhere in it. The diggers tell it
-otherwise. They say the ground under the tower sank from the middle, as the lids do, and the tower leaned into the
-hollow and went over, and the bell went down into it and the turf closed over it. The man who sits at every fire says
-the bell moved and the tower stayed where it was. Nobody has ever got him to say what he meant.
+slope toward the Barrows like a man asleep on his feet, and there was no bell anywhere in it. The diggers told it
+otherwise. They said the ground under the tower sank from the middle, as the lids do, and the tower leaned into the
+hollow and went over, and the bell went down into it and the turf closed over it. The man who used to sit at every fire
+said the bell moved and the tower stayed where it was. Nobody ever got him to say what he meant.
 
-It still rings under the turf when the wind comes from the right quarter, never more than once at a time. When we hear
-it we go out with the lanterns and walk the rings, as we did when there was a man in the tower, and in all my life we
+It still rings under the turf when the wind comes from the right quarter, never more than once at a time. When I hear
+it I go out with the lantern and walk the rings, as we did when there was a man in the tower, and in all my life I
 have not once found anybody up. My grandmother said that was because it no longer rings for the Barrows. I asked her who
 it rang for, then, and she said for whoever is listening, of course.
 
 After the fall nobody would sit up in the broken stump at night, so our people cut watchmen out of the moor-stone and
 stood them on the slope below, facing the Barrows, each with a hollow in its hands to hold a lantern. Somebody always
-sits up, the grandmothers say. Now it is them.
+sits up, the grandmothers said. Now it is them.
 
 Over the tower door a line is cut in old letters that says the watch saw the god fall. My grandmother laughed at that.
 If anybody had been standing outside to watch it fall, she said, where would we have come out of?
@@ -65,7 +65,7 @@ worn in it where the wind comes round the tower, and two posts and a lintel by t
 paper. Whoever set them set them where the wind snags, which was right. Both guardian stones had turned from the road. I
 knelt and turned them back, and breathed on their faces until the dust moved, and the air was easier.
 
-In the morning both had turned again, down the slope, toward the low hump in the turf where the barrow families say
+In the morning both had turned again, down the slope, toward the low hump in the turf where the barrow families said
 their bell is buried. A forgotten stone turns to the wall; these had turned to the hump, both the same distance, as if
 they had heard the same thing at the same moment.
 

@@ -12,12 +12,12 @@ in his first week. He did not finish his reading.*
 Forget what the faiths have told you about the beginning. Every faith begins its story with its own god, and the
 world is older than any of them.
 
-A god is a belief that grew a body. When enough people fear a thing, or pray to it, for long enough, it stands up.
-Fear grows one fastest. In that age, when there were cities, a city that was afraid of its river for a lifetime would
-one spring see the river stand up. The oldest books call the gods of that age the Ythraal. Nobody knows what the word
-meant; everyone says it quietly. Fear is what they were made of, and fear was what they ate. A city that trembled was
-a city that fed its god, and a god nobody fears any more grows thin, and then hungry, and then comes looking. There was an age when they walked the world, and it is the age most of our ruins come
-from, and most of what we know about it is wrong.
+A god is a belief that grew a body. When enough people fear a thing, or pray to it, for long enough, it stands up. Fear
+grows one fastest. In that age, when there were cities, a city that was afraid of its river for a lifetime would one
+spring see the river stand up. The oldest books call the gods of that age the Ythraal. Nobody knows what the word meant;
+everyone says it quietly. Fear is what they were made of, and fear was what they ate. A city that trembled was a city
+that fed its god, and a god nobody fears any more grows thin, and then hungry, and then comes looking. There was an age
+when they walked the world, and it is the age most of our ruins come from, and most of what we know about it is wrong.
 
 Belief does not pass through a god and away. It settles. In the bones of anything that was long feared or long
 prayed to, it hardens, and we call what it hardens into marrow. That is why the faiths dig. You will notice, if you
