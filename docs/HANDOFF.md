@@ -49,38 +49,41 @@ world is the hide of a dead god, a desolate wasteland with almost nobody left, w
   names; wordplay, Lovecraftian names and each people's own telling instead; no hard numbers of time; "the Pale", never
   "white"; nobody knows where the people came from; a desolate world; never "the dead stand up"; "god" used sparingly.
 
-## 4. The state of the game (2026-10-09)
+## 4. The state of the game (2026-10-09, late)
 
-**Playable:** the title, the Reading (character creation, the Stranger's tarot), and four callings that walk: the
-Ossuarch (Derek's first; to be rebuilt from the ground up), the Hollow Mystic, the Shrine Keeper (Miasma, Discordia,
-Concordia), the Empty Hand. The Red Penitent is data only.
+**Playable:** the title, and four callings that walk: the Ossuarch (Derek's first; his model is a placeholder, to be
+rebuilt from the ground up), the Hollow Mystic, the Shrine Keeper (Miasma, Discordia, Concordia), the Empty Hand. The
+Red Penitent is data only.
 
-**The world** (`data/zones/index.json`, 26 zones):
-- **The Red Shore's cove** (`red_shore`, seed 9201): the first area built on the 3D road and baked into the game. Four
-  screens of black sand between headlands, the Red Water on a dying heartbeat, the jam of giant bones, the dead. Baked
-  on the 2 x 2 grid, 60 fps.
-- **The opening cave** (`opening_cave`, seed 9301): baked and in the game (2026-10-09; `tools/landkit3d/cave_bake.py`,
-  `cave_export.py`), 60 fps, the walk proved (all 460 walkable tiles reached). The pilgrim rises in the pool of blood,
-  climbs the stairs of bleeding faces, and finds the Stranger on the throne's dais; speaking to him opens the Reading;
-  walking into the mirror in the great face's mouth comes out on the cove by its waystone. New characters start there
-  only on trial (`--cave`, `GM_START=cave`, or a file `user://start_in_cave`) until Derek signs the cave off.
-- **The camp** (`moor`) is a bare clearing standing in until the act is rebuilt.
-- **The Sunken Bog** (`sunken_bog`, seed 9101) is the first land made our own way (maze, walkability proof, baked).
+**How a game begins:** a new pilgrim starts in the opening cave, in the pool of blood (no lantern; a stand-up animation
+later). It climbs the stairs of bleeding faces to the Stranger on the throne's dais; speaking to him opens **the
+Reading**, now blind (`ui/reading.gd`, `data/reading_spread.json`): the calling face up at the crown, every other card
+drawn from the fanned deck of the twenty-two mantles into a spread laid like a body, turned by the player, one more
+under it in the Red; he weaves the spread into one telling; no numbers are ever shown. Then the mirror in the great
+face's mouth leads out onto the cove. A pilgrim continued wakes on the cove.
+
+**The world** (`data/zones/index.json`):
+- **The opening cave** (`opening_cave`, seed 9301): baked, walked (every tile proved), 60 fps; the pool holds bones and
+  gore; the rock carries cracks, grit, dust and lichen.
+- **The Red Shore's cove** (`red_shore`, seed 9201): held at dawn in a lightning storm, black sand blowing in the world
+  (`world/sand_storm.gd`), gusts that slow you walking into them (`core/gust.gd`), thunder; the Red's swells and swash
+  run along the shore's own shape on a slow heartbeat (`shaders/baked_ground.gdshader`, the shore field). No waystone
+  or stash: they wait for the first town (the shore folk's dead village). Its cleft leads to the Hollow Wood.
+- **The Ashen Moor is deleted** (Derek, 2026-10-09). Its gates are paired two-way so Act I stays whole: the cove's
+  cleft and the Hollow Wood, the crypt and the barrow, the fen and the Sighing Ridge. How Act I truly joins is
+  Derek's to decide.
+- **The Sunken Bog** (`sunken_bog`, seed 9101): the first land made our own way.
 - The other Act I zones are older generated maps, to be rebuilt on the 3D road zone by zone.
 
 ## 5. The work in progress
 
-**The first area, the Red Shore** (`docs/wiki/mythology/areas/the-red-shore.md`), in this order:
-1. **The opening cave:** in the game and tested (the pool, the stairs, the Stranger opening the Reading, the mirror
-   onto the cove). Waiting on Derek's look in the game and his sign-off to make it the real start; then drop the trial
-   flag in `core/main.gd` `_start_zone`.
-2. **The shared corpse asset:** one properly built body (shaped limbs, joints, hands, feet, weight, bloat and rot as
-   states) for the cave and the beach both, replacing the tube-limbed stand-ins (`opening_cave.md`, last checks).
-3. **The cove's open items:** the drowned's legs, the shrine and cairns at game scale, the Red's true heartbeat loop in
-   the game in place of the shader's heave.
-4. **Then the rest of the area** (MASTER_RULES section 8): the giant trees and the wind-bent fringe; the shore folk's
-   dead village (hide huts, the palisade, the fire pit of the dead, the merchant's corner); the bluffs as the first
-   seeded zone (the map policy), with the blood rivers and estuaries.
+1. **The dead** (`tools/landkit/passes/the_dead.md`, chapter 15): one shared body (`tools/landkit3d/body3d.py`) on
+   the beach and in the Red; pass 3, grade C. Next: the cloak's folds, hands and feet that read, the bloat's dome.
+   The cave's pool now holds remains instead (Derek).
+2. **The Reading's faces** (`tools/reading/card_fronts.py`): first pass; the Hanged Twin and the Beggar's Cup to redraw.
+3. **The cove's storm and sea:** Derek's look in the game (the swash slowed and gentled at his word).
+4. **Then the rest of the area** (MASTER_RULES section 8): the giant trees and the fringe; the shore folk's dead
+   village, the first town (the waystone, the stash, the merchant); the bluffs as the first seeded zone.
 
 **Review pages:**
 - the Red Shore (cave and cove, current state only): https://claude.ai/artifact/UiDv3XxS7TmkW5v3ahzTDn
@@ -119,7 +122,7 @@ way first.
 
 ## 8. Open questions for Derek
 
-- His grade of the opening cave's pass 11, and the sign-off that makes the cave the real start.
+- His look at the cave, the storm and the blind Reading in the game.
 - The Red Shore's names (the village, the merchant), and how the area joins the rest of Act I.
 - The in-game Codex (`data/codex.json`) still tells retired lore (the congregation, salt, dates): rewrite it to the
   bible, voice by voice?
