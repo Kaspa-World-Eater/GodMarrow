@@ -117,3 +117,10 @@ belt gathering it with its knot and ends, the hem in uneven lobes on the ground;
 half curled under. **Seen** (`dead_sheet`, coloured by material): they read as cloaked pilgrims lying face down, no
 longer sacks. **Grade: C+.** **Worst now:** a pilgrim's cloak is long, but these stop at the hips, so the legs lie
 bare and pale; the bone state is still a stick figure; nothing yet of the stages' form (the bloat's dome).
+
+## Pass 5: a pilgrim's long cloak
+
+**Fixed:** the cloak runs to mid-calf and its sleeves to the wrists; only the hands, the shins and the feet show,
+pale against the wet black wool. **Grade: C+.** **Worst now:** the cloak wraps each leg on its own like a tight suit;
+a cloak hangs as one skirt across both legs, bridging between them (chapter 15: "bridges in a taut sheet ... between
+the legs") and spreading at the hem. Then the bone state, then the bloat's dome.

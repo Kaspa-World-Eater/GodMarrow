@@ -222,11 +222,16 @@ def _cloak(name, Wj, A, rnd, state):
     only where it leaves the body (pooled at the waist, gathered by the rope belt), the hem spread on the ground in a few
     uneven lobes"""
     mb, ob = _mb(name)
-    cover = ("pelvis", "lumbar", "chest", "neck", "head", "sh_l", "sh_r", "hip_l", "hip_r")
+    def covered(a, b, t):
+        # a pilgrim's cloak runs to mid-calf, its sleeves to the wrist: the trunk, the hood, the whole arm but the hand,
+        # the thigh and the knee, the calf's upper half
+        if a in ("pelvis", "lumbar", "chest", "neck") or a.startswith("sh") or a.startswith("hip") or a.startswith("elb"):
+            return not (a.startswith("elb") and t > 0.8)
+        if a.startswith("kne"):
+            return t < 0.5
+        return False
     for (a, b, t, rw, rh, _) in A:
-        if a in cover and (b in cover or a.startswith("sh") or a.startswith("hip")):
-            if a.startswith("sh") and t > 0.5 or a.startswith("hip") and t > 0.6:
-                continue
+        if covered(a, b, t):
             pa, pb = Vector(Wj[a]), Vector(Wj[b])
             q = pa.lerp(pb, t)
             seg = pb - pa
