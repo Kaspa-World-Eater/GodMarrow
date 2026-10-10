@@ -287,9 +287,9 @@ READ = {
               "That's what's in its heart, then: {g}. Wanting is the oldest thing on the Hide. Older than the Hide."],
     "lhand": ["In the left hand, what it holds and won't put down: {g}. It came up out of the pool already holding "
               "it.",
-              "The left hand closes on {g}. It won't open, not for anything. Watch it try."],
-    "rhand": ["The right hand opens, and lets go of {g}. Something always stays on the step with the rest. Old "
-              "Scythe counts it.",
+              "The left hand closes, and what's in it is {g}. It won't open, not for anything. Watch it try."],
+    "rhand": ["The right hand opens, and what it lets go is {g}. Something always stays on the step with the rest. "
+              "Old Scythe counts it.",
               "What it gives up: {g}. It won't miss it. Not yet."],
     "belly": ["Down in the belly, where the fear lives: {g}. Mind that one. Fear's the only thing here that never "
               "lies.",
@@ -322,6 +322,37 @@ DRAWN_REV = [
 ]
 CLOSE_SUM = "Here's what the cards made of it, all together. Don't ask which card did which. They won't say."
 
+# the end, told as a story (Derek, 2026-10-09: "the end sequence needs work. More story like"): the spread told as a
+# tale, one place at a time, in the order a life goes (where it came from, how it looks, what it wants and fears, what
+# it holds and gives up, and under it all the card that did the drawing); {p} is the card's bible phrase ("the one who
+# buries"), {g} its meaning ("to bury what it cannot carry"), {W} who wears it now
+TALE = {
+    "open": ["Listen. This is how it goes, for this one.",
+             "Sit, then. I'll tell it the way the cards told me.",
+             "Here's the story of it. It's a short one. They all are, here."],
+    "feet": ["It came the way of {p}, though it won't remember the road.",
+             "Its feet knew the way of {p} before it ever stood up out of the pool."],
+    "brow": ["It rose out of the Red wearing the face of {p}, and the face was still wet.",
+             "When it came up, the face it had on was the face of {p}. It'll wear it a long while."],
+    "heart": ["What it wanted, more than anything, was {g}. It wouldn't have said so. It didn't have to.",
+              "Down where the wanting lives, it wanted {g}, and it would walk the whole Hide for it."],
+    "belly": ["What it feared was {g}. That fear will keep it alive longer than any blade.",
+              "And under the wanting, the fear: {g}. It'll meet that one again. Fears come round."],
+    "lhand": ["In its left hand it carried a thing it would not put down, and the thing was {g}.",
+              "What it held on to, with the left hand, was {g}, and nothing on the Hide would make it let go."],
+    "rhand": ["With the right it let something go, and what it let go was {g}. It won't miss it until much later.",
+              "And the right hand opened, and what fell out of it was {g}. The step kept that, with all the rest."],
+    "under": ["But that was only the top of it. Under all of it, face down in the Red the whole time, lay the card that "
+              "did the drawing: {p}. {W} wears that one now. One day it might be this one's turn.",
+              "That's what lay on top. Underneath, in the Red, where nobody looks, it was {p} all along. {W} has that "
+              "one now. Mantles change hands. That's what hands are for."],
+    "close": ["That's the story. It isn't finished. They never are.",
+              "And that's where it begins. Go on. The sand's waiting. It always is.",
+              "Isn't it horrible? A moment ago it was nothing, and it was so quiet."],
+    "prophecy": "And the last thing the cards said, they said to it, not to me:",
+}
+TALE_ORDER = ["open", "feet", "brow", "heart", "belly", "lhand", "rhand", "under"]
+
 def main():
     ms = []
     for (i, a, o, r, w, sy, sr) in M:
@@ -329,7 +360,8 @@ def main():
         ms.append(dict(id=i, aspect=a, one=o, rev=r, wears=w, say=st[0] if st else sy, say_rev=st[1] if st else sr,
                        gist=st[2] if st else o, gist_rev=st[3] if st else r))
     d = dict(places=PLACES, weave=WEAVE, open=OPEN, shapes=SHAPES, close=CLOSE, aspect_word=ASPECT_WORD, read=READ,
-             deck_open=DECK_OPEN, drawn=DRAWN, drawn_rev=DRAWN_REV, close_sum=CLOSE_SUM, mantles=ms)
+             deck_open=DECK_OPEN, drawn=DRAWN, drawn_rev=DRAWN_REV, close_sum=CLOSE_SUM, tale=TALE,
+             tale_order=TALE_ORDER, mantles=ms)
     p = os.path.join(ROOT, "data", "reading_spread.json")
     with open(p, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(d, fh, indent=1, ensure_ascii=False)

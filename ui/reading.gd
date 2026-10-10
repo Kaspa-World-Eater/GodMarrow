@@ -68,6 +68,9 @@ var end_t := 0.0
 var auto := ""                    # GM_READ_ACT: "all" draws everything, "end" lets him lay the rest
 var rise_r := Rect2(260, 930, 200, 56)
 var fly_rev_last := false
+var tale: Array = []              # the end, told one part at a time: {pid, text}
+var tale_n := 0                   # how many parts are told so far
+var tale_t := 0.0                 # time since the last part began
 
 func _init(m: Node = null, c: String = "animancer") -> void:
 	main = m
@@ -242,6 +245,8 @@ func _skip() -> void:
 func _end() -> void:
 	phase = "end"
 	end_t = 0.0
+	tale_n = 0
+	tale_t = 0.0
 	prompt = ""
 	said = ""
 	telling = _weave()
@@ -268,25 +273,26 @@ func _phrase(c: Dictionary) -> String:
 	var m: Dictionary = c["m"]
 	return String(m.get("rev" if c["rev"] else "one", ""))
 
-## the whole spread told as one thing, in his voice; how it lies changes what he says
+## the whole spread told as a story (Derek, 2026-10-09: "the end sequence needs work. More story like"): one part a
+## place, in the order a life goes, each lighting its card as it is told; how the spread lies changes what he says
 func _weave() -> String:
-	var W: Dictionary = S.get("weave", {})
-	var parts: Array = []
-	var op: Array = S.get("open", [""])
-	parts.append(String(op[randi() % op.size()]))
-	for pid in ["brow", "heart", "lhand", "rhand", "belly", "feet", "under"]:
-		if not laid.has(pid):
+	var T: Dictionary = S.get("tale", {})
+	tale = []
+	var pick := func(key: String) -> String:
+		var v: Array = T.get(key, [""]) if T.get(key) is Array else [String(T.get(key, ""))]
+		return String(v[randi() % v.size()])
+	for key in S.get("tale_order", []):
+		if key == "open":
+			tale.append({"pid": "", "text": pick.call("open")})
 			continue
-		var line := String(W.get(pid, "{p}."))
-		if pid == "under":
-			var rd: Array = S.get("read", {}).get("under", [])
-			if not rd.is_empty():
-				var g := String(laid[pid]["m"].get("gist_rev" if laid[pid]["rev"] else "gist", ""))
-				parts.append(String(rd[0]).replace("{g}", g))
-				continue
-		var wears := String(laid[pid]["m"].get("wears", ""))
-		line = line.replace("{p}", _phrase(laid[pid])).replace("{w}", wears.substr(0, 1).to_upper() + wears.substr(1))
-		parts.append(line)
+		if not laid.has(key):
+			continue
+		var c: Dictionary = laid[key]
+		var m: Dictionary = c["m"]
+		var wears := String(m.get("wears", ""))
+		var txt := String(pick.call(key)).replace("{p}", _phrase(c)).replace("{g}", String(m.get("gist_rev" if c["rev"] else "gist", "")))
+		txt = txt.replace("{W}", wears.substr(0, 1).to_upper() + wears.substr(1))
+		tale.append({"pid": key, "text": txt})
 	var sh: Dictionary = S.get("shapes", {})
 	var said_shapes := 0
 	var nrev := 0
@@ -307,13 +313,36 @@ func _weave() -> String:
 		["calling", asp_count >= 3],
 		["under_rev", laid.has("under") and laid["under"]["rev"]],
 	]
+	var shapes := []
 	for tst in tests:
 		if tst[1] and said_shapes < 2 and sh.has(tst[0]):
-			parts.append(String(sh[tst[0]]).replace("{a}", String(S.get("aspect_word", {}).get(mine, mine))))
+			shapes.append(String(sh[tst[0]]).replace("{a}", String(S.get("aspect_word", {}).get(mine, mine))))
 			said_shapes += 1
-	var cl: Array = S.get("close", [""])
-	parts.append(String(cl[randi() % cl.size()]))
-	return " ".join(PackedStringArray(parts))
+	if not shapes.is_empty():
+		tale.append({"pid": "crown", "text": " ".join(PackedStringArray(shapes))})
+	tale.append({"pid": "", "text": pick.call("close")})
+	var all: Array = []
+	for part in tale:
+		all.append(part["text"])
+	return " ".join(PackedStringArray(all))
+
+## how long a part stays before the next is told: long enough to read it
+func _dur(part: Dictionary) -> float:
+	return 2.2 + String(part["text"]).length() / 32.0
+
+func _tale_pid() -> String:
+	return String(tale[tale_n - 1]["pid"]) if tale_n > 0 and tale_n <= tale.size() else ""
+
+## the tale told, the cards' last words, then the hand's sum; each click hurries him on
+func _tale_next() -> void:
+	if tale_n < tale.size():
+		tale_n += 1
+		tale_t = 0.0
+		Sfx.play("page_close", 0.35, 0.8)
+	elif tale_t < 3.0:
+		tale_t = 3.0
+	else:
+		_finish()
 
 func _fx_line(k: String, v: float) -> String:
 	var sgn := "+" if v > 0 else "-"
@@ -334,6 +363,12 @@ func _fx_line(k: String, v: float) -> String:
 
 func _res_word() -> String:
 	return {"animancer": "Essence", "ossumancer": "Marrow", "hemomancer": "Vitae", "miasmancer": "Miasma", "monk": "Sand"}.get(cls, "Essence")
+
+func _turned_under() -> bool:
+	for i in tale_n:
+		if tale[i]["pid"] == "under":
+			return true
+	return false
 
 func _asp(pid: String) -> String:
 	return String(laid[pid]["m"].get("aspect", "")) if laid.has(pid) else ""
@@ -382,7 +417,14 @@ func _process(dt: float) -> void:
 				_turned(pid)
 	if phase == "end":
 		end_t += dt
-		if laid.has("under") and end_t > 0.8 and float(laid["under"]["flip"]) < 1.0:
+		tale_t += dt
+		if tale_n == 0 and end_t > 0.6:
+			tale_n = 1
+			tale_t = 0.0
+		elif tale_n > 0 and tale_n < tale.size() and tale_t > _dur(tale[tale_n - 1]):
+			tale_n += 1
+			tale_t = 0.0
+		if laid.has("under") and tale_n > 0 and _turned_under() and float(laid["under"]["flip"]) < 1.0:
 			laid["under"]["flip"] = minf(1.0, float(laid["under"]["flip"]) + dt / 0.6)
 	if leaving >= 0.0:
 		leaving += dt
@@ -396,7 +438,7 @@ func _process(dt: float) -> void:
 			if phase != "end":
 				_skip()
 		elif phase == "end":
-			if end_t > 4.0:
+			if tale_n >= tale.size() and tale_t > 5.0:
 				_finish()
 		elif phase == "open" or phase == "deck" or phase == "told":
 			_next()
@@ -441,8 +483,10 @@ func _gui(ev: InputEvent) -> void:
 			"open", "deck", "told":
 				_next()
 			"end":
-				if rise_r.has_point(ev.position) or end_t > 3.5:
+				if tale_n >= tale.size() and tale_t >= 3.0 and rise_r.has_point(ev.position):
 					_finish()
+				else:
+					_tale_next()
 
 func _unhandled_key_input(ev: InputEvent) -> void:
 	if not (ev is InputEventKey) or not ev.pressed or leaving >= 0.0:
@@ -450,7 +494,7 @@ func _unhandled_key_input(ev: InputEvent) -> void:
 	match ev.keycode:
 		KEY_ESCAPE:
 			if phase == "end":
-				_finish()
+				_tale_next()
 			else:
 				_skip()
 		KEY_ENTER, KEY_KP_ENTER, KEY_SPACE:
@@ -462,7 +506,7 @@ func _unhandled_key_input(ev: InputEvent) -> void:
 				"open", "deck", "told":
 					_next()
 				"end":
-					_finish()
+					_tale_next()
 		_:
 			return
 	get_viewport().set_input_as_handled()
@@ -499,7 +543,7 @@ func _draw_all() -> void:
 	# where we are
 	ci.draw_string(sc, Vector2(60, 70), "THE READING", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Color(MARROW_D, a))
 	var p := _place()
-	var title := "The Crown: what it is" if phase == "open" else ("The Deck" if phase == "deck" else ("The Spread" if phase == "end" else "%s: %s" % [p.get("name", ""), p.get("what", "")]))
+	var title := "The Crown: what it is" if phase == "open" else ("The Deck" if phase == "deck" else ("The Telling" if phase == "end" else "%s: %s" % [p.get("name", ""), p.get("what", "")]))
 	ci.draw_string(sc, Vector2(60, 112), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 34, Color(BONE, a))
 	# the Red under the body, where the last card lies
 	var uc: Vector2 = SLOT["under"]
@@ -527,7 +571,13 @@ func _draw_all() -> void:
 		var sx := absf(cos(f * PI))
 		var shown := _tex("_back") if f < 0.5 else _face(cd["m"])
 		var ang := (PI / 2.0 if pid == "under" else 0.0) + (PI if cd["rev"] and f >= 0.5 else 0.0)
-		_card_at(ci, SLOT[pid], shown, ang, sx, a)
+		var told: bool = phase == "end" and pid == _tale_pid()
+		if told:
+			var gl := 0.55 + 0.3 * sin(t * 3.0)
+			var rw := Vector2(SH, SW) if pid == "under" else Vector2(SW, SH)
+			for k in 3:
+				ci.draw_rect(Rect2(SLOT[pid] - rw / 2.0 - Vector2(4 + k * 3, 4 + k * 3), rw + Vector2(8 + k * 6, 8 + k * 6)), Color(MARROW, gl * a * (0.5 - k * 0.15)), false, 2.0)
+		_card_at(ci, SLOT[pid], shown, ang, sx, a * (1.0 if not (phase == "end" and tale_n < tale.size()) or told or pid == "crown" else 0.55))
 		if f >= 0.999 and pid != "crown" or pid == "crown":
 			var nm := String(cd.get("name", ""))
 			if pid != "under" or phase == "end":
@@ -548,17 +598,26 @@ func _draw_all() -> void:
 	# the words
 	if phase == "end":
 		var y := 160.0
-		for ln in _wrap(telling, fi, 22, 800.0):
-			ci.draw_string(fi, Vector2(70, y), ln, HORIZONTAL_ALIGNMENT_LEFT, 800, 22, Color(BONE, a * clampf(end_t / 1.2, 0.0, 1.0)))
-			y += 30.0
-		if prophecy != "" and end_t > 1.5:
-			y += 14.0
-			for ln in _wrap("“%s”" % prophecy, fi, 26, 800.0):
-				ci.draw_string(fi, Vector2(70, y), ln, HORIZONTAL_ALIGNMENT_LEFT, 800, 26, Color(MARROW, a * clampf((end_t - 1.5) / 1.0, 0.0, 1.0)))
-				y += 34.0
+		var done := tale_n >= tale.size() and tale_t >= 1.2
+		if not done:
+			for i in range(maxi(0, tale_n - 4), tale_n):
+				var cur := i == tale_n - 1
+				var al := clampf(tale_t / 0.8, 0.0, 1.0) if cur else 0.55
+				for ln in _wrap(String(tale[i]["text"]), fi, 25, 800.0):
+					ci.draw_string(fi, Vector2(70, y), ln, HORIZONTAL_ALIGNMENT_LEFT, 800, 25, Color(BONE if cur else BONE_D, a * al))
+					y += 33.0
+				y += 14.0
+		else:
+			# the cards' last words, to it
+			var pa := a * clampf((tale_t - 1.2) / 1.0, 0.0, 1.0)
+			ci.draw_string(fi, Vector2(70, y), String(S.get("tale", {}).get("prophecy", "")), HORIZONTAL_ALIGNMENT_LEFT, 800, 22, Color(BONE_D, pa))
+			y += 40.0
+			for ln in _wrap("\u201c%s\u201d" % prophecy, fi, 30, 800.0):
+				ci.draw_string(fi, Vector2(70, y), ln, HORIZONTAL_ALIGNMENT_LEFT, 800, 30, Color(MARROW, pa))
+				y += 40.0
 		# the whole hand, all together (never which card did which)
-		if end_t > 2.4:
-			var ka := a * clampf((end_t - 2.4) / 1.0, 0.0, 1.0)
+		if done and tale_t >= 3.0:
+			var ka := a * clampf((tale_t - 3.0) / 1.0, 0.0, 1.0)
 			y += 16.0
 			for ln in _wrap(String(S.get("close_sum", "")), fi, 20, 800.0):
 				ci.draw_string(fi, Vector2(70, y), ln, HORIZONTAL_ALIGNMENT_LEFT, 800, 20, Color(BONE_D, ka))
@@ -579,6 +638,9 @@ func _draw_all() -> void:
 				ci.draw_string(fb, Vector2(470, y + i * 24.0), _fx_line(took[i], fate[took[i]]), HORIZONTAL_ALIGNMENT_LEFT, 380, 19, Color(Color("#b58a7a"), ka))
 			y += maxi(gave.size(), took.size()) * 24.0
 		rise_r = Rect2(70, maxf(900.0, y + 24.0), 200, 56)
+		if not (tale_n >= tale.size() and tale_t >= 3.0):
+			ci.draw_string(fi, Vector2(0, 1056), "click to hurry him on", HORIZONTAL_ALIGNMENT_CENTER, 1920, 18, Color(ASH, a * (0.6 + 0.2 * sin(t * 2.0))))
+			return
 		var on2 := hover == 99
 		ci.draw_rect(rise_r, Color(0.05, 0.04, 0.05, 0.9 * a))
 		ci.draw_rect(rise_r, Color(MARROW if on2 else MARROW_D, a), false, 1.5)

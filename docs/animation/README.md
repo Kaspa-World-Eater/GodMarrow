@@ -38,6 +38,7 @@ Morbid).
 | `04-the-world-moves.md` | Things that are not characters: fire, the Red, blood, cloth, lanterns, objects in combat, spells, the wind |
 | `05-checklist.md` | The checklist every animation is graded against, in writing, in its pass log |
 | `06-our-animations.md` | Where our animations stand (the Ossuarch measured frame by frame) and the plan to make them better, in order |
+| `07-the-body-in-motion.md` | Hips, feet and lean (from Lincoln Margison's locomotion notes): the pelvis drop, the counter-turn, the relaxed foot, lean from speed, the lagging feet that overshoot a stop |
 
 ## The laws in brief
 
