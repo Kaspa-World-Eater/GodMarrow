@@ -1,7 +1,8 @@
 # 06 · Art direction: what Godmarrow looks like
 
-*Rewritten 2026-10-08. The laws are `docs/MASTER_RULES.md`; how a pixel gets its colour is `docs/PAINTED_STANDARD.md`;
-how the art is made is page 07. This page is the look itself and the reasons for it.*
+*Rewritten 2026-10-08; brought up to date 2026-10-09. The laws are `docs/MASTER_RULES.md`; how a pixel gets its
+colour is `docs/PAINTED_STANDARD.md`; how the art is made is page 07. This page is the look itself and the reasons for
+it.*
 
 ## 1. The standard in one breath
 
@@ -67,7 +68,10 @@ how the art is made is page 07. This page is the look itself and the reasons for
 - **Dither** lightly, only where one tone meets the next. Full Bayer speckle reads as gravel.
 - **Pigment pools** at a wet edge: a dark band inside, then a lit lip.
 - **Dry-brush strokes** along the form, the wind or the flow. **Highlights** are dragged, never dabbed.
-- **A paper tooth** fixed to the world, never to the screen. **Whole world pixels** (the 4 px art grid).
+- **A paper tooth** fixed to the world, never to the screen. **Whole world pixels** on the 2 x 2 art grid (Derek,
+  2026-10-09: "2x2"; baked lands are painted at two texels an engine pixel).
+- **Turn every form:** everything rounded gets the five tones of form (light, halftone, core shadow, reflected light,
+  cast shadow and contact); soft light is no excuse for a flat shaft.
 - **Contact:**
   - ambient occlusion where things meet;
   - moss, litter and grass over the feet of things;
@@ -80,8 +84,11 @@ how the art is made is page 07. This page is the look itself and the reasons for
 - **FORM IS LAW** (Derek: "not flat painted bullshit"): paving stones' tilt and proud edges, joints, cracks, bone, roots,
   ripples, drifts. If it has height in the real world, it has height in ours.
 - **The value-only test, every pass:** with all colour taken away, the piece must still read as solid, deep and lit.
-- **Built things and overhangs** (roofs and eaves, hut frames, arches, branches, hanging moss) are made on the 3D road.
-  Ground and terrain are made on the height engine. The game never *looks* 3D: the 3D is the form under the paint.
+- **Ground is never flat** (Derek, 2026-10-09: the cove's sand "just so flat"): every ground has its depth at three
+  scales, the landform, the drift and the grain, and the bare ground alone passes the value-only test.
+- **Everything is made on the 3D road** now: built things, overhangs, cliffs and sheer rock as real geometry; ground as
+  one floor function that the mesh, the bake and the walk grid all read. The game never *looks* 3D: the 3D is the form
+  under the paint. How: page 07; the code: `tools/landkit3d/README.md`.
 
 ## 6. The world's surface
 
@@ -109,7 +116,7 @@ how the art is made is page 07. This page is the look itself and the reasons for
 
 | Land | Look | State |
 |---|---|---|
-| **The Red Shore** (new; replaces the Ashen Moor as Act I's start; Derek, 2026-10-08) | Black sand at the edge of the Red Water, a sea of blood going on forever under a grey sky, which nobody there knows is a sea. Much of the area is the sand and the coast (sea stacks, drift logs, dunes, wind-bent spruce, bluffs, river mouths); it works inland by real ecology, like the Olympic coast, into old-growth rainforest (giant spruce and cedar, moss-hung maples, sword ferns, nurse logs). Always overcast, no fog. There the shore folk's village stands, fallen after seven winters' siege by the dead and the things that came up out of the Red: round hide huts in a ring, a cedar palisade broken on the water side, a great pit in the centre still burning the dead (the only warm light), a temple hall with a serpent stair, and spirit houses on carved posts. The culture is a fusion of Thai and Northwest Coast forms (tiered roofs and flame gables, carved face-posts, canoes, woven cedar bark; human faces, the serpent and insects only) in a true Dark Souls mood. The town is safe, its one soul a mad, mocking merchant | The temple is in its method trial (3D won); the rest is planned. Area lore: `docs/wiki/mythology/areas/the-red-shore.md` |
+| **The Red Shore** (Act I's start; Derek, 2026-10-08) | It begins in **a cave under the black cliffs**: the pilgrim rises out of a pool of blood, climbs a stair of carved faces bleeding from their noses and mouths, finds the Stranger on the top step under a great face, and walks out through the onyx mirror in its mouth. Then **the cove**: black sand at the edge of the Red, a sea of blood on a dying heartbeat (a surge, a weaker surge, a long stillness; thick, no chop, a sagging roll), under a grey overcast, closed by basalt headlands, with a jam of giant bones where drift logs would lie and the dead the Red gives back. Inland by real ecology, like the Olympic coast, into old-growth rainforest, and the shore folk's dead village: round hide huts, a broken cedar palisade, a fire pit still burning the dead with nobody seen to feed it, a temple with a serpent stair, spirit houses on carved posts. Thai and Northwest Coast forms (human faces, the serpent and insects only), a true Dark Souls mood. Safe, its one soul a mad, mocking merchant | **The cove** is baked and in the game (B-). **The cave** is being baked into the game, with the Stranger and the mirror. The temple won the method trial. The rest is planned. Area lore: `docs/wiki/mythology/areas/the-red-shore.md` |
 | **The Sunken Bog** | The Long Back, a long-dead serpent god's spine, walked as a causeway through black mirror water, mostly overgrown, vertebrae breaking through. Lots of plant life; drowned trees and ruins; open marsh chambers (raw nature, ruins, a straw hut with a cold wisp-fire, the eye socket, the skull's crown, the worms' ground); board causeways to islands; the pit of offering. A maze like Diablo II's maggot lair | Baked and in the game (seed 9101), lit by the lantern through its normals, plants in the wind. Review page graded; the pit "exceptional" |
 | **The Hollow Wood** | The god's veins stood up as pale trees, warm a hand's depth in, a slow beat in them; every tenth trunk has grown round something the god was carrying. Towering, crowns out of frame | A 50-piece set baked; a seeded zone (s9001). Open: the trees' white stripes; some trees mostly straight |
 | **The Ashen Moor** | Wiped to a bare camp (Derek, 2026-10-08: "fucking trash"): a small clearing with the camp's people, the stash, the lantern and the waystone, and the roads out | A stand-in until the first area is built |
@@ -132,7 +139,7 @@ The art library holds what each taught.
 
 | Calling | Look | In the game |
 |---|---|---|
-| **The Ossuarch** | A tall pointed helm like the Adeptus Custodes, a ghostly pale green plume, black iron armour with bone set into it, counts in nines everywhere | `ossuarch_px`, at the Tithe-Hand's grain, the Bone Blade |
+| **The Ossuarch** | A tall pointed helm like the Adeptus Custodes, a ghostly pale green plume, black iron armour with bone set into it, counts in nines everywhere | in the game now; to be rebuilt from the ground up (Derek, 2026-10-09), his motion by `docs/animation/` |
 | **The Hollow Mystic** | slate coat, iron, cold silver-blue mirrors and soul-wire | `mystic_hd` |
 | **The Shrine Keeper** | white robe, madder hakama, miasma violet | `keeper_hd` |
 | **The Empty Hand** | gaunt barefoot beggar-monk, ash robe, a dried-blood vermilion shawl | the HD monk |
@@ -142,7 +149,8 @@ The art library holds what each taught.
   - **The standard:** the Tithe-Hand's level of detail is the minimum (a lore brief, many materials with their own
     ramps and outlines, real light, motion made for the body).
   - Each kind behaves differently, so players fear specific packs.
-  - No animals: every creature is a piece of the god. Insects are allowed.
+  - No animals: every creature is a piece of the god. The only exceptions are insects, the moor's crows and the
+    bog's dead serpent.
 - **NPCs** are people of the world. None of them ever explains controls or how to play.
 
 ## 9. Effects, interface, sound
@@ -159,6 +167,9 @@ The art library holds what each taught.
   Diablo II, dark, with a slight tone of traditional Muay Thai fight music**: the sarama's oboe (pi java), the glong
   khaek drums, the ching cymbals.
 - **Sound** comes from the world: wind with the gust, rain by material, footsteps by ground, fire near flames.
+- **Motion** (`docs/animation/`, from the Lasseter study): timing is weight, so frames are held for different lengths;
+  every action has an anticipation, the action and a settle; the head leads (the helmed and the eyeless above all);
+  nothing stops dead; plants bend from the base up, water's timing makes the liquid.
 
 ## 10. Lessons to keep
 

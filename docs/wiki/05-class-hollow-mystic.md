@@ -3,6 +3,10 @@
 
 *Class doc. Code id `animancer`. Updated 2026-09-29 (v78): the look section records the current PixelLab sprite, the floating lantern and the wisps' direction. His old steppe, drum and breath lore was dropped by the user ("no breath, no drum, no fur"). Wiki hub: `wiki/00-start-here.md`.*
 
+*Patched 2026-10-09 to the bible (`mythology/`): the Crone's fourth face is the Eye; her people sit in circles, which
+split into the Shroud and the Mirror, and the Hollow Mystic comes out of the Mirror; §2 is the Mirror's telling, never
+one man's story.*
+
 > "Every soul is a thread. I only hold the end of it up to the light, so it can see where it goes."
 
 ## 1. The god and the circle
@@ -11,27 +15,47 @@
 
 - The Reading calls her **the Veiled Crone**. Others call her the Weaver, Grandmother Spindle, the Knot and the Tangle.
 
-- Her aspects are the Spinner, the Weaver, the Unraveller and **the Hollow**, the empty space inside the weave where the pattern shows through.
+- Her four faces are the Spinner, the Weaver, the Unraveller and **the Eye**, the hole every thread passes through,
+  whose name is only hummed.
 
-- **The circle.** The Hollow Mystics serve the Hollow. They read the threads there with mirrors and bend them. Some of the other faiths call that heresy.
+- **The circle.** Since the loose winter the Crone's circles are split: **the Shroud** send the dead on and burn
+  uncovered glass; **the Mirror** keep the dead in glass and carry them. The Hollow Mystics come out of the Mirror. They
+  read the threads in hollowed mirrors and bend them. The Shroud, and some of the other faiths, call that heresy.
 
-- **The feel.** Sufi in rhythm and imagery: lodges and circles, remembrance, polished mirrors, turning. No drums, no fur, no breath-rites (breath belongs to the Myriad).
+- **The feel.** Sufi in rhythm and imagery: circles, remembrance, polished mirrors, turning. No drums, no fur, no
+  breath-rites (breath belongs to the Myriad).
 
-- **Other names for him:** **the Glass Man** (villagers turn their mirrors to the wall when he passes); **the Hundred-Faced** (anyone who looks at his coat sees their own face many times over); **Needle-Brother** (among mourners who pay him to sew their dead a little longer into the world).
+- **Other names for him:** **the Glass Man** (whoever is left turns the mirrors to the wall when one passes); **the
+  Hundred-Faced** (anyone who looks at his coat sees their own face many times over); **Needle-Brother** (among mourners
+  who pay him to sew their dead a little longer into the world).
 
-## 2. Where he comes from
+## 2. Where he comes from (the Mirror's telling)
 
-- **The lodge.** The **Veiled Crone's lodge** stood where her threads surface in the Hide. Its people sat in circles and repeated the Crone's names until remembrance and the self were one thing. They taught that each Tithed life is a thread; at death it is drawn back through the Hollow, the eye of the loom, and woven again. Their work was polishing mirrors so the pattern could be read and a dying thread could find its way.
+- **The circles.** The Veiled Crone's people sit in circles from dusk to the grey hour, saying her names mouth to mouth
+  round the ring until the names and the selves saying them are one thread. They teach that each life is a thread; at
+  death it is drawn out through the Eye, the eye of her needle, and woven into her cloth. Their work is polishing
+  mirrors with felt and ash, one of the Crone's names to every stroke, so the pattern can be read. Above all they polish
+  **the coat of glass** that the eldest of every circle wears: iron sewn with hollowed mirrors by every eldest before,
+  until it weighs what a second body weighs.
 
-- **The Polisher.** A foundling set to that work: twenty years with felt and ash, one of the Crone's names to every stroke. Above all he polished **the eldest's coat**, sewn by every eldest of the circle with more iron and small round mirrors until only she could bear its weight.
+- **The covering.** A soul cannot pass its own reflection. So at every death the circles cover every mirror and every
+  still water until the dead have gone through.
 
-- **The Unravelling.** One winter the threads of a whole valley came loose at once. The eldest put on the coat and looked into the Hollow for forty nights. On the last night she said: *"There is no loom. It goes on and on, and it never finishes."* Then her own thread ran out of her hands.
+- **The loose winter.** The dead did not go through. The mirrors were covered and the felt laid right, and still the
+  dead came back up the valleys to the doors of the houses they had died in, and asked whoever opened the same thing,
+  quietly: *Which way?* An eldest stood up in the coat of glass and said: *"There is no loom. It goes on and on, and it
+  never finishes."* Then she sat down, and died, and did not go through either.
 
-- **The mirrors uncovered.** The loose dead came home, wandering, asking which way. By custom every mirror in a house of death is covered; he pulled the cloth off the coat's mirrors instead. Each dead face met its own and stopped. **A soul cannot pass its own reflection.** The weave never finishes, and the circle had been sending the dead into nothing. So he kept them. The choir of wisps that circles him is that valley's dead, each trailing its thread.
+- **The mirrors uncovered.** After that the circles of the Mirror took the felt off and let the dead stop at their own
+  faces in the glass. If the weave never finishes, the Mirror says, the circles had been sending the dead into nothing.
+  So it keeps them. The choir of wisps that circles a Hollow Mystic is the kept dead, each trailing its thread.
 
-- **The iron stood up.** He could not carry the coat and the dead together. He hung it on its post and asked the choir into the iron. The coat stood up as a knight twice his height, a lamp burning where the heart-mirror had been: the **Iron Golem**, which never dies for good, because the glass keeps count.
+- **The iron rose.** The coat of glass rose on its own, full of the kept dead, and has not fallen down. Every Hollow
+  Mystic asks the kept dead into iron the same way, and the iron rises as a knight twice a man's height, a lamp burning
+  where the heart-mirror would be. That is the **Iron Golem**, which never dies for good, because the glass keeps count.
 
-- **Now.** He sews: needles on soul-wire, mirrors thrown down as looms, threads pulled taut. The villages still hand him their dead, because he is the only one who keeps them. **He saves no one. He keeps them.**
+- **Now.** He sews: needles on soul-wire, mirrors thrown down as looms, threads pulled taut. The few left on the Hide
+  still hand him their dead, because the Mirror is the only one that keeps them. **He saves no one. He keeps them.**
 
 ## 3. How he plays
 
@@ -67,7 +91,7 @@ Rows open at levels 1, 6, 12, 18, 24 and 30. No cooldowns anywhere.
 
 - **The Shrine Keepers** say his mirrors are cages, and a breath held forever.
 
-- **The servants of the Silence** show nothing in a mirror. No lodge ever let one past its door alive.
+- **The servants of the Silence** show nothing in a mirror. No circle ever let one past its door alive.
 
 ## 7. Look
 

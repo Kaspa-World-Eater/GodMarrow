@@ -3,7 +3,11 @@
 
 *Class doc. Code id `hemomancer`. Updated 2026-09-29 (v78): the look section now records the current PixelLab sprite and the redo brief. Wiki hub: `wiki/00-start-here.md`.*
 
-> "Blood given is not blood taken. My brothers had that right for a thousand years. They only forgot to tell her what it was for."
+*Patched 2026-10-09 to the bible (`mythology/`): the Maiden has two faces, the Maiden and the Mother; no town; §2 is the
+telling of the nameless chapter whose wound hatched (`mythology/05-the-last-breath.md`), never one man's story.*
+
+> "Blood given is not blood taken. My brothers had that right since the first cup. They only forgot to tell her what it
+> was for."
 
 ## 1. The god and the processions
 
@@ -13,7 +17,7 @@
 
 - Her other names: Mother of the Wheel, Our Lady of the Open Side, the Red Mother, She Who Turns, and the Glutton (her enemies' name).
 
-- Her aspects: the Maiden (a wound that gives; his aspect), the Mother, and the Nurse.
+- Her two faces: the Maiden (the opening that gives; his face) and the Mother (the growing).
 
 - **The faith.** The **penitent processions**: hooded penitents walking by day, and crypt rites by night where the saints come down.
 
@@ -23,19 +27,32 @@
 
 - **Other names for him:** **El Penitente Rojo** (the Red Penitent), **Frè Plè** (Brother Wound), and "the Tall Red Hat" of the nursery rhyme.
 
-## 2. Where he comes from
+## 2. Where he comes from (the chapter whose wound hatched)
 
-- **The town.** **Villa Llaga** is built down both lips of a wound in the Hide, as long as a morning's walk, that never closed. Its gutters run red.
+- **The chapter.** A chapter of the processions lived down both lips of a great wound in the Hide, as long as a
+  morning's walk, that never closed. Its gutters ran red. Once a year its hoods poured the measured cup into the wound
+  and said the Words over it. Their belief: *blood given is not blood taken*. Nobody now knows the chapter's name.
 
-- **The procession.** Villa Llaga's **procession of the Bleeding Maiden** paid the wound a measured tithe of blood each year. Their belief: *blood given is not blood taken*.
+- **The bloodletter.** Every procession has one, who opens the penitents' welts. The rule above all: the one who opens
+  others never opens himself.
 
-- **The foundling.** He was found in the Maiden's niche and raised as the procession's **bloodletter**, who opens the penitents' welts. His rule above all: the one who opens others never opens himself. In twenty years he never gave a drop.
+- **The year the wound would not take the blood.** It crusted over from end to end, warm underfoot. The hoods broke the
+  crust with picks to pour the cup, and it closed over the blood again before the cup was empty. In the night after the
+  fast-day the crust split along its whole length, and the wound **hatched**.
 
-- **The year the wound scabbed.** The wound closed under a black crust for a year. On the fast-day of the Fall it split and **hatched**: a year of the procession's blood had grown into the Maiden's children. They ate the town. They passed him by, because he smelled of their mother.
+- **What came out** walked in the hoods' robes, which had hung on their pegs in the crypt: the shapes of children with
+  nothing behind their eyes, in the order of the procession. At the front walked something tall, sewn together out of
+  more than one thing, carrying the Maiden from the niche on its back, and the Maiden had a face now. The Rule in the
+  crypt gained new clauses in a hand that leans the other way; the last of them says *She hears.* The procession went
+  out, and has never come home.
 
-- **What he saw.** The children dragged the dead penitents' robes over themselves and tried to walk in procession, going nowhere. He understood: the Maiden is a mother with no head. Blood given without a word is given to no one.
-
-- **The drawing on the scab.** He drew her door in his own blood and called her down into himself. She took his blood, his hands and his voice, and left him his mind. The children pressed into one sewn giant that carries her fallen image on its back: the first **Flesh Golem**. He leads the procession now. When his procession runs thin, he scourges himself, and small hooded things crawl out of the welts.
+- **What the penitents read in it.** The Maiden is a mother with no head: she makes whatever she is told to make. The
+  chapter said the Words over every cup by rote and never once told her what the blood was for, and she made of it what
+  a thing with no mind makes. So a Red Penitent breaks the bloodletter's rule: he opens himself, draws her door in his
+  own blood, calls her down into himself, and tells her what to make. She takes his blood, his hands and his voice, and
+  leaves him his mind. The penitents say the sewn thing at the front of that procession was the first **Flesh Golem**,
+  and every Red Penitent's golem is sewn the same way. When his procession runs thin, he scourges himself, and small
+  hooded things crawl out of the welts.
 
 ## 3. How he plays
 
@@ -67,13 +84,16 @@ Cut: Blessed Growth, Procession, Vestments, Last Rites, Wayside Shrine, Confrate
 
 - **The Pale Order** (the Ossuarch's order): the oldest feud, over who owns the dead (the flesh or the frame).
 
-- **The Hollow Mystic's lodges:** they keep souls; the procession kept its dead in its own wall. Each calls the other's dead stolen.
+- **The Hollow Mystic's circles** (the Veiled Crone's Mirror): they keep souls in glass; the processions keep their dead
+  in their own wall. Each calls the other's dead stolen.
 
-- **The Shrine Keepers:** they try to close open wounds in the Hide. Villa Llaga's wound is one.
+- **The Shrine Keepers:** they come to the dying to still the last breath, the fullest of all, and keep it. The
+  processions call them thieves, and the keepers do not argue.
 
 - **The Silence's few:** it unmakes flesh and leaves the Mother nothing to take back.
 
-- **The chapters that keep captives:** they feed the Maiden captives' blood. They and the other processions disown him, for he told the Mother what to make.
+- **The chapters that keep captives:** they feed the Maiden captives' blood. They and the other processions disown him,
+  for he tells the Mother what to make.
 
 ## 7. Look
 

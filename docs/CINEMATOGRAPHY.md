@@ -12,7 +12,9 @@ This is that chapter. It binds every piece of art as the painted standard does (
   (`tools/art_study/chapters/12-cinematography-atmosphere-wonder.md`).
 - **The full research, with every quote and source:** `tools/art_study/private/cinematography_research.md` (private).
 - **The rules a machine can measure** are checked on every render by `tools/landkit3d/cine_check.py`, and its numbers go
-  in the pass log.
+  in the pass log. Interiors and dungeons are checked as they are; an outdoor frame under the overcast (the cove) with
+  `--exterior`, which drops the low-key rule (rule 2): a grey shore is not a crypt, and its frame is composed by the
+  subject, the dark masses and depth instead.
 
 ## Why it matters
 

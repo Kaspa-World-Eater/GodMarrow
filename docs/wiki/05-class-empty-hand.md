@@ -3,12 +3,16 @@
 
 *Class doc. Code id `monk`. Shown in game as **The Empty Hand**. Lore rewritten 2026-09-29, third pass.*
 
+*Patched 2026-10-09 to the bible (`mythology/`): the Peak has no god; its fall is told as
+`mythology/05-the-last-breath.md` tells it; a calling is a calling, never a particular person (§6); the `zz_*.js` files
+named here are the retired browser build's, kept as reference only.*
+
 **The user's direction for this pass:**
 - The original order lore was 90% right; keep it and deepen it.
 - **Radiance is erasing light.**
 - He is **just a monk of the same order**, not the monk of legend, and nothing odd about his body.
 - **The lore is about the order, not the man.**
-- The man is a beggar. Or is he? Keep him a mystery.
+- The Empty Hand is a beggar. Or is he? Keep him a mystery.
 
 **Still gone:** the mask (in any form), the fat gilded Buddha, the Weight meter and the yin-yang orb.
 
@@ -22,9 +26,12 @@
 
 - **The Gilded Peak, the Kinrei-shū**, "the Gold Bell". Their monastery stood on a mountain of the god's knee-bone, high above the lowlands.
 
-- **They serve Ur-Nihl, the Silence:** the thing that unsaid the god. It has no name, only negations.
+- **No god.** The Peak looked at Ur-Nihl, the Silence: the thing, the Peak taught, that unsaid the god. It gave it no face and no will,
+  and would not call it a god, for a god is a thing that wants. It has no name, only negations.
 
-- Most people say **the Silence**, or leave a pause where the name would go; the Peak's monks called it **That Which Cannot Be Held**, and the Reading says **the Void That Emanates**. Only the Peak's monks and the mad say "Ur-Nihl" plainly.
+- Most people say **the Silence**, or leave a pause where the name would go; the Peak's monks called it **That Which
+  Cannot Be Named** and **That Which Cannot Be Held**, and the Reading says **the Void That Emanates**. Only the Peak's
+  monks and the mad say "Ur-Nihl" plainly.
 
 - **What the lowlands saw:** gaunt, gentle monks who chanted night and day to hold the miasma off the slopes, and came down to beg.
 
@@ -42,7 +49,7 @@
 
 ## 2. The two hands
 
-The Peak taught that **the Silence has two hands, and both are empty.**
+The Peak taught that **the Silence has two hands, both empty, and both destroy.**
 - **Radiance, the open hand, erases with light.**
   - It is noon with no shadow: white fire, glare, a brightness so complete it leaves nothing to see.
   - The Peak's gold was for this. Gold leaf in full sun gives back so much light that the face beneath it disappears.
@@ -87,7 +94,7 @@ The Peak taught that **the Silence has two hands, and both are empty.**
 
 **Courtyard Glass**
 
-> *Smooth black glass from the courtyard of the Gilded Peak, which was flagstone until the night the dead came up the stair.*
+> *Smooth black glass from the courtyard of the Gilded Peak, which was flagstone until the night the great bell rang.*
 > *There are shapes inside it, very faint, all turned toward the sanctum door.*
 
 **Words of a beggar-monk** (his rare lines)
@@ -112,10 +119,16 @@ The Peak taught that **the Silence has two hands, and both are empty.**
 
 **The Destroyer's stone.** The Peak was cut from the god's knee-bone, and its oldest masters knew how to make the mountain move: bars, grips, pagodas and a weeping stone guardian at the gate. This is the third tree, paid in the body's own poise.
 
-**The fall.** The **Pale Order**, the Ossuarch's order, learned that the Peak had been gilding its dead and giving them to the Silence, leaving no bone.
-- To the Order that was the worst waste in the world. Its dead came up the Peak's stair to take the bones before the Silence could (see `claude/godmarrow-class-ossuarch.md`).
-- The monks were too light to fight and too gentle to try, so each was cut down and raised before he hit the ground.
-- **What happened next is not agreed.** By morning the courtyard was black glass. The dead were gone, and the doors of the inner sanctum were open.
+**The fall** (as `mythology/05-the-last-breath.md` tells it). In the spring the monks began to die in their rooms at
+night, one or two a night, and in the morning there was nothing in the room but a little black glass and a little dust.
+- The abbot counted them night after night, and at last sent the youngest down the mountain with a letter, and told him
+  not to look back.
+- The next night the great bell over the courtyard rang, long, though it had never rung where it hung. By morning the
+  courtyard was black glass from wall to wall, warm to the hand, and the doors of the inner sanctum stood open.
+- The gilded saints were in their niches. The last niche on the left was empty, as it had always been kept, except that
+  the dust before it held footprints going out.
+- **What happened is not agreed.** The few monks who were below the mountain that night walk the roads carrying nothing,
+  and are called the Empty Hands.
 
 ## 5. What the Peak hid (for us; never stated plainly in game)
 
@@ -128,17 +141,25 @@ The Peak taught that **the Silence has two hands, and both are empty.**
 
 - **The names went somewhere.** Every name carried up in a bowl and given to the Silence was gone from the Hide. The Peak never asked whether the Silence was only forgetting them, or keeping them.
 
-## 6. The man
+## 6. The calling
 
-*The lore is about the monastery. About him, there is very little.*
+*The lore is about the monastery. The Empty Hand is a calling, never one man, and the world tells very little of those
+who walk it.*
 
-He is a barefoot beggar-monk with a wooden bowl, a vermilion shawl and a lantern that burns black. He comes to villages at dusk and asks for a name. Things he strikes leave smooth black glass, a little dust, or nothing, never a corpse; that is the Silence's signature.
+An Empty Hand is a barefoot beggar-monk with a wooden bowl, a vermilion shawl and a lantern that burns black. He comes
+to a lone house or a camp at dusk and asks for a name. What he strikes leaves smooth black glass, a little dust, or
+nothing, never a corpse; that is the Silence's signature.
 
-The stories about him do not agree. Some say he is one of the Peak's monks, one who was down in the lowlands with his bowl the night the Peak fell. Some say he is the one who opened the sanctum doors, and that when the Order's knights came back to the Peak to count, there was a gilded saint missing from the sanctum. Others say there is no gold on him and there never was: he is a beggar, and that is all. Asked about any of it, he says only, "Put a name in the bowl."
+The stories about them do not agree. Some say every Empty Hand is one of the Peak's monks who were down in the lowlands
+with their bowls the night the Peak fell. Some say the footprints going out of the empty niche were an Empty Hand's, and
+that one of them opened the sanctum doors. Others say there is no gold on any of them and there never was: a beggar, and
+that is all. Asked about any of it, an Empty Hand says only, "Put a name in the bowl."
 
-He is called **the Smiling Oblivion**, and **Hōkai-bō** ("the Monk of the Broken Realm", an old pilgrim name for any monk of the Peak). In the Bleeding Maiden's processions he is **the Palm**, and they spit when they say it.
+An Empty Hand is called **the Smiling Oblivion**, and **Hōkai-bō** ("the Monk of the Broken Realm", an old pilgrim name
+for any monk of the Peak). In the Bleeding Maiden's processions he is **the Palm**, and they spit when they say it.
 
-**For us:** he may be a monk, a saint with the gold worn off, or older than the Peak. He may be immortal. Leave every door open.
+**For us:** the calling is a mantle (`mythology/00-the-deep-lore.md`). Whoever wears it may be a monk, a saint with the
+gold worn off, or older than the Peak. Leave every door open.
 
 ## 7. How he plays (and why)
 
@@ -162,7 +183,8 @@ He is called **the Smiling Oblivion**, and **Hōkai-bō** ("the Monk of the Brok
 
 **No waits:** the dear skills cost more sand instead.
 
-**Code:** `zz_monk_sand.js`.
+**Code (the retired browser build, reference only):** `zz_monk_sand.js`, in `web/triune_desktop/src/`. In the Godot game
+the hourglass is `skills/monk.gd` and `skills/monk/base.gd`.
 - `P.kR` and `P.kA` are the two sands.
 - `P.mana` is kept as the room left in the glass.
 - `KS.sand(tab)` is a tree's strength.
@@ -175,7 +197,8 @@ By day Radiance is stronger; by night Absence is. Underground counts as dusk.
 
 ### His melee is everyone's
 
-His three-blow string, the held heavy and the roll are the model for every order (`zz_melee_chain.js`).
+His three-blow string, the held heavy and the roll are the model for every order (`zz_melee_chain.js`, the retired
+browser build).
 
 ### The trees as they are in the game
 
@@ -217,11 +240,14 @@ His three-blow string, the held heavy and the roll are the model for every order
 - The-Weeping-One-Who-Walks (the weeping stone guardian from the Peak's gate)
 - Thousand-Arms-Of-Nothing
 
-**v92 skill text** (words only): a dry laugh, a rattling breath, a bare hand, a shawl gone black, knees-first, the weeping stone guardian, a many-armed figure, paper sutras, and no "once every N s" (`zz_zz_empty92.js`).
+**v92 skill text** (words only): a dry laugh, a rattling breath, a bare hand, a shawl gone black, knees-first, the
+weeping stone guardian, a many-armed figure, paper sutras, and no "once every N s" (`zz_zz_empty92.js`, the retired
+browser build).
 
 ### His Arcana
 
-- **Where they're defined:** `zz_arcana_monk.js`. There are three pages of Majors and Minors, plus the hybrids the Black-Flame Lantern and the Unraised.
+- **Where they're defined:** `zz_arcana_monk.js` (the retired browser build, reference only). There are three pages of
+  Majors and Minors, plus the hybrids the Black-Flame Lantern and the Unraised.
 
 - **The Crown of Nothing:** his crown at the seat. It holds the sand back.
 
@@ -236,9 +262,10 @@ His three-blow string, the held heavy and the roll are the model for every order
 - Minor roads run along the two midlines, the meridians and the spring in the sole.
 - **Notables:** the Hundred Meetings, the Sea of Breath, Lantern in the Fist, the Empty Laugh, the Bubbling Spring, the Barefoot Gate, Three Leagues More.
 
-## 9. Look (the character as he is)
+## 9. Look (as the calling is drawn)
 
-- **Source:** the approved HD beggar-monk, baked in `show64/px_monk` and in the game since v0.53 (`zz_hero_monk_hd.js`). The user's reference standard is `refs/monk_std`.
+- **Source (the retired browser build, reference only):** the approved HD beggar-monk, baked in `show64/px_monk` and in
+  the browser game since v0.53 (`zz_hero_monk_hd.js`). The user's reference standard is `refs/monk_std`.
 
 - **Body:** gaunt, old and bald.
 
@@ -258,13 +285,17 @@ His three-blow string, the held heavy and the roll are the model for every order
 
 ## 10. The monastery's enemies
 
-- **The Pale Order** (the Ossuarch's order): the bloodiest feud. The Order's dead took the Peak, and something on the Peak took them back. The Peak leaves glass where the Order wants bone.
+- **The Pale Order** (the Ossuarch's order): the bloodiest feud. The Peak gilded its dead and gave them to the Silence,
+  and left no bone; to the Order that was the worst sacrilege in the world. The Peak leaves glass where the Order wants
+  bone.
 
 - **The Bleeding Maiden's processions:** the Peak starved the flesh; the processions fill it. They hate the Silence more than they hated the Peak.
 
-- **The Hollow Mystic's lodges:** to them the Silence is a weave with no pattern left, and they bar their doors to anyone who speaks its name.
+- **The Veiled Crone's circles** (the Hollow Mystic's faith): to them the Silence is a weave with no pattern left, and
+  they bar their doors to anyone who speaks its name.
 
-- **The Shrine Keepers:** they set spirits back in their places. The Peak would rather have quieted them altogether, and the Keepers hunt its monks for it.
+- **The Shrine Keepers:** they still the breath and keep its kami quarrelling, so that none grows great. The Peak would
+  rather have quieted them altogether, and the keepers hunt its monks for it.
 
 ## 11. Writing rules for him
 

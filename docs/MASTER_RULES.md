@@ -6,7 +6,8 @@ documents and techniques, and effects and ecosystems."
 This is the one list. A 15-minute reminder points at it while work is under way. Before any piece of art is begun,
 and again whenever the reminder fires, the work in progress is checked against every line here, in writing. Rules
 live here; the reasons and the techniques live in the pages it names. *Rewritten 2026-10-08 with the 3D road, the
-baked lands, the review pages and Derek's rulings since 2026-10-07.*
+baked lands, the review pages and Derek's rulings since 2026-10-07; brought up to date 2026-10-09 with the bake road
+into the game, the zoom rule, the soft overcast shadow and the animation section.*
 
 ## The gate: the rules check before any new area or piece (Derek, 2026-10-07)
 
@@ -38,6 +39,7 @@ No check written, no work begun.
 | **`docs/CINEMATOGRAPHY.md`** | How light composes every frame: depth, atmosphere, wonder; run `cine_check.py` on every render |
 | **`docs/animation/`** (Derek, 2026-10-09) | Everything that moves: Lasseter's principles for our sprites, the timing sheet, layers down the skeleton, every clip, the world's motion, and the checklist each animation is graded on. Read before any animation, effect or loop |
 | `docs/wiki/07-art-pipelines.md` | Which road makes the piece (the 3D road, the height engine, a baked land, a set, a character) and what was rejected |
+| **`tools/landkit3d/README.md`** (and `tools/README.md` for the other kits) | Every module of the 3D road: what it does, what it reads and writes, how to run it, the gotchas, and how a new area is made from scene to bake to zone |
 | **`tools/art_study/library/`** (index: `library/README.md`) | THE TECHNIQUE LIBRARY: methods, environments, objects; how each thing is made, what worked, what failed, the code. Read the pages for the piece first |
 | **Chapter 12, cinematography** (`tools/art_study/chapters/12-cinematography-atmosphere-wonder.md`) | Every piece: how light composes the frame, why darkness makes wonder (section 0c) |
 | **`tools/art_study/chapters/`** and **`tools/art_study/reports/`** | Studies of the real world with recipes (one per subject), and one report per finished piece. Read every chapter and report that touches the piece |
@@ -233,6 +235,10 @@ means that they always need to be perfect. All this will become assets for the g
 13. Contact: darkness where things meet the ground; grass, moss and litter over the feet of things; a lit rim against
     what is behind.
 14. Detail where it counts: lit edges, chips, carving and moss on the props; the shade kept flat.
+15. **Every pixel-sized constant follows the grid:** scaled by the render's zoom (`d["zoom"]`), or kept with a comment
+    saying why.
+16. **Soft light, soft shadow:** under an overcast the cast shadow is blurred wide and weakened, the contact kept dark.
+17. **Long rigid things stay rigid:** one straight line on the upper hull of what they rest on.
 
 ## 4. The checklist (every pass, every line, in writing)
 
@@ -254,7 +260,10 @@ means that they always need to be perfect. All this will become assets for the g
 9. **Detail where it counts:** drawn shapes on the lit side and the silhouette; the shade kept flat.
 10. **Life:** it moves in the one wind; nothing pasted.
 11. **Seen as the player sees it:** the game's camera, zoom and lighting, with the Ossuarch for scale. For anything
-    going into the game, a capture in the game itself; no visible repeat.
+    going into the game:
+    - the bake proved aligned (`check_align`, 0.00 px on every tile);
+    - the walk proved by the exporter, from the start to every walkable tile and every way out;
+    - a capture in the game itself; no visible repeat.
 12. **Skeptic round:** side by side with the best pieces; the worst difference fixed first.
 13. **Cinematography (section 0c, `docs/CINEMATOGRAPHY.md`; `cine_check.py`'s report pasted in the log):**
     - one subject, brightest;
@@ -360,8 +369,12 @@ etc." In order of his latest word (2026-10-08: "finish the bog first, and then w
      - Northwest Coast forms (plank, post, canoe, woven bark), taken as forms only: no animal crests, no real nation's
        crests, stories or ceremonies;
    - the temple to an A (**done** 2026-10-09: Derek's A, with its inside);
-   - the Red Water and the black sand (blood that is red by colour, never by glow);
-   - the drift logs and sea stacks;
+   - the Red Water and the black sand (blood that is red by colour, never by glow) (**in the game** 2026-10-09: the
+     cove inside its basalt bluffs, baked and walkable, the Red heaving on the heartbeat; Derek has
+     not graded it yet);
+   - the opening cave (pass 11; being baked into the game 2026-10-09, behind a trial flag, with the Stranger at the
+     top step and the mirror onto the cove);
+   - the drift logs and sea stacks (the cove's basalt columns in the water are done);
    - the giant trees and the wind-bent fringe;
    - the hide hut kit;
    - the palisade;
@@ -384,3 +397,9 @@ etc." In order of his latest word (2026-10-08: "finish the bog first, and then w
 11. **Old scenes and lands rebuilt on the 3D road** (Derek, 2026-10-09: "It's going to be awesome when we go back and
     redesign all those other areas"), zone by zone through Act I, with the area lore as the brief. The Sunken Bog's
     serpent way first ("we'll probably have to redo snake way area").
+12. **Animation, when it resumes** (`docs/animation/`):
+    - the Ossuarch is rebuilt whole first (Derek, 2026-10-09: "he's going to get it. Total rebuild"), so his old clips
+      are not reworked;
+    - per-frame holds in the engine (`meta.timing` in place of `meta.fps`, `core/sprite_set.gd`);
+    - the world's motion by the Lasseter study: the water and the trees and plants
+      (`docs/animation/04-the-world-moves.md`).

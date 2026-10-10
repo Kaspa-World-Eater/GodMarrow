@@ -1,41 +1,37 @@
 # 02 · The world
 
-*Rewritten 2026-10-08. This page is the world as design: what the pilgrim walks through, what the creatures are, how
-the world shows itself in play. The myths, told in the world's own voices, are in `mythology/`; every Act I place has
-its page in `mythology/areas/`; everything decided about the lore, with its sources, is in `mythology/backstage.md`.
-Derek's newest dated ruling in `01-rules-and-decisions.md` wins over all of it.*
+*Rewritten 2026-10-08; brought to the canon of 2026-10-09. This page is the world as design: what the pilgrim walks
+through, what the creatures are, how the world shows itself in play. The myths, told as myths, are the makers' bible
+in `mythology/` (start at its `README.md`); what a pilgrim finds and reads is in `in-game-texts/`; every Act I place
+has its page in `mythology/areas/`. Derek's newest dated ruling in `01-rules-and-decisions.md` wins over all of it.*
 
-> Everything that lives here grew out of a dead god. Nothing was born; everything was shed.
+> Every creature here grew out of a dead god. Nothing was born; everything was shed. Where the people came from,
+> nobody knows.
 
 ## 1. The world in brief
 
-**The corpse.** The world is the corpse of a dead god, which scholars call the Reliquary.
-- Nobody knows whose corpse it is, or how the god died. Every people tells it differently, and all the tellings are
-  canon as beliefs.
-- What every faith agrees on: the ground is warm, the dead do not stay down, and things still come up out of the body.
+The myths, the ages, the powers, the faiths and the peoples are the bible's, and this page does not repeat them: how
+the bible is told and its word laws are in `mythology/README.md`, the powers, faiths, peoples and mantles in
+`mythology/07-who-is-who.md`, the ages in `mythology/01-the-ages.md`. In one breath: the world is the corpse of a dead
+god, and nobody knows whose, or how it died. The ground is warm, the dead do not stay down, and things still come up
+out of the body. It is the Age of the Last Breath, and the land is a desolate waste with almost nobody left in it. The
+Tithed are whoever is left, and nobody knows where they came from. What the design needs on top of the bible:
 
-**Where the acts lie on it:**
+**Where the acts lie on the body:**
 - **Act I** is the Hide, the skin. It begins at the edge of the world, on black sand by the Red Water, a sea of blood
   nobody there knows is a sea.
 - **Acts II to IV** are the bones, the flesh and the heights.
 - **Act V** goes down inside the body.
 - **The god shows more the deeper you go.** In the first lands, the world looks almost ordinary.
 
-**The Age of the Last Breath.** It is the year 1114 of the common count.
-- Most history is lost; knowledge is the rarest thing there is.
-- The people, the Tithed, live in toil, keeping what is left of the world going.
-- The god's last breath is still leaving the corpse, and people live in that breath.
-
-**The people.** The Tithed descend from the congregation that knelt inside the god when it died.
-- They are the only things in the world not made of the god, so the god's pieces want them back: some to take inside,
-  some to wear.
-- **The double Tithe:** to be tithed is also to be hollowed out. Both meanings stand (Derek, 2026-10-05).
+**The double Tithe:** the Tithed leave a tenth of everything for what is owed, and to be tithed is also to be hollowed
+out. Both meanings stand (Derek, 2026-10-05).
 
 **No animals.** Every creature is a piece of the god that forgot it was part of something: a thought that grew teeth,
-a prayer that grew skin. Allowed exceptions:
+a prayer that grew skin. The only exceptions:
 - insects;
 - the moor's crows;
-- the Sunken Bog's long-dead serpent god.
+- the Sunken Bog's dead serpent.
 
 **Every lantern burns a soul,** one that chose to be kept rather than go down with the last breath:
 - it chooses whom it follows;
@@ -43,24 +39,17 @@ a prayer that grew skin. Allowed exceptions:
 
 ## 2. The powers and the faiths
 
-| Power | Old name | What it is now | Faith (its word) | Calling | Herald | Altar name |
-|---|---|---|---|---|---|---|
-| Bone | Oss-Vharoth | the skeleton that refuses to lie down; the Bearing Mother | the Pale Order (order) | the Ossuarch | the Marrow Pontiff | Old Upright |
-| Soul | Yh'Anuul | the threads of fate, still weaving with no pattern | the Veiled Crone (circle) | the Hollow Mystic | none yet | (open) |
-| Flesh | Nol-Shogthuth | the flesh that keeps growing without a mind | the Bleeding Maiden (procession) | the Red Penitent | **open** (see below) | the Red Mother |
-| Breath | none; asking is an insult | the last breath, and the small gods riding it out | the Myriad, the Shrine Keepers (shrine) | the Shrine Keeper | the Long Exhale | the Last Breath |
-| the Silence | Ur-Nihl (taboo) | the space between words, holding all meaning | the Gilded Peak, fallen in 1098 (monastery) | the Empty Hand | a Silent One | That Which Cannot Be Named |
-
-**The faiths' words are proposed, not confirmed** (order, monastery, circle, procession, shrine). There is one cult, the
-Second Mouth, hidden in the processions.
-
-**The Flesh herald's name is open.** The game still shows "the Wet Nurse", which Derek retired. "The Weeping Gash"
-was proposed, but the Maiden's faith is never "Weeping".
-
-**Heralds** wake at rare god altars, and only they grant Major Arcana. An altar shows its speaker's name, never the
-true name.
-
-**The callings are callings,** never particular people: the player decides who they are.
+The five aspects (Bone, Soul, Flesh, Breath and the Silence), with their old names, masks, faiths, heralds and altars,
+and the calling each one gives, are tabled in `mythology/07-who-is-who.md`. Breath's masks are the kami, the spirits
+of thoughts and words carried on the breath. Each calling's design is its `05-class-*.md` page. What matters here is
+how the powers show in play:
+- **Heralds** wake at rare god altars, and only they grant Major Arcana. An altar shows its speaker's name, never the
+  true name.
+- **The Flesh herald's name is open.** The game still shows "the Wet Nurse", which Derek retired. "The Weeping Gash"
+  was proposed, but the Maiden's faith is never "Weeping". Soul has no herald yet.
+- **The faiths' words** (order, monastery, circle, procession, shrine) were proposed and never formally confirmed; the
+  bible uses them. There is one cult, the Second Mouth, hidden in the processions.
+- **The callings are callings,** never particular people: who the pilgrim is, the cards decide.
 
 ## 3. The world in play
 
@@ -106,17 +95,20 @@ arenas at least 16 by 16) are a reference for intent, never a port.
 
 ## 5. The acts
 
-| Act | Region | Creature levels | Town | The act's end |
+| Act | Region | Creature levels | Camp | The act's end |
 |---|---|---|---|---|
 | I | **The Hide** (25 zones, plus the new start) | 1–17 | the shore folk's fallen village on the Red Shore, with only the merchant (to build); the Ashen Moor's bare camp stands in | the Ossuary Matron, in the lower catacombs; the Carrion Warden keeps the Hollow Crypt |
 | II | **The Bleached Barrens of Ossa** | 18–24 | the Citadel of the Shattered Femur | Saint Calcifer, in the Empty Socket |
 | III | **Shog-Mire** | 24–30 | the Kettlewick Stilts | the Brood-Mother, in the Blood-Basin |
 | IV | **The Heights of An-Vhar** | 30–34 | Bellrest Hearth | the Chime-Abbot, at the summit of the Unrung Bell |
-| V | **The Descent** into the body | 34–40 | the Last Vigil | the Thought of the Slayer, in the Slayers' temple |
+| V | **The Descent** into the body | 34–40 | the Last Vigil | the Thought of the Vhoor-Qhan, in their temple |
 | beyond | **The Scar of Ur-Nihl** and the Silent Monolith | 36–40 | none | none |
 
+**No living towns** (Derek, 2026-10-09). Each act's safe place is a camp or a ruin with a few lone figures in it
+(section 7). The places' names are the old design's, kept until each act is made.
+
 **The first playthrough** ends around level 36 to 40. Killing an act's last creature opens the way to the next act's
-town. Derek's order (2026-10-05) stands: finish and polish Act I before anything new.
+camp. Derek's order (2026-10-05) stands: finish and polish Act I before anything new.
 
 ## 6. Act I's lands
 
@@ -125,8 +117,8 @@ building it.
 
 **The start: the Red Shore** (new, 2026-10-08):
 - black sand at the edge of the Red Water;
-- then inland through a real coast's bands to the old growth, where the shore folk's village stands, fallen after
-  seven winters' siege;
+- then inland through a real coast's bands to the old growth, where the shore folk's village stands, fallen after a
+  siege of winter after winter;
 - the culture is a Thai and Northwest Coast fusion, in a Dark Souls mood;
 - it is safe, with one mad merchant.
 
@@ -162,21 +154,30 @@ building it.
 
 There are fewer near the start and more deeper in.
 
-## 7. Towns and their people
+## 7. The camps and their few people
 
-**Towns are safe.** Each has buying and selling, the shared stash, a waystone and the Stranger, and most have a
-healer, a smith and someone with work.
+**No living towns, markets or trade** (Derek, 2026-10-09: "it's in fact more of a desolate wasteland and there's
+almost nobody there"). Each act's safe place is a camp or a ruin where a few lone figures have stopped. The game's
+services stay (buying and selling, healing, the smith's few made pieces, the shared stash, a waystone and the
+Stranger); fewer people give them: at most one tender, who heals, and one trader, where the game needs a vendor.
+**How many figures each camp has, and which services they give, is Derek's call.**
 
-| Act | People |
+| Act | Who is there |
 |---|---|
 | I | **the merchant** (the new start: a little mad, mocking the pilgrim's ignorance, picking the village clean). The old camp's people, Maren (vendor), Sister Ysolde (healer), Brannoc of the Nail (smith) and Warden-Crone Esk, are parked: whether they return is Derek's |
-| II | Qasim the Dust-Factor; Mother Oss-Ana; Ibbat the Knuckle-Smith; the Last Reliquarist |
-| III | Lugh the Eel-Monger; Asheth the Leech-Wife; Old Tamb; Priestess Ninsun |
-| IV | Dorje the Incense-Trader; Sister Palden; Chime-Wright Ulan; Brother Tenzar |
-| V | the Tallow-Merchant; the Nurse Without a Face; Ferrous; the Hollow Seer |
+| II | **Qasim** (the trader), alone in the Citadel's ruin with what the dust gives up; **Mother Oss-Ana** (the tender) |
+| III | **Lugh** (the trader), on the empty stilts with what the mire gives up; **Asheth** (the tender), who lets blood to heal |
+| IV | **Dorje** (the trader), keeping the hearth and its incense; **Sister Palden** (the tender) |
+| V | **a tallow seller** (the trader), selling the lamp-bearers' spare tallow at the Vigil; **the Nurse Without a Face** (the tender) |
+
+**Recast 2026-10-09:** the traders' old trade-names went with the towns, and Act III's two names that broke the
+animal law are replaced (the old lists are in `14-mechanics-checklist.md`, 18.4).
+
+**Parked from the old lists:** the smiths and the work-givers (Ibbat the Knuckle-Smith and the Last Reliquarist; Old
+Tamb and Priestess Ninsun; Chime-Wright Ulan and Brother Tenzar; Ferrous and the Hollow Seer). Whether any return,
+and whether the trader takes on the smith's made pieces, is Derek's.
 
 **To fix when those acts are made** (flagged for Derek):
-- **Act III's "Eel-Monger" and "Leech-Wife"** break the animal-word law.
 - **Act IV's names** (Dorje, Palden, Ulan, Tenzar) are Tibetan, which is ruled out for the Peak and the Order; whether
   the Heights keep them is open.
 
@@ -202,17 +203,18 @@ brackets).
 | Ossuary Warden | a bone knight with a skull tower-shield | blocks everything from the front (shield) | the shield lowers | flank it, or break its poise |
 | the Trunk-Thing | a great hulk of the Moor and the Root Deep (not yet described in the lore) | a wall that walks (shield) | | flank it |
 | Marrow Duelist | a skeleton fencer | parries flurries, ripostes (duelist) | the blade tip rises | slow heavy blows; spells |
-| Kneeler | a penitent still on its knees, one of those who never came out | comes on its knees with the packs (husk) | the head lifts | as for Husks |
+| Kneeler | a penitent of the low road who came the last league on its knees and never rose | comes on its knees with the packs (husk) | the head lifts | as for Husks |
 | Stalker Crone | an old woman in the tall grass | stalks, unseen until close (stalker) | the grass parts | keep your lantern high and turn |
 | the Carrion Warden | the crypt's keeper, who forgot what he guarded | the Hollow Crypt's master (boss) | | |
-| the Ossuary Matron | she counts the dead she stands up | Act I's last (boss) | | |
+| the Ossuary Matron | she counts the dead she wakes | Act I's last (boss) | | |
 
 **Ideas not yet built:**
 - the Long Sister, a shroud-weaver who wrapped herself;
 - the Ash-Choir, three tiny singers who never finished the note;
 - the Splint;
 - the Weeping Post;
-- the Miscount, two skeletons sharing one set of bones;
+- the Odd Pair, two skeletons sharing one set of bones: odd as in strange, and as a count that never comes out even
+  (it was "the Miscount", now the name of the lowlanders who unmake the Order's tallies);
 - the Un-Bell;
 - the Root-Bride;
 - the Sub-Deacon, a four-armed censer priest;
@@ -229,7 +231,7 @@ brackets).
   - **Whispers:** every 60 to 120 seconds of exploring, 18 words at most, never in a fight.
   - **Landmarks, lantern names and inscriptions** surface when you pass or touch them.
   - **Item text:** one lore line on rare and unique items.
-- **The Mysterious Stranger** reads the tarot at the start and appears in every town. He speaks in half-lines and
+- **The Mysterious Stranger** reads the tarot at the start and appears at every camp. He speaks in half-lines and
   calls each god by a different name every time.
 - **Banned words and the world's own words:** `01-rules-and-decisions.md`.
 

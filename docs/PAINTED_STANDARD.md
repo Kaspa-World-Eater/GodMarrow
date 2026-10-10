@@ -51,6 +51,11 @@ with what the bog, the pit and the 3D temple taught.*
 - Bakes render at twice the engine's scale (36 × 18 px a yard, 42 of height), and the game draws them at 2× with
   nearest filtering (a baked land's `index.json`: `"scale": 2`). Lands baked before (the Sunken Bog) stay on the 4 px
   grid until they are rebaked.
+- **Every size a painter measures in pixels follows the grid.** A blur radius, an edge's depth, a run's length or a
+  pool's depth tuned on the old grid acts at half its size on the 2 x 2 grid, so it is scaled by the render's zoom
+  (`d["zoom"]`). The cave's pool went flat bright red because one depth was not. Where scaling makes the look worse,
+  the old value stays, with a comment saying why (the cave's local-contrast blur, which flattened the faces when
+  scaled).
 
 **7b. Turn every form.**
 - Every rounded thing is painted with the five tones of form: the light side, the halftone, the core shadow, the
@@ -91,11 +96,18 @@ with what the bog, the pit and the 3D temple taught.*
 
 ## How each road paints
 
-**The 3D road** (`tools/landkit3d/paint3d.py`) paints from Blender's data passes:
+**The 3D road** (`tools/landkit3d/`; every painter listed in its `README.md`) paints from Blender's data passes.
+`paint3d.py` is the shared base (ramps, the dither, sky and moon, the floor); `paint_shore.py` paints the sea of blood
+and the black sand; `paint_cave.py` paints the fire-lit interiors.
 - **The light:**
   - the overcast sky, stronger on what faces up and darker in the sheltered (occlusion);
   - a soft key from the upper left;
-  - a breath of the moon's true shadow.
+  - **under an overcast, a soft shadow:** the key keeps the turn of form, but the cast shadow is taken out of the
+    moon pass, blurred wide (7 texels for each texel of zoom) and weakened to a third, with the contact kept dark
+    (`paint_shore.light`). An overcast throws no hard shadow; the cove's hard streaks from every bone failed;
+  - **in a fire-lit interior, the lamp pass is the light:** each pool stepped into widening bands with black between,
+    the flames painted as tongues at their lamps, highlights on dark liquid in the fire's own colour, carved stone
+    rolling off in its highlights instead of blowing out (`paint_cave`).
 - **Each material** by its causes:
   - stucco lost where the damp rises and the eaves drip;
   - algae on the low shade side;
@@ -112,6 +124,10 @@ with what the bog, the pit and the 3D temple taught.*
   - rain's sheen by material;
   - stucco loss as real chipped geometry rather than paint.
 
+**Long rigid things stay rigid** (any road): a bone, a log, a spear or a beam is one straight line laid at the height
+of the upper hull of what it rests on, never lifted point by point onto the ground under it (the cove's bones "doing an
+accordion thing").
+
 **The height engine** (`tools/art_study/wood_scene.py` and the scenes on it):
 - **Shade** gives the moon, the lantern, the sky fill and occlusion.
 - **Paint** gives each material by its own painter (bark, bone, stone, peat, water).
@@ -121,7 +137,8 @@ with what the bog, the pit and the 3D temple taught.*
 
 **Shaders in the game:**
 - the lake, blood pools, meadow, snowfield and the skill effects;
-- the baked land's water slides its rows in a slow swell and glints a texel at a time;
+- the baked land's water slides its rows in a slow swell and glints a texel at a time; the Red heaves on the dying
+  heartbeat (texels marked by alpha 254 in the bake, moved by `shaders/baked_ground.gdshader`);
 - the lantern rakes the baked ground and the landkit pieces through their normal maps.
 
 ## What failed (and stays failed)
@@ -134,6 +151,11 @@ with what the bog, the pit and the 3D temple taught.*
 - **Fog and mist layers:** filters.
 - **Form put into colour:** flat.
 - **Pillowed stones and blurred normals:** cartoony.
+- **A steeper tone curve for "more definition":** blows a form out to one mass; the fault was the mesh (too few
+  vertices across the face), never the light.
+- **Slanted planes for broken stone:** read as cut wedges ("looks lazy"); broken tops stay level, corners only inset.
+- **A hard shadow under an overcast:** dark streaks from every bone.
+- **Pixel constants left at the 4 px grid's values:** they act at half size on the 2 x 2 grid.
 
 ## The masterwork rule and the ten passes
 

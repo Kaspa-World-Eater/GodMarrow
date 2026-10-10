@@ -83,11 +83,14 @@ quarter of her Miasma) · The Still Hand (passive)
 
 - **The Pale Order** (the Ossuarch's order): the oldest feud. The Myriad lets the dead go into the water; the Order's knights dredge the bones back up to stand.
 
-- **The processions of the Maiden:** mindless flesh warps essence faster than anything. They are her worst enemy and, grimly, her best supplier.
+- **The processions of the Maiden:** mindless flesh fouls the breath faster than anything. They are her worst enemy and,
+  grimly, her best supplier.
 
-- **The Hollow Mystic's lodges:** uneasy cousins. They hold souls in mirrors, and to the Myriad that is a breath held forever.
+- **The Hollow Mystic's circles** (the Veiled Crone's Mirror): uneasy cousins. They hold souls in mirrors, and to the
+  Myriad that is a breath held forever.
 
-- **The servants of the Silence:** the enemy the Myriad fears most. Where they pass there is nothing left to breathe in. Distortion can be carried. Nothing cannot.
+- **The servants of the Silence:** the enemy the Myriad fears most. Where they pass there is nothing left to breathe in,
+  and nothing to still. A breath can be held. Nothing cannot.
 
 ## 7. Look
 

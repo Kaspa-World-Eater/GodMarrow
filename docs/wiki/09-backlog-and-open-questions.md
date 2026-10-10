@@ -15,7 +15,7 @@ the bog first (done), then decide how the game begins (decided: the first area),
    - the study chapters (the Olympic coast; Northwest Coast forms);
    - the temple to an A;
    - the Red Water and the black sand;
-   - the drift logs and sea stacks;
+   - the jam of giant bones (where a coast would pile drift logs) and the sea stacks;
    - the giant trees and the fringe;
    - the hide hut kit, the palisade, the fire pit of the dead, the merchant's corner;
    - the land laid out from a seed from the water inland, baked and placed in the game.
@@ -66,7 +66,8 @@ the bog first (done), then decide how the game begins (decided: the first area),
 
 ## Parked
 
-- **The Hollow King** (a cow-king mini-boss): cartoony, back burner.
+- **The Hollow King** (a joke mini-boss after Diablo II's Cow King): cartoony, back burner. The animal law rules out
+  the cow: if it comes back, it is a crowned hollow thing at the head of a field of its own kind, never an animal.
 - **Armour tiers and weapons in hand:** after the Ossuarch's metal.
 - **The Codex filling in by discovery** for release (every chapter is open while we build).
 - **Acts II to V:** not started in the new art; they use the nearest Act I palettes.
@@ -77,7 +78,7 @@ the bog first (done), then decide how the game begins (decided: the first area),
 
 - **Gaps in the game's code** (survey of 2026-10-08, listed in `04-systems-and-combat.md` section 12):
   - the Herald's Arcanum is announced and never given;
-  - the Silent One's hush does nothing;
+  - the Silent One's dimming (the old "hush") does nothing;
   - most of the Ossuarch's Count tree is unbuilt, though points can be spent on it;
   - the death remnant is invisible and unsaved;
   - the Ossuarch's and Penitent's board cards do nothing;
@@ -100,26 +101,36 @@ the bog first (done), then decide how the game begins (decided: the first area),
   - the names of the area, the village and the merchant, and whether the sea's common name is the Red Water;
   - how many zones the start is (the sand, the fringe and bluffs, the old growth and the village?);
   - how it joins the rest of Act I, and which way the sea lies on the map;
-  - which town services the village has with only the merchant;
+  - which services the dead village has with only the merchant;
   - whether the camp's people (Esk, Ysolde, Brannoc, Maren) return later in the act;
   - what becomes of the Ashen Moor, now that the start is the shore;
   - whether the Ash Shore's grey sea is the same blood under ash (proposed in the lore).
 - **The vows:** the game has six Act I vows (quests) from the old design, and the lore is now world-building only. Do
   they stay as gameplay?
+- **The camps' people:** with no living towns, how many lone figures each act's camp has, and which services they give
+  (page 02 section 7 proposes one tender and one trader at most).
 - **Words still to clear from the game** (found by the Codex cleanup, 2026-10-08):
   - skill names and texts in `data/skills.json`: "Murder of Crows", "Soul Leech", "Wailing Rot", "like a raven moving
     between carcasses", "Crow's Heel";
   - the scrapped Laden Board material, still in the Codex sermon of chapter VI and the interviews;
   - about 80 interview lines about food and daily life (`12b`), left because they mean nothing without it;
   - in the voice lines: "Nine orders", "crusader order", "the Crusade", "mantra", "spider-silk";
-  - the old Codex (`data/codex.json`) still names little towns throughout (Derek, 2026-10-08: no little towns).
+  - **the old Codex** (`data/codex.json`) still tells retired lore throughout: the congregation that knelt inside the
+    god (9 times), salt (52 times), years of a count (1071, 1091, 1103, 1106), little towns (Derek, 2026-10-08: no
+    little towns), and the Silence as "the Quiet" (9 times). It is to be rewritten to the bible, voice by voice;
+  - **the 2026-10-09 renames,** where the old names still show: "the Slayers" (now the Vhoor-Qhan) in Act V's zone "The
+    Alien Temple of the Slayers" (`data/world.json`), its boss "The Thought of the Slayer" (`data/monsters.json`) and
+    its lines (`art/ui/voice.json`, `art/ui/zone_lines.json`); "the Angled Door" in the voice lines (the Angles); the
+    cut Sky-Climbers in two Act IV places (`data/world.json`). The other renames (the Ythraal, the Thrae, the Ghauul,
+    the Khar-Dhuum, Oss-Karrhath, the Miscount, the Shroud and the Mirror) hold for every new text.
 - **Names that break the laws in the game's data:**
   - the Flesh herald still shows as "the Wet Nurse" (retired; "the Weeping Gash" clashes with "never Weeping");
-  - Act III's "Eel-Monger" and "Leech-Wife", "Brood-Sow" and "Brood" names;
+  - Act III's "Brood-Sow" and "Brood" names;
   - Act II's "Chalk-Wyrm";
   - Act I's Bellwether (a bellwether is a sheep), a name from the start;
   - Act IV's Tibetan names.
-- **The ages' names:** the Lore Bible offers three sets, and none is chosen. Soul still has no herald.
+- **The ages' names:** the bible uses working names (the Lying Down, the age of the Ythraal, the Wasting, the Age of
+  the Last Breath) until Derek settles them. Soul still has no herald.
 - **Frictions:** which of the old Act I plan's frictions he wants, if any:
   - unread items;
   - no free road home;

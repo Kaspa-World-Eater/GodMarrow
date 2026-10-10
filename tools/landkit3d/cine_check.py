@@ -32,7 +32,7 @@ def sat(img):
 def check(path, interior=True):
     im = np.asarray(Image.open(path).convert("RGB")).astype(float) / 255.0
     if im.shape[0] > 600:
-        im = im[::4, ::4]                                       # back to world pixels (the 4 px art grid)
+        im = im[::4, ::4]                                       # back to the render's texels (the painters write each 4 x 4)
     L = lum(im)
     S = sat(im)
     n = L.size

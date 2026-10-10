@@ -3,6 +3,11 @@
 
 *Class doc. Code id `ossumancer`. Lore rewritten 2026-09-29, fourth pass; skill trees redone 2026-09-30 (Ossuary · Bone · the Count). In the game the Ossuarch walks (2026-10-08): the Ossuary and Carapace trees are built, and the Count tree has 2 of its 12 skills, the Bone Blade and Tally (`04-systems-and-combat.md`).*
 
+*Patched 2026-10-09 to the bible (`mythology/`): the Pale is named for the Order's pale of numbered thigh-bones; the
+halls beneath were cut by the Angles; the Ossuarch is a calling and an office, never one man, and keeps a sliver of the
+reaper's scythe-bone (§5); the plate is black iron with bone set into it (§9); the Peak's fall is told as
+`mythology/05-the-last-breath.md` tells it.*
+
 **The user's direction, as it stands:**
 - **The order:**
   - timeless and ancient, as old as the world, or so it claims
@@ -11,9 +16,10 @@
   - the dust is sacred
   - it holds sky funerals, and it hides something
 - **The Mother** stays: the Bearing Mother. No pregnancy.
-- **Dropped:** iron as a theme, the mills and bellows, "the Knitting" (that is the Hollow Mystic's flavour), eating dust, and anything Tibetan.
+- **Dropped:** iron as a theme of the lore (the mills and bellows), "the Knitting" (that is the Hollow Mystic's
+  flavour), eating dust, and anything Tibetan. Black iron stays as the material of his plate (Derek, 2026-10-05; §9).
 - **The growth:** the Bone is growing, encroaching, calcifying, like a cancer. It is never said in the lore, only implied. His skills can show it openly (§6), and the words around it stay silent.
-- **The approach:** Dark Souls, esoteric, Lovecraftian. The lore is about the order; the man stays a mystery.
+- **The approach:** Dark Souls, esoteric, Lovecraftian. The lore is about the order; the calling stays a mystery.
 
 *Wiki hub: `wiki/00-start-here.md`. World lore: `wiki/02-world-and-lore.md`.*
 
@@ -23,7 +29,11 @@
 
 ## 1. The order at a glance
 
-- **The Pale Order** (the name is locked, 2026-09-29). The lowlands named them for the dust that lies on their plate, and for the sky above their mountains. In its own old tongue it is **the Kostyak**, a word for a skeleton, and for the few who hold a thing together.
+- **The Pale Order** (the name is locked, 2026-09-29). It is named for its **pale**: a fence of thigh-bones set upright
+  round the first bone-house, end to end, each cut with its number. Inside the pale everything is counted; beyond it,
+  nothing is yet anything. Every year the pale is moved out by the length of one bone, and the country inside it is the
+  Pale (`mythology/06-the-ends-of-the-world.md`, "Beyond the Pale"). In its own old tongue the Order is **the Kostyak**,
+  a word for a skeleton, and for the few who hold a thing together.
 
 - **What they claim:** the Order says it is as old as the world. It says its first brothers stood at the god's side when it fell, and laid its bones where they lie.
 
@@ -119,7 +129,8 @@
   - stairs with risers knee-high to a man
   - niches too long for any body the world has
   - halls whose floors slope very slightly toward the centre, in proportions that make a man keep glancing behind him
-- **The Order built its own halls on top**, in plain grey stone and bone, the way a village builds against a castle wall.
+- **The Order built its own halls on top**, in plain grey stone and bone, the way a lone house is built against a castle
+  wall.
 - **The Order's chronicle:** its oldest pages are in another hand.
 
 **The reverence of bone.** A brother's life is spent in the company of bones, and all of it is devotion.
@@ -147,7 +158,9 @@
 
 **The knighthood.** The Order is monastic, but it is not gentle.
 - **What they go down for:** its brothers are knights in plate of carved bone who go down into the lowlands to bring home the bones that lie out of place.
-- **The feuds:** they come from this. The Bleeding Maiden's processions want the flesh, the lodges want the souls left in peace, and the Shrine Keepers want the dead given to the water. The Order carries the bones home anyway, politely, with an escort of the standing dead, and does not negotiate.
+- **The feuds:** they come from this. The Bleeding Maiden's processions want the flesh, the Veiled Crone's circles want
+  the souls left in peace, and the Shrine Keepers want the dead given to the water. The Order carries the bones home
+  anyway, politely, with an escort of the standing dead, and does not negotiate.
 
 **Their manner:** stoic, grim, beyond hurry, beyond thanks.
 - **"Rest":** they never say it of anything that is not yet dust.
@@ -164,7 +177,12 @@
   - A count whose root is not nine is an **open count**, unfinished. Talliers carry open counts in their heads until they close.
 - **The frame number.** A whole man is two hundred and six bones. Brothers tell their own frame on a cord of 206 knots.
   - **The fewer is the holier:** a child is born with more bones than a man dies with, and they knit to fewer over a life. The Order teaches that every frame seeks the fewer, and the Mother seeks the One Bone. A count that falls is good.
-- **The Pale (the Ossuarch's path; locked 2026-09-29).** Ossuarchs *walk the Pale*: a path out of the Ossa and across the Hide, marked by nothing a lowlander can see except the white waymarks (Pale-Stones) a warden sets where he has gathered bones. Knights ride the low road and come home; an Ossuarch walks the Pale, always outward. The Order's name carries it too (the dust, the sky, and the path). Lowland saying for someone gone too far to be reached: *gone beyond the Pale*. Hidden, never stated: the chart of Pale-Stones in the Ninth Stair's tally-room grows longer every year, with stones no living Ossuarch set.
+- **The Pale (the Ossuarch's path; locked 2026-09-29).** Ossuarchs *walk the Pale*: out of the Ossa, across the counted
+  country and past the last bone of the pale (§1), marked by nothing a lowlander can see except the pale waymarks
+  (Pale-Stones) a warden sets where he has gathered bones. Knights ride the low road and come home; an Ossuarch walks
+  the Pale, always outward. Lowland saying for someone gone too far to be reached: *gone beyond the Pale*. Hidden, never
+  stated: the chart of Pale-Stones in the Ninth Stair's tally-room grows longer every year, with stones no living
+  Ossuarch set.
 - **The Unfallen (the stars).** The Order teaches that the stars are pieces of the god's bones that have not yet fallen to the Hide to rest. They hang in the dark, uncounted; the Count cannot close until the last one has come down. When one falls, brothers go out to find it and lay it in a niche. **Bone Rain** is an Ossuarch asking the Unfallen to come down early: shards of old star-bone fall straight, and what they strike is counted.
 - **The Last Number.** When every bone of the Mother is counted, the Count closes, and she rests. Every sweep and every tally is a step toward the Last Number.
 - **The dread (implied only):** the Count rises. It has risen every year of the chronicle.
@@ -179,7 +197,9 @@
 
 *It comes in layers. Each fragment in §2 points at one, and none proves it.*
 
-- **They did not build the ossuaries.** When the first brothers came into the Ossa range, the ossuaries were already there, full.
+- **They did not build the ossuaries.** The bone-houses are the upper floors of halls the Angles cut
+  (`mythology/04-the-held-space.md`). When the first brothers came into the Ossa range, the ossuaries were already
+  there, full.
    - The bones in the oldest niches are long and many-jointed, of no shape the world makes.
    - The Order took up the keeping and wrote *"we were here when she fell"* over the stairs. By now they may believe it.
 
@@ -190,7 +210,10 @@
    - Every Ossuarch reads the records once, and never speaks of them again.
    - The dust is given to the sky because the sky is the one place it can't touch anything. The pale sky over the Ossa range is slowly thickening.
 
-- **The builders.** The many-jointed bones in the oldest niches were once whoever cut the knee-high stairs, before the Order, doing the same work. They stand in their niches still. They are the only bones in the ossuaries that have never gone brittle.
+- **The Angles.** The many-jointed bones in the oldest niches may be theirs, the host that cut the knee-high stairs long
+  before the Order. Over those niches is cut *Lie down facing the stair. Watch.* Beside it: *Our joints do not finish.*
+  They lie in their niches still, facing the stair. They are the only bones in the ossuaries that have never gone
+  brittle.
 
 - **What the Rule really is.** The Order says it helps the Mother bear the world. On the Ninth Stair the teaching is quieter:
    - **Keep her where she is.** Hold her in her halls. Let finish, with honour and a rite, as much of her as will finish.
@@ -198,15 +221,29 @@
 
 *The designer's truth, for us only:* **the Bone is growing.** Slowly, without a plan, it encroaches and calcifies. The Order reveres it and is containing it, and both are true. Never state this in the game; let the count, the stairs, the weights and the sky say it.
 
-## 5. The man
+## 5. The calling
 
-*We don't need to know much about him, and neither does the player.*
+*The lore is about the Order. The Ossuarch is a calling and an office of no one man, and neither we nor the player need
+to know much about whoever wears the helm.*
 
-He is a colossal figure in carved bone plate. He comes down out of the Ossa range with an escort of the standing dead and goes wherever bones lie out of place. He calls himself an Ossuarch, and no ossuary will open its gate to him.
+**The office.** An Ossuarch is the warden of a bone-house. The Order writes him by number, and when one dies another
+takes the helm. The office is the Order's oldest keeping made into a man: its first brothers, the Order says, laid the
+Mother's bones over the pit of Oss-Karrhath, death's Titan, to keep the reaper under, and every Ossuarch carries a
+sliver of the reaper's own scythe-bone, set in his plate where no one sees it. The bone answers him because it knows
+whose it is. The Order does not say what happens when an Ossuarch dies with the sliver on him
+(`mythology/03-the-age-of-terrors.md`, "The reaper below").
 
-The stories about him do not agree. Some say his ossuary went quiet and he is the last who came out of it. Some say he was sent down to carry home every bone in the lowlands before the Unmaking can take them, and some that he read the weights on the Ninth Stair and walked out. Others say his plate has more bone on it every year than the year before, and that the Order has noticed, or that he was never a brother at all, but something from the oldest niches, wearing a brother's armour. He says nothing about any of it.
+**The one who walks out.** An Ossuarch sent down the Pale comes out of the Ossa range in black iron and bone, with an
+escort of the standing dead, and goes wherever bones lie out of place. No ossuary opens its gate to him again.
 
-In the lowland villages he is **Grandfather Dust**, and children are told he will sweep them up. In the Order he is **the Ungated**.
+The stories about such a one do not agree. Some say his ossuary went quiet and he is the last who walked out of it. Some
+say he was sent down to carry home every bone in the lowlands before the Unmaking can take them, and some that he read
+the weights on the Ninth Stair and walked out. Others say his plate has more bone on it every year than the year before,
+and that the Order has noticed, or that the one in the helm was never a brother at all, but something from the oldest
+niches, wearing a brother's armour. He says nothing about any of it.
+
+To the few left in the lowlands he is **Grandfather Dust**, and a child is told he will sweep her up. In the Order he is
+**the Ungated**.
 
 ## 6. How he plays (the lore behind the mechanics)
 
@@ -245,7 +282,19 @@ In the lowland villages he is **Grandfather Dust**, and children are told he wil
 
 - **The count, seen (the user, 2026-09-30):** a small white geometric sigil hangs ghostly over the head of whatever he curses: the curse's own figure in nine strands (Open Count the nine-pointed star; The Fewer nine spokes from one point; The Weighing a beam whose strands tip; The Ninth Stair nine steps going down). Each notch lights the next strand, so the lit strands are the count; no numeral (the user). At nine it swells and thins away. It breathes and turns slowly, never flickers, and the dark never hides it (`entities/count_sigil.gd`, test `--arena=4 --sigils`).
 
-- **What is seen, skill by skill (the growth the lore won't name):** every skill is bone growing. **His own bone** grows straight and ordered; **bone in his enemies and the ground** grows wild: lumps, spurs, asymmetry. Raise Skeleton: the dead stand up out of his grit, straightening as they rise. Bone Offering: a skeleton bursts outward in a thicket of spurs. Grave Tithe: what was bone in the slain comes to him as grit. Unearth: the buried dead come up through the ground, spurred and fused. Ossuary Colossus: a hundred dead fused into one frame, seams and all. Death March: spurs rise in their footprints. Reassemble: broken dead come back together, a little lumpier each time. Bone Legion: more dead, larger than the men they were. Bone Lance: a spear grows out of the ground in a dead-straight line. Marrow Siphon: the struck wither and their bone shows through. Charnel Cage: ribs and arms grow up round the target and close. Ossify: its own bones overgrow and fuse; it shatters when struck. Bone Spurs: spurs erupt from whatever he has wounded. Shard Storm: the grit driven outward, every splinter straight. Bone Rain: shards of star-bone fall straight out of the dark. Pale Lord: a white stone, and a warden of old bone standing on it. Mantle: the ground spurs and splinters round him. Bone Armor: plates grow over him and between him and his dead. The Count: notches cut into bone you can see on the struck; a closing count cracks them through. Melee weapons grow from the relic bone (table above).
+- **What is seen, skill by skill (the growth the lore won't name):** every skill is bone growing. **His own bone** grows
+  straight and ordered; **bone in his enemies and the ground** grows wild: lumps, spurs, asymmetry. Raise Skeleton: the
+  dead rise out of his grit, straightening as they come. Bone Offering: a skeleton bursts outward in a thicket of spurs.
+  Grave Tithe: what was bone in the slain comes to him as grit. Unearth: the buried dead come up through the ground,
+  spurred and fused. Ossuary Colossus: a hundred dead fused into one frame, seams and all. Death March: spurs rise in
+  their footprints. Reassemble: broken dead come back together, a little lumpier each time. Bone Legion: more dead,
+  larger than the men they were. Bone Lance: a spear grows out of the ground in a dead-straight line. Marrow Siphon: the
+  struck wither and their bone shows through. Charnel Cage: ribs and arms grow up round the target and close. Ossify:
+  its own bones overgrow and fuse; it shatters when struck. Bone Spurs: spurs erupt from whatever he has wounded. Shard
+  Storm: the grit driven outward, every splinter straight. Bone Rain: shards of star-bone fall straight out of the dark.
+  Pale Lord: a pale stone, and a warden of old bone standing on it. Mantle: the ground spurs and splinters round him.
+  Bone Armor: plates grow over him and between him and his dead. The Count: notches cut into bone you can see on the
+  struck; a closing count cracks them through. Melee weapons grow from the relic bone (table above).
 
 - **Art rule:** bone growth is drawn as material, never light: white-ochre bone creeping, knotting and cracking, with dust where it breaks.
 
@@ -273,35 +322,50 @@ In the lowland villages he is **Grandfather Dust**, and children are told he wil
 
 - **The Gilded Peak** (the Empty Hand's monastery): the Peak gilded its dead and gave them to the Silence, and left no bone.
 
-- To the Order that was the worst sacrilege in the world. So its standing dead went up the Peak's stair to carry the monks' bones home before the Silence could.
+- To the Order that was the worst sacrilege in the world. When the Peak fell, its monks left no bone at all: a little
+  black glass and a little dust in their rooms, and a courtyard of warm black glass (`mythology/05-the-last-breath.md`,
+  "The fall of the Gilded Peak"). There was nothing for the Order to carry home.
 
-- What happened in the Peak's courtyard afterwards, the Order does not discuss (see `claude/godmarrow-class-kusho.md`).
+- What happened on the Peak, the Order does not discuss.
 
-- **The processions of the Red Mother** (the Hemomancer's faith): two mothers and one dead world between them. They have fought for centuries over the dead, the processions claiming the flesh and the Order the frame.
+- **The processions of the Red Mother** (the Hemomancer's faith): two mothers and one dead world between them. They have
+  fought over the dead for as long as either remembers, the processions claiming the flesh and the Order the frame.
 
-- **The Hollow Mystic's lodges:** they keep souls and let bone lie. The Order calls it neglect, and the lodges call the standing dead a desecration.
+- **The Hollow Mystic's circles** (the Veiled Crone's Mirror): they keep souls and let bone lie. The Order calls it
+  neglect, and the circles call the standing dead a desecration.
 
 - **The Shrine Keepers:** they give the dead to the water, and the Order's knights dredge the bones back out.
 
 ## 9. Look
 
-**Direction:** the colossal stature of a golden praetorian guard, made entirely of **bone**, in no way gold. It is our own design, borrowing none of the original's heraldry.
+**Direction (Derek, 2026-10-05):** a tall pointed helm like the Adeptus Custodes, a ghostly pale green plume at its top,
+black iron armour with bone set into it, and counting in nines worked into everything. It has the colossal stature of a
+golden praetorian guard, in no way gold, and is our own design, borrowing none of the original's heraldry. The full
+design is `docs/concepts/ossuarch/DESIGN.md`.
 
 **Silhouette:** the tallest hero in the game, a narrow tower, **a column with shoulders**. At isometric scale it reads as a vertical.
-- **Crest:** a high one of stacked vertebrae.
+- **Helm:** tall, narrow and pointed, of blackened iron, rising to a spike like a lancet arch; nine vertebrae climb its
+  back, and the plume rises from its tip.
 - **Mantle:** long and hanging straight to the ground.
 
-**Armour:** plate of carved and fitted bone, the relics of brothers who went before, each plate cut with a name.
-- Old, ivory to ochre, crazed with fine cracks.
+**Armour:** black iron plate, worn dull and never shining, with bone set into it: the relics of brothers who went
+before, each bone plate cut with a name and a number.
+- The bone is old, ivory to ochre, crazed with fine cracks. Pale dust lies in every seam of the iron.
+- **Counted in nines:** nine ribs a side on the breastplate, nine lames to each tasset, tally notches cut in nines.
 - **The unease:** one pauldron and the back of one gauntlet carry more bone than the rest. It's knotted and lumpy there, with a small spur curling out. Nobody carved that.
+- **The sliver:** somewhere in the plate, where no one sees it, is set a sliver of the reaper's scythe-bone (§5).
 
-**Head:** a closed helm whose faceplate is a polished skull-cover, with only the eye sockets and teeth left dark.
+**Head:** the helm closes over a faceplate of polished bone, a skull-cover with only the eye sockets and teeth left
+dark.
 - A ring of script runs round the brow. Not the Order's script. Nobody asks.
+- **The plume:** a long spill of very fine strands, cold green-white, bound into the tip of the spike. It is a material,
+  never a light, and it drifts up, not down.
 
 **Cloth:** a dust-grey mantle, heavy and weathered pale. It is embroidered in bone thread with the Order's sign: **a figure bowed under a bar across its shoulders.**
 
-**Colour:** muted ivory-to-ochre bone and dust grey, with deep shadow in the joints.
-- **The one bold mass:** a window of old **amber marrow-glass** in the breastplate, the Marrow orb's colour. It is a material, not a light: no glow.
+**Colour:** black iron, muted ivory-to-ochre bone and dust grey, with deep shadow in the joints.
+- **Two small accents:** the cold pale green plume, and a window of old **amber marrow-glass** in the breastplate, the
+  Marrow orb's colour. Both are materials, not lights: no glow.
 
 **Around him:** hanging grit and splinters, and a faint trail of pale dust behind each step.
 
@@ -346,9 +410,10 @@ In the lowland villages he is **Grandfather Dust**, and children are told he wil
 
 - say the Bone is growing (show it only in skills and art)
 
-- explain the builders, the count or the weight
+- explain the Angles, the count or the weight
 
-- pregnancy, mills or bellows, iron as a theme, or "the Knitting"
+- pregnancy, mills or bellows, iron as a theme of the lore (the plate is black iron, and it is never spoken of),
+  or "the Knitting"
 
 - eating dust
 

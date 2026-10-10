@@ -429,7 +429,7 @@ def pool_gloss(img, d, proj, fk, t):
         dd = np.linalg.norm(P_ - lp[:3], axis=1)
         k = hit & keep & (dd < size * 0.55)
         if k.any():
-            # a highlight on a dark liquid keeps the light's own colour: a small white-blue glint
+            # a highlight on a dark liquid keeps the light's own colour: a small glint of the fire
             add[k] = FL[1] * 0.6 * fk[i]
     out[jj, ii] = np.clip(img[jj, ii] + add, 0, 1)
     return out
