@@ -322,6 +322,7 @@ def paint(d, t=0.0):
         hot = (np.clip((light[m] - 6.0) * 0.06, 0, 0.3) * np.clip(tm * 1.4, 0, 1))[:, None]
         col = col * (1 - hot) + (WISP_C * 0.75 * hm + 0.05) * hot * np.clip(tm * 1.3, 0, 1)[:, None]
         img[m] = col
+    img = fine_detail(img, d, T, mat, X, Y, Z, n, ao, up, wall)
     # the weeping (rule 37, ancient): water has seeped from every socket and crevice of the carved and the raw rock for
     # longer than anyone remembers, and run down the face below it, leaving long dark mineral tears, a pale crust at
     # their lips where a fire finds them
@@ -604,5 +605,55 @@ def main():
     print("saved", out)
 
 
+
+def _h2(a, b):
+    return np.modf(np.abs(np.sin(a * 12.9898 + b * 78.233) * 43758.5453))[0]
+
+
+def fine_detail(img, d, T, mat, X, Y, Z, n, ao, up, wall):
+    """the small life of the rock and the blood (Derek, 2026-10-09: "a lack of fine detail on the rocks and in the
+    blood in the cave like where's the lichen and cracks and grit and dust"): hairline cracks with a lit lip where a
+    fire grazes them, grit on what faces up, dust settled in the sheltered hollows, pale crusts of lichen in patches on
+    the raw basalt; in the blood, clotted flecks, small bubbles and the wrinkles of its skin. All of it scaled by the
+    light that reaches it, so it shows only where light grazes (CINEMATOGRAPHY rule 4) and the dark stays quiet"""
+    lit = np.clip(T * 2.2, 0, 1)[..., None]
+    stone = (mat == 20) | (mat == 26) | (mat == 27)
+    raw = (mat == 20) | (mat == 26)
+    # cracks: two octaves of hairline, the finer only where the coarse has split the face
+    c1 = np.abs(vn(X * 1.7 + Z * 0.9, Y * 1.7 - Z * 0.6) - 0.5) < 0.013
+    c2 = (np.abs(vn(X * 4.3 + 7.0, Y * 4.3 + Z * 2.0) - 0.5) < 0.009) & (vn(X * 0.6, Y * 0.6 + Z * 0.4) > 0.45)
+    crack = stone & (c1 | c2)
+    img = np.where(crack[..., None], img * 0.5, img)
+    lip = np.zeros(crack.shape, bool)
+    lip[:-1, :] = crack[1:, :] & ~crack[:-1, :]
+    img = np.where((lip & stone)[..., None], np.clip(img * (1.0 + 0.22 * lit), 0, 1), img)
+    # grit on what faces up: a speckle of light and dark grains, a few hundredths of a yard
+    gh_ = _h2(np.floor(X * 26.0), np.floor(Y * 26.0) + np.floor(Z * 26.0) * 0.37)
+    flat = stone & (up > 0.55)
+    img = np.where((flat & (gh_ > 0.93))[..., None], np.clip(img + 0.07 * lit, 0, 1), img)
+    img = np.where((flat & (gh_ < 0.07))[..., None], img * 0.82, img)
+    # dust settled where nothing walks and nothing drips: on what faces up, in the sheltered, in soft drifts
+    dk = np.clip((vn(X * 0.9 + 3.0, Y * 0.9) - 0.42) * 2.4, 0, 1) * np.clip((ao - 0.5) * 2.5, 0, 1)
+    dust = np.array([0.33, 0.3, 0.28]) * np.clip(T * 1.6 + 0.05, 0, 1)[..., None]
+    kd = (flat * dk * 0.42)[..., None]
+    img = img * (1 - kd) + dust * kd
+    # lichen: pale grey-green crusts in patches on the raw basalt, dotted, where any light has ever reached
+    patch = (vn(X * 5.2 + Z * 3.1, Y * 5.2 - Z * 1.7) > 0.8) & (vn(X * 0.8, Y * 0.8 + Z * 0.5) > 0.5)
+    dots = vn(X * 26.0 + Z * 19.0, Y * 26.0 - Z * 15.0) > 0.52
+    lich = raw & patch & dots & (T > 0.04)
+    lcol = np.array([0.43, 0.46, 0.37]) * (0.3 + 0.7 * np.clip(T * 1.8, 0, 1))[..., None]
+    img = np.where(lich[..., None], img * 0.55 + lcol * 0.45, img)
+    # the blood: clotted flecks, small bubbles at the surface, the fine wrinkles of its skin
+    pool = (mat == 24) | (mat == 17)
+    bh = _h2(np.floor(X * 30.0), np.floor(Y * 30.0))
+    img = np.where((pool & (bh < 0.08))[..., None], img * 0.55, img)
+    bub = pool & (bh > 0.985) & (up > 0.6)
+    img = np.where(bub[..., None], np.clip(img * 1.3 + np.array([0.05, 0.015, 0.015]) * lit, 0, 1), img)
+    wr = pool & (np.abs(vn(X * 6.0 + 11.0, Y * 6.0) - 0.5) < 0.02)
+    img = np.where(wr[..., None], img * 0.72, img)
+    return img
+
+
 if __name__ == "__main__":
     main()
+

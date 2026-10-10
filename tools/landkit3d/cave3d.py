@@ -1151,13 +1151,77 @@ def pool():
 
 
 def pool_bodies():
-    """three who came up out of the blood and did not stand: face down across the shore stumps, half in the blood,
-    drowned and bloated, one gone to its bones (they look exactly as the pilgrim did a moment before). The one shared
-    body (body3d.py; Derek, 2026-10-09: "Bodies look bad")"""
-    import body3d as B
-    for k, (x0, y0, yaw, state, pose) in enumerate(((-1.7, 2.6, 0.4, "bloat", "prone_reach"), (3.6, -1.3, 2.4, "bone", "prone"),
-                                                    (-0.6, -2.4, -1.1, "fresh", "prone"))):
-        B.body("pb%d" % k, pose, state, x0, y0, yaw, lambda x, y: max(floor_at(x, y) or 0.0, -0.18) - 0.07, seed=40 + k)
+    """what is left of the ones who came up out of the blood and did not stand (Derek, 2026-10-09: "In the pool just
+    make the bodies, bones and Gore. We don't need their actual bodies"): at three places in the pool, half in the
+    blood, a skull with its jaw come away, a ribcage fallen in on its spine, long bones with their knuckled ends, a run
+    of vertebrae, lumps of torn flesh and clotted blood, and rags of a pilgrim's cloak"""
+    rnd = random.Random(73)
+    SURF = -0.18
+    for k, (x0, y0) in enumerate(((-1.7, 2.6), (3.6, -1.3), (-0.6, -2.4))):
+        def z_at(x, y, lift=0.0):
+            return max(floor_at(x, y) or 0.0, SURF) + lift
+        a0 = rnd.uniform(0, math.pi * 2)
+        ax, ay = math.cos(a0), math.sin(a0)
+        # the skull, half sunk, and its jaw a hand away
+        sx, sy = x0 + ax * 0.5, y0 + ay * 0.5
+        P.sphere("pr%d_skull" % k, (sx, sy, z_at(sx, sy, 0.02)), 0.1, "bone", scale=(1.15, 0.9, 0.85))
+        jx, jy = sx + rnd.uniform(-0.25, 0.25), sy + rnd.uniform(0.12, 0.28)
+        P.tube("pr%d_jaw" % k, [(jx - 0.07, jy - 0.03, z_at(jx, jy, 0.01)), (jx, jy + 0.05, z_at(jx, jy, 0.03)),
+                                (jx + 0.07, jy - 0.03, z_at(jx, jy, 0.01))], [0.016, 0.02, 0.016], "bone", 5)
+        # the ribcage fallen in on its spine (each rib a rigid arc from the spine out to the blood)
+        cx, cy = x0 - ax * 0.15, y0 - ay * 0.15
+        spine = [(cx - ax * 0.45, cy - ay * 0.45), (cx + ax * 0.25, cy + ay * 0.25)]
+        P.tube("pr%d_spine" % k, [(spine[0][0], spine[0][1], z_at(*spine[0], lift=0.03)), (spine[1][0], spine[1][1], z_at(*spine[1], lift=0.04))],
+               [0.028, 0.024], "bone", 6)
+        for r in range(8):
+            u = 0.1 + r * 0.06
+            px, py = cx + ax * (0.2 - u), cy + ay * (0.2 - u)
+            for sd in (-1, 1):
+                w = (0.2 - abs(r - 3) * 0.015) * rnd.uniform(0.75, 1.0)
+                tx, ty = px - ay * sd * w, py + ax * sd * w
+                mx, my = px - ay * sd * w * 0.55, py + ax * sd * w * 0.55
+                P.tube("pr%d_rib%d%d" % (k, r, sd), [(px, py, z_at(px, py, 0.05)), (mx, my, z_at(mx, my, 0.08 * rnd.uniform(0.4, 1.0))),
+                                                     (tx, ty, z_at(tx, ty, -0.01))], [0.011, 0.009, 0.006], "bone", 4)
+        # long bones, straight, their knuckled ends
+        for i in range(3):
+            b = rnd.uniform(0, math.pi)
+            ln = rnd.uniform(0.32, 0.46)
+            bx, by = x0 + rnd.uniform(-0.7, 0.7), y0 + rnd.uniform(-0.7, 0.7)
+            p0 = (bx - math.cos(b) * ln / 2, by - math.sin(b) * ln / 2)
+            p1 = (bx + math.cos(b) * ln / 2, by + math.sin(b) * ln / 2)
+            z0, z1 = z_at(*p0, lift=0.02), z_at(*p1, lift=0.02)
+            zz = max(z0, z1)
+            P.tube("pr%d_lb%d" % (k, i), [(p0[0], p0[1], zz), (p1[0], p1[1], zz)], [0.022, 0.019], "bone", 6)
+            P.sphere("pr%d_lbk%d_a" % (k, i), (p0[0], p0[1], zz), 0.034, "bone", scale=(1.0, 1.0, 0.75))
+            P.sphere("pr%d_lbk%d_b" % (k, i), (p1[0], p1[1], zz), 0.03, "bone", scale=(1.0, 1.0, 0.75))
+        # a run of vertebrae come apart
+        vb = rnd.uniform(0, math.pi)
+        for i in range(rnd.randint(3, 6)):
+            vx, vy = x0 + ax * 0.7 + math.cos(vb) * i * 0.075, y0 + ay * 0.7 + math.sin(vb) * i * 0.075
+            P.sphere("pr%d_v%d" % (k, i), (vx, vy, z_at(vx, vy, 0.02)), 0.03, "bone", scale=(0.8, 1.3, 0.7))
+        # gore: lumps of torn flesh, dark and wet, and clotted blood heaped on them
+        for i in range(7):
+            gx, gy = x0 + rnd.uniform(-0.8, 0.8), y0 + rnd.uniform(-0.8, 0.8)
+            r = rnd.uniform(0.05, 0.13)
+            o = P.sphere("pr%d_g%d" % (k, i), (gx, gy, z_at(gx, gy, r * 0.25)), r, "corpse" if i % 3 else "blood",
+                         scale=(rnd.uniform(0.9, 1.6), rnd.uniform(0.7, 1.1), rnd.uniform(0.35, 0.6)))
+            o.rotation_euler = (0, 0, rnd.uniform(0, 3.14))
+            P.displace(o, 0.018, 0.05, 2)
+        # rags of the cloak, sodden, lying on the blood
+        for i in range(2):
+            rx, ry = x0 + rnd.uniform(-0.6, 0.6), y0 + rnd.uniform(-0.6, 0.6)
+            verts, faces = [], []
+            for jj in range(5):
+                for ii in range(6):
+                    u, w = (ii - 2.5) * 0.09, (jj - 2) * 0.08
+                    xx, yy = rx + u * math.cos(a0) - w * math.sin(a0), ry + u * math.sin(a0) + w * math.cos(a0)
+                    verts.append((xx, yy, z_at(xx, yy, 0.01 + 0.015 * math.sin(ii * 1.7 + jj))))
+            for jj in range(4):
+                for ii in range(5):
+                    if (ii * 3 + jj * 5 + i) % 6:
+                        q = jj * 6 + ii
+                        faces.append((q, q + 1, q + 7, q + 6))
+            P.poly("pr%d_rag%d" % (k, i), verts, faces, "cloth")
 
 
 def pool_dead():
