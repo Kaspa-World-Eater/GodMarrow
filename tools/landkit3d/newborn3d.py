@@ -56,6 +56,55 @@ def load():
     return arm, bpy.data.objects["Mannequin"]
 
 
+def one_skin(arm, body, voxel=0.02, faces=24000):
+    """the Mannequin's skin rebuilt as one continuous body (pass 2): the doll's segments and ball joints at the elbows,
+    hips and knees fused by a voxel remesh in the rest pose (2 cm: coarser than the grooves between the segments, so
+    it fills them; the hands become mitts, which is all 20 px can show), subdivided and smoothed, brought down to a
+    game budget, and its bone
+    weights carried back from the original by the nearest surface. Returns the new body."""
+    bpy.ops.object.select_all(action="DESELECT")
+    new = body.copy()
+    new.data = body.data.copy()
+    bpy.context.scene.collection.objects.link(new)
+    new.modifiers.clear()
+    new.vertex_groups.clear()
+    new.data.remesh_voxel_size = voxel
+    new.data.remesh_voxel_adaptivity = 0.0
+    bpy.context.view_layer.objects.active = new
+    new.select_set(True)
+    bpy.ops.object.voxel_remesh()
+    sd = new.modifiers.new("sub", "SUBSURF")
+    sd.levels = 1
+    bpy.ops.object.modifier_apply(modifier="sub")
+    sm = new.modifiers.new("smooth", "SMOOTH")
+    sm.factor = 0.6
+    sm.iterations = 4
+    bpy.ops.object.modifier_apply(modifier="smooth")
+    dc = new.modifiers.new("dec", "DECIMATE")
+    dc.ratio = min(1.0, faces / max(1, len(new.data.polygons)))
+    bpy.ops.object.modifier_apply(modifier="dec")
+    for vg in body.vertex_groups:
+        new.vertex_groups.new(name=vg.name)
+    dt = new.modifiers.new("weights", "DATA_TRANSFER")
+    dt.object = body
+    dt.use_vert_data = True
+    dt.data_types_verts = {"VGROUP_WEIGHTS"}
+    dt.vert_mapping = "POLYINTERP_NEAREST"
+    dt.layers_vgroup_select_src = "ALL"
+    dt.layers_vgroup_select_dst = "NAME"
+    bpy.ops.object.modifier_apply(modifier="weights")
+    am = new.modifiers.new("Armature", "ARMATURE")
+    am.object = arm
+    new.parent = arm
+    for p in new.data.polygons:
+        p.use_smooth = True
+    name = body.name
+    bpy.data.objects.remove(body, do_unlink=True)
+    new.name = name
+    print("one skin: %d faces, %d groups" % (len(new.data.polygons), len(new.vertex_groups)))
+    return new
+
+
 def coat_material():
     """the coat: blood drying on skin. Most of it dried near black and matte in blotches; fresh blood in runs that go
     straight down the body as it stood up out of the pool (a noise stretched along the height, so the streaks are
@@ -85,9 +134,9 @@ def coat_material():
     L.new(runs.outputs["Fac"], runk.inputs["Value"])
     ramp = N.new("ShaderNodeValToRGB")                            # the blotches: dried to tacky
     cr = ramp.color_ramp
-    cr.elements[0].position = 0.42
+    cr.elements[0].position = 0.46
     cr.elements[0].color = (0.007, 0.002, 0.002, 1)        # dried, near black
-    cr.elements[1].position = 0.62
+    cr.elements[1].position = 0.56
     cr.elements[1].color = (0.06, 0.008, 0.009, 1)         # tacky, dark red
     L.new(big.outputs["Fac"], ramp.inputs["Fac"])
     mixc = N.new("ShaderNodeMix")
@@ -463,6 +512,86 @@ def bake_coat(body, out, size=1024):
     L.new(nm.outputs["Normal"], bsdf.inputs["Normal"])
 
 
+def _vnoise(p, f, seed):
+    """a smooth value noise in [0, 1] (mathutils' noise, offset by a seed)"""
+    from mathutils import noise
+    return 0.5 + 0.5 * noise.noise(Vector((p.x * f + seed, p.y * f - seed, p.z * f + 0.37 * seed)))
+
+
+def caul_shell(body):
+    """the caul it was born in, torn and still clinging (pass 2; the lore: "The pilgrim looks exactly like the corpses
+    on the beach", who lie hooded): a membrane over the skull like a wet hood, so no face can be told, draped off the
+    shoulders and down the upper back, torn through in holes, its hem ragged, strands of it hanging from the hem. Made
+    from the body's own faces (head, shoulders, upper back), lifted off the skin, so it keeps their bone weights and
+    moves with the body."""
+    import bmesh
+    mat = bpy.data.materials.get("caul_shell") or gore_material("caul_shell", (0.045, 0.011, 0.011), 0.42)
+    body.data.materials.append(mat)
+    mi = len(body.data.materials) - 1
+    bm = bmesh.new()
+    bm.from_mesh(body.data)
+    bm.normal_update()
+
+    def region(c):
+        hem = 1.18 + 0.16 * _vnoise(c, 9.0, 3.1)                     # the ragged hem's height, front and back
+        if c.z > 1.5:
+            return True                                              # the whole skull, the face too
+        if abs(c.x) > 0.15 + 0.04 * _vnoise(c, 11.0, 1.7):
+            return False                                             # off the shoulder caps (it read as armour)
+        if c.y > 0.0:
+            return c.z > hem - 0.12                                  # down the back further
+        return c.z > hem + 0.1                                       # over the collarbones in front
+
+    faces = [f for f in bm.faces if region(f.calc_center_median())]
+    dup = bmesh.ops.duplicate(bm, geom=faces)
+    nf = [g for g in dup["geom"] if isinstance(g, bmesh.types.BMFace)]
+    nv = {v for f in nf for v in f.verts}
+    for v in nv:
+        # lifted off the skin unevenly: it clings in places and bags in others, most over the back of the skull, so
+        # the head reads as a hooded mass and never as a ball
+        lift = 0.01 + 0.026 * _vnoise(v.co, 13.0, 5.3) ** 2
+        # the cowl: a bag of it hanging behind and under the back of the skull, as a wet hood falls back
+        dy, dz = v.co.y - 0.06, v.co.z - 1.56
+        lift += 0.085 * math.exp(-(dy * dy) / (2 * 0.06 ** 2) - (dz * dz) / (2 * 0.08 ** 2)) * (1.0 if v.co.y > -0.02 else 0.0)
+        # the crown: it sags into a soft peak over the top and back of the skull, so the head is never a ball
+        cy, cz = v.co.y - 0.03, v.co.z - 1.76
+        lift += 0.05 * math.exp(-(cy * cy) / (2 * 0.05 ** 2) - (cz * cz) / (2 * 0.05 ** 2))
+        # a fold sagging over the face, so there is no face to tell
+        fy, fz = v.co.y + 0.09, v.co.z - 1.63
+        lift += 0.025 * math.exp(-(fy * fy) / (2 * 0.04 ** 2) - (fz * fz) / (2 * 0.05 ** 2))
+        if v.co.z < 1.5:
+            lift *= 0.6                                              # the drape clings to the shoulders and back
+        v.co += v.normal * lift
+    # torn: holes through it where the noise runs high (never over the face, which it hides whole)
+    tear = [f for f in nf if f.calc_center_median().z < 1.6 and _vnoise(f.calc_center_median(), 15.0, 8.2) > 0.6]
+    bmesh.ops.delete(bm, geom=tear, context="FACES")
+    nf = [f for f in nf if f.is_valid]
+    for f in nf:
+        f.material_index = mi
+        f.smooth = True
+    # strands: from the lowest edges of the hem, thin strips of it hanging straight down (at rest) a hand's length
+    edges = {e for f in nf for e in f.edges if e.is_boundary}
+    low = sorted(edges, key=lambda e: (e.verts[0].co.z + e.verts[1].co.z))
+    made = 0
+    for e in low:
+        c = (e.verts[0].co + e.verts[1].co) / 2
+        if c.z > 1.35 or _vnoise(c, 31.0, 2.2) < 0.62 or made >= 26:
+            continue
+        ln = 0.05 + 0.12 * _vnoise(c, 41.0, 6.6)
+        r = bmesh.ops.extrude_edge_only(bm, edges=[e])
+        vs = [g for g in r["geom"] if isinstance(g, bmesh.types.BMVert)]
+        for v in vs:
+            v.co.z -= ln
+            v.co += (c - v.co) * 0.45                                  # narrowing to its tip
+        made += 1
+    bm.to_mesh(body.data)
+    bm.free()
+    for p in body.data.polygons:
+        if p.material_index == mi:
+            p.use_smooth = True
+    print("caul: %d faces, %d strands" % (sum(1 for p in body.data.polygons if p.material_index == mi), made))
+
+
 def join_clots(arm, body):
     """the clots made part of the skin, each wholly on its bone, so the game's skeleton carries them"""
     reset(arm)
@@ -483,35 +612,65 @@ def join_clots(arm, body):
 
 
 def key_clips(arm, clips):
-    """each clip keyed at 30 fps from newborn_pose and laid on its own NLA track (the glb's animation of that name)"""
+    """each clip keyed at 30 fps from newborn_pose and laid on its own NLA track (the glb's animation of that name).
+    Every pose is laid with the animation system off (no action, no tracks: otherwise the clips already keyed are
+    evaluated over the pose as it is laid, and the first frames of each later clip came out wrong), its values kept,
+    and the curves written after; each rotation kept on the same side as the one before it, so nothing flips between
+    keys."""
     for a in list(bpy.data.actions):
         bpy.data.actions.remove(a)
     arm.animation_data_create()
+    ad = arm.animation_data
     bones = [pb for pb in arm.pose.bones if pb.name.startswith("DEF-") and "f_" not in pb.name and "thumb" not in pb.name]
     for c in clips:
+        ad.action = None
+        for tr in ad.nla_tracks:
+            tr.mute = True
         sec = NP.CLIPS[c][0]
-        act = bpy.data.actions.new(c)
-        act.use_fake_user = True
-        arm.animation_data.action = act
         n = int(round(sec * FPS))
+        vals = {pb.name: ([], []) for pb in bones}
         for f in range(n + 1):
             lay(arm, NP.pose(c, f / FPS))
             for pb in bones:
-                pb.keyframe_insert("location", frame=f)
-                pb.keyframe_insert("rotation_quaternion", frame=f)
-        arm.animation_data.action = None
-        tr = arm.animation_data.nla_tracks.new()
+                q = pb.rotation_quaternion.copy()
+                rots = vals[pb.name][1]
+                if rots and q.dot(rots[-1]) < 0.0:
+                    q.negate()
+                vals[pb.name][0].append(pb.location.copy())
+                rots.append(q)
+        act = bpy.data.actions.new(c)
+        act.use_fake_user = True
+        ad.action = act
+        for pb in bones:
+            locs, rots = vals[pb.name]
+            for path, seq, k in (("location", locs, 3), ("rotation_quaternion", rots, 4)):
+                for ix in range(k):
+                    fc = act.fcurve_ensure_for_datablock(arm, 'pose.bones["%s"].%s' % (pb.name, path), index=ix)
+                    fc.keyframe_points.add(len(seq))
+                    co = []
+                    for f, v in enumerate(seq):
+                        co += [float(f), float(v[ix])]
+                    fc.keyframe_points.foreach_set("co", co)
+                    for kp in fc.keyframe_points:
+                        kp.interpolation = "LINEAR"
+                    fc.update()
+        ad.action = None
+        tr = ad.nla_tracks.new()
         tr.name = c
         tr.strips.new(c, 0, act)
+    for tr in ad.nla_tracks:
+        tr.mute = False
     reset(arm)
 
 
 def export_glb(arm, body, out, clips):
     os.makedirs(out, exist_ok=True)
+    body = one_skin(arm, body)
     coat(arm, body)
     bpy.context.view_layer.objects.active = body
     bpy.ops.object.modifier_apply(modifier="lumps")
     bake_coat(body, out)
+    caul_shell(body)
     clots(arm, body)
     join_clots(arm, body)
     key_clips(arm, clips)

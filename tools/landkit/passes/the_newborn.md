@@ -94,3 +94,58 @@ etc". So the newborn is the pilot of **live 3D characters**: a rigged body playe
 3. It throws no shadow (the hero's silhouette shadow reads the hidden sprite).
 4. The blood streaming off it is the game's 2D drips; the per-frame strands in `newborn3d.py drips()` are not in the
    live body yet.
+
+## Rules check (after pass 1)
+
+**Read:** `MASTER_RULES` in full; the area's opening (`docs/wiki/mythology/areas/the-red-shore.md` 152-157); the review
+page's notes (Derek graded the cove B+, no note on the newborn yet).
+**One true detail from the lore:** "A dark silhouette drags itself up out of a visceral pool of blood ... The pilgrim
+looks exactly like the corpses on the beach, and stands." The dead on the beach are hooded shapes (body3d's wet hood).
+**The checklist, line by line:**
+1. Brief: met, but the lore's detail (it looks like the dead) is not in the body yet. **Fails.**
+2. Scale: 1.83 m at the hero sprites' 195 px, shown at Iso.FIG beside the cave's heaps and steps. Passes.
+3. Form: a real skinned body, lit through its normals. But the coat is a smooth shell (lumps of 1 cm), and the
+   Mannequin's joint seams show: it reads as a mannequin, not as flesh under caul. **Fails (worst).**
+4. Light: its own fixed key and rim, not the cave's fires. **Fails.**
+5. Values: the body in three groups (lit flank, shade, near-black). Passes.
+6. Ramps: the picture is stepped to 7 tones by value, hue kept. Passes.
+7. Paint: a live render, not painted strokes. This is the open question of the live road (a later pass: a painterly
+   pass in the picture's shader).
+8. Contact: no shadow on the ground. **Fails.**
+9. Detail where it counts: none on the silhouette. **Fails** (with 3).
+10. Life: it breathes and sways; the blood runs off (the game's drips). Passes.
+11. Seen as the player sees it: captured in the game. Passes.
+12. Skeptic round: beside the Ossuarch it is smoother and plainer. **Fails** (with 3).
+13. Cinematography: the dark shape against the pool's glow reads; no rim from the pool, which is the one red light.
+    Partly fails.
+
+**Worst failure first: 3, 9 and 12, through the lore's detail (1).** Pass 2 gives it the caul it was born in, torn and
+still clinging, as a wet hood over the head and a drape off the shoulders and back. In silhouette it becomes one of the
+hooded dead, the face stays untellable, and the seams and the smoothness are broken by real form.
+
+## Pass 2: one skin, the caul, the clips' first frames
+
+- **The worst failure first (form, 3/9/12):** at twice the size the Mannequin is plainly an artist's wooden doll,
+  with segments and ball joints at the elbows, hips and knees; no coat could make it flesh. `one_skin()` rebuilds it as
+  one continuous body: a voxel remesh in the rest pose at 2 cm (a 9 mm remesh kept the grooves; 2 cm fills them),
+  subdivided, smoothed, brought to about 28,000 faces, its bone weights carried back from the original by the nearest
+  surface.
+- **The lore's detail (1):** `caul_shell()`, the caul it was born in, torn and still clinging. It is made from the
+  body's own faces over the skull, the neck and the upper back, lifted off the skin unevenly, with a cowl bagging behind
+  the skull, a sagging peak at the crown and a fold over the face, holes torn through it, a ragged hem and 26 strands
+  hanging from the hem. It keeps the skin's bone weights. A first version, as light and glossy as fresh blood, read as a
+  red plastic helmet; it is now as dark as the coat. Its drape over the shoulder caps read as armour and was taken off
+  them.
+- **A bug found on the way:** every clip after the first began on a broken frame (heads below the ground). While each
+  pose was laid, Blender evaluated the clips already keyed over it. The poses are now laid with the animation system
+  off and the curves written after, each rotation kept on the same side as the last (no flips). Every clip's first
+  frame was checked from the exported glb.
+- **The coat:** the dried blotches darker and wider.
+- **In the game:** a dark, wet, lumpy body, no longer a smooth doll. Smoke not rerun (no game code changed this pass).
+
+**Grade: C+** (unchanged; it gained form and lost the doll, but the next two items hold it down).
+**Worst open, in order:**
+1. The shoulder caps still bulge: the doll's deltoid shells, fused but still cap-shaped.
+2. From the front the head is still round (the caul follows the skull).
+3. Its light: its own key, not the cave's fires.
+4. No shadow.
