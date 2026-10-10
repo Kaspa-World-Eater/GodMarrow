@@ -166,6 +166,14 @@ func enter(zid: String, from: String) -> void:
 		at = Vector2(zone.arrive[from]["x"], zone.arrive[from]["y"])
 	else:
 		at = Vector2(zone.markers["start"]["x"], zone.markers["start"]["y"])
+	if zone.id == "red_shore":
+		# the Red's own sound, a beat at a time, in step with the shore's swash (core/sfx.gd _red_surge)
+		var rs := AudioStreamPlayer.new()
+		rs.stream = Sfx.loop("red_surge")
+		rs.bus = "World"
+		rs.volume_db = -7.0 + linear_to_db(maxf(0.0001, float(Settings.sfx_vol)))
+		zone.add_child(rs)
+		rs.play(fmod(Time.get_ticks_msec() / 1000.0, 6.5))
 	if zone.id == "opening_cave":
 		# its fires are painted into its bake, so they stand still: each gets a live flame (world/live_flames.gd)
 		var lf = load("res://world/live_flames.gd").new()

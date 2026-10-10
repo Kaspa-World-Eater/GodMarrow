@@ -181,6 +181,9 @@ static var _loops := {}
 static func loop(kind: String) -> AudioStreamWAV:
 	if _loops.has(kind):
 		return _loops[kind]
+	if kind == "red_surge":
+		_loops[kind] = _red_surge()
+		return _loops[kind]
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(kind)
 	var L := int(RATE * 3.0)
@@ -254,6 +257,54 @@ static func loop(kind: String) -> AudioStreamWAV:
 	wv.loop_begin = 0
 	wv.loop_end = L
 	_loops[kind] = wv
+	return wv
+
+## the Red on the shore (Derek, 2026-10-10: "the ocean makes no sound"): one beat of the heart it moves on, 6.5 s, as the
+## shore's shader moves it (shaders/baked_ground.gdshader, the shore field): the first surge swells in from 0.13 s, crests
+## at 1.4 s as the film creeps up the sand, and drains slowly back until about 5.2 s; a weaker second surge crests at
+## 2.7 s; then stillness. Thick blood, not water: a heavy, dull slosh, never a bright break; the drain a low wet drag;
+## under all of it the mass of the Red, a rumble felt more than heard. Played from the same clock as the shader.
+static func _red_surge() -> AudioStreamWAV:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 6502
+	var P := 6.5
+	var L := int(RATE * P)
+	var s := PackedFloat32Array()
+	s.resize(L)
+	var a := 0.0
+	var b := 0.0
+	var c := 0.0
+	var d := 0.0
+	for i in L:
+		var t := float(i) / RATE
+		var ph := t / P
+		var w := rng.randf() * 2.0 - 1.0
+		a += (w - a) * 0.004                 # the deep rumble
+		b += (w - b) * 0.03                  # the slosh's body
+		c += (b - c) * 0.18
+		d += (w - d) * 0.12                  # the wet drag's grit
+		var s1 := smoothstep(0.02, 0.22, ph) * (1.0 - smoothstep(0.22, 0.8, ph))
+		var s2 := smoothstep(0.3, 0.42, ph) * (1.0 - smoothstep(0.42, 0.85, ph))
+		var rise1 := smoothstep(0.02, 0.22, ph) * (1.0 - smoothstep(0.2, 0.32, ph))   # the push in, loudest
+		var rise2 := smoothstep(0.3, 0.42, ph) * (1.0 - smoothstep(0.41, 0.5, ph))
+		var drain := (s1 + 0.6 * s2) * smoothstep(0.24, 0.4, ph)                      # the slow drag back
+		var slosh := (rise1 + 0.55 * rise2) * c * 2.6
+		var drag := drain * d * 0.35 * (0.7 + 0.3 * sin(t * 23.0 + sin(t * 3.0)))
+		s[i] = a * 9.0 * 0.12 + slosh + drag
+	var pk := 0.0
+	for v in s:
+		pk = maxf(pk, absf(v))
+	var data := PackedByteArray()
+	data.resize(L * 2)
+	for i in L:
+		data.encode_s16(i * 2, int(clampf(s[i] * (0.85 / maxf(pk, 0.001)), -1.0, 1.0) * 32767.0))
+	var wv := AudioStreamWAV.new()
+	wv.format = AudioStreamWAV.FORMAT_16_BITS
+	wv.mix_rate = RATE
+	wv.data = data
+	wv.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	wv.loop_begin = 0
+	wv.loop_end = L
 	return wv
 
 func _wav(samples: PackedFloat32Array) -> AudioStreamWAV:
