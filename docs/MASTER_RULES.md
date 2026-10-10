@@ -321,7 +321,8 @@ means that they always need to be perfect. All this will become assets for the g
   - ice glazes; lightning seeks the tallest;
   - stone and bone shatter shots;
   - water douses; force breaks what is rotten.
-- **The game's camera:** Diablo II's proportion, the pilgrim about an eighth of the screen's height.
+- **The game's camera:** further out, as Path of Exile frames it (Derek, 2026-10-10: "zoomed out a bit more, like
+  poe"; `world/cam_director.gd` BASE 0.86, was 1.06): the pilgrim about a tenth of the screen's height.
 
 ## 6. Effects
 
