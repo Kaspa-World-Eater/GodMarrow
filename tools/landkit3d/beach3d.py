@@ -307,6 +307,163 @@ def wrack():
         P.sphere("lknob%d_b" % i, p1, 0.03, "bone", scale=(1, 1, 0.7))
 
 
+def _blades(verts, faces, x, y, z, ln, lean, bend, w):
+    """one blade of grass as a thin tapered ribbon of three segments, bent over by the wind (into the mesh being built)"""
+    pts = []
+    for k in range(4):
+        u = k / 3.0
+        pts.append((x + lean[0] * ln * u + bend[0] * ln * u * u, y + lean[1] * ln * u + bend[1] * ln * u * u,
+                    z + ln * u * (1.0 - 0.35 * u * u)))
+    base = len(verts)
+    for k, (px, py, pz) in enumerate(pts):
+        ww = w * (1.0 - k / 3.5)
+        verts.append((px - ww * 0.7, py + ww * 0.7, pz))
+        verts.append((px + ww * 0.7, py - ww * 0.7, pz))
+    for k in range(3):
+        a_ = base + 2 * k
+        faces.append((a_, a_ + 1, a_ + 3, a_ + 2))
+
+
+def driftwood():
+    """the drift wood (2026-10-10, Derek: the beach "empty, flat and lifeless"; BF.DRIFT gives where each lies, and its
+    drift of sand): thrown up by the storms, bleached and checked, half sunk in the sand, each its own: forked branches,
+    small logs broken at the ends, root wads with their roots splayed, warped planks. The things a foot to a few yards
+    long that make a beach a beach"""
+    rnd = random.Random(1207)
+    for i, (s_, t_, ang, ln, r, kind) in enumerate(BF.DRIFT):
+        x0, y0 = S.xy(s_, t_)
+        dsx, dsy = S.xy(s_ + math.sin(ang) * 0.5, t_ + math.cos(ang) * 0.5)
+        ux, uy = dsx - x0, dsy - y0
+        ul = math.hypot(ux, uy) or 1.0
+        ux, uy = ux / ul, uy / ul
+
+        def along(u, off=0.0):
+            x, y = x0 + ux * u * ln + (-uy) * off, y0 + uy * u * ln + ux * off
+            return (x, y, _gz(x, y))
+        sink = -0.35 * r                                              # half sunk in the sand
+        if kind in ("log", "branch"):
+            n = 5
+            pts, rad = [], []
+            for k in range(n):
+                u = k / (n - 1) - 0.5
+                x, y, z = along(u, 0.06 * math.sin(k * 1.7 + i) * (1 if kind == "branch" else 0.4))
+                pts.append((x, y, z + r + sink + 0.02 * rnd.uniform(-1, 1)))
+                rad.append(r * (1.0 - (0.45 if kind == "branch" else 0.15) * (k / (n - 1))) * rnd.uniform(0.9, 1.08))
+            P.tube("dw%d" % i, pts, rad, "cedar", 8)
+            if kind == "branch":
+                for q in range(rnd.randint(1, 3)):
+                    u0 = rnd.uniform(-0.3, 0.35)
+                    side = rnd.choice((-1, 1))
+                    x, y, z = along(u0)
+                    bl = ln * rnd.uniform(0.25, 0.45)
+                    ex, ey, ez = along(u0 + 0.18, side * bl)
+                    P.tube("dwb%d_%d" % (i, q), [(x, y, z + r * 0.9 + sink), ((x + ex) / 2, (y + ey) / 2, z + r * 1.3 + sink),
+                                                 (ex, ey, ez + r * 0.5)], [r * 0.6, r * 0.45, r * 0.22], "cedar", 6)
+            else:
+                OBSTACLES.extend([(s_ + math.sin(ang) * ln * u, t_ + math.cos(ang) * ln * u, r + 0.12) for u in (-0.4, -0.13, 0.13, 0.4)])
+        elif kind == "rootwad":
+            x, y, z = along(-0.5)
+            stub = [along(-0.5 + 0.1 * k) for k in range(5)]
+            P.tube("rwl%d" % i, [(px, py, pz + r * 0.8 + sink) for px, py, pz in stub], [r, r * 0.95, r * 0.9, r * 0.85, r * 0.8], "cedar", 8)
+            for q in range(9):                                       # the root plate: roots splayed round the butt
+                aq = 2 * math.pi * q / 9 + rnd.uniform(-0.25, 0.25)
+                rl = r * rnd.uniform(2.5, 4.2)
+                p1 = (x - ux * r * 0.3 + math.cos(aq) * rl * 0.5 * uy, y - uy * r * 0.3 - math.cos(aq) * rl * 0.5 * ux,
+                      z + r * 0.8 + math.sin(aq) * rl * 0.5 + sink)
+                p2 = (x - ux * r * 0.6 + math.cos(aq) * rl * uy, y - uy * r * 0.6 - math.cos(aq) * rl * ux,
+                      max(z + 0.03, z + r * 0.8 + math.sin(aq) * rl + sink))
+                P.tube("rwr%d_%d" % (i, q), [(x, y, z + r * 0.8 + sink), p1, p2], [r * 0.4, r * 0.22, r * 0.06], "cedar", 5)
+            OBSTACLES.append((s_, t_, r * 3.0))
+        else:                                                        # a plank, warped, lying on the sand
+            x, y, z = along(0.0)
+            P.box("dwp%d" % i, (x - ln / 2, y - 0.14, z - 0.02), (x + ln / 2, y + 0.14, z + r), "cedar",
+                  rot_z=math.atan2(uy, ux))
+
+
+def kelp_heaps():
+    """heaps of kelp and wrack left at the high tide line, piled where the swash dropped them: half a yard to a yard
+    across, a tangle of fronds and stipes and bulbs"""
+    rnd = random.Random(77)
+    for h in range(34):
+        t_ = rnd.uniform(T0 + 3, T1 - 3)
+        if abs(t_) > float(BF.side_t(np.array([58.0]))[0]) - 2.0:
+            continue
+        s_ = float(BF.high_tide(np.array([t_]))[0]) + rnd.gauss(0, 0.35)
+        cx, cy = S.xy(s_, t_)
+        R = rnd.uniform(0.3, 0.6)
+        for q in range(rnd.randint(14, 26)):
+            a = rnd.uniform(0, 6.28)
+            d = R * math.sqrt(rnd.random())
+            x, y = cx + math.cos(a) * d, cy + math.sin(a) * d
+            z = _gz(x, y) + 0.03 + 0.18 * (1.0 - d / R) * rnd.random()
+            b = rnd.uniform(0, 6.28)
+            l = rnd.uniform(0.3, 0.9)
+            pts = [(x + math.cos(b) * l * u + math.sin(u * 4 + q) * 0.06, y + math.sin(b) * l * u + math.cos(u * 3 + q) * 0.06,
+                    z + 0.04 * math.sin(u * 3.0)) for u in (0, 0.33, 0.66, 1.0)]
+            P.tube("kh%d_%d" % (h, q), pts, [0.045, 0.05, 0.04, 0.02], "kelp", 5)
+            if rnd.random() < 0.3:
+                P.sphere("khb%d_%d" % (h, q), pts[-1], 0.05, "kelp", scale=(1, 1, 0.8))
+
+
+def cobble_patches():
+    """cobbles gathered in the blowout pans on the backshore, where the wind took the sand and left the stones (the
+    floor's pans): a fist to a head in size, rounded, sitting in the hollow"""
+    rnd = random.Random(91)
+    n = 0
+    for _ in range(9000):
+        s_, t_ = rnd.uniform(26.0, 55.0), rnd.uniform(T0, T1)
+        if float(BF.cove_d(np.array([s_]), np.array([t_]))[0]) > -1.0:
+            continue
+        pan = float(BF._vn2(np.array([s_ * 0.33 + 9.0]), np.array([t_ * 0.33]), 75.0)[0])
+        if pan < 0.72 or rnd.random() > (pan - 0.72) * 4.0:
+            continue
+        x, y = S.xy(s_, t_)
+        r = rnd.uniform(0.07, 0.24)
+        P.sphere("cbp%d" % n, (x, y, _gz(x, y) + r * 0.25), r, "stone", scale=(1.0, rnd.uniform(0.65, 0.95), rnd.uniform(0.45, 0.65)),
+                 rot=(rnd.uniform(-0.3, 0.3), rnd.uniform(-0.3, 0.3), rnd.uniform(0, 6.28)))
+        n += 1
+        if r > 0.18:
+            OBSTACLES.append((s_, t_, r))
+        if n >= 260:
+            break
+    return n
+
+
+def dune_grass():
+    """dead dune grass on the crests and the windward slopes of the dunes, where the sand holds still enough for it:
+    clumps of pale, wiry blades bent over seaward by the one wind, the clumps catching the sand (they are what builds
+    the hummocks). One mesh for all of it"""
+    rnd = random.Random(55)
+    verts, faces = [], []
+    n = 0
+    for _ in range(14000):
+        s_, t_ = rnd.uniform(26.0, 46.0), rnd.uniform(T0, T1)
+        if float(BF.cove_d(np.array([s_]), np.array([t_]))[0]) > -1.5:
+            continue
+        d0 = float(BF.dune_relief(np.array([s_]), np.array([t_]))[0])
+        if d0 < 0.6 or rnd.random() > min(1.0, (d0 - 0.6) * 0.9):
+            continue
+        x, y = S.xy(s_, t_)
+        z = _gz(x, y) - 0.02
+        wx, wy = S.xy(s_ + 1.0, t_)
+        wx, wy = wx - x, wy - y                                       # downwind: seaward
+        for b in range(rnd.randint(7, 14)):
+            a = rnd.uniform(0, 6.28)
+            rr = rnd.uniform(0.0, 0.16)
+            bx, by = x + math.cos(a) * rr, y + math.sin(a) * rr
+            ln = rnd.uniform(0.25, 0.65)
+            lean = (math.cos(a) * 0.25 + wx * 0.25, math.sin(a) * 0.25 + wy * 0.25)
+            bend = (wx * rnd.uniform(0.3, 0.7), wy * rnd.uniform(0.3, 0.7))
+            _blades(verts, faces, bx, by, z, ln, lean, bend, 0.012)
+        n += 1
+        if n >= 420:
+            break
+    if verts:
+        o = P.poly("dunegrass", verts, faces, "straw")
+        o.data.polygons.foreach_set("use_smooth", [True] * len(faces))
+    return n
+
+
 def bones_jam():
     """the bone jam (Derek, 2026-10-09: "Turn the logs into bones"): where a coast piles its drift logs, the Red has
     thrown up giant bones and the storms have jammed them at the back of the beach, piled crosswise as logs pile: long
@@ -914,6 +1071,10 @@ def build(root, material):
     cove_cliffs()
     sea_columns()
     cleft_gate()
+    driftwood()
+    kelp_heaps()
+    cobble_patches()
+    dune_grass()
     if os.environ.get("GM_OBST"):
         with open(os.environ["GM_OBST"], "w") as fh:
             json.dump([[round(a, 2), round(b, 2), round(c, 2)] for a, b, c in OBSTACLES], fh)

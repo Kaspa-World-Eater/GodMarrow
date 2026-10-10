@@ -86,12 +86,15 @@ def height_st(s, t):
     # the berm: near vertical at its crest, the backshore behind it rising gently to the logs
     crest = (WATER - BERM_S) / 8.0
     k = np.clip((BERM_S - se) / 0.55, 0, 1)
-    berm = crest + 0.48 * (k * k * (3 - 2 * k))
-    back = crest + 0.48 + (BERM_S - 0.55 - se) * 0.028
+    berm = crest + 0.85 * (k * k * (3 - 2 * k))                 # (a real step, most of a yard: 2026-10-10)
+    back = crest + 0.85 + (BERM_S - 0.55 - se) * 0.045
     z = np.where(se > WATER, off, np.where(se > BERM_S, face, np.where(se > BERM_S - 0.55, berm, back)))
     # a worn runnel down each cusp bay, where the backwash runs out
     bay = np.clip(-c, 0, 1) ** 2
-    z = z - np.where((se > BERM_S) & (se < WATER + 1.5), 0.08 * bay, 0.0)
+    z = z - np.where((se > BERM_S) & (se < WATER + 1.5), 0.2 * bay, 0.0)
+    # ridge and runnel on the low beach face: a bar the swash built and the trough behind it, along the shore
+    rr = np.where((se > BERM_S + 1.0) & (se < WATER - 0.8), 0.16 * np.sin((se - BERM_S) * 1.1 + 0.4 * np.sin(t * 0.13)), 0.0)
+    z = z + rr
     # ---- the dry sand's depth (MASTER_RULES 0.5b; Derek: "just so flat. Shouldn't it have depth profiles"): the
     # landform, the drift and the grain, all by cause. The one wind blows off the land out to sea (+s), so every dune's
     # gentle stoss faces the land and its steep slip face the sea; its crests run along the shore ----
@@ -100,7 +103,7 @@ def height_st(s, t):
     # the grain: wind ripples over all the dry sand, stronger in the swales where the sand runs loose
     r = SF.ripple_phase(s, t) % 1.0
     loose = 0.55 + 0.45 * np.clip((_vn1(s * 0.3 + t * 0.21, 51.0) - 0.2) * 2.0, 0, 1)
-    z = z + (SF.ripple_profile(r) - 0.5) * 0.075 * loose * dry
+    z = z + (SF.ripple_profile(r) - 0.5) * 0.14 * loose * dry           # (readable at the camera, 2026-10-10)
     # the footprints coming up out of the Red (the area page: the one true detail)
     dz, _ = prints(s, t)
     # the cove's edges: the talus apron at the cliffs' feet, the cleft's ramp
@@ -186,37 +189,83 @@ def _dune(u, crest, h, stoss, lee):
 
 
 def dune_relief(s, t):
-    """the backshore's landforms and drifts, by cause (yards of height added to the profile)"""
+    """the backshore's landforms and drifts, by cause (yards of height added to the profile). (2026-10-10, Derek: the sand
+    "still looks like flat ass ... empty, flat and lifeless. Not like a beach at all", "using depth profiles ... to make
+    it look like it's rising falling": everything here made big enough to read at the game's camera under a soft light,
+    slopes kept walkable, about one in two at the steepest)"""
     s = np.asarray(s, float)
     t = np.asarray(t, float)
-    # the foredune behind the storm line: the wind lifts sand off the beach and drops it where the jam's bones and the
-    # wrack break its flow; its crest wanders, breached by blowouts where the wind found a gap and scooped it out
-    fc = 40.5 + 1.6 * np.sin(t * 0.09 + 0.4) + 1.1 * (_vn1(t * 0.23, 61.0) - 0.5)
-    fh = 1.15 + 0.45 * _vn1(t * 0.17, 63.0)
-    blow = np.clip((_vn1(t * 0.11, 65.0) - 0.62) * 5.0, 0, 1)              # a blowout: the ridge scooped down
-    fore = _dune(s, fc, fh * (1 - 0.75 * blow), 7.0, 2.4)
-    fore = fore - 0.35 * blow * np.exp(-((s - fc - 1.0) / 2.2) ** 2)       # its floor scoured below the sand round it
-    # low dunes and swales inland of it, between it and the back rim: crests along the shore, each its own
-    ph = (s - 26.0) / 8.5 + 0.35 * np.sin(t * 0.07 + 1.3) + 0.6 * (_vn1(t * 0.12 + s * 0.05, 67.0) - 0.5)
+    # the landform. The foredune behind the storm line, two yards and more, its crest wandering, breached by blowouts
+    # where the wind found a gap and scooped it out to below the sand round it
+    fc = 40.5 + 2.2 * np.sin(t * 0.09 + 0.4) + 1.6 * (_vn1(t * 0.23, 61.0) - 0.5)
+    fh = 2.0 + 0.9 * _vn1(t * 0.17, 63.0)
+    blow = np.clip((_vn1(t * 0.11, 65.0) - 0.6) * 4.0, 0, 1)
+    fore = _dune(s, fc, fh * (1 - 0.8 * blow), 9.0, 4.2)
+    fore = fore - 0.6 * blow * np.exp(-((s - fc - 1.0) / 2.6) ** 2)
+    # dunes and swales inland of it, each its own height and crest line, the swales between them deep enough to hide in
+    ph = (s - 26.0) / 9.0 + 0.45 * np.sin(t * 0.07 + 1.3) + 0.7 * (_vn1(t * 0.12 + s * 0.05, 67.0) - 0.5)
     fr = ph - np.floor(ph)
-    low = 0.55 * (0.6 + 0.4 * _vn1(t * 0.2 + np.floor(ph) * 3.1, 69.0)) * np.where(fr < 0.7, (fr / 0.7) ** 1.5, ((1 - fr) / 0.3) ** 1.2)
+    low = 1.35 * (0.55 + 0.45 * _vn1(t * 0.2 + np.floor(ph) * 3.1, 69.0)) * np.where(fr < 0.68, (fr / 0.68) ** 1.5, ((1 - fr) / 0.32) ** 1.2)
     low = low * np.clip((fc - 3.0 - s) / 3.0, 0, 1)
+    # the whole backshore rolls: broad hummocky ground under everything, a yard of rise and fall across ten
+    roll = 0.75 * (_vn2(s * 0.09, t * 0.09, 81.0) - 0.5) + 0.35 * (_vn2(s * 0.21, t * 0.21, 83.0) - 0.5)
     # the jam's swale: the bones lie in a hollow the storms scoured between the beach and the dune
-    swale = -0.32 * np.exp(-((s - 47.0) / 3.2) ** 2) * (0.7 + 0.3 * _vn1(t * 0.2, 71.0))
-    # hummocks: low mounds where a tuft of wrack or a stone held the sand
-    hum = 0.16 * np.clip((_vn2(s * 0.55, t * 0.55, 73.0) - 0.62) * 3.0, 0, 1)
-    # drifts round what stands: a scour hollow on the windward (land) side, a sand tail on the lee (seaward)
+    swale = -0.7 * np.exp(-((s - 47.0) / 3.4) ** 2) * (0.7 + 0.3 * _vn1(t * 0.2, 71.0))
+    # the drift. Hummocks where a tuft of wrack or a stone held the sand, half a yard; small blowout pans scooped between
+    hum = 0.45 * np.clip((_vn2(s * 0.5, t * 0.5, 73.0) - 0.55) * 2.6, 0, 1)
+    pan = -0.35 * np.clip((_vn2(s * 0.33 + 9.0, t * 0.33, 75.0) - 0.7) * 3.5, 0, 1)
+    # drifts round what stands, and round every piece of drift wood: a scour hollow on the windward (land) side, a sand
+    # tail on the lee (seaward), the sand banked along a log's land side and scoured round its ends
     drift = np.zeros_like(s)
-    for (ps, pt, r) in STANDING:
+    for (ps, pt, r) in STANDING + [(d[0], d[1], d[4] * 2.2) for d in DRIFT]:
         ds, dt = s - ps, t - pt
-        drift = drift - 0.28 * r * np.exp(-((ds + r * 1.4) ** 2 + (dt * 0.8) ** 2) / (r * r * 1.2))
-        tail = np.clip(ds / (r * 5.0), 0, 1)
-        drift = drift + 0.22 * r * np.exp(-(dt / (r * (1.0 - 0.5 * tail))) ** 2) * np.where(ds > 0, (1 - tail) ** 1.4, 0.0)
-    return fore + low + swale + hum + drift
+        drift = drift - 0.45 * r * np.exp(-((ds + r * 1.4) ** 2 + (dt * 0.8) ** 2) / (r * r * 1.2))
+        tail = np.clip(ds / (r * 6.0), 0, 1)
+        drift = drift + 0.38 * r * np.exp(-(dt / (r * (1.0 - 0.5 * tail))) ** 2) * np.where(ds > 0, (1 - tail) ** 1.4, 0.0)
+    return fore + low + roll + swale + hum + pan + drift
 
 
 # what stands on the dry sand and shapes its drifts (s, t, reach): the shrine and the cairns (beach3d)
 STANDING = [(37.5, 7.5, 1.0), (33.0, -10.0, 0.5), (41.5, 21.0, 0.5), (30.5, 28.5, 0.5), (45.0, -31.0, 0.6), (35.5, -2.5, 0.5)]
+
+
+def _drift_list():
+    """the drift wood (built by beach3d.driftwood, its drifts here): thrown up by the storms and left where the sea
+    could carry it, so most along the storm line and against the foredune's foot, some far up in the swales, a few
+    stranded on the berm; each (s, t, angle, length, radius, kind): branch, log, root wad or plank"""
+    rnd = np.random.default_rng(1207)
+    out = []
+    tries = 0
+    while len(out) < 90 and tries < 4000:
+        tries += 1
+        band = rnd.random()
+        if band < 0.4:
+            s_ = BERM_S - 4.3 + rnd.normal(0, 0.9)              # the storm line
+        elif band < 0.65:
+            s_ = 41.0 + rnd.normal(0, 1.2)                      # the foredune's foot
+        elif band < 0.9:
+            s_ = rnd.uniform(27.0, 39.0)                        # the swales
+        else:
+            s_ = BERM_S + rnd.uniform(0.3, 2.5)                 # stranded on the berm
+        t_ = rnd.uniform(-34.0, 34.0)
+        if abs(s_ - 47.0) < 3.5 and abs(t_) < 22.0:
+            continue                                            # the bone jam's hollow is its own
+        if any(abs(s_ - a) < 2.5 and abs(t_ - b) < 2.5 for a, b, _ in STANDING):
+            continue
+        if any(abs(s_ - d[0]) < 1.6 and abs(t_ - d[1]) < 1.6 for d in out):
+            continue
+        k = rnd.random()
+        kind = "branch" if k < 0.45 else ("log" if k < 0.7 else ("rootwad" if k < 0.85 else "plank"))
+        ln = {"branch": rnd.uniform(1.2, 3.2), "log": rnd.uniform(2.0, 4.5), "rootwad": rnd.uniform(1.4, 2.6),
+              "plank": rnd.uniform(1.0, 2.4)}[kind]
+        r = {"branch": rnd.uniform(0.05, 0.11), "log": rnd.uniform(0.16, 0.3), "rootwad": rnd.uniform(0.2, 0.32),
+             "plank": rnd.uniform(0.05, 0.08)}[kind]
+        ang = rnd.normal(0.0, 0.5) + (0.0 if band < 0.65 else rnd.uniform(-1.2, 1.2))   # laid along the shore, mostly
+        out.append((float(s_), float(t_), float(ang), float(ln), float(r), kind))
+    return out
+
+
+DRIFT = _drift_list()
 
 
 def height(x, y):
