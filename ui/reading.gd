@@ -13,7 +13,9 @@ extends CanvasLayer
 ## (Derek, 2026-10-10: "pick 3 face down from every draw, then they are shown face down and flipped over") the pilgrim
 ## draws three blind from the fan; they fly out and land face down in a row, turn themselves over one after another, and
 ## the pilgrim chooses one (hovering weighs it); the other two go back into the deck, and the chosen one flies to its
-## place, where the deck may still turn it reversed. The card under the body is one blind draw, and stays face down
+## place. Which way up a card lies is settled when it is drawn (Derek, 2026-10-10: "it should happen when we draw it and
+## it flips to reveal with the stranger mentioning it"): a reversed one turns up head down, he says so as it turns, and
+## it keeps that way to the end. The card under the body is one blind draw, and stays face down
 ## until the end. Then he weaves the whole spread into one telling, a part to a click, and how the cards lie changes what
 ## he says; the last words send the pilgrim to the black mirror. What each card does in each place is never shown: it
 ## comes from the old pools of data/reading.json by card, place and which way up, summed within the caps into the
@@ -26,7 +28,9 @@ extends CanvasLayer
 ## Tests (GM_READ_ACT): "all" plays it through and rises; "end" lets him lay the rest and clicks through the telling;
 ## "pick" stops with three drawn face down; "flip" stops mid-turn; "offer" stops at the choice, weighing the middle
 ## card; "type" stops with the first card's story half told; "final" stops at the last words, waiting for the click;
-## "esc" presses Esc with two of the three drawn, then clicks through the telling and rises.
+## "esc" presses Esc with two of the three drawn, then clicks through the telling and rises; "shuffle" stops mid-riffle;
+## "slow" plays it all through like "all" but lets every line type out in full first; "stack" stops at the crown, the
+## deck lying squared.
 
 const U := preload("res://ui/uikit.gd")
 const BONE := Color("#dcd3c2")
@@ -50,7 +54,7 @@ const LAB := {"con": " Constitution", "vit": " Vitality", "spi": " Essence", "li
 	"lok": " life after each kill", "armor": " armor", "mf": "% magic find", "hpPct": "% life", "dmg": "% damage",
 	"dmg_night": "% damage in the dark", "dmg_day": "% damage under an open sky", "raised": "% damage to the raised dead",
 	"fcr": "% faster cast rate", "gold": "% gold found", "res": "% magic resist", "res_fire": "% fire resist",
-	"res_cold": "% cold resist", "res_poison": "% poison resist", "frw": "% faster movement", "xp": "% experience",
+	"res_cold": "% cold resist", "res_poison": "% miasma resist", "frw": "% faster movement", "xp": "% experience",
 	"lrad": "% lantern reach", "potion": "% from draughts"}
 ## the hidden effects: each place's own pool in data/reading.json
 const POOL := {"brow": "cards", "heart": "seeks", "lhand": "answers", "rhand": "sacs", "belly": "fears", "feet": "roads", "under": "cards"}
@@ -67,7 +71,9 @@ var main: Node
 var cls := "animancer"
 var R: Dictionary = {}            # data/reading.json (the old pools: the hidden effects, the calling, the prophecies)
 var S: Dictionary = {}            # data/reading_spread.json (the places, the mantles' words, the weaving)
-var root: Control
+var root: Control                 # the whole window: the backdrop, and every click
+var stage: Control                # the spread's 1920 x 1080, centred in it
+const BASE := Vector2(1920, 1080)
 var tex := {}
 var t := 0.0
 var deck: Array = []              # the mantles still face down in the fan
@@ -93,6 +99,9 @@ var picked: Array = []            # the three drawn blind for this place: {m, fr
 var flip_i := 0                   # which of the three is turning itself over
 var flip_wait := 0.0
 var offer: Array = []             # the three, face up: the pilgrim chooses one
+var offer_rev: Array = []         # which of them turned up head down (reversed)
+var rev_said: Array = []          # the reversal lines said for this place's three
+var said_lines := {}              # every line he has said in this Reading: none is ever said twice
 var back: Array = []              # the two passed over, going home to the deck: {m, from, t}
 const OW := 162.0                 # a drawn card in the row: 54 x 84, drawn x3
 const OH := 252.0
@@ -100,7 +109,17 @@ var tale: Array = []              # the end, told one part to a click: {pid, tex
 var tale_n := 0                   # how many parts are begun
 var tale_t := 0.0                 # time since the last part began
 var sum_a := 0.0                  # the hand's sum, coming up
-var tp := {}                      # what he is saying -> how many letters of it are out
+var typed := 0.0                  # how many letters of what he is saying now are out
+var typed_key := ""               # what he is saying now: a new line always starts from its first letter
+## the deck before the spread (Derek, 2026-10-10: "the deck should be stacked before the spread and show the shuffle"):
+## squared in a stack while he reads the crown; then cut in two, riffled together, squared, and fanned out
+const STACK := Vector2(440, 610)  # where the stack lies (the middle of the fan)
+const SHUF_SPLIT := 0.3           # the cut: the top half off to the right
+const SHUF_RIFFLE := 1.05         # the riffle: the two halves let go into each other (the sound with it)
+const SHUF_SQUARE := 1.4          # the bridge and the squaring
+const SHUF_FAN := 1.55            # then the fan, card by card
+const SHUF_END := 2.05
+var shuf := -1.0                  # the shuffle's clock: below 0 the deck lies stacked; at SHUF_END it is fanned
 
 func _init(m: Node = null, c: String = "animancer") -> void:
 	main = m
@@ -115,13 +134,21 @@ func _ready() -> void:
 	S = k if k is Dictionary else {}
 	deck = S.get("mantles", []).duplicate()
 	deck.shuffle()
+	# the whole screen (Derek, 2026-10-10: "make the tarot the whole screen"): the backdrop fills the window edge to edge
+	# at any shape (the viewport grows past 1920 x 1080 when the window is not 16:9); the spread is laid out on a 1920 x
+	# 1080 stage kept in the middle of it
 	root = Control.new()
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
-	root.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	root.draw.connect(_draw_all)
+	root.draw.connect(_draw_back)
 	root.gui_input.connect(_gui)
 	add_child(root)
+	stage = Control.new()
+	stage.size = BASE
+	stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	stage.draw.connect(_draw_all)
+	root.add_child(stage)
 	auto = OS.get_environment("GM_READ_ACT")
 	# the crown: the calling, face up, the one card it knows
 	var st: Dictionary = R.get("stars", {}).get(cls, {})
@@ -148,6 +175,27 @@ func _place() -> Dictionary:
 	var ps := _places()
 	return ps[place_i] if place_i < ps.size() else {}
 
+## what a card means in this place, its way up (each card has its own reading for every place of the spread); the
+## card's one gist only if the place has none
+func _mean(m: Dictionary, pid: String, rev: bool) -> String:
+	var mn = m.get("mean", {}).get(pid)
+	if mn is Array and mn.size() == 2:
+		return String(mn[1 if rev else 0])
+	return String(m.get("gist_rev" if rev else "gist", ""))
+
+## one of his lines from a pool, never one he has said before in this Reading (Derek, 2026-10-10: "he says it too
+## much"); "" when the pool is spent, and then he says nothing
+func _line(pool: Array) -> String:
+	var fresh: Array = []
+	for l in pool:
+		if String(l) != "" and not said_lines.has(String(l)):
+			fresh.append(String(l))
+	if fresh.is_empty():
+		return ""
+	var l: String = fresh[randi() % fresh.size()]
+	said_lines[l] = true
+	return l
+
 ## a card's meaning set into a line: {g} as it is, {G} with a capital (it begins a sentence)
 func _fill(line: String, g: String) -> String:
 	return line.replace("{g}", g).replace("{G}", g.substr(0, 1).to_upper() + g.substr(1))
@@ -163,34 +211,42 @@ func _speech() -> Array:
 	var w := said if said != "" else prompt
 	if w == "":
 		return ["", 0]
-	return ["%d|%s" % [place_i, w], w.length()]
+	return [w, w.length()]
+
+## the same for every line he says (Derek, 2026-10-10: "doesnt animate in consistantly"): whenever what he is saying
+## changes, it types in again from its first letter; only when he goes on (new words after a breath, _say_on) does what
+## was already out stay out
+func _sync() -> void:
+	var k := String(_speech()[0])
+	if k == typed_key:
+		return
+	if not (phase != "end" and typed_key != "" and k.begins_with(typed_key + "\n\n")):
+		typed = 0.0
+	typed_key = k
 
 func _shown() -> int:
-	var sp := _speech()
-	return int(float(tp.get(sp[0], 0.0)))
+	_sync()
+	return int(typed)
 
 func _typing() -> bool:
-	var sp := _speech()
-	return int(sp[1]) > 0 and float(tp.get(sp[0], 0.0)) < float(sp[1])
+	_sync()
+	var n: int = _speech()[1]
+	return n > 0 and typed < float(n)
 
 ## a click or a key while he speaks: the whole line at once
 func _hurry() -> void:
-	var sp := _speech()
-	if int(sp[1]) > 0:
-		tp[sp[0]] = float(sp[1])
+	_sync()
+	typed = maxf(typed, float(_speech()[1]))
 
 func _type(dt: float) -> void:
-	var sp := _speech()
-	var n: int = sp[1]
-	if n <= 0:
-		return
-	var v := float(tp.get(sp[0], 0.0))
-	if v >= n:
-		return
-	v = minf(float(n), v + dt * CPS)
+	_sync()
+	var n: int = _speech()[1]
+	if n <= 0 or typed >= n or fade < 0.5:
+		return                                       # (the first words wait for the cards to come up)
+	var v := minf(float(n), typed + dt * CPS)
 	if auto == "type" and phase == "told" and v >= n * 0.45:
-		return                                       # (test: hold the first card's story half told)
-	tp[sp[0]] = v
+		return                                       # (test "type": hold the first card's story half told)
+	typed = v
 
 # ------------------------------------------------------------------ the draw
 
@@ -202,9 +258,10 @@ func _begin_place() -> void:
 	said = ""
 	hover = -1
 	picked = []
+	rev_said = []
 	var pid := String(p["id"])
 	var a: Array = p.get("ask", [""])
-	prompt = String(a[randi() % a.size()])
+	prompt = _line(a)
 	# the choice: three drawn blind from the fan, turned over, one chosen; the last card is one blind draw
 	phase = "pick" if pid != "under" and deck.size() >= 3 else "draw"
 
@@ -225,7 +282,7 @@ func _pick_card(i: int) -> void:
 	var c := _fan(i, deck.size())
 	var m: Dictionary = deck[i]
 	deck.remove_at(i)
-	picked.append({"m": m, "from": c[0], "ang": c[1], "t": 0.0, "flip": 0.0})
+	picked.append({"m": m, "from": c[0], "ang": c[1], "t": 0.0, "flip": 0.0, "rev": randf() < 0.32})   # its way up, settled now
 	hover = -1
 	Sfx.play("page_open", 0.55, 1.15)
 
@@ -256,34 +313,59 @@ func _pick_tick(dt: float) -> void:
 		if f <= 0.0:
 			Sfx.play("page_close", 0.45, 1.25)
 		pk["flip"] = minf(1.0, f + dt / 0.25)
+		if f < 0.5 and float(pk["flip"]) >= 0.5 and pk["rev"]:
+			_rev_line()                              # it turns up head down, and he says so
 		if float(pk["flip"]) >= 1.0:
 			flip_i += 1
 			flip_wait = 0.08
 		return
 	offer = []
+	offer_rev = []
 	for pk in picked:
 		offer.append(pk["m"])
+		offer_rev.append(pk["rev"])
 	picked = []
 	phase = "offer"
 	var dl: Array = S.get("deal", {}).get(String(_place().get("id", "")), [""])
-	prompt = String(dl[randi() % dl.size()])
+	var deal := _line(dl)
+	if rev_said.is_empty():
+		prompt = deal
+	elif deal != "":
+		_say_on(deal)
 
-## the pilgrim chooses one of the three; the others go back into the deck; the deck may still turn it over as it lands
+## he goes on speaking: the new words follow the old, and what was already out stays out
+func _say_on(more: String) -> void:
+	_sync()
+	prompt = prompt + "\n\n" + more if prompt != "" else more
+
+## a card of the three turns up head down: he says so, then and there (TURNED; one line a card, never the same twice)
+func _rev_line() -> void:
+	var line := _line(S.get("turned", []))
+	if line == "":
+		return
+	if rev_said.is_empty():
+		prompt = line
+	else:
+		_say_on(line)
+	rev_said.append(line)
+
+## the pilgrim chooses one of the three, the way up it turned; the others go back into the deck
 func _choose(i: int) -> void:
 	if phase != "offer" or i < 0 or i >= offer.size():
 		return
 	var m: Dictionary = offer[i]
+	var rev: bool = offer_rev[i]
 	for k in offer.size():
 		if k != i:
-			back.append({"m": offer[k], "from": _offer_c(k), "t": 0.0})
+			back.append({"m": offer[k], "from": _offer_c(k), "t": 0.0, "rev": offer_rev[k]})
 	var from := _offer_c(i)
 	offer = []
+	offer_rev = []
 	var pid := String(_place()["id"])
-	fly = {"m": m, "rev": randf() < 0.32, "from": from, "to": SLOT[pid], "t": 0.0, "place": pid, "face": true, "big": true}
+	fly = {"m": m, "rev": rev, "from": from, "to": SLOT[pid], "t": 0.0, "place": pid, "face": true, "big": true}
 	phase = "fly"
 	hover = -1
-	var cl: Array = S.get("chose", [""])
-	prompt = String(cl[randi() % cl.size()])
+	prompt = ""                                      # (nothing said over what the screen already shows)
 	said = ""
 	Sfx.play("page_open", 0.8, 0.85)
 	Sfx.play("shuffle", 0.7)
@@ -302,11 +384,13 @@ func _back_flush() -> void:
 		deck.append(r["m"])
 	back = []
 
-## the meaning of an offered card in this place, as the pilgrim weighs it (upright: the deck has not turned it yet)
+## the meaning of an offered card in this place, as the pilgrim weighs it, the way up it turned
 func _weigh(i: int) -> String:
 	var m: Dictionary = offer[i]
+	var rev: bool = offer_rev[i] if i < offer_rev.size() else false
 	var pid := String(_place().get("id", ""))
-	return "%s. %s" % [_name_of(m), _fill(String(S.get("on", {}).get(pid, "{G}.")), String(m.get("gist", "")))]
+	return "%s%s. %s" % [_name_of(m), ", reversed" if rev else "", _fill(String(S.get("on", {}).get(pid, "{G}.")),
+		_mean(m, pid, rev))]
 
 ## the card at fan index i, drawn: it flies to the place and lands upright or reversed
 func _draw_card(i: int) -> void:
@@ -330,11 +414,8 @@ func _landed() -> void:
 	_take(pid, m, fly["rev"])
 	fly = {}
 	if chosen:
-		# chosen face up: its story at once, and if the deck turned it as it landed, he says so first
+		# chosen face up, the way it turned: its story at once
 		_turned(pid)
-		if fly_rev_last:
-			var tv: Array = S.get("turned", [""])
-			said = String(tv[randi() % tv.size()]) + "\n\n" + said
 		return
 	if pid == "under":
 		# it stays face down, under everything, until the end
@@ -344,7 +425,7 @@ func _landed() -> void:
 		return
 	phase = "turn"
 	var dr: Array = S.get("drawn_rev" if fly_rev_last else "drawn", [""])
-	prompt = String(dr[randi() % dr.size()])
+	prompt = _line(dr)
 
 func _turn() -> void:
 	var pid := String(_place().get("id", ""))
@@ -359,16 +440,19 @@ func _turned(pid: String) -> void:
 	said = String(m.get("say_rev" if c["rev"] else "say", ""))
 	var rd: Array = S.get("read", {}).get(pid, [])
 	if not rd.is_empty():
-		said += "\n\n" + _fill(String(rd[randi() % rd.size()]), String(m.get("gist_rev" if c["rev"] else "gist", "")))
+		var rl := _line(rd)
+		if rl != "":
+			said += "\n\n" + _fill(rl, _mean(m, pid, c["rev"]))
 	phase = "told"
 
 func _next() -> void:
 	if phase == "open":
 		phase = "deck"
 		var dl: Array = S.get("deck_open", [""])
-		said = String(dl[randi() % dl.size()])
-		Sfx.play("shuffle", 0.8)
+		said = _line(dl)
+		shuf = 0.0                                   # the shuffle begins (its sound comes with the riffle)
 	elif phase == "deck":
+		shuf = SHUF_END
 		place_i = 0
 		_begin_place()
 	elif phase == "told":
@@ -381,11 +465,16 @@ func _name_of(m: Dictionary) -> String:
 			return String(c.get("name", ""))
 	return String(m.get("id", ""))
 
-## what the card does in this place, this way up: taken from the place's own old pool, never shown
+## what the card does in this place, this way up, never shown: the card's own table for the place (each gives and takes,
+## balanced over a whole hand; tools/reading/spread_data.py, tools/reading/balance_check.py); the old pools of
+## data/reading.json only for a card without one
 func _take(pid: String, m: Dictionary, rev: bool) -> void:
 	var fx: Dictionary = {}
 	var key: String = POOL.get(pid, "cards")
-	if key == "cards":
+	var own = m.get("fx", {}).get(pid) if m.get("fx") is Dictionary else null
+	if own is Array and own.size() == 2:
+		fx = own[1 if rev else 0]
+	elif key == "cards":
 		for c in R.get("cards", []):
 			if c.get("id", "") == m.get("id", ""):
 				fx = c.get("rev", {}).get("fx", c.get("fx", {})) if rev else c.get("fx", {})
@@ -415,10 +504,12 @@ func _skip() -> void:
 	picked = []
 	deck.append_array(offer)
 	offer = []
+	offer_rev = []
 	_back_flush()
 	deck.shuffle()
 	if home:
 		Sfx.play("shuffle", 0.6)
+	shuf = SHUF_END
 	if phase == "fly":
 		_landed()
 	if phase == "open" or phase == "deck":
@@ -447,6 +538,7 @@ func _end() -> void:
 	said = ""
 	picked = []
 	offer = []
+	offer_rev = []
 	_back_flush()
 	telling = _weave()
 	var ids := {}
@@ -473,7 +565,10 @@ func _end() -> void:
 	var go: Array = T.get("go", [""]) if T.get("go") is Array else [String(T.get("go", ""))]
 	tale.append({"pid": "", "kind": "prophecy", "text": ""})
 	tale.append({"pid": "", "kind": "sum", "text": ""})
-	tale.append({"pid": "", "kind": "go", "text": String(go[randi() % go.size()])})
+	# the calling it has become, a paragraph to a click, its card lit at the crown
+	for para in S.get("calling", {}).get(cls, []):
+		tale.append({"pid": "crown", "kind": "calling", "text": String(para)})
+	tale.append({"pid": "", "kind": "go", "text": _line(go)})
 
 func _phrase(c: Dictionary) -> String:
 	var m: Dictionary = c["m"]
@@ -486,7 +581,7 @@ func _weave() -> String:
 	tale = []
 	var pick := func(key: String) -> String:
 		var v: Array = T.get(key, [""]) if T.get(key) is Array else [String(T.get(key, ""))]
-		return String(v[randi() % v.size()])
+		return _line(v)
 	for key in S.get("tale_order", []):
 		if key == "open":
 			tale.append({"pid": "", "text": pick.call("open")})
@@ -496,7 +591,7 @@ func _weave() -> String:
 		var c: Dictionary = laid[key]
 		var m: Dictionary = c["m"]
 		var wears := String(m.get("wears", ""))
-		var txt := _fill(String(pick.call(key)).replace("{p}", _phrase(c)), String(m.get("gist_rev" if c["rev"] else "gist", "")))
+		var txt := _fill(String(pick.call(key)).replace("{p}", _phrase(c)), _mean(m, key, c["rev"]))
 		txt = txt.replace("{W}", wears.substr(0, 1).to_upper() + wears.substr(1))
 		tale.append({"pid": key, "text": txt})
 	var sh: Dictionary = S.get("shapes", {})
@@ -629,6 +724,11 @@ func _process(dt: float) -> void:
 			_landed()
 	_pick_tick(dt)
 	_back_tick(dt)
+	if _shuffling() and not (auto == "shuffle" and shuf >= 0.62):   # (test "shuffle": hold it mid-riffle)
+		var was := shuf
+		shuf = minf(SHUF_END, shuf + dt)
+		if was < SHUF_SPLIT and shuf >= SHUF_SPLIT:
+			Sfx.play("shuffle", 0.85)
 	for pid in laid:
 		if laid[pid].has("turning"):
 			laid[pid]["flip"] = minf(1.0, float(laid[pid]["flip"]) + dt / 0.4)
@@ -642,7 +742,7 @@ func _process(dt: float) -> void:
 			tale_n = 1
 			tale_t = 0.0
 		var ck := _kind(tale_n - 1)
-		if ck == "go" or (ck == "sum" and not _typing()):
+		if ck == "sum" and not _typing():
 			sum_a = minf(1.0, sum_a + dt / 0.8)
 		if laid.has("under") and tale_n > 0 and _turned_under() and float(laid["under"]["flip"]) < 1.0:
 			laid["under"]["flip"] = minf(1.0, float(laid["under"]["flip"]) + dt / 0.6)
@@ -655,10 +755,16 @@ func _process(dt: float) -> void:
 			return
 	if auto != "" and leaving < 0.0 and fmod(t, 0.3) < dt:
 		_auto()
+	stage.position = ((root.size - BASE) / 2.0).floor()
 	root.queue_redraw()
+	stage.queue_redraw()
 
 ## the test runs (GM_READ_ACT), a click every 0.3 s
 func _auto() -> void:
+	if auto == "slow" and _typing():
+		return                                       # (test "slow": every line typed out in full, at his own pace)
+	if auto == "stack":
+		return                                       # (test "stack": the deck lying squared, before the shuffle)
 	if auto == "end" or auto == "final":
 		if phase != "end":
 			_skip()
@@ -671,6 +777,8 @@ func _auto() -> void:
 		"open", "deck":
 			if _typing():
 				_hurry()
+			elif phase == "deck" and (auto == "shuffle" or _shuffling()):
+				return                               # (the shuffle plays out; test "shuffle" holds it)
 			else:
 				_next()
 		"told":
@@ -712,14 +820,21 @@ func _fan_hit(p: Vector2) -> int:
 	return -1
 
 func _fan_live() -> bool:
-	return phase == "draw" or (phase == "pick" and picked.size() < 3)
+	return shuf >= SHUF_END and (phase == "draw" or (phase == "pick" and picked.size() < 3))
+
+func _shuffling() -> bool:
+	return shuf >= 0.0 and shuf < SHUF_END
 
 func _at_last() -> bool:
 	return phase == "end" and tale_n >= tale.size() and tale_n > 0 and not _typing()
 
-func _gui(ev: InputEvent) -> void:
+func _gui(ev0: InputEvent) -> void:
 	if leaving >= 0.0:
 		return
+	var ev := ev0
+	if ev0 is InputEventMouse:
+		ev = ev0.duplicate()
+		ev.position = ev0.position - stage.position       # (the stage's own coordinates)
 	if ev is InputEventMouseMotion:
 		var h := -1
 		if _fan_live():
@@ -753,8 +868,10 @@ func _gui(ev: InputEvent) -> void:
 				else:
 					_turn()
 			"open", "deck", "told":
-				if _typing():
-					_hurry()
+				if _typing() or (phase == "deck" and _shuffling()):
+					_hurry()                         # (his words, and the shuffle, all at once)
+					if phase == "deck":
+						shuf = SHUF_END
 				else:
 					_next()
 			"end":
@@ -830,16 +947,23 @@ func _type_draw(ci: CanvasItem, text: String, f: Font, size: int, lh: float, at:
 		y += lh
 	return y
 
-func _card_at(ci: CanvasItem, c: Vector2, texture: Texture2D, ang: float, sx: float, a: float, lift: float = 0.0, sz: Vector2 = Vector2(SW, SH)) -> void:
+func _card_at(ci: CanvasItem, c: Vector2, texture: Texture2D, ang: float, sx: float, a: float, lift: float = 0.0, sz: Vector2 = Vector2(SW, SH), tint: float = 1.0, shade: bool = true) -> void:
 	ci.draw_set_transform(c + Vector2(0, -lift), ang, Vector2(maxf(sx, 0.02), 1.0))
-	ci.draw_rect(Rect2(Vector2(-sz.x / 2.0 + 5, -sz.y / 2.0 + 8), sz), Color(0, 0, 0, 0.45 * a))
-	ci.draw_texture_rect(texture, Rect2(-sz / 2.0, sz), false, Color(1, 1, 1, a))
+	if shade:
+		ci.draw_rect(Rect2(Vector2(-sz.x / 2.0 + 5, -sz.y / 2.0 + 8), sz), Color(0, 0, 0, 0.45 * a))
+	ci.draw_texture_rect(texture, Rect2(-sz / 2.0, sz), false, Color(tint, tint, tint, a))
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+func _alpha() -> float:
+	return fade if leaving < 0.0 else fade * (1.0 - clampf(leaving / 1.2, 0.0, 1.0))
+
+## the backdrop: the world dimmed, edge to edge
+func _draw_back() -> void:
+	root.draw_rect(Rect2(Vector2.ZERO, root.size), Color(0.01, 0.01, 0.015, 0.66 * _alpha()))
 
 func _draw_all() -> void:
 	var a := fade if leaving < 0.0 else fade * (1.0 - clampf(leaving / 1.2, 0.0, 1.0))
-	var ci := root
-	ci.draw_rect(Rect2(0, 0, 1920, 1080), Color(0.01, 0.01, 0.015, 0.66 * a))
+	var ci := stage
 	var sc := U.font("sc")
 	var fi := U.font("italic")
 	# where we are: the place, and under it what the place holds
@@ -847,6 +971,9 @@ func _draw_all() -> void:
 	var p := _place()
 	var title := "The Telling" if phase == "end" else String(p.get("name", ""))
 	var sub := "" if phase == "end" else String(p.get("what", ""))
+	if phase == "end" and _kind(tale_n - 1) in ["calling", "go"]:
+		title = String(S.get("calling_name", {}).get(cls, title))
+		sub = "what it has become"
 	if phase == "open":
 		title = "The Crown"
 		sub = "what it is"
@@ -876,7 +1003,7 @@ func _draw_all() -> void:
 		ci.draw_rect(Rect2(Vector2(-SW / 2.0, -SH / 2.0), Vector2(SW, SH)), Color(MARROW, al * a), false, 1.5)
 		ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	# the laid cards: face down until turned, then the face, head down when reversed; the one under lies across
-	var in_tale := phase == "end" and (tale_n == 0 or _kind(tale_n - 1) == "tale")
+	var in_tale := phase == "end" and (tale_n == 0 or _kind(tale_n - 1) in ["tale", "calling"])
 	for pid in laid:
 		var cd: Dictionary = laid[pid]
 		var f: float = cd["flip"]
@@ -900,21 +1027,24 @@ func _draw_all() -> void:
 		var u: float = fly["t"]
 		var e := u * u * (3.0 - 2.0 * u)
 		var c3: Vector2 = (fly["from"] as Vector2).lerp(fly["to"], e) + Vector2(0, -60.0 * sin(PI * u))
-		var ang2: float = lerpf(0.0, PI / 2.0 if fly["place"] == "under" else 0.0, e)
+		var ang2: float = lerpf(0.0, PI / 2.0 if fly["place"] == "under" else 0.0, e) + (PI if fly.get("face", false) and fly["rev"] else 0.0)
 		var sz := Vector2(OW, OH).lerp(Vector2(SW, SH), e) if fly.get("big", false) else Vector2(SW, SH)
 		_card_at(ci, c3, _face(fly["m"]) if fly.get("face", false) else _tex("_back"), ang2, 1.0, a, 0.0, sz)
-	# the fan: the deck, face down, waiting
+	# the deck, face down: stacked, then shuffled, then fanned and waiting
 	if phase != "end":
-		var dim := 1.0 if _fan_live() else 0.45
-		for i in deck.size():
-			var fc: Array = _fan(i, deck.size())
-			_card_at(ci, fc[0], _tex("_back"), fc[1], 1.0, a * dim, 26.0 if _fan_live() and i == hover else 0.0)
+		if shuf >= SHUF_END:
+			var dim := 1.0 if _fan_live() else 0.45
+			for i in deck.size():
+				var fc: Array = _fan(i, deck.size())
+				_card_at(ci, fc[0], _tex("_back"), fc[1], 1.0, a * dim, 26.0 if _fan_live() and i == hover else 0.0)
+		else:
+			_draw_shuffle(ci, a)
 	# the two passed over, going home to the fan
 	for r in back:
 		var u2: float = r["t"]
 		var e2 := u2 * u2 * (3.0 - 2.0 * u2)
 		var home: Vector2 = _fan(deck.size() >> 1, maxi(1, deck.size()))[0]
-		_card_at(ci, (r["from"] as Vector2).lerp(home, e2), _face(r["m"]), 0.0, 1.0, a * (1.0 - u2 * 0.7), 0.0, Vector2(OW, OH).lerp(Vector2(SW, SH), e2))
+		_card_at(ci, (r["from"] as Vector2).lerp(home, e2), _face(r["m"]), PI if r.get("rev", false) else 0.0, 1.0, a * (1.0 - u2 * 0.7), 0.0, Vector2(OW, OH).lerp(Vector2(SW, SH), e2))
 	# the three drawn for this place: where they will lie, then flying out face down, then turning themselves over
 	if phase == "pick" or phase == "flip":
 		for k in range(picked.size(), 3):
@@ -926,8 +1056,12 @@ func _draw_all() -> void:
 			var e3 := u3 * u3 * (3.0 - 2.0 * u3)
 			var c4: Vector2 = (pk["from"] as Vector2).lerp(_offer_c(k), e3) + Vector2(0, -50.0 * sin(PI * u3))
 			var fl: float = pk["flip"]
-			_card_at(ci, c4, _tex("_back") if fl < 0.5 else _face(pk["m"]), lerpf(float(pk["ang"]), 0.0, e3), absf(cos(fl * PI)), a, 0.0,
+			# a reversed one turns up head down
+			var up := PI if pk["rev"] and fl >= 0.5 else 0.0
+			_card_at(ci, c4, _tex("_back") if fl < 0.5 else _face(pk["m"]), lerpf(float(pk["ang"]), 0.0, e3) + up, absf(cos(fl * PI)), a, 0.0,
 				Vector2(SW, SH).lerp(Vector2(OW, OH), e3))
+			if fl >= 1.0:
+				_row_name(ci, fi, k, pk["m"], pk["rev"], false, a)
 	# the words
 	if phase == "end":
 		_draw_end(ci, a, sc, fi)
@@ -936,13 +1070,11 @@ func _draw_all() -> void:
 	if phase == "offer":
 		for i in offer.size():
 			var oc := _offer_c(i) + Vector2(0, -20.0 if i == hover else 0.0)
-			_card_at(ci, oc, _face(offer[i]), 0.0, 1.0, a, 0.0, Vector2(OW, OH))
+			var rv: bool = offer_rev[i] if i < offer_rev.size() else false
+			_card_at(ci, oc, _face(offer[i]), PI if rv else 0.0, 1.0, a, 0.0, Vector2(OW, OH))
 			if i == hover:
 				ci.draw_rect(Rect2(oc - Vector2(OW, OH) / 2.0, Vector2(OW, OH)).grow(3), Color(MARROW, 0.8 * a), false, 2.0)
-			var ny := _offer_c(i).y + OH / 2.0 + 30.0
-			for ln in _wrap(_name_of(offer[i]), fi, 22, 228.0):
-				ci.draw_string(fi, Vector2(_offer_c(i).x - 114.0, ny), ln, HORIZONTAL_ALIGNMENT_CENTER, 228, 22, Color(BONE if i == hover else BONE_D, a))
-				ny += 26.0
+			_row_name(ci, fi, i, offer[i], rv, i == hover, a)
 	# his words: under the fan, on the left, clear of the spread; the meaning of a weighed card comes whole
 	var words := said if said != "" else prompt
 	var budget := _shown()
@@ -959,28 +1091,117 @@ func _draw_all() -> void:
 		hint += "    ·    Esc lets him lay the rest"
 	ci.draw_string(fi, Vector2(0, 1056), hint, HORIZONTAL_ALIGNMENT_CENTER, 1920, 22, Color(ASH, a * (0.6 + 0.2 * sin(t * 2.0))))
 
+## a turned card's name under it in the row (and that it lies reversed)
+func _row_name(ci: CanvasItem, fi: Font, i: int, m: Dictionary, rev: bool, lit: bool, a: float) -> void:
+	var ny := _offer_c(i).y + OH / 2.0 + 30.0
+	for ln in _wrap(_name_of(m), fi, 22, 228.0):
+		ci.draw_string(fi, Vector2(_offer_c(i).x - 114.0, ny), ln, HORIZONTAL_ALIGNMENT_CENTER, 228, 22, Color(BONE if lit else BONE_D, a))
+		ny += 26.0
+	if rev:
+		ci.draw_string(fi, Vector2(_offer_c(i).x - 114.0, ny), "reversed", HORIZONTAL_ALIGNMENT_CENTER, 228, 20, Color(MARROW, a))
+
+## a card's place in the squared stack, j cards up from the cloth (each a little higher: the deck's thickness)
+func _lvl(j: int) -> Vector2:
+	return Vector2(0.4 * j, -2.0 * j)
+
+## how light a card in a pile is drawn: the lower, the darker (the thickness reads)
+func _tone(j: int, m: int) -> float:
+	return 0.5 + 0.5 * float(j + 1) / float(maxi(1, m))
+
+## the deck before the spread: the stack, the cut, the riffle (the two halves falling into one, alternately, bottom
+## first), the bridge and the squaring, then the fan coming off the stack card by card
+func _draw_shuffle(ci: CanvasItem, a: float) -> void:
+	var n := deck.size()
+	var bk := _tex("_back")
+	var h := n >> 1
+	var al := a * 0.9
+	var card := Vector2(SW, SH)
+	var gap := 150.0                                 # how far each half sits from the middle while riffled
+	if shuf < SHUF_SPLIT:
+		# the stack; then the cut: the top half lifted off to the right, the bottom half slid left
+		var u := 0.0 if shuf < 0.0 else smoothstep(0.0, 1.0, shuf / SHUF_SPLIT)
+		for k in n:
+			var top := k >= h
+			var lv := _lvl(k).lerp(_lvl(k - h), u) if top else _lvl(k)
+			var c := STACK + lv + Vector2((gap if top else -gap) * u, -40.0 * sin(PI * u) if top else 0.0)
+			_card_at(ci, c, bk, (-0.16 if top else 0.16) * u, 1.0, al, 0.0, card,
+				_tone(k - h, n - h) if top and u > 0.5 else _tone(k, n), k == 0 or (top and k == h and u > 0.0))
+		return
+	if shuf < SHUF_RIFFLE:
+		# the riffle: the halves bent at the thumbs, letting go into the middle one card at a time, left and right in
+		# turn, bottom card first; the pile's edges show the cards' teeth, left, right, left
+		var r := (shuf - SHUF_SPLIT) / (SHUF_RIFFLE - SHUF_SPLIT)
+		var gone := [0, 0]
+		var falling: Array = []
+		for j in n:
+			var t0 := float(j) / float(n) * 0.88
+			if r >= t0:
+				var sd := j % 2
+				if int(gone[sd]) >= (h if sd == 0 else n - h):
+					sd = 1 - sd
+				gone[sd] = int(gone[sd]) + 1
+				falling.append([j, sd, clampf((r - t0) / 0.12, 0.0, 1.0)])
+		for sd in 2:
+			var m: int = (h if sd == 0 else n - h) - int(gone[sd])
+			var sx := -gap if sd == 0 else gap
+			for k in m:
+				_card_at(ci, STACK + _lvl(k) + Vector2(sx, -16.0), bk, 0.16 if sd == 0 else -0.16, 1.0, al, 0.0, card, _tone(k, m), k == 0)
+		for fl in falling:
+			var j: int = fl[0]
+			var sd: int = fl[1]
+			var e := smoothstep(0.0, 1.0, float(fl[2]))
+			var m0: int = (h if sd == 0 else n - h)
+			var from := STACK + _lvl(m0 >> 1) + Vector2((-gap + SW * 0.35) if sd == 0 else (gap - SW * 0.35), -16.0)
+			var to := STACK + _lvl(j) + Vector2(-14.0 if sd == 0 else 14.0, 0)
+			_card_at(ci, from.lerp(to, e) + Vector2(0, -24.0 * sin(PI * e)), bk, lerpf(0.16 if sd == 0 else -0.16, 0.0, e), 1.0, al, 0.0,
+				card, _tone(j, n), j == 0)
+		return
+	if shuf < SHUF_FAN:
+		# the bridge (the pile bowed up once) and the squaring (the teeth pushed true)
+		var q := clampf((shuf - SHUF_RIFFLE) / (SHUF_SQUARE - SHUF_RIFFLE), 0.0, 1.0)
+		var sq := 1.0 - smoothstep(0.0, 1.0, q)
+		for j in n:
+			var bow := -sin(PI * q) * 18.0 * sin(PI * float(j) / float(maxi(1, n - 1)))
+			_card_at(ci, STACK + _lvl(j) + Vector2((-14.0 if j % 2 == 0 else 14.0) * sq, bow), bk, 0.0, 1.0, al, 0.0, card, _tone(j, n), j == 0)
+		return
+	# the fan, coming off the stack one card after another
+	var f := (shuf - SHUF_FAN) / (SHUF_END - SHUF_FAN)
+	for i in n:
+		var e2 := smoothstep(0.0, 1.0, clampf((f - float(i) / float(n) * 0.4) / 0.6, 0.0, 1.0))
+		var fc: Array = _fan(i, n)
+		_card_at(ci, (STACK + _lvl(i)).lerp(fc[0], e2), bk, lerpf(0.0, float(fc[1]), e2), 1.0, lerpf(al, a * 0.45, e2), 0.0, card,
+			lerpf(_tone(i, n), 1.0, e2), i == 0 or e2 > 0.0)
+
 ## the end: the tale a part at a time, then the cards' last words, the hand's sum, and his last words; each waits for
 ## a click
 func _draw_end(ci: CanvasItem, a: float, sc: Font, fi: Font) -> void:
-	var y := 180.0
+	var y := 200.0                                  # (clear of the title and its line)
 	var ck := _kind(tale_n - 1)
 	var budget := _shown()
-	if tale_n == 0 or ck == "tale":
+	if ck == "calling" or ck == "go":
+		# the calling it has become, then his last words, to the black mirror
+		for i in tale_n:
+			if _kind(i) != "calling" and _kind(i) != "go":
+				continue
+			var cur := i == tale_n - 1
+			y = _type_draw(ci, String(tale[i]["text"]), fi, 27 if _kind(i) == "calling" else FS_WORDS, 35.0 if _kind(i) == "calling" else LH_WORDS,
+				Vector2(70, y + (10.0 if _kind(i) == "go" else 0.0)), 760.0, budget if cur else ALL,
+				Color(BONE if cur else BONE_D, a * (1.0 if cur else 0.6))) + 14.0
+	elif tale_n == 0 or ck == "tale":
 		for i in range(maxi(0, tale_n - 4), tale_n):
 			var cur := i == tale_n - 1
-			y = _type_draw(ci, String(tale[i]["text"]), fi, 30, 39.0, Vector2(70, y), 820.0, budget if cur else ALL,
+			y = _type_draw(ci, String(tale[i]["text"]), fi, 30, 39.0, Vector2(70, y), 760.0, budget if cur else ALL,
 				Color(BONE if cur else BONE_D, a * (1.0 if cur else 0.55))) + 16.0
 	else:
 		# the cards' last words, to it
 		var intro := String(S.get("tale", {}).get("prophecy", ""))
 		var b := budget if ck == "prophecy" else ALL
 		var dim := 1.0 if ck == "prophecy" else 0.75
-		y = _type_draw(ci, intro, fi, 27, 34.0, Vector2(70, y), 820.0, b, Color(BONE_D, a * dim)) + 10.0
-		y = _type_draw(ci, _quote(), fi, 36, 44.0, Vector2(70, y), 820.0, b - intro.length() - 1, Color(MARROW, a * dim)) + 18.0
-		if ck == "sum" or ck == "go":
+		y = _type_draw(ci, intro, fi, 27, 34.0, Vector2(70, y), 760.0, b, Color(BONE_D, a * dim)) + 10.0
+		y = _type_draw(ci, _quote(), fi, 36, 44.0, Vector2(70, y), 760.0, b - intro.length() - 1, Color(MARROW, a * dim)) + 18.0
+		if ck == "sum":
 			# the whole hand, all together (never which card did which)
-			y = _type_draw(ci, String(S.get("close_sum", "")), fi, 25, 32.0, Vector2(70, y), 820.0, budget if ck == "sum" else ALL,
-				Color(BONE_D, a * (1.0 if ck == "sum" else 0.75))) + 10.0
+			y = _type_draw(ci, String(S.get("close_sum", "")), fi, 25, 32.0, Vector2(70, y), 760.0, budget, Color(BONE_D, a)) + 10.0
 			var ka := a * sum_a
 			var gave: Array = []
 			var took: Array = []
@@ -996,9 +1217,6 @@ func _draw_end(ci: CanvasItem, a: float, sc: Font, fi: Font) -> void:
 			for i in took.size():
 				ci.draw_string(fb, Vector2(490, y + i * 29.0), _fx_line(took[i], fate[took[i]]), HORIZONTAL_ALIGNMENT_LEFT, 400, 23, Color(Color("#b58a7a"), ka))
 			y += maxi(gave.size(), took.size()) * 29.0
-		if ck == "go":
-			# his last words: to the black mirror
-			y = _type_draw(ci, String(tale[tale_n - 1]["text"]), fi, FS_WORDS, LH_WORDS, Vector2(70, y + 22.0), 820.0, budget, Color(BONE, a))
 	var last := _at_last()
 	if last:
 		rise_r = Rect2(70, minf(y + 14.0, 990.0), 220, 64)
