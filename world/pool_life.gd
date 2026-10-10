@@ -20,7 +20,8 @@ var rect := Rect2()             # the simulated area, screen px
 var cells := Vector2(192, 96)
 var vps: Array = []             # the simulation's viewport
 var sims: Array = []            # its material
-var imps: Array = []            # [uv, strength, radius], each for one frame
+var imps: Array = []            # [uv, strength (down +, up -), radius], each for one frame
+const N_IMPS := 16                # shaders/pool_sim.gdshader imps[]
 var spring_uv := Vector2(0.5, 0.5)
 var t := 0.0
 var level := 0.0                # the tide: -1 drained down, +1 welled up
@@ -86,7 +87,15 @@ func _uv(tile: Vector2) -> Vector2:
 ## a push down into the surface at a tile (a step 1, a hand or a drip less)
 func ring(tile: Vector2, strength: float = 1.0) -> void:
 	imps.append([_uv(tile), 0.06 * strength, 3.5])        # a heavy step, a broad dent
-	while imps.size() > 8:
+	while imps.size() > N_IMPS:
+		imps.pop_front()
+
+## the surface heaved at a tile for one frame: lifted (+) or pushed down (-), over a breadth in cells (a cell is about a
+## sixth of a yard). The newborn coming up out of the blood drives it (world/opening.gd): the swell its back lifts, the
+## blood sheeting off it, a hand or a knee going down.
+func heave(tile: Vector2, amount: float, radius: float = 4.0) -> void:
+	imps.append([_uv(tile), -amount, radius])
+	while imps.size() > N_IMPS:
 		imps.pop_front()
 
 ## how deep the blood is over the floor at a tile (metres): deepest at the heart, nothing past the shore, falling off
@@ -126,21 +135,24 @@ func _process(dt: float) -> void:
 			sp.append(Vector4.ZERO)
 	u_["spouts"] = sp
 	var im: Array = []
-	for i in 8:
+	for i in N_IMPS:
 		im.append(Vector4(imps[i][0].x, imps[i][0].y, imps[i][1], imps[i][2]) if i < imps.size() else Vector4.ZERO)
 	u_["imps"] = im
 	imps.clear()
 	var h = get_tree().current_scene.get("hero") if get_tree() and get_tree().current_scene else null
 	if h != null and is_instance_valid(h) and depth_at(h.tp) > 0.01:
 		var u := _uv(h.tp)
-		u_["body"] = Vector4(u.x, u.y, 2.2, 0.25)
+		# the hollow round the body only where it is in the surface: a body lying under the blood makes none
+		var b3 = h.get("body3d")
+		var dip := 0.25 * (1.0 - smoothstep(0.35, 0.8, float(b3.sink))) if b3 != null and is_instance_valid(b3) else 0.25
+		u_["body"] = Vector4(u.x, u.y, 2.2, dip)
 	else:
 		u_["body"] = Vector4(-1.0, -1.0, 0.0, 0.0)
 	for sm in sims:
 		for k in u_:
 			(sm as ShaderMaterial).set_shader_parameter(k, u_[k])
 	# (a look at the simulation itself: GM_POOLDUMP=path saves its height field as a grey image after five seconds)
-	if OS.get_environment("GM_POOLDUMP") != "" and t > 5.0 and not has_meta("dumped"):
+	if OS.get_environment("GM_POOLDUMP") != "" and t > float(OS.get_environment("GM_POOLDUMP_T") if OS.get_environment("GM_POOLDUMP_T") != "" else "5") and not has_meta("dumped"):
 		set_meta("dumped", true)
 		var dimg := (vps[0] as SubViewport).get_texture().get_image()
 		var out := Image.create(dimg.get_width(), dimg.get_height(), false, Image.FORMAT_L8)

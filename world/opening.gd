@@ -24,6 +24,9 @@ var t := 0.0
 var dist := 0.0
 var start := Vector2.ZERO
 var thrown := false
+var _sink0 := SINK
+var _shed := 0.0                          # the clock of the blood sheeting off it into the pool
+var _beats: Dictionary = {}               # the rise's moments already struck in the pool
 
 func _init(m, h, b: Body3D) -> void:
 	main = m
@@ -96,6 +99,57 @@ func _process(dt: float) -> void:
 		"rise":
 			if t >= body.length("rise") - 0.05:
 				_finish()
+	_slosh(dt)
+
+## the blood answering the body (Derek, 2026-10-10: "no blood sloshes around the new born as he gets out of the pool"):
+## thick and slow, never a chop (world/pool_life.gd heave, shaders/pool_sim.gdshader):
+## - surfacing, its back lifts the blood in a broad swell before it breaks through, and the swell runs out from it in
+##   slow heavy rings, reflected by the stumps;
+## - the blood sheets off it back into the pool, many small falls round its body, heavy at first and easing;
+## - every blow the body gives the surface pushes it down: the skidding hand, the viscera thrown, the knee dropping back
+##   as it fails to stand, and the blood falling off it as it stands at last.
+func _slosh(dt: float) -> void:
+	var pl = load("res://world/pool_life.gd").me
+	# (GM_NOSLOSH=1 leaves the pool as it was, for an A/B look at what the body does to it)
+	if pl == null or not is_instance_valid(pl) or OS.get_environment("GM_NOSLOSH") != "":
+		return
+	var tp: Vector2 = hero.tp
+	var fwd := DIR.normalized()
+	if phase == "surfacing":
+		# the swell its back lifts, at the rate it comes up (the most as it breaks through the surface)
+		var up := maxf(0.0, _sink0 - body.sink) / SINK
+		pl.heave(tp, 3.2 * up, 7.0)
+		pl.heave(tp + fwd * 0.5, 1.4 * up, 4.5)
+	_sink0 = body.sink
+	# the blood sheeting off it, once its back is out: heavy as it comes up, easing as it crawls and stands
+	if body.sink < 0.55 and pl.depth_at(tp) > 0.01:
+		var rate := 8.0 if phase == "surfacing" else (4.0 if phase in ["crawl", "slip"] else 3.0)
+		_shed += dt * rate
+		while _shed >= 1.0:
+			_shed -= 1.0
+			var a := randf() * TAU
+			var r := randf_range(0.2, 0.45)
+			pl.heave(tp + Vector2(cos(a), sin(a) * 0.8) * r, -randf_range(0.04, 0.07), randf_range(2.6, 3.4))
+	# the blows, once each
+	match phase:
+		"slip":
+			_strike(pl, "skid", t >= 0.3, [[tp + fwd * 0.55, -0.9, 4.0], [tp + fwd * 1.0, 0.5, 5.0]])
+		"retch":
+			_strike(pl, "throw", thrown, [[tp + fwd * 0.6, -0.8, 4.5]])
+		"rise":
+			_strike(pl, "heels", t >= 0.6, [[tp - fwd * 0.3, -0.6, 4.5]])         # it sits back onto its heels
+			_strike(pl, "foot", t >= 2.5, [[tp + fwd * 0.35, -0.7, 3.5]])         # the right foot planted
+			_strike(pl, "fail", t >= 3.75, [[tp, -1.6, 5.5], [tp - fwd * 0.4, -0.6, 4.0]])   # it drops back onto its knee
+			_strike(pl, "stand", t >= 5.0, [[tp, 0.6, 6.0]])                      # up: the blood falling off it
+	if phase == "rise" and t >= 5.0 and t < 5.6:
+		_shed += dt * 14.0
+
+func _strike(pl, key: String, now: bool, hits: Array) -> void:
+	if not now or _beats.has(key):
+		return
+	_beats[key] = true
+	for hh in hits:
+		pl.heave(hh[0], hh[1], hh[2])
 
 func _finish() -> void:
 	body.sink = 0.0

@@ -37,7 +37,7 @@ var lamps: Array = []                    # the world's lights near the body, pla
 var world_lit := false
 ## the clips' contacts (cycle phases where a foot, or a crawling hand, lands; tools/landkit3d/newborn_pose.py): walk,
 ## the left foot at 0.4 and the right at 0.9; crawl, the right hand at 0.34 and the left at 0.84
-const CONTACTS := {"walk": [0.4, 0.9], "crawl": [0.34, 0.84], "climb": [0.42, 0.92]}
+const CONTACTS := {"walk": [0.4, 0.9], "crawl": [0.34, 0.84], "climb": [0.42, 0.92], "descend": [0.42, 0.92]}
 signal contact(clip: String)
 var _last_ph := -1.0                   # lit only by the world's lights (light_from), not the fixed key and rim
 const N_LAMPS := 4
@@ -135,15 +135,20 @@ func play(c: String, blend: float = 0.25, speed: float = 1.0) -> void:
 		clip = c
 		anim.play(c, blend)
 
-## hold a clip at a phase of its cycle (0..1): the stairs drive it by where the body stands on them, not by the clock
+## hold a clip at a phase of its cycle (0..1): the stairs drive it by where the body stands on them, not by the clock.
+## The player keeps running at speed 1 and is set back to the phase every frame: its blends advance by the clock (with
+## the speed at 0 they never did, so the last clip, the walk or the idle, stayed in full and frozen, and the legs never
+## stepped on the stairs: Derek, 2026-10-10, "animations don't showing when moving up stairs"). The clock moves it on
+## by one frame after the seek, so it is set that much behind.
 func hold_at(c: String, phase: float, blend: float = 0.2) -> void:
 	if anim == null or not anim.has_animation(c):
 		return
+	var ln := anim.get_animation(c).length
 	if c != clip:
 		clip = c
 		anim.play(c, blend)
-	anim.speed_scale = 0.0
-	anim.seek(fposmod(phase, 1.0) * anim.get_animation(c).length, true)
+	anim.speed_scale = 1.0
+	anim.seek(fposmod(fposmod(phase, 1.0) * ln - get_process_delta_time(), ln), false)
 
 func length(c: String) -> float:
 	return anim.get_animation(c).length if anim and anim.has_animation(c) else 0.0

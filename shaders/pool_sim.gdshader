@@ -17,7 +17,7 @@ uniform vec2 cells = vec2(192.0, 96.0);
 uniform float t = 0.0;
 uniform vec4 spring = vec4(0.5, 0.5, 0.0, 0.0);   // uv, strength now
 uniform vec4 spouts[6];                           // uv, strength (0 none)
-uniform vec4 imps[8];                             // uv, strength (a one-frame push down), radius in cells
+uniform vec4 imps[16];                            // uv, strength (a one-frame push: down +, up -), radius in cells
 uniform vec4 body = vec4(-1.0, -1.0, 0.0, 0.0);   // uv, radius in cells, depth
 
 // the viewports are float targets (HDR 2D): a height is stored as it is, R now and G a step ago
@@ -72,8 +72,8 @@ void fragment() {
 		// a heavy fall, not a spray: a slow, broad churn (the rope's own beat), never noise
 		hn += k * S.z * (0.6 * sin(t * 1.3 + float(i) * 1.7) + 0.4 * sin(t * 2.1 + float(i) * 2.9)) * 0.03;
 	}
-	// impulses: a step or a hand going in pushes the surface down
-	for (int i = 0; i < 8; i++) {
+	// impulses: a step or a hand going in pushes the surface down; the newborn's back coming up lifts it
+	for (int i = 0; i < 16; i++) {
 		vec4 I = imps[i];
 		if (I.z == 0.0) continue;
 		vec2 d = (uv - I.xy) * cells;
