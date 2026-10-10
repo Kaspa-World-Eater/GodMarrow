@@ -1,22 +1,23 @@
-# Before the god died: the Uncounted, the Age of Terrors, the Wasting
+# Before the god died: the Uncounted, the Age of the Ythraal, the Wasting
 
-The world the congregation walked out into was already a ruin. Long before them, other peoples lived on the thing
+The world the Tithed woke up in was already a ruin. Long before them, other peoples lived on the thing
 beneath, in the open and the dark. They rose higher than any people since, and their fears grew gods. This is what is
 told of that time. Almost all of it is wrong, and it is all that is left. Nothing here has a date; the ages before the
 god's death were never counted.
 
-## How the Terrors were made
+## How the Ythraal were made
 
 Every people that has studied the old ruins agrees on one law, and it is the oldest law in the world: **a belief held
 long enough by enough people grows a body.**
 
 Fear grows one fastest. Love grows one too, and need, and hope, but slowly, and what they grow is soft and dies young.
-Fear makes things with teeth. A city that is afraid of the river for a hundred years will one spring see the river
+Fear makes things with teeth. A city that is afraid of the river for a lifetime will one spring see the river
 stand up. A people that fears the dark long enough will find, one night, that the dark has hands. The later peoples
-call the gods of that age **the Terrors**, because that is what they were made of, and because terror was what they ate.
+call the gods of that age **the Ythraal**, a word from a tongue nobody speaks, which everyone who says it says quietly.
+They were made of fear, and fear was what they ate.
 A city that trembles feeds its god; a god that nobody fears any more grows thin, and then grows hungry, and then
-comes looking. So the Terrors ruled by terror, and the peoples fed them, and the more they fed them the larger they
-grew, and the larger they grew the more there was to be afraid of. And when the people slept, the Terrors walked in
+comes looking. So the Ythraal ruled by terror, and the peoples fed them, and the more they fed them the larger they
+grew, and the larger they grew the more there was to be afraid of. And when the people slept, the Ythraal walked in
 their dreams, because a dream is a door left open. A nightmare is something feeding.
 
 Belief does not pass through a god and away. It settles. In anything long feared or long prayed to, in a god's bones
@@ -30,25 +31,25 @@ Every age that dug marrow dug a little of the world's own life out of it and bur
 nothing afterward. A hill dug hollow sinks. The peoples who dug deepest called the grey country they left behind the
 waste, and did not stop.
 
-Not everything that walked was a Terror. There were great things that never learned a name, older than any fear.
+Not everything that walked was an Ythraal. There were great things that never learned a name, older than any fear.
 There were the dead, who in that age did not lie down unless they were told. And there were things from outside the
 world that owed nothing to anyone's belief. Nobody had dreamed them, so nobody could stop dreaming them. They were
-worse than the Terrors, because a Terror at least wanted to be feared, and these wanted nothing that could be given.
+worse than the Ythraal, because an Ythraal at least wanted to be feared, and these wanted nothing that could be given.
 
 *Behind the myth.* This law is the deep lore showing at the surface (`00-the-deep-lore.md`): everything here is told,
 and what is told enough stands up. Marrow is belief settled into bone, and the world's own marrow is what kept the god
-alive. Every power that has been taken out of the ground since, by the Terrors, the cities in the sky, the faiths and the
+alive. Every power that has been taken out of the ground since, by the Ythraal, the cities in the sky, the faiths and the
 pilgrim's own hands, has been taken from the god. Nobody in the world has put this together. The game never says it.
 It lets the player notice that every source of power in the world is a wound in it.
 
-## The Unhewn, and the herald
+## The Thrae, and the herald
 
-In the Uncounted, before the Terrors were many, something reached into the world.
+In the Uncounted, before the Ythraal were many, something reached into the world.
 
 Nobody knows from where. The scholars who have tried to say it say "from outside", and then, because outside is only
 the dark between the stars and the dark between the stars is still the world's, they say "from outside the outside",
-and stop. The grandmothers of the white country say: from behind. Three things came in. The later peoples call them
-**the Unhewn**, the things that were never cut into any shape, and the oldest tellings say they were never three things
+and stop. The grandmothers of the Pale say: from behind. Three things came in. The later peoples call them
+**the Thrae**, an old word that sounds like *three* and may mean nothing more, and the oldest tellings say they were never three things
 at all, but three fingers of one hand, put in through the skin of the world the way a hand is put into a sack, feeling
 for something at the bottom.
 
@@ -72,11 +73,11 @@ country says the god raised it out of its own dead to be its hand in the world. 
 the Red. The Citadel of the Shattered Femur says nothing raised it, that it came the way a fever comes. Everybody agrees
 that it was not afraid, because it had nothing left to be afraid for.
 
-It fought the Unhewn for longer than anyone has counted, and the fire of its ribs burned whole countries to glass. And
-the strangest thing told of that war, told by everyone, is that the Unhewn never fought back. They did not turn. They
+It fought the Thrae for longer than anyone has counted, and the fire of its ribs burned whole countries to glass. And
+the strangest thing told of that war, told by everyone, is that the Thrae never fought back. They did not turn. They
 did not seem to know. The herald tore at them, and burned them, and broke its bones on them, and they went on feeling
 through the world for whatever they were feeling for, as if nothing were happening at all. Whoever has watched a dog
-worry at the wheel of a moving cart has seen the herald's war, the white country says, except that the cart went over
+worry at the wheel of a moving cart has seen the herald's war, the Pale says, except that the cart went over
 the dog again and again, and the dog got up.
 
 In the end one of the three was killed, if it can be said to have been killed. The One That Unfolds lay down at the edge
@@ -90,7 +91,7 @@ The other two went. Whether they were driven out, or simply finished feeling for
 Whether they found it, nobody knows. The hand drew back out of the sack, and the hole it had come in by closed, or
 seemed to.
 
-The herald fell. It had been broken against them too many times, and somewhere in the white country it came down out of
+The herald fell. It had been broken against them too many times, and somewhere in the Pale it came down out of
 the sky and struck the ground so hard that it made a crater a day's walk across, and lay at the bottom of it, burning
 low. The peoples who came after found it there: a valley of bone in a cup of glass, with a fire still in its ribs. They
 knelt. They built a city round it, ring on ring up the crater's sides, and called it **Uth-Kharesh**, and worshipped the
@@ -101,12 +102,12 @@ in, and the worship of Uth-Kharesh was the first it had ever had, and it found i
 thinned, as all worship thinned in the Wasting, it ate the worshippers, a few at first, and then the rest, and when
 there were none left it began on itself. It sits now at the bottom of the crater on a broken throne, in the city it has
 eaten from the inside, wearing an iron crown it had them forge for it when it still had subjects. It is very thin. It
-wants nothing in the world so much as to be believed in again. The white country calls it **the Starved Crown**, and
+wants nothing in the world so much as to be believed in again. The Pale calls it **the Starved Crown**, and
 the oldest texts **Morrh-Ythraal**, and the grandmothers there tell their children: when you go out at night, do not
 be afraid of the dark. That is how it finds you.
 
 *Behind the myth.* The herald is the one dracolich (Derek's ruling), but the world's voice never calls it a dragon: it
-is the herald, the Starved Crown, the bone-winged thing, the fire in the ribs. The Unhewn are three fingers of something
+is the herald, the Starved Crown, the bone-winged thing, the fire in the ribs. The Thrae are three fingers of something
 beyond even the dark between the stars, alien past understanding. They had no followers and fought nobody; what they
 wanted is never told. The One That Unfolds is the bleeding mountains above the Red Water (the blood rivers and their
 estuaries, `areas/the-red-shore.md`); the shore folk's Fallen One is the same mountains told another way, and both
@@ -114,7 +115,7 @@ stand. Whether the other two will reach in again, now that the god whose herald 
 
 ## The Famines
 
-Some Terrors grew so vast that their bodies outlasted their lives. These were **the Famines**, whom the oldest texts
+Some Ythraal grew so vast that their bodies outlasted their lives. These were **the Famines**, whom the oldest texts
 call **the Gorrhaun**, and they are named for what they left behind: wherever one walked, the harvest failed behind it
 for a generation, the wells went dry and the marrow was gone out of the ground, because a god that has outlived its
 people goes on eating anyway, and eats what is under its feet. They were god-corpses the height of hills, and they kept
@@ -129,9 +130,8 @@ you can feel in your feet. High on its side, at dusk, there are lights: the lamp
 city that climbed up into it, and the last city under the sky that still walks. The lamps are lit every evening, after
 all these years. Nobody knows who lights them.
 
-*Behind the myth.* Kingdoms climbed into the Famines and lived inside them for generations without seeing out. The
-congregation knelt inside the thing beneath, in a warm dark they could never see the edges of, and came out through
-its mouth. The rhyme is meant to be heard. Whether the world itself is the last and greatest of the Famines, a god that
+*Behind the myth.* Kingdoms climbed into the Famines and lived inside them for generations without seeing out. The rhyme is
+meant to be heard. Whether the world itself is the last and greatest of the Famines, a god that
 outlived its believers and lay down, and whether the Tithed are only the last kingdom that climbed up into one, no myth
 says outright. The player is meant to come to suspect it. Dhum is the one walking city under the sky; Vesk, the iron
 city, walks below, in the Deep (`04-the-held-space.md`), and is no Famine, whatever the readers say.
@@ -170,8 +170,8 @@ ankle. How a sleeper gets into the Needle, when it has no door, nobody has seen.
 say that for a while afterward they dream other people's dreams, as if the Needle had spilled.
 
 *Behind the myth.* Dreams are what gods are made of (`00-the-deep-lore.md`). Every dream the Needle drinks is a god that
-will not be born. The scholars of the Last Breath have noticed that no new god has stood up anywhere in their count of
-years; none of them has looked toward the forest. The liquid is a gut's, and the Needle is digesting; what it is
+will not be born. The scholars of the Last Breath have noticed that no new god has stood up anywhere in all their
+records; none of them has looked toward the forest. The liquid is a gut's, and the Needle is digesting; what it is
 digesting toward, and what the eyes are kept for, is never told. Its likeness to the spikes of the iron maidens of the
 Wasting is meant: nobody in the world knows whether the maidens were made in its image or it in theirs.
 
@@ -196,9 +196,9 @@ anybody had ever had.
 
 It walked the world for an age, reaping. Wherever the dead stood, it came. The peoples sang it in, and laid flowers in
 its prints, and gave it a hundred names. The one the Citadel keeps, from under the oldest drawing, is
-**Oss-Karrhath**. The lowlands call it **the Gleaner**. Children call it Old Scythe and do not say it after dark.
+**Oss-Karrhath**. Children call it Old Scythe and do not say it after dark.
 
-But a Terror eats what made it, and what made the Gleaner was the fear of death. When it had reaped the standing dead of
+But an Ythraal eats what made it, and what made Oss-Karrhath was the fear of death. When it had reaped the standing dead of
 the whole world, and none were left standing, it was hungry still, and the fear was still there, in the living, where it
 had always been. So it went where the fear was. It reaped the sick first, in their beds, because they were the most
 afraid. Then the old. Then anyone who saw it coming, and everyone saw it coming, because it was the height of a hill.
@@ -219,20 +219,20 @@ death adds one to the count, so the count is never done.
 
 The mouth of the crack is a pit, round, a stone's throw across, in a country nobody farms. It has no bottom anyone has
 heard: a stone dropped into it is never heard to land. People have brought their dead to its edge and tipped them in,
-to save the Gleaner the walk, since before there were graves; it is the oldest burial there is. On the longest nights,
+to save Oss-Karrhath the walk, since before there were graves; it is the oldest burial there is. On the longest nights,
 those who live nearest say, a sound comes up out of the pit, slow and even, like a whetstone drawn along a blade.
 
 The Pale Order counts the dead. It is the first thing a brother learns and the last thing he does, and every bone-house
-of the Ossa is cut in the shape of the Gleaner's hall: the same long hall floored with the dead, the same niche at the
+of the Ossa is cut in the shape of Oss-Karrhath's hall: the same long hall floored with the dead, the same niche at the
 far end where something lies on its side. The Order says it counts the dead so that none of them is ever lost. A heresy
-inside the Order says it counts them so that the Gleaner never has to wake and count them itself. And under the heresy
+inside the Order says it counts them so that Oss-Karrhath never has to wake and count them itself. And under the heresy
 there is a whisper, which no brother has ever written down, that says the Order counts *for* it, and that on the day the
-Order's count and the Gleaner's agree, it will get up.
+Order's count and Oss-Karrhath's agree, it will get up.
 
-*Behind the myth.* A Terror made of the fear that the dead would never lie down: the first of the Terrors and the
+*Behind the myth.* An Ythraal made of the fear that the dead would never lie down: the first of the Ythraal and the
 greatest to outlive its use, and death as that age knew it. Since the god died the dead get up again (the Red gives them
-back, the hollow walk), and nobody knows whether the Gleaner's count has stopped, or whether it is only very far behind.
-The Xyrr cut the lowest halls under the bone-houses in the same shape (`04-the-held-space.md`): they copied it, or
+back, the hollow walk), and nobody knows whether Oss-Karrhath's count has stopped, or whether it is only very far behind.
+The Angles cut the lowest halls under the bone-houses in the same shape (`04-the-held-space.md`): they copied it, or
 remembered it, or were told to. The Pale Order's counting and the Ossuarch's numerology rhyme with it; whether the Order
 counts for it or against it is never said.
 
@@ -254,21 +254,21 @@ What drowns near the shell does not stay drowned. Its dreaming reaches them, dow
 walk on the bottom of the sea, toward it or away from it, and on the out-breath some of them are carried back to the
 shore. This is why whatever goes into the Red comes back. A city called Thessar sank itself on purpose to be near the
 sleeper, every street and tower going down in one night, singing, and the lights of its windows were seen under the
-water for a year. The shore folk say that in the long calms you can still see them, far out, very deep, a city of
+water long afterward. The shore folk say that in the long calms you can still see them, far out, very deep, a city of
 lights going on and off, as if someone were walking from room to room.
 
 Some say that when the sleeper wakes it will not need to breathe the Red in and out any more, because it will drink it.
 
-*Behind the myth.* Whether the sleeper is a Terror, one of the Unhewn, or something older than the god, nobody knows,
+*Behind the myth.* Whether the sleeper is an Ythraal, one of the Thrae, or something older than the god, nobody knows,
 and it stays unknown. Its breath and the dying heart are rival tellings of the same tide; both stand. The dead the Red
 gives back to the black sand are, read this way, its dreams washing up.
 
 ## The serpent of the wet country
 
-Before the Terrors, before the Unhewn, before anyone counted anything, something long died in the low country.
+Before the Ythraal, before the Thrae, before anyone counted anything, something long died in the low country.
 
 Nobody knows what it was. It was long past reckoning, longer than a day's walk: a serpent's length, with a crowned head
-on it and arms, many of them, folded under. That much the bones say. Whether it was a god, or a beast, or the Terror of
+on it and arms, many of them, folded under. That much the bones say. Whether it was a god, or a beast, or the Ythraal of
 a people so old that nothing else of them is left, nobody knows, and the bones do not say. It died, and it lay where it
 died, along the low country in a long slack coil, and it did what dead things do. It rotted.
 
@@ -333,7 +333,7 @@ was not dying; they went hollow. Then the great city cut its chains.
 
 The lesser cities fell. **Ghenn** came down on the lowlands in one night, and its ash lies under the lowland grass for a
 hundred leagues, and its lamps, which never went out, still glow faintly up through the grass on dark nights.
-**Sorrath** fell slowly, over a hundred years, tilting and shedding towers, and broke at last on the white ridges, and
+**Sorrath** fell slowly, over lifetimes, tilting and shedding towers, and broke at last on the pale ridges, and
 lies there upside down, so that the words cut on its underside face the sky. If there were others, they fell too far
 away for anyone to find. Their people came down with them, and climbed out of the wreck, and went walking, hollow.
 
@@ -347,7 +347,7 @@ that on its highest throne sits one dead thing that still gives the order to ris
 obey. The shore folk call that one **the Man in the Rust**. The Citadel calls it **the Regent**, and does not like to
 talk about it.
 
-**The Emptied**, whom the oldest texts call **the Ghauul**, are what came down out of the lesser cities: very tall, very
+**The Ghauul**, the emptied ones, are what came down out of the lesser cities: very tall, very
 thin, courteous, hollow to the bone. They remember being full. They knock at a door after midnight, softly, three times,
 and ask whether there is marrow in the house, and thank you when you say there is not, and do not go away. The common
 roads call them the Marrow-Eaters, and say they crack the bones of sleepers.
@@ -370,11 +370,11 @@ ridges could be places the pilgrim stands.
 
 ## Outside of everything
 
-Some things owe nothing to the thing beneath, to any Terror, or to the Silence. Nobody dreamed them up; they came, or
-they were always there. The scholars call them **the Uninvited**.
+Some things owe nothing to the thing beneath, to any Ythraal, or to the Silence. Nobody dreamed them up; they came, or
+they were always there. The Citadel keeps them in a book of their own and gives them no name.
 
 - **The Unborn** lies curled in the dark between the stars, a shape like a child the size of the night, not yet born.
-  When it stirs the ground shakes; the white country's grandmothers say the earthquakes are its kicks. When it is born,
+  When it stirs the ground shakes; the Pale's grandmothers say the earthquakes are its kicks. When it is born,
   they say, it will be very hungry, and the world will be the first thing it sees.
 - **The Drowned Twin** stands on the other side of every still surface: the Red Water in a calm, a puddle, a polished
   blade, the onyx. When you look in, it looks out, wearing your face, a little late. On the other side there is a world
@@ -388,8 +388,8 @@ they were always there. The scholars call them **the Uninvited**.
 ## The Wasting
 
 It ended the way it had to. The marrow was gone out of half the world, burned in the sky by the cities there and dug out
-by everyone else, and the ground the Terrors walked on had nothing left in it to give. The peoples who fed the Terrors died
-of the waste, or stopped believing, or were eaten by what they believed in, and the Terrors began to waste away. The
+by everyone else, and the ground the Ythraal walked on had nothing left in it to give. The peoples who fed the Ythraal died
+of the waste, or stopped believing, or were eaten by what they believed in, and the Ythraal began to waste away. The
 later peoples call this age **the Wasting**.
 
 A god that wastes to its end does not die cleanly. It breaks apart into lesser things, the way a fallen tree breaks
@@ -414,13 +414,20 @@ one of them did not die. They became something: a saint, or a Want, or a god for
 and in the Wasting every people that had lost its god tried it. Almost nobody survived trying. The ones who did were
 not what anyone had hoped for.
 
-And under all of it there was the toil. The peoples who did not walk in the processions or stand in the iron worked.
-They hauled water, they dug the dry fields, they buried the dead the waste made, and when the dead would not lie down
-they buried them again. In the last of the Wasting, one telling says, a people of toilers looked at the grey country
-and saw that it was dying because the marrow had been taken out of it. They went down into the thing beneath, through
-its mouth, with their tools on their backs, to do the only thing they knew how to do: to work. To mend what could be
-mended, to tend what was still warm, and to kneel where the work was. The Tithed do not remember this. They remember
-only that they were already kneeling, and that the kneeling was work.
+One of them is remembered, though not by name. In the last of the Wasting, out in the waste, a girl stepped into a
+maiden of her own will and closed it on herself, as thousands had before her, and did not die. The spikes went in and
+the iron drank, and she went on bleeding: a day, a season, longer than anyone could stand to watch, and still they came
+to watch, more of them every year, and the more of them came, the less she could die. Her blood ran out from under the
+iron's foot and wore a channel in the waste, and the channel deepened into a wound in the ground that does not close.
+The people who knelt round it began to call her by the only name they had for her: the maiden, the bleeding one. Then,
+because a name said often enough stands up, the Bleeding Maiden.
+
+The processions of the Bleeding Maiden do not tell it this way. They say the wound came first, before anything, a wound
+in nothing (`02-the-creation-myths.md`), and that the Maiden is the opening that gives. The iron-gleaners and the
+grandmothers of the lowlands say the girl came first, and the wound after, and the faith last of all, and that the
+processions' scale, their scourges and their cup are what is left of the crowd that came to watch her. Where the
+processions poured their first cup there is a wound in the ground. Whether an iron maiden ever stood over it, closed,
+the processions will not say, and nobody has dug.
 
 The cities emptied. Knowledge died with the hands that held it, and what was written was written in scripts nobody now
 reads. Some powers did not die: they slept, or went under, or kept walking because nobody told them to stop. The world

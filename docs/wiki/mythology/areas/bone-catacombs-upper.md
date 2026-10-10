@@ -74,7 +74,7 @@ beside the lectern, shaded on the side toward the door, so that the only lit thi
 lies open near its beginning. One leaf has been turned, and no more.
 
 I set down my lamp and leaned over it, and the hand on the page was mine: the hand you taught me, with the long tail I
-give my letters at the end of a line, which you have scolded me for these nine years. It told how a copyist leaned
+give my letters at the end of a line, which you have scolded me for these many years. It told how a copyist leaned
 over the book in a bay off the long gallery, and found that the hand on the page was his own.
 
 I read on, and it was always one line ahead of me. When I took out my pen, it said I took out my pen. When I began to

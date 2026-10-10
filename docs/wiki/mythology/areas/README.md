@@ -27,7 +27,7 @@ Zone ids, names and borders are the game's (`data/world.json`). Levels are the c
 |---|---|---|---|
 | `sighing-ridge.md` | `sighing_ridge` | 2–4 | a long rise where the wind goes out like breath; broken colonnades |
 | `ash-shore.md` | `ash_shore` | 3–5 | a grey sea that does not move like water |
-| `burnt-heath.md` | `burnt_heath` | 4–6 | burned a year after the god died, and nobody lit it; the dead herd |
+| `burnt-heath.md` | `burnt_heath` | 4–6 | burned in the first years after the god died, and nobody lit it; the dead herd |
 | `fern-gully.md` | `fern_gully` | 3–6 | a wet cut full of ferns between the heath and the hunters' ground |
 | `hunters-cache.md` | `hunter_cache` | 4–5 | where the hunters kept what they took from the things that come up |
 | `the-gnawed-chapel.md` | `wolf_den_chapel` | 4–8 | a chapel under the ridge, gnawed from inside |
@@ -61,7 +61,7 @@ Zone ids, names and borders are the game's (`data/world.json`). Levels are the c
 |---|---|---|---|
 | `hollow-wood.md` | `hollow_wood` | 5–8 | the god's veins stood up as pale trees |
 | `pilgrim-road.md` | `pilgrim_road` | 6–8 | the old road, there before the Wood; patches paved in glass |
-| `the-tree-hollow.md` | `tree_hollow` | 6–7 | a candle burning eight hundred years in a knot |
+| `the-tree-hollow.md` | `tree_hollow` | 6–7 | a candle in a knot that has burned longer than anyone remembers |
 | `root-deep.md` | `root_deep` | 13–16 | the country under the Hide; it breathes |
 | `the-broken-bridge.md` | `broken_bridge` | 10–13 | a bridge over something that is not a river |
 

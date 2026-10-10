@@ -41,7 +41,7 @@ People disagree about what she did with the years. My mother said she lived on t
 long. The pilgrims say she put them into her candles.
 
 Because she made candles. The bog keeps its drowned. You will have seen them in the turf banks, if you looked: a hand in
-the cut face, a shoulder, brown and whole, a hundred years down. Down there in the wet, where no air gets in, the fat of
+the cut face, a shoulder, brown and whole, generations down. Down there in the wet, where no air gets in, the fat of
 the drowned goes pale and hard, like wax. The turf-cutters call it grave-wax and will not touch it. Hesk paid them to
 bring it to her. She rendered it in her vat and poured it, and her candles burned slow and gave a good light, and some
 of them got up and walked.
@@ -67,7 +67,7 @@ Sister,
 
 You will have heard that Aled lived. I want you to know what it cost, and that I do not grudge it.
 
-The fever went on nine days, and nothing from the road did any good, and on the ninth night I wrapped him and carried
+The fever went on for days, and nothing from the road did any good, and on the worst night I wrapped him and carried
 him down into the bog. The guides would only take me to the foot of the hump. I went up alone in the dark, with him
 burning in my arms.
 

@@ -96,14 +96,14 @@ know what we are counting. I know he is still keeping them. I think it is the on
   2.2 yards long.
 - **The floor is never bare:** flagstones laid between the ribs, lifting and settling on a slow breath as real height
   (the ground log's one true detail), grey grease and dust in their joints; a walked line polished down each gallery;
-  old nails from worn tools laid along every niche lip; grave-cloth rags; wax runs and stubs; chalk dust under the
+  grave-cloth rags; wax runs and stubs; chalk dust under the
   Counting Wall; ash blown in at the mouth.
 
 **Landmarks.**
 - **The Long Candle** (the threshold of the first gallery):
   - *Shape:* one candle as thick as a man's waist on a mound of its own runs wider than a cart, its small flame leaning
     toward whoever comes.
-  - *Story by cause:* the mound is centuries of runs, each a pale skin over the last, the oldest yellow-grey and hard as
+  - *Story by cause:* the mound is ages of runs, each a pale skin over the last, the oldest yellow-grey and hard as
     stone; the flags round it are worn by those who knelt; the candle is no shorter than anyone remembers.
   - *Light:* the one warm standing light in the crypt; it reaches the gallery's mouth and nothing beyond.
   - *Age:* older than the Tithed's coming out, the grandmothers say; its wax gone grey and amber.

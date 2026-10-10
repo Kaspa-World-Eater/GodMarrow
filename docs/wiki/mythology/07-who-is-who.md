@@ -29,7 +29,7 @@ Every herald is a mantle (`00-the-deep-lore.md`): whoever wears it now. They wak
   halls.
 - **Its calling:** the Ossuarch, the warden of a bone-house and an office of no one man.
 
-**The Gilded Peak** (a *monastery*, fallen in 1098). It wore no mask, and looked at the Silence itself.
+**The Gilded Peak** (a *monastery*, fallen). It wore no mask, and looked at the Silence itself.
 - **Its dead** were gilded and given to the Silence, leaving nothing.
 - **Its rites:** the chant of one breath, the bowls carried down at dusk ("Put a name in it"), and gold laid on what
   should be looked at and not seen.
@@ -42,9 +42,9 @@ Every herald is a mantle (`00-the-deep-lore.md`): whoever wears it now. They wak
 - **Its dead:** at a death, every mirror and still water is covered, so the soul can go through the eye of the loom.
 - **Its rites:** the circle of names from dusk to the grey hour, the coat of glass, and the year's cloth knitted at
   midwinter.
-- **Its factions:** since the loose winter of 1106, the Covered, who send the dead on, and the Unveiled, who keep the
+- **Its factions:** since the loose winter, the Shroud, who send the dead on, and the Mirror, who keep the
   dead in glass and carry them.
-- **Its calling:** the Hollow Mystic, out of the Unveiled.
+- **Its calling:** the Hollow Mystic, out of the Mirror.
 
 **The Bleeding Maiden** (a *procession*). Its mask has two faces: the Maiden, the opening, and the Mother, the growing.
 - **Its dead** lie in their own wall, each robe on its peg beside them, and come back, they say, as saints on the
@@ -72,13 +72,14 @@ Every herald is a mantle (`00-the-deep-lore.md`): whoever wears it now. They wak
 
 ## The peoples
 
-**The Tithed** are everyone: the children of the congregation that knelt inside the god.
-- **Their ways:** a worn tool across the sill and round the cradle; belts knotted at the back; true names kept behind the teeth; no
-  singing on the open ash at night.
-- **Their nights:** Kneel-Night, once a year; Low Day at the barrows.
-- **Their end:** "somebody always sits up". They have no end of their own.
+**The Tithed** are everyone. Their memory begins on the first morning, waking on the ash; how they came there, nobody
+knows (`02-the-creation-myths.md`).
+- **Their ways:** the tithe, a tenth of everything left for what is owed: the tenth row standing, the tenth loaf on
+  the sill, the tenth night kept awake; true names kept behind the teeth; no singing on the open ash at night.
+- **Their nights:** the tenth night, kept awake; Low Day at the barrows.
+- **Their end:** the Reckoning, when the debt comes due (`06-the-ends-of-the-world.md`).
 
-**The shore folk** lived in the giant trees above the Red Water, at the start of the game, and are gone since 1114.
+**The shore folk** lived in the giant trees above the Red Water, at the start of the game, and are gone now.
 - **What they believed:** the land is the Fallen One's body, the Red is its blood, and whatever goes into the Red comes
   back.
 - **Their dead** were burned the night they died.
@@ -95,34 +96,62 @@ Every herald is a mantle (`00-the-deep-lore.md`): whoever wears it now. They wak
 
 **Further off, and later in the acts:**
 - **the Last Vigil:** lamp-bearers keeping a watch at the gate of the Descent;
-- **the Count-breakers:** lowlanders who unmake the Order's tallies at night;
+- **the Miscount:** lowlanders who unmake the Order's tallies at night;
 - **the herald-cults:** each worshipping one power's herald.
 
 ## Mantles
 
-Every role in the world is a mantle (`00-the-deep-lore.md`). These are some the world knows:
-- the Ossuarch;
-- the Marrow Pontiff;
-- each herald;
-- the Ossuary Matron;
-- the Carrion Warden;
-- the Tallow-Mother;
-- the Starved Crown;
-- the Mysterious Stranger, who lays the cards for every pilgrim of every turn;
-- the merchant at the end of the world;
-- the pilgrim.
+Every role in the world is a mantle (`00-the-deep-lore.md`), and every mantle is a card (Derek, 2026-10-09: "There
+should be one for every card in the tarot deck"). The deck the Stranger lays in the Reading holds these. Each card is a
+role that has always existed and never existed; whoever wears it now can be killed, and the card cannot. Reversed, a
+card is the same mantle seen from the other side.
 
-Whoever wears one now can be killed. The mantle cannot.
+| The card | The mantle | Who wears it now | Reversed |
+|---|---|---|---|
+| **The Gravedigger's Hands** | the one who buries | the Ossuary Matron, laying the catacombs' dead | the one who digs them up |
+| **The Singed Veil** | the one drawn to the light that burns it | the moths that wear the court's white faces | the one already burned |
+| **The Swaddling** | the one who is carried | every infant the Deep asks for | the knife that cut the cloth |
+| **The Gleaner** | the one who reaps and counts | Oss-Karrhath, on its harvest under the ground | the Pale Order, counting for it |
+| **The Weeping Saint** | the one who suffers to be believed | the girl in the iron, who is the Bleeding Maiden | the crowd that came to watch |
+| **The Scholar's Eye** | the one who reads until it is read | the Citadel's oldest reader | the eyes in the Needle |
+| **The Hanged Twin** | the one a breath behind | the Drowned Twin, on the other side of every still surface | the one a breath ahead |
+| **The Knot of Mouths** | the one that eats to keep | the Second Mouth; the Tallow-Mother | the one that is eaten |
+| **The Wick** | the one that burns down to give light | every soul kept in a lantern | the dark at the edge of the light |
+| **The Pilgrim** | the one who walks and does not know why | the pilgrim | the one who has stopped |
+| **The Mourner** | the one who cuts her hair | the Grandmother of the Red | the one who is mourned |
+| **The Ossuary Key** | the one who locks the count | the Ossuarch; the Marrow Pontiff, kneeling in the well | the one who opens it |
+| **The Beggar's Cup** | the one who asks at the door | the Ghauul, knocking for marrow | the house that answers |
+| **The Drowned Bell** | the one who rings under the water | the drowned king's court, still walking down the spine | the bell rung in tune |
+| **The First Coin** | the one who sells at the end of the world | the merchant | the one who buys |
+| **The Kiln** | the one with a fire in its ribs | the herald, the Starved Crown, burning low in its cup | the ash it leaves |
+| **The Unravelling Loom** | the one who unpicks | the Veiled Crone, behind her veil | the one who reweaves |
+| **The Lantern-Wright** | the one who keeps what is lost | nobody now; the makers were hunted out, and the lanterns are fewer every year | the one who lets it go |
+| **The Drowned Choir** | the one who holds the note | the Choir, under the crypts | the rest between notes |
+| **The Tithe** | the one who owes | the Tithed, every one | the one who comes to collect |
+| **The Hollow Crown** | the one whose orders are never obeyed | the Man in the Rust, on the dark moon | the city that would obey if it could |
+| **The Unwritten** | the one who ends the turn | nobody yet | the one who begins the next |
+
+More cards turn up every year that nobody has seen before, and each is a mantle too: the heralds, the Carrion Warden
+and the rest of the world's named dead are cards of the deeper deck. No card has ever been found for the Mysterious
+Stranger. Some readers say he is the hand that turns them. Some say he is the last card, the one at the bottom of every
+deck, which nobody ever gets to.
+
+*Behind the myth.* The pilgrim is dealt the Pilgrim, and at the end of the turn it is turned over and read as the
+Unwritten. The game's bosses and named uniques are worn mantles (`00-the-deep-lore.md`): kill the wearer and the card
+waits for the next.
 
 ## The callings
 
-| Calling | Code id | Its faith | Its aspect | Its resource |
-|---|---|---|---|---|
-| the Ossuarch | `ossumancer` | the Pale Order | Bone | Marrow, and the Mantle's shards |
-| the Hollow Mystic | `animancer` | the Veiled Crone's Unveiled | Soul | Essence, and the choir of wisps |
-| the Red Penitent | `hemomancer` | the Bleeding Maiden | Flesh | Vitae: skills cost life |
-| the Shrine Keeper | `miasmancer` | the Myriad | Breath | Miasma, and Omens |
-| the Empty Hand | `monk` | the Gilded Peak | the Silence | the hourglass of two sands |
+Each calling is a card too: the god's card the Stranger turns face up first, before any other is drawn, and the one
+card the pilgrim does not choose.
+
+| Calling | Code id | Its card | Its faith | Its aspect | Its resource |
+|---|---|---|---|---|---|
+| the Ossuarch | `ossumancer` | **The Standing Dead** (Oss-Vharoth) | the Pale Order | Bone | Marrow, and the Mantle's shards |
+| the Hollow Mystic | `animancer` | **The Veiled Crone** (Yh'Anuul) | the Veiled Crone's Mirror | Soul | Essence, and the choir of wisps |
+| the Red Penitent | `hemomancer` | **The Mother of the Wheel** (Nol-Shogthuth) | the Bleeding Maiden | Flesh | Vitae: skills cost life |
+| the Shrine Keeper | `miasmancer` | **The Myriad** | the Myriad | Breath | Miasma, and Omens |
+| the Empty Hand | `monk` | **The Silence** (Ur-Nihl, written as a gap) | the Gilded Peak | the Silence | the hourglass of two sands |
 
 The callings are callings, never particular people. Who the pilgrim is, the cards decide (`00-the-deep-lore.md`, "The
 Reading").

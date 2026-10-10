@@ -48,7 +48,7 @@ Then the knocking began. We had a knock for the false floors, twice and then onc
 would know it was us. One night my uncle knocked, and the knock came back from under the floor, twice and then once,
 and none of us was down there.
 
-We left that floor alone. A month later it knocked first. My uncle lifted the plank to look, and something took hold
+We left that floor alone. Not long after, it knocked first. My uncle lifted the plank to look, and something took hold
 of his hand from underneath, and he would never say what. After that he would not lift a plank, or let us. We left the
 lime and the crates and the ledger standing open, and went up the lime-runners' way, and pulled it down behind us.
 
@@ -68,7 +68,7 @@ will carry you.*
 
 On the back the keeper wrote:
 
-We kept her on our altar thirty years. Women with sick children prayed to her, and some of the children lived, and I
+We kept her on our altar for years. Women with sick children prayed to her, and some of the children lived, and I
 will not say that was nothing.
 
 Then a carter told us that the chapel at the next crossing had her finger too, and so did the one past that, and a
@@ -153,7 +153,7 @@ counting.
 red light; fog.
 
 **Open questions.**
-- Lime as a ward: should bone packed in lime truly stay lying, as the runners believed? (The lowland ward is a worn
-  tool across the sill; lime is the runners' own belief.)
+- Lime as a ward: should bone packed in lime truly stay lying, as the runners believed? (The lowland ward is the tenth
+  loaf on the sill; lime is the runners' own belief.)
 - The levels: the Hold's creatures (5–9) are far weaker than the catacombs' above (15–18), though it is reached only
   from them. Raise them, or reopen the lime-runners' way to a shallower zone?

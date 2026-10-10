@@ -104,7 +104,7 @@ curtains; the cenotes of the Yucatán, roots dropping to still water.
 
 **Landmarks**, each by the pit method:
 - **The coin stone at the head of the road:** a squat numbered stone like the Pilgrim Road's, its figure worn away, its
-  top dished smooth by centuries of coins laid and taken. No light of its own: a copper glints in the dish at dusk and
+  top dished smooth by ages of coins laid and taken. No light of its own: a copper glints in the dish at dusk and
   is gone when the pilgrim comes back.
 - **The Horned's road:** a broad way down through the halls, worn smooth by feet all going one way, every print pointing
   down. Here and there a sack set down against the wall, tied at the neck, very old, never opened.

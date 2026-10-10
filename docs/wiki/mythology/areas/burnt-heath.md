@@ -4,11 +4,11 @@
 Shore, Fern Gully · in the game: the old procedural map (`burnt_heath_s1001` to `s1020`), to be remade by the bog's
 method*
 
-Off the Ridge the land runs down into a wide heath burned to black wire. It burned for a year after the god died, and
-nobody lit it, and it has never quite stopped: the wind off the Ridge drives every fire across it the same way, so the
-Heath is a patchwork of burns of every age in long tongues that all point downwind, toward the sea. Pilgrims cross it
-by one road and sleep at one banked fire. In the corner the road bends away from, seven great horned carcasses lie in a
-ring, all facing the same way, and no lantern will go nearer than its edge.
+Off the Ridge the land runs down into a wide heath burned to black wire. It burned season on season after the god died,
+and nobody lit it, and it has never quite stopped: the wind off the Ridge drives every fire across it the same way, so
+the Heath is a patchwork of burns of every age in long tongues that all point downwind, toward the sea. Pilgrims cross
+it by one road and sleep at one banked fire. In the corner the road bends away from, seven great horned carcasses lie in
+a ring, all facing the same way, and no lantern will go nearer than its edge.
 
 The Heath is the god's skin, burned, with one old wound under the seven that closed. It should feel wide, dry, smoky
 and watched: there is always a fire somewhere on it.
@@ -82,13 +82,13 @@ ring, and there are seven. There have always been seven.
 
 ### How the Heath caught
 
-*Two tellings of the year-long fire, the carters' and the keeper's, written one under the other on a single leaf by
+*Two tellings of the first fire, the carters' and the keeper's, written one under the other on a single leaf by
 someone who heard both and would not choose.*
 
-The carters who cross the Ridge say that in the year after the god died the Moor was hotter under its ash than it has
+The carters who cross the Ridge say that soon after the god died the Moor was hotter under its ash than it has
 been since. One night the wind over the Ridge came harder than it had ever come, one long breath that did not stop,
 and it lifted hot ash off the Moor in sparks and carried them over the crest. The heath below was dry, and it caught,
-and the wind fed it for a year. That is why every burn on the Heath runs the same way, toward the sea: the
+and the wind fed it season on season. That is why every burn on the Heath runs the same way, toward the sea: the
 wind drove the first fire, and it has driven every fire since.
 
 The keeper tells it with her hand flat on the ground. Nobody lit the Heath, she says, and nothing carried fire to it. It
@@ -96,7 +96,7 @@ came up. Her grandmother's grandmother said the Heath burned the way a candle bu
 was only the wick. Dig a spade's depth where the burn is blackest and the earth is warm and greasy in the hand, and if
 you leave the hole open overnight it is smoking by morning. The wind, she says, only ever told the fire which way to go.
 
-Both tellings agree that the Pyre-Saints walked in the burning that year, and walk still. The carters say they were the
+Both tellings agree that the Pyre-Saints walked in that first burning, and walk still. The carters say they were the
 faithful of some procession who walked into the fire to pray it out, and the fire took their prayers and kept them
 burning. The keeper says nobody has ever known whose faithful they were, and that anyone who tells you is selling
 something. Someone once chalked the milestone at the fork, then took a stone and cracked it across the figure. The

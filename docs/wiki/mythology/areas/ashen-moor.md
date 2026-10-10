@@ -92,17 +92,17 @@ every year of my life. I would like to know what he finds under his.
 *The last leaves of a day-book kept by a copyist in a stone room built against the ninth milestone of the old road.
 It came back to the copyists with his other papers when he died.*
 
-The milestones on this road were set in the two hundred and sixth year after the god died, by people who found the road
+The milestones on this road were set in the first years after the god died, by people who found the road
 already lying here and wanted it counted. The figures go down the farther you walk, and nobody can say what
-they are counting down to. I have sat beside the ninth for thirty-one years, and I can tell you only that it has grown.
+they are counting down to. I have sat beside the ninth for most of my life, and I can tell you only that it has grown.
 It came to my hip when I first leaned on it. It is at my shoulder now.
 
 Every spring, for as long as there have been copyists on this road, the hooded penitents came up two by two from their
 chapter at the great wound and chalked the figures fresh on every stone. They said nothing to us and took nothing, and
-went home the way they came. The chalk lasted eleven months, never twelve, and we used to say the year had not turned
+went home the way they came. The chalk never lasted the year out, and we used to say the year had not turned
 until the hoods had been.
 
-They have not come for three springs. The chalk is gone from every stone; the figures are still cut, and anyone who
+They have not come these last springs. The chalk is gone from every stone; the figures are still cut, and anyone who
 stoops can read them, but nobody stoops. The four of us on this road argued all one winter over whether to chalk the
 stones ourselves. The eldest would not have it. She said a figure chalked by the wrong hand counts wrong, and since we
 did not know what the stones were counting, we could not know what a wrong count would do. We left them bare.
@@ -132,7 +132,7 @@ North York Moors, buried and growing grey up through it, as the farms under Eyja
   at its knees is the warmest on the Moor and steams in rain. Older than the Tithed.
 - **The black glass runs,** each in the shape of what bled: a smooth face up, conchoidal ripples beneath, glints held
   back as on the pit's obsidian.
-- **The milestones of the old road:** the ninth grown to a man's shoulder, bare of chalk for three years, one figure
+- **The milestones of the old road:** the ninth grown to a man's shoulder, bare of chalk for some years, one figure
   chalked again in brown.
 
 **What travels if the Moor does not come back:** the Sighing Lantern and the Widow's Stumps to the Sighing Ridge, whose

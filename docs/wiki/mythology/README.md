@@ -21,11 +21,11 @@ leaves), written in the world's own voices. Those live in `../in-game-texts/` an
 | Page | What it holds |
 |---|---|
 | `00-the-deep-lore.md` | **the truth beneath everything, for us only:** the world as narrative, gods as dreams believed real, everything reflecting everything, mantles, the Silence, the pilgrim |
-| `01-the-ages.md` | **the timeline:** the ages from the Silence to the year 1114, and the dated events of the last thousand years |
+| `01-the-ages.md` | **the timeline:** the ages from the Silence to now, and the events of the Last Breath in order |
 | `02-the-creation-myths.md` | **every people's creation myth,** in full |
-| `03-the-age-of-terrors.md` | the world before the god died: the Terrors, the Unhewn and the herald, the Famines, the Needle, the reaper, the dead serpent, the cities in the sky and the dark moon, the peoples of that age, and the Wasting that ended it |
-| `04-the-held-space.md` | inside the living god: the Choir, the Xyrr, the court of white faces, the congregation; and every telling of how the god died |
-| `05-the-last-breath.md` | the thousand years since, era by era: the coming out, the founding of the faiths, the serpent's death, the great events, to now |
+| `03-the-age-of-terrors.md` | the world before the god died: the Ythraal, the Thrae and the herald, the Famines, the Needle, the reaper, the dead serpent, the cities in the sky and the dark moon, the peoples of that age, and the Wasting that ended it |
+| `04-the-held-space.md` | inside the living god: the Choir, the Angles, the court of white faces, the Keeper, the Deep; the first morning; and every telling of how the god died |
+| `05-the-last-breath.md` | the long age since, era by era: the coming out, the founding of the faiths, the serpent's death, the great events, to now |
 | `06-the-ends-of-the-world.md` | **every people's end of the world** |
 | `07-who-is-who.md` | the powers, the faiths and the peoples: what each holds holy, how it keeps its dead, its rites, its quarrels |
 | `areas/` | **the lands of Act I,** one page per zone: what the place is, the texts found there, and a brief for building it |
@@ -45,8 +45,8 @@ leaves), written in the world's own voices. Those live in `../in-game-texts/` an
 - **Myths are told as myths.** The voice is that of a good book of world mythology, readable and in order, with
   little jargon. The old tongue's names (Oss-Vharoth, Ur-Nihl) appear rarely. No myth is framed as a character's
   journal.
-- **Depth of time.** Every myth belongs to an age, and `01-the-ages.md` places it. The last thousand years have dates;
-  what came before has only an order.
+- **Depth of time.** Every myth belongs to an age, and `01-the-ages.md` places it. Nothing is dated; the ages and
+  their events have only an order.
 - **Rival tellings stand.** The peoples of the Hide were not there for most of what they tell, and they disagree.
   Contradictions are canon (Derek, 2026-10-05); the bible tells each telling and never reconciles them.
 - **Behind the myth.** Where Derek has ruled a truth the world's people never learn, a short note marked *Behind the
@@ -67,17 +67,17 @@ leaves), written in the world's own voices. Those live in `../in-game-texts/` an
 ## Still open for Derek
 
 - **The ages' names.** These pages use the Lore Bible's first set, with Derek's change of 2026-10-09: the Uncounted,
-  the Age of Terrors, the Wasting (was the Starving), the Age of the Last Breath.
+  the Age of the Ythraal, the Wasting (was the Starving), the Age of the Last Breath.
 - **Settled from Derek's notes of 2026-10-09** (the rewrite of `02`, `03` and `04`):
-  - the retired folk ward and trade are gone from the zones too, not only the myths: the Tithed lay worn tools (and,
-    here and there, hearth-ash or old nails) where the zones had it; the Ash Shore's boilers boil the grey-soaked ash
-    for potash; the Smugglers' Hold packs its bone in lime. The game's own Codex (`data/codex.json`) and the Shrine
-    Keeper's passive "Salt on the Threshold" (`data/board.json`, `data/progression.json`) still have the old word;
+  - the retired folk ward and trade are gone from the zones too, not only the myths: the Tithed leave the tenth loaf on
+    the sill where the zones had it; the Ash Shore's boilers boil the grey-soaked ash for potash; the Smugglers' Hold
+    packs its bone in lime. The game's own Codex (`data/codex.json`) and the Shrine Keeper's passive "Salt on the
+    Threshold" (`data/board.json`, `data/progression.json`) still have the old word;
   - the in-game texts that retell the old age (`../in-game-texts/10-the-old-powers.md`, `11-the-gone-peoples.md`)
     are rewritten to the new names;
   - the game's boss "The Marrow-Eater" (`data/progression.json`) stays: "Marrow-Eaters" is what the common roads call
-    the Emptied.
+    the Ghauul.
 - **The Flesh herald's name.** The game still shows the retired "Wet Nurse"; Soul has no herald.
 - **The faiths' own words:** order, monastery, circle, procession, shrine.
 - **The start's names:** the village, the merchant, and the sea's common name.
-- **The proposals** marked *(proposed)* in `01-the-ages.md`: dates and orders the canon never fixed.
+- **The proposals** in `01-the-ages.md`: orders of events the canon never fixed.

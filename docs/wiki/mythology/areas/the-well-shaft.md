@@ -93,14 +93,14 @@ There. They have stopped. Now we go.
   the shaft. Near the top, round chambers open off the coil: cisterns the village cut sideways in dry summers when the
   well ran low.
 - **Three depths**, the god showing more the deeper:
-  1. dressed stone lining and iron rungs, rusted dark in the wet centuries before the water went dry;
+  1. dressed stone lining and iron rungs, rusted dark in the wet ages before the water went dry;
   2. raw rock, then the meeting with bone: the last iron rung, and an arm's length below it the first bone one;
   3. the Coiling Deep: walls in close pale rings like a windpipe's, warm, smooth, a little glossy, and the air moving
      in and out.
 - **The water going up:** the dry water creeps up the walls as a clear film and drips upward off ledges and rungs;
   drops rise past the lantern and vanish up the shaft; where it gathers, it lies against the undersides of things. Every
   floor is dry.
-- **The floor is never bare:** what the village dropped down its well over the centuries (rings, shoes, a child's
+- **The floor is never bare:** what the village dropped down its well over the generations (rings, shoes, a child's
   knife, bucket staves, a broken bucket, rope ends), stone grit and flakes of rust; lower down, bone grit and fine dust
   in the hollows between the rings.
 

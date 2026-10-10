@@ -27,7 +27,7 @@ on the crypt stair. Blood given without the Words is given to no one.
 Blood given is not blood taken.
 
 What was wounded, the Rule does not say. Of the god's fall, which the lowlands talk about so much, the processions
-remember nothing at all. The cup came down to us from somewhere, and we count our years from the first cup filled.
+remember nothing at all. The cup came down to us from somewhere, and our faith begins with the first cup filled.
 
 ## The Day of the Measure
 
@@ -66,7 +66,7 @@ pattern.*
 Every chapter has a niche over its crypt stair, and in every niche stands the Maiden. Her face is never finished. It
 is left rough from the axe, the first cuts of a face and nothing more.
 
-The carvers say the first carver of the first niche worked on her for a year, and every time he set his chisel to
+The carvers say the first carver of the first niche worked on her a long while, and every time he set his chisel to
 her face it slipped. In the end he put the chisel down and left her as she was. When the Elder asked him why, he said
 that she did not want a face, because a face can be named, and a thing that can be named can be called.
 
@@ -87,7 +87,7 @@ I did not believe them. I lay in the guest room with the door open a crack, and 
 the stair, slow and heavy, more of them than there were penitents in that chapter, and then candles going down after
 them.
 
-Then I heard a voice in the crypt say my mother's name. My mother has been in the ground nine years.
+Then I heard a voice in the crypt say my mother's name. My mother has been in the ground for years.
 
 And a penitent's voice answered, *Yes, I'm here*, very gently, the way you would answer a child who has woken in the
 night.

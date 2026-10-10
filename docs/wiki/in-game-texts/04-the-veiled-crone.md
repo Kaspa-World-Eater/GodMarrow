@@ -2,7 +2,7 @@
 
 *The circles of the Veiled Crone keep the soul. They meet in round lodges built where, they say, her threads come up
 through the skin of the world, and they sit in rings from dusk until the grey hour saying her names. Their texts are
-kept in the lodges and copied by their readers. Some came out with the Unveiled, who left.*
+kept in the lodges and copied by their readers. Some came out with the Mirror, who left.*
 
 ## The first thread
 
@@ -58,7 +58,7 @@ on a still night, running under the surface toward the shore. I would like to se
 *Told in every circle as the reason for the oldest law. A grinder of glass, who made the hollowed
 mirrors for the lodges, wrote it down.*
 
-A soul cannot pass its own reflection. Every circle holds this, Covered and Unveiled alike, and every circle tells
+A soul cannot pass its own reflection. Every circle holds this, Shroud and Mirror alike, and every circle tells
 the same story of how it was learned.
 
 A reader's son died young. On the way out of the house his soul crossed the yard, and in the yard there was a pail of
@@ -78,10 +78,10 @@ lodge has ever let one past its door alive.
 
 *From a lodge's day-book, kept that winter in several hands. The last hand shakes.*
 
-In the winter of the year 1106, the dead did not go through.
+That winter, the dead did not go through.
 
 We covered the mirrors as we always have. The felt was laid right, and the stones were on the corners. But the dead
-came back up the valley anyway, every night for forty nights. They came to the doors of the houses they had died in
+came back up the valley anyway, night after night. They came to the doors of the houses they had died in
 and stood there and asked the same thing, over and over, quietly, of whoever opened the door: *Which way?* Nobody
 could tell them. They went from door to door. By the end of the winter they were at the lodge doors too.
 
@@ -91,16 +91,16 @@ would not say anything else, and in the morning she was dead, and her soul did n
 
 After that, some of the circles took the felt off. They let the dead look at their own faces in the glass, and the
 dead stopped there, and were still, and stayed. Those circles kept them, held in the glass, and carried them. The
-circles that did this call themselves the Unveiled. The ones who would not call themselves the Covered, and say the
+circles that did this call themselves the Mirror. The ones who would not call themselves the Shroud, and say the
 Unveiled are thieves of the dead.
 
 The coat of glass did not go into the ground with our eldest. It stood up on its own in the lodge, full of the kept,
 and it has not fallen down since.
 
-Since that winter the Covered send their dead through faster and more fiercely than before, and they burn any glass
-they find uncovered. "The loom is there," they say, "and saying so is the work." The Unveiled walk the roads with
-needles and hollowed mirrors, and the kept go round them in the dark like small cold lights. Widows pay the Unveiled
-for a little more time with the dead, and the Unveiled take the copper.
+Since that winter the Shroud send their dead through faster and more fiercely than before, and they burn any glass
+they find uncovered. "The loom is there," they say, "and saying so is the work." The Mirror walk the roads with
+needles and hollowed mirrors, and the kept go round them in the dark like small cold lights. Widows pay the Mirror
+for a little more time with the dead, and the Mirror take the copper.
 
 ## The reading-room
 
@@ -137,7 +137,7 @@ rows are done, we fold the cloth and lay it with the others, and we say this ove
 One winter, every thread that ever went through the eye will come back up its valley at once. Every soul that ever
 died will stand at its own door, in the snow, and ask which way.
 
-The Unveiled say that then the dead will stop at their own faces, at last, and be home. The Covered say the loom will
+The Mirror say that then the dead will stop at their own faces, at last, and be home. The Shroud say the loom will
 finish its cloth and fold it, as we fold ours tonight.
 
 Either way, nothing will move again. The candle will stop burning down.

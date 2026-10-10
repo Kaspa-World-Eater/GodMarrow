@@ -78,7 +78,7 @@ Our crew went on building alone, out as far as the stone would hold without the 
 further, and then they stopped. The last of them was cutting his name on the parapet when they stopped. He got half of
 it cut. He put down his chisel and walked back up the road, and nobody knows his name, because he never finished it.
 
-The boatmen tell it otherwise. They say the bridge stood whole for a hundred years, and pilgrims crossed it, until one
+The boatmen tell it otherwise. They say the bridge stood whole for generations, and pilgrims crossed it, until one
 spring the vein came down in a single great push and took the middle out. After that there was a ferry, with a bell on a
 post at the landing to call it, and the last ferry went over at dusk full of people and never came back, and the ones
 who had missed it are standing on the bank still. And the pilgrims who knew Garrow say the half-cut name is his, begun

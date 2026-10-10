@@ -4,7 +4,7 @@
 wrong. These texts are what frightened people wrote down: readers at the Citadel of the Shattered Femur, copyists,
 grandmothers, and a few who saw.*
 
-## The Terrors
+## The Ythraal
 
 *The opening lecture given to new readers at the Citadel of the Shattered Femur, as one of them copied it down in
 his first week. He did not finish his reading.*
@@ -13,8 +13,8 @@ Forget what the faiths have told you about the beginning. Every faith begins its
 world is older than any of them.
 
 A god is a belief that grew a body. When enough people fear a thing, or pray to it, for long enough, it stands up.
-Fear grows one fastest. A city that is afraid of its river for a hundred years will one spring see the river stand
-up. We call the gods of that age the Terrors, because that is what they were made of, and because terror was what
+Fear grows one fastest. A city that is afraid of its river for a lifetime will one spring see the river stand
+up. The oldest books call the gods of that age the Ythraal. Nobody knows what the word meant; everyone says it quietly. Fear is what they were made of, and fear was what
 they ate. A city that trembles is a city that feeds its god, and a god nobody fears any more grows thin, and then
 hungry, and then comes looking. There was an age when they walked the world, and it is the age most of our ruins come
 from, and most of what we know about it is wrong.
@@ -24,7 +24,7 @@ prayed to, it hardens, and we call what it hardens into marrow. That is why the 
 walk the old diggings, that a field dug for marrow gives nothing afterward, and a hill dug hollow sinks. The faiths
 dig anyway.
 
-And when you sleep, you dream, and the Terrors walk there too. A dream is a door left open. A nightmare is something
+And when you sleep, you dream, and the Ythraal walk there too. A dream is a door left open. A nightmare is something
 feeding.
 
 Not everything was a god, then or now. There were great things that never learned a name. There were the dead, who in
@@ -39,7 +39,7 @@ those.
 
 ## The Starved Crown
 
-*A warning the grandmothers of the white country give to children who go out after dark. A reader of the Citadel
+*A warning the grandmothers of the Pale give to children who go out after dark. A reader of the Citadel
 set it down, and wrote under it what the Citadel thinks.*
 
 There was only ever one of it. Anyone who tells you there were many has been listening to songs.
@@ -63,7 +63,7 @@ subjects. It is very thin now. It wants nothing in the world so much as to be be
 
 So when you go out at night, do not be afraid of the dark. That is how it finds you.
 
-*Under it the reader wrote:* The grandmothers say the ribs that stand in a valley of the white country, twenty-three
+*Under it the reader wrote:* The grandmothers say the ribs that stand in a valley of the Pale, twenty-three
 of them or twenty-four, depending on who counted, are its own, shed when it began on itself. The Citadel holds that
 the god never raised it at all, that nothing did, and that it tells the story of the god's hand only because a thing
 made by a god may ask to be worshipped like one. Nobody at the Citadel has gone to count the ribs again.
@@ -110,7 +110,7 @@ like.
 *A note found in the margin of the Citadel's oldest book of drawings, beside a drawing of a cavern. The hand is a
 scholar's of the Pale Order.*
 
-The book calls it Oss-Karrhath, and the lowlands call it the Gleaner. It is a skeleton too great to measure, the drawing says, lying in a cavern
+The book calls it Oss-Karrhath. It is a skeleton too great to measure, the drawing says, lying in a cavern
 floored with the dead of a whole age, and its right arm ends in a scythe grown out of its own bone. The book says it
 may be asleep.
 
@@ -167,17 +167,17 @@ edges. That is the city, and it is not small; it is only far away, and it is bro
 
 It is dead up there, all of it, and the dead walk its streets as if they still had somewhere to be. And on the highest
 throne there is one thing that does not walk, because it is sitting, and it gives the order to rise. Every day. To a
-city that cannot rise any further. It has been giving it for longer than we have been counting years, and it has not
+city that cannot rise any further. It has been giving it for longer than anyone has counted, and it has not
 once been obeyed, and it has not once stopped. The shore folk call it the Man in the Rust. The Citadel calls it the
 Regent and will not discuss it, and that is why I am here.
 
-## The Uninvited
+## Outside of everything
 
 *From the Citadel's book of things it cannot place. The reader who kept the book wrote at the top of every page: these
 owe nothing to the corpse, nor to any god, nor to the Silence.*
 
 The first is the Unborn. It lies curled in the dark between the stars, a shape like a child the size of the night,
-not yet born. The grandmothers of the white country say the earthquakes are its kicks. When it is born, they say, it
+not yet born. The grandmothers of the Pale say the earthquakes are its kicks. When it is born, they say, it
 will be very hungry, and the world will be the first thing it sees.
 
 The second is the Drowned Twin. It stands on the other side of every still surface: a puddle, a polished blade, the

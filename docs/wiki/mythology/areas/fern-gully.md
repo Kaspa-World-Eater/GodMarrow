@@ -26,7 +26,7 @@ curling shut along the path behind the pilgrim like fingers closing.
 *Told by a hunter's mother to the children at the hunters' fires beyond the gully, and written down long after by one
 of those children, who had gone to the copyists to learn her letters.*
 
-When the Heath burned, the year after the god died, the fire went everywhere the wind sent it. It went over the low
+When the Heath burned, soon after the god died, the fire went everywhere the wind sent it. It went over the low
 ground and the high, and round the pools, and it came to the lip of the gully, all along it, the whole length, and
 looked down, and did not go in. That is why the heather on our side has never burned.
 

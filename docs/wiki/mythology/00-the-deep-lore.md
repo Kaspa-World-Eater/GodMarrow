@@ -175,7 +175,7 @@ ever says why.
 **The joke at the end:** the pilgrim is not a hero but the world-ender, brought back into being to end the turn and
 renew it, the way Kali destroys so that things begin again. At the last, the pilgrim takes up the mantle of the thing
 they came to kill, and becomes the next one, the ender the next turn of the world will fear. It has always been so.
-Perhaps the Slayers, who "came in where it was open", were the last turn's pilgrims.
+Perhaps the Vhoor-Qhan, who "came in where it was open", were the last turn's pilgrims.
 
 The game never states any of it. The player may come to suspect it, and the end may show it.
 
@@ -228,7 +228,7 @@ each is a little true, and none is the thing.
 - **The Bone grows because it is counted.** Every number the brothers cut makes a little more of what they count.
 - **The gilded saints cannot finish.** They are looked at and not seen, so they are neither told nor untold, and a
   thing in between cannot end.
-- **The congregation answered the Choir "badly, with names".** The names they gave are why there is anything left of the
+- **The people answer the Choir "badly, with names".** The names they give are why there is anything left of the
   god at all: hands, faces, bone, blood, breath, each one a name that kept a piece of it standing.
 
 ## Showing it, never saying it

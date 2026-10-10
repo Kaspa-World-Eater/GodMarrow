@@ -1,13 +1,13 @@
 # The Held Space, and the death of the god
 
-All through the ages outside, while the Terrors walked and wasted on its skin, the thing beneath had an inside.
+All through the ages outside, while the Ythraal walked and wasted on its skin, the thing beneath had an inside.
 This page tells what is told of it, and of how the thing died, which is the one event every people of the Hide agrees
 happened and no two tell the same.
 
 ## A space held open
 
 Inside the thing there was a space held open, and in it there was no night. It lay in the thing's head, the peoples
-who lived in it came to believe, though none of them ever saw its walls: they came out of it through the mouth. Light lay evenly over everything and came
+who lived in it came to believe, though none of them ever saw its walls. Light lay evenly over everything and came
 from nowhere, and the air smelled of being held. The monks of the Gilded Peak said the thing held the space open inside
 the Silence, the way a held breath holds a pause open, and everything was kept inside that pause.
 
@@ -30,46 +30,35 @@ and perhaps they are too.
 
 They are still singing, under the floors of the Hide's deepest crypts, faint and without end. They are waiting for the
 thing's last breath to finish going out, so that there will be a rest again, and they mean to come in on the next
-line. They do not say what the next line is. They are practising it. Of the congregation that knelt near them at the
-last, they say only that it *answered badly, with names*.
+line. They do not say what the next line is. They are practising it. Of the people who came after, they say only that
+they *answer badly, with names*.
 
-## The Xyrr
+## The Angles
 
-There were cutters in the Held Space before anyone else. They had no name anyone could say. They signed their work
-with a sigil instead, and the scholars, who cannot copy the sigil, call them **the Xyrr**, after the sound the first
-copyist made trying to read it aloud. Everybody who has stood in their halls agrees on one thing about them: there are
-too many angles.
+Before anything else stood in the Held Space, there were the Angles, and almost nothing is known about them. They left
+halls with more corners than a room can have, so that whoever walks the edge of one and counts gets a different count
+each time, and higher. They left stairs with risers that come only to the knee, doors set a little off true, and
+niches too long for any body. People who sleep in their halls wake with nosebleeds. They signed everything with a sigil
+that is all angles, more than its lines can hold, which hurts the eyes to look at; copyists who tried to draw it went
+blind in the eye they used.
 
-Their halls have more corners than a room can have. Walk the edge of one and count the corners, and the count comes out
-different every time, and higher. Their stairs have risers that come only to the knee and treads that slope very
-slightly, so that whoever climbs them leans, and arrives leaning. Their niches are too long for any body that walks now,
-and their doors are set a little off true, so that a door seen straight on looks open and seen from the side looks
-shut. Lines that should meet do not; lines that should not, do. People who sleep in their halls wake with nosebleeds.
+Their few words are cut in a plain script beside the sigils: *We were cut from the first of the room, and began cutting
+at once.* Over the niches: *Lie down facing the stair. Watch.* Everywhere: *Our joints do not finish.* There was one
+thing they would never cut. Wherever it should appear they cut around it, and every ring of their carving has a gap in
+it the width of a thumb: *Do not say its name. We cut no name for it. We cut around it.* At the end of their deepest
+hall there is a pillar with a seat cut at its foot, empty, and over it the newest carving of all: *Now one of you.* The
+rings with teeth that stand all over the Hide (the waystones) carry their sigil on their inner faces, where only someone
+standing in the pit would see it: *WE CUT THEM FACING IN, SO THE MOUTH IS KEPT BY WHAT IT HOLDS.*
 
-They cut signs everywhere, and the signs hurt. A sigil of the Xyrr is all angles, more than its lines can hold,
-and it cannot be looked at for long: the eye slides off it, comes back, slides off again, and behind the eyes
-something aches. Copyists who have tried to draw one have gone blind in the eye they used, and one copyist who
-finished a drawing was found sitting in front of it, still looking, a day later, and did not get up. Some of their
-carvings can be read, in the plain script beside the sigils: *We were cut from the first of the room, and began cutting
-at once.* Over the niches: *Lie down facing the stair. Watch.* Everywhere: *Our joints do not finish.*
+That is all. What they were, what they looked like and where they went, nobody knows. But the word has got into the
+common speech of the Hide the way old words do, and people use it without thinking:
+- *May the Angles keep you*, said at a door to someone going out at night, and not said warmly;
+- *An Angle passed through here*, said of a room that has one more corner than it had last night;
+- *Fools go where Angles won't.*
 
-There was one thing they would never cut a sigil for. Wherever it should appear they cut around it and left a space,
-and every ring of carving they made has a gap in it the width of a thumb. *Do not say its name. We cut no name for it.
-We cut around it.* At the end of their deepest hall there is a pillar with a seat cut at its foot, empty, and over it
-the newest carving of all: *Now one of you.*
-
-What they looked like, nobody alive has seen. Their bones turn up in the deepest halls: long, many-jointed, with more
-joints in a finger than a person has in an arm, and they never go brittle.
-
-The rings with teeth that stand all over the Hide (the waystones: eight hooked stones round a pit of breathing ash, that
-take a walker apart and put them back together at another ring) carry the Xyrr's sigil on their inner faces, where
-only someone standing in the pit would see it: *WE CUT THEM FACING IN, SO THE MOUTH IS KEPT BY WHAT IT HOLDS.* Others
-claim them too.
-
-*Behind the myth.* The Xyrr were not people and never pretended to be. When the Pale Order came to the white ridges,
-the Xyrr walled themselves into their own halls. The Order's bone-houses are their upper floors, and the Order hides
-the older halls beneath. It is whispered that the rings are coming nearer to each other, and that someone is still
-cutting them.
+*Behind the myth.* The joke is only the word: the world says Angles where we would say angels, and never says the other
+word. What they measured the Held Space for is never told. The Pale Order hides their halls beneath its bone-houses, and
+it is whispered that the rings are coming nearer to each other, and that someone is still cutting them.
 
 ## The court of white faces
 
@@ -94,7 +83,7 @@ thing knew what it had heard.
 There was a Keeper there. It lay coiled in the spiral, following its turns, so long that nobody ever saw both its ends,
 and its whole body was ears: it listened with its skin. Its work was to listen before the thing did, and to sort what
 came in, and to let the thing hear only what it should. The Choir's song came in at the hollow, always, and the Keeper
-let it through. The cries of the peoples outside came in, from the Terrors' cities and the waste, faint as weather, and
+let it through. The cries of the peoples outside came in, from the Ythraal's cities and the waste, faint as weather, and
 the Keeper let those through too, a little at a time, because the thing should know it was not alone. Some things it
 did not let through. The Keeper never said what they were. The pale walls of the hollow are scored in places, deep, as
 if something had tried to get down the spiral and been held at a turn.
@@ -120,7 +109,7 @@ those ages, and whether it is still holding it at a turn of the spiral, is unkno
 At the bottom of everything, under the skin of the world and under the flesh and under the bone, there was the blood
 that had nowhere left to run. It had pooled there since before the Uncounted, at the low point of the thing, and stood,
 and stood. Blood that stands too long goes dark and thick and then hard. And the weight of the whole world lay on it,
-the bone and the flesh and every people and every Terror, pressing down from every side at once, for longer than there
+the bone and the flesh and every people and every Ythraal, pressing down from every side at once, for longer than there
 are years for, and under that weight the stale blood was forced into iron.
 
 Iron is old blood. Everyone in the Hide knows that; it is why the miners bleed the first ore they bring up, to give it
@@ -128,9 +117,9 @@ back, and why iron always smells a little like a wound. In the Deep there is not
 ridged and crusted like a scab the size of the world, hot underfoot. And in the iron there is life, and the life is
 iron too. Things grow there, slowly, iron that branches like coral and iron that opens and closes. Things walk there:
 great shapes of iron, heavy and patient, jointed like armour with nobody inside, that the few who have come back call
-the golems. They do not speak, or they speak too slowly to hear. They work.
+**the Khar-Dhuum**, a name from a tongue nobody speaks. They do not speak, or they speak too slowly to hear. They work.
 
-What they work at is the core. Deep under the iron country there is the core of everything, and the golems are
+What they work at is the core. Deep under the iron country there is the core of everything, and the Khar-Dhuum are
 hardening it. They lay iron on it, layer on layer, scale on scale, and beat it down, and lay more, the way a shell is
 laid down round an egg, from the outside in. Nobody knows what the core is, or why it must be hard. The ones who came
 back say that, at the bottom of the shafts, you can feel it under the iron: something round, very large, and warm, and
@@ -155,13 +144,13 @@ blood-dark and jointed every way. They did not let go, and they did not fall. Ve
 
 It walks still, down there. It went down into the Deep on its legs and never came up, and it walks the iron country
 under everything, carrying its empty streets on its back through the dark, and the iron things of the Deep step aside
-for it. The miners call those things **the Answerers**, for the way they strike back, and say that Vesk is the greatest
+for it. The miners say that Vesk is the greatest of the Khar-Dhuum, or the first
 of them, or their mother, or the god they work for. In the deepest shafts there are sometimes prints in the ore, round
 and deep and close together, hundreds in a line, going on under the rock. Some miners say that if you lie with your
 ear to the ore you can hear it walking, very far off, and under the walking, very faintly, the people of Vesk, still
 holding.
 
-And it asks, very politely, for infants, where the folded thing lies nearest the top. The golems do not know how to
+And it asks, very politely, for infants, where the folded thing lies nearest the top. The Khar-Dhuum do not know how to
 make a mind. The thing inside the shell will need one. They say soon.
 
 *Behind the myth.* What hatches when the shell is hard, if anything does, is unknown, and kept so. The iron of the Hide
@@ -169,22 +158,18 @@ is the god's stale blood (the iron maidens, the red heart of old iron, `03-the-a
 only city that walks anywhere but Dhum, which walks in a Famine under the sky. The deep lore
 offers a rhyme: the cycle turns (`00-the-deep-lore.md`), and something is always being got ready for the next telling.
 
-## The congregation
-
-Last of all came the congregation, the ancestors of every person alive on the Hide. They knelt, and they sang. Their
-song had four notes: three low, each going down from the one before, and a fourth that went up, the way a voice goes
-up at the end of a question.
-
-Near the end, the thing set something down among them, small and folded, the way a woman banks a coal in ash so that
-there will be fire in the morning. It lies, they say, nearest the top in a newborn, where the skull has not yet
-closed.
-
-Where the congregation came from is told two ways:
-- they were always there, inside, as the Xyrr and the Choir were;
-- they walked in from the wasting world outside, through the thing's mouth, with their tools on their backs, to
-  mend what the marrow-diggers had taken and to kneel at the work (`03-the-age-of-terrors.md`).
-
-They remember only that they were already kneeling.
+**Every iron story is the same story** (Derek, 2026-10-09: "tie everything iron related together ... every story is
+the same story in a way, but completely different"). Iron is blood that was held too long, under weight, until it
+hardened; and every iron thing in the world is something held:
+- **the Deep:** the god's own blood, held still under the whole world until it set;
+- **the iron maidens:** penitents holding still on the spikes until the iron drank them, and the girl who is holding
+  still in hers yet, and bleeding (`03-the-age-of-terrors.md`);
+- **Vesk:** a people holding their city up until they hardened into its legs;
+- **the Needle:** a spike like a maiden's, holding what it is digesting;
+- **the Starved Crown's crown:** forged by the people it then ate, holding up its head;
+- **Qhaloth:** a city held up in the sky until it rusted there, and turned the brown of old blood;
+- **the miners:** who bleed the first ore of every shaft, to give back a little of what is held.
+Held is the Held Space's own word. Nobody in the world has laid these side by side. The player may.
 
 ## How the god died
 
@@ -192,7 +177,7 @@ The thing stopped. Every people tells it, and none was there to see. All the tel
 
 - **The common people of the lowlands** say something pressed in from outside, the way cold presses at a tent, and took
   the thing's names, the little ones first: the name of the smallest finger, the name of one eyelash, the name of the
-  hour before morning. The people sang louder, and it took more, until the thing forgot how to be three. Where its name
+  hour before morning. The Choir sang louder, and it took more, until the thing forgot how to be three. Where its name
   should be, the grandmothers leave a breath of nothing.
 - **The Choir** says it came in through the rest, the one moment when all of them drew breath together.
 - **The Pale Order** says only that the Mother fell, and that the first brothers stood beside her.
@@ -203,10 +188,10 @@ The thing stopped. Every people tells it, and none was there to see. All the tel
 - **On the roads it is told** that the faithful divided it: that its worshippers took knives to it, dying or sleeping,
   and shared out its bone and soul and flesh among them, and that the Tithe-Hands that run on their fingers are its
   right hand, taken off at the wrist. The grandmothers will not have this told at their fires.
-- **The Xyrr's carvings** say that she listened toward something, or too far, and while she listened she forgot to
+- **The Angles' carvings** say that she listened toward something, or too far, and while she listened she forgot to
   close her hand.
 - **The Keeper of the Spiral Hollow** says a speaking came in with no mouth behind it and said her names one at a time.
-- **The Slayers** say nothing of a death. They say something was opened, and they came in where it was open.
+- **The Vhoor-Qhan** say nothing of a death. They say something was opened, and they came in where it was open.
 - **A wandering preacher** taught that the thing was eased, the way you loosen a dying man's fingers one at a time, and
   that the last fingers hold hardest.
 - **Some say it is not dead.**
@@ -214,25 +199,21 @@ The thing stopped. Every people tells it, and none was there to see. All the tel
 *Behind the myth.* Unknown, even to us, and kept so. The deep lore offers a reading (`00-the-deep-lore.md`): the Choir
 stopped telling the thing what it was, for one breath, and it was unsaid. It is a reading, nothing more.
 
-## The coming out, year 0
+## The first morning
 
-The light went out, and the warmth went out of the walls. In the dark the congregation took hold of each other's belts,
-so that nobody would be lost, and walked. They walked through soft places, and hard places, and places that pulsed
-underfoot, toward a door that was warm and wet and opened and shut. They went out through it on the thing's last breath,
-into a grey light, and fell on the ash of its cheek, and kissed the ash because it was ground.
+The light went out of the Held Space, and the warmth went out of its walls, and the thing beneath let go its last
+breath, and it has been letting it go ever since. Every thought that had ever walked in the folds lay down where it
+stood.
 
-All of them came out, or most of them. Those who did not are still kneeling somewhere inside, and they still know the
-tune. Sing the fourth note on the open ash at night, the lowlands say, and something answers it, and comes toward you on
-its knees, singing the next line.
-
-The common count begins here, at year 0, and every age since is the Age of the Last Breath (`05-the-last-breath.md`).
+And on the outside of the thing, in the grey of the first morning, the people woke on the ash of its hide. How they
+came to be lying there, nobody knows, and every hearth tells it its own way (`02-the-creation-myths.md`). Their
+memory begins there. Every age since is the Age of the Last Breath (`05-the-last-breath.md`).
 
 ## What became of them
 
 - **The Choir** sings under the crypts, waiting for the rest.
-- **The Xyrr** sleep walled into their halls beneath the Ossa, and their carvings wait for someone to take the
+- **The Angles** sleep walled into their halls beneath the Ossa, and their carvings wait for someone to take the
   empty seat.
 - **The court's faces** fly at dusk on borrowed wings.
 - **The Keeper** waits for the Holder to hear again.
 - **The Deep** hardens the shell round the core, and asks for infants, and says soon.
-- **The congregation's children** are the Tithed, and they are everyone.

@@ -80,31 +80,29 @@ in the ash, in a ring, were the marks of knees, close together, every one of the
 That is why we do not sing the fourth note. The ones who did not come out still know the tune, and they want the rest
 of the song.
 
-## The tool on the sill
+## The tenth loaf on the sill
 
 *Told by a mother to her children, as it has been told in her family for longer than they know. A brother of the
-Pale Order, quartered in a lowland house one winter, asked about the worn awl across the sill and wrote down her
+Pale Order, quartered in a lowland house one winter, asked about the loaf left on the sill and wrote down her
 answer.*
 
-When we went in to kneel, we carried our tools with us. Nobody knows where we got them, because we do not know where
-we were before we went in. But we had them, and we worked with them all the time we knelt, and our hands wore them
-smooth. The god never worked. Nothing of the god ever has.
+When we came out of the god, we came out owing. Nobody knows to whom, because we do not know who gave us the morning.
+But we owe, and a tenth of everything is still owed, and we have been behind on it ever since.
 
 Everything that comes up out of the god now is made of the god. We are the only things that are not. That is why they
 want us. Some of them want to take us back inside. Some of them want to put us on the way you put on a coat, and kneel
 the way we knelt, and be us. They are homesick. They do not hate us. That would be simpler.
 
-The first winter on the Cheek, a child was born in the open, the first born outside the god. On the third night the
-things came to the shelter where the mother lay with her child, and they stood round it in the dark and breathed. The
-mother had nothing but the few tools she had carried out, worn thin with work. She laid them in a line across the
-door, and along the gaps in the wall, and in a ring round the child, and the things stood outside the line all night
-and did not cross it. In the morning they were gone.
+The first winter on the Cheek, a child was born in the open, the first born outside the god. One night the things
+came to the shelter where the mother lay with her child, and they stood round it in the dark and breathed. The mother
+had nothing but a little bread she had carried out, hard and grey. She broke off a tenth of it and laid it on the sill,
+and the things stood outside all night and did not come in. In the morning the bread was gone, and the mother and the
+child were still there.
 
-So we lay a worn tool across the doorstep, and on the sill, and round the bed where a child sleeps: an awl, a nail, a
-blade whetted thin, never a new one. We hang a lantern at the head of every cradle. And a mother gives her child its
-true name in her own mouth, and says it aloud only once, by the hearth, on the day the child first walks. After that
-it stays behind the child's teeth for life. That Which Cannot Be Named took the god apart one name at a time, and the
-dead call the living by their names. A name that is never said cannot be called and cannot be taken.
+So we set the tenth loaf on the sill at night, and we hang a lantern at the head of every cradle. And a mother gives her
+child its true name in her own mouth, and says it aloud only once, by the hearth, on the day the child first walks.
+After that it stays behind the child's teeth for life. That Which Cannot Be Named took the god apart one name at a time,
+and the dead call the living by their names. A name that is never said cannot be called and cannot be taken.
 
 ## The lantern that sighs
 

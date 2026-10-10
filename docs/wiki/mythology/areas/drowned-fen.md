@@ -147,7 +147,7 @@ Pyre-Saints 32, Weepers 26, Mire Gasps 20, Bellwethers 13, Wick-Saints of the Ca
 - **Pyre-Saints:** the dry reed beds go up like straw; draw them into open water, which closes over their flame (a
   proposal: the dry water douses, but leaves nothing wet, so the reeds still burn; in rain they only smoulder).
 - **Weepers:** reeds do not stop needles; stone and the shrine's piles do. **Mire Gasps:** the wrong breath the Shrine
-  Keepers breathed into the Fen for two centuries, still coming up. **Bellwethers:** heard across the water first; put
+  Keepers breathed into the Fen for generations, still coming up. **Bellwethers:** heard across the water first; put
   an arch pier at your back and step aside on the second toll.
 
 **Sound.** The dry rattle of the reeds; no lapping or splash, so wading is near silent; the pole knocking on the Nave's

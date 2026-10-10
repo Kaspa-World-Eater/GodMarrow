@@ -126,7 +126,7 @@ crust at the pits; pilgrims' dropped things.
 **Landmarks, by the pit method.**
 - **The Shore's Broken Kneeler** (the altar). A kneeling-bench of grey stone about seven yards long, broken in the
   middle, its halves leaning apart toward the water like a door opened onto the sea; the strand between them glassed in
-  a fan; knee-hollows worn into each step; worn tools, cloth strips and glass heaped on the landward ends. Its hidden
+  a fan; knee-hollows worn into each step; cloth strips and glass heaped on the landward ends. Its hidden
   light: a lantern behind the landward half, out of sight, so its light reaches the step first. Older than the Tithed.
 - **The glass strand:** black glass 3 to 10 yards wide, in low ridges, one for each high tide, like the rings of a
   felled tree; and rows of glass running straight down to the water, a stride apart, where the Husks knelt.

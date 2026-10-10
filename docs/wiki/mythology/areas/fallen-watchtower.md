@@ -2,14 +2,14 @@
 
 *Act I · zone `fallen_watchtower` · outdoors · creatures of levels 6–9 · borders: the Old Barrow · in the game: the old
 procedural moor map (124 × 124), to be remade by the bog's method · the sky-readers' charcoal on its stair is the
-Codex's "The Sky over the Hide, Forty Years Read"*
+Codex's entry on the sky over the Hide*
 
 On a granite rise at the edge of the Ashen Moor, where the ash runs down to the barrow-field, stands the stump of a
 round stone tower. The families who bury at the Barrows built it to keep watch, because the dead there come up and walk
 home, and hung a bell in its top to wake the families when they did. Most of the tower fell, in one long tongue of stone
 down the slope. Its bell went into the ground, and it still rings under the turf when the wind is right, though nobody
-strikes it. Later two sky-readers, a master and then his pupil, roofed the stump, read the sky from it for seventy-one
-years and wrote what they saw on the inside wall, climbing with the stair. Nobody lives there now, and the writing has
+strikes it. Later two sky-readers, a master and then his pupil, roofed the stump, read the sky from it for two
+lifetimes and wrote what they saw on the inside wall, climbing with the stair. Nobody lives there now, and the writing has
 gone on climbing.
 
 It is the barrow country seen from above: open high ground over the Old Barrow, all wind and heather and ash. The god
@@ -110,7 +110,7 @@ the bell. It did not seem mine to turn them from it.
   - *Material:* grey moor-stone ashlar, its arrises rounded, gold and grey with lichen on the weather side; soot-black
     inside.
   - *Light:* inside, grey light from the slits falls in bars across the charcoal line, its source unseen.
-  - *Age:* the tower centuries old; the fall some grandmothers ago; the roof two lifetimes old.
+  - *Age:* the tower ages old; the fall some grandmothers ago; the roof two lifetimes old.
 - **The Buried Bell:** a low hump at the foot of the fallen tongue, where the turf has sunk in a ring the width of a
   bell's mouth. One curve of the rim shows above the turf, bronze gone green and black, its cast letters filled with
   ash, polished where pilgrims have touched it. Beside it a rent in the turf looks down into a hollow where the bell
@@ -120,8 +120,8 @@ the bell. It did not seem mine to turn them from it.
   the slope, facing the Barrows, each holding a sooted hollow at its chest. The wind has worn their faces blank; ash
   drifts against their backs and tails away in front. One has fallen on its face and been left there.
 - **The two shrines:** a cup-stone and two posts and a lintel, both guardian stones facing the Buried Bell.
-- **The altar:** the game places one. Make it the squat block below the tower door, its top rusted with worn tools where
-  the barrow families laid one for the watchman each dusk.
+- **The altar:** the game places one. Make it the squat block below the tower door, its top worn smooth where the barrow
+  families laid their tithe for the watchman each dusk.
 
 **Light and weather.**
 - Overcast by day, moonlit by night. The lantern is the key light; the game's two lanterns stand on the road up the rise

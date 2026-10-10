@@ -30,6 +30,10 @@ ruling in `../01-rules-and-decisions.md` always wins. Section 8 lists what the 2
   is never a dragon, no Shaper; Vesk walks in the Deep, not among the Famines; the serpent is a plain corpse (no
   ouroboros); the tower that drinks is **the Needle**. Old digest names brought back: Gorrhaun (the Famines),
   Vhul-Oghra (the Needle), Oss-Karrhath (the reaper), Morrh-Ythraal (the Starved Crown), Ghauul (the Emptied).
+- **By Derek's third notes of 2026-10-09** (the decision log has them): no names of the form "the [verb]-ers" or "the
+  [participle]"; no hard numbers of time (the dates and the year count below are retired); "the Pale" for the white
+  country; the people's origin unknown (no congregation, no kneeling, no coming out); the Terrors are the Ythraal, the
+  builders the Angles, the Unhewn the Thrae, the Emptied the Ghauul, the Slayers the Vhoor-Qhan.
 The digest keeps the old words as a record of its sources. The bible is `00-the-deep-lore.md` to `07-who-is-who.md`.
 
 ## 0. Sources, precedence and shorthand

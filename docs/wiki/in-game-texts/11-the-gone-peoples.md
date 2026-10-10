@@ -23,12 +23,12 @@ first silence. It is their holiest day and their worst one, and they sing about 
 
 After that there was one of them. Or there were eleven hundred and one, and then one. I could not make out which.
 
-They speak of us, once. The congregation that knelt in the god, they sing, answered badly, with names.
+They speak of us, once. The ones who woke on the ash after, they sing, answer badly, with names.
 
 Now they are waiting. The god's out-breath is still going out, and when it has finished, there will be a rest, and
 they mean to come in on the next line. They do not say what the next line is. I think they are practising it.
 
-## The Xyrr
+## The Angles
 
 *Copied by a scholar of the Undercount from the plain script in the lowest halls under a bone-house of the Pale Order,
 and sent in secret to the Citadel. The Order does not know the copy exists.*
@@ -42,11 +42,11 @@ Count the corners of a hall down there and the count comes out different every t
 halls left no name for themselves, only a sign at the head of every stair, all angles, more angles than its lines can
 hold. I have not tried to copy it. The brother who went down with me the first time did, and he went blind in the eye
 he drew it with. Before he went blind he tried to read it aloud, and the sound he made is the name the Citadel has
-written for them ever since: the Xyrr. The brothers call them the Stair-Cutters, and do not call them anything at all
-if they can help it.
+written for them ever since. The brothers will not say it. In their old songs the word is sung so that it can be heard
+two ways, and they will not say which they mean. The Citadel writes it the Angles, for the corners.
 
-Beside the signs there is a plainer script of straight cuts, and that I could read, in four years. They say they were
-cut from the first of the room, and began cutting at once. They say, over the niches, *Lie down facing the stair.
+Beside the signs there is a plainer script of straight cuts, and that I could read, after years of trying. They say they
+were cut from the first of the room, and began cutting at once. They say, over the niches, *Lie down facing the stair.
 Watch.* They say, in many places, *Our joints do not finish.*
 
 There is one thing they will not cut. Wherever it should appear, they cut around it, and leave a space. *Do not say its
@@ -80,7 +80,7 @@ comes, it has found you wanting, and you should not be there when it decides wha
 
 ## The undersides
 
-*Cut on the underside of Sorrath, the city that broke on the white ridges, where only someone looking up from below was
+*Cut on the underside of Sorrath, the city that broke on the pale ridges, where only someone looking up from below was
 ever meant to read it. A reader of the Citadel copied it lying on his back in a trench the diggers had cut under the
 stone, and wrote his own notes after it.*
 
@@ -122,7 +122,7 @@ are still thinking it, somewhere, all of them, very slowly.
 
 ## The tall ones at the door
 
-*What one of the Emptied said of its own people, through a closed door, to a reader of the Citadel who did not open
+*What one of the Ghauul said of its own people, through a closed door, to a reader of the Citadel who did not open
 it. He wrote it down that night and left the Citadel the next morning.*
 
 It knocked at my door after midnight, three times, softly, and when I asked who was there it answered very politely.
@@ -142,7 +142,7 @@ It said they were tall and hollow, and that it would show me if I opened the doo
 morning there were marks on the outside of it, very high up, as if someone tall had leaned their forehead against
 it for a long time.
 
-## The Slayers
+## The Vhoor-Qhan
 
 *From the walls of the temple deep inside the body, as the lamp-bearers of the Last Vigil copied them, a line at a
 time, between watches. The lamp-bearers say the walls are warm, and that there is a thought still thinking in the
@@ -156,15 +156,15 @@ This place is a thought, and it is forgetting what is in it, one thing at a time
 thing the name was for. It forgets a face, and then the one who wore it. When it has forgotten everything that is in
 it, it will be a thought that remembers no one. That is rest. We are helping.
 
-*Under the copy, a lamp-bearer wrote:* The readers ask whether the Slayers mean the Silence. I cannot say. Their walls
+*Under the copy, a lamp-bearer wrote:* The readers ask whether the Vhoor-Qhan mean the Silence. I cannot say. Their walls
 never once mention it. They may mean the Silence, or its opposite, or something none of us has a word for.
 
 ## What answers iron
 
-*Told by a miner of the white country to a copyist at the pithead, on the day he gave up the work.*
+*Told by a miner of the Pale to a copyist at the pithead, on the day he gave up the work.*
 
 We bleed the first ore we bring up out of a new shaft. Everybody does. Iron is old blood, and you give a little back.
-I had done it forty years and never asked why.
+I had done it all my life and never asked why.
 
 At the bottom of the deepest shaft I worked, the iron is warm. It is ridged and crusted like a scab, and it is warm,
 and it grows. I have seen it branch in a night like frost on a pane. If you strike iron on iron down there, something

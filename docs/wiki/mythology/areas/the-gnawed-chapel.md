@@ -30,7 +30,7 @@ we never had barrows like the lowland folk. When one of ours died, we carried th
 the crest, and the men cut a place in the wall long enough to lie in. We laid the dead one in it with their belt knotted
 at the back and a line of hearth-ash along the lip, and the plasterer closed it up flush with the wall. When the plaster
 was dry, the nearest kin painted the face on it, and the name under the face. My mother painted my father. She was no
-painter, and he looked surprised for forty years.
+painter, and he looked surprised ever after.
 
 We closed them up flush because of the knights. Every spring the knights of the Pale Order came down the Ridge road in
 their carved plate and asked us for our bones. A bone out of its place, they said, is a wound in the world. We told them
@@ -64,7 +64,7 @@ The knights came that spring as they always did. We told them we had no dead, an
 for a lowland scholar by a brother who had been told to copy the book and not to read it.*
 
 The Ridge folk say again that they have no dead. This year I went down into their chapel under the crest, which I have
-passed nine springs without entering, because the old woman at the stair-head would not look at me.
+passed many springs without entering, because the old woman at the stair-head would not look at me.
 
 Its walls are cut full of places for the dead, a hundred and more, each once closed with plaster and painted with a
 face. Every seal broke outward: the pieces lie on the floor before each place, painted side down, and the plaster dust
@@ -81,7 +81,7 @@ book. I have not written the three.
 The woman told me at last that her people said their dead's names aloud over them every fast-day, so that the Unmaking
 could not have them. We do the same when we lay a bone in the wall, and give it its number besides, and the number is
 what holds it. A name with no number is a door left on the latch. I think these dead heard themselves called every
-fast-day for a hundred years, and went to find out who was calling.
+fast-day for generations, and went to find out who was calling.
 
 There was nothing to carry home.
 

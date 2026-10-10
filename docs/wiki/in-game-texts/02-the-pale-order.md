@@ -1,13 +1,13 @@
 # The Pale Order
 
-*The Pale Order keeps the bone-houses cut into the white ridges of the Ossa, where it lays the dead and counts them.
+*The Pale Order keeps the bone-houses cut into the pale ridges of the Ossa, where it lays the dead and counts them.
 Its brothers write little and count much. These texts were read to novices, cut over the Order's stairs, or copied
 by the few outsiders the Order let in.*
 
 ## The Falling
 
 *Read aloud to every novice on his first night in the Order, by the eldest brother of the house. This copy was found
-folded into a novice's yoke-strap in a ruined bone-house on the white ridges.*
+folded into a novice's yoke-strap in a ruined bone-house on the pale ridges.*
 
 Before the Count there was no count. That is all a brother may say of that time, so I say it, and I say no more. In
 our oldest books it is written as a gap, a space left on the page, and you will not put your finger in it.
@@ -78,7 +78,7 @@ hands, and it is laid in the Wall of the Come Down.
 
 I have held one. A fallen star is colder than any bone in any niche, and there is no marrow in it at all.
 
-I have counted the sky every clear night for forty years, and I write the count in this book. On the night I write of
+I have counted the sky every clear night for most of my life, and I write the count in this book. On the night I write of
 now, I was on the high ledge with my lamp shuttered, and there was a man on the ridge across from me, alone, in the
 plate of an Ossuarch. He stood a long while looking up. Then he raised both his hands, palms up, as a brother raises
 them to receive a bone, and he asked.

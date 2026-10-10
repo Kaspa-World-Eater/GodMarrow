@@ -113,7 +113,7 @@ the holed Blowing Stone below the Ridgeway, which booms when air is driven throu
 
 **Landmarks, by the pit method.**
 - **The colonnade.** One long line of columns along the crest, broken into runs where drums have fallen: loose and
-  gappy, never a corridor of walls. Eleven hundred years of ash on one wind have sanded every column from one side:
+  gappy, never a corridor of walls. Ages of ash on one wind have sanded every column from one side:
   the windward face planed smooth and pale, the lee face keeping its flutes and a frieze of walking figures, all going
   downwind. Fallen drums lie in lines along the fall, half buried as at Palmyra (chapter 2); the blast has worn holes
   through some, and the wind sounds in them. A pale fine stone, bleached where the ash strikes, the flute bottoms pale

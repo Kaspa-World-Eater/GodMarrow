@@ -34,7 +34,7 @@ const PROMPT := {
 		"It wants something. Something wants it back. That's how the Hide stays fed."],
 	"road": ["The road it came by. It didn't. It came up a stair out of a pool an hour ago. Give it a road anyway. A road's a kindness.",
 		"Pick it a road. It'll have walked it by morning. That's how roads work here."],
-	"sac": ["The price. Something stays on the step with the rest. The Gleaner keeps a count; leave him something to count.",
+	"sac": ["The price. Something stays on the step with the rest. Old Scythe keeps a count; leave him something to count.",
 		"Something of the hide stays here. Not much. The hide grows back. Mostly."],
 }
 ## the end: what he says over the finished spread (docs/wiki/mythology/areas/the-red-shore.md, his lines). He speaks

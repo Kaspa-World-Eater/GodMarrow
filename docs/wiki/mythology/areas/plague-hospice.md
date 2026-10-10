@@ -96,8 +96,8 @@ way down the ward, one of the blankets moves.
   rows; the shafts a yard across, going up out of sight.
 - **The floor is never bare:** straw from the cots, matted and scattered; paper figures by the hundred, folded with
   their arms open, a few with them closed; long knotted cords; basins and ewers; grey felt fallen from the covered
-  mirrors (the Veiled Crone's families covered them); worn tool-heads and nails rusted to the outer steps; grit and old
-  ash fanned under every shaft; paper-boat ash at the bank.
+  mirrors (the Veiled Crone's families covered them); grit and old ash fanned under every shaft; paper-boat ash at the
+  bank.
 
 **Landmarks.**
 - **The long ward** (the zone's signature):
@@ -110,9 +110,9 @@ way down the ward, one of the blankets moves.
   - *Light:* one shaft is still open at the top, and a thin hard thread of grey daylight comes down it onto one bed, its
     source far above. Rain comes down the same way and has soaked that bed's straw dark, a level puddle beside it.
   - *Age:* a lifetime since the last sister.
-- **The grilles:** iron grilles in the outer passage wall, looking down the wards, their bars worn bright at hand height
-  on both sides, a worn tool or two rusted to the step beneath, the Ossuary Wardens at the doors beside them. A lantern
-  in the outer passage throws the bars' shadows long down the ward.
+- **The grilles:** iron grilles in the outer passage wall, looking down the wards, their bars worn bright at hand
+  height on both sides, the Ossuary Wardens at the doors beside them. A lantern in the outer passage throws the bars'
+  shadows long down the ward.
 - **The burning bank:** a raised bank of dry stone in a side room under a flue, where the sisters burned the year's
   wrong breath in paper boats and kept silent until the ash was cold. Ash and half-burnt boats drift against it, and
   grey light comes down the flue onto the ash.

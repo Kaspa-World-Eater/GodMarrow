@@ -18,7 +18,7 @@ village:
 - a small, old temple hall with a serpent stair;
 - carved posts with little houses on them at the feet of the giant trees.
 
-For seven winters the dead and the things that come up out of the Red besieged it. The wall broke, the last of the
+Winter after winter the dead and the things that come up out of the Red besieged it. The wall broke, the last of the
 people died on the temple's platform, and now no one lives here. The only soul left is a wandering merchant who is
 picking over the huts and the dead, a little mad, and laughing at everything the pilgrim does not know.
 
@@ -50,11 +50,11 @@ I am the last keeper of the stair, and I am cutting this into the door because t
 We were never troubled in my grandmother's time, or in hers. The forest kept us, and the Red kept to the sand. Our
 dead went to the fire, nothing of ours went into the water, and nothing that was ours came up out of it.
 
-Seven winters ago, in the wet season, the dead began to come up out of the Red again. They were not our dead. They
+Winters ago now, in the wet season, the dead began to come up out of the Red again. They were not our dead. They
 came from somewhere far along the water, from wherever else people give their dead to it. They came up the black
 sand at night in the old way, red to the eyes, and stood at the edge of the trees and looked up at our fire. Some
 still wore pilgrims' cloaks, and some carried staffs. In the morning they went back down into the water, and the
-next night there were more of them, and on the ninth night they did not go back down.
+next night there were more of them, and then one night they did not go back down.
 
 After the dead came the other things, the ones that were never alive the way we are: things that crawl up out of the
 surf on their fingers, things with no faces, things that come up through the sand where it is soft. My mother said
@@ -63,14 +63,14 @@ ourselves, and they swept it twice a day after that until they died.
 
 We built the wall higher on the water side. We split cedar for it, and they gnawed through the cedar, and we split
 more. When the cedar near us was gone we pulled down the empty huts and used their poles, then the doors, then the
-boards from the back of the temple, and at the last the old canoes, which nobody had touched in a hundred years.
+boards from the back of the temple, and at the last the old canoes, which nobody had touched since our grandmothers' time.
 
 Our fighters went up on the wall every dusk. Before they went up, each one danced the slow dance their teacher had
 taught them, so that if they fell, their teacher would know them and come for them before the Red could. We played
 the drum and the pipe on the wall all night, so the fighters would not hear the dead calling up to them from the
 sand.
 
-Every night someone fell, and every night we gave them to the fire before they were cold. After the second winter we
+Every night someone fell, and every night we gave them to the fire before they were cold. After the first winters we
 never let the fire go out. We burned the dead of the wall, the old who died in their beds and the children who did
 not wake, and at the end we were burning the huts to burn the dead.
 
@@ -96,7 +96,7 @@ village.
 The wall is down in a dozen places, mostly on the side that faces the water. Inside it the huts stand in a ring,
 round and roofed with hides, most of them burned to their poles. In the middle of the ring is a pit as wide as a
 chapel floor, and there is a fire in it, and there are dead on the fire. It was burning when I came and it is burning
-now. In two days I have not seen anyone put wood on it or carry the dead to it, yet each morning there are more of
+now. In all my time here I have not seen anyone put wood on it or carry the dead to it, yet each morning there are more of
 them on it than the night before.
 
 There is one man here. He is nobody from the village; he says so himself, and laughs. He carries a pack bigger than
@@ -195,9 +195,9 @@ then, as if by mistake, and he does not take it back. He plays on words the way 
 skin; the Hide the world is; the hiding the people did), **Red** and **read**, **lie** (lie down, lie), **count**, **held**,
 **face**. Under the play, the lore lies where only someone who knows it will find it:
 - the god is dead and dreaming;
-- the people came out of a mouth;
+- nobody remembers lying down on the first morning;
 - the faces are masks;
-- the Gleaner is still counting;
+- Oss-Karrhath is still counting;
 - the dark moon has someone giving orders on it;
 - the Keeper is still listening;
 - the out-breath is still going out;
@@ -224,7 +224,7 @@ None of it is said plainly.
 - **"Who are you?"** *(To the cards:)* "It wants to know who's reading. Go on, tell it." *(He turns a card over,
   looks at it a long while, and puts it back.)* "...No. Not that one either."
 - **"What is this place?"** "A room with a mouth in it. Or a mouth with a room in it. The ones who cut it didn't stay to
-  say. The last lot who came out of a mouth thought it was the beginning of everything." *(He laughs, a beat too
+  say. Everything here is a mouth or a room. The trick is knowing which one you're in." *(He laughs, a beat too
   long.)*
 - **"What is that?"** *(the mirror)* "The way out. Nothing looks back from it. Something used to."
 - **"Choose for me."** "It won't choose. Good. The cards were choosing before it was warm. They only like being asked."
@@ -245,7 +245,7 @@ not to the pilgrim):
 6. **The road:** "The road it came by. It didn't. It came up a stair out of a pool an hour ago. Give it a road anyway.
    A road's a kindness." / "Pick it a road. It'll have walked it by morning. That's how roads work here."
 7. **The question:** "One question. Not for it. For me." *(He listens to nothing for too long.)*
-8. **The price:** "The price. Something stays on the step with the rest. The Gleaner keeps a count; leave him something
+8. **The price:** "The price. Something stays on the step with the rest. Old Scythe keeps a count; leave him something
    to count." / "Something of the hide stays here. Not much. The hide grows back. Mostly."
 9. **The reading:** "There. That's the hide of it." *(He looks at the spread a long time.)* "And what's hid in it."
    / "Isn't it horrible? A moment ago it was nothing, and it was so quiet."
@@ -254,10 +254,10 @@ not to the pilgrim):
 - "Don't. It's listening. They always listen at this part."
 - "You said that about the last one." *(A long pause.)* "...You were right about the last one."
 - "No, it doesn't know. They never know. Keep it from the Keeper."
-- "Breathe out, then. You've been breathing out for a thousand years. One more won't hurt."
+- "Breathe out, then. You've been breathing out for ages. One more won't hurt."
 
 *After the Reading, if the pilgrim lingers (one of):*
-- "Still here? The mouth's that way. The people went out by one, once. Look how that turned out."
+- "Still here? The mouth's that way. Nobody remembers going into the last one. That's how you know it worked."
 - "Out on the sand they're all lying down, wearing its face. Lying is what the sand's for. Don't turn them over."
 - "Count the faces on its way out, if it likes. The count's never the same twice. Nothing here likes being counted.
   Except the dead. The dead love it."
@@ -269,7 +269,7 @@ not to the pilgrim):
 - "One left her teeth." *(To the cards:)* "I didn't ask, did I. No. I didn't ask."
 
 *When the skeleton's weapon falls, on the stairs below (his voice carries up):*
-- "Take it. He's held it out for a hundred years. Held. Everything here is held, one way or another."
+- "Take it. He's held it out longer than anyone remembers. Held. Everything here is held, one way or another."
 
 *As the pilgrim walks into the mirror* (he is gathering the cards back into the deck, and does not look up):
 - "There it goes. Don't look back. There's nothing to see, and it'll mind."
@@ -354,7 +354,7 @@ of the real world.
   - **Material:** fire-cracked stone, cedar ash, white calcined bone, soot.
   - **Light:** the only warm light in the village. The deep embers light the smoke's underside, the faces of the huts
     and the wet ground; rain hisses and steams on the hot stones.
-  - **Age:** seven winters of burning without a break.
+  - **Age:** every winter of the siege, burning without a break.
 
   It is this game's bonfire.
 - **The temple hall,** as its brief (`tools/landkit/passes/thai_temple.md`):
@@ -503,7 +503,7 @@ and pipe the shore folk played on the wall.
 great dead beast of behemoth of a thing, and from its wounds the red flows. So we can have like a lot of waterfalls or
 something. I mean blood rivers that flow into estuaries."
 - **The bible's telling** (`../03-the-age-of-terrors.md`, 2026-10-09): the mountains inland are the body of the One That
-  Unfolds, the Unhewn the herald killed; the shore folk call them the Fallen One. **The shore folk's telling:** the
+  Unfolds, the Thrae the herald killed; the shore folk call them the Fallen One. **The shore folk's telling:** the
   mountains inland are the body of a great dead behemoth, and the Red runs out of its
   wounds, down the land, to the sea (a rival or a deepening of the Fallen One's wound in its side).
 - **For the land:** blood falls down the bluffs and the cliffs; blood rivers cutting the terrace and fanning out into

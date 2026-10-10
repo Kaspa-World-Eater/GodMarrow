@@ -154,6 +154,31 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-09 (night), the third lore pass: names, numbers and the people's origin (Derek's notes and messages):**
+  - **Names:** "stop using names like 'the answers, the lifted, the climbers' ... I've given you so many interesting
+    ways to name things." No more "the [verb]-ers" or "the [participle]" names. Names come from wordplay, Lovecraftian
+    proper names, or each people's own telling. Renamed: the Terrors are **the Ythraal**; the builders are **the
+    Angles** (angles heard as angels: wheels within wheels full of eyes, the fallen Angles folded into their own
+    corners); the Unhewn are **the Thrae**; the Emptied are **the Ghauul**; the Slayers are **the Vhoor-Qhan**; the
+    Deep's iron walkers are **the Khar-Dhuum** (no "golem": the Hollow Mystic has an iron golem); the reaper is
+    **Oss-Karrhath**; the Count-breakers are **the Miscount**; the Crone's circles are **the Shroud** and **the Mirror**.
+  - **No hard numbers:** "The year timeline thing and the 1,000 years ... We don't need hard numbers." No years, dates,
+    timeline tables or spans; time is told by what happened. Year 0 is **the first morning**.
+  - **"Pale", not "white":** "white country" sounds racist; the northern country is **the Pale** (the Pale Order's
+    fence of numbered bones: beyond the pale).
+  - **The people's origin: nobody knows** (his answer). The Tithed no longer knelt inside the god or came out of its
+    mouth ("almost like Christian"); the congregation is deleted. Their memory begins on the first morning, waking on
+    the ash; every hearth tells it its own way (dreamed, grown, given back by the Red, counted, left). They are tithed
+    because they owe a tenth of everything to whatever gave them the morning. The idea that people are "not part of
+    the god" is gone, and the tools motif with it.
+  - **Tied together:** the Wasting's iron maidens are the root of the Bleeding Maiden (a girl in a maiden who would not
+    die); every iron thing is one story, blood held too long (the Deep, the maidens, Vesk, the Needle, the crown,
+    Qhaloth's rust).
+  - **The ends of the world rewritten** (several graded D and F): the Pale Order's Beyond the Pale, the Gilded Peak's
+    Dissolution (Radiance and Absence), the Veiled Crone's Unweaving, the Myriad's Concord (discord, concord, miasma),
+    the Second Mouth's Swallowing, the Tithed's Reckoning, the shore folk's Grandmother of the Red (the tide, her
+    braid, the seven holes); each read in the cards; the older voices cut; the signs read in the tarot.
+  - **Mantles are cards:** one mantle for every card in the Reading's deck; each calling is a card too.
 - **2026-10-09 (evening), the old age's second lore pass (Derek's notes on the Myths and Lands page):**
   - **Names:** "the builders, the hinge, the lifted" are "boring"; old powers get Lovecraftian names and each people
     its own telling of them. The builders are **the Xyrr** (the Stair-Cutters, the Corner Men); the Lifted and Ithmar

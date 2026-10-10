@@ -1,7 +1,7 @@
 # The Gilded Peak
 
 *The Gilded Peak was a monastery cut into a mountain of bone, which its monks said was the god's knee broken up
-through the Hide. It listened to the Silence. It fell in the year 1098 of the common count. What is left of its
+through the Hide. It listened to the Silence. It fell within living memory. What is left of its
 teaching came down the mountain with the few who lived, in the letters they carried, and in what the lowlands
 remember of the monks who came down to them at dusk with their bowls.*
 
@@ -34,7 +34,7 @@ owned it could not read and had it read to her.*
 
 The first of us was a bell-caster. He struck a new bell to hear its note, and in the moment after the note died away
 he heard what was behind it. He put down his hammer, climbed the mountain, sat down at the top, and did not speak
-again for nine years. When he did speak, he taught this.
+again for years. When he did speak, he taught this.
 
 The Silence has two hands, and both of them are empty. One hand is open. It is Radiance: the light at noon that
 leaves no shadow, which takes things away by showing all of them at once. The other hand is closed. It is Absence:
@@ -75,24 +75,24 @@ The forgetting had no edge. That is what frightened people, in the end. You coul
 thing you wanted gone. And the bowls grew heavier every year, though they were always empty when the monks came down.
 Nobody knows where the names went: whether they are forgotten, or only kept somewhere none of us can reach.
 
-## The tenth night
+## The last night
 
 *Written by Sō, the youngest novice of the Peak, years after the fall, in the valley below the mountain, where he
 washes the dead.*
 
 In the spring of the year the Peak fell, the monks began to die in their rooms at night. They died one or two a
-night, and in the morning there was nothing in the room but a little black glass and a little dust. For nine days the
-abbot counted them. On the ninth day there were nine of us left who were not gilded.
+night, and in the morning there was nothing in the room but a little black glass and a little dust. Night after night the
+abbot counted them, until there were nine of us left who were not gilded.
 
 The gilded masters had been dying differently, if it was dying. The oldest of them were gilded while still breathing
 and set in the niches of the inner sanctum, a hundred and eight niches, the last on the left always empty and kept.
 For years before the end, dark tracks had run down from the gilded masters' eyes every night, and every morning we
 wiped them away, and the pilgrims said the masters wept for the living.
 
-On the ninth evening the abbot wrote a letter and gave it to me. I was the youngest and the quickest down the old
+On the last evening the abbot wrote a letter and gave it to me. I was the youngest and the quickest down the old
 water-cut. He told me to take the letter down to the valley and not to look back. I did not look back.
 
-That night was the tenth night. From below we heard the great bell over the courtyard ring, a long time, though
+That night, from below, we heard the great bell over the courtyard ring, a long time, though
 it had never once rung where it hung; it was only ever heard ringing down in the valley. Nobody in the valley slept.
 
 In the morning I went up. The courtyard was black glass, smooth and whole from wall to wall, and when I put my hand on

@@ -35,7 +35,7 @@ they had sung at night since the night of the fall. By the fall they meant the n
 came down, and they said their house had been standing then. My mother said that was the Order's way: they were there
 first, whatever it was.
 
-The winter I was twelve, the singing changed. I was lying awake, and I heard the brothers stop for their rest, and in
+One winter when I was a girl, the singing changed. I was lying awake, and I heard the brothers stop for their rest, and in
 the rest something else went on singing. It was further down, under them, slower, with more voices than there were
 brothers in the house, and it was singing their tune. When the brothers came in on their next line, it stopped. The next
 night it sang through their rest again, and the night after, and by the end of that winter it no longer stopped when
@@ -107,7 +107,7 @@ faces.
     wall to the font. From the game's camera, a room split into a black half and a grey half.
   - *Story by cause:* the slabs fell inward in a ramp across the south pews, crushing the front ones; the font stands
     under the sky, full of rainwater and silt; south of the break the tuff is bleached, wet and green, and north of it
-    dry and black with centuries of lamp soot.
+    dry and black with ages of lamp soot.
   - *Material:* pale tuff; soot; moss and fern on the wet side only.
   - *Light:* the grey sky through the break, a hard-edged pool across the south half. The north half is black.
   - *Age:* a lifetime since the fall: fern rooted in the slab joints, silt in the font.

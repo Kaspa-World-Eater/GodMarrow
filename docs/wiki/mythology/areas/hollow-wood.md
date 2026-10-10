@@ -86,13 +86,13 @@ driest spell, and nobody picks them.
 
 Once in a long while the ash at the ring of stones lies still, and the whole Wood leans the other way. Nobody hunts
 then. The pickers laid white caps on every flat stone and sat in their doorways to wait for the ash to lift. My father
-called those days a bad year; the pickers called them holy. In my life there has been one such time, nine days long. On
-the tenth the ash lifted and the Wood leaned back, and I went down to their hollow to tell them. They were sitting in
-their doorways, all four families, and the caps on the stones had gone grey. They did not get up.
+called those days a bad year; the pickers called them holy. In my life there has been one such time, and it went on for
+days. At last the ash lifted and the Wood leaned back, and I went down to their hollow to tell them. They were
+sitting in their doorways, all four families, and the caps on the stones had gone grey. They did not get up.
 
 People who come through say the same thing took them that took the hamlet at the Wood's edge. At the hamlet there was
 nothing left to bury. At the hollow there was a great deal. I have left them lying, each with a stick at the head, and I
-watch them. Fresh, a body lies any way it fell. A day on, its head is toward the ring. In three days it has moved a
+watch them. Fresh, a body lies any way it fell. A day on, its head is toward the ring. In a few days it has moved a
 hand's width toward it, and nobody drags them. I keep their fire going in the iron bin. It is only manners.
 
 Further in is a glade the pickers never went near, where somebody long ago held rites to bring the god back up out of

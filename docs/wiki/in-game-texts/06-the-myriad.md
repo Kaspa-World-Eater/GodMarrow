@@ -71,27 +71,27 @@ she is folded: her birth-name is written into a paper figure and burned, and she
 *From the Well-Shrine's day-book. The entries for the grey year are in many hands, and the count of steps differs
 from entry to entry.*
 
-The Well-Shrine stands at the one clean pool of the Drowned Fen. For more than two hundred years, once a year, we
+The Well-Shrine stands at the one clean pool of the Drowned Fen. For generations, once a year, we
 kept the Cutting-Away. On that night every purifier of the Myriad came to the pool and breathed out into the Fen all
 the wrong breath she had held that year. The Fen took it. The Fen took everything, and the year went with it, and we
 started the next one clean.
 
-In the two hundred and fourth year of the Cuttings, the Fen gave it back.
+Then came the grey year, and the Fen gave it back.
 
 The pool went grey. It went grey from the bottom up, in a single night, and the grey came up out of the water and lay
-over the reed camps for a month. Children who breathed it forgot how to sleep. The keepers who breathed it heard
+over the reed camps for days on end. Children who breathed it forgot how to sleep. The keepers who breathed it heard
 voices in the reeds speaking their own names back to them.
 
 Below the pool, under the water, there is an older shrine, drowned: its bell, its pews, its altar, and a stair going
-down to it. In the month of the grey, seven purifiers went down the stair to find what had turned the Fen. They went
+down to it. While the grey lay there, seven purifiers went down the stair to find what had turned the Fen. They went
 down one by one. One of them counted the steps going down as thirty-three, another as thirty-four. The one who came up
 last counted thirty-six, and would not say what was on the extra steps.
 
 Six of the seven came up horned. Their faces had gone long and hard, and the horns had begun at their brows, as they
-come at a purifier's end, though none of the six was old. The seventh came up carrying a girl of about nine in her
+come at a purifier's end, though none of the six was old. The seventh came up carrying a little girl in her
 arms. Nobody had ever sent a girl down. Nobody knew her. She was not wet.
 
-Some of us say the grey came from our own century of breath, which the Fen could not hold any longer. The Pale Order
+Some of us say the grey came from our own generations of breath, which the Fen could not hold any longer. The Pale Order
 had been dredging the Fen for its drowned bones, and some of us say the bones came up bent and turned the water. We
 have argued it for years, and we will argue it for years more.
 

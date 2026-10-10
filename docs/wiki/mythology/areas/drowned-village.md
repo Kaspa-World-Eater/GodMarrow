@@ -57,7 +57,7 @@ what they are doing and look up, to see if it is me.
 Every dusk there is a lamp in the weaver's upper window, just above the water. My mother lights it. They leave the
 doors open and the lamp lit for whoever is coming home late, and I know who that is.
 
-They tell me the belfry fell a thousand years ago. I rang it. Both of those are true, and I will not choose between
+They tell me the belfry fell before anyone's grandmother was born. I rang it. Both of those are true, and I will not choose between
 them. The bells still go at dusk, down under the square. My sister rings them.
 
 My mother always said I parted my hair on the left. I part it on the right. Mothers misremember.
@@ -86,7 +86,7 @@ the first who ever did. My grandmother thought the water knows who has let go of
 the old woman who lives at its edge let go of her own sister's, she said, and look where she lives.
 
 She came out in the end, and the tellings do not agree how. Some say she walked out on her own one dusk while the bells
-were ringing, dry as paper, in a dress of a kind nobody had sewn in a hundred years. Others say the drowned let go of
+were ringing, dry as paper, in a dress of a kind nobody had sewn in living memory. Others say the drowned let go of
 her one morning, the way you let go of a hand. All of them agree on what she asked: that nobody be told she had let go.
 So the Ridge does not tell it. There are three stumps on the crest, and the Ridge will not say which of them is empty.
 
@@ -102,7 +102,7 @@ I only tell it the way it was told to me.
   lych-gate.
 - **The water:** the Fen's own, clear, dry and flat: knee to waist deep in the upper streets, which the pilgrim wades;
   two to four yards over the lower ones, roofs and all. The square stands at the edge between them.
-- **The waterline is a line of time**, as in the Fen: above it, a thousand years of weather (thatch fallen in, gables
+- **The waterline is a line of time**, as in the Fen: above it, ages of weather (thatch fallen in, gables
   mossed, the Fen's dry reeds in the lanes); below it, the village on the day, under a thin skin of pale silt.
 - **A life stopped in the middle of the day**, under the water: the silt worn into paths where the drowned walk their
   rounds; washing hung dry on a line; a broom against a step beside its heap of sweepings; a ladder at a roof with a

@@ -3,10 +3,10 @@
 *Act I · zone `pilgrim_road` · outdoors · creatures of levels 6–8 · borders: the Hollow Wood, the Drowned Fen, the
 Tree-Hollow · in the game: the old procedural zone (184 × 128 yards), to be remade by the bog's method*
 
-The old road down. It runs through the Hollow Wood and on down toward the Fen, and it was there before
-the Wood, before the faiths and before anyone counted. In the year 206, people who found it already lying there set
-numbered stones along it. The figures go down the farther you walk, and nobody will say what they count toward.
-Its oldest stretches are paved in something no one laid, and here and there the paving is black glass.
+The old road down. It runs through the Hollow Wood and on down toward the Fen, and it was there before the Wood, before
+the faiths and before anyone counted. In the first years after the god died, people who found it already lying there set
+numbered stones along it. The figures go down the farther you walk, and nobody will say what they count toward. Its
+oldest stretches are paved in something no one laid, and here and there the paving is black glass.
 
 This is the act's long walk: a road that is always going down, even where it seems to climb, sunk between high banks and
 then let out across open heath, with kneeling posts, wayside saints and lantern-stones along it, and mourners with no
@@ -29,7 +29,7 @@ Every faith on the Hide will tell you it cut this road, and every one of them is
 through the pale wood as if the wood were not there, and the roots turn aside at its edge, as a hand turns aside from a
 hot stone. Under the dust it is hard and dark and close-fitted, and nobody has ever found the mark of a tool on it.
 
-The stones came later. They were set along it in one autumn of the two hundred and sixth year after the god died, by
+The stones came later. They were set along it one autumn in the first years after the god died, by
 people who found the road already lying there and wanted it numbered. Who those people were, the faiths dispute as they
 dispute everything. The brothers in the white mountains say their own first brothers set them, because nothing should go
 uncounted. The grandmothers of the lowlands say it was the first children born on the ash, so that their own children
@@ -129,7 +129,7 @@ it. Someone back up the road will have to teach me the verse again.
   of a seated man, three stones below a hearth-ring. Their light is borrowed, the lantern and the moon doubled in broken
   dabs.
 - **The kneeling posts:** waist-high grey posts with a hollow rubbed smooth by foreheads at kneeling height, and two
-  knee-hollows worn in the step before each: centuries of one motion.
+  knee-hollows worn in the step before each: ages of one motion.
 - **The still stretch:** thirty paces with nothing to mark them, where the verge grass does not move in the one wind and
   the insects fall quiet. It is shown only as a pause in the world's living layer and a gap in the sound.
 

@@ -5,7 +5,7 @@ procedural zone (104 × 104 yards), to be remade by the bog's method · its tree
 
 Off the Pilgrim Road, in a dell among the pale trees, stands one trunk as wide as a chapel, hollow, and open on the side
 that faces the road. Its inner walls are ribbed like the inside of a wrist, and they pulse, faintly. In a knot in that
-wall a candle burns that has not run down in eight hundred years. Scratch the wall and a clear cold thing runs out,
+wall a candle burns that has not run down in living memory. Scratch the wall and a clear cold thing runs out,
 almost water. Somewhere in it the bark has closed over something, and nobody agrees what.
 
 It is a small, still side place, a dead end off the road where pilgrims have always stopped to shelter and stare: a
@@ -24,7 +24,7 @@ ribbed wall, one small steady flame.
 rebound. Each year one copyist walks down the Pilgrim Road to the great hollow tree and writes one line in it.*
 
 The book is older than its binding and older than this scriptorium, and nobody knows who began it. It has a line for
-every year, and nearly every line is the same two words: *still burning*. I have counted eight hundred and some. The
+every year, and nearly every line is the same two words: *still burning*. I tried once to count them, and gave it up. The
 first lines are in a hand none of us can read, the letters all leaning left, but we know the words by their shape,
 because they are the same shape as ours.
 
@@ -100,7 +100,7 @@ live on.
 **Landmarks**, each by the pit method:
 - **The hollow.**
   - **Shape:** the chapel-wide trunk and its tall arched opening.
-  - **Story by cause:** a great limb tore away centuries ago, the heart decayed and fell out, and the tree rolled
+  - **Story by cause:** a great limb tore away ages ago, the heart decayed and fell out, and the tree rolled
     woundwood round the wound until it stood as an arch; pilgrims' names cut in the inner wall long ago have healed into
     scars.
   - **Material:** pale bark outside; inside, a bare wall ribbed in vertical cords like the tendons of a wrist, smooth
