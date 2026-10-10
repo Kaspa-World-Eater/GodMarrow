@@ -353,6 +353,30 @@ TALE = {
 }
 TALE_ORDER = ["open", "feet", "brow", "heart", "belly", "lhand", "rhand", "under"]
 
+# the choice (Derek, 2026-10-10: "I want them to feel like they are given a choice"): for every place but the one
+# under the body, the deck deals three cards face up and the pilgrim chooses; the deck may still turn the chosen card
+# against it (it can land reversed). ON: how a card's meaning is named in each place, shown as the pilgrim weighs it.
+ON = {"brow": "On the brow", "heart": "Over the heart", "lhand": "In the left hand", "rhand": "Out of the right hand",
+      "belly": "In the belly", "feet": "Under the feet"}
+DEAL = {
+    "brow": ["Three faces. It can wear one. The others go back in the drawer.",
+             "Three come up for the brow. Choose. Choosing is the only freedom the deck allows, and it lies about that."],
+    "heart": ["Three for the heart. What does it want? Go on. It's allowed to want.",
+              "The heart. Three of them, face up, and every one of them hungry."],
+    "lhand": ["Three for the left hand. What does it hold on to? Pick, and it'll never put it down.",
+              "Left hand. Three things it might be holding. Only one fits the hand."],
+    "rhand": ["Three for the right hand. What does it let go of? Choose what to lose. That's a kindness. Most never get to.",
+              "Right hand. Something has to fall out of it. Three come up. Pick the one it can spare."],
+    "belly": ["Three for the belly. Choose its fear. ...Choose carefully. It'll meet that one again.",
+              "The belly. Three fears, face up. It only gets to keep one."],
+    "feet": ["Three roads. It came by one of them. Pick which, and it'll remember the walking.",
+             "The feet. Three roads lie open, and every one of them ends here."],
+}
+CHOSE = ["Chosen. Now let's see if the deck agrees.", "That one. The deck had a feeling it would.",
+         "Good. The other two will remember being passed over."]
+TURNED = ["...And the deck turns it over as it lands. It chose. The deck chose back.",
+          "Head down. It chose that card; the card chose to lie the other way. That's how choosing goes here."]
+
 def main():
     ms = []
     for (i, a, o, r, w, sy, sr) in M:
@@ -361,7 +385,7 @@ def main():
                        gist=st[2] if st else o, gist_rev=st[3] if st else r))
     d = dict(places=PLACES, weave=WEAVE, open=OPEN, shapes=SHAPES, close=CLOSE, aspect_word=ASPECT_WORD, read=READ,
              deck_open=DECK_OPEN, drawn=DRAWN, drawn_rev=DRAWN_REV, close_sum=CLOSE_SUM, tale=TALE,
-             tale_order=TALE_ORDER, mantles=ms)
+             tale_order=TALE_ORDER, on=ON, deal=DEAL, chose=CHOSE, turned=TURNED, mantles=ms)
     p = os.path.join(ROOT, "data", "reading_spread.json")
     with open(p, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(d, fh, indent=1, ensure_ascii=False)

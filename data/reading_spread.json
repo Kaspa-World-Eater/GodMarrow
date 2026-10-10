@@ -203,6 +203,49 @@
   "rhand",
   "under"
  ],
+ "on": {
+  "brow": "On the brow",
+  "heart": "Over the heart",
+  "lhand": "In the left hand",
+  "rhand": "Out of the right hand",
+  "belly": "In the belly",
+  "feet": "Under the feet"
+ },
+ "deal": {
+  "brow": [
+   "Three faces. It can wear one. The others go back in the drawer.",
+   "Three come up for the brow. Choose. Choosing is the only freedom the deck allows, and it lies about that."
+  ],
+  "heart": [
+   "Three for the heart. What does it want? Go on. It's allowed to want.",
+   "The heart. Three of them, face up, and every one of them hungry."
+  ],
+  "lhand": [
+   "Three for the left hand. What does it hold on to? Pick, and it'll never put it down.",
+   "Left hand. Three things it might be holding. Only one fits the hand."
+  ],
+  "rhand": [
+   "Three for the right hand. What does it let go of? Choose what to lose. That's a kindness. Most never get to.",
+   "Right hand. Something has to fall out of it. Three come up. Pick the one it can spare."
+  ],
+  "belly": [
+   "Three for the belly. Choose its fear. ...Choose carefully. It'll meet that one again.",
+   "The belly. Three fears, face up. It only gets to keep one."
+  ],
+  "feet": [
+   "Three roads. It came by one of them. Pick which, and it'll remember the walking.",
+   "The feet. Three roads lie open, and every one of them ends here."
+  ]
+ },
+ "chose": [
+  "Chosen. Now let's see if the deck agrees.",
+  "That one. The deck had a feeling it would.",
+  "Good. The other two will remember being passed over."
+ ],
+ "turned": [
+  "...And the deck turns it over as it lands. It chose. The deck chose back.",
+  "Head down. It chose that card; the card chose to lie the other way. That's how choosing goes here."
+ ],
  "mantles": [
   {
    "id": "unwritten",

@@ -65,9 +65,12 @@ var on_done: Callable
 var fade := 0.0
 var leaving := -1.0
 var end_t := 0.0
-var auto := ""                    # GM_READ_ACT: "all" draws everything, "end" lets him lay the rest
+var auto := ""                    # GM_READ_ACT: "all" draws everything, "end" lets him lay the rest, "offer" stops at the first deal
 var rise_r := Rect2(260, 930, 200, 56)
 var fly_rev_last := false
+var offer: Array = []             # the three cards dealt face up for this place (the pilgrim chooses one)
+const OW := 162.0                 # an offered card: 54 x 84, drawn x3
+const OH := 252.0
 var tale: Array = []              # the end, told one part at a time: {pid, text}
 var tale_n := 0                   # how many parts are told so far
 var tale_t := 0.0                 # time since the last part began
@@ -125,11 +128,55 @@ func _begin_place() -> void:
 	if p.is_empty():
 		_end()
 		return
-	phase = "draw"
 	said = ""
 	hover = -1
+	var pid := String(p["id"])
+	if pid != "under" and deck.size() >= 3:
+		# the choice (Derek, 2026-10-10): three dealt face up; the pilgrim chooses
+		offer = [deck.pop_back(), deck.pop_back(), deck.pop_back()]
+		phase = "offer"
+		var dl: Array = S.get("deal", {}).get(pid, [""])
+		prompt = String(dl[randi() % dl.size()])
+		Sfx.play("page_open", 0.6, 1.1)
+		return
+	phase = "draw"
 	var a: Array = p.get("ask", [""])
 	prompt = String(a[randi() % a.size()])
+
+func _offer_c(i: int) -> Vector2:
+	return Vector2(170.0 + i * 230.0, 520.0)
+
+func _offer_hit(pt: Vector2) -> int:
+	for i in offer.size():
+		if Rect2(_offer_c(i) - Vector2(OW, OH) / 2.0, Vector2(OW, OH)).has_point(pt):
+			return i
+	return -1
+
+## the pilgrim chooses one of the three; the others go back into the deck; the deck may still turn it over as it lands
+func _choose(i: int) -> void:
+	if phase != "offer" or i < 0 or i >= offer.size():
+		return
+	var m: Dictionary = offer[i]
+	for k in offer.size():
+		if k != i:
+			deck.append(offer[k])
+	deck.shuffle()
+	var from := _offer_c(i)
+	offer = []
+	var pid := String(_place()["id"])
+	fly = {"m": m, "rev": randf() < 0.32, "from": from, "to": SLOT[pid], "t": 0.0, "place": pid, "face": true}
+	phase = "fly"
+	hover = -1
+	var cl: Array = S.get("chose", [""])
+	prompt = String(cl[randi() % cl.size()])
+	said = ""
+	Sfx.play("page_open", 0.8, 0.85)
+
+## the meaning of an offered card in this place, as the pilgrim weighs it (upright: the deck has not turned it yet)
+func _weigh(i: int) -> String:
+	var m: Dictionary = offer[i]
+	var pid := String(_place().get("id", ""))
+	return "%s. %s: %s." % [_name_of(m), String(S.get("on", {}).get(pid, "")), String(m.get("gist", ""))]
 
 ## the card at fan index i, drawn: it flies to the place and lands upright or reversed
 func _draw_card(i: int) -> void:
@@ -148,9 +195,17 @@ func _landed() -> void:
 	var pid: String = fly["place"]
 	var m: Dictionary = fly["m"]
 	fly_rev_last = fly["rev"]
-	laid[pid] = {"m": m, "rev": fly["rev"], "flip": 0.0, "name": _name_of(m)}
+	var chosen: bool = fly.get("face", false)
+	laid[pid] = {"m": m, "rev": fly["rev"], "flip": 1.0 if chosen else 0.0, "name": _name_of(m)}
 	_take(pid, m, fly["rev"])
 	fly = {}
+	if chosen:
+		# chosen face up: its story at once, and if the deck turned it as it landed, he says so first
+		_turned(pid)
+		if fly_rev_last:
+			var tv: Array = S.get("turned", [""])
+			said = String(tv[randi() % tv.size()]) + "\n\n" + said
+		return
 	if pid == "under":
 		# it stays face down, under everything, until the end
 		said = ""
@@ -224,6 +279,10 @@ func _take(pid: String, m: Dictionary, rev: bool) -> void:
 func _skip() -> void:
 	if phase == "end":
 		return
+	if phase == "offer":
+		deck.append_array(offer)
+		offer = []
+		deck.shuffle()
 	if phase == "fly":
 		_landed()
 	if phase == "open" or phase == "deck":
@@ -444,6 +503,11 @@ func _process(dt: float) -> void:
 			_next()
 		elif phase == "draw":
 			_draw_card(0)
+		elif phase == "offer":
+			if auto == "offer":
+				hover = 1                                # (test: stop at the first deal, weighing the middle card)
+			else:
+				_choose(0)
 		elif phase == "turn":
 			_turn()
 	root.queue_redraw()
@@ -468,6 +532,8 @@ func _gui(ev: InputEvent) -> void:
 		var h := -1
 		if phase == "draw":
 			h = _fan_hit(ev.position)
+		elif phase == "offer":
+			h = _offer_hit(ev.position)
 		elif phase == "end" and rise_r.has_point(ev.position):
 			h = 99
 		if h != hover:
@@ -478,6 +544,8 @@ func _gui(ev: InputEvent) -> void:
 		match phase:
 			"draw":
 				_draw_card(_fan_hit(ev.position))
+			"offer":
+				_choose(_offer_hit(ev.position))
 			"turn":
 				_turn()
 			"open", "deck", "told":
@@ -501,6 +569,8 @@ func _unhandled_key_input(ev: InputEvent) -> void:
 			match phase:
 				"draw":
 					_draw_card(randi() % maxi(1, deck.size()))
+				"offer":
+					_choose(maxi(hover, 0))
 				"turn":
 					_turn()
 				"open", "deck", "told":
@@ -589,10 +659,10 @@ func _draw_all() -> void:
 		var e := u * u * (3.0 - 2.0 * u)
 		var c3: Vector2 = (fly["from"] as Vector2).lerp(fly["to"], e) + Vector2(0, -60.0 * sin(PI * u))
 		var ang2: float = lerpf(0.0, PI / 2.0 if fly["place"] == "under" else 0.0, e)
-		_card_at(ci, c3, _tex("_back"), ang2, 1.0, a)
+		_card_at(ci, c3, _face(fly["m"]) if fly.get("face", false) else _tex("_back"), ang2, 1.0, a)
 	# the fan: the deck, face down, waiting
 	var dim := 1.0 if phase == "draw" else 0.45
-	for i in (deck.size() if phase != "end" else 0):
+	for i in (deck.size() if phase != "end" and phase != "offer" else 0):
 		var fc: Array = _fan(i, deck.size())
 		_card_at(ci, fc[0], _tex("_back"), fc[1], 1.0, a * dim, 26.0 if i == hover else 0.0)
 	# the words
@@ -646,13 +716,26 @@ func _draw_all() -> void:
 		ci.draw_rect(rise_r, Color(MARROW if on2 else MARROW_D, a), false, 1.5)
 		ci.draw_string(sc, rise_r.position + Vector2(0, 38), "Rise", HORIZONTAL_ALIGNMENT_CENTER, rise_r.size.x, 30, Color(BONE if on2 else BONE_D, a))
 		return
+	# the three dealt for this place, face up, each with its name; the one weighed lifted and lit
+	if phase == "offer":
+		for i in offer.size():
+			var oc := _offer_c(i) + Vector2(0, -20.0 if i == hover else 0.0)
+			var otex := _face(offer[i])
+			ci.draw_rect(Rect2(oc - Vector2(OW, OH) / 2.0 + Vector2(6, 10), Vector2(OW, OH)), Color(0, 0, 0, 0.5 * a))
+			ci.draw_texture_rect(otex, Rect2(oc - Vector2(OW, OH) / 2.0, Vector2(OW, OH)), false, Color(1, 1, 1, a))
+			if i == hover:
+				ci.draw_rect(Rect2(oc - Vector2(OW, OH) / 2.0, Vector2(OW, OH)).grow(3), Color(MARROW, 0.8 * a), false, 2.0)
+			ci.draw_string(fi, oc + Vector2(-110, OH / 2.0 + 26), _name_of(offer[i]), HORIZONTAL_ALIGNMENT_CENTER, 220, 18, Color(BONE_D, a))
 	# his words: under the fan, on the left, clear of the spread
 	var words := said if said != "" else prompt
+	if phase == "offer" and hover >= 0 and hover < offer.size():
+		words = _weigh(hover)
 	if words != "":
 		var y2 := 780.0
 		for ln in _wrap(words, fi, 24, 800.0):
 			ci.draw_string(fi, Vector2(70, y2), ln, HORIZONTAL_ALIGNMENT_LEFT, 800, 24, Color(BONE if said != "" else BONE_D, a))
 			y2 += 32.0
-	var hint: String = {"open": "click to go on", "deck": "click to go on", "draw": "draw a card from the deck    ·    Esc lets him lay the rest",
+	var hint: String = {"open": "click to go on", "deck": "click to go on", "draw": "draw the last card blind from the deck    ·    Esc lets him lay the rest",
+		"offer": "choose one    ·    Esc lets him lay the rest",
 		"fly": "", "turn": "click to turn it over", "told": "click to go on"}.get(phase, "")
 	ci.draw_string(fi, Vector2(0, 1056), hint, HORIZONTAL_ALIGNMENT_CENTER, 1920, 18, Color(ASH, a * (0.6 + 0.2 * sin(t * 2.0))))
