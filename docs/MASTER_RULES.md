@@ -369,11 +369,11 @@ etc." In order of his latest word (2026-10-08: "finish the bog first, and then w
      - Northwest Coast forms (plank, post, canoe, woven bark), taken as forms only: no animal crests, no real nation's
        crests, stories or ceremonies;
    - the temple to an A (**done** 2026-10-09: Derek's A, with its inside);
-   - the Red Water and the black sand (blood that is red by colour, never by glow) (**in the game** 2026-10-09: the
-     cove inside its basalt bluffs, baked and walkable, the Red heaving on the heartbeat; Derek has
-     not graded it yet);
-   - the opening cave (pass 11; **in the game** 2026-10-09 behind a trial flag: the Stranger on the dais opens the
-     Reading, the mirror leads onto the cove);
+   - the Red Water and the black sand (blood that is red by colour, never by glow) (**done** 2026-10-10, Derek: "call
+     the cove done after the bake": the cove inside its basalt bluffs at dawn in a lightning storm, the Red heaving on
+     the heartbeat, the dead's passes 9 and 10 baked in);
+   - the opening cave (**done** 2026-10-10, Derek: "good to go": every new pilgrim starts in it; the newborn comes up
+     out of its pool, the Stranger on the dais opens the Reading, and the last card leads onto the cove);
    - the drift logs and sea stacks (the cove's basalt columns in the water are done);
    - the giant trees and the wind-bent fringe;
    - the hide hut kit;

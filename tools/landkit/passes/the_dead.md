@@ -179,3 +179,7 @@ painted; the skeleton's pelvis and hands; the dead nearer the lantern, where the
 shape). **Worst open line:** 11; passes 9 and 10 (the bloat, the faces) are in the builder but not yet in the game.
 **Done:** the cove rebaked from the new builder (then the cove's and the cave's exports, which put back the shore field
 and the cave's link).
+
+**Baked (2026-10-10):** passes 9 and 10 are in the game: the cove rebaked and re-exported (every walkable tile
+reached; 60 fps; smoke 12/0). With it the cove is **done** (Derek: "Let's call the cove done after the bake"). The
+dead's open items above stay on the return-to list.

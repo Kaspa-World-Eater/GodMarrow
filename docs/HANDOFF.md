@@ -55,17 +55,20 @@ world is the hide of a dead god, a desolate wasteland with almost nobody left, w
 rebuilt from the ground up), the Hollow Mystic, the Shrine Keeper (Miasma, Discordia, Concordia), the Empty Hand. The
 Red Penitent is data only.
 
-**How a game begins:** a new pilgrim starts in the opening cave, in the pool of blood (no lantern; a stand-up animation
-later). It climbs the stairs of bleeding faces to the Stranger on the throne's dais; speaking to him opens **the
-Reading**, now blind (`ui/reading.gd`, `data/reading_spread.json`): the calling face up at the crown, every other card
-drawn from the fanned deck of the twenty-two mantles into a spread laid like a body, turned by the player, one more
-under it in the Red; he weaves the spread into one telling; no numbers are ever shown. Then the mirror in the great
-face's mouth leads out onto the cove. A pilgrim continued wakes on the cove.
+**How a game begins:** a new pilgrim starts in the opening cave, under the blood of its pool: the newborn, a live 3D
+body (`entities/body3d.gd`, `world/opening.gd`; the pilot of live 3D characters, Derek 2026-10-10), crawls up out of
+it, slips, retches and struggles to stand before the player has it (no lantern, slow). It climbs the stairs of bleeding faces to the Stranger on the throne's dais; speaking to him opens **the
+Reading**, now blind (`ui/reading.gd`, `data/reading_spread.json`): the calling face up at the crown; for each other
+place three cards dealt face up and the player chooses one (the deck may still turn it), and one more drawn blind
+under it in the Red; he weaves the spread into one telling; no numbers are ever shown. The last card drawn, the game
+goes on out on the cove in the calling's own body. A pilgrim continued wakes on the cove.
 
 **The world** (`data/zones/index.json`):
-- **The opening cave** (`opening_cave`, seed 9301): baked, walked (every tile proved), 60 fps; the pool holds bones and
-  gore; the rock carries cracks, grit, dust and lichen.
-- **The Red Shore's cove** (`red_shore`, seed 9201): held at dawn in a lightning storm, black sand blowing in the world
+- **The opening cave** (`opening_cave`, seed 9301): **done** (Derek, 2026-10-10). Baked, walked (every tile
+  proved), 60 fps (55 while the newborn's live body is on screen); the pool holds bones and gore; the rock carries
+  cracks, grit, dust and lichen.
+- **The Red Shore's cove** (`red_shore`, seed 9201): **done** (Derek, 2026-10-10: "call the cove done after the
+  bake"; rebaked with the dead's passes 9 and 10, every tile walked, 60 fps). Held at dawn in a lightning storm, black sand blowing in the world
   (`world/sand_storm.gd`), gusts that slow you walking into them (`core/gust.gd`), thunder; the Red's swells and swash
   run along the shore's own shape on a slow heartbeat (`shaders/baked_ground.gdshader`, the shore field). No waystone
   or stash: they wait for the first town (the shore folk's dead village). Its cleft leads to the Hollow Wood.
@@ -77,11 +80,15 @@ face's mouth leads out onto the cove. A pilgrim continued wakes on the cove.
 
 ## 5. The work in progress
 
-1. **The dead** (`tools/landkit/passes/the_dead.md`, chapter 15): one shared body (`tools/landkit3d/body3d.py`) on
-   the beach and in the Red; pass 3, grade C. Next: the cloak's folds, hands and feet that read, the bloat's dome.
+1. **The newborn** (`tools/landkit/passes/the_newborn.md`): the pilot of live 3D characters (a rigged body played in
+   the game behind a locked camera, never rendered to frames; Derek, 2026-10-10). Pass 1 in the game; next: break up
+   the smooth mannequin coat (caul, strands, matted hair), light it from the cave's fires, give it a shadow. Whether
+   every character follows is Derek's call.
+2. **The dead** (`tools/landkit/passes/the_dead.md`, chapter 15): one shared body (`tools/landkit3d/body3d.py`) on
+   the beach and in the Red; ten passes (B- the robed dead, C+ the bone), all baked into the cove. Next: the wet sheen
+   and the sand packed into the cloth, the skeleton's pelvis and hands.
    The cave's pool now holds remains instead (Derek).
-2. **The Reading's faces** (`tools/reading/card_fronts.py`): first pass; the Hanged Twin and the Beggar's Cup to redraw.
-3. **The cove's storm and sea:** Derek's look in the game (the swash slowed and gentled at his word).
+3. **The Reading's faces** (`tools/reading/card_fronts.py`): first pass; the Hanged Twin and the Beggar's Cup to redraw.
 4. **Then the rest of the area** (MASTER_RULES section 8): the giant trees and the fringe; the shore folk's dead
    village, the first town (the waystone, the stash, the merchant); the bluffs as the first seeded zone.
 
