@@ -57,7 +57,7 @@ straight ever described it, because nobody who looked at it straight said anythi
 
 They brought nothing with them: no servants, no spawn, no host. They did not hate the world and they did not want it.
 Where they moved, rivers left their beds and wandered off, forests grew downward into the ground, and a people woke one
-morning with their faces on the backs of their heads and did not remember that it had ever been otherwise. Nobody has
+mourning with their faces on the backs of their heads and did not remember that it had ever been otherwise. Nobody has
 ever said what they wanted. Nobody has ever been sure they knew the world was there.
 
 **The fourth.** Every telling that counts the Thrae says three, and every telling says, a little later, that there was a
@@ -152,14 +152,14 @@ liquid. They are alive. When somebody looks in at the crack, they turn to the cr
 digesting, and the eyes are what it cannot digest, or will not.
 
 It drinks dreams. Whoever lives in its sight dreams no dreams of their own: they lie down and close their eyes and open
-them in the morning with nothing between. At first they do not mind. Then they find that they have stopped having ideas,
+them in the mourning with nothing between. At first they do not mind. Then they find that they have stopped having ideas,
 because an idea is only a dream that came in the daytime, and the Needle drinks those too. Then they cannot picture the
 faces of their dead. The last thing to go is the ability to imagine tomorrow, and a people that cannot imagine tomorrow
 sits down where it is and waits. There were villages like that once, in its sight. What is left of their people is
 sitting there still.
 
 And it calls. One night a sleeper gets up out of bed without waking and walks out into the forest, toward the Needle,
-and does not come back, and in the morning the others find that they can remember the sleeper's dreams, every one, as if
+and does not come back, and in the mourning the others find that they can remember the sleeper's dreams, every one, as if
 they had been handed round. The few who live near it bar their doors from the outside at night and tie their sleepers
 by the ankle. How a sleeper gets into the Needle, when it has no door, nobody has seen. The rare traveller who passes
 near it at night says that for a while afterward they dream other people's dreams, as if the Needle had spilled.

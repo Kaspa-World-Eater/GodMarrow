@@ -57,7 +57,7 @@ blood, and walks out onto black sand by a sea of blood.
 | the Reading | character creation: a tarot reading by the Mysterious Stranger |
 | Minor and Major Arcana | small passive pegs and tarot cards on the body board |
 | poise | the stagger meter, from Constitution; melee and rolls spend it |
-| the first mourning | the morning after the god's death, when the people woke on the ash; there are no dated years |
+| the first mourning | the mourning after the god's death, when the people woke on the ash; there are no dated years |
 | the Red | the sea of blood, on a dying heartbeat |
 | the Pale | the northern country of bone ridges, the Pale Order's (never "white") |
 | the Ythraal | the powers of the old age, grown from whatever was held hardest |

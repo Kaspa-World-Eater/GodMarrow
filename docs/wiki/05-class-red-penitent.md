@@ -30,7 +30,7 @@ telling of the nameless chapter whose wound hatched (`mythology/05-the-last-brea
 ## 2. Where he comes from (the chapter whose wound hatched)
 
 - **The chapter.** A chapter of the processions lived down both lips of a great wound in the Hide, as long as a
-  morning's walk, that never closed. Its gutters ran red. Once a year its hoods poured the measured cup into the wound
+  mourning's walk, that never closed. Its gutters ran red. Once a year its hoods poured the measured cup into the wound
   and said the Words over it. Their belief: *blood given is not blood taken*. Nobody now knows the chapter's name.
 
 - **The bloodletter.** Every procession has one, who opens the penitents' welts. The rule above all: the one who opens

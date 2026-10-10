@@ -37,7 +37,7 @@ PLACES = [
               "Down in the belly. Put the fear here, little hide, where it can be counted."]),
     dict(id="feet", name="The Feet", what="the road it came by", pool="roads",
          ask=["The feet. A road. It came up a stair out of a pool an hour ago. Give it a road anyway. A road's a kindness.",
-              "Feet. Pick it a road. It'll have walked it by morning."]),
+              "Feet. Pick it a road. It'll have walked it by mourning."]),
     dict(id="under", name="Under It, in the Red", what="what lies beneath", pool="cards",
          ask=["And one under it. Face down, in the Red. We don't read that one yet. ...Red. Read. Ha.",
               "The last goes underneath, where the Red is. Leave it lying. It'll turn when it's ready."]),

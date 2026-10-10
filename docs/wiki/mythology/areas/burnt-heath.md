@@ -36,7 +36,7 @@ over, and you don't tell her which way you were lying. If someone calls your nam
 only if they say it wrong. "Your own people say your name wrong," she said. "They always did."
 
 At the fork stands the saint, a stone woman with no hands. Pilgrims leave a pinch of ash in her lap for a safe road, and
-in the morning the lap is clean, and Aud has never swept it. When Aud's mother was a girl the saint stood twenty paces
+in the mourning the lap is clean, and Aud has never swept it. When Aud's mother was a girl the saint stood twenty paces
 back from the road. It is twelve now. Aud paces it every spring and says nothing, as her mother did.
 
 At the edge of the Heath, cages hang on posts. The ones in them came up out of the rings wrong. You step into a ring
@@ -45,10 +45,10 @@ looking at a fire. They walk out to the edge by themselves and ask to be hung up
 done. They ask Aud for a pinch of ash in a cup, the way the pilgrims give it to the saint, and they thank her for it.
 The one with the extra hand thanks her twice. She counts the cages at dusk and again at dark. Mostly the numbers agree.
 
-On the third morning I woke with my feet pointing at the far corner. I turned over before she saw, or I think she
+On the third mourning I woke with my feet pointing at the far corner. I turned over before she saw, or I think she
 didn't see. She was looking at all our feet when I sat up, and she said nothing.
 
-I am going on in the morning. I am telling you which way I was lying, so that somebody knows.
+I am going on in the mourning. I am telling you which way I was lying, so that somebody knows.
 
 ### The seven
 
@@ -93,7 +93,7 @@ wind drove the first fire, and it has driven every fire since.
 The keeper tells it with her hand flat on the ground. Nobody lit the Heath, she says, and nothing carried fire to it. It
 came up. Her grandmother's grandmother said the Heath burned the way a candle burns, from underneath, and the heather
 was only the wick. Dig a spade's depth where the burn is blackest and the earth is warm and greasy in the hand, and if
-you leave the hole open overnight it is smoking by morning. The wind, she says, only ever told the fire which way to go.
+you leave the hole open overnight it is smoking by mourning. The wind, she says, only ever told the fire which way to go.
 
 Both tellings agree that the Pyre-Saints walked in that first burning, and walk still. The pilgrims say they were the
 faithful of some procession who walked into the fire to pray it out, and the fire took their prayers and kept them

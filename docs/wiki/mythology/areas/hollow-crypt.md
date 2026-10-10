@@ -8,7 +8,7 @@ method · the singing under the floor: the Codex's "The Hymn Under the Long Cand
 Under the edge of the Moor the Hollow Crypt goes in between the god's ribs: nine galleries, one to each space between
 two ribs. The ribs are its walls, curved walls of old bone that lean in overhead until the lantern loses them. The
 Tithed of the Moor laid their mothers in niches cut in those walls, until what the grandmothers call the Great Standing,
-when one morning every niche was empty. After it the Carrion Warden, who had been set to guard the place, forgot what he
+when one mourning every niche was empty. After it the Carrion Warden, who had been set to guard the place, forgot what he
 was guarding and began to gather up whatever the Tithed laid there, and the Moor has laid no mother in it since. The
 flagstones lift and settle under the boot, slow and even, because something below is breathing, and on some nights there
 is singing through the floor.
@@ -42,7 +42,7 @@ There was a candle burning at the door the first time they carried a mother in. 
 and we call it the Long Candle, and it leans toward you when you come, as if it wants to hear who you are. My
 grandmother said that meant somebody had been in there before us, keeping a light. She would never say who.
 
-Then, in my grandmother's grandmother's time, the sextons went down one morning to lay a mother and found every place in
+Then, in my grandmother's grandmother's time, the sextons went down one mourning to lay a mother and found every place in
 all nine galleries empty, and not a bone left. That is the Great Standing. Some say the mothers got up in the night, all
 together, and walked out. If they walked out, I say, where did they go? Nobody on the Moor ever met them. My grandmother
 said they went in, further, the way we never could, because they were tired of waiting to be carried. Others say they
@@ -69,7 +69,7 @@ the mothers from the knights' carts. The knights say their Order set him there, 
 counted. My father thought he was there first, before any mother, and that the first children carried their mother in
 past him because there was no other way in.
 
-The year after the Great Standing, the sextons laid three new mothers in the empty places. In the morning the Warden was
+The year after the Great Standing, the sextons laid three new mothers in the empty places. In the mourning the Warden was
 not at the door. We found him in the ninth gallery, walking. He walked all that day and all that night, up one gallery
 and down the next, his cage turning from side to side as if he had lost something and could not remember what. The three
 new places were open, and the three new mothers were gone.

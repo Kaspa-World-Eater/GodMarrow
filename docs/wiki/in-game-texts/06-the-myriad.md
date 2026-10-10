@@ -19,7 +19,7 @@ a grudge aloud, not even to a wall: said, it is loose, and someone will breathe 
 
 When the great one died, it breathed out its last, and everything it had ever thought went out on that one breath. That
 is the wind. It has never turned. It is full of the dead god's kami, more than there are stars, and you have been
-breathing them since the morning you were born. Some of what you think is yours. Some of it is the dead god's. You will
+breathing them since the mourning you were born. Some of what you think is yours. Some of it is the dead god's. You will
 never know which.
 
 The kami are not kind. They fight, belief against belief, in the breath. Good. While they fight, they stay small.
@@ -115,7 +115,7 @@ the cord. It has grown longer than the knots you tied.
 It goes slowly. The face goes long and hard first. Then the horns come in, slowly, the way a child's teeth come in, and
 it does not hurt as much as you fear. Your hands stay your own for a long time.
 
-One morning you will stand up with your chest full of everything you ever took in, and you will not breathe out, and
+One mourning you will stand up with your chest full of everything you ever took in, and you will not breathe out, and
 you will walk down. Some of us walk down into the water. Some walk down the warm road under the Hide, and do not come
 back up it. We call them kegare then, which is the word for the filth they carry, and we say it gently.
 

@@ -30,7 +30,7 @@ line for every year, and nearly every line is the same two words: *still burning
 it up. The first lines are in a hand nobody now can read, the letters all leaning left, but I know the words by their
 shape, because they are the same shape as ours.
 
-The custom is that on the first grey morning of the year a copyist walks down the road to the hollow tree, goes in,
+The custom is that on the first grey mourning of the year a copyist walks down the road to the hollow tree, goes in,
 looks at the candle in the knot, and comes home and writes the line. There used to be turns. Now there is only me. The
 candle is no bigger than your thumb. It stands in a knot at the height of a man's heart, with the wood drawn back from
 the flame all round, and its light is small and does not flicker, even when the wind is loud in the trees. Some early
@@ -76,7 +76,7 @@ than the rest of the wall. I have never put my ear to it, and I will not start t
 The little lights drifting about in here are spores. They drift toward your warmth. They mean nothing by it; they only
 want warm.
 
-Lie down on this side, by the opening. The storm will be gone by morning. It always is, in here.
+Lie down on this side, by the opening. The storm will be gone by mourning. It always is, in here.
 
 ## For building it
 

@@ -55,13 +55,13 @@ That's the Hook. Copper in the box on the post. A boat has no side, and every bo
 *From the day-book of a purifier of the Myriad who wintered in the empty reed-camps: what the last boatman told her
 about the arch, and then what a pilgrim told her.*
 
-The boatman sleeps tied to the arch, because no boat tied there has ever been found in the morning cut loose or empty.
+The boatman sleeps tied to the arch, because no boat tied there has ever been found in the mourning cut loose or empty.
 A thing that kneels, he says, is keeping watch.
 
 It was the rose-arch of the chapel in the drowned village, and it stood straight until the water came up and reached
 it. Then it bowed, slowly, all one evening, the way an old man gets down on his knees, and stopped, and has gone no
 further since. It bows toward the edge of the world, where the sky sits lowest. Every night, the boatman says, it is a
-hand nearer to kneeling, and every morning it is back where it was.
+hand nearer to kneeling, and every mourning it is back where it was.
 
 Why it bows, nobody agrees. The boatman says it kneels toward the edge of the world in prayer, as his grandmother did.
 The old woman in the reed hut says it is looking for something past the edge, and waiting to be sure before it bows any

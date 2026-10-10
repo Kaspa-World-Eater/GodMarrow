@@ -179,7 +179,7 @@ The thing stopped. Every people tells it, and none was there to see. All the tel
 
 - **The few who are left in the lowlands** say something pressed in from outside, the way cold presses at a tent, and
   took the thing's names, the little ones first: the name of the smallest finger, the name of one eyelash, the name of
-  the hour before morning. The Choir sang louder, and it took more, until the thing forgot how to be three. Where its
+  the hour before mourning. The Choir sang louder, and it took more, until the thing forgot how to be three. Where its
   name should be, the grandmothers leave a breath of nothing.
 - **The Choir** says it came in through the rest, the one moment when all of them drew breath together.
 - **The Pale Order** says only that the Mother fell, and that the first brothers stood beside her.

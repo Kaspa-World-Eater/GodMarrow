@@ -61,14 +61,14 @@ There were not many doors below the mountain even then. They stopped at each one
 each: *Put a name in it.*
 
 You could whisper anything into the bowl. People whispered the names of what they wanted gone: a grief, a debt, a
-fear, a man. The monk would bow and walk on, and you would forget it. In the morning you would not remember what you
+fear, a man. The monk would bow and walk on, and you would forget it. In the mourning you would not remember what you
 had whispered. You would only feel lighter, and not know why.
 
 The monks carried the names up the mountain, and at noon the abbot gave them to the open hand. He stood on the east
 stone and tipped each bowl out over its lip, into the light, and the names went wherever names go.
 
 There was a widow near us whose husband had died in the spring, and she could not bear it. She put his name in the bowl.
-In the morning she did not know him. She did not know she had ever had a husband. But every fast-day for the rest of her
+In the mourning she did not know him. She did not know she had ever had a husband. But every fast-day for the rest of her
 life she walked out to the same grave in the barrow field and sat beside it until dark, and when anyone asked whose
 grave it was, she said she did not know, and that her feet knew the way.
 
@@ -82,12 +82,12 @@ Nobody knows where the names went: whether they are forgotten, or only kept some
 washes the dead.*
 
 In the spring of the year the Peak fell, the monks began to die in their rooms at night. They died one or two a
-night, and in the morning there was nothing in the room but a little black glass and a little dust. Night after night the
+night, and in the mourning there was nothing in the room but a little black glass and a little dust. Night after night the
 abbot counted them, until there were nine of us left who were not gilded.
 
 The gilded masters had been dying differently, if it was dying. The oldest of them were gilded while still breathing and
 set in the niches of the inner sanctum, a hundred and eight niches, the last on the left always empty and kept. For
-years before the end, dark tracks had run down from the gilded masters' eyes every night, and every morning we wiped
+years before the end, dark tracks had run down from the gilded masters' eyes every night, and every mourning we wiped
 them away, and the few pilgrims who climbed to them said the masters wept for the living.
 
 On the last evening the abbot wrote a letter and gave it to me. I was the youngest and the quickest down the old
@@ -96,7 +96,7 @@ water-cut. He told me to take the letter down to the valley and not to look back
 That night, from below, I heard the great bell over the courtyard ring, a long time, though it had never once rung
 where it hung; it was only ever heard ringing down in the valley. I did not sleep.
 
-In the morning I went up. The courtyard was black glass, smooth and whole from wall to wall, and when I put my hand on
+In the mourning I went up. The courtyard was black glass, smooth and whole from wall to wall, and when I put my hand on
 it, it was warm. It is still warm, at noon and at midnight. There was nobody in the rooms, and nothing.
 
 The doors of the inner sanctum were open. Who opened them, I do not know; I saw nobody go up. Others tell it

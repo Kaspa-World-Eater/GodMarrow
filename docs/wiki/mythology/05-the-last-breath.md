@@ -16,7 +16,7 @@ way ever since, the same length every day to the width of a thread.
 
 **The first night.** The things that come up out of the ground came to them on the first night, and stood round them
 in the dark, and breathed. The people had nothing to give them, so they gave them a tenth of what little they had: a
-tenth of the bread, laid on a flat stone at the edge of the firelight. In the morning the bread was gone and the people
+tenth of the bread, laid on a flat stone at the edge of the firelight. In the mourning the bread was gone and the people
 were not. Ever since, the Tithed set the tenth loaf on the sill at night and hang a lantern at the cradle's head. What
 the things that come up want, nobody knows. The grandmothers say they are only the people's own fears come back up
 with teeth on them, and that a fear is fed like anything else.
@@ -81,7 +81,7 @@ out along the spine away from the pit and up out of the wet country, and did not
 trees above the Red Water. There her people built a house for the keepers on a platform, and up to its door a stair,
 and she carved the serpent on the stair's rails, its body running down and its heads rearing at the foot, so that if
 the thing in the bog was only sleeping, it would see itself already at their door and believe itself still kept, and
-not come looking. She set the rule that the stair be swept every morning before anything else is done.
+not come looking. She set the rule that the stair be swept every mourning before anything else is done.
 
 Down in the wet country nobody fed the pit after that, and nothing came up out of it, and the red down there glows on.
 The bog folk who walk the spine forgot whose it is, and say their own people laid it as a road. Pilgrims made a saint
@@ -169,14 +169,14 @@ year someone wrote: *Where does the year go now? It goes into us.*
 
 **The east wall.** A circle of the Veiled Crone sat down in its reading-room to say the names,
 and something was standing by the east wall that had come in without the door opening. It showed nothing in the glass.
-The candle's flame leaned toward it, and the ink went white at the edge of the page nearest it. In the morning the next
+The candle's flame leaned toward it, and the ink went white at the edge of the page nearest it. In the mourning the next
 circle found the seven chairs in their ring with no bodies in them, no bones and no dust, and the floor along that
 wall has stayed dry in every season since.
 
 ## The breaking
 
 **The wound that hatched.** A chapter of the processions was built down both lips of a great
-wound in the ground, as long as a morning's walk. In its last year the wound would not take the blood. It crusted over
+wound in the ground, as long as a mourning's walk. In its last year the wound would not take the blood. It crusted over
 from end to end, warm underfoot, and the hoods broke the crust with picks to pour the cup, and it closed over the
 blood again before the cup was empty. In the night after the fast-day the crust split along its whole length. What came
 out walked in the hoods' robes, which had hung on their pegs in the crypt: the shapes of children with nothing behind
@@ -185,15 +185,15 @@ thing, carrying the Maiden from the niche on its back, and the Maiden had a face
 clauses in a hand that leans the other way. The last of them says *She hears.* The procession went out, and has never
 come home.
 
-**The grave too many.** At the Hollow Wood's edge, every door stood open one morning, the beds
+**The grave too many.** At the Hollow Wood's edge, every door stood open one mourning, the beds
 still holding the shapes of the sleepers, and there was nothing left of anyone: no bone, no tooth, no smell. The one man
 left dug a grave for every hearth and laid a shawl or a pair of boots in each, and dug one more than he had names for.
 Something that leaves nothing had passed.
 
 **The fall of the Gilded Peak.** In the spring the monks began to die in their rooms at night, one or two a night, and
-in the morning there was nothing in the room but a little black glass and a little dust. Night after night the abbot
+in the mourning there was nothing in the room but a little black glass and a little dust. Night after night the abbot
 counted them, and at last he sent the youngest down the mountain with a letter and told him not to look back. The next
-night the great bell over the courtyard rang, long, though it had never rung where it hung. In the morning the courtyard
+night the great bell over the courtyard rang, long, though it had never rung where it hung. In the mourning the courtyard
 was black glass from wall to wall, warm to the hand, and it is warm still. The sanctum's doors stood open. The gilded
 saints were in their niches, a hundred and seven of them, and the last niche on the left was empty as it had always been
 kept, except that the dust before it held footprints going out. Over the door someone had cut in the night *THEY WERE

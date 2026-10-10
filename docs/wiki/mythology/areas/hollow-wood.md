@@ -6,7 +6,7 @@ floor still bare · pass logs: `tools/landkit/passes/hollow_wood_seeded.md`, `vi
 
 Past the ordinary old growth, the trees turn pale and warm. These are the god's veins, stood up out of the Hide and
 grown into a forest: trunks that go up out of sight, warm a hand's depth in, with a slow beat under the bark. Cut one
-and it weeps, and the cut closes by morning. Every tenth trunk has grown round something the god was carrying, and every
+and it weeps, and the cut closes by mourning. Every tenth trunk has grown round something the god was carrying, and every
 root lies combed one way, toward where the Root Deep breathes. The roads were there first; the Wood grew away from them.
 
 It is the act's first forest of the god: towering, open, grim and quiet. One woodcutter and one hunter are all who still
@@ -34,9 +34,9 @@ Why one trunk in ten, the children always asked. Because the god let go with bot
 are ten fingers on two hands.
 
 The first woodcutter in the Wood knew none of this. He cut whatever came to hand, and the trunks wept clear and closed
-by morning, and he cut again. On the tenth his axe struck metal. He split the wood and lifted out a bell, and it rang
+by mourning, and he cut again. On the tenth his axe struck metal. He split the wood and lifted out a bell, and it rang
 once in his hands, though he had not swung it, and every trunk in the Wood leaned toward him at once, the way a crowded
-room turns to look at a man. He put the bell back and ran. By morning the wood had closed over it, all but the lip. It
+room turns to look at a man. He put the bell back and ran. By mourning the wood had closed over it, all but the lip. It
 is there still, by the road, if you count.
 
 So they counted, and left every tenth one be.

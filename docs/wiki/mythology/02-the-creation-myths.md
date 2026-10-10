@@ -20,25 +20,25 @@ A child in the lowlands counts it on her fingers:
 
 *What they look at:* nothing they can name. The Tithed have no beginning of their own. They have a mourning.
 
-Every memory the Tithed have starts in the same place. A grey morning; ash underfoot and in the mouth; the sky low and
+Every memory the Tithed have starts in the same place. A grey mourning; ash underfoot and in the mouth; the sky low and
 the light coming from one side; and everyone lying down, scattered over the ash in the cold, as if they had been set
 there in the night. Nobody remembers lying down. Nobody remembers anything before it. The grandmothers say "before the
-morning" the way other people say "before you were born", and they mean the same thing by it: a place nobody can get
+mourning" the way other people say "before you were born", and they mean the same thing by it: a place nobody can get
 back to, and nobody is to try.
 
 That much every telling agrees on. How the people came to be lying there, no two tellings agree, and the tellers have
 stopped expecting to. The tellings heard most often:
 - **Dreamed.** The grandmothers of the lowlands say the old one was dying under the ash that night, and the dying dream,
-  and what the dying dream of most is company. It dreamed of people around it, and dreamed so hard that in the morning
+  and what the dying dream of most is company. It dreamed of people around it, and dreamed so hard that in the mourning
   they were there. That is why, some nights, you dream a dream that is not your own, of warm dark and a sound like
   breath: it is the old one's dream, still running in you, and you are in it.
 - **Grown.** The diggers of the lowlands say people came up out of the Hide the way everything comes
   up out of a body left lying: the old one died, and the warm ash bred, and what it bred was them. They say it without
   shame. Everything that lives here grew out of something dead, they say. Why should we be the only ones ashamed of it?
 - **Given back.** The shore folk say the first people came up out of the Red on the first mourning, red to the hair,
-  crawling up the black sand on their hands, because the Red gives back whatever goes into it, and that morning it gave
+  crawling up the black sand on their hands, because the Red gives back whatever goes into it, and that mourning it gave
   back a people. Nobody asks them what had gone in.
-- **Counted.** The Pale Order says people were always here, laid in the Mother like the bones of a hand, and the morning
+- **Counted.** The Pale Order says people were always here, laid in the Mother like the bones of a hand, and the mourning
   is only when the first of them was counted. Before the count, nothing is anything.
 - **Left.** Some old women say the people were here before the mourning, a long time before, living under the old powers
   in the old age, and that whatever took the old one's names that night took everyone's names with it, and left the bodies
@@ -47,7 +47,7 @@ stopped expecting to. The tellings heard most often:
 None of the tellings says who the people were before, or whether there was a before. The Tithed have learned to leave
 it there.
 
-**The debt.** Every telling agrees on one thing more: the people owe. Whoever or whatever gave them the morning gave it
+**The debt.** Every telling agrees on one thing more: the people owe. Whoever or whatever gave them the mourning gave it
 on credit, and a tenth of everything is still owed. That is the name. The Tithed who are left leave a tenth of whatever
 they grow standing in the ground, the tenth loaf on the sill overnight, the tenth word of a long telling unsaid. Every
 tenth night they keep awake, so that whatever comes to collect finds someone up to pay it. Who they owe, they do not

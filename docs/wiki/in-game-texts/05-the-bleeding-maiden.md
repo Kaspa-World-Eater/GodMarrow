@@ -76,7 +76,7 @@ there. Each of us has seen something. We do not compare.
 
 ## The saints on the stair
 
-*A pilgrim's account of a night spent in a chapter of the processions, written the next morning at a waystone on the
+*A pilgrim's account of a night spent in a chapter of the processions, written the next mourning at a waystone on the
 ash road and left there under a stone.*
 
 They warned me before I went down to sleep in the guest room. At night, they said, the saints come down the crypt
@@ -101,7 +101,7 @@ I left before it was light. I left a copper on the guest room's sill, I do not k
 built along a great wound in the ground. It was written down at its daughter chapter, where the few hoods left still
 set out the old chapter's tithe-cup at their closed gate once a year.*
 
-The chapter was built down both lips of a long wound in the ground, as long as a morning's walk. Twelve hoods walked
+The chapter was built down both lips of a long wound in the ground, as long as a mourning's walk. Twelve hoods walked
 in its procession, and its gutters ran dark. Some people say they ran the colour of old brown ink, and that
 anyone who calls them red has never been there. Others say red.
 
@@ -112,7 +112,7 @@ and the crust closed over it again before the cup was empty.
 
 On the fast-day after, the crust split along its whole length in the night. What came out of the wound came out in
 the hoods' robes. The robes had been hanging on their pegs in the crypt, as robes do between processions, and in the
-morning they were walking: children, or the shapes of children, with nothing behind their eyes, twelve of them in the
+mourning they were walking: children, or the shapes of children, with nothing behind their eyes, twelve of them in the
 twelve robes, in the order of the procession. At the front walked something tall, sewn together out of more than one
 thing, and on its back it carried the Maiden out of the niche. I saw her. She had a face now.
 

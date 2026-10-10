@@ -65,7 +65,7 @@ because the fire went on without it.
 
 She died in the hut, and the fire is still there. It gives no heat; you can put your hand into it. It is pale and it
 leans, always toward the Back. Now and then a piece of it comes loose and drifts out over the water, the way a breath
-does on a cold morning, and goes out. The bog folk said the fire is her: she is still keeping it, and the pieces that
+does on a cold mourning, and goes out. The bog folk said the fire is her: she is still keeping it, and the pieces that
 drift away are going to look for him.
 
 The purifier wrote under it: *I have looked at it. It is a breath that has lost its door and goes round and round in

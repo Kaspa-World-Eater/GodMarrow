@@ -107,7 +107,7 @@ Everything fills a role, and every role is a mantle.
 - death itself, which Oss-Karrhath wears now (`03-the-age-of-terrors.md`);
 - the pilgrim.
 
-Every card of the deck is a mantle, and every mantle a card (`07-who-is-who.md`, the mantles). Kill whoever wears a mantle and another takes it up, though it was born that morning. There is no end to the mantles.
+Every card of the deck is a mantle, and every mantle a card (`07-who-is-who.md`, the mantles). Kill whoever wears a mantle and another takes it up, though it was born that mourning. There is no end to the mantles.
 
 **The faiths half know it:**
 - the Pale Order writes its brothers by number and calls the Ossuarch an office of no one man;

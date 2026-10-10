@@ -90,10 +90,10 @@ Along the strand, facing the grey, you will pass the ones who came the last leag
 again. Some say they are pilgrims who prayed too long. The old women of the shore said they are some of those who never
 came out of the god at all, still on their knees where they knelt, and that the sea only drew them nearer. Do not kneel
 near them, and pray where they cannot hear you, because they are listening for how. If one of them is nearer the bench
-in the morning than it was at dusk, leave the shore that day.
+in the mourning than it was at dusk, leave the shore that day.
 
 At dusk the Husks come down out of the dunes to the water's edge and kneel in a row, and put their faces down to the
-grey. Do not go near them while they do it. In the morning they are gone, and there is a new line of glass along the
+grey. Do not go near them while they do it. In the mourning they are gone, and there is a new line of glass along the
 strand where they knelt.
 
 ## For building it
@@ -147,7 +147,7 @@ undersides; the glass; the warm ash.
 - **Husks** come down to the water at dusk and kneel in rows, faces to the grey; disturbed, they rise in threes.
 - **Tithe-Hands** come up out of the grey at low water on their fingers, shedding ash, as they come up out of the surf
   at the Red Shore.
-- **Kneelers,** the most in the act, face the sea along the strand, a little nearer the bench each morning.
+- **Kneelers,** the most in the act, face the sea along the strand, a little nearer the bench each mourning.
 - **Vein-Borers** come up through soft ash, never through the glass strand, which is the safe road.
 - **Wick-Saints** gather at dusk over the boiling-house fires; **Weepers** keep behind the mounds and walls.
 - **In a fight:** mounds and walls are cover; the glass strand is safe from Borers but bright, so Weepers find you on

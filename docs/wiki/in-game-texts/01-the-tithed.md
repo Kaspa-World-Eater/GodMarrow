@@ -27,13 +27,13 @@ fill it out. The children say it like this:
 > *Flesh for the filling, and none for the name.*
 
 What its own name was, nobody kept. And near the end, the grandmothers say, the god set something down among us,
-small and folded, the way a woman banks a coal in ash so there will be fire in the morning. They say it lies nearest
+small and folded, the way a woman banks a coal in ash so there will be fire in the mourning. They say it lies nearest
 the top in a newborn, where the head is still soft, and that is why you hold a newborn's head in your hand and not
 anywhere else.
 
 Then it came. We do not say its name. It pressed against the outside of the warm place the way cold presses at a tent.
 It took the little names first: the name of the smallest finger, the name of one eyelash, the name of the hour before
-morning. We sang louder. It took more. And one night, though there was no night there, the god forgot how to be three
+mourning. We sang louder. It took more. And one night, though there was no night there, the god forgot how to be three
 things at once. The warmth went out of the walls, and the light went out with it, and everything we were kneeling inside
 was dead.
 
@@ -74,7 +74,7 @@ mouths open, singing.
 He ran. He left the lantern where it was and ran all the way to the stones at the crossroads, and he lived to be old,
 and he never sang anything again, not even at his children's namings.
 
-In the morning his father went out to fetch the lantern. It was still burning where he had dropped it. All round it
+In the mourning his father went out to fetch the lantern. It was still burning where he had dropped it. All round it
 in the ash, in a ring, were the marks of knees, close together, every one of them facing in.
 
 That is why we do not sing the fourth note. The ones who did not come out still know the tune, and they want the rest
@@ -86,7 +86,7 @@ of the song.
 Pale Order, who sheltered one winter in the only house still standing on that stretch of the lowlands, asked about
 the loaf left on the sill and wrote down her answer.*
 
-When we came out of the god, we came out owing. Nobody knows to whom, because we do not know who gave us the morning.
+When we came out of the god, we came out owing. Nobody knows to whom, because we do not know who gave us the mourning.
 But we owe, and a tenth of everything is still owed, and we have been behind on it ever since.
 
 Everything that comes up out of the god now is made of the god. We are the only things that are not. That is why they
@@ -96,7 +96,7 @@ the way we knelt, and be us. They are homesick. They do not hate us. That would 
 The first winter on the Cheek, a child was born in the open, the first born outside the god. One night the things
 came to the shelter where the mother lay with her child, and they stood round it in the dark and breathed. The mother
 had nothing but a little bread she had carried out, hard and grey. She broke off a tenth of it and laid it on the sill,
-and the things stood outside all night and did not come in. In the morning the bread was gone, and the mother and the
+and the things stood outside all night and did not come in. In the mourning the bread was gone, and the mother and the
 child were still there.
 
 So we set the tenth loaf on the sill at night, and we hang a lantern at the head of every cradle. And a mother gives her

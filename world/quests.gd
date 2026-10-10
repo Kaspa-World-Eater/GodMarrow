@@ -100,7 +100,7 @@ const GREET := {
 	"healer": ["Godmarrow. Let's see how much of yours is left.", "Godmarrow. Sit. You're dripping on my floor."],
 	"smith": ["Godmarrow. Iron's hot, and so's the god, somewhere under.", "Godmarrow. Bring it here and let me look."],
 	"giver": ["Godmarrow. The dead have been asking after you.", "Godmarrow. A vow doesn't keep. The dead do."],
-	"stranger": ["Godmarrow... an old word. Older than the ones who say it.", "Godmarrow. They used to mean the morning by it."],
+	"stranger": ["Godmarrow... an old word. Older than the ones who say it.", "Godmarrow. They used to mean the mourning by it."],
 }
 ## how the folk greet each order: plays on each order's own trade (blood, mirrors and thread, bone, breath and paper,
 ## the empty hand). Mixed into greet() by the hero's order.

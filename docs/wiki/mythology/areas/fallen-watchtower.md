@@ -32,12 +32,12 @@ watched the Barrows, and when one of ours came up out of a lid and started home,
 up with the spades and the flat stones. But men fall asleep, and too often the dead got to the doors first. So we
 built the tower, high enough to see every ring from the top, and hung a bell in it, and a man sat up there every night
 with the rope in his hand. One stroke meant one of them was up, and two meant more than one. At three strokes every door
-was barred until morning.
+was barred until mourning.
 
 The bell had words cast round its rim, as bells do. I won't say them. It is still out there, and it might answer.
 
 My grandmother saw the tower fall. She said the bell rang on its own one night for a long time, more strokes than
-anybody could count, and every family sat behind its doors and listened. In the morning the tower had fallen down the
+anybody could count, and every family sat behind its doors and listened. In the mourning the tower had fallen down the
 slope toward the Barrows like a man asleep on his feet, and there was no bell anywhere in it. The diggers told it
 otherwise. They said the ground under the tower sank from the middle, as the lids do, and the tower leaned into the
 hollow and went over, and the bell went down into it and the turf closed over it. The man who used to sit at every fire
@@ -65,7 +65,7 @@ worn in it where the wind comes round the tower, and two posts and a lintel by t
 paper. Whoever set them set them where the wind snags, which was right. Both guardian stones had turned from the road. I
 knelt and turned them back, and breathed on their faces until the dust moved, and the air was easier.
 
-In the morning both had turned again, down the slope, toward the low hump in the turf where the barrow families said
+In the mourning both had turned again, down the slope, toward the low hump in the turf where the barrow families said
 their bell is buried. A forgotten stone turns to the wall; these had turned to the hump, both the same distance, as if
 they had heard the same thing at the same moment.
 

@@ -21889,7 +21889,7 @@
       "region": "kus",
       "stat": null,
       "fx": {},
-      "name": "The Morning Star",
+      "name": "The Mourning Star",
       "area": "The Black-Flame Road",
       "lore": null,
       "links": [],
@@ -23202,9 +23202,9 @@
    "kr_star": {
     "cls": "monk",
     "kind": "major",
-    "name": "The Morning Star",
-    "up": "The breath sweeps back the way it came: a second pass of Morning-Star-Exhaled follows the first, at 60%.",
-    "rev": "The breath is drawn in, not out: Morning-Star-Exhaled drags what it burns 2 yd toward you and blinds it for half a second, but burns 30% less."
+    "name": "The Mourning Star",
+    "up": "The breath sweeps back the way it came: a second pass of Mourning-Star-Exhaled follows the first, at 60%.",
+    "rev": "The breath is drawn in, not out: Mourning-Star-Exhaled drags what it burns 2 yd toward you and blinds it for half a second, but burns 30% less."
    },
    "kr_sutra": {
     "cls": "monk",
@@ -23217,7 +23217,7 @@
     "cls": "monk",
     "kind": "minor",
     "name": "Ash in the Palms",
-    "up": "When Hundred-Hands-Of-Morning ends, the ground where its target stood burns for 4 s."
+    "up": "When Hundred-Hands-Of-Mourning ends, the ground where its target stood burns for 4 s."
    },
    "kr_belly": {
     "cls": "monk",

@@ -120,10 +120,10 @@ The Peak taught that **the Silence has two hands, both empty, and both destroy.*
 **The Destroyer's stone.** The Peak was cut from the god's knee-bone, and its oldest masters knew how to make the mountain move: bars, grips, pagodas and a weeping stone guardian at the gate. This is the third tree, paid in the body's own poise.
 
 **The fall** (as `mythology/05-the-last-breath.md` tells it). In the spring the monks began to die in their rooms at
-night, one or two a night, and in the morning there was nothing in the room but a little black glass and a little dust.
+night, one or two a night, and in the mourning there was nothing in the room but a little black glass and a little dust.
 - The abbot counted them night after night, and at last sent the youngest down the mountain with a letter, and told him
   not to look back.
-- The next night the great bell over the courtyard rang, long, though it had never rung where it hung. By morning the
+- The next night the great bell over the courtyard rang, long, though it had never rung where it hung. By mourning the
   courtyard was black glass from wall to wall, warm to the hand, and the doors of the inner sanctum stood open.
 - The gilded saints were in their niches. The last niche on the left was empty, as it had always been kept, except that
   the dust before it held footprints going out.
@@ -205,9 +205,9 @@ browser build).
 **Radiance** (tab 0), erasure by light:
 - Halo-That-Turns
 - Amber-That-Eats-Itself (toggle)
-- Hundred-Hands-Of-Morning
+- Hundred-Hands-Of-Mourning
 - Laughter-Without-Warmth (passive)
-- Morning-Star-Exhaled
+- Mourning-Star-Exhaled
 - Fist-Of-High-Noon
 - Sutra-That-Seeks
 - Tears-For-The-Living

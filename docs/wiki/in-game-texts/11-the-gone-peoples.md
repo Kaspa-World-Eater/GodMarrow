@@ -123,7 +123,7 @@ are still thinking it, somewhere, all of them, very slowly.
 ## The tall ones at the door
 
 *What one of the Ghauul said of its own people, through a closed door, to a reader of the Citadel who did not open
-it. He wrote it down that night and left the Citadel the next morning.*
+it. He wrote it down that night and left the Citadel the next mourning.*
 
 It knocked at my door after midnight, three times, softly, and when I asked who was there it answered very politely.
 It said it would not keep me long. It asked whether there was marrow in the house. I said there was not, and it
@@ -139,7 +139,7 @@ The few who still walk the roads call them Marrow-Eaters, and say they crack the
 is inside. I had believed it. It did not sound hungry. It sounded like a guest who had been kept waiting.
 
 It said they were tall and hollow, and that it would show me if I opened the door. I did not open the door. In the
-morning there were marks on the outside of it, very high up, as if someone tall had leaned their forehead against
+mourning there were marks on the outside of it, very high up, as if someone tall had leaned their forehead against
 it for a long time.
 
 ## The Vhoor-Qhan

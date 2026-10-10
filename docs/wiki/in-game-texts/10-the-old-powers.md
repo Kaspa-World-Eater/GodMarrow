@@ -100,7 +100,7 @@ down and told us, and the next winter he got up in his sleep and walked into the
 since. We can all remember his dreams now. They are mostly about the sea.
 
 Nobody here has dreamed for as long as I have been alive. We lie down and close our eyes and open them again in the
-morning, and nothing has happened in between. The old ones say it was not always so. They say the Needle drinks the
+mourning, and nothing has happened in between. The old ones say it was not always so. They say the Needle drinks the
 dreams of anyone who lives in its sight, and that a house in its sight has no dreams of its own. We tie our sleepers
 by the ankle.
 

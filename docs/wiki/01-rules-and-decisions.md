@@ -169,7 +169,7 @@ marrow.
   - **The people's origin: nobody knows** (his answer). The Tithed no longer knelt inside the god or came out of its
     mouth ("almost like Christian"); the congregation is deleted. Their memory begins on the first mourning, waking on
     the ash; every hearth tells it its own way (dreamed, grown, given back by the Red, counted, left). They are tithed
-    because they owe a tenth of everything to whatever gave them the morning. The idea that people are "not part of
+    because they owe a tenth of everything to whatever gave them the mourning. The idea that people are "not part of
     the god" is gone, and the tools motif with it.
   - **Tied together:** the Wasting's iron maidens are the root of the Bleeding Maiden (a girl in a maiden who would not
     die); every iron thing is one story, blood held too long (the Deep, the maidens, Vesk, the Needle, the crown,
@@ -317,7 +317,7 @@ marrow.
   - So `mythology/` is now the makers' bible, the found texts are in `in-game-texts/`, and no lore names small towns or villages that are not in the game.
 - **2026-10-08, the start on the Red Water:** "Let's make the starting area also on the edge of the ocean. Of course they don't know it's the ocean, but it's also completely made of blood. When they go down to the black sands all they see is the red blood going forever. Come up with a myth for that."
   - Much of the area is black sand and coast, then it "works its way inward through the environment following the natural landscape ecosystem trends".
-  - The culture: "combine some native American elements with the thai theme and some sort of new fusion all wrapped in a real dark souls like atmosphere". This overturns "all Thai" of the same morning.
+  - The culture: "combine some native American elements with the thai theme and some sort of new fusion all wrapped in a real dark souls like atmosphere". This overturns "all Thai" of the same mourning.
   - "We're not writing story or quests or anything. We're just building the world."
   - Written up in `mythology/08-the-shore-folk.md` (the myth of the Red Water) and `mythology/areas/the-red-shore.md`.
 - **2026-10-08, the lore:** rewrite the lore as readable myths (a creation myth, myths and the end of the world for each faith and people), told as texts found on scrolls, in tombs, or passed down, with only a little jargon; and area lore for every Act I zone, as inspiration for building each one; and the inconsistencies fixed. In `mythology/`.
@@ -408,7 +408,7 @@ marrow.
 
 - **2026-09-29, Ossuarch lore, fourth pass.** The order **reveres bone**. Dropped: iron as a theme, the mills and bellows, and "the Knitting" (that is the Hollow Mystic's flavour). **The growth is never said**, only implied (a count that keeps rising, rooms nobody dug, dust that weighs more); the skills and art show it openly.
 
-- **2026-09-29, the Bone grows.** A dark theme for the Ossuarch: the Bone grows, encroaches, calcifies and spreads like a cancer. His skills show it, with bone growing over his weapons, over his armour and in his enemies. The Chapter uses iron as a trellis for the growth and prunes it back each morning. In the doc's hidden layer, the growth is what the Mother has become, and the ossuaries are a quarantine.
+- **2026-09-29, the Bone grows.** A dark theme for the Ossuarch: the Bone grows, encroaches, calcifies and spreads like a cancer. His skills show it, with bone growing over his weapons, over his armour and in his enemies. The Chapter uses iron as a trellis for the growth and prunes it back each mourning. In the doc's hidden layer, the growth is what the Mother has become, and the ossuaries are a quarantine.
 
 - **2026-09-29, third pass on the Ossuarch and Empty Hand lore.**
 

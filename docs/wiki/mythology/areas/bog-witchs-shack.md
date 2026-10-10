@@ -52,7 +52,7 @@ candles, as my mother did. I have the better right to name them; I see them ever
 
 Is she dead? An old woman who had been a warden once told my mother she felt Hesk go out, all her candles at once, like
 a tooth pulled. But the candles still walk. The smoke still goes up from the chimney, and nobody lights a fire under it.
-And the doorstone is still being worn. I have seen it wet in the hollows of a morning, when nobody I know had been up
+And the doorstone is still being worn. I have seen it wet in the hollows of a mourning, when nobody I know had been up
 there.
 
 I will take you to the foot of the hump, if you have something to ask her. Nobody guides you up it. You go up alone, the

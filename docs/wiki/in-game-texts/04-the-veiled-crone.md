@@ -33,7 +33,7 @@ knot before she began.
 
 ## The circle of names
 
-*From a letter written by a girl to her mother on the morning after her first night in a circle. Her mother kept it
+*From a letter written by a girl to her mother on the mourning after her first night in a circle. Her mother kept it
 all her life.*
 
 They sat us in a ring on the floor of the round lodge, nine of us, with the eldest in the middle. The eldest
@@ -88,7 +88,7 @@ the door: *Which way?* Nobody could tell them. By the end of the winter they wer
 
 On the thirtieth night the eldest of our circle stood up in the coat of glass, without the menders, which she had
 not done in years. She said: *There is no loom. It goes on and on, and it never finishes.* Then she sat down, and she
-would not say anything else, and in the morning she was dead, and her soul did not go through either.
+would not say anything else, and in the mourning she was dead, and her soul did not go through either.
 
 After that, some of the circles took the felt off. They let the dead look at their own faces in the glass, and the
 dead stopped there, and were still, and stayed. Those circles kept them, held in the glass, and carried them. The

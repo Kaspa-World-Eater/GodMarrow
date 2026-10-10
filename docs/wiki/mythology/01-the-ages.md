@@ -102,7 +102,7 @@ The thing beneath stopped. Something that cannot be named pressed in and took it
 divided it; or something from outside came in where it was open; or it grew tired and the Silence came in to let it lie
 down. Every people tells it differently (`04-the-held-space.md`). Some say it is not dead.
 
-In the grey of the next morning the people woke on the ash of its hide, cold, scattered, with no names and no memory of
+In the grey of the next mourning the people woke on the ash of its hide, cold, scattered, with no names and no memory of
 lying down. How they came there, nobody knows, and every fire that is left tells it its own way
 (`02-the-creation-myths.md`). Everyone's memory begins there.
 

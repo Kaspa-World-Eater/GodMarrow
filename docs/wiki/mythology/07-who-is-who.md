@@ -85,7 +85,7 @@ nobody knows (`02-the-creation-myths.md`).
 - **What they believed:** the land is the Fallen One's body, the Red is its blood, and whatever goes into the Red comes
   back.
 - **Their dead** were burned the night they died.
-- **Their ways:** the stair swept every morning, spirit houses on carved posts, and a teacher's dance before every fight.
+- **Their ways:** the stair swept every mourning, spirit houses on carved posts, and a teacher's dance before every fight.
 - **Their forms:** Thai and Northwest Coast together.
 
 **The few still out on the lands** (one or two to a zone, most of them alone; none has a town, and they are fewer

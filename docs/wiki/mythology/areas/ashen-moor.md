@@ -43,7 +43,7 @@ Where a Husk bleeds into the ash, the ash drinks the blood and goes hard, and wh
 black, smooth on the face that was up and rippled on the face that was down, and it stays warm in the hand for a day
 after you lift it. A Husk that falls quickly leaves a splash, and a splash is chips. A Husk that stands a long while
 bleeding, the way they do, leaves a run as long as a man, and a run is knife-edges for every hand at our fire. I go out
-in the morning after a bad night and walk the ash, and you can tell from the fire where the glass is, because that is
+in the mourning after a bad night and walk the ash, and you can tell from the fire where the glass is, because that is
 where the crows are standing.
 
 The crows were here before us. My grandmother said that when the people first came out, the crows were already
@@ -108,7 +108,7 @@ to chalk the stones ourselves. She was the elder, and she would not have it. She
 counts wrong, and since we did not know what the stones were counting, we could not know what a wrong count would do.
 We left them bare. She is gone now.
 
-This morning there was chalk on the ninth again. I did not put it there. The figure is right. The chalk is the colour
+This mourning there was chalk on the ninth again. I did not put it there. The figure is right. The chalk is the colour
 of old brown ink.
 
 ## For building it

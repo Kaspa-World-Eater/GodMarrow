@@ -86,7 +86,7 @@ them to receive a bone, and he asked.
 I did not hear what he asked. I saw the Unfallen come down. They came down early, before their time, seven of them,
 in white lines, all toward the place where he stood.
 
-The sky was short by seven that night, and it is short by seven still. In the morning the Seekers went out. I have
+The sky was short by seven that night, and it is short by seven still. In the mourning the Seekers went out. I have
 not asked what they found, and I have not counted that ridge since.
 
 ## The well

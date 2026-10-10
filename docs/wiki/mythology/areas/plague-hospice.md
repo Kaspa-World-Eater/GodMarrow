@@ -46,7 +46,7 @@ water. We pay it. We curse them in the wards and pay them on the step.
 This season the figures hang straight. The breath no longer goes down. Somebody has stopped the shafts at the top, I do
 not know who: the knights say the lowlanders did it, and the lowlanders say we did. So the wrong breath stays in the
 rooms and turns round and finds the next bed. I have taken in more than I have room for. My cord is longer than the
-knots I remember tying, and this morning the guardian stone at the ward door was facing my alcove.
+knots I remember tying, and this mourning the guardian stone at the ward door was facing my alcove.
 
 The sick all dream the same room now. Every one of them, waking, tells me of a warm room they have never been in, very
 large, full of people on their knees. They speak of it gladly, and they are very patient.

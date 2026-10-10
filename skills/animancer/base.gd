@@ -42,7 +42,7 @@ const FxNode = preload("res://skills/animancer/fx.gd")
 const WISP_NERF := 0.65 * 0.65
 const OWN := ["swarm", "storm", "condense", "attack"]         # keep their own wisp costs: no fuel burned
 const HOLD := ["lance", "condense", "proc", "overcharge"]
-const WEAPON_NAMES := {"sword": "Knight Sword", "axe": "Headsman Axe", "flail": "Morning Star"}
+const WEAPON_NAMES := {"sword": "Knight Sword", "axe": "Headsman Axe", "flail": "Mourning Star"}
 ## elements (zz_mech_resists.js SKILL_ELEMENT): mirrors and the golem cut, soul-light is magic, the phantom's burst void
 const ELEM := {"pillars": "phys", "fissure": "phys", "cage": "phys", "anvil": "phys", "golem": "phys", "toss": "phys",
 	"thorns": "phys", "challenge": "phys", "phantom": "magic", "wraith": "void"}

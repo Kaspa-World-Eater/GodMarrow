@@ -44,12 +44,12 @@ goes past in long pushes, the way your blood goes when you hold your breath. Put
 feel the push in your fingers, and you never want to do it again.
 
 The last year of his life he came up here to see the seven in the far corner of the Heath. Before he left the bridge, he
-said, he raked out his fire and laid it for morning, kindling crossed on the ash, so he would only have to put a light
+said, he raked out his fire and laid it for mourning, kindling crossed on the ash, so he would only have to put a light
 to it when he got back. He went out to the seven, and came back to my fire, and lay down here with his feet toward the
 corner, and I let him. He never went back down.
 
 The boatman of the Fen, who has been there, tells it otherwise. He says the fire at the bridge went out generations
-before Garrow was born, its ash already laid for a morning that never came, and that Garrow only sat beside it and told
+before Garrow was born, its ash already laid for a mourning that never came, and that Garrow only sat beside it and told
 everyone it was burning. Garrow would have liked that. It is a better lie than any of his.
 
 Either way the ash is still laid, and nobody has put a light to it. I would not.
@@ -121,7 +121,7 @@ in the river, with a small chapel on one pier; the old ferry crossings with a be
   - **Light, from a hidden source:** the vein's slow pushes throw rippling light up onto the arches' undersides, as real
     water lights the underside of a bridge, pulsing on the beat.
   - **Age:** older than the oldest name.
-- **Garrow's camp:** a ring of fieldstones on a terrace above the landing; the hearth raked and laid for morning,
+- **Garrow's camp:** a ring of fieldstones on a terrace above the landing; the hearth raked and laid for mourning,
   kindling crossed on cold ash, never lit; a lean-to of old ferry planks; a seat worn smooth. The one hearth on the road
   that is cold.
 - **The landing:** a stone slip into the vein, a post where the bell hung, the ferry rope frayed off into the water.

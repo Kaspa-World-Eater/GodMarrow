@@ -205,7 +205,7 @@ never paid. It is only kept from coming due. One day it will come due.
 It will come at night, on foot, down the roads, from wherever the mourning came from, and it will knock, and it will be
 very polite. It will not be angry. It will only have come for what was always its. And the people will lie down where
 they stand, as they were lying on the first mourning, cold, on the ash, with nothing in their mouths, and the collector
-will go on to the next door. And in the morning, the grandmothers say, the morning will come for someone else.
+will go on to the next door. And in the mourning, the grandmothers say, the mourning will come for someone else.
 
 The grandmothers will not say what the collector looks like. The children say it carries a lantern. The old men say
 it carries a deck of cards, and that it has been seen already, here and there, sitting by a road, laying them out for

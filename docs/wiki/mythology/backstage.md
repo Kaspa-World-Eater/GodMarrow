@@ -169,7 +169,7 @@ The digest keeps the old words as a record of its sources. The bible is `00-the-
 
 ### 1.5 How it died: rival tellings, all canon as beliefs
 
-1. **The Moor:** the Hush pressed like cold at a tent. It took little names first: the smallest finger, one eyelash, "the hour before morning." The people sang louder, and one night the god forgot how to be three (CV, M01).
+1. **The Moor:** the Hush pressed like cold at a tent. It took little names first: the smallest finger, one eyelash, "the hour before mourning." The people sang louder, and one night the god forgot how to be three (CV, M01).
 2. **The sages:**
    - Aumery: the Hush unsaid it "the way a reader unsays a line by reading it aloud too many times."
    - Idrenne of the Lower Stacks: it took the names in order, smallest outward.
@@ -550,7 +550,7 @@ The digest keeps the old words as a record of its sources. The bible is `00-the-
 
 **Seat:**
 - Chapters along open wounds in the world.
-- **Villa Llaga:** "a town built down both lips of a long wound… as long as a morning's walk." Forty hoods walked its procession. Its gutters run "the colour of old brown ink, and anyone who said red had never been" (M04, ST); others say red. Now it is empty.
+- **Villa Llaga:** "a town built down both lips of a long wound… as long as a mourning's walk." Forty hoods walked its procession. Its gutters run "the colour of old brown ink, and anyone who said red had never been" (M04, ST); others say red. Now it is empty.
 - **Sallow Lip:** a daughter chapter on the salt road, "Measured." Its walls are its bricked-in dead. It sets Villa Llaga's tithe-cup at its closed gate every year, and "someone in their robes takes it in the night."
 - **The crypt stair:** the Maiden's niche above it. The chapter's dead lie in their own wall, each robe on a peg. No knight of the Order may enter.
 
@@ -646,7 +646,7 @@ The digest keeps the old words as a record of its sources. The bible is `00-the-
 - **A fan opened and shut** means "I will take that in later, alone."
 - **A doll on a doorstep** "asks once."
 
-**Creation, "the Breath":** "The great one breathed in once, long, and every small god was inside that breath, warm, one sound. Then it began to breathe out, and the world is the out-breath, and every stone, ford and bell is a small god riding it on the way out." On the morning the great one went still, each small god gave its name to the wind. "It matters less what breathes than that the breath is leaving."
+**Creation, "the Breath":** "The great one breathed in once, long, and every small god was inside that breath, warm, one sound. Then it began to breathe out, and the world is the out-breath, and every stone, ford and bell is a small god riding it on the way out." On the mourning the great one went still, each small god gave its name to the wind. "It matters less what breathes than that the breath is leaving."
 
 **Eschaton, "the Last Breath Out":** "The out-breath finishes. Every small god… settles like dust. A purifier who has already walked down into the water comes back up and breathes the world in, once, as the last rite; the world is folded like a paper figure with its arms open and set on a step, and nothing comes to breathe on it."
 - The Ford-Bell: "Out is closer than it was."
@@ -654,7 +654,7 @@ The digest keeps the old words as a record of its sources. The bible is `00-the-
 **The ending of every purifier:**
 - "Every held breath leaves a little of itself behind." The cord grows longer than the knots she tied.
 - The face "goes long and hard; the horns come in slowly, like a child's teeth."
-- One morning she stands up "with her hands full of everything she took and walks down": into the water, or the Root Deep.
+- One mourning she stands up "with her hands full of everything she took and walks down": into the water, or the Root Deep.
 - "They say *ends*, and they say it gently." Her time is near "when the guardian stones begin to turn toward her."
 
 **Factions:**
@@ -860,7 +860,7 @@ The digest keeps the old words as a record of its sources. The bible is `00-the-
 | The catacombs and the Ossuary Matron | The Reader's Bay book; the Miscount; "end the count" | M05; Q |
 | The Pale Order's teaching texts | The sweeper's letter; the Lesser Catechism (Q&A form, banned now); the tallier's arithmetic; At the Windlass (the Fifth Well); Radko's letter; Cold Adit's book; Benn's letters (206 becomes 207) | CV III |
 | Entry the Four Hundred and Fifth; Of the Unfallen; Old Upright | The Ungated shut out; the star-watcher sees a man ask the stars down; the Pontiff counts a woman to 207 | CV III; M03 |
-| The fall of the Peak | Nine days of counting dead; the abbot's letter; the tenth night (1098); the morning of glass; the knight-scribe's 206/209 count and the empty niche | CV IV; M03; ST |
+| The fall of the Peak | Nine days of counting dead; the abbot's letter; the tenth night (1098); the mourning of glass; the knight-scribe's 206/209 count and the empty niche | CV IV; M03; ST |
 | The Peak's survivors | The lamp-seller novice; the bread-woman's second cup; the goldbeater's pinholes at the saints' mouths; the tongueless bell; the magistrate's clean spaces | CV IV |
 | The loose winter (1106) | Forty nights; "There is no loom. It goes on and on, and it never finishes"; the dead ask "Which way?"; the felt pulled; the coat stands up; the blind grandmother walks on | CV V; M02; M04 |
 | Greywell | A circle meets the Silence; seven chairs, no bones, the glass shows nothing | CV VIII; M02 |
@@ -941,7 +941,7 @@ The digest keeps the old words as a record of its sources. The bible is `00-the-
 - Art references: the "Famine" painting of a sunken Gorrhaun face; the wisp-fire.
 
 **Hollow Wood** (veins):
-- Pale trunks warm a hand's depth in, with a slow beat. Cuts weep clear and close by morning.
+- Pale trunks warm a hand's depth in, with a slow beat. Cuts weep clear and close by mourning.
 - **Every tenth trunk holds something the god carried:** a bell in its hand, a candle in its mouth, a skull, ribs with a pilgrim badge, a lantern that "was a ninth the year before."
 - Three colours of light caps; the Codex says white for sound ground, blue for hollow, red where it still bleeds.
 - The roads were "there first; the Wood grew away from them."
@@ -975,7 +975,7 @@ The digest keeps the old words as a record of its sources. The bible is `00-the-
 
 **Other lowland places:**
 - **Ashwake:** crossroads, lantern-stones, ring, inn, scriptorium.
-- **Kerrow Cross:** the truce-stone where five roads meet; the Share Fair "on the fourth morning."
+- **Kerrow Cross:** the truce-stone where five roads meet; the Share Fair "on the fourth mourning."
 - **Four Wents:** the Barrow road crosses the salt road; the reeve; the soft place.
 - **The Dry Ford:** its river god "rode off on the breath."
 - **Cold Adit:** an iron hamlet under the Ossa that tithes sons.
@@ -1157,7 +1157,7 @@ beliefs:
   sand, so now they burn every dead body on the night it dies, and give the Red nothing.
 - **The stair:** their ancestors fed the Long One (the bog's serpent god) blood at the pit of black stone. A keeper
   refused to give her daughter and led the people up into the trees. She carved him on the temple stair's rails so
-  he would believe he was still kept, and set the rule that the stair is swept every morning. Unfed, he starved and
+  he would believe he was still kept, and set the rule that the stair is swept every mourning. Unfed, he starved and
   broke; the bog is what is left. "He is not as dead as the bog folk think."
 - **Spirit houses:** every great tree's spirit gets a house on a carved post, so it does not come down into a child.
   The Myriad's purifier: a small god kept in a house cannot leave when the breath goes out.
@@ -1190,5 +1190,6 @@ beliefs:
 - "stand still and it lets go" (the mud listens for fear);
 - the cold fire on the hump is a lost breath going round a narrow place, a widow's, still waiting.
 
-**2026-10-09, Derek:** "The first morning should be the first mourning." The day the Tithed woke lying in the ash is
-the first mourning everywhere it is named; the grey dawn itself stays a morning, so the word does both.
+**2026-10-09, Derek:** "The first morning should be the first mourning", then "All morning references will be
+mourning." Every morning in the lore, the in-game texts and the game's own words is a mourning: the first mourning,
+the Mourning Star, the Hundred-Hands-Of-Mourning, "by mourning". (Only the art tools' notes keep the real light's word.)

@@ -65,7 +65,7 @@ years, and every patch is a place where something died on it.
 
 My own teacher said otherwise. She once sat out a night on this road with a barefoot monk, one of those from the
 mountain that fell, who carried an empty bowl and a lantern that burned black. He asked her for a name, and she nearly
-gave him one, and he did not press. In the morning he was gone, and where he had sat there was a patch of black glass in
+gave him one, and he did not press. In the mourning he was gone, and where he had sat there was a patch of black glass in
 the shape of a man sitting, still warm. It is three stones down from here. So she held that the glass is where such men
 have sat, and that they have walked this road longer than anyone knows.
 
@@ -97,7 +97,7 @@ mother's time, she said, a choir came down from the lowlands meaning to sing str
 came near, and then they were walking in silence like everyone else, and their master wept because he could not say when
 they had stopped. Nobody starts again on the lower road, she said, and you do not miss it.
 
-I went back alone the next morning to find the place. There is a stretch of about thirty paces where the grass on the
+I went back alone the next mourning to find the place. There is a stretch of about thirty paces where the grass on the
 verges does not move when the wind blows, and the insects are quiet. I stood in the middle of it and opened my mouth to
 sing the verse we had stopped in, and found I did not know how it went.
 

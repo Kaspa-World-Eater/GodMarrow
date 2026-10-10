@@ -52,7 +52,7 @@ names, they say, so that the dead do not hear them.
 
 I went to it last, when they had all gone. The hollow was warm from their foreheads. I had nobody of my own to name
 there, and I stood with my head against it anyway. After a while I heard, from inside the stone or from under it,
-something saying names back, too low to make out. I told the woman of my house in the morning. She said that was the
+something saying names back, too low to make out. I told the woman of my house in the mourning. She said that was the
 stone keeping them, and that I should not have stayed.
 
 ### The Turned Mound

@@ -87,8 +87,8 @@ stair she carved the Long One, his body running down the rails and his heads rea
 climbing to the door. That way, she said, he would see himself already at our door and believe he was still being
 kept, and he would not come looking.
 
-She set the rule that the stair is swept every morning, every step, before anything else is done, so that the Long
-One carved on it is kept clean and knows he is minded. The keepers swept it every morning after her, longer than
+She set the rule that the stair is swept every mourning, every step, before anything else is done, so that the Long
+One carved on it is kept clean and knows he is minded. The keepers swept it every mourning after her, longer than
 anyone can count.
 
 Down in the low wet country, with no one to feed him, the Long One starved. A god that nobody feeds does not lie down
@@ -110,16 +110,16 @@ the nearest warm thing, and the nearest warm thing is usually a person, and usua
 
 So when the people first came into the trees, the first keeper carved a post for the foot of every great tree near
 the village. On top of each post she set a little house with a roof like her own house and a door the size of a
-hand, so that the tree's spirit would have a house of its own and stay in it. Every morning the people hung a flower
+hand, so that the tree's spirit would have a house of its own and stay in it. Every mourning the people hung a flower
 on each house, and every evening they lit a light in each door, so that the spirits would know they were thought
 of.
 
 There was a family who cut down a great tree to make a canoe and forgot to move its house first. The house fell with
 the tree and broke, and the spirit had nowhere to live. That night it came down into the family's youngest child.
 The child stopped speaking. She did nothing all day but look up into the crowns, and at night she climbed, higher
-than any child should be able to, and in the morning they would find her asleep in the branches, sixty spans up,
+than any child should be able to, and in the mourning they would find her asleep in the branches, sixty spans up,
 with her eyes open. The keepers built a new house for the spirit and carried the child to it and waited all night,
-and in the morning the spirit had gone into its house, and the child came down. She never climbed again, but she
+and in the mourning the spirit had gone into its house, and the child came down. She never climbed again, but she
 never stopped looking up, either.
 
 The keeper's note: *These people build little houses on posts for their spirits and set food before them, and call

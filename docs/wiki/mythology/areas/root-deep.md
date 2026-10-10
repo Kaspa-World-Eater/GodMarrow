@@ -27,7 +27,7 @@ breathes, and far down the hall a line of horned figures walking away, sacks on 
 *From the day-book of a purifier of the Shrine Keepers at the Well-Shrine in the Drowned Fen, written in the season her
 guardian stones began to turn toward her.*
 
-The elder says I should see the road before I walk it, so that when my morning comes my feet will know the way. So today
+The elder says I should see the road before I walk it, so that when my mourning comes my feet will know the way. So today
 I went down behind three of the Horned, at a distance, as far as one may go and still come up.
 
 They went down past the drowned altar, where the floor broke in a ring long ago, and the road begins there, going down.

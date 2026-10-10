@@ -71,7 +71,7 @@ The boatman says the bells got up and walked when the tower fell, the way bells 
 with somebody's head shut up inside it, and that they went down the well because it was the only road left them.
 
 The Shrine Keepers say every bell has its small god, and a bell's god is its sound, and these are ringing down there
-for the names they gave to the wind on the morning the great one went still.
+for the names they gave to the wind on the mourning the great one went still.
 
 I say they ring for dusk, the way bells always did, because nobody ever told them to stop. My mother walked the bog all
 her life and never crossed the square while they rang, and nor do I, and that is reason enough.

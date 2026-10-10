@@ -87,7 +87,7 @@ the old woman who lives at its edge let go of her own sister's, she said, and lo
 
 She came out in the end, and the tellings do not agree how. Some say she walked out on her own one dusk while the bells
 were ringing, dry as paper, in a dress of a kind nobody had sewn in living memory. Others say the drowned let go of
-her one morning, the way you let go of a hand. All of them agree on what she asked: that nobody be told she had let go.
+her one mourning, the way you let go of a hand. All of them agree on what she asked: that nobody be told she had let go.
 So the Ridge does not tell it. There are three stumps on the crest, and the Ridge will not say which of them is empty.
 
 Some who walk the Ridge road tell it the other way about: that it was the other sister who let go, and Nell who held on.

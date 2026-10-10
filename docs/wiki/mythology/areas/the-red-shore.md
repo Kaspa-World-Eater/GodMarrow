@@ -53,7 +53,7 @@ dead went to the fire, nothing of ours went into the water, and nothing that was
 Winters ago now, in the wet season, the dead began to come up out of the Red again. They were not our dead. They
 came from somewhere far along the water, from wherever else people give their dead to it. They came up the black
 sand at night in the old way, red to the eyes, and stood at the edge of the trees and looked up at our fire. Some
-still wore pilgrims' cloaks, and some carried staffs. In the morning they went back down into the water, and the
+still wore pilgrims' cloaks, and some carried staffs. In the mourning they went back down into the water, and the
 next night there were more of them, and then one night they did not go back down.
 
 After the dead came the other things, the ones that were never alive the way we are: things that crawl up out of the
@@ -90,14 +90,14 @@ people.
 
 You come to it from the sand. I walked two days along the black beach with the Red on my left hand. I will not try to
 tell you what that is like, except that it does not end, and it comes up the sand and goes back as if it were
-breathing. On the second morning there were footprints coming up out of it that did not go back down. Where a stream
+breathing. On the second mourning there were footprints coming up out of it that did not go back down. Where a stream
 comes down to the beach, a path climbs up through the bent trees, and at the top of it, in the big trees, is the
 village.
 
 The wall is down in a dozen places, mostly on the side that faces the water. Inside it the huts stand in a ring,
 round and roofed with hides, most of them burned to their poles. In the middle of the ring is a pit as wide as a
 chapel floor, and there is a fire in it, and there are dead on the fire. It was burning when I came and it is burning
-now. In all my time here I have not seen anyone put wood on it or carry the dead to it, yet each morning there are more of
+now. In all my time here I have not seen anyone put wood on it or carry the dead to it, yet each mourning there are more of
 them on it than the night before.
 
 There is one man here. He is nobody from the village; he says so himself, and laughs. He carries a pack bigger than
@@ -244,7 +244,7 @@ not to the pilgrim):
 5. **The seeking:** "What it's after. Marrow, whatever it calls it. They're all after marrow." / "It wants something.
    Something wants it back. That's how the Hide stays fed."
 6. **The road:** "The road it came by. It didn't. It came up a stair out of a pool an hour ago. Give it a road anyway.
-   A road's a kindness." / "Pick it a road. It'll have walked it by morning. That's how roads work here."
+   A road's a kindness." / "Pick it a road. It'll have walked it by mourning. That's how roads work here."
 7. **The question:** "One question. Not for it. For me." *(He listens to nothing for too long.)*
 8. **The price:** "The price. Something stays on the step with the rest. Old Scythe keeps a count; leave him something
    to count." / "Something of the hide stays here. Not much. The hide grows back. Mostly."
