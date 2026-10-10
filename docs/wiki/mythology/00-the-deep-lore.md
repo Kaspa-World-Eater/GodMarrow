@@ -39,7 +39,7 @@ So each faith's god is the faith itself, looked at in the bone, the blood or the
 - **the Bearing Mother** is the brothers' own need to be carried, seen in bone;
 - **the Bleeding Maiden** is the processions' own wound;
 - **the Veiled Crone** is the circles' fear of being forgotten;
-- **the small gods** are the shrine-keepers' own thoughts, breathed out and breathed in again;
+- **the kami** are the shrine-keepers' own thoughts, breathed out and breathed in again;
 - **the Fallen One** is the shore folk lying down at the end of everything;
 - **the creatures that come up** out of the god are the people's fears, given back to them with teeth.
 

@@ -11,7 +11,7 @@ calling has its own page (`../05-class-*.md`).
 | **Bone** | the frame of the world, which will not lie down, and grows | Oss-Vharoth | the Bearing Mother (the Pale Order) | the Marrow Pontiff | Old Upright |
 | **Soul** | the threads that pull lives toward each other and away | Yh'Anuul | the Veiled Crone (her circles) | none yet | not yet named |
 | **Flesh** | the warm, growing, mindless stuff of the world | Nol-Shogthuth | the Bleeding Maiden and the Mother (the processions) | not yet named | the Red Mother |
-| **Breath** | the last breath going out of the world, and whatever rides it | none; asking is an insult | the small gods (the Myriad, the Shrine Keepers) | the Long Exhale | the Last Breath |
+| **Breath** | the last breath going out of the world, and whatever rides it | none; asking is an insult | the kami (the Myriad, the Shrine Keepers) | the Long Exhale | the Last Breath |
 | **The Silence** | the untold: the space between words | Ur-Nihl, usually written as a gap | none: the Gilded Peak looked at it unmasked, and fell | a Silent One | That Which Cannot Be Named |
 
 Every herald is a mantle (`00-the-deep-lore.md`): whoever wears it now. They wake at the gods' altars.
@@ -55,10 +55,10 @@ Every herald is a mantle (`00-the-deep-lore.md`): whoever wears it now. They wak
 - **Its factions:** the Measured, and the Open Vein, whose processions go out and do not come home.
 - **Its calling:** the Red Penitent, who opens their own veins and lets the Mother through.
 
-**The Myriad**, whom common folk call the Shrine Keepers (a *shrine*). Its masks are the small gods: the gods of thoughts, grudges, lies and beliefs, carried on
-the breath, many and nameless.
+**The Myriad**, whom common folk call the Shrine Keepers (a *shrine*). Its masks are the kami: the spirits of thoughts, grudges, lies and beliefs, carried
+on the breath, many and nameless (the keepers call those born of words kotodama).
 - **Its dead** are given to the water.
-- **Its rites:** stealing breath (from the air, the sick, the dying, the grieving who pay), holding it longer than
+- **Its rites:** stilling breath (taking it, from the air, the sick, the dying, the grieving who pay), holding it longer than
   anyone living, and breathing it out by the fan into a shrine, a paper figure or an enemy's face; whispering quarrels
   into the shrines so the caught gods never agree; the Small Cutting, since the grey year.
 - **Its end of a keeper:** a keeper who holds too much grows horns and walks down into the dark, still holding; she is

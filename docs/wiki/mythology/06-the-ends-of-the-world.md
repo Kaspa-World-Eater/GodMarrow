@@ -131,23 +131,23 @@ close the Silence too, and the processions say it carefully.
 
 The keepers teach that the world is the dead god's out-breath, and that every breath that goes out comes back in.
 
-The one wind is still going out across the Hide, thick with the small gods of everything the great one ever thought, and
+The one wind is still going out across the Hide, thick with the kami of everything the great one ever thought, and
 of everything everyone since has said aloud. They quarrel in it. That is the only thing keeping the world as it is:
 **discord**, belief against belief, god against god, each small one holding every other small one down. The keepers tend
 the quarrel. They whisper contradictions into their shrines so that the caught gods never settle. They breathe a lie
 into a room where a truth has been told too often. They set one village's grudge loose in the next village's well. They
 are hated for it, and they would say they are hated by people who do not understand what they are holding back.
 
-**The Concord.** But the miasma is thickening. Every year the breath is fouler, and the small gods in it are sicker and
+**The Concord.** But the miasma is thickening. Every year the breath is fouler, and the kami in it are sicker and
 quarrel less, and here and there, the keepers have seen it, they have begun to agree. Two grudges find they are the same
 grudge and run together. A whole valley's fear of the dark becomes one fear, and stands up. The keepers say the end
-comes when the agreeing spreads faster than they can sow quarrel: when, on one still day, every small god in the breath
+comes when the agreeing spreads faster than they can sow quarrel: when, on one still day, every kami in the breath
 believes the same thing at the same moment, and they run together, all of them, into one god as large as the dead one.
 It will not be a new god. It will be the old one, made again out of its own last thoughts, and it will do what a thing
 that has breathed out does next. **It will breathe in.**
 
 The wind will turn, for the first time since the first morning. Everything that went out on it will come back: the ash,
-the voices, the thoughts, the small gods, and every breath anyone has ever let go of, drawn back across the Hide toward
+the voices, the thoughts, the kami, and every breath anyone has ever let go of, drawn back across the Hide toward
 wherever the great one lies. Everyone breathing will have their breath taken with it, out of their mouths, all at once,
 in one long pull. The world will be inhaled, and held.
 
@@ -155,7 +155,7 @@ in one long pull. The world will be inhaled, and held.
 a breath longer than anyone living, a night, then a season of nights, and the eldest say they have not truly let one go
 in years. On the day the wind turns, they will hold, with everything they have caught still in their lungs, while the
 world is drawn in around them. And when the great one has held its breath as long as it can, it will have to let go
-again, and the keepers will be the only things left with breath of their own, and the small gods they carry will be the
+again, and the keepers will be the only things left with breath of their own, and the kami they carry will be the
 only ones left in the world. That, the eldest say, is what the shrines were always for.
 
 **The cards.** The keepers read the cards by breathing on them: each card is held to the lips, breathed on once, and laid

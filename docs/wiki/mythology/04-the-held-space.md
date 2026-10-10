@@ -182,7 +182,8 @@ The thing stopped. Every people tells it, and none was there to see. All the tel
 - **The Choir** says it came in through the rest, the one moment when all of them drew breath together.
 - **The Pale Order** says only that the Mother fell, and that the first brothers stood beside her.
 - **The Gilded Peak** said the thing grew tired, as a held breath tires, and the Silence came in to let it lie down.
-- **The Myriad** say the great one went still, and every small god gave its name to the wind.
+- **The Myriad** say the great one breathed out its last, and every thought it ever had went out on that breath as a
+  kami, and is in the wind still.
 - **The circles of the Veiled Crone** say the threads went slack, as a weaver's hand tires at the treadle.
 - **The processions of the Bleeding Maiden** remember nothing of it. The cup came down to them from somewhere.
 - **On the roads it is told** that the faithful divided it: that its worshippers took knives to it, dying or sleeping,

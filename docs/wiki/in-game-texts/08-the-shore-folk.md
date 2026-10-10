@@ -122,10 +122,10 @@ with her eyes open. The keepers built a new house for the spirit and carried the
 and in the morning the spirit had gone into its house, and the child came down. She never climbed again, but she
 never stopped looking up, either.
 
-The purifier's note: *The Myriad teaches that every tree and stone has its small god, that each small god gave its
-name to the wind when the great one went still, and that all of them are riding the last breath out of the world.
-These people have the right of it in their way, but they have built houses to keep the small gods in, and a small god
-kept in a house cannot leave when the breath goes out. I did not tell them so. They have enough to fear.*
+The keeper's note: *These people build little houses on posts for their spirits and set food before them, and call
+it keeping them. We build the same houses, and we know what a house is for. A kami shut in a house with a paper door
+cannot get out on the breath, and it is fed so that it stays quiet. Theirs are fed so that they stay. I did not tell
+them the difference. They have enough to fear.*
 
 ## The teacher's dance
 

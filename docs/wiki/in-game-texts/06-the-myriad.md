@@ -1,6 +1,6 @@
 # The Myriad
 
-*The faith of the breath is called the Myriad, after the small gods it keeps; the common folk call its people the
+*The faith of the breath is called the Myriad, after the kami it keeps; the common folk call its people the
 Shrine Keepers, after the little wooden houses they leave along the roads, and do not stand near those houses after
 dark. Their texts come from the day-book of the Well-Shrine in the Drowned Fen, the first of their shrines, and from the
 folders of paper figures in the reed camps.*
@@ -10,7 +10,7 @@ folders of paper figures in the reed camps.*
 *Taught to every novice on the night she is folded. Copied from the first leaves of the Well-Shrine's day-book, which
 are so old the keepers turn them with a reed.*
 
-Nothing you think stays in you. Think a thing long enough and it grows a small god, the size of the thing: a grudge
+Nothing you think stays in you. Think a thing long enough and it grows a kami, a kotodama, the size of the thing: a grudge
 grows a grudge's god, a lie a lie's, a worry a worry's. It lives in your breath. Say the thing aloud, and the god goes
 out of your mouth with the word and hangs in the air, looking for another mouth. Breathing in is how it gets in.
 
@@ -18,11 +18,11 @@ So hold your tongue. Breathe shallow among strangers. Cover your mouth when you 
 a grudge aloud, not even to a wall: said, it is loose, and someone will breathe it, and it will grow in them.
 
 When the great one died, it breathed out its last, and everything it had ever thought went out on that one breath. That
-is the wind. It has never turned. It is full of the dead god's small gods, more than there are stars, and you have been
+is the wind. It has never turned. It is full of the dead god's kami, more than there are stars, and you have been
 breathing them since the morning you were born. Some of what you think is yours. Some of it is the dead god's. You will
 never know which.
 
-The small gods are not kind. They fight, belief against belief, in the breath. Good. While they fight, they stay small.
+The kami are not kind. They fight, belief against belief, in the breath. Good. While they fight, they stay small.
 Pray, if you pray, that they never agree.
 
 ## The shrines
@@ -31,7 +31,7 @@ Pray, if you pray, that they never agree.
 
 A shrine is a house the size of a cradle on a post, with a paper door. There is nothing in it but what a keeper
 breathed into it. When we take a breath from the sick, or the dying, or the grieving who pay us, we carry it in our
-chests as far as we can bear, and then we breathe it into a shrine and seal the door, and the small gods in it are
+chests as far as we can bear, and then we breathe it into a shrine and seal the door, and the kami in it are
 shut in. We feed them. Once a season we come back and whisper into the door something they can quarrel over, so that
 they never settle and never grow.
 
@@ -49,7 +49,7 @@ written somewhere. They say that what is inside has started to agree with itself
 *How the first keeper learned her work, as the folders of the reed camps tell it. One of them, who could write, wrote it
 down for the Well-Shrine.*
 
-Breath gone foul is called miasma: breath so crowded with small gods, so many of them rotten, that it sickens whoever
+Breath gone foul is called miasma: breath so crowded with kami, so many of them rotten, that it sickens whoever
 breathes it. It comes of a grudge kept past its season, a curse said into a well, a lie told over a grave and never
 taken back. A house with miasma in it ails, and nothing ever grows right there.
 
@@ -60,7 +60,8 @@ as if it had been called, and she knew it had taken the foul breath in.
 
 Then she did what no one had done before. She took the figure up to her own mouth and breathed it in, all of it, and
 held it. It hurt. She tied a knot in a cord at her wrist so that she would know she was holding it. And she did not let
-it go. She held it for a month, and learned that she could. Then she took the fan from her belt and opened it one rib at
+it go. She held it for a month, and learned that she could: she had stilled it. By the end of the month it had set in
+her chest like steel. Then she took the fan from her belt and opened it one rib at
 a time, because every rib is a road, and breathed it out, down the right rib, into the face of the man whose grudge it
 had been. He did not get up.
 
@@ -125,7 +126,7 @@ bulge toward the dark. Yours have begun. We will fold a figure for you tonight, 
 
 *The last leaf of the Well-Shrine's day-book is left blank but for this, written small at the bottom of the page.*
 
-When the small gods agree, the wind will turn.
+When the kami agree, the wind will turn.
 
 Everything that went out will come back in: every breath, every word, every thought anyone ever let go of, drawn back
 across the Hide in one long pull, and the breath of everyone breathing with it.

@@ -179,36 +179,41 @@ frightening thing it says. Deep in Shog-Mire it is whispered that something in t
 *What they look at:* the breath, and what rides it. The Shrine Keepers say that nothing a person thinks stays inside
 them. It goes out on the breath, and it does not go out alone.
 
-Every thought held long enough becomes a small god. Not a great one; the great ones need whole peoples to fear them for
+Every thought held long enough becomes a kami. Not a great one; the great ones need whole peoples to fear them for
 an age. A small one needs only a single mind and a little time: a grudge nursed through a winter, a promise nobody meant
 to keep, a lie told so often the liar half believes it, a mother's worry for a child who has not come home, a hope that
-has gone sour. Each grows a small, hungry god of its own, the size of the thing it was made of. The keepers call them
-the myriad, because nobody could count them, and their faith is named for them.
+has gone sour. Each grows a small, hungry kami of its own, the size of the thing it was made of. The keepers call them
+**kotodama**, the souls in words, and call all of them together the myriad, because nobody could count them; their faith
+is named for them.
 
-The small gods live in the breath. A thought spoken aloud goes out on the breath, and its god goes with it, out of the
+The kami live in the breath. A thought spoken aloud goes out on the breath, and its god goes with it, out of the
 mouth and into the air, looking for another mouth to get into. Breathing in is how they enter. That is why the people of
 the wet country breathe shallow among strangers and cover their mouths when they speak of anything that matters, and
 why nobody there will say a grudge aloud: said, it is loose, and it will be breathed in by someone, and it will grow.
 
 When the great one beneath died, the keepers teach, it breathed out its last, and every thought it had ever had went out
-on that one breath: all its small gods at once, more than there are stars, into the grey. That breath is the one wind
+on that one breath: all its kami at once, more than there are stars, into the grey. That breath is the one wind
 that blows across the Hide and never turns. It is full of them. Everyone on the Hide breathes it, all the time. Every
 mind on the Hide has some of the dead god's thoughts in it, breathed in on the wind, and does not know which ones.
 
-**The quarrel.** The small gods are not good, and they are not kind to each other. Every belief contradicts some other
+**The quarrel.** The kami are not good, and they are not kind to each other. Every belief contradicts some other
 belief, and their gods fight in the breath, the god of a promise against the god of the lie that broke it, the god of a
-hope against the god of the fear under it. The keepers call this **discord**, and they bless it. While the small gods
-quarrel, they stay small. When enough of them agree, they run together into one, and one large enough is no small god
+hope against the god of the fear under it. The keepers call this **discord**, and they bless it. While the kami
+quarrel, they stay small. When enough of them agree, they run together into one, and one large enough is no kami
 any more: it is an Ythraal, a fear grown great, the way the old gods grew. **Concord** is the word the keepers use for
 that, and they say it the way other people say plague.
 
-**Miasma** is breath gone foul: breath so crowded with small gods, and so many of them rotten (spite, shame, the gods of
+**Miasma** is breath gone foul: breath so crowded with kami, and so many of them rotten (spite, shame, the gods of
 old lies nobody remembers telling), that it sickens whoever breathes it. It hangs in low places and in the rooms of the
 dying. It is the dead god's last breath, going bad as it goes out.
 
-**The keepers.** The Shrine Keepers are not purifiers, whatever the paper streamers on their belts suggest. They steal
-breath, and are proud of it. They take it: from the air where miasma hangs thickest, from the sick, from the
-dying, whose last breath is the fullest of all, and they hold it in their own lungs with the small gods still in it.
+**The keepers.** The Shrine Keepers are not purifiers, whatever the paper streamers on their belts suggest. The common
+folk say the keepers steal breath. The keepers say they **still** it, and the word is the same word, said with a
+different face. To still a breath is to take it and hold it: from the air where miasma hangs thickest, from the sick,
+from the dying, whose last breath is the fullest of all, held in a keeper's own lungs with the kotodama still in it,
+and not let go. Held long enough, the keepers say, a stilled breath sets in the chest like **steel**, and a keeper who
+breathes it out breathes out a blade. Still, steal, steel: the novices learn the three as one word, and so do the
+people who have been breathed on.
 They can hold a breath longer than anyone living. They learn to hold one through a whole night, and then through a
 season of nights, and the old ones say they have not truly let one go in years. And they breathe it out where they
 choose: into a shrine, which is a small wooden house with a paper door and nothing inside but what was breathed into
@@ -221,7 +226,7 @@ the widow feels lighter, and the keeper keeps the grief. A village pays a keeper
 Nobody asks what the keeper does afterward with everything she holds. Nobody wants to know which of the shrines along the
 road hold a grief, and which a curse, and which a dead man's last thought.
 
-*Behind the myth.* Read through the deep lore (`00-the-deep-lore.md`), the small gods are the law of the world at its
+*Behind the myth.* Read through the deep lore (`00-the-deep-lore.md`), the kami are the law of the world at its
 smallest: every thought told enough stands up, and breath is how a thought is told. The keepers are the only people who
 handle belief with their own bodies, and it shows: they go grey, they cough, their lips go dark, and a keeper who holds
 too much grows horns and walks down into the water, still holding it. The faith calls those ones **kegare**, which is
