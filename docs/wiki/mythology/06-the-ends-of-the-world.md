@@ -127,39 +127,41 @@ first. The lowland children, who know nothing of the litanies, end their countin
 *Behind the myth.* The gap between one word and the next is where the Silence is. The Filling is the one end that would
 close the Silence too, and the processions say it carefully.
 
-## The Myriad: the Last Breath Out
+## The Myriad: the Breath Drawn In
 
-The Shrine Keepers teach that there is no one god, only the myriad: a small god in every stone and ford and bell and
-doorpost, each with its own temper, and all of them forever quarrelling. The stone wants to stay; the river wants to go;
-the bell wants to be heard and the wind wants to carry everything off. The quarrel is the world. **Discord** is what
-keeps the stone a stone and the river a river: things stay themselves because they disagree with everything else. The
-keepers tend the quarrel, never the peace. They ring the shrine bells a little out of tune with each other on purpose,
-and set every offering a little crooked, so that no two small gods are ever quite pleased at once.
+The keepers teach that the world is the dead god's out-breath, and that every breath that goes out comes back in.
 
-The small gods ride the god's last breath, which is still going out across the Hide as the one wind, and the breath is
-sick. It carries the **miasma**, the rot of the great one's dying, and the small gods are choking on it. That is the
-keepers' calling: they breathe the sickness in, so that the small gods need not, and carry it in their own chests, and
-go grey, and cough, and die young, and are proud of it.
+The one wind is still going out across the Hide, thick with the small gods of everything the great one ever thought, and
+of everything everyone since has said aloud. They quarrel in it. That is the only thing keeping the world as it is:
+**discord**, belief against belief, god against god, each small one holding every other small one down. The keepers tend
+the quarrel. They whisper contradictions into their shrines so that the caught gods never settle. They breathe a lie
+into a room where a truth has been told too often. They set one village's grudge loose in the next village's well. They
+are hated for it, and they would say they are hated by people who do not understand what they are holding back.
 
-**The Concord.** The end comes, the keepers teach, when the quarrel stops. As the out-breath thins and the miasma
-thickens, the small gods will quarrel less, because they will be too sick to want anything; and on the last day, for
-one breath, every small god on the Hide will want the same thing at once. Every stone and river and bell will agree.
-That is the Concord, and it is the most terrible thing the keepers know, because a world in which everything agrees
-with everything is a world in which nothing is anything in particular. The stone will stop being a stone, because it
-will have no reason to. Everything will settle like dust where it lies, in perfect accord, and be still.
+**The Concord.** But the miasma is thickening. Every year the breath is fouler, and the small gods in it are sicker and
+quarrel less, and here and there, the keepers have seen it, they have begun to agree. Two grudges find they are the same
+grudge and run together. A whole valley's fear of the dark becomes one fear, and stands up. The keepers say the end
+comes when the agreeing spreads faster than they can sow quarrel: when, on one still day, every small god in the breath
+believes the same thing at the same moment, and they run together, all of them, into one god as large as the dead one.
+It will not be a new god. It will be the old one, made again out of its own last thoughts, and it will do what a thing
+that has breathed out does next. **It will breathe in.**
 
-**The last breath in.** And then, the keepers say, the ones who are left will be the ones who breathed the miasma all
-their lives: the keepers themselves, grey and coughing in the dust of an agreed world, the only things left with the
-sickness in them, and so the only things left that still disagree with anything. A purifier who walked down into the
-water long ago will come back up out of it, horned, and the keepers will breathe in, once, all together, and take the
-world in with the breath, and hold it. The world will be folded like a paper figure, its arms left open, and set down
-on a step. And nothing will come to breathe on it.
+The wind will turn, for the first time since the first morning. Everything that went out on it will come back: the ash,
+the voices, the thoughts, the small gods, and every breath anyone has ever let go of, drawn back across the Hide toward
+wherever the great one lies. Everyone breathing will have their breath taken with it, out of their mouths, all at once,
+in one long pull. The world will be inhaled, and held.
 
-**The cards.** The keepers read the cards by dropping them from a height in the wind and reading how they fall, which
-ones land face up, which ones touch. They have noticed in this age that the cards are falling closer together than they
-used to, and more of them face the same way.
+**The held breath.** The keepers alone mean to live through it, and they say how: by holding. Every keeper learns to hold
+a breath longer than anyone living, a night, then a season of nights, and the eldest say they have not truly let one go
+in years. On the day the wind turns, they will hold, with everything they have caught still in their lungs, while the
+world is drawn in around them. And when the great one has held its breath as long as it can, it will have to let go
+again, and the keepers will be the only things left with breath of their own, and the small gods they carry will be the
+only ones left in the world. That, the eldest say, is what the shrines were always for.
 
-The bells of the wet country have been heard to ring a new way in this age, all in tune. The keepers say they ring *out
+**The cards.** The keepers read the cards by breathing on them: each card is held to the lips, breathed on once, and laid
+down, and they read which ones the breath fogs and which stay clear. In this age more of the cards stay clear.
+
+The bells of the wet country have been heard to ring a new way in this age, all in tune. The keepers say they ring *in
 is closer than it was*.
 
 ## The Second Mouth: the Swallowing

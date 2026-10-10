@@ -55,12 +55,14 @@ Every herald is a mantle (`00-the-deep-lore.md`): whoever wears it now. They wak
 - **Its factions:** the Measured, and the Open Vein, whose processions go out and do not come home.
 - **Its calling:** the Red Penitent, who opens their own veins and lets the Mother through.
 
-**The Myriad**, whom common folk call the Shrine Keepers (a *shrine*). Its masks are the small gods, many and nameless.
+**The Myriad**, whom common folk call the Shrine Keepers (a *shrine*). Its masks are the small gods: the gods of thoughts, grudges, lies and beliefs, carried on
+the breath, many and nameless.
 - **Its dead** are given to the water.
-- **Its rites:** bowing to every small god and never asking its name; purifiers taking wrong breath into themselves and
-  sending it out by the fan; the Small Cutting, since the grey year.
-- **Its factions:** the Folded, who serve while they have room, and the Horned, purifiers at their end, who walk down
-  into the dark.
+- **Its rites:** stealing breath (from the air, the sick, the dying, the grieving who pay), holding it longer than
+  anyone living, and breathing it out by the fan into a shrine, a paper figure or an enemy's face; whispering quarrels
+  into the shrines so the caught gods never agree; the Small Cutting, since the grey year.
+- **Its end of a keeper:** a keeper who holds too much grows horns and walks down into the dark, still holding; she is
+  called kegare then, the word for the filth she carries.
 - **Its calling:** the Shrine Keeper.
 
 **The Second Mouth**, the only cult, hidden inside the processions.
