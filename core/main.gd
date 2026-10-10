@@ -101,7 +101,7 @@ func _ready() -> void:
 		hud = load("res://ui/hud.gd").new()
 		add_child(hud)
 	add_child(load("res://world/sleepers.gd").new(self))   # far creatures frozen until the pilgrim comes near (D2's rule)
-	await enter(args.get("zone", "moor"), "")
+	await enter(args.get("zone", _start_zone()), "")
 	await TestHooks.run(self)   # test and capture hooks (core/test_hooks.gd); nothing without their args
 
 
@@ -158,6 +158,9 @@ func enter(zid: String, from: String) -> void:
 		at = Vector2(zone.arrive[from]["x"], zone.arrive[from]["y"])
 	else:
 		at = Vector2(zone.markers["start"]["x"], zone.markers["start"]["y"])
+	if args.has("at") and from == "":   # tests: the pilgrim stood at x,y (zone tiles), for captures
+		var p := String(args["at"]).split(",")
+		at = Vector2(float(p[0]), float(p[1]))
 	at = _clear_of_folk(at)
 	hero = Hero.new()
 	hero.st = old_stats
@@ -184,8 +187,8 @@ func enter(zid: String, from: String) -> void:
 	hero.died.connect(_on_hero_died)
 	if title_open:
 		_title_open()
-	elif reading_open and fresh_pilgrim:
-		_reading_open()
+	elif reading_open and fresh_pilgrim and zone.id != "opening_cave":
+		_reading_open()      # (in the opening cave the Stranger opens it, when the pilgrim speaks to him)
 	var tamed := {}
 	for m0 in zone.d.get("monsters", []):
 		if str(m0.get("rank", "")) == "unique" and str(m0.get("pack", "")).begins_with("q"):
@@ -233,6 +236,14 @@ func _title_open() -> void:
 		hud.set_process_input(false)
 	hero.set_process_unhandled_input(false)
 	hero.set_process_input(false)
+
+## where a new pilgrim begins: the moor's camp, or (on trial, until Derek signs the cave off) the opening cave, rising
+## out of the pool: --cave, GM_START=cave, or a file user://start_in_cave
+func _start_zone() -> String:
+	var cave := args.has("cave") or OS.get_environment("GM_START") == "cave" or FileAccess.file_exists("user://start_in_cave")
+	if cave and reading_open and FileAccess.file_exists("res://data/zones/opening_cave_s9301.json.gz"):
+		return "opening_cave"
+	return "moor"
 
 ## the Reading: the Stranger's fire over everything until the new pilgrim rises; what it gives is theirs for the walk
 func _reading_open() -> void:

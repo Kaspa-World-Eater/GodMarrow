@@ -1572,13 +1572,39 @@
     3
    ],
    "links": [
-    "moor"
+    "moor",
+    "opening_cave"
    ],
    "seeds": [
     9201
    ],
    "files": [
     "red_shore_s9201.json.gz"
+   ]
+  },
+  "opening_cave": {
+   "id": "opening_cave",
+   "name": "Under the Black Cliffs",
+   "act": 1,
+   "kind": "dungeon",
+   "outdoor": false,
+   "theme": "crypt",
+   "land": "crypt",
+   "wallTheme": "crypt",
+   "w": 25,
+   "h": 51,
+   "mlvl": [
+    1,
+    1
+   ],
+   "links": [
+    "red_shore"
+   ],
+   "seeds": [
+    9301
+   ],
+   "files": [
+    "opening_cave_s9301.json.gz"
    ]
   }
  },

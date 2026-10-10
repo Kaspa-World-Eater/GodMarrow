@@ -227,7 +227,12 @@ corners. **Posts:**
 - `--arena=N --arena_kind=K --arena_live --arena_rank=champion --affix=Name`.
 
 **Looking:**
-- `--shot=PATH --shot_t=SECS` (a screenshot, then quit);
+- `--shot=PATH --shot_t=SECS` (a screenshot, then quit; `--shot_n=N --shot_dt=SECS` for a run of them);
+- `--at=x,y` (a new pilgrim stood there, in zone tiles; kept a step clear of folk and portals);
+- `--use=ROLE|TYPE` (the first thing of that role or type used as a click would use it: `--use=stranger` speaks to
+  him);
+- `--goto=x,y` (the pilgrim walks there, to test a portal, gate or stair on the way; `--walk` is the Act I walker);
+- `--cave` (a new pilgrim starts in the opening cave, on trial);
 - `--show=collision`;
 - `--panel=skills|inv|char|board|journal`.
 

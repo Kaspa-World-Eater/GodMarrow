@@ -876,6 +876,29 @@ def chains(x, y, z, k, floor=FLOOR_HALL, step=0.12):
         P.sphere("ch%d_%d" % (k, i), (x + (0.02 if i % 2 else -0.02), y, zz), 0.05, "rust", scale=(0.4 if i % 2 else 1.0, 1.0 if i % 2 else 0.4, 1.0))
 
 
+DAIS_STEPS = 5
+
+
+def _dais_step(k):
+    """the throne dais's step k: its depth out from the face, its width, its top over the hall floor (yards)"""
+    return 6.2 - k * 1.05, 8.4 - k * 1.1, 0.28 * (k + 1)
+
+
+def dais_at(x, y):
+    """the dais's height over the hall floor where a body stands on it, or None off it (throne() builds these steps;
+    the bake walks them)"""
+    fx, fy, nx, ny = _face_span()
+    sx, sy = -ny, nx
+    a = (x - fx) * nx + (y - fy) * ny
+    b = (x - fx) * sx + (y - fy) * sy
+    z = None
+    for k in range(DAIS_STEPS):
+        dep, wid, z1 = _dais_step(k)
+        if -0.6 <= a <= dep - 0.6 and abs(b) <= wid / 2:
+            z = z1
+    return z
+
+
 def throne():
     """the empty throne (Derek: "The throne sucks too"): set in the open mouth of a face eight yards tall, cut into a
     mass of the raw columns at the head of the nave (Bomarzo's Orcus: the mouth in the rock with a seat inside). Its
@@ -887,11 +910,10 @@ def throne():
     sx, sy = -ny, nx
     f = FLOOR_HALL
     H = 10.0                                                       # grown, so the archway walks through under the nose
-    # the dais, five steps of dressed stone, each worn hollow where the feet went
-    for k in range(5):
-        dep = 6.2 - k * 1.05
-        wid = 8.4 - k * 1.1
-        z1 = f + 0.28 * (k + 1)
+    # the dais, five steps of dressed stone, each worn hollow where the feet went (dais_at reads the same steps)
+    for k in range(DAIS_STEPS):
+        dep, wid, z1 = _dais_step(k)
+        z1 = f + z1
         cx, cy = fx + nx * (dep / 2 - 0.6), fy + ny * (dep / 2 - 0.6)
         corners = [(cx + nx * a * dep / 2 + sx * b * wid / 2, cy + ny * a * dep / 2 + sy * b * wid / 2) for a, b in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
         verts = [(x, y, f - 0.5) for x, y in corners] + [(x, y, z1) for x, y in corners]

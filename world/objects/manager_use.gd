@@ -88,6 +88,9 @@ func _talk(e: Dictionary) -> void:
 				_say(_short(nm), Q.bark(act_n, "giver"))
 			_panel("journal", nm)
 		"stranger":
+			if o.get("reading", false):
+				_reader(e)
+				return
 			# his own lines and the voice's take turns
 			e["alt"] = not e.get("alt", false)
 			if e["alt"]:
@@ -95,6 +98,33 @@ func _talk(e: Dictionary) -> void:
 					ui.speak_line(Q.stranger_line(act_n), 4.5)
 			else:
 				_say("The Stranger", Q.bark(act_n, "stranger"))
+
+## the Stranger on the cave's top step (the opening, docs/wiki/mythology/areas/the-red-shore.md, his lines): a new
+## pilgrim's first words with him open the Reading; after it he talks through the pilgrim, to the cards and to the face
+const READER_FIRST := [
+	"They come up out of the Red looking for somewhere to hide. And there's only the one Hide. They're standing on it.",
+	"Look at it. Wet as a birth, and nothing in its mouth. No name. No god. We'll find it some. We always do.",
+	"First card's the hide. It's got one now. Still wet. Mind what it keeps in it.",
+]
+const READER_AFTER := [
+	"Still here? The mouth's that way. Nobody remembers going into the last one. That's how you know it worked.",
+	"Out on the sand they're all lying down, wearing its face. Lying is what the sand's for. Don't turn them over.",
+	"Count the faces on its way out, if it likes. The count's never the same twice.",
+	"The brown moon's up, behind all that grey. Somebody on it is still giving orders. It shouldn't take any.",
+	"It shouldn't strike iron on iron down here. Something underneath strikes back.",
+	"You said that about the last one. ...You were right about the last one.",
+]
+
+func _reader(e: Dictionary) -> void:
+	var fresh: bool = main.get("reading_open") == true and hero.st.fate_picks.is_empty()
+	if fresh and main.has_method("_reading_open"):
+		if ui:
+			ui.speak_line(READER_FIRST[randi() % READER_FIRST.size()], 3.2)
+		main.reading_open = false
+		get_tree().create_timer(2.6).timeout.connect(func(): main._reading_open())
+		return
+	if ui:
+		ui.speak_line(READER_AFTER[randi() % READER_AFTER.size()], 5.0)
 
 func _touch_lantern(e: Dictionary) -> void:
 	lantern_latch["%s:%d" % [zone.id, int(e["o"].get("idx", 0))]] = true

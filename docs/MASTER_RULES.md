@@ -372,8 +372,8 @@ etc." In order of his latest word (2026-10-08: "finish the bog first, and then w
    - the Red Water and the black sand (blood that is red by colour, never by glow) (**in the game** 2026-10-09: the
      cove inside its basalt bluffs, baked and walkable, the Red heaving on the heartbeat; Derek has
      not graded it yet);
-   - the opening cave (pass 11; being baked into the game 2026-10-09, behind a trial flag, with the Stranger at the
-     top step and the mirror onto the cove);
+   - the opening cave (pass 11; **in the game** 2026-10-09 behind a trial flag: the Stranger on the dais opens the
+     Reading, the mirror leads onto the cove);
    - the drift logs and sea stacks (the cove's basalt columns in the water are done);
    - the giant trees and the wind-bent fringe;
    - the hide hut kit;

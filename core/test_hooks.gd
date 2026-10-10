@@ -76,6 +76,10 @@ static func run(g) -> void:
 		_covertest(g)                    # --covertest (with --near): shots loosed through the piece, to see cover answer
 	if a.get("show", "") == "collision":
 		_show_collision(g)
+	if a.has("use"):
+		_use(g, String(a["use"]))        # --use=stranger (a role) or a type (lantern, chest): used as a click would use it
+	if a.has("goto"):
+		_goto(g, String(a["goto"]))      # --goto=x,y (zone tiles): the pilgrim walks there, as a click on the ground would send him (--walk is the walker)
 	if a.has("shot"):
 		_shot(g, a)
 	if a.has("groundfire"):
@@ -378,6 +382,28 @@ static func _menutest(g, a: Dictionary) -> void:
 		await _click_at(g, w2)
 		await g.get_tree().create_timer(1.5).timeout
 		print("MENU after click: mode ", T.mode if is_instance_valid(T) else "(title gone)", " leaving ", T.leaving if is_instance_valid(T) else -1.0)
+
+## a thing used as the pilgrim's click would use it (--use=stranger: speak to him; with --shot, to see what follows)
+static func _use(g, what: String) -> void:
+	await g.get_tree().create_timer(1.5).timeout
+	var mgr = g.zone.get_node_or_null("WorldObjects")
+	if mgr == null:
+		print("USE: no objects here")
+		return
+	for e in mgr.things:
+		var o: Dictionary = e.get("o", {})
+		if String(o.get("role", "")) == what or String(e.get("type", "")) == what:
+			mgr._interact(e)
+			print("USE: ", what)
+			return
+	print("USE: nothing here is ", what)
+
+## the pilgrim sent walking to x,y (--goto), to test what lies on the way: a portal, a gate, a stair
+static func _goto(g, xy: String) -> void:
+	await g.get_tree().create_timer(1.0).timeout
+	var p := xy.split(",")
+	g.hero.walk_to(Vector2(float(p[0]), float(p[1])))
+	print("GOTO: ", xy, " from ", g.hero.tp)
 
 ## the screen, saved (--shot): for side-by-side checks against the browser build
 static func _shot(g, a: Dictionary) -> void:

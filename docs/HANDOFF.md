@@ -59,9 +59,10 @@ Concordia), the Empty Hand. The Red Penitent is data only.
 - **The Red Shore's cove** (`red_shore`, seed 9201): the first area built on the 3D road and baked into the game. Four
   screens of black sand between headlands, the Red Water on a dying heartbeat, the jam of giant bones, the dead. Baked
   on the 2 x 2 grid, 60 fps.
-- **The opening cave** (`opening_cave`, seed 9301): baking now (`tools/landkit3d/cave_bake.py`, then `cave_export.py`).
-  The pilgrim rises in the pool of blood, climbs the stairs of bleeding faces, and finds the Stranger on the top step by
-  the onyx mirror; speaking to him opens the Reading; the mirror leads out onto the cove. New characters start there
+- **The opening cave** (`opening_cave`, seed 9301): baked and in the game (2026-10-09; `tools/landkit3d/cave_bake.py`,
+  `cave_export.py`), 60 fps, the walk proved (all 460 walkable tiles reached). The pilgrim rises in the pool of blood,
+  climbs the stairs of bleeding faces, and finds the Stranger on the throne's dais; speaking to him opens the Reading;
+  walking into the mirror in the great face's mouth comes out on the cove by its waystone. New characters start there
   only on trial (`--cave`, `GM_START=cave`, or a file `user://start_in_cave`) until Derek signs the cave off.
 - **The camp** (`moor`) is a bare clearing standing in until the act is rebuilt.
 - **The Sunken Bog** (`sunken_bog`, seed 9101) is the first land made our own way (maze, walkability proof, baked).
@@ -70,8 +71,9 @@ Concordia), the Empty Hand. The Red Penitent is data only.
 ## 5. The work in progress
 
 **The first area, the Red Shore** (`docs/wiki/mythology/areas/the-red-shore.md`), in this order:
-1. **The opening cave into the game:** finish the bake, export the zone, test it (start in the pool, the Stranger, the
-   mirror out), capture it, put it on the review page.
+1. **The opening cave:** in the game and tested (the pool, the stairs, the Stranger opening the Reading, the mirror
+   onto the cove). Waiting on Derek's look in the game and his sign-off to make it the real start; then drop the trial
+   flag in `core/main.gd` `_start_zone`.
 2. **The shared corpse asset:** one properly built body (shaped limbs, joints, hands, feet, weight, bloat and rot as
    states) for the cave and the beach both, replacing the tube-limbed stand-ins (`opening_cave.md`, last checks).
 3. **The cove's open items:** the drowned's legs, the shrine and cairns at game scale, the Red's true heartbeat loop in

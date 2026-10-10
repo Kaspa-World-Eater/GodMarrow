@@ -164,3 +164,25 @@ mouth", two torches removed ("I meant to remove the two on the stairs"), "the fl
 render itself (any surface 0.35 to 2.4 yards above the floor blocks its half-yard), and marks the pool as moving blood;
 `cave_export.py` writes the zone: the start in the pool's heart, the Stranger on the top step (speaking to him opens the
 Reading), the mirror as the portal onto the cove, the fires as gentle live lights.
+
+## Into the game (2026-10-09)
+
+**Done:** eight tiles at full quality, each aligned to 0.00 px; 21 chunks; the walk proved (460 tiles, all reached, the
+Stranger and the mirror among them); 60 fps. In the game: the pilgrim rises in the pool, the Reading waits for the
+Stranger, and the mirror leads onto the cove.
+
+**What the bake taught** (each found in the game or in the walk proof, not in the stills):
+
+| Fault | Why | Fixed by |
+|---|---|---|
+| Only two tiles reached from the start | Heights were measured from `floor_at` alone, which knows neither the throne's dais nor the stairs' landing nor the blood's surface: the dais read as a wall, the pool's heart as bodies at chest height | One walk floor (`cave_bake.walk_z`): the floor, `cave3d.dais_at`, the landing, the blood's surface |
+| The stairs cut by lines of "wall" | A sword or helm lying across a step's edge measured from the step below | Height over the highest walk floor within half a yard |
+| A seam of rock at the top step | Two strict bounds met at one line (`y < y1` and `y > y1`) | The landing takes its edge |
+| Walls drawn over a pilgrim on the stairs or in the hall | The rock outside the rooms sorted as if it stood at the ground, six yards down | The rock sorts at the floor of the room it borders |
+| Flat grey cliffs under the hall | The stills never showed the camera-side faces; the paint's bounce lit them evenly | They fall to black below the rooms they border (`void_fade`) |
+| Three orange orbs floating over the pool | The pool's red glow went in as fire, and every light's height was multiplied by 4 twice | Red glow as plain light pools; heights in engine px (21 a yard) over the walk floor |
+| The exporter wrote a zone it had not proved | It printed the failure and wrote anyway | It writes nothing unless the walk is proved |
+
+**Carry forward:** a scene's walk floor is everything a body stands on, not its ground function; prove the walk before
+writing; a bake shows sides of a scene no still ever framed, so look at the whole zone (compose the chunks) before the
+game.
