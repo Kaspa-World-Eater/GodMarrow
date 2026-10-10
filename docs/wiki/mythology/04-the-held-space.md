@@ -202,13 +202,13 @@ The thing stopped. Every people tells it, and none was there to see. All the tel
 *Behind the myth.* Unknown, even to us, and kept so. The deep lore offers a reading (`00-the-deep-lore.md`): the Choir
 stopped telling the thing what it was, for one breath, and it was unsaid. It is a reading, nothing more.
 
-## The first morning
+## The first mourning
 
 The light went out of the Held Space, and the warmth went out of its walls, and the thing beneath let go its last
 breath, and it has been letting it go ever since. Every thought that had ever walked in the folds lay down where it
 stood.
 
-And on the outside of the thing, in the grey of the first morning, the people woke on the ash of its hide. How they came
+And on the outside of the thing, in the grey of the first mourning, the people woke on the ash of its hide. How they came
 to be lying there, nobody knows, and every fire that is left tells it its own way (`02-the-creation-myths.md`). Their
 memory begins there. Every age since is the Age of the Last Breath (`05-the-last-breath.md`).
 

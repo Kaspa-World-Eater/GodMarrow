@@ -50,14 +50,14 @@ blood, and walks out onto black sand by a sea of blood.
 | the Reliquary | the dead god's corpse, which is the world ("the old one beneath") |
 | the Hide | Act I; the god's skin and surface |
 | godmarrow | what still lives in the corpse's bones; every calling draws on it. Also the Hide's greeting, a play on "good morrow" |
-| the Tithed | whoever is left: the people who woke on the ash on the first morning, nobody knows from where, owing a tenth of everything |
+| the Tithed | whoever is left: the people who woke on the ash on the first mourning, nobody knows from where, owing a tenth of everything |
 | the Myriad | the faith of the breath: the dead one's last breath is the one wind, full of kami (spirits of thoughts and beliefs); its keepers still (steal) breath and hold it |
 | miasma | breath gone wrong. **Never "rot"** |
 | the Wickbound | the soul bound in every lantern; the lantern follows you, carries you back when you fall, and keeps a little each time |
 | the Reading | character creation: a tarot reading by the Mysterious Stranger |
 | Minor and Major Arcana | small passive pegs and tarot cards on the body board |
 | poise | the stagger meter, from Constitution; melee and rolls spend it |
-| the first morning | the morning after the god's death, when the people woke on the ash; there are no dated years |
+| the first mourning | the morning after the god's death, when the people woke on the ash; there are no dated years |
 | the Red | the sea of blood, on a dying heartbeat |
 | the Pale | the northern country of bone ridges, the Pale Order's (never "white") |
 | the Ythraal | the powers of the old age, grown from whatever was held hardest |

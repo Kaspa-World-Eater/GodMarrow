@@ -10,7 +10,7 @@ pale round the first bone-house: thigh-bones set upright in the ground, end to e
 Inside the pale, everything was counted. Outside it, nothing was. Uncounted, the brothers teach, a thing is not yet
 anything; it is only waiting. Beyond the pale is where the waiting things are.
 
-Every year, at the counting of the walls, the pale is moved out by the length of one bone. Since the first morning it
+Every year, at the counting of the walls, the pale is moved out by the length of one bone. Since the first mourning it
 has gone out across the ridges and down the valleys and out over the lowlands, a line of numbered thigh-bones walking
 across the world one bone a year, and everything it passes is counted, and is something at last. The brothers call the
 country inside it the Pale, and the rest of the world is beyond it.
@@ -85,7 +85,7 @@ dark moon crosses the pale one she is blinking.
 **The lifting of the veil.** One night she will lift it. The circles do not agree why. Some say she will finish the
 cloth and want to see it; some say a thread will cut her finger; some say the Silence, which got in once already, will
 get in under the veil and lift it from inside. However it begins, the grey will draw back off the sky for the first time
-since the first morning, and whoever is left on the Hide will stand out of doors and see the sky bare: the sun for the
+since the first mourning, and whoever is left on the Hide will stand out of doors and see the sky bare: the sun for the
 hole it is, and the two moons for what they are, and the Crone looking down through all three.
 
 And she will see what she has woven, and it will be wrong. It has been wrong since the old one died, the circles say,
@@ -146,7 +146,7 @@ believes the same thing at the same moment, and they run together, all of them, 
 It will not be a new god. It will be the old one, made again out of its own last thoughts, and it will do what a thing
 that has breathed out does next. **It will breathe in.**
 
-The wind will turn, for the first time since the first morning. Everything that went out on it will come back: the ash,
+The wind will turn, for the first time since the first mourning. Everything that went out on it will come back: the ash,
 the voices, the thoughts, the kami, and every breath anyone has ever let go of, drawn back across the Hide toward
 wherever the great one lies. Everyone breathing will have their breath taken with it, out of their mouths, all at once,
 in one long pull. The world will be inhaled, and held.
@@ -197,14 +197,14 @@ Deep in Shog-Mire it is whispered that something in the red water is learning th
 The Tithed who are left have no great end of their own, and the faiths' ends are not asked of them. What they have is
 the debt (`02-the-creation-myths.md`).
 
-They have been paying it since the first morning: the tenth row left standing, the tenth loaf on the sill, the tenth
+They have been paying it since the first mourning: the tenth row left standing, the tenth loaf on the sill, the tenth
 night kept awake, the tenth word unsaid. Nobody knows to whom. And the grandmothers say a debt paid by the tenth is
 never paid. It is only kept from coming due. One day it will come due.
 
 **The collector.** On that day, they say, whoever is owed will come to collect the rest. Not the tenth. The other nine.
-It will come at night, on foot, down the roads, from wherever the morning came from, and it will knock, and it will be
+It will come at night, on foot, down the roads, from wherever the mourning came from, and it will knock, and it will be
 very polite. It will not be angry. It will only have come for what was always its. And the people will lie down where
-they stand, as they were lying on the first morning, cold, on the ash, with nothing in their mouths, and the collector
+they stand, as they were lying on the first mourning, cold, on the ash, with nothing in their mouths, and the collector
 will go on to the next door. And in the morning, the grandmothers say, the morning will come for someone else.
 
 The grandmothers will not say what the collector looks like. The children say it carries a lantern. The old men say

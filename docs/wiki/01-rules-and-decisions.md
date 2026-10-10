@@ -163,11 +163,11 @@ marrow.
     Deep's iron walkers are **the Khar-Dhuum** (no "golem": the Hollow Mystic has an iron golem); the reaper is
     **Oss-Karrhath**; the Count-breakers are **the Miscount**; the Crone's circles are **the Shroud** and **the Mirror**.
   - **No hard numbers:** "The year timeline thing and the 1,000 years ... We don't need hard numbers." No years, dates,
-    timeline tables or spans; time is told by what happened. Year 0 is **the first morning**.
+    timeline tables or spans; time is told by what happened. Year 0 is **the first mourning**.
   - **"Pale", not "white":** "white country" sounds racist; the northern country is **the Pale** (the Pale Order's
     fence of numbered bones: beyond the pale).
   - **The people's origin: nobody knows** (his answer). The Tithed no longer knelt inside the god or came out of its
-    mouth ("almost like Christian"); the congregation is deleted. Their memory begins on the first morning, waking on
+    mouth ("almost like Christian"); the congregation is deleted. Their memory begins on the first mourning, waking on
     the ash; every hearth tells it its own way (dreamed, grown, given back by the Red, counted, left). They are tithed
     because they owe a tenth of everything to whatever gave them the morning. The idea that people are "not part of
     the god" is gone, and the tools motif with it.

@@ -196,7 +196,7 @@ then, as if by mistake, and he does not take it back. He plays on words the way 
 skin; the Hide the world is; the hiding the people did), **Red** and **read**, **lie** (lie down, lie), **count**, **held**,
 **face**. Under the play, the lore lies where only someone who knows it will find it:
 - the god is dead and dreaming;
-- nobody remembers lying down on the first morning;
+- nobody remembers lying down on the first mourning;
 - the faces are masks;
 - Oss-Karrhath is still counting;
 - the dark moon has someone giving orders on it;

@@ -19,7 +19,7 @@ before. This page tells only this turn.
 | **The Age of the Ythraal** | fear and worship grow bodies, and the bodies rule; the Thrae reach in from beyond, and the old one's herald goes against them; the Famines; the cities in the sky; the Needle, the reaper, the shell | `03` |
 | **The Wasting** | the marrow is gone out of half the world; the Ythraal waste away and break into Wants; penance, the iron maidens, the girl who would not die in hers; the cities empty | `03` |
 | **The Held Space** | alongside the ages above, inside the thing beneath: a space held open and lit from nowhere, the Choir, the Angles, the court of white faces, the Keeper | `04` |
-| **The first morning** | the thing beneath lets go its last breath; the people wake on the ash of its hide, and nobody knows how they came there | `02`, `04` |
+| **The first mourning** | the thing beneath lets go its last breath; the people wake on the ash of its hide, and nobody knows how they came there | `02`, `04` |
 | **The Age of the Last Breath** | the world as a corpse that has not finished dying; its last breath still going out; the faiths, the lanterns, the long dark, and now | `05` |
 
 ## The Silence
@@ -96,7 +96,7 @@ over everything and came from nowhere. In it:
 Whether the Held Space was the thing's life, a dream it had, or a story told by things that need one, no voice
 agrees.
 
-## The first morning
+## The first mourning
 
 The thing beneath stopped. Something that cannot be named pressed in and took its names one at a time; or the faithful
 divided it; or something from outside came in where it was open; or it grew tired and the Silence came in to let it lie
@@ -113,7 +113,7 @@ flesh still grows without a mind, its threads still pull, and things still come 
 faiths of this age keeps the dark back with a soul in a jar for a lamp.
 
 What happened, in the order the tellings agree on, as near as anyone can set it. No one on the Hide dates any of it.
-- **The first morning.** The people wake on the ash. On the first night the things that come up stand round them, and
+- **The first mourning.** The people wake on the ash. On the first night the things that come up stand round them, and
   take the tenth loaf, and go. The sky is grey and stays grey. (`02`, `04`, `05`)
 - **The first lantern.** A soul chooses to be kept, in glass, as a flame. (`05`)
 - **The burning heath.** The heath below the moor burns through a whole round of seasons, and nobody lit it. (`05`)

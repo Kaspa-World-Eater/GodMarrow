@@ -74,7 +74,7 @@ grudges, lies and beliefs, carried on the breath, many and nameless (the keepers
 
 ## The peoples
 
-**The Tithed** are whoever is left. Their memory begins on the first morning, waking on the ash; how they came there,
+**The Tithed** are whoever is left. Their memory begins on the first mourning, waking on the ash; how they came there,
 nobody knows (`02-the-creation-myths.md`).
 - **Their ways:** the tithe, a tenth of everything left for what is owed: the tenth row standing, the tenth loaf on
   the sill, the tenth night kept awake; true names kept behind the teeth; no singing on the open ash at night.

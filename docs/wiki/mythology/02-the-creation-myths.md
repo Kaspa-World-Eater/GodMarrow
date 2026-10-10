@@ -16,9 +16,9 @@ A child in the lowlands counts it on her fingers:
 > *Soul for the thread and Bone for the frame,*
 > *Flesh for the filling, and none for the name.*
 
-## The Tithed: the First Morning
+## The Tithed: the First Mourning
 
-*What they look at:* nothing they can name. The Tithed have no beginning of their own. They have a morning.
+*What they look at:* nothing they can name. The Tithed have no beginning of their own. They have a mourning.
 
 Every memory the Tithed have starts in the same place. A grey morning; ash underfoot and in the mouth; the sky low and
 the light coming from one side; and everyone lying down, scattered over the ash in the cold, as if they had been set
@@ -35,12 +35,12 @@ stopped expecting to. The tellings heard most often:
 - **Grown.** The diggers of the lowlands say people came up out of the Hide the way everything comes
   up out of a body left lying: the old one died, and the warm ash bred, and what it bred was them. They say it without
   shame. Everything that lives here grew out of something dead, they say. Why should we be the only ones ashamed of it?
-- **Given back.** The shore folk say the first people came up out of the Red on the first morning, red to the hair,
+- **Given back.** The shore folk say the first people came up out of the Red on the first mourning, red to the hair,
   crawling up the black sand on their hands, because the Red gives back whatever goes into it, and that morning it gave
   back a people. Nobody asks them what had gone in.
 - **Counted.** The Pale Order says people were always here, laid in the Mother like the bones of a hand, and the morning
   is only when the first of them was counted. Before the count, nothing is anything.
-- **Left.** Some old women say the people were here before the morning, a long time before, living under the old powers
+- **Left.** Some old women say the people were here before the mourning, a long time before, living under the old powers
   in the old age, and that whatever took the old one's names that night took everyone's names with it, and left the bodies
   lying on the ash to wake up with nobody in them. They say: we are not new. We are what was left.
 
@@ -404,7 +404,7 @@ higher up the black sand than on any other night, reaching for them. The shore f
 those nights.
 
 **The grey itself**, everyone agrees, is newer than the sun. The oldest tellings say the sky went grey on the
-first morning. The Myriad say the grey is the old one's last breath: it breathed out as it died and the breath is still
+first mourning. The Myriad say the grey is the old one's last breath: it breathed out as it died and the breath is still
 going out, rising off the whole Hide and hanging between the world and the sun, and the sky will not clear until the
 breath has all gone. The circles of the Veiled Crone say the grey is her veil, drawn over the whole sky, and that the
 two moons are her eyes behind it, one open and one shut, and that when the dark moon crosses the pale one she is

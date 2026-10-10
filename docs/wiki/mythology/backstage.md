@@ -1189,3 +1189,6 @@ beliefs:
 - the guides hold that the Long Back is a road their people laid;
 - "stand still and it lets go" (the mud listens for fear);
 - the cold fire on the hump is a lost breath going round a narrow place, a widow's, still waiting.
+
+**2026-10-09, Derek:** "The first morning should be the first mourning." The day the Tithed woke lying in the ash is
+the first mourning everywhere it is named; the grey dawn itself stays a morning, so the word does both.

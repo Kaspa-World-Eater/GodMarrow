@@ -175,7 +175,7 @@ direction he likes, and story notes toward its end:
 - **Out of a ring:** they rose out of a waystone, one of the rings with teeth that take a walker apart, blood first and
   bone last, and put them back together elsewhere. But this pilgrim never stepped in.
 - **Out of the Red:** the game begins with the pilgrim rising out of a pool of blood in a cave under the black cliffs,
-  the way the shore folk said the first people came up out of the Red on the first morning
+  the way the shore folk said the first people came up out of the Red on the first mourning
   (`areas/the-red-shore.md`, the opening).
 
 The Reading that begins the game is the Stranger giving a nameless thing a fate. It is identity given from outside,

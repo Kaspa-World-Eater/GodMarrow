@@ -10,7 +10,7 @@ it is set here so we share one shape; `01-the-ages.md` has the whole chronicle.
 
 ## The waking
 
-**The first morning.** The people woke on the ash of the place now called the Ashen Moor, scattered and cold, with no
+**The first mourning.** The people woke on the ash of the place now called the Ashen Moor, scattered and cold, with no
 names and nothing before (`02-the-creation-myths.md`). The light was grey and came from one side, and it has come that
 way ever since, the same length every day to the width of a thread.
 
