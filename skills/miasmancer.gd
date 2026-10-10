@@ -155,7 +155,7 @@ func melee_k() -> float:
 	return (1.0 + 0.06 * K("deathm")) * (1.0 + 0.06 * omens)
 
 func hud_gauge() -> Dictionary:
-	return {"text": "OMENS %d/%d" % [omens, omen_max()], "pips": omens, "max": omen_max(), "col": PALE}
+	return {"text": "ACCORDS %d/%d" % [omens, omen_max()], "pips": omens, "max": omen_max(), "col": PALE}
 
 func on_lantern() -> void:
 	hero.st.res = hero.st.res_max()
@@ -386,7 +386,7 @@ func _inhale(dt: float) -> void:
 func _warp(m, c: Vector2) -> void:
 	if m.dead or m.boss or randf() >= warp_chance():
 		return
-	var opts := ["confuse", "slow", "twist"]
+	var opts := ["confuse", "confuse", "confuse", "slow", "twist"]     # Out of Tune: mostly a quarrel
 	if K("warpfear") > 0:
 		opts.append("fear")
 	var k: String = opts[randi() % opts.size()]
@@ -397,7 +397,7 @@ func _warp(m, c: Vector2) -> void:
 		_:
 			var d: float = maxf(0.01, c.distance_to(m.tp))
 			m.tp = zone.move(m.tp, (c - m.tp) / d * minf(d, 0.9), m.radius * 0.6)
-	say_at(m.tp, {"twist": "twisted", "slow": "warped", "fear": "terror"}.get(k, "lost"), WARP)
+	say_at(m.tp, {"twist": "twisted", "slow": "out of tune", "fear": "terror"}.get(k, "quarrel"), WARP)
 
 func _update_clouds(dt: float) -> void:
 	for c in clouds:

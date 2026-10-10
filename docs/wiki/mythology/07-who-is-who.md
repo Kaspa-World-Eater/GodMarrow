@@ -152,7 +152,7 @@ card the pilgrim does not choose.
 | the Ossuarch | `ossumancer` | **The Standing Dead** (Oss-Vharoth) | the Pale Order | Bone | Marrow, and the Mantle's shards |
 | the Hollow Mystic | `animancer` | **The Veiled Crone** (Yh'Anuul) | the Veiled Crone's Mirror | Soul | Essence, and the choir of wisps |
 | the Red Penitent | `hemomancer` | **The Mother of the Wheel** (Nol-Shogthuth) | the Bleeding Maiden | Flesh | Vitae: skills cost life |
-| the Shrine Keeper | `miasmancer` | **The Myriad** | the Myriad | Breath | Miasma, and Omens |
+| the Shrine Keeper | `miasmancer` | **The Myriad** | the Myriad | Breath | Miasma, and Accords |
 | the Empty Hand | `monk` | **The Silence** (Ur-Nihl, written as a gap) | the Gilded Peak | the Silence | the hourglass of two sands |
 
 The callings are callings, never particular people. Who the pilgrim is, the cards decide (`00-the-deep-lore.md`, "The

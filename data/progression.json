@@ -1448,7 +1448,7 @@
        "frw": 1,
        "armor": -3
       },
-      "txt": "+1 to Distortion skills · +1% faster movement · -3 armor",
+      "txt": "+1 to Discordia skills · +1% faster movement · -3 armor",
       "say": "The Keeper at the Gate, who guards the spirit road. It is never where you look. Neither will you be."
      },
      {
@@ -1461,7 +1461,7 @@
        "lok": 1,
        "res": -1
       },
-      "txt": "+1 to Death skills · +1 life after each kill · -1% magic resist",
+      "txt": "+1 to Concordia skills · +1 life after each kill · -1% magic resist",
       "say": "The Bell-Rope, pulled to wake the spirits before a killing. One pull for every ending. It will be pulled once for you."
      }
     ],
@@ -2213,7 +2213,7 @@
       "lore": "She did not breathe out. She is still looking for someone who will."
      },
      "nB": {
-      "name": "Salt on the Threshold",
+      "name": "Paper on the Threshold",
       "fx": {
        "res": 4,
        "evade": 1
@@ -5454,7 +5454,7 @@
        -15.8,
        -9.95
       ],
-      "name": "Salt on the Threshold",
+      "name": "Paper on the Threshold",
       "fx": {
        "res": 4,
        "evade": 1
@@ -7378,7 +7378,7 @@
       "fx": {
        "res": 1
       },
-      "name": "Salt Line",
+      "name": "Ash Line",
       "area": "The Optic Road",
       "lore": null,
       "links": [],
@@ -8452,7 +8452,7 @@
       "fx": {
        "res": 1
       },
-      "name": "Salt Line",
+      "name": "Ash Line",
       "area": "The Tibial Nerve",
       "lore": null,
       "links": [],
@@ -10875,7 +10875,7 @@
       "fx": {
        "res": 1
       },
-      "name": "Salt Line",
+      "name": "Ash Line",
       "area": "The Skull",
       "lore": null,
       "links": [],
@@ -14551,7 +14551,7 @@
       "fx": {
        "res": 1
       },
-      "name": "Salt Line",
+      "name": "Ash Line",
       "area": "The Aorta",
       "lore": null,
       "links": [],
@@ -16470,7 +16470,7 @@
         -15.8,
         -9.95
        ],
-       "name": "Salt on the Threshold",
+       "name": "Paper on the Threshold",
        "fx": {
         "res": 4,
         "evade": 1
@@ -16584,7 +16584,7 @@
       "fx": {
        "res": 1
       },
-      "name": "Salt Line",
+      "name": "Ash Line",
       "area": "The Windpipe",
       "lore": null,
       "links": [],
@@ -17334,7 +17334,7 @@
       "fx": {
        "res": 1
       },
-      "name": "Salt Line",
+      "name": "Ash Line",
       "area": "The Breath Drawn In",
       "lore": null,
       "links": [],
@@ -17523,7 +17523,7 @@
        "res": 4,
        "evade": 1
       },
-      "name": "Salt on the Threshold",
+      "name": "Paper on the Threshold",
       "area": "The Open Fan",
       "lore": "The guardian stone at the torii faces the wrong way. She turns it back each time she passes.",
       "links": [],
@@ -18069,7 +18069,7 @@
       "fx": {
        "res": 1
       },
-      "name": "Salt Line",
+      "name": "Ash Line",
       "area": "The Right-Hand Wind",
       "lore": null,
       "links": [],
@@ -18629,7 +18629,7 @@
       "region": "shr",
       "stat": null,
       "fx": {},
-      "name": "Wider Contagion",
+      "name": "Wider Passed Breath",
       "area": "The Well-Shrine",
       "lore": null,
       "links": [],
@@ -18850,7 +18850,7 @@
       "region": "shr",
       "stat": null,
       "fx": {},
-      "name": "Omen-Sight",
+      "name": "Accord-Sight",
       "area": "The Well-Shrine",
       "lore": null,
       "links": [],
@@ -19998,7 +19998,7 @@
       "fx": {
        "res": 1
       },
-      "name": "Salt Line",
+      "name": "Ash Line",
       "area": "The Governing Vessel",
       "lore": null,
       "links": [],
@@ -22971,8 +22971,8 @@
     "cls": "miasmancer",
     "kind": "major",
     "name": "The Tide",
-    "up": "Miasma Tide splits into three walls in a fan.",
-    "rev": "Melee: Miasma Tide whirls around you as a ring of cutting miasma for 2 s instead of rolling forward."
+    "up": "The Rolling Breath splits into three walls in a fan.",
+    "rev": "Melee: The Rolling Breath whirls around you as a ring of cutting miasma for 2 s instead of rolling forward."
    },
    "z_venom": {
     "cls": "miasmancer",
@@ -23010,7 +23010,7 @@
     "cls": "miasmancer",
     "kind": "minor",
     "name": "Held Breath",
-    "up": "Exhale keeps a quarter of the Miasma it spends, and Inhale draws in clouds from twice as far."
+    "up": "Exhale keeps a quarter of the Miasma it spends, and Still the Air draws in clouds from twice as far."
    },
    "zm_carrion": {
     "cls": "miasmancer",
@@ -23021,22 +23021,22 @@
    "zm_contag": {
     "cls": "miasmancer",
     "kind": "minor",
-    "name": "Wider Contagion",
-    "up": "Contagion leaps to one more enemy each time."
+    "name": "Wider Passed Breath",
+    "up": "Passed Breath leaps to one more enemy each time."
    },
    "z_mirror": {
     "cls": "miasmancer",
     "kind": "major",
     "name": "The Mirror",
-    "up": "Blur leaves two decoys instead of one.",
-    "rev": "Melee: Blur steps into the enemy nearest the cursor and strikes it, gaining an Omen. The decoy stays where you stood."
+    "up": "Utsusemi leaves two decoys instead of one.",
+    "rev": "Melee: Utsusemi steps into the enemy nearest the cursor and strikes it, gaining an Accord. The decoy stays where you stood."
    },
    "z_hanged": {
     "cls": "miasmancer",
     "kind": "major",
     "name": "The Hanged Man",
-    "up": "Enemies that wander into Haze hang in the air: held for 1.5 s before the madness takes them.",
-    "rev": "Haze becomes a mantle on you for 6 s: anything that comes close is confused."
+    "up": "Enemies that wander into Quarrel hang in the air: held for 1.5 s before the madness takes them.",
+    "rev": "Quarrel becomes a mantle on you for 6 s: anything that comes close is confused."
    },
    "z_trapq": {
     "cls": "miasmancer",
@@ -23055,7 +23055,7 @@
     "cls": "miasmancer",
     "kind": "minor",
     "name": "Heavy Smoke",
-    "up": "Miasma Wake smokes 50% longer and its waves hit a quarter harder."
+    "up": "The Cracked Censer smokes 50% longer and its waves hit a quarter harder."
    },
    "zd_mine": {
     "cls": "miasmancer",
@@ -23067,52 +23067,52 @@
     "cls": "miasmancer",
     "kind": "minor",
     "name": "Afterimage",
-    "up": "Blur's decoy lasts 2 s longer."
+    "up": "Utsusemi's decoy lasts 2 s longer."
    },
    "zd_lure": {
     "cls": "miasmancer",
     "kind": "minor",
     "name": "Siren Song",
-    "up": "Siren Lure confuses what it drags."
+    "up": "The Whispered Promise confuses what it drags."
    },
    "zd_mirage": {
     "cls": "miasmancer",
     "kind": "minor",
     "name": "Warped Flesh",
-    "up": "Enemies in Mirage take 15% more damage."
+    "up": "Enemies in Kagero take 15% more damage."
    },
    "z_reaper": {
     "cls": "miasmancer",
     "kind": "major",
     "name": "The Reaper",
-    "up": "A finisher that kills keeps its Omens.",
-    "rev": "Ranged: Reap is thrown. A spectral scythe flies out and back, spending your Omens on everything it cuts."
+    "up": "A finisher that kills keeps its Accords.",
+    "rev": "Ranged: All Together is thrown. A spectral scythe flies out and back, spending your Accords on everything it cuts."
    },
    "z_grave": {
     "cls": "miasmancer",
     "kind": "major",
     "name": "The Grave",
-    "up": "Grave Strike, Carrion Talon and Reap root what they hit for a second.",
+    "up": "The First Accord, Carrion Talon and All Together root what they hit for a second.",
     "rev": "Your cloud turns to grave-dust: it stops sickening, but everything in it is slowed hard and takes 15% more damage."
    },
    "z_death": {
     "cls": "miasmancer",
     "kind": "major",
     "name": "Death",
-    "up": "Every kill, by any means, gives an Omen.",
-    "rev": "Omens never fade, but you can hold only two, and finishers strike for double."
+    "up": "Every kill, by any means, gives an Accord.",
+    "rev": "Accords never fade, but you can hold only two, and finishers strike for double."
    },
    "zx_omen": {
     "cls": "miasmancer",
     "kind": "minor",
-    "name": "Omen-Sight",
-    "up": "Omens last 15 s instead of 8."
+    "name": "Accord-Sight",
+    "up": "Accords last 15 s instead of 8."
    },
    "zx_step": {
     "cls": "miasmancer",
     "kind": "minor",
     "name": "Death's Wake",
-    "up": "Death's Step leaves miasma clouds along its path."
+    "up": "Surinuke leaves miasma clouds along its path."
    },
    "zx_kiss": {
     "cls": "miasmancer",
@@ -23395,7 +23395,7 @@
    "t_animancer_3": {
     "cls": "animancer",
     "kind": "thread",
-    "name": "Thread of Salt",
+    "name": "Thread of Ash",
     "up": "+2% magic resist. A small step toward the Major Arcana beyond.",
     "fx": {
      "k": "res",
@@ -23482,7 +23482,7 @@
    "t_animancer_12": {
     "cls": "animancer",
     "kind": "thread",
-    "name": "Thread of Salt",
+    "name": "Thread of Ash",
     "up": "+2% magic resist. A small step toward the Major Arcana beyond.",
     "fx": "[ref]"
    },

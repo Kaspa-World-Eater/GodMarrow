@@ -1,120 +1,83 @@
-<!-- Orders · updated 2026-09-29 · 1202 words · source page #keeper -->
+<!-- Orders · rewritten 2026-10-09 (Derek: discordia, concordia and miasma; kami; still, steal, steel) -->
 # The Shrine Keeper (the Assassin)
 
-*Class doc. Code id `miasmancer`. Rewritten 2026-09-28 to match the game; references to the Ossuarch's order updated 2026-09-29 (the Pale Order).*
-- *The fox imagery is gone. The user's rule is "no animals exist in the world; no foxes, no fur".*
-- *The Myriad is Breath now (the user's correction), and her whole class is breath.*
+*Class doc. Code id `miasmancer`. Rewritten 2026-10-09 from Derek's notes: the Myriad's kami are spirits of thoughts
+and beliefs carried on the breath, not of stones and rivers; nobody in the faith is good; the keepers steal, hold and
+weaponise breath; the trees are Miasma, Discordia and Concordia. The bible's telling is
+`mythology/02-the-creation-myths.md` ("The Myriad: the Breath") and its end `mythology/06-the-ends-of-the-world.md`.*
+- *No animals: no foxes, no fur, no ravens.*
+- *A calling is a calling, never a particular person: the old page's named girl and her paper sister are retired.*
 - *Wiki hub: `wiki/00-start-here.md`.*
 
 > "Give it to me. All of it. I have room."
 
-## 1. The god and the shrines
+## 1. The faith and the breath
 
-- **The god: the Myriad.** She serves **Breath**: the god's last breath, and the small spirits of every stone, river and bell that ride it.
-
-- **Names:** the Eight Million, the Small Gods, the Last Breath, the Long Exhale, the Sigh Under the Door, Grandmother Wind.
-
-- **No true name.** It is not one being, and asking for its true name is an insult.
-
-- **Miasma is breath gone wrong.**
-
-- It is the essence of things twisted out of balance, a poison in reality itself.
-
-- It is never called "rot".
-
-- **The faith: the Myriad**, Shinto purifiers.
-
-- A **katashiro** is the paper doll that takes a person's impurity in the old rite. The Myriad's purifiers make themselves into that doll.
-
-- They breathe the distortion out of the world, hold it in their own lungs, and breathe it back out at whoever made it.
-
-- The fan tells the breath where to go.
-
-- **Other names for her:**
-
-- **Paper Dolls:** in the lowland camps, a folded paper figure on a doorstep asks one to stop.
-
-- **Fan-Bearers:** what the Fen's boatmen call them.
-
-- **the Shrine Keeper:** wherever a forgotten wayside shrine has been set right.
+- **The faith: the Myriad.** It serves **Breath**: the dead god's last breath, which is the one wind, and the **kami**
+  that ride it. Every thought held long enough grows a kami the size of the thing (a grudge, a lie, a worry, a sour
+  hope); spoken aloud, it goes out on the breath looking for another mouth. The keepers call the kami of words
+  **kotodama**. The wind is full of the dead god's own thoughts, and everyone breathes them.
+- **Discord** is the kami quarrelling, belief against belief. It keeps them small, and the keepers bless it and sow it.
+- **Concord** is the kami agreeing and running together into a great one; the keepers say the word the way other people
+  say plague. Their end of the world is the Concord: the wind turns and the world is breathed in.
+- **Miasma** is breath gone foul with too many kami, most of them rotten. It sickens whoever breathes it.
+- **Still, steal, steel.** The folk say the keepers steal breath. The keepers say they *still* it: take it, from the
+  air, the sick, the dying and the grieving who pay them, and hold it longer than anyone living. Held long enough, a
+  stilled breath sets in the chest like steel, and a keeper breathing it out breathes out a blade.
+- **The shrines are cages:** small houses on posts with paper doors, holding only what a keeper breathed into them,
+  fed whispered quarrels so the caught kami never agree. A forgotten shrine's door bulges outward at night.
+- **The fan tells the breath where to go.** The iron war-fan, the tessen, is her signature.
+- **Their end:** a keeper who holds too much grows horns and walks down into the water, still holding; she is called
+  **kegare**, the word for the filth she carries.
+- **Names the folk use:** the Shrine Keepers; Paper Dolls (a folded paper figure on a doorstep asks one to stop); the
+  Fan-Bearers (the Fen's boatmen).
 
 ## 2. Where she comes from
 
-- **The Well-Shrine (Misogi-ido).** It stands at the one clean pool in the Drowned Fen.
-
-- She was left at its torii as a baby and named **Shiori**, the bent twig pilgrims leave to mark the way back.
-
-- **The paper sister.** **Akane** was a real girl, two years older, who took Shiori's fevers and her first held breaths.
-
-- **The Great Cutting-Away.** Every year the purifiers breathed the year's distortion into the Fen's water, trusting it to carry the distortion away.
-
-- It carried it nowhere.
-
-- It sank into **Minasoko-dō, the Drowned Nave**, a cathedral drowned under the Fen, until the Nave was full and gave it back up the spring.
-
-- The guardian stone at the torii was found one morning facing the wall. The well's reflections came back reversed twice.
-
-- **The Drowned Nave.**
-
-- The knights of the Pale Order had dredged the Fen's drowned dead and stood them up down there, and the raised bone came up bent.
-
-- Seven purifiers went down. The older six ran out of room and walked off into the water as **the Horned**, carrying what they had taken.
-
-- At the spring, Akane breathed in a century of distortion at once.
-
-- **The thousandth breath.**
-
-- Shiori would not cut her. She held Akane's face and breathed in everything: the spring's century, the warp in Akane's bones, and the grief of the drowned.
-
-- For as long as she held it, the clock above the altar did not tick.
-
-- Akane's body lay down. Her spirit stepped into the violet haze around Shiori, reversed as in water. She is **the Mirror-Sister**.
-
-- **Now.**
-
-- Shiori walks the Hide in faded vermilion and white, a fan in her hand and a cloud at her back.
-
-- She keeps the shrines her faith forgot, and turns their guardian stones back from the wall.
-
-- She is running out of room. Every katashiro ends as one of the Horned.
+- **The Well-Shrine.** The first of the shrines stands at the one clean pool in the Drowned Fen. Novices come to it, or
+  are left at its posts, and on the night a novice is **folded** her birth-name is written into a paper figure,
+  breathed on and burned, and she takes another.
+- **The first keeper** was a girl of the reed camps who folded a paper figure, had the sick breathe on it, breathed it
+  in herself and held it for a month, and then breathed it into the face of the man whose grudge it had been. Every
+  keeper since wears the knotted cord at her wrist that marks each held breath.
+- **The grey year.** For generations the keepers breathed what they could not use into the Fen at the Cutting-Away. In
+  the grey year the Fen gave it all back; six of the seven who went down the drowned stair came up horned. Since then
+  there is only the Small Cutting, and the year's breath goes into the keepers.
+- **Now.** She walks the Hide in faded vermilion and white, a fan in her hand and a cloud at her back, holding more
+  than she can carry, whispering quarrels into the shrines she passes. Every keeper ends as kegare.
 
 ## 3. How she plays
 
-- **Resource orb: Miasma.** It fills by breathing in and is spent by breathing out.
-
-- **Her cloud:** a purple, drifting haze that thickens as Miasma is levelled.
-
-- It sickens whatever stands in it, and makes blows miss her.
-
-- **Inhale** is a passive and always pulls: from the air, her clouds and sickened enemies. It pulls harder inside miasma.
-
-- **Exhale** empties her lungs in one blast.
-
-- **Miasma Vortex** breathes in and out, dragging enemies in, then shoving them away.
-
-- **Omens:** her strikes build Omens and her finishers spend them. The HUD shows OMENS.
-
-- **Weapons:** claws are her class base, and the **war-fan** is her signature.
-
-- Iron War-Fan is a skill today.
-
-- Weapons are separate layers, and every class can use every weapon.
-
-- **Poise:** she has little. She survives by not being hit.
+- **Resource orb: Miasma.** It fills by stilling breath and is spent by breathing out.
+- **Her cloud:** a purple, drifting haze that thickens as Miasma is levelled. It sickens whatever stands in it, and
+  makes blows miss her.
+- **Still the Air** is a passive and always draws in breath: from the air, her clouds and sickened enemies, harder
+  inside miasma.
+- **Exhale** empties her lungs in one blast. **Miasma Vortex** breathes in and out, dragging enemies in, then shoving
+  them away.
+- **Accords:** her Concordia strikes build Accords (up to three, pale skulls circling her) and her finishers spend them.
+  The HUD shows ACCORDS.
+- **Weapons:** claws are her class base, and the war-fan, the **Tessen**, is her signature skill. Weapons are separate
+  layers, and every class can use every weapon.
+- **Poise:** she has little. She survives by not being hit, and by enemies fighting each other instead of her.
 
 ## 4. The trees as they are in the game
 
-**Miasma** (tab 0): Venom Claws · Miasma (passive) · Iron War-Fan · Inhale (passive) · Miasmic Exhalation · Contagion · Miasma Tide · Exhale · Miasma Vortex · Toxicology (passive)
+**Miasma** (tab 0, breath stilled and spent): Steel Breath · Miasma (passive) · Tessen · Still the Air (passive) ·
+Tameiki · Passed Breath · The Rolling Breath · Exhale · Miasma Vortex · Old Lungs (passive)
 
-**Distortion** (tab 1): Needle Sentry · Blur · Miasma Wake · Haze · Sighing Bladder · Mirage · Siren Lure · Warped Miasma (passive) · The Mirror-Sister (passive) · The Unseen (passive)
+**Discordia** (tab 1, the quarrel sown): Hokora · Utsusemi · The Cracked Censer · Quarrel · Onnen · Kagero · The
+Whispered Promise · Out of Tune (passive: her clouds mostly set enemies quarrelling) · Amanojaku (passive: the
+contrary reflection that fights at her side and does what she would not) · Never Twice the Same (passive)
 
-**Death** (tab 2): Rending Arc · Grave Strike · Impaling Thrust · Hanged Man's Heel · Death's Step · Reap · Black-Rag Flurry (hold) · Death's Head (passive) · Execute · Sigil Mastery (passive)
-
-**Text to tidy:** some descriptions still say "Sigil" where the HUD says Omen, and a few still name Crow's Heel and Raven Flurry, which are now Hanged Man's Heel and Black-Rag Flurry.
+**Concordia** (tab 2, the deadly agreement): The Wide Accord (two caught together give an Accord, four give two) · The
+First Accord · Ichimonji · Hanged Man's Heel · Surinuke · All Together (finisher: the weak it catches die together) ·
+Black-Rag Flurry (hold) · The Seam (passive) · The Stilling (finisher: a kill stills the dying breath and returns a
+quarter of her Miasma) · The Still Hand (passive)
 
 ## 5. Her body board
 
-**The Well-Shrine: the breath of the Shrine Keeper.** Cards over the lungs; roads along the windpipe, breath leaving the mouth, and two winds curling round the body. Notables: the Held Breath, the Fan Unfolded, Salt on the Threshold, Grandmother Wind, the Undertow, the Mouth of the Well.
+**The Well-Shrine: the breath of the Shrine Keeper.** Cards over the lungs; roads along the windpipe, breath leaving the mouth, and two winds curling round the body. Notables: the Held Breath, the Fan Unfolded, Paper on the Threshold, Grandmother Wind, the Undertow, the Mouth of the Well.
 
 ## 6. The Myriad's enemies
 

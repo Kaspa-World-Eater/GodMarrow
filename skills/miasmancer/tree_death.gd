@@ -110,7 +110,9 @@ func _rarc(a: Vector2) -> bool:
 			claw(m)
 			on_weapon_hit(m, 0.0)
 			shove(m, hero.tp, 0.25)
-		if hits.size() >= 3:
+		if hits.size() >= 2:
+			add_omen()
+		if hits.size() >= 4:
 			add_omen()
 		clawfx.append({"tp": hero.tp, "a": dv.angle(), "t": 0.18, "arc": R})
 	sweep.call(1.0)
@@ -202,9 +204,13 @@ func _reap() -> bool:
 	var R := (1.6 + 0.3 * n) * (1.3 if K("reapwide") > 0 else 1.0) + (0.15 if claw_on() else 0.0)
 	var dmg := weapon() * (1.2 + 0.1 * L1("reap")) * syn("reap") * (1.0 + 0.7 * n) * (2.0 if aR("z_death") else 1.0)
 	reap_kept = 0
+	var thr := (0.15 if K("execthr") > 0 else 0.1) + 0.08 * n
 	var hits: Array = []
 	for m in foes(hero.tp, R):
-		hurt(m, crit(dmg, true), "reap", {"melee": true})
+		var d_ := crit(dmg, true)
+		if not m.boss and m.hp / maxf(1.0, m.hp_max) < thr:
+			d_ = m.hp + 9999.0          # all together: the weak die with the rest
+		hurt(m, d_, "reap", {"melee": true})
 		hits.append(m)
 		_grave_root(m)
 		if n >= 3:
@@ -219,7 +225,7 @@ func _reap() -> bool:
 	ring(hero.tp, R, 0.3, PALE)
 	clawfx.append({"tp": hero.tp, "a": 0.0, "t": 0.3, "arc": R, "full": true})
 	if n > 0:
-		say_at(hero.tp + Vector2(0, -0.3), "reap x%d" % n)
+		say_at(hero.tp + Vector2(0, -0.3), "together x%d" % n)
 	Game.shake(1.0 + n)
 	cast_len = 0.5
 	return true
@@ -243,12 +249,15 @@ func _execute(a: Vector2) -> bool:
 			dmg *= 3.0
 		else:
 			dmg = m.hp + 9999.0
-			say_at(m.tp, "EXECUTED", Color.WHITE)
+			say_at(m.tp, "STILLED", Color.WHITE)
 	hurt(m, crit(dmg, true), "execute", {"melee": true, "poise": dmg})
 	claw(m)
 	puff(m.tp, PALE, 14, 2.4)
 	Game.shake(2.0 + n)
 	reap_kept = 0
+	if m.dead:
+		hero.st.res = minf(hero.st.res_max(), hero.st.res + hero.st.res_max() * 0.25)
+		puff(m.tp, VIOLET_D, 10, 1.6)
 	_finisher_kill(m, n)
 	if reap_kept > 0:
 		omens = mini(omen_max(), reap_kept)

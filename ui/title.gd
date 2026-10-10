@@ -33,8 +33,8 @@ const ORDER := {
 		"text": "The Brotherhood of the Precious Wound pays for everything in blood, and their own first. What a Hemomancer opens, he keeps: a brood that crawls out of the cut, a golem of it, pools that drink what falls in them. They are gentle with strangers. I would still not sleep near one."},
 	"ossumancer": {"god": "Of the Bone, Old Upright", "portrait": "portrait_ossu", "draws": "Marrow", "ways": "Ossuary · Carapace · Count",
 		"text": "The Pale Order counts the dead, and what they count stands up. An Ossuarch sends the bones of the fallen to walk ahead of him, wears the rest as plate, throws the splinters, and cuts a count into whatever he strikes. He does not bend. I once saw one carried home on a door, sitting upright, still counting."},
-	"miasmancer": {"god": "Of the Breath, the Myriad", "portrait": "", "draws": "Miasma, breathed in and given back", "ways": "Miasma · Distortion · Death",
-		"text": "The House of Eight Million keeps the small gods that ride the last breath out. A Keeper breathes in the spoiled air and gives it back as a violet haze, folds paper that walks, and reads Omens in what the breath leaves behind. She fights with a fan. Do not laugh at the fan."},
+	"miasmancer": {"god": "Of the Breath, the Myriad", "portrait": "", "draws": "Miasma, stilled and given back", "ways": "Miasma · Discordia · Concordia",
+		"text": "The Myriad keeps the kami that ride the last breath out, and keeps them quarrelling. A Keeper stills the breath of the sick and the dying, holds it until it sets like steel, and breathes it out as a violet haze. Where she has been, people turn on each other. She fights with a fan. Do not laugh at the fan."},
 	"monk": {"god": "Of That Which Cannot Be Held", "portrait": "", "draws": "An hourglass: amber sand by day, black sand by night", "ways": "Radiance · Absence · Destroyer",
 		"text": "The Gilded Peak gave everything away, and the Empty Hand is what came down the stair after. He carries a lantern with a black flame and nothing else, and strikes with the sun or with its going. He did not ask my name. I think he would not have kept it."},
 }
