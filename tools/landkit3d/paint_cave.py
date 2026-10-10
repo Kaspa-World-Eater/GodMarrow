@@ -297,6 +297,14 @@ def paint(d, t=0.0):
             # dark iron, the blades and helms: near black, its edges and glints catching the fires (light on dark)
             col = tone(R["iron"], tm * 1.3, dith[m])
             wet[m] = True
+        elif name in ("corpse", "cloth") and name in R:
+            # the dead (body3d) and their cloaks turned with the five tones of form (MASTER_RULES 0.5c; Derek: "Bodies
+            # look bad"): a fire a few yards off lights a body almost evenly, so the turn of every limb and fold is
+            # laid over the light it gets, scaled by that light, so the darks stay dark
+            import paint_shore as PS
+            ft = PS.form_tones(n[m], ao[m], np.ones(int(m.sum())))
+            tb = np.clip(tm * (1.0 + 1.8 * ft) + 0.025 * ft, 0, None)
+            col = tone(R[name], tb * (0.9 + 0.2 * oh[m]), dith[m])
         elif name in R:
             col = tone(R[name], tm * (0.9 + 0.2 * oh[m]), dith[m])
         elif name == "boxpaint":

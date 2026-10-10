@@ -64,3 +64,38 @@ render beside the painted one, the old stand-ins beside both. Ten graded passes,
 45 minutes) and the cove (its own bake), checked in the game.
 
 **Waiting for Derek's go before pass 1.**
+
+**Derek's go:** 2026-10-09, "Yes do it" (and: "the ossuarch model is a place holder too. He will be replaced at some
+point", so the dead are built on the pilgrim's proportions, not on the Ossuarch's sprite).
+
+## Pass 1: one body from one skeleton (`tools/landkit3d/body3d.py`)
+
+**Study:** chapter 15 (written for this piece). **Built:** a skeleton at true size (1.80 m, jittered per body), four
+poses (face down, face down reaching, face up, curled on the side), each joint laid on the ground under it and each
+straight bone lifted just clear of what lies under it (the upper hull); the flesh as joined masses (Blender
+metaballs): the ribcage's barrel, the belly and the pelvis, the deltoids, a limb's bellies along its straight bone; a
+looser shell for the hooded cloak with its hem spread on the ground; states `fresh`, `bloat`, `rot`, `bone`.
+**Proof:** `dead_sheet.py` (every pose and state on a gently uneven ground), judged in one grey
+(`value_render.py`, MASTER_RULES 0.4). **Grade: C.** They read as bodies lying by their weight, one skin, never a
+sphere and tubes. **Worst failures:** limbs taper to spikes at the hands and feet; the bloat a shapeless blob; the
+cloak shows only as flat discs; the bone state a stick figure.
+
+## Pass 2: hands, feet, limbs and hood
+
+**Fixed:** the forearm's bulk near the elbow, the calf a third down, the wrist and ankle, the palm and fingers as one
+plate, the heel and arch and the ball of the foot as blocks; the hood stands well off the skull. **Into the places:**
+`redwater3d.corpse` (the cove's strand), `beach3d.drowned` (the dead riding the Red) and `cave3d.pool_bodies` (the
+pool) all build the one body now. **Seen on the strand** (`paint_shore`, the overcast): the bodies are in, under their
+cloaks, but at this frame they are small and the bone state is too thin to read. **Next:** the cave's pool under the
+fires (the place Derek's note was about), then the bloat's dome, the bone state's real skeleton, the cloak's folds.
+
+## Pass 3: the cave's pool, under the fires
+
+**Seen** (`cave3d` at the pool, `paint_cave`, zoom 3): the dead lie across the stumps and half in the blood as cloaked
+bodies, by their weight; no sphere and tubes. **Grade: C.** **Worst failures, honestly:** the cloak is one smooth
+blob with no folds, so it reads as a sack; the arms and legs that show are pale sticks of one value, no wrist, no
+hand that reads; the bloat in the pool is lost in the blood. **Done:** `paint_cave` now turns skin and cloth with the
+five tones (scaled by the light that reaches them); it changes little, because the fault is the form. **Next pass:** the
+cloak's folds and wet drape (pooled in the hollows, plastered on the high forms), the hands and feet as forms that
+read at the game's size, the body's shape showing through the cloth, the bloat's dome against the blood's meniscus.
+Not yet baked into the game: the cave and the cove keep their old dead until the dead pass.

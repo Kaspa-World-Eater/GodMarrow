@@ -1152,28 +1152,12 @@ def pool():
 
 def pool_bodies():
     """three who came up out of the blood and did not stand: face down across the shore stumps, half in the blood,
-    drowned and bloated, one gone to its bones (they look exactly as the pilgrim did a moment before)"""
-    for k, (x0, y0, yaw, rot) in enumerate(((-1.7, 2.6, 0.4, 0), (3.6, -1.3, 2.4, 2), (-0.6, -2.4, -1.1, 0))):
-        c, s_ = math.cos(yaw), math.sin(yaw)
-        def at(u, w, z):
-            x, y = x0 + u * c - w * s_, y0 + u * s_ + w * c
-            f = floor_at(x, y) or 0.0
-            return (x, y, max(f, -0.12) + z)
-        fl = "corpse" if rot < 2 else "bone"
-        if rot < 2:
-            P.sphere("pb%d_torso" % k, at(0, 0, 0.12), 1.0, fl, scale=(0.45, 0.3, 0.2), rot=(0, 0, yaw))
-            P.sphere("pb%d_head" % k, at(0.66, 0.02, 0.08), 0.14, fl, scale=(1.1, 0.9, 0.85))
-        else:
-            P.tube("pb%d_spine" % k, [at(-0.5, 0, 0.06), at(0.5, 0, 0.08)], [0.035, 0.03], "bone", 6)
-            for r in range(9):
-                for sd in (-1, 1):
-                    P.tube("pb%d_rib%d_%d" % (k, r, sd), [at(0.4 - r * 0.08, 0, 0.1), at(0.36 - r * 0.08, sd * 0.18, 0.17), at(0.32 - r * 0.08, sd * 0.26, 0.02)],
-                           [0.015, 0.012, 0.008], "bone", 4)
-            P.sphere("pb%d_skull" % k, at(0.68, 0.1, 0.08), 0.12, "bone", scale=(1.2, 0.9, 0.95))
-        lr = 0.07 if rot < 2 else 0.03
-        for sd in (-1, 1):
-            P.tube("pb%d_arm%d" % (k, sd), [at(0.32, sd * 0.28, 0.1), at(0.7, sd * 0.42, 0.05), at(1.05, sd * 0.36, 0.03)], [lr, lr * 0.9, lr * 0.75], fl, 6)
-            P.tube("pb%d_leg%d" % (k, sd), [at(-0.6, sd * 0.12, 0.08), at(-1.1, sd * 0.17, 0.05), at(-1.55, sd * 0.22, 0.02)], [lr * 1.3, lr * 1.05, lr * 0.85], fl, 6)
+    drowned and bloated, one gone to its bones (they look exactly as the pilgrim did a moment before). The one shared
+    body (body3d.py; Derek, 2026-10-09: "Bodies look bad")"""
+    import body3d as B
+    for k, (x0, y0, yaw, state, pose) in enumerate(((-1.7, 2.6, 0.4, "bloat", "prone_reach"), (3.6, -1.3, 2.4, "bone", "prone"),
+                                                    (-0.6, -2.4, -1.1, "fresh", "prone"))):
+        B.body("pb%d" % k, pose, state, x0, y0, yaw, lambda x, y: max(floor_at(x, y) or 0.0, -0.18) - 0.07, seed=40 + k)
 
 
 def pool_dead():

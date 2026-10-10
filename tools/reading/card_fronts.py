@@ -496,10 +496,10 @@ def a_silence(c):      # the Silence: a ring with a gap, and the gap is everythi
 MANTLES = [
     ("unwritten", 0, "silence", unwritten), ("pilgrim", 1, "silence", pilgrim), ("digger", 2, "bone", hands),
     ("veil", 3, "soul", veil), ("swaddling", 4, "flesh", swaddling), ("gleaner", 5, "bone", gleaner),
-    ("saint", 6, "flesh", saint), ("scholar", 7, "soul", scholar), ("twin", 8, "soul", twin),
-    ("mouths", 9, "flesh", mouths), ("wick", 10, "breath", wick), ("mourner", 11, "flesh", mourner),
+    ("saint", 6, "flesh", saint), ("scholar", 7, "soul", scholar), ("hanged", 8, "soul", twin),
+    ("knot", 9, "flesh", mouths), ("wick", 10, "breath", wick), ("mourner", 11, "flesh", mourner),
     ("key", 12, "bone", key), ("cup", 13, "bone", cup), ("bell", 14, "breath", bell), ("coin", 15, "silence", coin),
-    ("kiln", 16, "flesh", kiln), ("loom", 17, "soul", loom), ("wright", 18, "breath", lantern),
+    ("kiln", 16, "flesh", kiln), ("loom", 17, "soul", loom), ("lanternwright", 18, "breath", lantern),
     ("choir", 19, "breath", choir), ("tithe", 20, "bone", tithe), ("crown", 21, "silence", crown),
 ]
 ASPECTS = [("bone", a_bone), ("soul", a_soul), ("flesh", a_flesh), ("breath", a_breath), ("silence", a_silence)]

@@ -139,61 +139,15 @@ def _gz(x, y):
 
 def corpse(k, s0, t0, yaw, rot, sink, flung):
     """one of the dead the Red gave back (the area page: "the washed-up dead along the strand"; Derek: "bodies embedded
-    into the shoreline. Rotting corpses"): a body lying face down as the water left it, sunk into the wet sand, drowned
-    and bloated, or rotted to its ribs and skull; a pilgrim's rag over it. Built as forms at a person's true size"""
-    def at(u, w, z):
-        x, y = _body_xy(s0, t0, yaw, u, w)
-        return (x, y, _gz(x, y) + z - sink)
-    d0, d1 = S.xy(s0 + math.cos(yaw), t0 + math.sin(yaw)), S.xy(s0, t0)
-    ang = math.atan2(d0[1] - d1[1], d0[0] - d1[0])
-    bloat = 1.25 if rot == 0 else 1.0
-    tag = "corpse%d" % k
-    flesh = "corpse"
-    if rot < 2:
-        o = P.sphere(tag + "_torso", at(0.0, 0.0, 0.14), 1.0, flesh, scale=(0.4, 0.24 * bloat, 0.17 * bloat))
-        o.rotation_euler = (0, 0, ang)
-        o = P.sphere(tag + "_hips", at(-0.42, 0.0, 0.12), 1.0, flesh, scale=(0.2, 0.21 * bloat, 0.14 * bloat))
-        o.rotation_euler = (0, 0, ang)
-        P.sphere(tag + "_head", at(0.6, 0.04, 0.09), 0.115 * bloat, flesh, scale=(1.1, 0.9, 0.85))
-    else:
-        # rotted to the bone: the spine and the ribs' arcs standing out of the sand, the skull turned aside
-        P.tube(tag + "_spine", [at(-0.45, 0, 0.06), at(0.0, 0, 0.1), at(0.45, 0, 0.08)], [0.035, 0.035, 0.03], "bone", 6)
-        for r in range(9):
-            u = 0.4 - r * 0.075
-            for side in (-1, 1):
-                P.tube("%s_rib%d_%d" % (tag, r, side), [at(u, 0, 0.1), at(u - 0.04, side * 0.16, 0.16), at(u - 0.07, side * 0.24, 0.02)],
-                       [0.014, 0.012, 0.008], "bone", 4)
-        P.sphere(tag + "_skull", at(0.62, 0.1, 0.07), 0.1, "bone", scale=(1.2, 0.9, 0.9))
-        P.sphere(tag + "_pelvis", at(-0.5, 0, 0.05), 0.13, "bone", scale=(0.8, 1.3, 0.5))
-    limb = flesh if rot < 2 else "bone"
-    lr = (0.055 if rot < 2 else 0.025) * bloat
-    for side in (-1, 1):
-        # the arms: one flung up past the head, the other along the side (or both flung, as the water dropped it)
-        if flung or side > 0:
-            P.tube("%s_arm%d" % (tag, side), [at(0.3, side * 0.24, 0.12), at(0.62, side * 0.36, 0.06), at(0.9, side * 0.32, 0.03)],
-                   [lr, lr * 0.9, lr * 0.75], limb, 6)
-        else:
-            P.tube("%s_arm%d" % (tag, side), [at(0.3, side * 0.25, 0.12), at(0.02, side * 0.32, 0.05), at(-0.28, side * 0.3, 0.03)],
-                   [lr, lr * 0.9, lr * 0.75], limb, 6)
-        P.tube("%s_leg%d" % (tag, side), [at(-0.55, side * 0.11, 0.1), at(-1.0, side * 0.15, 0.06), at(-1.42, side * 0.2, 0.03)],
-               [lr * 1.4, lr * 1.1, lr * 0.85], limb, 6)
-    # a rag of a pilgrim's cloak over the back, plastered to it, torn
-    verts, faces = [], []
-    nu, nv = 8, 6
-    for j in range(nv):
-        for i in range(nu):
-            u = -0.55 + 1.0 * i / (nu - 1)
-            w = -0.3 + 0.6 * j / (nv - 1)
-            x, y = _body_xy(s0, t0, yaw, u, w)
-            body = max(0.0, 1.0 - (u / 0.6) ** 2 - (w / 0.3) ** 2)
-            verts.append((x, y, _gz(x, y) - sink + 0.04 + (0.3 if rot < 2 else 0.12) * body ** 0.5 * bloat))
-    for j in range(nv - 1):
-        for i in range(nu - 1):
-            if (i * 7 + j * 3 + k) % 5 == 0:
-                continue
-            a = j * nu + i
-            faces.append((a, a + nu, a + nu + 1, a + 1))
-    P.poly(tag + "_rag", verts, faces, "cloth")
+    into the shoreline. Rotting corpses"), lying face down as the water left it, sunk a little into the wet sand:
+    drowned and bloated (rot 0), rotting (1) or gone to bone (2), the arms flung forward or by its sides. Since
+    2026-10-09 every dead is the one shared body (body3d.py; Derek: "Bodies look bad")"""
+    import body3d as B
+    x, y = S.xy(s0, t0)
+    d0 = S.xy(s0 + math.cos(yaw), t0 + math.sin(yaw))
+    wy = math.atan2(d0[1] - y, d0[0] - x)
+    B.body("corpse%d" % k, "prone_reach" if flung else "prone", ("bloat", "rot", "bone")[min(rot, 2)], x, y, wy,
+           lambda a, b: _gz(a, b) - sink, seed=k * 7 + 3)
 
 
 def corpses():

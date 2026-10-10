@@ -495,48 +495,19 @@ def drowned():
             x, y = RW._body_xy(s0, t0, yaw, u, w)
             return (x, y, surf(u, w) + z - sink)
 
-        d0, d1 = S.xy(s0 + math.cos(yaw), t0 + math.sin(yaw)), S.xy(s0, t0)
-        ang = math.atan2(d0[1] - d1[1], d0[0] - d1[0])
-        tag = "drowned%d" % k
-        rot = (roll, 0.0, ang)
-        P.sphere(tag + "_torso", at(0.0, 0.0, 0.05), 1.0, "corpse", scale=(0.4, 0.26, 0.17), rot=rot)
-        for side in (-1, 1):                                          # the shoulder blades standing out of the blood
-            P.sphere("%s_blade%d" % (tag, side), at(0.2, side * 0.12, 0.11), 1.0, "corpse", scale=(0.13, 0.09, 0.07), rot=rot)
-        P.sphere(tag + "_hips", at(-0.42, 0.0, 0.02), 1.0, "corpse", scale=(0.22, 0.23, 0.13), rot=rot)
-        # face down the head is only its crown, the hair spread on the blood; face up, the face itself, pale
-        P.sphere(tag + "_head", at(0.62, 0.0, 0.0 if up else -0.03), 0.12, "corpse", scale=(1.1, 0.9, 0.75))
-        if not up:
-            for h in range(7):
-                a = -1.2 + h * 0.4
-                P.tube("%s_hair%d" % (tag, h), [at(0.66, 0.0, 0.01), at(0.78 + 0.08 * math.cos(a), 0.18 * math.sin(a), 0.0),
-                                                at(0.9 + 0.12 * math.cos(a), 0.3 * math.sin(a), -0.005)], [0.018, 0.014, 0.008], "cloth", 4)
-        for side in (-1, 1):
-            # the arms hang down into the red, or float out flung; the legs trail under, only a heel showing
-            if side > 0 or k % 2 == 0:
-                P.tube("%s_arm%d" % (tag, side), [at(0.3, side * 0.27, 0.04), at(0.55, side * 0.55, 0.03), at(0.75, side * 0.72, 0.02)],
-                       [0.06, 0.055, 0.045], "corpse", 6)
-            else:
-                P.tube("%s_arm%d" % (tag, side), [at(0.3, side * 0.27, 0.0), at(0.2, side * 0.4, -0.12), at(0.1, side * 0.45, -0.3)],
-                       [0.06, 0.055, 0.045], "corpse", 6)
-            P.tube("%s_leg%d" % (tag, side), [at(-0.55, side * 0.12, 0.0), at(-1.0, side * 0.18, -0.06), at(-1.35, side * 0.22, -0.1)],
-                   [0.075, 0.06, 0.05], "corpse", 6)
-        if cloak:
-            # sodden, clinging to the back, its ragged edges sinking under the blood so the Red itself cuts its outline
-            verts = []
-            nu, nw = 15, 11
-            rr = random.Random(k * 31)
-            for j in range(nw):
-                for i in range(nu):
-                    u, w = -0.85 + i * 0.12, -0.75 + j * 0.15
-                    x, y = RW._body_xy(s0, t0, yaw, u, w)
-                    body = max(0.0, 1 - (u / 0.6) ** 2 - (w / 0.32) ** 2)
-                    edge = math.hypot(u / 0.85, w / 0.75) + 0.25 * math.sin(i * 1.7 + j * 2.3 + k) + rr.uniform(-0.1, 0.1)
-                    fold = 0.02 * math.sin(u * 14 + w * 5)
-                    verts.append((x, y, surf(u, w) - sink + 0.02 + 0.17 * body ** 0.5 + fold - 0.12 * max(0.0, edge - 0.75)))
-            faces = [(j * nu + i, j * nu + i + 1, (j + 1) * nu + i + 1, (j + 1) * nu + i)
-                     for j in range(nw - 1) for i in range(nu - 1)]
-            P.poly(tag + "_cloak", verts, faces, "cloth")
+        # the one shared body (body3d.py), riding the surface face down (or up), mostly under it: only the back, the
+        # shoulders and the hood break the blood
+        import body3d as B
+        x0, y0 = S.xy(s0, t0)
+        d0 = S.xy(s0 + math.cos(yaw), t0 + math.sin(yaw))
+        wy = math.atan2(d0[1] - y0, d0[0] - x0)
 
+        def floating(x, y, sink=sink):
+            ss, tt = S.st(x, y)
+            zw, g = BF.sea_z(np.array([ss]), np.array([tt]))
+            return float(max(zw[0], g[0] + 0.05)) - 0.1 - sink
+        B.body("drowned%d" % k, "supine" if up else ("prone_reach" if k % 2 else "prone"), "bloat", x0, y0, wy + roll,
+               floating, seed=100 + k, cloak=cloak or k % 3 == 0)
 
 def cove_column_height(s_, t_, d, k):
     """the cove's basalt by cause and by the camera: the headlands at the sides stand 20 to 28 yd (their tops out of
