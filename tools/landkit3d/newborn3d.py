@@ -56,6 +56,41 @@ def load():
     return arm, bpy.data.objects["Mannequin"]
 
 
+def reshape(new):
+    """the doll's tells taken out of the rest-pose skin (pass 3), in place:
+    - the shoulders: its deltoid shells sat on as round caps; pulled in toward the body and down, and smoothed, so the
+      shoulder slopes from the neck into the arm as flesh does;
+    - the skull: an egg; given a jaw that narrows under the cheekbones, a chin a little forward and low, and the
+      occiput's swell behind, so even under the caul it is a head and not a ball."""
+    import bmesh
+    bm = bmesh.new()
+    bm.from_mesh(new.data)
+    cap = []
+    for v in bm.verts:
+        x, y, z = v.co
+        for sx in (1.0, -1.0):
+            d = math.sqrt((x - sx * 0.2) ** 2 + (y - 0.0) ** 2 + (z - 1.43) ** 2)
+            if d < 0.12:
+                k = (1.0 - d / 0.12) ** 2
+                v.co.x -= sx * 0.022 * k
+                v.co.z -= 0.012 * k
+                cap.append(v)
+        if z > 1.55:
+            # the face's lower half narrows into the jaw; the chin comes forward and down a touch
+            if z < 1.68:
+                t = (1.68 - z) / 0.13
+                v.co.x *= 1.0 - 0.16 * t
+                if y < -0.03:
+                    v.co.y -= 0.012 * t
+            # the occiput swells behind, above the nape
+            oy, oz = y - 0.07, z - 1.7
+            v.co.y += 0.018 * math.exp(-(oy * oy + oz * oz) / (2 * 0.05 ** 2))
+    bmesh.ops.smooth_vert(bm, verts=list(set(cap)), factor=0.8, use_axis_x=True, use_axis_y=True, use_axis_z=True)
+    bmesh.ops.smooth_vert(bm, verts=list(set(cap)), factor=0.8, use_axis_x=True, use_axis_y=True, use_axis_z=True)
+    bm.to_mesh(new.data)
+    bm.free()
+
+
 def one_skin(arm, body, voxel=0.02, faces=24000):
     """the Mannequin's skin rebuilt as one continuous body (pass 2): the doll's segments and ball joints at the elbows,
     hips and knees fused by a voxel remesh in the rest pose (2 cm: coarser than the grooves between the segments, so
@@ -83,6 +118,7 @@ def one_skin(arm, body, voxel=0.02, faces=24000):
     dc = new.modifiers.new("dec", "DECIMATE")
     dc.ratio = min(1.0, faces / max(1, len(new.data.polygons)))
     bpy.ops.object.modifier_apply(modifier="dec")
+    reshape(new)
     for vg in body.vertex_groups:
         new.vertex_groups.new(name=vg.name)
     dt = new.modifiers.new("weights", "DATA_TRANSFER")
@@ -194,7 +230,7 @@ def coat(arm, body):
 
 
 def clots(arm, body):
-    """clots and caul lumps, each on its bone: the matted mass over the skull, clots on the shoulders, the shoulder
+    """clots and caul lumps, each on its bone: small clots on the shoulder
     blades, the small of the back, the belly, and a torn flap of caul down the right forearm. Each is laid onto the
     skin where it was aimed (the nearest point of the body's surface), sunk to half its thickness, never floating."""
     clot = gore_material("clot", (0.035, 0.005, 0.006), 0.4)
@@ -202,15 +238,10 @@ def clots(arm, body):
     mw = arm.matrix_world
     # (bone, offset from the bone's head in armature space at rest (m), radii, material)
     spec = [
-        ("DEF-head", (0.0, 0.02, 0.14), (0.085, 0.10, 0.06), clot),      # the matted mass of the hair
-        ("DEF-head", (0.05, 0.04, 0.10), (0.04, 0.06, 0.05), clot),
-        ("DEF-head", (-0.05, 0.05, 0.09), (0.035, 0.05, 0.05), clot),
-        ("DEF-head", (0.0, 0.07, 0.05), (0.06, 0.04, 0.07), clot),        # down the back of the skull
-        ("DEF-spine.003", (0.11, 0.08, 0.10), (0.06, 0.035, 0.045), clot),
-        ("DEF-spine.003", (-0.10, 0.09, 0.06), (0.05, 0.03, 0.06), clot),
+        ("DEF-spine.003", (0.08, 0.13, 0.02), (0.035, 0.022, 0.03), clot),       # on the shoulder blade, small
+        ("DEF-spine.003", (-0.07, 0.13, -0.03), (0.03, 0.02, 0.04), clot),
         ("DEF-spine.002", (0.03, 0.12, 0.05), (0.07, 0.03, 0.05), caul),
         ("DEF-spine.001", (-0.04, 0.12, 0.02), (0.05, 0.03, 0.04), clot),
-        ("DEF-spine.001", (0.02, -0.12, 0.04), (0.06, 0.03, 0.04), caul),
         ("DEF-upper_arm.L", (0.10, 0.03, -0.03), (0.06, 0.03, 0.035), clot),
         ("DEF-forearm.R", (-0.12, 0.0, -0.04), (0.09, 0.035, 0.025), caul),
         ("DEF-thigh.R", (0.0, 0.07, -0.15), (0.04, 0.03, 0.08), clot),
@@ -533,37 +564,24 @@ def caul_shell(body):
     bm.normal_update()
 
     def region(c):
-        hem = 1.18 + 0.16 * _vnoise(c, 9.0, 3.1)                     # the ragged hem's height, front and back
-        if c.z > 1.5:
-            return True                                              # the whole skull, the face too
-        if abs(c.x) > 0.15 + 0.04 * _vnoise(c, 11.0, 1.7):
-            return False                                             # off the shoulder caps (it read as armour)
-        if c.y > 0.0:
-            return c.z > hem - 0.12                                  # down the back further
-        return c.z > hem + 0.1                                       # over the collarbones in front
+        # (pass 3) only the back of the scalp and the upper back: a clinging shell over the whole skull and the
+        # shoulders read as a helmet and pauldrons, since a hood cannot fall by its weight in every pose
+        if c.z > 1.62:
+            return c.y > -0.03 + 0.04 * _vnoise(c, 12.0, 4.4)       # the back and top of the scalp, ragged at the brow
+        if abs(c.x) > 0.13 + 0.04 * _vnoise(c, 11.0, 1.7):
+            return False
+        return c.y > 0.02 and c.z > 1.1 + 0.18 * _vnoise(c, 9.0, 3.1)   # down the upper back, the hem ragged
 
     faces = [f for f in bm.faces if region(f.calc_center_median())]
     dup = bmesh.ops.duplicate(bm, geom=faces)
     nf = [g for g in dup["geom"] if isinstance(g, bmesh.types.BMFace)]
     nv = {v for f in nf for v in f.verts}
     for v in nv:
-        # lifted off the skin unevenly: it clings in places and bags in others, most over the back of the skull, so
-        # the head reads as a hooded mass and never as a ball
-        lift = 0.01 + 0.026 * _vnoise(v.co, 13.0, 5.3) ** 2
-        # the cowl: a bag of it hanging behind and under the back of the skull, as a wet hood falls back
-        dy, dz = v.co.y - 0.06, v.co.z - 1.56
-        lift += 0.085 * math.exp(-(dy * dy) / (2 * 0.06 ** 2) - (dz * dz) / (2 * 0.08 ** 2)) * (1.0 if v.co.y > -0.02 else 0.0)
-        # the crown: it sags into a soft peak over the top and back of the skull, so the head is never a ball
-        cy, cz = v.co.y - 0.03, v.co.z - 1.76
-        lift += 0.05 * math.exp(-(cy * cy) / (2 * 0.05 ** 2) - (cz * cz) / (2 * 0.05 ** 2))
-        # a fold sagging over the face, so there is no face to tell
-        fy, fz = v.co.y + 0.09, v.co.z - 1.63
-        lift += 0.025 * math.exp(-(fy * fy) / (2 * 0.04 ** 2) - (fz * fz) / (2 * 0.05 ** 2))
-        if v.co.z < 1.5:
-            lift *= 0.6                                              # the drape clings to the shoulders and back
+        # it clings: lifted only a few millimetres, in wrinkles, thicker where it has bunched
+        lift = 0.004 + 0.012 * _vnoise(v.co, 19.0, 5.3) ** 3
         v.co += v.normal * lift
     # torn: holes through it where the noise runs high (never over the face, which it hides whole)
-    tear = [f for f in nf if f.calc_center_median().z < 1.6 and _vnoise(f.calc_center_median(), 15.0, 8.2) > 0.6]
+    tear = [f for f in nf if _vnoise(f.calc_center_median(), 15.0, 8.2) > 0.57]
     bmesh.ops.delete(bm, geom=tear, context="FACES")
     nf = [f for f in nf if f.is_valid]
     for f in nf:

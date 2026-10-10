@@ -149,3 +149,45 @@ hooded dead, the face stays untellable, and the seams and the smoothness are bro
 2. From the front the head is still round (the caul follows the skull).
 3. Its light: its own key, not the cave's fires.
 4. No shadow.
+
+## Rules check (after pass 2)
+
+**Read:** `MASTER_RULES` (unchanged since the last check, my own commit 78ab0ac7); the area's opening (the dead's
+hooded shape). **The checklist:**
+1. Brief, with the lore's detail: the caul's hood is in. Passes in part (the head still reads round from the front).
+2. Scale: passes.
+3. Form: one skin now, but the doll's deltoid caps bulge and the skull is an egg. **Fails (worst).**
+4. Light: its own key. Fails.
+5. Values, 6. ramps: pass.
+7. Paint: the live road's open question. Open.
+8. Contact: no shadow. Fails.
+9. Detail where it counts: the caul's tears, strands and clots on the silhouette. Passes in part.
+10. Life, 11. seen in the game: pass.
+12. Skeptic round: beside the dead on the beach, the newborn's head and shoulders are the difference. Fails, with 3.
+13. Cinematography: unchanged. Partly fails.
+
+**Worst first: 3.** The shoulders and the skull are reshaped in the rest pose: the deltoid caps pulled in and smoothed
+into a sloping shoulder, the skull given a jaw that narrows under the cheekbones and an occiput behind, and the caul
+hanging in flaps at the sides of the head.
+
+## Pass 3: a person, not a helmet and pauldrons
+
+- **Found by looking, not guessing:** two changes to the shoulders and skull showed nothing. A render coloured by
+  material showed why: the round head and the shoulder pads were the caul's shell itself. A clinging hood follows the
+  skull (a helmet) and stands on the shoulders (pauldrons), and a hood cannot fall by its weight in every pose on this
+  road. **The hood is dropped.** The lore's detail (it looks like the dead) is carried by the same gaunt proportions,
+  the coat of blood and the torn caul, not by a garment.
+- **The caul:** now thin torn patches clinging a few millimetres off the back and top of the scalp and the upper back,
+  with ragged edges, wrinkles and the 26 strands at the hem.
+- **The skin, reshaped in the rest pose** (`reshape()`): the doll's deltoid caps pulled in and smoothed into sloping
+  shoulders; the egg of a skull given a jaw narrowing under the cheekbones, a chin, and the swell of the occiput.
+- **Clots:** the four spheres of "matted hair" were removed (they made the head a ball); the shoulder clots were made
+  small and moved onto the shoulder blades; the caul lump on the belly read as a belt buckle and is gone.
+- **In the game:** a gaunt, blood-slick person drags itself out, heaves, and gets up.
+
+**Grade: B-.** The form now reads as a body, in the game and up close.
+**Worst open, in order:**
+1. Light: its own key and rim, not the cave's fires (checklist 4, 13).
+2. No shadow (8).
+3. The wrists and knees still show faint rings where the doll's cuffs were.
+4. Paint (7): the picture is a stepped render, not yet painted.
