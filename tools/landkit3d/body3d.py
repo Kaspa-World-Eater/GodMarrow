@@ -258,6 +258,21 @@ def _cloak(name, Wj, A, rnd, state):
         q = lw + d * rnd.uniform(0.1, 0.16)
         q.z = lw.z + 0.08
         _el(mb, q, 0.014, 0.016, (d.x, d.y), 0.07)
+    # the skirt: below the belt the cloak hangs as one sheet across both legs, bridging between them (chapter 15: "bridges
+    # in a taut sheet ... between the legs"), lower where it sags between, spreading toward its hem at mid-calf
+    for k in range(7):
+        u = k / 6.0
+        pl = top("hip_l").lerp(top("kne_l"), min(u * 1.5, 1.0)) if u < 0.67 else top("kne_l").lerp(top("ank_l"), (u - 0.67) * 1.5)
+        pr = top("hip_r").lerp(top("kne_r"), min(u * 1.5, 1.0)) if u < 0.67 else top("kne_r").lerp(top("ank_r"), (u - 0.67) * 1.5)
+        mid = (pl + pr) * 0.5
+        span = (pl - pr)
+        span.z = 0
+        half = min(span.length * 0.5, 0.3)
+        w = half + 0.07 + u * 0.05                                # the sheet widens toward the hem
+        q = Vector((mid.x, mid.y, min(pl.z, pr.z) - 0.005 - 0.02 * u))
+        acr = Vector((span.x, span.y, 0)).normalized() if span.length > 1e-4 else sd
+        along = Vector((-acr.y, acr.x))
+        _el(mb, q, w, 0.045 - 0.015 * u, (along.x, along.y), 0.1)
     # the hem: wet wool spread on the ground in a few uneven lobes about the hips and down the thighs
     for k in range(5):
         j = ("pelvis", "kne_l", "kne_r", "hip_l", "hip_r")[k]
@@ -282,43 +297,76 @@ def _cloak(name, Wj, A, rnd, state):
 
 
 def bones(name, Wj, support, rnd, roll, cloak):
-    """gone to bone: the skeleton of the same joints, the skull and jaw apart, the ribs fallen in, a hand scattered;
-    the cloak a collapsed sack along the spine"""
+    """gone to bone (chapter 15, "Skeletal"): the skeleton of the same joints lying in its cloak; the long bones straight
+    with their knuckled ends, the skull with its brow and its jaw come away, the ribs arched over a cage fallen in on the
+    spine, the pelvis a bowl; the cloak a collapsed sack following the spine, the ribs breaking through it, the hood a
+    rag round the skull"""
     for q in Wj.values():
         q[2] = support(q[0], q[1]) + 0.03
     objs = []
     def rod(a, b, r, nm):
         pa, pb = Vector(Wj[a]), Vector(Wj[b])
-        objs.append(P.tube(name + nm, [tuple(pa), tuple(pb)], [r, r * 0.85], "bone", 6))
-    for s in "lr":
-        rod("sh_" + s, "elb_" + s, 0.018, "hum" + s)
-        rod("elb_" + s, "wri_" + s, 0.014, "rad" + s)
-        rod("hip_" + s, "kne_" + s, 0.024, "fem" + s)
-        rod("kne_" + s, "ank_" + s, 0.02, "tib" + s)
-    rod("pelvis", "neck", 0.022, "spine")
+        z = max(pa.z, pb.z)
+        pa.z = pb.z = z
+        objs.append(P.tube(name + nm, [tuple(pa), tuple(pb)], [r, r * 0.8], "bone", 6))
+        for e, rr in ((pa, r * 1.7), (pb, r * 1.5)):
+            objs.append(P.sphere(name + nm + "k%d" % len(objs), tuple(e), rr, "bone", scale=(1.0, 1.0, 0.8)))
+    for s_ in "lr":
+        rod("sh_" + s_, "elb_" + s_, 0.02, "hum" + s_)
+        rod("elb_" + s_, "wri_" + s_, 0.015, "rad" + s_)
+        rod("hip_" + s_, "kne_" + s_, 0.027, "fem" + s_)
+        rod("kne_" + s_, "ank_" + s_, 0.022, "tib" + s_)
+        for k in range(4):                                         # the hand's small bones, come apart
+            w = Vector(Wj["wri_" + s_]) + Vector((rnd.uniform(-0.08, 0.08), rnd.uniform(-0.08, 0.08), 0))
+            w.z = support(w.x, w.y) + 0.01
+            objs.append(P.sphere(name + "hb%s%d" % (s_, k), tuple(w), 0.012, "bone", scale=(1.6, 0.7, 0.6)))
     sp = Vector(Wj["pelvis"])
     nk = Vector(Wj["neck"])
     ax = (nk - sp)
     ax.z = 0
     ax.normalize()
     side = Vector((-ax.y, ax.x, 0))
+    # the spine, a run of vertebrae
+    for k in range(14):
+        c = sp.lerp(nk, k / 13.0)
+        c.z = support(c.x, c.y) + 0.035
+        objs.append(P.sphere(name + "vt%d" % k, tuple(c), 0.026, "bone", scale=(0.75, 1.25, 0.7)))
+    # the ribs arched over a cage fallen in on the spine
     for k in range(10):
-        c = sp.lerp(nk, 0.45 + k * 0.05)
+        c = sp.lerp(nk, 0.42 + k * 0.05)
+        c.z = support(c.x, c.y) + 0.05
         for sd in (-1, 1):
-            w = 0.16 - abs(k - 4) * 0.012
-            tip = c + side * sd * w * (0.8 + 0.3 * rnd.random())
+            w = (0.17 - abs(k - 4) * 0.012) * (0.85 + 0.25 * rnd.random())
+            tip = c + side * sd * w
             tip.z = support(tip.x, tip.y) + 0.01
             mid = c + side * sd * w * 0.6
-            mid.z = c.z + 0.05 * (0.5 + rnd.random() * 0.5)
-            objs.append(P.tube("%srib%d%d" % (name, k, sd), [tuple(c), tuple(mid), tuple(tip)], [0.008, 0.007, 0.005], "bone", 4))
+            mid.z = c.z + 0.07 * (0.6 + rnd.random() * 0.4)
+            objs.append(P.tube("%srib%d%d" % (name, k, sd), [tuple(c), tuple(mid), tuple(tip)], [0.011, 0.01, 0.007], "bone", 4))
+    # the skull, its brow and the hollow of its eyes, the jaw come away beside it
     hd = Vector(Wj["head"]) + side * rnd.uniform(-0.05, 0.05)
-    objs.append(P.sphere(name + "skull", tuple(hd + Vector((0, 0, 0.05))), 0.1, "bone", scale=(1.15, 0.85, 0.85)))
+    hd.z = support(hd.x, hd.y) + 0.07
+    objs.append(P.sphere(name + "skull", tuple(hd), 0.1, "bone", scale=(1.15, 0.88, 0.85)))
+    objs.append(P.sphere(name + "brow", tuple(hd + ax * 0.06 + Vector((0, 0, 0.03))), 0.06, "bone", scale=(0.6, 1.3, 0.5)))
+    jw = hd + ax * 0.16 + side * 0.08
+    jw.z = support(jw.x, jw.y) + 0.015
+    objs.append(P.tube(name + "jaw", [tuple(jw - side * 0.06), tuple(jw + ax * 0.05), tuple(jw + side * 0.06)], [0.014, 0.018, 0.014], "bone", 5))
+    # the pelvis, a bowl tipped forward
     pl = Vector(Wj["pelvis"])
-    objs.append(P.sphere(name + "pelv", tuple(pl + Vector((0, 0, 0.03))), 0.13, "bone", scale=(0.7, 1.25, 0.45)))
+    pl.z = support(pl.x, pl.y) + 0.05
+    objs.append(P.sphere(name + "pelv", tuple(pl), 0.14, "bone", scale=(0.65, 1.2, 0.42)))
     if cloak:
         mb, ob = _mb(name + "c")
-        for j in ("pelvis", "lumbar", "chest", "neck"):
+        for j in ("pelvis", "lumbar", "chest"):
             q = Vector(Wj[j])
-            _el(mb, q + Vector((0, 0, 0.0)), 0.2, 0.05, (ax.x, ax.y), 0.22)
+            q.z = support(q.x, q.y) + 0.035
+            _el(mb, q, 0.21, 0.035, (ax.x, ax.y), 0.24)                  # the sack, fallen flat between the ribs
+        for k in range(4):
+            u = rnd.uniform(-0.2, 0.25)
+            q = sp.lerp(nk, 0.5 + u) + side * rnd.choice((-1, 1)) * rnd.uniform(0.18, 0.3)
+            q.z = support(q.x, q.y) + 0.01
+            _el(mb, q, rnd.uniform(0.1, 0.16), 0.02, (rnd.uniform(-1, 1), rnd.uniform(-1, 1)), 0.18)   # its spread edges
+        q = hd - ax * 0.02
+        q.z = support(q.x, q.y) + 0.03
+        _el(mb, q, 0.13, 0.03, (ax.x, ax.y), 0.15)                      # the hood, a rag round the skull
         objs.append(_mesh(ob, name + "c", "cloth"))
     return objs

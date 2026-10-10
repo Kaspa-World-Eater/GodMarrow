@@ -124,3 +124,17 @@ bare and pale; the bone state is still a stick figure; nothing yet of the stages
 pale against the wet black wool. **Grade: C+.** **Worst now:** the cloak wraps each leg on its own like a tight suit;
 a cloak hangs as one skirt across both legs, bridging between them (chapter 15: "bridges in a taut sheet ... between
 the legs") and spreading at the hem. Then the bone state, then the bloat's dome.
+
+## Pass 6: one skirt across both legs
+
+**Fixed:** below the belt the cloak hangs as one sheet bridging the legs, lower where it sags between them and widening
+toward its hem; they read as robed pilgrims lying where they fell. **Grade: B-.** **Worst now:** the bone state, still
+a stick figure of rods and two balls.
+
+## Pass 7: gone to bone
+
+**Fixed:** the bone state is a skeleton of the same joints: the long bones straight with knuckled ends, a run of
+vertebrae, the ribs arched over a cage fallen in on the spine, the skull with its brow and its jaw come away, the hand's
+small bones scattered, the cloak a collapsed sack under the ribs with its hood round the skull. **Grade: C+** (the
+bone); the robed bodies stay B-. **Worst now:** the pelvis a smooth lump (a bowl with its wings is wanted); the bloat
+has no dome against the cloak; none of it yet seen painted at the game's scale on the strand.
