@@ -143,8 +143,7 @@ def main():
                            heightPx=int(round(max(0.0, z - fl) * 21)), dxPx=0))
     N["objects"], N["connections"], N["arrive"], N["markers"], N["lights"] = objects, conns, {}, mk, lights
     N["packs"], N["monsters"] = [], []
-    M = json.load(gzip.open(os.path.join(ROOT, "data", "zones", "moor_s9001.json.gz"), "rt", encoding="utf-8"))
-    amb = copy.deepcopy(M["ambient"])
+    amb = json.load(open(os.path.join(HERE, "ambient_outdoor.json"), encoding="utf-8"))   # the hours' light (once the moor's)
     for ph in amb["byPhase"]:
         ph["rgb"] = [205, 198, 200]                                   # underground: no hour reaches in; the paint is the light
     amb["dark"] = 0.22

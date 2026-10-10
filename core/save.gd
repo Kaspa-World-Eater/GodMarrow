@@ -3,7 +3,7 @@ extends RefCounted
 ## Vector2s). Saved: order, level, xp, attributes, points, skill points and binds, the order's own choices (golem orders,
 ## weapon), gold, pack, equipment, belt, Hollow Tokens, what the lantern keeps, the vows and waystones and lanterns,
 ## the return point. Not saved: the map (every start rolls a new world), creatures, things on the ground.
-## Continue loads it into a freshly rolled world at the Ashen Moor camp. Load by path: load("res://core/save.gd").
+## Continue loads it into a freshly rolled world on the cove (the Red Shore), the act's safe place. Load by path: load("res://core/save.gd").
 
 const FILE := "user://godmarrow.save"          # the old single slot (moved into its order's slot on first run)
 const VERSION := 1

@@ -8,10 +8,10 @@ extends RefCounted
 ## progress, fulfilled}], max_act(), act_name(n). For the waystone panel: waystones(act) -> [{id, name, town, here}].
 
 const ROMAN := ["", "I", "II", "III", "IV", "V"]
-const ACT_NAME := ["", "Act I · The Ashen Moor", "Act II · The Bleached Barrens", "Act III · The Fen of Shog-Mire", "Act IV · The Heights of An-Vhar", "Act V · The Descent"]
+const ACT_NAME := ["", "Act I · The Hide", "Act II · The Bleached Barrens", "Act III · The Fen of Shog-Mire", "Act IV · The Heights of An-Vhar", "Act V · The Descent"]
 const ACT_MLVL := [[0, 0], [1, 17], [18, 24], [24, 30], [30, 34], [34, 40]]
 ## Act I waystones (every town has one; about every other zone)
-const A1_WP := ["moor", "hollow_wood", "fen", "crypt", "barrow", "cata1", "cata2", "root_deep", "sighing_ridge", "pilgrim_road", "drowned_village", "sunken_bog", "burnt_heath"]
+const A1_WP := ["red_shore", "hollow_wood", "fen", "crypt", "barrow", "cata1", "cata2", "root_deep", "sighing_ridge", "pilgrim_road", "drowned_village", "sunken_bog", "burnt_heath"]
 const ELEMS := ["magic", "miasma", "blood", "void", "radiance", "fire", "cold", "poison"]
 
 ## kinds: zoneboss (a zone's own boss), kill (a named one placed in a zone), relic (take it), shrine (kneel and hold
@@ -20,7 +20,7 @@ const QUESTS := [
 	{"id": "a1_warden", "act": 1, "kind": "zoneboss", "zones": ["crypt"], "name": "The Carrion Warden", "target": "The Carrion Warden",
 		"desc": "Beneath the Moor the Hollow Crypt keeps a warden who forgot what he guards. He eats what the Tithed bury. Go down into {Z} and let him stop.",
 		"done": "Esk: 'Then the Tithed can bury their mothers again. Take this. It was his, and he will not want it.'", "rew": {"gold": 200, "item": "magic"}},
-	{"id": "a1_lantern", "act": 1, "kind": "shrine", "zones": ["sighing_ridge", "moor"], "name": "The Sighing Lantern", "target": "The Sighing Lantern",
+	{"id": "a1_lantern", "act": 1, "kind": "shrine", "zones": ["sighing_ridge"], "name": "The Sighing Lantern", "target": "The Sighing Lantern",
 		"desc": "The bronze lantern at the crossing has stopped singing. Something drinks the light before it reaches the road. Kneel at it in {Z} and hold it until the drinkers are gone.",
 		"done": "Esk: 'It sings again. Badly. It always sang badly. Here, a small truth for your trouble.'", "rew": {"skill": 1}},
 	{"id": "a1_daughter", "act": 1, "kind": "captive", "zones": ["drowned_village", "fen"], "name": "The Widow's Daughter", "target": "Nell, the foreman's daughter",
@@ -38,8 +38,7 @@ const QUESTS := [
 ]
 
 const TOWN := {
-	1: {"giver": "Warden-Crone Esk", "healer": "Sister Ysolde, Tallow-Nurse", "smith": "Brannoc of the Nail", "vendor": "Maren the Gravekeeper",
-		"greet": "Esk: 'Another pilgrim. Good. The dead swore what they could not finish. Now you have. Your journal (J).'"},
+	1: {"giver": "Warden-Crone Esk", "healer": "Sister Ysolde, Tallow-Nurse", "smith": "Brannoc of the Nail", "vendor": "Maren the Gravekeeper"},
 }
 const STRANGER_LINES := {
 	1: ["The Stranger: 'You have found the Sighing Lantern? Good. Not all of them still sing.'",
@@ -231,7 +230,7 @@ static func lair_of(n: int) -> String:
 	return "cata2" if n == 1 else "a%d_lair" % n
 
 static func is_town(id: String) -> bool:
-	return id == "moor" or (id.begins_with("a") and id.ends_with("_town"))
+	return id == "red_shore" or (id.begins_with("a") and id.ends_with("_town"))
 
 static func zone_exists(id: String) -> bool:
 	return Data.zone_index().get("zones", {}).has(id)

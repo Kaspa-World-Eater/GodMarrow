@@ -237,13 +237,13 @@ func _title_open() -> void:
 	hero.set_process_unhandled_input(false)
 	hero.set_process_input(false)
 
-## where a new pilgrim begins: the moor's camp, or (on trial, until Derek signs the cave off) the opening cave, rising
-## out of the pool: --cave, GM_START=cave, or a file user://start_in_cave
+## where a pilgrim begins (Derek, 2026-10-09: "Make the game just start into the cave automatically"): a new one rises
+## out of the pool in the opening cave; a pilgrim continued wakes on the cove, the act's safe place (the old camp on the
+## Ashen Moor is gone)
 func _start_zone() -> String:
-	var cave := args.has("cave") or OS.get_environment("GM_START") == "cave" or FileAccess.file_exists("user://start_in_cave")
-	if cave and reading_open and FileAccess.file_exists("res://data/zones/opening_cave_s9301.json.gz"):
+	if pending_load.is_empty() and FileAccess.file_exists("res://data/zones/opening_cave_s9301.json.gz"):
 		return "opening_cave"
-	return "moor"
+	return "red_shore"
 
 ## the Reading: the Stranger's fire over everything until the new pilgrim rises; what it gives is theirs for the walk
 func _reading_open() -> void:
@@ -502,7 +502,7 @@ func _on_hero_died() -> void:
 	else:
 		Bus.say.emit(DEATH_LINES[_last_death], 3.0)
 	await get_tree().create_timer(3.0).timeout
-	var back_zone: String = last_lantern.get("zone", "moor")
+	var back_zone: String = last_lantern.get("zone", "red_shore")
 	var at_self := back_zone == zone.id and not last_lantern.is_empty()
 	if at_self:
 		hero.revive(Vector2(last_lantern["x"], last_lantern["y"] + 1.2))

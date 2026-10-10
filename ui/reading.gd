@@ -86,7 +86,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var j = JSON.parse_string(FileAccess.get_file_as_string("res://data/reading.json"))
 	R = j if j is Dictionary else {}
-	sheet = load("res://art/reading/stranger_sheet.webp")
+	# (Derek, 2026-10-09: "Remove the stranger cinematic, I just want the cards to appear on screen": the painting of
+	# the Stranger at his fire, art/reading/stranger_sheet.webp, is no longer shown; the cards lie over the game)
 	root = Control.new()
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -351,22 +352,10 @@ func _wrap(s: String, f: Font, size: int, width: float) -> PackedStringArray:
 func _draw_all() -> void:
 	var a := fade if leaving < 0.0 else fade * (1.0 - clampf(leaving / 1.4, 0.0, 1.0))
 	var ci := root
-	ci.draw_rect(Rect2(0, 0, 1920, 1080), Color(0.01, 0.01, 0.015))
-	# the Stranger at his fire
-	if sheet:
-		var f := sframe
-		var src := Rect2((f % 11) * FW, (f / 11) * FH, FW, FH)
-		ci.draw_texture_rect_region(sheet, Rect2(320, 0, FW * SK, FH * SK), src, Color(a, a, a))
-		# the painting's edges go down into the dark
-		for k in 24:
-			var w := 6.0
-			var e := Color(0.01, 0.01, 0.015, 1.0 - k / 24.0)
-			ci.draw_rect(Rect2(320 + k * w, 0, w, 1080), e)
-			ci.draw_rect(Rect2(1600 - (k + 1) * w, 0, w, 1080), e)
-	# the cloth: the lower frame darkened so the cards and words read
-	for k in 40:
-		ci.draw_rect(Rect2(0, 420 + k * 10, 1920, 10), Color(0.01, 0.01, 0.015, clampf(k / 40.0 * 0.85, 0.0, 0.85) * a))
-	ci.draw_rect(Rect2(0, 820, 1920, 260), Color(0.01, 0.01, 0.015, 0.85 * a))
+	# the world stays behind the cards, dimmed so they and the words read
+	ci.draw_rect(Rect2(0, 0, 1920, 1080), Color(0.01, 0.01, 0.015, 0.62 * a))
+	for k in 30:
+		ci.draw_rect(Rect2(0, 780 + k * 10, 1920, 10), Color(0.01, 0.01, 0.015, clampf(k / 30.0, 0.0, 1.0) * 0.6 * a))
 	var sc := U.font("sc")
 	var fi := U.font("italic")
 	var fb := U.font("book")

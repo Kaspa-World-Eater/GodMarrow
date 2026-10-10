@@ -21,7 +21,7 @@ done
 run "champions + deeds" 100000 --seed=7 --new --zone=fen --cls=monk --arena=4 --arena_kind=hollow --arena_live --arena_rank=champion --arena_t=10
 run "count sigils" 100000 --new --zone=fen --cls=monk --arena=4 --arena_kind=hollow --sigils --arena_t=5
 for p in skills inv char board journal; do
-  run "panel $p" 240 --zone=moor --cls=animancer --panel=$p
+  run "panel $p" 240 --zone=red_shore --cls=animancer --panel=$p
 done
 run "title" 240 --title
 cat "$OUT"

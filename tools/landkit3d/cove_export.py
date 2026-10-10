@@ -137,11 +137,11 @@ def main():
     mk = dict(T["markers"])
     for k in ("lanterns", "waystones", "chests", "shrines", "altars", "statues", "npcs", "questObjects", "ruins", "channels89"):
         mk[k] = []
-    objects = [dict(type="portal", x=portal[0], y=portal[1], to="moor", name="Up into the bluffs", spr="cave", i=0, solid=False,
+    objects = [dict(type="portal", x=portal[0], y=portal[1], to="hollow_wood", name="Up into the bluffs", spr="cave", i=0, solid=False,
                     sprites=[])]
-    conns = [dict(to="moor", toName="moor", name="Up into the bluffs", x=portal[0], y=portal[1], spr="cave", object=0,
+    conns = [dict(to="hollow_wood", toName="hollow_wood", name="Up into the bluffs", x=portal[0], y=portal[1], spr="cave", object=0,
                   arriveHereFrom=None)]
-    arrive = {"moor": dict(x=arrive_up[0], y=arrive_up[1])}
+    arrive = {"hollow_wood": dict(x=arrive_up[0], y=arrive_up[1])}
     mk["start"] = dict(x=st0[0], y=st0[1])
     lp = zone_of(47.0, 27.5)
     objects.append(dict(type="lantern", x=lp[0], y=lp[1], idx=0, name="The Last Lantern on the Sand", vOld="The Red Shore",
@@ -157,8 +157,7 @@ def main():
     N["packs"], N["monsters"] = [], []
     # the light over the cove: the paint already holds the overcast, so the day lays only a breath of cool grey over it
     # (the bog's ambience is a heavy veil for a dark marsh); the night is the moor's deep blue
-    M = json.load(gzip.open(os.path.join(ROOT, "data", "zones", "moor_s9001.json.gz"), "rt", encoding="utf-8"))
-    amb = copy.deepcopy(M["ambient"])
+    amb = json.load(open(os.path.join(HERE, "ambient_outdoor.json"), encoding="utf-8"))   # the hours' light (once the moor's)
     for ph in amb["byPhase"]:
         k = float(ph["dayK"])
         night = [28, 37, 67]
@@ -174,7 +173,7 @@ def main():
     idx = json.load(open(ip, encoding="utf-8"))
     idx["zones"]["red_shore"] = {"id": "red_shore", "name": "The Red Shore", "act": 1, "kind": "outdoor", "outdoor": True,
                                  "theme": "moor", "land": "moor", "wallTheme": "moor", "w": W, "h": H, "mlvl": [1, 3],
-                                 "links": ["moor"], "seeds": [CB.SEED], "files": ["red_shore_s%d.json.gz" % CB.SEED]}
+                                 "links": ["hollow_wood"], "seeds": [CB.SEED], "files": ["red_shore_s%d.json.gz" % CB.SEED]}
     with open(ip, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(idx, fh, indent=1, ensure_ascii=False)
     # a picture of the grid for the log: sand, Red, rock, the start and the portal

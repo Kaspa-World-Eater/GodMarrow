@@ -25,35 +25,6 @@
   1020
  ],
  "zones": {
-  "moor": {
-   "id": "moor",
-   "name": "Ashen Moor",
-   "act": 1,
-   "kind": "town",
-   "outdoor": true,
-   "theme": "moor",
-   "land": "moor",
-   "wallTheme": "moor",
-   "w": 48,
-   "h": 48,
-   "mlvl": [
-    2,
-    6
-   ],
-   "links": [
-    "crypt",
-    "fen",
-    "barrow",
-    "sighing_ridge",
-    "hollow_wood"
-   ],
-   "seeds": [
-    9001
-   ],
-   "files": [
-    "moor_s9001.json.gz"
-   ]
-  },
   "crypt": {
    "id": "crypt",
    "name": "Hollow Crypt",
@@ -70,7 +41,7 @@
     11
    ],
    "links": [
-    "moor",
+    "barrow",
     "fallen_monastery",
     "hollow_wood"
    ],
@@ -135,7 +106,7 @@
     17
    ],
    "links": [
-    "moor",
+    "sighing_ridge",
     "cata1",
     "drowned_village",
     "root_deep",
@@ -202,7 +173,7 @@
     10
    ],
    "links": [
-    "moor",
+    "crypt",
     "fallen_watchtower"
    ],
    "seeds": [
@@ -397,7 +368,7 @@
     4
    ],
    "links": [
-    "moor",
+    "fen",
     "burnt_heath",
     "wolf_den_chapel"
    ],
@@ -1442,7 +1413,7 @@
     8
    ],
    "links": [
-    "moor",
+    "red_shore",
     "crypt",
     "pilgrim_road"
    ],
@@ -1572,7 +1543,7 @@
     3
    ],
    "links": [
-    "moor",
+    "hollow_wood",
     "opening_cave"
    ],
    "seeds": [
