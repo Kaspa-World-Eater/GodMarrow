@@ -350,3 +350,11 @@ not the skin, so they can swim over a moving limb (3.6: a tooth fixed to the wor
   it could catch more rim).
 - **Return-to:** a wet highlight on the blood strands; pooled wet edges in the paint; whether every character goes live
   3D (Derek's call).
+
+## Rules check (after pass 10, awaiting Derek's grade)
+
+**Check:** rules and lore unchanged. Derek: "You did good." The piece waits for his grade; the next piece waits for his
+go. **The improvement this reminder (2.8):** from the return-to list, the blood strands don't read against the body.
+They were the same near-black red as the dried coat, but fresh blood running off is brighter and wetter than blood
+drying on the skin. The strands are now a fresh red (0.2, 0.012, 0.016), nearly glossy (roughness 0.06, full
+specular), so the candles catch a wet highlight on them.
