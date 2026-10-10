@@ -11,7 +11,7 @@ extends Node2D
 ## world/atmos.gd over the dark, as the web draws them in drawAtmos.
 
 const Flame = preload("res://fx/flame.gd")
-const PX := 4.0
+const PX := Iso.WPX            # a unit: the web's world px, for lengths only (positions, heights, speeds)
 const AP := 2.0               # the art pixel: the 2 x 2 grid (MASTER_RULES 3.7; Derek, 2026-10-10: "eliminate all 4x4 ... asure it 2x2")
 const EMB_COL := [Color("#fff0b8"), Color("#ffc860"), Color("#ff9038"), Color("#8a6a4a"), Color("#4a4038")]
 
@@ -134,8 +134,8 @@ func _draw() -> void:
 		var c: Vector2 = ps + Vector2(15, -61) * PX
 		if not _on_screen(c, 120.0):
 			continue
-		var tex := WispView.halo(24)
-		draw_texture_rect(tex, Rect2(((c / PX).round() - Vector2(24, 24)) * PX, Vector2(48, 48) * PX), false, Color(217 / 255.0, 190 / 255.0, 120 / 255.0, 0.4 + 0.05 * sin(t * 5.0)))
+		var tex := WispView.halo(48)
+		draw_texture_rect(tex, Rect2(((c / AP).round() - Vector2(48, 48)) * AP, Vector2(96, 96) * AP), false, Color(217 / 255.0, 190 / 255.0, 120 / 255.0, 0.4 + 0.05 * sin(t * 5.0)))
 
 ## embers and smoke, over the dark (called by world/atmos.gd with its canvas and the world-to-screen transform)
 func draw_air(cv: CanvasItem, xf: Transform2D, light: Callable) -> void:
@@ -174,16 +174,18 @@ func _draw_refl() -> void:
 		i += 1
 		if not _on_screen(ps, 400.0):
 			continue
-		var lsx := roundf(ps.x / PX)
-		var lsy := roundf(ps.y / PX) - 30.0
-		for d in range(24, 89):
-			var yy := lsy + d
-			var px := lsx + roundf(sin(t * 2.2 + yy * 0.5) * 1.4)
-			var ty := zone.type_at(Iso.to_tile(Vector2(px, yy) * PX))
+		# (on the 2 x 2 grid: twice the rows, each an art pixel)
+		var lsx := roundf(ps.x / AP)
+		var lsy := roundf(ps.y / AP) - 60.0
+		for d2 in range(48, 178):
+			var d := d2 / 2.0
+			var yy := lsy + d2
+			var px := lsx + roundf(sin(t * 2.2 + yy * 0.25) * 2.8)
+			var ty := zone.type_at(Iso.to_tile(Vector2(px, yy) * AP))
 			if ty != 4 and ty != 12:
 				continue
 			var n := Flame.hash2(int(yy), int(floor(t * 3.0)) + i * 7)
 			if n < 0.45 + (d - 24) / 130.0:
 				continue
 			var c := Color("#d8a848") if d < 44 and n > 0.9 else (Color("#8a6a30") if d < 60 else Color("#4e4022"))
-			refl.draw_rect(Rect2(Vector2(px, yy) * PX, Vector2(PX, PX)), c)
+			refl.draw_rect(Rect2(Vector2(px, yy) * AP, Vector2(AP, AP)), c)

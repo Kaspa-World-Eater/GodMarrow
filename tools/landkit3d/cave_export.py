@@ -58,6 +58,84 @@ def grid():
     return g, gcls
 
 
+def pool_sim_field(pool, spouts, NX=192, NY=96):
+    """the pool's simulation field (world/pool_life.gd; Derek, 2026-10-10: "a blood pool that flows like it has an
+    underground source that swells it and sloshes it, with the blood flowing from the faces into it like real water"):
+    over a screen rect round the pool, at NX x NY cells, which cells are blood (open to the waves) and which are the
+    stumps and the shore (they reflect them), read from the bake's own painted chunks (alpha 254 blood); and the steady
+    flow of the blood from where the faces pour and the spring wells up, round the stumps and out across the pool (a
+    potential flow solved on the cells, its walls the stumps). Written as pool_sim.png: R, G the flow (0.5 still), B
+    the blood mask. Returns the rect (screen px) and the file"""
+    idx = json.load(open(os.path.join(CB.OUT, "index.json")))
+    sc = float(idx["scale"])
+    cw, ch = idx["chunk"]
+    def scr(tx, ty):
+        return (tx - ty) * 72.0, (tx + ty) * 36.0 - float(pool["surface"]) * 84.0
+    cx, cy = scr(pool["cx"], pool["cy"])
+    R = float(pool["r_shore"]) + 1.6
+    hw, hh = R * 102.0, R * 51.0
+    x0, y0 = cx - hw, cy - hh
+    cell = (2 * hw / NX, 2 * hh / NY)
+    mask = np.zeros((NY, NX), np.uint8)
+    imgs = {}
+    for c in idx["chunks"]:
+        px, py = c["pos"]
+        w_, h_ = 4.0 * cw, 4.0 * ch
+        if px > x0 + 2 * hw or py > y0 + 2 * hh or px + w_ < x0 or py + h_ < y0:
+            continue
+        im = np.asarray(Image.open(os.path.join(CB.OUT, c["file"])).convert("RGBA"))
+        imgs[c["file"]] = (px, py, im)
+    for j in range(NY):
+        for i in range(NX):
+            sx, sy = x0 + (i + 0.5) * cell[0], y0 + (j + 0.5) * cell[1]
+            for (px, py, im) in imgs.values():
+                u, v = int((sx - px) / sc), int((sy - py) / sc)
+                if 0 <= v < im.shape[0] and 0 <= u < im.shape[1]:
+                    if im[v, u, 3] == 254:
+                        mask[j, i] = 1
+                    break
+    # the flow: sources where the faces pour and at the spring, an even sink over all the blood, walls at the stumps
+    src = np.zeros((NY, NX))
+    def put(tx, ty, k):
+        sx, sy = scr(tx, ty)
+        i, j = int((sx - x0) / cell[0]), int((sy - y0) / cell[1])
+        for dj in range(-2, 3):
+            for di in range(-2, 3):
+                if 0 <= j + dj < NY and 0 <= i + di < NX and mask[j + dj, i + di]:
+                    src[j + dj, i + di] += k / 25.0
+    for spt in spouts:
+        put(spt["x"], spt["y"], 1.0)
+    put(pool["cx"], pool["cy"], 2.0)
+    m = mask.astype(bool)
+    src[m] -= src[m].sum() / max(1, m.sum())
+    phi = np.zeros((NY, NX))
+    for _ in range(2500):
+        pp = np.pad(phi, 1, mode="edge")
+        mp = np.pad(m, 1, constant_values=False)
+        nb = []
+        for dj, di in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            q = pp[1 + dj:NY + 1 + dj, 1 + di:NX + 1 + di]
+            qm = mp[1 + dj:NY + 1 + dj, 1 + di:NX + 1 + di]
+            nb.append(np.where(qm, q, phi))                       # a wall: no flow across it (its value mirrors)
+        phi = np.where(m, (sum(nb) + src * 4.0) / 4.0, 0.0)
+    # the gradient between blood cells only (across a wall there is no flow)
+    def d1(a_, ax):
+        fwd = np.roll(a_, -1, ax) - a_
+        bwd = a_ - np.roll(a_, 1, ax)
+        mf = m & np.roll(m, -1, ax)
+        mb = m & np.roll(m, 1, ax)
+        return np.where(mf & mb, (fwd + bwd) / 2, np.where(mf, fwd, np.where(mb, bwd, 0.0)))
+    gx, gy = d1(phi, 1), d1(phi, 0)
+    vx, vy = -gx * m, -gy * m
+    mag = np.sqrt(vx ** 2 + vy ** 2)
+    k = 1.0 / max(np.percentile(mag[m], 95), 1e-6)
+    vx, vy = np.clip(vx * k, -1, 1), np.clip(vy * k, -1, 1)
+    out = np.dstack([(vx * 0.5 + 0.5) * 255, (vy * 0.5 + 0.5) * 255, mask * 255, np.full((NY, NX), 255)]).astype(np.uint8)
+    Image.fromarray(out, "RGBA").save(os.path.join(CB.OUT, "pool_sim.png"))
+    print("pool sim: %dx%d cells, %d of blood" % (NX, NY, int(m.sum())))
+    return dict(file="pool_sim.png", rect=[round(x0, 1), round(y0, 1), round(2 * hw, 1), round(2 * hh, 1)], nx=NX, ny=NY)
+
+
 def nearest_walk(g, p):
     H, W = g.shape
     best, bd = None, 1e9
@@ -178,6 +256,7 @@ def main():
     for (x_, y_, nx_, ny_, ux_, uy_, ln_) in CV.OOZE_FACES:             # the plain faces' tongues (cave3d.ooze_faces)
         sp.append(zone_of(CV.BASIN[0] - ux_ * (CV.BASIN[2] + 0.4), CV.BASIN[1] - uy_ * (CV.BASIN[2] + 0.4)))
     N["spouts"] = [dict(x=round(a_, 2), y=round(b_, 2)) for a_, b_ in sp]
+    N["pool"]["sim"] = pool_sim_field(N["pool"], N["spouts"])
     # candles (Derek, 2026-10-10: "add a few candles around in the cave main area and on the stairs to add a little light
     # an ambiance"): left by those who came before, in small clusters on the chamber's floor round the pool (never in the
     # blood) and at the stair's side ends every few steps; each a small warm light, drawn live (world/live_flames.gd)

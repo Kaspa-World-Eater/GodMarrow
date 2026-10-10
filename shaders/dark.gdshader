@@ -20,7 +20,7 @@ uniform float occ_h[128];// which hole it belongs to
 uniform float dark_a = 0.82;
 uniform vec3 dark_rgb = vec3(0.031, 0.051, 0.106);
 uniform float tint_a = 0.25;
-uniform float cell = 4.0;
+uniform float cell = 2.0;
 uniform float snap_n = 32.0;     // steps per channel for the final snap (0 = off)
 uniform vec3 amb = vec3(1.0);        // the land's shade by the hour (the web's ambient), lifted inside the pools
 uniform float amb_lift = 0.35;
@@ -88,7 +88,7 @@ vec3 grade(vec3 c, vec2 uv, vec2 fc) {
 	vec2 d2 = (uv - 0.5) * 2.0;
 	float dv = sqrt(d2.x * d2.x * 0.8 + d2.y * d2.y * 1.1);
 	float v = max(0.0, (dv - 0.66) / 0.5) * 3.0;
-	ivec2 cc = ivec2(floor(fc / 4.0));
+	ivec2 cc = ivec2(floor(fc / cell));
 	float th = (BAY[(cc.y & 3) * 4 + (cc.x & 3)] + 0.5) / 16.0;
 	float lv = min(3.0, floor(v) + ((v - floor(v) - 0.3) * 2.5 > th ? 1.0 : 0.0));
 	c = mix(c, vec3(0.02, 0.016, 0.035), lv * 60.0 / 255.0);
