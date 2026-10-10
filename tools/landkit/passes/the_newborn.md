@@ -231,3 +231,26 @@ restored from the commit before anything else ran.)
 
 **Grade: B-.** **Worst open:** 1. the faint rings at the wrists and knees; 2. paint (7): the picture is a stepped
 render; 3. the blood streaming off it is still 2D drips, not strands on the body.
+
+## Rules check (after pass 5)
+
+**Check:** rules and lore unchanged. The checklist: 1-6 pass, 8 passes (faint, honest), 9-11 pass, 12 and 13 in part.
+**7 (paint) fails outright:** the picture is a render with its value stepped; no hue-shifted ramp, no dither where
+tones meet, no lit lip. The rings at the wrists and knees (3, 9) barely show at the game's scale, so **7 first**.
+
+## Pass 6: the picture painted (checklist 7)
+
+`shaders/body3d.gdshader` now keeps the painting rules a live picture can:
+- a short ramp of 8 tones stepped in a square-root space, so the darks (most of a body in a cave) get their tones;
+- the ramp hue-shifted, its darks toward violet-blue and its lights warm (3.9);
+- dither only where one tone meets another (3.2): a 4x4 ordered pattern in the band at each step's edge, fixed to the
+  picture's own pixels so it rides with the body;
+- a lit lip (3.3, 3.13): an edge pixel already in the light is lifted a step, the rim the candle catches.
+
+**In the game, before and after at the same moments:** subtle at the game's size, but more tones in the dark, the warm
+lip on the skull and shoulders, cooler shadows. Smoke 12/0.
+
+**Grade: B-.** 7 now passes in part. Still missing: the dry-brush strokes along the form and the world-fixed tooth;
+that needs the form's direction, which a picture alone doesn't carry.
+**Worst open:** 1. the blood streaming off it is 2D drips, not strands on the body (10, 6); 2. the rings at the wrists
+and knees; 3. strokes and tooth (7).
