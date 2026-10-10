@@ -256,6 +256,8 @@ func _physics_process(dt: float) -> void:
 		if dead:
 			spr.step(dt)
 		return
+	if body3d and zone:
+		body3d.light_from(zone.d.get("lights", []), tp)   # the live body lit by the world's own lights
 	if scripted:
 		_sync()
 		return

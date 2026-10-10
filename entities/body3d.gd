@@ -29,6 +29,13 @@ var yaw := 0.0
 var yaw_to := 0.0
 var clip := ""
 var mats: Array = []                     # the model's surfaces (shaders/body3d_model.gdshader)
+var env: Environment
+var key: DirectionalLight3D
+var rim: DirectionalLight3D
+var lamps: Array = []                    # the world's lights near the body, placed where they truly are (light_from)
+var world_lit := false                   # lit only by the world's lights (light_from), not the fixed key and rim
+const N_LAMPS := 4
+const YD_M := 0.9144
 var sink := 0.0 :                        # metres under the ground line (the pool's surface): hidden below it
 	set(v):
 		sink = v
@@ -45,14 +52,15 @@ func _init(scene_path: String) -> void:
 	vp.msaa_3d = Viewport.MSAA_DISABLED
 	vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	add_child(vp)
-	var env := WorldEnvironment.new()
+	var we := WorldEnvironment.new()
 	var e := Environment.new()
+	env = e
 	e.background_mode = Environment.BG_CLEAR_COLOR
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	e.ambient_light_color = Color(0.32, 0.3, 0.34)
 	e.ambient_light_energy = 0.55
-	env.environment = e
-	vp.add_child(env)
+	we.environment = e
+	vp.add_child(we)
 	var cam := Camera3D.new()
 	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
 	cam.size = FRAME / PX_M
@@ -64,16 +72,23 @@ func _init(scene_path: String) -> void:
 	cam.transform = Transform3D(b, centre + b.z * 20.0)
 	vp.add_child(cam)
 	# the light: a key high from the upper left and in front (the sprites' own), a cool rim from behind
-	var key := DirectionalLight3D.new()
+	key = DirectionalLight3D.new()
 	key.light_color = Color(1.0, 0.93, 0.85)
 	key.light_energy = 1.35
 	key.rotation = Vector3(deg_to_rad(-48.0), deg_to_rad(-30.0), 0.0)
 	vp.add_child(key)
-	var rim := DirectionalLight3D.new()
+	rim = DirectionalLight3D.new()
 	rim.light_color = Color(0.72, 0.78, 1.0)
 	rim.light_energy = 0.9
 	rim.rotation = Vector3(deg_to_rad(-25.0), deg_to_rad(160.0), 0.0)
 	vp.add_child(rim)
+	for i in N_LAMPS:
+		var o := OmniLight3D.new()
+		o.visible = false
+		o.shadow_enabled = false
+		o.omni_attenuation = 1.2
+		vp.add_child(o)
+		lamps.append(o)
 	pivot = Node3D.new()
 	vp.add_child(pivot)
 	var ps: PackedScene = load(scene_path)
@@ -117,6 +132,48 @@ func face_ground(g: Vector2, at_once: bool = false) -> void:
 	yaw_to = atan2(g.x - g.y, g.x + g.y)
 	if at_once:
 		yaw = yaw_to
+
+## lit by the world's own lights, not a fixed key (pass 4; MASTER_RULES 0c: underground the fires make all the light,
+## no fill, ambient about 0.08): the strongest few of the zone's lights at the body's place `tp` (tiles), each an omni
+## light in the body's little world where it truly stands from the body (the ground's axes turned to the camera's, its
+## height above the body's floor, its colour and reach), the pool's raw red glow among them. Call every frame or so.
+func light_from(lights: Array, tp: Vector2) -> void:
+	if not world_lit:
+		world_lit = true
+		key.visible = false
+		rim.visible = false
+		env.ambient_light_color = Color(0.5, 0.42, 0.45)
+		env.ambient_light_energy = 0.08
+	var floor_yd := Iso.lift(tp) / Iso.lift_px
+	var best: Array = []
+	for L in lights:
+		var t := String(L.get("type", ""))
+		if t != "fire" and t != "raw":
+			continue
+		var lt := Vector2(float(L.get("x", 0)), float(L.get("y", 0)))
+		var R := float(L.get("radius", 3.0)) if t == "fire" else float(L.get("radiusPx", 36.0)) / 18.0
+		var a := float(L.get("a", 1.0)) if t == "fire" else 0.9
+		var d := lt.distance_to(tp)
+		var reach := R * 1.6
+		if d > reach:
+			continue
+		var w := a * pow(1.0 - d / reach, 2.0)
+		var h := (Iso.lift(lt) / Iso.lift_px + float(L.get("heightPx", 0)) / 21.0) if t == "fire" else floor_yd + 0.15
+		best.append([w, lt, h, reach, a, String(L.get("rgb", "255,150,72")), t])
+	best.sort_custom(func(p, q): return p[0] > q[0])
+	for i in lamps.size():
+		var o: OmniLight3D = lamps[i]
+		if i >= best.size():
+			o.visible = false
+			continue
+		var b: Array = best[i]
+		var g: Vector2 = b[1] - tp
+		o.position = Vector3((g.x - g.y) / sqrt(2.0), float(b[2]) - floor_yd, (g.x + g.y) / sqrt(2.0)) * YD_M
+		o.omni_range = float(b[3]) * YD_M
+		var rgb: PackedStringArray = String(b[5]).split(",")
+		o.light_color = Color8(int(rgb[0]), int(rgb[1]), int(rgb[2]))
+		o.light_energy = (2.8 if b[6] == "fire" else 1.6) * float(b[4])
+		o.visible = true
 
 func _process(dt: float) -> void:
 	var d := wrapf(yaw_to - yaw, -PI, PI)

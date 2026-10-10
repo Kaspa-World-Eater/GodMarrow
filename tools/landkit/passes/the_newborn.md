@@ -191,3 +191,23 @@ hanging in flaps at the sides of the head.
 2. No shadow (8).
 3. The wrists and knees still show faint rings where the doll's cuffs were.
 4. Paint (7): the picture is a stepped render, not yet painted.
+
+## Rules check (after pass 3), and pass 4: lit by the cave's own lights
+
+**Check:** `MASTER_RULES` and the area's lore unchanged (no commits but mine). The checklist as after pass 3; the worst
+open line is **4 (light)**, with **13 (cinematography: every source seen, silhouettes and rims, the room's colour of
+light)**. The body was lit by its own fixed key and rim, though underground the fires make all the light.
+
+**Pass 4:** `Body3D.light_from()` (called by the hero each frame) takes the strongest four of the zone's lights at the
+body's place: the candles, the braziers and the pool's raw red glow. It sets each as an omni light in the body's little
+world, where it truly stands from the body: the ground's axes turned to the camera's, its height above the body's floor
+(`heightPx` over its own floor, from `Iso.lift`), its colour and its reach. The fixed key and rim go out, and the
+ambient drops to 0.08 (MASTER_RULES 0c).
+- **In the game:** in the pool the body is lit red from below by the glow, the first sight of it. At the edge it is a
+  dark shape with a warm candle rim on its back and skull. Standing, the candles catch its shoulder and head. The fires
+  were lifted a little (2.2 to 2.8) so the retch reads (Derek: "You can't really enjoy the oh shit if you can't see
+  it").
+- **Smoke 12/0. 60 fps in the cave with the body** (the 55 measured at pass 1 was taken while the cove bake ran).
+
+**Grade: B-** (light now passes; the next items hold it).
+**Worst open:** 1. no shadow (8); 2. the faint rings at the wrists and knees; 3. paint (7).
