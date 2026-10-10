@@ -86,6 +86,8 @@ static func run(g) -> void:
 		_flowtest(g)
 	if a.has("walklog"):
 		_walklog(g)
+	if a.has("isotest"):
+		_isotest(g)
 	if a.has("shot"):
 		_shot(g, a)
 	if a.has("groundfire"):
@@ -998,3 +1000,25 @@ static func _walklog(g) -> void:
 		var h = g.hero
 		print("WALK t%d tp %s moved %.2f walking %s path %d/%d act '%s' scripted %s" % [i, h.tp, h.tp.distance_to(last), h.walking, h.path_i, h.path.size(), h.act, h.scripted])
 		last = h.tp
+
+## --isotest: every walkable tile's centre to the screen (lifted) and back (Iso.to_tile, as a click is read): how far off
+static func _isotest(g) -> void:
+	await g.get_tree().create_timer(1.0).timeout
+	var z = g.zone
+	var bad := 0
+	var worst := 0.0
+	var n := 0
+	var where := Vector2.ZERO
+	for y in z.h:
+		for x in z.w:
+			var t := Vector2(x + 0.5, y + 0.5)
+			if z.is_solid(t):
+				continue
+			n += 1
+			var e := Iso.to_tile(Iso.to_screen(t)).distance_to(t)
+			if e > 0.5:
+				bad += 1
+			if e > worst:
+				worst = e
+				where = t
+	print("ISO tiles %d, off by more than half a tile %d, worst %.2f at %s" % [n, bad, worst, where])

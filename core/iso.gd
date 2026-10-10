@@ -22,8 +22,12 @@ static var lift_h := 0
 static var lift_res := 0.5
 static var lift_px := 84.0
 
+static var lift_max := 0.0
 static func set_lift(z: PackedFloat32Array, w: int, h: int, res: float, px: float) -> void:
 	lift_z = z
+	lift_max = 0.0
+	for v in z:
+		lift_max = maxf(lift_max, v)
 	lift_w = w
 	lift_h = h
 	lift_res = res
@@ -59,10 +63,37 @@ static func to_tile(s: Vector2) -> Vector2:
 	var u := s.x / HX
 	var v := s.y / HY
 	var t := Vector2((u + v) * 0.5, (v - u) * 0.5)
-	if lift_w > 0:                 # a point seen on lifted ground lies further south: walk back down to it
-		for i in 4:
-			v = (s.y + lift(t)) / HY
-			t = Vector2((u + v) * 0.5, (v - u) * 0.5)
+	if lift_w > 0 and lift_max > 0.0:
+		# a point seen on lifted ground lies further south, along the one line of the map that screen x allows: scan
+		# down that line for where the ground's own drawn height meets the point, and take the nearest such place to
+		# the camera (the most southern: a ledge hides what lies behind and below it). (Four fixed-point steps had
+		# left 167 of the cave's tiles wrong, up to 13 tiles off: Derek, 2026-10-10, "hes walking way more than i click")
+		var v0 := s.y / HY
+		var v1 := (s.y + lift_max * lift_px) / HY + 0.5
+		var best := t
+		var prev_g := 0.0
+		var vv := v1
+		var first := true
+		while vv >= v0 - 0.01:
+			var tt := Vector2((u + vv) * 0.5, (vv - u) * 0.5)
+			var gg := vv * HY - lift(tt) - s.y
+			if not first and signf(gg) != signf(prev_g):
+				# the crossing lies between vv and vv + step: refine it
+				var a_ := vv
+				var b_ := vv + 0.25
+				for k in 12:
+					var m_ := (a_ + b_) * 0.5
+					var tm := Vector2((u + m_) * 0.5, (m_ - u) * 0.5)
+					if signf(m_ * HY - lift(tm) - s.y) == signf(gg):
+						a_ = m_
+					else:
+						b_ = m_
+				var vf := (a_ + b_) * 0.5
+				return Vector2((u + vf) * 0.5, (vf - u) * 0.5)
+			prev_g = gg
+			first = false
+			vv -= 0.25
+		return best
 	return t
 
 ## depth for y-sorting: the web sorts by x + y; screen y is proportional to it

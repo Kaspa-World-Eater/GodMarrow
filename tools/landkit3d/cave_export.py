@@ -293,10 +293,12 @@ def main():
             continue
         cands.append((cx_, cy_, f_))
         got += 1
+    # (Derek, 2026-10-10: "remove 25% of the candles but increase the light they produce by 50%")
+    cands = [c_ for k_, c_ in enumerate(cands) if k_ % 4 != 3]
     for cx_, cy_, f_ in cands:
         zx_, zy_ = zone_of(cx_, cy_)
         lights.append(dict(type="fire", kind="floorcandles", x=round(zx_, 2), y=round(zy_, 2), radius=3.0, rgb="255,150,64",
-                           a=0.6, heightPx=4, dxPx=0, zAbs=round(float(f_) + 0.2, 2)))
+                           a=0.9, heightPx=4, dxPx=0, zAbs=round(float(f_) + 0.2, 2)))
     N["lights"] = lights
     N["sunless"] = True                                               # no sun throws a shadow down here (entities/sil_shadow.gd)
     path = os.path.join(ROOT, "data", "zones", "opening_cave_s%d.json.gz" % CB.SEED)

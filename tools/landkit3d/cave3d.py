@@ -1870,6 +1870,11 @@ def build(root, material):
     for i, (y, kind, H) in enumerate(STAIR_FACES):
         fz = (floor_at(STAIR[0] + 0.4, y) or 0.0) + 0.35 + 0.575 * H
         torch("torch%d" % (i + 1), wx + 0.35, y + 0.3, fz + 0.64 * H, FACE_TURN[0], FACE_TURN[1], 140.0)   # above its head
+    # and one on the stair's right wall, between the faces (Derek, 2026-10-10: "the stairs could use another torch"): the
+    # climb lit from both sides at its middle, the steps' edges raked across
+    rx = STAIR[1] + 0.05
+    fr = floor_at(STAIR[1] - 0.4, -11.0) or 0.0
+    torch("torch_r", rx - 0.15, -11.0, fr + 2.2, -1.0, 0.0, 120.0)
     f = floor_at(STAIR[0] + 0.4, -15.2) or 0.0
     skeleton(wx + 0.3, -15.2, f + 1.5, 1.0, 0.0)
     stairs_cut()
