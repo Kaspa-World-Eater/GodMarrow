@@ -184,76 +184,96 @@ to threads. He has laid this reading for every one who came up the stairs, and i
 things, laughs a moment too long, speaks to the empty throne as if it had said something, and mocks the pilgrim
 gently, because he knows how it ends. Every line is short. He never explains.
 
-**His lines** (in-game writing, second draft, 2026-10-09; Derek: "come up with some good dialogue better than what you
-shared earlier"). He stands on the top step under the great face, beside the onyx mirror, never in front of it. He
-talks to the pilgrim as to a child who has come home late, and to the great face as to an old man who interrupts.
-Every line is short. He never explains, and he is never quite wrong.
+**His lines** (in-game writing, third draft, 2026-10-09). Derek: "play on words like hide and hide and then like not
+talk directly at you but like through you like you're not even really there almost like he's doing a tarot reading
+with no one else there speaking to himself but also kind of at you. And subtle hiddens in his dialogue of the lore of
+the world."
+
+**How he speaks.** He never looks up. He lays the cards for someone who is not quite there. He talks to the cards, to
+the great face and to himself, and of the pilgrim as "it", "this one", "the wet one"; "you" slips out of him now and
+then, as if by mistake, and he does not take it back. He plays on words the way a man plays with a coin: **hide** (the
+skin; the Hide the world is; the hiding the people did), **Red** and **read**, **lie** (lie down, lie), **count**, **held**,
+**face**. Under the play, the lore lies where only someone who knows it will find it:
+- the god is dead and dreaming;
+- the people came out of a mouth;
+- the faces are masks;
+- the Gleaner is still counting;
+- the dark moon has someone giving orders on it;
+- the Keeper is still listening;
+- the out-breath is still going out;
+- something under the iron strikes back;
+- the cycle comes round again.
+None of it is said plainly.
 
 *As the pilgrim climbs into sight (one of):*
-- "There you are. Still warm from it. Mind the steps; they're older than walking."
-- "Up, up. The first ones crawled the whole way. You're walking already. Show-off."
-- "Another one out of the pot."
+- "Another one up out of the Red. Into the read, then."
+- "Wet footsteps. ...Lay the cloth."
+- "Up the stair it comes, the way they all come. As if the stair had asked."
 
-*The first time the pilgrim speaks to him:*
-1. "Don't wipe it off. It's the only thing you're wearing that's yours."
-2. "You came up out of the Red with nothing in your mouth. No name. No god. No reason. That won't do. He won't let
-   you through like that." *(He tips his head back at the great face without looking at it.)*
-3. "Sit. The floor's fine. Everyone sits on the floor here. He's the only one with a seat, and he hasn't the body for
-   it."
-4. "I have a deck. It was old when the god was young, and it's missing cards nobody remembers. We'll find out who you
-   are. Or we'll decide. From the outside it looks the same."
+*The first time the pilgrim speaks to him* (he is shuffling, and does not stop):
+1. "They come up out of the Red looking for somewhere to hide. And there's only the one Hide. They're standing on it."
+2. *(To the cards:)* "Look at it. Wet as a birth, and nothing in its mouth. No name. No god. We'll find it some. We
+   always do."
+3. "First card's the hide. It's got one now. Still wet. Mind what it keeps in it; everything here keeps something in
+   its hide."
+4. *(To the great face, not looking round:)* "Yes, I see it. I'm not blind. Not that eye, anyway."
 
 *What the pilgrim can say:*
-- **"Read me."** "Good. Hands where I can see them. Not for me. For them." *(The Reading begins.)*
-- **"Who are you?"** "Me? I'm the one who's here when you come up. That's the whole of me. I had a name once. I dealt
-  it to someone. Lovely girl. Didn't last."
-- **"What is this place?"** "A room somebody cut for something. They cut all those faces so it wouldn't be lonely. It
-  didn't work. Ask the faces. They've been listening longer than I have."
-- **"What is that?"** *(the mirror)* "A door. A mouth. A bad mirror. Whatever you like. It doesn't mind. It doesn't
-  do anything. That's what's wrong with it."
-- **"Choose for me."** "Lazy. Good. The ones who choose everything take so long." *(He reads it all himself.)*
+- **"Read me."** "It wants reading. They always want reading. As if there were a way not to be read." *(The Reading
+  begins.)*
+- **"Who are you?"** *(To the cards:)* "It wants to know who's reading. Go on, tell it." *(He turns a card over,
+  looks at it a long while, and puts it back.)* "...No. Not that one either."
+- **"What is this place?"** "A room with a mouth in it. Or a mouth with a room in it. The ones who cut it didn't stay to
+  say. The last lot who came out of a mouth thought it was the beginning of everything." *(He laughs, a beat too
+  long.)*
+- **"What is that?"** *(the mirror)* "The way out. Nothing looks back from it. Something used to."
+- **"Choose for me."** "It won't choose. Good. The cards were choosing before it was warm. They only like being asked."
 
-*The Reading* (each of the nine draws, `00-the-deep-lore.md`; the game picks one line a draw):
-1. **The god** (chosen at the order's page; he only turns it over): "Your god. You picked it before you were born,
-   which is the only time anyone picks well."
-2. **The face:** "Gods keep a few faces for the ones who come asking. Three on the cloth. One of them has been wearing
-   you since before you climbed out. Which?" / "Faces. Take the one that looks least surprised to see you."
-3. **The card:** "Now one from the deck. Don't turn it. I turn it. If it comes up the wrong way, that's not my fault.
-   That's yours." / "Draw. Gently. They bruise."
-4. **The fear:** "What frightens you? Quickly, before you think of something brave." / "Put your fear on the cloth.
-   It's safer there than in you. For a minute."
-5. **The seeking:** "And what do you go out there for? Everyone says something. It's never true. Say something
-   anyway." / "What do you want? ...No. Under that."
-6. **The road:** "You remember a road. You never walked it. Pick one, and it will have been yours." / "Which road
-   brought you? Don't look so lost. Choose, and it brought you."
-7. **The question:** "One question. I always ask one. It's the only one that matters, and you won't know which it was."
-8. **The price:** "Now the price. Not coin; you haven't any, and I've no pockets. Something of you stays on this step." /
-   "Something stays with me. Look at the heap. They all leave something."
-9. **The reading:** "There. That's you." *(He looks at the cards a long time.)* "Isn't it horrible? A moment ago you
-   were nothing, and it was so quiet."
+*The Reading* (each of the nine draws, `00-the-deep-lore.md`; the game picks one line a draw; he speaks to the spread,
+not to the pilgrim):
+1. **The god** (chosen at the order's page; he only turns it over): "The god first. It's turned itself already. They
+   do, for this one." / "There. A dead thing dreaming it's a god. Or a god dreaming it's dead. Hard to tell from in
+   here."
+2. **The face:** "Faces. Three. Every god keeps a drawer of them. One's been wearing this one since before the hide
+   was." / "Watch its hand, not its eyes. The hand knows which face."
+3. **The card:** "One from the deck, blind. If it comes up the wrong way, well. Everything here's the wrong way up.
+   Ask the cities on the ridge." / "Draw. Gently. They bruise. ...So do you."
+4. **The fear:** "What it fears. It'll lie about this one. They all lie. The card lies down and tells the truth." /
+   "Put the fear down here, little hide, where it can be counted."
+5. **The seeking:** "What it's after. Marrow, whatever it calls it. They're all after marrow." / "It wants something.
+   Something wants it back. That's how the Hide stays fed."
+6. **The road:** "The road it came by. It didn't. It came up a stair out of a pool an hour ago. Give it a road anyway.
+   A road's a kindness." / "Pick it a road. It'll have walked it by morning. That's how roads work here."
+7. **The question:** "One question. Not for it. For me." *(He listens to nothing for too long.)*
+8. **The price:** "The price. Something stays on the step with the rest. The Gleaner keeps a count; leave him something
+   to count." / "Something of the hide stays here. Not much. The hide grows back. Mostly."
+9. **The reading:** "There. That's the hide of it." *(He looks at the spread a long time.)* "And what's hid in it."
+   / "Isn't it horrible? A moment ago it was nothing, and it was so quiet."
 
-*Spoken to the great face, now and then, not to the pilgrim:*
-- "No. This one's mine till the cards are down. ...Yes. I know."
-- "He can hear you. Of course he can hear you. Stop it."
-- "You said that about the last one." *(A long pause.)* "Well. You were right about the last one."
+*Spoken to the great face, now and then:*
+- "Don't. It's listening. They always listen at this part."
+- "You said that about the last one." *(A long pause.)* "...You were right about the last one."
+- "No, it doesn't know. They never know. Keep it from the Keeper."
+- "Breathe out, then. You've been breathing out for a thousand years. One more won't hurt."
 
 *After the Reading, if the pilgrim lingers (one of):*
-- "Still here? Walk into it. No, don't knock. It's rude to knock on a mouth."
-- "You'll come out on the sand. Don't count them. I did, once. It took a winter, and then the sea brought more."
-- "If you find yourself out there, face down in the red, don't turn it over. Bad luck. For it."
-- "Four hundred and nine faces. I counted them the first winter. The second winter there were none. Only stone. Only
-  you, looking."
+- "Still here? The mouth's that way. The people went out by one, once. Look how that turned out."
+- "Out on the sand they're all lying down, wearing its face. Lying is what the sand's for. Don't turn them over."
+- "Count the faces on its way out, if it likes. The count's never the same twice. Nothing here likes being counted.
+  Except the dead. The dead love it."
+- "The brown moon's up, behind all that grey. Somebody on it is still giving orders. It shouldn't take any."
+- "It shouldn't strike iron on iron down here. Something underneath strikes back."
 
 *If the pilgrim looks at the heaps at the stair's foot:*
-- "Gifts. Everyone who came up left something. Most of them left what they were holding."
-- "One left her teeth. I didn't ask."
+- "Gifts. Each one left something. Most of them left what they were holding."
+- "One left her teeth." *(To the cards:)* "I didn't ask, did I. No. I didn't ask."
 
 *When the skeleton's weapon falls, on the stairs below (his voice carries up):*
-- "Take it. He won't miss it. He's held it out for a hundred years. His arm must be numb."
+- "Take it. He's held it out for a hundred years. Held. Everything here is held, one way or another."
 
-*As the pilgrim walks into the mirror (he does not look up):*
-- "Don't look back. Not because it's forbidden. Because there's nothing to see, and you'll mind."
-- "Go on. I'll keep your place."
+*As the pilgrim walks into the mirror* (he is gathering the cards back into the deck, and does not look up):
+- "There it goes. Don't look back. There's nothing to see, and it'll mind."
+- *(Squaring the deck, to no one:)* "Again, then."
 
 ## For building it
 

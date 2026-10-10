@@ -24,21 +24,23 @@ const CH := 252.0
 const STEPS := ["star", "face", "card", "fear", "seek", "road", "ask", "sac", "end"]
 ## what he asks at each step (one of these, each time)
 const PROMPT := {
-	"face": ["Gods keep a few faces for the ones who come asking. Three on the cloth. One of them has been wearing you since before you climbed out. Which?",
-		"Faces. Take the one that looks least surprised to see you."],
-	"card": ["Now one from the deck. Don't turn it. I turn it. If it comes up the wrong way, that's not my fault. That's yours.",
-		"Draw. Gently. They bruise."],
-	"fear": ["What frightens you? Quickly, before you think of something brave.",
-		"Put your fear on the cloth. It's safer there than in you. For a minute."],
-	"seek": ["And what do you go out there for? Everyone says something. It's never true. Say something anyway.",
-		"What do you want? ...No. Under that."],
-	"road": ["You remember a road. You never walked it. Pick one, and it will have been yours.",
-		"Which road brought you? Don't look so lost. Choose, and it brought you."],
-	"sac": ["Now the price. Not coin; you haven't any, and I've no pockets. Something of you stays on this step.",
-		"Something stays with me. Look at the heap. They all leave something."],
+	"face": ["Faces. Three. Every god keeps a drawer of them. One's been wearing this one since before the hide was.",
+		"Watch its hand, not its eyes. The hand knows which face."],
+	"card": ["One from the deck, blind. If it comes up the wrong way, well. Everything here's the wrong way up. Ask the cities on the ridge.",
+		"Draw. Gently. They bruise. ...So do you."],
+	"fear": ["What it fears. It'll lie about this one. They all lie. The card lies down and tells the truth.",
+		"Put the fear down here, little hide, where it can be counted."],
+	"seek": ["What it's after. Marrow, whatever it calls it. They're all after marrow.",
+		"It wants something. Something wants it back. That's how the Hide stays fed."],
+	"road": ["The road it came by. It didn't. It came up a stair out of a pool an hour ago. Give it a road anyway. A road's a kindness.",
+		"Pick it a road. It'll have walked it by morning. That's how roads work here."],
+	"sac": ["The price. Something stays on the step with the rest. The Gleaner keeps a count; leave him something to count.",
+		"Something of the hide stays here. Not much. The hide grows back. Mostly."],
 }
-## the end: what he says over the finished spread (docs/wiki/mythology/areas/the-red-shore.md, his lines)
-const END_SAY := "There. That's you. Isn't it horrible? A moment ago you were nothing, and it was so quiet."
+## the end: what he says over the finished spread (docs/wiki/mythology/areas/the-red-shore.md, his lines). He speaks
+## through the pilgrim, to the cards and to himself, as if no one were quite there (Derek, 2026-10-09)
+const END_SAY := ["There. That's the hide of it. ...And what's hid in it.",
+	"Isn't it horrible? A moment ago it was nothing, and it was so quiet."]
 const STEP_NAME := {"star": "The God", "face": "The Face", "card": "The Card", "fear": "The Fear", "seek": "The Seeking",
 	"road": "The Road", "ask": "The Question", "sac": "The Price", "end": "The Reading"}
 ## how a fate's sum reads, in the order it is shown
@@ -157,7 +159,7 @@ func _enter(i: int) -> void:
 			var pool: Array = fit if not fit.is_empty() and randf() < 0.75 else any
 			prophecy = String(pool[randi() % pool.size()]) if not pool.is_empty() else ""
 			_sum()
-			prompt = END_SAY
+			prompt = END_SAY[randi() % END_SAY.size()]
 	if PROMPT.has(s):
 		var pv: Array = PROMPT[s]
 		prompt = aside + String(pv[randi() % pv.size()])
