@@ -308,7 +308,9 @@ func _on_enter() -> void:
 	var s := Q.state()
 	if act_n > int(s["act"]) and not zid.begins_with("qvault_"):
 		s["act"] = act_n
-	var fresh := Q.activate(act_n)
+	# the opening cave is presentation, not a quest (Derek, 2026-10-09): the act's vows wait until the pilgrim is out on
+	# the sand
+	var fresh: int = 0 if zid == "opening_cave" else Q.activate(act_n)
 	if fresh > 0:
 		_later(2.6, func(): Bus.say.emit("New grave vows are written in your journal (J)", 4.0))
 	if Q.is_town(zid):

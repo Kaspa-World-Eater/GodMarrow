@@ -873,3 +873,12 @@ newest note on the review page, `cave_now`: "Bodies look bad".
   bad". This is the worst failure.
 **The fix is a piece of its own** (2b, 2.3): one shared body for the cave, the beach and every later dead. Its rules
 check and brief are written at the head of `tools/landkit/passes/the_dead.md`, for Derek's go before pass 1.
+
+## Rules check (6th since pass 11): waiting on Derek's go for the dead
+
+**Read:** `MASTER_RULES` (unchanged since the 5th); the area's opening: "presentation, not a quest" (Derek). **Worst
+failure still the dead**, which wait for Derek's go on their brief (`the_dead.md`). **Improved meanwhile:** the old
+"New grave vows are written in your journal" line greeted the pilgrim rising out of the pool, a quest-log notice in
+the one place that is pure presentation. The act's vows now wait until the pilgrim is out on the sand
+(`world/objects/manager_build.gd`, `_on_enter`): checked in the game (no line in the cave; the line on the cove);
+smoke test 0 errors.
