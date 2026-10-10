@@ -580,15 +580,26 @@ def bones_jam():
                                               c[2] + sgn * 0.05)], [r * 0.22, r * 0.12], "bone", 7)
         laid.append((x, y, z + r * 0.75, r))
 
+    # ways through the jam (Derek, 2026-10-10: "we need paths occasionaly between the large bones to explore easier"):
+    # every so often along the shore a gap three or four yards wide, where the storms left the bones lying apart, so the
+    # backshore and the beach are joined by more than the jam's ends
+    gaps = [(-47.0, 1.9), (-27.5, 1.7), (-1.5, 2.0), (17.0, 1.8), (37.5, 1.9), (56.0, 1.7)]
+
+    def in_gap(t_lo, t_hi):
+        return any(t_hi > g - w and t_lo < g + w for g, w in gaps)
+
     n = 0
-    for i in range(40):
+    for i in range(48):
         t_c = rnd.uniform(T0 + 6, T1 - 6)
-        s_c = rnd.uniform(44.0, 49.5) if i < 32 else rnd.uniform(50.0, 52.0)
+        s_c = rnd.uniform(44.0, 49.5) if i < 38 else rnd.uniform(50.0, 52.0)
         if float(BF.cove_d(np.array([s_c]), np.array([t_c]))[0]) > -6.0:
             continue
         ln_ = rnd.uniform(5.0, 10.0)
         r_ = rnd.uniform(0.2, 0.34)
         yaw_ = rnd.gauss(0, 0.35)
+        half = 0.5 * ln_ * abs(math.cos(yaw_)) + r_ * 2.5
+        if in_gap(t_c - half, t_c + half):
+            continue
         long_bone(n, s_c, t_c, ln_, r_, yaw_)
         for u in np.linspace(-0.5, 0.5, max(2, int(ln_ / 1.2))):
             OBSTACLES.append((s_c + u * ln_ * math.sin(yaw_), t_c + u * ln_ * math.cos(yaw_), r_ * 1.3 + 0.1))
@@ -600,11 +611,17 @@ def bones_jam():
         rib(k, s0 - k * 0.25, t0 + k * 1.25, rnd.uniform(3.2, 4.2), 0.25 + rnd.uniform(-0.08, 0.08), rnd.uniform(1.3, 2.1),
             rnd.uniform(0.25, 0.5), rnd.uniform(0.2, 0.26))
     for k in range(4, 14):
-        rib(k, rnd.uniform(45.0, 50.5), rnd.uniform(T0 + 8, T1 - 8), rnd.uniform(2.5, 4.0), rnd.uniform(-0.6, 0.6),
-            rnd.uniform(0.4, 0.9), rnd.uniform(0.9, 1.3), rnd.uniform(0.17, 0.22))
+        rs_, rt_, rsp = rnd.uniform(45.0, 50.5), rnd.uniform(T0 + 8, T1 - 8), rnd.uniform(2.5, 4.0)
+        ryaw, rh, rlean, rr0 = rnd.uniform(-0.6, 0.6), rnd.uniform(0.4, 0.9), rnd.uniform(0.9, 1.3), rnd.uniform(0.17, 0.22)
+        if in_gap(rt_ - rsp * 0.6, rt_ + rsp * 0.6):
+            continue
+        rib(k, rs_, rt_, rsp, ryaw, rh, rlean, rr0)
     for k in range(14):
         vs, vt = rnd.uniform(45.5, 52.5), rnd.uniform(T0 + 8, T1 - 8)
-        vertebra(k, vs, vt, rnd.uniform(0.5, 0.75))
+        vr = rnd.uniform(0.5, 0.75)
+        if in_gap(vt - 1.6, vt + 1.6):
+            continue
+        vertebra(k, vs, vt, vr)
         OBSTACLES.append((vs, vt, 0.9))
 
 

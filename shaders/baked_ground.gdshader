@@ -19,6 +19,7 @@ uniform bool red = false;
 // surge of the heartbeat the swash runs up the real sand as a thin film with a dull froth at its lip, then drains back,
 // leaving the sand dark and wet behind it until the next beat
 uniform bool has_shore = false;
+uniform bool live_sea = false;          // the Red drawn live in 3D over this (world/red_sea.gd): no painted swash
 // a still pool of blood (the opening cave's; Derek, 2026-10-10: it "moves chunky and doesnt look like a smoothly animated
 // pool of blood", its drips' ripples "frozen"): no texel ever slides; a slow sheen drifts over the thick surface and it
 // breathes a little on the heartbeat; live rings spread where the faces' blood strikes it and wherever a body moves in it
@@ -109,7 +110,7 @@ void fragment() {
 		if (c.a < 0.5) discard;
 	} else {
 		if (c.a < 0.5) discard;
-		if (red && has_shore) {
+		if (red && has_shore && !live_sea) {
 			// thick blood on a dying heartbeat (Derek, 2026-10-09: "slower and gentler since it's thick blood and a heart
 			// beat"): one slow beat, a surge and a weaker one, then a long stillness; the swells barely sag in, the swash
 			// creeps up a yard or so and drains back slower than it came, and leaves the sand dark

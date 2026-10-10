@@ -120,6 +120,12 @@ static func build(z) -> bool:
 	print("baked ground: %d chunks, %d sorted bands from %s" % [idx["chunks"].size(), bands, d])
 	# the picture's own bounds: the camera stops at them, as Diablo stops at a map's edge, so the view never runs past what
 	# was baked (Derek, 2026-10-10: in the cave "the screen is cut off at the top")
+	# the Red, live (world/red_sea.gd): its waves in real 3D over the baked sea, drawn above the ground, under all that stands
+	var sf: Dictionary = idx.get("seafield", {})
+	if str(idx.get("water", "")) == "red" and not sf.is_empty() and FileAccess.file_exists(d + "/" + str(sf["file"])) and OS.get_environment("GM_NO_SEA") == "":
+		var wo: Array = idx.get("world_origin", [-108.0, -108.0])
+		ground.add_child(load("res://world/red_sea.gd").new(d, sf, float(wo[0]), float(hz.get("lift", 84.0))))
+		mat.set_shader_parameter("live_sea", true)
 	z.set_meta("bake_rect", bounds)
 	z.set_meta("ground_mats", [mat, bmat])         # the fires relight both (world/live_flames.gd)
 	return true

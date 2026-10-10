@@ -179,6 +179,11 @@ def cut_chunks(t, d, img):
     return rows
 
 
+# what is big enough to stand in the way (Derek, 2026-10-10: "little debris on the beach shouldnt block the path"): the
+# columns, the great bones, the canoes, the heavy logs and cairns; pebbles, sticks, small drift and kelp are walked over
+BLOCK_R = 0.3                                        # (pebbles, cobbles and thin drift are less; the bones, the root wads, the heavy logs more)
+
+
 def lattice(obst):
     """the floor's height and the block map on the half-yard lattice"""
     gx, gy = np.meshgrid(np.arange(0, 2 * W + 1), np.arange(0, 2 * H + 1))
@@ -190,7 +195,8 @@ def lattice(obst):
     bl[s > BF.WATER + 0.6] = 128
     bl[BF.cove_d(s, t) > -0.4] = 255
     for (os_, ot_, r) in obst:
-        bl[np.hypot(s - os_, t - ot_) < r] = 255
+        if r >= BLOCK_R:                                   # (the little debris is walked over: Derek, 2026-10-10)
+            bl[np.hypot(s - os_, t - ot_) < r] = 255
     return hg, bl
 
 

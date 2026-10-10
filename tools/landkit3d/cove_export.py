@@ -69,6 +69,8 @@ def grid():
     # what stands on the sand
     obst = json.load(open(os.path.join(CB.OUT, "obstacles.json")))
     for (os_, ot_, r) in obst:
+        if r < CB.BLOCK_R:
+            continue                                     # little debris is walked over (Derek, 2026-10-10)
         near = np.hypot(s - os_, t - ot_) < r + 0.25
         g[near & (g == WALK)] = ROCK
     gcls = np.where(g == WATER, 7, np.where(g == WALK, 4, 1)).astype(np.uint8)
@@ -121,6 +123,9 @@ def main():
     bi["shore"] = dict(file="shore.png", w=int(W), h=int(H), span=SPAN)
     with open(ip, "w", newline="\n") as fh:
         json.dump(bi, fh, indent=0)
+    # the Red's field for the live sea (world/red_sea.gd)
+    import sea_field
+    sea_field.write(CB.OUT)
     seen, walk = reach(g, st0)
     cut = walk & ~seen
     # small pieces cut off by the obstacles go solid (a yard or two between a bone and the cliff); report the rest
