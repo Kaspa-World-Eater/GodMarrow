@@ -107,20 +107,25 @@ def masses(state, roll):
         if side:
             rw, rh = rh * 1.05, rw * 0.92
         A.append((a, b, t, rw, rh, "corpse"))
-    tr("pelvis", "lumbar", 0.0, 0.165 * f, 0.105 * f)
-    tr("pelvis", "lumbar", 0.75, 0.14 * f, 0.11 * belly)
-    tr("lumbar", "chest", 0.55, 0.15 * f, 0.125 * (belly * 0.5 + 0.5))
-    tr("chest", "neck", 0.15, 0.165 * f, 0.13 * f)
-    tr("chest", "neck", 0.6, 0.18 * f, 0.115 * f)
-    tr("neck", "head", 0.15, 0.06 * f, 0.055 * f)
-    tr("neck", "head", 1.0, 0.085 * f, 0.1 * f)
+    # bloat (chapter 15, 6h): the whole trunk swells taut into a dome, more than the belly alone (face down, the belly
+    # is under it, so it is the back that rises), the neck and the face puffed by about two fifths
+    dome = dict(bloat=1.45, rot=0.8).get(state, 1.0)
+    face = dict(bloat=1.4, rot=0.85).get(state, 1.0)
+    tr("pelvis", "lumbar", 0.0, 0.165 * f, 0.105 * f * dome)
+    tr("pelvis", "lumbar", 0.75, 0.14 * f * (1.0 + (belly - 1.0) * 0.4), 0.11 * belly)
+    tr("lumbar", "chest", 0.55, 0.15 * f * (1.0 + (dome - 1.0) * 0.6), 0.125 * (belly * 0.5 + 0.5) * dome)
+    tr("chest", "neck", 0.15, 0.165 * f, 0.13 * f * dome)
+    tr("chest", "neck", 0.6, 0.18 * f, 0.115 * f * (1.0 + (dome - 1.0) * 0.5))
+    tr("neck", "head", 0.15, 0.06 * face, 0.055 * face)
+    tr("neck", "head", 1.0, 0.085 * face, 0.1 * face)
     for s in "lr":
         A.append(("sh_" + s, "chest", 0.08, 0.08 * f, 0.075 * f, "corpse"))            # the deltoid's cap
         A.append(("sh_" + s, "elb_" + s, 0.4, 0.058 * f, 0.054 * f, "corpse"))          # the arm's belly
         A.append(("sh_" + s, "elb_" + s, 0.9, 0.046 * f, 0.044 * f, "corpse"))          # the elbow
         A.append(("elb_" + s, "wri_" + s, 0.25, 0.052 * f, 0.046 * f, "corpse"))         # the forearm's bulk near the elbow
         A.append(("elb_" + s, "wri_" + s, 0.85, 0.036 * f, 0.03 * f, "corpse"))         # the wrist
-        A.append(("wri_" + s, "fin_" + s, 0.3, 0.048 * f, 0.024 * f, "corpse"))         # the palm
+        hp = 1.25 if state == "bloat" else 1.0
+        A.append(("wri_" + s, "fin_" + s, 0.3, 0.048 * f * hp, 0.024 * f * hp, "corpse"))   # the palm
         A.append(("wri_" + s, "fin_" + s, 0.62, 0.044 * f, 0.02 * f, "corpse"))         # the knuckles
         A.append(("wri_" + s, "fin_" + s, 0.86, 0.036 * f, 0.022 * f, "corpse"))        # the fingers, half curled under
         A.append(("hip_" + s, "kne_" + s, 0.3, 0.092 * f, 0.088 * f, "corpse"))         # the thigh
@@ -252,7 +257,7 @@ def _cloak(name, Wj, A, rnd, state):
             _el(mb, q, r, h * 0.6, (ax.x, ax.y), r)
     # a few small sharp folds where the cloth leaves the body: pooled at the waist, running out from the high forms
     lw = top("lumbar")
-    for k in range(6):
+    for k in range(0 if state == "bloat" else 6):            # stretched taut over the bloat, the cloth has no folds
         ang = (k - 2.5) * 0.45 + rnd.uniform(-0.15, 0.15)
         d = (ax * math.cos(ang) * 0.3 + sd * math.sin(ang)).normalized()
         q = lw + d * rnd.uniform(0.1, 0.16)

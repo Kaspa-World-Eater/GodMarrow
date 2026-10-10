@@ -153,3 +153,13 @@ tiles none; the walk proved, 2,553 tiles). **In the game:** a body on the strand
 hands and feet, lying by its weight, small at the game's true scale. **Also:** the cove's held dawn moved later
 (0.978), because at 0.955 the frame was still too dark to see (Derek: "You can't really enjoy the oh shit if you can't
 see it"). **Next:** the bloat's dome; the dead seen nearer the lantern, where their form turns.
+
+## Rules check, and pass 9: the bloat
+
+**Read:** `MASTER_RULES` checklist; chapter 15, 6h (bloat: the trunk swollen taut, the face and neck by two fifths, the
+hands puffed, the belt cut in). **Worst first:** the bloat, whose swelling was the belly alone, hidden under a body
+lying face down. **Fixed:** the whole trunk domes (so the back rises taut under the cloak), the head and neck and hands
+puffed, the cloak stretched smooth over it with no folds, the belt cutting in. **Seen** (`dead_sheet`, by material):
+the bloated body reads heavy and domed beside the fresh dead. **Grade: B-** for the robed dead, C+ the bone. **Next:**
+the face for the bodies that lie face up (the supine pose shows the hood's opening, empty dark), and the dead seen near
+the lantern in the game.
