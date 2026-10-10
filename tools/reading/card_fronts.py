@@ -259,18 +259,23 @@ def scholar(c):        # the Scholar's Eye: an open book with an eye on its page
     c.put(X0 - 1, 25, LIGHT[2])
 
 
-def twin(c):           # the Hanged Twin: a figure hanging head down, its twin standing in the water a breath behind
-    def fig(top, d, lit):
-        c.disc(X0, top + d * 4, 3.4, lit, ry=3.6)
-        c.poly([(X0 - 3, top + d * 8), (X0 + 3, top + d * 8), (X0 + 4, top + d * 18), (X0 - 4, top + d * 18)], BONE[0])
-        c.line(X0 - 3, top + d * 8, X0 - 3, top + d * 18, lit)
-        c.line(X0 - 6, top + d * 11, X0 + 6, top + d * 11, BONE[1])
-    c.line(X0, 15, X0, 17, GILT[2])
-    fig(17, 1, BONE[2])
-    c.line(9, 39, 44, 39, GILT[2])
+def twin(c):           # the Hanged Twin: one hangs head down from a beam; its twin stands mirrored under the water
+    c.line(12, 16, 41, 16, GILT[2], 2)
+    c.line(X0, 17, X0, 19, BONE[1])
+    def body(top, d, lit, dark):
+        # feet at top (the rope), legs, hips, torso, arms hanging past the head, the head nearest the water
+        c.line(X0 - 1.5, top, X0 - 1.5, top + d * 7, dark, 2)
+        c.line(X0 + 1.5, top, X0 + 1.5, top + d * 7, lit, 2)
+        c.poly([(X0 - 3.5, top + d * 7), (X0 + 3.5, top + d * 7), (X0 + 3, top + d * 15), (X0 - 3, top + d * 15)], dark)
+        c.line(X0 - 3.5, top + d * 7, X0 - 3, top + d * 15, lit)
+        c.line(X0 - 3.5, top + d * 13, X0 - 6, top + d * 20, lit)
+        c.line(X0 + 3.5, top + d * 13, X0 + 6, top + d * 20, dark)
+        c.disc(X0, top + d * 17.5, 2.6, lit, ry=2.8)
+    body(19, 1, BONE[2], BONE[0])
+    c.line(10, 39.5, 43, 39.5, GILT[2])
     for x in range(10, 44, 3):
         c.put(x, 41, GILT[0])
-    fig(61, -1, BONE[1])
+    body(60, -1, BONE[1], HIDE[3])
 
 
 def mouths(c):         # the Knot of Mouths: open mouths knotted round one another
@@ -325,15 +330,23 @@ def key(c):            # the Ossuary Key: a key of bone, its bow a skull's ring,
         c.line(X0 + 1, 44 + k * 1.6, X0 + 3 + (k % 3), 44 + k * 1.6, BONE[0] if k % 2 else BONE[2])
 
 
-def cup(c):            # the Beggar's Cup: an empty bowl held up in two hands, asking at the door
+def cup(c):            # the Beggar's Cup: an empty bowl held up on one open hand, at a door
     c.outline([(11, 64), (11, 24), (X0, 17), (42, 24), (42, 64)], GILT[0])
-    c.poly([(X0 - 10, 34), (X0 + 10, 34), (X0 + 7, 43), (X0 - 7, 43)], BONE[1])
-    c.line(X0 - 10, 34, X0 - 7, 43, BONE[2])
-    c.disc(X0, 34, 10, BONE[2], ry=2.2)
-    c.disc(X0, 34, 8, VOID, ry=1.3)
-    for side in (-1, 1):
-        c.disc(X0 + side * 8, 44, 3.2, BONE[0], ry=2.4, lit=BONE[1])
-        c.line(X0 + side * 9, 46, X0 + side * 12, 62, BONE[0], 3)
+    # the bowl: a rim seen from above, its body below, its dark inside
+    c.disc(X0, 34, 11, BONE[1], ry=3.4)
+    c.disc(X0, 34, 9.5, VOID, ry=2.2)
+    for y in range(35, 44):
+        k = (y - 34) / 10.0
+        w = 11 * (1.0 - k * k) ** 0.5
+        c.line(X0 - w, y, X0 + w, y, BONE[1] if y < 40 else BONE[0])
+        c.put(X0 - w, y, BONE[2])
+    c.line(X0 - 3, 44, X0 + 3, 44, BONE[0])
+    # the hand under it, the fingers curled up its side, the wrist and forearm going down out of the light
+    c.disc(X0, 47, 7, BONE[0], ry=2.6, lit=BONE[1])
+    for k in range(4):
+        c.line(X0 + 5 + k * 0.6, 46 - k * 1.6, X0 + 8 + k * 0.2, 42 - k * 1.2, BONE[1])
+    c.line(X0 - 7, 46, X0 - 10, 42, BONE[1], 2)
+    c.line(X0 - 2, 49, X0 - 4, 63, BONE[0], 4)
 
 
 def bell(c):           # the Drowned Bell: a bell under the lines of the water, still ringing
