@@ -37,6 +37,7 @@ Morbid).
 | `03-the-clips.md` | Every clip a character has (idle, walk, run, attack, charged attack, cast, hit, death, dodge, and the rest), what it must do and how it reads |
 | `04-the-world-moves.md` | Things that are not characters: fire, the Red, blood, cloth, lanterns, objects in combat, spells, the wind |
 | `05-checklist.md` | The checklist every animation is graded against, in writing, in its pass log |
+| `06-our-animations.md` | Where our animations stand (the Ossuarch measured frame by frame) and the plan to make them better, in order |
 
 ## The laws in brief
 
