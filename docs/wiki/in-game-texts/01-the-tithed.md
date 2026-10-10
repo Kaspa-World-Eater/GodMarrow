@@ -1,13 +1,13 @@
 # The Tithed
 
-*The common people of the lowlands call themselves the Tithed. They keep few books. Their myths are told at banked
-fires, by mothers and grandmothers, and some were written down by the copyists, who heard them at many
-fires and set down what the tellers agreed on.*
+*The few who still live scattered across the lowlands call themselves the Tithed. They keep no books. Their myths are
+told at banked fires, by mothers and grandmothers, to whoever is left to hear them, and a few were written down by
+wanderers who sat at those fires.*
 
 ## The Kneeling
 
-*Told by the grandmothers of the lowlands on Kneel-Night. A copyist heard it at nine fires and wrote down
-what the nine agreed on.*
+*Told on Kneel-Night by the grandmothers of the lowlands. A wanderer heard it at three fires, many days' walk apart,
+and wrote down what the three agreed on.*
 
 We were inside something warm, and we were kneeling, and we were singing. That is where we start, because that is as
 far back as anyone remembers.
@@ -52,8 +52,8 @@ other's belts. That is why we knot our belts at the back, so that whoever walks 
 
 ## The fourth note
 
-*Written by a copyist about something that happened on the Moor in his grandfather's time. He heard it
-from three people. They agreed on everything but the young man's name.*
+*Written by a wanderer about something that happened on the Moor in the grandmothers' time. He heard it from three
+people, met far apart. They agreed on everything but the young man's name.*
 
 The song we sang inside the god had four notes. We keep three of them, low, each going down from the one before.
 The fourth goes up, the way a voice goes up at the end of a question, and nobody sings it. Every child is told never
@@ -83,8 +83,8 @@ of the song.
 ## The tenth loaf on the sill
 
 *Told by a mother to her children, as it has been told in her family for longer than they know. A brother of the
-Pale Order, quartered in a lowland house one winter, asked about the loaf left on the sill and wrote down her
-answer.*
+Pale Order, who sheltered one winter in the only house still standing on that stretch of the lowlands, asked about
+the loaf left on the sill and wrote down her answer.*
 
 When we came out of the god, we came out owing. Nobody knows to whom, because we do not know who gave us the morning.
 But we owe, and a tenth of everything is still owed, and we have been behind on it ever since.
@@ -106,15 +106,16 @@ and the dead call the living by their names. A name that is never said cannot be
 
 ## The lantern that sighs
 
-*A letter from the tender of the lantern round to the copyists, who kept it with their books. The
-tender had been asked how the lanterns came to be.*
+*A letter from the last tender of the lantern round, found folded into the base of the lantern at the crossroads.
+Someone had asked her how the lanterns came to be.*
 
 No lantern on any road burns oil. You know that much. Every one of them is lit with a soul that chose to be kept
 rather than go on down with the last breath: a pilgrim who fell on the road, a mother from the crypt niches, somebody
 nobody remembers. The soul is the flame.
 
-The first who kept one were the Wick-Binders. They were a guild, long ago, and the faiths hunted them out for it.
-Nobody has been a Wick-Binder for longer than anyone can count, but every lantern on every road is theirs still.
+The first who kept one were the Wick-Binders. There were only ever a handful of them, long ago, and the faiths hunted
+them out for it. Nobody has been a Wick-Binder for longer than anyone can count, but every lantern on every road is
+theirs still.
 
 A kept soul chooses whom it follows. It cannot be struck, and it will not be ordered. It goes where you go, a little
 behind and a little to one side, and when you fall it carries you back to the lantern-stones and stands you up again.
@@ -133,8 +134,8 @@ have never forgotten: she was kind about the road.
 
 ## Somebody always sits up
 
-*Said at deathbed vigils in the lowlands. This is how an old woman of the families who bury at the Barrows said it to
-her grandson, who wrote it down after she died.*
+*Said at deathbed vigils in the lowlands. This is how an old woman, the last of the families who buried at the
+Barrows, said it to her grandson, who wrote it down after she died.*
 
 We have no end of our own. The faiths each have one. The brothers in the white mountains say their Mother will set
 the world down at last. The processions say the flesh will fill every empty place until there is nothing empty left.

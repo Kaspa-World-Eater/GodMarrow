@@ -5,7 +5,8 @@ Fallen Watchtower · in the game: the old procedural barrow map (87 × 87), to b
 diggers' own rules: the Codex's "The Digger's Tally, Widow's Lane" · the Tithed's ways with the dead:
 `../../in-game-texts/01-the-tithed.md`*
 
-The Barrows are where the Tithed bury their own: nine barrows to a ring, and nine of a family to each barrow. The Old
+The Barrows are where the Tithed have always buried their own, and the few of them left still do: nine barrows to a
+ring, and nine of a family to each barrow. The Old
 Barrow is their oldest end, at the foot of Widow's Lane, where the first ring was raised round a standing stone that was
 there before it. Every lid in the Barrows sinks from the middle, deeper at dawn than at dusk, and every hollow leans the
 same way: east, toward the Barrow ring, a ring of tooth-stones beyond the Lane. The old rings have sunk so long that
@@ -14,7 +15,7 @@ and chalk under roofs that sag into the room like a cheek sucked hollow.
 
 It is the Tithed's own place of the dead, kept by frightened rules: no name said over a grave, the risen put back face
 down with a flat stone on the neck. It should feel like grief held very still. The god is in the ground's breath, which
-went out once, the diggers say, and never came back in.
+went out once, the digger says, and never came back in.
 
 **The one image:** a chamber's roof sagging down to a ragged hole of grey sky, rain falling through it in a thread, and
 the dead on their shelves beneath it.
@@ -25,20 +26,20 @@ the dead on their shelves beneath it.
 
 ### Low Day
 
-*Written by a pilgrim who wintered with the families who bury at the Barrows and kept Low Day with them. The leaf was
-found folded into the back of his road-book when the book was sold.*
+*Written by a pilgrim who wintered with the last of the families who bury at the Barrows and kept Low Day with them.
+The leaf was found folded into the back of his road-book.*
 
-Low Day falls in the dark of the year, and nobody in the barrow families works on it. At dusk every household comes out
-with a lantern, the old ones carried and the children holding the belt of whoever is in front, and they all walk
-down to the Barrows without a word. They set a lantern at the foot of every barrow, nine to a ring, ring after ring,
-until the whole field is pricked out with lights like a town seen from a hill.
+Low Day falls in the dark of the year. Only a few households are left at the top of the Lane, and at dusk they come out
+with a lantern each, the old ones carried and a child holding the belt of whoever is in front, and walk down to the
+Barrows without a word. They have not lanterns enough for every barrow. They set them at the foot of their own, and the
+rest of the field, ring after ring, stays dark.
 
 When the last lantern is down, they stand among the rings and say one line together, low, nine times over: *lie down,
 lie still, lie low, lie long, till the Kneeler finishes.* Afterward I asked who the Kneeler was. The woman whose house I
 lodged in said it was the one who is still praying. When I asked who that was, she said it was the one in the song, and
 went inside.
 
-Nobody says a name. That is the hardest rule of the Barrows. The diggers say the dead follow their names, so no name may
+Nobody says a name. That is the hardest rule of the Barrows. The digger says the dead follow their names, so no name may
 be said over a grave, not even on Low Day, not even to the one you put there yourself. You stand at the foot of your own
 family's barrow with your mouth shut and your lantern burning, and that is all you are allowed.
 
@@ -56,7 +57,7 @@ stone keeping them, and that I should not have stayed.
 
 ### The Turned Mound
 
-*Told by a woman of the barrow families to a pilgrim at her door, and written down by him there. She would not give her
+*Told by a woman of the last barrow families to a pilgrim at her door, and written down by him there. She would not give her
 mother's name, or her own.*
 
 Every lid in the Barrows points east, to the ring of teeth. Stand at the foot of the Lane at dawn and look along them,
@@ -74,10 +75,10 @@ the digger found her.
 
 After the third time she stayed down. But in the year after, her lid turned. It sank from the middle like all the
 others, and its hollow leans west, up the Lane, toward where we live. It is the only one in the Barrows that points
-home. The diggers call it the Turned Mound. They have laid it flat again more than once, and inside a year it goes back
+home. The digger calls it the Turned Mound. He has laid it flat again more than once, and inside a year it goes back
 the same way.
 
-The knights came that spring and asked for her, as they ask for all of them, and my brother let them have her, because
+A knight came that spring and asked for her, as they ask for all of them, and my brother let them have her, because
 he could not sleep. The knight lifted her out in his two hands as if she were asleep and carried her up the Lane. She
 went with him quietly. He said she was the easiest he had lifted in the Barrows.
 

@@ -1,8 +1,8 @@
 # The Held Space, and the death of the god
 
 All through the ages outside, while the Ythraal walked and wasted on its skin, the thing beneath had an inside.
-This page tells what is told of it, and of how the thing died, which is the one event every people of the Hide agrees
-happened and no two tell the same.
+This page tells what is told of it, and of how the thing died, which is the one event every people that has lived on
+the Hide agrees happened and no two tell the same.
 
 ## A space held open
 
@@ -39,7 +39,7 @@ Before anything else stood in the Held Space, there were the Angles, and almost 
 halls with more corners than a room can have, so that whoever walks the edge of one and counts gets a different count
 each time, and higher. They left stairs with risers that come only to the knee, doors set a little off true, and
 niches too long for any body. People who sleep in their halls wake with nosebleeds. They signed everything with a sigil
-that is all angles, more than its lines can hold, which hurts the eyes to look at; copyists who tried to draw it went
+that is all angles, more than its lines can hold, which hurts the eyes to look at; those who tried to draw it went
 blind in the eye they used.
 
 Their few words are cut in a plain script beside the sigils: *We were cut from the first of the room, and began cutting
@@ -50,8 +50,8 @@ hall there is a pillar with a seat cut at its foot, empty, and over it the newes
 rings with teeth that stand all over the Hide (the waystones) carry their sigil on their inner faces, where only someone
 standing in the pit would see it: *WE CUT THEM FACING IN, SO THE MOUTH IS KEPT BY WHAT IT HOLDS.*
 
-That is all. What they were, what they looked like and where they went, nobody knows. But the word has got into the
-common speech of the Hide the way old words do, and people use it without thinking:
+That is all. What they were, what they looked like and where they went, nobody knows. But the word has got into what
+speech is left on the Hide the way old words do, and the few who still talk use it without thinking:
 - *May the Angles keep you*, said at a door to someone going out at night, and not said warmly;
 - *An Angle passed through here*, said of a room that has one more corner than it had last night;
 - *Fools go where Angles won't.*
@@ -69,8 +69,8 @@ be judged. It found most of them wanting.
 When the thing died, the court fell. The faces came down out of the dark and lay where they fell, all across the Hide,
 white and still watching, and nobody would pick them up. The moths found them, because moths go to anything pale in the
 dark, and took them up, and wear them. At dusk they come to lanterns on the roads in long arcs, and the faces on them
-are the court's. The lantern-keepers say the faces still judge, and that one which hangs in the air and looks at you a
-long time before it comes has found you wanting.
+are the court's. The few lantern-keepers left say the faces still judge, and that one which hangs in the air and looks
+at you a long time before it comes has found you wanting.
 
 ## The Keeper of the Spiral Hollow
 
@@ -112,12 +112,13 @@ and stood. Blood that stands too long goes dark and thick and then hard. And the
 the bone and the flesh and every people and every Ythraal, pressing down from every side at once, for longer than there
 are years for, and under that weight the stale blood was forced into iron.
 
-Iron is old blood. Everyone in the Hide knows that; it is why the miners bleed the first ore they bring up, to give it
-back, and why iron always smells a little like a wound. In the Deep there is nothing but iron: a dark country of it,
-ridged and crusted like a scab the size of the world, hot underfoot. And in the iron there is life, and the life is
-iron too. Things grow there, slowly, iron that branches like coral and iron that opens and closes. Things walk there:
-great shapes of iron, heavy and patient, jointed like armour with nobody inside, that the few who have come back call
-**the Khar-Dhuum**, a name from a tongue nobody speaks. They do not speak, or they speak too slowly to hear. They work.
+Iron is old blood. Whoever is left on the Hide knows that; it is why the few who still dig bleed the first ore they
+bring up, to give it back, and why iron always smells a little like a wound. In the Deep there is nothing but iron: a
+dark country of it, ridged and crusted like a scab the size of the world, hot underfoot. And in the iron there is life,
+and the life is iron too. Things grow there, slowly, iron that branches like coral and iron that opens and closes.
+Things walk there: great shapes of iron, heavy and patient, jointed like armour with nobody inside, that the few who
+have come back call **the Khar-Dhuum**, a name from a tongue nobody speaks. They do not speak, or they speak too slowly
+to hear. They work.
 
 What they work at is the core. Deep under the iron country there is the core of everything, and the Khar-Dhuum are
 hardening it. They lay iron on it, layer on layer, scale on scale, and beat it down, and lay more, the way a shell is
@@ -144,9 +145,9 @@ blood-dark and jointed every way. They did not let go, and they did not fall. Ve
 
 It walks still, down there. It went down into the Deep on its legs and never came up, and it walks the iron country
 under everything, carrying its empty streets on its back through the dark, and the iron things of the Deep step aside
-for it. The miners say that Vesk is the greatest of the Khar-Dhuum, or the first
+for it. The few who have dug that deep say that Vesk is the greatest of the Khar-Dhuum, or the first
 of them, or their mother, or the god they work for. In the deepest shafts there are sometimes prints in the ore, round
-and deep and close together, hundreds in a line, going on under the rock. Some miners say that if you lie with your
+and deep and close together, hundreds in a line, going on under the rock. Some of them say that if you lie with your
 ear to the ore you can hear it walking, very far off, and under the walking, very faintly, the people of Vesk, still
 holding.
 
@@ -168,17 +169,17 @@ hardened; and every iron thing in the world is something held:
 - **the Needle:** a spike like a maiden's, holding what it is digesting;
 - **the Starved Crown's crown:** forged by the people it then ate, holding up its head;
 - **Qhaloth:** a city held up in the sky until it rusted there, and turned the brown of old blood;
-- **the miners:** who bleed the first ore of every shaft, to give back a little of what is held.
+- **the few who still dig iron:** who bleed the first ore of every shaft, to give back a little of what is held.
 Held is the Held Space's own word. Nobody in the world has laid these side by side. The player may.
 
 ## How the god died
 
 The thing stopped. Every people tells it, and none was there to see. All the tellings stand.
 
-- **The common people of the lowlands** say something pressed in from outside, the way cold presses at a tent, and took
-  the thing's names, the little ones first: the name of the smallest finger, the name of one eyelash, the name of the
-  hour before morning. The Choir sang louder, and it took more, until the thing forgot how to be three. Where its name
-  should be, the grandmothers leave a breath of nothing.
+- **The few who are left in the lowlands** say something pressed in from outside, the way cold presses at a tent, and
+  took the thing's names, the little ones first: the name of the smallest finger, the name of one eyelash, the name of
+  the hour before morning. The Choir sang louder, and it took more, until the thing forgot how to be three. Where its
+  name should be, the grandmothers leave a breath of nothing.
 - **The Choir** says it came in through the rest, the one moment when all of them drew breath together.
 - **The Pale Order** says only that the Mother fell, and that the first brothers stood beside her.
 - **The Gilded Peak** said the thing grew tired, as a held breath tires, and the Silence came in to let it lie down.
@@ -206,8 +207,8 @@ The light went out of the Held Space, and the warmth went out of its walls, and 
 breath, and it has been letting it go ever since. Every thought that had ever walked in the folds lay down where it
 stood.
 
-And on the outside of the thing, in the grey of the first morning, the people woke on the ash of its hide. How they
-came to be lying there, nobody knows, and every hearth tells it its own way (`02-the-creation-myths.md`). Their
+And on the outside of the thing, in the grey of the first morning, the people woke on the ash of its hide. How they came
+to be lying there, nobody knows, and every fire that is left tells it its own way (`02-the-creation-myths.md`). Their
 memory begins there. Every age since is the Age of the Last Breath (`05-the-last-breath.md`).
 
 ## What became of them

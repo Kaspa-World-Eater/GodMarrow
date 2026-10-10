@@ -1,9 +1,9 @@
 # The Myriad
 
-*The faith of the breath is called the Myriad, after the kami it keeps; the common folk call its people the
-Shrine Keepers, after the little wooden houses they leave along the roads, and do not stand near those houses after
-dark. Their texts come from the day-book of the Well-Shrine in the Drowned Fen, the first of their shrines, and from the
-folders of paper figures in the reed camps.*
+*The faith of the breath is called the Myriad, after the kami it keeps. Whoever still lives near the roads calls its
+few keepers the Shrine Keepers, after the little wooden houses they leave along the roads, and does not stand near
+those houses after dark. Their texts come from the day-book of the Well-Shrine in the Drowned Fen, the first of their
+shrines, and from the last folders of paper figures in what is left of the reed camps.*
 
 ## The breath
 
@@ -30,13 +30,12 @@ Pray, if you pray, that they never agree.
 *From the Well-Shrine's day-book, in the hand of an old keeper.*
 
 A shrine is a house the size of a cradle on a post, with a paper door. There is nothing in it but what a keeper
-breathed into it. When we take a breath from the sick, or the dying, or the grieving who pay us, we carry it in our
-chests as far as we can bear, and then we breathe it into a shrine and seal the door, and the kami in it are
-shut in. We feed them. Once a season we come back and whisper into the door something they can quarrel over, so that
+breathed into it. When we take a breath from the sick, or the dying, or the grieving who ask us, we carry it in our
+chests as far as we can bear, and then we breathe it into a shrine and seal the door, and the kami in it are shut in. We feed them. Once a season we come back and whisper into the door something they can quarrel over, so that
 they never settle and never grow.
 
-The common folk think the shrines are holy. Let them. They bow to them, and leave rice, and do not open the doors, and
-that is all we need of them.
+The few who pass the shrines think they are holy. Let them. They bow to them, and leave what they can spare, and do
+not open the doors, and that is all we need of them.
 
 When a shrine is forgotten, and nobody whispers to it any more, its paper door begins to bulge outward at night, a
 little at a time, as if what is inside were breathing out and could not stop. A keeper who finds one bulging must open
@@ -46,8 +45,8 @@ written somewhere. They say that what is inside has started to agree with itself
 
 ## The figure and the fan
 
-*How the first keeper learned her work, as the folders of the reed camps tell it. One of them, who could write, wrote it
-down for the Well-Shrine.*
+*How the first keeper learned her work, as the last folders of the reed camps tell it. One of them, who could write,
+wrote it down for the Well-Shrine.*
 
 Breath gone foul is called miasma: breath so crowded with kami, so many of them rotten, that it sickens whoever
 breathes it. It comes of a grudge kept past its season, a curse said into a well, a lie told over a grave and never

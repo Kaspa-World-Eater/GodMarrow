@@ -4,10 +4,10 @@
 Heath, the Gnawed Chapel · in the game: the old procedural map (`sighing_ridge_s1001` to `s1020`), to be remade by the
 bog's method · the breath the wind is said to be: `../../in-game-texts/06-the-myriad.md`*
 
-Where the Moor lifts into a long bare ridge, the god's last breath goes over it. Every lowlander feels that breath as a
-steady wind at the back, always pulling toward the same quarter; on the Ridge it is strong enough to hear. It comes in
-long, slow surges like breath going out, stops, and comes again, and it has never once blown the other way. In the
-stillness between surges, the people of the Ridge stand where they are and say nothing.
+Where the Moor lifts into a long bare ridge, the god's last breath goes over it. Whoever still walks the lowlands feels
+that breath as a steady wind at the back, always pulling toward the same quarter; on the Ridge it is strong enough to
+hear. It comes in long, slow surges like breath going out, stops, and comes again, and it has never once blown the other
+way. In the stillness between surges, whoever is on the Ridge stands where they are and says nothing.
 
 A broken colonnade runs along the crest, its columns worn down on the side the wind comes from. The ash the wind lifts
 off the Moor streams from the lee of every column in long grey scarves, down onto the Burnt Heath and at last to the Ash
@@ -25,8 +25,8 @@ smoke off snuffed candles, and at the end of the line one small lantern breathin
 
 ### When the wind stops
 
-*Told to pilgrims by the woman who wiped the lanterns at the Ridge end of the lantern round, and written down by one of
-them at the next fire. She would not give her name; she said that on the Ridge a name said aloud is a name the wind
+*Told by the woman who wiped the lanterns at the Ridge end of the lantern round, the last to do it, to a lone pilgrim,
+who wrote it down at the next fire. She would not give her name; she said that on the Ridge a name said aloud is a name the wind
 takes.*
 
 You've felt it at your back since the Moor. Up here you'll hear it too. That wind is the god's last breath, still going
@@ -43,19 +43,18 @@ set anything down, until it starts again. My mother said something listens in th
 copyists say there is nothing there at all, only the quiet between one breath and the next. I have seen what
 the copyists haven't.
 
-When I was a girl a carter came over the crest in a long stillness, pulling his cart in its harness the way carts are
-pulled. He was late, and he could see the next lantern, and he didn't stop. A dozen of us watched him from the
-columns, standing like posts. He walked on in the quiet with the cart behind him. When the wind came back he wasn't
-there. The cart stood in the road with its straps hanging empty, and the ash where he had been walking lay smooth, as
-if nobody had walked on it that day.
+When I was a girl a man came over the crest in a long stillness, a pack on his back. He was late, and he could see the
+next lantern, and he didn't stop. My mother and I watched him from the columns, standing like posts. He walked on in
+the quiet. When the wind came back he wasn't there. His pack lay in the road with its straps hanging empty, and the ash
+where he had been walking lay smooth, as if nobody had walked on it that day.
 
 The longest stillness I ever stood in began at dusk and ended in the middle of the night. Every soul on the Ridge stood
-in it, pilgrims and carters and me, and the Husks stood too, out among the columns, and in the dark you couldn't tell
+in it, which was two pilgrims and me, and the Husks stood too, out among the columns, and in the dark you couldn't tell
 which of the still shapes were which. When the wind came back, all of us walked on together, and none of us looked at
 the others.
 
-Nobody knows who raised the columns. The grandmothers on the Moor say our people raised them in the first years, as a
-walk out of the wind for pilgrims, with a roof on it. The copyists say the columns were standing when the people came
+Nobody knows who raised the columns. The grandmothers on the Moor used to say our people raised them in the first years,
+as a walk out of the wind for pilgrims, with a roof on it. The copyists say the columns were standing when the people came
 out, the way the road was lying there. The wind is wearing them down from the side it comes from, a finger's width in a
 lifetime. On the sheltered side you can still see the carving: people walking, every one of them going the way the wind
 goes.
@@ -65,24 +64,25 @@ round to see where it's going. It's going where everything goes.
 
 ### The Widow's Stumps
 
-*Told on the Ridge by the lantern folk, and on the Moor by the grandmothers of the camps. A copyist heard
-both tellings in one autumn and wrote them on one leaf, the Ridge's first.*
+*Told on the Ridge by the last of the lantern folk, and on the Moor by the grandmothers of the camps while there were
+any. A lone copyist heard both tellings and wrote them on one leaf, which was found under a stone on the widow's
+grave.*
 
-In a year nobody can now name, a caravan was crossing the Ridge, and its foreman walked between the carts with a
-daughter at each hand. Something came on them on the crest. Some say it was Husks, three standing among the columns who
-lifted their heads all at once. Some say the wind stopped and the foreman would not stand still in the stillness,
-because his girls were cold and the lantern was near. Whatever it was, he did not let go of either hand. When the next
-carts came over they found no foreman and no daughters, only three stumps on the crest where the three had stood, a tall
-one between two smaller, leaning together. They were warm to the touch, and they are warm still. Their tops have grown
+In a year nobody can now name, a man was crossing the Ridge with a daughter at each hand. Something came on them on the
+crest. Some say it was Husks, three standing among the columns who lifted their heads all at once. Some say the wind
+stopped and the father would not stand still in the stillness, because his girls were cold and the lantern was near.
+Whatever it was, he did not let go of either hand. When the next walker came over, days after, there was no father and
+no daughters, only three stumps on the crest where the three had stood, a tall one between two smaller, leaning
+together. They were warm to the touch, and they are warm still. Their tops have grown
 into one another like hands that have held on too long to come apart.
 
-Nobody can say what they are made of. The Ridge folk call them stone. Woodcutters who came up from the Wood to look
+Nobody can say what they are made of. The lantern folk call them stone. A woodcutter who came up from the Wood to look
 called them wood. A knight of the Pale Order cut a chip from the tallest, wrote a word in his book, crossed it out, and
 wrote a number under it instead.
 
-They are the widow's because of the foreman's wife. When the caravan did not come down onto the Moor, she walked up
-looking, found the three of them standing, and sat down at their feet. She would not come away. The lantern folk sat
-with her by turns, and she sat there until she died, and they buried her where she sat. That is how the Ridge tells it,
+They are the widow's because of the man's wife. When they did not come down onto the Moor, she walked up looking, found
+the three of them standing, and sat down at their feet. She would not come away. The lantern folk sat with her by
+turns, and she sat there until she died, and they buried her where she sat. That is how the Ridge tells it,
 and the Ridge will not hear it told another way on the crest.
 
 The grandmothers of the Moor tell one thing more, and they tell it quietly. One of the daughters let go. She let go of

@@ -6,9 +6,9 @@ method · the Myriad's myths, the grey year at the Well-Shrine among them: `../.
 
 Below the Moor the land goes down into a wide country of pale reeds standing in water so clear it hardly seems to be
 there. The old books call it the god's lymph. It does not wet: an arm put in to the shoulder comes out dry, and a
-little lighter. Every reed bends the same way, whatever the wind, toward something nobody agrees on. Boatmen take
-their fares at the Iron Hook; the Shrine Keepers keep their first shrine, the Well-Shrine, at the one clean pool; under
-the deep water beyond it lies the Drowned Nave, its bell still hung. The Kneeling Arch bows out of the shallows toward
+little lighter. Every reed bends the same way, whatever the wind, toward something nobody agrees on. One old boatman
+still poles the channels and takes his fare at the Iron Hook; a handful of Shrine Keepers keep their first shrine, the
+Well-Shrine, at the one clean pool; under the deep water beyond it lies the Drowned Nave, its bell still hung. The Kneeling Arch bows out of the shallows toward
 the edge of the world, and in the western pool one wet reed turns to point toward home. It should feel pale, quiet
 and still. On the surveyor's chart of the god's face, the Fen lies at the throat.
 
@@ -21,8 +21,8 @@ clear to see, and far below its hull, a roof of slates.
 
 ### Pay at the Hook
 
-*What a boatman told the pilgrims in his boat as he poled them across to the Well-Shrine. One of them wrote it down
-that night in the reed-camp where they slept.*
+*What the last boatman of the Fen told a pilgrim in his boat as he poled her across to the Well-Shrine. She wrote it
+down that night in the empty reed-camp where she slept.*
 
 Sit low and keep your hands in the boat. Trail them if you like; they will come back dry, and a little lighter. We say
 the Fen takes the wet first, and then the rest. Nobody I know has found out what the rest is, and the ones who might
@@ -30,41 +30,41 @@ have are not in the boat.
 
 You pay at the Hook, and not before. Before the Hook the Fen may still want you back, and a man should keep his copper
 until he knows. There it is, leaning out of the shallows: black iron taller than a man, bent over at the top into a
-barb, its foot down in the bed with something holding it. Every year the Shrine Keepers row out and hang a paper figure
-on the barb, folded with its arms open, and every year the old ones slide a little further down the iron, under the
+barb, its foot down in the bed with something holding it. Every year one of the Shrine Keepers rows out and hangs a
+paper figure on the barb, folded with its arms open, and every year the old ones slide a little further down the iron, under the
 water. They go down as far as you can see, all of them dry, and the oldest still have their arms out.
 
-Whose hook it is depends on who poles you. The reed-camp women say it is the well-hook out of the drowned village,
-carried out here by the water when it spread; the old woman in the reed hut, whose father drew that well, says his
+Whose hook it is depended on who poled you, when there were more of us to pole. The reed-camp women used to say it was
+the well-hook out of the drowned village, carried out here by the water when it spread; the old woman in the reed hut, whose father drew that well, says his
 hook is in the well still, and laughs at them. My father said the knights from the white mountains left it, the year
 they came dredging for our dead with hooks and chains, when one hook caught on something below and they cut the chain.
 My grandfather said it was here before any village or any knight, and that is why we pay at it.
 
 Don't look over the side past the Hook. The bed drops away, and you can see roofs, and further on one roof bigger than
 the rest with a stair going down beside it. The Shrine Keepers count that stair at thirty-three steps; the children in
-the camps sing thirty-four; I have heard thirty-six, from a little girl with no one near her. I keep a notch on my pole
+the camps used to sing thirty-four; I have heard thirty-six, from a little girl with no one near her. I keep a notch on my pole
 for that roof, and I have cut it three times. Some crossings it is a hand deeper than I left it, and some a hand nearer.
 
 That's the Hook. Copper in the box on the post. A boat has no side, and every boat has a fare.
 
 ### The bowed arch
 
-*From the day-book of a purifier of the Myriad who wintered in the reed-camps: what the boatmen told her about the
-arch, and then what a pilgrim told her.*
+*From the day-book of a purifier of the Myriad who wintered in the empty reed-camps: what the last boatman told her
+about the arch, and then what a pilgrim told her.*
 
-The boatmen sleep tied to the arch, because no boat tied there has ever been found in the morning cut loose or empty.
-A thing that kneels, they say, is keeping watch.
+The boatman sleeps tied to the arch, because no boat tied there has ever been found in the morning cut loose or empty.
+A thing that kneels, he says, is keeping watch.
 
 It was the rose-arch of the chapel in the drowned village, and it stood straight until the water came up and reached
 it. Then it bowed, slowly, all one evening, the way an old man gets down on his knees, and stopped, and has gone no
-further since. It bows toward the edge of the world, where the sky sits lowest. Every night, the boatmen say, it is a
+further since. It bows toward the edge of the world, where the sky sits lowest. Every night, the boatman says, it is a
 hand nearer to kneeling, and every morning it is back where it was.
 
-Why it bows, they quarrel over. Most say it kneels toward the edge of the world in prayer, as their grandmothers did.
+Why it bows, nobody agrees. The boatman says it kneels toward the edge of the world in prayer, as his grandmother did.
 The old woman in the reed hut says it is looking for something past the edge, and waiting to be sure before it bows any
 further.
 
-This winter a pilgrim came through the camps who had walked up from the black sand at the land's end, where the shore
+This winter a pilgrim came through the empty camps who had walked up from the black sand at the land's end, where the shore
 people lived in the great trees until they died. She stood in my boat under the arch a long while, and then told me it
 bows the way she had come, exactly, toward the red water. Our elders teach that the red water is where breath goes
 when it is spent, and that nobody living has seen it. I asked her what it was like. She said that it does not end, and
@@ -72,8 +72,9 @@ that it breathes.
 
 ### The reed in the western pool
 
-*A reed-camp grandmother's telling, given to the children the night before they are first taken out to the western
-pool. A purifier who had been a foundling of the shrine wrote it down, and added what happened when she stood there.*
+*A reed-camp grandmother's telling, given to the children the night before they were first taken out to the western
+pool, when there were still children in the camps. A purifier who had been a foundling of the shrine wrote it down, and
+added what happened when she stood there.*
 
 Out in the western pool there is one reed that is wet.
 
@@ -86,7 +87,7 @@ Everything drifts to it. The paper figures you set on the water float high and g
 one, and gather round its foot.
 
 Stand by it, and it turns its head, slowly, the way a sleeper turns over, and points toward the place where you were
-born. Pilgrims come from everywhere to stand by it and weep. A man from the moor once stood by it and laughed for joy,
+born. Now and then a pilgrim comes from far off to stand by it and weep. A man from the moor once stood by it and laughed for joy,
 and went home that same day.
 
 The old woman of the reed hut has stood by it. It points down.

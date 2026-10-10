@@ -7,19 +7,19 @@ These are the others.*
 
 ## The names
 
-*From a pilgrim's guide to the wet country, copied many times over. This passage is in every copy, though the copies
-differ in almost everything else.*
+*From a pilgrim's guide to the wet country. The few copies that are left differ in almost everything, but this passage
+is in each of them.*
 
-The road across the Sunken Bog has as many names as there are people who walk it.
+The road across the Sunken Bog has as many names as there are people who walk it, and few people walk it.
 
-The bog folk who live along it call it the Long Back, and they will tell you their own people laid it at the start of
+The last of the bog folk, who live along it, call it the Long Back, and they will tell you their own people laid it at the start of
 things, out of the biggest stones they could find, so as to have a road that would not sink. They are proud of it,
 and they keep it. Ask them why the stones are hollow in the middle and knobbed at the sides and they will tell you
 that is how stones were made in those days.
 
-Pilgrims call it Saint Uss's Causeway, after a saint who is in no calendar of any faith. The boatmen of the Fen call
-it the Stair of the Drowned King, and the bog folk's children call it Old Coil and dare each other to walk it
-after dark. The shore folk, who lived in the bog before they lived in the trees, call it the Long One, and say it was
+Pilgrims call it Saint Uss's Causeway, after a saint who is in no calendar of any faith. The old boatman of the Fen
+calls it the Stair of the Drowned King, and the bog folk's few children call it Old Coil and dare each other to walk
+it after dark. The shore folk, who lived in the bog before they lived in the trees, call it the Long One, and say it was
 a god.
 
 Nobody knows what it was called first. The oldest bog folk say that if it had a name of its own, the name is under
@@ -27,8 +27,8 @@ the water with the rest of it.
 
 ## The stair of the drowned king
 
-*Told by the boatmen of the Drowned Fen on the nights they sleep under the Kneeling Arch. A purifier of the Myriad
-wrote it down in her day-book.*
+*Told by the old boatman of the Drowned Fen, the only one left, on the nights he sleeps under the Kneeling Arch. A
+purifier of the Myriad wrote it down in her day-book.*
 
 Before the bog was a bog, there was a kingdom in the wet country, and it had a king. Nobody remembers the kingdom's
 name or the king's. One spring the king heard something calling him from under the water, and he put on his crown and
@@ -38,11 +38,11 @@ so that whatever called him would know he was coming.
 Where the Back goes down under the water, he did not stop. He walked down into the black water as if it were a stair,
 and his court walked down after him, ringing, and the water closed over the last of the bells.
 
-The boatmen say he is still walking. They say the stair goes down for as long as there has been a bog, and he has not
+The boatman says he is still walking. He says the stair goes down for as long as there has been a bog, and he has not
 reached the bottom of it yet. On still nights, if you put your ear to the water beside the Back, you can hear the
 court's bells, very far down.
 
-And they say this, which is why they tell the story at all. If you ever see a crowned head in the water beside the
+And he says this, which is why he tells the story at all. If you ever see a crowned head in the water beside the
 Back, do not reach down and help him up. He is only looking for the next step down, and he
 will take you with him to show him where it is.
 

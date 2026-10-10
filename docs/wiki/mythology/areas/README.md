@@ -18,7 +18,7 @@ Zone ids, names and borders are the game's (`data/world.json`). Levels are the c
 
 | Page | Zone | Levels | What it is |
 |---|---|---|---|
-| `the-red-shore.md` | (new; names open) | town safe; the lands round it wild | the start: black sands at the edge of the Red Water, a sea of blood; inland through the coast's bands to the shore folk's fallen village in the old growth; the act's town |
+| `the-red-shore.md` | (new; names open) | the dead village safe; the lands round it wild | the start: black sands at the edge of the Red Water, a sea of blood; inland through the coast's bands to the shore folk's fallen village in the old growth, where everyone died; the act's safe place |
 | `ashen-moor.md` | `moor`, the Ashen Moor | 2–6 | the god's cheek, warm ash; **wiped to a bare camp** (2026-10-08) until its future is decided |
 
 **The ridge, the heath and the shore** (the dry, burnt side)
@@ -43,7 +43,7 @@ Zone ids, names and borders are the game's (`data/world.json`). Levels are the c
 | `bone-catacombs-upper.md` | `cata1` | 14–16 | the pilgrim ossuary: bone laid as sermons |
 | `bone-catacombs-lower.md` | `cata2` | 15–18 | where the patterns forget themselves; the Ossuary Matron, the act's end |
 | `plague-hospice.md` | `plague_hospice` | 9–12 | where the breath-sick were tended, and kept |
-| `smugglers-hold.md` | `smugglers_hold` | 5–9 | contraband bone, moved under the catacombs |
+| `smugglers-hold.md` | `smugglers_hold` | 5–9 | where contraband bone was once moved, under the catacombs |
 
 **The wet country** (fen, village, bog)
 
@@ -83,7 +83,7 @@ Zone ids, names and borders are the game's (`data/world.json`). Levels are the c
      text.
    
    The myths live in the bible (`../`). A zone page holds the place's own texts: a local legend, a warning, an
-   inscription, what the people nearby believe. No little towns or villages are named, and the Silence is never "the
+   inscription, what the few left nearby believe. No little towns or villages are named, and the Silence is never "the
    Hush".
 4. **For building it:** plain design notes for whoever makes the place.
    - **The land:** ground, water, plants and ecology, true to scale.

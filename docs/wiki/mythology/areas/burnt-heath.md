@@ -6,15 +6,15 @@ method*
 
 Off the Ridge the land runs down into a wide heath burned to black wire. It burned season on season after the god died,
 and nobody lit it, and it has never quite stopped: the wind off the Ridge drives every fire across it the same way, so
-the Heath is a patchwork of burns of every age in long tongues that all point downwind, toward the sea. Pilgrims cross
-it by one road and sleep at one banked fire. In the corner the road bends away from, seven great horned carcasses lie in
+the Heath is a patchwork of burns of every age in long tongues that all point downwind, toward the sea. The few pilgrims
+who cross it keep to one road and sleep at one banked fire. In the corner the road bends away from, seven great horned carcasses lie in
 a ring, all facing the same way, and no lantern will go nearer than its edge.
 
 The Heath is the god's skin, burned, with one old wound under the seven that closed. It should feel wide, dry, smoky
 and watched: there is always a fire somewhere on it.
 
-**The one image:** black wire heath to the edge of sight, one small banked fire with sleepers round it whose feet all
-point one way, and far off in the corner, seven great horned shapes lying in a ring.
+**The one image:** black wire heath to the edge of sight, one small banked fire with two or three sleepers round it
+whose feet all point one way, and far off in the corner, seven great horned shapes lying in a ring.
 
 ## Found in the world
 
@@ -22,15 +22,15 @@ point one way, and far off in the corner, seven great horned shapes lying in a r
 
 ### Three nights at the Heath fire
 
-*A letter from a pilgrim to her sister in the Moor camps, written at the keeper's fire on the Burnt Heath and carried
-back up the road by a carter. Her sister kept it in her tinder tin.*
+*A letter from a pilgrim to her sister at the Moor camp, written at the keeper's fire on the Burnt Heath. Nobody was
+going back up the road to carry it. It was found in the keeper's tinder tin.*
 
 The fire is by the road, short of the fork, banked so low you cannot see it from twenty paces, with a reed tent behind
-it and the sleepers lying round it. The keeper is called Aud, as her mother was and her grandmother, and she tells her
-rules to everyone who sits down.
+it and two other sleepers lying round it. The keeper is called Aud, as her mother was and her grandmother, and she
+tells her rules to whoever sits down.
 
 The fire stays banked, and nobody feeds it but her. Once a man fed it an armful of heath-brush to be kind, and it went
-up so high you could see the far corner of the Heath by it, and everybody sat very quiet until it came down. She would
+up so high you could see the far corner of the Heath by it, and they all sat very quiet until it came down. She would
 not say what they saw. You sleep with your feet toward the road. If you wake with them pointing some other way, you turn
 over, and you don't tell her which way you were lying. If someone calls your name from outside the tent, you answer
 only if they say it wrong. "Your own people say your name wrong," she said. "They always did."
@@ -66,7 +66,7 @@ to something coming up. A knight of the Pale Order sat at the fire and said they
 their weight, and then he went out and counted their bones twice. He wrote the first number
 in his book and would not say the second. The keeper knows it all the same: he dropped his book in the ash going out,
 and she read it before she gave it back, and the second number was the first with one more figure on the end. The
-keeper's mother had it in six words, and the pilgrims carry those away: the ground between them was opened once, and
+keeper's mother had it in six words, and the few pilgrims who pass carry those away: the ground between them was opened once, and
 closed.
 
 Garrow went out to the ring in the last year of his life. He left his lantern at the edge, where it stopped, and went
@@ -82,10 +82,10 @@ ring, and there are seven. There have always been seven.
 
 ### How the Heath caught
 
-*Two tellings of the first fire, the carters' and the keeper's, written one under the other on a single leaf by
+*Two tellings of the first fire, the pilgrims' and the keeper's, written one under the other on a single leaf by
 someone who heard both and would not choose.*
 
-The carters who cross the Ridge say that soon after the god died the Moor was hotter under its ash than it has
+The pilgrims who come over the Ridge say that soon after the god died the Moor was hotter under its ash than it has
 been since. One night the wind over the Ridge came harder than it had ever come, one long breath that did not stop,
 and it lifted hot ash off the Moor in sparks and carried them over the crest. The heath below was dry, and it caught,
 and the wind fed it season on season. That is why every burn on the Heath runs the same way, toward the sea: the
@@ -96,11 +96,11 @@ came up. Her grandmother's grandmother said the Heath burned the way a candle bu
 was only the wick. Dig a spade's depth where the burn is blackest and the earth is warm and greasy in the hand, and if
 you leave the hole open overnight it is smoking by morning. The wind, she says, only ever told the fire which way to go.
 
-Both tellings agree that the Pyre-Saints walked in that first burning, and walk still. The carters say they were the
+Both tellings agree that the Pyre-Saints walked in that first burning, and walk still. The pilgrims say they were the
 faithful of some procession who walked into the fire to pray it out, and the fire took their prayers and kept them
 burning. The keeper says nobody has ever known whose faithful they were, and that anyone who tells you is selling
 something. Someone once chalked the milestone at the fork, then took a stone and cracked it across the figure. The
-carters say it was the keeper's mother. The keeper says she does not know who, and that on the Heath, not knowing the
+pilgrims say it was the keeper's mother. The keeper says she does not know who, and that on the Heath, not knowing the
 distance is a mercy.
 
 ## For building it

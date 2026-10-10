@@ -21,8 +21,8 @@ from behind, and rows of the stood-up dead waiting before it in the dark.
 
 ### Two counts of one room
 
-*A tallier of the Pale Order wrote this to the elder brother who had sent him down. A carter found it in a dead
-knight's pack on the white road, and sold it.*
+*A tallier of the Pale Order wrote this to the elder brother who had sent him down. A pilgrim found it in a dead
+knight's pack on the white road.*
 
 Brother, I have done as you asked and counted the round chamber in the lowest galleries, the one the pilgrims call
 the Miscount.
@@ -45,15 +45,15 @@ Then I went out into the passage and counted the room from the doorway, without 
 thirteen.
 
 I stood in the doorway a long while, and did not go back in. The pilgrims say that whoever counts that room twice
-finds one more, and that the one is the counter. Lowland people say a great many things. I write it down because you
+finds one more, and that the one is the counter. Pilgrims say a great many things. I write it down because you
 told me to bring back every number, and I have brought you both.
 
 Six thousand one hundred and ten, tallier.
 
 ### Where the monks stopped
 
-*A lowland telling of the monks who dug the lower galleries. A carter's daughter wrote it down as her grandmother told
-it, who had it from hers.*
+*A telling of the monks who dug the lower galleries, cut into a slate and left at the head of the ossuary stair. Whoever
+cut it had it from her grandmother, who had it from hers.*
 
 Nobody can tell you which monks they were. They wore grey, my grandmother said, or brown, and kept no name that
 anyone remembers. What everyone agrees on is that the pilgrim ossuary was full.
@@ -82,8 +82,8 @@ them. She never said why.
 
 ### End the count
 
-*A lowland woman's telling at a wake, when the talk turned to the ossuary. The reeve's clerk, who was sitting up with
-the dead that night too, wrote it down.*
+*An old woman's telling at her mother's wake, where there was nobody to sit up with the dead but her and a pilgrim who
+had asked for shelter. The pilgrim wrote it down.*
 
 My grandfather went down to the ossuary on a board, the way our dead always went, and my mother walked
 beside him as far as the stair. She told me about the matron there.
@@ -98,15 +98,15 @@ count what they laid, because it was hers to count. My mother believed she is do
 in rows the better to count them, and beginning again whenever she reaches the end, because the number is never the
 same twice.
 
-Our old women tell it differently. They say so many people asked the matron to keep their dead for
+The old women I grew up among told it differently. They said so many people asked the matron to keep their dead for
 them, and went on asking so long, that when she died she could not lie down. Too many were still asking. A thing that
-enough people ask for gets up in the end and answers, they say, whether it wants to or not.
+enough people ask for gets up in the end and answers, they said, whether it wants to or not.
 
 The knights from the white mountains say there was never any such woman, and that whoever counts the dead standing up
 has it all backward: the dead are counted lying down, in their walls, by brothers, once a year.
 
-Whoever she is, we say the same words for our dead who went down there, at every wake. My mother said them for my
-grandfather, and I will say them for her. Those who went down and came back have cut them into the steps of the last
+Whoever she is, we always said the same words for our dead who went down there, at every wake. My mother said them for
+my grandfather, and I will say them for her. Those who went down and came back have cut them into the steps of the last
 stair, over and over in every kind of hand, so that she will see them whenever she comes up.
 
 End the count. Let them lie.

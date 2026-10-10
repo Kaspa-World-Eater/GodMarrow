@@ -34,7 +34,7 @@ Every herald is a mantle (`00-the-deep-lore.md`): whoever wears it now. They wak
 - **Its rites:** the chant of one breath, the bowls carried down at dusk ("Put a name in it"), and gold laid on what
   should be looked at and not seen.
 - **Its seat:** a mountain of bone, now a courtyard of warm black glass.
-- **Its factions:** the Bowl, who still go down in fours, and the Gilt, who gild themselves living.
+- **Its factions:** the Bowl, a few of whom still go down in fours, and the Gilt, who gild themselves living.
 - **Its calling:** the Empty Hand, "Of That Which Cannot Be Held". What an Empty Hand strikes leaves glass, dust, or
   nothing.
 
@@ -55,12 +55,12 @@ Every herald is a mantle (`00-the-deep-lore.md`): whoever wears it now. They wak
 - **Its factions:** the Measured, and the Open Vein, whose processions go out and do not come home.
 - **Its calling:** the Red Penitent, who opens their own veins and lets the Mother through.
 
-**The Myriad**, whom common folk call the Shrine Keepers (a *shrine*). Its masks are the kami: the spirits of thoughts, grudges, lies and beliefs, carried
-on the breath, many and nameless (the keepers call those born of words kotodama).
+**The Myriad**, whom others call the Shrine Keepers (a *shrine*). Its masks are the kami: the spirits of thoughts,
+grudges, lies and beliefs, carried on the breath, many and nameless (the keepers call those born of words kotodama).
 - **Its dead** are given to the water.
-- **Its rites:** stilling breath (taking it, from the air, the sick, the dying, the grieving who pay), holding it longer than
-  anyone living, and breathing it out by the fan into a shrine, a paper figure or an enemy's face; whispering quarrels
-  into the shrines so the caught gods never agree; the Small Cutting, since the grey year.
+- **Its rites:** stilling breath (taking it, from the air, the sick, the dying, the grieving who ask), holding it longer
+  than anyone living, and breathing it out by the fan into a shrine, a paper figure or an enemy's face; whispering
+  quarrels into the shrines so the caught gods never agree; the Small Cutting, since the grey year.
 - **Its end of a keeper:** a keeper who holds too much grows horns and walks down into the dark, still holding; she is
   called kegare then, the word for the filth she carries.
 - **Its calling:** the Shrine Keeper.
@@ -74,8 +74,8 @@ on the breath, many and nameless (the keepers call those born of words kotodama)
 
 ## The peoples
 
-**The Tithed** are everyone. Their memory begins on the first morning, waking on the ash; how they came there, nobody
-knows (`02-the-creation-myths.md`).
+**The Tithed** are whoever is left. Their memory begins on the first morning, waking on the ash; how they came there,
+nobody knows (`02-the-creation-myths.md`).
 - **Their ways:** the tithe, a tenth of everything left for what is owed: the tenth row standing, the tenth loaf on
   the sill, the tenth night kept awake; true names kept behind the teeth; no singing on the open ash at night.
 - **Their nights:** the tenth night, kept awake; Low Day at the barrows.
@@ -88,17 +88,18 @@ knows (`02-the-creation-myths.md`).
 - **Their ways:** the stair swept every morning, spirit houses on carved posts, and a teacher's dance before every fight.
 - **Their forms:** Thai and Northwest Coast together.
 
-**Those who work the lands** (each lives in its zone, and none has a town):
-- the bog folk, who walk the Long Back and say their own people laid it;
-- the ash-boilers of the Ash Shore, who boil the grey-soaked ash for potash;
-- the lantern folk of the Sighing Ridge, who stand still when the wind stops;
-- the boatmen of the Drowned Fen;
-- the hunters, who take hide, bone and tallow from what comes up out of the god;
-- the copyists, who keep the registers of the old road's numbered stones.
+**The few still out on the lands** (one or two to a zone, most of them alone; none has a town, and they are fewer
+every year):
+- the last of the bog folk, who walk the Long Back and say their own people laid it;
+- a lone ash-boiler on the Ash Shore, boiling the grey-soaked ash;
+- the lantern folk of the Sighing Ridge, a handful, who stand still when the wind stops;
+- a boatman on the Drowned Fen;
+- a hunter here and there, who takes hide, bone and tallow from what comes up out of the god;
+- a last copyist, who keeps the register of the old road's numbered stones.
 
 **Further off, and later in the acts:**
-- **the Last Vigil:** lamp-bearers keeping a watch at the gate of the Descent;
-- **the Miscount:** lowlanders who unmake the Order's tallies at night;
+- **the Last Vigil:** a handful of lamp-bearers keeping a watch at the gate of the Descent;
+- **the Miscount:** a few lowlanders who unmake the Order's tallies at night;
 - **the herald-cults:** each worshipping one power's herald.
 
 ## Mantles
@@ -129,7 +130,7 @@ card is the same mantle seen from the other side.
 | **The Unravelling Loom** | the one who unpicks | the Veiled Crone, behind her veil | the one who reweaves |
 | **The Lantern-Wright** | the one who keeps what is lost | nobody now; the makers were hunted out, and the lanterns are fewer every year | the one who lets it go |
 | **The Drowned Choir** | the one who holds the note | the Choir, under the crypts | the rest between notes |
-| **The Tithe** | the one who owes | the Tithed, every one | the one who comes to collect |
+| **The Tithe** | the one who owes | the Tithed, every one left | the one who comes to collect |
 | **The Hollow Crown** | the one whose orders are never obeyed | the Man in the Rust, on the dark moon | the city that would obey if it could |
 | **The Unwritten** | the one who ends the turn | nobody yet | the one who begins the next |
 

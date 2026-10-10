@@ -1,15 +1,15 @@
 # The Red Shore
 
-*Act I · the start: the act's town and the wild lands round it · names not yet chosen · not yet in the game (the
-Ashen Moor's bare camp stands in for it) · built so far: the temple hall, as the 3D trial
+*Act I · the start: the act's safe place, a dead village, and the wild lands round it · names not yet chosen · not yet
+in the game (the Ashen Moor's bare camp stands in for it) · built so far: the temple hall, as the 3D trial
 (`tools/landkit/passes/thai_temple.md`, pass 6, B-) · the shore folk's myths, the Red Water's among them:
 `../../in-game-texts/08-the-shore-folk.md` · their serpent: `../../in-game-texts/09-the-long-back.md`*
 
 The game begins at the edge of the world.
 
 **The Red Water.** The land ends in black sand, and beyond the sand lies the Red Water. It is an ocean of blood going
-on forever under a grey sky. The people here do not know it is a sea. The shore folk believe it is the blood of the
-Fallen One, the body the land is made of, run out of a wound in its side. The tide is its heartbeat, and whatever
+on forever under a grey sky. The shore folk who lived here never knew it was a sea. They believed it was the blood of
+the Fallen One, the body the land is made of, run out of a wound in its side; the tide was its heartbeat, and whatever
 goes into the Red comes back. The dead of the whole world wash up out of it onto the black sand.
 
 **The village.** Above the sand, hidden in giant trees on the first terrace past the bluffs, stands the shore folk's
@@ -85,7 +85,8 @@ Whoever reads this: give us to the fire. Do not let the Red have us.
 *Written by a pilgrim to her brother in the lowlands. It never reached him. The merchant sold it, with the satchel it
 was in, to the next pilgrim who came.*
 
-I found the village the old trader told us of, and it is as he said, except that he said there would be people.
+I found the village the old man on the road told us of, and it is as he said, except that he said there would be
+people.
 
 You come to it from the sand. I walked two days along the black beach with the Red on my left hand. I will not try to
 tell you what that is like, except that it does not end, and it comes up the sand and goes back as if it were
@@ -493,7 +494,7 @@ and pipe the shore folk played on the wall.
 - **How many zones the start is:** perhaps the sand, the fringe and bluffs, and the old growth with the village.
 - **How it joins the rest of Act I.**
 - **Which way the sea lies on the map:** west, like the Olympic coast.
-- **Which town services the village has** with only the merchant: buying and selling, and perhaps repair. Healing,
+- **Which services the dead village has** with only the merchant: buying and selling, and perhaps repair. Healing,
   the stash and a waystone are open.
 - **Whether the old camp's people** (Maren, Ysolde, Brannoc, Esk) appear later in the act.
 - **The Ash Shore (a proposal that ties the two coasts):** far along the coast, the same blood lies under a skin of ash

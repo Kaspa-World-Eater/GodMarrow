@@ -56,7 +56,7 @@ If everything is told, the Silence is the untold: the space between words, where
 the one thing nobody made by speaking, and so the one thing in the world that is not a dream. It holds everything
 because it holds nothing.
 
-It has no name that can be said, and the peoples say it many ways:
+It has no name that can be said, and the few who speak of it say it many ways:
 - **That Which Cannot Be Named;**
 - **That Which Cannot Be Held**, as the monks of the Empty Hand say it;
 - **the Unmaking;**
@@ -66,8 +66,8 @@ Derek: "a fusion of nihilism and daoism." Whatever name can be said of it misses
 remains when the telling stops. **Never "the Hush"** ("so corny").
 
 **It unmakes by unsaying.** What its servants touch leaves no body, bone, breath or thread, because the telling is
-taken out of it, and a thing with no telling never was. A hamlet is emptied and its survivors dig a grave too many,
-for someone none of them can remember.
+taken out of it, and a thing with no telling never was. A lone house is emptied, and the one left in it digs a grave too
+many, for someone he cannot remember.
 
 **How the god died, read this way:**
 - The Choir told the god what it was, in turns, so that the telling never stopped.
@@ -111,8 +111,8 @@ One thing every people has, in every age and every turn of the world, is the tar
 > all the cards or the formations that they can take when drawn." (Derek)
 
 **What the cards are:**
-- **Everywhere and always.** The brothers of the bone-houses lay cards, and so do the circles, the processions, the
-  shrine-keepers, the shore folk and the grandmothers at the banked fires. Cards are cut into the oldest ruins, by
+- **Everywhere and always.** The last brothers of the bone-houses lay cards, and so do the circles, the processions,
+  the shrine-keepers, the shore folk and the old women at the banked fires. Cards are cut into the oldest ruins, by
   peoples who left nothing else anyone can read.
 - **Read differently by every people.** Each reads the same cards its own way, and gives them its own names.
 - **Never all known.** Nobody knows all the cards. There are always more: a card turns up in a dead man's coat, or in a

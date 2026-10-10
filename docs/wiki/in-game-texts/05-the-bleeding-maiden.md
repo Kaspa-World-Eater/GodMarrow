@@ -1,8 +1,9 @@
 # The Bleeding Maiden
 
-*The faith of the Bleeding Maiden walks in processions. Its chapters stand along open wounds in the world, and each
-keeps its Rule chained to the wall of its crypt. These texts come from the Rule, from what was chalked and cut inside
-the crypts, and from what outsiders saw.*
+*The faith of the Bleeding Maiden walks in processions, though a procession now is a few hooded figures on an empty
+road. Its chapters stood along open wounds in the world. Most of them are empty now, and each still keeps its Rule
+chained to the wall of its crypt. These texts come from the Rule, from what was chalked and cut inside the crypts, and
+from what outsiders saw.*
 
 ## The wound
 
@@ -35,8 +36,8 @@ remember nothing at all. The cup came down to us from somewhere, and our faith b
 chalk, a hood of that chapter wrote this account of the Measure on the wall.*
 
 Once a year, on the Day of the Measure, the procession goes out from the chapter door to the wound. The Elder walks
-at the front. We walk behind, in our hoods, each of us known by our place in the line: the ninth hood, the
-twenty-ninth hood. When one of us goes into the wall, everyone behind moves up a place.
+at the front. We walk behind, in our hoods, each of us known by our place in the line: the third hood, the ninth
+hood. When one of us goes into the wall, everyone behind moves up a place.
 
 The bloodletter walks at the back. She carries the small blade, and she opens each of us in turn and keeps the tally
 of what each has given. By the oldest rule, the one who opens others never opens herself. Her sleeves stay down and
@@ -60,13 +61,13 @@ the lowland children have a rhyme about them, about the Tall Red Hat.
 
 ## The unfinished face
 
-*Told by the carvers who make the images for the chapters. A carver's apprentice wrote it down on the back of a
-pattern.*
+*Told by the last carver who made the images for the chapters. Written on the back of one of his patterns, found in
+his empty workroom.*
 
 Every chapter has a niche over its crypt stair, and in every niche stands the Maiden. Her face is never finished. It
 is left rough from the axe, the first cuts of a face and nothing more.
 
-The carvers say the first carver of the first niche worked on her a long while, and every time he set his chisel to
+The carvers always said the first carver of the first niche worked on her a long while, and every time he set his chisel to
 her face it slipped. In the end he put the chisel down and left her as she was. When the Elder asked him why, he said
 that she did not want a face, because a face can be named, and a thing that can be named can be called.
 
@@ -75,8 +76,8 @@ there. Each of us has seen something. We do not compare.
 
 ## The saints on the stair
 
-*A pilgrim's account of a night spent in a chapter of the processions, written the next morning at an inn on the ash
-road.*
+*A pilgrim's account of a night spent in a chapter of the processions, written the next morning at a waystone on the
+ash road and left there under a stone.*
 
 They warned me before I went down to sleep in the guest room. At night, they said, the saints come down the crypt
 stair. From wherever they come from, they come down the stair and go into the carved images in the crypt, and
@@ -96,12 +97,12 @@ I left before it was light. I left a copper on the guest room's sill, I do not k
 
 ## The year the wound hatched
 
-*Told by an ash-carter who passed many times, before and after, through a chapter of the processions built along a
-great wound in the ground. It was written down at its daughter chapter, which still sets out the old chapter's
-tithe-cup at its closed gate once a year.*
+*Told by a lone walker of the ash road who passed many times, before and after, through a chapter of the processions
+built along a great wound in the ground. It was written down at its daughter chapter, where the few hoods left still
+set out the old chapter's tithe-cup at their closed gate once a year.*
 
-The chapter was built down both lips of a long wound in the ground, as long as a morning's walk. Forty hoods
-walked in its procession, and its gutters ran dark. Some people say they ran the colour of old brown ink, and that
+The chapter was built down both lips of a long wound in the ground, as long as a morning's walk. Twelve hoods walked
+in its procession, and its gutters ran dark. Some people say they ran the colour of old brown ink, and that
 anyone who calls them red has never been there. Others say red.
 
 In its last year the wound would not take the blood. It had crusted over from one end to the other, a
@@ -111,11 +112,11 @@ and the crust closed over it again before the cup was empty.
 
 On the fast-day after, the crust split along its whole length in the night. What came out of the wound came out in
 the hoods' robes. The robes had been hanging on their pegs in the crypt, as robes do between processions, and in the
-morning they were walking: children, or the shapes of children, with nothing behind their eyes, forty of them in the
-forty robes, in the order of the procession. At the front walked something tall, sewn together out of more than one
+morning they were walking: children, or the shapes of children, with nothing behind their eyes, twelve of them in the
+twelve robes, in the order of the procession. At the front walked something tall, sewn together out of more than one
 thing, and on its back it carried the Maiden out of the niche. I saw her. She had a face now.
 
-The forty hoods were gone, and nobody found them.
+The twelve hoods were gone, and nobody found them.
 
 The Rule in the crypt has new clauses since that night. They are written in brown ink, in a hand that leans the other
 way. One says *The measure is all of it.* One says *The niche shall hold a face.* One says *The procession goes out,

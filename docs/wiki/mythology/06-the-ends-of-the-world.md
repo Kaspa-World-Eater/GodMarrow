@@ -82,11 +82,11 @@ veil, by feel, a thread for every life, warp and weft, and she has never once se
 Hide is her veil, drawn across the whole sky; the two moons behind it are her eyes, one open and one shut, and when the
 dark moon crosses the pale one she is blinking.
 
-**The lifting of the veil.** One night she will lift it. The circles do not agree why. Some say she will finish the cloth
-and want to see it; some say a thread will cut her finger; some say the Silence, which got in once already, will get in
-under the veil and lift it from inside. However it begins, the grey will draw back off the sky for the first time since
-the first morning, and the whole Hide will stand out of doors and see the sky bare: the sun for the hole it is, and the
-two moons for what they are, and the Crone looking down through all three.
+**The lifting of the veil.** One night she will lift it. The circles do not agree why. Some say she will finish the
+cloth and want to see it; some say a thread will cut her finger; some say the Silence, which got in once already, will
+get in under the veil and lift it from inside. However it begins, the grey will draw back off the sky for the first time
+since the first morning, and whoever is left on the Hide will stand out of doors and see the sky bare: the sun for the
+hole it is, and the two moons for what they are, and the Crone looking down through all three.
 
 And she will see what she has woven, and it will be wrong. It has been wrong since the god died, the circles say,
 because the god was the loom and she has been weaving without one ever since, and the cloth has puckered and run and
@@ -119,7 +119,7 @@ The flesh will fill every hollow: every wound and every mouth, every grave and e
 and the next. When nothing is hollow anywhere, there will be no *then*. That will be the Mother made whole.
 
 The processions keep the name of every knight of the Pale Order in their litanies, so that she will know whom to take
-first. The lowland children, who know nothing of the litanies, end their counting game with the rhyme's last verse:
+first. The few lowland children, who know nothing of the litanies, end their counting game with the rhyme's last verse:
 
 > *Who will open the Tall Red Hat?*
 > *Mother will.*
@@ -135,7 +135,7 @@ The one wind is still going out across the Hide, thick with the kami of everythi
 of everything everyone since has said aloud. They quarrel in it. That is the only thing keeping the world as it is:
 **discord**, belief against belief, god against god, each small one holding every other small one down. The keepers tend
 the quarrel. They whisper contradictions into their shrines so that the caught gods never settle. They breathe a lie
-into a room where a truth has been told too often. They set one village's grudge loose in the next village's well. They
+into a room where a truth has been told too often. They set one house's grudge loose in the next house's well. They
 are hated for it, and they would say they are hated by people who do not understand what they are holding back.
 
 **The Concord.** But the miasma is thickening. Every year the breath is fouler, and the kami in it are sicker and
@@ -194,8 +194,8 @@ Deep in Shog-Mire it is whispered that something in the red water is learning th
 
 ## The Tithed: the Reckoning
 
-The common people have no great end of their own, and the faiths' ends are not asked of them. What they have is the
-debt (`02-the-creation-myths.md`).
+The Tithed who are left have no great end of their own, and the faiths' ends are not asked of them. What they have is
+the debt (`02-the-creation-myths.md`).
 
 They have been paying it since the first morning: the tenth row left standing, the tenth loaf on the sill, the tenth
 night kept awake, the tenth word unsaid. Nobody knows to whom. And the grandmothers say a debt paid by the tenth is
@@ -211,9 +211,9 @@ The grandmothers will not say what the collector looks like. The children say it
 it carries a deck of cards, and that it has been seen already, here and there, sitting by a road, laying them out for
 nobody.
 
-**The signs, as the hearths tell them:** the tenth rows left standing in the fields have begun to lean, at night, all
-one way, as if something were walking past them; the tenth loaf is taken earlier in the night than it used to be; and
-on the nights kept awake, more and more of the watchers say they heard footsteps on the road that did not stop at any
+**The signs, as the last hearths tell them:** the tenth rows left standing in the fields have begun to lean, at night,
+all one way, as if something were walking past them; the tenth loaf is taken earlier in the night than it used to be;
+and on the nights kept awake, more of the few watchers say they heard footsteps on the road that did not stop at any
 door. Yet.
 
 ## The shore folk: When the Grandmother Cuts Her Hair
@@ -235,7 +235,7 @@ she will know who is grateful and who is sorry; for every life on the shore is l
 and every death on the shore is given back to her. Whatever goes into the Red comes back, they say. She sends it back.
 She is only lending.
 
-**The cutting.** Every grandmother on the shore cuts her hair when she is widowed, and lays it on the Red. So, the
+**The cutting.** Every grandmother on the shore cut her hair when she was widowed, and laid it on the Red. So, the
 keepers say, will the Grandmother of the Red, when the Fallen One finishes dying. She will take a knife to her braid
 and cut it at the nape, and let it go.
 
@@ -254,13 +254,13 @@ the Red will be glass where they stand, a whole people of red glass, on the shor
 say, is why the oldest roads on the Hide are black glass in places. It has happened before.
 
 **The cards.** The shore folk read the cards on the wet sand at low tide, laid face up in a line from the dry sand down
-toward the Red, and read them by which ones the Red takes when it comes back in. They have noticed, these last years, that
-the Red has begun to leave the cards alone.
+toward the Red, and read them by which ones the Red takes when it comes back in. They noticed, in their last years, that
+the Red had begun to leave the cards alone.
 
 ## The signs
 
-Every people lays the cards, and in this age they have all been seeing the same things. These are the signs that every
-people can read, now:
+Whoever is left lays the cards, and in this age they have all been seeing the same things. These are the signs that any
+of them can read, now:
 - **The Pilgrim keeps turning up.** In every spread laid on the Hide these last years, whatever the deck and whoever the
   reader, the card called the Pilgrim has turned up, and nobody can remember when it last came up reversed.
 - **New cards are found.** More cards turn up every year that nobody has seen before, in the coats of the dead and the

@@ -5,7 +5,7 @@ Drowned Fen, the upper catacombs, the Broken Bridge · in the game: the old proc
 remade by the bog's method · the Horned: `../../in-game-texts/06-the-myriad.md` · the Deep in its own words: "Words Up Through the Seam"
 in the Codex (`data/codex.json`)*
 
-Under the skin of the world lies a country. The lowlands call it the Root Deep, or only the Deep; the oldest texts give
+Under the skin of the world lies a country. Those left in the lowlands call it the Root Deep, or only the Deep; the oldest texts give
 it another name, Ne-no-kuni, which nobody now says. It is warm and dark, and it breathes: out for a long while, then in.
 It is courteous. It answers iron. It keeps a little of everyone who goes down, and sends the rest back up in good order.
 Its halls are wider when you enter them than when you leave. The Horned, the Shrine Keepers' purifiers come to their
@@ -36,7 +36,7 @@ horns on the oldest were longer than my hand. Each carried a sack on her back, t
 heavy. I know what is in them, because one day there will be one on mine.
 
 At the head of the road stands a stone, squat, like the numbered stones on the pilgrims' road, so worn that nobody can
-read its figure. Its top is hollowed into a dish by the coins laid there. Leave a copper on the stone, the boatmen say,
+read its figure. Its top is hollowed into a dish by the coins laid there. Leave a copper on the stone, the boatman says,
 and something will be kinder to you. I left one. Coming up, I found the dish empty.
 
 The road goes down a long way through halls. The roof is high and pale and hung with roots, thousands of them, some as
@@ -51,20 +51,20 @@ I turned back at the third hall. I had counted my paces going in. Coming out, th
 been, and the second narrower than that, and I reached the stone at the top in fewer paces than I had gone down in. I
 have counted it twice since on my cord, and the cord says the same.
 
-It keeps a little of everyone, the boatmen say. I do not know what it kept of me. My breath is the same, and my knots
-are the same. When I came up, the boatmen's wives were on the bank with their small ones, and one of them saw where I
-had been and turned her baby's face into her shoulder, and laid her hand over the top of its head, on the soft place,
-until I had gone by. They do that, I am told, when anyone comes up from the Deep, and they will not say why.
+It keeps a little of everyone, the boatman says. I do not know what it kept of me. My breath is the same, and my knots
+are the same. When I came up, the boatman's wife was on the bank with her baby, and she saw where I had been and turned
+its face into her shoulder, and laid her hand over the top of its head, on the soft place, until I had gone by. It is an
+old thing on the Fen, I am told, and she would not say why.
 
 My stones have turned another finger's width toward me. I am in no hurry. The road will wait. It was very polite.
 
 ### The echo
 
-*Told by the boatmen of the Fen on the nights they sleep under the bowed arch. A purifier wrote it down in her
+*Told by the last boatman of the Fen, on a night he slept under the bowed arch. A purifier wrote it down in her
 day-book.*
 
 Two brothers went down into the Deep to see if it was true that it answers iron. The elder carried a pick, and in the
-first hall, where the roof hangs low, he knocked on the wall with it three times, as the diggers on the Moor do.
+first hall, where the roof hangs low, he knocked on the wall with it three times, as the diggers on the Moor did.
 
 The wall answered. It said good evening, in a voice like warm air coming out of a crack, and thanked him for knocking,
 because it is courteous to answer a knock. Then it thanked him for the last time he had come, and for what he had
@@ -80,7 +80,7 @@ late, as if he were always answering something. He lived a long time, and poled 
 answered things nobody else had heard. Near the end he would stop in the middle of a word, and listen, and nod, and say
 "yes," and finish the word.
 
-So the boatmen tell their sons: in the Deep your echo comes back before you speak, and you must never answer it. And if
+So the boatmen used to tell their sons: in the Deep your echo comes back before you speak, and you must never answer it. And if
 the wall thanks you for something you never did, thank it back and leave. It means no harm. It never means any harm.
 
 ## For building it

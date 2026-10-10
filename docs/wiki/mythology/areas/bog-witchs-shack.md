@@ -23,10 +23,10 @@ before the door a stone worn into two hollows by knees.
 
 ### The Tallow-Mother
 
-*Told by a bog guide, one of those who keep the Long Back, to pilgrims waiting out the rain at the bog's landward edge.
-One of the pilgrims wrote it down.*
+*Told by the last of the bog guides who kept the Long Back, to a pilgrim waiting out the rain at the bog's landward
+edge. The pilgrim wrote it down.*
 
-There are a dozen Hesks in the wet country. When we lower our voices, we mean this one.
+There are a dozen Hesks in the old tellings of the wet country. When a guide lowers his voice, he means this one.
 
 She lived on the hump at the land end of the bog, in the shack you can see from here when the rain thins, the one with
 the smoke going up from it. My grandmother's grandmother knew her as an old woman. So did my grandmother. That tells you
@@ -42,13 +42,13 @@ long. The pilgrims say she put them into her candles.
 
 Because she made candles. The bog keeps its drowned. You will have seen them in the turf banks, if you looked: a hand in
 the cut face, a shoulder, brown and whole, generations down. Down there in the wet, where no air gets in, the fat of
-the drowned goes pale and hard, like wax. The turf-cutters call it grave-wax and will not touch it. Hesk paid them to
-bring it to her. She rendered it in her vat and poured it, and her candles burned slow and gave a good light, and some
+the drowned goes pale and hard, like wax. The turf-cutters called it grave-wax and would not touch it, in the days when
+there were turf-cutters. Hesk paid them to bring it to her. She rendered it in her vat and poured it, and her candles burned slow and gave a good light, and some
 of them got up and walked.
 
 You will see them on the hump, the ones that burn as they go and leave their footprints smoking in the wet. The pilgrims
-call them saints, martyrs out of the burnt country who walk wherever there is something to burn. We call them Hesk's
-candles. We have the better right to name them; we see them every night.
+call them saints, martyrs out of the burnt country who walk wherever there is something to burn. I call them Hesk's
+candles, as my mother did. I have the better right to name them; I see them every night.
 
 Is she dead? An old woman who had been a warden once told my mother she felt Hesk go out, all her candles at once, like
 a tooth pulled. But the candles still walk. The smoke still goes up from the chimney, and nobody lights a fire under it.
@@ -60,15 +60,15 @@ way people always did, and you kneel.
 
 ### A year for the fever
 
-*A letter from a woman of the Monastery road to her sister in the lowlands. It was never sent. It turned up years later
-in the lining of a pilgrim's coat, far from the bog, and nobody knows how it got there.*
+*A letter from a woman who lived in a lone house on the Monastery road, to her sister far away. It was never sent. It
+turned up long after in the lining of a dead pilgrim's coat, far from the bog, and nobody knows how it got there.*
 
 Sister,
 
 You will have heard that Aled lived. I want you to know what it cost, and that I do not grudge it.
 
 The fever went on for days, and nothing from the road did any good, and on the worst night I wrapped him and carried
-him down into the bog. The guides would only take me to the foot of the hump. I went up alone in the dark, with him
+him down into the bog. The guide would only take me to the foot of the hump. I went up alone in the dark, with him
 burning in my arms.
 
 The shack is smaller than you would think, and blacker. The boards are dark and slick to the touch, as if they had been
@@ -89,7 +89,7 @@ the floor stood in rows, like people waiting to be called.
 A little clay bottle came out to me through the crack. I wet his lips with it, and he was cool before I was down off the
 hump.
 
-Here is what I want you to know. Everyone says she takes the year off the end of your life, so that you die a year
+Here is what I want you to know. They say she takes the year off the end of your life, so that you die a year
 sooner. I believed it, and I made my peace with it on the way down.
 
 She took it out of the middle. I knew as soon as I was home. I can count my life up to the spring I was married, and
@@ -150,7 +150,7 @@ wind. No fog over the water.
 **Creatures.**
 - **Drowned Husks** (18): the bog's kept dead, up out of the pools and the turf banks. Fight them on the narrow turf
   paths, where they come one at a time.
-- **Pyre-Saints** (12), "Hesk's candles" to the bog folk. Their fire hisses in the wet. Their footprints light the dry
+- **Pyre-Saints** (12), "Hesk's candles" to the last guide. Their fire hisses in the wet. Their footprints light the dry
   turf stacks and the heather on the hump, which burn long and hot; any pool puts them out, so here the water is the
   safe ground.
 - **Gravebloats** (6): walking stomachs, drawn to the smoke; let them burst among the Husks.

@@ -40,8 +40,12 @@ leaves), written in the world's own voices. Those live in `../in-game-texts/` an
   masks,** human ways of trying to understand. The bible tells the myths behind the masks, and never pretends a mask is
   the thing.
 - **A world of unknowns** ("not Baldur's Gate"). The bible keeps to the great things: the entities, the ages, the
-  faiths, the regions. It names no little towns or villages (they don't exist yet; the Ossa is fine), and few people.
+  faiths, the regions. It names no little towns or villages (they don't exist; the Ossa is fine), and few people.
   The player makes the connections.
+- **A desolate world** (Derek, 2026-10-09: "it's in fact more of a desolate wasteland and there's almost nobody
+  there"). The living are few and scattered: a lone house, a camp, a hermit, the last one left in a place. The faiths
+  are dwindling remnants. Trades, markets and busy roads stay out of the lore, but for a few lone figures. The cities
+  of the old age are ruins, and make the world emptier.
 - **Myths are told as myths.** The voice is that of a good book of world mythology, readable and in order, with
   little jargon. The old tongue's names (Oss-Vharoth, Ur-Nihl) appear rarely. No myth is framed as a character's
   journal.
@@ -75,8 +79,8 @@ leaves), written in the world's own voices. Those live in `../in-game-texts/` an
     Threshold" (`data/board.json`, `data/progression.json`) still have the old word;
   - the in-game texts that retell the old age (`../in-game-texts/10-the-old-powers.md`, `11-the-gone-peoples.md`)
     are rewritten to the new names;
-  - the game's boss "The Marrow-Eater" (`data/progression.json`) stays: "Marrow-Eaters" is what the common roads call
-    the Ghauul.
+  - the game's boss "The Marrow-Eater" (`data/progression.json`) stays: "Marrow-Eaters" is what the few on the roads
+    call the Ghauul.
 - **The Flesh herald's name.** The game still shows the retired "Wet Nurse"; Soul has no herald.
 - **The faiths' own words:** order, monastery, circle, procession, shrine.
 - **The start's names:** the village, the merchant, and the sea's common name.

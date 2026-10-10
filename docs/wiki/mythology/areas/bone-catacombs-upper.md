@@ -6,7 +6,7 @@ remade by the bog's method · how the Pale Order lays its own dead, which is not
 `../../in-game-texts/02-the-pale-order.md`*
 
 From the reeds at the edge of the Drowned Fen the ossuary stair goes down into the pilgrim ossuary. For longer than
-the lowlands remember, pilgrims who died on the road were carried here by those who walked on and laid into the walls
+anyone remembers, pilgrims who died on the road were carried here by those who walked on and laid into the walls
 without their names, and the walls were laid as sermons: a gallery of thigh-bones, a gallery of jaws, and the Cup
 Wall, where skull-caps lie cup-down like roof tiles and one touched cap sets ten thousand ringing. Nobody keeps it
 now. Bone knights walk the galleries and salute each other as they pass, fencers of bone practise their forms in the
@@ -23,8 +23,9 @@ height where pilgrims touched it, and a thin grey shaft of daylight falling on i
 
 ### The walls, read aloud
 
-*How the old keepers of the ossuary preached the walls to pilgrims, walking ahead of them with a lamp. A pilgrim
-wrote it down from memory that night at the head of the stair, and a lowland scriptorium kept her leaf.*
+*How the old keepers of the ossuary preached the walls to pilgrims, walking ahead of them with a lamp, when there were
+keepers. A pilgrim wrote it down from memory that night at the head of the stair, and left her leaf there under a
+stone, where it was found long after.*
 
 Keep your lamps low, and keep close. The galleries are long, and it is easy to stop at a wall and find your company
 gone on without you.
@@ -64,8 +65,8 @@ Now we go up the way we came, and nobody looks back down the stair.
 
 ### The page one line ahead
 
-*A copyist's letter to the master of the scriptorium that sent him to copy the book in the Reader's Bay. It was found
-at the head of the ossuary stair with his copy folded inside it, which his master has never unfolded.*
+*A copyist's letter to the old master who taught him his hand and sent him to copy the book in the Reader's Bay. It was
+found at the head of the ossuary stair, unsent, with his copy folded inside it. Nobody has unfolded the copy.*
 
 You asked me for a copy of the book in the Reader's Bay. I have made one, and first I will tell you how.
 
@@ -79,7 +80,7 @@ over the book in a bay off the long gallery, and found that the hand on the page
 
 I read on, and it was always one line ahead of me. When I took out my pen, it said I took out my pen. When I began to
 copy, what I copied was what it said. I thought I would get ahead of it. I wrote a thing no book could know, the name
-of the girl at the mill at home, and when I looked up the page had her name already, in my hand, with the long tail.
+of a girl I knew as a boy, and when I looked up the page had her name already, in my hand, with the long tail.
 
 Then I understood that I was only copying, and I put down the pen, and the page said I put down the pen. I did not
 read what it said after that. I laid my coat over the book and went out backward, the way you leave a room where

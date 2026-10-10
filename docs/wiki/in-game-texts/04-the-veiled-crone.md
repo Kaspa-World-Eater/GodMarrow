@@ -1,8 +1,9 @@
 # The Veiled Crone
 
-*The circles of the Veiled Crone keep the soul. They meet in round lodges built where, they say, her threads come up
-through the skin of the world, and they sit in rings from dusk until the grey hour saying her names. Their texts are
-kept in the lodges and copied by their readers. Some came out with the Mirror, who left.*
+*The few circles of the Veiled Crone that are left keep the soul. They meet in round lodges built where, they say, her
+threads come up through the skin of the world, and they sit in rings from dusk until the grey hour saying her names.
+Most of the lodges stand empty now. Their texts were kept in the lodges and copied by their readers. Some came out
+with the Mirror, who left.*
 
 ## The first thread
 
@@ -35,7 +36,7 @@ knot before she began.
 *From a letter written by a girl to her mother on the morning after her first night in a circle. Her mother kept it
 all her life.*
 
-They sat us in a ring on the floor of the round lodge, forty-one of us, with the eldest in the middle. The eldest
+They sat us in a ring on the floor of the round lodge, nine of us, with the eldest in the middle. The eldest
 wore the coat of glass. It is an iron coat sewn all over with small hollowed mirrors, and every eldest before her
 sewed more of them on, until it weighs what a second body weighs. She could not stand up in it without two of the
 menders lifting her. She did not need to stand.
@@ -55,11 +56,11 @@ on a still night, running under the surface toward the shore. I would like to se
 
 ## The law of the mirror
 
-*Told in every circle as the reason for the oldest law. A grinder of glass, who made the hollowed
+*Told in every circle that is left as the reason for the oldest law. The last grinder of glass, who made the hollowed
 mirrors for the lodges, wrote it down.*
 
-A soul cannot pass its own reflection. Every circle holds this, Shroud and Mirror alike, and every circle tells
-the same story of how it was learned.
+A soul cannot pass its own reflection. Every circle holds this, Shroud and Mirror alike, and every circle tells the
+same story of how it was learned.
 
 A reader's son died young. On the way out of the house his soul crossed the yard, and in the yard there was a pail of
 rainwater, and the soul looked into the pail and saw its own face, and stopped. It did not go on. It stood in the yard
@@ -81,9 +82,9 @@ lodge has ever let one past its door alive.
 That winter, the dead did not go through.
 
 We covered the mirrors as we always have. The felt was laid right, and the stones were on the corners. But the dead
-came back up the valley anyway, night after night. They came to the doors of the houses they had died in
-and stood there and asked the same thing, over and over, quietly, of whoever opened the door: *Which way?* Nobody
-could tell them. They went from door to door. By the end of the winter they were at the lodge doors too.
+came back up the valley anyway, night after night. They came to the doors of the houses they had died in, whether
+anyone still lived there or not, and stood there and asked the same thing, over and over, quietly, of whoever opened
+the door: *Which way?* Nobody could tell them. By the end of the winter they were at the lodge doors too.
 
 On the thirtieth night the eldest of our circle stood up in the coat of glass, without the menders, which she had
 not done in years. She said: *There is no loom. It goes on and on, and it never finishes.* Then she sat down, and she
@@ -99,8 +100,8 @@ and it has not fallen down since.
 
 Since that winter the Shroud send their dead through faster and more fiercely than before, and they burn any glass
 they find uncovered. "The loom is there," they say, "and saying so is the work." The Mirror walk the roads with
-needles and hollowed mirrors, and the kept go round them in the dark like small cold lights. Widows pay the Mirror
-for a little more time with the dead, and the Mirror take the copper.
+needles and hollowed mirrors, and the kept go round them in the dark like small cold lights. A widow who meets them
+on the road will give them whatever she has for a little more time with her dead, and the Mirror take it.
 
 ## The reading-room
 

@@ -22,10 +22,10 @@ figure cut in it, and black glass in the paving catching the lantern.
 
 ### The numbering of the road
 
-*The preface to the copyists' register of the Pilgrim Road's stones, kept in their scriptorium. Each copyist
-who takes up the register adds a line below it; the preface has never been changed.*
+*The first leaf of the copyists' register of the Pilgrim Road's stones, found with the register in a dry niche of a
+lantern-stone. A few later hands have added lines below it; none has changed it.*
 
-Every faith on the Hide will tell you it cut this road, and every one of them is wrong. The road was here first. It goes
+Every faith that is left will tell you it cut this road, and every one of them is wrong. The road was here first. It goes
 through the pale wood as if the wood were not there, and the roots turn aside at its edge, as a hand turns aside from a
 hot stone. Under the dust it is hard and dark and close-fitted, and nobody has ever found the mark of a tool on it.
 
@@ -42,7 +42,7 @@ white mountains, and he said "to the end of the count," which is no answer. I as
 which may be one.
 
 There is a stone that says one. A traveller who spent a night beside it says the ground past it looked like the ground
-before it, only warmer. The boatmen of the Fen say it stands at the water's edge, where the road goes under. The
+before it, only warmer. The boatman of the Fen says it stands at the water's edge, where the road goes under. Some
 pilgrims say it stands at the head of the warm road the horned ones walk down. I have not found it, and I am too old now
 to look.
 
@@ -50,17 +50,17 @@ Copy the figures as they stand. If one seems out of its order, the stone is righ
 
 ### The glass in the road
 
-*Told by an old walker at a roadside hearth on the Pilgrim Road to a girl making her first walk. The girl wrote it down
-years later, when she had walked it many times herself.*
+*Told by an old walker at a cold hearth-ring on the Pilgrim Road to a girl making her first walk, the only other soul on
+the road that night. The girl wrote it down long after, when she was the old walker and there was nobody left to tell.*
 
 Look down when you walk, child, and you will see it: black glass in the road, a stretch here and a patch there, smooth
 as still water and set in as close as the stones. At night it holds your lantern's light better than any stone. Every
 walker agrees on that much: lantern-light off the black glass is the surest road on the Hide. When you cannot see the
 way, look for the glass, and follow it down.
 
-How it came there, nobody agrees. The ash-pickers of the Moor say it is blood. Where one of the things that come up
-bleeds into the ash, the ash turns to glass, and they say this road was fought over in the first years, and every patch
-is a place where something died on it.
+How it came there, nobody agrees. The ash-pickers of the Moor, when there were any, said it was blood. Where one of the
+things that come up bleeds into the ash, the ash turns to glass, and they said this road was fought over in the first
+years, and every patch is a place where something died on it.
 
 My own teacher said otherwise. She once sat out a night on this road with a barefoot monk, one of those from the
 mountain that fell, who carried an empty bowl and a lantern that burned black. He asked her for a name, and she nearly
@@ -68,33 +68,33 @@ gave him one, and he did not press. In the morning he was gone, and where he had
 the shape of a man sitting, still warm. It is three stones down from here. So she held that the glass is where such men
 have sat, and that they have walked this road longer than anyone knows.
 
-The oldest walkers, the ones who say the road was here first, say the glass is the road itself: that the whole road is
-glass underneath, and the stones and the dust have only grown over it, the way skin grows over a splinter. Where the
-glass shows, they say, the road is coming up through.
+The oldest walker I ever met, who held that the road was here first, said the glass is the road itself: that the whole
+road is glass underneath, and the stones and the dust have only grown over it, the way skin grows over a splinter. Where
+the glass shows, he said, the road is coming up through.
 
 I do not know which of them is right. I know it is warm under the hand, all of it, and that the lower you go, the more
 of it there is.
 
 ### Where the singing stops
 
-*A letter from a pilgrim to the copyists, who ask walkers to write to them of anything on the road their
-register does not hold.*
+*A leaf found weighted under a stone at the foot of the lower road, addressed to whoever keeps the copyists' register.
+Nobody has come down for it.*
 
-You asked for anything on the lower road that your register does not hold. Here is one thing, and I do not know what to
+Your register asks for anything on the lower road that it does not hold. Here is one thing, and I do not know what to
 make of it.
 
-We were twelve, walking down out of the pale wood and singing as pilgrims do on this road by day, the long walking-song
-whose verses go round. We sang past the kneeling posts, where each of us knelt and found that our foreheads fitted the
+We were three, walking down out of the pale wood and singing as pilgrims used to on this road by day, the long
+walking-song whose verses go round. We sang past the kneeling posts, where each of us knelt and found that our foreheads fitted the
 hollow worn in the post. We sang past the stone where they say Sister Un's reliquary rested a night on its way below,
 the one no dust will settle on. Somewhere below that, we stopped singing.
 
-Nobody decided to. We were in the middle of a verse, and then we were walking without it, all twelve of us, and when I
+Nobody decided to. We were in the middle of a verse, and then we were walking without it, all three of us, and when I
 noticed I could not remember stopping. Nothing marked the place.
 
-At the next lantern-stone an old walker told us every company stops there. In her mother's time, she said, a choir of
-forty came down from the lowlands meaning to sing straight through. They sang louder as they came near, and then they
-were walking in silence like everyone else, and their master wept because he could not say when they had stopped. Nobody
-starts again on the lower road, she said, and you do not miss it.
+At the next lantern-stone an old walker sitting alone told us every company that ever came down stopped there. In her
+mother's time, she said, a choir came down from the lowlands meaning to sing straight through. They sang louder as they
+came near, and then they were walking in silence like everyone else, and their master wept because he could not say when
+they had stopped. Nobody starts again on the lower road, she said, and you do not miss it.
 
 I went back alone the next morning to find the place. There is a stretch of about thirty paces where the grass on the
 verges does not move when the wind blows, and the insects are quiet. I stood in the middle of it and opened my mouth to

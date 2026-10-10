@@ -1,6 +1,6 @@
 # The ages
 
-The world is older than anyone can say, and nobody on the Hide counts its years: the peoples tell time by what
+The world is older than anyone can say, and nobody on the Hide counts its years: the few who are left tell time by what
 happened, the year of the grey breath, the winter the dead came back asking, before the Peak fell, in my grandmother's
 time. Everything here has an order and no numbers, and most of it is known only through myths that disagree. The age
 names are working names; Derek chooses the final ones.
@@ -100,14 +100,14 @@ divided it; or something from outside came in where it was open; or it grew tire
 down. Every people tells it differently (`04-the-held-space.md`). Some say it is not dead.
 
 In the grey of the next morning the people woke on the ash of its hide, cold, scattered, with no names and no memory of
-lying down. How they came there, nobody knows, and every hearth tells it its own way (`02-the-creation-myths.md`).
-Everyone's memory begins there.
+lying down. How they came there, nobody knows, and every fire that is left tells it its own way
+(`02-the-creation-myths.md`). Everyone's memory begins there.
 
 ## The Age of the Last Breath: in order
 
 The world now is a corpse that has not finished dying. Its last breath is still going out, its bone still stands, its
-flesh still grows without a mind, its threads still pull, and things still come up out of it. The faiths of this age
-keep the dark back with a soul in a jar for a lamp.
+flesh still grows without a mind, its threads still pull, and things still come up out of it. What is left of the
+faiths of this age keeps the dark back with a soul in a jar for a lamp.
 
 What happened, in the order the tellings agree on, as near as anyone can set it. No one on the Hide dates any of it.
 - **The first morning.** The people wake on the ash. On the first night the things that come up stand round them, and

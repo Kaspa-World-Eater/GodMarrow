@@ -2,8 +2,8 @@
 
 *The Gilded Peak was a monastery cut into a mountain of bone, which its monks said was the god's knee broken up
 through the Hide. It listened to the Silence. It fell within living memory. What is left of its
-teaching came down the mountain with the few who lived, in the letters they carried, and in what the lowlands
-remember of the monks who came down to them at dusk with their bowls.*
+teaching came down the mountain with the few who lived, in the letters they carried, and in what the few left below
+the mountain remember of the monks who came down at dusk with their bowls.*
 
 ## The Mouth
 
@@ -29,8 +29,8 @@ Hide is a wound that has not yet been allowed to close. We are wounds too. We ha
 
 ## The two empty hands
 
-*Painted inside the lid of a monk's bowl. The bowl was found in a lowland house below the mountain, where the woman who
-owned it could not read and had it read to her.*
+*Painted inside the lid of a monk's bowl. The bowl was found in a fallen house below the mountain, beside what was
+left of the woman who had kept it. She could not read.*
 
 The first of us was a bell-caster. He struck a new bell to hear its note, and in the moment after the note died away
 he heard what was behind it. He put down his hammer, climbed the mountain, sat down at the top, and did not speak
@@ -53,11 +53,12 @@ below his novice on the stair, to catch the fall.
 
 ## The bowl
 
-*Told in the lowlands below the mountain, where the monks came down with their bowls at dusk. A copyist from
-the plains wrote it down from an old woman who remembered the bowls.*
+*Told by an old woman who lives alone below the mountain, where the monks came down with their bowls at dusk, and who
+remembers the bowls. A wanderer who sheltered with her wrote it down.*
 
 At dusk the monks came down the mountain in fours, with small brass bells, and each of them carried an empty bowl.
-They stopped at every door, and they said the same thing at every door: *Put a name in it.*
+There were not many doors below the mountain even then. They stopped at each one, and they said the same thing at
+each: *Put a name in it.*
 
 You could whisper anything into the bowl. People whispered the names of what they wanted gone: a grief, a debt, a
 fear, a man. The monk would bow and walk on, and you would forget it. In the morning you would not remember what you
@@ -66,7 +67,7 @@ had whispered. You would only feel lighter, and not know why.
 The monks carried the names up the mountain, and at noon the abbot gave them to the open hand. He stood on the east
 stone and tipped each bowl out over its lip, into the light, and the names went wherever names go.
 
-There was a widow among us whose husband had died in the spring, and she could not bear it. She put his name
+There was a widow near us whose husband had died in the spring, and she could not bear it. She put his name
 in the bowl. In the morning she did not know him. She did not know she had ever had a husband. But every fast-day
 for the rest of her life she walked out to the same grave in the barrow field and sat beside it until dark, and when
 anyone asked whose grave it was, she said she did not know, and that her feet knew the way.
@@ -87,20 +88,20 @@ abbot counted them, until there were nine of us left who were not gilded.
 The gilded masters had been dying differently, if it was dying. The oldest of them were gilded while still breathing
 and set in the niches of the inner sanctum, a hundred and eight niches, the last on the left always empty and kept.
 For years before the end, dark tracks had run down from the gilded masters' eyes every night, and every morning we
-wiped them away, and the pilgrims said the masters wept for the living.
+wiped them away, and the few pilgrims who climbed to them said the masters wept for the living.
 
 On the last evening the abbot wrote a letter and gave it to me. I was the youngest and the quickest down the old
 water-cut. He told me to take the letter down to the valley and not to look back. I did not look back.
 
-That night, from below, we heard the great bell over the courtyard ring, a long time, though
-it had never once rung where it hung; it was only ever heard ringing down in the valley. Nobody in the valley slept.
+That night, from below, I heard the great bell over the courtyard ring, a long time, though it had never once rung
+where it hung; it was only ever heard ringing down in the valley. I did not sleep.
 
 In the morning I went up. The courtyard was black glass, smooth and whole from wall to wall, and when I put my hand on
 it, it was warm. It is still warm, at noon and at midnight. There was nobody in the rooms, and nothing.
 
 The doors of the inner sanctum were open. Who opened them, I do not know; I saw nobody go up. Others tell it
-differently. A traveller swears a monk handed him a lantern on the stair and went up past him. The beggar who sits at
-our door says he walked out of the empty niche himself, and laughs when he says it. The saints were still in
+differently. A traveller swears a monk handed him a lantern on the stair and went up past him. The madman who sleeps
+by my door says he walked out of the empty niche himself, and laughs when he says it. The saints were still in
 their niches, gilded, a hundred and seven of them, and the last on the left was empty as it had always been. The dust
 in front of it had footprints in it, going out.
 
@@ -110,7 +111,8 @@ will not say which it is.
 
 ## The Empty Hand
 
-*Told in the lowlands, and written down by a copyist.*
+*Told by the few who still live in the lowlands. Written on a leaf found in a dead pilgrim's pack, on the road below
+the mountain.*
 
 Long before the name meant any one of them, the lowlands called every monk of the Peak an Empty Hand, because they
 came down the mountain carrying nothing but a bowl, and the bowl was always empty.
@@ -122,12 +124,12 @@ them, a little behind, and no one has ever seen it give heat.
 
 Every faith fears them. The Pale Order says the Peak leaves glass where it should leave bone. The processions of the
 Bleeding Maiden hate the Silence more than they ever hated the Peak. The circles of the Veiled Crone bar their doors to
-anyone who speaks its name, and the Shrine Keepers send purifiers to hunt them. The Empty Hands do not seem to mind.
+anyone who speaks its name, and the Shrine Keepers who are left hunt them when they can. The Empty Hands do not seem to mind.
 They do not seem to mind anything.
 
 ## The pause completed
 
-*The last office of the Peak, as the monks who were below the mountain when it fell still keep it. A lowland reeve
+*The last office of the Peak, as the monks who were below the mountain when it fell still keep it. A grave-digger
 heard one of them say it over a grave and wrote it down that night.*
 
 The held breath will be let go.

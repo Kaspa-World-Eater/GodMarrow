@@ -1,14 +1,14 @@
 # The Shore Folk
 
-*The people of the village above the black sand left little writing. What survives was painted inside canoes, carved
-round the posts that face the Red Water, cut into the temple's stones, or told by their keepers to the few outsiders
-who reached them and written down by those outsiders afterward.*
+*The people of the village above the black sand are all dead, and their village is a ruin. They left little writing.
+What survives was painted inside canoes, carved round the posts that face the Red Water, cut into the temple's stones,
+or told by their keepers, while they lived, to the few outsiders who reached them and written down by those outsiders
+afterward.*
 
 ## The Red Water
 
-*A keeper's telling, given to the children on the night they were first taken down to the black sand. A lowland
-trader who wintered with the shore folk wrote it down; his copy was found among his things at an inn on the forest's
-edge.*
+*A keeper's telling, given to the children on the night they were first taken down to the black sand. A wanderer who
+wintered with the shore folk, before they died, wrote it down; his copy was found on his body at the forest's edge.*
 
 Sit where you can see it. Don't go nearer. This is near enough.
 
@@ -93,7 +93,7 @@ anyone can count.
 
 Down in the low wet country, with no one to feed him, the Long One starved. A god that nobody feeds does not lie
 down quietly. It breaks apart, and what it breaks into is worse than what it was. The bog is what is left of him. His
-back is the road the bog folk walk now, his bones lie everywhere in the black water, and nobody down there remembers
+back is the road the last of the bog folk walk now, his bones lie everywhere in the black water, and nobody down there remembers
 his name.
 
 The last stone says: *Sweep the stair. He is not as dead as the bog folk think.*
@@ -130,7 +130,7 @@ them the difference. They have enough to fear.*
 ## The teacher's dance
 
 *Woven into the border of a fighter's cape of cedar bark, in a pattern the keepers could read and outsiders cannot.
-This is a keeper's reading of it, as the lowland trader wrote it down.*
+This is a keeper's reading of it, as the same wanderer wrote it down.*
 
 When the dead first came up out of the Red, the people had no fighters. They were carvers and canoe-makers, and they
 knew the adze and the knife and nothing else. On the first night the dead came, a carver went down to the sand with

@@ -13,12 +13,13 @@ under a skin of ash.
 under ash the way coals go grey when a fire is banked. Nobody on the shore knows it, and only a few believe it. Where
 the grey wets the warm ash of the strand, the ash hardens into black glass, as it does on the Moor where a Husk bleeds.
 
-The shore is the end of a pilgrim road. Its own Broken Kneeler, a halved prayer-bench, stands by the water, and the
-Kneelers who came the last league on their knees face the sea along the strand. Ash-boilers work above the tide. It is
-the Hide's edge, where the skin stops, and it should feel like the end of the world gone quiet: flat, pale, listening.
+The shore is the end of a pilgrim road that few walk now. Its own Broken Kneeler, a halved prayer-bench, stands by the
+water, and the Kneelers who came the last league on their knees face the sea along the strand. One old ash-boiler still
+works above the tide, the last of them. It is the Hide's edge, where the skin stops, and it should feel like the end of
+the world gone quiet: flat, pale, listening.
 
 **The one image:** a flat grey sea heaving without breaking, a strand of black glass where it meets the ash, a row of
-kneeling figures facing it, and the ash-boilers' smoke laid flat over the water by the wind.
+kneeling figures facing it, and the one ash-boiler's smoke laid flat over the water by the wind.
 
 ## Found in the world
 
@@ -26,8 +27,8 @@ kneeling figures facing it, and the ash-boilers' smoke laid flat over the water 
 
 ### The grey
 
-*Told by an ash-boiler of the Ash Shore to a carter who had come down for potash and asked why nobody ever put a boat on
-the water. The carter's daughter, who was with him, wrote it down on the walk home.*
+*Told by the last ash-boiler on the Ash Shore to a pilgrim who had come down for the Kneeler and asked why nobody ever
+put a boat on the water. The pilgrim wrote it down that night by the boiler's pan.*
 
 Nobody puts a boat on the grey because nobody knows where a boat would go. My grandfather said that as if it were a
 joke, and nobody laughed.
@@ -39,20 +40,20 @@ washes up here but the grey's own skin, in plates, and those we turn face down a
 
 The wind always blows out over it, never in. Every bit of ash that ever lifted off the Moor or the Heath comes down here
 in the end, and the wind lets it fall on the water, and the water takes it, and has been taking it longer than anyone
-has counted. That's the grey: ash on top. What's under the ash, nobody here can say. The pilgrims who come down for
-the Kneeler call it the god's eye, filmed over and still looking up, and they won't look at it for long. They don't
-have to work beside it.
+has counted. That's the grey: ash on top. What's under the ash, nobody here can say. The few pilgrims who still come
+down for the Kneeler call it the god's eye, filmed over and still looking up, and they won't look at it for long. They
+don't have to work beside it.
 
-We dig the ash at the tide line where the grey has soaked it, wash it in the pits, and boil the wash in the pans, and
-the pans give potash. Good potash, white as a tooth; the Moor washes its grave-cloth in the lye of it. My father said
-that settles it. Boil blood and you get black scab, everybody knows that, and our pans come up white, so whatever is
-under the ash is water, whatever the old women say.
+I dig the ash at the tide line where the grey has soaked it, wash it in the pit, and boil the wash in the pan, and the
+pan gives potash. Good potash, white as a tooth. My father said that settles it. Boil blood and you get black scab,
+everybody knows that, and our pans came up white, so whatever is under the ash is water, whatever the old women said.
 
-My aunt said otherwise. A trader came along the coast once, in her girlhood, from far along, where he said the sea is
-red. The people there live up in the trees, he said, and burn their dead, and give the water nothing, because whatever
-goes into it comes back. My aunt said ours is the same sea. She said grey is the colour red goes under ash, the way
-coals go grey when you bank a fire. She said the glass along the strand was the proof, because ash goes to glass only
-where blood runs into it, and look at the strand. My father said the trader was a liar and the glass is just the shore.
+My aunt said otherwise. A man came along the coast once, in her girlhood, alone, from far along, where he said the sea
+is red. The people there lived up in the trees, he said, and burned their dead, and gave the water nothing, because
+whatever goes into it comes back. My aunt said ours is the same sea. She said grey is the colour red goes under ash, the
+way coals go grey when you bank a fire. She said the glass along the strand was the proof, because ash goes to glass
+only where blood runs into it, and look at the strand. My father said the man was a liar and the glass is just the
+shore.
 
 My uncle, when he was a boy, threw a big stone off the end of the glass as far as he could, and it tore the skin. He
 said that for the space of a breath, before the grey closed over, he saw what was under it, and it was dark red, the
@@ -61,8 +62,8 @@ was.
 
 We used to give our dead to the grey, laid on a board at low water, and it took them down slowly, the way it takes a
 stone. The old women stopped that in the year the grey came up the strand higher than anyone had ever seen, and stood
-there a day and a night before it went back. Since then we carry our dead up to the Heath fire, and the keeper lays them
-by the saint.
+there a day and a night before it went back. After that we carried our dead up to the Heath fire, and the keeper laid
+them by the saint.
 
 I boil ash. I don't throw stones.
 
@@ -78,15 +79,15 @@ Broken Kneeler, the true one, whatever you were told on the Moor.
 It is a bench of grey stone, long enough for nine to kneel at it side by side, broken in two in the middle. On the night
 the god died something came down out of the dark over the grey, struck the bench in two, and went on into the water,
 and the water closed over it. That is why the halves lean apart toward the sea, and why the strand between them is
-glass. The people of the Moor have a stone man up on their rise who kneels with his head off, and they call him the
+glass. Up on the Moor there is a stone man on a rise who kneels with his head off, and the camp up there calls him the
 Kneeler, and they are welcome to him. A kneeler is a thing you kneel at. Kneel at ours.
 
-Go the last league on your knees if you have come to do that. Many do. Leave your boots here. They will be here when you
+Go the last league on your knees if you have come to do that. Some still do. Leave your boots here. They will be here when you
 come back, and if you do not come back, someone will have the use of them. Whatever you have come to ask, ask it at the
 bench. Do not ask it of the water.
 
 Along the strand, facing the grey, you will pass the ones who came the last league on their knees and did not get up
-again. Some say they are pilgrims who prayed too long. The old women of the shore say they are some of those who never
+again. Some say they are pilgrims who prayed too long. The old women of the shore said they are some of those who never
 came out of the god at all, still on their knees where they knelt, and that the sea only drew them nearer. Do not kneel
 near them, and pray where they cannot hear you, because they are listening for how. If one of them is nearer the bench
 in the morning than it was at dusk, leave the shore that day.
@@ -104,7 +105,7 @@ vats and boiled the lye down in iron pots to a white crust.
 1. **The heath's edge** thins into dunes of drifted ash held by lyme grass and sea holly, every tuft trailing a tail of
    ash toward the sea.
 2. **The ash-works:** boiling-houses of stone and turf with wide iron pans, clay-lined lye pits, raked ash beds above
-   the tide, and mounds of spent ash taller than a house. One or two are still worked.
+   the tide, and mounds of spent ash taller than a house. Only one is still worked, by one old boiler.
 3. **The glass strand** at the tide line, and **the grey sea.**
 
 **The floor stays alive:** ash in a dozen greys, rippled across the wind; glass chips, black and brown-green at their
@@ -119,7 +120,7 @@ crust at the pits; pilgrims' dropped things.
 - **The skin:** ash fine as flour, cracked in great plates like old paint. Where anything breaks it (a stone, a
   creature, a pilgrim who falls) the dark beneath shows for a breath, deep red-brown and glossy, and the grey closes
   over without a ring.
-- **Stranded plates** at the tide lines, grey on top, dark red-brown and tacky beneath, which the ash-boilers turn
+- **Stranded plates** at the tide lines, grey on top, dark red-brown and tacky beneath, which the last boiler turns
   face down: the only place what lies under the grey can be seen. Keep them small.
 - **Never walkable:** the zone's edge.
 

@@ -1,8 +1,9 @@
 # The creation myths
 
-Nobody was there. Every people of the Hide tells the beginning, and every telling is a face put on something that has
-none. What the world is made of was too large and too strange for any of them to see whole, so each people took the
-part it could bear to look at and gave that part a face. The faces are masks. The myths are what the masks say.
+Nobody was there. Every people that has lived on the Hide tells the beginning, or told it, and every telling is a face
+put on something that has none. What the world is made of was too large and too strange for any of them to see whole, so
+each people took the part it could bear to look at and gave that part a face. The faces are masks. The myths are what
+the masks say.
 
 They agree on almost nothing. They agree on this much:
 - the ground is warm;
@@ -10,14 +11,14 @@ They agree on almost nothing. They agree on this much:
 - things still come up out of the body;
 - the world is a body, or was.
 
-Children in the lowlands count it on their fingers:
+A child in the lowlands counts it on her fingers:
 
 > *Soul for the thread and Bone for the frame,*
 > *Flesh for the filling, and none for the name.*
 
 ## The Tithed: the First Morning
 
-*What they look at:* nothing they can name. The common people have no beginning of their own. They have a morning.
+*What they look at:* nothing they can name. The Tithed have no beginning of their own. They have a morning.
 
 Every memory the Tithed have starts in the same place. A grey morning; ash underfoot and in the mouth; the sky low and
 the light coming from one side; and everyone lying down, scattered over the ash in the cold, as if they had been set
@@ -25,13 +26,13 @@ there in the night. Nobody remembers lying down. Nobody remembers anything befor
 morning" the way other people say "before you were born", and they mean the same thing by it: a place nobody can get
 back to, and nobody is to try.
 
-That much every hearth agrees on. How the people came to be lying there, no two hearths agree, and they have stopped
-expecting to. The tellings heard most often:
+That much every telling agrees on. How the people came to be lying there, no two tellings agree, and the tellers have
+stopped expecting to. The tellings heard most often:
 - **Dreamed.** The grandmothers of the lowlands say the god was dying under the ash that night, and the dying dream,
   and what the dying dream of most is company. It dreamed of people around it, and dreamed so hard that in the morning
   they were there. That is why, some nights, you dream a dream that is not your own, of warm dark and a sound like
   breath: it is the old one's dream, still running in you, and you are in it.
-- **Grown.** The farmers of the lowlands and the diggers say people came up out of the Hide the way everything comes
+- **Grown.** The diggers of the lowlands say people came up out of the Hide the way everything comes
   up out of a body left lying: the god died, and the warm ash bred, and what it bred was them. They say it without
   shame. Everything that lives here grew out of something dead, they say. Why should we be the only ones ashamed of it?
 - **Given back.** The shore folk say the first people came up out of the Red on the first morning, red to the hair,
@@ -47,11 +48,11 @@ None of the tellings says who the people were before, or whether there was a bef
 it there.
 
 **The debt.** Every telling agrees on one thing more: the people owe. Whoever or whatever gave them the morning gave it
-on credit, and a tenth of everything is still owed. That is the name. The Tithed leave the tenth row of every field
-standing, the tenth loaf on the sill overnight, the tenth word of a long telling unsaid. Every tenth night they keep
-awake, so that whatever comes to collect finds someone up to pay it. Who they owe, they do not say; they do not know.
-What they say is: *we are behind on it*, and they work the way people work who are behind on something, from dark to
-dark, and do not rest well.
+on credit, and a tenth of everything is still owed. That is the name. The Tithed who are left leave a tenth of whatever
+they grow standing in the ground, the tenth loaf on the sill overnight, the tenth word of a long telling unsaid. Every
+tenth night they keep awake, so that whatever comes to collect finds someone up to pay it. Who they owe, they do not
+say; they do not know. What they say is: *we are behind on it*, and they work the way people work who are behind on
+something, from dark to dark, and do not rest well.
 
 **The Hide.** They called the land they woke on the Hide. It is the skin of the thing that died beneath it, the
 grandmothers say, and anyone who lies on it at night can feel that it is warm. And it is where the people hid, ever
@@ -186,14 +187,15 @@ has gone sour. Each grows a small, hungry kami of its own, the size of the thing
 **kotodama**, the souls in words, and call all of them together the myriad, because nobody could count them; their faith
 is named for them.
 
-The kami live in the breath. A thought spoken aloud goes out on the breath, and its god goes with it, out of the
-mouth and into the air, looking for another mouth to get into. Breathing in is how they enter. That is why the people of
-the wet country breathe shallow among strangers and cover their mouths when they speak of anything that matters, and
-why nobody there will say a grudge aloud: said, it is loose, and it will be breathed in by someone, and it will grow.
+The kami live in the breath. A thought spoken aloud goes out on the breath, and its god goes with it, out of the mouth
+and into the air, looking for another mouth to get into. Breathing in is how they enter. That is why the few who live in
+the wet country breathe shallow when anyone comes near and cover their mouths when they speak of anything that matters,
+and why nobody there will say a grudge aloud: said, it is loose, and it will be breathed in by someone, and it will
+grow.
 
 When the great one beneath died, the keepers teach, it breathed out its last, and every thought it had ever had went out
-on that one breath: all its kami at once, more than there are stars, into the grey. That breath is the one wind
-that blows across the Hide and never turns. It is full of them. Everyone on the Hide breathes it, all the time. Every
+on that one breath: all its kami at once, more than there are stars, into the grey. That breath is the one wind that
+blows across the Hide and never turns. It is full of them. Whoever is left on the Hide breathes it, all the time. Every
 mind on the Hide has some of the dead god's thoughts in it, breathed in on the wind, and does not know which ones.
 
 **The quarrel.** The kami are not good, and they are not kind to each other. Every belief contradicts some other
@@ -207,8 +209,8 @@ that, and they say it the way other people say plague.
 old lies nobody remembers telling), that it sickens whoever breathes it. It hangs in low places and in the rooms of the
 dying. It is the dead god's last breath, going bad as it goes out.
 
-**The keepers.** The Shrine Keepers are not purifiers, whatever the paper streamers on their belts suggest. The common
-folk say the keepers steal breath. The keepers say they **still** it, and the word is the same word, said with a
+**The keepers.** The Shrine Keepers are not purifiers, whatever the paper streamers on their belts suggest. Those who
+meet them say the keepers steal breath. The keepers say they **still** it, and the word is the same word, said with a
 different face. To still a breath is to take it and hold it: from the air where miasma hangs thickest, from the sick,
 from the dying, whose last breath is the fullest of all, held in a keeper's own lungs with the kotodama still in it,
 and not let go. Held long enough, the keepers say, a stilled breath sets in the chest like **steel**, and a keeper who
@@ -219,12 +221,12 @@ season of nights, and the old ones say they have not truly let one go in years. 
 choose: into a shrine, which is a small wooden house with a paper door and nothing inside but what was breathed into
 it, where the caught gods are shut in and fed whispered beliefs to keep them quiet; or into a paper figure, which takes
 the breath and is burned; or into the face of whoever they want harmed. A keeper breathing out at you is the last thing
-a great many people on the Hide have seen.
+many who met one have seen.
 
-People pay them. A widow pays a keeper to take her grief out of her, and the keeper leans close and breathes it in, and
-the widow feels lighter, and the keeper keeps the grief. A village pays a keeper to take the miasma out of a sickroom.
-Nobody asks what the keeper does afterward with everything she holds. Nobody wants to know which of the shrines along the
-road hold a grief, and which a curse, and which a dead man's last thought.
+Some still go to them. A widow asks a keeper to take her grief out of her, and the keeper leans close and breathes it
+in, and the widow feels lighter, and the keeper keeps the grief. A dying man's kin bring a keeper to take the miasma out
+of his sickroom. Nobody asks what the keeper does afterward with everything she holds. Nobody wants to know which of the
+shrines along the road hold a grief, and which a curse, and which a dead man's last thought.
 
 *Behind the myth.* Read through the deep lore (`00-the-deep-lore.md`), the kami are the law of the world at its
 smallest: every thought told enough stands up, and breath is how a thought is told. The keepers are the only people who
@@ -283,7 +285,7 @@ them, and it is a boast. In the beginning, it says, there was a heavy world, and
 rivers held in their beds, the people held to the ground, the gods held to the people who feared them. Then the first
 of us opened a bone and found the weight inside it, and drank it, and was light. *We were the first thing in the world
 that did not fall.* Everything after that, in their telling, was going up, and every line of it ends on the same word,
-*higher*. The scholars who read it note that the cities it is cut on are lying in the ash, upside down, and that whoever
+*higher*. The few who have read it note that the cities it is cut on are lying in the ash, upside down, and that whoever
 carved it never imagined anyone would read it from above.
 
 What they could do is told as if it were magic, because nobody now can tell it apart from magic. They made doors that
@@ -294,8 +296,8 @@ beneath. They wrote with light. Who they were, the peoples after them have never
   slept and could never get back in, and went up looking for somewhere else to be thought;
 - **the Pale Order** says there were never any people in the cities at all, only the lamps, and that the lamps built
   the cities to hang themselves in;
-- **the diggers** who go under the lowland grass for the lamps say they were people like us, and that we will be them
-  again, and that is why they dig;
+- **the few diggers** who still go under the lowland grass for the lamps say they were people like us, and that we will
+  be them again, and that is why they dig;
 - **the shore folk** say nothing about them, and do not look at the dark moon.
 
 **The Choir**, behind the ribs: *We were the part of the god that told it what it was.* Their beginning was the first
@@ -320,11 +322,10 @@ everything lay on it, and it hardened, and we woke in it.*
 
 ## The sky: the sun and the moons
 
-Over the Hide the sky is grey. It has been grey for as long as anyone remembers, by day a low pale lid of cloud
-with the sun behind it as a white smear that gives light and no warmth, and at night a darker lid with the moons
-behind it. On some nights the cloud thins and the moons stand out clear, and on very few days the sun does, and the
-people go out of their houses to look. Every people of the Hide has a telling of what is up there. Here are the ones
-told most.
+Over the Hide the sky is grey. It has been grey for as long as anyone remembers, by day a low pale lid of cloud with the
+sun behind it as a white smear that gives light and no warmth, and at night a darker lid with the moons behind it. On
+some nights the cloud thins and the moons stand out clear, and on very few days the sun does, and whoever is left goes
+out to look. Every people that has lived on the Hide has a telling of what is up there. Here are the ones told most.
 
 **The grandmothers of the lowlands** say that when the god died, somebody laid coins on its eyes, so that it would not
 see what came after. Those are the two moons. One is silver, and that is the pale moon, the great one, whose light the
@@ -361,10 +362,10 @@ older, and does not agree with it.
 **The processions of the Bleeding Maiden** say the sun is not an eye or a hand but a wound in the sky, and the light is
 what bleeds through it from the other side.
 
-**The cities in the sky** left their own telling, cut in the undersides of the ones that fell. *We made the second moon*, it
-says. *We lifted a city so high it would never come down.* The scholars who read it have looked a long time at the dark
-moon through the gaps in the cloud. It is not round. It has edges, and it turns, slowly, and on the clearest nights
-there are, some of them swear, lights on it.
+**The cities in the sky** left their own telling, cut in the undersides of the ones that fell. *We made the second
+moon*, it says. *We lifted a city so high it would never come down.* Those who have read it have looked a long time at
+the dark moon through the gaps in the cloud. It is not round. It has edges, and it turns, slowly, and on the clearest
+nights there are, some of them swear, lights on it.
 
 *Behind the myth.* What the sun and the moons are, nobody knows, and it stays unknown. The pale moon is the night's key
 light in every scene (the moonlight the pilgrim walks by). The dark moon is rarely seen, and its crossings are an

@@ -1,8 +1,8 @@
 # The Pale Order
 
-*The Pale Order keeps the bone-houses cut into the pale ridges of the Ossa, where it lays the dead and counts them.
-Its brothers write little and count much. These texts were read to novices, cut over the Order's stairs, or copied
-by the few outsiders the Order let in.*
+*The Pale Order keeps what is left of the bone-houses cut into the pale ridges of the Ossa, where its few brothers lay
+the dead and count them. Most of the houses stand empty now. The brothers write little and count much. These texts
+were read to novices, cut over the Order's stairs, or copied by the few outsiders the Order let in.*
 
 ## The Falling
 
@@ -114,10 +114,11 @@ have been, and nobody said so.
 
 ## Beyond the Pale
 
-*Told in the lowlands, where the saying comes from. A copyist set it down.*
+*Told in the lowlands, where the saying comes from. A wanderer heard it from an old man living alone under the
+mountains, and set it down.*
 
 Each of the Order's bone-houses has a warden, and the warden is called the Ossuarch. It is the name of an office,
-the way reeve is. Ask a brother the name of the man who holds it and he will give you a number.
+not of a man. Ask a brother the name of the man who holds it and he will give you a number.
 
 Sometimes the Order sends an Ossuarch out of the mountains. When it does, he does not come home. He walks what the
 brothers call the Pale. Wherever he gathers bone that needs laying, he sets a white stone, and the stones make a line
@@ -125,9 +126,9 @@ that goes on across the lowlands, and the line moves outward year by year. Insid
 dead are kept. Outside it, they are not. That is where the lowland saying comes from: a thing gone *beyond the Pale*
 is lost and past keeping.
 
-In the lowlands under the mountains they call him Grandfather Dust, and the children have a counting rhyme about
-him, in which he sweeps the child behind the door. Mothers sing it to make the children laugh, and then stop singing
-it when the children ask what happens to the child.
+The few who live in the lowlands under the mountains call him Grandfather Dust, and their children have a counting
+rhyme about him, in which he sweeps the child behind the door. Mothers sing it to make the children laugh, and then
+stop singing it when the children ask what happens to the child.
 
 There is a story told only in whispers, of an Ossuarch the Order shut out. His count came out above two hundred and
 six, they say. He came down the stair with dead of no house anyone knew, standing at his back, and he read the old
@@ -152,9 +153,9 @@ the wind at first light from the highest peak, and the sky over these mountains 
 one has ever seen the dust come down. Before it goes, it is weighed on the Ninth Stair, where only the Ossuarch goes
 down, and the weights are never spoken of.
 
-On the Day of the Count, every wall in every house is counted, and every year the count is higher than the year
-before, by more than the year's dead. The brothers call the difference the Mother's gift. It is written on a second
-leaf, in a hand no tallier has ever seen at work. A tallier may add across that leaf. He may never add down it.
+On the Day of the Count, every wall in every house still kept is counted, and every year the count is higher than the
+year before, by more than the year's dead. The brothers call the difference the Mother's gift. It is written on a
+second leaf, in a hand no tallier has ever seen at work. A tallier may add across that leaf. He may never add down it.
 
 At the end of every Day of the Count, the brothers stand and name every other end of the world that any faith has
 ever told, one by one, and condemn each of them aloud. It takes until dark.

@@ -11,7 +11,7 @@ that a wrong breath let go in it goes down with the air, away from the next bed.
 doors, because the dead do not breathe and the sickness could not take them. The sisters kept the sick, and then the
 sickness kept the sisters. The dead are still keeping the doors.
 
-The game calls it the Plague Hospice; the lowlands call it the breath-house, and its sickness is breath gone wrong and
+The game calls it the Plague Hospice; the few left in the lowlands call it the breath-house, and its sickness is breath gone wrong and
 nothing else. It should feel still and patient: mercy that was tried and failed, with the air itself the danger.
 
 **The one image:** a long ward under a low vault, cots in rows with the blankets drawn up over patient shapes, shafts
@@ -40,7 +40,7 @@ rock to the sky as well, one over every third bed, so that whatever would not go
 The knights' dead keep the doors. The sick are not to leave and the well are not to come in, and the living could not be
 trusted with that, because the living breathe. The dead stand at the grilles and do not breathe, and nothing passes
 them. Their price is the frames of everyone who dies here, carried up the mountain, when we would give our dead to the
-water. We pay it. We curse them in the lanes and pay them on the step.
+water. We pay it. We curse them in the wards and pay them on the step.
 
 This season the figures hang straight. The breath no longer goes down. Somebody has stopped the shafts at the top, I do
 not know who: the knights say the lowlanders did it, and the lowlanders say we did. So the wrong breath stays in the

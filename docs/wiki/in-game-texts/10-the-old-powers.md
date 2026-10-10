@@ -1,22 +1,22 @@
 # The Old Powers
 
 *Before the god died, other powers walked the world, and some of them still do. Most of what is known about them is
-wrong. These texts are what frightened people wrote down: readers at the Citadel of the Shattered Femur, copyists,
+wrong. These texts are what frightened people wrote down: the last readers at the Citadel of the Shattered Femur,
 grandmothers, and a few who saw.*
 
 ## The Ythraal
 
-*The opening lecture given to new readers at the Citadel of the Shattered Femur, as one of them copied it down in
-his first week. He did not finish his reading.*
+*The opening lecture given to the rare new reader at the Citadel of the Shattered Femur, as one of them copied it down
+in his first week. He did not finish his reading.*
 
 Forget what the faiths have told you about the beginning. Every faith begins its story with its own god, and the
 world is older than any of them.
 
 A god is a belief that grew a body. When enough people fear a thing, or pray to it, for long enough, it stands up.
-Fear grows one fastest. A city that is afraid of its river for a lifetime will one spring see the river stand
-up. The oldest books call the gods of that age the Ythraal. Nobody knows what the word meant; everyone says it quietly. Fear is what they were made of, and fear was what
-they ate. A city that trembles is a city that feeds its god, and a god nobody fears any more grows thin, and then
-hungry, and then comes looking. There was an age when they walked the world, and it is the age most of our ruins come
+Fear grows one fastest. In that age, when there were cities, a city that was afraid of its river for a lifetime would
+one spring see the river stand up. The oldest books call the gods of that age the Ythraal. Nobody knows what the word
+meant; everyone says it quietly. Fear is what they were made of, and fear was what they ate. A city that trembled was
+a city that fed its god, and a god nobody fears any more grows thin, and then hungry, and then comes looking. There was an age when they walked the world, and it is the age most of our ruins come
 from, and most of what we know about it is wrong.
 
 Belief does not pass through a god and away. It settles. In the bones of anything that was long feared or long
@@ -70,7 +70,8 @@ made by a god may ask to be worshipped like one. Nobody at the Citadel has gone 
 
 ## The Famines
 
-*From a pilgrim's account of the road through the far south, written at the next inn.*
+*From a pilgrim's account of the road through the far south. The leaves were found at a waystone, weighted down with
+a stone.*
 
 On the third day we saw one of the Famines walking, far off across the plain.
 
@@ -87,10 +88,10 @@ lights them.
 
 ## The Needle
 
-*A letter from a village in the sight of the Needle. It was carried out by a pedlar, who said it was the only letter
-anybody there had written in a year.*
+*A letter with nobody's name on the outside, found on the body of a woman on the road away from the Needle. She came
+from one of the few houses still standing in its sight.*
 
-We can see it from every window, over the trees. It is iron, and it goes up until the grey takes it, and it has no
+We can see it from the window, over the trees. It is iron, and it goes up until the grey takes it, and it has no
 door. Old Haddo climbed it once when he was young, as far as the crack where the rust has eaten through, and looked in.
 He said it is full to the top of something like the water in a blister, and that there are bones in it all the way
 down, going soft, and eyes. He said the eyes were bigger than he was, and that they turned to look at him. He came
@@ -98,9 +99,9 @@ down and told us, and the next winter he got up in his sleep and walked into the
 since. We can all remember his dreams now. They are mostly about the sea.
 
 Nobody here has dreamed for as long as I have been alive. We lie down and close our eyes and open them again in the
-morning, and nothing has happened in between. The old people say it was not always so. They say the Needle drinks the
-dreams of any village in its sight, and that a village in its sight has no dreams of its own. We tie our sleepers by
-the ankle.
+morning, and nothing has happened in between. The old ones say it was not always so. They say the Needle drinks the
+dreams of anyone who lives in its sight, and that a house in its sight has no dreams of its own. We tie our sleepers
+by the ankle.
 
 I do not know what a dream is. I am writing to ask whether anyone where you are still has them, and what they are
 like.
@@ -121,8 +122,8 @@ I will say only that I have seen this shape twice.
 
 ## Vesk
 
-*Scratched into the wall of a pithead hut in the iron hills, by a miner who did not come up from his next shift. The
-miner who found it copied it out and sent it to the Citadel.*
+*Scratched into the wall of a pithead hut in the iron hills, by a miner who worked the hills alone, went down one more
+time, and did not come up. A reader of the Citadel found it and copied it out.*
 
 The readers will tell you Vesk is one of the Famines, walking on the edge of the sky. It is not. Vesk is under us.
 
@@ -142,13 +143,13 @@ I am going down again tomorrow. I want to hear whether they say anything.
 
 ## The Hallowed
 
-*Told in whispers by people who live under one. A copyist who did not say where he lived wrote it down.*
+*Told in whispers by the few who live under one. Written on a leaf left at a waystone, with no name on it.*
 
 There are men and women who drink the belief that blood carries. They take a little, from many, over many years,
-and they do not grow old. One lives among a people. Never two.
+and they do not grow old. One lives among whoever is left in a place. Never two.
 
-You cannot kill one with iron, or fire, or water. The only thing that kills one is being forgotten, and a people that
-has one never forgets it. They keep its name in every prayer without ever saying whose name it is. They keep its house
+You cannot kill one with iron, or fire, or water. The only thing that kills one is being forgotten, and the few who
+have one never forget it. They keep its name in every prayer without ever saying whose name it is. They keep its house
 swept. They send their daughters to the door on the right nights, and the daughters come back pale and say nothing.
 The readers call them the Hallowed, after the prayers: hallowed be the name.
 
@@ -168,7 +169,7 @@ edges. That is the city, and it is not small; it is only far away, and it is bro
 It is dead up there, all of it, and the dead walk its streets as if they still had somewhere to be. And on the highest
 throne there is one thing that does not walk, because it is sitting, and it gives the order to rise. Every day. To a
 city that cannot rise any further. It has been giving it for longer than anyone has counted, and it has not
-once been obeyed, and it has not once stopped. The shore folk call it the Man in the Rust. The Citadel calls it the
+once been obeyed, and it has not once stopped. The shore folk called it the Man in the Rust. The Citadel calls it the
 Regent and will not discuss it, and that is why I am here.
 
 ## Outside of everything

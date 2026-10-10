@@ -1,7 +1,7 @@
 # The Second Mouth
 
 *The Second Mouth is the only cult in the world: a heresy hidden inside the processions of the Bleeding Maiden. Its
-people write nothing down if they can help it. What is known of it comes from what the processions found when they
+few people write nothing down if they can help it. What is known of it comes from what the processions found when they
 burned it out, and from the confessions they took first. Outsiders call its teaching the oldest theft in the world.*
 
 ## The door

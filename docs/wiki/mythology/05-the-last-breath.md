@@ -1,9 +1,9 @@
 # The Age of the Last Breath
 
 From the god's death to now, longer than anyone remembers. The world is a corpse that has not finished dying. Its last
-breath is still going out, and people live in that breath. Its bone still stands, its flesh still grows, its threads
-still pull, and things still come up out of it. Knowledge is the rarest thing there is. The faiths keep the dark back
-with a soul in a jar for a lamp.
+breath is still going out, and the few who are left live in that breath. Its bone still stands, its flesh still grows,
+its threads still pull, and things still come up out of it. Knowledge is the rarest thing there is. What is left of the
+faiths keeps the dark back with a soul in a jar for a lamp.
 
 Nothing here is dated. The events stand in the order the tellings give them, and where the canon never fixed an order
 it is set here so we share one shape; `01-the-ages.md` has the whole chronicle.
@@ -23,15 +23,15 @@ with teeth on them, and that a fear is fed like anything else.
 
 **The first lantern.** In that first winter a soul chose to be kept rather than go down with the last breath, and
 somebody found how to keep it, in glass, as a flame. That was the first lantern. A kept soul chooses whom it follows; it
-carries them back to the lantern-stones when they fall, and keeps a little of them each time, and the little it keeps
-is what it burns: a way of whistling, a sister's name, the second verse of a song. The makers of lanterns were a guild,
-later hunted out by the faiths, but every lantern on every road is theirs still. Every lantern carries the same words:
-*Dust on the glass. Wipe it. It is someone.*
+carries them back to the lantern-stones when they fall, and keeps a little of them each time, and the little it keeps is
+what it burns: a way of whistling, a sister's name, the second verse of a song. The makers of lanterns were always few,
+and were later hunted out by the faiths, but every lantern on every road is theirs still. Every lantern carries the same
+words: *Dust on the glass. Wipe it. It is someone.*
 
 **The burning.** In the first years after the death, the heath below the cheek caught and burned season on season, and
-nobody lit it. The carters say hot ash came over the ridge on one long breath of the wind. The heath's fire-keepers say
-it came up from underneath, the heather only the wick. The Burnt Heath has never quite stopped burning since, and every
-burn on it runs one way: the way the wind goes.
+nobody lit it. Some say hot ash came over the ridge on one long breath of the wind. The few fire-keepers left on the
+heath say it came up from underneath, the heather only the wick. The Burnt Heath has never quite stopped burning since,
+and every burn on it runs one way: the way the wind goes.
 
 **The wind.** That wind is the god's last breath going out. It blows one way across the whole Hide, out past the
 Sighing Ridge toward the dark and out over the Red Water, and it has never once blown back. Ash that goes out on it
@@ -130,12 +130,12 @@ things were past keeping.
 *Behind the myth.* The bone-houses were never cut by the Order. They are the upper floors of the builders' halls
 (`04-the-held-space.md`), and the Order hides what lies beneath.
 
-**The bridge over the vein.** Beyond the Root Deep the Hide lies split open, and along the
-bottom of the rift runs a clear, slow, thick water that every boatman calls a vein. Masons came to bridge it, a crew on
-each bank, singing across the water to keep time as they built toward each other. One evening the far crew stopped
-singing in the middle of a line, and was never heard from again, and the near crew built out as far as the stone would
-hold and stopped. The Broken Bridge's two halves still reach for each other. The last name cut on the near parapet is
-half a name.
+**The bridge over the vein.** Beyond the Root Deep the Hide lies split open, and along the bottom of the rift runs a
+clear, slow, thick water that the few who have seen it call a vein. Masons came to bridge it, a crew on each bank,
+singing across the water to keep time as they built toward each other. One evening the far crew stopped singing in the
+middle of a line, and was never heard from again, and the near crew built out as far as the stone would hold and
+stopped. The Broken Bridge's two halves still reach for each other. The last name cut on the near parapet is half a
+name.
 
 **The Well-Shrine.** The Myriad's purifiers set their first shrine at the Drowned Fen's one clean pool and
 began the Cutting-Away: once a year every purifier breathed the year's wrong breath into the Fen, and the Fen took it,
@@ -190,16 +190,16 @@ still holding the shapes of the sleepers, and there was nothing left of anyone: 
 left dug a grave for every hearth and laid a shawl or a pair of boots in each, and dug one more than he had names for.
 Something that leaves nothing had passed.
 
-**The fall of the Gilded Peak.** In the spring the monks began to die in their rooms at night, one or two a
-night, and in the morning there was nothing in the room but a little black glass and a little dust. Night after
-night the abbot counted them, and at last he sent the youngest down the mountain with a letter and told him not to look
-back. The next night the great bell over the courtyard rang, long, though it had never rung where it hung. In the
-morning the courtyard was black glass from wall to wall, warm to the hand, and it is warm still. The sanctum's doors
-stood open. The gilded saints were in their niches, a hundred and seven of them, and the last niche on the left was
-empty as it had always been kept, except that the dust before it held footprints going out. Over the door someone had cut
-in the night *THEY WERE NOT WEEPING FOR US*, or, as others read it, *UNDER THE GOLD THEY WERE STILL LOOKING*. Since then
-the monks who were below the mountain walk the roads carrying nothing, and are called the Empty Hands, and what they
-strike leaves glass, dust, or nothing.
+**The fall of the Gilded Peak.** In the spring the monks began to die in their rooms at night, one or two a night, and
+in the morning there was nothing in the room but a little black glass and a little dust. Night after night the abbot
+counted them, and at last he sent the youngest down the mountain with a letter and told him not to look back. The next
+night the great bell over the courtyard rang, long, though it had never rung where it hung. In the morning the courtyard
+was black glass from wall to wall, warm to the hand, and it is warm still. The sanctum's doors stood open. The gilded
+saints were in their niches, a hundred and seven of them, and the last niche on the left was empty as it had always been
+kept, except that the dust before it held footprints going out. Over the door someone had cut in the night *THEY WERE
+NOT WEEPING FOR US*, or, as others read it, *UNDER THE GOLD THEY WERE STILL LOOKING*. Since then the few monks who were
+below the mountain walk the roads carrying nothing, and are called the Empty Hands, and what they strike leaves glass,
+dust, or nothing.
 
 **The loose winter.** The dead did not go through. The mirrors were covered and the felt laid right, and still,
 night after night, the dead came back up the valleys to the doors of the houses they had died in, and asked whoever
@@ -231,8 +231,8 @@ The fire in the ring of huts above the black sand still burns the dead, and nobo
 the village clean, and laughs at everything a stranger does not know. In the temple a candle burns that no one living
 could have lit. The stair has not been swept.
 
-Across the Hide the lanterns are fewer every year. The Count rises. The rings with teeth are said to be coming nearer to
-each other, and someone is still cutting them. The wind goes out and never comes back.
+Across the Hide the lanterns are fewer every year, and so are the living. The Count rises. The rings with teeth are said
+to be coming nearer to each other, and someone is still cutting them. The wind goes out and never comes back.
 
 And somewhere a pilgrim is walking who does not know where it came from: out of a ring, out of a dream, or out of
 nothing, given a fate by a reading of the cards (`00-the-deep-lore.md`).

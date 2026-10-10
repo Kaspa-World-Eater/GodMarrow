@@ -46,12 +46,12 @@ It lets the player notice that every source of power in the world is a wound in 
 
 In the Uncounted, before the Ythraal were many, something reached into the world.
 
-Nobody knows from where. The scholars who have tried to say it say "from outside", and then, because outside is only
-the dark between the stars and the dark between the stars is still the world's, they say "from outside the outside",
-and stop. The grandmothers of the Pale say: from behind. Three things came in. The later peoples call them
-**the Thrae**, an old word that sounds like *three* and may mean nothing more, and the oldest tellings say they were never three things
-at all, but three fingers of one hand, put in through the skin of the world the way a hand is put into a sack, feeling
-for something at the bottom.
+Nobody knows from where. The few who have tried to say it say "from outside", and then, because outside is only the dark
+between the stars and the dark between the stars is still the world's, they say "from outside the outside", and stop.
+The grandmothers of the Pale say: from behind. Three things came in. The later peoples call them **the Thrae**, an old
+word that sounds like *three* and may mean nothing more, and the oldest tellings say they were never three things at
+all, but three fingers of one hand, put in through the skin of the world the way a hand is put into a sack, feeling for
+something at the bottom.
 
 The first was the One That Unfolds: wherever it lay, the ground opened like a flower, layer under layer, and kept
 opening. The second was the One That Eats the Edges: a mountain it had passed no longer ended anywhere, and a man it
@@ -102,9 +102,9 @@ in, and the worship of Uth-Kharesh was the first it had ever had, and it found i
 thinned, as all worship thinned in the Wasting, it ate the worshippers, a few at first, and then the rest, and when
 there were none left it began on itself. It sits now at the bottom of the crater on a broken throne, in the city it has
 eaten from the inside, wearing an iron crown it had them forge for it when it still had subjects. It is very thin. It
-wants nothing in the world so much as to be believed in again. The Pale calls it **the Starved Crown**, and
-the oldest texts **Morrh-Ythraal**, and the grandmothers there tell their children: when you go out at night, do not
-be afraid of the dark. That is how it finds you.
+wants nothing in the world so much as to be believed in again. The Pale calls it **the Starved Crown**, and the oldest
+texts **Morrh-Ythraal**, and the few grandmothers left there tell their children: when you go out at night, do not be
+afraid of the dark. That is how it finds you.
 
 *Behind the myth.* The herald is the one dracolich (Derek's ruling), but the world's voice never calls it a dragon: it
 is the herald, the Starved Crown, the bone-winged thing, the fire in the ribs. The Thrae are three fingers of something
@@ -123,7 +123,7 @@ walking after whatever moved them was gone.
 
 Whole kingdoms worshipped them by climbing the long ramps of their bodies and going inside, and lived there, in the
 warm, in the dark, in the god, for generations, and were not seen again outside. Most of the Famines have fallen and lie
-where they fell, and grass grows on them, and the peoples who live round them call them hills.
+where they fell, and grass grows on them, and the few who live round them call them hills.
 
 One still walks. It takes an afternoon to cross the edge of the sky, and where it has trodden the ground keeps a pulse
 you can feel in your feet. High on its side, at dusk, there are lights: the lamps of **Dhum the Swallowed**, the last
@@ -141,7 +141,7 @@ city, walks below, in the Deep (`04-the-held-space.md`), and is no Famine, whate
 In a forest that no road goes to, there is a spike of iron standing up out of the trees.
 
 It is higher than the trees by many times their height: straight, black, narrowing to a point that is lost in the grey.
-It has no door, no window and no seam. Rust runs down it in long red streaks like the tracks of tears. The woodcutters
+It has no door, no window and no seam. Rust runs down it in long red streaks like the tracks of tears. The few
 who live nearest it, as near as anybody lives, call it **the Needle**, and say it is a spike broken off the inside of an
 iron maiden the size of a mountain, standing point up where it fell, and that one day whoever owns the maiden will come
 back for it. The lowlands call it **the Sleepless**. The Citadel's oldest book calls it **Vhul-Oghra**, and says nothing
@@ -157,23 +157,24 @@ eyes, wider than a man is tall, white and veined, with no faces round them and n
 liquid. They are alive. When somebody looks in at the crack, they turn to the crack. Whatever is in the Needle is
 digesting, and the eyes are what it cannot digest, or will not.
 
-It drinks dreams. A village in its sight dreams no dreams of its own: the people lie down and close their eyes and open
+It drinks dreams. Whoever lives in its sight dreams no dreams of their own: they lie down and close their eyes and open
 them in the morning with nothing between. At first they do not mind. Then they find that they have stopped having ideas,
 because an idea is only a dream that came in the daytime, and the Needle drinks those too. Then they cannot picture the
 faces of their dead. The last thing to go is the ability to imagine tomorrow, and a people that cannot imagine tomorrow
-sits down where it is and waits. There are villages like that still, in its sight, sitting.
+sits down where it is and waits. There were villages like that once, in its sight. What is left of their people is
+sitting there still.
 
 And it calls. One night a sleeper gets up out of bed without waking and walks out into the forest, toward the Needle,
 and does not come back, and in the morning the others find that they can remember the sleeper's dreams, every one, as if
-they had been handed round. The woodcutters bar their doors from the outside at night and tie their sleepers by the
-ankle. How a sleeper gets into the Needle, when it has no door, nobody has seen. Travellers who pass near it at night
-say that for a while afterward they dream other people's dreams, as if the Needle had spilled.
+they had been handed round. The few who live near it bar their doors from the outside at night and tie their sleepers
+by the ankle. How a sleeper gets into the Needle, when it has no door, nobody has seen. The rare traveller who passes
+near it at night says that for a while afterward they dream other people's dreams, as if the Needle had spilled.
 
 *Behind the myth.* Dreams are what gods are made of (`00-the-deep-lore.md`). Every dream the Needle drinks is a god that
-will not be born. The scholars of the Last Breath have noticed that no new god has stood up anywhere in all their
-records; none of them has looked toward the forest. The liquid is a gut's, and the Needle is digesting; what it is
-digesting toward, and what the eyes are kept for, is never told. Its likeness to the spikes of the iron maidens of the
-Wasting is meant: nobody in the world knows whether the maidens were made in its image or it in theirs.
+will not be born. The few in the Last Breath who still keep records have noticed that no new god has stood up anywhere
+in all their records; none of them has looked toward the forest. The liquid is a gut's, and the Needle is digesting;
+what it is digesting toward, and what the eyes are kept for, is never told. Its likeness to the spikes of the iron
+maidens of the Wasting is meant: nobody in the world knows whether the maidens were made in its image or it in theirs.
 
 ## The reaper below
 
@@ -220,7 +221,7 @@ death adds one to the count, so the count is never done.
 The mouth of the crack is a pit, round, a stone's throw across, in a country nobody farms. It has no bottom anyone has
 heard: a stone dropped into it is never heard to land. People have brought their dead to its edge and tipped them in,
 to save Oss-Karrhath the walk, since before there were graves; it is the oldest burial there is. On the longest nights,
-those who live nearest say, a sound comes up out of the pit, slow and even, like a whetstone drawn along a blade.
+the few who live nearest say, a sound comes up out of the pit, slow and even, like a whetstone drawn along a blade.
 
 The Pale Order counts the dead. It is the first thing a brother learns and the last thing he does, and every bone-house
 of the Ossa is cut in the shape of Oss-Karrhath's hall: the same long hall floored with the dead, the same niche at the
@@ -283,7 +284,7 @@ Its bones did not rot. The bile soaked into them as they lay, and the bog, and t
 of grey stone, each knuckle of it as big as a house, running in a long curve right through the wet country, the only dry
 ground in it. So the peoples who came walked on it. It is the road. It has always been the road. Every people that has
 lived in the wet country has used it to get from one dry place to the next, and most of them never knew it was a spine,
-and walked to market along the top of it and set their carts down on its knuckles.
+and walked along the top of it and sat down to rest on its knuckles.
 
 Some knew. Where the spine rises at its far end toward the skull, which is under the mire, a people long gone cut a pit
 of black stone at the throat, with gutters to it, and fed the dead thing. Once a year they opened the throats of the
@@ -349,8 +350,8 @@ talk about it.
 
 **The Ghauul**, the emptied ones, are what came down out of the lesser cities: very tall, very
 thin, courteous, hollow to the bone. They remember being full. They knock at a door after midnight, softly, three times,
-and ask whether there is marrow in the house, and thank you when you say there is not, and do not go away. The common
-roads call them the Marrow-Eaters, and say they crack the bones of sleepers.
+and ask whether there is marrow in the house, and thank you when you say there is not, and do not go away. The few who
+meet them on the roads call them the Marrow-Eaters, and say they crack the bones of sleepers.
 
 **The Unison** were one mind in many bodies, in the mire that is now Shog-Mire. They built the stepped tower and the
 causeway that runs to it, and nobody has lived in either since. They thought one thought at a time, all of them
@@ -423,8 +424,8 @@ The people who knelt round it began to call her by the only name they had for he
 because a name said often enough stands up, the Bleeding Maiden.
 
 The processions of the Bleeding Maiden do not tell it this way. They say the wound came first, before anything, a wound
-in nothing (`02-the-creation-myths.md`), and that the Maiden is the opening that gives. The iron-gleaners and the
-grandmothers of the lowlands say the girl came first, and the wound after, and the faith last of all, and that the
+in nothing (`02-the-creation-myths.md`), and that the Maiden is the opening that gives. The grandmothers of the
+lowlands say the girl came first, and the wound after, and the faith last of all, and that the
 processions' scale, their scourges and their cup are what is left of the crowd that came to watch her. Where the
 processions poured their first cup there is a wound in the ground. Whether an iron maiden ever stood over it, closed,
 the processions will not say, and nobody has dug.

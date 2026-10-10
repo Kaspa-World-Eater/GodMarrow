@@ -4,14 +4,14 @@
 old procedural map (`hunter_cache_s1001` to `s1020`), to be remade by the bog's method*
 
 Up out of the far side of Fern Gully lies heather the fire never reached: old, deep, knee- to waist-high, grey-green and
-rolling to the sky. Hunters have worked this ground for generations, and the cache is where one of them kept what he
-took: a turf-roofed hut half sunk in the heather, hides stretched on frames, tallow in crocks, bone tied in bundles, a
+rolling to the sky. One family of hunters worked this ground, father to son, and the cache is where the last of them
+kept what he took: a turf-roofed hut half sunk in the heather, hides stretched on frames, tallow in crocks, bone tied in bundles, a
 bow leaning by the door. He meant to come back for it. His boots are on the step, and his footprints lead away barefoot.
 
-Nothing in this world was ever born that a hunter could take. The hunters take from what comes up out of the god: hide
+Nothing in this world was ever born that a hunter could take. The hunters took from what comes up out of the god: hide
 and finger-bone from the Hands, fat for tallow from the swollen ones, the bone needles the Weepers cry, and from the
-Husks only the knot of the belt, for the copper the road-wardens pay. The heather here grows over soft, warm ground
-where things push up through the skin, and the hunters dig their waiting-pits at its edges. It is the Heath as it was
+Husks only the knot of the belt. The heather here grows over soft, warm ground where things push up through the skin,
+and the hunters dug their waiting-pits at its edges. It is the Heath as it was
 before the burning, and it should feel lonely, patient and watched, the way a place feels when somebody has only just
 left it.
 
@@ -31,11 +31,11 @@ The later lines are cut deeper.*
 Whoever opens this door, you are welcome to the cache if you keep the rules. They are mine, and my father's, and his.
 
 There is nothing on the Hide to hunt that was ever born. Everything that walks out there came up out of the god, and
-the god is all there is to take from. So we take from what comes up. That is the trade, and anyone who tells you it is a
+the god is all there is to take from. So we take from what comes up. That is the work, and anyone who tells you it is a
 holy work or a filthy one has never done it.
 
 From the Hands we take the hide of the palm, which is the best leather there is, pale and without a hair, and the bones
-of the fingers, which the carvers want. Set the snares along the soft ground at dusk, a loop at finger height, staked,
+of the fingers, for pegs. Set the snares along the soft ground at dusk, a loop at finger height, staked,
 and come back at first grey. A Hand caught by one finger will wait for you. Never go to a snare in the dark, because a
 Hand is never alone.
 
@@ -43,11 +43,10 @@ From the swollen ones we take the fat, and you render it to tallow in the pan in
 smell brings more of them. Lance them from as far off as you can. The small ones burst quicker than you think.
 
 From the Weepers we take the needles they cry. Pull them out of whatever they struck, a post or a shield or a coat, and
-keep them in the roll by the door. The camps on the Moor buy bone needles for awls.
+keep them in the roll by the door. They make good awls.
 
-From the Husks we take nothing but the knot. The road-wardens pay a copper for every belt-knot brought in, as proof of
-a Husk put down. A belt is knotted at the back so that whoever walks behind has something to hold. I know that. I cut it
-anyway. A copper is a copper, and a Husk will not be holding anyone.
+From the Husks we take nothing but the knot, so that we know how many we have put down. A belt is knotted at the back so
+that whoever walks behind has something to hold. I know that. I cut it anyway. A Husk will not be holding anyone.
 
 Take nothing else from anything that was a person, not a hide, not a bone, not a tooth. Burn them where they fall if you
 can, and if you cannot, turn them face down.
@@ -62,11 +61,11 @@ Lately I have woken in the night with my boots off.
 
 ### What was found at the cache
 
-*A letter from the hunter's sister to a copyist, who had asked whether the cache was still kept. She had gone
-out to it the spring after her brother stopped coming in.*
+*A letter in the hunter's sister's hand, left under a stone beside his boots on the step, for whoever comes next. She
+had gone out to the cache the spring after her brother stopped coming home.*
 
-You asked whether my brother's cache is still kept. It is not. I went out to it in the spring, when he had not come in
-to the Moor all winter, and I will tell you what I found, since you asked, and since nobody else will go.
+If you have come for my brother's cache, it is not kept. I went out to it in the spring, when he had not come home all
+winter, and I will tell you what I found, since nobody else will come.
 
 The door was shut, and his rules were on the inside of it as they always were, with a new line at the bottom. The hides
 were on their frames, gone black as tar because nobody had turned them. The tallow was in the crocks. The finger-bones
@@ -139,7 +138,7 @@ hides); snares or traps sized for any real creature; trophies of real creatures;
 generator's shared landmarks.
 
 **Open questions for Derek.**
-- Whether the hunters' trade is right for the world: hide and finger-bone from the Hands, tallow from the swollen ones,
-  Weeper needles for awls, and a copper from the road-wardens for each Husk's belt-knot.
-- Who pays the bounties. We say the road-wardens (after the warden's notice in the Codex, "What the Marked Carry").
+- Whether the hunters' work is right for the world: hide and finger-bone from the Hands, tallow from the swollen ones,
+  Weeper needles for awls, and each Husk's belt-knot kept as a count. (The road-wardens' copper bounty was cut
+  2026-10-09 with the trade; the Codex's warden's notice, "What the Marked Carry", still names it.)
 - Whether a zone this small stays its own map or becomes the far end of Fern Gully.

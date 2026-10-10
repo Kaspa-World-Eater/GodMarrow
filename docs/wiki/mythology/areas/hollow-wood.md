@@ -9,9 +9,9 @@ grown into a forest: trunks that go up out of sight, warm a hand's depth in, wit
 and it weeps, and the cut closes by morning. Every tenth trunk has grown round something the god was carrying, and every
 root lies combed one way, toward where the Root Deep breathes. The roads were there first; the Wood grew away from them.
 
-It is the act's first forest of the god: towering, open, grim and quiet. Woodcutters, fungus-pickers and one hunter live
-at its edges, and two of its hamlets are empty now, emptied in two different ways. The god shows plainly, though far
-less than in the Deep.
+It is the act's first forest of the god: towering, open, grim and quiet. One woodcutter and one hunter are all who still
+live at its edges, and the two places where people lived in it are empty now, emptied in two different ways. The god
+shows plainly, though far less than in the Deep.
 
 **The one image:** the pilgrim small at the foot of a pale trunk that goes up out of the frame, one hand on the bark; at
 the tenth trunk along the road, the lip of a bell showing in the wood.
@@ -22,16 +22,16 @@ the tenth trunk along the road, the lip of a bell showing in the wood.
 
 ### The tenth trunk
 
-*Told by the fungus-pickers in their hollow to their children, as a copyist who wintered with them wrote it down. The
-hunter of the Wood added the last lines.*
+*The fungus-pickers told it in their hollow to their children, before they died. The hunter of the Wood tells it now as
+they told it, and added the last lines.*
 
 When the god fell, it was carrying things: a bell in its hand, a candle in its mouth, and other things besides. They
 fell from it when it struck the ground and lay scattered where the Wood is now. And because the god was dying, its veins
 came up out of the ground the way a drowning man's hands come up out of the water, reaching for what it had dropped.
 Each vein that found a thing closed round it, and stood up, and became a tree.
 
-Why one trunk in ten, the children always ask. Because the god let go with both hands, the pickers say, and there are
-ten fingers on two hands.
+Why one trunk in ten, the children always asked. Because the god let go with both hands, the pickers said, and there
+are ten fingers on two hands.
 
 The first woodcutter in the Wood knew none of this. He cut whatever came to hand, and the trunks wept clear and closed
 by morning, and he cut again. On the tenth his axe struck metal. He split the wood and lifted out a bell, and it rang
@@ -39,7 +39,7 @@ once in his hands, though he had not swung it, and every trunk in the Wood leane
 room turns to look at a man. He put the bell back and ran. By morning the wood had closed over it, all but the lip. It
 is there still, by the road, if you count.
 
-So we count, and leave every tenth one be.
+So they counted, and left every tenth one be.
 
 *The hunter's lines:* My father told it so, and I believed him. But on my line a tenth has grown round a man's ribs with
 a pilgrim's badge still in them, warm, and the god carried no pilgrims. Last winter I counted a tenth grown round a
@@ -47,10 +47,10 @@ lantern, its flame turned toward the road. The year before, that trunk was a nin
 
 ### Fourteen hearths
 
-*A leaf from the day-book of a brother of the Pale Order sent to a hamlet at the Wood's edge in the spring after it was
-emptied. It was found pressed in a book at his bone-house.*
+*A leaf from the day-book of a brother of the Pale Order sent to the houses at the Wood's edge in the spring after they
+were emptied. It was found pressed in a book at his bone-house.*
 
-I was sent with the captain to cut the count of the dead in the hamlet at the Wood's edge.
+I was sent with the captain to cut the count of the dead in the houses at the Wood's edge.
 
 There were no dead. Every door in the lane stood open. The beds still held the shape of the sleepers, boots stood at the
 hearths, shawls hung on the pegs, and there was nothing to count: no bone, no tooth, no nail, not even a smell. I took
@@ -59,7 +59,7 @@ clean.
 
 One man is left, a woodcutter. He had dug fourteen graves by the old stone and laid in each a shawl or a pair of boots
 from a house, because there was nothing else to lay. He had things from thirteen houses. In the fourteenth grave lies a
-small glass, face down. He says the hamlet was fourteen hearths. I counted thirteen houses.
+small glass, face down. He says there were fourteen hearths. I counted thirteen houses.
 
 He gave us the names, Tam, and Wenna who owned the glass, and the Hollis boys, and Gethin, and on, twelve names. At the
 thirteenth his mouth opened and nothing came out. In his own house a short coat hangs by the door with its sleeves
@@ -70,7 +70,7 @@ The captain said one word to me in the old tongue, a number, and told me to writ
 of this leaf. We did not stay the night.
 
 When anything of the god dies, it leaves us something to lay. This left nothing. I know of only one thing that leaves
-nothing. Every faith on the Hide is afraid of it, and in that hamlet I understood why.
+nothing. Every faith that is left is afraid of it, and in those houses I understood why.
 
 ### The pickers' hollow
 
@@ -90,8 +90,8 @@ called those days a bad year; the pickers called them holy. In my life there has
 days. At last the ash lifted and the Wood leaned back, and I went down to their hollow to tell them. They were
 sitting in their doorways, all four families, and the caps on the stones had gone grey. They did not get up.
 
-People who come through say the same thing took them that took the hamlet at the Wood's edge. At the hamlet there was
-nothing left to bury. At the hollow there was a great deal. I have left them lying, each with a stick at the head, and I
+The woodcutter says the same thing took them that took the houses at the Wood's edge. At the houses there was nothing
+left to bury. At the hollow there was a great deal. I have left them lying, each with a stick at the head, and I
 watch them. Fresh, a body lies any way it fell. A day on, its head is toward the ring. In a few days it has moved a
 hand's width toward it, and nobody drags them. I keep their fire going in the iron bin. It is only manners.
 
@@ -99,7 +99,7 @@ Further in is a glade the pickers never went near, where somebody long ago held 
 the ground. Its candles are burning still, and the wax runs red. Whether the rites failed, or worked and that is all
 that came of it, nobody can tell you.
 
-And where the Wood thins into tall grass, keep your face to the grass. Something the woodcutters call the Stalker Crone
+And where the Wood thins into tall grass, keep your face to the grass. Something the woodcutter calls the Stalker Crone
 keeps there, and comes when you look away.
 
 ## For building it
@@ -128,7 +128,7 @@ keeps there, and comes when you look away.
 - **The Niche Candle:** a tenth trunk whose bark has drawn back from its candle until the hollow stands man-high.
   Pilgrims' candles on its sill burn down to wax runs and soot; the one inside never has.
 - **The Sword-in-Root:** a root-flare grown round a sword to the hilt, woundwood rolled up the blade, an old run of
-  dried blood below it; black, pitted iron, lit by one shaft of moon through a gap. The hunters say the hilt sits a
+  dried blood below it; black, pitted iron, lit by one shaft of moon through a gap. The hunter says the hilt sits a
   finger lower each spring.
 - **The Vigil, the altar glade** (`vigil.py`, B-): an altar in a hollow under a pointed arch, a spiral of runes, red-wax
   candles that never go out because the sap dripping from the roof sets into wax as it falls, wax pouring into blood in
