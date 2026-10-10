@@ -58,7 +58,8 @@ func bind(z) -> void:
 		n.material = m
 		holder.add_child(n)
 		var at := Vector2(ground.x, fy)
-		flames.append({"node": n, "seed": seed})
+		flames.append({"node": n, "seed": seed, "at": Vector2(ground.x, fy), "reach": float(L.get("radius", 3.0)) * 120.0,
+			"h": 60.0 if kind >= 2 else 140.0})
 		# its sound, at the fire: a torch crackles, a brazier roars low, candles barely flutter (core/sfx.gd loop)
 		var snd := "fire_brazier" if kind == 1 else ("fire_candle" if kind >= 2 else "fire_torch")
 		var ap := AudioStreamPlayer2D.new()
@@ -73,7 +74,36 @@ func bind(z) -> void:
 		ap.play(randf() * 2.9)
 
 func _process(_dt: float) -> void:
+	_relight()
 	for f in flames:
 		var m: ShaderMaterial = (f["node"] as ColorRect).material
 		m.set_shader_parameter("breath", Flame.smooth(f["seed"]))
 		m.set_shader_parameter("wind", Gust.dir() * Gust.k() * 0.5 if Gust.storm else 0.0)
+
+## the near fires handed to the ground's shader each frame (shaders/baked_ground.gdshader, fires): the sixteen nearest the
+## view, each its place, its height, its reach, its breath, and a jitter of its source with the flicker
+func _relight() -> void:
+	if zone == null or not zone.has_meta("ground_mats"):
+		return
+	var cam := get_viewport().get_camera_2d()
+	var c := cam.get_screen_center_position() if cam else Vector2.ZERO
+	var near := flames.duplicate()
+	near.sort_custom(func(a, b): return (a["at"] as Vector2).distance_squared_to(c) < (b["at"] as Vector2).distance_squared_to(c))
+	var fs: Array = []
+	var ff: Array = []
+	var t := Time.get_ticks_msec() / 1000.0
+	for i in 16:
+		if i < near.size() and (near[i]["at"] as Vector2).distance_to(c) < 2200.0:
+			var f: Dictionary = near[i]
+			var br: float = 1.0 + (Flame.smooth(f["seed"]) - 1.0) * 3.0
+			var sd: float = f["seed"]
+			fs.append(Vector4(f["at"].x, f["at"].y, f["h"], f["reach"]))
+			ff.append(Vector4(br, 3.0 * sin(t * 7.3 + sd) + 1.5 * sin(t * 13.1 + sd * 2.0), 2.0 * sin(t * 5.1 + sd * 1.7), 0.0))
+		else:
+			fs.append(Vector4.ZERO)
+			ff.append(Vector4.ZERO)
+	var n := mini(16, near.size())
+	for m in zone.get_meta("ground_mats"):
+		(m as ShaderMaterial).set_shader_parameter("n_fires", n)
+		(m as ShaderMaterial).set_shader_parameter("fires", fs)
+		(m as ShaderMaterial).set_shader_parameter("fire_f", ff)

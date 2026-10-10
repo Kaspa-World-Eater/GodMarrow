@@ -183,24 +183,24 @@ def main():
     # blood) and at the stair's side ends every few steps; each a small warm light, drawn live (world/live_flames.gd)
     rnd = np.random.default_rng(9302)
     cands = []
-    for ang in np.linspace(0.0, 2 * math.pi, 9, endpoint=False) + rnd.uniform(-0.25, 0.25, 9):
+    for ang in np.linspace(0.0, 2 * math.pi, 18, endpoint=False) + rnd.uniform(-0.12, 0.12, 18):   # (doubled, Derek 2026-10-10)
         rr = CV.BASIN[2] + 2.0 + rnd.uniform(0.0, 1.6)
         cx_, cy_ = CV.BASIN[0] + math.cos(ang) * rr, CV.BASIN[1] + math.sin(ang) * rr * 0.9
         f_ = CV.floor_at(cx_, cy_)
         if f_ is None or CV._ell(cx_, cy_, CV.POOL) > 0.9 or abs(cx_ - (CV.STAIR[0] + CV.STAIR[1]) / 2) < 3.0 and cy_ < CV.STAIR[2] + 1.0:
             continue
         cands.append((cx_, cy_, f_))
-    for i in range(2, CV.STEPS - 1, 3):
+    for i in range(1, CV.STEPS - 1, 2):
         u_ = (i + 0.5) / CV.STEPS
         sy_ = CV.STAIR[2] - (CV.STAIR[2] - CV.STAIR[3]) * u_
-        sx_ = (CV.STAIR[0] + 0.35) if (i // 3) % 2 == 0 else (CV.STAIR[1] - 0.35)
+        sx_ = (CV.STAIR[0] + 0.35) if (i // 2) % 2 == 0 else (CV.STAIR[1] - 0.35)
         cands.append((sx_, sy_, CV.floor_at(sx_, sy_) or 0.0))
     # and the hall's floor before the dais (Derek, 2026-10-10: "the bottom area needs candles"): clusters left on the
     # flags, kept off the worn way up to the face and off the dais
     hx_, hy_, hrx, hry = CV.HALL
     got = 0
-    for k_ in range(80):
-        if got >= 11:
+    for k_ in range(200):
+        if got >= 22:
             break
         a_ = rnd.uniform(0, 2 * math.pi)
         rr = math.sqrt(rnd.uniform(0.08, 0.85))
@@ -210,7 +210,7 @@ def main():
             continue
         if abs(cx_ - hx_) < 1.6:                                       # the worn way up the middle
             continue
-        if any(math.hypot(cx_ - a, cy_ - b) < 2.6 for a, b, _ in cands):
+        if any(math.hypot(cx_ - a, cy_ - b) < 1.8 for a, b, _ in cands):
             continue
         cands.append((cx_, cy_, f_))
         got += 1

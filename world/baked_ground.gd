@@ -121,4 +121,5 @@ static func build(z) -> bool:
 	# the picture's own bounds: the camera stops at them, as Diablo stops at a map's edge, so the view never runs past what
 	# was baked (Derek, 2026-10-10: in the cave "the screen is cut off at the top")
 	z.set_meta("bake_rect", bounds)
+	z.set_meta("ground_mats", [mat, bmat])         # the fires relight both (world/live_flames.gd)
 	return true

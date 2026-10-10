@@ -23,6 +23,13 @@ uniform bool has_shore = false;
 // pool of blood", its drips' ripples "frozen"): no texel ever slides; a slow sheen drifts over the thick surface and it
 // breathes a little on the heartbeat; live rings spread where the faces' blood strikes it and wherever a body moves in it
 // (world/pool_life.gd fills `rings`: x, y in world px, age in seconds, strength)
+// the fires relight the painted form (Derek, 2026-10-10: "the torch light of the faces and walls doesnt seem to create
+// depth or shadow movement as the flicker"): each near fire (world/live_flames.gd) lights the carvings it faces through
+// their normal maps, its shading swelling and guttering with the flame's breath, and its source jittering a few pixels
+// with the flicker, so the shadows in the eyes, the mouths and the folds shift as torchlight's do
+uniform int n_fires = 0;
+uniform vec4 fires[16];        // x, y (world px of the flame), height (px), reach (px)
+uniform vec4 fire_f[16];       // breath (about 0.8 to 1.2), jitter x, jitter y (px), 0
 uniform bool pool = false;
 uniform vec4 rings[12];
 uniform vec4 pool_geo = vec4(0.0, 0.0, 3.7, 0.0);   // the pool's centre (tiles) and its shore's reach (tiles)
@@ -158,10 +165,19 @@ void fragment() {
 			float depth = clamp(1.0 - length(dv0) / (pool_geo.z * lobe), 0.0, 1.0);
 			float T = TIME * 0.35;
 			vec2 wd = normalize(vec2(1.0, 0.35));
-			vec2 ax = vec2(dot(wp, wd), dot(wp, vec2(-wd.y, wd.x)));
+			// the slosh (Derek, 2026-10-10: "there should be a gentle swell and slosh"): the whole surface rocks back and
+			// forth as blood in a basin, a slow sway with a second, slower one under it
+			float rock = 9.0 * sin(TIME * 0.55) + 5.0 * sin(TIME * 0.23 + 1.3);
+			vec2 ax = vec2(dot(wp, wd) + rock, dot(wp, vec2(-wd.y, wd.x)));
 			float stroke = vn(vec2(ax.x * 0.012 - T * 0.25, ax.y * 0.16));
 			float stroke2 = vn(vec2(ax.x * 0.03 + T * 0.4, ax.y * 0.3 + 5.0));
-			float v = 0.1 + depth * 0.22 + (stroke - 0.5) * 0.26 + (stroke2 - 0.5) * 0.06;
+			float v = 0.16 + depth * 0.2 + (stroke - 0.5) * 0.26 + (stroke2 - 0.5) * 0.06;
+			// the swell: broad, gentle crests rolling slowly out across the pool from its heart, lifted on the heartbeat
+			float beat = fract(TIME / 3.6);
+			float push = exp(-pow((beat - 0.06) / 0.05, 2.0)) + 0.5 * exp(-pow((beat - 0.27) / 0.035, 2.0));
+			float sw = sin(length(dv0) * 2.6 - TIME * 1.1 + 0.6 * sin(atan(dv0.y, dv0.x) * 2.0)) * 0.5 + 0.5;
+			float crest = smoothstep(0.72, 0.98, sw) * (0.6 + 0.4 * push);
+			v += (sw - 0.5) * 0.12 + crest * 0.14;
 			// the rings (world/pool_life.gd): thin, broken like a brush lifted, spreading slowly in thick blood
 			float rip = 0.0;
 			for (int i = 0; i < 12; i++) {
@@ -188,7 +204,7 @@ void fragment() {
 			}
 			// the light broken into dull, heavy dabs; clots drifting; the skin wrinkling
 			float dab = step(0.68, vn(vec2(ax.x * 0.035 - T * 0.5, ax.y * 0.22 + 31.0)));
-			v += dab * 0.12 * smoothstep(0.2, 0.7, lum * 3.0);
+			v += dab * (0.12 + 0.12 * crest) * smoothstep(0.15, 0.6, lum * 3.0);       // the firelight caught on the crests
 			float clot = vn(wp * 0.035 + vec2(T * 0.05, T * 0.03) + 40.0);
 			if (clot > 0.74) v = min(v, 0.12);
 			float wr = 1.0 - abs(vn(wp * 0.06 + vec2(T * 0.04, 0.0)) * 2.0 - 1.0);
@@ -199,7 +215,7 @@ void fragment() {
 			float lv = clamp(v + (dth - 0.5) * 0.07, 0.0, 1.0);
 			vec3 bc = lv > 0.62 ? vec3(0.5, 0.09, 0.09) : (lv > 0.44 ? vec3(0.34, 0.04, 0.06) : (lv > 0.26 ? vec3(0.2, 0.02, 0.04) : vec3(0.09, 0.01, 0.02)));
 			// lit by the baked light that fell here (the fires, the pool's glow), held dark
-			c.rgb = bc * clamp(0.45 + lum * 1.6, 0.4, 1.35);
+			c.rgb = bc * clamp(0.72 + lum * 1.5, 0.65, 1.45);
 		} else if (c.a < 0.998 && red) {
 			vec2 W = floor(wpos / 4.0);
 			float ph = fract(TIME / 3.6);                   // one beat: a surge, a weaker surge, then the stillness
@@ -229,6 +245,22 @@ void fragment() {
 		}
 	}
 	vec3 n = texture(NORMAL_TEXTURE, uv).rgb;
+	if (length(n) > 0.05 && n_fires > 0) {
+		vec3 nf = n * 2.0 - 1.0;
+		nf.y = -nf.y;
+		nf = normalize(nf);
+		for (int i = 0; i < 16; i++) {
+			if (i >= n_fires) break;
+			vec4 F = fires[i];
+			vec2 dv = F.xy + fire_f[i].yz - wpos;
+			float k = clamp(1.0 - length(dv * vec2(1.0, 2.0)) / F.w, 0.0, 1.0);
+			k *= k;
+			if (k <= 0.0) continue;
+			float lam = max(0.0, dot(nf, normalize(vec3(dv, F.z))));
+			float br = fire_f[i].x;
+			c.rgb *= 1.0 + k * ((lam - 0.42) * 0.75 + (br - 1.0) * 1.4 * (0.3 + lam));
+		}
+	}
 	if (length(n) > 0.05 && lamp_reach > 1.0) {
 		n = n * 2.0 - 1.0;
 		n.y = -n.y;
