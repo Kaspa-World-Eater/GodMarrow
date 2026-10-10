@@ -259,7 +259,7 @@ static func loop(kind: String) -> AudioStreamWAV:
 	_loops[kind] = wv
 	return wv
 
-## the Red on the shore (Derek, 2026-10-10: "the ocean makes no sound"): one beat of the heart it moves on, 6.5 s, as the
+## the Red on the shore (Derek, 2026-10-10: "the ocean makes no sound"): one beat of the heart it moves on, 5.2 s, as the
 ## shore's shader moves it (shaders/baked_ground.gdshader, the shore field): the first surge swells in from 0.13 s, crests
 ## at 1.4 s as the film creeps up the sand, and drains slowly back until about 5.2 s; a weaker second surge crests at
 ## 2.7 s; then stillness. Thick blood, not water: a heavy, dull slosh, never a bright break; the drain a low wet drag;
@@ -267,7 +267,7 @@ static func loop(kind: String) -> AudioStreamWAV:
 static func _red_surge() -> AudioStreamWAV:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 6502
-	var P := 6.5
+	var P := 5.2
 	var L := int(RATE * P)
 	var s := PackedFloat32Array()
 	s.resize(L)

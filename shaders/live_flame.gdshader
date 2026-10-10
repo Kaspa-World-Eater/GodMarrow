@@ -15,6 +15,8 @@ uniform float seed = 0.0;
 uniform float breath = 1.0;
 uniform float wind = 0.0;           // the lean, -1..1
 uniform int kind = 0;
+uniform bool cold = false;           // wisp-fire (world/red_wisps.gd): white core, pale blue-white body, dim blue-grey edge
+uniform float life = 1.0;            // 0..1: flaring in, burning, guttering out
 uniform vec2 rect_size = vec2(28.0, 56.0);
 
 const float B4[16] = float[](0., 8., 2., 10., 12., 4., 14., 6., 3., 11., 1., 9., 15., 7., 13., 5.);
@@ -97,13 +99,19 @@ void fragment() {
 		heat = tongue(x, y, t, seed, 1.0);
 		smoke = smoothstep(0.7, 1.0, y) * fbm(vec2(x * 2.4, y * 3.0 - t * 0.9)) * 0.45;
 	}
+	heat *= life;
 	float lv = heat * 3.5 + d * 0.9;
 	vec4 col = vec4(0.0);
-	if (lv > 3.75 && y < 0.4) col = vec4(1.0, 0.93, 0.62, 1.0);         // the white-yellow core, small and low
+	if (cold) {
+		// wisp-fire: a cold teardrop off the blood, torn at the tip, the dither only at its border; no smoke
+		if (lv > 3.4 && y < 0.45) col = vec4(0.96, 0.98, 1.0, 1.0);
+		else if (lv > 2.3) col = vec4(0.66, 0.8, 0.96, 0.95);
+		else if (lv > 1.4) col = vec4(0.36, 0.46, 0.62, 0.8);
+	} else if (lv > 3.75 && y < 0.4) col = vec4(1.0, 0.93, 0.62, 1.0);         // the white-yellow core, small and low
 	else if (lv > 2.4) col = vec4(1.0, 0.84, 0.42, 1.0);                 // yellow
 	else if (lv > 1.6) col = vec4(0.98, 0.56, 0.17, 1.0);                // orange
 	else if (lv > 1.0) col = vec4(0.72, 0.22, 0.06, 0.92);               // the red edge
 	else if (smoke + d * 0.25 > 0.42) col = vec4(0.09, 0.07, 0.07, 0.55); // the tips darkening into smoke
-	if (col.a < 0.5 && wax.a > 0.5) col = wax;
+	if (!cold && col.a < 0.5 && wax.a > 0.5) col = wax;
 	COLOR = col;
 }

@@ -84,33 +84,60 @@ void fragment() {
 			// creeps up a yard or so and drains back slower than it came, and leaves the sand dark
 			vec2 tl = vec2(wpos.x / 72.0 + wpos.y / 36.0, wpos.y / 36.0 - wpos.x / 72.0) * 0.5;
 			float din = (texture(shore, tl / shore_size).r - 0.5) * shore_span;
-			float P = 6.5;
+			// (2026-10-10, Derek: the swash "just looks like a line of jello, needs way more realisticness and some foam,
+			// you can increase the speed a bit"; "the surf also have a low pixel look"): the beat a little quicker (5.2 s;
+			// core/sfx.gd _red_surge keeps step); every mark on the 2 x 2 art grid; the film thin at its lip with the wet
+			// sand showing through it, thickening seaward, a sheen of the sky on it; a dirty froth riding its lip, broken,
+			// heaviest in the surge, left in scraps as it drains; foam lines on the swells' backs in the last two yards
+			// running in; and the film laid over the last half yard of the sea's own texels too, so the water's edge is
+			// the swash's soft line and never the bake's staircase
+			float P = 5.2;
 			float n1 = floor(TIME / P);
 			float ph = fract(TIME / P);
-			vec2 W = floor(wpos / 4.0);
+			vec2 W = floor(wpos / 2.0);
 			float s1 = smoothstep(0.02, 0.22, ph) * (1.0 - smoothstep(0.22, 0.8, ph));
 			float s2 = smoothstep(0.3, 0.42, ph) * (1.0 - smoothstep(0.42, 0.85, ph));
-			if (c.a < 0.998) {
+			float rag = 0.8 + 0.35 * vn(vec2(W.x * 0.03 + W.y * 0.015, n1 * 3.7)) + 0.12 * vn(W * 0.12 + vec2(n1 * 5.0, 0.0));
+			float R = (1.5 * s1 + 0.7 * s2) * rag;
+			float wetR = 1.6 * rag * (1.0 - smoothstep(0.22, 1.0, ph));
+			float surge = s1 + 0.6 * s2;
+			vec3 film = vec3(0.12, 0.014, 0.022);
+			if (c.a < 0.998 && din < -0.6) {
 				// the swells: low, broad, sagging in toward the line only while the heart pushes
 				float hc = n1 + 0.6 * smoothstep(0.02, 0.22, ph) + 0.25 * smoothstep(0.3, 0.42, ph);
 				float crest = 0.5 + 0.5 * sin(din * 0.45 - hc * 6.2832 + 0.4 * sin(W.x * 0.02 + n1));
 				float cr = crest * crest;
 				c.rgb *= 0.95 + 0.07 * cr;
-				// in the last yard a dull skin gathers on the swell's back, never white
-				if (din > -1.5 && cr > 0.85 && vn(vec2(W.x * 0.12, W.y * 0.5) + vec2(n1 * 7.0, 0.0)) > 0.6)
-					c.rgb = mix(c.rgb, vec3(0.32, 0.17, 0.17), 0.22);
+				// foam lines on the swells' backs in the last two yards, broken, carried in on the surge
+				if (din > -2.4 && cr > 0.82 && vn(vec2(W.x * 0.09, W.y * 0.32) + vec2(n1 * 7.0, hc * 2.0)) > 0.52)
+					c.rgb = mix(c.rgb, vec3(0.4, 0.26, 0.26), 0.35 + 0.25 * surge);
 			} else if (din < 4.0) {
-				float rag = 0.85 + 0.3 * vn(vec2(W.x * 0.025, n1 * 3.7));
-				float R = (1.5 * s1 + 0.7 * s2) * rag;
-				float wetR = 1.5 * rag * (1.0 - smoothstep(0.22, 1.0, ph));
 				if (din < R) {
-					float lip = R - din;
-					c.rgb = mix(c.rgb, vec3(0.13, 0.015, 0.025), clamp(lip / 0.7, 0.35, 0.85));   // the film of blood
-					if (lip < 0.18 && s1 + s2 > 0.3)
-						c.rgb = mix(c.rgb, vec3(0.3, 0.12, 0.12), 0.3);                      // its blunt lip
+					// the film: thin at the lip (the wet sand through it), thicker seaward, the sky's sheen on it
+					float depth = R - din;
+					float a = clamp(0.3 + depth / 0.9, 0.3, 0.9);
+					vec3 under = c.rgb * 0.62;
+					c.rgb = mix(under, film, a);
+					float sheen = vn(vec2(W.x * 0.05, W.y * 0.2) + vec2(TIME * 0.18, 0.0));
+					c.rgb += vec3(0.07, 0.03, 0.035) * smoothstep(0.6, 0.85, sheen) * (1.0 - a * 0.5);
+					// the froth riding the lip: a ragged band, broken by its own noise, heaviest in the surge
+					float fr = vn(W * 0.22 + vec2(n1 * 9.0, 0.0)) * 0.6 + vn(W * 0.55 - vec2(0.0, n1 * 4.0)) * 0.4;
+					float fband = 1.0 - smoothstep(0.08, 0.32 + 0.2 * surge, depth);
+					if (fr * fband > 0.32 - 0.12 * surge)
+						c.rgb = mix(c.rgb, vec3(0.46, 0.31, 0.3), 0.55 + 0.25 * fband);
 				} else if (din < wetR) {
-					c.rgb = c.rgb * 0.78 + vec3(0.02, 0.0, 0.002);                       // the sand left wet
+					c.rgb = c.rgb * 0.74 + vec3(0.02, 0.0, 0.002);                       // the sand left wet
+					// scraps of froth left behind as the film drains, fading
+					float fr = vn(W * 0.3 + vec2(n1 * 9.0, 0.0));
+					if (din < wetR * 0.8 && fr > 0.72 && ph < 0.75)
+						c.rgb = mix(c.rgb, vec3(0.36, 0.24, 0.24), 0.4 * (1.0 - ph));
 				}
+			} else {
+				// (the sea's own texels within half a yard of the line: covered by the film, so no staircase shows)
+			}
+			if (c.a < 0.998 && din >= -0.6 && din < 0.2) {
+				float a = clamp(0.55 + (-din) * 0.5, 0.55, 0.85);
+				c.rgb = mix(c.rgb, film, a);
 			}
 		} else if (c.a < 0.998 && red && pool) {
 			vec2 W = floor(wpos / 2.0);                     // the 2 x 2 art grid

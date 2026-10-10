@@ -70,6 +70,8 @@ static func build(z) -> bool:
 			mat.set_shader_parameter("shore_size", Vector2(float(sh["w"]), float(sh["h"])))
 			mat.set_shader_parameter("shore_span", float(sh["span"]))
 			mat.set_shader_parameter("has_shore", true)
+			# kept on the zone for what moves on the water (world/red_wisps.gd): yards past the waterline at a tile
+			z.set_meta("shore", {"img": simg, "w": float(sh["w"]), "h": float(sh["h"]), "span": float(sh["span"])})
 	var bmat := ShaderMaterial.new()                 # the tall bands: their plants bend in the wind
 	bmat.shader = mat.shader
 	bmat.set_shader_parameter("band", true)
