@@ -298,3 +298,25 @@ they read as bracers.
 
 **Grade: B.** Form, light, contact, life and the lore's detail now pass. **Worst open:** 1. strokes and tooth (7); 2. a
 wet highlight on the strands so they read in the dark (10); 3. the skeptic round beside the Ossuarch in the game (12).
+
+## Rules check (after pass 8)
+
+**Check:** rules and lore unchanged. Lines 1-6, 8, 10 (in part), 11 pass; 12 and 13 in part. The worst open line is
+**7 (paint)**: no dry-brush strokes along the form (3.4) and no tooth (3.6).
+
+## Pass 9: strokes along the form, and a tooth (checklist 7)
+
+`shaders/body3d.gdshader`: the picture doesn't carry the form's direction, but its light does. Across a turning form
+the light's iso-lines run along it, so each dry-brush stroke is laid at right angles to the value's gradient (a value
+noise long along the stroke, fine across it). The strokes nudge the value before it is stepped, so the tone edges take
+brushed, ragged shapes. A fine tooth sits under everything. At the silhouette a missing neighbour counts as the pixel
+itself, so the edge makes no false stroke.
+- **In the game, before and after:** the tone edges break in brushed shapes with a grain under them; the body reads less
+  like a smooth render. Subtle at the game's size, as paint should be under the cave's light.
+- **Caveat:** the strokes, the tooth and the dither are fixed to the picture's pixels, not to the skin, so on a moving
+  limb the pattern can swim a little (3.6 asks for a tooth fixed to the world). To fix, they move onto the model's
+  surface (its UV space), a later pass.
+- Smoke 12/0; 60 fps.
+
+**Grade: B.** **Worst open:** 1. the paint's pattern fixed to the skin, not the picture (7); 2. a wet highlight on the
+strands (10); 3. the skeptic round beside the Ossuarch (12).

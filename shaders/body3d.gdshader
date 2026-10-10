@@ -6,15 +6,35 @@
 // - the ramp hue-shifted: its darks lean violet-blue, its lights warm (3.9);
 // - dither only where one tone meets another (3.2): a 4x4 ordered pattern in the band at each step's edge, fixed to the
 //   picture's own pixels, so it rides with the body and never crawls over it;
-// - a lit lip (3.3, 3.13): an edge pixel already in the light is lifted a step, the rim the flame catches.
+// - a lit lip (3.3, 3.13): an edge pixel already in the light is lifted a step, the rim the flame catches;
+// - dry-brush strokes along the form (3.4; pass 9): the picture doesn't carry the form's direction, but its light
+//   does. Across a turning form the light's iso-lines run along it, so each stroke is laid at right angles to the
+//   value's gradient. The strokes nudge the value before it is stepped, so the tone edges take brushed, ragged shapes;
+// - a tooth under everything (3.6), fixed to the body's own pixels so it rides with the body.
 shader_type canvas_item;
 
 uniform float steps = 8.0;
 uniform float band = 0.16;            // how wide the dithered band at a step's edge is (of one step)
+uniform float stroke = 0.055;         // how much a stroke moves the value (of the whole ramp, in its square-root space)
+uniform float tooth = 0.018;
 const vec3 OUTLINE = vec3(0.031, 0.024, 0.039);
 
 float a_at(sampler2D tex, vec2 uv) {
 	return texture(tex, uv).a;
+}
+
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+
+float vnoise(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+
+float val(sampler2D tex, vec2 uv) {
+	vec4 c = texture(tex, uv);
+	return c.a < 0.5 ? -1.0 : sqrt(max(max(c.r, c.g), c.b));
 }
 
 float bayer4(vec2 p) {
@@ -37,6 +57,17 @@ void fragment() {
 		vec3 c = texture(TEXTURE, UV).rgb;
 		float v = max(max(c.r, c.g), c.b);
 		float g = sqrt(max(v, 0.0));
+		// the stroke's direction: along the light's iso-line, at right angles to the value's gradient (off the
+		// silhouette, a neighbour counts as this pixel, so the edge makes no false gradient)
+		float vr = val(TEXTURE, UV + vec2(px.x, 0.0)), vl = val(TEXTURE, UV - vec2(px.x, 0.0));
+		float vu = val(TEXTURE, UV - vec2(0.0, px.y)), vd = val(TEXTURE, UV + vec2(0.0, px.y));
+		vr = vr < 0.0 ? g : vr; vl = vl < 0.0 ? g : vl; vu = vu < 0.0 ? g : vu; vd = vd < 0.0 ? g : vd;
+		vec2 grad = vec2(vr - vl, vd - vu);
+		vec2 along = length(grad) > 0.004 ? normalize(vec2(-grad.y, grad.x)) : vec2(0.0, 1.0);
+		vec2 q = UV / px;
+		float sa = dot(q, along), sc = dot(q, vec2(-along.y, along.x));
+		float st = vnoise(vec2(sa * 0.11, sc * 0.75)) - 0.5;          // long along the stroke, fine across it
+		g += st * stroke + (hash(q) - 0.5) * tooth;
 		float s = g * steps;
 		float lo = floor(s);
 		float f = s - lo;
