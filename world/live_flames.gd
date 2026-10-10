@@ -14,6 +14,7 @@ var flames: Array = []        # {node, seed}
 
 func bind(z) -> void:
 	zone = z
+	z.set_meta("live_flames", true)
 	var sh: Shader = load("res://shaders/live_flame.gdshader")
 	for L in z.d.get("lights", []):
 		if str(L.get("type", "")) != "fire":
@@ -24,8 +25,8 @@ func bind(z) -> void:
 		var size := Vector2(30, 50)
 		var root := Vector2(0.5, 1.0)          # where in the rect the flame stands on its fuel
 		if str(L.get("kind", "")) == "floorcandles":
-			kind = 3                  # a cluster of wax stubs on the floor or a step, each with its flame
-			size = Vector2(30, 26)
+			kind = 3                  # a cluster of candles on the floor or a step, each cluster its own make
+			size = Vector2(44, 34)
 		elif str(L.get("kind", "")) == "brazier":
 			kind = 1                  # a fire down in its bowl: the bowl's opening an ellipse, its front lip hiding the root
 			size = Vector2(100, 96)

@@ -54,21 +54,42 @@ void fragment() {
 	bool cut = false;
 	vec4 wax = vec4(0.0);
 	if (kind == 3) {
-		// three stubs: wax columns two or four pixels wide, their own heights, lit on the flame's side, a teardrop on each
-		for (int i = 0; i < 3; i++) {
+		// candles left by those before (Derek, 2026-10-10: "add more variety to the candle"): each cluster its own make,
+		// one to six, of their own heights and girths, some leaning, the wax of each its own (old ivory, yellowed, red,
+		// blackened with age), a few snuffed, drips down their sides, the wax pooled and spread at their feet
+		float hs = fract(sin(seed * 12.9898) * 43758.5453);
+		int n = 1 + int(floor(hs * 5.99));
+		// the pool of wax at the feet: low, wide, uneven
+		float py = (y - 0.06) / 0.08;
+		if (abs(py) < 1.0 && abs(x) < 0.85 * (1.0 - py * py * 0.4) * (0.6 + 0.4 * float(n) / 6.0)) {
+			wax = vec4(vec3(0.32, 0.27, 0.22) * (0.8 + 0.2 * vn(vec2(x * 9.0, seed))), 1.0);
+		}
+		for (int i = 0; i < 6; i++) {
+			if (i >= n) break;
 			float fi = float(i);
-			float cx = -0.5 + 0.5 * fi + 0.1 * sin(seed * 2.3 + fi * 1.9);
-			float wh = 0.22 + 0.3 * fract(sin(seed * 1.7 + fi * 5.3) * 71.7);   // the stub's height, of the rect
-			float ww = (fract(sin(seed + fi * 3.1) * 37.9) > 0.5) ? 0.14 : 0.1;
-			if (abs(x - cx) < ww && y < wh) {
-				float lit = (x - cx) < 0.0 ? 1.0 : 0.72;
-				wax = vec4(vec3(0.62, 0.52, 0.4) * lit * (0.75 + 0.25 * y / wh), 1.0);
+			float r1 = fract(sin(seed * 1.7 + fi * 5.3) * 71.7);
+			float r2 = fract(sin(seed * 2.9 + fi * 3.7) * 53.1);
+			float r3 = fract(sin(seed * 0.7 + fi * 7.1) * 91.3);
+			float cx = (float(n) > 1.0 ? -0.62 + 1.24 * fi / (float(n) - 1.0) : 0.0) + (r2 - 0.5) * 0.18;
+			float wh = 0.12 + 0.62 * r1 * r1;                        // a stub, a half-burnt, a tall one
+			float ww = r3 > 0.75 ? 0.15 : (r3 > 0.3 ? 0.1 : 0.065);  // girth
+			float lean = (r2 - 0.5) * 0.25 * step(0.6, r3);
+			vec3 wc = r2 < 0.4 ? vec3(0.66, 0.58, 0.46) : (r2 < 0.65 ? vec3(0.62, 0.5, 0.3) : (r2 < 0.85 ? vec3(0.46, 0.1, 0.09) : vec3(0.2, 0.16, 0.13)));
+			float xc = x - cx - lean * y;
+			if (abs(xc) < ww && y < wh) {
+				float lit = xc < 0.0 ? 1.0 : 0.7;
+				vec3 cc = wc * lit * (0.75 + 0.25 * y / wh);
+				// a drip down its side, a shade lighter, ending in a bead
+				float dx = ww * (r1 > 0.5 ? -0.7 : 0.7);
+				if (abs(xc - dx) < 0.035 && y > wh * (0.25 + 0.4 * r3)) cc = wc * 1.15;
+				wax = vec4(cc, 1.0);
 			}
-			float sx = (x - cx) * 3.6;
+			if (r3 > 0.84) continue;                                 // snuffed: a wick, no flame
+			float sx = (xc) * 3.6;
 			float sy = (y - wh) * 2.6;
 			if (sy < 0.0 || sy > 1.0) continue;
 			float fl = 0.85 + 0.15 * sin(t * (5.0 + fi) + fi * 1.7) + 0.08 * sin(t * 13.0 + fi);
-			float w = (0.5 - 0.42 * sy) * fl;
+			float w = (0.5 - 0.42 * sy) * fl * (0.8 + 0.4 * ww / 0.15);
 			float b = clamp(1.0 - abs(sx + 0.15 * sy * sin(t * 2.0 + fi)) / max(w, 0.02), 0.0, 1.0);
 			float top = 1.0 - smoothstep(0.55 * fl, 0.95 * fl, sy);
 			heat = max(heat, (pow(b, 1.4) * 1.2 + b * 0.3) * top);

@@ -92,7 +92,9 @@ func _process(dt: float) -> void:
 		if randf() < er * dt and emb.size() < 160:
 			emb.append({"p": at + Vector2((randf() - 0.5) * (8.0 if k == "brazier" else 3.0), -2.0) * PX, "vx": (randf() - 0.5) * 8.0, "vy": -(14.0 + randf() * 22.0),
 				"t": 0.0, "life": 0.9 + randf() * (2.6 if k in ["brazier", "fire", "pyre"] else 1.2), "s": randf() * TAU})
-		var sr: float = {"brazier": 7.0, "fire": 3.5, "pyre": 3.5, "sconce": 2.4, "candles": 0.8}.get(k, 0.0)
+		# (no smoke off torches and candles: their round puffs rose from fires hidden behind a pillar, "invisible torches",
+		# Derek 2026-10-10; a brazier's smoke stays)
+		var sr: float = {"brazier": 4.0, "fire": 3.5, "pyre": 3.5}.get(k, 0.0)
 		if randf() < sr * dt and smk.size() < 110:
 			smk.append({"p": at + Vector2((randf() - 0.5) * 3.0, -5.0) * PX, "vx": w2 * 0.5 + (randf() - 0.5) * 3.0, "vy": -(7.0 + randf() * 6.0), "t": 0.0,
 				"life": (4.5 if k == "brazier" else 3.0) + randf() * 3.0, "r0": 1.5 if k == "candles" else (3.5 if k == "brazier" else 2.5), "s": randf() * TAU, "src": k})
