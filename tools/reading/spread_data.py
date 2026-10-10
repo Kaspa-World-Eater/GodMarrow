@@ -141,14 +141,200 @@ CLOSE = ["Isn't it horrible? A moment ago it was nothing, and it was so quiet.",
 ASPECT_WORD = {"bone": "bone", "soul": "thread", "flesh": "flesh", "breath": "breath", "silence": "quiet"}
 
 
+# Derek, 2026-10-09: "a bit more detailed and story like, with more meaning given in each draw. and more stuff about how
+# the deck draws you". Each card's own line (upright, reversed), longer, a small story with the lore under it; and what
+# it MEANS for the pilgrim (gist), read in the place it fell (READ).
+STORY = {
+    "unwritten": (
+        "The Unwritten. A page nobody's put a word on. The last one who held it out the whole age long never wrote "
+        "anything, and the age ended anyway. Blank isn't empty. Blank is waiting.",
+        "Turned over, and it's still blank. Worse. That means it's been written and wiped, again and again, until "
+        "the page wore thin. You can see through it if you hold it to the fire. Don't.",
+        "a turn nobody has taken yet", "a story already told too many times"),
+    "pilgrim": (
+        "The Pilgrim. Walking. Always walking, a staff and a hood and no idea where. The pilgrim road's worn a "
+        "trench in the Hide a man deep, and everyone in it is walking to something that's already dead.",
+        "The Pilgrim, sat down at the side of the road with its boots off. Some stop because they've arrived. Most "
+        "stop because the road ran out under them. The road always runs out.",
+        "to keep walking and never ask where", "to stop, at last, and not get up"),
+    "digger": (
+        "The Gravedigger's Hands. Dirt under every nail and no memory of whose graves. The hands remember for it. "
+        "They dig straight and they dig deep and they never once look in.",
+        "The Hands, digging up. What was put down for a reason is coming back for one. The Ossuary Matron lays "
+        "the dead in their order; these hands undo it.",
+        "to bury what it cannot carry", "to dig up what was put down for a reason"),
+    "veil": (
+        "The Singed Veil. A moth with a white face, going round and round the one light that'll burn it. The moths "
+        "in the high court wear faces like that. They know what the light does. They go anyway.",
+        "The Veil, already burned. Nothing left to draw it now, and nothing left to lose. It's lighter, burned. "
+        "Ask anything that's been in a fire.",
+        "the light that burns it", "nothing, now; it has already burned"),
+    "swaddling": (
+        "The Swaddling. Wrapped tight against the ash and carried. On the Hide somebody's always carried and "
+        "somebody always carries, and the one who carries never puts it down, not even to sleep.",
+        "The Swaddling, cut open. Somebody took a knife to the cloth. Maybe to free what was in it. Maybe not. The "
+        "Deep asks for children, and somebody always pays.",
+        "to be carried, and to carry", "the knife that cuts the cloth"),
+    "gleaner": (
+        "The Gleaner. Old Scythe himself, down in his pit under the bone. He comes up once an age to take the "
+        "harvest, and he has never missed one. Not one stalk. Not one.",
+        "The Gleaner, reversed: the one who keeps him under. An Ossuarch with a sliver of the scythe in his plate, "
+        "counting, always counting, so the old harvester stays down a little longer.",
+        "the end that comes for everything", "to keep the end under, a little longer"),
+    "saint": (
+        "The Weeping Saint. She bleeds so they'll believe her, and they do; they always do. The girl in the iron "
+        "wept until the weeping was the only thing left of her, and they made a faith of the tears.",
+        "The Saint, reversed: the crowd that came to watch her. A thousand faces and not one of them looking at "
+        "her. They came for the weeping. They'd come again.",
+        "to suffer, so as to be believed", "to watch, and do nothing"),
+    "scholar": (
+        "The Scholar's Eye. Reads, and reads, and reads, until the page starts reading back. The oldest reader in "
+        "the Citadel still sits at his book. He hasn't turned a page in an age. The page turns him.",
+        "The Eye, turned inward: the eyes in the Needle, looking back. Once they've seen you, they don't stop. "
+        "...It looked. It shouldn't have looked.",
+        "to know, whatever knowing costs", "the eyes that look back"),
+    "hanged": (
+        "The Hanged Twin. Hung head down over still water, and in the water its twin stands upright, a breath "
+        "behind it. Every still surface has one. The Drowned Twin keeps very good time.",
+        "The Twin, a breath ahead. Worse. That one knows where it's going, and it's only waiting for this one to "
+        "catch up. It will. They always do.",
+        "a twin a breath behind it", "a twin a breath ahead, waiting"),
+    "knot": (
+        "The Knot of Mouths. Many mouths and one hunger, eating to keep and keeping to eat. The Second Mouth "
+        "preaches it. The Tallow-Mother lives it. Round and round it goes.",
+        "The Knot, reversed: the one that's eaten. Someone has to be the meal. Somebody always is. Better to know "
+        "which one you are.",
+        "to eat, and keep what it eats", "to be eaten"),
+    "wick": (
+        "The Wick. It burns down to give a little light, and the light is all that's left of it. Every lantern on "
+        "the Hide has one inside: a soul that chose to stay and burn instead of going out with the breath.",
+        "The Wick, reversed: the dark just past the edge of the light. Always there. Always patient. The light "
+        "only ever pushes it back a step.",
+        "to burn itself down for a little light", "the dark at the edge of every light"),
+    "mourner": (
+        "The Mourner. She cuts her hair for every one the Red takes, and the Red takes them all. The Grandmother of "
+        "the Red has none left. She cuts it anyway. The shore folk say you can hear the scissors in the surf.",
+        "The Mourner, reversed: the one being mourned. ...Somebody, somewhere, cut their hair for it already. Long "
+        "before it came up out of the pool.",
+        "grief that cuts and keeps cutting", "to be mourned, and not know it"),
+    "key": (
+        "The Ossuary Key. It locks the count. Nine, and nine, and nine, and every bone in its place. The Pale "
+        "Order's whole faith is a key turned in a lock, and the lock is the world.",
+        "The Key, reversed: the one who opens it. Somebody always does. That's why there's a key. That's why "
+        "there's always somebody looking for it.",
+        "to lock the count and keep it", "to open what was locked"),
+    "cup": (
+        "The Beggar's Cup. It knocks at the door with an empty bowl and asks, very politely, for marrow. The Ghauul "
+        "ask like that. So does hunger. So does the Hide.",
+        "The Cup, reversed: the house that answers the door. Don't answer the door. Whatever knocks at night on the "
+        "Hide, don't answer.",
+        "to ask, and keep on asking", "to open the door to what knocks"),
+    "bell": (
+        "The Drowned Bell. It rings under the water where nobody living hears it. The drowned king's court still "
+        "walks down the old one's spine to the sound of it, in step, the whole way.",
+        "The Bell, reversed: rung in tune at last. That should frighten anybody. A drowned bell isn't meant to "
+        "sound right.",
+        "a call only the drowned can hear", "a bell rung true, for once"),
+    "coin": (
+        "The First Coin. Somebody sold something at the end of the world, and here's what they got for it. The "
+        "merchant on the shore picks the dead clean and sells it back. Somebody's always selling.",
+        "The Coin, reversed: the one who buys. What did it buy? ...No. Don't tell me. I'd rather not know what "
+        "it paid.",
+        "to sell what is left", "to buy, and pay too much"),
+    "kiln": (
+        "The Kiln. It hardens what's given to it. Soft goes in, and doesn't come out soft. The Deep sets the old "
+        "one's blood to iron in the dark under everything, slowly, the way a kiln does.",
+        "The Kiln, reversed: the one that cracks in the firing. Something always cracks. Better it cracks in the "
+        "fire than after.",
+        "to be hardened by what it goes through", "to crack in the fire"),
+    "loom": (
+        "The Unravelling Loom. Somebody's picking it apart, thread by thread, and humming while they do it. The "
+        "Crone behind her veil pulls out what was woven wrong. It's mostly woven wrong.",
+        "The Loom, reversed: the one who weaves it back. Badly. Knots and lumps, threads from somebody else's "
+        "life. But it holds. Mostly it holds.",
+        "to be unpicked, thread by thread", "to be stitched back together, badly"),
+    "lanternwright": (
+        "The Lantern-Wright. The one who made the lanterns, and kept what was lost inside them. The makers were "
+        "hunted out. There are fewer lanterns every year, and nobody left who knows how.",
+        "The Wright, reversed: the one who lets it go. The light goes out the top, they say, like breath. Some of "
+        "them want to go. Most of them do.",
+        "to keep what was lost", "to let go what it kept"),
+    "choir": (
+        "The Drowned Choir. Under the crypts they're still holding the note. They've held it so long the stone hums "
+        "with it, and the water in the low places shivers when you walk by.",
+        "The Choir, reversed: the rest between the notes. Listen. ...There. That. That's what they're afraid of.",
+        "to hold on past all breath", "the silence between notes"),
+    "tithe": (
+        "The Tithe. It owes. Everyone left owes: a tenth of everything, back to whatever gave them the mourning. "
+        "Nobody remembers taking the loan. Everybody pays.",
+        "The Tithe, reversed: the one who comes to collect. On foot, at night, very polite. Knock, knock. Not the "
+        "tenth, this time. The rest.",
+        "to owe, and pay", "the one who comes to collect"),
+    "crown": (
+        "The Hollow Crown. Orders, given and given, and nobody obeying. The Man in the Rust sits up on the dark moon "
+        "and still gives them. The Hide doesn't listen. It never did.",
+        "The Crown, reversed: the city that would obey if it could. It can't. It's empty. Not one left in it to "
+        "hear the orders.",
+        "to command, and not be obeyed", "to want to obey, and have nothing left"),
+}
+
+# what each place makes of a card: its gist read in that place (one picked each time)
+READ = {
+    "brow": ["On the brow: the face it shows the Hide. {g}. That's what they'll see coming. Whether it's true is "
+             "another card.",
+             "So that's the face it wears: {g}. Faces are lent here. It'll give this one back, one day."],
+    "heart": ["Over the heart, what it wants: {g}. It'll walk the whole Hide for that, and never know why.",
+              "That's what's in its heart, then: {g}. Wanting is the oldest thing on the Hide. Older than the Hide."],
+    "lhand": ["In the left hand, what it holds and won't put down: {g}. It came up out of the pool already holding "
+              "it.",
+              "The left hand closes on {g}. It won't open, not for anything. Watch it try."],
+    "rhand": ["The right hand opens, and lets go of {g}. Something always stays on the step with the rest. Old "
+              "Scythe counts it.",
+              "What it gives up: {g}. It won't miss it. Not yet."],
+    "belly": ["Down in the belly, where the fear lives: {g}. Mind that one. Fear's the only thing here that never "
+              "lies.",
+              "So that's what it's afraid of: {g}. Good. The ones afraid of nothing go first."],
+    "feet": ["Under the feet, the road that brought it: {g}. Roads don't end on the Hide. They just stop.",
+             "It came here by {g}. It'll leave by it too. That's how roads are."],
+    "under": ["And under it all, in the Red, face down till now: {g}. That's the one that's been doing the drawing. "
+              "All along."],
+}
+
+# how the deck draws you: when the fan first lies down, and when a card lands
+DECK_OPEN = [
+    "Twenty-two of them, cut from hide and older than the count. Every one has lain on a body before this one. "
+    "They remember the shape. Pick, and they'll tell it what it is. They already know.",
+    "The deck. Feel it? Warm, like something that's been held a long while. It's read every one that came up out "
+    "of that pool. It knows this one. It's only being polite.",
+]
+DRAWN = [
+    "It didn't take that card. That card took it. They always do.",
+    "The deck reads the hand before the hand reads the deck. It's been waiting for this hand.",
+    "Hear that? A card comes off the deck the way a tooth comes out. Something's left a gap.",
+    "Don't look so pleased. Nobody chooses. The cards come up the way the dead come up: when they're ready.",
+    "There. It reached, and the deck let it. The deck doesn't let everyone.",
+    "Warm where it touched. They like this one. That's never good.",
+]
+DRAWN_REV = [
+    "Upside down. It came to it that way on purpose. The deck has a sense of humour, and no mercy.",
+    "Reversed. The card's lying. Or it's telling the truth the wrong way up. Same thing, here.",
+    "Head down, like the drowned. The deck turned this one over itself. Let's see why.",
+]
+CLOSE_SUM = "Here's what the cards made of it, all together. Don't ask which card did which. They won't say."
+
 def main():
-    d = dict(places=PLACES, weave=WEAVE, open=OPEN, shapes=SHAPES, close=CLOSE, aspect_word=ASPECT_WORD,
-             mantles=[dict(id=i, aspect=a, one=o, rev=r, wears=w, say=s, say_rev=sr) for (i, a, o, r, w, s, sr) in M])
+    ms = []
+    for (i, a, o, r, w, sy, sr) in M:
+        st = STORY.get(i)
+        ms.append(dict(id=i, aspect=a, one=o, rev=r, wears=w, say=st[0] if st else sy, say_rev=st[1] if st else sr,
+                       gist=st[2] if st else o, gist_rev=st[3] if st else r))
+    d = dict(places=PLACES, weave=WEAVE, open=OPEN, shapes=SHAPES, close=CLOSE, aspect_word=ASPECT_WORD, read=READ,
+             deck_open=DECK_OPEN, drawn=DRAWN, drawn_rev=DRAWN_REV, close_sum=CLOSE_SUM, mantles=ms)
     p = os.path.join(ROOT, "data", "reading_spread.json")
     with open(p, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(d, fh, indent=1, ensure_ascii=False)
         fh.write("\n")
-    print("wrote", p, len(M), "mantles")
+    print("wrote", p, len(ms), "mantles")
 
 
 if __name__ == "__main__":
