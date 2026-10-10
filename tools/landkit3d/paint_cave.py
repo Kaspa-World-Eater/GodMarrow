@@ -357,7 +357,8 @@ def paint(d, t=0.0):
     img = np.where((alpha > 0.5)[..., None], img, tone(R["basalt"], np.full((gh, gw), 0.1), np.full((gh, gw), 0.5)))
     proj = projector(d)
     img = mirrors(img, d, proj, fk)
-    img = pool_gloss(img, d, proj, fk, t)
+    # (the blood holds no reflections: Derek, 2026-10-09, "Remove the reflections from the blood pool"; pool_gloss is kept
+    # below, unused)
     img = fires(img, d, proj, fk, t)
     # black is a note, not a fill (rule 4): the darkenings above never take a surface below its ramp's darkest swatch,
     # except in the contacts (the darkest note) and the onyx mirror (black by its nature)
