@@ -30,14 +30,18 @@ extends CanvasLayer
 ## card; "type" stops with the first card's story half told; "final" stops at the last words, waiting for the click;
 ## "esc" presses Esc with two of the three drawn, then clicks through the telling and rises; "shuffle" stops mid-riffle;
 ## "slow" plays it all through like "all" but lets every line type out in full first; "stack" stops at the crown, the
-## deck lying squared.
+## deck lying squared. GM_READ_FX=0 plays it blind and =1 shows the effects, whatever Settings.reading_effects says.
 
 const U := preload("res://ui/uikit.gd")
-const BONE := Color("#dcd3c2")
-const BONE_D := Color("#a39a8b")
-const ASH := Color("#6f685f")
-const MARROW := Color("#c9974a")
-const MARROW_D := Color("#8c6a37")
+## the colours (Derek's partner, 2026-10-10: "its too hard to read the font and the color looks bad on it too"): warm
+## off-white for every word, a muted gold only for titles and card names; every word over a shadow
+const BONE := Color("#f2ead9")
+const BONE_D := Color("#ddd3c0")
+const ASH := Color("#bdb39f")
+const MARROW := Color("#dcb064")
+const MARROW_D := Color("#b48d4c")
+const GAIN_C := Color("#b5d39a")       # what a card gives
+const LOSS_C := Color("#e5a493")       # what it takes
 const RED_POOL := Color(0.16, 0.02, 0.03)
 const SW := 108.0                 # a card on the cloth: 54 x 84, drawn x2
 const SH := 168.0
@@ -45,7 +49,7 @@ const ASPECT_OF := {"ossumancer": "bone", "animancer": "soul", "hemomancer": "fl
 ## where each card lies (its centre): the body, head at the top; the last card under it, lying across, in the Red
 ## (spaced so each card's name fits under it, clear of the next)
 const SLOT := {"crown": Vector2(1180, 110), "brow": Vector2(1180, 310), "heart": Vector2(1180, 510),
-	"lhand": Vector2(960, 560), "rhand": Vector2(1400, 560), "belly": Vector2(1180, 710), "feet": Vector2(1180, 910),
+	"lhand": Vector2(900, 560), "rhand": Vector2(1460, 560), "belly": Vector2(1180, 710), "feet": Vector2(1180, 910),
 	"under": Vector2(1470, 830)}
 ## how the whole hand's sum reads at the end, in the order it is shown (never card by card)
 const FX_ORDER := ["skt0", "skt1", "skt2", "vit", "spi", "con", "life", "hpPct", "mana", "armor", "stam", "res", "res_fire", "res_cold", "res_poison",
@@ -73,6 +77,8 @@ var R: Dictionary = {}            # data/reading.json (the old pools: the hidden
 var S: Dictionary = {}            # data/reading_spread.json (the places, the mantles' words, the weaving)
 var root: Control                 # the whole window: the backdrop, and every click
 var stage: Control                # the spread's 1920 x 1080, centred in it
+var group: CanvasGroup            # the stage drawn whole, then faded whole: cards never show through one another
+var body_font: Font               # the words: the engine's own sans, plain and clear
 const BASE := Vector2(1920, 1080)
 var tex := {}
 var t := 0.0
@@ -143,12 +149,16 @@ func _ready() -> void:
 	root.draw.connect(_draw_back)
 	root.gui_input.connect(_gui)
 	add_child(root)
+	group = CanvasGroup.new()
+	group.modulate.a = 0.0
+	root.add_child(group)
 	stage = Control.new()
 	stage.size = BASE
 	stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	stage.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	stage.draw.connect(_draw_all)
-	root.add_child(stage)
+	group.add_child(stage)
+	body_font = ThemeDB.fallback_font
 	auto = OS.get_environment("GM_READ_ACT")
 	# the crown: the calling, face up, the one card it knows
 	var st: Dictionary = R.get("stars", {}).get(cls, {})
@@ -241,8 +251,8 @@ func _hurry() -> void:
 func _type(dt: float) -> void:
 	_sync()
 	var n: int = _speech()[1]
-	if n <= 0 or typed >= n or fade < 0.5:
-		return                                       # (the first words wait for the cards to come up)
+	if n <= 0 or typed >= n or t < 1.45:
+		return                                       # (his first words wait until the cards are up)
 	var v := minf(float(n), typed + dt * CPS)
 	if auto == "type" and phase == "told" and v >= n * 0.45:
 		return                                       # (test "type": hold the first card's story half told)
@@ -314,7 +324,7 @@ func _pick_tick(dt: float) -> void:
 			Sfx.play("page_close", 0.45, 1.25)
 		pk["flip"] = minf(1.0, f + dt / 0.25)
 		if f < 0.5 and float(pk["flip"]) >= 0.5 and pk["rev"]:
-			_rev_line()                              # it turns up head down, and he says so
+			_rev_line(pk["m"])                              # it turns up head down, and he says so
 		if float(pk["flip"]) >= 1.0:
 			flip_i += 1
 			flip_wait = 0.08
@@ -339,8 +349,8 @@ func _say_on(more: String) -> void:
 	prompt = prompt + "\n\n" + more if prompt != "" else more
 
 ## a card of the three turns up head down: he says so, then and there (TURNED; one line a card, never the same twice)
-func _rev_line() -> void:
-	var line := _line(S.get("turned", []))
+func _rev_line(m: Dictionary) -> void:
+	var line := _line(S.get("turned", [])).replace("{n}", _name_of(m))
 	if line == "":
 		return
 	if rev_said.is_empty():
@@ -469,6 +479,10 @@ func _name_of(m: Dictionary) -> String:
 ## balanced over a whole hand; tools/reading/spread_data.py, tools/reading/balance_check.py); the old pools of
 ## data/reading.json only for a card without one
 func _take(pid: String, m: Dictionary, rev: bool) -> void:
+	picks.append({"step": pid, "id": m.get("id", ""), "name": _name_of(m), "emb": "m_" + String(m.get("id", "")), "fx": _fx_of(m, pid, rev), "rev": rev})
+
+## what a card does in a place, one way up
+func _fx_of(m: Dictionary, pid: String, rev: bool) -> Dictionary:
 	var fx: Dictionary = {}
 	var key: String = POOL.get(pid, "cards")
 	var own = m.get("fx", {}).get(pid) if m.get("fx") is Dictionary else null
@@ -492,7 +506,7 @@ func _take(pid: String, m: Dictionary, rev: bool) -> void:
 				if ms[i].get("id", "") == m.get("id", ""):
 					idx = i
 			fx = pool[(idx * 7 + (11 if rev else 0)) % pool.size()].get("fx", {})
-	picks.append({"step": pid, "id": m.get("id", ""), "name": _name_of(m), "emb": "m_" + String(m.get("id", "")), "fx": fx, "rev": rev})
+	return fx
 
 ## let him lay the rest
 func _skip() -> void:
@@ -756,6 +770,9 @@ func _process(dt: float) -> void:
 	if auto != "" and leaving < 0.0 and fmod(t, 0.3) < dt:
 		_auto()
 	stage.position = ((root.size - BASE) / 2.0).floor()
+	# the way in (Derek, 2026-10-10: "smooth the transition to the tarot read"): the cave darkens first, then the cards
+	# come up out of it, then he speaks
+	group.modulate.a = clampf((t - 0.45) / 0.8, 0.0, 1.0) * (1.0 - clampf(leaving / 1.2, 0.0, 1.0) if leaving >= 0.0 else 1.0)
 	root.queue_redraw()
 	stage.queue_redraw()
 
@@ -809,7 +826,7 @@ func _auto() -> void:
 ## the fan: every card still face down, spread in an arc on the left of the cloth; [centre, angle]
 func _fan(i: int, n: int) -> Array:
 	var u := 0.5 if n <= 1 else float(i) / float(n - 1)
-	var c := Vector2(130.0 + u * 620.0, 640.0 - 80.0 * sin(PI * u))
+	var c := Vector2(110.0 + u * 590.0, 640.0 - 80.0 * sin(PI * u))
 	return [c, (u - 0.5) * 0.55]
 
 func _fan_hit(p: Vector2) -> int:
@@ -942,7 +959,7 @@ func _type_draw(ci: CanvasItem, text: String, f: Font, size: int, lh: float, at:
 			left -= 1
 			continue
 		if left > 0:
-			ci.draw_string(f, Vector2(at.x, y), ln if left >= ln.length() else ln.substr(0, left), HORIZONTAL_ALIGNMENT_LEFT, width, size, col)
+			_txt(ci, f, Vector2(at.x, y), ln if left >= ln.length() else ln.substr(0, left), HORIZONTAL_ALIGNMENT_LEFT, width, size, col)
 		left -= ln.length() + 1
 		y += lh
 	return y
@@ -950,8 +967,12 @@ func _type_draw(ci: CanvasItem, text: String, f: Font, size: int, lh: float, at:
 func _card_at(ci: CanvasItem, c: Vector2, texture: Texture2D, ang: float, sx: float, a: float, lift: float = 0.0, sz: Vector2 = Vector2(SW, SH), tint: float = 1.0, shade: bool = true) -> void:
 	ci.draw_set_transform(c + Vector2(0, -lift), ang, Vector2(maxf(sx, 0.02), 1.0))
 	if shade:
-		ci.draw_rect(Rect2(Vector2(-sz.x / 2.0 + 5, -sz.y / 2.0 + 8), sz), Color(0, 0, 0, 0.45 * a))
-	ci.draw_texture_rect(texture, Rect2(-sz / 2.0, sz), false, Color(tint, tint, tint, a))
+		ci.draw_rect(Rect2(Vector2(-sz.x / 2.0 + 5, -sz.y / 2.0 + 8), sz), Color(0, 0, 0, 0.5))
+	# every card fully opaque (Derek, 2026-10-10: "the cards also appear to be transparent?"): a solid base, the art at
+	# full alpha; a card set back (a < 1) is drawn darker instead
+	var k := tint * (0.35 + 0.65 * clampf(a, 0.0, 1.0))
+	ci.draw_rect(Rect2(-sz / 2.0, sz), Color(0.06, 0.045, 0.04, 1.0))
+	ci.draw_texture_rect(texture, Rect2(-sz / 2.0, sz), false, Color(k, k, k, 1.0))
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 func _alpha() -> float:
@@ -959,30 +980,39 @@ func _alpha() -> float:
 
 ## the backdrop: the world dimmed, edge to edge
 func _draw_back() -> void:
-	root.draw_rect(Rect2(Vector2.ZERO, root.size), Color(0.01, 0.01, 0.015, 0.66 * _alpha()))
+	root.draw_rect(Rect2(Vector2.ZERO, root.size), Color(0.01, 0.01, 0.015, 0.8 * _alpha()))
+	# the words' side of the cloth a shade darker still, so nothing of the cave sits behind a line
+	var lw := maxf(0.0, (root.size.x - BASE.x) / 2.0) + 980.0
+	for k in 8:
+		root.draw_rect(Rect2(0, 0, lw - k * 30.0, root.size.y), Color(0, 0, 0, 0.035 * _alpha()))
+
+## a line of words, over its own shadow
+func _txt(ci: CanvasItem, f: Font, at: Vector2, s: String, al: int, w: float, size: int, col: Color) -> void:
+	ci.draw_string(f, at + Vector2(2, 2), s, al, w, size, Color(0, 0, 0, 0.9 * col.a))
+	ci.draw_string(f, at, s, al, w, size, col)
 
 func _draw_all() -> void:
-	var a := fade if leaving < 0.0 else fade * (1.0 - clampf(leaving / 1.2, 0.0, 1.0))
+	var a := 1.0                                     # (the fade is the group's, so cards never show through)
 	var ci := stage
 	var sc := U.font("sc")
-	var fi := U.font("italic")
+	var fi := body_font
 	# where we are: the place, and under it what the place holds
-	ci.draw_string(sc, Vector2(60, 66), "THE READING", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(MARROW_D, a))
+	_txt(ci, sc, Vector2(60, 66), "THE READING", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(MARROW_D, a))
 	var p := _place()
 	var title := "The Telling" if phase == "end" else String(p.get("name", ""))
 	var sub := "" if phase == "end" else String(p.get("what", ""))
 	if phase == "end" and _kind(tale_n - 1) in ["calling", "go"]:
 		title = String(S.get("calling_name", {}).get(cls, title))
-		sub = "what it has become"
+		sub = "what they have become"
 	if phase == "open":
 		title = "The Crown"
-		sub = "what it is"
+		sub = "what they are"
 	elif phase == "deck":
 		title = "The Deck"
-		sub = "what draws it"
-	ci.draw_string(sc, Vector2(60, 112), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 42, Color(BONE, a))
+		sub = "what draws them"
+	_txt(ci, sc, Vector2(60, 112), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 42, Color(MARROW, a))
 	if sub != "":
-		ci.draw_string(fi, Vector2(62, 148), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 27, Color(BONE_D, a))
+		_txt(ci, fi, Vector2(62, 148), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, Color(BONE_D, a))
 	# the Red under the body, where the last card lies
 	var uc: Vector2 = SLOT["under"]
 	for k in 6:
@@ -1017,11 +1047,8 @@ func _draw_all() -> void:
 			for k in 3:
 				ci.draw_rect(Rect2(SLOT[pid] - rw / 2.0 - Vector2(4 + k * 3, 4 + k * 3), rw + Vector2(8 + k * 6, 8 + k * 6)), Color(MARROW, gl * a * (0.5 - k * 0.15)), false, 2.0)
 		_card_at(ci, SLOT[pid], shown, ang, sx, a * (0.55 if in_tale and not told and pid != "crown" else 1.0))
-		if f >= 0.999 or pid == "crown":
-			var nm := String(cd.get("name", ""))
-			if pid != "under" or phase == "end":
-				var c2: Vector2 = SLOT[pid] + Vector2(0, SH / 2.0 + 22 if pid != "under" else SW / 2.0 + 22)
-				ci.draw_string(fi, c2 - Vector2(150, 0), nm + (", reversed" if cd["rev"] else ""), HORIZONTAL_ALIGNMENT_CENTER, 300, 20, Color(BONE_D, a * 0.9))
+		if (f >= 0.999 or pid == "crown") and (pid != "under" or phase == "end"):
+			_label(ci, fi, pid, cd)
 	# the card in flight (a chosen one shrinks from the row to the cloth)
 	if not fly.is_empty():
 		var u: float = fly["t"]
@@ -1082,23 +1109,92 @@ func _draw_all() -> void:
 		words = _weigh(hover)
 		budget = ALL
 	if words != "":
-		_type_draw(ci, words, fi, FS_WORDS, LH_WORDS, WORDS_AT, WORDS_W, budget, Color(BONE if said != "" or budget == ALL else BONE_D, a))
+		var wy := _type_draw(ci, words, fi, FS_WORDS, LH_WORDS, WORDS_AT, WORDS_W, budget, Color(BONE, a))
+		if phase == "offer" and hover >= 0 and hover < offer.size() and _shown_fx():
+			var rv: bool = offer_rev[hover] if hover < offer_rev.size() else false
+			var x := WORDS_AT.x
+			for ln in _fx_lines(_fx_of(offer[hover], String(_place().get("id", "")), rv)):
+				_txt(ci, fi, Vector2(x, wy + 4.0), ln[0], HORIZONTAL_ALIGNMENT_LEFT, -1, 25, GAIN_C if ln[1] else LOSS_C)
+				x += fi.get_string_size(ln[0], HORIZONTAL_ALIGNMENT_LEFT, -1, 25).x + 36.0
+	if _shown_fx():
+		_draw_so_far(ci, sc, fi)
 	var hint: String = {"open": "click to go on", "deck": "click to go on",
 		"pick": ["draw three, blind, from the deck", "two more", "one more", ""][mini(picked.size(), 3)],
 		"draw": "draw the last card blind from the deck",
 		"offer": "choose one", "turn": "click to turn it over", "told": "click to go on"}.get(phase, "")
 	if hint != "" and phase in ["pick", "draw", "offer"]:
 		hint += "    ·    Esc lets him lay the rest"
-	ci.draw_string(fi, Vector2(0, 1056), hint, HORIZONTAL_ALIGNMENT_CENTER, 1920, 22, Color(ASH, a * (0.6 + 0.2 * sin(t * 2.0))))
+	_txt(ci, fi, Vector2(0, 1056), hint, HORIZONTAL_ALIGNMENT_CENTER, 1920, 22, Color(ASH, a * (0.6 + 0.2 * sin(t * 2.0))))
+
+## the Reading's effects shown plainly (Settings.reading_effects; Derek, 2026-10-10: "she didnt understand the tarot so
+## maybe we should have the stat effects present"); off, it plays blind
+func _shown_fx() -> bool:
+	if OS.get_environment("GM_READ_FX") != "":
+		return OS.get_environment("GM_READ_FX") == "1"       # (tests: GM_READ_FX=0 plays it blind, =1 shows)
+	return bool(Settings.get("reading_effects")) if "reading_effects" in Settings else true
+
+## what a card does in this place, this way up, as [text, gives] lines
+func _fx_lines(fx: Dictionary) -> Array:
+	var out: Array = []
+	for k in FX_ORDER:
+		if fx.has(k) and not is_zero_approx(float(fx[k])):
+			out.append([_fx_line(k, float(fx[k])), float(fx[k]) > 0.0])
+	for k in fx:
+		if not k in FX_ORDER and not is_zero_approx(float(fx[k])):
+			out.append([_fx_line(k, float(fx[k])), float(fx[k]) > 0.0])
+	return out
+
+## a laid card's name, beside it (the column) or under it (the hands, the last card), and what it does when shown
+func _label(ci: CanvasItem, fi: Font, pid: String, cd: Dictionary) -> void:
+	# the column's names beside it, clear of the right hand and the last card; the left hand's under it; the right
+	# hand's under it, running right, clear of the column's; the last card's under it
+	var side := pid in ["crown", "brow", "heart", "belly", "feet"]
+	var w := 140.0 if side else (190.0 if pid == "rhand" else 210.0)
+	var x: float = SLOT[pid].x + SW / 2.0 + 10.0 if side else (SLOT[pid].x - SW / 2.0 if pid == "rhand" else SLOT[pid].x - w / 2.0)
+	var y: float = SLOT[pid].y - SH / 2.0 + 22.0 if side else SLOT[pid].y + (SW if pid == "under" else SH) / 2.0 + 24.0
+	var al := HORIZONTAL_ALIGNMENT_LEFT if side or pid == "rhand" else HORIZONTAL_ALIGNMENT_CENTER
+	for ln in _wrap(String(cd.get("name", "")), fi, 19, w):
+		_txt(ci, fi, Vector2(x, y), ln, al, w, 19, MARROW)
+		y += 22.0
+	if cd["rev"]:
+		_txt(ci, fi, Vector2(x, y), "reversed", al, w, 17, BONE_D)
+		y += 21.0
+	if _shown_fx():
+		var fx: Dictionary = {}
+		for pk in picks:
+			if pk["step"] == pid:
+				fx = pk["fx"]
+		for ln in _fx_lines(fx):
+			for part in _wrap(ln[0], fi, 17, w):
+				_txt(ci, fi, Vector2(x, y), part, al, w, 17, GAIN_C if ln[1] else LOSS_C)
+				y += 20.0
+
+## what the whole hand has made so far, at the right edge (the end's sum, as it builds)
+func _draw_so_far(ci: CanvasItem, sc: Font, fi: Font) -> void:
+	var tot := {}
+	for pk in picks:
+		for k in pk["fx"]:
+			tot[k] = float(tot.get(k, 0.0)) + float(pk["fx"][k])
+	var caps: Dictionary = R.get("caps", {})
+	for k in tot.keys():
+		if caps.has(k):
+			tot[k] = clampf(tot[k], -float(caps[k]), float(caps[k]))
+	var y := 120.0
+	_txt(ci, sc, Vector2(1610, y), "SO FAR", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, MARROW)
+	y += 32.0
+	for ln in _fx_lines(tot):
+		for part in _wrap(ln[0], fi, 18, 280.0):
+			_txt(ci, fi, Vector2(1610, y), part, HORIZONTAL_ALIGNMENT_LEFT, 290, 18, GAIN_C if ln[1] else LOSS_C)
+			y += 23.0
 
 ## a turned card's name under it in the row (and that it lies reversed)
 func _row_name(ci: CanvasItem, fi: Font, i: int, m: Dictionary, rev: bool, lit: bool, a: float) -> void:
 	var ny := _offer_c(i).y + OH / 2.0 + 30.0
 	for ln in _wrap(_name_of(m), fi, 22, 228.0):
-		ci.draw_string(fi, Vector2(_offer_c(i).x - 114.0, ny), ln, HORIZONTAL_ALIGNMENT_CENTER, 228, 22, Color(BONE if lit else BONE_D, a))
+		_txt(ci, fi, Vector2(_offer_c(i).x - 114.0, ny), ln, HORIZONTAL_ALIGNMENT_CENTER, 228, 22, MARROW if lit else MARROW_D.lerp(MARROW, 0.5))
 		ny += 26.0
 	if rev:
-		ci.draw_string(fi, Vector2(_offer_c(i).x - 114.0, ny), "reversed", HORIZONTAL_ALIGNMENT_CENTER, 228, 20, Color(MARROW, a))
+		_txt(ci, fi, Vector2(_offer_c(i).x - 114.0, ny), "reversed", HORIZONTAL_ALIGNMENT_CENTER, 228, 19, BONE_D)
 
 ## a card's place in the squared stack, j cards up from the cloth (each a little higher: the deck's thickness)
 func _lvl(j: int) -> Vector2:
@@ -1185,37 +1281,37 @@ func _draw_end(ci: CanvasItem, a: float, sc: Font, fi: Font) -> void:
 				continue
 			var cur := i == tale_n - 1
 			y = _type_draw(ci, String(tale[i]["text"]), fi, 27 if _kind(i) == "calling" else FS_WORDS, 35.0 if _kind(i) == "calling" else LH_WORDS,
-				Vector2(70, y + (10.0 if _kind(i) == "go" else 0.0)), 760.0, budget if cur else ALL,
-				Color(BONE if cur else BONE_D, a * (1.0 if cur else 0.6))) + 14.0
+				Vector2(70, y + (10.0 if _kind(i) == "go" else 0.0)), 720.0, budget if cur else ALL,
+				Color(BONE if cur else BONE_D, a * (1.0 if cur else 0.8))) + 14.0
 	elif tale_n == 0 or ck == "tale":
 		for i in range(maxi(0, tale_n - 4), tale_n):
 			var cur := i == tale_n - 1
-			y = _type_draw(ci, String(tale[i]["text"]), fi, 30, 39.0, Vector2(70, y), 760.0, budget if cur else ALL,
-				Color(BONE if cur else BONE_D, a * (1.0 if cur else 0.55))) + 16.0
+			y = _type_draw(ci, String(tale[i]["text"]), fi, 30, 39.0, Vector2(70, y), 720.0, budget if cur else ALL,
+				Color(BONE if cur else BONE_D, a * (1.0 if cur else 0.8))) + 16.0
 	else:
 		# the cards' last words, to it
 		var intro := String(S.get("tale", {}).get("prophecy", ""))
 		var b := budget if ck == "prophecy" else ALL
 		var dim := 1.0 if ck == "prophecy" else 0.75
-		y = _type_draw(ci, intro, fi, 27, 34.0, Vector2(70, y), 760.0, b, Color(BONE_D, a * dim)) + 10.0
-		y = _type_draw(ci, _quote(), fi, 36, 44.0, Vector2(70, y), 760.0, b - intro.length() - 1, Color(MARROW, a * dim)) + 18.0
+		y = _type_draw(ci, intro, fi, 27, 34.0, Vector2(70, y), 720.0, b, Color(BONE_D, a * dim)) + 10.0
+		y = _type_draw(ci, _quote(), fi, 36, 44.0, Vector2(70, y), 720.0, b - intro.length() - 1, Color(MARROW, a * dim)) + 18.0
 		if ck == "sum":
 			# the whole hand, all together (never which card did which)
-			y = _type_draw(ci, String(S.get("close_sum", "")), fi, 25, 32.0, Vector2(70, y), 760.0, budget, Color(BONE_D, a)) + 10.0
+			y = _type_draw(ci, String(S.get("close_sum", "")), fi, 25, 32.0, Vector2(70, y), 720.0, budget, Color(BONE_D, a)) + 10.0
 			var ka := a * sum_a
 			var gave: Array = []
 			var took: Array = []
 			for k in FX_ORDER:
 				if fate.has(k):
 					(gave if float(fate[k]) > 0.0 else took).append(k)
-			ci.draw_string(sc, Vector2(70, y), "IT GAVE", HORIZONTAL_ALIGNMENT_LEFT, 400, 17, Color(ASH, ka))
-			ci.draw_string(sc, Vector2(490, y), "IT TOOK", HORIZONTAL_ALIGNMENT_LEFT, 400, 17, Color(ASH, ka))
+			_txt(ci, sc, Vector2(70, y), "IT GAVE", HORIZONTAL_ALIGNMENT_LEFT, 400, 17, Color(ASH, ka))
+			_txt(ci, sc, Vector2(490, y), "IT TOOK", HORIZONTAL_ALIGNMENT_LEFT, 400, 17, Color(ASH, ka))
 			y += 30.0
-			var fb := U.font("book")
+			var fb := body_font
 			for i in gave.size():
-				ci.draw_string(fb, Vector2(70, y + i * 29.0), _fx_line(gave[i], fate[gave[i]]), HORIZONTAL_ALIGNMENT_LEFT, 400, 23, Color(Color("#9fb08a"), ka))
+				_txt(ci, fb, Vector2(70, y + i * 29.0), _fx_line(gave[i], fate[gave[i]]), HORIZONTAL_ALIGNMENT_LEFT, 400, 23, Color(GAIN_C, ka))
 			for i in took.size():
-				ci.draw_string(fb, Vector2(490, y + i * 29.0), _fx_line(took[i], fate[took[i]]), HORIZONTAL_ALIGNMENT_LEFT, 400, 23, Color(Color("#b58a7a"), ka))
+				_txt(ci, fb, Vector2(490, y + i * 29.0), _fx_line(took[i], fate[took[i]]), HORIZONTAL_ALIGNMENT_LEFT, 400, 23, Color(LOSS_C, ka))
 			y += maxi(gave.size(), took.size()) * 29.0
 	var last := _at_last()
 	if last:
@@ -1223,6 +1319,6 @@ func _draw_end(ci: CanvasItem, a: float, sc: Font, fi: Font) -> void:
 		var on2 := hover == 99
 		ci.draw_rect(rise_r, Color(0.05, 0.04, 0.05, 0.9 * a))
 		ci.draw_rect(rise_r, Color(MARROW if on2 else MARROW_D, a), false, 1.5)
-		ci.draw_string(sc, rise_r.position + Vector2(0, 44), "Rise", HORIZONTAL_ALIGNMENT_CENTER, rise_r.size.x, 36, Color(BONE if on2 else BONE_D, a))
+		_txt(ci, sc, rise_r.position + Vector2(0, 44), "Rise", HORIZONTAL_ALIGNMENT_CENTER, rise_r.size.x, 36, Color(BONE if on2 else BONE_D, a))
 	var hint := "" if tale_n == 0 else ("click to rise" if last else "click to go on")
-	ci.draw_string(fi, Vector2(0, 1056), hint, HORIZONTAL_ALIGNMENT_CENTER, 1920, 22, Color(ASH, a * (0.6 + 0.2 * sin(t * 2.0))))
+	_txt(ci, fi, Vector2(0, 1056), hint, HORIZONTAL_ALIGNMENT_CENTER, 1920, 22, Color(ASH, a * (0.6 + 0.2 * sin(t * 2.0))))

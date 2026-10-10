@@ -280,6 +280,10 @@ func _reading_open() -> void:
 	var Rd = load("res://ui/reading.gd").new(self, hero.cls)
 	Rd.on_done = _reading_done
 	add_child(Rd)
+	# his mutter fades away as the cave darkens into the Reading (Derek, 2026-10-10: "smooth the transition")
+	var W := _world_ui()
+	if W and "_bark_t" in W:
+		W._bark_t = minf(float(W._bark_t), 0.9)
 	title_open = true      # (the world waits the same way it does for the title)
 	if hud:
 		hud.visible = false

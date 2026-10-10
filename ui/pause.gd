@@ -46,6 +46,7 @@ func _build() -> void:
 				["Sound: %d%%" % roundi(Settings.sfx_vol * 100), "v:sfx_vol"],
 				["The title: " + String(Settings.TITLE_NAMES[Settings.title_scene]), "title_scene"],
 				["Fewer effects (a slower machine): " + _on(Settings.fewer_fx), "t:fewer_fx"],
+				["Show the Reading's effects: " + _on(Settings.reading_effects), "t:reading_effects"],
 				["Back", "back"]]
 		"controls":
 			rows = [["Back", "back"]]

@@ -102,16 +102,16 @@ func _talk(e: Dictionary) -> void:
 ## the Stranger on the cave's top step (the opening, docs/wiki/mythology/areas/the-red-shore.md, his lines): a new
 ## pilgrim's first words with him open the Reading; after it he talks through the pilgrim, to the cards and to the face
 const READER_FIRST := [
-	"They come up out of the Red looking for somewhere to hide. And there's only the one Hide. They're standing on it.",
-	"Look at it. Wet as a birth, and nothing in its mouth. No name. No god. We'll find it some. We always do.",
-	"First card's the hide. It's got one now. Still wet. Mind what it keeps in it.",
+	"Another one up out of the Red. Sit. Let's see what the cards make of the newborn.",
+	"Look at them. Wet as a birth, and no name yet. The cards will find them one. They always do.",
+	"Come and sit, newborn. The deck has been waiting for you.",
 ]
 const READER_AFTER := [
 	"Still here? The mouth's that way. Nobody remembers going into the last one. That's how you know it worked.",
-	"Out on the sand they're all lying down, wearing its face. Lying is what the sand's for. Don't turn them over.",
-	"Count the faces on its way out, if it likes. The count's never the same twice.",
-	"The brown moon's up, behind all that grey. Somebody on it is still giving orders. It shouldn't take any.",
-	"It shouldn't strike iron on iron down here. Something underneath strikes back.",
+	"Out on the sand the dead are all lying down, wearing your face. Don't turn them over.",
+	"Count the faces on your way out, if you like. The count is never the same twice.",
+	"The brown moon is up, behind all that grey. Somebody on it is still giving orders. Don't take any.",
+	"Don't strike iron on iron down here. Something underneath strikes back.",
 	"You said that about the last one. ...You were right about the last one.",
 ]
 
