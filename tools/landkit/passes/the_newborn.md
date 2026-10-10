@@ -275,3 +275,26 @@ a bead go, which falls to the floor. All are hidden while the body is under the 
 
 **Grade: B-.** **Worst open:** 1. the rings at the wrists and knees; 2. strokes and tooth (7); 3. the strands could
 catch the light (a wet highlight) to read in the dark.
+
+## Rules check (after pass 7)
+
+**Check:** rules and lore unchanged. Lines 1-6, 8, 10, 11 pass; 7, 12, 13 in part. The worst open line is **3
+(form)**: faint rings at the wrists, elbows and knees, the doll's cuff grooves that the 2 cm remesh didn't fill. Standing,
+they read as bracers.
+
+## Pass 8: the rings were the coat, not the form
+
+- **Smoothing first:** the skin round the wrists, elbows, knees, ankles and hips was smoothed in the rest pose
+  (`reshape()`). The bands stayed.
+- **Looked at the geometry** (the rest pose in plain grey, close): the arms and knees were already clean, continuous
+  limbs with their anatomy. So the bands weren't form.
+- **The cause:** the coat's runs are noise stretched along the rest pose's height, so they run down the body. In the
+  rest pose (a T-pose) the arms lie level, so the same streaks crossed the arms as rings, which read as cuffs when the
+  arms hang. On the arms (masked by distance from the body's axis) the runs are now stretched along the arm.
+- Also: the model's textures sampled without mipmaps (at the game's size they bled the black between the bake's small
+  islands into seams), and the bake's margin widened to 16.
+- **Look test:** the forearms read as one continuous limb streaked lengthwise; the band above each knee is the kneecap
+  catching the light. Smoke 12/0.
+
+**Grade: B.** Form, light, contact, life and the lore's detail now pass. **Worst open:** 1. strokes and tooth (7); 2. a
+wet highlight on the strands so they read in the dark (10); 3. the skeptic round beside the Ossuarch in the game (12).

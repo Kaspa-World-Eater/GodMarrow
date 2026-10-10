@@ -87,6 +87,15 @@ def reshape(new):
             v.co.y += 0.018 * math.exp(-(oy * oy + oz * oz) / (2 * 0.05 ** 2))
     bmesh.ops.smooth_vert(bm, verts=list(set(cap)), factor=0.8, use_axis_x=True, use_axis_y=True, use_axis_z=True)
     bmesh.ops.smooth_vert(bm, verts=list(set(cap)), factor=0.8, use_axis_x=True, use_axis_y=True, use_axis_z=True)
+    # (pass 8) the doll's cuff grooves at its joints, which a 2 cm remesh leaves as faint rings (bracers, standing):
+    # the skin smoothed round each joint until the ring is gone, the limb's own mass kept
+    joints = []
+    for sx in (1.0, -1.0):
+        joints += [Vector((sx * 0.739, 0.065, 1.441)), Vector((sx * 0.466, 0.07, 1.441)), Vector((sx * 0.089, 0.0, 0.532)),
+                   Vector((sx * 0.089, 0.036, 0.104)), Vector((sx * 0.089, 0.0, 0.93))]
+    ring = [v for v in bm.verts if min((v.co - j).length for j in joints) < 0.075]
+    for _ in range(8):
+        bmesh.ops.smooth_vert(bm, verts=ring, factor=0.6, use_axis_x=True, use_axis_y=True, use_axis_z=True)
     bm.to_mesh(new.data)
     bm.free()
 
@@ -164,10 +173,33 @@ def coat_material():
     runs.inputs["Scale"].default_value = 3.0
     runs.inputs["Detail"].default_value = 3.0
     L.new(mp.outputs["Vector"], runs.inputs["Vector"])
+    # (pass 8) the arms lie level in the rest pose, so streaks long in the height ringed them (cuffs, when they hang):
+    # on the arms the runs are long along the arm instead, chosen by how far out from the body's axis a point is
+    mpa = N.new("ShaderNodeMapping")
+    mpa.inputs["Scale"].default_value = (0.7, 9.0, 9.0)
+    L.new(tc.outputs["Object"], mpa.inputs["Vector"])
+    runa = N.new("ShaderNodeTexNoise")
+    runa.inputs["Scale"].default_value = 3.0
+    runa.inputs["Detail"].default_value = 3.0
+    L.new(mpa.outputs["Vector"], runa.inputs["Vector"])
+    sep = N.new("ShaderNodeSeparateXYZ")
+    L.new(tc.outputs["Object"], sep.inputs["Vector"])
+    ax = N.new("ShaderNodeMath")
+    ax.operation = "ABSOLUTE"
+    L.new(sep.outputs["X"], ax.inputs[0])
+    armk = N.new("ShaderNodeMapRange")
+    armk.inputs["From Min"].default_value = 0.2
+    armk.inputs["From Max"].default_value = 0.27
+    L.new(ax.outputs["Value"], armk.inputs["Value"])
+    mixr = N.new("ShaderNodeMix")
+    mixr.data_type = "FLOAT"
+    L.new(armk.outputs["Result"], mixr.inputs["Factor"])
+    L.new(runs.outputs["Fac"], mixr.inputs["A"])
+    L.new(runa.outputs["Fac"], mixr.inputs["B"])
     runk = N.new("ShaderNodeMapRange")                            # only the strongest streaks are fresh runs
     runk.inputs["From Min"].default_value = 0.55
     runk.inputs["From Max"].default_value = 0.68
-    L.new(runs.outputs["Fac"], runk.inputs["Value"])
+    L.new(mixr.outputs["Result"], runk.inputs["Value"])
     ramp = N.new("ShaderNodeValToRGB")                            # the blotches: dried to tacky
     cr = ramp.color_ramp
     cr.elements[0].position = 0.46
@@ -516,7 +548,7 @@ def bake_coat(body, out, size=1024):
             sc.render.bake.use_pass_direct = False
             sc.render.bake.use_pass_indirect = False
             sc.render.bake.use_pass_color = True
-        sc.render.bake.margin = 6
+        sc.render.bake.margin = 16                      # wide: the islands are small, and any black between them shows
         bpy.ops.object.bake(type=btype)
         img.filepath_raw = os.path.join(out, "newborn_%s.png" % kind)
         img.file_format = "PNG"

@@ -5,12 +5,12 @@ shader_type spatial;
 render_mode cull_back, depth_draw_opaque;
 
 uniform vec4 albedo : source_color = vec4(1.0);
-uniform sampler2D albedo_tex : source_color, filter_linear_mipmap;
+uniform sampler2D albedo_tex : source_color, filter_linear;   // no mipmaps: at the game.s size they bled the black between the bake.s islands into seams
 uniform bool has_albedo_tex = false;
-uniform sampler2D rough_tex : hint_roughness_g, filter_linear_mipmap;
+uniform sampler2D rough_tex : hint_roughness_g, filter_linear;
 uniform bool has_rough_tex = false;
 uniform float rough = 0.5;
-uniform sampler2D normal_tex : hint_normal, filter_linear_mipmap;
+uniform sampler2D normal_tex : hint_normal, filter_linear;
 uniform bool has_normal_tex = false;
 uniform float surface_y = -100.0;
 
