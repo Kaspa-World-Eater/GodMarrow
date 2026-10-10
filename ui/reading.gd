@@ -9,35 +9,54 @@ extends CanvasLayer
 ## So the cards lie over the dimmed world, in a spread laid like a body on the cloth (the old one lying down): the
 ## calling at the crown, face up, the only card known; then the brow, the heart, the two hands, the belly, the feet, and
 ## one more under it all, in the Red. One deck, the twenty-two mantles (data/reading_spread.json, made by
-## tools/reading/spread_data.py; faces by tools/reading/card_fronts.py), fanned face down. For each place but the last
-## (Derek, 2026-10-10: "pick 3 face down from every draw, then they are shown face down and flipped over") the pilgrim
-## draws three blind from the fan; they fly out and land face down in a row, turn themselves over one after another, and
-## the pilgrim chooses one (hovering weighs it); the other two go back into the deck, and the chosen one flies to its
-## place. Which way up a card lies is settled when it is drawn (Derek, 2026-10-10: "it should happen when we draw it and
-## it flips to reveal with the stranger mentioning it"): a reversed one turns up head down, he says so as it turns, and
-## it keeps that way to the end. The card under the body is one blind draw, and stays face down
-## until the end. Then he weaves the whole spread into one telling, a part to a click, and how the cards lie changes what
-## he says; the last words send the pilgrim to the black mirror. What each card does in each place is never shown: it
-## comes from the old pools of data/reading.json by card, place and which way up, summed within the caps into the
-## pilgrim's fate (HeroStats.fate). Esc lets him lay the rest.
+## tools/reading/spread_data.py from his words in tools/reading/words.py; faces by tools/reading/card_fronts.py).
 ##
-## His words come a letter at a time (Derek, 2026-10-10: "not so slow its annoying"); a click or a key brings the whole
-## line at once, and the next click goes on. No colons anywhere the pilgrim reads ("doesnt feel like a normal
-## conversation with those").
+## It opens with the lowland rhyme (Derek, 2026-10-10: "add that fun poem to the begining"), half sung a line at a
+## time as he takes up the deck, a sigil drawing itself into the great ring round the spread with each line; then the
+## calling turns itself over at the crown; then the deck is shuffled and fanned. Before every place he speaks between
+## the draws (Derek, 2026-10-10: "we need exposition and transition between draws"), a line to a click: what the cards
+## so far say together, then what the next place governs. For each place but the last the pilgrim draws three blind
+## from the fan; they land face down in a row and turn themselves over, and the pilgrim chooses one (hovering weighs it:
+## its meaning in that place). Which way up a card lies is settled when it is drawn: a reversed one turns up head down,
+## and he says so then, in a line of that card's own for that part of the body (Derek: "see how repetative this reads").
+## The chosen card flies to its place and he reads it there, its meaning and what lies under the meaning. The card
+## under the body is one blind draw, face down until the end. Then he weaves the whole spread into one telling, a part
+## to a click; how the cards lie changes what he says; the last words send the pilgrim to the black mirror. What each
+## card does is summed within the caps into the pilgrim's fate (HeroStats.fate). Esc lets him lay the rest.
+##
+## The look (Derek, 2026-10-10: "i want the whole experience to be esoteric and for that to be a visual experience as
+## well"): a great ring with a seven-pointed star drawn in round the spread, its ticks like an astrolabe's; each empty
+## place marked by its own faint diagram; the laid cards joined in a slow line, crown to feet; dust motes in the fire's
+## light; a breathing dark at the edges (shaders/reading_veil.gdshader); the faces' glyphs kindling when they turn up
+## (an additive pass of the face over itself). (An ink-bleed between the parts was tried and cut, Derek, 2026-10-10:
+## "i dont like the transition of black smoke or whatever in the card game, get rid of it"; the parts simply follow.)
+## Every drawn mark is 2 x 2 screen px (MASTER_RULES 3.7); no red light, no fog. A card the mouse passes over ruffles (Derek:
+## "id like a light ruffle to the cards when the mouse passes over them"): a small tilt and lift and a shiver, on a damped
+## spring, never a bounce.
+##
+## His words come a letter at a time at one speed (Derek, 2026-10-10: "not so slow its annoying"), in Cormorant Garamond
+## (OFL, art/fonts/OFL-CormorantGaramond.txt) in a warm aged tone (Derek: "the font is a bit bold in the stranger talk,
+## needs to be more stylized and the color is too white"); a click or a key brings the whole line at once, and the next
+## click goes on. No colons anywhere the pilgrim reads.
 ##
 ## Tests (GM_READ_ACT): "all" plays it through and rises; "end" lets him lay the rest and clicks through the telling;
-## "pick" stops with three drawn face down; "flip" stops mid-turn; "offer" stops at the choice, weighing the middle
-## card; "type" stops with the first card's story half told; "final" stops at the last words, waiting for the click;
-## "esc" presses Esc with two of the three drawn, then clicks through the telling and rises; "shuffle" stops mid-riffle;
-## "slow" plays it all through like "all" but lets every line type out in full first; "stack" stops at the crown, the
-## deck lying squared. GM_READ_FX=0 plays it blind and =1 shows the effects, whatever Settings.reading_effects says.
+## "rhyme" stops with the rhyme sung and his aside half said; "pick" stops with three drawn face down; "flip" stops
+## mid-turn; "offer" stops at a choice, weighing the middle card and passing the mouse over it now and then (the ruffle),
+## at the place GM_READ_AT names (0 the brow, 3 the right hand; default 0); "told" stops with the first card read in
+## full; "bridge" stops between the brow and the heart, his look at the cards so far typed; "type" stops with the first
+## card's reading half told; "final" stops at the last words, waiting for the click; "esc" presses Esc with two of the
+## three drawn, then clicks through the telling and rises; "shuffle" stops mid-riffle; "slow" plays it all through like
+## "all" but lets every line type out in full first; "stack" stops at the crown, the deck lying squared. GM_READ_FX=0
+## plays it blind and =1 shows the effects, whatever Settings.reading_effects says.
 
 const U := preload("res://ui/uikit.gd")
-## the colours (Derek's partner, 2026-10-10: "its too hard to read the font and the color looks bad on it too"): warm
-## off-white for every word, a muted gold only for titles and card names; every word over a shadow
-const BONE := Color("#f2ead9")
-const BONE_D := Color("#ddd3c0")
-const ASH := Color("#bdb39f")
+## the colours (Derek's partner, 2026-10-10: the words must read and the colours must not look bad; Derek: "the color is
+## too white"): an aged parchment for his words, a deeper one for what is past, a muted gold for names and titles;
+## every word over a shadow
+const BONE := Color("#dcc9a1")
+const BONE_D := Color("#b5a17c")
+const ASH := Color("#8f8169")
+const MEAN_C := Color("#d9bd88")       # a card's meaning, as it is weighed (italic)
 const MARROW := Color("#dcb064")
 const MARROW_D := Color("#b48d4c")
 const GAIN_C := Color("#b5d39a")       # what a card gives
@@ -51,6 +70,9 @@ const ASPECT_OF := {"ossumancer": "bone", "animancer": "soul", "hemomancer": "fl
 const SLOT := {"crown": Vector2(1180, 110), "brow": Vector2(1180, 310), "heart": Vector2(1180, 510),
 	"lhand": Vector2(900, 560), "rhand": Vector2(1460, 560), "belly": Vector2(1180, 710), "feet": Vector2(1180, 910),
 	"under": Vector2(1470, 830)}
+## the line that joins the laid cards: each place from the one it hangs from
+const LINK := {"brow": "crown", "heart": "brow", "lhand": "heart", "rhand": "heart", "belly": "heart", "feet": "belly",
+	"under": "feet"}
 ## how the whole hand's sum reads at the end, in the order it is shown (never card by card)
 const FX_ORDER := ["skt0", "skt1", "skt2", "vit", "spi", "con", "life", "hpPct", "mana", "armor", "stam", "res", "res_fire", "res_cold", "res_poison",
 	"dmg", "dmg_day", "dmg_night", "raised", "fcr", "frw", "regen", "lok", "potion", "lrad", "mf", "gold", "xp"]
@@ -62,14 +84,18 @@ const LAB := {"con": " Constitution", "vit": " Vitality", "spi": " Essence", "li
 	"lrad": "% lantern reach", "potion": "% from draughts"}
 ## the hidden effects: each place's own pool in data/reading.json
 const POOL := {"brow": "cards", "heart": "seeks", "lhand": "answers", "rhand": "sacs", "belly": "fears", "feet": "roads", "under": "cards"}
-## the type (Derek, 2026-10-10: "can be a little larger"): every size about a fifth up from before
-const FS_WORDS := 29              # his words under the fan
-const LH_WORDS := 37.0
-const WORDS_AT := Vector2(70, 770)
-const WORDS_W := 860.0
+## the type: Cormorant's small x-height wants a size or so more than a sans
+const FS_WORDS := 34              # his words under the fan
+const LH_WORDS := 41.0
+const WORDS_AT := Vector2(70, 738)
+const WORDS_W := 700.0           # (clear of the great ring)
 const PARA := 12.0                # the breath between two paragraphs
 const CPS := 65.0                 # letters a second as he speaks
 const ALL := 1 << 20              # a budget that shows the whole of a line
+const RHYME_HOLD := 0.9           # the breath after each line of the rhyme, while its sigil finishes drawing in
+## the great ring round the spread
+const RING_C := Vector2(1180, 510)
+const RING_R := 468.0
 
 var main: Node
 var cls := "animancer"
@@ -78,14 +104,19 @@ var S: Dictionary = {}            # data/reading_spread.json (the places, the ma
 var root: Control                 # the whole window: the backdrop, and every click
 var stage: Control                # the spread's 1920 x 1080, centred in it
 var group: CanvasGroup            # the stage drawn whole, then faded whole: cards never show through one another
-var body_font: Font               # the words: the engine's own sans, plain and clear
+var geo: Control                  # the ring, the star, the sigils and the line through the laid cards (behind them)
+var glow: Control                 # the faces' glyphs kindling (an additive pass over the stage)
+var veil: ColorRect               # the breathing dark at the edges
+var body_font: Font               # his words: Cormorant Garamond, medium
+var ital_font: Font               # the rhyme, a card's meaning as it is weighed, the hints: its italic
+var stat_font: Font               # what the cards give and take: the roman, a little heavier
 const BASE := Vector2(1920, 1080)
 var tex := {}
 var t := 0.0
 var deck: Array = []              # the mantles still face down in the fan
-var laid := {}                    # place -> {m, rev, flip (0 face down .. 1 turned), name}
+var laid := {}                    # place -> {m, rev, flip (0 face down .. 1 turned), name, rt (when it turned up)}
 var place_i := 0
-var phase := "open"               # open, deck, pick, flip, offer, draw, fly, turn, told, end
+var phase := "rhyme"              # rhyme, open, deck, bridge, pick, flip, offer, draw, fly, turn, told, end
 var fly := {}
 var hover := -1
 var prompt := ""
@@ -99,13 +130,15 @@ var fade := 0.0
 var leaving := -1.0
 var end_t := 0.0
 var auto := ""                    # GM_READ_ACT (see the head of this file)
+var auto_at := 0                  # GM_READ_AT: the place the "offer" test stops at
 var rise_r := Rect2(70, 930, 220, 64)
 var fly_rev_last := false
-var picked: Array = []            # the three drawn blind for this place: {m, from, ang, t (flight 0..1), flip (0..1)}
+var picked: Array = []            # the three drawn blind for this place: {m, from, ang, t (flight 0..1), flip (0..1), rev, rt}
 var flip_i := 0                   # which of the three is turning itself over
 var flip_wait := 0.0
 var offer: Array = []             # the three, face up: the pilgrim chooses one
 var offer_rev: Array = []         # which of them turned up head down (reversed)
+var offer_rt: Array = []          # when each turned up (its glyph's kindling)
 var rev_said: Array = []          # the reversal lines said for this place's three
 var said_lines := {}              # every line he has said in this Reading: none is ever said twice
 var back: Array = []              # the two passed over, going home to the deck: {m, from, t}
@@ -117,6 +150,27 @@ var tale_t := 0.0                 # time since the last part began
 var sum_a := 0.0                  # the hand's sum, coming up
 var typed := 0.0                  # how many letters of what he is saying now are out
 var typed_key := ""               # what he is saying now: a new line always starts from its first letter
+## the rhyme: its lines, where each begins in what he says, the breath after each, and each line's sigil drawn in
+var rhyme: Array = []
+var rhyme_at: Array = []
+var rhyme_len := 0
+var rhyme_k := 0
+var rhyme_hold := 0.0
+var sig := [0.0, 0.0, 0.0, 0.0]
+## between the draws: the lines he says before a place, a click each
+var bridge: Array = []
+var bridge_i := 0
+## the ruffle: card id -> {a (tilt), va, y (lift), vy, sh (shiver)}
+var ruf := {}
+var ruf_id := ""                  # the card the mouse is over now (it stays a little lifted)
+## the esoteric layer
+var link_t := {}                  # place -> when its card landed (its line draws in from the place it hangs from)
+var motes: Array = []
+var glows: Array = []             # the faces drawn this frame, for the glyphs' glow: [centre, angle, x scale, size, texture, strength]
+var geo_done := false
+var geo_img: Image                # the ring and its marks, baked at one texel a 2 x 2 cell (redrawn only while they draw in)
+var geo_tex: ImageTexture
+var _img: Image = null            # while baking: where _dot puts its cells
 ## the deck before the spread (Derek, 2026-10-10: "the deck should be stacked before the spread and show the shuffle"):
 ## squared in a stack while he reads the crown; then cut in two, riffled together, squared, and fanned out
 const STACK := Vector2(440, 610)  # where the stack lies (the middle of the fan)
@@ -131,6 +185,16 @@ func _init(m: Node = null, c: String = "animancer") -> void:
 	main = m
 	cls = c
 
+## Cormorant Garamond (a variable face) at a weight
+func _cormorant(italic: bool, w: int) -> Font:
+	var p := "res://art/fonts/CormorantGaramond%s-VF.ttf" % ("-Italic" if italic else "")
+	if not ResourceLoader.exists(p):
+		return ThemeDB.fallback_font
+	var fv := FontVariation.new()
+	fv.base_font = load(p)
+	fv.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): w}
+	return fv
+
 func _ready() -> void:
 	layer = 26
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -140,6 +204,9 @@ func _ready() -> void:
 	S = k if k is Dictionary else {}
 	deck = S.get("mantles", []).duplicate()
 	deck.shuffle()
+	body_font = _cormorant(false, 530)
+	ital_font = _cormorant(true, 520)
+	stat_font = _cormorant(false, 640)
 	# the whole screen (Derek, 2026-10-10: "make the tarot the whole screen"): the backdrop fills the window edge to edge
 	# at any shape (the viewport grows past 1920 x 1080 when the window is not 16:9); the spread is laid out on a 1920 x
 	# 1080 stage kept in the middle of it
@@ -149,6 +216,23 @@ func _ready() -> void:
 	root.draw.connect(_draw_back)
 	root.gui_input.connect(_gui)
 	add_child(root)
+	veil = ColorRect.new()
+	veil.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var vm := ShaderMaterial.new()
+	vm.shader = load("res://shaders/reading_veil.gdshader")
+	veil.material = vm
+	root.add_child(veil)
+	# the ring sits behind the cards and outside their group, faded with it (inside it, its faint cells were
+	# composited twice over and went out against the dark)
+	geo = Control.new()
+	geo.size = BASE
+	geo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	geo.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	geo.draw.connect(_draw_geo)
+	geo_img = Image.create(int(BASE.x) / 2, int(BASE.y) / 2, false, Image.FORMAT_RGBA8)
+	geo_tex = ImageTexture.create_from_image(geo_img)
+	root.add_child(geo)
 	group = CanvasGroup.new()
 	group.modulate.a = 0.0
 	root.add_child(group)
@@ -158,15 +242,35 @@ func _ready() -> void:
 	stage.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	stage.draw.connect(_draw_all)
 	group.add_child(stage)
-	body_font = ThemeDB.fallback_font
+	glow = Control.new()
+	glow.size = BASE
+	glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	glow.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	var gm := CanvasItemMaterial.new()
+	gm.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	glow.material = gm
+	glow.draw.connect(_draw_glow)
+	group.add_child(glow)
 	auto = OS.get_environment("GM_READ_ACT")
-	# the crown: the calling, face up, the one card it knows
+	auto_at = int(OS.get_environment("GM_READ_AT")) if OS.get_environment("GM_READ_AT") != "" else 0
+	# the dust in the fire's light
+	for i in 46:
+		motes.append({"p": Vector2(randf() * BASE.x, randf() * BASE.y), "v": randf_range(3.0, 11.0),
+			"ph": randf() * TAU, "a": randf_range(0.08, 0.3)})
+	# the crown: the calling, the one card it knows; it turns itself over when the rhyme is done
 	var st: Dictionary = R.get("stars", {}).get(cls, {})
-	laid["crown"] = {"m": {"id": "_" + ASPECT_OF.get(cls, "bone")}, "rev": false, "flip": 1.0, "name": String(st.get("name", ""))}
+	laid["crown"] = {"m": {"id": "_" + ASPECT_OF.get(cls, "bone")}, "rev": false, "flip": 0.0, "name": String(st.get("name", ""))}
 	picks.append({"step": "crown", "id": st.get("id", ""), "name": st.get("name", ""), "emb": "a_" + ASPECT_OF.get(cls, "bone"),
 		"fx": st.get("fx", {}), "rev": false})
-	said = String(st.get("say", ""))
-	phase = "open"
+	# the rhyme, half sung a line at a time, then his aside
+	rhyme = S.get("rhyme", [])
+	var at := 0
+	for l in rhyme:
+		rhyme_at.append(at)
+		at += String(l).length() + 1
+	rhyme_len = maxi(0, at - 1)
+	said = "\n".join(PackedStringArray(rhyme)) + "\n\n" + _line(S.get("rhyme_aside", []))
+	phase = "rhyme"
 
 func _tex(name: String) -> Texture2D:
 	if not tex.has(name):
@@ -185,13 +289,19 @@ func _place() -> Dictionary:
 	var ps := _places()
 	return ps[place_i] if place_i < ps.size() else {}
 
-## what a card means in this place, its way up (each card has its own reading for every place of the spread); the
-## card's one gist only if the place has none
-func _mean(m: Dictionary, pid: String, rev: bool) -> String:
+func _cap(s: String) -> String:
+	return s.substr(0, 1).to_upper() + s.substr(1)
+
+## a name mid sentence: "The Wick" becomes "the Wick"
+func _mid(n: String) -> String:
+	return "the " + n.substr(4) if n.begins_with("The ") else n
+
+## what a card means in this place, its way up: [short, sub] (each card has its own reading for every place)
+func _mean(m: Dictionary, pid: String, rev: bool) -> Array:
 	var mn = m.get("mean", {}).get(pid)
-	if mn is Array and mn.size() == 2:
-		return String(mn[1 if rev else 0])
-	return String(m.get("gist_rev" if rev else "gist", ""))
+	if mn is Array and mn.size() == 2 and mn[1 if rev else 0] is Array:
+		return mn[1 if rev else 0]
+	return [String(m.get("rev" if rev else "one", "")), ""]
 
 ## one of his lines from a pool, never one he has said before in this Reading (Derek, 2026-10-10: "he says it too
 ## much"); "" when the pool is spent, and then he says nothing
@@ -206,9 +316,26 @@ func _line(pool: Array) -> String:
 	said_lines[l] = true
 	return l
 
-## a card's meaning set into a line: {g} as it is, {G} with a capital (it begins a sentence)
-func _fill(line: String, g: String) -> String:
-	return line.replace("{g}", g).replace("{G}", g.substr(0, 1).to_upper() + g.substr(1))
+## his words filled in from the spread so far: {crown}/{Crown} the calling's card, {a} its aspect word, {brow}/{Brow}
+## a laid card's name, {brow_m}/{Brow_m} its meaning in its place, {asp} the aspect word of the card laid last
+func _vars(s: String) -> String:
+	var st: Dictionary = R.get("stars", {}).get(cls, {})
+	var cn := String(st.get("name", ""))
+	var aw: Dictionary = S.get("aspect_word", {})
+	var mine: String = ASPECT_OF.get(cls, "bone")
+	s = s.replace("{crown}", _mid(cn)).replace("{Crown}", cn).replace("{a}", String(aw.get(mine, mine)))
+	var last := ""
+	for pl in _places():
+		var pid := String(pl["id"])
+		if not laid.has(pid):
+			continue
+		var c: Dictionary = laid[pid]
+		var nm := _name_of(c["m"])
+		var mm := String(_mean(c["m"], pid, c["rev"])[0])
+		s = s.replace("{%s}" % pid, _mid(nm)).replace("{%s}" % _cap(pid), nm)
+		s = s.replace("{%s_m}" % pid, mm).replace("{%s_m}" % _cap(pid), _cap(mm))
+		last = String(c["m"].get("aspect", ""))
+	return s.replace("{asp}", String(aw.get(last, last)))
 
 # ------------------------------------------------------------------ his words, a letter at a time
 
@@ -247,33 +374,113 @@ func _typing() -> bool:
 func _hurry() -> void:
 	_sync()
 	typed = maxf(typed, float(_speech()[1]))
+	if phase == "rhyme":
+		rhyme_k = rhyme.size()
+		sig = [1.0, 1.0, 1.0, 1.0]
 
 func _type(dt: float) -> void:
 	_sync()
 	var n: int = _speech()[1]
 	if n <= 0 or typed >= n or t < 1.45:
 		return                                       # (his first words wait until the cards are up)
+	if phase == "rhyme" and rhyme_k < rhyme.size():
+		# the rhyme: each line at the one speed, then a breath while its sigil finishes drawing in
+		var e: int = int(rhyme_at[rhyme_k]) + String(rhyme[rhyme_k]).length()
+		if typed >= e:
+			rhyme_hold += dt
+			sig[rhyme_k] = 0.4 + 0.6 * minf(1.0, rhyme_hold / RHYME_HOLD)
+			if rhyme_hold < RHYME_HOLD * (1.5 if rhyme_k == rhyme.size() - 1 else 1.0):
+				return
+			sig[rhyme_k] = 1.0
+			rhyme_hold = 0.0
+			rhyme_k += 1
+			if rhyme_k < rhyme.size():
+				Sfx.play("page_close", 0.25, 0.7 + 0.08 * rhyme_k)
+			return
+		var v0 := minf(float(e), typed + dt * CPS)
+		sig[rhyme_k] = 0.4 * clampf((v0 - float(rhyme_at[rhyme_k])) / maxf(1.0, float(String(rhyme[rhyme_k]).length())), 0.0, 1.0)
+		typed = v0
+		return
 	var v := minf(float(n), typed + dt * CPS)
 	if auto == "type" and phase == "told" and v >= n * 0.45:
 		return                                       # (test "type": hold the first card's story half told)
+	if auto == "rhyme" and phase == "rhyme" and v >= rhyme_len + 2 + (n - rhyme_len - 2) * 0.5:
+		return                                       # (test "rhyme": the rhyme sung, his aside half said)
 	typed = v
 
 # ------------------------------------------------------------------ the draw
 
+## a place begins: first he speaks between the draws, a line to a click (Derek, 2026-10-10: "we need exposition and
+## transition between draws"), then the drawing
 func _begin_place() -> void:
 	var p := _place()
 	if p.is_empty():
 		_end()
 		return
 	said = ""
+	prompt = ""
 	hover = -1
 	picked = []
 	rev_said = []
-	var pid := String(p["id"])
-	var a: Array = p.get("ask", [""])
-	prompt = _line(a)
-	# the choice: three drawn blind from the fan, turned over, one chosen; the last card is one blind draw
-	phase = "pick" if pid != "under" and deck.size() >= 3 else "draw"
+	bridge = _bridge_lines(String(p["id"]))
+	bridge_i = 0
+	if bridge.is_empty():
+		_start_draw()
+		return
+	phase = "bridge"
+	said = bridge[0]
+
+## the drawing: three blind from the fan, turned over, one chosen; the last card one blind draw. His last line before
+## it stays up as the drawing begins.
+func _start_draw() -> void:
+	prompt = said if said != "" else (String(bridge.back()) if not bridge.is_empty() else "")
+	said = ""
+	phase = "pick" if String(_place().get("id", "")) != "under" and deck.size() >= 3 else "draw"
+
+## what he says before a place: a look at the cards so far (the first condition that holds), then what the place is
+func _bridge_lines(pid: String) -> Array:
+	var B: Dictionary = S.get("bridge", {}).get(pid, {})
+	var out: Array = []
+	var look: Dictionary = B.get("look", {})
+	for cnd in B.get("order", []):
+		if look.has(cnd) and _cond(String(cnd), pid):
+			var l := _line(look[cnd])
+			if l != "":
+				out.append(_vars(l))
+				break
+	var st := _line(B.get("set", []))
+	if st != "":
+		out.append(_vars(st))
+	return out
+
+## how the cards so far lie, for his look before a place
+func _cond(c: String, pid: String) -> bool:
+	var ps := _places()
+	var idx := 0
+	for i in ps.size():
+		if String(ps[i]["id"]) == pid:
+			idx = i
+	var p1 := String(ps[idx - 1]["id"]) if idx >= 1 else ""
+	var p2 := String(ps[idx - 2]["id"]) if idx >= 2 else ""
+	var mine: String = ASPECT_OF.get(cls, "bone")
+	match c:
+		"default":
+			return true
+		"kin":
+			return laid.has(p1) and String(laid[p1]["m"].get("aspect", "")) == mine
+		"rev":
+			return laid.has(p1) and bool(laid[p1]["rev"])
+		"pair":
+			return laid.has(p1) and laid.has(p2) and String(laid[p1]["m"].get("aspect", "")) == String(laid[p2]["m"].get("aspect", ""))
+		"both_rev":
+			return laid.has(p1) and laid.has(p2) and bool(laid[p1]["rev"]) and bool(laid[p2]["rev"])
+		"many_rev":
+			var n := 0
+			for q in laid:
+				if q != "crown" and bool(laid[q]["rev"]):
+					n += 1
+			return n >= 3
+	return false
 
 ## where the three drawn for a place lie, in a row above the fan
 func _offer_c(i: int) -> Vector2:
@@ -292,7 +499,7 @@ func _pick_card(i: int) -> void:
 	var c := _fan(i, deck.size())
 	var m: Dictionary = deck[i]
 	deck.remove_at(i)
-	picked.append({"m": m, "from": c[0], "ang": c[1], "t": 0.0, "flip": 0.0, "rev": randf() < 0.32})   # its way up, settled now
+	picked.append({"m": m, "from": c[0], "ang": c[1], "t": 0.0, "flip": 0.0, "rev": randf() < 0.32, "rt": -1.0})   # its way up, settled now
 	hover = -1
 	Sfx.play("page_open", 0.55, 1.15)
 
@@ -323,34 +530,41 @@ func _pick_tick(dt: float) -> void:
 		if f <= 0.0:
 			Sfx.play("page_close", 0.45, 1.25)
 		pk["flip"] = minf(1.0, f + dt / 0.25)
-		if f < 0.5 and float(pk["flip"]) >= 0.5 and pk["rev"]:
-			_rev_line(pk["m"])                              # it turns up head down, and he says so
+		if f < 0.5 and float(pk["flip"]) >= 0.5:
+			pk["rt"] = t                                 # its glyph kindles as it turns up
+			if pk["rev"]:
+				_rev_line(pk["m"])                       # it turns up head down, and he says so
 		if float(pk["flip"]) >= 1.0:
 			flip_i += 1
 			flip_wait = 0.08
 		return
 	offer = []
 	offer_rev = []
+	offer_rt = []
 	for pk in picked:
 		offer.append(pk["m"])
 		offer_rev.append(pk["rev"])
+		offer_rt.append(pk["rt"])
 	picked = []
 	phase = "offer"
-	var dl: Array = S.get("deal", {}).get(String(_place().get("id", "")), [""])
-	var deal := _line(dl)
-	if rev_said.is_empty():
-		prompt = deal
-	elif deal != "":
-		_say_on(deal)
 
 ## he goes on speaking: the new words follow the old, and what was already out stays out
 func _say_on(more: String) -> void:
 	_sync()
 	prompt = prompt + "\n\n" + more if prompt != "" else more
 
-## a card of the three turns up head down: he says so, then and there (TURNED; one line a card, never the same twice)
+## a card of the three turns up head down: he says so, then and there, in that card's own line for that part of the
+## body (never a formula; never the same line twice)
 func _rev_line(m: Dictionary) -> void:
-	var line := _line(S.get("turned", [])).replace("{n}", _name_of(m))
+	var pid := String(_place().get("id", ""))
+	var reg := "head" if pid in ["brow", "heart"] else ("hands" if pid in ["lhand", "rhand"] else "low")
+	var tn: Dictionary = m.get("turned", {})
+	var line := _line([tn.get(reg, "")])
+	if line == "":
+		for r2 in ["head", "hands", "low"]:
+			line = _line([tn.get(r2, "")])
+			if line != "":
+				break
 	if line == "":
 		return
 	if rev_said.is_empty():
@@ -371,10 +585,12 @@ func _choose(i: int) -> void:
 	var from := _offer_c(i)
 	offer = []
 	offer_rev = []
+	offer_rt = []
 	var pid := String(_place()["id"])
 	fly = {"m": m, "rev": rev, "from": from, "to": SLOT[pid], "t": 0.0, "place": pid, "face": true, "big": true}
 	phase = "fly"
 	hover = -1
+	ruf_id = ""
 	prompt = ""                                      # (nothing said over what the screen already shows)
 	said = ""
 	Sfx.play("page_open", 0.8, 0.85)
@@ -394,13 +610,12 @@ func _back_flush() -> void:
 		deck.append(r["m"])
 	back = []
 
-## the meaning of an offered card in this place, as the pilgrim weighs it, the way up it turned
+## the meaning of an offered card in this place, as the pilgrim weighs it, the way up it turned (the name and the way
+## up are already under the card; this is only what it would be here)
 func _weigh(i: int) -> String:
 	var m: Dictionary = offer[i]
 	var rev: bool = offer_rev[i] if i < offer_rev.size() else false
-	var pid := String(_place().get("id", ""))
-	return "%s%s. %s" % [_name_of(m), ", reversed" if rev else "", _fill(String(S.get("on", {}).get(pid, "{G}.")),
-		_mean(m, pid, rev))]
+	return _cap(String(_mean(m, String(_place().get("id", "")), rev)[0])) + "."
 
 ## the card at fan index i, drawn: it flies to the place and lands upright or reversed
 func _draw_card(i: int) -> void:
@@ -420,11 +635,12 @@ func _landed() -> void:
 	var m: Dictionary = fly["m"]
 	fly_rev_last = fly["rev"]
 	var chosen: bool = fly.get("face", false)
-	laid[pid] = {"m": m, "rev": fly["rev"], "flip": 1.0 if chosen else 0.0, "name": _name_of(m)}
+	laid[pid] = {"m": m, "rev": fly["rev"], "flip": 1.0 if chosen else 0.0, "name": _name_of(m), "rt": t if chosen else -1.0}
+	link_t[pid] = t
 	_take(pid, m, fly["rev"])
 	fly = {}
 	if chosen:
-		# chosen face up, the way it turned: its story at once
+		# chosen face up, the way it turned: its reading at once
 		_turned(pid)
 		return
 	if pid == "under":
@@ -434,8 +650,7 @@ func _landed() -> void:
 		_begin_place()
 		return
 	phase = "turn"
-	var dr: Array = S.get("drawn_rev" if fly_rev_last else "drawn", [""])
-	prompt = _line(dr)
+	prompt = ""
 
 func _turn() -> void:
 	var pid := String(_place().get("id", ""))
@@ -444,27 +659,36 @@ func _turn() -> void:
 	laid[pid]["turning"] = true
 	Sfx.play("page_close", 0.7, 0.9)
 
+## a card read in its place: what it is there, and what lies under that
 func _turned(pid: String) -> void:
 	var c: Dictionary = laid[pid]
-	var m: Dictionary = c["m"]
-	said = String(m.get("say_rev" if c["rev"] else "say", ""))
-	var rd: Array = S.get("read", {}).get(pid, [])
-	if not rd.is_empty():
-		var rl := _line(rd)
-		if rl != "":
-			said += "\n\n" + _fill(rl, _mean(m, pid, c["rev"]))
+	var mn := _mean(c["m"], pid, c["rev"])
+	said = _cap(String(mn[0])) + ". " + String(mn[1])
+	prompt = ""
 	phase = "told"
 
 func _next() -> void:
-	if phase == "open":
+	if phase == "rhyme":
+		phase = "open"
+		said = String(S.get("crown_say", {}).get(cls, ""))
+		if said == "":
+			said = String(R.get("stars", {}).get(cls, {}).get("say", ""))
+		laid["crown"]["turning"] = true
+		Sfx.play("page_close", 0.7, 0.8)
+	elif phase == "open":
 		phase = "deck"
-		var dl: Array = S.get("deck_open", [""])
-		said = _line(dl)
+		said = _line(S.get("deck_open", [""]))
 		shuf = 0.0                                   # the shuffle begins (its sound comes with the riffle)
 	elif phase == "deck":
 		shuf = SHUF_END
 		place_i = 0
 		_begin_place()
+	elif phase == "bridge":
+		if bridge_i + 1 < bridge.size():
+			bridge_i += 1
+			said = bridge[bridge_i]
+		else:
+			_start_draw()
 	elif phase == "told":
 		place_i += 1
 		_begin_place()
@@ -519,21 +743,29 @@ func _skip() -> void:
 	deck.append_array(offer)
 	offer = []
 	offer_rev = []
+	offer_rt = []
 	_back_flush()
 	deck.shuffle()
 	if home:
 		Sfx.play("shuffle", 0.6)
 	shuf = SHUF_END
+	sig = [1.0, 1.0, 1.0, 1.0]
+	rhyme_k = rhyme.size()
+	if float(laid["crown"]["flip"]) < 1.0:
+		laid["crown"]["flip"] = 1.0
+		laid["crown"].erase("turning")
+		laid["crown"]["rt"] = t
 	if phase == "fly":
 		_landed()
-	if phase == "open" or phase == "deck":
+	if phase in ["rhyme", "open", "deck"]:
 		place_i = 0
 	while place_i < _places().size():
 		var pid := String(_places()[place_i]["id"])
 		if not laid.has(pid) and not deck.is_empty():
 			var m: Dictionary = deck.pop_back()
 			var rev := randf() < 0.32
-			laid[pid] = {"m": m, "rev": rev, "flip": 0.0 if pid == "under" else 1.0, "name": _name_of(m)}
+			laid[pid] = {"m": m, "rev": rev, "flip": 0.0 if pid == "under" else 1.0, "name": _name_of(m), "rt": t}
+			link_t[pid] = t + 0.12 * place_i
 			_take(pid, m, rev)
 		elif laid.has(pid) and pid != "under":
 			laid[pid]["flip"] = 1.0
@@ -553,6 +785,7 @@ func _end() -> void:
 	picked = []
 	offer = []
 	offer_rev = []
+	offer_rt = []
 	_back_flush()
 	telling = _weave()
 	var ids := {}
@@ -584,10 +817,6 @@ func _end() -> void:
 		tale.append({"pid": "crown", "kind": "calling", "text": String(para)})
 	tale.append({"pid": "", "kind": "go", "text": _line(go)})
 
-func _phrase(c: Dictionary) -> String:
-	var m: Dictionary = c["m"]
-	return String(m.get("rev" if c["rev"] else "one", ""))
-
 ## the whole spread told as a story (Derek, 2026-10-09: "the end sequence needs work. More story like"): one part a
 ## place, in the order a life goes, each lighting its card as it is told; how the spread lies changes what he says
 func _weave() -> String:
@@ -604,9 +833,11 @@ func _weave() -> String:
 			continue
 		var c: Dictionary = laid[key]
 		var m: Dictionary = c["m"]
-		var wears := String(m.get("wears", ""))
-		var txt := _fill(String(pick.call(key)).replace("{p}", _phrase(c)), _mean(m, key, c["rev"]))
-		txt = txt.replace("{W}", wears.substr(0, 1).to_upper() + wears.substr(1))
+		var mn := _mean(m, key, c["rev"])
+		var nm := _name_of(m) + (", head down" if c["rev"] else "")
+		var txt := String(pick.call(key))
+		txt = txt.replace("{m}", String(mn[0])).replace("{M}", _cap(String(mn[0])))
+		txt = txt.replace("{n}", _mid(nm)).replace("{N}", nm).replace("{s}", String(mn[1]))
 		tale.append({"pid": key, "text": txt})
 	var sh: Dictionary = S.get("shapes", {})
 	var said_shapes := 0
@@ -631,7 +862,7 @@ func _weave() -> String:
 	var shapes := []
 	for tst in tests:
 		if tst[1] and said_shapes < 2 and sh.has(tst[0]):
-			shapes.append(String(sh[tst[0]]).replace("{a}", String(S.get("aspect_word", {}).get(mine, mine))))
+			shapes.append(_vars(String(sh[tst[0]])))
 			said_shapes += 1
 	if not shapes.is_empty():
 		tale.append({"pid": "crown", "text": " ".join(PackedStringArray(shapes))})
@@ -726,6 +957,50 @@ func result() -> Dictionary:
 	ps.append({"step": "sum", "lines": [], "prophecy": prophecy, "telling": telling})
 	return {"fx": fate.duplicate(), "picks": ps, "prophecy": prophecy}
 
+# ------------------------------------------------------------------ the ruffle
+
+## a card the mouse passes over: a kick of tilt (the way the mouse went) and lift, and a shiver
+func _ruffle(id: String, dir: float, k: float = 1.0) -> void:
+	if id == "":
+		return
+	var r: Dictionary = ruf.get(id, {"a": 0.0, "va": 0.0, "y": 0.0, "vy": 0.0, "sh": 0.0, "ph": randf() * TAU})
+	r["va"] = float(r["va"]) + dir * 0.95 * k
+	r["vy"] = float(r["vy"]) + 60.0 * k
+	r["sh"] = maxf(float(r["sh"]), k)
+	ruf[id] = r
+
+## every ruffled card settles on its springs: the tilt underdamped a little (a shiver, then still), the lift damped
+## near critical (it rises and stays while the mouse is on it, never bounces)
+func _ruffle_tick(dt: float) -> void:
+	var h := dt / 3.0
+	for id in ruf.keys():
+		var r: Dictionary = ruf[id]
+		var to := (14.0 if phase == "offer" else 18.0) if id == ruf_id else 0.0
+		var a := float(r["a"])
+		var va := float(r["va"])
+		var y := float(r["y"])
+		var vy := float(r["vy"])
+		for s in 3:
+			va += (-240.0 * a - 9.5 * va) * h
+			a += va * h
+			vy += (-140.0 * (y - to) - 21.0 * vy) * h
+			y += vy * h
+		r["a"] = a
+		r["va"] = va
+		r["y"] = y
+		r["vy"] = vy
+		r["sh"] = float(r["sh"]) * exp(-dt * 5.5)
+		if id != ruf_id and absf(a) < 0.0005 and absf(va) < 0.005 and absf(y) < 0.2 and absf(vy) < 0.5:
+			ruf.erase(id)
+
+## a card's ruffle now: [tilt, lift] (the lift kept on the 2 px grid)
+func _ruf(id: String) -> Vector2:
+	if not ruf.has(id):
+		return Vector2.ZERO
+	var r: Dictionary = ruf[id]
+	var ang := float(r["a"]) + float(r["sh"]) * 0.014 * sin(t * 46.0 + float(r["ph"]))
+	return Vector2(ang, roundf(float(r["y"]) / 2.0) * 2.0)
+
 # ------------------------------------------------------------------ time and input
 
 func _process(dt: float) -> void:
@@ -738,6 +1013,7 @@ func _process(dt: float) -> void:
 			_landed()
 	_pick_tick(dt)
 	_back_tick(dt)
+	_ruffle_tick(dt)
 	if _shuffling() and not (auto == "shuffle" and shuf >= 0.62):   # (test "shuffle": hold it mid-riffle)
 		var was := shuf
 		shuf = minf(SHUF_END, shuf + dt)
@@ -745,10 +1021,14 @@ func _process(dt: float) -> void:
 			Sfx.play("shuffle", 0.85)
 	for pid in laid:
 		if laid[pid].has("turning"):
-			laid[pid]["flip"] = minf(1.0, float(laid[pid]["flip"]) + dt / 0.4)
+			var f0 := float(laid[pid]["flip"])
+			laid[pid]["flip"] = minf(1.0, f0 + dt / (0.55 if pid == "crown" else 0.4))
+			if f0 < 0.5 and float(laid[pid]["flip"]) >= 0.5:
+				laid[pid]["rt"] = t
 			if float(laid[pid]["flip"]) >= 1.0:
 				laid[pid].erase("turning")
-				_turned(pid)
+				if pid != "crown":
+					_turned(pid)
 	if phase == "end":
 		end_t += dt
 		tale_t += dt
@@ -759,7 +1039,17 @@ func _process(dt: float) -> void:
 		if ck == "sum" and not _typing():
 			sum_a = minf(1.0, sum_a + dt / 0.8)
 		if laid.has("under") and tale_n > 0 and _turned_under() and float(laid["under"]["flip"]) < 1.0:
-			laid["under"]["flip"] = minf(1.0, float(laid["under"]["flip"]) + dt / 0.6)
+			var u0 := float(laid["under"]["flip"])
+			laid["under"]["flip"] = minf(1.0, u0 + dt / 0.6)
+			if u0 < 0.5 and float(laid["under"]["flip"]) >= 0.5:
+				laid["under"]["rt"] = t
+	# the dust, rising slowly through the fire's light
+	for mo in motes:
+		var p: Vector2 = mo["p"]
+		p += Vector2(sin(t * 0.35 + float(mo["ph"])) * 4.0, -float(mo["v"])) * dt
+		if p.y < -4.0:
+			p = Vector2(randf() * BASE.x, BASE.y + 2.0)
+		mo["p"] = p
 	if leaving >= 0.0:
 		leaving += dt
 		if leaving >= 1.2:
@@ -770,18 +1060,34 @@ func _process(dt: float) -> void:
 	if auto != "" and leaving < 0.0 and fmod(t, 0.3) < dt:
 		_auto()
 	stage.position = ((root.size - BASE) / 2.0).floor()
+	geo.position = stage.position
+	glow.position = stage.position
 	# the way in (Derek, 2026-10-10: "smooth the transition to the tarot read"): the cave darkens first, then the cards
 	# come up out of it, then he speaks
 	group.modulate.a = clampf((t - 0.45) / 0.8, 0.0, 1.0) * (1.0 - clampf(leaving / 1.2, 0.0, 1.0) if leaving >= 0.0 else 1.0)
+	var vmat := veil.material as ShaderMaterial
+	vmat.set_shader_parameter("size", root.size)
+	vmat.set_shader_parameter("strength", _alpha())
+	vmat.set_shader_parameter("breath", 0.5 + 0.5 * sin(t * TAU / 7.5))
+	# the ring and its marks breathe with the dark; they are drawn again only while something in them is still drawing in
+	geo.modulate.a = group.modulate.a * (0.82 + 0.18 * sin(t * TAU / 7.5 + 1.2))
+	geo.queue_redraw()
 	root.queue_redraw()
 	stage.queue_redraw()
+	glow.queue_redraw()
+
+func _links_moving() -> bool:
+	for pid in link_t:
+		if t - float(link_t[pid]) < 1.0:
+			return true
+	return false
 
 ## the test runs (GM_READ_ACT), a click every 0.3 s
 func _auto() -> void:
 	if auto == "slow" and _typing():
 		return                                       # (test "slow": every line typed out in full, at his own pace)
-	if auto == "stack":
-		return                                       # (test "stack": the deck lying squared, before the shuffle)
+	if auto == "stack" and phase != "rhyme":
+		return                                       # (test "stack": the crown up, the deck lying squared, before the shuffle)
 	if auto == "end" or auto == "final":
 		if phase != "end":
 			_skip()
@@ -791,16 +1097,25 @@ func _auto() -> void:
 			_tale_next()
 		return
 	match phase:
-		"open", "deck":
+		"rhyme", "open", "deck":
+			if auto == "rhyme" and phase == "rhyme":
+				return                               # (test "rhyme": the rhyme sung, his aside coming)
 			if _typing():
 				_hurry()
 			elif phase == "deck" and (auto == "shuffle" or _shuffling()):
 				return                               # (the shuffle plays out; test "shuffle" holds it)
 			else:
 				_next()
+		"bridge":
+			if auto == "bridge" and place_i == 1:
+				return                               # (test "bridge": his look at the brow, before the heart)
+			if _typing():
+				_hurry()
+			else:
+				_next()
 		"told":
-			if auto == "type":
-				return                               # (test "type": the first card's story, half told)
+			if auto == "type" or auto == "told":
+				return                               # (test "type": half told; "told": the first card read in full)
 			if _typing():
 				_hurry()
 			else:
@@ -814,8 +1129,12 @@ func _auto() -> void:
 		"draw":
 			_draw_card(0)
 		"offer":
-			if auto == "offer":
-				hover = 1                            # (test: stop at the first choice, weighing the middle card)
+			if auto == "offer" and place_i >= auto_at:
+				# (test: stop at the choice, weighing the middle card; the mouse passes over it now and then)
+				hover = 1
+				ruf_id = String(offer[1].get("id", ""))
+				if fmod(t, 1.5) < 0.3:
+					_ruffle(ruf_id, 1.0 if fmod(t, 3.0) < 1.5 else -1.0)
 			else:
 				_choose(0)
 		"turn":
@@ -854,16 +1173,28 @@ func _gui(ev0: InputEvent) -> void:
 		ev.position = ev0.position - stage.position       # (the stage's own coordinates)
 	if ev is InputEventMouseMotion:
 		var h := -1
+		var fan := false
 		if _fan_live():
 			h = _fan_hit(ev.position)
+			fan = true
 		elif phase == "offer":
 			h = _offer_hit(ev.position)
 		elif _at_last() and rise_r.has_point(ev.position):
 			h = 99
 		if h != hover:
 			hover = h
+			ruf_id = ""
 			if h >= 0 and h != 99:
 				Sfx.play("page_close", 0.2, 1.5)
+				# the ruffle: the card the mouse passes onto, and a little of it into its neighbours in the fan
+				var dir := signf(ev.relative.x) if absf(ev.relative.x) > 0.01 else (1.0 if randf() < 0.5 else -1.0)
+				var ids: Array = deck if fan else offer
+				ruf_id = String(ids[h].get("id", ""))
+				_ruffle(ruf_id, dir)
+				if fan:
+					for nb in [h - 1, h + 1]:
+						if nb >= 0 and nb < deck.size():
+							_ruffle(String(deck[nb].get("id", "")), dir, 0.4)
 	elif ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
 		var hit := -1
 		match phase:
@@ -884,7 +1215,7 @@ func _gui(ev0: InputEvent) -> void:
 					_hurry()
 				else:
 					_turn()
-			"open", "deck", "told":
+			"rhyme", "open", "deck", "bridge", "told":
 				if _typing() or (phase == "deck" and _shuffling()):
 					_hurry()                         # (his words, and the shuffle, all at once)
 					if phase == "deck":
@@ -918,7 +1249,7 @@ func _unhandled_key_input(ev: InputEvent) -> void:
 						_choose(maxi(hover, 0))
 					"turn":
 						_turn()
-					"open", "deck", "told":
+					"rhyme", "open", "deck", "bridge", "told":
 						_next()
 					"end":
 						_tale_next()
@@ -926,7 +1257,197 @@ func _unhandled_key_input(ev: InputEvent) -> void:
 			return
 	get_viewport().set_input_as_handled()
 
-# ------------------------------------------------------------------ drawing
+# ------------------------------------------------------------------ drawing: the marks, on the 2 x 2 grid
+
+## a point of the marks: one 2 x 2 cell (while baking the ring, one texel of its image)
+func _dot(ci: CanvasItem, p: Vector2, col: Color) -> void:
+	if _img != null:
+		var x := int(floorf(p.x / 2.0))
+		var y := int(floorf(p.y / 2.0))
+		if x >= 0 and y >= 0 and x < _img.get_width() and y < _img.get_height():
+			_img.set_pixel(x, y, col)
+		return
+	ci.draw_rect(Rect2((p / 2.0).floor() * 2.0, Vector2(2, 2)), col)
+
+## a line of cells from a toward b, drawn in as far as u; every gap-th cell only (2 a solid line)
+func _pline(ci: CanvasItem, a: Vector2, b: Vector2, col: Color, u: float = 1.0, gap: int = 2) -> void:
+	if u <= 0.0:
+		return
+	var e := a.lerp(b, clampf(u, 0.0, 1.0))
+	var n := int(maxf(absf(e.x - a.x), absf(e.y - a.y)) / 2.0)
+	for i in n + 1:
+		if gap > 2 and (i * 2) % gap != 0:
+			continue
+		_dot(ci, a.lerp(e, float(i) / float(maxi(1, n))), col)
+
+## an arc of cells round c from angle a0, as far as a0 + (a1 - a0) * u
+func _parc(ci: CanvasItem, c: Vector2, r: float, a0: float, a1: float, col: Color, u: float = 1.0, gap: int = 2) -> void:
+	if u <= 0.0:
+		return
+	var span := (a1 - a0) * clampf(u, 0.0, 1.0)
+	var n := int(absf(span) * r / 2.0)
+	for i in n + 1:
+		if gap > 2 and (i * 2) % gap != 0:
+			continue
+		var an := a0 + span * float(i) / float(maxi(1, n))
+		_dot(ci, c + Vector2(cos(an), sin(an)) * r, col)
+
+## the ring round the spread (behind the cards), one texture: baked again only while something in it is drawing in
+## (a canvas item of thousands of faint cells left undrawn lost its faintest ones, so they are baked instead)
+func _draw_geo() -> void:
+	if (not geo_done or _links_moving()) and (Engine.get_process_frames() % 3 == 0 or not geo_done and t > 1.6 + 6.5):
+		_img = geo_img
+		geo_img.fill(Color(0, 0, 0, 0))
+		_bake_geo(geo)
+		_img = null
+		geo_tex.update(geo_img)
+	geo.draw_texture_rect(geo_tex, Rect2(Vector2.ZERO, BASE), false)
+	# the dust in the fire's light, behind the cards
+	for mo in motes:
+		var tw: float = 0.55 + 0.45 * sin(t * 0.8 + float(mo["ph"]) * 3.0)
+		_dot(geo, mo["p"], Color(0.86, 0.74, 0.52, float(mo["a"]) * tw))
+
+## the ring: drawn in as the rhyme is sung, its ticks, a seven-pointed star for the seven places of the body, the
+## rhyme's four sigils on it, and the line that joins the laid cards
+func _bake_geo(ci: CanvasItem) -> void:
+	var gu := clampf((t - 1.6) / 6.5, 0.0, 1.0)      # how far the ring has drawn itself in
+	var col := Color(MARROW, 0.2)
+	var dim := Color(MARROW, 0.1)
+	var u1 := smoothstep(0.0, 0.45, gu)
+	_parc(ci, RING_C, RING_R, -PI / 2.0, PI * 1.5, col, u1)
+	_parc(ci, RING_C, RING_R - 20.0, PI / 2.0, PI * 2.5, dim, smoothstep(0.15, 0.6, gu), 8)
+	# the ticks, like an astrolabe's: every sixth part of a twelfth, longer at the twelfths
+	var tu := smoothstep(0.35, 0.7, gu)
+	for k in 60:
+		if float(k) / 60.0 > tu:
+			break
+		var an := -PI / 2.0 + TAU * float(k) / 60.0
+		var d := Vector2(cos(an), sin(an))
+		var ln := 22.0 if k % 5 == 0 else 8.0
+		_pline(ci, RING_C + d * (RING_R - 4.0), RING_C + d * (RING_R - 4.0 - ln), col)
+	# the star: seven points, each joined to the third on from it
+	var su := smoothstep(0.55, 1.0, gu)
+	var pts: Array = []
+	for k in 7:
+		var an2 := -PI / 2.0 + TAU * float(k) / 7.0
+		pts.append(RING_C + Vector2(cos(an2), sin(an2)) * (RING_R - 34.0))
+	for k in 7:
+		_pline(ci, pts[k], pts[(k + 3) % 7], dim, clampf(su * 7.0 - float(k), 0.0, 1.0))
+	for k in 7:
+		if su > float(k) / 7.0:
+			_parc(ci, pts[k], 6.0, 0.0, TAU, col)
+	# the inner ring about the heart
+	_parc(ci, RING_C, 150.0, -PI / 2.0, PI * 1.5, dim, smoothstep(0.6, 1.0, gu), 6)
+	# the rhyme's sigils, on the ring where its diagonals cross it: thread, frame, filling, and the gap for the name
+	var at := [-0.75 * PI, -0.25 * PI, 0.25 * PI, 0.75 * PI]
+	for i in 4:
+		var c := RING_C + Vector2(cos(at[i]), sin(at[i])) * RING_R
+		_sigil(ci, i, c, float(sig[i]))
+	# the laid cards joined, crown to feet, each line drawing in as its card lands
+	for pid in link_t:
+		var from := String(LINK.get(pid, ""))
+		if from == "" or not laid.has(from):
+			continue
+		var lu := clampf((t - float(link_t[pid])) / 0.9, 0.0, 1.0)
+		_pline(ci, SLOT[from], SLOT[pid], Color(MARROW, 0.3), smoothstep(0.0, 1.0, lu), 4)
+	geo_done = gu >= 1.0 and sig[3] >= 1.0 and phase != "rhyme"
+
+## one of the rhyme's four sigils, drawn in as far as u: Soul for the thread (a spiral), Bone for the frame (a square
+## braced), Flesh for the filling (a filled round), and none for the name (a broken ring, the gap at its top)
+func _sigil(ci: CanvasItem, i: int, c: Vector2, u: float) -> void:
+	if u <= 0.0:
+		return
+	var col := Color(MARROW, 0.24 + 0.3 * (1.0 - u) * u * 4.0)
+	# a dark ground under it, so the ring breaks for it
+	for y in range(-30, 32, 2):
+		for x in range(-30, 32, 2):
+			if Vector2(x, y).length() <= 30.0:
+				_dot(ci, c + Vector2(x, y), Color(0.012, 0.01, 0.014, 0.85 * minf(1.0, u * 3.0)))
+	_parc(ci, c, 30.0, 0.0, TAU, Color(MARROW, 0.12), u)
+	match i:
+		0:
+			var n := int(160.0 * u)
+			for k in n:
+				var th := float(k) / 160.0 * 4.0 * PI
+				_dot(ci, c + Vector2(cos(th), sin(th)) * (2.0 + 18.0 * th / (4.0 * PI)), col)
+		1:
+			var q := [Vector2(-16, -16), Vector2(16, -16), Vector2(16, 16), Vector2(-16, 16)]
+			for k in 4:
+				_pline(ci, c + q[k], c + q[(k + 1) % 4], col, clampf(u * 6.0 - float(k), 0.0, 1.0))
+			_pline(ci, c + q[0], c + q[2], col, clampf(u * 6.0 - 4.0, 0.0, 1.0))
+			_pline(ci, c + q[1], c + q[3], col, clampf(u * 6.0 - 5.0, 0.0, 1.0))
+		2:
+			_parc(ci, c, 18.0, -PI / 2.0, PI * 1.5, col, minf(1.0, u * 1.6))
+			var fu := clampf(u * 2.0 - 1.0, 0.0, 1.0)
+			for y in range(-14, 16, 2):
+				for x in range(-14, 16, 2):
+					if Vector2(x, y).length() < 15.0 * fu and ((x + y) / 2) % 2 == 0:
+						_dot(ci, c + Vector2(x, y), col)
+		3:
+			_parc(ci, c, 18.0, -PI / 2.0 + 0.5, PI * 1.5 - 0.5, col, u)
+
+## the glyphs kindling: each face drawn again over itself, added, warm (the gold of its lines lifts most)
+func _draw_glow() -> void:
+	for g in glows:
+		var s: float = g[5]
+		if s <= 0.01:
+			continue
+		glow.draw_set_transform(g[0], g[1], Vector2(maxf(float(g[2]), 0.02), 1.0))
+		var sz: Vector2 = g[3]
+		glow.draw_texture_rect(g[4], Rect2(-sz / 2.0, sz), false, Color(0.62 * s, 0.46 * s, 0.24 * s, 1.0))
+	glow.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+## how strongly a turned face's glyph glows: a kindling as it turns up, then a faint slow pulse
+func _gl(rt: float) -> float:
+	if rt < 0.0:
+		return 0.0
+	return 0.13 + 0.06 * sin(t * 1.7 + rt) + 0.7 * exp(-(t - rt) * 2.0)
+
+## a faint occult diagram for an empty place, each its own: the crown a round with its point, the brow an eye, the
+## heart a rising triangle, the hands their crescents, the belly a square in a round, the feet a falling triangle
+## barred, the place in the Red three waves
+func _diagram(ci: CanvasItem, pid: String, c: Vector2, col: Color) -> void:
+	var hw := (SH if pid == "under" else SW) / 2.0
+	var hh := (SW if pid == "under" else SH) / 2.0
+	var q := [Vector2(-hw, -hh), Vector2(hw, -hh), Vector2(hw, hh), Vector2(-hw, hh)]
+	for k in 4:
+		_pline(ci, c + q[k], c + q[(k + 1) % 4], col, 1.0, 6)
+	var m := Color(col, col.a * 1.4)
+	match pid:
+		"crown":
+			_parc(ci, c, 14.0, 0.0, TAU, m)
+			_dot(ci, c, m)
+		"brow":
+			_parc(ci, c + Vector2(0, 16), 24.0, -PI * 0.78, -PI * 0.22, m)
+			_parc(ci, c - Vector2(0, 16), 24.0, PI * 0.22, PI * 0.78, m)
+			_parc(ci, c, 4.0, 0.0, TAU, m)
+		"heart":
+			var tri := [c + Vector2(0, -16), c + Vector2(15, 11), c + Vector2(-15, 11)]
+			for k in 3:
+				_pline(ci, tri[k], tri[(k + 1) % 3], m)
+		"lhand":
+			_parc(ci, c, 15.0, PI * 0.35, PI * 1.65, m)
+			_parc(ci, c - Vector2(6, 0), 11.0, PI * 0.42, PI * 1.58, m)
+		"rhand":
+			_parc(ci, c, 15.0, -PI * 0.65, PI * 0.65, m)
+			_parc(ci, c + Vector2(6, 0), 11.0, -PI * 0.58, PI * 0.58, m)
+		"belly":
+			_parc(ci, c, 17.0, 0.0, TAU, m)
+			var sq := [Vector2(-11, -11), Vector2(11, -11), Vector2(11, 11), Vector2(-11, 11)]
+			for k in 4:
+				_pline(ci, c + sq[k], c + sq[(k + 1) % 4], m)
+		"feet":
+			var tr2 := [c + Vector2(-15, -11), c + Vector2(15, -11), c + Vector2(0, 16)]
+			for k in 3:
+				_pline(ci, tr2[k], tr2[(k + 1) % 3], m)
+			_pline(ci, c + Vector2(-9, 1), c + Vector2(9, 1), m)
+		"under":
+			for row in 3:
+				var y := -8.0 + row * 8.0
+				for x in range(-22, 24, 2):
+					_dot(ci, c + Vector2(x, y + 3.0 * sin(float(x) * 0.28 + t * 0.6)), m)
+
+# ------------------------------------------------------------------ drawing: the cloth
 
 ## words wrapped to a width; a blank line ("\n\n") becomes "" (a breath between paragraphs)
 func _wrap(s: String, f: Font, size: int, width: float) -> PackedStringArray:
@@ -964,16 +1485,19 @@ func _type_draw(ci: CanvasItem, text: String, f: Font, size: int, lh: float, at:
 		y += lh
 	return y
 
-func _card_at(ci: CanvasItem, c: Vector2, texture: Texture2D, ang: float, sx: float, a: float, lift: float = 0.0, sz: Vector2 = Vector2(SW, SH), tint: float = 1.0, shade: bool = true) -> void:
+## a card drawn whole at its place; gl > 0 also kindles its glyph (the additive pass)
+func _card_at(ci: CanvasItem, c: Vector2, texture: Texture2D, ang: float, sx: float, a: float, lift: float = 0.0, sz: Vector2 = Vector2(SW, SH), tint: float = 1.0, shade: bool = true, gl: float = 0.0) -> void:
 	ci.draw_set_transform(c + Vector2(0, -lift), ang, Vector2(maxf(sx, 0.02), 1.0))
 	if shade:
-		ci.draw_rect(Rect2(Vector2(-sz.x / 2.0 + 5, -sz.y / 2.0 + 8), sz), Color(0, 0, 0, 0.5))
+		ci.draw_rect(Rect2(Vector2(-sz.x / 2.0 + 6, -sz.y / 2.0 + 8 + lift * 0.5), sz), Color(0, 0, 0, 0.5))
 	# every card fully opaque (Derek, 2026-10-10: "the cards also appear to be transparent?"): a solid base, the art at
 	# full alpha; a card set back (a < 1) is drawn darker instead
 	var k := tint * (0.35 + 0.65 * clampf(a, 0.0, 1.0))
 	ci.draw_rect(Rect2(-sz / 2.0, sz), Color(0.06, 0.045, 0.04, 1.0))
 	ci.draw_texture_rect(texture, Rect2(-sz / 2.0, sz), false, Color(k, k, k, 1.0))
 	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	if gl > 0.0:
+		glows.append([c + Vector2(0, -lift), ang, sx, sz, texture, gl * k])
 
 func _alpha() -> float:
 	return fade if leaving < 0.0 else fade * (1.0 - clampf(leaving / 1.2, 0.0, 1.0))
@@ -988,7 +1512,7 @@ func _draw_back() -> void:
 
 ## a line of words, over its own shadow
 func _txt(ci: CanvasItem, f: Font, at: Vector2, s: String, al: int, w: float, size: int, col: Color) -> void:
-	ci.draw_string(f, at + Vector2(2, 2), s, al, w, size, Color(0, 0, 0, 0.9 * col.a))
+	ci.draw_string(f, at + Vector2(2, 2), s, al, w, size, Color(0, 0, 0, 0.92 * col.a))
 	ci.draw_string(f, at, s, al, w, size, col)
 
 func _draw_all() -> void:
@@ -996,6 +1520,7 @@ func _draw_all() -> void:
 	var ci := stage
 	var sc := U.font("sc")
 	var fi := body_font
+	glows = []
 	# where we are: the place, and under it what the place holds
 	_txt(ci, sc, Vector2(60, 66), "THE READING", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Color(MARROW_D, a))
 	var p := _place()
@@ -1003,16 +1528,19 @@ func _draw_all() -> void:
 	var sub := "" if phase == "end" else String(p.get("what", ""))
 	if phase == "end" and _kind(tale_n - 1) in ["calling", "go"]:
 		title = String(S.get("calling_name", {}).get(cls, title))
-		sub = "what they have become"
-	if phase == "open":
+		sub = "what you have become"
+	if phase == "rhyme":
+		title = "The Count"
+		sub = "thread, frame, filling, name"
+	elif phase == "open":
 		title = "The Crown"
-		sub = "what they are"
+		sub = "what calls you"
 	elif phase == "deck":
 		title = "The Deck"
-		sub = "what draws them"
+		sub = "what draws you"
 	_txt(ci, sc, Vector2(60, 112), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 42, Color(MARROW, a))
 	if sub != "":
-		_txt(ci, fi, Vector2(62, 148), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 26, Color(BONE_D, a))
+		_txt(ci, ital_font, Vector2(62, 150), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 29, Color(BONE_D, a))
 	# the Red under the body, where the last card lies
 	var uc: Vector2 = SLOT["under"]
 	for k in 6:
@@ -1020,21 +1548,19 @@ func _draw_all() -> void:
 		ci.draw_set_transform(uc, 0.0, Vector2(1.0, 0.45))
 		ci.draw_circle(Vector2.ZERO, rr, Color(RED_POOL, (0.14 + k * 0.06) * a))
 		ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-	# the places not yet laid: faint outlines; the one being laid, its outline breathing
+	# the places not yet laid: each its faint diagram; the one being laid, breathing
 	for pl in [{"id": "crown"}] + _places():
 		var pid := String(pl["id"])
-		if laid.has(pid) or (not fly.is_empty() and fly["place"] == pid):
+		if (laid.has(pid) and not (pid == "crown" and phase == "rhyme")) or (not fly.is_empty() and fly["place"] == pid):
 			continue
-		var c: Vector2 = SLOT[pid]
-		var on := phase in ["draw", "fly", "pick", "flip", "offer"] and pid == String(p.get("id", ""))
-		var al := (0.45 + 0.35 * sin(t * 3.0)) if on else 0.16
-		var ang := PI / 2.0 if pid == "under" else 0.0
-		ci.draw_set_transform(c, ang, Vector2.ONE)
-		ci.draw_rect(Rect2(Vector2(-SW / 2.0, -SH / 2.0), Vector2(SW, SH)), Color(MARROW, al * a), false, 1.5)
-		ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		var on := phase in ["bridge", "draw", "fly", "pick", "flip", "offer"] and pid == String(p.get("id", ""))
+		var al := (0.32 + 0.22 * sin(t * 2.4)) if on else 0.13
+		_diagram(ci, pid, SLOT[pid], Color(MARROW, al * a))
 	# the laid cards: face down until turned, then the face, head down when reversed; the one under lies across
 	var in_tale := phase == "end" and (tale_n == 0 or _kind(tale_n - 1) in ["tale", "calling"])
 	for pid in laid:
+		if pid == "crown" and phase == "rhyme":
+			continue                                 # (the crown comes up when the rhyme is done)
 		var cd: Dictionary = laid[pid]
 		var f: float = cd["flip"]
 		var sx := absf(cos(f * PI))
@@ -1046,8 +1572,10 @@ func _draw_all() -> void:
 			var rw := Vector2(SH, SW) if pid == "under" else Vector2(SW, SH)
 			for k in 3:
 				ci.draw_rect(Rect2(SLOT[pid] - rw / 2.0 - Vector2(4 + k * 3, 4 + k * 3), rw + Vector2(8 + k * 6, 8 + k * 6)), Color(MARROW, gl * a * (0.5 - k * 0.15)), false, 2.0)
-		_card_at(ci, SLOT[pid], shown, ang, sx, a * (0.55 if in_tale and not told and pid != "crown" else 1.0))
-		if (f >= 0.999 or pid == "crown") and (pid != "under" or phase == "end"):
+		var set_back: bool = in_tale and not told and pid != "crown"
+		_card_at(ci, SLOT[pid], shown, ang, sx, a * (0.55 if set_back else 1.0), 0.0, Vector2(SW, SH), 1.0, true,
+			(_gl(float(cd.get("rt", -1.0))) * (1.6 if told else 1.0)) if f >= 0.5 else 0.0)
+		if f >= 0.999 and (pid != "under" or phase == "end"):
 			_label(ci, fi, pid, cd)
 	# the card in flight (a chosen one shrinks from the row to the cloth)
 	if not fly.is_empty():
@@ -1056,14 +1584,16 @@ func _draw_all() -> void:
 		var c3: Vector2 = (fly["from"] as Vector2).lerp(fly["to"], e) + Vector2(0, -60.0 * sin(PI * u))
 		var ang2: float = lerpf(0.0, PI / 2.0 if fly["place"] == "under" else 0.0, e) + (PI if fly.get("face", false) and fly["rev"] else 0.0)
 		var sz := Vector2(OW, OH).lerp(Vector2(SW, SH), e) if fly.get("big", false) else Vector2(SW, SH)
-		_card_at(ci, c3, _face(fly["m"]) if fly.get("face", false) else _tex("_back"), ang2, 1.0, a, 0.0, sz)
-	# the deck, face down: stacked, then shuffled, then fanned and waiting
+		_card_at(ci, c3, _face(fly["m"]) if fly.get("face", false) else _tex("_back"), ang2, 1.0, a, 0.0, sz, 1.0, true,
+			0.2 if fly.get("face", false) else 0.0)
+	# the deck, face down: stacked, then shuffled, then fanned and waiting; a card the mouse passes over ruffles
 	if phase != "end":
 		if shuf >= SHUF_END:
 			var dim := 1.0 if _fan_live() else 0.45
 			for i in deck.size():
 				var fc: Array = _fan(i, deck.size())
-				_card_at(ci, fc[0], _tex("_back"), fc[1], 1.0, a * dim, 26.0 if _fan_live() and i == hover else 0.0)
+				var rf := _ruf(String(deck[i].get("id", "")))
+				_card_at(ci, fc[0], _tex("_back"), float(fc[1]) + rf.x, 1.0, a * dim, rf.y)
 		else:
 			_draw_shuffle(ci, a)
 	# the two passed over, going home to the fan
@@ -1076,7 +1606,11 @@ func _draw_all() -> void:
 	if phase == "pick" or phase == "flip":
 		for k in range(picked.size(), 3):
 			var oc0 := _offer_c(k)
-			ci.draw_rect(Rect2(oc0 - Vector2(OW, OH) / 2.0, Vector2(OW, OH)), Color(MARROW, 0.22 * a), false, 1.5)
+			var hw := OW / 2.0
+			var hh := OH / 2.0
+			var q := [oc0 + Vector2(-hw, -hh), oc0 + Vector2(hw, -hh), oc0 + Vector2(hw, hh), oc0 + Vector2(-hw, hh)]
+			for j in 4:
+				_pline(ci, q[j], q[(j + 1) % 4], Color(MARROW, 0.24 * a), 1.0, 6)
 		for k in picked.size():
 			var pk: Dictionary = picked[k]
 			var u3: float = pk["t"]
@@ -1086,45 +1620,63 @@ func _draw_all() -> void:
 			# a reversed one turns up head down
 			var up := PI if pk["rev"] and fl >= 0.5 else 0.0
 			_card_at(ci, c4, _tex("_back") if fl < 0.5 else _face(pk["m"]), lerpf(float(pk["ang"]), 0.0, e3) + up, absf(cos(fl * PI)), a, 0.0,
-				Vector2(SW, SH).lerp(Vector2(OW, OH), e3))
+				Vector2(SW, SH).lerp(Vector2(OW, OH), e3), 1.0, true, _gl(float(pk["rt"])) if fl >= 0.5 else 0.0)
 			if fl >= 1.0:
 				_row_name(ci, fi, k, pk["m"], pk["rev"], false, a)
 	# the words
 	if phase == "end":
 		_draw_end(ci, a, sc, fi)
 		return
-	# the three, face up, each with its name; the one weighed lifted and lit
+	# the three, face up, each with its name; the one weighed lifted (on its ruffle) and lit
 	if phase == "offer":
 		for i in offer.size():
-			var oc := _offer_c(i) + Vector2(0, -20.0 if i == hover else 0.0)
+			var rf2 := _ruf(String(offer[i].get("id", "")))
+			var oc := _offer_c(i)
 			var rv: bool = offer_rev[i] if i < offer_rev.size() else false
-			_card_at(ci, oc, _face(offer[i]), PI if rv else 0.0, 1.0, a, 0.0, Vector2(OW, OH))
+			_card_at(ci, oc, _face(offer[i]), (PI if rv else 0.0) + rf2.x, 1.0, a, rf2.y, Vector2(OW, OH), 1.0, true,
+				_gl(float(offer_rt[i]) if i < offer_rt.size() else -1.0) * (1.5 if i == hover else 1.0))
 			if i == hover:
-				ci.draw_rect(Rect2(oc - Vector2(OW, OH) / 2.0, Vector2(OW, OH)).grow(3), Color(MARROW, 0.8 * a), false, 2.0)
+				ci.draw_set_transform(oc + Vector2(0, -rf2.y), rf2.x, Vector2.ONE)
+				ci.draw_rect(Rect2(-Vector2(OW, OH) / 2.0, Vector2(OW, OH)).grow(3), Color(MARROW, 0.8 * a), false, 2.0)
+				ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 			_row_name(ci, fi, i, offer[i], rv, i == hover, a)
-	# his words: under the fan, on the left, clear of the spread; the meaning of a weighed card comes whole
+	# the rhyme: high on the left, a line to a breath, each a step further in
 	var words := said if said != "" else prompt
 	var budget := _shown()
+	if phase == "rhyme":
+		for i in rhyme.size():
+			var vis := clampi(budget - int(rhyme_at[i]), 0, String(rhyme[i]).length())
+			if vis > 0:
+				_txt(ci, ital_font, Vector2(86 + i * 40, 246 + i * 58), String(rhyme[i]).substr(0, vis), HORIZONTAL_ALIGNMENT_LEFT, -1, 44,
+					Color(BONE.lerp(MARROW, 0.3), a))
+		words = said.substr(rhyme_len + 2)
+		budget -= rhyme_len + 2
+	# his words: under the fan, on the left, clear of the spread; the meaning of a weighed card comes whole
+	var mean_c := false
 	if phase == "offer" and hover >= 0 and hover < offer.size():
 		words = _weigh(hover)
 		budget = ALL
-	if words != "":
-		var wy := _type_draw(ci, words, fi, FS_WORDS, LH_WORDS, WORDS_AT, WORDS_W, budget, Color(BONE, a))
-		if phase == "offer" and hover >= 0 and hover < offer.size() and _shown_fx():
+		mean_c = true
+	if words != "" and budget > 0:
+		var wy := _type_draw(ci, words, ital_font if mean_c else fi, FS_WORDS + (2 if mean_c else 0), LH_WORDS, WORDS_AT, WORDS_W, budget,
+			Color(MEAN_C if mean_c else BONE, a))
+		if mean_c and _shown_fx():
 			var rv: bool = offer_rev[hover] if hover < offer_rev.size() else false
 			var x := WORDS_AT.x
 			for ln in _fx_lines(_fx_of(offer[hover], String(_place().get("id", "")), rv)):
-				_txt(ci, fi, Vector2(x, wy + 4.0), ln[0], HORIZONTAL_ALIGNMENT_LEFT, -1, 25, GAIN_C if ln[1] else LOSS_C)
-				x += fi.get_string_size(ln[0], HORIZONTAL_ALIGNMENT_LEFT, -1, 25).x + 36.0
+				_txt(ci, stat_font, Vector2(x, wy + 6.0), ln[0], HORIZONTAL_ALIGNMENT_LEFT, -1, 27, GAIN_C if ln[1] else LOSS_C)
+				x += stat_font.get_string_size(ln[0], HORIZONTAL_ALIGNMENT_LEFT, -1, 27).x + 36.0
 	if _shown_fx():
 		_draw_so_far(ci, sc, fi)
-	var hint: String = {"open": "click to go on", "deck": "click to go on",
+	var hint: String = {"rhyme": "click to go on", "open": "click to go on", "deck": "click to go on", "bridge": "click to go on",
 		"pick": ["draw three, blind, from the deck", "two more", "one more", ""][mini(picked.size(), 3)],
 		"draw": "draw the last card blind from the deck",
 		"offer": "choose one", "turn": "click to turn it over", "told": "click to go on"}.get(phase, "")
+	if phase == "rhyme" and _typing():
+		hint = ""
 	if hint != "" and phase in ["pick", "draw", "offer"]:
 		hint += "    ·    Esc lets him lay the rest"
-	_txt(ci, fi, Vector2(0, 1056), hint, HORIZONTAL_ALIGNMENT_CENTER, 1920, 22, Color(ASH, a * (0.6 + 0.2 * sin(t * 2.0))))
+	_txt(ci, ital_font, Vector2(0, 1056), hint, HORIZONTAL_ALIGNMENT_CENTER, 1920, 25, Color(ASH, a * (0.6 + 0.2 * sin(t * 2.0))))
 
 ## the Reading's effects shown plainly (Settings.reading_effects; Derek, 2026-10-10: "she didnt understand the tarot so
 ## maybe we should have the stat effects present"); off, it plays blind
@@ -1149,25 +1701,25 @@ func _label(ci: CanvasItem, fi: Font, pid: String, cd: Dictionary) -> void:
 	# the column's names beside it, clear of the right hand and the last card; the left hand's under it; the right
 	# hand's under it, running right, clear of the column's; the last card's under it
 	var side := pid in ["crown", "brow", "heart", "belly", "feet"]
-	var w := 140.0 if side else (190.0 if pid == "rhand" else 210.0)
+	var w: float = {"feet": 135.0, "belly": 140.0, "heart": 160.0}.get(pid, 185.0) if side else (190.0 if pid == "rhand" else 210.0)   # (clear of the right hand and the card in the Red)
 	var x: float = SLOT[pid].x + SW / 2.0 + 10.0 if side else (SLOT[pid].x - SW / 2.0 if pid == "rhand" else SLOT[pid].x - w / 2.0)
-	var y: float = SLOT[pid].y - SH / 2.0 + 22.0 if side else SLOT[pid].y + (SW if pid == "under" else SH) / 2.0 + 24.0
+	var y: float = SLOT[pid].y - SH / 2.0 + 22.0 if side else SLOT[pid].y + (SW if pid == "under" else SH) / 2.0 + 26.0
 	var al := HORIZONTAL_ALIGNMENT_LEFT if side or pid == "rhand" else HORIZONTAL_ALIGNMENT_CENTER
-	for ln in _wrap(String(cd.get("name", "")), fi, 19, w):
-		_txt(ci, fi, Vector2(x, y), ln, al, w, 19, MARROW)
-		y += 22.0
+	for ln in _wrap(String(cd.get("name", "")), stat_font, 23, w):
+		_txt(ci, stat_font, Vector2(x, y), ln, al, w, 23, MARROW)
+		y += 25.0
 	if cd["rev"]:
-		_txt(ci, fi, Vector2(x, y), "reversed", al, w, 17, BONE_D)
-		y += 21.0
+		_txt(ci, ital_font, Vector2(x, y), "reversed", al, w, 21, BONE_D)
+		y += 24.0
 	if _shown_fx():
 		var fx: Dictionary = {}
 		for pk in picks:
 			if pk["step"] == pid:
 				fx = pk["fx"]
 		for ln in _fx_lines(fx):
-			for part in _wrap(ln[0], fi, 17, w):
-				_txt(ci, fi, Vector2(x, y), part, al, w, 17, GAIN_C if ln[1] else LOSS_C)
-				y += 20.0
+			for part in _wrap(ln[0], stat_font, 20, w):
+				_txt(ci, stat_font, Vector2(x, y), part, al, w, 20, GAIN_C if ln[1] else LOSS_C)
+				y += 23.0
 
 ## what the whole hand has made so far, at the right edge (the end's sum, as it builds)
 func _draw_so_far(ci: CanvasItem, sc: Font, fi: Font) -> void:
@@ -1180,21 +1732,21 @@ func _draw_so_far(ci: CanvasItem, sc: Font, fi: Font) -> void:
 		if caps.has(k):
 			tot[k] = clampf(tot[k], -float(caps[k]), float(caps[k]))
 	var y := 120.0
-	_txt(ci, sc, Vector2(1610, y), "SO FAR", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, MARROW)
+	_txt(ci, sc, Vector2(1690, y), "SO FAR", HORIZONTAL_ALIGNMENT_LEFT, -1, 20, MARROW)
 	y += 32.0
 	for ln in _fx_lines(tot):
-		for part in _wrap(ln[0], fi, 18, 280.0):
-			_txt(ci, fi, Vector2(1610, y), part, HORIZONTAL_ALIGNMENT_LEFT, 290, 18, GAIN_C if ln[1] else LOSS_C)
-			y += 23.0
+		for part in _wrap(ln[0], stat_font, 23, 210.0):
+			_txt(ci, stat_font, Vector2(1690, y), part, HORIZONTAL_ALIGNMENT_LEFT, 220, 23, GAIN_C if ln[1] else LOSS_C)
+			y += 25.0
 
 ## a turned card's name under it in the row (and that it lies reversed)
 func _row_name(ci: CanvasItem, fi: Font, i: int, m: Dictionary, rev: bool, lit: bool, a: float) -> void:
-	var ny := _offer_c(i).y + OH / 2.0 + 30.0
-	for ln in _wrap(_name_of(m), fi, 22, 228.0):
-		_txt(ci, fi, Vector2(_offer_c(i).x - 114.0, ny), ln, HORIZONTAL_ALIGNMENT_CENTER, 228, 22, MARROW if lit else MARROW_D.lerp(MARROW, 0.5))
-		ny += 26.0
+	var ny := _offer_c(i).y + OH / 2.0 + 32.0
+	for ln in _wrap(_name_of(m), stat_font, 25, 228.0):
+		_txt(ci, stat_font, Vector2(_offer_c(i).x - 114.0, ny), ln, HORIZONTAL_ALIGNMENT_CENTER, 228, 25, MARROW if lit else MARROW_D.lerp(MARROW, 0.5))
+		ny += 27.0
 	if rev:
-		_txt(ci, fi, Vector2(_offer_c(i).x - 114.0, ny), "reversed", HORIZONTAL_ALIGNMENT_CENTER, 228, 19, BONE_D)
+		_txt(ci, ital_font, Vector2(_offer_c(i).x - 114.0, ny), "reversed", HORIZONTAL_ALIGNMENT_CENTER, 228, 22, BONE_D)
 
 ## a card's place in the squared stack, j cards up from the cloth (each a little higher: the deck's thickness)
 func _lvl(j: int) -> Vector2:
@@ -1280,24 +1832,25 @@ func _draw_end(ci: CanvasItem, a: float, sc: Font, fi: Font) -> void:
 			if _kind(i) != "calling" and _kind(i) != "go":
 				continue
 			var cur := i == tale_n - 1
-			y = _type_draw(ci, String(tale[i]["text"]), fi, 27 if _kind(i) == "calling" else FS_WORDS, 35.0 if _kind(i) == "calling" else LH_WORDS,
-				Vector2(70, y + (10.0 if _kind(i) == "go" else 0.0)), 720.0, budget if cur else ALL,
-				Color(BONE if cur else BONE_D, a * (1.0 if cur else 0.8))) + 14.0
+			var go := _kind(i) == "go"
+			y = _type_draw(ci, String(tale[i]["text"]), ital_font if go else fi, FS_WORDS if go else 32, LH_WORDS if go else 39.0,
+				Vector2(70, y + (12.0 if go else 0.0)), 690.0, budget if cur else ALL,
+				Color(BONE if cur else BONE_D, a * (1.0 if cur else 0.78))) + 14.0
 	elif tale_n == 0 or ck == "tale":
 		for i in range(maxi(0, tale_n - 4), tale_n):
 			var cur := i == tale_n - 1
-			y = _type_draw(ci, String(tale[i]["text"]), fi, 30, 39.0, Vector2(70, y), 720.0, budget if cur else ALL,
-				Color(BONE if cur else BONE_D, a * (1.0 if cur else 0.8))) + 16.0
+			y = _type_draw(ci, String(tale[i]["text"]), fi, 34, 41.0, Vector2(70, y), 690.0, budget if cur else ALL,
+				Color(BONE if cur else BONE_D, a * (1.0 if cur else 0.78))) + 16.0
 	else:
 		# the cards' last words, to it
 		var intro := String(S.get("tale", {}).get("prophecy", ""))
 		var b := budget if ck == "prophecy" else ALL
 		var dim := 1.0 if ck == "prophecy" else 0.75
-		y = _type_draw(ci, intro, fi, 27, 34.0, Vector2(70, y), 720.0, b, Color(BONE_D, a * dim)) + 10.0
-		y = _type_draw(ci, _quote(), fi, 36, 44.0, Vector2(70, y), 720.0, b - intro.length() - 1, Color(MARROW, a * dim)) + 18.0
+		y = _type_draw(ci, intro, fi, 31, 38.0, Vector2(70, y), 690.0, b, Color(BONE_D, a * dim)) + 10.0
+		y = _type_draw(ci, _quote(), ital_font, 40, 47.0, Vector2(70, y), 690.0, b - intro.length() - 1, Color(MARROW, a * dim)) + 18.0
 		if ck == "sum":
 			# the whole hand, all together (never which card did which)
-			y = _type_draw(ci, String(S.get("close_sum", "")), fi, 25, 32.0, Vector2(70, y), 720.0, budget, Color(BONE_D, a)) + 10.0
+			y = _type_draw(ci, String(S.get("close_sum", "")), fi, 30, 36.0, Vector2(70, y), 690.0, budget, Color(BONE_D, a)) + 10.0
 			var ka := a * sum_a
 			var gave: Array = []
 			var took: Array = []
@@ -1307,11 +1860,10 @@ func _draw_end(ci: CanvasItem, a: float, sc: Font, fi: Font) -> void:
 			_txt(ci, sc, Vector2(70, y), "IT GAVE", HORIZONTAL_ALIGNMENT_LEFT, 400, 17, Color(ASH, ka))
 			_txt(ci, sc, Vector2(490, y), "IT TOOK", HORIZONTAL_ALIGNMENT_LEFT, 400, 17, Color(ASH, ka))
 			y += 30.0
-			var fb := body_font
 			for i in gave.size():
-				_txt(ci, fb, Vector2(70, y + i * 29.0), _fx_line(gave[i], fate[gave[i]]), HORIZONTAL_ALIGNMENT_LEFT, 400, 23, Color(GAIN_C, ka))
+				_txt(ci, stat_font, Vector2(70, y + i * 29.0), _fx_line(gave[i], fate[gave[i]]), HORIZONTAL_ALIGNMENT_LEFT, 400, 25, Color(GAIN_C, ka))
 			for i in took.size():
-				_txt(ci, fb, Vector2(490, y + i * 29.0), _fx_line(took[i], fate[took[i]]), HORIZONTAL_ALIGNMENT_LEFT, 400, 23, Color(LOSS_C, ka))
+				_txt(ci, stat_font, Vector2(490, y + i * 29.0), _fx_line(took[i], fate[took[i]]), HORIZONTAL_ALIGNMENT_LEFT, 400, 25, Color(LOSS_C, ka))
 			y += maxi(gave.size(), took.size()) * 29.0
 	var last := _at_last()
 	if last:
@@ -1321,4 +1873,4 @@ func _draw_end(ci: CanvasItem, a: float, sc: Font, fi: Font) -> void:
 		ci.draw_rect(rise_r, Color(MARROW if on2 else MARROW_D, a), false, 1.5)
 		_txt(ci, sc, rise_r.position + Vector2(0, 44), "Rise", HORIZONTAL_ALIGNMENT_CENTER, rise_r.size.x, 36, Color(BONE if on2 else BONE_D, a))
 	var hint := "" if tale_n == 0 else ("click to rise" if last else "click to go on")
-	_txt(ci, fi, Vector2(0, 1056), hint, HORIZONTAL_ALIGNMENT_CENTER, 1920, 22, Color(ASH, a * (0.6 + 0.2 * sin(t * 2.0))))
+	_txt(ci, ital_font, Vector2(0, 1056), hint, HORIZONTAL_ALIGNMENT_CENTER, 1920, 25, Color(ASH, a * (0.6 + 0.2 * sin(t * 2.0))))

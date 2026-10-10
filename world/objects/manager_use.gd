@@ -102,9 +102,9 @@ func _talk(e: Dictionary) -> void:
 ## the Stranger on the cave's top step (the opening, docs/wiki/mythology/areas/the-red-shore.md, his lines): a new
 ## pilgrim's first words with him open the Reading; after it he talks through the pilgrim, to the cards and to the face
 const READER_FIRST := [
-	"Another one up out of the Red. Sit. Let's see what the cards make of the newborn.",
-	"Look at them. Wet as a birth, and no name yet. The cards will find them one. They always do.",
-	"Come and sit, newborn. The deck has been waiting for you.",
+	"Another one up out of the Red. Sit. The cards have been warm all mourning. Morning. Whichever.",
+	"Wet as a birth, and no name in your mouth. Sit down. We'll lend you one.",
+	"There you are. Sit. The deck's been shuffling itself since you started up the stair.",
 ]
 const READER_AFTER := [
 	"Still here? The mouth's that way. Nobody remembers going into the last one. That's how you know it worked.",

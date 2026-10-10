@@ -1,0 +1,1329 @@
+"""The Stranger's words in the Reading (third pass), read by tools/reading/spread_data.py into data/reading_spread.json.
+
+Derek, 2026-10-10: "the dialogue can say you, id lack a bit more of the personality of the stranger can come through
+more in the dialouge"; "the meanings and positions need more to them to, like gravedigger on the brow means dirt in the
+face or whatever is so literal it has no subcontext or depth"; "see how repetative this reads. and we need exposition
+and transition between draws, its too dumber down now"; "add that fun poem to the begining, bone for the frame, flesh
+for the....name"; "i want the whole experience to be esoteric".
+
+So he is wry, unsettling and intimate; he knows more than he says, talks half to the cards and half to the newborn, and
+may say "you". The lore lies under the puns (hide and the Hide, Red and read, mourning and morning, lie, count, keep,
+still and steal and steel). No colons, no numbers or dates, "Pale" never "white", never "the Hush" (nor "hush" at all),
+no animals but insects, no food or kitchen framing, "deck" never "drawer".
+
+Every card has its own reading in every place, upright and reversed, as (short, sub):
+  short  what it is in that place, a phrase that fits the place's grammar (brow: a face; heart: what you want, after
+         "want"; left hand: what you keep, after "keep"; right hand: what you let go, after "let go of"; belly: what you
+         fear, after "fear"; feet: the road, after "came by"; under: a noun). Shown alone (capitalised) as the newborn
+         weighs the card, and woven into the bridges and the telling.
+  sub    his reading of it, said when it is chosen: subtext, consequence, a hint of who the newborn becomes, and a
+         second reading under the first. Never a literal body-part pun.
+"""
+
+# ------------------------------------------------------------------ the opening: the lowland rhyme
+# docs/wiki/mythology/02-the-creation-myths.md (the 02 wording, "filling"); he half sings it as he takes up the deck,
+# a line at a time, a sigil drawing itself in with each
+RHYME = ["Soul for the thread,", "and Bone for the frame,", "Flesh for the filling,", "and none for the name."]
+RHYME_ASIDE = [
+    "None for the name. The lowland children skip to that, and never notice they're counting. ...None for you either. "
+    "Not yet. The cards will lend you one. They only ever lend.",
+    "That's the old count. Thread, frame, filling, and a gap where the name goes. You came up out of the Red with the "
+    "first three. The gap is what we're here for.",
+]
+
+# ------------------------------------------------------------------ the crown: the calling, turned before he touches it
+CROWN_SAY = {
+    "ossumancer": "Turned up on its own. Oss-Vharoth, the frame that would not lie down when everything else did. It's "
+                  "had a hand on your spine since the pool. Bone holds you up now. Bone keeps count of you.",
+    "hemomancer": "Already face up, and warm. Nol-Shogthuth, the Mother of the Wheel, the flesh that keeps on growing "
+                  "with no mind to tell it stop. She's drinking already. She drinks what spills.",
+    "animancer": "There, at the crown. Yh'Anuul, behind her veil, at her loom. She's drawn one thread up out of the Red "
+                 "and she's holding it to the light. That's you. Don't wriggle.",
+    "miasmancer": "The Myriad. Not one, a crowd, riding the last breath out of the world, every one of them sick. You "
+                  "breathed in, coming up the stair. They came in with it.",
+    "monk": "The crown is... ah. That one. I won't say its name. It hasn't got one, and lending it one would be rude. A "
+            "gap at the top of you where something ought to sit. Smiling, if a gap can.",
+}
+
+# the deck, taken up and shuffled
+DECK_OPEN = [
+    "The deck. Every face anyone ever wore is in it, and some nobody has worn yet. Watch my hands. No, don't. Watch the "
+    "cards. They're the ones doing it.",
+    "Old deck. Warm. It has read everyone who came up out of that pool, and it remembers the shape of their hands. It "
+    "shuffles itself, really. I only hold it still.",
+]
+
+# ------------------------------------------------------------------ the places
+# what each place is called on the cloth, and the small line under its name
+PLACE_WHAT = {"brow": "the face you'll wear", "heart": "what you want", "lhand": "what you keep",
+              "rhand": "what you let go", "belly": "what you fear", "feet": "the road you came by",
+              "under": "what lies beneath"}
+
+# between the draws (Derek, 2026-10-10: "we need exposition and transition between draws"): a click a line. First he
+# looks at what the cards so far say together (LOOK, the first condition that holds; the conditions are tried in the
+# order given), then he opens the next place, what it governs (SET). In them: {crown}/{Crown} the calling's card,
+# {brow}/{Brow} etc. a laid card's name (lower case "the" mid sentence), {brow_m}/{Brow_m} its meaning in its place,
+# {a} the calling's aspect word, {asp} the last card's aspect word.
+BRIDGE = {
+    "brow": {
+        "order": [],
+        "look": {},
+        "set": [
+            "First the brow. The face. Not the one you came up with, that's only the Red's. The one the Hide will know "
+            "you by. Draw three, blind. Your hand knows more than your eyes do, tonight.",
+            "The brow, first. Every power keeps a deck of faces and lends them out like coats. Draw three. One of them "
+            "has been waiting for your shape.",
+        ],
+    },
+    "heart": {
+        "order": ["kin", "rev", "default"],
+        "look": {
+            "kin": ["{Brow} at the brow, and {a} in it again. The deck keeps handing you back to {crown}. It does that "
+                    "when it has made up its mind."],
+            "rev": ["A face that came up head down. Well. The world will meet you upside down, and you'll have to "
+                    "decide which of you is standing wrong."],
+            "default": ["So that's the face. {Brow_m}. Faces are cheap here, everyone's wearing someone's. What matters "
+                        "is what moves behind it."],
+        },
+        "set": [
+            "Now the heart. Not the one that beats. The other one, under it, that wants. The deck likes that place "
+            "best. It always finds something there.",
+            "The heart next. Lay your hand flat on the cloth there. Feel that? Warm. It's always warm there, whoever "
+            "sits where you sit.",
+        ],
+    },
+    "lhand": {
+        "order": ["pair", "rev", "default"],
+        "look": {
+            "pair": ["Face and heart drawn from the same {asp}. No quarrel in you there. That's restful. It's also how "
+                     "a thing gets swallowed whole."],
+            "rev": ["The heart turned over. {Heart}, head down. Wanting backwards is still wanting. It's only harder to "
+                    "explain to anyone who asks."],
+            "default": ["{Brow_m}, over a heart that wants {heart_m}. Those two will argue all the way down the road. "
+                        "Let them. The arguing is where the walking comes from."],
+        },
+        "set": [
+            "The left hand. The keeping hand, the shore folk say. Whatever closes in it you'll carry past all sense, "
+            "and call it yours.",
+            "Left hand now. The one that holds on. What it closes on doesn't open easily, and doesn't open whole.",
+        ],
+    },
+    "rhand": {
+        "order": ["kin", "rev", "default"],
+        "look": {
+            "kin": ["{Lhand}, and the {a} in your keeping hand. {Crown} will feel that grip. It likes being held. It "
+                    "likes it a little too much."],
+            "rev": ["Reversed, in the keeping hand. You'll hold the wrong end of it. Everyone does, at first. Some "
+                    "never let go long enough to turn it round."],
+            "default": ["In the left, then, {lhand_m}. That's what you'll still be holding when the rest goes. Hold it "
+                        "loosely. Or don't, and see."],
+        },
+        "set": [
+            "The right hand gives. It opens. What falls from it the Hide takes, and the Hide has never once given "
+            "anything back.",
+            "Now the right. The hand that lets go. Every hand here is emptied in the end. This is only choosing the "
+            "order.",
+        ],
+    },
+    "belly": {
+        "order": ["both_rev", "pair", "default"],
+        "look": {
+            "both_rev": ["Both hands reversed. You'll grip what you ought to drop, and drop what you ought to grip. "
+                         "Clumsy. The clumsy last, sometimes. Nobody expects them to."],
+            "pair": ["Both hands out of the same {asp}. One keeps what the other lets go. That isn't a contradiction, "
+                     "here. That's a heartbeat."],
+            "default": ["Keeping {lhand_m}. Letting go of {rhand_m}. Between the two hands a life gets its shape, "
+                        "the way clay does between palms."],
+        },
+        "set": [
+            "Down to the belly. Fear lives here, not in the head. The head only explains it afterward, and badly.",
+            "The belly. Where fear sits, low and warm, curled round itself. Draw gently. It wakes easily.",
+        ],
+    },
+    "feet": {
+        "order": ["kin", "rev", "default"],
+        "look": {
+            "kin": ["Even the fear is {a}. {Crown} lives where you're afraid. Most powers do. It's the one door "
+                    "everybody leaves open."],
+            "rev": ["A fear upside down. {Belly}. Hold a fear like that to the light and it looks like a wish. Don't "
+                    "hold it to the light."],
+            "default": ["So. A face, a want, two hands, and down in the belly a fear of {belly_m}. It's starting to "
+                        "look like someone. Like everyone who ever came up those stairs."],
+        },
+        "set": [
+            "Now the feet, and the road behind them. You came up a stair out of a pool, not long since. Never mind. "
+            "Everyone gets a road. A road's a kindness.",
+            "The feet. Where you came from. You don't remember. Nobody does. The cards remember for you, and they "
+            "remember generously.",
+        ],
+    },
+    "under": {
+        "order": ["many_rev", "kin", "default"],
+        "look": {
+            "many_rev": ["Look at it. Half of you lying head down. The Red reads things the other way up, so perhaps "
+                         "you're the right way round after all, and the rest of us are hanging."],
+            "kin": ["Even the road was {a}. The deck has been dealing you one thing again and again, in different "
+                    "coats. It isn't subtle. It has never had to be."],
+            "default": ["{Feet_m}. That's the road behind you. On top of it a fear, two hands, a heart, a face, and "
+                        "{crown} at the crown. Whole. Nearly."],
+        },
+        "set": [
+            "One more. Not on the body. Under it, face down, in the Red. We don't turn that one. It turns us. Read. "
+            "Red. Always red.",
+        ],
+    },
+}
+
+# ------------------------------------------------------------------ a card turning up head down
+# said the moment it turns (Derek, 2026-10-10: "see how repetative this reads"): every card its own line for each part
+# of the body (head: brow, heart; hands; low: belly, feet), every one a different shape, never a formula. {n} is not
+# used: he names the card his own way.
+TURNED = {
+    "unwritten": {
+        "head": "Blank, and still it found a way to lie upside down. Takes talent, that.",
+        "hands": "Nothing on it, nothing at all, and the empty thing came up inverted. Ending, that means. Or the "
+                 "start of something. Same card, turned.",
+        "low": "Down that low the Unwritten always lands on its head. The next turn starts underfoot. Mind where you "
+               "step.",
+    },
+    "pilgrim": {
+        "head": "Look, the Pilgrim's sat down. On its head. Tired before the walk's begun.",
+        "hands": "There goes the walker, feet in the air. Stopped. I've seen that card stop in steadier hands than "
+                 "yours.",
+        "low": "Boots to the sky. So the road ends low, does it. Roads drain. They all drain somewhere.",
+    },
+    "digger": {
+        "head": "Hands digging upward, toward the face. Something buried is on its way up to meet you.",
+        "hands": "Working backwards, those Hands. Opening, not filling. Somebody's rest is about to be disturbed, "
+                 "and I have a feeling it's mine.",
+        "low": "The Gravedigger's turned over, down by the belly. What you put away long ago is coming back up the "
+               "way it went in.",
+    },
+    "veil": {
+        "head": "Dropped, like a moth that flew too close. The Veil's already singed, look at the edge of it.",
+        "hands": "The Singed Veil, scorched side up. Nothing left on it to burn. That's either peace, or the end "
+                 "of the line.",
+        "low": "Ash settles low. That's where the Veil fell, upside down. Everything settles, given long enough.",
+    },
+    "swaddling": {
+        "head": "Cut loose. The cloth's in ribbons and the Swaddling's on its head.",
+        "hands": "The knife side of the Swaddling. Somebody always holds the knife. Mostly it's the one who was "
+                 "wrapped.",
+        "low": "Bare to the cold, down there. The Swaddling unwrapped, head down. Somebody let you out early.",
+    },
+    "gleaner": {
+        "head": "Not the reaper. The keeper. Old Scythe's card, inverted, and someone holding the end down by the "
+                "hair.",
+        "hands": "Counting instead of cutting. That's how the Gleaner reads the other way up. Count with him. He "
+                 "likes company.",
+        "low": "Down at the pit, the Gleaner turned. That's where the keepers stand guard. Cold work, and nobody "
+               "thanks you.",
+    },
+    "saint": {
+        "head": "Turn the Saint over and you get the crowd. All those faces, none of them weeping. Look closer. "
+                "...See yourself?",
+        "hands": "Not her, then. The watchers, hands tucked in their sleeves. The Weeping Saint, the wrong way up.",
+        "low": "Head down, she gives the crowd's view of the iron. Everyone gets a good view from down there.",
+    },
+    "scholar": {
+        "head": "Ah. Now the Eye is reading you. Don't blink. It notes the blinking.",
+        "hands": "That one's turned to look back up your arm. The Scholar's Eye, upside down. Something in the "
+                 "Needle has the page open.",
+        "low": "Watching from underneath, the Eye. Low on the body, and very patient. An old habit of the Needle's.",
+    },
+    "hanged": {
+        "head": "The Twin, right way up for once. Which means reversed. The one in the water is the true one, you "
+                "see.",
+        "hands": "A breath ahead now, the Hanged Twin. It already knows which you'll choose.",
+        "low": "Ha. Hangs upright when it's reversed, that one. Waiting at the bottom, a breath ahead of you.",
+    },
+    "knot": {
+        "head": "Turned, and the mouths are on the outside now. That's the side that gets swallowed.",
+        "hands": "Seen from inside one of the mouths. That's the Knot, inverted. Damp in there.",
+        "low": "In the belly, head down, the Knot of Mouths. It'll gnaw from below. Patient little teeth.",
+    },
+    "wick": {
+        "head": "The dark at the edge of the flame, looking in at you. That's the Wick turned round.",
+        "hands": "Wick down, the dark leaning in. It's very patient, that dark. It has outlasted every flame so far.",
+        "low": "Burning downward, into the Red. The Wick never comes out of that well.",
+    },
+    "mourner": {
+        "head": "Someone's mourning you already. That's what the Mourner means, head down. That was quick.",
+        "hands": "The grieved-for, not the griever. Cut hair everywhere, and your name in all of it.",
+        "low": "A wake, held down at your feet. The Mourner reversed. Short notice, but well attended.",
+    },
+    "key": {
+        "head": "Somebody's opening the count. In the head, of all places. That's the Key, turned.",
+        "hands": "The lock's on the other side of the door now. Ossuary Key, reversed. Which side are you on?",
+        "low": "Turning, low down. Down there the Key opens what was shut for good reason.",
+    },
+    "cup": {
+        "head": "The house that answers. You've opened the door, haven't you. In your sleep. That's the Cup the "
+                "wrong way up.",
+        "hands": "Empty bowl, open door. Knock, knock. The Beggar's Cup, inverted.",
+        "low": "Spilled, the Cup. Low down the door's a cellar door. Don't open it. You will.",
+    },
+    "bell": {
+        "head": "Ringing true, and upside down. A drowned bell in tune. That's the frightening one.",
+        "hands": "Mouth up, the Bell, full of the Red. One clean note out of it and they'll all come up to listen.",
+        "low": "Rung in tune, under you. Feel it in your heels? No. You will.",
+    },
+    "coin": {
+        "head": "Not the seller now. The buyer. And you haven't even asked the price.",
+        "hands": "The First Coin, face down in your palm. You're the one paying. Turn out your pockets... ah. No "
+                 "pockets yet.",
+        "low": "Paid for already, whatever it was. That's the Coin, low and inverted. Paid low.",
+    },
+    "kiln": {
+        "head": "Something cracked in the firing. Up near the face, too. The Kiln, reversed.",
+        "hands": "A shard, not a pot. That's how the Kiln lies turned over. Sharp, though. Very sharp.",
+        "low": "A crack running downward. Cracks always find the bottom. The Kiln knows.",
+    },
+    "loom": {
+        "head": "Reweaving. Lumpy work. Somebody is mending your face and isn't very good at it.",
+        "hands": "Stitching instead of picking, the Loom inverted. A clumsy needle, but a stubborn one.",
+        "low": "Darned at the bottom. Patches hold, low down. It's the hems that go first.",
+    },
+    "lanternwright": {
+        "head": "The lantern's door is open. Someone's breath, going up and out of the top. The Wright, reversed.",
+        "hands": "Letting go of the kept. Brave hands, those. Cold, after.",
+        "low": "The light is leaving by the top, and you're down at the bottom with the Lantern-Wright on its head.",
+    },
+    "choir": {
+        "head": "The rest between the notes. ...Hear it? No. That's the point. That's the whole point.",
+        "hands": "Mouths shut, the Drowned Choir. A breath between notes. Don't fill it.",
+        "low": "Low on you, the Choir turned over. The gap under the song. Something lives in the gap.",
+    },
+    "tithe": {
+        "head": "The collector, not the debtor. Polite. Punctual. That's the Tithe from the other side.",
+        "hands": "Your hand out, and someone else's pockets. How the Tithe turns.",
+        "low": "The collector's down in the cellar. Been there a while, by the look of the card.",
+    },
+    "crown": {
+        "head": "A city kneeling with nobody to kneel to. The Hollow Crown, upside down.",
+        "hands": "Worn on the wrong end, that Crown. Obedience, with nothing left to obey.",
+        "low": "Rust running down into the Red. The empty city sits under everything, and it's listening for orders.",
+    },
+}
+
+# ------------------------------------------------------------------ what each card means in each place
+MEANS = {
+    "unwritten": {
+        "brow": (("a blank face, which everyone will write on",
+                  "They'll each see their own hand in it and call it yours. Let them. A face nobody can read is the "
+                  "oldest mask there is."),
+                 ("a face rubbed out and drawn again, and again",
+                  "Something wore this face before you, and wiped it, and wore it. The page goes thin. One day the "
+                  "light will show through, and they'll see what's behind it.")),
+        "heart": (("to be written at last, in anyone's hand",
+                   "Wanting a story so badly you'd take a cruel one. Most do. The cruel ones are the ones that get "
+                   "finished."),
+                  ("to be left unwritten, just once",
+                   "A want for the quiet between words. Careful. Something lives in that quiet, and it wants the "
+                   "same thing you do.")),
+        "lhand": (("a clean page no one is let near",
+                   "Kept back, kept for something. Nobody keeps a page that clean unless they know what's coming to "
+                   "write on it."),
+                  ("a page worn so thin the fire shows through",
+                   "Every story ever tried on it, scraped off. Hold it to a lantern and you'll see them all, faint, "
+                   "and the last one isn't over.")),
+        "rhand": (("every life you might have been",
+                   "The hand opens and they all go, the might-have-beens, like ash off a palm. Lighter. Narrower. "
+                   "That's how a road gets made."),
+                  ("the one story you kept telling",
+                   "You let go the tale you told about yourself. What's left has no story at all. A kind of freedom. "
+                   "A kind of drowning.")),
+        "belly": (("passing through and leaving no mark",
+                   "The Hide is full of the unmarked, and they don't rest well. You'll cut your sign into things. "
+                   "Walls. Faces. You'll call it remembering."),
+                  ("being written over in someone else's hand",
+                   "The pen frightens you more than the blank. Sensible. Every face here was written by someone who "
+                   "wasn't wearing it.")),
+        "feet": (("a road with no marks on it at all",
+                  "No footprints ahead, none behind. Either nobody came this way, or everybody did and the sand "
+                  "forgave them."),
+                 ("a road walked so often it's only a ditch now",
+                  "Worn a man deep by all who came before. You think you're the first. They all thought that, down "
+                  "in the ditch.")),
+        "under": (("the turn nobody has taken yet",
+                   "At the bottom of everything, blank, patient as a held breath. The deck keeps that one for the end "
+                   "of things. Odd to find it this early. Odd, or not early at all."),
+                  ("the first page of the next telling",
+                   "Upside down, the blank is a beginning. Someone ends the turn so someone can start the next. I "
+                   "won't say who. The cards won't either.")),
+    },
+    "pilgrim": {
+        "brow": (("a hood, a staff, and nobody under them",
+                  "The face of everyone on the road. People will look at you and see the last pilgrim they buried. "
+                  "Some will be kind for it. Some won't."),
+                 ("the face of one who sat down by the road",
+                  "Tired before you've begun. A face like that gets left alone, mostly. Mostly is a long word on the "
+                  "Hide.")),
+        "heart": (("to keep walking, and never ask where",
+                   "The going is the want. Arriving would spoil it. A heart like that walks through anything, and "
+                   "anyone, to keep from stopping."),
+                  ("to sit down at last and not get up",
+                   "You want the end of the road more than the road. Rest, you'll call it. The dead call it that "
+                   "too.")),
+        "lhand": (("a staff worn smooth by someone else's grip",
+                   "You hold what the last walker held. The staff knows the way better than the hand does. Let it "
+                   "lead, and wonder whose way it is."),
+                  ("a pair of boots you won't put back on",
+                   "Holding on to the stopping. Clutching it. Some keep a grave like that, close and warm, and "
+                   "ready.")),
+        "rhand": (("the reason you set out",
+                   "You drop the why and keep the walking. You'll go a long way like that. You won't remember the "
+                   "point, and you'll be very good at it."),
+                  ("the road itself",
+                   "You drop the road and the road doesn't notice. Roads never do. Someone else will be walking it "
+                   "by mourning.")),
+        "belly": (("arriving",
+                   "Afraid of the door at the end, because then you'd have to be someone. Better to be a pair of "
+                   "feet. Feet are never asked their name."),
+                  ("the road running out under you",
+                   "That cold drop where the path stops and the dark doesn't. You'll dream of that edge. In the "
+                   "dream you'll walk toward it.")),
+        "feet": (("the pilgrim trench, a man deep in the Hide",
+                  "Feet past counting wore that road into the skin of the world. You came along it without walking "
+                  "it. That's how most of us came."),
+                 ("a road that ended in the middle of nowhere",
+                  "You came from a place the road gave up on. Nothing's there now. Nothing has a way of following "
+                  "you.")),
+        "under": (("a walker who never stopped",
+                   "Under you another walks, step for step, upside down in the Red. It was walking before the stair. "
+                   "Don't look for it. It's looking for you."),
+                  ("one who stopped a long way back, and waits",
+                   "Somewhere behind, a pilgrim sat down and never rose, and the road has been bending back toward "
+                   "them ever since. Toward you, then. Eventually.")),
+    },
+    "digger": {
+        "brow": (("a face kept clean of what the hands have done",
+                  "The hands bury and the face never looks down. People will trust a face like that. You'll let "
+                  "them, and dig."),
+                 ("a face that looks into every grave it opens",
+                  "You can't help looking. Every opened grave looks back a little, and leaves something in the eyes. "
+                  "You'll be known by that look.")),
+        "heart": (("to put the past down deep and tamp it flat",
+                   "A heart that wants things finished and covered. Neat rows. You'll make a fine keeper of the dead. "
+                   "A poor one of the living."),
+                  ("to know what was buried, and why",
+                   "The want to open. Every faith here put something under on purpose. You'll want to see it. You "
+                   "will see it.")),
+        "lhand": (("a grip that never once looks in",
+                   "You keep the work and not the meaning. A hand like that can bury anything, a friend, a faith, "
+                   "itself, and sleep after."),
+                  ("a bone dug up and never put back",
+                   "You carry what should be under, close against the body. It'll get heavier. Bones here always do, "
+                   "once someone starts counting them.")),
+        "rhand": (("whatever you can't carry, into the ground",
+                   "What you can't bear, you bury. That's mercy, nearly. The ground here keeps what it's given, and "
+                   "keeps count."),
+                  ("the order the dead were laid in",
+                   "You let the rows go crooked. Somewhere the Matron feels a bone slip its place, and lifts her "
+                   "head.")),
+        "belly": (("a grave that won't stay filled",
+                   "The thing that climbs back. Wise to fear it. Nothing you bury here is quite as dead as it was "
+                   "told."),
+                  ("what comes up with the dirt",
+                   "Not the dead. What the dead were buried with. Names, mostly. Names are worse.")),
+        "feet": (("the long rows where the dead lie in their order",
+                  "You walked out between the graves and the graves let you. They don't, usually. Something down "
+                  "there knew your step."),
+                 ("a churned road of opened graves",
+                  "The way of the robbed and the risen. Your boots carry that dirt still. The dead will catch the "
+                  "smell of it and turn their heads.")),
+        "under": (("everything you ever buried, lying very still",
+                   "Under you, a field of quiet things, all put down by your own hands. You don't remember one of "
+                   "them. They remember you."),
+                  ("a grave dug open from below",
+                   "Something under the Red has been digging upward, toward you. Patient work. It's close now. Put "
+                   "your ear to the floor sometime. Or don't.")),
+    },
+    "veil": {
+        "brow": (("a pale face turned always toward the fire",
+                  "The moths wear faces like that, the old court's faces, flying at every lamp. You'll be mistaken "
+                  "for something holy. That's how the moths get close."),
+                 ("a face with the singe still on it",
+                  "Burned once, and wearing the mark. People will know you've been near something bright. They'll "
+                  "wonder what you brought back from it.")),
+        "heart": (("to reach the one light that will burn you",
+                   "Knowing it will burn makes no difference. The burning is the want. Call it devotion, if the "
+                   "word helps."),
+                  ("nothing, now the burning's done",
+                   "A cooled heart. Ash wants nothing. Ash is very hard to frighten, and very easy to scatter.")),
+        "lhand": (("a veil held up to the flame",
+                   "You keep the thin thing between yourself and the fire and call it protection. Look at it "
+                   "sideways and it's a wick."),
+                  ("a palm of ash that used to be a veil",
+                   "You keep what's left of the burning, as proof. One breath and it's gone. You'll go very still "
+                   "near open doors.")),
+        "rhand": (("your fear of the fire",
+                   "You let go of the fear and keep the fire. Brave, the living call that. The moths call it the "
+                   "only way to fly."),
+                  ("the last of what the fire left",
+                   "The hand opens on the ashes and the wind takes them. Nothing left to burn. Nothing left to be, "
+                   "for a while.")),
+        "belly": (("the dark, more than the burning",
+                   "Better to burn than be left unlit. A fear like that drives you toward the worst light there is, "
+                   "and gladly."),
+                  ("the pull of a light, again",
+                   "Once burned, you fear the pull more than the pain. You'll feel it anyway. The pull doesn't "
+                   "ask.")),
+        "feet": (("a road from lamp to lamp to lamp",
+                  "You came the way the moths go, by the lights, never by the road between. Every lamp you passed "
+                  "is a little dimmer now."),
+                 ("a road through what had already burned",
+                  "Cinder underfoot the whole way. You walked out of a fire that had finished. Someone else was the "
+                  "fuel.")),
+        "under": (("a pull toward the brightest thing in the room",
+                   "Under you something lifts its pale face to every light. One day the light will be yours, and it "
+                   "will come."),
+                  ("a scorch where something used to stand",
+                   "Something burned here before you came up, and left its shape in the stone. Your height. Your "
+                   "stance. Fancy that.")),
+    },
+    "swaddling": {
+        "brow": (("a face wrapped tight against the ash",
+                  "A face not yet shown to the world. Others will want to shield it, and will think shielding makes "
+                  "it theirs."),
+                 ("a face cut free of its wrappings",
+                  "Raw to the air and too new for it. You'll be stared at. New things are, here, by things that "
+                  "remember being new.")),
+        "heart": (("to be carried, and to carry",
+                   "The weight and the arms, both at once. You'll pick up more than you can bear and call it love, "
+                   "and you'll be right."),
+                  ("the knife, and the cut it makes",
+                   "To be free of the wrapping, whatever it costs the hands that wrapped you. Every child wants that. "
+                   "The Deep counts on it.")),
+        "lhand": (("a bundle you won't set down even to sleep",
+                   "Something small and warm, and you won't say what. Nobody asks. Don't you ask either."),
+                  ("a short knife, still sharp",
+                   "Kept close, kept clean. A knife for cloth, you'll say. Cloth is the least of what a knife "
+                   "learns.")),
+        "rhand": (("the arms that carried you",
+                   "You set down the ones who held you, and walk. Someone's arms will ache a long while after. "
+                   "That's the price of being carried."),
+                  ("the cloth you were cut out of",
+                   "The wrappings fall and you don't look back at them. Somewhere the Deep notes one fewer, and asks "
+                   "again.")),
+        "belly": (("being set down and left",
+                   "Older than the dark, that fear. You'll keep company you shouldn't, to keep from feeling it."),
+                  ("whatever was in the bundle",
+                   "Afraid of what you carry, and still carrying it. Fear and love feel the same in the arms.")),
+        "feet": (("a road you never walked, carried the whole way",
+                  "Somebody bore you here step by step while you slept. Ask whose back. Don't expect an answer."),
+                 ("a road away from the Deep, at a run",
+                  "Somebody cut the cloth and ran with you under one arm. Who's still running, I wonder. And who "
+                  "stopped.")),
+        "under": (("a child the Deep asked for",
+                   "Under you, wrapped and waiting, a little one meant for the dark. Were you the one given, or the "
+                   "one kept back? The card won't say. It never has."),
+                  ("the knife that answered the Deep",
+                   "Someone refused the asking once, with a blade. The refusal is still down there in the Red, still "
+                   "sharp. It knows a name for you before you have one.")),
+    },
+    "gleaner": {
+        "brow": (("the face the harvest sees last",
+                  "A face for endings. The dying will be calm under it, or not. Either way they'll look at it "
+                  "longest of anything."),
+                 ("a counting face under a plate of bone",
+                  "The keeper's face, the one that holds the end down. Stern. Tired. Patient. You'll look older "
+                  "than you are, very soon.")),
+        "heart": (("the harvest, every stalk of it",
+                   "A heart that wants things to finish. Not cruel. Tidy. Everything ripe should come down. That's "
+                   "the trouble with it."),
+                  ("one more day before the harvest",
+                   "To hold the end back a little longer, and longer. Every day bought is a day owed. The Gleaner "
+                   "keeps a count of those too.")),
+        "lhand": (("an edge that has never missed",
+                   "The end of things, in one hand. That hand will be steady. It's the other that'll shake."),
+                  ("a sliver of the edge, set in your own plate",
+                   "A splinter of the harvest, carried inside the armour, close to the skin. You'll ache at every "
+                   "death nearby, the way old men ache at weather.")),
+        "rhand": (("whatever is ripe",
+                   "You let the ripe things go to the edge without a fight. Merciful, or tired. The ripe can't tell "
+                   "the difference."),
+                  ("the count, for one moment",
+                   "You loosen your grip on the count, once, and something below stirs. One moment. Old Scythe has "
+                   "never needed more than one.")),
+        "belly": (("being the harvest",
+                   "Everyone is a stalk in a field. It's only that you've seen the edge coming."),
+                  ("losing count",
+                   "The keeper's fear. Lose the count and the pit opens. So you'll count, under your breath, always, "
+                   "even in sleep.")),
+        "feet": (("the road Old Scythe walks up out of his pit",
+                  "The reaper's road, walked once an age. It was warm when you came along it. That should worry "
+                  "anyone who knows the timing."),
+                 ("the narrow stair down to the pit",
+                  "You came up the way the keepers go down. Against the traffic. The keepers will notice, and look "
+                  "at you sideways.")),
+        "under": (("Old Scythe, waiting for his age to come round",
+                   "Under everything, the end of everything, resting. It isn't a threat. It's a calendar."),
+                  ("someone below, counting, so he stays under",
+                   "Down there a keeper counts without stopping, and the end stays down. If the counting ever "
+                   "stops... Listen. ...Still counting. Good.")),
+    },
+    "saint": {
+        "brow": (("a weeping face that everyone believes",
+                  "Grief worn so well it becomes a kind of proof. People will follow that face. You'll have to keep "
+                  "weeping, or they'll stop."),
+                 ("a face lost in the crowd",
+                  "One more watcher. Nobody looks twice. The safest place to stand, and the most damning.")),
+        "heart": (("to be believed, whatever it costs",
+                   "Wanting so badly to be true that you'll bleed for it. Blood is how you're believed here. Ask the "
+                   "girl in the iron."),
+                  ("to watch, and be no part of it",
+                   "To stand near suffering and feel the heat of it, safe. A small want. Whole crowds are made of "
+                   "it.")),
+        "lhand": (("a wound kept open so it can be shown",
+                   "Your hurt held out in the open hand. Faiths have been built on less. Faiths have been built on "
+                   "exactly this."),
+                  ("a good place near the front, to see",
+                   "Your spot at every killing, kept. Not cruel. Curious. Curiosity is how the Maiden fills her "
+                   "crowds.")),
+        "rhand": (("your tears, to whoever will gather them",
+                   "You give your grief away and someone bottles it. Somewhere a relic will be made of what you "
+                   "wept. Not a pleasant thought, is it."),
+                  ("the girl in the iron, to her weeping",
+                   "You turn away from the one suffering and let her go on. Everyone did. Look how that turned "
+                   "out.")),
+        "belly": (("bleeding for nothing in an empty square",
+                   "Suffering with no one to see. Pain without a witness is only pain. You want yours to be a "
+                   "sermon."),
+                  ("being the one they come to watch",
+                   "The iron, and the crowd turning to look. You're right to be afraid. The crowd is always looking "
+                   "for its next saint.")),
+        "feet": (("a procession road, still wet",
+                  "You came behind the penitents, stepping where they bled. That road ends at a wall. They all go "
+                  "into the wall. Everyone behind moves up."),
+                 ("the road the crowd takes home, after",
+                  "The way the onlookers go, talking low, not looking back. That road leads home, and home leads "
+                  "back to the square.")),
+        "under": (("a suffering that made a faith",
+                   "Under you, an old agony, still being believed. Every belief here needs a body. Hers is spoken "
+                   "for. They'll be looking for another."),
+                  ("a crowd of faces that did nothing",
+                   "Under everything, the watchers, shoulder to shoulder. They watched the Maiden made. They're "
+                   "watching now. Wave, if you like.")),
+    },
+    "scholar": {
+        "brow": (("a reader's squint, gone glassy from the page",
+                  "A face that has stopped looking at people and started reading them. They'll feel it. They'll "
+                  "tell you things they meant to keep."),
+                 ("a face the Needle has already seen",
+                  "Something far off has taken this face's measure. You'll be known in places you've never been. "
+                  "Mind the eyes on high walls.")),
+        "heart": (("to know, whatever knowing costs",
+                   "You'll pay. The knowing kind always do. The first price is always small. That's how the reading "
+                   "rooms filled up."),
+                  ("to be unseen again",
+                   "To be shut, a book back on the shelf. Too late. A thing once read stays read.")),
+        "lhand": (("a book you can't stop reading",
+                   "The page turns itself under your thumb. Somewhere near the end is a chapter about you, one page "
+                   "ahead. Don't skip."),
+                  ("an eye that won't close",
+                   "The watching, carried everywhere, never put down to sleep. The Citadel's readers had a word for "
+                   "it, before they stopped sleeping at all.")),
+        "rhand": (("everything you read, once you knew it",
+                   "You let the learning go and keep only the knowing. Lighter. Colder. A scholar who forgets the "
+                   "books becomes something else."),
+                  ("the page that started reading back",
+                   "You drop the book. Too late. It has your scent. Somewhere a page is still turned toward you.")),
+        "belly": (("a page with nothing left to teach you",
+                   "An end to learning. A funny fear, here. The Hide has plenty left to teach, and none of it "
+                   "kindly."),
+                  ("the eyes in the Needle, turning your way",
+                   "You fear being read more than dying. That's the right order, here.")),
+        "feet": (("the long stair up to the reading rooms",
+                  "Up from the stacks, ink on your soles. The Citadel's oldest reader looked up the day you passed, "
+                  "they say. Then looked down again."),
+                 ("a road the Needle watched you walk",
+                  "Every step under an eye. The Needle doesn't follow. It doesn't need to. It has read how the road "
+                  "ends.")),
+        "under": (("the oldest reader, asleep over his book",
+                   "Under everything, a reader who hasn't turned a page in an age. The book is open at you. Don't "
+                   "wake him. He'll want to know how it ends."),
+                  ("something reading you, line by line",
+                   "Under you something reads, and you're the page. Every step written as it's taken. Every word "
+                   "read as it's written.")),
+    },
+    "hanged": {
+        "brow": (("a face that hangs head down in every pool",
+                  "You've a twin in every still water, and the twin's face is the true one. People will feel they've "
+                  "met you before. They have. Upside down."),
+                 ("the face of the one waiting up ahead",
+                  "You wear the twin's face, the one that went first. Some will greet you by a name you don't know. "
+                  "Answer to it. See what happens.")),
+        "heart": (("to catch your other half",
+                   "Always a breath behind something that looks just like you. The chasing will be your whole life. "
+                   "The catching would end it."),
+                  ("never to be caught",
+                   "To stay a breath ahead of what follows. You'll run well. Running is a kind of faith.")),
+        "lhand": (("the rope you were hung by, still knotted",
+                   "You keep the knot that held you. Not as a warning. As a handhold. There's a difference, and it's "
+                   "thin."),
+                  ("a hand reaching back out of still water",
+                   "You're holding a hand nobody else can see. The water's very cold. You won't let go.")),
+        "rhand": (("your reflection, for one breath",
+                   "You let your twin go, a breath, and for that breath you're alone the way nothing here has been "
+                   "alone. Then the water stills."),
+                  ("the breath you were ahead by",
+                   "You give up your lead and the one behind closes the gap. Whatever happens when you meet was "
+                   "always going to.")),
+        "belly": (("still water",
+                   "The mirror that doesn't ripple, and the thing in it that doesn't blink. Keep away from the black "
+                   "glass, then. ...Ah. Never mind."),
+                  ("the moment the twin stops waiting",
+                   "The other turning round. What looks back out of water has been patient so long. Patience ends.")),
+        "feet": (("the shore of every still pool",
+                  "Along the water's edge, keeping pace with your reflection. Look at the footprints. Two sets. One "
+                  "of them goes in."),
+                 ("a road the other one walked first",
+                  "Every step already taken, a breath ago, by the same feet. You're following yourself. You don't "
+                  "know it yet.")),
+        "under": (("the Drowned Twin, keeping very good time",
+                   "Under you, face up in the Red, the twin. Lift a hand. ...There. It lifted one too. A breath "
+                   "late."),
+                  ("a twin a step ahead, who knows the way",
+                   "The one under the Red is a breath ahead. It knows where you're going. It's already there, "
+                   "waiting, wet.")),
+    },
+    "knot": {
+        "brow": (("a mouth, and behind it another mouth",
+                  "A face that smiles with more than one smile. People will feel hollow around you and not know "
+                  "why."),
+                 ("a face with bite marks in it",
+                  "Something has had a taste of this face already, and means to come back. They'll see the marks "
+                  "and stand a little further off.")),
+        "heart": (("to swallow, and keep what you swallow",
+                   "A hunger that isn't for anything. It's for keeping. Every hunger here is a hunger to keep. The "
+                   "old one kept everything, once."),
+                  ("to be swallowed, and be done",
+                   "To be taken in and stop being separate. It sounds like rest. It's a throat.")),
+        "lhand": (("a hunger fed with both hands",
+                   "You keep the appetite itself, not the thing it wants. You can't fill a hand that's holding a "
+                   "hunger."),
+                  ("a bone with your own teeth marks in it",
+                   "Gnawing on yourself when there's nothing else. Keeps the wanting sharp. Keeps it lean.")),
+        "rhand": (("the scraps, never the whole",
+                   "You give away what you don't want and call it charity. The Knot is generous like that. The "
+                   "mouths keep the rest."),
+                  ("the last of yourself, to the mouths",
+                   "You let yourself be taken. A little. Then more. The mouths are very good at a little, then "
+                   "more.")),
+        "belly": (("an empty belly",
+                   "The hollow, more than any blade. Empty is where you started. You'll fill yourself with anything "
+                   "to keep from going back."),
+                  ("the Second Mouth, preaching",
+                   "The voice that says hunger is holy. You fear it because you've heard the sermon, and found it "
+                   "beautiful.")),
+        "feet": (("a road with a mouth at both ends",
+                  "Out of one mouth, toward the other. That's a throat, not a road. Most roads here are."),
+                 ("a road that goes round and down",
+                  "Spiralling, every turn a little lower. You think you're walking. You're being swallowed slowly. "
+                  "Same thing, from inside.")),
+        "under": (("one hunger with many mouths",
+                   "Under you the Knot, working quietly. Everything goes down into the Red sooner or later. The Red "
+                   "is a mouth too."),
+                  ("what the Tallow-Mother keeps for later",
+                   "Under everything, something set aside, wrapped in fat and patience. Kept. For later. Whose "
+                   "later, I couldn't tell you.")),
+    },
+    "wick": {
+        "brow": (("a face lit from below by its own burning",
+                  "You'll look like you're carrying a light, and you are. The light is you. Those beside you will be "
+                  "warm, and won't ask what's burning."),
+                 ("a face just past where the light reaches",
+                  "The face at the edge of the lantern, half there. People will think you're following them. "
+                  "Sometimes they'll be right.")),
+        "heart": (("to burn down for a little light",
+                   "Spending yourself, gladly. The lanterns are full of hearts like that. That isn't a comfort. "
+                   "That's what's in the lanterns."),
+                  ("the dark that waits for every flame",
+                   "You want the after, when the burning's done. A heart like that is patient with everyone, and "
+                   "everyone should be afraid of it.")),
+        "lhand": (("a lantern with a soul inside it",
+                   "You carry someone's burning to see by. Whose? Lanterns don't say. They flicker when you ask."),
+                  ("a cold wick, burned all the way down",
+                   "What's left when the light is spent, and you won't throw it away. Mourning, or thrift. Hard to "
+                   "tell which, here.")),
+        "rhand": (("the last of your tallow, to the light",
+                   "You give your last to keep a flame alive. That's how the lantern bearers end, mostly. In a "
+                   "lantern, giving light to strangers."),
+                  ("the light, a step at a time",
+                   "You let the light go and follow the dark at its edge. Easier on the eyes. Harder on everything "
+                   "else.")),
+        "belly": (("going out",
+                   "The flame's own fear, the little gutter at the end. You'll start at every draught, and stand "
+                   "near the Red and shiver."),
+                  ("the light finding you",
+                   "Being seen. The edge of the dark was always safe. Lanterns change that. Lanterns are coming.")),
+        "feet": (("a road lit one lantern at a time",
+                  "Somebody lit the way for you, flame by flame, and every flame was somebody. You walked on all of "
+                  "them, lit."),
+                 ("the dark verge just off the lantern road",
+                  "Beside the light, never in it. The roadside has its own travellers. They keep to the edges for "
+                  "good reason.")),
+        "under": (("a soul that stayed to burn",
+                   "Under you, someone chose to stay and be the light. Still burning, down in the Red, for your "
+                   "sake. Be worth it."),
+                  ("the patient dark the light only pushes back a step",
+                   "Under everything, the dark the lanterns lean against. It doesn't push. It doesn't need to. It "
+                   "has waited out every flame so far.")),
+    },
+    "mourner": {
+        "brow": (("a shorn head bowed toward the Red",
+                  "Grief worn plain and cut close. People will tell you their dead without being asked. You'll carry "
+                  "a great many names that way, and none of them yours."),
+                 ("the face someone is still weeping over",
+                  "Somebody wept over this face before you rose in it. You look like someone. You'll meet people "
+                  "who stop dead at the sight of you.")),
+        "heart": (("grief that cuts, and keeps cutting",
+                   "Loving the cutting more than what was lost. Every mourning makes the next one easier. That's the "
+                   "horror of it."),
+                  ("to be remembered by someone",
+                   "To have someone cut their hair for you. A simple want. The hardest thing on the Hide to come by, "
+                   "with so few left to cut.")),
+        "lhand": (("a lock of cut hair",
+                   "A lock of someone. You won't say who. Every morning you'll check it's still there. Every "
+                   "mourning, I should say."),
+                  ("a name somebody else is grieving",
+                   "A stranger's grief, carried by mistake and folded small. It'll steer you. Grief makes a better "
+                   "compass than most.")),
+        "rhand": (("everyone the Red takes",
+                   "You let them go to the water without a fight. The Grandmother does the same. One day it'll be "
+                   "you on the shore with the scissors."),
+                  ("the one who mourns you, unknowing",
+                   "Somewhere someone grieves for you, and you let them, and walk the other way. Kind, or cowardly. "
+                   "Grief doesn't care which.")),
+        "belly": (("the sound of the scissors at the tide line",
+                   "The next loss, because there's always a next. You'll hear the blades in the surf. Everyone on "
+                   "this shore does, at night."),
+                  ("being forgotten by the one who grieved",
+                   "The worst fear on the shore. To be mourned, and then not. To be cut away with the hair.")),
+        "feet": (("the tide line, walked at dusk",
+                  "Along the wrack and the drowned, the way the mourners walk. The Red came up to meet you. It does "
+                  "that, for its own."),
+                 ("a funeral road, walked the wrong way",
+                  "From the grave toward the living, against the procession. They stepped aside for you and didn't "
+                  "know why.")),
+        "under": (("the Grandmother of the Red, with no hair left to cut",
+                   "Under you, the oldest mourning of all, shorn bare and still weeping. She's grieving for you "
+                   "already. Ahead of time. She's always ahead of time."),
+                  ("your own wake, held long before you rose",
+                   "Under everything, a mourning for you, finished and swept up. Rather a lot of hair, for someone "
+                   "only just born.")),
+    },
+    "key": {
+        "brow": (("an iron face with the count behind it",
+                  "A face like a locked door. People will think something precious is inside. Something is. Not what "
+                  "they'd hope."),
+                 ("the face of whoever comes with the key",
+                  "A face that opens things. Doors will. People won't, around you. They'll hold their breath and hope "
+                  "you pass.")),
+        "heart": (("every bone in its place",
+                   "Order to the last splinter. Beyond the Pale they'd call that holy. Out here it's merely "
+                   "exhausting."),
+                  ("the door the Pale Order keeps shut",
+                   "To open the one thing that should stay closed. Every keeper has that want, deep down. That's why "
+                   "they're chosen. They know it from inside.")),
+        "lhand": (("a key that locks the count",
+                   "The closing, in your hand. Nothing gets out past you. Nothing gets in either, and that's lonelier "
+                   "than it sounds."),
+                  ("a key never meant to be turned",
+                   "Warm from waiting. Something on the far side of the lock knows exactly whose hand it's in.")),
+        "rhand": (("whatever you locked away",
+                   "You let go of what you shut in, and forget where the door was. Mercy, perhaps. The door won't "
+                   "forget."),
+                  ("the lock, and all it kept",
+                   "You let the count go. Bones out of their places, rattling in the dark. Somewhere beyond the Pale "
+                   "a brother wakes and can't say why.")),
+        "belly": (("a bone out of its place",
+                   "One splinter wrong and you can't sleep. Every keeper is a little mad that way. You'll count the "
+                   "fallen under your breath, and hate yourself for it."),
+                  ("the click of the lock giving way",
+                   "Listening for it, always. Every door that shuts behind you, you'll turn to check. One day you'll "
+                   "hear it.")),
+        "feet": (("the cloisters of the Pale, swept bare",
+                  "The long cold halls where the count is kept. Bare feet on bare stone. You know the number of every "
+                  "flagstone and don't know you know it."),
+                 ("a road through a door left open",
+                  "You came through a place that should have been locked, and wasn't. Someone left it ajar. Someone "
+                  "will be blamed.")),
+        "under": (("the lock the whole world turns in",
+                   "Under you the count, closed, and the world held shut by it. Heavy to lie on. Heavier to stand "
+                   "on, which is what you'll be doing."),
+                  ("a hand already on the key",
+                   "Under everything, the turning has begun. Slowly. Hear it? No. You won't, until it's done.")),
+    },
+    "cup": {
+        "brow": (("a beggar's face at the door, very polite",
+                  "Humble, patient, harmless to look at. That's the face the Ghauul wears too, when it knocks."),
+                 ("the face that opens the door at night",
+                  "A house that answers. Welcoming. Too welcoming. People will stay too long near you and wake "
+                  "lighter.")),
+        "heart": (("marrow, asked for nicely",
+                   "What's at the middle of things, and you'll ask, and ask, and ask. Politeness is a kind of "
+                   "siege."),
+                  ("to let the knocking in",
+                   "To open the door just to see. There are more doors here than there are living to open them.")),
+        "lhand": (("an empty bowl held out",
+                   "Need itself, held out. Strangers will drop things in. Some of those things will still be "
+                   "moving."),
+                  ("a latch you have already lifted",
+                   "You're holding the door open a crack. You think nobody's noticed. Something has.")),
+        "rhand": (("your pride, for asking at all",
+                   "You drop the pride and keep the bowl. Beggars last. The proud are mostly bones in the heaps below "
+                   "the stair."),
+                  ("the door, wide open",
+                   "You let go of the door and the night walks in. Guest, or tenant, or owner. You find out which by "
+                   "morning.")),
+        "belly": (("the door staying shut",
+                   "The knock nobody answers. Asking forever. That's the Ghauul's fear too, if it fears. Odd company "
+                   "to keep."),
+                  ("whatever is knocking",
+                   "The asking at the door. You'll hear it everywhere. Hollow trees, old helms, your own ribs.")),
+        "feet": (("a road from door to door to door",
+                  "The long way, asking at every house. The houses are all empty now. You asked anyway. Something "
+                  "answered at the last one."),
+                 ("a road that ends at your own threshold",
+                  "All the way round, back to your own door, knocking. Let yourself in? Careful. It doesn't look "
+                  "quite like you.")),
+        "under": (("the Ghauul, knocking for marrow",
+                   "Under you, the polite one, knuckles to the floor of the world. Knock, knock. It will knock all "
+                   "your life, waiting for you to answer."),
+                  ("a house that answered once",
+                   "Under everything, a door already opened. Whatever came in through it is still inside. You're "
+                   "standing on its roof.")),
+    },
+    "bell": {
+        "brow": (("a face that hears something under the water",
+                  "Always listening for a sound nobody else catches. You'll stop mid-step, head tilted. Others will "
+                  "stop too, hear nothing, and be afraid."),
+                 ("a face that rings true, and shouldn't",
+                  "Everything you say will sound right. Clear as a bell. On the Hide nothing true is clear, so mind "
+                  "what sounds it.")),
+        "heart": (("to answer a call only the drowned can hear",
+                   "Something under the water is calling, and you want to answer. That's a long way down from "
+                   "wanting to live."),
+                  ("to ring one true note, once",
+                   "One clear sound in a broken world. Ambitious. The drowned court would come up to hear it. All of "
+                   "them.")),
+        "lhand": (("a clapper wrapped in weed",
+                   "The bell's silence, the muffle, held in your hand. While you hold it the court stays down. Your "
+                   "hand will cramp."),
+                  ("a note held perfectly in tune",
+                   "Something exact. Exact things draw attention. Down in the water, something keeps time with "
+                   "you.")),
+        "rhand": (("the living, out of step",
+                   "You let go the warm and the clumsy and fall into the drowned court's time. Graceful, after that. "
+                   "Very graceful. Very cold."),
+                  ("the long quiet the bell kept",
+                   "You let it go, and the bell rings. Somewhere under the water a court begins to walk.")),
+        "belly": (("the bell stopping",
+                   "The silence after the last ring. The drowned keep time by that bell. If it stops, they'll come "
+                   "up to see why."),
+                  ("the bell sounding right",
+                   "Perfect pitch. A sound with no flaw in it. Somehow you know the world wasn't built to bear "
+                   "one.")),
+        "feet": (("the old spine, walked in step with the drowned",
+                  "Along the bones of something huge, keeping time with feet that weren't there. You'll walk in step "
+                  "with them a while yet. Count the beat."),
+                 ("a road that rings under every footfall",
+                  "Every step sounded, all the way here, and every step was heard. Hollow ground. Something under it "
+                  "was listening.")),
+        "under": (("the drowned king's court, walking",
+                   "Under you, a procession in the Red, in perfect step, going somewhere it never arrives. It's "
+                   "walking toward you now. Slowly. Always slowly."),
+                  ("a drowned bell, in tune at last",
+                   "Under everything, the bell has found its note. Can you hear it? Lucky. The drowned can, and "
+                   "they're all turning to listen.")),
+    },
+    "coin": {
+        "brow": (("a merchant's smile on a picked-clean face",
+                  "A face that prices things. People will feel weighed when you look at them. Some will like it, the "
+                  "way the drowning like a rope."),
+                 ("the face of a buyer who didn't ask the price",
+                  "Eager. Open. Easy to sell to. You'll leave most bargains a little poorer and not mind. The minding "
+                  "comes later.")),
+        "heart": (("to sell whatever is left",
+                   "Everything has a price at the end of the world, even the end of the world. You want to know what "
+                   "it would fetch."),
+                  ("to buy, and pay too much",
+                   "To own something, anything, at any cost, on a dead shore, from the one merchant left. Think "
+                   "what he charges.")),
+        "lhand": (("a coin from the end of the world",
+                   "The first coin, or the last. Same coin. It'll buy one thing, once. Choose carefully. Or don't. "
+                   "The coin chooses anyway."),
+                  ("a thing you paid far too much for",
+                   "The bargain kept close, and you won't say what it cost. You'll find out. Everyone finds out what "
+                   "things cost, here.")),
+        "rhand": (("whatever will sell",
+                   "Anything with a price, you let go. Nothing you own will last. You'll be light, and empty, and "
+                   "never quite poor."),
+                  ("the price, gladly",
+                   "You pay without counting. Generous, or careless. The merchant loves that kind. He'll remember "
+                   "you.")),
+        "belly": (("having nothing left to sell",
+                   "The merchant's fear, and it's catching. When there's nothing left, they say, you sell the name. "
+                   "You haven't got one yet. You'll want one, for that."),
+                  ("what you have already paid",
+                   "The bill. It's been settled, and you don't know what with. Something's missing. Count your "
+                   "fingers. Count your names.")),
+        "feet": (("the market road along the dead shore",
+                  "The merchant's way, past every corpse he'd picked. Some of them still had their coin. Not "
+                  "anymore."),
+                 ("a road you bought, and paid for twice",
+                  "Every step of it purchased. The seller's still owed. He'll come along the shore one day with his "
+                  "hand out, smiling.")),
+        "under": (("the merchant who picks the shore clean",
+                   "Under you, the last trader, counting. He's priced you already. Not a high price. He's very "
+                   "fair."),
+                  ("a bargain struck in the dark, still open",
+                   "Under everything, a deal half done. Somebody sold you into the world. The buyer hasn't come to "
+                   "collect. Yet.")),
+    },
+    "kiln": {
+        "brow": (("a face fired hard",
+                  "Whatever was soft in it went into the heat and didn't come out. People will break against you. "
+                  "You won't notice."),
+                 ("a face with a crack across it",
+                  "Fired too fast. It'll hold, mostly, but light comes through the crack at angles, and people will "
+                  "stare at the light.")),
+        "heart": (("to be hardened by what you go through",
+                   "You want the fire. You want to come out iron. The Deep sets the old one's blood that way, slow, "
+                   "under the world. It's a long firing."),
+                  ("to break in the fire and be done",
+                   "To shatter rather than set. Iron lasts. Shards rest.")),
+        "lhand": (("a coal you won't drop",
+                   "Heat in a bare hand. That hand won't be soft again. That hand will be very good at holding."),
+                  ("a shard that broke in the firing",
+                   "The failure, sharp, carried close, and you keep cutting yourself on it. You'll know the shape of "
+                   "the break better than the shape of the pot.")),
+        "rhand": (("everything soft in you",
+                   "You let it go piece by piece. Kindness first, usually. Then the rest. The fire is very "
+                   "thorough."),
+                  ("the shape you were meant to have",
+                   "The mould let go before it set. Now you're whatever shape the fire left. Ugly, maybe. Your "
+                   "own.")),
+        "belly": (("going in soft and coming out soft",
+                   "That nothing will change you. That you'll go through everything and be no harder. You'll go "
+                   "looking for heat."),
+                  ("the crack you can feel spreading",
+                   "What's already happening. A fine line through the middle. Listen at night. You'll hear it "
+                   "tick.")),
+        "feet": (("a road through the heat under everything",
+                  "Up from below, past the Deep, where the blood turns to iron. Your feet were warm when you rose. "
+                  "Did you notice? I did."),
+                 ("a road of broken pots",
+                  "Shards the whole way. Everything that came out of the fire wrong was thrown on that road. You "
+                  "walked out over the failures. You're not one of them. Yet.")),
+        "under": (("the Deep, setting blood to iron in the dark",
+                   "Under you, the slow forge of the world, patient as a mother. Every iron thing on the Hide came "
+                   "from there. You'll feel at home near iron."),
+                  ("a crack running all the way down",
+                   "Under everything, a fault. The whole world was fired with a flaw in it, and you're standing "
+                   "right on the line. Tread lightly.")),
+    },
+    "loom": {
+        "brow": (("a face coming undone, thread by thread",
+                  "Something is unpicking this face, and humming. People will see it fray and pity you. Pity is a "
+                  "thread too. The Crone picks that one out last."),
+                 ("a face stitched back together, lumpy",
+                  "Mended badly, but mended. People will see the stitches and trust you more, oddly. Mended things "
+                  "have been through something.")),
+        "heart": (("to be unpicked down to the first thread",
+                   "To know what you were before the weaving. There's nothing there. The first thread is tied to "
+                   "nothing. That's the trick of it."),
+                  ("to be stitched back together, however badly",
+                   "To be whole, even ugly. A sound want. The Crone won't allow it. That's what makes it brave.")),
+        "lhand": (("a loose thread you keep pulling",
+                   "You can't leave it alone. Every tug undoes a little more. Of what? Pull and find out, you'll "
+                   "say."),
+                  ("a knot of thread from somebody else's life",
+                   "A tangle that isn't yours. Some other weaving got caught on you. You'll find its owner, or "
+                   "what's left. The thread will see to it.")),
+        "rhand": (("whatever was woven wrong",
+                   "You let the mistakes unravel. Cleaner, after. Thinner too. A cloth can only lose so many "
+                   "threads."),
+                  ("a thread you should have kept",
+                   "You let go of something that held you together. You won't notice until the wind gets in.")),
+        "belly": (("the humming behind the veil",
+                   "The Crone's tune. You'll hear it in the wind, in wet sand dragging back, in your own breath. A "
+                   "low tune. Patient fingers."),
+                  ("unravelling all at once",
+                   "Not slowly. One pulled thread and the whole thing in a heap. You'll walk very carefully, as if "
+                   "that could help.")),
+        "feet": (("a road that unspools behind you",
+                  "Every step, the road behind comes undone. No going back. There never was. Now you're only honest "
+                  "about it."),
+                 ("a road darned from other people's roads",
+                  "Patched from journeys past counting, none of them yours. You'll know places you've never been. Don't "
+                  "trust that knowing.")),
+        "under": (("the Crone, picking you out and humming",
+                   "Under you, the one behind the veil, already at work, fingers in the weave. She has found your "
+                   "loose end. She's in no hurry."),
+                  ("a patch that holds, mostly",
+                   "Under everything, a repair, crude, holding the whole spread together. Somebody mended this world "
+                   "once. Rather badly. It's held so far.")),
+    },
+    "lanternwright": {
+        "brow": (("a maker's soot-dark face",
+                  "The face of someone who makes the lights. Nobody does, now. People will see it and remember there "
+                  "used to be such hands. So will the ones who hunted them."),
+                 ("a face that looks up as the light goes out",
+                  "Watching the kept soul leave the lantern like a breath. A face for farewells. You'll be good at "
+                  "them. You'll have many.")),
+        "heart": (("to keep what was lost",
+                   "You can't bear the going. You'll hold the dead in glass and flame. That's love, here. It's also "
+                   "a cage."),
+                  ("to let go of everything you kept",
+                   "To open every lantern. A beautiful want, and a terrible one. The kept are all that's lighting "
+                   "the way.")),
+        "lhand": (("a lantern nobody knows how to make anymore",
+                   "The last of a craft, in your hand. People will want it. People will kill for it. People have."),
+                  ("an empty lantern with its door open",
+                   "The lantern after the breath has left it. Empty, and still warm. You won't say who was inside.")),
+        "rhand": (("anything you try to keep",
+                   "Everything you hold, you'll lose, and you know it. You'll make the light anyway. That's what "
+                   "makers are for."),
+                  ("a breath, out of the top of the lantern",
+                   "You let the kept one go. The light rises like an out-breath and is gone. The road gets darker. "
+                   "The soul gets free. Pick one.")),
+        "belly": (("the last lantern going dark",
+                   "The world unlit. Fair enough. It's mostly unlit already. You'll carry your light through it like "
+                   "a held breath."),
+                  ("being kept, when you want to go",
+                   "The glass. Ending up inside, shining for strangers. Every lantern carries you back when you fall. "
+                   "Think on that.")),
+        "feet": (("the road the hunted makers took",
+                  "Quiet, at night, without lights. The makers learned to walk dark. They had their reasons."),
+                 ("a road that goes up and out with the light",
+                  "You came down the way the freed go up. Against the current. Something has noticed you came "
+                  "down.")),
+        "under": (("the last maker, hiding something lit",
+                   "Under you, someone crouched over a little flame, shielding it. The last of the makers. What "
+                   "they're keeping alive down there is no business of mine. Or yours. Yet."),
+                  ("every soul let out of every lantern",
+                   "Under everything, all the freed lights, gone up and out. Nothing left to see by. You'll make do "
+                   "with what you carry.")),
+    },
+    "choir": {
+        "brow": (("a mouth open on a note that never ends",
+                  "Always about to speak, always singing something under it. People will lean close to hear. Don't "
+                  "let them lean too close."),
+                 ("a face holding its breath",
+                  "Tight, held, waiting. A face like that is a pause, and things come in through pauses. I'd keep "
+                  "talking, if I were you.")),
+        "heart": (("to hold on, past all breath",
+                   "To keep the note going when the lungs say no. Admirable. The Choir has held it for ages beyond "
+                   "counting, and look at them."),
+                  ("the rest between the notes",
+                   "The gap where nothing is said. Once, everyone breathed in at the same moment. I won't tell you "
+                   "what came in.")),
+        "lhand": (("a note you won't let go of",
+                   "One sound, steady, against everything. That's how a world is kept up, they say. Someone always "
+                   "holding the note."),
+                  ("a breath you've been saving",
+                   "Hoarded air, for something. A last word, or a first one. You'll know when. You won't like it.")),
+        "rhand": (("your own voice, into the stone",
+                   "You give your voice to the crypts. The walls will hum with it after you've gone. You'll go "
+                   "quieter all your life."),
+                  ("the note, at last",
+                   "You let the note go. Just for a breath. In that breath something very large can slip in. It "
+                   "has before.")),
+        "belly": (("the note ending",
+                   "The last breath of the song, and what comes in after. A good instinct. Keep it."),
+                  ("what comes in the quiet",
+                   "Not the dark. Not the dead. The gap between words. The oldest fear there is, and truer than the "
+                   "rest.")),
+        "feet": (("the low wet roads under the crypts",
+                  "Up through the Choir's own passages, and the note followed you up the stair. Put an ear to your "
+                  "bones and you can hear it still."),
+                 ("a road with no sound on it at all",
+                  "Not a footfall, not a breath, the whole way. You came out of a quiet so deep it had no name. "
+                  "Let's not give it one.")),
+        "under": (("the Drowned Choir, still holding the note",
+                   "Under you, the long note, rising out of the Red. It's what keeps the floor up, more or less. "
+                   "Don't interrupt them."),
+                  ("the rest the singers are afraid of",
+                   "Under everything, a gap in the song. Something lives in it. It's been very patient. It has "
+                   "nothing else to be.")),
+    },
+    "tithe": {
+        "brow": (("a debtor's lowered face",
+                  "The face of the Tithed, all of them, eyes down. You'll pass among the last of them and be taken "
+                  "for kin. You might be."),
+                 ("a polite face at the door at night",
+                  "The collector's face. Unhurried. Owed. People will pay you things before you ask. That's the face "
+                  "working.")),
+        "heart": (("to be paid up, and free",
+                   "To owe nothing. Nobody here has ever owed nothing. The want will drive you hard, and the debt "
+                   "will grow faster than the paying."),
+                  ("everything, not just your share",
+                   "To collect it all, every debt the world owes. That's a great deal of knocking. You'll have the "
+                   "patience. Collectors do.")),
+        "lhand": (("a debt nobody remembers taking",
+                   "The owing, kept close, like a stone in a pocket. Whose loan? Nobody remembers. Everybody pays. "
+                   "That's the Tithe."),
+                  ("a ledger with your own name in it",
+                   "You keep the book. Your name's in it, near the bottom, unpaid. Funny. You haven't got a name yet. "
+                   "The ledger has.")),
+        "rhand": (("your share, every time",
+                   "You pay without arguing. A good debtor. The best debtors are bled the longest. Everything here "
+                   "takes its share of the hide."),
+                  ("the waiting, to go and collect",
+                   "You stop waiting to be paid and go knocking in person. Doors will open faster after that. Not "
+                   "gladly.")),
+        "belly": (("the knock",
+                   "The collector's knock, at the dark end of the night. The Tithed all fear it. You'll lie awake "
+                   "listening, hear your own heart, and think it's the door."),
+                  ("a debtor who cannot pay",
+                   "The one who owes and has nothing. What does a collector take then? You know. That's the fear.")),
+        "feet": (("a road paved with what was paid",
+                  "Over the offerings of everyone who paid before. A road of small losses, smooth with walking. Every "
+                  "stone a little piece of someone."),
+                 ("the collector's road, walked at night",
+                  "The way the collector comes. Doors shut along that road as you passed. They knew the step.")),
+        "under": (("a loan from whatever gave the first mourning",
+                   "Under you, the first debt, older than anyone. You were born owing. So were we all. Don't feel "
+                   "special."),
+                  ("the one who comes to collect",
+                   "Under everything, the collector, by the door of the world. Not for you. Not yet. Only checking "
+                   "the address.")),
+    },
+    "crown": {
+        "brow": (("a hollow crown, giving orders to the wind",
+                  "A face that commands, and nothing listens. The wind is very polite about it. You'll keep giving "
+                  "orders. A habit. Also a curse."),
+                 ("a face waiting to be told what to do",
+                  "An obedient face, ready. People will try to use it. Something on the brown moon will try too. It "
+                  "is always looking for willing faces.")),
+        "heart": (("to be obeyed, just once",
+                   "One order followed. That's all. The Man in the Rust has wanted the same since before the world "
+                   "had a name. It's a lonely want."),
+                  ("to obey, with nothing left to obey",
+                   "To kneel to something and find it has no hands. The Hide is full of people who want this. They "
+                   "make the best faithful.")),
+        "lhand": (("an order no one will carry out",
+                   "A command held like a coal. You can't pass it on. You can't drop it. It'll burn there until "
+                   "someone takes it, and nobody will."),
+                  ("the keys of an empty city",
+                   "Every door of a place no one lives. Streets of rust. You'll know the way through them in your "
+                   "sleep. You'll go there in your sleep.")),
+        "rhand": (("the crown, though it never fit",
+                   "You set down a rule you never had. Easier, after. A crown that fits nobody is lighter on the "
+                   "ground."),
+                  ("your last order, into the silence",
+                   "You give the final command and let it go out into nothing. Nothing answers. That's an answer, "
+                   "here.")),
+        "belly": (("nobody listening",
+                   "That you're speaking to no one. That the cards are. That I am. ...Well. Moving on."),
+                  ("an order you can't refuse",
+                   "Being told. Being bound. Something on the dark moon has been composing an order for a very long "
+                   "time. It will fit you exactly.")),
+        "feet": (("a road toward the brown moon",
+                  "You came up out of the Red already facing the dark moon. Not walking toward it. Facing it. Turn "
+                  "your head away now and then. Do."),
+                 ("the empty streets of the city that would obey",
+                  "Through rust and doorways, and every doorway leaned toward you, wanting an order. You gave none. "
+                  "They're still leaning.")),
+        "under": (("the Man in the Rust, still giving orders",
+                   "Under you, in the Red, the dark moon's reflection, and in it the Man in the Rust, commanding. "
+                   "Reflections listen better than people do. That's what worries me."),
+                  ("an empty city, waiting for a voice",
+                   "Under everything, rust and doorways, all waiting to be told. One day you'll speak near them. "
+                   "Mind what you say.")),
+    },
+}
+
+# ------------------------------------------------------------------ the telling, at the end
+# a part to a click, in the order a life goes; {m} the card's meaning in its place, {M} capitalised, {n}/{N} its name,
+# {s} its whole reading (the card under the body: never read until now), {w} who wears that mantle now
+TALE = {
+    "open": ["Now. All of it at once, the way the cards meant it.",
+             "Listen, then. This is you, as the cards tell it. Not as you'd tell it. You'd lie."],
+    "feet": ["You came by {m}, though you'll swear you only climbed a stair.",
+             "The road first. {M}. You won't remember walking it. Roads here don't need you to."],
+    "brow": ["You rose out of the Red wearing {m}, and the Hide will know you by it.",
+             "And the face. {M}. Wear it well. It was worn before you."],
+    "heart": ["Behind the face, always, the wanting. {M}.",
+              "Under it all you want {m}. Quietly. Always."],
+    "belly": ["Low down, where nobody looks, you fear {m}. Keep the fear. It's the one thing here that won't lie to you.",
+              "And the fear, curled in the belly. {M}. Feed it nothing. It'll grow anyway."],
+    "lhand": ["The left hand keeps {m}, and opens for no one.",
+              "In the keeping hand, {m}. Mind the grip."],
+    "rhand": ["The right lets go of {m}, the way the tide lets go of the shore. Not for long.",
+              "And the right hand opens. {M}, gone. The Hide keeps what falls."],
+    "under": ["And the one in the Red, face down all this while. {N}. {s}",
+              "Last, the card under everything. {N}. {s}"],
+    "close": ["That's the telling. It isn't finished. They never are.",
+              "That's you. For now. The cards are only ever for now."],
+    "prophecy": "The cards keep one last word back. It's for you, not for me.",
+    "go": ["The mirror, then, in the great face's mouth. Look into it until it looks back, and walk in. It's the only door "
+           "this room has ever had.",
+           "Up the last step, into the black glass. Don't look back. Nothing behind you is yours anymore."],
+}
+CLOSE_SUM = "And this is what they made of you, all told."
+
+# what the spread's shape says (tried in order; the first few that hold are said)
+SHAPES = {
+    "many_rev": "Most of you came up head down. Don't fret. Everything here is the wrong way up. Ask the cities on the ridge.",
+    "none_rev": "Not one card turned against you. I've seen that before. It didn't last.",
+    "heart_belly": "You fear the very thing you want. That isn't a flaw. That's the shape of a pilgrim.",
+    "hands": "Both hands out of the same suit. One of them will drop it, and you won't know which until it's on the ground.",
+    "calling": "There's more {a} in you than you know. {Crown} is thorough.",
+    "under_rev": "And the one in the Red lay head down too. Of course it did. It's the only card lying the right way.",
+}
+
+# the calling it has become (Derek, 2026-10-10: "like an identity or mantle they take on, the role they become"): a
+# coronation and a sentence at once, a paragraph to a click
+CALLING = {
+    "ossumancer": [
+        "The bone has you. Feel it? You're standing straighter already. Ossuarch. Not a name. An office, and nobody has "
+        "ever held it long.",
+        "Your mantle is black iron with bone grown through it. You'll keep the count now. Every bone out of its place "
+        "will itch in you like a splinter you can't reach.",
+        "An Ossuarch lets things finish. Everything that was ever told is still dying, slowly, and someone has to say "
+        "enough. The living will step aside for you. Not out of respect.",
+        "The cost is the bone itself. It grows under the plate, where nobody looks. You won't bend. One day you'll "
+        "break, and someone else will put on the iron, and count you.",
+    ],
+    "animancer": [
+        "The thread pulled tight. Hollow Mystic. One of the circles that stopped covering the glass, and looked.",
+        "Your mantle is a coat of hollowed mirrors, and the dead stop at their own faces in every piece of it. People "
+        "will turn their mirrors to the wall when you pass.",
+        "You'll keep the dead. Not save them. Keep them. The few left will hand you their dead anyway, because nobody "
+        "else will hold them.",
+        "The cost is that they never go through. The loom never finishes, and you're a thread in it now, pulled "
+        "tight. Hold still, little thread.",
+    ],
+    "hemomancer": [
+        "It was always going to come up red. Red Penitent. The processions will know your hat before they know your "
+        "face.",
+        "Your mantle is the hood and the welts. You'll break the bloodletter's rule. Open yourself, call the Maiden "
+        "down, and tell her what to make.",
+        "A Penitent tells a mindless thing what the blood is for. Someone forgot to tell it, once, and a wound hatched. "
+        "Blood given is not blood taken. You'll say that often. You'll need to.",
+        "The cost is your own life, every time, and she drinks what spills. She'll leave you your mind. Mostly.",
+    ],
+    "miasmancer": [
+        "Breathe in. Shrine Keeper. The folk will say you steal breath. You'll say you still it. Both, and steel at the "
+        "end of it.",
+        "Your mantle is the fan, and a cord at the wrist with a knot for every breath held. A cloud at your back will "
+        "think other people's thoughts.",
+        "You'll hold what the wind is full of, grudges and lies and sour hopes, until it sets hard in the chest and "
+        "comes out an edge.",
+        "The cost comes last. A keeper who holds too much walks down into the water, still holding. Not yet. Breathe "
+        "out. Slowly.",
+    ],
+    "monk": [
+        "Nothing in the bowl. Of course. Empty Hand. A beggar of the Gilded Peak, or something wearing one.",
+        "Your mantle is gold so bright the face beneath it goes away. To be looked at and not seen. The Peak called "
+        "that holy. The Peak isn't there anymore.",
+        "The gap at the top of you has two hands, both empty, and both unmake. One with light, one with dark. You're "
+        "one of the hands now. Don't ask which.",
+        "The cost is that you keep nothing. Whatever you hold, you'll let go. Whatever you touch goes quiet. Put a "
+        "name in the bowl. It won't keep.",
+    ],
+}

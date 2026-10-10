@@ -8,31 +8,33 @@ the fanned deck and turned over, one of them chosen, landing upright or reversed
 the end weaves the whole spread into one telling. What each card does in each place stays hidden (ui/reading.gd takes
 it from the old pools of data/reading.json, by card and place and which way up).
 
-The Stranger's voice (docs/wiki/mythology/areas/the-red-shore.md; Derek): he speaks through the pilgrim, to himself
-and to the cards, as if no one were quite there; the pilgrim is "it"; the lore hides under the puns.
+The Stranger's words are in tools/reading/words.py (third pass, 2026-10-10: the lowland rhyme to open, the bridges
+between the draws, a reversal line of its own for every card, every card's reading in every place with its subtext).
 
   python tools/reading/spread_data.py
 """
 import os
 import json
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import words as W  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 # the places of the spread, in the order they are drawn (the crown is the calling, face up from the start)
 PLACES = [
-    dict(id="brow", name="The Brow", what="the face they wear", pool="cards",
-         ask=["The brow first. Draw three, face down. One of them will be the face they wear."]),
-    dict(id="heart", name="The Heart", what="what they want", pool="seeks", ask=[]),
-    dict(id="lhand", name="The Left Hand", what="what they hold", pool="answers", ask=[]),
-    dict(id="rhand", name="The Right Hand", what="what they let go", pool="sacs", ask=[]),
-    dict(id="belly", name="The Belly", what="what they fear", pool="fears", ask=[]),
-    dict(id="feet", name="The Feet", what="the road they came by", pool="roads", ask=[]),
-    dict(id="under", name="Under Them, in the Red", what="what lies beneath", pool="cards",
-         ask=["One last card, face down, under them in the Red. We haven't read that one yet. Read. Red. Always red."]),
+    dict(id="brow", name="The Brow", what=W.PLACE_WHAT["brow"], pool="cards"),
+    dict(id="heart", name="The Heart", what=W.PLACE_WHAT["heart"], pool="seeks"),
+    dict(id="lhand", name="The Left Hand", what=W.PLACE_WHAT["lhand"], pool="answers"),
+    dict(id="rhand", name="The Right Hand", what=W.PLACE_WHAT["rhand"], pool="sacs"),
+    dict(id="belly", name="The Belly", what=W.PLACE_WHAT["belly"], pool="fears"),
+    dict(id="feet", name="The Feet", what=W.PLACE_WHAT["feet"], pool="roads"),
+    dict(id="under", name="Under You, in the Red", what=W.PLACE_WHAT["under"], pool="cards"),
 ]
 
-# the mantles: what he says to each, upright and reversed; the bible's phrase for each (who wears it upright, and
-# reversed), its aspect (the card faces' sigils, tools/reading/card_fronts.py), and who wears it now
+# the mantles: the bible's phrase for each (who wears it upright, and reversed), its aspect (the card faces' sigils,
+# tools/reading/card_fronts.py), and who wears it now; the last two (his old lines) are kept for the record only
 M = [
     ("unwritten", "silence", "the one who ends the turn", "the one who begins the next", "nobody yet",
      "Nothing on it. Good. It'll write itself in somebody else's hand.",
@@ -43,7 +45,7 @@ M = [
     ("digger", "bone", "the one who buries", "the one who digs them up", "the Ossuary Matron",
      "The Hands. It's buried more than it remembers. The hands remember.",
      "Digging the other way now. Up. Mind what comes up with it."),
-    ("veil", "soul", "the one drawn to the light that burns it", "the one already burned", "the moths with the white faces",
+    ("veil", "soul", "the one drawn to the light that burns it", "the one already burned", "the moths with the pale faces",
      "The Singed Veil. Goes to every light that burns it. The moths have the right of it.",
      "Already burned. Not much left to be drawn to anything."),
     ("swaddling", "flesh", "the one who is carried", "the knife that cut the cloth", "every child the Deep asks for",
@@ -103,438 +105,11 @@ M = [
      "The city that would obey if it could. Can't. Never could."),
 ]
 
-# how each place is told in the weaving, the card's phrase in its gap
-WEAVE = {
-    "brow": "They wore the face of {p}.",
-    "heart": "They are after what {p} is after.",
-    "lhand": "In their left hand, {p}.",
-    "rhand": "They let go of {p}.",
-    "belly": "Down in the belly, they fear {p}.",
-    "feet": "They came the way of {p}.",
-    "under": "And under them, in the Red, {p}. {w} wears that one.",
-}
-OPEN = ["Here's how it lies.", "There. That's the newborn, laid out."]
-# what the spread's shape says (the order they are tried; the first few that hold are said)
-SHAPES = {
-    "many_rev": "Most of the cards lie the wrong way up. So does everything here.",
-    "none_rev": "Not one card turned against them. That's rare, and never good.",
-    "heart_belly": "They fear the very thing they want.",
-    "hands": "Both hands hold the same thing. One of them will drop it.",
-    "calling": "There's more {a} in them than they know.",
-    "under_rev": "And the card underneath is reversed too.",
-}
-CLOSE = ["A moment ago they were nothing, and it was so quiet.", "Up they get, then."]
-ASPECT_WORD = {"bone": "bone", "soul": "thread", "flesh": "flesh", "breath": "breath", "silence": "quiet"}
-
-
-# Derek, 2026-10-09: "a bit more detailed and story like, with more meaning given in each draw. and more stuff about how
-# the deck draws you". Each card's own line (upright, reversed), longer, a small story with the lore under it; and what
-# it MEANS for the pilgrim (gist), read in the place it fell (READ).
-STORY = {
-    "unwritten": ("The Unwritten. A blank page. Blank isn't empty. It's waiting for a hand.",
-                  "The Unwritten, reversed. Written and wiped so often the page has worn thin.",
-                  "a turn nobody has taken yet", "a story already told too many times"),
-    "pilgrim": ("The Pilgrim. Always walking, never asking where. The road is worn a man deep.",
-                "The Pilgrim, reversed. Sat down by the road with their boots off. The road ran out.",
-                "to keep walking and never ask where", "to stop, at last, and not get up"),
-    "digger": ("The Gravedigger's Hands. They dig straight and deep, and never look in.",
-               "The Hands, reversed. Digging up what was buried for a reason.",
-               "to bury what they cannot carry", "to dig up what was put down for a reason"),
-    "veil": ("The Singed Veil. Drawn to the one light that will burn it, and going anyway.",
-             "The Veil, reversed. Already burned. Nothing left to lose, and lighter for it.",
-             "the light that burns them", "nothing, now; they have already burned"),
-    "swaddling": ("The Swaddling. Wrapped tight against the ash, and carried. Someone always carries.",
-                  "The Swaddling, reversed. Someone took a knife to the cloth. To free what was inside, maybe.",
-                  "to be carried, and to carry", "the knife that cuts the cloth"),
-    "gleaner": ("The Gleaner. Old Scythe, who comes up once an age for the harvest and never misses.",
-                "The Gleaner, reversed. The one who keeps Old Scythe down in his pit, counting.",
-                "the end that comes for everything", "to keep the end under, a little longer"),
-    "saint": ("The Weeping Saint. She bled so people would believe her, and they did.",
-              "The Saint, reversed. The crowd that came to watch her. Not one of them helped.",
-              "to suffer, so as to be believed", "to watch, and do nothing"),
-    "scholar": ("The Scholar's Eye. It reads until the page starts reading back.",
-                "The Eye, reversed. The eyes in the Needle, looking back. Once they see someone, they keep looking.",
-                "to know, whatever knowing costs", "the eyes that look back"),
-    "hanged": ("The Hanged Twin. Hung over still water, with a twin a breath behind in the reflection.",
-               "The Twin, reversed. Now the twin is a breath ahead, and waiting.",
-               "a twin a breath behind them", "a twin a breath ahead, waiting"),
-    "knot": ("The Knot of Mouths. One hunger, many mouths. Eat to keep, keep to eat.",
-             "The Knot, reversed. The one that gets eaten. Better to know which one they are.",
-             "to eat, and keep what they eat", "to be eaten"),
-    "wick": ("The Wick. It burns down to give a little light. Every lantern has one inside.",
-             "The Wick, reversed. The dark just past the light. Patient. Always there.",
-             "to burn themselves down for a little light", "the dark at the edge of every light"),
-    "mourner": ("The Mourner. She cuts her hair for everyone the Red takes, and it takes them all.",
-                "The Mourner, reversed. The one being mourned. Somebody has cut their hair for the newborn already.",
-                "grief that cuts and keeps cutting", "to be mourned, and not know it"),
-    "key": ("The Ossuary Key. It locks the count, every bone in its place.",
-            "The Key, reversed. The one who opens what was locked. Someone always does.",
-            "to lock the count and keep it", "to open what was locked"),
-    "cup": ("The Beggar's Cup. It knocks at the door and asks, very politely, for marrow.",
-            "The Cup, reversed. The house that opens the door. Never open the door at night.",
-            "to ask, and keep on asking", "to open the door to what knocks"),
-    "bell": ("The Drowned Bell. It rings under the water, where only the drowned can hear.",
-             "The Bell, reversed. Rung in tune at last. A drowned bell shouldn't sound right.",
-             "a call only the drowned can hear", "a bell rung true, for once"),
-    "coin": ("The First Coin. Someone sold something at the end of the world. This is what they got.",
-             "The Coin, reversed. The buyer. Whatever was bought, it cost too much.",
-             "to sell what is left", "to buy, and pay too much"),
-    "kiln": ("The Kiln. Soft goes in. It doesn't come out soft.",
-             "The Kiln, reversed. The one that cracks in the firing. Better in the fire than after.",
-             "to be hardened by what they go through", "to crack in the fire"),
-    "loom": ("The Unravelling Loom. Someone is picking the weave apart, thread by thread, humming.",
-             "The Loom, reversed. Stitched back together, badly. Lumpy, but it holds.",
-             "to be unpicked, thread by thread", "to be stitched back together, badly"),
-    "lanternwright": ("The Lantern-Wright. The one who made the lanterns, and kept the lost inside them.",
-                      "The Wright, reversed. The one who lets them go. The light leaves out the top, like a breath.",
-                      "to keep what was lost", "to let go what they kept"),
-    "choir": ("The Drowned Choir. Under the crypts they are still holding one long note.",
-              "The Choir, reversed. The rest between the notes. That silence is what the singers fear.",
-              "to hold on past all breath", "the silence between notes"),
-    "tithe": ("The Tithe. Everyone left owes something. Nobody remembers the loan. Everybody pays.",
-              "The Tithe, reversed. The collector. On foot, at night, and very polite.",
-              "to owe, and pay", "the one who comes to collect"),
-    "crown": ("The Hollow Crown. Orders given and given, and nobody obeying.",
-              "The Crown, reversed. A city that would obey if it could. It's empty.",
-              "to command, and not be obeyed", "to want to obey, and have nothing left"),
-}
-
-# what each place makes of a card: its gist read in that place (one picked each time)
-READ = {
-    "brow": ["On the brow, it means {g}. That's the face the newborn will show the world.",
-             "So the face they wear is {g}."],
-    "heart": ["Over the heart, it means {g}. That's what they'll want, without knowing why.",
-              "So what they want most is {g}."],
-    "lhand": ["In the left hand, it means {g}. They won't put that down.",
-              "So what they hold on to is {g}."],
-    "rhand": ["In the right hand, it means {g}. That's what they'll let go.",
-              "So what they give up is {g}."],
-    "belly": ["In the belly, it means {g}. That's their fear, and fear here never lies.",
-              "So what they fear is {g}."],
-    "feet": ["Under the feet, it means {g}. That's the road that brought them.",
-             "So they came by {g}."],
-    "under": ["Under them, it meant {g}. That card was doing the drawing all along."],
-}
-
-# how the deck draws you: when the fan first lies down, and when a card lands
-DECK_OPEN = [
-    "The deck. It has read every newborn that came up out of that pool. It knows this one already.",
-    "The deck. Old, and warm from all the hands. It knows the newborn better than they do.",
-]
-DRAWN = ["There. That one's theirs now.", "The deck let that one go easily."]
-DRAWN_REV = ["Reversed. Turn it over and see what it costs."]
-CLOSE_SUM = "This is what the cards made of them, all together."
-
-# the end, told as a story (Derek, 2026-10-09: "the end sequence needs work. More story like"): the spread told as a
-# tale, one place at a time, in the order a life goes (where it came from, how it looks, what it wants and fears, what
-# it holds and gives up, and under it all the card that did the drawing); {p} is the card's bible phrase ("the one who
-# buries"), {g} its meaning ("to bury what it cannot carry"), {W} who wears it now
-TALE = {
-    "open": ["Here's how it goes for this one.", "Listen. This is their story, as the cards tell it."],
-    "feet": ["They came the way of {p}, though they won't remember the road."],
-    "brow": ["They rose out of the Red wearing the face of {p}."],
-    "heart": ["What they wanted most was {g}."],
-    "belly": ["What they feared was {g}. That fear will keep them alive."],
-    "lhand": ["In the left hand they carried {g}, and would not put it down."],
-    "rhand": ["With the right they let go of {g}."],
-    "under": ["And under it all, face down in the Red, lay {p}. {W} wears that one now. Some day it might be theirs."],
-    "close": ["That's the story. It isn't finished. They never are.", "That's where it begins."],
-    "prophecy": "The cards' last words were for them, not for me.",
-    # the very last words, after the sum (Derek, 2026-10-10: "we should also be told to look into the black mirror and
-    # walk to it not just auto move to the next area"): he sends them to the mirror in the great face's mouth
-    "go": ["Now go to the black mirror, in the great face's mouth. Look into it, then walk in. That's the only way out.",
-           "The way out is the black mirror, in the mouth of the great face. Step into it, and don't look back."],
-}
-TALE_ORDER = ["open", "feet", "brow", "heart", "belly", "lhand", "rhand", "under"]
-
-# the calling it has become, said at the end before he sends it to the mirror (Derek, 2026-10-10: "the strangers needs
-# to say more about the class you become at the end so the player really feels it when the transition happens, like an
-# identity or mantle they take on, the role they become"): a coronation and a sentence at once, a paragraph to a click;
-# the name it will be called, the mantle it wears, what the calling is for, and what it costs. From the class pages
-# (docs/wiki/05-class-*.md) and the bible; hinted, never explained.
 CALLING_NAME = {"ossumancer": "The Ossuarch", "animancer": "The Hollow Mystic", "hemomancer": "The Red Penitent",
                 "miasmancer": "The Shrine Keeper", "monk": "The Empty Hand"}
-CALLING = {
-    "ossumancer": [
-        "The bone took them. Look, they stand straighter already. The newborn is an Ossuarch now, a warden of the dead.",
-        "Their mantle is black iron with bone set into it. They will keep the count, and every bone out of its place will "
-        "feel like a splinter they can't reach.",
-        "An Ossuarch lets things finish. Everything the god was is still dying, and someone has to say enough. The "
-        "living will step aside for them, and not out of respect.",
-        "The cost is the bone itself. It keeps growing under the plate, where nobody looks. They will not bend. One day "
-        "they will break.",
-    ],
-    "animancer": [
-        "The thread pulled tight. The newborn is a Hollow Mystic now, out of the Mirror, the circles that stopped "
-        "covering the glass.",
-        "Their mantle is a coat of hollowed mirrors, and the dead stop at their own faces in every one. People will turn "
-        "their mirrors to the wall when they pass.",
-        "A Hollow Mystic keeps the dead. They save no one. The few left will hand them their dead anyway, because no one "
-        "else will hold them.",
-        "The cost is that the dead never go through. The loom never finishes, and now they are a thread in it, pulled "
-        "tight. Hold still, little thread.",
-    ],
-    "hemomancer": [
-        "It was always going to come up red. The newborn is a Red Penitent now. The processions will know the hat before "
-        "they know the face.",
-        "Their mantle is the hood and the welts. They break the bloodletter's rule. They open themselves, call the "
-        "Maiden down, and tell her what to make.",
-        "A Red Penitent tells a mindless god what the blood is for. Someone forgot to, once, and a wound hatched. Blood "
-        "given is not blood taken. They'll say that often.",
-        "The cost is their own life, every time, and she drinks what spills. She leaves them their mind. Mostly.",
-    ],
-    "miasmancer": [
-        "Breathe in. The newborn is a Shrine Keeper now. The folk will say they steal breath. They will say they still it.",
-        "Their mantle is the fan, and a cord at the wrist with a knot for every breath held. A cloud at their back will "
-        "think other people's thoughts.",
-        "A Shrine Keeper holds what the wind is full of, grudges and lies and sour hopes, until it sets like steel in the "
-        "chest and comes out as a blade.",
-        "The cost comes at the end. A keeper who holds too much walks down into the water, still holding. Not yet. "
-        "Breathe out, slowly.",
-    ],
-    "monk": [
-        "Nothing in the bowl. Of course. The newborn is an Empty Hand now, a beggar of the Gilded Peak. Or something "
-        "wearing one.",
-        "Their mantle is gold so bright the face beneath it disappears. To be looked at and not seen. The Peak called "
-        "that holy.",
-        "The Silence has two hands, both empty, and both unmake. One erases with light, the other with dark. Now they "
-        "are one of those hands.",
-        "The cost is that they keep nothing. Whatever they hold, they let go. Whatever they touch goes quiet. Put a name "
-        "in the bowl. It won't keep.",
-    ],
-}
-
-# the choice (Derek, 2026-10-10: "I want them to feel like they are given a choice"): for every place but the one
-# under the body, the pilgrim draws three blind from the fanned deck (Derek, 2026-10-10: "pick 3 face down from every
-# draw, then they are shown face down and flipped over"); they turn themselves over (DEAL is said then) and the pilgrim
-# chooses one, the way up it turned (a reversed one turns up head down, and he says so then, TURNED); the other two go
-# back in the deck. ON: what a card would mean in each place, said whole as the pilgrim weighs it ({g} its meaning).
-# No colons anywhere the pilgrim reads (Derek, 2026-10-10: "dont use ':' in the text"); {G} is {g} with a capital.
-ON = {"brow": "On the brow it would mean {g}.", "heart": "Over the heart it would mean {g}.",
-      "lhand": "In the left hand it would mean {g}.", "rhand": "What the right hand lets go would be {g}.",
-      "belly": "In the belly it would mean {g}.", "feet": "Under the feet it would mean {g}."}
-DEAL = {}
-# said the moment one of the three turns up head down (Derek, 2026-10-10: "it should happen when we draw it and it flips
-# to reveal with the stranger mentioning it"); the way up is settled at the draw and never changes after. Never the same
-# line twice in a Reading (ui/reading.gd _line): enough of them for a whole hand of reversals.
-TURNED = ["{n} came up reversed. Upside down, it reads darker.",
-          "{n} came up reversed. Its meaning turns against them.",
-          "{n} is upside down. That one takes more than it gives.",
-          "{n} came up reversed. Read it the hard way.",
-          "{n}, reversed. What it gave, it now takes.",
-          "{n} came up the wrong way. It still counts.",
-          "{n} came up reversed. The cards do that when they like someone.",
-          "{n} is reversed. It means the opposite now.",
-          "{n} came up reversed, head down like the drowned.",
-          "{n} came up upside down. Nobody turns them back.",
-          "{n} came up reversed. That one will cost them.",
-          "{n} is upside down. Mind that one."]
-
-# what each card means in each place of the spread, upright and reversed (Derek, 2026-10-10: "the meaning per card per
-# body part reads the same, each should have a different interpretation"): the brow (the face it wears), the heart
-# (what it wants), the left hand (what it holds), the right hand (what it lets go), the belly (its fear), the feet (the
-# road it came by), and under the body (the hidden one). Each is said as {g} in that place's lines (ON, READ, TALE), so
-# each reads after "it would mean", "is" or "was"; the card's gist stays only as a fallback.
-MEANS = {
-    "unwritten": {
-        "brow": ("a blank face that others will write on", "a face rubbed out and drawn again too often"),
-        "heart": ("to be written at last, in any hand", "to be left blank, just once"),
-        "lhand": ("a clean page they won't let anyone touch", "a page worn so thin the fire shows through it"),
-        "rhand": ("every story they might have been", "the one story they kept on telling"),
-        "belly": ("that nothing will ever be written on them", "being written over in somebody else's hand"),
-        "feet": ("a road with no marks on it at all", "a road walked so often it's only a ditch now"),
-        "under": ("the turn nobody has taken, waiting under everything", "an old story, wiped and told again underneath"),
-    },
-    "pilgrim": {
-        "brow": ("a hood and a staff and nobody under them", "the face of one sat down by the road"),
-        "heart": ("to keep walking and never ask where", "to sit down at last and not get up"),
-        "lhand": ("a staff worn smooth by somebody else's grip", "the boots they took off and won't put back on"),
-        "rhand": ("the reason they set out", "the road itself"),
-        "belly": ("arriving", "the road running out under them"),
-        "feet": ("the pilgrim trench, a man deep in the Hide", "a road that ended in the middle of nowhere"),
-        "under": ("a walker who never stopped, under every step", "one who stopped a long way back, and is waiting"),
-    },
-    "digger": {
-        "brow": ("a face with grave dirt in its creases", "a face that looks into every grave they open"),
-        "heart": ("to put the past down deep and pat it flat", "to know what was buried, and why"),
-        "lhand": ("a spade that has never once looked in", "a bone they dug up and won't put back"),
-        "rhand": ("whatever they could not carry, into the ground", "the order the Matron laid the dead in"),
-        "belly": ("a grave that won't stay filled", "what comes up with the dirt"),
-        "feet": ("the long rows where the dead lie in their order", "a churned road of opened graves"),
-        "under": ("everything they ever buried, lying very still", "a grave dug open from below"),
-    },
-    "veil": {
-        "brow": ("a pale face turned always toward the fire", "a face with the singe still on it"),
-        "heart": ("the one light that will burn them", "nothing at all, now the burning's done"),
-        "lhand": ("a veil held up close to the flame", "ash that used to be a veil"),
-        "rhand": ("their fear of the fire", "the last of what the fire left"),
-        "belly": ("the dark, more than the burning", "being drawn to a light again"),
-        "feet": ("a road from lamp to lamp to lamp", "a road through what has already burned"),
-        "under": ("a pull toward the brightest thing in the room", "a scorch mark where something used to stand"),
-    },
-    "swaddling": {
-        "brow": ("a face wrapped tight against the ash", "a face cut free of its wrappings"),
-        "heart": ("to be carried, and to carry", "the knife, and the cut it makes"),
-        "lhand": ("a bundle they won't put down even to sleep", "a short knife, still sharp"),
-        "rhand": ("the one who carried them", "the cloth they were cut out of"),
-        "belly": ("being set down and left", "what was in the bundle"),
-        "feet": ("a road they never walked, carried the whole way", "a road away from the Deep, running"),
-        "under": ("a child the Deep asked for", "the knife that answered the Deep"),
-    },
-    "gleaner": {
-        "brow": ("the face the harvest sees last", "a counting face under a plate of bone"),
-        "heart": ("the harvest, every stalk of it", "one more day before the harvest"),
-        "lhand": ("a scythe that has never missed", "a sliver of the scythe, set in its own plate"),
-        "rhand": ("whatever is ripe", "the count, for one moment, and the cost of that"),
-        "belly": ("being the harvest", "losing count"),
-        "feet": ("the road Old Scythe walks up out of his pit", "the narrow way down to the pit, to stand guard"),
-        "under": ("Old Scythe, waiting for his age to come round", "someone down there counting, so he stays under"),
-    },
-    "saint": {
-        "brow": ("a weeping face that everyone believes", "a face lost in the crowd"),
-        "heart": ("to be believed, whatever it costs", "to watch, and be no part of it"),
-        "lhand": ("a wound kept open so it can be shown", "a good place near the front, to see"),
-        "rhand": ("their tears, to whoever will gather them", "the girl in the iron, to her weeping"),
-        "belly": ("bleeding for nothing in an empty square", "being the one they come to watch"),
-        "feet": ("a procession road wet with somebody's blood", "the road the crowd takes home, after"),
-        "under": ("a suffering that made a faith", "a crowd of faces that did nothing"),
-    },
-    "scholar": {
-        "brow": ("a reader's squint, gone glassy from the page", "a face the Needle has already seen"),
-        "heart": ("to know, whatever knowing costs", "to be unseen again"),
-        "lhand": ("a book they can't stop reading", "an eye that won't close"),
-        "rhand": ("everything they read, once they knew", "the page that started reading back"),
-        "belly": ("a page with nothing more to teach them", "the eyes in the Needle, turning their way"),
-        "feet": ("the long stair up to the Citadel's reading rooms", "a road the Needle watched them walk"),
-        "under": ("the oldest reader, who hasn't turned a page in an age", "something reading this one, line by line"),
-    },
-    "hanged": {
-        "brow": ("a face that hangs upside down in every pool", "the face of the one waiting up ahead"),
-        "heart": ("to catch up with their other half", "never to catch up at all"),
-        "lhand": ("the rope they were hung by, still knotted", "a hand reaching back out of still water"),
-        "rhand": ("their reflection, for one breath", "the breath they were ahead by"),
-        "belly": ("still water", "the moment the twin stops waiting"),
-        "feet": ("the shore of every still pool", "a road the other one already walked"),
-        "under": ("the Drowned Twin, keeping very good time", "a twin a step ahead, who knows the way"),
-    },
-    "knot": {
-        "brow": ("a mouth, and behind it another mouth", "a face with bite marks in it"),
-        "heart": ("to eat, and keep what they eat", "to be swallowed and be done"),
-        "lhand": ("a hunger they feed with both hands", "a bone with their own teeth marks on it"),
-        "rhand": ("the scraps, never the meal", "the last of themselves, to the mouths"),
-        "belly": ("an empty belly", "the Second Mouth, preaching"),
-        "feet": ("a road with a mouth at both ends", "a road that goes round and round and down a throat"),
-        "under": ("one hunger with many mouths", "the meal the Tallow-Mother keeps for later"),
-    },
-    "wick": {
-        "brow": ("a face lit from below by its own burning", "a face just past where the light reaches"),
-        "heart": ("to burn themselves down for a little light", "the dark that waits for every flame"),
-        "lhand": ("a lantern with a soul inside it", "a cold wick, burned all the way down"),
-        "rhand": ("the last of their tallow, to the light", "the light, a step at a time"),
-        "belly": ("going out", "the light finding them"),
-        "feet": ("a road lit one lantern at a time", "the dark verge just off the lantern road"),
-        "under": ("a soul that stayed to burn", "the patient dark the light only pushes back a step"),
-    },
-    "mourner": {
-        "brow": ("a shorn head bowed toward the Red", "the face somebody is still weeping over"),
-        "heart": ("grief that cuts and keeps cutting", "to be remembered by someone"),
-        "lhand": ("a lock of cut hair", "a name somebody else is grieving"),
-        "rhand": ("everyone the Red takes", "the one who mourns them, without knowing"),
-        "belly": ("the sound of the scissors in the surf", "being forgotten by the one who cut her hair"),
-        "feet": ("the tide line, walked at dusk", "a funeral road, walked the wrong way"),
-        "under": ("the Grandmother of the Red, with no hair left to cut", "their own wake, held long before they rose"),
-    },
-    "key": {
-        "brow": ("an iron face with the count behind it", "the face of whoever comes with the key"),
-        "heart": ("every bone in its place", "the door the Pale Order keeps shut"),
-        "lhand": ("a key that locks the count", "a key that was never meant to be turned"),
-        "rhand": ("whatever they locked away", "the lock, and all it kept"),
-        "belly": ("a bone out of its place", "the click of the lock giving way"),
-        "feet": ("the cloisters of the Pale Order, swept bare", "a road that runs through a door left open"),
-        "under": ("the lock the whole world turns in", "a hand already on the key"),
-    },
-    "cup": {
-        "brow": ("a beggar's face at the door, very polite", "the face that opens the door at night"),
-        "heart": ("marrow, asked for nicely", "to let the knocking in"),
-        "lhand": ("an empty bowl held out", "a latch they have already lifted"),
-        "rhand": ("their pride, for asking at all", "the door, wide open"),
-        "belly": ("the door staying shut", "whatever is knocking"),
-        "feet": ("a road from door to door to door", "a road that leads to their own threshold"),
-        "under": ("the Ghauul, knocking for marrow", "a house that answered once"),
-    },
-    "bell": {
-        "brow": ("a face that hears something under the water", "a face that rings true, and shouldn't"),
-        "heart": ("a call only the drowned can hear", "a bell rung true, for once"),
-        "lhand": ("a clapper wrapped in weed", "a note held perfectly in tune"),
-        "rhand": ("the living, out of step", "the silence the bell kept"),
-        "belly": ("the bell stopping", "the bell sounding right"),
-        "feet": ("the old one's spine, walked in step with the drowned court", "a road that rings under every footfall"),
-        "under": ("the drowned king's court, walking", "a drowned bell, in tune at last"),
-    },
-    "coin": {
-        "brow": ("a merchant's smile on a picked-clean face", "the face of a buyer who didn't ask the price"),
-        "heart": ("to sell what is left", "to buy, and pay too much"),
-        "lhand": ("a coin from the end of the world", "a thing they paid far too much for"),
-        "rhand": ("whatever will sell", "the price, gladly"),
-        "belly": ("having nothing left to sell", "what they have already paid"),
-        "feet": ("the market road along the dead shore", "a road they bought, and paid for twice"),
-        "under": ("the merchant who picks the shore clean", "a bargain struck in the dark that isn't finished"),
-    },
-    "kiln": {
-        "brow": ("a face fired hard", "a face with a crack across it"),
-        "heart": ("to be hardened by what they go through", "to break in the fire and be done"),
-        "lhand": ("a coal they won't drop", "a shard that broke in the firing"),
-        "rhand": ("everything soft in them", "the shape they were meant to have"),
-        "belly": ("going in soft and coming out soft", "the crack they can feel spreading"),
-        "feet": ("a road through the heat under everything", "a road of broken pots"),
-        "under": ("the Deep, setting blood to iron in the dark", "a crack running all the way down"),
-    },
-    "loom": {
-        "brow": ("a face coming undone thread by thread", "a face stitched back together, lumpy"),
-        "heart": ("to be unpicked down to the first thread", "to be stitched back together, badly"),
-        "lhand": ("a loose thread they keep pulling", "a knot of thread from somebody else's life"),
-        "rhand": ("whatever was woven wrong", "a thread they should have kept"),
-        "belly": ("the humming behind the veil", "unravelling all at once"),
-        "feet": ("a road that unspools behind them", "a road darned with other people's roads"),
-        "under": ("the Crone, picking them out and humming", "a patch that holds, mostly"),
-    },
-    "lanternwright": {
-        "brow": ("a maker's soot-dark face", "a face that looks up as the light goes out"),
-        "heart": ("to keep what was lost", "to let go what they kept"),
-        "lhand": ("a lantern nobody knows how to make anymore", "an empty lantern with its door open"),
-        "rhand": ("nothing, ever, that they can keep", "a breath out of the top of the lantern"),
-        "belly": ("the last lantern going dark", "being kept, when they want to go"),
-        "feet": ("the road the hunted makers took", "a road that goes up and out with the light"),
-        "under": ("the last maker, hiding something lit", "every soul let out of every lantern"),
-    },
-    "choir": {
-        "brow": ("a mouth open on a note that never ends", "a face holding its breath"),
-        "heart": ("to hold on past all breath", "the silence between notes"),
-        "lhand": ("a note they will not let go of", "a breath they have been saving"),
-        "rhand": ("their own voice, into the stone", "the note, at last"),
-        "belly": ("the note ending", "what comes in the quiet"),
-        "feet": ("the low wet roads under the crypts, humming", "a road with no sound on it at all"),
-        "under": ("the Drowned Choir, still holding the note", "the rest the singers are afraid of"),
-    },
-    "tithe": {
-        "brow": ("a debtor's lowered face", "a polite face at the door at night"),
-        "heart": ("to be paid up, and free", "everything, not just their share"),
-        "lhand": ("a debt nobody remembers taking", "a ledger with their name in it"),
-        "rhand": ("their share of everything, every time", "their patience, waiting to be paid"),
-        "belly": ("the knock", "a debtor who cannot pay"),
-        "feet": ("a road paved with what was paid", "the collector's road, walked at night"),
-        "under": ("a loan from whatever gave them the mourning", "the one who comes to collect"),
-    },
-    "crown": {
-        "brow": ("a hollow crown giving orders to the wind", "a face waiting to be told what to do"),
-        "heart": ("to be obeyed, just once", "to obey, and have nothing left to obey with"),
-        "lhand": ("an order no one will carry out", "the keys of an empty city"),
-        "rhand": ("the crown, though it never fit", "their last order, into the silence"),
-        "belly": ("nobody listening", "an order they can't keep"),
-        "feet": ("a road toward the brown moon", "the empty streets of the city that would obey"),
-        "under": ("the Man in the Rust, still giving orders", "an empty city, waiting for a voice"),
-    },
-}
+ASPECT_WORD = {"bone": "bone", "soul": "thread", "flesh": "flesh", "breath": "breath", "silence": "quiet"}
+TALE_ORDER = ["open", "feet", "brow", "heart", "belly", "lhand", "rhand", "under"]
+REGIONS = ("head", "hands", "low")
 
 
 # what each card does in each place, upright and reversed: the hidden effects (Derek, 2026-10-10: "the cards should also
@@ -603,21 +178,31 @@ def main():
     with open(os.path.join(ROOT, "data", "reading.json"), encoding="utf-8") as fh:
         value = json.load(fh).get("value", {})
     ms = []
-    for (i, a, o, r, w, sy, sr) in M:
-        st = STORY.get(i)
-        assert i in MEANS and len(MEANS[i]) == 7, i
-        ms.append(dict(id=i, aspect=a, one=o, rev=r, wears=w, say=st[0] if st else sy, say_rev=st[1] if st else sr,
-                       gist=st[2] if st else o, gist_rev=st[3] if st else r,
-                       mean={k: list(v) for k, v in MEANS[i].items()}, fx=card_fx(i, a, value)))
-    d = dict(places=PLACES, weave=WEAVE, open=OPEN, shapes=SHAPES, close=CLOSE, aspect_word=ASPECT_WORD, read=READ,
-             deck_open=DECK_OPEN, drawn=DRAWN, drawn_rev=DRAWN_REV, close_sum=CLOSE_SUM, tale=TALE,
-             tale_order=TALE_ORDER, on=ON, deal=DEAL, turned=TURNED,
-             calling=CALLING, calling_name=CALLING_NAME, mantles=ms)
+    pids = [p["id"] for p in PLACES]
+    for (i, a, o, r, w, _sy, _sr) in M:
+        mn = W.MEANS[i]
+        assert sorted(mn) == sorted(pids), i
+        assert sorted(W.TURNED[i]) == sorted(REGIONS), i
+        ms.append(dict(id=i, aspect=a, one=o, rev=r, wears=w,
+                       mean={k: [list(v[0]), list(v[1])] for k, v in mn.items()},
+                       turned=W.TURNED[i], fx=card_fx(i, a, value)))
+    # every reading its own: no short or sub said twice anywhere in the deck
+    seen = {}
+    for m in ms:
+        for k, v in m["mean"].items():
+            for way in v:
+                for txt in way:
+                    assert txt not in seen, (m["id"], k, txt, seen.get(txt))
+                    assert ":" not in txt, txt
+                    seen[txt] = (m["id"], k)
+    d = dict(places=PLACES, rhyme=W.RHYME, rhyme_aside=W.RHYME_ASIDE, crown_say=W.CROWN_SAY, deck_open=W.DECK_OPEN,
+             bridge=W.BRIDGE, shapes=W.SHAPES, aspect_word=ASPECT_WORD, close_sum=W.CLOSE_SUM, tale=W.TALE,
+             tale_order=TALE_ORDER, calling=W.CALLING, calling_name=CALLING_NAME, mantles=ms)
     p = os.path.join(ROOT, "data", "reading_spread.json")
     with open(p, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(d, fh, indent=1, ensure_ascii=False)
         fh.write("\n")
-    print("wrote", p, len(ms), "mantles")
+    print("wrote", p, len(ms), "mantles,", len(seen), "readings")
 
 
 if __name__ == "__main__":

@@ -154,6 +154,21 @@ marrow.
 
 ## Decision log (newest first)
 
+- **2026-10-10, the Reading, third pass (Derek's notes):**
+  - his words in Cormorant Garamond (OFL, shipped in `art/fonts/`), a warm parchment tone, never white ("the font is
+    a bit bold in the stranger talk, needs to be more stylized and the color is too white");
+  - the Stranger may say "you", and has more of himself in it; between the draws he speaks, a click a line: what the
+    cards so far say together, then what the next place governs ("we need exposition and transition between draws");
+  - every card has its own reading in every place, with subtext and a second reading under the first, never a literal
+    body pun; every card has its own reversal line for each part of the body, never a formula ("see how repetative
+    this reads");
+  - it opens with the lowland rhyme, a line at a time, a sigil drawing in with each;
+  - a light ruffle on a card the mouse passes over (a tilt, a lift, a shiver, settling on damped springs);
+  - the look is esoteric: a ring with a seven-pointed star round the spread, a diagram on each empty place, the laid
+    cards joined, dust motes, a breathing dark at the edges, the glyphs kindling as they turn up;
+  - no black-smoke or ink transition between the parts ("i dont like the transition of black smoke or whatever in the
+    card game, get rid of it").
+
 - **2026-10-10, characters are live 3D (Derek, testing the newborn):** "3D wins for the character model." After the
   newborn's ten passes as the pilot (`tools/landkit/passes/the_newborn.md`), every character is a rigged 3D body
   played live in the game (`entities/body3d.gd`), never rendered to frames; the sprite characters stay until each is
