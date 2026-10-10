@@ -979,6 +979,23 @@ def throne():
             q = 1 - u * u - v * v
             best = max(best, f - 0.35 + 0.36 * 2.0 * math.sqrt(max(0.0, q)))
         return best
+    # candles left burning on the heaps' fronts by those who came up before (the rules check after pass 11: the heaps,
+    # the room's one true detail, read as dark mounds with a glint; every source seen, a small pool of light on each),
+    # stubs on the mail with their wax run down over the iron; their own seed, so the heaps stay as they were
+    crnd = random.Random(47)
+    for q, (hx_, hy_) in enumerate(HEAPS):
+        for k in range(5):
+            r_ = crnd.uniform(0.9, 1.7)
+            a_ = math.atan2(1.0, 1.0) + crnd.uniform(-0.8, 0.8)            # the side that faces the camera
+            x, y = hx_ + math.cos(a_) * r_, hy_ + math.sin(a_) * r_
+            z = mound_z(x, y)
+            h_ = crnd.uniform(0.06, 0.2)
+            P.cylinder("hcan%d_%d" % (q, k), (x, y, z - 0.02), crnd.uniform(0.04, 0.06), h_, "bone", sides=6)
+            for w_ in range(3):
+                P.tube("hcanrun%d_%d_%d" % (q, k, w_), [(x, y, z + h_ * 0.8),
+                       (x + crnd.uniform(-0.16, 0.16), y + crnd.uniform(-0.16, 0.16), z - 0.05)], [0.02, 0.01], "bone", 4)
+            if k < 4:                                                     # one has guttered out
+                flame("hcan%d_%d" % (q, k), x, y, z + h_ + 0.01, 0.06, 26.0)
     for i in range(460):
         hx_, hy_ = HEAPS[i % 2]
         r = rnd.uniform(0, 1) ** 0.6 * 2.6

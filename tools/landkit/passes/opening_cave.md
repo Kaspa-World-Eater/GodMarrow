@@ -809,3 +809,15 @@ loudest things on the floor.
 depth at the boss), a rolled iron rim, an iron boss, tipped up on its edge so the fire turns over the dish; face down
 it shows its hollow back and the grip. In `cv19_face` the dark rims outline every shield, the dishes turn from lit to
 shade, and the heap's leaning shields catch the brazier.
+
+## Rules check (2nd since pass 11)
+
+**Read:** `MASTER_RULES` (unchanged since the last check but for the new `docs/animation/` row), the area's opening.
+**Checklist on `cv19_face`:** as at the last check; `cine_check` 9 of 9. **Worst failure, line 9 (detail where it
+counts) and cinematography rule 2 (pools of light):** the heaps at the stair's foot, the room's one true detail ("the
+rusted weapons and armour of everyone who came up before"), still read as dark mounds with a glint; nothing near them
+lit their fronts.
+**Fixed** (`cave3d`, the heaps): five candle stubs on each heap's camera-facing side, left by those who came before,
+their wax run down over the mail, four burning low and one guttered out. In `cv20_face` each heap is now a small pool
+of light: the shields' rims, a helm and the sword hilts catch it, and the heap reads as a heap. `cine_check`: 9 of 9.
+
