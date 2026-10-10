@@ -20494,5 +20494,11 @@
 "k": 0.05,
 "lift": 84.0
 },
-"baked": "tools/landkit3d/cove_bake.py through beach3d.py and paint_shore.py"
+"baked": "tools/landkit3d/cove_bake.py through beach3d.py and paint_shore.py",
+"shore": {
+"file": "shore.png",
+"w": 145,
+"h": 145,
+"span": 24.0
+}
 }

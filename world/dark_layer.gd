@@ -44,6 +44,7 @@ var round_things: Array = []   # [[tile, radius yd]] camp things that throw shad
 var extra_lights: Array = []   # PointLight2D nodes found in the zone
 var scan_t := 0.0
 var flash_next := 0.0          # the far flash (zz_zz_cine76.js): rare, at night, on open ground, never in town
+var flash_v := 0.0             # the flash now, 0..1 (world/weather.gd lights the blowing sand by it)
 var flash_t0 := -9.0
 var mood := 1.0               # the lantern's mood (zz_zz_cine76): shrinks and stutters when the wound is deep, gutters in a boss fight
 var keep := 1.0               # the dim wick and what the lantern keeps (zz_zz_study82), applied after the 5.4 cap
@@ -141,12 +142,20 @@ func _process(dt: float) -> void:
 	# the far flash: two flickers, a quick one, a gap, a longer one fading; the land stands up out of the dark
 	var nk := clampf((1.0 - dk - 0.4) / 0.6, 0.0, 1.0) if outdoor else 0.0
 	var fv := 0.0
-	if nk > 0.0 and not load("res://world/quests.gd").is_town(zone.id):
+	# a lightning storm (a zone's "weather": "sandstorm", the cove; Derek 2026-10-09): near flashes every few seconds,
+	# by day or night, the thunder after each, sooner and louder the nearer the stroke
+	var storm: bool = outdoor and zone.d.get("weather", "") == "sandstorm"
+	if storm:
+		nk = maxf(nk, 0.75)
+	if nk > 0.0 and (storm or not load("res://world/quests.gd").is_town(zone.id)):
 		if flash_next <= 0.0:
-			flash_next = t + randf_range(30.0, 70.0)
+			flash_next = t + (randf_range(2.0, 5.0) if storm else randf_range(30.0, 70.0))
 		if t > flash_next and (boss_m == null or not is_instance_valid(boss_m)):
 			flash_t0 = t
-			flash_next = t + randf_range(55.0, 125.0)
+			flash_next = t + (randf_range(4.0, 12.0) if storm else randf_range(55.0, 125.0))
+			if storm:
+				var far := randf()
+				get_tree().create_timer(0.3 + far * 2.6).timeout.connect(func(): Sfx.play("thunder", 1.0 - far * 0.55, 1.0 - far * 0.25))
 		var fa := t - flash_t0
 		if fa >= 0.0 and fa <= 0.9:
 			var f1 := 0.7 if fa < 0.07 else 0.0
@@ -154,7 +163,8 @@ func _process(dt: float) -> void:
 			fv = maxf(f1, f2) * nk
 	else:
 		flash_next = maxf(flash_next, t + 20.0)
-	A *= 1.0 - 0.6 * fv
+	A *= 1.0 - (0.95 if storm else 0.6) * fv
+	flash_v = fv
 	var dark_rgb := Color8(8, 13, 27) if outdoor else Color8(8, 9, 20)
 	# the hours' own colours (Derek 2026-10-05: "get the day and night cycle tuned"): dusk sinks through a wine dark,
 	# dawn through a cold rose-grey; the night's dark is lifted a little toward the moon, so it reads as moonlight

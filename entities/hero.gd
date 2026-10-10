@@ -343,6 +343,7 @@ func _walk(dt: float) -> bool:
 		spd *= 0.35
 	if skills.has_method("move_k"):
 		spd *= skills.move_k()
+	spd *= Gust.drag(to)   # a storm's gust in your face slows you (core/gust.gd)
 	var step := spd * dt
 	step_acc += minf(step, to.length())
 	if step_acc > 0.62:

@@ -57,6 +57,15 @@ static func build(z) -> bool:
 	var mat := ShaderMaterial.new()
 	mat.shader = load("res://shaders/baked_ground.gdshader")
 	mat.set_shader_parameter("red", str(idx.get("water", "")) == "red")   # the Red Water moves on its own beat
+	# the shore field (tools/landkit3d/cove_export.py): the water runs in along the land's own shape, up the real sand
+	var sh: Dictionary = idx.get("shore", {})
+	if not sh.is_empty() and FileAccess.file_exists(d + "/" + str(sh["file"])):
+		var simg := Image.load_from_file(ProjectSettings.globalize_path(d + "/" + str(sh["file"])))
+		if simg:
+			mat.set_shader_parameter("shore", ImageTexture.create_from_image(simg))
+			mat.set_shader_parameter("shore_size", Vector2(float(sh["w"]), float(sh["h"])))
+			mat.set_shader_parameter("shore_span", float(sh["span"]))
+			mat.set_shader_parameter("has_shore", true)
 	var bmat := ShaderMaterial.new()                 # the tall bands: their plants bend in the wind
 	bmat.shader = mat.shader
 	bmat.set_shader_parameter("band", true)

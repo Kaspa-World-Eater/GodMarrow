@@ -151,6 +151,9 @@ func enter(zid: String, from: String) -> void:
 	add_child(zone)
 	move_child(zone, 0)
 	zone.load_zone(zid, Game.seed_for(zid))
+	# a place that keeps its own hour (the cove: Derek 2026-10-09, "change the time of day to be Dawn. Maybe it's a
+	# little too dark"): held while the pilgrim is in it, let go on leaving
+	Game.hour_hold = float(zone.d.get("holdPhase", -1.0))
 	var at: Vector2
 	if from == "__lantern" and not last_lantern.is_empty():
 		at = Vector2(last_lantern["x"], last_lantern["y"] + 1.2)

@@ -78,7 +78,7 @@ const CM := {
 }
 
 func _play(name: String, vol: float, pitch: float) -> void:
-	if cm:
+	if cm and not OURS.has(name):
 		var id: String = str(CM.get(name, ""))
 		if id != "":
 			load("res://core/cm_sound.gd").play(self, id, linear_to_db(maxf(0.0001, vol * float(Settings.sfx_vol))) + (-8.0 if name.begins_with("step_") else 0.0), pitch)
@@ -143,7 +143,10 @@ const SGAIN := {"step_stone": -22.0, "step_ash": -21.0, "step_leaf": -16.0, "hit
 	"fall_body": -12.0, "break_iron": -12.0, "glass": -15.0, "bell_far": -20.0, "lid": -12.0, "roll": -12.0, "hinge": -8.0,
 	"coins": -8.0, "leather": -14.0, "page_open": -4.0, "page_close": -6.0, "draw_blade": 8.0, "latch": -10.0}
 
-const GAIN := {"break_ring": -15.0, "fall_knocks": -16.0, "cast_mirror_ring": -20.0, "step_ash": -17.0, "step_stone": -18.0, "step_leaf": -18.0, "step_wet": -14.0, "swing": -13.0, "hit": -7.0,
+## sounds always made here, with or without Cursemark's
+const OURS := ["thunder"]
+
+const GAIN := {"thunder": -3.0, "break_ring": -15.0, "fall_knocks": -16.0, "cast_mirror_ring": -20.0, "step_ash": -17.0, "step_stone": -18.0, "step_leaf": -18.0, "step_wet": -14.0, "swing": -13.0, "hit": -7.0,
 	"heavy": -5.0, "break": -9.0, "hurt": -8.0, "fall": -10.0, "roll": -12.0, "drink": -10.0, "m_wind": -12.0, "cast_mirror": -14.0, "cast_soul": -12.0, "cast_thread": -12.0, "chest": -9.0, "kindle": -9.0, "shrine": -10.0, "passage": -12.0}
 
 func _takes(name: String) -> Array:
@@ -226,6 +229,30 @@ func _mix(a: PackedFloat32Array, b: PackedFloat32Array, off: int = 0) -> PackedF
 
 func _make(name: String, rng: RandomNumberGenerator) -> PackedFloat32Array:
 	match name:
+		"thunder":     # a crack overhead, then the roll going away across the water: low noise in slow swells, dying
+			var n := int(4.2 * RATE)
+			var s := PackedFloat32Array()
+			s.resize(n)
+			var a := 0.0
+			var b := 0.0
+			var c := 0.0
+			var swells := []
+			for k in 5:
+				swells.append([rng.randf_range(0.1, 2.6), rng.randf_range(0.35, 1.0), rng.randf_range(0.25, 0.7)])
+			for i in n:
+				var t := float(i) / RATE
+				var w := rng.randf() * 2.0 - 1.0
+				a += (w - a) * 0.03
+				b += (a - b) * 0.05
+				c += (w - c) * 0.35
+				var env := exp(-t * 0.9) * 0.6
+				for sw in swells:
+					var u: float = (t - float(sw[0])) / float(sw[2])
+					if u > 0.0:
+						env += float(sw[1]) * u * exp(1.0 - u) * exp(-t * 0.5) * 0.7
+				var crack := c * exp(-t * 18.0) * 0.8 if t < 0.4 else 0.0
+				s[i] = b * 3.2 * env + crack
+			return s
 		"step_ash":    # a soft crunch in ash and dry earth
 			return _mix(_noise(rng, 0.09, 0.004, 45.0, 0.25, 0.55, 1.2), _noise(rng, 0.05, 0.002, 70.0, 0.6, 0.9, 0.4), int(RATE * 0.02))
 		"step_stone":  # a hard heel on flags: a click and a short knock

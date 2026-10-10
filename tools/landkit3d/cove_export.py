@@ -109,6 +109,18 @@ def main():
     t_top = float(BF.cleft_t(np.array([s_top]))[0])
     portal = zone_of(s_top, t_top)
     arrive_up = zone_of(s_top + 2.5, float(BF.cleft_t(np.array([s_top + 2.5]))[0]))
+    # the shore field (Derek, 2026-10-09: the ocean "happening on the world, not in the world"): how far inland of the
+    # calm waterline each tile lies, in yards, one texel a tile; the game's water reads it to run its swells in along the
+    # cove's own shape and its swash up the real sand (shaders/baked_ground.gdshader); +-SPAN/2 yards over 0..255
+    SPAN = 24.0
+    din = BF.WATER - s
+    from PIL import Image as Im
+    Im.fromarray((np.clip(0.5 + din / SPAN, 0, 1) * 255).astype(np.uint8), "L").save(os.path.join(CB.OUT, "shore.png"))
+    ip = os.path.join(CB.OUT, "index.json")
+    bi = json.load(open(ip, encoding="utf-8"))
+    bi["shore"] = dict(file="shore.png", w=int(W), h=int(H), span=SPAN)
+    with open(ip, "w", newline="\n") as fh:
+        json.dump(bi, fh, indent=0)
     seen, walk = reach(g, st0)
     cut = walk & ~seen
     # small pieces cut off by the obstacles go solid (a yard or two between a bone and the cliff); report the rest
@@ -148,12 +160,14 @@ def main():
                         vInscr="A light set on the black sand where the cliffs let the living out.", i=len(objects), solid=False,
                         sprites=[]))
     mk["lanterns"].append(dict(idx=0, name="The Last Lantern on the Sand", x=lp[0], y=lp[1], object=len(objects) - 1))
-    wp = zone_of(46.0, 31.0)
-    objects.append(dict(type="qobj", q="wp", x=wp[0], y=wp[1], name="The Shore Ring", spr="shrine", i=len(objects), solid=False,
-                        sprites=[]))
-    mk["waystones"].append(len(objects) - 1)
+    # no waystone and no stash on the beach (Derek, 2026-10-09: "It will be in the first little town. Same with the
+    # waypoint"): both wait for the shore folk's dead village
     lights = [dict(type="fire", kind="lantern", x=lp[0], y=lp[1] + 0.3, radius=8.5, rgb="255,150,72", a=1.4, heightPx=44, dxPx=13)]
     N["objects"], N["connections"], N["arrive"], N["markers"], N["lights"] = objects, conns, arrive, mk, lights
+    # a lightning storm at dawn, the black sand blowing in off the Red (Derek, 2026-10-09: first "night", then "let's
+    # change the time of day to be Dawn ... You can't really enjoy the oh shit if you can't see it"; world/weather.gd,
+    # world/dark_layer.gd, core/gust.gd): the wind's heading in world tiles, from the sea inland
+    N["weather"], N["wind"], N["holdPhase"] = "sandstorm", [1.0, 0.0], 0.955    # well into dawn: light enough to see it
     N["packs"], N["monsters"] = [], []
     # the light over the cove: the paint already holds the overcast, so the day lays only a breath of cool grey over it
     # (the bog's ambience is a heavy veil for a dark marsh); the night is the moor's deep blue

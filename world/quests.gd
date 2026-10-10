@@ -11,7 +11,7 @@ const ROMAN := ["", "I", "II", "III", "IV", "V"]
 const ACT_NAME := ["", "Act I · The Hide", "Act II · The Bleached Barrens", "Act III · The Fen of Shog-Mire", "Act IV · The Heights of An-Vhar", "Act V · The Descent"]
 const ACT_MLVL := [[0, 0], [1, 17], [18, 24], [24, 30], [30, 34], [34, 40]]
 ## Act I waystones (every town has one; about every other zone)
-const A1_WP := ["red_shore", "hollow_wood", "fen", "crypt", "barrow", "cata1", "cata2", "root_deep", "sighing_ridge", "pilgrim_road", "drowned_village", "sunken_bog", "burnt_heath"]
+const A1_WP := ["hollow_wood", "fen", "crypt", "barrow", "cata1", "cata2", "root_deep", "sighing_ridge", "pilgrim_road", "drowned_village", "sunken_bog", "burnt_heath"]
 const ELEMS := ["magic", "miasma", "blood", "void", "radiance", "fire", "cold", "poison"]
 
 ## kinds: zoneboss (a zone's own boss), kill (a named one placed in a zone), relic (take it), shrine (kneel and hold
@@ -230,7 +230,7 @@ static func lair_of(n: int) -> String:
 	return "cata2" if n == 1 else "a%d_lair" % n
 
 static func is_town(id: String) -> bool:
-	return id == "red_shore" or (id.begins_with("a") and id.ends_with("_town"))
+	return id.begins_with("a") and id.ends_with("_town")   # (the first town, the shore folk's dead village, is still to build)
 
 static func zone_exists(id: String) -> bool:
 	return Data.zone_index().get("zones", {}).has(id)

@@ -5,14 +5,17 @@ extends CanvasLayer
 ## - the fen and the bog: rain in long thin strokes (s05), seen best where a light catches it, and small splashes
 ##   on the ground about you;
 ## - the woods by day: shafts of light through the canopy (s15), slow, drifting, breathing;
-## - under the ground: drips from the roof, each landing in a small ring of water near the lantern.
+## - under the ground: drips from the roof, each landing in a small ring of water near the lantern;
+## - the cove (a zone's "weather": "sandstorm"; Derek 2026-10-09: "night and a lightning storm ... with sand blowing"):
+##   black sand driven in off the Red, laid in the world itself (world/sand_storm.gd, under the night's dark); the
+##   gusts are core/gust.gd's storm, which slows a pilgrim walking into them; the lightning is world/dark_layer.gd's.
 ## Everything takes its colour and strength from the light round it (the dark layer's light_at), never red.
 
 const WPX := 4.0
 var zone: Zone
 var hero: Hero
 var dark: DarkLayer
-var kind := ""               # ash | rain | none
+var kind := ""               # ash | rain | sand | none
 var woody := false
 var outdoor := false
 var canvas: Node2D
@@ -60,6 +63,16 @@ func bind(z: Zone, h: Hero, d: DarkLayer) -> void:
 			kind = "rain"
 		elif th.contains("moor") or th.contains("heath") or th.contains("ash"):
 			kind = "ash"
+	Gust.storm = outdoor and str(zone.d.get("weather", "")) == "sandstorm"
+	if Gust.storm:
+		kind = "sand"
+		var ss := Node2D.new()
+		ss.set_script(load("res://world/sand_storm.gd"))
+		zone.floor_layer.add_child(ss)
+		ss.call("bind", zone, hero)
+		var wv: Array = zone.d.get("wind", [0.7071, 0.7071])
+		Gust.storm_base = Vector2(float(wv[0]), float(wv[1])).normalized()
+		Gust.storm_dir = Gust.storm_base
 	woody = outdoor and (th.contains("wood") or th.contains("root") or th.contains("fern") or th.contains("grove"))
 	beat_ph = float(hash(zone.id) % 1000) / 1000.0 * TAU
 

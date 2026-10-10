@@ -13,6 +13,15 @@ uniform bool band = false;          // a tall band (sorted with the bodies), not
 // (Derek, 2026-10-09): no glint (nothing glints on it), the slide only in the beat's two surges, a long stillness
 // between, the surface darkening a breath as each surge passes
 uniform bool red = false;
+// the shore field (Derek, 2026-10-09: the ocean "happening on the world, not in the world"): yards inland of the calm
+// waterline at each zone tile (tools/landkit3d/cove_export.py). With it the Red is no longer a picture sliding: swells
+// run in along the cove's own shape and wrap round what stands in them, steepen and froth in the last yards, and on each
+// surge of the heartbeat the swash runs up the real sand as a thin film with a dull froth at its lip, then drains back,
+// leaving the sand dark and wet behind it until the next beat
+uniform bool has_shore = false;
+uniform sampler2D shore : filter_linear, repeat_disable;
+uniform vec2 shore_size = vec2(1.0);
+uniform float shore_span = 24.0;
 // the pilgrim's lantern, as every prop reads it (core/main.gd sets these each frame; shaders/landkit_lit.gdshader):
 // it lights the painted form through its own normal map, so the light rakes across the bone, the boards and the
 // stones as the pilgrim walks, and the far side of every vertebra falls into its own shade (MASTER_RULES 0.2)
@@ -63,7 +72,41 @@ void fragment() {
 		if (c.a < 0.5) discard;
 	} else {
 		if (c.a < 0.5) discard;
-		if (c.a < 0.998 && red) {
+		if (red && has_shore) {
+			// thick blood on a dying heartbeat (Derek, 2026-10-09: "slower and gentler since it's thick blood and a heart
+			// beat"): one slow beat, a surge and a weaker one, then a long stillness; the swells barely sag in, the swash
+			// creeps up a yard or so and drains back slower than it came, and leaves the sand dark
+			vec2 tl = vec2(wpos.x / 72.0 + wpos.y / 36.0, wpos.y / 36.0 - wpos.x / 72.0) * 0.5;
+			float din = (texture(shore, tl / shore_size).r - 0.5) * shore_span;
+			float P = 6.5;
+			float n1 = floor(TIME / P);
+			float ph = fract(TIME / P);
+			vec2 W = floor(wpos / 4.0);
+			float s1 = smoothstep(0.02, 0.22, ph) * (1.0 - smoothstep(0.22, 0.8, ph));
+			float s2 = smoothstep(0.3, 0.42, ph) * (1.0 - smoothstep(0.42, 0.85, ph));
+			if (c.a < 0.998) {
+				// the swells: low, broad, sagging in toward the line only while the heart pushes
+				float hc = n1 + 0.6 * smoothstep(0.02, 0.22, ph) + 0.25 * smoothstep(0.3, 0.42, ph);
+				float crest = 0.5 + 0.5 * sin(din * 0.45 - hc * 6.2832 + 0.4 * sin(W.x * 0.02 + n1));
+				float cr = crest * crest;
+				c.rgb *= 0.95 + 0.07 * cr;
+				// in the last yard a dull skin gathers on the swell's back, never white
+				if (din > -1.5 && cr > 0.85 && vn(vec2(W.x * 0.12, W.y * 0.5) + vec2(n1 * 7.0, 0.0)) > 0.6)
+					c.rgb = mix(c.rgb, vec3(0.32, 0.17, 0.17), 0.22);
+			} else if (din < 4.0) {
+				float rag = 0.85 + 0.3 * vn(vec2(W.x * 0.025, n1 * 3.7));
+				float R = (1.5 * s1 + 0.7 * s2) * rag;
+				float wetR = 1.5 * rag * (1.0 - smoothstep(0.22, 1.0, ph));
+				if (din < R) {
+					float lip = R - din;
+					c.rgb = mix(c.rgb, vec3(0.13, 0.015, 0.025), clamp(lip / 0.7, 0.35, 0.85));   // the film of blood
+					if (lip < 0.18 && s1 + s2 > 0.3)
+						c.rgb = mix(c.rgb, vec3(0.3, 0.12, 0.12), 0.3);                      // its blunt lip
+				} else if (din < wetR) {
+					c.rgb = c.rgb * 0.78 + vec3(0.02, 0.0, 0.002);                       // the sand left wet
+				}
+			}
+		} else if (c.a < 0.998 && red) {
 			vec2 W = floor(wpos / 4.0);
 			float ph = fract(TIME / 3.6);                   // one beat: a surge, a weaker surge, then the stillness
 			float d1 = ph - 0.06;

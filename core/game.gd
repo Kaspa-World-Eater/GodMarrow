@@ -29,12 +29,17 @@ func seed_for(zid: String) -> int:
 ## the Empty Hand can turn the sky: a forced noon or night holds the hour (and so the light and the creatures)
 var sky_force := ""
 var sky_t := 0.0
+## a place that keeps its own hour while the pilgrim is in it (a zone's "holdPhase", set by core/main.gd on entering;
+## the cove's storm at dawn), or -1
+var hour_hold := -1.0
 
 func phase() -> float:
 	if sky_force == "noon":
 		return 0.3
 	if sky_force == "night":
 		return 0.78
+	if hour_hold >= 0.0:
+		return hour_hold
 	return fmod(clock / day_len, 1.0)
 
 ## the hour (Derek 2026-10-05: "get the day and night cycle tuned"): a 12-minute day, the light longer in going and
