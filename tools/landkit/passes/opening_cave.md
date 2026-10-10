@@ -795,3 +795,17 @@ rendered on the 2 x 2 grid (painted standard 7), where each flame has four times
 - **The blood runs** are twice as thick, painted as wet blood with a glint where the fire catches them.
 - **The flames:** a small hot seat and four separate tongues (seven in a brazier), narrower, taller and swaying more,
   with dark between them. They had merged into one soft teardrop.
+
+## Rules check (1st since pass 11)
+
+**Read:** `MASTER_RULES` in full, the area's opening (the Stranger's new lines), `CINEMATOGRAPHY.md`.
+**Checklist on `cv18_face` (the hall, game zoom, 2 x 2):** lines 1, 2, 4 to 8, 10 and 12 pass; line 3 now passes its
+bare-floor test (pass 11). `cine_check`: 9 of 9 measured rules pass. Line 11 (seen in the game) waits on the cave's
+bake, which waits on Derek's go.
+**Worst failure, line 3 (0.5c, the five tones of form):** the fallen shields on the hall floor were squashed spheres
+of rust. From the game's camera each read as a flat orange plate with a dot, one value across, and they were the
+loudest things on the floor.
+**Fixed** (`cave3d.shield`, used on the floor and in the heaps): a dished face of rusted iron (a polar mesh with real
+depth at the boss), a rolled iron rim, an iron boss, tipped up on its edge so the fire turns over the dish; face down
+it shows its hollow back and the grip. In `cv19_face` the dark rims outline every shield, the dishes turn from lit to
+shade, and the heap's leaning shields catch the brazier.

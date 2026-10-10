@@ -1013,9 +1013,7 @@ def throne():
             P.sphere("heap_hr%d" % i, (x, y, z + 0.02), 0.2, "rust", scale=(1.0, 0.95, 0.15))
             P.tube("heap_hn%d" % i, [(x + math.cos(b) * 0.15, y + math.sin(b) * 0.15, z + 0.16), (x + math.cos(b) * 0.17, y + math.sin(b) * 0.17, z - 0.02)], [0.02, 0.015], "iron", 4)
         elif kind < 0.74:                                          # a shield, leaning
-            tilt = rnd.uniform(-0.7, 0.7)
-            P.sphere("heap_sh%d" % i, (x, y, z + 0.28), 0.4, "rust", scale=(1.0, 0.1, 1.0), rot=(tilt, 0, b))
-            P.sphere("heap_sb%d" % i, (x - math.sin(b) * 0.05, y + math.cos(b) * 0.05, z + 0.28), 0.09, "iron", scale=(1.0, 0.6, 1.0), rot=(tilt, 0, b))
+            shield("heap_sh%d" % i, x, y, z, rnd.uniform(0.34, 0.44), b, rnd.uniform(0.9, 1.3), rnd.random() < 0.7)
         elif kind < 0.82:                                          # a skull
             P.sphere("heap_sk%d" % i, (x, y, z + 0.08), 0.1, "bone", scale=(1.1, 0.9, 0.95))
         elif kind < 0.92:                                          # long bones
@@ -1590,6 +1588,47 @@ def sconce(name, x, y, z, nx, ny):
     P.sphere(name + "_pan", (bx, by, z + 0.05), 0.09, "rust", scale=(1, 1, 0.4))
 
 
+def shield(name, x, y, f, R, yaw, tilt, face_up=True):
+    """a round shield of the old dead, as real form (the rules check after pass 11: the old ones were squashed spheres
+    that read from above as flat orange plates with a dot, one value across, failing the five tones of form): a dished
+    face of rusted iron, a rolled iron rim, a boss; tipped by `tilt` toward `yaw`, its lowest edge on the floor at `f`.
+    Face down it shows its hollow back and the grip across it"""
+    d = 0.2 * R                                                   # the dish's depth at the boss
+    if tilt < 0:                                                  # a tilt the other way is a tilt toward the far side
+        tilt, yaw = -tilt, yaw + math.pi
+    st_, ct_ = math.sin(tilt), math.cos(tilt)
+    n = (st_ * math.cos(yaw), st_ * math.sin(yaw), ct_)           # e1, e2, n right-handed: the faces' winding faces n
+    e1 = (ct_ * math.cos(yaw), ct_ * math.sin(yaw), -st_)
+    e2 = (-math.sin(yaw), math.cos(yaw), 0.0)
+    flip = 1.0 if face_up else -1.0
+    oz = f + R * st_ + (d * ct_ if not face_up else 0.0) + 0.015
+
+    def at(u, v, w):
+        w *= flip
+        return (x + u * e1[0] + v * e2[0] + w * n[0], y + u * e1[1] + v * e2[1] + w * n[1], oz + u * e1[2] + v * e2[2] + w * n[2])
+
+    SEG, RINGS = 28, 6
+    verts = [at(0.0, 0.0, d)]
+    for j in range(1, RINGS + 1):
+        r = R * j / RINGS
+        for k in range(SEG):
+            a = 2 * math.pi * k / SEG
+            verts.append(at(r * math.cos(a), r * math.sin(a), d * (1.0 - (r / R) ** 2)))
+    faces = [(0, 1 + k, 1 + (k + 1) % SEG) for k in range(SEG)]
+    for j in range(RINGS - 1):
+        b0, b1 = 1 + j * SEG, 1 + (j + 1) * SEG
+        faces += [(b0 + k, b1 + k, b1 + (k + 1) % SEG, b0 + (k + 1) % SEG) for k in range(SEG)]
+    P.poly(name + "_face", verts, faces, "rust", 0.025)          # face down, the winding shows the hollow back up
+    rim = [at(R * math.cos(2 * math.pi * k / SEG), R * math.sin(2 * math.pi * k / SEG), 0.0) for k in range(SEG + 1)]
+    P.tube(name + "_rim", rim, [0.03 * R / 0.36] * (SEG + 1), "iron", 5)
+    if face_up:
+        bx, by, bz = at(0.0, 0.0, d + 0.02)
+        P.sphere(name + "_boss", (bx, by, bz), 0.075 * R / 0.36, "iron", scale=(1.0, 1.0, 0.6))
+    else:
+        P.tube(name + "_grip", [at(-0.5 * R, 0.0, 0.045), at(-0.42 * R, 0.0, 0.02), at(0.42 * R, 0.0, 0.02), at(0.5 * R, 0.0, 0.045)],
+               [0.022, 0.022, 0.022, 0.022], "iron", 4)
+
+
 def relics():
     """iron left lying where it fell, through the hall, up the stairs and round the pool (Derek: "more iron relics
     laying around"): swords, broken blades, helms, shields, chains, manacles, spearheads on broken shafts, iron
@@ -1632,8 +1671,9 @@ def relics():
         elif kind < 0.33:                                        # a helm on its side
             P.sphere("rl_hm%d" % i, (x, y, z + 0.1), 0.15, "iron", scale=(1.0, 0.9, 0.85), rot=(1.2, 0, b))
         elif kind < 0.43:                                        # a shield, face down or up
-            P.sphere("rl_sh%d" % i, (x, y, z + 0.04), 0.36, "rust", scale=(1.0, 1.0, 0.09), rot=(rnd.uniform(-0.15, 0.15), 0, b))
-            P.sphere("rl_sb%d" % i, (x, y, z + 0.08), 0.08, "iron", scale=(1.0, 1.0, 0.5))
+            # tipped up on whatever it fell across, so the fire turns over its dish
+            shield("rl_sh%d" % i, x, y, f, rnd.uniform(0.3, 0.4), b, rnd.uniform(0.12, 0.42) * rnd.choice((-1, 1)),
+                   rnd.random() < 0.6)
         elif kind < 0.56:                                        # a length of chain lying in a curve
             n = rnd.randint(6, 14)
             for q in range(n):
