@@ -48,6 +48,18 @@ func bind(z) -> void:
 		n.material = m
 		add_child(n)
 		flames.append({"node": n, "seed": seed})
+		# its sound, at the fire: a torch crackles, a brazier roars low, candles barely flutter (core/sfx.gd loop)
+		var snd := "fire_brazier" if kind == 1 else ("fire_candle" if kind >= 2 else "fire_torch")
+		var ap := AudioStreamPlayer2D.new()
+		ap.stream = Sfx.loop(snd)
+		ap.bus = "World"
+		ap.position = at
+		ap.max_distance = {"fire_brazier": 1500.0, "fire_torch": 1000.0, "fire_candle": 360.0}[snd]
+		ap.attenuation = 1.6
+		ap.volume_db = {"fire_brazier": -9.0, "fire_torch": -13.0, "fire_candle": -16.0}[snd] + linear_to_db(maxf(0.0001, float(Settings.sfx_vol)))
+		ap.pitch_scale = randf_range(0.9, 1.1)
+		add_child(ap)
+		ap.play(randf() * 2.9)
 
 func _process(_dt: float) -> void:
 	for f in flames:

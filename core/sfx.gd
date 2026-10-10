@@ -81,7 +81,7 @@ func _play(name: String, vol: float, pitch: float) -> void:
 	if cm and not OURS.has(name):
 		var id: String = str(CM.get(name, ""))
 		if id != "":
-			load("res://core/cm_sound.gd").play(self, id, linear_to_db(maxf(0.0001, vol * float(Settings.sfx_vol))) + (-8.0 if name.begins_with("step_") else 0.0), pitch)
+			load("res://core/cm_sound.gd").play(self, id, linear_to_db(maxf(0.0001, vol * float(Settings.sfx_vol))) + (-14.0 if name.begins_with("step_") else 0.0), pitch)   # (steps 6 dB down, Derek 2026-10-10: "too intense")
 		return
 	if LAYERS.has(name):
 		for l in LAYERS[name]:
@@ -170,6 +170,91 @@ func _takes(name: String) -> Array:
 		out.append(_wav(s))
 	bank[name] = out
 	return out
+
+## a fire's own sound, looping, for a player standing at the fire (world/live_flames.gd; Derek, 2026-10-10: "The fire
+## should have sound too, a crackling if it's a torch or camp fire, and other to match each type"), made here once:
+## - "fire_torch": a soft breathing roar under a dry crackle, small pops several a second and now and then a snap;
+## - "fire_brazier": a bed of coals, a deeper roar, the crackle thicker, the snaps louder, a hiss now and then;
+## - "fire_candle": almost nothing, a faint flutter of air and a rare tick, heard only up close.
+## Three seconds, the end crossfaded into the start so the loop has no seam.
+static var _loops := {}
+static func loop(kind: String) -> AudioStreamWAV:
+	if _loops.has(kind):
+		return _loops[kind]
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(kind)
+	var L := int(RATE * 3.0)
+	var X := int(RATE * 0.25)
+	var n := L + X
+	var s := PackedFloat32Array()
+	s.resize(n)
+	var roar: float = {"fire_torch": 0.14, "fire_brazier": 0.3, "fire_candle": 0.035}.get(kind, 0.1)
+	var pops: float = {"fire_torch": 9.0, "fire_brazier": 15.0, "fire_candle": 0.8}.get(kind, 6.0)
+	var snaps: float = {"fire_torch": 0.5, "fire_brazier": 1.1, "fire_candle": 0.0}.get(kind, 0.3)
+	var lowk := 0.012 if kind == "fire_brazier" else 0.03
+	var a := 0.0
+	var b := 0.0
+	for i in n:
+		var t := float(i) / RATE
+		var w := rng.randf() * 2.0 - 1.0
+		a += (w - a) * lowk
+		b += (a - b) * 0.08
+		var flutter := 0.7 + 0.3 * sin(t * 6.2832 * (5.0 + 2.0 * sin(t * 1.3))) * sin(t * 6.2832 * 0.9 + 1.0)
+		s[i] = b * 6.0 * roar * flutter
+	# the crackle: short bright bursts, each its own size; the snaps: fewer, louder, with a ring
+	var ev := int(pops * 3.25)
+	for e in ev:
+		var at := rng.randi_range(0, n - 400)
+		var amp := rng.randf_range(0.05, 0.35) * (1.0 if kind != "fire_candle" else 0.25)
+		var dur := rng.randi_range(40, 260)
+		var c := 0.0
+		for j in dur:
+			var w := rng.randf() * 2.0 - 1.0
+			c += (w - c) * 0.7
+			s[at + j] += c * amp * exp(-float(j) / (dur * 0.25))
+	for e in int(snaps * 3.25):
+		var at := rng.randi_range(0, n - 1600)
+		var amp := rng.randf_range(0.35, 0.7)
+		var c := 0.0
+		for j in 1500:
+			var w := rng.randf() * 2.0 - 1.0
+			c += (w - c) * 0.85
+			s[at + j] += (c * exp(-float(j) / 90.0) + 0.25 * sin(float(j) * 0.9) * exp(-float(j) / 300.0)) * amp
+	if kind == "fire_brazier":
+		for e in 2:                                                   # a hiss: sap, or wet in the coals
+			var at := rng.randi_range(0, n - RATE)
+			var c := 0.0
+			for j in int(RATE * 0.6):
+				var w := rng.randf() * 2.0 - 1.0
+				c += (w - c) * 0.9
+				var u := float(j) / (RATE * 0.6)
+				s[at + j] += c * 0.08 * sin(u * PI)
+	var out := PackedFloat32Array()
+	out.resize(L)
+	for i in L:
+		out[i] = s[i]
+	for i in X:
+		var k := float(i) / X
+		out[i] = s[i] * k + s[L + i] * (1.0 - k)
+	var pk := 0.0
+	for v in out:
+		pk = maxf(pk, absf(v))
+	if pk > 0.9:
+		for i in L:
+			out[i] *= 0.9 / pk
+	var data := PackedByteArray()
+	data.resize(L * 2)
+	for i in L:
+		data.encode_s16(i * 2, int(clampf(out[i], -1.0, 1.0) * 32767.0))
+	var wv := AudioStreamWAV.new()
+	wv.format = AudioStreamWAV.FORMAT_16_BITS
+	wv.mix_rate = RATE
+	wv.data = data
+	wv.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	wv.loop_begin = 0
+	wv.loop_end = L
+	_loops[kind] = wv
+	return wv
 
 func _wav(samples: PackedFloat32Array) -> AudioStreamWAV:
 	var pk := 0.0
