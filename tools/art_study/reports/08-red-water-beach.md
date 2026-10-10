@@ -22,6 +22,7 @@ Kept as the work goes (MASTER_RULES 2c); it is written in full when Derek calls 
 | Pass 5, mid-pass | "Make sure the tide moves rather slow as it's based on dying heart beats not normal speeds and blood is think and viscous" | |
 | Pass 6 | "Turn the logs into bones" | |
 | After pass 6 | "Doing great I'm loving it. Good job" | |
+| The cove (pass 13 on) | the wedges, the cave's grit, the wave coming in, the accordion bones, the shadows, "2x2", the flat sand and bones (see below) | |
 
 ## What the studies taught
 
@@ -105,3 +106,64 @@ These become library pages when Derek calls the beach done:
 - grain along each object's own axis;
 - fine local meshes for small form;
 - the bone jam.
+
+## The cove, and the road into the game (pass 13 on)
+
+Derek, after pass 12: make the beach "at least 4 screens long", lead it into bluffs that force the player inland, sand
+"2 screens" deep before the cliffs "like a big cove", a crumbled basalt shrine and "random columns of basalt in the
+water sparsely", "make sure it's all walkable and ship it to game assets". Then, on the cove in the game:
+
+| Words | What it changed |
+|---|---|
+| "The triangle shaped wedges are bad ... looks lazy" | the cliffs' broken tops stay level; no corner drops, no sliver cells, rim stumps kept out of the split tier |
+| "that raw gritty rough texture ... inside of the cave" | the cliffs painted as the cave's basalt: grit, rust, zeolite, weeping runs, tide marks |
+| "The wave should be coming in not from the side" | the peel slowed so the wave comes toward the shore |
+| "some [bones] doing an accordion thing" | each bone a rigid line laid on the support's upper hull |
+| "the shadows ... look pretty bad" | the soft overcast shadow (below) |
+| "why does it look so pixely?" → "2x2" | the bake on the 2 x 2 grid (painted standard 7) |
+| "the Sandy sand ... is just so flat. Shouldn't it have depth profiles" | ground depth at three scales, made a rule (MASTER_RULES 0.5b) |
+| "The bones have the same issue of looking very flat too" | the five tones of form, made a rule (0.5c) |
+
+**Grade:** my B- (the frame composes; the painting still wants work). Derek has not graded the cove yet.
+
+**What worked:**
+- **The cove as a shape by cause:** a superellipse distance (`beach_floor.cove_d`) bounds the sand between headlands, its
+  back (`back_s`) and sides (`side_t`) where the rim stands, with one cleft cut through (`cleft_t`, `in_cleft`) as the
+  way on. Ground, cliffs, the walk grid and the bake all read the same function.
+- **Ground depth at three scales** (`beach_floor.dune_relief`): the landform (a foredune with blowouts, low dunes and a
+  swale), the drift (drifts banked against what stands, scour hollows on the windward side, sand tails on the lee), the
+  grain (ripples, prints, pebbles). The value-only render of bare sand reads.
+- **The five tones of form** (`paint_shore.form_tones`): a value offset from each surface's turn to the key and its
+  occlusion, laid over the material's own tone. The bones read as round shafts, the dead as bodies.
+- **The overcast's soft shadow** (`paint_shore.light`): the key keeps the turn of form, but the cast shadow is separated
+  out of the moon pass, blurred wide (7 texels for each texel of zoom) and weakened to a third. Contact stays dark. The
+  whole cove was repainted from its saved passes without a new render.
+- **Rigid long bones:** a bone is a straight line between two ends, laid at the height of the upper hull of what it
+  rests on, never sampled point by point.
+- **The bake** (`cove_bake.py`): one Blender build renders 51 aligned tiles (`blend_tiles.py`); every tile proved aligned
+  to 0.00 px from the position pass; 174 chunks with depth-sorted bands, normal maps, a height map and a block map.
+  The Red is baked between beats (`GM_CALM`) and moved in the game by the shader.
+- **The exporter** (`cove_export.py`): the walk grid from the cove's shape and the obstacles, proved by a walk from the
+  start (2,553 tiles reached, the cleft's portal reached); the start under the right headland, a lantern and a
+  waystone; the cove's own ambient. 60 fps in the game.
+
+**What failed, and why:**
+
+| Tried | What it looked like | Why it failed | Fixed by |
+|---|---|---|---|
+| Broken column tops tilted; corners dropped on stumps | Triangle wedges along the rim | Slanted planes read as cut wedges, not broken stone | Level tops, corners inset only |
+| Sliver cells in the cliff's Voronoi | Thin shards | Cells too small to be columns | Sliver cells skipped |
+| Each sample of a bone lifted to the ground under it | An accordion | A rigid thing followed every bump | One rigid line on the upper hull |
+| The sky as a gradient in the facets' reflections | Wrong-way skies | Facets tilted away mirror the horizon, not the zenith | Reverted to the flat overcast |
+| The moon pass's hard shadow under an overcast | Long dark streaks from every bone | An overcast throws no hard shadow | The soft shadow |
+| The bog's ambience on the cove | Too dark in the game | A dark marsh's veil on a grey shore | The cove's own ambient |
+| A shader variable named `band` | A compile error | It collided with a uniform | Renamed `swb` |
+
+**Traps:**
+- the bake's height lift is the engine's, `KZ * 4`, never the art scale;
+- the game's live lantern casts its own hard shadows off every object's occluder (`world/dark_layer.gd`); they are not
+  the bake's, and a repaint cannot fix them.
+
+**What carries forward** (add to the list above): the cove shape by one distance function read by everything; ground
+depth at three scales; the five tones of form; the overcast's soft shadow; rigid long objects on the upper hull; the
+aligned-tile bake and the proving exporter, now the road for every 3D-road area into the game.

@@ -28,12 +28,10 @@ blood, and walks out onto black sand by a sea of blood.
 | 08 | `08-tech-and-build.md` | Running, testing, committing and delivering the game; the PC and its tools |
 | 09 | `09-backlog-and-open-questions.md` | The plan beyond the current piece, what's parked, what Derek still decides |
 | 10 | `10-study-great-games.md` | The study of Path of Exile, Diablo II, Blasphemous and gritty pixel games |
-| 11 | `11-codex-voices.md`, `11a-codex-stranger.md` | The Codex: in-world works by many writers, and the Stranger's own pages (older than the bible; due a rewrite to it) |
-| 12 | `12-lore-notes.md`, `12b-codex-interviews.md` | Ideas from the writer interviews: a quarry, not canon (much is retired: see `mythology/backstage.md`) |
 | 13 | `13-godot.md` | The game's code: units, layers, folders, the autoloads, a zone, bodies, test hooks |
 | 14 | `14-mechanics-checklist.md` | Every mechanic with numbers, from the old browser build (a reference for intent, not a port list) |
 | 15 | `15-arcana-v103.md` | The body board's roads and the Mystic's cards |
-| 16 | `16-errant-ways.md` | The Errant Ways: three archetypes per calling (a proposal) |
+| — | `../archive/wiki_before_the_bible/` | **Retired 2026-10-09:** the old Codex pages (11, 11a), the interview notes (12, 12b) and the Errant Ways proposal (16), written before the bible; records to mine, not canon |
 
 ## The callings
 

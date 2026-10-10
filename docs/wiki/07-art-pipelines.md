@@ -1,6 +1,6 @@
 # 07 · Art pipelines: how the art is made
 
-*Rewritten 2026-10-08. The look these pipelines aim at is page 06; the laws they obey are `docs/MASTER_RULES.md`; how
+*Rewritten 2026-10-08; the 3D road brought up to date 2026-10-09. The look these pipelines aim at is page 06; the laws they obey are `docs/MASTER_RULES.md`; how
 each pixel gets its colour is `docs/PAINTED_STANDARD.md`; the techniques in depth are the art library
 (`tools/art_study/library/`). The PixelLab era, the browser's packing scripts and the Cursemark assets are retired
 (section 9).*
@@ -12,6 +12,7 @@ each pixel gets its colour is `docs/PAINTED_STANDARD.md`; the techniques in dept
 | **The 3D road** | built things and anything that overhangs: temples, huts, walls, frames, trees with branches, hanging moss | `tools/landkit3d/` (Blender, driven from Python) | every new area's built pieces, from the first area on (Derek, 2026-10-08: "absolutely fucking crushed with the 3d ... this is the way") |
 | **The height-field engine** | ground, terrain, water, bone half-sunk in mud, anything that is one surface seen from above | `tools/art_study/wood_scene.py`, `bog_scene.py`, `bog_chambers.py`; generators in `tools/landkit/` | floors, the bog, review scenes; it is also the engine the bakes run through |
 | **Baking a land** | a whole zone painted for the game, chunk by chunk: ground, sorted tall bands, normals, floor heights | `tools/worldgen/` (`bog.py` → `bog_export.py` → `bog_bake.py`) | a generated area going into the game (the Sunken Bog first) |
+| **Baking a 3D-road area** | the same chunks, rendered from real 3D forms in aligned tiles | `tools/landkit3d/` (`cove_bake.py` → `cove_export.py`; `cave_bake.py` → `cave_export.py`) | every area built on the 3D road (the Red Shore's cove, the opening cave) |
 | **Baking an object set** | reusable pieces as sprites with normal maps, shadows, collision, cover | `tools/landkit/bake.py`, `build_set.py` → `art/landkit/<set>/` | trees, stumps, stones placed by a zone generator |
 | **Characters** | heroes, NPCs, creatures in 8 directions with every clip | PixelForge (`tools/pixelforge/`), shape sprites (`.shapes.json`); `tools/paintover/` for the hand pass | anything that walks |
 | **Effects and surfaces** | blood, fire, water, ice, miasma, skill effects, painted surfaces | `shaders/*.gdshader`, benches in `core/test_hooks.gd` | anything that moves or glows in the game |
@@ -21,60 +22,66 @@ Every road ends the same way: **one piece at a time, ten graded passes, Derek's 
 
 ## 2. The 3D road (`tools/landkit3d/`)
 
+*Updated 2026-10-09: the road now carries whole areas into the game (the Red Shore's cove; the opening cave). Every
+module is listed in `tools/landkit3d/README.md`.*
+
 **The idea:** the form is real 3D geometry, built from code in Blender at true size. Blender renders **only data**
-(which way every surface faces, where it is in the world, what it is made of, how sheltered it is, whether the moon
-reaches it), never a look. Our painter turns the data into pixel art with our ramps and rules. The 3D never shows;
+(which way every surface faces, where it is in the world, what it is made of, how sheltered it is, whether the moon or a
+lamp reaches it), never a look. A painter turns the data into pixel art with our ramps and rules. The 3D never shows;
 only the paint does.
 
-**The files:**
-- `blend_scene.py`, run inside Blender:
-  `blender.exe --background --python tools/landkit3d/blend_scene.py -- SCENE OUT_DIR FX FY W H [--heightfield]`.
-  - It builds the scene module's forms in the game's own coordinates (yards; x screen right-down, y screen left-down,
-    z up) under one parent. That parent flips y, because the game's axes are mirrored against a right-handed world,
-    and squeezes z by 0.952, because a true 30° look gives 22.05 px a yard of height where the game uses 21.
-  - An orthographic camera at 60°/0°/45° with `ortho_scale` = width / 25.46 px a yard matches the game's projection
-    pixel for pixel (18 × 9 px a yard on the ground). FX, FY are the ground point at the frame's centre.
-  - The moon is a sun lamp from the screen's upper left (`SUN`, as the painted standard says).
-  - Cycles renders the passes in a few seconds (a whole temple takes 8):
-    - normal, position, ambient occlusion, material index;
-    - the moon's direct light (lambert × shadow);
-    - alpha.
-  - They are flipped back into game coordinates and saved to `passes.npz`.
-- `parts3d.py`: the reusable parts (boxes, slabs from corner points, tubes along a path with a radius per point,
-  spheres, displaced relief) and the material table (`MATS`: ground, stucco, brick, stone, lacquer, gold, tile, wood,
-  root, iron, bone, moss, cloth).
-- `temple3d.py`: the destroyed Thai temple (the trial piece). It shows how a scene is written: one function per part
-  (platform, walls, porch, roof tiers as stepped tile courses, gable trim, stair, sema stones, guardian, spirit house,
-  siege debris, ferns), every number a true size, every ruin by its cause.
-- `paint3d.py`: `python tools/landkit3d/paint3d.py PASSES_DIR OUT.png [HX HY HZ FX FY]`.
-  - **The light:** the overcast sky, soft from above, a soft key from the upper left, a breath of the moon's true
-    shadow, and deep occlusion in the crevices.
-  - **Each material** gets its short hue-shifted ramp, and its wear by cause:
-    - stucco lost where the damp rises and the eaves drip;
-    - algae on the low shade side;
-    - streaks under every lip;
-    - gold only in the recesses;
-    - moss where a surface faces up and holds the wet;
-    - each roof tile its own;
-    - the forest floor a moss carpet with every fallen leaf placed by world position.
-  - **Lit lips** where the form turns toward the light, dark ones where it turns away.
-  - **The paper's tooth**, fixed to the world.
-  - The Ossuarch is stood at a given point for scale, hidden behind what is nearer.
+**One scene, start to finish:**
+1. **A scene module** builds the forms (`temple3d.py`, `beach3d.py`, `cave3d.py`): one function per part, every number a
+   true size, every ruin, drift and stain by its cause. Shared parts live in `parts3d.py` (boxes, slabs, tubes along a
+   path, spheres, displaced relief, the material table); shared ground in the floor modules (`shore_floor.py`,
+   `beach_floor.py`, `floor3d.py`): **the floor's height is one function** that the mesh, the bake's height map and the
+   zone's walk grid all read.
+2. **Blender renders the passes** (`blend_scene.py` for one camera, `blend_tiles.py` for many tiles in one build):
+   normal, position, occlusion, material, the moon's light and shadow, the lamps' light, sky view, reflection, object
+   ids, all saved to `passes.npz` in game coordinates. The orthographic camera matches the game's projection pixel for
+   pixel (18 × 9 px a yard on the ground, 21 px a yard of height; `K = 25.46` px a yard on the screen's axes).
+3. **A painter paints them** to the painted standard: `paint3d.py` (built things), `paint_shore.py` (sand, sea, basalt,
+   bone, the dead), `paint_cave.py` (fire-lit interiors: stepped light zones, flames as tongues, carved faces, the pool).
+4. **The frame is measured:** `cine_check.py` scores the measurable cinematography rules; the value-only render proves
+   the form; the Ossuarch is placed for scale.
 
-**The height-field switch** (`--heightfield`): rays straight down turn the same scene into one height per spot, the
-way the height engine stores the world. It exists for the method trial: everything under something else fills solid
-(the eaves become walls), which is why the 3D road won.
+**What the painters now do, and must keep doing:**
+- **Ground with depth at three scales** (MASTER_RULES 0.5b): the landform, the drift, the grain, all real height (the
+  cove's dunes, swales, drifts round what stands, ripples; the cave hall's heaved flags and worn trough).
+- **The five tones of form** on everything rounded (0.5c, `paint_shore.form_tones`): light side, halftone, core shadow,
+  reflected light, cast shadow and contact.
+- **Light by the place:** the overcast's soft key from the sky's bright side, with the cast shadow blurred wide and
+  weakened (an overcast throws no hard shadow, `paint_shore.light`); in the cave, the fires only, each pool of light
+  stepped into widening bands with black between.
+- **The 2 x 2 grid** (painted standard 7): baked lands are painted at two texels an engine pixel. **Every pixel-sized
+  constant in a painter is scaled by the render's zoom** (`d["zoom"]`); the cave's pool once went flat because one was
+  not.
+- **Materials by cause:** the cave's gritty raw basalt with rust and weeping runs, carved stone finished smooth, blood
+  near-black with a skin and a gloss, foam as a life cycle, tide marks of dried red film.
+
+**Into the game** (the cove and the cave):
+- **The bake** (`cove_bake.py`, `cave_bake.py`) renders the zone as aligned tiles (each camera placed so a pixel's centre
+  lands on an engine pixel; `check_align` proves it from the position pass, 0.00 px), paints them, and cuts them into the
+  game's chunks: the ground, its normal map, the standing things sorted into half-yard depth bands, `height.png` (the
+  floor's height for lifting bodies), `block.png` (what blocks walking), and `index.json`. The game draws them with
+  `world/baked_ground.gd`; water marked in the alpha (254) moves with the shader (`shaders/baked_ground.gdshader`, the
+  Red's heave on the heartbeat).
+- **The exporter** (`cove_export.py`, `cave_export.py`) writes the zone file (`data/zones/<id>_s<seed>.json.gz`): the walk
+  grid from the floor and the bake's blocks, **proved by a walk from the start that must reach every walkable tile and
+  every way out**; the start, portals, lanterns, waystones, lights from the scene's lamps, folk (the Stranger), and the
+  zone's ambient; then the zone index.
+- **A whole zone** takes about an hour to bake at the cave's quality; repaint-only passes (`paint` step) reuse the saved
+  tiles.
 
 **What the road still needs:**
-- **Export to the game:** a piece's sprite, normal map, depth bands and collision footprint come straight from the
-  passes. The baked land's band-sorting already proves the method.
-- **Parts kits** for the Red Shore:
-  - the fusion roof (Thai tiers, finials and bargeboards over plank);
-  - carved face-posts, canoes;
-  - the hide hut, the palisade;
-  - the forest's giants, drift logs, sea stacks.
-- **A painter at the painted standard:** broad tone shapes, wet edges, dry-brush strokes along the form, wet sheen.
-  This is where the work is now (Derek: "the painting and details have a long ways to go").
+- the Red's true heartbeat loop in the game (the cove bakes one calm frame; the shader only heaves);
+- live fire in baked interiors (the cave's flames are painted into the bake; its game lights flicker over them);
+- shared, properly built dead (one corpse asset for every area, `tools/landkit/passes/opening_cave.md`);
+- the parts kits for the rest of the Red Shore: the hide hut, the palisade, the fire pit of the dead, the giant trees;
+- the seeded zones of the map policy (MASTER_RULES section 5): a generator per land, a graded pool of seeds, each baked.
+
+**The height-field switch** (`blend_scene.py --heightfield`) still exists for the method trial: as a height field,
+everything under something else fills solid (the eaves become walls), which is why the 3D road won.
 
 ## 3. The height-field engine (`tools/art_study/wood_scene.py` and the scenes on it)
 

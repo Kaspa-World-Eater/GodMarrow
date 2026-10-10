@@ -118,7 +118,7 @@ marrow.
 **Names:**
 - the Bleeding Maiden, never "Weeping";
 - the Ossuarch's order is the Pale Order;
-- the Shrine Keeper's stacks are Omens; the Word skill's sigil stays a sigil; the runeword-style words are sigils;
+- the Shrine Keeper's stacks are Accords (were Omens until 2026-10-09); the Word skill's sigil stays a sigil; the runeword-style words are sigils;
 - "Minor Arcana", not nodes or knots;
 - the Empty Hand's name is "The Empty Hand".
 

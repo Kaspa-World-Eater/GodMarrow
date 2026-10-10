@@ -403,8 +403,8 @@ On the nights when they come close together, nose to nose over the sea, they are
 higher up the black sand than on any other night, reaching for them. The shore folk do not go down to the water on
 those nights.
 
-**The grey itself**, everyone agrees, is newer than the sun. The oldest tellings say the sky went grey in the year
-of the coming out. The Myriad say the grey is the old one's last breath: it breathed out as it died and the breath is still
+**The grey itself**, everyone agrees, is newer than the sun. The oldest tellings say the sky went grey on the
+first morning. The Myriad say the grey is the old one's last breath: it breathed out as it died and the breath is still
 going out, rising off the whole Hide and hanging between the world and the sun, and the sky will not clear until the
 breath has all gone. The circles of the Veiled Crone say the grey is her veil, drawn over the whole sky, and that the
 two moons are her eyes behind it, one open and one shut, and that when the dark moon crosses the pale one she is

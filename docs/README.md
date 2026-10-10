@@ -36,12 +36,13 @@ Derek's newest dated ruling in `wiki/01-rules-and-decisions.md` wins; then the n
 ## The design wiki (`wiki/`)
 
 `wiki/00-start-here.md` lists every page.
-- **The game:** `04` systems and combat; `05-class-*` the callings; `14` the mechanics checklist; `15` the body board;
-  `16` the Errant Ways.
+- **The game:** `04` systems and combat; `05-class-*` the callings; `14` the mechanics checklist; `15` the body board.
 - **The look and the making:** `06` art direction; `07` the art pipelines (the 3D road, bakes, characters); `10` the
   study of great games.
 - **The machine:** `08` tech and build (running, testing, git, delivering to the laptop); `13` the code's architecture.
-- **Older lore pages** (`02`, `11`, `11a`, `12`, `12b`): written before the bible; where they disagree, the bible wins.
+- **`02` the world as design** (acts, zones, creatures, voice); the lore itself is the bible's.
+- **Retired 2026-10-09:** the old Codex pages, the interview notes and the Errant Ways proposal, written before the
+  bible, are in `archive/wiki_before_the_bible/`.
 
 ## The tools (`../tools/`)
 

@@ -22,16 +22,12 @@ trees with branches, hanging moss.
 
 ## How it fits the game
 
-- **The forms are built in the game's own coordinates:** yards on the ground, height up. They are built under one
-  parent that flips the game's mirrored axis and squashes height to the game's ratio, scaled (1, −1, 0.952).
-- **The camera** is orthographic at the game's exact angle and pixel scale, so a 3D render lines up with the iso grid
-  pixel for pixel. A scene's frame is given in the game's own terms: focus, width, height.
-- **Blender renders data only:** normals, world position, ambient occlusion, a material index per surface, the direct
-  light and the alpha. These go into one `passes.npz`.
-- **Our painter paints the data** (`paint3d.py`), the way it paints a height field: ramps, dither, materials by cause,
-  lit lips, a tooth fixed to the world. **Nothing of Blender's own shading reaches the screen.** That is what keeps it
-  from the cheap 3D look Derek forbids.
-- **Renders are fast:** the whole temple takes 8 seconds. A piece can be rebuilt and repainted many times a pass.
+*Updated 2026-10-09: the road now takes whole areas into the game.* A scene renders in aligned tiles, is painted, and is
+cut into the game's chunks (ground, depth-sorted tall bands, normal maps, a height map, a block map), exactly the format
+the Sunken Bog's land bake made; an exporter writes the zone, proves it walkable and places the start, ways out,
+lights and folk. The Red Shore's cove (`cove_bake.py`, `cove_export.py`) was the first; the opening cave
+(`cave_bake.py`, `cave_export.py`) the second. The whole chain is `docs/wiki/07-art-pipelines.md` section 2; every
+module is in `tools/landkit3d/README.md`.
 
 ## What the passes taught
 
@@ -73,15 +69,14 @@ trees with branches, hanging moss.
 
 ## Still to learn
 
-From the trial's open list:
-- the roof: its repair tiles and missing tiles are a checker of square patches, a pixel grid;
-- the stair's readability (the treads and risers are lost under brick, moss and leaves);
-- the giant trees round the temple;
-- drizzle and wet sheen, by material;
-- the guardian and the candle's hidden light.
-
-The temple's next passes also carry the Red Shore's fusion details: carved cedar face-posts at the porch, and
-eye-like ovoids among the gable's flames (`docs/wiki/mythology/areas/the-red-shore.md`).
+- **Done since the temple:** the painter at the painted standard (reports 07 and 08), real stone (`cliff3d`), the export
+  to the game (above), ground depth at three scales and the five tones of form (MASTER_RULES 0.5b, 0.5c), the 2 x 2
+  grid.
+- **Still open:**
+  - the Red's true heartbeat loop and live fire inside a baked zone (the bake holds one frame);
+  - one shared, properly built corpse for every area;
+  - the parts kits for the rest of the Red Shore (the hide hut, the palisade, the fire pit, the giant trees);
+  - the seeded zones (MASTER_RULES section 5): a generator per land on the 3D road.
 
 ## Parts
 

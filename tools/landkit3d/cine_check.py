@@ -2,7 +2,7 @@
 "This study needs to be taken super seriously"). The numbers go in the pass log; the thresholds are our starting
 values, tuned by Derek's grades.
 
-  python tools/landkit3d/cine_check.py FRAME.png [--interior] [--sources MASK.png]
+  python tools/landkit3d/cine_check.py FRAME.png [--exterior]   (interior rules unless --exterior)
 
 Rules measured (their numbers in CINEMATOGRAPHY.md):
    1  the brightest pixels sit in a few small places (sources), not spread over surfaces

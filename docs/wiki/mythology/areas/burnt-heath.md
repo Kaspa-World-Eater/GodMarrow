@@ -162,5 +162,5 @@ Hollow King (parked); fog; red light; crows; the old generator's shared landmark
 **Open questions for Derek.**
 - How near the seven may come to the old homage (horns, size, pose) without reading as any real creature.
 - Whether the seat is ever shown. We suggest never.
-- The keeper's name, Aud, comes from the interviews (`../../12b-codex-interviews.md`), which are not canon until
+- The keeper's name, Aud, comes from the interviews (`../../../archive/wiki_before_the_bible/12b-codex-interviews.md`), which are not canon until
   adopted.

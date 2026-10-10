@@ -5,7 +5,7 @@ face cut into cusps, the berm, the backshore), the pebbles and cobbles the waves
 the one heavy shore-break peeling from the headland (an unbroken swell, a curling lip with its hollow under it, the bore
 of foam lumps), the swash sheet with a real step at its front, the glossy film the backwash leaves (a mirror, so the
 reflection pass shows the cliffs and the dead in it), the wrack lines, the drift-log jam, the dead the Red gave back,
-and the black cliffs (cliff3d.cliffs_v2) closing the beach on the right. Only what is smaller than a pixel is painted
+and the black cliffs (this module's cove_cliffs, on cliff3d's rough prisms) closing the cove. Only what is smaller than a pixel is painted
 (paint_shore.py): the lace, the grain, the stain.
 
   blender --background --python blend_scene.py -- beach3d OUT -48.44 -42.78 480 340     (GM_T sets the wave's time)

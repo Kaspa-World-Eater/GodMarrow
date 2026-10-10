@@ -33,6 +33,8 @@ section 1).
 | [The 3D road](methods/09-the-3d-road.md) | Built things and overhangs as real 3D forms in Blender, painted by our painter; what the temple trial taught |
 | [Baking a land](methods/10-baking-a-land.md) | A whole zone painted for the game in chunks: the proof, seams, height, bands, wind, cost |
 | [Stone and dark interiors](../reports/07-opening-cave.md) | Basalt of every girth (`cliff3d.seeds`, `cells`, `rough_prism`, `chunk`); the cave painter (`paint_cave.py`: the lamps as the light, log curve, light zones, black as a note, quiet darks, fire with embers and shimmer); stone carved smooth against rough walls; faces in the rock (`serene_depth`); `cine_check.py` |
+| [The sea of blood and the black sand](../reports/08-red-water-beach.md) | The heartbeat clock and viscous water; Fresnel on a dark body; foam by stage; the sand by its state; ground depth at three scales (`beach_floor.dune_relief`); the five tones of form (`paint_shore.form_tones`); the overcast's soft shadow; rigid bones; the cove shape; the aligned-tile bake and the proving exporter (`cove_bake.py`, `cove_export.py`) |
+| [Motion](../../../docs/animation/README.md) | Everything that moves: Lasseter's principles for our sprites, the timing sheet, the clips, plants, water, fire, the checklist; `tools/anim/contact_sheet.py` |
 
 ## Environments: one page per land
 [Old-growth wood](environments/old-growth-wood.md) ·

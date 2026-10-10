@@ -124,3 +124,43 @@ walls aren't rough enough"; "The basalt is too uniform"; "There's no cinematogra
 - **`cine_check.py`** runs on every render. Its numbers go in the pass log.
 - **The face model** (`serene_depth`) is the carving for every face in stone in the game.
 - **The object-id and reflection passes** in `blend_scene` are available to every scene.
+
+## Pass 11 and the checks after it (2026-10-09)
+
+**Derek's notes:** the faces "a little bit more defined", "all of them having blood running out of their nose and
+mouth", two torches removed ("I meant to remove the two on the stairs"), "the flames look not great"; and, from the cove,
+"you need to go back and fix the starting area too" (ground depth).
+
+**What worked:**
+- **The face mesh scaled to the face** (`relief`: about 28 vertices a yard across and 34 up). The faces' real fault was
+  never the light: a lid or a nostril was three or four vertices and smeared into triangles. The features are cut 2.4
+  times deeper.
+- **The carved stone's tone rolls off in the highlights** (`0.92 * tanh(1.15 * t)`, times the occlusion): a face beside
+  its fire keeps turning instead of blowing out.
+- **Every face bleeds** (`cave3d.bleed`, called by `relief`): runs from both nostrils and both corners of the mouth follow
+  the carved surface down, gather, drip off the slab's foot into a pool; a source that falls into a hole is skipped.
+  Painted as wet blood with a glint where the fire catches it.
+- **The flames as tongues:** a small hot seat and four separate tongues (seven in a brazier), narrow and tall, with dark
+  between them.
+- **The hall floor's depth** (`hall_relief`): long swells of heave, a worn trough up the way to the great face, each
+  flag following the floor at its corners, one in twenty tipped; dust banked against the walls as real drifts.
+- **Real shields** (`cave3d.shield`): a dished face on a polar mesh, an iron rim and boss, tipped on its edge; face down,
+  the hollow back and the grip. They had been squashed spheres that read as flat orange plates.
+- **The heaps lit by what was left on them:** candle stubs on each heap's camera-facing side, wax run down the mail,
+  one guttered out. The room's one true detail became a pool of light.
+- **The pool's depth scaled by the zoom:** on the 2 x 2 grid, a depth measured in pixels saturated and the whole pool
+  went flat bright red; scaled by `d["zoom"]`, it is near-black blood again.
+- **The local-contrast blur kept at 16 px on purpose:** scaled by the zoom, it flattened the faces beside their fires.
+
+**What failed, and why** (add to the table above):
+
+| Tried | Why it failed |
+|---|---|
+| A steeper tone curve for "more defined" | It blew the faces out to one orange mass; the mesh was the fault |
+| Pixel-sized constants left at the 4 px grid's values | On the 2 x 2 grid they act at half the size (the pool) |
+| Bodies of a sphere and tube limbs at the pool | Primitive stand-ins (MASTER_RULES 2.3); queued as one shared corpse asset |
+
+**Into the game:** `cave_bake.py` renders the cave in eight aligned tiles at full quality, takes the walk blocks from the
+render itself (any surface 0.35 to 2.4 yards above the floor blocks its half-yard), and marks the pool as moving blood;
+`cave_export.py` writes the zone: the start in the pool's heart, the Stranger on the top step (speaking to him opens the
+Reading), the mirror as the portal onto the cove, the fires as gentle live lights.

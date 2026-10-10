@@ -1,6 +1,6 @@
 """Bake a generated Sunken Bog for the game: the whole zone (worldgen/bog.py, exported by bog_export.py) painted through
 the bog scene's engine (art_study/bog_scene.py, bog_chambers.py) at the game's camera, chunk by chunk, into
-art/zones/sunken_bog_s<SEED>/ for world/bog_ground.gd:
+art/zones/sunken_bog_s<SEED>/ for world/baked_ground.gd (once world/bog_ground.gd):
 
   c<A>_<B>.webp     the ground: every pixel of the render at the engine's scale (the game draws it at 4, nearest);
                     alpha 255 land, 254 open water (the game moves it), 0 past the zone's edge

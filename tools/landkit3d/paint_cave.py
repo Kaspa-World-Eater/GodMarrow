@@ -4,7 +4,7 @@ The shared painter (paint3d.py) lights a scene by the sky and lays the lamps ove
 the light IS the lamps: every surface's tone comes from the light that truly reaches it (the lamp pass, through the real
 forms with their true shadows), stepped down a short ramp, so the stone shows its roughness only where a fire grazes
 it and falls to black between the pools (rules 2 and 4). Each source is seen: the wisp-fire's flames are painted at
-their lamps, white-blue, flickering and ethereal (Derek), with a small aura on the stone behind and cold motes rising
+their lamps, ordinary orange fire (Derek, 2026-10-09; once white-blue wisp-fire), flickering, with a small aura on the stone behind and cold motes rising
 (rules 3 and 10). The dark mirrors show what their reflection pass found: the fires again, deep in the walls.
 
   python tools/landkit3d/paint_cave.py PASSES_DIR OUT.(png|webp) [HERO_X HERO_Y HERO_Z FOCUS_X FOCUS_Y] [--frames 8]
