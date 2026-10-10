@@ -254,3 +254,24 @@ lip on the skull and shoulders, cooler shadows. Smoke 12/0.
 that needs the form's direction, which a picture alone doesn't carry.
 **Worst open:** 1. the blood streaming off it is 2D drips, not strands on the body (10, 6); 2. the rings at the wrists
 and knees; 3. strokes and tooth (7).
+
+## Rules check (after pass 6)
+
+**Check:** rules and lore unchanged. 7 passes in part. The worst open line is **10 (life)**, with section 6 (effects
+live in the world). The lore says it comes up out of "a visceral pool of blood" and Derek asked for "gore and blood
+streaming off". The streaming is the game's 2D drips on the floor, not blood running off the body.
+
+## Pass 7: blood streaming off the body (checklist 10; section 6)
+
+`Body3D.enable_drips()` (the newborn only, from `core/main.gd`): twelve strands of blood on bone attachments (the chin,
+the wrists twice, the elbows, the knees, the chest, the belly). Each starts inside its limb, so only what is below the
+skin shows, and always hangs straight down whatever the pose. Each runs on its own clock: it lengthens, necks and lets
+a bead go, which falls to the floor. All are hidden while the body is under the surface.
+- **First look:** at 7 mm they were under a pixel wide; now a finger's width (14 to 20 mm) with longer runs, which
+  the game's scale shows.
+- **In the game:** dark blood on a dark, blood-coated body. They read mostly as a ragged, dripping underside while it
+  crawls, not as distinct threads; in the open look test they are plain. The game's 2D drips still mark the floor.
+- Smoke 12/0; 60 fps.
+
+**Grade: B-.** **Worst open:** 1. the rings at the wrists and knees; 2. strokes and tooth (7); 3. the strands could
+catch the light (a wet highlight) to read in the dark.

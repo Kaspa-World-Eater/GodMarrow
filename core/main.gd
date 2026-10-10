@@ -287,6 +287,7 @@ func _nascent() -> void:
 	hero.add_child(b)
 	hero.body3d = b
 	b.face_ground(Vector2(1, 1), true)
+	b.enable_drips()
 	b.play("idle", 0.0)
 	if hero.lamp:
 		hero.lamp.enabled = false

@@ -180,6 +180,83 @@ func _process(dt: float) -> void:
 	yaw += d * minf(1.0, TURN * dt * 0.5)
 	if pivot:
 		pivot.rotation.y = yaw
+	if not drips.is_empty():
+		_drip_tick()
+
+## blood streaming off it (the newborn's pass 7; Derek: "gore and blood streaming off"): from each low point of the
+## body (the chin, the wrists, the elbows, the knees, the chest, the belly) a strand hangs straight down whatever the
+## pose, starting inside the limb so only what is below the skin shows, each on its own clock: it lengthens, necks, and
+## lets a bead go, which falls to the floor. Crawling, the blood pours from the chest and the face; standing, from the
+## fingers and the chin. Hidden while the body is under the surface.
+var drips: Array = []                    # {att: BoneAttachment3D, strand, bead, period, phase, base}
+const DRIP_BONES := [["DEF-head", 0.07], ["DEF-hand.L", 0.03], ["DEF-hand.R", 0.03], ["DEF-forearm.L", 0.04],
+	["DEF-forearm.R", 0.04], ["DEF-shin.L", 0.05], ["DEF-shin.R", 0.05], ["DEF-spine.003", 0.11],
+	["DEF-spine.001", 0.1], ["DEF-hand.L", 0.03], ["DEF-hand.R", 0.03], ["DEF-head", 0.06]]
+
+func enable_drips() -> void:
+	var sk: Skeleton3D = null
+	for n in model.find_children("*", "Skeleton3D", true, false):
+		sk = n
+		break
+	if sk == null:
+		return
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.13, 0.008, 0.012)
+	mat.roughness = 0.12
+	mat.metallic_specular = 0.7
+	for i in DRIP_BONES.size():
+		var e: Array = DRIP_BONES[i]
+		var att := BoneAttachment3D.new()
+		att.bone_name = e[0]
+		sk.add_child(att)
+		var cm := CylinderMesh.new()
+		cm.top_radius = 0.014 + 0.003 * (i % 3)          # thick, slow blood: a finger's width, so the game's scale shows it
+		cm.bottom_radius = 0.007
+		cm.height = 1.0
+		cm.radial_segments = 6
+		cm.rings = 1
+		var st := MeshInstance3D.new()
+		st.mesh = cm
+		st.material_override = mat
+		st.top_level = true
+		vp.add_child(st)
+		var sm := SphereMesh.new()
+		sm.radius = 0.014
+		sm.height = 0.03
+		sm.radial_segments = 6
+		sm.rings = 4
+		var bd := MeshInstance3D.new()
+		bd.mesh = sm
+		bd.material_override = mat
+		bd.top_level = true
+		vp.add_child(bd)
+		drips.append({"att": att, "strand": st, "bead": bd, "period": 0.9 + 0.23 * float((i * 7) % 5),
+			"phase": float((i * 13) % 10) / 10.0, "base": float(e[1])})
+
+func _drip_tick() -> void:
+	var under := sink > 0.0005
+	var t := Time.get_ticks_msec() / 1000.0
+	for d in drips:
+		var st: MeshInstance3D = d["strand"]
+		var bd: MeshInstance3D = d["bead"]
+		if under:
+			st.visible = false
+			bd.visible = false
+			continue
+		var top: Vector3 = (d["att"] as BoneAttachment3D).global_position
+		var ph := fmod(t / float(d["period"]) + float(d["phase"]), 1.0)
+		# the strand: from inside the limb down past the skin, lengthening as it fills, then letting go
+		var vis := 0.03 + 0.14 * ph * ph
+		var ln: float = float(d["base"]) + vis
+		var floor_y := -sink
+		ln = minf(ln, maxf(0.01, top.y - floor_y - 0.005))
+		st.visible = true
+		st.global_transform = Transform3D(Basis.from_scale(Vector3(1.0, ln, 1.0)), top - Vector3(0, ln / 2.0, 0))
+		# the bead let go at the end of each cycle, falling until it meets the floor
+		var fall := ph * float(d["period"])
+		var by := top.y - ln - 0.5 * 9.8 * fall * fall * 0.35
+		bd.visible = ph < 0.45 and by > floor_y + 0.01
+		bd.global_position = Vector3(top.x, by, top.z)
 
 ## the glb's materials remade on shaders/body3d_model.gdshader (the same baked textures, and the pool's waterline)
 func _own_surfaces(root: Node) -> void:
