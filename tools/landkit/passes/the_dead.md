@@ -99,3 +99,21 @@ five tones (scaled by the light that reaches them); it changes little, because t
 cloak's folds and wet drape (pooled in the hollows, plastered on the high forms), the hands and feet as forms that
 read at the game's size, the body's shape showing through the cloth, the bloat's dome against the blood's meniscus.
 Not yet baked into the game: the cave and the cove keep their old dead until the dead pass.
+
+## Rules check (before pass 4)
+
+**Read:** `MASTER_RULES` 0.5c, 2.3, checklist 1 to 13; chapter 15 section 4 (wet cloth: "plastered on the high forms
+... the folds only where it leaves the body", the hood "collapses onto the skull", the hem in "a few broad lobes", the
+rope belt); the area's true detail (the dead wear the pilgrim's shape: the hooded cloak, the rope belt). **Since pass
+3:** Derek: "In the pool just make the bodies, bones and Gore" (the cave's pool holds remains now; the body stays for
+the beach and the Red). **Checked:** 1 brief, held; 2 scale, held; 3 form, FAILS (the cloak a smooth blob, the hood
+blown up off the skull, which is the study's opposite); 6 to 9 follow from it. **Worst first:** the cloak.
+
+## Pass 4: the wet cloak
+
+**Fixed:** the cloak plastered tight on the body (the shoulder blades and buttocks read through it), the hood collapsed
+onto the skull (pass 2 had blown it up, the study's opposite), a few small sharp folds pooled at the waist, the rope
+belt gathering it with its knot and ends, the hem in uneven lobes on the ground; the hands a palm, knuckles and fingers
+half curled under. **Seen** (`dead_sheet`, coloured by material): they read as cloaked pilgrims lying face down, no
+longer sacks. **Grade: C+.** **Worst now:** a pilgrim's cloak is long, but these stop at the hips, so the legs lie
+bare and pale; the bone state is still a stick figure; nothing yet of the stages' form (the bloat's dome).

@@ -120,8 +120,9 @@ def masses(state, roll):
         A.append(("sh_" + s, "elb_" + s, 0.9, 0.046 * f, 0.044 * f, "corpse"))          # the elbow
         A.append(("elb_" + s, "wri_" + s, 0.25, 0.052 * f, 0.046 * f, "corpse"))         # the forearm's bulk near the elbow
         A.append(("elb_" + s, "wri_" + s, 0.85, 0.036 * f, 0.03 * f, "corpse"))         # the wrist
-        A.append(("wri_" + s, "fin_" + s, 0.35, 0.05 * f, 0.022 * f, "corpse"))         # the palm, a plate
-        A.append(("wri_" + s, "fin_" + s, 0.8, 0.046 * f, 0.018 * f, "corpse"))         # the fingers, together
+        A.append(("wri_" + s, "fin_" + s, 0.3, 0.048 * f, 0.024 * f, "corpse"))         # the palm
+        A.append(("wri_" + s, "fin_" + s, 0.62, 0.044 * f, 0.02 * f, "corpse"))         # the knuckles
+        A.append(("wri_" + s, "fin_" + s, 0.86, 0.036 * f, 0.022 * f, "corpse"))        # the fingers, half curled under
         A.append(("hip_" + s, "kne_" + s, 0.3, 0.092 * f, 0.088 * f, "corpse"))         # the thigh
         A.append(("hip_" + s, "kne_" + s, 0.82, 0.066 * f, 0.064 * f, "corpse"))        # the knee
         A.append(("kne_" + s, "ank_" + s, 0.32, 0.062 * f, 0.06 * f, "corpse"))         # the calf, a third down
@@ -216,8 +217,10 @@ def _shell(name, Wj, A, rnd, grow):
 
 
 def _cloak(name, Wj, A, rnd, state):
-    """the hooded cloak: a looser shell over the trunk, the upper arms and the thighs, the hood over the head, the hem
-    spread on the ground about the hips and knees"""
+    """the hooded cloak, wet (chapter 15, section 4): plastered on the high forms so the body reads through it (the
+    shoulder blades, the buttocks, the backs of the thighs), the hood collapsed onto the skull, a few small sharp folds
+    only where it leaves the body (pooled at the waist, gathered by the rope belt), the hem spread on the ground in a few
+    uneven lobes"""
     mb, ob = _mb(name)
     cover = ("pelvis", "lumbar", "chest", "neck", "head", "sh_l", "sh_r", "hip_l", "hip_r")
     for (a, b, t, rw, rh, _) in A:
@@ -227,15 +230,50 @@ def _cloak(name, Wj, A, rnd, state):
             pa, pb = Vector(Wj[a]), Vector(Wj[b])
             q = pa.lerp(pb, t)
             seg = pb - pa
-            g = 1.22 if b != "head" else 1.6                      # the hood stands well off the skull
-            _el(mb, q + Vector((0, 0, 0.012)), rw * g + 0.012, rh * g + 0.01, (seg.x, seg.y),
+            g = 1.05 if b != "head" else 1.1                        # wet: tight on the body; the hood on the skull
+            _el(mb, q + Vector((0, 0, 0.008)), rw * g + 0.006, rh * g + 0.006, (seg.x, seg.y),
                 (min(seg.length * 0.42, 0.3) + rw * 0.4) * g)
-    # the hem: wet wool spread flat on the ground round the hips and down the thighs
-    for j, k in (("pelvis", 1.0), ("kne_l", 0.7), ("kne_r", 0.7)):
-        q = Vector(Wj[j])
-        q.z = q.z - 0.06
-        _el(mb, q, 0.24 * k, 0.03, (1.0, 0.3), 0.3 * k)
-    return _mesh(ob, name, "cloth")
+    ax = Vector(Wj["neck"]) - Vector(Wj["pelvis"])
+    ax.z = 0
+    ln = ax.length
+    ax = ax / max(ln, 1e-6)
+    sd = Vector((-ax.y, ax.x, 0))
+    top = lambda j: Vector(Wj[j])
+    # the high forms the wet cloth shows: the shoulder blades and the buttocks
+    for s_ in (-1, 1):
+        for (j, u, w, r, h) in (("chest", 0.08, 0.075, 0.06, 0.055), ("pelvis", -0.05, 0.065, 0.075, 0.07)):
+            q = top(j) + ax * u * M + sd * s_ * w * M
+            q.z = Vector(Wj[j]).z + 0.09
+            _el(mb, q, r, h * 0.6, (ax.x, ax.y), r)
+    # a few small sharp folds where the cloth leaves the body: pooled at the waist, running out from the high forms
+    lw = top("lumbar")
+    for k in range(6):
+        ang = (k - 2.5) * 0.45 + rnd.uniform(-0.15, 0.15)
+        d = (ax * math.cos(ang) * 0.3 + sd * math.sin(ang)).normalized()
+        q = lw + d * rnd.uniform(0.1, 0.16)
+        q.z = lw.z + 0.08
+        _el(mb, q, 0.014, 0.016, (d.x, d.y), 0.07)
+    # the hem: wet wool spread on the ground in a few uneven lobes about the hips and down the thighs
+    for k in range(5):
+        j = ("pelvis", "kne_l", "kne_r", "hip_l", "hip_r")[k]
+        q = top(j) + sd * rnd.uniform(-0.12, 0.12) + ax * rnd.uniform(-0.12, 0.05)
+        q.z = q.z - 0.07
+        r = rnd.uniform(0.14, 0.22)
+        _el(mb, q, r, 0.025, (rnd.uniform(-1, 1), rnd.uniform(-1, 1)), r * rnd.uniform(1.0, 1.5))
+    shell = _mesh(ob, name, "cloth")
+    # the rope belt gathering the cloth at the waist: a twisted cord round the body, its knot and hanging ends
+    if state != "bone":
+        pts = []
+        c = top("lumbar") * 0.6 + top("pelvis") * 0.4
+        for k in range(17):
+            th = k / 16.0 * 2 * math.pi
+            p_ = c + sd * math.cos(th) * 0.165 * M + Vector((0, 0, math.sin(th) * 0.1))
+            p_.z = max(p_.z, Vector(Wj["pelvis"]).z - 0.05)
+            pts.append(tuple(p_))
+        P.tube(name + "belt", pts, [0.012] * len(pts), "straw", 5)
+        kn = c + sd * 0.17 * M
+        P.tube(name + "beltend", [tuple(kn), tuple(kn + sd * 0.06 - ax * 0.12)], [0.011, 0.009], "straw", 5)
+    return shell
 
 
 def bones(name, Wj, support, rnd, roll, cloak):
