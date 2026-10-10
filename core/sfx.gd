@@ -184,6 +184,9 @@ static func loop(kind: String) -> AudioStreamWAV:
 	if kind == "red_surge":
 		_loops[kind] = _red_surge()
 		return _loops[kind]
+	if kind == "red_mass":
+		_loops[kind] = _red_mass()
+		return _loops[kind]
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(kind)
 	var L := int(RATE * 3.0)
@@ -264,6 +267,104 @@ static func loop(kind: String) -> AudioStreamWAV:
 ## at 1.4 s as the film creeps up the sand, and drains slowly back until about 5.2 s; a weaker second surge crests at
 ## 2.7 s; then stillness. Thick blood, not water: a heavy, dull slosh, never a bright break; the drain a low wet drag;
 ## under all of it the mass of the Red, a rumble felt more than heard. Played from the same clock as the shader.
+## the live Red's sounds (world/red_sea.gd): under everything the mass of it, a rumble felt more than heard with a slow
+## wet movement in it ("red_mass", a seamless loop); and what each wave does in view, played as it happens there:
+## "red_slump", the heavy roll folding over and landing (thick blood: a dull low thud and a gloopy splat, never a bright
+## crash, then a seething that settles); "red_drag", the slow drain back down the sand (a low wet drag with grit in it)
+static func _red_mass() -> AudioStreamWAV:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7301
+	var L := int(RATE * 6.0)
+	var X := int(RATE * 0.5)
+	var s := PackedFloat32Array()
+	s.resize(L + X)
+	var a := 0.0
+	var b := 0.0
+	var c := 0.0
+	for i in L + X:
+		var t := float(i) / RATE
+		var w := rng.randf() * 2.0 - 1.0
+		a += (w - a) * 0.003
+		b += (w - b) * 0.02
+		c += (b - c) * 0.1
+		var swell := 0.6 + 0.4 * sin(t * TAU / 6.0 + sin(t * 0.9) * 0.6)
+		s[i] = a * 6.0 * swell + c * 0.5 * (0.5 + 0.5 * sin(t * 1.7 + sin(t * 0.43) * 2.0))
+	for i in X:                                          # the end crossfaded into the start: no seam
+		var k := float(i) / X
+		s[i] = s[i] * k + s[L + i] * (1.0 - k)
+	s.resize(L)
+	return _pack(s, true)
+
+static func red_slump() -> AudioStreamWAV:
+	if _loops.has("red_slump"):
+		return _loops["red_slump"]
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7302
+	var L := int(RATE * 3.2)
+	var s := PackedFloat32Array()
+	s.resize(L)
+	var b := 0.0
+	var c := 0.0
+	var d := 0.0
+	var ph := 0.0
+	for i in L:
+		var t := float(i) / RATE
+		var w := rng.randf() * 2.0 - 1.0
+		b += (w - b) * 0.05
+		c += (b - c) * 0.25
+		d += (w - d) * 0.18
+		# the fold landing: a low thud falling in pitch
+		ph += TAU * (58.0 - 18.0 * minf(t / 0.5, 1.0)) / RATE
+		var thud := sin(ph) * exp(-t * 5.0) * smoothstep(0.0, 0.02, t)
+		# the splat: a gloopy burst of low noise, quick in, slow out
+		var splat := c * 2.2 * smoothstep(0.0, 0.04, t) * exp(-t * 3.2)
+		# the seethe: thick bubbling settling, a slow gurgle in it
+		var seethe := d * 0.5 * smoothstep(0.1, 0.5, t) * exp(-(t - 0.4) * 0.9) * (0.6 + 0.4 * sin(t * 19.0 + sin(t * 7.0) * 2.0))
+		s[i] = thud * 0.9 + splat + seethe
+	var wv := _pack(s, false)
+	_loops["red_slump"] = wv
+	return wv
+
+static func red_drag() -> AudioStreamWAV:
+	if _loops.has("red_drag"):
+		return _loops["red_drag"]
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7303
+	var L := int(RATE * 3.6)
+	var s := PackedFloat32Array()
+	s.resize(L)
+	var b := 0.0
+	var d := 0.0
+	for i in L:
+		var t := float(i) / RATE
+		var w := rng.randf() * 2.0 - 1.0
+		b += (w - b) * 0.035
+		d += (w - d) * 0.14
+		var env := smoothstep(0.0, 0.8, t) * (1.0 - smoothstep(1.6, 3.6, t))
+		var grit := d * 0.3 * (0.7 + 0.3 * sin(t * 23.0 + sin(t * 3.0)))
+		s[i] = (b * 1.6 + grit) * env
+	var wv := _pack(s, false)
+	_loops["red_drag"] = wv
+	return wv
+
+static func _pack(s: PackedFloat32Array, looped: bool) -> AudioStreamWAV:
+	var pk := 0.0
+	for v in s:
+		pk = maxf(pk, absf(v))
+	var data := PackedByteArray()
+	data.resize(s.size() * 2)
+	for i in s.size():
+		data.encode_s16(i * 2, int(clampf(s[i] * (0.85 / maxf(pk, 0.001)), -1.0, 1.0) * 32767.0))
+	var wv := AudioStreamWAV.new()
+	wv.format = AudioStreamWAV.FORMAT_16_BITS
+	wv.mix_rate = RATE
+	wv.data = data
+	if looped:
+		wv.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		wv.loop_begin = 0
+		wv.loop_end = s.size()
+	return wv
+
 static func _red_surge() -> AudioStreamWAV:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 6502

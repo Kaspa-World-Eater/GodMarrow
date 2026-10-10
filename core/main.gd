@@ -169,7 +169,8 @@ func enter(zid: String, from: String) -> void:
 	if zone.id == "red_shore":
 		# the Red's own sound, a beat at a time, in step with the shore's swash (core/sfx.gd _red_surge)
 		var rs := AudioStreamPlayer.new()
-		rs.stream = Sfx.loop("red_surge")
+		# (where the Red is live, world/red_sea.gd sounds each wave itself; this old beat only where it is not)
+		rs.stream = Sfx.loop("red_surge") if zone.find_child("RedSea", true, false) == null else null
 		rs.bus = "World"
 		rs.volume_db = -7.0 + linear_to_db(maxf(0.0001, float(Settings.sfx_vol)))
 		zone.add_child(rs)

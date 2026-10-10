@@ -20,6 +20,51 @@ var mats: Array = []
 var _clock := PackedFloat32Array()       # the heart's clock through one beat (beach_floor.py _CLOCK)
 var _size := Vector2i.ZERO
 var _wo := -108.0
+var _mass: AudioStreamPlayer
+var _shots: Array = []
+var _shot_i := 0
+var _last_ph := {}
+const PEEL := 46.0                       # (shaders/red_sea.gdshaderinc)
+const WATER := 66.0
+
+static func _h1(i: float, sd: float) -> float:
+	var v := sin(i * 127.1 + sd * 74.7) * 43758.5453
+	return v - floorf(v)
+
+static func _vn1(x: float, sd: float) -> float:
+	var i := floorf(x)
+	var f := x - i
+	f = f * f * (3.0 - 2.0 * f)
+	return lerpf(_h1(i, sd), _h1(i + 1.0, sd), f)
+
+## the wave's phase at a place along the shore (shaders/red_sea.gdshaderinc phase())
+static func _phase(hv: float, t: float) -> float:
+	return fposmod(hv + t / PEEL + 0.07 * (_vn1(t * 0.12, 41.0) - 0.5) + 0.03 * (_vn1(t * 0.5, 43.0) - 0.5), 1.0)
+
+func _shot(stream: AudioStream, vol: float) -> void:
+	var p: AudioStreamPlayer = _shots[_shot_i % _shots.size()]
+	_shot_i += 1
+	p.stream = stream
+	p.volume_db = linear_to_db(maxf(0.0001, vol * float(Settings.sfx_vol)))
+	p.pitch_scale = randf_range(0.9, 1.06)
+	p.play()
+
+## the waves in view heard as they land and as they drain: three places across the view, the nearest loudest
+func _hear(hv: float, sc: float, tc: float) -> void:
+	var near := clampf(1.25 - absf(sc - (WATER + 2.0)) / 22.0, 0.15, 1.0)
+	_mass.volume_db = linear_to_db(maxf(0.0001, (0.35 + 0.4 * near) * float(Settings.sfx_vol))) - 6.0
+	if not _mass.playing:
+		_mass.play()
+	for k in 3:
+		var t := tc + (k - 1) * 9.0
+		var ph := _phase(hv, t)
+		var was: float = _last_ph.get(k, ph)
+		_last_ph[k] = ph
+		var w := 1.0 if k == 1 else 0.55
+		if was < 0.33 and ph >= 0.33:
+			_shot(Sfx.red_slump(), 0.9 * near * w)       # the roll lands
+		elif was < 0.62 and ph >= 0.62:
+			_shot(Sfx.red_drag(), 0.55 * near * w)       # the drain back down the sand
 const RES := 0.25                        # the grid's spacing, yards
 const WIN_S := 40.0                      # the window's depth (s) and breadth (t), yards
 const WIN_T := 60.0
@@ -73,6 +118,16 @@ func _init(dir: String, sf: Dictionary, world_o: float, lift_px: float) -> void:
 	_add(_grid(0.0, WIN_S, RES, 0.0, WIN_T, RES), sea_sh, ftex, sf, world_o, lift_px)
 	_add(_lip(0.0, WIN_T, 0.1), lip_sh, ftex, sf, world_o, lift_px)
 	_dead(ftex, sf, world_o, lift_px)
+	# its sound: the mass of it always; each wave in view as it lands and as it drains (core/sfx.gd)
+	_mass = AudioStreamPlayer.new()
+	_mass.stream = Sfx.loop("red_mass")
+	_mass.bus = "World"
+	add_child(_mass)
+	for i in 4:
+		var p := AudioStreamPlayer.new()
+		p.bus = "World"
+		add_child(p)
+		_shots.append(p)
 	pic = Sprite2D.new()
 	pic.centered = false
 	pic.scale = Vector2(AP, AP)
@@ -228,6 +283,7 @@ func _process(_dt: float) -> void:
 	var hv := _heart(x)
 	var bv := _pulse(x, 0.06, 0.045) + 0.5 * _pulse(x, 0.27, 0.035)
 	var g := 0.9 + 0.12 * sin(TAU * b * 0.37 + 1.0)
+	_hear(hv, sc, tc)
 	for m in mats:
 		m.set_shader_parameter("origin", o)
 		m.set_shader_parameter("vsize", Vector2(sz) * AP)
