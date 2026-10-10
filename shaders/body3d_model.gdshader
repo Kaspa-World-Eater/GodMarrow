@@ -13,8 +13,19 @@ uniform float rough = 0.5;
 uniform sampler2D normal_tex : hint_normal, filter_linear;
 uniform bool has_normal_tex = false;
 uniform float surface_y = -100.0;
+uniform float stroke = 0.22;          // the dry-brush strokes' strength on the colour (pass 10)
+uniform float tooth = 0.07;
 
 varying float wy;
+
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+
+float vnoise(vec2 p) {
+	vec2 i = floor(p);
+	vec2 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+}
 
 void vertex() {
 	wy = (MODEL_MATRIX * vec4(VERTEX, 1.0)).y;
@@ -25,6 +36,11 @@ void fragment() {
 	vec3 c = albedo.rgb;
 	if (has_albedo_tex) c *= texture(albedo_tex, UV).rgb;
 	float wl = 1.0 - smoothstep(0.0, 0.07, wy - surface_y);
+	// the paint, fixed to the skin (pass 10): dry-brush strokes long along the limb (UV2: along and around the bone
+	// that carries the skin, newborn3d.py stroke_uv), and a fine tooth on the bake's own UV
+	float st = vnoise(vec2(UV2.x * 2.2, UV2.y * 46.0)) - 0.5;
+	float th = hash(floor(UV * 900.0)) - 0.5;
+	c *= 1.0 + st * stroke + th * tooth;
 	ALBEDO = mix(c, c * 0.55, wl);
 	float r = has_rough_tex ? texture(rough_tex, UV).g : rough;
 	ROUGHNESS = mix(r, 0.1, wl);

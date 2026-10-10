@@ -661,6 +661,42 @@ def join_clots(arm, body):
     bpy.ops.object.join()
 
 
+def stroke_uv(arm, body):
+    """(pass 10) a second UV that rides with the skin and runs along the form: for each vertex, its distance along the
+    bone that carries it most and its angle around that bone, in the rest pose. Strokes drawn long in this coordinate
+    run down the length of the limb (shaders/body3d_model.gdshader), and move with the skin as it bends."""
+    me = body.data
+    mw = arm.matrix_world
+    names = [vg.name for vg in body.vertex_groups]
+    bones = {}
+    for i, n in enumerate(names):
+        b = arm.data.bones.get(n)
+        if b is None:
+            continue
+        h, t = mw @ b.head_local, mw @ b.tail_local
+        ax = (t - h).normalized()
+        ref = Vector((0, 0, 1)) if abs(ax.z) < 0.9 else Vector((1, 0, 0))
+        u = ax.cross(ref).normalized()
+        w = ax.cross(u)
+        bones[i] = (h, ax, u, w, list(arm.data.bones.keys()).index(n))
+    per_v = []
+    for v in me.vertices:
+        best = max(v.groups, key=lambda g: g.weight, default=None)
+        if best is None or best.group not in bones:
+            per_v.append((0.0, 0.0))
+            continue
+        h, ax, u, w, bi = bones[best.group]
+        d = v.co - h
+        sa = d.dot(ax)
+        th = math.atan2(d.dot(w), d.dot(u)) / (2 * math.pi) + 0.5
+        per_v.append((sa * 3.0 + bi * 7.0, th))
+    uv = me.uv_layers.new(name="UVStroke")
+    for loop in me.loops:
+        uv.data[loop.index].uv = per_v[loop.vertex_index]
+    me.uv_layers.active_index = 0
+    print("stroke uv: %d vertices" % len(per_v))
+
+
 def key_clips(arm, clips):
     """each clip keyed at 30 fps from newborn_pose and laid on its own NLA track (the glb's animation of that name).
     Every pose is laid with the animation system off (no action, no tracks: otherwise the clips already keyed are
@@ -723,6 +759,7 @@ def export_glb(arm, body, out, clips):
     caul_shell(body)
     clots(arm, body)
     join_clots(arm, body)
+    stroke_uv(arm, body)
     key_clips(arm, clips)
     for o in bpy.data.objects:
         o.select_set(o in (arm, body))

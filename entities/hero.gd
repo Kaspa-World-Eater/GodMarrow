@@ -262,7 +262,8 @@ func _physics_process(dt: float) -> void:
 		_sync()
 		return
 	st.tick(dt)
-	skills.tick(dt)
+	if not nascent:
+		skills.tick(dt)          # the newborn has no calling yet: no mantle, no aura, until the last card
 	invuln = maxf(0.0, invuln - dt)
 	break_grace = maxf(0.0, break_grace - dt)
 	if poise_burst > 0.0:

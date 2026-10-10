@@ -320,3 +320,33 @@ itself, so the edge makes no false stroke.
 
 **Grade: B.** **Worst open:** 1. the paint's pattern fixed to the skin, not the picture (7); 2. a wet highlight on the
 strands (10); 3. the skeptic round beside the Ossuarch (12).
+
+## Rules check (after pass 9)
+
+**Check:** rules and lore unchanged. The worst open line is **7**: the strokes and the tooth are fixed to the picture,
+not the skin, so they can swim over a moving limb (3.6: a tooth fixed to the world).
+
+## Pass 10: the paint on the skin, and the skeptic round
+
+- **The paint fixed to the skin (7):** `stroke_uv()` gives every vertex a second UV: its distance along the bone that
+  carries it most and its angle around that bone, in the rest pose. `shaders/body3d_model.gdshader` draws the dry-brush
+  strokes long in that coordinate, so they run down the limb and move with the skin; the tooth sits on the bake's UV.
+  The picture keeps only its ordered dither at the tone edges (ordinary pixel art); its own strokes and tooth are off.
+  The look test shows lengthwise streaks down the thighs and arms.
+- **The skeptic round (12), beside the Ossuarch in the game at the same scale:** the heights match. The Ossuarch is crisp,
+  with hard outlines and readable parts; the newborn is soft, dark and wet with a warm candle rim, undefined as Derek
+  asked, and it reads as a standing person. **One real fault found:** once the player had it, the Ossuarch's Mantle (his
+  bone shards) orbited the newborn: the calling's skills ran on the body before any card was drawn. Now the skill book
+  doesn't tick while the body is newborn (`entities/hero.gd`), for every calling; its effects are made on its first
+  tick, so they never appear, and the hero made for the cove after the Reading has them as before.
+- Smoke 12/0; 60 fps.
+
+**Grade after ten passes: B**, for Derek's grade on the review page.
+- **Passes:** the brief and the lore's detail (it looks like the dead: their gaunt shape, the blood, the torn caul);
+  scale; form (one continuous skin, a skull with a jaw, sloping shoulders, no doll's rings); light (the cave's own
+  fires and the pool's red glow); values; ramps; contact (its own shadow, faint as the candles make it); life (it
+  breathes, sways, streams blood); seen in the game.
+- **In part:** paint (strokes, tooth, dither, lip; no pooled wet edges); cinematography (the reveal from the pool works;
+  it could catch more rim).
+- **Return-to:** a wet highlight on the blood strands; pooled wet edges in the paint; whether every character goes live
+  3D (Derek's call).
