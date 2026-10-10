@@ -948,7 +948,7 @@ static func _esctest(g) -> void:
 		await _key(g, step[1])
 		print("ESC after %s: panel %s, pause %s, hud input %s" % [step[0], h.any_panel(), h.pause.visible, h.is_processing_input()])
 
-## --flowtest (with --new and GM_READ_ACT=all): the opening end to end (Derek, 2026-10-10): the newborn rises; the
+## --flowtest (with --new --reading, as a new game from the title, and GM_READ_ACT=all): the opening end to end (Derek, 2026-10-10): the newborn rises; the
 ## mirror refuses it unread; the Stranger reads it; no one moves it; it walks into the mirror and wakes on the cove in its
 ## calling's body with the HUD. FLOW lines at each step.
 static func _flowtest(g) -> void:
