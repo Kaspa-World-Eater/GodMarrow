@@ -233,7 +233,10 @@ def paint(d, t=0.0):
             import blood as BL
             full = np.zeros(m.shape, bool)
             full[m] = True
-            dep = np.clip(nd.distance_transform_edt(full)[m] / 18.0, 0, 1)
+            # depth from the edge in world terms: 18 px at the old 4 px grid, scaled by the render's zoom (on the 2 x 2 grid
+            # the unscaled depth saturated, and the whole pool took the brightest red, flat)
+            zm_ = float(d["zoom"]) if "zoom" in d else 1.0
+            dep = np.clip(nd.distance_transform_edt(full)[m] / (18.0 * zm_), 0, 1)
             breathe = fk[[i for i, lp in enumerate(d["lamps"]) if lp[4] > 0.9 and lp[5] < 0.3]].mean() if len(d["lamps"]) else 1.0
             lvp = dep * 1.1 * breathe + (fbm(X[m] * 0.8, Y[m] * 0.8) - 0.5) * 0.08 + (dith[m] - 0.5) * 0.1
             # its glow cut well down (Derek: "Reduce the blood glow"): near black, only a dull red heart

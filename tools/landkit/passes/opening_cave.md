@@ -821,3 +821,21 @@ lit their fronts.
 their wax run down over the mail, four burning low and one guttered out. In `cv20_face` each heap is now a small pool
 of light: the shields' rims, a helm and the sword hilts catch it, and the heap reads as a heap. `cine_check`: 9 of 9.
 
+## Rules check (3rd since pass 11): the pool on the 2 x 2 grid
+
+**Read:** `MASTER_RULES` (unchanged), the area's opening ("a visceral pool of blood ... the Red, come in under the
+cliffs"; pass 8: near-black, a congealed skin, clots, a gloss that catches the fires).
+**The pool re-rendered at game scale on the 2 x 2 grid (`cv20_pool`):** `cine_check` 9 of 9, but by eye the worst
+failure was the room's subject: **the blood had gone flat and bright**, one red fill with dark specks, like a painted
+rug. **Cause:** the pool's depth from its edge was measured in pixels (`edt / 18`), a constant set for the old 4 px
+grid; on the 2 x 2 grid the same pool is twice the pixels, the depth saturated, and almost all of it took the
+brightest red.
+**Fixed** (`paint_cave`, the pool): the depth scaled by the render's zoom. In `cv21_pool` the blood is near-black red
+again, with the dull heart, the skin and the clots reading; 9 of 9.
+**Next, by the checklist:**
+- **2.3, no primitive stand-ins:** two of the dead at the pool's edge (the ones who came up and did not stand) are grey
+  tubes and blobs, a puppet, not a body. They need real form: the five tones, the weight lying on the stumps.
+- **Follow-up:** `paint_cave.light_field`'s grain smoothing (2 px) and the local-contrast blur (16 px) are the same kind
+  of pixel constant; scaling them by the zoom changes every room's light, so it is its own pass, checked on all three
+  rooms.
+
