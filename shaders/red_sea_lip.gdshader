@@ -49,8 +49,8 @@ void fragment() {
 	vec3 n = normalize(NRM);
 	// spray tearing off the roll as it falls, heaviest on its nose
 	float foam = 0.0;
-	if (vn2(vec2(P.y * 2.2, P.z * 4.0 - heart * 6.0), 59.0) > 0.58)
-		foam = 0.8;
+	if (vn2(vec2(P.y * 2.2, P.z * 4.0 - heart * 6.0), 59.0) > 0.8)
+		foam = 0.55;                               // (thick: froth clinging to the roll, no spray)
 	vec3 c = shade(n, foam, 1.0, px, 0.0);
 	// the crease under the roll: the hollow in its own shadow
 	ALBEDO = mix(c, blood_ramp(0.05), under * 0.7);

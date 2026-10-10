@@ -38,28 +38,34 @@ void fragment() {
 	float ph = phase(t);
 	float sb = break_s(t);
 	float foam = 0.0;
-	// the bore's foam, laid as the break runs along the crest (the sideways trail), carried in, then drawn back out and
-	// along the shore by the current: fresh, heaped with dark blood showing between; within half a beat torn into lace,
-	// a net of thin strands round dark holes; then gone, sunk into the thick Red
+	float fage = 0.0;
+	// the bore's foam (chapter 13, section 3), laid as the break runs along the crest (the sideways trail), carried in,
+	// then drawn back out and along the shore by the current. Stage A: a mat, heaped and lumpy, few holes. Stage B: the
+	// mat thins and tears: round holes punched in it by the boils, growing and stretching along the drift until only a
+	// lace of holes is left, then scraps, then nothing. Holes in a sheet, never lines on the water; white scarce.
 	float age = foam_age(s, t);
-	if (age < 0.75 && s < sb + 0.4 + 1.2 * vn1(t * 0.5 + age * 3.0, 39.0)) {
+	if (age < 0.8 && s < sb + 0.3 + 1.0 * vn1(t * 0.5 + age * 3.0, 39.0)) {
 		vec2 q = vec2(s + age * 1.8, t - age * 6.5);
-		float nz = vn2(q * vec2(1.7, 2.8), 21.0) * 0.55 + vn2(q * vec2(4.0, 6.5), 23.0) * 0.3 + vn2(q * vec2(9.0, 14.0), 29.0) * 0.15;
-		float I = exp(-age * 5.0);
-		float heap = step(0.83 - 0.38 * I, nz);
-		float lv = vn2(q * vec2(2.2, 3.6) + vec2(7.0, 0.0), 31.0) * 0.75 + vn2(q * vec2(6.0, 9.5), 33.0) * 0.25;
-		float w = 0.045 * smoothstep(0.75, 0.15, age);
-		float lace = step(abs(lv - 0.5), w) * step(0.3, vn2(q * vec2(0.6, 1.0), 35.0));
-		if (heap > 0.5)
-			foam = 0.55 + 0.45 * I;
-		else if (lace > 0.5 && age > 0.06)
-			foam = 0.3;
+		// the mat's own extent: patches, shrinking as it drains
+		float nz = vn2(q * vec2(0.8, 1.3), 21.0) * 0.6 + vn2(q * vec2(2.2, 3.5), 23.0) * 0.4;
+		float mat_ = step(0.42 + 0.45 * age, nz);
+		// the holes: stretched along the drift (in t), growing with age
+		float hole = worley(q * vec2(3.2, 2.0), 41.0);
+		float hr = 0.2 + 0.55 * smoothstep(0.02, 0.6, age);
+		float holes = step(hole, hr);
+		// the heap's lumps: thick fresh foam a little lifted, its lit tops the only near-white
+		float lump = vn2(q * vec2(6.0, 9.0), 29.0);
+		if (mat_ > 0.5 && holes < 0.5) {
+			// lumps: the mat heaped and hollowed, its tone by its own small relief
+			foam = (age < 0.12 ? 0.35 + 0.65 * lump * lump : 0.2 + 0.35 * lump - 0.2 * age) * (0.9 + 0.2 * grp);
+			fage = age;
+		}
 	}
 	// the crest spilling as it comes over: ragged white along its top in the last moments before the break
 	vec2 cH = crest(min(ph, 0.38), t);
 	if (ph > 0.24 && ph < 0.38 && abs(s - cH.x + 0.15) < 0.2 + 0.35 * (ph - 0.24) / 0.14) {
-		if (vn2(vec2(s * 3.0, t * 4.5 - heart * 2.0), 37.0) > 0.66 - (ph - 0.24) * 1.4)
-			foam = max(foam, 0.9);
+		if (vn2(vec2(s * 3.0, t * 4.5 - heart * 2.0), 37.0) > 0.74 - (ph - 0.24) * 0.9)
+			foam = max(foam, 0.5);                     // (thick: a skin wrinkling over, never a burst of white)
 	}
 	// the swash's running front: a low roll of foam along its nose while it climbs
 	vec3 sw = swash_front(t);
@@ -76,7 +82,7 @@ void fragment() {
 		if (cd < rim || (cd < 2.4 && wake > 0.62 + cd * 0.12))
 			foam = max(foam, 0.7 * (1.0 - cd / 3.0) + 0.3);
 	}
-	ALBEDO = shade(n, foam, depth, px, 0.0);
+	ALBEDO = shade(n, foam, depth, px, fage);
 	if (debug == 1)
 		ALBEDO = vec3(fract(s / 10.0), fract(t / 10.0), step(WATER, s));
 }

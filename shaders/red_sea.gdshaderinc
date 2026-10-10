@@ -194,33 +194,49 @@ float stepped(float v, vec2 px, float steps) {
 	return clamp(b / steps, 0.0, 1.0);
 }
 
-// the light on the water: the grey dawn's dome glazing every facet that tips toward it, the blood's own body under it
-vec3 shade(vec3 n, float foam, float depth, vec2 px, float glint_seed) {
+// Worley: the distance to the nearest of one scattered point per cell (the holes punched in the foam's mat)
+float worley(vec2 p, float sd) {
+	vec2 i = floor(p);
+	vec2 f = p - i;
+	float d = 9.0;
+	for (int y = -1; y <= 1; y++) {
+		for (int x = -1; x <= 1; x++) {
+			vec2 g = vec2(float(x), float(y));
+			vec2 o = vec2(h2(i + g, sd), h2(i + g, sd + 17.0));
+			d = min(d, length(g + o - f));
+		}
+	}
+	return d;
+}
+
+// the light on the water (chapter 13, section 5; the overcast dawn, so no sun glint anywhere): the grey dome's sheen on
+// every facet tipped away from the camera, the faces turned toward it dark; the thin film over the sand a lacquer that
+// mirrors the sky ("the Red is a mirror nobody can cover"). The foam by its age: fresh pale rose, draining
+// salmon-maroon, stranded crust brown (section 6)
+vec3 shade(vec3 n, float foam, float depth, vec2 px, float fage) {
 	vec3 V = normalize(vec3(-0.866, 0.0, 0.5));          // toward the camera, in (s, t, z)
-	vec3 L = normalize(vec3(0.55, -0.35, 0.62));         // the dawn, low over the Red and off to the left
+	vec3 L = normalize(vec3(0.55, -0.35, 0.62));         // where the grey dawn is brightest, low over the Red
 	float nv = max(dot(n, V), 0.0);
 	vec3 R = reflect(-V, n);
 	float sky = 0.35 + 0.65 * smoothstep(-0.1, 0.9, R.z);                  // the dome, brighter overhead
-	sky += 0.5 * pow(max(dot(normalize(R.xy + vec2(1e-4)), normalize(L.xy)), 0.0), 6.0) * smoothstep(0.6, 0.05, R.z);   // the dawn's band on the horizon
+	sky += 0.35 * pow(max(dot(normalize(R.xy + vec2(1e-4)), normalize(L.xy)), 0.0), 4.0) * smoothstep(0.6, 0.05, R.z);   // the dawn's band on the horizon
 	float fres = 0.05 + 0.95 * pow(1.0 - nv, 4.0);
-	float body = 0.22 + 0.4 * max(dot(n, L), 0.0);
-	// thin over the sand it is a film: darker, the wet floor through it
-	body *= mix(0.6, 1.0, smoothstep(0.0, 0.25, depth));
+	float body = 0.2 + 0.32 * max(dot(n, L), 0.0);
 	float v = body * 0.78 + fres * sky * 1.0;
-	// the dawn's own glint off a facet turned just so: hard pink specks
-	vec3 H = normalize(V + L);
-	float spec = pow(max(dot(n, H), 0.0), 220.0);
-	v += spec * 1.2;
-	v += 0.08 * beat_v;                                  // the push of the beat lifts it a breath
+	// the film: centimetres of lacquer over the sand, the lightest wet value, the sky in it
+	float film = 1.0 - smoothstep(0.03, 0.22, depth);
+	v = mix(v, 0.42 + 0.25 * sky, film * 0.75);
+	v += 0.06 * beat_v;                                  // the push of the beat lifts it a breath
 	v = stepped(clamp(v, 0.0, 1.0), px, 6.0);
 	vec3 c = blood_ramp(v);
 	if (foam > 0.0) {
-		// the foam in three tones by its thickness and its light: shadowed rose, flesh, the lit tops
-		float fv = clamp(-0.05 + 0.6 * foam + 0.5 * max(dot(n, L), 0.0) + 0.25 * (fres * sky), 0.0, 1.0);
+		// three tones by thickness and light, the ramp walking with age: pale rose, salmon-maroon, crust brown
+		float fv = clamp(-0.1 + 0.55 * foam + 0.45 * max(dot(n, L), 0.0) + 0.2 * (fres * sky), 0.0, 1.0);
 		fv = stepped(fv, px, 3.0);
-		vec3 f0 = vec3(0.2, 0.05, 0.065);
-		vec3 f1 = vec3(0.44, 0.22, 0.23);
-		vec3 f2 = vec3(0.76, 0.56, 0.53);
+		float a = clamp(fage, 0.0, 1.0);
+		vec3 f0 = mix(vec3(0.24, 0.07, 0.08), vec3(0.17, 0.06, 0.05), a);
+		vec3 f1 = mix(vec3(0.5, 0.29, 0.29), vec3(0.34, 0.15, 0.13), a);
+		vec3 f2 = mix(vec3(0.74, 0.55, 0.52), vec3(0.47, 0.27, 0.24), a);
 		c = fv < 0.5 ? mix(f0, f1, fv * 2.0) : mix(f1, f2, fv * 2.0 - 1.0);
 	}
 	return c;
