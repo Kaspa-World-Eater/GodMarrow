@@ -815,6 +815,12 @@ func _end() -> void:
 	# the calling it has become, a paragraph to a click, its card lit at the crown
 	for para in S.get("calling", {}).get(cls, []):
 		tale.append({"pid": "crown", "kind": "calling", "text": String(para)})
+	# then a page of its own: what the mouth will put on them, and the last words, into the black glass (Derek,
+	# 2026-10-10: "explain how passing through the mouth makes you become the class and explain the sudden armor and
+	# clothes, but keep it esoteric and on theme")
+	var wear := String(S.get("wearing", {}).get(cls, ""))
+	if wear != "":
+		tale.append({"pid": "crown", "kind": "wear", "text": wear})
 	tale.append({"pid": "", "kind": "go", "text": _line(go)})
 
 ## the whole spread told as a story (Derek, 2026-10-09: "the end sequence needs work. More story like"): one part a
@@ -1526,9 +1532,9 @@ func _draw_all() -> void:
 	var p := _place()
 	var title := "The Telling" if phase == "end" else String(p.get("name", ""))
 	var sub := "" if phase == "end" else String(p.get("what", ""))
-	if phase == "end" and _kind(tale_n - 1) in ["calling", "go"]:
+	if phase == "end" and _kind(tale_n - 1) in ["calling", "wear", "go"]:
 		title = String(S.get("calling_name", {}).get(cls, title))
-		sub = "what you have become"
+		sub = "what you have become" if _kind(tale_n - 1) == "calling" else "what waits past the mouth"
 	if phase == "rhyme":
 		title = "The Count"
 		sub = "thread, frame, filling, name"
@@ -1557,7 +1563,7 @@ func _draw_all() -> void:
 		var al := (0.32 + 0.22 * sin(t * 2.4)) if on else 0.13
 		_diagram(ci, pid, SLOT[pid], Color(MARROW, al * a))
 	# the laid cards: face down until turned, then the face, head down when reversed; the one under lies across
-	var in_tale := phase == "end" and (tale_n == 0 or _kind(tale_n - 1) in ["tale", "calling"])
+	var in_tale := phase == "end" and (tale_n == 0 or _kind(tale_n - 1) in ["tale", "calling", "wear"])
 	for pid in laid:
 		if pid == "crown" and phase == "rhyme":
 			continue                                 # (the crown comes up when the rhyme is done)
@@ -1826,10 +1832,11 @@ func _draw_end(ci: CanvasItem, a: float, sc: Font, fi: Font) -> void:
 	var y := 200.0                                  # (clear of the title and its line)
 	var ck := _kind(tale_n - 1)
 	var budget := _shown()
-	if ck == "calling" or ck == "go":
-		# the calling it has become, then his last words, to the black mirror
+	if ck in ["calling", "wear", "go"]:
+		# the calling it has become; then, a page of its own, what the mouth will put on it and his last words
+		var pages := ["calling"] if ck == "calling" else ["wear", "go"]
 		for i in tale_n:
-			if _kind(i) != "calling" and _kind(i) != "go":
+			if not _kind(i) in pages:
 				continue
 			var cur := i == tale_n - 1
 			var go := _kind(i) == "go"

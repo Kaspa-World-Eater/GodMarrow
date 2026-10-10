@@ -197,7 +197,7 @@ def main():
                     seen[txt] = (m["id"], k)
     d = dict(places=PLACES, rhyme=W.RHYME, rhyme_aside=W.RHYME_ASIDE, crown_say=W.CROWN_SAY, deck_open=W.DECK_OPEN,
              bridge=W.BRIDGE, shapes=W.SHAPES, aspect_word=ASPECT_WORD, close_sum=W.CLOSE_SUM, tale=W.TALE,
-             tale_order=TALE_ORDER, calling=W.CALLING, calling_name=CALLING_NAME, mantles=ms)
+             tale_order=TALE_ORDER, calling=W.CALLING, wearing=W.WEARING, calling_name=CALLING_NAME, mantles=ms)
     p = os.path.join(ROOT, "data", "reading_spread.json")
     with open(p, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(d, fh, indent=1, ensure_ascii=False)

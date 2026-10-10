@@ -260,8 +260,8 @@
   ],
   "prophecy": "The cards keep one last word back. It's for you, not for me.",
   "go": [
-   "The mirror, then, in the great face's mouth. Look into it until it looks back, and walk in. It's the only door this room has ever had.",
-   "Up the last step, into the black glass. Don't look back. Nothing behind you is yours anymore."
+   "The mouth, then. The glass in it is black because it hasn't decided what you are. Now it has. Walk in with the cards' words still on you and it will take them, every one, and give them back as a body. Don't mind the weight. Names are heavy, put on. Read. Red. Always red.",
+   "Up the last step, into the black glass. It swallows what was said over you and gives back what was said. Whoever went through before you left it all there waiting, the iron, the cloth, the set of the shoulders. It will fit. It always fits. Read. Red. Always red."
   ]
  },
  "tale_order": [
@@ -277,34 +277,36 @@
  "calling": {
   "ossumancer": [
    "The bone has you. Feel it? You're standing straighter already. Ossuarch. Not a name. An office, and nobody has ever held it long.",
-   "Your mantle is black iron with bone grown through it. You'll keep the count now. Every bone out of its place will itch in you like a splinter you can't reach.",
    "An Ossuarch lets things finish. Everything that was ever told is still dying, slowly, and someone has to say enough. The living will step aside for you. Not out of respect.",
    "The cost is the bone itself. It grows under the plate, where nobody looks. You won't bend. One day you'll break, and someone else will put on the iron, and count you."
   ],
   "animancer": [
    "The thread pulled tight. Hollow Mystic. One of the circles that stopped covering the glass, and looked.",
-   "Your mantle is a coat of hollowed mirrors, and the dead stop at their own faces in every piece of it. People will turn their mirrors to the wall when you pass.",
    "You'll keep the dead. Not save them. Keep them. The few left will hand you their dead anyway, because nobody else will hold them.",
    "The cost is that they never go through. The loom never finishes, and you're a thread in it now, pulled tight. Hold still, little thread."
   ],
   "hemomancer": [
    "It was always going to come up red. Red Penitent. The processions will know your hat before they know your face.",
-   "Your mantle is the hood and the welts. You'll break the bloodletter's rule. Open yourself, call the Maiden down, and tell her what to make.",
-   "A Penitent tells a mindless thing what the blood is for. Someone forgot to tell it, once, and a wound hatched. Blood given is not blood taken. You'll say that often. You'll need to.",
+   "You'll break the bloodletter's rule. Open yourself, call the Maiden down, and tell a mindless thing what the blood is for. Someone forgot to tell it, once, and a wound hatched. Blood given is not blood taken. You'll say that often. You'll need to.",
    "The cost is your own life, every time, and she drinks what spills. She'll leave you your mind. Mostly."
   ],
   "miasmancer": [
    "Breathe in. Shrine Keeper. The folk will say you steal breath. You'll say you still it. Both, and steel at the end of it.",
-   "Your mantle is the fan, and a cord at the wrist with a knot for every breath held. A cloud at your back will think other people's thoughts.",
    "You'll hold what the wind is full of, grudges and lies and sour hopes, until it sets hard in the chest and comes out an edge.",
    "The cost comes last. A keeper who holds too much walks down into the water, still holding. Not yet. Breathe out. Slowly."
   ],
   "monk": [
    "Nothing in the bowl. Of course. Empty Hand. A beggar of the Gilded Peak, or something wearing one.",
-   "Your mantle is gold so bright the face beneath it goes away. To be looked at and not seen. The Peak called that holy. The Peak isn't there anymore.",
    "The gap at the top of you has two hands, both empty, and both unmake. One with light, one with dark. You're one of the hands now. Don't ask which.",
    "The cost is that you keep nothing. Whatever you hold, you'll let go. Whatever you touch goes quiet. Put a name in the bowl. It won't keep."
   ]
+ },
+ "wearing": {
+  "ossumancer": "Past the glass the iron is waiting, black and dull, with bone set into it. Brothers' bones, each cut with a number. The helm rises to a point like a held breath, and a pale plume stands up out of it. You'll come out of the mouth already wearing it, and you'll think you always were. Count the ribs on the plate. Nine a side. Don't count the extra.",
+  "animancer": "A coat is waiting past the glass, slate-dark and hooded, hung with coins and charms and little hollowed mirrors. Every circle that stopped covering its glass sewed a piece onto it. Look down at it when you come out and you'll see your own face, many times over. Some of them won't be yours.",
+  "hemomancer": "The hood is on the far side, and the robe the processions leave on its peg in the crypt, and the welts that come with them, already healed. You'll step out wearing all of it. Nobody cut it to fit you. It fits anyway. Blood remembers a shape.",
+  "miasmancer": "Past the glass, a wide straw hat and a pale robe, sleeves bound back with cord, the faded vermilion beneath, paper streamers at the belt, and half a lacquer mask, cracked. And the fan. The cracked half is the half that breathes.",
+  "monk": "Nothing is waiting for you past the glass. A robe the colour of ash, a shawl the colour of old blood, a bowl, bare feet, small bells on a cord. That is less than nothing, and it will weigh more than iron. The bells ring a moment after you've gone."
  },
  "calling_name": {
   "ossumancer": "The Ossuarch",
