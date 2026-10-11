@@ -1553,18 +1553,20 @@ def mouth_teeth(c, s_, n_, H, out, seed=91):
             pts.append(at(pu, pz, 0.05 + 0.08 * (1 - f)))
             rad.append(max(0.015, r * (1.0 - f) ** 0.9 * (1.0 + rnd.uniform(-0.12, 0.12))))
         P.tube(name, pts, rad, "carved", rnd.choice((4, 5, 5, 6)))
+    # (Derek, 2026-10-11: "Remove the teeth from the mouth I don't like them": the teeth are not built; the runes stay)
+    TEETH = False
     # the upper teeth: down the sides from the spring, and over the curve, all pointing into the mouth
     n_t = 0
     k = 0
     zz = zb + 0.9
-    while zz < zs:                                           # down the sides
+    while TEETH and zz < zs:                                 # down the sides
         for side in (-1, 1):
             if rnd.random() < 0.85:
                 ln = rnd.uniform(0.3, 0.7) * (0.45 if rnd.random() < 0.2 else 1.0)
                 tooth("tooth%d" % n_t, side * hw, zz, -side * 1.0, rnd.uniform(-0.35, 0.05), ln, rnd.uniform(0.12, 0.19))
                 n_t += 1
         zz += rnd.uniform(0.32, 0.46)
-    for i in range(1, 15):                                   # over the curve
+    for i in (range(1, 15) if TEETH else ()):                # over the curve
         a = math.pi - math.pi * i / 15 + rnd.uniform(-0.04, 0.04)
         u, z = math.cos(a) * hw, zs + math.sin(a) * rise
         du, dz = -math.cos(a) * 0.35, -1.0
@@ -1574,7 +1576,7 @@ def mouth_teeth(c, s_, n_, H, out, seed=91):
         tooth("tooth%d" % n_t, u, z, du / dl, dz / dl, ln, rnd.uniform(0.14, 0.22))
         n_t += 1
     # the lower teeth: at the corners only, the middle ones worn to stumps and then to nothing by the feet
-    for side in (-1, 1):
+    for side in ((-1, 1) if TEETH else ()):
         for j in range(3):
             u = side * (hw - 0.2 - j * 0.38)
             worn = j == 2
