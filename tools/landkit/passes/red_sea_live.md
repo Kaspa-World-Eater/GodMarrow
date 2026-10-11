@@ -48,7 +48,7 @@ Line by line:
 
 ## Pass 2 (2026-10-10)
 
-(below)
+
 - No sun glints (the dawn is overcast): the swells' backs take the grey dome's sheen, their faces go dark.
 - The foam rebuilt as chapter 13 has it: a mat laid along the break, lumpy, its tone from its own small relief;
   holes punched in it that grow and stretch along the drift until it is lace of holes, then scraps, then gone; its ramp

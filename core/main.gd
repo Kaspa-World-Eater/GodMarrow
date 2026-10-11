@@ -186,6 +186,9 @@ func enter(zid: String, from: String) -> void:
 		var lf = load("res://world/live_flames.gd").new()
 		zone.add_child(lf)
 		lf.bind(zone)
+	if zone.d.has("onyx"):
+		# the onyx in the colossal face's mouth, live: it shows the one who looks in it, wrong (world/onyx_mirror.gd)
+		zone.sorted.add_child(load("res://world/onyx_mirror.gd").new(zone, self))
 	if args.has("at") and from == "":   # tests: the pilgrim stood at x,y (zone tiles), for captures
 		var p := String(args["at"]).split(",")
 		at = Vector2(float(p[0]), float(p[1]))

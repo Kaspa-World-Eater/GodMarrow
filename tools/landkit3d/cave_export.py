@@ -243,6 +243,15 @@ def main():
     sx0, sy0 = zone_of(CV.STAIR[0], CV.STAIR[2])
     sx1, sy1 = zone_of(CV.STAIR[1], CV.STAIR[3])
     N["stairs"] = [dict(x0=sx0, x1=sx1, y0=sy0, y1=sy1, steps=CV.STEPS, z0=0.0, z1=CV.FLOOR_HALL)]
+    # the onyx in the colossal face's mouth (Derek, 2026-10-10: "put a black onyx mirror in the mouth that shows a weird
+    # distorted reflection"): its outline (zone tiles and height in yards) and the way it faces, for the game's live
+    # mirror (world/onyx_mirror.gd); the same archway cave3d.throne() cut and filled
+    ofx, ofy, onx, ony = CV._face_span()
+    oH = 10.0
+    ocz = CV.FLOOR_HALL + 1.4 - CV.ARCH_BOT * 0.5 * oH - 0.1
+    opts = CV.arch_path((ofx, ofy, ocz), (-ony, onx), (onx, ony), oH, 0.0, 1.7)
+    N["onyx"] = dict(pts=[[round(a, 3) for a in zone_of(x, y)] + [round(float(z), 3)] for x, y, z in opts],
+                     n=[round(onx, 4), round(ony, 4)])
     # the pool, alive in the game (Derek, 2026-10-10: the blood "moves chunky", the drips' ripples "are frozen", "depth to
     # the pool so we sink when we go in or out", "ripples in the blood when we step in it"): its heart and shore (the
     # wading depth: the surface over the floor, deepest at the heart, nothing past the shore), and where the blood out of

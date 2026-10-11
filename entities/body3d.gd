@@ -126,6 +126,40 @@ func _init(scene_path: String) -> void:
 	pic.material = m
 	add_child(pic)
 
+## the body as a mirror standing on the ground would show it (world/onyx_mirror.gd): a second camera in the same little
+## world, the main one reflected in the mirror's plane (its normal n on the ground, in tiles), its x turned back to keep
+## it right-handed; so its picture is the true reflection flipped left for right, which the mirror flips back. Off when
+## the body is far from any mirror (it costs a second render).
+var mvp: SubViewport
+var _mcam: Camera3D
+
+func mirror_view(on: bool, n: Vector2 = Vector2.ZERO) -> Texture2D:
+	if not on:
+		if mvp:
+			mvp.render_target_update_mode = SubViewport.UPDATE_DISABLED
+		return null
+	if mvp == null:
+		mvp = SubViewport.new()
+		mvp.size = Vector2i(FRAME, FRAME)
+		mvp.transparent_bg = true
+		mvp.msaa_3d = Viewport.MSAA_DISABLED
+		mvp.world_3d = vp.find_world_3d()
+		add_child(mvp)
+		_mcam = Camera3D.new()
+		_mcam.projection = Camera3D.PROJECTION_ORTHOGONAL
+		_mcam.size = FRAME / PX_M
+		_mcam.near = 0.1
+		_mcam.far = 40.0
+		mvp.add_child(_mcam)
+		_mcam.current = true
+	mvp.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	var cam: Camera3D = vp.get_camera_3d()
+	var m := Vector3((n.x - n.y) / sqrt(2.0), 0.0, (n.x + n.y) / sqrt(2.0)).normalized()
+	var R := Basis(Vector3(1, 0, 0) - 2.0 * m.x * m, Vector3(0, 1, 0) - 2.0 * m.y * m, Vector3(0, 0, 1) - 2.0 * m.z * m)
+	var b := cam.transform.basis
+	_mcam.transform = Transform3D(Basis(-(R * b.x), R * b.y, R * b.z), R * cam.transform.origin)
+	return mvp.get_texture()
+
 ## play a clip, blended from the last over `blend` seconds
 func play(c: String, blend: float = 0.25, speed: float = 1.0) -> void:
 	if anim == null or not anim.has_animation(c):

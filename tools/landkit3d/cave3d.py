@@ -455,6 +455,10 @@ def bleed(name, c, nrm, H, kind, seed=0, wscale=0.55):
     elif kind == "orcus":
         srcs += [(-0.36, -0.4, 1.0), (0.36, -0.4, 1.0)]
     r0 = 0.022 * H                                                        # thick enough to read on the firelit stone
+    if kind == "orcus":
+        # the colossal face's runs scaled to it read as pipes beside its mouth (Derek, 2026-10-10: "Get rid of the
+        # weird pipe thing around the mouth"): trickles, not tubes
+        r0 = 0.0075 * H
     for q, (X0, Y0, w) in enumerate(srcs):
         if depth(X0, Y0) < -0.12:
             continue
@@ -965,7 +969,7 @@ def throne():
     fc = (fx, fy, cz)
     outline = arch_path(fc, (sx, sy), (nx, ny), H, 0.0, 1.7)
     P.poly("voidmirror", outline, [tuple(range(len(outline)))], "voidmirror")
-    onyx_arch_frame(fc, (sx, sy), (nx, ny), H, 1.78)
+    mouth_teeth(fc, (sx, sy), (nx, ny), H, 1.78)
     mc = (fx + nx * 1.7, fy + ny * 1.7, cz + (ARCH_BOT + ARCH_SPRING) * 0.25 * H)
     for k, (cx_, cy_, cz_) in enumerate(THRONE_C):
         P.cylinder("tcandle%d" % k, (cx_, cy_, cz_ - 0.12), 0.06, 0.14, "bone", sides=6)
@@ -1518,6 +1522,86 @@ def arch_path(c, s_, n_, H, off, out, n=64):
     for i in range(1, k_side + 1):
         pts.append((hw, zs - (zs - zb) * i / k_side))
     return [(c[0] + sx * u + nx * out, c[1] + sy * u + ny * out, z) for u, z in pts]
+
+
+def mouth_teeth(c, s_, n_, H, out, seed=91):
+    """the colossal face's mouth, with the onyx in it (Derek, 2026-10-10: "Get rid of the weird pipe thing around the
+    mouth, maybe ad some jagged stone teeth or runes or something"; "The mirror should be in the mouth"; the old frame's
+    round mouldings read as pipes): jagged teeth of the face's own stone hanging from the arch's curve and down its
+    sides, each its own length and lean, some snapped short; lower teeth rising from the sill at the corners, worn away
+    in the middle where everyone before walked into the glass; and round the lips, outside the teeth, the builders'
+    runes cut into the stone"""
+    rnd = random.Random(seed)
+    sx, sy = s_
+    nx, ny = n_
+    hw = ARCH_HW * 0.55 * H
+    zb = c[2] + ARCH_BOT * 0.5 * H
+    zs = c[2] + ARCH_SPRING * 0.5 * H
+    rise = ARCH_RISE * 0.5 * H
+    cx, cy = c[0] + nx * out, c[1] + ny * out
+
+    def at(u, z, o=0.0):
+        return (cx + sx * u + nx * o, cy + sy * u + ny * o, z)
+
+    def tooth(name, u, z, du, dz, ln, r):
+        """a tooth from (u, z) on the lip pointing (du, dz) in the face's plane: a faceted, chipped, tapering prong"""
+        bend = rnd.uniform(-0.12, 0.12)
+        pts, rad = [], []
+        for k, f in enumerate((0.0, 0.35, 0.7, 1.0)):
+            pu = u + du * ln * f + bend * f * f * (-dz)
+            pz = z + dz * ln * f + bend * f * f * du
+            pts.append(at(pu, pz, 0.05 + 0.08 * (1 - f)))
+            rad.append(max(0.015, r * (1.0 - f) ** 0.9 * (1.0 + rnd.uniform(-0.12, 0.12))))
+        P.tube(name, pts, rad, "carved", rnd.choice((4, 5, 5, 6)))
+    # the upper teeth: down the sides from the spring, and over the curve, all pointing into the mouth
+    n_t = 0
+    k = 0
+    zz = zb + 0.9
+    while zz < zs:                                           # down the sides
+        for side in (-1, 1):
+            if rnd.random() < 0.85:
+                ln = rnd.uniform(0.3, 0.7) * (0.45 if rnd.random() < 0.2 else 1.0)
+                tooth("tooth%d" % n_t, side * hw, zz, -side * 1.0, rnd.uniform(-0.35, 0.05), ln, rnd.uniform(0.12, 0.19))
+                n_t += 1
+        zz += rnd.uniform(0.32, 0.46)
+    for i in range(1, 15):                                   # over the curve
+        a = math.pi - math.pi * i / 15 + rnd.uniform(-0.04, 0.04)
+        u, z = math.cos(a) * hw, zs + math.sin(a) * rise
+        du, dz = -math.cos(a) * 0.35, -1.0
+        dl = math.hypot(du, dz)
+        long_ = 1.0 - abs(math.cos(a)) * 0.5                 # longest at the crown, the fangs either side of it
+        ln = rnd.uniform(0.45, 0.95) * long_ * (0.4 if rnd.random() < 0.2 else 1.0)
+        tooth("tooth%d" % n_t, u, z, du / dl, dz / dl, ln, rnd.uniform(0.14, 0.22))
+        n_t += 1
+    # the lower teeth: at the corners only, the middle ones worn to stumps and then to nothing by the feet
+    for side in (-1, 1):
+        for j in range(3):
+            u = side * (hw - 0.2 - j * 0.38)
+            worn = j == 2
+            tooth("tooth%d" % n_t, u, zb, rnd.uniform(-0.15, 0.15), 1.0, rnd.uniform(0.15, 0.25) if worn else rnd.uniform(0.35, 0.6),
+                  rnd.uniform(0.13, 0.2))
+            n_t += 1
+    # the runes round the lips, cut into the stone outside the teeth: the old script's marks, dark in their grooves
+    mid = arch_path(c, s_, n_, H, 0.5, out - 0.01, n=110)
+    mid = [p for p in mid if p[2] > zs - 0.4]                 # round the upper lip only (down the sides they smeared)
+    i = 2
+    m = 0
+    while i < len(mid) - 2:
+        p0, p1 = mid[i - 1], mid[i + 1]
+        tan = (p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2])
+        tl = math.sqrt(sum(t * t for t in tan)) + 1e-9
+        tan = tuple(t / tl for t in tan)
+        up = (-tan[2] * ny, tan[2] * nx, tan[0] * ny - tan[1] * nx)
+        ul = math.sqrt(sum(t * t for t in up)) + 1e-9
+        up = tuple(t / ul for t in up)
+        glyph = SCRIPT[rnd.randrange(len(SCRIPT))]
+        w, h = 0.2, 0.3
+        for q, (u0, v0, u1, v1) in enumerate(glyph):
+            a = tuple(mid[i][j] + tan[j] * (u0 - 0.5) * w + up[j] * (v0 - 0.5) * h for j in range(3))
+            b = tuple(mid[i][j] + tan[j] * (u1 - 0.5) * w + up[j] * (v1 - 0.5) * h for j in range(3))
+            P.tube("mouth_rune%d_%d" % (m, q), [a, b], [0.03, 0.03], "basalt", 4)
+        m += 1
+        i += rnd.randint(7, 11)
 
 
 def onyx_arch_frame(c, s_, n_, H, out, seed=77):
